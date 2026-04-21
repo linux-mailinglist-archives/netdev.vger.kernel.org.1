@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-280222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280221-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GHW4GW7R52k4BAIAu9opvQ
-	(envelope-from <netdev+bounces-280222-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 21:35:10 +0200
+	id sH68MinR52k4BAIAu9opvQ
+	(envelope-from <netdev+bounces-280221-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 21:34:01 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C095D43EFFC
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 21:35:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A89643EFC0
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 21:34:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A8E603071852
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 19:31:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A28D8305C629
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 19:31:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C6CB39BFEA;
-	Tue, 21 Apr 2026 19:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6640B3DB646;
+	Tue, 21 Apr 2026 19:31:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bJF4WdD/"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="s0MsWJ41"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB3D351C03;
-	Tue, 21 Apr 2026 19:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE833DCDBC;
+	Tue, 21 Apr 2026 19:31:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776799897; cv=none; b=crXTk5PVJ+jiAQjCKhG8V24JqtBV63OMCVhfa3VgvQuzP9TZWh464nEadiS3as+Zj/3szp+nKGX4iJsylH6eI2Uc6jkXyEaZcHTW4Ps+ne0TlLdFrpfOzs8KJwKYeFLOBw7rov9ndE8i2hxkLmLOaO8p0h40JXDdJEJIysqWeKk=
+	t=1776799893; cv=none; b=sQTd5/OQHxpcVucxVaEl90o6h+A+Nh6FIqT33UBEeJ6AW0DGGLG9/Gk9pKUkDupqfhNdPee06Vc8xr4JBZ8AwKjGHbnHRpjNhqTjx+gbvwuFQ1QdCd3kINPdXQws3ltCsYvnzmbqQpXNe/8qQ1WRKBqEHSodVmjMusRFqejqQaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776799897; c=relaxed/simple;
-	bh=7WxzJrU9WgaTu/tH5Gnb4WEdkRvE+e/Wn7qKm2ahc4g=;
+	s=arc-20240116; t=1776799893; c=relaxed/simple;
+	bh=UyaXHhWsVbEnJzFhshGS5ImAdmwEPyKQ5XTLvu4rCrc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=pgIeTXMl3vcrEBjQEVU0LDpaUCmiokLB1xFvi04c6A+BoUIrnNnquOF0DN+AEnFolJrNxJ9HGfve7GCfGCL2+RuRzFE3TkCfNaefYlbLRfiB5ecoJuGexLouuZl59mbV+Bjbo29sTxPid1ag17hDf5jPbCaxijXspbmw42QOtYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bJF4WdD/; arc=none smtp.client-ip=156.67.10.101
+	 In-Reply-To:To:Cc; b=YJjYTPqyDppaDyy9zJl7OKP4YYH4KoVCEkCrnEBKpso61JG6aP/5qqvWunlXY8P1DXYfmCfWbadkOSiVcHCNr2IcwOjP1TJ8/mtSaqnu0szLkabJjN4rvIub2h0QnmcGF67BOm1rIQl3xlUgz8dIlF97XFIpZSqOwYDagEDvcTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=s0MsWJ41; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -39,18 +39,18 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:From:
 	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
 	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=OuenODQgi/IVQamyhIw5WSD4NPZBSp8tkODkAxLuMe0=; b=bJ
-	F4WdD/HcG+grXEpQcKWqUx43MzV7XyL7+/0VkycOcsGz5+ederOu077cGK0NdsMD+wFIhh+d5W0gl
-	3tw23WkzHZMtXM77ZKND6gI0e5ThM0TVAGz5BR//DzR/E0a8e3MAlFVkB7B/IvPOsXraabFj577IF
-	HWdGl+Rfm2e/DSk=;
+	In-Reply-To:References; bh=BxBYSj1YTrss5QpwzRXm/Y7o8QQj6x0oUHoFLHVKQ6o=; b=s0
+	MsWJ41B53ktZTft3ym2XHnGVoLF5RQ084groAoyx5uNQwBeJSwOVG1GTzew5qRTTiDirU0HPXCf8O
+	8OO4w6hhRsjjMlm1x8dIBVwhTysw7SGPNrYJX5FQ4BrWr/m9Kn5M+v0PBkKesH53pxdMpV+m1rtoG
+	DFllB01drNA3FVI=;
 Received: from c-66-41-74-139.hsd1.mn.comcast.net ([66.41.74.139] helo=thinkpad.home.lunn.ch)
 	by vps0.lunn.ch with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1wFGoZ-00GwVc-FH; Tue, 21 Apr 2026 21:31:19 +0200
+	id 1wFGoc-00GwVc-3g; Tue, 21 Apr 2026 21:31:22 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-Date: Tue, 21 Apr 2026 14:31:04 -0500
-Subject: [PATCH net 01/18] drivers: net: 3com: 3c509: Remove this driver
+Date: Tue, 21 Apr 2026 14:31:05 -0500
+Subject: [PATCH net 02/18] drivers: net: 3com: 3c515: Remove this driver
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,7 +59,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260421-v7-0-0-net-next-driver-removal-v1-v1-1-69517c689d1f@lunn.ch>
+Message-Id: <20260421-v7-0-0-net-next-driver-removal-v1-v1-2-69517c689d1f@lunn.ch>
 References: <20260421-v7-0-0-net-next-driver-removal-v1-v1-0-69517c689d1f@lunn.ch>
 In-Reply-To: <20260421-v7-0-0-net-next-driver-removal-v1-v1-0-69517c689d1f@lunn.ch>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -70,20 +70,20 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
 Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  linux-doc@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=43916; i=andrew@lunn.ch;
- h=from:subject:message-id; bh=7WxzJrU9WgaTu/tH5Gnb4WEdkRvE+e/Wn7qKm2ahc4g=;
- b=owEBbQKS/ZANAwAIAea/DcumaUyEAcsmYgBp59CB/WEO90/8TElZGnsSuFvNxPGKmbQAKaK7F
- jG4HCK+bZqJAjMEAAEIAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCaefQgQAKCRDmvw3LpmlM
- hNrhD/wLXhZASS35j81OgKkDlA+TQ9R0keXDbGjEAUs5tcjzOIVTRi9JKZwdsptKTldd3o3YjK4
- 8ruKshrHqxFix2jsku0BNgwlkGH00m459rpq0jrbmmLu0Yg3i/TEMocw+bmkIBxMAUfV9G0fngV
- Zj1c0Gun/348nJ5KeGwBgyy+mZ30AYQNAMvvQVQ9IgXd0gxDNFNa0PkTFvHILpcJkM5A0H+1mKr
- 0dMhXUmBPkTPkzF+lmAqGaMkVxUePDy/IoV1d6ZiI76JXc+R4x/3Vn9cJrdAl56KdRFS5+g0AgN
- PbfBG6tcu2CNf/mTyIGg594DxTd5a1sDYgjk/KwfZTUqu53KEMI5a9gfhgl8NM6q51e0UXn0ZVA
- oRFHxdw6KWi2xEnX0ko4qU6XPTCpJ0YlhQMMMIKJoAhM+41ZQeiQ9nLJCN86YD8V5zEsiG7Ev0F
- EFOmUYPH2Y84PYwcb/3v/n4sNAdwBZzUVEUvcM8oKP18C7HmlczamS8ZyOFUaaC/dZeG9mi8dlJ
- dZ8HYzvFCpdfFJTdhRFVhYoQLSV9XtKWtWOSuqefp+u+TtZgqK7Fxqy1ZwhNVeCt6sKKJIhTcBJ
- amsxyr82nKLQB4TEBjqTn8SirSFMNEEG4CdHYZ1S6sIYzCx2BDUgkripyKvu8yaTWwsl2m+CXNe
- 13M8wjpBnFFq06w==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=54104; i=andrew@lunn.ch;
+ h=from:subject:message-id; bh=UyaXHhWsVbEnJzFhshGS5ImAdmwEPyKQ5XTLvu4rCrc=;
+ b=owEBbQKS/ZANAwAIAea/DcumaUyEAcsmYgBp59CBuv+QrExCaqwAkRsuTXnVVpFD/4LTazLjI
+ JrNCe7efZiJAjMEAAEIAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCaefQgQAKCRDmvw3LpmlM
+ hHpZD/93V8R0Oie0hgA8B3+SaFlZdpsD1LRgnULkvy/s6wuEDPltEVgD72wYcs1/UNW70NsXWOb
+ X2nko609lFAijOJz0htxEpjPMQfvbXqtwgPhS8pRuTgku1PC6dtVZetkUCfLMjrAB5mE4rbRsWb
+ SBFQfIqhvqtMgm7NJyl/PbkrGGwLoj3/XVezIXwxXpoKBD9v64A8Xw2dxc4VazXkJAovRMLDUF+
+ DHC4oCPN5eqks//5+pjuFUueQ25ia1JlYzTFj0k+37b46W+W7ES+2Dtq4nhXmWJ8W32fsR7+4kr
+ WmNVgNMDcwMTPEZxy546DUFreCOpV1vlvhNLR43EgPfz4ELHTxcT7+W3xFDI7Xc+wSnXV55yOK/
+ t+7G6E51WRHqdK8dDMX2PoYTby1Y1yfY6vMY1WJH4qLOi7oHYFzJ3ndEc0s0B44lzSq6SXVChWo
+ c4MJiYo8/HbY3ZSQawIkx2XJK6QSU8RloVvbOKsZ2UtmCLDY2PaTsUgII+/RNeOxNCBN6FSFYvz
+ MP4HMHX4mOW4CebfJOBodF6Nrm8euT7SBVUPvVBQRJxVHLksOlgiSpHZomLt+I3AZXz834tC6YW
+ G2T0G4J/V2q1/jkKa1a1E2JpBENvfN1SzggP5Vvuif0KCeWbrfoVqAsru1ZIA2m4pipv+HzwWCr
+ RUmpf/6XS/4BG0w==
 X-Developer-Key: i=andrew@lunn.ch; a=openpgp;
  fpr=61FB1025CB53263916F9E1B7E6BF0DCBA6694C84
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -96,7 +96,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280222-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280221-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -112,1226 +112,1444 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[wild-wind.fr.eu.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,farfalle.com:email,commfireservices.com:email,scyld.com:url,scyld.com:email,lunn.ch:email,lunn.ch:dkim,lunn.ch:mid,pobox.com:email,rainbow-software.org:email,linuxpower.ca:email]
-X-Rspamd-Queue-Id: C095D43EFFC
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ukuu.org.uk:email,lunn.ch:email,lunn.ch:dkim,lunn.ch:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,scyld.com:email]
+X-Rspamd-Queue-Id: 0A89643EFC0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The 3c509 was written by Donald Becker between 1993-2000. It is an ISA
+The 3c515 was written by Donald Becker between 1997-1998. It is an ISA
 device, so unlikely to be used with modern kernels.
 
 Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 ---
- drivers/net/ethernet/3com/3c509.c  | 1448 ------------------------------------
- drivers/net/ethernet/3com/Kconfig  |   14 -
+ drivers/net/ethernet/3com/3c515.c  | 1566 ------------------------------------
+ drivers/net/ethernet/3com/Kconfig  |   11 -
  drivers/net/ethernet/3com/Makefile |    1 -
- 3 files changed, 1463 deletions(-)
+ 3 files changed, 1578 deletions(-)
 
-diff --git a/drivers/net/ethernet/3com/3c509.c b/drivers/net/ethernet/3com/3c509.c
+diff --git a/drivers/net/ethernet/3com/3c515.c b/drivers/net/ethernet/3com/3c515.c
 deleted file mode 100644
-index fb68339e1511..000000000000
---- a/drivers/net/ethernet/3com/3c509.c
+index 2227c83a4862..000000000000
+--- a/drivers/net/ethernet/3com/3c515.c
 +++ /dev/null
-@@ -1,1448 +0,0 @@
--/* 3c509.c: A 3c509 EtherLink3 ethernet driver for linux. */
+@@ -1,1566 +0,0 @@
 -/*
--	Written 1993-2000 by Donald Becker.
+-	Written 1997-1998 by Donald Becker.
 -
--	Copyright 1994-2000 by Donald Becker.
--	Copyright 1993 United States Government as represented by the
--	Director, National Security Agency.	 This software may be used and
--	distributed according to the terms of the GNU General Public License,
--	incorporated herein by reference.
+-	This software may be used and distributed according to the terms
+-	of the GNU General Public License, incorporated herein by reference.
 -
--	This driver is for the 3Com EtherLinkIII series.
+-	This driver is for the 3Com ISA EtherLink XL "Corkscrew" 3c515 ethercard.
 -
 -	The author may be reached as becker@scyld.com, or C/O
 -	Scyld Computing Corporation
 -	410 Severn Ave., Suite 210
 -	Annapolis MD 21403
 -
--	Known limitations:
--	Because of the way 3c509 ISA detection works it's difficult to predict
--	a priori which of several ISA-mode cards will be detected first.
 -
--	This driver does not use predictive interrupt mode, resulting in higher
--	packet latency but lower overhead.  If interrupts are disabled for an
--	unusually long time it could also result in missed packets, but in
--	practice this rarely happens.
+-	2000/2/2- Added support for kernel-level ISAPnP
+-		by Stephen Frost <sfrost@snowman.net> and Alessandro Zummo
+-	Cleaned up for 2.3.x/softnet by Jeff Garzik and Alan Cox.
 -
+-	2001/11/17 - Added ethtool support (jgarzik)
 -
--	FIXES:
--		Alan Cox:       Removed the 'Unexpected interrupt' bug.
--		Michael Meskes:	Upgraded to Donald Becker's version 1.07.
--		Alan Cox:	Increased the eeprom delay. Regardless of
--				what the docs say some people definitely
--				get problems with lower (but in card spec)
--				delays
--		v1.10 4/21/97 Fixed module code so that multiple cards may be detected,
--				other cleanups.  -djb
--		Andrea Arcangeli:	Upgraded to Donald Becker's version 1.12.
--		Rick Payne:	Fixed SMP race condition
--		v1.13 9/8/97 Made 'max_interrupt_work' an insmod-settable variable -djb
--		v1.14 10/15/97 Avoided waiting..discard message for fast machines -djb
--		v1.15 1/31/98 Faster recovery for Tx errors. -djb
--		v1.16 2/3/98 Different ID port handling to avoid sound cards. -djb
--		v1.18 12Mar2001 Andrew Morton
--			- Avoid bogus detect of 3c590's (Andrzej Krzysztofowicz)
--			- Reviewed against 1.18 from scyld.com
--		v1.18a 17Nov2001 Jeff Garzik <jgarzik@pobox.com>
--			- ethtool support
--		v1.18b 1Mar2002 Zwane Mwaikambo <zwane@commfireservices.com>
--			- Power Management support
--		v1.18c 1Mar2002 David Ruggiero <jdr@farfalle.com>
--			- Full duplex support
--		v1.19  16Oct2002 Zwane Mwaikambo <zwane@linuxpower.ca>
--			- Additional ethtool features
--		v1.19a 28Oct2002 Davud Ruggiero <jdr@farfalle.com>
--			- Increase *read_eeprom udelay to workaround oops with 2 cards.
--		v1.19b 08Nov2002 Marc Zyngier <maz@wild-wind.fr.eu.org>
--			- Introduce driver model for EISA cards.
--		v1.20  04Feb2008 Ondrej Zary <linux@rainbow-software.org>
--			- convert to isa_driver and pnp_driver and some cleanups
+-	2002/10/28 - Locking updates for 2.5 (alan@lxorguk.ukuu.org.uk)
+-
 -*/
 -
--#define DRV_NAME	"3c509"
+-#define DRV_NAME		"3c515"
+-
+-#define CORKSCREW 1
+-
+-/* "Knobs" that adjust features and parameters. */
+-/* Set the copy breakpoint for the copy-only-tiny-frames scheme.
+-   Setting to > 1512 effectively disables this feature. */
+-static int rx_copybreak = 200;
+-
+-/* Maximum events (Rx packets, etc.) to handle at each interrupt. */
+-static int max_interrupt_work = 20;
+-
+-/* Enable the automatic media selection code -- usually set. */
+-#define AUTOMEDIA 1
+-
+-/* Allow the use of fragment bus master transfers instead of only
+-   programmed-I/O for Vortex cards.  Full-bus-master transfers are always
+-   enabled by default on Boomerang cards.  If VORTEX_BUS_MASTER is defined,
+-   the feature may be turned on using 'options'. */
+-#define VORTEX_BUS_MASTER
 -
 -/* A few values that may be tweaked. */
--
--/* Time in jiffies before concluding the transmitter is hung. */
--#define TX_TIMEOUT  (400*HZ/1000)
+-/* Keep the ring sizes a power of two for efficiency. */
+-#define TX_RING_SIZE	16
+-#define RX_RING_SIZE	16
+-#define PKT_BUF_SZ		1536	/* Size of each temporary Rx buffer. */
 -
 -#include <linux/module.h>
--#include <linux/isa.h>
--#include <linux/pnp.h>
+-#include <linux/isapnp.h>
+-#include <linux/kernel.h>
+-#include <linux/netdevice.h>
 -#include <linux/string.h>
--#include <linux/interrupt.h>
 -#include <linux/errno.h>
 -#include <linux/in.h>
 -#include <linux/ioport.h>
--#include <linux/init.h>
--#include <linux/netdevice.h>
--#include <linux/etherdevice.h>
--#include <linux/pm.h>
 -#include <linux/skbuff.h>
--#include <linux/delay.h>	/* for udelay() */
--#include <linux/spinlock.h>
+-#include <linux/etherdevice.h>
+-#include <linux/interrupt.h>
+-#include <linux/timer.h>
 -#include <linux/ethtool.h>
--#include <linux/device.h>
--#include <linux/eisa.h>
 -#include <linux/bitops.h>
--
 -#include <linux/uaccess.h>
--#include <asm/io.h>
--#include <asm/irq.h>
 -
--#ifdef EL3_DEBUG
--static int el3_debug = EL3_DEBUG;
+-#include <net/Space.h>
+-
+-#include <asm/io.h>
+-#include <asm/dma.h>
+-
+-#define NEW_MULTICAST
+-#include <linux/delay.h>
+-
+-#define MAX_UNITS 8
+-
+-MODULE_AUTHOR("Donald Becker <becker@scyld.com>");
+-MODULE_DESCRIPTION("3Com 3c515 Corkscrew driver");
+-MODULE_LICENSE("GPL");
+-
+-/* "Knobs" for adjusting internal parameters. */
+-/* Put out somewhat more debugging messages. (0 - no msg, 1 minimal msgs). */
+-#define DRIVER_DEBUG 1
+-/* Some values here only for performance evaluation and path-coverage
+-   debugging. */
+-static int rx_nocopy, rx_copy, queued_packet;
+-
+-/* Number of times to check to see if the Tx FIFO has space, used in some
+-   limited cases. */
+-#define WAIT_TX_AVAIL 200
+-
+-/* Operational parameter that usually are not changed. */
+-#define TX_TIMEOUT  ((4*HZ)/10)	/* Time in jiffies before concluding Tx hung */
+-
+-/* The size here is somewhat misleading: the Corkscrew also uses the ISA
+-   aliased registers at <base>+0x400.
+-   */
+-#define CORKSCREW_TOTAL_SIZE 0x20
+-
+-#ifdef DRIVER_DEBUG
+-static int corkscrew_debug = DRIVER_DEBUG;
 -#else
--static int el3_debug = 2;
+-static int corkscrew_debug = 1;
 -#endif
 -
--/* Used to do a global count of all the cards in the system.  Must be
-- * a global variable so that the eisa probe routines can increment
-- * it */
--static int el3_cards = 0;
--#define EL3_MAX_CARDS 8
+-#define CORKSCREW_ID 10
 -
--/* To minimize the size of the driver source I only define operating
--   constants if they are used several times.  You'll need the manual
--   anyway if you want to understand driver details. */
--/* Offsets from base I/O address. */
--#define EL3_DATA 0x00
+-/*
+-				Theory of Operation
+-
+-I. Board Compatibility
+-
+-This device driver is designed for the 3Com 3c515 ISA Fast EtherLink XL,
+-3Com's ISA bus adapter for Fast Ethernet.  Due to the unique I/O port layout,
+-it's not practical to integrate this driver with the other EtherLink drivers.
+-
+-II. Board-specific settings
+-
+-The Corkscrew has an EEPROM for configuration, but no special settings are
+-needed for Linux.
+-
+-III. Driver operation
+-
+-The 3c515 series use an interface that's very similar to the 3c900 "Boomerang"
+-PCI cards, with the bus master interface extensively modified to work with
+-the ISA bus.
+-
+-The card is capable of full-bus-master transfers with separate
+-lists of transmit and receive descriptors, similar to the AMD LANCE/PCnet,
+-DEC Tulip and Intel Speedo3.
+-
+-This driver uses a "RX_COPYBREAK" scheme rather than a fixed intermediate
+-receive buffer.  This scheme allocates full-sized skbuffs as receive
+-buffers.  The value RX_COPYBREAK is used as the copying breakpoint: it is
+-chosen to trade-off the memory wasted by passing the full-sized skbuff to
+-the queue layer for all frames vs. the copying cost of copying a frame to a
+-correctly-sized skbuff.
+-
+-
+-IIIC. Synchronization
+-The driver runs as two independent, single-threaded flows of control.  One
+-is the send-packet routine, which enforces single-threaded use by the netif
+-layer.  The other thread is the interrupt handler, which is single
+-threaded by the hardware and other software.
+-
+-IV. Notes
+-
+-Thanks to Terry Murphy of 3Com for providing documentation and a development
+-board.
+-
+-The names "Vortex", "Boomerang" and "Corkscrew" are the internal 3Com
+-project names.  I use these names to eliminate confusion -- 3Com product
+-numbers and names are very similar and often confused.
+-
+-The new chips support both ethernet (1.5K) and FDDI (4.5K) frame sizes!
+-This driver only supports ethernet frames because of the recent MTU limit
+-of 1.5K, but the changes to support 4.5K are minimal.
+-*/
+-
+-/* Operational definitions.
+-   These are not used by other compilation units and thus are not
+-   exported in a ".h" file.
+-
+-   First the windows.  There are eight register windows, with the command
+-   and status registers available in each.
+-   */
+-#define EL3WINDOW(win_num) outw(SelectWindow + (win_num), ioaddr + EL3_CMD)
 -#define EL3_CMD 0x0e
 -#define EL3_STATUS 0x0e
--#define	EEPROM_READ 0x80
--
--#define EL3_IO_EXTENT	16
--
--#define EL3WINDOW(win_num) outw(SelectWindow + (win_num), ioaddr + EL3_CMD)
--
 -
 -/* The top five bits written to EL3_CMD are a command, the lower
--   11 bits are the parameter, if applicable. */
--enum c509cmd {
--	TotalReset = 0<<11, SelectWindow = 1<<11, StartCoax = 2<<11,
--	RxDisable = 3<<11, RxEnable = 4<<11, RxReset = 5<<11, RxDiscard = 8<<11,
--	TxEnable = 9<<11, TxDisable = 10<<11, TxReset = 11<<11,
--	FakeIntr = 12<<11, AckIntr = 13<<11, SetIntrEnb = 14<<11,
--	SetStatusEnb = 15<<11, SetRxFilter = 16<<11, SetRxThreshold = 17<<11,
--	SetTxThreshold = 18<<11, SetTxStart = 19<<11, StatsEnable = 21<<11,
--	StatsDisable = 22<<11, StopCoax = 23<<11, PowerUp = 27<<11,
--	PowerDown = 28<<11, PowerAuto = 29<<11};
+-   11 bits are the parameter, if applicable.
+-   Note that 11 parameters bits was fine for ethernet, but the new chips
+-   can handle FDDI length frames (~4500 octets) and now parameters count
+-   32-bit 'Dwords' rather than octets. */
 -
--enum c509status {
--	IntLatch = 0x0001, AdapterFailure = 0x0002, TxComplete = 0x0004,
--	TxAvailable = 0x0008, RxComplete = 0x0010, RxEarly = 0x0020,
--	IntReq = 0x0040, StatsFull = 0x0080, CmdBusy = 0x1000, };
+-enum corkscrew_cmd {
+-	TotalReset = 0 << 11, SelectWindow = 1 << 11, StartCoax = 2 << 11,
+-	RxDisable = 3 << 11, RxEnable = 4 << 11, RxReset = 5 << 11,
+-	UpStall = 6 << 11, UpUnstall = (6 << 11) + 1, DownStall = (6 << 11) + 2,
+-	DownUnstall = (6 << 11) + 3, RxDiscard = 8 << 11, TxEnable = 9 << 11,
+-	TxDisable = 10 << 11, TxReset = 11 << 11, FakeIntr = 12 << 11,
+-	AckIntr = 13 << 11, SetIntrEnb = 14 << 11, SetStatusEnb = 15 << 11,
+-	SetRxFilter = 16 << 11, SetRxThreshold = 17 << 11,
+-	SetTxThreshold = 18 << 11, SetTxStart = 19 << 11, StartDMAUp = 20 << 11,
+-	StartDMADown = (20 << 11) + 1, StatsEnable = 21 << 11,
+-	StatsDisable = 22 << 11, StopCoax = 23 << 11,
+-};
 -
 -/* The SetRxFilter command accepts the following classes: */
 -enum RxFilter {
--	RxStation = 1, RxMulticast = 2, RxBroadcast = 4, RxProm = 8 };
+-	RxStation = 1, RxMulticast = 2, RxBroadcast = 4, RxProm = 8
+-};
 -
--/* Register window 1 offsets, the window used in normal operation. */
--#define TX_FIFO		0x00
--#define RX_FIFO		0x00
--#define RX_STATUS 	0x08
--#define TX_STATUS 	0x0B
--#define TX_FREE		0x0C		/* Remaining free bytes in Tx buffer. */
+-/* Bits in the general status register. */
+-enum corkscrew_status {
+-	IntLatch = 0x0001, AdapterFailure = 0x0002, TxComplete = 0x0004,
+-	TxAvailable = 0x0008, RxComplete = 0x0010, RxEarly = 0x0020,
+-	IntReq = 0x0040, StatsFull = 0x0080,
+-	DMADone = 1 << 8, DownComplete = 1 << 9, UpComplete = 1 << 10,
+-	DMAInProgress = 1 << 11,	/* DMA controller is still busy. */
+-	CmdInProgress = 1 << 12,	/* EL3_CMD is still busy. */
+-};
 -
--#define WN0_CONF_CTRL	0x04		/* Window 0: Configuration control register */
--#define WN0_ADDR_CONF	0x06		/* Window 0: Address configuration register */
--#define WN0_IRQ		0x08		/* Window 0: Set IRQ line in bits 12-15. */
--#define WN4_MEDIA	0x0A		/* Window 4: Various transcvr/media bits. */
--#define	MEDIA_TP	0x00C0		/* Enable link beat and jabber for 10baseT. */
--#define WN4_NETDIAG	0x06		/* Window 4: Net diagnostic */
--#define FD_ENABLE	0x8000		/* Enable full-duplex ("external loopback") */
+-/* Register window 1 offsets, the window used in normal operation.
+-   On the Corkscrew this window is always mapped at offsets 0x10-0x1f. */
+-enum Window1 {
+-	TX_FIFO = 0x10, RX_FIFO = 0x10, RxErrors = 0x14,
+-	RxStatus = 0x18, Timer = 0x1A, TxStatus = 0x1B,
+-	TxFree = 0x1C,		/* Remaining free bytes in Tx buffer. */
+-};
+-enum Window0 {
+-	Wn0IRQ = 0x08,
+-#if defined(CORKSCREW)
+-	Wn0EepromCmd = 0x200A,	/* Corkscrew EEPROM command register. */
+-	Wn0EepromData = 0x200C,	/* Corkscrew EEPROM results register. */
+-#else
+-	Wn0EepromCmd = 10,	/* Window 0: EEPROM command register. */
+-	Wn0EepromData = 12,	/* Window 0: EEPROM results register. */
+-#endif
+-};
+-enum Win0_EEPROM_bits {
+-	EEPROM_Read = 0x80, EEPROM_WRITE = 0x40, EEPROM_ERASE = 0xC0,
+-	EEPROM_EWENB = 0x30,	/* Enable erasing/writing for 10 msec. */
+-	EEPROM_EWDIS = 0x00,	/* Disable EWENB before 10 msec timeout. */
+-};
+-
+-/* EEPROM locations. */
+-enum eeprom_offset {
+-	PhysAddr01 = 0, PhysAddr23 = 1, PhysAddr45 = 2, ModelID = 3,
+-	EtherLink3ID = 7,
+-};
+-
+-enum Window3 {			/* Window 3: MAC/config bits. */
+-	Wn3_Config = 0, Wn3_MAC_Ctrl = 6, Wn3_Options = 8,
+-};
+-enum wn3_config {
+-	Ram_size = 7,
+-	Ram_width = 8,
+-	Ram_speed = 0x30,
+-	Rom_size = 0xc0,
+-	Ram_split_shift = 16,
+-	Ram_split = 3 << Ram_split_shift,
+-	Xcvr_shift = 20,
+-	Xcvr = 7 << Xcvr_shift,
+-	Autoselect = 0x1000000,
+-};
+-
+-enum Window4 {
+-	Wn4_NetDiag = 6, Wn4_Media = 10,	/* Window 4: Xcvr/media bits. */
+-};
+-enum Win4_Media_bits {
+-	Media_SQE = 0x0008,	/* Enable SQE error counting for AUI. */
+-	Media_10TP = 0x00C0,	/* Enable link beat and jabber for 10baseT. */
+-	Media_Lnk = 0x0080,	/* Enable just link beat for 100TX/100FX. */
+-	Media_LnkBeat = 0x0800,
+-};
+-enum Window7 {			/* Window 7: Bus Master control. */
+-	Wn7_MasterAddr = 0, Wn7_MasterLen = 6, Wn7_MasterStatus = 12,
+-};
+-
+-/* Boomerang-style bus master control registers.  Note ISA aliases! */
+-enum MasterCtrl {
+-	PktStatus = 0x400, DownListPtr = 0x404, FragAddr = 0x408, FragLen =
+-	    0x40c,
+-	TxFreeThreshold = 0x40f, UpPktStatus = 0x410, UpListPtr = 0x418,
+-};
+-
+-/* The Rx and Tx descriptor lists.
+-   Caution Alpha hackers: these types are 32 bits!  Note also the 8 byte
+-   alignment contraint on tx_ring[] and rx_ring[]. */
+-struct boom_rx_desc {
+-	u32 next;
+-	s32 status;
+-	u32 addr;
+-	s32 length;
+-};
+-
+-/* Values for the Rx status entry. */
+-enum rx_desc_status {
+-	RxDComplete = 0x00008000, RxDError = 0x4000,
+-	/* See boomerang_rx() for actual error bits */
+-};
+-
+-struct boom_tx_desc {
+-	u32 next;
+-	s32 status;
+-	u32 addr;
+-	s32 length;
+-};
+-
+-struct corkscrew_private {
+-	const char *product_name;
+-	struct list_head list;
+-	struct net_device *our_dev;
+-	/* The Rx and Tx rings are here to keep them quad-word-aligned. */
+-	struct boom_rx_desc rx_ring[RX_RING_SIZE];
+-	struct boom_tx_desc tx_ring[TX_RING_SIZE];
+-	/* The addresses of transmit- and receive-in-place skbuffs. */
+-	struct sk_buff *rx_skbuff[RX_RING_SIZE];
+-	struct sk_buff *tx_skbuff[TX_RING_SIZE];
+-	unsigned int cur_rx, cur_tx;	/* The next free ring entry */
+-	unsigned int dirty_rx, dirty_tx;/* The ring entries to be free()ed. */
+-	struct sk_buff *tx_skb;	/* Packet being eaten by bus master ctrl.  */
+-	struct timer_list timer;	/* Media selection timer. */
+-	int capabilities	;	/* Adapter capabilities word. */
+-	int options;			/* User-settable misc. driver options. */
+-	int last_rx_packets;		/* For media autoselection. */
+-	unsigned int available_media:8,	/* From Wn3_Options */
+-		media_override:3,	/* Passed-in media type. */
+-		default_media:3,	/* Read from the EEPROM. */
+-		full_duplex:1, autoselect:1, bus_master:1,	/* Vortex can only do a fragment bus-m. */
+-		full_bus_master_tx:1, full_bus_master_rx:1,	/* Boomerang  */
+-		tx_full:1;
+-	spinlock_t lock;
+-	struct device *dev;
+-};
+-
+-/* The action to take with a media selection timer tick.
+-   Note that we deviate from the 3Com order by checking 10base2 before AUI.
+- */
+-enum xcvr_types {
+-	XCVR_10baseT = 0, XCVR_AUI, XCVR_10baseTOnly, XCVR_10base2, XCVR_100baseTx,
+-	XCVR_100baseFx, XCVR_MII = 6, XCVR_Default = 8,
+-};
+-
+-static struct media_table {
+-	char *name;
+-	unsigned int media_bits:16,	/* Bits to set in Wn4_Media register. */
+-		mask:8,			/* The transceiver-present bit in Wn3_Config. */
+-		next:8;			/* The media type to try next. */
+-	short wait;			/* Time before we check media status. */
+-} media_tbl[] = {
+-	{ "10baseT", Media_10TP, 0x08, XCVR_10base2, (14 * HZ) / 10 },
+-	{ "10Mbs AUI", Media_SQE, 0x20, XCVR_Default, (1 * HZ) / 10},
+-	{ "undefined", 0, 0x80, XCVR_10baseT, 10000},
+-	{ "10base2", 0, 0x10, XCVR_AUI, (1 * HZ) / 10},
+-	{ "100baseTX", Media_Lnk, 0x02, XCVR_100baseFx, (14 * HZ) / 10},
+-	{ "100baseFX", Media_Lnk, 0x04, XCVR_MII, (14 * HZ) / 10},
+-	{ "MII", 0, 0x40, XCVR_10baseT, 3 * HZ},
+-	{ "undefined", 0, 0x01, XCVR_10baseT, 10000},
+-	{ "Default", 0, 0xFF, XCVR_10baseT, 10000},
+-};
+-
+-#ifdef __ISAPNP__
+-static struct isapnp_device_id corkscrew_isapnp_adapters[] = {
+-	{	ISAPNP_ANY_ID, ISAPNP_ANY_ID,
+-		ISAPNP_VENDOR('T', 'C', 'M'), ISAPNP_FUNCTION(0x5051),
+-		(long) "3Com Fast EtherLink ISA" },
+-	{ }	/* terminate list */
+-};
+-
+-MODULE_DEVICE_TABLE(isapnp, corkscrew_isapnp_adapters);
+-
+-static int nopnp;
+-#endif /* __ISAPNP__ */
+-
+-static struct net_device *corkscrew_scan(int unit);
+-static int corkscrew_setup(struct net_device *dev, int ioaddr,
+-			    struct pnp_dev *idev, int card_number);
+-static int corkscrew_open(struct net_device *dev);
+-static void corkscrew_timer(struct timer_list *t);
+-static netdev_tx_t corkscrew_start_xmit(struct sk_buff *skb,
+-					struct net_device *dev);
+-static int corkscrew_rx(struct net_device *dev);
+-static void corkscrew_timeout(struct net_device *dev, unsigned int txqueue);
+-static int boomerang_rx(struct net_device *dev);
+-static irqreturn_t corkscrew_interrupt(int irq, void *dev_id);
+-static int corkscrew_close(struct net_device *dev);
+-static void update_stats(int addr, struct net_device *dev);
+-static struct net_device_stats *corkscrew_get_stats(struct net_device *dev);
+-static void set_rx_mode(struct net_device *dev);
+-static const struct ethtool_ops netdev_ethtool_ops;
+-
 -
 -/*
-- * Must be a power of two (we use a binary and in the
-- * circular queue)
-- */
--#define SKB_QUEUE_SIZE	64
+-   Unfortunately maximizing the shared code between the integrated and
+-   module version of the driver results in a complicated set of initialization
+-   procedures.
+-   init_module() -- modules /  tc59x_init()  -- built-in
+-		The wrappers for corkscrew_scan()
+-   corkscrew_scan()  		 The common routine that scans for PCI and EISA cards
+-   corkscrew_found_device() Allocate a device structure when we find a card.
+-					Different versions exist for modules and built-in.
+-   corkscrew_probe1()		Fill in the device structure -- this is separated
+-					so that the modules code can put it in dev->init.
+-*/
+-/* This driver uses 'options' to pass the media type, full-duplex flag, etc. */
+-/* Note: this is the only limit on the number of cards supported!! */
+-static int options[MAX_UNITS] = { -1, -1, -1, -1, -1, -1, -1, -1, };
 -
--enum el3_cardtype { EL3_ISA, EL3_PNP, EL3_EISA };
--
--struct el3_private {
--	spinlock_t lock;
--	/* skb send-queue */
--	int head, size;
--	struct sk_buff *queue[SKB_QUEUE_SIZE];
--	enum el3_cardtype type;
--};
--static int id_port;
--static int current_tag;
--static struct net_device *el3_devs[EL3_MAX_CARDS];
--
--/* Parameters that may be passed into the module. */
+-#ifdef MODULE
 -static int debug = -1;
--static int irq[] = {-1, -1, -1, -1, -1, -1, -1, -1};
--/* Maximum events (Rx packets, etc.) to handle at each interrupt. */
--static int max_interrupt_work = 10;
--#ifdef CONFIG_PNP
--static int nopnp;
--#endif
 -
--static int el3_common_init(struct net_device *dev);
--static void el3_common_remove(struct net_device *dev);
--static ushort id_read_eeprom(int index);
--static ushort read_eeprom(int ioaddr, int index);
--static int el3_open(struct net_device *dev);
--static netdev_tx_t el3_start_xmit(struct sk_buff *skb, struct net_device *dev);
--static irqreturn_t el3_interrupt(int irq, void *dev_id);
--static void update_stats(struct net_device *dev);
--static struct net_device_stats *el3_get_stats(struct net_device *dev);
--static int el3_rx(struct net_device *dev);
--static int el3_close(struct net_device *dev);
--static void set_multicast_list(struct net_device *dev);
--static void el3_tx_timeout (struct net_device *dev, unsigned int txqueue);
--static void el3_down(struct net_device *dev);
--static void el3_up(struct net_device *dev);
--static const struct ethtool_ops ethtool_ops;
--#ifdef CONFIG_PM
--static int el3_suspend(struct device *, pm_message_t);
--static int el3_resume(struct device *);
+-module_param(debug, int, 0);
+-module_param_array(options, int, NULL, 0);
+-module_param(rx_copybreak, int, 0);
+-module_param(max_interrupt_work, int, 0);
+-MODULE_PARM_DESC(debug, "3c515 debug level (0-6)");
+-MODULE_PARM_DESC(options, "3c515: Bits 0-2: media type, bit 3: full duplex, bit 4: bus mastering");
+-MODULE_PARM_DESC(rx_copybreak, "3c515 copy breakpoint for copy-only-tiny-frames");
+-MODULE_PARM_DESC(max_interrupt_work, "3c515 maximum events handled per interrupt");
+-
+-/* A list of all installed Vortex devices, for removing the driver module. */
+-/* we will need locking (and refcounting) if we ever use it for more */
+-static LIST_HEAD(root_corkscrew_dev);
+-
+-static int corkscrew_init_module(void)
+-{
+-	int found = 0;
+-	if (debug >= 0)
+-		corkscrew_debug = debug;
+-	while (corkscrew_scan(-1))
+-		found++;
+-	return found ? 0 : -ENODEV;
+-}
+-module_init(corkscrew_init_module);
+-
 -#else
--#define el3_suspend NULL
--#define el3_resume NULL
--#endif
--
--
--/* generic device remove for all device types */
--static int el3_device_remove (struct device *device);
--#ifdef CONFIG_NET_POLL_CONTROLLER
--static void el3_poll_controller(struct net_device *dev);
--#endif
--
--/* Return 0 on success, 1 on error, 2 when found already detected PnP card */
--static int el3_isa_id_sequence(__be16 *phys_addr)
+-struct net_device *tc515_probe(int unit)
 -{
--	short lrs_state = 0xff;
--	int i;
+-	struct net_device *dev = corkscrew_scan(unit);
 -
--	/* ISA boards are detected by sending the ID sequence to the
--	   ID_PORT.  We find cards past the first by setting the 'current_tag'
--	   on cards as they are found.  Cards with their tag set will not
--	   respond to subsequent ID sequences. */
--
--	outb(0x00, id_port);
--	outb(0x00, id_port);
--	for (i = 0; i < 255; i++) {
--		outb(lrs_state, id_port);
--		lrs_state <<= 1;
--		lrs_state = lrs_state & 0x100 ? lrs_state ^ 0xcf : lrs_state;
--	}
--	/* For the first probe, clear all board's tag registers. */
--	if (current_tag == 0)
--		outb(0xd0, id_port);
--	else			/* Otherwise kill off already-found boards. */
--		outb(0xd8, id_port);
--	if (id_read_eeprom(7) != 0x6d50)
--		return 1;
--	/* Read in EEPROM data, which does contention-select.
--	   Only the lowest address board will stay "on-line".
--	   3Com got the byte order backwards. */
--	for (i = 0; i < 3; i++)
--		phys_addr[i] = htons(id_read_eeprom(i));
--#ifdef CONFIG_PNP
--	if (!nopnp) {
--		/* The ISA PnP 3c509 cards respond to the ID sequence too.
--		   This check is needed in order not to register them twice. */
--		for (i = 0; i < el3_cards; i++) {
--			struct el3_private *lp = netdev_priv(el3_devs[i]);
--			if (lp->type == EL3_PNP &&
--			    ether_addr_equal((u8 *)phys_addr, el3_devs[i]->dev_addr)) {
--				if (el3_debug > 3)
--					pr_debug("3c509 with address %02x %02x %02x %02x %02x %02x was found by ISAPnP\n",
--						phys_addr[0] & 0xff, phys_addr[0] >> 8,
--						phys_addr[1] & 0xff, phys_addr[1] >> 8,
--						phys_addr[2] & 0xff, phys_addr[2] >> 8);
--				/* Set the adaptor tag so that the next card can be found. */
--				outb(0xd0 + ++current_tag, id_port);
--				return 2;
--			}
--		}
--	}
--#endif /* CONFIG_PNP */
--	return 0;
--
--}
--
--static void el3_dev_fill(struct net_device *dev, __be16 *phys_addr, int ioaddr,
--			 int irq, int if_port, enum el3_cardtype type)
--{
--	struct el3_private *lp = netdev_priv(dev);
--
--	eth_hw_addr_set(dev, (u8 *)phys_addr);
--	dev->base_addr = ioaddr;
--	dev->irq = irq;
--	dev->if_port = if_port;
--	lp->type = type;
--}
--
--static int el3_isa_match(struct device *pdev, unsigned int ndev)
--{
--	struct net_device *dev;
--	int ioaddr, isa_irq, if_port, err;
--	unsigned int iobase;
--	__be16 phys_addr[3];
--
--	while ((err = el3_isa_id_sequence(phys_addr)) == 2)
--		;	/* Skip to next card when PnP card found */
--	if (err == 1)
--		return 0;
--
--	iobase = id_read_eeprom(8);
--	if_port = iobase >> 14;
--	ioaddr = 0x200 + ((iobase & 0x1f) << 4);
--	if (irq[el3_cards] > 1 && irq[el3_cards] < 16)
--		isa_irq = irq[el3_cards];
--	else
--		isa_irq = id_read_eeprom(9) >> 12;
--
--	dev = alloc_etherdev(sizeof(struct el3_private));
 -	if (!dev)
--		return -ENOMEM;
+-		return ERR_PTR(-ENODEV);
 -
--	SET_NETDEV_DEV(dev, pdev);
+-	return dev;
+-}
+-#endif				/* not MODULE */
 -
--	if (!request_region(ioaddr, EL3_IO_EXTENT, "3c509-isa")) {
--		free_netdev(dev);
+-static int check_device(unsigned ioaddr)
+-{
+-	int timer;
+-
+-	if (!request_region(ioaddr, CORKSCREW_TOTAL_SIZE, "3c515"))
+-		return 0;
+-	/* Check the resource configuration for a matching ioaddr. */
+-	if ((inw(ioaddr + 0x2002) & 0x1f0) != (ioaddr & 0x1f0)) {
+-		release_region(ioaddr, CORKSCREW_TOTAL_SIZE);
 -		return 0;
 -	}
--
--	/* Set the adaptor tag so that the next card can be found. */
--	outb(0xd0 + ++current_tag, id_port);
--
--	/* Activate the adaptor at the EEPROM location. */
--	outb((ioaddr >> 4) | 0xe0, id_port);
--
--	EL3WINDOW(0);
--	if (inw(ioaddr) != 0x6d50) {
--		free_netdev(dev);
+-	/* Verify by reading the device ID from the EEPROM. */
+-	outw(EEPROM_Read + 7, ioaddr + Wn0EepromCmd);
+-	/* Pause for at least 162 us. for the read to take place. */
+-	for (timer = 4; timer >= 0; timer--) {
+-		udelay(162);
+-		if ((inw(ioaddr + Wn0EepromCmd) & 0x0200) == 0)
+-			break;
+-	}
+-	if (inw(ioaddr + Wn0EepromData) != 0x6d50) {
+-		release_region(ioaddr, CORKSCREW_TOTAL_SIZE);
 -		return 0;
 -	}
--
--	/* Free the interrupt so that some other card can use it. */
--	outw(0x0f00, ioaddr + WN0_IRQ);
--
--	el3_dev_fill(dev, phys_addr, ioaddr, isa_irq, if_port, EL3_ISA);
--	dev_set_drvdata(pdev, dev);
--	if (el3_common_init(dev)) {
--		free_netdev(dev);
--		return 0;
--	}
--
--	el3_devs[el3_cards++] = dev;
 -	return 1;
 -}
 -
--static void el3_isa_remove(struct device *pdev,
--				    unsigned int ndev)
+-static void cleanup_card(struct net_device *dev)
 -{
--	el3_device_remove(pdev);
--	dev_set_drvdata(pdev, NULL);
+-	struct corkscrew_private *vp = netdev_priv(dev);
+-	list_del_init(&vp->list);
+-	if (dev->dma)
+-		free_dma(dev->dma);
+-	outw(TotalReset, dev->base_addr + EL3_CMD);
+-	release_region(dev->base_addr, CORKSCREW_TOTAL_SIZE);
+-	if (vp->dev)
+-		pnp_device_detach(to_pnp_dev(vp->dev));
 -}
 -
--#ifdef CONFIG_PM
--static int el3_isa_suspend(struct device *dev, unsigned int n,
--			   pm_message_t state)
--{
--	current_tag = 0;
--	return el3_suspend(dev, state);
--}
--
--static int el3_isa_resume(struct device *dev, unsigned int n)
--{
--	struct net_device *ndev = dev_get_drvdata(dev);
--	int ioaddr = ndev->base_addr, err;
--	__be16 phys_addr[3];
--
--	while ((err = el3_isa_id_sequence(phys_addr)) == 2)
--		;	/* Skip to next card when PnP card found */
--	if (err == 1)
--		return 0;
--	/* Set the adaptor tag so that the next card can be found. */
--	outb(0xd0 + ++current_tag, id_port);
--	/* Enable the card */
--	outb((ioaddr >> 4) | 0xe0, id_port);
--	EL3WINDOW(0);
--	if (inw(ioaddr) != 0x6d50)
--		return 1;
--	/* Free the interrupt so that some other card can use it. */
--	outw(0x0f00, ioaddr + WN0_IRQ);
--	return el3_resume(dev);
--}
--#endif
--
--static struct isa_driver el3_isa_driver = {
--	.match		= el3_isa_match,
--	.remove		= el3_isa_remove,
--#ifdef CONFIG_PM
--	.suspend	= el3_isa_suspend,
--	.resume		= el3_isa_resume,
--#endif
--	.driver		= {
--		.name	= "3c509"
--	},
--};
--static int isa_registered;
--
--#ifdef CONFIG_PNP
--static const struct pnp_device_id el3_pnp_ids[] = {
--	{ .id = "TCM5090" }, /* 3Com Etherlink III (TP) */
--	{ .id = "TCM5091" }, /* 3Com Etherlink III */
--	{ .id = "TCM5094" }, /* 3Com Etherlink III (combo) */
--	{ .id = "TCM5095" }, /* 3Com Etherlink III (TPO) */
--	{ .id = "TCM5098" }, /* 3Com Etherlink III (TPC) */
--	{ .id = "PNP80f7" }, /* 3Com Etherlink III compatible */
--	{ .id = "PNP80f8" }, /* 3Com Etherlink III compatible */
--	{ .id = "" }
--};
--MODULE_DEVICE_TABLE(pnp, el3_pnp_ids);
--
--static int el3_pnp_probe(struct pnp_dev *pdev, const struct pnp_device_id *id)
--{
--	short i;
--	int ioaddr, irq, if_port;
--	__be16 phys_addr[3];
--	struct net_device *dev = NULL;
--	int err;
--
--	ioaddr = pnp_port_start(pdev, 0);
--	if (!request_region(ioaddr, EL3_IO_EXTENT, "3c509-pnp"))
--		return -EBUSY;
--	irq = pnp_irq(pdev, 0);
--	EL3WINDOW(0);
--	for (i = 0; i < 3; i++)
--		phys_addr[i] = htons(read_eeprom(ioaddr, i));
--	if_port = read_eeprom(ioaddr, 8) >> 14;
--	dev = alloc_etherdev(sizeof(struct el3_private));
--	if (!dev) {
--		release_region(ioaddr, EL3_IO_EXTENT);
--		return -ENOMEM;
--	}
--	SET_NETDEV_DEV(dev, &pdev->dev);
--
--	el3_dev_fill(dev, phys_addr, ioaddr, irq, if_port, EL3_PNP);
--	pnp_set_drvdata(pdev, dev);
--	err = el3_common_init(dev);
--
--	if (err) {
--		pnp_set_drvdata(pdev, NULL);
--		free_netdev(dev);
--		return err;
--	}
--
--	el3_devs[el3_cards++] = dev;
--	return 0;
--}
--
--static void el3_pnp_remove(struct pnp_dev *pdev)
--{
--	el3_common_remove(pnp_get_drvdata(pdev));
--	pnp_set_drvdata(pdev, NULL);
--}
--
--#ifdef CONFIG_PM
--static int el3_pnp_suspend(struct pnp_dev *pdev, pm_message_t state)
--{
--	return el3_suspend(&pdev->dev, state);
--}
--
--static int el3_pnp_resume(struct pnp_dev *pdev)
--{
--	return el3_resume(&pdev->dev);
--}
--#endif
--
--static struct pnp_driver el3_pnp_driver = {
--	.name		= "3c509",
--	.id_table	= el3_pnp_ids,
--	.probe		= el3_pnp_probe,
--	.remove		= el3_pnp_remove,
--#ifdef CONFIG_PM
--	.suspend	= el3_pnp_suspend,
--	.resume		= el3_pnp_resume,
--#endif
--};
--static int pnp_registered;
--#endif /* CONFIG_PNP */
--
--#ifdef CONFIG_EISA
--static const struct eisa_device_id el3_eisa_ids[] = {
--		{ "TCM5090" },
--		{ "TCM5091" },
--		{ "TCM5092" },
--		{ "TCM5093" },
--		{ "TCM5094" },
--		{ "TCM5095" },
--		{ "TCM5098" },
--		{ "" }
--};
--MODULE_DEVICE_TABLE(eisa, el3_eisa_ids);
--
--static int el3_eisa_probe (struct device *device);
--
--static struct eisa_driver el3_eisa_driver = {
--		.id_table = el3_eisa_ids,
--		.driver   = {
--				.name    = "3c579",
--				.probe   = el3_eisa_probe,
--				.remove  = el3_device_remove,
--				.suspend = el3_suspend,
--				.resume  = el3_resume,
--		}
--};
--static int eisa_registered;
--#endif
--
--static const struct net_device_ops netdev_ops = {
--	.ndo_open 		= el3_open,
--	.ndo_stop	 	= el3_close,
--	.ndo_start_xmit 	= el3_start_xmit,
--	.ndo_get_stats 		= el3_get_stats,
--	.ndo_set_rx_mode	= set_multicast_list,
--	.ndo_tx_timeout 	= el3_tx_timeout,
--	.ndo_set_mac_address 	= eth_mac_addr,
--	.ndo_validate_addr	= eth_validate_addr,
--#ifdef CONFIG_NET_POLL_CONTROLLER
--	.ndo_poll_controller	= el3_poll_controller,
--#endif
--};
--
--static int el3_common_init(struct net_device *dev)
--{
--	struct el3_private *lp = netdev_priv(dev);
--	int err;
--	static const char * const if_names[] = {
--		"10baseT", "AUI", "undefined", "BNC"
--	};
--
--	spin_lock_init(&lp->lock);
--
--	if (dev->mem_start & 0x05) { /* xcvr codes 1/3/4/12 */
--		dev->if_port = (dev->mem_start & 0x0f);
--	} else { /* xcvr codes 0/8 */
--		/* use eeprom value, but save user's full-duplex selection */
--		dev->if_port |= (dev->mem_start & 0x08);
--	}
--
--	/* The EL3-specific entries in the device structure. */
--	dev->netdev_ops = &netdev_ops;
--	dev->watchdog_timeo = TX_TIMEOUT;
--	dev->ethtool_ops = &ethtool_ops;
--
--	err = register_netdev(dev);
--	if (err) {
--		pr_err("Failed to register 3c5x9 at %#3.3lx, IRQ %d.\n",
--			dev->base_addr, dev->irq);
--		release_region(dev->base_addr, EL3_IO_EXTENT);
--		return err;
--	}
--
--	pr_info("%s: 3c5x9 found at %#3.3lx, %s port, address %pM, IRQ %d.\n",
--	       dev->name, dev->base_addr, if_names[(dev->if_port & 0x03)],
--	       dev->dev_addr, dev->irq);
--
--	return 0;
--
--}
--
--static void el3_common_remove (struct net_device *dev)
--{
--	unregister_netdev (dev);
--	release_region(dev->base_addr, EL3_IO_EXTENT);
--	free_netdev (dev);
--}
--
--#ifdef CONFIG_EISA
--static int el3_eisa_probe(struct device *device)
--{
--	short i;
--	int ioaddr, irq, if_port;
--	__be16 phys_addr[3];
--	struct net_device *dev = NULL;
--	struct eisa_device *edev;
--	int err;
--
--	/* Yeepee, The driver framework is calling us ! */
--	edev = to_eisa_device (device);
--	ioaddr = edev->base_addr;
--
--	if (!request_region(ioaddr, EL3_IO_EXTENT, "3c579-eisa"))
--		return -EBUSY;
--
--	/* Change the register set to the configuration window 0. */
--	outw(SelectWindow | 0, ioaddr + 0xC80 + EL3_CMD);
--
--	irq = inw(ioaddr + WN0_IRQ) >> 12;
--	if_port = inw(ioaddr + 6)>>14;
--	for (i = 0; i < 3; i++)
--		phys_addr[i] = htons(read_eeprom(ioaddr, i));
--
--	/* Restore the "Product ID" to the EEPROM read register. */
--	read_eeprom(ioaddr, 3);
--
--	dev = alloc_etherdev(sizeof (struct el3_private));
--	if (dev == NULL) {
--		release_region(ioaddr, EL3_IO_EXTENT);
--		return -ENOMEM;
--	}
--
--	SET_NETDEV_DEV(dev, device);
--
--	el3_dev_fill(dev, phys_addr, ioaddr, irq, if_port, EL3_EISA);
--	eisa_set_drvdata (edev, dev);
--	err = el3_common_init(dev);
--
--	if (err) {
--		eisa_set_drvdata (edev, NULL);
--		free_netdev(dev);
--		return err;
--	}
--
--	el3_devs[el3_cards++] = dev;
--	return 0;
--}
--#endif
--
--/* This remove works for all device types.
-- *
-- * The net dev must be stored in the driver data field */
--static int el3_device_remove(struct device *device)
+-static struct net_device *corkscrew_scan(int unit)
 -{
 -	struct net_device *dev;
+-	static int cards_found = 0;
+-	static int ioaddr;
+-	int err;
+-#ifdef __ISAPNP__
+-	short i;
+-	static int pnp_cards;
+-#endif
 -
--	dev = dev_get_drvdata(device);
+-	dev = alloc_etherdev(sizeof(struct corkscrew_private));
+-	if (!dev)
+-		return ERR_PTR(-ENOMEM);
 -
--	el3_common_remove (dev);
--	return 0;
+-	if (unit >= 0) {
+-		sprintf(dev->name, "eth%d", unit);
+-		netdev_boot_setup_check(dev);
+-	}
+-
+-#ifdef __ISAPNP__
+-	if(nopnp == 1)
+-		goto no_pnp;
+-	for(i=0; corkscrew_isapnp_adapters[i].vendor != 0; i++) {
+-		struct pnp_dev *idev = NULL;
+-		int irq;
+-		while((idev = pnp_find_dev(NULL,
+-					   corkscrew_isapnp_adapters[i].vendor,
+-					   corkscrew_isapnp_adapters[i].function,
+-					   idev))) {
+-
+-			if (pnp_device_attach(idev) < 0)
+-				continue;
+-			if (pnp_activate_dev(idev) < 0) {
+-				pr_warn("pnp activate failed (out of resources?)\n");
+-				pnp_device_detach(idev);
+-				continue;
+-			}
+-			if (!pnp_port_valid(idev, 0) || !pnp_irq_valid(idev, 0)) {
+-				pnp_device_detach(idev);
+-				continue;
+-			}
+-			ioaddr = pnp_port_start(idev, 0);
+-			irq = pnp_irq(idev, 0);
+-			if (!check_device(ioaddr)) {
+-				pnp_device_detach(idev);
+-				continue;
+-			}
+-			if(corkscrew_debug)
+-				pr_debug("ISAPNP reports %s at i/o 0x%x, irq %d\n",
+-					(char*) corkscrew_isapnp_adapters[i].driver_data, ioaddr, irq);
+-			pr_info("3c515 Resource configuration register %#4.4x, DCR %4.4x.\n",
+-		     		inl(ioaddr + 0x2002), inw(ioaddr + 0x2000));
+-			/* irq = inw(ioaddr + 0x2002) & 15; */ /* Use the irq from isapnp */
+-			SET_NETDEV_DEV(dev, &idev->dev);
+-			pnp_cards++;
+-			err = corkscrew_setup(dev, ioaddr, idev, cards_found++);
+-			if (!err)
+-				return dev;
+-			cleanup_card(dev);
+-		}
+-	}
+-no_pnp:
+-#endif /* __ISAPNP__ */
+-
+-	/* Check all locations on the ISA bus -- evil! */
+-	for (ioaddr = 0x100; ioaddr < 0x400; ioaddr += 0x20) {
+-		if (!check_device(ioaddr))
+-			continue;
+-
+-		pr_info("3c515 Resource configuration register %#4.4x, DCR %4.4x.\n",
+-		     inl(ioaddr + 0x2002), inw(ioaddr + 0x2000));
+-		err = corkscrew_setup(dev, ioaddr, NULL, cards_found++);
+-		if (!err)
+-			return dev;
+-		cleanup_card(dev);
+-	}
+-	free_netdev(dev);
+-	return NULL;
 -}
 -
--/* Read a word from the EEPROM using the regular EEPROM access register.
--   Assume that we are in register window zero.
-- */
--static ushort read_eeprom(int ioaddr, int index)
+-
+-static const struct net_device_ops netdev_ops = {
+-	.ndo_open		= corkscrew_open,
+-	.ndo_stop		= corkscrew_close,
+-	.ndo_start_xmit		= corkscrew_start_xmit,
+-	.ndo_tx_timeout		= corkscrew_timeout,
+-	.ndo_get_stats		= corkscrew_get_stats,
+-	.ndo_set_rx_mode	= set_rx_mode,
+-	.ndo_set_mac_address 	= eth_mac_addr,
+-	.ndo_validate_addr	= eth_validate_addr,
+-};
+-
+-
+-static int corkscrew_setup(struct net_device *dev, int ioaddr,
+-			    struct pnp_dev *idev, int card_number)
 -{
--	outw(EEPROM_READ + index, ioaddr + 10);
--	/* Pause for at least 162 us. for the read to take place.
--	   Some chips seem to require much longer */
--	mdelay(2);
--	return inw(ioaddr + 12);
+-	struct corkscrew_private *vp = netdev_priv(dev);
+-	unsigned int eeprom[0x40], checksum = 0;	/* EEPROM contents */
+-	__be16 addr[ETH_ALEN / 2];
+-	int i;
+-	int irq;
+-
+-#ifdef __ISAPNP__
+-	if (idev) {
+-		irq = pnp_irq(idev, 0);
+-		vp->dev = &idev->dev;
+-	} else {
+-		irq = inw(ioaddr + 0x2002) & 15;
+-	}
+-#else
+-	irq = inw(ioaddr + 0x2002) & 15;
+-#endif
+-
+-	dev->base_addr = ioaddr;
+-	dev->irq = irq;
+-	dev->dma = inw(ioaddr + 0x2000) & 7;
+-	vp->product_name = "3c515";
+-	vp->options = dev->mem_start;
+-	vp->our_dev = dev;
+-
+-	if (!vp->options) {
+-		 if (card_number >= MAX_UNITS)
+-			vp->options = -1;
+-		else
+-			vp->options = options[card_number];
+-	}
+-
+-	if (vp->options >= 0) {
+-		vp->media_override = vp->options & 7;
+-		if (vp->media_override == 2)
+-			vp->media_override = 0;
+-		vp->full_duplex = (vp->options & 8) ? 1 : 0;
+-		vp->bus_master = (vp->options & 16) ? 1 : 0;
+-	} else {
+-		vp->media_override = 7;
+-		vp->full_duplex = 0;
+-		vp->bus_master = 0;
+-	}
+-#ifdef MODULE
+-	list_add(&vp->list, &root_corkscrew_dev);
+-#endif
+-
+-	pr_info("%s: 3Com %s at %#3x,", dev->name, vp->product_name, ioaddr);
+-
+-	spin_lock_init(&vp->lock);
+-
+-	timer_setup(&vp->timer, corkscrew_timer, 0);
+-
+-	/* Read the station address from the EEPROM. */
+-	EL3WINDOW(0);
+-	for (i = 0; i < 0x18; i++) {
+-		int timer;
+-		outw(EEPROM_Read + i, ioaddr + Wn0EepromCmd);
+-		/* Pause for at least 162 us. for the read to take place. */
+-		for (timer = 4; timer >= 0; timer--) {
+-			udelay(162);
+-			if ((inw(ioaddr + Wn0EepromCmd) & 0x0200) == 0)
+-				break;
+-		}
+-		eeprom[i] = inw(ioaddr + Wn0EepromData);
+-		checksum ^= eeprom[i];
+-		if (i < 3)
+-			addr[i] = htons(eeprom[i]);
+-	}
+-	eth_hw_addr_set(dev, (u8 *)addr);
+-	checksum = (checksum ^ (checksum >> 8)) & 0xff;
+-	if (checksum != 0x00)
+-		pr_cont(" ***INVALID CHECKSUM %4.4x*** ", checksum);
+-	pr_cont(" %pM", dev->dev_addr);
+-	if (eeprom[16] == 0x11c7) {	/* Corkscrew */
+-		if (request_dma(dev->dma, "3c515")) {
+-			pr_cont(", DMA %d allocation failed", dev->dma);
+-			dev->dma = 0;
+-		} else
+-			pr_cont(", DMA %d", dev->dma);
+-	}
+-	pr_cont(", IRQ %d\n", dev->irq);
+-	/* Tell them about an invalid IRQ. */
+-	if (corkscrew_debug && (dev->irq <= 0 || dev->irq > 15))
+-		pr_warn(" *** Warning: this IRQ is unlikely to work! ***\n");
+-
+-	{
+-		static const char * const ram_split[] = {
+-			"5:3", "3:1", "1:1", "3:5"
+-		};
+-		__u32 config;
+-		EL3WINDOW(3);
+-		vp->available_media = inw(ioaddr + Wn3_Options);
+-		config = inl(ioaddr + Wn3_Config);
+-		if (corkscrew_debug > 1)
+-			pr_info("  Internal config register is %4.4x, transceivers %#x.\n",
+-				config, inw(ioaddr + Wn3_Options));
+-		pr_info("  %dK %s-wide RAM %s Rx:Tx split, %s%s interface.\n",
+-			8 << config & Ram_size,
+-			config & Ram_width ? "word" : "byte",
+-			ram_split[(config & Ram_split) >> Ram_split_shift],
+-			config & Autoselect ? "autoselect/" : "",
+-			media_tbl[(config & Xcvr) >> Xcvr_shift].name);
+-		vp->default_media = (config & Xcvr) >> Xcvr_shift;
+-		vp->autoselect = config & Autoselect ? 1 : 0;
+-		dev->if_port = vp->default_media;
+-	}
+-	if (vp->media_override != 7) {
+-		pr_info("  Media override to transceiver type %d (%s).\n",
+-		       vp->media_override,
+-		       media_tbl[vp->media_override].name);
+-		dev->if_port = vp->media_override;
+-	}
+-
+-	vp->capabilities = eeprom[16];
+-	vp->full_bus_master_tx = (vp->capabilities & 0x20) ? 1 : 0;
+-	/* Rx is broken at 10mbps, so we always disable it. */
+-	/* vp->full_bus_master_rx = 0; */
+-	vp->full_bus_master_rx = (vp->capabilities & 0x20) ? 1 : 0;
+-
+-	/* The 3c51x-specific entries in the device structure. */
+-	dev->netdev_ops = &netdev_ops;
+-	dev->watchdog_timeo = (400 * HZ) / 1000;
+-	dev->ethtool_ops = &netdev_ethtool_ops;
+-
+-	return register_netdev(dev);
 -}
 -
--/* Read a word from the EEPROM when in the ISA ID probe state. */
--static ushort id_read_eeprom(int index)
--{
--	int bit, word = 0;
 -
--	/* Issue read command, and pause for at least 162 us. for it to complete.
--	   Assume extra-fast 16Mhz bus. */
--	outb(EEPROM_READ + index, id_port);
--
--	/* Pause for at least 162 us. for the read to take place. */
--	/* Some chips seem to require much longer */
--	mdelay(4);
--
--	for (bit = 15; bit >= 0; bit--)
--		word = (word << 1) + (inb(id_port) & 0x01);
--
--	if (el3_debug > 3)
--		pr_debug("  3c509 EEPROM word %d %#4.4x.\n", index, word);
--
--	return word;
--}
--
--
--static int
--el3_open(struct net_device *dev)
+-static int corkscrew_open(struct net_device *dev)
 -{
 -	int ioaddr = dev->base_addr;
+-	struct corkscrew_private *vp = netdev_priv(dev);
+-	bool armtimer = false;
+-	__u32 config;
 -	int i;
 -
+-	/* Before initializing select the active media port. */
+-	EL3WINDOW(3);
+-	if (vp->full_duplex)
+-		outb(0x20, ioaddr + Wn3_MAC_Ctrl);	/* Set the full-duplex bit. */
+-	config = inl(ioaddr + Wn3_Config);
+-
+-	if (vp->media_override != 7) {
+-		if (corkscrew_debug > 1)
+-			pr_info("%s: Media override to transceiver %d (%s).\n",
+-				dev->name, vp->media_override,
+-				media_tbl[vp->media_override].name);
+-		dev->if_port = vp->media_override;
+-	} else if (vp->autoselect) {
+-		/* Find first available media type, starting with 100baseTx. */
+-		dev->if_port = 4;
+-		while (!(vp->available_media & media_tbl[dev->if_port].mask))
+-			dev->if_port = media_tbl[dev->if_port].next;
+-
+-		if (corkscrew_debug > 1)
+-			pr_debug("%s: Initial media type %s.\n",
+-			       dev->name, media_tbl[dev->if_port].name);
+-		armtimer = true;
+-	} else
+-		dev->if_port = vp->default_media;
+-
+-	config = (config & ~Xcvr) | (dev->if_port << Xcvr_shift);
+-	outl(config, ioaddr + Wn3_Config);
+-
+-	if (corkscrew_debug > 1) {
+-		pr_debug("%s: corkscrew_open() InternalConfig %8.8x.\n",
+-		       dev->name, config);
+-	}
+-
 -	outw(TxReset, ioaddr + EL3_CMD);
+-	for (i = 20; i >= 0; i--)
+-		if (!(inw(ioaddr + EL3_STATUS) & CmdInProgress))
+-			break;
+-
 -	outw(RxReset, ioaddr + EL3_CMD);
+-	/* Wait a few ticks for the RxReset command to complete. */
+-	for (i = 20; i >= 0; i--)
+-		if (!(inw(ioaddr + EL3_STATUS) & CmdInProgress))
+-			break;
+-
 -	outw(SetStatusEnb | 0x00, ioaddr + EL3_CMD);
 -
--	i = request_irq(dev->irq, el3_interrupt, 0, dev->name, dev);
--	if (i)
--		return i;
+-	/* Use the now-standard shared IRQ implementation. */
+-	if (vp->capabilities == 0x11c7) {
+-		/* Corkscrew: Cannot share ISA resources. */
+-		if (dev->irq == 0 ||
+-		    dev->dma == 0 ||
+-		    request_irq(dev->irq, corkscrew_interrupt, 0,
+-				vp->product_name, dev))
+-			return -EAGAIN;
+-		enable_dma(dev->dma);
+-		set_dma_mode(dev->dma, DMA_MODE_CASCADE);
+-	} else if (request_irq(dev->irq, corkscrew_interrupt, IRQF_SHARED,
+-			       vp->product_name, dev)) {
+-		return -EAGAIN;
+-	}
 -
--	EL3WINDOW(0);
--	if (el3_debug > 3)
--		pr_debug("%s: Opening, IRQ %d	 status@%x %4.4x.\n", dev->name,
--			   dev->irq, ioaddr + EL3_STATUS, inw(ioaddr + EL3_STATUS));
+-	if (armtimer)
+-		mod_timer(&vp->timer, jiffies + media_tbl[dev->if_port].wait);
 -
--	el3_up(dev);
+-	if (corkscrew_debug > 1) {
+-		EL3WINDOW(4);
+-		pr_debug("%s: corkscrew_open() irq %d media status %4.4x.\n",
+-		       dev->name, dev->irq, inw(ioaddr + Wn4_Media));
+-	}
 -
--	if (el3_debug > 3)
--		pr_debug("%s: Opened 3c509  IRQ %d  status %4.4x.\n",
--			   dev->name, dev->irq, inw(ioaddr + EL3_STATUS));
+-	/* Set the station address and mask in window 2 each time opened. */
+-	EL3WINDOW(2);
+-	for (i = 0; i < 6; i++)
+-		outb(dev->dev_addr[i], ioaddr + i);
+-	for (; i < 12; i += 2)
+-		outw(0, ioaddr + i);
+-
+-	if (dev->if_port == 3)
+-		/* Start the thinnet transceiver. We should really wait 50ms... */
+-		outw(StartCoax, ioaddr + EL3_CMD);
+-	EL3WINDOW(4);
+-	outw((inw(ioaddr + Wn4_Media) & ~(Media_10TP | Media_SQE)) |
+-	     media_tbl[dev->if_port].media_bits, ioaddr + Wn4_Media);
+-
+-	/* Switch to the stats window, and clear all stats by reading. */
+-	outw(StatsDisable, ioaddr + EL3_CMD);
+-	EL3WINDOW(6);
+-	for (i = 0; i < 10; i++)
+-		inb(ioaddr + i);
+-	inw(ioaddr + 10);
+-	inw(ioaddr + 12);
+-	/* New: On the Vortex we must also clear the BadSSD counter. */
+-	EL3WINDOW(4);
+-	inb(ioaddr + 12);
+-	/* ..and on the Boomerang we enable the extra statistics bits. */
+-	outw(0x0040, ioaddr + Wn4_NetDiag);
+-
+-	/* Switch to register set 7 for normal use. */
+-	EL3WINDOW(7);
+-
+-	if (vp->full_bus_master_rx) {	/* Boomerang bus master. */
+-		vp->cur_rx = vp->dirty_rx = 0;
+-		if (corkscrew_debug > 2)
+-			pr_debug("%s:  Filling in the Rx ring.\n", dev->name);
+-		for (i = 0; i < RX_RING_SIZE; i++) {
+-			struct sk_buff *skb;
+-			if (i < (RX_RING_SIZE - 1))
+-				vp->rx_ring[i].next =
+-				    isa_virt_to_bus(&vp->rx_ring[i + 1]);
+-			else
+-				vp->rx_ring[i].next = 0;
+-			vp->rx_ring[i].status = 0;	/* Clear complete bit. */
+-			vp->rx_ring[i].length = PKT_BUF_SZ | 0x80000000;
+-			skb = netdev_alloc_skb(dev, PKT_BUF_SZ);
+-			vp->rx_skbuff[i] = skb;
+-			if (skb == NULL)
+-				break;	/* Bad news!  */
+-			skb_reserve(skb, 2);	/* Align IP on 16 byte boundaries */
+-			vp->rx_ring[i].addr = isa_virt_to_bus(skb->data);
+-		}
+-		if (i != 0)
+-			vp->rx_ring[i - 1].next =
+-				isa_virt_to_bus(&vp->rx_ring[0]);	/* Wrap the ring. */
+-		outl(isa_virt_to_bus(&vp->rx_ring[0]), ioaddr + UpListPtr);
+-	}
+-	if (vp->full_bus_master_tx) {	/* Boomerang bus master Tx. */
+-		vp->cur_tx = vp->dirty_tx = 0;
+-		outb(PKT_BUF_SZ >> 8, ioaddr + TxFreeThreshold);	/* Room for a packet. */
+-		/* Clear the Tx ring. */
+-		for (i = 0; i < TX_RING_SIZE; i++)
+-			vp->tx_skbuff[i] = NULL;
+-		outl(0, ioaddr + DownListPtr);
+-	}
+-	/* Set receiver mode: presumably accept b-case and phys addr only. */
+-	set_rx_mode(dev);
+-	outw(StatsEnable, ioaddr + EL3_CMD);	/* Turn on statistics. */
+-
+-	netif_start_queue(dev);
+-
+-	outw(RxEnable, ioaddr + EL3_CMD);	/* Enable the receiver. */
+-	outw(TxEnable, ioaddr + EL3_CMD);	/* Enable transmitter. */
+-	/* Allow status bits to be seen. */
+-	outw(SetStatusEnb | AdapterFailure | IntReq | StatsFull |
+-	     (vp->full_bus_master_tx ? DownComplete : TxAvailable) |
+-	     (vp->full_bus_master_rx ? UpComplete : RxComplete) |
+-	     (vp->bus_master ? DMADone : 0), ioaddr + EL3_CMD);
+-	/* Ack all pending events, and set active indicator mask. */
+-	outw(AckIntr | IntLatch | TxAvailable | RxEarly | IntReq,
+-	     ioaddr + EL3_CMD);
+-	outw(SetIntrEnb | IntLatch | TxAvailable | RxComplete | StatsFull
+-	     | (vp->bus_master ? DMADone : 0) | UpComplete | DownComplete,
+-	     ioaddr + EL3_CMD);
 -
 -	return 0;
 -}
 -
--static void
--el3_tx_timeout (struct net_device *dev, unsigned int txqueue)
+-static void corkscrew_timer(struct timer_list *t)
 -{
+-#ifdef AUTOMEDIA
+-	struct corkscrew_private *vp = timer_container_of(vp, t, timer);
+-	struct net_device *dev = vp->our_dev;
+-	int ioaddr = dev->base_addr;
+-	unsigned long flags;
+-	int ok = 0;
+-
+-	if (corkscrew_debug > 1)
+-		pr_debug("%s: Media selection timer tick happened, %s.\n",
+-		       dev->name, media_tbl[dev->if_port].name);
+-
+-	spin_lock_irqsave(&vp->lock, flags);
+-
+-	{
+-		int old_window = inw(ioaddr + EL3_CMD) >> 13;
+-		int media_status;
+-		EL3WINDOW(4);
+-		media_status = inw(ioaddr + Wn4_Media);
+-		switch (dev->if_port) {
+-		case 0:
+-		case 4:
+-		case 5:	/* 10baseT, 100baseTX, 100baseFX  */
+-			if (media_status & Media_LnkBeat) {
+-				ok = 1;
+-				if (corkscrew_debug > 1)
+-					pr_debug("%s: Media %s has link beat, %x.\n",
+-						dev->name,
+-						media_tbl[dev->if_port].name,
+-						media_status);
+-			} else if (corkscrew_debug > 1)
+-				pr_debug("%s: Media %s is has no link beat, %x.\n",
+-					dev->name,
+-					media_tbl[dev->if_port].name,
+-					media_status);
+-
+-			break;
+-		default:	/* Other media types handled by Tx timeouts. */
+-			if (corkscrew_debug > 1)
+-				pr_debug("%s: Media %s is has no indication, %x.\n",
+-					dev->name,
+-					media_tbl[dev->if_port].name,
+-					media_status);
+-			ok = 1;
+-		}
+-		if (!ok) {
+-			__u32 config;
+-
+-			do {
+-				dev->if_port =
+-				    media_tbl[dev->if_port].next;
+-			}
+-			while (!(vp->available_media & media_tbl[dev->if_port].mask));
+-
+-			if (dev->if_port == 8) {	/* Go back to default. */
+-				dev->if_port = vp->default_media;
+-				if (corkscrew_debug > 1)
+-					pr_debug("%s: Media selection failing, using default %s port.\n",
+-						dev->name,
+-						media_tbl[dev->if_port].name);
+-			} else {
+-				if (corkscrew_debug > 1)
+-					pr_debug("%s: Media selection failed, now trying %s port.\n",
+-						dev->name,
+-						media_tbl[dev->if_port].name);
+-				vp->timer.expires = jiffies + media_tbl[dev->if_port].wait;
+-				add_timer(&vp->timer);
+-			}
+-			outw((media_status & ~(Media_10TP | Media_SQE)) |
+-			     media_tbl[dev->if_port].media_bits,
+-			     ioaddr + Wn4_Media);
+-
+-			EL3WINDOW(3);
+-			config = inl(ioaddr + Wn3_Config);
+-			config = (config & ~Xcvr) | (dev->if_port << Xcvr_shift);
+-			outl(config, ioaddr + Wn3_Config);
+-
+-			outw(dev->if_port == 3 ? StartCoax : StopCoax,
+-			     ioaddr + EL3_CMD);
+-		}
+-		EL3WINDOW(old_window);
+-	}
+-
+-	spin_unlock_irqrestore(&vp->lock, flags);
+-	if (corkscrew_debug > 1)
+-		pr_debug("%s: Media selection timer finished, %s.\n",
+-		       dev->name, media_tbl[dev->if_port].name);
+-
+-#endif				/* AUTOMEDIA */
+-}
+-
+-static void corkscrew_timeout(struct net_device *dev, unsigned int txqueue)
+-{
+-	int i;
+-	struct corkscrew_private *vp = netdev_priv(dev);
 -	int ioaddr = dev->base_addr;
 -
--	/* Transmitter timeout, serious problems. */
--	pr_warn("%s: transmit timed out, Tx_status %2.2x status %4.4x Tx FIFO room %d\n",
--		dev->name, inb(ioaddr + TX_STATUS), inw(ioaddr + EL3_STATUS),
--		inw(ioaddr + TX_FREE));
--	dev->stats.tx_errors++;
--	netif_trans_update(dev); /* prevent tx timeout */
+-	pr_warn("%s: transmit timed out, tx_status %2.2x status %4.4x\n",
+-		dev->name, inb(ioaddr + TxStatus),
+-		inw(ioaddr + EL3_STATUS));
+-	/* Slight code bloat to be user friendly. */
+-	if ((inb(ioaddr + TxStatus) & 0x88) == 0x88)
+-		pr_warn("%s: Transmitter encountered 16 collisions -- network cable problem?\n",
+-			dev->name);
+-#ifndef final_version
+-	pr_debug("  Flags; bus-master %d, full %d; dirty %d current %d.\n",
+-	       vp->full_bus_master_tx, vp->tx_full, vp->dirty_tx,
+-	       vp->cur_tx);
+-	pr_debug("  Down list %8.8x vs. %p.\n", inl(ioaddr + DownListPtr),
+-	       &vp->tx_ring[0]);
+-	for (i = 0; i < TX_RING_SIZE; i++) {
+-		pr_debug("  %d: %p  length %8.8x status %8.8x\n", i,
+-		       &vp->tx_ring[i],
+-		       vp->tx_ring[i].length, vp->tx_ring[i].status);
+-	}
+-#endif
 -	/* Issue TX_RESET and TX_START commands. */
 -	outw(TxReset, ioaddr + EL3_CMD);
+-	for (i = 20; i >= 0; i--)
+-		if (!(inw(ioaddr + EL3_STATUS) & CmdInProgress))
+-			break;
 -	outw(TxEnable, ioaddr + EL3_CMD);
+-	netif_trans_update(dev); /* prevent tx timeout */
+-	dev->stats.tx_errors++;
+-	dev->stats.tx_dropped++;
 -	netif_wake_queue(dev);
 -}
 -
--
--static netdev_tx_t
--el3_start_xmit(struct sk_buff *skb, struct net_device *dev)
+-static netdev_tx_t corkscrew_start_xmit(struct sk_buff *skb,
+-					struct net_device *dev)
 -{
--	struct el3_private *lp = netdev_priv(dev);
+-	struct corkscrew_private *vp = netdev_priv(dev);
 -	int ioaddr = dev->base_addr;
--	unsigned long flags;
 -
--	netif_stop_queue (dev);
+-	/* Block a timer-based transmit from overlapping. */
 -
--	dev->stats.tx_bytes += skb->len;
+-	netif_stop_queue(dev);
 -
--	if (el3_debug > 4) {
--		pr_debug("%s: el3_start_xmit(length = %u) called, status %4.4x.\n",
--			   dev->name, skb->len, inw(ioaddr + EL3_STATUS));
+-	if (vp->full_bus_master_tx) {	/* BOOMERANG bus-master */
+-		/* Calculate the next Tx descriptor entry. */
+-		int entry = vp->cur_tx % TX_RING_SIZE;
+-		struct boom_tx_desc *prev_entry;
+-		unsigned long flags;
+-		int i;
+-
+-		if (vp->tx_full)	/* No room to transmit with */
+-			return NETDEV_TX_BUSY;
+-		if (vp->cur_tx != 0)
+-			prev_entry = &vp->tx_ring[(vp->cur_tx - 1) % TX_RING_SIZE];
+-		else
+-			prev_entry = NULL;
+-		if (corkscrew_debug > 3)
+-			pr_debug("%s: Trying to send a packet, Tx index %d.\n",
+-				dev->name, vp->cur_tx);
+-		/* vp->tx_full = 1; */
+-		vp->tx_skbuff[entry] = skb;
+-		vp->tx_ring[entry].next = 0;
+-		vp->tx_ring[entry].addr = isa_virt_to_bus(skb->data);
+-		vp->tx_ring[entry].length = skb->len | 0x80000000;
+-		vp->tx_ring[entry].status = skb->len | 0x80000000;
+-
+-		spin_lock_irqsave(&vp->lock, flags);
+-		outw(DownStall, ioaddr + EL3_CMD);
+-		/* Wait for the stall to complete. */
+-		for (i = 20; i >= 0; i--)
+-			if ((inw(ioaddr + EL3_STATUS) & CmdInProgress) == 0)
+-				break;
+-		if (prev_entry)
+-			prev_entry->next = isa_virt_to_bus(&vp->tx_ring[entry]);
+-		if (inl(ioaddr + DownListPtr) == 0) {
+-			outl(isa_virt_to_bus(&vp->tx_ring[entry]),
+-			     ioaddr + DownListPtr);
+-			queued_packet++;
+-		}
+-		outw(DownUnstall, ioaddr + EL3_CMD);
+-		spin_unlock_irqrestore(&vp->lock, flags);
+-
+-		vp->cur_tx++;
+-		if (vp->cur_tx - vp->dirty_tx > TX_RING_SIZE - 1)
+-			vp->tx_full = 1;
+-		else {		/* Clear previous interrupt enable. */
+-			if (prev_entry)
+-				prev_entry->status &= ~0x80000000;
+-			netif_wake_queue(dev);
+-		}
+-		return NETDEV_TX_OK;
 -	}
--	/*
--	 *	We lock the driver against other processors. Note
--	 *	we don't need to lock versus the IRQ as we suspended
--	 *	that. This means that we lose the ability to take
--	 *	an RX during a TX upload. That sucks a bit with SMP
--	 *	on an original 3c509 (2K buffer)
--	 *
--	 *	Using disable_irq stops us crapping on other
--	 *	time sensitive devices.
--	 */
--
--	spin_lock_irqsave(&lp->lock, flags);
--
 -	/* Put out the doubleword header... */
--	outw(skb->len, ioaddr + TX_FIFO);
--	outw(0x00, ioaddr + TX_FIFO);
+-	outl(skb->len, ioaddr + TX_FIFO);
+-	dev->stats.tx_bytes += skb->len;
+-#ifdef VORTEX_BUS_MASTER
+-	if (vp->bus_master) {
+-		/* Set the bus-master controller to transfer the packet. */
+-		outl(isa_virt_to_bus(skb->data), ioaddr + Wn7_MasterAddr);
+-		outw((skb->len + 3) & ~3, ioaddr + Wn7_MasterLen);
+-		vp->tx_skb = skb;
+-		outw(StartDMADown, ioaddr + EL3_CMD);
+-		/* queue will be woken at the DMADone interrupt. */
+-	} else {
+-		/* ... and the packet rounded to a doubleword. */
+-		outsl(ioaddr + TX_FIFO, skb->data, (skb->len + 3) >> 2);
+-		dev_kfree_skb(skb);
+-		if (inw(ioaddr + TxFree) > 1536) {
+-			netif_wake_queue(dev);
+-		} else
+-			/* Interrupt us when the FIFO has room for max-sized packet. */
+-			outw(SetTxThreshold + (1536 >> 2),
+-			     ioaddr + EL3_CMD);
+-	}
+-#else
 -	/* ... and the packet rounded to a doubleword. */
 -	outsl(ioaddr + TX_FIFO, skb->data, (skb->len + 3) >> 2);
--
--	if (inw(ioaddr + TX_FREE) > 1536)
--		netif_start_queue(dev);
--	else
+-	dev_kfree_skb(skb);
+-	if (inw(ioaddr + TxFree) > 1536) {
+-		netif_wake_queue(dev);
+-	} else
 -		/* Interrupt us when the FIFO has room for max-sized packet. */
--		outw(SetTxThreshold + 1536, ioaddr + EL3_CMD);
+-		outw(SetTxThreshold + (1536 >> 2), ioaddr + EL3_CMD);
+-#endif				/* bus master */
 -
--	spin_unlock_irqrestore(&lp->lock, flags);
--
--	dev_consume_skb_any (skb);
 -
 -	/* Clear the Tx status stack. */
 -	{
 -		short tx_status;
 -		int i = 4;
 -
--		while (--i > 0	&&	(tx_status = inb(ioaddr + TX_STATUS)) > 0) {
--			if (tx_status & 0x38) dev->stats.tx_aborted_errors++;
--			if (tx_status & 0x30) outw(TxReset, ioaddr + EL3_CMD);
--			if (tx_status & 0x3C) outw(TxEnable, ioaddr + EL3_CMD);
--			outb(0x00, ioaddr + TX_STATUS); /* Pop the status stack. */
+-		while (--i > 0 && (tx_status = inb(ioaddr + TxStatus)) > 0) {
+-			if (tx_status & 0x3C) {	/* A Tx-disabling error occurred.  */
+-				if (corkscrew_debug > 2)
+-					pr_debug("%s: Tx error, status %2.2x.\n",
+-						dev->name, tx_status);
+-				if (tx_status & 0x04)
+-					dev->stats.tx_fifo_errors++;
+-				if (tx_status & 0x38)
+-					dev->stats.tx_aborted_errors++;
+-				if (tx_status & 0x30) {
+-					int j;
+-					outw(TxReset, ioaddr + EL3_CMD);
+-					for (j = 20; j >= 0; j--)
+-						if (!(inw(ioaddr + EL3_STATUS) & CmdInProgress))
+-							break;
+-				}
+-				outw(TxEnable, ioaddr + EL3_CMD);
+-			}
+-			outb(0x00, ioaddr + TxStatus);	/* Pop the status stack. */
 -		}
 -	}
 -	return NETDEV_TX_OK;
 -}
 -
--/* The EL3 interrupt handler. */
--static irqreturn_t
--el3_interrupt(int irq, void *dev_id)
+-/* The interrupt handler does all of the Rx thread work and cleans up
+-   after the Tx thread. */
+-
+-static irqreturn_t corkscrew_interrupt(int irq, void *dev_id)
 -{
+-	/* Use the now-standard shared IRQ implementation. */
 -	struct net_device *dev = dev_id;
--	struct el3_private *lp;
+-	struct corkscrew_private *lp = netdev_priv(dev);
 -	int ioaddr, status;
+-	int latency;
 -	int i = max_interrupt_work;
 -
--	lp = netdev_priv(dev);
+-	ioaddr = dev->base_addr;
+-	latency = inb(ioaddr + Timer);
+-
 -	spin_lock(&lp->lock);
 -
--	ioaddr = dev->base_addr;
+-	status = inw(ioaddr + EL3_STATUS);
 -
--	if (el3_debug > 4) {
--		status = inw(ioaddr + EL3_STATUS);
--		pr_debug("%s: interrupt, status %4.4x.\n", dev->name, status);
+-	if (corkscrew_debug > 4)
+-		pr_debug("%s: interrupt, status %4.4x, timer %d.\n",
+-			dev->name, status, latency);
+-	if ((status & 0xE000) != 0xE000) {
+-		static int donedidthis;
+-		/* Some interrupt controllers store a bogus interrupt from boot-time.
+-		   Ignore a single early interrupt, but don't hang the machine for
+-		   other interrupt problems. */
+-		if (donedidthis++ > 100) {
+-			pr_err("%s: Bogus interrupt, bailing. Status %4.4x, start=%d.\n",
+-				   dev->name, status, netif_running(dev));
+-			free_irq(dev->irq, dev);
+-			dev->irq = -1;
+-		}
 -	}
 -
--	while ((status = inw(ioaddr + EL3_STATUS)) &
--		   (IntLatch | RxComplete | StatsFull)) {
--
+-	do {
+-		if (corkscrew_debug > 5)
+-			pr_debug("%s: In interrupt loop, status %4.4x.\n",
+-			       dev->name, status);
 -		if (status & RxComplete)
--			el3_rx(dev);
+-			corkscrew_rx(dev);
 -
 -		if (status & TxAvailable) {
--			if (el3_debug > 5)
+-			if (corkscrew_debug > 5)
 -				pr_debug("	TX room bit was handled.\n");
 -			/* There's room in the FIFO for a full-sized packet. */
 -			outw(AckIntr | TxAvailable, ioaddr + EL3_CMD);
--			netif_wake_queue (dev);
+-			netif_wake_queue(dev);
 -		}
--		if (status & (AdapterFailure | RxEarly | StatsFull | TxComplete)) {
--			/* Handle all uncommon interrupts. */
--			if (status & StatsFull)				/* Empty statistics. */
--				update_stats(dev);
--			if (status & RxEarly) {				/* Rx early is unused. */
--				el3_rx(dev);
+-		if (status & DownComplete) {
+-			unsigned int dirty_tx = lp->dirty_tx;
+-
+-			while (lp->cur_tx - dirty_tx > 0) {
+-				int entry = dirty_tx % TX_RING_SIZE;
+-				if (inl(ioaddr + DownListPtr) == isa_virt_to_bus(&lp->tx_ring[entry]))
+-					break;	/* It still hasn't been processed. */
+-				if (lp->tx_skbuff[entry]) {
+-					dev_consume_skb_irq(lp->tx_skbuff[entry]);
+-					lp->tx_skbuff[entry] = NULL;
+-				}
+-				dirty_tx++;
+-			}
+-			lp->dirty_tx = dirty_tx;
+-			outw(AckIntr | DownComplete, ioaddr + EL3_CMD);
+-			if (lp->tx_full && (lp->cur_tx - dirty_tx <= TX_RING_SIZE - 1)) {
+-				lp->tx_full = 0;
+-				netif_wake_queue(dev);
+-			}
+-		}
+-#ifdef VORTEX_BUS_MASTER
+-		if (status & DMADone) {
+-			outw(0x1000, ioaddr + Wn7_MasterStatus);	/* Ack the event. */
+-			dev_consume_skb_irq(lp->tx_skb);	/* Release the transferred buffer */
+-			netif_wake_queue(dev);
+-		}
+-#endif
+-		if (status & UpComplete) {
+-			boomerang_rx(dev);
+-			outw(AckIntr | UpComplete, ioaddr + EL3_CMD);
+-		}
+-		if (status & (AdapterFailure | RxEarly | StatsFull)) {
+-			/* Handle all uncommon interrupts at once. */
+-			if (status & RxEarly) {	/* Rx early is unused. */
+-				corkscrew_rx(dev);
 -				outw(AckIntr | RxEarly, ioaddr + EL3_CMD);
 -			}
--			if (status & TxComplete) {			/* Really Tx error. */
--				short tx_status;
--				int i = 4;
--
--				while (--i>0 && (tx_status = inb(ioaddr + TX_STATUS)) > 0) {
--					if (tx_status & 0x38) dev->stats.tx_aborted_errors++;
--					if (tx_status & 0x30) outw(TxReset, ioaddr + EL3_CMD);
--					if (tx_status & 0x3C) outw(TxEnable, ioaddr + EL3_CMD);
--					outb(0x00, ioaddr + TX_STATUS); /* Pop the status stack. */
+-			if (status & StatsFull) {	/* Empty statistics. */
+-				static int DoneDidThat;
+-				if (corkscrew_debug > 4)
+-					pr_debug("%s: Updating stats.\n", dev->name);
+-				update_stats(ioaddr, dev);
+-				/* DEBUG HACK: Disable statistics as an interrupt source. */
+-				/* This occurs when we have the wrong media type! */
+-				if (DoneDidThat == 0 && inw(ioaddr + EL3_STATUS) & StatsFull) {
+-					int win, reg;
+-					pr_notice("%s: Updating stats failed, disabling stats as an interrupt source.\n",
+-						dev->name);
+-					for (win = 0; win < 8; win++) {
+-						EL3WINDOW(win);
+-						pr_notice("Vortex window %d:", win);
+-						for (reg = 0; reg < 16; reg++)
+-							pr_cont(" %2.2x", inb(ioaddr + reg));
+-						pr_cont("\n");
+-					}
+-					EL3WINDOW(7);
+-					outw(SetIntrEnb | TxAvailable |
+-					     RxComplete | AdapterFailure |
+-					     UpComplete | DownComplete |
+-					     TxComplete, ioaddr + EL3_CMD);
+-					DoneDidThat++;
 -				}
 -			}
 -			if (status & AdapterFailure) {
 -				/* Adapter failure requires Rx reset and reinit. */
 -				outw(RxReset, ioaddr + EL3_CMD);
 -				/* Set the Rx filter to the current state. */
--				outw(SetRxFilter | RxStation | RxBroadcast
--					 | (dev->flags & IFF_ALLMULTI ? RxMulticast : 0)
--					 | (dev->flags & IFF_PROMISC ? RxProm : 0),
--					 ioaddr + EL3_CMD);
--				outw(RxEnable, ioaddr + EL3_CMD); /* Re-enable the receiver. */
--				outw(AckIntr | AdapterFailure, ioaddr + EL3_CMD);
+-				set_rx_mode(dev);
+-				outw(RxEnable, ioaddr + EL3_CMD);	/* Re-enable the receiver. */
+-				outw(AckIntr | AdapterFailure,
+-				     ioaddr + EL3_CMD);
 -			}
 -		}
 -
 -		if (--i < 0) {
--			pr_err("%s: Infinite loop in interrupt, status %4.4x.\n",
--				   dev->name, status);
--			/* Clear all interrupts. */
--			outw(AckIntr | 0xFF, ioaddr + EL3_CMD);
+-			pr_err("%s: Too much work in interrupt, status %4.4x. Disabling functions (%4.4x).\n",
+-				dev->name, status, SetStatusEnb | ((~status) & 0x7FE));
+-			/* Disable all pending interrupts. */
+-			outw(SetStatusEnb | ((~status) & 0x7FE), ioaddr + EL3_CMD);
+-			outw(AckIntr | 0x7FF, ioaddr + EL3_CMD);
 -			break;
 -		}
 -		/* Acknowledge the IRQ. */
--		outw(AckIntr | IntReq | IntLatch, ioaddr + EL3_CMD); /* Ack IRQ */
--	}
+-		outw(AckIntr | IntReq | IntLatch, ioaddr + EL3_CMD);
 -
--	if (el3_debug > 4) {
--		pr_debug("%s: exiting interrupt, status %4.4x.\n", dev->name,
--			   inw(ioaddr + EL3_STATUS));
--	}
+-	} while ((status = inw(ioaddr + EL3_STATUS)) & (IntLatch | RxComplete));
+-
 -	spin_unlock(&lp->lock);
+-
+-	if (corkscrew_debug > 4)
+-		pr_debug("%s: exiting interrupt, status %4.4x.\n", dev->name, status);
 -	return IRQ_HANDLED;
 -}
 -
--
--#ifdef CONFIG_NET_POLL_CONTROLLER
--/*
-- * Polling receive - used by netconsole and other diagnostic tools
-- * to allow network i/o with interrupts disabled.
-- */
--static void el3_poll_controller(struct net_device *dev)
--{
--	disable_irq(dev->irq);
--	el3_interrupt(dev->irq, dev);
--	enable_irq(dev->irq);
--}
--#endif
--
--static struct net_device_stats *
--el3_get_stats(struct net_device *dev)
--{
--	struct el3_private *lp = netdev_priv(dev);
--	unsigned long flags;
--
--	/*
--	 *	This is fast enough not to bother with disable IRQ
--	 *	stuff.
--	 */
--
--	spin_lock_irqsave(&lp->lock, flags);
--	update_stats(dev);
--	spin_unlock_irqrestore(&lp->lock, flags);
--	return &dev->stats;
--}
--
--/*  Update statistics.  We change to register window 6, so this should be run
--	single-threaded if the device is active. This is expected to be a rare
--	operation, and it's simpler for the rest of the driver to assume that
--	window 1 is always valid rather than use a special window-state variable.
--	*/
--static void update_stats(struct net_device *dev)
+-static int corkscrew_rx(struct net_device *dev)
 -{
 -	int ioaddr = dev->base_addr;
--
--	if (el3_debug > 5)
--		pr_debug("   Updating the statistics.\n");
--	/* Turn off statistics updates while reading. */
--	outw(StatsDisable, ioaddr + EL3_CMD);
--	/* Switch to the stats window, and read everything. */
--	EL3WINDOW(6);
--	dev->stats.tx_carrier_errors 	+= inb(ioaddr + 0);
--	dev->stats.tx_heartbeat_errors	+= inb(ioaddr + 1);
--	/* Multiple collisions. */	   inb(ioaddr + 2);
--	dev->stats.collisions		+= inb(ioaddr + 3);
--	dev->stats.tx_window_errors	+= inb(ioaddr + 4);
--	dev->stats.rx_fifo_errors	+= inb(ioaddr + 5);
--	dev->stats.tx_packets		+= inb(ioaddr + 6);
--	/* Rx packets	*/		   inb(ioaddr + 7);
--	/* Tx deferrals */		   inb(ioaddr + 8);
--	inw(ioaddr + 10);	/* Total Rx and Tx octets. */
--	inw(ioaddr + 12);
--
--	/* Back to window 1, and turn statistics back on. */
--	EL3WINDOW(1);
--	outw(StatsEnable, ioaddr + EL3_CMD);
--}
--
--static int
--el3_rx(struct net_device *dev)
--{
--	int ioaddr = dev->base_addr;
+-	int i;
 -	short rx_status;
 -
--	if (el3_debug > 5)
+-	if (corkscrew_debug > 5)
 -		pr_debug("   In rx_packet(), status %4.4x, rx_status %4.4x.\n",
--			   inw(ioaddr+EL3_STATUS), inw(ioaddr+RX_STATUS));
--	while ((rx_status = inw(ioaddr + RX_STATUS)) > 0) {
--		if (rx_status & 0x4000) { /* Error, update stats. */
--			short error = rx_status & 0x3800;
--
--			outw(RxDiscard, ioaddr + EL3_CMD);
+-		     inw(ioaddr + EL3_STATUS), inw(ioaddr + RxStatus));
+-	while ((rx_status = inw(ioaddr + RxStatus)) > 0) {
+-		if (rx_status & 0x4000) {	/* Error, update stats. */
+-			unsigned char rx_error = inb(ioaddr + RxErrors);
+-			if (corkscrew_debug > 2)
+-				pr_debug(" Rx error: status %2.2x.\n",
+-				       rx_error);
 -			dev->stats.rx_errors++;
--			switch (error) {
--			case 0x0000:		dev->stats.rx_over_errors++; break;
--			case 0x0800:		dev->stats.rx_length_errors++; break;
--			case 0x1000:		dev->stats.rx_frame_errors++; break;
--			case 0x1800:		dev->stats.rx_length_errors++; break;
--			case 0x2000:		dev->stats.rx_frame_errors++; break;
--			case 0x2800:		dev->stats.rx_crc_errors++; break;
--			}
+-			if (rx_error & 0x01)
+-				dev->stats.rx_over_errors++;
+-			if (rx_error & 0x02)
+-				dev->stats.rx_length_errors++;
+-			if (rx_error & 0x04)
+-				dev->stats.rx_frame_errors++;
+-			if (rx_error & 0x08)
+-				dev->stats.rx_crc_errors++;
+-			if (rx_error & 0x10)
+-				dev->stats.rx_length_errors++;
 -		} else {
--			short pkt_len = rx_status & 0x7ff;
+-			/* The packet length: up to 4.5K!. */
+-			short pkt_len = rx_status & 0x1fff;
 -			struct sk_buff *skb;
 -
--			skb = netdev_alloc_skb(dev, pkt_len + 5);
--			if (el3_debug > 4)
+-			skb = netdev_alloc_skb(dev, pkt_len + 5 + 2);
+-			if (corkscrew_debug > 4)
 -				pr_debug("Receiving packet size %d status %4.4x.\n",
--					   pkt_len, rx_status);
+-				     pkt_len, rx_status);
 -			if (skb != NULL) {
--				skb_reserve(skb, 2);     /* Align IP on 16 byte */
--
--				/* 'skb->data' points to the start of sk_buff data area. */
--				insl(ioaddr + RX_FIFO, skb_put(skb,pkt_len),
--					 (pkt_len + 3) >> 2);
--
--				outw(RxDiscard, ioaddr + EL3_CMD); /* Pop top Rx packet. */
--				skb->protocol = eth_type_trans(skb,dev);
+-				skb_reserve(skb, 2);	/* Align IP on 16 byte boundaries */
+-				/* 'skb_put()' points to the start of sk_buff data area. */
+-				insl(ioaddr + RX_FIFO,
+-				     skb_put(skb, pkt_len),
+-				     (pkt_len + 3) >> 2);
+-				outw(RxDiscard, ioaddr + EL3_CMD);	/* Pop top Rx packet. */
+-				skb->protocol = eth_type_trans(skb, dev);
 -				netif_rx(skb);
--				dev->stats.rx_bytes += pkt_len;
 -				dev->stats.rx_packets++;
+-				dev->stats.rx_bytes += pkt_len;
+-				/* Wait a limited time to go to next packet. */
+-				for (i = 200; i >= 0; i--)
+-					if (! (inw(ioaddr + EL3_STATUS) & CmdInProgress))
+-						break;
 -				continue;
+-			} else if (corkscrew_debug)
+-				pr_debug("%s: Couldn't allocate a sk_buff of size %d.\n", dev->name, pkt_len);
+-		}
+-		outw(RxDiscard, ioaddr + EL3_CMD);
+-		dev->stats.rx_dropped++;
+-		/* Wait a limited time to skip this packet. */
+-		for (i = 200; i >= 0; i--)
+-			if (!(inw(ioaddr + EL3_STATUS) & CmdInProgress))
+-				break;
+-	}
+-	return 0;
+-}
+-
+-static int boomerang_rx(struct net_device *dev)
+-{
+-	struct corkscrew_private *vp = netdev_priv(dev);
+-	int entry = vp->cur_rx % RX_RING_SIZE;
+-	int ioaddr = dev->base_addr;
+-	int rx_status;
+-
+-	if (corkscrew_debug > 5)
+-		pr_debug("   In boomerang_rx(), status %4.4x, rx_status %4.4x.\n",
+-			inw(ioaddr + EL3_STATUS), inw(ioaddr + RxStatus));
+-	while ((rx_status = vp->rx_ring[entry].status) & RxDComplete) {
+-		if (rx_status & RxDError) {	/* Error, update stats. */
+-			unsigned char rx_error = rx_status >> 16;
+-			if (corkscrew_debug > 2)
+-				pr_debug(" Rx error: status %2.2x.\n",
+-				       rx_error);
+-			dev->stats.rx_errors++;
+-			if (rx_error & 0x01)
+-				dev->stats.rx_over_errors++;
+-			if (rx_error & 0x02)
+-				dev->stats.rx_length_errors++;
+-			if (rx_error & 0x04)
+-				dev->stats.rx_frame_errors++;
+-			if (rx_error & 0x08)
+-				dev->stats.rx_crc_errors++;
+-			if (rx_error & 0x10)
+-				dev->stats.rx_length_errors++;
+-		} else {
+-			/* The packet length: up to 4.5K!. */
+-			short pkt_len = rx_status & 0x1fff;
+-			struct sk_buff *skb;
+-
+-			dev->stats.rx_bytes += pkt_len;
+-			if (corkscrew_debug > 4)
+-				pr_debug("Receiving packet size %d status %4.4x.\n",
+-				     pkt_len, rx_status);
+-
+-			/* Check if the packet is long enough to just accept without
+-			   copying to a properly sized skbuff. */
+-			if (pkt_len < rx_copybreak &&
+-			    (skb = netdev_alloc_skb(dev, pkt_len + 4)) != NULL) {
+-				skb_reserve(skb, 2);	/* Align IP on 16 byte boundaries */
+-				/* 'skb_put()' points to the start of sk_buff data area. */
+-				skb_put_data(skb,
+-					     isa_bus_to_virt(vp->rx_ring[entry].addr),
+-					     pkt_len);
+-				rx_copy++;
+-			} else {
+-				void *temp;
+-				/* Pass up the skbuff already on the Rx ring. */
+-				skb = vp->rx_skbuff[entry];
+-				vp->rx_skbuff[entry] = NULL;
+-				temp = skb_put(skb, pkt_len);
+-				/* Remove this checking code for final release. */
+-				if (isa_bus_to_virt(vp->rx_ring[entry].addr) != temp)
+-					pr_warn("%s: Warning -- the skbuff addresses do not match in boomerang_rx: %p vs. %p / %p\n",
+-						dev->name,
+-						isa_bus_to_virt(vp->rx_ring[entry].addr),
+-						skb->head, temp);
+-				rx_nocopy++;
 -			}
--			outw(RxDiscard, ioaddr + EL3_CMD);
--			dev->stats.rx_dropped++;
--			if (el3_debug)
--				pr_debug("%s: Couldn't allocate a sk_buff of size %d.\n",
--					   dev->name, pkt_len);
+-			skb->protocol = eth_type_trans(skb, dev);
+-			netif_rx(skb);
+-			dev->stats.rx_packets++;
 -		}
--		inw(ioaddr + EL3_STATUS); 				/* Delay. */
--		while (inw(ioaddr + EL3_STATUS) & 0x1000)
--			pr_debug("	Waiting for 3c509 to discard packet, status %x.\n",
--				   inw(ioaddr + EL3_STATUS) );
+-		entry = (++vp->cur_rx) % RX_RING_SIZE;
 -	}
--
--	return 0;
--}
--
--/*
-- *     Set or clear the multicast filter for this adaptor.
-- */
--static void
--set_multicast_list(struct net_device *dev)
--{
--	unsigned long flags;
--	struct el3_private *lp = netdev_priv(dev);
--	int ioaddr = dev->base_addr;
--	int mc_count = netdev_mc_count(dev);
--
--	if (el3_debug > 1) {
--		static int old;
--		if (old != mc_count) {
--			old = mc_count;
--			pr_debug("%s: Setting Rx mode to %d addresses.\n",
--				 dev->name, mc_count);
+-	/* Refill the Rx ring buffers. */
+-	for (; vp->cur_rx - vp->dirty_rx > 0; vp->dirty_rx++) {
+-		struct sk_buff *skb;
+-		entry = vp->dirty_rx % RX_RING_SIZE;
+-		if (vp->rx_skbuff[entry] == NULL) {
+-			skb = netdev_alloc_skb(dev, PKT_BUF_SZ);
+-			if (skb == NULL)
+-				break;	/* Bad news!  */
+-			skb_reserve(skb, 2);	/* Align IP on 16 byte boundaries */
+-			vp->rx_ring[entry].addr = isa_virt_to_bus(skb->data);
+-			vp->rx_skbuff[entry] = skb;
 -		}
+-		vp->rx_ring[entry].status = 0;	/* Clear complete bit. */
 -	}
--	spin_lock_irqsave(&lp->lock, flags);
--	if (dev->flags&IFF_PROMISC) {
--		outw(SetRxFilter | RxStation | RxMulticast | RxBroadcast | RxProm,
--			 ioaddr + EL3_CMD);
--	}
--	else if (mc_count || (dev->flags&IFF_ALLMULTI)) {
--		outw(SetRxFilter | RxStation | RxMulticast | RxBroadcast, ioaddr + EL3_CMD);
--	}
--	else
--		outw(SetRxFilter | RxStation | RxBroadcast, ioaddr + EL3_CMD);
--	spin_unlock_irqrestore(&lp->lock, flags);
--}
--
--static int
--el3_close(struct net_device *dev)
--{
--	int ioaddr = dev->base_addr;
--	struct el3_private *lp = netdev_priv(dev);
--
--	if (el3_debug > 2)
--		pr_debug("%s: Shutting down ethercard.\n", dev->name);
--
--	el3_down(dev);
--
--	free_irq(dev->irq, dev);
--	/* Switching back to window 0 disables the IRQ. */
--	EL3WINDOW(0);
--	if (lp->type != EL3_EISA) {
--		/* But we explicitly zero the IRQ line select anyway. Don't do
--		 * it on EISA cards, it prevents the module from getting an
--		 * IRQ after unload+reload... */
--		outw(0x0f00, ioaddr + WN0_IRQ);
--	}
--
 -	return 0;
 -}
 -
--static int
--el3_link_ok(struct net_device *dev)
+-static int corkscrew_close(struct net_device *dev)
 -{
+-	struct corkscrew_private *vp = netdev_priv(dev);
 -	int ioaddr = dev->base_addr;
--	u16 tmp;
--
--	EL3WINDOW(4);
--	tmp = inw(ioaddr + WN4_MEDIA);
--	EL3WINDOW(1);
--	return tmp & (1<<11);
--}
--
--static void
--el3_netdev_get_ecmd(struct net_device *dev, struct ethtool_link_ksettings *cmd)
--{
--	u16 tmp;
--	int ioaddr = dev->base_addr;
--	u32 supported;
--
--	EL3WINDOW(0);
--	/* obtain current transceiver via WN4_MEDIA? */
--	tmp = inw(ioaddr + WN0_ADDR_CONF);
--	switch (tmp >> 14) {
--	case 0:
--		cmd->base.port = PORT_TP;
--		break;
--	case 1:
--		cmd->base.port = PORT_AUI;
--		break;
--	case 3:
--		cmd->base.port = PORT_BNC;
--		break;
--	default:
--		break;
--	}
--
--	cmd->base.duplex = DUPLEX_HALF;
--	supported = 0;
--	tmp = inw(ioaddr + WN0_CONF_CTRL);
--	if (tmp & (1<<13))
--		supported |= SUPPORTED_AUI;
--	if (tmp & (1<<12))
--		supported |= SUPPORTED_BNC;
--	if (tmp & (1<<9)) {
--		supported |= SUPPORTED_TP | SUPPORTED_10baseT_Half |
--				SUPPORTED_10baseT_Full;	/* hmm... */
--		EL3WINDOW(4);
--		tmp = inw(ioaddr + WN4_NETDIAG);
--		if (tmp & FD_ENABLE)
--			cmd->base.duplex = DUPLEX_FULL;
--	}
--
--	ethtool_convert_legacy_u32_to_link_mode(cmd->link_modes.supported,
--						supported);
--	cmd->base.speed = SPEED_10;
--	EL3WINDOW(1);
--}
--
--static int
--el3_netdev_set_ecmd(struct net_device *dev,
--		    const struct ethtool_link_ksettings *cmd)
--{
--	u16 tmp;
--	int ioaddr = dev->base_addr;
--
--	if (cmd->base.speed != SPEED_10)
--		return -EINVAL;
--	if ((cmd->base.duplex != DUPLEX_HALF) &&
--	    (cmd->base.duplex != DUPLEX_FULL))
--		return -EINVAL;
--
--	/* change XCVR type */
--	EL3WINDOW(0);
--	tmp = inw(ioaddr + WN0_ADDR_CONF);
--	switch (cmd->base.port) {
--	case PORT_TP:
--		tmp &= ~(3<<14);
--		dev->if_port = 0;
--		break;
--	case PORT_AUI:
--		tmp |= (1<<14);
--		dev->if_port = 1;
--		break;
--	case PORT_BNC:
--		tmp |= (3<<14);
--		dev->if_port = 3;
--		break;
--	default:
--		return -EINVAL;
--	}
--
--	outw(tmp, ioaddr + WN0_ADDR_CONF);
--	if (dev->if_port == 3) {
--		/* fire up the DC-DC convertor if BNC gets enabled */
--		tmp = inw(ioaddr + WN0_ADDR_CONF);
--		if (tmp & (3 << 14)) {
--			outw(StartCoax, ioaddr + EL3_CMD);
--			udelay(800);
--		} else
--			return -EIO;
--	}
--
--	EL3WINDOW(4);
--	tmp = inw(ioaddr + WN4_NETDIAG);
--	if (cmd->base.duplex == DUPLEX_FULL)
--		tmp |= FD_ENABLE;
--	else
--		tmp &= ~FD_ENABLE;
--	outw(tmp, ioaddr + WN4_NETDIAG);
--	EL3WINDOW(1);
--
--	return 0;
--}
--
--static void el3_get_drvinfo(struct net_device *dev, struct ethtool_drvinfo *info)
--{
--	strscpy(info->driver, DRV_NAME, sizeof(info->driver));
--}
--
--static int el3_get_link_ksettings(struct net_device *dev,
--				  struct ethtool_link_ksettings *cmd)
--{
--	struct el3_private *lp = netdev_priv(dev);
--
--	spin_lock_irq(&lp->lock);
--	el3_netdev_get_ecmd(dev, cmd);
--	spin_unlock_irq(&lp->lock);
--	return 0;
--}
--
--static int el3_set_link_ksettings(struct net_device *dev,
--				  const struct ethtool_link_ksettings *cmd)
--{
--	struct el3_private *lp = netdev_priv(dev);
--	int ret;
--
--	spin_lock_irq(&lp->lock);
--	ret = el3_netdev_set_ecmd(dev, cmd);
--	spin_unlock_irq(&lp->lock);
--	return ret;
--}
--
--static u32 el3_get_link(struct net_device *dev)
--{
--	struct el3_private *lp = netdev_priv(dev);
--	u32 ret;
--
--	spin_lock_irq(&lp->lock);
--	ret = el3_link_ok(dev);
--	spin_unlock_irq(&lp->lock);
--	return ret;
--}
--
--static u32 el3_get_msglevel(struct net_device *dev)
--{
--	return el3_debug;
--}
--
--static void el3_set_msglevel(struct net_device *dev, u32 v)
--{
--	el3_debug = v;
--}
--
--static const struct ethtool_ops ethtool_ops = {
--	.get_drvinfo = el3_get_drvinfo,
--	.get_link = el3_get_link,
--	.get_msglevel = el3_get_msglevel,
--	.set_msglevel = el3_set_msglevel,
--	.get_link_ksettings = el3_get_link_ksettings,
--	.set_link_ksettings = el3_set_link_ksettings,
--};
--
--static void
--el3_down(struct net_device *dev)
--{
--	int ioaddr = dev->base_addr;
+-	int i;
 -
 -	netif_stop_queue(dev);
+-
+-	if (corkscrew_debug > 1) {
+-		pr_debug("%s: corkscrew_close() status %4.4x, Tx status %2.2x.\n",
+-		     dev->name, inw(ioaddr + EL3_STATUS),
+-		     inb(ioaddr + TxStatus));
+-		pr_debug("%s: corkscrew close stats: rx_nocopy %d rx_copy %d tx_queued %d.\n",
+-			dev->name, rx_nocopy, rx_copy, queued_packet);
+-	}
+-
+-	timer_delete_sync(&vp->timer);
 -
 -	/* Turn off statistics ASAP.  We update lp->stats below. */
 -	outw(StatsDisable, ioaddr + EL3_CMD);
@@ -1340,284 +1558,181 @@ index fb68339e1511..000000000000
 -	outw(RxDisable, ioaddr + EL3_CMD);
 -	outw(TxDisable, ioaddr + EL3_CMD);
 -
--	if (dev->if_port == 3)
+-	if (dev->if_port == XCVR_10base2)
 -		/* Turn off thinnet power.  Green! */
 -		outw(StopCoax, ioaddr + EL3_CMD);
--	else if (dev->if_port == 0) {
--		/* Disable link beat and jabber, if_port may change here next open(). */
--		EL3WINDOW(4);
--		outw(inw(ioaddr + WN4_MEDIA) & ~MEDIA_TP, ioaddr + WN4_MEDIA);
--	}
+-
+-	free_irq(dev->irq, dev);
 -
 -	outw(SetIntrEnb | 0x0000, ioaddr + EL3_CMD);
 -
--	update_stats(dev);
--}
--
--static void
--el3_up(struct net_device *dev)
--{
--	int i, sw_info, net_diag;
--	int ioaddr = dev->base_addr;
--
--	/* Activating the board required and does no harm otherwise */
--	outw(0x0001, ioaddr + 4);
--
--	/* Set the IRQ line. */
--	outw((dev->irq << 12) | 0x0f00, ioaddr + WN0_IRQ);
--
--	/* Set the station address in window 2 each time opened. */
--	EL3WINDOW(2);
--
--	for (i = 0; i < 6; i++)
--		outb(dev->dev_addr[i], ioaddr + i);
--
--	if ((dev->if_port & 0x03) == 3) /* BNC interface */
--		/* Start the thinnet transceiver. We should really wait 50ms...*/
--		outw(StartCoax, ioaddr + EL3_CMD);
--	else if ((dev->if_port & 0x03) == 0) { /* 10baseT interface */
--		/* Combine secondary sw_info word (the adapter level) and primary
--			sw_info word (duplex setting plus other useless bits) */
--		EL3WINDOW(0);
--		sw_info = (read_eeprom(ioaddr, 0x14) & 0x400f) |
--			(read_eeprom(ioaddr, 0x0d) & 0xBff0);
--
--		EL3WINDOW(4);
--		net_diag = inw(ioaddr + WN4_NETDIAG);
--		net_diag = (net_diag | FD_ENABLE); /* temporarily assume full-duplex will be set */
--		pr_info("%s: ", dev->name);
--		switch (dev->if_port & 0x0c) {
--			case 12:
--				/* force full-duplex mode if 3c5x9b */
--				if (sw_info & 0x000f) {
--					pr_cont("Forcing 3c5x9b full-duplex mode");
--					break;
--				}
--				fallthrough;
--			case 8:
--				/* set full-duplex mode based on eeprom config setting */
--				if ((sw_info & 0x000f) && (sw_info & 0x8000)) {
--					pr_cont("Setting 3c5x9b full-duplex mode (from EEPROM configuration bit)");
--					break;
--				}
--				fallthrough;
--			default:
--				/* xcvr=(0 || 4) OR user has an old 3c5x9 non "B" model */
--				pr_cont("Setting 3c5x9/3c5x9B half-duplex mode");
--				net_diag = (net_diag & ~FD_ENABLE); /* disable full duplex */
--		}
--
--		outw(net_diag, ioaddr + WN4_NETDIAG);
--		pr_cont(" if_port: %d, sw_info: %4.4x\n", dev->if_port, sw_info);
--		if (el3_debug > 3)
--			pr_debug("%s: 3c5x9 net diag word is now: %4.4x.\n", dev->name, net_diag);
--		/* Enable link beat and jabber check. */
--		outw(inw(ioaddr + WN4_MEDIA) | MEDIA_TP, ioaddr + WN4_MEDIA);
+-	update_stats(ioaddr, dev);
+-	if (vp->full_bus_master_rx) {	/* Free Boomerang bus master Rx buffers. */
+-		outl(0, ioaddr + UpListPtr);
+-		for (i = 0; i < RX_RING_SIZE; i++)
+-			if (vp->rx_skbuff[i]) {
+-				dev_kfree_skb(vp->rx_skbuff[i]);
+-				vp->rx_skbuff[i] = NULL;
+-			}
+-	}
+-	if (vp->full_bus_master_tx) {	/* Free Boomerang bus master Tx buffers. */
+-		outl(0, ioaddr + DownListPtr);
+-		for (i = 0; i < TX_RING_SIZE; i++)
+-			if (vp->tx_skbuff[i]) {
+-				dev_kfree_skb(vp->tx_skbuff[i]);
+-				vp->tx_skbuff[i] = NULL;
+-			}
 -	}
 -
--	/* Switch to the stats window, and clear all stats by reading. */
--	outw(StatsDisable, ioaddr + EL3_CMD);
+-	return 0;
+-}
+-
+-static struct net_device_stats *corkscrew_get_stats(struct net_device *dev)
+-{
+-	struct corkscrew_private *vp = netdev_priv(dev);
+-	unsigned long flags;
+-
+-	if (netif_running(dev)) {
+-		spin_lock_irqsave(&vp->lock, flags);
+-		update_stats(dev->base_addr, dev);
+-		spin_unlock_irqrestore(&vp->lock, flags);
+-	}
+-	return &dev->stats;
+-}
+-
+-/*  Update statistics.
+-	Unlike with the EL3 we need not worry about interrupts changing
+-	the window setting from underneath us, but we must still guard
+-	against a race condition with a StatsUpdate interrupt updating the
+-	table.  This is done by checking that the ASM (!) code generated uses
+-	atomic updates with '+='.
+-	*/
+-static void update_stats(int ioaddr, struct net_device *dev)
+-{
+-	/* Unlike the 3c5x9 we need not turn off stats updates while reading. */
+-	/* Switch to the stats window, and read everything. */
 -	EL3WINDOW(6);
--	for (i = 0; i < 9; i++)
--		inb(ioaddr + i);
--	inw(ioaddr + 10);
+-	dev->stats.tx_carrier_errors += inb(ioaddr + 0);
+-	dev->stats.tx_heartbeat_errors += inb(ioaddr + 1);
+-	/* Multiple collisions. */ inb(ioaddr + 2);
+-	dev->stats.collisions += inb(ioaddr + 3);
+-	dev->stats.tx_window_errors += inb(ioaddr + 4);
+-	dev->stats.rx_fifo_errors += inb(ioaddr + 5);
+-	dev->stats.tx_packets += inb(ioaddr + 6);
+-	dev->stats.tx_packets += (inb(ioaddr + 9) & 0x30) << 4;
+-						/* Rx packets   */ inb(ioaddr + 7);
+-						/* Must read to clear */
+-	/* Tx deferrals */ inb(ioaddr + 8);
+-	/* Don't bother with register 9, an extension of registers 6&7.
+-	   If we do use the 6&7 values the atomic update assumption above
+-	   is invalid. */
+-	inw(ioaddr + 10);	/* Total Rx and Tx octets. */
 -	inw(ioaddr + 12);
+-	/* New: On the Vortex we must also clear the BadSSD counter. */
+-	EL3WINDOW(4);
+-	inb(ioaddr + 12);
 -
--	/* Switch to register set 1 for normal use. */
--	EL3WINDOW(1);
--
--	/* Accept b-case and phys addr only. */
--	outw(SetRxFilter | RxStation | RxBroadcast, ioaddr + EL3_CMD);
--	outw(StatsEnable, ioaddr + EL3_CMD); /* Turn on statistics. */
--
--	outw(RxEnable, ioaddr + EL3_CMD); /* Enable the receiver. */
--	outw(TxEnable, ioaddr + EL3_CMD); /* Enable transmitter. */
--	/* Allow status bits to be seen. */
--	outw(SetStatusEnb | 0xff, ioaddr + EL3_CMD);
--	/* Ack all pending events, and set active indicator mask. */
--	outw(AckIntr | IntLatch | TxAvailable | RxEarly | IntReq,
--		 ioaddr + EL3_CMD);
--	outw(SetIntrEnb | IntLatch|TxAvailable|TxComplete|RxComplete|StatsFull,
--		 ioaddr + EL3_CMD);
--
--	netif_start_queue(dev);
+-	/* We change back to window 7 (not 1) with the Vortex. */
+-	EL3WINDOW(7);
 -}
 -
--/* Power Management support functions */
--#ifdef CONFIG_PM
--
--static int
--el3_suspend(struct device *pdev, pm_message_t state)
+-/* This new version of set_rx_mode() supports v1.4 kernels.
+-   The Vortex chip has no documented multicast filter, so the only
+-   multicast setting is to receive all multicast frames.  At least
+-   the chip has a very clean way to set the mode, unlike many others. */
+-static void set_rx_mode(struct net_device *dev)
 -{
--	unsigned long flags;
--	struct net_device *dev;
--	struct el3_private *lp;
--	int ioaddr;
+-	int ioaddr = dev->base_addr;
+-	unsigned short new_mode;
 -
--	dev = dev_get_drvdata(pdev);
--	lp = netdev_priv(dev);
--	ioaddr = dev->base_addr;
+-	if (dev->flags & IFF_PROMISC) {
+-		if (corkscrew_debug > 3)
+-			pr_debug("%s: Setting promiscuous mode.\n",
+-			       dev->name);
+-		new_mode = SetRxFilter | RxStation | RxMulticast | RxBroadcast | RxProm;
+-	} else if (!netdev_mc_empty(dev) || dev->flags & IFF_ALLMULTI) {
+-		new_mode = SetRxFilter | RxStation | RxMulticast | RxBroadcast;
+-	} else
+-		new_mode = SetRxFilter | RxStation | RxBroadcast;
 -
--	spin_lock_irqsave(&lp->lock, flags);
--
--	if (netif_running(dev))
--		netif_device_detach(dev);
--
--	el3_down(dev);
--	outw(PowerDown, ioaddr + EL3_CMD);
--
--	spin_unlock_irqrestore(&lp->lock, flags);
--	return 0;
+-	outw(new_mode, ioaddr + EL3_CMD);
 -}
 -
--static int
--el3_resume(struct device *pdev)
+-static void netdev_get_drvinfo(struct net_device *dev,
+-			       struct ethtool_drvinfo *info)
 -{
--	unsigned long flags;
--	struct net_device *dev;
--	struct el3_private *lp;
--	int ioaddr;
--
--	dev = dev_get_drvdata(pdev);
--	lp = netdev_priv(dev);
--	ioaddr = dev->base_addr;
--
--	spin_lock_irqsave(&lp->lock, flags);
--
--	outw(PowerUp, ioaddr + EL3_CMD);
--	EL3WINDOW(0);
--	el3_up(dev);
--
--	if (netif_running(dev))
--		netif_device_attach(dev);
--
--	spin_unlock_irqrestore(&lp->lock, flags);
--	return 0;
+-	strscpy(info->driver, DRV_NAME, sizeof(info->driver));
+-	snprintf(info->bus_info, sizeof(info->bus_info), "ISA 0x%lx",
+-		 dev->base_addr);
 -}
 -
--#endif /* CONFIG_PM */
--
--module_param(debug,int, 0);
--module_param_hw_array(irq, int, irq, NULL, 0);
--module_param(max_interrupt_work, int, 0);
--MODULE_PARM_DESC(debug, "debug level (0-6)");
--MODULE_PARM_DESC(irq, "IRQ number(s) (assigned)");
--MODULE_PARM_DESC(max_interrupt_work, "maximum events handled per interrupt");
--#ifdef CONFIG_PNP
--module_param(nopnp, int, 0);
--MODULE_PARM_DESC(nopnp, "disable ISA PnP support (0-1)");
--#endif	/* CONFIG_PNP */
--MODULE_DESCRIPTION("3Com Etherlink III (3c509, 3c509B, 3c529, 3c579) ethernet driver");
--MODULE_LICENSE("GPL");
--
--static int __init el3_init_module(void)
+-static u32 netdev_get_msglevel(struct net_device *dev)
 -{
--	int ret = 0;
+-	return corkscrew_debug;
+-}
 -
--	if (debug >= 0)
--		el3_debug = debug;
+-static void netdev_set_msglevel(struct net_device *dev, u32 level)
+-{
+-	corkscrew_debug = level;
+-}
 -
--#ifdef CONFIG_PNP
--	if (!nopnp) {
--		ret = pnp_register_driver(&el3_pnp_driver);
--		if (!ret)
--			pnp_registered = 1;
+-static const struct ethtool_ops netdev_ethtool_ops = {
+-	.get_drvinfo		= netdev_get_drvinfo,
+-	.get_msglevel		= netdev_get_msglevel,
+-	.set_msglevel		= netdev_set_msglevel,
+-};
+-
+-#ifdef MODULE
+-static void __exit corkscrew_exit_module(void)
+-{
+-	while (!list_empty(&root_corkscrew_dev)) {
+-		struct net_device *dev;
+-		struct corkscrew_private *vp;
+-
+-		vp = list_entry(root_corkscrew_dev.next,
+-				struct corkscrew_private, list);
+-		dev = vp->our_dev;
+-		unregister_netdev(dev);
+-		cleanup_card(dev);
+-		free_netdev(dev);
 -	}
--#endif
--	/* Select an open I/O location at 0x1*0 to do ISA contention select. */
--	/* Start with 0x110 to avoid some sound cards.*/
--	for (id_port = 0x110 ; id_port < 0x200; id_port += 0x10) {
--		if (!request_region(id_port, 1, "3c509-control"))
--			continue;
--		outb(0x00, id_port);
--		outb(0xff, id_port);
--		if (inb(id_port) & 0x01)
--			break;
--		else
--			release_region(id_port, 1);
--	}
--	if (id_port >= 0x200) {
--		id_port = 0;
--		pr_err("No I/O port available for 3c509 activation.\n");
--	} else {
--		ret = isa_register_driver(&el3_isa_driver, EL3_MAX_CARDS);
--		if (!ret)
--			isa_registered = 1;
--	}
--#ifdef CONFIG_EISA
--	ret = eisa_driver_register(&el3_eisa_driver);
--	if (!ret)
--		eisa_registered = 1;
--#endif
--
--#ifdef CONFIG_PNP
--	if (pnp_registered)
--		ret = 0;
--#endif
--	if (isa_registered)
--		ret = 0;
--#ifdef CONFIG_EISA
--	if (eisa_registered)
--		ret = 0;
--#endif
--	return ret;
 -}
--
--static void __exit el3_cleanup_module(void)
--{
--#ifdef CONFIG_PNP
--	if (pnp_registered)
--		pnp_unregister_driver(&el3_pnp_driver);
--#endif
--	if (isa_registered)
--		isa_unregister_driver(&el3_isa_driver);
--	if (id_port)
--		release_region(id_port, 1);
--#ifdef CONFIG_EISA
--	if (eisa_registered)
--		eisa_driver_unregister(&el3_eisa_driver);
--#endif
--}
--
--module_init (el3_init_module);
--module_exit (el3_cleanup_module);
+-module_exit(corkscrew_exit_module);
+-#endif				/* MODULE */
 diff --git a/drivers/net/ethernet/3com/Kconfig b/drivers/net/ethernet/3com/Kconfig
-index 1fbab79e2be4..c05a1b63c1c9 100644
+index c05a1b63c1c9..3fd3202d9776 100644
 --- a/drivers/net/ethernet/3com/Kconfig
 +++ b/drivers/net/ethernet/3com/Kconfig
-@@ -17,20 +17,6 @@ config NET_VENDOR_3COM
+@@ -17,17 +17,6 @@ config NET_VENDOR_3COM
  
  if NET_VENDOR_3COM
  
--config EL3
--	tristate "3c509/3c579 \"EtherLink III\" support"
--	depends on (ISA || EISA)
+-config 3C515
+-	tristate "3c515 ISA \"Fast EtherLink\""
+-	depends on ISA && ISA_DMA_API && !PPC32
+-	select NETDEV_LEGACY_INIT
 -	help
--	  If you have a network (Ethernet) card belonging to the 3Com
--	  EtherLinkIII series, say Y here.
--
--	  If your card is not working you may need to use the DOS
--	  setup disk to disable Plug & Play mode, and to select the default
--	  media type.
+-	  If you have a 3Com ISA EtherLink XL "Corkscrew" 3c515 Fast Ethernet
+-	  network card, say Y here.
 -
 -	  To compile this driver as a module, choose M here. The module
--	  will be called 3c509.
+-	  will be called 3c515.
 -
- config 3C515
- 	tristate "3c515 ISA \"Fast EtherLink\""
- 	depends on ISA && ISA_DMA_API && !PPC32
+ config PCMCIA_3C574
+ 	tristate "3Com 3c574 PCMCIA support"
+ 	depends on PCMCIA && HAS_IOPORT
 diff --git a/drivers/net/ethernet/3com/Makefile b/drivers/net/ethernet/3com/Makefile
-index f8b73babc510..f7623fa2d441 100644
+index f7623fa2d441..babfd93d5d53 100644
 --- a/drivers/net/ethernet/3com/Makefile
 +++ b/drivers/net/ethernet/3com/Makefile
 @@ -3,7 +3,6 @@
  # Makefile for the 3Com Ethernet device drivers
  #
  
--obj-$(CONFIG_EL3) += 3c509.o
- obj-$(CONFIG_3C515) += 3c515.o
+-obj-$(CONFIG_3C515) += 3c515.o
  obj-$(CONFIG_PCMCIA_3C589) += 3c589_cs.o
  obj-$(CONFIG_PCMCIA_3C574) += 3c574_cs.o
+ obj-$(CONFIG_VORTEX) += 3c59x.o
 
 -- 
 2.53.0
