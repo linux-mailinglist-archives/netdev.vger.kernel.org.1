@@ -1,125 +1,125 @@
-Return-Path: <netdev+bounces-280273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280274-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gFPJEnkA6GlJEAIAu9opvQ
-	(envelope-from <netdev+bounces-280273-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 00:55:53 +0200
+	id mBRlDI0B6GlJEAIAu9opvQ
+	(envelope-from <netdev+bounces-280274-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 01:00:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3739F440550
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 00:55:51 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E980440605
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 01:00:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EAD7D30060AF
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:55:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 92B74305AE33
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:59:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B583A6B6B;
-	Tue, 21 Apr 2026 22:55:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B085379ED6;
+	Tue, 21 Apr 2026 22:59:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T1rFC0W8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kJnEIdXO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
+Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52932386C0C
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 22:55:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91AC63502B8
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 22:59:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.49
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776812147; cv=pass; b=N2SFRFhQU42+O4rqdgO4lMfzFB3FFIlNn/0GokIJ4a4hoD4Bz0NMNjWwmkXLq6A61aJRLlJA3PuE4rYy81Mzv2X490LGaOWfg112myt9DzurU07iIDKUBxftUBpVv1uAhCeN0r17EWUukcIHQj0wOUoZLOPrWszTvdoK3P7iIuo=
+	t=1776812392; cv=pass; b=SmzbpRzWnd3eD8Uaeb6NnQvqcftyKTGKpw+U6BOo2OSvAPiPsBzyODCQ0/ksfpZQW/eZgboHaMeFWGiEnYuURvV8F3HJ24Hg2GXE5IICQE9SBFnohTiDYfe/DUalvEJ4d7YBiMy0ahoWOojrZRQhItnK6GjR/A72FKqqxDkeYaA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776812147; c=relaxed/simple;
-	bh=7g+6Nj4I9wlSgMa6eYN57nLSLjoKXWzdMIwO8KfWfA0=;
+	s=arc-20240116; t=1776812392; c=relaxed/simple;
+	bh=a3Prwcdh8j9+3CtUCjVP05sQvOvEc9TKH7JXC6xKWl4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MSzEnI+hEnhu1xY34Vn4HYnFLu2HYpJHaEE5ouYKmD/yPU/WtxueiuO4JL4ym1jMO3KTMUA9n6dEHTBlBX7ny0hiQ9qi3uG3y21FhhiClPACiJRavHrSXB6+/3pUB0svci2WbReniyzvsy6NMz9hARyyy/HMzKH5A6mq7FyyL1c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T1rFC0W8; arc=pass smtp.client-ip=74.125.82.54
+	 To:Cc:Content-Type; b=DNvZyGd6hCQMwQ3d01T2aIOX81k3Kv2JT3xi6rpyht0uuGabs2gEdJGws6FgjyiwHmAx2IUqZyyHwkBuljOplWIn/BMFBX/cB7urMFUchxyz4kW4WxeACc0ux9r6QFRKlQq9ctlt+VZfLmHFB98J3iwsJeQFIsBg7cidQw2x7CI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kJnEIdXO; arc=pass smtp.client-ip=74.125.82.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-12c1a170a50so5944467c88.0
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 15:55:46 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776812145; cv=none;
+Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-12c565476d7so11123984c88.1
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 15:59:51 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776812391; cv=none;
         d=google.com; s=arc-20240605;
-        b=BP2ONHvSsE+7TBkwRZCDVKaICJnfwWlE6bSvboCe6FlTpIOkaNGui2qKbEKqnTbbL7
-         tizR6ktFpN456KyewoNdJRpJG2KwhpLGdjMqRdFYD8dqU6eS3MIp2xYVc8UccDiCxLpm
-         3AsI+x5ZjaFfvtEzl4cMKg8wAMVC/Y8MjCdMMjFoJFh7zCqtu3oTDGaRPQcBeXjkfFQD
-         qAOE7jZ1JAYUCCMakfhABHhsJ/ljFydtRzNnf/AED9Tg0f4+FjVkgf47utqCpng49l7N
-         Pr7POELc1VAKBbKhL+v868Wrt70T3L5/vqkmlSCOkcRRN5LxjSlt97Re1SnEoZERbi2X
-         W+OQ==
+        b=OH/Q97yPZh0s0chq6WqG75y2kGEFXvu3oFRle/k0avt99NK5V0AWX2kLdZxDe+Pco+
+         CkObrKXUWa3CrwhTm0boClrCCL+KRZPv2EAjdMHtXrCG1mHc3xGXSyG4qAZVum09qQB4
+         Nt9ql2ZfmfkktK+7V2yz6D25xSYyDGsjU0DllpdIyLpL9r8x8i3VeHCtLYN47kspmMYh
+         TsSdEp14ZiSrmCsh/zCy+6ZRVZahO86SyNEvFguDazfwVwtrTXTu4u+qPABgp69gTuSL
+         cALnW8x+93nDTntEybbjVhmL3P5UOcMiAe9d6ssfLl38kBbWEkszJx1cCtHlXyHsiT6/
+         B3gQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=7g+6Nj4I9wlSgMa6eYN57nLSLjoKXWzdMIwO8KfWfA0=;
-        fh=L2Iaf/jDpg1GxFyjIbNnelz23/LTaZpTzC/mk8CwgOE=;
-        b=TzuC/zUW11Ba+oOCH4EOAIy7755mblxULot9jCqgA3uG4p8HdaJhpyUKVevovcztYm
-         /0beU18m7KcwXhHPKDCHmqS41X0Sc6c3iz+dHE6ZaJ1fPRH5PabCE6ndrHPsoj34+tT7
-         0in9sm4RCOrkWGkc5KBX2WZ7mh0RQ3ltDCcfr55spNmgGgFsqLWz/BRzu0fJ02tP937y
-         xEYrwseto5jSe6S4JUaMDzAjgXiJX47ttqDtt3OZ1L2vogX+kOV8AZZ7i49qUORHnUEY
-         /pEjmSXiborpHv+veXF21fb/FMibWcRC6xh1NFG5YyM37eG610jIMh4hVJ0CU3mZ/xCt
-         ZILA==;
+        bh=EUyujIAApUVAkDEH0uSDEg04wL17CBrnWRgJpkrkKwA=;
+        fh=rg9FwRUfVQKqIEL/mhJkRo8b+mJGVFVDJ3GHRqjafJY=;
+        b=lqc3bO9B0CRmWuMuNfaO1y7XdWV/blQ0f1GPP3Qruyv4Hk8j4xEc8Bx0X9+KfDpZ9T
+         EjwCEUIIU8VpjFw9sUQvF83ZOcAAukM99xMCIRs8I1BYEUMJqJn0Dg/MQjBTnLZmTGkZ
+         kEB4ZMX0KRwdyp5c+e+G8uv3T69LM30n/ct4cGw8Bjd/RTBNUL49qltsihlxN2TBdAV1
+         L3AcQa1Wg4FHvyDvK183ziklgFcbfBXvMbDD3kPrNSn+vG7OvwL4iJ94aXO4WZr7bzgJ
+         wqIYIxjP54s4YCE0PYsiL7v7QAXX5E6xNekKeeNHGGpzeBCW+f1+lA8AJnwt/yTqpo8e
+         9OsQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776812145; x=1777416945; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1776812391; x=1777417191; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7g+6Nj4I9wlSgMa6eYN57nLSLjoKXWzdMIwO8KfWfA0=;
-        b=T1rFC0W8HJjEU5SYA02Yi58j2YaXzPiQfqL+81p8TaMFaUhTnYnp0fMRhmKsRdY4vW
-         ROjCRNiuafgBnFCzoVCuvtgYyZHlGBuJyMB0OQWu73QxEBrHz0WqzkmD/uUgRjCpWLp3
-         pfW9IBLsuNEqRRhUcJamdHgV/Ajncj2v8JVDqYQ1vAv2YC5Ui1LmgRpeuqE6w4O0p40+
-         xXzSwMO3NaQQZ/tLGkzd3X51HGIAWIg1kjgI5VhsnNGOo6RxU6OFTxAo9TmG4JPmLSHF
-         MEiVGFRbNRuBzxyOCM4s+2VlFVXE83XLAAIxgOh7pCrq1Slz6+MuBWHv8tumHp1WgWz7
-         JXtA==
+        bh=EUyujIAApUVAkDEH0uSDEg04wL17CBrnWRgJpkrkKwA=;
+        b=kJnEIdXOSNh5El6j8Cqf8cZQDH0EsSIFvXhpT1bMNNqRKxB73DY+SOpdx33agney4Q
+         qbxoyNQ+YyyZcBloPQN2hF2nzIqGMEVRqnD3jU5VaqYIolVbKrtYj4ILdfy1sgqxanTz
+         mX91nn/T6xuR7hD2PLwpr4qxKm5TpEZyFZ8LuTnezZBy/AWm4ASgMfSNDBoU1sZw+t+k
+         lR3MqLoT4OwFn2fCd3qnH4kxQiGx9+BfbRng0oiknMFjiJ3NATFyd1K496VpVMp4W0a0
+         eIpB2UHFW+sjPdMmsIEwNa+NeMtj8Vkh3ZllKJ7ChtjxM0XK5F1EyeRr4X3m72rJQVp5
+         O1yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776812145; x=1777416945;
+        d=1e100.net; s=20251104; t=1776812391; x=1777417191;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=7g+6Nj4I9wlSgMa6eYN57nLSLjoKXWzdMIwO8KfWfA0=;
-        b=W7DsbSF1F/GWdTMfIW+eRddUScGRf/Hswd3mMtynGVXE/y02vCIKfK/Ac7npxDlPMa
-         n9BXhLrOj7SE81y40HNxRWSCc4/m9d8rCxz1qd7hsN7YxnTnnKFueDumWUDzcwAvLRZ+
-         fUw2NxPNKBKVK0rp5seEYRItIvmnFaRRt/+Z+JcinnrgNjtRotHFANJiFpdi8BSGkRQn
-         FBIYD1uqt7YRLh2SQ+LdkiqiTxDRJGIk/FyqxIxcs4LWUjR1/pAOiSmvtznYSMZpW+zN
-         MbY2UtXD+XJkjnytSARC3qSrtq14qPoU59wE0IgnWhgWL8WB/qLCKMwhTU3idOTfdxwa
-         Gq1Q==
-X-Gm-Message-State: AOJu0YxsEwNoqDvi+UpBYaRPJXVbIPeh8jDesAjnb/1ZX3TXtzPwG1PH
-	rhhgmzqr5CD8+zpdVykAmchpw1IxjIhuXVB7QWKmz3exrPu982Y/Ggw3Rupo6XF4mq5I+AZ/bKk
-	Aa33D0UzhIAGSa4DRSm0MP8ttF4utyjWaxEltgP+0
-X-Gm-Gg: AeBDievkqYtOOrQ4Ttbyvetcz2UYp4o7IMDzOQzAvgwpbFNrXKDRfJ8TAaDDptli/Xe
-	lV+mE5X1bs+WuM8FzAmravp7Y2IyKm5DefwaHYW0/WLciK7TMka66y/10W1/s23jphn0Yynphjs
-	Hl318Zu0+Rrsae72IYCW8nZOumlf727KeqSYsZrXxdNq2bzJ0ONL+kmZSFp/8MH9yjq7kE7Rcv7
-	Fowh7etRjpx2XwOjUZ9VCeeTV2pVQby/2UbA6RvW3UNUEK78jCK9G3LWYYZQw/aiRoidiwKjHnT
-	DEgdV261zdXc9gBGv4V1m4b1oYTTrqZj1NP7zWbHsMgaWOqhWocm0vcijkqpYL6a47WFZUpHE3n
-	82lPDgRQw9CTxTGls2f1WvQrvJDQbx+gxCNZxvNGeDjKIRbCLjB6HGBJBk8tHJoNxn96id8eESQ
+        bh=EUyujIAApUVAkDEH0uSDEg04wL17CBrnWRgJpkrkKwA=;
+        b=sA5p5yV7Q2dZfKU/fZp1YSa7/CPROqmDYRhs74bbg91IzriWj/++klU0WYx5bd7b5H
+         1GiPWx30pGcBpnnYgqv8yDAnSc2OxQOGUmUX5jAhj+9Z/V3JzN43GqAdDp9XbMhGC8/h
+         94FoO4ns7g31sojMCVBoq2bm9fcpoXmhyjrMLH5SnTTD5UGzGfCjMnFAz55YQD3U64Hi
+         tD8CFA4QZv5xa66caLJFmc1/D0rxKu/iF5KPAXulvgKLyZxuMWcDtfLZRwzGfKtFZnsD
+         j+LK5p1MhQcYu2TD5YRuHiBRp3UGsqshAYG/7G9xvZV4P9GQSURp7SxYBtB0IPAriKPM
+         Yh4g==
+X-Gm-Message-State: AOJu0YyOiyq4aOUg0aeYaZdN8qi3Ee2SU77s0PspS9MCKq6TdRPN7Vf/
+	379wO/j7UjG7b80bTN8jLAjqO0KakY31YT72uhGQ7cUocDVSOkZWQHGeAWPHRpXVW20uWKdKx6n
+	jWBUFpz+/MLlSKNp0plBbfoMvwsxPdi8YpZp3VLws
+X-Gm-Gg: AeBDietLrmXxdpl4w+SNlmf0HXU91DMds9R3ZIswPCvFGP1bm7DMN0paBGSAr/VnVpt
+	U/0t0WfFkgl5Ri6YsyW7x1FVyl5jlzHzQbHurZzyvKeCkoXgwQJ7B1F8rG/UtbJWT09hdHIVv7g
+	lpkbmNv7kPP2VbYn/ebF1LFzqrFpLZ1bfpjedzwxz4WGwcf2sM+iKUuBiskkL0kHuPCsW6Sj4DD
+	mxJRFWh8mIOxzNq+vjHVnmOQxsjH4lW3JLlBGlz58Jg1Fz7dQS+NMeYIWFA+oWk/sSz9lpL9cVX
+	Vk0UVlWsw/nkMPxIZisRd+SlC4fc8ln+BtMB0zOZD9Xj46w1s19GyQqrYJhzkFRNvVUsO6CaBwN
+	90IUXD5/iT4mV/HO5w4PTyPDM0GqP2JiQJ44zkAHQSdTBRg/zV0wupuvG5TvlN0C35Ht1YYBL5A
 	==
-X-Received: by 2002:a05:7022:6627:b0:128:ca83:5aa1 with SMTP id
- a92af1059eb24-12c73f9217dmr11175890c88.16.1776812144868; Tue, 21 Apr 2026
- 15:55:44 -0700 (PDT)
+X-Received: by 2002:a05:7022:60c:b0:12a:713b:8958 with SMTP id
+ a92af1059eb24-12c73f7596bmr10068832c88.10.1776812390229; Tue, 21 Apr 2026
+ 15:59:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260421123106.142299-1-jt26wzz@gmail.com> <20260421123106.142299-2-jt26wzz@gmail.com>
-In-Reply-To: <20260421123106.142299-2-jt26wzz@gmail.com>
+References: <20260421123106.142299-1-jt26wzz@gmail.com> <20260421123106.142299-3-jt26wzz@gmail.com>
+In-Reply-To: <20260421123106.142299-3-jt26wzz@gmail.com>
 From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 21 Apr 2026 15:55:33 -0700
-X-Gm-Features: AQROBzD2b51gLvsY15bbLEJ6mf5qB0jtCSoEC5dNs0R6RYbWMCDYXu37HOUp92I
-Message-ID: <CAAVpQUCW2rAdz47kYM-YN7Er2iKVReyZbFSCJXG04Cw-8y_VjA@mail.gmail.com>
-Subject: Re: [PATCH net v3 1/2] tcp: call sk_data_ready() after listener migration
+Date: Tue, 21 Apr 2026 15:59:39 -0700
+X-Gm-Features: AQROBzD2IEw4ypAL697CZLXFoPfbIAflmemsvJ5os_4y8LuiwAgFAJA40Z9E2X0
+Message-ID: <CAAVpQUDv28sNCYdo6oH25FNKnddZibwrmxMUf4GqgS4fRA8+og@mail.gmail.com>
+Subject: Re: [PATCH net v3 2/2] selftests/bpf: check epoll readiness during
+ reuseport migration
 To: Zhenzhong Wu <jt26wzz@gmail.com>
 Cc: netdev@vger.kernel.org, edumazet@google.com, ncardwell@google.com, 
 	davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
 	horms@kernel.org, shuah@kernel.org, tamird@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	stable@vger.kernel.org
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -127,8 +127,8 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280273-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-280274-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -137,47 +137,129 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3739F440550
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amazon.co.jp:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 9E980440605
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 On Tue, Apr 21, 2026 at 5:31=E2=80=AFAM Zhenzhong Wu <jt26wzz@gmail.com> wr=
 ote:
 >
-> When inet_csk_listen_stop() migrates an established child socket from
-> a closing listener to another socket in the same SO_REUSEPORT group,
-> the target listener gets a new accept-queue entry via
-> inet_csk_reqsk_queue_add(), but that path never notifies the target
-> listener's waiters. A nonblocking accept() still works because it
-> checks the queue directly, but poll()/epoll_wait() waiters and
-> blocking accept() callers can also remain asleep indefinitely.
+> Inside migrate_dance(), add epoll checks around shutdown() to
+> verify that the target listener is not ready before shutdown()
+> and becomes ready immediately after shutdown() triggers migration.
 >
-> Call READ_ONCE(nsk->sk_data_ready)(nsk) after a successful migration
-> in inet_csk_listen_stop().
+> Cover TCP_ESTABLISHED and TCP_SYN_RECV. Exclude TCP_NEW_SYN_RECV
+> as it depends on later handshake completion.
 >
-> However, after inet_csk_reqsk_queue_add() succeeds, the ref acquired
-> in reuseport_migrate_sock() is effectively transferred to
-> nreq->rsk_listener. Another CPU can then dequeue nreq via accept()
-> or listener shutdown, hit reqsk_put(), and drop that listener ref.
-> Since listeners are SOCK_RCU_FREE, wrap the post-queue_add()
-> dereferences of nsk in rcu_read_lock()/rcu_read_unlock(), which also
-> covers the existing sock_net(nsk) access in that path.
->
-> The reqsk_timer_handler() path does not need the same changes for two
-> reasons: half-open requests become readable only after the final ACK,
-> where tcp_child_process() already wakes the listener; and once nreq is
-> visible via inet_ehash_insert(), the success path no longer touches
-> nsk directly.
->
-> Fixes: 54b92e841937 ("tcp: Migrate TCP_ESTABLISHED/TCP_SYN_RECV sockets i=
-n accept queues.")
-> Cc: stable@vger.kernel.org
-> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
 > Signed-off-by: Zhenzhong Wu <jt26wzz@gmail.com>
+> ---
+>  .../bpf/prog_tests/migrate_reuseport.c        | 46 ++++++++++++++++---
+>  1 file changed, 40 insertions(+), 6 deletions(-)
+>
+> diff --git a/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c b=
+/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
+> index 653b0a20f..6180a79a7 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
+> @@ -7,24 +7,29 @@
+>   *   3. call listen() for 1 server socket. (migration target)
+>   *   4. update a map to migrate all child sockets
+>   *        to the last server socket (migrate_map[cookie] =3D 4)
+> - *   5. call shutdown() for first 4 server sockets
+> + *   5. for TCP_ESTABLISHED and TCP_SYN_RECV cases, verify via epoll
+> + *        that the last server socket is not ready before migration.
+> + *   6. call shutdown() for first 4 server sockets
+>   *        and migrate the requests in the accept queue
+>   *        to the last server socket.
+> - *   6. call listen() for the second server socket.
+> - *   7. call shutdown() for the last server
+> + *   7. for TCP_ESTABLISHED and TCP_SYN_RECV cases, verify via epoll
+> + *        that the last server socket is ready after migration.
+> + *   8. call listen() for the second server socket.
+> + *   9. call shutdown() for the last server
+>   *        and migrate the requests in the accept queue
+>   *        to the second server socket.
+> - *   8. call listen() for the last server.
+> - *   9. call shutdown() for the second server
+> + *  10. call listen() for the last server.
+> + *  11. call shutdown() for the second server
+>   *        and migrate the requests in the accept queue
+>   *        to the last server socket.
+> - *  10. call accept() for the last server socket.
+> + *  12. call accept() for the last server socket.
+>   *
+>   * Author: Kuniyuki Iwashima <kuniyu@amazon.co.jp>
+>   */
+>
+>  #include <bpf/bpf.h>
+>  #include <bpf/libbpf.h>
+> +#include <sys/epoll.h>
+>
+>  #include "test_progs.h"
+>  #include "test_migrate_reuseport.skel.h"
+> @@ -350,8 +355,28 @@ static int update_maps(struct migrate_reuseport_test=
+_case *test_case,
+>
+>  static int migrate_dance(struct migrate_reuseport_test_case *test_case)
+>  {
+> +       struct epoll_event ev =3D {
+> +               .events =3D EPOLLIN,
+> +       };
+> +       int epoll =3D -1, nfds;
+>         int i, err;
+>
+> +       if (test_case->state !=3D BPF_TCP_NEW_SYN_RECV) {
+> +               epoll =3D epoll_create1(0);
+> +               if (!ASSERT_NEQ(epoll, -1, "epoll_create1"))
+> +                       return -1;
+> +
+> +               ev.data.fd =3D test_case->servers[MIGRATED_TO];
+> +               if (!ASSERT_OK(epoll_ctl(epoll, EPOLL_CTL_ADD,
+> +                                        test_case->servers[MIGRATED_TO],=
+ &ev),
+> +                              "epoll_ctl"))
+> +                       goto close_epoll;
+> +
+> +               nfds =3D epoll_wait(epoll, &ev, 1, 0);
+> +               if (!ASSERT_EQ(nfds, 0, "epoll_wait 1"))
+> +                       goto close_epoll;
+> +       }
+> +
+>         /* Migrate TCP_ESTABLISHED and TCP_SYN_RECV requests
+>          * to the last listener based on eBPF.
+>          */
+
+Sorry I forgot to update return -1 to goto close_epoll
+when shutdown() fails.
+
+Otherwise looks good.
 
 Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+
+
+> @@ -365,6 +390,15 @@ static int migrate_dance(struct migrate_reuseport_te=
+st_case *test_case)
+>         if (test_case->state =3D=3D BPF_TCP_NEW_SYN_RECV)
+>                 return 0;
+>
+> +       nfds =3D epoll_wait(epoll, &ev, 1, 0);
+> +       if (!ASSERT_EQ(nfds, 1, "epoll_wait 2")) {
+> +close_epoll:
+> +               close(epoll);
+> +               return -1;
+> +       }
+> +
+> +       close(epoll);
+> +
+>         /* Note that we use the second listener instead of the
+>          * first one here.
+>          *
+> --
+> 2.43.0
+>
 
