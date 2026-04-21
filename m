@@ -1,162 +1,226 @@
-Return-Path: <netdev+bounces-280100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280101-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eIjCBdNs52ke8AEAu9opvQ
-	(envelope-from <netdev+bounces-280100-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:25:55 +0200
+	id YAWUBpht52ke8AEAu9opvQ
+	(envelope-from <netdev+bounces-280101-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:29:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE09043A98E
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:25:54 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6239A43A9F8
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:29:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1E51530117E6
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 12:25:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A7AF4300CBD7
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 12:28:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A14C3C3C1E;
-	Tue, 21 Apr 2026 12:25:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F8F23C4553;
+	Tue, 21 Apr 2026 12:28:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cmxr/p+A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PZhMNGBa"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98B153C455C;
-	Tue, 21 Apr 2026 12:25:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81BB33C455C;
+	Tue, 21 Apr 2026 12:28:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776774347; cv=none; b=oYvNKaVjQR9g17tXaAXE4o6eyQTfLGEJeSZ4oS7XdEpOPWWJNBWD1vzg0dSzsDuhw2NPqjJJuAv0M1DEagwFEXMyEAEJc6VkXT7XnUeXFq45IX+4byaygjkpxQkRRdh7WmIhMhGcr81YaUjVeZ0KsQvJOPWNzoQu1jeY+Zliopc=
+	t=1776774490; cv=none; b=E3vCKrm2PHdUKh6pVLyQHpwLjzK3VffS9tJIV2G2reJH1Pcm5gCcWk4cMPLsYVPFLWjQry38pb0MAhHTE+zAFnNk2OzLSKWVqoUtYuM3tGJ+Tb3rCFYeHVbhAKzMiTmh3bpjILshG3THdQvMM9jB/tOsJhOaXIKtZ25voKx797w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776774347; c=relaxed/simple;
-	bh=ZhHd2FrW7rItrNUJWV3lcJYp57NU0EMoc2hYcgX69ws=;
+	s=arc-20240116; t=1776774490; c=relaxed/simple;
+	bh=SDyBzgCycOBHwfzh3Gt4icHGQgqy60beF8+fj/MrjW8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qC03uJnUDRZAQSKId/fdsEBW7OIZCQfaN3JW7XUTDKKzCChyfXuUiSlO1Bz/HXxZiffGmy/RVu/QgL2mMZ/KbC9csFviK7EFp9dXYOzKBliPl4MtCgDvWIoS7j9dQjoIsEZ2l+UvP9WS6XytsmvPiXKCmytFt2rCcoHWSM7XNVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cmxr/p+A; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=DNU9H52ZbtEWsgC0S8tHko+P0/6qPpSIAMXfwbnDHT8=; b=cmxr/p+A9thEWzclZs2J2oIdXo
-	Kz0cLlr//2AZdK5FURdQhba71NoaOO3mxZJNrColNBL1kEeVhDYC556exMJjZLEpkiodr0W/ik7D2
-	5Gu7wo71Y8mALxOHYZ/e8qxw8LhHZEULusDyEQn4U4VAosfpitdNDRax7Tv25PLj6PmE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wFAAR-00GtEv-GA; Tue, 21 Apr 2026 14:25:27 +0200
-Date: Tue, 21 Apr 2026 14:25:27 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: hugh@blemings.id.au
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	Mashiro Chen <mashiro.chen@mailbox.org>, netdev@vger.kernel.org,
-	linux-hams@vger.kernel.org, kuba@kernel.org, horms@kernel.org,
-	davem@davemloft.net, edumazet@google.com,
-	Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH v4 net] net: ax25: fix integer overflow in
- ax25_rx_fragment()
-Message-ID: <8bb9032b-3a5a-4e0f-aa17-da407af62df7@lunn.ch>
-References: <20260409025026.24575-1-mashiro.chen@mailbox.org>
- <20260413204921.70463-1-mashiro.chen@mailbox.org>
- <805a8583-6a84-4dfb-a4d4-53f80f50effc@redhat.com>
- <e2a47378-9008-45a2-92e3-d1f374b5e766@blemings.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=AgfwWK3ZdyyENzawv2ssitUFBbu91qaBo36owTkDlJV2xkAUQ/UQG6KHYZuQBsV7pnrKKyKJ/94mrsKLu6Dg4iA9f4yks9ozZdfqsVAS+RGRzYpveeieYZn0dx0KLwCDRPwAEz69P4zxNzvMi5IaW+xS6um9Ul6kxpKkOPuBwIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PZhMNGBa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC599C2BCB0;
+	Tue, 21 Apr 2026 12:28:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776774489;
+	bh=SDyBzgCycOBHwfzh3Gt4icHGQgqy60beF8+fj/MrjW8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PZhMNGBau1y7Xo5k5ig563sCBRdH5Z/+GrquuM0r/F6KWBpPr+c/XBbT0P0dBkanu
+	 NQgGsgGYalFhXIQvuBoxRkAFyjqewZ+zUy6Fdg/zitAoB93lHDrNyQyqJOMEDuvumY
+	 69I40orC3KBCqHniAmavNSuuHpe/26oXJ1a+V0bcHZVBNK4a8ap2v5UqiENTr86S7v
+	 Q4YntHOZytfzn9c/F6anhTSWHrZp2WSc0NKcTePsWyXrJRP01x0S+GNFPO1pmc4hk8
+	 Qb28vnJDdgGl0zSk0byic2fBEPBwnH8zNwxHQU/XBCXsiPjjPpK4gmF5c7d2Ikw0BM
+	 gXi2bPngfz8vw==
+Date: Tue, 21 Apr 2026 13:28:04 +0100
+From: Lee Jones <lee@kernel.org>
+To: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
+Cc: Jon Maloy <jmaloy@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"tipc-discussion@lists.sourceforge.net" <tipc-discussion@lists.sourceforge.net>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 1/1] tipc: fix double-free in tipc_buf_append()
+Message-ID: <20260421122804.GI3202366@google.com>
+References: <20260420130524.3527420-1-lee@kernel.org>
+ <GV1P189MB19886E03BDD0F407B757E5ABC62F2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+ <20260420143309.GD3202366@google.com>
+ <GV1P189MB198853F316580DDA547F4925C62F2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+ <20260420151040.GF3202366@google.com>
+ <20260421103543.GH3202366@google.com>
+ <GV1P189MB198888D44169106BFB04359BC62C2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <e2a47378-9008-45a2-92e3-d1f374b5e766@blemings.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <GV1P189MB198888D44169106BFB04359BC62C2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280100-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280101-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[lunn.ch:+];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lee@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mailbox.org:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lwn.net:url]
-X-Rspamd-Queue-Id: AE09043A98E
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,carlini.com:email]
+X-Rspamd-Queue-Id: 6239A43A9F8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 21, 2026 at 06:45:39PM +1000, Hugh Blemings wrote:
-> Hi Paolo, All,
-> 
-> On 21/4/2026 17:29, Paolo Abeni wrote:
-> > On 4/13/26 10:49 PM, Mashiro Chen wrote:
-> > > ax25_rx_fragment() accumulates fragment lengths into ax25_cb->fraglen,
-> > > which is an unsigned short. When the total exceeds 65535, fraglen wraps
-> > > around to a small value. The subsequent alloc_skb(fraglen) allocates a
-> > > too-small buffer, and skb_put() in the copy loop triggers skb_over_panic().
-> > > 
-> > > Add pskb_may_pull(skb, 1) at function entry to ensure the segmentation
-> > > header byte is in the linear data area before dereferencing skb->data.
-> > > This also rejects zero-length skbs, which the original code did not
-> > > check for.
-> > > 
-> > > Two issues in the overflow error path are also fixed:
-> > > First, the current skb, after skb_pull(skb, 1), is neither enqueued
-> > > nor freed before returning 1, leaking it. Add kfree_skb(skb) before
-> > > the return.
-> > > Second, ax25->fraglen is not reset after skb_queue_purge(). Add
-> > > ax25->fraglen = 0 to restore a consistent state.
-> > > 
-> > > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> > > Signed-off-by: Mashiro Chen <mashiro.chen@mailbox.org>
-> > we are moving ax25 out of tree:
-> > 
-> > https://lore.kernel.org/netdev/20260421021824.1293976-1-kuba@kernel.org/
-> > 
-> > please hold off until Thursday (after that our net PR will land into
-> > mainline), and eventually resend if the code still exists in Linus's
-> > tree at that point.
-> 
-> Is there any flexibility here ?
-> 
-> Jakubs (CC'd) patches to remove unfortunately weren't cross posted to
-> linux-hams and so I'm not able to directly reply in netdev
-> 
-> We've had a thread ongoing in linux-hams around the future of
-> AX25/ROSE/NETROM for the last week or so and believe we've a path towards an
-> orderly exit from the mainline tree, probably towards a userspace
-> implementation. This includes a couple of folks who have indicated they
-> would be open to overseeing the maintenance of the code in the meantime.
-> 
-> We'd hoped to have a period of a few months to do an orderly exit from the
-> tree to minimise the impact on the (admittedly small, but non-zero) users
-> that build trees/make use of the in kernel support.
-> 
-> Apologies for my lack of familiarity with the process here to deprecate etc.
+On Tue, 21 Apr 2026, Tung Quang Nguyen wrote:
 
-I know it is short notice, but there is a conference call today. Jakub
-sent this yesterday:
+> >Subject: Re: [PATCH 1/1] tipc: fix double-free in tipc_buf_append()
+> >
+> >On Mon, 20 Apr 2026, Lee Jones wrote:
+> >
+> >> On Mon, 20 Apr 2026, Tung Quang Nguyen wrote:
+> >>
+> >> > >> Subject: [PATCH 1/1] tipc: fix double-free in tipc_buf_append()
+> >> > >> >
+> >> > >> >The tipc_msg_validate() function can potentially reallocate the
+> >> > >> >skb it is validating, freeing the old one.  In
+> >> > >> >tipc_buf_append(), it was being called with a pointer to a local
+> >> > >> >variable which was a copy of the
+> >> > >caller's skb pointer.
+> >> > >> >
+> >> > >> >If the skb was reallocated and validation subsequently failed,
+> >> > >> >the error handling path would free the original skb pointer,
+> >> > >> >which had already been freed, leading to double-free.
+> >> > >> >
+> >> > >> >Fix this by passing the caller's skb pointer-pointer directly to
+> >> > >> >tipc_msg_validate(), ensuring any modification is reflected correctly.
+> >> > >> >The local skb pointer is then updated from the (possibly
+> >> > >> >modified) caller's pointer.
+> >> > >> >
+> >> > >> >Fixes: d618d09a68e4 ("tipc: enforce valid ratio between skb
+> >> > >> >truesize and
+> >> > >> >contents")
+> >> > >> >Assisted-by: Gemini:gemini-3.1-pro-preview
+> >> > >> >Signed-off-by: Lee Jones <lee@kernel.org>
+> >> > >> >---
+> >> > >> > net/tipc/msg.c | 3 ++-
+> >> > >> > 1 file changed, 2 insertions(+), 1 deletion(-)
+> >> > >> >
+> >> > >> >diff --git a/net/tipc/msg.c b/net/tipc/msg.c index
+> >> > >> >76284fc538eb..9f4f612ee027
+> >> > >> >100644
+> >> > >> >--- a/net/tipc/msg.c
+> >> > >> >+++ b/net/tipc/msg.c
+> >> > >> >@@ -177,8 +177,9 @@ int tipc_buf_append(struct sk_buff
+> >> > >> >**headbuf, struct sk_buff **buf)
+> >> > >> >
+> >> > >> > 	if (fragid == LAST_FRAGMENT) {
+> >> > >> > 		TIPC_SKB_CB(head)->validated = 0;
+> >> > >> >-		if (unlikely(!tipc_msg_validate(&head)))
+> >> > >> >+		if (unlikely(!tipc_msg_validate(headbuf)))
+> >> > >> > 			goto err;
+> >> > >> >+		head = *headbuf;
+> >> > >> This is a known issue and was reported via
+> >> > >> https://patchwork.kernel.org/project/netdevbpf/patch/202603302053
+> >> > >> 13.24 33372-1-nicholas@carlini.com/ The author did not respond to
+> >> > >> my comment.
+> >> > >> Can you improve the fix by applying my patch?
+> >> > >
+> >> > >I'd be happy to make any required changes.
+> >> > >
+> >> > >However, is this approach superior to simply passing a reference?
+> >> > >
+> >> > >v1 appears to be simpler, easier to read and avoids the explanation.
+> >> > >
+> >> > As I explained, your fix adds extra overhead to normal path while the error
+> >path is corner case and it rarely happens.
+> >> > Whatever approach is applied, we need to add explanation to understand
+> >more easily the logic and hidden trick in tipc_msg_validate().
+> >>
+> >> Very well.  I have made the recommended changes.
+> >>
+> >> The patch is currently in my build-test environment.
+> >>
+> >> I will post v2, when everything has been satisfied.
+> >
+> >Okay, I genuinely tried to apply your patch.  It builds just fine, but Gemini (the
+> >AI I use to pre-review patches before submission) has some doubts that this is
+> >the correct approach:
+> >
+> >> @@ -177,8 +177,20 @@ int tipc_buf_append(struct sk_buff **headbuf,
+> >> struct sk_buff **buf)
+> >>
+> >>       if (fragid == LAST_FRAGMENT) {
+> >>               TIPC_SKB_CB(head)->validated = 0;
+> >> -             if (unlikely(!tipc_msg_validate(&head)))
+> >> +
+> >> +             /* If the reassembled skb has been freed in
+> >> +              * tipc_msg_validate() because of an invalid truesize,
+> >> +              * then head will point to a newly allocated reassembled
+> >> +              * skb, while *headbuf points to freed reassembled skb.
+> >> +              * In such cases, correct *headbuf for freeing the newly
+> >> +              * allocated reassembled skb later.
+> >> +              *
+> >> +              * Note: It's done this way instead of passing &head          // I added
+> >this part to give
+> >> +              * to avoid slowing down the happy path since this failure    // the
+> >reviewer some additoinal
+> >> +              * is a rare event.                                           // context
+> >> +              */
+> >> +             if (unlikely(!tipc_msg_validate(headbuf))) {
+> You did NOT apply my patch correctly. I did not suggest passing headbuf to tipc_msg_validate().
 
-  The bi-weekly call is scheduled for tomorrow at 8:30 am (PT) /
-  5:30 pm (~EU), at https://bbb.lwn.net/rooms/ldm-chf-zxx-we7/join
+Ah, you're right.  I missed that line change.
 
-  I'd like to discuss evolution of the process which would prepare
-  us for the "AI age" (read: influx of plausibly looking yet entirely
-  computer generated patches).
+Let me revisit.  Bear with.
 
-	Andrew
+> My patch is very simple:
+> +               if (unlikely(!tipc_msg_validate(&head))) {
+> +                       /* reassembled skb has been freed in
+> +                        * tipc_msg_validate() because of invalid truesize.
+> +                        * head now points to newly-allocated reassembled skb
+> +                        * while *headbuf points to freed reassembled skb.
+> +                        * So, correct *headbuf for freeing newly-allocated
+> +                        * reassembled skb later.
+> +                        */
+> +                       if (head != *headbuf)
+> +                               *headbuf = head;
+> +
+>                         goto err;
+> +               }
+
+-- 
+Lee Jones [李琼斯]
 
