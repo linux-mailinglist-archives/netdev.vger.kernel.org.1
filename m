@@ -1,182 +1,295 @@
-Return-Path: <netdev+bounces-280110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280111-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qJQXGrRv52ke8AEAu9opvQ
-	(envelope-from <netdev+bounces-280110-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:38:12 +0200
+	id uMAfHIJw52ke8AEAu9opvQ
+	(envelope-from <netdev+bounces-280111-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:41:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DECF043AB83
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:38:11 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A85443AC66
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:41:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A8104300421D
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 12:35:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 022E2307BA59
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 12:37:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 349313BD226;
-	Tue, 21 Apr 2026 12:35:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CDF23D301D;
+	Tue, 21 Apr 2026 12:36:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iNXUwhuq";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="OpvEt3HU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IY2/CR3X"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB52921CFE0
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 12:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2600D3D0917;
+	Tue, 21 Apr 2026 12:36:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776774922; cv=none; b=Lj/vGovQRYjyjlFofjf1osFnHZJWPXPHoMYZ6XsU5FEbQdpwubrTYbKJxBq7PfrXA6CuTnA2ZYcKDCzjogWoF7KEQ3f2A4xUZF5bsnuSC4hdWa4Avlu5dNdwc+4PiupkReL2Qe97tX1RdXPP+Yq+DiWuBczDeIF0HMz66gyD38Q=
+	t=1776775002; cv=none; b=FHngiiR4SxbAzzDuI8zjB0xNLbFy19ccfSVzo1oylC6p8pNsayCOB4NhYmL4+48dySIPaLwyUa4BuQEiWtxKh5b9h60u58uV9Rzw4T/QkMokZBeygRjWpKvu3dRf8+L7AqA5ek9J1c2YEJFTA2+vL2Kmq5CD3hSuQ5u2eZFxxmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776774922; c=relaxed/simple;
-	bh=0EJ9YxVWaBS+cST2ToSkSQort5W3sfP3x2T/cCxVL3c=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=u0FvOYhaqVklLq43nAQiE7VHrJMBqb6hwHuYEXsYNLci2oOjCaNDR4U+90hm5WFQKhXMDoB29yF1/c31G7WRz5jAtroIwSd+DP2bqbr3APDGMXL/CGzoOjDLb5G2k5dI8reKMaMwrSlCZFCKaZ//7V/nEHHAin1co74dbYRddLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iNXUwhuq; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=OpvEt3HU; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776774919;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=6DyWgzF/0ZbRlr/ORBlatkQA01RdIil+zn8x1e8Sj98=;
-	b=iNXUwhuqGSBOHDTIH/hVTADmUOtVYFVvfqvyOQUqcW3nhq+UFEJpFqiJPKl2c0LsMlSD2U
-	nT85mSieofJJAGI9SEeyRtIGtGA5Wgfx/TbhrWxlFFkjMvf4f3ZiOIcmAawijzjMPxgP9W
-	Gg1IjoOExrYI7jeBuPuqv7JQOyA4tp0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-377-R6M5H97YOX6WILM2n22x0g-1; Tue, 21 Apr 2026 08:35:18 -0400
-X-MC-Unique: R6M5H97YOX6WILM2n22x0g-1
-X-Mimecast-MFC-AGG-ID: R6M5H97YOX6WILM2n22x0g_1776774917
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-488c768a9a9so33248045e9.1
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 05:35:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1776774917; x=1777379717; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6DyWgzF/0ZbRlr/ORBlatkQA01RdIil+zn8x1e8Sj98=;
-        b=OpvEt3HUHlMwVAi0McrbpiK8NR4EzP4mdVl4cBg0M8UmmRgIFfgRVHfK9FJjjKsJNR
-         5b8/BE59+THC1Q8pbl1IdZ993/Ld4jPbouvMqxhluJDHTnYSqsQb5dNVQYvwQWc2BPDm
-         9o0Q4tuvkSdWZy3AYXaSMli37DHAIUnewnBJhn+wVRS1FY7RoT18dANTAGmfrNWifscB
-         3xew9G8KcO3oYsQYxlGQ/IN+l1+BAQ7sb/SoPslYieFhxiulnSnE2hJ7PlLmGnerlEEH
-         5wuBoP18gR8gcpCyRt3xJAq+pvabOlgyZgQfnoe9SeVIt210fM7Cu+b5dQADDRGBv0oh
-         ew+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776774917; x=1777379717;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6DyWgzF/0ZbRlr/ORBlatkQA01RdIil+zn8x1e8Sj98=;
-        b=nYNFZLNp91TLUBxtJzo9DcZhfmvScYAquhC6atUxzsjKCkEgEwDWodtaC7JgtL7dYM
-         ne0I1Egl2pqvakROBR/D+2TPy9YCqMmh7iyvtl43s+IgGWlBnHDsm0PKkCkeKbAJOAZI
-         Jk6VqVRYh/0iZ0aEhNsLTf61SzUjB6p2brgezbla/7ekBJEpAEoRDkABo6yHT/8BAJcT
-         M5cImwXhzQZ698wGGEM1nfMr/vFZ5bLYJQxwFcb9ua6nLohS8Nfzgx2zI0iK8G3ZONie
-         Otn2NpZFl/RLfDzR3RJ9hSQUzNCAx9DSgiEkTnO8haqKrr81f9LheTZ98FxZ3JrnEbRZ
-         UV4w==
-X-Forwarded-Encrypted: i=1; AFNElJ9ZYEisKocKFXcnsYfLVqt9h5lk+6SEqiYRUCcoYh4QceCFUUWoLkNgEDyixgBjTDP5MGr9vu0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7cwTi8OrJL190yDqg9FdSP7ASiCSXa63Pz97Ah9Wpxp2nZcxg
-	PwEZBfMylt4nu+sCsD8ElRQ/M0D5Z3VYQCPuN3PMgbw0k1+xh9HqF/BKs2/5zr8FBZ+Txgl5mMc
-	j1Ic73k1JCj7V79Ow19fzLED7DU8A3Bza+lzrrrtU6uhjP4EoAXQcOIWJmw==
-X-Gm-Gg: AeBDieti9/odc/zD2gGS4D6CtRyAv/Lb5vR4D7Khw6cdY31yxA/UMY9meeLfm8ML/ta
-	dm2ISlOL2fkIsu92GVkrHPLI/8wVOwK8eqCEF27p4yWlblxGyOJYFHB661i2as6sZRYx0MyuREP
-	4gBaxMSJ5MyVxBiMyLNb375dZk6O1356NbnUPCDrgzf9nz1USYzI6+tjCfvCTt4sgszK6KJXBtW
-	cmHIzB45wf7xBxdJNuNT5y+QuU/8nQmGg5PlTSpaxyIKvnmBPH/toizl3ATHwqHCQGQdCjXqsO+
-	FvVUSw8ff3Tjwta1CT4Zxi45QBh6fXNmcFLfVU5CQ9X8uL4voeNi7wZcsjz3P8QfGVeuM/7kY9H
-	h7FUhl5GYv2G2XgYnpCMwuO548PbhUI1rTYSgrv0uFp8jQeJs4Hleziit5nFTzzwXJsVpiD4=
-X-Received: by 2002:a05:600c:5254:b0:488:8bdd:cfcc with SMTP id 5b1f17b1804b1-488fb6e62a8mr275756645e9.0.1776774917126;
-        Tue, 21 Apr 2026 05:35:17 -0700 (PDT)
-X-Received: by 2002:a05:600c:5254:b0:488:8bdd:cfcc with SMTP id 5b1f17b1804b1-488fb6e62a8mr275755995e9.0.1776774916541;
-        Tue, 21 Apr 2026 05:35:16 -0700 (PDT)
-Received: from lleonard-thinkpadx1carbongen13.rmtit.csb ([176.206.19.176])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-489207ebd3asm60397175e9.6.2026.04.21.05.35.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 05:35:16 -0700 (PDT)
-From: Luigi Leonardi <leonardi@redhat.com>
-Date: Tue, 21 Apr 2026 14:35:12 +0200
-Subject: [PATCH iproute2] ss: fix vsock port filter
+	s=arc-20240116; t=1776775002; c=relaxed/simple;
+	bh=v2a5WLA+RN6tb/gUePTDGD8H5yF9HruhsXt/Z+eBlFg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oa2TSDLnVcTlNwEv9oXc7m2ziG/UkLP0mH7LZuCNNm8EApY/QKoj/HRhMve9gQ5FNOR8JYfwqUMJAZH1ojp9WnGJZp/XWkgv3zE2rzsup9rkldp2JhXDos7fvSNspgOi61mdsnYP/xbGWSfjjaP+GszWpCgBF78KEED11+ZeBw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IY2/CR3X; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 476E2C2BCB0;
+	Tue, 21 Apr 2026 12:36:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776775001;
+	bh=v2a5WLA+RN6tb/gUePTDGD8H5yF9HruhsXt/Z+eBlFg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IY2/CR3Xju639eRatAjHmwgjJ2TI+jyLHKiKvD9uI8/RHml4/V7glLUlqpz94FiPg
+	 4sXKBHTxegc4fNzdWsBv0XpliFCQulawZ83bnirKyTpkUah90uM7QMdIVdhGgHLxlL
+	 dNYwytY4wN8bUJj5WKQMLSXPkluHP5+vKCKkQs9HLbpjhvH0eQZxbBx1BERsEc9O5O
+	 TYEgt1qZnv+UAx4ePggrzZ2GMyMTdIa7i0oN5S2RRbxUWUllWzwmd32P1CYkSPnQCp
+	 8fYAbxw4WRq4n+3DuTmDuq9KxOmnZRP+cQzzSltBI94jetrhhqlkFJpyU4I3AikMt5
+	 NfPYOC3XRsIjg==
+Date: Tue, 21 Apr 2026 18:06:21 +0530
+From: Sumit Garg <sumit.garg@kernel.org>
+To: bod@kernel.org, vikash.garodia@oss.qualcomm.com,
+	dikshita.agarwal@oss.qualcomm.com
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+	linux-media@vger.kernel.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
+	linux-remoteproc@vger.kernel.org, andersson@kernel.org,
+	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
+	akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
+	jesszhan0024@gmail.com, marijn.suijten@somainline.org,
+	airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
+	dikshita.agarwal@oss.qualcomm.com, bod@kernel.org,
+	mchehab@kernel.org, elder@kernel.org, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, jjohnson@kernel.org, mathieu.poirier@linaro.org,
+	trilokkumar.soni@oss.qualcomm.com, mukesh.ojha@oss.qualcomm.com,
+	pavan.kondeti@oss.qualcomm.com, jorge.ramirez@oss.qualcomm.com,
+	tonyh@qti.qualcomm.com, vignesh.viswanathan@oss.qualcomm.com,
+	srinivas.kandagatla@oss.qualcomm.com,
+	amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
+	op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
+	skare@qti.qualcomm.com, harshal.dev@oss.qualcomm.com,
+	linux-kernel@vger.kernel.org,
+	Sumit Garg <sumit.garg@oss.qualcomm.com>
+Subject: Re: [PATCH v3 11/15] media: qcom: Switch to generic PAS TZ APIs
+Message-ID: <aedvRYCd_mNwwQ5K@sumit-xelite>
+References: <20260327131043.627120-1-sumit.garg@kernel.org>
+ <20260327131043.627120-12-sumit.garg@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260421-fix_vsock-v1-1-812c80a76c1a@redhat.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2MQQqAIBAAvxJ7TrBFovpKRIittQQaWhKIf086D
- jNMhkiBKcLUZAiUOLJ3Fbq2AXNot5PgrTKgxF4q7ITld03Rm1MoaZCsGnHQGmp/Baryf83AV/D
- PTQhLKR9ZqNuJZQAAAA==
-X-Change-ID: 20260421-fix_vsock-40c2ef4928aa
-To: sgarzare@redhat.com, stefanha@redhat.com, netdev@vger.kernel.org
-Cc: Luigi Leonardi <leonardi@redhat.com>
-X-Mailer: b4 0.14.3
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260327131043.627120-12-sumit.garg@kernel.org>
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280110-lists,netdev=lfdr.de];
-	RCPT_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280111-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[53];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leonardi@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DECF043AB83
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1A85443AC66
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-parse_hostcond() uses get_u32() to parse the vsock port into the
-aafilter.port field, which is a long. On 64-bit systems, get_u32()
-only writes the lower 32 bits, leaving the upper 32 bits set from
-the -1 initialization. This causes the port comparison
-"a->port != s->rport" in run_ssfilter() to always fail, since the
-corrupted long value never matches the int rport.
+Hey Vikash, Dikshita,
 
-Fix by using get_long() instead, consistent with how AF_PACKET and
-AF_NETLINK handle the same field.
+On Fri, Mar 27, 2026 at 06:40:39PM +0530, Sumit Garg wrote:
+> From: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> 
+> Switch qcom media client drivers over to generic PAS TZ APIs. Generic PAS
+> TZ service allows to support multiple TZ implementation backends like QTEE
+> based SCM PAS service, OP-TEE based PAS service and any further future TZ
+> backend service.
+> 
+> Along with that pass proper PAS ID to set_remote_state API. As per testing
+> the SCM backend just ignores it while OP-TEE makes use of it to for proper
+> book keeping purpose.
+> 
+> Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> ---
+>  drivers/media/platform/qcom/iris/Kconfig      | 25 ++++++++++---------
+>  .../media/platform/qcom/iris/iris_firmware.c  |  9 ++++---
+>  drivers/media/platform/qcom/venus/Kconfig     |  1 +
+>  drivers/media/platform/qcom/venus/firmware.c  | 11 ++++----
+>  4 files changed, 25 insertions(+), 21 deletions(-)
+> 
 
-Fixes: c759116a0b2b ("ss: add AF_VSOCK support")
-Signed-off-by: Luigi Leonardi <leonardi@redhat.com>
----
- misc/ss.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Can I get an ack from you on this change? I expect this complete
+patch-set to land via Qcom SoC tree.
 
-diff --git a/misc/ss.c b/misc/ss.c
-index 14e9f27a..6e3321ac 100644
---- a/misc/ss.c
-+++ b/misc/ss.c
-@@ -2323,7 +2323,7 @@ void *parse_hostcond(char *addr, bool is_port)
- 		port = find_port(addr, is_port);
- 
- 		if (port && strcmp(port, "*") &&
--		    get_u32((__u32 *)&a.port, port, 0))
-+		    get_long(&a.port, port, 0))
- 			return NULL;
- 
- 		if (!is_port && addr[0] && strcmp(addr, "*")) {
+-Sumit
 
----
-base-commit: e0517e612199cacaf2dc4d54cbed52deec640c94
-change-id: 20260421-fix_vsock-40c2ef4928aa
-
-Best regards,
--- 
-Luigi Leonardi <leonardi@redhat.com>
-
+> diff --git a/drivers/media/platform/qcom/iris/Kconfig b/drivers/media/platform/qcom/iris/Kconfig
+> index 3c803a05305a..f54b759c18aa 100644
+> --- a/drivers/media/platform/qcom/iris/Kconfig
+> +++ b/drivers/media/platform/qcom/iris/Kconfig
+> @@ -1,13 +1,14 @@
+>  config VIDEO_QCOM_IRIS
+> -        tristate "Qualcomm iris V4L2 decoder driver"
+> -        depends on VIDEO_DEV
+> -        depends on ARCH_QCOM || COMPILE_TEST
+> -        select V4L2_MEM2MEM_DEV
+> -        select QCOM_MDT_LOADER if ARCH_QCOM
+> -        select QCOM_SCM
+> -        select VIDEOBUF2_DMA_CONTIG
+> -        help
+> -          This is a V4L2 driver for Qualcomm iris video accelerator
+> -          hardware. It accelerates decoding operations on various
+> -          Qualcomm SoCs.
+> -          To compile this driver as a module choose m here.
+> +	tristate "Qualcomm iris V4L2 decoder driver"
+> +	depends on VIDEO_DEV
+> +	depends on ARCH_QCOM || COMPILE_TEST
+> +	select V4L2_MEM2MEM_DEV
+> +	select QCOM_MDT_LOADER if ARCH_QCOM
+> +	select QCOM_SCM
+> +	select QCOM_PAS
+> +	select VIDEOBUF2_DMA_CONTIG
+> +	help
+> +	  This is a V4L2 driver for Qualcomm iris video accelerator
+> +	  hardware. It accelerates decoding operations on various
+> +	  Qualcomm SoCs.
+> +	  To compile this driver as a module choose m here.
+> diff --git a/drivers/media/platform/qcom/iris/iris_firmware.c b/drivers/media/platform/qcom/iris/iris_firmware.c
+> index 5f408024e967..856fa6a79064 100644
+> --- a/drivers/media/platform/qcom/iris/iris_firmware.c
+> +++ b/drivers/media/platform/qcom/iris/iris_firmware.c
+> @@ -4,6 +4,7 @@
+>   */
+>  
+>  #include <linux/firmware.h>
+> +#include <linux/firmware/qcom/qcom_pas.h>
+>  #include <linux/firmware/qcom/qcom_scm.h>
+>  #include <linux/of_address.h>
+>  #include <linux/of_reserved_mem.h>
+> @@ -79,7 +80,7 @@ int iris_fw_load(struct iris_core *core)
+>  		return -ENOMEM;
+>  	}
+>  
+> -	ret = qcom_scm_pas_auth_and_reset(core->iris_platform_data->pas_id);
+> +	ret = qcom_pas_auth_and_reset(core->iris_platform_data->pas_id);
+>  	if (ret)  {
+>  		dev_err(core->dev, "auth and reset failed: %d\n", ret);
+>  		return ret;
+> @@ -93,7 +94,7 @@ int iris_fw_load(struct iris_core *core)
+>  						     cp_config->cp_nonpixel_size);
+>  		if (ret) {
+>  			dev_err(core->dev, "qcom_scm_mem_protect_video_var failed: %d\n", ret);
+> -			qcom_scm_pas_shutdown(core->iris_platform_data->pas_id);
+> +			qcom_pas_shutdown(core->iris_platform_data->pas_id);
+>  			return ret;
+>  		}
+>  	}
+> @@ -103,10 +104,10 @@ int iris_fw_load(struct iris_core *core)
+>  
+>  int iris_fw_unload(struct iris_core *core)
+>  {
+> -	return qcom_scm_pas_shutdown(core->iris_platform_data->pas_id);
+> +	return qcom_pas_shutdown(core->iris_platform_data->pas_id);
+>  }
+>  
+>  int iris_set_hw_state(struct iris_core *core, bool resume)
+>  {
+> -	return qcom_scm_set_remote_state(resume, 0);
+> +	return qcom_pas_set_remote_state(resume, core->iris_platform_data->pas_id);
+>  }
+> diff --git a/drivers/media/platform/qcom/venus/Kconfig b/drivers/media/platform/qcom/venus/Kconfig
+> index ffb731ecd48c..574172724e8f 100644
+> --- a/drivers/media/platform/qcom/venus/Kconfig
+> +++ b/drivers/media/platform/qcom/venus/Kconfig
+> @@ -6,6 +6,7 @@ config VIDEO_QCOM_VENUS
+>  	select OF_DYNAMIC if ARCH_QCOM
+>  	select QCOM_MDT_LOADER if ARCH_QCOM
+>  	select QCOM_SCM
+> +	select QCOM_PAS
+>  	select VIDEOBUF2_DMA_CONTIG
+>  	select V4L2_MEM2MEM_DEV
+>  	help
+> diff --git a/drivers/media/platform/qcom/venus/firmware.c b/drivers/media/platform/qcom/venus/firmware.c
+> index 1de7436713ed..3c0727ea137d 100644
+> --- a/drivers/media/platform/qcom/venus/firmware.c
+> +++ b/drivers/media/platform/qcom/venus/firmware.c
+> @@ -12,6 +12,7 @@
+>  #include <linux/of_reserved_mem.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/of_device.h>
+> +#include <linux/firmware/qcom/qcom_pas.h>
+>  #include <linux/firmware/qcom/qcom_scm.h>
+>  #include <linux/sizes.h>
+>  #include <linux/soc/qcom/mdt_loader.h>
+> @@ -58,7 +59,7 @@ int venus_set_hw_state(struct venus_core *core, bool resume)
+>  	int ret;
+>  
+>  	if (core->use_tz) {
+> -		ret = qcom_scm_set_remote_state(resume, 0);
+> +		ret = qcom_pas_set_remote_state(resume, VENUS_PAS_ID);
+>  		if (resume && ret == -EINVAL)
+>  			ret = 0;
+>  		return ret;
+> @@ -218,7 +219,7 @@ int venus_boot(struct venus_core *core)
+>  	int ret;
+>  
+>  	if (!IS_ENABLED(CONFIG_QCOM_MDT_LOADER) ||
+> -	    (core->use_tz && !qcom_scm_is_available()))
+> +	    (core->use_tz && !qcom_pas_is_available()))
+>  		return -EPROBE_DEFER;
+>  
+>  	ret = of_property_read_string_index(dev->of_node, "firmware-name", 0,
+> @@ -236,7 +237,7 @@ int venus_boot(struct venus_core *core)
+>  	core->fw.mem_phys = mem_phys;
+>  
+>  	if (core->use_tz)
+> -		ret = qcom_scm_pas_auth_and_reset(VENUS_PAS_ID);
+> +		ret = qcom_pas_auth_and_reset(VENUS_PAS_ID);
+>  	else
+>  		ret = venus_boot_no_tz(core, mem_phys, mem_size);
+>  
+> @@ -259,7 +260,7 @@ int venus_boot(struct venus_core *core)
+>  						     res->cp_nonpixel_start,
+>  						     res->cp_nonpixel_size);
+>  		if (ret) {
+> -			qcom_scm_pas_shutdown(VENUS_PAS_ID);
+> +			qcom_pas_shutdown(VENUS_PAS_ID);
+>  			dev_err(dev, "set virtual address ranges fail (%d)\n",
+>  				ret);
+>  			return ret;
+> @@ -274,7 +275,7 @@ int venus_shutdown(struct venus_core *core)
+>  	int ret;
+>  
+>  	if (core->use_tz)
+> -		ret = qcom_scm_pas_shutdown(VENUS_PAS_ID);
+> +		ret = qcom_pas_shutdown(VENUS_PAS_ID);
+>  	else
+>  		ret = venus_shutdown_no_tz(core);
+>  
+> -- 
+> 2.51.0
+> 
+> 
 
