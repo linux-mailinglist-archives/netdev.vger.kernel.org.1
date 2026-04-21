@@ -1,237 +1,178 @@
-Return-Path: <netdev+bounces-280243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280244-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4C+/MNLY52kBBwIAu9opvQ
-	(envelope-from <netdev+bounces-280243-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:06:42 +0200
+	id kLNWLrbY52kBBwIAu9opvQ
+	(envelope-from <netdev+bounces-280244-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:06:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33EA143F3A1
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:06:42 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 567FE43F37C
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:06:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B798530CC4C0
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 20:03:10 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C15B43001460
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 20:05:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 574373DD53A;
-	Tue, 21 Apr 2026 20:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9545E3DD526;
+	Tue, 21 Apr 2026 20:05:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y15qGO7K";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qf5CfghO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LfboG50J"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A2E375F83
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 20:03:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21DD33DD509
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 20:05:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776801786; cv=none; b=YjAbHhxeEauERLJ/ZqxF7MI4dpoukvVSLadHXDRaBGLSoC/RdXQ9/Ly3Cj7P0ISJj5yVyC6o9in77ZFim1rpthhrf4bU6QsNdIQUjeOVr6fApgufhn1wgJNiuzIHGjO9meO2Hp/xnVSHsSCyv9atGl9jeVgARekKDLAJf7/9gfw=
+	t=1776801957; cv=none; b=Sw8NwhwcVWNCtdAMCp5PY1aMVyMCVn3o7EQi75j+eIXNnKwvXn2w+bamieQzWX3L3rq94rTrOgdg7M1QbIDLLHLBK4+C3GcQO1ohdrVQXAsFZjtVdKQDAoF4AhYUzZa5HWuuJrPtZPxDhHVrocpkGbiXD/7cUTaQSa/9tAVYp/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776801786; c=relaxed/simple;
-	bh=z/yo03AiSA0eCKVwpNdHXlr1nQWbFRacndf5yazbhEk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MKsTOU3iA0qATrxbCwxs/9qvlwjyIv9cDhRBwyxB+Au7Vy/JoBwcDb1viPiK43keDfi0Bu91pYQKvobNw+tw+kcYoUpDrBz1M84MDFOrV2TyIfNHXPNoDHk6iFq1W7Kp0wt8QJUC6+HNS+KYCLsCKc44nD4N38EzO81rOuETdqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y15qGO7K; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qf5CfghO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776801782;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3zuspwqjQXluBmm8BYsT+wPUm5BBdmNQ0nxP766NAw4=;
-	b=Y15qGO7KatdL8QazAM5wT6++n+fu4VAih4ufZsVgYo0ESc2Tb5Wl8Qsoq24N3D37l1qRRG
-	NM9Y+bBKmhYZL51LZ5uqXBTQL7esDc0GJz/S3nJSLcb5nxs5DePMQJ8TR0Q+o7c5mhZxoo
-	tpM4UfdP1fovgyRu70fQOJzv1kEo22A=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-97-Meu8y5skOhuLtF-xuBVkmw-1; Tue, 21 Apr 2026 16:02:59 -0400
-X-MC-Unique: Meu8y5skOhuLtF-xuBVkmw-1
-X-Mimecast-MFC-AGG-ID: Meu8y5skOhuLtF-xuBVkmw_1776801779
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-8acb26fbbb2so70005706d6.2
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 13:02:59 -0700 (PDT)
+	s=arc-20240116; t=1776801957; c=relaxed/simple;
+	bh=phULm1Ywed9W8M33T49Q6eS8se2Hvypqz3ZZdmbjhJM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tw4vr254WS5vqspxi3PDSAevI0CpOz0bCi6hJZo0WCe8A+fQDB7HFEMzOcuf5YieWoFKqIVLcHwWHWyE5pwLqX2tbx1mkgCJ2pNcHG+Zaoq02OW7U5GHs7Xj0/pXAAfErl6cfass/9DqbVNA+72DNApLHtxsXheIgyt6fFmQ0Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LfboG50J; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5a0ff30b240so6975943e87.0
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 13:05:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1776801779; x=1777406579; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3zuspwqjQXluBmm8BYsT+wPUm5BBdmNQ0nxP766NAw4=;
-        b=Qf5CfghOVthZvhlWyx//1FRq1D4MEv2vkPpXuvZRNNKNtZ1GdGI/h3UDhH/WP8brUU
-         2fBYsUlv+FLtOF0MeiwjAgPLHVS9pqRL36VN84uOkdQFlZgwrEfoHFneEW7LnCAOLA2S
-         er7vnuc0kNZAP45MakmSHkbWYikZNlv9FQ2VzVvR9S+UyYgEx+lBS6Xp12Biz30utn6+
-         UHeJnihQXQCoNFe1Zvts8Ht3emDdBPeevdwyiprqTznV5ZvY79KPENwqVcQU5yWwOQzP
-         PWsZGfC74eqZdktTUqT2vAFlxaO0EsVu/WeXm7q/ecwiMDGxEvO2HK03GRaf4tWf6XIC
-         UbyQ==
+        d=gmail.com; s=20251104; t=1776801954; x=1777406754; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aK4izauZRRt/B/VXYkiUQKoI5K7lJzjxQ+RWvCNLSKk=;
+        b=LfboG50JLmVr+cFmySs7f1HhhIew/QilyA0gHA4pXVhSqqQq9W5Qtv0lEGdXZTRrCl
+         J7G3U5HWvFalRlTiwCLWoA2zNVZ+6DvHuSYO6d8aASyd8zfOzUVM1ki4N5GmKOjWjhee
+         5cgVNihXuWFoctzZ2ESS3+uLBPaZxqd4glk5C3Onm2qJgkRBnHRG/+Dyt3qR8sKXt9b2
+         ZJsWNY/JmB3IbVP8PGNQ19w51sjFmN/Y/9FKMuvWllbAtBlbhEHRQejuxVbCcYNfy0Hc
+         733uVBUofTxPifcjEpfYL3l/LbMP/9Fo10iz5YIv1vdHGdFCw9NC/9O8+K4ZmnhJtYSK
+         0hjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776801779; x=1777406579;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3zuspwqjQXluBmm8BYsT+wPUm5BBdmNQ0nxP766NAw4=;
-        b=bNwp8bP320D5rt3qrQWHGGktqFC0GXjdzY0UXnf1NM9dXZcsL4wOcf+4fOlf+hgXcp
-         jtecoDWogjE2rRZyUGro+pCkwucMjKZ3Mg0b94Wa5GSdih2qjronjbuIS7nx/pB3At6i
-         os0PP06UcQkFu860w7hSZOo3+HP7FLOgb6JtKvkwB2uhIHE3P7iemDnkUIwRCOmwnaIj
-         Gu1+8FCNwx7eyJQzYksgSAToXS7/Lpc+iIM7+WWU98HAKeFEpAtMRNQjsVPxcFytM6pU
-         fE22jM0la4R/V0x+LkP+MYcqSZc3AuFsySA3n7xXcW6n54HbdVnOKt/4jMYTJq2inT8b
-         OVLg==
-X-Forwarded-Encrypted: i=1; AFNElJ9TWHt3ZCD8xqAS+dHseKZytXo6mbh1a7SX7GHWouE/5IRZ9+HD0U5kpsgNcxliMAqNXlI/dMM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzs+vkZq+ntk+J2JESv2ZW4N6M94n0AKoVA53hhzlCSfWhG91DA
-	2XngdzbYkd6idjZ3qX/9Twn/kETNAEwruO47VpLf+1pPnOc9egdE4D5ZsKnb5d5+ine+NTvIIZj
-	mCquS+ru/ezEdY3yreVtda5EELcURLM5PrhN7C9Q6duJy2lsStNUvHRHuMQ==
-X-Gm-Gg: AeBDietIwq7SGkfv4q0exEMW0moAED2dmDsSCFiEq/jIHE0CJvT4YO/7j5t3yNvjzJ7
-	MPTlKZGz2tdawq5CbQL1h2/99bzI5TSG6LBy6drNOH0WIVaMf7zIw4CYJkn0nx5EP8aUnlTDuP5
-	ryKJ/vgOmT+QNoxUxyCt2+K/VEwzfw3lZBypDr/fCmwlDyNaizrH4g9ADHOxLOcMmI7jEgf7qgk
-	eMUIuYn35kCvIOiCfGx/KQsesJ+7ZhKIyLJEWH7Dza2fBuv8CTe0tBnReGFMIp7yWagMRNogc2C
-	AsHRQ2UsvJInSzFgrJJhi938+hXvXRXf6QmhbPWg6imn9iXuVvHXWyHB3DKYIdwPAt7IXnIzAXR
-	o9sz4+mV/AN56mK3ItNYvPg3FXk/dT47/9WjQXuTBXQ==
-X-Received: by 2002:a05:6214:5b87:b0:8ac:a5a0:481 with SMTP id 6a1803df08f44-8b028015984mr335683606d6.4.1776801778612;
-        Tue, 21 Apr 2026 13:02:58 -0700 (PDT)
-X-Received: by 2002:a05:6214:5b87:b0:8ac:a5a0:481 with SMTP id 6a1803df08f44-8b028015984mr335682706d6.4.1776801778111;
-        Tue, 21 Apr 2026 13:02:58 -0700 (PDT)
-Received: from rh-jkangas-kernel ([2601:1c2:4400:6bf0:7677:bcee:4ef0:e09d])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b02ae5ec2dsm115982646d6.29.2026.04.21.13.02.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 13:02:57 -0700 (PDT)
-Date: Tue, 21 Apr 2026 13:02:52 -0700
-From: Jared Kangas <jkangas@redhat.com>
-To: jan.petrous@oss.nxp.com
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Chester Lin <chester62515@gmail.com>,
-	Matthias Brugger <mbrugger@suse.com>,
-	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
-	NXP S32 Linux Team <s32@nxp.com>, Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Frank Li <Frank.Li@nxp.com>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev, devicetree@vger.kernel.org,
-	rmk+kernel@armlinux.org.uk, vladimir.oltean@nxp.com,
-	boon.khai.ng@altera.com
-Subject: Re: [PATCH v11 4/4] stmmac: s32: enable support for Multi-IRQ mode
-Message-ID: <aefX7Ajltzt5EqIR@rh-jkangas-kernel>
-References: <20260312-dwmac_multi_irq-v11-0-09621ccb040b@oss.nxp.com>
- <20260312-dwmac_multi_irq-v11-4-09621ccb040b@oss.nxp.com>
+        d=1e100.net; s=20251104; t=1776801954; x=1777406754;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=aK4izauZRRt/B/VXYkiUQKoI5K7lJzjxQ+RWvCNLSKk=;
+        b=Mq07G6fTo9ZaWuKlYxrAfvx/mMs2IqRPOeYkmCQAjCPvp7QBt1b+Zb01Lw0A+7ICii
+         VwJbVsij6atpYpTrsO0faKmtsbUTlkRh/NvE5mb1VrudCney4PCFyf3y8kpG6H8dzbpN
+         K+/5B8SLcOvDMIGhjJlB3Bw3zslbYPtN8g+EaBLMOvXjTwi294CNu2UAxMs0OtsTBwmP
+         6r+QWiQno/jLMjUuZ7Ig6/bBmHPYcHz/HbA8cJp1DUIMG0ITUGh/fhneAV9nzICPt541
+         nc7nqYcUvsCQw+D4eEh6bUzv5jypUy/3FmqPWTwbe4c2o2jRnc5W22b5EyxbDir2dKfG
+         2FeA==
+X-Forwarded-Encrypted: i=1; AFNElJ+goTVrTywxV+PazhtZq3mfem9r9+6YmR93+QLmq8owefqrge8PqWVd1h7SPhYgXgpN070svIU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypwSxAgSe5iTaAM7cGZi9Y3OJcsDtvn6R9oxmIjKRWIQr7SmTp
+	b8SqjwY3vqeJ7fW2FDk4OfeEdPAKRk/kqXSVWYZOq/UBDQOxYJ8Q7END
+X-Gm-Gg: AeBDietP0naX+COfzDm7OjYXHtC6xDYab5Xtjss8lFMxB0t7GtwaN0AxaugAyon6o82
+	DsC+m5aukkdZB6po9ZCcXRqG029p+9bGCmM5Fo62ytArPOU8662AWFDtOHO+gIMcMVJKI0zY0zd
+	uxHmEaIE3Flr+bYoeJvbWBNT3RcMmuWaL98vgaxaMuPzdbCOmDliUxWbf6DxoY6DZEG0/87gzdL
+	CfAYxGvVr6Cy40mfmtL576SCCRnAuhvHi8Fg8OjeI8y1oUkk3gdFhY3cyuywWZXOqy2tIktCLjU
+	uCjqvjGXafugRCtULvsmFbwH08lrklM4sz8/NX1OmFUAHCPwOTXwd0F8oSqBHjIC7/0xUmpJ22k
+	IAt2gIZODT39V5kYyq9/Oj+zJI1PXPoN3pkn8bktRu6mrh83xEYZ8HCYcEIQomNrZ201AGHTcHT
+	37okdj8+gFZLbzi/b0eT5Z2CRYwrirzzncT/WLiCF/WvE=
+X-Received: by 2002:a05:6512:3b12:b0:5a3:f3a4:1aff with SMTP id 2adb3069b0e04-5a4172e87afmr5498771e87.38.1776801954040;
+        Tue, 21 Apr 2026 13:05:54 -0700 (PDT)
+Received: from foxbook (bfh75.neoplus.adsl.tpnet.pl. [83.28.45.75])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a4187e11ecsm3934256e87.47.2026.04.21.13.05.51
+        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
+        Tue, 21 Apr 2026 13:05:52 -0700 (PDT)
+Date: Tue, 21 Apr 2026 22:05:47 +0200
+From: Michal Pecio <michal.pecio@gmail.com>
+To: Morduan Zang <zhangdandan@uniontech.com>
+Cc: petkan@nucleusys.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+ linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com, Zhan Jun
+ <zhanjun@uniontech.com>,
+ syzbot+3f46c095ac0ca048cb71@syzkaller.appspotmail.com
+Subject: Re: [PATCH] net: usb: rtl8150: fix use-after-free in
+ rtl8150_start_xmit()
+Message-ID: <20260421220547.2f7f9d85.michal.pecio@gmail.com>
+In-Reply-To: <73ACB7391A6DE033+20260421110412.14795-1-zhangdandan@uniontech.com>
+References: <73ACB7391A6DE033+20260421110412.14795-1-zhangdandan@uniontech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260312-dwmac_multi_irq-v11-4-09621ccb040b@oss.nxp.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280243-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[29];
+	TAGGED_FROM(0.00)[bounces-280244-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,suse.com,oss.nxp.com,nxp.com,pengutronix.de,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,lists.linux.dev,armlinux.org.uk,altera.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jkangas@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_NEQ_ENVFROM(0.00)[michalpecio@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	TAGGED_RCPT(0.00)[netdev,3f46c095ac0ca048cb71];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[s32g399aevb3:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 33EA143F3A1
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,uniontech.com:email]
+X-Rspamd-Queue-Id: 567FE43F37C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Jan,
-
-On Thu, Mar 12, 2026 at 09:55:30AM +0100, Jan Petrous via B4 Relay wrote:
-> From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+On Tue, 21 Apr 2026 19:04:12 +0800, Morduan Zang wrote:
+> From: Zhan Jun <zhanjun@uniontech.com>
 > 
-> Based on previous changes in platform driver, the vendor
-> glue driver can enable Multi-IRQ mode, if needed.
+> syzbot reported a KASAN slab-use-after-free read in rtl8150_start_xmit()
+> when accessing skb->len for tx statistics after usb_submit_urb() has
+> been called:
 > 
-> [...]
+>   BUG: KASAN: slab-use-after-free in rtl8150_start_xmit+0x71f/0x760
+>     drivers/net/usb/rtl8150.c:712
+>   Read of size 4 at addr ffff88810eb7a930 by task kworker/0:4/5226
 > 
-> If those prerequisites are met, the driver switches to Multi-IRQ mode,
-> using per-queue IRQs for rx/tx data pathr:
+> The URB completion handler write_bulk_callback() frees the skb via
+> dev_kfree_skb_irq(dev->tx_skb). The URB may complete on another CPU
+> in softirq context before usb_submit_urb() returns in the submitter,
+> so by the time the submitter reads skb->len the skb has already been
+> queued to the per-CPU completion_queue and freed by net_tx_action():
 > 
-> [    1.387045] s32-dwmac 4033c000.ethernet: Multi-IRQ mode (per queue IRQs) selected
+>   CPU A (xmit)                      CPU B (USB completion softirq)
+>   ------------                      ------------------------------
+>   dev->tx_skb = skb;
+>   usb_submit_urb()      --+
+>                           |-------> write_bulk_callback()
+>                           |           dev_kfree_skb_irq(dev->tx_skb)
+>                           |         net_tx_action()
+>                           |           napi_skb_cache_put()   <-- free
+>   netdev->stats.tx_bytes  |
+>     += skb->len;          <-- UAF read
 > 
-> Now the driver owns all queues IRQs:
-> 
-> root@s32g399aevb3:~# grep eth /proc/interrupts
->  29:    0    0    0    0    0    0    0    0    GICv3  89 Level   eth0:mac
->  30:    0    0    0    0    0    0    0    0    GICv3  91 Level   eth0:rx-0
->  31:    0    0    0    0    0    0    0    0    GICv3  93 Level   eth0:rx-1
->  32:    0    0    0    0    0    0    0    0    GICv3  95 Level   eth0:rx-2
->  33:    0    0    0    0    0    0    0    0    GICv3  97 Level   eth0:rx-3
->  34:    0    0    0    0    0    0    0    0    GICv3  99 Level   eth0:rx-4
->  35:    0    0    0    0    0    0    0    0    GICv3  90 Level   eth0:tx-0
->  36:    0    0    0    0    0    0    0    0    GICv3  92 Level   eth0:tx-1
->  37:    0    0    0    0    0    0    0    0    GICv3  94 Level   eth0:tx-2
->  38:    0    0    0    0    0    0    0    0    GICv3  96 Level   eth0:tx-3
->  39:    0    0    0    0    0    0    0    0    GICv3  98 Level   eth0:tx-4
+> Fix it by caching skb->len before submitting the URB and using the
+> cached value when updating the tx_bytes counter.
 
-I ran this series' changes on an NXP S32G-VNP-RDB3 (dwmac-s32) and
-confirmed multichannel TX by doing a basic iperf3 throughput test:
+Question:
+Is it correct that ETH_ZLEN padding isn't counted in tx_bytes?
 
-    # dmesg | grep Multi-IRQ
-    [   37.463467] s32-dwmac 4033c000.ethernet: Multi-IRQ mode (per queue IRQs) selected
-    # iperf3 -s
-    [connection logs snipped]
-    # grep end0 /proc/interrupts | column -t
-    29:  0      0  0  0  0  0  0  0  GICv3  89  Level  end0:mac
-    30:  968    0  0  0  0  0  0  0  GICv3  90  Level  end0:tx-0
-    31:  0      3  0  0  0  0  0  0  GICv3  92  Level  end0:tx-1
-    32:  0      0  3  0  0  0  0  0  GICv3  94  Level  end0:tx-2
-    33:  0      0  0  3  0  0  0  0  GICv3  96  Level  end0:tx-3
-    34:  0      0  0  0  3  0  0  0  GICv3  98  Level  end0:tx-4
-    35:  67302  0  0  0  0  0  0  0  GICv3  91  Level  end0:rx-0
-    36:  0      0  0  0  0  0  0  0  GICv3  93  Level  end0:rx-1
-    37:  0      0  0  0  0  0  0  0  GICv3  95  Level  end0:rx-2
-    38:  0      0  0  0  0  0  0  0  GICv3  97  Level  end0:rx-3
-    39:  0      0  0  0  0  0  0  0  GICv3  99  Level  end0:rx-4
+> This mirrors the fix pattern used by other USB network drivers.
 
-Also tried out multichannel RX by adding 'snps,route-multi-broad' to
-rx-queues-config/queue2 in the devicetree, which showed activity on
-the corresponding rx-2 entry:
+Which ones? I looked at a few and they either:
 
-    # grep end0 /proc/interrupts | column -t
-    29:  0   0  0   0  0  0  0  0  GICv3  89  Level  end0:mac
-    30:  4   0  0   0  0  0  0  0  GICv3  90  Level  end0:tx-0
-    31:  0   1  0   0  0  0  0  0  GICv3  92  Level  end0:tx-1
-    32:  0   0  1   0  0  0  0  0  GICv3  94  Level  end0:tx-2
-    33:  0   0  0   0  0  0  0  0  GICv3  96  Level  end0:tx-3
-    34:  0   0  0   0  1  0  0  0  GICv3  98  Level  end0:tx-4
-    35:  68  0  0   0  0  0  0  0  GICv3  91  Level  end0:rx-0
-    36:  0   0  0   0  0  0  0  0  GICv3  93  Level  end0:rx-1
-    37:  0   0  91  0  0  0  0  0  GICv3  95  Level  end0:rx-2
-    38:  0   0  0   0  0  0  0  0  GICv3  97  Level  end0:rx-3
-    39:  0   0  0   0  0  0  0  0  GICv3  99  Level  end0:rx-4
+- appear to have the same bug (kaweth)
+- update stats on URB completion, right before freeing skb
+- copy data out of skb, update stats, free skb before URB completion
 
-I didn't see any regressions with light network usage, and both TX/RX
-appear to function as expected.
-
-Tested-by: Jared Kangas <jkangas@redhat.com>
-
+Regards,
+Michal
 
