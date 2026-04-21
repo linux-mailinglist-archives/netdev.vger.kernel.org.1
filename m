@@ -1,265 +1,201 @@
-Return-Path: <netdev+bounces-280274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280275-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mBRlDI0B6GlJEAIAu9opvQ
-	(envelope-from <netdev+bounces-280274-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 01:00:29 +0200
+	id yC1PLqMG6Gl2EQIAu9opvQ
+	(envelope-from <netdev+bounces-280275-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 01:22:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E980440605
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 01:00:28 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17ABC4408BA
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 01:22:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 92B74305AE33
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:59:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AE714312AFD7
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 23:16:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B085379ED6;
-	Tue, 21 Apr 2026 22:59:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kJnEIdXO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FC5A3A3E82;
+	Tue, 21 Apr 2026 23:16:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
+Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91AC63502B8
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 22:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776812392; cv=pass; b=SmzbpRzWnd3eD8Uaeb6NnQvqcftyKTGKpw+U6BOo2OSvAPiPsBzyODCQ0/ksfpZQW/eZgboHaMeFWGiEnYuURvV8F3HJ24Hg2GXE5IICQE9SBFnohTiDYfe/DUalvEJ4d7YBiMy0ahoWOojrZRQhItnK6GjR/A72FKqqxDkeYaA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776812392; c=relaxed/simple;
-	bh=a3Prwcdh8j9+3CtUCjVP05sQvOvEc9TKH7JXC6xKWl4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DNvZyGd6hCQMwQ3d01T2aIOX81k3Kv2JT3xi6rpyht0uuGabs2gEdJGws6FgjyiwHmAx2IUqZyyHwkBuljOplWIn/BMFBX/cB7urMFUchxyz4kW4WxeACc0ux9r6QFRKlQq9ctlt+VZfLmHFB98J3iwsJeQFIsBg7cidQw2x7CI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kJnEIdXO; arc=pass smtp.client-ip=74.125.82.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-12c565476d7so11123984c88.1
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 15:59:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776812391; cv=none;
-        d=google.com; s=arc-20240605;
-        b=OH/Q97yPZh0s0chq6WqG75y2kGEFXvu3oFRle/k0avt99NK5V0AWX2kLdZxDe+Pco+
-         CkObrKXUWa3CrwhTm0boClrCCL+KRZPv2EAjdMHtXrCG1mHc3xGXSyG4qAZVum09qQB4
-         Nt9ql2ZfmfkktK+7V2yz6D25xSYyDGsjU0DllpdIyLpL9r8x8i3VeHCtLYN47kspmMYh
-         TsSdEp14ZiSrmCsh/zCy+6ZRVZahO86SyNEvFguDazfwVwtrTXTu4u+qPABgp69gTuSL
-         cALnW8x+93nDTntEybbjVhmL3P5UOcMiAe9d6ssfLl38kBbWEkszJx1cCtHlXyHsiT6/
-         B3gQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=EUyujIAApUVAkDEH0uSDEg04wL17CBrnWRgJpkrkKwA=;
-        fh=rg9FwRUfVQKqIEL/mhJkRo8b+mJGVFVDJ3GHRqjafJY=;
-        b=lqc3bO9B0CRmWuMuNfaO1y7XdWV/blQ0f1GPP3Qruyv4Hk8j4xEc8Bx0X9+KfDpZ9T
-         EjwCEUIIU8VpjFw9sUQvF83ZOcAAukM99xMCIRs8I1BYEUMJqJn0Dg/MQjBTnLZmTGkZ
-         kEB4ZMX0KRwdyp5c+e+G8uv3T69LM30n/ct4cGw8Bjd/RTBNUL49qltsihlxN2TBdAV1
-         L3AcQa1Wg4FHvyDvK183ziklgFcbfBXvMbDD3kPrNSn+vG7OvwL4iJ94aXO4WZr7bzgJ
-         wqIYIxjP54s4YCE0PYsiL7v7QAXX5E6xNekKeeNHGGpzeBCW+f1+lA8AJnwt/yTqpo8e
-         9OsQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776812391; x=1777417191; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EUyujIAApUVAkDEH0uSDEg04wL17CBrnWRgJpkrkKwA=;
-        b=kJnEIdXOSNh5El6j8Cqf8cZQDH0EsSIFvXhpT1bMNNqRKxB73DY+SOpdx33agney4Q
-         qbxoyNQ+YyyZcBloPQN2hF2nzIqGMEVRqnD3jU5VaqYIolVbKrtYj4ILdfy1sgqxanTz
-         mX91nn/T6xuR7hD2PLwpr4qxKm5TpEZyFZ8LuTnezZBy/AWm4ASgMfSNDBoU1sZw+t+k
-         lR3MqLoT4OwFn2fCd3qnH4kxQiGx9+BfbRng0oiknMFjiJ3NATFyd1K496VpVMp4W0a0
-         eIpB2UHFW+sjPdMmsIEwNa+NeMtj8Vkh3ZllKJ7ChtjxM0XK5F1EyeRr4X3m72rJQVp5
-         O1yg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08BC63A1D1B
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 23:16:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.78
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776813400; cv=none; b=UG85BT4+zSl1rYXjnFJfT+lxXmhpQUT2+bijLfxGwBIl2pD/r/ZOcrkCcErDtxTOx3+8cKpfu8jO/nLUgayAF2xqvwP4dsVl0MoESvoaQJP2uNVwLaQGQ99ku6EUXsAkT49+ewjLKMnGrRrvWwl0ikwF8dYSvaDZhdL+JYFhZiU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776813400; c=relaxed/simple;
+	bh=jjNhiuEj7FQvPAjmnCV8hzKyi+/dVYWBPhagpVQW8YA=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=WwenfhkgflXBdYT+gHcVKgM7fWe3/9MGxgSC/MjgtxkJHCveR4QxUUp/9GKZoYpaK/1r+q15xQXTxmQ4zrnBRc8D2MsuPht3nMKz8COQF3p5geExK0I4Z9930tpYZ82nr2zQhrPq+iUistRgePZbW4do48qdyePKGqPvFhk5bpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-6948eac3522so5121741eaf.3
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 16:16:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776812391; x=1777417191;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=EUyujIAApUVAkDEH0uSDEg04wL17CBrnWRgJpkrkKwA=;
-        b=sA5p5yV7Q2dZfKU/fZp1YSa7/CPROqmDYRhs74bbg91IzriWj/++klU0WYx5bd7b5H
-         1GiPWx30pGcBpnnYgqv8yDAnSc2OxQOGUmUX5jAhj+9Z/V3JzN43GqAdDp9XbMhGC8/h
-         94FoO4ns7g31sojMCVBoq2bm9fcpoXmhyjrMLH5SnTTD5UGzGfCjMnFAz55YQD3U64Hi
-         tD8CFA4QZv5xa66caLJFmc1/D0rxKu/iF5KPAXulvgKLyZxuMWcDtfLZRwzGfKtFZnsD
-         j+LK5p1MhQcYu2TD5YRuHiBRp3UGsqshAYG/7G9xvZV4P9GQSURp7SxYBtB0IPAriKPM
-         Yh4g==
-X-Gm-Message-State: AOJu0YyOiyq4aOUg0aeYaZdN8qi3Ee2SU77s0PspS9MCKq6TdRPN7Vf/
-	379wO/j7UjG7b80bTN8jLAjqO0KakY31YT72uhGQ7cUocDVSOkZWQHGeAWPHRpXVW20uWKdKx6n
-	jWBUFpz+/MLlSKNp0plBbfoMvwsxPdi8YpZp3VLws
-X-Gm-Gg: AeBDietLrmXxdpl4w+SNlmf0HXU91DMds9R3ZIswPCvFGP1bm7DMN0paBGSAr/VnVpt
-	U/0t0WfFkgl5Ri6YsyW7x1FVyl5jlzHzQbHurZzyvKeCkoXgwQJ7B1F8rG/UtbJWT09hdHIVv7g
-	lpkbmNv7kPP2VbYn/ebF1LFzqrFpLZ1bfpjedzwxz4WGwcf2sM+iKUuBiskkL0kHuPCsW6Sj4DD
-	mxJRFWh8mIOxzNq+vjHVnmOQxsjH4lW3JLlBGlz58Jg1Fz7dQS+NMeYIWFA+oWk/sSz9lpL9cVX
-	Vk0UVlWsw/nkMPxIZisRd+SlC4fc8ln+BtMB0zOZD9Xj46w1s19GyQqrYJhzkFRNvVUsO6CaBwN
-	90IUXD5/iT4mV/HO5w4PTyPDM0GqP2JiQJ44zkAHQSdTBRg/zV0wupuvG5TvlN0C35Ht1YYBL5A
-	==
-X-Received: by 2002:a05:7022:60c:b0:12a:713b:8958 with SMTP id
- a92af1059eb24-12c73f7596bmr10068832c88.10.1776812390229; Tue, 21 Apr 2026
- 15:59:50 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776813389; x=1777418189;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GpWp0L8twdDIkkTdSHW3HMynYG72MHcZF+132o+rNOc=;
+        b=AN1lrF5fEZMmTXczdOtJ0ROP+kmGbsrFZcb9fbLhqhmuldbJ/8jcwoZNi4EO8c2lsQ
+         yqstgli3xT0WRq7V/F/wA4+F3JyPP8l55e8hPgp7JhoX3sjLg3T967WKo4pMi8E5X2d/
+         4OT8Y+VOWTcZHMQNtrt41goc53GIp3JTMDdjXTri2k/uJXahrGLOZtSVjaPE3n+pHiWu
+         B8xQyE9e2brm52lALuxiqVxom9+hodkxJalzQJPtZZRlJX6bPIF5pEzVf1jlZb7U/qp5
+         xv+kDG35ZXMqc4YkkLOx4N661bMlmvoFZ2HtIhOTZQNDCC3+cQVGT/wgCnjIsujRGNgC
+         tJWg==
+X-Forwarded-Encrypted: i=1; AFNElJ+aVwOqXzdjKEnFIfzSZl6B+VVfmxpjJSpcD6OHJQN7OGPACk2Mg7f2oGJn2J1GqWa2i6voHjk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZ6UJyiiooHi6Bx3zsU3EvRgsvAfS7e9QdEIPerSQDQMeprM9R
+	8owbLbk/+xMHpRaqwzKIpAmUJQhUXrOuF0kOipDh3LjJZl+JDxIBt4qAbQ/Ww9nC9iQyb4qYwOG
+	gqo9RYG4uK/9YnHWIMtyrU6dNOFUAMoW6ymmXuqxm4tv4bROZCrl6hPQyYJ8=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260421123106.142299-1-jt26wzz@gmail.com> <20260421123106.142299-3-jt26wzz@gmail.com>
-In-Reply-To: <20260421123106.142299-3-jt26wzz@gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 21 Apr 2026 15:59:39 -0700
-X-Gm-Features: AQROBzD2IEw4ypAL697CZLXFoPfbIAflmemsvJ5os_4y8LuiwAgFAJA40Z9E2X0
-Message-ID: <CAAVpQUDv28sNCYdo6oH25FNKnddZibwrmxMUf4GqgS4fRA8+og@mail.gmail.com>
-Subject: Re: [PATCH net v3 2/2] selftests/bpf: check epoll readiness during
- reuseport migration
-To: Zhenzhong Wu <jt26wzz@gmail.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com, ncardwell@google.com, 
-	davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, shuah@kernel.org, tamird@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-Received: by 2002:a05:6820:3098:b0:694:8e29:a920 with SMTP id
+ 006d021491bc7-6948e29ac68mr4612704eaf.39.1776813388947; Tue, 21 Apr 2026
+ 16:16:28 -0700 (PDT)
+Date: Tue, 21 Apr 2026 16:16:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69e8054c.a00a0220.9259.0016.GAE@google.com>
+Subject: [syzbot] [net?] kernel BUG in pn_socket_sendmsg
+From: syzbot <syzbot+706f5eb79044e686c794@syzkaller.appspotmail.com>
+To: courmisch@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-0.36 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=354b135d724a721f];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280274-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amazon.co.jp:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 9E980440605
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,vger.kernel.org,redhat.com,googlegroups.com];
+	TAGGED_FROM(0.00)[bounces-280275-lists,netdev=lfdr.de,706f5eb79044e686c794];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[goo.gl:url,syzkaller.appspot.com:url,googlegroups.com:email,storage.googleapis.com:url];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: 17ABC4408BA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 21, 2026 at 5:31=E2=80=AFAM Zhenzhong Wu <jt26wzz@gmail.com> wr=
-ote:
->
-> Inside migrate_dance(), add epoll checks around shutdown() to
-> verify that the target listener is not ready before shutdown()
-> and becomes ready immediately after shutdown() triggers migration.
->
-> Cover TCP_ESTABLISHED and TCP_SYN_RECV. Exclude TCP_NEW_SYN_RECV
-> as it depends on later handshake completion.
->
-> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
-> Signed-off-by: Zhenzhong Wu <jt26wzz@gmail.com>
-> ---
->  .../bpf/prog_tests/migrate_reuseport.c        | 46 ++++++++++++++++---
->  1 file changed, 40 insertions(+), 6 deletions(-)
->
-> diff --git a/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c b=
-/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
-> index 653b0a20f..6180a79a7 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
-> @@ -7,24 +7,29 @@
->   *   3. call listen() for 1 server socket. (migration target)
->   *   4. update a map to migrate all child sockets
->   *        to the last server socket (migrate_map[cookie] =3D 4)
-> - *   5. call shutdown() for first 4 server sockets
-> + *   5. for TCP_ESTABLISHED and TCP_SYN_RECV cases, verify via epoll
-> + *        that the last server socket is not ready before migration.
-> + *   6. call shutdown() for first 4 server sockets
->   *        and migrate the requests in the accept queue
->   *        to the last server socket.
-> - *   6. call listen() for the second server socket.
-> - *   7. call shutdown() for the last server
-> + *   7. for TCP_ESTABLISHED and TCP_SYN_RECV cases, verify via epoll
-> + *        that the last server socket is ready after migration.
-> + *   8. call listen() for the second server socket.
-> + *   9. call shutdown() for the last server
->   *        and migrate the requests in the accept queue
->   *        to the second server socket.
-> - *   8. call listen() for the last server.
-> - *   9. call shutdown() for the second server
-> + *  10. call listen() for the last server.
-> + *  11. call shutdown() for the second server
->   *        and migrate the requests in the accept queue
->   *        to the last server socket.
-> - *  10. call accept() for the last server socket.
-> + *  12. call accept() for the last server socket.
->   *
->   * Author: Kuniyuki Iwashima <kuniyu@amazon.co.jp>
->   */
->
->  #include <bpf/bpf.h>
->  #include <bpf/libbpf.h>
-> +#include <sys/epoll.h>
->
->  #include "test_progs.h"
->  #include "test_migrate_reuseport.skel.h"
-> @@ -350,8 +355,28 @@ static int update_maps(struct migrate_reuseport_test=
-_case *test_case,
->
->  static int migrate_dance(struct migrate_reuseport_test_case *test_case)
->  {
-> +       struct epoll_event ev =3D {
-> +               .events =3D EPOLLIN,
-> +       };
-> +       int epoll =3D -1, nfds;
->         int i, err;
->
-> +       if (test_case->state !=3D BPF_TCP_NEW_SYN_RECV) {
-> +               epoll =3D epoll_create1(0);
-> +               if (!ASSERT_NEQ(epoll, -1, "epoll_create1"))
-> +                       return -1;
-> +
-> +               ev.data.fd =3D test_case->servers[MIGRATED_TO];
-> +               if (!ASSERT_OK(epoll_ctl(epoll, EPOLL_CTL_ADD,
-> +                                        test_case->servers[MIGRATED_TO],=
- &ev),
-> +                              "epoll_ctl"))
-> +                       goto close_epoll;
-> +
-> +               nfds =3D epoll_wait(epoll, &ev, 1, 0);
-> +               if (!ASSERT_EQ(nfds, 0, "epoll_wait 1"))
-> +                       goto close_epoll;
-> +       }
-> +
->         /* Migrate TCP_ESTABLISHED and TCP_SYN_RECV requests
->          * to the last listener based on eBPF.
->          */
+Hello,
 
-Sorry I forgot to update return -1 to goto close_epoll
-when shutdown() fails.
+syzbot found the following issue on:
 
-Otherwise looks good.
+HEAD commit:    97e797263a5e Add linux-next specific files for 20260420
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=111f5702580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=354b135d724a721f
+dashboard link: https://syzkaller.appspot.com/bug?extid=706f5eb79044e686c794
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14bbf4ce580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=152051ba580000
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/bfe08255b02b/disk-97e79726.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/70874e341331/vmlinux-97e79726.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/68352f7fca94/bzImage-97e79726.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+706f5eb79044e686c794@syzkaller.appspotmail.com
+
+netlink: 'syz.0.17': attribute type 2 has an invalid length.
+------------[ cut here ]------------
+kernel BUG at net/phonet/socket.c:213!
+Oops: invalid opcode: 0000 [#1] SMP KASAN PTI
+CPU: 0 UID: 0 PID: 6014 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/18/2026
+RIP: 0010:pn_socket_autobind net/phonet/socket.c:213 [inline]
+RIP: 0010:pn_socket_sendmsg+0x240/0x250 net/phonet/socket.c:421
+Code: cc cc cc e8 c2 0c d2 00 89 d9 80 e1 07 fe c1 38 c1 0f 8c 04 ff ff ff 48 89 df e8 bb d3 be f7 e9 f7 fe ff ff e8 c1 5a 55 f7 90 <0f> 0b 66 66 66 66 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90
+RSP: 0018:ffffc900050d7ba0 EFLAGS: 00010293
+RAX: ffffffff8a6fa75f RBX: 0000000000000000 RCX: ffff888031b91ec0
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffc900050d7c58 R08: 0000000000000000 R09: 0000000000000000
+R10: dffffc0000000000 R11: fffffbfff1f9e8df R12: dffffc0000000000
+R13: ffff88805c7b5ec0 R14: ffff888034fecec0 R15: 1ffff92000a1af78
+FS:  00007f347ac666c0(0000) GS:ffff888125a62000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f347b5f7680 CR3: 000000003d362000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ sock_sendmsg_nosec+0x112/0x150 net/socket.c:797
+ __sock_sendmsg net/socket.c:812 [inline]
+ __sys_sendto+0x402/0x590 net/socket.c:2280
+ __do_sys_sendto net/socket.c:2287 [inline]
+ __se_sys_sendto net/socket.c:2283 [inline]
+ __x64_sys_sendto+0xde/0x100 net/socket.c:2283
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f347b5cd04e
+Code: 08 0f 85 a5 a8 ff ff 49 89 fb 48 89 f0 48 89 d7 48 89 ce 4c 89 c2 4d 89 ca 4c 8b 44 24 08 4c 8b 4c 24 10 4c 89 5c 24 08 0f 05 <c3> 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 80 00 00 00 00 48 83 ec 08
+RSP: 002b:00007f347ac64e88 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+RAX: ffffffffffffffda RBX: 00007f347ac666c0 RCX: 00007f347b5cd04e
+RDX: 0000000000000020 RSI: 00007f347ac65000 RDI: 0000000000000006
+RBP: 0000000000000000 R08: 00007f347ac64f04 R09: 000000000000000c
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000006
+R13: 00007f347ac64f58 R14: 00007f347ac65000 R15: 0000000000000000
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:pn_socket_autobind net/phonet/socket.c:213 [inline]
+RIP: 0010:pn_socket_sendmsg+0x240/0x250 net/phonet/socket.c:421
+Code: cc cc cc e8 c2 0c d2 00 89 d9 80 e1 07 fe c1 38 c1 0f 8c 04 ff ff ff 48 89 df e8 bb d3 be f7 e9 f7 fe ff ff e8 c1 5a 55 f7 90 <0f> 0b 66 66 66 66 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90
+RSP: 0018:ffffc900050d7ba0 EFLAGS: 00010293
+RAX: ffffffff8a6fa75f RBX: 0000000000000000 RCX: ffff888031b91ec0
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffc900050d7c58 R08: 0000000000000000 R09: 0000000000000000
+R10: dffffc0000000000 R11: fffffbfff1f9e8df R12: dffffc0000000000
+R13: ffff88805c7b5ec0 R14: ffff888034fecec0 R15: 1ffff92000a1af78
+FS:  00007f347ac666c0(0000) GS:ffff888125a62000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f347b5f7680 CR3: 000000003d362000 CR4: 00000000003526f0
 
 
-> @@ -365,6 +390,15 @@ static int migrate_dance(struct migrate_reuseport_te=
-st_case *test_case)
->         if (test_case->state =3D=3D BPF_TCP_NEW_SYN_RECV)
->                 return 0;
->
-> +       nfds =3D epoll_wait(epoll, &ev, 1, 0);
-> +       if (!ASSERT_EQ(nfds, 1, "epoll_wait 2")) {
-> +close_epoll:
-> +               close(epoll);
-> +               return -1;
-> +       }
-> +
-> +       close(epoll);
-> +
->         /* Note that we use the second listener instead of the
->          * first one here.
->          *
-> --
-> 2.43.0
->
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
