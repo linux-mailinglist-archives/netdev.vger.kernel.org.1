@@ -1,239 +1,155 @@
-Return-Path: <netdev+bounces-280216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280217-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YFQ0OnHE52nuAQIAu9opvQ
-	(envelope-from <netdev+bounces-280216-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 20:39:45 +0200
+	id +LoQI73E52lCAgIAu9opvQ
+	(envelope-from <netdev+bounces-280217-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 20:41:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B86D43EBA1
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 20:39:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E448A43EBE5
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 20:41:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 461B43007498
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 18:39:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 741AC302FAA5
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 18:40:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0019C3750C4;
-	Tue, 21 Apr 2026 18:39:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94D2E3DC4C7;
+	Tue, 21 Apr 2026 18:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iEB85HuP"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="W03jPU6v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37CF23A5E92
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 18:39:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776796782; cv=pass; b=ksMH+FF9Oqxmy1siM/poQNJeJVh/Ug/dU1KvriItAkGhC3W/r+7U/pa2M8rM2S5nnKJLOCOsvwFdosn2ULIR8QvYcAqRYVRNAcPEU/JOpxvuiaMa91fb9lOgcUGDUoDQalRPIJSvha9ldwxDKAkJ0E6VkPFTAlq3PWgd7jOR1Oo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776796782; c=relaxed/simple;
-	bh=XkUggc2YLAU4PEeLnjN+cRkW+CxfqN6FC35jAqE9Xaw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X9SbVHYhdgdEaRx49xDD533VkGTHd3KxrEGDagmz1qtayiL78o6nLzh7Z1mN1qsG6vD4+AjVnUoS57apR9hCk5JJ8fQJJabtL5rUmO1KqabFTA302hgcB+JtEqiQlvKn9Z6f21uL57/WpSspuA8BCAO042tzXSsqpl6LnWFwlAY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iEB85HuP; arc=pass smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-6714f678bdaso7584938a12.3
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 11:39:39 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776796778; cv=none;
-        d=google.com; s=arc-20240605;
-        b=QcLfYylJX5SXLN6VVmLNS5oOlXqTADGA3Rpc46PTVuDwwpGTFFrAyYtX5ydcisHrrE
-         nQ8rkCg4N47+bUghzcVcAfsyMZFtsesTEc1raI8ujI9L2jIAWe0tXAWqv5h/8TKyxbRl
-         Mm5QhRORrDzZODbooyTgt7xJg4+qm4jnuWSOnriTkQ/VdIR0juTl+wPlzOdQdqiJ2Pj8
-         JNFClhiMVS6N+Kp4TdzzculW6si3W4cyxlQ7rDnwGj58kc9aObsSPifBaaZkd/gGvrwv
-         9aRLbvAwGMCjwX0anEXYZjJeOVZAT5t/WjrBvllGeuLKcoVcxzb2nlnTuwKCJnX9NHxb
-         f+zQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=GL+MNg+fLay1tPgEJjKy5ape62o0vD/BhQMsEMOoPpk=;
-        fh=Qk3zsSediddKkd91lT6LSMNqyOz8uQhKMnRWtNZ7Ehg=;
-        b=PHGtiYSrM6KwSh1dt6iamBJyhUqnqEdsZUnnTH5kDvV975hUhnPdBTxSvK6szdyzCZ
-         vx8kYoulv6ciQs3J6JF4OMvViC39jIagPUd35BcQGcvguxjhZj22jzaZOftzjUueqIMm
-         Iy7cQ2FkIgHqhZZac1l33eHUAll4EFnrieHHw8uFt+TdJR41rsleeak/tathVZywFVOP
-         pqc7HDr1ETMwj6acxN927595QNs0VsZaUdU7ecM6GX5FlEcw/O+YwzZ58CsWz0Ece5np
-         attdhMoXWylD9ooAWg0inQ10FxjWJQPt+6GexmCN4Nm6T8IkeTuuZhge999q1LfClc/v
-         t3Ig==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776796778; x=1777401578; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=GL+MNg+fLay1tPgEJjKy5ape62o0vD/BhQMsEMOoPpk=;
-        b=iEB85HuP5LthnsBj2E7++hKY9A1doLCAr/eAu7KltI0GIjOQ0CUIP1Le8/rMxBH8x0
-         J/o82vBlnbXDwijXT1+aksPvq/ItQYE+/+hT6eOEshYzNOZfLA5fF70MAu6jYLtB6zNb
-         RS9OElGt0OXQ6lyv8ANBxlqg4BdITc5W7uVn/Kik1fUGpZNN78b+H58rxMoPKJmc1N97
-         95Pd+xwwDVRsK5UcYz+KMSwdtwPIWXyWNrS7wRv5HzdS6qoVf7Lc6lKLhHyx8MOPhBBV
-         QKVo1GBZ43JNyqg8vqq8/7n4OsWJYjU1j8ZMUR9rLjqpNkQwMMUj7qCiMj+NBE7Mtryr
-         jC4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776796778; x=1777401578;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GL+MNg+fLay1tPgEJjKy5ape62o0vD/BhQMsEMOoPpk=;
-        b=r403DUxSq7EkBMdS7hn3Q2MLD3Zc2PlTlLlbBoIbNtK3kKu7V5awX1p6gK99GL8Akx
-         uddmQLHjZ/cR69xK1vzl5Ofjgr7PCNxHnFmTgELsr0JElwyIfYby5NrDUQtX00AmXN7/
-         YKNmX7mnzyoCDQP8TWQgNCTuMlTzx90fZh/GZmJJ/FFT9ktBaHDtLHK+ao6eqSPbT80e
-         oUVoMxnKWvzMZxjD4nmq1lyV2/q4OEXdn9NBXTdtUWRHBaa3W2aFZBb1PaonH0AB53gN
-         Y/jGDKyWLu3Mw+Ff1nVAyNgrr4e7UK48yoBsCTBA8hKpqwT45dDaCKxJAE5mGm+x8TfX
-         W4aw==
-X-Forwarded-Encrypted: i=1; AFNElJ9CYE6W38erErocpOoHh/8SV8+4yCfjowN5YHaL8jyem1/6L3mOQDqFf3q/g/tytqZEii8xedU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsqPLD0pDzSJQwSzwPSdS1rVnAOqQHGCkHHEaMhL/uXkX3Hykm
-	tqNmStm01pC2NAYQFvH8j3dbh5h4tezkjildehZcGxTL/BPCU9XvrP79jK/gnwrKZ6nNI9PeQL/
-	DZw1Y8EE+AQFvwJqGK8fTgPOEs7/CO70=
-X-Gm-Gg: AeBDietolzlw98iz1YOMvYp+udjaMULffcoMjF+B4v0ZEevWCX/aqyK3JNujBC63uSw
-	YbkI6SlUTPmIe4IJb01W1wGQ9nkXMoSAYEUX9uI+RaRpW+9zlix4PGCsWX938KAvynSb1U7uK/O
-	c5qwm0f4fkLqxyMLBE6/kHtlBhmVC9hmfV83iElhSsAuWCaEZsM1weniCTWFGqe4KpgMQElDGZc
-	rKjVybxGa+kW2y4Oue5NIkrKGn9PEvLoJslpLTPtDuToUg3zZq/+VMp7YtpBuxq3GorcSfz95xU
-	vFPr9APO25rTxufqCA==
-X-Received: by 2002:a05:6402:26d2:b0:66e:8ce7:5461 with SMTP id
- 4fb4d7f45d1cf-672bfdc947cmr9242701a12.16.1776796778071; Tue, 21 Apr 2026
- 11:39:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE7E3DC4A6;
+	Tue, 21 Apr 2026 18:40:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776796805; cv=none; b=UrcuqsjdBVeO8T/XUxcc6U2P48E2GgkK7WD/BaeqaF4tSdQsrHA3k10lkng0XCvgWTThwhNczqgYYcDebZnsZ+spKeJ4BkQOGBCaBD4I4UuVcj32qcEFowSqV2Rk1Gjju7r0s0fXXO13YlNcsoJVKvrsQM0KzJl7XHA7y38MKIU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776796805; c=relaxed/simple;
+	bh=hR9w0ZwRSBV8FS5s0cQgmLvMB6qT8ow21OS/g1uvucE=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Subject:Cc:
+	 References:In-Reply-To; b=X3mYkk4MVKmcCsYMuHbGc99xC5kIAczTMMhoex28NqcbDDcqft8lNrvTb5fT6Q0i0eHiLDH05g00DKh53iG0Od6yD+WdEJwDLS8rX/ki+MEHOY+sQ36wLQRkQZBxoN8hRDyU0ZKTzcqkIan6bAni+Q8dbJRoNIF1nlqKHQ07aW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=W03jPU6v; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id A77C0C5C9B3;
+	Tue, 21 Apr 2026 18:40:39 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 22B3A600D2;
+	Tue, 21 Apr 2026 18:39:59 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 49E101046085F;
+	Tue, 21 Apr 2026 20:39:50 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1776796797; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=hR9w0ZwRSBV8FS5s0cQgmLvMB6qT8ow21OS/g1uvucE=;
+	b=W03jPU6veJWiofjBlPVaRXLhUhjBDldWhVhcmR/qtoJMPaKhVTZBr7nBu/8zy5ZjXP5iHa
+	eBnJWzW6Vne/bCVjybEsmqzGpUnHL5HkXz90OMj7J5FLLUtHIYU1Fu162hPj5OHqQh6Vyw
+	58MU4vG2k3lYm8XjXkYNSmFBDDhiAd2ij2uiLivBUoUAzTBYDbuyjlbSCYfSKW4AogSOfi
+	u7KtIy+AuZmtz2QJRc7wsLlGlUkUXduxKSCGVAqghowRqzkBjTF9bKMHIQu4bk3lIf8RJ/
+	lnE+WO6lXkIiU4pzCuBrCrHTp1StiohZ6MH3FZ9TRy+rDTZFd1SUw2jCNsBvmA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260420023304.57105-1-dbgh9129@gmail.com> <20260421153338.GE651125@horms.kernel.org>
-In-Reply-To: <20260421153338.GE651125@horms.kernel.org>
-From: =?UTF-8?B?7LWc7Jyg7Zi4?= <dbgh9129@gmail.com>
-Date: Tue, 21 Apr 2026 14:39:26 -0400
-X-Gm-Features: AQROBzAz9a21Rc_4CyNlK6c2aO8-bB1aTwzpX8mJpeDNlq_57_t5J4LfnJ76O_o
-Message-ID: <CACrCO_XVey7DcyAugHfcqOs=rj8j1u2=D2ervdGNONk50KrzQw@mail.gmail.com>
-Subject: Re: [PATCH v1] net: liquidio: resolve VF pci_dev on demand for FLR requests
-To: Simon Horman <horms@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, 
-	Kory Maincent <kory.maincent@bootlin.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Marco Crivellari <marco.crivellari@suse.com>, linux-kernel@vger.kernel.org, 
-	Myeonghun Pak <mhun512@gmail.com>, Ijae Kim <ae878000@gmail.com>, Taegyu Kim <tmk5904@psu.edu>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [4.84 / 15.00];
-	SEM_URIBL(3.50)[psu.edu:email];
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 21 Apr 2026 20:39:50 +0200
+Message-Id: <DHZ1W95EQ4NC.2U9U2Z5YLCXWY@bootlin.com>
+From: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+To: "Paul Chaignon" <paul.chaignon@gmail.com>,
+ =?utf-8?b?QWxleGlzIExvdGhvcsOpIChlQlBGIEZvdW5kYXRpb24p?=
+ <alexis.lothore@bootlin.com>
+Subject: Re: [PATCH bpf-next] selftests/bpf: drop xdping tool
+Cc: "Andrii Nakryiko" <andrii@kernel.org>, "Eduard Zingerman"
+ <eddyz87@gmail.com>, "Alexei Starovoitov" <ast@kernel.org>, "Daniel
+ Borkmann" <daniel@iogearbox.net>, "Martin KaFai Lau"
+ <martin.lau@linux.dev>, "Kumar Kartikeya Dwivedi" <memxor@gmail.com>, "Song
+ Liu" <song@kernel.org>, "Yonghong Song" <yonghong.song@linux.dev>, "Jiri
+ Olsa" <jolsa@kernel.org>, "Shuah Khan" <shuah@kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, "Jakub Kicinski" <kuba@kernel.org>, "Jesper
+ Dangaard Brouer" <hawk@kernel.org>, "John Fastabend"
+ <john.fastabend@gmail.com>, "Stanislav Fomichev" <sdf@fomichev.me>,
+ <ebpf@linuxfoundation.org>, "Bastien Curutchet"
+ <bastien.curutchet@bootlin.com>, "Thomas Petazzoni"
+ <thomas.petazzoni@bootlin.com>, <linux-kernel@vger.kernel.org>,
+ <bpf@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+ <netdev@vger.kernel.org>, "Alan Maguire" <alan.maguire@oracle.com>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260417-xdping-v1-1-9b0ce0e7adf8@bootlin.com>
+ <aefAHLdVZaOmf1Os@mail.gmail.com>
+In-Reply-To: <aefAHLdVZaOmf1Os@mail.gmail.com>
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-280217-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280216-lists,netdev=lfdr.de];
-	R_DKIM_ALLOW(0.00)[gmail.com:s=20251104];
-	GREYLIST(0.00)[pass,meta];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_TO(0.00)[gmail.com,bootlin.com];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,iogearbox.net,linux.dev,davemloft.net,fomichev.me,linuxfoundation.org,bootlin.com,vger.kernel.org,oracle.com];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,lunn.ch,google.com,bootlin.com,linux.dev,suse.com,gmail.com,psu.edu];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.622];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dbgh9129@gmail.com,netdev@vger.kernel.org];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
-	TAGGED_RCPT(0.00)[netdev];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_SPF_ALLOW(0.00)[+ip4:172.232.135.74:c];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3B86D43EBA1
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alexis.lothore@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[test_xdping.sh:url,bootlin.com:mid,bootlin.com:dkim,bootlin.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E448A43EBE5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Dear Simon,
+Hi Paul,
+thanks for the feedback.
 
-Thanks for pointing out the correct tree target and the linker error
-on net-next.
-I will rework this, targeting 'net' and ensuring the necessary
-functions are handled correctly.
+On Tue Apr 21, 2026 at 8:21 PM CEST, Paul Chaignon wrote:
+> On Fri, Apr 17, 2026 at 05:33:02PM +0200, Alexis Lothor=C3=A9 (eBPF Found=
+ation) wrote:
 
-Best regards,
+[...]
 
-On Tue, 21 Apr 2026 at 11:33, Simon Horman <horms@kernel.org> wrote:
+>> Drop test_xdping.sh and the corresponding xdping.c userspace part. Keep
+>> the ebpf part (xdping_kern.c), as it is used by another test integrated
+>> in test_progs (btf_dump)
 >
-> On Sun, Apr 19, 2026 at 10:33:04PM -0400, Yuho Choi wrote:
-> > The PF SR-IOV enable path caches VF pci_dev pointers in
-> > dpiring_to_vfpcidev_lut[] by iterating with pci_get_device(). Those
-> > entries do not own a reference, because the iterator drops the previous
-> > device reference on each step. The cached pointer is then dereferenced
-> > later when handling OCTEON_VF_FLR_REQUEST.
-> >
-> > This can leave stale VF pci_dev pointers in the lookup table and makes
-> > the FLR path rely on a PCI device object whose lifetime is not pinned.
-> >
-> > Drop the long-lived lookup table and resolve the VF pci_dev only when an
-> > FLR request arrives. Use the PF's SR-IOV metadata to derive the VF's
-> > bus/devfn, get a referenced pci_dev for immediate use, issue the FLR,
-> > and then drop the reference.
-> >
-> > Fixes: ca6139ffc67ee ("liquidio CN23XX: sysfs VF config support")
-> > Fixes: 8c978d059224 ("liquidio CN23XX: Mailbox support")
-> > Co-developed-by: Myeonghun Pak <mhun512@gmail.com>
-> > Signed-off-by: Myeonghun Pak <mhun512@gmail.com>
-> > Co-developed-by: Ijae Kim <ae878000@gmail.com>
-> > Signed-off-by: Ijae Kim <ae878000@gmail.com>
-> > Co-developed-by: Taegyu Kim <tmk5904@psu.edu>
-> > Signed-off-by: Taegyu Kim <tmk5904@psu.edu>
-> > Signed-off-by: Yuho Choi <dbgh9129@gmail.com>
->
-> As this fixes code present in the net tree, it should be targeted
-> at that tree, like this:
->
-> Subject: [PATCH net] ...
->
-> In this case the CI defaulted to the net-next tree.
-> Which might be harmless. But please keep this in mind for next time.
->
-> ...
->
-> > diff --git a/drivers/net/ethernet/cavium/liquidio/octeon_mailbox.c b/drivers/net/ethernet/cavium/liquidio/octeon_mailbox.c
-> > index ad685f5d0a136..b967c7928b4a7 100644
-> > --- a/drivers/net/ethernet/cavium/liquidio/octeon_mailbox.c
-> > +++ b/drivers/net/ethernet/cavium/liquidio/octeon_mailbox.c
-> > @@ -26,6 +26,29 @@
-> >  #include "octeon_mailbox.h"
-> >  #include "cn23xx_pf_device.h"
-> >
-> > +static struct pci_dev *lio_vf_pci_dev_by_qno(struct octeon_device *oct, u32 q_no)
-> > +{
-> > +     int vfidx, bus, devfn;
-> > +
-> > +     if (!oct->sriov_info.rings_per_vf)
-> > +             return NULL;
-> > +
-> > +     if (q_no % oct->sriov_info.rings_per_vf)
-> > +             return NULL;
-> > +
-> > +     vfidx = q_no / oct->sriov_info.rings_per_vf;
-> > +     if (vfidx >= oct->sriov_info.num_vfs_alloced)
-> > +             return NULL;
-> > +
-> > +     bus = pci_iov_virtfn_bus(oct->pci_dev, vfidx);
->
-> When applied against net-next this causes a linker error with x86_64
-> allmodconfig (at least) because pci_iov_virtfn_bus is not defined.
->
-> > +     devfn = pci_iov_virtfn_devfn(oct->pci_dev, vfidx);
-> > +     if (bus < 0 || devfn < 0)
-> > +             return NULL;
-> > +
-> > +     return pci_get_domain_bus_and_slot(pci_domain_nr(oct->pci_dev->bus),
-> > +                                        bus, devfn);
-> > +}
-> > +
-> >  /**
-> >   * octeon_mbox_read:
-> >   * @mbox: Pointer mailbox
->
-> --
-> pw-bot: changes-requested
+> The xdping_kern object file is just used in bpf_dump to check we can
+> parse the license as expected. You can replace that by any other test
+> with a GPL license (ex., btf_type_tag_percpu.bpf.o) and remove
+> xdping_kern.c.
+
+Indeed. I'll let a bit of time in case anyone finally advocates to make
+xdping stay, otherwise I'll send a v2 making the btf_dump test use
+another prog meant to stay, so that I can also drop the xdping_kern
+prog.
+
+Thanks,
+
+Alexis
+
+--=20
+Alexis Lothor=C3=A9, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
 
