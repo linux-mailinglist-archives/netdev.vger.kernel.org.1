@@ -1,197 +1,148 @@
-Return-Path: <netdev+bounces-280128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280129-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0A8tG9F752nC9QEAu9opvQ
-	(envelope-from <netdev+bounces-280128-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 15:29:53 +0200
+	id SELsFW5852nC9QEAu9opvQ
+	(envelope-from <netdev+bounces-280129-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 15:32:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08A7243B5BD
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 15:29:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C8C743B646
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 15:32:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 80F703027685
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:27:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1FFA73020004
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:30:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2413D5661;
-	Tue, 21 Apr 2026 13:27:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF135241C8C;
+	Tue, 21 Apr 2026 13:30:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="EYyr3rnX"
 X-Original-To: netdev@vger.kernel.org
-Received: from air.basealt.ru (air.basealt.ru [193.43.8.18])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B919C3C9437;
-	Tue, 21 Apr 2026 13:27:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.43.8.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22E8146B5
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 13:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776778053; cv=none; b=dO5rTWmLRGG7J8mmHdJE70WNu3cZgcIDohboX5uBqPV6GzrtO8TFcNBJW4Odd8fOre2tN8hagMeh57CcDQ0BKdl0/78dt8mHk9FpWQPjtP+Mb5ouQmv8Uf8Jn00c68maAlGjlSuOwEwP+qEBe/Kt/LRCvFH4QAPjGv1nflR/3Y4=
+	t=1776778219; cv=none; b=J6DmkIY6FN47974/nz2cNxf0q+SqC5E+l5jUkIHq04nsaJKou6Cr9CTXsXevDdLzDcui4510Q1xMzJgUOLpkpZOOeH/R+8B/wB6WYxf4uf3Iu22IpQ1i9N5nCwDRv5vW9QXDVu74TG2RemGWFEV9cGIZ4+lpLwDkX1eBJf57JMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776778053; c=relaxed/simple;
-	bh=J78oUUAhNyJ/encrpjCKQitXEcNFDvPCjirUqiPXbIM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dNDrPIxSeB6N87DA08NYSffD2PgbS8RT9ASVrX5SFcnAb21UOFA4tc9hP0qCTTnEb2Fw5gnw9LgQwohIQUjjKpB4CMgYE8kSfQTEapHVc3ji7uHUc6MhcCQKrvN1/yRbRe3lDnoYu/wvqECziOcGnxkhqWccCtidUauNHWkdVBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=193.43.8.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: from altlinux.ipa.basealt.ru (unknown [193.43.11.2])
-	(Authenticated sender: kovalevvv)
-	by air.basealt.ru (Postfix) with ESMTPSA id BCF9823390;
-	Tue, 21 Apr 2026 16:27:29 +0300 (MSK)
-From: Vasiliy Kovalev <kovalev@altlinux.org>
-To: stable@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Willem de Bruijn <willemb@google.com>,
-	Cezar Bulinaru <cbulinaru@gmail.com>,
-	netdev@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	kovalev@altlinux.org
-Subject: [PATCH 5.10.y] net: tap: NULL pointer derefence in dev_parse_header_protocol when skb->dev is null
-Date: Tue, 21 Apr 2026 16:27:29 +0300
-Message-Id: <20260421132729.38626-1-kovalev@altlinux.org>
-X-Mailer: git-send-email 2.33.8
+	s=arc-20240116; t=1776778219; c=relaxed/simple;
+	bh=Rg10/P7jeWvTDfsKaq4eNKycuEwlc6AiJGZgTfZ8v6k=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JDbkycQUUka5+WMPQ/QJpKJa6iR5SJk1YWA3AZ0f9n7IV2EfNt9QlqugByXo4RAL7iaGIhnEtIrC67WcRAVlOrJhFFLHK9SuWt/4ywC4xjOF7omuYL8auqd7omeudwZ94kCf0yOWbGZRGvgDegWsgTfIwZVOuAi1pfaTJPTlPmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=EYyr3rnX; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id D890A20868;
+	Tue, 21 Apr 2026 15:30:07 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 6gfYB6jFmBsq; Tue, 21 Apr 2026 15:30:03 +0200 (CEST)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id 76DBD207B0;
+	Tue, 21 Apr 2026 15:30:03 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 76DBD207B0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1776778203;
+	bh=tQPZkFrq9KzOVxiVwskoe1/Q5vcJjMH6EktytjGasTk=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=EYyr3rnXcNjN9hcGb09GjBm1fKf1idzrwYPuAeb7IXkYscSHBPqs8UVF6JmJZomvm
+	 CCkjXMTOcthNFQxU1AMdNWXxte4lYf1w3Von9AJKHmMQ2DZjCT4tKubCq2/RoTfUh7
+	 A4aZ/IxHen4eeZ+MLwKIliv7pAoucCa4Zy2csEn0F4vfXxitVcrpxMKDaPNc4HzqDJ
+	 knMZ/HYS2aAXYsdK+4Ybi9KVXcflv5kIaNVQV7w1Idw7iUPlSGozk2JJmnGaoi9wxz
+	 jvk5vOt9S+a6doPBA/Hi2cWFqcVuVB0QmJwUQrzYN0IHr4lnfojlphHTKr6LRgVQrD
+	 kFXEWAep4oLwQ==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 21 Apr
+ 2026 15:30:02 +0200
+Received: (nullmailer pid 3292382 invoked by uid 1000);
+	Tue, 21 Apr 2026 13:30:02 -0000
+Date: Tue, 21 Apr 2026 15:30:02 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Ren Wei <n05ec@lzu.edu.cn>
+CC: <netdev@vger.kernel.org>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<sd@queasysnail.net>, <yifanwucs@gmail.com>, <tomapufckgml@gmail.com>,
+	<yuantan098@gmail.com>, <bird@lzu.edu.cn>, <caoruide123@gmail.com>,
+	<zylzyl2333@gmail.com>
+Subject: Re: [PATCH net 1/1] ipv6: xfrm6: release dst on error in
+ xfrm6_rcv_encap()
+Message-ID: <aed72ja2qG0s1xxX@secunet.com>
+References: <cover.1775886482.git.zylzyl2333@gmail.com>
+ <fc06a81e1c1cbbb3e918825a718046cb18204f3c.1775886483.git.zylzyl2333@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.04 / 15.00];
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <fc06a81e1c1cbbb3e918825a718046cb18204f3c.1775886483.git.zylzyl2333@gmail.com>
+X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
+ (10.32.0.171)
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,gmail.com,vger.kernel.org,linuxtesting.org,altlinux.org];
-	TAGGED_FROM(0.00)[bounces-280128-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[altlinux.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gondor.apana.org.au,davemloft.net,kernel.org,google.com,redhat.com,queasysnail.net,gmail.com,lzu.edu.cn];
+	TAGGED_FROM(0.00)[bounces-280129-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,secunet.com:dkim,secunet.com:mid,lzu.edu.cn:email];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kovalev@altlinux.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,davemloft.net:email,altlinux.org:mid,altlinux.org:email]
-X-Rspamd-Queue-Id: 08A7243B5BD
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 7C8C743B646
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Cezar Bulinaru <cbulinaru@gmail.com>
+On Sun, Apr 12, 2026 at 01:07:54PM +0800, Ren Wei wrote:
+> From: Yilin Zhu <zylzyl2333@gmail.com>
+> 
+> xfrm6_rcv_encap() performs an IPv6 route lookup when the skb does not
+> already have a dst attached. ip6_route_input_lookup() returns a
+> referenced dst entry even when the lookup resolves to an error route.
+> 
+> If dst->error is set, xfrm6_rcv_encap() drops the skb without attaching
+> the dst to the skb and without releasing the reference returned by the
+> lookup. Repeated packets hitting this path therefore leak dst entries.
+> 
+> Release the dst before jumping to the drop path.
+> 
+> Fixes: 0146dca70b87 ("xfrm: add support for UDPv6 encapsulation of ESP")
+> Cc: stable@kernel.org
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+> Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+> Suggested-by: Xin Liu <bird@lzu.edu.cn>
+> Tested-by: Ruide Cao <caoruide123@gmail.com>
+> Signed-off-by: Yilin Zhu <zylzyl2333@gmail.com>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 
-commit 4f61f133f354853bc394ec7d6028adb9b02dd701 upstream.
-
-Fixes a NULL pointer derefence bug triggered from tap driver.
-When tap_get_user calls virtio_net_hdr_to_skb the skb->dev is null
-(in tap.c skb->dev is set after the call to virtio_net_hdr_to_skb)
-virtio_net_hdr_to_skb calls dev_parse_header_protocol which
-needs skb->dev field to be valid.
-
-The line that trigers the bug is in dev_parse_header_protocol
-(dev is at offset 0x10 from skb and is stored in RAX register)
-  if (!dev->header_ops || !dev->header_ops->parse_protocol)
-  22e1:   mov    0x10(%rbx),%rax
-  22e5:	  mov    0x230(%rax),%rax
-
-Setting skb->dev before the call in tap.c fixes the issue.
-
-BUG: kernel NULL pointer dereference, address: 0000000000000230
-RIP: 0010:virtio_net_hdr_to_skb.constprop.0+0x335/0x410 [tap]
-Code: c0 0f 85 b7 fd ff ff eb d4 41 39 c6 77 cf 29 c6 48 89 df 44 01 f6 e8 7a 79 83 c1 48 85 c0 0f 85 d9 fd ff ff eb b7 48 8b 43 10 <48> 8b 80 30 02 00 00 48 85 c0 74 55 48 8b 40 28 48 85 c0 74 4c 48
-RSP: 0018:ffffc90005c27c38 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: ffff888298f25300 RCX: 0000000000000010
-RDX: 0000000000000005 RSI: ffffc90005c27cb6 RDI: ffff888298f25300
-RBP: ffffc90005c27c80 R08: 00000000ffffffea R09: 00000000000007e8
-R10: ffff88858ec77458 R11: 0000000000000000 R12: 0000000000000001
-R13: 0000000000000014 R14: ffffc90005c27e08 R15: ffffc90005c27cb6
-FS:  0000000000000000(0000) GS:ffff88858ec40000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000230 CR3: 0000000281408006 CR4: 00000000003706e0
-Call Trace:
- tap_get_user+0x3f1/0x540 [tap]
- tap_sendmsg+0x56/0x362 [tap]
- ? get_tx_bufs+0xc2/0x1e0 [vhost_net]
- handle_tx_copy+0x114/0x670 [vhost_net]
- handle_tx+0xb0/0xe0 [vhost_net]
- handle_tx_kick+0x15/0x20 [vhost_net]
- vhost_worker+0x7b/0xc0 [vhost]
- ? vhost_vring_call_reset+0x40/0x40 [vhost]
- kthread+0xfa/0x120
- ? kthread_complete_and_exit+0x20/0x20
- ret_from_fork+0x1f/0x30
-
-Fixes: 924a9bc362a5 ("net: check if protocol extracted by virtio_net_hdr_set_proto is correct")
-Signed-off-by: Cezar Bulinaru <cbulinaru@gmail.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-[ kovalev: bp to fix CVE-2022-50073 ]
-Signed-off-by: Vasiliy Kovalev <kovalev@altlinux.org>
----
- drivers/net/tap.c | 23 +++++++++++++----------
- 1 file changed, 13 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-index 16fa0e3e752a..18f19fc66c64 100644
---- a/drivers/net/tap.c
-+++ b/drivers/net/tap.c
-@@ -703,11 +703,22 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
- 	skb_reset_mac_header(skb);
- 	skb->protocol = eth_hdr(skb)->h_proto;
- 
-+	rcu_read_lock();
-+	tap = rcu_dereference(q->tap);
-+	if (!tap) {
-+		kfree_skb(skb);
-+		rcu_read_unlock();
-+		return total_len;
-+	}
-+	skb->dev = tap->dev;
-+
- 	if (vnet_hdr_len) {
- 		err = virtio_net_hdr_to_skb(skb, &vnet_hdr,
- 					    tap_is_little_endian(q));
--		if (err)
-+		if (err) {
-+			rcu_read_unlock();
- 			goto err_kfree;
-+		}
- 	}
- 
- 	skb_probe_transport_header(skb);
-@@ -717,8 +728,6 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
- 	    vlan_get_protocol_and_depth(skb, skb->protocol, &depth) != 0)
- 		skb_set_network_header(skb, depth);
- 
--	rcu_read_lock();
--	tap = rcu_dereference(q->tap);
- 	/* copy skb_ubuf_info for callback when skb has no error */
- 	if (zerocopy) {
- 		skb_shinfo(skb)->destructor_arg = msg_control;
-@@ -729,14 +738,8 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
- 		uarg->callback(uarg, false);
- 	}
- 
--	if (tap) {
--		skb->dev = tap->dev;
--		dev_queue_xmit(skb);
--	} else {
--		kfree_skb(skb);
--	}
-+	dev_queue_xmit(skb);
- 	rcu_read_unlock();
--
- 	return total_len;
- 
- err_kfree:
--- 
-2.50.1
-
+Applied to the ipsec tree, thanks a lot!
 
