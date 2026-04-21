@@ -1,192 +1,153 @@
-Return-Path: <netdev+bounces-280270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280271-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4AXsAKz652lBDwIAu9opvQ
-	(envelope-from <netdev+bounces-280270-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 00:31:08 +0200
+	id wBCXJOD/52lJEAIAu9opvQ
+	(envelope-from <netdev+bounces-280271-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 00:53:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 742FF4402FB
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 00:31:07 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 370514404BB
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 00:53:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 635A83052A35
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:30:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BD59B307AB98
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:52:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 110573A63EB;
-	Tue, 21 Apr 2026 22:30:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9AD63A6F0E;
+	Tue, 21 Apr 2026 22:52:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uKuL8uGw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tUaRoA7n"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8457D3A63F9;
-	Tue, 21 Apr 2026 22:30:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 863B019C54E;
+	Tue, 21 Apr 2026 22:52:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776810649; cv=none; b=POr+PO0p18bzPI5+Kpa/ZW40v1MTRk3PssQYfNEgqfCu1SO7Ixs0YvokDh4X9j6rX9YCxTB2uxa7cHTiqKRzjjtJjGB5bi12A0ra/kpLLK8+iGuXRcVc54HYmr8N/HnHNsZ3xrUQCzNv9h6d2EuX4OOeACs5pmb5VCva+/rHMPo=
+	t=1776811942; cv=none; b=ZyfzdOj0BYOxITijxBSoa9NqYQYTRANKlh42+yG9QfrrwNxOXri+ILaBex8jnSDjdafepU+WWGEncnXnhiIq88w4cTg69vUkXxHs55YFqCw6k6zFGtlv0N8dyygzBDwfVv5c6WXtxYYU4cxjB4rfCeSwPUppJI5+b197q+bL6RI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776810649; c=relaxed/simple;
-	bh=JsBROnWsbsDyWIr9oR1HKPcD4AXQqSpDxm4A53tUoO8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H0h3c4rT6h43+uNrcdv2XdvJt/GZatHn3m3HyriQC07xxl+X2dGwmMwiWFaHM+MM7PbUkiw8JZ/kYFAOLGsOnE7HqTMXYBwGMbHwVtCsZWd+WDnW9FC84TuOvyOsFsH3XgKIJF0AgoAoUyI63iFWBBzrgFJIVd6yww1gyQr24fc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uKuL8uGw; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=0owjc2dIxrEANaZrUtLU2bidjjfsvfi6s/RKJ+8v4EY=; b=uKuL8uGwUDlq8ZeHU40EiewuKo
-	39gp1IbmdG3nVvoZdJQZpondzwS/Oet0WfNYqdxiYOfo+QJNlaGq89rKIeqs/fzrAAaDtvhPjSJsE
-	KiAME7OKq7YV4PCCo/WFwdSE9WsQsgfP32YmSWVamqaPi2dhwVz4qFBky1M3KCMgPjM8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wFJc4-00GxO6-QR; Wed, 22 Apr 2026 00:30:36 +0200
-Date: Wed, 22 Apr 2026 00:30:36 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Byron Stanoszek <gandalf@winds.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH net 00/18] Remove a number of ISA and PCMCIA Ethernet
- drivers
-Message-ID: <e056d348-4560-4df3-85c4-e29393b004e9@lunn.ch>
-References: <20260421-v7-0-0-net-next-driver-removal-v1-v1-0-69517c689d1f@lunn.ch>
- <71d319ef-cd49-e8a8-70dd-cf0763ac6305@winds.org>
+	s=arc-20240116; t=1776811942; c=relaxed/simple;
+	bh=f46TmGYCdgfDXqGRjBtqWGQpq0iU/ba6YvkdM5SdfYU=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=clbQPvmgJjVKvnXiFX9oQpjLmL1sWT9NnqXvc0ihrebzLWF5CZXJN5vNBfeweRaWZYLJQMqYfK6HwJde859EhidQD6OJ16lRudYSQOxUR0d36npOMcN5OV1IeLfGp42QYiKk1ZoCeCn2k8LpRoKR9GeHhR5fqoTXTyYRqe5Gots=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tUaRoA7n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA079C2BCC6;
+	Tue, 21 Apr 2026 22:52:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776811942;
+	bh=f46TmGYCdgfDXqGRjBtqWGQpq0iU/ba6YvkdM5SdfYU=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=tUaRoA7nEzWzZYg9DDl/NkbhWINTehmuKN/AUupHo5uuDiADu5ucx2xzLUrYaF8EQ
+	 /1hzEtmO4YH6zn0rxeAdEqGkRDJHkYpTwtfTOt6/21Vt3sFaQ+kHh6AXFmc/2mKWZI
+	 6tC2T2CTqs+Ldl0dT68kpaCnk2UccbnZAFbDcVlusYpFSjTv4Wy8ixQJavSsWSJ4o9
+	 5yfhpE+T6mqDnDyZB99JFAlW5F8XN8T7BGoD5H7wK7fFYH8Ge7kyl6XfwUd/900Q7f
+	 eLiqfR+RH5d4m3eQA5tVRREQ9/bg8fmv/4Ke1LQTqrcNG4QEFTeXFKYIjL9kzR5W4I
+	 qy9Xm17ZhdQvA==
+Content-Type: multipart/mixed; boundary="===============1910070603281241147=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <71d319ef-cd49-e8a8-70dd-cf0763ac6305@winds.org>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Message-Id: <d5679e6f2b458bb8771f83e6985247befd68fbab894a0d2a09797f0ec3a90efe@mail.kernel.org>
+In-Reply-To: <20260421221016.2967924-4-ameryhung@gmail.com>
+References: <20260421221016.2967924-4-ameryhung@gmail.com>
+Subject: Re: [PATCH bpf-next v3 3/9] bpf: Preserve reg->id of pointer objects after null-check
+From: bot+bpf-ci@kernel.org
+To: ameryhung@gmail.com,bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,alexei.starovoitov@gmail.com,andrii@kernel.org,daniel@iogearbox.net,eddyz87@gmail.com,memxor@gmail.com,martin.lau@kernel.org,mykyta.yatsenko5@gmail.com,ameryhung@gmail.com,kernel-team@meta.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Tue, 21 Apr 2026 22:52:21 +0000 (UTC)
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280270-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280271-lists,netdev=lfdr.de,bpf-ci];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com,linux.dev];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	MIME_TRACE(0.00)[0:+,1:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
-X-Rspamd-Queue-Id: 742FF4402FB
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 370514404BB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 21, 2026 at 04:44:11PM -0400, Byron Stanoszek wrote:
-> On Tue, 21 Apr 2026, Andrew Lunn wrote:
-> 
-> > These old drivers have not been much of a Maintenance burden until
-> > recently. Now there are more newbies using AI and fuzzers finding
-> > issues, resulting in more work for Maintainers. Fixing these old
-> > drivers make little sense, if it is not clear they have users.
-> > 
-> >      drivers: net: 3com: 3c59x: Remove this driver
-> 
-> Hi Andrew,
-> 
-> I happen to still use this driver on several hundred industrial PC
-> installations that were outfitted with 3com 3C905-B & CX cards 15+ years ago.
-> The old hardware still runs, therefore those cards haven't needed to be
-> replaced. I keep these systems up to date with the latest Linux kernel roughly
-> once per year.
+--===============1910070603281241147==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-So 6.18? 6.12?
+> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> index 93003a2a96b0..0313b7d5f6c9 100644
+> --- a/kernel/bpf/verifier.c
+> +++ b/kernel/bpf/verifier.c
+> @@ -15886,15 +15886,10 @@ static void mark_ptr_or_null_reg(struct bpf_func_state *state,
+>
+>  		mark_ptr_not_null_reg(reg);
+>
+> -		if (!reg_may_point_to_spin_lock(reg)) {
+> -			/* For not-NULL ptr, reg->ref_obj_id will be reset
+> -			 * in release_reference().
+> -			 *
+> -			 * reg->id is still used by spin_lock ptr. Other
+> -			 * than spin_lock ptr type, reg->id can be reset.
+> -			 */
+> -			reg->id = 0;
+> -		}
+> +		/*
+> +		 * reg->id is preserved for object relationship tracking
+> +		 * and spin_lock lock state tracking
+> +		 */
 
-> I understand the maintenance burden, but I would be delighted to continue
-> receiving bug fixes for this driver via the mainline Linux kernel if you are
-> still willing to continue to support it.
+How does preserving reg->id interact with reg_is_init_pkt_pointer()?
 
-Looking at the history of 3c59x.c i see:
+In v2 review, Alexei Starovoitov raised this concern: "That pointer has
+to have id == 0". Eduard Zingerman responded that dropping the id == 0
+check should be fine, but this change was not made in v3.
 
-Date:   Tue Jan 6 10:47:21 2026 +0100
+The function reg_is_init_pkt_pointer() still checks reg->id == 0:
 
-    net: 3com: 3c59x: fix possible null dereference in vortex_probe1()
+    return reg->type == which &&
+           reg->id == 0 &&
+           reg->off == 0 &&
 
-Date:   Wed Jan 3 13:09:23 2018 -0500
+With this patch, if a PTR_TO_PACKET register goes through null-checking
+in mark_ptr_or_null_reg(), it will now preserve its reg->id instead of
+resetting it to 0. Would this cause reg_is_init_pkt_pointer() to
+incorrectly return false for init packet pointers?
 
-    3c59x: fix missing dma_mapping_error check and bad ring refill logic
+Reference: https://lore.kernel.org/bpf/CAADnVQLCKi_QL1FeybW+6MH6FAOAoRJyW06UvtX3my3yNSH5eQ@mail.gmail.com/
 
-Date:   Thu Feb 25 13:02:50 2016 -0500
+>  	}
+>  }
 
-    3c59x: mask LAST_FRAG bit from length field in ring
 
-Date:   Sun Feb 28 16:49:29 2016 +0900
+---
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
-    3c59x: Ensure to apply the expires time
-
-Date:   Wed Jan 13 12:43:54 2016 -0500
-
-    3c59x: fix another page map/single unmap imbalance
-
-Date:   Wed Jan 13 12:43:53 2016 -0500
-
-    3c59x: balance page maps and unmaps
-
-Date:   Tue Jul 7 20:48:55 2015 +0200
-
-    3c59x: Fix shared IRQ handling
-
-So it looks like it was been pretty stable since 2016.
-
-Could you live with v6.18, which has an expected EOL of December 2028?
-If you are only updating once per year, security is not an issue, you
-just want stability.
-
-In fact, you might actually find stability starts going down in the
-next couple of years, maybe sooner. What we expect to happen soon is a
-lot more AI generated 'bug fixes', probably from newbies who are
-unable to evaluate if the AI is generated good fixes or bad fixes, or
-fixes which are theoretical rather than actual bugs etc. We netdev
-Maintainers are already seeing the number of patches going up, and are
-expecting to get overloaded. Which means quality will go down. We have
-also seen the AI generated fixes are indiscriminate, neither the AI,
-nor the human, care, or even look, to see if the driver is from the
-last century. We Maintainers however would prefer spending our time on
-drivers from the last ten years, maybe newer. So patches for these
-older drivers is going to get less review, and bad patches will slip
-through.
-
-By dropping them for the current HEAD, we are reducing our surface
-area. It will be interesting to see if the AI patches are only for
-HEAD, or they start going back to older kernels to find 'bugs'.
-
-However, just because a driver has gone from HEAD, it does not really
-prevent us from taking patches for stable. But we Maintainers want to
-avoid doing the triage work, figuring out good from bad.
-
-We have not discussed it as a Maintainer team, but one thing which
-might work is we add a entry for 3c59x.c in MAINTAINERS, in stable,
-pointing to you. You can then validate patches, and tell us if they
-are O.K. to queue for stable.
-
-    Andrew
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/24749741787
+--===============1910070603281241147==--
 
