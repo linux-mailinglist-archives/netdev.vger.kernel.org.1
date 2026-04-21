@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-279959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279960-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mHW2Ij7K5ml40wEAu9opvQ
-	(envelope-from <netdev+bounces-279959-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 02:52:14 +0200
+	id uK3RLEXK5ml40wEAu9opvQ
+	(envelope-from <netdev+bounces-279960-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 02:52:21 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3CB24352B6
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 02:52:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CDDFF4352BD
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 02:52:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 52A6030046B1
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 00:52:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E35863006238
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 00:52:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF22E18FDDE;
-	Tue, 21 Apr 2026 00:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 612211E8342;
+	Tue, 21 Apr 2026 00:52:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gogD/Xi8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="axkhj9Aj"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF101850A4
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 00:52:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF27C19D092
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 00:52:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776732727; cv=none; b=kNMgg54HC7IWd72q84h6vRBv+jsQ9UiCYQBmhNaL/C2HD+SQ7IiXuDrCpYWmQm4nJewh6VoVUPaN7CktmUc9jZzWTedwcfpMSLMNAovszYNtC0IWKJ5QMJp3XKIbW9tlH03HrAzk6Iz0yB6e4cmt3Ox6xmE+/5UR+FhYgOdrdaE=
+	t=1776732729; cv=none; b=BYTfPUyKX55hp+jzfsDHbYa3ef/0w/IKeYYvBxlyKrREB6Y6ZQRrbGv77iYIzkzrw0fXodzEaZwe6ZpVGzAeQoxyzjUCynQU6JPsGG09eCVgVg/zM8CeQ6njIHpHoiQDWGeSXcbbwyU/QomQwNVzCJk3LO0h0iZRxLVq2I1mJBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776732727; c=relaxed/simple;
-	bh=MkJXKTMqbuZ6q4jGzEi7hRlE6Y9ZszpyzeqyhYTwtAo=;
+	s=arc-20240116; t=1776732729; c=relaxed/simple;
+	bh=j2d3MsNh3px46DglOEiO8g/YXsWGAylIvQuJ9FXV13g=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=aOyTnIzEt2Ba6c9ZO5Rk/txDFPJxaqPxnmlEzgcRIU+RjmAvhLhsXR9rnQ/0eGARDnzJGITc2nkEveRKuaKImvy53eJr5i4GPCLKqmgR7Q+xEnBMO7m5FiKr5vf4rncKbX2Dctw/vNIv/t+buwWNVFnRchmV5eD0Th2uL9RCjxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gogD/Xi8; arc=none smtp.client-ip=198.175.65.21
+	 In-Reply-To:To:Cc; b=LsiqNnu11ejf8qI8HgkqbYpvk+WQm1mtgWsGV150OYD7KUGfZiwhqRT820fTgiWlBwP7z3N87FBMvBeG06/DBPjDjNcHeyh7BP5jplLmZWMFFtoKboLYlKU3BR3xDg4FvQTzBc1PmY/rdyWSxFBKKoRiTKxs069ibFkoqKRUDhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=axkhj9Aj; arc=none smtp.client-ip=198.175.65.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776732725; x=1808268725;
+  t=1776732727; x=1808268727;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=MkJXKTMqbuZ6q4jGzEi7hRlE6Y9ZszpyzeqyhYTwtAo=;
-  b=gogD/Xi8z0BhdhrMY7P+M7gUZjoB6cPGrTHjsmvsdyQ3+8kC61yXp5g3
-   I+Svms/1LobG6iKw4kwME+Kj+31YgLADV+RVNifSH1aUgvTor15O65xB9
-   jN9PvXMqQeyJC0OfN5BIMqWdGX4kZVmQG2kYNpw32e52j3T5ewMsyjeou
-   i1nKpBnt2ooS4s/7mkLLdnoxBShFM0V9ZjNNcEgf9IiRUboAtUlxtG8+T
-   6G+GGyYShg6/K76kL+5hO/d8oNeY4Y8s+saKzNZjwFjzpxVZk1EDfpwPd
-   k3d3aqv7yGC5x6/Z6qKRyZ0X8fHeFhyiPO3vUS/M9ZRUs6Zpynru/jxQZ
-   w==;
-X-CSE-ConnectionGUID: R9bkzavgSiWj4SeMI1GIEQ==
-X-CSE-MsgGUID: v5ChtzYMRtubbwqLiIPhpg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11762"; a="77530396"
+  bh=j2d3MsNh3px46DglOEiO8g/YXsWGAylIvQuJ9FXV13g=;
+  b=axkhj9AjheUeWed9yWk8bMdqSwfY5tD8IGwNU4SFXfyu5e8ktkCoj5Uz
+   IErVtryT/JYWLR0ZvpX+0CgfxRws40g9LYIohBgMGX+kOZk9tcezvnjV/
+   AJCnnXxnMynfAaMjB7R5ih++P9YEs1KB/oz11xI5y7qA9Cfmb2Hnd45pd
+   Fd320sy6cVtFbcJeBAkkRukOBBJJnG+7+mYhCdzQ6GjRP6CovboHg9dPh
+   z8RCX1huugEpjYMgAWUcVHxEPWtnC84od5Roc4kCLXizTeHf2Bl+dPhDA
+   4voDtxYTp880x/ELbKJs3YUc06qVjRXm2sCmmPAsrXK8E1sOWWdaa5Ks6
+   g==;
+X-CSE-ConnectionGUID: DiDuFW5EQXywcIiskmF6ig==
+X-CSE-MsgGUID: 5z9+RRhPTb66DLLtiDPTiw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11762"; a="77530403"
 X-IronPort-AV: E=Sophos;i="6.23,190,1770624000"; 
-   d="scan'208";a="77530396"
+   d="scan'208";a="77530403"
 Received: from orviesa003.jf.intel.com ([10.64.159.143])
   by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2026 17:52:04 -0700
-X-CSE-ConnectionGUID: EUTr1P2LTgKLagykuXx1iw==
-X-CSE-MsgGUID: zFmkl4uCTqa+2e0CJ6T7Pw==
+X-CSE-ConnectionGUID: 5CxgIRtwTKuVUVMT3VCopw==
+X-CSE-MsgGUID: fOTCi3eaRy6V3dnqz2yI+g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,190,1770624000"; 
-   d="scan'208";a="235886663"
+   d="scan'208";a="235886666"
 Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.109]) ([10.166.28.109])
   by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2026 17:52:04 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Mon, 20 Apr 2026 17:51:25 -0700
-Subject: [PATCH net 1/4] ice: fix timestamp interrupt configuration for
- E825C
+Date: Mon, 20 Apr 2026 17:51:26 -0700
+Subject: [PATCH net 2/4] ice: perform PHY soft reset for E825C ports at
+ initialization
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,7 +73,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260420-jk-iwl-net-2026-04-20-ptp-e825c-phy-interrupt-fixes-v1-1-bc2240f42251@intel.com>
+Message-Id: <20260420-jk-iwl-net-2026-04-20-ptp-e825c-phy-interrupt-fixes-v1-2-bc2240f42251@intel.com>
 References: <20260420-jk-iwl-net-2026-04-20-ptp-e825c-phy-interrupt-fixes-v1-0-bc2240f42251@intel.com>
 In-Reply-To: <20260420-jk-iwl-net-2026-04-20-ptp-e825c-phy-interrupt-fixes-v1-0-bc2240f42251@intel.com>
 To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
@@ -82,16 +82,17 @@ To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
  Grzegorz Nitka <grzegorz.nitka@intel.com>, 
+ Timothy Miskell <timothy.miskell@intel.com>, 
  Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
  Petr Oros <poros@redhat.com>, Sunitha Mekala <sunithax.d.mekala@intel.com>
 X-Mailer: b4 0.16-dev-ea14f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5595;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=7742;
  i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=f/72fmXUTGUBvRO8Pxozy0TmSLe/xIoCM96nSNyoatQ=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhsxnp4wbGeI4eO9oH7jxYLf+5lSjsGrOh0/k0iM/T80SK
- rTNX724o5SFQYyLQVZMkUXBIWTldeMJYVpvnOVg5rAygQxh4OIUgIlMusfwP3/rvSMdWdGXcue/
- E4/5pbE0wfcz96+qi9Oz5aZf+2X1bQLDP/P/uV6WOcFnOe1bFz1VOR4U1L3nyR7z7wEse0w3i2p
- ycwMA
+ bh=Wmq2AmsdT9Xcyn36ezqoFijUwREEJFwK31Ar+dg16+Y=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhsxnp4xvmL/9cfRDiwXblYebEmOXOkbunLXtilnFXMkfK
+ mtagrYxd5SyMIhxMciKKbIoOISsvG48IUzrjbMczBxWJpAhDFycAjCRinCG/xGdFRvMjrA4Omya
+ GZh/7RLPtKPxGfp/45/q61i+3FGqvIaR4UFWmV/R4Yxptx++fbkid+GlI/vS95dMuF305fe76QX
+ TXnEAAA==
 X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
  fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -103,12 +104,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279959-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279960-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -120,141 +121,198 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A3CB24352B6
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
+X-Rspamd-Queue-Id: CDDFF4352BD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Grzegorz Nitka <grzegorz.nitka@intel.com>
 
-The E825C ice_phy_cfg_intr_eth56g() function is responsible for programming
-the PHY interrupt for a given port. This function writes to the
-PHY_REG_TS_INT_CONFIG register of the port. The register is responsible for
-configuring whether the port interrupt logic is enabled, as well as
-programming the threshold of waiting timestamps that will trigger an
-interrupt from this port.
+In some cases the PHY timestamp block of the E825C can become stuck. This
+is known to occur if the software writes 0 to the Tx timestamp threshold,
+and with older versions of the ice driver the threshold configuration is
+buggy and can race in such that hardware briefly operates with a zero
+threshold enabled. There are no other known ways to trigger this behavior,
+but once it occurs, the hardware is not recovered by normal reset, a driver
+reload, or even a warm power cycle of the system. A cold power cycle is
+sufficient to recover hardware, but this is extremely invasive and can
+result in significant downtime on customer deployments.
 
-This threshold value must not be programmed to zero while the interrupt is
-enabled. Doing so puts the port in a misconfigured state where the PHY
-timestamp interrupt for the quad of connected ports will become stuck.
+The PHY for each port has a timestamping block which has its own reset
+functionality accessible by programming the PHY_REG_GLOBAL register.
+Writing to the PHY_REG_GLOBAL_SOFT_RESET_BIT triggers the hardware to
+perform a complete reset of the timestamping block of the PHY. This
+includes clearing the timestamp status for the port, clearing all
+outstanding timestamps in the memory bank, and resetting the PHY timer.
 
-This occurs, because a threshold of zero results in the timestamp interrupt
-status for the port becoming stuck high. The four ports in the connected
-quad have their timestamp status indicators muxed together. A new interrupt
-cannot be generated until the timestamp status indicators return low for
-all four ports.
+The new ice_ptp_phy_soft_reset_eth56g() function toggles the
+PHY_REG_GLOBAL soft reset bit with the required delays, ensuring the
+PHY is properly reinitialized without requiring a full device reset.
+The sequence clears the reset bit, asserts it, then clears it again,
+with short waits between transitions to allow hardware stabilization.
 
-Normally, the timestamp status for a port will clear once there are fewer
-timestamps in that ports timestamp memory bank than the threshold. A
-threshold of zero makes this impossible, so the timestamp status for the
-port does not clear.
+Call this function in the new ice_ptp_init_phc_e825c(), implementing the
+E825C device specific variant of the ice_ptp_init_phc(). Note that if
+ice_ptp_init_phc() fails, PTP functionality may be disabled, but the driver
+will still load to allow basic functionality to continue.
 
-The ice driver never intentionally programs the threshold to zero, indeed
-the driver always programs it to a value of 1, intending to get an
-interrupt immediately as soon as even a single packet is waiting for a
-timestamp.
+This causes the clock owning PF driver to perform a PHY soft reset for
+every port during initialization. This ensures the driver begins life in a
+known functional state regardless of how it was previously programmed.
 
-However, there is a subtle flaw in the programming logic in the
-ice_phy_cfg_intr_eth56g() function. Due to the way that the hardware
-handles enabling the PHY interrupt. If the threshold value is modified at
-the same time as the interrupt is enabled, the HW PHY state machine might
-enable the interrupt before the new threshold value is actually updated.
-This leaves a potential race condition caused by the hardware logic where
-a PHY timestamp interrupt might be triggered before the non-zero threshold
-is written, resulting in the PHY timestamp logic becoming stuck.
-
-Once the PHY timestamp status is stuck high, it will remain stuck even
-after attempting to reprogram the PHY block by changing its threshold or
-disabling the interrupt. Even a typical PF or CORE reset will not reset the
-particular block of the PHY that becomes stuck. Even a warm power cycle is
-not guaranteed to cause the PHY block to reset, and a cold power cycle is
-required.
-
-Prevent this by always writing the PHY_REG_TS_INT_CONFIG in two stages.
-First write the threshold value with the interrupt disabled, and only write
-the enable bit after the threshold has been programmed. When disabling the
-interrupt, leave the threshold unchanged. Additionally, re-read the
-register after writing it to guarantee that the write to the PHY has been
-flushed upon exit of the function.
-
-While we're modifying this function implementation, explicitly reject
-programming a threshold of 0 when enabling the interrupt. No caller does
-this today, but the consequences of doing so are significant. An explicit
-rejection in the code makes this clear.
+This ensures that we properly reconfigure the hardware after a device reset
+or when loading the driver, even if it was previously misconfigured with an
+out-of-date or modified driver.
 
 Fixes: 7cab44f1c35f ("ice: Introduce ETH56G PHY model for E825C products")
+Signed-off-by: Timothy Miskell <timothy.miskell@intel.com>
 Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Reviewed-by: Petr Oros <poros@redhat.com>
 Tested-by: Sunitha Mekala <sunithax.d.mekala@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 36 +++++++++++++++++++++++++----
- 1 file changed, 32 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h |  4 ++
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 90 ++++++++++++++++++++++++++++-
+ 2 files changed, 93 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+index 9bfd3e79c580..ac4611291052 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+@@ -374,6 +374,7 @@ int ice_stop_phy_timer_eth56g(struct ice_hw *hw, u8 port, bool soft_reset);
+ int ice_start_phy_timer_eth56g(struct ice_hw *hw, u8 port);
+ int ice_phy_cfg_intr_eth56g(struct ice_hw *hw, u8 port, bool ena, u8 threshold);
+ int ice_phy_cfg_ptp_1step_eth56g(struct ice_hw *hw, u8 port);
++int ice_ptp_phy_soft_reset_eth56g(struct ice_hw *hw, u8 port);
+ 
+ #define ICE_ETH56G_NOMINAL_INCVAL	0x140000000ULL
+ #define ICE_ETH56G_NOMINAL_PCS_REF_TUS	0x100000000ULL
+@@ -676,6 +677,9 @@ static inline u64 ice_get_base_incval(struct ice_hw *hw)
+ #define ICE_P0_GNSS_PRSNT_N	BIT(4)
+ 
+ /* ETH56G PHY register addresses */
++#define PHY_REG_GLOBAL			0x0
++#define PHY_REG_GLOBAL_SOFT_RESET_M	BIT(11)
++
+ /* Timestamp PHY incval registers */
+ #define PHY_REG_TIMETUS_L		0x8
+ #define PHY_REG_TIMETUS_U		0xC
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 5a5c511ccbb6..7f2f7440e705 100644
+index 7f2f7440e705..d4c2bb084255 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -1847,6 +1847,8 @@ static int ice_phy_cfg_mac_eth56g(struct ice_hw *hw, u8 port)
-  * @ena: enable or disable interrupt
-  * @threshold: interrupt threshold
-  *
-+ * The threshold cannot be 0 while the interrupt is enabled.
+@@ -377,6 +377,31 @@ static void ice_ptp_cfg_sync_delay(const struct ice_hw *hw, u32 delay)
+  * The following functions operate on devices with the ETH 56G PHY.
+  */
+ 
++/**
++ * ice_ptp_init_phc_e825c - Perform E825C specific PHC initialization
++ * @hw: pointer to HW struct
 + *
-  * Configure TX timestamp interrupt for the specified port
-  *
-  * Return:
-@@ -1858,19 +1860,45 @@ int ice_phy_cfg_intr_eth56g(struct ice_hw *hw, u8 port, bool ena, u8 threshold)
- 	int err;
- 	u32 val;
- 
-+	if (ena && !threshold)
-+		return -EINVAL;
++ * Perform E825C-specific PTP hardware clock initialization steps.
++ *
++ * Return: 0 on success, or a negative error value on failure.
++ */
++static int ice_ptp_init_phc_e825c(struct ice_hw *hw)
++{
++	int err;
 +
- 	err = ice_read_ptp_reg_eth56g(hw, port, PHY_REG_TS_INT_CONFIG, &val);
- 	if (err)
- 		return err;
- 
-+	val &= ~PHY_TS_INT_CONFIG_ENA_M;
- 	if (ena) {
--		val |= PHY_TS_INT_CONFIG_ENA_M;
- 		val &= ~PHY_TS_INT_CONFIG_THRESHOLD_M;
- 		val |= FIELD_PREP(PHY_TS_INT_CONFIG_THRESHOLD_M, threshold);
--	} else {
--		val &= ~PHY_TS_INT_CONFIG_ENA_M;
-+		err = ice_write_ptp_reg_eth56g(hw, port, PHY_REG_TS_INT_CONFIG,
-+					       val);
++	/* Soft reset all ports, to ensure everything is at a clean state */
++	for (int port = 0; port < hw->ptp.num_lports; port++) {
++		err = ice_ptp_phy_soft_reset_eth56g(hw, port);
 +		if (err) {
-+			ice_debug(hw, ICE_DBG_PTP,
-+				  "Failed to update 'threshold' PHY_REG_TS_INT_CONFIG port=%u ena=%u threshold=%u\n",
-+				  port, !!ena, threshold);
++			ice_debug(hw, ICE_DBG_PTP, "Failed to soft reset port %d, err %d\n",
++				  port, err);
 +			return err;
 +		}
-+		val |= PHY_TS_INT_CONFIG_ENA_M;
- 	}
- 
--	return ice_write_ptp_reg_eth56g(hw, port, PHY_REG_TS_INT_CONFIG, val);
-+	err = ice_write_ptp_reg_eth56g(hw, port, PHY_REG_TS_INT_CONFIG, val);
-+	if (err) {
-+		ice_debug(hw, ICE_DBG_PTP,
-+			  "Failed to update 'ena' PHY_REG_TS_INT_CONFIG port=%u ena=%u threshold=%u\n",
-+			  port, !!ena, threshold);
-+		return err;
-+	}
-+
-+	err = ice_read_ptp_reg_eth56g(hw, port, PHY_REG_TS_INT_CONFIG, &val);
-+	if (err) {
-+		ice_debug(hw, ICE_DBG_PTP,
-+			  "Failed to read PHY_REG_TS_INT_CONFIG port=%u ena=%u threshold=%u\n",
-+			  port, !!ena, threshold);
-+		return err;
 +	}
 +
 +	return 0;
++}
++
+ /**
+  * ice_ptp_get_dest_dev_e825 - get destination PHY for given port number
+  * @hw: pointer to the HW struct
+@@ -2179,6 +2204,69 @@ int ice_ptp_read_tx_hwtstamp_status_eth56g(struct ice_hw *hw, u32 *ts_status)
+ 	return 0;
  }
  
++/**
++ * ice_ptp_phy_soft_reset_eth56g - Perform a PHY soft reset on ETH56G
++ * @hw: pointer to the HW structure
++ * @port: PHY port number
++ *
++ * Trigger a soft reset of the ETH56G PHY by toggling the soft reset
++ * bit in the PHY global register. The reset sequence consists of:
++ *   1. Clearing the soft reset bit
++ *   2. Asserting the soft reset bit
++ *   3. Clearing the soft reset bit again
++ *
++ * Short delays are inserted between each step to allow the hardware
++ * to settle. This provides a controlled way to reinitialize the PHY
++ * without requiring a full device reset.
++ *
++ * Return: 0 on success, or a negative error code on failure when
++ *         reading or writing the PHY register.
++ */
++int ice_ptp_phy_soft_reset_eth56g(struct ice_hw *hw, u8 port)
++{
++	u32 global_val;
++	int err;
++
++	err = ice_read_ptp_reg_eth56g(hw, port, PHY_REG_GLOBAL, &global_val);
++	if (err) {
++		ice_debug(hw, ICE_DBG_PTP, "Failed to read PHY_REG_GLOBAL for port %d, err %d\n",
++			  port, err);
++		return err;
++	}
++
++	global_val &= ~PHY_REG_GLOBAL_SOFT_RESET_M;
++	ice_debug(hw, ICE_DBG_PTP, "Clearing soft reset bit for port %d, val: 0x%x\n",
++		  port, global_val);
++	err = ice_write_ptp_reg_eth56g(hw, port, PHY_REG_GLOBAL, global_val);
++	if (err) {
++		ice_debug(hw, ICE_DBG_PTP, "Failed to write PHY_REG_GLOBAL for port %d, err %d\n",
++			  port, err);
++		return err;
++	}
++
++	usleep_range(5000, 6000);
++
++	global_val |= PHY_REG_GLOBAL_SOFT_RESET_M;
++	ice_debug(hw, ICE_DBG_PTP, "Set soft reset bit for port %d, val: 0x%x\n",
++		  port, global_val);
++	err = ice_write_ptp_reg_eth56g(hw, port, PHY_REG_GLOBAL, global_val);
++	if (err) {
++		ice_debug(hw, ICE_DBG_PTP, "Failed to write PHY_REG_GLOBAL for port %d, err %d\n",
++			  port, err);
++		return err;
++	}
++	usleep_range(5000, 6000);
++
++	global_val &= ~PHY_REG_GLOBAL_SOFT_RESET_M;
++	ice_debug(hw, ICE_DBG_PTP, "Clear soft reset bit for port %d, val: 0x%x\n",
++		  port, global_val);
++	err = ice_write_ptp_reg_eth56g(hw, port, PHY_REG_GLOBAL, global_val);
++	if (err)
++		ice_debug(hw, ICE_DBG_PTP, "Failed to write PHY_REG_GLOBAL for port %d, err %d\n",
++			  port, err);
++	return err;
++}
++
  /**
+  * ice_get_phy_tx_tstamp_ready_eth56g - Read the Tx memory status register
+  * @hw: pointer to the HW struct
+@@ -5592,7 +5680,7 @@ int ice_ptp_init_phc(struct ice_hw *hw)
+ 	case ICE_MAC_GENERIC:
+ 		return ice_ptp_init_phc_e82x(hw);
+ 	case ICE_MAC_GENERIC_3K_E825:
+-		return 0;
++		return ice_ptp_init_phc_e825c(hw);
+ 	default:
+ 		return -EOPNOTSUPP;
+ 	}
 
 -- 
 2.54.0.rc2.531.gaf818d63126a
