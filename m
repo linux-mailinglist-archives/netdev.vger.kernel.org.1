@@ -1,209 +1,182 @@
-Return-Path: <netdev+bounces-280060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280055-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aJ5tDpE+52no5QEAu9opvQ
-	(envelope-from <netdev+bounces-280060-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:08:33 +0200
+	id 4IREFTA+52no5QEAu9opvQ
+	(envelope-from <netdev+bounces-280055-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:06:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A19C6438A43
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:08:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7C9B438A08
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:06:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 76448301CDA1
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:05:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8448D3019B80
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:00:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE69639EF2D;
-	Tue, 21 Apr 2026 09:05:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFE113A1E66;
+	Tue, 21 Apr 2026 09:00:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Xcc1CP1c"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tM76s56l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E39D39FCA6
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 09:05:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E38E39EF2D
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 09:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776762328; cv=none; b=Uj8nr9hU5tDMvG+8oirBJBnCzAIVPT/QS7NBcdS9RupSEz43ZfGC8rpitnM3Ytp5OiclPwBsFpcWl2DBWfKqCjsNi+qxs5POP+0AM+ANWPkChtFxQ6bEoNsPcBYsCzuZ8kG8CSRFrM2YQU3GRVggAa6cskMaJeAfvAYepPE2VxE=
+	t=1776762053; cv=none; b=leOJgRq7K/z0rLKoK6hv+QaFy+OCzVsfIMH2WmXbLqTgf4ut+yjSuWzS5b7EBe++mBJXY2J8soaW8sssAYqaZeyA3vzNu19J7IV+02DItNkSx9zbXcsoOWxVi8WysgevLjdd5PsDqXGgOzXOWUXQ67jaWawxi8aN6QNizP4aels=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776762328; c=relaxed/simple;
-	bh=jNS11TxrGCzC/ayr6dWUKwMQYFcjJbkoMNjsM92foRg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ht0B4d+QI1/hHajtWBAA/scuasz2eMPJ8ZhyLNhMfsej9cjxqCpR9D0v5f0ZnVPTDLl91rWqVV1Jh1Vov6Cq76PG0FFYKuyhf0exKsytQ6v8kz8B8BKTnzaNQPL4amX2mxCPoJRcpwI3PwfT6cX6v2YojPfwpkq6wvnCfM8th7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Xcc1CP1c; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-43d734223e4so2706091f8f.0
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 02:05:26 -0700 (PDT)
+	s=arc-20240116; t=1776762053; c=relaxed/simple;
+	bh=y+/AIiRTJdMKJNGPNWVH8nSZsggF71AOLdWzKUHA+M8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l4M5v4nFuIWkbAAoKgfpJqTVQVpHGCKKbrNvBzjMM424gtwm/9CDn6MWjmMvzs0MWWZnKv2LVFKDTasN1oVuV+bmGflkEyvtTAEurZNUQvI0L07iGlCCBU2tsvbetvQi1eu8Bxd7JrVvGf/UNrZ6jnNT0VKzEkHfKZ521JPlp7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=tM76s56l; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5a283c44478so6927643e87.3
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 02:00:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1776762325; x=1777367125; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bq9QG9cvLvgk2UCX7BCWel9Xe8wLb+Jo7joT5Pt0764=;
-        b=Xcc1CP1cnpjrdwUmB5v0J4Irq7DUhlBQD21ey2Ch8Kf6N2zXz11+vDy6TZgmIaAUJC
-         +zoEz8FhqsnU8ZDeplIlW5qDu4M1jS604a2J+/T4WHykYlPpreT7WCgIS73DUOordZhU
-         GSQpP79dJgdMCPtm+L0j6TbNe5PuLwUFNi+EpHD1QPWzLgzk5WJ2OJHQfvHv7r2ufHNM
-         nX6nSDXwcL1hB+Q6aa5W7/7q/7STQTSZPxNsZMvv51vHikW+kMIXBLc6pQtRVKpk8XIr
-         0PPbT4gMMmh5vdD5GsAgJgoWAemXJ+aXAnYSthNEwj6jZRtccCdx87/R/FK10xXMgnxj
-         3nYg==
+        d=gmail.com; s=20251104; t=1776762050; x=1777366850; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jIHT3F2PNAZPkCdPUPHQsxeMRfyG2lVqjjmEWm4QMoo=;
+        b=tM76s56lTVu9L3yTL42tSmOHHuj45F0eRZKT+i6hVDzwhyjyJTzTAw/zFXgDv6PBaK
+         RuYYMXoQY5SOhPwO8dk2R+2brtOX9luXrW7sN+6LZeK3pU44ARBjWV7XoEaTOIzrhtZ6
+         JuJfx9fPuJjgKl1E6plWgeePWRsu0SczpuOhnL+OT6ExD0mWgUzQwVwUM0JroLLv0im/
+         9nsoPK58IoJd71HDLnV5wXoLC20k+aERlhSRJumXSUa35+wDwiCpK7h0iiYIBXsIdkWR
+         Rc9Q72j1ml77/GVNxZ20JDHlvKr+PsaR3ccBeg8/8+1+xUEi144iEL5daBDSi6zM0wWE
+         38Qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776762325; x=1777367125;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Bq9QG9cvLvgk2UCX7BCWel9Xe8wLb+Jo7joT5Pt0764=;
-        b=li5wqoeD3qiH8Nnyld0K5jOPfyhOsyarBCBJAMoAnox4T+YkNBBwQdG5V3SffsdIzX
-         URiSyGmIK6ssYnxL53kBii1JYgiFBV6OckEQArIMF/6JDjk+WxueQ+SRb3bPEXY8asqG
-         Sv6jS8zsXDMgBnO5/IczEeqXBLeSnnggJjZ4nAX82nHQkdPUcdLEXSvmT9f8oaW/TL5k
-         vgGpDeyjM6VnRdJg2d6ZL3Fm8hqxF8g+dHUEp/SBCne45hKvAd13g+y8GO5W1LXy8BVn
-         bL4fGg2cUw/ETkHb7K0OpJNslPeBXaTNwo2gKgLLkFPmvgaKJ7c6SdZ8uzPJqiIGxeSe
-         aVYA==
-X-Forwarded-Encrypted: i=1; AFNElJ/sHWWh5GCKGHErPsAhCrrGVk+gycAc+d5NUpdCj9+3cxtv6Xjod15QNYL6WUGnkptBFuvbCns=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw32Wim89EFwFVZGe/m2U+qes/fm0DizuCdOwT+xnEmTkHQ+m1P
-	typdpY+yY1T0hFFCSNaikw4HkPOQzUZC3zIdCvNLnAj125ZZJ2PfDpGpnbHRXXWZM74=
-X-Gm-Gg: AeBDieutwqR0jVGTOKKiYnBsrCopRQvNmYlHMKwbuOR4hWvhJiEVS5DdeBB62rUHPc4
-	6i8YaEoFFFgTk++/fPRo/58E5x4VuxtqAdyYsteBRJm0Qs4IH+E1yvScogzQCdS6zLATq5WnGoX
-	+VZg2Byflgbvw7nL/9UTVAXidWWxOQ0/XYmKqYXOVNHiYnDQWIXbZUogVZzN2bSJxYfCzP5fPrp
-	sY1UaptMLX4/UmjuRq73TTbx0g1rvfzrWDeoow7WDZn7uH3u92lEmPd+d2PCPOCG9V4YtxMWJnG
-	SDqyyceknvKvHFdJSF+gpcBaiDLPkVvDjpAdWvWhuHp8eZX47e7+1kxES7PUfXsAyBzBYkms/f3
-	2qE3AxRujUMjeqvBrgo5U6r6i32issiZlh7kr8P8gAmEb5VKr50RFW5a/LwIMc9WiaybdO/IBWD
-	3mlUul+ltNcTqhLekUVHaqLZcBH/qQ4SF4k5GHMhmWdSImkuBdpmg=
-X-Received: by 2002:a5d:5c81:0:b0:43d:729e:f23a with SMTP id ffacd0b85a97d-43fe408dab9mr19081632f8f.22.1776762324596;
-        Tue, 21 Apr 2026 02:05:24 -0700 (PDT)
-Received: from pathway.suse.cz (nat2.prg.suse.com. [195.250.132.146])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4cb135asm39945351f8f.6.2026.04.21.02.05.22
+        d=1e100.net; s=20251104; t=1776762050; x=1777366850;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jIHT3F2PNAZPkCdPUPHQsxeMRfyG2lVqjjmEWm4QMoo=;
+        b=L0VnKU5MpKhAXwNSUyiMrVh6ezl+d5gJXwpKsLWBLSbZYtaqGYqmzlSHcK8kGnCnrz
+         piTPpxjqZ36w+8CnCKRzDM0YK5c7iiNEX3c/QHc61Y8Eh2NNfP1V4GNxiTR4inS9QJ0D
+         MUdZMjNWiYFUiF6/uW9p6woTTYzB3AXbh1N5cTPpjDWg5okhb4C2nm53r++TiXIgIDtH
+         P4YGbLSf8Y6MXLiqvVabCyiYGgHEyB0J9hdO1H3NyoquIQpuolSv8EQMIPuNFolyfdRH
+         /jp2qH7mPORjPfLkjQmyK7FMppUfu4E3ALoGoWYgXh57DtUhfe+icHSi/bGPFvoxEQTV
+         wVRA==
+X-Forwarded-Encrypted: i=1; AFNElJ/9alStdS9WSthE8/Vmqe6nxM/N+4fd/W55Qz2Sr4iBwmp9QQHTFWNj4Rs5Ypi1NIfjBttCvw8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEcwSWha/1Eqx4p+vcSesjjtFBIro3nvDaTl18b6YAVnsNEvih
+	gPM9T/OjRlg/jEhVjNgGsC3ze4neM5cj5D3GxuOKMbpC/B6w835M6wj0
+X-Gm-Gg: AeBDievOnGpw9Xj8WGhllJMSF7dWNFVftISnQJL5D0uC8TGfCoOVVrgSqZzFFWRdPR1
+	dY3J1tRzJ7cQy1xz1eSkyoAiXzAQZzE7YXkIUfyhoeIifBuF1+aNgOP2z8kLHTl308DXV+eM6m8
+	EpZxwRqr/OCTrvElqSbSl39pOmBDmjVflGnRkeAoJXBHPXgxsHqgA9eY8MYKYowtDXl6xCFZsCa
+	yYDqBwT2wEesx1tTB/+l79JJXmRzB7xltUJykf9IqFS0LiDszsCLBxpWFHWZp6p/TAuDy5LBMxr
+	VlTnAzvHBQF+2h9685oQ6aIu9sLLUgybhsuaI3qS5D2i1LBKkhG3J/WB5PH8sEze7XnhfNoImPH
+	dIPFRf0Mh1UJJFltA7onhytk+8YqzpZa5heS89a0uCImp8h/nCOFYmSfuPG+clm20oR5SCPDGSz
+	gA5KBUdI+kTvcuan3TRj2p564SmN6v6II=
+X-Received: by 2002:a05:6512:3b8d:b0:5a2:9bd8:838d with SMTP id 2adb3069b0e04-5a4172b7afcmr4858988e87.6.1776762050063;
+        Tue, 21 Apr 2026 02:00:50 -0700 (PDT)
+Received: from thinkpad ([178.205.156.194])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-38ecb75b033sm28583931fa.39.2026.04.21.02.00.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 02:05:24 -0700 (PDT)
-Date: Tue, 21 Apr 2026 11:05:21 +0200
-From: Petr Mladek <pmladek@suse.com>
-To: Masami Hiramatsu <mhiramat@kernel.org>
-Cc: chensong_2000@189.cn, rafael@kernel.org, lenb@kernel.org,
-	mturquette@baylibre.com, sboyd@kernel.org, viresh.kumar@linaro.org,
-	agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com,
-	bmarzins@redhat.com, song@kernel.org, yukuai@fnnas.com,
-	linan122@huawei.com, jason.wessel@windriver.com, danielt@kernel.org,
-	dianders@chromium.org, horms@kernel.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	paulmck@kernel.org, frederic@kernel.org, mcgrof@kernel.org,
-	petr.pavlu@suse.com, da.gomez@kernel.org, samitolvanen@google.com,
-	atomlin@atomlin.com, jpoimboe@kernel.org, jikos@kernel.org,
-	mbenes@suse.cz, joe.lawrence@redhat.com, rostedt@goodmis.org,
-	mark.rutland@arm.com, mathieu.desnoyers@efficios.com,
-	linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
-	linux-clk@vger.kernel.org, linux-pm@vger.kernel.org,
-	live-patching@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-raid@vger.kernel.org, kgdb-bugreport@lists.sourceforge.net,
+        Tue, 21 Apr 2026 02:00:49 -0700 (PDT)
+From: Matthew Bystrin <dev.mbstr@gmail.com>
+To: Lee Jones <lee@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Min Li <min.li.xe@renesas.com>
+Cc: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: Re: [RFC PATCH 1/2] kernel/notifier: replace single-linked list with
- double-linked list for reverse traversal
-Message-ID: <aec90caYZDHDAHgw@pathway.suse.cz>
-References: <20260415070137.17860-1-chensong_2000@189.cn>
- <20260420144429.57b45f2beece690bceea96ec@kernel.org>
+Subject: [PATCH 0/2] mfd: rsmu_spi: fixes and new IC support
+Date: Tue, 21 Apr 2026 12:07:08 +0300
+Message-ID: <20260421090710.395591-1-dev.mbstr@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260420144429.57b45f2beece690bceea96ec@kernel.org>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280060-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[189.cn,kernel.org,baylibre.com,linaro.org,redhat.com,fnnas.com,huawei.com,windriver.com,chromium.org,davemloft.net,google.com,suse.com,atomlin.com,suse.cz,goodmis.org,arm.com,efficios.com,vger.kernel.org,lists.linux.dev,lists.sourceforge.net];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[kernel.org,gmail.com,renesas.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[47];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[suse.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pmladek@suse.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-280055-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,pathway.suse.cz:mid,189.cn:email]
-X-Rspamd-Queue-Id: A19C6438A43
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devmbstr@gmail.com,netdev@vger.kernel.org];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B7C9B438A08
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon 2026-04-20 14:44:29, Masami Hiramatsu wrote:
-> Hi Song,
-> 
-> On Wed, 15 Apr 2026 15:01:37 +0800
-> chensong_2000@189.cn wrote:
-> 
-> > From: Song Chen <chensong_2000@189.cn>
-> > 
-> > The current notifier chain implementation uses a single-linked list
-> > (struct notifier_block *next), which only supports forward traversal
-> > in priority order. This makes it difficult to handle cleanup/teardown
-> > scenarios that require notifiers to be called in reverse priority order.
-> 
-> What about introducing a new notification callback API that allows you
-> to describe dependencies between callback functions?
-> 
-> For example, when registering a callback, you could register a string
-> as an ID and specify whether to call it before or after that ID,
-> or you could register a comparison function that is called when adding
-> to a list. (I prefer @name and @depends fields so that it can be easily
-> maintained.)
+Greetings!
 
-This looks too complex. It would make sense only
-when this API has more users.
+First patch fixes Renesas 8A34002 SPI driver.
 
-Also this won't be enough for the ftrace/livepatch callbacks.
-They need to be ordered against against each other. But they
-also need to be called before/after all other callbacks.
-For example, when the module is loaded:
+In my setup 8A34002 is connected to VisionFive2 via SPI. I've discovered that
+upstream driver does not work:
 
-   + 1st frace
-   + 2nd livepatch
-   + then other notifiers
+[    4.728771] 8a3400x-phc 8a3400x-phc.0.auto: 4.8.7, Id: 0x4002  HW Rev: 5  OTP Config Select: 0
+[    4.737389] 8a3400x-phc 8a3400x-phc.0.auto: requesting firmware 'idtcm.bin'
+[    4.744462] 8a3400x-phc 8a3400x-phc.0.auto: Direct firmware load for idtcm.bin failed with error -2
+[    4.753547] 8a3400x-phc 8a3400x-phc.0.auto: Failed at line 1273 in idtcm_load_firmware!
+[    4.761576] 8a3400x-phc 8a3400x-phc.0.auto: loading firmware failed with -2
+[    4.769411] 8a3400x-phc 8a3400x-phc.0.auto: No wait state: DPLL_SYS_STATE 0
+[    4.776374] 8a3400x-phc 8a3400x-phc.0.auto: Continuing while SYS APLL/DPLL is not locked
+[    4.785206] 8a3400x-phc 8a3400x-phc.0.auto: Unsupported MANUAL_REFERENCE: 0x00
+[    4.796930] 8a3400x-phc 8a3400x-phc.0.auto: PLL2 registered as ptp0
 
-See the commit c1bf08ac26e92122 ("ftrace: Be first to run code
-modification on modules").
+This being caused by a piece of code in rsmu_write_page_register() function:
 
-> This would allow for better dependency building when adding to the list.
- 
-> > 
-> > A concrete example is the ordering dependency between ftrace and
-> > livepatch during module load/unload. see the detail here [1].
-> 
-> If this only concerns notification callback issues with the ftrace
-> and livepatch modules, it's far more robust to simply call the
-> necessary processing directly when the modules load and unload,
-> rather than registering notification callbacks externally.
-> 
-> There are fprobe, kprobe and its trace-events, all of them are using
-> ftrace as its fundation layer. In this case, I always needs to
-> consider callback order when a module is unloaded.
-> 
-> If ftrace is working as a part of module callbacks, it will conflict
-> with fprobe/kprobe module callback. Of course we can reorder it with
-> modifying its priority. But this is ugly, because when we introduce
-> a new other feature which depends on another layer, we need to
-> reorder the callback's priority number on the list.
-> 
-> Based on the above, I don't think this can be resolved simply by
-> changing the list of notification callbacks to a bidirectional list.
+if (reg < RSMU_CM_SCSR_BASE)
+	return 0;
 
-I agree. I would keep it as is (hardcoded).
+All addresses in include/linux/mfd/idt8a340_reg.h are less than
+RSMU_CM_SCSR_BASE so function was returning early, before any modifications to
+the page register. Valid read of versions - is just a coincidence, because
+default value of the page register is zero.
 
-Best Regards,
-Petr
+There were 2 separate patch series which have to be merged in one time: mfd and
+ptp. The latter have been merged, the former[1] have not. As result we've got a
+broken driver.
+
+This patch can be reverted later when the second part will be ready (of course
+if it is planned to do so). Any comments, Min? I could support with testing.
+
+Also I've had a quick look into I2C part. It may also require the same kind of
+fixes to work properly. But I didn't tested it. I could do some experiments and
+return with patches later.
+
+
+Second patch just adds support for 8A34002, which is compatible with 8A34001. As
+I can see there is no need to update bindings, everything is already being done.
+
+Link: https://lore.kernel.org/netdev/LV3P220MB1202F8E2FCCFBA2519B4966EA0192@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM/
+Signed-off-by: Matthew Bystrin <dev.mbstr@gmail.com>
+
+Matthew Bystrin (2):
+  mfd: rsmu_spi: fix page register setup
+  mfd: rsmu_spi: add 8a34002 support
+
+ drivers/mfd/rsmu_spi.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+-- 
+2.53.0
+
 
