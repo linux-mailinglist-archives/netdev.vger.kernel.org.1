@@ -1,203 +1,313 @@
-Return-Path: <netdev+bounces-280087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280088-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UDRbG4Bj52l07gEAu9opvQ
-	(envelope-from <netdev+bounces-280087-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:46:08 +0200
+	id GE+DFeBj52l07gEAu9opvQ
+	(envelope-from <netdev+bounces-280088-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:47:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD6B143A318
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:46:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B820E43A348
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:47:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 064043006974
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:44:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 358DF3030B2B
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:45:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FE4630E836;
-	Tue, 21 Apr 2026 11:44:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 122FD3783C9;
+	Tue, 21 Apr 2026 11:45:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a3pHZQhv"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="s1Bn6xbc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2001273D8D
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 11:44:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A86413B7A3
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 11:45:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776771883; cv=none; b=NxChag+vBIWLdqKv/0BqAa0hJ1sYpdwSCJLBFgz2YOOzoR5b7eQ4tMbjzpqdgYDqfFL7yKj3qru8nBNznVDjjyi23RwFBT6Na6lkJeW8duV4vJaiBqUQjC5TPQqaWei2GgNUiPbFxKW0ululDEZaF/PF65n//jcFRe9VAA7kwfA=
+	t=1776771931; cv=none; b=tENAqGDDINcClavvW/APcQk+0ImHgw3szU1vEdloQ8oFM80StaAW434lhkIioeP8pRDp/yi+NOIhKhA2wxFGOE3g/+D4NnyZ51bbPysS8PgyyuweDAZOiZXBHn7WVZnXoRwKhLjlja+yvKsedCBMr9be5sSQoNhhgtXHN073FO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776771883; c=relaxed/simple;
-	bh=r90+RDns2ZPzVjbqOJnlJ8juGqdMvz1PjVUieZnHHwI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t+PdqbUhwdBxJDN+9WRuRbAJ6m+Gx18FBPfjlceBbviZHrKQLSk0PAWA48Qk3EjhiCPqNptniz71ykgSP5KW9vBejIK6C06rOrhLf89LTj7hnH1o3aBmJwSBG7P2av5bm84burq0YovOTiVwvVAhQLEymE5sZhFnnKSQqVI0jcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a3pHZQhv; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-43d77f6092eso2821026f8f.2
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 04:44:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776771880; x=1777376680; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=t+5uZWhRor1Vy//2ATFuXmZg83EPl8Su74lVjjp+oPE=;
-        b=a3pHZQhvhthjQgLDM1SwrQcvQc215usAvgtQkCOxolh/1Cc6mEMtfQ1/rflmYa/p5/
-         HAniKZIPC4j5WgGQr5+EyipolkhaS3ni1BFwNEH4Jht9cYvI3PT3KbZtsqA33tlGpeND
-         tqoJkXLVZ6+GeG1ziKDWo8vSKP7U0l6x9usoVRvXnN+SIVtDWjbieW//7MYXdgk9Ig5Z
-         sFFYWSIsxXNIC/qZuTk+g3oHQDmFdnft7nuUK16I0h89FNJaCGAKujaCUTyEoKrBSxe3
-         75GZ0rSNBXBJfASurXn/4T7aQAaZBxSAvux9ZcqRDAf6mSkvHxJEyNYX4JjYkCFZBDzl
-         S1kA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776771880; x=1777376680;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=t+5uZWhRor1Vy//2ATFuXmZg83EPl8Su74lVjjp+oPE=;
-        b=jRYFNYO1O/XnmINTvlm3guxkXfC7SEL4dpMTDydKIRVH3i5JRyAk8er5PDXKU9Vmht
-         io35uaYGmaJkbMhrvmCx82kS1V/dHo7cv+olbLcROqdKPD9ZmgAWYsD9R18U116BkNC7
-         x73jvCj2PeEWkaVfdHrWnLEC2rI3rIQbwW3j5zjaXLZymzvUTIhzmUZ2LVA99olWgALw
-         LnKfMUn34+zMxMlcvTQsX8UNZ9Z28Lor9VbFO9i0eUhyS3lrzvg0Kjs++ZcJ3w+B9UEg
-         1EEQ7fZc5bWH50JOwSf+IvBzC/B+P9M/UKEmr7OovxErw5AOW/sln/c8y3dJnz44SVss
-         qa0g==
-X-Forwarded-Encrypted: i=1; AFNElJ/c2fLcM8wH+hqi86qSE9HT4F4MFnhrh06+FFSkCmqDNW44cg5y0yef3mSvQiPlaglNY3NLv2A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOsz3W2p0i/g2H1Q2qIopf22PZLDIXWSPLRMQWAHRxvZLUIlrm
-	B1alCWwbOEzGnbMNaADVJBYLxcKU7MtkTXVqgKBFHqwbr9SjTeMzZCxE
-X-Gm-Gg: AeBDieu4zPIB4ETY0buDwE8zYUS6F0nJC7tVlbSP8DOqQU30ySOoMvwr8g2hH7w2F1J
-	0xQa9qOfi4dAhU0tYUv2GqytiQ618E+gihETX1xMUBCvtkw3XVvWm6+rGzA0C+7/UvyOPuQFnHm
-	BgzRClExYCE7pkVO8afcP7mNAgxVXP2fwLWL+hpfaT9NBzmmepanXlvDri4xfEhghhDyIYmQ2+D
-	JBZiUucI+SxKNEhBZdK8gGF3yqZbsG3I564J+eG5tzKhxFDEKvmzXW2uc8GOB5d0keG3H+HQkb6
-	R19Eyj385cpRa33iQbgz/4QR8Lk/KI1pccQDelay5uJeX9gAH7rCdIoXBRkFIv/58wAZL5vgitz
-	dU2vXta01Gq0p5oNe3EK5/Y7UICVmqwjm3IdBr0l952gQbIIZDzSikZz8qpmXvk4+vWhv0aLYq/
-	UWH78NtRkzi12x57fR2qbwFiiGgYDFCyAa+jtdyqBvY3+4RfU=
-X-Received: by 2002:a05:6000:2dc6:b0:43f:dc54:9493 with SMTP id ffacd0b85a97d-43fe3ddcc21mr27179412f8f.21.1776771880052;
-        Tue, 21 Apr 2026 04:44:40 -0700 (PDT)
-Received: from [192.168.1.169] ([46.10.223.24])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4e4ffa8sm36729294f8f.35.2026.04.21.04.44.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Apr 2026 04:44:39 -0700 (PDT)
-Message-ID: <be429e88-f10a-4d67-a516-67648aa2ab6e@gmail.com>
-Date: Tue, 21 Apr 2026 14:44:38 +0300
+	s=arc-20240116; t=1776771931; c=relaxed/simple;
+	bh=RNz5LmDyHPB4MHvSyJ0JgcjEODsNOXlh24JhzgEMuy8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 References; b=SITOvlL2KjUlrYGJSuPFpDnMwyaFa+ZY1XP/LOb2C2sybh5tgaU4aPA9Q6tcAr8SxKm3RMGUghWPSDx501aD8QwAbnZx1zvqkQntFEmlgoU9xOb5oiBPUGhGjNJZjwM8V6h3JpU+z/R4S67c7KWasouFGd6fQR3fbleUSBRmq9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=s1Bn6xbc; arc=none smtp.client-ip=210.118.77.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20260421114527euoutp018d1111454f4a14bfb542502de9b71755~oXKdu_uwA0828908289euoutp01y
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 11:45:27 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20260421114527euoutp018d1111454f4a14bfb542502de9b71755~oXKdu_uwA0828908289euoutp01y
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1776771927;
+	bh=FSqmIXppWFqk/YElGJWo05VBfGafJTbE0JQ6hI/zBT0=;
+	h=From:To:Cc:Subject:Date:References:From;
+	b=s1Bn6xbcEXFRLdVa0/dzHCiZP9Dp9CKlY0tTfrACNj46yevQbBXRQiYgGlCwwalOj
+	 x3XjBEX12Jr6SgiGvcIUnOC6CyS0CzdklimSu9o9CidFdY56oe3XtuGhho1H5E9hdz
+	 0z5mB6FP52BYkcUSIuE/n/PewGml6SBnXWpLCQO8=
+Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20260421114526eucas1p29a73b6c60123beb164975e931347f1a4~oXKdNCXqN1096110961eucas1p2B;
+	Tue, 21 Apr 2026 11:45:26 +0000 (GMT)
+Received: from AMDC4843.eu.corp.samsungelectronics.net (unknown
+	[106.120.77.61]) by eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20260421114526eusmtip2b6f946da4f0a3872649321dd09e2d436~oXKc2R3ST2309923099eusmtip2M;
+	Tue, 21 Apr 2026 11:45:26 +0000 (GMT)
+From: Jakub Raczynski <j.raczynski@samsung.com>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+	andrew+netdev@lunn.ch, kernel-janitors@vger.kernel.org, Jakub Raczynski
+	<j.raczynski@samsung.com>
+Subject: [PATCH] net/sun: Fix multiple typos in comments
+Date: Tue, 21 Apr 2026 13:45:12 +0200
+Message-Id: <20260421114512.2690443-1-j.raczynski@samsung.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] netdevsim: Initialize all fields of ip header when
- building dummy sk_buff
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260421073738.22110-1-zlatistiv@gmail.com>
- <aecyEArzjx8KRp8-@gmail.com> <9ce273bd-6912-4442-8672-4c89bebf32ed@gmail.com>
- <aec-UcPm5pRZjcSL@gmail.com>
-Content-Language: en-US
-From: "Nikola Z. Ivanov" <zlatistiv@gmail.com>
-In-Reply-To: <aec-UcPm5pRZjcSL@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-CMS-MailID: 20260421114526eucas1p29a73b6c60123beb164975e931347f1a4
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20260421114526eucas1p29a73b6c60123beb164975e931347f1a4
+X-EPHeader: CA
+X-CMS-RootMailID: 20260421114526eucas1p29a73b6c60123beb164975e931347f1a4
+References: <CGME20260421114526eucas1p29a73b6c60123beb164975e931347f1a4@eucas1p2.samsung.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
+	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280087-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[samsung.com:+];
+	TAGGED_FROM(0.00)[bounces-280088-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zlatistiv@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[j.raczynski@samsung.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BD6B143A318
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[samsung.com:email,samsung.com:dkim,samsung.com:mid]
+X-Rspamd-Queue-Id: B820E43A348
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+There are some typos in comments and while they are harmless and not visible,
+there is no reason not to fix them. Fix the ones that are not register related,
+which might have intentional naming convention.
 
+Signed-off-by: Jakub Raczynski <j.raczynski@samsung.com>
+---
+ drivers/net/ethernet/sun/cassini.c |  8 ++++----
+ drivers/net/ethernet/sun/cassini.h | 16 ++++++++--------
+ drivers/net/ethernet/sun/sunbmac.h |  2 +-
+ drivers/net/ethernet/sun/sungem.c  |  4 ++--
+ drivers/net/ethernet/sun/sungem.h  |  4 ++--
+ drivers/net/ethernet/sun/sunhme.c  |  2 +-
+ 6 files changed, 18 insertions(+), 18 deletions(-)
 
-On 4/21/26 12:12 PM, Breno Leitao wrote:
-> On Tue, Apr 21, 2026 at 11:54:19AM +0300, Nikola Z. Ivanov wrote:
->> On 4/21/26 11:19 AM, Breno Leitao wrote:
->>> On Tue, Apr 21, 2026 at 10:37:38AM +0300, Nikola Z. Ivanov wrote:
->>>> Closes: https://syzkaller.appspot.com/bug?extid=23d7fcd204e3837866ff
->>> How do you check in the report above that the missig un-initialized
->>> fields are "tos" and "id"?
->> I don't think it is visible here, my guess would
->> be because the checksum calculator walks the
->> header in small chunks instead of referencing
->> its fields.
->>
->> The whole "KMSAN: uninit-value in irqentry_exit_to_kernel_mode_preempt"
->> doesn't really sound quite right.
-> That's precisely my question - how does this fix relate to that specific
-> report?
-The fact that the 2 call traces from the allocation and usage
-have a common origin in nsim_dev_trap_skb_build sort of gives it away.
-Just to be clear, I saw the syzbot report and started investigating from
-there, not the other way around.
-> Were you able to reproduce the KMSAN report?
->
-> Thanks for the quick answer,
-> --breno
-Yes, but it is a bit inconsistent.
+diff --git a/drivers/net/ethernet/sun/cassini.c b/drivers/net/ethernet/sun/cassini.c
+index fe00e7dd3fe4..74fb0de12d21 100644
+--- a/drivers/net/ethernet/sun/cassini.c
++++ b/drivers/net/ethernet/sun/cassini.c
+@@ -1029,7 +1029,7 @@ static int cas_pcs_link_check(struct cas *cp)
+ 			 * point a bit earlier in the sequence. If we had
+ 			 * generated a reset a short time ago, we'll wait for
+ 			 * the link timer to check the status until a
+-			 * timer expires (link_transistion_jiffies_valid is
++			 * timer expires (link_transition_jiffies_valid is
+ 			 * true when the timer is running.)  Instead of using
+ 			 * a system timer, we just do a check whenever the
+ 			 * link timer is running - this clears the flag after
+@@ -4547,7 +4547,7 @@ static int cas_get_link_ksettings(struct net_device *dev,
+ 	}
+ 	if (linkstate != link_up) {
+ 		/* Force these to "unknown" if the link is not up and
+-		 * autonogotiation in enabled. We can set the link
++		 * autonegotiation in enabled. We can set the link
+ 		 * speed to 0, but not cmd->duplex,
+ 		 * because its legal values are 0 and 1.  Ethtool will
+ 		 * print the value reported in parentheses after the
+@@ -4799,7 +4799,7 @@ static void cas_program_bridge(struct pci_dev *cas_pdev)
+ 	 */
+ 	pci_write_config_word(pdev, 0x50, (5 << 10) | 0x3ff);
+ 
+-	/* The Read Prefecth Policy register is 16-bit and sits at
++	/* The Read Prefetch Policy register is 16-bit and sits at
+ 	 * offset 0x52.  It enables a "smart" pre-fetch policy.  We
+ 	 * enable it and max out all of the settings since only one
+ 	 * device is sitting underneath and thus bandwidth sharing is
+@@ -4906,7 +4906,7 @@ static int cas_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 
+ 	/*
+ 	 * On some architectures, the default cache line size set
+-	 * by pci_try_set_mwi reduces perforamnce.  We have to increase
++	 * by pci_try_set_mwi reduces performance.  We have to increase
+ 	 * it for this case.  To start, we'll print some configuration
+ 	 * data.
+ 	 */
+diff --git a/drivers/net/ethernet/sun/cassini.h b/drivers/net/ethernet/sun/cassini.h
+index 2d91f4936d52..0c24547a4534 100644
+--- a/drivers/net/ethernet/sun/cassini.h
++++ b/drivers/net/ethernet/sun/cassini.h
+@@ -259,7 +259,7 @@
+ 
+ /* output enables are provided for each device's chip select and for the rest
+  * of the outputs from cassini to its local bus devices. two sw programmable
+- * bits are connected to general purpus control/status bits.
++ * bits are connected to general purpose control/status bits.
+  * DEFAULT: 0x7
+  */
+ #define  REG_BIM_LOCAL_DEV_EN          0x1020  /* BIM local device
+@@ -404,7 +404,7 @@
+ 						    GMII on SERDES pins for
+ 						    monitoring. */
+ #define   SATURN_PCFG_FSI             0x00000200 /* 1 = freeze serdes/gmii. all
+-						    pins configed as outputs.
++						    pins configured as outputs.
+ 						    for power saving when using
+ 						    internal phy. */
+ #define   SATURN_PCFG_LAD             0x00000800 /* 0 = mac core led ctrl
+@@ -622,7 +622,7 @@
+ 						      enabled */
+ #define    RX_CFG_SWIVEL_MASK           0x00001C00 /* byte offset of the 1st
+ 						      data byte of the packet
+-						      w/in 8 byte boundares.
++						      w/in 8 byte boundaries.
+ 						      this swivels the data
+ 						      DMA'ed to header
+ 						      buffers, jumbo buffers
+@@ -1248,7 +1248,7 @@
+  */
+ #define  REG_MAC_TX_STATUS                 0x6010  /* TX MAC status reg */
+ #define    MAC_TX_FRAME_XMIT               0x0001  /* successful frame
+-						      transmision */
++						      transmission */
+ #define    MAC_TX_UNDERRUN                 0x0002  /* terminated frame
+ 						      transmission due to
+ 						      data starvation in the
+@@ -1414,7 +1414,7 @@
+  * when passed to the host. to ensure proper operation, need to wait 3.2ms
+  * after clearing RX_CFG_EN before writing to any other RX MAC registers
+  * or other MAC parameters. alternatively, poll RX_CFG_EN until it clears
+- * to 0. similary, HASH_FILTER_EN and ADDR_FILTER_EN have the same
++ * to 0. Similarly, HASH_FILTER_EN and ADDR_FILTER_EN have the same
+  * restrictions as CFG_EN.
+  */
+ #define  REG_MAC_RX_CFG                 0x6034  /* RX MAC config reg */
+@@ -1670,7 +1670,7 @@
+  * programmed in frame mode. load this register w/ a valid instruction
+  * (as per IEEE 802.3u MII spec). poll this register to check for instruction
+  * execution completion. during a read operation, this register will also
+- * contain the 16-bit data returned by the tranceiver. unless specified
++ * contain the 16-bit data returned by the transceiver. unless specified
+  * otherwise, fields are considered "don't care" when polling for
+  * completion.
+  */
+@@ -1734,7 +1734,7 @@
+ #define    MIF_CFG_POLL_REG_SHIFT       3
+ #define    MIF_CFG_MDIO_0               0x0100 /* (ro) dual purpose.
+ 						  when MDIO_0 is idle,
+-						  1 -> tranceiver is
++						  1 -> transceiver is
+ 						  connected to MDIO_0.
+ 						  when MIF is communicating
+ 						  w/ MDIO_0 in bit-bang
+@@ -1750,7 +1750,7 @@
+ 						  mode, this bit indicates
+ 						  the incoming bit stream
+ 						  during a read op */
+-#define    MIF_CFG_POLL_PHY_MASK        0x7C00 /* tranceiver address to
++#define    MIF_CFG_POLL_PHY_MASK        0x7C00 /* transceiver address to
+ 						  be polled */
+ #define    MIF_CFG_POLL_PHY_SHIFT       10
+ 
+diff --git a/drivers/net/ethernet/sun/sunbmac.h b/drivers/net/ethernet/sun/sunbmac.h
+index d379bd407eca..85778edcf8dc 100644
+--- a/drivers/net/ethernet/sun/sunbmac.h
++++ b/drivers/net/ethernet/sun/sunbmac.h
+@@ -205,7 +205,7 @@
+ #define FRAME_WRITE           0x50020000
+ #define FRAME_READ            0x60020000
+ 
+-/* Tranceiver registers. */
++/* Transceiver registers. */
+ #define TCVR_PAL_SERIAL       0x00000001 /* Enable serial mode              */
+ #define TCVR_PAL_EXTLBACK     0x00000002 /* Enable external loopback        */
+ #define TCVR_PAL_MSENSE       0x00000004 /* Media sense                     */
+diff --git a/drivers/net/ethernet/sun/sungem.c b/drivers/net/ethernet/sun/sungem.c
+index 8e69d917d827..35c3226ce719 100644
+--- a/drivers/net/ethernet/sun/sungem.c
++++ b/drivers/net/ethernet/sun/sungem.c
+@@ -2187,7 +2187,7 @@ static void gem_do_stop(struct net_device *dev, int wol)
+ 	 * if we did. This is not an issue however as the reset
+ 	 * task is synchronized vs. us (rtnl_lock) and will do
+ 	 * nothing if the device is down or suspended. We do
+-	 * still clear reset_task_pending to avoid a spurrious
++	 * still clear reset_task_pending to avoid a spurious
+ 	 * reset later on in case we do resume before it gets
+ 	 * scheduled.
+ 	 */
+@@ -2370,7 +2370,7 @@ static int __maybe_unused gem_resume(struct device *dev_d)
+ 	gem_do_start(dev);
+ 
+ 	/* If we had WOL enabled, the cell clock was never turned off during
+-	 * sleep, so we end up beeing unbalanced. Fix that here
++	 * sleep, so we end up being unbalanced. Fix that here
+ 	 */
+ 	if (gp->asleep_wol)
+ 		gem_put_cell(gp);
+diff --git a/drivers/net/ethernet/sun/sungem.h b/drivers/net/ethernet/sun/sungem.h
+index 626302a9bc89..b921d3074017 100644
+--- a/drivers/net/ethernet/sun/sungem.h
++++ b/drivers/net/ethernet/sun/sungem.h
+@@ -352,7 +352,7 @@
+ #define MAC_HASH14	0x60F8UL	/* Hash Table 14 Register	*/
+ #define MAC_HASH15	0x60FCUL	/* Hash Table 15 Register	*/
+ #define MAC_NCOLL	0x6100UL	/* Normal Collision Counter	*/
+-#define MAC_FASUCC	0x6104UL	/* First Attmpt. Succ Coll Ctr.	*/
++#define MAC_FASUCC	0x6104UL	/* First Attempt. Succ Coll Ctr.*/
+ #define MAC_ECOLL	0x6108UL	/* Excessive Collision Counter	*/
+ #define MAC_LCOLL	0x610CUL	/* Late Collision Counter	*/
+ #define MAC_DTIMER	0x6110UL	/* Defer Timer			*/
+@@ -657,7 +657,7 @@
+ 
+ /* MIF Frame/Output Register.  This 32-bit register allows the host to
+  * communicate with a transceiver in frame mode (as opposed to big-bang
+- * mode).  Writes by the host specify an instrution.  After being issued
++ * mode).  Writes by the host specify an instruction.  After being issued
+  * the host must poll this register for completion.  Also, after
+  * completion this register holds the data returned by the transceiver
+  * if applicable.
+diff --git a/drivers/net/ethernet/sun/sunhme.c b/drivers/net/ethernet/sun/sunhme.c
+index 4c9d5d4dd8a0..efbf042e9352 100644
+--- a/drivers/net/ethernet/sun/sunhme.c
++++ b/drivers/net/ethernet/sun/sunhme.c
+@@ -1118,7 +1118,7 @@ static void happy_meal_transceiver_check(struct happy_meal *hp, void __iomem *tr
+  *
+  * We use skb_reserve() to align the data block we get in the skb.  We
+  * also program the etxregs->cfg register to use an offset of 2.  This
+- * imperical constant plus the ethernet header size will always leave
++ * emperical constant plus the ethernet header size will always leave
+  * us with a nicely aligned ip header once we pass things up to the
+  * protocol layers.
+  *
+-- 
+2.34.1
 
-Just booting the disk from the report and adding a device
-is enough to trigger it, but we have to wait for some time:
-
-syzkaller
-syzkaller login: root
-# echo "1 1" > /sys/bus/netdevsim/new_device
-# [  726.477183][ T5462] 8021q: adding VLAN 0 to HW filter on device eth1
-
-# [ 1845.100611][   T80] 
-=====================================================
-[ 1845.102363][   T80] BUG: KMSAN: uninit-value in 
-irqentry_exit_to_kernel_mode_preempt+0x8f/0xa0
-[ 1845.104209][   T80] irqentry_exit_to_kernel_mode_preempt+0x8f/0xa0
-[ 1845.105594][   T80]  irqentry_exit+0x7c/0x7b0
-[ 1845.106629][   T80]  sysvec_apic_timer_interrupt+0x52/0x90
-[ 1845.107829][   T80]  asm_sysvec_apic_timer_interrupt+0x1f/0x30
-[ 1845.108959][   T80]  srso_alias_safe_ret+0x0/0x7
-[ 1845.108959][   T80]  __msan_metadata_ptr_for_load_4+0x24/0x40
-[ 1845.108959][   T80]  ip_fast_csum+0x1e6/0x3f0
-[ 1845.108959][   T80]  nsim_dev_trap_report_work+0x8c0/0x1430
-[ 1845.108959][   T80]  process_scheduled_works+0xbdb/0x1e20
-[ 1845.108959][   T80]  worker_thread+0xee5/0x1590
-[ 1845.108959][   T80]  kthread+0x540/0x600
-[ 1845.108959][   T80]  ret_from_fork+0x210/0x8f0
-[ 1845.108959][   T80]  ret_from_fork_asm+0x1a/0x30
-[ 1845.108959][   T80]
-[ 1845.108959][   T80] Uninit was created at:
-[ 1845.108959][   T80] __kmalloc_node_track_caller_noprof+0x4fb/0x1770
-[ 1845.108959][   T80]  __alloc_skb+0x90d/0x1190
-[ 1845.108959][   T80]  nsim_dev_trap_report_work+0x3f2/0x1430
-[ 1845.108959][   T80]  process_scheduled_works+0xbdb/0x1e20
-[ 1845.108959][   T80]  worker_thread+0xee5/0x1590
-[ 1845.108959][   T80]  kthread+0x540/0x600
-[ 1845.108959][   T80]  ret_from_fork+0x210/0x8f0
-[ 1845.108959][   T80]  ret_from_fork_asm+0x1a/0x30
-[ 1845.108959][   T80]
-
-
-Thank you,
-Nikola
 
