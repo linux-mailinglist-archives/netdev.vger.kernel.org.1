@@ -1,167 +1,134 @@
-Return-Path: <netdev+bounces-280344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280345-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SNcwChWE6GkNLQIAu9opvQ
-	(envelope-from <netdev+bounces-280344-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:17:25 +0200
+	id +D1vKGOF6GkNLQIAu9opvQ
+	(envelope-from <netdev+bounces-280345-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:22:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5679443579
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:17:24 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3CE4443664
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:22:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3420D301D086
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 08:16:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3E2E43020A7C
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 08:17:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C18A3B95EC;
-	Wed, 22 Apr 2026 08:16:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E06553BF678;
+	Wed, 22 Apr 2026 08:17:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="eMoQjmjv"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="phGMDeiM"
 X-Original-To: netdev@vger.kernel.org
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66233B6C15;
-	Wed, 22 Apr 2026 08:16:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006E03BED79;
+	Wed, 22 Apr 2026 08:17:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776845815; cv=none; b=pF5dxfYHXOJKaLWjk6sPxhjwvTAoxU1MEM4tkQzn72m6chcUvEHH8kpr2SZx3g7af5cuK4d7yqLU/F75SFJLPIQDiwp7ps/lsUHKmBVYbGd+mDNBIWTroQ70c8t0UON89XqG4lou1d1btXcgqp9O7L49fAUxvsIL+8wVwb74uFI=
+	t=1776845842; cv=none; b=LcHuR5jQBynVXjdHVAnFIffS+FcMtKBA+n+aadrD+ATfX6Bg02pf1C71AYvPIZYP/w5Fyf1tE/YMwGMDVxl4ns3mYmbwY+WT+7SB55Oe+w1fd8a6t9v5S44MgXoT40cgwkW5sQM4J0CcfTfOlKOdJkjOZMNNngqs+U29P6PNlic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776845815; c=relaxed/simple;
-	bh=k4p4LMgdJtO5cU5zDgCARGfX+/nRYgRKxs5+A+3xGg8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sGa9126QBso6iPaxi+T2MUcfYUC2LwdB9cdFuKrlYEOz+UFixf3MXI4rBe19g825EVvbOn2YOriZXrkGRs4K/VCnwAsKE5qnS8mdLG7LsDdudjuZu9r84YyzYhGNOhpK8ZdPrO4/f48e78LKIjAAadbM1wuhd6E4I1gXUT9JyOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=eMoQjmjv; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=dK9i7Cr5XO7g/+h3dQazZvCkWlC6rfLQehRve6OwtbY=; b=eMoQjmjvNKb97qy4zA7NuFMhoa
-	WvwgIkm+1ACHg41AAiBShiSyw2t7weJwYYBN+dzUZITHldr+TO/u2BeC7XPAuQumbzHj3eYuKcM1B
-	ICUrFUK23Pp+nd7QS9MaDquZIDU571Ai/dD5+eSVtAFCu3XJzt8nZehTKMWWYqorThbl22D5RLZjc
-	7mRzwFE9PBN7NtUVYXV8ZtcAweeAqgn6/4yLs88p1z17iXPmq4dD9cyBT9Zj2YUFTUm4tbwHDJfMk
-	1GKg6kfby3dB3s6z7TA+n7zVaiTFnDSTF381Pmrd/WurCdpdoT0MhJVB7tBbX0FIPvagogIqC+cZm
-	raembxRqRpJj2J88iZLv1P0Yr14l4tXOVQQb4vd5EPvPHqq28KtmFbjTBXFX+tXE8XbFoeX4AIkek
-	Ahn27LYEDKpH+4yqYMiI3kE4pEXo+WA4OyOWEEDcLw/HtCkoYdsV6W7RhJbmWkAdjGGivPOl2gPtB
-	HcRqMy46JFNzjYocvS1iHjl5;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1wFSlG-00000003ERj-3ZDU;
-	Wed, 22 Apr 2026 08:16:43 +0000
-Message-ID: <9cb0901c-18c5-4858-941c-3b37ee112af9@samba.org>
-Date: Wed, 22 Apr 2026 10:16:41 +0200
+	s=arc-20240116; t=1776845842; c=relaxed/simple;
+	bh=HGC/JRyoNvyNUV4QXYG4juHOZmN/yT2mah0PuAvfojo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=mi9z0sO+dD2AfoQsM8+Y9oLDD2ZVXtJeU6KvxeEM9a+ZWJjWuKp+l4xWHVy/P7+ez+bIvsuqkjzBq0OU25RXLhsZfKKGHKid7vYVMaL+vbrUxcH+L3KaurSoZUaRmRFd6HI1gbGxWBbjhIEQs72r7U2fzZq89P26z5voGrmt6Cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net; spf=none smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=phGMDeiM; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=HGC/JRyoNvyNUV4QXYG4juHOZmN/yT2mah0PuAvfojo=;
+	t=1776845841; x=1778055441; b=phGMDeiMzOFk1t4uzQHYuwFMgNPlMTPW0Sy/GuapqZTpU3x
+	pTihX8O7tX3gO6fgtCAPLEo0vvrU0U9V2lHe6eCjaN7RLtvquaFuOXhTG+ojxe2t/+kTyihQJH8LJ
+	QztSMPerOzXCcdkjDCjXrDkXVS2SXV+et1pFBqU5ysayXc598NGY9XN2KSMGWURrRrLfDCrXeAqtK
+	+DQUo5sOBkatie7caxPdueXcJehEGnzPpAFKPwdzYRHqEQckTJZoNeJyyJX2EIBI91eklGJlUP6Hi
+	Vgglf+8z9gvYikAK1fYQj+VR/G96Y4F3TJJGpsnqhRqKi1LCym54etCEtHJVp28Q==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <benjamin@sipsolutions.net>)
+	id 1wFSln-000000069nm-43Aq;
+	Wed, 22 Apr 2026 10:17:16 +0200
+Message-ID: <3720de2882e8238855e85b312f66a39366068433.camel@sipsolutions.net>
+Subject: Re: [PATCH] wifi: mac80211: check ieee80211_rx_data_set_link return
+ in pubsta MLO path
+From: Benjamin Berg <benjamin@sipsolutions.net>
+To: Johannes Berg <johannes@sipsolutions.net>, Michael Bommarito
+	 <michael.bommarito@gmail.com>, linux-wireless@vger.kernel.org
+Cc: Felix Fietkau <nbd@nbd.name>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Ramasamy Kaliappan
+	 <ramasamy.kaliappan@oss.qualcomm.com>
+Date: Wed, 22 Apr 2026 10:17:14 +0200
+In-Reply-To: <434407f50d6b7ee85ad14dd6db757f7d9f695a96.camel@sipsolutions.net> (sfid-20260422_082757_656444_8F0EBA32)
+References: <20260422000651.4184602-1-michael.bommarito@gmail.com>
+		 (sfid-20260422_020705_790305_99EA1A92) <434407f50d6b7ee85ad14dd6db757f7d9f695a96.camel@sipsolutions.net>
+	 (sfid-20260422_082757_656444_8F0EBA32)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] smb: smbdirect: move fs/smb/common/smbdirect/ to
- fs/smb/smbdirect/
-To: Christoph Hellwig <hch@infradead.org>
-Cc: linux-cifs@vger.kernel.org, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, samba-technical@lists.samba.org,
- Tom Talpey <tom@talpey.com>, Steve French <smfrench@gmail.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- Namjae Jeon <linkinjeon@kernel.org>
-References: <20260419192018.3046449-1-metze@samba.org>
- <aehrPuY60VMcYGU8@infradead.org>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <aehrPuY60VMcYGU8@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-malware-bazaar: not-scanned
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[samba.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[samba.org:s=42];
+	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.samba.org,talpey.com,gmail.com,linux-foundation.org,kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-280344-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[samba.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280345-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[sipsolutions.net: no valid DMARC record];
+	FREEMAIL_TO(0.00)[sipsolutions.net,gmail.com,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[sipsolutions.net:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[metze@samba.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[benjamin@sipsolutions.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[samba.org:dkim,samba.org:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B5679443579
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sipsolutions.net:dkim,sipsolutions.net:mid]
+X-Rspamd-Queue-Id: F3CE4443664
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Christoph,
+On Wed, 2026-04-22 at 08:27 +0200, Johannes Berg wrote:
+> On Tue, 2026-04-21 at 20:06 -0400, Michael Bommarito wrote:
+>=20
+> > Benjamin Berg's 2026-02 RFC v2 "wifi: mac80211: refactor RX
+> > link_id and station handling"
+> > (20260223133818.9f5550ab445f.I...@changeid) touches the same
+> > code and may supersede or subsume this patch; happy to fold /
+> > rebase / drop.
+>=20
+> Yeah, Benjamin, what's up with that :)
 
->> diff --git a/fs/smb/Makefile b/fs/smb/Makefile
->> index 9a1bf59a1a65..353b1c2eefc4 100644
->> --- a/fs/smb/Makefile
->> +++ b/fs/smb/Makefile
->> @@ -1,5 +1,6 @@
->>   # SPDX-License-Identifier: GPL-2.0
->>   
->>   obj-$(CONFIG_SMBFS)		+= common/
->> +obj-$(CONFIG_SMBDIRECT)		+= smbdirect/
-> 
-> Why is this not in net/smbdirect/ or driver/infiniband/ulp/smdirect?
+Hmm, good question. I was hoping for a userspace hostap implementation
+to start using the new NO_STA flag as that part is otherwise untested.
+Qualcomm was going to work on that, but I have not yet heard about it
+again.
 
-Yes, I also thought about net/smbdirect.
+That said, it should be fine to merge patches 1-4 at least. So I am
+happy to submit them separately.
 
-As IPPROTO_SMBDIRECT or PF_SMBDIRECT will be the next step,
-see the open discussion here:
-https://lore.kernel.org/linux-cifs/cover.1775571957.git.metze@samba.org/
-(I'll follow with that discussion soon)
+Benjamin
 
-I was just unsure about the consequences, e.g. would
-the maintainer/pull request flow have to change in that case?
-Or would Steve be able to take the changes via his trees?
-Any I also didn't want to offend anybody, so I just took
-what Linus proposed.
-
-Using driver/infiniband/ulp/smdirect would also work,
-if everybody prefer that.
-
-> As far as I can tell there is zero file system logic in this code.
-> 
->> -#include "../common/smbdirect/smbdirect_public.h"
->> +#include "../smbdirect/public.h"
-> 
-> And all these relative includes suggest you really want a
-> include/linux/smdirect/ instead.
-
-Yes, that's my also my goal in the next steps.
-
-> While we're at it: __SMBDIRECT_EXPORT_SYMBOL__ is really odd.
-> One thing is the __ pre- and postfix that make it look weird.
-
-Yes, the __SMBDIRECT_EXPORT_SYMBOL__ was mainly a temporary
-thing, now it's useless and I'll remove it.
-
-> The other is that EXPORT_SYMBOL_FOR_MODULES is for very specific
-> symbols that really should not exported.  What this warrants instead
-> is a normal EXPORT_SYMBOL_NS_GPL.
-
-I want the exported functions be minimal, as most of
-of should go via the socket layer instead.
-
-If EXPORT_SYMBOL_NS_GPL(func, "smbdirect") is better than
-EXPORT_SYMBOL_FOR_MODULES() I can change that.
-
-It means cifs.ko and ksmbd.ko would need MODULE_IMPORT_NS("smbdirect"), correct?
-
-Thanks!
-metze
+>=20
+> OTOH we perhaps wants this patch in wireless, and then yours in
+> wireless-next.
+>=20
+> johannes
 
