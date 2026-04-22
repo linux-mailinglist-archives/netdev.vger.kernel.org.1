@@ -1,94 +1,102 @@
-Return-Path: <netdev+bounces-280286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280287-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CMOhJIwv6GlHGgIAu9opvQ
-	(envelope-from <netdev+bounces-280286-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 04:16:44 +0200
+	id 6HZlJ6cw6GlHGgIAu9opvQ
+	(envelope-from <netdev+bounces-280287-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 04:21:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECBF54414BF
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 04:16:43 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 326264415C1
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 04:21:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C85343016CA3
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 02:15:45 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8B2AF3012228
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 02:21:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31D19304BA3;
-	Wed, 22 Apr 2026 02:15:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E544311958;
+	Wed, 22 Apr 2026 02:21:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jvzQa0ry"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f0BNdJBp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A941A9FBC
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 02:15:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26681310620
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 02:21:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776824145; cv=none; b=RQMBO2h9zJvJgJdAfb6y/KLmyYrwH4fPQZ3IjVqKYqPH0sqpUUXumw+W88v6FQn2FUyzhs5fZFknK++kKWjepN9FjcISFTkdPOEcFau2ztX5uCd+3A3BUA77eq63IYAtt5q5hfrG/lD7nwlVw1qIk281wzPigCta+rB1MU2fiso=
+	t=1776824485; cv=none; b=FzS7RT9L9tLw9TBs6g4SkcxJWYiwxSH/kicgpSUKmIlLuxGdSvfxKor6c4gvbDnB+8DFdWX3Q3sAWb2qkEYaeYRHiUDYqYmt03DpS3PSmsug/kczgKYjffdtDR/HJwYjNaD12fOaNHeIjynWdcCelHnC6wfyF6L2eC+iT5anHTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776824145; c=relaxed/simple;
-	bh=RaoS18NQ6ormUMAZohAhAbNG+kw7Dwqeuj/gOMWHJv4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WwyDbauOqteNCvOXun8GPhWdgkJUIOUHVGqkWT6Nk1Erzqw6S5/LcxsYoyGmz8IG8S6rmdDcuIMZyG+z6A/p5ON3hMP0+07wNMV5guOMQV2zo5DLVcpAab1E4WFHu9ZiVkR9h277R70hVCnirf+Bw+w1ud79QBfFRPinhF4f1Jc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jvzQa0ry; arc=none smtp.client-ip=209.85.210.170
+	s=arc-20240116; t=1776824485; c=relaxed/simple;
+	bh=qTQz2vSFPrt1UdUDLXJDjD2WVqA6OtwK3Yztcv6mH6g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=q/905jxjJDL2XF9HZXe+r0FvcsYUS0L8LGRZ097KmpFvumCdFPbe4Gn/CXOTJGLtVp5L9jn3kfRB1zGJH1BjR3a2feKZi32XjBtOJbeRnnKIggL2kWeTe72GfyIbIITkzrHauRg2ySdLVAcri7VUrSHhKu9xgqB4eXMbaUjZ7ks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f0BNdJBp; arc=none smtp.client-ip=209.85.210.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-82cebbdbdccso2982772b3a.1
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 19:15:43 -0700 (PDT)
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-82f2766905fso2203852b3a.3
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 19:21:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776824143; x=1777428943; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=q+ZGgRpaM6gIFlLsyQEgm5dg/TZd90+yNvNU+V/yubU=;
-        b=jvzQa0ryCkfTFujHDF5A415yxa8DV2IaZ6ak9FcJYqHRWpWR7x6sGmGTks8VE08lyu
-         14J6N2gpUOKqbxB14IEACNhHALZyE8iBpbmcyvUuggvYnkSd/WdiAInA4+hcW4SSCGwM
-         DKBYaDAt2Gosxubp02jO35iX0WfkpymGUFRIo9ouDzU7vXuEpr2ZDVCgPfUVGFdcjWUp
-         UsvVn817cWQt2Ml03YyGLwx2BNNisP0JZyIgQ+OmtXHUSLMrm0rVz33Q6/yToJqAtglg
-         gYARdQ56GWiln2kNqpSCLt2w0YeBWLVqN8GRu5i8SxXKGKhvXDDXNS6Fxa88K3woTF7R
-         1wNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776824143; x=1777428943;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1776824483; x=1777429283; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=q+ZGgRpaM6gIFlLsyQEgm5dg/TZd90+yNvNU+V/yubU=;
-        b=Jm1c55HTTU7lB0mlPlWb5mp8+Fc+usJ7gXzBXeqM/OwcZ5rTbTGDvVE1D12QzZSphf
-         eqpsn2WRH4uUY8LNIqugdVZKJTgosqvFM8rzh3ECIqJGlWFgWS5SlzBVbp4uLU2oX/zM
-         Lnwqfb6O+mH9TbOr9ksOh2a90qcs1C/AB5KFKMSqFisFOg/Iez4YaTqnoAekilCuoivk
-         OHDKaZSMuCHRJeI04Z21NasCupuqhNwTv/0C5WUTLo2cYCtJywa6wxcm5qTRkcnhOKVr
-         13MhOwdUbilXa1wTKzscgGVOm7AJDRJqx4RWMJIbxaBttTXlUHGlpsV+Pwu6GqGBwvqQ
-         yOdg==
-X-Gm-Message-State: AOJu0YwjT8zlD0G7lOiwegucxQsCxu7GH6J6ZakyahhtIpl06o3ib0sP
-	TdhiLUeRXIvR7ntCmenNZtUwA1xQO0hsjr4+bSUuh75Hg/QUh/uie17J
-X-Gm-Gg: AeBDiesubb1M1SXOZy877Ur1/pKhouomNBpMmT4Krh55E/YE02+fdnhJSCdfhecq5dI
-	RVBssrLrYTXZ3CIhbJwIcK9CXukYsqlDNQWlZLotXQlOQ8iZCsR9wWwOFvVSg5rURIZf1YagEcs
-	HnLQa+5Sf5UhpU5CK+UdWjC1Lje6bh1km/p61BHb6Q0w9pJ8rfmKe0kgoM5VLbZqiUN5sv+15PL
-	XktPvBWj9t/Rp2s7LBPxluFSpJ8t50xXWBpb1juGOyCwOFyHF3kOXBgvx6C0yq5euuJL8EhhAT5
-	JZMnXUojPVEgHFvDad806/RvRrjMrX3ts7TTApy7OOArMuM13fvqbAUv5uuvcuYVrbAUps2D5Sg
-	8GQls5QOyMbq3lqA6EPYR1ggwvuoriMXY8sSEzNO7nWd1MkgWAUBI110SPAMUT38VsGH5aILzrp
-	PkiLFYGVS7bmSEDZZMOMQ+VG1NKXtkf4c9/jO9prERe6rnnT0/eV3E/No+jIelxPcdqDmZl+NJx
-	vckAm0dAULlid/2Rg==
-X-Received: by 2002:a05:6a00:4b01:b0:82f:49b5:cfc3 with SMTP id d2e1a72fcca58-82f8b551df5mr17378366b3a.18.1776824143126;
-        Tue, 21 Apr 2026 19:15:43 -0700 (PDT)
+        bh=dyW6Dq3v0wfgMxaoUPexIZg9oPAHn/sng0+hK7J4HUE=;
+        b=f0BNdJBpobcde8Z1AOd+sT3q2R6sflKfcDUaN5CFqjB/uiGLgNOQyrmzqZ2vSCjYh4
+         xtrrJSd4oC7sjD7UUCoaMu2Aaj3ow8dICE9txVWSAdF+mDVNYUcF6oHI1/C9RR+8tSVd
+         qOU+P3Tgb14duQyxYT3J6SFiL3wVEFJuGF1wE7ZhGLMqToyGWsISsf5cvfRxEAJtO+Kv
+         1a2uKKpp1rUMWLJrb0f5GTKRdDG1dp8Jt6x1oOPDHUhIse5SINE1LOwrvTN2CRximGM8
+         pFUPTvHBtOUxJ+IJF/I1yYPMwOnGmG4D0mRtL9RgLOCcWz2WC8mh/jyTIA3LDTfDDhtq
+         0TyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776824483; x=1777429283;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=dyW6Dq3v0wfgMxaoUPexIZg9oPAHn/sng0+hK7J4HUE=;
+        b=GqwiI6K90a+HfQpgF8BjvvGv9CgsEqO/vI2VKYFqc5vVyxjfKmsyRb2GIzo4oQxOva
+         g0LV/PSkZ2X+4tdkA3Y4htiD6OYXSniS+P1DFVkwWwTY6IbqXCF7RHB/n5uBxwIbaYiL
+         fCYTN+yUJHUoFt53g9Tj1VvDtFMeSyzHJriZph/U/wt/wJIZz7x81hxqvEnmoYGD5ojq
+         7v6CBabpguMo0V/SXP3IRc+3CyTw7QoWFBCm/jclpB5YPYZ3uMtoo47lGq6rDOxX2SXD
+         lKYHBbxtStNZXg2EHfBeXA7RHBOXaN9zuPnojt5yDJ3HSgNjM6p6wTNpUvwJ3Dpj3Fbu
+         4dAQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+1RNZiVUZmxlBVXfHYYGu/CM/yOt7EnqIUi2T3pD2TQtjd7sV6utGTnL4tx+0Va3iKXyr0zwY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx08dX01n2tIWPFtYPcXn9utc29Amva/mkwIaFIj8IyWRIAVFW1
+	0j+G07Qbe3pLfAiZrbgwtUhUj3hHzoz7VeYluWKhkT4+YtMWi3vKVZ+0
+X-Gm-Gg: AeBDieuiQAv80Wakauu6NTwQ+KeXqTAQbmJ9QY7u0G2FR5zZWXeEFBg9EdBnu4wPqhL
+	9FKz6w0iIbiTixpBnqXfGNDLmsXhnv0QyrpuRUYLSuEh1AzI5oaV6tJfuVv4l7YlgQfsFCypT1I
+	f8yjUDmFAghKH8aLY4unxHwvVN2ReLjvhpp2PxMpUoIGo1MKwc2DDl/p9erpuv3jBfPco4n1q3u
+	GFY3xl0oNrO+KWUp69N4wxCxif24Ro/vPDZQuCGw7lWc0yvxZ+bOx2Tr6q0BdikruQRt/0nhhfd
+	C1ZAAo4v14TOD55mNov3ChKsD63glhEgXDzzB/3xb3DrKLqDfF/kHYIM/EsoD9GVPLYv4F4T8gF
+	clxm2/ykvqc8691ffBMe8K9f0Jc0lPTv5votf+mcnIvFKROdYXCmLIZ3gIwnwbJrTlMHMzRF+N6
+	A7xgJ44TkkcecvHR5BWfeEWeo5eVUPDhpMJ1MSR5mM1HoAfqzGvzkzxpmmZIMzfWwCifBSd90hC
+	LJ2W/imO8kFRHI3SA==
+X-Received: by 2002:a05:6a00:22c5:b0:82a:7734:8c6a with SMTP id d2e1a72fcca58-82f8c9378ebmr21412584b3a.48.1776824483420;
+        Tue, 21 Apr 2026 19:21:23 -0700 (PDT)
 Received: from deepanshu-kernel-hacker.. ([2405:201:682f:383f:6adb:27a7:d382:d9c9])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f8ec24850sm15689255b3a.60.2026.04.21.19.15.37
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f8ec0092bsm16269002b3a.50.2026.04.21.19.21.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 19:15:41 -0700 (PDT)
+        Tue, 21 Apr 2026 19:21:22 -0700 (PDT)
 From: Deepanshu Kartikey <kartikey406@gmail.com>
-To: courmisch@gmail.com,
+To: zhangdandan@uniontech.com
+Cc: courmisch@gmail.com,
 	davem@davemloft.net,
 	edumazet@google.com,
+	horms@kernel.org,
 	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Deepanshu Kartikey <kartikey406@gmail.com>,
-	syzbot+706f5eb79044e686c794@syzkaller.appspotmail.com
-Subject: [PATCH] net: phonet: fix BUG_ON() in pn_socket_autobind()
-Date: Wed, 22 Apr 2026 07:45:33 +0530
-Message-ID: <20260422021533.16987-1-kartikey406@gmail.com>
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzbot+706f5eb79044e686c794@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com,
+	zhanjun@uniontech.com,
+	Deepanshu Kartikey <kartikey406@gmail.com>
+Subject: Re: [PATCH] net: phonet: do not BUG_ON() in pn_socket_autobind() on failed bind
+Date: Wed, 22 Apr 2026 07:51:14 +0530
+Message-ID: <20260422022114.17097-1-kartikey406@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <81A6570B633FF6FE+20260422013807.63087-1-zhangdandan@uniontech.com>
+References: <81A6570B633FF6FE+20260422013807.63087-1-zhangdandan@uniontech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,78 +106,57 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,syzkaller.appspotmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,vger.kernel.org,redhat.com,syzkaller.appspotmail.com,googlegroups.com,uniontech.com];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-280286-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-280287-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_NEQ_ENVFROM(0.00)[kartikey406@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev,706f5eb79044e686c794];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-0.998];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,syzkaller.appspot.com:url]
-X-Rspamd-Queue-Id: ECBF54414BF
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 326264415C1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-pn_socket_autobind() calls pn_socket_bind() and treats
--EINVAL as a signal that the socket was already bound,
-then uses BUG_ON() to verify it:
+Hi Morduan,
 
-    if (err != -EINVAL)
-        return err;
-    BUG_ON(!pn_port(pn_sk(sock->sk)->sobject));
+Thanks for fixing this syzbot report!
 
-However, pn_socket_bind() returns -EINVAL in multiple
-cases:
+I independently worked on the same bug and sent an
+alternative patch here:
 
-  1. address length too short
-  2. socket not in TCP_CLOSE state
-  3. socket already bound  <- only intended case
+  https://lore.kernel.org/all/20260422021533.16987-1-kartikey406@gmail.com/
 
-When -EINVAL comes from cases 1 or 2, sobject is still
-zero (never assigned), causing BUG_ON to fire and crash
-the kernel.
+The key difference is that my approach checks the bound
+state BEFORE calling pn_socket_bind(), rather than after:
 
-Fix this by checking the bound state directly via
-pn_port(sobject) BEFORE calling pn_socket_bind(),
-eliminating the ambiguous -EINVAL interpretation
-entirely.
-
-Reported-by: syzbot+706f5eb79044e686c794@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=706f5eb79044e686c794
-Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
----
- net/phonet/socket.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/net/phonet/socket.c b/net/phonet/socket.c
-index c4af26357144..5a55e7d14e85 100644
 --- a/net/phonet/socket.c
 +++ b/net/phonet/socket.c
-@@ -204,14 +204,14 @@ static int pn_socket_autobind(struct socket *sock)
+@@ -207,12 +207,11 @@ static int pn_socket_autobind(struct socket *sock)
+ {
  	struct sockaddr_pn sa;
  	int err;
- 
+
 +	if (pn_port(pn_sk(sock->sk)->sobject))
 +		return 0; /* socket was already bound */
 +
@@ -183,9 +170,31 @@ index c4af26357144..5a55e7d14e85 100644
 -	return 0; /* socket was already bound */
 +	return err;
  }
- 
- static int pn_socket_connect(struct socket *sock, struct sockaddr_unsized *addr,
--- 
-2.43.0
 
+The root cause is that pn_socket_bind() returns -EINVAL
+for multiple reasons:
+
+  1. address length too short
+  2. sk_state != TCP_CLOSE (without prior bind)
+  3. socket already bound  <- only intended case
+
+Your fix correctly prevents the crash. However the
+ambiguous "if (err != -EINVAL)" path still remains.
+
+By checking pn_port(sobject) BEFORE calling
+pn_socket_bind(), this approach:
+
+  - eliminates the -EINVAL ambiguity entirely
+  - removes the special -EINVAL handling path
+  - makes "already bound" check direct and clear
+  - simplifies the overall logic flow
+
+Both fixes prevent the crash, but this removes the
+underlying ambiguity rather than working around it.
+
+Thoughts? Happy to defer to your patch if maintainers
+prefer the minimal change approach.
+
+Thanks,
+Deepanshu Kartikey
 
