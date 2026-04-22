@@ -1,132 +1,121 @@
-Return-Path: <netdev+bounces-280413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280414-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4ORdI+/E6Gl+QAIAu9opvQ
-	(envelope-from <netdev+bounces-280413-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 14:54:07 +0200
+	id EDQEOi3F6GmYQAIAu9opvQ
+	(envelope-from <netdev+bounces-280414-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 14:55:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F90844638A
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 14:54:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA33F446439
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 14:55:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 75BD13053CD1
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:46:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 960E53009B20
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:47:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CB893E6DE3;
-	Wed, 22 Apr 2026 12:46:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E827A3E8C75;
+	Wed, 22 Apr 2026 12:47:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VXhwhb/d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.mifritscher.de (mifritscher.de [188.40.170.105])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A19683D1CC6;
-	Wed, 22 Apr 2026 12:46:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.170.105
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5B53D170B;
+	Wed, 22 Apr 2026 12:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776861987; cv=none; b=WxEuxX3F9ZB1lkD5z7Ye2Lg9NDV7miW3T/BDNMUNi0VyWZp/UDvznKDrHawnP5pIJCjKkcO4ChZd/BqIwgqnhAqQvtDPnpSxgDeLWlcozEWhkRW9nRFT36fzs/HN8B5pjoUOJ9jc8KUyZ9EMxUFabWweYyrhtqLaClvBOSdyD4Y=
+	t=1776862067; cv=none; b=dGs0W06fKhIQzkALCr2n1/jXbmH2qSejpp0YvfywShTMkJwzBcWCId1E9rb3oIf1HsKlT6r0ZQx2KJHPEXzPOpwkhzT5bU5ZPAtJMLVNJhx2grSGm9IvY+ouPTM9Hyl+79Sh1VxTJy+O2HTKzv5raek1yfuxUUwVCet6iQUFSt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776861987; c=relaxed/simple;
-	bh=5XDs8cWdZXpGBsh4Aa38JGEB+lFfhkffirPSTw1NeOE=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=iEuvF5PiSP3tHcMrXMhUviuyF1+MX/qtZYnjmIn6yslaRMA2ps9jVqVYetncAurAa95P1ClEGQI8xLNpwJVNziA+NkOrLQixD5sMxIeXtq7jT601I91Bck5NtQCX0hiSIolLb391+bHt5cNncpSNZ0RkB/GAIpAN/wt1rG8VmWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fritscher.net; spf=pass smtp.mailfrom=fritscher.net; arc=none smtp.client-ip=188.40.170.105
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fritscher.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fritscher.net
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.mifritscher.de (Postfix) with ESMTP id 6CE2B3B2728;
-	Wed, 22 Apr 2026 14:46:23 +0200 (CEST)
-X-Virus-Scanned: Debian amavis at mifritscher.vserverkompetenz.de
-Received: from mail.mifritscher.de ([127.0.0.1])
- by localhost (mail.mifritscher.vserverkompetenz.de [127.0.0.1]) (amavis, port 10024)
- with ESMTP id Q2U_6VBKJUms; Wed, 22 Apr 2026 14:46:22 +0200 (CEST)
-Received: from mifritscher.de (localhost.localdomain [127.0.0.1])
-	by mail.mifritscher.de (Postfix) with ESMTPA id D83063B2618;
-	Wed, 22 Apr 2026 14:46:22 +0200 (CEST)
+	s=arc-20240116; t=1776862067; c=relaxed/simple;
+	bh=/7KKzmCUPAzn3ywPe9THLhfNRqp/gG453mYfw4BCtxM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IFNhxslUHODw82Z70LeglNrIENPdpajzhj6x65KbcpARzri5aSFmCCBPgfJLeuW0fl1d1Ynjf3WaFfK2SJpYrc6ZPFhQT8GsB+hCNC0C/HT6mkXzQ9tubirL0ooT9X0seC9U2/yhlvRU0EcLzYJC0SJACU3+6KgUfPa+3sas+N4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=VXhwhb/d; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=clASrg+WTACfIVmwSPZRwPOparTt2388K44CIhnQt0o=; b=VXhwhb/do4tzvuXj2cgIdGZQ92
+	8Ecq2EzXt9SYjNlwn2KgOjZiWBkSLFhza+L7R5eO2Y0VZUzBKe2RsebYQc2QzCw0pCBOc5+V4tW+k
+	z+PhS+Trd7bz8WhH9dUVhNYToI57Bo5nDEyTLKNyIzjJ7YFmjI2OsmqYPU0CChqKxKl8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wFWzS-00H1yx-2Z; Wed, 22 Apr 2026 14:47:38 +0200
+Date: Wed, 22 Apr 2026 14:47:38 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Raczynski <j.raczynski@samsung.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
+	davem@davemloft.net, andrew+netdev@lunn.ch,
+	kernel-janitors@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH] net/stmmac: Fix typos: 'tx_undeflow_irq' ->
+ 'tx_underflow_irq'
+Message-ID: <f1d51362-ca8f-481a-b9c1-400ab6422686@lunn.ch>
+References: <CGME20260421115052eucas1p103281c5b25719a44c0875d6b0860bfa6@eucas1p1.samsung.com>
+ <20260421115008.2690541-1-j.raczynski@samsung.com>
+ <7eb9e4d4-909c-4203-833d-bd8b664fdfbc@lunn.ch>
+ <aeiJ3zr4WJAm1UCk@AMDC4622.eu.corp.samsungelectronics.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 22 Apr 2026 14:46:22 +0200
-From: michael@fritscher.net
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org
-Subject: Re: [PATCH net 14/18] drivers: net: xircom: xirc2ps: Remove this
- driver
-In-Reply-To: <408d1987-6ecb-4d3b-afed-8e202c8ff21d@lunn.ch>
-References: <73e3a34c-f1dc-403b-b007-18ff85d66ea1@fritscher.net>
- <408d1987-6ecb-4d3b-afed-8e202c8ff21d@lunn.ch>
-Message-ID: <e36510873a1909a1bfd9a05cde99fef0@fritscher.net>
-X-Sender: michael@fritscher.net
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.36 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aeiJ3zr4WJAm1UCk@AMDC4622.eu.corp.samsungelectronics.net>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[fritscher.net : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[michael@fritscher.net,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280413-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280414-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NO_DN(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,fritscher.net:mid]
-X-Rspamd-Queue-Id: 2F90844638A
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EA33F446439
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Am 2026-04-22 14:15, schrieb Andrew Lunn:
-> On Wed, Apr 22, 2026 at 08:21:23AM +0200, Michael Fritscher wrote:
->> Good day,
->> 
->> actually, I do use Xircom PCMCIA network cards (yes, the 16 bit ones) 
->> on
->> Lenovo X60/X61 laptops as a second LAN card for server maintenances 
->> with
->> current 64 bit distros (e.g. Debian Trixie, which I plan to update to
->> Trixie+1 when available). Why? Because I have them and they are 
->> working ;-)
+> I don't see anything wrong with it?
+> - naming is correct, same as stmmac_extra_stats from common.h, as it
+>   wouldn't compile otherwise
+> - string length is ok, as max name length is ETH_GSTRING_LEN=32 and it is
+>   not close
+> - ethtool just polls data from driver and in my tests it is ok
+> - all instances of 'undeflow' are changed
+> - 'underflow' semantic is ok, 'undeflow' is just not correct
 > 
-> Hi Michael
-> 
-> I will drop this from the patchset for the moment.
-> 
-> Would you be willing to take up the Maintainer role for it?
-> 
-> 	Andrew
+> Please correct me if I am wrong, but imo no issues with this patch.
 
-Hello Andrew,
+ABI
 
-thanks! If someone mentors me I could try... I have experience with C 
-programming, esp. in the embedded world, but (almost) no experience with 
-the Linux kernel development.
-But regression tests etc. can be conducted by me - on 32 and 64 bit 
-machines. The oldest being a P120, the newest the mentioned X61 with its 
-C2D CPU.
+This name is published as part of the kAPI. You are changing its
+name. User space could be looking for this name, even thought it has a
+typo in it.
 
-Best regards
-Michael
+     Andrew
 
