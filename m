@@ -1,160 +1,146 @@
-Return-Path: <netdev+bounces-280385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280386-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8OYwL+mp6GnEOQIAu9opvQ
-	(envelope-from <netdev+bounces-280385-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:58:49 +0200
+	id yPhbFf6p6GnEOQIAu9opvQ
+	(envelope-from <netdev+bounces-280386-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:59:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97FA04450A2
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:58:47 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B23974450B7
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:59:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9ED91300EB52
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:58:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 025773011F22
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:59:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D8653C13FD;
-	Wed, 22 Apr 2026 10:58:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A17A93CCFC8;
+	Wed, 22 Apr 2026 10:58:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b="3LEM8CEX"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="zMz06eNG";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="tcCSdox/"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9017A1E5724;
-	Wed, 22 Apr 2026 10:58:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4258317DE36
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 10:58:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776855521; cv=none; b=GeVBsXolvHPUtDh2nYhsW53kQMNSOCP3LMjCyEYF6pb4MK4F+rjJBMcPhsNZXz7evcAXgXPkOTELzVN6SRWvnJvDGM3DzK12kPuxaIriHXaF+EaQ/rQqAY6UxkTdCB/AA+0qOQNRUhvsyOEnTMefzZ9SbjbZVlYSBI/SzYBOtVE=
+	t=1776855539; cv=none; b=Bs7Vk/EHG41VYMqmk8c3p9azAIxttdMLWI0DbuJkPYsGmXNmNFAg3I4wB1GLMg9OV3EzE06XgwDvn17jaJDkWJ+Yz5GtXMeaosGppkAkBRbHgDjNu1xYkHDWTCSvoIkQG2A0O2RrIxINKMnMXjmH7RB3r4+NevLmWi85peUfUmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776855521; c=relaxed/simple;
-	bh=TTcsVqyO+cRvqywCmON3S9sMBf2mjoLY9CJLaCXlzM0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=E0br4zTHTBt4ID2BB5ppPHioo+moVFXZaOJ6T6FYUhtQ98Y2fegjEuY0FuUIVhkVeBI0RbFYb2hC3h+osoDETokPTn7fFTdrP9m1Hqlrba/r6StpySawrMYj02JGrS+78/q224KEHGeSZ6J70lnBy6GI49BnuBPIFcAoTKeMlOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn; spf=pass smtp.mailfrom=stu.xidian.edu.cn; dkim=fail (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b=3LEM8CEX reason="key not found in DNS"; arc=none smtp.client-ip=162.243.164.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.xidian.edu.cn
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=stu.xidian.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:Date:
-	Message-Id:MIME-Version:Content-Transfer-Encoding; bh=AAAU2GMGPr
-	G1zZgq/1GH5AH+uMaADrCdJyeoKBuVvpc=; b=3LEM8CEX7eLAr6z97RMBLHwYm0
-	ib+ZC7IDSXJKR60LlXKVusSu1YQWlkafM75br5ylG7sUVguXsQiD2fthunltI2K5
-	JIVsN07kao1siFB8G06UWNQBbLRZfOQpAIbGIZtpTHifv/SxM4Y90czCNqwK8r9J
-	aDUxnfooA6pj5+0F4=
-Received: from wmy.localdomain (unknown [113.200.174.100])
-	by hzbj-edu-front-3.icoremail.net (Coremail) with SMTP id BbQMCkCmxjC8qehpyyKzAQ--.8112S2;
-	Wed, 22 Apr 2026 18:58:16 +0800 (CST)
-From: Mingyu Wang <25181214217@stu.xidian.edu.cn>
-To: willemdebruijn.kernel@gmail.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Mingyu Wang <25181214217@stu.xidian.edu.cn>
-Subject: [PATCH] ipv6: udp: fix memory leak in udpv6_sendmsg error path
-Date: Wed, 22 Apr 2026 18:58:02 +0800
-Message-Id: <20260422105802.486216-1-25181214217@stu.xidian.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1776855539; c=relaxed/simple;
+	bh=r18c/7FHWjAfUJ4mgup1bEnwDm+754O+tVmKP+uT2d0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RcUSO91l1eksklCzQlWu/OOe8J8sZqJZ6XOMU1YRfnVwZpLYNAlnYIBL/Jkfs3D+ke1qV5tiyygYSm/ptY2RIGVh+tuopoLREp4d49sBdkYY50GcbxLM7OyqS24DzDvS2owMquTUAQ+7wKJmMHv0JLJsmYBshX9kU1oc7sxKVP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=zMz06eNG; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=tcCSdox/; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Wed, 22 Apr 2026 12:58:54 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1776855536;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MSGw1jif+weQFLDuy+lS15aJ3QkgtlFox/KOoopjEFc=;
+	b=zMz06eNG7hjXscV+wjn3jvg6u4YmA1ro6QN9u30S9w5UrbtCJ9jcX8un5U+bh7ygRXLm1U
+	a+Wk+GmKItWsf9PnT42RxCh2hwN1+6G9Ix5t67rmXpX0FoQ5FIqTD2UnrCnUVOicTGpGpY
+	cTGtf/PB+kL2WIVdp7GuxyQxQSGxOQNV9N+ql/GkRAkO32gYg3FqzhHbfRA09mT0/tX45F
+	Ftc72nJ8p71tae3S1fk9d9Ak54Am1f+UxiNfEOhELFEAk1VPjtH/yUrczH/a1F1bL7T/yy
+	UgErnThI0VtKe2bDa0jEkYiBiIGuGuH/JO2sFCTA0BcG6Kcb1n5UHzvbB2qUaw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1776855536;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MSGw1jif+weQFLDuy+lS15aJ3QkgtlFox/KOoopjEFc=;
+	b=tcCSdox/8cwsK9cETfgvG6Wm3S0RZAtpljOtyDcx+4wH7CCsWjxkgomuBadc8VyIMbONJ6
+	FSJkTdwZA+8WNtBw==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Felix Maurer <fmaurer@redhat.com>
+Cc: Ren Wei <n05ec@lzu.edu.cn>, netdev@vger.kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, kees@kernel.org, kexinsun@smail.nju.edu.cn,
+	luka.gejak@linux.dev, Arvid.Brodin@xdin.com, m-karicheri2@ti.com,
+	yuantan098@gmail.com, yifanwucs@gmail.com, tomapufckgml@gmail.com,
+	bird@lzu.edu.cn, xuyuqiabc@gmail.com, royenheart@gmail.com
+Subject: Re: [PATCH net v3 1/1] net: hsr: limit node table growth
+Message-ID: <20260422105854.trLbmAmZ@linutronix.de>
+References: <3bdbe54e81bd89c1443b05500368fb45bddc3191.1776754203.git.royenheart@gmail.com>
+ <aeiHa7rzmSqzMIaJ@thinkpad>
+ <20260422085242.3TkVbXc2@linutronix.de>
+ <aeiYpkiWUD5MtGEB@thinkpad>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:BbQMCkCmxjC8qehpyyKzAQ--.8112S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7CrWUKFW7Jr15Jw18CFykXwb_yoW8Gr1kpw
-	4xKw4Yyr4DJrnxKFyxJ3WxZr15uayFqFyY9F13uas2krnxGF1xJr40vF4jqa1rAFs5uw45
-	ZayvqFW5uFyDCw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBa14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr
-	1j6F4UJwAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40E
-	FcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr
-	0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8v
-	x2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20x
-	vY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I
-	3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIx
-	AIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAI
-	cVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2js
-	IEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUQvtAUUUUU=
-X-CM-SenderInfo: qsvrmiqsrujiux6v33wo0lvxldqovvfxof0/1tbiAgULEWnnlGSYMwAAsI
-X-Spamd-Result: default: False [7.84 / 15.00];
-	SEM_URIBL(3.50)[xidian.edu.cn:email];
-	SUSPICIOUS_RECIPS(1.50)[];
-	DMARC_POLICY_QUARANTINE(1.50)[xidian.edu.cn : SPF not aligned (relaxed),quarantine];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aeiYpkiWUD5MtGEB@thinkpad>
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	R_DKIM_PERMFAIL(0.00)[stu.xidian.edu.cn:s=dkim];
-	TAGGED_FROM(0.00)[bounces-280385-lists,netdev=lfdr.de];
-	GREYLIST(0.00)[pass,meta];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-280386-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,kernel.org,google.com,redhat.com];
-	NEURAL_SPAM(0.00)[0.929];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FROM_NEQ_ENVFROM(0.00)[25181214217@stu.xidian.edu.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[stu.xidian.edu.cn:~];
-	TAGGED_RCPT(0.00)[netdev];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(0.00)[+ip6:2600:3c15:e001:75::/64:c];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,xidian.edu.cn:email,stu.xidian.edu.cn:mid]
-X-Rspamd-Queue-Id: 97FA04450A2
-X-Rspamd-Action: add header
+	FREEMAIL_CC(0.00)[lzu.edu.cn,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,smail.nju.edu.cn,linux.dev,xdin.com,ti.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B23974450B7
+X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spam: Yes
 
-During fuzzing with failslab enabled, a memory leak was observed in the
-IPv6 UDP send path.
+On 2026-04-22 11:45:38 [+0200], Felix Maurer wrote:
+> > I don't think the node count exceeds 100 in production. So having a
+> > counter which is incremented while adding to the list and decremented
+> > while removing items from the list would optimize the "worst case". So
+> > instead traversing the list with 1000 we would just give up.
+> 
+> The counter is what I had in mind. I agree that allocating under the
+> lock isn't what we want.
+> 
+> I'd argue counting through the whole list is the normal case.
 
-When sending via the lockless fast path (!corkreq), udpv6_sendmsg()
-calls ip6_make_skb() and assumes that the routing entry (dst_entry)
-reference has been stolen by the callee. However, if ip6_make_skb()
-fails early (e.g., due to an ENOMEM from memory allocation failure),
-it returns an error pointer without consuming the dst reference.
+yeah but counting here is just a register increment which is cheap. 
 
-Since udpv6_sendmsg() unconditionally jumps to the 'out_no_dst' label,
-the unconsumed dst_entry is never released, resulting in a memory leak.
+> hsr_add_node() is only called after the node table has been searched
+> already (without the lock). Here we go through the whole list again
+> under the lock to prevent TOCTOU-type situations.
+> 
+> I agree that, overall, it would be optimizing the worst case, but I
+> think it may be worth it to prevent the memory allocations and walking
+> the whole list. But I'd go along with the (current) on-the-fly counting
+> as well.
 
-Fix this by explicitly calling dst_release(dst) when ip6_make_skb()
-returns an error.
+Yeah. But then you have to manage the counter on add and removal just
+for this "we have too many nodes" case. And theoretically you would have
+to hold the list_lock while checking the counter because nodes might be
+added on both sides in the RX path (unless you check early lockless &
+optimistic and then again before adding under the lock).
 
-Signed-off-by: Mingyu Wang <25181214217@stu.xidian.edu.cn>
----
- net/ipv6/udp.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+So overall this looks simpler.
 
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 15e032194ecc..b83ecfd729af 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -1706,8 +1706,11 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 				   dst_rt6_info(dst),
- 				   msg->msg_flags, &cork);
- 		err = PTR_ERR(skb);
--		if (!IS_ERR_OR_NULL(skb))
-+		if (!IS_ERR_OR_NULL(skb)) {
- 			err = udp_v6_send_skb(skb, fl6, &cork.base);
-+		} else {
-+			dst_release(dst);
-+		}
- 		/* ip6_make_skb steals dst reference */
- 		goto out_no_dst;
- 	}
--- 
-2.34.1
+> Thanks,
+>    Felix
 
+Sebastian
 
