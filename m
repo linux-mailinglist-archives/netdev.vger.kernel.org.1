@@ -1,166 +1,196 @@
-Return-Path: <netdev+bounces-280427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280429-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2C1SOfvM6GklQQIAu9opvQ
-	(envelope-from <netdev+bounces-280427-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 15:28:27 +0200
+	id yIjkJC3P6GklQQIAu9opvQ
+	(envelope-from <netdev+bounces-280429-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 15:37:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CD04446BA1
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 15:28:26 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B21B3446D30
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 15:37:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4ED85303880F
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 13:27:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4AE283084B6F
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 13:27:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48E333EAC9E;
-	Wed, 22 Apr 2026 13:27:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88AA93CBE97;
+	Wed, 22 Apr 2026 13:27:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=thingy.jp header.i=@thingy.jp header.b="XyMTgi10"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="tIY2zndc";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="1AZNVJHo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D62C3EB81E
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 13:27:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0862E3D331A
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 13:27:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776864440; cv=none; b=nCPiTFmsLWU7e7H6QVhGUVh9ZjG7ktyB9FE+36cuWtJ+IInt6jIiroNtGUuKamiOHTYrQ0J9npBZ35dMYBPurSZ5seEMzXPG6AT7VOfxFGS/OSffGKe7luzWpdy6YRPGSfSAwzk8t6bnovCCZ792E56/QwspitvpfhFCI71F93o=
+	t=1776864462; cv=none; b=GKwytYS9JrkkJOD1WyEiLsux/Ry+5xANkoLX+2aP6K341fchGaP3rSkKDVRl/dqTYAYRlFL0LwDN3+VFfK7Hn8VkqmeZQ4z5hWknlP5/G4q0oHYchgOHvc2V1Mhr4VKfRkeNrNft379rg19xeEGK0mw3c9V3Om3HKmVXyrTzoxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776864440; c=relaxed/simple;
-	bh=CNmV50fwWM2qTb/hOpmr0ep4rnwuMTOUpDhQuUCzzaI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Oku099x2W7cqmbGFJ8JhGKfgTFge5geNwXynyZHeK6CUpylEGXpK0pUtZ+nLCB1SzkmP42brdh4BRYfVTulDHDTUoE1WKzhd4Ty4Lvk1A5BcLzDkG8oORy57Qw2IE95BW01mQ+c4mzUQtK/GB0f/d6/3GLYFslvB1qza5LBtajE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=thingy.jp; spf=pass smtp.mailfrom=0x0f.com; dkim=pass (1024-bit key) header.d=thingy.jp header.i=@thingy.jp header.b=XyMTgi10; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=thingy.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0x0f.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2b0afa0210bso25303305ad.2
-        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 06:27:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=thingy.jp; s=google; t=1776864437; x=1777469237; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jDcTBG+hlhD51mSvRcMB9jaoIaf7As497aHU40CIgJU=;
-        b=XyMTgi101dgrRbsAoVmGjSzfdqoZEZtd46wbhVU5xf2s8AUrD19aA2WtP/eLB//XPd
-         ufi/gtA24nuqyyqAE2k1yI9LZ9rKXJEqdEegpFXxuR9AiA2ZVEds3wKYIyfGrDJaTYJb
-         533m3mgCjQXKtr+ij6VsyJsSNPTnQbtPiKAZ0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776864437; x=1777469237;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jDcTBG+hlhD51mSvRcMB9jaoIaf7As497aHU40CIgJU=;
-        b=okdPVuG6sNMi3sycKGb2RPpOVEJVlkZlDstyIAxxuV4SNWlOzs6VFMchEGN1sdsHvv
-         H/GG5kVYwPXmKZH1i/LZVXbqks1pBV7pCCYykRy27lvmoMFyUJtR8vjq+r0Rp157fhuv
-         UlCErlT71M283GsMxpGFG40sdom5JKOg4yf+Nl6q310EaSanQxOjI89F5z9uoqCZI+Gx
-         4aHcAh2Rr3SOjNmmtOqG0/4e4HyhtX7JHuL3Pe/mVqAXJ5QiB9S9l73w/L93jt3xot95
-         ypEXcpFuJLomF30k8W7++xZ6MX4LU8Vg+botdobgaMomW34pR0LJLp+C7IM26RVZ3XKL
-         u2Qw==
-X-Forwarded-Encrypted: i=1; AFNElJ8wv8MnSJFPnHxoMpvymnhT+9hQMPoRzsopU9zNcSNdslVD4e0KghEGKGaiAwy+H602Guw5BK8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypzkFQVd4ELwfzU7b7Yulf/whBovJ/TDINunpNUKk5l07oPtZg
-	M9TDfc9AHU6+jAmprUfabjDtKh2D8t0893BMYz2hZo2odVivtJFYS2KEl4qXSti6cvk=
-X-Gm-Gg: AeBDieuTEcFwRHiv0Kvn3hGwJnP9MN7tp8XRiG2uoKEx5ojlYN6Jy8GOtDSIEJWCm1W
-	P8TMrXiRuhObysizJmrEZ8/H3JmKVksJPkse17ZpskbhboH3ZNgMKyTlvDIh/lPvEpyHFNBoV2V
-	qVJDj+d2Q9l2PCrm19wQBtgB7nQZ2oqLXJm110XUsm/64L9qA4mEtnk4XWYDwVe4Pg6o4m/LkMT
-	vXCVIJetNNefrSWGp7y0QtQ6eTjd57ZwiM5J9ZcbrEYZsZAhBT/j3ehoOJwtGfylXKLsg/lcppg
-	nJbcUBs0QqbzYMa4t614RppLUDF/nQDycYd1qjjXzhLLNkgW8gZ1zyh3Cnjfkh8ZI9AGDb8AKTJ
-	xIiIcb/87FXa/Xu+d+T3Nh6eDV5Rzs4vtodIzJCXGzIweTAWBtQdGoy8ncei8KwcOvs9t5qfhZo
-	IkahC20XWFBEVdp2J7sRqstgtCUdplS70NauJTIMrMmwzw1VQwTbvH5x7YVCNp2M2Y6mkBpcOxV
-	MIZo8oqj9LEUhlg8ONfcyA9
-X-Received: by 2002:a17:902:7c0f:b0:2b0:663f:6b53 with SMTP id d9443c01a7336-2b5f9eb2b36mr169293385ad.13.1776864436549;
-        Wed, 22 Apr 2026 06:27:16 -0700 (PDT)
-Received: from kinako.work.home.arpa (p1329195-ipxg00a01sizuokaden.shizuoka.ocn.ne.jp. [114.145.5.195])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-2b5faa34ea7sm165756005ad.34.2026.04.22.06.27.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Apr 2026 06:27:16 -0700 (PDT)
-From: Daniel Palmer <daniel@thingy.jp>
-To: andrew+netdev@lunn.ch
-Cc: geert@linux-m68k.org,
-	James.Bottomley@HansenPartnership.com,
-	martin.petersen@oracle.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-m68k@lists.linux-m68k.org,
-	linux-scsi@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Daniel Palmer <daniel@thingy.jp>
-Subject: [PATCH] m68k: mvme147: Make me the maintainer
-Date: Wed, 22 Apr 2026 22:27:10 +0900
-Message-ID: <20260422132710.2855826-1-daniel@thingy.jp>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1776864462; c=relaxed/simple;
+	bh=Pql9kSun8yhCpr7OB5Y/ZbxhKxZIRI5uVLS8Hj2D8hU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XAWw+h4yCOMUlUt8k6/elqTUZiqjgadqK/kmMIt4B7JKBBH6CcJPc2nwWmOHaWL+kZ/FDWzGtfANVrKlCGJN60G/Vglb3sEw3aXS+T8bhWheVTiAQOVARZs1E7uwe9wjiXbo0QE2dhcTFoGBigIvws9Qq5wu3n6U0O9Y8Bw5u6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=tIY2zndc; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=1AZNVJHo; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Wed, 22 Apr 2026 15:27:36 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1776864458;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gp6I89CelbWfiY620SyiAMASHDD2+76IuwJlP04E4n0=;
+	b=tIY2zndcq8hF9Tl7K7KqJ5j/T2dhuxPAm8cm4AjJ76BG1wf5WbNH3WT6WwbrGA1IHL9lUU
+	bbvw/rJI5iPxPDkT7+RWDyXNb9Ippua5HUcQBbkQjrjoizGMiroGkypUwG/7WvoSWzz7nw
+	U5rVRZHt8rIWEHBf1JR3wz9f/+ziavrbOAQpNFG2cF8W77AgkxFYzLprXs5rq4EcJdYqhD
+	asAIC2Fl9eiNGvuZGbeZJd49Lk3yzQf57PduNWUeGYrra7nz9XsLtnqzEDCvyhdwwOaEX1
+	kqWboKSWxJZ8U0NlLC6TFjVAlI3DwoRATWUl1THcVbJise5LE7YLLhzStfflZw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1776864458;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gp6I89CelbWfiY620SyiAMASHDD2+76IuwJlP04E4n0=;
+	b=1AZNVJHo4BGnMjVxXaZWLcJeWZVsVZU2Nkp/M1teUqvTucjsrng3Xheo+zBb7sVrmZ4svQ
+	WvjJSrSFP4fobuAg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, "(JC), Jayachandran" <j-rameshbabu@ti.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Chintan Vankar <c-vankar@ti.com>, Danish Anwar <danishanwar@ti.com>,
+	Daolin Qiu <d-qiu@ti.com>, Eric Dumazet <edumazet@google.com>,
+	Felix Maurer <fmaurer@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	"Raghavendra, Vignesh" <vigneshr@ti.com>,
+	"Bajjuri, Praneeth" <praneeth@ti.com>,
+	"TK, Pratheesh Gangadhar" <pratheesh@ti.com>,
+	"Muralidharan, Neelima" <neelima@ti.com>
+Subject: Re: [PATCH RFC net-next v2 2/2] af_packet: Add port specific
+ handling for HSR
+Message-ID: <20260422132736.TakH_dhQ@linutronix.de>
+References: <willemdebruijn.kernel.1fbf050c50d62@gmail.com>
+ <20260317172906.eG2LxlZ7@linutronix.de>
+ <willemdebruijn.kernel.17068ce38efa5@gmail.com>
+ <20260319142613.KHz32I-V@linutronix.de>
+ <willemdebruijn.kernel.8e323262df61@gmail.com>
+ <20260324163820.p9M2z27W@linutronix.de>
+ <20260402163237.EIE16Pj_@linutronix.de>
+ <willemdebruijn.kernel.1f3d8356e4a5a@gmail.com>
+ <20260416161856.CsL4npMH@linutronix.de>
+ <willemdebruijn.kernel.270fa204f615f@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [1.34 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <willemdebruijn.kernel.270fa204f615f@gmail.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[thingy.jp:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-280427-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[thingy.jp];
-	DKIM_TRACE(0.00)[thingy.jp:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@thingy.jp,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-280429-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,ti.com,davemloft.net,lunn.ch,google.com,redhat.com,kernel.org,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.983];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,thingy.jp:email,thingy.jp:dkim,thingy.jp:mid]
-X-Rspamd-Queue-Id: 6CD04446BA1
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B21B3446D30
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-I'm actively using mainline + patches on this board as a bootloader
-for another VME board and as a terminal server using a multiport
-serial board in the same VME backplane. I even have mainline u-boot
-on real EPROMs.
+On 2026-04-21 03:41:52 [-0400], Willem de Bruijn wrote:
+> Sebastian Andrzej Siewior wrote:
+Hi Willem,
 
-Make me the maintainer of its ethernet, scsi and arch code so I get
-an email before one or more of them get deleted.
+> > I understand your concern. I tried to make as self contained as
+> > possible and little runtime overhead as possible.
+> > 
+> > > One perhaps interesting Rx only option I had missed before is
+> > > SOF_TIMESTAMPING_OPT_PKTINFO. Would that give you the original
+> > > device ifindex today?
+> > 
+> > The upper logic expects to poll() on the fd. If I need to filter the
+> > device based on this then breaks the expectations.
+> > I need also to receive packets without a timestamp so I don't think this
+> > works.
+> 
+> I don't follow this. My suggestion is to optionally receive this
+> additional metadata along with the data. Not as a filter.
 
-Signed-off-by: Daniel Palmer <daniel@thingy.jp>
----
- MAINTAINERS | 7 +++++++
- 1 file changed, 7 insertions(+)
+Yes. Just ignore that part.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index d25342ca8aa1..9949b5528bcf 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -15311,6 +15311,13 @@ S:	Maintained
- W:	http://www.tazenda.demon.co.uk/phil/linux-hp
- F:	arch/m68k/hp300/
- 
-+M68K ON MVME147
-+M:	Daniel Palmer <daniel@thingy.jp>
-+S:	Maintained
-+F:	arch/m68k/mvme147/
-+F:	drivers/net/ethernet/amd/mvme147.c
-+F:	drivers/scsi/mvme147.*
-+
- M88DS3103 MEDIA DRIVER
- L:	linux-media@vger.kernel.org
- S:	Orphan
--- 
-2.53.0
+> > cb[] is limited to one layer. I do have a skb_ext variant working but
+> > this requires cmsg to set it. Do you think about generic skb_ext which
+> > is set from af_packet? But I don't think it brings much value if I can't
+> > filter on the RX side before returning the packet to userland.
+> > 
+> > > But at this point I see enough options that do not require changes
+> > > to packet sockets.
+> > > 
+> > > To get back to the simplest approach: skb->mark. Is there any
+> > > concrete risk that on this path that would conflict with other
+> > > uses of that field? If packet sockets inject directly into this
+> > > driver (possibly even with PACKET_QDISC_BYPASS)?
+> > 
+> > So I have a skb->mark variant working. I do read on the ethX interface
+> 
+> When reading on both ethX interfaces, that gives you all the info you
+> need on Rx, right? Or alternatively by attaching to hsr0 with
+> SOF_TIMESTAMPING_OPT_PKTINFO.
+> 
+> So skb->mark is only relevant to the Tx side, right? There might be
+> yet another way to identify in the hsr ndo_start_xmit that a packet
+> arrived from a PF_PACKET socket. E.g., by checking skb->sk->sk_family.
+> As alternative or complement to skb->protocol.
+> 
+> Btw, on receive the inverse could also be true: insert a synthetic
+> header and pop that in userspace, e.g., a VLAN tag.
 
+So I made this:
+I open hsr0 for TX with a custom header. The header is expected if the
+ether-type is set to PTP. This extra header holds the HSR-header
+information and port request.
+I open eth0 for RX. I set PACKET_IGNORE_OUTGOING to avoid the feedback
+from hsr0 writes. This is part is crucial ;)
+
+I use skb_ext to pass the information from the inline-header to
+the network driver since the data pointer of the skb is forwarded after
+that header. In the end I have no idea if the network driver supports HW
+offloading and needs this information or not and sends the packet as-is.
+
+HW offloading becomes a bit tricky but relying on skb_ext (for HSR) and
+checking otherwise for the ether type vs PTP (in the PRP case) does the
+trick.
+
+So it is slightly more complicated but seems to work.
+Let me wait until after the merge window and then I present what I have.
+
+Sebastian
 
