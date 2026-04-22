@@ -1,231 +1,222 @@
-Return-Path: <netdev+bounces-280295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280296-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4FY5JmU76GlfHQIAu9opvQ
-	(envelope-from <netdev+bounces-280295-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 05:07:17 +0200
+	id PpwiAChB6GllHwIAu9opvQ
+	(envelope-from <netdev+bounces-280296-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 05:31:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10522441B4C
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 05:07:16 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48525441C5F
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 05:31:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 318173024462
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 03:04:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0A5B6300F12E
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 03:31:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3291E3A3809;
-	Wed, 22 Apr 2026 03:04:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AEAD39A06B;
+	Wed, 22 Apr 2026 03:31:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s+KWwDpw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bs7sHMUH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A823921E7
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 03:04:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776827077; cv=none; b=O0c7k43rgFyHvL+4MJ+Kn1Aufye95sLAGxZEZadzvxaEH63aiIwfyxxiwiqexhk8+Ci93FEV2+DsE1JmYojTltnwv++H7OjX2skGOrYyt0L40NIHXau3ArvUR7uzST+qMGarCPsWG1W/iqc3cf8Y10xY2R0g6EmA4vn8DzfLSgo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776827077; c=relaxed/simple;
-	bh=2yG0Na14H8PIlcd1Ov+DXBcxLTZ/NTxyqyYeMX1t74I=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4BB03A1CD
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 03:31:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776828708; cv=pass; b=ueFL93oFLyezBxyaraCUrJP9mnhpILkwp9TPpiF7KRpwSRGd8WQ61F41+LUDeS91gY/7t4Onrv6EAdRFTHNG5fmVKrZIoTw7v+LNanMbahCfz9s2TRTAjauJ39aVe7+6iGur5JQDPEk5+LJBaOoUv3phrU+gEdKLSud3KtYvTXo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776828708; c=relaxed/simple;
+	bh=N27EOhK7auLzR+/02H89MbksVXXgMOXn2QiPGHDFR7E=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A75Lohh6An6+wPU7gk0S/+0ps9i9VmSwgCQbI3J6/oc1G/5s5nsN5iSIfdQgNsq63PUv4c3lFmsW2qK1jpyCeXb0EU/ejowP6EDqru75R/w5oAwguDWhqmKmCC9kufRF49IQ56f5CRZrLMSKaoNvx1OCwnuCueoVcGeS+W+lGas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s+KWwDpw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6758AC2BCB8
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 03:04:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776827074;
-	bh=2yG0Na14H8PIlcd1Ov+DXBcxLTZ/NTxyqyYeMX1t74I=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=s+KWwDpwVv0yqCrfMHHWg+bpN6sM+xnchwDrlBhkJz0ydnT9rXVPPUBqIxfY1qd1A
-	 L/Wo+mOW67vhsWuemdBIEYzwbpOgKn906IUtL/WOM5tRP39Mj57Rh24NXREt1gSdaJ
-	 la0yLZ8uqCyJzKKSJGzSyknvO2bkOHMGJrdNz6qPxaplGRYb0fpaZsHhpAJEgvX7Mh
-	 1mDt9pb8iKlHfgEuExIjNwJmoumvmnJazDO62TDyEchE/+JcfOhuHlMyBtKOnEwR8y
-	 8KHGcxsAR9O1JS0gdJ1IiEiyafl/qdQYNqnOwBiE+UJgaewGhVGS9jlvWlCBHbOqUf
-	 FpekFGLj6xE2w==
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-38e12c67a6fso48423311fa.1
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 20:04:34 -0700 (PDT)
-X-Gm-Message-State: AOJu0YydHS29AyCo5dGsW+jOYkYpgjXcdUJ3V/64zTnYPQ5QJoQe0GvJ
-	JPgpOi5ON9a2G+dlGHs4tEo2C3jr2pT2oZ2MFEV16I8FAVY67Q8c92sNjyQGrr5uE5Uv/eX1IXc
-	TwPRUhDMtPNq+NZvAG87IV7ccn+dKgsI=
-X-Received: by 2002:a05:651c:e18:b0:38e:d8a3:e08a with SMTP id
- 38308e7fff4ca-38ed8a3e2bemr58167831fa.3.1776827073104; Tue, 21 Apr 2026
- 20:04:33 -0700 (PDT)
+	 To:Cc:Content-Type; b=smQ/6QORU9KT3sGrU0/5mdLcW5Ow602X/pDk2IUaVAoKMbmPlKFaBtZ0noR9ThHst6epPfF3ZVZbBDexYFqAUmcE5Jfd75BdonX34lpHORcdzvLLXeKUKGBQlBghJYuEvJMUUS1NZwAwIBL4RIg4OfeuBmQyqNqImKKKkyqPReI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bs7sHMUH; arc=pass smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-488ff90d6c7so38952795e9.2
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 20:31:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776828705; cv=none;
+        d=google.com; s=arc-20240605;
+        b=a4R8uzmuWeURc3OY4XOIL86+eDLsfCO4UxwV513wypHlIUREjGs88rMHMGFsaFWaQe
+         95EYaYZ/fvMvE10GfnR7v6ST01SdUe97M/nwAqx1sLX1nYeAs9Zsiu/K4el7L7Z4TuSW
+         Id4KqYGf+XW7L5J30TweCvNRt/J8sK35o4EysvXPzxp8sR6kpBSPvuukP85fOLuvEQNj
+         /+TawVwI0yZ0o43hb7kRKRFevmUlyWO7ylpPmQU8RZEw2CYK7tJJmEI1jqnswT0f+qs0
+         0Eh+Ml9y2QP/ZQvpGd0dEu/lmvf7Qd8Eln40MTA27RBj3aNcvUsjzySHxhNmxVLGVWCU
+         anQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ojvQXvOD48VewuoUPRkS6bYSjpL7KnIpoJORaZS/O+Q=;
+        fh=a7Ufb1JAqxeu8Tnq7LPiQ3ahn0D2s6ig/VBLaNuQ+0M=;
+        b=VGbT2IOtsnWE8Q+ZrMf/DPq/7+aSkdaB5OwJwMHNrDuBbG0kFTu1CYVww2UW5iVgMj
+         s2GI18ufEP5r6ebH9uM6NVetunWWfRwTJxQDGKkQYgkCHsURobi1/PBmUaORbXp55jAO
+         mhzg+Lhiu/IDKUfNO7I0S53fUTK0bse7p7tkOLw2w56wf3u420oWtG9XmcuRxe4u14aG
+         MAFS72CrIa6xq2s3O3wjWZ9FTpkD97yWvHDZ40ZSjN/ENL/PRfOEl2spUjsJm+ZIDOiR
+         DtlSIvNge4V8Xl9g+W1YTNlmypmhuU+SiIqSgIYnbsX9/KgJJmwkEvTEWAYiVRS/+5wC
+         28tg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776828705; x=1777433505; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ojvQXvOD48VewuoUPRkS6bYSjpL7KnIpoJORaZS/O+Q=;
+        b=bs7sHMUHMhSjPO0V3Yi6l4qz6SVgLYiW8UEW4BNLiS6VKnFoADaMuDtSK0D1EPAAer
+         G4riYNp7uO7WU7dKhrhVyfvPTdJDEJFRepwsY8PTCuM+BpVDmkrpuNWyx0qfbYI4Ae7F
+         DTM1hO8Hf6Krx++axp8GzKqMZEbWrCcV+FbIfLyQYsTWTecfpSQOh0RJrFlI7TbH+hNT
+         MLMLIET0+gAgBEN9aFcgL7bC5qo4pGNq7f1EyciKad/uSUJgL5jlfCL7q8nluxxwUbGt
+         +UqMH6Nr9ZgtENHukdrOuYeJVVAPh1NZ06KxKv26X3I5MLy188bvUjX6jlY6K7r58rs9
+         Ifqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776828705; x=1777433505;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ojvQXvOD48VewuoUPRkS6bYSjpL7KnIpoJORaZS/O+Q=;
+        b=Mvu/L6yuRXnOgdwLZLC8KxKe16Wx6cdg101dbYUm0RfOqvRR5/tCCp7N6zxM19DdI4
+         e0S6t46XfJ66zQuHVWjCgg23Fyi74a9MqGcX27ALUo7teFp8m35xhtz+PGms9NZ87Gb6
+         XGf+8uJhUU3jmhQJ1d5U4FVqFcIGH7wvO/TL3LcjsqiJu611xQQoAPRqvoqhYDT7D1IE
+         f+rc+pxX6rmZ2ezDgYN/PTQZniQkv6mgNwarMmN2hLk2X4K9/4No86Vpkmfl66raudTu
+         /jcpyF34U0E05RXJakt6gGdV5ZaeWPZVGRSK+6hgxHMBcf4Zj2zfO82rdUysXUq+5/K5
+         S0hg==
+X-Forwarded-Encrypted: i=1; AFNElJ+W2cd4LpSDFJ9kF4YfueHLOoe9yB0dLDPOCu8QHWoE7l3lscq4a8faFbA0G5WhQUro2yoCqbY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwMUE8vcRJcmHPHaDEUt6ge5YaGhRyq5bwQqhR5Euyv8zWDISQ
+	rvafbvkgJYS0gu1PfeOjZHOwtPHQggToXfad1SwGaoo2tqBHU42ZbIL2FEatTTgmNgj+j7q3KO6
+	QcvDAbk40LQrTVFzRUFe3nu7yCRggCUU=
+X-Gm-Gg: AeBDievSPCrOUG0ZNsNWB5ZOi/aklvWxDMHsahrBfp8arAYvPXLpFtf05FabzEx4+vC
+	MkPOBqHZPABq2ZLB6lsHH4BC3d4GoM6zdXg0yoJffNkeqjAn1NJsK/FukALRaH1ClBirSCq6+Sz
+	bXpE9I6EgV3P/i7CQjLXNxmDDDtB93TQmto8JHfS0rgmCqqfJ0f5A9ghAw6f3xdrk47UQJL6vEh
+	T/zBVJrQEccCKrh8LOjq1/i+yHYQR7UQ5Yt70i4eNLRnUnZP1f6y583g2oVUKQ2cL+m3TEE3z/q
+	duQAe3wD5h/4Ybe+YS7t25EnhQsP3uqyQHtTi5tPmPhyOU+I
+X-Received: by 2002:a05:600c:308a:b0:48a:54fd:54ea with SMTP id
+ 5b1f17b1804b1-48a54fd690emr57151705e9.12.1776828705053; Tue, 21 Apr 2026
+ 20:31:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260422024554.130346-1-jt26wzz@gmail.com> <20260422024554.130346-3-jt26wzz@gmail.com>
-In-Reply-To: <20260422024554.130346-3-jt26wzz@gmail.com>
-From: Tamir Duberstein <tamird@kernel.org>
-Date: Tue, 21 Apr 2026 23:03:56 -0400
-X-Gmail-Original-Message-ID: <CAJ-ks9=FKMoczH+Z=GQ7C40T42=zdknYzzHCa8UVFOtq2H69cw@mail.gmail.com>
-X-Gm-Features: AQROBzB5S4pUq6MWULcMd0UwUqFuxUwpBS_8Dval67dyf8v48VLrrsf2Rq-d7OI
-Message-ID: <CAJ-ks9=FKMoczH+Z=GQ7C40T42=zdknYzzHCa8UVFOtq2H69cw@mail.gmail.com>
-Subject: Re: [PATCH net v4 2/2] selftests/bpf: check epoll readiness during
- reuseport migration
-To: Zhenzhong Wu <jt26wzz@gmail.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com, ncardwell@google.com, 
-	kuniyu@google.com, davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20260414013634.43997-1-ahacigu.linux@gmail.com> <CANn89i+vq9O8PJZaDf=0YjcKTM8=-64TcUn-i-F4siGKAMKz+A@mail.gmail.com>
+In-Reply-To: <CANn89i+vq9O8PJZaDf=0YjcKTM8=-64TcUn-i-F4siGKAMKz+A@mail.gmail.com>
+From: Altan Hacigumus <ahacigu.linux@gmail.com>
+Date: Tue, 21 Apr 2026 20:31:32 -0700
+X-Gm-Features: AQROBzD_W2VUpj8A43-4btJkIXSCnCgEm9H24RfUxZJiXFu49vm1cNLBCA21YYU
+Message-ID: <CALjTKDkJ9L-88hdODbt-8D=eEDe6r5egtTfk_RnwgVq_NF+q+g@mail.gmail.com>
+Subject: Re: [PATCH net] tcp: make probe0 timer handle expired user timeout
+To: Eric Dumazet <edumazet@google.com>
+Cc: Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	"David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Enke Chen <enchen@paloaltonetworks.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280295-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280296-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tamird@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[ahacigulinux@gmail.com,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 10522441B4C
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com]
+X-Rspamd-Queue-Id: 48525441C5F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 21, 2026 at 7:46=E2=80=AFPM Zhenzhong Wu <jt26wzz@gmail.com> wr=
-ote:
+On Mon, Apr 20, 2026 at 9:58=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
 >
-> Inside migrate_dance(), add epoll checks around shutdown() to
-> verify that the target listener is not ready before shutdown()
-> and becomes ready immediately after shutdown() triggers migration.
+> On Mon, Apr 13, 2026 at 6:36=E2=80=AFPM Altan Hacigumus <ahacigu.linux@gm=
+ail.com> wrote:
+> >
+> > tcp_clamp_probe0_to_user_timeout() computes remaining time in jiffies
+> > using subtraction with an unsigned lvalue.  If elapsed probing time
+> > already exceeds the configured TCP_USER_TIMEOUT, the subtraction
+> > underflows and yields a large value.
+> >
+> > Handle this expiration case similarly to tcp_clamp_rto_to_user_timeout(=
+).
+> >
+> > Fixes: 344db93ae3ee ("tcp: make TCP_USER_TIMEOUT accurate for zero wind=
+ow probes")
+> > Signed-off-by: Altan Hacigumus <ahacigu.linux@gmail.com>
+> > ---
+> >  net/ipv4/tcp_timer.c | 5 ++++-
+> >  1 file changed, 4 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+> > index 5a14a53a3c9e..4a43356a4e06 100644
+> > --- a/net/ipv4/tcp_timer.c
+> > +++ b/net/ipv4/tcp_timer.c
+> > @@ -50,7 +50,8 @@ static u32 tcp_clamp_rto_to_user_timeout(const struct=
+ sock *sk)
+> >  u32 tcp_clamp_probe0_to_user_timeout(const struct sock *sk, u32 when)
+> >  {
+> >         const struct inet_connection_sock *icsk =3D inet_csk(sk);
+> > -       u32 remaining, user_timeout;
+> > +       u32 user_timeout;
+> > +       s32 remaining;
+> >         s32 elapsed;
+> >
+> >         user_timeout =3D READ_ONCE(icsk->icsk_user_timeout);
+> > @@ -61,6 +62,8 @@ u32 tcp_clamp_probe0_to_user_timeout(const struct soc=
+k *sk, u32 when)
+> >         if (unlikely(elapsed < 0))
+> >                 elapsed =3D 0;
+> >         remaining =3D msecs_to_jiffies(user_timeout) - elapsed;
+> > +       if (remaining <=3D 0)
+> > +               return 1;
 >
-> Cover TCP_ESTABLISHED and TCP_SYN_RECV. Exclude TCP_NEW_SYN_RECV
-> as it depends on later handshake completion.
+> I do not think this chunk is needed ?
+> If @remaining is signed, then perhaps change the following line to:
 >
-> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
-> Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
-> Signed-off-by: Zhenzhong Wu <jt26wzz@gmail.com>
-> ---
->  .../bpf/prog_tests/migrate_reuseport.c        | 49 ++++++++++++++++---
->  1 file changed, 42 insertions(+), 7 deletions(-)
+> remaining =3D max_t(int, remaining, TCP_TIMEOUT_MIN);
 >
-> diff --git a/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c b=
-/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
-> index 653b0a20f..c62907732 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
-> @@ -7,24 +7,29 @@
->   *   3. call listen() for 1 server socket. (migration target)
->   *   4. update a map to migrate all child sockets
->   *        to the last server socket (migrate_map[cookie] =3D 4)
-> - *   5. call shutdown() for first 4 server sockets
-> + *   5. for TCP_ESTABLISHED and TCP_SYN_RECV cases, verify via epoll
-> + *        that the last server socket is not ready before migration.
-> + *   6. call shutdown() for first 4 server sockets
->   *        and migrate the requests in the accept queue
->   *        to the last server socket.
-> - *   6. call listen() for the second server socket.
-> - *   7. call shutdown() for the last server
-> + *   7. for TCP_ESTABLISHED and TCP_SYN_RECV cases, verify via epoll
-> + *        that the last server socket is ready after migration.
-> + *   8. call listen() for the second server socket.
-> + *   9. call shutdown() for the last server
->   *        and migrate the requests in the accept queue
->   *        to the second server socket.
-> - *   8. call listen() for the last server.
-> - *   9. call shutdown() for the second server
-> + *  10. call listen() for the last server.
-> + *  11. call shutdown() for the second server
->   *        and migrate the requests in the accept queue
->   *        to the last server socket.
-> - *  10. call accept() for the last server socket.
-> + *  12. call accept() for the last server socket.
->   *
->   * Author: Kuniyuki Iwashima <kuniyu@amazon.co.jp>
->   */
->
->  #include <bpf/bpf.h>
->  #include <bpf/libbpf.h>
-> +#include <sys/epoll.h>
->
->  #include "test_progs.h"
->  #include "test_migrate_reuseport.skel.h"
-> @@ -350,21 +355,51 @@ static int update_maps(struct migrate_reuseport_tes=
-t_case *test_case,
->
->  static int migrate_dance(struct migrate_reuseport_test_case *test_case)
->  {
-> +       struct epoll_event ev =3D {
-> +               .events =3D EPOLLIN,
-> +       };
-> +       int epoll =3D -1, nfds;
->         int i, err;
->
-> +       if (test_case->state !=3D BPF_TCP_NEW_SYN_RECV) {
-> +               epoll =3D epoll_create1(0);
-> +               if (!ASSERT_NEQ(epoll, -1, "epoll_create1"))
-> +                       return -1;
-> +
-> +               ev.data.fd =3D test_case->servers[MIGRATED_TO];
-> +               if (!ASSERT_OK(epoll_ctl(epoll, EPOLL_CTL_ADD,
-> +                                        test_case->servers[MIGRATED_TO],=
- &ev),
-> +                              "epoll_ctl"))
-> +                       goto close_epoll;
-> +
-> +               nfds =3D epoll_wait(epoll, &ev, 1, 0);
-> +               if (!ASSERT_EQ(nfds, 0, "epoll_wait 1"))
-> +                       goto close_epoll;
-> +       }
-> +
->         /* Migrate TCP_ESTABLISHED and TCP_SYN_RECV requests
->          * to the last listener based on eBPF.
->          */
->         for (i =3D 0; i < MIGRATED_TO; i++) {
->                 err =3D shutdown(test_case->servers[i], SHUT_RDWR);
->                 if (!ASSERT_OK(err, "shutdown"))
-> -                       return -1;
-> +                       goto close_epoll;
->         }
->
->         /* No dance for TCP_NEW_SYN_RECV to migrate based on eBPF */
->         if (test_case->state =3D=3D BPF_TCP_NEW_SYN_RECV)
->                 return 0;
->
-> +       nfds =3D epoll_wait(epoll, &ev, 1, 0);
-> +       if (!ASSERT_EQ(nfds, 1, "epoll_wait 2")) {
-> +close_epoll:
-> +               if (epoll >=3D 0)
-> +                       close(epoll);
-> +               return -1;
-> +       }
 
-I think you can avoid this goto using `__attribute__((cleanup(...))`:
+The if (remaining <=3D 0) return 1 handles the already-expired case and
+mirrors the logic in tcp_clamp_rto_to_user_timeout().
 
-  static void close_fd(int *fd)
-  {
-        if (*fd >=3D 0)
-                close(*fd);
-  }
+max_t(s32, remaining, TCP_TIMEOUT_MIN) with remaining changed to s32
+also fixes the underflow; I used the explicit early return for symmetry
+with the RTO helper, but I can switch that in v2 if you prefer.
 
-  #define __close_fd __attribute__((cleanup(close_fd)))
+> Also, it would be great to have a  new packetdrill test.
+>
 
-then in the test:
+With packetdrill, AFAICS it would require a late ACK to be processed
+after TCP_USER_TIMEOUT has elapsed but before tcp_probe_timer() runs the
+abort check - i.e. a race between the RX softirq path and the timer.
+This is not purely an event/packet ordering problem, so it is not clear
+to me how a deterministic behavior can be simulated with packetdrill
+without tying it to exact probe timing.
 
-__close_fd int epoll =3D -1;
+> >         remaining =3D max_t(u32, remaining, TCP_TIMEOUT_MIN);
+> >
+> >         return min_t(u32, remaining, when);
+> > --
+> > 2.43.0
+> >
 
-there's an example of this in
-tools/testing/selftests/bpf/prog_tests/socket_helpers.h.
+Thanks
 
