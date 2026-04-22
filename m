@@ -1,79 +1,93 @@
-Return-Path: <netdev+bounces-280407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280403-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IPkOLePB6Gm9PwIAu9opvQ
-	(envelope-from <netdev+bounces-280407-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 14:41:07 +0200
+	id 0K7DCKXB6Gm9PwIAu9opvQ
+	(envelope-from <netdev+bounces-280403-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 14:40:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31A11446138
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 14:41:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9795446122
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 14:40:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E96BD30598C5
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:36:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 21CD1306C376
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:33:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF793DCD9F;
-	Wed, 22 Apr 2026 12:35:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD1B73D3D1B;
+	Wed, 22 Apr 2026 12:33:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XtRsKYsH"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="GGrf3Nzr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB5F3DC4C7
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 12:35:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 155583D34B6
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 12:33:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776861357; cv=none; b=Vc1M1in8+0DsTe7ZsgBXYw/QaamWyKiXhW2TKk3p13fZhQxah6Ps5SAcHy5cMwW/JC06Yj+RkbFwX+6WQs7atLmj4/3TRNmZ/73PqYgVGQ/uqaOFFwAIbwnyTktPIrIs9GtSa7r+i0nrhcJbDoJOPFpFk1L4G4d6gCEfCA4wGkY=
+	t=1776861184; cv=none; b=YRG54QvK7poc/+LF3HWTnMjeXiBzU9UxBWIm571K2kCZsTMXFZHxwMafSRwhrVwSCbaoDJoWuLDW4kTRHsVEnuBPBoWyrPpVJFGey+c5kHSu7FtziNIvBc3jVEuIpd7NXYHmUh5oql5ii5orVCMpOrLgxF9dkPRgAS1EEoWyjzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776861357; c=relaxed/simple;
-	bh=wDLA3/GJGEO1IbM955Q5FElcfpvCOUEomPnwlKEBe7g=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Nq0RWKLevBUBbRQx827DfPAhw0NuS5dpxo95ax62KL8vlvE2yw/W/v0oJiHUdeNcwO5FNGExx8Sl5tA7m+VvUlOkwUYegP/Al1rutE7JeQrnLqZ5C9YaS3By49fVRN1sXzi/SlwLLmi+DaS8zbMKPRt7XllXPzdyTvbmPpOEiS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XtRsKYsH; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776861354; x=1808397354;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=wDLA3/GJGEO1IbM955Q5FElcfpvCOUEomPnwlKEBe7g=;
-  b=XtRsKYsHLMMIOvBawBL7pVE0F3l7lPgw1J3Dd4mnjYZWONW7GkpKKe5Y
-   /csQC2k2c2xQ7u1qLX5tshUe24HDkDEjcV/wn0azWzm400gLPEXymVQwY
-   9li/0BgpcfDCQn7GQ2VsXQjt7LYDc2ywQ2Gh1nE7xLN3uJ5CgRqFNOica
-   C6rrEcQFJ5ChTgCk3XF0GKnO0Nl90dXGU2+9SNgpo6vYDkNUyXCrYCi+T
-   lET8sjunlJYCVxK7xd6vdikoRkPvISRABiun18orZ1zkKwuMxnaGm/rZJ
-   UJR1S4MZWkEpT6aeO0L+y4MDQLAMGcRzV5pKPROGv60JPqpDar8Iz97lo
-   A==;
-X-CSE-ConnectionGUID: 2S1JhPu4TPm1/ZEqjjsBeg==
-X-CSE-MsgGUID: 7l5HGe8ASBuZ7DcXmGh2rQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11764"; a="77826165"
-X-IronPort-AV: E=Sophos;i="6.23,192,1770624000"; 
-   d="scan'208";a="77826165"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2026 05:35:54 -0700
-X-CSE-ConnectionGUID: jnPp+D69RzWk8HTMMSZLhg==
-X-CSE-MsgGUID: SIJp+xLLQbOKFjQTNtXCzw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,192,1770624000"; 
-   d="scan'208";a="229167437"
-Received: from gklab-003-001.igk.intel.com ([10.91.173.48])
-  by fmviesa007.fm.intel.com with ESMTP; 22 Apr 2026 05:35:52 -0700
-From: Grzegorz Nitka <grzegorz.nitka@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	Grzegorz Nitka <grzegorz.nitka@intel.com>,
-	Arkadiusz Kubalewski <Arkadiusz.kubalewski@intel.com>
-Subject: [PATCH iwl-net 2/2] ice: ptp: use primary NAC semaphore on E825
-Date: Wed, 22 Apr 2026 14:31:44 +0200
-Message-Id: <20260422123144.485930-3-grzegorz.nitka@intel.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20260422123144.485930-1-grzegorz.nitka@intel.com>
-References: <20260422123144.485930-1-grzegorz.nitka@intel.com>
+	s=arc-20240116; t=1776861184; c=relaxed/simple;
+	bh=QTh9wIlAamYhNlvoCiK1+h7aKAQjQuM99xpPXTv1Kq0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P+fIbKUa16rX7jLDVHcERigg+b+ZGx7HK9FS7D24E/ME4QSqtp9LeccMzW3tuVhKCqcr5D8mBeW09O/SWy9P21Ggp+0Kjn113MartQMNMkf+z8Aln4wD3sFd8U+VjWJEf8UwKhqHDkdTeP//2tgjKmBjkO5iz1h+v5+PuMxsN5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=GGrf3Nzr; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-488a9033b2cso60634425e9.2
+        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 05:33:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1776861181; x=1777465981; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pKIN0Wfe+CN+De0VB8LYO0G8+rdIAPkkf5uWjG4wwcs=;
+        b=GGrf3NzrRfc+PmyPIDgbI9e0/JlH555uASFSdcniUfohcoPXfaxd+m0L/fLjQCRJ8n
+         XlNkw6B1QyDIOR6N/c7FksVDYREjiJW+1+zC4IbDy3Jj8RBYeXlObwZQ2oUnfjk0r8H0
+         aAK90EJ0AOnvslz6Zo+moAmgq83uv2gtd1zi0GOZ4z8mhYyp9/rfaxbkTMULs/4vc1bQ
+         L+wu+klotxht8B5Sc61j8IZgZ+zsEo7uGZXY+E84bwpipIfSECCV9ECwqBs8RdrTK6yA
+         Ce/aFaDGmG7iQSyZBmqtOwnztmdScDuQV15MDlfp5b99Ls0egxn+bP7fLe2QeqFEopLc
+         WbxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776861181; x=1777465981;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pKIN0Wfe+CN+De0VB8LYO0G8+rdIAPkkf5uWjG4wwcs=;
+        b=giGGqe97QqTBcwHP/e4IJ+OrDzaM7FxbwovscLz876ITghTPLY/IZqp+D8HYuxSiY5
+         4Wo0DSyOolfaZFKtUwlZh4U7TQAxYmlhTl4qz2yaVyMu+oSrnEgpilMw9BsVqfcSknJi
+         9wtvhYfydgLkmckWgU0RNjtmjBppQSksHW2CyUoy5C/cYluFSYB4gQJTvVwGqffQOKzN
+         tdNt4DVyaWhvkbGItGbk6f5Sz1dyxvnYOTC30Qj3bxh3Ro8f2QySSBurs+DJCn5TUNKJ
+         EnF8981AocL3WkD3q9aaMsAIai799v3Z7HQL3Ca2tTf90NV8GQJQoQNBoGH2Dxx1/WJ+
+         ncNg==
+X-Gm-Message-State: AOJu0YzWDvFxrNhcQ6Mfwug5mlQX/kk7rejnxow+jKWBcnTrLZ3T0nhH
+	PGMkpR8+wz1d4XccMSZyVVCdNpUn4owFcqBIRDARXnap4EA8hj70k8VUscXsFxfnNjCn+9ofnbA
+	SFU1wim4jGagaNyJ6Zh4gsiZtW+RStf5dfAKvI8OW4j8enma0FV+OgBdEdMj0uP6e
+X-Gm-Gg: AeBDievTXayqmi3jwZTDG1Sot7k6iGyomZiIlZlPve3TYwHJwqEoohL+Mp06ArCmq5C
+	FV+vngNTQHlNNQ6LW8+y+lMMnL5shkYDxlh4Z/aOT65uzACGVA8botrJabHYTutPvL1yY7fZrt6
+	bwYsjz+SnUDxeu0irEMqq4hegOCiXEeXrOf6AVcE/JtC9JCSAb6Gz4rTMJt8AQy6cqd87EI7/xb
+	9kbAFlO0YuE4glpSk+Tug7LwLwUmspuObApuqyL8ka6jaqH/85YRlNYIOrhVvWgPVuKnj43eYeJ
+	vc3q7wCvnq7JxtSSU0HgylCLUGga59GZmO8KvBXAq1JcQf9v2KcGnH1NHs+JwJ/mzTKLzYeXO6N
+	PSQSvg9r/yyopXAavmKqlSXLQu4zMT2ibtAQHuiRG7qi9PQlr456/6uMU6v3trI1ybziPgtv2tz
+	sUFD+e0MWDEE81gdDTS/JCmy7qvOYT/qzvQSX5ZFbHI+GkacE=
+X-Received: by 2002:a05:600c:12d4:b0:489:1f04:96c3 with SMTP id 5b1f17b1804b1-4891f049763mr107158945e9.2.1776861180984;
+        Wed, 22 Apr 2026 05:33:00 -0700 (PDT)
+Received: from inifinity.mandelbit.com ([2001:67c:2fbc:1:9c05:1850:4a76:783e])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fb74c68asm139657135e9.3.2026.04.22.05.32.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Apr 2026 05:33:00 -0700 (PDT)
+From: Antonio Quartulli <antonio@openvpn.net>
+To: netdev@vger.kernel.org
+Cc: Antonio Quartulli <antonio@openvpn.net>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Ralf Lici <ralf@mandelbit.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>
+Subject: [PATCH net 0/1] pull request: fixes for ovpn 2026-04-22
+Date: Wed, 22 Apr 2026 14:32:41 +0200
+Message-ID: <20260422123242.530882-1-antonio@openvpn.net>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,88 +95,78 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280407-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FROM_NEQ_ENVFROM(0.00)[grzegorz.nitka@intel.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280403-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.982];
+	DKIM_TRACE(0.00)[openvpn.net:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
-X-Rspamd-Queue-Id: 31A11446138
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,openvpn.net:dkim,openvpn.net:mid]
+X-Rspamd-Queue-Id: D9795446122
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-For E825 2xNAC configurations, PTP semaphore operations must hit the
-primary NAC register block so both sides coordinate on the same lock.
+Hello netdev team,
 
-Commit e2193f9f9ec9 ("ice: enable timesync operation on 2xNAC E825
-devices") updated other primary-only PTP register accesses to
-use the primary NAC on non-primary functions, but left ice_ptp_lock()
-and ice_ptp_unlock() operating on the local NAC. As a result, secondary
-NAC PTP paths can take a different semaphore than the primary side.
+This PR is a new version of the one sent on March 20th.
+We are trying to address a remote, yet possible, race condition between
+tearing down an ovpn interface and adding new peers via netlink.
 
-Select the primary hardware in ice_ptp_lock() and ice_ptp_unlock() when
-the current function is not primary, keeping semaphore operations
-symmetric and consistent with the rest of the 2xNAC PTP register access
-path.
+After further discussion including Jakub and Sabrina, the following
+patch came up.
 
-Fixes: e2193f9f9ec9 ("ice: enable timesync operation on 2xNAC E825 devices")
-Reviewed-by: Arkadiusz Kubalewski <Arkadiusz.kubalewski@intel.com>
-Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+It should address all raised concerns.
+Sorry for taking so long to get back to this.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 8bb94e785f2a..2c18e16fe053 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -5264,9 +5264,13 @@ static void ice_ptp_init_phy_e830(struct ice_ptp_hw *ptp)
-  */
- bool ice_ptp_lock(struct ice_hw *hw)
- {
-+	struct ice_pf *pf = container_of(hw, struct ice_pf, hw);
- 	u32 hw_lock;
- 	int i;
- 
-+	if (!ice_is_primary(hw))
-+		hw = ice_get_primary_hw(pf);
-+
- #define MAX_TRIES 15
- 
- 	for (i = 0; i < MAX_TRIES; i++) {
-@@ -5293,6 +5297,11 @@ bool ice_ptp_lock(struct ice_hw *hw)
-  */
- void ice_ptp_unlock(struct ice_hw *hw)
- {
-+	struct ice_pf *pf = container_of(hw, struct ice_pf, hw);
-+
-+	if (!ice_is_primary(hw))
-+		hw = ice_get_primary_hw(pf);
-+
- 	wr32(hw, PFTSYN_SEM + (PFTSYN_SEM_BYTES * hw->pf_id), 0);
- }
- 
--- 
-2.39.3
+Please pull or let mw know of any issue!
 
+Thanks a lot,
+	Antonio
+
+
+The following changes since commit 478ed6b7d2577439c610f91fa8759a4c878a4264:
+
+  net/sched: sch_dualpi2: drain both C-queue and L-queue in dualpi2_change() (2026-04-21 15:00:39 +0200)
+
+are available in the Git repository at:
+
+  https://github.com/OpenVPN/ovpn-net-next.git tags/ovpn-net-20260422
+
+for you to fetch changes up to eac0dfc41d179d5f78d6d7ee401c63f48ba04b5a:
+
+  ovpn: fix race between deleting interface and adding new peer (2026-04-22 14:30:17 +0200)
+
+----------------------------------------------------------------
+Included change:
+* fix race condition between interface teardown and new peer being
+  added via netlink
+
+----------------------------------------------------------------
+Antonio Quartulli (1):
+      ovpn: fix race between deleting interface and adding new peer
+
+ drivers/net/ovpn/main.c | 12 ++----------
+ drivers/net/ovpn/peer.c |  8 ++++++++
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
