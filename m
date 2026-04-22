@@ -1,187 +1,167 @@
-Return-Path: <netdev+bounces-280515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280516-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sDkHHgsB6Wl5SgIAu9opvQ
-	(envelope-from <netdev+bounces-280515-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 19:10:35 +0200
+	id wOIcCVgB6Wl5SgIAu9opvQ
+	(envelope-from <netdev+bounces-280516-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 19:11:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEB424492E2
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 19:10:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CFC84492FC
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 19:11:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 20DEE303F7CC
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 17:06:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B22843076DDF
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 17:07:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 722C9382F20;
-	Wed, 22 Apr 2026 17:06:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26DF8383C79;
+	Wed, 22 Apr 2026 17:07:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cq3dH9RI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dBo+th1H"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC0A33F593;
-	Wed, 22 Apr 2026 17:06:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776877616; cv=none; b=qvL8Pi+j0KrhvFVpgDzujGTC3JjeUvW/X1v3UnpvmhpWgntsZ45JvSfETJw7gPbXtwLwmETg176rTWTw5AIwmXgA10Owfzli6TGikJsa0oZeHrLGsmKaz3fW4gopxTFd5cpTw041k/uE4y4+yxWVwwT5PtG/zZm9QKoWWXQUPm8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776877616; c=relaxed/simple;
-	bh=1jJXo85jXbFFhSP6at4arBQQAL/KtSBYU+cDxLEzjRg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BeW6w++OeYzYAsYoT/3vJMnuZw6XorzSmupPbrwYs17HqPZcANJvacKBTS7PZajbIBNQd2ISkKFkSWtIWIQM3z5pYGxSAoB+u1Zyd9cRDka3VVSKS3ETE0BoajYSw12f9WRPspJumZQeg62hHWZbpFWScaR6PDDeS/oOqqEiuFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cq3dH9RI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C58FEC19425;
-	Wed, 22 Apr 2026 17:06:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776877615;
-	bh=1jJXo85jXbFFhSP6at4arBQQAL/KtSBYU+cDxLEzjRg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cq3dH9RIdZpd36w+Aa1lS8vqs6DsAlKh6NPY+uXbLxODjxT53cF6bBEoVIjT9OnJG
-	 p90YgfnMVFZUjg6tjvBIUTcUS1NT/rvJW04CRnfMnf9EoID7bw9nPpWec205UpSCds
-	 T3fSvLxavPMTFGYgltayMjxtw8bmMeVIYUsKHhl0ojqzZazqlnoo1EXPozP6Fz17EX
-	 bXhFOYUD6eefLP62fJV5weGW1K21Xcf+6fSV+/G2P6h1mH67xRYbQi0OtlJalwJvVR
-	 gkImzCIUp3NLL5nHHc/j9CT5+Pin56rI76DaHW1KoXTW3vfQVdj6wVOGVvLhU2TJz8
-	 gbFFA5Vklf7gA==
-From: Simon Horman <horms@kernel.org>
-To: vikas.gupta@broadcom.com
-Cc: 'Simon Horman' <horms@kernel.org>,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	vsrama-krishna.nemani@broadcom.com,
-	bhargava.marreddy@broadcom.com,
-	rajashekar.hudumula@broadcom.com,
-	ajit.khaparde@broadcom.com,
-	dharmender.garg@broadcom.com,
-	rahul-rg.gupta@broadcom.com
-Subject: Re: [PATCH net v3 1/2] bnge: fix initial HWRM sequence
-Date: Wed, 22 Apr 2026 18:06:41 +0100
-Message-ID: <20260422170641.846322-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260418023438.1597876-2-vikas.gupta@broadcom.com>
-References: <20260418023438.1597876-2-vikas.gupta@broadcom.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA1F6382F1B
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 17:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.180
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776877630; cv=pass; b=QoVzQE+/otgr07ShHMFsOItNpM0oc74nwKOQe8zuH3//WUbW3uu7uMZCnhc0mdPxXkUWQIEm1NzjOlEJHnsvvtVmTjB91PG/t9MdHG4ljFYhglvbs/Yn0raq0mzyUoSeumA3cK2cfgccBDVyuMQbcq/PEox0zkQQzBXUwytzX8g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776877630; c=relaxed/simple;
+	bh=FPixIxhrPig/IiqM6bhPh/F0pcSNj18lhL/V/CNMZ68=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MGYRw1/8vi+cCcu0vNlQ3POWvItwx9h7vqrxQ6yl+6R2y1m2tZJ7VOm96L8jY0bKtdpFFA/RWYHITn420HleEBvFlmW3oZMdE5kTwBATqJ1EHKghFiKpasgsPH+JKg3CHS8QZ8TcIN3GvmJMRnFboAvgt3ndFDraf2rdr2OR1wA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dBo+th1H; arc=pass smtp.client-ip=209.85.128.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-797ab169454so75481347b3.3
+        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 10:07:08 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776877628; cv=none;
+        d=google.com; s=arc-20240605;
+        b=EDes5L5cRftkDO/QzbPagAymg6Z5n3NvaiN8TlFWarVZShE5EE1hd3rlVh7YL6H1gw
+         UDKppTUe5RVKfv87PtQ5TcHgECaiprV3plcTQoJ3Vvl1AI15yDG7xOcdAlnKW+0kOAGg
+         OSwBYQTygNqYUqqbEflbsfTWu5s+iLgLO3xMH9JpmkjBugNBHz2CFmaNCntOkI4jl3pz
+         ssEAQ4YFrPq37Sa1VQNFxIPbvd1XdS3CJSPYlSLHeuwFaL8IVmM2G36d6TILIxB5qsV1
+         ABt9u5bUy0AgnSCpbqMC/rkhXaic84+gGqpxnpAnLYMbvaC1sTkhLJcKPebcQsEyVxVM
+         LjTg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=FPixIxhrPig/IiqM6bhPh/F0pcSNj18lhL/V/CNMZ68=;
+        fh=5/43plroHvErNJh+j1DjC41SBJOM/VGI1bxx3F6YEpc=;
+        b=WYzMKAfclkipTslnjvFYYN962qOuyI2lC6H30/Hw+ayAQFkmKtZCi3U/p8IbREapVm
+         UB9IGEoR/FL7mzDgGtFCitelIfRVOyouYEUKSoFLh7Pn8SiVfVhtXw1X8rrN3g98EQVU
+         MVQzLAtabtSfDv/TsMGYbY6BVsYnuCM7upu9ieD6xqXdjSPr0vfUK8+pcHkiV2Oo8aqi
+         w0e/6mTUeSqimZUjioAm/YEPp6AJIdloNqr1+L2IolfYSEgGlULPSPzDyy5hDL2fxXC8
+         924sROQgZ+iLQdi3/TNbTXKdKjP/d3fIM3q1en0qMY6x/84FPslCPlMf4GuLHxNQhSqI
+         ooEg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776877628; x=1777482428; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FPixIxhrPig/IiqM6bhPh/F0pcSNj18lhL/V/CNMZ68=;
+        b=dBo+th1HX6Ki81bzuFsP6Cmu0zpIwe1XJI0BqX8zMq8dfo5ZlZMUYFSgJL/yQ7T/Ws
+         w910rYMKfqRxg3c0MUjpsXInfBv/OqHTxDVQA9IK4jz4AseHEzC5T/OwZ5gfFBvRv9Jx
+         xFooWuzX5aqeZxPk6rsCTd+jqrcSsqaov+EBAxn/i/buFeWwWSHYAY4qeaw5j+k+a3GM
+         09k/pu4Xnv4MUfruTM+HvhCKf3Pz2aab1w8NO2yZ7PvfMz2nFoUTfeNk/dEPXCY2dYIG
+         kPWcDwqtbfTO+GOHWOvMC+ytZiVQmk4M49saB9e4rn2RgRsMxb19HR/CdFQI2rNeMfv8
+         P2gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776877628; x=1777482428;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=FPixIxhrPig/IiqM6bhPh/F0pcSNj18lhL/V/CNMZ68=;
+        b=XdSHtw/ffWQQHGsDs0vQQcPFJ21omqpf9rBkjg/lRVpkuPI2rjXdJU6YmerKRNmub/
+         6IveS5T3wFS2jYewGbUgC0jzOHg38xvndl1K8ubCDrbT4wwYuKbkPYnBeilcPFYGthWl
+         Wqh1G97tmBtK9jzoqcuAHNMfH/5iE5PfIowG3OJI9Xbl+RbK1rNvzoGr+dJ72e5ytUhY
+         6q0GETk/UXSxocA5nJCHtVnUBu4aChqZ3v6z48c1qGatsQ2Z0U0aUuB7BZqW14shRXSd
+         v6IImS3ZfgV2fcsaAF8W+ywhUEO3maIyB1zlqKbB9vlOqgTlCOjew+DSQO6AabZ7JKTz
+         n5Ag==
+X-Forwarded-Encrypted: i=1; AFNElJ/qUrExg9rSScyIT78rAwACB6nLpZCdQREHr2bIjdclL0Am0FNmLcloishLADLoHUd9nANQfSg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvtcAu6n930DOkmcFWf/bzE7OQNJSm5ppqCxnPZN4CZWHw9+SE
+	gzDQqlzpb5XMH0B9RhUDjSDg8/O9uAF0cx+le+MRc2ZghXVWXs/NMRFnoTpg3b+cN/5gYzr4SOQ
+	FmF61ivkqi2orErWRFTfzVnpCghNLO8Q=
+X-Gm-Gg: AeBDieugqsG/35PPwXZ+be9fyC+gNBH5bJ65A36qTQff5E/7npf+5q4wLJ6IYPU3u0n
+	QuOH2tou5whMfF9QkvTEc9lY+xO7L2PVUebsR0A1GBgFGAD0Qm8S4pPbyZSPZBnexrCMoF12h6e
+	GxmrkvvLi+b38aLyfGn5DWU74G8eD/KoadYC1trQMrbUoEby3ocNdHXEeg2v5MqWXACERMZdjLn
+	fCrLxX/VIp/nCrtt2F3gxJCMbkX1Bp4Fz2Am0xOnXylDwvwZgVXPdJEwstNVWhTD7ZL4OlmDubf
+	0Yz/OA+xVW2byRBCxFLaD2gsz/3rsUU+JsV66miaHsw/HSM=
+X-Received: by 2002:a05:690e:dc9:b0:654:403b:6440 with SMTP id
+ 956f58d0204a3-654403b6530mr7740662d50.7.1776877627775; Wed, 22 Apr 2026
+ 10:07:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+References: <20260422160342.1975093-1-michael.bommarito@gmail.com> <aej66UTWzQ74dven@home.paul.comp>
+In-Reply-To: <aej66UTWzQ74dven@home.paul.comp>
+From: Michael Bommarito <michael.bommarito@gmail.com>
+Date: Wed, 22 Apr 2026 13:06:56 -0400
+X-Gm-Features: AQROBzDyQerIYJyyKMBWKNov1ZNnl-U6PdegiDgXORgyw06owREmKLKMo20mu3k
+Message-ID: <CAJJ9bXyoAND+CzLqY=jGWdtaY33jeLWf0sBbj-6OXHyXudqjUQ@mail.gmail.com>
+Subject: Re: [PATCH net 0/6] net/ncsi: harden packet parsing against malformed
+ BMC replies
+To: Paul Fertser <fercerpav@gmail.com>
+Cc: Samuel Mendoza-Jonas <sam@mendozajonas.com>, netdev@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-280515-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-280516-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
-X-Rspamd-Queue-Id: CEB424492E2
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 6CFC84492FC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: 'Simon Horman' <horms@kernel.org>
+On Wed, Apr 22, 2026 at 12:44=E2=80=AFPM Paul Fertser <fercerpav@gmail.com>=
+ wrote:
+> The code your patches modify always runs only on the BMC itself, the
+> packets parsed are generated by a NIC directly.
+>
+> So if anything, the threat model here is compromised NIC
+> firmware. MITMing sounds unlikely as that would require tricky
+> hardware modifications and if you can do that it's easier to put a
+> modified NIC instead.
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-bnge: fix initial HWRM sequence
+Thanks for the correction, I definitely got that backwards!
 
-Firmware may not advertize correct resources if backing store is not
-enabled before resource information is queried.
-Fix the initial sequence of HWRMs so that driver gets capabilities
-and resource information correctly.
+Should I submit a v2 with the corrected notes or wait for any other
+feedback / review on patch substance (assuming you think it's actually
+worth merging)?
 
-> diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_core.c b/drivers/net/ethernet/broadcom/bnge/bnge_core.c
-> index 1c14c5fe8d613..68b74eb2c3a29 100644
-> --- a/drivers/net/ethernet/broadcom/bnge/bnge_core.c
-> +++ b/drivers/net/ethernet/broadcom/bnge/bnge_core.c
-[ ... ]
-> @@ -133,23 +140,28 @@ static int bnge_fw_register_dev(struct bnge_dev *bd)
->  
->  	bnge_hwrm_fw_set_time(bd);
->  
-> -	rc =  bnge_hwrm_func_drv_rgtr(bd);
-> +	/* Get the resources and configuration from firmware */
-> +	rc = bnge_func_qcaps(bd);
->  	if (rc) {
-> -		dev_err(bd->dev, "Failed to rgtr with firmware rc: %d\n", rc);
-> +		dev_err(bd->dev, "Failed querying caps rc: %d\n", rc);
->  		return rc;
->  	}
->  
->  	rc = bnge_alloc_ctx_mem(bd);
->  	if (rc) {
->  		dev_err(bd->dev, "Failed to allocate ctx mem rc: %d\n", rc);
-> -		goto err_func_unrgtr;
-> +		goto err_free_ctx_mem;
->  	}
->  
-> -	/* Get the resources and configuration from firmware */
-> -	rc = bnge_func_qcaps(bd);
-> +	rc = bnge_hwrm_func_drv_rgtr(bd);
->  	if (rc) {
-> -		dev_err(bd->dev, "Failed initial configuration rc: %d\n", rc);
-> -		rc = -ENODEV;
-> +		dev_err(bd->dev, "Failed to rgtr with firmware rc: %d\n", rc);
-> +		goto err_free_ctx_mem;
-
-Does this regression leave the hardware with active DMA pointers to freed
-memory?
-
-If bnge_alloc_ctx_mem() allocates host DMA memory and passes the addresses
-to the firmware via bnge_hwrm_func_backing_store(), and then
-bnge_hwrm_func_drv_rgtr() fails, the code jumps directly to err_free_ctx_mem.
-
-> +	}
-> +
-> +	rc = bnge_func_qrcaps_qcfg(bd);
-> +	if (rc) {
-> +		dev_err(bd->dev, "Failed querying resources rc: %d\n", rc);
->  		goto err_func_unrgtr;
->  	}
->  
-> @@ -158,7 +170,9 @@ static int bnge_fw_register_dev(struct bnge_dev *bd)
->  	return 0;
->  
->  err_func_unrgtr:
-> -	bnge_fw_unregister_dev(bd);
-> +	bnge_hwrm_func_drv_unrgtr(bd);
-> +err_free_ctx_mem:
-> +	bnge_free_ctx_mem(bd);
-
-Since the err_func_unrgtr label is bypassed, is the firmware ever told to
-drop the backing store configuration before the host frees the memory in
-bnge_free_ctx_mem()?
-
-In the pre-patch sequence, the driver was registered first, so any failure
-subsequently triggered a driver unregister, which implicitly told the
-firmware to drop the backing store configuration. With the new order, does
-the firmware maintain active DMA pointers to the freed host memory?
+Thanks,
+Mike Bommarito
 
