@@ -1,208 +1,228 @@
-Return-Path: <netdev+bounces-280318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280319-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0MjgOiJm6GkLKAIAu9opvQ
-	(envelope-from <netdev+bounces-280318-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 08:09:38 +0200
+	id 6EQbEk5m6GkLKAIAu9opvQ
+	(envelope-from <netdev+bounces-280319-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 08:10:22 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A8904424D3
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 08:09:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C148E4424F0
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 08:10:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 47017304D41D
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 06:06:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 333CC3059E16
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 06:06:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD66D2DCC08;
-	Wed, 22 Apr 2026 06:06:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C94E12D7DCE;
+	Wed, 22 Apr 2026 06:06:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kfv5f0JH";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="hDqYmxVj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nxm39Kd6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D79221F2F
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 06:06:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776837961; cv=none; b=FYmnA/iuNVr7gz+XJeg3fJwvuSdXoWkHYqL1HMWtaxWYVvl99AAaHiPj2zryERYXmbYWvlQMYWkJBdU9Ax42KWsWnWPsL+fpNGafjYGpKyiWfUmb6wIIPu4QkAOB+412YkM9F0pc2BKS2TbXHwM4bxdHVcwb8sGQGwLiiedI7Ls=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776837961; c=relaxed/simple;
-	bh=D0IhErlGrKKuMRwPOP4Tlt1GsqbT8xAI/tb1DvR/nwI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gpbxBHfN5bn0GZM3mQYjJ0Vi/Td8/0PJVNKEwx8/W4JlcIzJERDxSZRJuCWH9IqYQS7SEUGgAmRazotriVYoVJkuZiRbXg5AqNtxYF2jchTb7ck7iVhltynpy3KR82QMr4mZEgt0wt1WB2eMxfDIEjUmmN5JezIUIAOnTHUp3VM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kfv5f0JH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=hDqYmxVj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776837959;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ztMyE+ktT7jgxWkcpg5pXckPoWAOQRydQBsfKgsWIR8=;
-	b=Kfv5f0JHpqpicGsTAaScc4FnO1qDnV/Qc6jlm8+NuYGhNC0RKJZGAPZOzwJNUc75kDcgO1
-	9j/9zv2szVNTHBT0X9Us3478saG06peoqVi+tumso6gUhMYxoBJAMAMvXwS/E6UEyCai+2
-	8VE9abcizCMjvzuAyG1Wm+wAubdzFbE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-379-_B549pBJPRKtQpM0wHvqXg-1; Wed, 22 Apr 2026 02:05:57 -0400
-X-MC-Unique: _B549pBJPRKtQpM0wHvqXg-1
-X-Mimecast-MFC-AGG-ID: _B549pBJPRKtQpM0wHvqXg_1776837956
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-48a55ecc249so10048145e9.1
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 23:05:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C262DB7B9
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 06:06:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776837993; cv=pass; b=pGcr8NlOENVrX1qk+4QS37UmCwd0EmODMEX2pJ1U9Vy5o4Y4Eq3lJ3zmRohaB3GvroMnlevKpI8+yq8RtjxpS3iUAJfkwJyW5vQOKEkwdhmv45/F65Dl81Oo76fGneBmsaX72uEM8QXO5LR9E6UtyLF9pShBzLP3JIDKelTlikM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776837993; c=relaxed/simple;
+	bh=Rh7Z1oqkCtIKP6IZti0zcf/vxEpcilMzd+W9RZI37eY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FavmllaKNbPdE9sdG1Z4ZGjHYnhWYfzTWC1tPHICkAa4rSaSatT3R5WAPESJvHtJaekhvp9N5618l5t914lfIRsvf1QdXq7jMJF4jufUvZEknc3d5iAOeYVkbAwDx8h1xnfT8xddDJTXXLLpmlaxHe7AgxSOjR8htxK7nE1je0c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nxm39Kd6; arc=pass smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-66f8f556f39so6470017a12.0
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 23:06:32 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776837990; cv=none;
+        d=google.com; s=arc-20240605;
+        b=exyYmhTWDNItyTvRnJanDl7zYYb4EhmzAx6SDLzt0QdkYFMd04K/y1b/hn7Cy+uYEv
+         y6SBq1RNyGb/jjk2fZ11ufeBRWT0Znb5WOdm4EEWiqY87fRg8qiPiAR8aT3/17N+frZp
+         HsWERncctCJvIcELcYc+4PSEMDaDswG8DNjCAtgoiEYqldNlMUnHt/Pl3ft1jPUIGgyP
+         qKt1fcURXBF3nGg5KXQ64bQrYqnx8xZH4x50X67wuxcWEk1FTE+dBEe70uMUFAvxSSrC
+         MWPmhQk4y9YsW3joXiHpFG0cAeUfU/R2V4Hs56cEsEUC6BYXaFEWXwLthgjzzRn2f46B
+         qLBw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=egbi2sYWJLZOIX/56COa8I4dQSgeroMlNExgr685yww=;
+        fh=Tq+RCCvtE49QZdm1LBsmIxIXIX044JCOD2UEZtYxFjk=;
+        b=XyBV2YGSuF7gn83ArAu+Bole9lx0QnM5eMKfEEY1LzBI816OUBpEmgRCcqB+27tbpl
+         6HvZSXhytPcS6tur5H9BOYdqK7UGjK4idFNPfQSg3BSn6oGS465u/K1v5CCcO7i2X8/Y
+         2A+vFglBeidlznlvpF/n7zVXra4itYggR3QxDtlxj21qSZb5Nu+TUYywA1hNYH4LCu9l
+         Uo8yRNJkNg3DrnIsvxZNmCYJkNPKr+WgX17sCYyB65OmRfZ348Bl4k5H6wWzezKZVQT9
+         MOI+HoluK8E5ZZuRQb74BlrK+/eplAs0B9MnPVC6T+dNh180s/u1O3Jo0dL8rdFssQfE
+         XyuQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1776837956; x=1777442756; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ztMyE+ktT7jgxWkcpg5pXckPoWAOQRydQBsfKgsWIR8=;
-        b=hDqYmxVjaUFNP+JqjAK10rEDyUqPY+VznggUVQe3/btlF51uwQpYbTtb55kBTMTcls
-         7ncjTixzlBivWxn4QY3xYORodFD6PN3rFZvNmVghZw6obWOH3h/ZYqP1lhSMTttDZKfb
-         J68mkCBHDsd5mCC/o7EiuHZC1TLbErOfBPlmGuV7vqunH5DA+IIDle8okMSUrZSBvm93
-         XW4JYjcYTa8hOll4OyAlooTBYbUFLdFVZ9ig3Olts6B1mUOyGUSCd55Z+7LiAdb0vd1d
-         bV8dks6QJ5d1hSR85vUW2RqQFnUy84iwTfZiOe34Dfi2Ji6afHrh104HrtwF5eTZkDtn
-         1rrQ==
+        d=gmail.com; s=20251104; t=1776837990; x=1777442790; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=egbi2sYWJLZOIX/56COa8I4dQSgeroMlNExgr685yww=;
+        b=Nxm39Kd60I3Ao0EdqMv2aquunRsxzS6GwoPr2lbSxRHl6b4WSgKmzhzhrUx9+XW03S
+         vSATzFgB/XL2VRbIzrREuBdACXQEB5V2bAvJZdSq4xyGTiuxnvhQFKsdes4uOUjm0GBu
+         0yixTDZeWd/FCI/LU6sXtK2sq9BzzddCJWp0TY7a1mlmZEylkq//Cs48u8nTwkRWtQgW
+         Uk7dINBEOcFkN3syUOatCRg2Tq7xbUo6gIUryNsLgvcyskOhYkUnZn66zx6lqvIKksss
+         5aY0pXasbPdtaLD2EzVVwMV/LC7P2j4uGwTRtB/mjNU4VQtkEtgN59jornV+MBZZoR5c
+         tdKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776837956; x=1777442756;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ztMyE+ktT7jgxWkcpg5pXckPoWAOQRydQBsfKgsWIR8=;
-        b=kJ1ofQPBwMs54Q+Iu8mU1a5QM4yW6BBnD+FGeiTfHmnpugmF1XjNhvoKf82HVNBWsq
-         CRKpcTWe6KBC+dtSd7YyLunSyBCkg0fasyBmuVVaXP3Ghh4hOGMfg0Zo4BXurc1yviJx
-         kfRwyD/akBPp+0TqHU3CELJEVMCfT5obhfs69Yci2Lqz5ydYEmJUSXBCMJ9J+0Fr3Soq
-         zWwTwE38SYSFNTWdBSTAiDz84tNSsaO0QIemVjt7XBmFwfBnD48Wa2TXBSgibDDu/dbR
-         GCdVJ3lS2mP2JPjxV2J5vFI0sUlEUNn8R4aXh4QMxEhc8lEsNyaFu66TZMwsEvJv4C4z
-         lv7g==
-X-Forwarded-Encrypted: i=1; AFNElJ9ipkfiWBl3xQdaNLxWSRqsQpNFwOGVSuIklZ7I6/7AelR8DWz3OuYNKpGc4N+MdScbs8UcgyY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOTA1Ax10DhRstmIYv3jcM0Gs+FJ6/T4NxgSM6o/Jhp/jRMoaF
-	m/+zx+HDnKRTxlGjWuJOuMjiWFXuUK0QNldPS8R44uS8dF0GzyMAbnUyxT3/WEZN+03jKIbENk4
-	DyNk0kRC+YLxtrk8OPeChK+tLEybIK+Z7sX/+Rpd+uS2mH5JtIiarUGoK+EYGJk84LA==
-X-Gm-Gg: AeBDieusmZ/fNgbe6rOg/5BRf38WiXTSYNuWDEYtM4DbsXjV+iEtwNLjgKtS+7MjFFQ
-	Uio+9DuZx34YIj2jw52ql/wERGSjd+C2KrE7D6Div+B9yF7HdEGmDcd08+2ybYW2sn3DMlzz+J1
-	U3UhLlXXgA0bfyts+y8Sr+QV3P5Jo6qLoe32+0cjRrAhE9LDoB+I3tcFCMex/Gk6Z3xRFLyD39Y
-	oUuFBanjkI9sfuT8/sdFDi5aZoXQdX4KbbQpIfwnN85nyCWqH5DttCKpdIUuCVoDQ3jH6XW/Q4e
-	8nenZNg2jCLstYnPZ9DDH5WCJUWIPaEQNxfyQjfFSrp2Mjs3z2SUwMTmkA512uUaJI9zeD0hiq9
-	4oAkVxsdhm7+Dwd7DqyIYUepoKqjDjh6YMtti3lpNz1GNbh+Ug20lTw==
-X-Received: by 2002:a05:600c:470d:b0:48a:52ce:a4b1 with SMTP id 5b1f17b1804b1-48a52cea6d8mr117687705e9.15.1776837956004;
-        Tue, 21 Apr 2026 23:05:56 -0700 (PDT)
-X-Received: by 2002:a05:600c:470d:b0:48a:52ce:a4b1 with SMTP id 5b1f17b1804b1-48a52cea6d8mr117687235e9.15.1776837955527;
-        Tue, 21 Apr 2026 23:05:55 -0700 (PDT)
-Received: from redhat.com (IGLD-80-230-25-21.inter.net.il. [80.230.25.21])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc177dafsm520792265e9.4.2026.04.21.23.05.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 23:05:54 -0700 (PDT)
-Date: Wed, 22 Apr 2026 02:05:52 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Kohei Enju <kohei@enjuk.jp>
-Cc: Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	syzbot+6985cb8e543ea90ba8ee@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v1] vhost_net: fix sleeping with preempt-disabled in
- vhost_net_busy_poll()
-Message-ID: <20260422020539-mutt-send-email-mst@kernel.org>
-References: <20260422023026.81960-1-kohei@enjuk.jp>
+        d=1e100.net; s=20251104; t=1776837990; x=1777442790;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=egbi2sYWJLZOIX/56COa8I4dQSgeroMlNExgr685yww=;
+        b=nTnXMntCydxU09bDGncQTSk0dDiTSd5oEzdaTRozXuWjzmgxc+FuhULPxgDzoiy8rx
+         Ffvb5B+HU1xC3Ak073suK0+5rrpAamfQ6a3R/40tL8UPCj7WOGj0wyp74DEKTQk+EfmQ
+         R7ATqd/dF7MMohvh/+eYD7Rc3bx3DHNer5FRq0EL3os7ztV1+A/ORmVriCnWYm5oF7Yz
+         ZPl4SPifjYUpOoCUDRaZL+mK1n9/9kHy1RH1ssNX9fejdoUDUus9y3NuIlcPca3p11xC
+         zPo43yX/TR7KtkhzOxDsYYYBzxUdlhcLMqe3XfsFEVtdkArKRnl/uUZrhHFxtBSO4Qj9
+         Hssg==
+X-Forwarded-Encrypted: i=1; AFNElJ+7QjYc8Zxb+alP2LyR7CXUDDQOj74PHa3ZtxoyRxpLc3+SD8qjU1pMdzNqNYqmLK38qs5mpfo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyL2NE+yi8XUBmhODvRdYGHIYivIErdzq73GLjcZ0Ln1D5qBRN8
+	4ZP2ejxtqAmNJT49C4pCM6xyOWqLEm502Bg4XqML3mrxXR43LdtYJGuXDGdIYZP9VDBPUSE+VwP
+	FHnjiKNp6yruSafJsG+KDcnF+e3fPMtc=
+X-Gm-Gg: AeBDiesrPjLysSpF/cyFKJaqrS9F6YeFz+g9r4OhXSXRt4ziLWME6EV+Rwu5i2Vy+fi
+	hFkfjhWr9/TkRUUr+9my/ara4wRRqo+FQXseaavqJjuVzx4CqbeOBgmiEthNEeuU9TcYygPsCTA
+	QGL79P+54elTgo7lopnPLQFrFbqUi2Lrq9QK3Sam/h8amBrtHPPqklT044qvrmWRA5Q+SZ5XIgA
+	88PDQ4IhLW5wjdRct411Z4NMso+ZkYHtlBwGbXIusU/Tfoy6m/AvqPWEvjsVUPfrjlZWEPNvfBb
+	riwpCKa7uaz5TOQy3B3yGLbT6qnOEM2Y3CKwkTJ2rD8Bd0GAgPLXBogtvwQj
+X-Received: by 2002:a05:6402:e9c:b0:673:f729:c7a1 with SMTP id
+ 4fb4d7f45d1cf-673f729efcdmr7714570a12.14.1776837990242; Tue, 21 Apr 2026
+ 23:06:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260422023026.81960-1-kohei@enjuk.jp>
+References: <20260331-realtek_forward-v1-0-44fb63033b7e@gmail.com>
+ <20260331-realtek_forward-v1-9-44fb63033b7e@gmail.com> <CAD++jL=v6qe+dVF-wk3cPg3aw8Qp7pS6BVtAqmWURJ=JvMvDHA@mail.gmail.com>
+In-Reply-To: <CAD++jL=v6qe+dVF-wk3cPg3aw8Qp7pS6BVtAqmWURJ=JvMvDHA@mail.gmail.com>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Wed, 22 Apr 2026 03:06:16 -0300
+X-Gm-Features: AQROBzDnU5su9t_BJb2buOZf5bl6PP_zSF1VLxTuTSd-YLTkPSfkk9N7GCVu_JA
+Message-ID: <CAJq09z6LJAZCFCymK=zR7W9qfQi5WLA2A9gg-O7S_JsT=Bbk_Q@mail.gmail.com>
+Subject: Re: [net-next PATCH 09/10] net: dsa: realtek: rtl8365mb: add bridge
+ port flags
+To: Linus Walleij <linusw@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	=?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280318-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280319-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,6985cb8e543ea90ba8ee];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,enjuk.jp:email]
-X-Rspamd-Queue-Id: 5A8904424D3
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: C148E4424F0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 22, 2026 at 02:30:24AM +0000, Kohei Enju wrote:
-> syzbot reported "sleeping function called from invalid context" in
-> vhost_net_busy_poll().
-> 
-> Commit 030881372460 ("vhost_net: basic polling support") introduced a
-> busy-poll loop and preempt_{disable,enable}() around it, where each
-> iteration calls a sleepable function inside the loop.
-> 
-> The purpose of disabling preemption was to keep local_clock()-based
-> timeout accounting on a single CPU, rather than as a requirement of
-> busy-poll itself:
-> 
-> https://lore.kernel.org/netdev/1448435489-5949-4-git-send-email-jasowang@redhat.com/T/#u
-> 
->   Changes from RFC V1:
->   ...
->   - Disable preemption during busy looping to make sure local_clock()
->     was correctly used.
-> 
-> >From this perspective, migrate_disable() is sufficient here, so replace
-> preempt_disable() with migrate_disable(), avoiding sleepable accesses
-> from a preempt-disabled context.
-> 
-> Fixes: 030881372460 ("vhost_net: basic polling support")
-> Tested-by: syzbot+6985cb8e543ea90ba8ee@syzkaller.appspotmail.com
-> Reported-by: syzbot+6985cb8e543ea90ba8ee@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/69e6a414.050a0220.24bfd3.002d.GAE@google.com/T/
-> Signed-off-by: Kohei Enju <kohei@enjuk.jp>
+> > +static int rtl8365mb_port_set_ucast_flood(struct realtek_priv *priv, int port,
+> > +                                         bool enable)
+> > +static int rtl8365mb_port_set_mcast_flood(struct realtek_priv *priv, int port,
+> > +                                         bool enable)
+> > +static int rtl8365mb_port_set_bcast_flood(struct realtek_priv *priv, int port,
+> > +                                         bool enable)
+>
+> Those are small and just writing registers so I guess they can be kept local,
+> but I think they should be accessed indirectly through
+> struct realtek_ops .rtl8366_port_set_ucast_flood() etc.
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Sure.
 
-> ---
->  drivers/vhost/net.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index 80965181920c..c6536cad9c4f 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -560,7 +560,7 @@ static void vhost_net_busy_poll(struct vhost_net *net,
->  	busyloop_timeout = poll_rx ? rvq->busyloop_timeout:
->  				     tvq->busyloop_timeout;
->  
-> -	preempt_disable();
-> +	migrate_disable();
->  	endtime = busy_clock() + busyloop_timeout;
->  
->  	while (vhost_can_busy_poll(endtime)) {
-> @@ -577,7 +577,7 @@ static void vhost_net_busy_poll(struct vhost_net *net,
->  		cpu_relax();
->  	}
->  
-> -	preempt_enable();
-> +	migrate_enable();
->  
->  	if (poll_rx || sock_has_rx_data(sock))
->  		vhost_net_busy_poll_try_queue(net, vq);
-> -- 
-> 2.51.0
+> > +static int rtl8365mb_port_bridge_flags(struct dsa_switch *ds, int port,
+> > +                                      struct switchdev_brport_flags flags,
+> > +                                      struct netlink_ext_ack *exack)
+>
+> Move this one to rtl8366-core.c under the name rtl8366_port_[pre_]bridge_flags()
+> and use the abstract accessors to do the register writes.
 
+OK
+
+> > @@ -1691,6 +1797,8 @@ static int rtl8365mb_port_bridge_join(struct dsa_switch *ds, int port,
+> >         int ret;
+> >         int i;
+> >
+> > +       dev_dbg(priv->dev, "bridge %d join port %d\n", port, bridge.num);
+> > +
+> >         /* Add this port to the isolation group of every other port
+> >          * offloading this bridge.
+> >          */
+> > @@ -1730,6 +1838,8 @@ static void rtl8365mb_port_bridge_leave(struct dsa_switch *ds, int port,
+> >         u32 mask = 0;
+> >         int i;
+> >
+> > +       dev_dbg(priv->dev, "bridge %d leave port %d\n", port, bridge.num);
+> > +
+> >         /* Remove this port from the isolation group of every other
+> >          * port offloading this bridge.
+> >          */
+>
+> These debug prints seem unrelated to this patch?
+
+Yes, sorry. I'll move them.
+
+>
+> > @@ -2547,6 +2657,19 @@ static int rtl8365mb_setup(struct dsa_switch *ds)
+> >                 if (ret)
+> >                         goto out_teardown_irq;
+> >
+> > +               /* Enable all types of flooding */
+> > +               ret = rtl8365mb_port_set_ucast_flood(priv, i, true);
+> > +               if (ret)
+> > +                       goto out_teardown_irq;
+> > +
+> > +               ret = rtl8365mb_port_set_mcast_flood(priv, i, true);
+> > +               if (ret)
+> > +                       goto out_teardown_irq;
+> > +
+> > +               ret = rtl8365mb_port_set_bcast_flood(priv, i, true);
+> > +               if (ret)
+> > +                       goto out_teardown_irq;
+>
+> Create rtl8366_setup_flood_control() in realtek-core.c and add these
+> three calls as a helper using the rtl8366_* generic calls there. It will be
+> done the same on all chips.
+
+OK. I think
+
+rtl83xx_setup_port_flood_control(struct realtek_priv *priv, int port);
+
+might be better as we can avoid looping again over the ports.
+
+Regards,
+
+Luiz
 
