@@ -1,183 +1,155 @@
-Return-Path: <netdev+bounces-280352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280353-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IFkuOjSJ6Gk6LgIAu9opvQ
-	(envelope-from <netdev+bounces-280352-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:39:16 +0200
+	id WA9sGCuK6Gk6LgIAu9opvQ
+	(envelope-from <netdev+bounces-280353-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:43:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 837D84438F7
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:39:16 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBD8944399E
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:43:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9227F300AB30
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 08:39:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7562E303AF09
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 08:42:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B41B23BF666;
-	Wed, 22 Apr 2026 08:39:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5081734CFC7;
+	Wed, 22 Apr 2026 08:42:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OzpvqIxL"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="ut+6VcWq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DEFA1A9FA7;
-	Wed, 22 Apr 2026 08:39:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B2637FF77
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 08:42:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776847152; cv=none; b=IPZNzh7Nrcph3jLaX7cBnSAsQjl+eRzVDnm+V4ARuOwys1g1orp60yHw0O/tsIBTo2piuf4zIFiP1umGdRAdFROfbn8d51CZS0pq+GO5qMZ4yRW+9mov83KmxBLnlZ8oj9CV2eIY4KcY9ZrvSED8gbvc97/ATxsCrgiKv08aPCE=
+	t=1776847334; cv=none; b=IgFre0SkINoN6eDPC2uLtIagtUAyvlymN1OqUSXPvLLlm/QuPYIUEhNJxIU0RC7X4UF3OyI4QY05BjWJ21PBeo83l8fdeGtzhb14tnOTlZu8B99kzm4X2xb+Bhj6z0w2SZ25xNx8Gv2Dj3xWjY3/HhSnll7Fn1UC+vNXG/yZAj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776847152; c=relaxed/simple;
-	bh=w73KMIQlHjPb+N1olkaiecVh/4Mf9dDmU8qVJtpkvSg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Rl1qkC219TtzJIrL1Z+p/zsYRn22m234LeWCP/xKGodyKVLcTyZilijVv8e6AhnqRsJ0zRK7ynQYj87pXg4zk0vORZ6PCB2hb8U0yMc/MTh3FHTGEx+Gh5WbbEbZw1aX0ZCTA3XSneKif2sswtreHeeuCOJGjvMqe1P+fFngZSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OzpvqIxL; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776847151; x=1808383151;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=w73KMIQlHjPb+N1olkaiecVh/4Mf9dDmU8qVJtpkvSg=;
-  b=OzpvqIxLaUY1Fy7FWxl/HVigYMNS+yQcluFXNbQhYyimXfI1UBqG/a7e
-   EjrJjW89Eo/+5ebs5KNr6z9r5EKU7ERYjphG1MKSealICzFoYStRlV6pe
-   4vv6XNhK3key+ojfVIoRJvmqrOdyhLvCZ51/iphQd5RUy+xtqU2SQKtvT
-   nVyBSaWSnfXpxt3210QesP2Tqk36yW4JA24hMj8/V/TPiUv94ERfpgKt/
-   UMwA1vwlo0h9ftjrllIAw7BixvUW9QFFL9UocfsXNE5oOhtYPVzERCyLG
-   pQg6acuXRVEFtZ3ss0k/LDD4aZQT8vjDAoESgtfKI3+XPt2doKMPjQIWK
-   g==;
-X-CSE-ConnectionGUID: dhDUlPErTBeLX9L2bdWh1Q==
-X-CSE-MsgGUID: P9jqPVRqQzGsLyxw/A27CA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11763"; a="76827701"
-X-IronPort-AV: E=Sophos;i="6.23,192,1770624000"; 
-   d="scan'208";a="76827701"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2026 01:39:10 -0700
-X-CSE-ConnectionGUID: bgQrZQfHQaazekliRtVgvg==
-X-CSE-MsgGUID: TjLeu755Si6KxtFXz56UZQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,192,1770624000"; 
-   d="scan'208";a="227957981"
-Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.20.189]) ([10.247.20.189])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2026 01:39:08 -0700
-Message-ID: <dfdf4a8c-41cd-482f-baf6-64fe82698453@linux.intel.com>
-Date: Wed, 22 Apr 2026 16:38:59 +0800
+	s=arc-20240116; t=1776847334; c=relaxed/simple;
+	bh=d1YGxQHxFz8oO27XTBzMvRQkzYc2VrFWcRQaOXzn8RQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=A9KgOaY7WrahXfEg9h6Oh0PjZLyanYft2+gnAZfAcuabtWxle6TwiO2X9TkYF7weeQobxx18m1CQcYUeE71ZMKNGZouoFaIAUhuHUqzcu7FX0rEMsN1jTRfiJHe/clsV+Amdq1wlKRQq9ds/kOyK15aEYKU+2zYulqeIyCAAIDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=ut+6VcWq; arc=none smtp.client-ip=210.118.77.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20260422084208euoutp022e56abe9ffb97e3d31746451d5d4ff97~ooTssH1JY0361503615euoutp02g
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 08:42:08 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20260422084208euoutp022e56abe9ffb97e3d31746451d5d4ff97~ooTssH1JY0361503615euoutp02g
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1776847328;
+	bh=YrPgAfVKB+qxDc2CcSoeSAb6iAceV4edZfrbKmtZrQI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ut+6VcWqnwBTF9NoOJ1778Dtgk6DwTujz0tNMOrl+XSJhLEP753HmZgb0RiD177Af
+	 3tHjIWF/a3W1ndJLEnZhsb+IOdv83NH3l7BlOD21/sJaqph4ovi7EeuzvSeAMa6pCv
+	 PWNQqT3fo2/oACq2NycAnD+2AeaJCJYUyg0M0/1k=
+Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20260422084208eucas1p137123bfccf5ca996ba7f0c56ecf1c1e9~ooTsZ4yvQ0209102091eucas1p1-;
+	Wed, 22 Apr 2026 08:42:08 +0000 (GMT)
+Received: from AMDC4622.eu.corp.samsungelectronics.net (unknown
+	[106.120.77.34]) by eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20260422084207eusmtip283f6f1250b08ee1a384856d03b43da69~ooTr9v0DZ1239612396eusmtip2K;
+	Wed, 22 Apr 2026 08:42:07 +0000 (GMT)
+Date: Wed, 22 Apr 2026 10:42:07 +0200
+From: Jakub Raczynski <j.raczynski@samsung.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
+	davem@davemloft.net, andrew+netdev@lunn.ch, kernel-janitors@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH] net/stmmac: Fix typos: 'tx_undeflow_irq' ->
+ 'tx_underflow_irq'
+Message-ID: <aeiJ3zr4WJAm1UCk@AMDC4622.eu.corp.samsungelectronics.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net v2] igc: fix potential skb leak in
- igc_fpe_xmit_smd_frame()
-To: Kohei Enju <kohei@enjuk.jp>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- kohei.enju@gmail.com, stable@vger.kernel.org
-References: <20260415025226.114115-1-kohei@enjuk.jp>
-Content-Language: en-US
-From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
-In-Reply-To: <20260415025226.114115-1-kohei@enjuk.jp>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+In-Reply-To: <7eb9e4d4-909c-4203-833d-bd8b664fdfbc@lunn.ch>
+X-CMS-MailID: 20260422084208eucas1p137123bfccf5ca996ba7f0c56ecf1c1e9
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----LmDszmo.tbCNUa4xLp9F.eTPx2S9.ufKTU9pfAqIN0sGcyaX=_213c8_"
+X-RootMTR: 20260421115052eucas1p103281c5b25719a44c0875d6b0860bfa6
+X-EPHeader: CA
+X-CMS-RootMailID: 20260421115052eucas1p103281c5b25719a44c0875d6b0860bfa6
+References: <CGME20260421115052eucas1p103281c5b25719a44c0875d6b0860bfa6@eucas1p1.samsung.com>
+	<20260421115008.2690541-1-j.raczynski@samsung.com>
+	<7eb9e4d4-909c-4203-833d-bd8b664fdfbc@lunn.ch>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	CTYPE_MIXED_BOGUS(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280352-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[samsung.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-280353-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+,1:+,2:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[faizal.abdul.rahim@linux.intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FROM_NEQ_ENVFROM(0.00)[j.raczynski@samsung.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.intel.com:mid,intel.com:dkim,intel.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 837D84438F7
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,AMDC4622.eu.corp.samsungelectronics.net:mid,samsung.com:dkim]
+X-Rspamd-Queue-Id: CBD8944399E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+------LmDszmo.tbCNUa4xLp9F.eTPx2S9.ufKTU9pfAqIN0sGcyaX=_213c8_
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
 
-
-On 15/4/2026 10:52 am, Kohei Enju wrote:
-> When igc_fpe_init_tx_descriptor() fails, no one takes care of an
-> allocated skb, leaking it. [1]
-> Use dev_kfree_skb_any() on failure.
+On Tue, Apr 21, 2026 at 02:39:15PM +0200, Andrew Lunn wrote:
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> > @@ -78,7 +78,7 @@ static const struct stmmac_stats stmmac_gstrings_stats[] = {
+> >  	STMMAC_STAT(rx_vlan),
+> >  	STMMAC_STAT(rx_split_hdr_pkt_n),
+> >  	/* Tx/Rx IRQ error info */
+> > -	STMMAC_STAT(tx_undeflow_irq),
+> > +	STMMAC_STAT(tx_underflow_irq),
 > 
-> Tested on an I226 adapter with the following command, while injecting
-> faults in igc_fpe_init_tx_descriptor() to trigger the error path.
->   # ethtool --set-mm $DEV verify-enabled on tx-enabled on pmac-enabled on
+> Please take another look at this one and think about it.
 > 
-> [1]
-> unreferenced object 0xffff888113c6cdc0 (size 224):
-> ...
->    backtrace (crc be3d3fda):
->      kmem_cache_alloc_node_noprof+0x3b1/0x410
->      __alloc_skb+0xde/0x830
->      igc_fpe_xmit_smd_frame.isra.0+0xad/0x1b0
->      igc_fpe_send_mpacket+0x37/0x90
->      ethtool_mmsv_verify_timer+0x15e/0x300
+>     Andrew
 > 
-> Cc: stable@vger.kernel.org
-> Fixes: 5422570c0010 ("igc: add support for frame preemption verification")
-> Signed-off-by: Kohei Enju <kohei@enjuk.jp>
 > ---
-> Changes:
->    v2:
->      - change to idiomatic style with goto (Simon)
->      - add Cc to stable (Alex)
->      - add reprodunction steps (Alex)
->    v1: https://lore.kernel.org/all/20260329145122.126040-1-kohei@enjuk.jp/
-> ---
->   drivers/net/ethernet/intel/igc/igc_tsn.c | 8 +++++++-
->   1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
-> index 8a110145bfee..02dd9f0290a3 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_tsn.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
-> @@ -109,10 +109,16 @@ static int igc_fpe_xmit_smd_frame(struct igc_adapter *adapter,
->   	__netif_tx_lock(nq, cpu);
->   
->   	err = igc_fpe_init_tx_descriptor(ring, skb, type);
-> -	igc_flush_tx_descriptors(ring);
-> +	if (err)
-> +		goto err_free_skb_any;
->   
-> +	igc_flush_tx_descriptors(ring);
->   	__netif_tx_unlock(nq);
-> +	return 0;
->   
-> +err_free_skb_any:
-> +	__netif_tx_unlock(nq);
-> +	dev_kfree_skb_any(skb);
->   	return err;
->   }
->   
+> pw-bot: cr
+>
 
-Thanks for helping to fix this.
+I don't see anything wrong with it?
+- naming is correct, same as stmmac_extra_stats from common.h, as it
+  wouldn't compile otherwise
+- string length is ok, as max name length is ETH_GSTRING_LEN=32 and it is
+  not close
+- ethtool just polls data from driver and in my tests it is ok
+- all instances of 'undeflow' are changed
+- 'underflow' semantic is ok, 'undeflow' is just not correct
 
-Reviewed-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+Please correct me if I am wrong, but imo no issues with this patch.
+
+Regards
+Jakub Raczynski
+
+------LmDszmo.tbCNUa4xLp9F.eTPx2S9.ufKTU9pfAqIN0sGcyaX=_213c8_
+Content-Type: text/plain; charset="utf-8"
 
 
+------LmDszmo.tbCNUa4xLp9F.eTPx2S9.ufKTU9pfAqIN0sGcyaX=_213c8_--
 
