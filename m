@@ -1,90 +1,62 @@
-Return-Path: <netdev+bounces-280426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280428-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wLlIKbrN6GklQQIAu9opvQ
-	(envelope-from <netdev+bounces-280426-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 15:31:38 +0200
+	id UO3BMv3O6GklQQIAu9opvQ
+	(envelope-from <netdev+bounces-280428-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 15:37:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3143A446C27
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 15:31:35 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8A0A446D12
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 15:37:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5471F302C6D6
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 13:24:31 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 77AB4307FD75
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 13:27:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A86483CAE65;
-	Wed, 22 Apr 2026 13:24:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04E7B3EAC9F;
+	Wed, 22 Apr 2026 13:27:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YlnqBRvx"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4Mml/GuL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57038381AF5
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 13:24:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 676953EAC9E;
+	Wed, 22 Apr 2026 13:27:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776864262; cv=none; b=Lnt/uvh4hGEiw2OHtQjSpmWL8QdXtQXl8JlGODCcXcUwjLx9qFLzH6dAdhn31d5NSp61YwS/UtCn+h+9MYoLZODGGIT7wh0sKJix0/9s//zAHMxNReflNsFhYDXiEWmd37Mq8h7lf99cKbE7tkOzwGTrDdG3T69EJGRYaO1kc3c=
+	t=1776864447; cv=none; b=MtN5pn2Q5j9OMqkT++UxZt9MFbh1ghGe5qJXWaRhLDkjUIDuKWIFz1cDzbjR2CYd1YPXRnyG6DaXkMtivm3XHf+3uL//kauMsdIfUZ6djoNZqAVcsOD7ApZtxsSzPHAGPL/RlnstlhV/oF8ESbBjUraadKdk2P/vjZjBmtnw2c8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776864262; c=relaxed/simple;
-	bh=vgxoIN557nDFvzI/TTrbPnjmb1JV6mfBHH85hdg3Vag=;
+	s=arc-20240116; t=1776864447; c=relaxed/simple;
+	bh=UAB8ew6M1c8iaKe1esw1FMMRUKB/6o7RwuwKu9bwzBg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YUoiyKfFH5uwPfR9IxigxU3YZ4Y1nlG7cn70x0qeerhyJZIeMb7tmvDxZc2PT9PS1qYU5bsJimDGAAL7IWAqmNYNiGtdxyLPI+mHb0ghcKUl04r7w/cxrCjsRD5/nNtp8AJmuWXrkJYlNZhOfBoqHAnTdvRknriQ5eiYVK4IXUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YlnqBRvx; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-79db5e18ac6so66251277b3.1
-        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 06:24:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776864260; x=1777469060; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oy65WrzLsyhPH4xON3+ggQSwKY4cV96EkJ63SIR9TYc=;
-        b=YlnqBRvxMe8d8c2SguxtWdKgtb+Mb6lpObECA+l/XlFqXJbIxJ2S4DWw9HoBeUlMeZ
-         rMWROTKh/OiWcec5GOprJ49Xj8q02QP4QRatMDYasQLtJe0CSE8RJTGqQh//8QSOM6/O
-         68QMMSrHCbiYBtVmfwtS6hdOjre6MCrtUA/+IpwD9IGqz7qQPQlQbas25rfJso3omMs0
-         uzMAjNVEDkQJL1ZaExop0LLk69O1fo8K7nqoDihwmhJPNCUSTRHlAXJ3axAW568SJU8s
-         /ucimmu7Cs/DOOXN017Iy/qXTyPGZLwluBBQj8gTdOrSAIxGU1Odz5aALBnrKwCF9aPp
-         wWGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776864260; x=1777469060;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oy65WrzLsyhPH4xON3+ggQSwKY4cV96EkJ63SIR9TYc=;
-        b=IWZU9A8EVKLCLA6XOYFXMAuQ7kyIwybAngx0VLgj1+fh2sXmt7pOhmhzqnhKpWDIdg
-         JJWivgZmwv3exgyUs8zCmsvJw2wMOQVFua2wfZRWsHaXKMa3J00s/rfTeU+R5QKWpdVR
-         B2+fRjGxQMqP8BFgycOD/in83fmzpAzOixnKmPbsApM6/pQ47f26vfaXIyaPqUKiNOC+
-         j8iyP0etvNyw2rwYxD9mqGVHsawFoZzlvmy3HCr9bu4nb70lBi56XYnhDAz4r8GZSxGC
-         w4b3M2ETNPFH2BC9uEb/KRDkdgiQz36NBeRZOgRKwKCieTV3qLYgE8fW/xjvi8R8hKhy
-         lW9A==
-X-Gm-Message-State: AOJu0YyxBdfTlnFQGRn1QWiL0hXbnLIgUxqzdw6g9SKLvR3epyjDUVUF
-	7E+mCSFlVtpOz4nteMKB11HP6lNAQGCCIAHfasu7hEs2nm2YdeTJc/5A
-X-Gm-Gg: AeBDieu54UThxndUtNpAyeHm364JJV5t0SyGVaZhSE7hTZEmFHm86jb6hAqppoNfIPr
-	MBFy6KGfBKGp3oSUc6B6bNHccDNEDZfU1e8X33ftYjMDgUpnWTIKVOWWUg2e1r+K8UhdkXUDXBa
-	raOJaiaVvXMlNxlq5kT4uqGZAwuezEFYC+gSQOiQ2GxT/77DBR/dxwq3IfQGPN+tCUA/tjAoOLc
-	B/lcSfcQA4cBAOAivc0TnaeYGM0AR5/8z3NX40Vlh2d+nhRHjO9dEiuWt3tWAkj3QOlG+IOlaWK
-	IcspDSd41J5tEUpFYIZ6udrTrDQpXniXw2AUQ23J7YA3NUwHbgR1iSCEIs/ydBmbLz32Cj0AVJE
-	c2rH2T3Ro3L9zlAYD1ClzNGRe1qCHL+dL4WaRCcNAvbAT7UN51UqTXajLQD/vYh3mE2Yp6MXaFP
-	MkeGJ+JGPA/wbffD6U5YKz5+lckmyY
-X-Received: by 2002:a05:690c:11:b0:796:45d4:9e55 with SMTP id 00721157ae682-7b9ed3d2454mr162986717b3.15.1776864260449;
-        Wed, 22 Apr 2026 06:24:20 -0700 (PDT)
-Received: from localhost ([172.216.252.13])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7b9ee9ccdc4sm67554937b3.43.2026.04.22.06.24.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Apr 2026 06:24:19 -0700 (PDT)
-Date: Wed, 22 Apr 2026 16:24:14 +0300
-From: Dan Carpenter <error27@gmail.com>
-To: Jakub Raczynski <j.raczynski@samsung.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, przemyslaw.kitszel@intel.com,
-	anthony.l.nguyen@intel.com, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH v2] net/intel: Replace manual array size calculation with
- ARRAY_SIZE
-Message-ID: <aejL_upxRzEZx3qG@stanley.mountain>
-References: <aeeFh1zQqhVysvxI@stanley.mountain>
- <CGME20260422105813eucas1p1a59a07ab8c1ac0c4b7eba37d509f69b8@eucas1p1.samsung.com>
- <20260422105710.268003-1-j.raczynski@samsung.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kmt/ZZzvBoepH7ziH0mY2InbzzSSplQFMOylQrLx/rzFZ0EkgDqexVeQ55Gt0Z4nY8niPtNKepK9fyND1BWmH4AeUZdYfImZ7Bxhh0MuYLl3KM7jZWE+pElCBFqS6jt+xbPGUY8W1Q5zd22j95lZF3EVKtsVgFNvvptvNZK6WZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4Mml/GuL; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=CUHnSisp2kcYkSoP1xx2XQwlkh4hdcNpQIBttcFUKgA=; b=4Mml/GuLFA5XsLCSZrj+zW/Gsr
+	h1S04ZOEiGXlmsUw7fjqxgGRFNdblXPn/co23sNxp4SsndEO51smHVPRbvepMIoRIbJaVN/6o4PF+
+	v5n/yOeAQEnfF5D8pZQ+g3ynkmdFRo3AWhIlzmyhtnGSei/jtFqV0USPG7I5UxA+o5Mk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wFXbe-00H2Il-DQ; Wed, 22 Apr 2026 15:27:06 +0200
+Date: Wed, 22 Apr 2026 15:27:06 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Minda Chen <minda.chen@starfivetech.com>
+Cc: Frank <Frank.Sae@motor-comm.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next v2 0/3] Add motorcomm 8531s set ds func and 8522 driver
+Message-ID: <eea18d2f-5294-40e4-9ea1-87aa55f8ea28@lunn.ch>
+References: <20260422083255.29692-1-minda.chen@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,54 +65,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260422105710.268003-1-j.raczynski@samsung.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+In-Reply-To: <20260422083255.29692-1-minda.chen@starfivetech.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280426-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[motor-comm.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-280428-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[error27@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,samsung.com:email]
-X-Rspamd-Queue-Id: 3143A446C27
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
+X-Rspamd-Queue-Id: C8A0A446D12
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 22, 2026 at 12:57:12PM +0200, Jakub Raczynski wrote:
-> There are still places in the code where manual calculation of array size
-> exist, but it is good to enforce usage of single macro through the whole
-> code as it makes code bit more readable.
-> While at it, beautify condition surrounding it by reversing check and remove
-> unnecessary casting.
+On Wed, Apr 22, 2026 at 04:32:52PM +0800, Minda Chen wrote:
+> This patch is for Starfive JHB100 EVB board. JHB100  contain
+> 1 RGMII/RMII and 1 RMII synopsys GMAC cores. In the EVB board, RGMII
+> interface connect with YT8531s Ethernet PHY. RMII interface connect
+> with YT8522 ethernet PHY. So patch 1-2 is for RGMII interface
+> patch 3 is RMII is for RMII interface.
 > 
-> Signed-off-by: Jakub Raczynski <j.raczynski@samsung.com>
-> ---
+> JHB100 is a Starfive new RISC-V SoC for datacenter BMC (BaseBoard
+> Managent Controller). Similar with Aspeed 27x0.
+> 
+> The JHB100 minimal system upstream is in progress:
+> https://patchwork.kernel.org/project/linux-riscv/cover/20260403054945.467700-1-changhuang.liang@starfivetech.com/
 
-Thanks.
+Please take a read of sections 1.3 and 1.4 of:
 
-Reviewed-by: Dan Carpenter <error27@gmail.com>
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
 
-regards,
-dan carpenter
+    Andrew
 
+---
+pw-bot: cr
 
