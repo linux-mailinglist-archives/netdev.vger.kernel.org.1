@@ -1,69 +1,61 @@
-Return-Path: <netdev+bounces-280384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280385-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wL0jNsyp6GnEOQIAu9opvQ
-	(envelope-from <netdev+bounces-280384-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:58:20 +0200
+	id 8OYwL+mp6GnEOQIAu9opvQ
+	(envelope-from <netdev+bounces-280385-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:58:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81987445093
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:58:20 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97FA04450A2
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:58:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D52C93004920
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:58:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9ED91300EB52
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE81B3CCFC8;
-	Wed, 22 Apr 2026 10:58:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D8653C13FD;
+	Wed, 22 Apr 2026 10:58:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="O78c/4K0"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b="3LEM8CEX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BBB73542E5
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 10:58:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9017A1E5724;
+	Wed, 22 Apr 2026 10:58:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776855498; cv=none; b=fJ4C89EnRLJCD96LCRq6QDeoK4YP2LpdxvuIwgZiSyiEaOK805dNNHkh7VUzDLoPyOQfjTqOVSIJKLW3tt8TmYKDbpBr8ADsVH8p+vo7PTMLhrr+oSjyQLBjwpO6f6PQCbY5fE+PVzNJjur6/gZk3/o8GKHd9RK7YZM/+tf4jbc=
+	t=1776855521; cv=none; b=GeVBsXolvHPUtDh2nYhsW53kQMNSOCP3LMjCyEYF6pb4MK4F+rjJBMcPhsNZXz7evcAXgXPkOTELzVN6SRWvnJvDGM3DzK12kPuxaIriHXaF+EaQ/rQqAY6UxkTdCB/AA+0qOQNRUhvsyOEnTMefzZ9SbjbZVlYSBI/SzYBOtVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776855498; c=relaxed/simple;
-	bh=087e/nvJmgEeLsXW0RHyWGzu7RXBNSYdUUjS8aydZE4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=bPPlHRv1BWut45knBfSW1X2aO7askuWVlAKRQH4m6dhPAVusd9RzsrvsHnU00XBysudZJLf4wm5/T9WR/hGCvw1nNsc56zz68hwrGYusgvTOCm321PskqzXQq7Sd34b0m4w4VJwXtKOJPuWhu9kFwIcL/yPaON6Nau4FPZ8CA+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=O78c/4K0; arc=none smtp.client-ip=210.118.77.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20260422105814euoutp02388d06c6b9bf5769f2f333b00c1c2c0f~oqKhphXnM3164431644euoutp02c
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 10:58:14 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20260422105814euoutp02388d06c6b9bf5769f2f333b00c1c2c0f~oqKhphXnM3164431644euoutp02c
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1776855494;
-	bh=HqZ/MfNxixsoC5HUHKPFpN1nTHkNJ5klIDKPGmogXBs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=O78c/4K0wAM0YGFZ8WN3N64GlFLsKgB+jiRv60SEoZNAtbVhzpEKeYLSMQ3/7khUI
-	 7FdazqVt7/3sz75rbUY+Fp10sbMgXkCVo6VQO9Z/HgAclQmWNllebCaL2MoUfZ7r90
-	 6LR38jWBGRGtiD0X6Pdxi7+TFxiEdSSqqVavZBJU=
-Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20260422105813eucas1p1a59a07ab8c1ac0c4b7eba37d509f69b8~oqKhYw4N90671706717eucas1p1Y;
-	Wed, 22 Apr 2026 10:58:13 +0000 (GMT)
-Received: from AMDC4843.eu.corp.samsungelectronics.net (unknown
-	[106.120.77.61]) by eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20260422105813eusmtip15775a2bab96a887094e270ad7d48787e~oqKhA-sow1020810208eusmtip1X;
-	Wed, 22 Apr 2026 10:58:13 +0000 (GMT)
-From: Jakub Raczynski <j.raczynski@samsung.com>
-To: error27@gmail.com
-Cc: netdev@vger.kernel.org, kuba@kernel.org, przemyslaw.kitszel@intel.com,
-	anthony.l.nguyen@intel.com, kernel-janitors@vger.kernel.org, Jakub Raczynski
-	<j.raczynski@samsung.com>
-Subject: [PATCH v2] net/intel: Replace manual array size calculation with
- ARRAY_SIZE
-Date: Wed, 22 Apr 2026 12:57:12 +0200
-Message-Id: <20260422105710.268003-1-j.raczynski@samsung.com>
+	s=arc-20240116; t=1776855521; c=relaxed/simple;
+	bh=TTcsVqyO+cRvqywCmON3S9sMBf2mjoLY9CJLaCXlzM0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=E0br4zTHTBt4ID2BB5ppPHioo+moVFXZaOJ6T6FYUhtQ98Y2fegjEuY0FuUIVhkVeBI0RbFYb2hC3h+osoDETokPTn7fFTdrP9m1Hqlrba/r6StpySawrMYj02JGrS+78/q224KEHGeSZ6J70lnBy6GI49BnuBPIFcAoTKeMlOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn; spf=pass smtp.mailfrom=stu.xidian.edu.cn; dkim=fail (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b=3LEM8CEX reason="key not found in DNS"; arc=none smtp.client-ip=162.243.164.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.xidian.edu.cn
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=stu.xidian.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:Date:
+	Message-Id:MIME-Version:Content-Transfer-Encoding; bh=AAAU2GMGPr
+	G1zZgq/1GH5AH+uMaADrCdJyeoKBuVvpc=; b=3LEM8CEX7eLAr6z97RMBLHwYm0
+	ib+ZC7IDSXJKR60LlXKVusSu1YQWlkafM75br5ylG7sUVguXsQiD2fthunltI2K5
+	JIVsN07kao1siFB8G06UWNQBbLRZfOQpAIbGIZtpTHifv/SxM4Y90czCNqwK8r9J
+	aDUxnfooA6pj5+0F4=
+Received: from wmy.localdomain (unknown [113.200.174.100])
+	by hzbj-edu-front-3.icoremail.net (Coremail) with SMTP id BbQMCkCmxjC8qehpyyKzAQ--.8112S2;
+	Wed, 22 Apr 2026 18:58:16 +0800 (CST)
+From: Mingyu Wang <25181214217@stu.xidian.edu.cn>
+To: willemdebruijn.kernel@gmail.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Mingyu Wang <25181214217@stu.xidian.edu.cn>
+Subject: [PATCH] ipv6: udp: fix memory leak in udpv6_sendmsg error path
+Date: Wed, 22 Apr 2026 18:58:02 +0800
+Message-Id: <20260422105802.486216-1-25181214217@stu.xidian.edu.cn>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <aeeFh1zQqhVysvxI@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,83 +63,97 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20260422105813eucas1p1a59a07ab8c1ac0c4b7eba37d509f69b8
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20260422105813eucas1p1a59a07ab8c1ac0c4b7eba37d509f69b8
-X-EPHeader: CA
-X-CMS-RootMailID: 20260422105813eucas1p1a59a07ab8c1ac0c4b7eba37d509f69b8
-References: <aeeFh1zQqhVysvxI@stanley.mountain>
-	<CGME20260422105813eucas1p1a59a07ab8c1ac0c4b7eba37d509f69b8@eucas1p1.samsung.com>
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-CM-TRANSID:BbQMCkCmxjC8qehpyyKzAQ--.8112S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7CrWUKFW7Jr15Jw18CFykXwb_yoW8Gr1kpw
+	4xKw4Yyr4DJrnxKFyxJ3WxZr15uayFqFyY9F13uas2krnxGF1xJr40vF4jqa1rAFs5uw45
+	ZayvqFW5uFyDCw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBa14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr
+	1j6F4UJwAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40E
+	FcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr
+	0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8v
+	x2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20x
+	vY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I
+	3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIx
+	AIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAI
+	cVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2js
+	IEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUQvtAUUUUU=
+X-CM-SenderInfo: qsvrmiqsrujiux6v33wo0lvxldqovvfxof0/1tbiAgULEWnnlGSYMwAAsI
+X-Spamd-Result: default: False [7.84 / 15.00];
+	SEM_URIBL(3.50)[xidian.edu.cn:email];
+	SUSPICIOUS_RECIPS(1.50)[];
+	DMARC_POLICY_QUARANTINE(1.50)[xidian.edu.cn : SPF not aligned (relaxed),quarantine];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
+	R_MISSING_CHARSET(0.50)[];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-280384-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[samsung.com:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	R_DKIM_PERMFAIL(0.00)[stu.xidian.edu.cn:s=dkim];
+	TAGGED_FROM(0.00)[bounces-280385-lists,netdev=lfdr.de];
+	GREYLIST(0.00)[pass,meta];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,kernel.org,google.com,redhat.com];
+	NEURAL_SPAM(0.00)[0.929];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[j.raczynski@samsung.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[25181214217@stu.xidian.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[stu.xidian.edu.cn:~];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[samsung.com:email,samsung.com:dkim,samsung.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 81987445093
-X-Rspamd-Action: no action
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(0.00)[+ip6:2600:3c15:e001:75::/64:c];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,xidian.edu.cn:email,stu.xidian.edu.cn:mid]
+X-Rspamd-Queue-Id: 97FA04450A2
+X-Rspamd-Action: add header
 X-Rspamd-Server: lfdr
+X-Spam: Yes
 
-There are still places in the code where manual calculation of array size
-exist, but it is good to enforce usage of single macro through the whole
-code as it makes code bit more readable.
-While at it, beautify condition surrounding it by reversing check and remove
-unnecessary casting.
+During fuzzing with failslab enabled, a memory leak was observed in the
+IPv6 UDP send path.
 
-Signed-off-by: Jakub Raczynski <j.raczynski@samsung.com>
+When sending via the lockless fast path (!corkreq), udpv6_sendmsg()
+calls ip6_make_skb() and assumes that the routing entry (dst_entry)
+reference has been stolen by the callee. However, if ip6_make_skb()
+fails early (e.g., due to an ENOMEM from memory allocation failure),
+it returns an error pointer without consuming the dst reference.
+
+Since udpv6_sendmsg() unconditionally jumps to the 'out_no_dst' label,
+the unconsumed dst_entry is never released, resulting in a memory leak.
+
+Fix this by explicitly calling dst_release(dst) when ip6_make_skb()
+returns an error.
+
+Signed-off-by: Mingyu Wang <25181214217@stu.xidian.edu.cn>
 ---
- drivers/net/ethernet/intel/i40e/i40e_adminq.h | 2 +-
- drivers/net/ethernet/intel/iavf/iavf_adminq.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ net/ipv6/udp.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.h b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-index 1be97a3a86ce..dcf3baec7b73 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-@@ -109,7 +109,7 @@ static inline int i40e_aq_rc_to_posix(int aq_ret, int aq_rc)
- 		-EFBIG,      /* I40E_AQ_RC_EFBIG */
- 	};
- 
--	if (!((u32)aq_rc < (sizeof(aq_to_posix) / sizeof((aq_to_posix)[0]))))
-+	if (aq_rc >= ARRAY_SIZE(aq_to_posix))
- 		return -ERANGE;
- 
- 	return aq_to_posix[aq_rc];
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_adminq.h b/drivers/net/ethernet/intel/iavf/iavf_adminq.h
-index bbf5c4b3a2ae..dd2f61172157 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_adminq.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf_adminq.h
-@@ -113,7 +113,7 @@ static inline int iavf_aq_rc_to_posix(int aq_ret, int aq_rc)
- 	if (aq_ret == IAVF_ERR_ADMIN_QUEUE_TIMEOUT)
- 		return -EAGAIN;
- 
--	if (!((u32)aq_rc < (sizeof(aq_to_posix) / sizeof((aq_to_posix)[0]))))
-+	if (aq_rc >= ARRAY_SIZE(aq_to_posix))
- 		return -ERANGE;
- 
- 	return aq_to_posix[aq_rc];
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index 15e032194ecc..b83ecfd729af 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -1706,8 +1706,11 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 				   dst_rt6_info(dst),
+ 				   msg->msg_flags, &cork);
+ 		err = PTR_ERR(skb);
+-		if (!IS_ERR_OR_NULL(skb))
++		if (!IS_ERR_OR_NULL(skb)) {
+ 			err = udp_v6_send_skb(skb, fl6, &cork.base);
++		} else {
++			dst_release(dst);
++		}
+ 		/* ip6_make_skb steals dst reference */
+ 		goto out_no_dst;
+ 	}
 -- 
 2.34.1
 
