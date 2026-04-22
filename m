@@ -1,140 +1,218 @@
-Return-Path: <netdev+bounces-280553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280555-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YNN8J9dD6WmqWwIAu9opvQ
-	(envelope-from <netdev+bounces-280553-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 23:55:35 +0200
+	id UEEyHqhK6WmqXQIAu9opvQ
+	(envelope-from <netdev+bounces-280555-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 00:24:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 048BC44B2C3
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 23:55:34 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B4E344B433
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 00:24:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 073A2304FFB9
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 21:55:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1B07C3010B6B
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 22:24:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BB3D3446AD;
-	Wed, 22 Apr 2026 21:55:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C00352FA5;
+	Wed, 22 Apr 2026 22:24:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HbFCm6NJ"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="ndCq9yn+"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.35.192.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57172223DE7
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 21:54:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B40AE32F757;
+	Wed, 22 Apr 2026 22:24:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.35.192.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776894900; cv=none; b=sCw3ioIXvPVIBg3b0fq6lREsuC3sAyMVPnBs5N4kFs7YJhRqdKrIRZkxlWRAu4evT+rZQy6L4UI5y1p86zUEbqyd//W8AsrDmiO81h6RpmpmFCnGv/J+ipbEt19Rs/EMMzBPgYoO0xHZ1Rm0UxM0eAPLeYmkNFKhkCX0b5JLbow=
+	t=1776896676; cv=none; b=IMZ5t+kjDHh64sIy+aYAY8o+kpBFV4RyqsGOY9k90C/jCJAJPYWw/OIq4ZgM/ZLCR889eQzoUAc0dKlmlYGR9VNHaiFT+u+zVdQ+K+CZoo3tsNKrPRWCVd9EoJDbgpse2f6EloEbfGJikYM7TdEc8PocIMYe5ruDJJ4x94+zHjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776894900; c=relaxed/simple;
-	bh=YogHmOpF4A3GhNzX/JlPwki2deFWzLDehVMmjrxi74w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R6xc9sdBn8qNVrTXbY/0a8mmmJPK8hZERP3GMJAPeuzVwy2UgkKEFxTOwYyebb02Pnr/GcZNXcoAVQb4mjQToaJzHE8bBlSPB6cb1ghJH72QYW0j6jN+flGfpZ/nJ0ujg3vFinHSbufthMATaZyIhN6sCijgc0PCjnJFEFc2Z3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HbFCm6NJ; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <e4e4b73c-3a0d-4245-9671-304bea0a50ca@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1776894896;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8baY9fEE70ed+r3IdwfqVGWeo+synaNC4tXtFwpdhuc=;
-	b=HbFCm6NJCTPdHyJAPvard6jLqweXUGSr1xNAAFPNDVD8YGxCXfPlN577b6fXjB460bsT6M
-	k0a8dsL9I4L4fakxwH2g3c9kZHxua7Hab9GnMB5A3/MWNgzTPr86dsZWCWzOQZA94NrMgt
-	LpDdKzL3VcISC/pjtYAQvJA4IFJrsd4=
-Date: Wed, 22 Apr 2026 22:54:46 +0100
+	s=arc-20240116; t=1776896676; c=relaxed/simple;
+	bh=64/A9eKby6JJjSlhlEoVioLXS6RwLUbJc8MhXuHlF9E=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lT1rzhaQMYZ4WqAP1OThzoMJ6wGAkMm1o0XqhxDvZ1WZnRs2Dxs1HzmJ8jZsdBrFXcWfX/BgPzUUtaXhp4/2Lc5NnfPpIn1PQlMuArJiwc5Hz8Ek7F5ktuLkjRY0CcYXQTiZ6cS/QEl/NbUI/UEHPEo/KE1/tvrfMNTXxNlwyNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=ndCq9yn+; arc=none smtp.client-ip=52.35.192.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1776896675; x=1808432675;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=hpJ2niGNMWMAiOWnWchr1xLnih4fGB7KThFqHTJLvkE=;
+  b=ndCq9yn+st6arL1jlRZoPNZSpa/PCAB4rnHS/cRc6eAQ9m+dVUIFzX/E
+   dLgzwwKcqTek0oIrgJUtB+1ee/UfzrF8/0uUFMTsbUHpuu8QuqxXsYaDE
+   7qP76urXzi6YtBwea8GC8n0eosQetaMdhDwUW88clhy/klRb+9mTdhric
+   HTPuC3T/2zoDSk7TPsh2u975llWnC5zuw+/HRdC14Ojp/BI25fG4Nd/dq
+   3HhlqeuBxNH8aQwhgexmtRjoTjLd0PF8TB1K3IjaHBHvlYtjs+Bx0Uhw6
+   C6cfhLwvLYEY25xCTFU6fw2S3Cf1+8YS86xwCOAg2JLMxJiFNvihRuCFx
+   w==;
+X-CSE-ConnectionGUID: RKVNVfxARX2lcKF/3V23Rw==
+X-CSE-MsgGUID: wL6wf5zNRoar8Fz59QCVSA==
+X-IronPort-AV: E=Sophos;i="6.23,193,1770595200"; 
+   d="scan'208";a="17763681"
+Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
+  by internal-pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2026 22:24:35 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:11045]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.10:2525] with esmtp (Farcaster)
+ id a1b1ab5e-00f8-48b2-a9b2-fd709f4ab206; Wed, 22 Apr 2026 22:24:35 +0000 (UTC)
+X-Farcaster-Flow-ID: a1b1ab5e-00f8-48b2-a9b2-fd709f4ab206
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Wed, 22 Apr 2026 22:24:32 +0000
+Received: from dev-dsk-wanjay-2c-d25651b4.us-west-2.amazon.com (172.19.198.4)
+ by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Wed, 22 Apr 2026 22:24:31 +0000
+From: Jay Wang <wanjay@amazon.com>
+To: <stable@vger.kernel.org>
+CC: <dhowells@redhat.com>, <marc.dionne@auristor.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-afs@lists.infradead.org>,
+	<jay.wang.upstream@gmail.com>, Faith <faith@zellic.io>, Pumpkin Chang
+	<pumpkin@devco.re>
+Subject: [PATCH 6.1.y] rxrpc: Fix recvmsg() unconditional requeue
+Date: Wed, 22 Apr 2026 22:24:31 +0000
+Message-ID: <20260422222431.7187-1-wanjay@amazon.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v2 3/3] net/ethernet/zte/dinghai: add hardware
- register access and PCI capability scanning
-To: Junyang Han <han.junyang@zte.com.cn>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, andrew+netdev@lunn.ch, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, ran.ming@zte.com.cn,
- han.chengfei@zte.com.cn, zhang.yanze@zte.com.cn
-References: <20260422144901.2403456-1-han.junyang@zte.com.cn>
- <20260422144901.2403456-4-han.junyang@zte.com.cn>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20260422144901.2403456-4-han.junyang@zte.com.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D035UWA001.ant.amazon.com (10.13.139.101) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	TAGGED_FROM(0.00)[bounces-280553-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[redhat.com,auristor.com,davemloft.net,google.com,kernel.org,vger.kernel.org,lists.infradead.org,gmail.com,zellic.io,devco.re];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-280555-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wanjay@amazon.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[amazon.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,zellic.io:email];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 048BC44B2C3
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 1B4E344B433
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 22.04.2026 15:49, Junyang Han wrote:
-> Implement PCI configuration space access, BAR mapping, capability
-> scanning (common/notify/device), and hardware queue register
-> definitions for DingHai PF device.
-> 
-> Signed-off-by: Junyang Han <han.junyang@zte.com.cn>
+From: David Howells <dhowells@redhat.com>
 
-[...]
+[ Upstream commit 2c28769a51deb6022d7fbd499987e237a01dd63a ]
 
-> +
-> +void __iomem *zxdh_pf_map_capability(struct dh_core_dev *dh_dev, int32_t off,
-> +				     size_t minlen, uint32_t align,
-> +				     uint32_t start, uint32_t size,
-> +				     size_t *len, resource_size_t *pa,
-> +				     uint32_t *bar_off)
-> +{
-> +	struct pci_dev *pdev = dh_dev->pdev;
-> +	uint8_t bar = 0;
-> +	uint32_t offset = 0;
-> +	uint32_t length = 0;
-> +	void __iomem *p = NULL;
+If rxrpc_recvmsg() fails because MSG_DONTWAIT was specified but the call
+at the front of the recvmsg queue already has its mutex locked, it
+requeues the call - whether or not the call is already queued.  The call
+may be on the queue because MSG_PEEK was also passed and so the call was
+not dequeued or because the I/O thread requeued it.
 
-Even though the changelog says that variable declaration ordering is fixed, this
-patch (as some others in the series) still has the problem.
+The unconditional requeue may then corrupt the recvmsg queue, leading to
+things like UAFs or refcount underruns.
 
-Also, please avoid using user-space fixed size types, kernel space uses short
-type names, like u32/u8 etc.
+Fix this by only requeuing the call if it isn't already on the queue -
+and moving it to the front if it is already queued.  If we don't queue
+it, we have to put the ref we obtained by dequeuing it.
 
-Try to avoid meaningless initialization as well.
+Also, MSG_PEEK doesn't dequeue the call so shouldn't call
+rxrpc_notify_socket() for the call if we didn't use up all the data on
+the queue, so fix that also.
 
-These comments apply to the whole series, not only to this single patch
+Fixes: 540b1c48c37a ("rxrpc: Fix deadlock between call creation and sendmsg/recvmsg")
+Reported-by: Faith <faith@zellic.io>
+Reported-by: Pumpkin Chang <pumpkin@devco.re>
+Signed-off-by: David Howells <dhowells@redhat.com>
+Acked-by: Marc Dionne <marc.dionne@auristor.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Cc: stable@vger.kernel.org
+[Adapted to 6.1: use write_lock_bh/write_unlock_bh, trace_rxrpc_call
+ directly for see-call tracing, and 6.1 trace enum naming convention.]
+Signed-off-by: Jay Wang <wanjay@amazon.com>
+---
+ include/trace/events/rxrpc.h |  4 ++++
+ net/rxrpc/recvmsg.c          | 20 ++++++++++++++++----
+ 2 files changed, 20 insertions(+), 4 deletions(-)
 
-> +
-> +	pci_read_config_byte(pdev, off + offsetof(struct zxdh_pf_pci_cap, bar), &bar);
-> +	pci_read_config_dword(pdev, off + offsetof(struct zxdh_pf_pci_cap, offset), &offset);
-> +	pci_read_config_dword(pdev, off + offsetof(struct zxdh_pf_pci_cap, length), &length);
-> +
-> +	if (bar_off)
-> +		*bar_off = offset;
-> +
+diff --git a/include/trace/events/rxrpc.h b/include/trace/events/rxrpc.h
+--- a/include/trace/events/rxrpc.h
++++ b/include/trace/events/rxrpc.h
+@@ -82,9 +82,13 @@
+ 	EM(rxrpc_call_put_notimer,		"PnT") \
+ 	EM(rxrpc_call_put_timer,		"PTM") \
+ 	EM(rxrpc_call_put_userid,		"Pus") \
++	EM(rxrpc_call_put_recvmsg_peek_nowait,	"PpN") \
+ 	EM(rxrpc_call_queued,			"QUE") \
+ 	EM(rxrpc_call_queued_ref,		"QUR") \
+ 	EM(rxrpc_call_release,			"RLS") \
++	EM(rxrpc_call_see_recvmsg_requeue,	"SrQ") \
++	EM(rxrpc_call_see_recvmsg_requeue_first,"SrF") \
++	EM(rxrpc_call_see_recvmsg_requeue_move,	"SrM") \
+ 	E_(rxrpc_call_seen,			"SEE")
+ 
+ #define rxrpc_transmit_traces \
+diff --git a/net/rxrpc/recvmsg.c b/net/rxrpc/recvmsg.c
+--- a/net/rxrpc/recvmsg.c
++++ b/net/rxrpc/recvmsg.c
+@@ -607,7 +607,8 @@ int rxrpc_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+ 
+ 		if (after(call->rx_top, call->rx_hard_ack) &&
+ 		    call->rxtx_buffer[(call->rx_hard_ack + 1) & RXRPC_RXTX_BUFF_MASK])
+-			rxrpc_notify_socket(call);
++			if (!(flags & MSG_PEEK))
++				rxrpc_notify_socket(call);
+ 		break;
+ 	default:
+ 		ret = 0;
+@@ -642,11 +643,24 @@ int rxrpc_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+ error_requeue_call:
+ 	if (!(flags & MSG_PEEK)) {
+ 		write_lock_bh(&rx->recvmsg_lock);
+-		list_add(&call->recvmsg_link, &rx->recvmsg_q);
+-		write_unlock_bh(&rx->recvmsg_lock);
++		if (list_empty(&call->recvmsg_link)) {
++			list_add(&call->recvmsg_link, &rx->recvmsg_q);
++			trace_rxrpc_call(call->debug_id,
++					 rxrpc_call_see_recvmsg_requeue,
++					 refcount_read(&call->ref),
++					 __builtin_return_address(0), NULL);
++			write_unlock_bh(&rx->recvmsg_lock);
++		} else if (list_is_first(&call->recvmsg_link, &rx->recvmsg_q)) {
++			write_unlock_bh(&rx->recvmsg_lock);
++			rxrpc_put_call(call, rxrpc_call_see_recvmsg_requeue_first);
++		} else {
++			list_move(&call->recvmsg_link, &rx->recvmsg_q);
++			write_unlock_bh(&rx->recvmsg_lock);
++			rxrpc_put_call(call, rxrpc_call_see_recvmsg_requeue_move);
++		}
+ 		trace_rxrpc_recvmsg(call, rxrpc_recvmsg_requeue, 0, 0, 0, 0);
+ 	} else {
+-		rxrpc_put_call(call, rxrpc_call_put);
++		rxrpc_put_call(call, rxrpc_call_put_recvmsg_peek_nowait);
+ 	}
+ error_no_call:
+ 	release_sock(&rx->sk);
+-- 
+2.43.0
+
 
