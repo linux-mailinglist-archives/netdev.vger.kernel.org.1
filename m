@@ -1,1614 +1,243 @@
-Return-Path: <netdev+bounces-280337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280339-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KIqkCLZ66GlvKwIAu9opvQ
-	(envelope-from <netdev+bounces-280337-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 09:37:26 +0200
+	id 2OaGBQJ96GmsKwIAu9opvQ
+	(envelope-from <netdev+bounces-280339-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 09:47:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA11F442FED
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 09:37:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EA9F4431B0
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 09:47:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7EDCA300D373
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 07:37:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 36BE630474DB
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 07:39:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1C82372B3D;
-	Wed, 22 Apr 2026 07:37:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF583372ED7;
+	Wed, 22 Apr 2026 07:39:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P3HtJIZL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7635634D38D
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 07:37:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776843441; cv=none; b=Htuu7CtdA4pTv0ax5kZ4MkApmf6OGrg+YHaaDRuLOhlmE1JHb+s8CJ1YBMZDa3y7a53guvORDFU0qN/hNeAVOBB7hoCUc8yCytX891zIw/F1e08N9fxUH8OtH8vFI5s23CNdf9/kZzAQCm892ONOu6wjGsRznm1kpbxz7cBQkKM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776843441; c=relaxed/simple;
-	bh=3GYHc+zvw8Cx3ECoCQuaHaB6GzeISywP0kNp1bRSNzE=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D987F2DC77F
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 07:39:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.170
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776843589; cv=pass; b=GKftuVoiVUNYFbHcDFYMLbjNwU/Al5C33pKsUNfYyKnd0wCc1vKGax8yvRVn+bARaCP7gQwXN0at1tSl5hb5mq+Zig24gEBJiT2zNhq0er2kdvftRQF1BUgZN/EMeMKPqiVCh3l+nP9kkNVT9J8TPmAqmam/kYUJIusR2rZxwjQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776843589; c=relaxed/simple;
+	bh=JIrqPstQwYNJn316wsBaxXz9zfKoIdJWF3ekFOqkV2g=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FhtbfFumnHpg2RIEKai5QN4JAzkcS20Bsukr0rWg6HFHtHzJyx8f6NXue7bKWFkjmjyUJOc7zkLBLjkr3K0+mxKvA6GshmUjXIybmEU3RlS55MBs5eraByw9ImSLcXu2IJcGKWMNcv6dzsJzC6he7Muo7gtnLrcLhvRDSZBHCF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-56f72d27e7eso5205893e0c.0
-        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 00:37:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776843437; x=1777448237;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+	 To:Cc:Content-Type; b=NNvPPK4+fDj6Gk1BWhDlzBVIy0M6XRlfad93MilwSWyY8QZgwYIeUpQIAhXRn3IvVN+/c/+D1Hajr5TLG05FzHSZ0C1b8BKnE06wpvQxOyXKuNHaF2zkhRT+xBXXehb/AoEk96w2zcCIcIUTOwpvHtm+fRCI9c6bOkgpj5lMoeo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P3HtJIZL; arc=pass smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-8ed4dd182efso159046185a.3
+        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 00:39:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776843586; cv=none;
+        d=google.com; s=arc-20240605;
+        b=VEADnTF3Wzt9DXkJBXk8gWZfB8AttJ+TV4R89DPgzmR3mGH147R45pgWtZOd+FYvFf
+         S1eF9zIKBdyHf2DJKVT+IOoIXdlOH/o5e32458Z/os4KQJs9/PSi0GpoDAiDLQ+mwVfv
+         JbUakATfHikN/YPATpY+mTD4qs/ChOf8GO1OC+hgDlN913/bEMzg3C/KlHwoYeBKkCui
+         Y3171babEgnbjPA3Tzc0I1Dp6MeuNNTIvO6kAUnsg5zHLnJQV0cXe7BVQr+qBmQBRXho
+         qGgPTjN920IdwkZGOaF1WsgfhvsE2s60FQyJsaJFoeItdiEAByfIy49Plm2JiFOg4RVk
+         VymA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=E8AU1puBQWeKYqSEIxsINcktHRXGb7onN9YVXllTiVY=;
+        fh=DhuG2D2chCHdXCaDPKTqk4m5sQ+v6n7dtRAwcL9AFS8=;
+        b=Bc0CYAsYWglt4QIfSS3c/nOBwKhtfAY0uh5VehaV9XY/unGlJ0bsV039pgCqi/0gKx
+         F8N1lX/9MdJh3+OULmrCfO38pjwrASorR7u6nzPE+sgQpgAH7RUVq0DVb5iw5gGKW0E7
+         tU7rsn6Seg8kTnIuIXWUgcW4scO9Pj7AFaVBbAXXfyG2enyZ/JCfLr3mRB8cZ6xU90os
+         HfUBMs3VOvaJjZqppp+ze50zeIx+udJJ9mesm9o4BjGL74gUC85lJLNcb/lrhlyWalGG
+         8W7nTMa/Qup/ZCCxxf2QbwGLr7dlQ189g6UVQJc3Z47TAAzdSmobN+V84Mv8seza71aR
+         dc9g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1776843586; x=1777448386; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=heCo2b4pUMTNyOlabKB+Q8YrZWL6NriqRZ5p561/Bdo=;
-        b=Tnuu9GP9fd3+l7YRRMbHyba0iOI1N9JMH7bPVECSsGPjxleXaajysqNDZ7KaOLVOvm
-         42N62VWnzFRtRH3TdQs7m2xusExipHkg7P5QX8jMRJZi3NJ3YceXRL2DFb5TFzMvu0YV
-         XUeQPng/digMbSSGiw4qgyvzm8CUoGW17d4ElXZuDkJfo2VJ3H0ilJNo50GdAEDBIo19
-         Y7+9n06hQnXPkYmwYc80q/YWfeP1N1+qJ0vxl6E7Xmv2CAP67YiilmcZf0maSWegAZGL
-         sHPIe9yiUyvjGAKqX+WSJLdYo+9jneezGzrMxNc5XH/OCvl6ROaNjofLNmshl8dtFQxU
-         4XGg==
-X-Forwarded-Encrypted: i=1; AFNElJ8AjzVNHd4yH9T5yJlVB07kialgw0xhHqWc340B2n2FeZ6YPirfAImmb7ksAb7sXQKDH90Bbas=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpWgtWb0GndEvaB7yftkVR1eiuziunZ+vHNgVM00u2Ve9rL5SE
-	iepdUHCqdFLVdq/g9Ws66wDvhvBYllxahEcbwHbvcxdoTbJjvFufnuVHi/4+69AKK3U=
-X-Gm-Gg: AeBDiet/3Q9nNXpzDA5NxDqzTXmCdz2ZmJPpI8Xl5V64naPzvkSB48SVAXLRCAG3HoF
-	t7kreKWYZSiaS9sMkxdUJbP40L3YGNr9yVfnfKB4wiLVujgRTwFKS3/C2bPMOntLq5vZ7ShFItW
-	Ow72GDkHTrZoNRtfR8jwQ6oBOuV9ltLoG37L7Xd2h918C9FART9Sxi2GM1ad1qD5tcDjYQepulH
-	SKdAgvUCB0eFP6+coYHd7/mhjkhTw+WC6lhWpaWORvDwaRp9neGmlBVW2k1fGWqB1lRyTmyUvu8
-	QENLIkAADI3r5I7G81+tDtp0aCiV03h4M1IqmIswJciAI54WvP5S6IUfiP48HSMtiBWdVDsBlZy
-	MH/0H/gW7KiTMIQtKc3Ks8MrR0oIfQet0kEnv8SI9xnEgMHlbpTbbZIy2GLhBc9GgO6eNM8rHGq
-	z8QCYNvZX33IQ3gu5PdEEPb1gfNxyr1MCFmaS+cRPWdaYGXeVPR9HPRHb/yvciHzZxruYV/jc=
-X-Received: by 2002:a05:6122:2913:b0:56b:a7de:7129 with SMTP id 71dfb90a1353d-56fa6697f14mr6013274e0c.7.1776843437087;
-        Wed, 22 Apr 2026 00:37:17 -0700 (PDT)
-Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com. [209.85.217.45])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56fa920f0b4sm9660854e0c.8.2026.04.22.00.37.16
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Apr 2026 00:37:16 -0700 (PDT)
-Received: by mail-vs1-f45.google.com with SMTP id ada2fe7eead31-60fea0840f3so4101549137.0
-        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 00:37:16 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ/sRvij5hKPCUYEKU4V0YDcPsOsQWPv9Mts4ASEtHOewVtpNkjqm3TvatiRkPcjuHHXl6ds4v4=@vger.kernel.org
-X-Received: by 2002:a05:6102:e0e:b0:608:d017:471c with SMTP id
- ada2fe7eead31-616fbfa882dmr7548078137.6.1776843435550; Wed, 22 Apr 2026
- 00:37:15 -0700 (PDT)
+        bh=E8AU1puBQWeKYqSEIxsINcktHRXGb7onN9YVXllTiVY=;
+        b=P3HtJIZLs7kDSBolrJNzMrG1uE48oHG8h06yAyq9xPxUwa+s1ryX+Q9KdgHmIqUjpL
+         3aiWKO8DoQABhi05ThWbW4LAdwPkmN5orv7fGQ4v+3yOgUQJVdXsfOisRIprQqaAny9e
+         KkG11tb72a2h4842ibzCILZjcROa++ZBcdeKvxxAHfhP3l9niBcWIAvpMl15nqrxwb24
+         jBXdx7Hwu3RtvGYshO92zjYDDgcBQtrjZ2kQS0Kg2qpmqDLT7ouomyO+bB8zJCUOx1Ku
+         xcutZB7UElyBsZrl4+orjDLJ5TRuQ3mQBjeUMHBtwF/fyhpq8uXJ7/jwArUMeOsj5Rhe
+         553w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776843586; x=1777448386;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=E8AU1puBQWeKYqSEIxsINcktHRXGb7onN9YVXllTiVY=;
+        b=Rt3Q+59Z3p6uHqr8Yt8PP4pDC0TLR7dr4uriqF9bubqDitRApXkrMCVkDghVjcomSO
+         sLYRh/OGkdLcwDf7cbp7vDJ+/a8hNT12Hg8TtZoWdH7kZ//LJpCoYHaM2HlBgByhwF5D
+         n3hpJuVGB55+M+og2IB7U9ljZOi5ah80w9vsZwZLoAjyw+bH0D3lE+jJ3YA+n1FESuNE
+         tAAj8oWt3FDMXn2BaEWc0HGsRjRUAKumOylPN31EAoj5VYJ5+X6R6IIaBqYy+40bUzxq
+         k0eKLHvkVy6M4XJs/so77QBEGnZuSCq19cagTItqbP7bALlsq4oNxphWQzhkQpSTHDxq
+         kecA==
+X-Forwarded-Encrypted: i=1; AFNElJ9unHs0ZazeHup1KCy28VOI3xcXr8TwVe+Iuqxzo9wv9MeJisV+L56ejTRnqBiLZS1149ylnuU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdlnWI0xV0AWjPPRsdjA1flBy3ZIDO9NUaITouWGYCMUMFSBn7
+	jP9IlkVRSDvxWYl+wvKK4QplhQuPrOQow6CR6bNn7FDgM/SOujsagH307THgTg/pGlgpXPbVELc
+	l6PK8XQzoRZxYgW65/deRsMo42zwStDvLmBO2fukd
+X-Gm-Gg: AeBDieul5wwmdCOtocMOfFQe99bW1CkrwXaWECyXrsHhLGv6XyXuw/PRGb8DdGXG1e8
+	N3jnFNIJqdqDFwgRSEU1lVyd1o4Zs8V2vtNiD2qWoXHWEiB5po7cZ0aE/WyADHayW9dCcwl+Mxu
+	25NiVIWtGIkVy62AUxAq3sIkshURv+J4LVhGUxcxJC2rHMW7zqw6negnpnr3vC7BrSLwpeAL509
+	7JshPM+Krt2UIOVQws2RLxk9W7nlOUDnXUnAZIPLzkgO9Vt8m7Z1d0tGxvW2cfkJ6P/vAPykLMy
+	dK7RgTLaJPxMZ5dCogiYXg+Bpo2WPZENWo4Y4lfXodUUOOE50zUH+M34YvgRisSJjF8wi1yIMdP
+	DcR10Y1bF
+X-Received: by 2002:a05:620a:4589:b0:8c7:13b8:8b55 with SMTP id
+ af79cd13be357-8e79236daddmr2963147785a.46.1776843585314; Wed, 22 Apr 2026
+ 00:39:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260421-v7-0-0-net-next-driver-removal-v1-v1-0-69517c689d1f@lunn.ch>
- <20260421-v7-0-0-net-next-driver-removal-v1-v1-6-69517c689d1f@lunn.ch>
-In-Reply-To: <20260421-v7-0-0-net-next-driver-removal-v1-v1-6-69517c689d1f@lunn.ch>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 22 Apr 2026 09:37:03 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdVY+dDhfYjfT+TSjcgrKRHqOS7sCgsBkP1XMCZpxwJt=g@mail.gmail.com>
-X-Gm-Features: AQROBzDcBZuBHUZg9RQD4mJlymE6yNNASjBiNGOnD0pZdf17X4ticGRx29r3PR8
-Message-ID: <CAMuHMdVY+dDhfYjfT+TSjcgrKRHqOS7sCgsBkP1XMCZpxwJt=g@mail.gmail.com>
-Subject: Re: [PATCH net 06/18] drivers: net: amd: Remove hplance and mvme147
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <skhan@linuxfoundation.org>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-m68k <linux-m68k@lists.linux-m68k.org>
+References: <20260414013634.43997-1-ahacigu.linux@gmail.com>
+ <CANn89i+vq9O8PJZaDf=0YjcKTM8=-64TcUn-i-F4siGKAMKz+A@mail.gmail.com> <CALjTKDkJ9L-88hdODbt-8D=eEDe6r5egtTfk_RnwgVq_NF+q+g@mail.gmail.com>
+In-Reply-To: <CALjTKDkJ9L-88hdODbt-8D=eEDe6r5egtTfk_RnwgVq_NF+q+g@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 22 Apr 2026 00:39:33 -0700
+X-Gm-Features: AQROBzA8TC84INUrYccUyZ1jV2DQcRrv0QbfayCd9P2QgDRedVzWP2R4pTIwduQ
+Message-ID: <CANn89iKwgoxM==synaLGKEP3k0jtCJ4b+Bap8ZF9k8yHJGnORg@mail.gmail.com>
+Subject: Re: [PATCH net] tcp: make probe0 timer handle expired user timeout
+To: Altan Hacigumus <ahacigu.linux@gmail.com>
+Cc: Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	"David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Enke Chen <enchen@paloaltonetworks.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.04 / 15.00];
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-280337-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[linux-m68k.org];
+	TAGGED_FROM(0.00)[bounces-280339-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,lunn.ch:email,greenend.org.uk:email]
-X-Rspamd-Queue-Id: AA11F442FED
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 8EA9F4431B0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-CC linux-m68k
+On Tue, Apr 21, 2026 at 8:31=E2=80=AFPM Altan Hacigumus <ahacigu.linux@gmai=
+l.com> wrote:
+>
+> On Mon, Apr 20, 2026 at 9:58=E2=80=AFPM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > On Mon, Apr 13, 2026 at 6:36=E2=80=AFPM Altan Hacigumus <ahacigu.linux@=
+gmail.com> wrote:
+> > >
+> > > tcp_clamp_probe0_to_user_timeout() computes remaining time in jiffies
+> > > using subtraction with an unsigned lvalue.  If elapsed probing time
+> > > already exceeds the configured TCP_USER_TIMEOUT, the subtraction
+> > > underflows and yields a large value.
+> > >
+> > > Handle this expiration case similarly to tcp_clamp_rto_to_user_timeou=
+t().
+> > >
+> > > Fixes: 344db93ae3ee ("tcp: make TCP_USER_TIMEOUT accurate for zero wi=
+ndow probes")
+> > > Signed-off-by: Altan Hacigumus <ahacigu.linux@gmail.com>
+> > > ---
+> > >  net/ipv4/tcp_timer.c | 5 ++++-
+> > >  1 file changed, 4 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+> > > index 5a14a53a3c9e..4a43356a4e06 100644
+> > > --- a/net/ipv4/tcp_timer.c
+> > > +++ b/net/ipv4/tcp_timer.c
+> > > @@ -50,7 +50,8 @@ static u32 tcp_clamp_rto_to_user_timeout(const stru=
+ct sock *sk)
+> > >  u32 tcp_clamp_probe0_to_user_timeout(const struct sock *sk, u32 when=
+)
+> > >  {
+> > >         const struct inet_connection_sock *icsk =3D inet_csk(sk);
+> > > -       u32 remaining, user_timeout;
+> > > +       u32 user_timeout;
+> > > +       s32 remaining;
+> > >         s32 elapsed;
+> > >
+> > >         user_timeout =3D READ_ONCE(icsk->icsk_user_timeout);
+> > > @@ -61,6 +62,8 @@ u32 tcp_clamp_probe0_to_user_timeout(const struct s=
+ock *sk, u32 when)
+> > >         if (unlikely(elapsed < 0))
+> > >                 elapsed =3D 0;
+> > >         remaining =3D msecs_to_jiffies(user_timeout) - elapsed;
+> > > +       if (remaining <=3D 0)
+> > > +               return 1;
+> >
+> > I do not think this chunk is needed ?
+> > If @remaining is signed, then perhaps change the following line to:
+> >
+> > remaining =3D max_t(int, remaining, TCP_TIMEOUT_MIN);
+> >
+>
+> The if (remaining <=3D 0) return 1 handles the already-expired case and
+> mirrors the logic in tcp_clamp_rto_to_user_timeout().
 
-On Tue, 21 Apr 2026 at 21:33, Andrew Lunn <andrew@lunn.ch> wrote:
-> These drivers use the 7990 core with wrappers for the HP300 and
-> Motorola MVME147 SBC circa 1998. It is unlikely they are used with a
-> modern kernel.
+tcp_clamp_rto_to_user_timeout() has two conditionals.
+
+if (remaining <=3D 0)
+   return 1;
+return min_t(u32, icsk->icsk_rto, msecs_to_jiffies(remaining));
+
+First one was to avoid to call msecs_to_jiffies() with a negative number.
+
+tcp_clamp_probe0_to_user_timeout() has 3 tests already, you want to
+add a fourth one...
+I would prefer something less obscure.
+We do not care if we return 1 or 2 (TCP_TIMEOUT_MIN) jiffies
+
 >
-> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
-> ---
->  drivers/net/ethernet/amd/7990.c    | 671 -------------------------------------
->  drivers/net/ethernet/amd/7990.h    | 251 --------------
->  drivers/net/ethernet/amd/Kconfig   |  18 -
->  drivers/net/ethernet/amd/Makefile  |   2 -
->  drivers/net/ethernet/amd/hplance.c | 238 -------------
->  drivers/net/ethernet/amd/hplance.h |  27 --
->  drivers/net/ethernet/amd/mvme147.c | 198 -----------
->  7 files changed, 1405 deletions(-)
+> max_t(s32, remaining, TCP_TIMEOUT_MIN) with remaining changed to s32
+> also fixes the underflow; I used the explicit early return for symmetry
+> with the RTO helper, but I can switch that in v2 if you prefer.
 >
-> diff --git a/drivers/net/ethernet/amd/7990.c b/drivers/net/ethernet/amd/7990.c
-> deleted file mode 100644
-> index 27792a52b6cf..000000000000
-> --- a/drivers/net/ethernet/amd/7990.c
-> +++ /dev/null
-> @@ -1,671 +0,0 @@
-> -// SPDX-License-Identifier: GPL-2.0-only
-> -/*
-> - * 7990.c -- LANCE ethernet IC generic routines.
-> - * This is an attempt to separate out the bits of various ethernet
-> - * drivers that are common because they all use the AMD 7990 LANCE
-> - * (Local Area Network Controller for Ethernet) chip.
-> - *
-> - * Copyright (C) 05/1998 Peter Maydell <pmaydell@chiark.greenend.org.uk>
-> - *
-> - * Most of this stuff was obtained by looking at other LANCE drivers,
-> - * in particular a2065.[ch]. The AMD C-LANCE datasheet was also helpful.
-> - * NB: this was made easy by the fact that Jes Sorensen had cleaned up
-> - * most of a2025 and sunlance with the aim of merging them, so the
-> - * common code was pretty obvious.
-> - */
-> -#include <linux/crc32.h>
-> -#include <linux/delay.h>
-> -#include <linux/errno.h>
-> -#include <linux/netdevice.h>
-> -#include <linux/etherdevice.h>
-> -#include <linux/module.h>
-> -#include <linux/kernel.h>
-> -#include <linux/types.h>
-> -#include <linux/fcntl.h>
-> -#include <linux/interrupt.h>
-> -#include <linux/ioport.h>
-> -#include <linux/in.h>
-> -#include <linux/route.h>
-> -#include <linux/string.h>
-> -#include <linux/skbuff.h>
-> -#include <linux/pgtable.h>
-> -#include <asm/irq.h>
-> -/* Used for the temporal inet entries and routing */
-> -#include <linux/socket.h>
-> -#include <linux/bitops.h>
-> -
-> -#include <asm/io.h>
-> -#include <asm/dma.h>
-> -#ifdef CONFIG_HP300
-> -#include <asm/blinken.h>
-> -#endif
-> -
-> -#include "7990.h"
-> -
-> -#define WRITERAP(lp, x)        out_be16(lp->base + LANCE_RAP, (x))
-> -#define WRITERDP(lp, x)        out_be16(lp->base + LANCE_RDP, (x))
-> -#define READRDP(lp)    in_be16(lp->base + LANCE_RDP)
-> -
-> -#if IS_ENABLED(CONFIG_HPLANCE)
-> -#include "hplance.h"
-> -
-> -#undef WRITERAP
-> -#undef WRITERDP
-> -#undef READRDP
-> -
-> -#if IS_ENABLED(CONFIG_MVME147_NET)
-> -
-> -/* Lossage Factor Nine, Mr Sulu. */
-> -#define WRITERAP(lp, x)        (lp->writerap(lp, x))
-> -#define WRITERDP(lp, x)        (lp->writerdp(lp, x))
-> -#define READRDP(lp)    (lp->readrdp(lp))
-> -
-> -#else
-> -
-> -/* These inlines can be used if only CONFIG_HPLANCE is defined */
-> -static inline void WRITERAP(struct lance_private *lp, __u16 value)
-> -{
-> -       do {
-> -               out_be16(lp->base + HPLANCE_REGOFF + LANCE_RAP, value);
-> -       } while ((in_8(lp->base + HPLANCE_STATUS) & LE_ACK) == 0);
-> -}
-> -
-> -static inline void WRITERDP(struct lance_private *lp, __u16 value)
-> -{
-> -       do {
-> -               out_be16(lp->base + HPLANCE_REGOFF + LANCE_RDP, value);
-> -       } while ((in_8(lp->base + HPLANCE_STATUS) & LE_ACK) == 0);
-> -}
-> -
-> -static inline __u16 READRDP(struct lance_private *lp)
-> -{
-> -       __u16 value;
-> -       do {
-> -               value = in_be16(lp->base + HPLANCE_REGOFF + LANCE_RDP);
-> -       } while ((in_8(lp->base + HPLANCE_STATUS) & LE_ACK) == 0);
-> -       return value;
-> -}
-> -
-> -#endif
-> -#endif /* IS_ENABLED(CONFIG_HPLANCE) */
-> -
-> -/* debugging output macros, various flavours */
-> -/* #define TEST_HITS */
-> -#ifdef UNDEF
-> -#define PRINT_RINGS() \
-> -do { \
-> -       int t; \
-> -       for (t = 0; t < RX_RING_SIZE; t++) { \
-> -               printk("R%d: @(%02X %04X) len %04X, mblen %04X, bits %02X\n", \
-> -                      t, ib->brx_ring[t].rmd1_hadr, ib->brx_ring[t].rmd0, \
-> -                      ib->brx_ring[t].length, \
-> -                      ib->brx_ring[t].mblength, ib->brx_ring[t].rmd1_bits); \
-> -       } \
-> -       for (t = 0; t < TX_RING_SIZE; t++) { \
-> -               printk("T%d: @(%02X %04X) len %04X, misc %04X, bits %02X\n", \
-> -                      t, ib->btx_ring[t].tmd1_hadr, ib->btx_ring[t].tmd0, \
-> -                      ib->btx_ring[t].length, \
-> -                      ib->btx_ring[t].misc, ib->btx_ring[t].tmd1_bits); \
-> -       } \
-> -} while (0)
-> -#else
-> -#define PRINT_RINGS()
-> -#endif
-> -
-> -/* Load the CSR registers. The LANCE has to be STOPped when we do this! */
-> -static void load_csrs(struct lance_private *lp)
-> -{
-> -       volatile struct lance_init_block *aib = lp->lance_init_block;
-> -       int leptr;
-> -
-> -       leptr = LANCE_ADDR(aib);
-> -
-> -       WRITERAP(lp, LE_CSR1);                    /* load address of init block */
-> -       WRITERDP(lp, leptr & 0xFFFF);
-> -       WRITERAP(lp, LE_CSR2);
-> -       WRITERDP(lp, leptr >> 16);
-> -       WRITERAP(lp, LE_CSR3);
-> -       WRITERDP(lp, lp->busmaster_regval);       /* set byteswap/ALEctrl/byte ctrl */
-> -
-> -       /* Point back to csr0 */
-> -       WRITERAP(lp, LE_CSR0);
-> -}
-> -
-> -/* #define to 0 or 1 appropriately */
-> -#define DEBUG_IRING 0
-> -/* Set up the Lance Rx and Tx rings and the init block */
-> -static void lance_init_ring(struct net_device *dev)
-> -{
-> -       struct lance_private *lp = netdev_priv(dev);
-> -       volatile struct lance_init_block *ib = lp->init_block;
-> -       volatile struct lance_init_block *aib; /* for LANCE_ADDR computations */
-> -       int leptr;
-> -       int i;
-> -
-> -       aib = lp->lance_init_block;
-> -
-> -       lp->rx_new = lp->tx_new = 0;
-> -       lp->rx_old = lp->tx_old = 0;
-> -
-> -       ib->mode = LE_MO_PROM;                             /* normal, enable Tx & Rx */
-> -
-> -       /* Copy the ethernet address to the lance init block
-> -        * Notice that we do a byteswap if we're big endian.
-> -        * [I think this is the right criterion; at least, sunlance,
-> -        * a2065 and atarilance do the byteswap and lance.c (PC) doesn't.
-> -        * However, the datasheet says that the BSWAP bit doesn't affect
-> -        * the init block, so surely it should be low byte first for
-> -        * everybody? Um.]
-> -        * We could define the ib->physaddr as three 16bit values and
-> -        * use (addr[1] << 8) | addr[0] & co, but this is more efficient.
-> -        */
-> -#ifdef __BIG_ENDIAN
-> -       ib->phys_addr[0] = dev->dev_addr[1];
-> -       ib->phys_addr[1] = dev->dev_addr[0];
-> -       ib->phys_addr[2] = dev->dev_addr[3];
-> -       ib->phys_addr[3] = dev->dev_addr[2];
-> -       ib->phys_addr[4] = dev->dev_addr[5];
-> -       ib->phys_addr[5] = dev->dev_addr[4];
-> -#else
-> -       for (i = 0; i < 6; i++)
-> -              ib->phys_addr[i] = dev->dev_addr[i];
-> -#endif
-> -
-> -       if (DEBUG_IRING)
-> -               printk("TX rings:\n");
-> -
-> -       lp->tx_full = 0;
-> -       /* Setup the Tx ring entries */
-> -       for (i = 0; i < (1 << lp->lance_log_tx_bufs); i++) {
-> -               leptr = LANCE_ADDR(&aib->tx_buf[i][0]);
-> -               ib->btx_ring[i].tmd0      = leptr;
-> -               ib->btx_ring[i].tmd1_hadr = leptr >> 16;
-> -               ib->btx_ring[i].tmd1_bits = 0;
-> -               ib->btx_ring[i].length    = 0xf000; /* The ones required by tmd2 */
-> -               ib->btx_ring[i].misc      = 0;
-> -               if (DEBUG_IRING)
-> -                       printk("%d: 0x%8.8x\n", i, leptr);
-> -       }
-> -
-> -       /* Setup the Rx ring entries */
-> -       if (DEBUG_IRING)
-> -               printk("RX rings:\n");
-> -       for (i = 0; i < (1 << lp->lance_log_rx_bufs); i++) {
-> -               leptr = LANCE_ADDR(&aib->rx_buf[i][0]);
-> -
-> -               ib->brx_ring[i].rmd0      = leptr;
-> -               ib->brx_ring[i].rmd1_hadr = leptr >> 16;
-> -               ib->brx_ring[i].rmd1_bits = LE_R1_OWN;
-> -               /* 0xf000 == bits that must be one (reserved, presumably) */
-> -               ib->brx_ring[i].length    = -RX_BUFF_SIZE | 0xf000;
-> -               ib->brx_ring[i].mblength  = 0;
-> -               if (DEBUG_IRING)
-> -                       printk("%d: 0x%8.8x\n", i, leptr);
-> -       }
-> -
-> -       /* Setup the initialization block */
-> -
-> -       /* Setup rx descriptor pointer */
-> -       leptr = LANCE_ADDR(&aib->brx_ring);
-> -       ib->rx_len = (lp->lance_log_rx_bufs << 13) | (leptr >> 16);
-> -       ib->rx_ptr = leptr;
-> -       if (DEBUG_IRING)
-> -               printk("RX ptr: %8.8x\n", leptr);
-> -
-> -       /* Setup tx descriptor pointer */
-> -       leptr = LANCE_ADDR(&aib->btx_ring);
-> -       ib->tx_len = (lp->lance_log_tx_bufs << 13) | (leptr >> 16);
-> -       ib->tx_ptr = leptr;
-> -       if (DEBUG_IRING)
-> -               printk("TX ptr: %8.8x\n", leptr);
-> -
-> -       /* Clear the multicast filter */
-> -       ib->filter[0] = 0;
-> -       ib->filter[1] = 0;
-> -       PRINT_RINGS();
-> -}
-> -
-> -/* LANCE must be STOPped before we do this, too... */
-> -static int init_restart_lance(struct lance_private *lp)
-> -{
-> -       int i;
-> -
-> -       WRITERAP(lp, LE_CSR0);
-> -       WRITERDP(lp, LE_C0_INIT);
-> -
-> -       /* Need a hook here for sunlance ledma stuff */
-> -
-> -       /* Wait for the lance to complete initialization */
-> -       for (i = 0; (i < 100) && !(READRDP(lp) & (LE_C0_ERR | LE_C0_IDON)); i++)
-> -               barrier();
-> -       if ((i == 100) || (READRDP(lp) & LE_C0_ERR)) {
-> -               printk("LANCE unopened after %d ticks, csr0=%4.4x.\n", i, READRDP(lp));
-> -               return -1;
-> -       }
-> -
-> -       /* Clear IDON by writing a "1", enable interrupts and start lance */
-> -       WRITERDP(lp, LE_C0_IDON);
-> -       WRITERDP(lp, LE_C0_INEA | LE_C0_STRT);
-> -
-> -       return 0;
-> -}
-> -
-> -static int lance_reset(struct net_device *dev)
-> -{
-> -       struct lance_private *lp = netdev_priv(dev);
-> -       int status;
-> -
-> -       /* Stop the lance */
-> -       WRITERAP(lp, LE_CSR0);
-> -       WRITERDP(lp, LE_C0_STOP);
-> -
-> -       load_csrs(lp);
-> -       lance_init_ring(dev);
-> -       netif_trans_update(dev); /* prevent tx timeout */
-> -       status = init_restart_lance(lp);
-> -#ifdef DEBUG_DRIVER
-> -       printk("Lance restart=%d\n", status);
-> -#endif
-> -       return status;
-> -}
-> -
-> -static int lance_rx(struct net_device *dev)
-> -{
-> -       struct lance_private *lp = netdev_priv(dev);
-> -       volatile struct lance_init_block *ib = lp->init_block;
-> -       volatile struct lance_rx_desc *rd;
-> -       unsigned char bits;
-> -#ifdef TEST_HITS
-> -       int i;
-> -#endif
-> -
-> -#ifdef TEST_HITS
-> -       printk("[");
-> -       for (i = 0; i < RX_RING_SIZE; i++) {
-> -               if (i == lp->rx_new)
-> -                       printk("%s",
-> -                              ib->brx_ring[i].rmd1_bits & LE_R1_OWN ? "_" : "X");
-> -               else
-> -                       printk("%s",
-> -                             ib->brx_ring[i].rmd1_bits & LE_R1_OWN ? "." : "1");
-> -       }
-> -       printk("]");
-> -#endif
-> -#ifdef CONFIG_HP300
-> -       blinken_leds(0x40, 0);
-> -#endif
-> -       WRITERDP(lp, LE_C0_RINT | LE_C0_INEA);     /* ack Rx int, reenable ints */
-> -       for (rd = &ib->brx_ring[lp->rx_new];     /* For each Rx ring we own... */
-> -            !((bits = rd->rmd1_bits) & LE_R1_OWN);
-> -            rd = &ib->brx_ring[lp->rx_new]) {
-> -
-> -               /* We got an incomplete frame? */
-> -               if ((bits & LE_R1_POK) != LE_R1_POK) {
-> -                       dev->stats.rx_over_errors++;
-> -                       dev->stats.rx_errors++;
-> -                       continue;
-> -               } else if (bits & LE_R1_ERR) {
-> -                       /* Count only the end frame as a rx error,
-> -                        * not the beginning
-> -                        */
-> -                       if (bits & LE_R1_BUF)
-> -                               dev->stats.rx_fifo_errors++;
-> -                       if (bits & LE_R1_CRC)
-> -                               dev->stats.rx_crc_errors++;
-> -                       if (bits & LE_R1_OFL)
-> -                               dev->stats.rx_over_errors++;
-> -                       if (bits & LE_R1_FRA)
-> -                               dev->stats.rx_frame_errors++;
-> -                       if (bits & LE_R1_EOP)
-> -                               dev->stats.rx_errors++;
-> -               } else {
-> -                       int len = (rd->mblength & 0xfff) - 4;
-> -                       struct sk_buff *skb = netdev_alloc_skb(dev, len + 2);
-> -
-> -                       if (!skb) {
-> -                               dev->stats.rx_dropped++;
-> -                               rd->mblength = 0;
-> -                               rd->rmd1_bits = LE_R1_OWN;
-> -                               lp->rx_new = (lp->rx_new + 1) & lp->rx_ring_mod_mask;
-> -                               return 0;
-> -                       }
-> -
-> -                       skb_reserve(skb, 2);           /* 16 byte align */
-> -                       skb_put(skb, len);             /* make room */
-> -                       skb_copy_to_linear_data(skb,
-> -                                        (unsigned char *)&(ib->rx_buf[lp->rx_new][0]),
-> -                                        len);
-> -                       skb->protocol = eth_type_trans(skb, dev);
-> -                       netif_rx(skb);
-> -                       dev->stats.rx_packets++;
-> -                       dev->stats.rx_bytes += len;
-> -               }
-> -
-> -               /* Return the packet to the pool */
-> -               rd->mblength = 0;
-> -               rd->rmd1_bits = LE_R1_OWN;
-> -               lp->rx_new = (lp->rx_new + 1) & lp->rx_ring_mod_mask;
-> -       }
-> -       return 0;
-> -}
-> -
-> -static int lance_tx(struct net_device *dev)
-> -{
-> -       struct lance_private *lp = netdev_priv(dev);
-> -       volatile struct lance_init_block *ib = lp->init_block;
-> -       volatile struct lance_tx_desc *td;
-> -       int i, j;
-> -       int status;
-> -
-> -#ifdef CONFIG_HP300
-> -       blinken_leds(0x80, 0);
-> -#endif
-> -       /* csr0 is 2f3 */
-> -       WRITERDP(lp, LE_C0_TINT | LE_C0_INEA);
-> -       /* csr0 is 73 */
-> -
-> -       j = lp->tx_old;
-> -       for (i = j; i != lp->tx_new; i = j) {
-> -               td = &ib->btx_ring[i];
-> -
-> -               /* If we hit a packet not owned by us, stop */
-> -               if (td->tmd1_bits & LE_T1_OWN)
-> -                       break;
-> -
-> -               if (td->tmd1_bits & LE_T1_ERR) {
-> -                       status = td->misc;
-> -
-> -                       dev->stats.tx_errors++;
-> -                       if (status & LE_T3_RTY)
-> -                               dev->stats.tx_aborted_errors++;
-> -                       if (status & LE_T3_LCOL)
-> -                               dev->stats.tx_window_errors++;
-> -
-> -                       if (status & LE_T3_CLOS) {
-> -                               dev->stats.tx_carrier_errors++;
-> -                               if (lp->auto_select) {
-> -                                       lp->tpe = 1 - lp->tpe;
-> -                                       printk("%s: Carrier Lost, trying %s\n",
-> -                                              dev->name,
-> -                                              lp->tpe ? "TPE" : "AUI");
-> -                                       /* Stop the lance */
-> -                                       WRITERAP(lp, LE_CSR0);
-> -                                       WRITERDP(lp, LE_C0_STOP);
-> -                                       lance_init_ring(dev);
-> -                                       load_csrs(lp);
-> -                                       init_restart_lance(lp);
-> -                                       return 0;
-> -                               }
-> -                       }
-> -
-> -                       /* buffer errors and underflows turn off the transmitter */
-> -                       /* Restart the adapter */
-> -                       if (status & (LE_T3_BUF|LE_T3_UFL)) {
-> -                               dev->stats.tx_fifo_errors++;
-> -
-> -                               printk("%s: Tx: ERR_BUF|ERR_UFL, restarting\n",
-> -                                      dev->name);
-> -                               /* Stop the lance */
-> -                               WRITERAP(lp, LE_CSR0);
-> -                               WRITERDP(lp, LE_C0_STOP);
-> -                               lance_init_ring(dev);
-> -                               load_csrs(lp);
-> -                               init_restart_lance(lp);
-> -                               return 0;
-> -                       }
-> -               } else if ((td->tmd1_bits & LE_T1_POK) == LE_T1_POK) {
-> -                       /*
-> -                        * So we don't count the packet more than once.
-> -                        */
-> -                       td->tmd1_bits &= ~(LE_T1_POK);
-> -
-> -                       /* One collision before packet was sent. */
-> -                       if (td->tmd1_bits & LE_T1_EONE)
-> -                               dev->stats.collisions++;
-> -
-> -                       /* More than one collision, be optimistic. */
-> -                       if (td->tmd1_bits & LE_T1_EMORE)
-> -                               dev->stats.collisions += 2;
-> -
-> -                       dev->stats.tx_packets++;
-> -               }
-> -
-> -               j = (j + 1) & lp->tx_ring_mod_mask;
-> -       }
-> -       lp->tx_old = j;
-> -       WRITERDP(lp, LE_C0_TINT | LE_C0_INEA);
-> -       return 0;
-> -}
-> -
-> -static irqreturn_t
-> -lance_interrupt(int irq, void *dev_id)
-> -{
-> -       struct net_device *dev = (struct net_device *)dev_id;
-> -       struct lance_private *lp = netdev_priv(dev);
-> -       int csr0;
-> -
-> -       spin_lock(&lp->devlock);
-> -
-> -       WRITERAP(lp, LE_CSR0);              /* LANCE Controller Status */
-> -       csr0 = READRDP(lp);
-> -
-> -       PRINT_RINGS();
-> -
-> -       if (!(csr0 & LE_C0_INTR)) {     /* Check if any interrupt has */
-> -               spin_unlock(&lp->devlock);
-> -               return IRQ_NONE;        /* been generated by the Lance. */
-> -       }
-> -
-> -       /* Acknowledge all the interrupt sources ASAP */
-> -       WRITERDP(lp, csr0 & ~(LE_C0_INEA|LE_C0_TDMD|LE_C0_STOP|LE_C0_STRT|LE_C0_INIT));
-> -
-> -       if ((csr0 & LE_C0_ERR)) {
-> -               /* Clear the error condition */
-> -               WRITERDP(lp, LE_C0_BABL|LE_C0_ERR|LE_C0_MISS|LE_C0_INEA);
-> -       }
-> -
-> -       if (csr0 & LE_C0_RINT)
-> -               lance_rx(dev);
-> -
-> -       if (csr0 & LE_C0_TINT)
-> -               lance_tx(dev);
-> -
-> -       /* Log misc errors. */
-> -       if (csr0 & LE_C0_BABL)
-> -               dev->stats.tx_errors++;       /* Tx babble. */
-> -       if (csr0 & LE_C0_MISS)
-> -               dev->stats.rx_errors++;       /* Missed a Rx frame. */
-> -       if (csr0 & LE_C0_MERR) {
-> -               printk("%s: Bus master arbitration failure, status %4.4x.\n",
-> -                      dev->name, csr0);
-> -               /* Restart the chip. */
-> -               WRITERDP(lp, LE_C0_STRT);
-> -       }
-> -
-> -       if (lp->tx_full && netif_queue_stopped(dev) && (TX_BUFFS_AVAIL >= 0)) {
-> -               lp->tx_full = 0;
-> -               netif_wake_queue(dev);
-> -       }
-> -
-> -       WRITERAP(lp, LE_CSR0);
-> -       WRITERDP(lp, LE_C0_BABL|LE_C0_CERR|LE_C0_MISS|LE_C0_MERR|LE_C0_IDON|LE_C0_INEA);
-> -
-> -       spin_unlock(&lp->devlock);
-> -       return IRQ_HANDLED;
-> -}
-> -
-> -int lance_open(struct net_device *dev)
-> -{
-> -       struct lance_private *lp = netdev_priv(dev);
-> -       int res;
-> -
-> -       /* Install the Interrupt handler. Or we could shunt this out to specific drivers? */
-> -       if (request_irq(lp->irq, lance_interrupt, IRQF_SHARED, lp->name, dev))
-> -               return -EAGAIN;
-> -
-> -       res = lance_reset(dev);
-> -       spin_lock_init(&lp->devlock);
-> -       netif_start_queue(dev);
-> -
-> -       return res;
-> -}
-> -EXPORT_SYMBOL_GPL(lance_open);
-> -
-> -int lance_close(struct net_device *dev)
-> -{
-> -       struct lance_private *lp = netdev_priv(dev);
-> -
-> -       netif_stop_queue(dev);
-> -
-> -       /* Stop the LANCE */
-> -       WRITERAP(lp, LE_CSR0);
-> -       WRITERDP(lp, LE_C0_STOP);
-> -
-> -       free_irq(lp->irq, dev);
-> -
-> -       return 0;
-> -}
-> -EXPORT_SYMBOL_GPL(lance_close);
-> -
-> -void lance_tx_timeout(struct net_device *dev, unsigned int txqueue)
-> -{
-> -       printk("lance_tx_timeout\n");
-> -       lance_reset(dev);
-> -       netif_trans_update(dev); /* prevent tx timeout */
-> -       netif_wake_queue(dev);
-> -}
-> -EXPORT_SYMBOL_GPL(lance_tx_timeout);
-> -
-> -netdev_tx_t lance_start_xmit(struct sk_buff *skb, struct net_device *dev)
-> -{
-> -       struct lance_private *lp = netdev_priv(dev);
-> -       volatile struct lance_init_block *ib = lp->init_block;
-> -       int entry, skblen, len;
-> -       static int outs;
-> -       unsigned long flags;
-> -
-> -       netif_stop_queue(dev);
-> -
-> -       if (!TX_BUFFS_AVAIL) {
-> -               dev_consume_skb_any(skb);
-> -               return NETDEV_TX_OK;
-> -       }
-> -
-> -       skblen = skb->len;
-> -
-> -#ifdef DEBUG_DRIVER
-> -       /* dump the packet */
-> -       {
-> -               int i;
-> -
-> -               for (i = 0; i < 64; i++) {
-> -                       if ((i % 16) == 0)
-> -                               printk("\n");
-> -                       printk("%2.2x ", skb->data[i]);
-> -               }
-> -       }
-> -#endif
-> -       len = (skblen <= ETH_ZLEN) ? ETH_ZLEN : skblen;
-> -       entry = lp->tx_new & lp->tx_ring_mod_mask;
-> -       ib->btx_ring[entry].length = (-len) | 0xf000;
-> -       ib->btx_ring[entry].misc = 0;
-> -
-> -       if (skb->len < ETH_ZLEN)
-> -               memset((void *)&ib->tx_buf[entry][0], 0, ETH_ZLEN);
-> -       skb_copy_from_linear_data(skb, (void *)&ib->tx_buf[entry][0], skblen);
-> -
-> -       /* Now, give the packet to the lance */
-> -       ib->btx_ring[entry].tmd1_bits = (LE_T1_POK|LE_T1_OWN);
-> -       lp->tx_new = (lp->tx_new + 1) & lp->tx_ring_mod_mask;
-> -
-> -       outs++;
-> -       /* Kick the lance: transmit now */
-> -       WRITERDP(lp, LE_C0_INEA | LE_C0_TDMD);
-> -       dev_consume_skb_any(skb);
-> -
-> -       spin_lock_irqsave(&lp->devlock, flags);
-> -       if (TX_BUFFS_AVAIL)
-> -               netif_start_queue(dev);
-> -       else
-> -               lp->tx_full = 1;
-> -       spin_unlock_irqrestore(&lp->devlock, flags);
-> -
-> -       return NETDEV_TX_OK;
-> -}
-> -EXPORT_SYMBOL_GPL(lance_start_xmit);
-> -
-> -/* taken from the depca driver via a2065.c */
-> -static void lance_load_multicast(struct net_device *dev)
-> -{
-> -       struct lance_private *lp = netdev_priv(dev);
-> -       volatile struct lance_init_block *ib = lp->init_block;
-> -       volatile u16 *mcast_table = (u16 *)&ib->filter;
-> -       struct netdev_hw_addr *ha;
-> -       u32 crc;
-> -
-> -       /* set all multicast bits */
-> -       if (dev->flags & IFF_ALLMULTI) {
-> -               ib->filter[0] = 0xffffffff;
-> -               ib->filter[1] = 0xffffffff;
-> -               return;
-> -       }
-> -       /* clear the multicast filter */
-> -       ib->filter[0] = 0;
-> -       ib->filter[1] = 0;
-> -
-> -       /* Add addresses */
-> -       netdev_for_each_mc_addr(ha, dev) {
-> -               crc = ether_crc_le(6, ha->addr);
-> -               crc = crc >> 26;
-> -               mcast_table[crc >> 4] |= 1 << (crc & 0xf);
-> -       }
-> -}
-> -
-> -
-> -void lance_set_multicast(struct net_device *dev)
-> -{
-> -       struct lance_private *lp = netdev_priv(dev);
-> -       volatile struct lance_init_block *ib = lp->init_block;
-> -       int stopped;
-> -
-> -       stopped = netif_queue_stopped(dev);
-> -       if (!stopped)
-> -               netif_stop_queue(dev);
-> -
-> -       while (lp->tx_old != lp->tx_new)
-> -               schedule();
-> -
-> -       WRITERAP(lp, LE_CSR0);
-> -       WRITERDP(lp, LE_C0_STOP);
-> -       lance_init_ring(dev);
-> -
-> -       if (dev->flags & IFF_PROMISC) {
-> -               ib->mode |= LE_MO_PROM;
-> -       } else {
-> -               ib->mode &= ~LE_MO_PROM;
-> -               lance_load_multicast(dev);
-> -       }
-> -       load_csrs(lp);
-> -       init_restart_lance(lp);
-> -
-> -       if (!stopped)
-> -               netif_start_queue(dev);
-> -}
-> -EXPORT_SYMBOL_GPL(lance_set_multicast);
-> -
-> -#ifdef CONFIG_NET_POLL_CONTROLLER
-> -void lance_poll(struct net_device *dev)
-> -{
-> -       struct lance_private *lp = netdev_priv(dev);
-> -
-> -       spin_lock(&lp->devlock);
-> -       WRITERAP(lp, LE_CSR0);
-> -       WRITERDP(lp, LE_C0_STRT);
-> -       spin_unlock(&lp->devlock);
-> -       lance_interrupt(dev->irq, dev);
-> -}
-> -EXPORT_SYMBOL_GPL(lance_poll);
-> -#endif
-> -
-> -MODULE_DESCRIPTION("LANCE Ethernet IC generic routines");
-> -MODULE_LICENSE("GPL");
-> diff --git a/drivers/net/ethernet/amd/7990.h b/drivers/net/ethernet/amd/7990.h
-> deleted file mode 100644
-> index e53551daeea1..000000000000
-> --- a/drivers/net/ethernet/amd/7990.h
-> +++ /dev/null
-> @@ -1,251 +0,0 @@
-> -/* SPDX-License-Identifier: GPL-2.0 */
-> -/*
-> - * 7990.h -- LANCE ethernet IC generic routines.
-> - * This is an attempt to separate out the bits of various ethernet
-> - * drivers that are common because they all use the AMD 7990 LANCE
-> - * (Local Area Network Controller for Ethernet) chip.
-> - *
-> - * Copyright (C) 05/1998 Peter Maydell <pmaydell@chiark.greenend.org.uk>
-> - *
-> - * Most of this stuff was obtained by looking at other LANCE drivers,
-> - * in particular a2065.[ch]. The AMD C-LANCE datasheet was also helpful.
-> - */
-> -
-> -#ifndef _7990_H
-> -#define _7990_H
-> -
-> -/* The lance only has two register locations. We communicate mostly via memory. */
-> -#define LANCE_RDP      0       /* Register Data Port */
-> -#define LANCE_RAP      2       /* Register Address Port */
-> -
-> -/* Transmit/receive ring definitions.
-> - * We allow the specific drivers to override these defaults if they want to.
-> - * NB: according to lance.c, increasing the number of buffers is a waste
-> - * of space and reduces the chance that an upper layer will be able to
-> - * reorder queued Tx packets based on priority. [Clearly there is a minimum
-> - * limit too: too small and we drop rx packets and can't tx at full speed.]
-> - * 4+4 seems to be the usual setting; the atarilance driver uses 3 and 5.
-> - */
-> -
-> -/* Blast! This won't work. The problem is that we can't specify a default
-> - * setting because that would cause the lance_init_block struct to be
-> - * too long (and overflow the RAM on shared-memory cards like the HP LANCE.
-> - */
-> -#ifndef LANCE_LOG_TX_BUFFERS
-> -#define LANCE_LOG_TX_BUFFERS 1
-> -#define LANCE_LOG_RX_BUFFERS 3
-> -#endif
-> -
-> -#define TX_RING_SIZE           (1 << LANCE_LOG_TX_BUFFERS)
-> -#define RX_RING_SIZE           (1 << LANCE_LOG_RX_BUFFERS)
-> -#define TX_RING_MOD_MASK       (TX_RING_SIZE - 1)
-> -#define RX_RING_MOD_MASK       (RX_RING_SIZE - 1)
-> -#define TX_RING_LEN_BITS       ((LANCE_LOG_TX_BUFFERS) << 29)
-> -#define RX_RING_LEN_BITS       ((LANCE_LOG_RX_BUFFERS) << 29)
-> -#define PKT_BUFF_SIZE          (1544)
-> -#define RX_BUFF_SIZE           PKT_BUFF_SIZE
-> -#define TX_BUFF_SIZE           PKT_BUFF_SIZE
-> -
-> -/* Each receive buffer is described by a receive message descriptor (RMD) */
-> -struct lance_rx_desc {
-> -       volatile unsigned short rmd0;       /* low address of packet */
-> -       volatile unsigned char  rmd1_bits;  /* descriptor bits */
-> -       volatile unsigned char  rmd1_hadr;  /* high address of packet */
-> -       volatile short    length;           /* This length is 2s complement (negative)!
-> -                                            * Buffer length */
-> -       volatile unsigned short mblength;   /* Actual number of bytes received */
-> -};
-> -
-> -/* Ditto for TMD: */
-> -struct lance_tx_desc {
-> -       volatile unsigned short tmd0;       /* low address of packet */
-> -       volatile unsigned char  tmd1_bits;  /* descriptor bits */
-> -       volatile unsigned char  tmd1_hadr;  /* high address of packet */
-> -       volatile short    length;           /* Length is 2s complement (negative)! */
-> -       volatile unsigned short misc;
-> -};
-> -
-> -/* There are three memory structures accessed by the LANCE:
-> - * the initialization block, the receive and transmit descriptor rings,
-> - * and the data buffers themselves. In fact we might as well put the
-> - * init block,the Tx and Rx rings and the buffers together in memory:
-> - */
-> -struct lance_init_block {
-> -       volatile unsigned short mode;           /* Pre-set mode (reg. 15) */
-> -       volatile unsigned char phys_addr[6];    /* Physical ethernet address */
-> -       volatile unsigned filter[2];            /* Multicast filter (64 bits) */
-> -
-> -       /* Receive and transmit ring base, along with extra bits. */
-> -       volatile unsigned short rx_ptr;         /* receive descriptor addr */
-> -       volatile unsigned short rx_len;         /* receive len and high addr */
-> -       volatile unsigned short tx_ptr;         /* transmit descriptor addr */
-> -       volatile unsigned short tx_len;         /* transmit len and high addr */
-> -
-> -       /* The Tx and Rx ring entries must be aligned on 8-byte boundaries.
-> -        * This will be true if this whole struct is 8-byte aligned.
-> -        */
-> -       volatile struct lance_tx_desc btx_ring[TX_RING_SIZE];
-> -       volatile struct lance_rx_desc brx_ring[RX_RING_SIZE];
-> -
-> -       volatile char tx_buf[TX_RING_SIZE][TX_BUFF_SIZE];
-> -       volatile char rx_buf[RX_RING_SIZE][RX_BUFF_SIZE];
-> -       /* we use this just to make the struct big enough that we can move its startaddr
-> -        * in order to force alignment to an eight byte boundary.
-> -        */
-> -};
-> -
-> -/* This is where we keep all the stuff the driver needs to know about.
-> - * I'm definitely unhappy about the mechanism for allowing specific
-> - * drivers to add things...
-> - */
-> -struct lance_private {
-> -       const char *name;
-> -       unsigned long base;
-> -       volatile struct lance_init_block *init_block; /* CPU address of RAM */
-> -       volatile struct lance_init_block *lance_init_block; /* LANCE address of RAM */
-> -
-> -       int rx_new, tx_new;
-> -       int rx_old, tx_old;
-> -
-> -       int lance_log_rx_bufs, lance_log_tx_bufs;
-> -       int rx_ring_mod_mask, tx_ring_mod_mask;
-> -
-> -       int tpe;                        /* TPE is selected */
-> -       int auto_select;                /* cable-selection is by carrier */
-> -       unsigned short busmaster_regval;
-> -
-> -       unsigned int irq;               /* IRQ to register */
-> -
-> -       /* This is because the HP LANCE is disgusting and you have to check
-> -        * a DIO-specific register every time you read/write the LANCE regs :-<
-> -        * [could we get away with making these some sort of macro?]
-> -        */
-> -       void (*writerap)(void *, unsigned short);
-> -       void (*writerdp)(void *, unsigned short);
-> -       unsigned short (*readrdp)(void *);
-> -       spinlock_t devlock;
-> -       char tx_full;
-> -};
-> -
-> -/*
-> - *             Am7990 Control and Status Registers
-> - */
-> -#define LE_CSR0                0x0000  /* LANCE Controller Status */
-> -#define LE_CSR1                0x0001  /* IADR[15:0] (bit0==0 ie word aligned) */
-> -#define LE_CSR2                0x0002  /* IADR[23:16] (high bits reserved) */
-> -#define LE_CSR3                0x0003  /* Misc */
-> -
-> -/*
-> - *             Bit definitions for CSR0 (LANCE Controller Status)
-> - */
-> -#define LE_C0_ERR      0x8000  /* Error = BABL | CERR | MISS | MERR */
-> -#define LE_C0_BABL     0x4000  /* Babble: Transmitted too many bits */
-> -#define LE_C0_CERR     0x2000  /* No Heartbeat (10BASE-T) */
-> -#define LE_C0_MISS     0x1000  /* Missed Frame (no rx buffer to put it in) */
-> -#define LE_C0_MERR     0x0800  /* Memory Error */
-> -#define LE_C0_RINT     0x0400  /* Receive Interrupt */
-> -#define LE_C0_TINT     0x0200  /* Transmit Interrupt */
-> -#define LE_C0_IDON     0x0100  /* Initialization Done */
-> -#define LE_C0_INTR     0x0080  /* Interrupt Flag
-> -                                  = BABL | MISS | MERR | RINT | TINT | IDON */
-> -#define LE_C0_INEA     0x0040  /* Interrupt Enable */
-> -#define LE_C0_RXON     0x0020  /* Receive On */
-> -#define LE_C0_TXON     0x0010  /* Transmit On */
-> -#define LE_C0_TDMD     0x0008  /* Transmit Demand */
-> -#define LE_C0_STOP     0x0004  /* Stop */
-> -#define LE_C0_STRT     0x0002  /* Start */
-> -#define LE_C0_INIT     0x0001  /* Initialize */
-> -
-> -
-> -/*
-> - *             Bit definitions for CSR3
-> - */
-> -#define LE_C3_BSWP     0x0004  /* Byte Swap (on for big endian byte order) */
-> -#define LE_C3_ACON     0x0002  /* ALE Control (on for active low ALE) */
-> -#define LE_C3_BCON     0x0001  /* Byte Control */
-> -
-> -
-> -/*
-> - *             Mode Flags
-> - */
-> -#define LE_MO_PROM     0x8000  /* Promiscuous Mode */
-> -/* these next ones 0x4000 -- 0x0080 are not available on the LANCE 7990,
-> - * but they are in NetBSD's am7990.h, presumably for backwards-compatible chips
-> - */
-> -#define LE_MO_DRCVBC   0x4000  /* disable receive broadcast */
-> -#define LE_MO_DRCVPA   0x2000  /* disable physical address detection */
-> -#define LE_MO_DLNKTST  0x1000  /* disable link status */
-> -#define LE_MO_DAPC     0x0800  /* disable automatic polarity correction */
-> -#define LE_MO_MENDECL  0x0400  /* MENDEC loopback mode */
-> -#define LE_MO_LRTTSEL  0x0200  /* lower RX threshold / TX mode selection */
-> -#define LE_MO_PSEL1    0x0100  /* port selection bit1 */
-> -#define LE_MO_PSEL0    0x0080  /* port selection bit0 */
-> -/* and this one is from the C-LANCE data sheet... */
-> -#define LE_MO_EMBA     0x0080  /* Enable Modified Backoff Algorithm
-> -                                  (C-LANCE, not original LANCE) */
-> -#define LE_MO_INTL     0x0040  /* Internal Loopback */
-> -#define LE_MO_DRTY     0x0020  /* Disable Retry */
-> -#define LE_MO_FCOLL    0x0010  /* Force Collision */
-> -#define LE_MO_DXMTFCS  0x0008  /* Disable Transmit CRC */
-> -#define LE_MO_LOOP     0x0004  /* Loopback Enable */
-> -#define LE_MO_DTX      0x0002  /* Disable Transmitter */
-> -#define LE_MO_DRX      0x0001  /* Disable Receiver */
-> -
-> -
-> -/*
-> - *             Receive Flags
-> - */
-> -#define LE_R1_OWN      0x80    /* LANCE owns the descriptor */
-> -#define LE_R1_ERR      0x40    /* Error */
-> -#define LE_R1_FRA      0x20    /* Framing Error */
-> -#define LE_R1_OFL      0x10    /* Overflow Error */
-> -#define LE_R1_CRC      0x08    /* CRC Error */
-> -#define LE_R1_BUF      0x04    /* Buffer Error */
-> -#define LE_R1_SOP      0x02    /* Start of Packet */
-> -#define LE_R1_EOP      0x01    /* End of Packet */
-> -#define LE_R1_POK      0x03    /* Packet is complete: SOP + EOP */
-> -
-> -
-> -/*
-> - *             Transmit Flags
-> - */
-> -#define LE_T1_OWN      0x80    /* LANCE owns the descriptor */
-> -#define LE_T1_ERR      0x40    /* Error */
-> -#define LE_T1_RES      0x20    /* Reserved, LANCE writes this with a zero */
-> -#define LE_T1_EMORE    0x10    /* More than one retry needed */
-> -#define LE_T1_EONE     0x08    /* One retry needed */
-> -#define LE_T1_EDEF     0x04    /* Deferred */
-> -#define LE_T1_SOP      0x02    /* Start of Packet */
-> -#define LE_T1_EOP      0x01    /* End of Packet */
-> -#define LE_T1_POK      0x03    /* Packet is complete: SOP + EOP */
-> -
-> -/*
-> - *             Error Flags
-> - */
-> -#define LE_T3_BUF      0x8000  /* Buffer Error */
-> -#define LE_T3_UFL      0x4000  /* Underflow Error */
-> -#define LE_T3_LCOL     0x1000  /* Late Collision */
-> -#define LE_T3_CLOS     0x0800  /* Loss of Carrier */
-> -#define LE_T3_RTY      0x0400  /* Retry Error */
-> -#define LE_T3_TDR      0x03ff  /* Time Domain Reflectometry */
-> -
-> -/* Miscellaneous useful macros */
-> -
-> -#define TX_BUFFS_AVAIL ((lp->tx_old <= lp->tx_new) ? \
-> -                       lp->tx_old + lp->tx_ring_mod_mask - lp->tx_new : \
-> -                       lp->tx_old - lp->tx_new - 1)
-> -
-> -/* The LANCE only uses 24 bit addresses. This does the obvious thing. */
-> -#define LANCE_ADDR(x) ((int)(x) & ~0xff000000)
-> -
-> -/* Now the prototypes we export */
-> -int lance_open(struct net_device *dev);
-> -int lance_close(struct net_device *dev);
-> -netdev_tx_t lance_start_xmit(struct sk_buff *skb, struct net_device *dev);
-> -void lance_set_multicast(struct net_device *dev);
-> -void lance_tx_timeout(struct net_device *dev, unsigned int txqueue);
-> -#ifdef CONFIG_NET_POLL_CONTROLLER
-> -void lance_poll(struct net_device *dev);
-> -#endif
-> -
-> -#endif /* ndef _7990_H */
-> diff --git a/drivers/net/ethernet/amd/Kconfig b/drivers/net/ethernet/amd/Kconfig
-> index 45e8d698781c..9e83f3aa435a 100644
-> --- a/drivers/net/ethernet/amd/Kconfig
-> +++ b/drivers/net/ethernet/amd/Kconfig
-> @@ -93,14 +93,6 @@ config DECLANCE
->           DEC (now Compaq) based on the AMD LANCE chipset, including the
->           DEPCA series.  (This chipset is better known via the NE2100 cards.)
+> > Also, it would be great to have a  new packetdrill test.
+> >
 >
-> -config HPLANCE
-> -       tristate "HP on-board LANCE support"
-> -       depends on DIO
-> -       select CRC32
-> -       help
-> -         If you want to use the builtin "LANCE" Ethernet controller on an
-> -         HP300 machine, say Y here.
-> -
->  config MIPS_AU1X00_ENET
->         tristate "MIPS AU1000 Ethernet support"
->         depends on MIPS_ALCHEMY
-> @@ -110,16 +102,6 @@ config MIPS_AU1X00_ENET
->           If you have an Alchemy Semi AU1X00 based system
->           say Y.  Otherwise, say N.
->
-> -config MVME147_NET
-> -       tristate "MVME147 (LANCE) Ethernet support"
-> -       depends on MVME147
-> -       select CRC32
-> -       help
-> -         Support for the on-board Ethernet interface on the Motorola MVME147
-> -         single-board computer.  Say Y here to include the
-> -         driver for this chip in your kernel.
-> -         To compile this driver as a module, choose M here.
-> -
->  config PCMCIA_NMCLAN
->         tristate "New Media PCMCIA support"
->         depends on PCMCIA && HAS_IOPORT
-> diff --git a/drivers/net/ethernet/amd/Makefile b/drivers/net/ethernet/amd/Makefile
-> index 2dcfb84731e1..387ec74e8e95 100644
-> --- a/drivers/net/ethernet/amd/Makefile
-> +++ b/drivers/net/ethernet/amd/Makefile
-> @@ -8,10 +8,8 @@ obj-$(CONFIG_AMD8111_ETH) += amd8111e.o
->  obj-$(CONFIG_ARIADNE) += ariadne.o
->  obj-$(CONFIG_ATARILANCE) += atarilance.o
->  obj-$(CONFIG_DECLANCE) += declance.o
-> -obj-$(CONFIG_HPLANCE) += hplance.o 7990.o
->  obj-$(CONFIG_LANCE) += lance.o
->  obj-$(CONFIG_MIPS_AU1X00_ENET) += au1000_eth.o
-> -obj-$(CONFIG_MVME147_NET) += mvme147.o 7990.o
->  obj-$(CONFIG_PCMCIA_NMCLAN) += nmclan_cs.o
->  obj-$(CONFIG_PCNET32) += pcnet32.o
->  obj-$(CONFIG_SUN3LANCE) += sun3lance.o
-> diff --git a/drivers/net/ethernet/amd/hplance.c b/drivers/net/ethernet/amd/hplance.c
-> deleted file mode 100644
-> index df42294530cb..000000000000
-> --- a/drivers/net/ethernet/amd/hplance.c
-> +++ /dev/null
-> @@ -1,238 +0,0 @@
-> -// SPDX-License-Identifier: GPL-2.0-only
-> -/* hplance.c  : the  Linux/hp300/lance ethernet driver
-> - *
-> - * Copyright (C) 05/1998 Peter Maydell <pmaydell@chiark.greenend.org.uk>
-> - * Based on the Sun Lance driver and the NetBSD HP Lance driver
-> - * Uses the generic 7990.c LANCE code.
-> - */
-> -
-> -#include <linux/module.h>
-> -#include <linux/kernel.h>
-> -#include <linux/types.h>
-> -#include <linux/interrupt.h>
-> -#include <linux/ioport.h>
-> -#include <linux/string.h>
-> -#include <linux/delay.h>
-> -#include <linux/init.h>
-> -#include <linux/errno.h>
-> -#include <linux/pgtable.h>
-> -/* Used for the temporal inet entries and routing */
-> -#include <linux/socket.h>
-> -#include <linux/route.h>
-> -#include <linux/dio.h>
-> -#include <linux/netdevice.h>
-> -#include <linux/etherdevice.h>
-> -#include <linux/skbuff.h>
-> -
-> -#include <asm/io.h>
-> -
-> -#include "hplance.h"
-> -
-> -/* We have 16392 bytes of RAM for the init block and buffers. This places
-> - * an upper limit on the number of buffers we can use. NetBSD uses 8 Rx
-> - * buffers and 2 Tx buffers, it takes (8 + 2) * 1544 bytes.
-> - */
-> -#define LANCE_LOG_TX_BUFFERS 1
-> -#define LANCE_LOG_RX_BUFFERS 3
-> -
-> -#include "7990.h"                                 /* use generic LANCE code */
-> -
-> -/* Our private data structure */
-> -struct hplance_private {
-> -       struct lance_private lance;
-> -};
-> -
-> -/* function prototypes... This is easy because all the grot is in the
-> - * generic LANCE support. All we have to support is probing for boards,
-> - * plus board-specific init, open and close actions.
-> - * Oh, and we need to tell the generic code how to read and write LANCE registers...
-> - */
-> -static int hplance_init_one(struct dio_dev *d, const struct dio_device_id *ent);
-> -static void hplance_init(struct net_device *dev, struct dio_dev *d);
-> -static void hplance_remove_one(struct dio_dev *d);
-> -static void hplance_writerap(void *priv, unsigned short value);
-> -static void hplance_writerdp(void *priv, unsigned short value);
-> -static unsigned short hplance_readrdp(void *priv);
-> -static int hplance_open(struct net_device *dev);
-> -static int hplance_close(struct net_device *dev);
-> -
-> -static struct dio_device_id hplance_dio_tbl[] = {
-> -       { DIO_ID_LAN },
-> -       { 0 }
-> -};
-> -
-> -static struct dio_driver hplance_driver = {
-> -       .name      = "hplance",
-> -       .id_table  = hplance_dio_tbl,
-> -       .probe     = hplance_init_one,
-> -       .remove    = hplance_remove_one,
-> -};
-> -
-> -static const struct net_device_ops hplance_netdev_ops = {
-> -       .ndo_open               = hplance_open,
-> -       .ndo_stop               = hplance_close,
-> -       .ndo_start_xmit         = lance_start_xmit,
-> -       .ndo_set_rx_mode        = lance_set_multicast,
-> -       .ndo_validate_addr      = eth_validate_addr,
-> -       .ndo_set_mac_address    = eth_mac_addr,
-> -#ifdef CONFIG_NET_POLL_CONTROLLER
-> -       .ndo_poll_controller    = lance_poll,
-> -#endif
-> -};
-> -
-> -/* Find all the HP Lance boards and initialise them... */
-> -static int hplance_init_one(struct dio_dev *d, const struct dio_device_id *ent)
-> -{
-> -       struct net_device *dev;
-> -       int err = -ENOMEM;
-> -
-> -       dev = alloc_etherdev(sizeof(struct hplance_private));
-> -       if (!dev)
-> -               goto out;
-> -
-> -       err = -EBUSY;
-> -       if (!request_mem_region(dio_resource_start(d),
-> -                               dio_resource_len(d), d->name))
-> -               goto out_free_netdev;
-> -
-> -       hplance_init(dev, d);
-> -       err = register_netdev(dev);
-> -       if (err)
-> -               goto out_release_mem_region;
-> -
-> -       dio_set_drvdata(d, dev);
-> -
-> -       printk(KERN_INFO "%s: %s; select code %d, addr %pM, irq %d\n",
-> -              dev->name, d->name, d->scode, dev->dev_addr, d->ipl);
-> -
-> -       return 0;
-> -
-> - out_release_mem_region:
-> -       release_mem_region(dio_resource_start(d), dio_resource_len(d));
-> - out_free_netdev:
-> -       free_netdev(dev);
-> - out:
-> -       return err;
-> -}
-> -
-> -static void hplance_remove_one(struct dio_dev *d)
-> -{
-> -       struct net_device *dev = dio_get_drvdata(d);
-> -
-> -       unregister_netdev(dev);
-> -       release_mem_region(dio_resource_start(d), dio_resource_len(d));
-> -       free_netdev(dev);
-> -}
-> -
-> -/* Initialise a single lance board at the given DIO device */
-> -static void hplance_init(struct net_device *dev, struct dio_dev *d)
-> -{
-> -       unsigned long va = (d->resource.start + DIO_VIRADDRBASE);
-> -       struct hplance_private *lp;
-> -       u8 addr[ETH_ALEN];
-> -       int i;
-> -
-> -       /* reset the board */
-> -       out_8(va + DIO_IDOFF, 0xff);
-> -       udelay(100);                              /* ariba! ariba! udelay! udelay! */
-> -
-> -       /* Fill the dev fields */
-> -       dev->base_addr = va;
-> -       dev->netdev_ops = &hplance_netdev_ops;
-> -       dev->dma = 0;
-> -
-> -       for (i = 0; i < 6; i++) {
-> -               /* The NVRAM holds our ethernet address, one nibble per byte,
-> -                * at bytes NVRAMOFF+1,3,5,7,9...
-> -                */
-> -               addr[i] = ((in_8(va + HPLANCE_NVRAMOFF + i*4 + 1) & 0xF) << 4)
-> -                       | (in_8(va + HPLANCE_NVRAMOFF + i*4 + 3) & 0xF);
-> -       }
-> -       eth_hw_addr_set(dev, addr);
-> -
-> -       lp = netdev_priv(dev);
-> -       lp->lance.name = d->name;
-> -       lp->lance.base = va;
-> -       lp->lance.init_block = (struct lance_init_block *)(va + HPLANCE_MEMOFF); /* CPU addr */
-> -       lp->lance.lance_init_block = NULL;              /* LANCE addr of same RAM */
-> -       lp->lance.busmaster_regval = LE_C3_BSWP;        /* we're bigendian */
-> -       lp->lance.irq = d->ipl;
-> -       lp->lance.writerap = hplance_writerap;
-> -       lp->lance.writerdp = hplance_writerdp;
-> -       lp->lance.readrdp = hplance_readrdp;
-> -       lp->lance.lance_log_rx_bufs = LANCE_LOG_RX_BUFFERS;
-> -       lp->lance.lance_log_tx_bufs = LANCE_LOG_TX_BUFFERS;
-> -       lp->lance.rx_ring_mod_mask = RX_RING_MOD_MASK;
-> -       lp->lance.tx_ring_mod_mask = TX_RING_MOD_MASK;
-> -}
-> -
-> -/* This is disgusting. We have to check the DIO status register for ack every
-> - * time we read or write the LANCE registers.
-> - */
-> -static void hplance_writerap(void *priv, unsigned short value)
-> -{
-> -       struct lance_private *lp = (struct lance_private *)priv;
-> -
-> -       do {
-> -               out_be16(lp->base + HPLANCE_REGOFF + LANCE_RAP, value);
-> -       } while ((in_8(lp->base + HPLANCE_STATUS) & LE_ACK) == 0);
-> -}
-> -
-> -static void hplance_writerdp(void *priv, unsigned short value)
-> -{
-> -       struct lance_private *lp = (struct lance_private *)priv;
-> -
-> -       do {
-> -               out_be16(lp->base + HPLANCE_REGOFF + LANCE_RDP, value);
-> -       } while ((in_8(lp->base + HPLANCE_STATUS) & LE_ACK) == 0);
-> -}
-> -
-> -static unsigned short hplance_readrdp(void *priv)
-> -{
-> -       struct lance_private *lp = (struct lance_private *)priv;
-> -       __u16 value;
-> -
-> -       do {
-> -               value = in_be16(lp->base + HPLANCE_REGOFF + LANCE_RDP);
-> -       } while ((in_8(lp->base + HPLANCE_STATUS) & LE_ACK) == 0);
-> -       return value;
-> -}
-> -
-> -static int hplance_open(struct net_device *dev)
-> -{
-> -       int status;
-> -       struct lance_private *lp = netdev_priv(dev);
-> -
-> -       status = lance_open(dev);                 /* call generic lance open code */
-> -       if (status)
-> -               return status;
-> -       /* enable interrupts at board level. */
-> -       out_8(lp->base + HPLANCE_STATUS, LE_IE);
-> -
-> -       return 0;
-> -}
-> -
-> -static int hplance_close(struct net_device *dev)
-> -{
-> -       struct lance_private *lp = netdev_priv(dev);
-> -
-> -       out_8(lp->base + HPLANCE_STATUS, 0);    /* disable interrupts at boardlevel */
-> -       lance_close(dev);
-> -       return 0;
-> -}
-> -
-> -static int __init hplance_init_module(void)
-> -{
-> -       return dio_register_driver(&hplance_driver);
-> -}
-> -
-> -static void __exit hplance_cleanup_module(void)
-> -{
-> -       dio_unregister_driver(&hplance_driver);
-> -}
-> -
-> -module_init(hplance_init_module);
-> -module_exit(hplance_cleanup_module);
-> -
-> -MODULE_DESCRIPTION("HP300 on-board LANCE Ethernet driver");
-> -MODULE_LICENSE("GPL");
-> diff --git a/drivers/net/ethernet/amd/hplance.h b/drivers/net/ethernet/amd/hplance.h
-> deleted file mode 100644
-> index bc845a2c60c1..000000000000
-> --- a/drivers/net/ethernet/amd/hplance.h
-> +++ /dev/null
-> @@ -1,27 +0,0 @@
-> -/* SPDX-License-Identifier: GPL-2.0 */
-> -/* Random defines and structures for the HP Lance driver.
-> - * Copyright (C) 05/1998 Peter Maydell <pmaydell@chiark.greenend.org.uk>
-> - * Based on the Sun Lance driver and the NetBSD HP Lance driver
-> - */
-> -
-> -/* Registers */
-> -#define HPLANCE_ID             0x01            /* DIO register: ID byte */
-> -#define HPLANCE_STATUS         0x03            /* DIO register: interrupt enable/status */
-> -
-> -/* Control and status bits for the status register */
-> -#define LE_IE 0x80                                /* interrupt enable */
-> -#define LE_IR 0x40                                /* interrupt requested */
-> -#define LE_LOCK 0x08                              /* lock status register */
-> -#define LE_ACK 0x04                               /* ack of lock */
-> -#define LE_JAB 0x02                               /* loss of tx clock (???) */
-> -/* We can also extract the IPL from the status register with the standard
-> - * DIO_IPL(hplance) macro, or using dio_scodetoipl()
-> - */
-> -
-> -/* These are the offsets for the DIO regs (hplance_reg), lance_ioreg,
-> - * memory and NVRAM:
-> - */
-> -#define HPLANCE_IDOFF 0                           /* board baseaddr */
-> -#define HPLANCE_REGOFF 0x4000                     /* lance registers */
-> -#define HPLANCE_MEMOFF 0x8000                     /* struct lance_init_block */
-> -#define HPLANCE_NVRAMOFF 0xC008                   /* etheraddress as one *nibble* per byte */
-> diff --git a/drivers/net/ethernet/amd/mvme147.c b/drivers/net/ethernet/amd/mvme147.c
-> deleted file mode 100644
-> index f19b04b92fa9..000000000000
-> --- a/drivers/net/ethernet/amd/mvme147.c
-> +++ /dev/null
-> @@ -1,198 +0,0 @@
-> -// SPDX-License-Identifier: GPL-2.0-only
-> -/* mvme147.c  : the  Linux/mvme147/lance ethernet driver
-> - *
-> - * Copyright (C) 05/1998 Peter Maydell <pmaydell@chiark.greenend.org.uk>
-> - * Based on the Sun Lance driver and the NetBSD HP Lance driver
-> - * Uses the generic 7990.c LANCE code.
-> - */
-> -
-> -#include <linux/module.h>
-> -#include <linux/kernel.h>
-> -#include <linux/types.h>
-> -#include <linux/interrupt.h>
-> -#include <linux/ioport.h>
-> -#include <linux/string.h>
-> -#include <linux/delay.h>
-> -#include <linux/init.h>
-> -#include <linux/errno.h>
-> -#include <linux/gfp.h>
-> -#include <linux/pgtable.h>
-> -/* Used for the temporal inet entries and routing */
-> -#include <linux/socket.h>
-> -#include <linux/route.h>
-> -#include <linux/netdevice.h>
-> -#include <linux/etherdevice.h>
-> -#include <linux/skbuff.h>
-> -
-> -#include <asm/io.h>
-> -#include <asm/mvme147hw.h>
-> -
-> -/* We have 32K of RAM for the init block and buffers. This places
-> - * an upper limit on the number of buffers we can use. NetBSD uses 8 Rx
-> - * buffers and 2 Tx buffers, it takes (8 + 2) * 1544 bytes.
-> - */
-> -#define LANCE_LOG_TX_BUFFERS 1
-> -#define LANCE_LOG_RX_BUFFERS 3
-> -
-> -#include "7990.h"                                 /* use generic LANCE code */
-> -
-> -/* Our private data structure */
-> -struct m147lance_private {
-> -       struct lance_private lance;
-> -       unsigned long ram;
-> -};
-> -
-> -/* function prototypes... This is easy because all the grot is in the
-> - * generic LANCE support. All we have to support is probing for boards,
-> - * plus board-specific init, open and close actions.
-> - * Oh, and we need to tell the generic code how to read and write LANCE registers...
-> - */
-> -static int m147lance_open(struct net_device *dev);
-> -static int m147lance_close(struct net_device *dev);
-> -static void m147lance_writerap(struct lance_private *lp, unsigned short value);
-> -static void m147lance_writerdp(struct lance_private *lp, unsigned short value);
-> -static unsigned short m147lance_readrdp(struct lance_private *lp);
-> -
-> -typedef void (*writerap_t)(void *, unsigned short);
-> -typedef void (*writerdp_t)(void *, unsigned short);
-> -typedef unsigned short (*readrdp_t)(void *);
-> -
-> -static const struct net_device_ops lance_netdev_ops = {
-> -       .ndo_open               = m147lance_open,
-> -       .ndo_stop               = m147lance_close,
-> -       .ndo_start_xmit         = lance_start_xmit,
-> -       .ndo_set_rx_mode        = lance_set_multicast,
-> -       .ndo_tx_timeout         = lance_tx_timeout,
-> -       .ndo_validate_addr      = eth_validate_addr,
-> -       .ndo_set_mac_address    = eth_mac_addr,
-> -};
-> -
-> -/* Initialise the one and only on-board 7990 */
-> -static struct net_device * __init mvme147lance_probe(void)
-> -{
-> -       struct net_device *dev;
-> -       static int called;
-> -       static const char name[] = "MVME147 LANCE";
-> -       struct m147lance_private *lp;
-> -       u8 macaddr[ETH_ALEN];
-> -       u_long *addr;
-> -       u_long address;
-> -       int err;
-> -
-> -       if (!MACH_IS_MVME147 || called)
-> -               return ERR_PTR(-ENODEV);
-> -       called++;
-> -
-> -       dev = alloc_etherdev(sizeof(struct m147lance_private));
-> -       if (!dev)
-> -               return ERR_PTR(-ENOMEM);
-> -
-> -       /* Fill the dev fields */
-> -       dev->base_addr = (unsigned long)MVME147_LANCE_BASE;
-> -       dev->netdev_ops = &lance_netdev_ops;
-> -       dev->dma = 0;
-> -
-> -       addr = (u_long *)ETHERNET_ADDRESS;
-> -       address = *addr;
-> -       macaddr[0] = 0x08;
-> -       macaddr[1] = 0x00;
-> -       macaddr[2] = 0x3e;
-> -       address = address >> 8;
-> -       macaddr[5] = address&0xff;
-> -       address = address >> 8;
-> -       macaddr[4] = address&0xff;
-> -       address = address >> 8;
-> -       macaddr[3] = address&0xff;
-> -       eth_hw_addr_set(dev, macaddr);
-> -
-> -       lp = netdev_priv(dev);
-> -       lp->ram = __get_dma_pages(GFP_ATOMIC, 3);       /* 32K */
-> -       if (!lp->ram) {
-> -               printk("%s: No memory for LANCE buffers\n", dev->name);
-> -               free_netdev(dev);
-> -               return ERR_PTR(-ENOMEM);
-> -       }
-> -
-> -       lp->lance.name = name;
-> -       lp->lance.base = dev->base_addr;
-> -       lp->lance.init_block = (struct lance_init_block *)(lp->ram); /* CPU addr */
-> -       lp->lance.lance_init_block = (struct lance_init_block *)(lp->ram);                 /* LANCE addr of same RAM */
-> -       lp->lance.busmaster_regval = LE_C3_BSWP;        /* we're bigendian */
-> -       lp->lance.irq = MVME147_LANCE_IRQ;
-> -       lp->lance.writerap = (writerap_t)m147lance_writerap;
-> -       lp->lance.writerdp = (writerdp_t)m147lance_writerdp;
-> -       lp->lance.readrdp = (readrdp_t)m147lance_readrdp;
-> -       lp->lance.lance_log_rx_bufs = LANCE_LOG_RX_BUFFERS;
-> -       lp->lance.lance_log_tx_bufs = LANCE_LOG_TX_BUFFERS;
-> -       lp->lance.rx_ring_mod_mask = RX_RING_MOD_MASK;
-> -       lp->lance.tx_ring_mod_mask = TX_RING_MOD_MASK;
-> -
-> -       err = register_netdev(dev);
-> -       if (err) {
-> -               free_pages(lp->ram, 3);
-> -               free_netdev(dev);
-> -               return ERR_PTR(err);
-> -       }
-> -
-> -       netdev_info(dev, "MVME147 at 0x%08lx, irq %d, Hardware Address %pM\n",
-> -                   dev->base_addr, MVME147_LANCE_IRQ, dev->dev_addr);
-> -
-> -       return dev;
-> -}
-> -
-> -static void m147lance_writerap(struct lance_private *lp, unsigned short value)
-> -{
-> -       out_be16(lp->base + LANCE_RAP, value);
-> -}
-> -
-> -static void m147lance_writerdp(struct lance_private *lp, unsigned short value)
-> -{
-> -       out_be16(lp->base + LANCE_RDP, value);
-> -}
-> -
-> -static unsigned short m147lance_readrdp(struct lance_private *lp)
-> -{
-> -       return in_be16(lp->base + LANCE_RDP);
-> -}
-> -
-> -static int m147lance_open(struct net_device *dev)
-> -{
-> -       int status;
-> -
-> -       status = lance_open(dev);                 /* call generic lance open code */
-> -       if (status)
-> -               return status;
-> -       /* enable interrupts at board level. */
-> -       m147_pcc->lan_cntrl = 0;       /* clear the interrupts (if any) */
-> -       m147_pcc->lan_cntrl = 0x08 | 0x04;     /* Enable irq 4 */
-> -
-> -       return 0;
-> -}
-> -
-> -static int m147lance_close(struct net_device *dev)
-> -{
-> -       /* disable interrupts at boardlevel */
-> -       m147_pcc->lan_cntrl = 0x0; /* disable interrupts */
-> -       lance_close(dev);
-> -       return 0;
-> -}
-> -
-> -MODULE_DESCRIPTION("MVME147 LANCE Ethernet driver");
-> -MODULE_LICENSE("GPL");
-> -
-> -static struct net_device *dev_mvme147_lance;
-> -static int __init m147lance_init(void)
-> -{
-> -       dev_mvme147_lance = mvme147lance_probe();
-> -       return PTR_ERR_OR_ZERO(dev_mvme147_lance);
-> -}
-> -module_init(m147lance_init);
-> -
-> -static void __exit m147lance_exit(void)
-> -{
-> -       struct m147lance_private *lp = netdev_priv(dev_mvme147_lance);
-> -       unregister_netdev(dev_mvme147_lance);
-> -       free_pages(lp->ram, 3);
-> -       free_netdev(dev_mvme147_lance);
-> -}
-> -module_exit(m147lance_exit);
->
-> --
-> 2.53.0
->
->
+> With packetdrill, AFAICS it would require a late ACK to be processed
+> after TCP_USER_TIMEOUT has elapsed but before tcp_probe_timer() runs the
+> abort check - i.e. a race between the RX softirq path and the timer.
+> This is not purely an event/packet ordering problem, so it is not clear
+> to me how a deterministic behavior can be simulated with packetdrill
+> without tying it to exact probe timing.
+
+I was trying to sense if the bug was serious or not, considering last
+tcp_clamp_probe0_to_user_timeout()
+statement is:
+
+return min_t(u32, remaining, when);
+
+Perhaps you should give more details in the changelog. What were the
+symptoms of this bug, for TCP_USER_TIMEOUT users.
 
