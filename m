@@ -1,223 +1,196 @@
-Return-Path: <netdev+bounces-280545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280546-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qnZiDcYp6WknVQIAu9opvQ
-	(envelope-from <netdev+bounces-280545-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 22:04:22 +0200
+	id mEwHKEQv6WkFVgIAu9opvQ
+	(envelope-from <netdev+bounces-280546-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 22:27:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31C5244A737
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 22:04:21 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4100444A95D
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 22:27:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B322630071D2
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 20:04:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9821F300DF6A
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 20:27:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50E983F210E;
-	Wed, 22 Apr 2026 20:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 667333750A7;
+	Wed, 22 Apr 2026 20:27:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="YtLDY9uF";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="IgovRglL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p9yB3agN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A8A39C005
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 20:04:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB3FB372692
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 20:27:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776888259; cv=none; b=ineW2VjPHqYFUij4Xxk7e+oJ/l4Qv0RrZdrRRBMxWylnP3qvm4Ae4QT5xx1lIsBx9GFHUqs4EBqEn3sB09GecOkzb5V1DiUjo9kFn2FSlQEnVG6FAUXBns7BB+0Gf+mOd7AKFyYz2VklTLs1t2xYvFcRrnD0s6AWSCiVNhH7d6c=
+	t=1776889666; cv=none; b=o00I2Kmmiyurgm6vQNyBlILOPo4+GcQ47w0TQcHES+yZV+OIdQlOaL6plZDd2gStTvxBYZPwhDnLi2ndH71cHjMtigSh6HlOifvuOkPhu+6lm6g6vV+sOR9OQIR5G5dXGAG0JIoEGlR+emaAF393nyDtNHHEg18dmKKI+exvHxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776888259; c=relaxed/simple;
-	bh=Vw5lbIz93bfPivnPlgZTf922sy3wFpATm4HMbXkasxA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cuTkCx84IalYZQi5fLTTiYJbhzhN8vVCfLJ7VhKIMKlzxMfZflINGO7t/V4lYcuIHjo0dPNX8ftzQZVxp2hoNeQdKFG87uwHyqnGz141MswDufNZY4MUqTkdObuAgyGqPPY0R1BRvqxss6ttmvy2EVfY6kLtKnuJ3t9FaTXgTjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=YtLDY9uF; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=IgovRglL; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63MGqhMg1218628
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 20:04:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=TWNv/n77xtlQNACjJ3+8jJLY
-	WYV7KxtU3j5KJIFZm9w=; b=YtLDY9uF5xOkCoR8E3Hapt6dWg8lw9y4CViURo4X
-	3sj1xGiBYjfiOlGRP6eA/ix80qQtgSD5BDXQ3OUdZi2TY8vDwvtnHONVZG5N4Mtp
-	Evjab88v4Ddg4qOo+pRr/xWx9Ns8qPgqG9+E9Y5FUY1c+m9NyDi490VZ+5rT9V3X
-	rNy5DzOcpX3JpNZdLuhslsk3tCP+DLqiJIYsqlrsEn3PjEuWX87GqgAERsSGEPLs
-	4Q9NPD4F4ixz33UAUspYkKvlTw16b6m5PgJ3Hig/XunesxrltP8r2sSMMsafu2is
-	qNEkRl9ZPlkFePAbtM2xVw8xZtpC76DJp4eX5vb3NdhhPA==
-Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com [209.85.217.72])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dq282rp19-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 20:04:17 +0000 (GMT)
-Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-620f5085c37so42933137.0
-        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 13:04:17 -0700 (PDT)
+	s=arc-20240116; t=1776889666; c=relaxed/simple;
+	bh=Z2pD7SzCnfwOR5N0cjRioBufHqwxBlEZjSb7T01ucEQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=X+b1sfZQNQkBEheyJcX7s/Hf2Mo68BcmoNHeu3o+vYZRNuWXp23nolD2T2jaLRqGI4ZClFZwSPG+Qqf3l1LW2sE2daG1YpFHRiwRvJzc5fyvHxNAFQCnf0TYr2Cy/+UYc+7rnFI8JYbOApTqlRLKQ2LO0tzDMkS7IqsIUtGL4oo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=p9yB3agN; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-488d2079582so69277015e9.2
+        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 13:27:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1776888256; x=1777493056; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TWNv/n77xtlQNACjJ3+8jJLYWYV7KxtU3j5KJIFZm9w=;
-        b=IgovRglLjqALlavWRYhryS09AZfjTpUyQgJZvl5VWXz3kRma5ipHqIJlski6CIlXtu
-         4lCkRaR9TqzZxGL9HQaTCtf+5AZsN8okA4UlztxlaRh6pmY9DbJGLPq7gmKzPSoNyo5V
-         qPsROGu4eN6JFKo9Qndiw2Zbf2YnrUlLQPCC8gNJpO9E54KFvVKe8VY7O4AZbP0WcaEm
-         SHBol4kMEsW2iKDBlIiwnmzUAKb2rzp49f1Y/RL8NJ+UA8/4mY+ErZ7WyizGV0U37hJ3
-         eCocGU1RM3QOuh7wHHnNaLDuv43OSkf+j2Tf2elJRQjWPJgo6DjsjHM8DK3o0zwRsrLv
-         In2A==
+        d=gmail.com; s=20251104; t=1776889663; x=1777494463; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ICar/pXdHGmmlf+IZ7pyC9kCaI/pqNFA9o2Llqb73rk=;
+        b=p9yB3agN9WcRdyXtijq7/Oz7JBrE2jzsQQ7ymtY43U+ie8uoJw0xTCclXS1OPhK92u
+         Z6qdAQ3YH4us6+Iqrqp65vMUP3hNy3Qj+MhzMFvtYRslcElzNBRy+MVK1sTDlbz9Zwl4
+         W9MKtci//R/tsvv4fAyrqiN6yzYSDnXkwsT3k0DJWNB7OjtEurP3kVRNyfAKP2FBCwtr
+         3EVzbPy0KxjZcWsbZ8f02AuQumTQ83pxmYB2dpNeS2dCmWa0Sn+GbCS3mvTB71c3ApSr
+         6QkEkELj9SJrMEjvIlFdXPIm43WbIdGNZFsvlV6CcOxokb965F+thFY+TmdnZmpVTU0r
+         bmXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776888256; x=1777493056;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TWNv/n77xtlQNACjJ3+8jJLYWYV7KxtU3j5KJIFZm9w=;
-        b=HvI1ggGlosFyXs48ysgG34dY1WqOxBWYy1/qK+bw6taYDucQE5BeK9awQAb1BCrBw/
-         AcYVigojQDCkk9G+HcPAcVJNUmN4DF4lW2z8kq2YNUq2a294OKCF0KTtbwOTmJOWT7bM
-         4JUfD8eRSwAW6B7EAulCl1K6dmx2Kj8lsp8hN3DhyqY40Q2jbTJGz/+c7Nh6ZSZ5z3Su
-         zSBmtTzwz6CIJST1cL+hzQEHEMVHZZRV2yDNl72PzAHA1u37gdAmCAGZQwCz6IwNNzmn
-         t9DSYlGKUDn043woYVJFsyFmzagLGbnFN9lVw9wUZXlWGSNyODx3SpQVIrgxwjNdd0ZT
-         30jg==
-X-Forwarded-Encrypted: i=1; AFNElJ+feNoePH+2pUwwsccRgFspb/kfpazNp/6fNYb1jFh65Qq9lgQYCiDx1UzLEsW3D93aHFFOg5E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxe8H9vJ+N6btnqmZHSPkN+jtYYyOg2062Dfne4mJiyrgkbSGwS
-	0lPy9sFHt88oiHHFmJHJQrzB+IYxtF1fkZoHnTIfEiLjBrbdlKitlCJmZJuFMRLYO83NDCwZYhy
-	EbMRxv2+fjuvi06iTj/mq7D2SsHMkqiOc/j/lAt+x0xSU8WuQCqBj4NlDJ4Q=
-X-Gm-Gg: AeBDievNJa8q0aet6wD8fhB1XS/hmUGb9dnlZydvJG0TgmAP97kxeMqWp7nCn1T+4tE
-	+Bh9nqjFHxZhLnbYmVSPDn/m9cAaDydFRPGxW/Bd3I6dJDTNbNyw1RyBsXS3SyXVJ5dMEP1aRoY
-	Tumb29COXJBFcxhpJphf6rTlgdUlg4a3IWC8TLdRlalRzaYNp6Lvn0geYjGYos75FsyMnTzTKT3
-	gdY7is4s31lb7HvITadlLLd2bd69PEl72ed7qogNBCl8ubiPDUGh6pM/aGNslwWV4axE3Z5sNzs
-	pxmz93yBmYncpmJLHwF3sND/Tegx3GTnlxzT18xSqAerDlSaQQ5j6OHtIM85Gwjl9QmW/kDEhQH
-	5GI4LxVpBMmohKGGsVfZoHuIxG7rGHF6wmeqMt0KG9ZMb5TDDLRQdHhcp2kvTJGXW64px9F8Fo+
-	oZOA+3fCZ2Ljqmumofb46zXOBIJ3xLSWQGTZN3cHDAWGhA0g==
-X-Received: by 2002:a05:6102:f9e:b0:609:4d86:77b with SMTP id ada2fe7eead31-616f73fb077mr11984412137.24.1776888256322;
-        Wed, 22 Apr 2026 13:04:16 -0700 (PDT)
-X-Received: by 2002:a05:6102:f9e:b0:609:4d86:77b with SMTP id ada2fe7eead31-616f73fb077mr11984380137.24.1776888255894;
-        Wed, 22 Apr 2026 13:04:15 -0700 (PDT)
-Received: from umbar.lan (2001-14ba-a073-af00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a073:af00:264b:feff:fe8b:be8a])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a4185bc25csm4689196e87.26.2026.04.22.13.04.13
+        d=1e100.net; s=20251104; t=1776889663; x=1777494463;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ICar/pXdHGmmlf+IZ7pyC9kCaI/pqNFA9o2Llqb73rk=;
+        b=oOhvOyYaRPfKM7OBnI9ear4xlHuqHCZaNNdEY7xPNZgfTLuWKaJCKn6FVCwyx5aoJB
+         cgJS7XHAnuSekGB0G0nGrBqCFZ9uLCeb1kkYltKHPyrMOBtbkLdBw9lFPFhavuijHbgK
+         DdCgRsU2EKCQEGR3YNbg8kryHZqUhpmCENUuuqU6GMoWiFRwBrveGLr5QmYcUacn2zXP
+         5mVH5KL3ihwM2fG+jIlfqqRVY7e50M+V39n/gh2VgC1U1vz/P5r5ZZZ2BhhGUb4bZu9I
+         o1JSDFYay6Pc57UyK1DYCJxE2IeFZHiLdF0VqGhVRBne/Yrfhb6HydbVcYN4awMSu9/q
+         yhRA==
+X-Forwarded-Encrypted: i=1; AFNElJ8QLv+LGSxKBob3HJz+vz2fwyqUBCblAu3csBZHvMqBuKuhxnHACaxMSSOAnjG3ng9joifYOZ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrG1hgGNl7SN3GiM+NnkYq++ZhD34i2WKLKYJLnhWV6Ih+Mi2x
+	AXMoEJA31226dEZSVRX4j9aYIRsl/hTLTbOdhtVZtGPI2LUSO4RWUM/6
+X-Gm-Gg: AeBDievHLlA3pKopIMQMM41VZw/LAVsSfk2DlB3VYeQd3RB6mz0oXUvsu77iVcC+mWN
+	b0l/7NYcYwUuNaYImoxN2zAg5uqZeb2hNAhE/9R9Dzu45gutADWAuJhJ4y7g1gYJtQ7ipWoSlzw
+	sISOFDlSl1NR0mJQvmcq5Vnlr1kjS6pvRaharG9bh2DrWT0aWU6mLnYilW5tmobrf/BDZrjWZ1o
+	m3GNi3hLp2vmlPAZzffQEuGi8iEcMs1W8Ju2YxU7c6ODSzDnOnH9yZemZfl1dvpZNsqOrdtJAJQ
+	h8oegKRDUcpHEchor6bZzVjFfctIvPLtEqQPbZQk+EBRghUtja139ux06d2N0zyXB4mEAfEQq4A
+	zZQwgT6kGdZO31jkbWYav+YP3as71ftsYfCQl+m6Xv7c2AydheedqGG1Y45Ggz9IL+0cvYL+sJs
+	swc5yQbqcjGN4m6UMK3GEZMM0QrPKi7e7mGyqylwNuqh2+789Ng/nt/IlqQ3Mry8vuk+VWUzb01
+	n8=
+X-Received: by 2002:a05:600c:3490:b0:48a:5970:2005 with SMTP id 5b1f17b1804b1-48a597021c6mr75710255e9.2.1776889662899;
+        Wed, 22 Apr 2026 13:27:42 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fb74c68asm147278435e9.3.2026.04.22.13.27.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Apr 2026 13:04:14 -0700 (PDT)
-Date: Wed, 22 Apr 2026 23:04:12 +0300
-From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-To: Sumit Garg <sumit.garg@kernel.org>
-Cc: lumag@kernel.org, robin.clark@oss.qualcomm.com,
-        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
-        linux-media@vger.kernel.org, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
-        linux-remoteproc@vger.kernel.org, andersson@kernel.org,
-        konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-        conor+dt@kernel.org, sean@poorly.run, akhilpo@oss.qualcomm.com,
-        abhinav.kumar@linux.dev, jesszhan0024@gmail.com,
-        marijn.suijten@somainline.org, airlied@gmail.com, simona@ffwll.ch,
-        vikash.garodia@oss.qualcomm.com, dikshita.agarwal@oss.qualcomm.com,
-        bod@kernel.org, mchehab@kernel.org, elder@kernel.org,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, jjohnson@kernel.org,
-        mathieu.poirier@linaro.org, trilokkumar.soni@oss.qualcomm.com,
-        mukesh.ojha@oss.qualcomm.com, pavan.kondeti@oss.qualcomm.com,
-        jorge.ramirez@oss.qualcomm.com, tonyh@qti.qualcomm.com,
-        vignesh.viswanathan@oss.qualcomm.com,
-        srinivas.kandagatla@oss.qualcomm.com,
-        amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
-        op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
-        skare@qti.qualcomm.com, harshal.dev@oss.qualcomm.com,
-        linux-kernel@vger.kernel.org, Sumit Garg <sumit.garg@oss.qualcomm.com>
-Subject: Re: [PATCH v3 10/15] drm/msm: Switch to generic PAS TZ APIs
-Message-ID: <fuypqlwseulyvlsgiq3dnh3kwhernjid2yqljiwmrxufzfuukq@mfy343uq5gs3>
-References: <20260327131043.627120-1-sumit.garg@kernel.org>
- <20260327131043.627120-11-sumit.garg@kernel.org>
- <aeduRrAMOAW4f5TU@sumit-xelite>
+        Wed, 22 Apr 2026 13:27:42 -0700 (PDT)
+Date: Wed, 22 Apr 2026 21:27:41 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com,
+ maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me,
+ ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net v3 8/8] xsk: don't support AF_XDP on 32-bit
+ architectures
+Message-ID: <20260422212741.50deeb06@pumpkin>
+In-Reply-To: <20260422033650.68457-9-kerneljasonxing@gmail.com>
+References: <20260422033650.68457-1-kerneljasonxing@gmail.com>
+	<20260422033650.68457-9-kerneljasonxing@gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aeduRrAMOAW4f5TU@sumit-xelite>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDIyMDE5NCBTYWx0ZWRfX0m+wD7tMfKWP
- Wz3xJ2uAInbMslWPn5AbY7C4KFPsLGfWU4yrWXE0A9ww5qYxQse7rI9DoLsqYMy0LfFWMMyPWtc
- 2WvhAcCLmnuBSvfSvgQ5rlkBLNig2LkFAhPiGtMCx14QwHkXv9cTHf0czmSGRoPfZTwXb2atck6
- uyRylAhOzXjg7LXLkC9kXhpnqOaMttUDTPbIhzxulrRWVk53Fur6gIwQmSXsUvESvV15LYHiRMo
- h7JcO23+OpH/s9aI5vfPn/jv+APIZO95o2Wq+jcV4GlAlWN/0MbaMocrzyIzEW66Sol/rIO/a+O
- OOtsSWbzdpQs2fqVhIU5d1xH4OXyZsjx6ZUdL/zuyGNksHyt+YZEq2xLKpJOLEiO5iuU3IP1th0
- TNPmOVgy8dCAcNS4yzRPB9BpVubZW9e6W0/Tr/W9lQR2u1oPIXGu+t1373ahVA8EOmS/HkCs34O
- EA1fhM4JUdXQs5ZHi6Q==
-X-Authority-Analysis: v=2.4 cv=Zond7d7G c=1 sm=1 tr=0 ts=69e929c1 cx=c_pps
- a=DUEm7b3gzWu7BqY5nP7+9g==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
- a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=eoimf2acIAo5FJnRuUoq:22 a=EUspDBNiAAAA:8
- a=dgZ2eqGgcVFd7X0fNysA:9 a=CjuIK1q_8ugA:10 a=-aSRE8QhW-JAV6biHavz:22
-X-Proofpoint-GUID: qhRJ03lDQHovwCc_XFDqsqq-Nr6S5Bqv
-X-Proofpoint-ORIG-GUID: qhRJ03lDQHovwCc_XFDqsqq-Nr6S5Bqv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-22_03,2026-04-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 malwarescore=0 suspectscore=0 clxscore=1015 impostorscore=0
- spamscore=0 adultscore=0 lowpriorityscore=0 phishscore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2604220194
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,oss.qualcomm.com,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.qualcomm.com:dkim,qualcomm.com:dkim,qualcomm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280545-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280546-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dmitry.baryshkov@oss.qualcomm.com,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[51];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,fomichev.me,iogearbox.net,vger.kernel.org,tencent.com];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 31C5244A737
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,tencent.com:email]
+X-Rspamd-Queue-Id: 4100444A95D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 21, 2026 at 06:02:06PM +0530, Sumit Garg wrote:
-> Hey Rob, Dmitry,
-> 
-> On Fri, Mar 27, 2026 at 06:40:38PM +0530, Sumit Garg wrote:
-> > From: Sumit Garg <sumit.garg@oss.qualcomm.com>
-> > 
-> > Switch drm/msm client drivers over to generic PAS TZ APIs. Generic PAS
-> > TZ service allows to support multiple TZ implementation backends like QTEE
-> > based SCM PAS service, OP-TEE based PAS service and any further future TZ
-> > backend service.
-> > 
-> > Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
-> > ---
-> >  drivers/gpu/drm/msm/Kconfig             |  1 +
-> >  drivers/gpu/drm/msm/adreno/a5xx_gpu.c   |  4 ++--
-> >  drivers/gpu/drm/msm/adreno/adreno_gpu.c | 11 ++++++-----
-> >  3 files changed, 9 insertions(+), 7 deletions(-)
-> > 
-> 
-> Can I get an ack from you on this change? I expect this complete
-> patch-set to land via Qcom SoC tree.
-> 
+On Wed, 22 Apr 2026 11:36:50 +0800
+Jason Xing <kerneljasonxing@gmail.com> wrote:
 
-Acked-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> In copy mode TX, xsk_skb_destructor_set_addr() stores the 64-bit
+> descriptor address into skb_shinfo(skb)->destructor_arg (void *) via a
+> uintptr_t cast:
+> 
+>     skb_shinfo(skb)->destructor_arg = (void *)((uintptr_t)addr | 0x1UL);
+> 
+> On 32-bit architectures uintptr_t is 32 bits, so the upper 32 bits of
+> the descriptor address are silently dropped. In XDP_ZEROCOPY unaligned
+> mode the chunk offset is encoded in bits 48-63 of the descriptor
+> address (XSK_UNALIGNED_BUF_OFFSET_SHIFT = 48), meaning the offset is
+> lost entirely. The completion queue then returns a truncated address to
+> userspace, making buffer recycling impossible.
 
+I had a look at how this is used.
 
--- 
-With best wishes
-Dmitry
+I suspect that XSK_UNALIGNED_BUF_OFFSET_SHIFT can just be made smaller.
+The 'addr' isn't really a normal address of any kind, it is a really
+and offset into an array made up of pages of memory.
+The actual address (kernel virtual of dma) is generated by:
+	ptr->array[addr >> PAGE_SHIFT] + addr & ~PAGE_MASK
+(after removing the unaligned chunk offset from 'addr').
+
+It is actually quite likely that there are enough free high bits
+even in 32bit mode.
+
+	David
+
+> 
+> Since we hear no one is using AF_XDP on 32-bit arch, we decided to
+> strictly stop supporting it at compile time.
+> 
+> Closes: https://lore.kernel.org/all/20260419045824.D9E5EC2BCAF@smtp.kernel.org/
+> Fixes: 0ebc27a4c67d ("xsk: avoid data corruption on cq descriptor number")
+> Suggested-by: Stanislav Fomichev <sdf@fomichev.me>
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>  net/xdp/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/xdp/Kconfig b/net/xdp/Kconfig
+> index 71af2febe72a..819aa5795f50 100644
+> --- a/net/xdp/Kconfig
+> +++ b/net/xdp/Kconfig
+> @@ -1,7 +1,7 @@
+>  # SPDX-License-Identifier: GPL-2.0-only
+>  config XDP_SOCKETS
+>  	bool "XDP sockets"
+> -	depends on BPF_SYSCALL
+> +	depends on BPF_SYSCALL && 64BIT
+>  	default n
+>  	help
+>  	  XDP sockets allows a channel between XDP programs and
+
 
