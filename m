@@ -1,290 +1,204 @@
-Return-Path: <netdev+bounces-280328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280329-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +M55Cvdu6GmNKQIAu9opvQ
-	(envelope-from <netdev+bounces-280328-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 08:47:19 +0200
+	id oDvkOuhv6GmbKQIAu9opvQ
+	(envelope-from <netdev+bounces-280329-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 08:51:20 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F77044293C
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 08:47:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 57BA94429AB
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 08:51:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 151103058087
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 06:40:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0076B3012E89
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 06:48:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B448D3246F0;
-	Wed, 22 Apr 2026 06:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42A9133AD9A;
+	Wed, 22 Apr 2026 06:48:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vPZHSoSN"
+	dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b="JaaLIsvF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011026.outbound.protection.outlook.com [52.101.70.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BD6818AE3
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 06:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C1E3126CA
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 06:47:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.26
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776840035; cv=pass; b=RHufMv/rrnvKiTELtKhpbEy2S3sXMi92WxEYRXDpJNANKFdRRdADEtJl65+yuUxNKjDs+TjoyN5MGJf7Jqckpnfhsax2e1AaaFL2UoG9J0SfYAHCmlpsylrmXO6Z3uDNpv3G7N201Qk8TnUq/MloL+wzeJ9hZisW5EWPBPyHx5k=
+	t=1776840480; cv=fail; b=BJQS9Y5A212QfZO65pNrqP36rsMAUltM0KO2f8sooZ9lGZWA2U2gdQmVjMhOZzLq/Ff984OioUvKCS6rAHYPVLt1yb2C13eiBjK8BqphaTfjsd0uka8xufVYHaE72vlzsAj+OyDYpHQAFG4hseF8I7SXyZLmluP2UaUOEhieRpg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776840035; c=relaxed/simple;
-	bh=Dub9yvFw6aVqsBwlj+o9QIz+Ydgw4jm4EZ6nTT2g1tw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Or4FldcnnP+dP9kJFoH4o8MPY3PIw2PNKCnasEYmrB2JmTk0aiMfsB/gQZR3KXKjo93sfNuVsPfRek3KUeX2rskgRge8kiVQGoMiVGGEDrOEyEjCTZNb0+hNSedcD76Vh7LirL8j5EQsXCmQlKNmndRpUIqyK4nCMSM/SejbNqg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vPZHSoSN; arc=pass smtp.client-ip=74.125.82.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-12c1a170a50so6312965c88.0
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 23:40:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776840033; cv=none;
-        d=google.com; s=arc-20240605;
-        b=FvDWSsjt/XkGjQql+GmWdQK5qIERi8jcKgBs52zE571CcdqnoDwWAwBPHFsmLoecus
-         45zI1e11vrTMIu4ATA47UQOCIT1p1I4GgJsTB6QtFhgBnXL7xTesFAfjJ7Mm1OLGMrKm
-         cADizd/VwATy31TZDd5TcetgMwnDIMX5KNgmfZYRP6rs/jp5l7tvEYSNyhIi89spm1IO
-         hmL4D5qB444HM01BbDYlIbSCrLR+C+49KBQxnn9VeHt57otMqI7QmSqVIdRoXzY+cl17
-         DFPwQTjXI2aPMEMYyIElJhs3C8lKiEf8wXwk9KAnLMOG5RDYqpsybz8WjEFk8hEiaEKO
-         diSQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=HkR7JxVUSSnzxmBjl0/viks3xyisurlnd8db9S4wWvM=;
-        fh=QM2w0BUeoLHZ5J32WWmECsmYnH66Aws1AoN/amXdo+I=;
-        b=UnzvEAfYRhx4d7WpVrUIkAazVRRj42B2lbOpt7lZ28ovrzo2dNba9ATcKUMGnfu3Qd
-         tR/lCPXVtV/6LSUzAr1SZWWvxcg8zaPquie45AsQ+Dq84pbpgXI+fHYaRBTxkZTFvM89
-         lGgwtJk2bcLsPrDwxImL8OhAshUGDfjI5DKhWFyVLIh9bhCGSGop/vwrQcf98aH04ycX
-         dz/QJdc08DWrS5ykAHdv7r31uxgVG80FIDNZ5ij3CYhuqL2M9hV05dnSFm7qjTjFkjHb
-         FaWgAPPUfNUYeO67+bTM/yT+yBS/NMQ1c9VqeESrDPPm4srG2zCCLmR+jveUc0+RtGzd
-         GN4Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776840033; x=1777444833; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HkR7JxVUSSnzxmBjl0/viks3xyisurlnd8db9S4wWvM=;
-        b=vPZHSoSNGTyUCfSVRaRDnr33kc9nxRTWt9jYcZkcyXEKbwrg8J8oQGZ03zhAy+xy1P
-         jFR6i6QKe1mwKnuwCwJWs4nSVlBl9wKlBfykg6a2niR1stl4rY7NWRXQ0lxhROdtXdiE
-         Y9HV0NQgYTLLCN9B55qFG8go1YWmrjWvPfVuJUw9xCL9W+sFU6zkq8WuR9Km7qlaa6z0
-         qxm2PxeiC0QW60tjvfJsDbLC+T+hjKH+vKLDFRoUTogP7hZ3z6lplSOwx2NNTkPe2QDv
-         hpI4H9uF52ZZgNmfEw9cbWiHHbPzKa6teSVbjqp9KA8m9XvAISvckZ9dZJdfm9SCtH0q
-         25/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776840033; x=1777444833;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=HkR7JxVUSSnzxmBjl0/viks3xyisurlnd8db9S4wWvM=;
-        b=ICM+zs/BT39wQl/CIPbZ6fUNWmp5HgfLGmviR1gRVHfjybNVvHD7uNq2UoUXTZGexZ
-         FhHaOBoBnpOdyl8cXWMnlMVItpf44u47yP9xoFfjwhfWxxP00S2ARBQ3sbgbO+1rZRp4
-         i6DkrRmKUKwgRIZTTKqaVeUsPFHdyQpyBgkqpE8HqJSAzRvtQZ/kR4mWZio1Y48BK9UD
-         aQ5tUO4yycylqfTpFIlyiwsVLkeGtP9HO8zH6OCYAhhq2KHWOAXs/NOKhbhdzirCpGZg
-         w2Sc/msSxJ/lpxOPP7bai0mkNoZ0YVTARBYniZsnwHExIgZnFjqv5bU2E8CjpLo4Hvrh
-         k7ng==
-X-Forwarded-Encrypted: i=1; AFNElJ+QjbZc828fsOlHZDdikHJaEvGreZTjgQfvi1yYf21twmpPemSuPR+ynfYrO5cZjBj49Nj6IDA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFn+PWP8GJX9YwLQJ7WaUc/T7d91XUqAOtjmImjnI55aEtyGV4
-	VAo9UJ37GsSs7KZtVHE2VBuuxaISfOvWBLPD+gyH0hsIOTKd8ja+c3JiBk4/Y4tDVTGUih0TFPX
-	zdRBaH6n/oIIa1k9dhE9BPLb4RmfzR3bUPdraD28P
-X-Gm-Gg: AeBDiesOAdeJ1EMgHYo6J2tRRvUHUFBFGnLAJuFi7YDmhECb5WlIyyK4MNwh9VeHOV1
-	EGiOq2YE2+aXnT/LpNtCECeIygxcdz/pAkqh4TYppCnLtBJy9rqzwy0ROH3PyWHdOM5yWbEbNG2
-	Mo9CwL5dNXCLHgImiySlptj+rNz5LZcomPpq4Cy4YOvEZy/4vtc/FnuE2b0cijzCg1GCzgVZn5u
-	dpt8c3yBijJZLQRplForIg0dv5RnPbYC7UciDLZ01czW8GbH3Yi4nTgtiC0X2aLQqKI0iaAJDBf
-	lsYY4yj+5gF/NYeHWRUp2LkdjoCP/mR4ugj9MohCF2A/p4Dznnr3ehKXW1K6iykijn0hbryYEvU
-	K+zZrP4HGKffIrKKWpQnC6G1oyzFpPUNiNtkzUwPSj/tSF67HBF6UNc+gey5dkQlu8cRSso50sw
-	==
-X-Received: by 2002:a05:7022:ef09:b0:11a:fec5:d005 with SMTP id
- a92af1059eb24-12c73f6c4f6mr11902651c88.10.1776840032640; Tue, 21 Apr 2026
- 23:40:32 -0700 (PDT)
+	s=arc-20240116; t=1776840480; c=relaxed/simple;
+	bh=1mFfQUQGVqgv4tyPZhzXW+8D7rqIhGSu55B6BYD21Uk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ID3jEYfR8xWYH7wlUCA6K6TOS219FgXeSHqLAuiFDvWzPnjE9yj75Fu5pJNMPJ4Z88eP/awjFrz8W80Pn940OV/z4HgEni/3Uql/KBXVRr7rf/uOJbt+0GYdqHBJ3x93UKRJrcM7wAI4PZh8fS3LXcRrkbfw5YrKDaV0qJSc7TU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com; spf=fail smtp.mailfrom=nokia.com; dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b=JaaLIsvF; arc=fail smtp.client-ip=52.101.70.26
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=CzmZ9bmRlks6EaXrruINBqe6YSpNdpIAZZYwJUVr3RDCRRM2o5e9ANwC3ueTeWTzHbTtS57xIVt3SzeY2ZvVnoEOE/P5HfY07pKWds8079vzSrciwWeHbfEpQhVZ3tavReDF8WqqWQiLu11RoFU+HHxXiMmy65Moc9CGcrz185EKJi1rlJKyQ+h2D8WJAyA08+1VHVZ4zm7QiSuBZ+iaapAy2GiwKG+uNbyqUyGER84WDTMS5odJjxnPTwaa1m3bZLoG9k1qRkV/F62StJWp0eFlQ2m2Ob7QPKNEYP5Z8t3bCQC19EvM/eC+cfOXSAvtVq7nYpMaXpmrVySAP5zxBg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1mFfQUQGVqgv4tyPZhzXW+8D7rqIhGSu55B6BYD21Uk=;
+ b=AJ+T9+w9d0A7Qrm3ndAWlq6ag+VOPQDbkdBFM04E89b6PQD429zjljrugbfHDmPsRMsrtHRoIaU5sv7TNZQt2alO+y/ROJPLlsUOoPqKM7PJRmfmGdjOqtNy1NbP8au/bYQn9CiPOvteyHpc9XRasfpyS6/Hbghg3wArZRyluZqEg7WHZrNOysKNe1xPBVQCdku7MD+V3eltSSAx7Dq6AzywVu8gyDnhuGT/EneZjaypl0ragtrNJrlcFQ01HEWVEdEf37UzcVblmH6vxsY7eLTSUBmQ9yTq9xcn4e3BWi6GTp6LOIIZhdHtBE2LjS1RAicdcEKLLlf+JVgGhMhOsQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nokia.com; dmarc=pass action=none header.from=nokia.com;
+ dkim=pass header.d=nokia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1mFfQUQGVqgv4tyPZhzXW+8D7rqIhGSu55B6BYD21Uk=;
+ b=JaaLIsvFx1mpGpO2Njdzt9j5QdTMJEbQ7+N4D+GSqqqj+unff/BiUBGPWa86GqslRGXkQpmC2CtWkayM/7/0BP/1Iu1Z4y0pVyDIlzYSCS5tItzy+d0Z0OV4jBMO1eKdrZar6XOjVZj1CWNl2QZ3F/FpWGySSUfeCR8bJMR7UdwUxOaN0jLhIcH0wPlV/wWgxk4MrjaWOB7pCiWKF/HEVz0FyT3MMoKe0l3zWtargvVpi++4LTGOuvNNYOJf95g4Dyk+Un3mTM+T83YKsJaKGQ3EZdahQe66sqo8EImJCQKC+7COmAXbBSG/uVw1dNmplO1KgwyWwTdE80HwRsF/Tg==
+Received: from VI1PR07MB9850.eurprd07.prod.outlook.com (2603:10a6:800:1db::9)
+ by AS8PR07MB9086.eurprd07.prod.outlook.com (2603:10a6:20b:56b::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9818.33; Wed, 22 Apr
+ 2026 06:47:56 +0000
+Received: from VI1PR07MB9850.eurprd07.prod.outlook.com
+ ([fe80::d889:14e5:7b50:cb3b]) by VI1PR07MB9850.eurprd07.prod.outlook.com
+ ([fe80::d889:14e5:7b50:cb3b%6]) with mapi id 15.20.9846.017; Wed, 22 Apr 2026
+ 06:47:55 +0000
+From: "Karol Gajdos (Nokia)" <karol.gajdos@nokia.com>
+To: Sabrina Dubroca <sd@queasysnail.net>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: a bug in drivers/net/macsec.c ? (ssci endianness)
+Thread-Topic: a bug in drivers/net/macsec.c ? (ssci endianness)
+Thread-Index: AQHc0YNKoCch/aFIFUC74tZa1KH047Xpe50AgAEh3hA=
+Date: Wed, 22 Apr 2026 06:47:55 +0000
+Message-ID:
+ <VI1PR07MB985021E5128D36B1905A53A6962D2@VI1PR07MB9850.eurprd07.prod.outlook.com>
+References:
+ <AS5PR07MB9837EA10B11F76A167FD20A896202@AS5PR07MB9837.eurprd07.prod.outlook.com>
+ <VI1PR07MB9850B2C9119357C3B254F83F962C2@VI1PR07MB9850.eurprd07.prod.outlook.com>
+ <aed1wCDC2Oh4eZ1h@krikkit>
+In-Reply-To: <aed1wCDC2Oh4eZ1h@krikkit>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nokia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: VI1PR07MB9850:EE_|AS8PR07MB9086:EE_
+x-ms-office365-filtering-correlation-id: 059fee9d-4ccb-4945-61ba-08dea03b1586
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|376014|38070700021|22082099003|18002099003|56012099003;
+x-microsoft-antispam-message-info:
+ Np5aKIec2qfXuOcP9hWe/gpNXvbcQ9yxfWkoy/nbZixlmpu2krYy2Wpnrywr9sZzZpirPWZrljxjr5tCfBPZq4oOE/Svtsn8WC1pT6UOczmh/vSnkslHpTdXXUeVVcM/4fejkaxb5lpsXYrKyg66wejanTholTqTRZb0Ldxd5oFScYYTvZgqeZmd2bmF22Su5RFx1XnP30eF0dsFOfSXxClBxKymtCBDzpy1ZD4L3p7N7eqdxJoYrntCxcKDbIMLyecEYdwStIYYB0HkvhmWkPG3vELmRzH7Ty72IX56SMlJCuxyA7ux3ka1N/youYtXuvt/HwrDWGX2GFJhCSqeuCBh0hu1iAYTOv4FZiHgyqvqZ8THfvkArFP4+28RMYiJg+g/HzwwCZCQkBsYENs64xHl84T6TDeWOseYNxP7L0d7miW6o223I6fhX7DjBiXzA3HYgBS4M/JuVLUDYSza5jXFyfXR6ZvsX8jPiqWc4OBtmZEYnaoKSfjlCMv/jsylRwinx8GwF4X9oEILNBTcUhWiXZ4AD3LICQ8rLqk6PRtQoonb4FuIIeyaG4pyWY+WEPNRm7aWWd828h99kX/TAKCk5OqlhCYGgUg93lVMgUyYx28qhwX21zLE5lQT4gg/FR/ivpeXKAIxfSxnIt+dTeG6FCMSm9FbYsv/r9KKtQQYIaGCuHLZU0Z+hhHYS+90UYAYd0/pt2E+p06GuenY02AreZS+9ZaedarCUrGyVZWeHkM2SYhjLOipYF/roerHZfsMXTshmTJ66a+8vT5SESV5CY/ia0ho6wXiRi8mvY8=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR07MB9850.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700021)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?MW1pRm5BY05MSEUyeHhCMWpON3NlUjFLZkZ6Rm9UNWtrNnluaHNMNXpjN0tW?=
+ =?utf-8?B?R3ozSTRMVldjVXVRd01HQldHU1NzOFE4dHZzdFVrdVFXMEdUU1NFSS9XWXpm?=
+ =?utf-8?B?aE83Vk1yRzVnNk9MaG1MdFV2NC85SXNYSkpuWjNRSWFzVTdBaDZVWnZoUDg5?=
+ =?utf-8?B?TW9UV09lcEUzeXpVVUlPSWFDTXJ6K0Fzb3lrejVUbk9LOHRwSWJhWStWWUpy?=
+ =?utf-8?B?WHk4VTZROGRUOGxTNy80dXB0MFcyWk5qUTlmZnp6S1RtQmg5dkg5bGJMR0Qr?=
+ =?utf-8?B?dmZ1MzY3Y3BkL05VcGpSZGNsZzAxa2d3VTNuZ1lVL1BDbGRTeEZzeTRJQTl6?=
+ =?utf-8?B?L0s3UkVxTjgxdFpZM2hGNXhmcEhuR21UcWw5TGtzaFQwUER2UkJFTU42QTZX?=
+ =?utf-8?B?L2RBdHA4TWp4SGJXdFFSWktOWk53anlNSWFmQVlGVFhraDJMNkNVeXlTclB1?=
+ =?utf-8?B?T1krRVYzUDBWSEtSWHlqdXBOYVJIQzR1QU1mMTZMbnZ0b0FoVHlSYnlvNzZM?=
+ =?utf-8?B?NlBuZ0FzY1JJdlpLb2dkWlpRbnhMUUVwZENIejBqY0Rkb2hTN3Uvek4raVBT?=
+ =?utf-8?B?YTRWa2k3M3h0cUltRFlvUXFZQ2MvM1Q1aE9MQkhCbm1VZEdCTGpTVXkzTTBj?=
+ =?utf-8?B?U2g2dHdWNnArYk8rWW1ncDAwWUVYUGtxaVJmTmc4OFZNdExjOTJ1ZFowVTdI?=
+ =?utf-8?B?akRWR1VhY1VMazViK1BGMXJpS0dHVm0xMVlVRStCaUR2VUh6b1JtNlprSTVE?=
+ =?utf-8?B?UjcyUGVNRVRraEJzM3lha0pScExnZ1A2bFpXWnk2dExaWkZJU1JleFlJUXZE?=
+ =?utf-8?B?Z1hOZEYzbVlWdCs4TXErRm03NThYMU95QzVJSC9tSTdhdWxYeEh2OUxmQ2Mz?=
+ =?utf-8?B?RHlZVXIvK3R6Q3h2M3AwUlVmVEk3Q0NEN044WGY4dVJZTy9TSjFMWm01a1VN?=
+ =?utf-8?B?bi9ac1R5ZStDQjNXWjk0dkZiRGZWY0NqcDBWdzBSYVV5QU5FUnFlYW5GNERX?=
+ =?utf-8?B?OThHcG1KekdzMWRUYmVocUpNcjl0akFUVzQ4c2ZRbFQ3cDVBS2U5am5ZNVRM?=
+ =?utf-8?B?UERiNUwzSXJNVGpwUXpsNHF0Szl4THBvem9yQlN2QUdBak5RV0dUcU40Z0VM?=
+ =?utf-8?B?UTFsejM0di91RW5iOTVxbHJOQ2RjSndlZEtiU2dabnJTRmxWVGZ2bzVkODQ1?=
+ =?utf-8?B?bFlMb05Pc3pVY3c5ZXUrYXhnUjVweVFVWmpLRktqZmx2eFdNN1BkNHlLMDhD?=
+ =?utf-8?B?NlZ2WmtuZXhjU1ZZellTcDY0ZkxCWnVHS3U4YU9STDNpQ1hPZjladGt2M1Ri?=
+ =?utf-8?B?bkdBRG1BdFBoSHRUQnFRbUxHdzgwQWN5Z2U5ZGxiVTd1QVNlbUVhNENpWGli?=
+ =?utf-8?B?SHJvc3Z6Y1ltTzYyVUl3UTV0ZkljaE5nWG1DTisvdjRoS2ZlZkkvZE1PT1NN?=
+ =?utf-8?B?WS9RY0dJZzRKSFBoNHJ1OWJjbzEvcDhIMEJCMTJSdDhyRDBYYkRwM2ZHY3gy?=
+ =?utf-8?B?YnhWUnVwZTVON3RvOEZzdi9RT2dHOGVtNUlTaU83VWZuVUFOQlkzc2cyQUJk?=
+ =?utf-8?B?OFg5TnB5Nm1KVmR4aUNrSG5KNjRYcEJOU25xT1NXRE43OFhBcGhjckRvdzNM?=
+ =?utf-8?B?OEVVNk5qazZsTHVYQ2VVYzNIR3g3L0FNV3RsWXQyd0UxQWJBYnZTazZ3bU10?=
+ =?utf-8?B?YzhWc3RGc0QzL0lVVW5QWHFtZkhneFF4RUJqUjdPaWg3SlJvajh3UStya0Rp?=
+ =?utf-8?B?djBodHJoVDlBcWxtSG5rYWYrTkNqbEFqcFNBNDVrUU1ObEc0S2lqandmVXJp?=
+ =?utf-8?B?Z3F6TFpOVHhsVjJVK0pWMkk2dkxiaXd1cTJoN2toYmRMSDZIamRqYnMrdGJl?=
+ =?utf-8?B?dTFXS3dhcmlFQUZzVmx3MHVqdW8ySU8xSU12SXRDNXhhNW95QW95UGFtTUt5?=
+ =?utf-8?B?QlI3ZEJ4MjkvZmVER3NaREJuc1cra0lLclN6NFNjZWR2VFc0TS9hVWN2Vkpq?=
+ =?utf-8?B?ZUpDenIyaG1LaEU2Tk9WcGJBckU0RzBaazVPK3JJS1VJbm9uOTVuUTFDaFZ3?=
+ =?utf-8?B?VG1QTS9tUG96QThvUGgxQlZ6WTNJTzE5OEIyZ1JEV2I2eDZNQkdhVlE1UnI1?=
+ =?utf-8?B?VFRvd2J6aGVTSXkvNFJhUU4rR0xWNjhqZ2RDaTZROVdQZEo1MDhkMTNjUE1r?=
+ =?utf-8?B?Vno3TkFBUDB2MXVaM0grVlFidi9MVDA4dXJYS3R6Sm83bHdNK1FIL1JCVTAw?=
+ =?utf-8?B?MHRTNE5xY1ZsUjJqSnlnU2F4ck02b21kcUx6VVpNVmg5UWdaRHJuWFp5OFZi?=
+ =?utf-8?B?OWxycUppelJETTZpME91bUoyN2srOGlHZG1UcGdyaU5JMmR4TjdUZz09?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260422024554.130346-1-jt26wzz@gmail.com> <20260422024554.130346-3-jt26wzz@gmail.com>
- <CAJ-ks9=FKMoczH+Z=GQ7C40T42=zdknYzzHCa8UVFOtq2H69cw@mail.gmail.com> <CALgi0XnM49xUZm2-YAjPFoc_8j_F=y4gmVemGHacyH8aXeXaHw@mail.gmail.com>
-In-Reply-To: <CALgi0XnM49xUZm2-YAjPFoc_8j_F=y4gmVemGHacyH8aXeXaHw@mail.gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 21 Apr 2026 23:40:21 -0700
-X-Gm-Features: AQROBzA3HpMyxVD5ELxOaE3sdPdgu6IawCkniN8Ei1PdRzCSt78S6iEoyACymtQ
-Message-ID: <CAAVpQUAKCDVPHhFjWch2-zpKp2rHEPzvwE4R1UrDTMd_6Y2HYA@mail.gmail.com>
-Subject: Re: [PATCH net v4 2/2] selftests/bpf: check epoll readiness during
- reuseport migration
-To: Zhenzhong Wu <jt26wzz@gmail.com>
-Cc: Tamir Duberstein <tamird@kernel.org>, netdev@vger.kernel.org, edumazet@google.com, 
-	ncardwell@google.com, davem@davemloft.net, dsahern@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+X-OriginatorOrg: nokia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR07MB9850.eurprd07.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 059fee9d-4ccb-4945-61ba-08dea03b1586
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Apr 2026 06:47:55.7703
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 5d471751-9675-428d-917b-70f44f9630b0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 9bAxCXVVBG2Ilhpv60PAgRWgTdVsJZDaywWZfd8v3TnH7q5KircnO5Z24He8B8K6gr2r9hn1UsinGHB4Txeg1g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR07MB9086
+X-Spamd-Result: default: False [0.94 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[nokia.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[nokia.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280328-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280329-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,queasysnail.net:email,nok.it:url,nokia.com:dkim,nokia.com:email];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[karol.gajdos@nokia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[nokia.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.991];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amazon.co.jp:email,mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3F77044293C
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: 57BA94429AB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 21, 2026 at 11:34=E2=80=AFPM Zhenzhong Wu <jt26wzz@gmail.com> w=
-rote:
->
-> Thanks Tamir, I will fold this into v5 - there's already a precedent
-> in socket_helpers.h, so I will just include it from there.
-
-The test does not use cleanup in other places,
-no need to mix them up.
-
-
->
-> On Wed, Apr 22, 2026 at 11:04=E2=80=AFAM Tamir Duberstein <tamird@kernel.=
-org> wrote:
-> >
-> > On Tue, Apr 21, 2026 at 7:46=E2=80=AFPM Zhenzhong Wu <jt26wzz@gmail.com=
-> wrote:
-> > >
-> > > Inside migrate_dance(), add epoll checks around shutdown() to
-> > > verify that the target listener is not ready before shutdown()
-> > > and becomes ready immediately after shutdown() triggers migration.
-> > >
-> > > Cover TCP_ESTABLISHED and TCP_SYN_RECV. Exclude TCP_NEW_SYN_RECV
-> > > as it depends on later handshake completion.
-> > >
-> > > Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
-> > > Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
-> > > Signed-off-by: Zhenzhong Wu <jt26wzz@gmail.com>
-> > > ---
-> > >  .../bpf/prog_tests/migrate_reuseport.c        | 49 ++++++++++++++++-=
---
-> > >  1 file changed, 42 insertions(+), 7 deletions(-)
-> > >
-> > > diff --git a/tools/testing/selftests/bpf/prog_tests/migrate_reuseport=
-.c b/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
-> > > index 653b0a20f..c62907732 100644
-> > > --- a/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
-> > > +++ b/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
-> > > @@ -7,24 +7,29 @@
-> > >   *   3. call listen() for 1 server socket. (migration target)
-> > >   *   4. update a map to migrate all child sockets
-> > >   *        to the last server socket (migrate_map[cookie] =3D 4)
-> > > - *   5. call shutdown() for first 4 server sockets
-> > > + *   5. for TCP_ESTABLISHED and TCP_SYN_RECV cases, verify via epoll
-> > > + *        that the last server socket is not ready before migration.
-> > > + *   6. call shutdown() for first 4 server sockets
-> > >   *        and migrate the requests in the accept queue
-> > >   *        to the last server socket.
-> > > - *   6. call listen() for the second server socket.
-> > > - *   7. call shutdown() for the last server
-> > > + *   7. for TCP_ESTABLISHED and TCP_SYN_RECV cases, verify via epoll
-> > > + *        that the last server socket is ready after migration.
-> > > + *   8. call listen() for the second server socket.
-> > > + *   9. call shutdown() for the last server
-> > >   *        and migrate the requests in the accept queue
-> > >   *        to the second server socket.
-> > > - *   8. call listen() for the last server.
-> > > - *   9. call shutdown() for the second server
-> > > + *  10. call listen() for the last server.
-> > > + *  11. call shutdown() for the second server
-> > >   *        and migrate the requests in the accept queue
-> > >   *        to the last server socket.
-> > > - *  10. call accept() for the last server socket.
-> > > + *  12. call accept() for the last server socket.
-> > >   *
-> > >   * Author: Kuniyuki Iwashima <kuniyu@amazon.co.jp>
-> > >   */
-> > >
-> > >  #include <bpf/bpf.h>
-> > >  #include <bpf/libbpf.h>
-> > > +#include <sys/epoll.h>
-> > >
-> > >  #include "test_progs.h"
-> > >  #include "test_migrate_reuseport.skel.h"
-> > > @@ -350,21 +355,51 @@ static int update_maps(struct migrate_reuseport=
-_test_case *test_case,
-> > >
-> > >  static int migrate_dance(struct migrate_reuseport_test_case *test_ca=
-se)
-> > >  {
-> > > +       struct epoll_event ev =3D {
-> > > +               .events =3D EPOLLIN,
-> > > +       };
-> > > +       int epoll =3D -1, nfds;
-> > >         int i, err;
-> > >
-> > > +       if (test_case->state !=3D BPF_TCP_NEW_SYN_RECV) {
-> > > +               epoll =3D epoll_create1(0);
-> > > +               if (!ASSERT_NEQ(epoll, -1, "epoll_create1"))
-> > > +                       return -1;
-> > > +
-> > > +               ev.data.fd =3D test_case->servers[MIGRATED_TO];
-> > > +               if (!ASSERT_OK(epoll_ctl(epoll, EPOLL_CTL_ADD,
-> > > +                                        test_case->servers[MIGRATED_=
-TO], &ev),
-> > > +                              "epoll_ctl"))
-> > > +                       goto close_epoll;
-> > > +
-> > > +               nfds =3D epoll_wait(epoll, &ev, 1, 0);
-> > > +               if (!ASSERT_EQ(nfds, 0, "epoll_wait 1"))
-> > > +                       goto close_epoll;
-> > > +       }
-> > > +
-> > >         /* Migrate TCP_ESTABLISHED and TCP_SYN_RECV requests
-> > >          * to the last listener based on eBPF.
-> > >          */
-> > >         for (i =3D 0; i < MIGRATED_TO; i++) {
-> > >                 err =3D shutdown(test_case->servers[i], SHUT_RDWR);
-> > >                 if (!ASSERT_OK(err, "shutdown"))
-> > > -                       return -1;
-> > > +                       goto close_epoll;
-> > >         }
-> > >
-> > >         /* No dance for TCP_NEW_SYN_RECV to migrate based on eBPF */
-> > >         if (test_case->state =3D=3D BPF_TCP_NEW_SYN_RECV)
-> > >                 return 0;
-> > >
-> > > +       nfds =3D epoll_wait(epoll, &ev, 1, 0);
-> > > +       if (!ASSERT_EQ(nfds, 1, "epoll_wait 2")) {
-> > > +close_epoll:
-> > > +               if (epoll >=3D 0)
-> > > +                       close(epoll);
-> > > +               return -1;
-> > > +       }
-> >
-> > I think you can avoid this goto using `__attribute__((cleanup(...))`:
-> >
-> >   static void close_fd(int *fd)
-> >   {
-> >         if (*fd >=3D 0)
-> >                 close(*fd);
-> >   }
-> >
-> >   #define __close_fd __attribute__((cleanup(close_fd)))
-> >
-> > then in the test:
-> >
-> > __close_fd int epoll =3D -1;
-> >
-> > there's an example of this in
-> > tools/testing/selftests/bpf/prog_tests/socket_helpers.h.
+T2ssIHNvIGl0J3Mgbm90IGEgYnVnLCBidXQgbGV0J3Mgc2F5IGFuIHVudXN1YWwgYWdyZWVtZW50
+IGJldHdlZW4gdXNlciBzcGFjZSBhbmQga2VybmVsLA0KYXMgbmV0bGluayBnZW5lcmFsbHkgdXNl
+cyB0aGUgaG9zdCBieXRlIG9yZGVyIGZvciBlbmNvZGluZyBhbmQgZGVjb2RpbmcgaW50ZWdlcnMu
+DQpBbnlob3cgdGhhbmtzIGZvciB0aGUgY2xhcmlmaWNhdGlvbiBhbmQgdGhlIGdyZWF0IHdvcmsg
+ZG9uZSBvbiBNQUNzZWMuICANCg0KS2Fyb2wNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0N
+CkZyb206IFNhYnJpbmEgRHVicm9jYSA8c2RAcXVlYXN5c25haWwubmV0PiANClNlbnQ6IFR1ZXNk
+YXksIEFwcmlsIDIxLCAyMDI2IDM6MDQgUE0NClRvOiBLYXJvbCBHYWpkb3MgKE5va2lhKSA8a2Fy
+b2wuZ2FqZG9zQG5va2lhLmNvbT4NCkNjOiBuZXRkZXZAdmdlci5rZXJuZWwub3JnDQpTdWJqZWN0
+OiBSZTogYSBidWcgaW4gZHJpdmVycy9uZXQvbWFjc2VjLmMgPyAoc3NjaSBlbmRpYW5uZXNzKQ0K
+DQoNCkNBVVRJT046IFRoaXMgaXMgYW4gZXh0ZXJuYWwgZW1haWwuIFBsZWFzZSBiZSB2ZXJ5IGNh
+cmVmdWwgd2hlbiBjbGlja2luZyBsaW5rcyBvciBvcGVuaW5nIGF0dGFjaG1lbnRzLiBTZWUgdGhl
+IFVSTCBub2suaXQvZXh0IGZvciBhZGRpdGlvbmFsIGluZm9ybWF0aW9uLg0KDQoNCg0KMjAyNi0w
+NC0yMSwgMTE6Mzc6NTMgKzAwMDAsIEthcm9sIEdhamRvcyAoTm9raWEpIHdyb3RlOg0KPiBIaSwN
+Cj4NCj4gdGhlcmUgc2VlbXMgdG8gYmUgYSBidWcgaW4gdGhlIGZ1bmN0aW9uIGZpbGxpbmcgSVYg
+Zm9yIHRoZSBYUE4gY2FzZS4NCj4gQ2FuIHlvdSBjb25maXJtIHBsZWFzZSA/DQoNCldlIGV4cGVj
+dCB1c2Vyc3BhY2UgdG8gcHJvdmlkZSB0aGUgU1NDSSBpbiBuZXR3b3JrIGJ5dGUgb3JkZXIgdmlh
+IHRoZSBuZXRsaW5rIEFQSSAoc2FtZSBhcyBTQ0kpLiBBcyBsb25nIGFzIHdlJ3JlIGhhbmRsaW5n
+IGl0IHRoYXQgd2F5IGNvbnNpc3RlbnRseSwgd2hpY2ggSSB0aGluayBpcyB0aGUgY2FzZSwgdGhl
+cmUgaXMgbm8gYnVnLg0KDQotLQ0KU2FicmluYQ0K
 
