@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-280480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280481-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iOjjMgb26Gl3SAIAu9opvQ
-	(envelope-from <netdev+bounces-280480-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:23:34 +0200
+	id oHO4JBH26Gl3SAIAu9opvQ
+	(envelope-from <netdev+bounces-280481-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:23:45 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25D504488D6
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:23:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 00BDB4488F4
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:23:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1B02D30F80E8
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 16:15:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A8A7830FD466
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 16:15:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1491B3803D4;
-	Wed, 22 Apr 2026 16:15:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AD82389DE3;
+	Wed, 22 Apr 2026 16:15:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zx3vNG33"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZVnSrAiu"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98353845C1
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 16:15:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A356F382F07
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 16:15:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776874524; cv=none; b=CLZ50vKd5FTWf9r5c7W2kCqodQ3NCIT46BqWNm600oI+EaL4hC77lBAuUKYwonE4xRIoB21mIxzzR50QCzPJtaPZKkDfzBWod+H+9J+p0PzvM8igBDpldrZnneiY88NCWQ+keJgbtLkht2bXpym/QhAlkG2VlazOB/frAJ6DX4s=
+	t=1776874526; cv=none; b=HnkQ5u3VinqD1sHx5LidoErau4V7EHK3dZ5SjbQGqWm2eJX3CPd0ZL6dJ6OV/IUDpvlB5FctyO6dFxEB+r5tOkZH0/nQjIWkBZMYDpfcZ0eYqoCVntaiI6fWmjDgJ6Dpu7RN7PNYZ/MV7NFijXCRDcxDUgNeKXDGeRw1j0ZF668=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776874524; c=relaxed/simple;
-	bh=VC0xaEp18VE11/4HL93isyezfiB6giE7QUc/XgHBk/w=;
+	s=arc-20240116; t=1776874526; c=relaxed/simple;
+	bh=kobuT0RyElyglIplrMxYPIAt1oGHGMs/d4UTM4dg+F4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LVCvAjl3pNi8w1mhVIUNr78XrrOC0hTt5KflIhy93UwofpJ5dSjc24FK0AuwVjWBGeqOtHgzjjmGqmlBchfVWkP914tVeeYqB0TRiSMksyeGmdgvM+fJfdc+KqgVMusMPL/fr+k2fVfLEZH1hac+iPi7Py8KTTEsY7XkSJU0AwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zx3vNG33; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=oZNhSW9yl65UFR7UDEdMoprp9oA0yvTGBRkMD3umLhhP/DDkoc5HbxcmC5jnMxU9UAnlL6h/gWSYLB4QVrHWw3kH4q9EbZp3jG91gjzF/s5Dw5HxVUQA0lBrOFldNpHkwGm63haiQWhc/f3wVrAZLUL3EP3ruGfpxOYMqSeytVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZVnSrAiu; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776874522;
+	s=mimecast20190719; t=1776874523;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Tg/xm4khmGTMt0O8denk3V8PJT+Q+STOFvsXoz9Lch4=;
-	b=Zx3vNG339tz5SWgDyIWLb4sLN7NSs5W75byHFUgAWwNsOu3nGb+38SZHnKKlK3GeQjCQUZ
-	k9mQCgKNXfovdPLs3gpQ3mTKbbFdlGRelkwonHAXOSZ9mEePfBuJHqRTP9Tc0NeRoXorfn
-	qt/5pFB68Y6HyMw9Unwd+ngCQNbHA68=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=wbqSbZnwuH51jNOBGnPIfoMjpBU58UXreLQO1CT0VkY=;
+	b=ZVnSrAiuCNNT6UkYMq0RtS5b4q67eHqwY1nRXLZlsGeXWpcVCaf6DwWqQvtZt7OYTXJvoq
+	C8Zl/aWi0MPFN+G/Yte6WnLum0+QyQHJm6Do166iflAdCUZ4wIL2o6F6IgZAPsM8L1dDgI
+	AySLh5fFLucgvxHpqn7o8XzncHMUWPk=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-637-uyVVsCh6Nxykmm23qjQCYw-1; Wed,
- 22 Apr 2026 12:15:17 -0400
-X-MC-Unique: uyVVsCh6Nxykmm23qjQCYw-1
-X-Mimecast-MFC-AGG-ID: uyVVsCh6Nxykmm23qjQCYw_1776874514
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-627-q_jbqwaAM8ebFkLdzXXKGg-1; Wed,
+ 22 Apr 2026 12:15:21 -0400
+X-MC-Unique: q_jbqwaAM8ebFkLdzXXKGg-1
+X-Mimecast-MFC-AGG-ID: q_jbqwaAM8ebFkLdzXXKGg_1776874519
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7D5F218005A8;
-	Wed, 22 Apr 2026 16:15:14 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B0F021955F0E;
+	Wed, 22 Apr 2026 16:15:19 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.44.48.17])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5D851180047F;
-	Wed, 22 Apr 2026 16:15:10 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1A3CB180058B;
+	Wed, 22 Apr 2026 16:15:15 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -74,9 +74,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-kernel@vger.kernel.org,
 	Jeffrey Altman <jaltman@auristor.com>,
 	stable@kernel.org
-Subject: [PATCH net v2 5/6] rxgk: Fix potential integer overflow in length check
-Date: Wed, 22 Apr 2026 17:14:34 +0100
-Message-ID: <20260422161438.2593376-6-dhowells@redhat.com>
+Subject: [PATCH net v2 6/6] rxrpc: Fix missing validation of ticket length in non-XDR key preparsing
+Date: Wed, 22 Apr 2026 17:14:35 +0100
+Message-ID: <20260422161438.2593376-7-dhowells@redhat.com>
 In-Reply-To: <20260422161438.2593376-1-dhowells@redhat.com>
 References: <20260422161438.2593376-1-dhowells@redhat.com>
 Precedence: bulk
@@ -86,7 +86,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
@@ -101,7 +101,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280480-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280481-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[redhat.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
@@ -113,17 +113,34 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[auristor.com:email,infradead.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,davemloft.net:email,sashiko.dev:url]
-X-Rspamd-Queue-Id: 25D504488D6
+	DBL_BLOCKED_OPENRESOLVER(0.00)[auristor.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,davemloft.net:email,infradead.org:email,allelesecurity.com:email]
+X-Rspamd-Queue-Id: 00BDB4488F4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Fix potential integer overflow in rxgk_extract_token() when checking the
-length of the ticket.  Rather than rounding up the value to be tested
-(which might overflow), round down the size of the available data.
+From: Anderson Nascimento <anderson@allelesecurity.com>
 
-Fixes: 2429a1976481 ("rxrpc: Fix untrusted unsigned subtract")
-Closes: https://sashiko.dev/#/patchset/20260408121252.2249051-1-dhowells%40redhat.com
+In rxrpc_preparse(), there are two paths for parsing key payloads: the
+XDR path (for large payloads) and the non-XDR path (for payloads <= 28
+bytes). While the XDR path (rxrpc_preparse_xdr_rxkad()) correctly
+validates the ticket length against AFSTOKEN_RK_TIX_MAX, the non-XDR
+path fails to do so.
+
+This allows an unprivileged user to provide a very large ticket length.
+When this key is later read via rxrpc_read(), the total
+token size (toksize) calculation results in a value that exceeds
+AFSTOKEN_LENGTH_MAX, triggering a WARN_ON().
+
+[ 2001.302904] WARNING: CPU: 2 PID: 2108 at net/rxrpc/key.c:778 rxrpc_read+0x109/0x5c0 [rxrpc]
+
+Fix this by adding a check in the non-XDR parsing path of rxrpc_preparse()
+to ensure the ticket length does not exceed AFSTOKEN_RK_TIX_MAX,
+bringing it into parity with the XDR parsing logic.
+
+Fixes: 8a7a3eb4ddbe ("KEYS: RxRPC: Use key preparsing")
+Fixes: 84924aac08a4 ("rxrpc: Fix checker warning")
+Reported-by: Anderson Nascimento <anderson@allelesecurity.com>
+Signed-off-by: Anderson Nascimento <anderson@allelesecurity.com>
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Marc Dionne <marc.dionne@auristor.com>
 cc: Jeffrey Altman <jaltman@auristor.com>
@@ -136,34 +153,23 @@ cc: linux-afs@lists.infradead.org
 cc: netdev@vger.kernel.org
 cc: stable@kernel.org
 ---
- net/rxrpc/rxgk_app.c    | 2 +-
- net/rxrpc/rxgk_common.h | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ net/rxrpc/key.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/net/rxrpc/rxgk_app.c b/net/rxrpc/rxgk_app.c
-index 30275cb5ba3e..5587639d60c5 100644
---- a/net/rxrpc/rxgk_app.c
-+++ b/net/rxrpc/rxgk_app.c
-@@ -214,7 +214,7 @@ int rxgk_extract_token(struct rxrpc_connection *conn, struct sk_buff *skb,
- 	ticket_len	= ntohl(container.token_len);
- 	ticket_offset	= token_offset + sizeof(container);
+diff --git a/net/rxrpc/key.c b/net/rxrpc/key.c
+index 6301d79ee35a..5ebb06d87cdd 100644
+--- a/net/rxrpc/key.c
++++ b/net/rxrpc/key.c
+@@ -502,6 +502,10 @@ static int rxrpc_preparse(struct key_preparsed_payload *prep)
+ 	if (v1->security_index != RXRPC_SECURITY_RXKAD)
+ 		goto error;
  
--	if (xdr_round_up(ticket_len) > token_len - sizeof(container))
-+	if (ticket_len > xdr_round_down(token_len - sizeof(container)))
- 		goto short_packet;
++	ret = -EKEYREJECTED;
++	if(v1->ticket_length > AFSTOKEN_RK_TIX_MAX)
++		goto error;
++
+ 	plen = sizeof(*token->kad) + v1->ticket_length;
+ 	prep->quotalen += plen + sizeof(*token);
  
- 	_debug("KVNO %u", kvno);
-diff --git a/net/rxrpc/rxgk_common.h b/net/rxrpc/rxgk_common.h
-index 80164d89e19c..1e257d7ab8ec 100644
---- a/net/rxrpc/rxgk_common.h
-+++ b/net/rxrpc/rxgk_common.h
-@@ -34,6 +34,7 @@ struct rxgk_context {
- };
- 
- #define xdr_round_up(x) (round_up((x), sizeof(__be32)))
-+#define xdr_round_down(x) (round_down((x), sizeof(__be32)))
- #define xdr_object_len(x) (4 + xdr_round_up(x))
- 
- /*
 
 
