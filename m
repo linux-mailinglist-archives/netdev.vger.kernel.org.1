@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-280336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280337-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oLR0MXt66GlvKwIAu9opvQ
-	(envelope-from <netdev+bounces-280336-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 09:36:27 +0200
+	id KIqkCLZ66GlvKwIAu9opvQ
+	(envelope-from <netdev+bounces-280337-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 09:37:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DF63442FB9
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 09:36:26 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA11F442FED
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 09:37:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9ABDD3017040
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 07:36:25 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7EDCA300D373
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 07:37:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D79337269F;
-	Wed, 22 Apr 2026 07:36:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1C82372B3D;
+	Wed, 22 Apr 2026 07:37:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9091237266E
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 07:36:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7635634D38D
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 07:37:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776843385; cv=none; b=nz6PEpYcTcq2EFDMxmiJJ6C1j33qVChiWEgUNNGItJdk7WBkmTaBbxyKh38NXhsZfIOi1Ycs2HKJlWnfSYivVFwzhabDMphuV0kTUl4tV6kaKCP1hD0l/BCpDYqZsmwHv7Ez39YzZkEZws4bT0Clp5EjlVv5qfpJA/eIxgbP5Ro=
+	t=1776843441; cv=none; b=Htuu7CtdA4pTv0ax5kZ4MkApmf6OGrg+YHaaDRuLOhlmE1JHb+s8CJ1YBMZDa3y7a53guvORDFU0qN/hNeAVOBB7hoCUc8yCytX891zIw/F1e08N9fxUH8OtH8vFI5s23CNdf9/kZzAQCm892ONOu6wjGsRznm1kpbxz7cBQkKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776843385; c=relaxed/simple;
-	bh=dYwnP09ok69IRT0CMZTSCFHUjNDCMvxUCJFOwyC3mTE=;
+	s=arc-20240116; t=1776843441; c=relaxed/simple;
+	bh=3GYHc+zvw8Cx3ECoCQuaHaB6GzeISywP0kNp1bRSNzE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mglX9V0jbkw/BnDs/zE+7zdQVeM/wBjsRmCmAiyvloFfOlXQxquZAQ4oKNd51mGAZV0lzTnlzHsxsvuTrSynBBnrBYc1nFwfIo5Cy1lnEb/ZGGaTuJ2EMDbcbZ0fcvZseaaOIWfRFnZM2hOO1snCSr5ciWeA+tg67laPn3l3QcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.175
+	 To:Cc:Content-Type; b=FhtbfFumnHpg2RIEKai5QN4JAzkcS20Bsukr0rWg6HFHtHzJyx8f6NXue7bKWFkjmjyUJOc7zkLBLjkr3K0+mxKvA6GshmUjXIybmEU3RlS55MBs5eraByw9ImSLcXu2IJcGKWMNcv6dzsJzC6he7Muo7gtnLrcLhvRDSZBHCF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-56f3e6bbecdso1654663e0c.2
-        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 00:36:22 -0700 (PDT)
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-56f72d27e7eso5205893e0c.0
+        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 00:37:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776843381; x=1777448181;
+        d=1e100.net; s=20251104; t=1776843437; x=1777448237;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+hTl3fMevoxyCDYyGguEshfy3b5RFB/24yHKhIouxoc=;
-        b=s4nxtraY+LIF3z68qICKCCEKhkts0JssJpJOxSI9+hWSfTfQI4fR5nGhq8/k+53VGV
-         7mv/S5KAdmjuH5HdIk6AJdxPIb+XqqWlyl2yAT6XBxTbqAF3qQuOrFIRjjiiNUolx86e
-         S5BKZRntQ/aL58xZYv8BairtEgQgLUGc9Hy2Ks3Ud3/g5BAwL3qzyAMjKJUOhrLno2CN
-         A9Jn+c0k1awynaHeO31NIJXww4ngZQtQJERmY8Aod439szX/E0+xiAyyjYS8MBt+mAnH
-         P9zNz7KMELTBt5JIeKm8BiEV3Kt2cNhAp2rNoPpZcZYU1lodk4sxSzYGDVMeyTQrbzRr
-         JFcw==
-X-Forwarded-Encrypted: i=1; AFNElJ/sc6zjDa/cvt+YAz1ook4t+Ao8Q63P2LbgZfN+YVHwcefaJyvNhr4PKTivSbmk2Yy7sq55T2k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzy5x5a82R2WsGYYe59320PekrET0xtTrr2B8A4z8UJ3YA7Bgcx
-	j+RY94RraHCrjPgw8KV7O6+0CbPC/QCkzNu6E66wQe2BjX+hPvQKQw8+CtB0GD48YHw=
-X-Gm-Gg: AeBDieuOigTqICsYE0EtekE/lSlKPyCLv0dbnRM6UXFH7TWrfvMrgcilDlRLn1Sz4Zz
-	eeQK0kFuI8pbvSYQvIOJbQh/M0+1DG0Cyh8Iqxld67AMU89fE74uEoJJ94e8E9lGAMRijLJZ2e/
-	fyRp1IEfqB39EssQWQXYGPSmm+HZM0xRHKJDbuvRXYqV0eFP7PQeATP6B9VnQXpmN92j0qFiRXh
-	4AmS8yoYfrKivot/2bncgQbalknqKv2xzGw2QjVPCX9r8LHNcpw0xb8uXIidUPupXiUSWhsGhky
-	yfQf/DH3e/VPEyRVcFfelLnRt73yhsitySKT8QnLLgc+847/0c+kBr1qWMEM4IvqWN98fDEdR0J
-	nYgrd0Sgdfq0YZHMPNhNugsAonATx9kZwKEV+7uSRsYjBc2j7goq62NiiSN2E9chDS517bCcaMU
-	2Z8lCyXDViF2UzyhYVR/1sefuTNT7fJUgHjlDR9HEpaeRl+mzRqeVw/MZh/htZKRox54s8WLM=
-X-Received: by 2002:a05:6122:608b:b0:566:23dd:19b9 with SMTP id 71dfb90a1353d-56fa57f8ec1mr8827833e0c.3.1776843381176;
-        Wed, 22 Apr 2026 00:36:21 -0700 (PDT)
-Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com. [209.85.222.53])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56fa92078adsm8930151e0c.7.2026.04.22.00.36.20
+        bh=heCo2b4pUMTNyOlabKB+Q8YrZWL6NriqRZ5p561/Bdo=;
+        b=Tnuu9GP9fd3+l7YRRMbHyba0iOI1N9JMH7bPVECSsGPjxleXaajysqNDZ7KaOLVOvm
+         42N62VWnzFRtRH3TdQs7m2xusExipHkg7P5QX8jMRJZi3NJ3YceXRL2DFb5TFzMvu0YV
+         XUeQPng/digMbSSGiw4qgyvzm8CUoGW17d4ElXZuDkJfo2VJ3H0ilJNo50GdAEDBIo19
+         Y7+9n06hQnXPkYmwYc80q/YWfeP1N1+qJ0vxl6E7Xmv2CAP67YiilmcZf0maSWegAZGL
+         sHPIe9yiUyvjGAKqX+WSJLdYo+9jneezGzrMxNc5XH/OCvl6ROaNjofLNmshl8dtFQxU
+         4XGg==
+X-Forwarded-Encrypted: i=1; AFNElJ8AjzVNHd4yH9T5yJlVB07kialgw0xhHqWc340B2n2FeZ6YPirfAImmb7ksAb7sXQKDH90Bbas=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpWgtWb0GndEvaB7yftkVR1eiuziunZ+vHNgVM00u2Ve9rL5SE
+	iepdUHCqdFLVdq/g9Ws66wDvhvBYllxahEcbwHbvcxdoTbJjvFufnuVHi/4+69AKK3U=
+X-Gm-Gg: AeBDiet/3Q9nNXpzDA5NxDqzTXmCdz2ZmJPpI8Xl5V64naPzvkSB48SVAXLRCAG3HoF
+	t7kreKWYZSiaS9sMkxdUJbP40L3YGNr9yVfnfKB4wiLVujgRTwFKS3/C2bPMOntLq5vZ7ShFItW
+	Ow72GDkHTrZoNRtfR8jwQ6oBOuV9ltLoG37L7Xd2h918C9FART9Sxi2GM1ad1qD5tcDjYQepulH
+	SKdAgvUCB0eFP6+coYHd7/mhjkhTw+WC6lhWpaWORvDwaRp9neGmlBVW2k1fGWqB1lRyTmyUvu8
+	QENLIkAADI3r5I7G81+tDtp0aCiV03h4M1IqmIswJciAI54WvP5S6IUfiP48HSMtiBWdVDsBlZy
+	MH/0H/gW7KiTMIQtKc3Ks8MrR0oIfQet0kEnv8SI9xnEgMHlbpTbbZIy2GLhBc9GgO6eNM8rHGq
+	z8QCYNvZX33IQ3gu5PdEEPb1gfNxyr1MCFmaS+cRPWdaYGXeVPR9HPRHb/yvciHzZxruYV/jc=
+X-Received: by 2002:a05:6122:2913:b0:56b:a7de:7129 with SMTP id 71dfb90a1353d-56fa6697f14mr6013274e0c.7.1776843437087;
+        Wed, 22 Apr 2026 00:37:17 -0700 (PDT)
+Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com. [209.85.217.45])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56fa920f0b4sm9660854e0c.8.2026.04.22.00.37.16
         for <netdev@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Apr 2026 00:36:20 -0700 (PDT)
-Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-953aacb9d78so1335297241.2
-        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 00:36:20 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ9kfDKhtQJJrekAUZt1SWWsKr6LwBu0ZfXagvRO5YPXo2pFko9KXXnZqvJ3QC1hIzV54IGUT4c=@vger.kernel.org
-X-Received: by 2002:a05:6102:c93:b0:602:a05c:e9c7 with SMTP id
- ada2fe7eead31-616f54a479cmr8099617137.7.1776843379354; Wed, 22 Apr 2026
- 00:36:19 -0700 (PDT)
+        Wed, 22 Apr 2026 00:37:16 -0700 (PDT)
+Received: by mail-vs1-f45.google.com with SMTP id ada2fe7eead31-60fea0840f3so4101549137.0
+        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 00:37:16 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ/sRvij5hKPCUYEKU4V0YDcPsOsQWPv9Mts4ASEtHOewVtpNkjqm3TvatiRkPcjuHHXl6ds4v4=@vger.kernel.org
+X-Received: by 2002:a05:6102:e0e:b0:608:d017:471c with SMTP id
+ ada2fe7eead31-616fbfa882dmr7548078137.6.1776843435550; Wed, 22 Apr 2026
+ 00:37:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,14 +76,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20260421-v7-0-0-net-next-driver-removal-v1-v1-0-69517c689d1f@lunn.ch>
- <20260421-v7-0-0-net-next-driver-removal-v1-v1-12-69517c689d1f@lunn.ch>
-In-Reply-To: <20260421-v7-0-0-net-next-driver-removal-v1-v1-12-69517c689d1f@lunn.ch>
+ <20260421-v7-0-0-net-next-driver-removal-v1-v1-6-69517c689d1f@lunn.ch>
+In-Reply-To: <20260421-v7-0-0-net-next-driver-removal-v1-v1-6-69517c689d1f@lunn.ch>
 From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 22 Apr 2026 09:36:07 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdU3g_c9UTX-K9fYaK1L98Fc3Y25gbk4Zj3VLyqGnsgndQ@mail.gmail.com>
-X-Gm-Features: AQROBzB0VYipEwveQPrO6MXgDl8wl7wClbWavrqQjN3cN2XZeQ4o_khpDH82xhc
-Message-ID: <CAMuHMdU3g_c9UTX-K9fYaK1L98Fc3Y25gbk4Zj3VLyqGnsgndQ@mail.gmail.com>
-Subject: Re: [PATCH net 12/18] drivers: net: cirrus: mac89x0: Remove this driver
+Date: Wed, 22 Apr 2026 09:37:03 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdVY+dDhfYjfT+TSjcgrKRHqOS7sCgsBkP1XMCZpxwJt=g@mail.gmail.com>
+X-Gm-Features: AQROBzDcBZuBHUZg9RQD4mJlymE6yNNASjBiNGOnD0pZdf17X4ticGRx29r3PR8
+Message-ID: <CAMuHMdVY+dDhfYjfT+TSjcgrKRHqOS7sCgsBkP1XMCZpxwJt=g@mail.gmail.com>
+Subject: Re: [PATCH net 06/18] drivers: net: amd: Remove hplance and mvme147
 To: Andrew Lunn <andrew@lunn.ch>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -95,13 +95,13 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-280336-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280337-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	DMARC_NA(0.00)[linux-m68k.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -112,1107 +112,1503 @@ X-Spamd-Result: default: False [0.04 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
 	R_DKIM_NA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,lunn.ch:email,conectiva.com.br:email]
-X-Rspamd-Queue-Id: 1DF63442FB9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,lunn.ch:email,greenend.org.uk:email]
+X-Rspamd-Queue-Id: AA11F442FED
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 CC linux-m68k
 
-On Wed, 22 Apr 2026 at 02:48, Andrew Lunn <andrew@lunn.ch> wrote:
->
-> The mac89x0 was written by Russell Nelson in 1996. It is an MAC
-> device, so unlikely to be used with modern kernels.
+On Tue, 21 Apr 2026 at 21:33, Andrew Lunn <andrew@lunn.ch> wrote:
+> These drivers use the 7990 core with wrappers for the HP300 and
+> Motorola MVME147 SBC circa 1998. It is unlikely they are used with a
+> modern kernel.
 >
 > Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 > ---
->  drivers/net/ethernet/cirrus/Kconfig   |  10 -
->  drivers/net/ethernet/cirrus/Makefile  |   1 -
->  drivers/net/ethernet/cirrus/cs89x0.h  | 461 ---------------------------
->  drivers/net/ethernet/cirrus/mac89x0.c | 577 ----------------------------------
->  4 files changed, 1049 deletions(-)
+>  drivers/net/ethernet/amd/7990.c    | 671 -------------------------------------
+>  drivers/net/ethernet/amd/7990.h    | 251 --------------
+>  drivers/net/ethernet/amd/Kconfig   |  18 -
+>  drivers/net/ethernet/amd/Makefile  |   2 -
+>  drivers/net/ethernet/amd/hplance.c | 238 -------------
+>  drivers/net/ethernet/amd/hplance.h |  27 --
+>  drivers/net/ethernet/amd/mvme147.c | 198 -----------
+>  7 files changed, 1405 deletions(-)
 >
-> diff --git a/drivers/net/ethernet/cirrus/Kconfig b/drivers/net/ethernet/cirrus/Kconfig
-> index 1a0c7b3bfcd6..786d379e79fe 100644
-> --- a/drivers/net/ethernet/cirrus/Kconfig
-> +++ b/drivers/net/ethernet/cirrus/Kconfig
-> @@ -25,14 +25,4 @@ config EP93XX_ETH
->           This is a driver for the ethernet hardware included in EP93xx CPUs.
->           Say Y if you are building a kernel for EP93xx based devices.
->
-> -config MAC89x0
-> -       tristate "Macintosh CS89x0 based ethernet cards"
-> -       depends on MAC
-> -       help
-> -         Support for CS89x0 chipset based Ethernet cards.  If you have a
-> -         Nubus or LC-PDS network (Ethernet) card of this type, say Y here.
-> -
-> -         To compile this driver as a module, choose M here. This module will
-> -         be called mac89x0.
-> -
->  endif # NET_VENDOR_CIRRUS
-> diff --git a/drivers/net/ethernet/cirrus/Makefile b/drivers/net/ethernet/cirrus/Makefile
-> index cb740939d976..03800af0f0e1 100644
-> --- a/drivers/net/ethernet/cirrus/Makefile
-> +++ b/drivers/net/ethernet/cirrus/Makefile
-> @@ -4,4 +4,3 @@
->  #
->
->  obj-$(CONFIG_EP93XX_ETH) += ep93xx_eth.o
-> -obj-$(CONFIG_MAC89x0) += mac89x0.o
-> diff --git a/drivers/net/ethernet/cirrus/cs89x0.h b/drivers/net/ethernet/cirrus/cs89x0.h
+> diff --git a/drivers/net/ethernet/amd/7990.c b/drivers/net/ethernet/amd/7990.c
 > deleted file mode 100644
-> index 210f9ec9af4b..000000000000
-> --- a/drivers/net/ethernet/cirrus/cs89x0.h
+> index 27792a52b6cf..000000000000
+> --- a/drivers/net/ethernet/amd/7990.c
 > +++ /dev/null
-> @@ -1,461 +0,0 @@
-> -/*  Copyright, 1988-1992, Russell Nelson, Crynwr Software
-> -
-> -   This program is free software; you can redistribute it and/or modify
-> -   it under the terms of the GNU General Public License as published by
-> -   the Free Software Foundation, version 1.
-> -
-> -   This program is distributed in the hope that it will be useful,
-> -   but WITHOUT ANY WARRANTY; without even the implied warranty of
-> -   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> -   GNU General Public License for more details.
-> -
-> -   You should have received a copy of the GNU General Public License
-> -   along with this program; if not, write to the Free Software
-> -   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-> -   */
-> -
-> -
-> -#define PP_ChipID 0x0000       /* offset   0h -> Corp -ID              */
-> -                               /* offset   2h -> Model/Product Number  */
-> -                               /* offset   3h -> Chip Revision Number  */
-> -
-> -#define PP_ISAIOB 0x0020       /*  IO base address */
-> -#define PP_CS8900_ISAINT 0x0022        /*  ISA interrupt select */
-> -#define PP_CS8920_ISAINT 0x0370        /*  ISA interrupt select */
-> -#define PP_CS8900_ISADMA 0x0024        /*  ISA Rec DMA channel */
-> -#define PP_CS8920_ISADMA 0x0374        /*  ISA Rec DMA channel */
-> -#define PP_ISASOF 0x0026       /*  ISA DMA offset */
-> -#define PP_DmaFrameCnt 0x0028  /*  ISA DMA Frame count */
-> -#define PP_DmaByteCnt 0x002A   /*  ISA DMA Byte count */
-> -#define PP_CS8900_ISAMemB 0x002C       /*  Memory base */
-> -#define PP_CS8920_ISAMemB 0x0348 /*  */
-> -
-> -#define PP_ISABootBase 0x0030  /*  Boot Prom base  */
-> -#define PP_ISABootMask 0x0034  /*  Boot Prom Mask */
-> -
-> -/* EEPROM data and command registers */
-> -#define PP_EECMD 0x0040                /*  NVR Interface Command register */
-> -#define PP_EEData 0x0042       /*  NVR Interface Data Register */
-> -#define PP_DebugReg 0x0044     /*  Debug Register */
-> -
-> -#define PP_RxCFG 0x0102                /*  Rx Bus config */
-> -#define PP_RxCTL 0x0104                /*  Receive Control Register */
-> -#define PP_TxCFG 0x0106                /*  Transmit Config Register */
-> -#define PP_TxCMD 0x0108                /*  Transmit Command Register */
-> -#define PP_BufCFG 0x010A       /*  Bus configuration Register */
-> -#define PP_LineCTL 0x0112      /*  Line Config Register */
-> -#define PP_SelfCTL 0x0114      /*  Self Command Register */
-> -#define PP_BusCTL 0x0116       /*  ISA bus control Register */
-> -#define PP_TestCTL 0x0118      /*  Test Register */
-> -#define PP_AutoNegCTL 0x011C   /*  Auto Negotiation Ctrl */
-> -
-> -#define PP_ISQ 0x0120          /*  Interrupt Status */
-> -#define PP_RxEvent 0x0124      /*  Rx Event Register */
-> -#define PP_TxEvent 0x0128      /*  Tx Event Register */
-> -#define PP_BufEvent 0x012C     /*  Bus Event Register */
-> -#define PP_RxMiss 0x0130       /*  Receive Miss Count */
-> -#define PP_TxCol 0x0132                /*  Transmit Collision Count */
-> -#define PP_LineST 0x0134       /*  Line State Register */
-> -#define PP_SelfST 0x0136       /*  Self State register */
-> -#define PP_BusST 0x0138                /*  Bus Status */
-> -#define PP_TDR 0x013C          /*  Time Domain Reflectometry */
-> -#define PP_AutoNegST 0x013E    /*  Auto Neg Status */
-> -#define PP_TxCommand 0x0144    /*  Tx Command */
-> -#define PP_TxLength 0x0146     /*  Tx Length */
-> -#define PP_LAF 0x0150          /*  Hash Table */
-> -#define PP_IA 0x0158           /*  Physical Address Register */
-> -
-> -#define PP_RxStatus 0x0400     /*  Receive start of frame */
-> -#define PP_RxLength 0x0402     /*  Receive Length of frame */
-> -#define PP_RxFrame 0x0404      /*  Receive frame pointer */
-> -#define PP_TxFrame 0x0A00      /*  Transmit frame pointer */
-> -
-> -/*  Primary I/O Base Address. If no I/O base is supplied by the user, then this */
-> -/*  can be used as the default I/O base to access the PacketPage Area. */
-> -#define DEFAULTIOBASE 0x0300
-> -#define FIRST_IO 0x020C                /*  First I/O port to check */
-> -#define LAST_IO 0x037C         /*  Last I/O port to check (+10h) */
-> -#define ADD_MASK 0x3000                /*  Mask it use of the ADD_PORT register */
-> -#define ADD_SIG 0x3000         /*  Expected ID signature */
-> -
-> -/* On Macs, we only need use the ISA I/O stuff until we do MEMORY_ON */
-> -#ifdef CONFIG_MAC
-> -#define LCSLOTBASE 0xfee00000
-> -#define MMIOBASE 0x40000
-> -#endif
-> -
-> -#define CHIP_EISA_ID_SIG 0x630E   /*  Product ID Code for Crystal Chip (CS8900 spec 4.3) */
-> -#define CHIP_EISA_ID_SIG_STR "0x630E"
-> -
-> -#ifdef IBMEIPKT
-> -#define EISA_ID_SIG 0x4D24     /*  IBM */
-> -#define PART_NO_SIG 0x1010     /*  IBM */
-> -#define MONGOOSE_BIT 0x0000    /*  IBM */
-> -#else
-> -#define EISA_ID_SIG 0x630E     /*  PnP Vendor ID (same as chip id for Crystal board) */
-> -#define PART_NO_SIG 0x4000     /*  ID code CS8920 board (PnP Vendor Product code) */
-> -#define MONGOOSE_BIT 0x2000    /*  PART_NO_SIG + MONGOOSE_BUT => ID of mongoose */
-> -#endif
-> -
-> -#define PRODUCT_ID_ADD 0x0002   /*  Address of product ID */
-> -
-> -/*  Mask to find out the types of  registers */
-> -#define REG_TYPE_MASK 0x001F
-> -
-> -/*  Eeprom Commands */
-> -#define ERSE_WR_ENBL 0x00F0
-> -#define ERSE_WR_DISABLE 0x0000
-> -
-> -/*  Defines Control/Config register quintuplet numbers */
-> -#define RX_BUF_CFG 0x0003
-> -#define RX_CONTROL 0x0005
-> -#define TX_CFG 0x0007
-> -#define TX_COMMAND 0x0009
-> -#define BUF_CFG 0x000B
-> -#define LINE_CONTROL 0x0013
-> -#define SELF_CONTROL 0x0015
-> -#define BUS_CONTROL 0x0017
-> -#define TEST_CONTROL 0x0019
-> -
-> -/*  Defines Status/Count registers quintuplet numbers */
-> -#define RX_EVENT 0x0004
-> -#define TX_EVENT 0x0008
-> -#define BUF_EVENT 0x000C
-> -#define RX_MISS_COUNT 0x0010
-> -#define TX_COL_COUNT 0x0012
-> -#define LINE_STATUS 0x0014
-> -#define SELF_STATUS 0x0016
-> -#define BUS_STATUS 0x0018
-> -#define TDR 0x001C
-> -
-> -/* PP_RxCFG - Receive  Configuration and Interrupt Mask bit definition -  Read/write */
-> -#define SKIP_1 0x0040
-> -#define RX_STREAM_ENBL 0x0080
-> -#define RX_OK_ENBL 0x0100
-> -#define RX_DMA_ONLY 0x0200
-> -#define AUTO_RX_DMA 0x0400
-> -#define BUFFER_CRC 0x0800
-> -#define RX_CRC_ERROR_ENBL 0x1000
-> -#define RX_RUNT_ENBL 0x2000
-> -#define RX_EXTRA_DATA_ENBL 0x4000
-> -
-> -/* PP_RxCTL - Receive Control bit definition - Read/write */
-> -#define RX_IA_HASH_ACCEPT 0x0040
-> -#define RX_PROM_ACCEPT 0x0080
-> -#define RX_OK_ACCEPT 0x0100
-> -#define RX_MULTCAST_ACCEPT 0x0200
-> -#define RX_IA_ACCEPT 0x0400
-> -#define RX_BROADCAST_ACCEPT 0x0800
-> -#define RX_BAD_CRC_ACCEPT 0x1000
-> -#define RX_RUNT_ACCEPT 0x2000
-> -#define RX_EXTRA_DATA_ACCEPT 0x4000
-> -#define RX_ALL_ACCEPT (RX_PROM_ACCEPT|RX_BAD_CRC_ACCEPT|RX_RUNT_ACCEPT|RX_EXTRA_DATA_ACCEPT)
-> -/*  Default receive mode - individually addressed, broadcast, and error free */
-> -#define DEF_RX_ACCEPT (RX_IA_ACCEPT | RX_BROADCAST_ACCEPT | RX_OK_ACCEPT)
-> -
-> -/* PP_TxCFG - Transmit Configuration Interrupt Mask bit definition - Read/write */
-> -#define TX_LOST_CRS_ENBL 0x0040
-> -#define TX_SQE_ERROR_ENBL 0x0080
-> -#define TX_OK_ENBL 0x0100
-> -#define TX_LATE_COL_ENBL 0x0200
-> -#define TX_JBR_ENBL 0x0400
-> -#define TX_ANY_COL_ENBL 0x0800
-> -#define TX_16_COL_ENBL 0x8000
-> -
-> -/* PP_TxCMD - Transmit Command bit definition - Read-only */
-> -#define TX_START_4_BYTES 0x0000
-> -#define TX_START_64_BYTES 0x0040
-> -#define TX_START_128_BYTES 0x0080
-> -#define TX_START_ALL_BYTES 0x00C0
-> -#define TX_FORCE 0x0100
-> -#define TX_ONE_COL 0x0200
-> -#define TX_TWO_PART_DEFF_DISABLE 0x0400
-> -#define TX_NO_CRC 0x1000
-> -#define TX_RUNT 0x2000
-> -
-> -/* PP_BufCFG - Buffer Configuration Interrupt Mask bit definition - Read/write */
-> -#define GENERATE_SW_INTERRUPT 0x0040
-> -#define RX_DMA_ENBL 0x0080
-> -#define READY_FOR_TX_ENBL 0x0100
-> -#define TX_UNDERRUN_ENBL 0x0200
-> -#define RX_MISS_ENBL 0x0400
-> -#define RX_128_BYTE_ENBL 0x0800
-> -#define TX_COL_COUNT_OVRFLOW_ENBL 0x1000
-> -#define RX_MISS_COUNT_OVRFLOW_ENBL 0x2000
-> -#define RX_DEST_MATCH_ENBL 0x8000
-> -
-> -/* PP_LineCTL - Line Control bit definition - Read/write */
-> -#define SERIAL_RX_ON 0x0040
-> -#define SERIAL_TX_ON 0x0080
-> -#define AUI_ONLY 0x0100
-> -#define AUTO_AUI_10BASET 0x0200
-> -#define MODIFIED_BACKOFF 0x0800
-> -#define NO_AUTO_POLARITY 0x1000
-> -#define TWO_PART_DEFDIS 0x2000
-> -#define LOW_RX_SQUELCH 0x4000
-> -
-> -/* PP_SelfCTL - Software Self Control bit definition - Read/write */
-> -#define POWER_ON_RESET 0x0040
-> -#define SW_STOP 0x0100
-> -#define SLEEP_ON 0x0200
-> -#define AUTO_WAKEUP 0x0400
-> -#define HCB0_ENBL 0x1000
-> -#define HCB1_ENBL 0x2000
-> -#define HCB0 0x4000
-> -#define HCB1 0x8000
-> -
-> -/* PP_BusCTL - ISA Bus Control bit definition - Read/write */
-> -#define RESET_RX_DMA 0x0040
-> -#define MEMORY_ON 0x0400
-> -#define DMA_BURST_MODE 0x0800
-> -#define IO_CHANNEL_READY_ON 0x1000
-> -#define RX_DMA_SIZE_64K 0x2000
-> -#define ENABLE_IRQ 0x8000
-> -
-> -/* PP_TestCTL - Test Control bit definition - Read/write */
-> -#define LINK_OFF 0x0080
-> -#define ENDEC_LOOPBACK 0x0200
-> -#define AUI_LOOPBACK 0x0400
-> -#define BACKOFF_OFF 0x0800
-> -#define FDX_8900 0x4000
-> -#define FAST_TEST 0x8000
-> -
-> -/* PP_RxEvent - Receive Event Bit definition - Read-only */
-> -#define RX_IA_HASHED 0x0040
-> -#define RX_DRIBBLE 0x0080
-> -#define RX_OK 0x0100
-> -#define RX_HASHED 0x0200
-> -#define RX_IA 0x0400
-> -#define RX_BROADCAST 0x0800
-> -#define RX_CRC_ERROR 0x1000
-> -#define RX_RUNT 0x2000
-> -#define RX_EXTRA_DATA 0x4000
-> -
-> -#define HASH_INDEX_MASK 0x0FC00
-> -
-> -/* PP_TxEvent - Transmit Event Bit definition - Read-only */
-> -#define TX_LOST_CRS 0x0040
-> -#define TX_SQE_ERROR 0x0080
-> -#define TX_OK 0x0100
-> -#define TX_LATE_COL 0x0200
-> -#define TX_JBR 0x0400
-> -#define TX_16_COL 0x8000
-> -#define TX_SEND_OK_BITS (TX_OK|TX_LOST_CRS)
-> -#define TX_COL_COUNT_MASK 0x7800
-> -
-> -/* PP_BufEvent - Buffer Event Bit definition - Read-only */
-> -#define SW_INTERRUPT 0x0040
-> -#define RX_DMA 0x0080
-> -#define READY_FOR_TX 0x0100
-> -#define TX_UNDERRUN 0x0200
-> -#define RX_MISS 0x0400
-> -#define RX_128_BYTE 0x0800
-> -#define TX_COL_OVRFLW 0x1000
-> -#define RX_MISS_OVRFLW 0x2000
-> -#define RX_DEST_MATCH 0x8000
-> -
-> -/* PP_LineST - Ethernet Line Status bit definition - Read-only */
-> -#define LINK_OK 0x0080
-> -#define AUI_ON 0x0100
-> -#define TENBASET_ON 0x0200
-> -#define POLARITY_OK 0x1000
-> -#define CRS_OK 0x4000
-> -
-> -/* PP_SelfST - Chip Software Status bit definition */
-> -#define ACTIVE_33V 0x0040
-> -#define INIT_DONE 0x0080
-> -#define SI_BUSY 0x0100
-> -#define EEPROM_PRESENT 0x0200
-> -#define EEPROM_OK 0x0400
-> -#define EL_PRESENT 0x0800
-> -#define EE_SIZE_64 0x1000
-> -
-> -/* PP_BusST - ISA Bus Status bit definition */
-> -#define TX_BID_ERROR 0x0080
-> -#define READY_FOR_TX_NOW 0x0100
-> -
-> -/* PP_AutoNegCTL - Auto Negotiation Control bit definition */
-> -#define RE_NEG_NOW 0x0040
-> -#define ALLOW_FDX 0x0080
-> -#define AUTO_NEG_ENABLE 0x0100
-> -#define NLP_ENABLE 0x0200
-> -#define FORCE_FDX 0x8000
-> -#define AUTO_NEG_BITS (FORCE_FDX|NLP_ENABLE|AUTO_NEG_ENABLE)
-> -#define AUTO_NEG_MASK (FORCE_FDX|NLP_ENABLE|AUTO_NEG_ENABLE|ALLOW_FDX|RE_NEG_NOW)
-> -
-> -/* PP_AutoNegST - Auto Negotiation Status bit definition */
-> -#define AUTO_NEG_BUSY 0x0080
-> -#define FLP_LINK 0x0100
-> -#define FLP_LINK_GOOD 0x0800
-> -#define LINK_FAULT 0x1000
-> -#define HDX_ACTIVE 0x4000
-> -#define FDX_ACTIVE 0x8000
-> -
-> -/*  The following block defines the ISQ event types */
-> -#define ISQ_RECEIVER_EVENT 0x04
-> -#define ISQ_TRANSMITTER_EVENT 0x08
-> -#define ISQ_BUFFER_EVENT 0x0c
-> -#define ISQ_RX_MISS_EVENT 0x10
-> -#define ISQ_TX_COL_EVENT 0x12
-> -
-> -#define ISQ_EVENT_MASK 0x003F   /*  ISQ mask to find out type of event */
-> -#define ISQ_HIST 16            /*  small history buffer */
-> -#define AUTOINCREMENT 0x8000   /*  Bit mask to set bit-15 for autoincrement */
-> -
-> -#define TXRXBUFSIZE 0x0600
-> -#define RXDMABUFSIZE 0x8000
-> -#define RXDMASIZE 0x4000
-> -#define TXRX_LENGTH_MASK 0x07FF
-> -
-> -/*  rx options bits */
-> -#define RCV_WITH_RXON  1       /*  Set SerRx ON */
-> -#define RCV_COUNTS     2       /*  Use Framecnt1 */
-> -#define RCV_PONG       4       /*  Pong respondent */
-> -#define RCV_DONG       8       /*  Dong operation */
-> -#define RCV_POLLING    0x10    /*  Poll RxEvent */
-> -#define RCV_ISQ                0x20    /*  Use ISQ, int */
-> -#define RCV_AUTO_DMA   0x100   /*  Set AutoRxDMAE */
-> -#define RCV_DMA                0x200   /*  Set RxDMA only */
-> -#define RCV_DMA_ALL    0x400   /*  Copy all DMA'ed */
-> -#define RCV_FIXED_DATA 0x800   /*  Every frame same */
-> -#define RCV_IO         0x1000  /*  Use ISA IO only */
-> -#define RCV_MEMORY     0x2000  /*  Use ISA Memory */
-> -
-> -#define RAM_SIZE       0x1000       /*  The card has 4k bytes or RAM */
-> -#define PKT_START PP_TxFrame  /*  Start of packet RAM */
-> -
-> -#define RX_FRAME_PORT  0x0000
-> -#define TX_FRAME_PORT RX_FRAME_PORT
-> -#define TX_CMD_PORT    0x0004
-> -#define TX_NOW         0x0000       /*  Tx packet after   5 bytes copied */
-> -#define TX_AFTER_381   0x0040       /*  Tx packet after 381 bytes copied */
-> -#define TX_AFTER_ALL   0x00c0       /*  Tx packet after all bytes copied */
-> -#define TX_LEN_PORT    0x0006
-> -#define ISQ_PORT       0x0008
-> -#define ADD_PORT       0x000A
-> -#define DATA_PORT      0x000C
-> -
-> -#define EEPROM_WRITE_EN                0x00F0
-> -#define EEPROM_WRITE_DIS       0x0000
-> -#define EEPROM_WRITE_CMD       0x0100
-> -#define EEPROM_READ_CMD                0x0200
-> -
-> -/*  Receive Header */
-> -/*  Description of header of each packet in receive area of memory */
-> -#define RBUF_EVENT_LOW 0   /*  Low byte of RxEvent - status of received frame */
-> -#define RBUF_EVENT_HIGH        1   /*  High byte of RxEvent - status of received frame */
-> -#define RBUF_LEN_LOW   2   /*  Length of received data - low byte */
-> -#define RBUF_LEN_HI    3   /*  Length of received data - high byte */
-> -#define RBUF_HEAD_LEN  4   /*  Length of this header */
-> -
-> -#define CHIP_READ 0x1   /*  Used to mark state of the repins code (chip or dma) */
-> -#define DMA_READ 0x2   /*  Used to mark state of the repins code (chip or dma) */
-> -
-> -/*  for bios scan */
-> -/*  */
-> -#ifdef CSDEBUG
-> -/*  use these values for debugging bios scan */
-> -#define BIOS_START_SEG 0x00000
-> -#define BIOS_OFFSET_INC 0x0010
-> -#else
-> -#define BIOS_START_SEG 0x0c000
-> -#define BIOS_OFFSET_INC 0x0200
-> -#endif
-> -
-> -#define BIOS_LAST_OFFSET 0x0fc00
-> -
-> -/*  Byte offsets into the EEPROM configuration buffer */
-> -#define ISA_CNF_OFFSET 0x6
-> -#define TX_CTL_OFFSET (ISA_CNF_OFFSET + 8)                     /*  8900 eeprom */
-> -#define AUTO_NEG_CNF_OFFSET (ISA_CNF_OFFSET + 8)               /*  8920 eeprom */
-> -
-> -  /*  the assumption here is that the bits in the eeprom are generally  */
-> -  /*  in the same position as those in the autonegctl register. */
-> -  /*  Of course the IMM bit is not in that register so it must be  */
-> -  /*  masked out */
-> -#define EE_FORCE_FDX  0x8000
-> -#define EE_NLP_ENABLE 0x0200
-> -#define EE_AUTO_NEG_ENABLE 0x0100
-> -#define EE_ALLOW_FDX 0x0080
-> -#define EE_AUTO_NEG_CNF_MASK (EE_FORCE_FDX|EE_NLP_ENABLE|EE_AUTO_NEG_ENABLE|EE_ALLOW_FDX)
-> -
-> -#define IMM_BIT 0x0040         /*  ignore missing media         */
-> -
-> -#define ADAPTER_CNF_OFFSET (AUTO_NEG_CNF_OFFSET + 2)
-> -#define A_CNF_10B_T 0x0001
-> -#define A_CNF_AUI 0x0002
-> -#define A_CNF_10B_2 0x0004
-> -#define A_CNF_MEDIA_TYPE 0x0070
-> -#define A_CNF_MEDIA_AUTO 0x0070
-> -#define A_CNF_MEDIA_10B_T 0x0020
-> -#define A_CNF_MEDIA_AUI 0x0040
-> -#define A_CNF_MEDIA_10B_2 0x0010
-> -#define A_CNF_DC_DC_POLARITY 0x0080
-> -#define A_CNF_NO_AUTO_POLARITY 0x2000
-> -#define A_CNF_LOW_RX_SQUELCH 0x4000
-> -#define A_CNF_EXTND_10B_2 0x8000
-> -
-> -#define PACKET_PAGE_OFFSET 0x8
-> -
-> -/*  Bit definitions for the ISA configuration word from the EEPROM */
-> -#define INT_NO_MASK 0x000F
-> -#define DMA_NO_MASK 0x0070
-> -#define ISA_DMA_SIZE 0x0200
-> -#define ISA_AUTO_RxDMA 0x0400
-> -#define ISA_RxDMA 0x0800
-> -#define DMA_BURST 0x1000
-> -#define STREAM_TRANSFER 0x2000
-> -#define ANY_ISA_DMA (ISA_AUTO_RxDMA | ISA_RxDMA)
-> -
-> -/*  DMA controller registers */
-> -#define DMA_BASE 0x00     /*  DMA controller base */
-> -#define DMA_BASE_2 0x0C0    /*  DMA controller base */
-> -
-> -#define DMA_STAT 0x0D0    /*  DMA controller status register */
-> -#define DMA_MASK 0x0D4    /*  DMA controller mask register */
-> -#define DMA_MODE 0x0D6    /*  DMA controller mode register */
-> -#define DMA_RESETFF 0x0D8    /*  DMA controller first/last flip flop */
-> -
-> -/*  DMA data */
-> -#define DMA_DISABLE 0x04     /*  Disable channel n */
-> -#define DMA_ENABLE 0x00     /*  Enable channel n */
-> -/*  Demand transfers, incr. address, auto init, writes, ch. n */
-> -#define DMA_RX_MODE 0x14
-> -/*  Demand transfers, incr. address, auto init, reads, ch. n */
-> -#define DMA_TX_MODE 0x18
-> -
-> -#define DMA_SIZE (16*1024) /*  Size of dma buffer - 16k */
-> -
-> -#define CS8900 0x0000
-> -#define CS8920 0x4000
-> -#define CS8920M 0x6000
-> -#define REVISON_BITS 0x1F00
-> -#define EEVER_NUMBER 0x12
-> -#define CHKSUM_LEN 0x14
-> -#define CHKSUM_VAL 0x0000
-> -#define START_EEPROM_DATA 0x001c /*  Offset into eeprom for start of data */
-> -#define IRQ_MAP_EEPROM_DATA 0x0046 /*  Offset into eeprom for the IRQ map */
-> -#define IRQ_MAP_LEN 0x0004 /*  No of bytes to read for the IRQ map */
-> -#define PNP_IRQ_FRMT 0x0022 /*  PNP small item IRQ format */
-> -#define CS8900_IRQ_MAP 0x1c20 /*  This IRQ map is fixed */
-> -
-> -#define CS8920_NO_INTS 0x0F   /*  Max CS8920 interrupt select # */
-> -
-> -#define PNP_ADD_PORT 0x0279
-> -#define PNP_WRITE_PORT 0x0A79
-> -
-> -#define GET_PNP_ISA_STRUCT 0x40
-> -#define PNP_ISA_STRUCT_LEN 0x06
-> -#define PNP_CSN_CNT_OFF 0x01
-> -#define PNP_RD_PORT_OFF 0x02
-> -#define PNP_FUNCTION_OK 0x00
-> -#define PNP_WAKE 0x03
-> -#define PNP_RSRC_DATA 0x04
-> -#define PNP_RSRC_READY 0x01
-> -#define PNP_STATUS 0x05
-> -#define PNP_ACTIVATE 0x30
-> -#define PNP_CNF_IO_H 0x60
-> -#define PNP_CNF_IO_L 0x61
-> -#define PNP_CNF_INT 0x70
-> -#define PNP_CNF_DMA 0x74
-> -#define PNP_CNF_MEM 0x48
-> diff --git a/drivers/net/ethernet/cirrus/mac89x0.c b/drivers/net/ethernet/cirrus/mac89x0.c
-> deleted file mode 100644
-> index 6723df9b65d9..000000000000
-> --- a/drivers/net/ethernet/cirrus/mac89x0.c
-> +++ /dev/null
-> @@ -1,577 +0,0 @@
-> -/* mac89x0.c: A Crystal Semiconductor CS89[02]0 driver for linux. */
+> @@ -1,671 +0,0 @@
+> -// SPDX-License-Identifier: GPL-2.0-only
 > -/*
-> -       Written 1996 by Russell Nelson, with reference to skeleton.c
-> -       written 1993-1994 by Donald Becker.
-> -
-> -       This software may be used and distributed according to the terms
-> -       of the GNU General Public License, incorporated herein by reference.
-> -
-> -       The author may be reached at nelson@crynwr.com, Crynwr
-> -       Software, 11 Grant St., Potsdam, NY 13676
-> -
-> -  Changelog:
-> -
-> -  Mike Cruse        : mcruse@cti-ltd.com
-> -                    : Changes for Linux 2.0 compatibility.
-> -                    : Added dev_id parameter in net_interrupt(),
-> -                    : request_irq() and free_irq(). Just NULL for now.
-> -
-> -  Mike Cruse        : Added MOD_INC_USE_COUNT and MOD_DEC_USE_COUNT macros
-> -                    : in net_open() and net_close() so kerneld would know
-> -                    : that the module is in use and wouldn't eject the
-> -                    : driver prematurely.
-> -
-> -  Mike Cruse        : Rewrote init_module() and cleanup_module using 8390.c
-> -                    : as an example. Disabled autoprobing in init_module(),
-> -                    : not a good thing to do to other devices while Linux
-> -                    : is running from all accounts.
-> -
-> -  Alan Cox          : Removed 1.2 support, added 2.1 extra counters.
-> -
-> -  David Huggins-Daines <dhd@debian.org>
-> -
-> -  Split this off into mac89x0.c, and gutted it of all parts which are
-> -  not relevant to the existing CS8900 cards on the Macintosh
-> -  (i.e. basically the Daynaport CS and LC cards).  To be precise:
-> -
-> -    * Removed all the media-detection stuff, because these cards are
-> -    TP-only.
-> -
-> -    * Lobotomized the ISA interrupt bogosity, because these cards use
-> -    a hardwired NuBus interrupt and a magic ISAIRQ value in the card.
-> -
-> -    * Basically eliminated everything not relevant to getting the
-> -    cards minimally functioning on the Macintosh.
-> -
-> -  I might add that these cards are badly designed even from the Mac
-> -  standpoint, in that Dayna, in their infinite wisdom, used NuBus slot
-> -  I/O space and NuBus interrupts for these cards, but neglected to
-> -  provide anything even remotely resembling a NuBus ROM.  Therefore we
-> -  have to probe for them in a brain-damaged ISA-like fashion.
-> -
-> -  Arnaldo Carvalho de Melo <acme@conectiva.com.br> - 11/01/2001
-> -  check kmalloc and release the allocated memory on failure in
-> -  mac89x0_probe and in init_module
-> -  use local_irq_{save,restore}(flags) in net_get_stat, not just
-> -  local_irq_{dis,en}able()
-> -*/
-> -
-> -#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-> -
-> -static const char version[] =
-> -"cs89x0.c:v1.02 11/26/96 Russell Nelson <nelson@crynwr.com>\n";
-> -
+> - * 7990.c -- LANCE ethernet IC generic routines.
+> - * This is an attempt to separate out the bits of various ethernet
+> - * drivers that are common because they all use the AMD 7990 LANCE
+> - * (Local Area Network Controller for Ethernet) chip.
+> - *
+> - * Copyright (C) 05/1998 Peter Maydell <pmaydell@chiark.greenend.org.uk>
+> - *
+> - * Most of this stuff was obtained by looking at other LANCE drivers,
+> - * in particular a2065.[ch]. The AMD C-LANCE datasheet was also helpful.
+> - * NB: this was made easy by the fact that Jes Sorensen had cleaned up
+> - * most of a2025 and sunlance with the aim of merging them, so the
+> - * common code was pretty obvious.
+> - */
+> -#include <linux/crc32.h>
+> -#include <linux/delay.h>
+> -#include <linux/errno.h>
+> -#include <linux/netdevice.h>
+> -#include <linux/etherdevice.h>
 > -#include <linux/module.h>
-> -
-> -/*
-> -  Sources:
-> -
-> -       Crynwr packet driver epktisa.
-> -
-> -       Crystal Semiconductor data sheets.
-> -
-> -*/
-> -
 > -#include <linux/kernel.h>
 > -#include <linux/types.h>
 > -#include <linux/fcntl.h>
 > -#include <linux/interrupt.h>
 > -#include <linux/ioport.h>
 > -#include <linux/in.h>
+> -#include <linux/route.h>
 > -#include <linux/string.h>
-> -#include <linux/nubus.h>
-> -#include <linux/errno.h>
-> -#include <linux/init.h>
-> -#include <linux/netdevice.h>
-> -#include <linux/platform_device.h>
-> -#include <linux/etherdevice.h>
 > -#include <linux/skbuff.h>
-> -#include <linux/delay.h>
+> -#include <linux/pgtable.h>
+> -#include <asm/irq.h>
+> -/* Used for the temporal inet entries and routing */
+> -#include <linux/socket.h>
 > -#include <linux/bitops.h>
-> -#include <linux/gfp.h>
 > -
 > -#include <asm/io.h>
-> -#include <asm/hwtest.h>
-> -#include <asm/macints.h>
+> -#include <asm/dma.h>
+> -#ifdef CONFIG_HP300
+> -#include <asm/blinken.h>
+> -#endif
 > -
-> -#include "cs89x0.h"
+> -#include "7990.h"
 > -
-> -static int debug = -1;
-> -module_param(debug, int, 0);
-> -MODULE_PARM_DESC(debug, "debug message level");
+> -#define WRITERAP(lp, x)        out_be16(lp->base + LANCE_RAP, (x))
+> -#define WRITERDP(lp, x)        out_be16(lp->base + LANCE_RDP, (x))
+> -#define READRDP(lp)    in_be16(lp->base + LANCE_RDP)
 > -
-> -/* Information that need to be kept for each board. */
-> -struct net_local {
-> -       int msg_enable;
-> -       int chip_type;          /* one of: CS8900, CS8920, CS8920M */
-> -       char chip_revision;     /* revision letter of the chip ('A'...) */
-> -       int send_cmd;           /* the propercommand used to send a packet. */
-> -       int rx_mode;
-> -       int curr_rx_cfg;
-> -        int send_underrun;      /* keep track of how many underruns in a row we get */
-> -};
+> -#if IS_ENABLED(CONFIG_HPLANCE)
+> -#include "hplance.h"
 > -
-> -/* Index to functions, as function prototypes. */
-> -static int net_open(struct net_device *dev);
-> -static netdev_tx_t net_send_packet(struct sk_buff *skb, struct net_device *dev);
-> -static irqreturn_t net_interrupt(int irq, void *dev_id);
-> -static void set_multicast_list(struct net_device *dev);
-> -static void net_rx(struct net_device *dev);
-> -static int net_close(struct net_device *dev);
-> -static struct net_device_stats *net_get_stats(struct net_device *dev);
-> -static int set_mac_address(struct net_device *dev, void *addr);
+> -#undef WRITERAP
+> -#undef WRITERDP
+> -#undef READRDP
 > -
-> -/* For reading/writing registers ISA-style */
-> -static inline int
-> -readreg_io(struct net_device *dev, int portno)
+> -#if IS_ENABLED(CONFIG_MVME147_NET)
+> -
+> -/* Lossage Factor Nine, Mr Sulu. */
+> -#define WRITERAP(lp, x)        (lp->writerap(lp, x))
+> -#define WRITERDP(lp, x)        (lp->writerdp(lp, x))
+> -#define READRDP(lp)    (lp->readrdp(lp))
+> -
+> -#else
+> -
+> -/* These inlines can be used if only CONFIG_HPLANCE is defined */
+> -static inline void WRITERAP(struct lance_private *lp, __u16 value)
 > -{
-> -       nubus_writew(swab16(portno), dev->base_addr + ADD_PORT);
-> -       return swab16(nubus_readw(dev->base_addr + DATA_PORT));
+> -       do {
+> -               out_be16(lp->base + HPLANCE_REGOFF + LANCE_RAP, value);
+> -       } while ((in_8(lp->base + HPLANCE_STATUS) & LE_ACK) == 0);
 > -}
 > -
-> -static inline void
-> -writereg_io(struct net_device *dev, int portno, int value)
+> -static inline void WRITERDP(struct lance_private *lp, __u16 value)
 > -{
-> -       nubus_writew(swab16(portno), dev->base_addr + ADD_PORT);
-> -       nubus_writew(swab16(value), dev->base_addr + DATA_PORT);
+> -       do {
+> -               out_be16(lp->base + HPLANCE_REGOFF + LANCE_RDP, value);
+> -       } while ((in_8(lp->base + HPLANCE_STATUS) & LE_ACK) == 0);
 > -}
 > -
-> -/* These are for reading/writing registers in shared memory */
-> -static inline int
-> -readreg(struct net_device *dev, int portno)
+> -static inline __u16 READRDP(struct lance_private *lp)
 > -{
-> -       return swab16(nubus_readw(dev->mem_start + portno));
+> -       __u16 value;
+> -       do {
+> -               value = in_be16(lp->base + HPLANCE_REGOFF + LANCE_RDP);
+> -       } while ((in_8(lp->base + HPLANCE_STATUS) & LE_ACK) == 0);
+> -       return value;
 > -}
 > -
-> -static inline void
-> -writereg(struct net_device *dev, int portno, int value)
+> -#endif
+> -#endif /* IS_ENABLED(CONFIG_HPLANCE) */
+> -
+> -/* debugging output macros, various flavours */
+> -/* #define TEST_HITS */
+> -#ifdef UNDEF
+> -#define PRINT_RINGS() \
+> -do { \
+> -       int t; \
+> -       for (t = 0; t < RX_RING_SIZE; t++) { \
+> -               printk("R%d: @(%02X %04X) len %04X, mblen %04X, bits %02X\n", \
+> -                      t, ib->brx_ring[t].rmd1_hadr, ib->brx_ring[t].rmd0, \
+> -                      ib->brx_ring[t].length, \
+> -                      ib->brx_ring[t].mblength, ib->brx_ring[t].rmd1_bits); \
+> -       } \
+> -       for (t = 0; t < TX_RING_SIZE; t++) { \
+> -               printk("T%d: @(%02X %04X) len %04X, misc %04X, bits %02X\n", \
+> -                      t, ib->btx_ring[t].tmd1_hadr, ib->btx_ring[t].tmd0, \
+> -                      ib->btx_ring[t].length, \
+> -                      ib->btx_ring[t].misc, ib->btx_ring[t].tmd1_bits); \
+> -       } \
+> -} while (0)
+> -#else
+> -#define PRINT_RINGS()
+> -#endif
+> -
+> -/* Load the CSR registers. The LANCE has to be STOPped when we do this! */
+> -static void load_csrs(struct lance_private *lp)
 > -{
-> -       nubus_writew(swab16(value), dev->mem_start + portno);
+> -       volatile struct lance_init_block *aib = lp->lance_init_block;
+> -       int leptr;
+> -
+> -       leptr = LANCE_ADDR(aib);
+> -
+> -       WRITERAP(lp, LE_CSR1);                    /* load address of init block */
+> -       WRITERDP(lp, leptr & 0xFFFF);
+> -       WRITERAP(lp, LE_CSR2);
+> -       WRITERDP(lp, leptr >> 16);
+> -       WRITERAP(lp, LE_CSR3);
+> -       WRITERDP(lp, lp->busmaster_regval);       /* set byteswap/ALEctrl/byte ctrl */
+> -
+> -       /* Point back to csr0 */
+> -       WRITERAP(lp, LE_CSR0);
 > -}
 > -
-> -static const struct net_device_ops mac89x0_netdev_ops = {
-> -       .ndo_open               = net_open,
-> -       .ndo_stop               = net_close,
-> -       .ndo_start_xmit         = net_send_packet,
-> -       .ndo_get_stats          = net_get_stats,
-> -       .ndo_set_rx_mode        = set_multicast_list,
-> -       .ndo_set_mac_address    = set_mac_address,
-> -       .ndo_validate_addr      = eth_validate_addr,
-> -};
-> -
-> -/* Probe for the CS8900 card in slot E.  We won't bother looking
-> -   anywhere else until we have a really good reason to do so. */
-> -static int mac89x0_device_probe(struct platform_device *pdev)
+> -/* #define to 0 or 1 appropriately */
+> -#define DEBUG_IRING 0
+> -/* Set up the Lance Rx and Tx rings and the init block */
+> -static void lance_init_ring(struct net_device *dev)
 > -{
-> -       struct net_device *dev;
-> -       struct net_local *lp;
-> -       int i, slot;
-> -       unsigned rev_type = 0;
-> -       unsigned long ioaddr;
-> -       unsigned short sig;
-> -       int err = -ENODEV;
-> -       struct nubus_rsrc *fres;
-> -
-> -       dev = alloc_etherdev(sizeof(struct net_local));
-> -       if (!dev)
-> -               return -ENOMEM;
-> -
-> -       /* We might have to parameterize this later */
-> -       slot = 0xE;
-> -       /* Get out now if there's a real NuBus card in slot E */
-> -       for_each_func_rsrc(fres)
-> -               if (fres->board->slot == slot)
-> -                       goto out;
-> -
-> -       /* The pseudo-ISA bits always live at offset 0x300 (gee,
-> -           wonder why...) */
-> -       ioaddr = (unsigned long)
-> -               nubus_slot_addr(slot) | (((slot&0xf) << 20) + DEFAULTIOBASE);
-> -       {
-> -               int card_present;
-> -
-> -               card_present = (hwreg_present((void *)ioaddr + 4) &&
-> -                               hwreg_present((void *)ioaddr + DATA_PORT));
-> -               if (!card_present)
-> -                       goto out;
-> -       }
-> -
-> -       nubus_writew(0, ioaddr + ADD_PORT);
-> -       sig = nubus_readw(ioaddr + DATA_PORT);
-> -       if (sig != swab16(CHIP_EISA_ID_SIG))
-> -               goto out;
-> -
-> -       SET_NETDEV_DEV(dev, &pdev->dev);
-> -
-> -       /* Initialize the net_device structure. */
-> -       lp = netdev_priv(dev);
-> -
-> -       lp->msg_enable = netif_msg_init(debug, 0);
-> -
-> -       /* Fill in the 'dev' fields. */
-> -       dev->base_addr = ioaddr;
-> -       dev->mem_start = (unsigned long)
-> -               nubus_slot_addr(slot) | (((slot&0xf) << 20) + MMIOBASE);
-> -       dev->mem_end = dev->mem_start + 0x1000;
-> -
-> -       /* Turn on shared memory */
-> -       writereg_io(dev, PP_BusCTL, MEMORY_ON);
-> -
-> -       /* get the chip type */
-> -       rev_type = readreg(dev, PRODUCT_ID_ADD);
-> -       lp->chip_type = rev_type &~ REVISON_BITS;
-> -       lp->chip_revision = ((rev_type & REVISON_BITS) >> 8) + 'A';
-> -
-> -       /* Check the chip type and revision in order to set the correct send command
-> -       CS8920 revision C and CS8900 revision F can use the faster send. */
-> -       lp->send_cmd = TX_AFTER_381;
-> -       if (lp->chip_type == CS8900 && lp->chip_revision >= 'F')
-> -               lp->send_cmd = TX_NOW;
-> -       if (lp->chip_type != CS8900 && lp->chip_revision >= 'C')
-> -               lp->send_cmd = TX_NOW;
-> -
-> -       netif_dbg(lp, drv, dev, "%s", version);
-> -
-> -       pr_info("cs89%c0%s rev %c found at %#8lx\n",
-> -               lp->chip_type == CS8900 ? '0' : '2',
-> -               lp->chip_type == CS8920M ? "M" : "",
-> -               lp->chip_revision, dev->base_addr);
-> -
-> -       /* Try to read the MAC address */
-> -       if ((readreg(dev, PP_SelfST) & (EEPROM_PRESENT | EEPROM_OK)) == 0) {
-> -               pr_info("No EEPROM, giving up now.\n");
-> -               goto out1;
-> -        } else {
-> -               u8 addr[ETH_ALEN];
-> -
-> -                for (i = 0; i < ETH_ALEN; i += 2) {
-> -                       /* Big-endian (why??!) */
-> -                       unsigned short s = readreg(dev, PP_IA + i);
-> -                       addr[i] = s >> 8;
-> -                       addr[i+1] = s & 0xff;
-> -                }
-> -               eth_hw_addr_set(dev, addr);
-> -        }
-> -
-> -       dev->irq = SLOT2IRQ(slot);
-> -
-> -       /* print the IRQ and ethernet address. */
-> -
-> -       pr_info("MAC %pM, IRQ %d\n", dev->dev_addr, dev->irq);
-> -
-> -       dev->netdev_ops         = &mac89x0_netdev_ops;
-> -
-> -       err = register_netdev(dev);
-> -       if (err)
-> -               goto out1;
-> -
-> -       platform_set_drvdata(pdev, dev);
-> -       return 0;
-> -out1:
-> -       nubus_writew(0, dev->base_addr + ADD_PORT);
-> -out:
-> -       free_netdev(dev);
-> -       return err;
-> -}
-> -
-> -/* Open/initialize the board.  This is called (in the current kernel)
-> -   sometime after booting when the 'ifconfig' program is run.
-> -
-> -   This routine should set everything up anew at each open, even
-> -   registers that "should" only need to be set once at boot, so that
-> -   there is non-reboot way to recover if something goes wrong.
-> -   */
-> -static int
-> -net_open(struct net_device *dev)
-> -{
-> -       struct net_local *lp = netdev_priv(dev);
+> -       struct lance_private *lp = netdev_priv(dev);
+> -       volatile struct lance_init_block *ib = lp->init_block;
+> -       volatile struct lance_init_block *aib; /* for LANCE_ADDR computations */
+> -       int leptr;
 > -       int i;
 > -
-> -       /* Disable the interrupt for now */
-> -       writereg(dev, PP_BusCTL, readreg(dev, PP_BusCTL) & ~ENABLE_IRQ);
+> -       aib = lp->lance_init_block;
 > -
-> -       /* Grab the interrupt */
-> -       if (request_irq(dev->irq, net_interrupt, 0, "cs89x0", dev))
-> -               return -EAGAIN;
+> -       lp->rx_new = lp->tx_new = 0;
+> -       lp->rx_old = lp->tx_old = 0;
 > -
-> -       /* Set up the IRQ - Apparently magic */
-> -       if (lp->chip_type == CS8900)
-> -               writereg(dev, PP_CS8900_ISAINT, 0);
-> -       else
-> -               writereg(dev, PP_CS8920_ISAINT, 0);
+> -       ib->mode = LE_MO_PROM;                             /* normal, enable Tx & Rx */
 > -
-> -       /* set the Ethernet address */
-> -       for (i=0; i < ETH_ALEN/2; i++)
-> -               writereg(dev, PP_IA+i*2, dev->dev_addr[i*2] | (dev->dev_addr[i*2+1] << 8));
+> -       /* Copy the ethernet address to the lance init block
+> -        * Notice that we do a byteswap if we're big endian.
+> -        * [I think this is the right criterion; at least, sunlance,
+> -        * a2065 and atarilance do the byteswap and lance.c (PC) doesn't.
+> -        * However, the datasheet says that the BSWAP bit doesn't affect
+> -        * the init block, so surely it should be low byte first for
+> -        * everybody? Um.]
+> -        * We could define the ib->physaddr as three 16bit values and
+> -        * use (addr[1] << 8) | addr[0] & co, but this is more efficient.
+> -        */
+> -#ifdef __BIG_ENDIAN
+> -       ib->phys_addr[0] = dev->dev_addr[1];
+> -       ib->phys_addr[1] = dev->dev_addr[0];
+> -       ib->phys_addr[2] = dev->dev_addr[3];
+> -       ib->phys_addr[3] = dev->dev_addr[2];
+> -       ib->phys_addr[4] = dev->dev_addr[5];
+> -       ib->phys_addr[5] = dev->dev_addr[4];
+> -#else
+> -       for (i = 0; i < 6; i++)
+> -              ib->phys_addr[i] = dev->dev_addr[i];
+> -#endif
 > -
-> -       /* Turn on both receive and transmit operations */
-> -       writereg(dev, PP_LineCTL, readreg(dev, PP_LineCTL) | SERIAL_RX_ON | SERIAL_TX_ON);
+> -       if (DEBUG_IRING)
+> -               printk("TX rings:\n");
 > -
-> -       /* Receive only error free packets addressed to this card */
-> -       lp->rx_mode = 0;
-> -       writereg(dev, PP_RxCTL, DEF_RX_ACCEPT);
+> -       lp->tx_full = 0;
+> -       /* Setup the Tx ring entries */
+> -       for (i = 0; i < (1 << lp->lance_log_tx_bufs); i++) {
+> -               leptr = LANCE_ADDR(&aib->tx_buf[i][0]);
+> -               ib->btx_ring[i].tmd0      = leptr;
+> -               ib->btx_ring[i].tmd1_hadr = leptr >> 16;
+> -               ib->btx_ring[i].tmd1_bits = 0;
+> -               ib->btx_ring[i].length    = 0xf000; /* The ones required by tmd2 */
+> -               ib->btx_ring[i].misc      = 0;
+> -               if (DEBUG_IRING)
+> -                       printk("%d: 0x%8.8x\n", i, leptr);
+> -       }
 > -
-> -       lp->curr_rx_cfg = RX_OK_ENBL | RX_CRC_ERROR_ENBL;
+> -       /* Setup the Rx ring entries */
+> -       if (DEBUG_IRING)
+> -               printk("RX rings:\n");
+> -       for (i = 0; i < (1 << lp->lance_log_rx_bufs); i++) {
+> -               leptr = LANCE_ADDR(&aib->rx_buf[i][0]);
 > -
-> -       writereg(dev, PP_RxCFG, lp->curr_rx_cfg);
+> -               ib->brx_ring[i].rmd0      = leptr;
+> -               ib->brx_ring[i].rmd1_hadr = leptr >> 16;
+> -               ib->brx_ring[i].rmd1_bits = LE_R1_OWN;
+> -               /* 0xf000 == bits that must be one (reserved, presumably) */
+> -               ib->brx_ring[i].length    = -RX_BUFF_SIZE | 0xf000;
+> -               ib->brx_ring[i].mblength  = 0;
+> -               if (DEBUG_IRING)
+> -                       printk("%d: 0x%8.8x\n", i, leptr);
+> -       }
 > -
-> -       writereg(dev, PP_TxCFG, TX_LOST_CRS_ENBL | TX_SQE_ERROR_ENBL | TX_OK_ENBL |
-> -              TX_LATE_COL_ENBL | TX_JBR_ENBL | TX_ANY_COL_ENBL | TX_16_COL_ENBL);
+> -       /* Setup the initialization block */
 > -
-> -       writereg(dev, PP_BufCFG, READY_FOR_TX_ENBL | RX_MISS_COUNT_OVRFLOW_ENBL |
-> -                TX_COL_COUNT_OVRFLOW_ENBL | TX_UNDERRUN_ENBL);
+> -       /* Setup rx descriptor pointer */
+> -       leptr = LANCE_ADDR(&aib->brx_ring);
+> -       ib->rx_len = (lp->lance_log_rx_bufs << 13) | (leptr >> 16);
+> -       ib->rx_ptr = leptr;
+> -       if (DEBUG_IRING)
+> -               printk("RX ptr: %8.8x\n", leptr);
 > -
-> -       /* now that we've got our act together, enable everything */
-> -       writereg(dev, PP_BusCTL, readreg(dev, PP_BusCTL) | ENABLE_IRQ);
-> -       netif_start_queue(dev);
+> -       /* Setup tx descriptor pointer */
+> -       leptr = LANCE_ADDR(&aib->btx_ring);
+> -       ib->tx_len = (lp->lance_log_tx_bufs << 13) | (leptr >> 16);
+> -       ib->tx_ptr = leptr;
+> -       if (DEBUG_IRING)
+> -               printk("TX ptr: %8.8x\n", leptr);
+> -
+> -       /* Clear the multicast filter */
+> -       ib->filter[0] = 0;
+> -       ib->filter[1] = 0;
+> -       PRINT_RINGS();
+> -}
+> -
+> -/* LANCE must be STOPped before we do this, too... */
+> -static int init_restart_lance(struct lance_private *lp)
+> -{
+> -       int i;
+> -
+> -       WRITERAP(lp, LE_CSR0);
+> -       WRITERDP(lp, LE_C0_INIT);
+> -
+> -       /* Need a hook here for sunlance ledma stuff */
+> -
+> -       /* Wait for the lance to complete initialization */
+> -       for (i = 0; (i < 100) && !(READRDP(lp) & (LE_C0_ERR | LE_C0_IDON)); i++)
+> -               barrier();
+> -       if ((i == 100) || (READRDP(lp) & LE_C0_ERR)) {
+> -               printk("LANCE unopened after %d ticks, csr0=%4.4x.\n", i, READRDP(lp));
+> -               return -1;
+> -       }
+> -
+> -       /* Clear IDON by writing a "1", enable interrupts and start lance */
+> -       WRITERDP(lp, LE_C0_IDON);
+> -       WRITERDP(lp, LE_C0_INEA | LE_C0_STRT);
+> -
 > -       return 0;
 > -}
 > -
-> -static netdev_tx_t
-> -net_send_packet(struct sk_buff *skb, struct net_device *dev)
+> -static int lance_reset(struct net_device *dev)
 > -{
-> -       struct net_local *lp = netdev_priv(dev);
-> -       unsigned long flags;
+> -       struct lance_private *lp = netdev_priv(dev);
+> -       int status;
 > -
-> -       netif_dbg(lp, tx_queued, dev, "sent %d byte packet of type %x\n",
-> -                 skb->len, skb->data[ETH_ALEN + ETH_ALEN] << 8 |
-> -                 skb->data[ETH_ALEN + ETH_ALEN + 1]);
+> -       /* Stop the lance */
+> -       WRITERAP(lp, LE_CSR0);
+> -       WRITERDP(lp, LE_C0_STOP);
 > -
-> -       /* keep the upload from being interrupted, since we
-> -          ask the chip to start transmitting before the
-> -          whole packet has been completely uploaded. */
-> -       local_irq_save(flags);
-> -       netif_stop_queue(dev);
-> -
-> -       /* initiate a transmit sequence */
-> -       writereg(dev, PP_TxCMD, lp->send_cmd);
-> -       writereg(dev, PP_TxLength, skb->len);
-> -
-> -       /* Test to see if the chip has allocated memory for the packet */
-> -       if ((readreg(dev, PP_BusST) & READY_FOR_TX_NOW) == 0) {
-> -               /* Gasp!  It hasn't.  But that shouldn't happen since
-> -                  we're waiting for TxOk, so return 1 and requeue this packet. */
-> -               local_irq_restore(flags);
-> -               return NETDEV_TX_BUSY;
-> -       }
-> -
-> -       /* Write the contents of the packet */
-> -       skb_copy_from_linear_data(skb, (void *)(dev->mem_start + PP_TxFrame),
-> -                                 skb->len+1);
-> -
-> -       local_irq_restore(flags);
-> -       dev_kfree_skb (skb);
-> -
-> -       return NETDEV_TX_OK;
+> -       load_csrs(lp);
+> -       lance_init_ring(dev);
+> -       netif_trans_update(dev); /* prevent tx timeout */
+> -       status = init_restart_lance(lp);
+> -#ifdef DEBUG_DRIVER
+> -       printk("Lance restart=%d\n", status);
+> -#endif
+> -       return status;
 > -}
 > -
-> -/* The typical workload of the driver:
-> -   Handle the network interface interrupts. */
-> -static irqreturn_t net_interrupt(int irq, void *dev_id)
+> -static int lance_rx(struct net_device *dev)
 > -{
-> -       struct net_device *dev = dev_id;
-> -       struct net_local *lp;
-> -       int ioaddr, status;
+> -       struct lance_private *lp = netdev_priv(dev);
+> -       volatile struct lance_init_block *ib = lp->init_block;
+> -       volatile struct lance_rx_desc *rd;
+> -       unsigned char bits;
+> -#ifdef TEST_HITS
+> -       int i;
+> -#endif
 > -
-> -       ioaddr = dev->base_addr;
-> -       lp = netdev_priv(dev);
-> -
-> -       /* we MUST read all the events out of the ISQ, otherwise we'll never
-> -           get interrupted again.  As a consequence, we can't have any limit
-> -           on the number of times we loop in the interrupt handler.  The
-> -           hardware guarantees that eventually we'll run out of events.  Of
-> -           course, if you're on a slow machine, and packets are arriving
-> -           faster than you can read them off, you're screwed.  Hasta la
-> -           vista, baby!  */
-> -       while ((status = swab16(nubus_readw(dev->base_addr + ISQ_PORT)))) {
-> -               netif_dbg(lp, intr, dev, "status=%04x\n", status);
-> -               switch(status & ISQ_EVENT_MASK) {
-> -               case ISQ_RECEIVER_EVENT:
-> -                       /* Got a packet(s). */
-> -                       net_rx(dev);
-> -                       break;
-> -               case ISQ_TRANSMITTER_EVENT:
-> -                       dev->stats.tx_packets++;
-> -                       netif_wake_queue(dev);
-> -                       if ((status & TX_OK) == 0)
-> -                               dev->stats.tx_errors++;
-> -                       if (status & TX_LOST_CRS)
-> -                               dev->stats.tx_carrier_errors++;
-> -                       if (status & TX_SQE_ERROR)
-> -                               dev->stats.tx_heartbeat_errors++;
-> -                       if (status & TX_LATE_COL)
-> -                               dev->stats.tx_window_errors++;
-> -                       if (status & TX_16_COL)
-> -                               dev->stats.tx_aborted_errors++;
-> -                       break;
-> -               case ISQ_BUFFER_EVENT:
-> -                       if (status & READY_FOR_TX) {
-> -                               /* we tried to transmit a packet earlier,
-> -                                   but inexplicably ran out of buffers.
-> -                                   That shouldn't happen since we only ever
-> -                                   load one packet.  Shrug.  Do the right
-> -                                   thing anyway. */
-> -                               netif_wake_queue(dev);
-> -                       }
-> -                       if (status & TX_UNDERRUN) {
-> -                               netif_dbg(lp, tx_err, dev, "transmit underrun\n");
-> -                                lp->send_underrun++;
-> -                                if (lp->send_underrun == 3) lp->send_cmd = TX_AFTER_381;
-> -                                else if (lp->send_underrun == 6) lp->send_cmd = TX_AFTER_ALL;
-> -                        }
-> -                       break;
-> -               case ISQ_RX_MISS_EVENT:
-> -                       dev->stats.rx_missed_errors += (status >> 6);
-> -                       break;
-> -               case ISQ_TX_COL_EVENT:
-> -                       dev->stats.collisions += (status >> 6);
-> -                       break;
-> -               }
+> -#ifdef TEST_HITS
+> -       printk("[");
+> -       for (i = 0; i < RX_RING_SIZE; i++) {
+> -               if (i == lp->rx_new)
+> -                       printk("%s",
+> -                              ib->brx_ring[i].rmd1_bits & LE_R1_OWN ? "_" : "X");
+> -               else
+> -                       printk("%s",
+> -                             ib->brx_ring[i].rmd1_bits & LE_R1_OWN ? "." : "1");
 > -       }
+> -       printk("]");
+> -#endif
+> -#ifdef CONFIG_HP300
+> -       blinken_leds(0x40, 0);
+> -#endif
+> -       WRITERDP(lp, LE_C0_RINT | LE_C0_INEA);     /* ack Rx int, reenable ints */
+> -       for (rd = &ib->brx_ring[lp->rx_new];     /* For each Rx ring we own... */
+> -            !((bits = rd->rmd1_bits) & LE_R1_OWN);
+> -            rd = &ib->brx_ring[lp->rx_new]) {
+> -
+> -               /* We got an incomplete frame? */
+> -               if ((bits & LE_R1_POK) != LE_R1_POK) {
+> -                       dev->stats.rx_over_errors++;
+> -                       dev->stats.rx_errors++;
+> -                       continue;
+> -               } else if (bits & LE_R1_ERR) {
+> -                       /* Count only the end frame as a rx error,
+> -                        * not the beginning
+> -                        */
+> -                       if (bits & LE_R1_BUF)
+> -                               dev->stats.rx_fifo_errors++;
+> -                       if (bits & LE_R1_CRC)
+> -                               dev->stats.rx_crc_errors++;
+> -                       if (bits & LE_R1_OFL)
+> -                               dev->stats.rx_over_errors++;
+> -                       if (bits & LE_R1_FRA)
+> -                               dev->stats.rx_frame_errors++;
+> -                       if (bits & LE_R1_EOP)
+> -                               dev->stats.rx_errors++;
+> -               } else {
+> -                       int len = (rd->mblength & 0xfff) - 4;
+> -                       struct sk_buff *skb = netdev_alloc_skb(dev, len + 2);
+> -
+> -                       if (!skb) {
+> -                               dev->stats.rx_dropped++;
+> -                               rd->mblength = 0;
+> -                               rd->rmd1_bits = LE_R1_OWN;
+> -                               lp->rx_new = (lp->rx_new + 1) & lp->rx_ring_mod_mask;
+> -                               return 0;
+> -                       }
+> -
+> -                       skb_reserve(skb, 2);           /* 16 byte align */
+> -                       skb_put(skb, len);             /* make room */
+> -                       skb_copy_to_linear_data(skb,
+> -                                        (unsigned char *)&(ib->rx_buf[lp->rx_new][0]),
+> -                                        len);
+> -                       skb->protocol = eth_type_trans(skb, dev);
+> -                       netif_rx(skb);
+> -                       dev->stats.rx_packets++;
+> -                       dev->stats.rx_bytes += len;
+> -               }
+> -
+> -               /* Return the packet to the pool */
+> -               rd->mblength = 0;
+> -               rd->rmd1_bits = LE_R1_OWN;
+> -               lp->rx_new = (lp->rx_new + 1) & lp->rx_ring_mod_mask;
+> -       }
+> -       return 0;
+> -}
+> -
+> -static int lance_tx(struct net_device *dev)
+> -{
+> -       struct lance_private *lp = netdev_priv(dev);
+> -       volatile struct lance_init_block *ib = lp->init_block;
+> -       volatile struct lance_tx_desc *td;
+> -       int i, j;
+> -       int status;
+> -
+> -#ifdef CONFIG_HP300
+> -       blinken_leds(0x80, 0);
+> -#endif
+> -       /* csr0 is 2f3 */
+> -       WRITERDP(lp, LE_C0_TINT | LE_C0_INEA);
+> -       /* csr0 is 73 */
+> -
+> -       j = lp->tx_old;
+> -       for (i = j; i != lp->tx_new; i = j) {
+> -               td = &ib->btx_ring[i];
+> -
+> -               /* If we hit a packet not owned by us, stop */
+> -               if (td->tmd1_bits & LE_T1_OWN)
+> -                       break;
+> -
+> -               if (td->tmd1_bits & LE_T1_ERR) {
+> -                       status = td->misc;
+> -
+> -                       dev->stats.tx_errors++;
+> -                       if (status & LE_T3_RTY)
+> -                               dev->stats.tx_aborted_errors++;
+> -                       if (status & LE_T3_LCOL)
+> -                               dev->stats.tx_window_errors++;
+> -
+> -                       if (status & LE_T3_CLOS) {
+> -                               dev->stats.tx_carrier_errors++;
+> -                               if (lp->auto_select) {
+> -                                       lp->tpe = 1 - lp->tpe;
+> -                                       printk("%s: Carrier Lost, trying %s\n",
+> -                                              dev->name,
+> -                                              lp->tpe ? "TPE" : "AUI");
+> -                                       /* Stop the lance */
+> -                                       WRITERAP(lp, LE_CSR0);
+> -                                       WRITERDP(lp, LE_C0_STOP);
+> -                                       lance_init_ring(dev);
+> -                                       load_csrs(lp);
+> -                                       init_restart_lance(lp);
+> -                                       return 0;
+> -                               }
+> -                       }
+> -
+> -                       /* buffer errors and underflows turn off the transmitter */
+> -                       /* Restart the adapter */
+> -                       if (status & (LE_T3_BUF|LE_T3_UFL)) {
+> -                               dev->stats.tx_fifo_errors++;
+> -
+> -                               printk("%s: Tx: ERR_BUF|ERR_UFL, restarting\n",
+> -                                      dev->name);
+> -                               /* Stop the lance */
+> -                               WRITERAP(lp, LE_CSR0);
+> -                               WRITERDP(lp, LE_C0_STOP);
+> -                               lance_init_ring(dev);
+> -                               load_csrs(lp);
+> -                               init_restart_lance(lp);
+> -                               return 0;
+> -                       }
+> -               } else if ((td->tmd1_bits & LE_T1_POK) == LE_T1_POK) {
+> -                       /*
+> -                        * So we don't count the packet more than once.
+> -                        */
+> -                       td->tmd1_bits &= ~(LE_T1_POK);
+> -
+> -                       /* One collision before packet was sent. */
+> -                       if (td->tmd1_bits & LE_T1_EONE)
+> -                               dev->stats.collisions++;
+> -
+> -                       /* More than one collision, be optimistic. */
+> -                       if (td->tmd1_bits & LE_T1_EMORE)
+> -                               dev->stats.collisions += 2;
+> -
+> -                       dev->stats.tx_packets++;
+> -               }
+> -
+> -               j = (j + 1) & lp->tx_ring_mod_mask;
+> -       }
+> -       lp->tx_old = j;
+> -       WRITERDP(lp, LE_C0_TINT | LE_C0_INEA);
+> -       return 0;
+> -}
+> -
+> -static irqreturn_t
+> -lance_interrupt(int irq, void *dev_id)
+> -{
+> -       struct net_device *dev = (struct net_device *)dev_id;
+> -       struct lance_private *lp = netdev_priv(dev);
+> -       int csr0;
+> -
+> -       spin_lock(&lp->devlock);
+> -
+> -       WRITERAP(lp, LE_CSR0);              /* LANCE Controller Status */
+> -       csr0 = READRDP(lp);
+> -
+> -       PRINT_RINGS();
+> -
+> -       if (!(csr0 & LE_C0_INTR)) {     /* Check if any interrupt has */
+> -               spin_unlock(&lp->devlock);
+> -               return IRQ_NONE;        /* been generated by the Lance. */
+> -       }
+> -
+> -       /* Acknowledge all the interrupt sources ASAP */
+> -       WRITERDP(lp, csr0 & ~(LE_C0_INEA|LE_C0_TDMD|LE_C0_STOP|LE_C0_STRT|LE_C0_INIT));
+> -
+> -       if ((csr0 & LE_C0_ERR)) {
+> -               /* Clear the error condition */
+> -               WRITERDP(lp, LE_C0_BABL|LE_C0_ERR|LE_C0_MISS|LE_C0_INEA);
+> -       }
+> -
+> -       if (csr0 & LE_C0_RINT)
+> -               lance_rx(dev);
+> -
+> -       if (csr0 & LE_C0_TINT)
+> -               lance_tx(dev);
+> -
+> -       /* Log misc errors. */
+> -       if (csr0 & LE_C0_BABL)
+> -               dev->stats.tx_errors++;       /* Tx babble. */
+> -       if (csr0 & LE_C0_MISS)
+> -               dev->stats.rx_errors++;       /* Missed a Rx frame. */
+> -       if (csr0 & LE_C0_MERR) {
+> -               printk("%s: Bus master arbitration failure, status %4.4x.\n",
+> -                      dev->name, csr0);
+> -               /* Restart the chip. */
+> -               WRITERDP(lp, LE_C0_STRT);
+> -       }
+> -
+> -       if (lp->tx_full && netif_queue_stopped(dev) && (TX_BUFFS_AVAIL >= 0)) {
+> -               lp->tx_full = 0;
+> -               netif_wake_queue(dev);
+> -       }
+> -
+> -       WRITERAP(lp, LE_CSR0);
+> -       WRITERDP(lp, LE_C0_BABL|LE_C0_CERR|LE_C0_MISS|LE_C0_MERR|LE_C0_IDON|LE_C0_INEA);
+> -
+> -       spin_unlock(&lp->devlock);
 > -       return IRQ_HANDLED;
 > -}
 > -
-> -/* We have a good packet(s), get it/them out of the buffers. */
-> -static void
-> -net_rx(struct net_device *dev)
+> -int lance_open(struct net_device *dev)
 > -{
-> -       struct net_local *lp = netdev_priv(dev);
-> -       struct sk_buff *skb;
-> -       int status, length;
+> -       struct lance_private *lp = netdev_priv(dev);
+> -       int res;
 > -
-> -       status = readreg(dev, PP_RxStatus);
-> -       if ((status & RX_OK) == 0) {
-> -               dev->stats.rx_errors++;
-> -               if (status & RX_RUNT)
-> -                               dev->stats.rx_length_errors++;
-> -               if (status & RX_EXTRA_DATA)
-> -                               dev->stats.rx_length_errors++;
-> -               if ((status & RX_CRC_ERROR) &&
-> -                   !(status & (RX_EXTRA_DATA|RX_RUNT)))
-> -                       /* per str 172 */
-> -                       dev->stats.rx_crc_errors++;
-> -               if (status & RX_DRIBBLE)
-> -                               dev->stats.rx_frame_errors++;
-> -               return;
-> -       }
+> -       /* Install the Interrupt handler. Or we could shunt this out to specific drivers? */
+> -       if (request_irq(lp->irq, lance_interrupt, IRQF_SHARED, lp->name, dev))
+> -               return -EAGAIN;
 > -
-> -       length = readreg(dev, PP_RxLength);
-> -       /* Malloc up new buffer. */
-> -       skb = alloc_skb(length, GFP_ATOMIC);
-> -       if (skb == NULL) {
-> -               dev->stats.rx_dropped++;
-> -               return;
-> -       }
-> -       skb_put(skb, length);
+> -       res = lance_reset(dev);
+> -       spin_lock_init(&lp->devlock);
+> -       netif_start_queue(dev);
 > -
-> -       skb_copy_to_linear_data(skb, (void *)(dev->mem_start + PP_RxFrame),
-> -                               length);
-> -
-> -       netif_dbg(lp, rx_status, dev, "received %d byte packet of type %x\n",
-> -                 length, skb->data[ETH_ALEN + ETH_ALEN] << 8 |
-> -                 skb->data[ETH_ALEN + ETH_ALEN + 1]);
-> -
-> -        skb->protocol=eth_type_trans(skb,dev);
-> -       netif_rx(skb);
-> -       dev->stats.rx_packets++;
-> -       dev->stats.rx_bytes += length;
+> -       return res;
 > -}
+> -EXPORT_SYMBOL_GPL(lance_open);
 > -
-> -/* The inverse routine to net_open(). */
-> -static int
-> -net_close(struct net_device *dev)
+> -int lance_close(struct net_device *dev)
 > -{
-> -
-> -       writereg(dev, PP_RxCFG, 0);
-> -       writereg(dev, PP_TxCFG, 0);
-> -       writereg(dev, PP_BufCFG, 0);
-> -       writereg(dev, PP_BusCTL, 0);
+> -       struct lance_private *lp = netdev_priv(dev);
 > -
 > -       netif_stop_queue(dev);
 > -
-> -       free_irq(dev->irq, dev);
+> -       /* Stop the LANCE */
+> -       WRITERAP(lp, LE_CSR0);
+> -       WRITERDP(lp, LE_C0_STOP);
 > -
-> -       /* Update the statistics here. */
+> -       free_irq(lp->irq, dev);
 > -
 > -       return 0;
-> -
 > -}
+> -EXPORT_SYMBOL_GPL(lance_close);
 > -
-> -/* Get the current statistics. This may be called with the card open or
-> -   closed. */
-> -static struct net_device_stats *
-> -net_get_stats(struct net_device *dev)
+> -void lance_tx_timeout(struct net_device *dev, unsigned int txqueue)
 > -{
+> -       printk("lance_tx_timeout\n");
+> -       lance_reset(dev);
+> -       netif_trans_update(dev); /* prevent tx timeout */
+> -       netif_wake_queue(dev);
+> -}
+> -EXPORT_SYMBOL_GPL(lance_tx_timeout);
+> -
+> -netdev_tx_t lance_start_xmit(struct sk_buff *skb, struct net_device *dev)
+> -{
+> -       struct lance_private *lp = netdev_priv(dev);
+> -       volatile struct lance_init_block *ib = lp->init_block;
+> -       int entry, skblen, len;
+> -       static int outs;
 > -       unsigned long flags;
 > -
-> -       local_irq_save(flags);
-> -       /* Update the statistics from the device registers. */
-> -       dev->stats.rx_missed_errors += (readreg(dev, PP_RxMiss) >> 6);
-> -       dev->stats.collisions += (readreg(dev, PP_TxCol) >> 6);
-> -       local_irq_restore(flags);
+> -       netif_stop_queue(dev);
 > -
-> -       return &dev->stats;
-> -}
-> -
-> -static void set_multicast_list(struct net_device *dev)
-> -{
-> -       struct net_local *lp = netdev_priv(dev);
-> -
-> -       if(dev->flags&IFF_PROMISC)
-> -       {
-> -               lp->rx_mode = RX_ALL_ACCEPT;
-> -       } else if ((dev->flags & IFF_ALLMULTI) || !netdev_mc_empty(dev)) {
-> -               /* The multicast-accept list is initialized to accept-all, and we
-> -                  rely on higher-level filtering for now. */
-> -               lp->rx_mode = RX_MULTCAST_ACCEPT;
+> -       if (!TX_BUFFS_AVAIL) {
+> -               dev_consume_skb_any(skb);
+> -               return NETDEV_TX_OK;
 > -       }
+> -
+> -       skblen = skb->len;
+> -
+> -#ifdef DEBUG_DRIVER
+> -       /* dump the packet */
+> -       {
+> -               int i;
+> -
+> -               for (i = 0; i < 64; i++) {
+> -                       if ((i % 16) == 0)
+> -                               printk("\n");
+> -                       printk("%2.2x ", skb->data[i]);
+> -               }
+> -       }
+> -#endif
+> -       len = (skblen <= ETH_ZLEN) ? ETH_ZLEN : skblen;
+> -       entry = lp->tx_new & lp->tx_ring_mod_mask;
+> -       ib->btx_ring[entry].length = (-len) | 0xf000;
+> -       ib->btx_ring[entry].misc = 0;
+> -
+> -       if (skb->len < ETH_ZLEN)
+> -               memset((void *)&ib->tx_buf[entry][0], 0, ETH_ZLEN);
+> -       skb_copy_from_linear_data(skb, (void *)&ib->tx_buf[entry][0], skblen);
+> -
+> -       /* Now, give the packet to the lance */
+> -       ib->btx_ring[entry].tmd1_bits = (LE_T1_POK|LE_T1_OWN);
+> -       lp->tx_new = (lp->tx_new + 1) & lp->tx_ring_mod_mask;
+> -
+> -       outs++;
+> -       /* Kick the lance: transmit now */
+> -       WRITERDP(lp, LE_C0_INEA | LE_C0_TDMD);
+> -       dev_consume_skb_any(skb);
+> -
+> -       spin_lock_irqsave(&lp->devlock, flags);
+> -       if (TX_BUFFS_AVAIL)
+> -               netif_start_queue(dev);
 > -       else
-> -               lp->rx_mode = 0;
+> -               lp->tx_full = 1;
+> -       spin_unlock_irqrestore(&lp->devlock, flags);
 > -
-> -       writereg(dev, PP_RxCTL, DEF_RX_ACCEPT | lp->rx_mode);
+> -       return NETDEV_TX_OK;
+> -}
+> -EXPORT_SYMBOL_GPL(lance_start_xmit);
 > -
-> -       /* in promiscuous mode, we accept errored packets, so we have to enable interrupts on them also */
-> -       writereg(dev, PP_RxCFG, lp->curr_rx_cfg |
-> -            (lp->rx_mode == RX_ALL_ACCEPT? (RX_CRC_ERROR_ENBL|RX_RUNT_ENBL|RX_EXTRA_DATA_ENBL) : 0));
+> -/* taken from the depca driver via a2065.c */
+> -static void lance_load_multicast(struct net_device *dev)
+> -{
+> -       struct lance_private *lp = netdev_priv(dev);
+> -       volatile struct lance_init_block *ib = lp->init_block;
+> -       volatile u16 *mcast_table = (u16 *)&ib->filter;
+> -       struct netdev_hw_addr *ha;
+> -       u32 crc;
+> -
+> -       /* set all multicast bits */
+> -       if (dev->flags & IFF_ALLMULTI) {
+> -               ib->filter[0] = 0xffffffff;
+> -               ib->filter[1] = 0xffffffff;
+> -               return;
+> -       }
+> -       /* clear the multicast filter */
+> -       ib->filter[0] = 0;
+> -       ib->filter[1] = 0;
+> -
+> -       /* Add addresses */
+> -       netdev_for_each_mc_addr(ha, dev) {
+> -               crc = ether_crc_le(6, ha->addr);
+> -               crc = crc >> 26;
+> -               mcast_table[crc >> 4] |= 1 << (crc & 0xf);
+> -       }
 > -}
 > -
 > -
-> -static int set_mac_address(struct net_device *dev, void *addr)
+> -void lance_set_multicast(struct net_device *dev)
 > -{
-> -       struct sockaddr *saddr = addr;
-> -       int i;
+> -       struct lance_private *lp = netdev_priv(dev);
+> -       volatile struct lance_init_block *ib = lp->init_block;
+> -       int stopped;
 > -
-> -       if (!is_valid_ether_addr(saddr->sa_data))
-> -               return -EADDRNOTAVAIL;
+> -       stopped = netif_queue_stopped(dev);
+> -       if (!stopped)
+> -               netif_stop_queue(dev);
 > -
-> -       eth_hw_addr_set(dev, saddr->sa_data);
-> -       netdev_info(dev, "Setting MAC address to %pM\n", dev->dev_addr);
+> -       while (lp->tx_old != lp->tx_new)
+> -               schedule();
 > -
-> -       /* set the Ethernet address */
-> -       for (i=0; i < ETH_ALEN/2; i++)
-> -               writereg(dev, PP_IA+i*2, dev->dev_addr[i*2] | (dev->dev_addr[i*2+1] << 8));
+> -       WRITERAP(lp, LE_CSR0);
+> -       WRITERDP(lp, LE_C0_STOP);
+> -       lance_init_ring(dev);
+> -
+> -       if (dev->flags & IFF_PROMISC) {
+> -               ib->mode |= LE_MO_PROM;
+> -       } else {
+> -               ib->mode &= ~LE_MO_PROM;
+> -               lance_load_multicast(dev);
+> -       }
+> -       load_csrs(lp);
+> -       init_restart_lance(lp);
+> -
+> -       if (!stopped)
+> -               netif_start_queue(dev);
+> -}
+> -EXPORT_SYMBOL_GPL(lance_set_multicast);
+> -
+> -#ifdef CONFIG_NET_POLL_CONTROLLER
+> -void lance_poll(struct net_device *dev)
+> -{
+> -       struct lance_private *lp = netdev_priv(dev);
+> -
+> -       spin_lock(&lp->devlock);
+> -       WRITERAP(lp, LE_CSR0);
+> -       WRITERDP(lp, LE_C0_STRT);
+> -       spin_unlock(&lp->devlock);
+> -       lance_interrupt(dev->irq, dev);
+> -}
+> -EXPORT_SYMBOL_GPL(lance_poll);
+> -#endif
+> -
+> -MODULE_DESCRIPTION("LANCE Ethernet IC generic routines");
+> -MODULE_LICENSE("GPL");
+> diff --git a/drivers/net/ethernet/amd/7990.h b/drivers/net/ethernet/amd/7990.h
+> deleted file mode 100644
+> index e53551daeea1..000000000000
+> --- a/drivers/net/ethernet/amd/7990.h
+> +++ /dev/null
+> @@ -1,251 +0,0 @@
+> -/* SPDX-License-Identifier: GPL-2.0 */
+> -/*
+> - * 7990.h -- LANCE ethernet IC generic routines.
+> - * This is an attempt to separate out the bits of various ethernet
+> - * drivers that are common because they all use the AMD 7990 LANCE
+> - * (Local Area Network Controller for Ethernet) chip.
+> - *
+> - * Copyright (C) 05/1998 Peter Maydell <pmaydell@chiark.greenend.org.uk>
+> - *
+> - * Most of this stuff was obtained by looking at other LANCE drivers,
+> - * in particular a2065.[ch]. The AMD C-LANCE datasheet was also helpful.
+> - */
+> -
+> -#ifndef _7990_H
+> -#define _7990_H
+> -
+> -/* The lance only has two register locations. We communicate mostly via memory. */
+> -#define LANCE_RDP      0       /* Register Data Port */
+> -#define LANCE_RAP      2       /* Register Address Port */
+> -
+> -/* Transmit/receive ring definitions.
+> - * We allow the specific drivers to override these defaults if they want to.
+> - * NB: according to lance.c, increasing the number of buffers is a waste
+> - * of space and reduces the chance that an upper layer will be able to
+> - * reorder queued Tx packets based on priority. [Clearly there is a minimum
+> - * limit too: too small and we drop rx packets and can't tx at full speed.]
+> - * 4+4 seems to be the usual setting; the atarilance driver uses 3 and 5.
+> - */
+> -
+> -/* Blast! This won't work. The problem is that we can't specify a default
+> - * setting because that would cause the lance_init_block struct to be
+> - * too long (and overflow the RAM on shared-memory cards like the HP LANCE.
+> - */
+> -#ifndef LANCE_LOG_TX_BUFFERS
+> -#define LANCE_LOG_TX_BUFFERS 1
+> -#define LANCE_LOG_RX_BUFFERS 3
+> -#endif
+> -
+> -#define TX_RING_SIZE           (1 << LANCE_LOG_TX_BUFFERS)
+> -#define RX_RING_SIZE           (1 << LANCE_LOG_RX_BUFFERS)
+> -#define TX_RING_MOD_MASK       (TX_RING_SIZE - 1)
+> -#define RX_RING_MOD_MASK       (RX_RING_SIZE - 1)
+> -#define TX_RING_LEN_BITS       ((LANCE_LOG_TX_BUFFERS) << 29)
+> -#define RX_RING_LEN_BITS       ((LANCE_LOG_RX_BUFFERS) << 29)
+> -#define PKT_BUFF_SIZE          (1544)
+> -#define RX_BUFF_SIZE           PKT_BUFF_SIZE
+> -#define TX_BUFF_SIZE           PKT_BUFF_SIZE
+> -
+> -/* Each receive buffer is described by a receive message descriptor (RMD) */
+> -struct lance_rx_desc {
+> -       volatile unsigned short rmd0;       /* low address of packet */
+> -       volatile unsigned char  rmd1_bits;  /* descriptor bits */
+> -       volatile unsigned char  rmd1_hadr;  /* high address of packet */
+> -       volatile short    length;           /* This length is 2s complement (negative)!
+> -                                            * Buffer length */
+> -       volatile unsigned short mblength;   /* Actual number of bytes received */
+> -};
+> -
+> -/* Ditto for TMD: */
+> -struct lance_tx_desc {
+> -       volatile unsigned short tmd0;       /* low address of packet */
+> -       volatile unsigned char  tmd1_bits;  /* descriptor bits */
+> -       volatile unsigned char  tmd1_hadr;  /* high address of packet */
+> -       volatile short    length;           /* Length is 2s complement (negative)! */
+> -       volatile unsigned short misc;
+> -};
+> -
+> -/* There are three memory structures accessed by the LANCE:
+> - * the initialization block, the receive and transmit descriptor rings,
+> - * and the data buffers themselves. In fact we might as well put the
+> - * init block,the Tx and Rx rings and the buffers together in memory:
+> - */
+> -struct lance_init_block {
+> -       volatile unsigned short mode;           /* Pre-set mode (reg. 15) */
+> -       volatile unsigned char phys_addr[6];    /* Physical ethernet address */
+> -       volatile unsigned filter[2];            /* Multicast filter (64 bits) */
+> -
+> -       /* Receive and transmit ring base, along with extra bits. */
+> -       volatile unsigned short rx_ptr;         /* receive descriptor addr */
+> -       volatile unsigned short rx_len;         /* receive len and high addr */
+> -       volatile unsigned short tx_ptr;         /* transmit descriptor addr */
+> -       volatile unsigned short tx_len;         /* transmit len and high addr */
+> -
+> -       /* The Tx and Rx ring entries must be aligned on 8-byte boundaries.
+> -        * This will be true if this whole struct is 8-byte aligned.
+> -        */
+> -       volatile struct lance_tx_desc btx_ring[TX_RING_SIZE];
+> -       volatile struct lance_rx_desc brx_ring[RX_RING_SIZE];
+> -
+> -       volatile char tx_buf[TX_RING_SIZE][TX_BUFF_SIZE];
+> -       volatile char rx_buf[RX_RING_SIZE][RX_BUFF_SIZE];
+> -       /* we use this just to make the struct big enough that we can move its startaddr
+> -        * in order to force alignment to an eight byte boundary.
+> -        */
+> -};
+> -
+> -/* This is where we keep all the stuff the driver needs to know about.
+> - * I'm definitely unhappy about the mechanism for allowing specific
+> - * drivers to add things...
+> - */
+> -struct lance_private {
+> -       const char *name;
+> -       unsigned long base;
+> -       volatile struct lance_init_block *init_block; /* CPU address of RAM */
+> -       volatile struct lance_init_block *lance_init_block; /* LANCE address of RAM */
+> -
+> -       int rx_new, tx_new;
+> -       int rx_old, tx_old;
+> -
+> -       int lance_log_rx_bufs, lance_log_tx_bufs;
+> -       int rx_ring_mod_mask, tx_ring_mod_mask;
+> -
+> -       int tpe;                        /* TPE is selected */
+> -       int auto_select;                /* cable-selection is by carrier */
+> -       unsigned short busmaster_regval;
+> -
+> -       unsigned int irq;               /* IRQ to register */
+> -
+> -       /* This is because the HP LANCE is disgusting and you have to check
+> -        * a DIO-specific register every time you read/write the LANCE regs :-<
+> -        * [could we get away with making these some sort of macro?]
+> -        */
+> -       void (*writerap)(void *, unsigned short);
+> -       void (*writerdp)(void *, unsigned short);
+> -       unsigned short (*readrdp)(void *);
+> -       spinlock_t devlock;
+> -       char tx_full;
+> -};
+> -
+> -/*
+> - *             Am7990 Control and Status Registers
+> - */
+> -#define LE_CSR0                0x0000  /* LANCE Controller Status */
+> -#define LE_CSR1                0x0001  /* IADR[15:0] (bit0==0 ie word aligned) */
+> -#define LE_CSR2                0x0002  /* IADR[23:16] (high bits reserved) */
+> -#define LE_CSR3                0x0003  /* Misc */
+> -
+> -/*
+> - *             Bit definitions for CSR0 (LANCE Controller Status)
+> - */
+> -#define LE_C0_ERR      0x8000  /* Error = BABL | CERR | MISS | MERR */
+> -#define LE_C0_BABL     0x4000  /* Babble: Transmitted too many bits */
+> -#define LE_C0_CERR     0x2000  /* No Heartbeat (10BASE-T) */
+> -#define LE_C0_MISS     0x1000  /* Missed Frame (no rx buffer to put it in) */
+> -#define LE_C0_MERR     0x0800  /* Memory Error */
+> -#define LE_C0_RINT     0x0400  /* Receive Interrupt */
+> -#define LE_C0_TINT     0x0200  /* Transmit Interrupt */
+> -#define LE_C0_IDON     0x0100  /* Initialization Done */
+> -#define LE_C0_INTR     0x0080  /* Interrupt Flag
+> -                                  = BABL | MISS | MERR | RINT | TINT | IDON */
+> -#define LE_C0_INEA     0x0040  /* Interrupt Enable */
+> -#define LE_C0_RXON     0x0020  /* Receive On */
+> -#define LE_C0_TXON     0x0010  /* Transmit On */
+> -#define LE_C0_TDMD     0x0008  /* Transmit Demand */
+> -#define LE_C0_STOP     0x0004  /* Stop */
+> -#define LE_C0_STRT     0x0002  /* Start */
+> -#define LE_C0_INIT     0x0001  /* Initialize */
+> -
+> -
+> -/*
+> - *             Bit definitions for CSR3
+> - */
+> -#define LE_C3_BSWP     0x0004  /* Byte Swap (on for big endian byte order) */
+> -#define LE_C3_ACON     0x0002  /* ALE Control (on for active low ALE) */
+> -#define LE_C3_BCON     0x0001  /* Byte Control */
+> -
+> -
+> -/*
+> - *             Mode Flags
+> - */
+> -#define LE_MO_PROM     0x8000  /* Promiscuous Mode */
+> -/* these next ones 0x4000 -- 0x0080 are not available on the LANCE 7990,
+> - * but they are in NetBSD's am7990.h, presumably for backwards-compatible chips
+> - */
+> -#define LE_MO_DRCVBC   0x4000  /* disable receive broadcast */
+> -#define LE_MO_DRCVPA   0x2000  /* disable physical address detection */
+> -#define LE_MO_DLNKTST  0x1000  /* disable link status */
+> -#define LE_MO_DAPC     0x0800  /* disable automatic polarity correction */
+> -#define LE_MO_MENDECL  0x0400  /* MENDEC loopback mode */
+> -#define LE_MO_LRTTSEL  0x0200  /* lower RX threshold / TX mode selection */
+> -#define LE_MO_PSEL1    0x0100  /* port selection bit1 */
+> -#define LE_MO_PSEL0    0x0080  /* port selection bit0 */
+> -/* and this one is from the C-LANCE data sheet... */
+> -#define LE_MO_EMBA     0x0080  /* Enable Modified Backoff Algorithm
+> -                                  (C-LANCE, not original LANCE) */
+> -#define LE_MO_INTL     0x0040  /* Internal Loopback */
+> -#define LE_MO_DRTY     0x0020  /* Disable Retry */
+> -#define LE_MO_FCOLL    0x0010  /* Force Collision */
+> -#define LE_MO_DXMTFCS  0x0008  /* Disable Transmit CRC */
+> -#define LE_MO_LOOP     0x0004  /* Loopback Enable */
+> -#define LE_MO_DTX      0x0002  /* Disable Transmitter */
+> -#define LE_MO_DRX      0x0001  /* Disable Receiver */
+> -
+> -
+> -/*
+> - *             Receive Flags
+> - */
+> -#define LE_R1_OWN      0x80    /* LANCE owns the descriptor */
+> -#define LE_R1_ERR      0x40    /* Error */
+> -#define LE_R1_FRA      0x20    /* Framing Error */
+> -#define LE_R1_OFL      0x10    /* Overflow Error */
+> -#define LE_R1_CRC      0x08    /* CRC Error */
+> -#define LE_R1_BUF      0x04    /* Buffer Error */
+> -#define LE_R1_SOP      0x02    /* Start of Packet */
+> -#define LE_R1_EOP      0x01    /* End of Packet */
+> -#define LE_R1_POK      0x03    /* Packet is complete: SOP + EOP */
+> -
+> -
+> -/*
+> - *             Transmit Flags
+> - */
+> -#define LE_T1_OWN      0x80    /* LANCE owns the descriptor */
+> -#define LE_T1_ERR      0x40    /* Error */
+> -#define LE_T1_RES      0x20    /* Reserved, LANCE writes this with a zero */
+> -#define LE_T1_EMORE    0x10    /* More than one retry needed */
+> -#define LE_T1_EONE     0x08    /* One retry needed */
+> -#define LE_T1_EDEF     0x04    /* Deferred */
+> -#define LE_T1_SOP      0x02    /* Start of Packet */
+> -#define LE_T1_EOP      0x01    /* End of Packet */
+> -#define LE_T1_POK      0x03    /* Packet is complete: SOP + EOP */
+> -
+> -/*
+> - *             Error Flags
+> - */
+> -#define LE_T3_BUF      0x8000  /* Buffer Error */
+> -#define LE_T3_UFL      0x4000  /* Underflow Error */
+> -#define LE_T3_LCOL     0x1000  /* Late Collision */
+> -#define LE_T3_CLOS     0x0800  /* Loss of Carrier */
+> -#define LE_T3_RTY      0x0400  /* Retry Error */
+> -#define LE_T3_TDR      0x03ff  /* Time Domain Reflectometry */
+> -
+> -/* Miscellaneous useful macros */
+> -
+> -#define TX_BUFFS_AVAIL ((lp->tx_old <= lp->tx_new) ? \
+> -                       lp->tx_old + lp->tx_ring_mod_mask - lp->tx_new : \
+> -                       lp->tx_old - lp->tx_new - 1)
+> -
+> -/* The LANCE only uses 24 bit addresses. This does the obvious thing. */
+> -#define LANCE_ADDR(x) ((int)(x) & ~0xff000000)
+> -
+> -/* Now the prototypes we export */
+> -int lance_open(struct net_device *dev);
+> -int lance_close(struct net_device *dev);
+> -netdev_tx_t lance_start_xmit(struct sk_buff *skb, struct net_device *dev);
+> -void lance_set_multicast(struct net_device *dev);
+> -void lance_tx_timeout(struct net_device *dev, unsigned int txqueue);
+> -#ifdef CONFIG_NET_POLL_CONTROLLER
+> -void lance_poll(struct net_device *dev);
+> -#endif
+> -
+> -#endif /* ndef _7990_H */
+> diff --git a/drivers/net/ethernet/amd/Kconfig b/drivers/net/ethernet/amd/Kconfig
+> index 45e8d698781c..9e83f3aa435a 100644
+> --- a/drivers/net/ethernet/amd/Kconfig
+> +++ b/drivers/net/ethernet/amd/Kconfig
+> @@ -93,14 +93,6 @@ config DECLANCE
+>           DEC (now Compaq) based on the AMD LANCE chipset, including the
+>           DEPCA series.  (This chipset is better known via the NE2100 cards.)
+>
+> -config HPLANCE
+> -       tristate "HP on-board LANCE support"
+> -       depends on DIO
+> -       select CRC32
+> -       help
+> -         If you want to use the builtin "LANCE" Ethernet controller on an
+> -         HP300 machine, say Y here.
+> -
+>  config MIPS_AU1X00_ENET
+>         tristate "MIPS AU1000 Ethernet support"
+>         depends on MIPS_ALCHEMY
+> @@ -110,16 +102,6 @@ config MIPS_AU1X00_ENET
+>           If you have an Alchemy Semi AU1X00 based system
+>           say Y.  Otherwise, say N.
+>
+> -config MVME147_NET
+> -       tristate "MVME147 (LANCE) Ethernet support"
+> -       depends on MVME147
+> -       select CRC32
+> -       help
+> -         Support for the on-board Ethernet interface on the Motorola MVME147
+> -         single-board computer.  Say Y here to include the
+> -         driver for this chip in your kernel.
+> -         To compile this driver as a module, choose M here.
+> -
+>  config PCMCIA_NMCLAN
+>         tristate "New Media PCMCIA support"
+>         depends on PCMCIA && HAS_IOPORT
+> diff --git a/drivers/net/ethernet/amd/Makefile b/drivers/net/ethernet/amd/Makefile
+> index 2dcfb84731e1..387ec74e8e95 100644
+> --- a/drivers/net/ethernet/amd/Makefile
+> +++ b/drivers/net/ethernet/amd/Makefile
+> @@ -8,10 +8,8 @@ obj-$(CONFIG_AMD8111_ETH) += amd8111e.o
+>  obj-$(CONFIG_ARIADNE) += ariadne.o
+>  obj-$(CONFIG_ATARILANCE) += atarilance.o
+>  obj-$(CONFIG_DECLANCE) += declance.o
+> -obj-$(CONFIG_HPLANCE) += hplance.o 7990.o
+>  obj-$(CONFIG_LANCE) += lance.o
+>  obj-$(CONFIG_MIPS_AU1X00_ENET) += au1000_eth.o
+> -obj-$(CONFIG_MVME147_NET) += mvme147.o 7990.o
+>  obj-$(CONFIG_PCMCIA_NMCLAN) += nmclan_cs.o
+>  obj-$(CONFIG_PCNET32) += pcnet32.o
+>  obj-$(CONFIG_SUN3LANCE) += sun3lance.o
+> diff --git a/drivers/net/ethernet/amd/hplance.c b/drivers/net/ethernet/amd/hplance.c
+> deleted file mode 100644
+> index df42294530cb..000000000000
+> --- a/drivers/net/ethernet/amd/hplance.c
+> +++ /dev/null
+> @@ -1,238 +0,0 @@
+> -// SPDX-License-Identifier: GPL-2.0-only
+> -/* hplance.c  : the  Linux/hp300/lance ethernet driver
+> - *
+> - * Copyright (C) 05/1998 Peter Maydell <pmaydell@chiark.greenend.org.uk>
+> - * Based on the Sun Lance driver and the NetBSD HP Lance driver
+> - * Uses the generic 7990.c LANCE code.
+> - */
+> -
+> -#include <linux/module.h>
+> -#include <linux/kernel.h>
+> -#include <linux/types.h>
+> -#include <linux/interrupt.h>
+> -#include <linux/ioport.h>
+> -#include <linux/string.h>
+> -#include <linux/delay.h>
+> -#include <linux/init.h>
+> -#include <linux/errno.h>
+> -#include <linux/pgtable.h>
+> -/* Used for the temporal inet entries and routing */
+> -#include <linux/socket.h>
+> -#include <linux/route.h>
+> -#include <linux/dio.h>
+> -#include <linux/netdevice.h>
+> -#include <linux/etherdevice.h>
+> -#include <linux/skbuff.h>
+> -
+> -#include <asm/io.h>
+> -
+> -#include "hplance.h"
+> -
+> -/* We have 16392 bytes of RAM for the init block and buffers. This places
+> - * an upper limit on the number of buffers we can use. NetBSD uses 8 Rx
+> - * buffers and 2 Tx buffers, it takes (8 + 2) * 1544 bytes.
+> - */
+> -#define LANCE_LOG_TX_BUFFERS 1
+> -#define LANCE_LOG_RX_BUFFERS 3
+> -
+> -#include "7990.h"                                 /* use generic LANCE code */
+> -
+> -/* Our private data structure */
+> -struct hplance_private {
+> -       struct lance_private lance;
+> -};
+> -
+> -/* function prototypes... This is easy because all the grot is in the
+> - * generic LANCE support. All we have to support is probing for boards,
+> - * plus board-specific init, open and close actions.
+> - * Oh, and we need to tell the generic code how to read and write LANCE registers...
+> - */
+> -static int hplance_init_one(struct dio_dev *d, const struct dio_device_id *ent);
+> -static void hplance_init(struct net_device *dev, struct dio_dev *d);
+> -static void hplance_remove_one(struct dio_dev *d);
+> -static void hplance_writerap(void *priv, unsigned short value);
+> -static void hplance_writerdp(void *priv, unsigned short value);
+> -static unsigned short hplance_readrdp(void *priv);
+> -static int hplance_open(struct net_device *dev);
+> -static int hplance_close(struct net_device *dev);
+> -
+> -static struct dio_device_id hplance_dio_tbl[] = {
+> -       { DIO_ID_LAN },
+> -       { 0 }
+> -};
+> -
+> -static struct dio_driver hplance_driver = {
+> -       .name      = "hplance",
+> -       .id_table  = hplance_dio_tbl,
+> -       .probe     = hplance_init_one,
+> -       .remove    = hplance_remove_one,
+> -};
+> -
+> -static const struct net_device_ops hplance_netdev_ops = {
+> -       .ndo_open               = hplance_open,
+> -       .ndo_stop               = hplance_close,
+> -       .ndo_start_xmit         = lance_start_xmit,
+> -       .ndo_set_rx_mode        = lance_set_multicast,
+> -       .ndo_validate_addr      = eth_validate_addr,
+> -       .ndo_set_mac_address    = eth_mac_addr,
+> -#ifdef CONFIG_NET_POLL_CONTROLLER
+> -       .ndo_poll_controller    = lance_poll,
+> -#endif
+> -};
+> -
+> -/* Find all the HP Lance boards and initialise them... */
+> -static int hplance_init_one(struct dio_dev *d, const struct dio_device_id *ent)
+> -{
+> -       struct net_device *dev;
+> -       int err = -ENOMEM;
+> -
+> -       dev = alloc_etherdev(sizeof(struct hplance_private));
+> -       if (!dev)
+> -               goto out;
+> -
+> -       err = -EBUSY;
+> -       if (!request_mem_region(dio_resource_start(d),
+> -                               dio_resource_len(d), d->name))
+> -               goto out_free_netdev;
+> -
+> -       hplance_init(dev, d);
+> -       err = register_netdev(dev);
+> -       if (err)
+> -               goto out_release_mem_region;
+> -
+> -       dio_set_drvdata(d, dev);
+> -
+> -       printk(KERN_INFO "%s: %s; select code %d, addr %pM, irq %d\n",
+> -              dev->name, d->name, d->scode, dev->dev_addr, d->ipl);
 > -
 > -       return 0;
+> -
+> - out_release_mem_region:
+> -       release_mem_region(dio_resource_start(d), dio_resource_len(d));
+> - out_free_netdev:
+> -       free_netdev(dev);
+> - out:
+> -       return err;
 > -}
 > -
-> -MODULE_DESCRIPTION("Macintosh CS89x0-based Ethernet driver");
-> -MODULE_LICENSE("GPL");
-> -
-> -static void mac89x0_device_remove(struct platform_device *pdev)
+> -static void hplance_remove_one(struct dio_dev *d)
 > -{
-> -       struct net_device *dev = platform_get_drvdata(pdev);
+> -       struct net_device *dev = dio_get_drvdata(d);
 > -
 > -       unregister_netdev(dev);
-> -       nubus_writew(0, dev->base_addr + ADD_PORT);
+> -       release_mem_region(dio_resource_start(d), dio_resource_len(d));
 > -       free_netdev(dev);
 > -}
 > -
-> -static struct platform_driver mac89x0_platform_driver = {
-> -       .probe = mac89x0_device_probe,
-> -       .remove = mac89x0_device_remove,
-> -       .driver = {
-> -               .name = "mac89x0",
-> -       },
+> -/* Initialise a single lance board at the given DIO device */
+> -static void hplance_init(struct net_device *dev, struct dio_dev *d)
+> -{
+> -       unsigned long va = (d->resource.start + DIO_VIRADDRBASE);
+> -       struct hplance_private *lp;
+> -       u8 addr[ETH_ALEN];
+> -       int i;
+> -
+> -       /* reset the board */
+> -       out_8(va + DIO_IDOFF, 0xff);
+> -       udelay(100);                              /* ariba! ariba! udelay! udelay! */
+> -
+> -       /* Fill the dev fields */
+> -       dev->base_addr = va;
+> -       dev->netdev_ops = &hplance_netdev_ops;
+> -       dev->dma = 0;
+> -
+> -       for (i = 0; i < 6; i++) {
+> -               /* The NVRAM holds our ethernet address, one nibble per byte,
+> -                * at bytes NVRAMOFF+1,3,5,7,9...
+> -                */
+> -               addr[i] = ((in_8(va + HPLANCE_NVRAMOFF + i*4 + 1) & 0xF) << 4)
+> -                       | (in_8(va + HPLANCE_NVRAMOFF + i*4 + 3) & 0xF);
+> -       }
+> -       eth_hw_addr_set(dev, addr);
+> -
+> -       lp = netdev_priv(dev);
+> -       lp->lance.name = d->name;
+> -       lp->lance.base = va;
+> -       lp->lance.init_block = (struct lance_init_block *)(va + HPLANCE_MEMOFF); /* CPU addr */
+> -       lp->lance.lance_init_block = NULL;              /* LANCE addr of same RAM */
+> -       lp->lance.busmaster_regval = LE_C3_BSWP;        /* we're bigendian */
+> -       lp->lance.irq = d->ipl;
+> -       lp->lance.writerap = hplance_writerap;
+> -       lp->lance.writerdp = hplance_writerdp;
+> -       lp->lance.readrdp = hplance_readrdp;
+> -       lp->lance.lance_log_rx_bufs = LANCE_LOG_RX_BUFFERS;
+> -       lp->lance.lance_log_tx_bufs = LANCE_LOG_TX_BUFFERS;
+> -       lp->lance.rx_ring_mod_mask = RX_RING_MOD_MASK;
+> -       lp->lance.tx_ring_mod_mask = TX_RING_MOD_MASK;
+> -}
+> -
+> -/* This is disgusting. We have to check the DIO status register for ack every
+> - * time we read or write the LANCE registers.
+> - */
+> -static void hplance_writerap(void *priv, unsigned short value)
+> -{
+> -       struct lance_private *lp = (struct lance_private *)priv;
+> -
+> -       do {
+> -               out_be16(lp->base + HPLANCE_REGOFF + LANCE_RAP, value);
+> -       } while ((in_8(lp->base + HPLANCE_STATUS) & LE_ACK) == 0);
+> -}
+> -
+> -static void hplance_writerdp(void *priv, unsigned short value)
+> -{
+> -       struct lance_private *lp = (struct lance_private *)priv;
+> -
+> -       do {
+> -               out_be16(lp->base + HPLANCE_REGOFF + LANCE_RDP, value);
+> -       } while ((in_8(lp->base + HPLANCE_STATUS) & LE_ACK) == 0);
+> -}
+> -
+> -static unsigned short hplance_readrdp(void *priv)
+> -{
+> -       struct lance_private *lp = (struct lance_private *)priv;
+> -       __u16 value;
+> -
+> -       do {
+> -               value = in_be16(lp->base + HPLANCE_REGOFF + LANCE_RDP);
+> -       } while ((in_8(lp->base + HPLANCE_STATUS) & LE_ACK) == 0);
+> -       return value;
+> -}
+> -
+> -static int hplance_open(struct net_device *dev)
+> -{
+> -       int status;
+> -       struct lance_private *lp = netdev_priv(dev);
+> -
+> -       status = lance_open(dev);                 /* call generic lance open code */
+> -       if (status)
+> -               return status;
+> -       /* enable interrupts at board level. */
+> -       out_8(lp->base + HPLANCE_STATUS, LE_IE);
+> -
+> -       return 0;
+> -}
+> -
+> -static int hplance_close(struct net_device *dev)
+> -{
+> -       struct lance_private *lp = netdev_priv(dev);
+> -
+> -       out_8(lp->base + HPLANCE_STATUS, 0);    /* disable interrupts at boardlevel */
+> -       lance_close(dev);
+> -       return 0;
+> -}
+> -
+> -static int __init hplance_init_module(void)
+> -{
+> -       return dio_register_driver(&hplance_driver);
+> -}
+> -
+> -static void __exit hplance_cleanup_module(void)
+> -{
+> -       dio_unregister_driver(&hplance_driver);
+> -}
+> -
+> -module_init(hplance_init_module);
+> -module_exit(hplance_cleanup_module);
+> -
+> -MODULE_DESCRIPTION("HP300 on-board LANCE Ethernet driver");
+> -MODULE_LICENSE("GPL");
+> diff --git a/drivers/net/ethernet/amd/hplance.h b/drivers/net/ethernet/amd/hplance.h
+> deleted file mode 100644
+> index bc845a2c60c1..000000000000
+> --- a/drivers/net/ethernet/amd/hplance.h
+> +++ /dev/null
+> @@ -1,27 +0,0 @@
+> -/* SPDX-License-Identifier: GPL-2.0 */
+> -/* Random defines and structures for the HP Lance driver.
+> - * Copyright (C) 05/1998 Peter Maydell <pmaydell@chiark.greenend.org.uk>
+> - * Based on the Sun Lance driver and the NetBSD HP Lance driver
+> - */
+> -
+> -/* Registers */
+> -#define HPLANCE_ID             0x01            /* DIO register: ID byte */
+> -#define HPLANCE_STATUS         0x03            /* DIO register: interrupt enable/status */
+> -
+> -/* Control and status bits for the status register */
+> -#define LE_IE 0x80                                /* interrupt enable */
+> -#define LE_IR 0x40                                /* interrupt requested */
+> -#define LE_LOCK 0x08                              /* lock status register */
+> -#define LE_ACK 0x04                               /* ack of lock */
+> -#define LE_JAB 0x02                               /* loss of tx clock (???) */
+> -/* We can also extract the IPL from the status register with the standard
+> - * DIO_IPL(hplance) macro, or using dio_scodetoipl()
+> - */
+> -
+> -/* These are the offsets for the DIO regs (hplance_reg), lance_ioreg,
+> - * memory and NVRAM:
+> - */
+> -#define HPLANCE_IDOFF 0                           /* board baseaddr */
+> -#define HPLANCE_REGOFF 0x4000                     /* lance registers */
+> -#define HPLANCE_MEMOFF 0x8000                     /* struct lance_init_block */
+> -#define HPLANCE_NVRAMOFF 0xC008                   /* etheraddress as one *nibble* per byte */
+> diff --git a/drivers/net/ethernet/amd/mvme147.c b/drivers/net/ethernet/amd/mvme147.c
+> deleted file mode 100644
+> index f19b04b92fa9..000000000000
+> --- a/drivers/net/ethernet/amd/mvme147.c
+> +++ /dev/null
+> @@ -1,198 +0,0 @@
+> -// SPDX-License-Identifier: GPL-2.0-only
+> -/* mvme147.c  : the  Linux/mvme147/lance ethernet driver
+> - *
+> - * Copyright (C) 05/1998 Peter Maydell <pmaydell@chiark.greenend.org.uk>
+> - * Based on the Sun Lance driver and the NetBSD HP Lance driver
+> - * Uses the generic 7990.c LANCE code.
+> - */
+> -
+> -#include <linux/module.h>
+> -#include <linux/kernel.h>
+> -#include <linux/types.h>
+> -#include <linux/interrupt.h>
+> -#include <linux/ioport.h>
+> -#include <linux/string.h>
+> -#include <linux/delay.h>
+> -#include <linux/init.h>
+> -#include <linux/errno.h>
+> -#include <linux/gfp.h>
+> -#include <linux/pgtable.h>
+> -/* Used for the temporal inet entries and routing */
+> -#include <linux/socket.h>
+> -#include <linux/route.h>
+> -#include <linux/netdevice.h>
+> -#include <linux/etherdevice.h>
+> -#include <linux/skbuff.h>
+> -
+> -#include <asm/io.h>
+> -#include <asm/mvme147hw.h>
+> -
+> -/* We have 32K of RAM for the init block and buffers. This places
+> - * an upper limit on the number of buffers we can use. NetBSD uses 8 Rx
+> - * buffers and 2 Tx buffers, it takes (8 + 2) * 1544 bytes.
+> - */
+> -#define LANCE_LOG_TX_BUFFERS 1
+> -#define LANCE_LOG_RX_BUFFERS 3
+> -
+> -#include "7990.h"                                 /* use generic LANCE code */
+> -
+> -/* Our private data structure */
+> -struct m147lance_private {
+> -       struct lance_private lance;
+> -       unsigned long ram;
 > -};
 > -
-> -module_platform_driver(mac89x0_platform_driver);
+> -/* function prototypes... This is easy because all the grot is in the
+> - * generic LANCE support. All we have to support is probing for boards,
+> - * plus board-specific init, open and close actions.
+> - * Oh, and we need to tell the generic code how to read and write LANCE registers...
+> - */
+> -static int m147lance_open(struct net_device *dev);
+> -static int m147lance_close(struct net_device *dev);
+> -static void m147lance_writerap(struct lance_private *lp, unsigned short value);
+> -static void m147lance_writerdp(struct lance_private *lp, unsigned short value);
+> -static unsigned short m147lance_readrdp(struct lance_private *lp);
+> -
+> -typedef void (*writerap_t)(void *, unsigned short);
+> -typedef void (*writerdp_t)(void *, unsigned short);
+> -typedef unsigned short (*readrdp_t)(void *);
+> -
+> -static const struct net_device_ops lance_netdev_ops = {
+> -       .ndo_open               = m147lance_open,
+> -       .ndo_stop               = m147lance_close,
+> -       .ndo_start_xmit         = lance_start_xmit,
+> -       .ndo_set_rx_mode        = lance_set_multicast,
+> -       .ndo_tx_timeout         = lance_tx_timeout,
+> -       .ndo_validate_addr      = eth_validate_addr,
+> -       .ndo_set_mac_address    = eth_mac_addr,
+> -};
+> -
+> -/* Initialise the one and only on-board 7990 */
+> -static struct net_device * __init mvme147lance_probe(void)
+> -{
+> -       struct net_device *dev;
+> -       static int called;
+> -       static const char name[] = "MVME147 LANCE";
+> -       struct m147lance_private *lp;
+> -       u8 macaddr[ETH_ALEN];
+> -       u_long *addr;
+> -       u_long address;
+> -       int err;
+> -
+> -       if (!MACH_IS_MVME147 || called)
+> -               return ERR_PTR(-ENODEV);
+> -       called++;
+> -
+> -       dev = alloc_etherdev(sizeof(struct m147lance_private));
+> -       if (!dev)
+> -               return ERR_PTR(-ENOMEM);
+> -
+> -       /* Fill the dev fields */
+> -       dev->base_addr = (unsigned long)MVME147_LANCE_BASE;
+> -       dev->netdev_ops = &lance_netdev_ops;
+> -       dev->dma = 0;
+> -
+> -       addr = (u_long *)ETHERNET_ADDRESS;
+> -       address = *addr;
+> -       macaddr[0] = 0x08;
+> -       macaddr[1] = 0x00;
+> -       macaddr[2] = 0x3e;
+> -       address = address >> 8;
+> -       macaddr[5] = address&0xff;
+> -       address = address >> 8;
+> -       macaddr[4] = address&0xff;
+> -       address = address >> 8;
+> -       macaddr[3] = address&0xff;
+> -       eth_hw_addr_set(dev, macaddr);
+> -
+> -       lp = netdev_priv(dev);
+> -       lp->ram = __get_dma_pages(GFP_ATOMIC, 3);       /* 32K */
+> -       if (!lp->ram) {
+> -               printk("%s: No memory for LANCE buffers\n", dev->name);
+> -               free_netdev(dev);
+> -               return ERR_PTR(-ENOMEM);
+> -       }
+> -
+> -       lp->lance.name = name;
+> -       lp->lance.base = dev->base_addr;
+> -       lp->lance.init_block = (struct lance_init_block *)(lp->ram); /* CPU addr */
+> -       lp->lance.lance_init_block = (struct lance_init_block *)(lp->ram);                 /* LANCE addr of same RAM */
+> -       lp->lance.busmaster_regval = LE_C3_BSWP;        /* we're bigendian */
+> -       lp->lance.irq = MVME147_LANCE_IRQ;
+> -       lp->lance.writerap = (writerap_t)m147lance_writerap;
+> -       lp->lance.writerdp = (writerdp_t)m147lance_writerdp;
+> -       lp->lance.readrdp = (readrdp_t)m147lance_readrdp;
+> -       lp->lance.lance_log_rx_bufs = LANCE_LOG_RX_BUFFERS;
+> -       lp->lance.lance_log_tx_bufs = LANCE_LOG_TX_BUFFERS;
+> -       lp->lance.rx_ring_mod_mask = RX_RING_MOD_MASK;
+> -       lp->lance.tx_ring_mod_mask = TX_RING_MOD_MASK;
+> -
+> -       err = register_netdev(dev);
+> -       if (err) {
+> -               free_pages(lp->ram, 3);
+> -               free_netdev(dev);
+> -               return ERR_PTR(err);
+> -       }
+> -
+> -       netdev_info(dev, "MVME147 at 0x%08lx, irq %d, Hardware Address %pM\n",
+> -                   dev->base_addr, MVME147_LANCE_IRQ, dev->dev_addr);
+> -
+> -       return dev;
+> -}
+> -
+> -static void m147lance_writerap(struct lance_private *lp, unsigned short value)
+> -{
+> -       out_be16(lp->base + LANCE_RAP, value);
+> -}
+> -
+> -static void m147lance_writerdp(struct lance_private *lp, unsigned short value)
+> -{
+> -       out_be16(lp->base + LANCE_RDP, value);
+> -}
+> -
+> -static unsigned short m147lance_readrdp(struct lance_private *lp)
+> -{
+> -       return in_be16(lp->base + LANCE_RDP);
+> -}
+> -
+> -static int m147lance_open(struct net_device *dev)
+> -{
+> -       int status;
+> -
+> -       status = lance_open(dev);                 /* call generic lance open code */
+> -       if (status)
+> -               return status;
+> -       /* enable interrupts at board level. */
+> -       m147_pcc->lan_cntrl = 0;       /* clear the interrupts (if any) */
+> -       m147_pcc->lan_cntrl = 0x08 | 0x04;     /* Enable irq 4 */
+> -
+> -       return 0;
+> -}
+> -
+> -static int m147lance_close(struct net_device *dev)
+> -{
+> -       /* disable interrupts at boardlevel */
+> -       m147_pcc->lan_cntrl = 0x0; /* disable interrupts */
+> -       lance_close(dev);
+> -       return 0;
+> -}
+> -
+> -MODULE_DESCRIPTION("MVME147 LANCE Ethernet driver");
+> -MODULE_LICENSE("GPL");
+> -
+> -static struct net_device *dev_mvme147_lance;
+> -static int __init m147lance_init(void)
+> -{
+> -       dev_mvme147_lance = mvme147lance_probe();
+> -       return PTR_ERR_OR_ZERO(dev_mvme147_lance);
+> -}
+> -module_init(m147lance_init);
+> -
+> -static void __exit m147lance_exit(void)
+> -{
+> -       struct m147lance_private *lp = netdev_priv(dev_mvme147_lance);
+> -       unregister_netdev(dev_mvme147_lance);
+> -       free_pages(lp->ram, 3);
+> -       free_netdev(dev_mvme147_lance);
+> -}
+> -module_exit(m147lance_exit);
+>
+> --
+> 2.53.0
+>
+>
 
