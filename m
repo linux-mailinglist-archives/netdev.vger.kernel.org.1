@@ -1,219 +1,153 @@
-Return-Path: <netdev+bounces-280346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280347-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +IJWC4mH6Gk6LgIAu9opvQ
-	(envelope-from <netdev+bounces-280346-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:32:09 +0200
+	id sFjWDGyI6Gk6LgIAu9opvQ
+	(envelope-from <netdev+bounces-280347-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:35:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB7434437AE
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:32:08 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A15EF443867
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:35:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2490D3017BC9
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 08:32:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AA52530182A4
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 08:32:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9253A3BF66E;
-	Wed, 22 Apr 2026 08:31:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4804E3BF676;
+	Wed, 22 Apr 2026 08:32:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JJxjl+37"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="l8UP3Od6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26D953BF673
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 08:31:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D3CA3BF695
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 08:32:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776846717; cv=none; b=NIzoFg9QKAuNxt2GKIKO37irVra5AzG378xDuysuzxR+RAcreVvXc0NnDixMbe7NrIBln9DAAZFOHLwNxnzF7Q+liHLPlRePQsazVP2P4lQ3/+yx8c2PqifC1sTy7Ck5gVAQLftkCb95EUw3xHgAsLyeKsMUF5UK3L0A87VZ3WU=
+	t=1776846743; cv=none; b=e4ADfqVDpKvyH9HP5BLtKj7Cf/gvhcec5GW3599vI2f3oOgCVjp7lV6ZS9lnlk9J2elnQkXZDfN/lkqTW3btyVPFl4KHecHYE3j1eMF5wk+fXsn1yc41eWQqd3jts/Ia9wGGqmTFt2i588kKqTYEHyZgXoNWlI9bI1PpbE077w0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776846717; c=relaxed/simple;
-	bh=zE9Fc5nWpkJfPNYZAFf95RUtVnUaWl/whe5X/cGa6fA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UddsCi7LD9mJvJDPTu7EwjMeWocAPdJr7LZYfl4xJNDez2m73bK6z+3l24fzoCQpdr3CHzF8hhiWjJddlWxaTfCxCdm6WdBqqL8YZo8ilWllnWfufAUngR34liIKHGm044dWW7JroWsfuczpbopAfI+jwbbIGqdDnVwwgEf2DKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JJxjl+37; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776846715;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OqgEsxzzthxZgE+ry6Kd2ShGZ2jDRQ5MG5BCDLqxp88=;
-	b=JJxjl+37dreZC3ZVMk3r4K3IoiD3NqT4lAfcZIUlOJ1AJTnwuFZHZjE1/iXqKHehkMP59q
-	E2MJ83XoKNTbm/oPvIXA6ZC+3RfewOZkaUM8fXv+3qdQb4LpIHYN5eHEnR72s2fCVhIBph
-	doE7tff8g55hLKrc0CgZkCvGB0KCClE=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-269-PP2LIxIgP_yTzG8t813a6w-1; Wed,
- 22 Apr 2026 04:31:50 -0400
-X-MC-Unique: PP2LIxIgP_yTzG8t813a6w-1
-X-Mimecast-MFC-AGG-ID: PP2LIxIgP_yTzG8t813a6w_1776846708
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 592611956055;
-	Wed, 22 Apr 2026 08:31:47 +0000 (UTC)
-Received: from thinkpad (headnet01.pony-001.prod.iad2.dc.redhat.com [10.2.32.101])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 607BB180047F;
-	Wed, 22 Apr 2026 08:31:42 +0000 (UTC)
-Date: Wed, 22 Apr 2026 10:31:39 +0200
-From: Felix Maurer <fmaurer@redhat.com>
-To: Ren Wei <n05ec@lzu.edu.cn>
-Cc: netdev@vger.kernel.org,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, kees@kernel.org,
-	kexinsun@smail.nju.edu.cn, luka.gejak@linux.dev,
-	Arvid.Brodin@xdin.com, m-karicheri2@ti.com, yuantan098@gmail.com,
-	yifanwucs@gmail.com, tomapufckgml@gmail.com, bird@lzu.edu.cn,
-	xuyuqiabc@gmail.com, royenheart@gmail.com
-Subject: Re: [PATCH net v3 1/1] net: hsr: limit node table growth
-Message-ID: <aeiHa7rzmSqzMIaJ@thinkpad>
-References: <3bdbe54e81bd89c1443b05500368fb45bddc3191.1776754203.git.royenheart@gmail.com>
+	s=arc-20240116; t=1776846743; c=relaxed/simple;
+	bh=ND+ndGsSvpuoov5b6PdL2BGaGfrwCL/bOxZfNCcX/RA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=Mo/GhpD0PRyrRv9SYyyfG+H4S+4LqOftbTJtz0qW06QNqbjLmFQS8ZGhpBJUG5YlFWy7tBILiUci+isW2BYoDoi31Wd8DDrYX8TzMsqViYsnQqQTeSJIko+905YFLTzGvZhaS0y9aYxevQYZfCnqaEkjRPvNtMbunvuImoXopvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=l8UP3Od6; arc=none smtp.client-ip=210.118.77.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20260422083218euoutp013c9f4b593d2c00ce4efc9213563bc747~ooLHVf9BW0998509985euoutp01c
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 08:32:18 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20260422083218euoutp013c9f4b593d2c00ce4efc9213563bc747~ooLHVf9BW0998509985euoutp01c
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1776846738;
+	bh=6KEwBFNl1WwvmqFNjndDjulH1Q7j/Lbc88+2DXd8d9Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=l8UP3Od6BGUMosrpuJ76ljCD6yIFXlebVxCUUnuyMYccBa9jaeDOWvYBuIxN0EdUD
+	 +eI1IADsIrT2KZgSgwWC1r0ofuDPcl3LAzey6btnsB+xW64NRSAWR/tNuh8yZ7TpFU
+	 GRx90Aqgrg9yZCYAGriz3gmZqpS64umUWqAfXKjw=
+Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20260422083218eucas1p19e4c668f95b21e640dd6d77125de4537~ooLGzqB702839728397eucas1p1y;
+	Wed, 22 Apr 2026 08:32:18 +0000 (GMT)
+Received: from AMDC4622.eu.corp.samsungelectronics.net (unknown
+	[106.120.77.34]) by eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20260422083217eusmtip1801f14871bad825b600e875a20f896a8~ooLGfk7nq1124311243eusmtip1j;
+	Wed, 22 Apr 2026 08:32:17 +0000 (GMT)
+Date: Wed, 22 Apr 2026 10:32:17 +0200
+From: Jakub Raczynski <j.raczynski@samsung.com>
+To: Dan Carpenter <error27@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, przemyslaw.kitszel@intel.com,
+	anthony.l.nguyen@intel.com, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] net/intel: Replace manual array size calculation with
+ ARRAY_SIZE
+Message-ID: <aeiHkejLjhRKyj/u@AMDC4622.eu.corp.samsungelectronics.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3bdbe54e81bd89c1443b05500368fb45bddc3191.1776754203.git.royenheart@gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
-X-Spamd-Result: default: False [-1.66 / 15.00];
+In-Reply-To: <aeeFh1zQqhVysvxI@stanley.mountain>
+X-CMS-MailID: 20260422083218eucas1p19e4c668f95b21e640dd6d77125de4537
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----hExaTKD8pSV4C1.mHO0xNjZioIzStKhMnOXfyxqZoi0.l2l2=_2101e_"
+X-RootMTR: 20260421114034eucas1p1d746ffe32b49aeb57f10e729d1331124
+X-EPHeader: CA
+X-CMS-RootMailID: 20260421114034eucas1p1d746ffe32b49aeb57f10e729d1331124
+References: <CGME20260421114034eucas1p1d746ffe32b49aeb57f10e729d1331124@eucas1p1.samsung.com>
+	<20260421114029.2689961-1-j.raczynski@samsung.com>
+	<aeeFh1zQqhVysvxI@stanley.mountain>
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
+	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280346-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,linutronix.de,davemloft.net,google.com,kernel.org,redhat.com,smail.nju.edu.cn,linux.dev,xdin.com,ti.com,gmail.com,lzu.edu.cn];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280347-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+,1:+,2:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[samsung.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_NEQ_ENVFROM(0.00)[j.raczynski@samsung.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BB7434437AE
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[samsung.com:dkim,AMDC4622.eu.corp.samsungelectronics.net:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A15EF443867
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 21, 2026 at 10:50:01PM +0800, Ren Wei wrote:
-> From: Haoze Xie <royenheart@gmail.com>
+------hExaTKD8pSV4C1.mHO0xNjZioIzStKhMnOXfyxqZoi0.l2l2=_2101e_
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+
+On Tue, Apr 21, 2026 at 05:11:19PM +0300, Dan Carpenter wrote:
+> On Tue, Apr 21, 2026 at 01:40:29PM +0200, Jakub Raczynski wrote:
+> >  
+> > -	if (!((u32)aq_rc < (sizeof(aq_to_posix) / sizeof((aq_to_posix)[0]))))
+> > +	if (!((u32)aq_rc < ARRAY_SIZE(aq_to_posix)))
+> 
+> This still isn't beautiful.  There are so many parens.  The !(foo < size)
+> formulation is weird.  The cast is unnnecessary.  Better to write it as:
+> 
+> 	if (aq_rc >= ARRAY_SIZE(aq_to_posix))
+> 		return -ERANGE;
+> 
+> >  		return -ERANGE;
+> >  
+> >  	return aq_to_posix[aq_rc];
+> 
+> regards,
+> dan carpenter
 >
-> The HSR/PRP node learning paths allocate one persistent entry per
-> previously unseen source MAC. Since learned entries stay alive until the
-> prune timer catches up, the node tables can otherwise grow without a
-> bound under high churn of learned senders.
->
-> Limit the number of learned entries in each node table and stop adding
-> new ones once the configured limit is reached. This keeps node-table
-> resource use bounded across the affected learning paths.
-Hi,
 
-thank you for giving this approach a try!
+Alright, will beautify it and resend soon.
 
-[snip]
-> diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
-> index d09875b33588..8a5a2a54a81f 100644
-> --- a/net/hsr/hsr_framereg.c
-> +++ b/net/hsr/hsr_framereg.c
-> @@ -14,12 +14,18 @@
->  #include <kunit/visibility.h>
->  #include <linux/if_ether.h>
->  #include <linux/etherdevice.h>
-> +#include <linux/moduleparam.h>
->  #include <linux/slab.h>
->  #include <linux/rculist.h>
->  #include "hsr_main.h"
->  #include "hsr_framereg.h"
->  #include "hsr_netlink.h"
->
-> +static unsigned int hsr_node_table_size = 1024;
-> +module_param_named(node_table_size, hsr_node_table_size, uint, 0644);
-> +MODULE_PARM_DESC(node_table_size,
-> +		 "Maximum number of learned entries in each HSR/PRP node table (0 = unlimited)");
-> +
->  bool hsr_addr_is_redbox(struct hsr_priv *hsr, unsigned char *addr)
->  {
->  	if (!hsr->redbox || !is_valid_ether_addr(hsr->macaddress_redbox))
-> @@ -189,6 +195,7 @@ static struct hsr_node *hsr_add_node(struct hsr_priv *hsr,
->  				     enum hsr_port_type rx_port)
->  {
->  	struct hsr_node *new_node, *node = NULL;
-> +	unsigned int node_count = 0;
->  	unsigned long now;
->  	size_t block_sz;
->  	int i;
-> @@ -226,20 +233,31 @@ static struct hsr_node *hsr_add_node(struct hsr_priv *hsr,
->  	spin_lock_bh(&hsr->list_lock);
->  	list_for_each_entry_rcu(node, node_db, mac_list,
->  				lockdep_is_held(&hsr->list_lock)) {
-> +		node_count++;
+I can see potential original intention of not comparing unsigned from sizeof
+with int, maybe that was original compiler configuration to include that
+warning.
+But at this variable range it is irrelevant and it is probably most disabled
+warning ever.
 
-I'm not sure if this on-the-fly node counting is the best solution here.
-My concern is that it comes quite late in the process, i.e., after we
-already allocated a bunch of memory, etc. As we are discussing a
-scenario where a lot of entries are created, maybe we shouldn't even
-allocate a new_node if the table is already full? For example by storing
-the node_count in hsr_priv and checking it early in the function?
+regards
+Jakub Raczynski
 
->  		if (ether_addr_equal(node->macaddress_A, addr))
-> -			goto out;
-> +			goto out_found;
->  		if (ether_addr_equal(node->macaddress_B, addr))
-> -			goto out;
-> +			goto out_found;
->  	}
-> +
-> +	if (hsr_node_table_size && node_count >= hsr_node_table_size)
-> +		goto out_drop;
+------hExaTKD8pSV4C1.mHO0xNjZioIzStKhMnOXfyxqZoi0.l2l2=_2101e_
+Content-Type: text/plain; charset="utf-8"
 
-I think it would be good to somehow make this situation transparent to
-the user, so they can react if this an undesired behavior (for example,
-because they simply have a large network and need a large node table).
 
->  	list_add_tail_rcu(&new_node->mac_list, node_db);
->  	spin_unlock_bh(&hsr->list_lock);
->  	return new_node;
-> -out:
-> +out_found:
->  	spin_unlock_bh(&hsr->list_lock);
-> +	xa_destroy(&new_node->seq_blocks);
->  	kfree(new_node->block_buf);
-> -free:
->  	kfree(new_node);
->  	return node;
-> +out_drop:
-> +	spin_unlock_bh(&hsr->list_lock);
-> +	xa_destroy(&new_node->seq_blocks);
-> +	kfree(new_node->block_buf);
-> +free:
-> +	kfree(new_node);
-> +	return NULL;
->  }
-
-The two cleanup paths are almost the same now. We usually attempt to
-keep them unified to make sure that we do the correct cleanup steps in
-all situations. So please keep them unified here as well.
-
-Thanks,
-   Felix
-
+------hExaTKD8pSV4C1.mHO0xNjZioIzStKhMnOXfyxqZoi0.l2l2=_2101e_--
 
