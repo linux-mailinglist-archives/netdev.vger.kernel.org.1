@@ -1,369 +1,186 @@
-Return-Path: <netdev+bounces-280377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280378-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MKGqGtij6GngOAIAu9opvQ
-	(envelope-from <netdev+bounces-280377-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:32:56 +0200
+	id WAecLHem6GmZOQIAu9opvQ
+	(envelope-from <netdev+bounces-280378-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:44:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DF84444C31
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:32:55 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53C35444DFA
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:44:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5A6B63004C80
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:32:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D8C0530387DC
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:43:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15C723A6407;
-	Wed, 22 Apr 2026 10:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9408A3CD8CA;
+	Wed, 22 Apr 2026 10:43:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="UEvTgWhL";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vQw3/1bB";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="UEvTgWhL";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vQw3/1bB"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="uEw11Ere";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="VkDnfR1T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D00537F8A1
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 10:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9DC3C277B;
+	Wed, 22 Apr 2026 10:43:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776853960; cv=none; b=mYy8Zw8eb5VNMYYtaplmjGTaEmZhxqwQXYhZe2za3iVO9vF4brB7qpLbshhvW7cUZxxxgd3AzeqBuIyjGDqbK+tla9UWoQXz+4uHM8wt6M5xH9++XDor27FyH89OetcmeVq7pxG0xYg7Q41Wx8+Hra9JKX31IRICI0qNBrJ81MM=
+	t=1776854619; cv=none; b=Mm1KHdu0TJNn7wSYApovG2bb1LrdXqDZQ2Zkx3n4GE+CYjcD8GhHoOd84sD7q75VAPq2Qv18b1Jm5jWqdATzzNEZbmgZMZ0CB0s3XL3hT3uacixfufLuYfpO6aLEFOxEeBwPUHiejquIvTwCPP65Kp4JentAs67ae8gzocm+gB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776853960; c=relaxed/simple;
-	bh=ftRsGwbBlXG7HcFqgFKI7EuKypI1HTPKPs5lzguV42A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YUU7wQj0oa67Q/RLforDoH4/Z+jySRnK8RQjNA7Ntlk6VAoPlCqaKN7gEGpMFy3ksy3uVTbbCu4IJdXW7yYjFaJdpVxZZtICxB0qM6ZM0wsjSqw7/Bjq5/rfCJQIzJl1ILEaUY5F+/G7k6VOAr4i2ryDUjld9T5oLkvQR6ktKQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=UEvTgWhL; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vQw3/1bB; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=UEvTgWhL; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vQw3/1bB; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 511C05BCC6;
-	Wed, 22 Apr 2026 10:32:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1776853956; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=geV2Y7KD8rYaVnkoozVtIqkBqooK12/gV2sn3Od+HHI=;
-	b=UEvTgWhLaRsV1pncheyz7SidQnKJcLb3KBUOPTEYUYfiuQMem9ra6GYwtXsrPrUN0kV+3r
-	mxhD0U6+a7c+hMbA4eV+E3bObpGB7KSS+CoXK+uk7hj0toGluH4r33wEAwITu3d7PZ1gSF
-	QKqvK1Rtd7IKIpuP8p+mldx9Kea9zCA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1776853956;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=geV2Y7KD8rYaVnkoozVtIqkBqooK12/gV2sn3Od+HHI=;
-	b=vQw3/1bB094z91bzpC4wdAamqcU30XlX7zEL45SeIHZi8Yd3kEf/JF1WHzuVC2uUzI0+Ve
-	9BGJuCkic6KRAwDw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=UEvTgWhL;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="vQw3/1bB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1776853956; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=geV2Y7KD8rYaVnkoozVtIqkBqooK12/gV2sn3Od+HHI=;
-	b=UEvTgWhLaRsV1pncheyz7SidQnKJcLb3KBUOPTEYUYfiuQMem9ra6GYwtXsrPrUN0kV+3r
-	mxhD0U6+a7c+hMbA4eV+E3bObpGB7KSS+CoXK+uk7hj0toGluH4r33wEAwITu3d7PZ1gSF
-	QKqvK1Rtd7IKIpuP8p+mldx9Kea9zCA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1776853956;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=geV2Y7KD8rYaVnkoozVtIqkBqooK12/gV2sn3Od+HHI=;
-	b=vQw3/1bB094z91bzpC4wdAamqcU30XlX7zEL45SeIHZi8Yd3kEf/JF1WHzuVC2uUzI0+Ve
-	9BGJuCkic6KRAwDw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 46CC6593AF;
-	Wed, 22 Apr 2026 10:32:35 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id yn6wDMOj6GmUdgAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Wed, 22 Apr 2026 10:32:35 +0000
-Message-ID: <f67a985f-c6a0-4796-b255-59d99e317b6f@suse.de>
-Date: Wed, 22 Apr 2026 12:32:34 +0200
+	s=arc-20240116; t=1776854619; c=relaxed/simple;
+	bh=uM1m22NQCJC6W6RjzJbd6hba2pmg1Gp2U5erA96FCJg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZtARE2fUVxMN/imlOjVX4noDW9/hYI1G23qm5gd2GfhFIrp5CkD8oixzi9jZ4K8p5RwCW+Ifwd5OAXwv1GvYfmTASNRzOOGZotUbA9vXCLsFHJ8xX6IXp7zqfMYmDvmeiRPEYgwTacqQn0ATkMcn2qyjvPvRq//r5hga/jEbOMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=uEw11Ere; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=VkDnfR1T; arc=none smtp.client-ip=103.168.172.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 38B6714000E4;
+	Wed, 22 Apr 2026 06:43:35 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Wed, 22 Apr 2026 06:43:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1776854615; x=
+	1776941015; bh=abmoqNblxfuAVDr9rChyocYxcejJ84mZ8H9MflgsjCU=; b=u
+	Ew11EreFFNLlLqsYtfzP0GgKeZ2Sx9qaSIjq3TuuIKmdYK7FDPwZH/aPmQPaWo1t
+	r7CJx27SCVjplvbzbwkVBgZpKY4r2J2YEqSFBURmZJWC/SBDOdRnpAoIhvBK5w/7
+	upBwD0JjOiYsS4urhR2RIrkzS7MJqaSzcYsJ7U6wOvS+Tu5W631Z8POdAW74FDUg
+	rxJG09JQkWVAwH9lTLAIQtZkOEz/sYWDGJdfZ3xdcOLRDEttjyn7eijuaVjR8Nkn
+	Ngbk3XE4aSHact/zrPQCiE13obvt5KsdoYvDVFm7GqfoJ1RR8Y9iLMCw0d5XH1GS
+	7+LcHnJJRrSC5azfamhJA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1776854615; x=1776941015; bh=abmoqNblxfuAVDr9rChyocYxcejJ84mZ8H9
+	MflgsjCU=; b=VkDnfR1Tzp6v7lLd4fXV7kfa6v4sMTq67FXSbr69EmO+AzKlR4B
+	xh3IyIckEye6hbXwYIGEDTbZdxWRK0aiwfU/mGsxk6DGWZxQ9NsiMIPR0RV2UdWi
+	lZJuotMmJIy2ckaiGN/dbB0gjfbXhdo/hp1o67dgn9rEvxc7oqg5lyjXbtjUnt8s
+	gJr3lsp6PobZ+UWlsglFP/1XggWhhsmqUip44xbZOS0Sp7sjyeURVeHR0HdTu/5t
+	byx8roVHNLSTTX5S9wOMpDqH3C/sCoZeEY0lhKAmiuEWo3JkF/jXKHV8CWZn/9Tx
+	ohiYYE6vrT7XgviqWOtaVGCfXahuwNbkdcA==
+X-ME-Sender: <xms:Vqboaac5e0q0c1kjg2EFkW7QkhSycDERUIQwnAbizoJcQWVlxj9hgg>
+    <xme:VqboaZJLxHHl64aGT8WX6V71nHSUifG7dc1LQN_esXGorgzdi4AKGB2lpC7xnetou
+    lrYqba4k_AMYj7Qtya-qOhrWxZ2zfke3xTSC7fBWocj9963Uk4lghk>
+X-ME-Received: <xmr:VqboafyIkZQx2zYekB55gPTbux-pFnoaDvRhxSHAvYOnFgzI9KA52USJUGo->
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdeigedtiecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgr
+    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
+    htthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeegteehgeehieffgfeuvdeuffef
+    gfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepledpmhhouggv
+    pehsmhhtphhouhhtpdhrtghpthhtoheplhhilhhinhhmrghosehkhihlihhnohhsrdgtnh
+    dprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohep
+    ughsrghhvghrnheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtse
+    hgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhr
+    tghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhohhrmh
+    hssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghr
+    nhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvg
+    hrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:VqboaXtx--QqrM0uz3fYDmDloxouxuOznzH5l08cj6u8nPgNsyJo9g>
+    <xmx:VqboaaDPbnedMDXNAkjEDKn9h9O3SizquM5uh54swheWS742YpfYfg>
+    <xmx:VqboaREOBAiMeg5FYAGLZAg-zjdZiaFao-1e3UK_XGOhdK2iP29M2A>
+    <xmx:VqboaSB8rzeF5g5AARdtcMHtnMJssE59ViFJqqqm5e3M2udAaWCkww>
+    <xmx:V6boaRygc9dKZPh5ZVepxeoT44jiDfOBhL4CQg0UOL22syODzkF7UqmS>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 22 Apr 2026 06:43:34 -0400 (EDT)
+Date: Wed, 22 Apr 2026 12:43:32 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Linmao Li <lilinmao@kylinos.cn>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] ipv6: addrconf: skip ERRDAD transition when
+ address already DEAD
+Message-ID: <aeimVEuF6Sn8l0x0@krikkit>
+References: <20260420032842.1063277-1-lilinmao@kylinos.cn>
+ <20260421075033.1110816-1-lilinmao@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Bug#1130336: [regression] Network failure beyond first connection
- after 69894e5b4c5e ("netfilter: nft_connlimit: update the count if add was
- skipped")
-To: Thorsten Leemhuis <regressions@leemhuis.info>,
- =?UTF-8?Q?Alejandro_Oliv=C3=A1n_Alvarez?=
- <alejandro.olivan.alvarez@gmail.com>,
- Salvatore Bonaccorso <carnil@debian.org>, 1130336@bugs.debian.org
-Cc: Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso <pablo@netfilter.org>,
- Phil Sutter <phil@nwl.cc>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- regressions@lists.linux.dev, stable@vger.kernel.org
-References: <177349610461.3071718.4083978280323144323@eldamar.lan>
- <c72a56ab-a16c-4866-9a44-a03393f074db@suse.de>
- <b3cbfd15-acd1-4500-ba30-eac6f48523fb@suse.de> <abW2MAAqLnKZm3KF@strlen.de>
- <177322336258.4376.10097494324750307114.reportbug@Desk1.simalex.iccbroadcast.com>
- <4da571ab-fa1d-4ee6-b71c-24f4a28243ed@suse.de> <abqfSB0TUik1kRU4@eldamar.lan>
- <e24a281622cedf9e8f4dc93c961813aeb7b6ce4c.camel@gmail.com>
- <8788e351-553f-48da-a6e6-ce082adacb8d@suse.de>
- <0b8607c8-2d29-4fca-961a-b7a677e968a1@leemhuis.info>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <0b8607c8-2d29-4fca-961a-b7a677e968a1@leemhuis.info>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -3.01
-X-Spam-Level: 
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260421075033.1110816-1-lilinmao@kylinos.cn>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280377-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[leemhuis.info,gmail.com,debian.org,bugs.debian.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	TAGGED_FROM(0.00)[bounces-280378-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[suse.de:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:dkim,suse.de:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,eldama:email]
-X-Rspamd-Queue-Id: 6DF84444C31
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,queasysnail.net:dkim,messagingengine.com:dkim]
+X-Rspamd-Queue-Id: 53C35444DFA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/22/26 11:18 AM, Thorsten Leemhuis wrote:
-> Lo! Top-posting on purpose to make this easy to process.
-> 
-> What happened to this regression? It looks a bit like things stalled and
-> fell through the cracks. Or Fernando, did you post a patch like you
-> mentioned? I looked for one referring the commit or the reporter, but
-> could not find anything -- but maybe I missed it.
-> 
+2026-04-21, 15:50:33 +0800, Linmao Li wrote:
+> addrconf_dad_end() transitions ifp->state from DAD to POSTDAD under
+> ifp->lock and releases the lock.  addrconf_dad_failure() takes
+> ifp->lock again with the spin_lock_bh() following the
+> net_info_ratelimited() duplicate-address log.  A concurrent
+> ipv6_del_addr() can acquire the lock in that window, set ifp->state
+> to DEAD and run list_del_rcu(&ifp->if_list).
 
-Yes, it stalled and fell through the cracks. Let me prepare a fix as I 
-mentioned.
+You're pretty much saying that the ifp->state check we did in
+addrconf_dad_end before dropping the lock is not valid, so it seems we
+should just skip that separate check since it's not doing anything
+useful, and move it under the "main" lock we acquire after the
+net_info_ratelimited(). There would still be a problem with "we
+dropped the lock in the STABLE_PRIVACY block", which your patch
+handles.
 
-Thanks for the reminder Thorsten!
+> addrconf_dad_failure() then overwrites DEAD with ERRDAD at errdad:
+> and schedules a new dad_work.  The work calls ipv6_del_addr() again,
+> hitting the already-poisoned list entry:
+> 
+>   general protection fault: 0000 [#1] SMP NOPTI
+>   CPU: 4 PID: 217 Comm: kworker/4:1
+>   Workqueue: ipv6_addrconf addrconf_dad_work
+>   RIP: 0010:ipv6_del_addr+0xe9/0x280
+>   RAX: dead000000000122
+>   Call Trace:
+>    addrconf_dad_stop+0x113/0x140
+>    addrconf_dad_work+0x28c/0x430
+>    process_one_work+0x1eb/0x3b0
+>    worker_thread+0x4d/0x400
+>    kthread+0x104/0x140
+>    ret_from_fork+0x35/0x40
+> 
+> Bail out at errdad: when ifp->state is already DEAD. The existing
+> in6_ifa_put() releases the reference taken for this invocation.
 
-> Ciao, Thorsten
-> 
-> On 3/19/26 09:59, Fernando Fernandez Mancera wrote:
->> On 3/19/26 9:44 AM, Alejandro Oliván Alvarez wrote:
->>> Hi folks.
->>>
->>> On Wed, 2026-03-18 at 13:49 +0100, Salvatore Bonaccorso wrote:
->>>> Hi Alejandro,
->>>>
->>>> On Sun, Mar 15, 2026 at 02:09:33AM +0100, Fernando Fernandez Mancera
->>>> wrote:
->>>>> On 3/14/26 8:25 PM, Florian Westphal wrote:
->>>>>> Fernando Fernandez Mancera <fmancera@suse.de> wrote:
->>>>>>> On 3/14/26 5:13 PM, Fernando Fernandez Mancera wrote:
->>>>>>>> Hi,
->>>>>>>>
->>>>>>>> On 3/14/26 3:03 PM, Salvatore Bonaccorso wrote:
->>>>>>>>> Control: forwarded -1
->>>>>>>>> https://lore.kernel.org/
->>>>>>>>> regressions/177349610461.3071718.4083978280323144323@eldama
->>>>>>>>> r.lan
->>>>>>>>> Control: tags -1 + upstream
->>>>>>>>>
->>>>>>>>> Hi
->>>>>>>>>
->>>>>>>>> In Debian, in https://bugs.debian.org/1130336, Alejandro
->>>>>>>>> reported that
->>>>>>>>> after updates including 69894e5b4c5e ("netfilter:
->>>>>>>>> nft_connlimit:
->>>>>>>>> update the count if add was skipped"), when the following
->>>>>>>>> rule is set
->>>>>>>>>
->>>>>>>>>        iptables -A INPUT -p tcp -m
->>>>>>>>> connlimit --connlimit-above 111 -j
->>>>>>>>> REJECT --reject-with tcp-reset
->>>>>>>>>
->>>>>>>>> connections get stuck accordingly, it can be easily
->>>>>>>>> reproduced by:
->>>>>>>>>
->>>>>>>>> # iptables -A INPUT -p tcp -m connlimit
->>>>>>>>> --connlimit-above 111 -j REJECT
->>>>>>>>> --reject-with tcp-reset
->>>>>>>>> # nft list ruleset
->>>>>>>>> # Warning: table ip filter is managed by iptables-nft, do
->>>>>>>>> not touch!
->>>>>>>>> table ip filter {
->>>>>>>>>             chain INPUT {
->>>>>>>>>                     type filter hook input priority filter;
->>>>>>>>> policy accept;
->>>>>>>>>                     ip protocol tcp xt
->>>>>>>>> match "connlimit" counter packets 0
->>>>>>>>> bytes 0 reject with tcp reset
->>>>>>>>>             }
->>>>>>>>> }
->>>>>>>>> # wget -O /dev/null
->>>>>>>>> https://git.kernel.org/torvalds/t/linux-7.0-
->>>>>>>>> rc3.tar.gz
->>>>>>>>> --2026-03-14 14:53:51--
->>>>>>>>> https://git.kernel.org/torvalds/t/linux-7.0-
->>>>>>>>> rc3.tar.gz
->>>>>>>>> Resolving git.kernel.org
->>>>>>>>> (git.kernel.org)... 172.105.64.184,
->>>>>>>>> 2a01:7e01:e001:937:0:1991:8:25
->>>>>>>>> Connecting to git.kernel.org
->>>>>>>>> (git.kernel.org)|172.105.64.184|:443...
->>>>>>>>> connected.
->>>>>>>>> HTTP request sent, awaiting response... 301 Moved
->>>>>>>>> Permanently
->>>>>>>>> Location:
->>>>>>>>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/
->>>>>>>>> linux.git/snapshot/linux-7.0-rc3.tar.gz
->>>>>>>>> [following]
->>>>>>>>> --2026-03-14 14:53:51--
->>>>>>>>> https://git.kernel.org/pub/scm/linux/kernel/ git/torvalds/l
->>>>>>>>> inux.git/snapshot/linux-7.0-rc3.tar.gz
->>>>>>>>> Reusing existing connection to git.kernel.org:443.
->>>>>>>>> HTTP request sent, awaiting response... 200 OK
->>>>>>>>> Length: unspecified [application/x-gzip]
->>>>>>>>> Saving to: ‘/dev/null’
->>>>>>>>>
->>>>>>>>> /dev/null                         [
->>>>>>>>> <=>                    ] 248.03M
->>>>>>>>> 51.9MB/s    in 5.0s
->>>>>>>>>
->>>>>>>>> 2026-03-14 14:53:56 (49.3 MB/s) - ‘/dev/null’ saved
->>>>>>>>> [260080129]
->>>>>>>>>
->>>>>>>>> # wget -O /dev/null
->>>>>>>>> https://git.kernel.org/torvalds/t/linux-7.0-
->>>>>>>>> rc3.tar.gz
->>>>>>>>> --2026-03-14 14:53:58--
->>>>>>>>> https://git.kernel.org/torvalds/t/linux-7.0-
->>>>>>>>> rc3.tar.gz
->>>>>>>>> Resolving git.kernel.org
->>>>>>>>> (git.kernel.org)... 172.105.64.184,
->>>>>>>>> 2a01:7e01:e001:937:0:1991:8:25
->>>>>>>>> Connecting to git.kernel.org
->>>>>>>>> (git.kernel.org)|172.105.64.184|:443...
->>>>>>>>> failed: Connection timed out.
->>>>>>>>> Connecting to git.kernel.org
->>>>>>>>> (git.kernel.org)|
->>>>>>>>> 2a01:7e01:e001:937:0:1991:8:25|:443...
->>>>>>>>> failed: Network is unreachable.
->>>>>>>>>
->>>>>>>>> Before the 69894e5b4c5e ("netfilter: nft_connlimit: update
->>>>>>>>> the count
->>>>>>>>> if add was skipped") commit this worked.
->>>>>>>>>
->>>>>>>>
->>>>>>>> Thanks for the report. I have reproduced
->>>>>>>> this on upstream kernel. I am working on it.
->>>>>>>>
->>>>>>>
->>>>>>> This is what is happening:
->>>>>>>
->>>>>>> 1. The first connection is established and
->>>>>>> tracked, all good. When it finishes, it goes to
->>>>>>> TIME_WAIT state
->>>>>>> 2. The second connection is established, ct is
->>>>>>> confirmed since the beginning, skipping the
->>>>>>> tracking and calling a GC.
->>>>>>> 3. The previously tracked connection is cleaned
->>>>>>> up during GC as TIME_WAIT is considered closed.
->>>>>>
->>>>>> This is stupid.  The fix is to add --syn or use
->>>>>> OUTPUT.  Its not even clear to me what the user wants to achive
->>>>>> with this rule.
->>>>>>
->>>>>
->>>>> Yes, the ruleset shown does not make sense. Having said this, it
->>>>> could
->>>>> affect to a soft-limit scenario as the one described on the blamed
->>>>> commit..
->>>>
->>>> Alejandro, can you describe what you would like to achieve with the
->>>> specific rule?
->>>>
->>>> Regards,
->>>> Salvatore
->>>
->>> The intended use of that rule was to prevent (limit) a single host from
->>> establishing too many TCP connections to given host (Denial of
->>> Service... particularly on streaming servers).
->>>
->>> I learnt about it in several IPtables guides/howtos (maaaany years
->>> ago!), and never was an issue on itself.
->>> Was it stupid? ... possibly... It 'seemed' to work, or, at least, when
->>> checking iptables -L -v one could see packet counter for the rule
->>> catching some traffic, without ever noticing it being troublesome, so,
->>> at the very least it 'didn't hurt', and, since DoS ever happened over
->>> the years...well, I tended to think it was indeed working the way I
->>> read it did.
->>>
->>> Certainly, I never (the authors of those guides at their time indeed)
->>> though about the possibility of just target the TCP syn.
->>> I have given a try to adding the --syn option to the rule to see the
->>> difference, and well, it is way less disruptive that way, but it still
->>> breaks things (I saw postfix queues hanging, for instance).
->>>
->>
->> The current problem with the ruleset is that it mixes both, incoming and
->> outgoing connections. This should probably use --syn flag so it targets
->> connections established against your host only.
->>
->> Anyway, I am sending a patch fixing this as it makes sense to do it IMO.
->> We just want to understand what is the real use-case and how the ruleset
->> can be improved.
->>
->> In addition, I would recommend you to transition to nftables because it
->> would be ideal for your use-case. With nftables it would be easy to
->> combine this with sets and probably quota expression to limit the usage.
->>
->> What is wrong with the current ruleset? (Even before the blammed
->> commit), if you reach the connlimit limit **ALL** TCP connections will
->> be rejected (including legit ones), I do not think that is what you want
->> to achieve.
->>
->> Thanks,
->> Fernando.
->>
->>> So, I have but screwed the idea of using connlimit anymore anyways.
->>> Sorry for the noise. Lesson learned.
->>>
->>> Cheers!
->>
->>
-> 
-> 
+Mentioning "the existing in6_ifa_put()" is a bit confusing since
+you're adding a separate unlock/put/return path.
 
+-- 
+Sabrina
 
