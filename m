@@ -1,100 +1,93 @@
-Return-Path: <netdev+bounces-280468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280469-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iCPlCi3y6GkdRwIAu9opvQ
-	(envelope-from <netdev+bounces-280468-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:07:09 +0200
+	id WIvTNObz6GmQSAIAu9opvQ
+	(envelope-from <netdev+bounces-280469-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:14:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B74B94483DB
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:07:03 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2FEE448584
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:14:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 75B6B3013BB1
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 16:05:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9655930FC104
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 16:07:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31C1638CFE4;
-	Wed, 22 Apr 2026 16:05:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6830834A3AC;
+	Wed, 22 Apr 2026 16:06:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aLdUHqnY"
+	dkim=pass (2048-bit key) header.d=bell-sw-com.20251104.gappssmtp.com header.i=@bell-sw-com.20251104.gappssmtp.com header.b="HYl1TdMB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00415383C78
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 16:05:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B49CA273D77
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 16:06:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776873917; cv=none; b=VuBBZyqei8/tasC3jVuX3Oe5l7StOv9mzd/BW5Lko0pH4CvTKXhDVIckrTHNKK7VpHVYxFls1cXzHWgx9xMh+CoAXtbkr1bY/qom6s5Mn5KlYzZF0ou7G3kKChJSA6Cy2aimmJIH3A6wzKZ9PyYoXU/c2XT9ri3FvmmSdM9YKZE=
+	t=1776873993; cv=none; b=jgcGJ/1+sLW1Z0ghVMD0i46LUzpQemsAGkCPC2MoV5o5JifNwljT3CGQGekZ1MFLTadAyOljDjk7VGvAf0G21gptTSL+XzJ3lofxw6OXriMvfU4dYVYiLIHaHNK/u7FBgqlOTCGA89Lb16cY0P8FhHSj5ckoNaoWauUZz8njN7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776873917; c=relaxed/simple;
-	bh=AtnVryVx9lrXSxBtUvHjd0g9UDr19+73eoU6BB1Ndsw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qAy2ZLrFoMi1rWHbt58h23Qho3uPaanoNqcw5bfIANtAiqivpeTd3QfDjD5KaVrUBPoQQC0/M7ifttFcJpAsr1aeiEFsYYCHxO0izvREyYzHfyLal/Lhaz7PUZZc8M9ywn6RJk1XotNn+0ys7qtavFoYgaSP/iopNddTIUbmsWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aLdUHqnY; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-8f0579401c4so56242785a.3
-        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 09:05:14 -0700 (PDT)
+	s=arc-20240116; t=1776873993; c=relaxed/simple;
+	bh=OES11U6RJhIxlpYHbZu1AGI2yaa+zPDWZog/rE/nnbw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mnR1Rc9YJNDoBb79XYB8+g1FWwV1hCTzLzC7jQzrJccuV2FsFOKUv4b1H8D2Gfkj2nPV85WD9tkCndcvNQ/cDi104VUMRFS7S3zqH88SapCK0WYy0Qq5G+WUi3TT6VI5ldSUQtrXscSZFYR9942G+oqyZTtAK1t+BJ0M4VQNOJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bell-sw.com; spf=pass smtp.mailfrom=bell-sw.com; dkim=pass (2048-bit key) header.d=bell-sw-com.20251104.gappssmtp.com header.i=@bell-sw-com.20251104.gappssmtp.com header.b=HYl1TdMB; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bell-sw.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bell-sw.com
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-79a7109f568so67275947b3.1
+        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 09:06:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776873914; x=1777478714; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LAsi8zUH7ChWQsvBus194I1lIQB9uLlb+xLBIearhJU=;
-        b=aLdUHqnYoPmjaVv77TbajnV64t+k67UNr+/eSkA92z9mGge6w60zePtKDJkemqRBsz
-         FaVj66iKYrFVWCzc6tdvGP7B2rP8/HuwDJ3k9OzI9MSpzlVC2j5b11vxwafuoBxVDH+E
-         yvMKawCmuFVOsH0UJLDMl7KpdhvB+RuKlI5QaIRI1f62Y3/bHY8+VBH+dzvSgry/16mS
-         sA8OsDIwRjx3wuDwP2MjoT9djMOdoThLtP0vLcYRoe+0Nb0FTObW2JNX9dtr3sap3Qsh
-         wkOqM+0Bb4lwdehyaWuYGU4l8/alXO1vapd9/7+hbxe9JAQ+neL6XbHsiMFvSDxhUxhn
-         X9TQ==
+        d=bell-sw-com.20251104.gappssmtp.com; s=20251104; t=1776873990; x=1777478790; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/3fX2z9Ff+ct+KP7n89t0K+j23JpEAx6OoiTsK1z6EE=;
+        b=HYl1TdMBKtbUtToN3GmTQGDieBaOmYsMUixq5t/bu/wuk9xiYrYjVu3qS6vFqK1Nuv
+         oqXhU1m9T1OaXaZ3fP4JbNJY01cszxkf2NoH9oBs3aWJ2T3XDw+3OtSjd6XDetl3EYPV
+         Ulvz2rxtOKlP9SIzDQsw/cq9diyhMErZf/RveN3ZtC10SJsxWS+McxAP3W7OavJHFBU+
+         kPdprNfRpnFaKIzlRPs5+yuotHvej+mlBwFTLOBsxx/ayRd2t2klLR5RqIyVjSBpTZHm
+         UH6rthaPAL9nS4/ww7LUWRp6LVT2UMq5gIND2GFBTdpvpI+xuwO8Y9pZG22S230BM+La
+         HI7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776873914; x=1777478714;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=LAsi8zUH7ChWQsvBus194I1lIQB9uLlb+xLBIearhJU=;
-        b=j8kDuoHSEHXU5mlhbaScrcM93r7+pFOeeOqx5AirgUNY9819cp7rfGxxUsfA3GN2+l
-         mKq7zyXAg9U84iTwJn66x+c2OeaqZPK1kqF/etVF3YeFMCNZJ2dHtpKtA8Csp+IpE2MF
-         k4CEZaCuuFyDackHEht3VVdpAs8cGeGhMfH66rTXbL5MKNQ/EDpf8CkQhSQPQNIWSy7E
-         Kh6tWS+OYE61hQozI8Ke8XvLlBby3MLcyp9YFxXCA5kL7kFmHeUX6ip6uXqv/qnq4CK/
-         BTkrWjVyWzdovIAl1/RPHrVY6Y38ZETyeSfXu233QavMW7klIhDWktUzoLVluc/Q8ykI
-         l05w==
-X-Forwarded-Encrypted: i=1; AFNElJ+xUNoDTVcIFxsP09fs81XQuhRiToNcZFfoP/NY5OlQDihkyvJX/buHEYist43dfsajMHhR6/s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzW2Xn1+QDK5zQ9STHXLFGuevyiakzah+poI62E+xEe9gMLPjTz
-	lz+wvnO9H0ocnNDiIkJt668oJjtyCokdLoINoTFZODbjd7RmQz+lJZgZ
-X-Gm-Gg: AeBDievKDnAVWb3z7RuHQhFxHGuaJ4mb+s0W0keg9aXjtXEb6n1koqz+Luh/5Pw3nmY
-	zuWRpAKY69zq+UWQSlIPb4tCu3I4TDl3W458ajU2uh9RWKMkZhDFfz/RToIuPpfSAHviEOA43Yj
-	tKylfbiDEYsjM5vB4Iok5m9TuqjPpR9kII4UUBrs48kW9HBtsYTOxaMdo/L3VeNypAaijSh+teH
-	LmpnAYfpk0C/FN/y1/Ayci4Jd3DyLMv3bwJx54GsSYNAho5BqWH4JmBx+RE5mXzNH5NW3ef9MIV
-	mdAVt9CaTlNU4n6tWXItRadVmIFj2jobSv/3CWGRaD5MKG5GM6B9JejKZr76L9DgWNw802K9MHX
-	suFWgwHJmi2D6gX7/Bv2MXxry62ZeVuNt5sLVcMzI9Q+x31rVLmCX1GE+RjsWXtw27Om/N8iCcr
-	U3aCVmTpln5loRCjx2i7rSTQqFAAQ9RrS9Z6rGQeprOUzC0S/pFyFoD7PM9MiqTpyfgLrRERH+U
-	myH+TvKVYRp3lKnDjwYcgES+oRtyLM=
-X-Received: by 2002:a05:6214:400a:b0:8a0:846e:8850 with SMTP id 6a1803df08f44-8b028042ba3mr348401516d6.20.1776873913609;
-        Wed, 22 Apr 2026 09:05:13 -0700 (PDT)
-Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b02ac462d9sm136370786d6.7.2026.04.22.09.05.12
+        d=1e100.net; s=20251104; t=1776873990; x=1777478790;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/3fX2z9Ff+ct+KP7n89t0K+j23JpEAx6OoiTsK1z6EE=;
+        b=Y1M+HbLHmTnJP/PBZl2taCUyGfosDMYS5ZmXdjkIbp8DNQQC14bUgD7hy14DP0lIAO
+         iWsMcpU2ctyhxfy3zMB9i5WiX1v2VeC5aMZlaGudhsyZCZDxAGtfMf+luJ6r9AWf4oOT
+         Kb0otyg7MJkSew4lRCAO/n7TBJnPWrVSgSe9srwMIhOBb3ZAq+DYHIYlnyyMPtQHxlHn
+         Wc8wVkA2hZSfJKcMidiCdpdwyj2XDiIy1fO6EWehDOqZBrz9HmZGbZJCA6UFVr7zrWZb
+         YJvguOTIJoNOslC56WCa9iWgHnkRbDAQiTKIdDhZmkxZ/aA04YnidY5/bNlVvtjCh3EF
+         R57g==
+X-Gm-Message-State: AOJu0YwhRfw/di5w5jhoxbp+1D4dvgRxW2nmU9uj+IOZ+ahv2qjcW3bK
+	BkQkjBK4o4vvcb6ZK0AbmBxjlMYungEd94KDiCdfNBHtzX22edO5PC12pWI2QVQqFO/XG3aPXfE
+	ROns=
+X-Gm-Gg: AeBDietPB36LxiVr9dktnv+zWob9mtn9YGCxNqv50VDClWe0u+Ng/ciu3ATRKpt9gAp
+	n2FJya2VliA/TqWnF/maEsW6FL+sz1Qh+FRcvKUIcptWmpulZtgixmgmrUUTlVQu1FLoFjZ62Ln
+	7eTsw4mCT7KElHC0JkfjnCjyMOxq17WZN0FqhL9xtCnmjU3xePfw2J40qsr7gcwW+EB6oWJ9mH9
+	yVgBV+Sc0t/3W2ehVbQXZaPWnJOdoEKmAYB1hfjDEfcL1ejtcacdGdE+UgXZry8S20orzjET2Nt
+	Lc+73bva2WMOyXXu0wyRth0Dy4nOF1fz1TlY35IYHyE0wna2mNBWOvdcqTwAQ5ux/iU1/ZvYm6s
+	VfW1T5yaZZoOPLfAo5XVo554SIt76H5jHbjTc38jx7yyXKbIajURiJqHX+om2D6IxVFrTP9hrA6
+	xDVbIaiMrAPmUnRLh2GJnDOVP/+0nnH5wa3JFvV1/ZEbe2YUNTTRHcAA==
+X-Received: by 2002:a05:690c:e3ee:b0:7b1:d1af:4ba6 with SMTP id 00721157ae682-7b9ed03cdf8mr252646437b3.43.1776873990023;
+        Wed, 22 Apr 2026 09:06:30 -0700 (PDT)
+Received: from localhost.localdomain ([185.119.0.227])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7b9ee8c03c8sm71079887b3.15.2026.04.22.09.06.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Apr 2026 09:05:12 -0700 (PDT)
-From: Michael Bommarito <michael.bommarito@gmail.com>
-To: Samuel Mendoza-Jonas <sam@mendozajonas.com>,
-	Paul Fertser <fercerpav@gmail.com>,
-	netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+        Wed, 22 Apr 2026 09:06:29 -0700 (PDT)
+From: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
+To: netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
 	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	Michael Bommarito <michael.bommarito@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net 6/6] net/ncsi: validate GP payload lengths before parsing
-Date: Wed, 22 Apr 2026 12:03:42 -0400
-Message-ID: <20260422160342.1975093-7-michael.bommarito@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260422160342.1975093-1-michael.bommarito@gmail.com>
-References: <20260422160342.1975093-1-michael.bommarito@gmail.com>
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	oss-drivers@corigine.com,
+	Alexey Kodanev <aleksei.kodanev@bell-sw.com>
+Subject: [PATCH net v2] nfp: fix swapped arguments in nfp_encode_basic_qdr() calls
+Date: Wed, 22 Apr 2026 16:05:36 +0000
+Message-Id: <20260422160536.61855-1-aleksei.kodanev@bell-sw.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,89 +95,135 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.44 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[bell-sw-com.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[bell-sw.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-280469-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280468-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	MAILSPIKE_FAIL(0.00)[2600:3c09:e001:a7::12fc:5321:query timed out];
-	FREEMAIL_TO(0.00)[mendozajonas.com,gmail.com,vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[aleksei.kodanev@bell-sw.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[bell-sw-com.20251104.gappssmtp.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B74B94483DB
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bell-sw-com.20251104.gappssmtp.com:dkim,bell-sw.com:mid,bell-sw.com:email]
+X-Rspamd-Queue-Id: B2FEE448584
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-ncsi_rsp_handler_gp() now bounds MAC and VLAN counts to software
-and GC-reported limits, but it still assumes the advertised GP
-payload is large enough for the fixed fields plus the consumed
-filter-table bytes. A short GP reply can still make parsing start
-past the payload or walk beyond its tail.
+There is a mismatch between the passed arguments and the actual
+nfp_encode_basic_qdr() function parameter names:
 
-Validate that the declared GP payload covers the fixed GP prefix,
-the consumed MAC and VLAN entries, and the checksum before parsing
-the filter tables.
+  static int nfp_encode_basic_qdr(u64 addr, int dest_island, int cpp_tgt,
+                                  int mode, bool addr40, int isld1,
+                                  int isld0)
+  {
+      ...
 
-Fixes: 062b3e1b6d4f ("net/ncsi: Refactor MAC, VLAN filters")
-Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-opus-4-7
-Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+But "dest_island" and "cpp_tgt" are swapped at every call-site.
+For example:
+
+  return nfp_encode_basic_qdr(*addr, cpp_tgt, dest_island,
+                              mode, addr40, isld1, isld0);
+
+As a result, nfp_encode_basic_qdr() receives "dest_island" as CPP target
+type, which is always NFP_CPP_TARGET_QDR(2) for these calls, and "cpp_tgt"
+as the destination island ID, which can accidentally match or be outside
+the valid NFP_CPP_TARGET_* types (e.g. '-1' for any destination).
+
+Since code already worked for years, also add extra pr_warn() to error
+paths in nfp_encode_basic_qdr() to help identify any potential address
+verification failures.
+
+Detected using the static analysis tool - Svace.
+
+Fixes: 4cb584e0ee7d ("nfp: add CPP access core")
+Signed-off-by: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
 ---
- net/ncsi/ncsi-rsp.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
 
-diff --git a/net/ncsi/ncsi-rsp.c b/net/ncsi/ncsi-rsp.c
-index 94354dca23ea..565d38fd4b92 100644
---- a/net/ncsi/ncsi-rsp.c
-+++ b/net/ncsi/ncsi-rsp.c
-@@ -899,6 +899,8 @@ static int ncsi_rsp_handler_gp(struct ncsi_request *nr)
- 	struct ncsi_dev_priv *ndp = nr->ndp;
- 	struct ncsi_rsp_gp_pkt *rsp;
- 	struct ncsi_channel *nc;
-+	size_t needed;
-+	unsigned int payload;
- 	unsigned short enable;
- 	unsigned char *pdata;
- 	unsigned long flags;
-@@ -924,6 +926,14 @@ static int ncsi_rsp_handler_gp(struct ncsi_request *nr)
- 	if (rsp->mac_cnt > mac_nbits || rsp->vlan_cnt > ncvf->n_vids)
- 		return -ERANGE;
+v2: tag patch for "net"
+    add extra warnings to nfp_encode_basic_qdr() error paths
+
+ .../ethernet/netronome/nfp/nfpcore/nfp_target.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_target.c b/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_target.c
+index 79470f198a62..9cf19446657c 100644
+--- a/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_target.c
++++ b/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_target.c
+@@ -435,12 +435,17 @@ static int nfp_encode_basic_qdr(u64 addr, int dest_island, int cpp_tgt,
  
-+	payload = ncsi_rsp_payload(nr->rsp);
-+	needed = offsetof(struct ncsi_rsp_gp_pkt, mac) - sizeof(rsp->rsp);
-+	needed += mac_cnt * ETH_ALEN;
-+	needed += vlan_cnt * sizeof(__be16);
-+	needed += sizeof(rsp->checksum);
-+	if (payload < needed)
-+		return -EINVAL;
-+
- 	/* Modes with explicit enabled indications */
- 	if (ntohl(rsp->valid_modes) & 0x1) {	/* BC filter mode */
- 		nc->modes[NCSI_MODE_BC].enable = 1;
+ 	/* Full Island ID and channel bits overlap? */
+ 	ret = nfp_decode_basic(addr, &v, cpp_tgt, mode, addr40, isld1, isld0);
+-	if (ret)
++	if (ret) {
++		pr_warn("%s: decode dest_island failed: %d\n", __func__, ret);
+ 		return ret;
++	}
+ 
+ 	/* The current address won't go where expected? */
+-	if (dest_island != -1 && dest_island != v)
++	if (dest_island != -1 && dest_island != v) {
++		pr_warn("%s: dest_island mismatch: current (%d) != decoded (%d)\n",
++			__func__, dest_island, v);
+ 		return -EINVAL;
++	}
+ 
+ 	/* If dest_island was -1, we don't care where it goes. */
+ 	return 0;
+@@ -493,7 +498,7 @@ static int nfp_encode_basic(u64 *addr, int dest_island, int cpp_tgt,
+ 			 * the address but we can verify if the existing
+ 			 * contents will point to a valid island.
+ 			 */
+-			return nfp_encode_basic_qdr(*addr, cpp_tgt, dest_island,
++			return nfp_encode_basic_qdr(*addr, dest_island, cpp_tgt,
+ 						    mode, addr40, isld1, isld0);
+ 
+ 		iid_lsb = addr40 ? 34 : 26;
+@@ -504,7 +509,7 @@ static int nfp_encode_basic(u64 *addr, int dest_island, int cpp_tgt,
+ 		return 0;
+ 	case 1:
+ 		if (cpp_tgt == NFP_CPP_TARGET_QDR && !addr40)
+-			return nfp_encode_basic_qdr(*addr, cpp_tgt, dest_island,
++			return nfp_encode_basic_qdr(*addr, dest_island, cpp_tgt,
+ 						    mode, addr40, isld1, isld0);
+ 
+ 		idx_lsb = addr40 ? 39 : 31;
+@@ -530,7 +535,7 @@ static int nfp_encode_basic(u64 *addr, int dest_island, int cpp_tgt,
+ 			 * be set before hand and with them select an island.
+ 			 * So we need to confirm that it's at least plausible.
+ 			 */
+-			return nfp_encode_basic_qdr(*addr, cpp_tgt, dest_island,
++			return nfp_encode_basic_qdr(*addr, dest_island, cpp_tgt,
+ 						    mode, addr40, isld1, isld0);
+ 
+ 		/* Make sure we compare against isldN values
+@@ -551,7 +556,7 @@ static int nfp_encode_basic(u64 *addr, int dest_island, int cpp_tgt,
+ 			 * iid<1> = addr<30> = channel<0>
+ 			 * channel<1> = addr<31> = Index
+ 			 */
+-			return nfp_encode_basic_qdr(*addr, cpp_tgt, dest_island,
++			return nfp_encode_basic_qdr(*addr, dest_island, cpp_tgt,
+ 						    mode, addr40, isld1, isld0);
+ 
+ 		isld[0] &= ~3;
 -- 
-2.53.0
+2.25.1
 
 
