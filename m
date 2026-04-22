@@ -1,225 +1,225 @@
-Return-Path: <netdev+bounces-280559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280561-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CPv9IdhQ6Wl2XgIAu9opvQ
-	(envelope-from <netdev+bounces-280559-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 00:51:04 +0200
+	id L5E9Kstd6WmpYAIAu9opvQ
+	(envelope-from <netdev+bounces-280561-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 01:46:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0553244B5AF
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 00:51:03 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1286C44BD99
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 01:46:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 059F13031011
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 22:51:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BAF48305F812
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 23:46:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CDB3377542;
-	Wed, 22 Apr 2026 22:51:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7399337110;
+	Wed, 22 Apr 2026 23:46:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EyI4fjzh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LEov8WDK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3581C701F
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 22:50:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776898262; cv=none; b=WdD/9+skQEN9a526Py/C2yEFjkhvdsF+z1PGVX9V9mymRu9XD7cvYkj01qzYlOD3D32UR5b5riKYZLUiKzUmGDHBfzV/Qa7XDb+KEz9PtGK+loR7jyoBk+sctQ8UrSGL6RVchN6mbpvV/bp67Am+o0+8vWQ7iuHDnNSVJdV2vU0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776898262; c=relaxed/simple;
-	bh=ks+dCualzOaqs77AbQPlKYXvBqKtbOBNZnorH0jGzJs=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=KdH8xqPfFZzfTm2UyzQOqUL2+vYsKSwoWUCHwdGJP6abvzAtn55Kv3q+QRPpTFFiGgQG5m1DU6KZMwV9/hVc/eiI+2Wi7zvUDXaTQ1QH+8gB7Sl79Xx7ux5VPLACkWABta/+auL1+fT9C8MSS/KXLACfm0iLbQlsvYt4WNzgc5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EyI4fjzh; arc=none smtp.client-ip=74.125.82.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3E0280A5B
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 23:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776901576; cv=pass; b=lz78DmSIs74LAKoNgF95EfZETYHzGClLGt52S6myjRswVfPLcrqSmbFYPP7D00Sx4XGlC1VjBpAcu49GVF9ixGZoQE0bzNQlFtVmCwNHJEejp5k/Ah/N+xP3rTNcIfdD+29QYCnc89j8nGKYuwxoiKwZQM4wKndPpE+UmXYpmiU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776901576; c=relaxed/simple;
+	bh=r85R57NVW8eSM/NE6sMPR1IjJ29w3fmDxqW/oYNi0ww=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UnN55dadimAcs27Rj7XKSWNz3vj8sPlyta1y8vt8AXijUELW9hWEryi0j4Z9dHdoLuxEe+wCnOx5wxadZZRMEJXQeCMX6wsI67p+0tEbOn8NZbPlFxdASC2Vo35GNfg1CeQjpV4YvzWwPQ2voSZgHJLpsNHglEDeQiEGRtJg1cM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LEov8WDK; arc=pass smtp.client-ip=209.85.167.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-12c637089ccso3559892c88.1
-        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 15:50:55 -0700 (PDT)
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5a2b5ea59a1so8263723e87.1
+        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 16:46:15 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776901573; cv=none;
+        d=google.com; s=arc-20240605;
+        b=R1tRjucOOp0NH2vRAE760qosisCrg+qWz33BT0m6J5rIlIDKou4N7/iPe7axO0qPg6
+         o4ZKtw59ztoBN5naRqtoByQY9561s2BJSr4FMWB/xGFeOYXtJANHzxveJ9M3/YQAffcX
+         MvJO+c4ooWZQuQZCycdefBR8OFOUVcmRWYM8POt4gjrWIfphy9/zQUCoe/fl71ThUpMz
+         TGQMqeFsiyYzEFs2Uorp25hYueMRSVXebKkjjlFmHQa2JAtKwr95rfZwNC569d0DIa1H
+         iwp4KjhmhdKJhOGxt/ZJl5MvF1+3vk3M27EjUUK3VHKBnlAfPg1WEVf1dCQmM4C+n0j1
+         cG2g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=GVdJjNNn1/VkVF3ZLZB/9uFSUrjOsGK5ioRT6dmRAqE=;
+        fh=etdBIslC9HzJHxzuDlspvI2iUE2k0njBXSxxDMiR+hA=;
+        b=SJFU5btWm26dTG7LtiysSJGVrGWmK/9Dnm1nj1E0xVjV9XVn9wGTDP58HwrZ6LjE9h
+         zbiuMwbZe8xDRkmiBMcXLZds5A6j7mMPIKBTFnE3KAEXdkoMLm1YxMgRHsIrGLqPwE6o
+         gaQM/R+LqUug7aCKgo9UJ/lI2W2GjANCMks73wPV+VusiyWt+rmO2iZFykmRWf4o5uYW
+         QKVDBCfp9RH2l4zLroGen0XBY5u+LpjIDrCBCWc1HqoWbXRxP4WNDd+R0p5elXh9OolX
+         WULKq1GXb1w5nYMoLmS3J3a2mTViYbqMeY5x3H09+sJpOkD/S3IZUbqU5gjV5qQSymSW
+         h+Xw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776898255; x=1777503055; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=EsIQHrEiJD5FzpoBONUuhlECKQYQ9gBcLPk2ubeY5ao=;
-        b=EyI4fjzheJmLMslMftbiCJbsvExX5Z0TDiI4LyK3u+VBtkPbbiZIn/8dRL4qjmDVUJ
-         dR1I2/q5zK1lx0X9MmwCAFjMwzzyNnoBKMrjsiyaM9jfot5Ixkylfsu82GNypNd11DP/
-         4ULbjG39JJO28vJ+pshVr/fKvhIimhn3WwFbW3NZ6pUtiQ3OXm/6GNyL0qpygJdYIIwP
-         3/th6UscbJSViPdI15cx4DsjDVSLViUJqaBRu0jABpSKLXSBRzTeTUZPASkpXrcEd0xC
-         TcXva58x2fAgMFLxtqrB7VcjG4FJ5HjmUW+VdCYVPNLw2NiEI6b/Dppua2gROrxYjYoT
-         2ctg==
+        d=gmail.com; s=20251104; t=1776901573; x=1777506373; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GVdJjNNn1/VkVF3ZLZB/9uFSUrjOsGK5ioRT6dmRAqE=;
+        b=LEov8WDKj597klFA7bnqipJ0uFLax7RlRjwccd8yOQDCwp4xFmWBUf8jV3Zll5S13Q
+         Dk/QDEozJVBofGP6kJa3rN7MOABT5x1R7rrQ8gANflGPQvuVjt3Fs7IQ+AXNjRhSf1xl
+         vwy5GmEbqlM3Vt402SxXSR86FmGR58oZi4raKZwBBa5WR00A/W7nLAiSddSddYrMnqbh
+         SZ07wLLNJcdYkvXRJ6MxNFSHKCUj6KSh9k3s/Dnx9jYO/vWwOt8I5aw38bCiWWL8P9ta
+         GmDo7FQVRUHC9EZgg4joiWETeinHS5N7VD9O04mKxLQD3Tr08JFHW21547aDkQ3hq53W
+         diMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776898255; x=1777503055;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EsIQHrEiJD5FzpoBONUuhlECKQYQ9gBcLPk2ubeY5ao=;
-        b=qIzMQl4eArnnNFLukEFIJeRXtPvz1kES0IG3XSZN5rlaU8StoSccnvSWb06ah8yS11
-         rrLJScEXClk5CWlWx7fff9DgzGRZfKFwIrNuXE5HkTZWltUIPmDW32eUtrOaaJMUVwgj
-         k2uhkZaYox2NfpUHZtb2Sy5ltetKAMMi+uUZVkkVTaRex6L0yD6OyLQsvXXZbX1JAmBq
-         u5gZXNbpaQu/7zJamQO13SGOhzjooG+3GR3DNBontvyvg+3/jmuRSGxDn2A9FzezeVhn
-         1X8jxIpauhH/LkLIT6kNbFcHeWbn8sd+FSMwwZZqXCTOt4jbiJ1Ehg0wdKwPrnhv2x9D
-         NeKw==
-X-Forwarded-Encrypted: i=1; AFNElJ9eCEE8UfNhbVJh0ev4Emr4KK0nWRISgcb5MRAh6aT0/fQK1CfJLGrVUDk6UXAmq6/P7BwTZzI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKiQ5L4dszlGbE4zDkhu85o9DRL3y+KlzgAxrTtva45xjBksa3
-	Fwb2tu8AXrB8/Z/RDf7nhpA4xq9LrSPW07htUjltwVtr210hbA2GK3RP
-X-Gm-Gg: AeBDievT1jQt+6IuoS9YxRdglzMXbKKroYcLVIGY7wWnMUCQN0s+jHrBbP6rRM9f8IW
-	BOm9ZdWE5vXxB8Y6vSrw9CHrxziAvLO2B6eYtIAQjCGGezvmfOaSV5AVAJXaQKPnBISExma0ubN
-	DMjRqFiLWFIB9sSyHJ52w1HsRiTeQgnQItbr7ukjL1nMyTSUtO+YB9ACffPwKCtaskyJdx7rYkM
-	fuYIvEDxx4mJk/9SmMqCCFtM+jNHqWkuxBQJdxHyeHZ39+wVXYCdRi/CykS40OcsqbYFmvM1nlT
-	9evfpbY3P7XeU27q7gevMvaZ5c6VnGHDXFNtH7TC9WKOrmDx7Gz7wnwQG8jKHaR9mPJywjOhV1N
-	/B6jQZ+ORvqG7KcHmLASz6WuOneY62M+DYnJ2IGknLCa+w9jrYcqyW+4XkyA1Or4YYyzFdqSPwT
-	xWzKyTtlelE1NcAWpR7N5Vx3ZFhO6gOqS+VoRtZJt7qlvN51l7bBdlrdx8LgsOffjjaA5ZOxIFS
-	pSlkoBPz0xVXObfY55RnMjXWfBuJC8=
-X-Received: by 2002:a05:7022:129:b0:12a:68cc:3efb with SMTP id a92af1059eb24-12c73f9303fmr14127409c88.16.1776898255008;
-        Wed, 22 Apr 2026 15:50:55 -0700 (PDT)
-Received: from ?IPv6:2a03:83e0:115c:1:1053:1d3b:d6cb:4350? ([2620:10d:c090:500::2:bea8])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12dbaab165bsm5912690c88.6.2026.04.22.15.50.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Apr 2026 15:50:54 -0700 (PDT)
-Message-ID: <c84a7beccd4ae527981797a6e5a6af840ba9c312.camel@gmail.com>
-Subject: Re: [PATCH bpf-next v3 2/9] bpf: Assign reg->id when getting
- referenced kptr from ctx
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- alexei.starovoitov@gmail.com, 	andrii@kernel.org, daniel@iogearbox.net,
- memxor@gmail.com, martin.lau@kernel.org, 	mykyta.yatsenko5@gmail.com,
- kernel-team@meta.com
-Date: Wed, 22 Apr 2026 15:50:52 -0700
-In-Reply-To: <CAMB2axMzeQs3WzFd1PZFB=DgR6d2ye4qzHKhATK2895ryzAEog@mail.gmail.com>
-References: <20260421221016.2967924-1-ameryhung@gmail.com>
-	 <20260421221016.2967924-3-ameryhung@gmail.com>
-	 <9237d7b35463c79863488e3f2180239aab679049.camel@gmail.com>
-	 <CAMB2axMzeQs3WzFd1PZFB=DgR6d2ye4qzHKhATK2895ryzAEog@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+        d=1e100.net; s=20251104; t=1776901573; x=1777506373;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=GVdJjNNn1/VkVF3ZLZB/9uFSUrjOsGK5ioRT6dmRAqE=;
+        b=J0Ra/Boz2/GkfIH43f8t/d6bRBz6s7fo+s7C/+r7XwOTpTsuQhguijkrCKx8+rDZym
+         G+0eI5Pck4oLs7+OKQX6h9paDnLtaL6+kO6x4JL7Rdku5tK3FMBAdYpFFniAKE0VTaV+
+         9TN37+kNqWMYTqtMTS2tMVu1QA9s7NqMLphe6EtLHZ6MqOp3UgBfEnWclxip9TGyKQNc
+         SiuDFo9Z3CmLBtfcVSnfOECUBgC3EGc4JPq0c7hLqGMTyl/kG0MebTyQYJxitQyuvJKY
+         /Z2U/5YV2mNaN40OHVQF4QsO+h7ivG3Lsn8D1pUVB6icwAQdA075f7zYhFxKGvhKpdUW
+         DYUw==
+X-Forwarded-Encrypted: i=1; AFNElJ/etSIOt4I/kx9VO3gwf4ZnSJhguRKzjT+6z83LtsCqEEPMp3KjCLaAFHfxTw94Wsq1NnSh2c8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy40t4guuItP01HwOsubL/PARxCEpzCnAgg7DrZU/NqkKSSr1pW
+	GgUVjCaNVtWP/OhIJWznKdJk7wguVI+kaOHqkM9fgePtYz3OBp6PwYfLL5cwIZzJ40pYPkJEx+o
+	UYUg/ym43MxCfqBgmgYC1eR3ogFp0IME=
+X-Gm-Gg: AeBDiesm701yx0Wxlmr0mkjL8ZotPm1HM2rT0U1H9d/LvBbG663wA2SMfCLt7vi8eNx
+	5ValAxbpnZAiUbeB95k/8NZCbZtHa+gCtDEoUAmUFHPANYJdc7hNxYL86zFsEHxmOpwo1dM+syV
+	7P4OFC4PfheN597wS3W0AlTtqpoDydSSljsJgJ3n8NMPvNGyMVfT4iC6SPPdytwDV01ZHsQrgpQ
+	K5u2NEkB7r11iAxoWfpw1jOjOzOPRqceM4i591h6mhtj2XoG+NFMtigLClcdZ6jjHqN3f7ovMKa
+	qShzSabvktczRlVrfA==
+X-Received: by 2002:a05:6512:3b08:b0:5a2:afbe:4aaf with SMTP id
+ 2adb3069b0e04-5a4172f63eamr7151436e87.21.1776901573109; Wed, 22 Apr 2026
+ 16:46:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20260422033650.68457-1-kerneljasonxing@gmail.com>
+ <20260422033650.68457-9-kerneljasonxing@gmail.com> <20260422212741.50deeb06@pumpkin>
+In-Reply-To: <20260422212741.50deeb06@pumpkin>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 23 Apr 2026 07:45:35 +0800
+X-Gm-Features: AQROBzDDuAl2OSnLbOvFaE-XlTSEU46HN_-vyDfaJxynGIzlHMZSeJrJj2JfxfA
+Message-ID: <CAL+tcoCMrtYR=938roeQ-q4j8LKcsUYxm_qSTPLCdYjBhD_urg@mail.gmail.com>
+Subject: Re: [PATCH net v3 8/8] xsk: don't support AF_XDP on 32-bit architectures
+To: David Laight <david.laight.linux@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
-	TAGGED_FROM(0.00)[bounces-280559-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280561-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[eddyz87@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,fomichev.me,iogearbox.net,vger.kernel.org,tencent.com];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0553244B5AF
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,tencent.com:email]
+X-Rspamd-Queue-Id: 1286C44BD99
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 2026-04-22 at 15:45 -0700, Amery Hung wrote:
-> On Wed, Apr 22, 2026 at 2:46=E2=80=AFPM Eduard Zingerman <eddyz87@gmail.c=
-om> wrote:
-> >=20
-> > On Tue, 2026-04-21 at 15:10 -0700, Amery Hung wrote:
-> > > Assign reg->id when getting referenced kptr from read program context
-> > > to be consistent with R0 of KF_ACQUIRE kfunc. skb dynptr will track t=
-he
-> > > referenced skb in qdisc programs using a new field reg->parent_id in
-> > > a later patch.
-> > >=20
-> > > Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> > > ---
-> > >  kernel/bpf/verifier.c | 5 +++--
-> > >  1 file changed, 3 insertions(+), 2 deletions(-)
-> > >=20
-> > > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> > > index 41e4ea41c72e..93003a2a96b0 100644
-> > > --- a/kernel/bpf/verifier.c
-> > > +++ b/kernel/bpf/verifier.c
-> > > @@ -6448,8 +6448,6 @@ static int check_mem_access(struct bpf_verifier=
-_env *env, int insn_idx, u32 regn
-> > >                       } else {
-> > >                               mark_reg_known_zero(env, regs,
-> > >                                                   value_regno);
-> > > -                             if (type_may_be_null(info.reg_type))
-> > > -                                     regs[value_regno].id =3D ++env-=
->id_gen;
-> > >                               /* A load of ctx field could have diffe=
-rent
-> > >                                * actual load size with the one encode=
-d in the
-> > >                                * insn. When the dst is PTR, it is for=
- sure not
-> > > @@ -6459,8 +6457,11 @@ static int check_mem_access(struct bpf_verifie=
-r_env *env, int insn_idx, u32 regn
-> > >                               if (base_type(info.reg_type) =3D=3D PTR=
-_TO_BTF_ID) {
-> > >                                       regs[value_regno].btf =3D info.=
-btf;
-> > >                                       regs[value_regno].btf_id =3D in=
-fo.btf_id;
-> > > +                                     regs[value_regno].id =3D info.r=
-ef_obj_id;
-> > >                                       regs[value_regno].ref_obj_id =
-=3D info.ref_obj_id;
-> > >                               }
-> >=20
-> > Hi Amery,
-> >=20
-> > Could you please help me double-check my understanding of this change?
-> >=20
-> > It adds a new behavior, if struct_ops method parameter is annotated
-> > with __ref, then if a field is read from such struct_ops context
-> > the destination register would now have it's .id =3D=3D ref_obj_id
-> > allocated for the parameter at the beginning of do_check().
-> > E.g. for `rB =3D *(T *)(rA + off)`, if `rA` is a pointer to struct_ops
-> > context and parameter corresponding to `off` has `__ref` annotation
-> > the `rB.id` will be assigned, contrary to old behavior, when it remaine=
-d 0.
-> >=20
->=20
-> Right
+On Thu, Apr 23, 2026 at 4:27=E2=80=AFAM David Laight
+<david.laight.linux@gmail.com> wrote:
+>
+> On Wed, 22 Apr 2026 11:36:50 +0800
+> Jason Xing <kerneljasonxing@gmail.com> wrote:
+>
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > In copy mode TX, xsk_skb_destructor_set_addr() stores the 64-bit
+> > descriptor address into skb_shinfo(skb)->destructor_arg (void *) via a
+> > uintptr_t cast:
+> >
+> >     skb_shinfo(skb)->destructor_arg =3D (void *)((uintptr_t)addr | 0x1U=
+L);
+> >
+> > On 32-bit architectures uintptr_t is 32 bits, so the upper 32 bits of
+> > the descriptor address are silently dropped. In XDP_ZEROCOPY unaligned
+> > mode the chunk offset is encoded in bits 48-63 of the descriptor
+> > address (XSK_UNALIGNED_BUF_OFFSET_SHIFT =3D 48), meaning the offset is
+> > lost entirely. The completion queue then returns a truncated address to
+> > userspace, making buffer recycling impossible.
+>
+> I had a look at how this is used.
+>
+> I suspect that XSK_UNALIGNED_BUF_OFFSET_SHIFT can just be made smaller.
+> The 'addr' isn't really a normal address of any kind, it is a really
+> and offset into an array made up of pages of memory.
+> The actual address (kernel virtual of dma) is generated by:
+>         ptr->array[addr >> PAGE_SHIFT] + addr & ~PAGE_MASK
+> (after removing the unaligned chunk offset from 'addr').
+>
+> It is actually quite likely that there are enough free high bits
+> even in 32bit mode.
 
-Ack, thank you.
+Interesting idea. But if everything is folded into a 32-bit area, it
+means the size of umem is only 20-bit. 20-bit reflects that users only
+put a max 1MB data into it. It might be too small to use?
 
-> > This change in behavior, however, becomes visible only after the
-> > changes to release_reference() later in the series.
-> > There the `rB.id` is used to initiate `mark_reg_invalid(env, reg)` for
-> > the `rB`.
-> >=20
->=20
-> I probably should mention it in the commit message. The purpose of the
-> patch is to make the implementation consistent with the design:
-> parent_id tracks the id of the parent objects.
->=20
-> Without this patch, it should still work since in this case ref_obj_id
-> always equals to id. When release_reference() is called on a
-> KF_RELEASE kfunc, the children objects will still be invalidated
-> correctly.
+Thanks,
+Jason
 
-bpf_qdisc_fail__invalid_dynptr_cross_frame.c:invalid_dynptr_cross_frame
-fails if I comment out the line `regs[value_regno].id =3D info.ref_obj_id;`=
-.
-The added .id link is used to propagate invalidation triggered by
-`free_skb(skb);` to  `hdr`.
-The patch seem mandatory for the series.
+>
+>         David
+>
+> >
+> > Since we hear no one is using AF_XDP on 32-bit arch, we decided to
+> > strictly stop supporting it at compile time.
+> >
+> > Closes: https://lore.kernel.org/all/20260419045824.D9E5EC2BCAF@smtp.ker=
+nel.org/
+> > Fixes: 0ebc27a4c67d ("xsk: avoid data corruption on cq descriptor numbe=
+r")
+> > Suggested-by: Stanislav Fomichev <sdf@fomichev.me>
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> >  net/xdp/Kconfig | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/net/xdp/Kconfig b/net/xdp/Kconfig
+> > index 71af2febe72a..819aa5795f50 100644
+> > --- a/net/xdp/Kconfig
+> > +++ b/net/xdp/Kconfig
+> > @@ -1,7 +1,7 @@
+> >  # SPDX-License-Identifier: GPL-2.0-only
+> >  config XDP_SOCKETS
+> >       bool "XDP sockets"
+> > -     depends on BPF_SYSCALL
+> > +     depends on BPF_SYSCALL && 64BIT
+> >       default n
+> >       help
+> >         XDP sockets allows a channel between XDP programs and
+>
 
