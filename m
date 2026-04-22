@@ -1,201 +1,213 @@
-Return-Path: <netdev+bounces-280277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280278-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oNVhFGoO6GmBEgIAu9opvQ
-	(envelope-from <netdev+bounces-280277-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 01:55:22 +0200
+	id mH8PBiwR6Gm2EgIAu9opvQ
+	(envelope-from <netdev+bounces-280278-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 02:07:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58DBC440BDC
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 01:55:21 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B082440CA1
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 02:07:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6B9F1300B298
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 23:54:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1CE0E3025721
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 00:07:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7343F3A640B;
-	Tue, 21 Apr 2026 23:54:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3AAB40DFAC;
+	Wed, 22 Apr 2026 00:07:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TU+fxFtT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JFWvnhUP"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9CB39D6F7;
-	Tue, 21 Apr 2026 23:54:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF271FC7
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 00:07:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776815693; cv=none; b=NQFKhymhM8AmAxK4YgothYqqVZeE2nFKOuX5opkV5k0Dfz4CS0fAhiemuGQOKLxhKe3GB3ViWVhb/7vMU/vV50P4CQK1etiksE0du3K+BEHifEUlDreTpegfCDjb7tNYwnSBeRghnx+hnAogJhgCWObpzssXgyqLoeE9uSZSpk8=
+	t=1776816425; cv=none; b=EE4GtMSuEEGFMsoYCiwn6lVltTF46EYyXp3axkzUXdqRzWY5ekow3iSEDuiq5B+ddjkL4k36xaVz39tSk7zGmaia2ql4mUKj5a7z98bMPh9LC1Cw8vLpZ4jINHcitMXWMzE2OcBEYzg0KxhgwLFHYe03uO8CHP0BtkOiWgjJ4m8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776815693; c=relaxed/simple;
-	bh=SBDHdYB3pdwLacODa+1Rx3u7gy9ZKcOefmzfiSp2Xjc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=uzBckulnyZYnjCprkxMcQP/TSk0HzdbZ2a4MeXncmeQ/G8jDzoxmH33czRI8U629c/QC1YeoGxDIiLTProxOe4y76zpMm8vIUp0xcTvLV6rdcixQA6rTsdjg5FIz/fU1TQOE7SGN2VId5nJz4g0cGcJYaxYooHx0+PFo4g7D/KU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TU+fxFtT; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <25b43a7f8fafcaf5e1f5cbb000d7e4ef430decf7.camel@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1776815679;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NdUjOdkoim+eC3jkTDv+T/Uc8ZOHJpFzinqX2Cu1/t0=;
-	b=TU+fxFtT+e4t+D1rep5vVMRLehgoKqzw+x8NXR/cvabMuMlcIImw8v3x5tIfN8x6PtR+KH
-	bZNUmAejf9KehGlhacu6b4b5nQs6XUWdhtlFCNInuVLmttUsf2lQp11D7v04Qy8w5q0DU2
-	t4niEyMh7zUiyCFvxubw1xDhyiCm7Gc=
-Subject: Re: [PATCH bpf-next v4 1/4] bpf: Reject TCP_NODELAY in TCP header
- option callbacks
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: KaFai Wan <kafai.wan@linux.dev>
-To: bot+bpf-ci@kernel.org, ast@kernel.org, daniel@iogearbox.net, 
- john.fastabend@gmail.com, andrii@kernel.org, martin.lau@linux.dev, 
- eddyz87@gmail.com, memxor@gmail.com, song@kernel.org,
- yonghong.song@linux.dev,  jolsa@kernel.org, sdf@fomichev.me,
- davem@davemloft.net, edumazet@google.com,  kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, dsahern@kernel.org,  shuah@kernel.org,
- ihor.solodrai@linux.dev, jiayuan.chen@linux.dev,  hoyeon.lee@suse.com,
- ameryhung@gmail.com, bpf@vger.kernel.org,  linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org,  linux-kselftest@vger.kernel.org
-Cc: 2022090917019@std.uestc.edu.cn, dddddd@hust.edu.cn,
- M202472210@hust.edu.cn,  martin.lau@kernel.org, clm@meta.com
-Date: Wed, 22 Apr 2026 07:53:58 +0800
-In-Reply-To: <158599be54ab5be12aa6394a30c5d1e8f155abf8f580214ea78103a2ff8cfe3e@mail.kernel.org>
-References: <20260421155804.135786-2-kafai.wan@linux.dev>
-	 <158599be54ab5be12aa6394a30c5d1e8f155abf8f580214ea78103a2ff8cfe3e@mail.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1776816425; c=relaxed/simple;
+	bh=wVF1iBXhpMscFx2tY5O3cc38r3BrEeXQDR9XcKj4S5g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eo4S1x+0YFAKSI1JaFjzhAgmYzw4tmaplMujTuX6Z4HRJnwdX8ndJuIzMbHIexF6o9I7n963X92AejyjVU8Qp7N+fNVOXGaTy0dk/e9OkendRwg8U6QgzgmwUBYGr9XZwwHum5/V5ZTwRsqEdHiafG0J/JUYRn/99kUoymS+r8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JFWvnhUP; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-8ee63e91acfso95013285a.2
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 17:07:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776816423; x=1777421223; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bmKKE5FYITyhTGVg5YFLJddC5/jrSBVncuDRBnt19M8=;
+        b=JFWvnhUPv5PUZsM4AINv3lpn/PV/yYDsw1O33Nl5jCcOP45saPnHwD02awFwkdHtUK
+         P+ySZzl12XL7bSONNgpRQzte5YuxA1HiwU76082A0QKjcENJZXI5husb1WL/6DNS2avG
+         bUAZg4GUv/TiWneJuEd594fvQJkQS8GAce2dpf0ePUyWdPEnYRbl69PwR0N/bFPX9zHD
+         YqwQigMRBUGZ0Fgj0fO5oBTFUEQTuS2Lz6V2CLlVZk+j9pQDvEvzol3/e3m217HX9S/U
+         sU3304ncqE8U2LgBzuTa//EbugoJt4v/5NG0BQcYYk3DyOp5I0I9kN4Q1Pz4dqfV38ew
+         KpXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776816423; x=1777421223;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bmKKE5FYITyhTGVg5YFLJddC5/jrSBVncuDRBnt19M8=;
+        b=XrJ/XA1V3oxgLTNETbKF4IVsqMhTLLoKI8yXEzAZWTMak2XLLkV/l8Jve+QBBx0ODJ
+         gSXlE7dO9pL1U28GCkqHXFSFoamCkln+u195oao4qJChVXyir3jOSoiZB4dMkEnmS1wq
+         mFx0TrD/RNAG0m0IlWXzFdJnvE9oCIOenNmA4K2U4y/xt6TNMub8hGDrBjk3S2060eMO
+         lTwR3A8DjNpNcpsXA6ELWsjgNNYtcCpJIbUp7tIAEAmtNqDGSSWo1dxjnKNKW/wWUsHd
+         UA+PmeFD/6ePJcgCShxlC1xQug9IJcvRRhuDW5M+B32Bt34Kdp252Yxx4VuN7MtrtG6s
+         38QA==
+X-Forwarded-Encrypted: i=1; AFNElJ9BElFQ9QhbTp7KnJbBUrbOSzRS2dLO9SDrp/QFjq84xiRIwsEHyo/bkCqAqxYnrnMlwtwD/88=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysESShNzVDPVRwzPJudljF+ZRnOd5okngbq5zDR0GS8Tfs1mOl
+	II8Mv4Pr4eAFqp28BamVvrSbFERc/dI+edBhViHUSnnAIlzfEIv0aTn5
+X-Gm-Gg: AeBDietlrgWl/c5hyXgYoWgqLqyhRfuutt9b6Q1U6AWiyQ9HZ9Q+41nODTM5+5/6nIL
+	3FaL+eBc48DcIKxo2Jq1k87lKzhFzK4FzPN6m8W+Eo1x1/9EWfgq8ukihmp5xTzoBq+sO0dWxqh
+	pjIq4tpfpIvOC/lyEfc7doQ/4FhCeg84F/skkCkBrtLy9cRXWQVgVS8b57eoN+ckxxUXykNxxhw
+	9BL1O2YmpC48iUU2thfNLud5EUqPnBm7zgU5Ga2D3M2YFCfjjId2N9AvTUhC1JVoB6LD13+oSfF
+	rBx5N61oheO/SZ+iXkp7xbRPRKzVsF5ojMPHRz7G9aWNSWW0simWjrchIarQEGV2Xc6j0SyKz4q
+	VXVcCJ0bvpcVl+SSjTPM5kufmUznu4zJ5qDUFEEanHLkMRLpIFNrVK2cKcwmztoqt0mFZsrBbJe
+	VtSogqMu6l9XFWcWlZFhU0x3erTTd9i1jfMv1LqbU8FMQWrkPmyxaJMgJyGKQJIigPqRPKmacXr
+	CJsUqY2py8HaSGKTeEnmsGLhSUpzkQ=
+X-Received: by 2002:a05:620a:17a3:b0:8d0:27b8:fb7 with SMTP id af79cd13be357-8e79246cd79mr2879505585a.46.1776816423026;
+        Tue, 21 Apr 2026 17:07:03 -0700 (PDT)
+Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8e7d64caf37sm1177984585a.11.2026.04.21.17.07.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Apr 2026 17:07:02 -0700 (PDT)
+From: Michael Bommarito <michael.bommarito@gmail.com>
+To: linux-wireless@vger.kernel.org
+Cc: Johannes Berg <johannes@sipsolutions.net>,
+	Felix Fietkau <nbd@nbd.name>,
+	Benjamin Berg <benjamin@sipsolutions.net>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Michael Bommarito <michael.bommarito@gmail.com>
+Subject: [PATCH] wifi: mac80211: check ieee80211_rx_data_set_link return in pubsta MLO path
+Date: Tue, 21 Apr 2026 20:06:51 -0400
+Message-ID: <20260422000651.4184602-1-michael.bommarito@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280277-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FREEMAIL_TO(0.00)[kernel.org,iogearbox.net,gmail.com,linux.dev,fomichev.me,davemloft.net,google.com,redhat.com,suse.com,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[sipsolutions.net,nbd.name,vger.kernel.org,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280278-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[32];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kafai.wan@linux.dev,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid]
-X-Rspamd-Queue-Id: 58DBC440BDC
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6B082440CA1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 2026-04-21 at 16:51 +0000, bot+bpf-ci@kernel.org wrote:
-> > diff --git a/net/core/filter.c b/net/core/filter.c
-> > index 5fa9189eb772..96849f4c1fbc 100644
-> > --- a/net/core/filter.c
-> > +++ b/net/core/filter.c
-> > @@ -5833,6 +5833,12 @@ BPF_CALL_5(bpf_sock_ops_setsockopt, struct bpf_s=
-ock_ops_kern *, bpf_sock,
-> > =C2=A0	if (!is_locked_tcp_sock_ops(bpf_sock))
-> > =C2=A0		return -EOPNOTSUPP;
-> >=20
-> > +	/* TCP_NODELAY triggers tcp_push_pending_frames() and re-enters these=
- callbacks. */
-> > +	if ((bpf_sock->op =3D=3D BPF_SOCK_OPS_HDR_OPT_LEN_CB ||
-> > +	=C2=A0=C2=A0=C2=A0=C2=A0 bpf_sock->op =3D=3D BPF_SOCK_OPS_WRITE_HDR_O=
-PT_CB) &&
-> > +	=C2=A0=C2=A0=C2=A0 level =3D=3D SOL_TCP && optname =3D=3D TCP_NODELAY=
-)
-> > +		return -EOPNOTSUPP;
-> > +
->=20
-> Does this same recursion vulnerability exist for BPF TCP congestion
-> control algorithms using BPF_PROG_TYPE_STRUCT_OPS?
->=20
-> If a BPF congestion control algorithm invokes bpf_setsockopt(TCP_NODELAY)
-> from its cwnd_event callback when handling CA_EVENT_TX_START, could it
-> trigger unbounded recursion through this path:
->=20
-> BPF_PROG_TYPE_STRUCT_OPS cwnd_event callback (CA_EVENT_TX_START)
-> =C2=A0 -> bpf_setsockopt(TCP_NODELAY)
-> =C2=A0=C2=A0=C2=A0 -> tcp_push_pending_frames()
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> tcp_write_xmit()
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> tcp_transmit_skb()
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> tcp_event_data_=
-sent()
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> cwn=
-d_event()
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 -> BPF congestion control cwnd_event callback
->=20
-> The author confirmed this issue in the v3 discussion thread and Martin
-> KaFai Lau suggested creating a new func_proto
-> (bpf_sk_setsockopt_nodelay_proto) to reject TCP_NODELAY for all struct_op=
-s
-> programs, but this patch only addresses BPF_SOCK_OPS callbacks.
+__ieee80211_rx_handle_packet() resolves the link via
+ieee80211_rx_data_set_link() on the pubsta->mlo path but ignores the
+helper's return value.  Inside the helper,
+  rx->link = rcu_dereference(rx->sdata->link[link_id]);
+can leave rx->link NULL if link_id references a slot already cleared
+by ieee80211_vif_set_links() during station-initiated ML
+reconfiguration (see mlme.c's ieee80211_ml_reconfiguration(), which
+invalidates sdata->link[] before the matching
+ieee80211_sta_remove_link() loop walks the link-sta hash).  RX dispatch
+still resolves a link_sta from the hash and then drops into
+ieee80211_prepare_and_rx_handle(), which dereferences link->conf->addr.
 
-patch#2 ("bpf: Reject TCP_NODELAY in bpf-tcp-cc") fix this, pls check.
->=20
-> Reference: https://lore.kernel.org/bpf/20260418092235.98444C19424@smtp.ke=
-rnel.org/
->=20
->=20
-> Does this fix also need to block TCP_CORK when the value is 0?
+Every other user site of ieee80211_rx_data_set_link() checks the return
+and bails on failure; only this branch did not.  Mirror the safe
+pattern.
 
-TCP_CORK is not support, return -EINVAL by default in sol_tcp_sockopt().
->=20
-> When bpf_setsockopt() is called with SOL_TCP and TCP_CORK with value 0
-> (disabling cork), the call path goes through __tcp_sock_set_cork() in
-> net/ipv4/tcp.c, which unconditionally calls tcp_push_pending_frames(sk)
-> when cork is disabled:
->=20
-> __tcp_sock_set_cork()
-> =C2=A0 -> tcp_push_pending_frames()
-> =C2=A0=C2=A0=C2=A0 -> tcp_current_mss()
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> tcp_established_options()
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> bpf_skops_hdr_opt_len()
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> BPF_SOCK_OPS_HD=
-R_OPT_LEN_CB
->=20
-> This triggers the same recursion chain described in the commit message,
-> but the patch only blocks TCP_NODELAY, not TCP_CORK with value 0.
->=20
-> Reference:
-> https://lore.kernel.org/bpf/5fea6b5e9d1a13e72edf8222a8ebe50cbb660b37e62b8=
-7b65dab6f6f317943ec@mail.kernel.org/
->=20
-> > =C2=A0	return _bpf_setsockopt(bpf_sock->sk, level, optname, optval, opt=
-len);
-> > =C2=A0}
-> >=20
->=20
->=20
-> ---
-> AI reviewed your patch. Please fix the bug or email reply why it's not a =
-bug.
-> See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/READM=
-E.md
->=20
-> CI run summary: https://github.com/kernel-patches/bpf/actions/runs/247333=
-56810
+Fixes: e66b7920aa5a ("wifi: mac80211: fix initialization of rx->link and rx->link_sta")
+Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+Assisted-by: Claude:claude-opus-4-7
+---
 
---=20
-Thanks,
-KaFai
+Notes for reviewers (not part of the commit):
+
+Found by static audit of unchecked return values on
+ieee80211_rx_data_set_link() call sites.  The non-pubsta
+arm was already fixed upstream by commit 32d340ae6758 ("wifi:
+mac80211: fix receiving MLO frames in the non-fast-path"); the
+pubsta arm was missed, and this patch mirrors the same shape.
+
+Runtime evidence:
+
+ - Synthetic kernel-side A/B: on parent commit e66b7920aa5a..
+   (pre-fix) forcing sdata->link[1] == NULL while sta->link[1]
+   stays live causes ieee80211_rx_data_set_link() to return 0
+   and ieee80211_prepare_and_rx_handle() to NULL-deref
+   link->conf->addr; with the patch applied the guard drops
+   the frame instead.
+
+ - Source-level race window confirmed observationally: an
+   instrumented pre-fix UML run with real hostapd + wpa_supplicant
+   MLO and station-initiated SETUP_LINK_RECONFIG hits
+   "sdata->link[1] == NULL while sta_valid_links still carries
+   bit 1" on every reconfiguration attempt, inside
+   ieee80211_setup_link_reconfig() between ieee80211_vif_set_links()
+   and the per-link ieee80211_sta_remove_link() loop.
+
+ - That same instrumented run does not itself crash, for two
+   reasons independent of this bug: mac80211_hwsim feeds RX via
+   ieee80211_rx_napi(hw, NULL, skb), so the pubsta arm at
+   rx.c:5335 is unreachable from hwsim (frames take the
+   already-fixed non-pubsta for_each_sta_info arm), and UML is
+   single-CPU so RX softirq cannot interleave with the mlme
+   reconfig sequence.  Real MLO-capable drivers (iwlwifi, mt76)
+   do populate pubsta on their fast RX paths, and SMP hardware
+   gives the race the micro-window it needs.
+
+Benjamin Berg's 2026-02 RFC v2 "wifi: mac80211: refactor RX
+link_id and station handling"
+(20260223133818.9f5550ab445f.I...@changeid) touches the same
+code and may supersede or subsume this patch; happy to fold /
+rebase / drop.
+
+ net/mac80211/rx.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/mac80211/rx.c b/net/mac80211/rx.c
+index 11d6c56c9d7e..e0ab4852c0c6 100644
+--- a/net/mac80211/rx.c
++++ b/net/mac80211/rx.c
+@@ -5332,7 +5332,9 @@ static void __ieee80211_rx_handle_packet(struct ieee80211_hw *hw,
+ 				if (!link_sta)
+ 					goto out;
+ 
+-				ieee80211_rx_data_set_link(&rx, link_sta->link_id);
++				if (!ieee80211_rx_data_set_link(&rx,
++								link_sta->link_id))
++					goto out;
+ 			}
+ 
+ 			if (ieee80211_prepare_and_rx_handle(&rx, skb, true))
+-- 
+2.53.0
+
 
