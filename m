@@ -1,162 +1,168 @@
-Return-Path: <netdev+bounces-280499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280500-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KPWxME/46GkgSQIAu9opvQ
-	(envelope-from <netdev+bounces-280499-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:33:19 +0200
+	id qLr4KzL56GnLSQIAu9opvQ
+	(envelope-from <netdev+bounces-280500-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:37:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 327A3448B50
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:33:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2055F448C1B
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:37:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1785030E203A
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 16:25:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F0BF330E0BCD
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 16:29:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8138C37CD5A;
-	Wed, 22 Apr 2026 16:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D2DA37EFE7;
+	Wed, 22 Apr 2026 16:29:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b="mR/8kxtP"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="pJvx2Y7f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27BB938237E
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 16:25:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776875124; cv=pass; b=SAkwmECfz/tem1jH2F2Zw0R8kCVwWsOIE0wvsKOYnMtlY7wbrjelxNa0T98Dmv/mIlrbKdEgov3L2KQwaBM1Vt8NHk1O4wuCHi9vR5glecCKlI/zviPaVbyfo+RavLF0eusZXDkPDQEZ53TwGL73/u3gGtPJWNg/G8iOcCpzaCk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776875124; c=relaxed/simple;
-	bh=Cp79fSO3GK2SRrsyvdg3YBqv98osqbRxtch40zv0Iy4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pqi7x0Ayln3xKDP9LupFiFeXnn5dHmXh8bRrp83vXUW7q5pxQSgPoc59bb6QYQeC2UAgSwJyUSEJQnO8KYc8OR1ied/RQxfjm4vVr514fQqBKUZtigCDzCuaspjd5JEYgm21kpF+FV7WEvUpJH6pILaeL9Qi7pcu9Ncdepg4KIY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=allelesecurity.com; spf=pass smtp.mailfrom=allelesecurity.com; dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b=mR/8kxtP; arc=pass smtp.client-ip=209.85.221.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=allelesecurity.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=allelesecurity.com
-Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-56d958880ecso1907720e0c.2
-        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 09:25:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776875122; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Hnde7deZxtl57TDpX0m/ju9X3ESPHH9X9JnqGNjGV1ElIcK6Y4ijix6abHIR2/Oc6+
-         K+xM0ZMMWfCfcCk++la9FY65tp7McCs49XeU+rgDl82CbKwk0GfqEvvJouUybdZ5THon
-         f+pSpUeiz7FQMzSlZyHb9vt1xKU6Cr25ZoqRlnQkhEwCcmNmXCAaMb1kOiTK76EGgXYR
-         ve6s7vRl0q8tsjslaMj/azYqvjB9WSy8u8O+wisQh1AvGKjRfKJnBJNKfqkxrais+7u7
-         gGiGuJ41KEJ+KFpCH0pmI6/oebkSqxy/uw+Pt6Rmupdcq6ObsB5Zn4Y4wg8YHCkpAchU
-         taAg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Cp79fSO3GK2SRrsyvdg3YBqv98osqbRxtch40zv0Iy4=;
-        fh=Mi/k46xFtaw1L6Ge/q6PCztNOC4H8StGBCKOXNkhO6Q=;
-        b=CTjDwno0PuV6BEtC4gwAchlq+ypFas10mhUumGDR7XP+a7ID1V5y+wYvVchC5JOeJw
-         OoU9DBhYFHBXOIXEfQfATALB4lmvspjUX3PHJu5BsX70yojwz4gWtaCjGo/Q5l74UtzH
-         mVT876I9oDINMzwTPm/A/BlqkmX2pm7dnCadi+r167NbVl4FyzILHy91u+UNI9ljnDlp
-         c6uaKpcuJsD5tIVfBJ3CBNtfFXfV7GFKo3SLvm5RWKMU1R0b49gGIaGyX9dB7FGkF3h3
-         rVG/q8m33DSKEZee1JJqz7OSJV9wOwLcB/lardNCYNikbGK5VqWoXzvxypzJJQp8ceaw
-         kIbw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E149E37C92E
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 16:29:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776875372; cv=none; b=JcJV7+1/0+9S6dcXgHcL9bd4J3474RpicWPpunGcLBcXSEucrOrDupnbmlB56tmkx51SER/6FcIwDY00psWMiww7RBR0O3rCq78bdZf/7KDgyUFePgMS++GyxguChwkOkaC/b527PhI95jZjdJTe3Yq/KAAgD5lSCSCtP5ze/Y0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776875372; c=relaxed/simple;
+	bh=7nUTpLDZcNwHVIBFnUXlZ2h+DqdD9r7qtP5b75FfdX8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q1LIOFXdVRn10sWAFqIJkvIWnegizOxvrTQPQFAs0kftCZ+w9eVBaEOFaJN1CdZjUnfN/QyGu8GWFcTVqHI2kco05uVkhFUVFAki3A7JgSpWpznr+yGOLuegZEG3kuA6vmO0BcZc4MvUDQci8nW58LtdDqgBKK5k+argt7wc/tU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=pJvx2Y7f; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-8cb5c9ba82bso895094885a.2
+        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 09:29:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=allelesecurity.com; s=google; t=1776875122; x=1777479922; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Cp79fSO3GK2SRrsyvdg3YBqv98osqbRxtch40zv0Iy4=;
-        b=mR/8kxtPde2qm99A+m3GY3pD0pfjmVPBB+b24KoA7cmrER8UJYll9Z6jZ+VbpW3AUk
-         Ws9t1A+Qc9dOF+gSd8JgbsCcKDwhwzhVnLYLZJYrdGEWNFh8/OfH+uvfFthTUE9GtRRx
-         zPFB2sFwjGgoOG8WOy4Lzh8kaIZpI0WIOFxY8=
+        d=ziepe.ca; s=google; t=1776875370; x=1777480170; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=h9IY/0ZHCf/patsFxziV9u+pjgUJWDhTV7Q7rdgygPM=;
+        b=pJvx2Y7fJ5pRaa87U2jGMRAagGCpZPf/KPXYOkaL7GhCt6l6UhqQZ/A0y/BhTI0DcR
+         7ESGzMELWUIIPm4cauAh9D/DzCJU3MXqnZn2QEj6UXZlGvpe5AaCgULd5jhGWP5gbC5k
+         cjW1khqmaDO4AAgE+7i1Jw32Lif3HY4W15HkkQ1O8iHli1j3wVrEWMW1GJlZlvSYlXmi
+         RGyaDzp7uoxx3YF1rVKy04lCwZazcXGkSorGhtUb9eygF71AqmacasFi+VsHlXGIZeln
+         +7qjZktq7NYcYRfxHPfvoZyhSRbvw9gYj1nNZUu7kCiMf3BpsGBEvSzo4Jfcxon6U5zl
+         k5SA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776875122; x=1777479922;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Cp79fSO3GK2SRrsyvdg3YBqv98osqbRxtch40zv0Iy4=;
-        b=SGb2thf7KmYWeYfAbRRojrCr6G4suxs/b2piVb+gbmM/uKAXmiWn4VL3+NaYLSB426
-         KxI33uCtEVJDyEanAkeCG+KBoFcAr1gXhxTrFIh/8XvR/BuP/1PXp0XQQP5tbF2a/aFa
-         VXe7cIw3AeNG6nMo2pGo5UhS3jU6ATHSwYKn5AmMSZPayo/Qy2ltfTd/gZDi5RjHFnqu
-         QrwxM7hBqREapwNJJVBn2oNMplWEJycWHLDZgL6N4mw7vU6o6DMUV0GHWH8cksXjXnb+
-         aGd7XgNHfFXv6HO7qboFI9Tc+kdmIcuUXNl50z3RRLrSzVcnO57nBwv8xGT8EnYnePvy
-         XLpg==
-X-Gm-Message-State: AOJu0YxOac4PszouHtoRhkGX7FkbbR6vuYcSfmX3cviHjsbz7d4ZrVMg
-	Pp6xTYw19gn6XImqhMyKuF3z7tRi0DMiH40Vt/VgL9ZtjMvyrZVZFZmYFrX9WD4zROR3JEa4tym
-	xZWxzwJ/Ult9N6vlmXZGN1MDDrqVPTCcv501BkJ8M9w==
-X-Gm-Gg: AeBDievPufpKR1ZiJopIrRBS84sRU62yp9YgE0ETdL/+PIpffjkuG5vPl4nkPTrDv7u
-	90efHV71qGTpXno+ELm20u/C5OSWb6owVkpi0cynHyTOxiZIit/UlTnDYO3rTkxCJlI4ADTV7Fc
-	0hlg3EmZ+z3i4NsQVLaUGAwqLUauBp/wQw9QbaNHJBFc+dg+GX2ejmPFgHfJ/Qs63cHAt3jqSn3
-	4IXX7bA4R9BK9BJKqh+Rb+yD3+PI2YNCCgCxIm49yFUq8thXy0hvzwhwQEurUV0F17rDjR7vd5o
-	wccy/6/lyYs3d5b58zY=
-X-Received: by 2002:a05:6122:218e:b0:56c:d34e:bb1a with SMTP id
- 71dfb90a1353d-56fa5828722mr11987755e0c.4.1776875121999; Wed, 22 Apr 2026
- 09:25:21 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776875370; x=1777480170;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=h9IY/0ZHCf/patsFxziV9u+pjgUJWDhTV7Q7rdgygPM=;
+        b=HN/vfIWLtPBbrwbtaS56QYlaOQaQLMklaiDNd3E7fOrvMixkGKsc1OMawM8Qt9Nzyw
+         T19GUtFUV47fRoSk7dsHUA5a/87Qh9ocq6Ujt0xNZgfM6xPD0prEUNeQ/HGtwE3UFSIt
+         +1ut+PiGp7GbyBX5gTZgbnKEBQDiamfzqulpHZ1VfJjaR81XLEYhWgZqxdMawFgAyjMa
+         5TOw+3Z6KaFnaXDrMa3P6BrRRN3z1FrkI+AUGZhJoiuAEwv1sXp9gW6Og/nHohZRuyr0
+         a+yjnoi9b+fNND76tNrmRc8bDEGgCplLeP8l3z4Ng2k3vtBwdpax4/KA0z2T9hgON10u
+         +oow==
+X-Forwarded-Encrypted: i=1; AFNElJ/M8YsaNUBGk9zWWrYlhWabFFHF+2FzWIr2InaHaLETH5jFKoKCVlyvjmsv4kH/MYtkKIfY9VA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoPpi48+L6YZXIrVpPiJt3pe+8RlhOw8XEz5wi/KWF7VNIkz5r
+	jZTdUlyVqghdC0CONmIG6tawRHOum1RNczh6J/7XXWJeVadPKg8q8VMnUI8gAbTthPRQLgZMG1V
+	9fj/VE4Y=
+X-Gm-Gg: AeBDieuLaaXTsnUysRnm+FyH93ygZwWJalJpVumitZxq30mex0HuzFQg/B9tjyZh1mz
+	TSkZOnmzo2jgc4yBGjOz5QYaxGEmuZcMLBgaGDecKOnU01aENnPyeQ5yT/Ey4SfADS6lwBhL6+h
+	uAQ/7LEQanYrcEvlgfjRLJ0IVkXBguneYhlDGoz7HCGxLfKnrcjd4EIrnXaS0QIgMA2bRaB2VkE
+	aDMUG8Ifti9Hr9F+sIcrCxXPm1e9nh5ATuKXlv9Im+sYPVn/Jwn1gx0giDqkRto2wYEtaS1J6Du
+	B8vKjOd8NJxOouOZIY+LYI/LvuPBCaa/zXTZQ5qo1w7DKWLKuyyYTSMz9dkZvnjlXcTSIdtAXxY
+	gGUmMVQueRrO1yGc6ac4Itfn0p9Xjqje9lUMiCHoCbWMvZWLt7ZU0SRvpgLaGn6RYYuVMZGp9bz
+	mFKXntquk5KF46TYwjZPkctlJF7tYsF8r3qepQV6Ga0VYyZxa/2KYMnb4rcdHAqW8BSCaTRNivk
+	Xvn5cnu1TrwITLR
+X-Received: by 2002:ac8:58c6:0:b0:50e:635b:5579 with SMTP id d75a77b69052e-50e635b57e4mr184629681cf.19.1776875369960;
+        Wed, 22 Apr 2026 09:29:29 -0700 (PDT)
+Received: from ziepe.ca (crbknf0213w-47-54-130-67.pppoe-dynamic.high-speed.nl.bellaliant.net. [47.54.130.67])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50e5d5ecffdsm83483301cf.29.2026.04.22.09.29.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Apr 2026 09:29:29 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1wFaS8-00000008cG7-3pDK;
+	Wed, 22 Apr 2026 13:29:28 -0300
+Date: Wed, 22 Apr 2026 13:29:28 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Alex Williamson <alex@shazbot.org>
+Cc: Zhiping Zhang <zhipingz@meta.com>, Stanislav Fomichev <sdf@meta.com>,
+	Keith Busch <kbusch@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	Bjorn Helgaas <helgaas@kernel.org>, linux-rdma@vger.kernel.org,
+	linux-pci@vger.kernel.org, netdev@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, Yochai Cohen <yochai@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [PATCH v1 1/2] vfio: add callback to get tph info for dma-buf
+Message-ID: <20260422162928.GL3611611@ziepe.ca>
+References: <20260420183920.3626389-1-zhipingz@meta.com>
+ <20260420183920.3626389-2-zhipingz@meta.com>
+ <20260422092327.3f629ad6@shazbot.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAPhRvkyFrKO3O=D9YZoWWVwykCZ1-fXkzA9NyaJ8aaX9b-pcXw@mail.gmail.com>
- <2593154.1776874118@warthog.procyon.org.uk>
-In-Reply-To: <2593154.1776874118@warthog.procyon.org.uk>
-From: Anderson Nascimento <anderson@allelesecurity.com>
-Date: Wed, 22 Apr 2026 13:25:11 -0300
-X-Gm-Features: AQROBzB03wIIgYtDLCMFBhc4ROpTIV-FOI4DzvQ0tcfmArUuGHXrJKPx6PIENa8
-Message-ID: <CAPhRvkyCQQM1cv+zQgZjbQDhQ2YVxJ26PG9UrkA6B7uTCguhPQ@mail.gmail.com>
-Subject: Re: [BUG] rxrpc: Client connection leak and BUG() call during kernel
- IO thread exit
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
-	Jeffrey Altman <jaltman@auristor.com>, Simon Horman <horms@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[allelesecurity.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[allelesecurity.com:s=google];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260422092327.3f629ad6@shazbot.org>
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280499-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[allelesecurity.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[anderson@allelesecurity.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-280500-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[ziepe.ca:+];
+	DMARC_NA(0.00)[ziepe.ca];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,allelesecurity.com:dkim,allelesecurity.com:url]
-X-Rspamd-Queue-Id: 327A3448B50
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ziepe.ca:dkim,ziepe.ca:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2055F448C1B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi David,
+On Wed, Apr 22, 2026 at 09:23:27AM -0600, Alex Williamson wrote:
+> In general though, I'm really hoping that someone interested in
+> enabling TPH as an interface through vfio actually decides to take
+> resource targeting and revocation seriously.  There's no validation of
+> the steering tag here relative to what the user has access to and no
+> mechanism to revoke those tags if access changes.  In fact, there's not
+> even a proposed mechanism allowing the user to derive valid steering
+> tags.  Does the user implicitly know the value and the kernel just
+> allows it because... yolo? 
 
-On Wed, Apr 22, 2026 at 1:08=E2=80=AFPM David Howells <dhowells@redhat.com>=
- wrote:
->
-> Do you by any chance have a reproducer program for this?
->
+This is the steering tag that remote devices will send *INTO* the VFIO
+device.
 
-Sorry, I mixed things up and ended up sending a different reproducer.
-I do have it, I will test it now and send here in a few minutes.
+IMHO it is entirely appropriate that the driver controlling the device
+decide what tags are sent into it and when, so that's the VFIO
+userspace.
 
-> David
->
+There is no concept of access here since the entire device is captured
+by VFIO.
 
+If the VFIO device catastrophically malfunctions when receiving
+certain steering tags then it is incompatible with VFIO and we should
+at least block this new API..
 
---=20
-Anderson Nascimento
-Allele Security Intelligence
-https://www.allelesecurity.com
+The only requirement is that the device limit the TPH to only the
+function that is perceiving them. If a device is really broken and
+doesn't meet that then it should be blocked off and it is probably not
+safe to be used with VMs at all.
+
+Jason
 
