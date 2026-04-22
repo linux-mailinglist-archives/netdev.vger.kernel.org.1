@@ -1,171 +1,167 @@
-Return-Path: <netdev+bounces-280368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280369-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sE+2HBGZ6GkwNQIAu9opvQ
-	(envelope-from <netdev+bounces-280368-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 11:46:57 +0200
+	id mN0WHuWc6GlNNQIAu9opvQ
+	(envelope-from <netdev+bounces-280369-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:03:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1351444364
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 11:46:56 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE23D44463F
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:03:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E204F300E173
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 09:45:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 15436305020C
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 09:57:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A7D03C9EC2;
-	Wed, 22 Apr 2026 09:45:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QDcv0/Et"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 322E43CA4A8;
+	Wed, 22 Apr 2026 09:57:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B945E3C8738
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 09:45:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02FF734C9AC
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 09:57:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776851157; cv=none; b=IGyvjfuS6P+FJo6hkGowCwSE5SxMRPf2EPYCfrZkBsxThm4yCASoFuuqM+L0P0SSL2shBkSWL7scyx0WReozLr4qVAoVvq6XGRipdhQQTt3NU6PI4WtABAhi2fPSA99pss8RoXX5LBJ1PBzUI+z5d+P8hk4WBf+a2SqwZHOxgEw=
+	t=1776851842; cv=none; b=D1Qvd9REawbNe/aeoNsCrwwxO3XnonspcmsuNQM0TUuO111DwwoMsNtwoW/hYCVN58pX6Gq+tRbfhLbLpRGkOw8knoAwyfFTVltKwHdPbymoawusb9IKLN7qpAlRRV9JRNWQD5q+wh4kE+PjIY7fxNjNIttCQEX+f3vIQ5fVAgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776851157; c=relaxed/simple;
-	bh=mav/STE0NF7fvNjlQRP3/FZ3RuBFYPwNZT9g9eXKEfY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Uv0SN4/iCoRwmRoOu4tMyK3eaCUfCtiXOGb63KCr4YeQ+FpdbyndzNECLrcmgoxKgzrSUH3XjukI5adz18XV8U8Q1ovr2iIsgCmhr+IF4ccXcculh1Rwz812Kc+S3Hyv6cOnhE9MEADlcigJwgxj9pKfGtwjV8UctiTmbJ/YfcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QDcv0/Et; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776851153;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DWElmvCW88iMc2QmGBoFNqAZ9xIkgo2vBjnUZn+loY8=;
-	b=QDcv0/EtqAOC51MYoEAfqIgEQB8tB6orSDjegqjrC4agsH4omKTleQdyRwztVne7T260/t
-	jU/inoWrTrr4ehadOfmWU4B7Kp9NDKEgeuR4clEoL9AJgUKcCo52jdfdg3xEvTbNe7IT02
-	6OUJDXj4X8Eq1pXJ5zJPbGmBbp06ej0=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-577-QjF5fv6JNrK_ceQh7NBaGw-1; Wed,
- 22 Apr 2026 05:45:49 -0400
-X-MC-Unique: QjF5fv6JNrK_ceQh7NBaGw-1
-X-Mimecast-MFC-AGG-ID: QjF5fv6JNrK_ceQh7NBaGw_1776851147
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EBE7B19560A3;
-	Wed, 22 Apr 2026 09:45:46 +0000 (UTC)
-Received: from thinkpad (dhcp-64-111.muc.redhat.com [10.32.64.111])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 920C03000C21;
-	Wed, 22 Apr 2026 09:45:41 +0000 (UTC)
-Date: Wed, 22 Apr 2026 11:45:38 +0200
-From: Felix Maurer <fmaurer@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Ren Wei <n05ec@lzu.edu.cn>, netdev@vger.kernel.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, kees@kernel.org, kexinsun@smail.nju.edu.cn,
-	luka.gejak@linux.dev, Arvid.Brodin@xdin.com, m-karicheri2@ti.com,
-	yuantan098@gmail.com, yifanwucs@gmail.com, tomapufckgml@gmail.com,
-	bird@lzu.edu.cn, xuyuqiabc@gmail.com, royenheart@gmail.com
-Subject: Re: [PATCH net v3 1/1] net: hsr: limit node table growth
-Message-ID: <aeiYpkiWUD5MtGEB@thinkpad>
-References: <3bdbe54e81bd89c1443b05500368fb45bddc3191.1776754203.git.royenheart@gmail.com>
- <aeiHa7rzmSqzMIaJ@thinkpad>
- <20260422085242.3TkVbXc2@linutronix.de>
+	s=arc-20240116; t=1776851842; c=relaxed/simple;
+	bh=c376wI9bbvUHaE4/CxYnAK/vL/4Qgq7MH2Z/nC1xMGg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=plOW1Rc2NR2V6+Uch1FIQxM+KsEHZdV4mPO87xjpYGrJq8A5IheOqX3fFEmwCOXx9iby3udjLTPj5hWbrMRq4Ek0xwc1D8+RtAMQx5BLFgYR4haEEq99UBJ7L4AcNqmIq0lU6UVkZV6MDis690sHwqzU/hW5u+t5aL9Q/sa3gyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.169.211.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: esmtpgz13t1776851790t3bc52678
+X-QQ-Originating-IP: czZiHjKyUPojHxxTid1qlj98yy3WIcCFpMvV9S8O+48=
+Received: from lap-jiawenwu.trustnetic.com ( [115.220.225.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 22 Apr 2026 17:56:26 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 11127821316921811768
+EX-QQ-RecipientCnt: 17
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Simon Horman <horms@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Breno Leitao <leitao@debian.org>,
+	Joe Damato <joe@dama.to>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Fabio Baltieri <fabio.baltieri@gmail.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [RFC PATCH net-next 0/5] net: wangxun: timeout and error
+Date: Wed, 22 Apr 2026 17:56:12 +0800
+Message-Id: <20260422095617.27080-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260422085242.3TkVbXc2@linutronix.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: MPImiETYjPupEFa2XSCy3byLd1mOjIxLBMQ0bkqHUJhMQmJHjG6UAfi1
+	WvoXPL9CD0x19BZfJ6ZWswLorHJnxy3i5NkuKkP6zVaFUGv/uEFSk/OC1W+iVCmRXvxwYem
+	lc+ukDCYpsR51QnO53G2dIFL1ng9fG1G4hHkoDcNotqZxbRirPltSSXf4DL2snaTlqt/EDo
+	VHM+7XGATg8n8dJLJG/QvgK8T3UyeCycuZirocCGQTvTONsQhJzO42wGKGgqpiRTFBThje7
+	GLV5iEOEn9tDLdNZGcwQ0rqGHpBO2xYzohZKtgjk7GnFOoPUZXDcOWkDJKsyw1hD3D48yFQ
+	XWU578wRuRdYKl8TttBaNxuGMrXIEvPTKA98T0Q1NqbVp8mrX7x2ekCajnABwWGc9Q2Vrin
+	cS5Xtz3BfJxG/voZQ+V14RVLiV/uPkwgPmZmv6rA6ef12LOIseJ2z/C0qItfXj+wtoNWTZP
+	iir+uynfE6Pxmx/7D7n+/nvvJfPaLsqJW/jigZc7fGQ98GtF/Ewe2bAHp9dU9SPXqUDPLww
+	3/g5BxnbH5sz0BVoVOSsXKms42h+uTuV1stxGj/n0H4ywNe2T3cztGwBvH6P+1J20xrgZAj
+	d2NaHSFRauvKqW4I2baH5Uflp/r6BlooMUpaONH0VzTx8zAqImONy6IDBAslDYbuIIyFOoD
+	AOCaRi0kKIyxWkUgLA86u+e46oCioAb5Yeg86yReczTxK8kLN+CmxcRWx9z43GBPzLQpK4Q
+	TklxccJXteFFR1Z0UiVHtB1q19X/BvGrxhr4qV+4FNaPVQEpBTR1aFg+Btez7kTkl1271Hu
+	8w7jbKbxX7OQMkPOYDn+PJw79p6iQQSDLdQP3XBF7PlmHEfxoAh3x+F1wKIEiIlbrKBKolU
+	d9azYw7zmRA/vBy7coaR4ymo+AFlm4iv9vr2ks9fFMEJgO56nCBg8kPvGvPYpRFH7Kp1PVo
+	sqMMhLGjqM7+ryt3JG1wVQSI8H36t962ijAF4o93Ko7LdPcPrQM8LRFZsYL77a1Nd0agcar
+	Zgdx5OTpUUnYUGFMQgz09iDxV52CDA8TmTfO6KStnuzKbOB92yBrYaTOQAQvYV+t+qNxI+a
+	0YRQRtLwbRTlIfWAFW3tYgi2TMUA09u86qR99p3z7VJyRWyZs6jlSVr/2g1l4ew20256J5k
+	hwmxqNyKv2/zbr0=
+X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
+X-QQ-RECHKSPAM: 0
+X-Spamd-Result: default: False [1.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	MID_CONTAINS_FROM(1.00)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-280369-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280368-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lzu.edu.cn,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,smail.nju.edu.cn,linux.dev,xdin.com,ti.com,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[trustnetic.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E1351444364
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,intel.com,debian.org,dama.to,trustnetic.com];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[trustnetic.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BE23D44463F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 22, 2026 at 10:52:42AM +0200, Sebastian Andrzej Siewior wrote:
-> On 2026-04-22 10:31:39 [+0200], Felix Maurer wrote:
-> > On Tue, Apr 21, 2026 at 10:50:01PM +0800, Ren Wei wrote:
-> > > diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
-> > > index d09875b33588..8a5a2a54a81f 100644
-> > > --- a/net/hsr/hsr_framereg.c
-> > > +++ b/net/hsr/hsr_framereg.c
-> > > @@ -189,6 +195,7 @@ static struct hsr_node *hsr_add_node(struct hsr_priv *hsr,
-> > >  				     enum hsr_port_type rx_port)
-> > >  {
-> > >  	struct hsr_node *new_node, *node = NULL;
-> > > +	unsigned int node_count = 0;
-> > >  	unsigned long now;
-> > >  	size_t block_sz;
-> > >  	int i;
-> > > @@ -226,20 +233,31 @@ static struct hsr_node *hsr_add_node(struct hsr_priv *hsr,
-> > >  	spin_lock_bh(&hsr->list_lock);
-> > >  	list_for_each_entry_rcu(node, node_db, mac_list,
-> > >  				lockdep_is_held(&hsr->list_lock)) {
-> > > +		node_count++;
-> >
-> > I'm not sure if this on-the-fly node counting is the best solution here.
-> > My concern is that it comes quite late in the process, i.e., after we
-> > already allocated a bunch of memory, etc. As we are discussing a
-> > scenario where a lot of entries are created, maybe we shouldn't even
-> > allocate a new_node if the table is already full? For example by storing
-> > the node_count in hsr_priv and checking it early in the function?
->
-> The node is allocated upfront. Then it iterates here and we only end up
-> counting through the full list if there is no match. This is under a
-> lock so "many clients" are serialized. If we allocate the node later
-> then we need to do it under the lock.
->
-> I don't think the node count exceeds 100 in production. So having a
-> counter which is incremented while adding to the list and decremented
-> while removing items from the list would optimize the "worst case". So
-> instead traversing the list with 1000 we would just give up.
+This series is a split of the previous series:
+https://lore.kernel.org/all/20260326021406.30444-1-jiawenwu@trustnetic.com
 
-The counter is what I had in mind. I agree that allocating under the
-lock isn't what we want.
+It is about adding the Tx timeout process and pci_error_handlers.
+The changes from the last full patch set V6:
+- Add 'else' handling in ngbe_do_reset().
+- Acquire rtnl_lock() before checking netif_running() in
+  wx_reset_subtask().
+- Use test_and_clear_bit() instead of test_bit()…clear_bit() to avoid
+  losing another reset request.
+- Change ‘u64 tx_done_old’ to ‘u32’ to avoid data race between
+  dev_watchdog and NAPI polling.
+- Check the return value of ndo_open() in wx_io_resume().
+- Drop pci_save_state().
 
-I'd argue counting through the whole list is the normal case.
-hsr_add_node() is only called after the node table has been searched
-already (without the lock). Here we go through the whole list again
-under the lock to prevent TOCTOU-type situations.
+Jiawen Wu (5):
+  net: ngbe: implement libwx reset ops
+  net: wangxun: add Tx timeout process
+  net: wangxun: add reinit parameter to wx->do_reset callback
+  net: wangxun: extract the close_suspend sequence
+  net: wangxun: implement pci_error_handlers ops
 
-I agree that, overall, it would be optimizing the worst case, but I
-think it may be worth it to prevent the memory allocations and walking
-the whole list. But I'd go along with the (current) on-the-fly counting
-as well.
+ drivers/net/ethernet/wangxun/libwx/Makefile   |   2 +-
+ drivers/net/ethernet/wangxun/libwx/wx_err.c   | 232 ++++++++++++++++++
+ drivers/net/ethernet/wangxun/libwx/wx_err.h   |  16 ++
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   |   2 +-
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  17 +-
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  41 +++-
+ drivers/net/ethernet/wangxun/libwx/wx_lib.h   |   1 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  16 +-
+ .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  |   1 -
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  68 ++++-
+ drivers/net/ethernet/wangxun/ngbe/ngbe_type.h |   2 +
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  26 +-
+ .../net/ethernet/wangxun/txgbe/txgbe_type.h   |   3 +-
+ 13 files changed, 398 insertions(+), 29 deletions(-)
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_err.c
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_err.h
 
-Thanks,
-   Felix
+-- 
+2.51.0
 
 
