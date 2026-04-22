@@ -1,685 +1,608 @@
-Return-Path: <netdev+bounces-280458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280460-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yDOFEAft6GkdRwIAu9opvQ
-	(envelope-from <netdev+bounces-280458-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 17:45:11 +0200
+	id oAoDEeHu6GkdRwIAu9opvQ
+	(envelope-from <netdev+bounces-280460-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 17:53:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 482EF44812D
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 17:45:10 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2B5A44825B
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 17:53:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EF465306F976
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 15:41:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 169F930036EB
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 15:49:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7653C23EAB0;
-	Wed, 22 Apr 2026 15:41:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9559E36921C;
+	Wed, 22 Apr 2026 15:49:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mrBXGnJc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144CA3603E8
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 15:41:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A728D37268A;
+	Wed, 22 Apr 2026 15:49:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776872488; cv=none; b=ld6qpdXwNI9yolWFcfgEV2HEBWdSQvaq0a9omwk7+BcQcotqiFJOTULoQpTkdcELXtQIQbVI/hNUJen1GjkBvV8xmxzBkIhzR4F2feb6ZT0mDb3p3WQSATQlOFKVWJUVvmFI5iiLTSyrLmMnp+RWDtB/n5M8Li47b6EUxSgZci0=
+	t=1776872957; cv=none; b=pcfsxKiXXk5JaTl3AzeF4ShlI00yhDrMMIvN6omJs4vbpKd3M2GWGaeaHnK9qPg5r8SyMYY/VJ6ZStuU3WH9IAPEdnkvVA8O4bNI1dPcVABq0UE3ybpWaMVmox/ayzAxul+DRR+BJphPaIfS9howId1B8xG11n38jaCdPh0zeI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776872488; c=relaxed/simple;
-	bh=FuHqeMPBugO7e7mKSgYSMiUtp5emEUTvVHMCGNrZXUw=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=ezbJIP/UfmoXJnm1PcOsf1ZiQkBIBlKQJhKiTYU2rZktyqd0m0WhBMvYUdfcflzGQzg2ASRXetdDxZ+N3HdReOa68LiBm4O46gKdwciR+c2LaizN6hsojc2frGDp7I5UhGCe1lLsQNgbrLrzx/hb+daV1BKIMU7mNvx2tZPks1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-7d4be1dee67so13625405a34.1
-        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 08:41:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776872483; x=1777477283;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TvOIbCOlcKLF/q9h5ZsMWZD9fBBrRQBXetA4KmJXLV0=;
-        b=C3W55ZcGSpPXJSscDnnrg4qzVQ3cS7xT6eDCRdb1za0aLQQmArpm9VKF74x8VC3KRA
-         tk4tl0npp1uZcEui1pXy/I9ErTWtFESeeaQWT83P2WrsOfQl5nelXxlb1rvg+ZjZUyA8
-         OkD8LESPX427ci+cJTkSDNGymOq3JwAdyx/zW9J2H+xWNfDfEjh5dE9hwN/+E2+RiOCP
-         YhCAU0SNZFXSJ6D0vqPkuShKX7OgU4hfu5VyhJiqmTUAD5ffyXLMVjkaiJN8xE0yhYX5
-         Cov5O5Y3quvrjituG3RLDuhWD+GVVim5Qu/kBWjASRGlU6KEaBYPlKVfWBpcQfj5Y6ZS
-         L11g==
-X-Forwarded-Encrypted: i=1; AFNElJ+QJ++3y5DsF4OlXRVSSnibme5w+SSnH9q2kFUF2prJ2/CQlysfvXH7GfFj33HiUTmQ10IhQYQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOkBh5Vv+90a7AR2aKzzOU1y+NZETbx0tVtFMkCtTkNyMWNxCm
-	nJylwtLMVTrzj49sQHcJH256pAU3v6MvCslhjsD7ZwrshtlojSdgf6X37MfFdWG3plat8Jrwpk8
-	gsH7PoW6Vzfaj1LuDLk/OirF7w1uNQIfLTxpLL/g+Fui+fuatbtBYs380+qw=
+	s=arc-20240116; t=1776872957; c=relaxed/simple;
+	bh=rSLN8a0eRNPWsCLF52YTCfIE3ezArt4x04asnJMGNVc=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:From:To:
+	 References:In-Reply-To; b=rGzjavv4vdfWPpDS3ikwcGZJU0Dd7pm7qeBIEf9Si5ZLVmmE3DlOXI6Z/iMiWsoSNmbRpcXB1gx+KkjxfVlGoTW9EDW74UByApj+NdcYn1OplVFSHbCQgL9eouFOME5qVaG8FAvz4m2zeDFfTA/oTRNtCtr3gXeDrkBw4XoGjf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mrBXGnJc; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 4BA6E4E42AB2;
+	Wed, 22 Apr 2026 15:49:05 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 0658E5FA8F;
+	Wed, 22 Apr 2026 15:49:05 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C7882104608C5;
+	Wed, 22 Apr 2026 17:48:57 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1776872943; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=ylCkfRaLbVCJVzP0hLJAxXkLelBwcBu5/BQPAM4q+nI=;
+	b=mrBXGnJc4P1KmPTjNV02hMhVnomrEcm19LAP35zV9pugvPXnovApZuOG9kFOJ1ozuPq7kz
+	l+arOaE7YU6eLuZVeqGsNC24RVBh06DK/KjgQfMs/TE3/jcmAmbNDWah2l8eOUpAzeTyXs
+	+S1fOIo2AmR0cteynRnK2SAQG2hPY59x23o5qACCzp2gg1Bzw52O2uTOiSZ4umlBoDoA1b
+	nOPx3URaLYdKfHSFq0mnIdAEX+mkIyMHwLmziwmfC0sm/YZ9P+UbddMSXY+0TFbSXFMOki
+	y88oVzsuPt2yHjVadzdPGpnYQvCuIh7tsqRrUQynTvplGnEG5ZO6TEFsNILdng==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6820:a28b:20b0:694:9c29:c288 with SMTP id
- 006d021491bc7-6949c29d69bmr2859833eaf.40.1776872483244; Wed, 22 Apr 2026
- 08:41:23 -0700 (PDT)
-Date: Wed, 22 Apr 2026 08:41:23 -0700
-In-Reply-To: <20260422105802.486216-1-25181214217@stu.xidian.edu.cn>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69e8ec23.a00a0220.9259.001f.GAE@google.com>
-Subject: [syzbot ci] Re: ipv6: udp: fix memory leak in udpv6_sendmsg error path
-From: syzbot ci <syzbot+ci226b639d4356c37f@syzkaller.appspotmail.com>
-To: 25181214217@stu.xidian.edu.cn, davem@davemloft.net, dsahern@kernel.org, 
-	edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	willemdebruijn.kernel@gmail.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.14 / 15.00];
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 22 Apr 2026 17:48:57 +0200
+Message-Id: <DHZSVYDAKTH0.2BOEGGXUZUJQJ@bootlin.com>
+Subject: Re: [PATCH bpf-next] selftests/bpf: drop xdping tool
+Cc: <ebpf@linuxfoundation.org>, "Bastien Curutchet"
+ <bastien.curutchet@bootlin.com>, "Thomas Petazzoni"
+ <thomas.petazzoni@bootlin.com>, <linux-kernel@vger.kernel.org>,
+ <bpf@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+ <netdev@vger.kernel.org>
+From: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+To: "Alan Maguire" <alan.maguire@oracle.com>,
+ =?utf-8?b?QWxleGlzIExvdGhvcsOpIChlQlBGIEZvdW5kYXRpb24p?=
+ <alexis.lothore@bootlin.com>, "Andrii Nakryiko" <andrii@kernel.org>,
+ "Eduard Zingerman" <eddyz87@gmail.com>, "Alexei Starovoitov"
+ <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>, "Martin KaFai
+ Lau" <martin.lau@linux.dev>, "Kumar Kartikeya Dwivedi" <memxor@gmail.com>,
+ "Song Liu" <song@kernel.org>, "Yonghong Song" <yonghong.song@linux.dev>,
+ "Jiri Olsa" <jolsa@kernel.org>, "Shuah Khan" <shuah@kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, "Jakub Kicinski" <kuba@kernel.org>, "Jesper
+ Dangaard Brouer" <hawk@kernel.org>, "John Fastabend"
+ <john.fastabend@gmail.com>, "Stanislav Fomichev" <sdf@fomichev.me>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260417-xdping-v1-1-9b0ce0e7adf8@bootlin.com>
+ <dc0f3c46-32e0-411d-9e50-498cf9b05505@oracle.com>
+In-Reply-To: <dc0f3c46-32e0-411d-9e50-498cf9b05505@oracle.com>
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280458-lists,netdev=lfdr.de,ci226b639d4356c37f];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-280460-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[oracle.com,bootlin.com,kernel.org,gmail.com,iogearbox.net,linux.dev,davemloft.net,fomichev.me];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[stu.xidian.edu.cn,davemloft.net,kernel.org,google.com,vger.kernel.org,redhat.com,gmail.com];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	FROM_NEQ_ENVFROM(0.00)[alexis.lothore@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,googlegroups.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,googlesource.com:url,syzbot.org:url]
-X-Rspamd-Queue-Id: 482EF44812D
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[test_lirc_mode2.sh:url,xsk_prereqs.sh:url,bootlin.com:mid,bootlin.com:email,bootlin.com:dkim,bootlin.com:url,oracle.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,test_xsk.sh:url,test_kmod.sh:url,test_bpftool_build.sh:url,liburandom_read.so:url,test_doc_build.sh:url,test_xdping.sh:url]
+X-Rspamd-Queue-Id: B2B5A44825B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-syzbot ci has tested the following series
+On Wed Apr 22, 2026 at 4:30 PM CEST, Alan Maguire wrote:
+> On 17/04/2026 16:33, Alexis Lothor=C3=A9 (eBPF Foundation) wrote:
+>> As part of a larger cleanup effort in the bpf selftests directory,
+>> tests and scripts are either being converted to the test_progs framework
+>> (so they are executed automatically in bpf CI), or removed if not
+>> relevant for such integration.
+>>=20
+>> The test_xdping.sh script (with the associated xdping.c) acts as a RTT
+>> measurement tool, by attaching two small xdp programs to two interfaces.
+>> Converting this test to test_progs may not make much sense:
+>> - RTT measurement does not really fit in the scope of a functional test,
+>>   this is rather about measuring some performance level.
+>> - there are other existing tests in test_progs that actively validate
+>>   XDP features like program attachment, return value processing, packet
+>>   modification, etc
+>>=20
+>> Drop test_xdping.sh and the corresponding xdping.c userspace part. Keep
+>> the ebpf part (xdping_kern.c), as it is used by another test integrated
+>> in test_progs (btf_dump)
+>>=20
+>> Signed-off-by: Alexis Lothor=C3=A9 (eBPF Foundation) <alexis.lothore@boo=
+tlin.com>
+>
+> Reviewed-by: Alan Maguire <alan.maguire@oracle.com>
+>
+> as discussed, switching to loading xdp_dummy.bpf.o in prog_tests/btf_dump=
+.c=20
+> would be good too (feel free to retain the Reviewed-by: with that v2 chan=
+ge).
 
-[v1] ipv6: udp: fix memory leak in udpv6_sendmsg error path
-https://lore.kernel.org/all/20260422105802.486216-1-25181214217@stu.xidian.edu.cn
-* [PATCH] ipv6: udp: fix memory leak in udpv6_sendmsg error path
+Great, I was kind of hoping to get your feedback, as you are the one who
+have originally introduced the test. Thanks !
 
-and found the following issues:
-* KASAN: slab-use-after-free Read in ip6_pol_route
-* KASAN: slab-use-after-free Write in rcuref_put
-* WARNING in rcuref_put_slowpath
-
-Full report is available here:
-https://ci.syzbot.org/series/2abb21f1-6f46-4f6f-a074-0051111986db
-
-***
-
-KASAN: slab-use-after-free Read in ip6_pol_route
-
-tree:      torvalds
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux
-base:      6596a02b207886e9e00bb0161c7fd59fea53c081
-arch:      amd64
-compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-config:    https://ci.syzbot.org/builds/ad85c1df-394a-471c-b2ea-0e168bab3b26/config
-syz repro: https://ci.syzbot.org/findings/66d12b42-aa7a-4da1-b456-d18de1a54007/syz_repro
-
-==================================================================
-BUG: KASAN: slab-use-after-free in rt6_get_pcpu_route net/ipv6/route.c:1446 [inline]
-BUG: KASAN: slab-use-after-free in ip6_pol_route+0x12b5/0x13d0 net/ipv6/route.c:2316
-Read of size 4 at addr ffff88810e948518 by task syz.0.26/6002
-
-CPU: 0 UID: 0 PID: 6002 Comm: syz.0.26 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- print_address_description+0x55/0x1e0 mm/kasan/report.c:378
- print_report+0x58/0x70 mm/kasan/report.c:482
- kasan_report+0x117/0x150 mm/kasan/report.c:595
- rt6_get_pcpu_route net/ipv6/route.c:1446 [inline]
- ip6_pol_route+0x12b5/0x13d0 net/ipv6/route.c:2316
- pol_lookup_func include/net/ip6_fib.h:667 [inline]
- fib6_rule_lookup+0x222/0x730 net/ipv6/fib6_rules.c:123
- ip6_route_output_flags_noref net/ipv6/route.c:2699 [inline]
- ip6_route_output_flags+0x364/0x5d0 net/ipv6/route.c:2711
- ip6_route_output include/net/ip6_route.h:100 [inline]
- ip6_dst_lookup_tail+0x1c3/0x15a0 net/ipv6/ip6_output.c:1155
- ip6_dst_lookup_flow+0x89/0x150 net/ipv6/ip6_output.c:1288
- ip6_datagram_dst_update+0x73a/0xd20 net/ipv6/datagram.c:97
- __ip6_datagram_connect+0xbd1/0x1150 net/ipv6/datagram.c:256
- udpv6_connect+0x36/0x240 net/ipv6/udp.c:1297
- __sys_connect_file net/socket.c:2148 [inline]
- __sys_connect+0x312/0x450 net/socket.c:2167
- __do_sys_connect net/socket.c:2173 [inline]
- __se_sys_connect net/socket.c:2170 [inline]
- __x64_sys_connect+0x7a/0x90 net/socket.c:2170
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f999eb9c819
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f999fa0a028 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
-RAX: ffffffffffffffda RBX: 00007f999ee15fa0 RCX: 00007f999eb9c819
-RDX: 000000000000001c RSI: 00002000000002c0 RDI: 0000000000000003
-RBP: 00007f999ec32c91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f999ee16038 R14: 00007f999ee15fa0 R15: 00007fff22f1ff88
- </TASK>
-
-Allocated by task 30:
- kasan_save_stack mm/kasan/common.c:57 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
- unpoison_slab_object mm/kasan/common.c:340 [inline]
- __kasan_slab_alloc+0x6c/0x80 mm/kasan/common.c:366
- kasan_slab_alloc include/linux/kasan.h:253 [inline]
- slab_post_alloc_hook mm/slub.c:4569 [inline]
- slab_alloc_node mm/slub.c:4898 [inline]
- kmem_cache_alloc_noprof+0x2bc/0x650 mm/slub.c:4905
- dst_alloc+0x105/0x170 net/core/dst.c:90
- ip6_dst_alloc net/ipv6/route.c:342 [inline]
- ip6_rt_pcpu_alloc net/ipv6/route.c:1419 [inline]
- rt6_make_pcpu_route net/ipv6/route.c:1468 [inline]
- ip6_pol_route+0xafb/0x13d0 net/ipv6/route.c:2319
- pol_lookup_func include/net/ip6_fib.h:667 [inline]
- fib6_rule_lookup+0x222/0x730 net/ipv6/fib6_rules.c:123
- ip6_route_output_flags_noref net/ipv6/route.c:2699 [inline]
- ip6_route_output_flags+0x364/0x5d0 net/ipv6/route.c:2711
- ip6_route_output include/net/ip6_route.h:100 [inline]
- ip6_dst_lookup_tail+0x1c3/0x15a0 net/ipv6/ip6_output.c:1155
- ip6_dst_lookup_flow+0x89/0x150 net/ipv6/ip6_output.c:1288
- send6+0x4dc/0x910 drivers/net/wireguard/socket.c:139
- wg_socket_send_skb_to_peer+0x111/0x1d0 drivers/net/wireguard/socket.c:177
- wg_packet_send_handshake_initiation drivers/net/wireguard/send.c:40 [inline]
- wg_packet_handshake_send_worker+0x203/0x350 drivers/net/wireguard/send.c:51
- process_one_work kernel/workqueue.c:3302 [inline]
- process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3385
- worker_thread+0xa53/0xfc0 kernel/workqueue.c:3466
- kthread+0x388/0x470 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-Freed by task 23:
- kasan_save_stack mm/kasan/common.c:57 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
- kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:584
- poison_slab_object mm/kasan/common.c:253 [inline]
- __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:285
- kasan_slab_free include/linux/kasan.h:235 [inline]
- slab_free_hook mm/slub.c:2689 [inline]
- slab_free mm/slub.c:6246 [inline]
- kmem_cache_free+0x182/0x650 mm/slub.c:6373
- dst_destroy+0x235/0x350 net/core/dst.c:122
- rcu_do_batch kernel/rcu/tree.c:2617 [inline]
- rcu_core+0x7cd/0x1070 kernel/rcu/tree.c:2869
- handle_softirqs+0x22a/0x840 kernel/softirq.c:622
- run_ksoftirqd+0x36/0x60 kernel/softirq.c:1076
- smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
- kthread+0x388/0x470 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-Last potentially related work creation:
- kasan_save_stack+0x3e/0x60 mm/kasan/common.c:57
- kasan_record_aux_stack+0xbd/0xd0 mm/kasan/generic.c:556
- __call_rcu_common kernel/rcu/tree.c:3131 [inline]
- call_rcu+0xee/0x890 kernel/rcu/tree.c:3251
- inet_sock_destruct+0x564/0x740 net/ipv4/af_inet.c:165
- __sk_destruct+0x8d/0x9d0 net/core/sock.c:2352
- rcu_do_batch kernel/rcu/tree.c:2617 [inline]
- rcu_core+0x7cd/0x1070 kernel/rcu/tree.c:2869
- handle_softirqs+0x22a/0x840 kernel/softirq.c:622
- run_ksoftirqd+0x36/0x60 kernel/softirq.c:1076
- smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
- kthread+0x388/0x470 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-The buggy address belongs to the object at ffff88810e948480
- which belongs to the cache ip6_dst_cache of size 232
-The buggy address is located 152 bytes inside of
- freed 232-byte region [ffff88810e948480, ffff88810e948568)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x10e948
-head: order:1 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-memcg:ffff88810e9480f9
-flags: 0x17ff00000000040(head|node=0|zone=2|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 017ff00000000040 ffff8881772f6c80 dead000000000100 dead000000000122
-raw: 0000000000000000 0000018000150015 00000000f5000000 ffff88810e9480f9
-head: 017ff00000000040 ffff8881772f6c80 dead000000000100 dead000000000122
-head: 0000000000000000 0000018000150015 00000000f5000000 ffff88810e9480f9
-head: 017ff00000000001 ffffffffffffff81 00000000ffffffff 00000000ffffffff
-head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000002
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 1, migratetype Unmovable, gfp_mask 0xd2820(GFP_ATOMIC|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5871, tgid 5871 (kworker/0:3), ts 86853962004, free_ts 86835725693
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x231/0x280 mm/page_alloc.c:1858
- prep_new_page mm/page_alloc.c:1866 [inline]
- get_page_from_freelist+0x24ba/0x2540 mm/page_alloc.c:3946
- __alloc_frozen_pages_noprof+0x18d/0x380 mm/page_alloc.c:5226
- alloc_slab_page mm/slub.c:3278 [inline]
- allocate_slab+0x77/0x660 mm/slub.c:3467
- new_slab mm/slub.c:3525 [inline]
- refill_objects+0x339/0x3d0 mm/slub.c:7251
- refill_sheaf mm/slub.c:2816 [inline]
- __pcs_replace_empty_main+0x321/0x720 mm/slub.c:4651
- alloc_from_pcs mm/slub.c:4749 [inline]
- slab_alloc_node mm/slub.c:4883 [inline]
- kmem_cache_alloc_noprof+0x37d/0x650 mm/slub.c:4905
- dst_alloc+0x105/0x170 net/core/dst.c:90
- ip6_dst_alloc net/ipv6/route.c:342 [inline]
- ip6_rt_pcpu_alloc net/ipv6/route.c:1419 [inline]
- rt6_make_pcpu_route net/ipv6/route.c:1468 [inline]
- ip6_pol_route+0xafb/0x13d0 net/ipv6/route.c:2319
- pol_lookup_func include/net/ip6_fib.h:667 [inline]
- fib6_rule_lookup+0x556/0x730 net/ipv6/fib6_rules.c:123
- ip6_route_input_lookup net/ipv6/route.c:2352 [inline]
- ip6_route_input+0x730/0xad0 net/ipv6/route.c:2655
- ip6_rcv_finish+0x141/0x280 net/ipv6/ip6_input.c:117
- NF_HOOK+0x336/0x3c0 include/linux/netfilter.h:318
- __netif_receive_skb_one_core net/core/dev.c:6209 [inline]
- __netif_receive_skb net/core/dev.c:6322 [inline]
- process_backlog+0x7dd/0x1950 net/core/dev.c:6673
- __napi_poll+0xae/0x340 net/core/dev.c:7737
- napi_poll net/core/dev.c:7800 [inline]
- net_rx_action+0x627/0xf70 net/core/dev.c:7957
-page last free pid 5871 tgid 5871 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- __free_pages_prepare mm/page_alloc.c:1402 [inline]
- __free_frozen_pages+0xbc7/0xd30 mm/page_alloc.c:2943
- rcu_do_batch kernel/rcu/tree.c:2617 [inline]
- rcu_core+0x7cd/0x1070 kernel/rcu/tree.c:2869
- handle_softirqs+0x22a/0x840 kernel/softirq.c:622
- do_softirq+0x76/0xd0 kernel/softirq.c:523
- __local_bh_enable_ip+0xf8/0x130 kernel/softirq.c:450
- local_bh_enable include/linux/bottom_half.h:33 [inline]
- __alloc_skb+0x1aa/0x7d0 net/core/skbuff.c:697
- alloc_skb include/linux/skbuff.h:1383 [inline]
- mld_newpack+0x14c/0xc90 net/ipv6/mcast.c:1775
- add_grhead+0x5a/0x2a0 net/ipv6/mcast.c:1886
- add_grec+0x1452/0x1740 net/ipv6/mcast.c:2025
- mld_send_cr net/ipv6/mcast.c:2148 [inline]
- mld_ifc_work+0x6e6/0xe70 net/ipv6/mcast.c:2693
- process_one_work kernel/workqueue.c:3302 [inline]
- process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3385
- worker_thread+0xa53/0xfc0 kernel/workqueue.c:3466
- kthread+0x388/0x470 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-Memory state around the buggy address:
- ffff88810e948400: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff88810e948480: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff88810e948500: fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc
-                            ^
- ffff88810e948580: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff88810e948600: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-
-***
-
-KASAN: slab-use-after-free Write in rcuref_put
-
-tree:      torvalds
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux
-base:      6596a02b207886e9e00bb0161c7fd59fea53c081
-arch:      amd64
-compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-config:    https://ci.syzbot.org/builds/ad85c1df-394a-471c-b2ea-0e168bab3b26/config
-syz repro: https://ci.syzbot.org/findings/3d5ef30a-8158-4bce-901b-48b8fcc50925/syz_repro
-
-==================================================================
-BUG: KASAN: slab-use-after-free in instrument_atomic_read_write include/linux/instrumented.h:112 [inline]
-BUG: KASAN: slab-use-after-free in atomic_sub_return_release include/linux/atomic/atomic-instrumented.h:326 [inline]
-BUG: KASAN: slab-use-after-free in __rcuref_put include/linux/rcuref.h:109 [inline]
-BUG: KASAN: slab-use-after-free in rcuref_put+0xf7/0x170 include/linux/rcuref.h:173
-Write of size 4 at addr ffff8881130ec940 by task klogd/5265
-
-CPU: 0 UID: 0 PID: 5265 Comm: klogd Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <IRQ>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- print_address_description+0x55/0x1e0 mm/kasan/report.c:378
- print_report+0x58/0x70 mm/kasan/report.c:482
- kasan_report+0x117/0x150 mm/kasan/report.c:595
- check_region_inline mm/kasan/generic.c:-1 [inline]
- kasan_check_range+0x264/0x2c0 mm/kasan/generic.c:200
- instrument_atomic_read_write include/linux/instrumented.h:112 [inline]
- atomic_sub_return_release include/linux/atomic/atomic-instrumented.h:326 [inline]
- __rcuref_put include/linux/rcuref.h:109 [inline]
- rcuref_put+0xf7/0x170 include/linux/rcuref.h:173
- dst_release+0x24/0x1b0 net/core/dst.c:168
- inet_sock_destruct+0x564/0x740 net/ipv4/af_inet.c:165
- __sk_destruct+0x8d/0x9d0 net/core/sock.c:2352
- rcu_do_batch kernel/rcu/tree.c:2617 [inline]
- rcu_core+0x7cd/0x1070 kernel/rcu/tree.c:2869
- handle_softirqs+0x22a/0x840 kernel/softirq.c:622
- do_softirq+0x76/0xd0 kernel/softirq.c:523
- </IRQ>
- <TASK>
- __local_bh_enable_ip+0xf8/0x130 kernel/softirq.c:450
- local_bh_enable include/linux/bottom_half.h:33 [inline]
- __alloc_skb+0x1aa/0x7d0 net/core/skbuff.c:697
- alloc_skb include/linux/skbuff.h:1383 [inline]
- alloc_skb_with_frags+0xc8/0x760 net/core/skbuff.c:6734
- sock_alloc_send_pskb+0x878/0x990 net/core/sock.c:2998
- unix_dgram_sendmsg+0x460/0x18d0 net/unix/af_unix.c:2131
- sock_sendmsg_nosec net/socket.c:787 [inline]
- __sock_sendmsg net/socket.c:802 [inline]
- __sys_sendto+0x672/0x710 net/socket.c:2265
- __do_sys_sendto net/socket.c:2272 [inline]
- __se_sys_sendto net/socket.c:2268 [inline]
- __x64_sys_sendto+0xde/0x100 net/socket.c:2268
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f2da31309b5
-Code: 8b 44 24 08 48 83 c4 28 48 98 c3 48 98 c3 41 89 ca 64 8b 04 25 18 00 00 00 85 c0 75 26 45 31 c9 45 31 c0 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 76 7a 48 8b 15 44 c4 0c 00 f7 d8 64 89 02 48 83
-RSP: 002b:00007fffcd483948 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007f2da31309b5
-RDX: 0000000000000071 RSI: 000055812f074f90 RDI: 0000000000000003
-RBP: 000055812f070910 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000004000 R11: 0000000000000246 R12: 0000000000000013
-R13: 00007f2da32be212 R14: 00007fffcd483a48 R15: 0000000000000000
- </TASK>
-
-Allocated by task 3571:
- kasan_save_stack mm/kasan/common.c:57 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
- unpoison_slab_object mm/kasan/common.c:340 [inline]
- __kasan_slab_alloc+0x6c/0x80 mm/kasan/common.c:366
- kasan_slab_alloc include/linux/kasan.h:253 [inline]
- slab_post_alloc_hook mm/slub.c:4569 [inline]
- slab_alloc_node mm/slub.c:4898 [inline]
- kmem_cache_alloc_noprof+0x2bc/0x650 mm/slub.c:4905
- dst_alloc+0x105/0x170 net/core/dst.c:90
- ip6_dst_alloc net/ipv6/route.c:342 [inline]
- ip6_rt_pcpu_alloc net/ipv6/route.c:1419 [inline]
- rt6_make_pcpu_route net/ipv6/route.c:1468 [inline]
- ip6_pol_route+0xafb/0x13d0 net/ipv6/route.c:2319
- pol_lookup_func include/net/ip6_fib.h:667 [inline]
- fib6_rule_lookup+0x222/0x730 net/ipv6/fib6_rules.c:123
- ip6_route_output_flags_noref net/ipv6/route.c:2699 [inline]
- ip6_route_output_flags+0x364/0x5d0 net/ipv6/route.c:2711
- ip6_route_output include/net/ip6_route.h:100 [inline]
- ip6_dst_lookup_tail+0x1c3/0x15a0 net/ipv6/ip6_output.c:1155
- ip6_dst_lookup_flow+0x89/0x150 net/ipv6/ip6_output.c:1288
- send6+0x4dc/0x910 drivers/net/wireguard/socket.c:139
- wg_socket_send_skb_to_peer+0x111/0x1d0 drivers/net/wireguard/socket.c:177
- wg_packet_send_handshake_initiation drivers/net/wireguard/send.c:40 [inline]
- wg_packet_handshake_send_worker+0x203/0x350 drivers/net/wireguard/send.c:51
- process_one_work kernel/workqueue.c:3302 [inline]
- process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3385
- worker_thread+0xa53/0xfc0 kernel/workqueue.c:3466
- kthread+0x388/0x470 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-Freed by task 5265:
- kasan_save_stack mm/kasan/common.c:57 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
- kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:584
- poison_slab_object mm/kasan/common.c:253 [inline]
- __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:285
- kasan_slab_free include/linux/kasan.h:235 [inline]
- slab_free_hook mm/slub.c:2689 [inline]
- slab_free mm/slub.c:6246 [inline]
- kmem_cache_free+0x182/0x650 mm/slub.c:6373
- dst_destroy+0x235/0x350 net/core/dst.c:122
- rcu_do_batch kernel/rcu/tree.c:2617 [inline]
- rcu_core+0x7cd/0x1070 kernel/rcu/tree.c:2869
- handle_softirqs+0x22a/0x840 kernel/softirq.c:622
- do_softirq+0x76/0xd0 kernel/softirq.c:523
- __local_bh_enable_ip+0xf8/0x130 kernel/softirq.c:450
- local_bh_enable include/linux/bottom_half.h:33 [inline]
- __alloc_skb+0x1aa/0x7d0 net/core/skbuff.c:697
- alloc_skb include/linux/skbuff.h:1383 [inline]
- alloc_skb_with_frags+0xc8/0x760 net/core/skbuff.c:6734
- sock_alloc_send_pskb+0x878/0x990 net/core/sock.c:2998
- unix_dgram_sendmsg+0x460/0x18d0 net/unix/af_unix.c:2131
- sock_sendmsg_nosec net/socket.c:787 [inline]
- __sock_sendmsg net/socket.c:802 [inline]
- __sys_sendto+0x672/0x710 net/socket.c:2265
- __do_sys_sendto net/socket.c:2272 [inline]
- __se_sys_sendto net/socket.c:2268 [inline]
- __x64_sys_sendto+0xde/0x100 net/socket.c:2268
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Last potentially related work creation:
- kasan_save_stack+0x3e/0x60 mm/kasan/common.c:57
- kasan_record_aux_stack+0xbd/0xd0 mm/kasan/generic.c:556
- __call_rcu_common kernel/rcu/tree.c:3131 [inline]
- call_rcu+0xee/0x890 kernel/rcu/tree.c:3251
- udpv6_sendmsg+0x1e9c/0x2690 net/ipv6/udp.c:1712
- sock_sendmsg_nosec net/socket.c:787 [inline]
- __sock_sendmsg net/socket.c:802 [inline]
- ____sys_sendmsg+0x5c7/0x9f0 net/socket.c:2698
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2752
- __sys_sendmmsg+0x27c/0x4e0 net/socket.c:2841
- __do_sys_sendmmsg net/socket.c:2868 [inline]
- __se_sys_sendmmsg net/socket.c:2865 [inline]
- __x64_sys_sendmmsg+0xa0/0xc0 net/socket.c:2865
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-The buggy address belongs to the object at ffff8881130ec900
- which belongs to the cache ip6_dst_cache of size 232
-The buggy address is located 64 bytes inside of
- freed 232-byte region [ffff8881130ec900, ffff8881130ec9e8)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1130ec
-head: order:1 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-memcg:ffff8881130ec0f9
-flags: 0x17ff00000000040(head|node=0|zone=2|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 017ff00000000040 ffff888103f2c500 dead000000000100 dead000000000122
-raw: 0000000000000000 0000018000150015 00000000f5000000 ffff8881130ec0f9
-head: 017ff00000000040 ffff888103f2c500 dead000000000100 dead000000000122
-head: 0000000000000000 0000018000150015 00000000f5000000 ffff8881130ec0f9
-head: 017ff00000000001 ffffffffffffff81 00000000ffffffff 00000000ffffffff
-head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000002
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 1, migratetype Unmovable, gfp_mask 0xd2820(GFP_ATOMIC|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 13, tgid 13 (kworker/u8:1), ts 74988667148, free_ts 74987085458
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x231/0x280 mm/page_alloc.c:1858
- prep_new_page mm/page_alloc.c:1866 [inline]
- get_page_from_freelist+0x24ba/0x2540 mm/page_alloc.c:3946
- __alloc_frozen_pages_noprof+0x18d/0x380 mm/page_alloc.c:5226
- alloc_slab_page mm/slub.c:3278 [inline]
- allocate_slab+0x77/0x660 mm/slub.c:3467
- new_slab mm/slub.c:3525 [inline]
- refill_objects+0x339/0x3d0 mm/slub.c:7251
- refill_sheaf mm/slub.c:2816 [inline]
- __pcs_replace_empty_main+0x321/0x720 mm/slub.c:4651
- alloc_from_pcs mm/slub.c:4749 [inline]
- slab_alloc_node mm/slub.c:4883 [inline]
- kmem_cache_alloc_noprof+0x37d/0x650 mm/slub.c:4905
- dst_alloc+0x105/0x170 net/core/dst.c:90
- ip6_dst_alloc net/ipv6/route.c:342 [inline]
- icmp6_dst_alloc+0x75/0x440 net/ipv6/route.c:3337
- ndisc_send_skb+0x44a/0x1670 net/ipv6/ndisc.c:491
- ndisc_send_ns+0xd7/0x160 net/ipv6/ndisc.c:671
- addrconf_dad_work+0xac4/0x14c0 net/ipv6/addrconf.c:4294
- process_one_work kernel/workqueue.c:3302 [inline]
- process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3385
- worker_thread+0xa53/0xfc0 kernel/workqueue.c:3466
- kthread+0x388/0x470 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
-page last free pid 5952 tgid 5952 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- __free_pages_prepare mm/page_alloc.c:1402 [inline]
- __free_frozen_pages+0xbc7/0xd30 mm/page_alloc.c:2943
- __slab_free+0x274/0x2c0 mm/slub.c:5608
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x99/0x100 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x148/0x160 mm/kasan/quarantine.c:286
- __kasan_slab_alloc+0x22/0x80 mm/kasan/common.c:350
- kasan_slab_alloc include/linux/kasan.h:253 [inline]
- slab_post_alloc_hook mm/slub.c:4569 [inline]
- slab_alloc_node mm/slub.c:4898 [inline]
- kmem_cache_alloc_noprof+0x2bc/0x650 mm/slub.c:4905
- alloc_empty_file+0x5b/0x1d0 fs/file_table.c:262
- alloc_file fs/file_table.c:396 [inline]
- alloc_file_pseudo+0x155/0x240 fs/file_table.c:425
- sock_alloc_file+0xb8/0x2e0 net/socket.c:543
- sock_map_fd net/socket.c:573 [inline]
- __sys_socket+0x13c/0x1b0 net/socket.c:1815
- __do_sys_socket net/socket.c:1820 [inline]
- __se_sys_socket net/socket.c:1818 [inline]
- __x64_sys_socket+0x7a/0x90 net/socket.c:1818
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Memory state around the buggy address:
- ffff8881130ec800: fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc
- ffff8881130ec880: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffff8881130ec900: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                           ^
- ffff8881130ec980: fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc
- ffff8881130eca00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-==================================================================
-
-
-***
-
-WARNING in rcuref_put_slowpath
-
-tree:      torvalds
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux
-base:      6596a02b207886e9e00bb0161c7fd59fea53c081
-arch:      amd64
-compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-config:    https://ci.syzbot.org/builds/ad85c1df-394a-471c-b2ea-0e168bab3b26/config
-syz repro: https://ci.syzbot.org/findings/e5d6936b-9f45-45fd-88ab-8e917a818ac4/syz_repro
-
-------------[ cut here ]------------
-rcuref - imbalanced put()
-WARNING: lib/rcuref.c:266 at rcuref_put_slowpath+0x16e/0x1d0 lib/rcuref.c:266, CPU#0: udevd/5862
-Modules linked in:
-CPU: 0 UID: 0 PID: 5862 Comm: udevd Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:rcuref_put_slowpath+0x16e/0x1d0 lib/rcuref.c:266
-Code: c1 e8 03 42 0f b6 04 38 84 c0 75 48 c7 03 00 00 00 a0 31 c0 e9 6d ff ff ff e8 9e ef 06 07 e8 99 1c 14 fd 48 8d 3d 02 a8 8c 0b <67> 48 0f b9 3a 48 89 df be 04 00 00 00 e8 50 5a 7f fd 48 89 d8 48
-RSP: 0018:ffffc90000007c20 EFLAGS: 00010246
-RAX: ffffffff84b1b457 RBX: ffff88811617cac0 RCX: ffff8881706f1d80
-RDX: 0000000000000100 RSI: 00000000dfffffff RDI: ffffffff903e5c60
-RBP: ffffc90000007cb8 R08: ffff88811617cac3 R09: 1ffff11022c2f958
-R10: dffffc0000000000 R11: ffffed1022c2f959 R12: 1ffff92000000f84
-R13: ffff888116047a08 R14: 00000000dfffffff R15: dffffc0000000000
-FS:  00007f0704ed8c80(0000) GS:ffff88818dc14000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f58f0b456b8 CR3: 000000016883c000 CR4: 00000000000006f0
-Call Trace:
- <IRQ>
- __rcuref_put include/linux/rcuref.h:117 [inline]
- rcuref_put+0x15b/0x170 include/linux/rcuref.h:173
- dst_release+0x24/0x1b0 net/core/dst.c:168
- inet_sock_destruct+0x564/0x740 net/ipv4/af_inet.c:165
- __sk_destruct+0x8d/0x9d0 net/core/sock.c:2352
- rcu_do_batch kernel/rcu/tree.c:2617 [inline]
- rcu_core+0x7cd/0x1070 kernel/rcu/tree.c:2869
- handle_softirqs+0x22a/0x840 kernel/softirq.c:622
- __do_softirq kernel/softirq.c:656 [inline]
- invoke_softirq kernel/softirq.c:496 [inline]
- __irq_exit_rcu+0xca/0x220 kernel/softirq.c:735
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:752
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1061 [inline]
- sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1061
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
-RIP: 0010:lock_acquire+0x221/0x350 kernel/locking/lockdep.c:5872
-Code: ff ff ff e8 a1 d7 16 0a f7 44 24 08 00 02 00 00 0f 84 3a ff ff ff 65 48 8b 05 8b f2 9e 11 48 3b 44 24 58 75 33 fb 48 83 c4 60 <5b> 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc cc 48 8d 3d 58 0a 95
-RSP: 0018:ffffc900032075b0 EFLAGS: 00000282
-RAX: 5df8ffef7d258800 RBX: 0000000000000000 RCX: 0000000000000046
-RDX: 00000000c1e3b5cc RSI: ffffffff8e24e50c RDI: ffffffff8c289ee0
-RBP: ffffffff81d5c3d6 R08: ffffffff81d5c3d6 R09: ffffffff8e95cce0
-R10: ffffc900032076d8 R11: ffffffff81b105c0 R12: 0000000000000002
-R13: ffffffff8e95cce0 R14: 0000000000000000 R15: 0000000000000246
- rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
- rcu_read_lock include/linux/rcupdate.h:838 [inline]
- is_bpf_text_address+0x47/0x2b0 kernel/bpf/core.c:747
- kernel_text_address+0xa5/0xe0 kernel/extable.c:125
- __kernel_text_address+0xd/0x30 kernel/extable.c:79
- unwind_get_return_address+0x4d/0x90 arch/x86/kernel/unwind_orc.c:385
- arch_stack_walk+0xfb/0x150 arch/x86/kernel/stacktrace.c:26
- stack_trace_save+0xa9/0x100 kernel/stacktrace.c:122
- kasan_save_stack mm/kasan/common.c:57 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
- kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:584
- poison_slab_object mm/kasan/common.c:253 [inline]
- __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:285
- kasan_slab_free include/linux/kasan.h:235 [inline]
- slab_free_hook mm/slub.c:2689 [inline]
- slab_free mm/slub.c:6246 [inline]
- kfree+0x1c5/0x640 mm/slub.c:6561
- tomoyo_path_perm+0x403/0x560 security/tomoyo/file.c:847
- security_inode_getattr+0x12b/0x310 security/security.c:1895
- vfs_getattr fs/stat.c:259 [inline]
- vfs_fstat fs/stat.c:281 [inline]
- vfs_fstatat+0xb4/0x170 fs/stat.c:371
- __do_sys_newfstatat fs/stat.c:538 [inline]
- __se_sys_newfstatat fs/stat.c:532 [inline]
- __x64_sys_newfstatat+0x151/0x200 fs/stat.c:532
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f0704b165f4
-Code: 64 c7 00 09 00 00 00 83 c8 ff c3 48 89 f2 b9 00 01 00 00 48 89 fe bf 9c ff ff ff e9 00 00 00 00 41 89 ca b8 06 01 00 00 0f 05 <45> 31 c0 3d 00 f0 ff ff 76 10 48 8b 15 03 a8 0d 00 f7 d8 41 83 c8
-RSP: 002b:00007ffff3316628 EFLAGS: 00000206 ORIG_RAX: 0000000000000106
-RAX: ffffffffffffffda RBX: 00007f0704bee460 RCX: 00007f0704b165f4
-RDX: 00007ffff3316630 RSI: 00007f0704bb3130 RDI: 0000000000000009
-RBP: 0000563dde263be0 R08: 0000000000000000 R09: 0000000000000001
-R10: 0000000000001000 R11: 0000000000000206 R12: 0000000000000002
-R13: 0000000000000002 R14: 0000563dde263be0 R15: 0000563db7af4ea6
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	c1 e8 03             	shr    $0x3,%eax
-   3:	42 0f b6 04 38       	movzbl (%rax,%r15,1),%eax
-   8:	84 c0                	test   %al,%al
-   a:	75 48                	jne    0x54
-   c:	c7 03 00 00 00 a0    	movl   $0xa0000000,(%rbx)
-  12:	31 c0                	xor    %eax,%eax
-  14:	e9 6d ff ff ff       	jmp    0xffffff86
-  19:	e8 9e ef 06 07       	call   0x706efbc
-  1e:	e8 99 1c 14 fd       	call   0xfd141cbc
-  23:	48 8d 3d 02 a8 8c 0b 	lea    0xb8ca802(%rip),%rdi        # 0xb8ca82c
-* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
-  2f:	48 89 df             	mov    %rbx,%rdi
-  32:	be 04 00 00 00       	mov    $0x4,%esi
-  37:	e8 50 5a 7f fd       	call   0xfd7f5a8c
-  3c:	48 89 d8             	mov    %rbx,%rax
-  3f:	48                   	rex.W
+Alexis
+>
+> Thanks!
+>
+> =20
+>> ---
+>>  tools/testing/selftests/bpf/.gitignore     |   1 -
+>>  tools/testing/selftests/bpf/Makefile       |   3 -
+>>  tools/testing/selftests/bpf/test_xdping.sh | 103 ------------
+>>  tools/testing/selftests/bpf/xdping.c       | 254 ----------------------=
+-------
+>>  4 files changed, 361 deletions(-)
+>>=20
+>> diff --git a/tools/testing/selftests/bpf/.gitignore b/tools/testing/self=
+tests/bpf/.gitignore
+>> index bfdc5518ecc8..986a6389186b 100644
+>> --- a/tools/testing/selftests/bpf/.gitignore
+>> +++ b/tools/testing/selftests/bpf/.gitignore
+>> @@ -21,7 +21,6 @@ test_lirc_mode2_user
+>>  flow_dissector_load
+>>  test_tcpnotify_user
+>>  test_libbpf
+>> -xdping
+>>  test_cpp
+>>  *.d
+>>  *.subskel.h
+>> diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selfte=
+sts/bpf/Makefile
+>> index 78e60040811e..00a986a7d088 100644
+>> --- a/tools/testing/selftests/bpf/Makefile
+>> +++ b/tools/testing/selftests/bpf/Makefile
+>> @@ -111,7 +111,6 @@ TEST_FILES =3D xsk_prereqs.sh $(wildcard progs/btf_d=
+ump_test_case_*.c)
+>>  # Order correspond to 'make run_tests' order
+>>  TEST_PROGS :=3D test_kmod.sh \
+>>  	test_lirc_mode2.sh \
+>> -	test_xdping.sh \
+>>  	test_bpftool_build.sh \
+>>  	test_doc_build.sh \
+>>  	test_xsk.sh \
+>> @@ -134,7 +133,6 @@ TEST_GEN_PROGS_EXTENDED =3D \
+>>  	xdp_features \
+>>  	xdp_hw_metadata \
+>>  	xdp_synproxy \
+>> -	xdping \
+>>  	xskxceiver
+>> =20
+>>  TEST_GEN_FILES +=3D $(TEST_KMODS) liburandom_read.so urandom_read sign-=
+file uprobe_multi
+>> @@ -320,7 +318,6 @@ $(OUTPUT)/test_tcpnotify_user: $(CGROUP_HELPERS) $(T=
+ESTING_HELPERS) $(TRACE_HELP
+>>  $(OUTPUT)/test_sock_fields: $(CGROUP_HELPERS) $(TESTING_HELPERS)
+>>  $(OUTPUT)/test_tag: $(TESTING_HELPERS)
+>>  $(OUTPUT)/test_lirc_mode2_user: $(TESTING_HELPERS)
+>> -$(OUTPUT)/xdping: $(TESTING_HELPERS)
+>>  $(OUTPUT)/flow_dissector_load: $(TESTING_HELPERS)
+>>  $(OUTPUT)/test_maps: $(TESTING_HELPERS)
+>>  $(OUTPUT)/test_verifier: $(TESTING_HELPERS) $(CAP_HELPERS) $(UNPRIV_HEL=
+PERS)
+>> diff --git a/tools/testing/selftests/bpf/test_xdping.sh b/tools/testing/=
+selftests/bpf/test_xdping.sh
+>> deleted file mode 100755
+>> index c3d82e0a7378..000000000000
+>> --- a/tools/testing/selftests/bpf/test_xdping.sh
+>> +++ /dev/null
+>> @@ -1,103 +0,0 @@
+>> -#!/bin/bash
+>> -# SPDX-License-Identifier: GPL-2.0
+>> -
+>> -# xdping tests
+>> -#   Here we setup and teardown configuration required to run
+>> -#   xdping, exercising its options.
+>> -#
+>> -#   Setup is similar to test_tunnel tests but without the tunnel.
+>> -#
+>> -# Topology:
+>> -# ---------
+>> -#     root namespace   |     tc_ns0 namespace
+>> -#                      |
+>> -#      ----------      |     ----------
+>> -#      |  veth1  | --------- |  veth0  |
+>> -#      ----------    peer    ----------
+>> -#
+>> -# Device Configuration
+>> -# --------------------
+>> -# Root namespace with BPF
+>> -# Device names and addresses:
+>> -#	veth1 IP: 10.1.1.200
+>> -#	xdp added to veth1, xdpings originate from here.
+>> -#
+>> -# Namespace tc_ns0 with BPF
+>> -# Device names and addresses:
+>> -#       veth0 IPv4: 10.1.1.100
+>> -#	For some tests xdping run in server mode here.
+>> -#
+>> -
+>> -readonly TARGET_IP=3D"10.1.1.100"
+>> -readonly TARGET_NS=3D"xdp_ns0"
+>> -
+>> -readonly LOCAL_IP=3D"10.1.1.200"
+>> -
+>> -setup()
+>> -{
+>> -	ip netns add $TARGET_NS
+>> -	ip link add veth0 type veth peer name veth1
+>> -	ip link set veth0 netns $TARGET_NS
+>> -	ip netns exec $TARGET_NS ip addr add ${TARGET_IP}/24 dev veth0
+>> -	ip addr add ${LOCAL_IP}/24 dev veth1
+>> -	ip netns exec $TARGET_NS ip link set veth0 up
+>> -	ip link set veth1 up
+>> -}
+>> -
+>> -cleanup()
+>> -{
+>> -	set +e
+>> -	ip netns delete $TARGET_NS 2>/dev/null
+>> -	ip link del veth1 2>/dev/null
+>> -	if [[ $server_pid -ne 0 ]]; then
+>> -		kill -TERM $server_pid
+>> -	fi
+>> -}
+>> -
+>> -test()
+>> -{
+>> -	client_args=3D"$1"
+>> -	server_args=3D"$2"
+>> -
+>> -	echo "Test client args '$client_args'; server args '$server_args'"
+>> -
+>> -	server_pid=3D0
+>> -	if [[ -n "$server_args" ]]; then
+>> -		ip netns exec $TARGET_NS ./xdping $server_args &
+>> -		server_pid=3D$!
+>> -		sleep 10
+>> -	fi
+>> -	./xdping $client_args $TARGET_IP
+>> -
+>> -	if [[ $server_pid -ne 0 ]]; then
+>> -		kill -TERM $server_pid
+>> -		server_pid=3D0
+>> -	fi
+>> -
+>> -	echo "Test client args '$client_args'; server args '$server_args': PAS=
+S"
+>> -}
+>> -
+>> -set -e
+>> -
+>> -server_pid=3D0
+>> -
+>> -trap cleanup EXIT
+>> -
+>> -setup
+>> -
+>> -for server_args in "" "-I veth0 -s -S" ; do
+>> -	# client in skb mode
+>> -	client_args=3D"-I veth1 -S"
+>> -	test "$client_args" "$server_args"
+>> -
+>> -	# client with count of 10 RTT measurements.
+>> -	client_args=3D"-I veth1 -S -c 10"
+>> -	test "$client_args" "$server_args"
+>> -done
+>> -
+>> -# Test drv mode
+>> -test "-I veth1 -N" "-I veth0 -s -N"
+>> -test "-I veth1 -N -c 10" "-I veth0 -s -N"
+>> -
+>> -echo "OK. All tests passed"
+>> -exit 0
+>> diff --git a/tools/testing/selftests/bpf/xdping.c b/tools/testing/selfte=
+sts/bpf/xdping.c
+>> deleted file mode 100644
+>> index 9ed8c796645d..000000000000
+>> --- a/tools/testing/selftests/bpf/xdping.c
+>> +++ /dev/null
+>> @@ -1,254 +0,0 @@
+>> -// SPDX-License-Identifier: GPL-2.0
+>> -/* Copyright (c) 2019, Oracle and/or its affiliates. All rights reserve=
+d. */
+>> -
+>> -#include <linux/bpf.h>
+>> -#include <linux/if_link.h>
+>> -#include <arpa/inet.h>
+>> -#include <assert.h>
+>> -#include <errno.h>
+>> -#include <signal.h>
+>> -#include <stdio.h>
+>> -#include <stdlib.h>
+>> -#include <string.h>
+>> -#include <unistd.h>
+>> -#include <libgen.h>
+>> -#include <net/if.h>
+>> -#include <sys/types.h>
+>> -#include <sys/socket.h>
+>> -#include <netdb.h>
+>> -
+>> -#include "bpf/bpf.h"
+>> -#include "bpf/libbpf.h"
+>> -
+>> -#include "xdping.h"
+>> -#include "testing_helpers.h"
+>> -
+>> -static int ifindex;
+>> -static __u32 xdp_flags =3D XDP_FLAGS_UPDATE_IF_NOEXIST;
+>> -
+>> -static void cleanup(int sig)
+>> -{
+>> -	bpf_xdp_detach(ifindex, xdp_flags, NULL);
+>> -	if (sig)
+>> -		exit(1);
+>> -}
+>> -
+>> -static int get_stats(int fd, __u16 count, __u32 raddr)
+>> -{
+>> -	struct pinginfo pinginfo =3D { 0 };
+>> -	char inaddrbuf[INET_ADDRSTRLEN];
+>> -	struct in_addr inaddr;
+>> -	__u16 i;
+>> -
+>> -	inaddr.s_addr =3D raddr;
+>> -
+>> -	printf("\nXDP RTT data:\n");
+>> -
+>> -	if (bpf_map_lookup_elem(fd, &raddr, &pinginfo)) {
+>> -		perror("bpf_map_lookup elem");
+>> -		return 1;
+>> -	}
+>> -
+>> -	for (i =3D 0; i < count; i++) {
+>> -		if (pinginfo.times[i] =3D=3D 0)
+>> -			break;
+>> -
+>> -		printf("64 bytes from %s: icmp_seq=3D%d ttl=3D64 time=3D%#.5f ms\n",
+>> -		       inet_ntop(AF_INET, &inaddr, inaddrbuf,
+>> -				 sizeof(inaddrbuf)),
+>> -		       count + i + 1,
+>> -		       (double)pinginfo.times[i]/1000000);
+>> -	}
+>> -
+>> -	if (i < count) {
+>> -		fprintf(stderr, "Expected %d samples, got %d.\n", count, i);
+>> -		return 1;
+>> -	}
+>> -
+>> -	bpf_map_delete_elem(fd, &raddr);
+>> -
+>> -	return 0;
+>> -}
+>> -
+>> -static void show_usage(const char *prog)
+>> -{
+>> -	fprintf(stderr,
+>> -		"usage: %s [OPTS] -I interface destination\n\n"
+>> -		"OPTS:\n"
+>> -		"    -c count		Stop after sending count requests\n"
+>> -		"			(default %d, max %d)\n"
+>> -		"    -I interface	interface name\n"
+>> -		"    -N			Run in driver mode\n"
+>> -		"    -s			Server mode\n"
+>> -		"    -S			Run in skb mode\n",
+>> -		prog, XDPING_DEFAULT_COUNT, XDPING_MAX_COUNT);
+>> -}
+>> -
+>> -int main(int argc, char **argv)
+>> -{
+>> -	__u32 mode_flags =3D XDP_FLAGS_DRV_MODE | XDP_FLAGS_SKB_MODE;
+>> -	struct addrinfo *a, hints =3D { .ai_family =3D AF_INET };
+>> -	__u16 count =3D XDPING_DEFAULT_COUNT;
+>> -	struct pinginfo pinginfo =3D { 0 };
+>> -	const char *optstr =3D "c:I:NsS";
+>> -	struct bpf_program *main_prog;
+>> -	int prog_fd =3D -1, map_fd =3D -1;
+>> -	struct sockaddr_in rin;
+>> -	struct bpf_object *obj;
+>> -	struct bpf_map *map;
+>> -	char *ifname =3D NULL;
+>> -	char filename[256];
+>> -	int opt, ret =3D 1;
+>> -	__u32 raddr =3D 0;
+>> -	int server =3D 0;
+>> -	char cmd[256];
+>> -
+>> -	while ((opt =3D getopt(argc, argv, optstr)) !=3D -1) {
+>> -		switch (opt) {
+>> -		case 'c':
+>> -			count =3D atoi(optarg);
+>> -			if (count < 1 || count > XDPING_MAX_COUNT) {
+>> -				fprintf(stderr,
+>> -					"min count is 1, max count is %d\n",
+>> -					XDPING_MAX_COUNT);
+>> -				return 1;
+>> -			}
+>> -			break;
+>> -		case 'I':
+>> -			ifname =3D optarg;
+>> -			ifindex =3D if_nametoindex(ifname);
+>> -			if (!ifindex) {
+>> -				fprintf(stderr, "Could not get interface %s\n",
+>> -					ifname);
+>> -				return 1;
+>> -			}
+>> -			break;
+>> -		case 'N':
+>> -			xdp_flags |=3D XDP_FLAGS_DRV_MODE;
+>> -			break;
+>> -		case 's':
+>> -			/* use server program */
+>> -			server =3D 1;
+>> -			break;
+>> -		case 'S':
+>> -			xdp_flags |=3D XDP_FLAGS_SKB_MODE;
+>> -			break;
+>> -		default:
+>> -			show_usage(basename(argv[0]));
+>> -			return 1;
+>> -		}
+>> -	}
+>> -
+>> -	if (!ifname) {
+>> -		show_usage(basename(argv[0]));
+>> -		return 1;
+>> -	}
+>> -	if (!server && optind =3D=3D argc) {
+>> -		show_usage(basename(argv[0]));
+>> -		return 1;
+>> -	}
+>> -
+>> -	if ((xdp_flags & mode_flags) =3D=3D mode_flags) {
+>> -		fprintf(stderr, "-N or -S can be specified, not both.\n");
+>> -		show_usage(basename(argv[0]));
+>> -		return 1;
+>> -	}
+>> -
+>> -	if (!server) {
+>> -		/* Only supports IPv4; see hints initialization above. */
+>> -		if (getaddrinfo(argv[optind], NULL, &hints, &a) || !a) {
+>> -			fprintf(stderr, "Could not resolve %s\n", argv[optind]);
+>> -			return 1;
+>> -		}
+>> -		memcpy(&rin, a->ai_addr, sizeof(rin));
+>> -		raddr =3D rin.sin_addr.s_addr;
+>> -		freeaddrinfo(a);
+>> -	}
+>> -
+>> -	/* Use libbpf 1.0 API mode */
+>> -	libbpf_set_strict_mode(LIBBPF_STRICT_ALL);
+>> -
+>> -	snprintf(filename, sizeof(filename), "%s_kern.bpf.o", argv[0]);
+>> -
+>> -	if (bpf_prog_test_load(filename, BPF_PROG_TYPE_XDP, &obj, &prog_fd)) {
+>> -		fprintf(stderr, "load of %s failed\n", filename);
+>> -		return 1;
+>> -	}
+>> -
+>> -	main_prog =3D bpf_object__find_program_by_name(obj,
+>> -						     server ? "xdping_server" : "xdping_client");
+>> -	if (main_prog)
+>> -		prog_fd =3D bpf_program__fd(main_prog);
+>> -	if (!main_prog || prog_fd < 0) {
+>> -		fprintf(stderr, "could not find xdping program");
+>> -		return 1;
+>> -	}
+>> -
+>> -	map =3D bpf_object__next_map(obj, NULL);
+>> -	if (map)
+>> -		map_fd =3D bpf_map__fd(map);
+>> -	if (!map || map_fd < 0) {
+>> -		fprintf(stderr, "Could not find ping map");
+>> -		goto done;
+>> -	}
+>> -
+>> -	signal(SIGINT, cleanup);
+>> -	signal(SIGTERM, cleanup);
+>> -
+>> -	printf("Setting up XDP for %s, please wait...\n", ifname);
+>> -
+>> -	printf("XDP setup disrupts network connectivity, hit Ctrl+C to quit\n"=
+);
+>> -
+>> -	if (bpf_xdp_attach(ifindex, prog_fd, xdp_flags, NULL) < 0) {
+>> -		fprintf(stderr, "Link set xdp fd failed for %s\n", ifname);
+>> -		goto done;
+>> -	}
+>> -
+>> -	if (server) {
+>> -		close(prog_fd);
+>> -		close(map_fd);
+>> -		printf("Running server on %s; press Ctrl+C to exit...\n",
+>> -		       ifname);
+>> -		do { } while (1);
+>> -	}
+>> -
+>> -	/* Start xdping-ing from last regular ping reply, e.g. for a count
+>> -	 * of 10 ICMP requests, we start xdping-ing using reply with seq numbe=
+r
+>> -	 * 10.  The reason the last "real" ping RTT is much higher is that
+>> -	 * the ping program sees the ICMP reply associated with the last
+>> -	 * XDP-generated packet, so ping doesn't get a reply until XDP is done=
+.
+>> -	 */
+>> -	pinginfo.seq =3D htons(count);
+>> -	pinginfo.count =3D count;
+>> -
+>> -	if (bpf_map_update_elem(map_fd, &raddr, &pinginfo, BPF_ANY)) {
+>> -		fprintf(stderr, "could not communicate with BPF map: %s\n",
+>> -			strerror(errno));
+>> -		cleanup(0);
+>> -		goto done;
+>> -	}
+>> -
+>> -	/* We need to wait for XDP setup to complete. */
+>> -	sleep(10);
+>> -
+>> -	snprintf(cmd, sizeof(cmd), "ping -c %d -I %s %s",
+>> -		 count, ifname, argv[optind]);
+>> -
+>> -	printf("\nNormal ping RTT data\n");
+>> -	printf("[Ignore final RTT; it is distorted by XDP using the reply]\n")=
+;
+>> -
+>> -	ret =3D system(cmd);
+>> -
+>> -	if (!ret)
+>> -		ret =3D get_stats(map_fd, count, raddr);
+>> -
+>> -	cleanup(0);
+>> -
+>> -done:
+>> -	if (prog_fd > 0)
+>> -		close(prog_fd);
+>> -	if (map_fd > 0)
+>> -		close(map_fd);
+>> -
+>> -	return ret;
+>> -}
+>>=20
+>> ---
+>> base-commit: b7fb68124aa80db90394236a9a4a6add12f4425d
+>> change-id: 20260417-xdping-5c2ef5a63899
+>>=20
+>> Best regards,
+>> -- =20
+>> Alexis Lothor=C3=A9 (eBPF Foundation) <alexis.lothore@bootlin.com>
+>>=20
 
 
-***
 
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
 
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+--=20
+Alexis Lothor=C3=A9, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
-To test a patch for this bug, please reply with `#syz test`
-(should be on a separate line).
-
-The patch should be attached to the email.
-Note: arguments like custom git repos and branches are not supported.
 
