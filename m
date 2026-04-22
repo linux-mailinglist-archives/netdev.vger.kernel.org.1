@@ -1,175 +1,146 @@
-Return-Path: <netdev+bounces-280481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280482-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oHO4JBH26Gl3SAIAu9opvQ
-	(envelope-from <netdev+bounces-280481-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:23:45 +0200
+	id AAxzK3f26Gl3SAIAu9opvQ
+	(envelope-from <netdev+bounces-280482-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:25:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00BDB4488F4
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:23:44 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42A78448944
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:25:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A8A7830FD466
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 16:15:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0CB6130CB6BB
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 16:16:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AD82389DE3;
-	Wed, 22 Apr 2026 16:15:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FDD137F8AB;
+	Wed, 22 Apr 2026 16:15:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZVnSrAiu"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="V/pOPKOW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A356F382F07
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 16:15:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E2E37F8A6;
+	Wed, 22 Apr 2026 16:15:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776874526; cv=none; b=HnkQ5u3VinqD1sHx5LidoErau4V7EHK3dZ5SjbQGqWm2eJX3CPd0ZL6dJ6OV/IUDpvlB5FctyO6dFxEB+r5tOkZH0/nQjIWkBZMYDpfcZ0eYqoCVntaiI6fWmjDgJ6Dpu7RN7PNYZ/MV7NFijXCRDcxDUgNeKXDGeRw1j0ZF668=
+	t=1776874539; cv=none; b=cvQ2oqidW1Vplo5uYesawC4pzp8WLD35eGZE4376a64IQyILAJaujpTCyHhc9kDEOIH3NQdNOhgCVE5LSpPrpF0GfWHAJ7fZ0VaMZxlRKRBOmt0wcZoPpCdTKldm2Dtpgqwr2sdGZOui18wkS+PObRoBeNiZStzyFfdhqWmq03s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776874526; c=relaxed/simple;
-	bh=kobuT0RyElyglIplrMxYPIAt1oGHGMs/d4UTM4dg+F4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oZNhSW9yl65UFR7UDEdMoprp9oA0yvTGBRkMD3umLhhP/DDkoc5HbxcmC5jnMxU9UAnlL6h/gWSYLB4QVrHWw3kH4q9EbZp3jG91gjzF/s5Dw5HxVUQA0lBrOFldNpHkwGm63haiQWhc/f3wVrAZLUL3EP3ruGfpxOYMqSeytVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZVnSrAiu; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776874523;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wbqSbZnwuH51jNOBGnPIfoMjpBU58UXreLQO1CT0VkY=;
-	b=ZVnSrAiuCNNT6UkYMq0RtS5b4q67eHqwY1nRXLZlsGeXWpcVCaf6DwWqQvtZt7OYTXJvoq
-	C8Zl/aWi0MPFN+G/Yte6WnLum0+QyQHJm6Do166iflAdCUZ4wIL2o6F6IgZAPsM8L1dDgI
-	AySLh5fFLucgvxHpqn7o8XzncHMUWPk=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-627-q_jbqwaAM8ebFkLdzXXKGg-1; Wed,
- 22 Apr 2026 12:15:21 -0400
-X-MC-Unique: q_jbqwaAM8ebFkLdzXXKGg-1
-X-Mimecast-MFC-AGG-ID: q_jbqwaAM8ebFkLdzXXKGg_1776874519
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B0F021955F0E;
-	Wed, 22 Apr 2026 16:15:19 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.44.48.17])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1A3CB180058B;
-	Wed, 22 Apr 2026 16:15:15 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Anderson Nascimento <anderson@allelesecurity.com>,
-	linux-afs@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Jeffrey Altman <jaltman@auristor.com>,
-	stable@kernel.org
-Subject: [PATCH net v2 6/6] rxrpc: Fix missing validation of ticket length in non-XDR key preparsing
-Date: Wed, 22 Apr 2026 17:14:35 +0100
-Message-ID: <20260422161438.2593376-7-dhowells@redhat.com>
-In-Reply-To: <20260422161438.2593376-1-dhowells@redhat.com>
-References: <20260422161438.2593376-1-dhowells@redhat.com>
+	s=arc-20240116; t=1776874539; c=relaxed/simple;
+	bh=s5b7+mdwioKCLtW03CRqm97/yQq5rIMl3h60W6HsUdM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EbFcb//MUO2ReRh6sd84mDk8zzBz6w6QDtLlxkXpAaMhK0JvvdkCXtde2mXRwcUlWwCkssJD6wFODJ29LMjIHU5DOVS7Jpm5pBQCapsaD26YZQnhInoId1ush7wiGvcs65syLdmr0XmaRHtZlTgKDkbT0dQ/Pzjl7TfQFbcVx3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=V/pOPKOW; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=gYxyLvufwZHnbxYQy/qzz6gAcWR7dlYuMmEysLwxlSI=; b=V/pOPKOWSD5uiySVRNqp6A7iNB
+	uT2OL2EmTUkjnqs5Kibj2+hMMuwMf+l5MG0yd6wuTSbZyDeKluuv+YbyZZC/m1FiYpV/8gr1W0CoR
+	NfJjE+bCx+I+PEtmFdqvipRIXuelyDo0xOtXQvQX6t9x/wXAaOy2Hy1t9V5j1LdD3ihU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wFaES-00H3Xk-Hr; Wed, 22 Apr 2026 18:15:20 +0200
+Date: Wed, 22 Apr 2026 18:15:20 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Raczynski <j.raczynski@samsung.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
+	davem@davemloft.net, andrew+netdev@lunn.ch,
+	kernel-janitors@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH] net/stmmac: Fix typos: 'tx_undeflow_irq' ->
+ 'tx_underflow_irq'
+Message-ID: <52b06f0a-8283-4903-9d8a-2bbdf637dd5d@lunn.ch>
+References: <CGME20260421115052eucas1p103281c5b25719a44c0875d6b0860bfa6@eucas1p1.samsung.com>
+ <20260421115008.2690541-1-j.raczynski@samsung.com>
+ <7eb9e4d4-909c-4203-833d-bd8b664fdfbc@lunn.ch>
+ <aeiJ3zr4WJAm1UCk@AMDC4622.eu.corp.samsungelectronics.net>
+ <f1d51362-ca8f-481a-b9c1-400ab6422686@lunn.ch>
+ <aejYCYObZyFPpLat@AMDC4622.eu.corp.samsungelectronics.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aejYCYObZyFPpLat@AMDC4622.eu.corp.samsungelectronics.net>
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280481-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-280482-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[auristor.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,davemloft.net:email,infradead.org:email,allelesecurity.com:email]
-X-Rspamd-Queue-Id: 00BDB4488F4
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 42A78448944
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Anderson Nascimento <anderson@allelesecurity.com>
+On Wed, Apr 22, 2026 at 04:15:37PM +0200, Jakub Raczynski wrote:
+> On Wed, Apr 22, 2026 at 02:47:38PM +0200, Andrew Lunn wrote:
+> > > I don't see anything wrong with it?
+> > > - naming is correct, same as stmmac_extra_stats from common.h, as it
+> > >   wouldn't compile otherwise
+> > > - string length is ok, as max name length is ETH_GSTRING_LEN=32 and it is
+> > >   not close
+> > > - ethtool just polls data from driver and in my tests it is ok
+> > > - all instances of 'undeflow' are changed
+> > > - 'underflow' semantic is ok, 'undeflow' is just not correct
+> > > 
+> > > Please correct me if I am wrong, but imo no issues with this patch.
+> > 
+> > ABI
+> > 
+> > This name is published as part of the kAPI. You are changing its
+> > name. User space could be looking for this name, even thought it has a
+> > typo in it.
+> > 
+> >      Andrew
+> >
+> I don't think it is? This part of extra stats (struct stmmac_extra_stats) and
+> is not part of standard ABI from
+> Documentation/ABI/testing/sysfs-class-net-statistics
+> nor is mentioned in
+> Documentation/networking/device_drivers/ethernet/stmicro/stmmac.rst
+> 
+> These extra stats are specific to stmmac driver and most of these are more
+> than standard
+> https://www.kernel.org/doc/html/v7.0/networking/statistics.html#c.rtnl_link_stats64
+> This name does not exist outside stmmac driver, so while some application may
+> expect this (stmmac specific app), question is should this typo stick?
 
-In rxrpc_preparse(), there are two paths for parsing key payloads: the
-XDR path (for large payloads) and the non-XDR path (for payloads <= 28
-bytes). While the XDR path (rxrpc_preparse_xdr_rxkad()) correctly
-validates the ticket length against AFSTOKEN_RK_TIX_MAX, the non-XDR
-path fails to do so.
+47dd7a540b8a0 drivers/net/stmmac/stmmac_ethtool.c                  (Giuseppe Cavallaro      2009-10-14 15:13:45 -0700   81)     STMMAC_STAT(tx_undeflow_irq),
 
-This allows an unprivileged user to provide a very large ticket length.
-When this key is later read via rxrpc_read(), the total
-token size (toksize) calculation results in a value that exceeds
-AFSTOKEN_LENGTH_MAX, triggering a WARN_ON().
+It has been exposed to user space for 17 years. In that time, there
+could well be stmmac specific apps using it.
 
-[ 2001.302904] WARNING: CPU: 2 PID: 2108 at net/rxrpc/key.c:778 rxrpc_read+0x109/0x5c0 [rxrpc]
+Just because it is not documented as ABI does not make it not ABI.
 
-Fix this by adding a check in the non-XDR parsing path of rxrpc_preparse()
-to ensure the ticket length does not exceed AFSTOKEN_RK_TIX_MAX,
-bringing it into parity with the XDR parsing logic.
-
-Fixes: 8a7a3eb4ddbe ("KEYS: RxRPC: Use key preparsing")
-Fixes: 84924aac08a4 ("rxrpc: Fix checker warning")
-Reported-by: Anderson Nascimento <anderson@allelesecurity.com>
-Signed-off-by: Anderson Nascimento <anderson@allelesecurity.com>
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: Jeffrey Altman <jaltman@auristor.com>
-cc: Eric Dumazet <edumazet@google.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Simon Horman <horms@kernel.org>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
-cc: stable@kernel.org
----
- net/rxrpc/key.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/net/rxrpc/key.c b/net/rxrpc/key.c
-index 6301d79ee35a..5ebb06d87cdd 100644
---- a/net/rxrpc/key.c
-+++ b/net/rxrpc/key.c
-@@ -502,6 +502,10 @@ static int rxrpc_preparse(struct key_preparsed_payload *prep)
- 	if (v1->security_index != RXRPC_SECURITY_RXKAD)
- 		goto error;
- 
-+	ret = -EKEYREJECTED;
-+	if(v1->ticket_length > AFSTOKEN_RK_TIX_MAX)
-+		goto error;
-+
- 	plen = sizeof(*token->kad) + v1->ticket_length;
- 	prep->quotalen += plen + sizeof(*token);
- 
-
+     Andrew
 
