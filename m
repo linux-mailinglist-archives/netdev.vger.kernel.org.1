@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-280523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280525-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8OJgNdcN6WkJTwIAu9opvQ
-	(envelope-from <netdev+bounces-280523-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 20:05:11 +0200
+	id 2CGWLi0O6WkJTwIAu9opvQ
+	(envelope-from <netdev+bounces-280525-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 20:06:37 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 470D1449881
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 20:05:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BF374498C7
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 20:06:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1CE35306C87A
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:02:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 60B763080798
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:02:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4139D3CB2C7;
-	Wed, 22 Apr 2026 18:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46F6F3CF04A;
+	Wed, 22 Apr 2026 18:02:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="J8DiZNun"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EpgMXUoo"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776F8285CA4;
-	Wed, 22 Apr 2026 18:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 255F625A2BB;
+	Wed, 22 Apr 2026 18:02:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776880962; cv=none; b=Q6gNs7zPKxgwiakIoH18hBG8NR3WxV1H1NqH5Qzmm/Ek/VdXj4Yrjhlu9b3Mj2iNiuc3Mt4HveZMHoi2zpvuSGbDECeHyZLAUEvbBiGW88lvaUqryZajsGyHLTuSVh8sIYInuZoS1OoRtXYQx3tCS6e74mqzSBmWq+fwKnQVqzc=
+	t=1776880965; cv=none; b=FPdo8+oGb36X6KsymGfNik5gBWdO8p2EikkcFmoSF2DTBq6CD/sWkb35yQHhsuYnsPRwC0kDQDFHGaYX8Ip0NdGE6yiclfA2lAF32wE5vHikApjcbHMaVgHw4fdvvXUTCZlmzf/9ASGW0DpCOyPFdmTh/aVGevmqeb+cxD37eow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776880962; c=relaxed/simple;
-	bh=mFTIQ6cuxfewRADA9sCAD8EUjvtaRRMTEC4Yzf+QQZI=;
+	s=arc-20240116; t=1776880965; c=relaxed/simple;
+	bh=GkOqBkZIXX6N0wA1qhjeRsoFb4pi3p3lU/HJT3EDBlo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=tISeSDuK3OoIWtpb82Y5Dmay33H3h0hBoFSoiRXk4/Fus9VSoEh4soJM0jf0mUbkWIAd/csUeCW2OzRXIAjkjhGkky+NFtPgeXIGYA8YAiy9uYAp4MaHnAjF2p13kXfTNEXExkVMNj4f89k6He35xZKA8fMjJjNBTGvcQgaurjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=J8DiZNun; arc=none smtp.client-ip=156.67.10.101
+	 In-Reply-To:To:Cc; b=HZVOZWaBZTCIUwykHfFfmyHBu1nCL0LWVFpiHvk8BGve9B+Tgzcbj7Zzg++eS68D2KZi2zhDgaMCmpCyo6dsaCcMUP0O21UpEywSIS+zRMZlEv48wszCiqZGkacGw/JXHg+HD9Y/vF1FiFHrjiqP7NvNbbC4yvwyYJYO32p65ZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=EpgMXUoo; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -39,18 +39,18 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:From:
 	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
 	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=oseksMDkV5xKYi7kdlkVt7Js5LhinwXICQS+kgUIHKA=; b=J8
-	DiZNunNMVQDTwXd9MQlWHTEAEYxiT4q9c9s5m9EmMyejJZ1xWTu9MB4/woHECoPNerZqGRWvzQe8h
-	C3qfZZtzf6H+xmE533uVpRgs4UWr4mVhP52Yvk3GZJ9cWOCR152YdvpFacQj6vyfCX3lzRQDQunwv
-	W/vbQIuAeRs2ogE=;
+	In-Reply-To:References; bh=8+meexwf6VdzduqbFgcgWdliQbddBRVCUaFDRoMTdq0=; b=Ep
+	gMXUooZPeqTCACEjd1t7XxTT1ZQ15YSyJqzoUCSzOHwkyA4McTTxAbyUX3psKz3OIH31g3fL9A7Zb
+	hDe5dNnSq6hm/VM5QoXAILcBvHgjSAjALd/fqlBgbmveJL4yhoLnR+NJvVegc5Tc8FMd7EyE2Xp4N
+	sbD3nSDg7xziM4w=;
 Received: from c-66-41-74-139.hsd1.mn.comcast.net ([66.41.74.139] helo=thinkpad.home.lunn.ch)
 	by vps0.lunn.ch with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1wFbuD-00H4Ba-GT; Wed, 22 Apr 2026 20:02:33 +0200
+	id 1wFbuG-00H4Ba-Lz; Wed, 22 Apr 2026 20:02:37 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-Date: Wed, 22 Apr 2026 13:01:47 -0500
-Subject: [PATCH net v2 04/15] drivers: net: 3com: 3c589: Remove this driver
+Date: Wed, 22 Apr 2026 13:01:48 -0500
+Subject: [PATCH net v2 05/15] drivers: net: amd: lance: Remove this driver
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,7 +59,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260422-v7-0-0-net-next-driver-removal-v1-v2-4-08a5b59784d5@lunn.ch>
+Message-Id: <20260422-v7-0-0-net-next-driver-removal-v1-v2-5-08a5b59784d5@lunn.ch>
 References: <20260422-v7-0-0-net-next-driver-removal-v1-v2-0-08a5b59784d5@lunn.ch>
 In-Reply-To: <20260422-v7-0-0-net-next-driver-removal-v1-v2-0-08a5b59784d5@lunn.ch>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -73,20 +73,20 @@ Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  linux-doc@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=29772; i=andrew@lunn.ch;
- h=from:subject:message-id; bh=mFTIQ6cuxfewRADA9sCAD8EUjvtaRRMTEC4Yzf+QQZI=;
- b=owEBbQKS/ZANAwAIAea/DcumaUyEAcsmYgBp6Q0oF4HtfKR0HkPCNMTXQx0LE7/DBN5q0zpUZ
- G+AxbYhyKiJAjMEAAEIAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCaekNKAAKCRDmvw3LpmlM
- hKmGD/4xYzs9ioPFzqV88i55OGg3KYaOveb4cWBsvqhiMl+v9TB+fBSiUKtgpy/5uyzygQUuaxo
- NV3vcgYMiYxBLk006b+cmToWo5xl4KlRDGQotgYwOaSdF4fLkTKdSQl4QkBse4cFmkSe3HGPmNz
- qcfWE22Fppl43q5xZx9SKoJrNOSbc4s5D7rSn3+9yRilLCYnOk+xy2q7Vv6r4X+XcY+VekXcZXj
- TskU1+J0M/GGwgibNrbNHftFQkblG4dZfPiPLJPIBHwkrtjwhxh6XRE2Nbm0Q5VeoI22DoV6+zT
- 7AcS/Pc5RCb28vo4BThW3/wag4Xi92bGKuzBZPGqfShTcMBi08ApNVyjWYXuMJpJDCwenytSZaX
- i+9Kmj5HOPeYoy7JqHMb3YJPYPJv2W//TDvxeioPKocKZ/PCKSbBI0X9isgvijhB0JSqHUDfJeq
- iOkrqaLlWNrq+oKBMoB7CGSZSvL4CU6W0iIs038PrzjKCdYveLPIuvdSQYLte1A+rQajd6VPwtU
- btK4S2XczUa0atNP1th2vW8gmSG3G/5iy45HTIYaCNYApPri4EoIsmjB1RPwTuvwNtbXUo8SRVv
- 2X72F3zg87CcI7S0jyqYePUhIwPrK0Fyj8ljY8d0QYKXgxA364QLEuMuIeokoWNg1rMb1/945wU
- xioyu0srLpVGx0g==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=46263; i=andrew@lunn.ch;
+ h=from:subject:message-id; bh=GkOqBkZIXX6N0wA1qhjeRsoFb4pi3p3lU/HJT3EDBlo=;
+ b=owEBbQKS/ZANAwAIAea/DcumaUyEAcsmYgBp6Q0ote1OTaoOHEeA7J0Hw85h4ZyfqkUSUJYjr
+ GbCxSv2IFyJAjMEAAEIAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCaekNKAAKCRDmvw3LpmlM
+ hMz1D/90ifMIDz771JQKrDTscgaNOVR5tkwoPDhBFPSjAZjxMr2XOUCS4RBLAKlCKy4FG4MRRs4
+ UGBBM/8Fubz/DzgJA6ffgBzKBhrWEQtPssh9A3u7tMZfA/d72BAY8sqD9HR10aYjXnkxx716Cjr
+ B8M4hOFwICuPLs5Xq1VbpgjkD5b9768tLH3DfFOf5ts97Um8jZRiM3gG79sV4P6+mZmrToMB2Rs
+ ijZ4yKKsVQhgCRKoafyVMYa38gN90/rP0jQ0ZEnsowSPyJt8WmLEdHR92xETXmZiOLRdAMHIhrb
+ 2s6SJWgjhfge/poP62cv+8JfGQ/ZNoh9q2Kd1chZt63rKa5w/7VdnySxns1tmpu3SU3ZS74KDLW
+ YHNJI3vNK9x5hiQf0A05Rrbn0xFYXXtEp1gGOSyyDcOq2Q859AVmQiVGYwvUwY/tL3OvNVEjIF+
+ ekx/aztSmv1CwU5BHAvG82mjhZr8pXr1mQBAnyc4MKWON0VbmUwr3fKBZOZM+riG95a6z3iZvEp
+ f4UgG5+g9HCA7rjVC1bZVU/ZXawsDIW71g3rc49bLkwPXBl3+GLT/OMggCeYWYw90W/HCUHjgcZ
+ 3T5Nt1ePqr2PjnYAtl3TI3BRut2cYespUAD6hGbXxkvRKd6Mf4GjXVcx8o/1lpccdTye/XyeEEk
+ 1xp6zNmEM55aPUQ==
 X-Developer-Key: i=andrew@lunn.ch; a=openpgp;
  fpr=61FB1025CB53263916F9E1B7E6BF0DCBA6694C84
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -99,7 +99,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280523-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280525-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -115,1033 +115,1378 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,lunn.ch:dkim,lunn.ch:mid,ukuu.org.uk:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,scyld.com:email]
-X-Rspamd-Queue-Id: 470D1449881
+	DBL_BLOCKED_OPENRESOLVER(0.00)[perftech.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,3do.com:email,scyld.com:email,anu.edu.au:email,conectiva.com.br:email,lunn.ch:email,lunn.ch:dkim,lunn.ch:mid,franken.de:email,iki.fi:email]
+X-Rspamd-Queue-Id: 3BF374498C7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The 3c589 was written by David A. Hinds 2001. It is an PCMCIA device,
-so unlikely to be used with modern kernels.
+The lance was written by Donald Becker between 1993-1998. It is an ISA
+device, so unlikely to be used with modern kernels.
 
 Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 ---
- drivers/net/ethernet/3com/3c589_cs.c | 974 -----------------------------------
- drivers/net/ethernet/3com/Kconfig    |  10 -
- drivers/net/ethernet/3com/Makefile   |   1 -
- 3 files changed, 985 deletions(-)
+ drivers/net/ethernet/amd/Kconfig  |   11 -
+ drivers/net/ethernet/amd/Makefile |    1 -
+ drivers/net/ethernet/amd/lance.c  | 1317 -------------------------------------
+ 3 files changed, 1329 deletions(-)
 
-diff --git a/drivers/net/ethernet/3com/3c589_cs.c b/drivers/net/ethernet/3com/3c589_cs.c
+diff --git a/drivers/net/ethernet/amd/Kconfig b/drivers/net/ethernet/amd/Kconfig
+index 45e8d698781c..c5abb81977dd 100644
+--- a/drivers/net/ethernet/amd/Kconfig
++++ b/drivers/net/ethernet/amd/Kconfig
+@@ -43,17 +43,6 @@ config AMD8111_ETH
+ 	  To compile this driver as a module, choose M here. The module
+ 	  will be called amd8111e.
+ 
+-config LANCE
+-	tristate "AMD LANCE and PCnet (AT1500 and NE2100) support"
+-	depends on ISA && ISA_DMA_API && !ARM && !PPC32
+-	select NETDEV_LEGACY_INIT
+-	help
+-	  If you have a network (Ethernet) card of this type, say Y here.
+-	  Some LinkSys cards are of this type.
+-
+-	  To compile this driver as a module, choose M here: the module
+-	  will be called lance.  This is recommended.
+-
+ config PCNET32
+ 	tristate "AMD PCnet32 PCI support"
+ 	depends on PCI && HAS_IOPORT
+diff --git a/drivers/net/ethernet/amd/Makefile b/drivers/net/ethernet/amd/Makefile
+index 2dcfb84731e1..f261501f7324 100644
+--- a/drivers/net/ethernet/amd/Makefile
++++ b/drivers/net/ethernet/amd/Makefile
+@@ -9,7 +9,6 @@ obj-$(CONFIG_ARIADNE) += ariadne.o
+ obj-$(CONFIG_ATARILANCE) += atarilance.o
+ obj-$(CONFIG_DECLANCE) += declance.o
+ obj-$(CONFIG_HPLANCE) += hplance.o 7990.o
+-obj-$(CONFIG_LANCE) += lance.o
+ obj-$(CONFIG_MIPS_AU1X00_ENET) += au1000_eth.o
+ obj-$(CONFIG_MVME147_NET) += mvme147.o 7990.o
+ obj-$(CONFIG_PCMCIA_NMCLAN) += nmclan_cs.o
+diff --git a/drivers/net/ethernet/amd/lance.c b/drivers/net/ethernet/amd/lance.c
 deleted file mode 100644
-index ea49be43b8c3..000000000000
---- a/drivers/net/ethernet/3com/3c589_cs.c
+index 98afd8cb0efb..000000000000
+--- a/drivers/net/ethernet/amd/lance.c
 +++ /dev/null
-@@ -1,974 +0,0 @@
--/* ======================================================================
-- *
-- * A PCMCIA ethernet driver for the 3com 3c589 card.
-- *
-- * Copyright (C) 1999 David A. Hinds -- dahinds@users.sourceforge.net
-- *
-- * 3c589_cs.c 1.162 2001/10/13 00:08:50
-- *
-- * The network driver code is based on Donald Becker's 3c589 code:
-- *
-- * Written 1994 by Donald Becker.
-- * Copyright 1993 United States Government as represented by the
-- * Director, National Security Agency.  This software may be used and
-- * distributed according to the terms of the GNU General Public License,
-- * incorporated herein by reference.
-- * Donald Becker may be reached at becker@scyld.com
-- *
-- * Updated for 2.5.x by Alan Cox <alan@lxorguk.ukuu.org.uk>
-- *
-- * ======================================================================
-- */
+@@ -1,1317 +0,0 @@
+-/* lance.c: An AMD LANCE/PCnet ethernet driver for Linux. */
+-/*
+-	Written/copyright 1993-1998 by Donald Becker.
 -
--#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+-	Copyright 1993 United States Government as represented by the
+-	Director, National Security Agency.
+-	This software may be used and distributed according to the terms
+-	of the GNU General Public License, incorporated herein by reference.
 -
--#define DRV_NAME	"3c589_cs"
+-	This driver is for the Allied Telesis AT1500 and HP J2405A, and should work
+-	with most other LANCE-based bus-master (NE2100/NE2500) ethercards.
+-
+-	The author may be reached as becker@scyld.com, or C/O
+-	Scyld Computing Corporation
+-	410 Severn Ave., Suite 210
+-	Annapolis MD 21403
+-
+-	Andrey V. Savochkin:
+-	- alignment problem with 1.3.* kernel and some minor changes.
+-	Thomas Bogendoerfer (tsbogend@bigbug.franken.de):
+-	- added support for Linux/Alpha, but removed most of it, because
+-        it worked only for the PCI chip.
+-      - added hook for the 32bit lance driver
+-      - added PCnetPCI II (79C970A) to chip table
+-	Paul Gortmaker (gpg109@rsphy1.anu.edu.au):
+-	- hopefully fix above so Linux/Alpha can use ISA cards too.
+-    8/20/96 Fixed 7990 autoIRQ failure and reversed unneeded alignment -djb
+-    v1.12 10/27/97 Module support -djb
+-    v1.14  2/3/98 Module support modified, made PCI support optional -djb
+-    v1.15 5/27/99 Fixed bug in the cleanup_module(). dev->priv was freed
+-                  before unregister_netdev() which caused NULL pointer
+-                  reference later in the chain (in rtnetlink_fill_ifinfo())
+-                  -- Mika Kuoppala <miku@iki.fi>
+-
+-    Forward ported v1.14 to 2.1.129, merged the PCI and misc changes from
+-    the 2.1 version of the old driver - Alan Cox
+-
+-    Get rid of check_region, check kmalloc return in lance_probe1
+-    Arnaldo Carvalho de Melo <acme@conectiva.com.br> - 11/01/2001
+-
+-	Reworked detection, added support for Racal InterLan EtherBlaster cards
+-	Vesselin Kostadinov <vesok at yahoo dot com > - 22/4/2004
+-*/
+-
+-static const char version[] = "lance.c:v1.16 2006/11/09 dplatt@3do.com, becker@cesdis.gsfc.nasa.gov\n";
 -
 -#include <linux/module.h>
 -#include <linux/kernel.h>
--#include <linux/ptrace.h>
--#include <linux/slab.h>
 -#include <linux/string.h>
--#include <linux/timer.h>
--#include <linux/interrupt.h>
--#include <linux/in.h>
 -#include <linux/delay.h>
--#include <linux/ethtool.h>
+-#include <linux/errno.h>
+-#include <linux/ioport.h>
+-#include <linux/slab.h>
+-#include <linux/interrupt.h>
+-#include <linux/pci.h>
+-#include <linux/init.h>
 -#include <linux/netdevice.h>
 -#include <linux/etherdevice.h>
 -#include <linux/skbuff.h>
--#include <linux/if_arp.h>
--#include <linux/ioport.h>
+-#include <linux/mm.h>
 -#include <linux/bitops.h>
--#include <linux/jiffies.h>
--#include <linux/uaccess.h>
--#include <linux/io.h>
+-#include <net/Space.h>
 -
--#include <pcmcia/cistpl.h>
--#include <pcmcia/cisreg.h>
--#include <pcmcia/ciscode.h>
--#include <pcmcia/ds.h>
+-#include <asm/io.h>
+-#include <asm/dma.h>
+-
+-static unsigned int lance_portlist[] __initdata = { 0x300, 0x320, 0x340, 0x360, 0};
+-static int lance_probe1(struct net_device *dev, int ioaddr, int irq, int options);
+-static int __init do_lance_probe(struct net_device *dev);
 -
 -
--/* To minimize the size of the driver source I only define operating
-- * constants if they are used several times. You'll need the manual
-- * if you want to understand driver details.
-- */
+-static struct card {
+-	char id_offset14;
+-	char id_offset15;
+-} cards[] = {
+-	{	//"normal"
+-		.id_offset14 = 0x57,
+-		.id_offset15 = 0x57,
+-	},
+-	{	//NI6510EB
+-		.id_offset14 = 0x52,
+-		.id_offset15 = 0x44,
+-	},
+-	{	//Racal InterLan EtherBlaster
+-		.id_offset14 = 0x52,
+-		.id_offset15 = 0x49,
+-	},
+-};
+-#define NUM_CARDS 3
+-
+-#ifdef LANCE_DEBUG
+-static int lance_debug = LANCE_DEBUG;
+-#else
+-static int lance_debug = 1;
+-#endif
+-
+-/*
+-				Theory of Operation
+-
+-I. Board Compatibility
+-
+-This device driver is designed for the AMD 79C960, the "PCnet-ISA
+-single-chip ethernet controller for ISA".  This chip is used in a wide
+-variety of boards from vendors such as Allied Telesis, HP, Kingston,
+-and Boca.  This driver is also intended to work with older AMD 7990
+-designs, such as the NE1500 and NE2100, and newer 79C961.  For convenience,
+-I use the name LANCE to refer to all of the AMD chips, even though it properly
+-refers only to the original 7990.
+-
+-II. Board-specific settings
+-
+-The driver is designed to work the boards that use the faster
+-bus-master mode, rather than in shared memory mode.	 (Only older designs
+-have on-board buffer memory needed to support the slower shared memory mode.)
+-
+-Most ISA boards have jumpered settings for the I/O base, IRQ line, and DMA
+-channel.  This driver probes the likely base addresses:
+-{0x300, 0x320, 0x340, 0x360}.
+-After the board is found it generates a DMA-timeout interrupt and uses
+-autoIRQ to find the IRQ line.  The DMA channel can be set with the low bits
+-of the otherwise-unused dev->mem_start value (aka PARAM1).  If unset it is
+-probed for by enabling each free DMA channel in turn and checking if
+-initialization succeeds.
+-
+-The HP-J2405A board is an exception: with this board it is easy to read the
+-EEPROM-set values for the base, IRQ, and DMA.  (Of course you must already
+-_know_ the base address -- that field is for writing the EEPROM.)
+-
+-III. Driver operation
+-
+-IIIa. Ring buffers
+-The LANCE uses ring buffers of Tx and Rx descriptors.  Each entry describes
+-the base and length of the data buffer, along with status bits.	 The length
+-of these buffers is set by LANCE_LOG_{RX,TX}_BUFFERS, which is log_2() of
+-the buffer length (rather than being directly the buffer length) for
+-implementation ease.  The current values are 2 (Tx) and 4 (Rx), which leads to
+-ring sizes of 4 (Tx) and 16 (Rx).  Increasing the number of ring entries
+-needlessly uses extra space and reduces the chance that an upper layer will
+-be able to reorder queued Tx packets based on priority.	 Decreasing the number
+-of entries makes it more difficult to achieve back-to-back packet transmission
+-and increases the chance that Rx ring will overflow.  (Consider the worst case
+-of receiving back-to-back minimum-sized packets.)
+-
+-The LANCE has the capability to "chain" both Rx and Tx buffers, but this driver
+-statically allocates full-sized (slightly oversized -- PKT_BUF_SZ) buffers to
+-avoid the administrative overhead. For the Rx side this avoids dynamically
+-allocating full-sized buffers "just in case", at the expense of a
+-memory-to-memory data copy for each packet received.  For most systems this
+-is a good tradeoff: the Rx buffer will always be in low memory, the copy
+-is inexpensive, and it primes the cache for later packet processing.  For Tx
+-the buffers are only used when needed as low-memory bounce buffers.
+-
+-IIIB. 16M memory limitations.
+-For the ISA bus master mode all structures used directly by the LANCE,
+-the initialization block, Rx and Tx rings, and data buffers, must be
+-accessible from the ISA bus, i.e. in the lower 16M of real memory.
+-This is a problem for current Linux kernels on >16M machines. The network
+-devices are initialized after memory initialization, and the kernel doles out
+-memory from the top of memory downward.	 The current solution is to have a
+-special network initialization routine that's called before memory
+-initialization; this will eventually be generalized for all network devices.
+-As mentioned before, low-memory "bounce-buffers" are used when needed.
+-
+-IIIC. Synchronization
+-The driver runs as two independent, single-threaded flows of control.  One
+-is the send-packet routine, which enforces single-threaded use by the
+-dev->tbusy flag.  The other thread is the interrupt handler, which is single
+-threaded by the hardware and other software.
+-
+-The send packet thread has partial control over the Tx ring and 'dev->tbusy'
+-flag.  It sets the tbusy flag whenever it's queuing a Tx packet. If the next
+-queue slot is empty, it clears the tbusy flag when finished otherwise it sets
+-the 'lp->tx_full' flag.
+-
+-The interrupt handler has exclusive control over the Rx ring and records stats
+-from the Tx ring. (The Tx-done interrupt can't be selectively turned off, so
+-we can't avoid the interrupt overhead by having the Tx routine reap the Tx
+-stats.)	 After reaping the stats, it marks the queue entry as empty by setting
+-the 'base' to zero. Iff the 'lp->tx_full' flag is set, it clears both the
+-tx_full and tbusy flags.
+-
+-*/
+-
+-/* Set the number of Tx and Rx buffers, using Log_2(# buffers).
+-   Reasonable default values are 16 Tx buffers, and 16 Rx buffers.
+-   That translates to 4 and 4 (16 == 2^^4).
+-   This is a compile-time option for efficiency.
+-   */
+-#ifndef LANCE_LOG_TX_BUFFERS
+-#define LANCE_LOG_TX_BUFFERS 4
+-#define LANCE_LOG_RX_BUFFERS 4
+-#endif
+-
+-#define TX_RING_SIZE			(1 << (LANCE_LOG_TX_BUFFERS))
+-#define TX_RING_MOD_MASK		(TX_RING_SIZE - 1)
+-#define TX_RING_LEN_BITS		((LANCE_LOG_TX_BUFFERS) << 29)
+-
+-#define RX_RING_SIZE			(1 << (LANCE_LOG_RX_BUFFERS))
+-#define RX_RING_MOD_MASK		(RX_RING_SIZE - 1)
+-#define RX_RING_LEN_BITS		((LANCE_LOG_RX_BUFFERS) << 29)
+-
+-#define PKT_BUF_SZ		1544
 -
 -/* Offsets from base I/O address. */
--#define EL3_DATA	0x00
--#define EL3_TIMER	0x0a
--#define EL3_CMD		0x0e
--#define EL3_STATUS	0x0e
+-#define LANCE_DATA 0x10
+-#define LANCE_ADDR 0x12
+-#define LANCE_RESET 0x14
+-#define LANCE_BUS_IF 0x16
+-#define LANCE_TOTAL_SIZE 0x18
 -
--#define EEPROM_READ	0x0080
--#define EEPROM_BUSY	0x8000
+-#define TX_TIMEOUT	(HZ/5)
 -
--#define EL3WINDOW(win_num) outw(SelectWindow + (win_num), ioaddr + EL3_CMD)
--
--/* The top five bits written to EL3_CMD are a command, the lower
-- * 11 bits are the parameter, if applicable.
-- */
--
--enum c509cmd {
--	TotalReset	= 0<<11,
--	SelectWindow	= 1<<11,
--	StartCoax	= 2<<11,
--	RxDisable	= 3<<11,
--	RxEnable	= 4<<11,
--	RxReset		= 5<<11,
--	RxDiscard	= 8<<11,
--	TxEnable	= 9<<11,
--	TxDisable	= 10<<11,
--	TxReset		= 11<<11,
--	FakeIntr	= 12<<11,
--	AckIntr		= 13<<11,
--	SetIntrEnb	= 14<<11,
--	SetStatusEnb	= 15<<11,
--	SetRxFilter	= 16<<11,
--	SetRxThreshold	= 17<<11,
--	SetTxThreshold	= 18<<11,
--	SetTxStart	= 19<<11,
--	StatsEnable	= 21<<11,
--	StatsDisable	= 22<<11,
--	StopCoax	= 23<<11
+-/* The LANCE Rx and Tx ring descriptors. */
+-struct lance_rx_head {
+-	s32 base;
+-	s16 buf_length;			/* This length is 2s complement (negative)! */
+-	s16 msg_length;			/* This length is "normal". */
 -};
 -
--enum c509status {
--	IntLatch	= 0x0001,
--	AdapterFailure	= 0x0002,
--	TxComplete	= 0x0004,
--	TxAvailable	= 0x0008,
--	RxComplete	= 0x0010,
--	RxEarly		= 0x0020,
--	IntReq		= 0x0040,
--	StatsFull	= 0x0080,
--	CmdBusy		= 0x1000
+-struct lance_tx_head {
+-	s32 base;
+-	s16 length;				/* Length is 2s complement (negative)! */
+-	s16 misc;
 -};
 -
--/* The SetRxFilter command accepts the following classes: */
--enum RxFilter {
--	RxStation	= 1,
--	RxMulticast	= 2,
--	RxBroadcast	= 4,
--	RxProm		= 8
+-/* The LANCE initialization block, described in databook. */
+-struct lance_init_block {
+-	u16 mode;		/* Pre-set mode (reg. 15) */
+-	u8  phys_addr[6]; /* Physical ethernet address */
+-	u32 filter[2];			/* Multicast filter (unused). */
+-	/* Receive and transmit ring base, along with extra bits. */
+-	u32  rx_ring;			/* Tx and Rx ring base pointers */
+-	u32  tx_ring;
 -};
 -
--/* Register window 1 offsets, the window used in normal operation. */
--#define TX_FIFO		0x00
--#define RX_FIFO		0x00
--#define RX_STATUS	0x08
--#define TX_STATUS	0x0B
--#define TX_FREE		0x0C	/* Remaining free bytes in Tx buffer. */
--
--#define WN0_IRQ		0x08	/* Window 0: Set IRQ line in bits 12-15. */
--#define WN4_MEDIA	0x0A	/* Window 4: Various transcvr/media bits. */
--#define MEDIA_TP	0x00C0	/* Enable link beat and jabber for 10baseT. */
--#define MEDIA_LED	0x0001	/* Enable link light on 3C589E cards. */
--
--/* Time in jiffies before concluding Tx hung */
--#define TX_TIMEOUT	((400*HZ)/1000)
--
--struct el3_private {
--	struct pcmcia_device	*p_dev;
--	/* For transceiver monitoring */
--	struct timer_list	media;
--	u16			media_status;
--	u16			fast_poll;
--	unsigned long		last_irq;
--	spinlock_t		lock;
+-struct lance_private {
+-	/* The Tx and Rx ring entries must be aligned on 8-byte boundaries. */
+-	struct lance_rx_head rx_ring[RX_RING_SIZE];
+-	struct lance_tx_head tx_ring[TX_RING_SIZE];
+-	struct lance_init_block	init_block;
+-	const char *name;
+-	/* The saved address of a sent-in-place packet/buffer, for skfree(). */
+-	struct sk_buff* tx_skbuff[TX_RING_SIZE];
+-	/* The addresses of receive-in-place skbuffs. */
+-	struct sk_buff* rx_skbuff[RX_RING_SIZE];
+-	unsigned long rx_buffs;		/* Address of Rx and Tx buffers. */
+-	/* Tx low-memory "bounce buffer" address. */
+-	char (*tx_bounce_buffs)[PKT_BUF_SZ];
+-	int cur_rx, cur_tx;			/* The next free ring entry */
+-	int dirty_rx, dirty_tx;		/* The ring entries to be free()ed. */
+-	int dma;
+-	unsigned char chip_version;	/* See lance_chip_type. */
+-	spinlock_t devlock;
 -};
 -
--static const char *if_names[] = { "auto", "10baseT", "10base2", "AUI" };
+-#define LANCE_MUST_PAD          0x00000001
+-#define LANCE_ENABLE_AUTOSELECT 0x00000002
+-#define LANCE_MUST_REINIT_RING  0x00000004
+-#define LANCE_MUST_UNRESET      0x00000008
+-#define LANCE_HAS_MISSED_FRAME  0x00000010
 -
--/*====================================================================*/
+-/* A mapping from the chip ID number to the part number and features.
+-   These are from the datasheets -- in real life the '970 version
+-   reportedly has the same ID as the '965. */
+-static struct lance_chip_type {
+-	int id_number;
+-	const char *name;
+-	int flags;
+-} chip_table[] = {
+-	{0x0000, "LANCE 7990",				/* Ancient lance chip.  */
+-		LANCE_MUST_PAD + LANCE_MUST_UNRESET},
+-	{0x0003, "PCnet/ISA 79C960",		/* 79C960 PCnet/ISA.  */
+-		LANCE_ENABLE_AUTOSELECT + LANCE_MUST_REINIT_RING +
+-			LANCE_HAS_MISSED_FRAME},
+-	{0x2260, "PCnet/ISA+ 79C961",		/* 79C961 PCnet/ISA+, Plug-n-Play.  */
+-		LANCE_ENABLE_AUTOSELECT + LANCE_MUST_REINIT_RING +
+-			LANCE_HAS_MISSED_FRAME},
+-	{0x2420, "PCnet/PCI 79C970",		/* 79C970 or 79C974 PCnet-SCSI, PCI. */
+-		LANCE_ENABLE_AUTOSELECT + LANCE_MUST_REINIT_RING +
+-			LANCE_HAS_MISSED_FRAME},
+-	/* Bug: the PCnet/PCI actually uses the PCnet/VLB ID number, so just call
+-		it the PCnet32. */
+-	{0x2430, "PCnet32",					/* 79C965 PCnet for VL bus. */
+-		LANCE_ENABLE_AUTOSELECT + LANCE_MUST_REINIT_RING +
+-			LANCE_HAS_MISSED_FRAME},
+-        {0x2621, "PCnet/PCI-II 79C970A",        /* 79C970A PCInetPCI II. */
+-                LANCE_ENABLE_AUTOSELECT + LANCE_MUST_REINIT_RING +
+-                        LANCE_HAS_MISSED_FRAME},
+-	{0x0, 	 "PCnet (unknown)",
+-		LANCE_ENABLE_AUTOSELECT + LANCE_MUST_REINIT_RING +
+-			LANCE_HAS_MISSED_FRAME},
+-};
 -
--/* Module parameters */
+-enum {OLD_LANCE = 0, PCNET_ISA=1, PCNET_ISAP=2, PCNET_PCI=3, PCNET_VLB=4, PCNET_PCI_II=5, LANCE_UNKNOWN=6};
 -
--MODULE_AUTHOR("David Hinds <dahinds@users.sourceforge.net>");
--MODULE_DESCRIPTION("3Com 3c589 series PCMCIA ethernet driver");
+-
+-/* Non-zero if lance_probe1() needs to allocate low-memory bounce buffers.
+-   Assume yes until we know the memory size. */
+-static unsigned char lance_need_isa_bounce_buffers = 1;
+-
+-static int lance_open(struct net_device *dev);
+-static void lance_init_ring(struct net_device *dev, gfp_t mode);
+-static netdev_tx_t lance_start_xmit(struct sk_buff *skb,
+-				    struct net_device *dev);
+-static int lance_rx(struct net_device *dev);
+-static irqreturn_t lance_interrupt(int irq, void *dev_id);
+-static int lance_close(struct net_device *dev);
+-static struct net_device_stats *lance_get_stats(struct net_device *dev);
+-static void set_multicast_list(struct net_device *dev);
+-static void lance_tx_timeout (struct net_device *dev, unsigned int txqueue);
+-
+-
+-
+-#ifdef MODULE
+-#define MAX_CARDS		8	/* Max number of interfaces (cards) per module */
+-
+-static struct net_device *dev_lance[MAX_CARDS];
+-static int io[MAX_CARDS];
+-static int dma[MAX_CARDS];
+-static int irq[MAX_CARDS];
+-
+-module_param_hw_array(io, int, ioport, NULL, 0);
+-module_param_hw_array(dma, int, dma, NULL, 0);
+-module_param_hw_array(irq, int, irq, NULL, 0);
+-module_param(lance_debug, int, 0);
+-MODULE_PARM_DESC(io, "LANCE/PCnet I/O base address(es),required");
+-MODULE_PARM_DESC(dma, "LANCE/PCnet ISA DMA channel (ignored for some devices)");
+-MODULE_PARM_DESC(irq, "LANCE/PCnet IRQ number (ignored for some devices)");
+-MODULE_PARM_DESC(lance_debug, "LANCE/PCnet debug level (0-7)");
+-
+-static int __init lance_init_module(void)
+-{
+-	struct net_device *dev;
+-	int this_dev, found = 0;
+-
+-	for (this_dev = 0; this_dev < MAX_CARDS; this_dev++) {
+-		if (io[this_dev] == 0)  {
+-			if (this_dev != 0) /* only complain once */
+-				break;
+-			printk(KERN_NOTICE "lance.c: Module autoprobing not allowed. Append \"io=0xNNN\" value(s).\n");
+-			return -EPERM;
+-		}
+-		dev = alloc_etherdev(0);
+-		if (!dev)
+-			break;
+-		dev->irq = irq[this_dev];
+-		dev->base_addr = io[this_dev];
+-		dev->dma = dma[this_dev];
+-		if (do_lance_probe(dev) == 0) {
+-			dev_lance[found++] = dev;
+-			continue;
+-		}
+-		free_netdev(dev);
+-		break;
+-	}
+-	if (found != 0)
+-		return 0;
+-	return -ENXIO;
+-}
+-module_init(lance_init_module);
+-
+-static void cleanup_card(struct net_device *dev)
+-{
+-	struct lance_private *lp = dev->ml_priv;
+-	if (dev->dma != 4)
+-		free_dma(dev->dma);
+-	release_region(dev->base_addr, LANCE_TOTAL_SIZE);
+-	kfree(lp->tx_bounce_buffs);
+-	kfree((void*)lp->rx_buffs);
+-	kfree(lp);
+-}
+-
+-static void __exit lance_cleanup_module(void)
+-{
+-	int this_dev;
+-
+-	for (this_dev = 0; this_dev < MAX_CARDS; this_dev++) {
+-		struct net_device *dev = dev_lance[this_dev];
+-		if (dev) {
+-			unregister_netdev(dev);
+-			cleanup_card(dev);
+-			free_netdev(dev);
+-		}
+-	}
+-}
+-module_exit(lance_cleanup_module);
+-#endif /* MODULE */
+-MODULE_DESCRIPTION("AMD LANCE/PCnet Ethernet driver");
 -MODULE_LICENSE("GPL");
 -
--#define INT_MODULE_PARM(n, v) static int n = v; module_param(n, int, 0)
 -
--/* Special hook for setting if_port when module is loaded */
--INT_MODULE_PARM(if_port, 0);
+-/* Starting in v2.1.*, the LANCE/PCnet probe is now similar to the other
+-   board probes now that kmalloc() can allocate ISA DMA-able regions.
+-   This also allows the LANCE driver to be used as a module.
+-   */
+-static int __init do_lance_probe(struct net_device *dev)
+-{
+-	unsigned int *port;
+-	int result;
 -
+-	if (high_memory <= phys_to_virt(16*1024*1024))
+-		lance_need_isa_bounce_buffers = 0;
 -
--/*====================================================================*/
+-	for (port = lance_portlist; *port; port++) {
+-		int ioaddr = *port;
+-		struct resource *r = request_region(ioaddr, LANCE_TOTAL_SIZE,
+-							"lance-probe");
 -
--static int tc589_config(struct pcmcia_device *link);
--static void tc589_release(struct pcmcia_device *link);
+-		if (r) {
+-			/* Detect the card with minimal I/O reads */
+-			char offset14 = inb(ioaddr + 14);
+-			int card;
+-			for (card = 0; card < NUM_CARDS; ++card)
+-				if (cards[card].id_offset14 == offset14)
+-					break;
+-			if (card < NUM_CARDS) {/*yes, the first byte matches*/
+-				char offset15 = inb(ioaddr + 15);
+-				for (card = 0; card < NUM_CARDS; ++card)
+-					if ((cards[card].id_offset14 == offset14) &&
+-						(cards[card].id_offset15 == offset15))
+-						break;
+-			}
+-			if (card < NUM_CARDS) { /*Signature OK*/
+-				result = lance_probe1(dev, ioaddr, 0, 0);
+-				if (!result) {
+-					struct lance_private *lp = dev->ml_priv;
+-					int ver = lp->chip_version;
 -
--static u16 read_eeprom(unsigned int ioaddr, int index);
--static void tc589_reset(struct net_device *dev);
--static void media_check(struct timer_list *t);
--static int el3_config(struct net_device *dev, struct ifmap *map);
--static int el3_open(struct net_device *dev);
--static netdev_tx_t el3_start_xmit(struct sk_buff *skb,
--					struct net_device *dev);
--static irqreturn_t el3_interrupt(int irq, void *dev_id);
--static void update_stats(struct net_device *dev);
--static struct net_device_stats *el3_get_stats(struct net_device *dev);
--static int el3_rx(struct net_device *dev);
--static int el3_close(struct net_device *dev);
--static void el3_tx_timeout(struct net_device *dev, unsigned int txqueue);
--static void set_rx_mode(struct net_device *dev);
--static void set_multicast_list(struct net_device *dev);
--static const struct ethtool_ops netdev_ethtool_ops;
+-					r->name = chip_table[ver].name;
+-					return 0;
+-				}
+-			}
+-			release_region(ioaddr, LANCE_TOTAL_SIZE);
+-		}
+-	}
+-	return -ENODEV;
+-}
 -
--static void tc589_detach(struct pcmcia_device *p_dev);
+-#ifndef MODULE
+-struct net_device * __init lance_probe(int unit)
+-{
+-	struct net_device *dev = alloc_etherdev(0);
+-	int err;
 -
--static const struct net_device_ops el3_netdev_ops = {
--	.ndo_open		= el3_open,
--	.ndo_stop		= el3_close,
--	.ndo_start_xmit		= el3_start_xmit,
--	.ndo_tx_timeout		= el3_tx_timeout,
--	.ndo_set_config		= el3_config,
--	.ndo_get_stats		= el3_get_stats,
+-	if (!dev)
+-		return ERR_PTR(-ENODEV);
+-
+-	sprintf(dev->name, "eth%d", unit);
+-	netdev_boot_setup_check(dev);
+-
+-	err = do_lance_probe(dev);
+-	if (err)
+-		goto out;
+-	return dev;
+-out:
+-	free_netdev(dev);
+-	return ERR_PTR(err);
+-}
+-#endif
+-
+-static const struct net_device_ops lance_netdev_ops = {
+-	.ndo_open 		= lance_open,
+-	.ndo_start_xmit		= lance_start_xmit,
+-	.ndo_stop		= lance_close,
+-	.ndo_get_stats		= lance_get_stats,
 -	.ndo_set_rx_mode	= set_multicast_list,
--	.ndo_set_mac_address	= eth_mac_addr,
+-	.ndo_tx_timeout		= lance_tx_timeout,
+-	.ndo_set_mac_address 	= eth_mac_addr,
 -	.ndo_validate_addr	= eth_validate_addr,
 -};
 -
--static int tc589_probe(struct pcmcia_device *link)
+-static int __init lance_probe1(struct net_device *dev, int ioaddr, int irq, int options)
 -{
--	struct el3_private *lp;
--	struct net_device *dev;
--	int ret;
+-	struct lance_private *lp;
+-	unsigned long dma_channels;	/* Mark spuriously-busy DMA channels */
+-	int i, reset_val, lance_version;
+-	const char *chipname;
+-	/* Flags for specific chips or boards. */
+-	unsigned char hpJ2405A = 0;	/* HP ISA adaptor */
+-	int hp_builtin = 0;		/* HP on-board ethernet. */
+-	static int did_version;		/* Already printed version info. */
+-	unsigned long flags;
+-	int err = -ENOMEM;
+-	void __iomem *bios;
+-	u8 addr[ETH_ALEN];
 -
--	dev_dbg(&link->dev, "3c589_attach()\n");
--
--	/* Create new ethernet device */
--	dev = alloc_etherdev(sizeof(struct el3_private));
--	if (!dev)
+-	/* First we look for special cases.
+-	   Check for HP's on-board ethernet by looking for 'HP' in the BIOS.
+-	   There are two HP versions, check the BIOS for the configuration port.
+-	   This method provided by L. Julliard, Laurent_Julliard@grenoble.hp.com.
+-	   */
+-	bios = ioremap(0xf00f0, 0x14);
+-	if (!bios)
 -		return -ENOMEM;
--	lp = netdev_priv(dev);
--	link->priv = dev;
--	lp->p_dev = link;
--
--	spin_lock_init(&lp->lock);
--	link->resource[0]->end = 16;
--	link->resource[0]->flags |= IO_DATA_PATH_WIDTH_16;
--
--	link->config_flags |= CONF_ENABLE_IRQ;
--	link->config_index = 1;
--
--	dev->netdev_ops = &el3_netdev_ops;
--	dev->watchdog_timeo = TX_TIMEOUT;
--
--	dev->ethtool_ops = &netdev_ethtool_ops;
--
--	ret = tc589_config(link);
--	if (ret)
--		goto err_free_netdev;
--
--	return 0;
--
--err_free_netdev:
--	free_netdev(dev);
--	return ret;
--}
--
--static void tc589_detach(struct pcmcia_device *link)
--{
--	struct net_device *dev = link->priv;
--
--	dev_dbg(&link->dev, "3c589_detach\n");
--
--	unregister_netdev(dev);
--
--	tc589_release(link);
--
--	free_netdev(dev);
--} /* tc589_detach */
--
--static int tc589_config(struct pcmcia_device *link)
--{
--	struct net_device *dev = link->priv;
--	int ret, i, j, multi = 0, fifo;
--	__be16 addr[ETH_ALEN / 2];
--	unsigned int ioaddr;
--	static const char * const ram_split[] = {"5:3", "3:1", "1:1", "3:5"};
--	u8 *buf;
--	size_t len;
--
--	dev_dbg(&link->dev, "3c589_config\n");
--
--	/* Is this a 3c562? */
--	if (link->manf_id != MANFID_3COM)
--		dev_info(&link->dev, "hmmm, is this really a 3Com card??\n");
--	multi = (link->card_id == PRODID_3COM_3C562);
--
--	link->io_lines = 16;
--
--	/* For the 3c562, the base address must be xx00-xx7f */
--	for (i = j = 0; j < 0x400; j += 0x10) {
--		if (multi && (j & 0x80))
--			continue;
--		link->resource[0]->start = j ^ 0x300;
--		i = pcmcia_request_io(link);
--		if (i == 0)
--			break;
+-	if (readw(bios + 0x12) == 0x5048)  {
+-		static const short ioaddr_table[] = { 0x300, 0x320, 0x340, 0x360};
+-		int hp_port = (readl(bios + 1) & 1)  ? 0x499 : 0x99;
+-		/* We can have boards other than the built-in!  Verify this is on-board. */
+-		if ((inb(hp_port) & 0xc0) == 0x80 &&
+-		    ioaddr_table[inb(hp_port) & 3] == ioaddr)
+-			hp_builtin = hp_port;
 -	}
--	if (i != 0)
--		goto failed;
+-	iounmap(bios);
+-	/* We also recognize the HP Vectra on-board here, but check below. */
+-	hpJ2405A = (inb(ioaddr) == 0x08 && inb(ioaddr+1) == 0x00 &&
+-		    inb(ioaddr+2) == 0x09);
 -
--	ret = pcmcia_request_irq(link, el3_interrupt);
--	if (ret)
--		goto failed;
+-	/* Reset the LANCE.	 */
+-	reset_val = inw(ioaddr+LANCE_RESET); /* Reset the LANCE */
 -
--	ret = pcmcia_enable_device(link);
--	if (ret)
--		goto failed;
+-	/* The Un-Reset needed is only needed for the real NE2100, and will
+-	   confuse the HP board. */
+-	if (!hpJ2405A)
+-		outw(reset_val, ioaddr+LANCE_RESET);
 -
--	dev->irq = link->irq;
--	dev->base_addr = link->resource[0]->start;
--	ioaddr = dev->base_addr;
--	EL3WINDOW(0);
--
--	/* The 3c589 has an extra EEPROM for configuration info, including
--	 * the hardware address.  The 3c562 puts the address in the CIS.
--	 */
--	len = pcmcia_get_tuple(link, 0x88, &buf);
--	if (buf && len >= 6) {
--		for (i = 0; i < 3; i++)
--			addr[i] = htons(le16_to_cpu(buf[i*2]));
--		kfree(buf);
--	} else {
--		kfree(buf); /* 0 < len < 6 */
--		for (i = 0; i < 3; i++)
--			addr[i] = htons(read_eeprom(ioaddr, i));
--		if (addr[0] == htons(0x6060)) {
--			dev_err(&link->dev, "IO port conflict at 0x%03lx-0x%03lx\n",
--					dev->base_addr, dev->base_addr+15);
--			goto failed;
--		}
--	}
--	eth_hw_addr_set(dev, (u8 *)addr);
--
--	/* The address and resource configuration register aren't loaded from
--	 * the EEPROM and *must* be set to 0 and IRQ3 for the PCMCIA version.
--	 */
--
--	outw(0x3f00, ioaddr + 8);
--	fifo = inl(ioaddr);
--
--	/* The if_port symbol can be set when the module is loaded */
--	if ((if_port >= 0) && (if_port <= 3))
--		dev->if_port = if_port;
--	else
--		dev_err(&link->dev, "invalid if_port requested\n");
--
--	SET_NETDEV_DEV(dev, &link->dev);
--
--	if (register_netdev(dev) != 0) {
--		dev_err(&link->dev, "register_netdev() failed\n");
--		goto failed;
--	}
--
--	netdev_info(dev, "3Com 3c%s, io %#3lx, irq %d, hw_addr %pM\n",
--			(multi ? "562" : "589"), dev->base_addr, dev->irq,
--			dev->dev_addr);
--	netdev_info(dev, "  %dK FIFO split %s Rx:Tx, %s xcvr\n",
--			(fifo & 7) ? 32 : 8, ram_split[(fifo >> 16) & 3],
--			if_names[dev->if_port]);
--	return 0;
--
--failed:
--	tc589_release(link);
--	return -ENODEV;
--} /* tc589_config */
--
--static void tc589_release(struct pcmcia_device *link)
--{
--	pcmcia_disable_device(link);
--}
--
--static int tc589_suspend(struct pcmcia_device *link)
--{
--	struct net_device *dev = link->priv;
--
--	if (link->open)
--		netif_device_detach(dev);
--
--	return 0;
--}
--
--static int tc589_resume(struct pcmcia_device *link)
--{
--	struct net_device *dev = link->priv;
--
--	if (link->open) {
--		tc589_reset(dev);
--		netif_device_attach(dev);
--	}
--
--	return 0;
--}
--
--/*====================================================================*/
--
--/* Use this for commands that may take time to finish */
--
--static void tc589_wait_for_completion(struct net_device *dev, int cmd)
--{
--	int i = 100;
--	outw(cmd, dev->base_addr + EL3_CMD);
--	while (--i > 0)
--		if (!(inw(dev->base_addr + EL3_STATUS) & 0x1000))
--			break;
--	if (i == 0)
--		netdev_warn(dev, "command 0x%04x did not complete!\n", cmd);
--}
--
--/* Read a word from the EEPROM using the regular EEPROM access register.
-- * Assume that we are in register window zero.
-- */
--
--static u16 read_eeprom(unsigned int ioaddr, int index)
--{
--	int i;
--	outw(EEPROM_READ + index, ioaddr + 10);
--	/* Reading the eeprom takes 162 us */
--	for (i = 1620; i >= 0; i--)
--		if ((inw(ioaddr + 10) & EEPROM_BUSY) == 0)
--			break;
--	return inw(ioaddr + 12);
--}
--
--/* Set transceiver type, perhaps to something other than what the user
-- * specified in dev->if_port.
-- */
--
--static void tc589_set_xcvr(struct net_device *dev, int if_port)
--{
--	struct el3_private *lp = netdev_priv(dev);
--	unsigned int ioaddr = dev->base_addr;
--
--	EL3WINDOW(0);
--	switch (if_port) {
--	case 0:
--	case 1:
--		outw(0, ioaddr + 6);
--		break;
--	case 2:
--		outw(3<<14, ioaddr + 6);
--		break;
--	case 3:
--		outw(1<<14, ioaddr + 6);
--		break;
--	}
--	/* On PCMCIA, this just turns on the LED */
--	outw((if_port == 2) ? StartCoax : StopCoax, ioaddr + EL3_CMD);
--	/* 10baseT interface, enable link beat and jabber check. */
--	EL3WINDOW(4);
--	outw(MEDIA_LED | ((if_port < 2) ? MEDIA_TP : 0), ioaddr + WN4_MEDIA);
--	EL3WINDOW(1);
--	if (if_port == 2)
--		lp->media_status = ((dev->if_port == 0) ? 0x8000 : 0x4000);
--	else
--		lp->media_status = ((dev->if_port == 0) ? 0x4010 : 0x8800);
--}
--
--static void dump_status(struct net_device *dev)
--{
--	unsigned int ioaddr = dev->base_addr;
--	EL3WINDOW(1);
--	netdev_info(dev, "  irq status %04x, rx status %04x, tx status %02x  tx free %04x\n",
--			inw(ioaddr+EL3_STATUS), inw(ioaddr+RX_STATUS),
--			inb(ioaddr+TX_STATUS), inw(ioaddr+TX_FREE));
--	EL3WINDOW(4);
--	netdev_info(dev, "  diagnostics: fifo %04x net %04x ethernet %04x media %04x\n",
--			inw(ioaddr+0x04), inw(ioaddr+0x06), inw(ioaddr+0x08),
--			inw(ioaddr+0x0a));
--	EL3WINDOW(1);
--}
--
--/* Reset and restore all of the 3c589 registers. */
--static void tc589_reset(struct net_device *dev)
--{
--	unsigned int ioaddr = dev->base_addr;
--	int i;
--
--	EL3WINDOW(0);
--	outw(0x0001, ioaddr + 4);			/* Activate board. */
--	outw(0x3f00, ioaddr + 8);			/* Set the IRQ line. */
--
--	/* Set the station address in window 2. */
--	EL3WINDOW(2);
--	for (i = 0; i < 6; i++)
--		outb(dev->dev_addr[i], ioaddr + i);
--
--	tc589_set_xcvr(dev, dev->if_port);
--
--	/* Switch to the stats window, and clear all stats by reading. */
--	outw(StatsDisable, ioaddr + EL3_CMD);
--	EL3WINDOW(6);
--	for (i = 0; i < 9; i++)
--		inb(ioaddr+i);
--	inw(ioaddr + 10);
--	inw(ioaddr + 12);
--
--	/* Switch to register set 1 for normal use. */
--	EL3WINDOW(1);
--
--	set_rx_mode(dev);
--	outw(StatsEnable, ioaddr + EL3_CMD); /* Turn on statistics. */
--	outw(RxEnable, ioaddr + EL3_CMD); /* Enable the receiver. */
--	outw(TxEnable, ioaddr + EL3_CMD); /* Enable transmitter. */
--	/* Allow status bits to be seen. */
--	outw(SetStatusEnb | 0xff, ioaddr + EL3_CMD);
--	/* Ack all pending events, and set active indicator mask. */
--	outw(AckIntr | IntLatch | TxAvailable | RxEarly | IntReq,
--	 ioaddr + EL3_CMD);
--	outw(SetIntrEnb | IntLatch | TxAvailable | RxComplete | StatsFull
--	 | AdapterFailure, ioaddr + EL3_CMD);
--}
--
--static void netdev_get_drvinfo(struct net_device *dev,
--			       struct ethtool_drvinfo *info)
--{
--	strscpy(info->driver, DRV_NAME, sizeof(info->driver));
--	snprintf(info->bus_info, sizeof(info->bus_info),
--		"PCMCIA 0x%lx", dev->base_addr);
--}
--
--static const struct ethtool_ops netdev_ethtool_ops = {
--	.get_drvinfo		= netdev_get_drvinfo,
--};
--
--static int el3_config(struct net_device *dev, struct ifmap *map)
--{
--	if ((map->port != (u_char)(-1)) && (map->port != dev->if_port)) {
--		if (map->port <= 3) {
--			WRITE_ONCE(dev->if_port, map->port);
--			netdev_info(dev, "switched to %s port\n", if_names[dev->if_port]);
--			tc589_set_xcvr(dev, dev->if_port);
--		} else {
--			return -EINVAL;
--		}
--	}
--	return 0;
--}
--
--static int el3_open(struct net_device *dev)
--{
--	struct el3_private *lp = netdev_priv(dev);
--	struct pcmcia_device *link = lp->p_dev;
--
--	if (!pcmcia_dev_present(link))
+-	outw(0x0000, ioaddr+LANCE_ADDR); /* Switch to window 0 */
+-	if (inw(ioaddr+LANCE_DATA) != 0x0004)
 -		return -ENODEV;
 -
--	link->open++;
--	netif_start_queue(dev);
+-	/* Get the version of the chip. */
+-	outw(88, ioaddr+LANCE_ADDR);
+-	if (inw(ioaddr+LANCE_ADDR) != 88) {
+-		lance_version = 0;
+-	} else {			/* Good, it's a newer chip. */
+-		int chip_version = inw(ioaddr+LANCE_DATA);
+-		outw(89, ioaddr+LANCE_ADDR);
+-		chip_version |= inw(ioaddr+LANCE_DATA) << 16;
+-		if (lance_debug > 2)
+-			printk("  LANCE chip version is %#x.\n", chip_version);
+-		if ((chip_version & 0xfff) != 0x003)
+-			return -ENODEV;
+-		chip_version = (chip_version >> 12) & 0xffff;
+-		for (lance_version = 1; chip_table[lance_version].id_number; lance_version++) {
+-			if (chip_table[lance_version].id_number == chip_version)
+-				break;
+-		}
+-	}
 -
--	tc589_reset(dev);
--	timer_setup(&lp->media, media_check, 0);
--	mod_timer(&lp->media, jiffies + HZ);
+-	/* We can't allocate private data from alloc_etherdev() because it must
+-	   a ISA DMA-able region. */
+-	chipname = chip_table[lance_version].name;
+-	printk("%s: %s at %#3x, ", dev->name, chipname, ioaddr);
 -
--	dev_dbg(&link->dev, "%s: opened, status %4.4x.\n",
--	  dev->name, inw(dev->base_addr + EL3_STATUS));
+-	/* There is a 16 byte station address PROM at the base address.
+-	   The first six bytes are the station address. */
+-	for (i = 0; i < 6; i++)
+-		addr[i] = inb(ioaddr + i);
+-	eth_hw_addr_set(dev, addr);
+-	printk("%pM", dev->dev_addr);
 -
+-	dev->base_addr = ioaddr;
+-	/* Make certain the data structures used by the LANCE are aligned and DMAble. */
+-
+-	lp = kzalloc_obj(*lp, GFP_DMA | GFP_KERNEL);
+-	if (!lp)
+-		return -ENOMEM;
+-	if (lance_debug > 6) printk(" (#0x%05lx)", (unsigned long)lp);
+-	dev->ml_priv = lp;
+-	lp->name = chipname;
+-	lp->rx_buffs = (unsigned long)kmalloc_array(RX_RING_SIZE, PKT_BUF_SZ,
+-						    GFP_DMA | GFP_KERNEL);
+-	if (!lp->rx_buffs)
+-		goto out_lp;
+-	if (lance_need_isa_bounce_buffers) {
+-		lp->tx_bounce_buffs = kmalloc_array(TX_RING_SIZE, PKT_BUF_SZ,
+-						    GFP_DMA | GFP_KERNEL);
+-		if (!lp->tx_bounce_buffs)
+-			goto out_rx;
+-	} else
+-		lp->tx_bounce_buffs = NULL;
+-
+-	lp->chip_version = lance_version;
+-	spin_lock_init(&lp->devlock);
+-
+-	lp->init_block.mode = 0x0003;		/* Disable Rx and Tx. */
+-	for (i = 0; i < 6; i++)
+-		lp->init_block.phys_addr[i] = dev->dev_addr[i];
+-	lp->init_block.filter[0] = 0x00000000;
+-	lp->init_block.filter[1] = 0x00000000;
+-	lp->init_block.rx_ring = ((u32)isa_virt_to_bus(lp->rx_ring) & 0xffffff) | RX_RING_LEN_BITS;
+-	lp->init_block.tx_ring = ((u32)isa_virt_to_bus(lp->tx_ring) & 0xffffff) | TX_RING_LEN_BITS;
+-
+-	outw(0x0001, ioaddr+LANCE_ADDR);
+-	inw(ioaddr+LANCE_ADDR);
+-	outw((short) (u32) isa_virt_to_bus(&lp->init_block), ioaddr+LANCE_DATA);
+-	outw(0x0002, ioaddr+LANCE_ADDR);
+-	inw(ioaddr+LANCE_ADDR);
+-	outw(((u32)isa_virt_to_bus(&lp->init_block)) >> 16, ioaddr+LANCE_DATA);
+-	outw(0x0000, ioaddr+LANCE_ADDR);
+-	inw(ioaddr+LANCE_ADDR);
+-
+-	if (irq) {					/* Set iff PCI card. */
+-		dev->dma = 4;			/* Native bus-master, no DMA channel needed. */
+-		dev->irq = irq;
+-	} else if (hp_builtin) {
+-		static const char dma_tbl[4] = {3, 5, 6, 0};
+-		static const char irq_tbl[4] = {3, 4, 5, 9};
+-		unsigned char port_val = inb(hp_builtin);
+-		dev->dma = dma_tbl[(port_val >> 4) & 3];
+-		dev->irq = irq_tbl[(port_val >> 2) & 3];
+-		printk(" HP Vectra IRQ %d DMA %d.\n", dev->irq, dev->dma);
+-	} else if (hpJ2405A) {
+-		static const char dma_tbl[4] = {3, 5, 6, 7};
+-		static const char irq_tbl[8] = {3, 4, 5, 9, 10, 11, 12, 15};
+-		short reset_val = inw(ioaddr+LANCE_RESET);
+-		dev->dma = dma_tbl[(reset_val >> 2) & 3];
+-		dev->irq = irq_tbl[(reset_val >> 4) & 7];
+-		printk(" HP J2405A IRQ %d DMA %d.\n", dev->irq, dev->dma);
+-	} else if (lance_version == PCNET_ISAP) {		/* The plug-n-play version. */
+-		short bus_info;
+-		outw(8, ioaddr+LANCE_ADDR);
+-		bus_info = inw(ioaddr+LANCE_BUS_IF);
+-		dev->dma = bus_info & 0x07;
+-		dev->irq = (bus_info >> 4) & 0x0F;
+-	} else {
+-		/* The DMA channel may be passed in PARAM1. */
+-		if (dev->mem_start & 0x07)
+-			dev->dma = dev->mem_start & 0x07;
+-	}
+-
+-	if (dev->dma == 0) {
+-		/* Read the DMA channel status register, so that we can avoid
+-		   stuck DMA channels in the DMA detection below. */
+-		dma_channels = ((inb(DMA1_STAT_REG) >> 4) & 0x0f) |
+-			(inb(DMA2_STAT_REG) & 0xf0);
+-	}
+-	err = -ENODEV;
+-	if (dev->irq >= 2)
+-		printk(" assigned IRQ %d", dev->irq);
+-	else if (lance_version != 0)  {	/* 7990 boards need DMA detection first. */
+-		unsigned long irq_mask;
+-
+-		/* To auto-IRQ we enable the initialization-done and DMA error
+-		   interrupts. For ISA boards we get a DMA error, but VLB and PCI
+-		   boards will work. */
+-		irq_mask = probe_irq_on();
+-
+-		/* Trigger an initialization just for the interrupt. */
+-		outw(0x0041, ioaddr+LANCE_DATA);
+-
+-		mdelay(20);
+-		dev->irq = probe_irq_off(irq_mask);
+-		if (dev->irq)
+-			printk(", probed IRQ %d", dev->irq);
+-		else {
+-			printk(", failed to detect IRQ line.\n");
+-			goto out_tx;
+-		}
+-
+-		/* Check for the initialization done bit, 0x0100, which means
+-		   that we don't need a DMA channel. */
+-		if (inw(ioaddr+LANCE_DATA) & 0x0100)
+-			dev->dma = 4;
+-	}
+-
+-	if (dev->dma == 4) {
+-		printk(", no DMA needed.\n");
+-	} else if (dev->dma) {
+-		if (request_dma(dev->dma, chipname)) {
+-			printk("DMA %d allocation failed.\n", dev->dma);
+-			goto out_tx;
+-		} else
+-			printk(", assigned DMA %d.\n", dev->dma);
+-	} else {			/* OK, we have to auto-DMA. */
+-		for (i = 0; i < 4; i++) {
+-			static const char dmas[] = { 5, 6, 7, 3 };
+-			int dma = dmas[i];
+-			int boguscnt;
+-
+-			/* Don't enable a permanently busy DMA channel, or the machine
+-			   will hang. */
+-			if (test_bit(dma, &dma_channels))
+-				continue;
+-			outw(0x7f04, ioaddr+LANCE_DATA); /* Clear the memory error bits. */
+-			if (request_dma(dma, chipname))
+-				continue;
+-
+-			flags=claim_dma_lock();
+-			set_dma_mode(dma, DMA_MODE_CASCADE);
+-			enable_dma(dma);
+-			release_dma_lock(flags);
+-
+-			/* Trigger an initialization. */
+-			outw(0x0001, ioaddr+LANCE_DATA);
+-			for (boguscnt = 100; boguscnt > 0; --boguscnt)
+-				if (inw(ioaddr+LANCE_DATA) & 0x0900)
+-					break;
+-			if (inw(ioaddr+LANCE_DATA) & 0x0100) {
+-				dev->dma = dma;
+-				printk(", DMA %d.\n", dev->dma);
+-				break;
+-			} else {
+-				flags=claim_dma_lock();
+-				disable_dma(dma);
+-				release_dma_lock(flags);
+-				free_dma(dma);
+-			}
+-		}
+-		if (i == 4) {			/* Failure: bail. */
+-			printk("DMA detection failed.\n");
+-			goto out_tx;
+-		}
+-	}
+-
+-	if (lance_version == 0 && dev->irq == 0) {
+-		/* We may auto-IRQ now that we have a DMA channel. */
+-		/* Trigger an initialization just for the interrupt. */
+-		unsigned long irq_mask;
+-
+-		irq_mask = probe_irq_on();
+-		outw(0x0041, ioaddr+LANCE_DATA);
+-
+-		mdelay(40);
+-		dev->irq = probe_irq_off(irq_mask);
+-		if (dev->irq == 0) {
+-			printk("  Failed to detect the 7990 IRQ line.\n");
+-			goto out_dma;
+-		}
+-		printk("  Auto-IRQ detected IRQ%d.\n", dev->irq);
+-	}
+-
+-	if (chip_table[lp->chip_version].flags & LANCE_ENABLE_AUTOSELECT) {
+-		/* Turn on auto-select of media (10baseT or BNC) so that the user
+-		   can watch the LEDs even if the board isn't opened. */
+-		outw(0x0002, ioaddr+LANCE_ADDR);
+-		/* Don't touch 10base2 power bit. */
+-		outw(inw(ioaddr+LANCE_BUS_IF) | 0x0002, ioaddr+LANCE_BUS_IF);
+-	}
+-
+-	if (lance_debug > 0  &&  did_version++ == 0)
+-		printk(version);
+-
+-	/* The LANCE-specific entries in the device structure. */
+-	dev->netdev_ops = &lance_netdev_ops;
+-	dev->watchdog_timeo = TX_TIMEOUT;
+-
+-	err = register_netdev(dev);
+-	if (err)
+-		goto out_dma;
 -	return 0;
+-out_dma:
+-	if (dev->dma != 4)
+-		free_dma(dev->dma);
+-out_tx:
+-	kfree(lp->tx_bounce_buffs);
+-out_rx:
+-	kfree((void*)lp->rx_buffs);
+-out_lp:
+-	kfree(lp);
+-	return err;
 -}
 -
--static void el3_tx_timeout(struct net_device *dev, unsigned int txqueue)
--{
--	unsigned int ioaddr = dev->base_addr;
 -
--	netdev_warn(dev, "Transmit timed out!\n");
--	dump_status(dev);
--	dev->stats.tx_errors++;
--	netif_trans_update(dev); /* prevent tx timeout */
--	/* Issue TX_RESET and TX_START commands. */
--	tc589_wait_for_completion(dev, TxReset);
--	outw(TxEnable, ioaddr + EL3_CMD);
--	netif_wake_queue(dev);
--}
--
--static void pop_tx_status(struct net_device *dev)
+-static int
+-lance_open(struct net_device *dev)
 -{
--	unsigned int ioaddr = dev->base_addr;
+-	struct lance_private *lp = dev->ml_priv;
+-	int ioaddr = dev->base_addr;
 -	int i;
 -
--	/* Clear the Tx status stack. */
--	for (i = 32; i > 0; i--) {
--		u_char tx_status = inb(ioaddr + TX_STATUS);
--		if (!(tx_status & 0x84))
+-	if (dev->irq == 0 ||
+-		request_irq(dev->irq, lance_interrupt, 0, dev->name, dev)) {
+-		return -EAGAIN;
+-	}
+-
+-	/* We used to allocate DMA here, but that was silly.
+-	   DMA lines can't be shared!  We now permanently allocate them. */
+-
+-	/* Reset the LANCE */
+-	inw(ioaddr+LANCE_RESET);
+-
+-	/* The DMA controller is used as a no-operation slave, "cascade mode". */
+-	if (dev->dma != 4) {
+-		unsigned long flags=claim_dma_lock();
+-		enable_dma(dev->dma);
+-		set_dma_mode(dev->dma, DMA_MODE_CASCADE);
+-		release_dma_lock(flags);
+-	}
+-
+-	/* Un-Reset the LANCE, needed only for the NE2100. */
+-	if (chip_table[lp->chip_version].flags & LANCE_MUST_UNRESET)
+-		outw(0, ioaddr+LANCE_RESET);
+-
+-	if (chip_table[lp->chip_version].flags & LANCE_ENABLE_AUTOSELECT) {
+-		/* This is 79C960-specific: Turn on auto-select of media (AUI, BNC). */
+-		outw(0x0002, ioaddr+LANCE_ADDR);
+-		/* Only touch autoselect bit. */
+-		outw(inw(ioaddr+LANCE_BUS_IF) | 0x0002, ioaddr+LANCE_BUS_IF);
+-	}
+-
+-	if (lance_debug > 1)
+-		printk("%s: lance_open() irq %d dma %d tx/rx rings %#x/%#x init %#x.\n",
+-			   dev->name, dev->irq, dev->dma,
+-		           (u32) isa_virt_to_bus(lp->tx_ring),
+-		           (u32) isa_virt_to_bus(lp->rx_ring),
+-			   (u32) isa_virt_to_bus(&lp->init_block));
+-
+-	lance_init_ring(dev, GFP_KERNEL);
+-	/* Re-initialize the LANCE, and start it when done. */
+-	outw(0x0001, ioaddr+LANCE_ADDR);
+-	outw((short) (u32) isa_virt_to_bus(&lp->init_block), ioaddr+LANCE_DATA);
+-	outw(0x0002, ioaddr+LANCE_ADDR);
+-	outw(((u32)isa_virt_to_bus(&lp->init_block)) >> 16, ioaddr+LANCE_DATA);
+-
+-	outw(0x0004, ioaddr+LANCE_ADDR);
+-	outw(0x0915, ioaddr+LANCE_DATA);
+-
+-	outw(0x0000, ioaddr+LANCE_ADDR);
+-	outw(0x0001, ioaddr+LANCE_DATA);
+-
+-	netif_start_queue (dev);
+-
+-	i = 0;
+-	while (i++ < 100)
+-		if (inw(ioaddr+LANCE_DATA) & 0x0100)
 -			break;
--		/* reset transmitter on jabber error or underrun */
--		if (tx_status & 0x30)
--			tc589_wait_for_completion(dev, TxReset);
--		if (tx_status & 0x38) {
--			netdev_dbg(dev, "transmit error: status 0x%02x\n", tx_status);
--			outw(TxEnable, ioaddr + EL3_CMD);
--			dev->stats.tx_aborted_errors++;
+-	/*
+-	 * We used to clear the InitDone bit, 0x0100, here but Mark Stockton
+-	 * reports that doing so triggers a bug in the '974.
+-	 */
+-	outw(0x0042, ioaddr+LANCE_DATA);
+-
+-	if (lance_debug > 2)
+-		printk("%s: LANCE open after %d ticks, init block %#x csr0 %4.4x.\n",
+-			   dev->name, i, (u32) isa_virt_to_bus(&lp->init_block), inw(ioaddr+LANCE_DATA));
+-
+-	return 0;					/* Always succeed */
+-}
+-
+-/* The LANCE has been halted for one reason or another (busmaster memory
+-   arbitration error, Tx FIFO underflow, driver stopped it to reconfigure,
+-   etc.).  Modern LANCE variants always reload their ring-buffer
+-   configuration when restarted, so we must reinitialize our ring
+-   context before restarting.  As part of this reinitialization,
+-   find all packets still on the Tx ring and pretend that they had been
+-   sent (in effect, drop the packets on the floor) - the higher-level
+-   protocols will time out and retransmit.  It'd be better to shuffle
+-   these skbs to a temp list and then actually re-Tx them after
+-   restarting the chip, but I'm too lazy to do so right now.  dplatt@3do.com
+-*/
+-
+-static void
+-lance_purge_ring(struct net_device *dev)
+-{
+-	struct lance_private *lp = dev->ml_priv;
+-	int i;
+-
+-	/* Free all the skbuffs in the Rx and Tx queues. */
+-	for (i = 0; i < RX_RING_SIZE; i++) {
+-		struct sk_buff *skb = lp->rx_skbuff[i];
+-		lp->rx_skbuff[i] = NULL;
+-		lp->rx_ring[i].base = 0;		/* Not owned by LANCE chip. */
+-		if (skb)
+-			dev_kfree_skb_any(skb);
+-	}
+-	for (i = 0; i < TX_RING_SIZE; i++) {
+-		if (lp->tx_skbuff[i]) {
+-			dev_kfree_skb_any(lp->tx_skbuff[i]);
+-			lp->tx_skbuff[i] = NULL;
 -		}
--		outb(0x00, ioaddr + TX_STATUS); /* Pop the status stack. */
 -	}
 -}
 -
--static netdev_tx_t el3_start_xmit(struct sk_buff *skb,
--					struct net_device *dev)
+-
+-/* Initialize the LANCE Rx and Tx rings. */
+-static void
+-lance_init_ring(struct net_device *dev, gfp_t gfp)
 -{
--	unsigned int ioaddr = dev->base_addr;
--	struct el3_private *priv = netdev_priv(dev);
+-	struct lance_private *lp = dev->ml_priv;
+-	int i;
+-
+-	lp->cur_rx = lp->cur_tx = 0;
+-	lp->dirty_rx = lp->dirty_tx = 0;
+-
+-	for (i = 0; i < RX_RING_SIZE; i++) {
+-		struct sk_buff *skb;
+-		void *rx_buff;
+-
+-		skb = alloc_skb(PKT_BUF_SZ, GFP_DMA | gfp);
+-		lp->rx_skbuff[i] = skb;
+-		if (skb)
+-			rx_buff = skb->data;
+-		else
+-			rx_buff = kmalloc(PKT_BUF_SZ, GFP_DMA | gfp);
+-		if (!rx_buff)
+-			lp->rx_ring[i].base = 0;
+-		else
+-			lp->rx_ring[i].base = (u32)isa_virt_to_bus(rx_buff) | 0x80000000;
+-		lp->rx_ring[i].buf_length = -PKT_BUF_SZ;
+-	}
+-	/* The Tx buffer address is filled in as needed, but we do need to clear
+-	   the upper ownership bit. */
+-	for (i = 0; i < TX_RING_SIZE; i++) {
+-		lp->tx_skbuff[i] = NULL;
+-		lp->tx_ring[i].base = 0;
+-	}
+-
+-	lp->init_block.mode = 0x0000;
+-	for (i = 0; i < 6; i++)
+-		lp->init_block.phys_addr[i] = dev->dev_addr[i];
+-	lp->init_block.filter[0] = 0x00000000;
+-	lp->init_block.filter[1] = 0x00000000;
+-	lp->init_block.rx_ring = ((u32)isa_virt_to_bus(lp->rx_ring) & 0xffffff) | RX_RING_LEN_BITS;
+-	lp->init_block.tx_ring = ((u32)isa_virt_to_bus(lp->tx_ring) & 0xffffff) | TX_RING_LEN_BITS;
+-}
+-
+-static void
+-lance_restart(struct net_device *dev, unsigned int csr0_bits, int must_reinit)
+-{
+-	struct lance_private *lp = dev->ml_priv;
+-
+-	if (must_reinit ||
+-		(chip_table[lp->chip_version].flags & LANCE_MUST_REINIT_RING)) {
+-		lance_purge_ring(dev);
+-		lance_init_ring(dev, GFP_ATOMIC);
+-	}
+-	outw(0x0000,    dev->base_addr + LANCE_ADDR);
+-	outw(csr0_bits, dev->base_addr + LANCE_DATA);
+-}
+-
+-
+-static void lance_tx_timeout (struct net_device *dev, unsigned int txqueue)
+-{
+-	struct lance_private *lp = (struct lance_private *) dev->ml_priv;
+-	int ioaddr = dev->base_addr;
+-
+-	outw (0, ioaddr + LANCE_ADDR);
+-	printk ("%s: transmit timed out, status %4.4x, resetting.\n",
+-		dev->name, inw (ioaddr + LANCE_DATA));
+-	outw (0x0004, ioaddr + LANCE_DATA);
+-	dev->stats.tx_errors++;
+-#ifndef final_version
+-	if (lance_debug > 3) {
+-		int i;
+-		printk (" Ring data dump: dirty_tx %d cur_tx %d%s cur_rx %d.",
+-		  lp->dirty_tx, lp->cur_tx, netif_queue_stopped(dev) ? " (full)" : "",
+-			lp->cur_rx);
+-		for (i = 0; i < RX_RING_SIZE; i++)
+-			printk ("%s %08x %04x %04x", i & 0x3 ? "" : "\n ",
+-			 lp->rx_ring[i].base, -lp->rx_ring[i].buf_length,
+-				lp->rx_ring[i].msg_length);
+-		for (i = 0; i < TX_RING_SIZE; i++)
+-			printk ("%s %08x %04x %04x", i & 0x3 ? "" : "\n ",
+-			     lp->tx_ring[i].base, -lp->tx_ring[i].length,
+-				lp->tx_ring[i].misc);
+-		printk ("\n");
+-	}
+-#endif
+-	lance_restart (dev, 0x0043, 1);
+-
+-	netif_trans_update(dev); /* prevent tx timeout */
+-	netif_wake_queue (dev);
+-}
+-
+-
+-static netdev_tx_t lance_start_xmit(struct sk_buff *skb,
+-				    struct net_device *dev)
+-{
+-	struct lance_private *lp = dev->ml_priv;
+-	int ioaddr = dev->base_addr;
+-	int entry;
 -	unsigned long flags;
 -
--	netdev_dbg(dev, "el3_start_xmit(length = %ld) called, status %4.4x.\n",
--	       (long)skb->len, inw(ioaddr + EL3_STATUS));
+-	spin_lock_irqsave(&lp->devlock, flags);
 -
--	spin_lock_irqsave(&priv->lock, flags);
+-	if (lance_debug > 3) {
+-		outw(0x0000, ioaddr+LANCE_ADDR);
+-		printk("%s: lance_start_xmit() called, csr0 %4.4x.\n", dev->name,
+-			   inw(ioaddr+LANCE_DATA));
+-		outw(0x0000, ioaddr+LANCE_DATA);
+-	}
+-
+-	/* Fill in a Tx ring entry */
+-
+-	/* Mask to ring buffer boundary. */
+-	entry = lp->cur_tx & TX_RING_MOD_MASK;
+-
+-	/* Caution: the write order is important here, set the base address
+-	   with the "ownership" bits last. */
+-
+-	/* The old LANCE chips doesn't automatically pad buffers to min. size. */
+-	if (chip_table[lp->chip_version].flags & LANCE_MUST_PAD) {
+-		if (skb->len < ETH_ZLEN) {
+-			if (skb_padto(skb, ETH_ZLEN))
+-				goto out;
+-			lp->tx_ring[entry].length = -ETH_ZLEN;
+-		}
+-		else
+-			lp->tx_ring[entry].length = -skb->len;
+-	} else
+-		lp->tx_ring[entry].length = -skb->len;
+-
+-	lp->tx_ring[entry].misc = 0x0000;
 -
 -	dev->stats.tx_bytes += skb->len;
 -
--	/* Put out the doubleword header... */
--	outw(skb->len, ioaddr + TX_FIFO);
--	outw(0x00, ioaddr + TX_FIFO);
--	/* ... and the packet rounded to a doubleword. */
--	outsl(ioaddr + TX_FIFO, skb->data, (skb->len + 3) >> 2);
--
--	if (inw(ioaddr + TX_FREE) <= 1536) {
--		netif_stop_queue(dev);
--		/* Interrupt us when the FIFO has room for max-sized packet. */
--		outw(SetTxThreshold + 1536, ioaddr + EL3_CMD);
+-	/* If any part of this buffer is >16M we must copy it to a low-memory
+-	   buffer. */
+-	if ((u32)isa_virt_to_bus(skb->data) + skb->len > 0x01000000) {
+-		if (lance_debug > 5)
+-			printk("%s: bouncing a high-memory packet (%#x).\n",
+-				   dev->name, (u32)isa_virt_to_bus(skb->data));
+-		skb_copy_from_linear_data(skb, &lp->tx_bounce_buffs[entry], skb->len);
+-		lp->tx_ring[entry].base =
+-			((u32)isa_virt_to_bus((lp->tx_bounce_buffs + entry)) & 0xffffff) | 0x83000000;
+-		dev_consume_skb_irq(skb);
+-	} else {
+-		lp->tx_skbuff[entry] = skb;
+-		lp->tx_ring[entry].base = ((u32)isa_virt_to_bus(skb->data) & 0xffffff) | 0x83000000;
 -	}
+-	lp->cur_tx++;
 -
--	pop_tx_status(dev);
--	spin_unlock_irqrestore(&priv->lock, flags);
--	dev_kfree_skb(skb);
+-	/* Trigger an immediate send poll. */
+-	outw(0x0000, ioaddr+LANCE_ADDR);
+-	outw(0x0048, ioaddr+LANCE_DATA);
 -
+-	if ((lp->cur_tx - lp->dirty_tx) >= TX_RING_SIZE)
+-		netif_stop_queue(dev);
+-
+-out:
+-	spin_unlock_irqrestore(&lp->devlock, flags);
 -	return NETDEV_TX_OK;
 -}
 -
--/* The EL3 interrupt handler. */
--static irqreturn_t el3_interrupt(int irq, void *dev_id)
+-/* The LANCE interrupt handler. */
+-static irqreturn_t lance_interrupt(int irq, void *dev_id)
 -{
--	struct net_device *dev = (struct net_device *) dev_id;
--	struct el3_private *lp = netdev_priv(dev);
--	unsigned int ioaddr;
--	__u16 status;
--	int i = 0, handled = 1;
--
--	if (!netif_device_present(dev))
--		return IRQ_NONE;
+-	struct net_device *dev = dev_id;
+-	struct lance_private *lp;
+-	int csr0, ioaddr, boguscnt=10;
+-	int must_restart;
 -
 -	ioaddr = dev->base_addr;
+-	lp = dev->ml_priv;
 -
--	netdev_dbg(dev, "interrupt, status %4.4x.\n", inw(ioaddr + EL3_STATUS));
+-	spin_lock (&lp->devlock);
 -
--	spin_lock(&lp->lock);
--	while ((status = inw(ioaddr + EL3_STATUS)) &
--	(IntLatch | RxComplete | StatsFull)) {
--		if ((status & 0xe000) != 0x2000) {
--			netdev_dbg(dev, "interrupt from dead card\n");
--			handled = 0;
--			break;
--		}
--		if (status & RxComplete)
--			el3_rx(dev);
--		if (status & TxAvailable) {
--			netdev_dbg(dev, "    TX room bit was handled.\n");
--			/* There's room in the FIFO for a full-sized packet. */
--			outw(AckIntr | TxAvailable, ioaddr + EL3_CMD);
--			netif_wake_queue(dev);
--		}
--		if (status & TxComplete)
--			pop_tx_status(dev);
--		if (status & (AdapterFailure | RxEarly | StatsFull)) {
--			/* Handle all uncommon interrupts. */
--			if (status & StatsFull)		/* Empty statistics. */
--				update_stats(dev);
--			if (status & RxEarly) {
--				/* Rx early is unused. */
--				el3_rx(dev);
--				outw(AckIntr | RxEarly, ioaddr + EL3_CMD);
--			}
--			if (status & AdapterFailure) {
--				u16 fifo_diag;
--				EL3WINDOW(4);
--				fifo_diag = inw(ioaddr + 4);
--				EL3WINDOW(1);
--				netdev_warn(dev, "adapter failure, FIFO diagnostic register %04x.\n",
--			    fifo_diag);
--				if (fifo_diag & 0x0400) {
--					/* Tx overrun */
--					tc589_wait_for_completion(dev, TxReset);
--					outw(TxEnable, ioaddr + EL3_CMD);
+-	outw(0x00, dev->base_addr + LANCE_ADDR);
+-	while ((csr0 = inw(dev->base_addr + LANCE_DATA)) & 0x8600 &&
+-	       --boguscnt >= 0) {
+-		/* Acknowledge all of the current interrupt sources ASAP. */
+-		outw(csr0 & ~0x004f, dev->base_addr + LANCE_DATA);
+-
+-		must_restart = 0;
+-
+-		if (lance_debug > 5)
+-			printk("%s: interrupt  csr0=%#2.2x new csr=%#2.2x.\n",
+-				   dev->name, csr0, inw(dev->base_addr + LANCE_DATA));
+-
+-		if (csr0 & 0x0400)			/* Rx interrupt */
+-			lance_rx(dev);
+-
+-		if (csr0 & 0x0200) {		/* Tx-done interrupt */
+-			int dirty_tx = lp->dirty_tx;
+-
+-			while (dirty_tx < lp->cur_tx) {
+-				int entry = dirty_tx & TX_RING_MOD_MASK;
+-				int status = lp->tx_ring[entry].base;
+-
+-				if (status < 0)
+-					break;			/* It still hasn't been Txed */
+-
+-				lp->tx_ring[entry].base = 0;
+-
+-				if (status & 0x40000000) {
+-					/* There was an major error, log it. */
+-					int err_status = lp->tx_ring[entry].misc;
+-					dev->stats.tx_errors++;
+-					if (err_status & 0x0400)
+-						dev->stats.tx_aborted_errors++;
+-					if (err_status & 0x0800)
+-						dev->stats.tx_carrier_errors++;
+-					if (err_status & 0x1000)
+-						dev->stats.tx_window_errors++;
+-					if (err_status & 0x4000) {
+-						/* Ackk!  On FIFO errors the Tx unit is turned off! */
+-						dev->stats.tx_fifo_errors++;
+-						/* Remove this verbosity later! */
+-						printk("%s: Tx FIFO error! Status %4.4x.\n",
+-							   dev->name, csr0);
+-						/* Restart the chip. */
+-						must_restart = 1;
+-					}
+-				} else {
+-					if (status & 0x18000000)
+-						dev->stats.collisions++;
+-					dev->stats.tx_packets++;
 -				}
--				if (fifo_diag & 0x2000) {
--					/* Rx underrun */
--					tc589_wait_for_completion(dev, RxReset);
--					set_rx_mode(dev);
--					outw(RxEnable, ioaddr + EL3_CMD);
+-
+-				/* We must free the original skb if it's not a data-only copy
+-				   in the bounce buffer. */
+-				if (lp->tx_skbuff[entry]) {
+-					dev_consume_skb_irq(lp->tx_skbuff[entry]);
+-					lp->tx_skbuff[entry] = NULL;
 -				}
--				outw(AckIntr | AdapterFailure, ioaddr + EL3_CMD);
+-				dirty_tx++;
 -			}
--		}
--		if (++i > 10) {
--			netdev_err(dev, "infinite loop in interrupt, status %4.4x.\n",
--					status);
--			/* Clear all interrupts */
--			outw(AckIntr | 0xFF, ioaddr + EL3_CMD);
--			break;
--		}
--		/* Acknowledge the IRQ. */
--		outw(AckIntr | IntReq | IntLatch, ioaddr + EL3_CMD);
--	}
--	lp->last_irq = jiffies;
--	spin_unlock(&lp->lock);
--	netdev_dbg(dev, "exiting interrupt, status %4.4x.\n",
--			inw(ioaddr + EL3_STATUS));
--	return IRQ_RETVAL(handled);
--}
 -
--static void media_check(struct timer_list *t)
--{
--	struct el3_private *lp = timer_container_of(lp, t, media);
--	struct net_device *dev = lp->p_dev->priv;
--	unsigned int ioaddr = dev->base_addr;
--	u16 media, errs;
--	unsigned long flags;
--
--	if (!netif_device_present(dev))
--		goto reschedule;
--
--	/* Check for pending interrupt with expired latency timer: with
--	 * this, we can limp along even if the interrupt is blocked
--	 */
--	if ((inw(ioaddr + EL3_STATUS) & IntLatch) &&
--	(inb(ioaddr + EL3_TIMER) == 0xff)) {
--		if (!lp->fast_poll)
--			netdev_warn(dev, "interrupt(s) dropped!\n");
--
--		local_irq_save(flags);
--		el3_interrupt(dev->irq, dev);
--		local_irq_restore(flags);
--
--		lp->fast_poll = HZ;
--	}
--	if (lp->fast_poll) {
--		lp->fast_poll--;
--		lp->media.expires = jiffies + HZ/100;
--		add_timer(&lp->media);
--		return;
--	}
--
--	/* lp->lock guards the EL3 window. Window should always be 1 except
--	 * when the lock is held
--	 */
--
--	spin_lock_irqsave(&lp->lock, flags);
--	EL3WINDOW(4);
--	media = inw(ioaddr+WN4_MEDIA) & 0xc810;
--
--	/* Ignore collisions unless we've had no irq's recently */
--	if (time_before(jiffies, lp->last_irq + HZ)) {
--		media &= ~0x0010;
--	} else {
--		/* Try harder to detect carrier errors */
--		EL3WINDOW(6);
--		outw(StatsDisable, ioaddr + EL3_CMD);
--		errs = inb(ioaddr + 0);
--		outw(StatsEnable, ioaddr + EL3_CMD);
--		dev->stats.tx_carrier_errors += errs;
--		if (errs || (lp->media_status & 0x0010))
--			media |= 0x0010;
--	}
--
--	if (media != lp->media_status) {
--		if ((media & lp->media_status & 0x8000) &&
--				((lp->media_status ^ media) & 0x0800))
--		netdev_info(dev, "%s link beat\n",
--				(lp->media_status & 0x0800 ? "lost" : "found"));
--		else if ((media & lp->media_status & 0x4000) &&
--		 ((lp->media_status ^ media) & 0x0010))
--		netdev_info(dev, "coax cable %s\n",
--				(lp->media_status & 0x0010 ? "ok" : "problem"));
--		if (dev->if_port == 0) {
--			if (media & 0x8000) {
--				if (media & 0x0800)
--					netdev_info(dev, "flipped to 10baseT\n");
--				else
--			tc589_set_xcvr(dev, 2);
--			} else if (media & 0x4000) {
--				if (media & 0x0010)
--					tc589_set_xcvr(dev, 1);
--				else
--					netdev_info(dev, "flipped to 10base2\n");
+-#ifndef final_version
+-			if (lp->cur_tx - dirty_tx >= TX_RING_SIZE) {
+-				printk("out-of-sync dirty pointer, %d vs. %d, full=%s.\n",
+-					   dirty_tx, lp->cur_tx,
+-					   netif_queue_stopped(dev) ? "yes" : "no");
+-				dirty_tx += TX_RING_SIZE;
 -			}
+-#endif
+-
+-			/* if the ring is no longer full, accept more packets */
+-			if (netif_queue_stopped(dev) &&
+-			    dirty_tx > lp->cur_tx - TX_RING_SIZE + 2)
+-				netif_wake_queue (dev);
+-
+-			lp->dirty_tx = dirty_tx;
 -		}
--		lp->media_status = media;
+-
+-		/* Log misc errors. */
+-		if (csr0 & 0x4000)
+-			dev->stats.tx_errors++; /* Tx babble. */
+-		if (csr0 & 0x1000)
+-			dev->stats.rx_errors++; /* Missed a Rx frame. */
+-		if (csr0 & 0x0800) {
+-			printk("%s: Bus master arbitration failure, status %4.4x.\n",
+-				   dev->name, csr0);
+-			/* Restart the chip. */
+-			must_restart = 1;
+-		}
+-
+-		if (must_restart) {
+-			/* stop the chip to clear the error condition, then restart */
+-			outw(0x0000, dev->base_addr + LANCE_ADDR);
+-			outw(0x0004, dev->base_addr + LANCE_DATA);
+-			lance_restart(dev, 0x0002, 0);
+-		}
 -	}
 -
--	EL3WINDOW(1);
--	spin_unlock_irqrestore(&lp->lock, flags);
+-	/* Clear any other interrupt, and set interrupt enable. */
+-	outw(0x0000, dev->base_addr + LANCE_ADDR);
+-	outw(0x7940, dev->base_addr + LANCE_DATA);
 -
--reschedule:
--	lp->media.expires = jiffies + HZ;
--	add_timer(&lp->media);
+-	if (lance_debug > 4)
+-		printk("%s: exiting interrupt, csr%d=%#4.4x.\n",
+-			   dev->name, inw(ioaddr + LANCE_ADDR),
+-			   inw(dev->base_addr + LANCE_DATA));
+-
+-	spin_unlock (&lp->devlock);
+-	return IRQ_HANDLED;
 -}
 -
--static struct net_device_stats *el3_get_stats(struct net_device *dev)
+-static int
+-lance_rx(struct net_device *dev)
 -{
--	struct el3_private *lp = netdev_priv(dev);
--	unsigned long flags;
--	struct pcmcia_device *link = lp->p_dev;
+-	struct lance_private *lp = dev->ml_priv;
+-	int entry = lp->cur_rx & RX_RING_MOD_MASK;
+-	int i;
 -
--	if (pcmcia_dev_present(link)) {
--		spin_lock_irqsave(&lp->lock, flags);
--		update_stats(dev);
--		spin_unlock_irqrestore(&lp->lock, flags);
--	}
--	return &dev->stats;
--}
+-	/* If we own the next entry, it's a new packet. Send it up. */
+-	while (lp->rx_ring[entry].base >= 0) {
+-		int status = lp->rx_ring[entry].base >> 24;
 -
--/* Update statistics.  We change to register window 6, so this should be run
--* single-threaded if the device is active. This is expected to be a rare
--* operation, and it's simpler for the rest of the driver to assume that
--* window 1 is always valid rather than use a special window-state variable.
--*
--* Caller must hold the lock for this
--*/
--
--static void update_stats(struct net_device *dev)
--{
--	unsigned int ioaddr = dev->base_addr;
--
--	netdev_dbg(dev, "updating the statistics.\n");
--	/* Turn off statistics updates while reading. */
--	outw(StatsDisable, ioaddr + EL3_CMD);
--	/* Switch to the stats window, and read everything. */
--	EL3WINDOW(6);
--	dev->stats.tx_carrier_errors	+= inb(ioaddr + 0);
--	dev->stats.tx_heartbeat_errors	+= inb(ioaddr + 1);
--	/* Multiple collisions. */
--	inb(ioaddr + 2);
--	dev->stats.collisions		+= inb(ioaddr + 3);
--	dev->stats.tx_window_errors		+= inb(ioaddr + 4);
--	dev->stats.rx_fifo_errors		+= inb(ioaddr + 5);
--	dev->stats.tx_packets		+= inb(ioaddr + 6);
--	/* Rx packets   */
--	inb(ioaddr + 7);
--	/* Tx deferrals */
--	inb(ioaddr + 8);
--	/* Rx octets */
--	inw(ioaddr + 10);
--	/* Tx octets */
--	inw(ioaddr + 12);
--
--	/* Back to window 1, and turn statistics back on. */
--	EL3WINDOW(1);
--	outw(StatsEnable, ioaddr + EL3_CMD);
--}
--
--static int el3_rx(struct net_device *dev)
--{
--	unsigned int ioaddr = dev->base_addr;
--	int worklimit = 32;
--	short rx_status;
--
--	netdev_dbg(dev, "in rx_packet(), status %4.4x, rx_status %4.4x.\n",
--	       inw(ioaddr+EL3_STATUS), inw(ioaddr+RX_STATUS));
--	while (!((rx_status = inw(ioaddr + RX_STATUS)) & 0x8000) &&
--		    worklimit > 0) {
--		worklimit--;
--		if (rx_status & 0x4000) { /* Error, update stats. */
--			short error = rx_status & 0x3800;
--			dev->stats.rx_errors++;
--			switch (error) {
--			case 0x0000:
+-		if (status != 0x03) {			/* There was an error. */
+-			/* There is a tricky error noted by John Murphy,
+-			   <murf@perftech.com> to Russ Nelson: Even with full-sized
+-			   buffers it's possible for a jabber packet to use two
+-			   buffers, with only the last correctly noting the error. */
+-			if (status & 0x01)	/* Only count a general error at the */
+-				dev->stats.rx_errors++; /* end of a packet.*/
+-			if (status & 0x20)
+-				dev->stats.rx_frame_errors++;
+-			if (status & 0x10)
 -				dev->stats.rx_over_errors++;
--				break;
--			case 0x0800:
--				dev->stats.rx_length_errors++;
--				break;
--			case 0x1000:
--				dev->stats.rx_frame_errors++;
--				break;
--			case 0x1800:
--				dev->stats.rx_length_errors++;
--				break;
--			case 0x2000:
--				dev->stats.rx_frame_errors++;
--				break;
--			case 0x2800:
+-			if (status & 0x08)
 -				dev->stats.rx_crc_errors++;
--				break;
--			}
--		} else {
--			short pkt_len = rx_status & 0x7ff;
+-			if (status & 0x04)
+-				dev->stats.rx_fifo_errors++;
+-			lp->rx_ring[entry].base &= 0x03ffffff;
+-		}
+-		else
+-		{
+-			/* Malloc up new buffer, compatible with net3. */
+-			short pkt_len = (lp->rx_ring[entry].msg_length & 0xfff)-4;
 -			struct sk_buff *skb;
 -
--			skb = netdev_alloc_skb(dev, pkt_len + 5);
+-			if(pkt_len<60)
+-			{
+-				printk("%s: Runt packet!\n",dev->name);
+-				dev->stats.rx_errors++;
+-			}
+-			else
+-			{
+-				skb = dev_alloc_skb(pkt_len+2);
+-				if (!skb)
+-				{
+-					printk("%s: Memory squeeze, deferring packet.\n", dev->name);
+-					for (i=0; i < RX_RING_SIZE; i++)
+-						if (lp->rx_ring[(entry+i) & RX_RING_MOD_MASK].base < 0)
+-							break;
 -
--			netdev_dbg(dev, "    Receiving packet size %d status %4.4x.\n",
--		       pkt_len, rx_status);
--			if (skb != NULL) {
--				skb_reserve(skb, 2);
--				insl(ioaddr+RX_FIFO, skb_put(skb, pkt_len),
--			(pkt_len+3)>>2);
--				skb->protocol = eth_type_trans(skb, dev);
+-					if (i > RX_RING_SIZE -2)
+-					{
+-						dev->stats.rx_dropped++;
+-						lp->rx_ring[entry].base |= 0x80000000;
+-						lp->cur_rx++;
+-					}
+-					break;
+-				}
+-				skb_reserve(skb,2);	/* 16 byte align */
+-				skb_put(skb,pkt_len);	/* Make room */
+-				skb_copy_to_linear_data(skb,
+-					(unsigned char *)isa_bus_to_virt((lp->rx_ring[entry].base & 0x00ffffff)),
+-					pkt_len);
+-				skb->protocol=eth_type_trans(skb,dev);
 -				netif_rx(skb);
 -				dev->stats.rx_packets++;
 -				dev->stats.rx_bytes += pkt_len;
--			} else {
--				netdev_dbg(dev, "couldn't allocate a sk_buff of size %d.\n",
--			   pkt_len);
--				dev->stats.rx_dropped++;
 -			}
 -		}
--		/* Pop the top of the Rx FIFO */
--		tc589_wait_for_completion(dev, RxDiscard);
+-		/* The docs say that the buffer length isn't touched, but Andrew Boyd
+-		   of QNX reports that some revs of the 79C965 clear it. */
+-		lp->rx_ring[entry].buf_length = -PKT_BUF_SZ;
+-		lp->rx_ring[entry].base |= 0x80000000;
+-		entry = (++lp->cur_rx) & RX_RING_MOD_MASK;
 -	}
--	if (worklimit == 0)
--		netdev_warn(dev, "too much work in el3_rx!\n");
+-
+-	/* We should check that at least two ring entries are free.	 If not,
+-	   we should free one and mark stats->rx_dropped++. */
+-
 -	return 0;
 -}
 -
--static void set_rx_mode(struct net_device *dev)
+-static int
+-lance_close(struct net_device *dev)
 -{
--	unsigned int ioaddr = dev->base_addr;
--	u16 opts = SetRxFilter | RxStation | RxBroadcast;
+-	int ioaddr = dev->base_addr;
+-	struct lance_private *lp = dev->ml_priv;
 -
--	if (dev->flags & IFF_PROMISC)
--		opts |= RxMulticast | RxProm;
--	else if (!netdev_mc_empty(dev) || (dev->flags & IFF_ALLMULTI))
--		opts |= RxMulticast;
--	outw(opts, ioaddr + EL3_CMD);
+-	netif_stop_queue (dev);
+-
+-	if (chip_table[lp->chip_version].flags & LANCE_HAS_MISSED_FRAME) {
+-		outw(112, ioaddr+LANCE_ADDR);
+-		dev->stats.rx_missed_errors = inw(ioaddr+LANCE_DATA);
+-	}
+-	outw(0, ioaddr+LANCE_ADDR);
+-
+-	if (lance_debug > 1)
+-		printk("%s: Shutting down ethercard, status was %2.2x.\n",
+-			   dev->name, inw(ioaddr+LANCE_DATA));
+-
+-	/* We stop the LANCE here -- it occasionally polls
+-	   memory if we don't. */
+-	outw(0x0004, ioaddr+LANCE_DATA);
+-
+-	if (dev->dma != 4)
+-	{
+-		unsigned long flags=claim_dma_lock();
+-		disable_dma(dev->dma);
+-		release_dma_lock(flags);
+-	}
+-	free_irq(dev->irq, dev);
+-
+-	lance_purge_ring(dev);
+-
+-	return 0;
 -}
+-
+-static struct net_device_stats *lance_get_stats(struct net_device *dev)
+-{
+-	struct lance_private *lp = dev->ml_priv;
+-
+-	if (chip_table[lp->chip_version].flags & LANCE_HAS_MISSED_FRAME) {
+-		short ioaddr = dev->base_addr;
+-		short saved_addr;
+-		unsigned long flags;
+-
+-		spin_lock_irqsave(&lp->devlock, flags);
+-		saved_addr = inw(ioaddr+LANCE_ADDR);
+-		outw(112, ioaddr+LANCE_ADDR);
+-		dev->stats.rx_missed_errors = inw(ioaddr+LANCE_DATA);
+-		outw(saved_addr, ioaddr+LANCE_ADDR);
+-		spin_unlock_irqrestore(&lp->devlock, flags);
+-	}
+-
+-	return &dev->stats;
+-}
+-
+-/* Set or clear the multicast filter for this adaptor.
+- */
 -
 -static void set_multicast_list(struct net_device *dev)
 -{
--	struct el3_private *priv = netdev_priv(dev);
--	unsigned long flags;
+-	short ioaddr = dev->base_addr;
 -
--	spin_lock_irqsave(&priv->lock, flags);
--	set_rx_mode(dev);
--	spin_unlock_irqrestore(&priv->lock, flags);
--}
+-	outw(0, ioaddr+LANCE_ADDR);
+-	outw(0x0004, ioaddr+LANCE_DATA); /* Temporarily stop the lance.	 */
 -
--static int el3_close(struct net_device *dev)
--{
--	struct el3_private *lp = netdev_priv(dev);
--	struct pcmcia_device *link = lp->p_dev;
--	unsigned int ioaddr = dev->base_addr;
--
--	dev_dbg(&link->dev, "%s: shutting down ethercard.\n", dev->name);
--
--	if (pcmcia_dev_present(link)) {
--		/* Turn off statistics ASAP.  We update dev->stats below. */
--		outw(StatsDisable, ioaddr + EL3_CMD);
--
--		/* Disable the receiver and transmitter. */
--		outw(RxDisable, ioaddr + EL3_CMD);
--		outw(TxDisable, ioaddr + EL3_CMD);
--
--		if (dev->if_port == 2)
--			/* Turn off thinnet power.  Green! */
--			outw(StopCoax, ioaddr + EL3_CMD);
--		else if (dev->if_port == 1) {
--			/* Disable link beat and jabber */
--			EL3WINDOW(4);
--			outw(0, ioaddr + WN4_MEDIA);
+-	if (dev->flags&IFF_PROMISC) {
+-		outw(15, ioaddr+LANCE_ADDR);
+-		outw(0x8000, ioaddr+LANCE_DATA); /* Set promiscuous mode */
+-	} else {
+-		short multicast_table[4];
+-		int i;
+-		int num_addrs=netdev_mc_count(dev);
+-		if(dev->flags&IFF_ALLMULTI)
+-			num_addrs=1;
+-		/* FIXIT: We don't use the multicast table, but rely on upper-layer filtering. */
+-		memset(multicast_table, (num_addrs == 0) ? 0 : -1, sizeof(multicast_table));
+-		for (i = 0; i < 4; i++) {
+-			outw(8 + i, ioaddr+LANCE_ADDR);
+-			outw(multicast_table[i], ioaddr+LANCE_DATA);
 -		}
--
--		/* Switching back to window 0 disables the IRQ. */
--		EL3WINDOW(0);
--		/* But we explicitly zero the IRQ line select anyway. */
--		outw(0x0f00, ioaddr + WN0_IRQ);
--
--		/* Check if the card still exists */
--		if ((inw(ioaddr+EL3_STATUS) & 0xe000) == 0x2000)
--			update_stats(dev);
+-		outw(15, ioaddr+LANCE_ADDR);
+-		outw(0x0000, ioaddr+LANCE_DATA); /* Unset promiscuous mode */
 -	}
 -
--	link->open--;
--	netif_stop_queue(dev);
--	timer_delete_sync(&lp->media);
+-	lance_restart(dev, 0x0142, 0); /*  Resume normal operation */
 -
--	return 0;
 -}
 -
--static const struct pcmcia_device_id tc589_ids[] = {
--	PCMCIA_MFC_DEVICE_MANF_CARD(0, 0x0101, 0x0562),
--	PCMCIA_MFC_DEVICE_PROD_ID1(0, "Motorola MARQUIS", 0xf03e4e77),
--	PCMCIA_DEVICE_MANF_CARD(0x0101, 0x0589),
--	PCMCIA_DEVICE_PROD_ID12("Farallon", "ENet", 0x58d93fc4, 0x992c2202),
--	PCMCIA_MFC_DEVICE_CIS_MANF_CARD(0, 0x0101, 0x0035, "cis/3CXEM556.cis"),
--	PCMCIA_MFC_DEVICE_CIS_MANF_CARD(0, 0x0101, 0x003d, "cis/3CXEM556.cis"),
--	PCMCIA_DEVICE_NULL,
--};
--MODULE_DEVICE_TABLE(pcmcia, tc589_ids);
--
--static struct pcmcia_driver tc589_driver = {
--	.owner		= THIS_MODULE,
--	.name		= "3c589_cs",
--	.probe		= tc589_probe,
--	.remove		= tc589_detach,
--	.id_table	= tc589_ids,
--	.suspend	= tc589_suspend,
--	.resume		= tc589_resume,
--};
--module_pcmcia_driver(tc589_driver);
-diff --git a/drivers/net/ethernet/3com/Kconfig b/drivers/net/ethernet/3com/Kconfig
-index 294403ad7141..399cb6c56198 100644
---- a/drivers/net/ethernet/3com/Kconfig
-+++ b/drivers/net/ethernet/3com/Kconfig
-@@ -17,16 +17,6 @@ config NET_VENDOR_3COM
- 
- if NET_VENDOR_3COM
- 
--config PCMCIA_3C589
--	tristate "3Com 3c589 PCMCIA support"
--	depends on PCMCIA && HAS_IOPORT
--	help
--	  Say Y here if you intend to attach a 3Com 3c589 or compatible PCMCIA
--	  (PC-card) Ethernet card to your computer.
--
--	  To compile this driver as a module, choose M here: the module will be
--	  called 3c589_cs.  If unsure, say N.
--
- config VORTEX
- 	tristate "3c590/3c900 series (592/595/597) \"Vortex/Boomerang\" support"
- 	depends on (PCI || EISA) && HAS_IOPORT_MAP
-diff --git a/drivers/net/ethernet/3com/Makefile b/drivers/net/ethernet/3com/Makefile
-index 45fb9af9b5c7..5c4d07f1d456 100644
---- a/drivers/net/ethernet/3com/Makefile
-+++ b/drivers/net/ethernet/3com/Makefile
-@@ -3,6 +3,5 @@
- # Makefile for the 3Com Ethernet device drivers
- #
- 
--obj-$(CONFIG_PCMCIA_3C589) += 3c589_cs.o
- obj-$(CONFIG_VORTEX) += 3c59x.o
- obj-$(CONFIG_TYPHOON) += typhoon.o
 
 -- 
 2.53.0
