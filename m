@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-280467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280468-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iKDvMgvy6GkdRwIAu9opvQ
-	(envelope-from <netdev+bounces-280467-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:06:35 +0200
+	id iCPlCi3y6GkdRwIAu9opvQ
+	(envelope-from <netdev+bounces-280468-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:07:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24B494483D4
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:06:35 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B74B94483DB
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:07:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1BB373008C17
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 16:05:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 75B6B3013BB1
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 16:05:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B75A83845C1;
-	Wed, 22 Apr 2026 16:05:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31C1638CFE4;
+	Wed, 22 Apr 2026 16:05:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ksoZxaPK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aLdUHqnY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A043803E9
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 16:05:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00415383C78
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 16:05:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776873915; cv=none; b=V9lXsYCl8nplrxFZBMb6gAy7+1kTHQ01BBe3yqa4hOvkiJB5dU2ZLMHUDpZtfJmbC+5fRnVOF6rYpdgjd+JZi/8SbqvMzd67AbcrO5HnrQIT3nEEkRssNZ7i3amTv7l1YEE6CkoZ89MMMYwT/C5U/7HH5RvetJdE7BEqRSuHe48=
+	t=1776873917; cv=none; b=VuBBZyqei8/tasC3jVuX3Oe5l7StOv9mzd/BW5Lko0pH4CvTKXhDVIckrTHNKK7VpHVYxFls1cXzHWgx9xMh+CoAXtbkr1bY/qom6s5Mn5KlYzZF0ou7G3kKChJSA6Cy2aimmJIH3A6wzKZ9PyYoXU/c2XT9ri3FvmmSdM9YKZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776873915; c=relaxed/simple;
-	bh=LnV6FHxAgXBSU98uYpz/Gtz2yuXuM8OmPayVHm+bqYw=;
+	s=arc-20240116; t=1776873917; c=relaxed/simple;
+	bh=AtnVryVx9lrXSxBtUvHjd0g9UDr19+73eoU6BB1Ndsw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=l1ZxuNOa2FVbjyXua7QifdB/Z2px3QjTuLqRBl/SkP9wJzVkXYmMBMxvEqx1ZTV4jCSd6uwyVgWZ2dicqrAVyf6BgzpzAebxaS/zaiVYFuDT/bTNiGzqwi7a4NILrChn0m2rbFzV36XkiiS534+byfxPCvjg6bX2vqxPQliQ0m0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ksoZxaPK; arc=none smtp.client-ip=209.85.219.48
+	 MIME-Version; b=qAy2ZLrFoMi1rWHbt58h23Qho3uPaanoNqcw5bfIANtAiqivpeTd3QfDjD5KaVrUBPoQQC0/M7ifttFcJpAsr1aeiEFsYYCHxO0izvREyYzHfyLal/Lhaz7PUZZc8M9ywn6RJk1XotNn+0ys7qtavFoYgaSP/iopNddTIUbmsWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aLdUHqnY; arc=none smtp.client-ip=209.85.222.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-8a3b0242631so68319386d6.3
-        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 09:05:13 -0700 (PDT)
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-8f0579401c4so56242785a.3
+        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 09:05:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776873912; x=1777478712; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776873914; x=1777478714; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9fLGOyiETc2mYukS8fgWyJY/y8XZRG6qnqK1xnE/hlo=;
-        b=ksoZxaPK0i9uhrCCXmEHrrysq7VzKfrC+kBwj62+KvvfdWlAw4k9PU6jyDoezZXaK+
-         APCc6prNQDeuG/CXbb9iKEVsM/L76pS0gNZpOnQMidI9DrYCK8lQwFMaKVCyJ4spZkwl
-         I9RJ+17UaRQ9wZRz1kDCw92Y2866qQwNZIYvFvbsEDIh8uqNJyxhSr4pQls0mEZUBY2z
-         fGstz5zRSbJ1+eWKkIiKuilb5iU0hIudNLjckrJD9EySvm61MYlIJ2SP20UWPjAE9Noh
-         QF6aGdStv5ChJXBoAr8NkUy/1sYeAQfz1nbreYhYhPaNkMJGYs4VSNq75T6ueKR4qIFL
-         ADVQ==
+        bh=LAsi8zUH7ChWQsvBus194I1lIQB9uLlb+xLBIearhJU=;
+        b=aLdUHqnYoPmjaVv77TbajnV64t+k67UNr+/eSkA92z9mGge6w60zePtKDJkemqRBsz
+         FaVj66iKYrFVWCzc6tdvGP7B2rP8/HuwDJ3k9OzI9MSpzlVC2j5b11vxwafuoBxVDH+E
+         yvMKawCmuFVOsH0UJLDMl7KpdhvB+RuKlI5QaIRI1f62Y3/bHY8+VBH+dzvSgry/16mS
+         sA8OsDIwRjx3wuDwP2MjoT9djMOdoThLtP0vLcYRoe+0Nb0FTObW2JNX9dtr3sap3Qsh
+         wkOqM+0Bb4lwdehyaWuYGU4l8/alXO1vapd9/7+hbxe9JAQ+neL6XbHsiMFvSDxhUxhn
+         X9TQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776873912; x=1777478712;
+        d=1e100.net; s=20251104; t=1776873914; x=1777478714;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=9fLGOyiETc2mYukS8fgWyJY/y8XZRG6qnqK1xnE/hlo=;
-        b=pVUSOhqLb+/nn+7cC2ZCJWBg9U4t6amsUE6Ur4mvINFjDu6MyewVhWxZEbVmMTINvB
-         vsozem1Mdqfs8DDd3n3viPCmsRcJ/d0KP68cAhZaArLKavMw0olMyivaRTvT7BOOap/R
-         KcE/tQOHSHHa3OeovLvpP0B5A1jE7Cqu2AmVUpP0hcBpykt3YIAzXOqT5l1gxBJQwLNb
-         s5paEHu82nTHzgXjSePkm/zlMyyQ9jRoZW30oUv3g8+2rtxDEDX0xO94BQPd2i/KntEe
-         tQLWUWjr36hAplB0FZiVjSIXVjnSu7sG0hgyzbKQ3T/3/DWO9xW89jXnf+CjzvZAg7JC
-         YA0w==
-X-Forwarded-Encrypted: i=1; AFNElJ8ytRn3LnO+h0vGkw7bWX3wIGLsCcmwpzJbLW63inQ0L58oCXLLRKQTUxaQRf9DE+6ybiT2ogY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyadgFsqLxo3nvgYdoI59g1ubu6XNJRSLOck9o7CplEkmgiQEAy
-	G/q0g1m+Tln9TgWrs/fOZuYsWAJVHyLiZuqDGVfhoqECdJqmD0YUwEHE
-X-Gm-Gg: AeBDieuRnWEIt1gPIhkG7dxLPUQz1r1JBbs4i291MUcKLU9c8YyUPw7EcOCV4xUSOTY
-	torHg5+4iJwgE+jc3A6E9XOOrhc4GboobSSWRtfhYza3cZeO3YEuDBin1nMfsQ21xFcJsFM59t5
-	nlGPW3OFJB29j2gykTmUGJwtum0GRZlc7CFrUmaklBB0gdB53N/Ww20tjLgcJ6VGN3IhMaR+Fco
-	hQJRHLGwe56x4f2bcpliz3gLXwOVzOsLjwgIG8maA990MH8iCIp1CJ/rZpxp0+L1PkcPM+wsya8
-	eKpgQV6D1fjPn+rxcT8FWEdQ5kLsfDWZ7yQNUy+tjrn+X0yoFZcVjMeB5Rgxujq7ESuizACkaBO
-	3GLz3cAJfkGgdfDBBp1d4lPWAnrYZ99tUsi19rNeeJ0eHf1F0eJnvnISO4yvKhAQvj02k9y9Eg0
-	XTSfNnc/ySXtM8TyMVd6YiJVXsbhUbP+EFEx7UUZVGxFjU1+DY6fJW5icNBW+K8c2hx0Q5d+vNF
-	uvg8kGQT6uGz+cqkPHbOiuVWSDXOF9Qucmvzzpg5Q==
-X-Received: by 2002:a05:6214:4f02:b0:8ae:652b:e3c4 with SMTP id 6a1803df08f44-8b028167396mr339665936d6.49.1776873912092;
-        Wed, 22 Apr 2026 09:05:12 -0700 (PDT)
+        bh=LAsi8zUH7ChWQsvBus194I1lIQB9uLlb+xLBIearhJU=;
+        b=j8kDuoHSEHXU5mlhbaScrcM93r7+pFOeeOqx5AirgUNY9819cp7rfGxxUsfA3GN2+l
+         mKq7zyXAg9U84iTwJn66x+c2OeaqZPK1kqF/etVF3YeFMCNZJ2dHtpKtA8Csp+IpE2MF
+         k4CEZaCuuFyDackHEht3VVdpAs8cGeGhMfH66rTXbL5MKNQ/EDpf8CkQhSQPQNIWSy7E
+         Kh6tWS+OYE61hQozI8Ke8XvLlBby3MLcyp9YFxXCA5kL7kFmHeUX6ip6uXqv/qnq4CK/
+         BTkrWjVyWzdovIAl1/RPHrVY6Y38ZETyeSfXu233QavMW7klIhDWktUzoLVluc/Q8ykI
+         l05w==
+X-Forwarded-Encrypted: i=1; AFNElJ+xUNoDTVcIFxsP09fs81XQuhRiToNcZFfoP/NY5OlQDihkyvJX/buHEYist43dfsajMHhR6/s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzW2Xn1+QDK5zQ9STHXLFGuevyiakzah+poI62E+xEe9gMLPjTz
+	lz+wvnO9H0ocnNDiIkJt668oJjtyCokdLoINoTFZODbjd7RmQz+lJZgZ
+X-Gm-Gg: AeBDievKDnAVWb3z7RuHQhFxHGuaJ4mb+s0W0keg9aXjtXEb6n1koqz+Luh/5Pw3nmY
+	zuWRpAKY69zq+UWQSlIPb4tCu3I4TDl3W458ajU2uh9RWKMkZhDFfz/RToIuPpfSAHviEOA43Yj
+	tKylfbiDEYsjM5vB4Iok5m9TuqjPpR9kII4UUBrs48kW9HBtsYTOxaMdo/L3VeNypAaijSh+teH
+	LmpnAYfpk0C/FN/y1/Ayci4Jd3DyLMv3bwJx54GsSYNAho5BqWH4JmBx+RE5mXzNH5NW3ef9MIV
+	mdAVt9CaTlNU4n6tWXItRadVmIFj2jobSv/3CWGRaD5MKG5GM6B9JejKZr76L9DgWNw802K9MHX
+	suFWgwHJmi2D6gX7/Bv2MXxry62ZeVuNt5sLVcMzI9Q+x31rVLmCX1GE+RjsWXtw27Om/N8iCcr
+	U3aCVmTpln5loRCjx2i7rSTQqFAAQ9RrS9Z6rGQeprOUzC0S/pFyFoD7PM9MiqTpyfgLrRERH+U
+	myH+TvKVYRp3lKnDjwYcgES+oRtyLM=
+X-Received: by 2002:a05:6214:400a:b0:8a0:846e:8850 with SMTP id 6a1803df08f44-8b028042ba3mr348401516d6.20.1776873913609;
+        Wed, 22 Apr 2026 09:05:13 -0700 (PDT)
 Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b02ac462d9sm136370786d6.7.2026.04.22.09.05.10
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b02ac462d9sm136370786d6.7.2026.04.22.09.05.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Apr 2026 09:05:11 -0700 (PDT)
+        Wed, 22 Apr 2026 09:05:12 -0700 (PDT)
 From: Michael Bommarito <michael.bommarito@gmail.com>
 To: Samuel Mendoza-Jonas <sam@mendozajonas.com>,
 	Paul Fertser <fercerpav@gmail.com>,
@@ -89,9 +89,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	linux-kernel@vger.kernel.org,
 	Michael Bommarito <michael.bommarito@gmail.com>,
 	stable@vger.kernel.org
-Subject: [PATCH net 5/6] net/ncsi: validate AEN packet lengths against the skb
-Date: Wed, 22 Apr 2026 12:03:41 -0400
-Message-ID: <20260422160342.1975093-6-michael.bommarito@gmail.com>
+Subject: [PATCH net 6/6] net/ncsi: validate GP payload lengths before parsing
+Date: Wed, 22 Apr 2026 12:03:42 -0400
+Message-ID: <20260422160342.1975093-7-michael.bommarito@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260422160342.1975093-1-michael.bommarito@gmail.com>
 References: <20260422160342.1975093-1-michael.bommarito@gmail.com>
@@ -107,15 +107,15 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280468-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280467-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MAILSPIKE_FAIL(0.00)[2600:3c09:e001:a7::12fc:5321:query timed out];
 	FREEMAIL_TO(0.00)[mendozajonas.com,gmail.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
@@ -124,123 +124,66 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 24B494483D4
+X-Rspamd-Queue-Id: B74B94483DB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-AEN packets are dispatched after only pulling the 16-byte common
-header. ncsi_aen_handler() then reads the 20-byte AEN header to
-select a per-type handler, and ncsi_validate_aen_pkt() walks
-farther into the payload and checksum without first ensuring the
-skb contains those bytes.
+ncsi_rsp_handler_gp() now bounds MAC and VLAN counts to software
+and GC-reported limits, but it still assumes the advertised GP
+payload is large enough for the fixed fields plus the consumed
+filter-table bytes. A short GP reply can still make parsing start
+past the payload or walk beyond its tail.
 
-Pull the AEN-specific header before reading h->type, and pull the
-full AEN header plus aligned payload before checksum validation.
-That keeps short AEN packets from reading past the skb tail on the
-AEN path.
+Validate that the declared GP payload covers the fixed GP prefix,
+the consumed MAC and VLAN entries, and the checksum before parsing
+the filter tables.
 
-Fixes: 2d283bdd079c ("net/ncsi: Resource management")
+Fixes: 062b3e1b6d4f ("net/ncsi: Refactor MAC, VLAN filters")
 Cc: stable@vger.kernel.org
 Assisted-by: Claude:claude-opus-4-7
 Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
 ---
- net/ncsi/ncsi-aen.c | 30 +++++++++++++++++++++++-------
- 1 file changed, 23 insertions(+), 7 deletions(-)
+ net/ncsi/ncsi-rsp.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/net/ncsi/ncsi-aen.c b/net/ncsi/ncsi-aen.c
-index 040a31557201..cd34ef144cf8 100644
---- a/net/ncsi/ncsi-aen.c
-+++ b/net/ncsi/ncsi-aen.c
-@@ -16,11 +16,19 @@
- #include "internal.h"
- #include "ncsi-pkt.h"
+diff --git a/net/ncsi/ncsi-rsp.c b/net/ncsi/ncsi-rsp.c
+index 94354dca23ea..565d38fd4b92 100644
+--- a/net/ncsi/ncsi-rsp.c
++++ b/net/ncsi/ncsi-rsp.c
+@@ -899,6 +899,8 @@ static int ncsi_rsp_handler_gp(struct ncsi_request *nr)
+ 	struct ncsi_dev_priv *ndp = nr->ndp;
+ 	struct ncsi_rsp_gp_pkt *rsp;
+ 	struct ncsi_channel *nc;
++	size_t needed;
++	unsigned int payload;
+ 	unsigned short enable;
+ 	unsigned char *pdata;
+ 	unsigned long flags;
+@@ -924,6 +926,14 @@ static int ncsi_rsp_handler_gp(struct ncsi_request *nr)
+ 	if (rsp->mac_cnt > mac_nbits || rsp->vlan_cnt > ncvf->n_vids)
+ 		return -ERANGE;
  
--static int ncsi_validate_aen_pkt(struct ncsi_aen_pkt_hdr *h,
-+static int ncsi_validate_aen_pkt(struct sk_buff *skb,
- 				 const unsigned short payload)
- {
-+	struct ncsi_aen_pkt_hdr *h;
- 	u32 checksum;
- 	__be32 *pchecksum;
-+	unsigned int len;
-+
-+	len = skb_network_offset(skb) + sizeof(*h) + ALIGN(payload, 4);
-+	if (!pskb_may_pull(skb, len))
++	payload = ncsi_rsp_payload(nr->rsp);
++	needed = offsetof(struct ncsi_rsp_gp_pkt, mac) - sizeof(rsp->rsp);
++	needed += mac_cnt * ETH_ALEN;
++	needed += vlan_cnt * sizeof(__be16);
++	needed += sizeof(rsp->checksum);
++	if (payload < needed)
 +		return -EINVAL;
 +
-+	h = (struct ncsi_aen_pkt_hdr *)skb_network_header(skb);
- 
- 	if (h->common.revision != NCSI_PKT_REVISION)
- 		return -EINVAL;
-@@ -31,7 +39,7 @@ static int ncsi_validate_aen_pkt(struct ncsi_aen_pkt_hdr *h,
- 	 * sender doesn't support checksum according to NCSI
- 	 * specification.
- 	 */
--	pchecksum = (__be32 *)((void *)(h + 1) + payload - 4);
-+	pchecksum = (__be32 *)((void *)(h + 1) + ALIGN(payload, 4) - 4);
- 	if (ntohl(*pchecksum) == 0)
- 		return 0;
- 
-@@ -210,12 +218,19 @@ int ncsi_aen_handler(struct ncsi_dev_priv *ndp, struct sk_buff *skb)
- {
- 	struct ncsi_aen_pkt_hdr *h;
- 	struct ncsi_aen_handler *nah = NULL;
-+	unsigned char type;
- 	int i, ret;
- 
-+	if (!pskb_may_pull(skb, skb_network_offset(skb) + sizeof(*h))) {
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
- 	/* Find the handler */
- 	h = (struct ncsi_aen_pkt_hdr *)skb_network_header(skb);
-+	type = h->type;
- 	for (i = 0; i < ARRAY_SIZE(ncsi_aen_handlers); i++) {
--		if (ncsi_aen_handlers[i].type == h->type) {
-+		if (ncsi_aen_handlers[i].type == type) {
- 			nah = &ncsi_aen_handlers[i];
- 			break;
- 		}
-@@ -223,24 +238,25 @@ int ncsi_aen_handler(struct ncsi_dev_priv *ndp, struct sk_buff *skb)
- 
- 	if (!nah) {
- 		netdev_warn(ndp->ndev.dev, "Invalid AEN (0x%x) received\n",
--			    h->type);
-+			    type);
- 		ret = -ENOENT;
- 		goto out;
- 	}
- 
--	ret = ncsi_validate_aen_pkt(h, nah->payload);
-+	ret = ncsi_validate_aen_pkt(skb, nah->payload);
- 	if (ret) {
- 		netdev_warn(ndp->ndev.dev,
- 			    "NCSI: 'bad' packet ignored for AEN type 0x%x\n",
--			    h->type);
-+			    type);
- 		goto out;
- 	}
- 
-+	h = (struct ncsi_aen_pkt_hdr *)skb_network_header(skb);
- 	ret = nah->handler(ndp, h);
- 	if (ret)
- 		netdev_err(ndp->ndev.dev,
- 			   "NCSI: Handler for AEN type 0x%x returned %d\n",
--			   h->type, ret);
-+			   type, ret);
- out:
- 	consume_skb(skb);
- 	return ret;
+ 	/* Modes with explicit enabled indications */
+ 	if (ntohl(rsp->valid_modes) & 0x1) {	/* BC filter mode */
+ 		nc->modes[NCSI_MODE_BC].enable = 1;
 -- 
 2.53.0
 
