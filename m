@@ -1,205 +1,167 @@
-Return-Path: <netdev+bounces-280343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280344-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SCpIMfuA6GkILAIAu9opvQ
-	(envelope-from <netdev+bounces-280343-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:04:11 +0200
+	id SNcwChWE6GkNLQIAu9opvQ
+	(envelope-from <netdev+bounces-280344-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:17:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAD06443385
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:04:10 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5679443579
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:17:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7FBA63009F3D
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 08:04:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3420D301D086
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 08:16:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C81F37D124;
-	Wed, 22 Apr 2026 08:04:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C18A3B95EC;
+	Wed, 22 Apr 2026 08:16:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bDs1aGyo";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="bnSqLVxP"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="eMoQjmjv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3F837CD59
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 08:04:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66233B6C15;
+	Wed, 22 Apr 2026 08:16:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776845044; cv=none; b=St9+NB6ZKwZnz/kEsXF9v5lb7Hbgkf6YZMo0gwISSIam+81CJVP/0mRY36M6AVWWaT7gb3vSUXDM9f5Nc2JeecVB/hHVw5ujAiRrFJ4yaNiIRtikIeShvARfS0yntUsAM49zKgoylc1Dev1vqI4E5QAdx7qotSCj8y1Suktdf5s=
+	t=1776845815; cv=none; b=pF5dxfYHXOJKaLWjk6sPxhjwvTAoxU1MEM4tkQzn72m6chcUvEHH8kpr2SZx3g7af5cuK4d7yqLU/F75SFJLPIQDiwp7ps/lsUHKmBVYbGd+mDNBIWTroQ70c8t0UON89XqG4lou1d1btXcgqp9O7L49fAUxvsIL+8wVwb74uFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776845044; c=relaxed/simple;
-	bh=n6FcGGfJc9FwT6eA3nxUiDSnvNyYqxRV+SHYqG5nBHU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pDUq9ZNJuSKFRvmNYCFVyM1yc7WfAIfVIELLEJoJMvwaEvwbdtd4mAs+mPA5jk25c1FLIl/7Fi2RXuIVjjH5ofJxAFvSuOrPBI3o/KsQ+3AoWUdjHM7Zp8jCrjdrhTgh7vTOxI0DHrHdiW0/zU5bAVzFd2/jgVTOM3d4HuZ4ofM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bDs1aGyo; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=bnSqLVxP; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776845040;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yggL1Y17qIJxiIQdsjnuguLrKkWd8ehhHbW7AOHNGYk=;
-	b=bDs1aGyoLnszHvg5Ke8HSXExrXHqJGyZk9CSRQtZ8GgH55qcBpFMinsLBqOLQ/g+BmHIap
-	zt0DEpFe5QwXLHkmowALwkLQu22zDbzEFrKiPXRRMriqTO3I60nz91AAvIxgWQNUx4VgTO
-	bb3YmnzH5odpBMyHHN1TesWb/S4c4f4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-169-hz-AqXvAOmOYFA1L4UF_tw-1; Wed, 22 Apr 2026 04:03:58 -0400
-X-MC-Unique: hz-AqXvAOmOYFA1L4UF_tw-1
-X-Mimecast-MFC-AGG-ID: hz-AqXvAOmOYFA1L4UF_tw_1776845037
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-48378df3469so34561555e9.1
-        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 01:03:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1776845037; x=1777449837; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yggL1Y17qIJxiIQdsjnuguLrKkWd8ehhHbW7AOHNGYk=;
-        b=bnSqLVxPSQxLQ8kwjwCZqaso1HXN7OFEm2L+U6eYRPUkm3euNhareMhDcYGJPudPR1
-         oCTAzhjzYuNt1HUruRjgkFiDF5noMAEYVsmEIZtTBEhlCaNuY0FiwGAPiebkZjYYT7Bw
-         qp8fcoGPqXetyBYMs53oS/7MY/7NBQO69KoDmmjXQBI6E4KrUlee7WiB8Kh02kkh+t3j
-         Eggqa6QPNPDeMel6pZYgfivqA7WyGd2VIC5+IexVpXiWJxcYuYTBurz3u/lqH7bIaZod
-         8xDhF3uX/+L4fXU0PNZbdMM57VtBSv+7cUtQmvjM/PXGgPu+fKK5dRO3yZRVbdpihaRf
-         ijzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776845037; x=1777449837;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yggL1Y17qIJxiIQdsjnuguLrKkWd8ehhHbW7AOHNGYk=;
-        b=rGJ7am2dIXQ1StQ5uVdputouMq1Quq3+9juqyMjVrblUvV57LGt/OCPmYthrCYVRbO
-         551Vx2jn/xGOL++me+D1pJmVuzjWgAdIEL3Z0XwxMXyZ2bYvFvigsa4NOEx63ofqeOL1
-         ANTVJBhutWVcgVjlYW6+0Lk8wUJiBV9jeADQfXo6DXP4OQ6009Qh+NpMoBqei9gGPx2d
-         TkJyWVScn2958x1UE12oJf6eA2yJiBLySNQTkXRFgmXqZXexAwuDeojPKJamgWDHvTaS
-         cpu/RbPxW7xaVt/4QnY5bA6R+CmM0gPyMndoCpzbsseNt4I1eidCYZTPQ+KVGhovoVlh
-         tDYA==
-X-Forwarded-Encrypted: i=1; AFNElJ+GO7MIYHzMQlEzUNvzGRsG2UVQ4yf+obJlHxc+F6BjP+1RZDYIMHbT+IPk6HXHXJokhzxZG64=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4WhSZgdrPzzRZGofWyyPRYmujPV2gfinSMGTM7ov7jTNKQUvy
-	FwZ82YchA2g37TeOEq2keWVboBF8dmMEJfn6U+AAc/AOqV7ebKsRjTmgmBMjpyWjTXt+Pn9SNcW
-	XFXpQ/N2gmHLNaCIztqiDQ/VY8yqflx80nkUBQJ6+wpE/Ybc2kuH4QM18WurA5BKvlw==
-X-Gm-Gg: AeBDieuQEvvhVF7SdtGSLbViWcNXXtX5xmsejSe8dE3iiWemLybrn3kNuoMtWiCc82n
-	hn7UbkHZpDRPhSJSYuQqyTR0Hz7Vq1OrA4RiCE+4WbtLbDE4YTO7UavVHuaXF3l9MnwBmM0DAs6
-	DaAMvOv6lGsE7F094OLlEVc7V1vdyqusNkpQiX9y88DHnth538CPlxDe9JVpAf/HZxT8V6SxSeI
-	Xw7uy+1iqVGWainFX45aMUbSi0nDZEix0T6q37047/oyYjKiBesIuCA7azhA2yW1+nuJWayNo3w
-	+0EyY4cvioMWCv2xzfNaRKZWZ29mU4F1XilHsKZUkiqZ9z5x7AKqiNiyyKsEgATjsSLnpD2QxYx
-	aNpP5L2npdFkjRO984Rhg2No52BZtcb10NyLZWa6RzoJ1pdGd0xBs3+z81lQV9nOUuhPdaZS6Xv
-	aHW5VMfg==
-X-Received: by 2002:a05:600c:8b6b:b0:485:3c2e:60d5 with SMTP id 5b1f17b1804b1-488fb8859ddmr282793095e9.2.1776845036788;
-        Wed, 22 Apr 2026 01:03:56 -0700 (PDT)
-X-Received: by 2002:a05:600c:8b6b:b0:485:3c2e:60d5 with SMTP id 5b1f17b1804b1-488fb8859ddmr282792575e9.2.1776845036304;
-        Wed, 22 Apr 2026 01:03:56 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-16-204-83.retail.telecomitalia.it. [87.16.204.83])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4891df9e50asm179358765e9.0.2026.04.22.01.03.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Apr 2026 01:03:55 -0700 (PDT)
-Date: Wed, 22 Apr 2026 10:03:49 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Luigi Leonardi <leonardi@redhat.com>, stefanha@redhat.com, 
-	netdev@vger.kernel.org, Mathieu Schroeter <mathieu@schroetersa.ch>, 
-	David Ahern <dsahern@kernel.org>
-Subject: Re: [PATCH iproute2] ss: fix vsock port filter
-Message-ID: <CAGxU2F4C4JbqBEWehBhhOehGaXZJOWLkQ09hjaaSAh8-J5W50w@mail.gmail.com>
-References: <20260421-fix_vsock-v1-1-812c80a76c1a@redhat.com>
- <20260421163757.31da8751@phoenix.local>
+	s=arc-20240116; t=1776845815; c=relaxed/simple;
+	bh=k4p4LMgdJtO5cU5zDgCARGfX+/nRYgRKxs5+A+3xGg8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sGa9126QBso6iPaxi+T2MUcfYUC2LwdB9cdFuKrlYEOz+UFixf3MXI4rBe19g825EVvbOn2YOriZXrkGRs4K/VCnwAsKE5qnS8mdLG7LsDdudjuZu9r84YyzYhGNOhpK8ZdPrO4/f48e78LKIjAAadbM1wuhd6E4I1gXUT9JyOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=eMoQjmjv; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=dK9i7Cr5XO7g/+h3dQazZvCkWlC6rfLQehRve6OwtbY=; b=eMoQjmjvNKb97qy4zA7NuFMhoa
+	WvwgIkm+1ACHg41AAiBShiSyw2t7weJwYYBN+dzUZITHldr+TO/u2BeC7XPAuQumbzHj3eYuKcM1B
+	ICUrFUK23Pp+nd7QS9MaDquZIDU571Ai/dD5+eSVtAFCu3XJzt8nZehTKMWWYqorThbl22D5RLZjc
+	7mRzwFE9PBN7NtUVYXV8ZtcAweeAqgn6/4yLs88p1z17iXPmq4dD9cyBT9Zj2YUFTUm4tbwHDJfMk
+	1GKg6kfby3dB3s6z7TA+n7zVaiTFnDSTF381Pmrd/WurCdpdoT0MhJVB7tBbX0FIPvagogIqC+cZm
+	raembxRqRpJj2J88iZLv1P0Yr14l4tXOVQQb4vd5EPvPHqq28KtmFbjTBXFX+tXE8XbFoeX4AIkek
+	Ahn27LYEDKpH+4yqYMiI3kE4pEXo+WA4OyOWEEDcLw/HtCkoYdsV6W7RhJbmWkAdjGGivPOl2gPtB
+	HcRqMy46JFNzjYocvS1iHjl5;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wFSlG-00000003ERj-3ZDU;
+	Wed, 22 Apr 2026 08:16:43 +0000
+Message-ID: <9cb0901c-18c5-4858-941c-3b37ee112af9@samba.org>
+Date: Wed, 22 Apr 2026 10:16:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260421163757.31da8751@phoenix.local>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] smb: smbdirect: move fs/smb/common/smbdirect/ to
+ fs/smb/smbdirect/
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-cifs@vger.kernel.org, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, samba-technical@lists.samba.org,
+ Tom Talpey <tom@talpey.com>, Steve French <smfrench@gmail.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ Namjae Jeon <linkinjeon@kernel.org>
+References: <20260419192018.3046449-1-metze@samba.org>
+ <aehrPuY60VMcYGU8@infradead.org>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <aehrPuY60VMcYGU8@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[samba.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[samba.org:s=42];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280343-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.samba.org,talpey.com,gmail.com,linux-foundation.org,kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-280344-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[samba.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[metze@samba.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid,networkplumber.org:email]
-X-Rspamd-Queue-Id: CAD06443385
+	DBL_BLOCKED_OPENRESOLVER(0.00)[samba.org:dkim,samba.org:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B5679443579
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 22 Apr 2026 at 01:38, Stephen Hemminger <stephen@networkplumber.org> wrote:
->
-> On Tue, 21 Apr 2026 14:35:12 +0200
-> Luigi Leonardi <leonardi@redhat.com> wrote:
->
-> > parse_hostcond() uses get_u32() to parse the vsock port into the
-> > aafilter.port field, which is a long. On 64-bit systems, get_u32()
-> > only writes the lower 32 bits, leaving the upper 32 bits set from
-> > the -1 initialization. This causes the port comparison
-> > "a->port != s->rport" in run_ssfilter() to always fail, since the
-> > corrupted long value never matches the int rport.
-> >
-> > Fix by using get_long() instead, consistent with how AF_PACKET and
-> > AF_NETLINK handle the same field.
-> >
-> > Fixes: c759116a0b2b ("ss: add AF_VSOCK support")
-> > Signed-off-by: Luigi Leonardi <leonardi@redhat.com>
-> > ---
-> >  misc/ss.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/misc/ss.c b/misc/ss.c
-> > index 14e9f27a..6e3321ac 100644
-> > --- a/misc/ss.c
-> > +++ b/misc/ss.c
-> > @@ -2323,7 +2323,7 @@ void *parse_hostcond(char *addr, bool is_port)
-> >               port = find_port(addr, is_port);
-> >
-> >               if (port && strcmp(port, "*") &&
-> > -                 get_u32((__u32 *)&a.port, port, 0))
-> > +                 get_long(&a.port, port, 0))
-> >                       return NULL;
->
-> If you use get_long() then the code could get negative values.
-> Actually have port in ss as signed value seems like a mistake in original design.
->
-> The port in unix domain socket is inode number.
-> Originally it was int, but got changed to long back in 6.6
->
-> The port in ss cache is int.
+Hi Christoph,
 
-Yeah, as I mentioned I think the issue was introduced by commit
-012cb515 ("ss: change aafilter port from int to long (inode support)").
+>> diff --git a/fs/smb/Makefile b/fs/smb/Makefile
+>> index 9a1bf59a1a65..353b1c2eefc4 100644
+>> --- a/fs/smb/Makefile
+>> +++ b/fs/smb/Makefile
+>> @@ -1,5 +1,6 @@
+>>   # SPDX-License-Identifier: GPL-2.0
+>>   
+>>   obj-$(CONFIG_SMBFS)		+= common/
+>> +obj-$(CONFIG_SMBDIRECT)		+= smbdirect/
+> 
+> Why is this not in net/smbdirect/ or driver/infiniband/ulp/smdirect?
 
-After teverting it, the filtering on AF_VSOCK works correctly.
+Yes, I also thought about net/smbdirect.
 
-IMO (I don't know the code at all), commit 012cb515 is incomplete and we 
-should also move from int to long lport and rport in `struct sockstat`.
+As IPPROTO_SMBDIRECT or PF_SMBDIRECT will be the next step,
+see the open discussion here:
+https://lore.kernel.org/linux-cifs/cover.1775571957.git.metze@samba.org/
+(I'll follow with that discussion soon)
 
->
-> The ss code is one of those legacy dog piles that needs a major
-> overhaul and refactoring.
->
+I was just unsure about the consequences, e.g. would
+the maintainer/pull request flow have to change in that case?
+Or would Steve be able to take the changes via his trees?
+Any I also didn't want to offend anybody, so I just took
+what Linus proposed.
 
-yeah, I see...
+Using driver/infiniband/ulp/smdirect would also work,
+if everybody prefer that.
 
-Thanks,
-Stefano
+> As far as I can tell there is zero file system logic in this code.
+> 
+>> -#include "../common/smbdirect/smbdirect_public.h"
+>> +#include "../smbdirect/public.h"
+> 
+> And all these relative includes suggest you really want a
+> include/linux/smdirect/ instead.
 
+Yes, that's my also my goal in the next steps.
+
+> While we're at it: __SMBDIRECT_EXPORT_SYMBOL__ is really odd.
+> One thing is the __ pre- and postfix that make it look weird.
+
+Yes, the __SMBDIRECT_EXPORT_SYMBOL__ was mainly a temporary
+thing, now it's useless and I'll remove it.
+
+> The other is that EXPORT_SYMBOL_FOR_MODULES is for very specific
+> symbols that really should not exported.  What this warrants instead
+> is a normal EXPORT_SYMBOL_NS_GPL.
+
+I want the exported functions be minimal, as most of
+of should go via the socket layer instead.
+
+If EXPORT_SYMBOL_NS_GPL(func, "smbdirect") is better than
+EXPORT_SYMBOL_FOR_MODULES() I can change that.
+
+It means cifs.ko and ksmbd.ko would need MODULE_IMPORT_NS("smbdirect"), correct?
+
+Thanks!
+metze
 
