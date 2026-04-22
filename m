@@ -1,186 +1,133 @@
-Return-Path: <netdev+bounces-280378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280380-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WAecLHem6GmZOQIAu9opvQ
-	(envelope-from <netdev+bounces-280378-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:44:07 +0200
+	id IKdvLSen6GmuOQIAu9opvQ
+	(envelope-from <netdev+bounces-280380-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:47:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53C35444DFA
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:44:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D8B7444F12
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:47:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D8C0530387DC
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:43:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 857623019806
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:45:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9408A3CD8CA;
-	Wed, 22 Apr 2026 10:43:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98D933CCFC2;
+	Wed, 22 Apr 2026 10:45:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="uEw11Ere";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="VkDnfR1T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f6bKDgI9"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9DC3C277B;
-	Wed, 22 Apr 2026 10:43:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E1CB3BF67A;
+	Wed, 22 Apr 2026 10:45:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776854619; cv=none; b=Mm1KHdu0TJNn7wSYApovG2bb1LrdXqDZQ2Zkx3n4GE+CYjcD8GhHoOd84sD7q75VAPq2Qv18b1Jm5jWqdATzzNEZbmgZMZ0CB0s3XL3hT3uacixfufLuYfpO6aLEFOxEeBwPUHiejquIvTwCPP65Kp4JentAs67ae8gzocm+gB4=
+	t=1776854736; cv=none; b=Lwzfnh2hqBaREHemN62p+57Ap9aBU4hGXRHfy9V0ZL/HjO/nXgow+qV/hBU+YG09P6AUfgwGVME4gUblfDvTKFl0NNKA3DVbwPScb4S7eUViqwr5l2ny4FIy6qPcohqWyACFIl+ZZH+T9kkNa92m3KcwbhDTvPhTSFkfP3qayk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776854619; c=relaxed/simple;
-	bh=uM1m22NQCJC6W6RjzJbd6hba2pmg1Gp2U5erA96FCJg=;
+	s=arc-20240116; t=1776854736; c=relaxed/simple;
+	bh=TpfNQlTkSNL7BzUK+Pd9K+KxRlrlEHZM5h0NyDeSYWQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZtARE2fUVxMN/imlOjVX4noDW9/hYI1G23qm5gd2GfhFIrp5CkD8oixzi9jZ4K8p5RwCW+Ifwd5OAXwv1GvYfmTASNRzOOGZotUbA9vXCLsFHJ8xX6IXp7zqfMYmDvmeiRPEYgwTacqQn0ATkMcn2qyjvPvRq//r5hga/jEbOMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=uEw11Ere; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=VkDnfR1T; arc=none smtp.client-ip=103.168.172.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 38B6714000E4;
-	Wed, 22 Apr 2026 06:43:35 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Wed, 22 Apr 2026 06:43:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1776854615; x=
-	1776941015; bh=abmoqNblxfuAVDr9rChyocYxcejJ84mZ8H9MflgsjCU=; b=u
-	Ew11EreFFNLlLqsYtfzP0GgKeZ2Sx9qaSIjq3TuuIKmdYK7FDPwZH/aPmQPaWo1t
-	r7CJx27SCVjplvbzbwkVBgZpKY4r2J2YEqSFBURmZJWC/SBDOdRnpAoIhvBK5w/7
-	upBwD0JjOiYsS4urhR2RIrkzS7MJqaSzcYsJ7U6wOvS+Tu5W631Z8POdAW74FDUg
-	rxJG09JQkWVAwH9lTLAIQtZkOEz/sYWDGJdfZ3xdcOLRDEttjyn7eijuaVjR8Nkn
-	Ngbk3XE4aSHact/zrPQCiE13obvt5KsdoYvDVFm7GqfoJ1RR8Y9iLMCw0d5XH1GS
-	7+LcHnJJRrSC5azfamhJA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1776854615; x=1776941015; bh=abmoqNblxfuAVDr9rChyocYxcejJ84mZ8H9
-	MflgsjCU=; b=VkDnfR1Tzp6v7lLd4fXV7kfa6v4sMTq67FXSbr69EmO+AzKlR4B
-	xh3IyIckEye6hbXwYIGEDTbZdxWRK0aiwfU/mGsxk6DGWZxQ9NsiMIPR0RV2UdWi
-	lZJuotMmJIy2ckaiGN/dbB0gjfbXhdo/hp1o67dgn9rEvxc7oqg5lyjXbtjUnt8s
-	gJr3lsp6PobZ+UWlsglFP/1XggWhhsmqUip44xbZOS0Sp7sjyeURVeHR0HdTu/5t
-	byx8roVHNLSTTX5S9wOMpDqH3C/sCoZeEY0lhKAmiuEWo3JkF/jXKHV8CWZn/9Tx
-	ohiYYE6vrT7XgviqWOtaVGCfXahuwNbkdcA==
-X-ME-Sender: <xms:Vqboaac5e0q0c1kjg2EFkW7QkhSycDERUIQwnAbizoJcQWVlxj9hgg>
-    <xme:VqboaZJLxHHl64aGT8WX6V71nHSUifG7dc1LQN_esXGorgzdi4AKGB2lpC7xnetou
-    lrYqba4k_AMYj7Qtya-qOhrWxZ2zfke3xTSC7fBWocj9963Uk4lghk>
-X-ME-Received: <xmr:VqboafyIkZQx2zYekB55gPTbux-pFnoaDvRhxSHAvYOnFgzI9KA52USJUGo->
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdeigedtiecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgr
-    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
-    htthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeegteehgeehieffgfeuvdeuffef
-    gfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepledpmhhouggv
-    pehsmhhtphhouhhtpdhrtghpthhtoheplhhilhhinhhmrghosehkhihlihhnohhsrdgtnh
-    dprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohep
-    ughsrghhvghrnheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtse
-    hgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhr
-    tghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhohhrmh
-    hssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghr
-    nhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvg
-    hrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:VqboaXtx--QqrM0uz3fYDmDloxouxuOznzH5l08cj6u8nPgNsyJo9g>
-    <xmx:VqboaaDPbnedMDXNAkjEDKn9h9O3SizquM5uh54swheWS742YpfYfg>
-    <xmx:VqboaREOBAiMeg5FYAGLZAg-zjdZiaFao-1e3UK_XGOhdK2iP29M2A>
-    <xmx:VqboaSB8rzeF5g5AARdtcMHtnMJssE59ViFJqqqm5e3M2udAaWCkww>
-    <xmx:V6boaRygc9dKZPh5ZVepxeoT44jiDfOBhL4CQg0UOL22syODzkF7UqmS>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 22 Apr 2026 06:43:34 -0400 (EDT)
-Date: Wed, 22 Apr 2026 12:43:32 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Linmao Li <lilinmao@kylinos.cn>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] ipv6: addrconf: skip ERRDAD transition when
- address already DEAD
-Message-ID: <aeimVEuF6Sn8l0x0@krikkit>
-References: <20260420032842.1063277-1-lilinmao@kylinos.cn>
- <20260421075033.1110816-1-lilinmao@kylinos.cn>
+	 Content-Type:Content-Disposition:In-Reply-To; b=KQ4twTkSPfcFUS6b1fhCR8KPzYiAq+wtzBkdLYopemJ7i2U0uTwXPAPxrXVBs7v+say2+SKg3DPhRCWs2ZoTDFLIuZIr1tKoruQjQntLfrye3sClOMizyqMk2ASnchQD037CDHfKmAx2VXCaUskPmmKaZIX3GYCh6kEC59cS/Fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f6bKDgI9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7891FC19425;
+	Wed, 22 Apr 2026 10:45:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776854736;
+	bh=TpfNQlTkSNL7BzUK+Pd9K+KxRlrlEHZM5h0NyDeSYWQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=f6bKDgI9RhEZIh7+hobdoxWlVq1gHUaQyXR4m+1d0/IMupVsD0m/usRRM6n2xHp7w
+	 LH52RTuZgV1klLheUCo5ynp4FP35Zj2EpxRVJQAfRpTDi6myG7w3JNn51MqTLFPfnh
+	 wdac20g8lTLSUjPxwCmZD7CQtRijt3WcBBiETSDJE4f41maAgeucEBT1IFzjLcQr6x
+	 KeIgEayOFRii/pXgvj2J3i3jcx9/lrZYwLlqo/03Lp+YKKbwfxyUkgJHA6/eCQ1fD5
+	 849kcCG7giSQotmykPgpASc+/lfbQNCloBaFITkZI0pmIu1agXk7hFNzKZLNhjSrkd
+	 DReCWtzjFLzJQ==
+Date: Wed, 22 Apr 2026 11:45:22 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, corbet@lwn.net,
+	skhan@linuxfoundation.org, federico.vaga@vaga.pv.it,
+	carlos.bilbao@kernel.org, avadhut.naik@amd.com, alexs@kernel.org,
+	si.yanteng@linux.dev, dzm91@hust.edu.cn,
+	2023002089@link.tyut.edu.cn, tsbogend@alpha.franken.de,
+	dsahern@kernel.org, jani.nikula@intel.com,
+	mchehab+huawei@kernel.org, gregkh@linuxfoundation.org,
+	jirislaby@kernel.org, tytso@mit.edu, herbert@gondor.apana.org.au,
+	ebiggers@kernel.org, johannes.berg@intel.com, geert@linux-m68k.org,
+	pablo@netfilter.org, tglx@kernel.org, mashiro.chen@mailbox.org,
+	mingo@kernel.org, dqfext@gmail.com, jreuter@yaina.de,
+	sdf@fomichev.me, pkshih@realtek.com, enelsonmoore@gmail.com,
+	mkl@pengutronix.de, toke@toke.dk, kees@kernel.org, crossd@gmail.com,
+	jlayton@kernel.org, wangliang74@huawei.com, aha310510@gmail.com,
+	takamitz@amazon.co.jp, kuniyu@google.com, linux-doc@vger.kernel.org,
+	linux-mips@vger.kernel.org
+Subject: Re: [PATCH net-deletions] net: remove ax25 and amateur radio
+ (hamradio) subsystem
+Message-ID: <20260422104522.GK651125@horms.kernel.org>
+References: <20260421021824.1293976-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260421075033.1110816-1-lilinmao@kylinos.cn>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+In-Reply-To: <20260421021824.1293976-1-kuba@kernel.org>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	TAGGED_FROM(0.00)[bounces-280378-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-280380-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,lwn.net,linuxfoundation.org,vaga.pv.it,kernel.org,amd.com,linux.dev,hust.edu.cn,link.tyut.edu.cn,alpha.franken.de,intel.com,mit.edu,gondor.apana.org.au,linux-m68k.org,netfilter.org,mailbox.org,gmail.com,yaina.de,fomichev.me,realtek.com,pengutronix.de,toke.dk,huawei.com,amazon.co.jp];
+	RCPT_COUNT_TWELVE(0.00)[46];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,queasysnail.net:dkim,messagingengine.com:dkim]
-X-Rspamd-Queue-Id: 53C35444DFA
+	TAGGED_RCPT(0.00)[netdev,huawei];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1D8B7444F12
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-04-21, 15:50:33 +0800, Linmao Li wrote:
-> addrconf_dad_end() transitions ifp->state from DAD to POSTDAD under
-> ifp->lock and releases the lock.  addrconf_dad_failure() takes
-> ifp->lock again with the spin_lock_bh() following the
-> net_info_ratelimited() duplicate-address log.  A concurrent
-> ipv6_del_addr() can acquire the lock in that window, set ifp->state
-> to DEAD and run list_del_rcu(&ifp->if_list).
-
-You're pretty much saying that the ifp->state check we did in
-addrconf_dad_end before dropping the lock is not valid, so it seems we
-should just skip that separate check since it's not doing anything
-useful, and move it under the "main" lock we acquire after the
-net_info_ratelimited(). There would still be a problem with "we
-dropped the lock in the STABLE_PRIVACY block", which your patch
-handles.
-
-> addrconf_dad_failure() then overwrites DEAD with ERRDAD at errdad:
-> and schedules a new dad_work.  The work calls ipv6_del_addr() again,
-> hitting the already-poisoned list entry:
+On Mon, Apr 20, 2026 at 07:18:23PM -0700, Jakub Kicinski wrote:
+> Remove the amateur radio (AX.25, NET/ROM, ROSE) protocol implementation
+> and all associated hamradio device drivers from the kernel tree.
+> This set of protocols has long been a huge bug/syzbot magnet,
+> and since nobody stepped up to help us deal with the influx
+> of the AI-generated bug reports we need to move it out of tree
+> to protect our sanity.
 > 
->   general protection fault: 0000 [#1] SMP NOPTI
->   CPU: 4 PID: 217 Comm: kworker/4:1
->   Workqueue: ipv6_addrconf addrconf_dad_work
->   RIP: 0010:ipv6_del_addr+0xe9/0x280
->   RAX: dead000000000122
->   Call Trace:
->    addrconf_dad_stop+0x113/0x140
->    addrconf_dad_work+0x28c/0x430
->    process_one_work+0x1eb/0x3b0
->    worker_thread+0x4d/0x400
->    kthread+0x104/0x140
->    ret_from_fork+0x35/0x40
+> The code is moved to an out-of-tree repo:
+> https://github.com/linux-netdev/mod-orphan
+> if it's cleaned up and reworked there we can accept it back.
 > 
-> Bail out at errdad: when ifp->state is already DEAD. The existing
-> in6_ifa_put() releases the reference taken for this invocation.
+> Minimal stub headers are kept for include/net/ax25.h (AX25_P_IP,
+> AX25_ADDR_LEN, ax25_address) and include/net/rose.h (ROSE_ADDR_LEN)
+> so that the conditional integration code in arp.c and tun.c continues
+> to compile and work when the out-of-tree modules are loaded.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Mentioning "the existing in6_ifa_put()" is a bit confusing since
-you're adding a separate unlock/put/return path.
-
--- 
-Sabrina
+Reviewed-by: Simon Horman <horms@kernel.org>
 
