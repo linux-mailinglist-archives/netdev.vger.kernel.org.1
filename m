@@ -1,157 +1,191 @@
-Return-Path: <netdev+bounces-280288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280289-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id l7Z0NdYy6GkAGwIAu9opvQ
-	(envelope-from <netdev+bounces-280288-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 04:30:46 +0200
+	id gJb8GWE16Gk6GwIAu9opvQ
+	(envelope-from <netdev+bounces-280289-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 04:41:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77166441751
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 04:30:46 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 603504418DB
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 04:41:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DBE51301EAF4
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 02:30:45 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 38E3E3013709
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 02:39:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30A3335975;
-	Wed, 22 Apr 2026 02:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2841037F75D;
+	Wed, 22 Apr 2026 02:39:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="jOnNv4vR"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cWbZu5hY"
 X-Original-To: netdev@vger.kernel.org
-Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB7BE375F7C;
-	Wed, 22 Apr 2026 02:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D684391849
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 02:38:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776825038; cv=none; b=j2hRqXpVTPHAwTeHz9BvsimI+3hPRh/FywuRpKnpi6ngkerAefeUXYQsnHaNzuzuiOELLgcTnygISHR3ksK5LJSl7FaNWkLcLfy+7tQkqJ4GXAJCtPbcFkYe/ujSm1oKENl4Vd0EEJzO3hL+GWm0UjVTIh6S3NGSLU1wFCQoq/0=
+	t=1776825537; cv=none; b=T2pvD+C/wxtpdVQGU8b4pBkocU7Xz67D37UKs+5QvCg/OjfwhsowoYkQG6ci/69PhfI7leawl4JhHOsmTzAquxGC9PDKD0x3rCi7XzD02SKgn0PkZ4VS+kiV/sXNJOpwllcL4w0iFlwcarphWUvVhH1zC46ifAi3jZTIpNB69do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776825038; c=relaxed/simple;
-	bh=qp19i8gKOQAW2OoVrGwPyPDIdtOoJJmFIYmFogXNP2w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uUYC34fLGNb8pKQGPue/sLnuhBD1Uu8sGpa2FnBpG0+xZ1gcOcqQAkXIwDteFJlabyPR11m+kNeMbCxAT9CJ+a0b990+g+uEXaPMxc79v/ycVrrbvAF87piPx6c8WjPDcdcl0VM7CY0624ZTz1QJhHvuaEvADzkFcXjvj7LJSwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=jOnNv4vR; arc=none smtp.client-ip=49.212.198.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
-Received: from ms-a2 (232.154.13.160.dy.iij4u.or.jp [160.13.154.232])
-	(authenticated bits=0)
-	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 63M2USQV090865
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 22 Apr 2026 11:30:28 +0900 (JST)
-	(envelope-from kohei@enjuk.jp)
-DKIM-Signature: a=rsa-sha256; bh=swiEIN7WrlDhQ8FdTFcXjLaM5ebLD8EN3bBCVp4yXgs=;
-        c=relaxed/relaxed; d=enjuk.jp;
-        h=From:Message-ID:To:Subject:Date;
-        s=rs20251215; t=1776825029; v=1;
-        b=jOnNv4vRad30NNuL1TItyyMkLMKSN3yaIbKcgLTLMmvtg+FmJxUoGR9fktP+IEw/
-         CBIrNyvQ7whqPJJtyi7l4nI3/urHNr3MT4mq47EsV2BexXOPyBAxjccTpAy2uzrR
-         W/AeeNddVdRpcYtAiOhNbtFltiu2BzLbfPZM87ak3UJBqktpRF8umkOiS0hoiuxB
-         K7YYlVhogp8+4PSlLv+P7bJobn9Br6XMTv5YB10jhn7Z2EGkoJpp2HP7oyvOGYzF
-         qloWGP8PnnxpxAZDA7EnSAX0cxTbEE0aaXqE4HePKyNOs8hyEtgWUWKcs+mjW20u
-         cDOj0JkS6hkFemKKgqxs2A==
-From: Kohei Enju <kohei@enjuk.jp>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
-Cc: =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux.dev,
-        netdev@vger.kernel.org, Kohei Enju <kohei@enjuk.jp>,
-        syzbot+6985cb8e543ea90ba8ee@syzkaller.appspotmail.com
-Subject: [PATCH net v1] vhost_net: fix sleeping with preempt-disabled in vhost_net_busy_poll()
-Date: Wed, 22 Apr 2026 02:30:24 +0000
-Message-ID: <20260422023026.81960-1-kohei@enjuk.jp>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1776825537; c=relaxed/simple;
+	bh=fzwjmIqQekPo8o/ATAU9/Fm3reUgMbTSC0pjAkixSBA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CcNdcNQ+7/0JbAujlbfERCM0uUUBwsijE48HkiTX3DTbublq+qmysEQxFUAePNU5QbcOUdib/eBUKoMHaE0oQfuSgL/nKlhUibz1sZhNaB7PKAeRN9H9hTvAzUFwB5gH7dJMc9V0goRDy+qIi8ml7fNXkMxHAEPLDNFwerzTje0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cWbZu5hY; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <615b2902-597e-49dc-9bfa-621c7e072b5d@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1776825509;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rXr5rEctMiuiUbhVQzGATPHv0oPQBw4ipel+oTNpUYg=;
+	b=cWbZu5hYhYzKX1CUShZqMDVfB1wjkHFwTRYVkc9HGlez4kuyN59OykEXelpQ5Dq7BH6+yy
+	z6wqtYgT1NdVJpHihoHXeBhmX79uHTh1mFipEIRRmV15wH4eEas679ej0tTUb2Bqs0NKs+
+	PEPD8UJIhjwaFmFR5CWGHtE6I6TVsoQ=
+Date: Wed, 22 Apr 2026 10:38:22 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+Subject: Re: [PATCH net v2 2/2] selftests/net: packetdrill: cover RFC 5961 5.2
+ challenge ACK on both edges
+To: netdev@vger.kernel.org
+Cc: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, "David S. Miller"
+ <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20260421014128.289362-1-jiayuan.chen@linux.dev>
+ <20260421014128.289362-3-jiayuan.chen@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260421014128.289362-3-jiayuan.chen@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280288-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[enjuk.jp:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-280289-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
-	TAGGED_RCPT(0.00)[netdev,6985cb8e543ea90ba8ee];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,enjuk.jp:email,enjuk.jp:dkim,enjuk.jp:mid]
-X-Rspamd-Queue-Id: 77166441751
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 603504418DB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-syzbot reported "sleeping function called from invalid context" in
-vhost_net_busy_poll().
 
-Commit 030881372460 ("vhost_net: basic polling support") introduced a
-busy-poll loop and preempt_{disable,enable}() around it, where each
-iteration calls a sleepable function inside the loop.
+On 4/21/26 9:41 AM, Jiayuan Chen wrote:
+> RFC 5961 Section 5.2 / RFC 793 Section 3.9 require a challenge ACK
+> whenever an incoming SEG.ACK falls outside
+> [SND.UNA - MAX.SND.WND, SND.NXT].  There is currently no packetdrill
+> coverage for either edge.
+>
+> Add tcp_rfc5961_ack-out-of-window.pkt, which in a single passive-open
+> connection exercises:
+>
+>    - Upper edge (SEG.ACK > SND.NXT): peer ACKs data that was never
+>      sent before the server has transmitted anything.
+>    - Lower edge (SEG.ACK < SND.UNA - MAX.SND.WND): after the server
+>      has sent 2000 bytes (the peer-advertised rwnd forces two 1000-byte
+>      segments, both acknowledged), peer sends an ACK that is older
+>      than the acceptable window.
+>
+> Both cases must elicit a challenge ACK
+> <SEQ = SND.NXT, ACK = RCV.NXT, CTL = ACK>.  The per-socket RFC 5961
+> Section 7 rate limit is disabled for the duration of the test so that
+> both challenge ACKs can fire back-to-back.
+>
+> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> ---
+>   .../tcp_rfc5961_ack-out-of-window.pkt         | 46 +++++++++++++++++++
+>   1 file changed, 46 insertions(+)
+>   create mode 100644 tools/testing/selftests/net/packetdrill/tcp_rfc5961_ack-out-of-window.pkt
+>
+> diff --git a/tools/testing/selftests/net/packetdrill/tcp_rfc5961_ack-out-of-window.pkt b/tools/testing/selftests/net/packetdrill/tcp_rfc5961_ack-out-of-window.pkt
+> new file mode 100644
+> index 000000000000..44d54c812820
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/packetdrill/tcp_rfc5961_ack-out-of-window.pkt
+> @@ -0,0 +1,46 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +//
+> +// RFC 5961 Section 5.2 / RFC 793 Section 3.9: an incoming segment's
+> +// ACK value must lie in [SND.UNA - MAX.SND.WND, SND.NXT]; otherwise
+> +// the receiver MUST discard the segment and send a challenge ACK
+> +// back.  Exercise both edges of that window in a single connection.
+> +
+> +`./defaults.sh
+> +sysctl -q net.ipv4.tcp_invalid_ratelimit=0
+> +`
+> +
+> +   0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
+> +  +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
+> +  +0 bind(3, ..., ...) = 0
+> +  +0 listen(3, 1) = 0
+> +
+> +// Three-way handshake.  Peer advertises rwnd = 1000 (no wscale), so
+> +// MAX.SND.WND is tracked as 1000.
+> +  +0 < S 0:0(0) win 1000 <mss 1000,sackOK,nop,nop,nop,wscale 0>
+> +  +0 > S. 0:0(0) ack 1 <...>
+> ++.1 < . 1:1(0) ack 1 win 1000
+> +  +0 accept(3, ..., ...) = 4
+> +
+> +// ---- Upper edge: SEG.ACK > SND.NXT --------------------------------
+> +// Server has sent nothing yet, so SND.UNA = SND.NXT = 1.
+> +// Peer sends a pure ACK with SEG.ACK = 2, beyond SND.NXT.
+> +  +0 < . 1:1(0) ack 2 win 1000
+> +// Expect a challenge ACK: <SEQ = SND.NXT = 1, ACK = RCV.NXT = 1>.
+> +  +0 > . 1:1(0) ack 1
+> +
+> +// Advance SND.UNA past MAX.SND.WND so that the lower edge becomes
+> +// reachable.  Write 2000 bytes; the peer's rwnd of 1000 forces two
+> +// 1000-byte segments, each acknowledged in turn.
+> +  +0 write(4, ..., 2000) = 2000
+> +  +0 > P. 1:1001(1000) ack 1
+> ++.01 < . 1:1(0) ack 1001 win 1000
+> +  +0 > P. 1001:2001(1000) ack 1
+> ++.01 < . 1:1(0) ack 2001 win 1000
+> +// Now SND.UNA = SND.NXT = 2001, MAX.SND.WND = 1000, bytes_acked = 2000.
+> +
+> +// ---- Lower edge: SEG.ACK < SND.UNA - MAX.SND.WND ------------------
+> +// SND.UNA - MAX.SND.WND = 2001 - 1000 = 1001, so SEG.ACK = 1000 falls
+> +// below the acceptable range.
+> +  +0 < . 1:1(0) ack 1000 win 1000
+> +// Expect a challenge ACK: <SEQ = SND.NXT = 2001, ACK = RCV.NXT = 1>.
+> +  +0 > . 2001:2001(0) ack 1
 
-The purpose of disabling preemption was to keep local_clock()-based
-timeout accounting on a single CPU, rather than as a requirement of
-busy-poll itself:
 
-https://lore.kernel.org/netdev/1448435489-5949-4-git-send-email-jasowang@redhat.com/T/#u
+https://sashiko.dev/#/patchset/20260421014128.289362-1-jiayuan.chen%40linux.dev
 
-  Changes from RFC V1:
-  ...
-  - Disable preemption during busy looping to make sure local_clock()
-    was correctly used.
+I don't think the AI's concern holds, but I think I can split 
+write(2000) into write(1000)
+so the test doesn't rely on kernel internals.
 
-From this perspective, migrate_disable() is sufficient here, so replace
-preempt_disable() with migrate_disable(), avoiding sleepable accesses
-from a preempt-disabled context.
-
-Fixes: 030881372460 ("vhost_net: basic polling support")
-Tested-by: syzbot+6985cb8e543ea90ba8ee@syzkaller.appspotmail.com
-Reported-by: syzbot+6985cb8e543ea90ba8ee@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/69e6a414.050a0220.24bfd3.002d.GAE@google.com/T/
-Signed-off-by: Kohei Enju <kohei@enjuk.jp>
----
- drivers/vhost/net.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 80965181920c..c6536cad9c4f 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -560,7 +560,7 @@ static void vhost_net_busy_poll(struct vhost_net *net,
- 	busyloop_timeout = poll_rx ? rvq->busyloop_timeout:
- 				     tvq->busyloop_timeout;
- 
--	preempt_disable();
-+	migrate_disable();
- 	endtime = busy_clock() + busyloop_timeout;
- 
- 	while (vhost_can_busy_poll(endtime)) {
-@@ -577,7 +577,7 @@ static void vhost_net_busy_poll(struct vhost_net *net,
- 		cpu_relax();
- 	}
- 
--	preempt_enable();
-+	migrate_enable();
- 
- 	if (poll_rx || sock_has_rx_data(sock))
- 		vhost_net_busy_poll_try_queue(net, vq);
--- 
-2.51.0
 
 
