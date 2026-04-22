@@ -1,234 +1,164 @@
-Return-Path: <netdev+bounces-280435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280437-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6F+JM3HW6GklQQIAu9opvQ
-	(envelope-from <netdev+bounces-280435-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 16:08:49 +0200
+	id CDxVKiHY6Gl7QwIAu9opvQ
+	(envelope-from <netdev+bounces-280437-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 16:16:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57C4F44713B
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 16:08:44 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B573344726E
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 16:15:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8689B304A222
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 14:07:54 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DE230300E1A6
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 14:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 597B43ED12B;
-	Wed, 22 Apr 2026 14:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D31093EC2F6;
+	Wed, 22 Apr 2026 14:15:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="PTz2utpP"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="mKyXyrF+"
 X-Original-To: netdev@vger.kernel.org
-Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.77.159])
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 339D9332634;
-	Wed, 22 Apr 2026 14:07:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.132.77.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12103FBA7
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 14:15:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776866871; cv=none; b=aC6LACKB6XbZcePP8sCqVRaLGRHPhCuC1dsYbwne5b/j4l2WAH84RTllguMkHqBcl8F5f95aAyodPmZzBfoYl9lThKBEKjDvLZgMPIH8ARNrf72K8zOkh6OJneMXvMN8Z2Isf0vAO7kCEGSo2C4bnyeglqQfojm9bjT/igKM8Sc=
+	t=1776867350; cv=none; b=gl/X/qHtG6FMzVuzaUB5C0OZxNRnJpA+HwWdoo/pVmZWdB7TguuXaCZ4QSfnmlfuCjOqe01fMqTqmytSeih/ecdJ8VNuJDviWXWbtrK0muGJ49iWx17k87hkCE0DxMpWHqVplsh9BjM6i1EmK2QvWybV0DVezzbAIbdjcVS8eXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776866871; c=relaxed/simple;
-	bh=uGFvtLAWamxcAKGzomzYdxJMOB56FEC0xZY1zIHrnAY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PsGemtbHDUA9KmN9hENBUUSyaNc6IcpVDwSfgPS4WOSDZpSmFkhMu7at6HfBmPYDHya8TQC7U0r6NBnuedS4Q5ib9omBwjbhrmHSgACzCYS40gmQYdMzRLYszJSu6FrBmK5lkhMfwXwKM5trOLdh6PIUzn+vt7rGivk7dkw5Vz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=PTz2utpP; arc=none smtp.client-ip=114.132.77.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1776866853;
-	bh=Pzt9GPYqHlrWqMYF6Atgi6G7hlhArIM+lXCWpMBLm64=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=PTz2utpPHnseddN8RO57oT43bhQnRj1D9ged1D5L4rej6fPZh8s+aVo9uQLi6jV6c
-	 wpwP7yne1wvnYBOwnj2Nrb2gjm+miV1j5csyzD3sjfIC0fkUp0PAGheTiHiB0I/SsM
-	 2EAwSJc0IjoWjtSpVOitQiUPoxO17SfW+s9N44Xs=
-X-QQ-mid: esmtpsz20t1776866828tcbf70014
-X-QQ-Originating-IP: D89ux7nbIrZe8FgffEeW4vPH0ULFL2ShFsaUTkYnHy8=
-Received: from uos-PC ( [117.152.201.246])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 22 Apr 2026 22:07:05 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 8588048875818352576
-EX-QQ-RecipientCnt: 15
-From: Morduan Zang <zhangdandan@uniontech.com>
-To: michal.pecio@gmail.com
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	petkan@nucleusys.com,
-	syzbot+3f46c095ac0ca048cb71@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com,
-	zhangdandan@uniontech.com,
-	zhanjun@uniontech.com,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: [PATCH net v2] net: usb: rtl8150: fix use-after-free in rtl8150_start_xmit()
-Date: Wed, 22 Apr 2026 22:07:02 +0800
-Message-ID: <EAE04AB0AE928B9F+20260422140703.103227-1-zhangdandan@uniontech.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20260421220547.2f7f9d85.michal.pecio@gmail.com>
-References: <20260421220547.2f7f9d85.michal.pecio@gmail.com>
+	s=arc-20240116; t=1776867350; c=relaxed/simple;
+	bh=BdKKhsnJvWWH0+JuV5Q03Ag5Jz82pO9hLgWrPM42paQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=UYMr47Li3LPh1hLhnM69mEQNfMnEhXkOQ9QovGDs8YcrzcCESC7Mz/9lptr+g5tGeClfUHT61nmKg91pxnVWN6WXlXwepJm2ldfkGwe0S/OeokhGWEODCQ0EhnlNDMOXC0GPN/qTKCA5P192X6gkrrjuO34k/5O2I885H+ePXe0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=mKyXyrF+; arc=none smtp.client-ip=210.118.77.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20260422141541euoutp019f20df1a4e6c9e09461b1b9dce344963~os2659odm1806718067euoutp01J
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 14:15:41 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20260422141541euoutp019f20df1a4e6c9e09461b1b9dce344963~os2659odm1806718067euoutp01J
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1776867341;
+	bh=5TRuoEZ4QJYPP3Pw1mvOMEiOGYnpwQfSAA/hUqjUCNs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mKyXyrF+n82XA33u0SGIGDQNCQ7dH4KodlRrt6FXUzWSF6QPl8bvHAsUact8qmSnZ
+	 wxrjTmsd8LIJIYuvXAkJHtDuCedpM9ZitVWIQXmJlhfF1w8XLIDD8hDZOLjJw0dXt0
+	 CwovohvKHA/dR35P7HtELGDB93JflxGk6YroA+xg=
+Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20260422141540eucas1p1f97c4c7a893f2fe7e8e847952e3b6f09~os26mX52C1742517425eucas1p1K;
+	Wed, 22 Apr 2026 14:15:40 +0000 (GMT)
+Received: from AMDC4622.eu.corp.samsungelectronics.net (unknown
+	[106.120.77.34]) by eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20260422141540eusmtip28d405d9149856677d74e51eae49a63a2~os26KFPAN1791517915eusmtip29;
+	Wed, 22 Apr 2026 14:15:40 +0000 (GMT)
+Date: Wed, 22 Apr 2026 16:15:37 +0200
+From: Jakub Raczynski <j.raczynski@samsung.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
+	davem@davemloft.net, andrew+netdev@lunn.ch, kernel-janitors@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH] net/stmmac: Fix typos: 'tx_undeflow_irq' ->
+ 'tx_underflow_irq'
+Message-ID: <aejYCYObZyFPpLat@AMDC4622.eu.corp.samsungelectronics.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: NoAfPw89eVWhelEs7weV/9IGsjQ/pECZvVQlLIdKw+uy9HbpaGmUzXI5
-	RYeOyc4trlylqWYn0S/FrmWmL3+dZhX1gIJBBTifYkaKGokDxrrKyvliDO40AlRuIs+L/y8
-	FI4d+y16HrShDk2lBzl7Gtj43pD8rlDxy/gYd2y84xEhtObwoGytKeQ9OuEWNIl4cm+UIgn
-	w6L8DqPtKY+Dnl1umf5J2xyp0qbV97Kha4XbZp983IclYNfugHtg+9QhlQDLblpmOrUmbEF
-	lMpHd3AeVrJ89e+dGpvgsoBAjdL37ExroM5wMr0fbIjvVU1Oby52f+FVn5nGpciWsNBxJoC
-	gnLNwOkSG59LpnCrgfFXxQKFQ4dQ+ibAvzQ4K3RtCvZKT3kxiloYP7U3cn6fEthskFZcyDL
-	aVW+e+ZOHNfES1GzNRSeevSoenD+drSRisjI7p4dwzPtS+5sJk3vKLiWgM4dDn5DIv0bP/s
-	keDuzT/KjhWgfKZ0RckWgktg8j2vfn3QHGbEoxYsQADEZ1HZlFfkIjjn292qQKcUGs15j0p
-	aUHjrffYLe0CiFqVTE3i1G6NJn0IaCe1Iiyi3+sEiAwPwerfTJBFcFW/Xbo5hSZXqoRKOs0
-	K84FrViBYpkhqkbdHgW3urzxFky7/VAzxNYwgyOMPwuDeXbkv8kY9P1EY6lxZ4krXyqmVZL
-	7FFGxpCZjefmtw3fXbvqiZZ8w9rbVrrA9Hxk/hVkzYr+FU5UWRCWQH9Gd8kHkLcRc+nXXk/
-	dpuX5nGTxg33saRKCKXV6MaGsNf9yVHcJc/poq53vyNVtbm2vsyL88lJSXcXzEEZz1Pru9e
-	oDtWA6t22tYSw3iDIzSELXaYoGFtQoE3zemZfPfQFip0SxGbNSGrqoV3FpgoDb4A9q79EAf
-	rZMNnjOylhX2Q/emTA3JlyaSbGBjg6nOivx5y49IH8AYl3q1Eb1i0AQzSKBbvVuHGSh4Wbb
-	xGWUGM26z6/UpRi8XfgZNMdBzDAyaVOG5k1TftYLCXDIKb99FpQVws4StWy6XnX68zRbBrv
-	HYMf8PPoqs5a2+4BHoX9D2CkvmcifbMWZ4SX/89UXYHjr5KsUWIy7CYDV569RNwCV3Sk0WD
-	utMlSS3tAIxKL9EuCYrYudkDcsp6T+Yrw==
-X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
-X-QQ-RECHKSPAM: 0
-X-Spamd-Result: default: False [0.84 / 15.00];
+In-Reply-To: <f1d51362-ca8f-481a-b9c1-400ab6422686@lunn.ch>
+X-CMS-MailID: 20260422141540eucas1p1f97c4c7a893f2fe7e8e847952e3b6f09
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----hExaTKD8pSV4C1.mHO0xNjZioIzStKhMnOXfyxqZoi0.l2l2=_277a9_"
+X-RootMTR: 20260421115052eucas1p103281c5b25719a44c0875d6b0860bfa6
+X-EPHeader: CA
+X-CMS-RootMailID: 20260421115052eucas1p103281c5b25719a44c0875d6b0860bfa6
+References: <CGME20260421115052eucas1p103281c5b25719a44c0875d6b0860bfa6@eucas1p1.samsung.com>
+	<20260421115008.2690541-1-j.raczynski@samsung.com>
+	<7eb9e4d4-909c-4203-833d-bd8b664fdfbc@lunn.ch>
+	<aeiJ3zr4WJAm1UCk@AMDC4622.eu.corp.samsungelectronics.net>
+	<f1d51362-ca8f-481a-b9c1-400ab6422686@lunn.ch>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[uniontech.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[uniontech.com:s=onoh2408];
+	CTYPE_MIXED_BOGUS(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280435-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[samsung.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhangdandan@uniontech.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+,1:+,2:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280437-lists,netdev=lfdr.de];
+	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[uniontech.com:+];
-	MAILSPIKE_FAIL(0.00)[172.105.105.114:query timed out];
-	TAGGED_RCPT(0.00)[netdev,3f46c095ac0ca048cb71];
+	TO_DN_SOME(0.00)[];
+	MAILSPIKE_FAIL(0.00)[2600:3c15:e001:75::12fc:5321:query timed out];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[j.raczynski@samsung.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,lunn.ch:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,syzkaller.appspot.com:url,uniontech.com:email,uniontech.com:dkim,uniontech.com:mid]
-X-Rspamd-Queue-Id: 57C4F44713B
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,AMDC4622.eu.corp.samsungelectronics.net:mid]
+X-Rspamd-Queue-Id: B573344726E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Zhan Jun <zhanjun@uniontech.com>
+------hExaTKD8pSV4C1.mHO0xNjZioIzStKhMnOXfyxqZoi0.l2l2=_277a9_
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
 
-syzbot reported a KASAN slab-use-after-free read in rtl8150_start_xmit()
-when accessing skb->len for tx statistics after usb_submit_urb() has
-been called:
+On Wed, Apr 22, 2026 at 02:47:38PM +0200, Andrew Lunn wrote:
+> > I don't see anything wrong with it?
+> > - naming is correct, same as stmmac_extra_stats from common.h, as it
+> >   wouldn't compile otherwise
+> > - string length is ok, as max name length is ETH_GSTRING_LEN=32 and it is
+> >   not close
+> > - ethtool just polls data from driver and in my tests it is ok
+> > - all instances of 'undeflow' are changed
+> > - 'underflow' semantic is ok, 'undeflow' is just not correct
+> > 
+> > Please correct me if I am wrong, but imo no issues with this patch.
+> 
+> ABI
+> 
+> This name is published as part of the kAPI. You are changing its
+> name. User space could be looking for this name, even thought it has a
+> typo in it.
+> 
+>      Andrew
+>
+I don't think it is? This part of extra stats (struct stmmac_extra_stats) and
+is not part of standard ABI from
+Documentation/ABI/testing/sysfs-class-net-statistics
+nor is mentioned in
+Documentation/networking/device_drivers/ethernet/stmicro/stmmac.rst
 
-  BUG: KASAN: slab-use-after-free in rtl8150_start_xmit+0x71f/0x760
-    drivers/net/usb/rtl8150.c:712
-  Read of size 4 at addr ffff88810eb7a930 by task kworker/0:4/5226
+These extra stats are specific to stmmac driver and most of these are more
+than standard
+https://www.kernel.org/doc/html/v7.0/networking/statistics.html#c.rtnl_link_stats64
+This name does not exist outside stmmac driver, so while some application may
+expect this (stmmac specific app), question is should this typo stick?
 
-The URB completion handler write_bulk_callback() frees the skb via
-dev_kfree_skb_irq(dev->tx_skb). The URB may complete on another CPU
-in softirq context before usb_submit_urb() returns in the submitter,
-so by the time the submitter reads skb->len the skb has already been
-queued to the per-CPU completion_queue and freed by net_tx_action():
+This type of typo is even mentioned in scripts/spelling.txt.
 
-  CPU A (xmit)                      CPU B (USB completion softirq)
-  ------------                      ------------------------------
-  dev->tx_skb = skb;
-  usb_submit_urb()      --+
-                          |-------> write_bulk_callback()
-                          |           dev_kfree_skb_irq(dev->tx_skb)
-                          |         net_tx_action()
-                          |           napi_skb_cache_put()   <-- free
-  netdev->stats.tx_bytes  |
-    += skb->len;          <-- UAF read
+Regards
+Jakub Raczynski
 
-Fix it by caching skb->len before submitting the URB and using the
-cached value when updating the tx_bytes counter.
+------hExaTKD8pSV4C1.mHO0xNjZioIzStKhMnOXfyxqZoi0.l2l2=_277a9_
+Content-Type: text/plain; charset="utf-8"
 
-The pre-existing tx_bytes semantics are preserved: the counter tracks
-the original frame length (skb->len), not the ETH_ZLEN/USB-alignment
-padded "count" value that is handed to the device.  Changing that
-would be a user-visible accounting change and is out of scope for
-this UAF fix.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot+3f46c095ac0ca048cb71@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/69e69ee7.050a0220.24bfd3.002b.GAE@google.com/
-Closes: https://syzkaller.appspot.com/bug?extid=3f46c095ac0ca048cb71
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Zhan Jun <zhanjun@uniontech.com>
----
-Changes in v2:
- - Drop the vague "This mirrors the fix pattern used by other USB
-   network drivers." claim from the changelog (Michal Pecio).
- - Clarify that the patch intentionally preserves the existing
-   tx_bytes semantics (no ETH_ZLEN/USB padding accounted), and that
-   adjusting that is out of scope for this UAF fix (Michal Pecio).
- - Use the correct "[PATCH net]" subject prefix per
-   Documentation/process/maintainer-netdev.rst (Andrew Lunn).
- - Add Reviewed-by: Andrew Lunn.
- - No functional changes; code diff is identical to v1.
-
-v1: https://lore.kernel.org/all/73ACB7391A6DE033+20260421110412.14795-1-zhangdandan@uniontech.com/
----
- drivers/net/usb/rtl8150.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/usb/rtl8150.c b/drivers/net/usb/rtl8150.c
-index 4cda0643afb6..6fc6be0cced6 100644
---- a/drivers/net/usb/rtl8150.c
-+++ b/drivers/net/usb/rtl8150.c
-@@ -683,6 +683,7 @@ static netdev_tx_t rtl8150_start_xmit(struct sk_buff *skb,
- 					    struct net_device *netdev)
- {
- 	rtl8150_t *dev = netdev_priv(netdev);
-+	unsigned int skb_len;
- 	int count, res;
- 
- 	/* pad the frame and ensure terminating USB packet, datasheet 9.2.3 */
-@@ -694,6 +695,14 @@ static netdev_tx_t rtl8150_start_xmit(struct sk_buff *skb,
- 		return NETDEV_TX_OK;
- 	}
- 
-+	/*
-+	 * Cache skb->len before submitting the URB: the URB completion
-+	 * handler (write_bulk_callback) frees the skb, and it may run
-+	 * on another CPU before usb_submit_urb() returns, which would
-+	 * leave skb dangling here.
-+	 */
-+	skb_len = skb->len;
-+
- 	netif_stop_queue(netdev);
- 	dev->tx_skb = skb;
- 	usb_fill_bulk_urb(dev->tx_urb, dev->udev, usb_sndbulkpipe(dev->udev, 2),
-@@ -709,7 +718,7 @@ static netdev_tx_t rtl8150_start_xmit(struct sk_buff *skb,
- 		}
- 	} else {
- 		netdev->stats.tx_packets++;
--		netdev->stats.tx_bytes += skb->len;
-+		netdev->stats.tx_bytes += skb_len;
- 		netif_trans_update(netdev);
- 	}
- 
--- 
-2.51.0
-
+------hExaTKD8pSV4C1.mHO0xNjZioIzStKhMnOXfyxqZoi0.l2l2=_277a9_--
 
