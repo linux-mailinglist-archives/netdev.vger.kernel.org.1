@@ -1,257 +1,217 @@
-Return-Path: <netdev+bounces-280330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280331-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MACeHfhx6GkSKgIAu9opvQ
-	(envelope-from <netdev+bounces-280330-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 09:00:08 +0200
+	id SG49KmJ06GlCKgIAu9opvQ
+	(envelope-from <netdev+bounces-280331-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 09:10:26 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E36CF442ADB
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 09:00:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6921E442CA4
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 09:10:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5580130104B2
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 06:57:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 35B0B300F17E
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 07:09:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A3A1296BA9;
-	Wed, 22 Apr 2026 06:57:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAD40369999;
+	Wed, 22 Apr 2026 07:09:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I/2CjADV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DAjWEFK7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D532E21C9EA
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 06:57:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776841023; cv=pass; b=KL8xWcrKjJ+2VLqDP5liVKFl3/eQ5H9LEUqTwWuVFY1mGkETM7ay5dFhKPwkWiotFIcV4byP0WTWJ6aCaPdDKNLPbElTYe8fNEkQpKcCnfc2HYrvVVQWJj9PKmz/5xia5HhCmLQLyLSA6HxgL0AVEvjvMDVU+/twRyMFTrjRJAw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776841023; c=relaxed/simple;
-	bh=yLE11MeCFeetS3czLgq8Pjwc45aBpmJm/oGj4ZtOZxQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Xx4rKUu98AaZf80bFDR2KWHeThIZ8HDW2uBewXkmDgedGAFhdJPtnNvGcFzwloJBkqfBG5VEO8Eu7sgrf9OBRmbC4PzqWskKu8RsM7n6DhnCHc80mPJ6VeP7iqaeRr3oxsqbROaCviyf3UxxjalN9FV31wBje1nwzUd7jeBuSTo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I/2CjADV; arc=pass smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-676e62faf2bso1155539a12.1
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 23:57:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776841020; cv=none;
-        d=google.com; s=arc-20240605;
-        b=S9jDXtEmWKkerWeFWyfQwSKu29qNv0sPA7QVz8nAEs5bkfE25aAkstC1xVDCRbJUvD
-         aDOKgPBi8WjNTXuzvNtAvmQ2vhsGrG0VkdE5bc8TOjd8vmyFnZkaz3X08tWxsfc2xkKM
-         dS6R7Ov01LHz1b+CTcY3TmUJGhZR+CuXlRazj3Eck2iDwCvkaYdP+Ywv9mC9aRSVFR4s
-         QN107bwwLIfSIUhGAnwHdgtNwC7EwR4Oj4RpfoBemAkrt+X+YJMxWdZGNMtuL1ijnMvJ
-         rgorFpuClbfVFqh5Z+jwgtYB8OCtWQcxPVM6Oy79syksQBw7KyCittHMSiylHIoexPdE
-         nLiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=mCCL5JMhZWas/kLIZBfmLtWUdx8tT416PCq2Caj0ZQo=;
-        fh=IUu3u3jDb0MwMriRQKGlbH3HzTg8vzPb6fdEZ/ByhlQ=;
-        b=C4k6t3ypynV8Zt2m2n/wzSULaT0wDE0kBRF8STSwNXOja70TSwpQ1e2EqDWbqR9uQA
-         fQbw0NsvUpbRlnq3dp0rCfCcoShDkpPoRi1h4vuHr7ayjrn4YgA5F5sRGE/c54HVpJB+
-         TTGOLhnRD0VcYldCw8csEOj1zTvi6OQNm2pE/rdWXtSeYJ2w8FDAIZbYJMZyZenxBcr1
-         QcHkfjqDkKutbFhcthQvvjFeEm4CrJTSFiO61uNSrmSFooJbIvAKJmCh9+NIeSbW3j+d
-         y61z2AsJBNJzLVTkWz7rxhWUIxmSXy9C56pvwhD9hXVxPJ0B3MbkhkA/5SD64ZHsIwIv
-         BA8Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776841020; x=1777445820; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mCCL5JMhZWas/kLIZBfmLtWUdx8tT416PCq2Caj0ZQo=;
-        b=I/2CjADVox+Oap9jk0pn+x6jMbmNxXuJWtn1Uph94Y7eLfvbPG3lY2UoRrN5mxtIkU
-         awv5m0NCAeRL10sANiSqyqn1IV3KQcsoqovofIU7JoLAs9iNPgnl/ZHcGvVSEiKZBvjm
-         CfOsR1utLcCwLGUIsZsrzqAznyL/OZYNmMee4tXN6aC39RRr8FDNoPbU/o0Rc71DoEm3
-         8N+lemK2X6Ut86JtupnM8dQeMRjbp1t+faVU2NJkxOKj/k3iLQu/rTZ6tqcqi7OMG1xT
-         DcU5fbUEqx7Qkp9CYGi4/6EoFb4e0Y5llqjMVqNSHJmHGNUOmDHF2/OY/udIBAvxuJvz
-         ycqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776841020; x=1777445820;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=mCCL5JMhZWas/kLIZBfmLtWUdx8tT416PCq2Caj0ZQo=;
-        b=gnYXlWcBRNXOXIh4fdnLOGyaNVqIZcHuVRy7kjw3pOD4ANuMdwkfQRQXD9NKKOtFz2
-         CII2Vg+18LZLKu/eez+a34arcgF5VprZcROkO2yuc4P+5Jl0Fq1EOjKZcI+pJRrZY/k4
-         QQp5jE40INTJzOKPPqkfIJ2lf3qqP+uYqwWwcRd4DiZ5/IxB7gUmkkb2l/ZdrOCcHsYT
-         fNwqHVyQjQ3W9sH1uO/yTi3YNS6ZWjJiQ48KYjOS2SnQjBhsdxt8uge3OI/Vt9xljuAj
-         dec6hBsrxyIgtbBoECs+6McOUahjmlnbKzCF/DuEwacCj3MAg/5QAkHC5kMtGzI9Lqox
-         wYew==
-X-Forwarded-Encrypted: i=1; AFNElJ+YnmNI3FXVt7Y+3O98hmn0e5gzqKlfpCKN5Xoh6ZacOtJyTRzxnebvTfPKAvKfrHhpGt7phYM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyMBS/ukygY0ZbewA34DzteVYC1gfBGoDxQx1SkoQRxeLHu5O2a
-	lnoUZnZbIvFQx10cEWhOgal5etpjNfe+hN5i/O1+L/YCwxhDUlhfgOrIhXhVp25m198IXtsgLAt
-	580D8y7pzoseDAT2i7XIbT+kntOXzdW4=
-X-Gm-Gg: AeBDieu2IbguDiYeFwiuG7dIOvd4YuYj+XZLQF3yaVO5/hMGBSFfVw7l3IO7m4eZTF+
-	QhRniTQImE9Yx3XT/5aTsDbcjn7zGbAsy1W+0cRyydJflRL5CdEBpFLCXVwLdcaM/xDlB3Yme/p
-	J29HeSUwwaa++63JlubnjDoa56azJyVEJbrwu2hMSD0xy02QqKZhdMRc7234U2zDwJI2i4g8CjZ
-	OUgMptsdXUmnxRtVjh8sQV6iYs36F5Jpo1cA3W48lPWYBwqhQ/A9TELkHq4p0Hja0lDO53KSPSP
-	0R/sP3gBlcWs/Qbs/FqEquOAXzBd/V+vQJQ48VD4mKEbv11wBw==
-X-Received: by 2002:a05:6402:46cf:b0:673:1d30:29b4 with SMTP id
- 4fb4d7f45d1cf-6731d302a0emr7440079a12.23.1776841020064; Tue, 21 Apr 2026
- 23:57:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CD6D36B07B;
+	Wed, 22 Apr 2026 07:09:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776841750; cv=none; b=Fsri+isfKJ+vhOBOFsq+9AXTFLDrQ7hnCO3luTSa9d0HXx3krzchCTFgqRyCgDIY1MqHbNKm7xm27fQpu6/CrZZSUuWuFHC02C2TZImU1HKQuT61A3R7RGwMwNAE1Q4X6U66sm/qW3ZJ8XRmxP8kqAvAbKsajGH5XlnyAyzUCLI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776841750; c=relaxed/simple;
+	bh=Lh8pVmomFkOo4amu9fFZXflKJKs84bSrFxYYo4jSUvY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DS35DCmLUiWkNiBvL7VpASbZk4JUxYXrrHhC9P9H9us/0lRYr4xaaSHWR6s5iCqCvK95HFWCAQOTMJ7+lg89aIC3vw2+TliOyLKiQMaiLSRrLP49HiHxE9Qv1ZFk9GV6C4lC052F4heC5vI9OtKKkwTC6j56ParCDkQy7Pfyjcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DAjWEFK7; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1776841748; x=1808377748;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Lh8pVmomFkOo4amu9fFZXflKJKs84bSrFxYYo4jSUvY=;
+  b=DAjWEFK79OhPmQCmtyCpRD+xz+iYKLeRUxsn49jLGI9FBJrGLGSHlqcG
+   silKH1PM7a3mp8jUQSyygG6EiaYowHQTjSddG5k1y46TA+jfMDAS3L6p9
+   1YNB6PLDvmXAMyPW4qE+EeNgOpvkSWgDhlvPRsQMA/5P3xEIXb24YNbty
+   EfTY5PV+23jFpus4jdLGMPukU69aEHdF8eYlEizRdbCbF+EnMv6akeeEs
+   d7u4u95y3VB6Gp/ScVUR0lPNugYeuG/UUPQbVssbfCIKA0crxItPflYDm
+   l855q4hs0KGocZJbMTg7ft8axausbPcSmJMS+7MByAdTCMNYXFXCpVTHn
+   Q==;
+X-CSE-ConnectionGUID: x/lfibuySdqTS2D0MpNRBg==
+X-CSE-MsgGUID: 8eskCpziS2qpLSpdPrrIIA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11763"; a="77664709"
+X-IronPort-AV: E=Sophos;i="6.23,192,1770624000"; 
+   d="scan'208";a="77664709"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2026 00:09:06 -0700
+X-CSE-ConnectionGUID: fjM2gdKWR9eNgwZD5Z38eQ==
+X-CSE-MsgGUID: LjAD8xsKRN6CT5YLUknGHA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,192,1770624000"; 
+   d="scan'208";a="225777795"
+Received: from smoticic-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.201])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2026 00:08:59 -0700
+Date: Wed, 22 Apr 2026 10:08:57 +0300
+From: Andy Shevchenko <andriy.shevchenko@intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	corbet@lwn.net, skhan@linuxfoundation.org, linux@armlinux.org.uk,
+	tsbogend@alpha.franken.de, maddy@linux.ibm.com, mpe@ellerman.id.au,
+	npiggin@gmail.com, chleroy@kernel.org, 3chas3@gmail.com,
+	razor@blackwall.org, idosch@nvidia.com, jani.nikula@intel.com,
+	mchehab+huawei@kernel.org, tytso@mit.edu,
+	herbert@gondor.apana.org.au, geert@linux-m68k.org,
+	ebiggers@kernel.org, johannes.berg@intel.com,
+	jonathan.cameron@huawei.com, kees@kernel.org, kuniyu@google.com,
+	fourier.thomas@gmail.com, rdunlap@infradead.org,
+	akpm@linux-foundation.org, linux-doc@vger.kernel.org,
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	bridge@lists.linux.dev, dwmw2@infradead.org
+Subject: Re: [PATCH net-deletions v2] net: remove unused ATM protocols and
+ legacy ATM device drivers
+Message-ID: <aeh0CV3UQw1quCXv@ashevche-desk.local>
+References: <20260422041846.2035118-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260331-realtek_forward-v1-0-44fb63033b7e@gmail.com>
- <20260331-realtek_forward-v1-8-44fb63033b7e@gmail.com> <CAD++jLnbZ6q+Noe9abWWRNrvYVjCU-X3w4jpzKKYQDUcKNcKew@mail.gmail.com>
-In-Reply-To: <CAD++jLnbZ6q+Noe9abWWRNrvYVjCU-X3w4jpzKKYQDUcKNcKew@mail.gmail.com>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Wed, 22 Apr 2026 03:56:47 -0300
-X-Gm-Features: AQROBzBP0C_UXLocaYpGge0ITSkbQwpxlORni0-j_m80aAVfYuFXeBjUBxYn9Tk
-Message-ID: <CAJq09z45vpYP+-pkWH=F4xmbur5iDh-Z=fz4KFLF+SVQhWrnLA@mail.gmail.com>
-Subject: Re: [net-next PATCH 08/10] net: dsa: realtek: rtl8365mb: add FDB support
-To: Linus Walleij <linusw@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	=?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260422041846.2035118-1-kuba@kernel.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280330-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,lwn.net,linuxfoundation.org,armlinux.org.uk,alpha.franken.de,linux.ibm.com,ellerman.id.au,gmail.com,blackwall.org,nvidia.com,intel.com,mit.edu,gondor.apana.org.au,linux-m68k.org,huawei.com,infradead.org,linux-foundation.org,lists.ozlabs.org,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-280331-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	HAS_ORG_HEADER(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[36];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E36CF442ADB
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,huawei];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6921E442CA4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> I actually at one point started to implement FDB accessors to the RTL8366=
-RB
-> before I got sidetracked (for the same reasons of being able to do hardwa=
-re
-> offloading), here is how far I got before I got distracted:
-> https://git.kernel.org/pub/scm/linux/kernel/git/linusw/linux-integrator.g=
-it/patch/?id=3D9941b129f91e92423803d6e2869022ffa66e9654
->
-> You can see that it also has an L2 table albeit with 4 entries rather tha=
-n 6,
-> and an additional "CAM" (content adressable memory...) table that I don't=
- quite
-> understand.
+On Tue, Apr 21, 2026 at 09:18:44PM -0700, Jakub Kicinski wrote:
+> Remove the ATM protocol modules and PCI/SBUS ATM device drivers
+> that are no longer in active use.
+> 
+> The ATM core protocol stack, PPPoATM, BR2684, and USB DSL modem
+> drivers (drivers/usb/atm/) are retained in-tree to maintain PPP
+> over ATM (PPPoA) and PPPoE-over-BR2684 support for DSL connections.
+> 
+> Removed ATM protocol modules:
+>  - net/atm/clip.c - Classical IP over ATM (RFC 2225)
+>  - net/atm/lec.c - LAN Emulation Client (LANE)
+>  - net/atm/mpc.c, mpoa_caches.c, mpoa_proc.c - Multi-Protocol Over ATM
+> 
+> Removed PCI/SBUS ATM device drivers (drivers/atm/):
+>  - adummy, atmtcp - software/testing ATM devices
+>  - eni - Efficient Networks ENI155P (OC-3, ~1995)
+>  - fore200e - FORE Systems 200E PCI/SBUS (OC-3, ~1999)
+>  - he - ForeRunner HE (OC-3/OC-12, ~2000)
+>  - idt77105 - IDT 77105 25 Mbps ATM PHY
+>  - idt77252 - IDT 77252 NICStAR II (OC-3, ~2000)
+>  - iphase - Interphase ATM PCI (OC-3/DS3/E3)
+>  - lanai - Efficient Networks Speedstream 3010
+>  - nicstar - IDT 77201 NICStAR (155/25 Mbps, ~1999)
+>  - solos-pci - Traverse Technologies ADSL2+ PCI
+>  - suni - PMC S/UNI SONET PHY library
+> 
+> Also clean up references in:
+>  - net/bridge/ - remove ATM LANE hook (br_fdb_test_addr_hook,
+>    br_fdb_test_addr)
+>  - net/core/dev.c - remove br_fdb_test_addr_hook export
+>  - defconfig files - remove ATM driver config options
+> 
+> The removed code is moved to an out-of-tree module package (mod-orphan).
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> v2:
+>  - keep BR2684
+>  - correct the claim that Traverse Technologies is defunct,
+>    I'm still deleting the solos driver, chances are nobody uses it.
+>    Easy enough to revert back in since core is still around.
+>    The guiding principle is to keep USB modems and delete
+>    the rest as USB ADSL2+ CPEs were most popular historically.
+> v1: https://lore.kernel.org/20260421021943.1295109-1-kuba@kernel.org
+> 
+> CC: corbet@lwn.net
+> CC: skhan@linuxfoundation.org
+> CC: linux@armlinux.org.uk
+> CC: tsbogend@alpha.franken.de
+> CC: maddy@linux.ibm.com
+> CC: mpe@ellerman.id.au
+> CC: npiggin@gmail.com
+> CC: chleroy@kernel.org
+> CC: 3chas3@gmail.com
+> CC: razor@blackwall.org
+> CC: idosch@nvidia.com
+> CC: jani.nikula@intel.com
+> CC: mchehab+huawei@kernel.org
+> CC: tytso@mit.edu
+> CC: herbert@gondor.apana.org.au
+> CC: geert@linux-m68k.org
+> CC: ebiggers@kernel.org
+> CC: johannes.berg@intel.com
+> CC: jonathan.cameron@huawei.com
+> CC: kees@kernel.org
+> CC: kuniyu@google.com
+> CC: fourier.thomas@gmail.com
+> CC: andriy.shevchenko@intel.com
+> CC: rdunlap@infradead.org
+> CC: akpm@linux-foundation.org
+> CC: linux-doc@vger.kernel.org
+> CC: linux-mips@vger.kernel.org
+> CC: linuxppc-dev@lists.ozlabs.org
+> CC: bridge@lists.linux.dev
+> CC: dwmw2@infradead.org
+> CC: herbert@gondor.apana.org.au
 
-I will look into the CAM table info in rtl8367c family.
+Acked-by: Andy Shevchenko <andriy.shevchenko@intel.com>
 
-> On Wed, Apr 1, 2026 at 1:01=E2=80=AFAM Luiz Angelo Daros de Luca
-> <luizluca@gmail.com> wrote:
->
-> > +int rtl8365mb_l2_del_mc(struct realtek_priv *priv, u16 port,
-> > +                       const unsigned char mac_addr[static ETH_ALEN],
-> > +                       u16 vid)
-> > +int rtl8365mb_l2_get_next_uc(struct realtek_priv *priv, u16 *addr, u16=
- port,
-> > +                            struct rtl8365mb_l2_uc *uc);
-> > +int rtl8365mb_l2_add_uc(struct realtek_priv *priv, u16 port,
-> > +                       const unsigned char addr[static ETH_ALEN],
-> > +                       u16 efid, u16 vid);
-> > +int rtl8365mb_l2_del_uc(struct realtek_priv *priv, u16 port,
-> > +                       const unsigned char addr[static ETH_ALEN],
-> > +                       u16 efid, u16 vid);
-> > +int rtl8365mb_l2_flush(struct realtek_priv *priv, int port, u16 vid);
-> > +
-> > +int rtl8365mb_l2_add_mc(struct realtek_priv *priv, u16 port,
-> > +                       const unsigned char mac_addr[static ETH_ALEN],
-> > +                       u16 vid);
-> > +int rtl8365mb_l2_del_mc(struct realtek_priv *priv, u16 port,
-> > +                       const unsigned char mac_addr[static ETH_ALEN],
-> > +                       u16 vid);
->
-> I think it would make sense to add these to struct realtek_ops and
->  make them available for all RTL8366 variants.
+P.S.
+Since it's almost removal and it will go via netdev tree (same tree you are
+maintaining, I suppose) the -D would have a big help to review the changes
+(and not see removals at all, as 32k lines of one email is too much).
 
-Agreed. I will add these to struct realtek_ops. I'll need to create a
-generic replacement for struct rtl8365mb_l2_uc, but the rest of the
-migration should be straightforward. For now, the efid argument can
-simply be ignored by the RTL8366 implementation.
+-- 
+With Best Regards,
+Andy Shevchenko
 
-> Possibly it would even make sense to move rtl8365mb_table_query()
-> to struct realtek_ops under the name .table_query and all of
-> these helpers to rtl8366-core.c as rtl8366_l2_del_mc() etc
-> just calling the per-chip table query variant. I'm not sure
-> but you can perhaps see what makes most sense?
 
-I suspect rtl8365mb_table_query() might be too complex to abstract
-effectively without first seeing how the RTL8366 handles table
-lookups, as hardware-specific behaviors can vary significantly here. I
-suggest we implement it for the RTL8366 first; once we have a
-reference point, we can discuss the best way to consolidate the logic.
-
-> > +       struct mutex l2_lock;
->
-> Move to struct realtek_priv, every chip will need an l2 lock.
-
-Sure.
-
-> > +static void rtl8365mb_port_fast_age(struct dsa_switch *ds, int port)
-> > +static int rtl8365mb_port_fdb_add(struct dsa_switch *ds, int port,
-> > +                                 const unsigned char *addr, u16 vid,
-> > +                                 struct dsa_db db)
-> > +static int rtl8365mb_port_fdb_del(struct dsa_switch *ds, int port,
-> > +                                 const unsigned char *addr, u16 vid,
-> > +                                 struct dsa_db db)
-> > +static int rtl8365mb_port_fdb_dump(struct dsa_switch *ds, int port,
-> > +                                  dsa_fdb_dump_cb_t *cb, void *data)
-> > +static int rtl8365mb_port_mdb_add(struct dsa_switch *ds, int port,
-> > +                                 const struct switchdev_obj_port_mdb *=
-mdb,
-> > +                                 struct dsa_db db)
-> > +static int rtl8365mb_port_mdb_del(struct dsa_switch *ds, int port,
-> > +                                 const struct switchdev_obj_port_mdb *=
-mdb,
-> > +                                 struct dsa_db db)
->
-> I think you should rename all of these rtl8366_port_* and move them
-> to rtl8366-core.c. They are generic.
-
-Yes. Once rtl8365mb_l2_* is moved to realtek_ops, these functions
-become generic wrappers and fit perfectly in rtl83xx.c.
-
-> > @@ -2498,6 +2687,12 @@ static const struct dsa_switch_ops rtl8365mb_swi=
-tch_ops =3D {
-> >         .port_bridge_join =3D rtl8365mb_port_bridge_join,
-> >         .port_bridge_leave =3D rtl8365mb_port_bridge_leave,
-> >         .port_stp_state_set =3D rtl8365mb_port_stp_state_set,
-> > +       .port_fast_age =3D rtl8365mb_port_fast_age,
->
-> .port_fast_age =3D rtl8366_port_fast_age,
-
-I will update the ops to use the new generics.
-
-Regards,
-
-Luiz
 
