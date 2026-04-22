@@ -1,70 +1,97 @@
-Return-Path: <netdev+bounces-280371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280375-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KPpOL4+b6GlNNQIAu9opvQ
-	(envelope-from <netdev+bounces-280371-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 11:57:35 +0200
+	id uOi5HY6f6GkLNgIAu9opvQ
+	(envelope-from <netdev+bounces-280375-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:14:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39634444549
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 11:57:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D350D44486A
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 12:14:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3F39D30162B9
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 09:57:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DE29D30812AC
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:09:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C94B53CAE72;
-	Wed, 22 Apr 2026 09:57:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34F753CBE86;
+	Wed, 22 Apr 2026 10:09:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=prodrive-technologies.com header.i=@prodrive-technologies.com header.b="mBQvOr3r"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11023082.outbound.protection.outlook.com [52.101.83.82])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 901413CAE7D
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 09:57:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776851845; cv=none; b=QBmTzZfYONNCvnYcGbh6qZCBXHm+SZEZSM1BPLkZtB8+PpJLjvXNRPyOxcVErpJIhPBjVtwJHTE2TDZvHm8H7xhtGMJCFEumbPfcHGYtjonONwq75j3WKhPHW57MGrVJbc4/nzMbtJVf7FppV4a/DD9GjgKkPeAbqQDpLTgsZs0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776851845; c=relaxed/simple;
-	bh=EVcQBeuVuB9XJd5hTp//WhXf03UQpYqnATPnVvCRWok=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=d7+pEgYjZR534IlQ0L4TEfqrlAUdoTFdBKLQyNQU+BzHCZjPXsSbQ9HUBZKMChgfKwDNRUAKVUAgE9/5ETLjl3lprNJAP+ormdfZ+NX99uhzRqI3s5ffdeTr1zcb6/pnXKSeSnr2WECmvo5T5PwCaQbAB4FFfbww4TTTyMoszWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.169.211.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: esmtpgz13t1776851806t8ce421d9
-X-QQ-Originating-IP: UXNweAQS4IM/EehiCjFK69lZ2D9c2ZA6uLlf0pgP4I0=
-Received: from lap-jiawenwu.trustnetic.com ( [115.220.225.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 22 Apr 2026 17:56:44 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 7649180331162594493
-EX-QQ-RecipientCnt: 17
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org
-Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Simon Horman <horms@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	Larysa Zaremba <larysa.zaremba@intel.com>,
-	Breno Leitao <leitao@debian.org>,
-	Joe Damato <joe@dama.to>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Fabio Baltieri <fabio.baltieri@gmail.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [RFC PATCH net-next 5/5] net: wangxun: implement pci_error_handlers ops
-Date: Wed, 22 Apr 2026 17:56:17 +0800
-Message-Id: <20260422095617.27080-6-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <20260422095617.27080-1-jiawenwu@trustnetic.com>
-References: <20260422095617.27080-1-jiawenwu@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D9BB3CBE78;
+	Wed, 22 Apr 2026 10:09:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.82
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776852586; cv=fail; b=NCePHHrhQ+smhH7xGrYvn42+mD28cb4aQEe9bT1mbGN1Tc+dItAecPY0loeXg23ohUTE5yLWG8uwhRUCKfVN9/Uvm/d8yB06Q4WlLt8GCcs+RwGI/H8tGNHKMTedTvj2xx3ajQGWvbq97XBDyjiky9K+XuRZtaHGxQB1HKb3q34=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776852586; c=relaxed/simple;
+	bh=bPvZ/jPKr0jcZK2JuyKc7tPKnIxUa4VWpKyYn9c379M=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Qv1IHcpBrXXcM0Fk3wJh2TQKZNJIMGSm+UNs4NN7JQJXKJuLRRPZ0XuCoWiIDoRi7THBCFYgzS4kop1tD6x3eH0i67AWGwKtu/p1yOQe+OVOxOWksIN+4gmku/R67iG4ECZL1aEtvrcGeWvlO3RtHUtjJzXWt5YTfzdFqDW9X74=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=prodrive-technologies.com; spf=pass smtp.mailfrom=prodrive-technologies.com; dkim=pass (1024-bit key) header.d=prodrive-technologies.com header.i=@prodrive-technologies.com header.b=mBQvOr3r; arc=fail smtp.client-ip=52.101.83.82
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=prodrive-technologies.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prodrive-technologies.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=zJ22slWFv04MQXuGX7X4epy65hg4ZvHJh2AJJs+B8fDMOEWtU4yjimtizQnTssQNhZGvK1Mgl1g/AmbeL1gE2jEfUJmGJQffKECe22OVR0Q7cjs0swNd50yoY0iZJvSeOum0aVPxrJj+xWOZP8AEy4HvbEkLHdtH0wGhCgeKO8w6vJgimdLhd3x12O80QLJUGqTntoYEQy/MJWRJ2FvxtrBQKOkNHzX9nzNJAtmuTT183YdJDfUSL2ITVcy7cHp+G04RMBK4R0cn4C9dw4HEG51x2byHN3SXZnD7PE1AaY35l5yPtvavtju3O4SDV6sp8OF0BuCbxLf+M+qHpiKEcQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gx69FgFVFkN5cVIxZ+PQDv5WJQ7ttMf3jz5SZ/O8DTg=;
+ b=wGBekHAw0pxMEZfJ7yfVymVRJ9ahh+Ifm81+ofjE/i59AhHcfA34oXJ/wQl3Iq7mOr7vX8KK3WyqxhylSs3WDoTt/zFU3vYhKVS7YFeVTyqx75GIz43O8606rFhR7zTDk1WKptzzPyRJzdt14GJXVaVYGPGoBQfWliNBt7Wgg3C3FLoxVV6PGFJ4r+q5VpbweEQpKswwkibPiwQnCyXFDulvo8Gnp/SXhVJcRuv4UJPBHN+j/KclFNmLi/w2ho7PzmFa5O/l2OCtSuhb/zLCh3FEux0Jn8rwRikJ4Z2/WV9ri1+6qkUnhqTqT/mikPRkVwnzuOnCg2YFR2Ib0pJ4tQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 212.61.153.67) smtp.rcpttodomain=animalcreek.com
+ smtp.mailfrom=prodrive-technologies.com; dmarc=pass (p=reject sp=reject
+ pct=100) action=none header.from=prodrive-technologies.com; dkim=none
+ (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=prodrive-technologies.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gx69FgFVFkN5cVIxZ+PQDv5WJQ7ttMf3jz5SZ/O8DTg=;
+ b=mBQvOr3rC0X3+Z9qE0nLK/JxeTAdG+Nm3tR13pMgJQzgUp66iZhJpDAGtyRJE1bODfFIcgbiAMlUv1yrEZtYX2+BbX+1qyAOLjugHisL84Uu6vWcSzaoKG6LYju+hYnolb5EXVj9YAVVYQ5Po+Ea5HFtWTapDBYfEnvvV0MgMZA=
+Received: from AS9PR05CA0174.eurprd05.prod.outlook.com (2603:10a6:20b:496::6)
+ by VI2PR02MB10999.eurprd02.prod.outlook.com (2603:10a6:800:27b::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.19; Wed, 22 Apr
+ 2026 10:09:36 +0000
+Received: from AMS0EPF000001B0.eurprd05.prod.outlook.com
+ (2603:10a6:20b:496:cafe::a2) by AS9PR05CA0174.outlook.office365.com
+ (2603:10a6:20b:496::6) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9791.48 via Frontend Transport; Wed,
+ 22 Apr 2026 10:09:36 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 212.61.153.67)
+ smtp.mailfrom=prodrive-technologies.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=prodrive-technologies.com;
+Received-SPF: Pass (protection.outlook.com: domain of
+ prodrive-technologies.com designates 212.61.153.67 as permitted sender)
+ receiver=protection.outlook.com; client-ip=212.61.153.67;
+ helo=webmail.prodrive.nl; pr=C
+Received: from webmail.prodrive.nl (212.61.153.67) by
+ AMS0EPF000001B0.mail.protection.outlook.com (10.167.16.164) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9846.18 via Frontend Transport; Wed, 22 Apr 2026 10:09:36 +0000
+Received: from EXCOP01.bk.prodrive.nl (10.1.0.22) by EXCOP01.bk.prodrive.nl
+ (10.1.0.22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.39; Wed, 22 Apr
+ 2026 12:09:35 +0200
+Received: from lnxdevrm02.bk.prodrive.nl (10.1.1.121) by
+ EXCOP01.bk.prodrive.nl (10.1.0.22) with Microsoft SMTP Server id 15.2.1748.39
+ via Frontend Transport; Wed, 22 Apr 2026 12:09:35 +0200
+Received: from paugeu by lnxdevrm02.bk.prodrive.nl with local (Exim 4.96)
+	(envelope-from <paul.geurts@prodrive-technologies.com>)
+	id 1wFUWV-002RiT-0S;
+	Wed, 22 Apr 2026 12:09:35 +0200
+From: Paul Geurts <paul.geurts@prodrive-technologies.com>
+To: <mgreer@animalcreek.com>, <sameo@linux.intel.com>,
+	<linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: <martijn.de.gouw@prodrive-technologies.com>, Paul Geurts
+	<paul.geurts@prodrive-technologies.com>
+Subject: [PATCH] NFC: trf7970a: Ignore antenna noise when checking for RF field
+Date: Wed, 22 Apr 2026 12:09:30 +0200
+Message-ID: <20260422100930.581237-1-paul.geurts@prodrive-technologies.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,296 +99,100 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: MQsReL9Bie4Ql6g1HBbnamLmD7QFGQCrbqe7RQK85GkQn+Rgo6YQ6LW7
-	+r3W1VoUYGv2uE8IblcCTkfdiBfN/sNb4BGPMbOs0xwBOkktBy/V/aj8QwrfMbK8OhHYF4f
-	XREERe9g3faxKvYqVQC2Z/UNOYsh65XM637xTvRkxeOni0qghdhU2FcfUNdZ7IdgoL3OWVB
-	6iKTzGpiqXwVQH11OXLFUiZKdvOz3jKb7TPyyErZom+9Fm8DPfxVtaZ9uxgw6QPvy5QMwBJ
-	HX2/uPJM6hwEve0B1ZxLuz6Sfpi6E0A7ZbifImKWrE36EfSoq6BJx3i59CO6aYnHJ1gkCG0
-	sCjWxU2VZlagHOMqlP+lsEx79E+mNami8NSqmUWB3UJgGD0iRmwwuzlajhmOWSyXrQa3ZVP
-	P2wBNdZXbDtfTiEFMEmydw08BCzFYkp0mHS/yHmyP7uAVTxGNH3cXLnc/I7O6ZjccDxzmJ+
-	5Uj88/a8H2EI3m1VXTkaKghQoYDPo8cdtpZ4qgTqiImD7rFnl9yUNs2VB420s8ryRxTmqH7
-	a/fbKY5Rjw0VkdOr9pfG5aC2AOi2G6gEUau1PIgChu8QI6kBvk/4IPX4gD6aUyI/wukVguW
-	TAxeBp2ginkhG9ONqKnYHgXQMBFO9ePsBkbtepFjqKGmuI687myBwDa1Uoh6vWg05nby7xr
-	lM+WRVbXyLe0NZeKoi73LA3h0Mi2GbITuskymSKg8kQoIm9ehSG8CqXvP5E0u55flJeCGi8
-	e8r8Jyjyh1ZlsalfMQUQcduBYrGsSW2l4xYcrLJY3Kzdvn2tIXy990vSpdfPvGy23JT6aMW
-	cfEr1dQcadUKnvEpwM+hejQpCXnAs9YbI137Qn+L7hWqCoAoo6tF3jTCJqOFIhLzsn77QwT
-	xApY9LOso08wAw0JAOOp8JPo7kpmJZqTuSY2t8KcSXBtxHEy+rjHwI9Rwxwocyhp3+IWJw3
-	Rl+L0ID6Yz3j/ft/+dsg+lPOKbRwyBb/pSKXhHLr+Fvr7Vj3TNUO1OZG4gvJdVAUaQkCmDZ
-	beMF24mjnHuduMyyhnaIfQa6wt/DpdW5O1l3bmXExvgVRqOq/w7Ta3G2F+sOixnPNccQmN6
-	YKBN5PUAjsR9U3pw4H+j4tn5KNNAVQfSQ==
-X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
-X-QQ-RECHKSPAM: 0
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AMS0EPF000001B0:EE_|VI2PR02MB10999:EE_
+X-MS-Office365-Filtering-Correlation-Id: b05fa4d7-3d42-4b82-14c5-08dea05741e0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700016|376014|82310400026|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	AQGCjCb0cFu/XR9/Kkb6mJkSBTXwM3Ot73fjtc80RXskgLUC1Z3zmCdJpaxdH44rG3UyTORDxk2DR6d7S7DkKhbu1OQDRJNRrRxOqsnFED03nF1fFzfr+2Qv/E+teSYq/3wgaZM50gztDsftRaSd43YaSTQ27kzhieS/Aj20hKjH3sQT529N/V8rjLZ5qQDLQrbRIYOSyaaroQWVSjAUL4OM0C6SjDRytWRs/5h+eogaCXR4T8WwEj/8/YS0mA1w8ciOOKx+Clpq0J0ScK2u2kfi34xj+cRQNXeHSjpioKzphCV7abrH6waHqKfYjVcJAIO2attb+Htsdi4l0NHJr826nSYIxwyPsP/9TEPEvGjoOigTo8wAAq1rbgEp1vL2aHzoSVty+r9GfCrQOji/DxJfJJQwsrsntMUim/VvegUSwAwCtxlb0yA+O2e++Ov4svuwttziF5H+l2Y4rAEKbxgRziYZx6tVX1ADRux39z1pIM6egU3sk8UL+WKFztJmzB7uEpcHymYEXh03vsjWjGwJLkZroYBBinNrixrmTxjQ55qAtSdh5HWFJ/gLOM5t05WS5df31BMdszU7j/spUg+6H4CbIay3WhFqChlxwLsZ/6OEarlyuYit9a3Kalhq7++Tkr0biwJ9UR+2rV55WXKTvO9dfq31yOOJHLPoCKW1emn8Rfe6RZU816YyqLBZYw/iM1g9blpAd95bD4La/GNqiV0AY1mKbLGstDJw6XVyKkuk/n4dfXkWN6/PgMHuCrFEEx0JRRp3YQTXI8ptKw==
+X-Forefront-Antispam-Report:
+	CIP:212.61.153.67;CTRY:NL;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:webmail.prodrive.nl;PTR:mail.prodrive-technologies.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700016)(376014)(82310400026)(18002099003)(56012099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	yessdqGPVb1BjY2ugm8Mm8RI6FXwjq19Gga9qUxEvP+PZ6OUb3oNYsXnrK4KmH5UsrHCpErWW2WZuoqCp1ZufLqx2vB0pSzBm4q1PoDbr13hU9Jm26uQf0WKQU4b8mWTIWFJKfBeNuF1EKrTufUYI2b1v1N1HYkZuqvPn3RlzV112/rrcU/PFiWiRllOhAKX7UFVK27RNyrDyB21kNczYCTzKT2epAzZSPyEnalf1E2xtIlU3hmliRcYAeQEvoQyyU4VcdoVI6aUNyw88YJvqigVJfUBTsWh9B0x7kZ/IMdTnuno7qPlOqzp2S7WuDjRX0YNUpAkFChPChSKsvvuJls1eoY2KGMp4LoMIyjoOi6Gsy5y4LYIhM3GvZ/s7gB+TJ4AgeRiPYPUIBmL36nCV4AXz8Z5VZmECFcUH/y9FtvSyL/LCpp7H5eMbdVNE+P0
+X-OriginatorOrg: prodrive-technologies.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2026 10:09:36.0224
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b05fa4d7-3d42-4b82-14c5-08dea05741e0
+X-MS-Exchange-CrossTenant-Id: 612607c9-5af7-4e7f-8976-faf1ae77be60
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=612607c9-5af7-4e7f-8976-faf1ae77be60;Ip=[212.61.153.67];Helo=[webmail.prodrive.nl]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AMS0EPF000001B0.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI2PR02MB10999
+X-Spamd-Result: default: False [1.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[prodrive-technologies.com,reject];
+	R_DKIM_ALLOW(-0.20)[prodrive-technologies.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280371-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-280375-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[prodrive-technologies.com:email,prodrive-technologies.com:dkim,prodrive-technologies.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[trustnetic.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,intel.com,debian.org,dama.to,trustnetic.com];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DKIM_TRACE(0.00)[prodrive-technologies.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[paul.geurts@prodrive-technologies.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.993];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 39634444549
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Rspamd-Queue-Id: D350D44486A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Support AER driver to handle the PCIe errors.
+The main channel Received Signal Strength Indicator (RSSI) measurement
+is used to determine whether an RF field is present or not. RSSI != 0
+is interpreted as an RF Field is present. This does not take RF noise
+and measurement inaccuracy into account, and results in false positives
+in the field.
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+Define a noise level and make sure the RF field is only interpreted as
+present when the RSSI is above the noise level.
+
+Fixes: 851ee3cbf850 ("NFC: trf7970a: Don't turn on RF if there is already an RF field")
+Signed-off-by: Paul Geurts <paul.geurts@prodrive-technologies.com>
 ---
- drivers/net/ethernet/wangxun/libwx/wx_err.c   | 107 ++++++++++++++++++
- drivers/net/ethernet/wangxun/libwx/wx_err.h   |   2 +
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |   1 +
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |   9 +-
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   5 +-
- 5 files changed, 121 insertions(+), 3 deletions(-)
+ drivers/nfc/trf7970a.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.c b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-index e7c9dcb148b5..1aefae402c8e 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_err.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-@@ -3,11 +3,118 @@
+diff --git a/drivers/nfc/trf7970a.c b/drivers/nfc/trf7970a.c
+index d17c701c7888..08c27bb438b5 100644
+--- a/drivers/nfc/trf7970a.c
++++ b/drivers/nfc/trf7970a.c
+@@ -317,6 +317,7 @@
+ #define TRF7970A_RSSI_OSC_STATUS_RSSI_MASK	(BIT(2) | BIT(1) | BIT(0))
+ #define TRF7970A_RSSI_OSC_STATUS_RSSI_X_MASK	(BIT(5) | BIT(4) | BIT(3))
+ #define TRF7970A_RSSI_OSC_STATUS_RSSI_OSC_OK	BIT(6)
++#define TRF7970A_RSSI_OSC_STATUS_RSSI_NOISE_LEVEL	1
  
- #include <linux/netdevice.h>
- #include <linux/pci.h>
-+#include <linux/aer.h>
+ #define TRF7970A_SPECIAL_FCN_REG1_COL_7_6		BIT(0)
+ #define TRF7970A_SPECIAL_FCN_REG1_14_ANTICOLL		BIT(1)
+@@ -1300,7 +1301,7 @@ static int trf7970a_is_rf_field(struct trf7970a *trf, bool *is_rf_field)
+ 	if (ret)
+ 		return ret;
  
- #include "wx_type.h"
- #include "wx_lib.h"
- #include "wx_err.h"
- 
-+/**
-+ * wx_io_error_detected - called when PCI error is detected
-+ * @pdev: Pointer to PCI device
-+ * @state: The current pci connection state
-+ *
-+ * Return: pci_ers_result_t.
-+ *
-+ * This function is called after a PCI bus error affecting
-+ * this device has been detected.
-+ */
-+static pci_ers_result_t wx_io_error_detected(struct pci_dev *pdev,
-+					     pci_channel_state_t state)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	struct net_device *netdev;
-+
-+	netdev = wx->netdev;
-+	if (!netif_device_present(netdev))
-+		return PCI_ERS_RESULT_DISCONNECT;
-+
-+	rtnl_lock();
-+	netif_device_detach(netdev);
-+
-+	if (netif_running(netdev))
-+		wx->close_suspend(wx);
-+
-+	if (state == pci_channel_io_perm_failure) {
-+		rtnl_unlock();
-+		return PCI_ERS_RESULT_DISCONNECT;
-+	}
-+
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
-+	rtnl_unlock();
-+
-+	/* Request a slot reset. */
-+	return PCI_ERS_RESULT_NEED_RESET;
-+}
-+
-+/**
-+ * wx_io_slot_reset - called after the pci bus has been reset.
-+ * @pdev: Pointer to PCI device
-+ *
-+ * Return: pci_ers_result_t.
-+ *
-+ * Restart the card from scratch, as if from a cold-boot.
-+ */
-+static pci_ers_result_t wx_io_slot_reset(struct pci_dev *pdev)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	pci_ers_result_t result;
-+
-+	if (pci_enable_device_mem(pdev)) {
-+		wx_err(wx, "Cannot re-enable PCI device after reset.\n");
-+		result = PCI_ERS_RESULT_DISCONNECT;
-+	} else {
-+		/* make all bar access done before reset. */
-+		smp_mb__before_atomic();
-+		clear_bit(WX_STATE_DISABLED, wx->state);
-+		pci_set_master(pdev);
-+		pci_restore_state(pdev);
-+		pci_wake_from_d3(pdev, false);
-+
-+		wx->do_reset(wx->netdev, false);
-+		result = PCI_ERS_RESULT_RECOVERED;
-+	}
-+
-+	pci_aer_clear_nonfatal_status(pdev);
-+
-+	return result;
-+}
-+
-+/**
-+ * wx_io_resume - called when traffic can start flowing again.
-+ * @pdev: Pointer to PCI device
-+ *
-+ * This callback is called when the error recovery driver tells us that
-+ * its OK to resume normal operation.
-+ */
-+static void wx_io_resume(struct pci_dev *pdev)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	struct net_device *netdev;
-+	int err;
-+
-+	netdev = wx->netdev;
-+	rtnl_lock();
-+	if (netif_running(netdev)) {
-+		err = netdev->netdev_ops->ndo_open(netdev);
-+		if (err) {
-+			wx_err(wx, "Failed to open netdev after reset\n");
-+			goto out;
-+		}
-+	}
-+	netif_device_attach(netdev);
-+out:
-+	rtnl_unlock();
-+}
-+
-+const struct pci_error_handlers wx_err_handler = {
-+	.error_detected = wx_io_error_detected,
-+	.slot_reset = wx_io_slot_reset,
-+	.resume = wx_io_resume,
-+};
-+EXPORT_SYMBOL(wx_err_handler);
-+
- static void wx_reset_subtask(struct wx *wx)
- {
- 	if (!test_bit(WX_FLAG_NEED_PF_RESET, wx->flags))
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.h b/drivers/net/ethernet/wangxun/libwx/wx_err.h
-index e317e6c8d928..8b1a7863b5b1 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_err.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_err.h
-@@ -7,6 +7,8 @@
- #ifndef _WX_ERR_H_
- #define _WX_ERR_H_
- 
-+extern const struct pci_error_handlers wx_err_handler;
-+
- void wx_handle_errors_subtask(struct wx *wx);
- void wx_tx_timeout(struct net_device *netdev, unsigned int txqueue);
- void wx_handle_tx_hang(struct wx_ring *tx_ring, unsigned int next);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index 4b72835ddec1..81e12609d3fa 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -1215,6 +1215,7 @@ enum wx_state {
- 	WX_STATE_PTP_RUNNING,
- 	WX_STATE_PTP_TX_IN_PROGRESS,
- 	WX_STATE_SERVICE_SCHED,
-+	WX_STATE_DISABLED,
- 	WX_STATE_NBITS		/* must be last */
- };
- 
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index bd6c0c9c51ba..a174605d1105 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -570,7 +570,8 @@ static void ngbe_dev_shutdown(struct pci_dev *pdev, bool *enable_wake)
- 	*enable_wake = !!wufc;
- 	wx_control_hw(wx, false);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- static void ngbe_shutdown(struct pci_dev *pdev)
-@@ -856,6 +857,7 @@ static int ngbe_probe(struct pci_dev *pdev,
- 		goto err_register;
- 
- 	pci_set_drvdata(pdev, wx);
-+	pci_save_state(pdev);
- 
- 	return 0;
- 
-@@ -907,7 +909,8 @@ static void ngbe_remove(struct pci_dev *pdev)
- 	kfree(wx->mac_table);
- 	wx_clear_interrupt_scheme(wx);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- static int ngbe_suspend(struct pci_dev *pdev, pm_message_t state)
-@@ -934,6 +937,7 @@ static int ngbe_resume(struct pci_dev *pdev)
- 		wx_err(wx, "Cannot enable PCI device from suspend\n");
- 		return err;
- 	}
-+	clear_bit(WX_STATE_DISABLED, wx->state);
- 	pci_set_master(pdev);
- 	device_wakeup_disable(&pdev->dev);
- 
-@@ -958,6 +962,7 @@ static struct pci_driver ngbe_driver = {
- 	.resume   = ngbe_resume,
- 	.shutdown = ngbe_shutdown,
- 	.sriov_configure = wx_pci_sriov_configure,
-+	.err_handler = &wx_err_handler,
- };
- 
- module_pci_driver(ngbe_driver);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index 20969dd7d47a..56e8482c1896 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -899,6 +899,7 @@ static int txgbe_probe(struct pci_dev *pdev,
- 		goto err_remove_phy;
- 
- 	pci_set_drvdata(pdev, wx);
-+	pci_save_state(pdev);
- 
- 	netif_tx_stop_all_queues(netdev);
- 
-@@ -969,7 +970,8 @@ static void txgbe_remove(struct pci_dev *pdev)
- 	kfree(wx->mac_table);
- 	wx_clear_interrupt_scheme(wx);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- static struct pci_driver txgbe_driver = {
-@@ -979,6 +981,7 @@ static struct pci_driver txgbe_driver = {
- 	.remove   = txgbe_remove,
- 	.shutdown = txgbe_shutdown,
- 	.sriov_configure = wx_pci_sriov_configure,
-+	.err_handler = &wx_err_handler,
- };
- 
- module_pci_driver(txgbe_driver);
+-	if (rssi & TRF7970A_RSSI_OSC_STATUS_RSSI_MASK)
++	if ((rssi & TRF7970A_RSSI_OSC_STATUS_RSSI_MASK) > TRF7970A_RSSI_OSC_STATUS_RSSI_NOISE_LEVEL)
+ 		*is_rf_field = true;
+ 	else
+ 		*is_rf_field = false;
 -- 
-2.51.0
+2.39.2
 
 
