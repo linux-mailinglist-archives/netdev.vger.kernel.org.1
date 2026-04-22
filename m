@@ -1,80 +1,82 @@
-Return-Path: <netdev+bounces-280462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280463-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KFdsMsDx6GkdRwIAu9opvQ
-	(envelope-from <netdev+bounces-280462-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:05:20 +0200
+	id MLUHBGfy6GkdRwIAu9opvQ
+	(envelope-from <netdev+bounces-280463-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:08:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AD4D4483B5
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:05:15 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2FF34483FA
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:08:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 69E4D30065D2
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 16:05:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B1A8E305FA06
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 16:05:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C22F637AA6C;
-	Wed, 22 Apr 2026 16:05:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D24837C912;
+	Wed, 22 Apr 2026 16:05:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BZbRHzgP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gica2eBG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA5C37CD3C
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 16:05:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA3F937D13A
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 16:05:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776873909; cv=none; b=XXb1Yd9DcVIBSZ3xOl8+f+DABK7Wq2LMVIvwBOkaIQvM/85yDAnSZysjCKRpb2Cwp2INpsbTM/Qy85Lo+2qiN+V3kyuYUysI5w++mKWUrynylzQEYjoftQMy5KA22Fz2n7BNlBtnIBzb6Jbwk7X0jKEVGduAJEUPoCV4F6phxk8=
+	t=1776873910; cv=none; b=Q5Z3X32Jmr2IOrB1+J4kUMTcEkVDdftdNsUQrK+WHuXYe5suB0c8myz9DNxDJocvm/FAIquwqmninH1G7cHRWp3U8vdN7baHU7h571+WjCGVCN7SeIzk+ZgN1rp7qWxgBhI4gu8/16TgNN1Q33zX2o76NTTDU2+c4wN3Olt9CoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776873909; c=relaxed/simple;
-	bh=MTFLpvqVFwD4wOUmZSXx4b0ZH4SvpKBE09cohDgGFFU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DBwLfp0sA6sjuSfMWQ4ZmK2Zs/MvlD6yM9+Ppd6YKClak9fXqJ0NbWvAO8gMiJHP8+mtsUVqYtS54gfRxuEksC+rRMvrHalwoF1QxNXqbWpOKY1Is9330+6vmaIm91WIV5jQmW408KL1U15j2Bmv+RdDyaGV82iwdvot7bmopsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BZbRHzgP; arc=none smtp.client-ip=209.85.221.171
+	s=arc-20240116; t=1776873910; c=relaxed/simple;
+	bh=VQKE++kSkNnafuk9pDx8+P5r00uAWKMmjuCw7JxQ0NE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=BknmKbIlh+dFuFCDwJGeJiSdtDAfWu2UFWXEhLPjcMbATOcGOarUT+UBm5hJOlkXHqfKrpJgBxKkXngNIZBtbBbNl6NJzsnPdBssGulxHnf44H6/hcmL+UNGh1bsDMOLlcxBn8s9G0hEV3Q5mPIOB23adhGU7htZGYpWtb/mpXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gica2eBG; arc=none smtp.client-ip=209.85.217.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-56f75445470so3406978e0c.2
-        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 09:05:05 -0700 (PDT)
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-6108228a851so1930299137.0
+        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 09:05:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776873905; x=1777478705; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=24ucL5O3EzfMhPg47OjudcgTvu+hLai1chIqdTg8Gs8=;
-        b=BZbRHzgP/WAnZzspo62I5qcgLW9G2PdSkMExOt+6ndvEbBI/DFD49xfqkgX4gzy2ti
-         oN4+ThKSzLC0+xs/Rj06mSQJjg0rit99DauF4UHdsI95knJLkaAAIKlcgMyc4K8Szggj
-         d4BgZrjuZf3kDNN/+fqYnxCUmpEQpb7Vp3HgBvRu/aOH/nZ5lTesh85dxhUsZWMgphuB
-         cXcK8LRqniQ3mWpKIpv8va5d16B1TjbhjD4ZgE0YGA9u3YRA5pSlC+3x41EApp7KpsEe
-         6JOW7fIVKy7oJ9p/wTtgjglFkdiZxE1cM1wEblhO8b6snIwd6+q5CskNgETQNh4vjqSv
-         N1ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776873905; x=1777478705;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1776873906; x=1777478706; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=24ucL5O3EzfMhPg47OjudcgTvu+hLai1chIqdTg8Gs8=;
-        b=KDscgwG/NRhizIDOHfQQiK/yK/PMnpTU0fzQQFLXZw7bc5MwlgW1oQb375e1vFeRnP
-         3uCA1nQtreDJWqMl+vglLKzl0dQtV1YR5+dFcGQ1yrJ+UiZNibtVGXZ28D7099fhARwN
-         7s8m4U9sdKBFFwq8cQg8u303bSnYTpCBJDa6piAejLV0L+khc8VfXtijVo2QjtgCfprm
-         zdP75UI3fHfS3oaeSQVOaLVyFoWA/68Rx8ajE0gU4zg48n2recNifvq1l8ZCWvjvE1Pt
-         /EvzyX5hyJKB5txelF2Nmo4qp1LjIegkUKUq3qf/RSPBBlsm4By8K/kGJrlFICZpBnRy
-         yQgQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8ZdQusbhqAutwCxmBilJTljJS0u4ey0iNno8tbCykFMZRmRj2QgVOrvCrqvmE1+9mnvXFrXwI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YymXPaj6uxDZs8r9E5QysOtOKBotHj+wcFjywZ9gxx5J1BILGkW
-	RvHTlUsEhAnbp462JOLRKEU+X3ipFjncRFF9lIEJnagZoIn7tDDqhnFl
-X-Gm-Gg: AeBDieveJAnvBvW6NhI6Og0K308zS3qy0zhi1BM/7XnyiT9+IGYlEb2bi6u393dSobV
-	DnA8lZM6m/SlxtmI8/fCO2h+VlM1XjXGpeVsAqB4/B80M+mm2SFERbLgywQHC33ElhO5Sid+RYY
-	WZtMJPKax4OwwlLhRUbC1dkby8ZdrvNRM02cE0yLEzeAbUOPFpCqfP7pTKIVa3WvP926yjWitPY
-	cHGMwq/FzfbwAnGLPsagOzHig5HD6VpIN9UL9YqV8oOyOKg1H6BLOZLjHLDrU2d956MiovzK2v1
-	bhjag/5O3xNejKzitaBZYOC7NwQsKKXD5k3gve7u4BmsGSbo14n7yMhhGHj8cfWKXmZENf1HxQb
-	s1o3TqU7YYxTNFbKNrfGfYhgRvVbDAtx+zRPurHlu835nsCPl8OwIAVembBeEx54wRdqseMUy/F
-	mq1EBM0Yh7Osc7LFwNbSE8Dq4rAPZC7f0eqFxdwK+jvF/z83r2KdKHzZHC8sEe8OABz7a1v+JeL
-	+lgyZVsfMR+iKJxDjmBo001zC+uWUo=
-X-Received: by 2002:a05:6122:4fa2:b0:56f:b2c3:d4d9 with SMTP id 71dfb90a1353d-56fb2c3daa2mr9155887e0c.14.1776873904625;
-        Wed, 22 Apr 2026 09:05:04 -0700 (PDT)
+        bh=dbIScAHLkzfolps6mpjGZEZ/01fVfgMv8ysDQ0vf3Jk=;
+        b=gica2eBGAKJXaP9LEss1tHCTUHXVXf8+exWJcWNUvCxyZ4HZOB1ZRIe3GEG8V8SZvB
+         Uoo+D8ID1zQQRGbDiL9AptZn445zEe2O0W16viafB/jxwResCBnO0r4t5Z4BtW8eScb1
+         5GybJi3mlchaNApHnSQLq9137Cyu4pTo8yut0QXe3+5KzhYtZIFJT6cKy06G2JZMA7Fd
+         9egIp0H0X4bD9k/+5ABSaFd+PaD5a0EBgswdIb7efsn2V7cElQHkHSKWAH0DQ78hXYda
+         MC62vGDwdU439cD0XXN8m/PvguwxNjJVDOBQ8yBBiEPXdiaThbhvaFNWhSABr8P4aJlW
+         cVGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776873906; x=1777478706;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=dbIScAHLkzfolps6mpjGZEZ/01fVfgMv8ysDQ0vf3Jk=;
+        b=p9BD4LKkvYxXceMWjMSoEUdWU3bvJiJmCORoDwpMBJND8wkfCfgN7YHq4n0AAz288E
+         jqYdxBgJsv1Ps//rgIq9REPi0cjRM5iZ5ITcaYTjX4ppIPzKZrYmX7zNBDYF6ai0sFrD
+         Hey6xzQgJ/aOeF7ngLrLm6JEIh+FPhxGsIp2ioRLxwjdh3c5QZWP8v9Lx2ciWqXflk8C
+         vQ37YT9hZrwBUKFQ2U0oknO6DiSTXtvdMIM9O0LGZIurVO+M2cv0yubgMkobLJVTKBa+
+         qRKY3udlGaeEwkw0UVSROWlnAW4Mmy3MBIQ2bAGZ6544RyzbukXT7WQmMjJZ42ET9MmC
+         7WGw==
+X-Forwarded-Encrypted: i=1; AFNElJ8WFa6lXWaH06XRPzexpA8TZQCWS7ZjWbdqjXaX+e5LkJ99UG3+n2zPkkWu35sVtn3zNIcdQv0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKB/0XxhnR/8dJiiF89S4VRaaexo3OaAa+1yZv+in7jJpvYudL
+	ORZlljEbGVkf/5p5a3OpYKWVbxZCQGj2sJ/XNV7hHLOpRCZrNr7k5XIX
+X-Gm-Gg: AeBDietw8ir76Os6i7JQfCqkgJ3tm2DwQyk21k2zJ5D2GyUn4uwsfMFCy841Hh/TmUy
+	qi+NG1rgWK4MMJXF2yobTbMt9sO1lKTti0cPXI761wbCC2gaw8PyDbUH+jjfmKwsTk7cs9yfiWR
+	9O15yhWDeeR0wSTlMgZEmbQBzsb6maqWIZU6y54fG8C6wKg/UIFiin7ydYMKgeU9ox/UOEo/XCb
+	tTjVF6fbHIR2DMeV1Nkorr616jc3p0445MR9JKeyC3W7IjGWsy4TDxz33O8FfpxiV6VU4S1e+XG
+	i+BAYoeabaKJ3mTOWGzO75wPD5O7CauSZ2Up7V5LIrs3ezcUWNY9xNsiQR5L8FkkAXJWQqqVNKT
+	yjfK3JUAYhIwLHIJXegn5ilmF0p3CsMRjoN5VAajq1qgbVAXPgJYctPOVaQNS8UMuxYd6dpMSKs
+	8eew3Prvn/CYtHgFdImAsF6uR1jxu2gwBTGOgoDp1D/T8ZybCV4SsTeYwxYH1DMGVKCXjzYo+64
+	NuLyIrYLXpk3FYHgHAfO0V5gHw6Xj8=
+X-Received: by 2002:a05:6102:5987:b0:613:95c8:d941 with SMTP id ada2fe7eead31-616f4f6f185mr10900447137.10.1776873906029;
+        Wed, 22 Apr 2026 09:05:06 -0700 (PDT)
 Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b02ac462d9sm136370786d6.7.2026.04.22.09.05.03
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b02ac462d9sm136370786d6.7.2026.04.22.09.05.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Apr 2026 09:05:03 -0700 (PDT)
+        Wed, 22 Apr 2026 09:05:05 -0700 (PDT)
 From: Michael Bommarito <michael.bommarito@gmail.com>
 To: Samuel Mendoza-Jonas <sam@mendozajonas.com>,
 	Paul Fertser <fercerpav@gmail.com>,
@@ -85,11 +87,14 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
 	linux-kernel@vger.kernel.org,
-	Michael Bommarito <michael.bommarito@gmail.com>
-Subject: [PATCH net 0/6] net/ncsi: harden packet parsing against malformed BMC replies
-Date: Wed, 22 Apr 2026 12:03:36 -0400
-Message-ID: <20260422160342.1975093-1-michael.bommarito@gmail.com>
+	Michael Bommarito <michael.bommarito@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net 1/6] net/ncsi: validate response packet lengths against the skb
+Date: Wed, 22 Apr 2026 12:03:37 -0400
+Message-ID: <20260422160342.1975093-2-michael.bommarito@gmail.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260422160342.1975093-1-michael.bommarito@gmail.com>
+References: <20260422160342.1975093-1-michael.bommarito@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,15 +107,16 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280462-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280463-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MAILSPIKE_FAIL(0.00)[172.232.135.74:query timed out];
+	URIBL_MULTI_FAIL(0.00)[tor.lore.kernel.org:server fail];
+	MAILSPIKE_FAIL(0.00)[172.105.105.114:query timed out];
 	FREEMAIL_TO(0.00)[mendozajonas.com,gmail.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
@@ -123,77 +129,72 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7AD4D4483B5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C2FF34483FA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-NC-SI treats the management controller as privileged, but the Linux
-packet parser still needs to reject malformed or truncated replies
-instead of walking past the skb or past its software filter tables.
+ncsi_rcv_rsp() reads the common packet header before checking that the
+skb contains enough data for it, and ncsi_validate_rsp_pkt() trusts
+the response payload length before accessing the checksum field.
 
-This series closes six linked parser issues in net/ncsi:
+Malformed NC-SI replies can therefore drive header and checksum reads
+past the received packet body. Make the dispatcher pull the common
+header first, then have ncsi_validate_rsp_pkt() pull the full response
+body before validating the packet.
 
-  - short replies accepted before response header/checksum reads
-  - GC/GP count fields exceeding software filter limits
-  - GMCMA address counts exceeding payload-backed addresses
-  - OEM response parsing that trusts vendor-specific payload offsets
-  - short AEN packets accepted before AEN header/payload reads
-  - GP payloads not checked against the consumed MAC/VLAN table bytes
+This keeps malformed responses on the error path instead of letting the
+parser walk past the skb payload.
 
-The threat model here is a compromised BMC or management-channel MITM
-on the NC-SI link. This is not internet-reachable remote input, so I am
-sending it as a public [PATCH net] series with Cc: stable rather than
-through security@.
+Fixes: 138635cc27c9 ("net/ncsi: NCSI response packet handler")
+Cc: stable@vger.kernel.org
+Assisted-by: Claude:claude-opus-4-7
+Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+---
+ net/ncsi/ncsi-rsp.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-Testing:
-
-  - x86_64 defconfig with CONFIG_NET_NCSI=y and
-    CONFIG_NCSI_OEM_CMD_GET_MAC=y:
-    `make -C ~/src/linux-mainline O=~/src/build-ncsi-bmc-oob ARCH=x86_64
-    -j$(nproc) net/ncsi/`
-  - live x86_64/KASAN QEMU guest for the GP path: guest `virtio-net`
-    registered with NCSI, `SP -> CIS -> GC -> GP` issued over the
-    `NCSI` generic-netlink family, and a host tap responder returning
-    matching NC-SI frames.  Without the series applied, a GP reply
-    with mac_cnt=65 triggers
-    `KASAN: slab-out-of-bounds in ncsi_rsp_handler_gp()`.  With the
-    series applied, the same reply is rejected with `-ERANGE` and no
-    KASAN report.
-  - synthetic A/B userspace harness covering the other malformed-
-    response cases: without the series, parsing either faults or
-    corrupts adjacent state; with the series, each case is rejected
-    or clamped at the parser boundary.
-
-Impact / regression notes:
-
-  - libclang call-graph query shows ncsi_validate_rsp_pkt() is only
-    reached from ncsi_rcv_rsp() and ncsi_rsp_handler_dc(), so the new
-    skb-length guard stays local to the response path.
-  - cscope shows ncsi_aen_handler() is only reached from ncsi_rcv_rsp(),
-    so the new AEN pulls stay local to AEN dispatch.
-  - cscope on n_vids shows the downstream consumers are the response
-    parser, the manage-side VLAN bitmap walkers, and ncsi-netlink's
-    channel dump path, which is the surface this series intentionally
-    tightens.
-
-Michael Bommarito (6):
-  net/ncsi: validate response packet lengths against the skb
-  net/ncsi: bound filter table state to software limits
-  net/ncsi: validate GMCMA address counts against the payload
-  net/ncsi: validate OEM response payloads before parsing
-  net/ncsi: validate AEN packet lengths against the skb
-  net/ncsi: validate GP payload lengths before parsing
-
- net/ncsi/ncsi-aen.c |  30 +++++++++---
- net/ncsi/ncsi-rsp.c | 114 ++++++++++++++++++++++++++++++++++++++++----
- 2 files changed, 128 insertions(+), 16 deletions(-)
-
+diff --git a/net/ncsi/ncsi-rsp.c b/net/ncsi/ncsi-rsp.c
+index fbd84bc8026a..1fe061ede26d 100644
+--- a/net/ncsi/ncsi-rsp.c
++++ b/net/ncsi/ncsi-rsp.c
+@@ -38,11 +38,18 @@ static int ncsi_validate_rsp_pkt(struct ncsi_request *nr,
+ 	struct ncsi_rsp_pkt_hdr *h;
+ 	u32 checksum;
+ 	__be32 *pchecksum;
++	unsigned int len;
+ 
+ 	/* Check NCSI packet header. We don't need validate
+ 	 * the packet type, which should have been checked
+ 	 * before calling this function.
+ 	 */
++	len = skb_network_offset(nr->rsp) + sizeof(*h) + ALIGN(payload, 4);
++	if (!pskb_may_pull(nr->rsp, len)) {
++		netdev_dbg(nr->ndp->ndev.dev, "NCSI: packet too short\n");
++		return -EINVAL;
++	}
++
+ 	h = (struct ncsi_rsp_pkt_hdr *)skb_network_header(nr->rsp);
+ 
+ 	if (h->common.revision != NCSI_PKT_REVISION) {
+@@ -1182,6 +1189,11 @@ int ncsi_rcv_rsp(struct sk_buff *skb, struct net_device *dev,
+ 	}
+ 
+ 	/* Check if it is AEN packet */
++	if (!pskb_may_pull(skb, skb_network_offset(skb) + sizeof(*hdr))) {
++		ret = -EINVAL;
++		goto err_free_skb;
++	}
++
+ 	hdr = (struct ncsi_pkt_hdr *)skb_network_header(skb);
+ 	if (hdr->type == NCSI_PKT_AEN)
+ 		return ncsi_aen_handler(ndp, skb);
 -- 
 2.53.0
+
 
