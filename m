@@ -1,196 +1,135 @@
-Return-Path: <netdev+bounces-280355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280357-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kBXLEU2M6Gk6LgIAu9opvQ
-	(envelope-from <netdev+bounces-280355-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:52:29 +0200
+	id eC+GDpCM6Gk6LgIAu9opvQ
+	(envelope-from <netdev+bounces-280357-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:53:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43F1A443A91
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:52:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87614443ABB
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:53:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9F19E30106B8
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 08:52:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 22721300B9EA
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 08:52:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 241133BED75;
-	Wed, 22 Apr 2026 08:52:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE7D4376BCC;
+	Wed, 22 Apr 2026 08:52:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ce+cA812"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JngPhmSr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38D526E71F;
-	Wed, 22 Apr 2026 08:52:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E10D2EA754
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 08:52:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776847939; cv=none; b=bBRuu1cuLzhk91xxRJTWozWQDLR37EFH+GIr7Lh0OuGUHM7VL8zGBZA32oWBZ+4XZ0G75ny2SQzFq90QWJH4yDcVuWBNBkCinKAh7/zgb0iWWkJyexRr5tfM+UcxvWjdleVNdX85pdl/wqhZzYt2MEL2DRQJdTJW6Gw1FLqVybY=
+	t=1776847978; cv=none; b=kg0PxpfU8SRvJZLao8yU3XXj09zkSSOufIJTLGcCHWuhbaFV/pDFeP9OHTuHNuXqiOfPw5LkFQsKzF+4QwMLaYjZMGR2H3ibOeWw09RNRol4pwm56yvaWXi29VzWmWXcrDskvhh1y3nqt+nM0Zf+JSlypKxogPXN1ewMLoOryW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776847939; c=relaxed/simple;
-	bh=Lqua1pS4ZmK47MXlRuBFRaKP4CJxJ0+JDtHlCR2N8/k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZxaKO4ieakQAOi98XjTusVB1qpVHr69DZ+vfbdLQ/UHv5QurZJfd0Ydcrn/n/PnUzqeIhMswD9z5VU6NyM2skFjDi/Yd0dcaxNP7N3wz9sHXfDsQxWDi8rJ6FT8+ieKXJzlmC62/fXmUkKPV96T6Gyj9UrRrzB2HTCqQycGy+d8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Ce+cA812; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63LImIrF590746;
-	Wed, 22 Apr 2026 08:52:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=CWmXBMP4bq7eKGOssZSZjtmv3UCSbFFGPeE4LBuDj
-	sI=; b=Ce+cA812hYIzTEaq8AJGmhBTl15lo1k/2rYY3v4ODPBMqVZy7c6PIpBr/
-	EC+GhkqP2noCAln4kFeYCg0hzspY8uHUOJF1oDbBd+1s4i7TUISqS52nIPX8yXAv
-	9UCGWeRISQ4QFBBQGGVM7il5AeYJzBFyUWwbIQwZW5b8BxVg9fOWi5nQcx0SxpMl
-	Z7V1zVsjf+DOmxqV1WjzHE7Z+Tb94WK2swNAXn3I+Xb/wisSiRYD1pjyByYoY9ld
-	AqWRuOUgty6R0Lu0bnhrZIy/IIEdcJOCuEDho9RmzUNWto8c/L5zAVNtT4iD8SWd
-	ZCGm3AsRZZ/W1ZCqK4MfB210iINow==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dpeu22k1m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 Apr 2026 08:52:05 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 63M8oJKD000692;
-	Wed, 22 Apr 2026 08:52:04 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4dpjkxsgde-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 Apr 2026 08:52:04 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63M8q1Yi23200036
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 22 Apr 2026 08:52:01 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2440C2004E;
-	Wed, 22 Apr 2026 08:52:01 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D81752004B;
-	Wed, 22 Apr 2026 08:52:00 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Wed, 22 Apr 2026 08:52:00 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 56341)
-	id BA1DFE08CC; Wed, 22 Apr 2026 10:52:00 +0200 (CEST)
-From: Mahanta Jambigi <mjambigi@linux.ibm.com>
-To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, alibuda@linux.alibaba.com,
-        dust.li@linux.alibaba.com, sidraya@linux.ibm.com, wenjia@linux.ibm.com
-Cc: pasic@linux.ibm.com, horms@kernel.org, tonylu@linux.alibaba.com,
-        guwen@linux.alibaba.com, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, Mahanta Jambigi <mjambigi@linux.ibm.com>
-Subject: [PATCH net-next] Documentation: net/smc: correct old value of smcr_max_recv_wr
-Date: Wed, 22 Apr 2026 10:51:58 +0200
-Message-ID: <20260422085159.459678-1-mjambigi@linux.ibm.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1776847978; c=relaxed/simple;
+	bh=ZP0zLOUYPCz6XY3n+DrjlGKzVp2SHC+G7wTWKDUfoGM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ng0lIgQDaBZOKv9rxhtSuWOHPHa/qv71r/yO52zsD/yITWu2EYywVEF697iNq2F60qyJ71bCLa3CjsIwOqSXf7lK7wRgKJjc2EqXCWVutsr7wEdzcProTvBVDf5bOGIcgP1g8/zpbXSAkKWy+NpTzp6erjh541GS+RkCbDix2ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JngPhmSr; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776847976;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZP0zLOUYPCz6XY3n+DrjlGKzVp2SHC+G7wTWKDUfoGM=;
+	b=JngPhmSrzzirXOCv9+bU8N95JhlIoN8QC+buDsdNrLC3n4sGv2Vf93VqNDG5nnZ/ocmEmB
+	8kGh1sAI7CgGyQColVhDr0gRTVTe+H+0by3HMK//y8B8drZTOPepMjoBU0zyfBcsnlMj9I
+	zFcIhYdUyQbmBC82Pvq/p35JJc5WESE=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-592-KAfABAXVPC2VY7LAeMqU0Q-1; Wed,
+ 22 Apr 2026 04:52:52 -0400
+X-MC-Unique: KAfABAXVPC2VY7LAeMqU0Q-1
+X-Mimecast-MFC-AGG-ID: KAfABAXVPC2VY7LAeMqU0Q_1776847971
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4C1071800473;
+	Wed, 22 Apr 2026 08:52:50 +0000 (UTC)
+Received: from griffin (unknown [10.44.48.93])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6A2AA19560AB;
+	Wed, 22 Apr 2026 08:52:44 +0000 (UTC)
+Date: Wed, 22 Apr 2026 10:52:42 +0200
+From: Jiri Benc <jbenc@redhat.com>
+To: Ren Wei <n05ec@lzu.edu.cn>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, yuantan098@gmail.com,
+ yifanwucs@gmail.com, tomapufckgml@gmail.com, bird@lzu.edu.cn,
+ lx24@stu.ynu.edu.cn, caoruide123@gmail.com
+Subject: Re: [PATCH net 1/1] net: nsh: handle nested NSH headers during GSO
+Message-ID: <20260422105242.7b28f72c@griffin>
+In-Reply-To: <6112cce99b4e3571444a616d0fb19e91e2fcca72.1776597598.git.caoruide123@gmail.com>
+References: <cover.1776597597.git.caoruide123@gmail.com>
+	<6112cce99b4e3571444a616d0fb19e91e2fcca72.1776597598.git.caoruide123@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-GUID: DiKhJPsbYyBo2LC1o3Q2OtwNoIlMSEbD
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDIyMDA4MyBTYWx0ZWRfX5GMLbm9neV7S
- i9omhBUhv7kTVDos5S8TB7zdabKGTMNAuC7IDSIcpiIbgm2kB2AdY1axkv0l1j0bDAJKnmFHeG9
- yZYqbhh/F915XDNLgB/YEv7axtdnxojVCFNTDqMxWdpwH6ITVs9G+o5JmDDRy+p8z9RWIPiT2wY
- T9KWsFDiXpHj6uJ+CqQmDxORwO0mmjUt5ZcDYtmOji98O10U/uzFOqYdx/FVzXX038h5a4fwyl8
- qnqU8Y47JP0ES9+VvSZEr/oRut+qKDDuXOXGuxWSmYc4ydzoq0QUm+c38+1Z3NMwnGOwBHQyFFZ
- Kn7BhUERha4tr148oj3e74jf9MFLA94Wu1bYgWIYdYzdFc6vP5vknertzcxG9SI8KeBaq3Wysee
- R9RiabKKn/QcWkMIG7eai1Yotj6jjH5Of0XAL/l1MUjyAqQR2nIjyhcvG7SrWjYdd7XGhuZcihT
- 23/h0m4YZGQpoahn8xQ==
-X-Authority-Analysis: v=2.4 cv=C8LZDwP+ c=1 sm=1 tr=0 ts=69e88c36 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8 a=-1I9Ca7gilJNwrX6hDwA:9
-X-Proofpoint-ORIG-GUID: 1kJ5ozpDJcrH44q8Eda_A4I41BcmCE51
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-21_03,2026-04-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 suspectscore=0 priorityscore=1501 malwarescore=0
- lowpriorityscore=0 clxscore=1011 bulkscore=0 impostorscore=0 spamscore=0
- phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2604200000
- definitions=main-2604220083
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-280357-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lzu.edu.cn,stu.ynu.edu.cn];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280355-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mjambigi@linux.ibm.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	RCVD_COUNT_TWELVE(0.00)[12];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jbenc@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.ibm.com:mid]
-X-Rspamd-Queue-Id: 43F1A443A91
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 87614443ABB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The smc-sysctl.rst documentation incorrectly stated that the previous
-hardcoded maximum number of WR buffers on the receive path (smcr_max_recv=
-_wr)
-was 16. The correct historical value used before the introduction of the =
-sysctl
-control was 48. Update the documentation to reflect the accurate default =
-value.
+On Mon, 20 Apr 2026 11:31:32 +0800, Ren Wei wrote:
+> Handle nested NSH headers iteratively in a single nsh_gso_segment()
+> invocation. Unwrap consecutive NSH headers until the first non-NSH payload
+> is reached, including the case where the next redispatch target is reached
+> through ETH_P_TEB, segment that payload once, and then restore the full
+> outer encapsulation on each output segment.
 
-Fixes: aef3cdb47bbb net/smc: make wr buffer count configurable
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-Reviewed-by: Sidraya Jayagond <sidraya@linux.ibm.com>
-Signed-off-by: Mahanta Jambigi <mjambigi@linux.ibm.com>
----
- Documentation/networking/smc-sysctl.rst | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This looks fragile. If there's ever another protocol with similar logic
+added, we'll be in the same situation. (And obviously, unrolling the
+recursion for any combination of protocols doesn't scale well.)
 
-diff --git a/Documentation/networking/smc-sysctl.rst b/Documentation/netw=
-orking/smc-sysctl.rst
-index 904a910f198e..279d15e61899 100644
---- a/Documentation/networking/smc-sysctl.rst
-+++ b/Documentation/networking/smc-sysctl.rst
-@@ -100,14 +100,14 @@ smcr_max_recv_wr - INTEGER
- 	depending on the workload it can be a bottleneck in a sense that thread=
-s
- 	have to wait for work request buffers to become available. Before the
- 	introduction of this control the maximal number of work request buffers
--	available on the receive path used to be hard coded to 16. With this co=
-ntrol
-+	available on the receive path used to be hard coded to 48. With this co=
-ntrol
- 	it becomes configurable. The acceptable range is between 2 and 2048.
-=20
- 	Please be aware that all the buffers need to be allocated as a physical=
-ly
- 	continuous array in which each element is a single buffer and has the s=
-ize
- 	of SMC_WR_BUF_SIZE (48) bytes. If the allocation fails, we keep retryin=
-g
- 	with half of the buffer count until it is ether successful or (unlikely=
-)
--	we dip below the old hard coded value which is 16 where we give up much
-+	we dip below the old hard coded value which is 48 where we give up much
- 	like before having this control.
-=20
- 	Default: 48
---=20
-2.51.0
+What about using a mechanism similar to dev_xmit_recursion to limit the
+depth and returning EINVAL if we exceed the limit? I think it's fine to
+drop the packet in this pathological case.
+
+We might even just use dev_xmit_recursion directly, since it can be
+argued that such nested NSH headers are in fact nested tunnels.
+
+ Jiri
 
 
