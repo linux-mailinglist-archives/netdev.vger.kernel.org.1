@@ -1,251 +1,257 @@
-Return-Path: <netdev+bounces-280338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280330-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AC4PGNV66GlvKwIAu9opvQ
-	(envelope-from <netdev+bounces-280338-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 09:37:57 +0200
+	id MACeHfhx6GkSKgIAu9opvQ
+	(envelope-from <netdev+bounces-280330-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 09:00:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF6E8443018
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 09:37:56 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E36CF442ADB
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 09:00:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2E66430234C4
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 07:37:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5580130104B2
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 06:57:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F263372B4B;
-	Wed, 22 Apr 2026 07:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A3A1296BA9;
+	Wed, 22 Apr 2026 06:57:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WWAwc0sj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I/2CjADV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CAFE37266E
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 07:37:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776843453; cv=none; b=tNNL8K4GbWuV3PKtI7BCN74+0dNVD1Bc+Wl4gqYWtdJF+T5y11U9nsiTV9Zi2tLN/xvs2JCi9FH6hkc0POJMff0uG6c8+/nXYfAT5hlur1v6WTkPoU1tTWkybtitQaloq0qNBhHziOXfWxeNq+0M42SXUSySer+tlgRZaGBVLLE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776843453; c=relaxed/simple;
-	bh=5dyoG/KCVtoa4Pp0xAZxPffQDXF8eRW3WvaFi6JA03I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EehX5D1jFL1dvohkZdCHD2OvVHQ+l9VbpDWcHRvkg0vNQ3EIktHzsAJZiKt9oA9I+FegLFrHBh9Q2s2f43W3zE/2DFxlRscXeiIrkNUjz8LlsHTpNgFTZQL3wyG/kLS6TvIYSqFjxmDqY0usUcOvickaUUM0ChaFIpU6KU84IOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WWAwc0sj; arc=none smtp.client-ip=74.125.82.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D532E21C9EA
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 06:57:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776841023; cv=pass; b=KL8xWcrKjJ+2VLqDP5liVKFl3/eQ5H9LEUqTwWuVFY1mGkETM7ay5dFhKPwkWiotFIcV4byP0WTWJ6aCaPdDKNLPbElTYe8fNEkQpKcCnfc2HYrvVVQWJj9PKmz/5xia5HhCmLQLyLSA6HxgL0AVEvjvMDVU+/twRyMFTrjRJAw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776841023; c=relaxed/simple;
+	bh=yLE11MeCFeetS3czLgq8Pjwc45aBpmJm/oGj4ZtOZxQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Xx4rKUu98AaZf80bFDR2KWHeThIZ8HDW2uBewXkmDgedGAFhdJPtnNvGcFzwloJBkqfBG5VEO8Eu7sgrf9OBRmbC4PzqWskKu8RsM7n6DhnCHc80mPJ6VeP7iqaeRr3oxsqbROaCviyf3UxxjalN9FV31wBje1nwzUd7jeBuSTo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I/2CjADV; arc=pass smtp.client-ip=209.85.208.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-12c19d23b19so6549184c88.0
-        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 00:37:32 -0700 (PDT)
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-676e62faf2bso1155539a12.1
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 23:57:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776841020; cv=none;
+        d=google.com; s=arc-20240605;
+        b=S9jDXtEmWKkerWeFWyfQwSKu29qNv0sPA7QVz8nAEs5bkfE25aAkstC1xVDCRbJUvD
+         aDOKgPBi8WjNTXuzvNtAvmQ2vhsGrG0VkdE5bc8TOjd8vmyFnZkaz3X08tWxsfc2xkKM
+         dS6R7Ov01LHz1b+CTcY3TmUJGhZR+CuXlRazj3Eck2iDwCvkaYdP+Ywv9mC9aRSVFR4s
+         QN107bwwLIfSIUhGAnwHdgtNwC7EwR4Oj4RpfoBemAkrt+X+YJMxWdZGNMtuL1ijnMvJ
+         rgorFpuClbfVFqh5Z+jwgtYB8OCtWQcxPVM6Oy79syksQBw7KyCittHMSiylHIoexPdE
+         nLiQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=mCCL5JMhZWas/kLIZBfmLtWUdx8tT416PCq2Caj0ZQo=;
+        fh=IUu3u3jDb0MwMriRQKGlbH3HzTg8vzPb6fdEZ/ByhlQ=;
+        b=C4k6t3ypynV8Zt2m2n/wzSULaT0wDE0kBRF8STSwNXOja70TSwpQ1e2EqDWbqR9uQA
+         fQbw0NsvUpbRlnq3dp0rCfCcoShDkpPoRi1h4vuHr7ayjrn4YgA5F5sRGE/c54HVpJB+
+         TTGOLhnRD0VcYldCw8csEOj1zTvi6OQNm2pE/rdWXtSeYJ2w8FDAIZbYJMZyZenxBcr1
+         QcHkfjqDkKutbFhcthQvvjFeEm4CrJTSFiO61uNSrmSFooJbIvAKJmCh9+NIeSbW3j+d
+         y61z2AsJBNJzLVTkWz7rxhWUIxmSXy9C56pvwhD9hXVxPJ0B3MbkhkA/5SD64ZHsIwIv
+         BA8Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776843451; x=1777448251; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8wgrP8hCcHXs+AdVctjn43hPNU4GYFc9lVuWtTj29k0=;
-        b=WWAwc0sjsbeFGHYjnuCaACNq5u0idJLYArsJNW7jW7/0n2vpC8H62GzhYDpNwQpYhX
-         DN//BuooZzVGHUTQloi1bt8gFWNiVjDTbCUgQXVNgcLgRsDNRb9Bhn4l2VuJVMsS4KGC
-         0N9LE3AfZDyUD76ffvMpE/SX6Jutx7U2FRP7lU7NPRI9r+RlTTQG/C0Vzd6EiHg+y2JS
-         dUlbKgOT67SBzXLh8mTbucgo3y4NCLbMHh4a1I2xDCNYkDyqBCoklF62lXLP/0Kw/juh
-         0ObdNILeWZZCzjbjiji8gCBPBETrze/A74aEomKI3l3bfiiOXIjWIKwK9rmnYhXAYm2+
-         J6hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776843451; x=1777448251;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1776841020; x=1777445820; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8wgrP8hCcHXs+AdVctjn43hPNU4GYFc9lVuWtTj29k0=;
-        b=jhP/GmwFC1hMpKZ7eIuIrFtF7T4iWC5jz7eqiJ8W4dpVjQS1WGqTPR0L4ds9TpkX7d
-         jVAYbv3PI/nEhv74KId8BiAwvRcWjZkZshjCHvqKONak24DLWmxrbsBpijp0j0eqbo5b
-         dYlEeGhO8h8RFlVaagB2ue7vdWcfHsAuUy9d7ht/isRKZDlTDSOcOVeR1nBFSnXZ6dC5
-         Qae+p93CCFUO1gyCHTn18C67f6rf0NItrxWBkwpKJRYpbROro1Z8ytN3qVC2wqosZHRR
-         ObqCBD8Bodld3Zsg/8+eBOdNnmctmFmmAHhWOvXiZ7yGqemjBWlLK25K4UHZAZ6XkYkG
-         H2fQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+4P1GXiPmufV3+AOvnQQNTAGGR9jVUE79O/ZSAspgE7jZ3+qFtgfbFY7wV97wzz8L2hTJwNA0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxjt1YtbQpVfqdfwRuLbziewd/5wxhIbWGR8OxBndWWXBQiHc3u
-	1a/X2RJokg1jNimWvfh3lUFysF6D3iXGIJ31hDrU00OdgHuxnQz6uxA2
-X-Gm-Gg: AeBDietCzQeryRkcBHyOmZStMUDtIHBfu5D3+UJc30Qa1+ZwMkotNux2Vwe9wsv0jWz
-	/Qae8He+xL3L0EL2T5VLIx2TFLoHwv/qBWlK0ZbBCyhJV7S9hihob+meOnE5T5HZ34UWdcVq20c
-	K/Yc0Eq3fAUZBRXV8A2/pp8cyF+zOspk4KssIsbomN1yD04GmeZlT97ee+5nYWsmDaX6VYEvpzw
-	YJi/9c4l0npv0WXQg+45rIiU3XlIHPIYrNAKVOD1m6sSDQiixgQgRj3ZmLLYxh6L4l1gVoHO9Y+
-	sHqKzD36keKxRBcxXkD9i42YZ6LRNgMtd8grMW02ajAcj+xkhrY6ANfvRzOOdFq/oJiRipKsXtv
-	CvFS5x879R1WieFgsTjM1ME3mdZg6bH+HttTGrSndPSXJjjd23Eq2aWlqA2EcoDU3i0hfky84UM
-	i3JBXaWtIb3pSmUndYkZxVOAbOrYfwizwZ89pksofWWhXTcLXIYcjnwexXsxFzSwU6ABy5Ip3mX
-	G+tUB38rFqZR06Wa0YcM8tQCjThC3M=
-X-Received: by 2002:a05:7022:eac8:b0:128:d375:f1cc with SMTP id a92af1059eb24-12c73f759e5mr11998285c88.12.1776843451156;
-        Wed, 22 Apr 2026 00:37:31 -0700 (PDT)
-Received: from efaec68ba852.tailc0aff1.ts.net ([206.206.192.132])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12db8684f90sm3360768c88.13.2026.04.22.00.37.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Apr 2026 00:37:30 -0700 (PDT)
-From: Weiming Shi <bestswngs@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Amery Hung <ameryhung@gmail.com>,
-	Leon Hwang <leon.hwang@linux.dev>,
-	Kees Cook <kees@kernel.org>,
-	Fushuai Wang <wangfushuai@baidu.com>,
-	Menglong Dong <menglong8.dong@gmail.com>,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Xiang Mei <xmei5@asu.edu>,
-	Weiming Shi <bestswngs@gmail.com>
-Subject: [PATCH bpf v3] bpf: Fix NULL pointer dereference in bpf_sk_storage_clone and diag paths
-Date: Tue, 21 Apr 2026 23:54:12 -0700
-Message-ID: <20260422065411.1007737-2-bestswngs@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        bh=mCCL5JMhZWas/kLIZBfmLtWUdx8tT416PCq2Caj0ZQo=;
+        b=I/2CjADVox+Oap9jk0pn+x6jMbmNxXuJWtn1Uph94Y7eLfvbPG3lY2UoRrN5mxtIkU
+         awv5m0NCAeRL10sANiSqyqn1IV3KQcsoqovofIU7JoLAs9iNPgnl/ZHcGvVSEiKZBvjm
+         CfOsR1utLcCwLGUIsZsrzqAznyL/OZYNmMee4tXN6aC39RRr8FDNoPbU/o0Rc71DoEm3
+         8N+lemK2X6Ut86JtupnM8dQeMRjbp1t+faVU2NJkxOKj/k3iLQu/rTZ6tqcqi7OMG1xT
+         DcU5fbUEqx7Qkp9CYGi4/6EoFb4e0Y5llqjMVqNSHJmHGNUOmDHF2/OY/udIBAvxuJvz
+         ycqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776841020; x=1777445820;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=mCCL5JMhZWas/kLIZBfmLtWUdx8tT416PCq2Caj0ZQo=;
+        b=gnYXlWcBRNXOXIh4fdnLOGyaNVqIZcHuVRy7kjw3pOD4ANuMdwkfQRQXD9NKKOtFz2
+         CII2Vg+18LZLKu/eez+a34arcgF5VprZcROkO2yuc4P+5Jl0Fq1EOjKZcI+pJRrZY/k4
+         QQp5jE40INTJzOKPPqkfIJ2lf3qqP+uYqwWwcRd4DiZ5/IxB7gUmkkb2l/ZdrOCcHsYT
+         fNwqHVyQjQ3W9sH1uO/yTi3YNS6ZWjJiQ48KYjOS2SnQjBhsdxt8uge3OI/Vt9xljuAj
+         dec6hBsrxyIgtbBoECs+6McOUahjmlnbKzCF/DuEwacCj3MAg/5QAkHC5kMtGzI9Lqox
+         wYew==
+X-Forwarded-Encrypted: i=1; AFNElJ+YnmNI3FXVt7Y+3O98hmn0e5gzqKlfpCKN5Xoh6ZacOtJyTRzxnebvTfPKAvKfrHhpGt7phYM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMBS/ukygY0ZbewA34DzteVYC1gfBGoDxQx1SkoQRxeLHu5O2a
+	lnoUZnZbIvFQx10cEWhOgal5etpjNfe+hN5i/O1+L/YCwxhDUlhfgOrIhXhVp25m198IXtsgLAt
+	580D8y7pzoseDAT2i7XIbT+kntOXzdW4=
+X-Gm-Gg: AeBDieu2IbguDiYeFwiuG7dIOvd4YuYj+XZLQF3yaVO5/hMGBSFfVw7l3IO7m4eZTF+
+	QhRniTQImE9Yx3XT/5aTsDbcjn7zGbAsy1W+0cRyydJflRL5CdEBpFLCXVwLdcaM/xDlB3Yme/p
+	J29HeSUwwaa++63JlubnjDoa56azJyVEJbrwu2hMSD0xy02QqKZhdMRc7234U2zDwJI2i4g8CjZ
+	OUgMptsdXUmnxRtVjh8sQV6iYs36F5Jpo1cA3W48lPWYBwqhQ/A9TELkHq4p0Hja0lDO53KSPSP
+	0R/sP3gBlcWs/Qbs/FqEquOAXzBd/V+vQJQ48VD4mKEbv11wBw==
+X-Received: by 2002:a05:6402:46cf:b0:673:1d30:29b4 with SMTP id
+ 4fb4d7f45d1cf-6731d302a0emr7440079a12.23.1776841020064; Tue, 21 Apr 2026
+ 23:57:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [6.34 / 15.00];
-	SEM_URIBL(3.50)[asu.edu:email];
+References: <20260331-realtek_forward-v1-0-44fb63033b7e@gmail.com>
+ <20260331-realtek_forward-v1-8-44fb63033b7e@gmail.com> <CAD++jLnbZ6q+Noe9abWWRNrvYVjCU-X3w4jpzKKYQDUcKNcKew@mail.gmail.com>
+In-Reply-To: <CAD++jLnbZ6q+Noe9abWWRNrvYVjCU-X3w4jpzKKYQDUcKNcKew@mail.gmail.com>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Wed, 22 Apr 2026 03:56:47 -0300
+X-Gm-Features: AQROBzBP0C_UXLocaYpGge0ITSkbQwpxlORni0-j_m80aAVfYuFXeBjUBxYn9Tk
+Message-ID: <CAJq09z45vpYP+-pkWH=F4xmbur5iDh-Z=fz4KFLF+SVQhWrnLA@mail.gmail.com>
+Subject: Re: [net-next PATCH 08/10] net: dsa: realtek: rtl8365mb: add FDB support
+To: Linus Walleij <linusw@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	=?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linux.dev,baidu.com,vger.kernel.org,asu.edu];
-	TAGGED_FROM(0.00)[bounces-280338-lists,netdev=lfdr.de];
-	GREYLIST(0.00)[pass,meta];
+	TAGGED_FROM(0.00)[bounces-280330-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	R_DKIM_ALLOW(0.00)[gmail.com:s=20251104];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	NEURAL_SPAM(0.00)[0.644];
-	R_SPF_ALLOW(0.00)[+ip4:172.105.105.114:c];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,asu.edu:email]
-X-Rspamd-Queue-Id: CF6E8443018
-X-Rspamd-Action: add header
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E36CF442ADB
+X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spam: Yes
 
-bpf_selem_unlink_nofail() sets SDATA(selem)->smap to NULL before
-removing the selem from the storage hlist. A concurrent RCU reader in
-bpf_sk_storage_clone() can observe the selem still on the list with
-smap already NULL, causing a NULL pointer dereference.
+> I actually at one point started to implement FDB accessors to the RTL8366=
+RB
+> before I got sidetracked (for the same reasons of being able to do hardwa=
+re
+> offloading), here is how far I got before I got distracted:
+> https://git.kernel.org/pub/scm/linux/kernel/git/linusw/linux-integrator.g=
+it/patch/?id=3D9941b129f91e92423803d6e2869022ffa66e9654
+>
+> You can see that it also has an L2 table albeit with 4 entries rather tha=
+n 6,
+> and an additional "CAM" (content adressable memory...) table that I don't=
+ quite
+> understand.
 
- general protection fault, probably for non-canonical address 0xdffffc000000000a:
- KASAN: null-ptr-deref in range [0x0000000000000050-0x0000000000000057]
- RIP: 0010:bpf_sk_storage_clone+0x1cd/0xaa0 net/core/bpf_sk_storage.c:174
- Call Trace:
-  <IRQ>
-  sk_clone+0xfed/0x1980 net/core/sock.c:2591
-  inet_csk_clone_lock+0x30/0x760 net/ipv4/inet_connection_sock.c:1222
-  tcp_create_openreq_child+0x35/0x2680 net/ipv4/tcp_minisocks.c:571
-  tcp_v4_syn_recv_sock+0x123/0xf90 net/ipv4/tcp_ipv4.c:1729
-  tcp_check_req+0x8e1/0x2580 include/net/tcp.h:855
-  tcp_v4_rcv+0x1845/0x3b80 net/ipv4/tcp_ipv4.c:2347
+I will look into the CAM table info in rtl8367c family.
 
-Add a NULL check for smap in bpf_sk_storage_clone().
-bpf_sk_storage_diag_put_all() and bpf_sk_storage_diag_put() have the
-same unprotected dereference pattern, add NULL checks there as well and
-pass the validated smap to diag_get() so it no longer performs its own
-rcu_dereference.
+> On Wed, Apr 1, 2026 at 1:01=E2=80=AFAM Luiz Angelo Daros de Luca
+> <luizluca@gmail.com> wrote:
+>
+> > +int rtl8365mb_l2_del_mc(struct realtek_priv *priv, u16 port,
+> > +                       const unsigned char mac_addr[static ETH_ALEN],
+> > +                       u16 vid)
+> > +int rtl8365mb_l2_get_next_uc(struct realtek_priv *priv, u16 *addr, u16=
+ port,
+> > +                            struct rtl8365mb_l2_uc *uc);
+> > +int rtl8365mb_l2_add_uc(struct realtek_priv *priv, u16 port,
+> > +                       const unsigned char addr[static ETH_ALEN],
+> > +                       u16 efid, u16 vid);
+> > +int rtl8365mb_l2_del_uc(struct realtek_priv *priv, u16 port,
+> > +                       const unsigned char addr[static ETH_ALEN],
+> > +                       u16 efid, u16 vid);
+> > +int rtl8365mb_l2_flush(struct realtek_priv *priv, int port, u16 vid);
+> > +
+> > +int rtl8365mb_l2_add_mc(struct realtek_priv *priv, u16 port,
+> > +                       const unsigned char mac_addr[static ETH_ALEN],
+> > +                       u16 vid);
+> > +int rtl8365mb_l2_del_mc(struct realtek_priv *priv, u16 port,
+> > +                       const unsigned char mac_addr[static ETH_ALEN],
+> > +                       u16 vid);
+>
+> I think it would make sense to add these to struct realtek_ops and
+>  make them available for all RTL8366 variants.
 
-Fixes: 5d800f87d0a5 ("bpf: Support lockless unlink when freeing map or local storage")
-Reported-by: Xiang Mei <xmei5@asu.edu>
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
----
-v3:
-  pass smap to diag_get()
-v2:
-  drop the NULL check in diag_get(); The caller already checks smap for
-NULL.
+Agreed. I will add these to struct realtek_ops. I'll need to create a
+generic replacement for struct rtl8365mb_l2_uc, but the rest of the
+migration should be straightforward. For now, the efid argument can
+simply be ignored by the RTL8366 implementation.
 
- net/core/bpf_sk_storage.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+> Possibly it would even make sense to move rtl8365mb_table_query()
+> to struct realtek_ops under the name .table_query and all of
+> these helpers to rtl8366-core.c as rtl8366_l2_del_mc() etc
+> just calling the per-chip table query variant. I'm not sure
+> but you can perhaps see what makes most sense?
 
-diff --git a/net/core/bpf_sk_storage.c b/net/core/bpf_sk_storage.c
-index f8338acebf077..1f9bd0005883b 100644
---- a/net/core/bpf_sk_storage.c
-+++ b/net/core/bpf_sk_storage.c
-@@ -172,7 +172,7 @@ int bpf_sk_storage_clone(const struct sock *sk, struct sock *newsk)
- 		struct bpf_map *map;
- 
- 		smap = rcu_dereference(SDATA(selem)->smap);
--		if (!(smap->map.map_flags & BPF_F_CLONE))
-+		if (!smap || !(smap->map.map_flags & BPF_F_CLONE))
- 			continue;
- 
- 		/* Note that for lockless listeners adding new element
-@@ -534,10 +534,10 @@ bpf_sk_storage_diag_alloc(const struct nlattr *nla_stgs)
- }
- EXPORT_SYMBOL_GPL(bpf_sk_storage_diag_alloc);
- 
--static int diag_get(struct bpf_local_storage_data *sdata, struct sk_buff *skb)
-+static int diag_get(struct bpf_local_storage_map *smap,
-+		    struct bpf_local_storage_data *sdata, struct sk_buff *skb)
- {
- 	struct nlattr *nla_stg, *nla_value;
--	struct bpf_local_storage_map *smap;
- 
- 	/* It cannot exceed max nlattr's payload */
- 	BUILD_BUG_ON(U16_MAX - NLA_HDRLEN < BPF_LOCAL_STORAGE_MAX_VALUE_SIZE);
-@@ -546,7 +546,6 @@ static int diag_get(struct bpf_local_storage_data *sdata, struct sk_buff *skb)
- 	if (!nla_stg)
- 		return -EMSGSIZE;
- 
--	smap = rcu_dereference(sdata->smap);
- 	if (nla_put_u32(skb, SK_DIAG_BPF_STORAGE_MAP_ID, smap->map.id))
- 		goto errout;
- 
-@@ -599,9 +598,11 @@ static int bpf_sk_storage_diag_put_all(struct sock *sk, struct sk_buff *skb,
- 	saved_len = skb->len;
- 	hlist_for_each_entry_rcu(selem, &sk_storage->list, snode) {
- 		smap = rcu_dereference(SDATA(selem)->smap);
-+		if (!smap)
-+			continue;
- 		diag_size += nla_value_size(smap->map.value_size);
- 
--		if (nla_stgs && diag_get(SDATA(selem), skb))
-+		if (nla_stgs && diag_get(smap, SDATA(selem), skb))
- 			/* Continue to learn diag_size */
- 			err = -EMSGSIZE;
- 	}
-@@ -633,6 +634,7 @@ int bpf_sk_storage_diag_put(struct bpf_sk_storage_diag *diag,
- 	unsigned int diag_size = nla_total_size(0);
- 	struct bpf_local_storage *sk_storage;
- 	struct bpf_local_storage_data *sdata;
-+	struct bpf_local_storage_map *smap;
- 	struct nlattr *nla_stgs;
- 	unsigned int saved_len;
- 	int err = 0;
-@@ -668,7 +670,11 @@ int bpf_sk_storage_diag_put(struct bpf_sk_storage_diag *diag,
- 
- 		diag_size += nla_value_size(diag->maps[i]->value_size);
- 
--		if (nla_stgs && diag_get(sdata, skb))
-+		smap = rcu_dereference(sdata->smap);
-+		if (!smap)
-+			continue;
-+
-+		if (nla_stgs && diag_get(smap, sdata, skb))
- 			/* Continue to learn diag_size */
- 			err = -EMSGSIZE;
- 	}
--- 
-2.43.0
+I suspect rtl8365mb_table_query() might be too complex to abstract
+effectively without first seeing how the RTL8366 handles table
+lookups, as hardware-specific behaviors can vary significantly here. I
+suggest we implement it for the RTL8366 first; once we have a
+reference point, we can discuss the best way to consolidate the logic.
 
+> > +       struct mutex l2_lock;
+>
+> Move to struct realtek_priv, every chip will need an l2 lock.
+
+Sure.
+
+> > +static void rtl8365mb_port_fast_age(struct dsa_switch *ds, int port)
+> > +static int rtl8365mb_port_fdb_add(struct dsa_switch *ds, int port,
+> > +                                 const unsigned char *addr, u16 vid,
+> > +                                 struct dsa_db db)
+> > +static int rtl8365mb_port_fdb_del(struct dsa_switch *ds, int port,
+> > +                                 const unsigned char *addr, u16 vid,
+> > +                                 struct dsa_db db)
+> > +static int rtl8365mb_port_fdb_dump(struct dsa_switch *ds, int port,
+> > +                                  dsa_fdb_dump_cb_t *cb, void *data)
+> > +static int rtl8365mb_port_mdb_add(struct dsa_switch *ds, int port,
+> > +                                 const struct switchdev_obj_port_mdb *=
+mdb,
+> > +                                 struct dsa_db db)
+> > +static int rtl8365mb_port_mdb_del(struct dsa_switch *ds, int port,
+> > +                                 const struct switchdev_obj_port_mdb *=
+mdb,
+> > +                                 struct dsa_db db)
+>
+> I think you should rename all of these rtl8366_port_* and move them
+> to rtl8366-core.c. They are generic.
+
+Yes. Once rtl8365mb_l2_* is moved to realtek_ops, these functions
+become generic wrappers and fit perfectly in rtl83xx.c.
+
+> > @@ -2498,6 +2687,12 @@ static const struct dsa_switch_ops rtl8365mb_swi=
+tch_ops =3D {
+> >         .port_bridge_join =3D rtl8365mb_port_bridge_join,
+> >         .port_bridge_leave =3D rtl8365mb_port_bridge_leave,
+> >         .port_stp_state_set =3D rtl8365mb_port_stp_state_set,
+> > +       .port_fast_age =3D rtl8365mb_port_fast_age,
+>
+> .port_fast_age =3D rtl8366_port_fast_age,
+
+I will update the ops to use the new generics.
+
+Regards,
+
+Luiz
 
