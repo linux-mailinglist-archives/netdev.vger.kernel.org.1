@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-280290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280292-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gK3XIjw46GkbHAIAu9opvQ
-	(envelope-from <netdev+bounces-280290-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 04:53:48 +0200
+	id IAzTMlg46GkbHAIAu9opvQ
+	(envelope-from <netdev+bounces-280292-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 04:54:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D587441A29
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 04:53:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D6A7441A45
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 04:54:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D03C53029C12
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 02:46:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E758A30210F1
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 02:46:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B70FC396D1C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B362739526F;
 	Wed, 22 Apr 2026 02:46:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HlCKI4rc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pikjsedV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C65A13932CC
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 02:46:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 044DA1E89C
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 02:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776826005; cv=none; b=rpZvfMjVNO+cq4D1HHQaM8mvUsRAAe7hMgrYqEbb5jnTOJbd9iYrygcWra4D7Vgiq6js0kzTV+5ayBsZjJ+hG5gbFo+iMPE0EDA7/4Rr6w0m4A0B5xLJqO8eB0LVDOzkHGiOi7YOLvYUjYLwLWLGleudv4/0w8zARUp8i6IFjlo=
+	t=1776826009; cv=none; b=CgbGVYxUTDBd2KUnhnjqmjcF5YGV74uUIrb5cpIVl2iaT00Hq/DyI81LeuQZGswDzPee1/K8ts2o0fV+i/FAqv3dxv+q9yekKzpr0gzmgITh2wrKaUxAVhimTbC42A+qtOJpDa2fq4TY+k24ZkYG7pVaFuGJdLeYJcKxSkMHVp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776826005; c=relaxed/simple;
-	bh=54mdUmpSfgqjXDGwvG814qjfvfFiFaCFWzugdgFYZ/s=;
+	s=arc-20240116; t=1776826009; c=relaxed/simple;
+	bh=0sA2sLWOI1+YrADOtn/nn5LqfxqcE06IldheBa+ejVk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=e7f0XYp1kFQ0/gi7/06ce6Kvi9fl2us7No2SCzvFd2dHXUttncGPmWU6Z/82Cy0YsAMy8CmZKpVT6txWzYIc3uciXHCKgipIT0JUkKEQlfzIP4OG1xN+rbZaFZsUy5d8JIvKef9cBussbji69ed2+I3N/FrGaN4x2RfXb37fpqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HlCKI4rc; arc=none smtp.client-ip=209.85.215.172
+	 MIME-Version; b=AHZRDvsiudR7VJ8sHTLMMZhXxa4Ikt2J2vsIWTAQ3HrCBzDVvze7TRjnYUWBLKZv8LEkOnl3lH0+5KzeBsxp+OUweCKBnBdjShSnR57Kp44N17rK5xQ/1cNoIQUxBaTX6IE/LVX6pomtPrTD0BEfSWwQx2LQNy6NaJecZFgvMZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pikjsedV; arc=none smtp.client-ip=209.85.215.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-c70c112cb61so3285991a12.0
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 19:46:35 -0700 (PDT)
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-c648bc907ebso3159682a12.3
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 19:46:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776825992; x=1777430792; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776825999; x=1777430799; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Fcd+LZFK9AMyl2emRFE9iJQXg1L+/s8eBXtgz15uq2o=;
-        b=HlCKI4rcIT6GzPAm1eX0Dxdabz54vsziUFvzkUy73YnLUgbD8Ia/n8B8aqzSiKj8s5
-         aK9uYActb3pA6MwqlsO6lFSYkCpDap7nfZDhe0YKmHJmfpdt5+z5m7Kq0T+3Y4JafZHG
-         gx2OgQ4yPXDOXSDFbn1IrabDS2Aa1OILkds2ImPDKvV3f3Q2glXQVLm6Tb/7DJbJU/S1
-         AMojfLiJlwxw8y8w9ZEsDSlTJ6Wap6Jt4s1bPs/GUPGC5EB7D8peYKvzxJLTccbag96n
-         Ne5tGr5DaymAMfBM/iVjMhVqk3H0hHj7XBM4MIhPkk1PJTgOF5dtrHjkGG8XJmxg3zsJ
-         AJPw==
+        bh=lS/6+OQwHBm0U4E/bt3m5g//SPZTdfGBYdVOL3eGpDw=;
+        b=pikjsedV/6GXojXW6P3fNbkfSD/yuiKE62Q2hOY9r3IVyzRPPoSJecEYQ/6QplW3IU
+         UeJSINZG+lkosuUVyjBCF8oJjqLW+1AirhSLsKfsKPL7XnlDaZSBUSP8UDp9+mtkZEqr
+         rOXj+aJSkOMTSy1102dXwJeKZWbNJibAsjhZGEbtD1Hja4GCTqbmcHr0CHBfzVDRVonY
+         M6BjClsCLIiMcSkWvyepNz66U6HAoJlLL4EHYibdVFaDKQKTjX2w/Avjx9jCAkQ8dn+G
+         Iu2RTIY2e67W0XKDqLIFygz2yE24Q7cftRn3Y638OWsgOURs9D5sgMYiDF7KWdzD+CqL
+         eXLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776825992; x=1777430792;
+        d=1e100.net; s=20251104; t=1776825999; x=1777430799;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Fcd+LZFK9AMyl2emRFE9iJQXg1L+/s8eBXtgz15uq2o=;
-        b=k5hZ+bNxk0cOJAJ8lW4dySs7nfufBDvBjjzn+ekqxmWKid1Wkdf90CUjmmHdSDlQYZ
-         SyJUyxN7ICeoA/rJQKNAS0UCh4hmkkCHxdm3kEXU1cFub8fI0aJ/KyH4lkEWYbrsY1fl
-         X9L9KXYs83+imp/Ld7cPNWl/EMNfNjk1wXeIFagqbyqr8PY/OGK6pKn6yW9QmUS4MWLw
-         sHkNq4iusedTcLcplrnWn475ZF9J5UDQwr/0FNeAxvdyLCRxqbwPKS1rJhIIYXshvg/g
-         yZaMUsS0iJd6U6cHSOlTj6OyTBDODRoHrpdE1wEP3BnGcLxnDXtoDGnWhtKI9MZoUrmS
-         hpXA==
-X-Gm-Message-State: AOJu0Yz4iDiU8j0RS7BcR6fPe/FK+yKAbEkWLgo6lpz44yycBLswDzoX
-	xPGh7vW437yVt6qv0yYbD0NIogdiFca7v4gCCCaw2qk93eT0GugIQL5Mku0aUukdOwR8cw==
-X-Gm-Gg: AeBDieuGexItk0igi7CP9BsQhCCrUv9SRPY/sOVWIZCuQK8eeRVx5MIYny6fcjpcY6+
-	ml2UVbYng228ncvpwT51VtNe+KNRalh2J/5ID6HwO2bQSLWOKMU5o236BH9YwdtRCnZfiTEDFLk
-	YXypt070H1lobw0U8Vd3uj45z75v1jC2fvIUSxD/FoIOJN5o59tE9Abybc9hPihWS1b0dy/Wn95
-	+kG+PfCWVvZgrXKrcY0Zyp8uynb6Hw9cFkDO0dHwZBuxU69fMvldRq1wpEL4WcSn/bvNBStaIrh
-	CE0t2Z8YbwDLoluas5AIN8NnpNvmXP8/kJGb0Y867cLVojpSKTSRxGpBVasrAJ826F4qqNmWUeG
-	w6DAgH7GL3bwSMT98X5evmhOVHwn+7oEMVekruqQbaG5jRHM6CZOWeRsJca3A6SNvKrf8Ud5Fwi
-	9SLy72cmKfYKfcZ5nWPcwBPyr8Bsmv3zbeYNQtAe7gLympS+4tAxQVzcFqTgNz/Q==
-X-Received: by 2002:a05:6a20:9187:b0:3a2:dd8a:5084 with SMTP id adf61e73a8af0-3a2dd8a5be1mr8799899637.37.1776825991972;
-        Tue, 21 Apr 2026 19:46:31 -0700 (PDT)
+        bh=lS/6+OQwHBm0U4E/bt3m5g//SPZTdfGBYdVOL3eGpDw=;
+        b=fdehMTe0vVo9s6eTXEqkekMO8UhdLcGBWmYggEjXT79dPSfJXfY2GshJfcRJwAoywu
+         fkGYelNjFcICC1Ulx5a40kyhGFIxfL5vLbferzbt6quGcE7T9A8sFkPUgT833E6Lkh/H
+         vRRW+MdqfD8ppVFW1rd3TWLu/ZVX2/hfXdXntdDYLsaMU66nL30GDAyUr4/nPjQcdO42
+         0sRenPMul12PT8+WrIxwirKH+7tSull1VJ62UP169FaW9DlA2lGxxWYnSuLb0nH9DZUd
+         Nblc/8TWcG+MDVQ+TPB6/3xpXmo/VK7SeamKPWrXVVxoLTOEe2sWJ6W7tP1h/usbflgs
+         F2lQ==
+X-Gm-Message-State: AOJu0YySLiDUsRoHCtBxE0UOl2eRGWKdOCXsNPpvG/EMFAsgdulDvsjs
+	3PJTHctKrIPrLeSI/VuDgag2tBIu4wNUSZ9+FHvtWv+cG+ux9yzBOWauLkCUCnIsd+aYhA==
+X-Gm-Gg: AeBDiesfmUSgaVayL1XeniIJl/DOTQIFzqZ8d0kWhecxyrUnDReXLrb8X841dg9pLI2
+	7Jh2maJj57hIsEVRsFgJGw6uZ55sVyQwkDbFgCXILfE0LDdVT3MzG+/Dh96J+71CeUJiyDJoPml
+	XU5jDNWG8nxfwrOFiM5E0Uk5yfkf+Y+PUEt2LqmDlrG7TFX1cpDjN27ISl6KDJoiKc3aJ9shZdW
+	70V+o65nblcnRBDFNwhDbfl1AY+l2gtPg2iQwbEUN4NL2GwXP2fpsMzyt0seRM+4ayJYxODdMD/
+	+RUrQOZTIAJiYaJ2e8rCoxq3OTGZ7Zh3KPVLiZ8l8yWT4y1DiQrw+SbxZvX7U648cVfmcAAsGo0
+	TXGt4EoOHJUqoXAltBRcgyWrBVSvJzh8E75Td3XjLp0TMX0BvE75mzWAZJ9DFGkXlCsU9z4FOiD
+	zQfmLxUp8ijJ9G1mBlgzB3Rh9X8mcM3BRm/e6KHi/cBAJfKdxWFfN8A0OwXVlzKg==
+X-Received: by 2002:a05:6a21:32a1:b0:3a2:f402:50fb with SMTP id adf61e73a8af0-3a2f402551emr4604812637.34.1776825999302;
+        Tue, 21 Apr 2026 19:46:39 -0700 (PDT)
 Received: from DESKTOP-MUHC17F.tail07b66e.ts.net ([188.253.121.151])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c7976f92183sm10656632a12.3.2026.04.21.19.46.26
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c7976f92183sm10656632a12.3.2026.04.21.19.46.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 19:46:31 -0700 (PDT)
+        Tue, 21 Apr 2026 19:46:38 -0700 (PDT)
 From: Zhenzhong Wu <jt26wzz@gmail.com>
 To: netdev@vger.kernel.org
 Cc: edumazet@google.com,
@@ -89,11 +89,10 @@ Cc: edumazet@google.com,
 	tamird@kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
-	Zhenzhong Wu <jt26wzz@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net v4 1/2] tcp: call sk_data_ready() after listener migration
-Date: Wed, 22 Apr 2026 10:45:53 +0800
-Message-ID: <20260422024554.130346-2-jt26wzz@gmail.com>
+	Zhenzhong Wu <jt26wzz@gmail.com>
+Subject: [PATCH net v4 2/2] selftests/bpf: check epoll readiness during reuseport migration
+Date: Wed, 22 Apr 2026 10:45:54 +0800
+Message-ID: <20260422024554.130346-3-jt26wzz@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260422024554.130346-1-jt26wzz@gmail.com>
 References: <20260422024554.130346-1-jt26wzz@gmail.com>
@@ -110,15 +109,15 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	URIBL_MULTI_FAIL(0.00)[tor.lore.kernel.org:server fail];
+	URIBL_MULTI_FAIL(0.00)[sea.lore.kernel.org:server fail,amazon.co.jp:server fail];
 	FREEMAIL_CC(0.00)[google.com,davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-280290-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-280292-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
@@ -131,70 +130,119 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 1D587441A29
+X-Rspamd-Queue-Id: 2D6A7441A45
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When inet_csk_listen_stop() migrates an established child socket from
-a closing listener to another socket in the same SO_REUSEPORT group,
-the target listener gets a new accept-queue entry via
-inet_csk_reqsk_queue_add(), but that path never notifies the target
-listener's waiters. A nonblocking accept() still works because it
-checks the queue directly, but poll()/epoll_wait() waiters and
-blocking accept() callers can also remain asleep indefinitely.
+Inside migrate_dance(), add epoll checks around shutdown() to
+verify that the target listener is not ready before shutdown()
+and becomes ready immediately after shutdown() triggers migration.
 
-Call READ_ONCE(nsk->sk_data_ready)(nsk) after a successful migration
-in inet_csk_listen_stop().
+Cover TCP_ESTABLISHED and TCP_SYN_RECV. Exclude TCP_NEW_SYN_RECV
+as it depends on later handshake completion.
 
-However, after inet_csk_reqsk_queue_add() succeeds, the ref acquired
-in reuseport_migrate_sock() is effectively transferred to
-nreq->rsk_listener. Another CPU can then dequeue nreq via accept()
-or listener shutdown, hit reqsk_put(), and drop that listener ref.
-Since listeners are SOCK_RCU_FREE, wrap the post-queue_add()
-dereferences of nsk in rcu_read_lock()/rcu_read_unlock(), which also
-covers the existing sock_net(nsk) access in that path.
-
-The reqsk_timer_handler() path does not need the same changes for two
-reasons: half-open requests become readable only after the final ACK,
-where tcp_child_process() already wakes the listener; and once nreq is
-visible via inet_ehash_insert(), the success path no longer touches
-nsk directly.
-
-Fixes: 54b92e841937 ("tcp: Migrate TCP_ESTABLISHED/TCP_SYN_RECV sockets in accept queues.")
-Cc: stable@vger.kernel.org
-Suggested-by: Eric Dumazet <edumazet@google.com>
+Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
 Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 Signed-off-by: Zhenzhong Wu <jt26wzz@gmail.com>
 ---
- net/ipv4/inet_connection_sock.c | 3 +++
- 1 file changed, 3 insertions(+)
+ .../bpf/prog_tests/migrate_reuseport.c        | 49 ++++++++++++++++---
+ 1 file changed, 42 insertions(+), 7 deletions(-)
 
-diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
-index 4ac3ae1bc..928654c34 100644
---- a/net/ipv4/inet_connection_sock.c
-+++ b/net/ipv4/inet_connection_sock.c
-@@ -1479,16 +1479,19 @@ void inet_csk_listen_stop(struct sock *sk)
- 			if (nreq) {
- 				refcount_set(&nreq->rsk_refcnt, 1);
+diff --git a/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c b/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
+index 653b0a20f..c62907732 100644
+--- a/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
++++ b/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
+@@ -7,24 +7,29 @@
+  *   3. call listen() for 1 server socket. (migration target)
+  *   4. update a map to migrate all child sockets
+  *        to the last server socket (migrate_map[cookie] = 4)
+- *   5. call shutdown() for first 4 server sockets
++ *   5. for TCP_ESTABLISHED and TCP_SYN_RECV cases, verify via epoll
++ *        that the last server socket is not ready before migration.
++ *   6. call shutdown() for first 4 server sockets
+  *        and migrate the requests in the accept queue
+  *        to the last server socket.
+- *   6. call listen() for the second server socket.
+- *   7. call shutdown() for the last server
++ *   7. for TCP_ESTABLISHED and TCP_SYN_RECV cases, verify via epoll
++ *        that the last server socket is ready after migration.
++ *   8. call listen() for the second server socket.
++ *   9. call shutdown() for the last server
+  *        and migrate the requests in the accept queue
+  *        to the second server socket.
+- *   8. call listen() for the last server.
+- *   9. call shutdown() for the second server
++ *  10. call listen() for the last server.
++ *  11. call shutdown() for the second server
+  *        and migrate the requests in the accept queue
+  *        to the last server socket.
+- *  10. call accept() for the last server socket.
++ *  12. call accept() for the last server socket.
+  *
+  * Author: Kuniyuki Iwashima <kuniyu@amazon.co.jp>
+  */
  
-+				rcu_read_lock();
- 				if (inet_csk_reqsk_queue_add(nsk, nreq, child)) {
- 					__NET_INC_STATS(sock_net(nsk),
- 							LINUX_MIB_TCPMIGRATEREQSUCCESS);
- 					reqsk_migrate_reset(req);
-+					READ_ONCE(nsk->sk_data_ready)(nsk);
- 				} else {
- 					__NET_INC_STATS(sock_net(nsk),
- 							LINUX_MIB_TCPMIGRATEREQFAILURE);
- 					reqsk_migrate_reset(nreq);
- 					__reqsk_free(nreq);
- 				}
-+				rcu_read_unlock();
+ #include <bpf/bpf.h>
+ #include <bpf/libbpf.h>
++#include <sys/epoll.h>
  
- 				/* inet_csk_reqsk_queue_add() has already
- 				 * called inet_child_forget() on failure case.
+ #include "test_progs.h"
+ #include "test_migrate_reuseport.skel.h"
+@@ -350,21 +355,51 @@ static int update_maps(struct migrate_reuseport_test_case *test_case,
+ 
+ static int migrate_dance(struct migrate_reuseport_test_case *test_case)
+ {
++	struct epoll_event ev = {
++		.events = EPOLLIN,
++	};
++	int epoll = -1, nfds;
+ 	int i, err;
+ 
++	if (test_case->state != BPF_TCP_NEW_SYN_RECV) {
++		epoll = epoll_create1(0);
++		if (!ASSERT_NEQ(epoll, -1, "epoll_create1"))
++			return -1;
++
++		ev.data.fd = test_case->servers[MIGRATED_TO];
++		if (!ASSERT_OK(epoll_ctl(epoll, EPOLL_CTL_ADD,
++					 test_case->servers[MIGRATED_TO], &ev),
++			       "epoll_ctl"))
++			goto close_epoll;
++
++		nfds = epoll_wait(epoll, &ev, 1, 0);
++		if (!ASSERT_EQ(nfds, 0, "epoll_wait 1"))
++			goto close_epoll;
++	}
++
+ 	/* Migrate TCP_ESTABLISHED and TCP_SYN_RECV requests
+ 	 * to the last listener based on eBPF.
+ 	 */
+ 	for (i = 0; i < MIGRATED_TO; i++) {
+ 		err = shutdown(test_case->servers[i], SHUT_RDWR);
+ 		if (!ASSERT_OK(err, "shutdown"))
+-			return -1;
++			goto close_epoll;
+ 	}
+ 
+ 	/* No dance for TCP_NEW_SYN_RECV to migrate based on eBPF */
+ 	if (test_case->state == BPF_TCP_NEW_SYN_RECV)
+ 		return 0;
+ 
++	nfds = epoll_wait(epoll, &ev, 1, 0);
++	if (!ASSERT_EQ(nfds, 1, "epoll_wait 2")) {
++close_epoll:
++		if (epoll >= 0)
++			close(epoll);
++		return -1;
++	}
++
++	close(epoll);
++
+ 	/* Note that we use the second listener instead of the
+ 	 * first one here.
+ 	 *
 -- 
 2.43.0
 
