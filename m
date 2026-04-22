@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-280534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280533-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2Pw1BOgT6WmtUAIAu9opvQ
-	(envelope-from <netdev+bounces-280534-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 20:31:04 +0200
+	id KBjyE5AT6WmtUAIAu9opvQ
+	(envelope-from <netdev+bounces-280533-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 20:29:36 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A7D2449BFF
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 20:31:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0841449BD8
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 20:29:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 40C0330FBA66
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:27:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 883C1305D5E5
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:27:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E10013CF663;
-	Wed, 22 Apr 2026 18:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62C693CEB9E;
+	Wed, 22 Apr 2026 18:27:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sd5DF/Ju"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Uun9bipL"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1628833C502;
-	Wed, 22 Apr 2026 18:27:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D272F19D08F;
+	Wed, 22 Apr 2026 18:27:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776882461; cv=none; b=W5tI4O4WHDMw6qnu8y9p3L5N0sxAeSOL6zHUMXQC6FBL2uKHG091zIKsLwBRrJpY/JVCHsbFAZmsA+G0V3OVju1Afc57xE4ERwXwy34C6Ur30clPe6WnkgO9J4J/0jIOAKLFqnDLSGzGX7OedrPUVOxyzjO2PPBiexieFdMHDbw=
+	t=1776882447; cv=none; b=NSoWhvTusiFhggPa+cAxjmgnqpxWPow4DadWdhfNyagrqVoebhHQausGLZkEJdJat7OwM2EUq3gU75itNOFmB/gKNoMRhT3mFzY/JeWVywqDK7KhOU459TFg9UMjJ4r3oFVLX7ifd3lUymUAYQ3b8NZAkcBwdL7KYyjhlgEEzvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776882461; c=relaxed/simple;
-	bh=W1gByLU7axMFlzQs7RTKWTuBeaHMDgQ5lwxUGkNl6HY=;
+	s=arc-20240116; t=1776882447; c=relaxed/simple;
+	bh=j210VXmsgnfsiosK3HjwZL9RWuyMORt8TMmSCCX8R4E=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Pzp1aYCywlTuwRfptXPN/ymlXxE5G0YSJTHysFchbJPu8ZNKNHFIf9wL3/7HoFE4wul8ZwgC/QR3r2AnFz0dz+6xIZWHQA+cJ7NSnVGaX+bh+fLxRcWxjGix6ONGZT2x8vXMm2CdcchIbemqD9iSbOn2PMWCOUbOstC6+pPLdHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sd5DF/Ju; arc=none smtp.client-ip=156.67.10.101
+	 In-Reply-To:To:Cc; b=rJpR1Gapnh7MIa72INAhdZ2a7fy1o/CsJh0r9tUlo8gs2th7baJwuBS4XIEFKRVEaIuuKUJWaYtIbuseKuD/PhS17UJvLPcdiExHryKOYwEIMAqGOY7A8o/lrtGZSm8p3G6BthQPDvpmfU1RFlShhTGwnIS3Nmrs29FpfkGOA4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Uun9bipL; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -39,18 +39,18 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:From:
 	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
 	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=Gd0a+9Q2VoHOHPG1E+QCXElTHRR9W0KDTLt9O+vVhTI=; b=sd
-	5DF/Juafy4kw5R/R+YeyTZorUXZP9grMF1vJ9IiQsnERysXZmogi+1SivfVQwULiPb/A1NPT6dGWc
-	C0Z80qRqMlPx0kbcfjs2/pveYbWEWF0PGn7420jVRb+t6pXN1cyJjuA4JDMTX6071XV0ELbL1G+3n
-	NYyinQtZeII/7/k=;
+	In-Reply-To:References; bh=cHVrIBNbMEO2oaXaakSg+VH8OQ+PF2rR6fx1P1Tt6B0=; b=Uu
+	n9bipLRXh1/rE18lf/gTOnnjDzQCW1zDw4wzxNsHrLENewRqiy8cfh/nwszrZmPnP6HF8duC3YQwn
+	fpN9a0h3cmwAzq6A9E7YQaVg8Ze9opiApa1cshjTnuFNUJ2M80Wn94BuExD0SSEhxlCmHYDfmFU3z
+	9VxSCbxaxG8zyIE=;
 Received: from c-66-41-74-139.hsd1.mn.comcast.net ([66.41.74.139] helo=thinkpad.home.lunn.ch)
 	by vps0.lunn.ch with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1wFbuW-00H4Ba-Gz; Wed, 22 Apr 2026 20:02:52 +0200
+	id 1wFbuZ-00H4Ba-Ls; Wed, 22 Apr 2026 20:02:56 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-Date: Wed, 22 Apr 2026 13:01:53 -0500
-Subject: [PATCH net v2 10/15] drivers: net: cirrus: mac89x0: Remove this
+Date: Wed, 22 Apr 2026 13:01:54 -0500
+Subject: [PATCH net v2 11/15] drivers: net: fujitsu: fmvj18x: Remove this
  driver
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -60,7 +60,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260422-v7-0-0-net-next-driver-removal-v1-v2-10-08a5b59784d5@lunn.ch>
+Message-Id: <20260422-v7-0-0-net-next-driver-removal-v1-v2-11-08a5b59784d5@lunn.ch>
 References: <20260422-v7-0-0-net-next-driver-removal-v1-v2-0-08a5b59784d5@lunn.ch>
 In-Reply-To: <20260422-v7-0-0-net-next-driver-removal-v1-v2-0-08a5b59784d5@lunn.ch>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -74,20 +74,20 @@ Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  linux-doc@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=37353; i=andrew@lunn.ch;
- h=from:subject:message-id; bh=W1gByLU7axMFlzQs7RTKWTuBeaHMDgQ5lwxUGkNl6HY=;
- b=owEBbQKS/ZANAwAIAea/DcumaUyEAcsmYgBp6Q0pxiVT3CcYNL/lJlZcgcwk1PKAYJ50ihFQH
- w7e2W2wvdqJAjMEAAEIAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCaekNKQAKCRDmvw3LpmlM
- hCVWD/4n+RWF+1Wt6iGavkjVg98raB9+AWof4wQB8h+G4jK0QX6y9PwDNfPHMUCjIxOy6IBRbC0
- 1g7MnHrVEpXVuiX9OxitZPxVExEm9eEB2oAPpeo6GMS/wMvR+k+qPCf8QIxB1SLr0N4jnZrA84K
- Sil/SLIb7xX5fzzb/N57dKgPu2AXS1NkowVZnun3z+RQwbMBW0Fpo1OujyQdZ2bVXhUb9i1KZ9f
- P+IMg2H9EOrkwvXp/MULQfSuOimKZem8W3Cde+4+CPra1DlQf4Xtn0Zsw8siMvON3N35ZMo4N6i
- ex0lpFPrl7LCGePvwljohMTLQWYnyJAYG4U/9IMjXGs3lAEuaujsfvzlCg5kFxZyPPAbwAsylN5
- L/THRaJ/udTm2kV8Bl4S9qxVoii4tjNIcKJkagMv0dTHn5H0RgLL+JuOoD7yg8Jw/oOogzVWObY
- EJoJJBwJmlLwQBlt4mv2h8Cwuu1IFwqKs8JhZsciq8i9jOUNpjy4ELItrtMNKwGo75qNBIBktzY
- g1PpYa2zy2w4rrZnR2Pp96RMULjSouoOz5cUi6LZMJ2BubrrwUejm+llwtKyk/ga+jYqs0Wci1e
- K4OSPewJ/iTekzU2rKwnqo3nZQq7z7Y7i9viVbJRXH1bGLdZU6tB6mrvP2HxCtJH2Vgz8ulhLnz
- 5ANGYmI70Ord4Jg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=39103; i=andrew@lunn.ch;
+ h=from:subject:message-id; bh=j210VXmsgnfsiosK3HjwZL9RWuyMORt8TMmSCCX8R4E=;
+ b=owEBbQKS/ZANAwAIAea/DcumaUyEAcsmYgBp6Q0pN/gUXZmwAhOh7WaZF1zrYjQAFF190gmMc
+ xAvwH1ut0CJAjMEAAEIAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCaekNKQAKCRDmvw3LpmlM
+ hOzSD/9co0H/eCezfjCd+QO4eJ6LXe2cNP8zHlIaDxGosW5WCAeYJDpytvwSIjuxrRK8EgJP82U
+ RGgdheRwDihNzYudn3u/MdiFIzwVNC2/SVo7vhNo/vbn+Rl8JdOGEjeAKC6q+XRKn+sLOkLLJf0
+ fSYTjEJ58mi1DbOwX0iRAdvBMiJKjHnBpJDn/anGKGDHVS5pmNh+WTepLUFc+PKm131OIV/Ve6t
+ AvDcI05j3oLbpP5DfbZG3J98C+DAKEEXnWilSfHhwFJwpMBDfeO+NCDTwg/XOPeXyN3Ind7X+A0
+ xf2SYjz/GH2PXQZ3NTSjDGmD+F9cgpAOb47XiNi42b+eHYNdoGi0Hta/GF9dQ2s5LfaCUvAOltf
+ 2KQRv7jEmen7YuB8wavI6FpeZPzljKtHLme07oOyCOplJEr58lUD7LgMeXKuZv7GotmFNGJ0G4m
+ NnJnxX9xzMig7NVgvnnhs2nsqYPSSmFfMcPmCQocttcEQzXpXe3R4rNA9lCymnxe+nPxisoiJw1
+ pGCUNDKL6aOHBCA3s84mcMpZRO8w7GFoU49Sp37S8vegryehTWHYAipqOXmqK1uPHy1Gb1T3u5T
+ TSbkxdJ2MYfP7Uj9d1v313q1hvPnjns6TRNzXZGEE7bXusYlwkgvZ6KJ0Uk6jJr7xGu0pM3MrFv
+ So2FRJNf9jSFNHA==
 X-Developer-Key: i=andrew@lunn.ch; a=openpgp;
  fpr=61FB1025CB53263916F9E1B7E6BF0DCBA6694C84
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -100,7 +100,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280534-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280533-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -116,1100 +116,1264 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[conectiva.com.br:email,crynwr.com:email,cti-ltd.com:email,lunn.ch:email,lunn.ch:dkim,lunn.ch:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1A7D2449BFF
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,lunn.ch:dkim,lunn.ch:mid,scyld.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C0841449BD8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The mac89x0 was written by Russell Nelson in 1996. It is an MAC
+The fmvj18x was written by Shingo Fujimoto in 2002. It is an PCMCIA
 device, so unlikely to be used with modern kernels.
 
 Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 ---
- drivers/net/ethernet/cirrus/Kconfig   |  10 -
- drivers/net/ethernet/cirrus/Makefile  |   1 -
- drivers/net/ethernet/cirrus/cs89x0.h  | 461 ---------------------------
- drivers/net/ethernet/cirrus/mac89x0.c | 577 ----------------------------------
- 4 files changed, 1049 deletions(-)
+ drivers/net/ethernet/Kconfig              |    1 -
+ drivers/net/ethernet/fujitsu/Kconfig      |   30 -
+ drivers/net/ethernet/fujitsu/Makefile     |    6 -
+ drivers/net/ethernet/fujitsu/fmvj18x_cs.c | 1176 -----------------------------
+ 4 files changed, 1213 deletions(-)
 
-diff --git a/drivers/net/ethernet/cirrus/Kconfig b/drivers/net/ethernet/cirrus/Kconfig
-index 1a0c7b3bfcd6..786d379e79fe 100644
---- a/drivers/net/ethernet/cirrus/Kconfig
-+++ b/drivers/net/ethernet/cirrus/Kconfig
-@@ -25,14 +25,4 @@ config EP93XX_ETH
- 	  This is a driver for the ethernet hardware included in EP93xx CPUs.
- 	  Say Y if you are building a kernel for EP93xx based devices.
- 
--config MAC89x0
--	tristate "Macintosh CS89x0 based ethernet cards"
--	depends on MAC
+diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
+index bdc29d143160..c94e8f27af94 100644
+--- a/drivers/net/ethernet/Kconfig
++++ b/drivers/net/ethernet/Kconfig
+@@ -61,7 +61,6 @@ source "drivers/net/ethernet/engleder/Kconfig"
+ source "drivers/net/ethernet/ezchip/Kconfig"
+ source "drivers/net/ethernet/faraday/Kconfig"
+ source "drivers/net/ethernet/freescale/Kconfig"
+-source "drivers/net/ethernet/fujitsu/Kconfig"
+ source "drivers/net/ethernet/fungible/Kconfig"
+ source "drivers/net/ethernet/google/Kconfig"
+ source "drivers/net/ethernet/hisilicon/Kconfig"
+diff --git a/drivers/net/ethernet/fujitsu/Kconfig b/drivers/net/ethernet/fujitsu/Kconfig
+deleted file mode 100644
+index 06a28bce5d27..000000000000
+--- a/drivers/net/ethernet/fujitsu/Kconfig
++++ /dev/null
+@@ -1,30 +0,0 @@
+-# SPDX-License-Identifier: GPL-2.0-only
+-#
+-# Fujitsu Network device configuration
+-#
+-
+-config NET_VENDOR_FUJITSU
+-	bool "Fujitsu devices"
+-	default y
+-	depends on PCMCIA
 -	help
--	  Support for CS89x0 chipset based Ethernet cards.  If you have a
--	  Nubus or LC-PDS network (Ethernet) card of this type, say Y here.
+-	  If you have a network (Ethernet) card belonging to this class, say Y.
 -
--	  To compile this driver as a module, choose M here. This module will
--	  be called mac89x0.
+-	  Note that the answer to this question doesn't directly affect the
+-	  the questions about Fujitsu cards. If you say Y, you will be asked for
+-	  your specific card in the following questions.
 -
- endif # NET_VENDOR_CIRRUS
-diff --git a/drivers/net/ethernet/cirrus/Makefile b/drivers/net/ethernet/cirrus/Makefile
-index cb740939d976..03800af0f0e1 100644
---- a/drivers/net/ethernet/cirrus/Makefile
-+++ b/drivers/net/ethernet/cirrus/Makefile
-@@ -4,4 +4,3 @@
- #
- 
- obj-$(CONFIG_EP93XX_ETH) += ep93xx_eth.o
--obj-$(CONFIG_MAC89x0) += mac89x0.o
-diff --git a/drivers/net/ethernet/cirrus/cs89x0.h b/drivers/net/ethernet/cirrus/cs89x0.h
+-if NET_VENDOR_FUJITSU
+-
+-config PCMCIA_FMVJ18X
+-	tristate "Fujitsu FMV-J18x PCMCIA support"
+-	depends on PCMCIA && HAS_IOPORT
+-	select CRC32
+-	help
+-	  Say Y here if you intend to attach a Fujitsu FMV-J18x or compatible
+-	  PCMCIA (PC-card) Ethernet card to your computer.
+-
+-	  To compile this driver as a module, choose M here: the module will be
+-	  called fmvj18x_cs.  If unsure, say N.
+-
+-endif # NET_VENDOR_FUJITSU
+diff --git a/drivers/net/ethernet/fujitsu/Makefile b/drivers/net/ethernet/fujitsu/Makefile
 deleted file mode 100644
-index 210f9ec9af4b..000000000000
---- a/drivers/net/ethernet/cirrus/cs89x0.h
+index 74feebbf4572..000000000000
+--- a/drivers/net/ethernet/fujitsu/Makefile
 +++ /dev/null
-@@ -1,461 +0,0 @@
--/*  Copyright, 1988-1992, Russell Nelson, Crynwr Software
+@@ -1,6 +0,0 @@
+-# SPDX-License-Identifier: GPL-2.0-only
+-#
+-# Makefile for the Fujitsu network device drivers.
+-#
 -
--   This program is free software; you can redistribute it and/or modify
--   it under the terms of the GNU General Public License as published by
--   the Free Software Foundation, version 1.
--
--   This program is distributed in the hope that it will be useful,
--   but WITHOUT ANY WARRANTY; without even the implied warranty of
--   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
--   GNU General Public License for more details.
--
--   You should have received a copy of the GNU General Public License
--   along with this program; if not, write to the Free Software
--   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
--   */
--
--
--#define PP_ChipID 0x0000	/* offset   0h -> Corp -ID              */
--				/* offset   2h -> Model/Product Number  */
--				/* offset   3h -> Chip Revision Number  */
--
--#define PP_ISAIOB 0x0020	/*  IO base address */
--#define PP_CS8900_ISAINT 0x0022	/*  ISA interrupt select */
--#define PP_CS8920_ISAINT 0x0370	/*  ISA interrupt select */
--#define PP_CS8900_ISADMA 0x0024	/*  ISA Rec DMA channel */
--#define PP_CS8920_ISADMA 0x0374	/*  ISA Rec DMA channel */
--#define PP_ISASOF 0x0026	/*  ISA DMA offset */
--#define PP_DmaFrameCnt 0x0028	/*  ISA DMA Frame count */
--#define PP_DmaByteCnt 0x002A	/*  ISA DMA Byte count */
--#define PP_CS8900_ISAMemB 0x002C	/*  Memory base */
--#define PP_CS8920_ISAMemB 0x0348 /*  */
--
--#define PP_ISABootBase 0x0030	/*  Boot Prom base  */
--#define PP_ISABootMask 0x0034	/*  Boot Prom Mask */
--
--/* EEPROM data and command registers */
--#define PP_EECMD 0x0040		/*  NVR Interface Command register */
--#define PP_EEData 0x0042	/*  NVR Interface Data Register */
--#define PP_DebugReg 0x0044	/*  Debug Register */
--
--#define PP_RxCFG 0x0102		/*  Rx Bus config */
--#define PP_RxCTL 0x0104		/*  Receive Control Register */
--#define PP_TxCFG 0x0106		/*  Transmit Config Register */
--#define PP_TxCMD 0x0108		/*  Transmit Command Register */
--#define PP_BufCFG 0x010A	/*  Bus configuration Register */
--#define PP_LineCTL 0x0112	/*  Line Config Register */
--#define PP_SelfCTL 0x0114	/*  Self Command Register */
--#define PP_BusCTL 0x0116	/*  ISA bus control Register */
--#define PP_TestCTL 0x0118	/*  Test Register */
--#define PP_AutoNegCTL 0x011C	/*  Auto Negotiation Ctrl */
--
--#define PP_ISQ 0x0120		/*  Interrupt Status */
--#define PP_RxEvent 0x0124	/*  Rx Event Register */
--#define PP_TxEvent 0x0128	/*  Tx Event Register */
--#define PP_BufEvent 0x012C	/*  Bus Event Register */
--#define PP_RxMiss 0x0130	/*  Receive Miss Count */
--#define PP_TxCol 0x0132		/*  Transmit Collision Count */
--#define PP_LineST 0x0134	/*  Line State Register */
--#define PP_SelfST 0x0136	/*  Self State register */
--#define PP_BusST 0x0138		/*  Bus Status */
--#define PP_TDR 0x013C		/*  Time Domain Reflectometry */
--#define PP_AutoNegST 0x013E	/*  Auto Neg Status */
--#define PP_TxCommand 0x0144	/*  Tx Command */
--#define PP_TxLength 0x0146	/*  Tx Length */
--#define PP_LAF 0x0150		/*  Hash Table */
--#define PP_IA 0x0158		/*  Physical Address Register */
--
--#define PP_RxStatus 0x0400	/*  Receive start of frame */
--#define PP_RxLength 0x0402	/*  Receive Length of frame */
--#define PP_RxFrame 0x0404	/*  Receive frame pointer */
--#define PP_TxFrame 0x0A00	/*  Transmit frame pointer */
--
--/*  Primary I/O Base Address. If no I/O base is supplied by the user, then this */
--/*  can be used as the default I/O base to access the PacketPage Area. */
--#define DEFAULTIOBASE 0x0300
--#define FIRST_IO 0x020C		/*  First I/O port to check */
--#define LAST_IO 0x037C		/*  Last I/O port to check (+10h) */
--#define ADD_MASK 0x3000		/*  Mask it use of the ADD_PORT register */
--#define ADD_SIG 0x3000		/*  Expected ID signature */
--
--/* On Macs, we only need use the ISA I/O stuff until we do MEMORY_ON */
--#ifdef CONFIG_MAC
--#define LCSLOTBASE 0xfee00000
--#define MMIOBASE 0x40000
--#endif
--
--#define CHIP_EISA_ID_SIG 0x630E   /*  Product ID Code for Crystal Chip (CS8900 spec 4.3) */
--#define CHIP_EISA_ID_SIG_STR "0x630E"
--
--#ifdef IBMEIPKT
--#define EISA_ID_SIG 0x4D24	/*  IBM */
--#define PART_NO_SIG 0x1010	/*  IBM */
--#define MONGOOSE_BIT 0x0000	/*  IBM */
--#else
--#define EISA_ID_SIG 0x630E	/*  PnP Vendor ID (same as chip id for Crystal board) */
--#define PART_NO_SIG 0x4000	/*  ID code CS8920 board (PnP Vendor Product code) */
--#define MONGOOSE_BIT 0x2000	/*  PART_NO_SIG + MONGOOSE_BUT => ID of mongoose */
--#endif
--
--#define PRODUCT_ID_ADD 0x0002   /*  Address of product ID */
--
--/*  Mask to find out the types of  registers */
--#define REG_TYPE_MASK 0x001F
--
--/*  Eeprom Commands */
--#define ERSE_WR_ENBL 0x00F0
--#define ERSE_WR_DISABLE 0x0000
--
--/*  Defines Control/Config register quintuplet numbers */
--#define RX_BUF_CFG 0x0003
--#define RX_CONTROL 0x0005
--#define TX_CFG 0x0007
--#define TX_COMMAND 0x0009
--#define BUF_CFG 0x000B
--#define LINE_CONTROL 0x0013
--#define SELF_CONTROL 0x0015
--#define BUS_CONTROL 0x0017
--#define TEST_CONTROL 0x0019
--
--/*  Defines Status/Count registers quintuplet numbers */
--#define RX_EVENT 0x0004
--#define TX_EVENT 0x0008
--#define BUF_EVENT 0x000C
--#define RX_MISS_COUNT 0x0010
--#define TX_COL_COUNT 0x0012
--#define LINE_STATUS 0x0014
--#define SELF_STATUS 0x0016
--#define BUS_STATUS 0x0018
--#define TDR 0x001C
--
--/* PP_RxCFG - Receive  Configuration and Interrupt Mask bit definition -  Read/write */
--#define SKIP_1 0x0040
--#define RX_STREAM_ENBL 0x0080
--#define RX_OK_ENBL 0x0100
--#define RX_DMA_ONLY 0x0200
--#define AUTO_RX_DMA 0x0400
--#define BUFFER_CRC 0x0800
--#define RX_CRC_ERROR_ENBL 0x1000
--#define RX_RUNT_ENBL 0x2000
--#define RX_EXTRA_DATA_ENBL 0x4000
--
--/* PP_RxCTL - Receive Control bit definition - Read/write */
--#define RX_IA_HASH_ACCEPT 0x0040
--#define RX_PROM_ACCEPT 0x0080
--#define RX_OK_ACCEPT 0x0100
--#define RX_MULTCAST_ACCEPT 0x0200
--#define RX_IA_ACCEPT 0x0400
--#define RX_BROADCAST_ACCEPT 0x0800
--#define RX_BAD_CRC_ACCEPT 0x1000
--#define RX_RUNT_ACCEPT 0x2000
--#define RX_EXTRA_DATA_ACCEPT 0x4000
--#define RX_ALL_ACCEPT (RX_PROM_ACCEPT|RX_BAD_CRC_ACCEPT|RX_RUNT_ACCEPT|RX_EXTRA_DATA_ACCEPT)
--/*  Default receive mode - individually addressed, broadcast, and error free */
--#define DEF_RX_ACCEPT (RX_IA_ACCEPT | RX_BROADCAST_ACCEPT | RX_OK_ACCEPT)
--
--/* PP_TxCFG - Transmit Configuration Interrupt Mask bit definition - Read/write */
--#define TX_LOST_CRS_ENBL 0x0040
--#define TX_SQE_ERROR_ENBL 0x0080
--#define TX_OK_ENBL 0x0100
--#define TX_LATE_COL_ENBL 0x0200
--#define TX_JBR_ENBL 0x0400
--#define TX_ANY_COL_ENBL 0x0800
--#define TX_16_COL_ENBL 0x8000
--
--/* PP_TxCMD - Transmit Command bit definition - Read-only */
--#define TX_START_4_BYTES 0x0000
--#define TX_START_64_BYTES 0x0040
--#define TX_START_128_BYTES 0x0080
--#define TX_START_ALL_BYTES 0x00C0
--#define TX_FORCE 0x0100
--#define TX_ONE_COL 0x0200
--#define TX_TWO_PART_DEFF_DISABLE 0x0400
--#define TX_NO_CRC 0x1000
--#define TX_RUNT 0x2000
--
--/* PP_BufCFG - Buffer Configuration Interrupt Mask bit definition - Read/write */
--#define GENERATE_SW_INTERRUPT 0x0040
--#define RX_DMA_ENBL 0x0080
--#define READY_FOR_TX_ENBL 0x0100
--#define TX_UNDERRUN_ENBL 0x0200
--#define RX_MISS_ENBL 0x0400
--#define RX_128_BYTE_ENBL 0x0800
--#define TX_COL_COUNT_OVRFLOW_ENBL 0x1000
--#define RX_MISS_COUNT_OVRFLOW_ENBL 0x2000
--#define RX_DEST_MATCH_ENBL 0x8000
--
--/* PP_LineCTL - Line Control bit definition - Read/write */
--#define SERIAL_RX_ON 0x0040
--#define SERIAL_TX_ON 0x0080
--#define AUI_ONLY 0x0100
--#define AUTO_AUI_10BASET 0x0200
--#define MODIFIED_BACKOFF 0x0800
--#define NO_AUTO_POLARITY 0x1000
--#define TWO_PART_DEFDIS 0x2000
--#define LOW_RX_SQUELCH 0x4000
--
--/* PP_SelfCTL - Software Self Control bit definition - Read/write */
--#define POWER_ON_RESET 0x0040
--#define SW_STOP 0x0100
--#define SLEEP_ON 0x0200
--#define AUTO_WAKEUP 0x0400
--#define HCB0_ENBL 0x1000
--#define HCB1_ENBL 0x2000
--#define HCB0 0x4000
--#define HCB1 0x8000
--
--/* PP_BusCTL - ISA Bus Control bit definition - Read/write */
--#define RESET_RX_DMA 0x0040
--#define MEMORY_ON 0x0400
--#define DMA_BURST_MODE 0x0800
--#define IO_CHANNEL_READY_ON 0x1000
--#define RX_DMA_SIZE_64K 0x2000
--#define ENABLE_IRQ 0x8000
--
--/* PP_TestCTL - Test Control bit definition - Read/write */
--#define LINK_OFF 0x0080
--#define ENDEC_LOOPBACK 0x0200
--#define AUI_LOOPBACK 0x0400
--#define BACKOFF_OFF 0x0800
--#define FDX_8900 0x4000
--#define FAST_TEST 0x8000
--
--/* PP_RxEvent - Receive Event Bit definition - Read-only */
--#define RX_IA_HASHED 0x0040
--#define RX_DRIBBLE 0x0080
--#define RX_OK 0x0100
--#define RX_HASHED 0x0200
--#define RX_IA 0x0400
--#define RX_BROADCAST 0x0800
--#define RX_CRC_ERROR 0x1000
--#define RX_RUNT 0x2000
--#define RX_EXTRA_DATA 0x4000
--
--#define HASH_INDEX_MASK 0x0FC00
--
--/* PP_TxEvent - Transmit Event Bit definition - Read-only */
--#define TX_LOST_CRS 0x0040
--#define TX_SQE_ERROR 0x0080
--#define TX_OK 0x0100
--#define TX_LATE_COL 0x0200
--#define TX_JBR 0x0400
--#define TX_16_COL 0x8000
--#define TX_SEND_OK_BITS (TX_OK|TX_LOST_CRS)
--#define TX_COL_COUNT_MASK 0x7800
--
--/* PP_BufEvent - Buffer Event Bit definition - Read-only */
--#define SW_INTERRUPT 0x0040
--#define RX_DMA 0x0080
--#define READY_FOR_TX 0x0100
--#define TX_UNDERRUN 0x0200
--#define RX_MISS 0x0400
--#define RX_128_BYTE 0x0800
--#define TX_COL_OVRFLW 0x1000
--#define RX_MISS_OVRFLW 0x2000
--#define RX_DEST_MATCH 0x8000
--
--/* PP_LineST - Ethernet Line Status bit definition - Read-only */
--#define LINK_OK 0x0080
--#define AUI_ON 0x0100
--#define TENBASET_ON 0x0200
--#define POLARITY_OK 0x1000
--#define CRS_OK 0x4000
--
--/* PP_SelfST - Chip Software Status bit definition */
--#define ACTIVE_33V 0x0040
--#define INIT_DONE 0x0080
--#define SI_BUSY 0x0100
--#define EEPROM_PRESENT 0x0200
--#define EEPROM_OK 0x0400
--#define EL_PRESENT 0x0800
--#define EE_SIZE_64 0x1000
--
--/* PP_BusST - ISA Bus Status bit definition */
--#define TX_BID_ERROR 0x0080
--#define READY_FOR_TX_NOW 0x0100
--
--/* PP_AutoNegCTL - Auto Negotiation Control bit definition */
--#define RE_NEG_NOW 0x0040
--#define ALLOW_FDX 0x0080
--#define AUTO_NEG_ENABLE 0x0100
--#define NLP_ENABLE 0x0200
--#define FORCE_FDX 0x8000
--#define AUTO_NEG_BITS (FORCE_FDX|NLP_ENABLE|AUTO_NEG_ENABLE)
--#define AUTO_NEG_MASK (FORCE_FDX|NLP_ENABLE|AUTO_NEG_ENABLE|ALLOW_FDX|RE_NEG_NOW)
--
--/* PP_AutoNegST - Auto Negotiation Status bit definition */
--#define AUTO_NEG_BUSY 0x0080
--#define FLP_LINK 0x0100
--#define FLP_LINK_GOOD 0x0800
--#define LINK_FAULT 0x1000
--#define HDX_ACTIVE 0x4000
--#define FDX_ACTIVE 0x8000
--
--/*  The following block defines the ISQ event types */
--#define ISQ_RECEIVER_EVENT 0x04
--#define ISQ_TRANSMITTER_EVENT 0x08
--#define ISQ_BUFFER_EVENT 0x0c
--#define ISQ_RX_MISS_EVENT 0x10
--#define ISQ_TX_COL_EVENT 0x12
--
--#define ISQ_EVENT_MASK 0x003F   /*  ISQ mask to find out type of event */
--#define ISQ_HIST 16		/*  small history buffer */
--#define AUTOINCREMENT 0x8000	/*  Bit mask to set bit-15 for autoincrement */
--
--#define TXRXBUFSIZE 0x0600
--#define RXDMABUFSIZE 0x8000
--#define RXDMASIZE 0x4000
--#define TXRX_LENGTH_MASK 0x07FF
--
--/*  rx options bits */
--#define RCV_WITH_RXON	1       /*  Set SerRx ON */
--#define RCV_COUNTS	2       /*  Use Framecnt1 */
--#define RCV_PONG	4       /*  Pong respondent */
--#define RCV_DONG	8       /*  Dong operation */
--#define RCV_POLLING	0x10	/*  Poll RxEvent */
--#define RCV_ISQ		0x20	/*  Use ISQ, int */
--#define RCV_AUTO_DMA	0x100	/*  Set AutoRxDMAE */
--#define RCV_DMA		0x200	/*  Set RxDMA only */
--#define RCV_DMA_ALL	0x400	/*  Copy all DMA'ed */
--#define RCV_FIXED_DATA	0x800	/*  Every frame same */
--#define RCV_IO		0x1000	/*  Use ISA IO only */
--#define RCV_MEMORY	0x2000	/*  Use ISA Memory */
--
--#define RAM_SIZE	0x1000       /*  The card has 4k bytes or RAM */
--#define PKT_START PP_TxFrame  /*  Start of packet RAM */
--
--#define RX_FRAME_PORT	0x0000
--#define TX_FRAME_PORT RX_FRAME_PORT
--#define TX_CMD_PORT	0x0004
--#define TX_NOW		0x0000       /*  Tx packet after   5 bytes copied */
--#define TX_AFTER_381	0x0040       /*  Tx packet after 381 bytes copied */
--#define TX_AFTER_ALL	0x00c0       /*  Tx packet after all bytes copied */
--#define TX_LEN_PORT	0x0006
--#define ISQ_PORT	0x0008
--#define ADD_PORT	0x000A
--#define DATA_PORT	0x000C
--
--#define EEPROM_WRITE_EN		0x00F0
--#define EEPROM_WRITE_DIS	0x0000
--#define EEPROM_WRITE_CMD	0x0100
--#define EEPROM_READ_CMD		0x0200
--
--/*  Receive Header */
--/*  Description of header of each packet in receive area of memory */
--#define RBUF_EVENT_LOW	0   /*  Low byte of RxEvent - status of received frame */
--#define RBUF_EVENT_HIGH	1   /*  High byte of RxEvent - status of received frame */
--#define RBUF_LEN_LOW	2   /*  Length of received data - low byte */
--#define RBUF_LEN_HI	3   /*  Length of received data - high byte */
--#define RBUF_HEAD_LEN	4   /*  Length of this header */
--
--#define CHIP_READ 0x1   /*  Used to mark state of the repins code (chip or dma) */
--#define DMA_READ 0x2   /*  Used to mark state of the repins code (chip or dma) */
--
--/*  for bios scan */
--/*  */
--#ifdef CSDEBUG
--/*  use these values for debugging bios scan */
--#define BIOS_START_SEG 0x00000
--#define BIOS_OFFSET_INC 0x0010
--#else
--#define BIOS_START_SEG 0x0c000
--#define BIOS_OFFSET_INC 0x0200
--#endif
--
--#define BIOS_LAST_OFFSET 0x0fc00
--
--/*  Byte offsets into the EEPROM configuration buffer */
--#define ISA_CNF_OFFSET 0x6
--#define TX_CTL_OFFSET (ISA_CNF_OFFSET + 8)			/*  8900 eeprom */
--#define AUTO_NEG_CNF_OFFSET (ISA_CNF_OFFSET + 8)		/*  8920 eeprom */
--
--  /*  the assumption here is that the bits in the eeprom are generally  */
--  /*  in the same position as those in the autonegctl register. */
--  /*  Of course the IMM bit is not in that register so it must be  */
--  /*  masked out */
--#define EE_FORCE_FDX  0x8000
--#define EE_NLP_ENABLE 0x0200
--#define EE_AUTO_NEG_ENABLE 0x0100
--#define EE_ALLOW_FDX 0x0080
--#define EE_AUTO_NEG_CNF_MASK (EE_FORCE_FDX|EE_NLP_ENABLE|EE_AUTO_NEG_ENABLE|EE_ALLOW_FDX)
--
--#define IMM_BIT 0x0040		/*  ignore missing media	 */
--
--#define ADAPTER_CNF_OFFSET (AUTO_NEG_CNF_OFFSET + 2)
--#define A_CNF_10B_T 0x0001
--#define A_CNF_AUI 0x0002
--#define A_CNF_10B_2 0x0004
--#define A_CNF_MEDIA_TYPE 0x0070
--#define A_CNF_MEDIA_AUTO 0x0070
--#define A_CNF_MEDIA_10B_T 0x0020
--#define A_CNF_MEDIA_AUI 0x0040
--#define A_CNF_MEDIA_10B_2 0x0010
--#define A_CNF_DC_DC_POLARITY 0x0080
--#define A_CNF_NO_AUTO_POLARITY 0x2000
--#define A_CNF_LOW_RX_SQUELCH 0x4000
--#define A_CNF_EXTND_10B_2 0x8000
--
--#define PACKET_PAGE_OFFSET 0x8
--
--/*  Bit definitions for the ISA configuration word from the EEPROM */
--#define INT_NO_MASK 0x000F
--#define DMA_NO_MASK 0x0070
--#define ISA_DMA_SIZE 0x0200
--#define ISA_AUTO_RxDMA 0x0400
--#define ISA_RxDMA 0x0800
--#define DMA_BURST 0x1000
--#define STREAM_TRANSFER 0x2000
--#define ANY_ISA_DMA (ISA_AUTO_RxDMA | ISA_RxDMA)
--
--/*  DMA controller registers */
--#define DMA_BASE 0x00     /*  DMA controller base */
--#define DMA_BASE_2 0x0C0    /*  DMA controller base */
--
--#define DMA_STAT 0x0D0    /*  DMA controller status register */
--#define DMA_MASK 0x0D4    /*  DMA controller mask register */
--#define DMA_MODE 0x0D6    /*  DMA controller mode register */
--#define DMA_RESETFF 0x0D8    /*  DMA controller first/last flip flop */
--
--/*  DMA data */
--#define DMA_DISABLE 0x04     /*  Disable channel n */
--#define DMA_ENABLE 0x00     /*  Enable channel n */
--/*  Demand transfers, incr. address, auto init, writes, ch. n */
--#define DMA_RX_MODE 0x14
--/*  Demand transfers, incr. address, auto init, reads, ch. n */
--#define DMA_TX_MODE 0x18
--
--#define DMA_SIZE (16*1024) /*  Size of dma buffer - 16k */
--
--#define CS8900 0x0000
--#define CS8920 0x4000
--#define CS8920M 0x6000
--#define REVISON_BITS 0x1F00
--#define EEVER_NUMBER 0x12
--#define CHKSUM_LEN 0x14
--#define CHKSUM_VAL 0x0000
--#define START_EEPROM_DATA 0x001c /*  Offset into eeprom for start of data */
--#define IRQ_MAP_EEPROM_DATA 0x0046 /*  Offset into eeprom for the IRQ map */
--#define IRQ_MAP_LEN 0x0004 /*  No of bytes to read for the IRQ map */
--#define PNP_IRQ_FRMT 0x0022 /*  PNP small item IRQ format */
--#define CS8900_IRQ_MAP 0x1c20 /*  This IRQ map is fixed */
--
--#define CS8920_NO_INTS 0x0F   /*  Max CS8920 interrupt select # */
--
--#define PNP_ADD_PORT 0x0279
--#define PNP_WRITE_PORT 0x0A79
--
--#define GET_PNP_ISA_STRUCT 0x40
--#define PNP_ISA_STRUCT_LEN 0x06
--#define PNP_CSN_CNT_OFF 0x01
--#define PNP_RD_PORT_OFF 0x02
--#define PNP_FUNCTION_OK 0x00
--#define PNP_WAKE 0x03
--#define PNP_RSRC_DATA 0x04
--#define PNP_RSRC_READY 0x01
--#define PNP_STATUS 0x05
--#define PNP_ACTIVATE 0x30
--#define PNP_CNF_IO_H 0x60
--#define PNP_CNF_IO_L 0x61
--#define PNP_CNF_INT 0x70
--#define PNP_CNF_DMA 0x74
--#define PNP_CNF_MEM 0x48
-diff --git a/drivers/net/ethernet/cirrus/mac89x0.c b/drivers/net/ethernet/cirrus/mac89x0.c
+-obj-$(CONFIG_PCMCIA_FMVJ18X) += fmvj18x_cs.o
+diff --git a/drivers/net/ethernet/fujitsu/fmvj18x_cs.c b/drivers/net/ethernet/fujitsu/fmvj18x_cs.c
 deleted file mode 100644
-index 6723df9b65d9..000000000000
---- a/drivers/net/ethernet/cirrus/mac89x0.c
+index 4859493471db..000000000000
+--- a/drivers/net/ethernet/fujitsu/fmvj18x_cs.c
 +++ /dev/null
-@@ -1,577 +0,0 @@
--/* mac89x0.c: A Crystal Semiconductor CS89[02]0 driver for linux. */
--/*
--	Written 1996 by Russell Nelson, with reference to skeleton.c
--	written 1993-1994 by Donald Becker.
+@@ -1,1176 +0,0 @@
+-/*======================================================================
+-    fmvj18x_cs.c 2.8 2002/03/23
 -
--	This software may be used and distributed according to the terms
--	of the GNU General Public License, incorporated herein by reference.
+-    A fmvj18x (and its compatibles) PCMCIA client driver
 -
--	The author may be reached at nelson@crynwr.com, Crynwr
--	Software, 11 Grant St., Potsdam, NY 13676
+-    Contributed by Shingo Fujimoto, shingo@flab.fujitsu.co.jp
 -
--  Changelog:
+-    TDK LAK-CD021 and CONTEC C-NET(PC)C support added by 
+-    Nobuhiro Katayama, kata-n@po.iijnet.or.jp
 -
--  Mike Cruse        : mcruse@cti-ltd.com
--                    : Changes for Linux 2.0 compatibility.
--                    : Added dev_id parameter in net_interrupt(),
--                    : request_irq() and free_irq(). Just NULL for now.
+-    The PCMCIA client code is based on code written by David Hinds.
+-    Network code is based on the "FMV-18x driver" by Yutaka TAMIYA
+-    but is actually largely Donald Becker's AT1700 driver, which
+-    carries the following attribution:
 -
--  Mike Cruse        : Added MOD_INC_USE_COUNT and MOD_DEC_USE_COUNT macros
--                    : in net_open() and net_close() so kerneld would know
--                    : that the module is in use and wouldn't eject the
--                    : driver prematurely.
+-    Written 1993-94 by Donald Becker.
 -
--  Mike Cruse        : Rewrote init_module() and cleanup_module using 8390.c
--                    : as an example. Disabled autoprobing in init_module(),
--                    : not a good thing to do to other devices while Linux
--                    : is running from all accounts.
--
--  Alan Cox          : Removed 1.2 support, added 2.1 extra counters.
--
--  David Huggins-Daines <dhd@debian.org>
--
--  Split this off into mac89x0.c, and gutted it of all parts which are
--  not relevant to the existing CS8900 cards on the Macintosh
--  (i.e. basically the Daynaport CS and LC cards).  To be precise:
--
--    * Removed all the media-detection stuff, because these cards are
--    TP-only.
--
--    * Lobotomized the ISA interrupt bogosity, because these cards use
--    a hardwired NuBus interrupt and a magic ISAIRQ value in the card.
--
--    * Basically eliminated everything not relevant to getting the
--    cards minimally functioning on the Macintosh.
--
--  I might add that these cards are badly designed even from the Mac
--  standpoint, in that Dayna, in their infinite wisdom, used NuBus slot
--  I/O space and NuBus interrupts for these cards, but neglected to
--  provide anything even remotely resembling a NuBus ROM.  Therefore we
--  have to probe for them in a brain-damaged ISA-like fashion.
--
--  Arnaldo Carvalho de Melo <acme@conectiva.com.br> - 11/01/2001
--  check kmalloc and release the allocated memory on failure in
--  mac89x0_probe and in init_module
--  use local_irq_{save,restore}(flags) in net_get_stat, not just
--  local_irq_{dis,en}able()
--*/
+-    Copyright 1993 United States Government as represented by the
+-    Director, National Security Agency.
+-    
+-    This software may be used and distributed according to the terms
+-    of the GNU General Public License, incorporated herein by reference.
+-    
+-    The author may be reached as becker@scyld.com, or C/O
+-    Scyld Computing Corporation
+-    410 Severn Ave., Suite 210
+-    Annapolis MD 21403
+-   
+-======================================================================*/
 -
 -#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 -
--static const char version[] =
--"cs89x0.c:v1.02 11/26/96 Russell Nelson <nelson@crynwr.com>\n";
+-#define DRV_NAME	"fmvj18x_cs"
+-#define DRV_VERSION	"2.9"
 -
 -#include <linux/module.h>
--
--/*
--  Sources:
--
--	Crynwr packet driver epktisa.
--
--	Crystal Semiconductor data sheets.
--
--*/
--
 -#include <linux/kernel.h>
--#include <linux/types.h>
--#include <linux/fcntl.h>
--#include <linux/interrupt.h>
--#include <linux/ioport.h>
--#include <linux/in.h>
+-#include <linux/ptrace.h>
+-#include <linux/slab.h>
 -#include <linux/string.h>
--#include <linux/nubus.h>
--#include <linux/errno.h>
--#include <linux/init.h>
+-#include <linux/timer.h>
+-#include <linux/interrupt.h>
+-#include <linux/in.h>
+-#include <linux/delay.h>
+-#include <linux/ethtool.h>
 -#include <linux/netdevice.h>
--#include <linux/platform_device.h>
 -#include <linux/etherdevice.h>
 -#include <linux/skbuff.h>
--#include <linux/delay.h>
--#include <linux/bitops.h>
--#include <linux/gfp.h>
+-#include <linux/if_arp.h>
+-#include <linux/ioport.h>
+-#include <linux/crc32.h>
 -
+-#include <pcmcia/cistpl.h>
+-#include <pcmcia/ciscode.h>
+-#include <pcmcia/ds.h>
+-
+-#include <linux/uaccess.h>
 -#include <asm/io.h>
--#include <asm/hwtest.h>
--#include <asm/macints.h>
 -
--#include "cs89x0.h"
+-/*====================================================================*/
 -
--static int debug = -1;
--module_param(debug, int, 0);
--MODULE_PARM_DESC(debug, "debug message level");
+-/* Module parameters */
 -
--/* Information that need to be kept for each board. */
--struct net_local {
--	int msg_enable;
--	int chip_type;		/* one of: CS8900, CS8920, CS8920M */
--	char chip_revision;	/* revision letter of the chip ('A'...) */
--	int send_cmd;		/* the propercommand used to send a packet. */
--	int rx_mode;
--	int curr_rx_cfg;
--        int send_underrun;      /* keep track of how many underruns in a row we get */
+-MODULE_DESCRIPTION("fmvj18x and compatible PCMCIA ethernet driver");
+-MODULE_LICENSE("GPL");
+-
+-#define INT_MODULE_PARM(n, v) static int n = v; module_param(n, int, 0)
+-
+-/* SRAM configuration */
+-/* 0:4KB*2 TX buffer   else:8KB*2 TX buffer */
+-INT_MODULE_PARM(sram_config, 0);
+-
+-
+-/*====================================================================*/
+-/*
+-    PCMCIA event handlers
+- */
+-static int fmvj18x_config(struct pcmcia_device *link);
+-static int fmvj18x_get_hwinfo(struct pcmcia_device *link, u_char *node_id);
+-static int fmvj18x_setup_mfc(struct pcmcia_device *link);
+-static void fmvj18x_release(struct pcmcia_device *link);
+-static void fmvj18x_detach(struct pcmcia_device *p_dev);
+-
+-/*
+-    LAN controller(MBH86960A) specific routines
+- */
+-static int fjn_config(struct net_device *dev, struct ifmap *map);
+-static int fjn_open(struct net_device *dev);
+-static int fjn_close(struct net_device *dev);
+-static netdev_tx_t fjn_start_xmit(struct sk_buff *skb,
+-					struct net_device *dev);
+-static irqreturn_t fjn_interrupt(int irq, void *dev_id);
+-static void fjn_rx(struct net_device *dev);
+-static void fjn_reset(struct net_device *dev);
+-static void set_rx_mode(struct net_device *dev);
+-static void fjn_tx_timeout(struct net_device *dev, unsigned int txqueue);
+-static const struct ethtool_ops netdev_ethtool_ops;
+-
+-/*
+-    card type
+- */
+-enum cardtype { MBH10302, MBH10304, TDK, CONTEC, LA501, UNGERMANN,
+-	       XXX10304, NEC, KME
 -};
 -
--/* Index to functions, as function prototypes. */
--static int net_open(struct net_device *dev);
--static netdev_tx_t net_send_packet(struct sk_buff *skb, struct net_device *dev);
--static irqreturn_t net_interrupt(int irq, void *dev_id);
--static void set_multicast_list(struct net_device *dev);
--static void net_rx(struct net_device *dev);
--static int net_close(struct net_device *dev);
--static struct net_device_stats *net_get_stats(struct net_device *dev);
--static int set_mac_address(struct net_device *dev, void *addr);
+-/*
+-    driver specific data structure
+-*/
+-struct local_info {
+-	struct pcmcia_device	*p_dev;
+-    long open_time;
+-    uint tx_started:1;
+-    uint tx_queue;
+-    u_short tx_queue_len;
+-    enum cardtype cardtype;
+-    u_short sent;
+-    u_char __iomem *base;
+-};
 -
--/* For reading/writing registers ISA-style */
--static inline int
--readreg_io(struct net_device *dev, int portno)
--{
--	nubus_writew(swab16(portno), dev->base_addr + ADD_PORT);
--	return swab16(nubus_readw(dev->base_addr + DATA_PORT));
--}
+-#define MC_FILTERBREAK 64
 -
--static inline void
--writereg_io(struct net_device *dev, int portno, int value)
--{
--	nubus_writew(swab16(portno), dev->base_addr + ADD_PORT);
--	nubus_writew(swab16(value), dev->base_addr + DATA_PORT);
--}
+-/*====================================================================*/
+-/* 
+-    ioport offset from the base address 
+- */
+-#define TX_STATUS               0 /* transmit status register */
+-#define RX_STATUS               1 /* receive status register */
+-#define TX_INTR                 2 /* transmit interrupt mask register */
+-#define RX_INTR                 3 /* receive interrupt mask register */
+-#define TX_MODE                 4 /* transmit mode register */
+-#define RX_MODE                 5 /* receive mode register */
+-#define CONFIG_0                6 /* configuration register 0 */
+-#define CONFIG_1                7 /* configuration register 1 */
 -
--/* These are for reading/writing registers in shared memory */
--static inline int
--readreg(struct net_device *dev, int portno)
--{
--	return swab16(nubus_readw(dev->mem_start + portno));
--}
+-#define NODE_ID                 8 /* node ID register            (bank 0) */
+-#define MAR_ADR                 8 /* multicast address registers (bank 1) */
 -
--static inline void
--writereg(struct net_device *dev, int portno, int value)
--{
--	nubus_writew(swab16(value), dev->mem_start + portno);
--}
+-#define DATAPORT                8 /* buffer mem port registers   (bank 2) */
+-#define TX_START               10 /* transmit start register */
+-#define COL_CTRL               11 /* 16 collision control register */
+-#define BMPR12                 12 /* reserved */
+-#define BMPR13                 13 /* reserved */
+-#define RX_SKIP                14 /* skip received packet register */
 -
--static const struct net_device_ops mac89x0_netdev_ops = {
--	.ndo_open		= net_open,
--	.ndo_stop		= net_close,
--	.ndo_start_xmit		= net_send_packet,
--	.ndo_get_stats		= net_get_stats,
--	.ndo_set_rx_mode	= set_multicast_list,
--	.ndo_set_mac_address	= set_mac_address,
+-#define LAN_CTRL               16 /* LAN card control register */
+-
+-#define MAC_ID               0x1a /* hardware address */
+-#define UNGERMANN_MAC_ID     0x18 /* UNGERMANN-BASS hardware address */
+-
+-/* 
+-    control bits 
+- */
+-#define ENA_TMT_OK           0x80
+-#define ENA_TMT_REC          0x20
+-#define ENA_COL              0x04
+-#define ENA_16_COL           0x02
+-#define ENA_TBUS_ERR         0x01
+-
+-#define ENA_PKT_RDY          0x80
+-#define ENA_BUS_ERR          0x40
+-#define ENA_LEN_ERR          0x08
+-#define ENA_ALG_ERR          0x04
+-#define ENA_CRC_ERR          0x02
+-#define ENA_OVR_FLO          0x01
+-
+-/* flags */
+-#define F_TMT_RDY            0x80 /* can accept new packet */
+-#define F_NET_BSY            0x40 /* carrier is detected */
+-#define F_TMT_OK             0x20 /* send packet successfully */
+-#define F_SRT_PKT            0x10 /* short packet error */
+-#define F_COL_ERR            0x04 /* collision error */
+-#define F_16_COL             0x02 /* 16 collision error */
+-#define F_TBUS_ERR           0x01 /* bus read error */
+-
+-#define F_PKT_RDY            0x80 /* packet(s) in buffer */
+-#define F_BUS_ERR            0x40 /* bus read error */
+-#define F_LEN_ERR            0x08 /* short packet */
+-#define F_ALG_ERR            0x04 /* frame error */
+-#define F_CRC_ERR            0x02 /* CRC error */
+-#define F_OVR_FLO            0x01 /* overflow error */
+-
+-#define F_BUF_EMP            0x40 /* receive buffer is empty */
+-
+-#define F_SKP_PKT            0x05 /* drop packet in buffer */
+-
+-/* default bitmaps */
+-#define D_TX_INTR  ( ENA_TMT_OK )
+-#define D_RX_INTR  ( ENA_PKT_RDY | ENA_LEN_ERR \
+-		   | ENA_ALG_ERR | ENA_CRC_ERR | ENA_OVR_FLO )
+-#define TX_STAT_M  ( F_TMT_RDY )
+-#define RX_STAT_M  ( F_PKT_RDY | F_LEN_ERR \
+-                   | F_ALG_ERR | F_CRC_ERR | F_OVR_FLO )
+-
+-/* commands */
+-#define D_TX_MODE            0x06 /* no tests, detect carrier */
+-#define ID_MATCHED           0x02 /* (RX_MODE) */
+-#define RECV_ALL             0x03 /* (RX_MODE) */
+-#define CONFIG0_DFL          0x5a /* 16bit bus, 4K x 2 Tx queues */
+-#define CONFIG0_DFL_1        0x5e /* 16bit bus, 8K x 2 Tx queues */
+-#define CONFIG0_RST          0xda /* Data Link Controller off (CONFIG_0) */
+-#define CONFIG0_RST_1        0xde /* Data Link Controller off (CONFIG_0) */
+-#define BANK_0               0xa0 /* bank 0 (CONFIG_1) */
+-#define BANK_1               0xa4 /* bank 1 (CONFIG_1) */
+-#define BANK_2               0xa8 /* bank 2 (CONFIG_1) */
+-#define CHIP_OFF             0x80 /* contrl chip power off (CONFIG_1) */
+-#define DO_TX                0x80 /* do transmit packet */
+-#define SEND_PKT             0x81 /* send a packet */
+-#define AUTO_MODE            0x07 /* Auto skip packet on 16 col detected */
+-#define MANU_MODE            0x03 /* Stop and skip packet on 16 col */
+-#define TDK_AUTO_MODE        0x47 /* Auto skip packet on 16 col detected */
+-#define TDK_MANU_MODE        0x43 /* Stop and skip packet on 16 col */
+-#define INTR_OFF             0x0d /* LAN controller ignores interrupts */
+-#define INTR_ON              0x1d /* LAN controller will catch interrupts */
+-
+-#define TX_TIMEOUT		((400*HZ)/1000)
+-
+-#define BANK_0U              0x20 /* bank 0 (CONFIG_1) */
+-#define BANK_1U              0x24 /* bank 1 (CONFIG_1) */
+-#define BANK_2U              0x28 /* bank 2 (CONFIG_1) */
+-
+-static const struct net_device_ops fjn_netdev_ops = {
+-	.ndo_open 		= fjn_open,
+-	.ndo_stop		= fjn_close,
+-	.ndo_start_xmit 	= fjn_start_xmit,
+-	.ndo_tx_timeout 	= fjn_tx_timeout,
+-	.ndo_set_config 	= fjn_config,
+-	.ndo_set_rx_mode	= set_rx_mode,
+-	.ndo_set_mac_address 	= eth_mac_addr,
 -	.ndo_validate_addr	= eth_validate_addr,
 -};
 -
--/* Probe for the CS8900 card in slot E.  We won't bother looking
--   anywhere else until we have a really good reason to do so. */
--static int mac89x0_device_probe(struct platform_device *pdev)
+-static int fmvj18x_probe(struct pcmcia_device *link)
 -{
--	struct net_device *dev;
--	struct net_local *lp;
--	int i, slot;
--	unsigned rev_type = 0;
--	unsigned long ioaddr;
--	unsigned short sig;
--	int err = -ENODEV;
--	struct nubus_rsrc *fres;
+-    struct local_info *lp;
+-    struct net_device *dev;
 -
--	dev = alloc_etherdev(sizeof(struct net_local));
--	if (!dev)
--		return -ENOMEM;
+-    dev_dbg(&link->dev, "fmvj18x_attach()\n");
 -
--	/* We might have to parameterize this later */
--	slot = 0xE;
--	/* Get out now if there's a real NuBus card in slot E */
--	for_each_func_rsrc(fres)
--		if (fres->board->slot == slot)
--			goto out;
+-    /* Make up a FMVJ18x specific data structure */
+-    dev = alloc_etherdev(sizeof(struct local_info));
+-    if (!dev)
+-	return -ENOMEM;
+-    lp = netdev_priv(dev);
+-    link->priv = dev;
+-    lp->p_dev = link;
+-    lp->base = NULL;
 -
--	/* The pseudo-ISA bits always live at offset 0x300 (gee,
--           wonder why...) */
--	ioaddr = (unsigned long)
--		nubus_slot_addr(slot) | (((slot&0xf) << 20) + DEFAULTIOBASE);
--	{
--		int card_present;
+-    /* The io structure describes IO port mapping */
+-    link->resource[0]->end = 32;
+-    link->resource[0]->flags |= IO_DATA_PATH_WIDTH_AUTO;
 -
--		card_present = (hwreg_present((void *)ioaddr + 4) &&
--				hwreg_present((void *)ioaddr + DATA_PORT));
--		if (!card_present)
--			goto out;
+-    /* General socket configuration */
+-    link->config_flags |= CONF_ENABLE_IRQ;
+-
+-    dev->netdev_ops = &fjn_netdev_ops;
+-    dev->watchdog_timeo = TX_TIMEOUT;
+-
+-    dev->ethtool_ops = &netdev_ethtool_ops;
+-
+-    return fmvj18x_config(link);
+-} /* fmvj18x_attach */
+-
+-/*====================================================================*/
+-
+-static void fmvj18x_detach(struct pcmcia_device *link)
+-{
+-    struct net_device *dev = link->priv;
+-
+-    dev_dbg(&link->dev, "fmvj18x_detach\n");
+-
+-    unregister_netdev(dev);
+-
+-    fmvj18x_release(link);
+-
+-    free_netdev(dev);
+-} /* fmvj18x_detach */
+-
+-/*====================================================================*/
+-
+-static int mfc_try_io_port(struct pcmcia_device *link)
+-{
+-    int i, ret;
+-    static const unsigned int serial_base[5] =
+-	{ 0x3f8, 0x2f8, 0x3e8, 0x2e8, 0x0 };
+-
+-    for (i = 0; i < 5; i++) {
+-	link->resource[1]->start = serial_base[i];
+-	link->resource[1]->flags |= IO_DATA_PATH_WIDTH_8;
+-	if (link->resource[1]->start == 0) {
+-	    link->resource[1]->end = 0;
+-	    pr_notice("out of resource for serial\n");
 -	}
+-	ret = pcmcia_request_io(link);
+-	if (ret == 0)
+-		return ret;
+-    }
+-    return ret;
+-}
 -
--	nubus_writew(0, ioaddr + ADD_PORT);
--	sig = nubus_readw(ioaddr + DATA_PORT);
--	if (sig != swab16(CHIP_EISA_ID_SIG))
--		goto out;
+-static int ungermann_try_io_port(struct pcmcia_device *link)
+-{
+-    int ret;
+-    unsigned int ioaddr;
+-    /*
+-	Ungermann-Bass Access/CARD accepts 0x300,0x320,0x340,0x360
+-	0x380,0x3c0 only for ioport.
+-    */
+-    for (ioaddr = 0x300; ioaddr < 0x3e0; ioaddr += 0x20) {
+-	link->resource[0]->start = ioaddr;
+-	ret = pcmcia_request_io(link);
+-	if (ret == 0) {
+-	    /* calculate ConfigIndex value */
+-	    link->config_index =
+-		((link->resource[0]->start & 0x0f0) >> 3) | 0x22;
+-	    return ret;
+-	}
+-    }
+-    return ret;	/* RequestIO failed */
+-}
 -
--	SET_NETDEV_DEV(dev, &pdev->dev);
+-static int fmvj18x_ioprobe(struct pcmcia_device *p_dev, void *priv_data)
+-{
+-	return 0; /* strange, but that's what the code did already before... */
+-}
 -
--	/* Initialize the net_device structure. */
--	lp = netdev_priv(dev);
+-static int fmvj18x_config(struct pcmcia_device *link)
+-{
+-    struct net_device *dev = link->priv;
+-    struct local_info *lp = netdev_priv(dev);
+-    int i, ret;
+-    unsigned int ioaddr;
+-    enum cardtype cardtype;
+-    char *card_name = "unknown";
+-    u8 *buf;
+-    size_t len;
+-    u_char buggybuf[32];
+-    u8 addr[ETH_ALEN];
 -
--	lp->msg_enable = netif_msg_init(debug, 0);
+-    dev_dbg(&link->dev, "fmvj18x_config\n");
 -
--	/* Fill in the 'dev' fields. */
--	dev->base_addr = ioaddr;
--	dev->mem_start = (unsigned long)
--		nubus_slot_addr(slot) | (((slot&0xf) << 20) + MMIOBASE);
--	dev->mem_end = dev->mem_start + 0x1000;
+-    link->io_lines = 5;
 -
--	/* Turn on shared memory */
--	writereg_io(dev, PP_BusCTL, MEMORY_ON);
+-    len = pcmcia_get_tuple(link, CISTPL_FUNCE, &buf);
+-    kfree(buf);
 -
--	/* get the chip type */
--	rev_type = readreg(dev, PRODUCT_ID_ADD);
--	lp->chip_type = rev_type &~ REVISON_BITS;
--	lp->chip_revision = ((rev_type & REVISON_BITS) >> 8) + 'A';
+-    if (len) {
+-	/* Yes, I have CISTPL_FUNCE. Let's check CISTPL_MANFID */
+-	ret = pcmcia_loop_config(link, fmvj18x_ioprobe, NULL);
+-	if (ret != 0)
+-		goto failed;
 -
--	/* Check the chip type and revision in order to set the correct send command
--	CS8920 revision C and CS8900 revision F can use the faster send. */
--	lp->send_cmd = TX_AFTER_381;
--	if (lp->chip_type == CS8900 && lp->chip_revision >= 'F')
--		lp->send_cmd = TX_NOW;
--	if (lp->chip_type != CS8900 && lp->chip_revision >= 'C')
--		lp->send_cmd = TX_NOW;
+-	switch (link->manf_id) {
+-	case MANFID_TDK:
+-	    cardtype = TDK;
+-	    if (link->card_id == PRODID_TDK_GN3410 ||
+-		link->card_id == PRODID_TDK_NP9610 ||
+-		link->card_id == PRODID_TDK_MN3200) {
+-		/* MultiFunction Card */
+-		link->config_base = 0x800;
+-		link->config_index = 0x47;
+-		link->resource[1]->end = 8;
+-	    }
+-	    break;
+-	case MANFID_NEC:
+-	    cardtype = NEC; /* MultiFunction Card */
+-	    link->config_base = 0x800;
+-	    link->config_index = 0x47;
+-	    link->resource[1]->end = 8;
+-	    break;
+-	case MANFID_KME:
+-	    cardtype = KME; /* MultiFunction Card */
+-	    link->config_base = 0x800;
+-	    link->config_index = 0x47;
+-	    link->resource[1]->end = 8;
+-	    break;
+-	case MANFID_CONTEC:
+-	    cardtype = CONTEC;
+-	    break;
+-	case MANFID_FUJITSU:
+-	    if (link->config_base == 0x0fe0)
+-		cardtype = MBH10302;
+-	    else if (link->card_id == PRODID_FUJITSU_MBH10302) 
+-                /* RATOC REX-5588/9822/4886's PRODID are 0004(=MBH10302),
+-                   but these are MBH10304 based card. */ 
+-		cardtype = MBH10304;
+-	    else if (link->card_id == PRODID_FUJITSU_MBH10304)
+-		cardtype = MBH10304;
+-	    else
+-		cardtype = LA501;
+-	    break;
+-	default:
+-	    cardtype = MBH10304;
+-	}
+-    } else {
+-	/* old type card */
+-	switch (link->manf_id) {
+-	case MANFID_FUJITSU:
+-	    if (link->card_id == PRODID_FUJITSU_MBH10304) {
+-		cardtype = XXX10304;    /* MBH10304 with buggy CIS */
+-		link->config_index = 0x20;
+-	    } else {
+-		cardtype = MBH10302;    /* NextCom NC5310, etc. */
+-		link->config_index = 1;
+-	    }
+-	    break;
+-	case MANFID_UNGERMANN:
+-	    cardtype = UNGERMANN;
+-	    break;
+-	default:
+-	    cardtype = MBH10302;
+-	    link->config_index = 1;
+-	}
+-    }
 -
--	netif_dbg(lp, drv, dev, "%s", version);
+-    if (link->resource[1]->end != 0) {
+-	ret = mfc_try_io_port(link);
+-	if (ret != 0) goto failed;
+-    } else if (cardtype == UNGERMANN) {
+-	ret = ungermann_try_io_port(link);
+-	if (ret != 0) goto failed;
+-    } else { 
+-	    ret = pcmcia_request_io(link);
+-	    if (ret)
+-		    goto failed;
+-    }
+-    ret = pcmcia_request_irq(link, fjn_interrupt);
+-    if (ret)
+-	    goto failed;
+-    ret = pcmcia_enable_device(link);
+-    if (ret)
+-	    goto failed;
 -
--	pr_info("cs89%c0%s rev %c found at %#8lx\n",
--		lp->chip_type == CS8900 ? '0' : '2',
--		lp->chip_type == CS8920M ? "M" : "",
--		lp->chip_revision, dev->base_addr);
+-    dev->irq = link->irq;
+-    dev->base_addr = link->resource[0]->start;
 -
--	/* Try to read the MAC address */
--	if ((readreg(dev, PP_SelfST) & (EEPROM_PRESENT | EEPROM_OK)) == 0) {
--		pr_info("No EEPROM, giving up now.\n");
--		goto out1;
--        } else {
--		u8 addr[ETH_ALEN];
+-    if (resource_size(link->resource[1]) != 0) {
+-	ret = fmvj18x_setup_mfc(link);
+-	if (ret != 0) goto failed;
+-    }
 -
--                for (i = 0; i < ETH_ALEN; i += 2) {
--			/* Big-endian (why??!) */
--			unsigned short s = readreg(dev, PP_IA + i);
--			addr[i] = s >> 8;
--			addr[i+1] = s & 0xff;
--                }
--		eth_hw_addr_set(dev, addr);
--        }
+-    ioaddr = dev->base_addr;
 -
--	dev->irq = SLOT2IRQ(slot);
+-    /* Reset controller */
+-    if (sram_config == 0) 
+-	outb(CONFIG0_RST, ioaddr + CONFIG_0);
+-    else
+-	outb(CONFIG0_RST_1, ioaddr + CONFIG_0);
 -
--	/* print the IRQ and ethernet address. */
+-    /* Power On chip and select bank 0 */
+-    if (cardtype == MBH10302)
+-	outb(BANK_0, ioaddr + CONFIG_1);
+-    else
+-	outb(BANK_0U, ioaddr + CONFIG_1);
+-    
+-    /* Set hardware address */
+-    switch (cardtype) {
+-    case MBH10304:
+-    case TDK:
+-    case LA501:
+-    case CONTEC:
+-    case NEC:
+-    case KME:
+-	if (cardtype == MBH10304) {
+-	    card_name = "FMV-J182";
 -
--	pr_info("MAC %pM, IRQ %d\n", dev->dev_addr, dev->irq);
+-	    len = pcmcia_get_tuple(link, CISTPL_FUNCE, &buf);
+-	    if (len < 11) {
+-		    kfree(buf);
+-		    goto failed;
+-	    }
+-	    /* Read MACID from CIS */
+-	    eth_hw_addr_set(dev, &buf[5]);
+-	    kfree(buf);
+-	} else {
+-	    if (pcmcia_get_mac_from_cis(link, dev))
+-		goto failed;
+-	    if( cardtype == TDK ) {
+-		card_name = "TDK LAK-CD021";
+-	    } else if( cardtype == LA501 ) {
+-		card_name = "LA501";
+-	    } else if( cardtype == NEC ) {
+-		card_name = "PK-UG-J001";
+-	    } else if( cardtype == KME ) {
+-		card_name = "Panasonic";
+-	    } else {
+-		card_name = "C-NET(PC)C";
+-	    }
+-	}
+-	break;
+-    case UNGERMANN:
+-	/* Read MACID from register */
+-	for (i = 0; i < 6; i++) 
+-	    addr[i] = inb(ioaddr + UNGERMANN_MAC_ID + i);
+-	eth_hw_addr_set(dev, addr);
+-	card_name = "Access/CARD";
+-	break;
+-    case XXX10304:
+-	/* Read MACID from Buggy CIS */
+-	if (fmvj18x_get_hwinfo(link, buggybuf) == -1) {
+-	    pr_notice("unable to read hardware net address\n");
+-	    goto failed;
+-	}
+-	eth_hw_addr_set(dev, buggybuf);
+-	card_name = "FMV-J182";
+-	break;
+-    case MBH10302:
+-    default:
+-	/* Read MACID from register */
+-	for (i = 0; i < 6; i++) 
+-	    addr[i] = inb(ioaddr + MAC_ID + i);
+-	eth_hw_addr_set(dev, addr);
+-	card_name = "FMV-J181";
+-	break;
+-    }
 -
--	dev->netdev_ops		= &mac89x0_netdev_ops;
+-    lp->cardtype = cardtype;
+-    SET_NETDEV_DEV(dev, &link->dev);
 -
--	err = register_netdev(dev);
--	if (err)
--		goto out1;
+-    if (register_netdev(dev) != 0) {
+-	pr_notice("register_netdev() failed\n");
+-	goto failed;
+-    }
 -
--	platform_set_drvdata(pdev, dev);
+-    /* print current configuration */
+-    netdev_info(dev, "%s, sram %s, port %#3lx, irq %d, hw_addr %pM\n",
+-		card_name, sram_config == 0 ? "4K TX*2" : "8K TX*2",
+-		dev->base_addr, dev->irq, dev->dev_addr);
+-
+-    return 0;
+-    
+-failed:
+-    fmvj18x_release(link);
+-    return -ENODEV;
+-} /* fmvj18x_config */
+-/*====================================================================*/
+-
+-static int fmvj18x_get_hwinfo(struct pcmcia_device *link, u_char *node_id)
+-{
+-    u_char __iomem *base;
+-    int i, j;
+-
+-    /* Allocate a small memory window */
+-    link->resource[2]->flags |= WIN_DATA_WIDTH_8|WIN_MEMORY_TYPE_AM|WIN_ENABLE;
+-    link->resource[2]->start = 0; link->resource[2]->end = 0;
+-    i = pcmcia_request_window(link, link->resource[2], 0);
+-    if (i != 0)
+-	return -1;
+-
+-    base = ioremap(link->resource[2]->start, resource_size(link->resource[2]));
+-    if (!base) {
+-	pcmcia_release_window(link, link->resource[2]);
+-	return -1;
+-    }
+-
+-    pcmcia_map_mem_page(link, link->resource[2], 0);
+-
+-    /*
+-     *  MBH10304 CISTPL_FUNCE_LAN_NODE_ID format
+-     *  22 0d xx xx xx 04 06 yy yy yy yy yy yy ff
+-     *  'xx' is garbage.
+-     *  'yy' is MAC address.
+-    */ 
+-    for (i = 0; i < 0x200; i++) {
+-	if (readb(base+i*2) == 0x22) {	
+-		if (readb(base+(i-1)*2) == 0xff &&
+-		    readb(base+(i+5)*2) == 0x04 &&
+-		    readb(base+(i+6)*2) == 0x06 &&
+-		    readb(base+(i+13)*2) == 0xff)
+-			break;
+-	}
+-    }
+-
+-    if (i != 0x200) {
+-	for (j = 0 ; j < 6; j++,i++) {
+-	    node_id[j] = readb(base+(i+7)*2);
+-	}
+-    }
+-
+-    iounmap(base);
+-    j = pcmcia_release_window(link, link->resource[2]);
+-    return (i != 0x200) ? 0 : -1;
+-
+-} /* fmvj18x_get_hwinfo */
+-/*====================================================================*/
+-
+-static int fmvj18x_setup_mfc(struct pcmcia_device *link)
+-{
+-    int i;
+-    struct net_device *dev = link->priv;
+-    unsigned int ioaddr;
+-    struct local_info *lp = netdev_priv(dev);
+-
+-    /* Allocate a small memory window */
+-    link->resource[3]->flags = WIN_DATA_WIDTH_8|WIN_MEMORY_TYPE_AM|WIN_ENABLE;
+-    link->resource[3]->start = link->resource[3]->end = 0;
+-    i = pcmcia_request_window(link, link->resource[3], 0);
+-    if (i != 0)
+-	return -1;
+-
+-    lp->base = ioremap(link->resource[3]->start,
+-		       resource_size(link->resource[3]));
+-    if (lp->base == NULL) {
+-	netdev_notice(dev, "ioremap failed\n");
+-	return -1;
+-    }
+-
+-    i = pcmcia_map_mem_page(link, link->resource[3], 0);
+-    if (i != 0) {
+-	iounmap(lp->base);
+-	lp->base = NULL;
+-	return -1;
+-    }
+-    
+-    ioaddr = dev->base_addr;
+-    writeb(0x47, lp->base+0x800);	/* Config Option Register of LAN */
+-    writeb(0x0,  lp->base+0x802);	/* Config and Status Register */
+-
+-    writeb(ioaddr & 0xff, lp->base+0x80a);	  /* I/O Base(Low) of LAN */
+-    writeb((ioaddr >> 8) & 0xff, lp->base+0x80c); /* I/O Base(High) of LAN */
+-   
+-    writeb(0x45, lp->base+0x820);	/* Config Option Register of Modem */
+-    writeb(0x8,  lp->base+0x822);	/* Config and Status Register */
+-
+-    return 0;
+-
+-}
+-/*====================================================================*/
+-
+-static void fmvj18x_release(struct pcmcia_device *link)
+-{
+-
+-    struct net_device *dev = link->priv;
+-    struct local_info *lp = netdev_priv(dev);
+-    u_char __iomem *tmp;
+-
+-    dev_dbg(&link->dev, "fmvj18x_release\n");
+-
+-    if (lp->base != NULL) {
+-	tmp = lp->base;
+-	lp->base = NULL;    /* set NULL before iounmap */
+-	iounmap(tmp);
+-    }
+-
+-    pcmcia_disable_device(link);
+-
+-}
+-
+-static int fmvj18x_suspend(struct pcmcia_device *link)
+-{
+-	struct net_device *dev = link->priv;
+-
+-	if (link->open)
+-		netif_device_detach(dev);
+-
 -	return 0;
--out1:
--	nubus_writew(0, dev->base_addr + ADD_PORT);
--out:
--	free_netdev(dev);
--	return err;
 -}
 -
--/* Open/initialize the board.  This is called (in the current kernel)
--   sometime after booting when the 'ifconfig' program is run.
--
--   This routine should set everything up anew at each open, even
--   registers that "should" only need to be set once at boot, so that
--   there is non-reboot way to recover if something goes wrong.
--   */
--static int
--net_open(struct net_device *dev)
+-static int fmvj18x_resume(struct pcmcia_device *link)
 -{
--	struct net_local *lp = netdev_priv(dev);
--	int i;
+-	struct net_device *dev = link->priv;
 -
--	/* Disable the interrupt for now */
--	writereg(dev, PP_BusCTL, readreg(dev, PP_BusCTL) & ~ENABLE_IRQ);
+-	if (link->open) {
+-		fjn_reset(dev);
+-		netif_device_attach(dev);
+-	}
 -
--	/* Grab the interrupt */
--	if (request_irq(dev->irq, net_interrupt, 0, "cs89x0", dev))
--		return -EAGAIN;
--
--	/* Set up the IRQ - Apparently magic */
--	if (lp->chip_type == CS8900)
--		writereg(dev, PP_CS8900_ISAINT, 0);
--	else
--		writereg(dev, PP_CS8920_ISAINT, 0);
--
--	/* set the Ethernet address */
--	for (i=0; i < ETH_ALEN/2; i++)
--		writereg(dev, PP_IA+i*2, dev->dev_addr[i*2] | (dev->dev_addr[i*2+1] << 8));
--
--	/* Turn on both receive and transmit operations */
--	writereg(dev, PP_LineCTL, readreg(dev, PP_LineCTL) | SERIAL_RX_ON | SERIAL_TX_ON);
--
--	/* Receive only error free packets addressed to this card */
--	lp->rx_mode = 0;
--	writereg(dev, PP_RxCTL, DEF_RX_ACCEPT);
--
--	lp->curr_rx_cfg = RX_OK_ENBL | RX_CRC_ERROR_ENBL;
--
--	writereg(dev, PP_RxCFG, lp->curr_rx_cfg);
--
--	writereg(dev, PP_TxCFG, TX_LOST_CRS_ENBL | TX_SQE_ERROR_ENBL | TX_OK_ENBL |
--	       TX_LATE_COL_ENBL | TX_JBR_ENBL | TX_ANY_COL_ENBL | TX_16_COL_ENBL);
--
--	writereg(dev, PP_BufCFG, READY_FOR_TX_ENBL | RX_MISS_COUNT_OVRFLOW_ENBL |
--		 TX_COL_COUNT_OVRFLOW_ENBL | TX_UNDERRUN_ENBL);
--
--	/* now that we've got our act together, enable everything */
--	writereg(dev, PP_BusCTL, readreg(dev, PP_BusCTL) | ENABLE_IRQ);
--	netif_start_queue(dev);
 -	return 0;
 -}
 -
--static netdev_tx_t
--net_send_packet(struct sk_buff *skb, struct net_device *dev)
+-/*====================================================================*/
+-
+-static const struct pcmcia_device_id fmvj18x_ids[] = {
+-	PCMCIA_DEVICE_MANF_CARD(0x0004, 0x0004),
+-	PCMCIA_DEVICE_PROD_ID12("EAGLE Technology", "NE200 ETHERNET LAN MBH10302 04", 0x528c88c4, 0x74f91e59),
+-	PCMCIA_DEVICE_PROD_ID12("Eiger Labs,Inc", "EPX-10BT PC Card Ethernet 10BT", 0x53af556e, 0x877f9922),
+-	PCMCIA_DEVICE_PROD_ID12("Eiger labs,Inc.", "EPX-10BT PC Card Ethernet 10BT", 0xf47e6c66, 0x877f9922),
+-	PCMCIA_DEVICE_PROD_ID12("FUJITSU", "LAN Card(FMV-J182)", 0x6ee5a3d8, 0x5baf31db),
+-	PCMCIA_DEVICE_PROD_ID12("FUJITSU", "MBH10308", 0x6ee5a3d8, 0x3f04875e),
+-	PCMCIA_DEVICE_PROD_ID12("FUJITSU TOWA", "LA501", 0xb8451188, 0x12939ba2),
+-	PCMCIA_DEVICE_PROD_ID12("HITACHI", "HT-4840-11", 0xf4f43949, 0x773910f4),
+-	PCMCIA_DEVICE_PROD_ID12("NextComK.K.", "NC5310B Ver1.0       ", 0x8cef4d3a, 0x075fc7b6),
+-	PCMCIA_DEVICE_PROD_ID12("NextComK.K.", "NC5310 Ver1.0        ", 0x8cef4d3a, 0xbccf43e6),
+-	PCMCIA_DEVICE_PROD_ID12("RATOC System Inc.", "10BASE_T CARD R280", 0x85c10e17, 0xd9413666),
+-	PCMCIA_DEVICE_PROD_ID12("TDK", "LAC-CD02x", 0x1eae9475, 0x8fa0ee70),
+-	PCMCIA_DEVICE_PROD_ID12("TDK", "LAC-CF010", 0x1eae9475, 0x7683bc9a),
+-	PCMCIA_DEVICE_PROD_ID1("CONTEC Co.,Ltd.", 0x58d8fee2),
+-	PCMCIA_DEVICE_PROD_ID1("PCMCIA LAN MBH10304  ES", 0x2599f454),
+-	PCMCIA_DEVICE_PROD_ID1("PCMCIA MBH10302", 0x8f4005da),
+-	PCMCIA_DEVICE_PROD_ID1("UBKK,V2.0", 0x90888080),
+-	PCMCIA_PFC_DEVICE_PROD_ID12(0, "TDK", "GlobalNetworker 3410/3412", 0x1eae9475, 0xd9a93bed),
+-	PCMCIA_PFC_DEVICE_PROD_ID12(0, "NEC", "PK-UG-J001" ,0x18df0ba0 ,0x831b1064),
+-	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0105, 0x0d0a),
+-	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0105, 0x0e0a),
+-	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0032, 0x0e01),
+-	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0032, 0x0a05),
+-	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0032, 0x0b05),
+-	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0032, 0x1101),
+-	PCMCIA_DEVICE_NULL,
+-};
+-MODULE_DEVICE_TABLE(pcmcia, fmvj18x_ids);
+-
+-static struct pcmcia_driver fmvj18x_cs_driver = {
+-	.owner		= THIS_MODULE,
+-	.name		= "fmvj18x_cs",
+-	.probe		= fmvj18x_probe,
+-	.remove		= fmvj18x_detach,
+-	.id_table       = fmvj18x_ids,
+-	.suspend	= fmvj18x_suspend,
+-	.resume		= fmvj18x_resume,
+-};
+-module_pcmcia_driver(fmvj18x_cs_driver);
+-
+-/*====================================================================*/
+-
+-static irqreturn_t fjn_interrupt(int dummy, void *dev_id)
 -{
--	struct net_local *lp = netdev_priv(dev);
--	unsigned long flags;
+-    struct net_device *dev = dev_id;
+-    struct local_info *lp = netdev_priv(dev);
+-    unsigned int ioaddr;
+-    unsigned short tx_stat, rx_stat;
 -
--	netif_dbg(lp, tx_queued, dev, "sent %d byte packet of type %x\n",
--		  skb->len, skb->data[ETH_ALEN + ETH_ALEN] << 8 |
--		  skb->data[ETH_ALEN + ETH_ALEN + 1]);
+-    ioaddr = dev->base_addr;
 -
--	/* keep the upload from being interrupted, since we
--	   ask the chip to start transmitting before the
--	   whole packet has been completely uploaded. */
--	local_irq_save(flags);
--	netif_stop_queue(dev);
+-    /* avoid multiple interrupts */
+-    outw(0x0000, ioaddr + TX_INTR);
 -
--	/* initiate a transmit sequence */
--	writereg(dev, PP_TxCMD, lp->send_cmd);
--	writereg(dev, PP_TxLength, skb->len);
+-    /* wait for a while */
+-    udelay(1);
 -
--	/* Test to see if the chip has allocated memory for the packet */
--	if ((readreg(dev, PP_BusST) & READY_FOR_TX_NOW) == 0) {
--		/* Gasp!  It hasn't.  But that shouldn't happen since
--		   we're waiting for TxOk, so return 1 and requeue this packet. */
--		local_irq_restore(flags);
--		return NETDEV_TX_BUSY;
+-    /* get status */
+-    tx_stat = inb(ioaddr + TX_STATUS);
+-    rx_stat = inb(ioaddr + RX_STATUS);
+-
+-    /* clear status */
+-    outb(tx_stat, ioaddr + TX_STATUS);
+-    outb(rx_stat, ioaddr + RX_STATUS);
+-    
+-    pr_debug("%s: interrupt, rx_status %02x.\n", dev->name, rx_stat);
+-    pr_debug("               tx_status %02x.\n", tx_stat);
+-    
+-    if (rx_stat || (inb(ioaddr + RX_MODE) & F_BUF_EMP) == 0) {
+-	/* there is packet(s) in rx buffer */
+-	fjn_rx(dev);
+-    }
+-    if (tx_stat & F_TMT_RDY) {
+-	dev->stats.tx_packets += lp->sent ;
+-        lp->sent = 0 ;
+-	if (lp->tx_queue) {
+-	    outb(DO_TX | lp->tx_queue, ioaddr + TX_START);
+-	    lp->sent = lp->tx_queue ;
+-	    lp->tx_queue = 0;
+-	    lp->tx_queue_len = 0;
+-	    netif_trans_update(dev);
+-	} else {
+-	    lp->tx_started = 0;
 -	}
+-	netif_wake_queue(dev);
+-    }
+-    pr_debug("%s: exiting interrupt,\n", dev->name);
+-    pr_debug("    tx_status %02x, rx_status %02x.\n", tx_stat, rx_stat);
 -
--	/* Write the contents of the packet */
--	skb_copy_from_linear_data(skb, (void *)(dev->mem_start + PP_TxFrame),
--				  skb->len+1);
+-    outb(D_TX_INTR, ioaddr + TX_INTR);
+-    outb(D_RX_INTR, ioaddr + RX_INTR);
 -
--	local_irq_restore(flags);
--	dev_kfree_skb (skb);
+-    if (lp->base != NULL) {
+-	/* Ack interrupt for multifunction card */
+-	writeb(0x01, lp->base+0x802);
+-	writeb(0x09, lp->base+0x822);
+-    }
 -
--	return NETDEV_TX_OK;
+-    return IRQ_HANDLED;
+-
+-} /* fjn_interrupt */
+-
+-/*====================================================================*/
+-
+-static void fjn_tx_timeout(struct net_device *dev, unsigned int txqueue)
+-{
+-    struct local_info *lp = netdev_priv(dev);
+-    unsigned int ioaddr = dev->base_addr;
+-
+-    netdev_notice(dev, "transmit timed out with status %04x, %s?\n",
+-		  htons(inw(ioaddr + TX_STATUS)),
+-		  inb(ioaddr + TX_STATUS) & F_TMT_RDY
+-		  ? "IRQ conflict" : "network cable problem");
+-    netdev_notice(dev, "timeout registers: %04x %04x %04x "
+-		  "%04x %04x %04x %04x %04x.\n",
+-		  htons(inw(ioaddr + 0)), htons(inw(ioaddr + 2)),
+-		  htons(inw(ioaddr + 4)), htons(inw(ioaddr + 6)),
+-		  htons(inw(ioaddr + 8)), htons(inw(ioaddr + 10)),
+-		  htons(inw(ioaddr + 12)), htons(inw(ioaddr + 14)));
+-    dev->stats.tx_errors++;
+-    /* ToDo: We should try to restart the adaptor... */
+-    local_irq_disable();
+-    fjn_reset(dev);
+-
+-    lp->tx_started = 0;
+-    lp->tx_queue = 0;
+-    lp->tx_queue_len = 0;
+-    lp->sent = 0;
+-    lp->open_time = jiffies;
+-    local_irq_enable();
+-    netif_wake_queue(dev);
 -}
 -
--/* The typical workload of the driver:
--   Handle the network interface interrupts. */
--static irqreturn_t net_interrupt(int irq, void *dev_id)
+-static netdev_tx_t fjn_start_xmit(struct sk_buff *skb,
+-					struct net_device *dev)
 -{
--	struct net_device *dev = dev_id;
--	struct net_local *lp;
--	int ioaddr, status;
+-    struct local_info *lp = netdev_priv(dev);
+-    unsigned int ioaddr = dev->base_addr;
+-    short length = skb->len;
+-    
+-    if (length < ETH_ZLEN)
+-    {
+-	if (skb_padto(skb, ETH_ZLEN))
+-		return NETDEV_TX_OK;
+-	length = ETH_ZLEN;
+-    }
 -
--	ioaddr = dev->base_addr;
--	lp = netdev_priv(dev);
+-    netif_stop_queue(dev);
 -
--	/* we MUST read all the events out of the ISQ, otherwise we'll never
--           get interrupted again.  As a consequence, we can't have any limit
--           on the number of times we loop in the interrupt handler.  The
--           hardware guarantees that eventually we'll run out of events.  Of
--           course, if you're on a slow machine, and packets are arriving
--           faster than you can read them off, you're screwed.  Hasta la
--           vista, baby!  */
--	while ((status = swab16(nubus_readw(dev->base_addr + ISQ_PORT)))) {
--		netif_dbg(lp, intr, dev, "status=%04x\n", status);
--		switch(status & ISQ_EVENT_MASK) {
--		case ISQ_RECEIVER_EVENT:
--			/* Got a packet(s). */
--			net_rx(dev);
--			break;
--		case ISQ_TRANSMITTER_EVENT:
--			dev->stats.tx_packets++;
--			netif_wake_queue(dev);
--			if ((status & TX_OK) == 0)
--				dev->stats.tx_errors++;
--			if (status & TX_LOST_CRS)
--				dev->stats.tx_carrier_errors++;
--			if (status & TX_SQE_ERROR)
--				dev->stats.tx_heartbeat_errors++;
--			if (status & TX_LATE_COL)
--				dev->stats.tx_window_errors++;
--			if (status & TX_16_COL)
--				dev->stats.tx_aborted_errors++;
--			break;
--		case ISQ_BUFFER_EVENT:
--			if (status & READY_FOR_TX) {
--				/* we tried to transmit a packet earlier,
--                                   but inexplicably ran out of buffers.
--                                   That shouldn't happen since we only ever
--                                   load one packet.  Shrug.  Do the right
--                                   thing anyway. */
--				netif_wake_queue(dev);
--			}
--			if (status & TX_UNDERRUN) {
--				netif_dbg(lp, tx_err, dev, "transmit underrun\n");
--                                lp->send_underrun++;
--                                if (lp->send_underrun == 3) lp->send_cmd = TX_AFTER_381;
--                                else if (lp->send_underrun == 6) lp->send_cmd = TX_AFTER_ALL;
--                        }
--			break;
--		case ISQ_RX_MISS_EVENT:
--			dev->stats.rx_missed_errors += (status >> 6);
--			break;
--		case ISQ_TX_COL_EVENT:
--			dev->stats.collisions += (status >> 6);
--			break;
--		}
+-    {
+-	unsigned char *buf = skb->data;
+-
+-	if (length > ETH_FRAME_LEN) {
+-	    netdev_notice(dev, "Attempting to send a large packet (%d bytes)\n",
+-			  length);
+-	    return NETDEV_TX_BUSY;
 -	}
--	return IRQ_HANDLED;
--}
 -
--/* We have a good packet(s), get it/them out of the buffers. */
--static void
--net_rx(struct net_device *dev)
+-	netdev_dbg(dev, "Transmitting a packet of length %lu\n",
+-		   (unsigned long)skb->len);
+-	dev->stats.tx_bytes += skb->len;
+-
+-	/* Disable both interrupts. */
+-	outw(0x0000, ioaddr + TX_INTR);
+-
+-	/* wait for a while */
+-	udelay(1);
+-
+-	outw(length, ioaddr + DATAPORT);
+-	outsw(ioaddr + DATAPORT, buf, (length + 1) >> 1);
+-
+-	lp->tx_queue++;
+-	lp->tx_queue_len += ((length+3) & ~1);
+-
+-	if (lp->tx_started == 0) {
+-	    /* If the Tx is idle, always trigger a transmit. */
+-	    outb(DO_TX | lp->tx_queue, ioaddr + TX_START);
+-	    lp->sent = lp->tx_queue ;
+-	    lp->tx_queue = 0;
+-	    lp->tx_queue_len = 0;
+-	    lp->tx_started = 1;
+-	    netif_start_queue(dev);
+-	} else {
+-	    if( sram_config == 0 ) {
+-		if (lp->tx_queue_len < (4096 - (ETH_FRAME_LEN +2)) )
+-		    /* Yes, there is room for one more packet. */
+-		    netif_start_queue(dev);
+-	    } else {
+-		if (lp->tx_queue_len < (8192 - (ETH_FRAME_LEN +2)) && 
+-						lp->tx_queue < 127 )
+-		    /* Yes, there is room for one more packet. */
+-		    netif_start_queue(dev);
+-	    }
+-	}
+-
+-	/* Re-enable interrupts */
+-	outb(D_TX_INTR, ioaddr + TX_INTR);
+-	outb(D_RX_INTR, ioaddr + RX_INTR);
+-    }
+-    dev_kfree_skb (skb);
+-
+-    return NETDEV_TX_OK;
+-} /* fjn_start_xmit */
+-
+-/*====================================================================*/
+-
+-static void fjn_reset(struct net_device *dev)
 -{
--	struct net_local *lp = netdev_priv(dev);
--	struct sk_buff *skb;
--	int status, length;
+-    struct local_info *lp = netdev_priv(dev);
+-    unsigned int ioaddr = dev->base_addr;
+-    int i;
 -
--	status = readreg(dev, PP_RxStatus);
--	if ((status & RX_OK) == 0) {
+-    netdev_dbg(dev, "fjn_reset() called\n");
+-
+-    /* Reset controller */
+-    if( sram_config == 0 ) 
+-	outb(CONFIG0_RST, ioaddr + CONFIG_0);
+-    else
+-	outb(CONFIG0_RST_1, ioaddr + CONFIG_0);
+-
+-    /* Power On chip and select bank 0 */
+-    if (lp->cardtype == MBH10302)
+-	outb(BANK_0, ioaddr + CONFIG_1);
+-    else
+-	outb(BANK_0U, ioaddr + CONFIG_1);
+-
+-    /* Set Tx modes */
+-    outb(D_TX_MODE, ioaddr + TX_MODE);
+-    /* set Rx modes */
+-    outb(ID_MATCHED, ioaddr + RX_MODE);
+-
+-    /* Set hardware address */
+-    for (i = 0; i < 6; i++) 
+-        outb(dev->dev_addr[i], ioaddr + NODE_ID + i);
+-
+-    /* (re)initialize the multicast table */
+-    set_rx_mode(dev);
+-
+-    /* Switch to bank 2 (runtime mode) */
+-    if (lp->cardtype == MBH10302)
+-	outb(BANK_2, ioaddr + CONFIG_1);
+-    else
+-	outb(BANK_2U, ioaddr + CONFIG_1);
+-
+-    /* set 16col ctrl bits */
+-    if( lp->cardtype == TDK || lp->cardtype == CONTEC) 
+-        outb(TDK_AUTO_MODE, ioaddr + COL_CTRL);
+-    else
+-        outb(AUTO_MODE, ioaddr + COL_CTRL);
+-
+-    /* clear Reserved Regs */
+-    outb(0x00, ioaddr + BMPR12);
+-    outb(0x00, ioaddr + BMPR13);
+-
+-    /* reset Skip packet reg. */
+-    outb(0x01, ioaddr + RX_SKIP);
+-
+-    /* Enable Tx and Rx */
+-    if( sram_config == 0 )
+-	outb(CONFIG0_DFL, ioaddr + CONFIG_0);
+-    else
+-	outb(CONFIG0_DFL_1, ioaddr + CONFIG_0);
+-
+-    /* Init receive pointer ? */
+-    inw(ioaddr + DATAPORT);
+-    inw(ioaddr + DATAPORT);
+-
+-    /* Clear all status */
+-    outb(0xff, ioaddr + TX_STATUS);
+-    outb(0xff, ioaddr + RX_STATUS);
+-
+-    if (lp->cardtype == MBH10302)
+-	outb(INTR_OFF, ioaddr + LAN_CTRL);
+-
+-    /* Turn on Rx interrupts */
+-    outb(D_TX_INTR, ioaddr + TX_INTR);
+-    outb(D_RX_INTR, ioaddr + RX_INTR);
+-
+-    /* Turn on interrupts from LAN card controller */
+-    if (lp->cardtype == MBH10302)
+-	outb(INTR_ON, ioaddr + LAN_CTRL);
+-} /* fjn_reset */
+-
+-/*====================================================================*/
+-
+-static void fjn_rx(struct net_device *dev)
+-{
+-    unsigned int ioaddr = dev->base_addr;
+-    int boguscount = 10;	/* 5 -> 10: by agy 19940922 */
+-
+-    pr_debug("%s: in rx_packet(), rx_status %02x.\n",
+-	  dev->name, inb(ioaddr + RX_STATUS));
+-
+-    while ((inb(ioaddr + RX_MODE) & F_BUF_EMP) == 0) {
+-	u_short status = inw(ioaddr + DATAPORT);
+-
+-	netdev_dbg(dev, "Rxing packet mode %02x status %04x.\n",
+-		   inb(ioaddr + RX_MODE), status);
+-#ifndef final_version
+-	if (status == 0) {
+-	    outb(F_SKP_PKT, ioaddr + RX_SKIP);
+-	    break;
+-	}
+-#endif
+-	if ((status & 0xF0) != 0x20) {	/* There was an error. */
+-	    dev->stats.rx_errors++;
+-	    if (status & F_LEN_ERR) dev->stats.rx_length_errors++;
+-	    if (status & F_ALG_ERR) dev->stats.rx_frame_errors++;
+-	    if (status & F_CRC_ERR) dev->stats.rx_crc_errors++;
+-	    if (status & F_OVR_FLO) dev->stats.rx_over_errors++;
+-	} else {
+-	    u_short pkt_len = inw(ioaddr + DATAPORT);
+-	    /* Malloc up new buffer. */
+-	    struct sk_buff *skb;
+-
+-	    if (pkt_len > 1550) {
+-		netdev_notice(dev, "The FMV-18x claimed a very large packet, size %d\n",
+-			      pkt_len);
+-		outb(F_SKP_PKT, ioaddr + RX_SKIP);
 -		dev->stats.rx_errors++;
--		if (status & RX_RUNT)
--				dev->stats.rx_length_errors++;
--		if (status & RX_EXTRA_DATA)
--				dev->stats.rx_length_errors++;
--		if ((status & RX_CRC_ERROR) &&
--		    !(status & (RX_EXTRA_DATA|RX_RUNT)))
--			/* per str 172 */
--			dev->stats.rx_crc_errors++;
--		if (status & RX_DRIBBLE)
--				dev->stats.rx_frame_errors++;
--		return;
--	}
--
--	length = readreg(dev, PP_RxLength);
--	/* Malloc up new buffer. */
--	skb = alloc_skb(length, GFP_ATOMIC);
--	if (skb == NULL) {
+-		break;
+-	    }
+-	    skb = netdev_alloc_skb(dev, pkt_len + 2);
+-	    if (skb == NULL) {
+-		outb(F_SKP_PKT, ioaddr + RX_SKIP);
 -		dev->stats.rx_dropped++;
--		return;
+-		break;
+-	    }
+-
+-	    skb_reserve(skb, 2);
+-	    insw(ioaddr + DATAPORT, skb_put(skb, pkt_len),
+-		 (pkt_len + 1) >> 1);
+-	    skb->protocol = eth_type_trans(skb, dev);
+-
+-	    {
+-		int i;
+-		pr_debug("%s: Rxed packet of length %d: ",
+-			dev->name, pkt_len);
+-		for (i = 0; i < 14; i++)
+-			pr_debug(" %02x", skb->data[i]);
+-		pr_debug(".\n");
+-	    }
+-
+-	    netif_rx(skb);
+-	    dev->stats.rx_packets++;
+-	    dev->stats.rx_bytes += pkt_len;
 -	}
--	skb_put(skb, length);
+-	if (--boguscount <= 0)
+-	    break;
+-    }
 -
--	skb_copy_to_linear_data(skb, (void *)(dev->mem_start + PP_RxFrame),
--				length);
--
--	netif_dbg(lp, rx_status, dev, "received %d byte packet of type %x\n",
--		  length, skb->data[ETH_ALEN + ETH_ALEN] << 8 |
--		  skb->data[ETH_ALEN + ETH_ALEN + 1]);
--
--        skb->protocol=eth_type_trans(skb,dev);
--	netif_rx(skb);
--	dev->stats.rx_packets++;
--	dev->stats.rx_bytes += length;
--}
--
--/* The inverse routine to net_open(). */
--static int
--net_close(struct net_device *dev)
--{
--
--	writereg(dev, PP_RxCFG, 0);
--	writereg(dev, PP_TxCFG, 0);
--	writereg(dev, PP_BufCFG, 0);
--	writereg(dev, PP_BusCTL, 0);
--
--	netif_stop_queue(dev);
--
--	free_irq(dev->irq, dev);
--
--	/* Update the statistics here. */
--
--	return 0;
--
--}
--
--/* Get the current statistics.	This may be called with the card open or
--   closed. */
--static struct net_device_stats *
--net_get_stats(struct net_device *dev)
--{
--	unsigned long flags;
--
--	local_irq_save(flags);
--	/* Update the statistics from the device registers. */
--	dev->stats.rx_missed_errors += (readreg(dev, PP_RxMiss) >> 6);
--	dev->stats.collisions += (readreg(dev, PP_TxCol) >> 6);
--	local_irq_restore(flags);
--
--	return &dev->stats;
--}
--
--static void set_multicast_list(struct net_device *dev)
--{
--	struct net_local *lp = netdev_priv(dev);
--
--	if(dev->flags&IFF_PROMISC)
--	{
--		lp->rx_mode = RX_ALL_ACCEPT;
--	} else if ((dev->flags & IFF_ALLMULTI) || !netdev_mc_empty(dev)) {
--		/* The multicast-accept list is initialized to accept-all, and we
--		   rely on higher-level filtering for now. */
--		lp->rx_mode = RX_MULTCAST_ACCEPT;
--	}
--	else
--		lp->rx_mode = 0;
--
--	writereg(dev, PP_RxCTL, DEF_RX_ACCEPT | lp->rx_mode);
--
--	/* in promiscuous mode, we accept errored packets, so we have to enable interrupts on them also */
--	writereg(dev, PP_RxCFG, lp->curr_rx_cfg |
--	     (lp->rx_mode == RX_ALL_ACCEPT? (RX_CRC_ERROR_ENBL|RX_RUNT_ENBL|RX_EXTRA_DATA_ENBL) : 0));
--}
--
--
--static int set_mac_address(struct net_device *dev, void *addr)
--{
--	struct sockaddr *saddr = addr;
+-    /* If any worth-while packets have been received, dev_rint()
+-	   has done a netif_wake_queue() for us and will work on them
+-	   when we get to the bottom-half routine. */
+-/*
+-    if (lp->cardtype != TDK) {
 -	int i;
+-	for (i = 0; i < 20; i++) {
+-	    if ((inb(ioaddr + RX_MODE) & F_BUF_EMP) == F_BUF_EMP)
+-		break;
+-	    (void)inw(ioaddr + DATAPORT);  /+ dummy status read +/
+-	    outb(F_SKP_PKT, ioaddr + RX_SKIP);
+-	}
 -
--	if (!is_valid_ether_addr(saddr->sa_data))
--		return -EADDRNOTAVAIL;
+-	if (i > 0)
+-	    pr_debug("%s: Exint Rx packet with mode %02x after "
+-		  "%d ticks.\n", dev->name, inb(ioaddr + RX_MODE), i);
+-    }
+-*/
+-} /* fjn_rx */
 -
--	eth_hw_addr_set(dev, saddr->sa_data);
--	netdev_info(dev, "Setting MAC address to %pM\n", dev->dev_addr);
+-/*====================================================================*/
 -
--	/* set the Ethernet address */
--	for (i=0; i < ETH_ALEN/2; i++)
--		writereg(dev, PP_IA+i*2, dev->dev_addr[i*2] | (dev->dev_addr[i*2+1] << 8));
--
--	return 0;
--}
--
--MODULE_DESCRIPTION("Macintosh CS89x0-based Ethernet driver");
--MODULE_LICENSE("GPL");
--
--static void mac89x0_device_remove(struct platform_device *pdev)
+-static void netdev_get_drvinfo(struct net_device *dev,
+-			       struct ethtool_drvinfo *info)
 -{
--	struct net_device *dev = platform_get_drvdata(pdev);
--
--	unregister_netdev(dev);
--	nubus_writew(0, dev->base_addr + ADD_PORT);
--	free_netdev(dev);
+-	strscpy(info->driver, DRV_NAME, sizeof(info->driver));
+-	strscpy(info->version, DRV_VERSION, sizeof(info->version));
+-	snprintf(info->bus_info, sizeof(info->bus_info),
+-		"PCMCIA 0x%lx", dev->base_addr);
 -}
 -
--static struct platform_driver mac89x0_platform_driver = {
--	.probe = mac89x0_device_probe,
--	.remove = mac89x0_device_remove,
--	.driver = {
--		.name = "mac89x0",
--	},
+-static const struct ethtool_ops netdev_ethtool_ops = {
+-	.get_drvinfo		= netdev_get_drvinfo,
 -};
 -
--module_platform_driver(mac89x0_platform_driver);
+-static int fjn_config(struct net_device *dev, struct ifmap *map){
+-    return 0;
+-}
+-
+-static int fjn_open(struct net_device *dev)
+-{
+-    struct local_info *lp = netdev_priv(dev);
+-    struct pcmcia_device *link = lp->p_dev;
+-
+-    pr_debug("fjn_open('%s').\n", dev->name);
+-
+-    if (!pcmcia_dev_present(link))
+-	return -ENODEV;
+-    
+-    link->open++;
+-    
+-    fjn_reset(dev);
+-    
+-    lp->tx_started = 0;
+-    lp->tx_queue = 0;
+-    lp->tx_queue_len = 0;
+-    lp->open_time = jiffies;
+-    netif_start_queue(dev);
+-    
+-    return 0;
+-} /* fjn_open */
+-
+-/*====================================================================*/
+-
+-static int fjn_close(struct net_device *dev)
+-{
+-    struct local_info *lp = netdev_priv(dev);
+-    struct pcmcia_device *link = lp->p_dev;
+-    unsigned int ioaddr = dev->base_addr;
+-
+-    pr_debug("fjn_close('%s').\n", dev->name);
+-
+-    lp->open_time = 0;
+-    netif_stop_queue(dev);
+-
+-    /* Set configuration register 0 to disable Tx and Rx. */
+-    if( sram_config == 0 ) 
+-	outb(CONFIG0_RST ,ioaddr + CONFIG_0);
+-    else
+-	outb(CONFIG0_RST_1 ,ioaddr + CONFIG_0);
+-
+-    /* Update the statistics -- ToDo. */
+-
+-    /* Power-down the chip.  Green, green, green! */
+-    outb(CHIP_OFF ,ioaddr + CONFIG_1);
+-
+-    /* Set the ethernet adaptor disable IRQ */
+-    if (lp->cardtype == MBH10302)
+-	outb(INTR_OFF, ioaddr + LAN_CTRL);
+-
+-    link->open--;
+-
+-    return 0;
+-} /* fjn_close */
+-
+-/*====================================================================*/
+-
+-/*
+-  Set the multicast/promiscuous mode for this adaptor.
+-*/
+-
+-static void set_rx_mode(struct net_device *dev)
+-{
+-    unsigned int ioaddr = dev->base_addr;
+-    u_char mc_filter[8];		 /* Multicast hash filter */
+-    u_long flags;
+-    int i;
+-    
+-    int saved_bank;
+-    int saved_config_0 = inb(ioaddr + CONFIG_0);
+-     
+-    local_irq_save(flags); 
+-
+-    /* Disable Tx and Rx */
+-    if (sram_config == 0) 
+-	outb(CONFIG0_RST, ioaddr + CONFIG_0);
+-    else
+-	outb(CONFIG0_RST_1, ioaddr + CONFIG_0);
+-
+-    if (dev->flags & IFF_PROMISC) {
+-	memset(mc_filter, 0xff, sizeof(mc_filter));
+-	outb(3, ioaddr + RX_MODE);	/* Enable promiscuous mode */
+-    } else if (netdev_mc_count(dev) > MC_FILTERBREAK ||
+-	       (dev->flags & IFF_ALLMULTI)) {
+-	/* Too many to filter perfectly -- accept all multicasts. */
+-	memset(mc_filter, 0xff, sizeof(mc_filter));
+-	outb(2, ioaddr + RX_MODE);	/* Use normal mode. */
+-    } else if (netdev_mc_empty(dev)) {
+-	memset(mc_filter, 0x00, sizeof(mc_filter));
+-	outb(1, ioaddr + RX_MODE);	/* Ignore almost all multicasts. */
+-    } else {
+-	struct netdev_hw_addr *ha;
+-
+-	memset(mc_filter, 0, sizeof(mc_filter));
+-	netdev_for_each_mc_addr(ha, dev) {
+-	    unsigned int bit = ether_crc_le(ETH_ALEN, ha->addr) >> 26;
+-	    mc_filter[bit >> 3] |= (1 << (bit & 7));
+-	}
+-	outb(2, ioaddr + RX_MODE);	/* Use normal mode. */
+-    }
+-
+-    /* Switch to bank 1 and set the multicast table. */
+-    saved_bank = inb(ioaddr + CONFIG_1);
+-    outb(0xe4, ioaddr + CONFIG_1);
+-
+-    for (i = 0; i < 8; i++)
+-	outb(mc_filter[i], ioaddr + MAR_ADR + i);
+-    outb(saved_bank, ioaddr + CONFIG_1);
+-
+-    outb(saved_config_0, ioaddr + CONFIG_0);
+-
+-    local_irq_restore(flags);
+-}
 
 -- 
 2.53.0
