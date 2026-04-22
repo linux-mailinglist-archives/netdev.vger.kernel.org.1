@@ -1,145 +1,176 @@
-Return-Path: <netdev+bounces-280501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280502-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OGhICOL36GkgSQIAu9opvQ
-	(envelope-from <netdev+bounces-280501-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:31:30 +0200
+	id 4NfyDhf46GkgSQIAu9opvQ
+	(envelope-from <netdev+bounces-280502-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:32:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAF13448AED
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:31:29 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA323448B2A
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 18:32:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 97B783007B96
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 16:31:25 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 02E52300827D
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 16:31:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DB403803E8;
-	Wed, 22 Apr 2026 16:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16A8237F8DA;
+	Wed, 22 Apr 2026 16:31:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="SYmly0FW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="edStutVr"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B146E37C90B;
-	Wed, 22 Apr 2026 16:31:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-oa1-f68.google.com (mail-oa1-f68.google.com [209.85.160.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C1837C90B
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 16:31:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776875483; cv=none; b=klBNe+xUB557CodiXH9N/xM8hz+NX1dbZX76ABF64saV+qK5RI0mKVVIBNaupUD5KCCnVhKSaofhadsoT0Tit+/P7OvuLV2v3vqp16Nj4gBIXkNySvjtNmeye6W0+9XaIsH/8c+WufAQRApUW4M5uvN2JRxKi9Nmakyrzgkg+RY=
+	t=1776875495; cv=none; b=U6pi0tpGh33N4YEr5KDSOJVKVoH+My6WNEbU0/imu85agGzdRTK3yNlcqSBKhaRmplB3dqb+dc4X5XpbGbLvuEQE/tOc1HaBca+JhU8jXAPWMEjFiPdnkuidjb7hwXepzaZGcitmPGDWJoGdEns4+I5o9A/J7GEV8CuuZuZ61/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776875483; c=relaxed/simple;
-	bh=peUBD5m08sTT67ZtgWka59qlYKJAljWCivBd1RqFQ6Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bsSU4jQbfGWlGBNEUmvIck2nXp22ob6XbYnhRAZmKxE3GnmYa2xL9kCY+SgCNepuYPHAP50ojsDCrW+8PR0byoJgzemUBcSljFKuWfySI8P/3I0MxR8QgIz/8AEimp+j5yzchIuGE7QS4wdSPAmmPsHLcyFyjYHeJm5MPTckJzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=SYmly0FW; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id D20B120B6F01; Wed, 22 Apr 2026 09:31:21 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D20B120B6F01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1776875481;
-	bh=yYcs3ciRPXLdYtHD830pxRSz6Am6DIQ9YVpyqqk8OZg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SYmly0FWM/3NduJBTSSY6wMj3HXYtWSraZqnyM//IW8Tm60Y09h9ExihlqQuVJVdt
-	 dwq+x6QjkchLy8GAyrRJ0bC7EovDXbx55/PqE4ktSNGBaKlrnO54skxB60PnqLqVfC
-	 r7scKS4+iYdLIzpGfwI+ADg1o29ifhg+A5tMbAQo=
-Date: Wed, 22 Apr 2026 09:31:21 -0700
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: Sasha Levin <sashal@kernel.org>
-Cc: patches@lists.linux.dev, stable@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>, kys@microsoft.com,
-	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
-	longli@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH AUTOSEL 7.0-6.18] net: mana: hardening: Validate
- adapter_mtu from MANA_QUERY_DEV_CONFIG
-Message-ID: <aej32XgkE1gzSa4D@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20260420132314.1023554-1-sashal@kernel.org>
- <20260420132314.1023554-44-sashal@kernel.org>
+	s=arc-20240116; t=1776875495; c=relaxed/simple;
+	bh=EhbGxSycWRGGPRefyE2yZ3qZMYiLgTkVaA9SF3zTDqM=;
+	h=Date:Message-ID:From:To:Cc:In-Reply-To:Subject:Content-Type; b=oou1wplPS5y+sJJYV9dfgjNOABooEVyrZsETjvmA1BRPBt+AvGi1E1K09/hxeXDAnTRQEiXuEdmGdowzU1S0pVSE6Ij8Wux+s52AMMt0BMWFpMRfgirXZXXOt83BT6dK2OOhJ4aasZiTDx5eLPiyzrXsONoB2SaxE4m9Cmuf0TU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=edStutVr; arc=none smtp.client-ip=209.85.160.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f68.google.com with SMTP id 586e51a60fabf-40946982a78so2036627fac.2
+        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 09:31:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776875493; x=1777480293; darn=vger.kernel.org;
+        h=subject:in-reply-to:cc:to:from:message-id:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=psTO9IXagb9gvkh6TivZ2kclv53ax7Oa2qxYLSN87Vs=;
+        b=edStutVr04h0IppyIN6HYAGwxl2Q6hEMmn2/TVhKb+tfx2flSK5BpRwgIuNoErQrkG
+         nRRknpM0yAaHnCnnVNxSMwwEfuB6VY9lwXdbQaL+k77jF81TByQaLu9usXzkwQYju7EN
+         noZ0uMRZ9Aj2RFxZEhC1qGE4QFEUD2evB5cyDxjkd0yIayss0yqI0x+r7QvMjtV5nfkr
+         v2iD7gIjQGkFYlJ8gOIgd6+S3SR/ytn5wlKeYfCfiG3+f3fnUDstRAW+OqvgYepYObXS
+         FrCqHBC0JPz9F5mo9gGnKVltwqhv33dy9R+zlpkYD4bUSFDHdUCkVeFLHTef/geZEnNf
+         3N4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776875493; x=1777480293;
+        h=subject:in-reply-to:cc:to:from:message-id:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=psTO9IXagb9gvkh6TivZ2kclv53ax7Oa2qxYLSN87Vs=;
+        b=Ij447Fi04GXseUi6nw2K2TnXZm3jQRbhMB92iiWNblLJ9mYOqKSijFAw3OhE+n1D69
+         mkrJgEPzp094sriZEZOekdbxKKIAmypHc8A0fVwCRQkvLQEgzlfVBFWnYX8xX/3ID7SV
+         lBPj+0x/ELiGPs6Ktu45E+IDU/HwbPXaAeMY/ZmNeTgqz/9bn+NFae5RtKWCbtGzEJDL
+         EZV61HhsgXBNqxboGUNz0fZWo1UkdyLlTzBvLF/4OY4x+HFe74djAmSiNsHkmCw4vyZY
+         v4Usmn8kKHQt91RWA2SzYemzVcCmRuJ4GquoTcn9PjRIIpqaoof6ufutaaWNzwMmmp82
+         WiqQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8IazsNOx6ELDD74/tQG9cHdyS3lq+Bt0SQYtlkKVS8td8RNEh/aN5AnsGo/7VnruybP17B2cY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhF3mThy0qThFbXsg3YFH/7GLg9DrLedXj6TmNYi1BnAM2latl
+	aWZKeDyM10vVlrn/3G2FX3GysJaGrs2s4d9LHLWlJ/hsDyPnb9LM5QjK
+X-Gm-Gg: AeBDietuupARMcD6nvrQLNnU/R3SEtWxeqfijkMVc/CxvWWOC1rgjb+sBd2NZ9B9RAW
+	m6XLnBHZ0M4P5U48hEg0CpYHHpO2XXGD9YOFx/FdDKL+aGbeuqhoqmRTKxn/k24+V1tgjQbLiTs
+	KtKbDoO05aPTqtbLnfpA/e1XFYbD58z25GcrNU6Shq5daeXA53tKxTovsqp8w+qvqw4WczlCHXW
+	/aNRp9bwYvMTXw5yNbs3mhQtPew8EqKFwPWL7JEuJgtkbhi+1XygMEDpNsc84C50PnbPHzd9aeZ
+	Oa7KEJisa0CwMS46plLlU0zvfBlRnaLeJdwyzLlXXah4rrTMjTQcCESbtpwbuDbg/DYtfL+ne97
+	RJ0mArQezAQpF5tcjBTpMe98RSTB/yJgpnJlyxri62JxfFTrSy+GWPNIL5rjiMvvoINc7mTkENX
+	tEQJkCVrVbEzN1T2sD6jrR/jjiMHM=
+X-Received: by 2002:a05:6870:1767:b0:423:188a:f0c4 with SMTP id 586e51a60fabf-42abf2543a0mr13964157fac.3.1776875492480;
+        Wed, 22 Apr 2026 09:31:32 -0700 (PDT)
+Received: from localhost ([2a03:2880:12ff:8::])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-42fb269f69bsm4365305fac.12.2026.04.22.09.31.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Apr 2026 09:31:31 -0700 (PDT)
+Date: Wed, 22 Apr 2026 09:31:31 -0700
+Message-ID: <1b3207ae8f4cfdea6bf857ca4211b355.sdf.kernel@gmail.com>
+From: Stanislav Fomichev <sdf.kernel@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Jason Xing <kernelxing@tencent.com>
+In-Reply-To: <20260422033650.68457-4-kerneljasonxing@gmail.com>
+Subject: Re: [PATCH net v3 3/8] xsk: fix use-after-free of xs->skb in
+ xsk_build_skb() free_err path
+Content-Type: text/plain
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260420132314.1023554-44-sashal@kernel.org>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	MISSING_MIME_VERSION(2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280501-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280502-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,msgid.link:url,linux.microsoft.com:dkim]
-X-Rspamd-Queue-Id: AAF13448AED
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,fomichev.me:email]
+X-Rspamd-Queue-Id: CA323448B2A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 20, 2026 at 09:17:18AM -0400, Sasha Levin wrote:
-> From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+> From: Jason Xing <kernelxing@tencent.com>
 > 
-> [ Upstream commit d7709812e13d06132ddae3d21540472ea5cb11c5 ]
+> When xsk_build_skb() processes multi-buffer packets in copy mode, the
+> first descriptor stores data into the skb linear area without adding
+> any frags, so nr_frags stays at 0. The caller then sets xs->skb = skb
+> to accumulate subsequent descriptors.
 > 
-> As a part of MANA hardening for CVM, validate the adapter_mtu value
-> returned from the MANA_QUERY_DEV_CONFIG HWC command.
+> If a continuation descriptor fails (e.g. alloc_page returns NULL with
+> -EAGAIN), we jump to free_err where the condition:
 > 
-> The adapter_mtu value is used to compute ndev->max_mtu via:
-> gc->adapter_mtu - ETH_HLEN. If hardware returns a bogus adapter_mtu
-> smaller than ETH_HLEN (e.g. 0), the unsigned subtraction wraps to a
-> huge value, silently allowing oversized MTU settings.
+>   if (skb && !skb_shinfo(skb)->nr_frags)
+>       kfree_skb(skb);
 > 
-> Add a validation check to reject adapter_mtu values below
-> ETH_MIN_MTU + ETH_HLEN, returning -EPROTO to fail the device
-> configuration early with a clear error message.
+> evaluates to true because nr_frags is still 0 (the first descriptor
+> used the linear area, not frags). This frees the skb while xs->skb
+> still points to it, creating a dangling pointer. On the next transmit
+> attempt or socket close, xs->skb is dereferenced, causing a
+> use-after-free or double-free.
 > 
-> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-> Link: https://patch.msgid.link/20260326173101.2010514-1-ernis@linux.microsoft.com
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
+> Fix by using a !xs->skb check to handle first frag situation, ensuring
+> we only free skbs that were freshly allocated in this call
+> (xs->skb is NULL) and never free an in-progress multi-buffer skb that
+> the caller still references.
+> 
+> Closes: https://lore.kernel.org/all/20260415082654.21026-4-kerneljasonxing@gmail.com/
+> Fixes: 6b9c129c2f93 ("xsk: remove @first_frag from xsk_build_skb()")
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
 > ---
+>  net/xdp/xsk.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> FOR backporting:
-> - Fixes a concrete integer underflow bug (adapter_mtu - ETH_HLEN wraps
->   to ~4GB)
-> - Small, surgical fix (6 lines of logic)
-> - Obviously correct bounds check
-> - No regression risk
-> - Accepted by netdev maintainer
-> - Author is regular driver contributor
-> - Affects widely-used Azure MANA driver
-> - Security-relevant in CVM environments
-> 
-> 2.53.0
+> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> index 6521604f8d42..d23d1b14b8b4 100644
+> --- a/net/xdp/xsk.c
+> +++ b/net/xdp/xsk.c
+> @@ -889,7 +889,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+>  	return skb;
+>  
+>  free_err:
+> -	if (skb && !skb_shinfo(skb)->nr_frags)
+> +	if (skb && !xs->skb)
+>  		kfree_skb(skb);
+>  
+>  	if (err == -EOVERFLOW) {
+> --
+> 2.41.3
+>
 
-Thanks Sasha, this is good for stable.
-
-This should also carry a Fixes tag:
-
-Fixes: 80f6215b450e ("net: mana: Add support for jumbo frame")
-
-The code was introduced in v6.4-rc1, so the backport applies
-to 6.6.y and later stable trees.
-
-Acked-by: Erni Sri Satya Vennela ernis@linux.microsoft.com
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
