@@ -1,135 +1,195 @@
-Return-Path: <netdev+bounces-280357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280356-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eC+GDpCM6Gk6LgIAu9opvQ
-	(envelope-from <netdev+bounces-280357-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:53:36 +0200
+	id ACIvE2WM6Gk6LgIAu9opvQ
+	(envelope-from <netdev+bounces-280356-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:52:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87614443ABB
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:53:35 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 359EB443AB3
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 10:52:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 22721300B9EA
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 08:52:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4B925300C399
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 08:52:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE7D4376BCC;
-	Wed, 22 Apr 2026 08:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B2B1376BCC;
+	Wed, 22 Apr 2026 08:52:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JngPhmSr"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="nwFX0Ynn";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="eEOJEHPi"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E10D2EA754
-	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 08:52:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3EFB3612FE
+	for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 08:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776847978; cv=none; b=kg0PxpfU8SRvJZLao8yU3XXj09zkSSOufIJTLGcCHWuhbaFV/pDFeP9OHTuHNuXqiOfPw5LkFQsKzF+4QwMLaYjZMGR2H3ibOeWw09RNRol4pwm56yvaWXi29VzWmWXcrDskvhh1y3nqt+nM0Zf+JSlypKxogPXN1ewMLoOryW4=
+	t=1776847967; cv=none; b=kho6bTcTqrIEmNxgLcFrIGrr331HYd1BmxYnS8Tkel5uHnBz+M9V2mgyifVp7Q9MNYqh9YA8XHEkYxY84ctYQbsfWhscjW7ifD6UARLPzqwRVxYABrOiRtUgBdVRBMpoqVtb1kpU83YQPxTdgVQnW3pF7QsvXtElg06Sv3Fq0RE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776847978; c=relaxed/simple;
-	bh=ZP0zLOUYPCz6XY3n+DrjlGKzVp2SHC+G7wTWKDUfoGM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ng0lIgQDaBZOKv9rxhtSuWOHPHa/qv71r/yO52zsD/yITWu2EYywVEF697iNq2F60qyJ71bCLa3CjsIwOqSXf7lK7wRgKJjc2EqXCWVutsr7wEdzcProTvBVDf5bOGIcgP1g8/zpbXSAkKWy+NpTzp6erjh541GS+RkCbDix2ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JngPhmSr; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776847976;
+	s=arc-20240116; t=1776847967; c=relaxed/simple;
+	bh=UBObT8iO/vf4D6/b8pnEOMv2hV3mF9Y327nTPnd46X4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n2AP7Qi3NRlALrsBVqse5fYGeLoprdKJyMqv6iqjSVVXrTHw+cDWf8J6E3iOqqwn2AltiLb5sYBLFSdAYqRMzrMxDLKY8S8qxO64vHNJjWG2OLhmz3zXjmjN/Q7vtzPlZDVjsBYBL6TCvPQ5JByfboDUIvIh7SehXoQ3G/nRyzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=nwFX0Ynn; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=eEOJEHPi; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Wed, 22 Apr 2026 10:52:42 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1776847964;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ZP0zLOUYPCz6XY3n+DrjlGKzVp2SHC+G7wTWKDUfoGM=;
-	b=JngPhmSrzzirXOCv9+bU8N95JhlIoN8QC+buDsdNrLC3n4sGv2Vf93VqNDG5nnZ/ocmEmB
-	8kGh1sAI7CgGyQColVhDr0gRTVTe+H+0by3HMK//y8B8drZTOPepMjoBU0zyfBcsnlMj9I
-	zFcIhYdUyQbmBC82Pvq/p35JJc5WESE=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-592-KAfABAXVPC2VY7LAeMqU0Q-1; Wed,
- 22 Apr 2026 04:52:52 -0400
-X-MC-Unique: KAfABAXVPC2VY7LAeMqU0Q-1
-X-Mimecast-MFC-AGG-ID: KAfABAXVPC2VY7LAeMqU0Q_1776847971
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4C1071800473;
-	Wed, 22 Apr 2026 08:52:50 +0000 (UTC)
-Received: from griffin (unknown [10.44.48.93])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6A2AA19560AB;
-	Wed, 22 Apr 2026 08:52:44 +0000 (UTC)
-Date: Wed, 22 Apr 2026 10:52:42 +0200
-From: Jiri Benc <jbenc@redhat.com>
-To: Ren Wei <n05ec@lzu.edu.cn>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, yuantan098@gmail.com,
- yifanwucs@gmail.com, tomapufckgml@gmail.com, bird@lzu.edu.cn,
- lx24@stu.ynu.edu.cn, caoruide123@gmail.com
-Subject: Re: [PATCH net 1/1] net: nsh: handle nested NSH headers during GSO
-Message-ID: <20260422105242.7b28f72c@griffin>
-In-Reply-To: <6112cce99b4e3571444a616d0fb19e91e2fcca72.1776597598.git.caoruide123@gmail.com>
-References: <cover.1776597597.git.caoruide123@gmail.com>
-	<6112cce99b4e3571444a616d0fb19e91e2fcca72.1776597598.git.caoruide123@gmail.com>
+	bh=5YlgJAWWX1POSj2Z7QVgPUdXiVYf0xmAWEaptmxSACM=;
+	b=nwFX0YnnDQ7pQKT/yGkLBJmdAyqWf+eYYzEf0JQt+L6jfV3hh7zt4sXFHDBjSHBsoMKuEd
+	aaAlK+94joG/ZfAH5tgbthpL3LHE+FEbWluPBE1PCVT6WJtUNkEyoLzeonCJ2xrVLN1PC5
+	7S90UAmZuoDx9jOKlOcB3XclmII4muPENHQPbzEEYLeQBr+T0cKlbGQsAbihpqEPY5BU3h
+	dV7B/VMyaAFF/U7+P9LYSCf9aVOzaMqfqC0NVK1WDnlMUIzYNMggXcYfI1+VEXAQtOFQkH
+	Pp5vidb+uTv6xqF3At64CfGZschSWQELAsifPOEF2Qk3OZ0WIY0ctuOa9MuH8g==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1776847964;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5YlgJAWWX1POSj2Z7QVgPUdXiVYf0xmAWEaptmxSACM=;
+	b=eEOJEHPiYPIdGOJcDLYTvfU0xSe+HNhGkSLSDzNlG4zqlfbMmwQz4drCkXxvZQKdOjE0Vr
+	VZkQvuG2Z8cJquDg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Felix Maurer <fmaurer@redhat.com>
+Cc: Ren Wei <n05ec@lzu.edu.cn>, netdev@vger.kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, kees@kernel.org, kexinsun@smail.nju.edu.cn,
+	luka.gejak@linux.dev, Arvid.Brodin@xdin.com, m-karicheri2@ti.com,
+	yuantan098@gmail.com, yifanwucs@gmail.com, tomapufckgml@gmail.com,
+	bird@lzu.edu.cn, xuyuqiabc@gmail.com, royenheart@gmail.com
+Subject: Re: [PATCH net v3 1/1] net: hsr: limit node table growth
+Message-ID: <20260422085242.3TkVbXc2@linutronix.de>
+References: <3bdbe54e81bd89c1443b05500368fb45bddc3191.1776754203.git.royenheart@gmail.com>
+ <aeiHa7rzmSqzMIaJ@thinkpad>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aeiHa7rzmSqzMIaJ@thinkpad>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-280356-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280357-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lzu.edu.cn,stu.ynu.edu.cn];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lzu.edu.cn,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,smail.nju.edu.cn,linux.dev,xdin.com,ti.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jbenc@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 87614443ABB
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:dkim,linutronix.de:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 359EB443AB3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 20 Apr 2026 11:31:32 +0800, Ren Wei wrote:
-> Handle nested NSH headers iteratively in a single nsh_gso_segment()
-> invocation. Unwrap consecutive NSH headers until the first non-NSH payload
-> is reached, including the case where the next redispatch target is reached
-> through ETH_P_TEB, segment that payload once, and then restore the full
-> outer encapsulation on each output segment.
+On 2026-04-22 10:31:39 [+0200], Felix Maurer wrote:
+> On Tue, Apr 21, 2026 at 10:50:01PM +0800, Ren Wei wrote:
+> > diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
+> > index d09875b33588..8a5a2a54a81f 100644
+> > --- a/net/hsr/hsr_framereg.c
+> > +++ b/net/hsr/hsr_framereg.c
+> > @@ -189,6 +195,7 @@ static struct hsr_node *hsr_add_node(struct hsr_priv *hsr,
+> >  				     enum hsr_port_type rx_port)
+> >  {
+> >  	struct hsr_node *new_node, *node = NULL;
+> > +	unsigned int node_count = 0;
+> >  	unsigned long now;
+> >  	size_t block_sz;
+> >  	int i;
+> > @@ -226,20 +233,31 @@ static struct hsr_node *hsr_add_node(struct hsr_priv *hsr,
+> >  	spin_lock_bh(&hsr->list_lock);
+> >  	list_for_each_entry_rcu(node, node_db, mac_list,
+> >  				lockdep_is_held(&hsr->list_lock)) {
+> > +		node_count++;
+> 
+> I'm not sure if this on-the-fly node counting is the best solution here.
+> My concern is that it comes quite late in the process, i.e., after we
+> already allocated a bunch of memory, etc. As we are discussing a
+> scenario where a lot of entries are created, maybe we shouldn't even
+> allocate a new_node if the table is already full? For example by storing
+> the node_count in hsr_priv and checking it early in the function?
 
-This looks fragile. If there's ever another protocol with similar logic
-added, we'll be in the same situation. (And obviously, unrolling the
-recursion for any combination of protocols doesn't scale well.)
+The node is allocated upfront. Then it iterates here and we only end up
+counting through the full list if there is no match. This is under a
+lock so "many clients" are serialized. If we allocate the node later
+then we need to do it under the lock.
 
-What about using a mechanism similar to dev_xmit_recursion to limit the
-depth and returning EINVAL if we exceed the limit? I think it's fine to
-drop the packet in this pathological case.
+I don't think the node count exceeds 100 in production. So having a
+counter which is incremented while adding to the list and decremented
+while removing items from the list would optimize the "worst case". So
+instead traversing the list with 1000 we would just give up.
 
-We might even just use dev_xmit_recursion directly, since it can be
-argued that such nested NSH headers are in fact nested tunnels.
+The "oom block" works regardless. This does not affect the common case
+where we have far less nodes.
 
- Jiri
+> >  		if (ether_addr_equal(node->macaddress_A, addr))
+> > -			goto out;
+> > +			goto out_found;
+> >  		if (ether_addr_equal(node->macaddress_B, addr))
+> > -			goto out;
+> > +			goto out_found;
+> >  	}
+> > +
+> > +	if (hsr_node_table_size && node_count >= hsr_node_table_size)
+> > +		goto out_drop;
+> 
+> I think it would be good to somehow make this situation transparent to
+> the user, so they can react if this an undesired behavior (for example,
+> because they simply have a large network and need a large node table).
 
+netdev_warn_once() probably.
+
+> >  	list_add_tail_rcu(&new_node->mac_list, node_db);
+> >  	spin_unlock_bh(&hsr->list_lock);
+> >  	return new_node;
+> > -out:
+> > +out_found:
+> >  	spin_unlock_bh(&hsr->list_lock);
+> > +	xa_destroy(&new_node->seq_blocks);
+> >  	kfree(new_node->block_buf);
+> > -free:
+> >  	kfree(new_node);
+> >  	return node;
+> > +out_drop:
+> > +	spin_unlock_bh(&hsr->list_lock);
+> > +	xa_destroy(&new_node->seq_blocks);
+> > +	kfree(new_node->block_buf);
+> > +free:
+> > +	kfree(new_node);
+> > +	return NULL;
+> >  }
+> 
+> The two cleanup paths are almost the same now. We usually attempt to
+> keep them unified to make sure that we do the correct cleanup steps in
+> all situations. So please keep them unified here as well.
+> 
+> Thanks,
+>    Felix
+
+Sebastian
 
