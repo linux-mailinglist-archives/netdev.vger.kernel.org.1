@@ -1,78 +1,59 @@
-Return-Path: <netdev+bounces-280624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280625-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OLllNYnA6WkXjQIAu9opvQ
-	(envelope-from <netdev+bounces-280624-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 08:47:37 +0200
+	id 6LH0EffA6WkXjQIAu9opvQ
+	(envelope-from <netdev+bounces-280625-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 08:49:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77A4C44DB60
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 08:47:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC3EE44DB96
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 08:49:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CF0653006447
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 06:47:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C1830301112C
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 06:48:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05A6439B97C;
-	Thu, 23 Apr 2026 06:47:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8279F3CC9FC;
+	Thu, 23 Apr 2026 06:48:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3F801A8F97;
-	Thu, 23 Apr 2026 06:47:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50EB134E763;
+	Thu, 23 Apr 2026 06:48:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776926854; cv=none; b=FS7Z2oAs0Pln6/vC49F1H2fYUnfCAw4FZ8YZEosrazX0chGDglldx+/Q2IYkPZXMNFxEGsgPoUSmhEfzfBQqnWLfaZ7iRuaM8cjnpk2Hnly6KoTsfNpocghAYxGWV0Vq7AScDmIxnM72raYRYT3ilDu4mcVBmbwpA0YsFQvepWk=
+	t=1776926911; cv=none; b=J7JHuP0QliSTDJWWcIQXl+C68PAteNasYxbdJHjV8L2VnWOLTrdi+mV8YHYJ+mZmip1pkTwF9/vXz2cMoWjgg8Kj542TwevLbC0NI+C2uqGxMvBd7k2UXVNzrG9FMiq+7io40leLUrqJBZdYCLeAdn8hE71vcSLHBBYskdIEHXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776926854; c=relaxed/simple;
-	bh=T85gaMy4LIQZW74fX7a1NM3xHggzpBS3fOSheJJkzdY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ieb5TAqYUqgjgBlheqMCQypZ+EvJbgq+4uBUSwy6LCBqX9SJH0PfcgDes+WYv0w1y6VYSyLxAOb6882PPcLmZxDILg38M8Bjowhzhaw0Qv+ah49tVTfJjbIBTVhhJhyOoTESEMSCEsmxAcks4+6iqEF4VDC6D6bgdeLWAvoeJSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 49e97ad63ee011f1aa26b74ffac11d73-20260423
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
-	HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NO_NAME
-	IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED, SA_EXISTED
-	SN_UNTRUSTED, SN_UNFAMILIAR, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS
-	CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO
-	GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:0fe5b066-c7ba-4aae-bb2f-e80d995e40c3,IP:10,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:5
-X-CID-INFO: VERSION:1.3.12,REQID:0fe5b066-c7ba-4aae-bb2f-e80d995e40c3,IP:10,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:5
-X-CID-META: VersionHash:e7bac3a,CLOUDID:8e9c053e02041cf42645112e92a36484,BulkI
-	D:260423144727UR1YRIPO,BulkQuantity:0,Recheck:0,SF:17|19|66|78|102|127|898
-	,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:99|1,File:nil,RT:nil,Bulk:nil,QS:
-	nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,AR
-	C:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_FSD,TF_CID_SPAM_ULS,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 49e97ad63ee011f1aa26b74ffac11d73-20260423
-X-User: cuitao@kylinos.cn
-Received: from ctao-book.. [(223.70.160.239)] by mailgw.kylinos.cn
-	(envelope-from <cuitao@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 566276217; Thu, 23 Apr 2026 14:47:25 +0800
-From: Tao Cui <cuitao@kylinos.cn>
-To: dsahern@kernel.org,
-	leon@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	Tao Cui <cuitao@kylinos.cn>
-Subject: [PATCH] rdma: display resource usage rate in resource show
-Date: Thu, 23 Apr 2026 14:47:11 +0800
-Message-ID: <20260423064711.360024-1-cuitao@kylinos.cn>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1776926911; c=relaxed/simple;
+	bh=ToaTXcmIVUSTWxVWGD+zkSMr0pWVWHXd5+bQHimR08I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YgrWMhMDvmNoyZl4vQr7IQpLW41Mj5hhGMiGdEHaolcinmk2Mh3RLJS6wkhOc7/Q+sORAc/u5LlL2B4Q+Hm83If8XH3SeSPzBJNRG4xzwXYBrlZsEj1R5sIzdlIn4ES560590LnEQ1STwHU4WR9Xkuk3xLzH4lBqe5usEohvTes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1009)
+	id 5FF3120B7165; Wed, 22 Apr 2026 23:48:30 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5FF3120B7165
+From: Dexuan Cui <decui@microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	longli@microsoft.com,
+	sgarzare@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	niuxuewei.nxw@antgroup.com,
+	linux-hyperv@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: stable@vger.kernel.org
+Subject: [PATCH net v2] hv_sock: Return -EIO for malformed/short packets
+Date: Wed, 22 Apr 2026 23:48:11 -0700
+Message-ID: <20260423064811.1371749-1-decui@microsoft.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,108 +61,101 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [2.04 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[microsoft.com : SPF not aligned (relaxed), No valid DKIM,reject];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[kylinos.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280624-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cuitao@kylinos.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-280625-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,kylinos.cn:mid,kylinos.cn:email]
-X-Rspamd-Queue-Id: 77A4C44DB60
+	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[decui@microsoft.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	TO_DN_NONE(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DC3EE44DB96
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Parse the new RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX netlink attribute
-to show resource usage percentage alongside current counts:
+Commit f63152958994 fixes a regression, however it fails to report an
+error for malformed/short packets -- normally we should never see such
+packets, but let's report an error for them just in case.
 
-  Before: 0: mlx5_0: qp 123  cq 45  mr 200  pd 10
-  After:  0: mlx5_0: qp 123 (0.0%)  cq 45 (0.0%)  mr 200 (0.0%)  pd 10 (0.0%)
-
-JSON output gains "max" and "usage" fields per resource type.
-Backward compatible: no output change when kernel lacks the new attribute.
-
-Link: https://lore.kernel.org/all/20260423061352.359749-1-cuitao@kylinos.cn/
-
-Signed-off-by: Tao Cui <cuitao@kylinos.cn>
+Fixes: f63152958994 ("hv_sock: Report EOF instead of -EIO for FIN")
+Cc: stable@vger.kernel.org
+Signed-off-by: Dexuan Cui <decui@microsoft.com>
 ---
- rdma/include/uapi/rdma/rdma_netlink.h |  5 +++++
- rdma/res.c                            | 15 +++++++++++++++
- rdma/utils.c                          |  1 +
- 3 files changed, 21 insertions(+)
 
-diff --git a/rdma/include/uapi/rdma/rdma_netlink.h b/rdma/include/uapi/rdma/rdma_netlink.h
-index 8709e558..12ca07ef 100644
---- a/rdma/include/uapi/rdma/rdma_netlink.h
-+++ b/rdma/include/uapi/rdma/rdma_netlink.h
-@@ -604,6 +604,11 @@ enum rdma_nldev_attr {
- 	RDMA_NLDEV_ATTR_RES_FRMR_POOL_PINNED,		/* u32 */
- 	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_KERNEL_VENDOR_KEY, /* u64 */
+Commit f63152958994 is currently only in net.git's master branch.
+
+Changes since v1:
+    Integrated comments from Stefano Garzarella:
+
+        1) access 'vsk' directly:
+           s/hvs->vsk->peer_shutdown/vsk->peer_shutdown/
+
+        2) test the error condition first and return -EIO for that.
+
+    NO other changes.
+
+
+ net/vmw_vsock/hyperv_transport.c | 27 ++++++++++++++++++---------
+ 1 file changed, 18 insertions(+), 9 deletions(-)
+
+diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
+index 76e78c83fdbc..f862988c1e86 100644
+--- a/net/vmw_vsock/hyperv_transport.c
++++ b/net/vmw_vsock/hyperv_transport.c
+@@ -704,17 +704,26 @@ static s64 hvs_stream_has_data(struct vsock_sock *vsk)
+ 		if (hvs->recv_desc) {
+ 			/* Here hvs->recv_data_len is 0, so hvs->recv_desc must
+ 			 * be NULL unless it points to the 0-byte-payload FIN
+-			 * packet: see hvs_update_recv_data().
++			 * packet or a malformed/short packet: see
++			 * hvs_update_recv_data().
+ 			 *
+-			 * Here all the payload has been dequeued, but
+-			 * hvs_channel_readable_payload() still returns 1,
+-			 * because the VMBus ringbuffer's read_index is not
+-			 * updated for the FIN packet: hvs_stream_dequeue() ->
+-			 * hv_pkt_iter_next() updates the cached priv_read_index
+-			 * but has no opportunity to update the read_index in
+-			 * hv_pkt_iter_close() as hvs_stream_has_data() returns
+-			 * 0 for the FIN packet, so it won't get dequeued.
++			 * If hvs->recv_desc points to the FIN packet, here all
++			 * the payload has been dequeued and the peer_shutdown
++			 * flag is set, but hvs_channel_readable_payload() still
++			 * returns 1, because the VMBus ringbuffer's read_index
++			 * is not updated for the FIN packet:
++			 * hvs_stream_dequeue() -> hv_pkt_iter_next() updates
++			 * the cached priv_read_index but has no opportunity to
++			 * update the read_index in hv_pkt_iter_close() as
++			 * hvs_stream_has_data() returns 0 for the FIN packet,
++			 * so it won't get dequeued.
++			 *
++			 * In case hvs->recv_desc points to a malformed/short
++			 * packet, return -EIO.
+ 			 */
++			if (!(vsk->peer_shutdown & SEND_SHUTDOWN))
++				return -EIO;
++
+ 			return 0;
+ 		}
  
-+	/*
-+	 * Resource summary entry maximum value, used to calculate usage rate.
-+	 */
-+	RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX,		/* u64 */
-+
- 	/*
- 	 * Always the end
- 	 */
-diff --git a/rdma/res.c b/rdma/res.c
-index 062f0007..cf9c79a3 100644
---- a/rdma/res.c
-+++ b/rdma/res.c
-@@ -56,6 +56,21 @@ static int res_print_summary(struct nlattr **tb)
- 		name = mnl_attr_get_str(nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_NAME]);
- 		curr = mnl_attr_get_u64(nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_CURR]);
- 		res_print_u64(name, curr, nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_CURR]);
-+
-+		if (nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX]) {
-+			uint64_t max;
-+
-+			max = mnl_attr_get_u64(
-+				nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX]);
-+			print_u64(PRINT_JSON, "max", NULL, max);
-+			if (max > 0) {
-+				char usage_str[32];
-+
-+				snprintf(usage_str, sizeof(usage_str), "(%.1f%%)",
-+					 (double)curr * 100.0 / (double)max);
-+				print_string(PRINT_ANY, "usage", "%s ", usage_str);
-+			}
-+		}
- 	}
- 	return 0;
- }
-diff --git a/rdma/utils.c b/rdma/utils.c
-index 87003b2c..90ea1c55 100644
---- a/rdma/utils.c
-+++ b/rdma/utils.c
-@@ -480,6 +480,7 @@ static const enum mnl_attr_data_type nldev_policy[RDMA_NLDEV_ATTR_MAX] = {
- 	[RDMA_NLDEV_ATTR_EVENT_TYPE] = MNL_TYPE_U8,
- 	[RDMA_NLDEV_SYS_ATTR_MONITOR_MODE] = MNL_TYPE_U8,
- 	[RDMA_NLDEV_ATTR_STAT_OPCOUNTER_ENABLED] = MNL_TYPE_U8,
-+	[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX] = MNL_TYPE_U64,
- };
- 
- static int rd_attr_check(const struct nlattr *attr, int *typep)
 -- 
-2.43.0
+2.49.0
 
 
