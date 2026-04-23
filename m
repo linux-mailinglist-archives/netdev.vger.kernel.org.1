@@ -1,247 +1,198 @@
-Return-Path: <netdev+bounces-280789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280790-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yH6eKew26mk+xAIAu9opvQ
-	(envelope-from <netdev+bounces-280789-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 17:12:44 +0200
+	id cDiYBWk66mnYxAIAu9opvQ
+	(envelope-from <netdev+bounces-280790-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 17:27:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35EB7454239
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 17:12:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DB99454548
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 17:27:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E06D0302D583
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 15:07:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8A78B302573B
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 15:20:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8C2435B651;
-	Thu, 23 Apr 2026 15:07:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C266D33261F;
+	Thu, 23 Apr 2026 15:20:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ihB2MWoI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iw84djJy";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="LNACJnJz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B34C282F0A
-	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 15:07:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6383631E853
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 15:20:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776956872; cv=none; b=IfDPrvBoKfGum+r5zBwtroGWnq0TSc0eMDwIU6uL3FoKPuNyDZpjsqk4Z6+HA3A/L1TdI2q9oZgdQp6+aP2qVGbbNX/aIKTPsYqEGCZEzvnmSyS+5pCPHbcbVz2cZInm+LS7kUluMWuaceOFGiUj5lAeOaoGiG2nH96OTaNoR2g=
+	t=1776957645; cv=none; b=SPQDPdZj0Uab16JW3uxwUdNAtCXeNjSZmJMbUTj2hGygRPqoz1Glbqc73+jKnbLxAsZ3ziyo8kZLUuQpHaVnpych1EAa3Cqv6aIl0LSIZjGIgAI6QqRzY1tvpNHRd6Dy71JW5STbIl13uXn2pHjoAd9t94N5uBjE1BZ0iM0be8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776956872; c=relaxed/simple;
-	bh=WMI4VjYNu03MckjM9rAUqTjjkeYUXUrN2E0VKTqs8mo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cWCRQ14kGA64RvM+vYOKXEjUYem6qOWjdS8iB6pmxi4YYDnPmVr0/7QQwUnm+nDPkBGcVYNlTyRMoFUKOLnlVwK926Ani79WP2Vw9u3BYq2LwOj5xTFbfZbmysQnzCQM4eXAbctGupQ4dAF2Cx/V2tm2+oHDeUseXw82OXYEmAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ihB2MWoI; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-c70c38515d3so120982a12.0
-        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 08:07:51 -0700 (PDT)
+	s=arc-20240116; t=1776957645; c=relaxed/simple;
+	bh=Braew1XveMAGlyFC2s/mzZ41yr7jUS4QWkO2xuBRjyE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E+hnZ0+U2Ll3COmJFCHGFWAEEYPlBM2Xvm/vIUaBynI1UO9QfGd578T8iOeczNz4xrEW9wC9wV3CJNePLfPU80HDFGIfFYzEvUvn1EKa7sVu4l9/QoDLL/Wyohta9A/YChWC2HGB+mC4hKSweSEYN0PxAUt3aOauoJ0GbxWcR6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Iw84djJy; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=LNACJnJz; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776957643;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iQf/P7hvHt9A1fs4c4DenfrxwjfBH28w3+BhoS4FuwU=;
+	b=Iw84djJymNIk6+G3cRW7Q4xhD4jtMzvt0YeI6KS8xVLizLZD257++7PxemfwsDwWCcDOp3
+	ekWT8agTwTndycj68bNsCm9AVjXs+qZaomvtoimiZT0o8UoawQ6YopeM/xC4A/FWSGqvp9
+	e2d7cyHXkBzVjwAmqSHWf8Y43rvXVv4=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-590-_9NFwpuANG2mtC04Fov4iQ-1; Thu, 23 Apr 2026 11:20:42 -0400
+X-MC-Unique: _9NFwpuANG2mtC04Fov4iQ-1
+X-Mimecast-MFC-AGG-ID: _9NFwpuANG2mtC04Fov4iQ_1776957641
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-50ea1a7a5d0so104257891cf.3
+        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 08:20:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776956871; x=1777561671; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9ncRdIw57dAdFwEniSDi8OzdJOxPZzPJeYFRngcHEmo=;
-        b=ihB2MWoI59lNit2/C1GJfrVa7kioQX0IDEeHRx36bLiIfjkJ/v3HGzo7GL00wyB7zN
-         ZFTfrfFN1dy9+Qx+F5o2sMMe10uPJ/kDxeax9oCKU6R34b4eMensrHPrR1czmYyjYRx3
-         Q+ErfxAkpA55ZW9lDZk8PHelYXSur/gA7XyoPiO1YRBPEurPDgAr6C9dV8GMCa8d3B8c
-         WLE1yN+S7qQ1bTkF0wOMjsKq36YItcw+IMJwNwtAtoZLnn4wR5EsJz1pO61xf23qMWsb
-         0plMHC6xovdo+s7rpG7QqO0MiJDZQrKDyQjPqIlQxyuW0pQsVdiHtLHttKNPvJz04Dun
-         hXPg==
+        d=redhat.com; s=google; t=1776957641; x=1777562441; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=iQf/P7hvHt9A1fs4c4DenfrxwjfBH28w3+BhoS4FuwU=;
+        b=LNACJnJz28uaWH8nXZUMxS045YJzSwXA8m7SsOppr3w/cerL0OTOINBm+7I8Nua98c
+         fNTvQl4rswH/Yj25YHZEXod1gZj85Rnm0gcgvnB/GYDoIjfJAALh8xu7EC13oL2GM21R
+         usi4dX5Vu1bGH9SywLXoMJgNMk1co4pEtryAE0koj6FDaj5Fx5r4nkTQWOqN1lukP9Tl
+         1X85VVo2ki46aVNfhB9WlIBDBYgglsBftK9vReQ2A/bgiFFUOE4NN9adUVtdMJR49NYJ
+         Eq8NC+qAmLC6DPnqWXHeAB7FrzFqCgkTnQhLFQiYnZ9yXaU3dAuQldiet3D1gxxEiHeS
+         02hQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776956871; x=1777561671;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=9ncRdIw57dAdFwEniSDi8OzdJOxPZzPJeYFRngcHEmo=;
-        b=WZdbFAsd1GfSgT3jJCDy+JwzAwh48+F8N/by3RqCHj+aY76sYBCmCyZE3LqLnVJwZK
-         Vy0cpCIWAEd6tlkfpdbli0V6usVN5vjfKFAcCMle5lEW/ee1+R0tndmOGrNK83DDgKUD
-         PAmYFZqNuktyLpZ+EQ5X2xLdQKE3BZJgmeWJysCw5vilwd1G32C/5zGzzU/riCqGNflM
-         bPkQRFq4R5U3i2hTchfR/UY6t7UrZo/2XqqEEFVZOhVKKV1wbCQpMTPFzmCkBFv//w8s
-         x3iQjThQWtHuTa78uTTUC+GtM/+dBzS2+F1CHAqLddBcdPeI7NvIb6ubkxtKq/1rr44J
-         ce1A==
-X-Forwarded-Encrypted: i=1; AFNElJ/ZANMVqI1LpuMeC34KL9kyXj3cFoffUH3ACNCtJkj+lCwhNq/H4fSvqCE75ZGyxIY/53eh4qA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjlKCnA6eEth0j63Bdpt+78Z8jMai+4QpOZGI7M5FRrR2h8FRr
-	GoDSw8fvEnzG62D5C7nxilJ7rLR6+BjdgEW01R9ttQNM4kvngNYa2TT7
-X-Gm-Gg: AeBDietaiBPxGHlplBpJin/N6wjV8wnMvhHugAqEc+nAycSx7WOJuZUSMOMZW7WrHwm
-	lVfqke3mXcffiGw77e5LZe8kZUTtIA3OlvhNWWwixA4e3Z0ky/2j2Qv6BruW0AsfOqrLu1kGYF8
-	k7N5mzzbyfNUAAelVV9o7xprPH612hf19HXD/NUvmx/+4Hk4PqvK05Qf5+unxUjZh1aa/q9C9Pl
-	mHdzBKUMyP6MeKxnjuJhj37thQTGujs00sQDWnkr0BqmEwCDJU6/4O2FwlWsx/jCbBTcEfhYhzA
-	RwSoAiXrLxgRfUioUhxZdaYjSrWvtUGItRzV57BFcZThIL9CfhRWrb+1CaZzG5zZpweJTYz8sig
-	5Lg5Y875dAI31h3AmP0QtCcj6EvVQPANWjFRJyGvUWvEUA+YJRcoNSorOG+mfeUK7GXhVBKH3xa
-	8wQg+eTRoYxpV9EpwD1wNMsfMnyRc=
-X-Received: by 2002:a05:6a20:7350:b0:3a2:d58a:b749 with SMTP id adf61e73a8af0-3a2d58b0db2mr10284603637.7.1776956870472;
-        Thu, 23 Apr 2026 08:07:50 -0700 (PDT)
-Received: from kali ([2402:e280:3d7c:a2:536a:b505:93f5:9d5d])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c797703ddf8sm15903101a12.28.2026.04.23.08.07.47
+        d=1e100.net; s=20251104; t=1776957641; x=1777562441;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iQf/P7hvHt9A1fs4c4DenfrxwjfBH28w3+BhoS4FuwU=;
+        b=SnqkR6pWPduX7DJhjvrhQILH/voQiSJQ5cGtErtMMFaVJzKnkd+wvFh1JPAKcPb6jY
+         1bVBSk8gCcNkBHRSLS7ZQlO9Pv/IBZ7XShB8UR0WxEl0lz/QDt66HnX/dwMEjMn5ug3g
+         VDv6hpIfopWAgmho2XxZtiYNn9STc2iAySpaJ4amW+lCWVo45Qg8DmkOrxgMTBPfz+5T
+         7p9iR9AUhL2NGH41yiezEH1w4dMKUYG7b2P1zODSldvuTovI4nDsLbUPk4b8COGuChmx
+         x83NdSXBV6X0GEg509frPrhaNaqkqtPb7u0Sx/lrvwNtEHWCmqou2Zr6dYhrD/lck/KH
+         PutA==
+X-Forwarded-Encrypted: i=1; AFNElJ8epvwCcxY1aYCNm/3agHjkcNVK3qPimwe/U+TtuFrSO6dGBXgb9tsk7jrhewhspEwEQTDIGB4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzK8V/mGBztY8Xo+tfpW4no4VzWRiANJQEl2IiYZLoD/r33+HOe
+	0LZFWFuitMbOm9s8gBTHhuyXPhZgPHehYUw4seKJ87Cx357vJh0oXZY9scBFlYUqVY1Vi2BHgKX
+	qCwFw53fXETsnxRNIrP3wRcBc4M6soXKGMxENZtp/bflEkdGDA+97cWIIcQ==
+X-Gm-Gg: AeBDietxccqtqB8zktpRhKDEnHq6aYmIRFgBK4Xsat9Qj/O8nOERe8YscU7TlJiu4Q3
+	Ta4VTHTd4RNqph6rlCAs0hkqNbK16TSlGKtKIqAXoFaTUXYbUShkNrpA7IA3uj3HdT/JRcyaxsR
+	BFVAXAN/QC6WEhWjKKsoYR6Zs2CyU161WNVkjAtPkZYxXk+UAEO44Rl+dDRu8laIETdodNk0/mO
+	ONXUvVvvVZDZm5Vw8qCulgzSr6vxrPzqtI+FrFDyBunnsH3/Ld0Zato7m4FqpQtkFx8NPX/zmO3
+	kxEGcfdWwrq0HdtM4V4yzp8IcWLHDYaknumW7GObRX10TfCuU1pSZzJxSmKwnyh+rQZBj6ZkUFy
+	WHH0J0SBV/PaAtpabmYkoPYHb89Q2bCcDvYG+jft8Gw==
+X-Received: by 2002:a05:622a:1390:b0:50f:b076:43dd with SMTP id d75a77b69052e-50fb0764918mr197597991cf.36.1776957640936;
+        Thu, 23 Apr 2026 08:20:40 -0700 (PDT)
+X-Received: by 2002:a05:622a:1390:b0:50f:b076:43dd with SMTP id d75a77b69052e-50fb0764918mr197597111cf.36.1776957640401;
+        Thu, 23 Apr 2026 08:20:40 -0700 (PDT)
+Received: from rh-jkangas-kernel ([2601:1c2:4400:6bf0:7677:bcee:4ef0:e09d])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50e5f5cc439sm105170541cf.17.2026.04.23.08.20.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Apr 2026 08:07:49 -0700 (PDT)
-From: Pavitra Jha <jhapavitra98@gmail.com>
-To: w@1wt.eu,
-	pabeni@redhat.com
-Cc: chandrashekar.devegowda@intel.com,
-	linux-wwan@lists.linux.dev,
-	netdev@vger.kernel.org,
-	stable@vger.kernel.org,
-	Pavitra Jha <jhapavitra98@gmail.com>
-Subject: [PATCH v5] net: wwan: t7xx: validate port_count against message length in t7xx_port_enum_msg_handler
-Date: Thu, 23 Apr 2026 11:07:33 -0400
-Message-ID: <20260423150733.2025838-1-jhapavitra98@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <3c2f573f-c457-4aec-b929-9e049b4c1d25@redhat.com>
-References: <3c2f573f-c457-4aec-b929-9e049b4c1d25@redhat.com>
+        Thu, 23 Apr 2026 08:20:39 -0700 (PDT)
+Date: Thu, 23 Apr 2026 08:20:34 -0700
+From: Jared Kangas <jkangas@redhat.com>
+To: jan.petrous@oss.nxp.com
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Chester Lin <chester62515@gmail.com>,
+	Matthias Brugger <mbrugger@suse.com>,
+	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
+	NXP S32 Linux Team <s32@nxp.com>, Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Frank Li <Frank.Li@nxp.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev, devicetree@vger.kernel.org,
+	rmk+kernel@armlinux.org.uk, vladimir.oltean@nxp.com,
+	boon.khai.ng@altera.com
+Subject: Re: [PATCH net-next v12 2/4] arm64: dts: s32: set Ethernet channel
+ irqs
+Message-ID: <aeo4wlrSinKUsdrZ@rh-jkangas-kernel>
+References: <20260313-dwmac_multi_irq-v12-0-b5c9d0aa13d6@oss.nxp.com>
+ <20260313-dwmac_multi_irq-v12-2-b5c9d0aa13d6@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260313-dwmac_multi_irq-v12-2-b5c9d0aa13d6@oss.nxp.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280789-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[intel.com,lists.linux.dev,vger.kernel.org,gmail.com];
-	MAILSPIKE_FAIL(0.00)[2600:3c04:e001:36c::12fc:5321:query timed out];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280790-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[29];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,suse.com,oss.nxp.com,nxp.com,pengutronix.de,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,lists.linux.dev,armlinux.org.uk,altera.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhapavitra98@gmail.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	FROM_NEQ_ENVFROM(0.00)[jkangas@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 35EB7454239
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5DB99454548
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-t7xx_port_enum_msg_handler() uses the modem-supplied port_count field as
-a loop bound over port_msg->data[] without checking that the message buffer
-contains sufficient data. A modem sending port_count=65535 in a 12-byte
-buffer triggers a slab-out-of-bounds read of up to 262140 bytes.
+On Fri, Mar 13, 2026 at 08:13:33AM +0100, Jan Petrous via B4 Relay wrote:
+> From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+> 
+> The GMAC Ethernet controller found on S32G2/S32G3 and S32R45
+> contains up to 5 RX and 5 TX channels.
+> It can operate in two interrupt modes:
+> 
+>   1) Sharing IRQ mode: only MAC IRQ line is used
+>      for all channels.
+> 
+>   2) Multiple IRQ mode: every channel uses two IRQ lines,
+>      one for RX and second for TX.
+> 
+> Specify all IRQ twins for all channels.
+> 
+> Reviewed-by: Matthias Brugger <mbrugger@suse.com>
+> Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+> ---
 
-Add a struct_size() check after extracting port_count and before the loop.
-Pass msg_len to t7xx_port_enum_msg_handler() and use it to validate
-the message size before accessing port_msg->data[].
-Pass msg_len from both call sites: skb->len at the DPMAIF path after
-skb_pull(), and the captured rt_feature->data_len at the handshake path.
+I missed that there was a net-next rebase and ended up sending a T-b to
+v11 instead of here ([1], [2]), sorry about that.
 
-Fixes: 39d439047f1d ("net: wwan: t7xx: Add control DMA interface")
-Cc: stable@vger.kernel.org
-Signed-off-by: Pavitra Jha <jhapavitra98@gmail.com>
----
- drivers/net/wwan/t7xx/t7xx_modem_ops.c     | 10 +++++++---
- drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c | 12 ++++++++++--
- drivers/net/wwan/t7xx/t7xx_port_proxy.h    |  2 +-
- 3 files changed, 18 insertions(+), 6 deletions(-)
+To give more details on my testing around this specific patch since the
+driver patch was merged: I configured RX queues 1-4 with
+'snps,route-multi-broad' across several different boots and verified
+that interrupts showed for all TX/RX channels in /proc/interrupts.
 
-diff --git a/drivers/net/wwan/t7xx/t7xx_modem_ops.c b/drivers/net/wwan/t7xx/t7xx_modem_ops.c
-index 7968e208d..dc90691ef 100644
---- a/drivers/net/wwan/t7xx/t7xx_modem_ops.c
-+++ b/drivers/net/wwan/t7xx/t7xx_modem_ops.c
-@@ -453,12 +453,14 @@ static int t7xx_parse_host_rt_data(struct t7xx_fsm_ctl *ctl, struct t7xx_sys_inf
- {
- 	enum mtk_feature_support_type ft_spt_st, ft_spt_cfg;
- 	struct mtk_runtime_feature *rt_feature;
-+	size_t feat_data_len;
- 	int i, offset;
- 
- 	offset = sizeof(struct feature_query);
- 	for (i = 0; i < FEATURE_COUNT && offset < data_length; i++) {
- 		rt_feature = data + offset;
--		offset += sizeof(*rt_feature) + le32_to_cpu(rt_feature->data_len);
-+		feat_data_len = le32_to_cpu(rt_feature->data_len);
-+		offset += sizeof(*rt_feature) + feat_data_len;
- 
- 		ft_spt_cfg = FIELD_GET(FEATURE_MSK, core->feature_set[i]);
- 		if (ft_spt_cfg != MTK_FEATURE_MUST_BE_SUPPORTED)
-@@ -468,8 +470,10 @@ static int t7xx_parse_host_rt_data(struct t7xx_fsm_ctl *ctl, struct t7xx_sys_inf
- 		if (ft_spt_st != MTK_FEATURE_MUST_BE_SUPPORTED)
- 			return -EINVAL;
- 
--		if (i == RT_ID_MD_PORT_ENUM || i == RT_ID_AP_PORT_ENUM)
--			t7xx_port_enum_msg_handler(ctl->md, rt_feature->data);
-+		if (i == RT_ID_MD_PORT_ENUM || i == RT_ID_AP_PORT_ENUM) {
-+			t7xx_port_enum_msg_handler(ctl->md, rt_feature->data,
-+						   feat_data_len);
-+		}
- 	}
- 
- 	return 0;
-diff --git a/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c b/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c
-index ae632ef96..fa2428444 100644
---- a/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c
-+++ b/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c
-@@ -117,6 +117,7 @@ static int fsm_ee_message_handler(struct t7xx_port *port, struct t7xx_fsm_ctl *c
-  * t7xx_port_enum_msg_handler() - Parse the port enumeration message to create/remove nodes.
-  * @md: Modem context.
-  * @msg: Message.
-+ * @msg_len:	Length of @msg in bytes.
-  *
-  * Used to control create/remove device node.
-  *
-@@ -124,7 +125,7 @@ static int fsm_ee_message_handler(struct t7xx_port *port, struct t7xx_fsm_ctl *c
-  * * 0		- Success.
-  * * -EFAULT	- Message check failure.
-  */
--int t7xx_port_enum_msg_handler(struct t7xx_modem *md, void *msg)
-+int t7xx_port_enum_msg_handler(struct t7xx_modem *md, void *msg, size_t msg_len)
- {
- 	struct device *dev = &md->t7xx_dev->pdev->dev;
- 	unsigned int version, port_count, i;
-@@ -141,6 +142,13 @@ int t7xx_port_enum_msg_handler(struct t7xx_modem *md, void *msg)
- 	}
- 
- 	port_count = FIELD_GET(PORT_MSG_PRT_CNT, le32_to_cpu(port_msg->info));
-+
-+	if (msg_len < struct_size(port_msg, data, port_count)) {
-+		dev_err(dev, "Port enum msg too short: need %zu, have %zu\n",
-+			struct_size(port_msg, data, port_count), msg_len);
-+		return -EINVAL;
-+	}
-+
- 	for (i = 0; i < port_count; i++) {
- 		u32 port_info = le32_to_cpu(port_msg->data[i]);
- 		unsigned int ch_id;
-@@ -191,7 +199,7 @@ static int control_msg_handler(struct t7xx_port *port, struct sk_buff *skb)
- 
- 	case CTL_ID_PORT_ENUM:
- 		skb_pull(skb, sizeof(*ctrl_msg_h));
--		ret = t7xx_port_enum_msg_handler(ctl->md, (struct port_msg *)skb->data);
-+		ret = t7xx_port_enum_msg_handler(ctl->md, (struct port_msg *)skb->data, skb->len);
- 		if (!ret)
- 			ret = port_ctl_send_msg_to_md(port, CTL_ID_PORT_ENUM, 0);
- 		else
-diff --git a/drivers/net/wwan/t7xx/t7xx_port_proxy.h b/drivers/net/wwan/t7xx/t7xx_port_proxy.h
-index f0918b36e..7c3190bf0 100644
---- a/drivers/net/wwan/t7xx/t7xx_port_proxy.h
-+++ b/drivers/net/wwan/t7xx/t7xx_port_proxy.h
-@@ -103,7 +103,7 @@ void t7xx_port_proxy_reset(struct port_proxy *port_prox);
- void t7xx_port_proxy_uninit(struct port_proxy *port_prox);
- int t7xx_port_proxy_init(struct t7xx_modem *md);
- void t7xx_port_proxy_md_status_notify(struct port_proxy *port_prox, unsigned int state);
--int t7xx_port_enum_msg_handler(struct t7xx_modem *md, void *msg);
-+int t7xx_port_enum_msg_handler(struct t7xx_modem *md, void *msg, size_t msg_len);
- int t7xx_port_proxy_chl_enable_disable(struct port_proxy *port_prox, unsigned int ch_id,
- 				       bool en_flag);
- void t7xx_port_proxy_set_cfg(struct t7xx_modem *md, enum port_cfg_id cfg_id);
--- 
-2.53.0
+Tested-by: Jared Kangas <jkangas@redhat.com>
+
+[1]: https://lore.kernel.org/all/aefX7Ajltzt5EqIR@rh-jkangas-kernel/
+[2]: https://lore.kernel.org/all/aefY8WGCuNr4BQG4@rh-jkangas-kernel/
 
 
