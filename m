@@ -1,217 +1,175 @@
-Return-Path: <netdev+bounces-280687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280688-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UEdzE23r6Wm2nAIAu9opvQ
-	(envelope-from <netdev+bounces-280687-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 11:50:37 +0200
+	id OLLzIUzt6Wm2nAIAu9opvQ
+	(envelope-from <netdev+bounces-280688-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 11:58:36 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3C2244FFFD
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 11:50:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DE410450205
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 11:58:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8C56B3044BBD
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 09:44:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0CA3C3051162
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 09:50:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AE503E558E;
-	Thu, 23 Apr 2026 09:44:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81D233E6DFB;
+	Thu, 23 Apr 2026 09:49:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PwYT88+y";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rx7VUmfM"
+	dkim=pass (2048-bit key) header.d=leavitt.info header.i=@leavitt.info header.b="xPr3VPJI"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail-10626.protonmail.ch (mail-10626.protonmail.ch [79.135.106.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8873E51F6
-	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 09:44:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A273E5EEF
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 09:49:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.26
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776937459; cv=none; b=aIZgEstr0Dg0p2ZnfpN29m7Q/e4j8j0j11QGt3olqrrRZC7CPMBZDFTFtBPU1I1DnhsKJheQ7qY6SvOfMHKFF0Bv+8XYxTusR38FwIVpU/VGSLC5Am3epAoTir8CpZG5qQE9SUd95gYVr+Rmqm3TVCUpJDMMDfr/Wc+qcEja+as=
+	t=1776937751; cv=none; b=j/Qj7/eZZ1KAGyHnW+1KzgPl3uD7BMpO5uBOYfDPRlGfEvuthk/8M2sExSkRGUz7nwwOMSn/sOQe0lPd5c+HRkLKJRmafQxGKatnfwUxyKIu+lhTvoVHcXyTjGKs4GIcHNC/ZtW4uhHUYV2HEiwUskgLVqLlDP/HIQE3TKevOk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776937459; c=relaxed/simple;
-	bh=Z/92kxlTMapvm6iTYEtSUelcWsiZw6+p+av2N6I37V8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KYWRrzddpYAiCST36FFUPMJ125ZvqR1NfAbg6nahrv+ORgkjtIE0OzBHpzuowkgMmfkWHR3Idsi+VmCzXFhHJDTLmNnEw6TkAib1cN9sb3nBnC6WGn1+BMesZ9Y9URpO9MQSVXrKP6TNQwazkRLdyXqJ3CYeyEPG8vy4cDB7kao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PwYT88+y; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rx7VUmfM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776937455;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3Czf+kEL9BcsX5OJ1yNM5tadNHCEbw6TrzapGuBP20Y=;
-	b=PwYT88+y0yj1hD6HNPAYSUWX8STw+Fnn78s+trZ4lzFeRvDAxzHcK6+Km0kR/3R2iJJxnZ
-	qgC/c3GdZ6mIr6qmR91syWH8tE7Df2AeQRs8/WWSb4is6H2iNfveHSagocbotmj3LRqH3N
-	8/HvEx1Y6BjjrbMfGNdfO/amNJw4bZs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-445-I7TypvCtMkiTrbNjAtnViA-1; Thu, 23 Apr 2026 05:44:13 -0400
-X-MC-Unique: I7TypvCtMkiTrbNjAtnViA-1
-X-Mimecast-MFC-AGG-ID: I7TypvCtMkiTrbNjAtnViA_1776937452
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4836abfc742so62896345e9.0
-        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 02:44:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1776937452; x=1777542252; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3Czf+kEL9BcsX5OJ1yNM5tadNHCEbw6TrzapGuBP20Y=;
-        b=Rx7VUmfMi3VBEGYuUrSO9Hz8ad3UdVfNhMlcMEfznuZsuenkg05IHDWYgIoU6ge2pl
-         dvH/c/2S5GBRk3bvNeJ/5HXjPn7Qbw8nKI9xLtBtqbhfB8sZVtDpAXZ+hYqCaRnwM17M
-         xD7r4zFaNBgj4Oq9bVLxX0UxqOYPnpOBZS5UZT2zrVSkiZPTd1RS3KaYp+tClIHPVOjo
-         Ndpl4eV2jE+pn8IQkeZBCtVT+KyO5Fe4XxLUOQcm7DGiV8Fe3m+dA70ahTFopJnRhdc7
-         3UzhTABhx/R4U9jHUs0yHXBkrsFcvxG9I8fu62V2cf39X7z8y9ZLPKHzt+LLyXMqQetN
-         JiEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776937452; x=1777542252;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3Czf+kEL9BcsX5OJ1yNM5tadNHCEbw6TrzapGuBP20Y=;
-        b=iVwa48iXdkhVUPzNf29a25PjhdktKckxb7O/qxV3nQlCKnvC4hy7LTbz2impBKI0/S
-         Bd9l2XPj/+BFzPuhplNwq22PjfFloYuIah9EKLYan5y2B9qLjLu/RsDAGQMyNN/zLcDV
-         84ljFQ7vYs4xP+OgT49gRqnXE0dUKJlzcvF7lzNSM2H1xNFUnkmxAR9ReeALgTRPst6j
-         aKylJzrJeURL0CIDvFoolXUkh3BArd3J6yiHe/fNAfiyxunGamaNRc6Wt4V7wsSdl2wk
-         rGG9/SbueXBvDUV3qnd3ox/kHL6XhdJ7Qqidh6k79hl3y3EupCiSHqM8jdz4dT6c0SiN
-         cyWg==
-X-Forwarded-Encrypted: i=1; AFNElJ8IpqSbZY29Mh8Kx84q2C9LS9MXyCCNc7QVtLdGG57/Gdc+dlt2c+dXa0//QOf015gmLrm7NH0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYy4Aa3yeDx+8HV93Us323F7mT05T61JPiD6oK902wHQUMd+wY
-	RdjaTXUT5WXhrOsd9gqVVMbNJsLSiA9U3A+qqOc/Kl/+ns/or9y/ZmqocvKserictju0ITgJXSk
-	w7URUgb5DMqGB3KXmU79D5MSIDNeTcA65Msxox14gU3ULsiDzo2EnTM4Vfg==
-X-Gm-Gg: AeBDiev7OvIQlAmUtHc90pp0BOAQ4uALtsqcXaWnl4JogyXQJwvSeOpz0a7L1qmJ0OZ
-	dDj4cMnUN0n6+A2vwXsr5J6hfTzoK4sv4Hnr2ik7PX79sNuervA+izpBCYjODESCv7+eHWSbJ2u
-	7i61MRgbQYm5N7bLlXhWGfpyXmI0VEbAMV9h7OI+DRUI5360Rwcz60TZr4LbSCuYdpezvVhe0ha
-	HH5MfA0ywj9/kNpPa6+jgcylpZC9P8bC8vbpC/NIp/R8GNg6P00al+9bRb5f7h0NR+WneBSM6Q+
-	/KXDGlBhFGfAsny+PHJK+bi3Hy+sJV9oVXDvwgFXHs0i2oBVQzQLlSGgT+/BVcCUsW76QN7OSgx
-	vKi1/ypxE9KgENjHMORcu7PmPfLJNf6y8xZ3SGdSWr45i53Up4I+ZaR9uPtTHFOd64b4=
-X-Received: by 2002:a05:600c:2d91:b0:48a:5301:bb5c with SMTP id 5b1f17b1804b1-48a5301bc69mr110956315e9.16.1776937452429;
-        Thu, 23 Apr 2026 02:44:12 -0700 (PDT)
-X-Received: by 2002:a05:600c:2d91:b0:48a:5301:bb5c with SMTP id 5b1f17b1804b1-48a5301bc69mr110956115e9.16.1776937451954;
-        Thu, 23 Apr 2026 02:44:11 -0700 (PDT)
-Received: from [192.168.88.32] ([150.228.93.216])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fb7a051dsm157378285e9.18.2026.04.23.02.44.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Apr 2026 02:44:11 -0700 (PDT)
-Message-ID: <a93c34d6-8c9f-417e-9ed2-ff4a9f668d11@redhat.com>
-Date: Thu, 23 Apr 2026 11:44:10 +0200
+	s=arc-20240116; t=1776937751; c=relaxed/simple;
+	bh=AuJP2O6s6sjf22qhVkoBhi80p54Kz3idPppPg0Vnsio=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=liWPOsa/37CCAITp5j+YBWLAL7NFRbgUTgYqaN/z/cIY4cSkE2fOA2coMFJNU53Si7rRRSA+yyQsls0FUVoKvQg9+H6ayJoDCE3RxCshMK8jzxaV6t8RzTTePMVAa2wYUMrVK67XSvf21AkzzJyxIv/av2Z06M40xT8YP5Xw3+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=leavitt.info; spf=pass smtp.mailfrom=leavitt.info; dkim=pass (2048-bit key) header.d=leavitt.info header.i=@leavitt.info header.b=xPr3VPJI; arc=none smtp.client-ip=79.135.106.26
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=leavitt.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leavitt.info
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=leavitt.info;
+	s=protonmail2; t=1776937737; x=1777196937;
+	bh=nYdzQzBkBvA+hLgpIa8MLVdS03AP7ZSnn49gBuNRwtM=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=xPr3VPJI2KWS1HLk1xQ3fsldTIrcpYvcgegipJJ9DDp90ejd8TfK54uWFif/ihmH4
+	 IUMMweqBaZ1WW05t2A9LiZC5jQXvY4WANGMHvxFk8ZXZ90hGGUmJ5zRJTDJ4L9svvV
+	 sFYk3HxWT25w5v60bnsCIx9k0fIc8Kxncc1KV6q6nG/KEYaY1NhroK2Wx15DWlsGF/
+	 gQu1QsB5JWP2MRANHU8VcyU4t9mBER49pvBMawqsVc9x30oU+uIYwE651vF2Yw2VN9
+	 E6KosUwT8FM5oMkRLDd839WByxk4ksTVSdnFWesgr/rKhUdRdYn9rAC6LmRaZnRRLT
+	 X0i2eMvafQveQ==
+Date: Thu, 23 Apr 2026 09:48:53 +0000
+To: Kory Maincent <kory.maincent@bootlin.com>, Carlo Szelinsky <github@szelinsky.de>
+From: Corey Leavitt <corey@leavitt.info>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew+netdev@lunn.ch>, Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 0/4] net: pse-pd: decouple controller lookup from MDIO probe
+Message-ID: <177693772506.254295.6378636892307427408@leavitt.info>
+In-Reply-To: <20260423110544.052f631e@kmaincent-XPS-13-7390>
+References: <20260423-pse-notifier-decouple-v1-0-86ed750a9d62@leavitt.info> <20260423110544.052f631e@kmaincent-XPS-13-7390>
+Feedback-ID: 22087991:user:proton
+X-Pm-Message-ID: 3416088fe9b126c48c731d95ff173bfb021dc17b
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net 0/11] octeontx2-af: npc: cn20k: MCAM fixes
-To: Ratheesh Kannoth <rkannoth@marvell.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: sgoutham@marvell.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, andrew+netdev@lunn.ch, dan.carpenter@linaro.org
-References: <20260420023442.3295891-1-rkannoth@marvell.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260420023442.3295891-1-rkannoth@marvell.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[leavitt.info,quarantine];
+	R_DKIM_ALLOW(-0.20)[leavitt.info:s=protonmail2];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280688-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280687-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[pengutronix.de,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[corey@leavitt.info,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[leavitt.info:+];
 	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D3C2244FFFD
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,leavitt.info:dkim,leavitt.info:mid]
+X-Rspamd-Queue-Id: DE410450205
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/20/26 4:34 AM, Ratheesh Kannoth wrote:
-> This series tightens Marvell OcteonTX2 AF NPC support for CN20K
-> silicon around MCAM key typing, optional debugfs setup, defrag
-> allocation rollback, x2 versus x4 KEX profiles and default-rule
-> allocation, logical MCAM clear and configuration, default-rule index
-> bookkeeping and explicit teardown, and NIXLF reserved-slot lookup when
-> default rules are missing.
-> 
-> Patches 1 through 3 focus on AF error handling: propagate
-> npc_mcam_idx_2_key_type() failures through cn20k MCAM enable, config,
-> copy, and read paths; treat cn20k NPC debugfs files as optional so
-> probe does not fail when debugfs is unavailable; and fix defrag MCAM
-> allocation rollback so allocation errno is not overwritten by subbank
-> index resolution.
-> 
-> Patches 4 and 5 align default-rule and flow-install behaviour with the
-> loaded mkex profile: prefer x4 default entries when the profile is x4,
-> and reject x4 flow keys when the profile is strictly x2.
-> 
-> Patches 6 through 8 refine cn20k MCAM programming: clear entries by
-> logical index and resolved key width, fix bank and CFG sequencing in
-> npc_cn20k_config_mcam_entry(), and read action metadata from the
-> correct bank in npc_cn20k_read_mcam_entry().
-> 
-> Patches 9 through 11 complete default-rule lifecycle handling:
-> initialize all default-rule index outputs up front, tear down default
-> MCAM rules explicitly (coordinated with npc_mcam_free_all_entries()),
-> and reject USHRT_MAX sentinel indices in npc_get_nixlf_mcam_index()
-> for cn20k.
-> 
-> Ratheesh Kannoth (11):
->   octeontx2-af: npc: cn20k: Propagate MCAM key-type errors on cn20k
->   octeontx2-af: npc: cn20k: Drop debugfs_create_file() error checks in
->   init
->   octeontx2-af: npc: cn20k: Propagate errors in defrag MCAM alloc
->   rollback
->   octeontx2-af: npc: cn20k: Make default entries as x4.
->   octeontx2-af: npc: cn20k: Reject request for x4 entries in x2
->   profile.
->   octeontx2-af: npc: cn20k: Clear MCAM entries by index and key width
->   octeontx2-af: npc: cn20k: Fix bank value.
->   octeontx2-af: npc: cn20k: Fix MCAM actions read
->   octeontx2-af: npc: cn20k: Initialize default-rule index outputs up
->   front
->   octeontx2-af: npc: cn20k: Tear down default MCAM rules explicitly on
->   free
->   octeontx2-af: npc: cn20k: Reject missing default-rule MCAM indices
-> 
-> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
-> 
-> --
-> v1 -> v2: Addressed simon comments. Added more patch fixes to this series.
-> 	https://lore.kernel.org/netdev/20260418162013.GG280379@horms.kernel.org/
+Hi Kory,
 
-I strongly suggest avoid extending a series to address issues found by
-the AI review, unless such issues are actual regressions/problems
-introduced by the new code. Sashiko tends to find a lot of collateral
-problem and the series could easily expand beyond any hope of merging.
+Thanks for the pointer -- I had not seen Carlo's thread; I should have
+searched lore before sending and will do so before v2. Adding Carlo on
+cc.
 
-Instead you should reply on the ML, commenting on sashiko's review,
-explain why or why not the outlined problems are valid and/or should be
-handled separately.
+Having read it end-to-end, my read of the state as of 2026-04-13 was
+that the conversation had narrowed to two open directions: propagate
+EPROBE_DEFER further up into phylink/MAC probe (Andrew/Russell), or
+resolve psec at PSE controller register time (your msg on 9 Apr,
+"save the phandle ... then at PSE register time look for each PHY and
+try to resolve every unresolved phandle"). Nothing concrete had been
+posted for either.
 
-Thanks,
+This RFC implements the second direction. pse_core publishes a
+BLOCKING_NOTIFIER chain with REGISTERED / UNREGISTERED events,
+phy_device subscribes, and psec ownership moves from fwnode_mdio probe
+into the notifier handler. Concretely with respect to points raised in
+the earlier thread:
 
-Paolo
+  - fwnode_mdio loses PSE awareness entirely, so the MDIO bus scan no
+    longer sees -EPROBE_DEFER from PSE lookup. Consistent with
+    Andrew's point that bus and device lifecycles are separate.
+
+  - psec is acquired at PSE register time, before
+    regulator_late_cleanup (30s) can run. Carlo's admin_state_synced
+    guard (his patch 1) therefore isn't needed in this model. psec
+    resolution happens eagerly on the REGISTERED event rather than
+    lazily on first ethtool access, so his patch 2 is also not needed.
+    And because fwnode_mdio no longer looks up PSE at all, the
+    non-fatal EPROBE_DEFER handling there (patch 3) drops out. This
+    series is a different architectural shape, not an increment on
+    his v2.
+
+  - Oleksij's concern about lazy resolution dropping UAPI
+    notifications is addressed: the notifier fires at register time,
+    so boot-time observer semantics are preserved.
+
+  - One caveat I already owe a fix for in v2: the attach helper in
+    phy_device currently treats every error from of_pse_control_get()
+    as retry-on-notifier, including non-transient ones. Carlo's v2
+    patch 3 was careful to differentiate -EPROBE_DEFER from bad-DT
+    errors at the fwnode_mdio lookup site (which matches his msg 1
+    concern about catching broken bindings at boot rather than
+    silently later). I need to preserve that discrimination at the
+    notifier-handler site -- phydev_warn() on anything other than
+    -EPROBE_DEFER. Trivial, but worth flagging.
+
+  - The DSA genphy force-bind sequence Carlo hit
+    (phy_attach_direct -> device_bind_driver -> deferred retry
+    skipped) does not apply, because psec attachment is not tied to
+    phy_probe.
+
+  - Patch 1 of this series scopes the regulator handle held by
+    pse_control to its own kref lifetime, fixing a latent
+    dangling-handle sequence that the notifier unregister path makes
+    reachable. This is a separate regulator-lifetime bug from the one
+    Carlo's patch 1 addresses.
+
+Validated end-to-end on a Cudy C200P (MT7621 DSA + i2c IP804AR as
+module), with lockdep active, across the i2c driver unbind/rebind
+cycle that triggers UNREGISTERED -> REGISTERED on the live system.
+The cover letter has the full evidence.
+
+I would welcome your view on whether this is the shape you had in
+mind on 9 Apr, or whether the MDI-based binding you raised with
+Maxime is the better endpoint and we should be reshaping around that.
+Happy to keep this RFC as the scaffolding either way.
+
+Carlo -- your debugging work on the DSA phy_attach_direct interaction
+is what made it clear this kind of approach was needed; thanks for
+laying that groundwork. Would value your thoughts on the tradeoffs.
+
+Best regards,
+Corey
 
 
