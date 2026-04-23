@@ -1,206 +1,275 @@
-Return-Path: <netdev+bounces-280876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280877-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oOcnMkKL6mk00gIAu9opvQ
-	(envelope-from <netdev+bounces-280876-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 23:12:34 +0200
+	id 4MDxNSaP6mn10gIAu9opvQ
+	(envelope-from <netdev+bounces-280877-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 23:29:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5F49457B48
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 23:12:33 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 149AE457E03
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 23:29:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0E585300734E
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 21:12:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 752D43004607
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 21:28:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2166E2DF142;
-	Thu, 23 Apr 2026 21:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E33083BFE2F;
+	Thu, 23 Apr 2026 21:28:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="TjXmjdGL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pE+/QREI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADCE6EEC0
-	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 21:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776978749; cv=pass; b=n4BU/kwOf4S60+Z0bujT9GgQAsrbVQwpcacQbZopgowwwZt02mFpGJrjF0v1DZHL8LnhTzRDn/QhQKYA81JCtQGSL3NT0pczBOJ2KKkiEVbRK05r3Y6McmgEGBpRMRLTAHJhndm0GB5166ZPHIUOliqoLQLrC8rZHNAHOyehogk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776978749; c=relaxed/simple;
-	bh=VTnEex8ZFMx1YfOB7NMNnEnvejgMwLrLX1JYYpBygGA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j/VbKg+fDYM2cw5bbMIeNfXt7p8/QJHI/HJXZUoNnwpPKP9nKejWfKR1gNWkvHXO6SZpbyFO7AZzim+0iiSYyx2Cd37YGpAQHdAamAT4vtyXE0Y4L5UNU6v9QuaktRnDIUQ74HhSOeUZCeKDUA42UkZjcqt8PENlrlcodAmE+5Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=TjXmjdGL; arc=pass smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-82cebbdbdccso4436017b3a.1
-        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 14:12:27 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776978747; cv=none;
-        d=google.com; s=arc-20240605;
-        b=X1iQNjTxccUMqNytNRitb0wxhLkiznqCGogCoySJ8KCVsuuacNqkSgHI3bSwTrlZSx
-         mN6qkp0KU9XMbtEk9KdIZPEEE8kae0aWC6EsGct1P98/10aGqp/IMKeUFVDAF8mTL3Ir
-         64shV2LOHiE3qo/iPuEt7kM+yaMusZ0yosGiRetW7a07mdNCSC6kDbcI1A4OJnEHMkMT
-         u1NiPHMzl5NxNEPL/BO+qD5q8EFwAia3CTPLKJr5NJqXmzqAv2mCFqZQE9yOOx0caYXt
-         +N3aNtlEE7sb7VRm+zpQP2u9uKEvaFXzPrkWaOVHK2508dSrppniOuMPmI07Np7oz7Ua
-         aPZA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=eGcK/enn2fESJTFKEHva2T8i1G8zJ+hzXP6ZXMfCiOQ=;
-        fh=nlkgO3bAkym8YB2pd34HvDTkgN6aQkTN0gpjP2RzgI0=;
-        b=Ni666cwiNUFU2LflZhDh89zvLNCfbubw9DPzBHpy26l1TU/kNDc7vXfWFw4jerYOYk
-         7E8i0h6JZdHpPE0KbVYFhKzIqDXIUwhOqXWwzanssLBr8q/EIYVAdXDZxyc3AtBIwpML
-         kl6Gbf5akxuHbOkoHpK5YOrahgrKsHVthZMIzexD5KUc/9mpYcmVGPh/NZNP6/moDPVl
-         7r8OHBpK2w1/K+E6ngq80pyJOWtriaXAPLHyPAntPPACYdqrY8ZeXeNeYWgWBJQ6CaeM
-         IVy2C1CtrE3MC2MpZ0Jx6DMfQszzXDNdeB3wOiW6z9MD0vXzsIeYHmpGR4VVeU46qMDO
-         taBQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F32FE3B2FDA
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 21:28:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776979737; cv=none; b=TKhWuew48NPzNEgnFUPLUSUbbjxBzuT/MdvhbCME3oGnSLFzi6/wpGyFWlSAbO3F3l9igHLnGlaXyhVEvCwW1+PQc+jPDWSBlLxkWmbnnXuYfO3+vsNpGG6nlQUREfpGmCT9gDDQVraGz/he5cenvg0/RbnFOsIztIhw3PU+8Vk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776979737; c=relaxed/simple;
+	bh=X+NK3AFVIn/vWQzi6BpYF9kMYkg9/BSUDVGl2a73Sh0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=TbdZelZewDDjQiWLg7bwtp5JJQ3UiDqHj+E5UG7KLoKLTEWMnGE6/4q9yB+vIRYtrPuIpHImwkpK5bX8Zkav9ftTnsHI58JHLv5SmWQAegw4RtH0p08X3wC0zJAn51DsaD3SxSDSt3z0NhApCjmk/qi5yvT0c2nzZ3IhFYrP1Z0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pE+/QREI; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-50e5dbd8e0eso46552601cf.1
+        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 14:28:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1776978747; x=1777583547; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1776979734; x=1777584534; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eGcK/enn2fESJTFKEHva2T8i1G8zJ+hzXP6ZXMfCiOQ=;
-        b=TjXmjdGL4F6DUFLF6khuZnQEjaeme8VOrY32iVeX90xf+IZf54RKcylvBL4gwcCk2Z
-         hJU2EaROD16+PE3RBWrdHqhuc8PFiQZEYVROSLbxJb9MSDYziM5LY0BFRKK/iBgTvNum
-         fRffJ1JOJk0Ss28hYq1UKxiLv84Aw0wcdkf1q2NtkVyGZy7Dk7szwZ9e2EQIDBD+Cnrz
-         oJ95NHvWYmDBI/8TBdtjfnE43X8MMOUl0ZP7y+AK7toqV3HyJKDkZCBg5ngLVyI+4gWd
-         2IHqkmPA9dh/GxfnXq/HT9DwC3kMsGHJMUeioblyuriqyArKh02gKf1GBE6V0ZAv0cap
-         2M1g==
+        bh=AFIEG8o2ocGEtq1F3O8VdMnxSWGZYL4bOI/0BGP9nvk=;
+        b=pE+/QREIvhD8LUhznixHWWp8lZ9N49BbF++qWI0Y7KmJSRUm/6i3BPgNASvQN+DZ9/
+         KpZKGdTyoQVMtYS3JUIvaDHxWjHKiF+WT7gDPpWXK/Dl2tHfRmHndgzys31nO1XYVZLZ
+         nQM9vSkvcHn052bTthJi2/v21TKZWnJFjxplvr6D4BUX2KjPGK7A83/MJdBx9Z5bS/wd
+         YCFWqxWBDgdFLIG2ORcxypUxfObm3TLmEgAqXgisNQvt7Ll/WwUkJwCgOgQGej8PCDe+
+         xtMbuOYQP5AsFZkPwGRG3xK8I6315OrhQCpMhcDONnLjlbyqVOSwZ5/E61MGVgn9Y4t8
+         6pSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776978747; x=1777583547;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1776979734; x=1777584534;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=eGcK/enn2fESJTFKEHva2T8i1G8zJ+hzXP6ZXMfCiOQ=;
-        b=i37tQ8g2BBTLiDisXyOItFmThcZHQHZnoVJR4gRF330GivJlEcbsDi9hlG52lp7qTj
-         sXsxcV7xSDY4Mgbhi4W6/WSHNhWV1odJ2fvXWQWrOGGsEf5X3wauYL3cTXTPPWgU+edl
-         b8+/33nUKvShvi5hBDCrYWn5a3Ie2VrN0tqgoqbuusXQhO28CanHSb0g1erMZJ/DqHbA
-         dlOwAbmye43MXzzhrfjtoQcbxaBaJAcU1bkIBvPnc7vCHWMBGxPR/dVnL5bbUPh7IqnO
-         4tpBuF6C+gyI4FpK0LYw9CtW6RD1QkUCOoEwgFR7rN9rR8yDZhNLqkA3uEK305Sk2z4n
-         8ILw==
-X-Gm-Message-State: AOJu0Yz52vPcnB/JHY8Ll4glpF1zrtwbDrS3RpET4RRm8OXBiVK3AW92
-	mPp6QpstJ74AntZswJ8ocdeN537yujxm2W5gZAXVOLKAmVDNZ1LrfX50e7wjVnlbOwFR6P+Chvm
-	Xw3tsR18MSimQ5DWDnPwBXqTJRnVpSFxKkjrZuJ2MSrVaPL2bWcU=
-X-Gm-Gg: AeBDies35KRGzFjjAc57ZksaeKR4bJnlCtezu/3RWupEpnk6plo537webj2s3O98Byq
-	FBaWblX222zDQF1TA1PQJD1zQqr2llzGqCW/W3WHdB0BladC1h1xJSKlbO9NK/ChIDgsX2H9Lgf
-	UtztJ4IM5exSqAc7YZ2BrnprENjKOiPSFTzWrq/QTgB4ITm2v9TWSkCeLvKiyDrqk+W9ElFVPyR
-	ENsk4j3xSfBQ2UnVQf+kjKsSkg3p6+yOAhFljopKj9dP3Voi1NiNgOEyrH+L4ROQmV3pzvkN882
-	I1M+HxMgAHEOrJbIvDU/yllDUpepeQ==
-X-Received: by 2002:a05:6a00:94e2:b0:82f:6cb3:645a with SMTP id
- d2e1a72fcca58-82f8b55537amr25069162b3a.31.1776978746973; Thu, 23 Apr 2026
- 14:12:26 -0700 (PDT)
+        bh=AFIEG8o2ocGEtq1F3O8VdMnxSWGZYL4bOI/0BGP9nvk=;
+        b=c8x9HJ+BnTHWD312luPK2Vrzc10VTkni6B4noXOeSYh/UP0JwfmImPtC8YWfeIfPhU
+         4gUxW2whDa7+uyKcwuGLfOgtQ8cks4OJKdIJ09srNcBWh4JZSRJgDGzl+EYGiujuxb6l
+         mEZPZ/z0k3PIzmtW6gakY2aFUzFsPpuQ0DpvE6u/VGDRG4gavOACo6p8CoXcm0Ok0EAS
+         R0TplsZzV4J2fxIxuWgzfQPYhwYh2jP2eC6OiAUJptlE5CVPa5qZ/Bud2anGFKAXt8oN
+         DdY2+zfgptEANwYBqNRtVqkAazQg7T1ES/i1TlX95x86E/9jSmOe9Jejg+Xk5KteXVZg
+         CLBw==
+X-Forwarded-Encrypted: i=1; AFNElJ+10Wj1RD2etzJNolYqfw7eTN7lXZg7PWigs+R7xpWrqUExm+s9DMyC0e4N/8S6B12rxIBz5Hk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YznUhaIPjRJyhYPyOyZee21J2V8g4rCZmIHzwkCtm69GIweUSrh
+	lEhpV4rtOPJCc6RK0QYuGuGmtwHNYbzo84q/JZCxbUyhah2IJ8ZU+Sd8
+X-Gm-Gg: AeBDiesferidC2NS5VB6bYsGQqlHtt9t+4uWvZG0Lyf/nrhqXikTVwdjaWHObl5fkrt
+	Y14m57BrKvoqBKUPeWysqUNz5iiWd6rSyknrs0LCiZQkFL31i1wgb4iIppTYx4MeR7Sni6F26ZA
+	VUCXhtUBPqy7uR25j/qH/a5ghSdBs70MLLSmlqBQtJy7VYCnDBJfDHVFvHImWmGqDBciXLh04Ur
+	+rcb5qZcKeoEkGMHG9vnAPI4qeSF5J66Dq3nMxIlUg6aTqftnWK3QCbYqV4HYY8Gb97p3QBkKFd
+	lZ7IJrwTSsCrSPv4kN2LYPnx3aB4msdMYyfaRIe8FcEiZ/MItY33yFnUgYEx1XefoJTAU9kMyjA
+	4D4hnY3SLIdRKyWdmdLZz6FUeWBMdohov2sgFba9InXzKeUwJAQjYuKbQNkGOZjhQ6GM+HiXc+X
+	073ByEilJ0I55iu7G1O51K7UNwMuW5bqH6HRYfw89bQ/cMcVTu4w5GenSnzBr0ebRlNsYj1zkAO
+	tpkRkAEogvFNotj+5GrpNqFYrP3njU=
+X-Received: by 2002:ac8:5a02:0:b0:50d:9033:f2ec with SMTP id d75a77b69052e-50e36c768bdmr425669421cf.50.1776979733840;
+        Thu, 23 Apr 2026 14:28:53 -0700 (PDT)
+Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b02ae5c300sm165696546d6.26.2026.04.23.14.28.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Apr 2026 14:28:53 -0700 (PDT)
+From: Michael Bommarito <michael.bommarito@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Kees Cook <kees@kernel.org>,
+	Feng Yang <yangfeng@kylinos.cn>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Michael Bommarito <michael.bommarito@gmail.com>
+Subject: [PATCH net-next v2] netlink: clean up failed initial dump-start state
+Date: Thu, 23 Apr 2026 17:28:27 -0400
+Message-ID: <20260423212827.1177552-1-michael.bommarito@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260420162734.854587-1-michael.bommarito@gmail.com>
+References: <20260420162734.854587-1-michael.bommarito@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260418032027.900913-1-stephen@networkplumber.org>
- <20260418032027.900913-5-stephen@networkplumber.org> <20260421131039.GA651125@horms.kernel.org>
- <87f5e94e-d354-423d-9976-6cf3fb0710b1@redhat.com>
-In-Reply-To: <87f5e94e-d354-423d-9976-6cf3fb0710b1@redhat.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 23 Apr 2026 17:12:15 -0400
-X-Gm-Features: AQROBzB3RrrF9FSgytPC07qAqFpCesRoo7ihrFljDXNuoFrfc9SP0fzUHU4ndnA
-Message-ID: <CAM0EoMmnHfUiKP1PO19sHJZpeGN5tdL7ds=_8Nma7Y-4XoSczg@mail.gmail.com>
-Subject: Re: [PATCH net v8 4/6] net/sched: netem: validate slot configuration
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Dave Taht <dave.taht@gmail.com>, 
-	open list <linux-kernel@vger.kernel.org>, 
-	Stephen Hemminger <stephen@networkplumber.org>, Simon Horman <horms@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280876-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-280877-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,resnulli.us,davemloft.net,google.com,kernel.org,gmail.com,networkplumber.org];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,kylinos.cn,vger.kernel.org,gmail.com];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: E5F49457B48
+	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 149AE457E03
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 23, 2026 at 3:50=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 4/21/26 3:10 PM, Simon Horman wrote:
-> > On Fri, Apr 17, 2026 at 08:19:42PM -0700, Stephen Hemminger wrote:
-> >> Reject slot configurations that have no defensible meaning:
-> >>
-> >>   - negative min_delay or max_delay
-> >>   - min_delay greater than max_delay
-> >>   - negative dist_delay or dist_jitter
-> >>   - negative max_packets or max_bytes
-> >>
-> >> Negative or out-of-order delays underflow in get_slot_next(),
-> >> producing garbage intervals. Negative limits trip the per-slot
-> >> accounting (packets_left/bytes_left <=3D 0) on the first packet of
-> >> every slot, defeating the rate-limiting half of the slot feature.
-> >>
-> >> Note that dist_jitter has been silently coerced to its absolute
-> >> value by get_slot() since the feature was introduced; rejecting
-> >> negatives here converts that silent coercion into -EINVAL. The
-> >> abs() can be removed in a follow-up.
-> >>
-> >> Fixes: 836af83b54e3 ("netem: support delivering packets in delayed tim=
-e slots")
-> >> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
-> >
-> > Reviewed-by: Simon Horman <horms@kernel.org>
-> >
-> > I acknowledge that Sashiko has provided feedback on this patch.
-> >
-> > 1. "Does rejecting negative dist_jitter values with -EINVAL cause a
-> >     regression in userspace ABI backward compatibility?  Since the kern=
-el
-> >     previously accepted these values and silently coerced them using ab=
-s(),
-> >     existing userspace tools or scripts that happen to pass negative va=
-lues
-> >     might start failing to configure the qdisc."
-> >
-> > This is intended and explicitly explained in the cover letter.
-> Jamal, given the uAPI implication, could you please double check that
-> the change is fine?
->
+__netlink_dump_start() installs cb->skb, takes the module reference,
+and sets cb_running before calling netlink_dump(sk, true). If that
+first call returns via errout_skb the callback state is left behind:
+cb_running stays set, module_put() and consume_skb(cb->skb) are
+deferred until recvmsg() drives the dump back through the success
+path, or netlink_release() on close runs the catch-all cleanup. On
+sustained alloc failure neither fires.
 
-It should be fine; at least iproute2 will never allow the kernel to
-receive a negative number.
-Stephen brought up the fact that strtod() could return a -ve number
-(but at least iproute2 makes sure negative numbers are not carried
-forward to the kernel).
+Factor the teardown into netlink_dump_cleanup(nlk, drop) shared by
+the dump success path, the lock_taken=true errout_skb path, and
+netlink_release(). The @drop flag preserves the existing split:
+consume_skb() on normal completion, kfree_skb() on abort.
 
-cheers,
-jamal
+Validation on a UML guest: an unprivileged task opens NETLINK_ROUTE,
+preloads sk_rmem_alloc, then issues RTM_GETLINK | NLM_F_DUMP. Stock
+kernel leaves cb_running stuck at 1 until recvmsg() or close()
+drives it. Patched kernel clears cb_running immediately on the
+lock_taken=true failure; the recvmsg continuation path is unchanged.
 
-> Thanks,
->
-> Paolo
->
+At scale: 3500 wedged sockets in a 256M guest show about 3.8-3.9
+MiB of extra unreclaimable slab (~1.1 KiB/sock) on stock vs zero on
+patched. RLIMIT_NOFILE bounds the test before OOM, so this is a
+local availability cleanup rather than an exhaustion primitive.
+
+Fixes: 16b304f3404f ("netlink: Eliminate kmalloc in netlink dump operation.")
+Assisted-by: Claude:claude-opus-4-7
+Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+---
+v2 (per Jakub's review <20260420103715.347fbd4a@kernel.org>):
+  * commit message names both paths that do clear the state
+    (recvmsg-driven retry on drain, netlink_release() on close)
+    and notes that neither fires on sustained alloc failure
+  * moved the UML validation into the commit message
+  * extracted netlink_dump_cleanup(nlk, bool drop); shared with
+    netlink_release() and the success path. The bool preserves
+    the existing kfree_skb / consume_skb split.
+
+v1: https://lore.kernel.org/netdev/20260420162734.854587-1-michael.bommarito@gmail.com/
+
+ net/netlink/af_netlink.c | 47 ++++++++++++++++++++++++++--------------
+ 1 file changed, 31 insertions(+), 16 deletions(-)
+
+diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+index 4d609d5cf406..ab21a6218631 100644
+--- a/net/netlink/af_netlink.c
++++ b/net/netlink/af_netlink.c
+@@ -131,6 +131,7 @@ static const char *const nlk_cb_mutex_key_strings[MAX_LINKS + 1] = {
+ };
+ 
+ static int netlink_dump(struct sock *sk, bool lock_taken);
++static void netlink_dump_cleanup(struct netlink_sock *nlk, bool drop);
+ 
+ /* nl_table locking explained:
+  * Lookup and traversal are protected with an RCU read-side lock. Insertion
+@@ -763,13 +764,8 @@ static int netlink_release(struct socket *sock)
+ 	}
+ 
+ 	/* Terminate any outstanding dump */
+-	if (nlk->cb_running) {
+-		if (nlk->cb.done)
+-			nlk->cb.done(&nlk->cb);
+-		module_put(nlk->cb.module);
+-		kfree_skb(nlk->cb.skb);
+-		WRITE_ONCE(nlk->cb_running, false);
+-	}
++	if (nlk->cb_running)
++		netlink_dump_cleanup(nlk, true);
+ 
+ 	module_put(nlk->module);
+ 
+@@ -2250,6 +2246,26 @@ static int netlink_dump_done(struct netlink_sock *nlk, struct sk_buff *skb,
+ 	return 0;
+ }
+ 
++/* Must be called with nl_cb_mutex NOT held. @drop=true frees the skb
++ * via kfree_skb() so drop-monitor sees the teardown; @drop=false uses
++ * consume_skb() for the normal-completion path.
++ */
++static void netlink_dump_cleanup(struct netlink_sock *nlk, bool drop)
++{
++	struct module *module = nlk->cb.module;
++	struct sk_buff *skb = nlk->cb.skb;
++
++	if (nlk->cb.done)
++		nlk->cb.done(&nlk->cb);
++
++	WRITE_ONCE(nlk->cb_running, false);
++	module_put(module);
++	if (drop)
++		kfree_skb(skb);
++	else
++		consume_skb(skb);
++}
++
+ static int netlink_dump(struct sock *sk, bool lock_taken)
+ {
+ 	struct netlink_sock *nlk = nlk_sk(sk);
+@@ -2258,7 +2274,6 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
+ 	struct sk_buff *skb = NULL;
+ 	unsigned int rmem, rcvbuf;
+ 	size_t max_recvmsg_len;
+-	struct module *module;
+ 	int err = -ENOBUFS;
+ 	int alloc_min_size;
+ 	int alloc_size;
+@@ -2366,19 +2381,19 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
+ 	else
+ 		__netlink_sendskb(sk, skb);
+ 
+-	if (cb->done)
+-		cb->done(cb);
+-
+-	WRITE_ONCE(nlk->cb_running, false);
+-	module = cb->module;
+-	skb = cb->skb;
+ 	mutex_unlock(&nlk->nl_cb_mutex);
+-	module_put(module);
+-	consume_skb(skb);
++	netlink_dump_cleanup(nlk, false);
+ 	return 0;
+ 
+ errout_skb:
+ 	mutex_unlock(&nlk->nl_cb_mutex);
++	/* The recvmsg() retry path (lock_taken=false) keeps cb_running so
++	 * the next recvmsg() can drive the dump forward once receive room
++	 * is available; only the initial __netlink_dump_start() failure
++	 * owns the teardown.
++	 */
++	if (lock_taken)
++		netlink_dump_cleanup(nlk, true);
+ 	kfree_skb(skb);
+ 	return err;
+ }
+-- 
+2.53.0
+
 
