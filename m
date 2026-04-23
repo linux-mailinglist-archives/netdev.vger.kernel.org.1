@@ -1,738 +1,281 @@
-Return-Path: <netdev+bounces-280891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280892-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cM59Lzmx6mkWCgAAu9opvQ
-	(envelope-from <netdev+bounces-280891-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 01:54:33 +0200
+	id qCf7Odmx6mkWCgAAu9opvQ
+	(envelope-from <netdev+bounces-280892-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 01:57:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DB7D458715
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 01:54:33 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BDDF458786
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 01:57:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9A5FC300E019
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 23:54:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9F9B53001FD6
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 23:57:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9083D904F;
-	Thu, 23 Apr 2026 23:54:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D94E2378815;
+	Thu, 23 Apr 2026 23:57:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pQNDBdK6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Zoh9NtyH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57B9B3D9031;
-	Thu, 23 Apr 2026 23:54:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776988464; cv=none; b=mHEKQz6LZWduUYngxhbHEpCT4Wk0IoZ/hi/ZBgks84Oj+AoF/gLvRCyARomkk1n8APkk8V0TgMwVOtgAk+Cmq00ew142KOlcm1s8bpUke9H+rT3CgYuZhQkF8wsdrl6RpSpP8ViBWzqXZXeIkq05dnlwSrY2dVxLCtBRxMEq/r8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776988464; c=relaxed/simple;
-	bh=xSYGhA8NBdeA+BkGufctAtR0Tlmly5tAQK4jOfX9v54=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CoXOoIqQcbZjUqqKADP9TgWfoKPqwzCFVlw3GgHRF6C9+q/mLcP4g9007V8wlqob4QlVYhbYxjguOIsAcRFawFYffdlYN4XvD0G6Voy8S8aSXaKJwEogeKgBU0tyC/kHHlwqPx2qWT1LzJe3ccS8qHQMpxiy7gbftane9D5t7As=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pQNDBdK6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6F02C2BCAF;
-	Thu, 23 Apr 2026 23:54:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776988463;
-	bh=xSYGhA8NBdeA+BkGufctAtR0Tlmly5tAQK4jOfX9v54=;
-	h=From:To:Cc:Subject:Date:From;
-	b=pQNDBdK6x9nVKRCeJ3Yow151193yyNmx5a0IInEboBhYFT14+y627VuLfWY0vJPUs
-	 +qGAsC25f/HFFxGixvQqAzokQmz6jlkA+j4PN5DXHiYaq3iMbd2Wed5RKRWOOSWmdF
-	 y8h/suXJxeZGVcw11z+RoFqWVW34WKKPX8Ov35ymfOC867Yy88Z3mN/z8sjn46kZJd
-	 lYGl6SIX1CpoKB4xT2T0WYAG8PJcYfbvUtN00fPMkesMWtDD43NvjCaXyAZY6WOsH1
-	 HvhovP8QJVz8na1RcLCFhFDAXrItazaQtiYBvtzhGpirwPJnzMHkoTY/h4B3Iuh6pZ
-	 iyZoOoii1c11A==
-From: Jakub Kicinski <kuba@kernel.org>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	pabeni@redhat.com
-Subject: [GIT PULL] Networking deletions for 7.1
-Date: Thu, 23 Apr 2026 16:54:22 -0700
-Message-ID: <20260423235422.1541768-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93CEE1C5F13;
+	Thu, 23 Apr 2026 23:57:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776988629; cv=fail; b=LkHFiu4uD/ZWoIAjbOgivz0a6fuouvDF17hsv5ljAEY4Am+G0dbsSUEfmvy7k8yhllYjwn9Kpq03AQqPEzmtoehZyBrS9Q2XjUOrHehOMWZWutWfvouEnUyOSp5A+uEMHQah4MHZMqGNGJ+Dm7zpcQ1TsG4V9DS+rExFa9jPQc8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776988629; c=relaxed/simple;
+	bh=xdg7tbOOnsTlLeGlAEftZvASN20dzT/Gxrj0gnb1ir8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=qWyTc+63PNB3Eahgq51mBt4aROYGGEVELup0sSpzZuG1O6SrgJdQ7Wsi1zat8YYSqpH8rX6h8a71lBwMRL1Hi96u1Wbme8FSQEdkzcBXeylD4YrknEE4/S0R9SwyPq/rgKqEweTSFR+0Jzh1/b3IWysF5lPh7zg//U8xrRJukpk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Zoh9NtyH; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1776988628; x=1808524628;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=xdg7tbOOnsTlLeGlAEftZvASN20dzT/Gxrj0gnb1ir8=;
+  b=Zoh9NtyHkAcf1/VT33PbpycfGBrizVkgj/I7LvSFnm70IqE1Bb4le0A6
+   kAtOCcexN1MqZf1WdctzUZm93HWejn+EnYTde9n1BYlX+oSkQoZ7bd2Hh
+   1NOVp9/rASfDjnE+xQuT6zslZho9p+nBIIht4Kut0IdIucy+ClJf/FixT
+   IQiYuxeBgsfJAKvVKUcUl4ZzvqKQ45jTjbyik6fl4Zu0ZtnnIB90Nh5iF
+   I0UMl2FY80R89/RLEDBsvZSN4P4cAfbGY9sQLVdbT/0cfMkouoSZYjrtG
+   cZULn9ZBo9J0LoriZV5I1GdGUEnDg+T9EnR5ROH/ODR0WlmU9CrHdWtO4
+   Q==;
+X-CSE-ConnectionGUID: lj4m+EGZQ9S/gc8d8ZXj0w==
+X-CSE-MsgGUID: 2L/DZTOVTF+VcRAlTMLLsA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11765"; a="78084080"
+X-IronPort-AV: E=Sophos;i="6.23,195,1770624000"; 
+   d="scan'208";a="78084080"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2026 16:57:07 -0700
+X-CSE-ConnectionGUID: wOVw9XySRJCunbpmhVq7Yg==
+X-CSE-MsgGUID: bJ2sVLWIQKqtKYv1Q+ceoA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,195,1770624000"; 
+   d="scan'208";a="226264197"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2026 16:57:06 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Thu, 23 Apr 2026 16:57:06 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Thu, 23 Apr 2026 16:57:06 -0700
+Received: from MW6PR02CU001.outbound.protection.outlook.com (52.101.48.14) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Thu, 23 Apr 2026 16:57:06 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=N9BJUNO4kWw5kAWVuwLZGumZItZu0enpV7klQecYLoEVE7/i1q32+xfNswZRuyXmx3qBXOAtal4HCrn40MHHP7ErJNwNN54Lh15mZYkzP/TTcwqc6khRxhp9btJMAuaR5/X1/rOrDzP4nGthJ8PKFjuQwLS/CszD7HJ495atIZTNJMRQldARDo12dynM4AZFX3+Yfeond4DB4u6uINGECiPHzBmr3N5iAyX9cFqw6rPXWGs0zs6d+ndWo1WMIMKc2/eEc0IRDUe8epXCDzSanS7M6S9geJOYYWeORAH+6oEIMRo2q/8VAYLK5vYGq+xQirD5kdnV4SQR9SuKAXYxiA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+okCoVX975svVxKp0ytHNb6U2BjInLQcpexD7tsm32E=;
+ b=XHvaFhPVEKji/sUWhh7Epalpeb0KdB4RlxvQlTqmGok1Xuk2scBfq7ZcXGauM+p/lat323Alu27cPcwymgstu8p/uVMST3pIs8cvrdBptBd0EP+QIDTyKmBAY/TPH1oyQiI1zpyFWkyxegUvDnhtaD2xdA3MRjC2+IPSdzFO0GN/w+xnqSdN8faoKvRnf2hAVYXQ/2GeqF3DD97APIC13gvHqiI5KspTQOld3lJw9vugu1utopoWBlCkp5JwK4JN3HLb2Cw+VC7pIPCWnrNjIrh2+te63EAK0SIvFFkkgXcUW5j3t0rw1rrFEGt7cT4v497xzdu7D8O0NB3wQaGhcw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from LV1PR11MB8790.namprd11.prod.outlook.com (2603:10b6:408:2b1::16)
+ by LV3PR11MB8603.namprd11.prod.outlook.com (2603:10b6:408:1b6::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.22; Thu, 23 Apr
+ 2026 23:57:03 +0000
+Received: from LV1PR11MB8790.namprd11.prod.outlook.com
+ ([fe80::27cb:7a60:19bb:584a]) by LV1PR11MB8790.namprd11.prod.outlook.com
+ ([fe80::27cb:7a60:19bb:584a%5]) with mapi id 15.20.9846.011; Thu, 23 Apr 2026
+ 23:57:03 +0000
+From: "Nowlin, Alexander" <alexander.nowlin@intel.com>
+To: "Oros, Petr" <poros@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, "Greenwalt, Paul"
+	<paul.greenwalt@intel.com>, Daniel Zahka <daniel.zahka@gmail.com>, "Kitszel,
+ Przemyslaw" <przemyslaw.kitszel@intel.com>, Nikolay Aleksandrov
+	<razor@blackwall.org>, Eric Dumazet <edumazet@google.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Loktionov,
+ Aleksandr" <aleksandr.loktionov@intel.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"Ertman, David M" <david.m.ertman@intel.com>, "Keller, Jacob E"
+	<jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net] ice: fix infinite recursion in
+ ice_cfg_tx_topo via ice_init_dev_hw
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net] ice: fix infinite recursion in
+ ice_cfg_tx_topo via ice_init_dev_hw
+Thread-Index: AQHcy3nXcql7iZkcaE+pcQ3qZQ19orXtYa3A
+Date: Thu, 23 Apr 2026 23:57:02 +0000
+Message-ID: <LV1PR11MB87901A00E2BF508A97772277902A2@LV1PR11MB8790.namprd11.prod.outlook.com>
+References: <20260413191420.3524013-1-poros@redhat.com>
+In-Reply-To: <20260413191420.3524013-1-poros@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV1PR11MB8790:EE_|LV3PR11MB8603:EE_
+x-ms-office365-filtering-correlation-id: b5245865-7ed0-4d1c-2796-08dea1940431
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016|38070700021|56012099003|22082099003|18002099003;
+x-microsoft-antispam-message-info: Yq/Ngrz9pVGnq9ZikbEtltRJT+wA5svqXhQqxLSHdDNTXP9HoFV0omtDVG4+wcl02Gb9kL0ZZhZLx0mzOo9F0RoYUpFRn6Va6haILc1y+M0Ff8s+Z3trywxdp4DArvwoorgT6cCdfogjDv1EyBmVfNl1+dOHUMc9o3S/Rxy5u73bedRD4KURwqnUnzwZ/FYKEn8AULkdFC4/u8u41mUVHtQPY7tdoa3F789n01rcnw8TVOX9lriaxNN4oyndq1Wab3tBu5/yBEHizXl2WCT4dwzOGdCQ6e7qbNTvQhv3zNMzqiuwGDf9eyRAXM6jS/jycEgLKS6Nc0Kp2acE9fejUvOWsobct7VBlQFpShVhNh5O6q6GxYmynFQb5rL3Ba2mRiJOyWWzT0sVSEiAUr/n671dY5x00iwUyhUez3IVLqoXk3RLYNxCNcgyy1A6/f/2GMj1fPsj2tZjNhNAgvjRHzF68ChjxQwaWCGI9x7K0Je01cvsM7MbfXOqux74Rt9QqlbxwXlned3v9OEAqFcvf5HKRSuBiPR7HBt+ohmeX8MEOpO5DdPHLx0awD6AhylcLTjj0WMFZ4c+SdSrBnwoFBtiJ4nUl0DnmXICzCuZMFoVxXDjs2w4x2m6vbKpdakDpeZJoZO9qwMbIc2269PK8jXFFRtIBiSVSumQ/2FYxsDgYVkTyx4g8Mogm9+e1ULeyyPrLdPyF9XwUEg0UwceewmsrXxgchd905vclH7YbLUZo9AJTtjeRO1zSYxaX7c/Ah9RimwNAkSvQSWLyoJje7dawFcyQr/Fwm15hI+XQlA=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV1PR11MB8790.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(38070700021)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?anKRWARrDtLOkRlcuNnHQPfvZLxkMKvnZPdPAKPfnNP2hyb6peTxrNdmtlwC?=
+ =?us-ascii?Q?q0ZTvMZa1rZaJGVjuEMRMO8BgZO4TuctXy9fMGxE8OVd/LyIWoJYxekfs72/?=
+ =?us-ascii?Q?HJ62Rj7qpB8DTDMJoxdjslgvuoeBRjFQPnWamMx5WkCEsXXyNna33A5y5FLX?=
+ =?us-ascii?Q?+3YiaLY3LczCDu3cFv+bGRuzi+w7g35o6+4tyypkSmV1oGUvKJoxyqXfSpa6?=
+ =?us-ascii?Q?vrZj1a4n+xTka3hiawMOyoq2qiXENFQJqNtMyh9akho7mjhPlxK3ttBayM+w?=
+ =?us-ascii?Q?KmUmyvAXekCwv12vB6WKfubpf8yQu0gCLXFgAMjO2E0rrlPrpYiYzhYunwCp?=
+ =?us-ascii?Q?Ryu8T8IMl2HlzFEAUyratDHJyX8sBHwl4F/vTgUyO9ivYdvMxEQdIyElfjIu?=
+ =?us-ascii?Q?M82Su9Mo5yHXWvJkK1zUkjNHECLQ+uUend8Uo2WJg0V2Snj2vk8uXulNwdLg?=
+ =?us-ascii?Q?GWXXyrArvQjrzGKgyyAop/3x11EScOhjZjOcowxrPSQ6w9DdByQXRAs7YGTO?=
+ =?us-ascii?Q?kYJl1Yk253CgWsFZGp86s3NvuXEd32h+NcCl4Vm4v3IdynrcV8OEOoOI5Zb2?=
+ =?us-ascii?Q?frtrfjQlvdfo//8kZL28BSZRH2vPkW/BoLNZvzcwjFPdLGib9m/qiRuVVCqc?=
+ =?us-ascii?Q?1wNVGRwVysyYKpZt9AR5R5POlJOhlZuLpTm9ofOz2+IwIQFLsSoFGZudN6WT?=
+ =?us-ascii?Q?HUoCfm1IaZy7fSnKyyo3KZ5FxuBPhy31WELwi75YV03ptOQuohyRiVr7EVSf?=
+ =?us-ascii?Q?XKzR2nTws5dSuAAL9l/pWaPz9Qw/ojXkgSyJrStDpMzgIvzwCsiD34SOFtrL?=
+ =?us-ascii?Q?XcCfShO/UzzkHocE84AdvZVlx3bwwVAS1WHmX/fxmvWAwyF1YD5GVeeWPhKm?=
+ =?us-ascii?Q?EWk3DNdfYTXqeAT5FReMJ+uFYnX1iVOgmRsQNh97SXh/FHZlzPCsXfgDqUAL?=
+ =?us-ascii?Q?njB4dWbeDj+gs3GseiKJds0e1AEzsofEDOdJcgacGjlMTVNNkh34r4lHt9gk?=
+ =?us-ascii?Q?cvMQWCyUS5EKf8NZ2nQQeO9IdhqpE54xXj1KvEWYdvo1jgB1Y3hBStYVNOvc?=
+ =?us-ascii?Q?/fQDvSSbBU5KGLKlbZujcHbYNLAC1b6LbVALv2lmE6b/EMBb27XWZIxtZ+l/?=
+ =?us-ascii?Q?fQbX8Y7jeKqDlaOPkyiR15QdEud1pKo1K7VvI5aggDJ4PwQPblWmOOhwA2X6?=
+ =?us-ascii?Q?dUGbRcQ1AhU3f/a5SPOI9vqnZQErJXlDavy17kbqCF/8Vvmy6cY6L9vFsA6z?=
+ =?us-ascii?Q?Eo1TuzRk/3cJAdykIXWi0C0Z1IF2QYYmk6nT3xGuucooQqfQ7mKw0thZENdn?=
+ =?us-ascii?Q?D8kTX2XeJEkErZgjf+y4rH0ep+PyHBfZgeqcYET3xjCtD19KIB537UlmK27/?=
+ =?us-ascii?Q?DHD9hjFmRHHLEk+YI4IEDGXs9cdnRQk8B/gEOhjIJgRZXTxLO4I0yPYHVdmo?=
+ =?us-ascii?Q?JOP8XD/b0kwZ0jZxipMCO6M+VChg0nNM8EqD6vgeyOe5sQaPTE9TlKrtSW+W?=
+ =?us-ascii?Q?1Zl41YufvOKwk/jrq13Hpb/kcPKTgmoKLcVmusoJvASCHwa6s2EpzbhuRVQ1?=
+ =?us-ascii?Q?ueFENr1BP7AnUmoQG51J7VsP9NOZxsr/TrJpif2VITALjBJIZYUfruGSEgPJ?=
+ =?us-ascii?Q?PwNZUPhPBfta+W6cbmX7PbirQOLvPadadH8kmpIOIGps5v3uMC8ViGji7nhF?=
+ =?us-ascii?Q?j0c9YE/LzxKrMukoZpwxLcKMHU5ceOkLoPPYJdlukm9TyZmPgC9Ftbq8AOlW?=
+ =?us-ascii?Q?FZlPam/8Lw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 3DB7D458715
+X-Exchange-RoutingPolicyChecked: Ewx4b6mfG4kL5fL4kM11bLtxau/ZBXTnz0Y6UIuKOrMZ1oXXWOS/ACuupUptw9pnDTnzOjPgBPBqm4kQwQz4utE1vHYiWTJG8MHHTGqr8/PDiWGndF7XaN/i+0V5m1/qe5M8w9UZZVpwm2kyDaMUoW7WQ51mFbUNF4SkOZIACIYDi8e41wpdKcMcIfKel1UXdSRXqK13BdEdhQ6TVGyuhobJDhztJbzQ7T4z4RHzjIosnKAdH3oqLjPDlbsZzvVFFXrWyj2IRcW1+J4z0KBv+QcU6Tb0rA3CzAgK+XNo8fV8EOZhIbr5MdMc+7zEsphRGzGADEM8fhcjG8a8/4DQIA==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV1PR11MB8790.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b5245865-7ed0-4d1c-2796-08dea1940431
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Apr 2026 23:57:03.0501
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: P0+vRlkICUQtzh2pj/hlCeeXHUAGxjsAFv7p2IJ2PM3NwaGdhlTtkE9WJQNa48vCuF0g+ciQrey7rSUUWkp11bnKFnSIkyrTU16pqg1xKKQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8603
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: 8BDDF458786
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280891-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280892-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[linux.intel.com,intel.com,gmail.com,blackwall.org,google.com,vger.kernel.org,lunn.ch,kernel.org,redhat.com,davemloft.net,lists.osuosl.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alexander.nowlin@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 
-Hi Linus!
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of P=
+etr Oros
+> Sent: Monday, April 13, 2026 12:14 PM
+> To: netdev@vger.kernel.org
+> Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>; Greenwalt, P=
+aul <paul.greenwalt@intel.com>; Daniel Zahka <daniel.zahka@gmail.com>; Kits=
+zel, Przemyslaw <przemyslaw.kitszel@intel.com>; Nikolay Aleksandrov <razor@=
+blackwall.org>; Eric Dumazet <edumazet@google.com>; linux-
+> kernel@vger.kernel.org; Loktionov, Aleksandr <aleksandr.loktionov@intel.c=
+om>; Andrew Lunn <andrew+netdev@lunn.ch>; Nguyen, Anthony L <anthony.l.nguy=
+en@intel.com>; Ertman, David M <david.m.ertman@intel.com>; Keller, Jacob E =
+<jacob.e.keller@intel.com>; Jakub Kicinski <kuba@kernel.org>; Paolo=20
+> Abeni <pabeni@redhat.com>; David S. Miller <davem@davemloft.net>; intel-w=
+ired-lan@lists.osuosl.org
+> Subject: [Intel-wired-lan] [PATCH iwl-net] ice: fix infinite recursion in=
+ ice_cfg_tx_topo via ice_init_dev_hw
+>=20
+> On certain E810 configurations where firmware supports Tx scheduler topol=
+ogy switching (tx_sched_topo_comp_mode_en), ice_cfg_tx_topo() may need to a=
+pply a new 5-layer or 9-layer topology from the DDP package. If the AQ comm=
+and to set the topology fails (e.g. due to invalid DDP data or firmware=20
+> limitations), the global configuration lock must still be cleared via a C=
+ORER reset.
+>=20
+> Commit 86aae43f21cf ("ice: don't leave device non-functional if Tx schedu=
+ler config fails") correctly fixed this by refactoring
+> ice_cfg_tx_topo() to always trigger CORER after acquiring the global lock=
+ and re-initialize hardware via ice_init_hw() afterwards.
+>=20
+> However, commit 8a37f9e2ff40 ("ice: move ice_deinit_dev() to the end of d=
+einit paths") later moved ice_init_dev_hw() into ice_init_hw(), breaking th=
+e reinit path introduced by 86aae43f21cf. This creates an infinite recursiv=
+e call chain:
+>=20
+>   ice_init_hw()
+>     ice_init_dev_hw()
+>       ice_cfg_tx_topo()         # topology change needed
+>         ice_deinit_hw()
+>         ice_init_hw()           # reinit after CORER
+>           ice_init_dev_hw()     # recurse
+>             ice_cfg_tx_topo()
+>               ...               # stack overflow
+>=20
+> Fix by moving ice_init_dev_hw() back out of ice_init_hw() and calling it =
+explicitly from ice_probe() and ice_devlink_reinit_up(). The third caller, =
+ice_cfg_tx_topo(), intentionally does not need ice_init_dev_hw() during its=
+ reinit, it only needs the core HW reinitialization. This breaks the recurs=
+ion cleanly without=20
+> adding flags or guards.
+>=20
+> The deinit ordering changes from commit 8a37f9e2ff40 ("ice: move
+> ice_deinit_dev() to the end of deinit paths") which fixed slow rmmod are =
+preserved, only the init-side placement of ice_init_dev_hw() is reverted.
 
-I've been trying to figure out how to survive the change in rate
-of submissions and we're doing 3 things in parallel:
- - more/better LLM code review tools
- - email bots guiding noobs and if needed throttling submissions
- - deleting long-orphaned code (unless someone steps up immediately)
+> Fixes: 8a37f9e2ff40 ("ice: move ice_deinit_dev() to the end of deinit pat=
+hs")
+> Signed-off-by: Petr Oros <poros@redhat.com>
+> ---
+>  drivers/net/ethernet/intel/ice/devlink/devlink.c | 2 ++
+>  drivers/net/ethernet/intel/ice/ice_common.c      | 2 --
+>  drivers/net/ethernet/intel/ice/ice_main.c        | 2 ++
+>  3 files changed, 4 insertions(+), 2 deletions(-)
 
-This PR is part of the 3rd point. I did move what could be built
-as a module to a GH repo, in case it helps someone.
-But I assume this is all basically unused code.
-
-For the LLM reviewer part tweaking local prompts is showing its limits.
-They are missing 50%+ of bugs Sashiko finds. (Sashiko is using LLM APIs
-directly.) Sashiko/Gemini finds a lot of real issues but it reports
-side-issues and occasional false positives. Paolo says we spend
-~40% of our time checking LLM outputs, sounds about right. I hacked up
-a Sashiko/Claude/semcode combo which is _much_ better in terms of
-false positives. But it also misses real things Sashiko/Gemini finds.
-Magic bullet I was hoping for yet to be found.
-
-The following changes since commit 1f5ffc672165ff851063a5fd044b727ab2517ae3:
-
-  Fix mismerge of the arm64 / timer-core interrupt handling changes (2026-04-14 23:03:02 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git tags/net-deletions
-
-for you to fetch changes up to 0c22ed0fadcad620277a56c0ba2867d4850d053a:
-
-  Merge branch 'remove-a-number-of-isa-and-pcmcia-ethernet-drivers' (2026-04-23 15:57:10 -0700)
-
-----------------------------------------------------------------
-Delete some obsolete networking code
-
-Old code like amateur radio and NFC have long been a burden
-to core networking developers. syzbot loves to find bugs
-in BKL-era code, and noobs try to fix them.
-
-If we want to have a fighting chance of surviving the LLM-pocalypse
-this code needs to find a dedicated owner or get deleted.
-We've talked about these deletions multiple times in the past
-and every time someone wanted the code to stay. It is never
-very clear to me how many of those people actually use the code
-vs are just nostalgic to see it go. Amateur radio did have
-occasional users (or so I think) but most users switched
-to user space implementations since its all super slow stuff.
-Nobody stepped up to maintain the kernel code.
-
-We were lucky enough to find someone who wants to help with NFC
-so we're giving that a chance. Let's try to put the rest of
-this code behind us.
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-----------------------------------------------------------------
-Andrew Lunn (12):
-      drivers: net: 3com: 3c509: Remove this driver
-      drivers: net: 3com: 3c515: Remove this driver
-      drivers: net: 3com: 3c574: Remove this driver
-      drivers: net: 3com: 3c589: Remove this driver
-      drivers: net: amd: lance: Remove this driver
-      drivers: net: amd: nmclan: Remove this driver
-      drivers: net: smsc: smc9194: Remove this driver
-      drivers: net: smsc: smc91c92: Remove this driver
-      drivers: net: fujitsu: fmvj18x: Remove this driver
-      drivers: net: 8390: AX88190: Remove this driver
-      drivers: net: 8390: ultra: Remove this driver
-      drivers: net: 8390: wd80x3: Remove this driver
-
-Jakub Kicinski (6):
-      caif: remove CAIF NETWORK LAYER
-      net: remove ISDN subsystem and Bluetooth CMTP
-      net: remove ax25 and amateur radio (hamradio) subsystem
-      net: remove unused ATM protocols and legacy ATM device drivers
-      Merge branch 'net-packetengines-remove-obsolete-pci-drivers'
-      Merge branch 'remove-a-number-of-isa-and-pcmcia-ethernet-drivers'
-
-Mingyu Wang (2):
-      net: packetengines: remove obsolete hamachi driver
-      net: packetengines: remove obsolete yellowfin driver and vendor dir
-
- CREDITS                                            |    5 +
- Documentation/.renames.txt                         |    6 -
- Documentation/admin-guide/kernel-parameters.txt    |   18 -
- Documentation/isdn/credits.rst                     |   73 -
- Documentation/isdn/index.rst                       |   14 -
- Documentation/isdn/interface_capi.rst              |  336 --
- Documentation/isdn/m_isdn.rst                      |    9 -
- Documentation/networking/6pack.rst                 |  191 -
- Documentation/networking/ax25.rst                  |   17 -
- Documentation/networking/caif/caif.rst             |  138 -
- Documentation/networking/caif/index.rst            |   12 -
- Documentation/networking/caif/linux_caif.rst       |  195 -
- .../networking/device_drivers/atm/fore200e.rst     |   66 -
- .../networking/device_drivers/atm/index.rst        |    2 -
- .../networking/device_drivers/atm/iphase.rst       |  193 -
- .../device_drivers/ethernet/3com/3c509.rst         |  249 -
- .../networking/device_drivers/ethernet/index.rst   |    2 -
- .../device_drivers/ethernet/smsc/smc9.rst          |   48 -
- .../networking/device_drivers/hamradio/baycom.rst  |  174 -
- .../networking/device_drivers/hamradio/index.rst   |   12 -
- .../device_drivers/hamradio/z8530drv.rst           |  686 ---
- Documentation/networking/device_drivers/index.rst  |    1 -
- Documentation/networking/index.rst                 |    3 -
- Documentation/staging/magic-number.rst             |    3 -
- Documentation/subsystem-apis.rst                   |    1 -
- .../translations/it_IT/staging/magic-number.rst    |    3 -
- .../translations/sp_SP/process/magic-number.rst    |    3 -
- .../translations/zh_CN/networking/index.rst        |    1 -
- .../translations/zh_CN/process/magic-number.rst    |    3 -
- .../translations/zh_TW/process/magic-number.rst    |    3 -
- MAINTAINERS                                        |  105 +-
- arch/alpha/configs/defconfig                       |    1 -
- arch/arm/configs/ixp4xx_defconfig                  |    4 -
- arch/arm/configs/neponset_defconfig                |    1 -
- arch/arm/configs/u8500_defconfig                   |    1 -
- arch/mips/configs/bcm47xx_defconfig                |    1 -
- arch/mips/configs/bigsur_defconfig                 |   10 -
- arch/mips/configs/db1xxx_defconfig                 |    1 -
- arch/mips/configs/gpr_defconfig                    |   24 -
- arch/mips/configs/mtx1_defconfig                   |   32 -
- arch/mips/configs/rb532_defconfig                  |    1 -
- arch/mips/configs/rm200_defconfig                  |    7 -
- arch/mips/configs/rt305x_defconfig                 |    1 -
- arch/mips/configs/xway_defconfig                   |    1 -
- arch/powerpc/configs/ppc6xx_defconfig              |   19 -
- drivers/Kconfig                                    |    2 -
- drivers/Makefile                                   |    1 -
- drivers/atm/.gitignore                             |    5 -
- drivers/atm/Kconfig                                |  300 --
- drivers/atm/Makefile                               |   29 -
- drivers/atm/adummy.c                               |  202 -
- drivers/atm/atmtcp.c                               |  513 --
- drivers/atm/eni.c                                  | 2321 --------
- drivers/atm/eni.h                                  |  136 -
- drivers/atm/fore200e.c                             | 3012 -----------
- drivers/atm/fore200e.h                             |  973 ----
- drivers/atm/he.c                                   | 2861 ----------
- drivers/atm/he.h                                   |  845 ---
- drivers/atm/idt77105.c                             |  376 --
- drivers/atm/idt77105.h                             |   92 -
- drivers/atm/idt77252.c                             | 3797 --------------
- drivers/atm/idt77252.h                             |  816 ---
- drivers/atm/idt77252_tables.h                      |  781 ---
- drivers/atm/iphase.c                               | 3283 ------------
- drivers/atm/iphase.h                               | 1452 -----
- drivers/atm/lanai.c                                | 2603 ---------
- drivers/atm/midway.h                               |  266 -
- drivers/atm/nicstar.c                              | 2759 ----------
- drivers/atm/nicstar.h                              |  759 ---
- drivers/atm/nicstarmac.c                           |  244 -
- drivers/atm/nicstarmac.copyright                   |   61 -
- drivers/atm/suni.c                                 |  391 --
- drivers/atm/suni.h                                 |  242 -
- drivers/atm/tonga.h                                |   21 -
- drivers/atm/zeprom.h                               |   35 -
- drivers/isdn/Kconfig                               |   27 -
- drivers/isdn/Makefile                              |    8 -
- drivers/isdn/capi/Kconfig                          |   32 -
- drivers/isdn/capi/Makefile                         |    6 -
- drivers/isdn/capi/capi.c                           | 1435 -----
- drivers/isdn/capi/capiutil.c                       |  677 ---
- drivers/isdn/capi/kcapi.c                          |  933 ----
- drivers/isdn/capi/kcapi.h                          |  182 -
- drivers/isdn/capi/kcapi_proc.c                     |  231 -
- drivers/isdn/hardware/Makefile                     |    6 -
- drivers/isdn/hardware/mISDN/Kconfig                |   98 -
- drivers/isdn/hardware/mISDN/Makefile               |   19 -
- drivers/isdn/hardware/mISDN/avmfritz.c             | 1164 ----
- drivers/isdn/hardware/mISDN/hfc_multi.h            | 1236 -----
- drivers/isdn/hardware/mISDN/hfc_multi_8xx.h        |  167 -
- drivers/isdn/hardware/mISDN/hfc_pci.h              |  214 -
- drivers/isdn/hardware/mISDN/hfcmulti.c             | 5540 --------------------
- drivers/isdn/hardware/mISDN/hfcpci.c               | 2360 ---------
- drivers/isdn/hardware/mISDN/hfcsusb.c              | 2157 --------
- drivers/isdn/hardware/mISDN/hfcsusb.h              |  425 --
- drivers/isdn/hardware/mISDN/iohelper.h             |   96 -
- drivers/isdn/hardware/mISDN/ipac.h                 |  393 --
- drivers/isdn/hardware/mISDN/isar.h                 |  256 -
- drivers/isdn/hardware/mISDN/isdnhdlc.c             |  617 ---
- drivers/isdn/hardware/mISDN/isdnhdlc.h             |   69 -
- drivers/isdn/hardware/mISDN/mISDNinfineon.c        | 1168 -----
- drivers/isdn/hardware/mISDN/mISDNipac.c            | 1636 ------
- drivers/isdn/hardware/mISDN/mISDNisar.c            | 1694 ------
- drivers/isdn/hardware/mISDN/netjet.c               | 1154 ----
- drivers/isdn/hardware/mISDN/netjet.h               |   44 -
- drivers/isdn/hardware/mISDN/speedfax.c             |  520 --
- drivers/isdn/hardware/mISDN/w6692.c                | 1417 -----
- drivers/isdn/hardware/mISDN/w6692.h                |  177 -
- drivers/isdn/mISDN/Kconfig                         |   48 -
- drivers/isdn/mISDN/Makefile                        |   14 -
- drivers/isdn/mISDN/clock.c                         |  197 -
- drivers/isdn/mISDN/core.c                          |  400 --
- drivers/isdn/mISDN/core.h                          |   69 -
- drivers/isdn/mISDN/dsp.h                           |  277 -
- drivers/isdn/mISDN/dsp_audio.c                     |  421 --
- drivers/isdn/mISDN/dsp_biquad.h                    |   51 -
- drivers/isdn/mISDN/dsp_blowfish.c                  |  667 ---
- drivers/isdn/mISDN/dsp_cmx.c                       | 1949 -------
- drivers/isdn/mISDN/dsp_core.c                      | 1227 -----
- drivers/isdn/mISDN/dsp_dtmf.c                      |  313 --
- drivers/isdn/mISDN/dsp_ecdis.h                     |   96 -
- drivers/isdn/mISDN/dsp_hwec.c                      |  122 -
- drivers/isdn/mISDN/dsp_hwec.h                      |   10 -
- drivers/isdn/mISDN/dsp_pipeline.c                  |  300 --
- drivers/isdn/mISDN/dsp_tones.c                     |  550 --
- drivers/isdn/mISDN/fsm.c                           |  176 -
- drivers/isdn/mISDN/fsm.h                           |   58 -
- drivers/isdn/mISDN/hwchannel.c                     |  516 --
- drivers/isdn/mISDN/l1oip.h                         |   92 -
- drivers/isdn/mISDN/l1oip_codec.c                   |  358 --
- drivers/isdn/mISDN/l1oip_core.c                    | 1505 ------
- drivers/isdn/mISDN/layer1.c                        |  415 --
- drivers/isdn/mISDN/layer1.h                        |   16 -
- drivers/isdn/mISDN/layer2.c                        | 2266 --------
- drivers/isdn/mISDN/layer2.h                        |  131 -
- drivers/isdn/mISDN/socket.c                        |  825 ---
- drivers/isdn/mISDN/stack.c                         |  654 ---
- drivers/isdn/mISDN/tei.c                           | 1416 -----
- drivers/isdn/mISDN/timerdev.c                      |  295 --
- drivers/net/Kconfig                                |    2 -
- drivers/net/Makefile                               |    2 -
- drivers/net/Space.c                                |   15 -
- drivers/net/caif/Kconfig                           |   33 -
- drivers/net/caif/Makefile                          |    8 -
- drivers/net/caif/caif_serial.c                     |  443 --
- drivers/net/caif/caif_virtio.c                     |  791 ---
- drivers/net/ethernet/3com/3c509.c                  | 1448 -----
- drivers/net/ethernet/3com/3c515.c                  | 1566 ------
- drivers/net/ethernet/3com/3c574_cs.c               | 1164 ----
- drivers/net/ethernet/3com/3c589_cs.c               |  974 ----
- drivers/net/ethernet/3com/Kconfig                  |   45 -
- drivers/net/ethernet/3com/Makefile                 |    4 -
- drivers/net/ethernet/8390/Kconfig                  |   41 -
- drivers/net/ethernet/8390/Makefile                 |    3 -
- drivers/net/ethernet/8390/axnet_cs.c               | 1707 ------
- drivers/net/ethernet/8390/smc-ultra.c              |  630 ---
- drivers/net/ethernet/8390/wd.c                     |  575 --
- drivers/net/ethernet/Kconfig                       |    2 -
- drivers/net/ethernet/Makefile                      |    2 -
- drivers/net/ethernet/amd/Kconfig                   |   21 -
- drivers/net/ethernet/amd/Makefile                  |    2 -
- drivers/net/ethernet/amd/lance.c                   | 1317 -----
- drivers/net/ethernet/amd/nmclan_cs.c               | 1508 ------
- drivers/net/ethernet/fujitsu/Kconfig               |   30 -
- drivers/net/ethernet/fujitsu/Makefile              |    6 -
- drivers/net/ethernet/fujitsu/fmvj18x_cs.c          | 1176 -----
- drivers/net/ethernet/packetengines/Kconfig         |   44 -
- drivers/net/ethernet/packetengines/Makefile        |    7 -
- drivers/net/ethernet/packetengines/hamachi.c       | 1967 -------
- drivers/net/ethernet/packetengines/yellowfin.c     | 1438 -----
- drivers/net/ethernet/smsc/Kconfig                  |   27 -
- drivers/net/ethernet/smsc/Makefile                 |    2 -
- drivers/net/ethernet/smsc/smc9194.c                | 1535 ------
- drivers/net/ethernet/smsc/smc91c92_cs.c            | 2059 --------
- drivers/net/hamradio/6pack.c                       |  912 ----
- drivers/net/hamradio/Kconfig                       |  162 -
- drivers/net/hamradio/Makefile                      |   22 -
- drivers/net/hamradio/baycom_epp.c                  | 1316 -----
- drivers/net/hamradio/baycom_par.c                  |  598 ---
- drivers/net/hamradio/baycom_ser_fdx.c              |  678 ---
- drivers/net/hamradio/baycom_ser_hdx.c              |  727 ---
- drivers/net/hamradio/bpqether.c                    |  593 ---
- drivers/net/hamradio/hdlcdrv.c                     |  747 ---
- drivers/net/hamradio/mkiss.c                       |  980 ----
- drivers/net/hamradio/scc.c                         | 2179 --------
- drivers/net/hamradio/yam.c                         | 1191 -----
- drivers/net/hamradio/z8530.h                       |  246 -
- include/linux/hdlcdrv.h                            |  276 -
- include/linux/isdn/capilli.h                       |   95 -
- include/linux/isdn/capiutil.h                      |   60 -
- include/linux/kernelcapi.h                         |   45 -
- include/linux/mISDNdsp.h                           |   40 -
- include/linux/mISDNhw.h                            |  192 -
- include/linux/mISDNif.h                            |  603 ---
- include/linux/netdevice.h                          |    5 +-
- include/linux/scc.h                                |   86 -
- include/linux/virtio_caif.h                        |   24 -
- include/linux/yam.h                                |   67 -
- include/net/Space.h                                |    5 -
- include/net/atmclip.h                              |   53 -
- include/net/ax25.h                                 |  476 +-
- include/net/caif/caif_dev.h                        |  128 -
- include/net/caif/caif_device.h                     |   55 -
- include/net/caif/caif_layer.h                      |  277 -
- include/net/caif/cfcnfg.h                          |   90 -
- include/net/caif/cfctrl.h                          |  130 -
- include/net/caif/cffrml.h                          |   21 -
- include/net/caif/cfmuxl.h                          |   20 -
- include/net/caif/cfpkt.h                           |  232 -
- include/net/caif/cfserl.h                          |   13 -
- include/net/caif/cfsrvl.h                          |   61 -
- include/net/netrom.h                               |  273 -
- include/net/rose.h                                 |  263 +-
- include/uapi/linux/baycom.h                        |   40 -
- include/uapi/linux/caif/caif_socket.h              |  195 -
- include/uapi/linux/caif/if_caif.h                  |   35 -
- include/uapi/linux/capi.h                          |  134 -
- include/uapi/linux/hdlcdrv.h                       |  111 -
- include/uapi/linux/isdn/capicmd.h                  |  117 -
- include/uapi/linux/kernelcapi.h                    |   48 -
- include/uapi/linux/netrom.h                        |   37 -
- include/uapi/linux/rose.h                          |   91 -
- include/uapi/linux/scc.h                           |  174 -
- net/Kconfig                                        |    2 -
- net/Makefile                                       |    4 -
- net/atm/Kconfig                                    |   37 -
- net/atm/Makefile                                   |    4 -
- net/atm/clip.c                                     |  960 ----
- net/atm/ioctl.c                                    |   14 -
- net/atm/lec.c                                      | 2274 --------
- net/atm/lec.h                                      |  155 -
- net/atm/lec_arpc.h                                 |   97 -
- net/atm/mpc.c                                      | 1538 ------
- net/atm/mpc.h                                      |   65 -
- net/atm/mpoa_caches.c                              |  565 --
- net/atm/mpoa_caches.h                              |   99 -
- net/atm/mpoa_proc.c                                |  307 --
- net/atm/proc.c                                     |   11 -
- net/ax25/Kconfig                                   |  108 -
- net/ax25/Makefile                                  |   12 -
- net/ax25/af_ax25.c                                 | 2089 --------
- net/ax25/ax25_addr.c                               |  303 --
- net/ax25/ax25_dev.c                                |  200 -
- net/ax25/ax25_ds_in.c                              |  298 --
- net/ax25/ax25_ds_subr.c                            |  204 -
- net/ax25/ax25_ds_timer.c                           |  235 -
- net/ax25/ax25_iface.c                              |  214 -
- net/ax25/ax25_in.c                                 |  455 --
- net/ax25/ax25_ip.c                                 |  247 -
- net/ax25/ax25_out.c                                |  398 --
- net/ax25/ax25_route.c                              |  416 --
- net/ax25/ax25_std_in.c                             |  443 --
- net/ax25/ax25_std_subr.c                           |   83 -
- net/ax25/ax25_std_timer.c                          |  175 -
- net/ax25/ax25_subr.c                               |  296 --
- net/ax25/ax25_timer.c                              |  224 -
- net/ax25/ax25_uid.c                                |  204 -
- net/ax25/sysctl_net_ax25.c                         |  181 -
- net/bluetooth/Kconfig                              |    3 -
- net/bluetooth/Makefile                             |    1 -
- net/bluetooth/cmtp/Kconfig                         |   12 -
- net/bluetooth/cmtp/Makefile                        |    8 -
- net/bluetooth/cmtp/capi.c                          |  579 --
- net/bluetooth/cmtp/cmtp.h                          |  129 -
- net/bluetooth/cmtp/core.c                          |  519 --
- net/bluetooth/cmtp/sock.c                          |  271 -
- net/bridge/br.c                                    |    7 -
- net/bridge/br_fdb.c                                |   29 -
- net/bridge/br_private.h                            |    4 -
- net/caif/Kconfig                                   |   54 -
- net/caif/Makefile                                  |   16 -
- net/caif/caif_dev.c                                |  586 ---
- net/caif/caif_socket.c                             | 1114 ----
- net/caif/caif_usb.c                                |  216 -
- net/caif/cfcnfg.c                                  |  612 ---
- net/caif/cfctrl.c                                  |  631 ---
- net/caif/cfdbgl.c                                  |   55 -
- net/caif/cfdgml.c                                  |  113 -
- net/caif/cffrml.c                                  |  204 -
- net/caif/cfmuxl.c                                  |  267 -
- net/caif/cfpkt_skbuff.c                            |  373 --
- net/caif/cfrfml.c                                  |  299 --
- net/caif/cfserl.c                                  |  192 -
- net/caif/cfsrvl.c                                  |  224 -
- net/caif/cfutill.c                                 |  104 -
- net/caif/cfveil.c                                  |  101 -
- net/caif/cfvidl.c                                  |   65 -
- net/caif/chnl_net.c                                |  531 --
- net/core/dev.c                                     |    7 -
- net/ipv4/arp.c                                     |    1 -
- net/netrom/Makefile                                |   10 -
- net/netrom/af_netrom.c                             | 1536 ------
- net/netrom/nr_dev.c                                |  178 -
- net/netrom/nr_in.c                                 |  301 --
- net/netrom/nr_loopback.c                           |   73 -
- net/netrom/nr_out.c                                |  272 -
- net/netrom/nr_route.c                              |  989 ----
- net/netrom/nr_subr.c                               |  280 -
- net/netrom/nr_timer.c                              |  249 -
- net/netrom/sysctl_net_netrom.c                     |  156 -
- net/rose/Makefile                                  |   10 -
- net/rose/af_rose.c                                 | 1687 ------
- net/rose/rose_dev.c                                |  141 -
- net/rose/rose_in.c                                 |  301 --
- net/rose/rose_link.c                               |  289 -
- net/rose/rose_loopback.c                           |  133 -
- net/rose/rose_out.c                                |  122 -
- net/rose/rose_route.c                              | 1333 -----
- net/rose/rose_subr.c                               |  556 --
- net/rose/rose_timer.c                              |  227 -
- net/rose/sysctl_net_rose.c                         |  125 -
- 311 files changed, 14 insertions(+), 138161 deletions(-)
- delete mode 100644 Documentation/isdn/credits.rst
- delete mode 100644 Documentation/isdn/index.rst
- delete mode 100644 Documentation/isdn/interface_capi.rst
- delete mode 100644 Documentation/isdn/m_isdn.rst
- delete mode 100644 Documentation/networking/6pack.rst
- delete mode 100644 Documentation/networking/ax25.rst
- delete mode 100644 Documentation/networking/caif/caif.rst
- delete mode 100644 Documentation/networking/caif/index.rst
- delete mode 100644 Documentation/networking/caif/linux_caif.rst
- delete mode 100644 Documentation/networking/device_drivers/atm/fore200e.rst
- delete mode 100644 Documentation/networking/device_drivers/atm/iphase.rst
- delete mode 100644 Documentation/networking/device_drivers/ethernet/3com/3c509.rst
- delete mode 100644 Documentation/networking/device_drivers/ethernet/smsc/smc9.rst
- delete mode 100644 Documentation/networking/device_drivers/hamradio/baycom.rst
- delete mode 100644 Documentation/networking/device_drivers/hamradio/index.rst
- delete mode 100644 Documentation/networking/device_drivers/hamradio/z8530drv.rst
- delete mode 100644 drivers/atm/.gitignore
- delete mode 100644 drivers/atm/adummy.c
- delete mode 100644 drivers/atm/atmtcp.c
- delete mode 100644 drivers/atm/eni.c
- delete mode 100644 drivers/atm/eni.h
- delete mode 100644 drivers/atm/fore200e.c
- delete mode 100644 drivers/atm/fore200e.h
- delete mode 100644 drivers/atm/he.c
- delete mode 100644 drivers/atm/he.h
- delete mode 100644 drivers/atm/idt77105.c
- delete mode 100644 drivers/atm/idt77105.h
- delete mode 100644 drivers/atm/idt77252.c
- delete mode 100644 drivers/atm/idt77252.h
- delete mode 100644 drivers/atm/idt77252_tables.h
- delete mode 100644 drivers/atm/iphase.c
- delete mode 100644 drivers/atm/iphase.h
- delete mode 100644 drivers/atm/lanai.c
- delete mode 100644 drivers/atm/midway.h
- delete mode 100644 drivers/atm/nicstar.c
- delete mode 100644 drivers/atm/nicstar.h
- delete mode 100644 drivers/atm/nicstarmac.c
- delete mode 100644 drivers/atm/nicstarmac.copyright
- delete mode 100644 drivers/atm/suni.c
- delete mode 100644 drivers/atm/suni.h
- delete mode 100644 drivers/atm/tonga.h
- delete mode 100644 drivers/atm/zeprom.h
- delete mode 100644 drivers/isdn/Kconfig
- delete mode 100644 drivers/isdn/Makefile
- delete mode 100644 drivers/isdn/capi/Kconfig
- delete mode 100644 drivers/isdn/capi/Makefile
- delete mode 100644 drivers/isdn/capi/capi.c
- delete mode 100644 drivers/isdn/capi/capiutil.c
- delete mode 100644 drivers/isdn/capi/kcapi.c
- delete mode 100644 drivers/isdn/capi/kcapi.h
- delete mode 100644 drivers/isdn/capi/kcapi_proc.c
- delete mode 100644 drivers/isdn/hardware/Makefile
- delete mode 100644 drivers/isdn/hardware/mISDN/Kconfig
- delete mode 100644 drivers/isdn/hardware/mISDN/Makefile
- delete mode 100644 drivers/isdn/hardware/mISDN/avmfritz.c
- delete mode 100644 drivers/isdn/hardware/mISDN/hfc_multi.h
- delete mode 100644 drivers/isdn/hardware/mISDN/hfc_multi_8xx.h
- delete mode 100644 drivers/isdn/hardware/mISDN/hfc_pci.h
- delete mode 100644 drivers/isdn/hardware/mISDN/hfcmulti.c
- delete mode 100644 drivers/isdn/hardware/mISDN/hfcpci.c
- delete mode 100644 drivers/isdn/hardware/mISDN/hfcsusb.c
- delete mode 100644 drivers/isdn/hardware/mISDN/hfcsusb.h
- delete mode 100644 drivers/isdn/hardware/mISDN/iohelper.h
- delete mode 100644 drivers/isdn/hardware/mISDN/ipac.h
- delete mode 100644 drivers/isdn/hardware/mISDN/isar.h
- delete mode 100644 drivers/isdn/hardware/mISDN/isdnhdlc.c
- delete mode 100644 drivers/isdn/hardware/mISDN/isdnhdlc.h
- delete mode 100644 drivers/isdn/hardware/mISDN/mISDNinfineon.c
- delete mode 100644 drivers/isdn/hardware/mISDN/mISDNipac.c
- delete mode 100644 drivers/isdn/hardware/mISDN/mISDNisar.c
- delete mode 100644 drivers/isdn/hardware/mISDN/netjet.c
- delete mode 100644 drivers/isdn/hardware/mISDN/netjet.h
- delete mode 100644 drivers/isdn/hardware/mISDN/speedfax.c
- delete mode 100644 drivers/isdn/hardware/mISDN/w6692.c
- delete mode 100644 drivers/isdn/hardware/mISDN/w6692.h
- delete mode 100644 drivers/isdn/mISDN/Kconfig
- delete mode 100644 drivers/isdn/mISDN/Makefile
- delete mode 100644 drivers/isdn/mISDN/clock.c
- delete mode 100644 drivers/isdn/mISDN/core.c
- delete mode 100644 drivers/isdn/mISDN/core.h
- delete mode 100644 drivers/isdn/mISDN/dsp.h
- delete mode 100644 drivers/isdn/mISDN/dsp_audio.c
- delete mode 100644 drivers/isdn/mISDN/dsp_biquad.h
- delete mode 100644 drivers/isdn/mISDN/dsp_blowfish.c
- delete mode 100644 drivers/isdn/mISDN/dsp_cmx.c
- delete mode 100644 drivers/isdn/mISDN/dsp_core.c
- delete mode 100644 drivers/isdn/mISDN/dsp_dtmf.c
- delete mode 100644 drivers/isdn/mISDN/dsp_ecdis.h
- delete mode 100644 drivers/isdn/mISDN/dsp_hwec.c
- delete mode 100644 drivers/isdn/mISDN/dsp_hwec.h
- delete mode 100644 drivers/isdn/mISDN/dsp_pipeline.c
- delete mode 100644 drivers/isdn/mISDN/dsp_tones.c
- delete mode 100644 drivers/isdn/mISDN/fsm.c
- delete mode 100644 drivers/isdn/mISDN/fsm.h
- delete mode 100644 drivers/isdn/mISDN/hwchannel.c
- delete mode 100644 drivers/isdn/mISDN/l1oip.h
- delete mode 100644 drivers/isdn/mISDN/l1oip_codec.c
- delete mode 100644 drivers/isdn/mISDN/l1oip_core.c
- delete mode 100644 drivers/isdn/mISDN/layer1.c
- delete mode 100644 drivers/isdn/mISDN/layer1.h
- delete mode 100644 drivers/isdn/mISDN/layer2.c
- delete mode 100644 drivers/isdn/mISDN/layer2.h
- delete mode 100644 drivers/isdn/mISDN/socket.c
- delete mode 100644 drivers/isdn/mISDN/stack.c
- delete mode 100644 drivers/isdn/mISDN/tei.c
- delete mode 100644 drivers/isdn/mISDN/timerdev.c
- delete mode 100644 drivers/net/caif/Kconfig
- delete mode 100644 drivers/net/caif/Makefile
- delete mode 100644 drivers/net/caif/caif_serial.c
- delete mode 100644 drivers/net/caif/caif_virtio.c
- delete mode 100644 drivers/net/ethernet/3com/3c509.c
- delete mode 100644 drivers/net/ethernet/3com/3c515.c
- delete mode 100644 drivers/net/ethernet/3com/3c574_cs.c
- delete mode 100644 drivers/net/ethernet/3com/3c589_cs.c
- delete mode 100644 drivers/net/ethernet/8390/axnet_cs.c
- delete mode 100644 drivers/net/ethernet/8390/smc-ultra.c
- delete mode 100644 drivers/net/ethernet/8390/wd.c
- delete mode 100644 drivers/net/ethernet/amd/lance.c
- delete mode 100644 drivers/net/ethernet/amd/nmclan_cs.c
- delete mode 100644 drivers/net/ethernet/fujitsu/Kconfig
- delete mode 100644 drivers/net/ethernet/fujitsu/Makefile
- delete mode 100644 drivers/net/ethernet/fujitsu/fmvj18x_cs.c
- delete mode 100644 drivers/net/ethernet/packetengines/Kconfig
- delete mode 100644 drivers/net/ethernet/packetengines/Makefile
- delete mode 100644 drivers/net/ethernet/packetengines/hamachi.c
- delete mode 100644 drivers/net/ethernet/packetengines/yellowfin.c
- delete mode 100644 drivers/net/ethernet/smsc/smc9194.c
- delete mode 100644 drivers/net/ethernet/smsc/smc91c92_cs.c
- delete mode 100644 drivers/net/hamradio/6pack.c
- delete mode 100644 drivers/net/hamradio/Kconfig
- delete mode 100644 drivers/net/hamradio/Makefile
- delete mode 100644 drivers/net/hamradio/baycom_epp.c
- delete mode 100644 drivers/net/hamradio/baycom_par.c
- delete mode 100644 drivers/net/hamradio/baycom_ser_fdx.c
- delete mode 100644 drivers/net/hamradio/baycom_ser_hdx.c
- delete mode 100644 drivers/net/hamradio/bpqether.c
- delete mode 100644 drivers/net/hamradio/hdlcdrv.c
- delete mode 100644 drivers/net/hamradio/mkiss.c
- delete mode 100644 drivers/net/hamradio/scc.c
- delete mode 100644 drivers/net/hamradio/yam.c
- delete mode 100644 drivers/net/hamradio/z8530.h
- delete mode 100644 include/linux/hdlcdrv.h
- delete mode 100644 include/linux/isdn/capilli.h
- delete mode 100644 include/linux/isdn/capiutil.h
- delete mode 100644 include/linux/kernelcapi.h
- delete mode 100644 include/linux/mISDNdsp.h
- delete mode 100644 include/linux/mISDNhw.h
- delete mode 100644 include/linux/mISDNif.h
- delete mode 100644 include/linux/scc.h
- delete mode 100644 include/linux/virtio_caif.h
- delete mode 100644 include/linux/yam.h
- delete mode 100644 include/net/atmclip.h
- delete mode 100644 include/net/caif/caif_dev.h
- delete mode 100644 include/net/caif/caif_device.h
- delete mode 100644 include/net/caif/caif_layer.h
- delete mode 100644 include/net/caif/cfcnfg.h
- delete mode 100644 include/net/caif/cfctrl.h
- delete mode 100644 include/net/caif/cffrml.h
- delete mode 100644 include/net/caif/cfmuxl.h
- delete mode 100644 include/net/caif/cfpkt.h
- delete mode 100644 include/net/caif/cfserl.h
- delete mode 100644 include/net/caif/cfsrvl.h
- delete mode 100644 include/net/netrom.h
- delete mode 100644 include/uapi/linux/baycom.h
- delete mode 100644 include/uapi/linux/caif/caif_socket.h
- delete mode 100644 include/uapi/linux/caif/if_caif.h
- delete mode 100644 include/uapi/linux/capi.h
- delete mode 100644 include/uapi/linux/hdlcdrv.h
- delete mode 100644 include/uapi/linux/isdn/capicmd.h
- delete mode 100644 include/uapi/linux/kernelcapi.h
- delete mode 100644 include/uapi/linux/netrom.h
- delete mode 100644 include/uapi/linux/rose.h
- delete mode 100644 include/uapi/linux/scc.h
- delete mode 100644 net/atm/clip.c
- delete mode 100644 net/atm/lec.c
- delete mode 100644 net/atm/lec.h
- delete mode 100644 net/atm/lec_arpc.h
- delete mode 100644 net/atm/mpc.c
- delete mode 100644 net/atm/mpc.h
- delete mode 100644 net/atm/mpoa_caches.c
- delete mode 100644 net/atm/mpoa_caches.h
- delete mode 100644 net/atm/mpoa_proc.c
- delete mode 100644 net/ax25/Kconfig
- delete mode 100644 net/ax25/Makefile
- delete mode 100644 net/ax25/af_ax25.c
- delete mode 100644 net/ax25/ax25_addr.c
- delete mode 100644 net/ax25/ax25_dev.c
- delete mode 100644 net/ax25/ax25_ds_in.c
- delete mode 100644 net/ax25/ax25_ds_subr.c
- delete mode 100644 net/ax25/ax25_ds_timer.c
- delete mode 100644 net/ax25/ax25_iface.c
- delete mode 100644 net/ax25/ax25_in.c
- delete mode 100644 net/ax25/ax25_ip.c
- delete mode 100644 net/ax25/ax25_out.c
- delete mode 100644 net/ax25/ax25_route.c
- delete mode 100644 net/ax25/ax25_std_in.c
- delete mode 100644 net/ax25/ax25_std_subr.c
- delete mode 100644 net/ax25/ax25_std_timer.c
- delete mode 100644 net/ax25/ax25_subr.c
- delete mode 100644 net/ax25/ax25_timer.c
- delete mode 100644 net/ax25/ax25_uid.c
- delete mode 100644 net/ax25/sysctl_net_ax25.c
- delete mode 100644 net/bluetooth/cmtp/Kconfig
- delete mode 100644 net/bluetooth/cmtp/Makefile
- delete mode 100644 net/bluetooth/cmtp/capi.c
- delete mode 100644 net/bluetooth/cmtp/cmtp.h
- delete mode 100644 net/bluetooth/cmtp/core.c
- delete mode 100644 net/bluetooth/cmtp/sock.c
- delete mode 100644 net/caif/Kconfig
- delete mode 100644 net/caif/Makefile
- delete mode 100644 net/caif/caif_dev.c
- delete mode 100644 net/caif/caif_socket.c
- delete mode 100644 net/caif/caif_usb.c
- delete mode 100644 net/caif/cfcnfg.c
- delete mode 100644 net/caif/cfctrl.c
- delete mode 100644 net/caif/cfdbgl.c
- delete mode 100644 net/caif/cfdgml.c
- delete mode 100644 net/caif/cffrml.c
- delete mode 100644 net/caif/cfmuxl.c
- delete mode 100644 net/caif/cfpkt_skbuff.c
- delete mode 100644 net/caif/cfrfml.c
- delete mode 100644 net/caif/cfserl.c
- delete mode 100644 net/caif/cfsrvl.c
- delete mode 100644 net/caif/cfutill.c
- delete mode 100644 net/caif/cfveil.c
- delete mode 100644 net/caif/cfvidl.c
- delete mode 100644 net/caif/chnl_net.c
- delete mode 100644 net/netrom/Makefile
- delete mode 100644 net/netrom/af_netrom.c
- delete mode 100644 net/netrom/nr_dev.c
- delete mode 100644 net/netrom/nr_in.c
- delete mode 100644 net/netrom/nr_loopback.c
- delete mode 100644 net/netrom/nr_out.c
- delete mode 100644 net/netrom/nr_route.c
- delete mode 100644 net/netrom/nr_subr.c
- delete mode 100644 net/netrom/nr_timer.c
- delete mode 100644 net/netrom/sysctl_net_netrom.c
- delete mode 100644 net/rose/Makefile
- delete mode 100644 net/rose/af_rose.c
- delete mode 100644 net/rose/rose_dev.c
- delete mode 100644 net/rose/rose_in.c
- delete mode 100644 net/rose/rose_link.c
- delete mode 100644 net/rose/rose_loopback.c
- delete mode 100644 net/rose/rose_out.c
- delete mode 100644 net/rose/rose_route.c
- delete mode 100644 net/rose/rose_subr.c
- delete mode 100644 net/rose/rose_timer.c
- delete mode 100644 net/rose/sysctl_net_rose.c
+Tested-by: Alexander Nowlin <alexander.nowlin@intel.com>
 
