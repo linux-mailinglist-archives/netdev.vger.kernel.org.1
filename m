@@ -1,258 +1,137 @@
-Return-Path: <netdev+bounces-280582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280583-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wGGCBr+L6WkecwIAu9opvQ
-	(envelope-from <netdev+bounces-280582-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 05:02:23 +0200
+	id wNMPFguM6WkecwIAu9opvQ
+	(envelope-from <netdev+bounces-280583-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 05:03:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 874EC44C6A9
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 05:02:22 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B114244C70B
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 05:03:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0907B302DE19
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 03:02:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3FB93300697E
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 03:03:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FE0330F816;
-	Thu, 23 Apr 2026 03:02:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7ED02DCF57;
+	Thu, 23 Apr 2026 03:03:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P1WfLsmr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZtHS0KWw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4AD178F4F
-	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 03:02:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776913338; cv=pass; b=r/xGHnw52DlcVbi3QfoIPEHZs/BWolbQBURpq6E0L7CTWv4QvHIFUZUAdgqAQWEYMtprCa15OX3nxhzLdwwI4b4Y/PBji1YgIGu1BPsPZS1s7VcWmrEfvxwFW0IH6gxGMGchxOegD2EgsepmafUaZ+CS1JJLF9OeNWaLJ6bOQoM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776913338; c=relaxed/simple;
-	bh=E6hkEOGESyKmWjWdt0okh8HE+iycOgibKcxZQyGHn6o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iOnqgjZOflCO52hZzd/TPpNOi/roHjVXbS5v5ArZxQ0tBORBO/aWd+zCVKk94gMVELAUs9UBTFbsB5uhZ4Jdv8YnoCNkXgzrzqjqyOMPCe5IGUlZpj2d628p0UNAxVV1Gi8ZlBcW7kUYPahqjn6naH8ObL4JS6CRGOHVj3lXimQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P1WfLsmr; arc=pass smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-43d75312379so4499743f8f.1
-        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 20:02:16 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776913335; cv=none;
-        d=google.com; s=arc-20240605;
-        b=PNndt3RFUiGx4yWlIvc7TADam8YBO1/TSDki7wxf6wEZAghHNnrEwkPHmxyui9sn/9
-         TikqbL210iftK9eni4jLqSrUsBy5MEF255n2gNs3vxzkW9WjObvqqMZzqpmQLXAYY9xm
-         INrXjYQ1bEBo7VTdlM8ByDokMsacPBVR5N6sbTmfePyQA1sfy5QhkICI0ZuFCJEW/7gq
-         AMT0F4Q1tCli7j3fs7PQgtx44U6TOispVMo1Qo0xsiadFa4hy/mwOl0XvY8tIgSp/A5b
-         hH69AwoKztgcsMDL/nLQBPHcz3WD+aiO/Mb0ZjpI9DnxfOD7jScczJlo40JAjdaTSGu1
-         fQFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=wCCN2vWTnn1FLYdK43Gndj8GHiNRh4VkMhL++OMbL20=;
-        fh=enCVQP8DKrA1TQPsfbAQr/6NIA7rj5qICoqaC9MgWQA=;
-        b=EENMN8B/ophHW44Qxw0CI1KI7Z8rcTqFgPopOmXh1oxOkmkjQJY6Y5LPT7BR6UpHlw
-         SDZg8I/+wuRjeYGdWPZuQUsVQm7lVGFcXiWRoqGr8CUHUNTWNFf26crESqcJqgePobrz
-         qOD8rHBIWUPDf9mbRDoni8USG6CZbcFtWPLrnHIEDtFXpywxd93xWpckcy/Qt4ZgGlVc
-         4DHv2y9ZOKrqCNRUj/AgG/tsznwe9GUpnCVFLaiG66I/7JOVPQdAvS9VKIrbBcDQlFou
-         fssVQQxLRv4ev3gvA8FK5qfO5o7IVm82EE2IzI8aQ+0Go5mDaXJJMuFNpc6JX83LpH7i
-         2wSg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776913335; x=1777518135; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wCCN2vWTnn1FLYdK43Gndj8GHiNRh4VkMhL++OMbL20=;
-        b=P1WfLsmrrEqNWzG+U0OJLBugq0kb7VU4eI3RvK0xBf/C9s1vCXVTmXuP7rW6o+yILy
-         eC2sOlZ+lZTbVTTDx2X0SrNlfIPW/pSixdPo2PQitgpqWkLGLstAWy4f1aUaw1RNCYsP
-         dL9LicI0N/QukUslHzh13cY3r54Bwc0rmcbMQx402P/f1f69N2Eqskjxga5XCBn2HQhH
-         zVZl/HNKKhxeUmBD5WHQGLo0Wdr29vXZa02R84y+6apU9tejEc1N9jE8QradMrbESt3R
-         QY8BvqTNH9oxX2ya6NjBs+R034wfwvGzm3F01y3tnVzGccsRfTJmny6fla3jc/gMDi4F
-         Cjtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776913335; x=1777518135;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wCCN2vWTnn1FLYdK43Gndj8GHiNRh4VkMhL++OMbL20=;
-        b=eVZFZvYU5iEa2zdRkBNFMt1ht+rcV3FIhfZdyQf30lhuA06qGLbI8+4SnZeFVMqG/e
-         ffsSVhFuiJwbFG5IERyI+avmcbmbA/fDOvF9Pyv1YawvqvbUUpzztk1FLVhsKR6FVJ+j
-         /vsfu3Yum91vDEH+bssOi+8HiEH/Z394PoPS79tgqz4bB936/oIrLvfEiIWt7DMQItty
-         TnoSOyylRoflD0z1QPZxnuxmym0SWpZ7MiV+c3QbzzOLUfJijzfTz/MICoJEdCtx2k4H
-         wpwUIa3cr05GuWnH8JXSvaqf/2cZwugtVHf+NcS2DYVhR8TMtwT3SYfRB327SnByxU2v
-         GWpw==
-X-Forwarded-Encrypted: i=1; AFNElJ9n4SPlkOW4RnHXQ21vX26MIxDneTPC2GIjOSv+fNmp4PB3rd4WuGq8Kn3diOe+ZJ1Mr/XCLXY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzor5aq07PuWWclLlsL3T9MJOj1yQhOkjmfqpzXiDJ2KZR1mBYN
-	jmtKpzppgknXDu+Rhl6c8Y++MNLNeMVM5IHEcqAqh+SHYeqII19PGCzvcZiCd4xWqFC5BKGjIUe
-	30DXRYtYOovwIR3dBxI0DGoglz+LKpUY=
-X-Gm-Gg: AeBDietncckM/HIvDBNGCiqNAgMbXtBQ6YufgitvBC3o2MLtxVrGQ2KlSGSZ4IxlilQ
-	/5TBgL+mNz5bGFoZ900jOxmDog5ujBY7XptkhtehQTuPT+TUPlrnOYEfJytrfAS4sM9YdMb0TYK
-	HI6agAufhPUwX/dNw9rJj0mDQTfhUYt2NwKYj5JShHz4SYn3eGckMvMl7aELqv6+AwMzZ0Me1EZ
-	dlZIHpWCS3CBQWmK4V0mKGBeZZtESHfTRfntp0PWTlH+8LWrpilewjOhWDtc1SwPgjuj9kUEzcw
-	KnWb700grhpwnlLBq22gZb+Cn90xAsKPSH6CleJoG4LbaGVJ8w==
-X-Received: by 2002:a05:6000:1846:b0:43b:5091:39db with SMTP id
- ffacd0b85a97d-43fe40737c5mr41041106f8f.13.1776913334883; Wed, 22 Apr 2026
- 20:02:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A569223FC5A;
+	Thu, 23 Apr 2026 03:03:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776913416; cv=none; b=E+YSlZV/GaiyksuIMe7m6Hj3SzwqWlVxT6Q63G3z7uq7g/gDkcXBl+WBZ5y5sNgpRnl9iSUTK9BsZX6oDZ1E3oOLc9O6KjqMmtX6dUb0GpsFPaJFDXRD9jdPNQB8wJPMo2iWRGas8XlKiFWsHm8752jBPeqqy4q36bvl8vhm2ls=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776913416; c=relaxed/simple;
+	bh=nxm9Oh6taLuXO9o0gYbpRDn0kH92kZteFVYn0Mwxiyg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SJGCfaA8PeAM8SM8yVPcFlwNxo+pFPCZ+h2WBjxqt0Crvnx0sKsbftgwMYF31t9pQmMHMz0PsSPhpWxr5UrQCvJfnCd8Exx5Dr/68zAaGc6L8YnNgPAppU1H7qu7w0n03LF6zzsWqftVT6CT45i7MFd9MJQ/jMk7AnP7qak9b94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZtHS0KWw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D862AC19425;
+	Thu, 23 Apr 2026 03:03:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776913416;
+	bh=nxm9Oh6taLuXO9o0gYbpRDn0kH92kZteFVYn0Mwxiyg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZtHS0KWwBDKJm/HK0rmLS6rvWYTj0UQ1OmVNBpbZ+tV5gCjJtR2MBuWTCI8fvmARW
+	 9yJAOy4HN1sZsSW2SLRCCza0MvEv+31uAikymcce9+3JAAIlF54199LjXTlamjbUbi
+	 mePP7wFEfLJXX2mVhEfY+Qtu/eoCfW/3yywlV6Cl3bqbSeBihsTQF00DyIdGryb47G
+	 ZAFwwUBQl1K5rDdjkDpVN0Aaw8rSJqgdIhswPN0A2uFdDd40udUfIxtN0UR7v/lJy5
+	 keiLhya6vBlOlc6UEHYNfLIdaPgdDlUZzuzgC+GwG5nw9ipOf3rKJWvtMPxtb+fqsF
+	 ZSVzJiWLiOFzw==
+Date: Wed, 22 Apr 2026 20:03:35 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Heidelberg <david@ixit.cz>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, Michael Thalmeier
+ <michael.thalmeier@hale.at>, Raymond Hackley
+ <raymondhackley@protonmail.com>, Michael Walle <michael@walle.cc>, Bongsu
+ Jeon <bongsu.jeon@samsung.com>, Mark Greer <mgreer@animalcreek.com>,
+ netdev@vger.kernel.org, oe-linux-nfc@lists.linux.dev
+Subject: Re: Path forward for NFC in the kernel
+Message-ID: <20260422200335.1d0428fc@kernel.org>
+In-Reply-To: <938496c6-84c1-4d53-bb56-73bbd7b2bdd7@ixit.cz>
+References: <20260416101041.4c533306@kernel.org>
+	<9c4a4acf-b4f1-4e84-93bf-cdf080cb9970@kernel.org>
+	<1725ea8d-ac1f-49d2-8d8c-2e09721454c2@ixit.cz>
+	<20260421071044.67a3cee1@kernel.org>
+	<938496c6-84c1-4d53-bb56-73bbd7b2bdd7@ixit.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260414013634.43997-1-ahacigu.linux@gmail.com>
- <CANn89i+vq9O8PJZaDf=0YjcKTM8=-64TcUn-i-F4siGKAMKz+A@mail.gmail.com>
- <CALjTKDkJ9L-88hdODbt-8D=eEDe6r5egtTfk_RnwgVq_NF+q+g@mail.gmail.com> <CANn89iKwgoxM==synaLGKEP3k0jtCJ4b+Bap8ZF9k8yHJGnORg@mail.gmail.com>
-In-Reply-To: <CANn89iKwgoxM==synaLGKEP3k0jtCJ4b+Bap8ZF9k8yHJGnORg@mail.gmail.com>
-From: Altan Hacigumus <ahacigu.linux@gmail.com>
-Date: Wed, 22 Apr 2026 20:02:02 -0700
-X-Gm-Features: AQROBzCvivoCD7FWwcAifCtw6r-Y5mvpGrUugIEjqEngrw9CdSKMIuv_-WRKNwU
-Message-ID: <CALjTKDk464XE3tXieFDyeMjhqtPgbVruxnWZPdfwrMbAMaDQng@mail.gmail.com>
-Subject: Re: [PATCH net] tcp: make probe0 timer handle expired user timeout
-To: Eric Dumazet <edumazet@google.com>
-Cc: Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	"David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Enke Chen <enchen@paloaltonetworks.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[kernel.org,hale.at,protonmail.com,walle.cc,samsung.com,animalcreek.com,vger.kernel.org,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-280583-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280582-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ahacigulinux@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 874EC44C6A9
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B114244C70B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 22, 2026 at 12:39=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Tue, Apr 21, 2026 at 8:31=E2=80=AFPM Altan Hacigumus <ahacigu.linux@gm=
-ail.com> wrote:
-> >
-> > On Mon, Apr 20, 2026 at 9:58=E2=80=AFPM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> > >
-> > > On Mon, Apr 13, 2026 at 6:36=E2=80=AFPM Altan Hacigumus <ahacigu.linu=
-x@gmail.com> wrote:
-> > > >
-> > > > tcp_clamp_probe0_to_user_timeout() computes remaining time in jiffi=
-es
-> > > > using subtraction with an unsigned lvalue.  If elapsed probing time
-> > > > already exceeds the configured TCP_USER_TIMEOUT, the subtraction
-> > > > underflows and yields a large value.
-> > > >
-> > > > Handle this expiration case similarly to tcp_clamp_rto_to_user_time=
-out().
-> > > >
-> > > > Fixes: 344db93ae3ee ("tcp: make TCP_USER_TIMEOUT accurate for zero =
-window probes")
-> > > > Signed-off-by: Altan Hacigumus <ahacigu.linux@gmail.com>
-> > > > ---
-> > > >  net/ipv4/tcp_timer.c | 5 ++++-
-> > > >  1 file changed, 4 insertions(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
-> > > > index 5a14a53a3c9e..4a43356a4e06 100644
-> > > > --- a/net/ipv4/tcp_timer.c
-> > > > +++ b/net/ipv4/tcp_timer.c
-> > > > @@ -50,7 +50,8 @@ static u32 tcp_clamp_rto_to_user_timeout(const st=
-ruct sock *sk)
-> > > >  u32 tcp_clamp_probe0_to_user_timeout(const struct sock *sk, u32 wh=
-en)
-> > > >  {
-> > > >         const struct inet_connection_sock *icsk =3D inet_csk(sk);
-> > > > -       u32 remaining, user_timeout;
-> > > > +       u32 user_timeout;
-> > > > +       s32 remaining;
-> > > >         s32 elapsed;
-> > > >
-> > > >         user_timeout =3D READ_ONCE(icsk->icsk_user_timeout);
-> > > > @@ -61,6 +62,8 @@ u32 tcp_clamp_probe0_to_user_timeout(const struct=
- sock *sk, u32 when)
-> > > >         if (unlikely(elapsed < 0))
-> > > >                 elapsed =3D 0;
-> > > >         remaining =3D msecs_to_jiffies(user_timeout) - elapsed;
-> > > > +       if (remaining <=3D 0)
-> > > > +               return 1;
-> > >
-> > > I do not think this chunk is needed ?
-> > > If @remaining is signed, then perhaps change the following line to:
-> > >
-> > > remaining =3D max_t(int, remaining, TCP_TIMEOUT_MIN);
-> > >
-> >
-> > The if (remaining <=3D 0) return 1 handles the already-expired case and
-> > mirrors the logic in tcp_clamp_rto_to_user_timeout().
->
-> tcp_clamp_rto_to_user_timeout() has two conditionals.
->
-> if (remaining <=3D 0)
->    return 1;
-> return min_t(u32, icsk->icsk_rto, msecs_to_jiffies(remaining));
->
-> First one was to avoid to call msecs_to_jiffies() with a negative number.
->
-> tcp_clamp_probe0_to_user_timeout() has 3 tests already, you want to
-> add a fourth one...
-> I would prefer something less obscure.
-> We do not care if we return 1 or 2 (TCP_TIMEOUT_MIN) jiffies
->
+On Wed, 22 Apr 2026 15:11:16 +0200 David Heidelberg wrote:
+> Yes, this is broadly in line with what I had in mind. To clarify the =E2=
+=80=9Climited=20
+> reviews and basic maintenance=E2=80=9D phrasing: that was more an attempt=
+ to set=20
+> expectations conservatively. I=E2=80=99m prepared to take on the responsi=
+bilities you=20
+> outlined =E2=80=94 maintaining a tree, collecting and triaging patches, a=
+nd sending=20
+> regular pull requests.
+>=20
+> Regarding reviews and responsiveness: I can do the 48h turnaround for ini=
+tial=20
+> feedback on submissions (excluding weekends, and occasional travel), and =
+I=E2=80=99ll=20
+> make sure no patch sits unattended. For more complex changes where my cur=
+rent=20
+> NFC-specific knowledge may be a limiting factor, I=E2=80=99ll seek input =
+rather than let=20
+> things stall.
 
-okay
+Sounds good. The discussion taking long is perfectly fine. Main concern
+to us is not hearing any response for a long time. Then we have to guess
+whether the maintainer is planning to respond, or AWOL.
 
-> >
-> > max_t(s32, remaining, TCP_TIMEOUT_MIN) with remaining changed to s32
-> > also fixes the underflow; I used the explicit early return for symmetry
-> > with the RTO helper, but I can switch that in v2 if you prefer.
-> >
-> > > Also, it would be great to have a  new packetdrill test.
-> > >
-> >
-> > With packetdrill, AFAICS it would require a late ACK to be processed
-> > after TCP_USER_TIMEOUT has elapsed but before tcp_probe_timer() runs th=
-e
-> > abort check - i.e. a race between the RX softirq path and the timer.
-> > This is not purely an event/packet ordering problem, so it is not clear
-> > to me how a deterministic behavior can be simulated with packetdrill
-> > without tying it to exact probe timing.
->
-> I was trying to sense if the bug was serious or not, considering last
-> tcp_clamp_probe0_to_user_timeout()
-> statement is:
->
-> return min_t(u32, remaining, when);
->
-> Perhaps you should give more details in the changelog. What were the
-> symptoms of this bug, for TCP_USER_TIMEOUT users.
+> I=E2=80=99m also planning to ramp up my familiarity with the NFC stack as=
+ I go, so I=20
+> expect both the quality and depth of my reviews to improve over time.
+>=20
+> If that works for you, I=E2=80=99ll proceed with setting up a public tree=
+ and start=20
+> tracking incoming patches.
 
-Yes, it at least clamps to @when, but still caused connection teardowns
-to be intermittently delayed beyond the user's explicit timeout sockopt.
-
-Will send a v2 accordingly.
-
-Thanks.
+Works! :)
 
