@@ -1,85 +1,83 @@
-Return-Path: <netdev+bounces-280784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280783-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4PxCElkz6mkCwwIAu9opvQ
-	(envelope-from <netdev+bounces-280784-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 16:57:29 +0200
+	id UGneHBEz6mkCwwIAu9opvQ
+	(envelope-from <netdev+bounces-280783-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 16:56:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDD48453F53
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 16:57:27 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF294453F19
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 16:56:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 45835302E85C
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 14:56:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 497C03004C8C
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 14:56:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD3EA344DB9;
-	Thu, 23 Apr 2026 14:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA6C34DCEB;
+	Thu, 23 Apr 2026 14:56:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ndHePR4v"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iucdWzqT"
 X-Original-To: netdev@vger.kernel.org
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013019.outbound.protection.outlook.com [40.93.196.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8917F3242BC
-	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 14:56:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776956186; cv=fail; b=bDRph7TEnPgfo5AK0KVLOUxBiXlCmFaErTY0KL4ipqItBlFGODBcoSI0RQhVf0T2bSFWGOPcXUmv0BKBIn9ZXeXgYzq4gJA5luhFHII9/VtsFN+bxrxL9SDIIKpLSnXbTZSwnQiAZsnqVs2YBrZYWr+igsY6ET49M4dS3OLrZVA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776956186; c=relaxed/simple;
-	bh=JLDvqVki/AVaj7kcuW5AthWLharpGDYtMKYiQC3wKXQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=kll42nJaP4xN+AGwWDATaaE7muFYmdjruhSWjqjlAco+tvTr6DawAr85cFJ8huenTfB1IJWb3dOhE86OIc1+rbQ4KyApIFcZOxG15dTHM+XOchwbigfPGhhPvIucRFzqENys6qhsLn1T/2k6674ozeIeBs+GyTDKWa1d41XnE6g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ndHePR4v; arc=fail smtp.client-ip=40.93.196.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=O907jcTkh9vOFe0vwZ6d6dbakgf6054N4KbYxXuS8msHxs6ilE/cz/IBgjchfqRLs4m4Jstc0TBr0jEtwkaEoNhk0wcMJdeLCXRroack9nDzXi9UaMoEFR6JKQrPjC5WGhAhLEPMYnYAF16gaWU+ZsKZk9K+HD78H5OnDzVQkz9bfL5hPaOj8W3oDVcK5aJBtVKGD/pYuOPrFhIdK352HoEvtQ6N5xuSM+DiCAdcBX9mZDT/ee6wJDiunpQGNciXiDCK1ux/iGVeUsEO+IZe7n0BOsbfYf5CSM897s/BKHovEgEOeMhLtBIpl2wjqAQapGHS+2tPaRHAXXs+WlMgng==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=u6mTRVoNB9Dm/EV9NlVcqdaACXS8CCds+j8k3HSjIbA=;
- b=ZJVSx3uXA5UHHSyjBx5/OHovjq+LPp6+MHfy9FqK4lgGifLBrB1PdYWAoeWJRN28jD/F6N27Ipc6d19RgDEu3xJggp0Ol2k/0+TO0tKiQ0aqCKJw0l0OIfUJq9ePLDW/xQJIhrpg7nntjJd+R9td30T+ziaKZPPBUF7n/0GLherkxYI0FGwIVYJuTb8wPL4R2hQtBHHeXPhvdT3pgIvsXzxUdNl953CRguyoLFm8Utu35q4zjRTGln/Pa1gun39MZ9bLyIw1MBmWJwj93r4j4XvKbd2oYixACkS4tNAVue9P70MdATDoU1+3DhlYe2i/VW855u/7JUkauvMCDOEKtQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=gmail.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=u6mTRVoNB9Dm/EV9NlVcqdaACXS8CCds+j8k3HSjIbA=;
- b=ndHePR4vIBj5ZWhSrnXzwTjPEUsd0tWCJf0RhAyyaD+OscHte+OVq/uGnYa0GtdWtDw9fEvgUEbhoUaByfAZslNB1Bl90okrRuoeEG6qBa4U4MHhjxbHlZB8mI75KxXRClBqZ5SU7fw2GUxawWMTYcwLLb0LWDT4xEw9BG9eN9bEs0ldTdZSfsrtAp+CkXGMGl6iSbgBti7MfJcU5tYF0WBihiyJ+O7F3agBpVYq92ut27y2XMAcdjr0DS6mCfKyTyywo8zQeL/+FdNjL1rhjPtBhfQeezWyXHFyNVFHsoHbUWmafU9CPdQN9fJszbk/EvoqBStg8aq1rTeGK7EkFQ==
-Received: from BY1P220CA0026.NAMP220.PROD.OUTLOOK.COM (2603:10b6:a03:5c3::17)
- by IA0PR12MB8893.namprd12.prod.outlook.com (2603:10b6:208:484::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.21; Thu, 23 Apr
- 2026 14:56:19 +0000
-Received: from SJ5PEPF000001D1.namprd05.prod.outlook.com
- (2603:10b6:a03:5c3:cafe::18) by BY1P220CA0026.outlook.office365.com
- (2603:10b6:a03:5c3::17) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9846.22 via Frontend Transport; Thu,
- 23 Apr 2026 14:56:19 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SJ5PEPF000001D1.mail.protection.outlook.com (10.167.242.53) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9846.18 via Frontend Transport; Thu, 23 Apr 2026 14:56:19 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 23 Apr
- 2026 07:55:57 -0700
-Received: from [10.221.197.34] (10.126.230.37) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 23 Apr
- 2026 07:55:55 -0700
-Message-ID: <58a85178-c00f-4705-aa20-61e668bb9216@nvidia.com>
-Date: Thu, 23 Apr 2026 17:55:53 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B3C13242BC
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 14:56:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776956168; cv=none; b=kAVkV+AND8tKYde9QJQNh9kPUtSzst4EoTNWU4nY1O2sfRW+LTWYimYI1NmhgOwpOzgrKhAR9Uh8O1+xr/MwNDUzXHJLJdpCgFYmB7ReOsPnIjZV7OvOk3DlWGman1kVaFUjJsBXeghJkIGbPypVT0UnfYSr3JZDhFen1K1zTCY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776956168; c=relaxed/simple;
+	bh=xFG9UQ4vv0qFkfaPJMd5Ex80q1yHfwSF6nzUMbq3Tkk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Gzttz4dXPpKsvs9jqirrPL2+5E6k3jmM5y0ZMN5RJwcoJ4g+Bc1JUsbJ9zm2VESUmYoagCKxafFUIbSR+oElT2FXJbr+2I8sxapArHMO2xJq68Gn+KLE0ABNuwJvgPqD+nIsFUWrCKQ3Jk4102WYpRjsoNS9oLcqBj5/4yatBn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iucdWzqT; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-43d7e23defbso4188669f8f.0
+        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 07:56:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776956165; x=1777560965; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TEMz0XPZT6C/C+qKG0F8X+6TnQq3cqgsvzk/V348H5A=;
+        b=iucdWzqTyVqdXM+VUvVH4bpXwv3BAfSjQFoB/9Cg6JANwt2v4cMHI/h5Tj8PaROcl2
+         53myZvTQrpNY4ZOmK5IxKZJx4dsm1krjIyzW/whr0FkEarLsWNvymS/kOa0nvYfsq22C
+         7m6Pn7tOaYnJP6XwOERR66hlFjELq4qYZGmXTZOEsM6dxGICu8jVGM/7FcQdUWBMM5Gw
+         LeFDbV0r4ZhsbKSePNQ/F+dMwkx6hhiF6QRQpVIKV3W/5pKc3qoVV6mMiW9DMVom14hk
+         1hk1Z4L7bvJzmAae0HYRxfV4X5t+X9tz4J/TUoHqTkDdXicTGAGTatYy4UxnIxg3pUFq
+         oC/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776956165; x=1777560965;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TEMz0XPZT6C/C+qKG0F8X+6TnQq3cqgsvzk/V348H5A=;
+        b=KNxJFueCkEyZMKM2e3qthwgjTc4CiuixzQOjFBhJ6CvkN+iDlOuYvbQtxrASVAdbjX
+         AzHtq6ciDDeRtXLMHHfHBltyldWRyK1deoxK0a/8ddgIh8Dc/MQgedN7ySCI5+Kadgju
+         z9wPAxSCPZBpN4RPIX47iVxEqBNP6TQbpoA3k5zLU7mePBGXMTf/mOuuLvrwPveGVWXN
+         T+vv+qnKcLQ18gak5Nm4Jt04CJrt/cPxR1ao+aqdjRBDqaA/Y0iy3i1S6fkfBVmy2Jza
+         nu6OAfwMIhgr/NCW7EkX0RHVQVzgxQcynExBI7EsjAuw2Ocg2iEIxt0Pa2JB+j4/le9N
+         GiIw==
+X-Gm-Message-State: AOJu0YwWozvonOHoM967k36kS99+a5cPMsUbVyL7vxv8dtZWRLDBiTMg
+	zovLBRsmDA4xdac+gEVH4ojF5KFX4CSgeFzyEQwVULHSPfbE//yzHS6S
+X-Gm-Gg: AeBDieu0ei6EzY6gd+9XlS9wjSjmQktGqBicqNIXjv+xmSUG9lylgepoqHC/zcz+rFW
+	zDzqCACtujU+1+z6Zk/5A7q94UZcepmnuLUhhEE9TAlAv5mnx7j3F7GI9/BMRnBCpdy8Wjr78IC
+	z7/nl+O+WwhhMQ7I9x7G8Zn/fDcZoLaS7+BMJVZfSZjHDOD7rzK1wIrK9qbjSaoQ2VhSAzhGzY0
+	QVyNQaCcXLP5FJCzod8imHq4o8zK1c5oMv4iFr6J9W4i2p/po1ffmv5ZTsrvBeOtaB6WKHLgWyt
+	B/eKIt+yImgOI/hKyPxFbgwAZ5b6pQar+zhLlHTkMpzPeXCwgSr9COsr5gKoV0a1kJ5Gz6GEAF2
+	CvmdftBnblH+iYfNPDaJ5RJYwMg9cmhvGpPgIAzdIv2Vuerz82xrm+nQoerZqPk5INbtd8InAjS
+	mTQLVCakudHX01Iq8dAKTsNE6fijD+/zKG0YOHJPKvfRhBBR4g9r2qqwl/81TzoHuWcj1V1YQ=
+X-Received: by 2002:a05:6000:2282:b0:43f:dd94:3c30 with SMTP id ffacd0b85a97d-43fe3dc6156mr41197898f8f.14.1776956164406;
+        Thu, 23 Apr 2026 07:56:04 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1126:4:2371:97f6:67a4:5909? ([2620:10d:c092:500::7:a503])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4e4eec9sm50915660f8f.34.2026.04.23.07.56.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Apr 2026 07:56:03 -0700 (PDT)
+Message-ID: <41ce8fd1-ca1b-44a0-9a02-67c21a89146d@gmail.com>
+Date: Thu, 23 Apr 2026 15:56:03 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,108 +85,429 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Help with PCIe THP on ConnectX-7
-To: <bmerry@gmail.com>, <netdev@vger.kernel.org>
-References: <aejnzWR_szvAOxkK@brucemerry.org.za>
+Subject: Re: [PATCH bpf-next v3 1/9] bpf: Unify dynptr handling in the
+ verifier
+To: Amery Hung <ameryhung@gmail.com>, bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org,
+ daniel@iogearbox.net, eddyz87@gmail.com, memxor@gmail.com,
+ martin.lau@kernel.org, kernel-team@meta.com
+References: <20260421221016.2967924-1-ameryhung@gmail.com>
+ <20260421221016.2967924-2-ameryhung@gmail.com>
 Content-Language: en-US
-From: Yishai Hadas <yishaih@nvidia.com>
-In-Reply-To: <aejnzWR_szvAOxkK@brucemerry.org.za>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+From: Mykyta Yatsenko <mykyta.yatsenko5@gmail.com>
+In-Reply-To: <20260421221016.2967924-2-ameryhung@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001D1:EE_|IA0PR12MB8893:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0c34e9ef-1670-413f-5e0a-08dea1487a5d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|376014|82310400026|1800799024|18002099003|22082099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	Y67QwLzVvDtQURvxtrYExE0WYNo+zElxZju1V3E5FD3DqktRBhkrYqG3YhNv1G/WAMQE/IzxEXgme9U3wTuXZVpsmz0Xg6L6xUKE9ZRYMTxZpSePGOzQ1hFzpUGk2XIdpuUxtixXui/ZNuyi9zwxgY5qqIscg1fEv961Dhmq4vSgnKDkKTzez+U+uC/iPxLq7gVyMRaxeG4g0R8JT9PG7zXs9MlHc9wr48MZD9oa59v499cLV4x0On+6qhu9R8NoMHkQsMhzPvuCHiQATeM0YaQPGIwzNHiD0Bdj0V0itVidAj671cXU5K5pw61av48C7R7ehfFPzrWWEcgS5XOmodJJCpO1wkGtbCALjSWaXOgCmCr2KE6Ielf8sr4KiMOu4eTHECtxJ9szhU0ZLqpf082tJs9uIZHgLRAUZJoTOXZfHMeNWef3+jk0KUulYG6H8pwp/RWEsvLrYjcc6fc9PHsxDbZjUeHaVU0F/gP3Z8m13lH6/nzNIVf4jTsIH1WZybUy21z9AMrCCf6nnaZdLJvQ/t1HDWtrWMpCs0AQMQ2bRB9g6otRIfQ0C0NillDMFpT9UshE+4QMhPx2fmXdSUB63FA9Vz+0DcfCRvETACwjnB/9tS+2MZVPhuz6yxyy6dZV8jKXm0JMrFiidQSlKpuc007zSL0/fPjCcOUt1Rb+d9fA+ltE5F+z3IPfxiKbCFtieEYCA3eVS6sO4EkeSj7dcuWpeCmMBfV5tfWy9jIhR7SFOsutlPRTdNsruRNvX1hhYW6Cjb45Dp+PwAEqhA==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(376014)(82310400026)(1800799024)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	Q8Mc2vD0gR85N1QmcgscuMS+0lrTEWpA76xYMN9gaau117WFYIrjmQkthOAqED7hs15egmuYp4QXlAkIHoMInXlcW6gvdM599TY3aypnlCfpfzQHXXdH4dUkSq/lT5H8AFrA/gc9qw7vpghi7NBFciZfpua1zyVuuWkSTwEuRQpGMUnEg4fMbeuQjoKiXrJrqKJxo1T3onQMHrPnK/k5gc/FYcGB9wz5VXuJkCO+Q3552XA6m7j/udxmFXYaDLjf/BQ8wK8SCYbSB2P0h7/0ZNw8xtY5k0XBAVD2qY0QQrQmu6FPybL/kanl1hQUz7ZbCxKbC/4/RGT9IF/+RsDavBnQCBT4MISwBo280i4oZpIDzdb8tvf0ctsDId0wbUyE+oONWJt4yqZxpGihjVNntpSmDskRQhbTtlymfolBmcNhqPLxu7LZ/vPNAFnNBh/D
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2026 14:56:19.4611
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0c34e9ef-1670-413f-5e0a-08dea1487a5d
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001D1.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8893
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280784-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,Nvidia.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	RCPT_COUNT_TWO(0.00)[2];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yishaih@nvidia.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
+	TAGGED_FROM(0.00)[bounces-280783-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mykytayatsenko5@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: EDD48453F53
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AF294453F19
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 22/04/2026 18:22, Bruce Merry wrote:
-> Hello
-> 
-> I'm hoping someone from NVIDIA Networking can help with this; I wasn't
-> sure of the best way to get in contact with the engineers working on
-> mlx5 kernel code so thought I'd try here. I'm trying to write some
-> (userspace) code using ibv_reg_mr_ex to register a memory region using
-> TLP Processing Hints (THP) to improve performance on an Epyc Turin
-> (Zen 5) system. However, in the kernel mlx5_st_create is bailing out
-> because of this check:
-> 
->         if (!MLX5_CAP_GEN(dev, mkey_pcie_tph))
->                  return NULL;
-> 
-> As far as I can tell, that is checking a capability bit returned by
-> the firmware.
 
-Right
 
+On 4/21/26 11:10 PM, Amery Hung wrote:
+> Simplify dynptr checking for helper and kfunc by unifying it. Remember
+> the initialized dynptr (i.e.,g !(arg_type |= MEM_UNINIT)) pass to a
+> dynptr kfunc during process_dynptr_func() so that we can easily
+> retrieve the information for verification later. By saving it in
+> meta->dynptr, there is no need to call dynptr helpers such as
+> dynptr_id(), dynptr_ref_obj_id() and dynptr_type() in check_func_arg().
 > 
-> Before I spend a lot more time debugging, can you tell me whether
-> ConnectX-7 supports this feature at all (I'm on the latest 28.48.1000
-> firmware)? I see it mentioned in release notes for ConnectX-8
-> firmware, but not in ConnectX-7 release notes.
+> Remove and open code the helpers in process_dynptr_func() when
+> saving id, ref_obj_id, and type. It is okay to drop spi < 0 check as
+> is_dynptr_reg_valid_init() has made sure the dynptr is valid.
 > 
-
-It's supported only on CX8 for now.
-
-Yishai
-
-> If ConnectX-7 does support it, do you have any tips on what might
-> cause that capability bit to be false and how to determine what the
-> cause is? For example, could that happen if the motherboard BIOS
-> doesn't support TPH?
+> Besides, since dynptr ref_obj_id information is now pass around in
+> meta->bpf_dynptr_desc, drop the check in helper_multiple_ref_obj_use.
 > 
-> Thanks
-> Bruce
+> Acked-by: Eduard Zingerman <eddyz87@gmail.com>
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> ---
+
+Acked-by: Mykyta Yatsenko <yatsenko@meta.com>
+
+>   include/linux/bpf_verifier.h |  12 ++-
+>   kernel/bpf/verifier.c        | 178 +++++++----------------------------
+>   2 files changed, 41 insertions(+), 149 deletions(-)
+> 
+> diff --git a/include/linux/bpf_verifier.h b/include/linux/bpf_verifier.h
+> index b148f816f25b..dc0cff59246d 100644
+> --- a/include/linux/bpf_verifier.h
+> +++ b/include/linux/bpf_verifier.h
+> @@ -1319,6 +1319,12 @@ struct bpf_map_desc {
+>   	int uid;
+>   };
+>   
+> +struct bpf_dynptr_desc {
+> +	enum bpf_dynptr_type type;
+> +	u32 id;
+> +	u32 ref_obj_id;
+> +};
+> +
+>   struct bpf_kfunc_call_arg_meta {
+>   	/* In parameters */
+>   	struct btf *btf;
+> @@ -1359,16 +1365,12 @@ struct bpf_kfunc_call_arg_meta {
+>   	struct {
+>   		struct btf_field *field;
+>   	} arg_rbtree_root;
+> -	struct {
+> -		enum bpf_dynptr_type type;
+> -		u32 id;
+> -		u32 ref_obj_id;
+> -	} initialized_dynptr;
+>   	struct {
+>   		u8 spi;
+>   		u8 frameno;
+>   	} iter;
+>   	struct bpf_map_desc map;
+> +	struct bpf_dynptr_desc dynptr;
+>   	u64 mem_size;
+>   };
+>   
+> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> index 185210b73385..41e4ea41c72e 100644
+> --- a/kernel/bpf/verifier.c
+> +++ b/kernel/bpf/verifier.c
+> @@ -232,6 +232,7 @@ static void bpf_map_key_store(struct bpf_insn_aux_data *aux, u64 state)
+>   
+>   struct bpf_call_arg_meta {
+>   	struct bpf_map_desc map;
+> +	struct bpf_dynptr_desc dynptr;
+>   	bool raw_mode;
+>   	bool pkt_access;
+>   	u8 release_regno;
+> @@ -240,7 +241,6 @@ struct bpf_call_arg_meta {
+>   	int mem_size;
+>   	u64 msize_max_value;
+>   	int ref_obj_id;
+> -	int dynptr_id;
+>   	int func_id;
+>   	struct btf *btf;
+>   	u32 btf_id;
+> @@ -434,11 +434,6 @@ static bool is_ptr_cast_function(enum bpf_func_id func_id)
+>   		func_id == BPF_FUNC_skc_to_tcp_request_sock;
+>   }
+>   
+> -static bool is_dynptr_ref_function(enum bpf_func_id func_id)
+> -{
+> -	return func_id == BPF_FUNC_dynptr_data;
+> -}
+> -
+>   static bool is_sync_callback_calling_kfunc(u32 btf_id);
+>   static bool is_async_callback_calling_kfunc(u32 btf_id);
+>   static bool is_callback_calling_kfunc(u32 btf_id);
+> @@ -507,8 +502,6 @@ static bool helper_multiple_ref_obj_use(enum bpf_func_id func_id,
+>   		ref_obj_uses++;
+>   	if (is_acquire_function(func_id, map))
+>   		ref_obj_uses++;
+> -	if (is_dynptr_ref_function(func_id))
+> -		ref_obj_uses++;
+>   
+>   	return ref_obj_uses > 1;
+>   }
+> @@ -7433,7 +7426,8 @@ static int process_kptr_func(struct bpf_verifier_env *env, int regno,
+>    * and checked dynamically during runtime.
+>    */
+>   static int process_dynptr_func(struct bpf_verifier_env *env, int regno, int insn_idx,
+> -			       enum bpf_arg_type arg_type, int clone_ref_obj_id)
+> +			       enum bpf_arg_type arg_type, int clone_ref_obj_id,
+> +			       struct bpf_dynptr_desc *dynptr)
+>   {
+>   	struct bpf_reg_state *reg = reg_state(env, regno);
+>   	int err;
+> @@ -7499,6 +7493,20 @@ static int process_dynptr_func(struct bpf_verifier_env *env, int regno, int insn
+>   		}
+>   
+>   		err = mark_dynptr_read(env, reg);
+> +
+> +		if (dynptr) {
+> +			struct bpf_func_state *state = bpf_func(env, reg);
+> +			int spi;
+> +
+> +			if (reg->type != CONST_PTR_TO_DYNPTR) {
+> +				spi = dynptr_get_spi(env, reg);
+> +				reg = &state->stack[spi].spilled_ptr;
+> +			}
+> +
+> +			dynptr->id = reg->id;
+> +			dynptr->type = reg->dynptr.type;
+> +			dynptr->ref_obj_id = reg->ref_obj_id;
+> +		}
+>   	}
+>   	return err;
+>   }
+> @@ -8263,72 +8271,6 @@ static int check_func_arg_reg_off(struct bpf_verifier_env *env,
+>   	}
+>   }
+>   
+> -static struct bpf_reg_state *get_dynptr_arg_reg(struct bpf_verifier_env *env,
+> -						const struct bpf_func_proto *fn,
+> -						struct bpf_reg_state *regs)
+> -{
+> -	struct bpf_reg_state *state = NULL;
+> -	int i;
+> -
+> -	for (i = 0; i < MAX_BPF_FUNC_REG_ARGS; i++)
+> -		if (arg_type_is_dynptr(fn->arg_type[i])) {
+> -			if (state) {
+> -				verbose(env, "verifier internal error: multiple dynptr args\n");
+> -				return NULL;
+> -			}
+> -			state = &regs[BPF_REG_1 + i];
+> -		}
+> -
+> -	if (!state)
+> -		verbose(env, "verifier internal error: no dynptr arg found\n");
+> -
+> -	return state;
+> -}
+> -
+> -static int dynptr_id(struct bpf_verifier_env *env, struct bpf_reg_state *reg)
+> -{
+> -	struct bpf_func_state *state = bpf_func(env, reg);
+> -	int spi;
+> -
+> -	if (reg->type == CONST_PTR_TO_DYNPTR)
+> -		return reg->id;
+> -	spi = dynptr_get_spi(env, reg);
+> -	if (spi < 0)
+> -		return spi;
+> -	return state->stack[spi].spilled_ptr.id;
+> -}
+> -
+> -static int dynptr_ref_obj_id(struct bpf_verifier_env *env, struct bpf_reg_state *reg)
+> -{
+> -	struct bpf_func_state *state = bpf_func(env, reg);
+> -	int spi;
+> -
+> -	if (reg->type == CONST_PTR_TO_DYNPTR)
+> -		return reg->ref_obj_id;
+> -	spi = dynptr_get_spi(env, reg);
+> -	if (spi < 0)
+> -		return spi;
+> -	return state->stack[spi].spilled_ptr.ref_obj_id;
+> -}
+> -
+> -static enum bpf_dynptr_type dynptr_get_type(struct bpf_verifier_env *env,
+> -					    struct bpf_reg_state *reg)
+> -{
+> -	struct bpf_func_state *state = bpf_func(env, reg);
+> -	int spi;
+> -
+> -	if (reg->type == CONST_PTR_TO_DYNPTR)
+> -		return reg->dynptr.type;
+> -
+> -	spi = bpf_get_spi(reg->var_off.value);
+> -	if (spi < 0) {
+> -		verbose(env, "verifier internal error: invalid spi when querying dynptr type\n");
+> -		return BPF_DYNPTR_TYPE_INVALID;
+> -	}
+> -
+> -	return state->stack[spi].spilled_ptr.dynptr.type;
+> -}
+> -
+>   static int check_reg_const_str(struct bpf_verifier_env *env,
+>   			       struct bpf_reg_state *reg, u32 regno)
+>   {
+> @@ -8683,7 +8625,7 @@ static int check_func_arg(struct bpf_verifier_env *env, u32 arg,
+>   					 true, meta);
+>   		break;
+>   	case ARG_PTR_TO_DYNPTR:
+> -		err = process_dynptr_func(env, regno, insn_idx, arg_type, 0);
+> +		err = process_dynptr_func(env, regno, insn_idx, arg_type, 0, &meta->dynptr);
+>   		if (err)
+>   			return err;
+>   		break;
+> @@ -9342,7 +9284,7 @@ static int btf_check_func_arg_match(struct bpf_verifier_env *env, int subprog,
+>   			if (ret)
+>   				return ret;
+>   
+> -			ret = process_dynptr_func(env, regno, -1, arg->arg_type, 0);
+> +			ret = process_dynptr_func(env, regno, -1, arg->arg_type, 0, NULL);
+>   			if (ret)
+>   				return ret;
+>   		} else if (base_type(arg->arg_type) == ARG_PTR_TO_BTF_ID) {
+> @@ -10429,52 +10371,10 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
+>   			}
+>   		}
+>   		break;
+> -	case BPF_FUNC_dynptr_data:
+> -	{
+> -		struct bpf_reg_state *reg;
+> -		int id, ref_obj_id;
+> -
+> -		reg = get_dynptr_arg_reg(env, fn, regs);
+> -		if (!reg)
+> -			return -EFAULT;
+> -
+> -
+> -		if (meta.dynptr_id) {
+> -			verifier_bug(env, "meta.dynptr_id already set");
+> -			return -EFAULT;
+> -		}
+> -		if (meta.ref_obj_id) {
+> -			verifier_bug(env, "meta.ref_obj_id already set");
+> -			return -EFAULT;
+> -		}
+> -
+> -		id = dynptr_id(env, reg);
+> -		if (id < 0) {
+> -			verifier_bug(env, "failed to obtain dynptr id");
+> -			return id;
+> -		}
+> -
+> -		ref_obj_id = dynptr_ref_obj_id(env, reg);
+> -		if (ref_obj_id < 0) {
+> -			verifier_bug(env, "failed to obtain dynptr ref_obj_id");
+> -			return ref_obj_id;
+> -		}
+> -
+> -		meta.dynptr_id = id;
+> -		meta.ref_obj_id = ref_obj_id;
+> -
+> -		break;
+> -	}
+>   	case BPF_FUNC_dynptr_write:
+>   	{
+> -		enum bpf_dynptr_type dynptr_type;
+> -		struct bpf_reg_state *reg;
+> +		enum bpf_dynptr_type dynptr_type = meta.dynptr.type;
+>   
+> -		reg = get_dynptr_arg_reg(env, fn, regs);
+> -		if (!reg)
+> -			return -EFAULT;
+> -
+> -		dynptr_type = dynptr_get_type(env, reg);
+>   		if (dynptr_type == BPF_DYNPTR_TYPE_INVALID)
+>   			return -EFAULT;
+>   
+> @@ -10665,10 +10565,7 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
+>   		return -EFAULT;
+>   	}
+>   
+> -	if (is_dynptr_ref_function(func_id))
+> -		regs[BPF_REG_0].dynptr_id = meta.dynptr_id;
+> -
+> -	if (is_ptr_cast_function(func_id) || is_dynptr_ref_function(func_id)) {
+> +	if (is_ptr_cast_function(func_id)) {
+>   		/* For release_reference() */
+>   		regs[BPF_REG_0].ref_obj_id = meta.ref_obj_id;
+>   	} else if (is_acquire_function(func_id, meta.map.ptr)) {
+> @@ -10682,6 +10579,11 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
+>   		regs[BPF_REG_0].ref_obj_id = id;
+>   	}
+>   
+> +	if (func_id == BPF_FUNC_dynptr_data) {
+> +		regs[BPF_REG_0].dynptr_id = meta.dynptr.id;
+> +		regs[BPF_REG_0].ref_obj_id = meta.dynptr.ref_obj_id;
+> +	}
+> +
+>   	err = do_refine_retval_range(env, regs, fn->ret_type, func_id, &meta);
+>   	if (err)
+>   		return err;
+> @@ -12260,7 +12162,7 @@ static int check_kfunc_args(struct bpf_verifier_env *env, struct bpf_kfunc_call_
+>   				meta->release_regno = regno;
+>   			} else if (meta->func_id == special_kfunc_list[KF_bpf_dynptr_clone] &&
+>   				   (dynptr_arg_type & MEM_UNINIT)) {
+> -				enum bpf_dynptr_type parent_type = meta->initialized_dynptr.type;
+> +				enum bpf_dynptr_type parent_type = meta->dynptr.type;
+>   
+>   				if (parent_type == BPF_DYNPTR_TYPE_INVALID) {
+>   					verifier_bug(env, "no dynptr type for parent of clone");
+> @@ -12268,29 +12170,17 @@ static int check_kfunc_args(struct bpf_verifier_env *env, struct bpf_kfunc_call_
+>   				}
+>   
+>   				dynptr_arg_type |= (unsigned int)get_dynptr_type_flag(parent_type);
+> -				clone_ref_obj_id = meta->initialized_dynptr.ref_obj_id;
+> +				clone_ref_obj_id = meta->dynptr.ref_obj_id;
+>   				if (dynptr_type_refcounted(parent_type) && !clone_ref_obj_id) {
+>   					verifier_bug(env, "missing ref obj id for parent of clone");
+>   					return -EFAULT;
+>   				}
+>   			}
+>   
+> -			ret = process_dynptr_func(env, regno, insn_idx, dynptr_arg_type, clone_ref_obj_id);
+> +			ret = process_dynptr_func(env, regno, insn_idx, dynptr_arg_type, clone_ref_obj_id,
+> +						  &meta->dynptr);
+>   			if (ret < 0)
+>   				return ret;
+> -
+> -			if (!(dynptr_arg_type & MEM_UNINIT)) {
+> -				int id = dynptr_id(env, reg);
+> -
+> -				if (id < 0) {
+> -					verifier_bug(env, "failed to obtain dynptr id");
+> -					return id;
+> -				}
+> -				meta->initialized_dynptr.id = id;
+> -				meta->initialized_dynptr.type = dynptr_get_type(env, reg);
+> -				meta->initialized_dynptr.ref_obj_id = dynptr_ref_obj_id(env, reg);
+> -			}
+> -
+>   			break;
+>   		}
+>   		case KF_ARG_PTR_TO_ITER:
+> @@ -12894,7 +12784,7 @@ static int check_special_kfunc(struct bpf_verifier_env *env, struct bpf_kfunc_ca
+>   		}
+>   	} else if (meta->func_id == special_kfunc_list[KF_bpf_dynptr_slice] ||
+>   		   meta->func_id == special_kfunc_list[KF_bpf_dynptr_slice_rdwr]) {
+> -		enum bpf_type_flag type_flag = get_dynptr_type_flag(meta->initialized_dynptr.type);
+> +		enum bpf_type_flag type_flag = get_dynptr_type_flag(meta->dynptr.type);
+>   
+>   		mark_reg_known_zero(env, regs, BPF_REG_0);
+>   
+> @@ -12918,11 +12808,11 @@ static int check_special_kfunc(struct bpf_verifier_env *env, struct bpf_kfunc_ca
+>   			}
+>   		}
+>   
+> -		if (!meta->initialized_dynptr.id) {
+> +		if (!meta->dynptr.id) {
+>   			verifier_bug(env, "no dynptr id");
+>   			return -EFAULT;
+>   		}
+> -		regs[BPF_REG_0].dynptr_id = meta->initialized_dynptr.id;
+> +		regs[BPF_REG_0].dynptr_id = meta->dynptr.id;
+>   
+>   		/* we don't need to set BPF_REG_0's ref obj id
+>   		 * because packet slices are not refcounted (see
+> @@ -13110,7 +13000,7 @@ static int check_kfunc_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
+>   	if (meta.release_regno) {
+>   		struct bpf_reg_state *reg = &regs[meta.release_regno];
+>   
+> -		if (meta.initialized_dynptr.ref_obj_id) {
+> +		if (meta.dynptr.ref_obj_id) {
+>   			err = unmark_stack_slots_dynptr(env, reg);
+>   		} else {
+>   			err = release_reference(env, reg->ref_obj_id);
 
 
