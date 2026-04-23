@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-280592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280593-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OOfhJi2f6WkAfQIAu9opvQ
-	(envelope-from <netdev+bounces-280592-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 06:25:17 +0200
+	id cChjMTGf6WkAfQIAu9opvQ
+	(envelope-from <netdev+bounces-280593-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 06:25:21 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E13F44CEE2
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 06:25:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A57744CEF3
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 06:25:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6C1B63044F04
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 04:10:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 69FAE309F0E2
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 04:10:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9B0B3CD8B6;
-	Thu, 23 Apr 2026 04:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67DA13BB9E3;
+	Thu, 23 Apr 2026 04:10:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gQ+h5C9s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H/xBp8pz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C459A3CD8A6;
-	Thu, 23 Apr 2026 04:10:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C208C3CD8BE;
+	Thu, 23 Apr 2026 04:10:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776917452; cv=none; b=HX62oyxhmiikKLntqwZtBUi01g8CPcDtjqrJbiFFkiKl/iGlkn84O+j3J+qC1Um6sZyLOdJbD0+gw5MHW4JYXKsfUN6c6RYAP31xI2Mxu8tF+p48MkNC5eIs6xbELMEKMvpAoh50FoC2zy5lw01rkk9Mnfzq5XoHDIceFn+1XF4=
+	t=1776917453; cv=none; b=Tz+9EuP2i8B3O5bWfbUyGtmRBPN/7BiCc0PBZbT9wRx7wq0lnXfAici7tNBzm9lYlMynY5y9uFVuDrnSYVPjnoLn+ftsXVOWBcqmTw2Q4Cc8tD/6Wkh+OPwDn9AvKqt3p+0xmULX7e54gn4U2VC0s5Px/HJrMENMqrvXndYw2Zs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776917452; c=relaxed/simple;
-	bh=HAjchdSIR516yxEHb4YmEGjklp5bYhrwsv8bJpaUrS4=;
+	s=arc-20240116; t=1776917453; c=relaxed/simple;
+	bh=7PrAqKeeuYuMAPjtByCwNFHL4suwiiKJnZF01gaSZ3M=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=EF9QUV7eUfmh4Svx7YEGsbSCswakXa9AU/KJP0gYYP5Nap61zO4KXFN0TDhArGHMe+XEk/z4WCf8J2d3udjG9tkVGzwHVIACyAB4guL04bFaHfUgxul5tZZ4isASPREeVK2xRX9f1s4U+EUQQ3OYPXAeY9HIYkokIQFUadOWqF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gQ+h5C9s; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93763C2BCB2;
-	Thu, 23 Apr 2026 04:10:51 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Uzay+HqZImoQ665S1cTG8PczgXLKqjRsbA6x1SwExBjRGrV+Xd3AK/j/fQv4RJvOtOEnnHKn60kioYi8al6mTJlyAPZkyHcBrhPzXXSXcO/L3N0OPiWg0NbioLH25Q35BqtC/kVp4hO4Yo0fTrCjEGl6X4nNQHDEjqoPVfe45Ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H/xBp8pz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12C98C2BCB2;
+	Thu, 23 Apr 2026 04:10:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776917451;
-	bh=HAjchdSIR516yxEHb4YmEGjklp5bYhrwsv8bJpaUrS4=;
+	s=k20201202; t=1776917453;
+	bh=7PrAqKeeuYuMAPjtByCwNFHL4suwiiKJnZF01gaSZ3M=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gQ+h5C9sfOin/6I65PsHp4THPHGS3t2QJFsMKjphPBLfdnYl5AmdZJqJgUedHC/41
-	 P/4QjiSTGhA1HFIYGCvLXg4lLcBzisNkxCKFPPm4R39QZd4swBjQgxMSdsEVD8aYeg
-	 cNJg7XtrW2Okm9dE+YzXs6viTaEnainQKEWJMsxJdn14VMEPIJtZeCToI6hkOFZTSr
-	 LWpEi4Se/hfHU5DUKrH6/MMliG1hOeUPKStXsXxOc15kyhCpQ3K0En0SiLghn83HiE
-	 DWYVPX9XcaMWusWDCeXqe3RYKSm90ZLZWyLCXygddV0/BJmluwZv9o9u+tnUpp2cNC
-	 YMFC6iV2Xc6+g==
+	b=H/xBp8pzVms05B9WXQruY3zZxnwI4cHd97+NUd/eBhBWwhTfvalw3+r8jhfsxX3sP
+	 3q03xs/5WauSBKlSiXV7oWTxL7SdadChE8+tFzU7oof2J/6OPxg9l0nWlAmrvEvOPJ
+	 /d/5uvoUrMtfhEWDDjY+KZAi4qYiI8BAIbfGjM5OH/op5PcfFnBivTc+FqvZdqpPkM
+	 gknbApols7U4rUuQLP9yWBiR9QIsVUEcPVaJ1NYNN1fWUoOvxUxZjggwe4Acn+R7V+
+	 tknI+gBWkO6CxTEhCSeyGRG7avlC8vVzZJSWO2hd9uVy1lrT5E9rIuKkRzsBdSCCmr
+	 /M2/eNuPpApiA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9EEB3809A86;
-	Thu, 23 Apr 2026 04:10:14 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FC653809A86;
+	Thu, 23 Apr 2026 04:10:16 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,50 +55,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] sctp: fix sockets_allocated imbalance after
- sk_clone()
+Subject: Re: [PATCH net] seg6: fix seg6 lwtunnel output redirect for L2
+ reduced
+ encap mode
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177691741355.4152232.15250739127421929666.git-patchwork-notify@kernel.org>
-Date: Thu, 23 Apr 2026 04:10:13 +0000
-References: 
- <af8d66f928dec3e9fcbee8d4a85b7d5a6b86f515.1776460180.git.lucien.xin@gmail.com>
-In-Reply-To: 
- <af8d66f928dec3e9fcbee8d4a85b7d5a6b86f515.1776460180.git.lucien.xin@gmail.com>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: netdev@vger.kernel.org, linux-sctp@vger.kernel.org, davem@davemloft.net,
- kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- marcelo.leitner@gmail.com, kuniyu@google.com
+ <177691741480.4152232.8683053471530230786.git-patchwork-notify@kernel.org>
+Date: Thu, 23 Apr 2026 04:10:14 +0000
+References: <20260418162838.31979-1-andrea.mayer@uniroma2.it>
+In-Reply-To: <20260418162838.31979-1-andrea.mayer@uniroma2.it>
+To: Andrea Mayer <andrea.mayer@uniroma2.it>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ anton.makarov11235@gmail.com, stefano.salsano@uniroma2.it,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com,uniroma2.it,vger.kernel.org];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-280592-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-280593-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 2E13F44CEE2
+X-Rspamd-Queue-Id: 6A57744CEF3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -107,21 +106,20 @@ Hello:
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 17 Apr 2026 17:09:40 -0400 you wrote:
-> sk_clone() increments sockets_allocated and sets the socket refcount to 2.
-> SCTP performs additional accounting in sctp_clone_sock(), so the clone-time
-> increment must be undone to avoid double counting.
-> 
-> Note we cannot simply remove the SCTP-side increment, because the SCTP
-> destroy path in sctp_destroy_sock() only decrements sockets_allocated when
-> sp->ep is set, which may not be true for all failure paths in
-> sctp_clone_sock().
+On Sat, 18 Apr 2026 18:28:38 +0200 you wrote:
+> When SEG6_IPTUN_MODE_L2ENCAP_RED (L2ENCAP_RED) was introduced, the
+> condition in seg6_build_state() that excludes L2 encap modes from
+> setting LWTUNNEL_STATE_OUTPUT_REDIRECT was not updated to account for
+> the new mode.
+> As a consequence, L2ENCAP_RED routes incorrectly trigger seg6_output()
+> on the output path, where the packet is silently dropped because
+> skb_mac_header_was_set() fails on L3 packets.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] sctp: fix sockets_allocated imbalance after sk_clone()
-    https://git.kernel.org/netdev/net/c/7c9b012d6367
+  - [net] seg6: fix seg6 lwtunnel output redirect for L2 reduced encap mode
+    https://git.kernel.org/netdev/net/c/ade67d5f5888
 
 You are awesome, thank you!
 -- 
