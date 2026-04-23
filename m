@@ -1,136 +1,134 @@
-Return-Path: <netdev+bounces-280865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280866-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GAmJD3x46mkUzwIAu9opvQ
-	(envelope-from <netdev+bounces-280865-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 21:52:28 +0200
+	id GLquOMJ56mkUzwIAu9opvQ
+	(envelope-from <netdev+bounces-280866-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 21:57:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 661D7456FB2
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 21:52:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 454DF45712D
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 21:57:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1B2F930060A7
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 19:51:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8A81B30131C1
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 19:56:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B477B39A075;
-	Thu, 23 Apr 2026 19:50:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E14DE39446F;
+	Thu, 23 Apr 2026 19:56:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FR0O3cGz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X3Qn7cWn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909C539A05A;
-	Thu, 23 Apr 2026 19:50:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9397B34B1AD
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 19:56:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776973852; cv=none; b=tUnHKc4bzA8yHapWmfjffRqUp2DV5tfextCosx4gnJV+I1AHBZLD6bZRQIpQVlUTq+vQVMWi3jrTV/xzkPdzkhCPuEbjD+8hHr14nMPv0JW6hUgWunjF+ixWNQ3jKH/eLSglZAB4SCENuF/xx4rJHCsBSrOk9IM9uhHNS3gSgZ8=
+	t=1776974200; cv=none; b=A7yqh+lqw3RFI6ZJuG1OI6USbNFGA1klFMLxEjLP1Ik7BMzQh+9DeQo53nhOSm5d7i86RGrodQ6ieIG9mw+xZnXpyvJzp3LV6PYp8inc2UCMCgwXywpCUFowTcJiWjguOqYUwIEvmOFYZ2mjlPwEyF9kzN3PB4hZLpw4AKodd7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776973852; c=relaxed/simple;
-	bh=U0CyDfCJvWNu+EA15wd4/oIWPPmLn8s74WMey1Bf8zg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ADPqVSH/GKxupr2PByfYpZvLeRdAWlfvXt3s7M2S7GNEujiADinTJf6e6rgDmOwhjpOkc16/lkuyqSRmI9jlWkHbZcayrP8PiWgUG1fHmG7otatThxDhkXUk3JZ7FB7ldqlKhbxumMjmkvtm7nibBhl3iKXblqQgcNU58aHTzms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FR0O3cGz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C755C2BCAF;
-	Thu, 23 Apr 2026 19:50:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776973852;
-	bh=U0CyDfCJvWNu+EA15wd4/oIWPPmLn8s74WMey1Bf8zg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FR0O3cGzLjvPaYkTUXniQgRhIaRTwyFaD5bupn99aK5vNQXPWElPatjBTa35xqhKT
-	 DAy0GKiEYzbtUqheMxXLlHdcyf2N8YiE+QMebZd3yWeYpMd3RQfzTMYM1nu29pfX7k
-	 81u6W1Sb/pH/CZL0G4hP3Y5m/76W9KRty3h9HOyfKi/ajD4zkmIoFflg7LAXrnFSY3
-	 8Y4S9yW8u12idIXynKCgnqaxrAc9+hPVqQHJBg99dUgTePliyCOPLYowXqGISCirj7
-	 wgduqu6++KB57H8wZ7A23+KH2rZaZuwXP+yuWI5/01gQ47hk+ER35RZQ04yrmYA3XN
-	 sdo5qywVoczJg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9E2E3809A90;
-	Thu, 23 Apr 2026 19:50:14 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1776974200; c=relaxed/simple;
+	bh=gMgmVmlxa7ovReRgHTlGcgL+SoczKjd4eQVfTmLTet4=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=FbMjPegO6oeLyMgqRc3iB0bLBB8ji7EXmmBZrlmQ8sWjHn983PdYeI5YnRTGpbIzxhMu1gBVuMFDk8kPwREyLZVxP4E6B3Jj3g5/NBm9iUyZdQoZi+YP1lT8xxGy1t++ibyxjww/h6UwG/5zJrZYw7/ZxKVYQkLY8uXLBdEs1PI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X3Qn7cWn; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776974198;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=X07foacc4iZIeJCjBihvUZxV0FoTwIiEUiMjOGRRzVc=;
+	b=X3Qn7cWn/MBhvesx448Xm/Go/9lBC0xl30ndY70BY4VnLNg3hA/xQE+ZQMB3bFD3gteit5
+	dPd3QmmoZ26II+sNnBNeUkmBBp91fkzXdXjJQZtqSs2p2m6WTj5SbeIWhQmMoeBTE9DJrR
+	8dc5tINkija1f5DiHJM65dgiRH0W8tY=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-227-c1_0_uiaPVWUtlUV2Ml9Vg-1; Thu,
+ 23 Apr 2026 15:56:35 -0400
+X-MC-Unique: c1_0_uiaPVWUtlUV2Ml9Vg-1
+X-Mimecast-MFC-AGG-ID: c1_0_uiaPVWUtlUV2Ml9Vg_1776974191
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9E505195608B;
+	Thu, 23 Apr 2026 19:56:30 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.48.17])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BE8E1180047F;
+	Thu, 23 Apr 2026 19:56:26 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20260423123947.156ce741@kernel.org>
+References: <20260423123947.156ce741@kernel.org> <20260423105639.6e0a0a7e@kernel.org> <20260422161438.2593376-1-dhowells@redhat.com> <2990993.1776970042@warthog.procyon.org.uk> <20260423115853.59273351@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: dhowells@redhat.com, netdev@vger.kernel.org,
+    Marc Dionne <marc.dionne@auristor.com>,
+    "David S.
+ Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+    Simon Horman <horms@kernel.org>,
+    Anderson Nascimento <anderson@allelesecurity.com>,
+    linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2 0/6] rxrpc: Miscellaneous fixes
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 0/6] rxrpc: Miscellaneous fixes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177697381355.740120.3673972749152907468.git-patchwork-notify@kernel.org>
-Date: Thu, 23 Apr 2026 19:50:13 +0000
-References: <20260422161438.2593376-1-dhowells@redhat.com>
-In-Reply-To: <20260422161438.2593376-1-dhowells@redhat.com>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, marc.dionne@auristor.com, kuba@kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, anderson@allelesecurity.com, linux-afs@lists.infradead.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3047315.1776974185.1@warthog.procyon.org.uk>
+Date: Thu, 23 Apr 2026 20:56:25 +0100
+Message-ID: <3047316.1776974185@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-280866-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280865-lists,netdev=lfdr.de,netdevbpf];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 661D7456FB2
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 454DF45712D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+> I've been hacking up Sashiko on top of Claude in these past few days,
+> and it's far less nit picky. For this series it doesn't flag a thing.
+> I'll just pull this in, if you could LMK whether any of the "real
+> Sashiko" reports are actually valid commentary on the current patches
+> I'd greatly appreciate.
 
-On Wed, 22 Apr 2026 17:14:29 +0100 you wrote:
-> Here are some fixes for rxrpc, as found by Sashiko[1]:
-> 
->  (1) Fix leaks in rxkad_verify_response().
-> 
->  (2) Fix handling of rxkad-encrypted packets with crypto-misaligned
->      lengths.
-> 
-> [...]
+They're all valid comments.  I've expanded my series by two further patches
+and modified two others (one just a trivial missing space) and will post a v3
+shortly.
 
-Here is the summary with links:
-  - [net,v2,1/6] rxrpc: Fix memory leaks in rxkad_verify_response()
-    https://git.kernel.org/netdev/net/c/34f61a07e0cd
-  - [net,v2,2/6] rxrpc: Fix rxkad crypto unalignment handling
-    https://git.kernel.org/netdev/net/c/def304aae2ed
-  - [net,v2,3/6] rxrpc: Fix potential UAF after skb_unshare() failure
-    https://git.kernel.org/netdev/net/c/1f2740150f90
-  - [net,v2,4/6] rxrpc: Fix conn-level packet handling to unshare RESPONSE packets
-    https://git.kernel.org/netdev/net/c/24481a7f5733
-  - [net,v2,5/6] rxgk: Fix potential integer overflow in length check
-    https://git.kernel.org/netdev/net/c/6929350080f4
-  - [net,v2,6/6] rxrpc: Fix missing validation of ticket length in non-XDR key preparsing
-    https://git.kernel.org/netdev/net/c/ac33733b10b4
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+David
 
 
