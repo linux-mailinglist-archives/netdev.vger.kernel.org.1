@@ -1,132 +1,133 @@
-Return-Path: <netdev+bounces-280724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280725-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QAoRHan+6WkHrAIAu9opvQ
-	(envelope-from <netdev+bounces-280724-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 13:12:41 +0200
+	id 6JZaIU//6WkHrAIAu9opvQ
+	(envelope-from <netdev+bounces-280725-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 13:15:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D83DE451204
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 13:12:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5B8445129C
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 13:15:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7945E300F9DB
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 11:10:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9A12C3057779
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 11:13:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE9043E6386;
-	Thu, 23 Apr 2026 11:10:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5175D3E6DC0;
+	Thu, 23 Apr 2026 11:13:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QMyjkQJz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PuMobCwl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7DE23793BF;
-	Thu, 23 Apr 2026 11:10:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D59D3E63B6;
+	Thu, 23 Apr 2026 11:13:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776942644; cv=none; b=Cg/TvswbtyBEv/SxSk0lZdIqGSVxOVSCvDy2NErFNeLoT+aQAk3p/NXxfe8DUhuDiHeEniidCEVkua7I5HmVlhq887I/Vpt65HuGZJy7kszN4p4Ywz3PiM0kgnqX3yY3PPsBD4bq2CpDQKzNx7AMawm1v6vih1uaM62f4ra4ME4=
+	t=1776942788; cv=none; b=NdfNccNXIRBWiorjlbNd69DIeH+NxPX+C9jUU6Z8mtd8l02S/3zi9N94w0jkl87gBBFOAQwdbItRYmaOXFLN85Nf66s7ud5Gjiy7AAk8SiMQjpiw95kiAz0F10UPrpWG2winMVaen8ZIq5DRo29RxJtwURRCXzphtnWvn27AaI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776942644; c=relaxed/simple;
-	bh=q/MO0aEEY1J/xinh+nE2w5/ns9zt5bzai2BiTVCHNRk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bl1+JGDqNZR5jP8Nb9DlQsi4q6ukYL90AUEYfEH66L/jszl/3atenvFY7T45ON3xesXkdJsZ+WmQydb22SRLUFjCEUplA9V9v+rZvqP0VzmGLP0dMLLxsezYgfLiSeWTslizLg+c47PK4wLqLa1wtrmRR9cCaWZ4TIg87PgLoFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QMyjkQJz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52A90C2BCAF;
-	Thu, 23 Apr 2026 11:10:44 +0000 (UTC)
+	s=arc-20240116; t=1776942788; c=relaxed/simple;
+	bh=cmM0w61J04+PEJxb+HlVlwAfMod8VR6dUIfGH1oByf0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TZ0Vj9r7auJmxLLNAAtBlczxMB7HPX4Dt1VUjmbXYcMzoIXzoaMiSudSxgHraN4taDNbHxKAGDhYM44Khicf64FwMm1R8c4eKSYnLebGdWlBWsJTuUcDwL/zrFlCelWXtLnHvLF97ji8Z9kg1rKXIJtD1nBoo3sr7wge+8RuIQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PuMobCwl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE72FC2BCAF;
+	Thu, 23 Apr 2026 11:13:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776942644;
-	bh=q/MO0aEEY1J/xinh+nE2w5/ns9zt5bzai2BiTVCHNRk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QMyjkQJzAVrZt5YYbF9d9VV9ejn7clw4Q1M6EFh+4ywWW42HW5fC1Bz31lLH1jW4T
-	 4kHkrtWvkCTUnJ6Q2e6Z/HrYGXGCHw9Xt8YtWCYk2Ff1WtgHCrz5SH7SQ9ahFyAR78
-	 +a++W+lRZp6DaP77BmybEbbnhjt1qfG3TG/fxQzDi8iJTokjXcpo1jZRw0LaiGRU8S
-	 ebJXeCtf9rzY2S5aCCNdJ3f+dWJbYTd+qddQqH234UudNLI+BQTQaf3dLkQO1+8RAk
-	 Az3UbNzvaMdb2S3hijjw7UhD8sXaFqpOOJAlO09l4dStJjyvsQCLmQtfGLwYK9BPgO
-	 yDsCU7NrNyw2Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FC79380CFFD;
-	Thu, 23 Apr 2026 11:10:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1776942788;
+	bh=cmM0w61J04+PEJxb+HlVlwAfMod8VR6dUIfGH1oByf0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PuMobCwlOXQzNWG03LmIUTDv7U9t0QOa1dHiBDM3ayTGuji+OWx5K6sQisdSXqCW0
+	 QvcGZCuDIObpA8PKeqbcoBKSdpWbC7ZXBBi5ymEug1xHUTPUjMneoCgIzM6CKh/Dxw
+	 Kpzd0Ftgd07/7QKvmZlSnv13ADRs4+o9vi1d3mArzVUzMRnqgMO/wtvLaX7WrsLANL
+	 Z3naXlbdz34FHYlM3Sjn25qwQ67Q41F+lcJllihkVpHbOVb4jC3Ykfl7c4QSGV1gDh
+	 dGIeAswhkGslfmEwYxaLcgNYo6PlGjMVMiAic0FNXw6nOJvsoh2xugSWvb+JQKoCYu
+	 +SKlaTMQ2aKVQ==
+Date: Thu, 23 Apr 2026 12:13:03 +0100
+From: Simon Horman <horms@kernel.org>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	sgoutham@marvell.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	dan.carpenter@linaro.org, Dan Carpenter <error27@gmail.com>
+Subject: Re: [PATCH v2 net 03/11] octeontx2-af: npc: cn20k: Propagate errors
+ in defrag MCAM alloc rollback
+Message-ID: <20260423111303.GA900403@horms.kernel.org>
+References: <20260420023442.3295891-1-rkannoth@marvell.com>
+ <20260420023442.3295891-4-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] vsock/virtio: fix MSG_ZEROCOPY pinned-pages
- accounting
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177694260605.114344.12041685261933585177.git-patchwork-notify@kernel.org>
-Date: Thu, 23 Apr 2026 11:10:06 +0000
-References: <20260420132051.217589-1-sgarzare@redhat.com>
-In-Reply-To: <20260420132051.217589-1-sgarzare@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org,
- kvm@vger.kernel.org, avkrasnov@salutedevices.com, davem@davemloft.net,
- pabeni@redhat.com, kuba@kernel.org, mst@redhat.com, jasowang@redhat.com,
- virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
- eperezma@redhat.com, xuanzhuo@linux.alibaba.com, stefanha@redhat.com,
- yimingqian591@gmail.com
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260420023442.3295891-4-rkannoth@marvell.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,kernel.org,salutedevices.com,davemloft.net,redhat.com,lists.linux.dev,linux.alibaba.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-280724-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[vger.kernel.org,marvell.com,davemloft.net,google.com,kernel.org,redhat.com,lunn.ch,linaro.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-280725-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D83DE451204
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: D5B8445129C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Mon, 20 Apr 2026 15:20:51 +0200 you wrote:
-> From: Stefano Garzarella <sgarzare@redhat.com>
+On Mon, Apr 20, 2026 at 08:04:34AM +0530, Ratheesh Kannoth wrote:
+> npc_defrag_alloc_free_slots() allocates MCAM indexes in up to two passes
+> on bank0 then bank1.  On failure it rolls back by freeing entries already
+> placed in save[].
 > 
-> virtio_transport_init_zcopy_skb() uses iter->count as the size argument
-> for msg_zerocopy_realloc(), which in turn passes it to
-> mm_account_pinned_pages() for RLIMIT_MEMLOCK accounting. However, this
-> function is called after virtio_transport_fill_skb() has already consumed
-> the iterator via __zerocopy_sg_from_iter(), so on the last skb, iter->count
-> will be 0, skipping the RLIMIT_MEMLOCK enforcement.
+> __npc_subbank_alloc() can return a negative errno while only part of the
+> indexes are valid.  The rollback loop used rc for
+> npc_mcam_idx_2_subbank_idx() as well, so a successful lookup stored zero
+> in rc and a later __npc_subbank_free() failure could still end with
+> return 0 when the allocation path had also left rc at zero
+> (for example shortfall after zero return values from the alloc helpers).
 > 
-> [...]
+> Jump to the rollback path immediately when either __npc_subbank_alloc()
+> call fails, preserving its errno.  If both calls succeed but the total
+> allocated count is still less than cnt, set rc to -ENOSPC before rollback.
+> Use a separate err variable for npc_mcam_idx_2_subbank_idx() so a
+> successful lookup no longer clears a non-zero rc from the allocation
+> phase.
+> 
+> Cc: Dan Carpenter <error27@gmail.com>
+> Fixes: 645c6e3c1999 ("octeontx2-af: npc: cn20k: virtual index support")
+> Link: https://lore.kernel.org/netdev/adjNJEpILRZATB2N@stanley.mountain/
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 
-Here is the summary with links:
-  - [net] vsock/virtio: fix MSG_ZEROCOPY pinned-pages accounting
-    https://git.kernel.org/netdev/net/c/1cb36e252211
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Sashiko has generated a review of this patch. I believe that the concerns
+raised there are all pre-existing issues that can be looked at in the
+context of potential follow-up; I do not believe they should block
+progress of this patchset.
 
-
+...
 
