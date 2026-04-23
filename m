@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-280697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280698-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OIjhOnL16WmepQIAu9opvQ
-	(envelope-from <netdev+bounces-280697-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 12:33:22 +0200
+	id 8GqsAvf16WnkpwIAu9opvQ
+	(envelope-from <netdev+bounces-280698-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 12:35:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF45A450C38
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 12:33:21 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D434450C8C
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 12:35:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7255C314AA5C
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 10:23:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C148D314DBB2
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 10:23:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0AD7382F0F;
-	Thu, 23 Apr 2026 10:23:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74A0D374731;
+	Thu, 23 Apr 2026 10:23:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="abF49ELC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MTP4akrh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3455F28C2DD
-	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 10:23:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D799423BCEE
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 10:23:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776939810; cv=none; b=la3IjMp6WGG1a1xk+8ZVnxXY8Sw8dKaecQy6fCYrIjSjzgUy7MOeuciXiF/TEqPJUwiPP0geOZI+eg/sLSrv10rxA4d6xjcWIhgNAl4F7gdOgSrKxtZctxHaLVGvW0V3yJBVCZ5oJoj0cfWykfUzWh7gh1ix0E2hmfhfvKuovTo=
+	t=1776939812; cv=none; b=Z41s97/QrubfRae/PhQhjFq5ivR7pDsW5tBfwy9xTuBdY6uyv7TMI4c1q1vNJ4PRLzsm1w8NfqaZRSzeve9qQuUL9Kt7VsSrHY0aTjl07qbSVR0rfJfL1rA5CilVGCbQAO1zCnHSlNY2ikz9YdaU0QTlDdRYC1JIa5p6rTBTwEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776939810; c=relaxed/simple;
-	bh=+40syrGbxrfDIRUw4eObxgmx8uzHBk6D7KZp9kMMaF4=;
+	s=arc-20240116; t=1776939812; c=relaxed/simple;
+	bh=7XLQijXFSfUXa6wdTquuHn10RROSHLj4bNZvX0NbQAQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kyQRdxhLwMQZ3h2/fGIFua6LVdT+4xW6mgPet3huIe/q/qOsgxfm0atT1vDeFzsAl3vtV6mxdRvNdS1ZP4+Dn2m2H065ZKFvp1RgeBoS3oVI7L7YwER6R/8cmeUpHSMTcNndGFoZzXBCLJYt3MsVR1edtDf9hNtSY5RmB9w4i3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=abF49ELC; arc=none smtp.client-ip=209.85.222.201
+	 To:Cc:Content-Type; b=HLkSJFY0cLEDc66QjTJS+RpwBiavu0ycsJvW+32gh+HLR7cmvNkQK2U0eZ0AuEBmLNcTcOr0txrR3KTE6GLzUFg2C8Ah7fLJq6NII94ZMN+eI+F3JYqcubZSWDYtcMNUulT8A65gpulQJMhYiIjTJjqiavkIcIxNjVX0vQrN+aY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MTP4akrh; arc=none smtp.client-ip=209.85.222.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8d3ea68b9cdso1255833485a.3
-        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 03:23:29 -0700 (PDT)
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8eaee67d1bcso692751285a.0
+        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 03:23:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776939808; x=1777544608; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1776939810; x=1777544610; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=EysEmg+1ufr9bf50eAqB1if1f2hgaDfqyUJotgs3rC8=;
-        b=abF49ELCYoBraOJ1PN/CP8ML8NM8aPiaLeY4n1bcDqlTDvFyg6GM0aGasUOmYnK15N
-         skxwEkyQMxWoYl/FKF0WgIAyQprPtd7vYcjhyt6BHHelbQkKLDvVzg5cmwfGNKMBn2NC
-         gCThkvt77TTSpeXsllWcMH0aqA8RVGB7FmlNB+rpDNqOj0Bwko5XMXnzYIYrkPoDnLwX
-         +bfCEFXrEPuMXTImAhPmIRbcz+BciwMWRVzp3l5zwPhz260L5fr7/z7Tr8AQOXaDKNYE
-         82vbzdWKXNbHIPGHq9mi7w6GVh67oaA5ndhxm1z9ROMKCkA8YhLpIZJe0D6tnhqLcFqq
-         jctw==
+        bh=/0QGCfQHriQpE01npTgJWBhIPzd28whWPsodjTbPNXg=;
+        b=MTP4akrh0u5CCp69pHTsGJ1StSS86hhIQpDzXUyrQZ19xceelUgjUWqpiMPn0I0Jwc
+         jrdAA/H/1btsHfjI7MacyDTOcC3GlYKvW12ENLHYe1Ww9N3KQAkQfeEKDtQzXHVSOIEU
+         Sspj+KCsk7UL9pC/2t2Ar3ms6DE39/wsSjNMsH00ChIK2dRv+VFsUufnCY79XnWmiLtt
+         4ZQPNzLs+HPNglbAvzmX+ijWr678FMmGUSpRcO5yhmDEhnhpacrEp7arrG9QKVj0N8Rc
+         LMb6WXA3ckTqeL0jc1i4V2NfnOowAwTZ/6Kc/rV6jyP+HQ7or2iB5zgJ0SelrT4AWekt
+         YEdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776939808; x=1777544608;
+        d=1e100.net; s=20251104; t=1776939810; x=1777544610;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=EysEmg+1ufr9bf50eAqB1if1f2hgaDfqyUJotgs3rC8=;
-        b=TA2C/WZHcrnmklouN7X00wqXp78Rq0gI5A+3YxWCU7+RLczYGfj0ACmQpzIeIfMwG0
-         B+I5lRs2mTPuSPJ/BELHv6hU65u5uJ+RC1FfcuuPfsEzl7417FhGTBa56WQmlgfJdTQc
-         X0r3UQ0nZjrve8bdoXE06bS8QB44WBQl3hxlY/2hbnIF8d1z5DghwBCfrplggCztI8mt
-         3uy9dKCSAHW2nB8mgfNkoJKxpkRoNFAgxTr8T1QdtwT7WDNXTrPOom240PIDcpuphnhw
-         eSKjenqFGV7YAom9I2O/RZDiOFeJrGlnL4sh5h6QdkJq/w9/QirEoO8ANtnzqZ/+Do/P
-         RT+g==
-X-Forwarded-Encrypted: i=1; AFNElJ9wPeaSw7jXFeUZl5zHgYZYb76upvpbpzjU3vHjauDFTQBdHjNSvH9IZ9WK+gyEkxzah+ktTD4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzzZGjn0upMRyN2qtEyE+p5D8R6FKu55+VzAMgCj5WbOj7V/eCq
-	a33lUir4JSGtmJ+W9ZR8Nv0i/macknu9v2JWN4WL5ruAOUU8k1zTjQZmIgvyO9ryiEfmqMwRgCj
-	Ib5o3tN4ZFjEI7Q==
-X-Received: from qkbe7-n2.prod.google.com ([2002:a05:620a:a407:20b0:8de:d98c:d165])
+        bh=/0QGCfQHriQpE01npTgJWBhIPzd28whWPsodjTbPNXg=;
+        b=HS+tey0iX5C15b6aXtpK404evkZMT46i4R6jfrYiTOoP1dbn6TajuZIbUdmYEB1fCp
+         5Np+KD5E9+8E8r10X+19S4SmbyRPIopGjfNZgVLornZp1o/GqDR9v1qWdeePH2Sxc3yp
+         OrL5RAAI6QwcyowJNEekAQK+1NEk2K0etQHYOUWqZyWwTlLf25xx2S6X/YHr/FQLIfkV
+         tVHvwNdYx5ldnSlPjbsZadzgC20qW3q/ZWD0AHyNbaG3fhvFTq+lcDBTnoIEinGj3Rmy
+         bss/dIFt7jPdC5XnZhi61nQ+yhRVoIXJ31BCP6LUl27gif8w7lhOltZY55FrTVS/DbaX
+         2tJw==
+X-Forwarded-Encrypted: i=1; AFNElJ+LOfTU3K0cPtZSr/wDj0nrTLEJTb74dYlsw3wtJvJxb9rlUcuW1OPugA1GbQYeB9xiiMjKVoU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvaPpnPswhzcotxAiQjUGK8YjZIs7YEq/21owMYBXAaZ+s4szw
+	QuwlSNPdootEe3Uldt4JFa+ilGU+eLXPA/hA0/iZGoaMQPscl3FuRFQNc+iv+xCJW1HR8qm1EG/
+	F00mhazOUY/a/oA==
+X-Received: from qknrq10.prod.google.com ([2002:a05:620a:674a:b0:8eb:edf:f268])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:2687:b0:8eb:d38d:201e with SMTP id af79cd13be357-8ebd38d25bemr1999915885a.4.1776939807833;
- Thu, 23 Apr 2026 03:23:27 -0700 (PDT)
-Date: Thu, 23 Apr 2026 10:23:20 +0000
+ 2002:a05:620a:47c8:b0:8eb:41de:fb43 with SMTP id af79cd13be357-8eb41defe38mr1870711385a.10.1776939809455;
+ Thu, 23 Apr 2026 03:23:29 -0700 (PDT)
+Date: Thu, 23 Apr 2026 10:23:21 +0000
 In-Reply-To: <20260423102324.3172448-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -78,9 +78,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260423102324.3172448-1-edumazet@google.com>
 X-Mailer: git-send-email 2.54.0.rc2.544.gc7ae2d5bb8-goog
-Message-ID: <20260423102324.3172448-2-edumazet@google.com>
-Subject: [PATCH net 1/5] net/sched: sch_cake: annotate data-races in
- cake_dump_stats() (I)
+Message-ID: <20260423102324.3172448-3-edumazet@google.com>
+Subject: [PATCH net 2/5] net/sched: sch_cake: annotate data-races in
+ cake_dump_stats() (II)
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -96,7 +96,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -106,7 +106,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280697-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280698-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -116,22 +116,21 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,toke.dk:email]
-X-Rspamd-Queue-Id: EF45A450C38
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[toke.dk:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5D434450C8C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 cake_dump_stats() runs without qdisc spinlock being held.
 
-In this first patch, I add READ_ONCE()/WRITE_ONCE() annotations
+In this second patch, I add READ_ONCE()/WRITE_ONCE() annotations
 for the following fields:
 
-- way_hits
-- way_misses
-- way_collisions
-- sparse_flow_count
-- decaying_flow_count
+- bulk_flow_count
+- unresponsive_flow_count
+- max_skblen
+- flow_quantum
 
 Other annotations are added in following patches, to ease code review.
 
@@ -140,136 +139,132 @@ disc")
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 Cc: "Toke H=C3=B8iland-J=C3=B8rgensen" <toke@toke.dk>
 ---
- net/sched/sch_cake.c | 42 +++++++++++++++++++++---------------------
- 1 file changed, 21 insertions(+), 21 deletions(-)
+ net/sched/sch_cake.c | 34 +++++++++++++++++++---------------
+ 1 file changed, 19 insertions(+), 15 deletions(-)
 
 diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
-index 02e1fa4577ae6089646e79b901b0d21945891855..bcc601fc486b13ab1609134f1ee=
-29ebdcb9e8a06 100644
+index bcc601fc486b13ab1609134f1ee29ebdcb9e8a06..d7465ee4c5507467effd5aaaf8c=
+fd05bcafde2cf 100644
 --- a/net/sched/sch_cake.c
 +++ b/net/sched/sch_cake.c
-@@ -813,7 +813,7 @@ static u32 cake_hash(struct cake_tin_data *q, const str=
-uct sk_buff *skb,
- 		     i++, k =3D (k + 1) % CAKE_SET_WAYS) {
- 			if (q->tags[outer_hash + k] =3D=3D flow_hash) {
- 				if (i)
--					q->way_hits++;
-+					WRITE_ONCE(q->way_hits, q->way_hits + 1);
+@@ -1590,7 +1590,8 @@ static unsigned int cake_drop(struct Qdisc *sch, stru=
+ct sk_buff **to_free)
+ 	}
 =20
- 				if (!q->flows[outer_hash + k].set) {
- 					/* need to increment host refcnts */
-@@ -831,7 +831,7 @@ static u32 cake_hash(struct cake_tin_data *q, const str=
-uct sk_buff *skb,
- 		for (i =3D 0; i < CAKE_SET_WAYS;
- 			 i++, k =3D (k + 1) % CAKE_SET_WAYS) {
- 			if (!q->flows[outer_hash + k].set) {
--				q->way_misses++;
-+				WRITE_ONCE(q->way_misses, q->way_misses + 1);
- 				allocate_src =3D cake_dsrc(flow_mode);
- 				allocate_dst =3D cake_ddst(flow_mode);
- 				goto found;
-@@ -841,7 +841,7 @@ static u32 cake_hash(struct cake_tin_data *q, const str=
-uct sk_buff *skb,
- 		/* With no empty queues, default to the original
- 		 * queue, accept the collision, update the host tags.
- 		 */
--		q->way_collisions++;
-+		WRITE_ONCE(q->way_collisions, q->way_collisions + 1);
- 		allocate_src =3D cake_dsrc(flow_mode);
- 		allocate_dst =3D cake_ddst(flow_mode);
+ 	if (cobalt_queue_full(&flow->cvars, &b->cparams, now))
+-		b->unresponsive_flow_count++;
++		WRITE_ONCE(b->unresponsive_flow_count,
++			   b->unresponsive_flow_count + 1);
 =20
-@@ -1917,11 +1917,11 @@ static s32 cake_enqueue(struct sk_buff *skb, struct=
- Qdisc *sch,
- 		if (!flow->set) {
- 			list_add_tail(&flow->flowchain, &b->new_flows);
- 		} else {
--			b->decaying_flow_count--;
-+			WRITE_ONCE(b->decaying_flow_count, b->decaying_flow_count - 1);
- 			list_move_tail(&flow->flowchain, &b->new_flows);
- 		}
- 		flow->set =3D CAKE_SET_SPARSE;
--		b->sparse_flow_count++;
-+		WRITE_ONCE(b->sparse_flow_count, b->sparse_flow_count + 1);
-=20
- 		flow->deficit =3D cake_get_flow_quantum(b, flow, q->config->flow_mode);
- 	} else if (flow->set =3D=3D CAKE_SET_SPARSE_WAIT) {
-@@ -1929,7 +1929,7 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Q=
+ 	len =3D qdisc_pkt_len(skb);
+ 	q->buffer_used      -=3D skb->truesize;
+@@ -1795,7 +1796,7 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Q=
 disc *sch,
- 		 * in the bulk rotation.
+ 	}
+=20
+ 	if (unlikely(len > b->max_skblen))
+-		b->max_skblen =3D len;
++		WRITE_ONCE(b->max_skblen, len);
+=20
+ 	if (qdisc_pkt_segs(skb) > 1 && q->config->rate_flags & CAKE_FLAG_SPLIT_GS=
+O) {
+ 		struct sk_buff *segs, *nskb;
+@@ -1930,7 +1931,7 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Q=
+disc *sch,
  		 */
  		flow->set =3D CAKE_SET_BULK;
--		b->sparse_flow_count--;
-+		WRITE_ONCE(b->sparse_flow_count, b->sparse_flow_count - 1);
- 		b->bulk_flow_count++;
+ 		WRITE_ONCE(b->sparse_flow_count, b->sparse_flow_count - 1);
+-		b->bulk_flow_count++;
++		WRITE_ONCE(b->bulk_flow_count, b->bulk_flow_count + 1);
 =20
  		cake_inc_srchost_bulk_flow_count(b, flow, q->config->flow_mode);
-@@ -2149,7 +2149,7 @@ static struct sk_buff *cake_dequeue(struct Qdisc *sch=
+ 		cake_inc_dsthost_bulk_flow_count(b, flow, q->config->flow_mode);
+@@ -2150,7 +2151,7 @@ static struct sk_buff *cake_dequeue(struct Qdisc *sch=
 )
- 		 */
  		if (flow->set =3D=3D CAKE_SET_SPARSE) {
  			if (flow->head) {
--				b->sparse_flow_count--;
-+				WRITE_ONCE(b->sparse_flow_count, b->sparse_flow_count - 1);
- 				b->bulk_flow_count++;
+ 				WRITE_ONCE(b->sparse_flow_count, b->sparse_flow_count - 1);
+-				b->bulk_flow_count++;
++				WRITE_ONCE(b->bulk_flow_count, b->bulk_flow_count + 1);
 =20
  				cake_inc_srchost_bulk_flow_count(b, flow, q->config->flow_mode);
-@@ -2192,27 +2192,27 @@ static struct sk_buff *cake_dequeue(struct Qdisc *s=
-ch)
- 					cake_dec_srchost_bulk_flow_count(b, flow, q->config->flow_mode);
- 					cake_dec_dsthost_bulk_flow_count(b, flow, q->config->flow_mode);
+ 				cake_inc_dsthost_bulk_flow_count(b, flow, q->config->flow_mode);
+@@ -2177,7 +2178,8 @@ static struct sk_buff *cake_dequeue(struct Qdisc *sch=
+)
+ 		if (!skb) {
+ 			/* this queue was actually empty */
+ 			if (cobalt_queue_empty(&flow->cvars, &b->cparams, now))
+-				b->unresponsive_flow_count--;
++				WRITE_ONCE(b->unresponsive_flow_count,
++					   b->unresponsive_flow_count - 1);
 =20
--					b->decaying_flow_count++;
-+					WRITE_ONCE(b->decaying_flow_count, b->decaying_flow_count + 1);
- 				} else if (flow->set =3D=3D CAKE_SET_SPARSE ||
- 					   flow->set =3D=3D CAKE_SET_SPARSE_WAIT) {
--					b->sparse_flow_count--;
--					b->decaying_flow_count++;
-+					WRITE_ONCE(b->sparse_flow_count, b->sparse_flow_count - 1);
-+					WRITE_ONCE(b->decaying_flow_count, b->decaying_flow_count + 1);
- 				}
- 				flow->set =3D CAKE_SET_DECAYING;
- 			} else {
- 				/* remove empty queue from the flowchain */
- 				list_del_init(&flow->flowchain);
- 				if (flow->set =3D=3D CAKE_SET_SPARSE ||
--				    flow->set =3D=3D CAKE_SET_SPARSE_WAIT)
--					b->sparse_flow_count--;
--				else if (flow->set =3D=3D CAKE_SET_BULK) {
-+				    flow->set =3D=3D CAKE_SET_SPARSE_WAIT) {
-+					WRITE_ONCE(b->sparse_flow_count, b->sparse_flow_count - 1);
-+				} else if (flow->set =3D=3D CAKE_SET_BULK) {
- 					b->bulk_flow_count--;
+ 			if (flow->cvars.p_drop || flow->cvars.count ||
+ 			    ktime_before(now, flow->cvars.drop_next)) {
+@@ -2187,7 +2189,7 @@ static struct sk_buff *cake_dequeue(struct Qdisc *sch=
+)
+ 				list_move_tail(&flow->flowchain,
+ 					       &b->decaying_flows);
+ 				if (flow->set =3D=3D CAKE_SET_BULK) {
+-					b->bulk_flow_count--;
++					WRITE_ONCE(b->bulk_flow_count, b->bulk_flow_count - 1);
 =20
  					cake_dec_srchost_bulk_flow_count(b, flow, q->config->flow_mode);
  					cake_dec_dsthost_bulk_flow_count(b, flow, q->config->flow_mode);
--				} else
--					b->decaying_flow_count--;
+@@ -2206,7 +2208,7 @@ static struct sk_buff *cake_dequeue(struct Qdisc *sch=
+)
+ 				    flow->set =3D=3D CAKE_SET_SPARSE_WAIT) {
+ 					WRITE_ONCE(b->sparse_flow_count, b->sparse_flow_count - 1);
+ 				} else if (flow->set =3D=3D CAKE_SET_BULK) {
+-					b->bulk_flow_count--;
++					WRITE_ONCE(b->bulk_flow_count, b->bulk_flow_count - 1);
+=20
+ 					cake_dec_srchost_bulk_flow_count(b, flow, q->config->flow_mode);
+ 					cake_dec_dsthost_bulk_flow_count(b, flow, q->config->flow_mode);
+@@ -2329,9 +2331,9 @@ static void cake_set_rate(struct cake_tin_data *b, u6=
+4 rate, u32 mtu,
+ 	u8  rate_shft =3D 0;
+ 	u64 rate_ns =3D 0;
+=20
+-	b->flow_quantum =3D 1514;
+ 	if (rate) {
+-		b->flow_quantum =3D max(min(rate >> 12, 1514ULL), 300ULL);
++		WRITE_ONCE(b->flow_quantum,
++			   max(min(rate >> 12, 1514ULL), 300ULL));
+ 		rate_shft =3D 34;
+ 		rate_ns =3D ((u64)NSEC_PER_SEC) << rate_shft;
+ 		rate_ns =3D div64_u64(rate_ns, max(MIN_RATE, rate));
+@@ -2339,8 +2341,10 @@ static void cake_set_rate(struct cake_tin_data *b, u=
+64 rate, u32 mtu,
+ 			rate_ns >>=3D 1;
+ 			rate_shft--;
+ 		}
+-	} /* else unlimited, ie. zero delay */
 -
-+				} else {
-+					WRITE_ONCE(b->decaying_flow_count, b->decaying_flow_count - 1);
-+				}
- 				flow->set =3D CAKE_SET_NONE;
- 			}
- 			goto begin;
-@@ -3050,12 +3050,12 @@ static int cake_dump_stats(struct Qdisc *sch, struc=
++	} else {
++		/* else unlimited, ie. zero delay */
++		WRITE_ONCE(b->flow_quantum, 1514);
++	}
+ 	b->tin_rate_bps  =3D rate;
+ 	b->tin_rate_ns   =3D rate_ns;
+ 	b->tin_rate_shft =3D rate_shft;
+@@ -3056,11 +3060,11 @@ static int cake_dump_stats(struct Qdisc *sch, struc=
 t gnet_dump *d)
- 		PUT_TSTAT_U32(BASE_DELAY_US,
- 			      ktime_to_us(ns_to_ktime(b->base_delay)));
 =20
--		PUT_TSTAT_U32(WAY_INDIRECT_HITS, b->way_hits);
--		PUT_TSTAT_U32(WAY_MISSES, b->way_misses);
--		PUT_TSTAT_U32(WAY_COLLISIONS, b->way_collisions);
-+		PUT_TSTAT_U32(WAY_INDIRECT_HITS, READ_ONCE(b->way_hits));
-+		PUT_TSTAT_U32(WAY_MISSES, READ_ONCE(b->way_misses));
-+		PUT_TSTAT_U32(WAY_COLLISIONS, READ_ONCE(b->way_collisions));
+ 		PUT_TSTAT_U32(SPARSE_FLOWS, READ_ONCE(b->sparse_flow_count) +
+ 					    READ_ONCE(b->decaying_flow_count));
+-		PUT_TSTAT_U32(BULK_FLOWS, b->bulk_flow_count);
+-		PUT_TSTAT_U32(UNRESPONSIVE_FLOWS, b->unresponsive_flow_count);
+-		PUT_TSTAT_U32(MAX_SKBLEN, b->max_skblen);
++		PUT_TSTAT_U32(BULK_FLOWS, READ_ONCE(b->bulk_flow_count));
++		PUT_TSTAT_U32(UNRESPONSIVE_FLOWS, READ_ONCE(b->unresponsive_flow_count))=
+;
++		PUT_TSTAT_U32(MAX_SKBLEN, READ_ONCE(b->max_skblen));
 =20
--		PUT_TSTAT_U32(SPARSE_FLOWS, b->sparse_flow_count +
--					    b->decaying_flow_count);
-+		PUT_TSTAT_U32(SPARSE_FLOWS, READ_ONCE(b->sparse_flow_count) +
-+					    READ_ONCE(b->decaying_flow_count));
- 		PUT_TSTAT_U32(BULK_FLOWS, b->bulk_flow_count);
- 		PUT_TSTAT_U32(UNRESPONSIVE_FLOWS, b->unresponsive_flow_count);
- 		PUT_TSTAT_U32(MAX_SKBLEN, b->max_skblen);
+-		PUT_TSTAT_U32(FLOW_QUANTUM, b->flow_quantum);
++		PUT_TSTAT_U32(FLOW_QUANTUM, READ_ONCE(b->flow_quantum));
+ 		nla_nest_end(d->skb, ts);
+ 	}
+=20
 --=20
 2.54.0.rc2.544.gc7ae2d5bb8-goog
 
