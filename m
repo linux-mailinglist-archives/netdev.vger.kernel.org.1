@@ -1,231 +1,162 @@
-Return-Path: <netdev+bounces-280667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280668-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CPXnEEPd6WmNlwIAu9opvQ
-	(envelope-from <netdev+bounces-280667-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 10:50:11 +0200
+	id SN3sKdfd6WmNlwIAu9opvQ
+	(envelope-from <netdev+bounces-280668-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 10:52:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D780444EC60
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 10:50:10 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBC3B44ECEF
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 10:52:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4A95E3006830
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 08:50:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 82C4930072A0
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 08:52:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CBAE364055;
-	Thu, 23 Apr 2026 08:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A061D3DEAC4;
+	Thu, 23 Apr 2026 08:52:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bGghTNlN";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ELm0MwvQ"
+	dkim=pass (1024-bit key) header.d=0x0f.com header.i=@0x0f.com header.b="pUZJ8S8/"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65D9285CA4
-	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 08:50:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776934209; cv=none; b=mNx3lWvh2WQPluOWdM0+FX06Dg4pZFZzhCUgmsjWQoSltdXcqdDmGL7RpSeI9MVyDNPMd2w8vrGRhCHpeFsmywW+WL59mSji/6piDpgKNYnw9PoCwpUWfv8fTGN2NsdCW8cHRZ5r/SK+Fewajnf6/jlY/hc7qtSfufCZYH5AKT8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776934209; c=relaxed/simple;
-	bh=2I33bLf3FEDj4HSeZsAcuVTcrQtXGindYCJsMLcyM0g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KAMM68T0gyrhICmSX42wVvXRj/3daBddeb4igaIT19WA3d7+dLnO4wjdr7T8PLQjYzG/bqQL8fV3iWjEr4PlMVeDUYeoHtnuGpAwVBHNuTH7fRn6klWZyjf2TylQQZr7A6oVBNp4xoPmTowwfo7j66x24j0IoDgehQ8syzeOjLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bGghTNlN; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ELm0MwvQ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776934206;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CPNjniPurFuKC+UJn7cdcULljo3LgHo4hck8QqufRls=;
-	b=bGghTNlNof9jWcO/0tJSbiaQ+QKCRg5Ae0tWq1cMyfyYHeFQ/EWsQHvim11uj1SwwCFClC
-	lUZVl4lJ00YjCmbRi+ophJukDHFxIv2hlyD90zNn0GTbW1PHI7dhnCKibfXNP/uDkJm7Pc
-	MIGfE+57+m8fpLDVe1Jabo6icDa0fhk=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-470-E5a-Bi5pOySUsY9PDzsAWA-1; Thu, 23 Apr 2026 04:50:05 -0400
-X-MC-Unique: E5a-Bi5pOySUsY9PDzsAWA-1
-X-Mimecast-MFC-AGG-ID: E5a-Bi5pOySUsY9PDzsAWA_1776934204
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-488be33b7a6so45584215e9.0
-        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 01:50:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E116B3DEAFD
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 08:52:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776934350; cv=pass; b=WiR1XlEfyIT4wwQ5o4H7dU+tVcC0lhR9C4atdIBDIKwSZs8Xiu2ZBMwF0loXyhNDFymsFn96Nh8RlYNiFQGC2s/dKxPQPVe9EEmFmy11t4b36ZBP22SgPf0QZkqLnn1zFqnMaqzupHxpxTTh2Gr6fLzevEL8bg10GJFDuDCuShw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776934350; c=relaxed/simple;
+	bh=QjsImxEKuQXmmT3bV+BkuZLjlWzEvsEVFzbyIuMQhG4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hTe2+I7HpH31rntqYX3MP9U7eMmK5Jn6JMmVd4vNM6IEkBySr90MuOVWojZfsRDiHLVD7Tzs2krRoswgGfrGJYhSoDUBun/91miDPMSEfYhmlScClj1uO7LQBzsPJAqvaN36An/up/YkW9/JVkXFUuFPLgpUtr2gwdAA7GxoZJ0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x0f.com; spf=pass smtp.mailfrom=0x0f.com; dkim=pass (1024-bit key) header.d=0x0f.com header.i=@0x0f.com header.b=pUZJ8S8/; arc=pass smtp.client-ip=74.125.82.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x0f.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0x0f.com
+Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-12db63c6df4so3316115c88.1
+        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 01:52:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776934347; cv=none;
+        d=google.com; s=arc-20240605;
+        b=LJsqvBO/9q9jLKZpESdkPMd2vINwxVZic1DQEuLZOgTAMNVpeX98T8ZfnJpnLzM+J+
+         QDR5K1UpwOTZPecbryX9IhoE2fDw+t0yqr1ydByU0MmmX9UEhHFmIoyd4QY7ji2+CC2N
+         whB/WlJSDt3U1RA2u2AqgD97TnfFaSKdOI/oO5NLSNoCTZFDA9bVoyGDLZBiAYMY0Ncf
+         hzV0bISwpAL43OPF5+cMdsuiqQqZrRXrU2OV/uIzdQRMJNfstyF5lT0GBI1ryMARlpcx
+         aLPSbz3pBIdJm3lM0hEHXZtE1GGJP8iujr6d8EYTbkFo+sKvF8Up6uoV/gS95lOb+7O+
+         wTpA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=QjsImxEKuQXmmT3bV+BkuZLjlWzEvsEVFzbyIuMQhG4=;
+        fh=ey4cE89rXVwc/JOIwvE5JuX1wWkmvlo75w1HIMlh3NQ=;
+        b=OxAURWjn+BGEqLoWD8slHb8ukoboKA645B1gEI2+po9oc0+lxWhDguGeKeMmgqW+wm
+         Q7ynig0g5gQ+yHViFpubmZVqWbFQdSZ+uQZccorZRcxyRcUAUxBm/uDauNzwZ0wUkOGq
+         zGd/oVgdM4qP7Za9oYPnHtmm8exHoWBzhfQ9gEsli3vYU0Ng9jYyqLbiF4Pb1mztnflt
+         Yg4Q/9qelCEtdZIIS6ARVIR5aSRO8pWD6T4uEO2DIDpN4WQ7VxwdYFLpNoyo/86gMSoO
+         cGtw1ybBLERUQ+7gTdz5XMXEfnmzZ1HNzfmxKUiGbMYtEZKJkXzW4j8E+8UwbyyN78b7
+         3v7g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1776934204; x=1777539004; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CPNjniPurFuKC+UJn7cdcULljo3LgHo4hck8QqufRls=;
-        b=ELm0MwvQ0i8F0eKIG5e35svBJxhoe3NnAYIjajTctoveo8i/WFFKQY5OJvakCSS1Ft
-         Iu0ewdB7jrJm2Gb7Nf14QCja0j9x9zZmTEBa3Q33/JNW6QdCQHfmWjyZCzgvFN4pOR46
-         3wrTRX1rOekXj8KdNLhC2w1b8pXfXY5ooz6pFPp3qrYnoS0p029fxwpnu/fHkdh3iCVE
-         Td5iKr4XWqDlHy9HrPecwIW20YFIk0RrlVm7WYFIWjsVQY+DRb5W9p+hXMra/v4kZx7Y
-         Odhj0ZXCG1xWNH/EIFbgPm7sfgX/XmeAWY9nRbCmLN046N7PpXMYo0QDSkXULLG4bcoL
-         TtDg==
+        d=0x0f.com; s=google; t=1776934347; x=1777539147; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=QjsImxEKuQXmmT3bV+BkuZLjlWzEvsEVFzbyIuMQhG4=;
+        b=pUZJ8S8/ORkDJdutzA/cA5/yLYsm85LJdgN9hFU1NQCc5SJUIlAXiQnVE8uF778b36
+         vcKGpdflRYQ78Bx1gY/J9F1WwKkMfiZNVsoF57Rn3yYSLEqp//ipqahbUhaUn43kl9dy
+         AoKvPP7SYLy2t77vg9zVRcY0+sattdoMkyWm0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776934204; x=1777539004;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CPNjniPurFuKC+UJn7cdcULljo3LgHo4hck8QqufRls=;
-        b=OoeREkTiQrNlfoFVIoJZf/vg6CjAfWebuVJipl3BNW5Yf37c9FcoKIj770t+oKfaYt
-         MOEetQcjZ6drK7fK681Q4QFTAlAlxi0EFBhiFef3YIvm3bqynuGB3oKjZ1AuU8Ganqdm
-         S5EEOImnAIh00Ab4botWCyfgF47+hI+dhfDf+zhBgthHoEPVYMTFcJwq/2Wig8OTqNba
-         YKVjLFUiFrQ4UtMQDHYvJEnDSkLCXCFVheOs8D8b9RVf6bIiH6G76wwNbtX4/bmgcAOk
-         4TESmKb82gMY0Zh2aKG2zJufvEIL/roi4FcCqh4dkxz/9AOyOM6A/lWbGRAYqI6RdxqS
-         EUyQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9POrI8yksUKv0P8hgrBw6qmMtTffRmT2XcegpMwTwfAb3WWQf/jsSrtIKi53lOSOxuHOrk7qQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxt5YxA/R8NceVvpoEAxRMJHjTa0AEDlIzZ6T0cYxWrQSU+mGlM
-	IiRae2BeAJe4dzBbXpk7oGR4i2EysP7sWolv0NjYKcxOS/02+g14yh5Z325mktnqRF9sDOCb6TR
-	x/AE91if0hCOoBaEBsaarT/x5M27VBBKV/V8scUvdCCZnlJ0VT2U1M5ZKiA==
-X-Gm-Gg: AeBDies2ccX077Hc90o7SYYaaoCVE0OuPF2QjQ5tRuN8leuJDfpld464aoy9toFwRkG
-	u7jWmnrFZb8fBLjmHgbLWvmpShXt5DFcOmMnz6qaZcz2FbfrzbuU8Rf0GhFejEmKROiIIHUr0+W
-	mkIaYnB4LViagsYcOSqlwv4yug2LUsnLSXFOeR0X7qKhUWp1YYMbjxi13i4FTJq7HBjYBleXJ8W
-	dnpVG7ZJ9E2y8RyolzZyTblRzDgcZgBPiawWSsgIEYH5ehVl/gw4wNSsAUZhS0+3y/0TnVwrZuf
-	rNtUAfRdTCJfzy13AGqSnww+QT0WPPnAzt+hbKUzd6eoqHpidK0zeL+gYJf3hk6elufzOTtQzd4
-	sXkaSq6K+H1tFx/HrRT40LYiJR2GEA/eUaYyeCA==
-X-Received: by 2002:a05:600c:c4a2:b0:488:c078:bfda with SMTP id 5b1f17b1804b1-488fb78eebdmr358546195e9.26.1776934203725;
-        Thu, 23 Apr 2026 01:50:03 -0700 (PDT)
-X-Received: by 2002:a05:600c:c4a2:b0:488:c078:bfda with SMTP id 5b1f17b1804b1-488fb78eebdmr358545615e9.26.1776934203241;
-        Thu, 23 Apr 2026 01:50:03 -0700 (PDT)
-Received: from leonardi-redhat ([176.206.19.176])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fb7aa593sm159041235e9.24.2026.04.23.01.50.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Apr 2026 01:50:01 -0700 (PDT)
-Date: Thu, 23 Apr 2026 10:49:59 +0200
-From: Luigi Leonardi <leonardi@redhat.com>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, stefanha@redhat.com, 
-	netdev@vger.kernel.org, Mathieu Schroeter <mathieu@schroetersa.ch>, 
-	David Ahern <dsahern@kernel.org>
-Subject: Re: [PATCH iproute2] ss: fix vsock port filter
-Message-ID: <aenV8MVMhsXv4U5O@leonardi-redhat>
-References: <20260421-fix_vsock-v1-1-812c80a76c1a@redhat.com>
- <20260421163757.31da8751@phoenix.local>
- <CAGxU2F4C4JbqBEWehBhhOehGaXZJOWLkQ09hjaaSAh8-J5W50w@mail.gmail.com>
- <20260422092100.46744a32@phoenix.local>
+        d=1e100.net; s=20251104; t=1776934347; x=1777539147;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QjsImxEKuQXmmT3bV+BkuZLjlWzEvsEVFzbyIuMQhG4=;
+        b=X/bt6uS4ZxB7Me6i/jgBCrwRS+Mk/SaYNZhoUneB5yX/f/xmbQgHu1D8fm/fFBjoRj
+         LkNHfM+BCTFn6GT+/AA1eOpcOFZ/vqgMDC4d7BD1uXePe3diZ2DuiapfkqH6g8IT8Ytp
+         0fx82kZ9cEfOFYcpjRGJ14efMlo0EMv3krBXB7I92mNSImjguelmlDN0+B9Z4ouXuAhz
+         kCUjNM9qutxAmG0ruJM6ot8OmkzGrm2z8BLVRUfpE5pzWlgZhtFKQ4bL8ChD3v2UgU//
+         pUnrFv8P7o6JtPe3zvC+9xzaL5Qtilr+0mIsAQ4UlClMvAxCxMMoubvZKtW/Yikp8YZ9
+         sExQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8mmvw/ZLD02h3njDLJyHBfds3ZvMDLzCHOZKXUHyGeZazJqp1bSCMTz6hiWSATWpNuqXcAi24=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx69oAYVarf54kc4da1Dt50IGc+ZQuDLxVvOKXuxJHocGkb2u+m
+	4P1/cIEAM4c0oYnjoT4WxK74GSttTIGlG1bT4cJM2GbqPSNAbpVTt8U4ojUbv+807vRnspi4pfK
+	M753O+X8D5XvKRfA8iGwzhDkrGksYOuNAA3QNaWrPXw==
+X-Gm-Gg: AeBDietq32PJD1sH3MkA7g5cOdbOn/viAEGUyJtxyeCW8R+u2YUFmUW1t37MZpRlje8
+	NluElo0KeLa/hWxiq/ILwZV4jUZUJwaSmUwikLjrfMVy2pfppJjHrHZ+fXKXFCwMOycbeMh2WJX
+	DkEznCccRH/YKFVompNgDom61Fw4fBS41+MZlvT+bB+8OnqVDW2gJbcnEzkhkofz9o/o9vTeXX0
+	N/MbyqU4RSk9Dt1cgBdydNGRdIu8xcgG0F8/7z0g5IYI74GT6i1pz9y9YcEnBZiYRwlHKSonmck
+	DUgNZnkY9Ccv13rVZw==
+X-Received: by 2002:a05:7022:383:b0:128:d4db:447a with SMTP id
+ a92af1059eb24-12c73fa73e6mr14286081c88.29.1776934346915; Thu, 23 Apr 2026
+ 01:52:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260422092100.46744a32@phoenix.local>
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+References: <20260422-v7-0-0-net-next-driver-removal-v1-v2-0-08a5b59784d5@lunn.ch>
+ <20260422-v7-0-0-net-next-driver-removal-v1-v2-10-08a5b59784d5@lunn.ch>
+ <CAMuHMdV-vF6sTvAi8kKzxGwZ9YUSBO1Qta5PDCRbA0zr-LEp_w@mail.gmail.com> <c0c80113af470b265650405fa24deefe2d82ea24.camel@physik.fu-berlin.de>
+In-Reply-To: <c0c80113af470b265650405fa24deefe2d82ea24.camel@physik.fu-berlin.de>
+From: Daniel Palmer <daniel@0x0f.com>
+Date: Thu, 23 Apr 2026 17:52:15 +0900
+X-Gm-Features: AQROBzCE5_am-yGAVd6HVGlMuKn48vLDnCtCy6OhnZNL7yJIJYBvslDU1PnlxZI
+Message-ID: <CAFr9PXnECog56b+Jq9TBohhQ4oBB3hGV1pHj6OstOSLqkOpcTQ@mail.gmail.com>
+Subject: Re: [PATCH net v2 10/15] drivers: net: cirrus: mac89x0: Remove this driver
+To: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <skhan@linuxfoundation.org>, Michael Fritscher <michael@fritscher.net>, 
+	Byron Stanoszek <gandalf@winds.org>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-m68k <linux-m68k@lists.linux-m68k.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[0x0f.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280667-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[0x0f.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leonardi@redhat.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-280668-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@0x0f.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[0x0f.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,networkplumber.org:email]
-X-Rspamd-Queue-Id: D780444EC60
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,fu-berlin.de:email,mail.gmail.com:mid,0x0f.com:dkim]
+X-Rspamd-Queue-Id: BBC3B44ECEF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 22, 2026 at 09:21:00AM -0700, Stephen Hemminger wrote:
->On Wed, 22 Apr 2026 10:03:49 +0200
->Stefano Garzarella <sgarzare@redhat.com> wrote:
->
->> On Wed, 22 Apr 2026 at 01:38, Stephen Hemminger <stephen@networkplumber.org> wrote:
->> >
->> > On Tue, 21 Apr 2026 14:35:12 +0200
->> > Luigi Leonardi <leonardi@redhat.com> wrote:
->> >
->> > > parse_hostcond() uses get_u32() to parse the vsock port into the
->> > > aafilter.port field, which is a long. On 64-bit systems, get_u32()
->> > > only writes the lower 32 bits, leaving the upper 32 bits set from
->> > > the -1 initialization. This causes the port comparison
->> > > "a->port != s->rport" in run_ssfilter() to always fail, since the
->> > > corrupted long value never matches the int rport.
->> > >
->> > > Fix by using get_long() instead, consistent with how AF_PACKET and
->> > > AF_NETLINK handle the same field.
->> > >
->> > > Fixes: c759116a0b2b ("ss: add AF_VSOCK support")
->> > > Signed-off-by: Luigi Leonardi <leonardi@redhat.com>
->> > > ---
->> > >  misc/ss.c | 2 +-
->> > >  1 file changed, 1 insertion(+), 1 deletion(-)
->> > >
->> > > diff --git a/misc/ss.c b/misc/ss.c
->> > > index 14e9f27a..6e3321ac 100644
->> > > --- a/misc/ss.c
->> > > +++ b/misc/ss.c
->> > > @@ -2323,7 +2323,7 @@ void *parse_hostcond(char *addr, bool is_port)
->> > >               port = find_port(addr, is_port);
->> > >
->> > >               if (port && strcmp(port, "*") &&
->> > > -                 get_u32((__u32 *)&a.port, port, 0))
->> > > +                 get_long(&a.port, port, 0))
->> > >                       return NULL;
->> >
->> > If you use get_long() then the code could get negative values.
->> > Actually have port in ss as signed value seems like a mistake in original design.
->> >
->> > The port in unix domain socket is inode number.
->> > Originally it was int, but got changed to long back in 6.6
->> >
->> > The port in ss cache is int.
->>
->> Yeah, as I mentioned I think the issue was introduced by commit
->> 012cb515 ("ss: change aafilter port from int to long (inode support)").
->
->What about this which avoids the cast but keeps the same semantics.
->
->diff --git a/misc/ss.c b/misc/ss.c
->index 14e9f27a..e830e146 100644
->--- a/misc/ss.c
->+++ b/misc/ss.c
->@@ -2317,14 +2317,16 @@ void *parse_hostcond(char *addr, bool is_port)
->
-> 	if (fam == AF_VSOCK) {
-> 		__u32 cid = ~(__u32)0;
->+		__u32 vport = 0;
->
-> 		a.addr.family = AF_VSOCK;
->
-> 		port = find_port(addr, is_port);
->-
->-		if (port && strcmp(port, "*") &&
->-		    get_u32((__u32 *)&a.port, port, 0))
->-			return NULL;
->+		if (port && strcmp(port, "*")) {
->+			if (get_u32(&vport, port, 0))
->+				return NULL;
->+		}
->+		a.port = vport;
->
-> 		if (!is_port && addr[0] && strcmp(addr, "*")) {
-> 			a.addr.bitlen = 32;
->
->
+Hi Adrian,
 
-With high enough ports it's not working, I expect to be a problem with
-the sign. I'll try updating `struct sockstat` as Stefano suggested.
+On Thu, 23 Apr 2026 at 16:10, John Paul Adrian Glaubitz
+<glaubitz@physik.fu-berlin.de> wrote:
+> > Macs do run modern kernels.
+>
+> Retrocomputing still is not well regarded by some maintainers, it seems :-(.
 
-Luigi
+I've found bugs in drivers by plugging those things into exotic
+hardware like my Amiga 4000 and Ultra5 [0].
+So, it's not totally pointless. And having a shader capable Amiga[1]
+is pretty cool.
+Sad to see fun stuff getting pushed out by basically spam bots. :(
 
+0 - https://lists.freedesktop.org/archives/amd-gfx/2025-October/132283.html
+1 - https://gist.github.com/fifteenhex/0e5ce8c1614bcec20ed242045c11d1d9
 
