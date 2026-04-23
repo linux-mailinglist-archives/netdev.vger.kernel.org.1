@@ -1,283 +1,142 @@
-Return-Path: <netdev+bounces-280703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280704-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UMgBGF316WnkpwIAu9opvQ
-	(envelope-from <netdev+bounces-280703-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 12:33:01 +0200
+	id 6OJxIo/16WnkpwIAu9opvQ
+	(envelope-from <netdev+bounces-280704-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 12:33:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E64E450C1A
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 12:32:59 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2D4F450C42
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 12:33:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4CA7E3025488
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 10:32:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9AEEE301E995
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 10:33:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C78583C552C;
-	Thu, 23 Apr 2026 10:32:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19042386444;
+	Thu, 23 Apr 2026 10:33:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eNCP7jh/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MqXAP9E9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22AFA37BE71
-	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 10:32:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C2E37D127
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 10:33:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776940372; cv=none; b=NvZUN2ShExf6XhRCFmr+iX2YkY08BOoExFczS8myc32oJxcTSZIndw7nseKZZp5Bg0B+N/jccUWgL70+Jz7wduocGh5AZrviwg6RI4QAUkXhZ+MwRFTsCdrCmWFCUo/49o2zhXDIq5zuZXe9rjSPNzzGEqJBoa2FHhB1/8/F5y8=
+	t=1776940427; cv=none; b=FaK5cWpnaOcLNM3q2OkuT9DdrbnPpZpvXht9XSRV0ONl0AUcbsN9v0thKtsnerKYDR4kl25rHulbeNL7Fm25cWcn3FEPQPjQqHMRLzQLFIn/zAnXm+F1goE6r7BUK31XiyroJm6LYyagfAXoPKmD0LTo8z4tiOHbUuCPkkeMORs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776940372; c=relaxed/simple;
-	bh=8UbIf2uSVqc7izxQmCopqDfeYI4eb4iDEozOw0bmOMY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Rq1vTwGj06FIpEyYgQeSI/k/Bg4l8GME5+rP+pmqGcWy1xTfztObGnnor9K+WObRq32NKyhZdpKeKLbEffUH5ClivluXjM+/3CKSTlQLQUsZga7zmj/eMPRif/Hod4mdAlr1cxjMe3Y66KHqr1ZucAeVVUN6mQ7k3zFvhZYWwYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eNCP7jh/; arc=none smtp.client-ip=209.85.214.181
+	s=arc-20240116; t=1776940427; c=relaxed/simple;
+	bh=JB0AMGcFjkY9bWcUlSMC3gnGNhtYYvNztyoAMc+8nRw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XEyh77lGDug3GQiB1z3rDePF5Kgjj4LecC0QvkKBKAR3O2QvhGd9P7bCF4KUk6YCo5hZw1oip4eIcGCO/AUQaoU4mLRdkijdG4q5aITAnAATfesjqWjadijwZqNQRFwXGcdnM818jySQLweVpoVEjvABn4SHWFImXpHKMM3Ly3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MqXAP9E9; arc=none smtp.client-ip=74.125.82.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2b4650d5f5cso24234795ad.0
-        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 03:32:50 -0700 (PDT)
+Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-2bd9a485bd6so7163593eec.1
+        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 03:33:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776940369; x=1777545169; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=NIBU6hPj55m3UPQo8Z53Iik1F/p/LDB+WPBA/j4Ee7g=;
-        b=eNCP7jh/9GxuMmiGqfDnCAKB0wdPm9YQ30kIDmU5RWKGa7l6RsNnbcXytwrpkz1uUJ
-         R4nm2oEgyzWdHSVi2Ga7jJB/Pxt7ErnchDvGQlkNdHZ1qf+nRXsV27OK2Jomdy8NlyHx
-         u48HBBvPO/EF0S67NbomSjtYrzYInZBHnskwIdNhNe7Af7ENxBncmiwMRQa0cLnp8Bcu
-         CE2+n27U/nL5MKYmY6FsVYCPFwyqJ3sEficqLDDQHmkmWLSa3kRTSvfB+bu67V813IRJ
-         UpoiP4hCkM/2uNXLlUYj/ywi2EzJ4MWvzSL4F899I0IPDKFe7dO+a1293GJN005akzfz
-         xFWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776940369; x=1777545169;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1776940425; x=1777545225; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NIBU6hPj55m3UPQo8Z53Iik1F/p/LDB+WPBA/j4Ee7g=;
-        b=R3nY4dfcNltYuFYZgwUMKw+1x8AqCBcAStXsdZJYd26/s7A4G4klkj58oW96zd/b9+
-         HCmc+X7NvQ0BqEa7+OhsG1CjzxyaRQzSyxogzcTXh8ittOy77VBhvQWYEDVNWRWMyB85
-         p/wNhXCtvNkbPFPNaRDu0oL+jC6fLMLb8b+3MnAybWxLc3UYSAfrfMpxqd9V6tqHHgu3
-         FXlweWqRMjPkcGuQ8OX3wcDib3bRjpmHyjHzyp8QoLnV5NAdKUiJTzPAL5OrOmtOaj8a
-         ZHPIX6HOHb4p8GaPFOQlbGSqUYrGDRmeJ8cV2aVH7cf+y2a0MEN0FVYUsdR7PdVYAUYj
-         AKlg==
-X-Gm-Message-State: AOJu0Yxh8FhDdkOcD2c70rgAkeCr44+GQzX942zFkB8iqsqZ0tOOupt5
-	HIGsMfDY3Ws3XOR4Gb8v629GYun8ev/TqcQyMjJFku6n+il7rPZz5Bww
-X-Gm-Gg: AeBDiesvTo5gmSOrNM8gQ+4DH75mqTqLQxe/ymzBJ+NPHdxlPbmZqoDKubZTA9F33dM
-	Rvylahz0ZjDFItZ3hOZm6DCk/I6iRArj/HF+EHfsoP6vM1FUI9p8xPCowH0U2ru+RsNzI+JsTpB
-	NySGrdTnv+vy9PKO6b9WxDS0YW/SEeAU8tE2Uwet5zKJ+h8t+M0+I/w/sd4VtkthOjN4ZEP+PdI
-	LxXiBxkwgOYJtSmO2/hYpXpUaWHIMrMFUF9UugnDrIcwGcCikML5cDYuurAM1HLUF5S02ITewTb
-	ozmT9iUqJyAMXROsGM9UNomsB8BkMQkOd+HwLKMN4p3dZNfgJBgPbOHMC0yNeNayvwUDzgynkoj
-	7+Sv8G1jLsJPh/9f+0l8QwQ1Qj6DRlUC/sUCgY04//9fhP6flgu5rlNo+kHhWUaRN+v2to3Iu4e
-	hw70BFFxm+FOf2xkQHluDBhFRcM8YRWltOnN7slcokvcqDtgHiGVP2
-X-Received: by 2002:a17:903:1b6f:b0:2b2:4d08:9e02 with SMTP id d9443c01a7336-2b5f9f3c677mr266049425ad.21.1776940369276;
-        Thu, 23 Apr 2026 03:32:49 -0700 (PDT)
+        bh=BU2fB1hG+kBEp+Z15zImyMutLvS0MfhU4gRUy1hVlf8=;
+        b=MqXAP9E9UrPgFhvxzgOc4JwQ7cNbD7jE6DrLI94cVSNqwdKWH2sY5gDibOifdbDF/Y
+         ypVT3PjioZUVlhnW80mO5dmVmfY9uH/XtmwZWFrFS9GG0rkDybNWemzOmzCzFjqLUgGs
+         kyy5EC8bA8M90Wiq92OXP0qK5N6AF2chwE002krvsBVDYdOS2E446ddT21zECyQMNYQe
+         svM5rzEfbVdEjJz4pE+rTSmW16nGwOEcOZDCmEZ1C/iSCfd4PeHbOv00rP/8CwNo8fAU
+         IiuGpI1TezyvZ3VPSMiu6QEu5XSrMKrGKa5QFMu5O7ds9OjkFabG3u7Yk3mgOn2GmMF6
+         5Rug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776940425; x=1777545225;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=BU2fB1hG+kBEp+Z15zImyMutLvS0MfhU4gRUy1hVlf8=;
+        b=HDqURLbcH337+OQdKqAjZfRNA6tNETvk4tfDRid1cBgoaau1ZgET6jYgKJAl3yezGk
+         ssDZ/WXonafmEmg1XZQHQ/IBOo85hN2DVe5FtZkjqW715R1dGxxCNKR/b1pKZMdBaBUQ
+         bRWvvYMjLW6yHSLSCw2BgnjFp/CaZyxH09NLUOtIspW0mfZgFd2PQ2T2sycbmkRV3k2i
+         UdytiDyNJeY/FBTcPirCIOZ2a2GZ5cVJ+oC9TpH2yVcwXneT1sy4Mj3B/lrqG06uhyMK
+         Z4Q49K4Hmpv6Dfotx+vPRaeoyAhoJVXYMQeW7YAk1pdF7TyJy4p9n2drvJ44jkBk6+bb
+         +56A==
+X-Forwarded-Encrypted: i=1; AFNElJ9l9rFqdrob1z8jUCp4sLz8wpJtP7Y9NmDxfojACIzHrig2Ys0g31U0sP+7BPW1rmSkhqvhO/0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIhs8g5FZdh4UHIuqb4/f7+7mB859VIYYLxo2Vw/ufxBIGI78E
+	QWS+5PWvto1bmXt13Zbt7430gAT7VMXNkfe5mj5UO+IDYgEUk5BS8b9g
+X-Gm-Gg: AeBDieuEr5HCtkuf9U1VFPyWw/8lcQIR9L28q4AaY6x/jbEPmyEe8yJxvSV7vfrmTqZ
+	QSS6EqfvRnbV0iI86A3GdPWdSFE7Jl43S+hIDIo1NYmpjbc2GR1JDL6Xyhb/sphX4fZeLQ5jYHW
+	8L//Lsz1xewGrn/a+fxpoYZCJtFuvUzoOZmUXO2FYo7vOu57aN6aoBiA3hGdl+xnofIzpBCMI2G
+	XQO/mMrG9C1ySEskEwAKzaLLPCE8teIJn4TNDPHBXqv814t+RSuH7KdM0zRIopBbrBCBEQgHWJD
+	x7M2UwKJSVwYzY174fv3GeaBTadqD+Vj9cpMF17seQbsjOU0PTIIn8tHtDRiNsIeyvNXH5uPAHc
+	N79QN6RvQPCw5fSy9EZ6ikocv3nxWAkp/LOcvZyP65BR+pptLH5Tcq+2Q7rQJ9fM6JklJb2Y+/U
+	Ac+JiCmsrXc0nOgbUOdDeRVgStgkdMriD3cnpydCaJFZniga8EYxMu
+X-Received: by 2002:a05:7300:1351:b0:2be:142f:d499 with SMTP id 5a478bee46e88-2e478a2f186mr14131699eec.16.1776940424968;
+        Thu, 23 Apr 2026 03:33:44 -0700 (PDT)
 Received: from teatimelab.tailcd024.ts.net ([148.135.103.3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b5fab0cdbbsm189358425ad.48.2026.04.23.03.32.43
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2e53d2cfd3esm26578635eec.21.2026.04.23.03.33.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Apr 2026 03:32:48 -0700 (PDT)
+        Thu, 23 Apr 2026 03:33:44 -0700 (PDT)
 From: Qi Tang <tpluszz77@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>,
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
 	David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Qi Tang <tpluszz77@gmail.com>
-Subject: [PATCH net v3] ipv6: validate extension header length before copying to cmsg
-Date: Thu, 23 Apr 2026 18:32:38 +0800
-Message-ID: <20260423103238.3987364-1-tpluszz77@gmail.com>
+Subject: Re: [PATCH net v2] ipv6: validate extension header length before copying to cmsg
+Date: Thu, 23 Apr 2026 18:33:39 +0800
+Message-ID: <20260423103339.3991950-1-tpluszz77@gmail.com>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260423102255.3752004-1-tpluszz77@gmail.com>
+References: <20260423102255.3752004-1-tpluszz77@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-280703-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-280704-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[tpluszz77@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0E64E450C1A
+X-Rspamd-Queue-Id: E2D4F450C42
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-ip6_datagram_recv_specific_ctl() builds IPV6_{HOPOPTS,DSTOPTS,RTHDR}
-cmsgs (and their IPV6_2292* legacy counterparts) by trusting the
-on-wire hdrlen byte (ptr[1]) when computing the put_cmsg() length.
-The length was validated only at parse time (ipv6_parse_hopopts(),
-etc.).  An nftables payload-write expression can rewrite hdrlen after
-parsing and before the skb reaches recvmsg; the write itself is
-in-bounds but put_cmsg() then reads up to ((hdrlen+1) << 3) = 2040
-bytes from an 8-byte header.  nftables is reachable from an
-unprivileged user namespace, so this is an unprivileged
-slab-out-of-bounds read:
+Please drop v2 — it was incorrectly sent as a reply to v1 instead
+of a new thread.  Resent as v3:
+https://lore.kernel.org/netdev/20260423103238.3987364-1-tpluszz77@gmail.com/
 
-  BUG: KASAN: slab-out-of-bounds in put_cmsg+0x3ac/0x540
-   put_cmsg+0x3ac/0x540
-   udpv6_recvmsg+0xca0/0x1250
-   sock_recvmsg+0xdf/0x190
-   ____sys_recvmsg+0x1b1/0x620
+Sorry for the noise.
 
-Add ipv6_get_exthdr_len() which computes the extension header length
-and validates it against skb_tail_pointer(skb), returning 0 on
-failure.  Extension headers are kept in the linear skb area by
-pskb_may_pull() during input, so skb_tail_pointer() is the correct
-bound.
-
-Use ipv6_get_exthdr_len() at all non-AH call sites: the five
-standalone cmsg blocks (HbH, 2292HbH, 2292DSTOPTS x2, 2292RTHDR)
-and the three standard cases in the extension-header walk loop
-(DSTOPTS, ROUTING, default).  AH retains an inline bounds check
-because its length formula differs ((ptr[1]+2)<<2).
-
-When the walk loop detects a corrupted header, return from the
-function instead of continuing to process later socket options.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Qi Tang <tpluszz77@gmail.com>
----
-Changes v2 -> v3:
-  - Resend as new thread (v2 was incorrectly sent as reply to v1)
-
-Changes v1 -> v2 (Paolo Abeni):
-  - Factor repeated bounds-check + put_cmsg into ipv6_get_exthdr_len()
-  - Return from the function on corrupted walk-loop entry instead of
-    goto + empty label
-
-v2: https://lore.kernel.org/netdev/20260423102255.3752004-1-tpluszz77@gmail.com/
-v1: https://lore.kernel.org/netdev/20260419150344.624673-1-tpluszz77@gmail.com/
-
- net/ipv6/datagram.c | 46 +++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 38 insertions(+), 8 deletions(-)
-
-diff --git a/net/ipv6/datagram.c b/net/ipv6/datagram.c
-index 972bf0426d59..0a7b74d5f402 100644
---- a/net/ipv6/datagram.c
-+++ b/net/ipv6/datagram.c
-@@ -617,6 +617,13 @@ void ip6_datagram_recv_common_ctl(struct sock *sk, struct msghdr *msg,
- 	}
- }
- 
-+static u16 ipv6_get_exthdr_len(const struct sk_buff *skb, const u8 *ptr)
-+{
-+	u16 len = (ptr[1] + 1) << 3;
-+
-+	return (ptr + len <= skb_tail_pointer(skb)) ? len : 0;
-+}
-+
- void ip6_datagram_recv_specific_ctl(struct sock *sk, struct msghdr *msg,
- 				    struct sk_buff *skb)
- {
-@@ -643,7 +650,10 @@ void ip6_datagram_recv_specific_ctl(struct sock *sk, struct msghdr *msg,
- 	/* HbH is allowed only once */
- 	if (np->rxopt.bits.hopopts && (opt->flags & IP6SKB_HOPBYHOP)) {
- 		u8 *ptr = nh + sizeof(struct ipv6hdr);
--		put_cmsg(msg, SOL_IPV6, IPV6_HOPOPTS, (ptr[1]+1)<<3, ptr);
-+		u16 len = ipv6_get_exthdr_len(skb, ptr);
-+
-+		if (len)
-+			put_cmsg(msg, SOL_IPV6, IPV6_HOPOPTS, len, ptr);
- 	}
- 
- 	if (opt->lastopt &&
-@@ -667,23 +677,31 @@ void ip6_datagram_recv_specific_ctl(struct sock *sk, struct msghdr *msg,
- 			switch (nexthdr) {
- 			case IPPROTO_DSTOPTS:
- 				nexthdr = ptr[0];
--				len = (ptr[1] + 1) << 3;
-+				len = ipv6_get_exthdr_len(skb, ptr);
-+				if (!len)
-+					return;
- 				if (np->rxopt.bits.dstopts)
- 					put_cmsg(msg, SOL_IPV6, IPV6_DSTOPTS, len, ptr);
- 				break;
- 			case IPPROTO_ROUTING:
- 				nexthdr = ptr[0];
--				len = (ptr[1] + 1) << 3;
-+				len = ipv6_get_exthdr_len(skb, ptr);
-+				if (!len)
-+					return;
- 				if (np->rxopt.bits.srcrt)
- 					put_cmsg(msg, SOL_IPV6, IPV6_RTHDR, len, ptr);
- 				break;
- 			case IPPROTO_AH:
- 				nexthdr = ptr[0];
- 				len = (ptr[1] + 2) << 2;
-+				if (ptr + len > skb_tail_pointer(skb))
-+					return;
- 				break;
- 			default:
- 				nexthdr = ptr[0];
--				len = (ptr[1] + 1) << 3;
-+				len = ipv6_get_exthdr_len(skb, ptr);
-+				if (!len)
-+					return;
- 				break;
- 			}
- 
-@@ -705,19 +723,31 @@ void ip6_datagram_recv_specific_ctl(struct sock *sk, struct msghdr *msg,
- 	}
- 	if (np->rxopt.bits.ohopopts && (opt->flags & IP6SKB_HOPBYHOP)) {
- 		u8 *ptr = nh + sizeof(struct ipv6hdr);
--		put_cmsg(msg, SOL_IPV6, IPV6_2292HOPOPTS, (ptr[1]+1)<<3, ptr);
-+		u16 len = ipv6_get_exthdr_len(skb, ptr);
-+
-+		if (len)
-+			put_cmsg(msg, SOL_IPV6, IPV6_2292HOPOPTS, len, ptr);
- 	}
- 	if (np->rxopt.bits.odstopts && opt->dst0) {
- 		u8 *ptr = nh + opt->dst0;
--		put_cmsg(msg, SOL_IPV6, IPV6_2292DSTOPTS, (ptr[1]+1)<<3, ptr);
-+		u16 len = ipv6_get_exthdr_len(skb, ptr);
-+
-+		if (len)
-+			put_cmsg(msg, SOL_IPV6, IPV6_2292DSTOPTS, len, ptr);
- 	}
- 	if (np->rxopt.bits.osrcrt && opt->srcrt) {
- 		struct ipv6_rt_hdr *rthdr = (struct ipv6_rt_hdr *)(nh + opt->srcrt);
--		put_cmsg(msg, SOL_IPV6, IPV6_2292RTHDR, (rthdr->hdrlen+1) << 3, rthdr);
-+		u16 len = ipv6_get_exthdr_len(skb, (u8 *)rthdr);
-+
-+		if (len)
-+			put_cmsg(msg, SOL_IPV6, IPV6_2292RTHDR, len, rthdr);
- 	}
- 	if (np->rxopt.bits.odstopts && opt->dst1) {
- 		u8 *ptr = nh + opt->dst1;
--		put_cmsg(msg, SOL_IPV6, IPV6_2292DSTOPTS, (ptr[1]+1)<<3, ptr);
-+		u16 len = ipv6_get_exthdr_len(skb, ptr);
-+
-+		if (len)
-+			put_cmsg(msg, SOL_IPV6, IPV6_2292DSTOPTS, len, ptr);
- 	}
- 	if (np->rxopt.bits.rxorigdstaddr) {
- 		struct sockaddr_in6 sin6;
--- 
-2.47.3
-
+Qi
 
