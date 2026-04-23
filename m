@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-280811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280812-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CN1QFQ1O6mkhxgIAu9opvQ
-	(envelope-from <netdev+bounces-280811-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 18:51:25 +0200
+	id 4JzhD1xQ6mkhxgIAu9opvQ
+	(envelope-from <netdev+bounces-280812-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 19:01:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7F9D4551CF
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 18:51:24 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68E854553DE
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 19:01:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 81212301D625
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 16:46:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 78F76300DD7C
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 16:59:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75EA637BE89;
-	Thu, 23 Apr 2026 16:46:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7684B37D137;
+	Thu, 23 Apr 2026 16:59:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jtuFRaQR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gOZ4Z8IQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FACE31DDBF;
-	Thu, 23 Apr 2026 16:46:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7952D2488
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 16:59:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776962808; cv=none; b=kUkclskBtWLM0bMr/6CGtyZ772dEpLLOoL0PO5f6IsbJLW7iMzd7e/DfGSXKp46J1fD77tr2xMzM33TUudDN0/JSp88GWZA4ni1yvpEihDyHCq90eT1WC77yGh6qNZKjS6wJUKbrS0W+tGmyZ2Pqzl97y7LsImrq7k8Y9nlAjDE=
+	t=1776963544; cv=none; b=bRIlk6Pwy3n4bd4VhP8sDrZabqzrWnwotRvo+QlznqoOmvW0hdWAW4fWLPJTuJFRy1GqhzNMk5Fip59nAPv71KZECh1drRZqCV3f8ImVDkQU50fDCCraCcDjO64B3C2FsKSIK5fD9xVMJbQBd3yXkvVJHgyL9bsz8GP0m3d+xFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776962808; c=relaxed/simple;
-	bh=bT4T3mr5wQG7XMwrFze16ct6UyUgR364L6z1mh3xjjw=;
+	s=arc-20240116; t=1776963544; c=relaxed/simple;
+	bh=HWF3fynQuO3pQwWRnZ31DO+K+HHAJDpLv0yXmAxCd9g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sAcjGkic+CAqOfwvN4cOEMLOq2RUQdgCZhfUMwgF8ZNGjzB82qsGjaz13o//g/ZBAxHTjZByp3Gm4WYheNPOqRPsStoTOR26JDRERzh13Cc3iuf3yRNh7uKpzhBRAqFbxgO3lLwMwX0Seo5qCqATXUpPu9pF6bs0cjq4ngTBVZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jtuFRaQR; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=KRyk8zs0yOkAi8m3yp/2JrJvn5JKJ5mHqm7TULytzF0=; b=jtuFRaQR9HJKm6KgImnmOr3pFQ
-	1fvyJdWnFXwpgUMaYxiV7wyC+e206Bon8Wb7mPOMg5hgUqxeqYR2ljBYijO+o0amP7oClbSCXNL5y
-	kFetmKw9OKiVM70w+bWCdfZmee6PF87rmosVeXRL9LffY3Ilca/inWJ7AaT6a3FVazvc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wFxCI-00HGq4-Kx; Thu, 23 Apr 2026 18:46:38 +0200
-Date: Thu, 23 Apr 2026 18:46:38 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Dmitry Antipov <dmantipov@yandex.ru>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC PATCH] net: skb: on zero-copy formatted output to skb
-Message-ID: <cdcb241c-5c7c-4ce4-a628-0375ff2668b2@lunn.ch>
-References: <20260423073638.778334-1-dmantipov@yandex.ru>
- <8ed4f473-9c7b-4f77-911c-85cfb2fba2a5@lunn.ch>
- <65872064c2ab5fbf47a743f2dcd72182ea8296a7.camel@yandex.ru>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ABGyPaj9H5r+ccHNQiUpkCuswZEsi22KKvX4r8gmOY3QWSYboRgFw6aWcL5PmUgNubHSdyqbgGR0IHkBkqGoFq+ZZEEqIfOloeQkm33dpB/EgaRk20gv81izhTbjCqmB9wD6S1HFb700yUgeXe8hfC/wenqNTb7huNWpDmy2bKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gOZ4Z8IQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7D16C2BCAF;
+	Thu, 23 Apr 2026 16:59:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776963544;
+	bh=HWF3fynQuO3pQwWRnZ31DO+K+HHAJDpLv0yXmAxCd9g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gOZ4Z8IQ6NqKs4G2m5bqTZDFzIX3P56QkXyJVv9e74wCnhd3n+dYPKjak4raCrWJp
+	 ji9PwAfwf/GwZBLV7Nngb+AQJqpRJFZPFRVQwom0eulEiSvddyKJfPvZZ17lR21+DL
+	 +uIx3hGlUP2WbCpfWdsiWSj75MFRWcDIlivQR+SIrW18Iqm+Bm7/qcPHQYgGc3O/4m
+	 RgoIyO9B2dAY7BHP82u+LwlZDufnGTxKmuhB2nqlYVhtjj6/Cx7Y7cD0hbQDS0u3iT
+	 4MHvGUQnpTRR2OyHuX1ragrLrvusuRwveJVVcmn8dvag8o6vP6mbFEoQ3kxW6W2pkL
+	 B4Zqz/gMdvhwg==
+Date: Thu, 23 Apr 2026 17:58:59 +0100
+From: Simon Horman <horms@kernel.org>
+To: Ren Wei <n05ec@lzu.edu.cn>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	andreas.a.roeseler@gmail.com, yuantan098@gmail.com,
+	yifanwucs@gmail.com, tomapufckgml@gmail.com, bird@lzu.edu.cn,
+	caoruide123@gmail.com
+Subject: Re: [PATCH net 1/1] ipv4: icmp: validate reply type before using
+ icmp_pointers
+Message-ID: <20260423165859.GE900403@horms.kernel.org>
+References: <cover.1776563662.git.caoruide123@gmail.com>
+ <efb2c33f544ece7727704608fc577525b415ae26.1776563662.git.caoruide123@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,52 +65,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <65872064c2ab5fbf47a743f2dcd72182ea8296a7.camel@yandex.ru>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+In-Reply-To: <efb2c33f544ece7727704608fc577525b415ae26.1776563662.git.caoruide123@gmail.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280811-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280812-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[yandex.ru];
+	RSPAMD_URIBL_FAIL(0.00)[lzu.edu.cn:query timed out];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,google.com,redhat.com,gmail.com,lzu.edu.cn];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E7F9D4551CF
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lzu.edu.cn:email]
+X-Rspamd-Queue-Id: 68E854553DE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> > So please add some kerneldoc describing what it actually does.
+On Sun, Apr 19, 2026 at 06:19:18PM +0800, Ren Wei wrote:
+> From: Ruide Cao <caoruide123@gmail.com>
 > 
-> OK, some more neutral name like 'skb_fmt(...)' may be better indeed.
-
-Sure. Just document what it actually does, what the return value
-means, etc.
-
-> > Please also annotate the const char *fmt, so the compiler can do
-> > format string checks, parameter counting etc.
+> Extended echo replies use ICMP_EXT_ECHOREPLY as the outbound reply type.
+> That value is outside the range covered by icmp_pointers[], which only
+> describes the traditional ICMP types up to NR_ICMP_TYPES.
 > 
-> Surely '__printf(2, 3)' should be used here.
+> Avoid consulting icmp_pointers[] for reply types outside that range and
+> keep the existing behavior for normal ICMP replies unchanged.
+> 
+> Fixes: d329ea5bd884 ("icmp: add response to RFC 8335 PROBE messages")
+> Cc: stable@kernel.org
+> Reported-by: Yuan Tan <yuantan098@gmail.com>
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Reported-by: Xin Liu <bird@lzu.edu.cn>
+> Signed-off-by: Ruide Cao <caoruide123@gmail.com>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 
-Yep.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Thanks
-	Andrew
+Sashiko has generated a review of this patch.  I do not believe the
+problems flagged there need to be addressed as the array indexes used in
+those cases have are always valid.  However, I would appreciate it if you
+could look over this.
+
 
