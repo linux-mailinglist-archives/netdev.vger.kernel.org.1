@@ -1,129 +1,127 @@
-Return-Path: <netdev+bounces-280567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280569-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id BsmZBZpw6WniZgIAu9opvQ
-	(envelope-from <netdev+bounces-280567-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 03:06:34 +0200
+	id gFOZGlZx6WniZgIAu9opvQ
+	(envelope-from <netdev+bounces-280569-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 03:09:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7282F44C00D
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 03:06:33 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF2D344C05F
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 03:09:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3C08C3019FFE
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 01:06:32 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4761530058DE
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 01:09:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 248E81EA7DB;
-	Thu, 23 Apr 2026 01:06:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CED2E27FB2A;
+	Thu, 23 Apr 2026 01:09:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YvSOX0NS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f77.google.com (mail-ot1-f77.google.com [209.85.210.77])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 992E21A6825
-	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 01:06:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC17D531
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 01:09:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776906390; cv=none; b=PCfCxYX7/7g5EZMUxy5manjLU0i1aZOBrgDb89ZT1X2iS829EBmN6HGBatrDUl6RjLh9YK3Fn7cmXMLWv+J1OhT3sQUhqGwZiyGSU07Vjq4CBiOn4eMq9u+zFvxFYfgFRQx8RkdWiEKDWjOLQWpW/d1tOWKB8/2f9UbaTMNhMGw=
+	t=1776906578; cv=none; b=E0Xd/cVUg2dBXeWA+LsLSm2V0t3mtWV80uaUD6pxW6JADwp7XhPW8zZYF876KUTFMIdBDA0nsb8H8cL1DvyRtbU8vao9xVG9FVimeg8TXGv+wtz5G5Vot/aS+kxbuCoWcT1HWrISWHpgN6W/OdQ5suLp1wWhVuJ56lPnZWMzVxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776906390; c=relaxed/simple;
-	bh=vWqOM9nXuwLGUOZ+JxVDQtJNjHxs/osDVjdzuCyp35E=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=p82LltlkLDdslsn/lkyxKfi3DDI2MKJ7/DcNgvteBFoPR5gWKf1TAgLrKGHmIVAjHhlYR8+NZ64yho9DeLS3L2HQ0tH1a9ptogyeJV2CUoIkBWJNItgtsQBmYG6t6GyZ4vtjL6fRw3pBL7Tv/hzEsxngC8rBtJ9ay/bzbfuu87s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f77.google.com with SMTP id 46e09a7af769-7d4be1dee67so14913552a34.1
-        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 18:06:28 -0700 (PDT)
+	s=arc-20240116; t=1776906578; c=relaxed/simple;
+	bh=G0fWXcpsumiQWbIF+CRC3d2rl/yp4ny1tPloTWFYEko=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=oDaY682P2N3lCE99IxguyRc38cgyBuz4DXL5TlE9q5heEz1c4kpeIaQbyIkZaOWLSkitgi+wC1DCEWewLnfGXMGzq85+7PlZrM58f142MxznLGesl6hLfFk3+V/SMgVmdloXdd6ioUeKLI7UkDoFkIhbgAF+5oO21qJRcAOZ8k0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YvSOX0NS; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-82f5f48458eso3595593b3a.3
+        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 18:09:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1776906577; x=1777511377; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=cDZHDtDqpfzbVV04Qhj+qX0cLthlms0tlhiGlbb7lzM=;
+        b=YvSOX0NS+hlaK123L+ucBfeuOBuhUp9wTVpD1I5qC9XWPgnzIWZFaUS9FUG+8DSyWZ
+         IgVVkaaMwa58e8z8S6xb6iBCJXO6bz0WtNd3E9n78Rqo2s2dAHvOlbFmE/X5CzQTPjDF
+         8xjIAC+Y9WThmWv4C/C/+gaMOiDvq6bWmU9U+EWEiMNukjZnMbX/llDoWp2Q5MdcyDU/
+         osTzRXeVWjiUd0vSKw6gBglfX9oRxPj6X5c2glNMgoIbCipojKRm5CoNk7tqlrbgxNtX
+         NLyCYtHj+bQPf9HOAuHsSSPFL6on16fgOZsuD+U37Xt9rYmfXXKCqI0rwPW5iqIJ0mjG
+         SGSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776906387; x=1777511187;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20251104; t=1776906577; x=1777511377;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=zsSvGzVB80tFyVwkB3cRPRPM6dI8of/Q43SEFzEvigI=;
-        b=OrnztPrGYvGUlBn1QoO/4eodUEIXCn2R7BrAHb7sTJDxWyaHRXYQA0I1WWn5cF9NSq
-         kstglstnjNRygvYdjDNR90nB7LfQqaiXVjV+BdRowegY4z2UhPa/9cfDhurTBI2fkChr
-         Y8DJSXp21UdjPVE0qBns+unSHoxLLElD+MK3KNFB25aL9mBtfsiAaQtYZpkJ7eBHckOc
-         lSX30psFeqAhT6pJWOFhjHUgfqaPbuXFAj3lYLnb4COu4zA2S4jTrrLUAbQkn7JRpLNQ
-         FJcbR7npKa9Ss9CMayxc6izlZKFmxsjF+WuyoRMFZn8zopLIHzwnBNZ8gTMx3AHK393f
-         kFiw==
-X-Forwarded-Encrypted: i=1; AFNElJ8GhIFTURRqtGMhw2QSWRUrJbSm9pQkLGji/Eo/U0y/+C/P+8NVwYXmwILGl42rpPclsICu8yI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTlk3Q5YUE/EpV2AJTxu+BamWTKjvsmzSf0snkU30MfyrDfa+e
-	A6sRbhPUZJ+WgRCZLRQfGJSRtLfyn3FNC+63A4oyVjCjYv4gv03IhnmfL+waT9MTRr2FNxmSxYj
-	aWPZ9vbhj4FQWVU+E8nYx4hAAhe9tBrk5sWnDETExDMaR+d1d+ItrinyMMFg=
+        bh=cDZHDtDqpfzbVV04Qhj+qX0cLthlms0tlhiGlbb7lzM=;
+        b=KWtrxkd6UpOdB4UHVv0n/oG+0+gJbOBQPeiClF6VvQknkZ2LIDhBKro1OZLy1wP5Oj
+         JealV3wPUDe8olgrrFlwASSvItpYS5IcaobWIwyAUeBgTiYPzoENT5lxv9Rcpa6ctFzj
+         jgDeDuJIkxflVBzAkc37lWgGSv995fAkvsJL7UiEboq0CcgR0F4qPKp8dW4Yx1ooDi9M
+         vYCsK/XuOqX3vc6a5GHBXEipY1dIJRxTbi/QRy1+ARBu3rzu0ScMP4dWuS1aqlcbYaPP
+         xgkOut3OyVzWG1DepJlgf7PcozhHYyjtUwp76KZsE6i4mljZ9KE5IO7vqoh50Ssi2jQz
+         Xu4g==
+X-Forwarded-Encrypted: i=1; AFNElJ/3f8IVEX+rQjL0qRXtPIWC18SDSRsL2RWH54WxzVIuvMVZhOhFrTIh+2j/lpqiAkMsmz4Eu78=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwClLTgFoe0UR7dN3op69BQFsNgGpgEJ/WIuuN6D7cDWKbROejk
+	L5Ls2R//CWIdwwly+kQ1VOdXkY/4mLhjZXH7F7F4fLc1okCbFhbINpJBz/88V5ohyqbSpVhCI6E
+	b4kjO1Q==
+X-Received: from pfbhw5.prod.google.com ([2002:a05:6a00:8905:b0:82f:71fd:3094])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:8710:b0:82f:d34c:ccc6
+ with SMTP id d2e1a72fcca58-82fd34ccd79mr5805895b3a.10.1776906576633; Wed, 22
+ Apr 2026 18:09:36 -0700 (PDT)
+Date: Thu, 23 Apr 2026 01:09:31 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a4a:e844:0:b0:67e:36e9:79a6 with SMTP id
- 006d021491bc7-69462e48a91mr15566883eaf.19.1776906387619; Wed, 22 Apr 2026
- 18:06:27 -0700 (PDT)
-Date: Wed, 22 Apr 2026 18:06:27 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69e97093.050a0220.24bfd3.0048.GAE@google.com>
-Subject: [syzbot] [net?] KCSAN: data-race in __udp4_lib_mcast_deliver /
- udp_lib_unhash (3)
-From: syzbot <syzbot+04905b8b3523856476c0@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	willemdebruijn.kernel@gmail.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.rc2.533.g4f5dca5207-goog
+Message-ID: <20260423010933.3899132-1-kuniyu@google.com>
+Subject: [PATCH v1 net] udp: Use READ_ONCE()/WRITE_ONCE() for hslot->count.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>
+Cc: Simon Horman <horms@kernel.org>, David Held <drheld@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	syzbot+04905b8b3523856476c0@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=6b32b22d8934c136];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_TO(0.00)[davemloft.net,kernel.org,google.com,vger.kernel.org,redhat.com,googlegroups.com,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280567-lists,netdev=lfdr.de,04905b8b3523856476c0];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org,syzkaller.appspotmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280569-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[storage.googleapis.com:url,syzkaller.appspot.com:url,googlegroups.com:email,appspotmail.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,goo.gl:url]
-X-Rspamd-Queue-Id: 7282F44C00D
+	TAGGED_RCPT(0.00)[netdev,04905b8b3523856476c0];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DF2D344C05F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello,
+__udp4_lib_mcast_demux_lookup() and __udp4_lib_mcast_deliver()
+reads the number of sockets in the 1-tuple hash table chain
+locklessly. [0]
 
-syzbot found the following issue on:
+Let's use READ_ONCE() and WRITE_ONCE() for hslot->count.
 
-HEAD commit:    c23719abc330 Merge tag 'x86-urgent-2026-03-08' of git://gi..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=141b0806580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6b32b22d8934c136
-dashboard link: https://syzkaller.appspot.com/bug?extid=04905b8b3523856476c0
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/c0ec3784100d/disk-c23719ab.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ff5ee751c9be/vmlinux-c23719ab.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/1dda25fb6996/bzImage-c23719ab.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+04905b8b3523856476c0@syzkaller.appspotmail.com
-
-==================================================================
+[0]:
 BUG: KCSAN: data-race in __udp4_lib_mcast_deliver / udp_lib_unhash
 
 read-write to 0xffff88810194a9c8 of 4 bytes by task 15107 on cpu 0:
@@ -180,29 +178,59 @@ read to 0xffff88810194a9c8 of 4 bytes by task 15111 on cpu 1:
 value changed: 0x00000001 -> 0x00000000
 
 Reported by Kernel Concurrency Sanitizer on:
-CPU: 1 UID: 0 PID: 15111 Comm: syz.6.4060 Not tainted syzkaller #0 PREEMPT(full) 
+CPU: 1 UID: 0 PID: 15111 Comm: syz.6.4060 Not tainted syzkaller #0 PREEMPT(full)
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2026
-==================================================================
 
-
+Fixes: 2dc41cff7545 ("udp: Use hash2 for long hash1 chains in __udp*_lib_mcast_deliver.")
+Fixes: 63c6f81cdde5 ("udp: ipv4: do not waste time in __udp4_lib_mcast_demux_lookup")
+Reported-by: syzbot+04905b8b3523856476c0@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/69e97093.050a0220.24bfd3.0048.GAE@google.com/
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/ipv4/udp.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 0ac2bf4f8759..f7e6045f5985 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -323,7 +323,7 @@ int udp_lib_get_port(struct sock *sk, unsigned short snum,
+ 		sock_set_flag(sk, SOCK_RCU_FREE);
+ 
+ 		sk_add_node_rcu(sk, &hslot->head);
+-		hslot->count++;
++		WRITE_ONCE(hslot->count, hslot->count + 1);
+ 		sock_prot_inuse_add(sock_net(sk), sk->sk_prot, 1);
+ 
+ 		hslot2 = udp_hashslot2(udptable, udp_sk(sk)->udp_portaddr_hash);
+@@ -2200,7 +2200,7 @@ void udp_lib_unhash(struct sock *sk)
+ 		if (rcu_access_pointer(sk->sk_reuseport_cb))
+ 			reuseport_detach_sock(sk);
+ 		if (sk_del_node_init_rcu(sk)) {
+-			hslot->count--;
++			WRITE_ONCE(hslot->count, hslot->count - 1);
+ 			inet_sk(sk)->inet_num = 0;
+ 			sock_prot_inuse_add(net, sk->sk_prot, -1);
+ 
+@@ -2471,7 +2471,7 @@ static int __udp4_lib_mcast_deliver(struct net *net, struct sk_buff *skb,
+ 	hash2_any = 0;
+ 	hash2 = 0;
+ 	hslot = udp_hashslot(udptable, net, hnum);
+-	use_hash2 = hslot->count > 10;
++	use_hash2 = READ_ONCE(hslot->count) > 10;
+ 	offset = offsetof(typeof(*sk), sk_node);
+ 
+ 	if (use_hash2) {
+@@ -2703,7 +2703,7 @@ static struct sock *__udp4_lib_mcast_demux_lookup(struct net *net,
+ 	hslot = &udptable->hash[slot];
+ 
+ 	/* Do not bother scanning a too big list */
+-	if (hslot->count > 10)
++	if (READ_ONCE(hslot->count) > 10)
+ 		return NULL;
+ 
+ 	result = NULL;
+-- 
+2.54.0.rc2.533.g4f5dca5207-goog
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
