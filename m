@@ -1,178 +1,197 @@
-Return-Path: <netdev+bounces-280584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280586-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0KCnFN2M6WlwdAIAu9opvQ
-	(envelope-from <netdev+bounces-280584-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 05:07:09 +0200
+	id CMNhBUGU6WkreAIAu9opvQ
+	(envelope-from <netdev+bounces-280586-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 05:38:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C48944C74E
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 05:07:08 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DE3544C902
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 05:38:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 868EA300680E
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 03:07:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A9C1A307AF7E
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 03:37:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 233383C5523;
-	Thu, 23 Apr 2026 03:07:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E10163CCFCD;
+	Thu, 23 Apr 2026 03:37:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ej1N1txR"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tFcgs4kI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B323C5526
-	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 03:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776913623; cv=pass; b=IOuB27AGM7vTk21buln3qFertWJOpT+A8qHsi0h7LdMfDRIJf6UeUMt5CNJ+/BJezQWtwgSRSymKesrN8ANJoH45slR8nZnsNQ6B/x1PKBNmUwmvR8mWKd40MCFLIzfq6wmnSFVYe+TgBt7De/dwKsScbbl+x/AHhCZ3/xPbFzU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776913623; c=relaxed/simple;
-	bh=XCLXDbphdhLQ8I7NEFQiQanixH7UqHhty+yjIG/7YyQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J7nOTGe0V2S9QEkQN43AV62V7NgZd4k0K3UFv5lpTnUpE+OQdQsiOXwRmFuUTcSSNdEMSoMiHiZQAwJ4QzHX5MZyIjd73GbFryLae7uBQj7tRFTAF+yPYgiwkriMRH5PHTsF7mC5sAp0pvrlYoFFV6cspVyZ9VjL2CfdxChk72U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ej1N1txR; arc=pass smtp.client-ip=74.125.82.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-12db7bf1541so2454296c88.0
-        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 20:07:00 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776913619; cv=none;
-        d=google.com; s=arc-20240605;
-        b=HK7bbQiIRwBZYd4b2+gl4a1Nb1BXkWYd/wUFLsX8Cmb36dAXquLWW3+tUxIUJWy0wF
-         ZowQZ6HC8pghAJPqvVirdDNmPt7LUcD48LTIvigLuSk8jCqqtR0VH06Lc8uU3W1b6rBY
-         o1tzyGY6Ir62CuyBS3Z0V6P9nlwxxu+Tnop1jk8Qh2kGPwcK4AHyvvxKyVCQcE5hW3zt
-         Nmp8cJGYHdcjXqibGUxcYCdbgMfacR9hRar5GV3D6u8mX+DIfr4nzjraT/W5QE2nn+kz
-         OYxWyvcgoZRW12yUlcwaizlIFIVyReYFJQkexB/F2XS3+DXJlfjtpH9CIODpqdXfDwnr
-         6GDg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=XCLXDbphdhLQ8I7NEFQiQanixH7UqHhty+yjIG/7YyQ=;
-        fh=L9mVfi8LAkfPbprz6IQJwAMN+QXvcasfQJU6bimWxdo=;
-        b=IO1MpCpLsE2jRC9iebp4BEWZAXrl6uf+ZmB1h+99PlgUQrBs+tzs3p5ouUJ2dRjylb
-         36hYDNszrWUxioUdKB8Eh1Dz6NuvN2RNjCBk4n88CtybHOOfg7QdPXbWFVga8FjK0lNz
-         7Tobqyq5rRBtxRV3Srl4e99cCXOYomKAhGdofP23VLPPR52F5ShwranTb9BFaxKrhB9w
-         lpsgRXjJBJ8zuQ/xXXG7z5HEg21PDW2NocheB/MzBm49FaPPQOgiV6Hqg9cQfkP0/QeD
-         N/NxgEcmqPE7J5rSOQ4qPfUYy4wNGENwiW/8ugY8u5Po5yEl+Ue6NtC/VuTb1wlCKCZh
-         PdOw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776913619; x=1777518419; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=XCLXDbphdhLQ8I7NEFQiQanixH7UqHhty+yjIG/7YyQ=;
-        b=ej1N1txRZVXBkMgsUrykOzJKn/MqbcJKlGZUKe4lnycAS8NPyPEpRLAX/T33qNpbS9
-         eRJoKxAEZyLiBK0XaxPKYzkP6v1RdRdzOwch1CochPY75yyExkZdl6wqdB2UR/cT9KGN
-         XS6J8CePVkHpDvfEW4eQ3Mh7qmCI2FXYBQs93+NBc34+3XUGu/xUCnwCWK+nlmDwd1gK
-         rHk5TT9X7A0yrxByOGSigmQiST27c1mDDZDilDYcoGS/uJe9QNdS0trGyYnq2ohDmZIJ
-         r0r9fj104cE5q4xv6IabjccFCCi347D2P/jbc5t1+zMCZJ7F1yjhcVjSa2peysZL8+hJ
-         2YZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776913619; x=1777518419;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XCLXDbphdhLQ8I7NEFQiQanixH7UqHhty+yjIG/7YyQ=;
-        b=F3M0CriJ6xVjruawShZxZN1woLv33l0tH0CuUoGZ8F9myEznEziHgi03ZqVzYYmWyj
-         0ZER2APz5aW4dxf6oLlTo4/Ogbszf2a+DazF/lnyLCDZ/IhaJ4MJwqbW5XZHCopL4mj9
-         97LWAHhGB1KPIW807sR92aJqeWPBWNpa7qdkItSo4GcJuCznENM7hJea8W6o6Qn0oBaC
-         DaVRFwUNnAMzTatQvUeAHg+thrZx1CTCJy0O2I80f52AZfBE8wWifo9kRFCiK24bcFf7
-         0ZjVkvR6WQ6vy9/8MFR3mzgBukAgWgnAI1bMIrzJx1du+GxjBwVAIK2e+CETwvXT7Oo2
-         kZ+g==
-X-Forwarded-Encrypted: i=1; AFNElJ9mqtyjbxEpOytP403TgBUFgckbjater0DvF5UwSBNCxPqYd2anMyiScMX3781FYMzGkjw/M5Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBFdFF4AbUV3+6skFXUgtf4BYqPjblS99+DPuTQvSBc3EhZ2uT
-	R0zLOHl+YqhRjrmE0/636I6vrAYqz9uem37icnXE+9CePMW5Bzp+SWHkAFegCfR4hAklDmY60ve
-	DmXdX8d4QCaEgpIit0JN5E6DDCqpvFidx9VEI2a62
-X-Gm-Gg: AeBDiet7hFUoWRP4pkWEzhUv891IBFPloyTkfdn8uMKeVy3hd5SBAAEuNrVzM8pFOMs
-	qcil7LJQLms2/gWmM96bvwgFiVIzq6csqLIpfpL4/IM41sVCwFunLhpEjlc5EhGi1pVY9//IEzY
-	OGhOA8DjHjU6J79ucKql5BXkva42cVrOqhNu/qO+ER6b/h1a/sY+5WAlKiSILAEaShTopKODTNY
-	Qmv9B/7R9hPJra1tSRR3kehDVr+c114bAvCC9L86nfde+lYXV1svet8VhcD/K3Q/LSmATO3XD3h
-	TTHENPTvwg8mdB105llPC0AkPU5EKSXSHYG0xZGfPVxEHhcYwDkhJrKkPe9cCWm4I5p6JA44x2l
-	UuJlsys+PFhVZ+bXsFA+k/dPIx6ul24rXLEwRXR+LiE+E/LMbyOH6dh8S8AB5IpnckHWuhtgjMg
-	==
-X-Received: by 2002:a05:7022:eac8:b0:12b:ec96:c936 with SMTP id
- a92af1059eb24-12c73f70bc8mr14367576c88.14.1776913618818; Wed, 22 Apr 2026
- 20:06:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E3C3CBE7D
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 03:36:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776915420; cv=none; b=SC1D1797dLn6jGznw7fo+UxURDQPZ7/sh1qpJJiMdC2WFWgs1S7cMOBWWm/6M1sXuuMv+aYep2bWP8EOEuM+iYwHmiBEZ0jQd4q3eC0yN4NSrTiZlbiQvJA7aNngEGBFNtVyWOOMh0gMngYUBQXyka5hYyr8xQk04UrbBZBH5z4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776915420; c=relaxed/simple;
+	bh=xkUp7YbxTslCh+0YyFCzAEuM4b/zsQTPJ3kO9vWkOHo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Hb8/qtyNXz7mz5QczfSmKN4BfxTxUQKeHBGwTgwYiV3t5Aj9ds3JIVvotWQV3nPzV0xyiXp0SA20B4cWps0uxPwsBnub1E+m2rS6acxebG5RG/wpdIjhA8zEH8f8Q2QsagQ/rMo5jj9BvPVIksY7T7CqJFw2Cj4ihRmgQo5iQ+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tFcgs4kI; arc=none smtp.client-ip=91.218.175.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1776915407;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=i33KsMWjfwLpg6r+eMQA9mWtVkf7dIqTm10rTuc1LBg=;
+	b=tFcgs4kIcbQxqzR9Gq5W9C2TW4PVw2HcNSVEVIEcxV4NFU8v7Hjl4eAR87RGczIrLcWjt/
+	wNne3SoMI/yaHN2aH/V7h1TA6cPFV67MEqgWTZJgMHKAn7BxGjtEM6ZNWCVCYpYT6RzZom
+	9Z8llhju4Yper4R9exlCrpmluRV0H+Y=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: bpf@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH bpf 0/2] bpf: prevent offloaded programs from running on host via tcx/netkit
+Date: Thu, 23 Apr 2026 11:36:04 +0800
+Message-ID: <20260423033609.252464-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260421021824.1293976-1-kuba@kernel.org> <20260422104522.GK651125@horms.kernel.org>
-In-Reply-To: <20260422104522.GK651125@horms.kernel.org>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 22 Apr 2026 20:06:47 -0700
-X-Gm-Features: AQROBzB6Gd9vT7YrdkLSBHh2mcbacrp5O3_yj1j4ISHF0fFTaxESKOHzNGh7T24
-Message-ID: <CAAVpQUC8N5+V+ZSq_=TVf5N2f=L71vrRsyo65U96V17as8+0kQ@mail.gmail.com>
-Subject: Re: [PATCH net-deletions] net: remove ax25 and amateur radio
- (hamradio) subsystem
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, Simon Horman <horms@kernel.org>, corbet@lwn.net, 
-	skhan@linuxfoundation.org, federico.vaga@vaga.pv.it, carlos.bilbao@kernel.org, 
-	avadhut.naik@amd.com, alexs@kernel.org, si.yanteng@linux.dev, 
-	dzm91@hust.edu.cn, 2023002089@link.tyut.edu.cn, tsbogend@alpha.franken.de, 
-	dsahern@kernel.org, jani.nikula@intel.com, mchehab+huawei@kernel.org, 
-	gregkh@linuxfoundation.org, jirislaby@kernel.org, tytso@mit.edu, 
-	herbert@gondor.apana.org.au, ebiggers@kernel.org, johannes.berg@intel.com, 
-	geert@linux-m68k.org, pablo@netfilter.org, tglx@kernel.org, 
-	mashiro.chen@mailbox.org, mingo@kernel.org, dqfext@gmail.com, 
-	jreuter@yaina.de, sdf@fomichev.me, pkshih@realtek.com, enelsonmoore@gmail.com, 
-	mkl@pengutronix.de, toke@toke.dk, kees@kernel.org, crossd@gmail.com, 
-	jlayton@kernel.org, wangliang74@huawei.com, aha310510@gmail.com, 
-	takamitz@amazon.co.jp, linux-doc@vger.kernel.org, linux-mips@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280584-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[46];
-	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,lwn.net,linuxfoundation.org,vaga.pv.it,amd.com,linux.dev,hust.edu.cn,link.tyut.edu.cn,alpha.franken.de,intel.com,mit.edu,gondor.apana.org.au,linux-m68k.org,netfilter.org,mailbox.org,gmail.com,yaina.de,fomichev.me,realtek.com,pengutronix.de,toke.dk,huawei.com,amazon.co.jp];
+	TAGGED_FROM(0.00)[bounces-280586-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[linux.dev,iogearbox.net,blackwall.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,fomichev.me,vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,huawei];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5C48944C74E
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 7DE3544C902
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 20, 2026 at 07:18:23PM -0700, Jakub Kicinski wrote:
-> Remove the amateur radio (AX.25, NET/ROM, ROSE) protocol implementation
-> and all associated hamradio device drivers from the kernel tree.
-> This set of protocols has long been a huge bug/syzbot magnet,
-> and since nobody stepped up to help us deal with the influx
-> of the AI-generated bug reports we need to move it out of tree
-> to protect our sanity.
->
-> The code is moved to an out-of-tree repo:
-> https://github.com/linux-netdev/mod-orphan
-> if it's cleaned up and reworked there we can accept it back.
->
-> Minimal stub headers are kept for include/net/ax25.h (AX25_P_IP,
-> AX25_ADDR_LEN, ax25_address) and include/net/rose.h (ROSE_ADDR_LEN)
-> so that the conditional integration code in arp.c and tun.c continues
-> to compile and work when the out-of-tree modules are loaded.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Yinhao reported a splat [1] when attaching a BPF program loaded with
+prog_ifindex (targeted at an offload-capable device such as netdevsim)
+to the software path via BPF_TCX_EGRESS. The program's bpf_func had
+already been replaced by bpf_prog_warn_on_exec() during offload compile,
+so the first packet that reaches tcx_run() trips the WARN:
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+[   19.592982] ------------[ cut here ]------------
+[   19.594654] attempt to execute device eBPF program on the host!
+[   19.594659] WARNING: kernel/bpf/offload.c:420 at 0x0, CPU#0: poc/337
+[   19.599906] Modules linked in:
+[   19.600680] CPU: 0 UID: 0 PID: 337 Comm: poc Not tainted
+6.18.0-rc7-next-20251125 #10 PREEMPT(none)
+[   19.601659] Hardware name: QEMU Ubuntu 24.04 PC (i440FX + PIIX,
+1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+[   19.602684] RIP: 0010:bpf_prog_warn_on_exec+0xc/0x20
+[   19.603241] Code: 28 00 48 89 ef e8 74 44 2f 00 eb d7 66 90 90 90 90
+90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 48 8d 3d a4 eb 95
+06 <67> 48 0f b9 3a 31 c0 e9 83 76 44 ff 0f 1f 84 00 00 00 00 00 90 90
+[   19.605093] RSP: 0018:ffff8881066e73d8 EFLAGS: 00010246
+[   19.605663] RAX: ffffffff81cbca70 RBX: ffff8881013c4210 RCX:
+0000000000000004
+[   19.606378] RDX: 1ffff11020278842 RSI: ffffc90000563060 RDI:
+ffffffff8861b620
+[   19.607107] RBP: ffff8881010d0640 R08: ffff8881013c4210 R09:
+ffff8881010d06b0
+[   19.607827] R10: ffff8881010d06c3 R11: ffffc90000563000 R12:
+ffffc90000563000
+[   19.608751] R13: ffff8881010d06b4 R14: ffff888115eb1a34 R15:
+dffffc0000000000
+[   19.609478] FS:  000000000294c380(0000) GS:ffff8881911e9000(0000)
+knlGS:0000000000000000
+[   19.610316] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   19.610943] CR2: 000057f6b9eb38c0 CR3: 00000001010ea000 CR4:
+0000000000750ef0
+[   19.611712] PKRU: 55555554
+[   19.612006] Call Trace:
+[   19.612281]  <TASK>
+[   19.612523]  __dev_queue_xmit+0x22cb/0x3530
+[   19.617607]  ip_finish_output2+0x621/0x1a60
+[   19.621371]  ip_output+0x170/0x2e0
+[   19.624586]  ip_send_skb+0x129/0x180
+[   19.624940]  udp_send_skb+0x65d/0x1300
+[   19.625316]  udp_sendmsg+0x13bf/0x2000
+[   19.629960]  __sys_sendto+0x396/0x470
+[   19.633720]  __x64_sys_sendto+0xdc/0x1b0
+[   19.635066]  do_syscall_64+0x76/0x10a0
+[   19.641701]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[   19.642240] RIP: 0033:0x4240d7
+[   19.642597] Code: 00 89 01 e9 c1 fe ff ff e8 f6 03 00 00 66 0f 1f 44
+00 00 f3 0f 1e fa 80 3d 8d 3f 09 00 00 41 89 ca 74 10 b8 2c 00 00 00 0f
+05 <48> 3d 00 f0 ff ff 77 69 c3 55 48 89 e5 53 48 83 ec 38 44 89 4d d0
+[   19.646088] RSP: 002b:00007fffcb9ecb68 EFLAGS: 00000202 ORIG_RAX:
+000000000000002c
+[   19.648938] RAX: ffffffffffffffda RBX: 0000000000000001 RCX:
+00000000004240d7
+[   19.652116] RDX: 0000000000000008 RSI: 00007fffcb9ecce0 RDI:
+0000000000000005
+[   19.653148] RBP: 00007fffcb9eccf0 R08: 00007fffcb9ecbb0 R09:
+0000000000000010
+[   19.653951] R10: 0000000000000000 R11: 0000000000000202 R12:
+00007fffcb9ece08
+[   19.654760] R13: 00007fffcb9ece18 R14: 00000000004b2868 R15:
+0000000000000001
+[   19.657462]  </TASK>
+[   19.657703] ---[ end trace 0000000000000000 ]---
+
+The reason is that tcx and netkit never checked for offloaded programs
+on attach, unlike XDP which already rejects this in dev_xdp_attach().
+This series adds the same guard to both so offloaded programs can't be
+attached to the software path.
+
+[1]: https://lore.kernel.org/bpf/64d8e2b5-a214-4f3c-b9e8-bcedbcb2c602@hust.edu.cn/
+
+Jiayuan Chen (2):
+  bpf, tcx: reject offloaded programs on attach
+  bpf, netkit: reject offloaded programs on attach
+
+ drivers/net/netkit.c | 6 ++++++
+ kernel/bpf/tcx.c     | 6 ++++++
+ 2 files changed, 12 insertions(+)
+
+-- 
+2.43.0
+
 
