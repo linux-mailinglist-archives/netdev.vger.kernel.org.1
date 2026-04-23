@@ -1,130 +1,132 @@
-Return-Path: <netdev+bounces-280881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280882-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QGFIBz2U6mnQ0wIAu9opvQ
-	(envelope-from <netdev+bounces-280881-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 23:50:53 +0200
+	id mEVGNgiX6mnY1AIAu9opvQ
+	(envelope-from <netdev+bounces-280882-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 00:02:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80E91457FC2
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 23:50:52 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAE79458080
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 00:02:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DC4E130131E0
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 21:50:50 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E2ECA3005176
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 22:02:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BDB7361DBF;
-	Thu, 23 Apr 2026 21:50:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA3DC33DEF2;
+	Thu, 23 Apr 2026 22:02:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n4JSeUjv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nICZytuC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED49023D7CE;
-	Thu, 23 Apr 2026 21:50:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62C11F1932;
+	Thu, 23 Apr 2026 22:02:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776981050; cv=none; b=UJ/X4gr4m/pU7k9urtrj3QmTp+min5Dkr8E8/ZdrBjE6xULY+CBKfM9qM1Z2mbg8ny2lmDyQgxzkXLW3Jd7kfYmpyRJCKaSiq5wLqaig13ojbWfhQ+CDpLxjSJuq8YlsK5h4f+L+s0AsRBfk9kbvjrSeU5Ib00CnALPrrCYc5bE=
+	t=1776981761; cv=none; b=herrVonBIAIaHt6ujP5XTtYFcjNTk+FL6hXH5NDWkDjwgcbDz3FtLrzv7qs2DZhmLni7VBhBtBdRfxxtO3GgFEtiIz3fzivoXEdzKlvdcBKbdIOMKm4hTdyYx8GbvEX6NI7GnrT15r3o0vsCL6pA+WI9J1/ZWc5d6Owkt3M235c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776981050; c=relaxed/simple;
-	bh=XYuKr+eaOJj0h6C00DY+gStx8tqVxxnWPOfaL0ideFs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=o4FMsOoQUvbR408104n2lgwOku3TF1LV7EQU0W1cWNvHo1p8UzwjbJQe3zDioDecDi2Wh8PBHy0meAXz/Y5f2PQIXla22ahtJYbv/CDYDrR1aEimrDjlMBSuhCU+ql06CeCyB87geoa4N03FgRZcW6aFVLIOjwHY075VeI8irck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n4JSeUjv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86CDFC2BCAF;
-	Thu, 23 Apr 2026 21:50:49 +0000 (UTC)
+	s=arc-20240116; t=1776981761; c=relaxed/simple;
+	bh=iesPwsztrmjzqui51g0i4ZUJjHRh01BEx/nK4WBofiE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TfS0ADj0l8IkFp/FFk1gJOjhE5Kk4tbhSlKeS2AZl+O+NQaeqcuVkpEFvnOCBOnHboVf1m+NE/a5m8bR8Z+3D1KVQdz9uCSE9zg/d8qWGRKHWAMQt4egvIc0M9stAJDp8IM8sJVYc9EYsY5Ajybq4LrhBkIdPsBSRNwWZJsM6iI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nICZytuC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E931FC2BCAF;
+	Thu, 23 Apr 2026 22:02:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776981049;
-	bh=XYuKr+eaOJj0h6C00DY+gStx8tqVxxnWPOfaL0ideFs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=n4JSeUjvAxQOaOZKSOuAOEhyZUagMglFLYbT7kJx+29PPFnKsb6tTP1EOg4u1H7EP
-	 yXkBPNp/8ZRIzUs7Qq/yhSpolzWadXLwcKXGNfIWnCOwjUdV3ZxkOLvkTTf5/0h1/W
-	 L4xCJ1j14PM0D5r6qPNc8SCRQBUfzES5Eu8ycMnjQNSWCAu1qwDDPuj8Rri1M2KRj7
-	 Fu1IPdk+fYvXmeT+uvaY2yBNPueADw/Rstab0UUu5UDhpU1SS5YzwkYudvf54eOhQy
-	 oRf93hINIew46E78/SdaylGufTbWb1lUXCC4vIqIfDOGMROxcla3p+Aj3lo/jRsERh
-	 CdSaDpnAtFYSA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02DDE380A94F;
-	Thu, 23 Apr 2026 21:50:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1776981761;
+	bh=iesPwsztrmjzqui51g0i4ZUJjHRh01BEx/nK4WBofiE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nICZytuCKFQx1NjUGnK00MlvMZ6BTkRxWuArGYeg7uSAoyotoI5/n4t5tcrHYpN5E
+	 X8GHApH6zuetYq6cytvOKH8mh3lUPOlm/zyXh+nsvfKowVoc09bNmUIZqmFh+xc2ig
+	 AEpr9ftRmvzoQJrUt0gbv2fzKbvdFTgQhbn8WZ8Jqvtx6hcmc2R0cVyo1j1SJEwJvD
+	 0rtpedsKqqsFQTse7FsMeb8gzXK7EsoKsGiZ3ZfOZMaV1/vQ7qh3iWXfSsN+aJIDGJ
+	 dP2a1MaJ6DXgdShAvpMDtlLnm46sNF+D4bgElxfEICpjqQJo8qmNhBhI2AebrByk8R
+	 cgtgFUn1MgGyQ==
+Date: Thu, 23 Apr 2026 15:02:40 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Cc: Daniel Palmer <daniel@0x0f.com>, Geert Uytterhoeven
+ <geert@linux-m68k.org>, Andrew Lunn <andrew@lunn.ch>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet	 <edumazet@google.com>, Paolo Abeni	 <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Jonathan Corbet	 <corbet@lwn.net>, Shuah Khan
+ <skhan@linuxfoundation.org>, Michael Fritscher	 <michael@fritscher.net>,
+ Byron Stanoszek <gandalf@winds.org>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org, linux-m68k
+ <linux-m68k@lists.linux-m68k.org>
+Subject: Re: [PATCH net v2 10/15] drivers: net: cirrus: mac89x0: Remove this
+ driver
+Message-ID: <20260423150240.07c350a2@kernel.org>
+In-Reply-To: <aee0393e2a2bd5a5d0bf8aee758122633e54aa06.camel@physik.fu-berlin.de>
+References: <20260422-v7-0-0-net-next-driver-removal-v1-v2-0-08a5b59784d5@lunn.ch>
+	<20260422-v7-0-0-net-next-driver-removal-v1-v2-10-08a5b59784d5@lunn.ch>
+	<CAMuHMdV-vF6sTvAi8kKzxGwZ9YUSBO1Qta5PDCRbA0zr-LEp_w@mail.gmail.com>
+	<c0c80113af470b265650405fa24deefe2d82ea24.camel@physik.fu-berlin.de>
+	<CAFr9PXnECog56b+Jq9TBohhQ4oBB3hGV1pHj6OstOSLqkOpcTQ@mail.gmail.com>
+	<aee0393e2a2bd5a5d0bf8aee758122633e54aa06.camel@physik.fu-berlin.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3] rxrpc: Miscellaneous fixes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177698101049.775674.1567171164890583654.git-patchwork-notify@kernel.org>
-Date: Thu, 23 Apr 2026 21:50:10 +0000
-References: <20260423200909.3049438-1-dhowells@redhat.com>
-In-Reply-To: <20260423200909.3049438-1-dhowells@redhat.com>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, marc.dionne@auristor.com, kuba@kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, anderson@allelesecurity.com, linux-afs@lists.infradead.org,
- linux-kernel@vger.kernel.org
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280882-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280881-lists,netdev=lfdr.de,netdevbpf];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 80E91457FC2
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DAE79458080
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 23 Apr 2026 21:09:05 +0100 you wrote:
-> Here are some fixes for rxrpc, as found by Sashiko[1]:
+On Thu, 23 Apr 2026 11:28:11 +0200 John Paul Adrian Glaubitz wrote:
+> > > Retrocomputing still is not well regarded by some maintainers, it seems :-(.  
+> > 
+> > I've found bugs in drivers by plugging those things into exotic
+> > hardware like my Amiga 4000 and Ultra5 [0].
+> > So, it's not totally pointless. And having a shader capable Amiga[1]
+> > is pretty cool.  
 > 
->  (1) Fix rxrpc_input_call_event() to only unshare DATA packets.
+> Not only that. Those exotic architectures also help iron out generic kernel
+> bugs and give new maintainers an possibility to get their feet wet.
 > 
->  (2) Fix re-decryption of RESPONSE packets where a partially decrypted
->      skbuff gets requeued if there was a failure due to ENOMEM.
+> > Sad to see fun stuff getting pushed out by basically spam bots. :(  
 > 
-> [...]
+> It's not so much pushed out by spam bots but by the commercialization of the
+> Linux kernel. Many developers think that the sole purpose of the Linux kernel
+> is to run on modern commodity hardware.
 
-Here is the summary with links:
-  - [net,1/3] rxrpc: Fix rxrpc_input_call_event() to only unshare DATA packets
-    https://git.kernel.org/netdev/net/c/55b2984c96c3
-  - [net,2/3] rxrpc: Fix re-decryption of RESPONSE packets
-    https://git.kernel.org/netdev/net/c/0422e7a4883f
-  - [net,3/3] rxrpc: Fix error handling in rxgk_extract_token()
-    https://git.kernel.org/netdev/net/c/3476c8bb960f
+Please send that MAINTAINERS patch to designate yourselves
+as maintainers (like Daniel already did for another driver).
+This is the ideal outcome.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+We want to be welcoming in the community. But being a part
+of the community means participating in _work_.
 
