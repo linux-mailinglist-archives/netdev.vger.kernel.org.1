@@ -1,158 +1,112 @@
-Return-Path: <netdev+bounces-280604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280607-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0Id9NIGw6WlchgIAu9opvQ
-	(envelope-from <netdev+bounces-280604-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 07:39:13 +0200
+	id eFRlD/C06WkJiAIAu9opvQ
+	(envelope-from <netdev+bounces-280607-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 07:58:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D4E444D4D6
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 07:39:13 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A813444D5F2
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 07:58:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6FE54300682D
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 05:39:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D3E123024A1A
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 05:58:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A7F3A1689;
-	Thu, 23 Apr 2026 05:39:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nshC468M"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D761E3CCFC8;
+	Thu, 23 Apr 2026 05:58:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from isilmar-4.linta.de (isilmar-4.linta.de [136.243.71.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DF2039280D;
-	Thu, 23 Apr 2026 05:39:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD8E237C923;
+	Thu, 23 Apr 2026 05:58:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=136.243.71.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776922751; cv=none; b=UaDy5u6NJ+X6fl1vAbhpmUtbKAIZS0ttYzXmSbwy1Fx6bO2i5NpXUhihtKGO5K2BWm01SVHFF8cDjewqeYpE5sbAN+PEKlPH7uV6QzD4h5tkegFBz0mbcWPDJnSPV6lCsvoyTns0bpNqtjtyzYn73dbuf9z4qRooWJUvurRVCUQ=
+	t=1776923884; cv=none; b=lNVCG4CY7kexMB8U2ZeJU+5ihOKje/70CVvhpc5sY6dkH9a9TRv2euS5MEzXEm8ObEW1+Pt/R5k72951JjeRjg5PayEAy2mw3ImetoStWbPxa8DLXk+Xd1XTY2zTdUtBQcrmtzobDrhrZ4rke8S7ubUcKZUeEnM8JCGgwVUlmFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776922751; c=relaxed/simple;
-	bh=rowK5DSec9h1SfrIxFRjEH/ZsljFmavsKkMyOS1b4G0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SM2Gxuh6zRQuuCScBgCTRdkbeYzRDYD2nlj2iJk2g8P5a2Fci82CyA6D6z6TD9RmM7z0OEP359SmpKgccac8wUfK4/WQ3iKWQEi2EicUbVCB4gPA63b8+7LsMfWGO9a//ke953Pnd1tATUpFcuGGaq7lvxORxCCzYHLfm2Fm9xA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nshC468M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70E69C2BCAF;
-	Thu, 23 Apr 2026 05:39:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776922751;
-	bh=rowK5DSec9h1SfrIxFRjEH/ZsljFmavsKkMyOS1b4G0=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=nshC468MLUdeq6ua1iH0soJMxRatSDUHngY0w+hhnBfJ9ToHsNeB/7hzEujDbtPaq
-	 EwjODy3ryDQ4GAYwlURDkUVe+mvJNGqG971uygnyV8hqv/p2XRGXB0vZsUXXaK9KRe
-	 Be/WX/qzv16aG3Ic4Ko89rPJnswXnsPF5KBHbqgb8heHHhvzk4G0MmsZ6kZ250lv2R
-	 IStH4wJJbyLaxanIGYi94YDj+Thgrn7LXY48JOcQqr9Kvw/jMaFslkCbITsaz8FLOk
-	 NzY8nQBc8TePCfhNvl8qGITunclFy8I5EQXZJWzprpOtDRYK5g7z+GBuWeuHeWoa87
-	 hLrkyKePLwWUA==
-Message-ID: <15512dc3c3250ae025f9e588e2335e2a2acf5107.camel@kernel.org>
-Subject: Re: [PATCH net 1/1] net: rds: fix MR cleanup on copy error
-From: Allison Henderson <achender@kernel.org>
-To: Ren Wei <n05ec@lzu.edu.cn>, netdev@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com,  horms@kernel.org, leon@kernel.org,
- santosh.shilimkar@oracle.com,  jhubbard@nvidia.com, yuantan098@gmail.com,
- yifanwucs@gmail.com,  tomapufckgml@gmail.com, bird@lzu.edu.cn,
- draw51280@163.com
-Date: Wed, 22 Apr 2026 22:39:08 -0700
-In-Reply-To: <79c8ef73ec8e5844d71038983940cc2943099baf.1776764247.git.draw51280@163.com>
-References: <cover.1776764247.git.draw51280@163.com>
-	 <79c8ef73ec8e5844d71038983940cc2943099baf.1776764247.git.draw51280@163.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3-0ubuntu1.1 
+	s=arc-20240116; t=1776923884; c=relaxed/simple;
+	bh=17CWfY63CJpkL5X3N8B6Nj5ektoHahVkJ4AqnzUiJpo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LugwxR5VU2tuVSA9c05D9GQIPkQSYOpWprzFr5JZYfi5AROAMpj3VfXj9rX2gG3CqTiiUwcO3l05mzc0p8MQHCDOyKun2gdMPO7f01pvk3xlph0uFvpHLSODhn8E1oIUYI2LFQhnPXkmgnxjsHZFzOLA11IBGfIq+V52GT7JkeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dominikbrodowski.net; spf=pass smtp.mailfrom=dominikbrodowski.net; arc=none smtp.client-ip=136.243.71.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dominikbrodowski.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dominikbrodowski.net
+Received: by isilmar-4.linta.de (Postfix, from userid 1000)
+	id A64F52006ED; Thu, 23 Apr 2026 05:49:24 +0000 (UTC)
+Date: Thu, 23 Apr 2026 07:49:24 +0200
+From: Dominik Brodowski <linux@dominikbrodowski.net>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Michael Fritscher <michael@fritscher.net>,
+	Byron Stanoszek <gandalf@winds.org>,
+	Daniel Palmer <daniel@0x0f.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net v2 13/15] drivers: net: 8390: pcnet: Remove this
+ driver
+Message-ID: <aemy5Lm9B2dLItdd@isilmar-4.linta.de>
+References: <20260422-v7-0-0-net-next-driver-removal-v1-v2-0-08a5b59784d5@lunn.ch>
+ <20260422-v7-0-0-net-next-driver-removal-v1-v2-13-08a5b59784d5@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260422-v7-0-0-net-next-driver-removal-v1-v2-13-08a5b59784d5@lunn.ch>
+X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280604-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[dominikbrodowski.net];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,oracle.com,nvidia.com,gmail.com,lzu.edu.cn,163.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-280607-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linux@dominikbrodowski.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	R_DKIM_NA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6D4E444D4D6
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,dominikbrodowski.net:email,isilmar-4.linta.de:mid]
+X-Rspamd-Queue-Id: A813444D5F2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 2026-04-22 at 22:52 +0800, Ren Wei wrote:
-> From: Ao Zhou <draw51280@163.com>
->=20
-> __rds_rdma_map() hands sg/pages ownership to the transport after
-> get_mr() succeeds. If copying the generated cookie back to user space
-> fails after that point, the error path must not free those resources
-> again before dropping the MR reference.
->=20
-> Remove the duplicate unpin/free from the put_user() failure branch so
-> that MR teardown is handled only through the existing final cleanup
-> path.
->=20
-> Fixes: 0d4597c8c5ab ("net/rds: Track user mapped pages through special AP=
-I")
-> Cc: stable@kernel.org
-> Reported-by: Yuan Tan <yuantan098@gmail.com>
-> Reported-by: Yifan Wu <yifanwucs@gmail.com>
-> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-> Reported-by: Xin Liu <bird@lzu.edu.cn>
-> Signed-off-by: Ao Zhou <draw51280@163.com>
-> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
-
-Hi Aso,
-
-This fix looks good to me.  Since this is a bug fix, this patch should be c=
-c'd to stable@vger.kernel.org.  Also be sure
-to note the target tree and component in the subject line like this: =20
-
-[PATCH net v2 1/1] net/net: rds: fix MR cleanup on copy error
-
-Other than that, the patch looks good to me.  Thanks Aso.
-
-Reviewed-by: Allison Henderson <achender@kernel.org>
-
-Allison
-
+On Wed, Apr 22, 2026 at 01:01:56PM -0500, Andrew Lunn wrote:
+> The pcnet was written by David A. Hindsh in 1999. It is an PCMCIA
+> device, so unlikely to be used with modern kernels.
+> 
+> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 > ---
->  net/rds/rdma.c | 4 ----
->  1 file changed, 4 deletions(-)
->=20
-> diff --git a/net/rds/rdma.c b/net/rds/rdma.c
-> index aa6465dc742c..61fb6e45281b 100644
-> --- a/net/rds/rdma.c
-> +++ b/net/rds/rdma.c
-> @@ -326,10 +326,6 @@ static int __rds_rdma_map(struct rds_sock *rs, struc=
-t rds_get_mr_args *args,
-> =20
->  	if (args->cookie_addr &&
->  	    put_user(cookie, (u64 __user *)(unsigned long)args->cookie_addr)) {
-> -		if (!need_odp) {
-> -			unpin_user_pages(pages, nr_pages);
-> -			kfree(sg);
-> -		}
->  		ret =3D -EFAULT;
->  		goto out;
->  	}
+>  drivers/net/ethernet/8390/Kconfig    |   11 -
+>  drivers/net/ethernet/8390/Makefile   |    1 -
+>  drivers/net/ethernet/8390/pcnet_cs.c | 1717 ----------------------------------
 
+NACK for this one. This is the most common PCMCIA networking device, so
+should be removed only once the rest of the PCMCIA subsystem is removed.
+For the other removals of PCMCIA device drivers in this series:
+
+	Acked-by: Dominik Brodowski <linux@dominikbrodowski.net>
+
+Thanks,
+	Dominik
 
