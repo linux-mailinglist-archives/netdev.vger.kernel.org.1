@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-280621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280622-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OFgrMB+86WlJigIAu9opvQ
-	(envelope-from <netdev+bounces-280621-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 08:28:47 +0200
+	id cG7VI7e96WnijAIAu9opvQ
+	(envelope-from <netdev+bounces-280622-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 08:35:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16C0F44D9E1
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 08:28:46 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id F19A744DA4A
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 08:35:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 707463019903
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 06:28:45 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id F02533006B42
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 06:35:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1CAC37DE81;
-	Thu, 23 Apr 2026 06:28:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 964513822AA;
+	Thu, 23 Apr 2026 06:35:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LcTRjjvU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aqKCU/Df"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315B81A7264
-	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 06:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21C753101A7
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 06:35:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776925724; cv=none; b=kjVAkXdZkRSGXeErARx4d7N0tP+0dkNnWp49V/GbcjO7+xg/BzjJ7DncSp2XbHY5Rtx3w2lhNSt3g7t2e6mZ7CZSjcin/4CQO5DplDTJnKQeIa8Sz/sCkNhwPxk2LHxlIU3Xv1IjPNO257V6ALJxKoh4zTgqlDlThz1/BAxVlWE=
+	t=1776926131; cv=none; b=Sd0wUrgm7aLCjnYCxFeCLiUvmrcFZA3sTppLlQooVVmEalpTvOppEjVXrNmGgfLY7vZZKOqe/Zzg5aEC3X2p1xWv8KXEurQEHaaMbFdurEWJHOwj5LZwkUmWLPt0j6IjuLP5jsqDu4+NiOOFrH7MqgdmR1b9VtJxa/CeLyf4hnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776925724; c=relaxed/simple;
-	bh=TIKWurkCeViktvT6vRCxXoXGv6LQQRRCc9UHJ9Nv66Q=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=OyFcnwniYF98u/E6lQSKVcPHwbdBVki6zGIhELJMWiZ+/ya2JWHTLuKJci7fNidax0M1uTiAz0/jdz54/bgPd9KPCvNT90Mj9hKrIDoocIqRcu56rvCLZfga0dTf3VSg3XUbYZH8CRYawcbFrrWKt5Pmm/gaS0qcLLgGt2OBaSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LcTRjjvU; arc=none smtp.client-ip=209.85.222.201
+	s=arc-20240116; t=1776926131; c=relaxed/simple;
+	bh=cxz2KiGzD3Qss2gSS/NisGV15V/6kFI2Yh17cqNmoMw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=CeaEi0LPbGWvi9TGe9Wt2sZ4Qnj9X/1HO6TOAqoRXWCl00wdAQibssINcvfcVIY5RRYHxDP9PYzD7pcSIJC96ztigttlOJ5B2xf0NK2By371SURTt9ao61yP54HKXmFtio2zDv8yM8acoVig1jIvGW7lPMkFQF59uAUSiWG1IH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aqKCU/Df; arc=none smtp.client-ip=209.85.219.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8e8950b3ee1so1615601085a.3
-        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 23:28:43 -0700 (PDT)
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-8acadca1ac4so180054446d6.0
+        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 23:35:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776925722; x=1777530522; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1776926129; x=1777530929; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=d2awcyUUlOZ7DiUll5yCRAkp5hrWVwnaXgkecEMdniQ=;
-        b=LcTRjjvUmFlolRMK/sxv3m5TZYWG5Dp2F5oeRrsrj8SE6H7Ig9Zfs1eLJWsfuqM6sx
-         Rorp/tq/T+1TwQVeaH0eGYrJGBGxyYqaBUI7YMfkEFlBv65aqaBn/41BaEN7O/Nm4mX4
-         sr1sIgL6fBJ7KMBp2BTzsfHxp50njZhTGiHSpp2cxScF331FEzoF8EDOZYwFQF9dsk2u
-         2awwFkKGqkpxV/+CMbPJZEV6yRbELYkWvQQ7q9Fzllgpn5Pr/zEajIN9Myy64wTQIVYf
-         CtPvhRNtQPieIFG6By9F1OCMA4TdNAGaGeMch+AaKHfW9VjsX88LxE53d8+J2XUoEius
-         b54A==
+        bh=Ox5sew3kehZFDXer8EqslhcqBsxATnmvyhuAOPZiFOs=;
+        b=aqKCU/Df4r1CGzo+3PgVT+ca7aZ0ycRGpFuehcPmbOlsI3LMhqKIBYhwDzZglygrWN
+         pjPMRkiBMTDRH5hstRUIi7+DA2VB3x1B0z0bIwLT1OYss52b3H5VNY+dgbf+bc5K8q/S
+         Hm0cgGgxzC73BdbSvUi5iwMCnMkJ1WkWegYH5d0ousdS0XizKFfIC0rDVZGjQS3UmFkp
+         EqS4hGV4pBzuQO0TuWnspSZlBcjfn9o8sB3FqUpR6+VVUVtpbi+9wS5cNUG0Fkzl4xrI
+         mCzq3o4pryA5aW0ZUrq4pWQJXQdPmbB0XzuGA5uyaFLkFvurngEDO7+XR0MPFqwOcrJQ
+         pZLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776925722; x=1777530522;
+        d=1e100.net; s=20251104; t=1776926129; x=1777530929;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=d2awcyUUlOZ7DiUll5yCRAkp5hrWVwnaXgkecEMdniQ=;
-        b=FVybnc+ehPO8/8m3fEM4AFziKBntlthm0DTHplltxyEufC8ukq+5Q0qdhWYrNHbfgu
-         iRMIeEUEsF19uTjTStKCW0xXOIgreLbyRl6s0lftmhbWsjVH0UDDEgfr306n7z8YTTN3
-         IZ6N+RhCDGRh/9Ygn8PiVIVSnKG/GkTjkZFktk5xWXhlmgNfrtsH8Gs5b/KmWfDV4kgy
-         q2MFaKP4C+INfCjtveixSVRn9n4suQyjHi3OVDJ7yi9cfy4fkymBdwQeGg2PpLEoLZxm
-         OMmiNXhgXatnsCrIzf2Bu0Y3IRVBgAz+OO82/1ZgVyR4YDSGzj25ksh6PJlJvQSDOMsq
-         x4rA==
-X-Forwarded-Encrypted: i=1; AFNElJ+c0vgC7SrAeXszj9PzJOYkLRUxBYu2+FcqbPYJrdBHM0hMu6lINh6Il4pJhMV5mLg9jNW2V1c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsoMlwKSvJslaY6BuHyaFrLzAT+GmHCOopzgqkb6wyz8lDr2vM
-	Kh540Vp6Ca2GfGYqsd22E2qWuZzwZHBWtBcl9a//+2wgcmAqNbVKyz6YtB790Td4REwsUm7IO3H
-	8nGZgciTAqi1XjA==
-X-Received: from qknrd3.prod.google.com ([2002:a05:620a:8dc3:b0:8eb:1c73:20c7])
+        bh=Ox5sew3kehZFDXer8EqslhcqBsxATnmvyhuAOPZiFOs=;
+        b=BXBbrlDVuxTBXcRS7hO1ZAPL8A375c+16JgpSkohthClHE2Ji3XytYEgff7h+Fe0is
+         +qZlRVGvnd6eOKKtP6exQa+Bka4/9iUofeu4jaItlRTHIlgg70VLrJ993ejczcZC57OO
+         tCtlnghu7MlKad/mv97PEUN4R4aWeF3s1RqfMiqSKNgf25yeGPsQqEHDQZulCHjmfsiB
+         a8lNIoWtSdUpUL/1hVOrpiAwfO2gz71oPK0+Qr+GaVoDnZVpZs/86XP+yVMpwrYzd5mV
+         50QeGu36xuCEs756A6FTpeWDmCmIqzmW/gnOr9bRjxbfkfd1orRNTFhbVOYXqJmZprE0
+         xmqg==
+X-Forwarded-Encrypted: i=1; AFNElJ9tBVaOU9Rqz1JmScTOe2gYq6pHI2voaWT+p7TCOk8m2DBZrRINte+LwJf2GrYTytqfXZzYnqw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFs7VrpO64ndUEYcKUOq86K+UJlw/n2V5F6eRB+AbRaP/3WHRX
+	K6MIpzj/XlVCe4UFaflI0bu4FC3gWx4d4Gca6AmHJrNcrub5z2+NuQCC/e3zlRbKagOp804tkNY
+	aoGltvbSLqhcQEg==
+X-Received: from qvboo32.prod.google.com ([2002:a05:6214:4520:b0:89c:6104:2e8f])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:4089:b0:8cd:9707:630e with SMTP id af79cd13be357-8e78f82ad1amr3834388785a.19.1776925722029;
- Wed, 22 Apr 2026 23:28:42 -0700 (PDT)
-Date: Thu, 23 Apr 2026 06:28:39 +0000
+ 2002:a05:6214:1d08:b0:8ac:74f5:fbaf with SMTP id 6a1803df08f44-8b028177e9fmr417491306d6.51.1776926128820;
+ Wed, 22 Apr 2026 23:35:28 -0700 (PDT)
+Date: Thu, 23 Apr 2026 06:35:27 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,8 +73,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.54.0.rc2.544.gc7ae2d5bb8-goog
-Message-ID: <20260423062839.2524324-1-edumazet@google.com>
-Subject: [PATCH net] net/sched: sch_choke: annotate data-races in choke_dump_stats()
+Message-ID: <20260423063527.2568262-1-edumazet@google.com>
+Subject: [PATCH net] net/sched: sch_fq_pie: annotate data-races in fq_pie_dump_stats()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -88,7 +88,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -98,7 +98,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280621-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280622-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -108,94 +108,59 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 16C0F44D9E1
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F19A744DA4A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-choke_dump_stats() only runs with RTNL held.
-It reads fields that can be changed in qdisc fast path.
-Add READ_ONCE()/WRITE_ONCE() annotations.
+fq_codel_dump_stats() acquires the qdisc spinlock a bit too late.
 
-Fixes: edb09eb17ed8 ("net: sched: do not acquire qdisc spinlock in qdisc/class stats dump")
+Move this acquisition before we fill tc_fq_pie_xstats with live data.
+
+Alternative would be to add READ_ONCE() and WRITE_ONCE() annotations,
+but the spinlock is needed anyway to scan q->new_flows and q->old_flows.
+
+Fixes: ec97ecf1ebe4 ("net: sched: add Flow Queue PIE packet scheduler")
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
 ---
- net/sched/sch_choke.c | 26 ++++++++++++++++----------
- 1 file changed, 16 insertions(+), 10 deletions(-)
+ net/sched/sch_fq_pie.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/net/sched/sch_choke.c b/net/sched/sch_choke.c
-index 94df8e741a979191a06885ad3ee813f12650ff3c..2875bcdb18a413075c795665e95f9dbbaac45962 100644
---- a/net/sched/sch_choke.c
-+++ b/net/sched/sch_choke.c
-@@ -229,7 +229,7 @@ static int choke_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 
- 		/* Draw a packet at random from queue and compare flow */
- 		if (choke_match_random(q, skb, &idx)) {
--			q->stats.matched++;
-+			WRITE_ONCE(q->stats.matched, q->stats.matched + 1);
- 			choke_drop_by_idx(sch, idx, to_free);
- 			goto congestion_drop;
- 		}
-@@ -241,11 +241,13 @@ static int choke_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 			qdisc_qstats_overlimit(sch);
- 			if (use_harddrop(q) || !use_ecn(q) ||
- 			    !INET_ECN_set_ce(skb)) {
--				q->stats.forced_drop++;
-+				WRITE_ONCE(q->stats.forced_drop,
-+					   q->stats.forced_drop + 1);
- 				goto congestion_drop;
- 			}
- 
--			q->stats.forced_mark++;
-+			WRITE_ONCE(q->stats.forced_mark,
-+				   q->stats.forced_mark + 1);
- 		} else if (++q->vars.qcount) {
- 			if (red_mark_probability(p, &q->vars, q->vars.qavg)) {
- 				q->vars.qcount = 0;
-@@ -253,11 +255,13 @@ static int choke_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 
- 				qdisc_qstats_overlimit(sch);
- 				if (!use_ecn(q) || !INET_ECN_set_ce(skb)) {
--					q->stats.prob_drop++;
-+					WRITE_ONCE(q->stats.prob_drop,
-+					           q->stats.prob_drop + 1);
- 					goto congestion_drop;
- 				}
- 
--				q->stats.prob_mark++;
-+				WRITE_ONCE(q->stats.prob_mark,
-+					   q->stats.prob_mark + 1);
- 			}
- 		} else
- 			q->vars.qR = red_random(p);
-@@ -272,7 +276,7 @@ static int choke_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		return NET_XMIT_SUCCESS;
- 	}
- 
--	q->stats.pdrop++;
-+	WRITE_ONCE(q->stats.pdrop, q->stats.pdrop + 1);
- 	return qdisc_drop(skb, sch, to_free);
- 
- congestion_drop:
-@@ -461,10 +465,12 @@ static int choke_dump_stats(struct Qdisc *sch, struct gnet_dump *d)
+diff --git a/net/sched/sch_fq_pie.c b/net/sched/sch_fq_pie.c
+index 154c70f489f289066db5d61bb51e58aaf328f16e..7becbf5362b3165bac4517f32887386b01301612 100644
+--- a/net/sched/sch_fq_pie.c
++++ b/net/sched/sch_fq_pie.c
+@@ -509,18 +509,19 @@ static int fq_pie_dump(struct Qdisc *sch, struct sk_buff *skb)
+ static int fq_pie_dump_stats(struct Qdisc *sch, struct gnet_dump *d)
  {
- 	struct choke_sched_data *q = qdisc_priv(sch);
- 	struct tc_choke_xstats st = {
--		.early	= q->stats.prob_drop + q->stats.forced_drop,
--		.marked	= q->stats.prob_mark + q->stats.forced_mark,
--		.pdrop	= q->stats.pdrop,
--		.matched = q->stats.matched,
-+		.early	= READ_ONCE(q->stats.prob_drop) +
-+			  READ_ONCE(q->stats.forced_drop),
-+		.marked	= READ_ONCE(q->stats.prob_mark) +
-+			  READ_ONCE(q->stats.forced_mark),
-+		.pdrop	= READ_ONCE(q->stats.pdrop),
-+		.matched = READ_ONCE(q->stats.matched),
- 	};
+ 	struct fq_pie_sched_data *q = qdisc_priv(sch);
+-	struct tc_fq_pie_xstats st = {
+-		.packets_in	= q->stats.packets_in,
+-		.overlimit	= q->stats.overlimit,
+-		.overmemory	= q->overmemory,
+-		.dropped	= q->stats.dropped,
+-		.ecn_mark	= q->stats.ecn_mark,
+-		.new_flow_count = q->new_flow_count,
+-		.memory_usage   = q->memory_usage,
+-	};
++	struct tc_fq_pie_xstats st = { 0 };
+ 	struct list_head *pos;
  
- 	return gnet_stats_copy_app(d, &st, sizeof(st));
+ 	sch_tree_lock(sch);
++
++	st.packets_in	= q->stats.packets_in;
++	st.overlimit	= q->stats.overlimit;
++	st.overmemory	= q->overmemory;
++	st.dropped	= q->stats.dropped;
++	st.ecn_mark	= q->stats.ecn_mark;
++	st.new_flow_count = q->new_flow_count;
++	st.memory_usage   = q->memory_usage;
++
+ 	list_for_each(pos, &q->new_flows)
+ 		st.new_flows_len++;
+ 
 -- 
 2.54.0.rc2.544.gc7ae2d5bb8-goog
 
