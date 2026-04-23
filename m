@@ -1,84 +1,103 @@
-Return-Path: <netdev+bounces-280627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280628-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4JMfOsXC6WkAjwIAu9opvQ
-	(envelope-from <netdev+bounces-280627-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 08:57:09 +0200
+	id kHHYLxDE6WkAjwIAu9opvQ
+	(envelope-from <netdev+bounces-280628-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 09:02:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4292144DC25
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 08:57:09 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A462B44DCCB
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 09:02:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 44621305C8EE
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 06:55:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D8F0E3014BD0
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 07:01:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2CC3D47D9;
-	Thu, 23 Apr 2026 06:55:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D43853DC4A1;
+	Thu, 23 Apr 2026 07:01:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wkennington-com.20251104.gappssmtp.com header.i=@wkennington-com.20251104.gappssmtp.com header.b="Fd+Y0jAk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gfkSKZ0d";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="dKCfx5Z1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B8C3D411A
-	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 06:55:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 703C83DBD74
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 07:01:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776927327; cv=none; b=VS73AanrC5HJLwUcluSinxnnZpPqAADWFimK7qm1CtGjCI2acMJyKOhrp17GN6AUhyJ2zQR7P6rMMn6j9jM/RXt97zmWRtnQLm8NlbkpovOnIdlUMZWbIyA1BztWZaZ0iQfLhOLl7g7DEIx/v6dCHPLZs5yVkDu/0zl51l2S69I=
+	t=1776927694; cv=none; b=VGa3xnscWDgaap3DqaFo4ncwIvVoTOItfq3gsjq0u1K83zGvylHJk/3FdUoh/jxXFu9p8vGhzrQypbM5vj/NY3aV70BGKeeHsx+Ff2fXjRwjrgWNc9fxjYUmn1O2h/NTGoNFk+DrwAJYTGVTGqt0Y6HTx78VxvrKrF3JeR7BvMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776927327; c=relaxed/simple;
-	bh=WkK0k/e0hNXF+pgwnaYOKO1eVKPkc8tQ6NYSLjy9qVY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fLSS/XAAKIhcxcG9jc1DQwdnqAyG6MLgCYhZ+DelsqNDREUJ/WZCuUsvsE0W60KNGZmtUSeHMa3KI37KBYBKwB4wA2BN4AzL4OXT/bFg/y03G5rPcU5d9aSmBoN5o6d3RhUNZCvgxNl5G8L8vUJBdcNjih0RVtAVhZEY0g4b9As=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wkennington.com; spf=none smtp.mailfrom=wkennington.com; dkim=pass (2048-bit key) header.d=wkennington-com.20251104.gappssmtp.com header.i=@wkennington-com.20251104.gappssmtp.com header.b=Fd+Y0jAk; arc=none smtp.client-ip=74.125.82.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wkennington.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=wkennington.com
-Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-12db7bf1541so2634299c88.0
-        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 23:55:24 -0700 (PDT)
+	s=arc-20240116; t=1776927694; c=relaxed/simple;
+	bh=QzCiSb/LA/Ut5togtkAJ5NFWLSQz8LQCLtANZgKMTpI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=o45bcFRXqyAbQyTcsRpW8TcNhutbYkyE5JX2U5eaf3f4AqzLvzItUqul5FifbV/O/nXH8pF42+yLFfIFMcpXcaonpEndpGY16iYGK0cQoYdaPpSWKD/pmiV8GNVSOfRyH6PXbu+c7SJla0BOXj2ToESTKBioWMzX5ZBnzXThWj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gfkSKZ0d; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=dKCfx5Z1; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776927692;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J7TMV+5ulw9mIc+/zQLjcApELfOKAdT/wWOID1gLrF4=;
+	b=gfkSKZ0dtuRWgtWdfZ6rGkFjdnDc18V5vDvM7/shu3w1oBkfwwIPpYzdg1EZUg+w+xOSRj
+	Skf7kEUu+tmApTcd3Njvyz8xD0sWre6HO0wRj/H7aED1sFhWpP2mW2a7f9wsXN50wdrpxQ
+	/dcWX0/ExPTzxeAm53KRwmm4qNeRH3s=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-400-kGd3VOCCMOq7Iz2h1KpYxQ-1; Thu, 23 Apr 2026 03:01:30 -0400
+X-MC-Unique: kGd3VOCCMOq7Iz2h1KpYxQ-1
+X-Mimecast-MFC-AGG-ID: kGd3VOCCMOq7Iz2h1KpYxQ_1776927689
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4836abfc742so61629895e9.0
+        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 00:01:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=wkennington-com.20251104.gappssmtp.com; s=20251104; t=1776927324; x=1777532124; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1776927689; x=1777532489; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lKzsjqI7iNKcF5Q0iWD4bwo8udZOOyNt3EuqeHWnF9M=;
-        b=Fd+Y0jAkz6C4Fx9f/zRoYFB2oWEeWQTCCFGGwqW62keipxm4aeRgSRr2hBnM2WSQ+B
-         8pZGVF2/cYo/195cuf344zFNgyoSvIiOKLPX4ZPiJQAPjIvLvfPWq4RhQSP7Axag0TtZ
-         ASm1x/PClm0Avt2UxSECy+32lZZ0DZE2Weora2pkW3aZhwbCENAlC8xqDstOuaIB9l37
-         te9Jydw6P6xG90+BAZL0yUK2Fv0VsD979ZuGLqFKPNN66qjZa5HOW5buZymy67G3PgIB
-         cVyu2ScPB+aVoKpxW906uyFAMwEkKfKiqpfSGF6UHgb6ZoUaNkxkBsaxLgXqjPGk2RMD
-         k75w==
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=J7TMV+5ulw9mIc+/zQLjcApELfOKAdT/wWOID1gLrF4=;
+        b=dKCfx5Z1c7cTDh2b6E5993W1zQonnSFFzfvQtKpZnneLHhBHfVVt7hVHsZ+5psYFdT
+         wOWtu8qqxWuTmLzD0YTObR/kK4/69e+dJtQAPuaPeZh+2e+DcNWFAm1GmG5wq2e1myQm
+         E/aYrN50r4PhD2EKCHmwIEMmCblQF7I66PxKfriNhQgNc8Rbsr10j9HxKBc+CR65ITW3
+         2d/mJMvoagu+YAdNsaQMnDf4t83hTXt2XkuDv3PehmnHJ+OJM094HxbusWAGZexizIm9
+         WjQYaxVCr/bTB2jQs35Vp6jb1+KEw+aUeR6nLvlm5fXaHqQ67AvGgpD7IJtCaN7K6AT0
+         8rLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776927324; x=1777532124;
+        d=1e100.net; s=20251104; t=1776927689; x=1777532489;
         h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=lKzsjqI7iNKcF5Q0iWD4bwo8udZOOyNt3EuqeHWnF9M=;
-        b=Rwu++O0fh6O+egFEZC0+Fxj3hWihGJ+92tYxt0ouCH1mzo3+uFIwZF6CHzXFZ/eG0R
-         hgxyf3urzjIOxL6t7+aZfT7Txk7nmpVvJ3ru1XiQkU1cuny8oPIvfNtx3OCm5Y3LYnfH
-         IqwBBCHgiklEdL2g9K71roeziCPX2MplZX0Fhx5UEBS05TGyXwY6avTAFRCDcGKYCX/o
-         77e3keGlPHp3+evHWyZi+a+8HkQgSpvW+qHDDKBjCRTnCgXePbDh/EhnJU2MQ4hBmwrC
-         bJh7yDK9RhgWzJmNNDosCEcEvW8DoQsFX9gyKNiZx81TLpjH/9UBNadE7SaOC3RJrRAh
-         pkig==
-X-Gm-Message-State: AOJu0YxcX7HVcCq8DPv54OBtkjOKZzGZV26kM/UAqciybstKPVcujRTd
-	LTT6VlbmDFNk/WF0q7NFD4YK4v4g+KWh4bBZWBt0zLw0D1vkhc+QO/mcgfhk0apCEGg=
-X-Gm-Gg: AeBDiesVHeNIP34cLUnL47DPNnLp8ueKpRz5WcHHIxjII+qKlsIohYIVqgjjrQxWaKG
-	7WLtKk+1BBJ7xvTxwZaAlOHo+tQOU1sumP8n/lhLURPETaWrHiFZuOCq6JRTywyb/AIqGSnAiXu
-	XduvsE1eUWmWrsgFYC4cEGXWlGV+1WPa4GWERty8tGu9E889XX4o7ELpfBEBJGg3uKNb54J0lCK
-	dH22RtSAVwGQtz4G1+TaibZfjS95UCzM3++CqbgFoZv1AqQovHFGmhBtrxYmm+2SBXBYXGqKXyL
-	jM8RkwcMQFx0J+9FUCPsujamIih1oOGiHyt5bqJxnIxxyEGgb3JlVVuvNoYVbCu4Cm2ztBgXBSE
-	nibB/rnw2kSatLnUztAWUn3Jg6+/Fb22z9Va+CyYw3AqyLmKHN4eofp4f/jpVNQEfZ112Kr5FAX
-	hHypC8QWjFYzgKQmPbCY7hnR+vEom5Z+WuiS58okhlB/TNtLIXWtSQXNeCFbczWgTXIeJXdjgD+
-	6W5Y9tMFczgJ6s=
-X-Received: by 2002:a05:7022:fa0:b0:123:2c98:f65d with SMTP id a92af1059eb24-12c73f6fc12mr14027226c88.13.1776927324063;
-        Wed, 22 Apr 2026 23:55:24 -0700 (PDT)
-Received: from ?IPV6:2600:1700:5ae0:228c:e58:7bff:fe94:34ed? ([2600:1700:5ae0:228c:e58:7bff:fe94:34ed])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12c749c422csm27268805c88.3.2026.04.22.23.55.23
+        bh=J7TMV+5ulw9mIc+/zQLjcApELfOKAdT/wWOID1gLrF4=;
+        b=eveP7sHXtfDYD39Um95NQmQbsla92RAGyPYmnu3zqdqf1XYzzRSs4L6YFWUOEe8eYa
+         iyCddkk1iVhYylvg2dwarEO37pd5xZJieTlaoZ7eBqAGBipvQPMo5a3CBPS3YyKIBFMp
+         GAfAuURrRIS6JAUKigjfOxIfPx/Os5rA7oI+HfHG4sgC0KYmUCQbpYQUrg5ORHrmb++b
+         y3CiIyBKzB2NfPZvFqX7cMaPA+zZTbmBidaCcYm+bxlecgOQior5JqFuQcbpTv7BBMZY
+         VaCfJqbbzgHDcc37VtYYBL+EaPzTs1rqiN0dXsrW/Ww0Z9JQ6HHkFwVMPt3G/u77gCCq
+         bicw==
+X-Forwarded-Encrypted: i=1; AFNElJ+h10ilnAVKMblFUMmWbr/fym1IyM7NIRiTl6EEdswF2OBPbeMhBnEhsQux+fxhUj3kugzVgQg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/0TUpEFlbEMn3SEizswz0Tcg/vAWf1pe6qd01u4vaLajsmW3H
+	ThDQdX9YJLYICqyrAhK+yLLQjcSKHY9Qml35Afn2aGA6NEJS7yHYg1jCmML5CRyjwRqocXBe4ip
+	EnvN0CLhDrOIVhD5eOcHyGEOYXLRnNjS3Li5FULx5rU1YEuGX/SUn4d6aGQ==
+X-Gm-Gg: AeBDiesFp3CwsBY/8DVbgMc9dbGJ+z9/RDuGIEpurgY8avyQaEQJxYpTfygy/Padyae
+	B5WR5JCvvk85A09gv0Yonqx/KKSgeHJMNgocLwY6TDZrPVZuUed0oxyxR8i9F3Zflg9S/S/0Dqo
+	L/lLhCANB80H7cyy7780k0WYSsM2T2LlotMYoN8VsNkcKJTpXTFKY8zXTqNcKOq6kEiwvgt3vqZ
+	63LNh8sZKFs+nIFUR1iwNRPWpL/Jb7KMLbUb9ZJKF7EIXUFl41FJhgbZtN6MSXuLXXXebaQO0qO
+	YFdHTLxyPH42ZvSFqjSCn6PkX7FO6goVqZTi4RB3oL96YdPbfIMpVxpy3ulg4CZQbX8J0I11dGT
+	LHlYbBJAFFoPvDGRdUae2yoC/wxDUuwdUIyUIBHySpxnr998tFLgrcZbmx9Q6ehgZCBY=
+X-Received: by 2002:a05:600c:a30a:b0:48a:581c:ead with SMTP id 5b1f17b1804b1-48a581c113cmr99215455e9.10.1776927689043;
+        Thu, 23 Apr 2026 00:01:29 -0700 (PDT)
+X-Received: by 2002:a05:600c:a30a:b0:48a:581c:ead with SMTP id 5b1f17b1804b1-48a581c113cmr99214875e9.10.1776927688526;
+        Thu, 23 Apr 2026 00:01:28 -0700 (PDT)
+Received: from [192.168.88.32] ([150.228.93.216])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a5aa3ae83sm186313685e9.12.2026.04.23.00.01.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Apr 2026 23:55:23 -0700 (PDT)
-Message-ID: <c94fc7c9-279b-4b4b-92f3-7f1b88bc0c64@wkennington.com>
-Date: Wed, 22 Apr 2026 23:55:21 -0700
+        Thu, 23 Apr 2026 00:01:28 -0700 (PDT)
+Message-ID: <1222eb4d-2b6d-44c6-96a3-03c42f714b4a@redhat.com>
+Date: Thu, 23 Apr 2026 09:01:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,89 +105,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] mctp i2c: check packet length before marking flow active
-To: Jeremy Kerr <jk@codeconstruct.com.au>,
- Matt Johnston <matt@codeconstruct.com.au>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Wolfram Sang <wsa@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260423001517.79219-1-william@wkennington.com>
- <61bb1b3838609996600f46ccb2c4ff89d085ee6f.camel@codeconstruct.com.au>
+Subject: Re: [PATCH net] virtio_net: sync rss_trailer.max_tx_vq on queue_pairs
+ change via VQ_PAIRS_SET
+To: Brett Creeley <brett.creeley@amd.com>, mst@redhat.com,
+ jasowang@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>
+References: <20260416212121.29073-1-brett.creeley@amd.com>
 Content-Language: en-US
-From: "William A. Kennington III" <william@wkennington.com>
-In-Reply-To: <61bb1b3838609996600f46ccb2c4ff89d085ee6f.camel@codeconstruct.com.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260416212121.29073-1-brett.creeley@amd.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[wkennington-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[wkennington-com.20251104.gappssmtp.com:+];
-	TAGGED_FROM(0.00)[bounces-280627-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[wkennington.com];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280628-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[william@wkennington.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,wkennington-com.20251104.gappssmtp.com:dkim,codeconstruct.com.au:email]
-X-Rspamd-Queue-Id: 4292144DC25
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A462B44DCCB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/22/26 20:47, Jeremy Kerr wrote:
+On 4/16/26 11:21 PM, Brett Creeley wrote:
+> When netif_is_rxfh_configured() is true (i.e., the user has explicitly
+> configured the RSS indirection table), virtnet_set_queues() skips the
+> RSS update path and falls through to the VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET
+> command to change the number of queue pairs. However, it does not update
+> vi->rss_trailer.max_tx_vq to reflect the new queue_pairs value.
+> 
+> This causes a mismatch between vi->curr_queue_pairs and
+> vi->rss_trailer.max_tx_vq. Any subsequent RSS reconfiguration (e.g.,
+> via ethtool -X) calls virtnet_commit_rss_command(), which sends the
+> stale max_tx_vq to the device, silently reverting the queue count.
+> 
+> Reproduction:
+> 1. User configured RSS
+>   ethtool -X eth0 equal 8
+> 2. VQ_PAIRS_SET path; max_tx_vq stays 16
+>   ethtool -L eth0 combined 12
+> 3. RSS commit uses max_tx_vq=16 instead of 12
+>   ethtool -X eth0 equal 4
+> 
+> Fix this by updating vi->rss_trailer.max_tx_vq after a successful
+> VQ_PAIRS_SET command when RSS is enabled, keeping it in sync with
+> curr_queue_pairs.
+> 
+> Fixes: 50bfcaedd78e ("virtio_net: Update rss when set queue")
+> Assisted-by: Claude: claude-opus-4.6
+> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
 
-> Hi William,
->
->> Move the mctp_i2c_get_tx_flow_state() call to after the length sanity
->> check to ensure we only transition the flow state if we are actually
->> going to proceed with the transmission and locking.
-> Good catch, thanks!
->
->> Subject: [PATCH] mctp i2c: check packet length before marking flow active
-> You'll want to indicate that this is for the net tree, rather than
-> net-next, so something like:
->
->     Subject: [PATCH net] net: mctp i2c: check packet length [...]
+The patch LGTM, but waiting a little longer just in case the virtio crew
+has some comments.
 
-Thanks, forgot the convention...
+/P
 
->
-> With that change:
->
-> Acked-by: Jeremy Kerr <jk@codeconstruct.com.au>
->
-> Out of curiosity though, how did you hit the hdr_byte_count mismatch in
-> the first place?
-
-Our current theory is that we have known buggy firmware on our NVME MCTP 
-devices and we are seeing some kind of corruption on the bus that we are 
-going to fix in on the firmware side. We started also seeing kernel 
-crashes along with the bad firmware symptoms, walked through ~110 kdumps 
-and found i2c locks that were held by 2 owners (eeprom reading and the 
-MCTP TX queue). This ended up causing deadlocks in the i2c stack that 
-result in panics. We noticed in many of these cases that we had 10K+ 
-BERs and 800+ NACKs in the i2c driver stats struct at the time of crash.
-
->
-> Cheers,
->
->
-> Jeremy
 
