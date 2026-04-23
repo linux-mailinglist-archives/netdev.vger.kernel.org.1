@@ -1,160 +1,132 @@
-Return-Path: <netdev+bounces-280692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280693-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wA5VNpr06WmepQIAu9opvQ
-	(envelope-from <netdev+bounces-280692-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 12:29:46 +0200
+	id WMpnJcPz6WmepQIAu9opvQ
+	(envelope-from <netdev+bounces-280693-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 12:26:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F2DE450AF3
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 12:29:45 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ABCA450A32
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 12:26:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C9E803100211
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 10:20:47 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E0D59303F8C8
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 10:22:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B6983E7173;
-	Thu, 23 Apr 2026 10:19:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3D6939DBD4;
+	Thu, 23 Apr 2026 10:20:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WdFbFYl7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hO3y7UlT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 782FF38737A;
-	Thu, 23 Apr 2026 10:19:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0F3B393DF9
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 10:20:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776939570; cv=none; b=AQ6BaswjrbMQNbNH8iydrGjUcPNi92vXks3iWyuc96PE0kwG86BrT+2luFRdfTFdyEnUXemTh7IDx8WTPpJ7mVdsdzLdFWFWOG0VoFsFVuYZD3UzrfziVv5an/nZcwWuc5fMK9NCgI3RQGK5lf8BkDkYxTqL38Ur9lOwqCNpQeI=
+	t=1776939645; cv=none; b=anZOzuOH6J4OtYZskpXXHz7F/sdYMXnKjuv+u84wZntP/kubGKrAEnsIQLccmg3RtbI1WdSA8fZfcsxe8e2i06AO5ct31g57bxgZSUf2KHR8OUHSoeDK4+9mVbq+0Ak3BMUe5I5QnMomq10cgc9As0TwIyk/CIXf0Az8jWHYE0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776939570; c=relaxed/simple;
-	bh=3ygz8aPQ887mmlXRKJ2niuUkt3iUa+0zyJRimlH0iLg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O3QsDMCLOcW4r80DVqa70vs7NsxzL5GJZvQ8vZ+wVtwHQLu6MTPhMyYI0LtcS2COZkDPGsHgbtrAfw9b0A89fOvrl/fNKecMgvJMEAIE08uJzG7Fn1gVQaIROyTWMb301XCWBZMhHUUq6BwzTQCNctWkzyn9LpzV1mNX+sBNqVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WdFbFYl7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62B77C2BCAF;
-	Thu, 23 Apr 2026 10:19:28 +0000 (UTC)
+	s=arc-20240116; t=1776939645; c=relaxed/simple;
+	bh=PrGrCeyBMouX9tyuir9Kgx3+v6Zkg73D2XDlZkdfPm8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=FrM8fGCYkWqtmD3SEPI+Nsmmx57UzUyckHmSRwfGXrpTeQupILgbo75FrXOrQEedmefkEdfyqeVZoFtL/h7yex0irfpVhCQ/z7kC53NMVSjf+OYzmqLLuno3GX+KaAkIIw5hBuDmwWrG4ORKNyUHxxsoHPQbzb6xgq0I+U3TLzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hO3y7UlT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 508C5C2BCAF;
+	Thu, 23 Apr 2026 10:20:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776939570;
-	bh=3ygz8aPQ887mmlXRKJ2niuUkt3iUa+0zyJRimlH0iLg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WdFbFYl7H0jbCT8dSo1bJErpMV5J/bQS1D6GT7LviSzdrkc1ANJuyh4N1Ww1b7Y9u
-	 Cd2mW+9bEAknm5VH+yY+BHD5NTdni+7zMnHnpxOtkqc91h7oOvPI5GiutDoUGhw4QW
-	 s33rrZZHxx2YytIIoBvImlZlU1rYctjB2GsY9M/UXhh29p8AvKBA/JLDq53Axu0Xce
-	 dfjx6UKHV90rHugLaF6MYnoS8FBE8sJu21qUUohO4naSFLbiSJu7IqjIg2RHCN1SXk
-	 NpDzzO1Jg0wq48N2b+XYaz2xndvfuSQ8629Ma2RHHHQ5y/z/d9Bv0spT3AKcwXD/ov
-	 RAeChM9mscW4g==
-Date: Thu, 23 Apr 2026 13:19:24 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Chenguang Zhao <zhaochenguang@kylinos.cn>
-Cc: Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	RDMA mailing list <linux-rdma@vger.kernel.org>
-Subject: Re: [PATCH] selftests: net: add RDMA CM observability and regression
- scripts
-Message-ID: <20260423101924.GB172828@unreal>
-References: <20260416062224.1546388-1-zhaochenguang@kylinos.cn>
+	s=k20201202; t=1776939645;
+	bh=PrGrCeyBMouX9tyuir9Kgx3+v6Zkg73D2XDlZkdfPm8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=hO3y7UlTUhnr3h/vrlpZCQCIi05Qa7c505CkgwPXEtkAKQGpkIKJAu+k5In3Btbsg
+	 nvA86K3Dn3nemCWuOxcV2niGHUCnHWG3a5dfrXVD6kzgvOWId0mwdr5t5WJkHvN1A5
+	 uq0dLxXsga6jHLi9U5tCHQBr44VOS2Xu5ehozL3fS1GpVypdj5s2ZJZfwlLHmXy0z6
+	 Zv/ZOguvrAHMsR3ZgthyUeCWUyNVkwV29m+Y/NwEsYepFpO3kBstwcLVcp1EKirxtn
+	 fF+F+1Vgt1MgPru2bMuOE3NxpUQ1nNGYGMYEKfl6ksaILpt/7uy1o1U2Dy+gAnx/a0
+	 j/0lCwFlgct6Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FED8380CFFD;
+	Thu, 23 Apr 2026 10:20:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260416062224.1546388-1-zhaochenguang@kylinos.cn>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2 1/2] 8021q: use RCU for egress QoS mappings
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177693960705.95198.14343810737478655925.git-patchwork-notify@kernel.org>
+Date: Thu, 23 Apr 2026 10:20:07 +0000
+References: 
+ <9136768189f8c6d3f824f476c62d2fa1111688e8.1776647968.git.yuantan098@gmail.com>
+In-Reply-To: 
+ <9136768189f8c6d3f824f476c62d2fa1111688e8.1776647968.git.yuantan098@gmail.com>
+To: Ren Wei <n05ec@lzu.edu.cn>
+Cc: netdev@vger.kernel.org, horms@kernel.org, edumazet@google.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, kees@kernel.org, yuantan098@gmail.com, ylong030@ucr.edu,
+ yifanwucs@gmail.com, tomapufckgml@gmail.com, bird@lzu.edu.cn
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280692-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280693-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,google.com,lunn.ch,davemloft.net,redhat.com,gmail.com,ucr.edu,lzu.edu.cn];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,kylinos.cn:email]
-X-Rspamd-Queue-Id: 7F2DE450AF3
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,ucr.edu:email]
+X-Rspamd-Queue-Id: 1ABCA450A32
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 16, 2026 at 02:22:24PM +0800, Chenguang Zhao wrote:
-> Add a minimal RDMA CM selftest suite that captures observability
-> baselines and runs trace, counter-delta, and fault-injection oriented
-> checks, plus a review-loop helper for repeated validation rounds.
-> 
-> Usage (client side):
-> - export
->   CM_WORKLOAD_CMD='ib_send_bw -d <dev> -i <port> -R -g <gid> <server_ip>'
->   (User can customize CM_WORKLOAD_CMD)
-> - sudo -E make -C tools/testing/selftests
->   TARGETS=drivers/net/rdma run_tests
-> 
-> Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
-> ---
->   The first patch adds a focused RDMA CM selftest suite under
->   kselftest to make CM behavior easier to observe and validate
->   in routine regression runs.
-> 
->   It introduces baseline collection, trace-sequence checks,
->   counter-delta checks, and failslab-based recovery checks, plus
->   a review-loop script for one-shot serial execution. It also
->   registers drivers/net/rdma in the top-level selftests TARGETS,
->   so the suite runs through standard kselftest flow
->   (make ... TARGETS=drivers/net/rdma run_tests) instead of requiring
->   manual script-by-script execution.
-> ---
->  tools/testing/selftests/Makefile              |   1 +
->  .../selftests/drivers/net/rdma/Makefile       |  13 ++
->  .../selftests/drivers/net/rdma/README.md      | 168 ++++++++++++++++++
->  .../drivers/net/rdma/rdma_cm_baseline.sh      |  58 ++++++
->  .../drivers/net/rdma/rdma_cm_counter_delta.sh |  72 ++++++++
->  .../net/rdma/rdma_cm_fault_injection.sh       |  95 ++++++++++
->  .../drivers/net/rdma/rdma_cm_review_loop.sh   |  35 ++++
->  .../net/rdma/rdma_cm_trace_sequence.sh        |  83 +++++++++
->  .../selftests/drivers/net/rdma/rdma_common.sh | 126 +++++++++++++
->  9 files changed, 651 insertions(+)
->  create mode 100644 tools/testing/selftests/drivers/net/rdma/Makefile
->  create mode 100644 tools/testing/selftests/drivers/net/rdma/README.md
->  create mode 100755 tools/testing/selftests/drivers/net/rdma/rdma_cm_baseline.sh
->  create mode 100755 tools/testing/selftests/drivers/net/rdma/rdma_cm_counter_delta.sh
->  create mode 100755 tools/testing/selftests/drivers/net/rdma/rdma_cm_fault_injection.sh
->  create mode 100755 tools/testing/selftests/drivers/net/rdma/rdma_cm_review_loop.sh
->  create mode 100755 tools/testing/selftests/drivers/net/rdma/rdma_cm_trace_sequence.sh
->  create mode 100755 tools/testing/selftests/drivers/net/rdma/rdma_common.sh
-> 
-> diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
-> index 984abb6d42ab..0df7034f46b2 100644
-> --- a/tools/testing/selftests/Makefile
-> +++ b/tools/testing/selftests/Makefile
-> @@ -22,6 +22,7 @@ TARGETS += drivers/ntsync
->  TARGETS += drivers/s390x/uvdevice
->  TARGETS += drivers/net
->  TARGETS += drivers/net/bonding
-> +TARGETS += drivers/net/rdma
+Hello:
 
-It is very wrong place to put RDMA functionality.
-We have tools/testing/selftests/rdma folder for that.
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Thanks
+On Mon, 20 Apr 2026 11:18:45 +0800 you wrote:
+> From: Longxuan Yu <ylong030@ucr.edu>
+> 
+> The TX fast path and reporting paths walk egress QoS mappings without
+> RTNL. Convert the mapping lists to RCU-protected pointers, use RCU
+> reader annotations in readers, and defer freeing mapping nodes with an
+> embedded rcu_head.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2,1/2] 8021q: use RCU for egress QoS mappings
+    https://git.kernel.org/netdev/net/c/fc69decc811b
+  - [net,v2,2/2] 8021q: delete cleared egress QoS mappings
+    https://git.kernel.org/netdev/net/c/7dddc74af369
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
