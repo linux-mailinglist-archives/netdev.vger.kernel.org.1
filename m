@@ -1,205 +1,202 @@
-Return-Path: <netdev+bounces-280620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280621-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QN09Nl266WlJigIAu9opvQ
-	(envelope-from <netdev+bounces-280620-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 08:21:17 +0200
+	id OFgrMB+86WlJigIAu9opvQ
+	(envelope-from <netdev+bounces-280621-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 08:28:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0D4D44D8E2
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 08:21:16 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16C0F44D9E1
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 08:28:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4D30F300B50E
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 06:17:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 707463019903
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 06:28:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71A9931E85E;
-	Thu, 23 Apr 2026 06:17:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1CAC37DE81;
+	Thu, 23 Apr 2026 06:28:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bCj3YTNO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LcTRjjvU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5B62310777;
-	Thu, 23 Apr 2026 06:17:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315B81A7264
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 06:28:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776925075; cv=none; b=jXFCBIvivshCYQPR2n95uk0TBjctDc3hgQAhY7dN/TFeFFaNwv1C9oX4DvF+nqQYBj+DUsOOSwyFhIpclUujf3u2EKSLMxAOb/RjRoFVSeLMiI4dgBZrQ7yGiVnuS97odp/hDp4hxzsj4DIhXKBIX5NPPsoaBMT+x2BvytzHf/Q=
+	t=1776925724; cv=none; b=kjVAkXdZkRSGXeErARx4d7N0tP+0dkNnWp49V/GbcjO7+xg/BzjJ7DncSp2XbHY5Rtx3w2lhNSt3g7t2e6mZ7CZSjcin/4CQO5DplDTJnKQeIa8Sz/sCkNhwPxk2LHxlIU3Xv1IjPNO257V6ALJxKoh4zTgqlDlThz1/BAxVlWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776925075; c=relaxed/simple;
-	bh=b6MuRVTf/ZgA9L22eiHzgpdsNzUtE5SipssmAjn0OuY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q5ziba7oKYUFVGaP7jrd+VeXjyqyMZt+ovYGo9LF5sd1095OF/LG4j71J+G87qPQrGFCU2EYlmatHqUtRGlzJ6CibBkxaD/EM6Kr20+E4mUEWTcMkUM3BE+FZx6PI/wEy1QPqhdCKgVeHnylRxEgVKXPSf2H34TPL9pZReCdRlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bCj3YTNO; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776925074; x=1808461074;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=b6MuRVTf/ZgA9L22eiHzgpdsNzUtE5SipssmAjn0OuY=;
-  b=bCj3YTNOJJ+0bpJZbCMlkL2fCcPybdY6VP56M0YVzUXVDG4T2jDLhWr1
-   4x2tRTBzHZzTu5TS5+870ntFcd7jLrceDUnGp0RpZjT1RDlqPlr0gqB09
-   bIVyexesLw1Sh34n33kgSSxs1MMQ+A/dtABUv+uuoaMV4KGOzL9K1l+fa
-   mdNB1oFKeTfOTdKPwg6fAwveXOf7vIXmkzz64GsxINQnw2hh2aJzNcs96
-   yC255KgLFuoePoXI3klMl8g5oCsn/CA/3R/s33FqGiwBD+ITfHTqTqgfq
-   OA29AgZAWOXwTUSlvDJzzaomMstw8Jc1ns1Xf/C4KR/WHP/mtoxGKuuCc
-   g==;
-X-CSE-ConnectionGUID: RDG7+Fw9SwKy91R9WQ55TA==
-X-CSE-MsgGUID: fUtcQbmTT4ij4CWLdm14OQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11764"; a="100539497"
-X-IronPort-AV: E=Sophos;i="6.23,194,1770624000"; 
-   d="scan'208";a="100539497"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2026 23:17:53 -0700
-X-CSE-ConnectionGUID: S+yNJqCWSamNx0R/Nab0pw==
-X-CSE-MsgGUID: ldGozOmnSMCeaNdo8u1hhA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,194,1770624000"; 
-   d="scan'208";a="229899249"
-Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2026 23:17:52 -0700
-Date: Wed, 22 Apr 2026 23:17:52 -0700
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: x86@kernel.org, Jon Kohler <jon@nutanix.com>,
-	Nikolay Borisov <nik.borisov@suse.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	David Kaplan <david.kaplan@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Laight <david.laight.linux@gmail.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jason Baron <jbaron@akamai.com>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Shuah Khan <skhan@linuxfoundation.org>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	Asit Mallick <asit.k.mallick@intel.com>,
-	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: [PATCH v11 12/12] x86/vmscape: Add cmdline vmscape=on to override
- attack vector controls
-Message-ID: <20260422-vmscape-bhb-v11-12-b18e0cf32af4@linux.intel.com>
-X-Mailer: b4 0.16-dev
-References: <20260422-vmscape-bhb-v11-0-b18e0cf32af4@linux.intel.com>
+	s=arc-20240116; t=1776925724; c=relaxed/simple;
+	bh=TIKWurkCeViktvT6vRCxXoXGv6LQQRRCc9UHJ9Nv66Q=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=OyFcnwniYF98u/E6lQSKVcPHwbdBVki6zGIhELJMWiZ+/ya2JWHTLuKJci7fNidax0M1uTiAz0/jdz54/bgPd9KPCvNT90Mj9hKrIDoocIqRcu56rvCLZfga0dTf3VSg3XUbYZH8CRYawcbFrrWKt5Pmm/gaS0qcLLgGt2OBaSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LcTRjjvU; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8e8950b3ee1so1615601085a.3
+        for <netdev@vger.kernel.org>; Wed, 22 Apr 2026 23:28:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1776925722; x=1777530522; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=d2awcyUUlOZ7DiUll5yCRAkp5hrWVwnaXgkecEMdniQ=;
+        b=LcTRjjvUmFlolRMK/sxv3m5TZYWG5Dp2F5oeRrsrj8SE6H7Ig9Zfs1eLJWsfuqM6sx
+         Rorp/tq/T+1TwQVeaH0eGYrJGBGxyYqaBUI7YMfkEFlBv65aqaBn/41BaEN7O/Nm4mX4
+         sr1sIgL6fBJ7KMBp2BTzsfHxp50njZhTGiHSpp2cxScF331FEzoF8EDOZYwFQF9dsk2u
+         2awwFkKGqkpxV/+CMbPJZEV6yRbELYkWvQQ7q9Fzllgpn5Pr/zEajIN9Myy64wTQIVYf
+         CtPvhRNtQPieIFG6By9F1OCMA4TdNAGaGeMch+AaKHfW9VjsX88LxE53d8+J2XUoEius
+         b54A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776925722; x=1777530522;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=d2awcyUUlOZ7DiUll5yCRAkp5hrWVwnaXgkecEMdniQ=;
+        b=FVybnc+ehPO8/8m3fEM4AFziKBntlthm0DTHplltxyEufC8ukq+5Q0qdhWYrNHbfgu
+         iRMIeEUEsF19uTjTStKCW0xXOIgreLbyRl6s0lftmhbWsjVH0UDDEgfr306n7z8YTTN3
+         IZ6N+RhCDGRh/9Ygn8PiVIVSnKG/GkTjkZFktk5xWXhlmgNfrtsH8Gs5b/KmWfDV4kgy
+         q2MFaKP4C+INfCjtveixSVRn9n4suQyjHi3OVDJ7yi9cfy4fkymBdwQeGg2PpLEoLZxm
+         OMmiNXhgXatnsCrIzf2Bu0Y3IRVBgAz+OO82/1ZgVyR4YDSGzj25ksh6PJlJvQSDOMsq
+         x4rA==
+X-Forwarded-Encrypted: i=1; AFNElJ+c0vgC7SrAeXszj9PzJOYkLRUxBYu2+FcqbPYJrdBHM0hMu6lINh6Il4pJhMV5mLg9jNW2V1c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsoMlwKSvJslaY6BuHyaFrLzAT+GmHCOopzgqkb6wyz8lDr2vM
+	Kh540Vp6Ca2GfGYqsd22E2qWuZzwZHBWtBcl9a//+2wgcmAqNbVKyz6YtB790Td4REwsUm7IO3H
+	8nGZgciTAqi1XjA==
+X-Received: from qknrd3.prod.google.com ([2002:a05:620a:8dc3:b0:8eb:1c73:20c7])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:4089:b0:8cd:9707:630e with SMTP id af79cd13be357-8e78f82ad1amr3834388785a.19.1776925722029;
+ Wed, 22 Apr 2026 23:28:42 -0700 (PDT)
+Date: Thu, 23 Apr 2026 06:28:39 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260422-vmscape-bhb-v11-0-b18e0cf32af4@linux.intel.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.rc2.544.gc7ae2d5bb8-goog
+Message-ID: <20260423062839.2524324-1-edumazet@google.com>
+Subject: [PATCH net] net/sched: sch_choke: annotate data-races in choke_dump_stats()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
+	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280620-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,google.com,alien8.de,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net,akamai.com,goodmis.org,linuxfoundation.org];
+	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com,google.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[42];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280621-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pawan.kumar.gupta@linux.intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.intel.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,nutanix.com:email,suse.com:email,intel.com:dkim,intel.com:email]
-X-Rspamd-Queue-Id: D0D4D44D8E2
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 16C0F44D9E1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In general, individual mitigation knobs override the attack vector
-controls. For VMSCAPE, =ibpb exists but nothing to select BHB clearing
-mitigation. The =force option would select BHB clearing when supported, but
-with a side-effect of also forcing the bug, hence deploying the mitigation
-on unaffected parts too.
+choke_dump_stats() only runs with RTNL held.
+It reads fields that can be changed in qdisc fast path.
+Add READ_ONCE()/WRITE_ONCE() annotations.
 
-Add a new cmdline option vmscape=on to enable the mitigation based on the
-VMSCAPE variant the CPU is affected by.
-
-Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
-Tested-by: Jon Kohler <jon@nutanix.com>
-Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Fixes: edb09eb17ed8 ("net: sched: do not acquire qdisc spinlock in qdisc/class stats dump")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
 ---
- Documentation/admin-guide/hw-vuln/vmscape.rst   | 4 ++++
- Documentation/admin-guide/kernel-parameters.txt | 2 ++
- arch/x86/kernel/cpu/bugs.c                      | 2 ++
- 3 files changed, 8 insertions(+)
+ net/sched/sch_choke.c | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/Documentation/admin-guide/hw-vuln/vmscape.rst b/Documentation/admin-guide/hw-vuln/vmscape.rst
-index 7c40cf70ad7a..2558a5c3d956 100644
---- a/Documentation/admin-guide/hw-vuln/vmscape.rst
-+++ b/Documentation/admin-guide/hw-vuln/vmscape.rst
-@@ -117,3 +117,7 @@ The mitigation can be controlled via the ``vmscape=`` command line parameter:
+diff --git a/net/sched/sch_choke.c b/net/sched/sch_choke.c
+index 94df8e741a979191a06885ad3ee813f12650ff3c..2875bcdb18a413075c795665e95f9dbbaac45962 100644
+--- a/net/sched/sch_choke.c
++++ b/net/sched/sch_choke.c
+@@ -229,7 +229,7 @@ static int choke_enqueue(struct sk_buff *skb, struct Qdisc *sch,
  
-    Choose the mitigation based on the VMSCAPE variant the CPU is affected by.
-    (default when CONFIG_MITIGATION_VMSCAPE=y)
-+
-+ * ``vmscape=on``:
-+
-+   Same as ``auto``, except that it overrides attack vector controls.
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 3853c7109419..98204d464477 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -8383,6 +8383,8 @@ Kernel parameters
- 					  unaffected processors
- 			auto		- (default) use IBPB or BHB clear
- 					  mitigation based on CPU
-+			on		- same as "auto", but override attack
-+					  vector control
+ 		/* Draw a packet at random from queue and compare flow */
+ 		if (choke_match_random(q, skb, &idx)) {
+-			q->stats.matched++;
++			WRITE_ONCE(q->stats.matched, q->stats.matched + 1);
+ 			choke_drop_by_idx(sch, idx, to_free);
+ 			goto congestion_drop;
+ 		}
+@@ -241,11 +241,13 @@ static int choke_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 			qdisc_qstats_overlimit(sch);
+ 			if (use_harddrop(q) || !use_ecn(q) ||
+ 			    !INET_ECN_set_ce(skb)) {
+-				q->stats.forced_drop++;
++				WRITE_ONCE(q->stats.forced_drop,
++					   q->stats.forced_drop + 1);
+ 				goto congestion_drop;
+ 			}
  
- 	vsyscall=	[X86-64,EARLY]
- 			Controls the behavior of vsyscalls (i.e. calls to
-diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index fbdb137720c4..4e0b77fb21dd 100644
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -3088,6 +3088,8 @@ static int __init vmscape_parse_cmdline(char *str)
- 	} else if (!strcmp(str, "force")) {
- 		setup_force_cpu_bug(X86_BUG_VMSCAPE);
- 		vmscape_mitigation = VMSCAPE_MITIGATION_ON;
-+	} else if (!strcmp(str, "on")) {
-+		vmscape_mitigation = VMSCAPE_MITIGATION_ON;
- 	} else if (!strcmp(str, "auto")) {
- 		vmscape_mitigation = VMSCAPE_MITIGATION_AUTO;
- 	} else {
-
+-			q->stats.forced_mark++;
++			WRITE_ONCE(q->stats.forced_mark,
++				   q->stats.forced_mark + 1);
+ 		} else if (++q->vars.qcount) {
+ 			if (red_mark_probability(p, &q->vars, q->vars.qavg)) {
+ 				q->vars.qcount = 0;
+@@ -253,11 +255,13 @@ static int choke_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 
+ 				qdisc_qstats_overlimit(sch);
+ 				if (!use_ecn(q) || !INET_ECN_set_ce(skb)) {
+-					q->stats.prob_drop++;
++					WRITE_ONCE(q->stats.prob_drop,
++					           q->stats.prob_drop + 1);
+ 					goto congestion_drop;
+ 				}
+ 
+-				q->stats.prob_mark++;
++				WRITE_ONCE(q->stats.prob_mark,
++					   q->stats.prob_mark + 1);
+ 			}
+ 		} else
+ 			q->vars.qR = red_random(p);
+@@ -272,7 +276,7 @@ static int choke_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 		return NET_XMIT_SUCCESS;
+ 	}
+ 
+-	q->stats.pdrop++;
++	WRITE_ONCE(q->stats.pdrop, q->stats.pdrop + 1);
+ 	return qdisc_drop(skb, sch, to_free);
+ 
+ congestion_drop:
+@@ -461,10 +465,12 @@ static int choke_dump_stats(struct Qdisc *sch, struct gnet_dump *d)
+ {
+ 	struct choke_sched_data *q = qdisc_priv(sch);
+ 	struct tc_choke_xstats st = {
+-		.early	= q->stats.prob_drop + q->stats.forced_drop,
+-		.marked	= q->stats.prob_mark + q->stats.forced_mark,
+-		.pdrop	= q->stats.pdrop,
+-		.matched = q->stats.matched,
++		.early	= READ_ONCE(q->stats.prob_drop) +
++			  READ_ONCE(q->stats.forced_drop),
++		.marked	= READ_ONCE(q->stats.prob_mark) +
++			  READ_ONCE(q->stats.forced_mark),
++		.pdrop	= READ_ONCE(q->stats.pdrop),
++		.matched = READ_ONCE(q->stats.matched),
+ 	};
+ 
+ 	return gnet_stats_copy_app(d, &st, sizeof(st));
 -- 
-2.34.1
-
+2.54.0.rc2.544.gc7ae2d5bb8-goog
 
 
