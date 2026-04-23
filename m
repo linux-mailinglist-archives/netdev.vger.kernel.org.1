@@ -1,137 +1,114 @@
-Return-Path: <netdev+bounces-280579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280578-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kMHuNzyI6WnccQIAu9opvQ
-	(envelope-from <netdev+bounces-280579-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 04:47:24 +0200
+	id yL48ABOI6WnccQIAu9opvQ
+	(envelope-from <netdev+bounces-280578-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 04:46:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5770544C5B4
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 04:47:24 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F2C744C59E
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 04:46:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B563D3071865
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 02:45:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3E7213055837
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 02:44:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C4C377543;
-	Thu, 23 Apr 2026 02:45:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58EFA3BADBD;
+	Thu, 23 Apr 2026 02:44:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="epxMGkaK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.redfish-solutions.com (mail.redfish-solutions.com [50.20.195.61])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3036E30E857;
-	Thu, 23 Apr 2026 02:45:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=50.20.195.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 344363A7F61;
+	Thu, 23 Apr 2026 02:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776912328; cv=none; b=L2QOJso66XvMdnCOH2E17mVJHYxhmXtd+pbl336Aw8Aqsi2ndtku0sTKVzGQOnMqb7JWH588zj1b3jkz8HtTJup7cZJ7/1aeGJw89YdASPQU1F994ZXmR9Fj4DrEum4rBjKwcouaC/Dya5ofuCrqZnQCdNgWMvcXrZTpyOu6TwE=
+	t=1776912278; cv=none; b=CaVrTLGVyyVdu6ISwZCONw8aaho7/DKR2vRWdPBosnWghmjQosL2IfKr4XnQalLnnkAjOMCczlw45naGAINfjGTTxZ6Gme+yilK45+v34aZOWmnK+Qg2Mvvl6G0s0GzEIhXWf0047PTnU2BM7Y25bTlJFzgAwt+Qe53chzd9ewY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776912328; c=relaxed/simple;
-	bh=ncskTVHsX9Hfe2ImeJP3V0bXdObuDuc46kCl383gQnk=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=ZO/cD9uA1rz6BnzNAqm+S4ck6tgkEMpijv8rIdHtVreMUWWYrFPSeJG0wUCtxWR52FCYc4AMfwtEurr+vzL6AnTgMR3u1kOBAcMbTDPX3amyzWjkxGnk5vieTSMNOBbGaiu38hnlo6myIt+WZG7dbKl8oXYc2jKUrMxLm0glE0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=redfish-solutions.com; spf=pass smtp.mailfrom=redfish-solutions.com; arc=none smtp.client-ip=50.20.195.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=redfish-solutions.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redfish-solutions.com
-Received: from smtpclient.apple (macbook4.redfish-solutions.com [192.168.3.6])
-	(authenticated bits=0)
-	by mail.redfish-solutions.com (8.18.1/8.18.1) with ESMTPSA id 63N2fckv405223
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 Apr 2026 20:41:38 -0600
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1776912278; c=relaxed/simple;
+	bh=X6TikhqBuKL3LHIiQZRafoGq2I9En0G3QhQRU26UtH8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=chWr0JfMDg/Ukd2Zy4Q1GrKEKVWZFL798jGLdWrR3gcmoH2jWTQMHUF9XQeP3hQnylJkDAT/QMG5q1rjKmJP4HvWuTCPV2RchJ90Eg4z4iSfI8dCCR39Oxc7hroE9GAUc3SOFQ49x9ekkGhzEqBXm+I7LQFq+pJmYC//NIE4Plw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=epxMGkaK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47767C19425;
+	Thu, 23 Apr 2026 02:44:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776912277;
+	bh=X6TikhqBuKL3LHIiQZRafoGq2I9En0G3QhQRU26UtH8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=epxMGkaKD1KnvCAr2uEOuBEj+WyuNFq0Wu9fnVwxD/v8fyI7XMVuBUG9Ly/lrBw7C
+	 t45vL0AL1p0dYdWBbH2eL+/+BzkR73njaBnWpJ/YsO7YTqZgRu3bYD3nlGIt1UbQ0K
+	 n9mlmbo/vUIJiFA33OaDnsli6H2kSA8tdp2DsPeAVRDZmwh3MvR7mZRdgG4JB0JZc5
+	 gEBLEDJ5ynMTgW6DUl6H8RzCJlx79EyhuFwqA5JPyciMDmzrEQJ5k4XwEzjjhpjdAx
+	 Ws60RlIc+WjvpC6bqnDitefmygd1EICWH9XAr4RWb3MdASv9izrLmjqyQdOi2VcVc9
+	 Rjl7GPzjzaEXw==
+Date: Wed, 22 Apr 2026 19:44:36 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Daniel Palmer <daniel@0x0f.com>
+Cc: David Laight <david.laight.linux@gmail.com>, Andrew Lunn
+ <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org
+Subject: Re: [PATCH net 00/18] Remove a number of ISA and PCMCIA Ethernet
+ drivers
+Message-ID: <20260422194436.7e1e6ce0@kernel.org>
+In-Reply-To: <CAFr9PXnuyb0jTAhRgJGRmdzUMxP-0HrHHHN3YpQnOn8-nBBC1g@mail.gmail.com>
+References: <20260421-v7-0-0-net-next-driver-removal-v1-v1-0-69517c689d1f@lunn.ch>
+	<CAFr9PXn1ixyhD42OswoyGZ=W-O-oZygUGpRNm2dcAuYBNgtmQw@mail.gmail.com>
+	<20260422101316.0efdcf24@pumpkin>
+	<CAFr9PXnuyb0jTAhRgJGRmdzUMxP-0HrHHHN3YpQnOn8-nBBC1g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.500.181\))
-Subject: Re: [PATCH net-deletions v2] net: remove unused ATM protocols and
- legacy ATM device drivers
-From: Philip Prindeville <philipp_subx@redfish-solutions.com>
-In-Reply-To: <accbbcdf0ec14ae4d3f21ef5da7091bdcbd6574f.camel@infradead.org>
-Date: Wed, 22 Apr 2026 20:41:27 -0600
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-        openwrt-devel <openwrt-devel@lists.openwrt.org>,
-        Guy Ellis <guy@traverse.com.au>, netdev@vger.kernel.org,
-        edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
-        horms@kernel.org, corbet@lwn.net, skhan@linuxfoundation.org,
-        linux@armlinux.org.uk, tsbogend@alpha.franken.de, maddy@linux.ibm.com,
-        mpe@ellerman.id.au, npiggin@gmail.com, chleroy@kernel.org,
-        3chas3@gmail.com, razor@blackwall.org, idosch@nvidia.com,
-        jani.nikula@intel.com, mchehab+huawei@kernel.org, tytso@mit.edu,
-        herbert@gondor.apana.org.au, geert@linux-m68k.org, ebiggers@kernel.org,
-        johannes.berg@intel.com, jonathan.cameron@huawei.com, kees@kernel.org,
-        kuniyu@google.com, fourier.thomas@gmail.com,
-        andriy.shevchenko@intel.com, rdunlap@infradead.org,
-        akpm@linux-foundation.org, linux-doc@vger.kernel.org,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        bridge@lists.linux.dev
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <68316F0B-2442-4492-A041-E57EFC58AC08@redfish-solutions.com>
-References: <20260422041846.2035118-1-kuba@kernel.org>
- <accbbcdf0ec14ae4d3f21ef5da7091bdcbd6574f.camel@infradead.org>
-To: David Woodhouse <dwmw2@infradead.org>
-X-Mailer: Apple Mail (2.3864.500.181)
-X-Scanned-By: MIMEDefang 3.6 on 192.168.4.49
-X-Spamd-Result: default: False [2.04 / 15.00];
-	DMARC_POLICY_REJECT(2.00)[redfish-solutions.com : SPF not aligned (relaxed), No valid DKIM,reject];
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280579-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280578-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,lists.openwrt.org,traverse.com.au,vger.kernel.org,google.com,redhat.com,lunn.ch,lwn.net,linuxfoundation.org,armlinux.org.uk,alpha.franken.de,linux.ibm.com,ellerman.id.au,gmail.com,blackwall.org,nvidia.com,intel.com,mit.edu,gondor.apana.org.au,linux-m68k.org,huawei.com,infradead.org,linux-foundation.org,lists.ozlabs.org,lists.linux.dev];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[39];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,lwn.net,linuxfoundation.org,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[philipp_subx@redfish-solutions.com,netdev@vger.kernel.org];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	APPLE_MAILER_COMMON(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,huawei];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,openwrt.org:url]
-X-Rspamd-Queue-Id: 5770544C5B4
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9F2C744C59E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Wed, 22 Apr 2026 18:33:15 +0900 Daniel Palmer wrote:
+> Seriously though, I think we should have something to mark stuff in
+> MAINTAINERS and elsewhere that is in the kernel but only because a few
+> people are having fun with it.
 
-
-> On Apr 22, 2026, at 7:05=E2=80=AFAM, David Woodhouse =
-<dwmw2@infradead.org> wrote:
->=20
-> On Tue, 2026-04-21 at 21:18 -0700, Jakub Kicinski wrote:
->>=20
->>    I'm still deleting the solos driver, chances are nobody uses it.
->>    Easy enough to revert back in since core is still around.
->>    The guiding principle is to keep USB modems and delete
->>    the rest as USB ADSL2+ CPEs were most popular historically.
->=20
-> Still not entirely convinced; I worked on both USB ATM modems and on
-> Solos, and the Solos is both the most modern and the only one I still
-> actually have. And the only one we have native support for that could
-> ever do full 24Mb/s ADSL2+, I believe.
->=20
-> If we drop it, OpenWrt will need to drop support for these, which I
-> think were quite popular at the time; there were a few UK resellers:
-> https://openwrt.org/toh/traverse/geos1_1
->=20
-> I still don't actually care *enough* to try to find an ADSL line I
-> could plug one into for testing though... :)
-
-
-I have 3 boards lying around if anyone wants them.
-
-
-
+IMHO that's not a great use of upstream maintainers' time.
+We support loadable modules, perfect fit for retro computing
+and drivers which aren't up to the standards.
 
