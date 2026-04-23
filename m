@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-280684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280685-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qAIkDqjr6Wm2nAIAu9opvQ
-	(envelope-from <netdev+bounces-280684-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 11:51:36 +0200
+	id qFkpKkHq6Wm2nAIAu9opvQ
+	(envelope-from <netdev+bounces-280685-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 11:45:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CFA745007B
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 11:51:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 140F144FF25
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 11:45:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E83FC301DE6D
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 09:41:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C00E930C0135
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 09:42:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D24E3E51CC;
-	Thu, 23 Apr 2026 09:41:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACA583E5588;
+	Thu, 23 Apr 2026 09:41:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="jK/n6907"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="emrACOhv"
 X-Original-To: netdev@vger.kernel.org
 Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07ABC1A3029;
-	Thu, 23 Apr 2026 09:41:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 105923E5EC6;
+	Thu, 23 Apr 2026 09:41:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776937314; cv=none; b=ezyqXS5OgA78zgOjvkADAJPsTX1Wez2Ys6ngyhLlP44WxLkt1xjMYybaYpm5NO3o8hx+n4XPe7R3LYUnFp5fOqFgpywYQK2SMLPwZMomaIj8CkJd4l3cJQhq8iBRiWrPase+qNDBGKe+wMKYTqWWfliIuHUe+VTVnaDSm4CohqA=
+	t=1776937318; cv=none; b=WMtcokPOLZilxAxlTmcYHZSqTXrkfhdT+HWjhDwPPYqaMD8MeqZew9r+qksWv09nuLkTy8gqqlj1Za6bmYXcX5Vn9C0Tf2Aihl//alV3Mr2fEOO68Fo4J0yrXN03jbO0CgCS4bN69Dp8SohVTdHmQin/J0wGNYIzKkAsz66mw+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776937314; c=relaxed/simple;
-	bh=8x4At0Do1Cty9ND3pfccFdX93y605DyeVEobD7GXeIk=;
+	s=arc-20240116; t=1776937318; c=relaxed/simple;
+	bh=3COiEshc7gTyW6DMFD5MNIcpreAuljSpeRgtW9AY7C4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=vDCWvhx0iPHg7uJ+LMK4Zj1+NkBhknIBeWbb440uqdMZ+MB0/hY1YjQgTx9689rv5ChLvTToO3fHg+jbetu3zU5aemMD5tUUKWMmUqSIGWIueKOP3pYr/DXZytmdcvulSJsgi6SA6Cc5My7ZKOQ+ELyBW7BPKyDCBOK/cBct4GI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=jK/n6907; arc=none smtp.client-ip=82.195.75.108
+	 In-Reply-To:To:Cc; b=FINTt9a1u9kXJ0rSVaFPWwL4DX8PzewkyWqIp26cBoBJKBqNkTnwmhNnyGy0+qdGCafVtRPbslv87/aZgv4/c4Fn/P3ONULoXBAKTyqHwY+5lolAFIbIoNbrTzhEcOp4j+SxipYMkOb6NFQo8b7aUcECNAxv7I8ggG6tSSZwqEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=emrACOhv; arc=none smtp.client-ip=82.195.75.108
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
 	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:In-Reply-To:References:
 	Message-Id:Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:
 	From:Reply-To:Content-ID:Content-Description;
-	bh=TZRmeG+bR/YyfZlhGH05MuZ+5F0a4B1qU8O0L01XVj4=; b=jK/n6907M5fXF3wYR9usnwZb2C
-	3mM/RLNoW0Sg+0v7ltEMfTkWc6qGUBwFeY+8ME4cmrab+eeHEhOWv/dfSHk4eK/GsYJcTEs6EmClp
-	QyTM5IYdlO4GF3eIQ5oUROGp7olR17IJHOZF4OX1y44H5rDipghnyovV9Sn+OcD4FUykBuhWtbPYR
-	dTGAfMDS/Y+TaVfFMS8DcF80iq9ZBvbi5oHLKmTngNzA+s+qu+PIGGtpztdjiVlpY/eqp1JPAXvzi
-	OxwkJXsIye2DPWqlAklqmSBE8xVoOgYgaCY51AQn2/5p4ZffSDyfYE//2eX6k+vbHxX5SHL5/41SK
-	K8nrKntg==;
+	bh=wpdPe9XhOX5V5gSK77+eeohi2elXFk0ijT4NFwGJpWk=; b=emrACOhvp8bS6Zzl31nEZlwfMH
+	9l9r9/W5GIwC9X/lamfBUab/2PgSUFIiU+TJavdsM1jLAgcVcuq+GqFqN+GsrB3P1Vaj0lr5mmG2o
+	ZFpgMVIPIJuFSyz9iZViqct2qtwaihMERFS3T4IfYKQGkTCv4o3fIwXlH0RHxAMCd2yiyf1L8j6ic
+	eN/zRv6RvAqMW836aoozmJtjenN2pPgoyK0ofuzh0urQSGStXzobbkig+30B6dUP2YdTPZxoHijZB
+	1x7N4phQCvaAt77G0uaGseOvDELckMdWvJ7IiSEfLkQfkYmkrwQm2/Acr/rzaWWlbPlnD/T4zS1Wg
+	JJPWk2pA==;
 Received: from authenticated user
 	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.96)
 	(envelope-from <leitao@debian.org>)
-	id 1wFqZC-002J3i-1I;
-	Thu, 23 Apr 2026 09:41:50 +0000
+	id 1wFqZH-002J3s-0L;
+	Thu, 23 Apr 2026 09:41:55 +0000
 From: Breno Leitao <leitao@debian.org>
-Date: Thu, 23 Apr 2026 02:41:15 -0700
-Subject: [PATCH net 1/3] netconsole: return count instead of strnlen(buf,
- count) from store callbacks
+Date: Thu, 23 Apr 2026 02:41:16 -0700
+Subject: [PATCH net 2/3] netconsole: avoid clobbering userdatum value on
+ truncated write
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,7 +62,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260423-netconsole_ai_fixes-v1-1-92b8b7de9a2c@debian.org>
+Message-Id: <20260423-netconsole_ai_fixes-v1-2-92b8b7de9a2c@debian.org>
 References: <20260423-netconsole_ai_fixes-v1-0-92b8b7de9a2c@debian.org>
 In-Reply-To: <20260423-netconsole_ai_fixes-v1-0-92b8b7de9a2c@debian.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -75,20 +75,20 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Breno Leitao <leitao@debian.org>, kernel-team@meta.com
 X-Mailer: b4 0.16-dev-453a6
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5252; i=leitao@debian.org;
- h=from:subject:message-id; bh=8x4At0Do1Cty9ND3pfccFdX93y605DyeVEobD7GXeIk=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBp6elU9B3p/s7nH8ntQXG9AoaqBeT/fsrIFrimx
- OaJLls3YRiJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaenpVAAKCRA1o5Of/Hh3
- bfbuD/44XiPCG8w9x753hrFon9TF7n5y0z+MOGov18bIHTM45iFjxai2rXNoRt6eUCYUyN3C2r9
- Ya+DXRz8TT77xA3EbS+/K3Hktu99Z2f6V/vzgJsWSl74Ow9xuvPdLtap/NAkwsZu0j3h99iQkMi
- 3/fdE3ekoCG9COb6VCB/3clptKHrkSKX5Q7U9+cj0ZhTblJqLFUOrt6kIr9ZCFiuuOA2DZ4+RVa
- XL0spbCnQf6aQAmCp3/YhPH2NxUEuyPW0cl8DoRS2M74Y5W58siT+4ok1iswv73JlN58qY2aBx/
- b1+S6OYzja1tAntfTK+syGmVoQkZzU0ac4Nic5cwrTgot+8WiYMfors1iILbofq2jqaDc84j/E/
- x002IriVtaqfrwgImS77cRyWWq0SANKO6dbw3s97v/SpWnRgoTbu7rQZNN4hqYVS+BHu9zL07Vh
- xsLTPN8hdCOpabpLf9eO+cr+W9JKcwyMvbQOiVOOAIw7VOhhbCW/zifnyyHbNeD2Lg2GXJHZ+cs
- iD98p8DElrOo7dDwLgF5gnAfgY+xtL4dl/aG6DHeLgkzyA9ZpXS/j9MnFxzsd57wf1t21IFf5gU
- iwITppAiAWtppwWNrsnbLek7cgF3PrWxVWil6aJAh+g5dv8tCiOhtQ2xgqX9c1Gdr2jATXS1cQu
- bX2QWq74vw8+1AQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2000; i=leitao@debian.org;
+ h=from:subject:message-id; bh=3COiEshc7gTyW6DMFD5MNIcpreAuljSpeRgtW9AY7C4=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBp6elUA6o589/R/toys8m8U5tU9wH7ykF1gDTMB
+ Ec09kwP/QyJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaenpVAAKCRA1o5Of/Hh3
+ bQKTD/9K4+NaDDl4xWsyLchSrx39pTsyKgoygnNMAEPFGhXkzjoGAfkPqUaUMUHPFW+YeYTbSXy
+ rZP3dGQGmiAiYg1NsYq+zRXVlHFnerhmsPfXRgxY545ZHFx1jjtUw9s4RVTP2Od5roH/duJbVqn
+ JiAqA37P5dMT+vSWHFk69eSxrwEKLuHq+VXzzMby0hfzHixDtz7goULVid3x1KJZ/H/VsYbNCJy
+ E8eqmf7ldkaLD7yQCjnnW5aIHYJZws1yGLWRpz6GLGTAiNM4LdtOv3YSEPRvUZqNPeUInUHQ/bb
+ rW09y1rx+KNvNJmBqjQkqHqJ6AXT79tJ4Z76jtNgi5h56OWbTEm3L7aPycbki+WuGi3DPFGkghc
+ SL55ukgft5aEIS2ah9H+dlzHkJApybbRglri0i4uFuxkcPMolUyjTMZweWiV7txLFDbcXCCuEE9
+ HK6N5DCLYEgFCIOejLOuA7U0/C+lNMkXZ5xb5TBCcHcTRKALe0OkGC5gUu4U9ACFc0uixWVzlAa
+ qWodQ1iozHHUrYyhL43qinkgO8K2O7O6iEWSsEmgDxj+hShyB43QEU3fPvv+YzudEhS69kOZ0bB
+ NC+37fdLooISoxNvoxMgrE8MKYFJjCy/VyUu1WjE7Q2RcYQheCYjhDma4T5xiyESl3iFOz/Xyib
+ 4tLI2JxwIWT6A2g==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 X-Debian-User: leitao
@@ -96,7 +96,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -108,7 +108,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	DMARC_NA(0.00)[debian.org];
 	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-280684-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280685-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -117,165 +117,59 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3CFA745007B
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 140F144FF25
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Several configfs store callbacks in netconsole end with:
+userdatum_value_store() bounds count by MAX_EXTRADATA_VALUE_LEN (200)
+and then copies straight into udm->value, which is itself 200 bytes:
 
-	ret = strnlen(buf, count);
+	if (count > MAX_EXTRADATA_VALUE_LEN)
+		return -EMSGSIZE;
+	...
+	ret = strscpy(udm->value, buf, sizeof(udm->value));
+	if (ret < 0)
+		goto out_unlock;
 
-This under-reports the number of bytes consumed when the input
-contains an embedded NUL within count, telling the VFS that fewer
-bytes were written than userspace actually handed in. A conformant
-partial-write loop would then retry the trailing bytes against a
-callback that has already accepted them.
+If userspace writes exactly MAX_EXTRADATA_VALUE_LEN bytes with no NUL
+within them, strscpy() copies 199 bytes plus a NUL into udm->value and
+returns -E2BIG. The function jumps to out_unlock and reports the error
+to userspace, but udm->value has already been overwritten with the
+truncated string and update_userdata() is skipped, so the corruption
+is not yet visible on the wire.
 
-Every other configfs driver in the tree returns count directly from
-its store callbacks once parsing has succeeded, including
-drivers/nvme/target/configfs.c, drivers/gpio/gpio-sim.c,
-drivers/most/configfs.c, drivers/block/null_blk/main.c,
-drivers/pci/endpoint/pci-ep-cfs.c, and the rest of the configfs
-users. netconsole was the outlier (along with
-drivers/infiniband/core/cma_configfs.c, which has the same latent
-issue).
+The next successful write to any userdatum entry under the same target
+calls update_userdata(), which packs udm->value into the active
+netconsole payload. From that point on, every netconsole message
+carries the silently truncated value, and userspace has no indication
+that a previous, error-returning write left state behind.
 
-Align netconsole with the rest of the configfs ecosystem: return
-count once the parser/validator has accepted the input. The numeric
-and boolean parsers (kstrtobool, kstrtou16, mac_pton,
-netpoll_parse_ip_addr) have already validated the meaningful prefix;
-any trailing bytes are padding and should simply be reported as
-consumed.
+Tighten the entry check from "count > MAX_EXTRADATA_VALUE_LEN" to
+"count >= MAX_EXTRADATA_VALUE_LEN". With count strictly less than
+sizeof(udm->value), strscpy() can no longer return -E2BIG here, so
+the corrupting truncation path is removed entirely.
 
-Fixes: 0bcc1816188e ("[NET] netconsole: Support dynamic reconfiguration using configfs")
+Fixes: 8a6d5fec6c7f ("net: netconsole: add a userdata config_group member to netconsole_target")
 Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- drivers/net/netconsole.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ drivers/net/netconsole.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index 3c9acd6e49e86..5713cb3783ef2 100644
+index 5713cb3783ef2..4bef003d9df64 100644
 --- a/drivers/net/netconsole.c
 +++ b/drivers/net/netconsole.c
-@@ -750,7 +750,7 @@ static ssize_t enabled_store(struct config_item *item,
- 		unregister_netcons_consoles();
- 	}
+@@ -1074,7 +1074,7 @@ static ssize_t userdatum_value_store(struct config_item *item, const char *buf,
+ 	struct userdata *ud;
+ 	ssize_t ret;
  
--	ret = strnlen(buf, count);
-+	ret = count;
- 	/* Deferred cleanup */
- 	netconsole_process_cleanups();
- out_unlock:
-@@ -779,7 +779,7 @@ static ssize_t release_store(struct config_item *item, const char *buf,
+-	if (count > MAX_EXTRADATA_VALUE_LEN)
++	if (count >= MAX_EXTRADATA_VALUE_LEN)
+ 		return -EMSGSIZE;
  
- 	nt->release = release;
- 
--	ret = strnlen(buf, count);
-+	ret = count;
- out_unlock:
- 	dynamic_netconsole_mutex_unlock();
- 	return ret;
-@@ -805,7 +805,7 @@ static ssize_t extended_store(struct config_item *item, const char *buf,
- 		goto out_unlock;
- 
- 	nt->extended = extended;
--	ret = strnlen(buf, count);
-+	ret = count;
- out_unlock:
- 	dynamic_netconsole_mutex_unlock();
- 	return ret;
-@@ -828,7 +828,7 @@ static ssize_t dev_name_store(struct config_item *item, const char *buf,
- 	trim_newline(nt->np.dev_name, IFNAMSIZ);
- 
- 	dynamic_netconsole_mutex_unlock();
--	return strnlen(buf, count);
-+	return count;
- }
- 
- static ssize_t local_port_store(struct config_item *item, const char *buf,
-@@ -847,7 +847,7 @@ static ssize_t local_port_store(struct config_item *item, const char *buf,
- 	ret = kstrtou16(buf, 10, &nt->np.local_port);
- 	if (ret < 0)
- 		goto out_unlock;
--	ret = strnlen(buf, count);
-+	ret = count;
- out_unlock:
- 	dynamic_netconsole_mutex_unlock();
- 	return ret;
-@@ -869,7 +869,7 @@ static ssize_t remote_port_store(struct config_item *item,
- 	ret = kstrtou16(buf, 10, &nt->np.remote_port);
- 	if (ret < 0)
- 		goto out_unlock;
--	ret = strnlen(buf, count);
-+	ret = count;
- out_unlock:
- 	dynamic_netconsole_mutex_unlock();
- 	return ret;
-@@ -894,7 +894,7 @@ static ssize_t local_ip_store(struct config_item *item, const char *buf,
- 		goto out_unlock;
- 	nt->np.ipv6 = !!ipv6;
- 
--	ret = strnlen(buf, count);
-+	ret = count;
- out_unlock:
- 	dynamic_netconsole_mutex_unlock();
- 	return ret;
-@@ -919,7 +919,7 @@ static ssize_t remote_ip_store(struct config_item *item, const char *buf,
- 		goto out_unlock;
- 	nt->np.ipv6 = !!ipv6;
- 
--	ret = strnlen(buf, count);
-+	ret = count;
- out_unlock:
- 	dynamic_netconsole_mutex_unlock();
- 	return ret;
-@@ -955,7 +955,7 @@ static ssize_t remote_mac_store(struct config_item *item, const char *buf,
- 		goto out_unlock;
- 	memcpy(nt->np.remote_mac, remote_mac, ETH_ALEN);
- 
--	ret = strnlen(buf, count);
-+	ret = count;
- out_unlock:
- 	dynamic_netconsole_mutex_unlock();
- 	return ret;
-@@ -1131,7 +1131,7 @@ static ssize_t sysdata_msgid_enabled_store(struct config_item *item,
- 		disable_sysdata_feature(nt, SYSDATA_MSGID);
- 
- unlock_ok:
--	ret = strnlen(buf, count);
-+	ret = count;
- 	dynamic_netconsole_mutex_unlock();
- 	mutex_unlock(&netconsole_subsys.su_mutex);
- 	return ret;
-@@ -1160,7 +1160,7 @@ static ssize_t sysdata_release_enabled_store(struct config_item *item,
- 		disable_sysdata_feature(nt, SYSDATA_RELEASE);
- 
- unlock_ok:
--	ret = strnlen(buf, count);
-+	ret = count;
- 	dynamic_netconsole_mutex_unlock();
- 	mutex_unlock(&netconsole_subsys.su_mutex);
- 	return ret;
-@@ -1189,7 +1189,7 @@ static ssize_t sysdata_taskname_enabled_store(struct config_item *item,
- 		disable_sysdata_feature(nt, SYSDATA_TASKNAME);
- 
- unlock_ok:
--	ret = strnlen(buf, count);
-+	ret = count;
- 	dynamic_netconsole_mutex_unlock();
- 	mutex_unlock(&netconsole_subsys.su_mutex);
- 	return ret;
-@@ -1223,7 +1223,7 @@ static ssize_t sysdata_cpu_nr_enabled_store(struct config_item *item,
- 		disable_sysdata_feature(nt, SYSDATA_CPU_NR);
- 
- unlock_ok:
--	ret = strnlen(buf, count);
-+	ret = count;
- 	dynamic_netconsole_mutex_unlock();
- 	mutex_unlock(&netconsole_subsys.su_mutex);
- 	return ret;
+ 	mutex_lock(&netconsole_subsys.su_mutex);
 
 -- 
 2.52.0
