@@ -1,117 +1,130 @@
-Return-Path: <netdev+bounces-280880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280881-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mCb8HB+T6mmr0wIAu9opvQ
-	(envelope-from <netdev+bounces-280880-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 23:46:07 +0200
+	id QGFIBz2U6mnQ0wIAu9opvQ
+	(envelope-from <netdev+bounces-280881-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 23:50:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3DD7457F4F
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 23:46:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80E91457FC2
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 23:50:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D524E301DC23
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 21:46:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DC4E130131E0
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 21:50:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBEE13D6485;
-	Thu, 23 Apr 2026 21:46:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BDB7361DBF;
+	Thu, 23 Apr 2026 21:50:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iE+nck/o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n4JSeUjv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561163D5668;
-	Thu, 23 Apr 2026 21:46:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED49023D7CE;
+	Thu, 23 Apr 2026 21:50:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776980764; cv=none; b=cQpFsJVQASwAG6urD5bCyyhDPlKC4BHFxWrBnxEhhnS7JVgSUYUtUYy6mHsgWINYJuk0VXfjxEOiYi+t6xt3Ja3w7mEuC+1Z+ZGDQh7TQZ2mXzsn1bWBoJJ6qucc//6ooO0Y8lWbqAcLpDB8kpHPJHfHXDj7e5nfHEzcGA66Ios=
+	t=1776981050; cv=none; b=UJ/X4gr4m/pU7k9urtrj3QmTp+min5Dkr8E8/ZdrBjE6xULY+CBKfM9qM1Z2mbg8ny2lmDyQgxzkXLW3Jd7kfYmpyRJCKaSiq5wLqaig13ojbWfhQ+CDpLxjSJuq8YlsK5h4f+L+s0AsRBfk9kbvjrSeU5Ib00CnALPrrCYc5bE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776980764; c=relaxed/simple;
-	bh=qByhxwu6Bt5xslpZsiI4eQ4Zl4sKrReDFKD5Bfhqfvc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=n9WzYr9d/LztxY6Z/zrCalZdhufOIchSN/KnG9GDsMoUH7KE168p6DnOT8aNsTLQSqJaqzdocXxb1msVYei7g1lM5jrpUXJNy4MFDlnz408J6gLtowT/kPtnQS9c3D+ywm9zU7OExSPngXXnMn2b50LQkRk213VSaAaXi8UfwWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iE+nck/o; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53671C2BCAF;
-	Thu, 23 Apr 2026 21:46:03 +0000 (UTC)
+	s=arc-20240116; t=1776981050; c=relaxed/simple;
+	bh=XYuKr+eaOJj0h6C00DY+gStx8tqVxxnWPOfaL0ideFs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=o4FMsOoQUvbR408104n2lgwOku3TF1LV7EQU0W1cWNvHo1p8UzwjbJQe3zDioDecDi2Wh8PBHy0meAXz/Y5f2PQIXla22ahtJYbv/CDYDrR1aEimrDjlMBSuhCU+ql06CeCyB87geoa4N03FgRZcW6aFVLIOjwHY075VeI8irck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n4JSeUjv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86CDFC2BCAF;
+	Thu, 23 Apr 2026 21:50:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776980763;
-	bh=qByhxwu6Bt5xslpZsiI4eQ4Zl4sKrReDFKD5Bfhqfvc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iE+nck/o9tVtvqzqBfb2DzoXx/daOClAwVG3siDCPi26JTkdqcJeHlRDXYvX2aK7g
-	 IgSKH+b+Bq6yaG39Porqo/a/sMM/5uOw/uYFo6AgBvgOWbL+jnzKlJyhIxcxqClKmA
-	 c9YP84BvjC64jrv8c1bNw+65hbX6UeAy7o/tCiXt/DhVbUt2dQ1jTLiTTyGNoZBEDr
-	 j3dupUgXtEvNeDUQhL9WhO9o3O27eJMOMcLQVunWqjIyujRVCudd4AIvJjwToKT7LI
-	 lXpUzfkzvR55dhJ2qeVgIlUgrYfcHEUOhQFrIavZbJZ9NA55vVwuN9ByCIeqzvB/S2
-	 j6BgzYjETIIwg==
-Date: Thu, 23 Apr 2026 14:46:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Anderson
- Nascimento <anderson@allelesecurity.com>, linux-afs@lists.infradead.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2 0/6] rxrpc: Miscellaneous fixes
-Message-ID: <20260423144602.127b7068@kernel.org>
-In-Reply-To: <3047316.1776974185@warthog.procyon.org.uk>
-References: <20260423123947.156ce741@kernel.org>
-	<20260423105639.6e0a0a7e@kernel.org>
-	<20260422161438.2593376-1-dhowells@redhat.com>
-	<2990993.1776970042@warthog.procyon.org.uk>
-	<20260423115853.59273351@kernel.org>
-	<3047316.1776974185@warthog.procyon.org.uk>
+	s=k20201202; t=1776981049;
+	bh=XYuKr+eaOJj0h6C00DY+gStx8tqVxxnWPOfaL0ideFs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=n4JSeUjvAxQOaOZKSOuAOEhyZUagMglFLYbT7kJx+29PPFnKsb6tTP1EOg4u1H7EP
+	 yXkBPNp/8ZRIzUs7Qq/yhSpolzWadXLwcKXGNfIWnCOwjUdV3ZxkOLvkTTf5/0h1/W
+	 L4xCJ1j14PM0D5r6qPNc8SCRQBUfzES5Eu8ycMnjQNSWCAu1qwDDPuj8Rri1M2KRj7
+	 Fu1IPdk+fYvXmeT+uvaY2yBNPueADw/Rstab0UUu5UDhpU1SS5YzwkYudvf54eOhQy
+	 oRf93hINIew46E78/SdaylGufTbWb1lUXCC4vIqIfDOGMROxcla3p+Aj3lo/jRsERh
+	 CdSaDpnAtFYSA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02DDE380A94F;
+	Thu, 23 Apr 2026 21:50:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/3] rxrpc: Miscellaneous fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177698101049.775674.1567171164890583654.git-patchwork-notify@kernel.org>
+Date: Thu, 23 Apr 2026 21:50:10 +0000
+References: <20260423200909.3049438-1-dhowells@redhat.com>
+In-Reply-To: <20260423200909.3049438-1-dhowells@redhat.com>
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, marc.dionne@auristor.com, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ horms@kernel.org, anderson@allelesecurity.com, linux-afs@lists.infradead.org,
+ linux-kernel@vger.kernel.org
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280881-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-280880-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E3DD7457F4F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 80E91457FC2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 23 Apr 2026 20:56:25 +0100 David Howells wrote:
-> Jakub Kicinski <kuba@kernel.org> wrote:
-> 
-> > I've been hacking up Sashiko on top of Claude in these past few days,
-> > and it's far less nit picky. For this series it doesn't flag a thing.
-> > I'll just pull this in, if you could LMK whether any of the "real
-> > Sashiko" reports are actually valid commentary on the current patches
-> > I'd greatly appreciate.  
-> 
-> They're all valid comments.  I've expanded my series by two further patches
-> and modified two others (one just a trivial missing space) and will post a v3
-> shortly.
+Hello:
 
-There goes my hope that we found a way to reduce the noise.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 23 Apr 2026 21:09:05 +0100 you wrote:
+> Here are some fixes for rxrpc, as found by Sashiko[1]:
+> 
+>  (1) Fix rxrpc_input_call_event() to only unshare DATA packets.
+> 
+>  (2) Fix re-decryption of RESPONSE packets where a partially decrypted
+>      skbuff gets requeued if there was a failure due to ENOMEM.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/3] rxrpc: Fix rxrpc_input_call_event() to only unshare DATA packets
+    https://git.kernel.org/netdev/net/c/55b2984c96c3
+  - [net,2/3] rxrpc: Fix re-decryption of RESPONSE packets
+    https://git.kernel.org/netdev/net/c/0422e7a4883f
+  - [net,3/3] rxrpc: Fix error handling in rxgk_extract_token()
+    https://git.kernel.org/netdev/net/c/3476c8bb960f
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
