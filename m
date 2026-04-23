@@ -1,170 +1,277 @@
-Return-Path: <netdev+bounces-280885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280887-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yHBDAcyc6mnF1QIAu9opvQ
-	(envelope-from <netdev+bounces-280885-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 00:27:24 +0200
+	id kA3AGmGh6mlF1gIAu9opvQ
+	(envelope-from <netdev+bounces-280887-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 00:46:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E76145820B
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 00:27:21 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C621B458361
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 00:46:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D70A6300821F
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 22:27:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7DA963016900
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 22:46:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 992EC3603C9;
-	Thu, 23 Apr 2026 22:27:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10DBA3385A1;
+	Thu, 23 Apr 2026 22:46:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="TVTbuRAV";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="M6wmyyVt"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="hUQ7Hbix"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88BD433436A
-	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 22:27:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776983237; cv=none; b=kK62OMykw7Gm7A+T7kVkfhFNRqHIeiADgSGhjmyHs8D1Be/+TpqCwJGAIFUE/xlTCMLZd3DZV38PwxLczPwSvs85alxH/kP1d71zYwfBEUz40MF3igFURS+5DmglLH5vb+bW/KsBw6UZL1qiwYZsw1/aLFoC+ReOJ40khVzxsxI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776983237; c=relaxed/simple;
-	bh=K/rv7vg9o1YKpDguK+R50Qfy17vzgHgNh9qMLvluVBk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ERlT4ao+gHZszZuzb7yheLpGksiztIUoMNOYa6KGzCbybdxC+tOrIhhEo68oaqIugGygQImzG1n3B93n4CzfqVmGQQhKy28ys2BR7hOQ9yX8xLxbtFOGg6W5RTD2/2aaO+S8mg6xyDdYpN+8MLcl5jzAt54zwf82mLyrYhLZbUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=TVTbuRAV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=M6wmyyVt; arc=none smtp.client-ip=202.12.124.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 52AB17A0140;
-	Thu, 23 Apr 2026 18:27:13 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Thu, 23 Apr 2026 18:27:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1776983233; x=
-	1777069633; bh=VN2AmLlnP64m1QZ3DL+eF3J0eOsS0udkViE9JKY2i6c=; b=T
-	VTbuRAVLWFhgECrY8GBvfgeB8OKwpRkH0OuUBU+XAlu+0z5GB0Tr+7LoE+Rpd3yn
-	jnOXgNE0bGYzDYO+C5oQHV+rShp5Wfn+cbjsrVN5KyOlrJGSmURF+A17gb03dLkJ
-	g/JfzVCSNAVa5CAPA5mDsXaBdYOtFOkT+AHpTm3CVNNE19u851k2ci35+Vh/3cro
-	5maGI6mVSY6fiCl6Lsik8UDMVIxpQnvQoTzkjhTxnAiTQKSSRA/QiTyYfqyu+c4W
-	4wKLzTtfZe7beS5Sic/TRSd0U8vxKmxSM1WHNlhAi9gJOzNn8LZxglZeblEs5HfX
-	NU8R/Wv20uCf2FZVoCSDg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1776983233; x=1777069633; bh=VN2AmLlnP64m1QZ3DL+eF3J0eOsS0udkViE
-	9JKY2i6c=; b=M6wmyyVtPXjj5VD2VJTV4AJwcPuh8sGI2j4pw9SSZCNFz+AWa0A
-	GQiCxmJ1uXYQ4uSRYobcpqv9+SQYbPtJBkHxaREhu3HBWf8y4JOYZCY3tF8ePBY7
-	Yot1Bo+yr4exZElXnPWWhCPhAwHMd9dkQzAQJXNN/Jt9VKOqdkC/XRIKcozpZDIo
-	ZJ4iNROoOKYTyy8c+CRTorz6sCHw3o33tggpoBo+ZwRaZWJknU5cFyCiFtT6pkQa
-	po48LmK07+Ccq7qiiS9QAzyvrj1khKCdGiaR5EiApVtYYBdJAieX3DpbQvYwgk56
-	T8fUKbWutulTUwJ4/P+o36KncUA1iaiQNBw==
-X-ME-Sender: <xms:wJzqaa3cl6za5C1-haRoaysM7dBXtd08BYtxxH-xfdd97EvkztBYDA>
-    <xme:wJzqafpDHJU0RkDos6MJlXNIbWRCHgy-MIA8h7XqigI8hBTfFXsqE8NJals4ak0fI
-    0_p85WuZhcAAhstj68cIgyJp6AuGV45cDn692JsKcE9aUv9EjawXkY>
-X-ME-Received: <xmr:wJzqaWhisd9-COnzj7b8yM9IlbtXZK6ZMlML_rRpys9YDXCew_HzhCqvZkut>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdeikeefhecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgr
-    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
-    htthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeegteehgeehieffgfeuvdeuffef
-    gfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepledpmhhouggv
-    pehsmhhtphhouhhtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtph
-    htthhopegrnhhtohhnihhosehophgvnhhvphhnrdhnvghtpdhrtghpthhtohepnhgvthgu
-    vghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprhgrlhhfsehmrghnug
-    gvlhgsihhtrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdp
-    rhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtoh
-    epuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigv
-    thesghhoohhglhgvrdgtohhmpdhrtghpthhtohepihhmvhegsggvlhesghhmrghilhdrtg
-    homh
-X-ME-Proxy: <xmx:wJzqab8LXZKMAdjG9f8x1tAIVxnnEKOQIujyrZH0tUgN5sWbc7Ya0Q>
-    <xmx:wJzqaSXKv-F7LakomHPS_xkW2t0x4Tr7ZsNG07ROEH82TjtIJLHfxQ>
-    <xmx:wJzqafAFBPCrEK4p89Si0HYZMn1ANF4REN80UMhs56u75Mk4-fg2cw>
-    <xmx:wJzqaXEjUzEioN6MmdbzFt-_X81a9CFGUhVcidKUkDgnmmLg3hiBtw>
-    <xmx:wZzqaXdEspw62baSWFUnExk9hLhbw7ajwX5bHaAeUXFBMK3uPAGwmpir>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 23 Apr 2026 18:27:12 -0400 (EDT)
-Date: Fri, 24 Apr 2026 00:27:10 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Antonio Quartulli <antonio@openvpn.net>, netdev@vger.kernel.org,
-	Ralf Lici <ralf@mandelbit.com>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Hyunwoo Kim <imv4bel@gmail.com>
-Subject: Re: [PATCH net 1/1] ovpn: fix race between deleting interface and
- adding new peer
-Message-ID: <aeqcvgufY0F50rkU@krikkit>
-References: <20260422123242.530882-1-antonio@openvpn.net>
- <20260422123242.530882-2-antonio@openvpn.net>
- <20260422192050.7c4ca760@kernel.org>
- <7481bc31-44f6-43ae-b3aa-07002644d9e6@openvpn.net>
- <9221605c-ad31-44f9-b3b7-db2237f75eb7@openvpn.net>
- <aepK3XXc8IFemb1Z@krikkit>
- <20260423103628.4ce6fc05@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC4B3093CB
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 22:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=67.231.153.30
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776984411; cv=pass; b=s7YTaKdmyLK7UZ2Cmms6EFMlW5SEJ7HACI8Siw3MBqK/VbdraXjfKTI7lWnzRiJ4MNhSlU/kl+ZlaFEPun8zS0zZWzpIKr5K0Os+kbLibwlDZITNHETQudO1UPrKQhxgEeWTfG6jzq4kJKxby5mq+EoPkrUYAhryPoHCzrqqe+0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776984411; c=relaxed/simple;
+	bh=Wxr23wANLnnyuzn218fgcEsk3niAu/vPTkNHqBH3Tn8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZOKfBBc1YTNwzLfbb9XGYLDjfqxhSyxnMK8GqzygXWGw6PyACQ1cOYs4NmRCVh1acVYM3bXCrXDyFZ5UelLeCdAlMnF7BAB8hJIuXWdUwC97TJ64hFJitS6uBFHIGGSvznmV8X00FzwEIz1GdIOpG13UWAkfwRRmHzi5O4vnx+g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=hUQ7Hbix; arc=pass smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
+	by m0089730.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 63NH8lC01998188
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 15:46:41 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=PquePwN2z+FIAknp17G21flfgP6AWqZXSQwJJptNxF8=; b=hUQ7Hbixk7KH
+	V6p3ES/P2a8CUtPmNt74t2cfuKABvfu/m4D6tbVY5gJFj9eJ/n3+/iJQWTVArvg/
+	oMqQVJ95qtjzKP32JCFVknOAexBRDj6Mffc7oJ5QInNnJhytcy2KTnv6notZJeEr
+	k0j7rbuOZ+ELiPyAddoRU/DteHRQnxXE7Q6qu1e5SKVCpdCr6MkdXCA5t6Yuy7sV
+	iqxBpub2msTYWRBiu5ecNK90BXZB0calftezHQR5aB/iqFzdFZSYtVp8nwE1WH60
+	w5hHU4VPDIZ1gHuPhwWch+XnA48N/04PWW0oPI9beYdQn+hd/m+6t2/MmJVqAlp0
+	P7NU/bVRyA==
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com [209.85.218.71])
+	by m0089730.ppops.net (PPS) with ESMTPS id 4dpepafnqe-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 15:46:40 -0700 (PDT)
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-ba84b4c7130so460106166b.0
+        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 15:46:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776984399; cv=none;
+        d=google.com; s=arc-20240605;
+        b=T3wHAQ9a75+XbOrBa91MNy5hFqWHwRxOUQjapZM/6uPK4Y+ZcHtU4SREotGIPRTY2i
+         APeOz/1Ej2DitO7J5Q1VZ+a+fVohsFvSudioyXMJbPHFMCZeBz1Ow04Q9WW8Ux7p+x5V
+         pSmyfWjSPCRBT2M0b9jmpDnWqx76KRXPqZQjArTeMpTnl8BBkJG0xFRUkTV6u+gi4N6W
+         SvsLJyc9mH/o5QBf9IfZeZFmnU3ERHb4J5Q35MLQTzLx4bQXK+qF42U/zcUIavNuTG+a
+         +mRhzviILjn2uxq1NkCjk0uVKFDtfA9qMHArhe7AEHyLsd+tmgYJGBzWJpdUkBEBoSTZ
+         GewQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version;
+        bh=PquePwN2z+FIAknp17G21flfgP6AWqZXSQwJJptNxF8=;
+        fh=DUyFJQyizO7KQiHPMSqDotHs7GUAUqHxBeksj9YlezM=;
+        b=eChilnUXJUnrDqjvtAm2qBUj0dlC4HFl9ry0Fdb44GGY9He9ZSaWdbQ71Yv0TFUcgK
+         xWT1s34CCQGPPTYK2h4K2s/Xc5tFYcRtEjT3x2pzJ/G8m/Itwd5imirOgKKM5oY670oh
+         S/z74Fmez+Jd7IT0iaW9kcAsN+NFawsBccnCcHASNAYQia/sc5yewhw40GWEf5XH1b9J
+         7Z3BF6NbbS3KXl34Aq8zkWSlBkOillkMGYhtapwPH/BhoK3A7qAwLGZstTO606UvTGFd
+         G/mUe38WzndmfLtfs3JLF+zfuZeBHVzIazn1MRsEmaMZBacJUlvNEXkroBQIuJZsPpij
+         0C9Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776984399; x=1777589199;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=PquePwN2z+FIAknp17G21flfgP6AWqZXSQwJJptNxF8=;
+        b=p1/BMliTNFSNLT8u9acxNfoQPRF1tGrwIvaG0T3KYwK3dED2dVCv0KRO4SX7xEjmo1
+         6hQqSB201Ywhg8d9nDRCw4vocktbnScqMFs1tdC/nAEfkzU+E7AfowkRhcR80bhbKu4v
+         ctDQsgnI8KO5Na2HZ4PRWGTg5nipmsoOnm1bxtRlOgT66luhZXdorVR3lBtAXlLM6PsZ
+         OXbq9ihTitA4/GtsI8C67KX6/0f5H/TGtbE3Zp8dIh+qWetsqK7JJJM/Am837eKV3E61
+         dPYtQFHLQ5s6Imr72Wei8+lKQI8SfskrJFFYv1b65aun4LAn8nU21RMOgba+dKjmXHny
+         laLA==
+X-Forwarded-Encrypted: i=1; AFNElJ/2+I4IjLJjD2RcGe434mBBZ6Efqbgbuo6VLt31oDquqHlHqnhl4iG17/uHsC/0zhb/85ltWIo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvBxFHncwYu3w2nxuuHpMIYVHn37GIwwwFmd+Uzyg+Q6502tZL
+	9j9WBXrvmm4OFE/yvL86omOFe7eLg+85XN+xgY/trynKD0g3+ILuM8M4EA8jC/QS0DziLT2092b
+	64L0TrbUattoJ8PcA3btJxglwdOW64gUrIR/BhyAH7FYrT/B6zHFhFFK5FMJtGekrDtx0jCzPXS
+	n9WkqUdEARvm9Y5xfKL4Ydi8BiLJMeWNg=
+X-Gm-Gg: AeBDieu7EKQI4Jx5vg8NVTtW4VSr28LHuxlqBs+AfetpjkE8rm30Bh52JtNB3uOFYLn
+	N/efYwp2QV9vj3iYvgJueqgb4UJow1MT0Ly8spsW0TewouZMKQZybsk/rst62fD/OPh/zl8BPla
+	cZTzmpBuq7dXqf66hz1mEPUu37+tOyZUEWlY6wkr5lr/gW22TgA6yt7ehzHWyMjnIBblomuEMTC
+	WH9VdzjRHNR4h3MAt2+zmSTJHYcVA==
+X-Received: by 2002:a17:907:7fa0:b0:ba5:962f:9db8 with SMTP id a640c23a62f3a-ba5962fcc19mr1234842966b.29.1776984399334;
+        Thu, 23 Apr 2026 15:46:39 -0700 (PDT)
+X-Received: by 2002:a17:907:7fa0:b0:ba5:962f:9db8 with SMTP id
+ a640c23a62f3a-ba5962fcc19mr1234841166b.29.1776984398771; Thu, 23 Apr 2026
+ 15:46:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260423103628.4ce6fc05@kernel.org>
-X-Spamd-Result: default: False [0.34 / 15.00];
+References: <20260421221016.2967924-1-ameryhung@gmail.com> <20260421221016.2967924-3-ameryhung@gmail.com>
+ <9237d7b35463c79863488e3f2180239aab679049.camel@gmail.com>
+ <CAMB2axMzeQs3WzFd1PZFB=DgR6d2ye4qzHKhATK2895ryzAEog@mail.gmail.com> <c84a7beccd4ae527981797a6e5a6af840ba9c312.camel@gmail.com>
+In-Reply-To: <c84a7beccd4ae527981797a6e5a6af840ba9c312.camel@gmail.com>
+From: Amery Hung <ameryhung@meta.com>
+Date: Thu, 23 Apr 2026 15:46:24 -0700
+X-Gm-Features: AQROBzC1De56wmESn2eT6JrBcX_snpphIjr5o2acJR5S3Bb8bBEZf2if_Th2DN4
+Message-ID: <CAP17u3Nh=_9ftdp-tA=yS5TRW7j-5Tk1PPdaDz-GZCW6k_Nvvw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 2/9] bpf: Assign reg->id when getting
+ referenced kptr from ctx
+To: Eduard Zingerman <eddyz87@gmail.com>
+Cc: Amery Hung <ameryhung@gmail.com>, bpf@vger.kernel.org,
+        netdev@vger.kernel.org, alexei.starovoitov@gmail.com,
+        andrii@kernel.org, daniel@iogearbox.net, memxor@gmail.com,
+        martin.lau@kernel.org, mykyta.yatsenko5@gmail.com,
+        kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-ORIG-GUID: m1aiZjAeI2klfQIWzY9U0Op_Ot41x4sh
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDIzMDIyMSBTYWx0ZWRfX86hpEndJLv/P
+ 082xC/ExvJVDURS0ZhnNhEMQFJhLM3b7WydWpFsQZXfrDeiA6vSEbJqxfTTNzYUdYGugcETRag+
+ 1kECCI7tusbANejCMtyPSFuWa0WMMi6cFhpNhsQTR8+tEJrNsEznt1gh8Pd7nocSUZwnMmoG3m4
+ 1Enk56FbOk0E3rGo5EkKI8JieXyOxFtanT8YPiskD2dOGqSrn0VyYvepbbE9tcA9D60wfJsQu+S
+ fmUsr9qGO9cGemPt5t41ZBwq1CeiM8kP8DwPRS7yPpGNMnpPDrnmiYmJ9jzqYdBCFr5pXBXc+yV
+ V5+SkfYP9Jsf50+6VUYZj5MXt5LsPgqbcx3JKwZD/B0YZF0dcjBlHFTaE23orwSFeLRUsWErWV9
+ vlyLLHiy1SJEdW1elsp1SRM9KfyCAVSgobbPaJlVaVRZn0GLzsNjBhWFQqtm9UPo0GUs8JjGc1M
+ 2NsIW4IMVGgmkpo/8wA==
+X-Proofpoint-GUID: m1aiZjAeI2klfQIWzY9U0Op_Ot41x4sh
+X-Authority-Analysis: v=2.4 cv=MIJQXsZl c=1 sm=1 tr=0 ts=69eaa150 cx=c_pps
+ a=Ak8bExYEjeps3Jj0Zi+cTQ==:117 a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22 a=855S8uPTkML1Oy45N9_h:22
+ a=pGLkceISAAAA:8 a=rXDmgZ6x93T5uffNZgUA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-23_03,2026-04-21_02,2025-10-01_01
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280885-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,kernel.org,iogearbox.net,meta.com];
+	TAGGED_FROM(0.00)[bounces-280887-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FREEMAIL_CC(0.00)[openvpn.net,vger.kernel.org,mandelbit.com,redhat.com,lunn.ch,davemloft.net,google.com,gmail.com];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[meta.com:+];
 	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[ameryhung@meta.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4E76145820B
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C621B458361
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-04-23, 10:36:28 -0700, Jakub Kicinski wrote:
-> On Thu, 23 Apr 2026 18:37:49 +0200 Sabrina Dubroca wrote:
-> > We could also wrap all of ovpn_peer_add (including the new reg_state
-> > check) in netdev_lock, since we can't move to NETREG_UNREGISTERING
-> > until netdev_lock is released (then I think we wouldn't need the
-> > READ_ONCE(reg_state)). But I don't know if that's an acceptable use of
-> > netdev_lock.
-> 
-> Yup, fwiw it's a perfectly legitimate use case.
+On Wed, Apr 22, 2026 at 3:50=E2=80=AFPM Eduard Zingerman <eddyz87@gmail.com=
+> wrote:
+>
+> On Wed, 2026-04-22 at 15:45 -0700, Amery Hung wrote:
+> > On Wed, Apr 22, 2026 at 2:46=E2=80=AFPM Eduard Zingerman <eddyz87@gmail=
+.com> wrote:
+> > >
+> > > On Tue, 2026-04-21 at 15:10 -0700, Amery Hung wrote:
+> > > > Assign reg->id when getting referenced kptr from read program conte=
+xt
+> > > > to be consistent with R0 of KF_ACQUIRE kfunc. skb dynptr will track=
+ the
+> > > > referenced skb in qdisc programs using a new field reg->parent_id i=
+n
+> > > > a later patch.
+> > > >
+> > > > Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> > > > ---
+> > > >  kernel/bpf/verifier.c | 5 +++--
+> > > >  1 file changed, 3 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> > > > index 41e4ea41c72e..93003a2a96b0 100644
+> > > > --- a/kernel/bpf/verifier.c
+> > > > +++ b/kernel/bpf/verifier.c
+> > > > @@ -6448,8 +6448,6 @@ static int check_mem_access(struct bpf_verifi=
+er_env *env, int insn_idx, u32 regn
+> > > >                       } else {
+> > > >                               mark_reg_known_zero(env, regs,
+> > > >                                                   value_regno);
+> > > > -                             if (type_may_be_null(info.reg_type))
+> > > > -                                     regs[value_regno].id =3D ++en=
+v->id_gen;
+> > > >                               /* A load of ctx field could have dif=
+ferent
+> > > >                                * actual load size with the one enco=
+ded in the
+> > > >                                * insn. When the dst is PTR, it is f=
+or sure not
+> > > > @@ -6459,8 +6457,11 @@ static int check_mem_access(struct bpf_verif=
+ier_env *env, int insn_idx, u32 regn
+> > > >                               if (base_type(info.reg_type) =3D=3D P=
+TR_TO_BTF_ID) {
+> > > >                                       regs[value_regno].btf =3D inf=
+o.btf;
+> > > >                                       regs[value_regno].btf_id =3D =
+info.btf_id;
+> > > > +                                     regs[value_regno].id =3D info=
+.ref_obj_id;
+> > > >                                       regs[value_regno].ref_obj_id =
+=3D info.ref_obj_id;
+> > > >                               }
+> > >
+> > > Hi Amery,
+> > >
+> > > Could you please help me double-check my understanding of this change=
+?
+> > >
+> > > It adds a new behavior, if struct_ops method parameter is annotated
+> > > with __ref, then if a field is read from such struct_ops context
+> > > the destination register would now have it's .id =3D=3D ref_obj_id
+> > > allocated for the parameter at the beginning of do_check().
+> > > E.g. for `rB =3D *(T *)(rA + off)`, if `rA` is a pointer to struct_op=
+s
+> > > context and parameter corresponding to `off` has `__ref` annotation
+> > > the `rB.id` will be assigned, contrary to old behavior, when it remai=
+ned 0.
+> > >
+> >
+> > Right
+>
+> Ack, thank you.
+>
+> > > This change in behavior, however, becomes visible only after the
+> > > changes to release_reference() later in the series.
+> > > There the `rB.id` is used to initiate `mark_reg_invalid(env, reg)` fo=
+r
+> > > the `rB`.
+> > >
+> >
+> > I probably should mention it in the commit message. The purpose of the
+> > patch is to make the implementation consistent with the design:
+> > parent_id tracks the id of the parent objects.
+> >
+> > Without this patch, it should still work since in this case ref_obj_id
+> > always equals to id. When release_reference() is called on a
+> > KF_RELEASE kfunc, the children objects will still be invalidated
+> > correctly.
+>
+> bpf_qdisc_fail__invalid_dynptr_cross_frame.c:invalid_dynptr_cross_frame
+> fails if I comment out the line `regs[value_regno].id =3D info.ref_obj_id=
+;`.
+> The added .id link is used to propagate invalidation triggered by
+> `free_skb(skb);` to  `hdr`.
+> The patch seem mandatory for the series.
 
-Ok. There's still a worrying bit in nesting lock_sock under
-netdev_lock (ovpn_peer_add -> netdev_lock -> ovpn_peer_add_p2p ->
-unlock_ovpn -> ovpn_socket_release -> lock_sock).
+Ah yes... because an skb dynptr do track parent's id in
+check_kfunc_args(). Thanks for the correction.
 
--- 
-Sabrina
+ret =3D process_dynptr_func(env, regno, insn_idx, dynptr_arg_type,
+                          meta->ref_obj_id ? meta->id : 0, &meta->dynptr);
 
