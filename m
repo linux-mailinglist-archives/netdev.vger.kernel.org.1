@@ -1,224 +1,214 @@
-Return-Path: <netdev+bounces-280781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280782-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id Non4K9gw6mkCwwIAu9opvQ
-	(envelope-from <netdev+bounces-280781-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 16:46:48 +0200
+	id YO+uEKQz6mkCwwIAu9opvQ
+	(envelope-from <netdev+bounces-280782-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 16:58:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1610E453D92
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 16:46:47 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9C20453FAE
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 16:58:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 82882301F17E
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 14:46:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8B29B3070378
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 14:54:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A75C2F7AC1;
-	Thu, 23 Apr 2026 14:46:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B18033ADAF;
+	Thu, 23 Apr 2026 14:54:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n37nGt0U"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dV1tzpp+";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="CnA0t39G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B104677F39;
-	Thu, 23 Apr 2026 14:46:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C39582222CC
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 14:54:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776955603; cv=none; b=Iuukus4o0q15oF6CrmvjLUiJBZCmqGcBozfW/r38knuZtigUsfPDZ64H8cyyFGMmdxRhKe+tipwJpQnU85ptPQqT/QGbdzN7SuOXNhQkqtYnKRCZDBCOgG/Pl/wBaG5qQ+d06cPskWVru57EgmOOwVek5bJpgcXjqeRReusuArY=
+	t=1776956088; cv=none; b=NAc4RWup+Wz03Gd/o6yyceedatlqz6x9KG8Oxq8iFrEpD9RdBXm7gY/Tc/UBFhFeC+mw7dbumNiUo/o8qzBsla0elxVRUAMnNKOPmRksfyuCy6w70GW48Zw3lhcgwMzTAZQZDyoA2WW7qK1bgwCteOmtYOQZRBsTngAQVE30uqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776955603; c=relaxed/simple;
-	bh=3vy9o7HfDGoaToU61cCWVda460q9/2Qh/swmUMeL9OM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZwEvKTkVMxBWT5WfFmoNv09hF+ouVL0FbbeQrEAQQ33cQmG5OrWkK2jHdsvZjO1A4RMBPwhvo2GM/maJ9AkLhhC7tO3yYLVMBdfrzilXHaLitDCwwRPd2wlKPdleA9utljcOQdUqyU6Alc2f4Cgag3Livqt7fZK90fu0ck6TPu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n37nGt0U; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776955601; x=1808491601;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=3vy9o7HfDGoaToU61cCWVda460q9/2Qh/swmUMeL9OM=;
-  b=n37nGt0UrJeSWG0xQ9DvIg/kqfkqQKXskNo+Q6Jx2pSovD6XuXq8Sy7X
-   sLmD2ivwO0dOVAtsFrks0pwTy2/VvwyLUwGdn9eU3f/r0aVtDv9Nlge7i
-   teACc111OeljQomF7vzYCBEcej6E6HUZTiVMwyIt4+qWOHnbilNNbiaxp
-   T77DrfArJsNTmoc5pPF1F/C5XwIUz+mibhivRv6QgyxQ1JEuRZPFiYucZ
-   wh4u+t9C85AEJi/K4RrNimUIksS+H++L9CcFAk6CZJJziq88/kpbTmvN8
-   jPAmxH9VXVRxlz1co74WLDITpK9WD/YiEBTanoVzW5nKQqraiI0waB3jH
-   w==;
-X-CSE-ConnectionGUID: 853DUtztRLe0KVmpJvztdA==
-X-CSE-MsgGUID: Y05vqM4jS8iehlHBp5djyA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11765"; a="103387809"
-X-IronPort-AV: E=Sophos;i="6.23,194,1770624000"; 
-   d="scan'208";a="103387809"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2026 07:46:41 -0700
-X-CSE-ConnectionGUID: lJQQusUiTc+74cGl11/ByQ==
-X-CSE-MsgGUID: HhZHMzHdQ+6vF4bYtaAzqw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,194,1770624000"; 
-   d="scan'208";a="226149901"
-Received: from arjan-box.jf.intel.com ([10.88.27.153])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2026 07:46:41 -0700
-From: arjan@linux.intel.com
-To: netdev@vger.kernel.org
-Cc: anderson@allelesecurity.com,
-	dhowells@redhat.com,
-	marc.dionne@auristor.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	jaltman@auristor.com,
-	horms@kernel.org,
-	Arjan van de Ven <arjan@linux.intel.com>
-Subject: Re: [BUG] rxrpc: Client connection leak and BUG() call during kernel IO thread exit
-Date: Thu, 23 Apr 2026 07:48:00 -0700
-Message-ID: <20260423144801.292566-1-arjan@linux.intel.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <CAPhRvkyZGKHRTBhV3P2PCCRxmRKGEvJQ0W5a9SMW3qwS2hp2Qw@mail.gmail.com>
-References: <CAPhRvkyZGKHRTBhV3P2PCCRxmRKGEvJQ0W5a9SMW3qwS2hp2Qw@mail.gmail.com>
+	s=arc-20240116; t=1776956088; c=relaxed/simple;
+	bh=hfUHLyKJSvrgtYgi0uQNctjhIyNjTTEmXV7g3LiZRcc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eSYZKWXIb5dCKtxMownxwy4LNXoFntwxAZixyiKWPkZpDhvUb7t4cmWtKH6juxuAfdAxgR3PYo1TWZuG072q7vgAhGV/2DrU+6oxu6So2saUyu18ofVhRDrbsMghfn3NPIy/nRhdTMi0cmh7Mne2fIEAPUp/hTzGkE90Vtk5IaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dV1tzpp+; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=CnA0t39G; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776956086;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TdUVkFiLAqBCJes+oJ0QB0pTbT2jdIw+uaSjtun6geI=;
+	b=dV1tzpp+JGeoe/daPipG6Clwob+O64hgsnMkp/Z6gm4LfvThcwuXrqyra7fNPl5Bf3k/5o
+	SgBJ7fyoo0bXcR5gXaF/kPX0b6yg/QaEUPv6jqntEycM0/mD/bqpTbd+pOJuHLKlEaeMkX
+	Nv3o5nC0r44dUQVn0A7yIk1na1bQ4Fw=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-663-2uv11gLVPuuo0B-kh0uPnA-1; Thu, 23 Apr 2026 10:54:43 -0400
+X-MC-Unique: 2uv11gLVPuuo0B-kh0uPnA-1
+X-Mimecast-MFC-AGG-ID: 2uv11gLVPuuo0B-kh0uPnA_1776956082
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-43d1fec59c9so4264436f8f.0
+        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 07:54:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1776956082; x=1777560882; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TdUVkFiLAqBCJes+oJ0QB0pTbT2jdIw+uaSjtun6geI=;
+        b=CnA0t39GN66aBCJ4CDapQLEd1l/vYCwSFJVzw3qIP3LONwah90G/Q3P4BoRjL3USHz
+         tlOtLuR5Y0ss5TTjpQe3njEOdeveV068jGv89jjpLnQYln0ZleIpCcJMi9xrBS/9Ntsm
+         s/H6E2YaeTs6uFA7TanZZHwDwQbcJ2rqKI5s0uSDpTgiuOREN4w9JVWTKwXA3jqLUvwl
+         CCfhjaQvTG2pmQ9JqeqQJe5VMtWaIqQn0SxeX4fu89daIa+IbvmplirS96ucOMLOJgFi
+         0ExVMmPcmx3srJbPUgKDIB7HRFXG6bChJez5ViuIwziPCcsjoB4YCtadti4McbKqCOMq
+         NsgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776956082; x=1777560882;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TdUVkFiLAqBCJes+oJ0QB0pTbT2jdIw+uaSjtun6geI=;
+        b=Ard0y83cdncR8vIXS7tKeefDmm7TzfaOJ1Z0diVk3FmmyW42SsaW4KMvT8xOPa+8PI
+         ztDnF/sG6F+hWJt93UEXAdQ/HvN7iHHYA4dJtenLVHZUsZK2rHj6xNvrIForPgvkpNJL
+         BXCks+Cghfy9/Kx/uBzvvwL0d6xxX0OwCB3mJXLJXgvSxXb8tEN21jEVvqzkg7CNfCUt
+         BCzamhYngFZVcnTU5/oS8pvM6iqmajE+dz/mmF6PSMQYxQ/Yswos2NSLglA8u2MbvBn8
+         pJx7CSKMO0Jb/cqmcg9d6A4MndUnlCfLM5rzLNifZVO8125y2tlBSy9xRfHrxTBxW9oy
+         GrBA==
+X-Forwarded-Encrypted: i=1; AFNElJ/s+PYsre59PqETp6hRvyJ/CslJUA2Nr1fH8DvFF3d7JaXLGAStf0bQtW2mvsagN4nKQeBQ7ZQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmAgCFRCUq5GeLglPZuTfCOPMatj0dBLbBvdfo8yDshu/5XWp3
+	+WtWpnix8dh0uZl7OA6s46lu2H1iJRSTKH4R1u+r6Ux+Tj21pn7pKTytGm5OXMvqCYEiUj3JfEG
+	njJssuSR2rflPaiL+WG3GsUObbh56mCObN2s47dPT2COjRM/2d4xW6Zz/Mw==
+X-Gm-Gg: AeBDieu5rhGJ0hwRMihhKze8imLieMq8kUSPhGqIGUQlk6dIoJZt9nyBd383rIS41J0
+	UzWh/dnElAt8P/10dgG8DbADTcA43+HVd7ZZr8XYjjL0uQURCA/MayjPft0DlLIxK4NzzqLMDaO
+	YWr67MXAzryakQ2kwsVt16G1UneBsGivbQOnc0XeHVoQyF51m8vQ2jheuH/rmz+805TFGs+gCHp
+	4WXfAwMHUOwIhl9GYGIoQ0UBTppj77GgkdEF5Z3pKckDZrIky9+pFz/Mm0EY22sIS5hr5MRU43c
+	04ZFOXoBi3EutaD02PhOPFPDnZ0O23RYweETgB1uybeaYUYGxMNsI6b/iRzJ5o72HTGY/gQmbUZ
+	CD/GEw89OSsZFlmqACTWN3Zk5ITdP3PgaWAnCJi+TJlgKlw7FlE+P2eXJ+VhGe5xcl2s=
+X-Received: by 2002:a05:6000:4a1a:b0:43e:a8d8:f3dc with SMTP id ffacd0b85a97d-43fe4052190mr36059641f8f.13.1776956081716;
+        Thu, 23 Apr 2026 07:54:41 -0700 (PDT)
+X-Received: by 2002:a05:6000:4a1a:b0:43e:a8d8:f3dc with SMTP id ffacd0b85a97d-43fe4052190mr36059588f8f.13.1776956081154;
+        Thu, 23 Apr 2026 07:54:41 -0700 (PDT)
+Received: from [192.168.88.32] ([150.228.93.216])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4e4daf2sm52345982f8f.33.2026.04.23.07.54.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Apr 2026 07:54:40 -0700 (PDT)
+Message-ID: <8e81d2a9-e095-4687-ae37-e4328bedb7a6@redhat.com>
+Date: Thu, 23 Apr 2026 16:54:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-deletions v2] net: remove unused ATM protocols and
+ legacy ATM device drivers
+To: Andy Shevchenko <andriy.shevchenko@intel.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, corbet@lwn.net,
+ skhan@linuxfoundation.org, linux@armlinux.org.uk, tsbogend@alpha.franken.de,
+ maddy@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com,
+ chleroy@kernel.org, 3chas3@gmail.com, razor@blackwall.org,
+ idosch@nvidia.com, jani.nikula@intel.com, mchehab+huawei@kernel.org,
+ tytso@mit.edu, herbert@gondor.apana.org.au, geert@linux-m68k.org,
+ ebiggers@kernel.org, johannes.berg@intel.com, jonathan.cameron@huawei.com,
+ kees@kernel.org, kuniyu@google.com, fourier.thomas@gmail.com,
+ rdunlap@infradead.org, akpm@linux-foundation.org, linux-doc@vger.kernel.org,
+ linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ bridge@lists.linux.dev, dwmw2@infradead.org
+References: <20260422041846.2035118-1-kuba@kernel.org>
+ <aeh0CV3UQw1quCXv@ashevche-desk.local>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <aeh0CV3UQw1quCXv@ashevche-desk.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	TAGGED_FROM(0.00)[bounces-280781-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,lunn.ch,kernel.org,lwn.net,linuxfoundation.org,armlinux.org.uk,alpha.franken.de,linux.ibm.com,ellerman.id.au,gmail.com,blackwall.org,nvidia.com,intel.com,mit.edu,gondor.apana.org.au,linux-m68k.org,huawei.com,infradead.org,linux-foundation.org,lists.ozlabs.org,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-280782-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[36];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[arjan@linux.intel.com,netdev@vger.kernel.org];
-	FROM_NO_DN(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.intel.com:mid]
-X-Rspamd-Queue-Id: 1610E453D92
+	TAGGED_RCPT(0.00)[netdev,huawei];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C9C20453FAE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Arjan van de Ven <arjan@linux.intel.com>
+On 4/22/26 9:08 AM, Andy Shevchenko wrote:
+> On Tue, Apr 21, 2026 at 09:18:44PM -0700, Jakub Kicinski wrote:
+>> Remove the ATM protocol modules and PCI/SBUS ATM device drivers
+>> that are no longer in active use.
+>>
+>> The ATM core protocol stack, PPPoATM, BR2684, and USB DSL modem
+>> drivers (drivers/usb/atm/) are retained in-tree to maintain PPP
+>> over ATM (PPPoA) and PPPoE-over-BR2684 support for DSL connections.
+>>
+>> Removed ATM protocol modules:
+>>  - net/atm/clip.c - Classical IP over ATM (RFC 2225)
+>>  - net/atm/lec.c - LAN Emulation Client (LANE)
+>>  - net/atm/mpc.c, mpoa_caches.c, mpoa_proc.c - Multi-Protocol Over ATM
+>>
+>> Removed PCI/SBUS ATM device drivers (drivers/atm/):
+>>  - adummy, atmtcp - software/testing ATM devices
+>>  - eni - Efficient Networks ENI155P (OC-3, ~1995)
+>>  - fore200e - FORE Systems 200E PCI/SBUS (OC-3, ~1999)
+>>  - he - ForeRunner HE (OC-3/OC-12, ~2000)
+>>  - idt77105 - IDT 77105 25 Mbps ATM PHY
+>>  - idt77252 - IDT 77252 NICStAR II (OC-3, ~2000)
+>>  - iphase - Interphase ATM PCI (OC-3/DS3/E3)
+>>  - lanai - Efficient Networks Speedstream 3010
+>>  - nicstar - IDT 77201 NICStAR (155/25 Mbps, ~1999)
+>>  - solos-pci - Traverse Technologies ADSL2+ PCI
+>>  - suni - PMC S/UNI SONET PHY library
+>>
+>> Also clean up references in:
+>>  - net/bridge/ - remove ATM LANE hook (br_fdb_test_addr_hook,
+>>    br_fdb_test_addr)
+>>  - net/core/dev.c - remove br_fdb_test_addr_hook export
+>>  - defconfig files - remove ATM driver config options
+>>
+>> The removed code is moved to an out-of-tree module package (mod-orphan).
+>>
+>> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>> ---
+>> v2:
+>>  - keep BR2684
+>>  - correct the claim that Traverse Technologies is defunct,
+>>    I'm still deleting the solos driver, chances are nobody uses it.
+>>    Easy enough to revert back in since core is still around.
+>>    The guiding principle is to keep USB modems and delete
+>>    the rest as USB ADSL2+ CPEs were most popular historically.
 
-This email is created by automation to help kernel developers deal
-with a large volume of AI generated bug reports by decoding oopses
-into more actionable information.
+A possible alternative would be moving the solos driver (and others
+similarly old, possibly not used anymore drivers into the staging dir
+(and let them be removed after some reasonable grace period).
 
+/P
 
-Decoded Backtrace
-
---- rxrpc_destroy_client_conn_ids (inlined into rxrpc_purge_client_connections)
-    Source: net/rxrpc/conn_client.c
-
- 54 static void rxrpc_destroy_client_conn_ids(struct rxrpc_local *local)
- 55 {
- 56     struct rxrpc_connection *conn;
- 57     int id;
- 58
- 59     if (!idr_is_empty(&local->conn_ids)) {
- 60         idr_for_each_entry(&local->conn_ids, conn, id) {
- 61             pr_err("AF_RXRPC: Leaked client conn %p {%d}\n",
- 62                    conn, refcount_read(&conn->ref));
- 63         }
- 64         BUG();   // <- crash here
- 65     }
- 66
- 67     idr_destroy(&local->conn_ids);
- 68 }
-
---- rxrpc_destroy_local
-    Source: net/rxrpc/local_object.c
-
-420 void rxrpc_destroy_local(struct rxrpc_local *local)
-421 {
-422     struct socket *socket = local->socket;
-423     struct rxrpc_net *rxnet = local->rxnet;
-    ...
-427     local->dead = true;
-    ...
-433     rxrpc_clean_up_local_conns(local);
-434     rxrpc_service_connection_reaper(&rxnet->service_conn_reaper);
-435     ASSERT(!local->service);
-    ...
-450     rxrpc_purge_queue(&local->rx_queue);
-451     rxrpc_purge_client_connections(local);   // <- call here
-452     page_frag_cache_drain(&local->tx_alloc);
-453 }
-
---- rxrpc_io_thread
-    Source: net/rxrpc/io_thread.c
-
-554     if (!list_empty(&local->new_client_calls))
-555         rxrpc_connect_client_calls(local);
-    ...
-569     if (should_stop)
-570         break;
-    ...
-596     __set_current_state(TASK_RUNNING);
-598     rxrpc_destroy_local(local);   // <- call here
-601     return 0;
-
-
-Tentative Analysis
-
-The crash fires the unconditional BUG() at net/rxrpc/conn_client.c:64
-because local->conn_ids is non-empty when rxrpc_destroy_local() is
-called by the krxrpcio I/O thread during socket teardown.
-
-When a client sendmsg() queues a call, the I/O thread picks it up via
-rxrpc_connect_client_calls(). That function allocates a client
-connection (rxrpc_alloc_client_connection()), registers it in the
-local->conn_ids IDR with refcount=1, stores it in bundle->conns[], and
-moves the call from new_client_calls to bundle->waiting_calls.
-
-Once new_client_calls is empty and kthread_should_stop() is true, the
-I/O thread exits its loop and calls rxrpc_destroy_local(). Inside that
-function, rxrpc_clean_up_local_conns() iterates only the
-local->idle_client_conns list. A connection that is in bundle->conns[]
-but has never been activated on a channel (and thus never went idle) is
-completely missed. rxrpc_purge_client_connections() then finds the
-connection still registered in conn_ids and fires BUG().
-
-The coverage gap was introduced by commit 9d35d880e0e4 ("rxrpc: Move
-client call connection to the I/O thread"), which created a new
-"allocated in bundle, not yet idle" state for connections that the
-existing idle-list cleanup does not handle.
-
-Note: fc9de52de38f ("rxrpc: Fix missing locking causing hanging calls"),
-already present in 6.18.13, fixes a related missing-lock bug in the
-same code area but does not address this idle-list coverage gap.
-
-
-Potential Solution
-
-rxrpc_clean_up_local_conns() should be extended to also release
-connections stored in bundle->conns[] that have not yet appeared on
-idle_client_conns. After the existing idle-list loop, the function
-should iterate over all entries in local->client_bundles (the RB-tree
-of active bundles), call rxrpc_unbundle_conn() on each occupied
-bundle->conns[] slot, and put the connection. This ensures
-rxrpc_destroy_client_conn_ids() always finds an empty IDR.
-
-
-More information
-
-Oops-Analysis: http://oops.fenrus.org/reports/lkml/CAPhRvkyZGKHRTBhV3P2PCCRxmRKGEvJQ0W5a9SMW3qwS2hp2Qw/
-Assisted-by: GitHub-Copilot:claude-sonnet-4.6 linux-kernel-oops-x86.
 
