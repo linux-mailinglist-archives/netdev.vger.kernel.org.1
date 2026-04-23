@@ -1,192 +1,224 @@
-Return-Path: <netdev+bounces-280780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280781-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oJdYMz0u6mmVwQIAu9opvQ
-	(envelope-from <netdev+bounces-280780-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 16:35:41 +0200
+	id Non4K9gw6mkCwwIAu9opvQ
+	(envelope-from <netdev+bounces-280781-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 16:46:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14880453C7E
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 16:35:40 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1610E453D92
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 16:46:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4C0A530432D8
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 14:29:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 82882301F17E
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 14:46:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF2F9311967;
-	Thu, 23 Apr 2026 14:29:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A75C2F7AC1;
+	Thu, 23 Apr 2026 14:46:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f3OPJzSH";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZtFDFXIE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n37nGt0U"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554F11A680E
-	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 14:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B104677F39;
+	Thu, 23 Apr 2026 14:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776954554; cv=none; b=AzFcwz3BzoAavcuShtu2fo9MbUDcW0lbkeBmS4PaYtctocAMW25kmGIrQ3XXJ+c1YUzSIQC8rqHqlw6RRqaUKGseUjeDQzm2n8TydLrtEAVAoXrCKkj9N1/sVQXzfouHA1ud7ZGtkVTBEVCjOq4PFOY03jsgqiTM/AF0RqlVSak=
+	t=1776955603; cv=none; b=Iuukus4o0q15oF6CrmvjLUiJBZCmqGcBozfW/r38knuZtigUsfPDZ64H8cyyFGMmdxRhKe+tipwJpQnU85ptPQqT/QGbdzN7SuOXNhQkqtYnKRCZDBCOgG/Pl/wBaG5qQ+d06cPskWVru57EgmOOwVek5bJpgcXjqeRReusuArY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776954554; c=relaxed/simple;
-	bh=GFNw/wZGwOTusl3rL6b9d1EVaGY5WK1WmpecL466I30=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OIFeGl9cgOb99sQBDR8ns7kRXKad+J3SFWAGunOfL9Fqy9XsZdN5zDnjKiQExnYaZGwPwyEbM0padcpM2k9pc8/E6TNTS93HhSrkrhKZpWOxd74/FiRqOkwHJSrf05Avt5koxZuBmIsYD7hUAGzCIrBOviCXJtWWKigLfNR0wPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f3OPJzSH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZtFDFXIE; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776954552;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mJXAYCiKedl47jf6xE6Z60fJSrR9e2EHlsKXBtesuI4=;
-	b=f3OPJzSHzGmz+uv7l0mUT36o6rX+Rhm7RgZ6ZT/c+WxdwW5ief0AV1ggDra/9nBqlASPab
-	CwO/XBpGejPNlxAA8Q1AqZPM/MvSjtwq6kX6ZVfhA/yv8XdY1gPv4QXUQ8RoVDcxKtAWbD
-	uanaMSshDy5IEIz/q0em0V8UKMuqR+M=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-413-afsn_4x9Pm228Yg9oJ7enw-1; Thu, 23 Apr 2026 10:29:10 -0400
-X-MC-Unique: afsn_4x9Pm228Yg9oJ7enw-1
-X-Mimecast-MFC-AGG-ID: afsn_4x9Pm228Yg9oJ7enw_1776954549
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-48919890a95so33470585e9.2
-        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 07:29:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1776954549; x=1777559349; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mJXAYCiKedl47jf6xE6Z60fJSrR9e2EHlsKXBtesuI4=;
-        b=ZtFDFXIEAFL1lOddBMl7R3JlXSzCTZi59GTEMU2xoEZ0Cp/evVQ4ofGHTEjvPCbe1H
-         aVyzysmD27baL/VCxQAZavAhmiHIZCU2KQiebYP9husah8/ECNphRc/oL1g7WM1OfVl5
-         rQXM1PonQV+qQwuJfS4tZcn7wZc3Xfh0lJD102MWYUf3JoyZu7CYn4vIOW8Ras9gPRPM
-         /0QlgKOMZLwH+iwHFRExOWL1TNiNFZX/3QAhGTSXmg7BoNmqJ/272/f3j1ojlxAebX+n
-         Ge7eOfu1lhrClo5Z8E7jH9mDj8KuPTOFtdM3vFkCGoz3l62hB6tEa6WHqvDJcJCXtrIP
-         n8YQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776954549; x=1777559349;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mJXAYCiKedl47jf6xE6Z60fJSrR9e2EHlsKXBtesuI4=;
-        b=bGScyW78dRPAUDdNmBPxeGF4yWg/m6FZYdi00rUeSYp5qHv8LWb6UWFwPfXgaLKUP8
-         5myhubTNYA24nnM3MqynNbn+sLz5lOwpThzoZpgcJfEHPeA2B9CTWVPl1E38L84JZq3+
-         HQLIdxOQnf8K3aVcVterpPw21hn7TEpCfCw7bhgd6X1y1n5ugXtUIRpBsStADpK96cmm
-         T3sp/7K9e9A9rOQAqBvTnaSvNpqXB5Td7BwzbiQ7KcKlaCT3TFx78i6xs9ZKYiclviCE
-         XyRe4IGcbysyVI6sEaA7LZNz8bOO3lIzog2+BgIa36vp2zh3yB1XlzU0+6T1NbjUZJsx
-         FMIA==
-X-Gm-Message-State: AOJu0YxjbVJ6WXr2LxYFHYGOhhYXM+p4nC9JBncL47CjWCzM83VQZ8zp
-	dbNU1SzJQKtgbY0XfV/62Fh4Pb4FUoxeqH4mhpQvzkbZOyGxjYWzLHLtpwqWETCfTIBOpb8j3nP
-	rHNSfLPuXQ/w9M/IetH9+wvX+zaYiYvVlyAwGnqDHXczzWfgWpNzRDdizRstiY4DRRw==
-X-Gm-Gg: AeBDietv/1YvSJAe02nWHTAkUUCfCKMN7POd0FADIJr0RH690zkPu2A47Ne/zXHJBDK
-	tD1ymMffnljoTU9LHi+aXbpd82czy45ueps0Ve4KtASreI8Q6UEZ+HBPEQeOrKqB66INJiiWcmr
-	fmIxCMyQHA3btJqLqD8tzexho4na/4zbjfRUYG1eR0eH514PyD5+FPqb40m3SOXvIfSnIGQuxGv
-	YDTs/nneO48LCH+fXVnjJWA33vRFNQGWrtOn0r3B6uZpFx5uM2EJzaeJQIz5EJE/F4M050+cm2T
-	4f8NJwK10Wl14eMC6PxoiXXiBHvFF3gC7V+6Yfaj+I7y26N4Fza7xuiJHc/j5+HwkQ3vK+6vnUh
-	YdQh/15cPbGXOBW5WIR3HbrkXxhUIcx4O2R441nkmQ/YCRy7WtGtKqUsL6SmWoWcBGkw=
-X-Received: by 2002:a05:600c:1e28:b0:483:7903:c3b1 with SMTP id 5b1f17b1804b1-488fb77fbf3mr389501915e9.20.1776954549205;
-        Thu, 23 Apr 2026 07:29:09 -0700 (PDT)
-X-Received: by 2002:a05:600c:1e28:b0:483:7903:c3b1 with SMTP id 5b1f17b1804b1-488fb77fbf3mr389501355e9.20.1776954548690;
-        Thu, 23 Apr 2026 07:29:08 -0700 (PDT)
-Received: from [192.168.88.32] ([150.228.93.216])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fb74c68asm164855685e9.3.2026.04.23.07.29.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Apr 2026 07:29:08 -0700 (PDT)
-Message-ID: <a8634793-e905-4298-bf48-ba9a2e9c3eee@redhat.com>
-Date: Thu, 23 Apr 2026 16:29:06 +0200
+	s=arc-20240116; t=1776955603; c=relaxed/simple;
+	bh=3vy9o7HfDGoaToU61cCWVda460q9/2Qh/swmUMeL9OM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ZwEvKTkVMxBWT5WfFmoNv09hF+ouVL0FbbeQrEAQQ33cQmG5OrWkK2jHdsvZjO1A4RMBPwhvo2GM/maJ9AkLhhC7tO3yYLVMBdfrzilXHaLitDCwwRPd2wlKPdleA9utljcOQdUqyU6Alc2f4Cgag3Livqt7fZK90fu0ck6TPu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n37nGt0U; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1776955601; x=1808491601;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=3vy9o7HfDGoaToU61cCWVda460q9/2Qh/swmUMeL9OM=;
+  b=n37nGt0UrJeSWG0xQ9DvIg/kqfkqQKXskNo+Q6Jx2pSovD6XuXq8Sy7X
+   sLmD2ivwO0dOVAtsFrks0pwTy2/VvwyLUwGdn9eU3f/r0aVtDv9Nlge7i
+   teACc111OeljQomF7vzYCBEcej6E6HUZTiVMwyIt4+qWOHnbilNNbiaxp
+   T77DrfArJsNTmoc5pPF1F/C5XwIUz+mibhivRv6QgyxQ1JEuRZPFiYucZ
+   wh4u+t9C85AEJi/K4RrNimUIksS+H++L9CcFAk6CZJJziq88/kpbTmvN8
+   jPAmxH9VXVRxlz1co74WLDITpK9WD/YiEBTanoVzW5nKQqraiI0waB3jH
+   w==;
+X-CSE-ConnectionGUID: 853DUtztRLe0KVmpJvztdA==
+X-CSE-MsgGUID: Y05vqM4jS8iehlHBp5djyA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11765"; a="103387809"
+X-IronPort-AV: E=Sophos;i="6.23,194,1770624000"; 
+   d="scan'208";a="103387809"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2026 07:46:41 -0700
+X-CSE-ConnectionGUID: lJQQusUiTc+74cGl11/ByQ==
+X-CSE-MsgGUID: HhZHMzHdQ+6vF4bYtaAzqw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,194,1770624000"; 
+   d="scan'208";a="226149901"
+Received: from arjan-box.jf.intel.com ([10.88.27.153])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2026 07:46:41 -0700
+From: arjan@linux.intel.com
+To: netdev@vger.kernel.org
+Cc: anderson@allelesecurity.com,
+	dhowells@redhat.com,
+	marc.dionne@auristor.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	jaltman@auristor.com,
+	horms@kernel.org,
+	Arjan van de Ven <arjan@linux.intel.com>
+Subject: Re: [BUG] rxrpc: Client connection leak and BUG() call during kernel IO thread exit
+Date: Thu, 23 Apr 2026 07:48:00 -0700
+Message-ID: <20260423144801.292566-1-arjan@linux.intel.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <CAPhRvkyZGKHRTBhV3P2PCCRxmRKGEvJQ0W5a9SMW3qwS2hp2Qw@mail.gmail.com>
+References: <CAPhRvkyZGKHRTBhV3P2PCCRxmRKGEvJQ0W5a9SMW3qwS2hp2Qw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ipv4: clamp MCAST_MSFILTER getsockopt to optlen, not
- gf_numsrc
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, stable <stable@kernel.org>
-References: <2026042054-dime-spectator-820e@gregkh>
- <17e348e1-b551-41e4-a512-906109dded4d@redhat.com>
- <2026042345-prompter-boogieman-1f5e@gregkh>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <2026042345-prompter-boogieman-1f5e@gregkh>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280780-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
+	TAGGED_FROM(0.00)[bounces-280781-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[arjan@linux.intel.com,netdev@vger.kernel.org];
+	FROM_NO_DN(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 14880453C7E
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.intel.com:mid]
+X-Rspamd-Queue-Id: 1610E453D92
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/23/26 4:18 PM, Greg Kroah-Hartman wrote:
-> On Thu, Apr 23, 2026 at 03:57:55PM +0200, Paolo Abeni wrote:
->> On 4/20/26 9:26 PM, Greg Kroah-Hartman wrote:
->>> @@ -1486,8 +1491,12 @@ static int compat_ip_get_mcast_msfilter(struct sock *sk, sockptr_t optval,
->>>  	gf.gf_interface = gf32.gf_interface;
->>>  	gf.gf_fmode = gf32.gf_fmode;
->>>  	num = gf.gf_numsrc = gf32.gf_numsrc;
->>> -	gf.gf_group = gf32.gf_group;
->>>  
->>> +	if (num > (len - size0) / sizeof(struct sockaddr_storage))
->>> +		num = (len - size0) / sizeof(struct sockaddr_storage);
->>> +	gf.gf_numsrc = num;
->>
->> Since this is exactly the same code added above, likely a common helper
->> would be useful.
-> 
-> Useful where else?
+From: Arjan van de Ven <arjan@linux.intel.com>
 
-Just in these 2 functions, to avoid duplicating the logic.
+This email is created by automation to help kernel developers deal
+with a large volume of AI generated bug reports by decoding oopses
+into more actionable information.
 
-Not a big deal, but it would feel nicer. Also the
 
-	gf.gf_group = gf32.gf_group;
+Decoded Backtrace
 
-statement is moved around but such change is not needed, right?
+--- rxrpc_destroy_client_conn_ids (inlined into rxrpc_purge_client_connections)
+    Source: net/rxrpc/conn_client.c
 
->> I guess we don't care if this would break bad application passing optval
->> area properly sized for gf_numsrc sockets and a small optval, right? I
->> don't see how to eventually save them.
-> 
-> I couldn't see how to save them either, and if an application sends bad
-> data we should be rejecting it, right?  Especially as this overflows
-> things as-is :(
+ 54 static void rxrpc_destroy_client_conn_ids(struct rxrpc_local *local)
+ 55 {
+ 56     struct rxrpc_connection *conn;
+ 57     int id;
+ 58
+ 59     if (!idr_is_empty(&local->conn_ids)) {
+ 60         idr_for_each_entry(&local->conn_ids, conn, id) {
+ 61             pr_err("AF_RXRPC: Leaked client conn %p {%d}\n",
+ 62                    conn, refcount_read(&conn->ref));
+ 63         }
+ 64         BUG();   // <- crash here
+ 65     }
+ 66
+ 67     idr_destroy(&local->conn_ids);
+ 68 }
 
-Agreed.
+--- rxrpc_destroy_local
+    Source: net/rxrpc/local_object.c
 
-Thanks,
+420 void rxrpc_destroy_local(struct rxrpc_local *local)
+421 {
+422     struct socket *socket = local->socket;
+423     struct rxrpc_net *rxnet = local->rxnet;
+    ...
+427     local->dead = true;
+    ...
+433     rxrpc_clean_up_local_conns(local);
+434     rxrpc_service_connection_reaper(&rxnet->service_conn_reaper);
+435     ASSERT(!local->service);
+    ...
+450     rxrpc_purge_queue(&local->rx_queue);
+451     rxrpc_purge_client_connections(local);   // <- call here
+452     page_frag_cache_drain(&local->tx_alloc);
+453 }
 
-Paolo
+--- rxrpc_io_thread
+    Source: net/rxrpc/io_thread.c
 
+554     if (!list_empty(&local->new_client_calls))
+555         rxrpc_connect_client_calls(local);
+    ...
+569     if (should_stop)
+570         break;
+    ...
+596     __set_current_state(TASK_RUNNING);
+598     rxrpc_destroy_local(local);   // <- call here
+601     return 0;
+
+
+Tentative Analysis
+
+The crash fires the unconditional BUG() at net/rxrpc/conn_client.c:64
+because local->conn_ids is non-empty when rxrpc_destroy_local() is
+called by the krxrpcio I/O thread during socket teardown.
+
+When a client sendmsg() queues a call, the I/O thread picks it up via
+rxrpc_connect_client_calls(). That function allocates a client
+connection (rxrpc_alloc_client_connection()), registers it in the
+local->conn_ids IDR with refcount=1, stores it in bundle->conns[], and
+moves the call from new_client_calls to bundle->waiting_calls.
+
+Once new_client_calls is empty and kthread_should_stop() is true, the
+I/O thread exits its loop and calls rxrpc_destroy_local(). Inside that
+function, rxrpc_clean_up_local_conns() iterates only the
+local->idle_client_conns list. A connection that is in bundle->conns[]
+but has never been activated on a channel (and thus never went idle) is
+completely missed. rxrpc_purge_client_connections() then finds the
+connection still registered in conn_ids and fires BUG().
+
+The coverage gap was introduced by commit 9d35d880e0e4 ("rxrpc: Move
+client call connection to the I/O thread"), which created a new
+"allocated in bundle, not yet idle" state for connections that the
+existing idle-list cleanup does not handle.
+
+Note: fc9de52de38f ("rxrpc: Fix missing locking causing hanging calls"),
+already present in 6.18.13, fixes a related missing-lock bug in the
+same code area but does not address this idle-list coverage gap.
+
+
+Potential Solution
+
+rxrpc_clean_up_local_conns() should be extended to also release
+connections stored in bundle->conns[] that have not yet appeared on
+idle_client_conns. After the existing idle-list loop, the function
+should iterate over all entries in local->client_bundles (the RB-tree
+of active bundles), call rxrpc_unbundle_conn() on each occupied
+bundle->conns[] slot, and put the connection. This ensures
+rxrpc_destroy_client_conn_ids() always finds an empty IDR.
+
+
+More information
+
+Oops-Analysis: http://oops.fenrus.org/reports/lkml/CAPhRvkyZGKHRTBhV3P2PCCRxmRKGEvJQ0W5a9SMW3qwS2hp2Qw/
+Assisted-by: GitHub-Copilot:claude-sonnet-4.6 linux-kernel-oops-x86.
 
