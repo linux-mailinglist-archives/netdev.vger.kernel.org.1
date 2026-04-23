@@ -1,231 +1,197 @@
-Return-Path: <netdev+bounces-280570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280571-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cAYEJr5x6WniZgIAu9opvQ
-	(envelope-from <netdev+bounces-280570-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 03:11:26 +0200
+	id UMUKIah36WkBagIAu9opvQ
+	(envelope-from <netdev+bounces-280571-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 03:36:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7FE044C0AC
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 03:11:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6CEB44C235
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 03:36:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id CB1713006D51
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 01:11:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E21B7304753D
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 01:35:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4126281530;
-	Thu, 23 Apr 2026 01:11:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 773BA314D1F;
+	Thu, 23 Apr 2026 01:35:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2100.outbound.protection.partner.outlook.cn [139.219.17.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C78ECA4E;
-	Thu, 23 Apr 2026 01:11:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776906676; cv=none; b=bJxtXhPF/aRmVHnDnmsNXEjRrF9L3DVByYLyfZjx3CApYaQCx+xkYZuOFw4ZWOURhkA3HqP3W9o+bk+2xMe2+OjbjcQUJPLBIx8ttK+sqclIOhjlhtblop6NN3XoU9t7nbP8HKFY8Y4Za1BTBJ270cmoE0QmGK+9BpqsSd/IFFY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776906676; c=relaxed/simple;
-	bh=6IEjWa5Bp2HmWAT63DqZwaxugME+cvx69VMEGChpnTc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WVRejSmhhCgsxKtvPEj58Bj3JmWHQnjc2iachVRVjxev+oxqR+ZeQwazuZfDNjxSM9mBV/KwnyRB11mXfm+zcSxImBubeMqKL+uVwQe2Za2GMLYtKCSiaw7vnd6FaE8Xw61t+cNEL0fO965Kjc3CNVrVsAchaY6qqNJtaXLkdzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.170])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4g1J0p05thzYQtjP;
-	Thu, 23 Apr 2026 09:10:02 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id C684140561;
-	Thu, 23 Apr 2026 09:11:00 +0800 (CST)
-Received: from [10.67.111.176] (unknown [10.67.111.176])
-	by APP3 (Coremail) with SMTP id _Ch0CgAnHbehcelp3eGGBQ--.59173S2;
-	Thu, 23 Apr 2026 09:10:59 +0800 (CST)
-Message-ID: <e8824498-f8ec-496a-a21c-d1dc594f4c8e@huaweicloud.com>
-Date: Thu, 23 Apr 2026 09:10:57 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF53121CC71;
+	Thu, 23 Apr 2026 01:35:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.100
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776908148; cv=fail; b=rALmUw/93px0hJ9h5w7/+0UE/f6I8DxXASb54ldudcnKt9t67TgjF9owT0VragoNRL13lFOuvppkrSNSzvec8UOGuleYdgEBk6vouqB4KaBhuqKpU9KWu9mPz5Ep6K+6FLEAg9oP34Av6RkFGZKwuJGz3gsFk+ucnHgPfc5XmMs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776908148; c=relaxed/simple;
+	bh=4L/t7wsidp1PHQ0xB8bgFUwx0zp3pEN3G6frufnMlig=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=gYIun4sMINIupzT0lra+aOvoetatRJKH5PLkcjRPVM1LiK/3J+KQTvkKntJBF0KmYShRIQjpuce7nCaAmvkaWmTmXpnBZNYjSFNMX2Rb3esQFJK5PC05xaT9w8VeeIqGm2RKOdm8KD+enJl8voHDMp4jMbTOb8qHiC0+4RlA1+I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AAe41QcrldmtNyV4FOtHeHcQZ8Ft+Hr4/s+9y/1AdbcbSDRxg7Q1MYOmE/at3H6vtEuLWQ8fd90lC0BCGLZmHpv3fvVxs9bFN2JeFartQ+IjrYbnGDd8Sz/yueAWlSuGrjEWRfkAisIFsxHVfn2Z+AFpp7Y/vURRDoQmEYLihqVd2GTDjY30si+txs5Z+om0CWTEsv35rP6w/4+cC5SkpNv86GJEr/r3EKzRF7ud21BhEiHPvSBWLLvbn5Olt9vEQ1dj95/pEcR14nfzjB2eeHrghY9W2U6eSOtUJXw/Ws4eTiaB1APSN8MkJFX+1vMrX1LzFaLzUrQ7fCoqALilPQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DwmiqaygApm041HGYkr7y1nAQJnFmSu4NMJUoJ36ctA=;
+ b=gI3jy8JU6M/AcVLSwyp/M3CdKFCOGLWF3VvMUob6tIbK09Aua2VVBdjA72WAKAXRWlF6rFr5bdJiOAUaO6YVVT08iIQU55urnmPkXJjQc2x6SSl8RDndWFZ0c3VnlDymMp+sO0aZhxcJ7BF2MrlmE+b/aiu3rO6hTVyREzaUYKqUiU+03Vsvn0rEeBNTakn4y6N11mkzaIqF8BOmRYF0wXHWo8XwFGn1S/Su7lPBw/MJNWo/u8q0blKH6Rk+0gk1KilJmU24pdYr4gvUWglr3/hdsN8zzV3Joy92BSS8C0fgGThCUwd0e5ONDgfjVNhFymF8hOW9ldSIKy4je2Bp2g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=starfivetech.com; dmarc=pass action=none
+ header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
+Received: from BJXPR01MB0855.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c211:18::12) by BJXPR01MB0808.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c211:1a::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9818.32; Thu, 23 Apr
+ 2026 01:20:03 +0000
+Received: from BJXPR01MB0855.CHNPR01.prod.partner.outlook.cn
+ ([fe80::e2de:92aa:4c1c:a829]) by
+ BJXPR01MB0855.CHNPR01.prod.partner.outlook.cn ([fe80::e2de:92aa:4c1c:a829%6])
+ with mapi id 15.20.9846.017; Thu, 23 Apr 2026 01:20:03 +0000
+From: Minda Chen <minda.chen@starfivetech.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Frank <Frank.Sae@motor-comm.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [net-next v2 0/3] Add motorcomm 8531s set ds func and 8522 driver
+Thread-Topic: [net-next v2 0/3] Add motorcomm 8531s set ds func and 8522
+ driver
+Thread-Index: AQHc0jKj7LLlbKXJQkCOhBsLzCBIc7XrEwcAgADHMoA=
+Date: Thu, 23 Apr 2026 01:20:03 +0000
+Message-ID:
+ <BJXPR01MB08553693DD4C48ACA6CFA181E62A2@BJXPR01MB0855.CHNPR01.prod.partner.outlook.cn>
+References: <20260422083255.29692-1-minda.chen@starfivetech.com>
+ <eea18d2f-5294-40e4-9ea1-87aa55f8ea28@lunn.ch>
+In-Reply-To: <eea18d2f-5294-40e4-9ea1-87aa55f8ea28@lunn.ch>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=starfivetech.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BJXPR01MB0855:EE_|BJXPR01MB0808:EE_
+x-ms-office365-filtering-correlation-id: c6daa873-e12c-4d5a-c606-08dea0d67263
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|366016|1800799024|7416014|38070700021|18002099003|56012099003|22082099003;
+x-microsoft-antispam-message-info:
+ dvis1xFnlSOFgXANbG0VjJkaa+BJjyW0cX3qWkIuz+6wISdC56Rtvnvx7f0EMHNZYTg0NAUqOlh0NbecL197dW7f6orQHPH/16d4xWg7zg5MPex6l4mxe3qXZ9Sd23OI6VfFcBQdaRmoRn8dbAJbP8MDCrPEA4x2YZ2twhBjK2R/p6ZZ14jJrRK21NSJjMHVQ1Mf5AnWJW78BFZCIKCVbRRmw77vZPQYoNaaGSOaYOnGASkw//IfxYoF1DpPyuQJL2C+Qvxphgikn6ifjfGA47OyNRrCj0Zj4tipYJIF4hDdiXPpUOoVRbaPoBeQHMgYweb9cExpx1QRVDAO3jTcjhZMX4qjuyCLl3P2vYdZb+SLDjFiKFw1txnfA/JF4L682GAKCV4cJ8DU2XrsA/IW7WOFOCFg7UdPG1hjIs0Jfn1USd0Zcb2lNuZbOsxYc9zHKODGe4bqfekSoGKzkVHDS3FLY4eXNlK8GnWUctHlMP+3S+ZGgHbk+xkzfblL4hGfddg7XA8y4yhzHnAe/Tyf+SVaA5bpZR404+FbHQfuhGffl4lfBcQnbfracW/XXgl8+GhMkRbQy+YAH9gK3yNUJg==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BJXPR01MB0855.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7416014)(38070700021)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?OfNbrwMEuFb74M4zQGp2jupIg6bx8d9obmEg6UDBdtbArsosVX2kOpVR+Na1?=
+ =?us-ascii?Q?ka6vtAvyG5DbDy+27Q8kSQUB4gAkSsJRduzD6wrWqEPc/u9xYQEA2X67bGiF?=
+ =?us-ascii?Q?WkSNVJZE12RosbD63moI7ov+vIwFftALaEF3fBIIsAwj5XN6cftbtZLZ8hle?=
+ =?us-ascii?Q?baq7UYMVkvOoFfNMrYmGZkDIzPdP9ye8pXanwRLp2HDpYN+PIM9x/am1AZI8?=
+ =?us-ascii?Q?R5HvGbj6vNiob3ubJy/FAyn30f/AbzY5OjQX8+A7BsTH1Tfs5I5vK59vP9c0?=
+ =?us-ascii?Q?0RhyTebiGQ4DDe9BQE1okyl3XpVfgR2pESlaGnuSjetgA/Fs+1el4oWsAB22?=
+ =?us-ascii?Q?waYqy5VqLHD4F8eamkYm7w06KcmiR+skwzGRB3CaVJCL36QXPPLRc7scXWIL?=
+ =?us-ascii?Q?jDz4+HmtzCF2tlnF93XBpJBO68UYjWzZXb2uO+F4h01O27kTvya4CT8pDLBk?=
+ =?us-ascii?Q?W5pSUFQPxPW3jqosiG4S+1quPCFzRdj+CGymg/ZJyims47iiYBJrIs2XGaMS?=
+ =?us-ascii?Q?vanUTjLIchwJYXMj4SAF9meXQlIAqM8qit4aLwOGdoNOxw67l5fho/EBSSec?=
+ =?us-ascii?Q?B1Zev/dAUtJlnjfXmL7toU4THkNx/VJUKGKGZrzfTsjYP0D7JuXk6Wdx73KG?=
+ =?us-ascii?Q?IY6xUk+IP36fJIVbj1RiJoOroBBho7wQJ0dLr/2Rfa7QylqTME1RVXXHOrBQ?=
+ =?us-ascii?Q?2JlXuhXm0X3o3TNHt0NULt/LjO4colJHPjj3sIy5MrQU12NekbrL4zxH550s?=
+ =?us-ascii?Q?dkU4j5C07Koi7RHr2v525ZFlWcz6yWJl9Bdu3b8HRHSNYTNQCHDaTjQS13UH?=
+ =?us-ascii?Q?HCj7dI0ZlcOYVrGVIQt1XgkZ7Gtue+S8JhSFZDOG+Tr2jcaL5G/SbBiB1ozO?=
+ =?us-ascii?Q?L3Qumh7HNSSUkbXl8gq2pP+pnGiRHcR65VT+83PIdTabiqkGLRgLXPhVg6Ur?=
+ =?us-ascii?Q?jbOI/CvQzqv6zUw/aEQ0ENr+eaVNEHwt7isrnZFLWuluFkePmXlYr3UZYowi?=
+ =?us-ascii?Q?5U2UTRgX07E9oxmY79ZSNGI8uUPz+T3uf2994wY5jiugPm5/qBjfyXTvqsmH?=
+ =?us-ascii?Q?j5HAm0hQw4uP+b8O/f+t8PZgcHm/T5wDchdhi2D0m9DSUADYxMB0+A/gynMm?=
+ =?us-ascii?Q?pCeThrLhLTul1yl58sXhp3DQU7kZ4fqw+t1v8aFEMgXHprJdrGEZIYCSCPCM?=
+ =?us-ascii?Q?ICBvi10V2R+1bVyypyEZp7FDGJPAPSrhA1qFxXuNaOeE8zIR9QarjwDP2PbN?=
+ =?us-ascii?Q?s7Aon9xCHFWhNffdsDG2lalWMZATa78Mhqu/FcjV5GmPBTXopdYWHcEeQZkH?=
+ =?us-ascii?Q?sEmlCu58aVXv23uc3N3UgRUKZo8qXrlKtrwOMlkbdUTfGrfW8zPznVTpammc?=
+ =?us-ascii?Q?7nU3mdGNmV4jCY8Na2eb0VAFpM8Jj2e0I1mJ2ppW6d6j+b+qGIVkvD+ah0ce?=
+ =?us-ascii?Q?TQ2/4hAbOIJSQqjhLylTlQbCoPwLoAQhM6qM9QPt61YXo2pCMbg+dzd/nUvi?=
+ =?us-ascii?Q?mDObccnlTe/7Ap7zMU/JQrp7bHws0KxtIh1E3J3AfPmgIPHtL2hDeqi/YF0C?=
+ =?us-ascii?Q?kjLrnq7/sJWXDnzvsiSbMqa7xnYA64/FzaU+jxRIMko+V+0X3DVJeFNXM4XD?=
+ =?us-ascii?Q?K6mSTqFNeaRU02pCXUPG4ZTfRk0JLf03XopqLzMqhmQVt9hS2jHrp0pIwfdg?=
+ =?us-ascii?Q?ZBlJg18siZh+UmOpNNvDueZsej/jooJCMj8a04lZ84TFPzxHhQfbuYt65l/B?=
+ =?us-ascii?Q?OqX3+wy7GA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 19/23] cgroup/cpuset: Improve check for calling
- housekeeping_update()
-To: Waiman Long <longman@redhat.com>, Tejun Heo <tj@kernel.org>,
- Johannes Weiner <hannes@cmpxchg.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
- <mkoutny@suse.com>, Jonathan Corbet <corbet@lwn.net>,
- Shuah Khan <skhan@linuxfoundation.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- "K. Y. Srinivasan" <kys@microsoft.com>,
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
- Guenter Roeck <linux@roeck-us.net>, Frederic Weisbecker
- <frederic@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>,
- Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
- Joel Fernandes <joelagnelf@nvidia.com>, Josh Triplett
- <josh@joshtriplett.org>, Boqun Feng <boqun@kernel.org>,
- Uladzislau Rezki <urezki@gmail.com>, Steven Rostedt <rostedt@goodmis.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Lai Jiangshan <jiangshanlai@gmail.com>, Zqiang <qiang.zhang@linux.dev>,
- Anna-Maria Behnsen <anna-maria@linutronix.de>, Ingo Molnar
- <mingo@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
- Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>,
- Dietmar Eggemann <dietmar.eggemann@arm.com>, Ben Segall
- <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
- Valentin Schneider <vschneid@redhat.com>,
- K Prateek Nayak <kprateek.nayak@amd.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>
-Cc: cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-hyperv@vger.kernel.org, linux-hwmon@vger.kernel.org,
- rcu@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Costa Shulyupin <cshulyup@redhat.com>,
- Qiliang Yuan <realwujing@gmail.com>
-References: <20260421030351.281436-1-longman@redhat.com>
- <20260421030351.281436-20-longman@redhat.com>
-Content-Language: en-US
-From: Chen Ridong <chenridong@huaweicloud.com>
-In-Reply-To: <20260421030351.281436-20-longman@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:_Ch0CgAnHbehcelp3eGGBQ--.59173S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxCw1UJF1UurW7urWktr13urg_yoW5AFy5pr
-	yUWrW3t345trs7u343Xwn7Wry0gw48GF17KasxG3WrGF9rZFn2yry0kFnxCry8uwnxGryU
-	ZF9rWws29a4UArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvFb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
-	14v26rWY6Fy7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWrXVW8
-	Jr1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
-	CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AK
-	xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj
-	xUVZ2-UUUUU
-X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
-X-Spamd-Result: default: False [-1.46 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+X-OriginatorOrg: starfivetech.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BJXPR01MB0855.CHNPR01.prod.partner.outlook.cn
+X-MS-Exchange-CrossTenant-Network-Message-Id: c6daa873-e12c-4d5a-c606-08dea0d67263
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Apr 2026 01:20:03.5727
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: iy+tXrj4FWewf3+uTB5TpHIb5khpoRb/vCGQBer0MOtEq4DBzIoH/+L83Yz9RcHvESbwEj1OToPGPHWcIxiBP8v838N6s7ycr7A6D5dX/LE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BJXPR01MB0808
+X-Spamd-Result: default: False [3.54 / 15.00];
+	DMARC_POLICY_QUARANTINE(1.50)[starfivetech.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280570-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,redhat.com,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[redhat.com,kernel.org,cmpxchg.org,suse.com,lwn.net,linuxfoundation.org,arm.com,microsoft.com,roeck-us.net,nvidia.com,joshtriplett.org,gmail.com,goodmis.org,efficios.com,linux.dev,linutronix.de,infradead.org,linaro.org,google.com,suse.de,amd.com,davemloft.net];
+	FREEMAIL_CC(0.00)[motor-comm.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-280571-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[huaweicloud.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chenridong@huaweicloud.com,netdev@vger.kernel.org];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[52];
-	R_DKIM_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[minda.chen@starfivetech.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D7FE044C0AC
+	RCPT_COUNT_SEVEN(0.00)[10];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,BJXPR01MB0855.CHNPR01.prod.partner.outlook.cn:mid]
+X-Rspamd-Queue-Id: B6CEB44C235
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 
 
-On 2026/4/21 11:03, Waiman Long wrote:
-> By making sure that isolated_hk_cpus matches isolated_cpus at boot time,
-> we can more accurately determine if calling housekeeping_update()
-> is needed by comparing if the two cpumasks are equal. The
-> update_housekeeping flag still have a use in cpuset_handle_hotplug()
-> to determine if a work function should be queued to invoke
-> cpuset_update_sd_hk_unlock() as it is not supposed to look at
-> isolated_hk_cpus without holding cpuset_top_mutex.
-> 
-
-Currently, isolated_hk_cpus is updated within the cpuset_mutex critical section
-(before mutex_unlock(&cpuset_mutex)) in cpuset_update_sd_hk_unlock. Therefore, I
-think update_housekeeping can now be removed.
-
-> Signed-off-by: Waiman Long <longman@redhat.com>
+>=20
+> On Wed, Apr 22, 2026 at 04:32:52PM +0800, Minda Chen wrote:
+> > This patch is for Starfive JHB100 EVB board. JHB100  contain
+> > 1 RGMII/RMII and 1 RMII synopsys GMAC cores. In the EVB board, RGMII
+> > interface connect with YT8531s Ethernet PHY. RMII interface connect
+> > with YT8522 ethernet PHY. So patch 1-2 is for RGMII interface patch 3
+> > is RMII is for RMII interface.
+> >
+> > JHB100 is a Starfive new RISC-V SoC for datacenter BMC (BaseBoard
+> > Managent Controller). Similar with Aspeed 27x0.
+> >
+> > The JHB100 minimal system upstream is in progress:
+> > https://patchwork.kernel.org/project/linux-riscv/cover/20260403054945.
+> > 467700-1-changhuang.liang@starfivetech.com/
+>=20
+> Please take a read of sections 1.3 and 1.4 of:
+>=20
+> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+>=20
+>     Andrew
+>=20
 > ---
->  kernel/cgroup/cpuset.c | 36 ++++++++++++++++++++----------------
->  1 file changed, 20 insertions(+), 16 deletions(-)
-> 
-> diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
-> index a4eccb0ec0d1..1b0c50b46a49 100644
-> --- a/kernel/cgroup/cpuset.c
-> +++ b/kernel/cgroup/cpuset.c
-> @@ -1339,26 +1339,29 @@ static void cpuset_update_sd_hk_unlock(void)
->  	__releases(&cpuset_mutex)
->  	__releases(&cpuset_top_mutex)
->  {
-> +	update_housekeeping = false;
-> +
->  	/* force_sd_rebuild will be cleared in rebuild_sched_domains_locked() */
->  	if (force_sd_rebuild)
->  		rebuild_sched_domains_locked();
->  
-> -	if (update_housekeeping) {
-> -		update_housekeeping = false;
-> -		cpumask_copy(isolated_hk_cpus, isolated_cpus);
-> -
-> -		/*
-> -		 * housekeeping_update() is now called without holding
-> -		 * cpus_read_lock and cpuset_mutex. Only cpuset_top_mutex
-> -		 * is still being held for mutual exclusion.
-> -		 */
-> -		mutex_unlock(&cpuset_mutex);
-> -		cpus_read_unlock();
-> -		WARN_ON_ONCE(housekeeping_update(isolated_hk_cpus, BIT(HK_TYPE_DOMAIN)));
-> -		mutex_unlock(&cpuset_top_mutex);
-> -	} else {
-> +	if (cpumask_equal(isolated_hk_cpus, isolated_cpus)) {
-> +		/* No housekeeping cpumask update needed */
->  		cpuset_full_unlock();
-> +		return;
->  	}
-> +
-> +	cpumask_copy(isolated_hk_cpus, isolated_cpus);
-> +
-> +	/*
-> +	 * housekeeping_update() is now called without holding
-> +	 * cpus_read_lock and cpuset_mutex. Only cpuset_top_mutex
-> +	 * is still being held for mutual exclusion.
-> +	 */
-> +	mutex_unlock(&cpuset_mutex);
-> +	cpus_read_unlock();
-> +	WARN_ON_ONCE(housekeeping_update(isolated_hk_cpus, BIT(HK_TYPE_DOMAIN)));
-> +	mutex_unlock(&cpuset_top_mutex);
->  }
->  
->  /*
-> @@ -3692,10 +3695,11 @@ int __init cpuset_init(void)
->  
->  	BUG_ON(!alloc_cpumask_var(&cpus_attach, GFP_KERNEL));
->  
-> -	if (housekeeping_enabled(HK_TYPE_DOMAIN_BOOT))
-> +	if (housekeeping_enabled(HK_TYPE_DOMAIN_BOOT)) {
->  		cpumask_andnot(isolated_cpus, cpu_possible_mask,
->  			       housekeeping_cpumask(HK_TYPE_DOMAIN_BOOT));
-> -
-> +		cpumask_copy(isolated_hk_cpus, isolated_cpus);
-> +	}
->  	return 0;
->  }
->  
+> pw-bot: cr
 
--- 
-Best regards,
-Ridong
-
+I am sorry about the "net-next" in merge window
 
