@@ -1,177 +1,212 @@
-Return-Path: <netdev+bounces-280637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280638-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 5j2JJQ3K6WmpkQIAu9opvQ
-	(envelope-from <netdev+bounces-280637-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 09:28:13 +0200
+	id EOU+IXrK6WnAkAIAu9opvQ
+	(envelope-from <netdev+bounces-280638-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 09:30:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 257E144DF72
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 09:28:12 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 783DC44DFA2
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 09:30:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F17B7300BB95
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 07:28:11 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 620723004063
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 07:29:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 885C22FD1C2;
-	Thu, 23 Apr 2026 07:28:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11FC43019D8;
+	Thu, 23 Apr 2026 07:29:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X594Ofdr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j4jGPTaC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8122F999F
-	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 07:28:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918222F6596
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 07:29:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776929289; cv=pass; b=gn67mixmSZOcI/1aJIK3ll/1AIJzw8hkreLFsmGZZATjS8WEQg2Ha6VXmOul2vwIsuTNn+GhusMoO4e783OQeUXxuPYdwzR5Qp7BgPnut+/YbjXSdZtO3LBujBq4jdqra9SpEAElfnvUAxH3ha1nrroaq2+QwEBqD6V9SRL88Tg=
+	t=1776929396; cv=pass; b=LW9QvGPLgKd4ZhwfdjHcj9ZqRzwJoh63DjyxB0q1cG7URZjoow7jAeWgI64MZNrvsj2f3ob2GpUqDt8vQacHV32mBbunWEyz5DP7qiuIwEOEY9c7H0EVvuxZCF0miWks7dlF5tRfMopTzL/THCCVPxa9eUY9FEt79X2NZJvhxoE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776929289; c=relaxed/simple;
-	bh=5yw8g8XFUdWb9UghxesiQ1xjOzz57lIbFFFsRe+uzxg=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=hMxOyW8NO4UbUH7dmwbmB5KFjm9ZQRNqfqt4yNJoMYGhjixD3G5L9dEbOqsvMKMqxs0ASnWx38A8dbIsDVEiGLQQiJN11gY+mJtJ1kNLqAXfzM6uTpN0a0VRKWsZ3rlayXh5Irf8w8jG30jpVyXYZwdWGNX8ujRxjD5cZ2H9tPE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X594Ofdr; arc=pass smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-79827d28fc4so63356847b3.1
-        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 00:28:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776929287; cv=none;
+	s=arc-20240116; t=1776929396; c=relaxed/simple;
+	bh=VaDUsQKV38C45wmrL7PiZd9GpWCcs1l+OT1jLLAPiTg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n4wqEsqr9vxHNmSn1QCDc1zvIeCGFcGNtt4/X5wgZeIjJQkDm3njSlUFJe0YZq8Vhb37JRUj5OpDkYNh/NRFbSQ41/ojzvi8DxEmzYoodnKcQY8oTWdsxd3ZLDkAIExLjgpQ+qkHqNkuOA/3m/MFCkSoPZa6u7lh7YNhAMfAOMA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j4jGPTaC; arc=pass smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-50d75bfb259so47045841cf.1
+        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 00:29:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776929393; cv=none;
         d=google.com; s=arc-20240605;
-        b=kLW7W0a/5Fj9/oxNjYNS3ReAnTxj1tbOBiJNA953F15Vs3qTABojU/YrgwjzfoNWyQ
-         moZqfRHkJT71uKkib9409Wp4+4Nj6xaC00Lzn72WEeR2MmIkRBPC0ogZCK+MyAqFUxh1
-         XdDoRO7THi/GZzEzlprCS9UQHWpesTte2wmxSk/tJjn5Kk522Bq0QFxcNa/GKjmsjovz
-         GkAb17c9w0eEVHdlP+bExA1b+AXWmfzZKqYjtVvQMHwbcGeJ/r41NxUB+IQwPKrL2ggw
-         vCu3O7e32VtEDGmjAyCgUQw1W6rGyioy6+fPBH7d54650fuwzqhJYdAIsT7LyYYG6DOR
-         n+Pw==
+        b=XoTCJwa9JWhWQb/9MFPlwTIU6eM3CapSeBpE/qItHyoyvuySUX59kpAcsVq+DPV4IV
+         34+BHfO9zU4TpOwjYz+ep4WW0cP+wBgy3HZdmjkB+92QobPkG4f/ElDC9NdfNOzAv/VV
+         mic5uBDpxmsf27obrupUIWgUgbA9wRzxb2tMCOfONOQLGXM1Q41d6jGLPfCBtpWpaWYA
+         VDEmQ+7oJsoKN8BDlOraIJ/P1GUmBWMfqpceG/BrWO8eXDCbtMVQJpolmXUAsPE4MG5E
+         qLv/Rxag/GtuxAui5G9ytiwsHzjKJLrumyvGYBc0OMEFm1WvahykrKqV+aL8+K9Q8BSa
+         7eaw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=jQmlk/yKjczRcTAz28plcJ29BII8uPeCQOY4QMYcZ/o=;
-        fh=jq7KfhrPAEOkvrGp74foMMaIFLiAY6OvtzS32kUHwkk=;
-        b=ZU/CfudrGmoAwUoU2wATjsga+1ZTl2JtR6+K+iSdodaJHdVdW7t07s/nvEMpNaX5lk
-         8pjfDu8QDABPuFIzlLQtlgfF0F0vqCiwJ0RjoMNbiH4ZM8z3zVhtz7MjzyGU7PTKcFpC
-         zrbcsNUoWexvFhG2/3KstCjXcpvgz+QxGf/b2MPICCRiT+6eMMcaYkTXhitKWzoIxPRE
-         skDWeiza6OQsLL0miivJIokUfwdbukpUaSRdJM89WwmOf1Mh4g2Fh19CaJItmdv6mJye
-         FCzDNsKiNFsIHCrLUA5FCnBUQNKKtbOKG0hwAogxedYckk55VMwuqXcSyn0mM0jtHMrB
-         dOyw==;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=jLerY7DcJMoLq+ZZtWqlDzEo51W2UmhOWIB77RZJ9cA=;
+        fh=oUSa4gDjxn/8GsSdHf9ukA/IYlZiz2yTa4dlYgznNes=;
+        b=MKFwY2HKelvews5C2Rs/USflKMEAPQivch2NsdunpjKEd/CT0EgTie42+QlXQqY6Di
+         0TYB60CHciWWjAU3AJdp8d76geYTcUvrgV7lP5Lf7gjzutWtAXAGaXG2vbDy4v7OBzwa
+         SCmfXikFOC+wtOKoSXuC4lYZKIMp50s8dILj3ng0Yd++KMJcxcbedNVxuNJ1J6zSZRxY
+         G8k2rZglPdlYUi2iKxvb3e9Z/4QEvqY79NE+2opXCHKWtKkhxqEnbvYdP08ThqxB+4fk
+         DU6XL/SScn3bGsHw/ovyPPRl3Ca1jfMYfPFYO7qBb8OZsAqi8KJTyJ8bRMBq0srgOPpc
+         Ka5g==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776929287; x=1777534087; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=jQmlk/yKjczRcTAz28plcJ29BII8uPeCQOY4QMYcZ/o=;
-        b=X594Ofdr3Lnh43wbmH8BnvD/1tOFMAuOUL9S+fvD2VBQdQpsKN2JGVVKZD7DIfoEXG
-         lA1E1D2UZldEHQT74mX20Vsos7XpDlxije7/HEB5K2cXwlbOOx28RBh9CRnJlm0wv0Hp
-         emgK3HiQGT9U0Z1oywYezi8nfbO6hEKi1uEUmKZQ+CDyy1pXwzRyIgdG6lgnip05Z5zS
-         CpFUsYX72llD9mqc9mlIxCyKRrfKzGK2Wg/Xkbyaid7rtiIWmd8CTfPq88GbDqDlg86E
-         N0P2x3VY3i+3CXkQxHVWIARs8iNOmCtlSODhpowAtt5SOrHFDthkQB39Aua4WC+e2H39
-         cI8A==
+        d=google.com; s=20251104; t=1776929393; x=1777534193; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jLerY7DcJMoLq+ZZtWqlDzEo51W2UmhOWIB77RZJ9cA=;
+        b=j4jGPTaCI4bVEd9ULKEI1kAUJMVJso+wb9MKawFtCl6OKw2zLgnklLxKFOOnQj0x+f
+         3LN42WualrmdP5g8VVIIpHWsKq5UlkwmwdiByrSqwBF+bTMZCbeSaZf1qoFWsHgQh4v6
+         ObyW5DhT/8DfPzmKBrzgnctJKDO3czg+HNLnnRFJWyG4f/CN3fn2WIP1Dpnfs2UEiG+Q
+         kXk+v4eSr0bLZ7jfiSQETvMvwdkw1mETDywteppC+9WIrPy4s3Gw9Y+CNf9eVHYXxcnn
+         oFrQsBFCXnBIjbpz1UQesIUdmze2GtqmJPNT8/WYrcxbHUSEjqYb1s10ejyVQ5u31Ikq
+         F5qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776929287; x=1777534087;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jQmlk/yKjczRcTAz28plcJ29BII8uPeCQOY4QMYcZ/o=;
-        b=hOa5KYtlAg2YqpsLy/Ye1zSy+yVOy6n4bJ0jbM0Q79DXvF5fA3/qPAuCGRhRm1qKhR
-         g5z439H8YZEkjkONSqNGb3F6iVunt+9CW9pAjgKg0QIcFtmiih0SWLif1ys7Xh+ZAsX+
-         1lOhYj5L0q0IUOIbwDR2RLneN7wfvEvGUPRqs55TgJXV7PcgHkXBZxErYI+BJK1hRq64
-         hWTj2Sgq3kwO3lbfj2tNH5uOaYrnuJb5xv9JdvkA+n5J2AYjQ4DeHWGDD4N5TpneCUZz
-         ou66IMH6QQX51VEfUQ95AtIqPOfY4kmq4XclP9D86Gu8bDaNAcUccxMJp3iazKvj+7m9
-         j5NA==
-X-Gm-Message-State: AOJu0YybZEs94Fcwlr/JoO+dH2V0DSH6irSHi+QilpZIgxFagksqazgB
-	4V+S2SJp3Z/JO9vuTT2H8Ei3HXLFQ5A09JF8/3Xjc0Wu2EVIb18q2UhiBTdTVhiIk0THOvFeDBS
-	1gsRVnIbHZSutGVz+hUQ4JRsJ4OYPfFj0zwztAnQ=
-X-Gm-Gg: AeBDieugZxONBg5yCZDIomMQ6QSUwly44Xg2pRBZ+VFR46r4q2jm/OZ45VRt21lSjTw
-	+KJTxGyv2rIopduLdPU61UVePJrsoLJ9Izo90YFe3EjamEUfq1oCL+YKi7SLXJ2bvXCM9JhMuo2
-	+12ABsimY3XpsWQVy3h7SeIr5uzjBJqcNNCZiUkQSQFr9wPYIMLhieT1b132Xztm9UjF+m1dUp6
-	N+QtiuUK71Me8PwERMcgheAOQ5KFkDhXX0SGil1LYL8qCjHf4/4Sdd4BR36bisUmFN7/pLM/NEs
-	qcqsx5yHj6mx615gE8ixvLLl0Iokttw=
-X-Received: by 2002:a05:690c:c4e9:b0:7ba:f2f1:86b5 with SMTP id
- 00721157ae682-7baf2f18fb0mr171663307b3.14.1776929287162; Thu, 23 Apr 2026
- 00:28:07 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776929393; x=1777534193;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=jLerY7DcJMoLq+ZZtWqlDzEo51W2UmhOWIB77RZJ9cA=;
+        b=dX26yf8MtAAsjvYkWKkFPaaChyknk9gVMa/4T0D2FlfxWlcQCHqsDy2xaZzkcFn/qd
+         6Vlp0RJ0kJ2RA0Odl+9FEW66I0dMfQbruaI2k0f7T33yM2xL/9tCkQGKPWUPhpod4ogb
+         62yInRQVuPkb3REdq9H79GhRkLFaoEds73t4M3Ez++7dkgmAAcP1IXIB5b0eBmisFWx5
+         WagNn4UptBa33Qu7hn3ngbutKgRMA4s6NjgGqXsUOo2XqzlLavhkrzNGjprPBfhMck4N
+         NR6/0ayhgdz7OLW5uTkackHc9S5n915L305RpxQBmY+PVjYH8+YtGaD+u6f6wdjj4Ykj
+         fFjg==
+X-Forwarded-Encrypted: i=1; AFNElJ+M4shQd3YPRwyVUBbEHSZlI4oDu6N2SE99gr3BGG3FnunfyGE0UJG7f0SS9gtuzPRiFJDfWzU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRpJFMdmd5PsxPdP6MMJuYj58a08ZdYVhuw63DPyenhuGkYhva
+	pLmZdVtGxXdPic+YpYszMbp4zPW3vaHUndUlTGoqicw9b0fua9r0zVw0WRJ/UMocJk8MpCZ3pXh
+	aNrUX/ra3hsjqA6VD+RhiP+8Qq+3FPmlzVgv6v8/h
+X-Gm-Gg: AeBDiev8l7svx6Uvmav2uDLqYPex7EIrt0JKVN5Yo2dagBUBcvi9BvNUVi20BIJ5cN2
+	ZrAU59Ro5+bqHUyjb7uzMQNLQiFe/FLQV4qZyrkdoyhS5MZy4+prPSAhgSXnUc5/A/plHKXP9WH
+	aE7V1xVwD5TlSPqoT4V6PDPpBRLivEZqAqKL3mg6pDChCiBlz6xWgjRmccXApHNEIpjNuEKCPE9
+	kMCJv43Kr+jkI5UQjgFD8Z9dRlaeFopYM5OEXs5KxpKYiRdLWlUPB3S1+TzW55RpF2j6ZiC6ezE
+	mPAs8zc409CVmJPwp2X12qa9iqh+NFvzOzHJ2y9L3d/8JAlIl4h84xzBdDJoDlRQgOn+uRnLd7Y
+	1T7R935+JuwT1PSO0luM=
+X-Received: by 2002:a05:622a:59c6:b0:50f:c54f:cc42 with SMTP id
+ d75a77b69052e-50fc54fd65fmr79267461cf.14.1776929393013; Thu, 23 Apr 2026
+ 00:29:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Ginger <ginger.jzllee@gmail.com>
-Date: Thu, 23 Apr 2026 15:27:57 +0800
-X-Gm-Features: AQROBzDdEa1YUatb3ogl5sfM0j7IHDGd7xHyBBqGW7GUCRpfw6kRrbdoP3PvaMI
-Message-ID: <CAGp+u1bQg=Xc6d61o8i2Vi30z5G4A-iEWmvE_G-ygbL8weXFkA@mail.gmail.com>
-Subject: [bug report] Potential atomicity/refcounting issues in
- 'drivers/net/ethernet/chelsio/cxgb4/clip_tbl.c', between 'cxgb4_clip_get()'
- and 'cxgb4_clip_release()'
-To: bharat@chelsio.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260423010933.3899132-1-kuniyu@google.com>
+In-Reply-To: <20260423010933.3899132-1-kuniyu@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 23 Apr 2026 00:29:41 -0700
+X-Gm-Features: AQROBzALElDcbS3X4-wky_SDD92inr2sB1fQOaUUc_5WBt20g9tpjWHM7KNJDVY
+Message-ID: <CANn89iKwALD=b-FqwQe=GjB23u5ksdepOZG+3PCjMESBqSw1bg@mail.gmail.com>
+Subject: Re: [PATCH v1 net] udp: Use READ_ONCE()/WRITE_ONCE() for hslot->count.
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, Simon Horman <horms@kernel.org>, 
+	David Held <drheld@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	syzbot+04905b8b3523856476c0@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280637-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,gmail.com,vger.kernel.org,syzkaller.appspotmail.com];
+	TAGGED_FROM(0.00)[bounces-280638-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gingerjzllee@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[3];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 257E144DF72
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,04905b8b3523856476c0];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,appspotmail.com:email]
+X-Rspamd-Queue-Id: 783DC44DFA2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Dear Linux kernel maintainers,
+On Wed, Apr 22, 2026 at 6:09=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.co=
+m> wrote:
+>
+> __udp4_lib_mcast_demux_lookup() and __udp4_lib_mcast_deliver()
+> reads the number of sockets in the 1-tuple hash table chain
+> locklessly. [0]
+>
+> Let's use READ_ONCE() and WRITE_ONCE() for hslot->count.
+>
+> [0]:
+> BUG: KCSAN: data-race in __udp4_lib_mcast_deliver / udp_lib_unhash
 
-My research-based static analyzer found a potential
-refcounting/atomicity bug within the
-'drivers/net/ethernet/chelsio/cxgb4' subsystem, more specifically, in
-'drivers/net/ethernet/chelsio/cxgb4/clip_tbl.c'.
+...
 
-Kernel version: long-term kernel v6.18.9
+>
+> Reported by Kernel Concurrency Sanitizer on:
+> CPU: 1 UID: 0 PID: 15111 Comm: syz.6.4060 Not tainted syzkaller #0 PREEMP=
+T(full)
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 02/12/2026
+>
+> Fixes: 2dc41cff7545 ("udp: Use hash2 for long hash1 chains in __udp*_lib_=
+mcast_deliver.")
+> Fixes: 63c6f81cdde5 ("udp: ipv4: do not waste time in __udp4_lib_mcast_de=
+mux_lookup")
+> Reported-by: syzbot+04905b8b3523856476c0@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/69e97093.050a0220.24bfd3.0048.GAE@=
+google.com/
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> ---
 
-Potential concurrent triggering executions:
-T0:
-cxgb4_clip_get
-     --> read_unlock_bh(&ctbl->lock);
-     --> refcount_inc(&ce->refcnt);
-or
-cxgb4_clip_get
-     --> write_unlock_bh(&ctbl->lock);
-     --> refcount_set(&ce->refcnt, 1);
+You forgot to change net/ipv6/udp.c
 
-T1:
-cxgb4_clip_release
-    --> write_lock_bh(&ctbl->lock);
-    --> spin_lock_bh(&ce->lock);
-    --> refcount_dec_and_test(&ce->refcnt);
-    --> spin_unlock_bh(&ce->lock);
-    --> write_unlock_bh(&ctbl->lock);
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index 15e032194eccc3c29b3e5f3a09214cad60623329..1f4dabe4c350118441f61c1cf03=
+98e698581542c
+100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -953,7 +953,7 @@ static int __udp6_lib_mcast_deliver(struct net
+*net, struct sk_buff *skb,
+        hash2_any =3D 0;
+        hash2 =3D 0;
+        hslot =3D udp_hashslot(udptable, net, hnum);
+-       use_hash2 =3D hslot->count > 10;
++       use_hash2 =3D READ_ONCE(hslot->count) > 10;
+        offset =3D offsetof(typeof(*sk), sk_node);
 
-In T0, the refcounting increment on 'ce->refcnt' is not operated
-within 'ctbl->lock' and or does not check whether the refcount has
-already reached zero, i.e., not synchronized with
-'cxgb4_clip_release'.
-Although 'ctbl->lock' does not seem to protect 'ce->refcnt', this is
-potentially problematic because T1 decrements the 'ce->refcnt' using
-synchronized locks and refcounting decrement.
+        if (use_hash2) {
 
-Thank you for your time and consideration.
 
-Best regards,
-Ginger
+Also one part is missing in udp_lib_get_port()
+
+@@ -289,7 +289,7 @@ int udp_lib_get_port(struct sock *sk, unsigned short sn=
+um,
+                        hash2_nulladdr &=3D udptable->mask;
+
+                        hslot2 =3D udp_hashslot2(udptable, slot2);
+-                       if (hslot->count < hslot2->count)
++                       if (hslot->count < READ_ONCE(hslot2->count))
+                                goto scan_primary_hash;
+
+                        exist =3D udp_lib_lport_inuse2(net, snum, hslot2, s=
+k);
 
