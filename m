@@ -1,123 +1,165 @@
-Return-Path: <netdev+bounces-280847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280854-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eKJcOIBv6mlBzQIAu9opvQ
-	(envelope-from <netdev+bounces-280847-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 21:14:08 +0200
+	id iFyKIlhw6mlBzQIAu9opvQ
+	(envelope-from <netdev+bounces-280854-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 21:17:44 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 232D14568D5
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 21:14:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D74BB456A14
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 21:17:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 741DC30136BA
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 19:10:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4E5933031CC7
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 19:12:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 627633033DE;
-	Thu, 23 Apr 2026 19:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D80313921DC;
+	Thu, 23 Apr 2026 19:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eOJDR2Ta"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lYKESqXu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F1E92D0C72;
-	Thu, 23 Apr 2026 19:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A6A3921CD;
+	Thu, 23 Apr 2026 19:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776971430; cv=none; b=WN8+JDfY/lNHbEQICdxxTJgFm9hrNk82UKbEDoaOl1f1STDWvcHMuukSVaydz++PXv5b3vGaAi4aWAL5es+NRHs8cubAuYf42S6j7Brs/qaEOmdyoqwVAfBATLRgpEGsPCFO8h/c1XmoZNgCyFXRTq4nlwge99zroUNjAgp16DU=
+	t=1776971527; cv=none; b=R7iAd7BeQb9IxxGqPFPHuFiQjPkdEbbV+c93D4GL/HNgsVK7b7f0B8xOEsTWvGRZNVg0LddpNRGXUw10nTNkYxeBebBQMkGLGwFfXw4TrzxbUvB8UvgAyg2VT2jVf+WvPK7VXGrAVl7G3GprpGLN3v3Nrj9vu1VHJj6h5QSihsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776971430; c=relaxed/simple;
-	bh=8CQFHiiCKbq7zgsrgaz6pt31g625ZCmmS9WRYx+cFBU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TgbhxB4kSm+aONvPtXHzgprbE5Fo0nejnStsU3c03sdv6wlxsWNOIvb/pqa8sUTSd07YJwSd7T5ovdLFrkYkBSLheIeEfOD04i4c+wM5wPrq7Q9H8PiKgrRmrthI8FqSKWaLIbfzKqWBIwa7oKWIoN4+iDjt+Goo8WCT3+GyuwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eOJDR2Ta; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF72BC2BCAF;
-	Thu, 23 Apr 2026 19:10:27 +0000 (UTC)
+	s=arc-20240116; t=1776971527; c=relaxed/simple;
+	bh=Rg+/kqy7//JrIXigz5eHvVtRaNDdjXzSYhWaYfJ9iL8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Yb1i6m8m1KPhsr7Za+pQGq3ztfkzxJ24e8gUMvSeW2Sqbf4JqdYtKfIEXjt/iE04sOwYt0WbbXLmJPsDckYriEBqjJQj2iAx6T1q7Hn/zYbRoRooCfVlmpJADe6zVd7OM0DRpOxnxRImMsoVApcoUhM4+voM5prYLUASnWNX7L4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lYKESqXu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6AA6C2BCAF;
+	Thu, 23 Apr 2026 19:12:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776971429;
-	bh=8CQFHiiCKbq7zgsrgaz6pt31g625ZCmmS9WRYx+cFBU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eOJDR2TaSqwBPtRjWf7v5oep4qFIuGzG/g3o4tiSorBKWkdoqualqifJVh2Xuipga
-	 54JWsybnIUG+2wkSl1BvzFGNRvsDiWZdwrhNaw2Hp87DQVIy9KAkrSbDBQ6S6swxqu
-	 mMJgO9n6yWwnahXM065/0pl2noCHTAxnoXmCA/U7NvVQs7FEZKiv/Up84qbZLgfBAS
-	 bPglJbh52xC37tjeF8wLAlifQJLrXJpjBzV4vaTFuxlH5JF9lLN86GufXthbjchz2o
-	 viTN6pQvbwVROCHWzNR5A7yObVXtgwcrvMsvepgSp9FsReNlI0zi/ba92O76lm0390
-	 f05ewczxvc1eg==
-Date: Thu, 23 Apr 2026 20:10:25 +0100
-From: Simon Horman <horms@kernel.org>
-To: Lee Jones <lee@kernel.org>
-Cc: Jon Maloy <jmaloy@redhat.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ying Xue <ying.xue@windriver.com>, netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
-	Tung Nguyen <tung.quang.nguyen@est.tech>
-Subject: Re: [PATCH v2 1/1] tipc: fix double-free in tipc_buf_append()
-Message-ID: <20260423191025.GJ900403@horms.kernel.org>
-References: <20260421124528.162996-1-lee@kernel.org>
+	s=k20201202; t=1776971527;
+	bh=Rg+/kqy7//JrIXigz5eHvVtRaNDdjXzSYhWaYfJ9iL8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=lYKESqXuYVl5q8+zyHRZyjDKa/Jr2da+EVB8P1IJB1DBf/nxBT1Aosd6Txre9K8q4
+	 Khsg8ITCwIOIGyx3ETTLS5OFOiq7HUHGof5h6pU5elwi9IwMTWX1uxS0m99I7cl2bt
+	 AhTpLz7OpSwW45dCdD1JIOS5jJEqFiMgA8hQeTbpDDIFy+un+jDn7qjDHZ114lMfb5
+	 9KSCzF1xz9zK/gRzoU98XE0kpIjuFBMCIVzuAhRC6ia2HSkOMbdARxdHM/YFnXkkUB
+	 o6JF1FvOcomZV56kHUxPMrmZjQeJ177wAXwYdezkwFVdsQ7ejWsscOx5dAACZfkED4
+	 vlL/AkW49piGQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: michael.bommarito@gmail.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	sam@mendozajonas.com,
+	fercerpav@gmail.com,
+	netdev@vger.kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net 1/6] net/ncsi: validate response packet lengths against the skb
+Date: Thu, 23 Apr 2026 12:12:03 -0700
+Message-ID: <20260423191203.3296364-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260422160342.1975093-2-michael.bommarito@gmail.com>
+References: <20260422160342.1975093-2-michael.bommarito@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260421124528.162996-1-lee@kernel.org>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,mendozajonas.com,gmail.com,vger.kernel.org,davemloft.net,google.com,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-280847-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280854-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[est.tech:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: 232D14568D5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D74BB456A14
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 21, 2026 at 01:45:26PM +0100, Lee Jones wrote:
-> tipc_msg_validate() can potentially reallocate the skb it is validating,
-> freeing the old one.  In tipc_buf_append(), it was being called with a
-> pointer to a local variable which was a copy of the caller's skb
-> pointer.
-> 
-> If the skb was reallocated and validation subsequently failed, the error
-> handling path would free the original skb pointer, which had already
-> been freed, leading to double-free.
-> 
-> Fix this by checking if head now points to a newly allocated reassembled
-> skb.  If it does, reassign *headbuf for later freeing operations.
-> 
-> Fixes: d618d09a68e4 ("tipc: enforce valid ratio between skb truesize and contents")
-> Suggested-by: Tung Nguyen <tung.quang.nguyen@est.tech>
-> Signed-off-by: Lee Jones <lee@kernel.org>
-> ---
-> 1v => v2: Keep the passed pointer type the same, but reassign on-change
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+---
+net/ncsi: validate response packet lengths against the skb
 
-FTR: Sashiko has generated a review of this patch which I have examined.
-I do not believe that review should halt progress of this patch
-as it appears that the problem flagged pre-dates this patch. Actually,
-its unclear to me if it is a problem that warrants addressing at all.
-But I'd appreciate if it could be looked over as a follow-up task.
+This commit adds packet length validation for NC-SI responses. It pulls the
+common header first, then pulls the full response body before validating the
+packet to prevent reading past the received packet body.
+
+> diff --git a/net/ncsi/ncsi-rsp.c b/net/ncsi/ncsi-rsp.c
+> index fbd84bc8026a3..1fe061ede26dd 100644
+> --- a/net/ncsi/ncsi-rsp.c
+> +++ b/net/ncsi/ncsi-rsp.c
+> @@ -38,11 +38,18 @@ static int ncsi_validate_rsp_pkt(struct ncsi_request *nr,
+>  	struct ncsi_rsp_pkt_hdr *h;
+>  	u32 checksum;
+>  	__be32 *pchecksum;
+> +	unsigned int len;
+>  
+>  	/* Check NCSI packet header. We don't need validate
+>  	 * the packet type, which should have been checked
+>  	 * before calling this function.
+>  	 */
+> +	len = skb_network_offset(nr->rsp) + sizeof(*h) + ALIGN(payload, 4);
+> +	if (!pskb_may_pull(nr->rsp, len)) {
+
+Does this pskb_may_pull() call potentially invalidate the hdr pointer cached
+earlier in ncsi_rcv_rsp()?
+
+Looking at ncsi_rcv_rsp(), it caches the header pointer before validating:
+
+ncsi_rcv_rsp() {
+    ...
+    hdr = (struct ncsi_pkt_hdr *)skb_network_header(skb);
+    ...
+    ret = ncsi_validate_rsp_pkt(nr, payload);
+
+If the SKB is fragmented and pskb_may_pull() needs to pull data into the
+linear area, it can reallocate the SKB's data buffer and free the old buffer.
+
+When ncsi_validate_rsp_pkt() returns, the local hdr pointer in ncsi_rcv_rsp()
+would still point to the freed memory.
+
+This pointer is then dereferenced in multiple error paths:
+
+    if (ret) {
+        netdev_warn(ndp->ndev.dev,
+                    "NCSI: 'bad' packet ignored for type 0x%x\n",
+                    hdr->type);
+...
+    ret = nrh->handler(nr);
+    if (ret)
+        netdev_err(ndp->ndev.dev,
+                   "NCSI: Handler for packet type 0x%x returned %d\n",
+                   hdr->type, ret);
+
+Could this cause a use-after-free when reading hdr->type?
+-- 
+pw-bot: cr
 
