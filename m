@@ -1,176 +1,233 @@
-Return-Path: <netdev+bounces-280726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280727-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sJjdEBgA6mkHrAIAu9opvQ
-	(envelope-from <netdev+bounces-280726-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 13:18:48 +0200
+	id OOmyEjsB6mk/rQIAu9opvQ
+	(envelope-from <netdev+bounces-280727-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 13:23:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD013451321
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 13:18:47 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8FB54513C1
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 13:23:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EEAA7301F795
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 11:18:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 21C5E301AF6B
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 11:19:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE3783E6DEB;
-	Thu, 23 Apr 2026 11:18:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 734563E714B;
+	Thu, 23 Apr 2026 11:19:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="GrspeKci"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CW8wzeyJ";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="t0PgTL0E"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 932D5318B83;
-	Thu, 23 Apr 2026 11:18:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F01D93E3D9F
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 11:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776943122; cv=none; b=CeeOMFLQYRFT0V+1FZOKpz1+KNsd9T3trW7hcy/LbbAPWeO2Bf6JsJTAm0+k7t0MqBfpCVdPVHpIsDVeFmvPyON0SX+vSLXZuwDZCwCIVKXutozKUumgpediJZx3BRGvm2eejYVC8y4OG8Fx0obqOdxnORaZRmk61SxGd9knj0Y=
+	t=1776943179; cv=none; b=ptw+oAF4NEQl6caQsxIpNANTYwu5ZXK4tY6qpRZATgI7kxwTlutc/GMlmJAthUSj6UlQdpLj1jEc8aYJGdFsxNdyb08+SpsHIU8te1aTSM+Xpc7+9kjZuyh23vFydcJIg0+vDRcwinxsR19RcMQrvYv2PB2DTPAJpxtddebST6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776943122; c=relaxed/simple;
-	bh=+Ht1fX7O8pKem0a8MgKLr6XElqTzJxRyeT9Bznf9fMU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G7hBqOROhiF4ZX1U5Au42nyXCHISLcF104QZAmkoGqJIN8MiCDqRX693DYLQ956ECm2ccUweToUUs7EIBbDJwLdHhq7Lhd7eNi77ul+NDK3rDGe4jnioqRnVX/Z68/NzsidKgJIXs5TCIDT+hO7rnHLu9DSxTim49YIFXCyRNVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=GrspeKci; arc=none smtp.client-ip=115.124.30.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1776943117; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=1EeyjAvqHGtasAKLij7JQvZvTEdx3GHT3hnRxa4XgIo=;
-	b=GrspeKciy7JvZWe6DOoSDRXLwkn3fwSms0QANQ1FKJuF+aj9rqRWYrqoXuOoS1XvfXVjSSwZSTrE0YZYCBu9gsFYG+/aJ0R6XWEY+Sn05XyuagSE7dVg309AK5S6U/Bn3E51NzKW32JGw1AtcTf/fBqhJPHw/Le93xVaZgUYkfI=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045133197;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0X1ZU3hl_1776943115;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0X1ZU3hl_1776943115 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 23 Apr 2026 19:18:36 +0800
-Date: Thu, 23 Apr 2026 19:18:35 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Weiming Shi <bestswngs@gmail.com>,
-	"D . Wythe" <alibuda@linux.alibaba.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, Simon Horman <horms@kernel.org>,
-	Ursula Braun <ubraun@linux.vnet.ibm.com>,
-	Ren Wei <n05ec@lzu.edu.cn>, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	Xiang Mei <xmei5@asu.edu>
-Subject: Re: [PATCH net] net/smc: fix NULL pointer dereference in
- smc_clc_wait_msg()
-Message-ID: <aeoAC_rsoqNpmAdl@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20260423100205.1093987-3-bestswngs@gmail.com>
+	s=arc-20240116; t=1776943179; c=relaxed/simple;
+	bh=YzgqUvEkB3ELb/c4huxqlPLApTouDPjH3572wtEdlXs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i31pM1YLSm16e+en4eTMQI/lrBEYFLhUrtXwMnDICvlLmWeOIXtD2pDj0snSnST21dcxBAss4or0EGmyWYGW7kZAV3s9qoWatM4CoivtG2yyNR3+rQkX6BCqheiuZ1kumCO/xc3KFB90NoqomsXyESw+zOhibw+DPF10IIsoELE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CW8wzeyJ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=t0PgTL0E; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776943176;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kv1JJ0H+OUXUHdzQ3o5oEflmdhWCO48wnsej6Wx4hYw=;
+	b=CW8wzeyJfE8N5vs18emwg/+PrXGOVtBmcB9lWv87PLT++Ibke9c2nYsKX4efCJ2W+wVeVk
+	/Ny1t7NqJyQW1ZEbVO17y9zgZCT5qcHmPcFB22jDhw9eBcSQR8QZ7x9JwtCrFZUpEscZid
+	yEdYZYEJj7Nikno9+HDc3p99t3maeEs=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-368-2xEJ_TsZNCW69uxyAk13xg-1; Thu, 23 Apr 2026 07:19:33 -0400
+X-MC-Unique: 2xEJ_TsZNCW69uxyAk13xg-1
+X-Mimecast-MFC-AGG-ID: 2xEJ_TsZNCW69uxyAk13xg_1776943172
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-35fb6cd0879so6257852a91.2
+        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 04:19:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1776943172; x=1777547972; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kv1JJ0H+OUXUHdzQ3o5oEflmdhWCO48wnsej6Wx4hYw=;
+        b=t0PgTL0EBwZJIFhx4XQ8yc/CEUgYFq2BfqhSFIdJwtrgn5jbjqn3FZy4xPZ1HaDZl0
+         Ga8KAnZ81gTOlJoHd6o1pLC1RkvyKJrjdYKJMv8gT6aHjZXx2o14/al6oc2j6PkbYMr+
+         LSLJuiCVFhtyKZzd8ifH1Qzr3fS4rTcFapgE1j7yBSD3xdQrmTmQCOksq/9VrNDwkqkA
+         xLBOvoJeUpNqaNLHyJ9QMAevzrba/HZ4PehytOiXjClp1FrtUCsA4qq8DYhxFHsycO2x
+         DbQQccEyghcOuADcIsggfnREq+JOuZ3vVJacbHFDdSBCgH/W+FWqYSkjPhXJ51xKljTz
+         M5PA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776943172; x=1777547972;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kv1JJ0H+OUXUHdzQ3o5oEflmdhWCO48wnsej6Wx4hYw=;
+        b=O6Sb5ljWdaSC6iq0W9SacvetP+/ja/kjSHHTemD5Kfpl1kSEbIBBmc1ceYPIJlW+ji
+         yKHRgUOEk7gvGFLfh+NoCSnqmoVvGRHg+BySWLQdUOQzgfwJ8xOyKx9ythJDi6ue+qyq
+         p9IEONB2FoAQvwy4U9ri1p0sDLhqOhjhERRhER2IGzFE7W0XJWfnD6i1GqHHouA+mq3K
+         /fmzJm+DrgF6VAzOOvsWJpLwoxb0Ug4fl4MHUrnvB3LAjq03N4CB4r9ISkqdQYdlNPtE
+         /SlxW0gYvjw9qhFzr9bkYUUufUOmuNtQCaGVvFG4jkt9yIEY8zmU79UMnxBf+pbvKCTv
+         Zg+Q==
+X-Forwarded-Encrypted: i=1; AFNElJ/s/zHwbn4ybqCmTY3yRLBSGi+ELOrBMPG3QyRcxDB9RescFk/CIdeTT+29GF4pNbyhHfPVRzg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzd/qys+GYNL2XDfSAa10kTQ27bWC6bUn/c1r3qMWKhneLAr6/G
+	QqpJrv7JSl5LgtNJaU4wO5jdwfG4jpFg05d4J4jFCJjw4g0yUFMBsdMH1THc4XceZY0Uyhq7OFD
+	AaepZ6jODnVl4ed2VABRu7mhDc/MprLN+/rDl+sR9Bl/M+RvE8QBAEt2j3w==
+X-Gm-Gg: AeBDietw2Es4bu7xvymfc0TA+V49cmZGs+fIVxoNP1/BIsprLt8byExIWVGHfInULBT
+	akebigRGZYI7awdoovIxy2NixfPh+H3NUdYDjOJhn2vQ+guBstpS3i4z8CA6PRhHEwAjZTJCoyX
+	LXLq1DpTXNwPwFzH22QnBJ7GOv/EzOB15oqIFGFZjglmFCNijUnGOwskdZUf+xYHlzamFLscSCD
+	M3BujJOwL7q0o9Zd5YTk07+mSm17K/gGKNW2eagKok4FRCyE25TZ1mOSKfDKPXzgfuduhSzSTXe
+	mZLhSWzsKiv81b3RUPwGcxR7PxSsukXbkyNUwnpgf0kCMXlSC2xVmiPfFH4LFPgyCI4AilvuFzp
+	7P2CTUaLD3yN2PuwapE3pTyCit8zbz14EAl102ayirjcxeANm5SU+4hf86lOBSqabYgQ=
+X-Received: by 2002:a17:902:8603:b0:2ae:6092:8d93 with SMTP id d9443c01a7336-2b5f9f9469cmr215400645ad.28.1776943172244;
+        Thu, 23 Apr 2026 04:19:32 -0700 (PDT)
+X-Received: by 2002:a17:902:8603:b0:2ae:6092:8d93 with SMTP id d9443c01a7336-2b5f9f9469cmr215400385ad.28.1776943171748;
+        Thu, 23 Apr 2026 04:19:31 -0700 (PDT)
+Received: from [192.168.88.32] ([150.228.93.216])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b5fab0db13sm205281755ad.53.2026.04.23.04.19.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Apr 2026 04:19:31 -0700 (PDT)
+Message-ID: <2f6fd850-e187-4e63-9a32-6b4b72c09905@redhat.com>
+Date: Thu, 23 Apr 2026 13:19:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260423100205.1093987-3-bestswngs@gmail.com>
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	SEM_URIBL(3.50)[asu.edu:email];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] net: phy: air_en8811h: add AN8811HB MCU
+ assert/deassert support
+To: "Lucien.Jheng" <lucienzx159@gmail.com>, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bjorn@mork.no
+Cc: ericwouds@gmail.com, frank-w@public-files.de, daniel@makrotopia.org,
+ lucien.jheng@airoha.com, albert-al.lee@airoha.com
+References: <20260420134506.35164-1-lucienzx159@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260420134506.35164-1-lucienzx159@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	R_DKIM_ALLOW(0.00)[linux.alibaba.com:s=default];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280726-lists,netdev=lfdr.de];
-	DMARC_POLICY_ALLOW(0.00)[linux.alibaba.com,none];
-	FREEMAIL_TO(0.00)[gmail.com,linux.alibaba.com,linux.ibm.com,davemloft.net,google.com,kernel.org,redhat.com];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	FREEMAIL_CC(0.00)[gmail.com,public-files.de,makrotopia.org,airoha.com];
+	TAGGED_FROM(0.00)[bounces-280727-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	HAS_REPLYTO(0.00)[dust.li@linux.alibaba.com];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,kernel.org,vger.kernel.org,mork.no];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.020];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dust.li@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_SPF_ALLOW(0.00)[+ip4:172.105.105.114:c];
-	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.alibaba.com:replyto,linux.alibaba.com:dkim,linux.alibaba.com:mid]
-X-Rspamd-Queue-Id: AD013451321
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A8FB54513C1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-04-23 03:02:07, Weiming Shi wrote:
-
-Hi Weiming,
-
-Ren Wei has already send the patch to the mailist
-
-[PATCH net 1/1] net/smc: avoid early lgr access in smc_clc_wait_msg
-
-Best regards,
-Dust
-
->In smc_listen_work(), smc_clc_wait_msg() is called to wait for a CLC
->PROPOSAL message before any link group has been created, so
->smc->conn.lgr is still NULL at this point. smc_clc_wait_msg() also
->accepts CLC DECLINE messages regardless of the expected type. When a
->DECLINE with SMC_FIRST_CONTACT_MASK set in hdr.typev2 arrives, the code
->unconditionally dereferences smc->conn.lgr to set sync_err, causing a
->NULL pointer dereference.
->
->KASAN reported a null-ptr-deref in smc_clc_wait_msg():
->
-> Oops: general protection fault, 0000 [#1] SMP KASAN NOPTI
-> KASAN: null-ptr-deref in range [0x0000000000000310-0x0000000000000317]
-> RIP: 0010:smc_clc_wait_msg (net/smc/smc_clc.c:793)
-> Call Trace:
->  <TASK>
->  smc_listen_work (net/smc/af_smc.c:2491)
->  process_one_work (kernel/workqueue.c:3281)
->  worker_thread (kernel/workqueue.c:3440)
->  kthread (kernel/kthread.c:436)
->  ret_from_fork (arch/x86/kernel/process.c:164)
->  ret_from_fork_asm (arch/x86/entry/entry_64.S:257)
->  </TASK>
-> Kernel panic - not syncing: Fatal exception
->
->Add a NULL check for smc->conn.lgr before dereferencing it. 
->
->Fixes: 0cfdd8f92cac ("smc: connection and link group creation")
->Reported-by: Xiang Mei <xmei5@asu.edu>
->Signed-off-by: Weiming Shi <bestswngs@gmail.com>
->---
-> net/smc/smc_clc.c | 6 ++++--
-> 1 file changed, 4 insertions(+), 2 deletions(-)
->
->diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
->index c38fc7bf0a7e..d22c9417d239 100644
->--- a/net/smc/smc_clc.c
->+++ b/net/smc/smc_clc.c
->@@ -790,8 +790,10 @@ int smc_clc_wait_msg(struct smc_sock *smc, void *buf, int buflen,
-> 		smc->peer_diagnosis = ntohl(dclc->peer_diagnosis);
-> 		if (((struct smc_clc_msg_decline *)buf)->hdr.typev2 &
-> 						SMC_FIRST_CONTACT_MASK) {
->-			smc->conn.lgr->sync_err = 1;
->-			smc_lgr_terminate_sched(smc->conn.lgr);
->+			if (smc->conn.lgr) {
->+				smc->conn.lgr->sync_err = 1;
->+				smc_lgr_terminate_sched(smc->conn.lgr);
->+			}
-> 		}
-> 	}
+On 4/20/26 3:45 PM, Lucien.Jheng wrote:
+> AN8811HB needs a MCU soft-reset cycle before firmware loading begins.
+> Assert the MCU (hold it in reset) and immediately deassert (release)
+> via a dedicated PBUS register pair (0x5cf9f8 / 0x5cf9fc), accessed
+> through a registered mdio_device at PHY-addr+8.
 > 
->-- 
->2.43.0
+> Add __air_pbus_reg_write() as a low-level helper taking a struct
+> mdio_device *, create and register the PBUS mdio_device in
+> an8811hb_probe() and store it in priv->pbusdev, then implement
+> an8811hb_mcu_assert() / _deassert() on top of it. Add
+> an8811hb_remove() to unregister the PBUS device on teardown. Wire
+> both calls into an8811hb_load_firmware() and en8811h_restart_mcu()
+> so every firmware load or MCU restart on AN8811HB correctly sequences
+> the reset control registers.
+> 
+> Fixes: 0a55766b7711 ("net: phy: air_en8811h: add Airoha AN8811HB support")
+
+The hash is incorrect, should be 5afda1d734ed
+
+[...]
+> @@ -254,6 +267,31 @@ static int air_phy_write_page(struct phy_device *phydev, int page)
+>  	return __phy_write(phydev, AIR_EXT_PAGE_ACCESS, page);
+>  }
+>  
+> +static int __air_pbus_reg_write(struct mdio_device *mdiodev,
+> +				u32 pbus_reg, u32 pbus_data)
+> +{
+> +	int ret;
+> +
+> +	ret = __mdiobus_write(mdiodev->bus, mdiodev->addr, AIR_EXT_PAGE_ACCESS,
+> +			      upper_16_bits(pbus_reg));
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = __mdiobus_write(mdiodev->bus, mdiodev->addr, AIR_PBUS_ADDR_HIGH,
+> +			      (pbus_reg & GENMASK(15, 6)) >> 6);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = __mdiobus_write(mdiodev->bus, mdiodev->addr,
+> +			      (pbus_reg & GENMASK(5, 2)) >> 2,
+> +			      lower_16_bits(pbus_data));
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	return __mdiobus_write(mdiodev->bus, mdiodev->addr, AIR_PBUS_DATA_HIGH,
+> +			       upper_16_bits(pbus_data));
+
+Sashiko says:
+
+Will writing the lower 16 bits before the upper 16 bits cause the
+hardware transaction to fire with stale upper data?
+The __air_buckpbus_reg_write() helper triggers the 32-bit transaction
+using the lower 16 bits as the execution trigger. If this hardware
+behaves similarly, should AIR_PBUS_DATA_HIGH be populated before writing
+the lower 16 bits?
+
+[...]
+> @@ -1175,10 +1281,22 @@ static int an8811hb_probe(struct phy_device *phydev)
+>  		return -ENOMEM;
+>  	phydev->priv = priv;
+>  
+> +	mdiodev = mdio_device_create(phydev->mdio.bus,
+> +				     phydev->mdio.addr + EN8811H_PBUS_ADDR_OFFS);
+
+Sashiko says:
+
+Can this create an out-of-bounds array access if the base PHY address is
+high?
+The mdio_map array in struct mii_bus has a fixed size of PHY_MAX_ADDR (32).
+If phydev->mdio.addr is 24 or higher, adding EN8811H_PBUS_ADDR_OFFS (8)
+will result in an address of 32 or more.
+Neither mdio_device_create() nor mdio_device_register() validate that
+the address is within PHY_MAX_ADDR. When mdiobus_register_device()
+executes mdiodev->bus->mdio_map[mdiodev->addr] = mdiodev, could this
+write past the end of the array and corrupt adjacent memory?
+
+/P
+
 
