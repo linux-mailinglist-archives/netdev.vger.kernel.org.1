@@ -1,388 +1,221 @@
-Return-Path: <netdev+bounces-280764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280765-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mHSJLdAd6mntuQIAu9opvQ
-	(envelope-from <netdev+bounces-280764-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 15:25:36 +0200
+	id MHkDMMke6mntuQIAu9opvQ
+	(envelope-from <netdev+bounces-280765-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 15:29:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2FC3452E0F
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 15:25:35 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E1DD452E78
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 15:29:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 89E27300A642
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 13:17:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1E3753009B2E
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 13:23:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A31AC3F0746;
-	Thu, 23 Apr 2026 13:17:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gaUxxh5z"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A1D13F0AA7;
+	Thu, 23 Apr 2026 13:23:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f77.google.com (mail-oo1-f77.google.com [209.85.161.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 023E12236E0
-	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 13:17:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776950249; cv=fail; b=E57U1of/KMRKjescCDeUMkbNig1EQ5LHHb9y+sKHKT0Lt8hJvGxHKjz47dVYLU/65jczdqqp9vfcK70zpa/PsTFICEKUa28CQws4IXKDNzExd+UWOVVKNl3h9H4Yoss6Pb1Zo2EcMnfEQbhV91S+1/WULqOHdqvFJK935ocDgXI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776950249; c=relaxed/simple;
-	bh=rq9LLFKLdd7e8k4RsBxHGElwLH65MyYS1V+D20871VU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=GJqanoOwT12wHQGcyq8wMFaXtKLdqbjJ4C3W4l7KEIBm6aT2YC67PPOuDDvxKoJJKxWc/ZNivybLvBrzYgydLwqNdv8FArRJcZ9RI4IqRVmSPWLMLJ6Y3sIu3DoRnQ7gRteoamyEN8ju37Oo+6i5MvGYOIjdevgRz20B3yl+GbM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gaUxxh5z; arc=fail smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776950248; x=1808486248;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=rq9LLFKLdd7e8k4RsBxHGElwLH65MyYS1V+D20871VU=;
-  b=gaUxxh5zzBSf9cm9+qx+vZ5td3M5jMwvsapKm5C0HJk6Kdzf2QNMAwJM
-   htWVvSDsG9wA5WSFnr+1CY/PFBFSS8V0UCQReu+m5af4Nuy/Pm6BFv7UW
-   b6XlPk/5cGu6o4IWoPwLMpIUPjoZzTxj6gvRx+zsQIj1rcVJb5p3kKxbK
-   2f0el+cRCrH/ih8VMbdjDHE+iq498Qr5oIPRp8byIBSNpthj36H+uX5F2
-   GFt/R3TWUlBtGOTy5GCWiJNB4eae6Q0rD3mshh9fjXkbiUZJa3MNKD4QF
-   8w32Dr2G6iTb6vAIMv2KZgM6sFnZmHCnTdpDlY+YJ7W5LkJxb1GY16SY+
-   w==;
-X-CSE-ConnectionGUID: Jjyvg1oLR8uu1ZU/k9UZzQ==
-X-CSE-MsgGUID: OoVlwz6CSdyYl82nMzaAOA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11764"; a="77797673"
-X-IronPort-AV: E=Sophos;i="6.23,194,1770624000"; 
-   d="scan'208";a="77797673"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2026 06:17:27 -0700
-X-CSE-ConnectionGUID: wgpdXsrDSumAKgWuitkXsQ==
-X-CSE-MsgGUID: QZ8uTZTwQPyybP50Q0JOig==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,194,1770624000"; 
-   d="scan'208";a="256146918"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2026 06:17:27 -0700
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 23 Apr 2026 06:17:26 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Thu, 23 Apr 2026 06:17:26 -0700
-Received: from PH8PR06CU001.outbound.protection.outlook.com (40.107.209.4) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 23 Apr 2026 06:17:25 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NdpF+lsKxAkH/eJ8i/97iYLhGjJub0Tzv6p0ia5WfinbDY/vzkiHribiGeUzliAzoWxVoPqTaIVWhsIlxoQeyRarTYeAtk3jGAzJG8z1+sDgzgFBCn5UfPS9p9bfLk8Se0kijhJL5VX3Txb2ymjvGbknLzsieibT5o/elu/lNgiEwk8Cml4i3r2Yrdr1bvaBfuO3oiGbsHLfNLELqTIeDPZGB8XG5uXDtpcaiMaACdzAMgiQznUsSetSotPn5HF8LX+CuqZ6YRxkEUmn5HSYn9HGLAKfIcostqR6QiGIuuK9UvJ2leJyv5/J6ElvnEg+R+fRp3P/+Y2Y+txMp4H62w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fKPXQPMSktDDXWZmTsBgIq+Qtjg+4Ryn+IN+Hj6cPRY=;
- b=BvbTJvXIlvYf82t7N7wJY5E/X3DImzTexjxQ1aS7GlAIcPXl62wE8SxgJEdPf3lmtwWijYZkPWhV+LMb5klD2fDpOc0Cs565uEFOOv2hCtkS9E9uNS9HLPHlInu0OqvvAeByWWDEetWlmubPAtPrPDDOaarr+g+i5j52b1ywKe2oz8CHXUO+UsMTXZYW1a/a6XjteRs+78BiACY6hp0COxCOezZ5JpqhgPeN1F/qnj1si8mqvlOho5wX6kaf+Kr4LRQiC84o/y7SsSIfUKlMVz6ODmHKk8phd4FiUJcqm0hcH/5Ba6dtb7ncdc87WW5wcKG5XbIqTjrvrFWECjnLUw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by PH3PPF383C22AA3.namprd11.prod.outlook.com (2603:10b6:518:1::d17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.21; Thu, 23 Apr
- 2026 13:17:21 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c%5]) with mapi id 15.20.9846.014; Thu, 23 Apr 2026
- 13:17:21 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "Keller, Jacob E"
-	<jacob.e.keller@intel.com>, "horms@kernel.org" <horms@kernel.org>,
-	"jesse.brandeburg@intel.com" <jesse.brandeburg@intel.com>, "Nguyen, Anthony
- L" <anthony.l.nguyen@intel.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
-Subject: RE: [PATCH net v4 4/4] ice: skip unnecessary VF reset when setting
- trust
-Thread-Topic: [PATCH net v4 4/4] ice: skip unnecessary VF reset when setting
- trust
-Thread-Index: AQHc0yHPL3usVtJTakKErPoC2Bf5x7XsoCew
-Date: Thu, 23 Apr 2026 13:17:21 +0000
-Message-ID: <IA3PR11MB89862412A9F682D59474841DE52A2@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20260423130405.139568-1-jtornosm@redhat.com>
- <20260423130405.139568-5-jtornosm@redhat.com>
-In-Reply-To: <20260423130405.139568-5-jtornosm@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|PH3PPF383C22AA3:EE_
-x-ms-office365-filtering-correlation-id: 1870311d-8126-4fa6-cf6f-08dea13aa6ce
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|56012099003|22082099003|18002099003|38070700021;
-x-microsoft-antispam-message-info: A8DIpiM7IAOKhrhCAk5gCzd4VBDd/6ALKLG2Irm83Hdw9oCqaW8vkOWZ5wgHblg0MoO68gy6Ezz8kCUvGzlOijgv0/M7xiTf18kpS2rbMEyE3yf+drsPI2puDA7D9qMzPdr7+zJhOjudtgXFA88Ybl4ORRPP0glMvGtDWI0cSvJkBwrndAfxolPGFNNEcpcGGQj1aD8621pGIZ820Iq42yMwEmOomEB5cAW/G6wILTNbofJcaNNBIr2N7vICLYEExE2DhSG60BkjgXpar0xPCrCEvI21MGlKJ0ySf4asfqZD4M0xiA64yCay/kY1VphjNiAcAUayfHnvrqlpOZT0slGLzM4TVrX+Zwbe1IYUCzNUCuea3pn5jKLfwLiQ8QJ4s/FyWCCGgr8gScM+DeWWNYII/f5IiDsegSgtUawdC+yh/Gf9VGK9eDlhbCsmFoOsTc36fdGWbk+CTQ15FM2Ji+e+z7wEyKsxPj+DpRMbCcL60qDPjRPMbpNwQku4ig98qC2PI1pC9m4t8TmVi3/XYMRdLId5+1EJGojhA4HvNo6a36IoDDA/9MUlxSsAI+ozwrytwAW2BfkxT3w1WgjVZjZBS060J27jOGnJJJWRkm8KEwzQJZQZcT5qW4usvo+DTCT/A8z/zRTiDbMjmfaVa89KkelBAyK950F3wXaxZnLp/fFjjpRDkNugGhNpQ8pa12LLoQVyjpzObWk64xSIT1nuyUOPMfATlG5UmqTEiHytq0eNlf84MIkx7JN6v0QV3sIt2RKxNrLgXt7IF6WzJVlerOhvhKPydpZFCD1fcr4=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(56012099003)(22082099003)(18002099003)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?RcyDtwb7BwY2YSp1swI3gXNWOEPlxlJkPGaOBHEjJaXrZu6MVZ3D9cgb7o4V?=
- =?us-ascii?Q?X/OnKIra/jRSd1H45f07USubcx/vzbkfxME3O4b/ETsyRLwHa36L+1xRs1cY?=
- =?us-ascii?Q?gZqvi47X9cwzxFMJuNreZzH1KpDDZyQHQj7W0yV8tbZ4rL8fG4yvM8VU19gC?=
- =?us-ascii?Q?VCx0bLvNcmr+V30fy7Cm5Ip9SHBs5rQXEWfUOsrTTX3xRbp6/FFluGurKmA/?=
- =?us-ascii?Q?I6RkGnljHGhUerYLEtQy0rqY9eLLJBy3/E8fjDVDV+kAkbY3Jd4qa6Xq44dT?=
- =?us-ascii?Q?RGRw5IDPwiNKTXMu7OVKkwW0MROsPH75zM0r1TSE0LlZZ1rgEQz9APLoEgf7?=
- =?us-ascii?Q?JMP04RbhTctAMJl5GPq558395slCfJD8XFMNTD7R2fqUThiisqKykbTwiGgh?=
- =?us-ascii?Q?9lT3EbOYzu9TwKGjMK/ZjWra1QWpXaMPAM8cwxn1z8j7OnluStOjUTxM75ff?=
- =?us-ascii?Q?MwhUPAK2SP3ViDOFirNboC+IQqSJU6VMl7B8LVNWUJbTJ7ulquTr/u2TZOtZ?=
- =?us-ascii?Q?M3p4R4IGPSigaJEdkW/y/xBNqnxai6DJCXG56shCGM2JheJGGqHXDgjQRSj2?=
- =?us-ascii?Q?AE/VFtsnNKEyST5XbTn5WszeIiNXDIZ+NFcniX1YcCtgwbxNVMKvbVGt0DNs?=
- =?us-ascii?Q?iFu45VWlPI1PnQMpZAEplYFQWskjVLeN8A+bxsbdz4O7KMDjIrcJWURyUamD?=
- =?us-ascii?Q?lGBYsQb/FE/bB/0ChvmjiJZYNtNHtFT+ap5s0WSBZKZ6F1nGawMi4aWpggsI?=
- =?us-ascii?Q?stSqDSe2A0Mom1ezfaL180uIIoCJ27Wk4UgXL+i6VbJlmcBo/QAdjzoNAveo?=
- =?us-ascii?Q?t1OqXdK/goCKq465jn3AMQ1PAtCG4BpcBAm/Q0VRZUDWZMbgsFdxASs6wlEU?=
- =?us-ascii?Q?laXX8kK7mHXX42V77EOfw+HaJQZlX9mEHWtB6S3oFxeaOOGou8qcY3OHNt1e?=
- =?us-ascii?Q?P1BE+B63M0WbQvxcawuwuXsVklBfUJ9tenO7mFjEk+bLof6xPG/qP83FjT4m?=
- =?us-ascii?Q?Le5S1Pk1x2xgzMsWLm1iAiX/KzV26uMbjhjL1b+OhHz/0e+Lgd6A1YaOkxKc?=
- =?us-ascii?Q?Ni2dRvEF8wfv/FZqrTQ/QEYjx2IPNiMubfwgUV/E2XvMtvdBfn3c4bNt/LEu?=
- =?us-ascii?Q?34dw7cRy55TTedVcI6KkMjJNqLGjvVPlfegnPVVsACPQfOWdq8g3oagA8H6K?=
- =?us-ascii?Q?1LPwcZJLaBcTsd3CkXixjdW9tvUTGlRHFQ16WDbptrZgJxomLJCLLLpgFHpd?=
- =?us-ascii?Q?eEnm2lRysV4TYWQ6x0BDQV5cpEh6NGIXZvWBOFDEdz7OOtJ7Z/AiAhvA4TGl?=
- =?us-ascii?Q?UVpQqPGrSs7zp7Gb05Tr6aQ7T161WnFzU+/LPQk+MtepcbTXJ4hVOLZ9viNM?=
- =?us-ascii?Q?mLGSHcIUy/wtdIvelEECwP4ZeEzyhPdlyKnTKS8FfqqvtsOYKC8qddQnQk8T?=
- =?us-ascii?Q?+MUTVOeE601VRoQ3asIhkR2LdCCnfrQDRsASLe7iyMHRSKC6utthyQ50aCXC?=
- =?us-ascii?Q?6kmP+62tNn7ER+Sl5GStuLDL35uHd+2oVebCaCZYFB36gxwl1SkJV6u57EeH?=
- =?us-ascii?Q?FhGAACHrj1ZUVL20sSvAj5Bdita95FDFfYgXqogpsVitUo0CMtIt2j+ryHix?=
- =?us-ascii?Q?kMMXF4T9TUK4lVcToGhjH9Ckao9CFcZbNr1mRKEH8XKVwcBljqGU0YrdNjAt?=
- =?us-ascii?Q?ZCsJZtmbuuLAxlQ43QthiZoJeZOnpLJCuhcH17+y/+dGID4RFP7xRqdel7QF?=
- =?us-ascii?Q?GcZmNMjEeEAoPhmLWbWMr+A38QAE4Pk=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A623F0755
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 13:23:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.77
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776950615; cv=none; b=MRvBm4sAPIYXTZAVgRZjF4A3yGizm7IsCCcchzX2Dr5mdSJKMJKFoNRGSQfGbmRLS3R1FtK55hO7Q+3fhWV3Lq18tNMJN0gPZcH6FMxWzyYuUb22FaZ7kPVFj4lCaBgT6Dc7BxxrAFfKuD0ymwdhMnOxlSH31mdO89Lryd6PCFw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776950615; c=relaxed/simple;
+	bh=63ShA8NK9kpnaJH+jLi3Lq4me0eshFWuqt1ONUPqAFQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Yir5r7XzkJTswq4VkLGT5SUEjmWS/7eGD5c+2CaYw353lgS89uMAjnhEhi7HzE9JAa2vq0K/8YG/O7Ye9jF6dgP4hN1budI4SLbVOjlxfxZ6tGxQ97s0dVftDJD9eTp/WzzLfRPHs5VTq3bH5MaLyTnNFx3zhoklzoOImPOxadE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f77.google.com with SMTP id 006d021491bc7-6949ebccfcdso2887267eaf.2
+        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 06:23:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776950612; x=1777555412;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=P3RxVIZmQIvR1MLx6j1nb0GzLH5yhyU+E4PLS8iiTg4=;
+        b=lIUuWJgj+xXsM3Z2LIiTaDYJHt3m3l1SJRjNFF3uM5r5LgXOawLT4AEFmVe9pjCIsV
+         MDA5pDCK2Kp/hNJIZnE+rmy28sZ6Dplq0sSQYt8PnxcttX1oNxPYDB8ZuMJtrA2zKOMB
+         Jp1Xv7YjVFmcFmiSMR5Hw2cnPAmocxiNq8Ceg2btuy00DKdsv6zjcR1UjrlcyY6PhAB+
+         gFRMkJ1XXxmqxWfB6RWZ1QqQnzPAwrTHKxBSFniLApxZuTYp2lGss6EPtw8vMTm1EAA8
+         9oJ3vO5gcE0d3VAY3vkOx1X0Vy5ddsuavKYSX7/p/2Hn6+WWYhlUti+BlYFmo/4PRU8G
+         PPkw==
+X-Forwarded-Encrypted: i=1; AFNElJ9+6GSoImoESrrTaCrudVtdqQPDVt96Hnsx3SRqKuNGf7uNgM5VXRhr917q5SD8NDZFu/4Z4dA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSef+7tUnfB6azujryIMf2OdRJ1E6HldMbklQZ0HxoaYb04NPb
+	7pUUoN5pqN9Czn0Ka5CmobIuTQuJjQseA2M/ITzlDtNTP4TeLmAvbg9YJrWjWivG6SysuGCj4Xc
+	g9gdcjRcAyXkyxrcFfdiu+XimbwxPGAtLh9KsSoT0Z41GmRCha8bwPviMCDQ=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: LIO23jYgsgXoiBY3HN4IWau0lhnYv/HM5npCANgfKsQNxTt4tqcvDwGoKYjVUYPW/JpVC3C2mWtBVLctXBVk+yIeIbQ+ypQIA27VUT9ybuZ02Ua+ywOIU9EM2G3IErXqwRqJot4ID03sBHnpS4RS42qr5VVz0qO4sRBnceAeII/F9r4hS0CYHWXrgYVRt9Q8aHvSoO+JrTtrp4rA1YO3+whRGVOY/r7sseY8CifcOEOBOvc7ro0Xkj68p2Vtcwg67512Rfm/XuHazS2Ia3NkgSKv6q4kBMKWDSCWYYq6QN36NnJ3VIRv9fv1hMLvSi89V8jAyoSmqdtrTRRj2hLekw==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1870311d-8126-4fa6-cf6f-08dea13aa6ce
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Apr 2026 13:17:21.1478
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: fvaHQ+LNyAXIhtdc6P1B7YC0Uc9qFXw963oanubFNvEJo2EzNmJBAzpIpC1HR5ePrGffIp0g/o8oFfV/REL18cxtz/OFHYC+kQg/YK9Mb7Y=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH3PPF383C22AA3
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+X-Received: by 2002:a4a:e90c:0:b0:694:8b4d:5f8f with SMTP id
+ 006d021491bc7-6948b4d61b9mr9352920eaf.57.1776950612565; Thu, 23 Apr 2026
+ 06:23:32 -0700 (PDT)
+Date: Thu, 23 Apr 2026 06:23:32 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69ea1d54.a00a0220.9259.0026.GAE@google.com>
+Subject: [syzbot] [hams?] WARNING: ODEBUG bug in rose_release
+From: syzbot <syzbot+b091c5774423d1319a22@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-0.36 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=3e19fa1907a3dfda];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280764-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[osuosl.org:email,intel.com:dkim,intel.com:email,davemloft.net:email,sashiko.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,IA3PR11MB8986.namprd11.prod.outlook.com:mid];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	MAILSPIKE_FAIL(0.00)[2600:3c15:e001:75::12fc:5321:server fail];
-	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280765-lists,netdev=lfdr.de,b091c5774423d1319a22];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[googlegroups.com:email,storage.googleapis.com:url,goo.gl:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	REDIRECTOR_URL(0.00)[goo.gl];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: B2FC3452E0F
+	MAILSPIKE_FAIL(0.00)[2600:3c04:e001:36c::12fc:5321:server fail];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	R_DKIM_NA(0.00)[];
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: 0E1DD452E78
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    2a4c0c11c019 Merge tag 's390-7.1-1' of git://git.kernel.or..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=12df3702580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3e19fa1907a3dfda
+dashboard link: https://syzkaller.appspot.com/bug?extid=b091c5774423d1319a22
+compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-2a4c0c11.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/2702dddfd186/vmlinux-2a4c0c11.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/51878be8732c/bzImage-2a4c0c11.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b091c5774423d1319a22@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+ODEBUG: free active (active state 0) object: ffff88803f4d2090 object type: timer_list hint: rose_t0timer_expiry+0x0/0x150 include/linux/skbuff.h:2942
+WARNING: lib/debugobjects.c:629 at debug_print_object+0x18e/0x2a0 lib/debugobjects.c:629, CPU#2: syz.1.11287/7248
+Modules linked in:
+CPU: 2 UID: 0 PID: 7248 Comm: syz.1.11287 Tainted: G             L      syzkaller #0 PREEMPT(full) 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+RIP: 0010:debug_print_object+0x19b/0x2a0 lib/debugobjects.c:629
+Code: b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 4f 48 8d 3d f2 18 e4 0b 41 56 48 8b 14 dd c0 33 1c 8c 4c 89 e6 <67> 48 0f b9 3a 58 83 05 0c c5 d9 0b 01 48 83 c4 18 5b 5d 41 5c 41
+RSP: 0018:ffffc90005ba7808 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: 0000000000000003 RCX: 0000000000000000
+RDX: ffffffff8c1c3300 RSI: ffffffff8c1c2f20 RDI: ffffffff90e6aac0
+RBP: 0000000000000001 R08: ffff88803f4d2090 R09: ffffffff8bb2c6e0
+R10: 0000000000000001 R11: 0000000000000000 R12: ffffffff8c1c2f20
+R13: ffffffff8bb2c720 R14: ffffffff8a84b230 R15: ffffc90005ba7908
+FS:  0000000000000000(0000) GS:ffff8880d64db000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000555594c2f9e8 CR3: 0000000039419000 CR4: 0000000000352ef0
+Call Trace:
+ <TASK>
+ __debug_check_no_obj_freed lib/debugobjects.c:1116 [inline]
+ debug_check_no_obj_freed+0x4da/0x630 lib/debugobjects.c:1146
+ slab_free_hook mm/slub.c:2620 [inline]
+ slab_free mm/slub.c:6246 [inline]
+ kfree+0x3d0/0x6c0 mm/slub.c:6561
+ rose_neigh_put include/net/rose.h:166 [inline]
+ rose_neigh_put include/net/rose.h:160 [inline]
+ rose_release+0x60b/0x740 net/rose/af_rose.c:658
+ __sock_release+0xb3/0x260 net/socket.c:722
+ sock_close+0x1c/0x30 net/socket.c:1514
+ __fput+0x3ff/0xb50 fs/file_table.c:510
+ task_work_run+0x150/0x240 kernel/task_work.c:233
+ exit_task_work include/linux/task_work.h:40 [inline]
+ do_exit+0x8d2/0x2a60 kernel/exit.c:975
+ do_group_exit+0xd5/0x2a0 kernel/exit.c:1117
+ get_signal+0x1ec7/0x21e0 kernel/signal.c:3037
+ arch_do_signal_or_restart+0x91/0x7a0 arch/x86/kernel/signal.c:337
+ __exit_to_user_mode_loop kernel/entry/common.c:64 [inline]
+ exit_to_user_mode_loop+0x86/0x4a0 kernel/entry/common.c:98
+ __exit_to_user_mode_prepare include/linux/irq-entry-common.h:207 [inline]
+ syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:238 [inline]
+ syscall_exit_to_user_mode include/linux/entry-common.h:318 [inline]
+ do_syscall_64+0x706/0xf80 arch/x86/entry/syscall_64.c:100
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: eccb:0xe4a421182f13d611
+Code: Unable to access opcode bytes at 0xe4a421182f13d5e7.
+RSP: 002b:00007fb92f11ff58 EFLAGS: 00000756 ORIG_RAX: d1d66dbfed01019b
+RAX: 2bf9e1987c1988ee RBX: 6f67a894836fe1f3 RCX: ed0b474b2b46640f
+RDX: fb381f0b5e12d2ce RSI: 401aaa756d8c34aa RDI: 30b9ec15aecde911
+RBP: 532828f82bbb556c R08: dbce39d105fdbf88 R09: ae9ea378b9c9fbc7
+R10: 33740f3b8630618c R11: 2450ade207355af5 R12: 0a61688f027fb1a4
+R13: 339c71c774e61334 R14: 28baed4a0483d193 R15: 7c1f9cf2b758efdc
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	b8 00 00 00 00       	mov    $0x0,%eax
+   5:	00 fc                	add    %bh,%ah
+   7:	ff                   	lcall  (bad)
+   8:	df 48 89             	fisttps -0x77(%rax)
+   b:	fa                   	cli
+   c:	48 c1 ea 03          	shr    $0x3,%rdx
+  10:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
+  14:	75 4f                	jne    0x65
+  16:	48 8d 3d f2 18 e4 0b 	lea    0xbe418f2(%rip),%rdi        # 0xbe4190f
+  1d:	41 56                	push   %r14
+  1f:	48 8b 14 dd c0 33 1c 	mov    -0x73e3cc40(,%rbx,8),%rdx
+  26:	8c
+  27:	4c 89 e6             	mov    %r12,%rsi
+* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
+  2f:	58                   	pop    %rax
+  30:	83 05 0c c5 d9 0b 01 	addl   $0x1,0xbd9c50c(%rip)        # 0xbd9c543
+  37:	48 83 c4 18          	add    $0x18,%rsp
+  3b:	5b                   	pop    %rbx
+  3c:	5d                   	pop    %rbp
+  3d:	41 5c                	pop    %r12
+  3f:	41                   	rex.B
 
 
-> -----Original Message-----
-> From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-> Sent: Thursday, April 23, 2026 3:04 PM
-> To: netdev@vger.kernel.org
-> Cc: intel-wired-lan@lists.osuosl.org; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; Loktionov, Aleksandr
-> <aleksandr.loktionov@intel.com>; Keller, Jacob E
-> <jacob.e.keller@intel.com>; horms@kernel.org;
-> jesse.brandeburg@intel.com; Nguyen, Anthony L
-> <anthony.l.nguyen@intel.com>; davem@davemloft.net;
-> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com; Jose Ignacio
-> Tornos Martinez <jtornosm@redhat.com>
-> Subject: [PATCH net v4 4/4] ice: skip unnecessary VF reset when
-> setting trust
->=20
-> Similar to the i40e fix, ice_set_vf_trust() unconditionally calls
-> ice_reset_vf() when the trust setting changes. While the delay is
-> smaller than i40e this reset is still unnecessary in most cases.
->=20
-> Additionally, the original code has a race condition: it deletes MAC
-> LLDP filters BEFORE resetting the VF. During this deletion, the VF is
-> still ACTIVE and can add new MAC LLDP filters concurrently,
-> potentially corrupting the filter list.
->=20
-> When granting trust, no reset is needed - we can just set the
-> capability flag to allow privileged operations.
->=20
-> When revoking trust, we need to:
-> 1. Clear the capability flag to block privileged operations 2. Disable
-> promiscuous mode if it was enabled (trusted VFs can enable it) 3. Only
-> reset if MAC LLDP filters exist (to clean them up)
->=20
-> When we do reset (MAC LLDP case), we fix the race condition by
-> resetting first to clear VF state (which blocks new MAC LLDP filter
-> additions), then delete existing filters safely. During cleanup, vf-
-> >trusted remains true so
-> ice_vf_is_lldp_ena() works properly. Only after cleanup do we set
-> vf->trusted =3D false.
->=20
-> When we don't reset, we manually handle capability flag and
-> promiscuous mode via helper function.
->=20
-> The ice driver already has logic to clean up MAC LLDP filters when
-> removing trust. After this cleanup, the VF reset is only necessary if
-> there were actually filters to remove (num_mac_lldp was non-zero).
->=20
-> This saves time and eliminates unnecessary service disruption when
-> changing VF trust settings in most cases, while properly handling
-> filter cleanup.
->=20
-> Fixes: 2296345416b0 ("ice: receive LLDP on trusted VFs")
-For me it looks like  cc: stable@vger.kernel.org must be added
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-> Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-> ---
-> v4:
->     - Address AI review (sashiko.dev) from Simon Horman:
->       vf->trusted ordering bug
->     - Fix upstream race condition when comparing with i40e code
->     - Apply capability flag and promiscuous mode fixes from i40e AI
-> review
->     - Add helper function ice_setup_vf_trust() for non-reset path
->     - Export ice_vf_clear_all_promisc_modes() for code reuse
-> v3: https://lore.kernel.org/all/20260414110006.124286-5-
-> jtornosm@redhat.com/
->=20
->  drivers/net/ethernet/intel/ice/ice_sriov.c  | 41 +++++++++++++++++++-
-> -  drivers/net/ethernet/intel/ice/ice_vf_lib.c |  2 +-
-> drivers/net/ethernet/intel/ice/ice_vf_lib.h |  1 +
->  3 files changed, 39 insertions(+), 5 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c
-> b/drivers/net/ethernet/intel/ice/ice_sriov.c
-> index 7e00e091756d..d0da7f6adc23 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_sriov.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-> @@ -1364,6 +1364,34 @@ int ice_set_vf_mac(struct net_device *netdev,
-> int vf_id, u8 *mac)
->  	return __ice_set_vf_mac(ice_netdev_to_pf(netdev), vf_id, mac);
-> }
->=20
-> +/**
-> + * ice_setup_vf_trust - Enable/disable VF trust mode without reset
-> + * @vf: VF to configure
-> + * @setting: trust setting
-> + *
-> + * Manually handle capability flag and promiscuous mode when changing
-> +trust
-> + * without performing a VF reset.
-> + * When reset is performed, this is not necessary as the reset
-> +procedure
-> + * already handles this.
-> + **/
-> +static void ice_setup_vf_trust(struct ice_vf *vf, bool setting) {
-> +	struct ice_vsi *vsi;
-> +
-> +	if (setting) {
-> +		set_bit(ICE_VIRTCHNL_VF_CAP_PRIVILEGE, &vf->vf_caps);
-> +	} else {
-> +		clear_bit(ICE_VIRTCHNL_VF_CAP_PRIVILEGE, &vf->vf_caps);
-> +
-> +		if (test_bit(ICE_VF_STATE_UC_PROMISC, vf->vf_states) ||
-> +		    test_bit(ICE_VF_STATE_MC_PROMISC, vf->vf_states)) {
-> +			vsi =3D ice_get_vf_vsi(vf);
-> +			if (vsi)
-> +				ice_vf_clear_all_promisc_modes(vf, vsi);
-You declare ice_vf_clear_all_promisc_modes() returning int, but ignore the =
-return value.
-Looks suspicious isn't it?
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-> +		}
-> +	}
-> +}
-> +
->  /**
->   * ice_set_vf_trust
->   * @netdev: network interface device structure @@ -1399,11 +1427,16
-> @@ int ice_set_vf_trust(struct net_device *netdev, int vf_id, bool
-> trusted)
->=20
->  	mutex_lock(&vf->cfg_lock);
->=20
-> -	while (!trusted && vf->num_mac_lldp)
-> -		ice_vf_update_mac_lldp_num(vf, ice_get_vf_vsi(vf),
-> false);
-> -
-> +	/* Reset only if revoking trust with MAC LLDP filters */
-> +	if (!trusted && vf->num_mac_lldp) {
-> +		ice_reset_vf(vf, ICE_VF_RESET_NOTIFY);
-> +		while (vf->num_mac_lldp)
-> +			ice_vf_update_mac_lldp_num(vf,
-> ice_get_vf_vsi(vf), false);
-> +	} else {
-> +		ice_setup_vf_trust(vf, trusted);
-> +	}
->  	vf->trusted =3D trusted;
-> -	ice_reset_vf(vf, ICE_VF_RESET_NOTIFY);
-> +
->  	dev_info(ice_pf_to_dev(pf), "VF %u is now %strusted\n",
->  		 vf_id, trusted ? "" : "un");
->=20
-> diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-> b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-> index c8bc952f05cd..81bbf30e5c29 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-> @@ -623,7 +623,7 @@ ice_vf_get_promisc_masks(struct ice_vf *vf, struct
-> ice_vsi *vsi,
->   *
->   * Clear all promiscuous/allmulticast filters for a VF
->   */
-> -static int
-> +int
->  ice_vf_clear_all_promisc_modes(struct ice_vf *vf, struct ice_vsi
-> *vsi)  {
->  	struct ice_pf *pf =3D vf->pf;
-> diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-> b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-> index 7a9c75d1d07c..a3501bd92311 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-> @@ -310,6 +310,7 @@ bool ice_is_any_vf_in_unicast_promisc(struct
-> ice_pf *pf);  void  ice_vf_get_promisc_masks(struct ice_vf *vf, struct
-> ice_vsi *vsi,
->  			 u8 *ucast_m, u8 *mcast_m);
-> +int ice_vf_clear_all_promisc_modes(struct ice_vf *vf, struct ice_vsi
-> +*vsi);
->  int
->  ice_vf_set_vsi_promisc(struct ice_vf *vf, struct ice_vsi *vsi, u8
-> promisc_m);  int
-> --
-> 2.53.0
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
