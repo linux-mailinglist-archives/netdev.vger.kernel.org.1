@@ -1,157 +1,164 @@
-Return-Path: <netdev+bounces-280721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280722-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4NeFNRr86WkFqwIAu9opvQ
-	(envelope-from <netdev+bounces-280721-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 13:01:46 +0200
+	id EFpqIVf76WnkpwIAu9opvQ
+	(envelope-from <netdev+bounces-280722-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 12:58:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B751F451069
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 13:01:38 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BDA1450FF5
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 12:58:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CEB8D303FAB0
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 10:57:11 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 574813002B69
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 10:58:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 126BA39E191;
-	Thu, 23 Apr 2026 10:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37ED39E191;
+	Thu, 23 Apr 2026 10:58:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="gM4+758l"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dWi52aMf";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Afwsa714"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79E2318B83;
-	Thu, 23 Apr 2026 10:57:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7591A35C1AD
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 10:58:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776941831; cv=none; b=QynT6MYUdAaRH+6YYkIPx52PM5KDcvd3vrxD5pqAHy03TUYdh2mqT7+JvQnqJQHC3Xo2GP8xxpdbK4BlDWg0kin4JYdZG8n3zIZy41uyWZp6kXkEyPJiLO8QCZsURvDIEy00knNNCxjvYbK8BJ6/2bnyeroq8RZphIQsf5FGXCk=
+	t=1776941905; cv=none; b=XGmIh2UkoeaSXv8kDV2akMHCxVioSaEYVl16AJu1kQ4RSHrimMt+5FP/r3Vrc7nfpkiaUV+7jgjAzJNSJOAwi4iJxNFxUkoFsewqoKFDJCrz56nDABBBf+rijqI7pa01fgOUEScPDE0qa+RrdZr7rCIJpGmsHqcfsRP3dRi3JRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776941831; c=relaxed/simple;
-	bh=x1cfWGvw5Do9Wneecux32loFJK989fZi5d5eQM4OJO0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ckw9TxMCywGW4iUjHbdJHDZs7DnYGHkmJNBjc64O3dad/2+8dUA2oYO2I349HO13nsRn/G4RGGQeRxp50jtS/n6K04F3KHd0uI8Dgu65+DxX8zeXmHdbSGwjNRf53SbdO3vg9wiOEIp15YDBRl4IjS78g1ftAoX69ULQMxd7BLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=gM4+758l; arc=none smtp.client-ip=115.124.30.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1776941819; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=9q1FaQahwENCvtHoXxo/f55d34TX6GkQWSa7xSkulcw=;
-	b=gM4+758l0p4Pas0xo1VH+iha7IZbtp1Ddjpn4Ik9jNZqOQWWn3Y+nHj7gKtKPgLU3pMmnbge53Sce1f6yrBYJV5/3+iIZ7dF2HE727j++6DzCa/YixCGSLwlFPYRM4XgKOXBRIkLggLI15KgWczKa0O8n2eDZFcRv9Qb+GQcv1w=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam011083073210;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0X1ZQOX2_1776941817;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0X1ZQOX2_1776941817 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 23 Apr 2026 18:56:58 +0800
-Date: Thu, 23 Apr 2026 18:56:57 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Ren Wei <n05ec@lzu.edu.cn>, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org
-Cc: alibuda@linux.alibaba.com, sidraya@linux.ibm.com, wenjia@linux.ibm.com,
-	mjambigi@linux.ibm.com, tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	ubraun@linux.vnet.ibm.com, yuantan098@gmail.com,
-	yifanwucs@gmail.com, tomapufckgml@gmail.com, bird@lzu.edu.cn,
-	ruijieli51@gmail.com
-Subject: Re: [PATCH net 1/1] net/smc: avoid early lgr access in
- smc_clc_wait_msg
-Message-ID: <aen6-Q21biAYoXV_@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <cover.1776850759.git.ruijieli51@gmail.com>
- <08c68a5c817acf198cce63d22517e232e8d60718.1776850759.git.ruijieli51@gmail.com>
+	s=arc-20240116; t=1776941905; c=relaxed/simple;
+	bh=Xa+bG6qN1HYUdPh3Ry+dhLiasWfSYhw/BRfkFbL+dqA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YZC8ZJD+RGI2uPd/pspFLGZ/gTzo9MeFEoT27h/YHYu4mKC8a/hhFzeuoPYPZHCPR8FoucaEZbYjVG+NIhshA7g06UXo08yt0/a68Ld7tjHYgjMZhrudGkFdjS41Rng0PjdHDIrLCAk9JsmUHLVcdUhtFtGH4O+Os/B+6TNZknI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dWi52aMf; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Afwsa714; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776941903;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KBet+od90qNMkud3NOqhuOiwhH6Rxym+XJmlrlPXzjs=;
+	b=dWi52aMfyux+vxadvKVlYN9W+rM/KQciH1Gac0KpYHSrQXNfm7NMXaZeAh0sBOCWxIFNrq
+	Nev7/3CRHKLUUt7xlb8XaniRoNL9yzyr/BSVvaIRhbQ96wDz9760KFyKLMMFnOYrIG19bd
+	xZESAywYVVpAjsHbKEg1G5a5roEGtwg=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-653-gVsiufXsPTSWuIW06u9qOA-1; Thu, 23 Apr 2026 06:58:22 -0400
+X-MC-Unique: gVsiufXsPTSWuIW06u9qOA-1
+X-Mimecast-MFC-AGG-ID: gVsiufXsPTSWuIW06u9qOA_1776941901
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-35e59791605so6876724a91.1
+        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 03:58:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1776941901; x=1777546701; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KBet+od90qNMkud3NOqhuOiwhH6Rxym+XJmlrlPXzjs=;
+        b=Afwsa714J/K4hzZ54ohOwghwHW41/2VlMAz3nuRK7UndbPFoOUc+sK3MwpkxJU2YS2
+         hkp05NkPZ/X2aS6KE3dK1YKxtiayRbJ5DLHrkV7Fe9S3+7HynS6wzn/FTCzZkYXoxzO6
+         JmesLQsJ9xA0lpa98qaSbuKWgv+VCNP34e52ZHekCQhpNe9ftDaafsbBk9UeMlswG0dS
+         u4bKOMaPbiTFM2WGqtHN61fsZvLNhww57npo3pOTdzBp6QOYbpw0NjPyAcWDvPDQfkH8
+         cnoC8D55hd4Hi8VwC3TCAfnwZFj+YOvaHj+iddum+E4ahTpZCrvXVMvun2iqDKhXd4Td
+         umBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776941901; x=1777546701;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KBet+od90qNMkud3NOqhuOiwhH6Rxym+XJmlrlPXzjs=;
+        b=kRlwdy4P1GGegXevuAHhyGY3BunGZ6MvGS20BQmXYXgjhDuTscky59aClY3L5FtnJ+
+         x3bPq/5peRD01N97rZ4a1OAvfQZVh03vi7NQIRX2yICBHHkJZKEoJ4zVPecgwYeEWxyC
+         sdNFnqHD13XqoNIb6utZx6j4xBgHxat8vrS8Fp6qojcQMUr7HSy7nK1r1yslhySx0jA3
+         pebBbxaHyGN9TNGKntdoD7o153U2/GViWhpD7n8LRgozbO5ilMjdlWPlu+CuHw6Vu9WO
+         Q7+eKMnpSXkVKhNOaAtlB2P+ClYI9wO0p6gxtkG319irk2CpQvD2aw2GnrmmIJISB3/l
+         bhMw==
+X-Forwarded-Encrypted: i=1; AFNElJ+lrB+P110GOxl7ZoXDerxehdmSZj8TDQW+4VLPZdJs8wCTpO8ZIhYhIwQ6PLjJbihnFn8mfm0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIN3VPnbwxJfMcZmvIX9NX5dXPQcyCorgvg0JmUWZqD2r68Pte
+	usa1IsGaznBMxf4x4kc8TSqEkZa/SE7Bk43S1AkPbKMl9/7m4rnGZSIu9837+wokCZ95Bz3ra8h
+	xkGZse6FNsTVG9mdnDKhxVDu6yc9kg+EFM+4kB388eYWUJycm1xqU1aRgFA==
+X-Gm-Gg: AeBDieumPxGdL1LG1/QTGgjf4SYwPbBs9fj/IlYJ7VCT/8ci2tipIWsnOhx48cn4Ol8
+	KnY/ye7GeJ0dd0LDOW2pEHxvFVRIUw0rAZDPJbQYLF5eqMn5vrfoaV3i0iuqRz6ByMZs04JnoN8
+	iIed4UuypYpKo953sZU5slV1bELbmtjRwEVWDt//sL2Xglbs6qj3ymKWvw5G7U3WFwz4/+xRzvC
+	m5CqHvrY3gA/A+iFGJhQI8C/7h0c46C91SmOJzimVWzC9vdgzW4+dY0Q0uTGfthOT98pGToKKd3
+	i/DaWzMTVyhuB70rwBE2g+h75UraX2oPU/39/yrkduBb49PtT5n2KbKnatupNaOlvrpbpPToN3C
+	NtZPvg8nf6XPzOoA2xw7SeNYhM1xpdF4LZTbqEAKDA9Q2S6BK4qNBencQNhvpbrgKdrI=
+X-Received: by 2002:a17:90b:2244:b0:35d:9c32:6219 with SMTP id 98e67ed59e1d1-3614040e440mr27528864a91.9.1776941901087;
+        Thu, 23 Apr 2026 03:58:21 -0700 (PDT)
+X-Received: by 2002:a17:90b:2244:b0:35d:9c32:6219 with SMTP id 98e67ed59e1d1-3614040e440mr27528825a91.9.1776941900601;
+        Thu, 23 Apr 2026 03:58:20 -0700 (PDT)
+Received: from [192.168.88.32] ([150.228.93.216])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3613fba1436sm7249554a91.11.2026.04.23.03.58.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Apr 2026 03:58:20 -0700 (PDT)
+Message-ID: <21c7e3e2-c264-4f28-841e-42f562440365@redhat.com>
+Date: Thu, 23 Apr 2026 12:58:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <08c68a5c817acf198cce63d22517e232e8d60718.1776850759.git.ruijieli51@gmail.com>
-X-Spamd-Result: default: False [-9.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] ipv6: validate extension header length before
+ copying to cmsg
+To: Qi Tang <tpluszz77@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260423102255.3752004-1-tpluszz77@gmail.com>
+ <20260423103339.3991950-1-tpluszz77@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260423103339.3991950-1-tpluszz77@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[linux.alibaba.com,linux.ibm.com,davemloft.net,google.com,kernel.org,redhat.com,linux.vnet.ibm.com,gmail.com,lzu.edu.cn];
-	TAGGED_FROM(0.00)[bounces-280721-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	TAGGED_FROM(0.00)[bounces-280722-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dust.li@linux.alibaba.com,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	MID_RHS_MATCH_FROM(0.00)[];
-	HAS_REPLYTO(0.00)[dust.li@linux.alibaba.com];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,alibaba.com:email,linux.alibaba.com:replyto,linux.alibaba.com:dkim,linux.alibaba.com:mid,lzu.edu.cn:email]
-X-Rspamd-Queue-Id: B751F451069
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8BDA1450FF5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-04-22 23:40:18, Ren Wei wrote:
->From: Ruijie Li <ruijieli51@gmail.com>
->
->A CLC decline can be received while the handshake is still in an early
->stage, before the connection has been associated with a link group.
->
->The decline handling in smc_clc_wait_msg() updates link-group level sync
->state for first-contact declines, but that state only exists after link
->group setup has completed. Guard the link-group update accordingly and
->keep the per-socket peer diagnosis handling unchanged.
->
->This preserves the existing sync_err handling for established link-group
->contexts and avoids touching link-group state before it is available.
->
->Fixes: 0cfdd8f92cac ("smc: connection and link group creation")
->Cc: stable@kernel.org
->Reported-by: Yuan Tan <yuantan098@gmail.com>
->Reported-by: Yifan Wu <yifanwucs@gmail.com>
->Reported-by: Juefei Pu <tomapufckgml@gmail.com>
->Reported-by: Xin Liu <bird@lzu.edu.cn>
->Signed-off-by: Ruijie Li <ruijieli51@gmail.com>
->Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+On 4/23/26 12:33 PM, Qi Tang wrote:
+> Please drop v2 — it was incorrectly sent as a reply to v1 instead
+> of a new thread.  Resent as v3:
+> https://lore.kernel.org/netdev/20260423103238.3987364-1-tpluszz77@gmail.com/
 
+FTR, you should have waited 24h before sending v3. Beyond keeping the
+traffic on the ML under control, that helps you learning and remembering
+the process.
 
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+/P
 
-Best regards,
-Dust
-
->---
-> net/smc/smc_clc.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
->
->diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
->index c38fc7bf0a7e..014d527d5462 100644
->--- a/net/smc/smc_clc.c
->+++ b/net/smc/smc_clc.c
->@@ -788,8 +788,8 @@ int smc_clc_wait_msg(struct smc_sock *smc, void *buf, int buflen,
-> 		dclc = (struct smc_clc_msg_decline *)clcm;
-> 		reason_code = SMC_CLC_DECL_PEERDECL;
-> 		smc->peer_diagnosis = ntohl(dclc->peer_diagnosis);
->-		if (((struct smc_clc_msg_decline *)buf)->hdr.typev2 &
->-						SMC_FIRST_CONTACT_MASK) {
->+		if ((dclc->hdr.typev2 & SMC_FIRST_CONTACT_MASK) &&
->+		    smc->conn.lgr) {
-> 			smc->conn.lgr->sync_err = 1;
-> 			smc_lgr_terminate_sched(smc->conn.lgr);
-> 		}
->-- 
->2.34.1
 
