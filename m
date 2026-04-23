@@ -1,261 +1,169 @@
-Return-Path: <netdev+bounces-280759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280760-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sIYoBXYZ6mmzuAIAu9opvQ
-	(envelope-from <netdev+bounces-280759-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 15:07:02 +0200
+	id uNMkLI8c6mntuQIAu9opvQ
+	(envelope-from <netdev+bounces-280760-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 15:20:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F65445279F
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 15:06:56 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD092452BEC
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 15:20:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5FD4C306C3E5
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 13:04:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 704673019625
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 13:14:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D43852FE071;
-	Thu, 23 Apr 2026 13:04:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C48963F23A1;
+	Thu, 23 Apr 2026 13:13:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Plzb8MjS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ph4tBiup"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E34C3EE1EF
-	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 13:04:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA383F0A91
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 13:13:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776949490; cv=none; b=hc2Z3CNN8lT0O0NN9zfTI+wUF839t2BqNFb6ch/kOWpCZsPzY7niXNwf1lU2AI4Lzp4EJPxTwM7xF3ofJtDnj1vAKkwV6k2dZmsQr8chCShUlVYc3JxhkRdGmVkPVG+lsr4fpD5i7teMJZbBmtkSj+6AEcQk0aUZYXqN1z6kSqI=
+	t=1776949983; cv=none; b=muYEx8aKOOHgsEn2iTd6gt9R+PrafXAWZrjBCNk8jlu7gG5/t3xZ2ZbO4xZWDit8qIFc0oSJ2TYJwKpLl8lhaafybGFbrx1jBR27bdkQdck4lAo/hHqKWyX66Dca1i2KwI7i2ayDwNvz8UFTRog90sCi9ZISpsVFIUOLxNnfV1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776949490; c=relaxed/simple;
-	bh=fIZ8ZiY1KDfMs3Phm7asXwByqiXQvDJI7aWp8x6bzTQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CpIT+xNSkBcIfbXF5QYGhsm2IGezEK5HrbuJtX+4x/hM3PkjOaPhxtVS54ZplrVMIW+1VpHRC+h7N4SJiqvFWrlPhmJTq5c7PKGXPQmnzOlgxswtRmH1eMa7eo+wD9wn+WKqwqGE2/AFJC78OOVcSJV8sclnJ6UiBlIYG9sMPSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Plzb8MjS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776949488;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hNxPm0l1Sh7y0ewMYZbtJKVp2OY0iO3QRahnfY38HjY=;
-	b=Plzb8MjSwYJbhDTtlhgXBCDU3YboU83AVGOSIe7AxhCtS9vyXScGY6faqrV4nT7hdV8xBP
-	qEXvOTmvE7m+0iZcte9g415stD3yvgswlX7czOwESEmh7UaGRfYN/KUw4Jc9DplJHTeBS+
-	oHJ05P6YX9ExSjdlF5NmnIlr772rfSs=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-380-gryGd0IUPd6ToVTN0eyAgA-1; Thu,
- 23 Apr 2026 09:04:45 -0400
-X-MC-Unique: gryGd0IUPd6ToVTN0eyAgA-1
-X-Mimecast-MFC-AGG-ID: gryGd0IUPd6ToVTN0eyAgA_1776949482
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 76A0A1935303;
-	Thu, 23 Apr 2026 13:04:42 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.44.32.35])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4036E19560AB;
-	Thu, 23 Apr 2026 13:04:37 +0000 (UTC)
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-To: netdev@vger.kernel.org
-Cc: intel-wired-lan@lists.osuosl.org,
-	przemyslaw.kitszel@intel.com,
-	aleksandr.loktionov@intel.com,
-	jacob.e.keller@intel.com,
-	horms@kernel.org,
-	jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-Subject: [PATCH net v4 4/4] ice: skip unnecessary VF reset when setting trust
-Date: Thu, 23 Apr 2026 15:04:05 +0200
-Message-ID: <20260423130405.139568-5-jtornosm@redhat.com>
-In-Reply-To: <20260423130405.139568-1-jtornosm@redhat.com>
-References: <20260423130405.139568-1-jtornosm@redhat.com>
+	s=arc-20240116; t=1776949983; c=relaxed/simple;
+	bh=OFPsVUKTkkJPaSLrVoEdb9zPLdAMuapXjHJIMHyQpqI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=opthv4JlJKbnwolYYikJpJqSSTRXWjoYv7/uqHohni3pGIlfNuW72SM8d1NBoebmeNoszeuS4iSs1IeSJFuIKjNZHJvenzziGsS4W2Di+EfhIwmyp+5ec+/SZudv/YLrCmO/9YWo4K7HU6J7DafQyBPEr3676VhdvM985I5kmTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ph4tBiup; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c79744a2d99so2905242a12.1
+        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 06:13:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1776949981; x=1777554781; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9gKFsUpIcJrOZ7JV012cOGqmLlLh75Tdbz6kdKZGcdk=;
+        b=ph4tBiupjuLp6t/sTgxD1XKl1wEf5iYcYhvGnRrqD4t1vCR6kfvWJKwW8NFxZKOg5A
+         YWOgnN4RlxtFofD33JhSbYF+ttQQlRuC0XMpZF5aLlUIpjpG8cgAvch59hv0of20jvIU
+         lGCdY3mei3SBG69+W5naU3Spr8cC0ThfxUh5xA7NXp6jiyeWQOHVE/rWzePhgoi+wQXR
+         3THDivfKBAAirFeT+zGeHqmemtiLtP2IfFlQ8ra033+J9fdp2viVLgsXs2YyzZqQBK6x
+         oKacUrNjZJ86LwU2h6Ojh+7NfbOmriJzJ6KbnhXs04VSHsdDCtAu+IUWpGAzMajY5iAi
+         HTZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776949981; x=1777554781;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9gKFsUpIcJrOZ7JV012cOGqmLlLh75Tdbz6kdKZGcdk=;
+        b=Qf8ZoboN9rQvnnJjT5tGdkQX/fD4vr8KgzkksgvxRoKrl59ZYsibPFbVzbo4Cmbpj0
+         ee07S/yrLp6Y18iWw0gZqPrg9jjxssukirIeaKsWrxzoPQ+1xX5+XTQQBx7cMrZB7844
+         yV5WBf2iH6THccxtO9durcBQ5buFvC0XccuMDeU2Aptgx0XD43VgiqTWw+t/l/JA+B+o
+         8B4U7PxwLdmH0rGcCVShuVpgMA6N/f2964DqWLqoxGbEBkImBIUHEyyaUzWc+2ZvKFj6
+         KF1EfZsg+0j1iwYHM/caYkwmThKzdl+GX0NJE49EWAooD/V6HwjWkC/nJLuuG2lib9cO
+         NfJQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8Quakvy02CMYtmFs+Wevwy9EwspvKCL5t0czdMY5fKpmmnqNlPYyTHdf2VzJ9/UaaDSxK2dP4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpHjuDEsD+GGdvxGcDBxnptIyvnbJ76Ol8rcceQm+wUJUCwQxa
+	/QZxYoYsYssOCODJDMIddoRKSsiq/+oyAChoH++46ZXy9+lNj9zDmtxGz4omjcrJvOcjcQueshq
+	/vxVHqA==
+X-Received: from pfbiv33.prod.google.com ([2002:a05:6a00:66e1:b0:82f:1051:621])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:a883:b0:829:6f7d:3093
+ with SMTP id d2e1a72fcca58-82f8c9ece1emr28281470b3a.48.1776949980819; Thu, 23
+ Apr 2026 06:13:00 -0700 (PDT)
+Date: Thu, 23 Apr 2026 06:12:59 -0700
+In-Reply-To: <20260422-vmscape-bhb-v11-8-b18e0cf32af4@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Mime-Version: 1.0
+References: <20260422-vmscape-bhb-v11-0-b18e0cf32af4@linux.intel.com> <20260422-vmscape-bhb-v11-8-b18e0cf32af4@linux.intel.com>
+Message-ID: <aeoa2yM2gq8Llype@google.com>
+Subject: Re: [PATCH v11 08/12] kvm: Define EXPORT_STATIC_CALL_FOR_KVM()
+From: Sean Christopherson <seanjc@google.com>
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc: x86@kernel.org, Jon Kohler <jon@nutanix.com>, Nikolay Borisov <nik.borisov@suse.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Josh Poimboeuf <jpoimboe@kernel.org>, David Kaplan <david.kaplan@amd.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>, 
+	Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	David Laight <david.laight.linux@gmail.com>, Andy Lutomirski <luto@kernel.org>, 
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Jason Baron <jbaron@akamai.com>, Alice Ryhl <aliceryhl@google.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Ard Biesheuvel <ardb@kernel.org>, 
+	Shuah Khan <skhan@linuxfoundation.org>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>, 
+	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280759-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jtornosm@redhat.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,alien8.de,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,google.com,lwn.net,akamai.com,goodmis.org,linuxfoundation.org,vger.kernel.org,intel.com];
+	TAGGED_FROM(0.00)[bounces-280760-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	MAILSPIKE_FAIL(0.00)[2600:3c04:e001:36c::12fc:5321:query timed out];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[6];
+	MAILSPIKE_FAIL(0.00)[2600:3c15:e001:75::12fc:5321:query timed out];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sashiko.dev:url]
-X-Rspamd-Queue-Id: 8F65445279F
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[42];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: CD092452BEC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Similar to the i40e fix, ice_set_vf_trust() unconditionally calls
-ice_reset_vf() when the trust setting changes. While the delay is smaller
-than i40e this reset is still unnecessary in most cases.
+Uber nit (don't bother with a new version), please capitalize KVM:
 
-Additionally, the original code has a race condition: it deletes MAC LLDP
-filters BEFORE resetting the VF. During this deletion, the VF is still
-ACTIVE and can add new MAC LLDP filters concurrently, potentially
-corrupting the filter list.
+On Wed, Apr 22, 2026, Pawan Gupta wrote:
+> EXPORT_SYMBOL_FOR_KVM() exists to export symbols to KVM modules. Static
+> calls need the same treatment when the core kernel defines a static_call
+> that KVM needs access to (e.g. from a VM-exit path).
+> 
+> Define EXPORT_STATIC_CALL_FOR_KVM() as the static_call analogue of
+> EXPORT_SYMBOL_FOR_KVM(). The same three-way logic applies:
+> 
+>   - KVM_SUB_MODULES defined: export to "kvm," plus all sub-modules
+>   - KVM=m, no sub-modules: export to "kvm" only
+>   - KVM built-in: no export needed (noop)
+> 
+>   As with EXPORT_SYMBOL_FOR_KVM(), allow architectures to override both
+>   macros (e.g. to suppress the export when kvm.ko itself will not be
+>   built despite CONFIG_KVM=m). Add the x86 no-op overrides in
+>   arch/x86/include/asm/kvm_types.h for that case. To keep the pair in
+>   sync, EXPORT_STATIC_CALL_FOR_KVM() is defined inside the
+>   EXPORT_SYMBOL_FOR_KVM #ifndef block; an arch that defines
+>   EXPORT_SYMBOL_FOR_KVM must also define EXPORT_STATIC_CALL_FOR_KVM or the
+>   build will fail with a compile-time error.
+> 
+> As with EXPORT_SYMBOL_FOR_KVM(), allow architectures to override
+> EXPORT_STATIC_CALL_FOR_KVM definition (e.g. to suppress the export when
+> kvm.ko itself will not be built despite CONFIG_KVM=m). Add the x86 no-op
+> override in arch/x86/include/asm/kvm_types.h for that case.
+> 
+> Architectures must also define EXPORT_STATIC_CALL_FOR_KVM when they define
+> EXPORT_SYMBOL_FOR_KVM.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> ---
 
-When granting trust, no reset is needed - we can just set the capability
-flag to allow privileged operations.
-
-When revoking trust, we need to:
-1. Clear the capability flag to block privileged operations
-2. Disable promiscuous mode if it was enabled (trusted VFs can enable it)
-3. Only reset if MAC LLDP filters exist (to clean them up)
-
-When we do reset (MAC LLDP case), we fix the race condition by resetting
-first to clear VF state (which blocks new MAC LLDP filter additions), then
-delete existing filters safely. During cleanup, vf->trusted remains true so
-ice_vf_is_lldp_ena() works properly. Only after cleanup do we set
-vf->trusted = false.
-
-When we don't reset, we manually handle capability flag and promiscuous
-mode via helper function.
-
-The ice driver already has logic to clean up MAC LLDP filters when
-removing trust. After this cleanup, the VF reset is only necessary if
-there were actually filters to remove (num_mac_lldp was non-zero).
-
-This saves time and eliminates unnecessary service disruption when
-changing VF trust settings in most cases, while properly handling filter
-cleanup.
-
-Fixes: 2296345416b0 ("ice: receive LLDP on trusted VFs")
-Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
----
-v4:
-    - Address AI review (sashiko.dev) from Simon Horman:
-      vf->trusted ordering bug
-    - Fix upstream race condition when comparing with i40e code
-    - Apply capability flag and promiscuous mode fixes from i40e AI review
-    - Add helper function ice_setup_vf_trust() for non-reset path
-    - Export ice_vf_clear_all_promisc_modes() for code reuse 
-v3: https://lore.kernel.org/all/20260414110006.124286-5-jtornosm@redhat.com/
-
- drivers/net/ethernet/intel/ice/ice_sriov.c  | 41 +++++++++++++++++++--
- drivers/net/ethernet/intel/ice/ice_vf_lib.c |  2 +-
- drivers/net/ethernet/intel/ice/ice_vf_lib.h |  1 +
- 3 files changed, 39 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
-index 7e00e091756d..d0da7f6adc23 100644
---- a/drivers/net/ethernet/intel/ice/ice_sriov.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-@@ -1364,6 +1364,34 @@ int ice_set_vf_mac(struct net_device *netdev, int vf_id, u8 *mac)
- 	return __ice_set_vf_mac(ice_netdev_to_pf(netdev), vf_id, mac);
- }
- 
-+/**
-+ * ice_setup_vf_trust - Enable/disable VF trust mode without reset
-+ * @vf: VF to configure
-+ * @setting: trust setting
-+ *
-+ * Manually handle capability flag and promiscuous mode when changing trust
-+ * without performing a VF reset.
-+ * When reset is performed, this is not necessary as the reset procedure
-+ * already handles this.
-+ **/
-+static void ice_setup_vf_trust(struct ice_vf *vf, bool setting)
-+{
-+	struct ice_vsi *vsi;
-+
-+	if (setting) {
-+		set_bit(ICE_VIRTCHNL_VF_CAP_PRIVILEGE, &vf->vf_caps);
-+	} else {
-+		clear_bit(ICE_VIRTCHNL_VF_CAP_PRIVILEGE, &vf->vf_caps);
-+
-+		if (test_bit(ICE_VF_STATE_UC_PROMISC, vf->vf_states) ||
-+		    test_bit(ICE_VF_STATE_MC_PROMISC, vf->vf_states)) {
-+			vsi = ice_get_vf_vsi(vf);
-+			if (vsi)
-+				ice_vf_clear_all_promisc_modes(vf, vsi);
-+		}
-+	}
-+}
-+
- /**
-  * ice_set_vf_trust
-  * @netdev: network interface device structure
-@@ -1399,11 +1427,16 @@ int ice_set_vf_trust(struct net_device *netdev, int vf_id, bool trusted)
- 
- 	mutex_lock(&vf->cfg_lock);
- 
--	while (!trusted && vf->num_mac_lldp)
--		ice_vf_update_mac_lldp_num(vf, ice_get_vf_vsi(vf), false);
--
-+	/* Reset only if revoking trust with MAC LLDP filters */
-+	if (!trusted && vf->num_mac_lldp) {
-+		ice_reset_vf(vf, ICE_VF_RESET_NOTIFY);
-+		while (vf->num_mac_lldp)
-+			ice_vf_update_mac_lldp_num(vf, ice_get_vf_vsi(vf), false);
-+	} else {
-+		ice_setup_vf_trust(vf, trusted);
-+	}
- 	vf->trusted = trusted;
--	ice_reset_vf(vf, ICE_VF_RESET_NOTIFY);
-+
- 	dev_info(ice_pf_to_dev(pf), "VF %u is now %strusted\n",
- 		 vf_id, trusted ? "" : "un");
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-index c8bc952f05cd..81bbf30e5c29 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-@@ -623,7 +623,7 @@ ice_vf_get_promisc_masks(struct ice_vf *vf, struct ice_vsi *vsi,
-  *
-  * Clear all promiscuous/allmulticast filters for a VF
-  */
--static int
-+int
- ice_vf_clear_all_promisc_modes(struct ice_vf *vf, struct ice_vsi *vsi)
- {
- 	struct ice_pf *pf = vf->pf;
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.h b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-index 7a9c75d1d07c..a3501bd92311 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-@@ -310,6 +310,7 @@ bool ice_is_any_vf_in_unicast_promisc(struct ice_pf *pf);
- void
- ice_vf_get_promisc_masks(struct ice_vf *vf, struct ice_vsi *vsi,
- 			 u8 *ucast_m, u8 *mcast_m);
-+int ice_vf_clear_all_promisc_modes(struct ice_vf *vf, struct ice_vsi *vsi);
- int
- ice_vf_set_vsi_promisc(struct ice_vf *vf, struct ice_vsi *vsi, u8 promisc_m);
- int
--- 
-2.53.0
-
+Acked-by: Sean Christopherson <seanjc@google.com>
 
