@@ -1,130 +1,155 @@
-Return-Path: <netdev+bounces-280752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280753-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GI8kKl8U6mmytQIAu9opvQ
-	(envelope-from <netdev+bounces-280752-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 14:45:19 +0200
+	id QC8xKAoW6mlHtwIAu9opvQ
+	(envelope-from <netdev+bounces-280753-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 14:52:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F70E452321
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 14:45:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEFC2452560
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 14:52:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 01EAB3097DE0
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 12:42:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6D50830BEFE2
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 12:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D90B63EDAA3;
-	Thu, 23 Apr 2026 12:42:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7329F3EDACB;
+	Thu, 23 Apr 2026 12:48:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CL71IOE+"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="IQuj429Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6BE93ED5DB;
-	Thu, 23 Apr 2026 12:42:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3405B306B11;
+	Thu, 23 Apr 2026 12:48:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776948146; cv=none; b=k2P7c8j1Bmurwgr8KqABJFBL9LyUfZQyY1S8LlSciFrZbotLJljAoasR6hB8EK2gZBJAZjXduf3bo1lIUnIv4w5e7C/6+EuVLpD6Ra50MDOJk6YRl/+LqYgZym/1hXJ4rmqZbzom+Bh8/HmEwbOn+pcOmrTj+hB7XLaC5W+dXSo=
+	t=1776948492; cv=none; b=n+w7vHqBCrq3q/RAcyw1XYAwH7CWf5tC3h/MLMN8Vc9bpAPnaMlWlJL3kU6lTBVKS2gDMuOTUkqiYNwjpkPEuM6hp2ihjnuIJZKJbc8sD6wSuPxqR2j3e+Rpmj2RtZF/9QwR+4CbALiOuVvYG9aC663WfOkqIa7R5N2DiprLnAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776948146; c=relaxed/simple;
-	bh=Bx/9m+ue0sbCmAlZZ7RlFUBHs/8rfUrIxfR7ssMhcc0=;
+	s=arc-20240116; t=1776948492; c=relaxed/simple;
+	bh=vCN2HlAnO4nmInBDUaHYmYFdEuWV6o0FtfKcw/RZ274=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NvfuAl8vDhTpnOF1mTL3RRX7DpzpyA2LqWnDX+k+34akPZMOmXHDFS3ZcQAmAWzHtCH364AlRpu9FLqSrsG0B59YeziMPzmkWpGWhhofElRLb2OVXbIOylrbvCisk3OG6GwV54jbZHev5xin/Q2VP6QGXdUMoUTG5FDFPSiNlPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CL71IOE+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 575F1C2BCAF;
-	Thu, 23 Apr 2026 12:42:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776948146;
-	bh=Bx/9m+ue0sbCmAlZZ7RlFUBHs/8rfUrIxfR7ssMhcc0=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=Py6lm2vZUdgFbnj/EoD7Vhp/st6XFfZnteSC9uPSInOCxrEEazLbRdLNydtYs8Y0HBHcja605FKM8NAZoAlDIttw6uCuT2bdh8o8eFHljqWYTjtdVVdTtRI1LqCt8p+8zWNI38e9G1ZObEKhzqLSp4y1jx+ZKXWdf6e5Hivl4tA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=IQuj429Z; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 5634620B716C; Thu, 23 Apr 2026 05:48:11 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5634620B716C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1776948491;
+	bh=tYfcCNmDGFuPmCFHrVbO62C1GJgiMfAx2nXRPGoKCIs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CL71IOE+/XqllE4gYeqIHJf426vw84w4SoA2ZVOayvrebeHYvQ/L/8I8J7jQThlg0
-	 o7odu713HJiu38cDrLMMAy6AKG4up9pVyOqWAzCTktQZI9VBukjro7Byn6fvIYaXL9
-	 DhsXvWiVmaT9jowX+hVWtgGMqm7ojepdldQMh2lnoI997DbPM1f2wKYXBYyAiPLzWu
-	 yTdXSdlCBVwn0qNXNsGBljChDdRd7p4NZZ+I/stYiV5uWthvVcGjbFxkJk5LolVpbQ
-	 4TT2G7y5k/5+s2SVIhsi3KV5c0UhZY27SguPk/9BbGASqQ0sfisbnxXrv/OJIr5A8L
-	 77V3cIdwYpOyQ==
-Date: Thu, 23 Apr 2026 13:42:21 +0100
-From: Simon Horman <horms@kernel.org>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	sgoutham@marvell.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
-	dan.carpenter@linaro.org
-Subject: Re: [PATCH v2 net 04/11] octeontx2-af: npc: cn20k: Make default
- entries as x4.
-Message-ID: <20260423124221.GB900403@horms.kernel.org>
-References: <20260420023442.3295891-1-rkannoth@marvell.com>
- <20260420023442.3295891-5-rkannoth@marvell.com>
+	b=IQuj429ZBmOmbg4rZqnFcreE9tkZ61WuRRZHeOxFdwtV4YVrKTb16ajeM4V2TL68H
+	 2K+v4HirZDKf6EWy8eRi/dP4GCcYtuyJr2k2fwlZ1uWQm6ycpQqKg1tziwdzylBrOG
+	 b+hgLqvIKcM2lljxSeqrlyJaLAAA/BC+KyUPN8GA=
+Date: Thu, 23 Apr 2026 05:48:11 -0700
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, leon@kernel.org,
+	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	stephen@networkplumber.org, jacob.e.keller@intel.com,
+	leitao@debian.org, kees@kernel.org, john.fastabend@gmail.com,
+	hawk@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net,
+	ast@kernel.org, sdf@fomichev.me, dipayanroy@microsoft.com
+Subject: Re: [PATCH net-next v6 0/2] net: mana: add ethtool private flag for
+ full-page RX buffers
+Message-ID: <aeoVC27mIzoKytqA@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20260407200216.272659-1-dipayanroy@linux.microsoft.com>
+ <20260409183509.0b24dea6@kernel.org>
+ <20260412125917.4fa8fc8d@kernel.org>
+ <ad5kuCZz+gR1TlSh@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20260416083146.0bb94d2b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260420023442.3295891-5-rkannoth@marvell.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260416083146.0bb94d2b@kernel.org>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280752-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280753-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[32];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1F70E452321
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.microsoft.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid]
+X-Rspamd-Queue-Id: DEFC2452560
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 20, 2026 at 08:04:35AM +0530, Ratheesh Kannoth wrote:
-> X4 profile users won't alloc x2 entries. Allocating x2 entries
-> would cause under utilized subbanks(X2). Avoid this in X4 kex
-> profile, all allocations will be from x4 subbank.
+On Thu, Apr 16, 2026 at 08:31:46AM -0700, Jakub Kicinski wrote:
+> On Tue, 14 Apr 2026 09:00:56 -0700 Dipayaan Roy wrote:
+> > I still see roughly a 5% overhead from the atomic refcount operation
+> > itself, but on that platform there is no throughput drop when using
+> > page fragments versus full-page mode.
 > 
-> Fixes: 09d3b7a1403f ("octeontx2-af: npc: cn20k: Allocate default MCAM indexes")
-> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
-> ---
->  .../ethernet/marvell/octeontx2/af/cn20k/npc.c | 26 ++++++++--
->  .../marvell/octeontx2/nic/otx2_flows.c        | 48 +++++++++++++------
->  2 files changed, 56 insertions(+), 18 deletions(-)
+> That seems to contradict your claim that it's a problem with a specific
+> platform.. Since we're in the merge window I asked David Wei to try to
+> experiment with disabling page fragmentation on the ARM64 platforms we
+> have at Meta. If it repros we should use the generic rx-buf-len
+> ringparam because more NICs may want to implement this strategy.
 
-Hi Ratheesh,
+Hi Jakub,
 
-This patch seems to involve a non-trivial amount of refactoring
-in order to facilitate implementing the change described in the
-changelog. This makes review a bit challenging (for me).
+Thanks. I think I was not precise enough in my previous reply.
 
-I am wondering if the patch could be split into two: a refactor
-followed by the functional change.
+What I meant is that the atomic refcount cost itself does not appear to
+be unique to the affected platform. I see a similar ~5% overhead on
+another ARM64 platformi (different vendor) as well. However, on that platform
+there is no throughput delta between fragment mode and full-page mode; both reach
+line rate.
 
-Also, this feels more like an improvement to be targeted at net-next
-than a fix for net. If it is a bug fix, I think that warrants a being
-explained more clearly in the commit message.
+On the affected platform, fragment mode shows an additional ~15%
+throughput drop versus full-page mode. So the current data suggests that
+the atomic overhead is common, but the throughput regression is not
+explained by that overhead alone and likely depends on an additional
+platform-specific factor.
 
-Lastly, Sashiko generated a review of this patch. However, I do
-not believe the concerns it raises are bugs or need to block
-progress of this patchset.
+Separately, the hardware team collected PCIe traces on the affected
+platform and reported stalls in the fragment-mode case that are not seen
+in full-page mode. They are still investigating the root cause, but
+their current hypothesis is that this is related to that platform’s
+PCIe/root-port microarchitecture rather than to page_pool refcounting
+alone.
 
-...
+That said, I agree the right direction depends on whether this
+reproduces on other ARM64 platforms. If David is able to reproduce the
+same behavior, then using the generic rx-buf-len ringparam sounds like
+the better direction.
+
+Please let me know what David finds, and I can rework the patch
+accordingly.
+
+
+Regards
+Dipayaan Roy
 
