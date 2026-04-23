@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-280765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280766-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MHkDMMke6mntuQIAu9opvQ
-	(envelope-from <netdev+bounces-280765-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 15:29:45 +0200
+	id iECuAeIe6mntuQIAu9opvQ
+	(envelope-from <netdev+bounces-280766-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 15:30:10 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E1DD452E78
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 15:29:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 74A7F452E9D
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 15:30:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1E3753009B2E
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 13:23:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 73BAB303AF2F
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 13:23:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A1D13F0AA7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1BF3F0ABB;
 	Thu, 23 Apr 2026 13:23:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f77.google.com (mail-oo1-f77.google.com [209.85.161.77])
+Received: from mail-ot1-f80.google.com (mail-ot1-f80.google.com [209.85.210.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A623F0755
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 063D73F0A83
 	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 13:23:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.77
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776950615; cv=none; b=MRvBm4sAPIYXTZAVgRZjF4A3yGizm7IsCCcchzX2Dr5mdSJKMJKFoNRGSQfGbmRLS3R1FtK55hO7Q+3fhWV3Lq18tNMJN0gPZcH6FMxWzyYuUb22FaZ7kPVFj4lCaBgT6Dc7BxxrAFfKuD0ymwdhMnOxlSH31mdO89Lryd6PCFw=
+	t=1776950615; cv=none; b=J75vLRVzvjqzbIcR4GwL5gcnTs8gvmoyiGjYu2BiEbMyEsRr4tPQSABC8b9X44yk4ujMgKhVqAxDtWs/7hgSKA+0YXFcmBUHOTzf/d7qPtp/Jwbm9kjaPxfCENPbryz1dji+S98FOiva1ykBUE/hBgMU0B2T0a3iER5esz1esAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1776950615; c=relaxed/simple;
-	bh=63ShA8NK9kpnaJH+jLi3Lq4me0eshFWuqt1ONUPqAFQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Yir5r7XzkJTswq4VkLGT5SUEjmWS/7eGD5c+2CaYw353lgS89uMAjnhEhi7HzE9JAa2vq0K/8YG/O7Ye9jF6dgP4hN1budI4SLbVOjlxfxZ6tGxQ97s0dVftDJD9eTp/WzzLfRPHs5VTq3bH5MaLyTnNFx3zhoklzoOImPOxadE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.77
+	bh=kxR5kZe+RhUT1YsIZ7iRg17j5v51ZEPQ/oI9VX4dRiw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=NccprhFQ50/oVy60JYkO3ajSRMSd/zgqbXtkN0ZCW31llZ71kXjsu5FMZBNX3zrjaluRHVGnWlUbrrR+0aATmitlcxLiq0lHGZwgivjd1sFM1Noe+U6w39TPl3y2UctuPpsZi+p8aq/2Qdr+4GXMJAbitkr/Xf/7rBcZMx7fM1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f77.google.com with SMTP id 006d021491bc7-6949ebccfcdso2887267eaf.2
+Received: by mail-ot1-f80.google.com with SMTP id 46e09a7af769-7dccc707d36so4152013a34.3
         for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 06:23:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776950612; x=1777555412;
+        d=1e100.net; s=20251104; t=1776950613; x=1777555413;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=P3RxVIZmQIvR1MLx6j1nb0GzLH5yhyU+E4PLS8iiTg4=;
-        b=lIUuWJgj+xXsM3Z2LIiTaDYJHt3m3l1SJRjNFF3uM5r5LgXOawLT4AEFmVe9pjCIsV
-         MDA5pDCK2Kp/hNJIZnE+rmy28sZ6Dplq0sSQYt8PnxcttX1oNxPYDB8ZuMJtrA2zKOMB
-         Jp1Xv7YjVFmcFmiSMR5Hw2cnPAmocxiNq8Ceg2btuy00DKdsv6zjcR1UjrlcyY6PhAB+
-         gFRMkJ1XXxmqxWfB6RWZ1QqQnzPAwrTHKxBSFniLApxZuTYp2lGss6EPtw8vMTm1EAA8
-         9oJ3vO5gcE0d3VAY3vkOx1X0Vy5ddsuavKYSX7/p/2Hn6+WWYhlUti+BlYFmo/4PRU8G
-         PPkw==
-X-Forwarded-Encrypted: i=1; AFNElJ9+6GSoImoESrrTaCrudVtdqQPDVt96Hnsx3SRqKuNGf7uNgM5VXRhr917q5SD8NDZFu/4Z4dA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSef+7tUnfB6azujryIMf2OdRJ1E6HldMbklQZ0HxoaYb04NPb
-	7pUUoN5pqN9Czn0Ka5CmobIuTQuJjQseA2M/ITzlDtNTP4TeLmAvbg9YJrWjWivG6SysuGCj4Xc
-	g9gdcjRcAyXkyxrcFfdiu+XimbwxPGAtLh9KsSoT0Z41GmRCha8bwPviMCDQ=
+        bh=VZIEEV94aBlR3Ds7V+JNZozyuyfwHjuccKFw4gC7tm8=;
+        b=OR9wAisxC/WigSuHVWG2RZ845E4Sp+yTVq/qKsyuDusLNsuY3lU2MgsxdffyOGAVIc
+         O2M9pRX6NqiElnRVvA7BW+1UjT3bk81C7r5broylzw3R0HCE0nS+OINCcdODfxjxiT1u
+         5O6A/HOoTMyjcPCJ2cu7AZCHCatx3PGI2FRaA+skXY9PiHGTcdcGpjXG/WUt0Yff4zbk
+         ABzM5fmZgOIpQ4I90jajS/G2oJBMhegktz/s/JARq6tK6IFAnLGH5VrxJmQ8VShsr9sx
+         qylB5Sm2rYvEpjGrQEVSVJuPqGiMxVIh5UlLMANTXYteDIAZydwyK5qOr9I0x01TEGgM
+         4mpg==
+X-Forwarded-Encrypted: i=1; AFNElJ8V9U3aa9aOqnzrLQa8zXVM9n5oYlC0vkGjl3mBJsK1rMhbgnTEgy++YWcKxfA5wX5CczMQLnk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfRRibgWuVfPlKMMZ4+8FCgD0dARF8WRtaBfKrJK8nB70LFiw8
+	yafNmoHU5UDb/Gfs+H9lEfxkKOt7hhgu9ue6nhLCoY1wfKUUcgAs9ZoBRPysNlOI6q4FEE6JCXg
+	vk+h5cFvKiFabmnTZSw1/NzN0reI29uHj1KDxV7EVIJKdGQkd8Rya5a7pbQ4=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a4a:e90c:0:b0:694:8b4d:5f8f with SMTP id
- 006d021491bc7-6948b4d61b9mr9352920eaf.57.1776950612565; Thu, 23 Apr 2026
+X-Received: by 2002:a05:6820:62a:b0:67e:2e4d:6c75 with SMTP id
+ 006d021491bc7-69462f084a4mr15429094eaf.41.1776950612826; Thu, 23 Apr 2026
  06:23:32 -0700 (PDT)
 Date: Thu, 23 Apr 2026 06:23:32 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69ea1d54.a00a0220.9259.0026.GAE@google.com>
-Subject: [syzbot] [hams?] WARNING: ODEBUG bug in rose_release
-From: syzbot <syzbot+b091c5774423d1319a22@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
+Message-ID: <69ea1d54.a00a0220.9259.0027.GAE@google.com>
+Subject: [syzbot] [net?] WARNING: refcount bug in sk_common_release (2)
+From: syzbot <syzbot+8c9eede336e3a843750e@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
 	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 X-Spamd-Result: default: False [-0.36 / 15.00];
@@ -81,8 +81,8 @@ X-Spamd-Result: default: False [-0.36 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280765-lists,netdev=lfdr.de,b091c5774423d1319a22];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[googlegroups.com:email,storage.googleapis.com:url,goo.gl:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	TAGGED_FROM(0.00)[bounces-280766-lists,netdev=lfdr.de,8c9eede336e3a843750e];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[storage.googleapis.com:url,googlegroups.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,appspotmail.com:email,goo.gl:url];
 	REDIRECTOR_URL(0.00)[goo.gl];
 	TAGGED_RCPT(0.00)[netdev];
 	MAILSPIKE_FAIL(0.00)[2600:3c04:e001:36c::12fc:5321:server fail];
@@ -95,7 +95,7 @@ X-Spamd-Result: default: False [-0.36 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	R_DKIM_NA(0.00)[];
 	SUBJECT_HAS_QUESTION(0.00)[]
-X-Rspamd-Queue-Id: 0E1DD452E78
+X-Rspamd-Queue-Id: 74A7F452E9D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -105,9 +105,9 @@ syzbot found the following issue on:
 
 HEAD commit:    2a4c0c11c019 Merge tag 's390-7.1-1' of git://git.kernel.or..
 git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=12df3702580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=142dff16580000
 kernel config:  https://syzkaller.appspot.com/x/.config?x=3e19fa1907a3dfda
-dashboard link: https://syzkaller.appspot.com/bug?extid=b091c5774423d1319a22
+dashboard link: https://syzkaller.appspot.com/bug?extid=8c9eede336e3a843750e
 compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
 
 Unfortunately, I don't have any reproducer for this issue yet.
@@ -118,84 +118,85 @@ vmlinux: https://storage.googleapis.com/syzbot-assets/2702dddfd186/vmlinux-2a4c0
 kernel image: https://storage.googleapis.com/syzbot-assets/51878be8732c/bzImage-2a4c0c11.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b091c5774423d1319a22@syzkaller.appspotmail.com
+Reported-by: syzbot+8c9eede336e3a843750e@syzkaller.appspotmail.com
 
 ------------[ cut here ]------------
-ODEBUG: free active (active state 0) object: ffff88803f4d2090 object type: timer_list hint: rose_t0timer_expiry+0x0/0x150 include/linux/skbuff.h:2942
-WARNING: lib/debugobjects.c:629 at debug_print_object+0x18e/0x2a0 lib/debugobjects.c:629, CPU#2: syz.1.11287/7248
+refcount_t: underflow; use-after-free.
+WARNING: lib/refcount.c:28 at refcount_warn_saturate+0xf4/0x130 lib/refcount.c:28, CPU#1: syz.8.4131/20639
 Modules linked in:
-CPU: 2 UID: 0 PID: 7248 Comm: syz.1.11287 Tainted: G             L      syzkaller #0 PREEMPT(full) 
+CPU: 1 UID: 0 PID: 20639 Comm: syz.8.4131 Tainted: G             L      syzkaller #0 PREEMPT(full) 
 Tainted: [L]=SOFTLOCKUP
 Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-RIP: 0010:debug_print_object+0x19b/0x2a0 lib/debugobjects.c:629
-Code: b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 4f 48 8d 3d f2 18 e4 0b 41 56 48 8b 14 dd c0 33 1c 8c 4c 89 e6 <67> 48 0f b9 3a 58 83 05 0c c5 d9 0b 01 48 83 c4 18 5b 5d 41 5c 41
-RSP: 0018:ffffc90005ba7808 EFLAGS: 00010246
-RAX: dffffc0000000000 RBX: 0000000000000003 RCX: 0000000000000000
-RDX: ffffffff8c1c3300 RSI: ffffffff8c1c2f20 RDI: ffffffff90e6aac0
-RBP: 0000000000000001 R08: ffff88803f4d2090 R09: ffffffff8bb2c6e0
-R10: 0000000000000001 R11: 0000000000000000 R12: ffffffff8c1c2f20
-R13: ffffffff8bb2c720 R14: ffffffff8a84b230 R15: ffffc90005ba7908
-FS:  0000000000000000(0000) GS:ffff8880d64db000(0000) knlGS:0000000000000000
+RIP: 0010:refcount_warn_saturate+0xf4/0x130 lib/refcount.c:28
+Code: cc e8 60 a7 0f fd 48 8d 3d 99 d0 ec 0b 67 48 0f b9 3a e8 4f a7 0f fd 5b 5d e9 48 27 a4 06 e8 43 a7 0f fd 48 8d 3d 8c d0 ec 0b <67> 48 0f b9 3a e8 32 a7 0f fd 5b 5d c3 cc cc cc cc e8 26 a7 0f fd
+RSP: 0018:ffffc90003aaf120 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: ffff8880368a2280 RCX: ffffffff84f9d30b
+RDX: ffff888061e04a00 RSI: ffffffff84f9d39d RDI: ffffffff90e6a430
+RBP: 0000000000000003 R08: 0000000000000005 R09: 0000000000000004
+R10: 0000000000000003 R11: 0000000000000000 R12: ffff8880368a2280
+R13: ffffffff8a0c6f20 R14: 0000000000000000 R15: 0000000000000018
+FS:  00007fd377c686c0(0000) GS:ffff8880d63db000(0000) knlGS:0000000000000000
 CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000555594c2f9e8 CR3: 0000000039419000 CR4: 0000000000352ef0
+CR2: 0000001b33023ffc CR3: 00000000308a1000 CR4: 0000000000352ef0
 Call Trace:
  <TASK>
- __debug_check_no_obj_freed lib/debugobjects.c:1116 [inline]
- debug_check_no_obj_freed+0x4da/0x630 lib/debugobjects.c:1146
- slab_free_hook mm/slub.c:2620 [inline]
- slab_free mm/slub.c:6246 [inline]
- kfree+0x3d0/0x6c0 mm/slub.c:6561
- rose_neigh_put include/net/rose.h:166 [inline]
- rose_neigh_put include/net/rose.h:160 [inline]
- rose_release+0x60b/0x740 net/rose/af_rose.c:658
- __sock_release+0xb3/0x260 net/socket.c:722
- sock_close+0x1c/0x30 net/socket.c:1514
- __fput+0x3ff/0xb50 fs/file_table.c:510
- task_work_run+0x150/0x240 kernel/task_work.c:233
- exit_task_work include/linux/task_work.h:40 [inline]
- do_exit+0x8d2/0x2a60 kernel/exit.c:975
- do_group_exit+0xd5/0x2a0 kernel/exit.c:1117
- get_signal+0x1ec7/0x21e0 kernel/signal.c:3037
- arch_do_signal_or_restart+0x91/0x7a0 arch/x86/kernel/signal.c:337
- __exit_to_user_mode_loop kernel/entry/common.c:64 [inline]
- exit_to_user_mode_loop+0x86/0x4a0 kernel/entry/common.c:98
- __exit_to_user_mode_prepare include/linux/irq-entry-common.h:207 [inline]
- syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:238 [inline]
- syscall_exit_to_user_mode include/linux/entry-common.h:318 [inline]
- do_syscall_64+0x706/0xf80 arch/x86/entry/syscall_64.c:100
+ __refcount_sub_and_test include/linux/refcount.h:400 [inline]
+ __refcount_dec_and_test include/linux/refcount.h:432 [inline]
+ refcount_dec_and_test include/linux/refcount.h:450 [inline]
+ sock_put include/net/sock.h:2009 [inline]
+ sk_common_release+0x260/0x370 net/core/sock.c:4024
+ inet_release+0xed/0x200 net/ipv4/af_inet.c:442
+ __sock_release net/socket.c:722 [inline]
+ sock_release+0x91/0x1c0 net/socket.c:750
+ rxe_release_udp_tunnel drivers/infiniband/sw/rxe/rxe_net.c:294 [inline]
+ rxe_sock_put+0xae/0x130 drivers/infiniband/sw/rxe/rxe_net.c:639
+ rxe_net_del+0x83/0x120 drivers/infiniband/sw/rxe/rxe_net.c:660
+ rxe_dellink+0x15/0x20 drivers/infiniband/sw/rxe/rxe.c:254
+ nldev_dellink+0x289/0x3c0 drivers/infiniband/core/nldev.c:1849
+ rdma_nl_rcv_msg+0x392/0x6f0 drivers/infiniband/core/netlink.c:195
+ rdma_nl_rcv_skb.constprop.0.isra.0+0x2cb/0x410 drivers/infiniband/core/netlink.c:239
+ netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+ netlink_unicast+0x585/0x850 net/netlink/af_netlink.c:1344
+ netlink_sendmsg+0x8b0/0xda0 net/netlink/af_netlink.c:1894
+ sock_sendmsg_nosec net/socket.c:787 [inline]
+ __sock_sendmsg net/socket.c:802 [inline]
+ ____sys_sendmsg+0x9e1/0xb70 net/socket.c:2698
+ ___sys_sendmsg+0x190/0x1e0 net/socket.c:2752
+ __sys_sendmsg+0x170/0x220 net/socket.c:2784
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x10b/0xf80 arch/x86/entry/syscall_64.c:94
  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: eccb:0xe4a421182f13d611
-Code: Unable to access opcode bytes at 0xe4a421182f13d5e7.
-RSP: 002b:00007fb92f11ff58 EFLAGS: 00000756 ORIG_RAX: d1d66dbfed01019b
-RAX: 2bf9e1987c1988ee RBX: 6f67a894836fe1f3 RCX: ed0b474b2b46640f
-RDX: fb381f0b5e12d2ce RSI: 401aaa756d8c34aa RDI: 30b9ec15aecde911
-RBP: 532828f82bbb556c R08: dbce39d105fdbf88 R09: ae9ea378b9c9fbc7
-R10: 33740f3b8630618c R11: 2450ade207355af5 R12: 0a61688f027fb1a4
-R13: 339c71c774e61334 R14: 28baed4a0483d193 R15: 7c1f9cf2b758efdc
+RIP: 0033:0x7fd376d9c819
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fd377c68028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fd377016090 RCX: 00007fd376d9c819
+RDX: 0000000000000004 RSI: 0000200000004680 RDI: 0000000000000003
+RBP: 00007fd376e32c91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fd377016128 R14: 00007fd377016090 R15: 00007ffe66f5e6c8
  </TASK>
 ----------------
 Code disassembly (best guess):
-   0:	b8 00 00 00 00       	mov    $0x0,%eax
-   5:	00 fc                	add    %bh,%ah
-   7:	ff                   	lcall  (bad)
-   8:	df 48 89             	fisttps -0x77(%rax)
-   b:	fa                   	cli
-   c:	48 c1 ea 03          	shr    $0x3,%rdx
-  10:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
-  14:	75 4f                	jne    0x65
-  16:	48 8d 3d f2 18 e4 0b 	lea    0xbe418f2(%rip),%rdi        # 0xbe4190f
-  1d:	41 56                	push   %r14
-  1f:	48 8b 14 dd c0 33 1c 	mov    -0x73e3cc40(,%rbx,8),%rdx
-  26:	8c
-  27:	4c 89 e6             	mov    %r12,%rsi
+   0:	cc                   	int3
+   1:	e8 60 a7 0f fd       	call   0xfd0fa766
+   6:	48 8d 3d 99 d0 ec 0b 	lea    0xbecd099(%rip),%rdi        # 0xbecd0a6
+   d:	67 48 0f b9 3a       	ud1    (%edx),%rdi
+  12:	e8 4f a7 0f fd       	call   0xfd0fa766
+  17:	5b                   	pop    %rbx
+  18:	5d                   	pop    %rbp
+  19:	e9 48 27 a4 06       	jmp    0x6a42766
+  1e:	e8 43 a7 0f fd       	call   0xfd0fa766
+  23:	48 8d 3d 8c d0 ec 0b 	lea    0xbecd08c(%rip),%rdi        # 0xbecd0b6
 * 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
-  2f:	58                   	pop    %rax
-  30:	83 05 0c c5 d9 0b 01 	addl   $0x1,0xbd9c50c(%rip)        # 0xbd9c543
-  37:	48 83 c4 18          	add    $0x18,%rsp
-  3b:	5b                   	pop    %rbx
-  3c:	5d                   	pop    %rbp
-  3d:	41 5c                	pop    %r12
-  3f:	41                   	rex.B
+  2f:	e8 32 a7 0f fd       	call   0xfd0fa766
+  34:	5b                   	pop    %rbx
+  35:	5d                   	pop    %rbp
+  36:	c3                   	ret
+  37:	cc                   	int3
+  38:	cc                   	int3
+  39:	cc                   	int3
+  3a:	cc                   	int3
+  3b:	e8 26 a7 0f fd       	call   0xfd0fa766
 
 
 ---
