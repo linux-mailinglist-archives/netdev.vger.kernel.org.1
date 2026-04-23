@@ -1,574 +1,204 @@
-Return-Path: <netdev+bounces-280645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280648-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 17DpDWvN6Wm9kgIAu9opvQ
-	(envelope-from <netdev+bounces-280645-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 09:42:35 +0200
+	id sFfAKH3O6Wm9kgIAu9opvQ
+	(envelope-from <netdev+bounces-280648-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 09:47:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2D4E44E134
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 09:42:34 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3878A44E208
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 09:47:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7BC3A3016038
-	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 07:42:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D769030BBE0D
+	for <lists+netdev@lfdr.de>; Thu, 23 Apr 2026 07:43:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02D52316189;
-	Thu, 23 Apr 2026 07:42:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D2A3264C8;
+	Thu, 23 Apr 2026 07:42:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OkUqYUjb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CY+i9rXP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B3430FF37;
-	Thu, 23 Apr 2026 07:42:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE0C320A14
+	for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 07:42:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776930135; cv=none; b=R6SKgNmdA9RnMaLL1a+JWoakclWlCfSsSwdxaPuBqygXQRW3PpmUHOnjJea+Tjh2Rqqg+nEot/GDwiW0MHZj7TAYQ3XxE3OKCGbPJLiE+l4bXlFMZCPrTtyofC5un2Mq2LMsMzGF4eoUgGHh+13TajBcWc2/gY2aULndARu4hgY=
+	t=1776930151; cv=none; b=pqfUUsaR0M6Ff9rCh905EUlYxilbZrdp76ZmD0EzBXYUh4t6dQAiq9dpMD1mKhw9ejeZyfEoYjDhpj6///+VwUTScLIoVLeqjjAEdkKZcTg8EjX0z63V2D4SiQudDu/5wENC5qAEujIj31OMyUI/5EBnYLZdj5Lamxk+kStMDvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776930135; c=relaxed/simple;
-	bh=0lHQl65JViCcYaSRexKi4sz3ALisV44JRIeCGFa8Lnk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ULWBCnSyI0fj/ghQsemO/e1tuDFUSkETc3pAOFF5DBGXqmoVY9vfsugOQFJtj0UzyDnLADGDOD0xBmzEm56dP1jy7g9D5yNHDqZXWCqUSjotlhlLFHIkvv67R0A8TydqMUPifxvuyS8V0Ehj3IQ4IMW/xZUMBvmeMX4gxpmfUig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OkUqYUjb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8EFD8C2BCB9;
-	Thu, 23 Apr 2026 07:42:15 +0000 (UTC)
+	s=arc-20240116; t=1776930151; c=relaxed/simple;
+	bh=XRdpb9nVRkqJctOt0Dfi0nllkU3AoSVeiFDjds5RJCA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kb8eNajv60/n2JEgSl/LpJ9K9lGrA/QUPw9t4B9JWslXbw/AhzuYfYVngbsUcbKZ9TZXl+ON6z/yUaQDqg0oYjOzxCqhnu29XVnjkUgBGkgAbtJhmKqPk7lc3R5VdwBXK6Aeb0cO9t9eBlb2Qk0lVXIcpwDGlV0peVsDLJaGRVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CY+i9rXP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC7C2C2BCAF;
+	Thu, 23 Apr 2026 07:42:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776930135;
-	bh=0lHQl65JViCcYaSRexKi4sz3ALisV44JRIeCGFa8Lnk=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=OkUqYUjbwuWR+LYr3DXgoqMV482dX4vQ0RVHEPPeuimk58haF/evc+quFiGr1kyAL
-	 jafCNWkNdJJb9VWqenp7BFaI5GKdytnU43DWDu0R2xKiHZnNOhjhsXjTZf70HdscsP
-	 I2Rod1dy5BVfYygyribd196jYaeFN7KjTif/kLenyYJ8UdV8OwDMm4SFGdt4iX7sMZ
-	 8wsazioXHj1ya/XeS60pits68i2iTmUwrlS4UQS/3HnB8H33JZp1Vbq2+qSfvzkCwU
-	 h1k6v+OKqOBIh1jem+9p/ROdl2fc+jyxcuOXOoxaBo6AiwU0GRS52KL7pmO1Mjya2/
-	 0EM+YMrsOv8Gw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 888A1F9934D;
-	Thu, 23 Apr 2026 07:42:15 +0000 (UTC)
-From: Corey Leavitt via B4 Relay <devnull+corey.leavitt.info@kernel.org>
-Date: Thu, 23 Apr 2026 01:42:17 -0600
-Subject: [PATCH RFC net-next 4/4] net: phy: own phydev->psec via PSE
- notifier and remove fwnode_mdio hook
+	s=k20201202; t=1776930151;
+	bh=XRdpb9nVRkqJctOt0Dfi0nllkU3AoSVeiFDjds5RJCA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CY+i9rXP7j/oBVjARa/Hga/mWJYfWrYij6Ejp9K8Fmx0Fw52s4dCXIhvCr4xf4AjC
+	 FTw+atqA7j65Cn7ygGjeEL27vpc0HE1LEpl9kwxrUt6m/TmN6E055rWYx2vlycLXgH
+	 jdwz/9GyxoyZWXWYQ0Ink7GFquEUAiigkToZ/84M7crxVGd4r7DcWI93Rs5xWvZknE
+	 HaO/yxJ0/LpHzxR3I3UNkOJd8s1jMt3Vh2WJhCoUmVW1ti3bHRrN7cjsL+L87uABsU
+	 APkFOfhiQsdu7qcAHL4wPA+BiMgpXi4oWVzwVSAVhYMj11JKDf4bvq5Mg4z2OQkA38
+	 UiLHj27jE0X5w==
+Date: Thu, 23 Apr 2026 09:42:28 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: airoha: stop net_device TX queue before
+ updating CPU index
+Message-ID: <aenNZELmY3Z7VP7j@lore-desk>
+References: <20260421-airoha-xmit-stop-condition-v1-1-e670d6a48467@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260423-pse-notifier-decouple-v1-4-86ed750a9d62@leavitt.info>
-References: <20260423-pse-notifier-decouple-v1-0-86ed750a9d62@leavitt.info>
-In-Reply-To: <20260423-pse-notifier-decouple-v1-0-86ed750a9d62@leavitt.info>
-To: Oleksij Rempel <o.rempel@pengutronix.de>, 
- Kory Maincent <kory.maincent@bootlin.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Corey Leavitt <corey@leavitt.info>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1776930134; l=15445;
- i=corey@leavitt.info; s=default; h=from:subject:message-id;
- bh=doMA7uwXNEZkymG7Ed0bflskqQqfJ/G13i1ggh380Aw=;
- b=QY4BAIghTuSOAsdlA3Y8aWcsUOy+PuRg8hq7J4GiJKFGv2hZeeb7k0cAYzILD1/qDkysypc0A
- disOxvRubHUB1BNCYsOrgq9NtNRYUHuzS9oM7C6DTBO+0lhNLbCVOZG
-X-Developer-Key: i=corey@leavitt.info; a=ed25519;
- pk=Q3mmZT+4CRYT8qp8RWvab30X2v2JnLdhHuK7YIHKzpI=
-X-Endpoint-Received: by B4 Relay for corey@leavitt.info/default with
- auth_id=748
-X-Original-From: Corey Leavitt <corey@leavitt.info>
-Reply-To: corey@leavitt.info
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="n+fdmW4T+/Z6vLY1"
+Content-Disposition: inline
+In-Reply-To: <20260421-airoha-xmit-stop-condition-v1-1-e670d6a48467@kernel.org>
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-280648-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280645-lists,netdev=lfdr.de,corey.leavitt.info];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[pengutronix.de,bootlin.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	HAS_REPLYTO(0.00)[corey@leavitt.info];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[leavitt.info:email,leavitt.info:replyto,leavitt.info:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nxp.com:email]
-X-Rspamd-Queue-Id: C2D4E44E134
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3878A44E208
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Corey Leavitt <corey@leavitt.info>
 
-Transfer ownership of phydev->psec from fwnode_mdio to the phy
-subsystem itself. The phy subsystem now subscribes to the pse-pd
-notifier chain and manages psec attach/detach in response to PSE
-controller lifecycle events, while fwnode_mdio loses its PSE
-awareness entirely.
+--n+fdmW4T+/Z6vLY1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Split phy_device_register() into a public entry point that takes
-rtnl_lock() and a phy_device_register_locked() variant that assumes
-rtnl is already held. Callers that already hold rtnl (the SFP
-module state machine via __sfp_sm_event) use the _locked form to
-avoid deadlock; all other callers use the unchanged public API.
-This pair mirrors the register_netdevice() / register_netdev()
-split convention already established in the core networking stack.
-rtnl must span the full registration sequence through device_add(),
-not just phy_try_attach_pse(): a PSE_REGISTERED event firing between
-a narrow attach lock and device_add() would walk mdio_bus_type, find
-the phy not yet on the bus, and leave it permanently unattached.
+> Currently, airoha_eth driver updates the CPU index register prior of
+> verifying whether the number of free descriptors has fallen below the
+> threshold.
+> Move net_device TX queue length check before updating the TX CPU index
+> in order to update TX CPU index even if there are more packets to be
+> transmitted but the net_device TX queue is going to be stopped
+> accounting the inflight packets.
+>=20
+> Fixes: 1d304174106c ("net: airoha: Implement BQL support")
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+>  drivers/net/ethernet/airoha/airoha_eth.c | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
+net/airoha/airoha_eth.c
+> index 19f67c7dd8e1..5d327237e274 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> @@ -2058,17 +2058,16 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff=
+ *skb,
+> =20
+>  	skb_tx_timestamp(skb);
+>  	netdev_tx_sent_queue(txq, skb->len);
+> +	if (q->ndesc - q->queued < q->free_thr) {
+> +		netif_tx_stop_queue(txq);
+> +		q->txq_stopped =3D true;
+> +	}
+> =20
+>  	if (netif_xmit_stopped(txq) || !netdev_xmit_more())
+>  		airoha_qdma_rmw(qdma, REG_TX_CPU_IDX(qid),
+>  				TX_RING_CPU_IDX_MASK,
+>  				FIELD_PREP(TX_RING_CPU_IDX_MASK, index));
+> =20
+> -	if (q->ndesc - q->queued < q->free_thr) {
+> -		netif_tx_stop_queue(txq);
+> -		q->txq_stopped =3D true;
+> -	}
+> -
+>  	spin_unlock_bh(&q->lock);
+> =20
+>  	return NETDEV_TX_OK;
+>=20
+> ---
+> base-commit: a663bac71a2f0b3ac6c373168ca57b2a6e6381aa
+> change-id: 20260421-airoha-xmit-stop-condition-344dc0292a19
+>=20
+> Best regards,
+> --=20
+> Lorenzo Bianconi <lorenzo@kernel.org>
+>=20
 
-With rtnl held across the full registration sequence:
+commenting on Sashiko retported issues:
+https://sashiko.dev/#/patchset/20260421-airoha-xmit-stop-condition-v1-1-e67=
+0d6a48467%40kernel.org
 
-  - At phy_device_register_locked(), phy_try_attach_pse() attempts
-    an of_pse_control_get() for phys whose DT pses phandle resolves
-    now. If the controller is already registered, psec is attached
-    before device_add() makes the phy visible on mdio_bus_type.
-    If the controller is not yet registered, the swallow-error path
-    leaves psec NULL and relies on the subsequent notifier event.
+- Could this cause a deadlock if exactly q->free_thr descriptors are free?
+  This does not seem a problem to me since, even if the netdev tx queue is
+  stopped as described in the report, the airoha_qdma_tx_napi_poll() will f=
+ree
+  space in the queue and subsequent packets will update REG_TX_CPU_IDX regi=
+ster.
 
-  - On PSE_REGISTERED: an rtnl-guarded bus walk retries the attach
-    for every registered phy whose psec is still NULL. This is the
-    "phy was enumerated before the PSE controller loaded" case,
-    which is the root cause of the boot-time probe-retry storm on
-    systems with a modular PSE controller driver. Because the
-    pse_controller_notifier is fired synchronously, a concurrent
-    pse_controller_register() either (a) completes list_add and
-    releases pse_list_mutex before this function takes rtnl, in
-    which case phy_try_attach_pse() finds the controller in the
-    list and attaches; or (b) fires its notifier during this
-    function, in which case the callback blocks on rtnl until this
-    function returns, then walks the bus and finds the phy fully
-    registered (attaching if psec is still NULL).
+- Is it possible for this loop to read past the end of the frags array?
+  As pointed out by Sashiko, this issue is not introduced by this patch and=
+ I
+  will fix with a dedicated patch.
 
-  - On PSE_UNREGISTERED: an rtnl-guarded bus walk releases every
-    phydev->psec that targets the departing controller before
-    pse_release_pis() frees pcdev->pi. Without this, a phy still
-    holding a pse_control reference would cause a use-after-free
-    in __pse_control_release's pcdev->pi[psec->id] access, and the
-    PSE driver module could not finish unloading while any phy
-    still held a reference via module_put().
+- Might this lead to memory corruption if the tcp header is not in the line=
+ar area?
+  This issue is not introduced by this patch and I will fix with a dedicate=
+d patch.
 
-Introduce phy_try_attach_pse() as the rtnl-guarded helper used by
-both the register path and the notifier walk. Holding rtnl across
-of_pse_control_get() is safe because pse_list_mutex is never held
-in the opposite order.
+- If an error occurs during transmission, the driver jumps to the error lab=
+el
+  frees the skb, and returns NETDEV_TX_OK without ringing the qdma cpu inde=
+x doorbell?
+  Similar to the first issue, this does not seem a problem to me since subs=
+equent
+  packets will update REG_TX_CPU_IDX register.
 
-Expose pse_control_matches_pcdev() as a predicate so subscribers
-can identify which of their held pse_control references target a
-given controller, without leaking the struct pse_controller_dev *
-out of pse_control opacity.
+Regards,
+Lorenzo
 
-Move the final pse_control_put() of phydev->psec from
-phy_device_remove() to phy_device_release(). The kobject release
-callback runs only after every reference on the device has been
-dropped, including the bus iterator references taken by
-bus_for_each_dev() in the notifier walk, which means by the time
-release fires no concurrent reader or writer of phydev->psec can
-exist. The mdio_bus_type klist is set up in bus_register() with
-klist_devices_get() / klist_devices_put() (drivers/base/bus.c),
-which bracket each iteration step with get_device() / put_device()
-on the underlying struct device; that reference defers the release
-callback from firing until the walk has advanced past this phy.
-Keeping phy_device_remove() unchanged avoids introducing a new
-locking contract on its many callers (sfp, fixed_phy, xgbe, hns,
-netsec, bcm_sf2, mdiobus_unregister).
+--n+fdmW4T+/Z6vLY1
+Content-Type: application/pgp-signature; name=signature.asc
 
-Finally, delete fwnode_find_pse_control() and its call site in
-fwnode_mdiobus_register_phy(), and drop the PSE header from
-fwnode_mdio.c. This removes the probe-time -EPROBE_DEFER coupling
-between mdio and pse-pd that caused the boot-hang regression on
-systems with a modular PSE controller driver and a DT phy with a
-pses phandle: the MDIO/DSA probe no longer sees any PSE-originated
--EPROBE_DEFER, so the probe-retry storm is gone. fwnode_mdio is
-now PSE-agnostic.
+-----BEGIN PGP SIGNATURE-----
 
-Fixes: fa2f0454174c ("net: pse-pd: Introduce attached_phydev to pse control")
-Signed-off-by: Corey Leavitt <corey@leavitt.info>
----
- drivers/net/mdio/fwnode_mdio.c |  34 ----------
- drivers/net/phy/phy_device.c   | 144 ++++++++++++++++++++++++++++++++++++++---
- drivers/net/phy/sfp.c          |   2 +-
- drivers/net/pse-pd/pse_core.c  |  14 ++++
- include/linux/phy.h            |   2 +
- include/linux/pse-pd/pse.h     |   9 +++
- 6 files changed, 161 insertions(+), 44 deletions(-)
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaenNZAAKCRA6cBh0uS2t
+rC1vAP9MtTmL8U3BdrfMedc+Vlc+MTA91gnMBQG8HOGouOvAdgEA1r1ltUGjtato
+t0YBtofFZLtW7ijWbfS45I4FIwGzKAo=
+=N6KP
+-----END PGP SIGNATURE-----
 
-diff --git a/drivers/net/mdio/fwnode_mdio.c b/drivers/net/mdio/fwnode_mdio.c
-index ba7091518265..7bd979b59f49 100644
---- a/drivers/net/mdio/fwnode_mdio.c
-+++ b/drivers/net/mdio/fwnode_mdio.c
-@@ -11,33 +11,11 @@
- #include <linux/fwnode_mdio.h>
- #include <linux/of.h>
- #include <linux/phy.h>
--#include <linux/pse-pd/pse.h>
- 
- MODULE_AUTHOR("Calvin Johnson <calvin.johnson@oss.nxp.com>");
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("FWNODE MDIO bus (Ethernet PHY) accessors");
- 
--static struct pse_control *
--fwnode_find_pse_control(struct fwnode_handle *fwnode,
--			struct phy_device *phydev)
--{
--	struct pse_control *psec;
--	struct device_node *np;
--
--	if (!IS_ENABLED(CONFIG_PSE_CONTROLLER))
--		return NULL;
--
--	np = to_of_node(fwnode);
--	if (!np)
--		return NULL;
--
--	psec = of_pse_control_get(np, phydev);
--	if (PTR_ERR(psec) == -ENOENT)
--		return NULL;
--
--	return psec;
--}
--
- static struct mii_timestamper *
- fwnode_find_mii_timestamper(struct fwnode_handle *fwnode)
- {
-@@ -118,7 +96,6 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
- 				struct fwnode_handle *child, u32 addr)
- {
- 	struct mii_timestamper *mii_ts = NULL;
--	struct pse_control *psec = NULL;
- 	struct phy_device *phy;
- 	bool is_c45;
- 	u32 phy_id;
-@@ -159,14 +136,6 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
- 			goto clean_phy;
- 	}
- 
--	psec = fwnode_find_pse_control(child, phy);
--	if (IS_ERR(psec)) {
--		rc = PTR_ERR(psec);
--		goto unregister_phy;
--	}
--
--	phy->psec = psec;
--
- 	/* phy->mii_ts may already be defined by the PHY driver. A
- 	 * mii_timestamper probed via the device tree will still have
- 	 * precedence.
-@@ -176,9 +145,6 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
- 
- 	return 0;
- 
--unregister_phy:
--	if (is_acpi_node(child) || is_of_node(child))
--		phy_device_remove(phy);
- clean_phy:
- 	phy_device_free(phy);
- clean_mii_ts:
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index c2cdf1ae3542..7948800e6e49 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -223,8 +223,19 @@ static void phy_mdio_device_free(struct mdio_device *mdiodev)
- 
- static void phy_device_release(struct device *dev)
- {
-+	struct phy_device *phydev = to_phy_device(dev);
-+
-+	/* bus_for_each_dev() holds get_device() across each iteration
-+	 * step, deferring this release callback until any in-flight PSE
-+	 * notifier walk has advanced past this phy. pse_control_put()
-+	 * takes pse_list_mutex, so this path must run in sleepable
-+	 * context.
-+	 */
-+	might_sleep();
-+	pse_control_put(phydev->psec);
-+
- 	fwnode_handle_put(dev->fwnode);
--	kfree(to_phy_device(dev));
-+	kfree(phydev);
- }
- 
- static void phy_mdio_device_remove(struct mdio_device *mdiodev)
-@@ -1102,14 +1113,102 @@ struct phy_device *get_phy_device(struct mii_bus *bus, int addr, bool is_c45)
- }
- EXPORT_SYMBOL(get_phy_device);
- 
--/**
-- * phy_device_register - Register the phy device on the MDIO bus
-- * @phydev: phy_device structure to be added to the MDIO bus
-+/* Best-effort attach of phydev->psec from a DT `pses = <&...>` phandle.
-+ * Caller must hold rtnl. Errors are swallowed; the notifier retries
-+ * at PSE_REGISTERED time.
-  */
--int phy_device_register(struct phy_device *phydev)
-+static void phy_try_attach_pse(struct phy_device *phydev)
-+{
-+	struct pse_control *psec;
-+	struct device_node *np;
-+
-+	ASSERT_RTNL();
-+
-+	np = phydev->mdio.dev.of_node;
-+	if (!np)
-+		return;
-+
-+	if (phydev->psec)
-+		return;
-+
-+	psec = of_pse_control_get(np, phydev);
-+	if (IS_ERR(psec))
-+		return;
-+
-+	phydev->psec = psec;
-+}
-+
-+static int phy_pse_attach_one(struct device *dev, void *data __maybe_unused)
-+{
-+	ASSERT_RTNL();
-+
-+	if (dev->type != &mdio_bus_phy_type)
-+		return 0;
-+
-+	phy_try_attach_pse(to_phy_device(dev));
-+	return 0;
-+}
-+
-+static int phy_pse_detach_one(struct device *dev, void *data)
-+{
-+	struct pse_controller_dev *pcdev = data;
-+	struct phy_device *phydev;
-+	struct pse_control *psec;
-+
-+	ASSERT_RTNL();
-+
-+	if (dev->type != &mdio_bus_phy_type)
-+		return 0;
-+
-+	phydev = to_phy_device(dev);
-+	psec = phydev->psec;
-+	if (!psec || !pse_control_matches_pcdev(psec, pcdev))
-+		return 0;
-+
-+	phydev->psec = NULL;
-+	pse_control_put(psec);
-+	return 0;
-+}
-+
-+static int phy_pse_notifier_event(struct notifier_block *nb,
-+				  unsigned long event, void *data)
-+{
-+	switch (event) {
-+	case PSE_REGISTERED:
-+		rtnl_lock();
-+		bus_for_each_dev(&mdio_bus_type, NULL, NULL,
-+				 phy_pse_attach_one);
-+		rtnl_unlock();
-+		return NOTIFY_OK;
-+	case PSE_UNREGISTERED:
-+		rtnl_lock();
-+		bus_for_each_dev(&mdio_bus_type, NULL, data,
-+				 phy_pse_detach_one);
-+		rtnl_unlock();
-+		return NOTIFY_OK;
-+	default:
-+		return NOTIFY_DONE;
-+	}
-+}
-+
-+static struct notifier_block phy_pse_notifier __read_mostly = {
-+	.notifier_call = phy_pse_notifier_event,
-+};
-+
-+/**
-+ * phy_device_register_locked - Register the phy device on the MDIO bus
-+ * @phydev: phy_device structure to be added to the MDIO bus
-+ *
-+ * Same as phy_device_register() but caller must already hold rtnl_lock().
-+ *
-+ * Return: 0 on success, negative error code on failure.
-+ */
-+int phy_device_register_locked(struct phy_device *phydev)
- {
- 	int err;
- 
-+	ASSERT_RTNL();
-+
- 	err = mdiobus_register_device(&phydev->mdio);
- 	if (err)
- 		return err;
-@@ -1124,6 +1223,8 @@ int phy_device_register(struct phy_device *phydev)
- 		goto out;
- 	}
- 
-+	phy_try_attach_pse(phydev);
-+
- 	err = device_add(&phydev->mdio.dev);
- 	if (err) {
- 		phydev_err(phydev, "failed to add\n");
-@@ -1133,12 +1234,32 @@ int phy_device_register(struct phy_device *phydev)
- 	return 0;
- 
-  out:
--	/* Assert the reset signal */
-+	/* If phy_try_attach_pse() set phydev->psec before device_add()
-+	 * failed, the caller's phy_device_free() -> phy_device_release()
-+	 * chain will drop it.
-+	 */
- 	phy_device_reset(phydev, 1);
--
- 	mdiobus_unregister_device(&phydev->mdio);
- 	return err;
- }
-+EXPORT_SYMBOL(phy_device_register_locked);
-+
-+/**
-+ * phy_device_register - Register the phy device on the MDIO bus
-+ * @phydev: phy_device structure to be added to the MDIO bus
-+ *
-+ * Return: 0 on success, negative error code on failure.
-+ */
-+int phy_device_register(struct phy_device *phydev)
-+{
-+	int err;
-+
-+	rtnl_lock();
-+	err = phy_device_register_locked(phydev);
-+	rtnl_unlock();
-+
-+	return err;
-+}
- EXPORT_SYMBOL(phy_device_register);
- 
- /**
-@@ -1152,8 +1273,6 @@ EXPORT_SYMBOL(phy_device_register);
- void phy_device_remove(struct phy_device *phydev)
- {
- 	unregister_mii_timestamper(phydev->mii_ts);
--	pse_control_put(phydev->psec);
--
- 	device_del(&phydev->mdio.dev);
- 
- 	/* Assert the reset signal */
-@@ -3962,8 +4081,14 @@ static int __init phy_init(void)
- 	if (rc)
- 		goto err_c45;
- 
-+	rc = pse_register_notifier(&phy_pse_notifier);
-+	if (rc)
-+		goto err_genphy;
-+
- 	return 0;
- 
-+err_genphy:
-+	phy_driver_unregister(&genphy_driver);
- err_c45:
- 	phy_driver_unregister(&genphy_c45_driver);
- err_ethtool_phy_ops:
-@@ -3980,6 +4105,7 @@ static int __init phy_init(void)
- 
- static void __exit phy_exit(void)
- {
-+	pse_unregister_notifier(&phy_pse_notifier);
- 	phy_driver_unregister(&genphy_c45_driver);
- 	phy_driver_unregister(&genphy_driver);
- 	rtnl_lock();
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index bd970f753beb..d19fe0f30c5d 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -1932,7 +1932,7 @@ static int sfp_sm_probe_phy(struct sfp *sfp, int addr, bool is_c45)
- 	/* Mark this PHY as being on a SFP module */
- 	phy->is_on_sfp_module = true;
- 
--	err = phy_device_register(phy);
-+	err = phy_device_register_locked(phy);
- 	if (err) {
- 		phy_device_free(phy);
- 		dev_err(sfp->dev, "phy_device_register failed: %pe\n",
-diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
-index 82125502a8e3..a0667324a029 100644
---- a/drivers/net/pse-pd/pse_core.c
-+++ b/drivers/net/pse-pd/pse_core.c
-@@ -2016,3 +2016,17 @@ bool pse_has_c33(struct pse_control *psec)
- 	return psec->pcdev->types & ETHTOOL_PSE_C33;
- }
- EXPORT_SYMBOL_GPL(pse_has_c33);
-+
-+/**
-+ * pse_control_matches_pcdev - Test whether a pse_control targets a controller
-+ * @psec: pse_control obtained from of_pse_control_get()
-+ * @pcdev: PSE controller to compare against
-+ *
-+ * Return: %true if @psec was obtained from @pcdev, %false otherwise.
-+ */
-+bool pse_control_matches_pcdev(struct pse_control *psec,
-+			       struct pse_controller_dev *pcdev)
-+{
-+	return psec->pcdev == pcdev;
-+}
-+EXPORT_SYMBOL_GPL(pse_control_matches_pcdev);
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 199a7aaa341b..865b9baddb85 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -2158,6 +2158,8 @@ struct phy_device *fwnode_phy_find_device(struct fwnode_handle *phy_fwnode);
- struct fwnode_handle *fwnode_get_phy_node(const struct fwnode_handle *fwnode);
- struct phy_device *get_phy_device(struct mii_bus *bus, int addr, bool is_c45);
- int phy_device_register(struct phy_device *phy);
-+/* Caller must hold rtnl_lock(); see phy_device_register() for the public form. */
-+int phy_device_register_locked(struct phy_device *phy);
- void phy_device_free(struct phy_device *phydev);
- void phy_device_remove(struct phy_device *phydev);
- int phy_get_c45_ids(struct phy_device *phydev);
-diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
-index 78fe3a2b1ea8..d4310ca71a3e 100644
---- a/include/linux/pse-pd/pse.h
-+++ b/include/linux/pse-pd/pse.h
-@@ -385,6 +385,9 @@ int pse_ethtool_set_prio(struct pse_control *psec,
- bool pse_has_podl(struct pse_control *psec);
- bool pse_has_c33(struct pse_control *psec);
- 
-+bool pse_control_matches_pcdev(struct pse_control *psec,
-+			       struct pse_controller_dev *pcdev);
-+
- int pse_register_notifier(struct notifier_block *nb);
- int pse_unregister_notifier(struct notifier_block *nb);
- 
-@@ -438,6 +441,12 @@ static inline bool pse_has_c33(struct pse_control *psec)
- 	return false;
- }
- 
-+static inline bool pse_control_matches_pcdev(struct pse_control *psec,
-+					     struct pse_controller_dev *pcdev)
-+{
-+	return false;
-+}
-+
- static inline int pse_register_notifier(struct notifier_block *nb)
- {
- 	return 0;
-
--- 
-2.53.0
-
-
+--n+fdmW4T+/Z6vLY1--
 
