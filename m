@@ -1,286 +1,131 @@
-Return-Path: <netdev+bounces-280899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280900-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ANdhFzC46mmNCwAAu9opvQ
-	(envelope-from <netdev+bounces-280899-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 02:24:16 +0200
+	id yKJFImy86mlPDAAAu9opvQ
+	(envelope-from <netdev+bounces-280900-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 02:42:20 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE7184588FB
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 02:24:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D56AE45897E
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 02:42:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 77BA8300736C
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 00:23:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7C6B430078E8
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 00:42:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90A1A1CEADB;
-	Fri, 24 Apr 2026 00:23:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B14717D6;
+	Fri, 24 Apr 2026 00:42:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sZLSlA2s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f77.google.com (mail-ot1-f77.google.com [209.85.210.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73C512E1E9
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 00:23:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7603A1E7C18
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 00:42:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776990213; cv=none; b=srTyNn2jfN20FPRqEqFms90Nu3uZpGCm5sZZ40/V88tggGeSCVi9tgY+ok3vmA87yFPzW3U+Ba3tjVTz63xlbAVHQ/T065i5eBuhw9i1pvW8Dzujl759R+SjCJM4MHa76ZCD3rH0s+4nc3Vitl8v8kQrPp9wKjswXbdkXMNGnVI=
+	t=1776991337; cv=none; b=IN5RUe6NcHPY43KGDVaBy2Y57eNl5YhSUPc5Hq4eV8xMcNIvvbJBpXREfgp1o+vVfca0CgqG9aUvI/vHRBmOZz+Feo9RcYqKhBvZzx79VEbieDGD012rzJ2bHv6CbRSYhlMOF0u6HnnoOQ4BKUTTE+S1MsNIbJc8H+t3G7v+Qgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776990213; c=relaxed/simple;
-	bh=5m7vaCWCW/Dp50arIK7vZoYoBwVtPNWeTXYDEj46N3U=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=fkogTw5dpPxIRqoBb/vhr1W0Eo5X5JJqNZl90bYr/6cGKlcPBfekBuLCMeQ9DMBrgnrn7Nid/j5gTonBWmYgRmrTRvsawlVhIcRunzy8IdjCkMRHy0eLM4oTDOhvu7my4dltEstuB2Be6NpkbEkeTARI7R0hEg/r1d9NXwbpTKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f77.google.com with SMTP id 46e09a7af769-7dbe0e914adso11178764a34.2
-        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 17:23:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776990211; x=1777595011;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IaunhynHfLXlsj+OKWi/KTfUfNlbIvYRUylj6i26Qx8=;
-        b=TyozzEZrHh1xOTXuI/Z18UVm4LCzkyknAQErTPPohlM+EUDVn+tUBlQ9n/qsdAAHKf
-         mzJyLYk02i/9guN9hLRdDIzAhT3AgBNCHmhOnjRIdo2RepJoH5Ftofpzv5LM6YfZUE8X
-         eyh0ZUIOIVOvsnsl/ElsPzQtbcflCd/Mqea3nB1/wIVnl0hvErCBLdEEmsONnxZr0cCG
-         ceN03nNaK86SEZICG+uxSfcvXEZJOXOoWb0Xv6VCCpppKEvJDI2Nls48O2VbjlNHbjuX
-         nzA1QanNJkSlIVnFyUTpKQJ86xPeZxic1n2ssD5/RdRD8Y/Xd18FFK2lzZM7+iblrJEI
-         cM/Q==
-X-Forwarded-Encrypted: i=1; AFNElJ9FGrR9JJxDHa/ql42BmbcT/MQDMUI+Nz5WG8icJ0UWrYGPTk+QgJoiwTelfHTeoTSX2WCXj+8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxW5CQ0YiF9yqOKjul0vLGb2PjswefAf/n1I/RYrwT5vMmyrvKY
-	rb0HaqvpjINuQIMTfQt3XGdEneD9sEbCCh/KBbIGzqFAD5tw9nQfYyKk5/FIXsOvZgXLiSdOP9d
-	FskmpXpb/rGj5K7229DQeE421QEFKKMMVWWFIqKHjoF67OLiok7YZrQqsMZI=
+	s=arc-20240116; t=1776991337; c=relaxed/simple;
+	bh=HxasFVtwjC3AOAksdUMADU4qhgML9rAHGFKuZRPB1Mk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YFIfSLSivpVCus26cwJ6r32LjWJcuRjSH9UxLzG4yWFEzh9aPym3DjUsYkqCETFeXmITegeWTdEXOOXbqKhqYTsGm9uSuE7JDotmmsBLxHRdlBSN1XPsJKWFFuxH7ro4qVBz/9GGF5zMv0TghN45S2yfRehz0SjQoYeYIkXYRzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sZLSlA2s; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 23 Apr 2026 17:41:56 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1776991324;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=potNxk/pM0MniWtXALjT6MlDua7BAZZZoXk/cZMfdQ4=;
+	b=sZLSlA2soQ8pThSVn3XG4aIICFiQLDgQm5dkRFbvhTfKjP0oKC87OMh/0x23uR8xA2u6ZG
+	PjD3GUkyivNoonqHC1KyHu6/wmt954V1AoZH+ghMKwgIaeU25fINHtVeWfEkLP2ccVbi3Q
+	eKAyX8XCGIH9z2hGaUegBhqiyHcVAL4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+To: Weiming Shi <bestswngs@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Martin KaFai Lau <martin.lau@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Amery Hung <ameryhung@gmail.com>, Leon Hwang <leon.hwang@linux.dev>, Kees Cook <kees@kernel.org>, 
+	Fushuai Wang <wangfushuai@baidu.com>, Menglong Dong <menglong8.dong@gmail.com>, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org, Xiang Mei <xmei5@asu.edu>
+Subject: Re: [PATCH bpf v3] bpf: Fix NULL pointer dereference in
+ bpf_sk_storage_clone and diag paths
+Message-ID: <202642403529.Rc5t.martin.lau@linux.dev>
+References: <20260422065411.1007737-2-bestswngs@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:2901:b0:694:9d3d:e040 with SMTP id
- 006d021491bc7-6949d3de22cmr7931783eaf.31.1776990210905; Thu, 23 Apr 2026
- 17:23:30 -0700 (PDT)
-Date: Thu, 23 Apr 2026 17:23:30 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69eab802.a00a0220.17a17.0049.GAE@google.com>
-Subject: [syzbot] [wireless?] [usb?] KASAN: stack-out-of-bounds Write in carl9170_handle_command_response
-From: syzbot <syzbot+5c1ca6ccaa1215781cac@syzkaller.appspotmail.com>
-To: chunkeey@googlemail.com, linux-kernel@vger.kernel.org, 
-	linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: AE7184588FB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260422065411.1007737-2-bestswngs@gmail.com>
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: D56AE45897E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=37c3a614a8bc8d27];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-280900-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280899-lists,netdev=lfdr.de,5c1ca6ccaa1215781cac];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[googlemail.com,vger.kernel.org,googlegroups.com];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,googlegroups.com:email];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[3];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	REDIRECTOR_URL(0.00)[goo.gl];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linux.dev,baidu.com,vger.kernel.org,asu.edu];
 	TAGGED_RCPT(0.00)[netdev];
-	SUBJECT_HAS_QUESTION(0.00)[]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Hello,
+On Tue, Apr 21, 2026 at 11:54:12PM -0700, Weiming Shi wrote:
+> @@ -668,7 +670,11 @@ int bpf_sk_storage_diag_put(struct bpf_sk_storage_diag *diag,
+>  
+>  		diag_size += nla_value_size(diag->maps[i]->value_size);
 
-syzbot found the following issue on:
+This is the same issue pointed out as v1. diag_size is updated with
+a smap in diag->maps[i]...
 
-HEAD commit:    2e6803928193 Merge tag 'tracefs-v7.1-2' of git://git.kerne..
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
-console output: https://syzkaller.appspot.com/x/log.txt?x=113342ce580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=37c3a614a8bc8d27
-dashboard link: https://syzkaller.appspot.com/bug?extid=5c1ca6ccaa1215781cac
-compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12acb1ba580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16acb1ba580000
+>  
+> -		if (nla_stgs && diag_get(sdata, skb))
+> +		smap = rcu_dereference(sdata->smap);
+> +		if (!smap)
+> +			continue;
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/592131f484c3/disk-2e680392.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/2ca791aa3d9c/vmlinux-2e680392.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/3aaca7d6d8d9/bzImage-2e680392.xz
+... and then nothing is stored in skb, so diag_size is incorrectly inflated.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5c1ca6ccaa1215781cac@syzkaller.appspotmail.com
+> +
+> +		if (nla_stgs && diag_get(smap, sdata, skb))
 
-usb 4-1: received invalid command response:got 60, instead of 0
-usb 4-1: restart device (9)
-usb 4-1: received invalid command response:got -2, instead of 0
-usb 4-1: received invalid command response:got 60, instead of 4
-==================================================================
-BUG: KASAN: stack-out-of-bounds in carl9170_cmd_callback drivers/net/wireless/ath/carl9170/rx.c:153 [inline]
-BUG: KASAN: stack-out-of-bounds in carl9170_handle_command_response+0x21f/0xc50 drivers/net/wireless/ath/carl9170/rx.c:168
-Write of size 60 at addr ffffc900001e7a38 by task swapper/1/0
+diag->maps[i] can be directly used here. I fixed it up before applying.
 
-CPU: 1 UID: 0 PID: 0 Comm: swapper/1 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
-Call Trace:
- <IRQ>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0x13d/0x4b0 mm/kasan/report.c:482
- kasan_report+0xdf/0x1d0 mm/kasan/report.c:595
- check_region_inline mm/kasan/generic.c:186 [inline]
- kasan_check_range+0x10f/0x1e0 mm/kasan/generic.c:200
- __asan_memcpy+0x3c/0x60 mm/kasan/shadow.c:106
- carl9170_cmd_callback drivers/net/wireless/ath/carl9170/rx.c:153 [inline]
- carl9170_handle_command_response+0x21f/0xc50 drivers/net/wireless/ath/carl9170/rx.c:168
- carl9170_usb_rx_irq_complete+0xfc/0x1b0 drivers/net/wireless/ath/carl9170/usb.c:307
- __usb_hcd_giveback_urb+0x38d/0x610 drivers/usb/core/hcd.c:1657
- usb_hcd_giveback_urb+0x3ca/0x4a0 drivers/usb/core/hcd.c:1741
- dummy_timer+0xda1/0x36c0 drivers/usb/gadget/udc/dummy_hcd.c:2005
- __run_hrtimer kernel/time/hrtimer.c:1930 [inline]
- __hrtimer_run_queues+0x470/0xa00 kernel/time/hrtimer.c:1994
- hrtimer_run_softirq+0x17d/0x2c0 kernel/time/hrtimer.c:2011
- handle_softirqs+0x1dd/0x9e0 kernel/softirq.c:622
- __do_softirq kernel/softirq.c:656 [inline]
- invoke_softirq kernel/softirq.c:496 [inline]
- __irq_exit_rcu+0x160/0x210 kernel/softirq.c:735
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:752
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1061 [inline]
- sysvec_apic_timer_interrupt+0x8f/0xb0 arch/x86/kernel/apic/apic.c:1061
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
-RIP: 0010:pv_native_safe_halt+0xf/0x20 arch/x86/kernel/paravirt.c:63
-Code: d4 b4 01 c3 cc cc cc cc 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 66 90 0f 00 2d 63 9d 15 00 fb f4 <e9> 7c f2 02 00 66 2e 0f 1f 84 00 00 00 00 00 66 90 90 90 90 90 90
-RSP: 0018:ffffc9000013fe00 EFLAGS: 00000246
-RAX: 0000000000046e1b RBX: ffff8881022d9dc0 RCX: ffffffff8770e3f5
-RDX: 0000000000000000 RSI: ffffffff890d1d42 RDI: ffffffff87b03fe0
-RBP: 0000000000000000 R08: 0000000000000001 R09: ffffed103eae673d
-R10: ffff8881f57339eb R11: 0000000000000000 R12: 0000000000000001
-R13: ffffed102045b3b8 R14: 0000000000000001 R15: ffffffff8af1a1d0
- arch_safe_halt arch/x86/include/asm/paravirt.h:62 [inline]
- default_idle+0x9/0x10 arch/x86/kernel/process.c:767
- default_idle_call+0x6c/0xb0 kernel/sched/idle.c:122
- cpuidle_idle_call kernel/sched/idle.c:199 [inline]
- do_idle+0x464/0x590 kernel/sched/idle.c:352
- cpu_startup_entry+0x4f/0x60 kernel/sched/idle.c:451
- start_secondary+0x21d/0x2d0 arch/x86/kernel/smpboot.c:312
- common_startup_64+0x13e/0x148
- </TASK>
-
-The buggy address belongs to a 8-page vmalloc region starting at 0xffffc900001e0000 allocated at kernel_clone+0x12e/0x9c0 kernel/fork.c:2723
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x102aa7
-flags: 0x200000000000000(node=0|zone=2)
-raw: 0200000000000000 ffffea00040aa9c8 ffffea00040aa9c8 0000000000000000
-raw: 0000000000000000 0000000000000000 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x29c2(GFP_NOWAIT|__GFP_HIGHMEM|__GFP_IO|__GFP_FS|__GFP_ZERO), pid 2, tgid 2 (kthreadd), ts 2543325669, free_ts 0
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x153/0x170 mm/page_alloc.c:1858
- prep_new_page mm/page_alloc.c:1866 [inline]
- get_page_from_freelist+0xf34/0x3a90 mm/page_alloc.c:3946
- __alloc_frozen_pages_noprof+0x273/0x28a0 mm/page_alloc.c:5226
- __alloc_pages_noprof+0xb/0x110 mm/page_alloc.c:5260
- __alloc_pages_node_noprof include/linux/gfp.h:289 [inline]
- alloc_pages_node_noprof include/linux/gfp.h:316 [inline]
- vm_area_alloc_pages mm/vmalloc.c:3655 [inline]
- __vmalloc_area_node mm/vmalloc.c:3878 [inline]
- __vmalloc_node_range_noprof+0xe0c/0x1630 mm/vmalloc.c:4064
- __vmalloc_node_noprof+0xad/0xf0 mm/vmalloc.c:4124
- alloc_thread_stack_node kernel/fork.c:357 [inline]
- dup_task_struct kernel/fork.c:926 [inline]
- copy_process+0x7fb/0x7d20 kernel/fork.c:2088
- kernel_clone+0x12e/0x9c0 kernel/fork.c:2723
- kernel_thread+0xdb/0x120 kernel/fork.c:2784
- create_kthread kernel/kthread.c:459 [inline]
- kthreadd+0x498/0x7a0 kernel/kthread.c:817
- ret_from_fork+0x69a/0xc80 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-page_owner free stack trace missing
-
-Memory state around the buggy address:
- ffffc900001e7900: f1 f1 f1 00 00 00 f3 f3 f3 f3 f3 00 00 00 00 00
- ffffc900001e7980: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->ffffc900001e7a00: 00 f1 f1 f1 f1 f1 f1 04 f2 04 f3 f3 f3 00 00 00
-                                        ^
- ffffc900001e7a80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
- ffffc900001e7b00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-==================================================================
-----------------
-Code disassembly (best guess), 1 bytes skipped:
-   0:	b4 01                	mov    $0x1,%ah
-   2:	c3                   	ret
-   3:	cc                   	int3
-   4:	cc                   	int3
-   5:	cc                   	int3
-   6:	cc                   	int3
-   7:	0f 1f 00             	nopl   (%rax)
-   a:	90                   	nop
-   b:	90                   	nop
-   c:	90                   	nop
-   d:	90                   	nop
-   e:	90                   	nop
-   f:	90                   	nop
-  10:	90                   	nop
-  11:	90                   	nop
-  12:	90                   	nop
-  13:	90                   	nop
-  14:	90                   	nop
-  15:	90                   	nop
-  16:	90                   	nop
-  17:	90                   	nop
-  18:	90                   	nop
-  19:	90                   	nop
-  1a:	f3 0f 1e fa          	endbr64
-  1e:	66 90                	xchg   %ax,%ax
-  20:	0f 00 2d 63 9d 15 00 	verw   0x159d63(%rip)        # 0x159d8a
-  27:	fb                   	sti
-  28:	f4                   	hlt
-* 29:	e9 7c f2 02 00       	jmp    0x2f2aa <-- trapping instruction
-  2e:	66 2e 0f 1f 84 00 00 	cs nopw 0x0(%rax,%rax,1)
-  35:	00 00 00
-  38:	66 90                	xchg   %ax,%ax
-  3a:	90                   	nop
-  3b:	90                   	nop
-  3c:	90                   	nop
-  3d:	90                   	nop
-  3e:	90                   	nop
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+>  			/* Continue to learn diag_size */
+>  			err = -EMSGSIZE;
+>  	}
+> -- 
+> 2.43.0
+> 
 
