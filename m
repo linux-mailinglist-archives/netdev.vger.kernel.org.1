@@ -1,150 +1,152 @@
-Return-Path: <netdev+bounces-280965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280966-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ABuBCSwr62keJgAAu9opvQ
-	(envelope-from <netdev+bounces-280965-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:34:52 +0200
+	id QJC+NLkr62mBJgAAu9opvQ
+	(envelope-from <netdev+bounces-280966-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:37:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A06945B8CA
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:34:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB83B45B96B
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:37:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 239B73020A53
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 08:32:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0EE283009FAC
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 08:36:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D917730F7F8;
-	Fri, 24 Apr 2026 08:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7181731A7F6;
+	Fri, 24 Apr 2026 08:36:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cijdMRBm"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="IGi8crrt"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F4B33C19E
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 08:32:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FED729ACF6;
+	Fri, 24 Apr 2026 08:36:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777019546; cv=none; b=gVMBsGSDm4AFxXURcEvno+CvG9g/bdaHtpgahIH1HsOh+LJduMn7H+7qo0W1dmB11V1iYJHXZpIsKbURg4GccSrEjlD9rJ3IE6GIKM3SKdXXvIrPnQCQ66YVLoJtBVWRgMUHa8P4piNgC5e/pZ+6D31ZZ5/zOArgOVA3mQzEP/g=
+	t=1777019792; cv=none; b=d68As199DmXtL5i5LcigN4ETO3g+yBjbtDo2/yKjzWZhOxmx95lQnGG4VtKnIx9PrRiCPTrO0hjSf4l4aM1X2wC2S5Kg0a8DvJwTCAU7ZAXEE6kgozHCV9pRBIiw27tkz8aw8ghKaNsX/4m8L5+MuTIIXUtUaBp1fMgHuulniDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777019546; c=relaxed/simple;
-	bh=pJkzSL/k+5TGVlKtzz3sl7/5vEzJQCMbHMekVJ4welw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FLiE3N3ezePJ5MuwF+OqTSgFsr5mLA1C5AY+FUSLxZej/3nJteYXxGnE0SHlj1jGvXHSb0KRYtFx4IodIj5Htb/u3soN8rJ/srynwk9y7ksXRnCZmreJsWDg7nts/dE4b3SMIWA0spGHmnpK4odYuZKV0Obiqwq+lH9IHV3K1JI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cijdMRBm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777019542;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VJsfL0ZYr6ksiH6VKINKLh9cflWXlJdEnCTwwmMW534=;
-	b=cijdMRBmY62jxMxlWJ39bAtadDmv7b7OsxT7WwuruEvf9Cz+tt0ZDzx6CVBOwE/MYEe7/h
-	TxuztRWkf7s6r/ekx5sU0h7tVnQbN74dspnNA02iNEcbBosPX67xpSysnlJ7ljdY3wgKpL
-	SMjOjn6vWMF4OP5Kprkbl6UPJYoWuMM=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-192-ewUZX9sePIKYDg19RBQe5A-1; Fri,
- 24 Apr 2026 04:32:19 -0400
-X-MC-Unique: ewUZX9sePIKYDg19RBQe5A-1
-X-Mimecast-MFC-AGG-ID: ewUZX9sePIKYDg19RBQe5A_1777019538
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EB87E1800578;
-	Fri, 24 Apr 2026 08:32:17 +0000 (UTC)
-Received: from calimero.vinschen.de (unknown [10.44.32.45])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 68CDB19560AB;
-	Fri, 24 Apr 2026 08:32:17 +0000 (UTC)
-Received: by calimero.vinschen.de (Postfix, from userid 500)
-	id C0469A80BFD; Fri, 24 Apr 2026 10:32:14 +0200 (CEST)
-Date: Fri, 24 Apr 2026 10:32:14 +0200
-From: Corinna Vinschen <vinschen@redhat.com>
-To: Simon Horman <horms@kernel.org>
-Cc: intel-wired-lan@osuosl.org, stable@vger.kernel.org,
-	Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
-	netdev@vger.kernel.org, Corinna Vinschen <vinschen@redhat.com>
-Subject: Re: [Intel-wired-lan] [PATCH net] iavf: iavf_virtchnl_completion:
- drop duplicate ether_addr_equal() test
-Message-ID: <aesqjovwYNeLlfX4@calimero.vinschen.de>
-Mail-Followup-To: Simon Horman <horms@kernel.org>,
-	intel-wired-lan@osuosl.org, stable@vger.kernel.org,
-	Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
-	netdev@vger.kernel.org
-References: <IA3PR11MB898664A49E614F197D4FED6EE52C2@IA3PR11MB8986.namprd11.prod.outlook.com>
- <20260421111236.875379-1-vinschen@redhat.com>
- <20260423185530.GI900403@horms.kernel.org>
+	s=arc-20240116; t=1777019792; c=relaxed/simple;
+	bh=Osjn5zIzItASdIK1vVSsoI77bcq+prIokLTVS9iqMd8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ELx9XY4X2Sa4jxd1lpUp6mK2GJkmHhwQd/24ivdLOErNFWraTsAiODw0QaC9SZGiSj16m1UFwGQhQqAfK4kiXbzLkNWl+XK06nyHEwHZO/86ixILN4rVK81U7yxnWcnpixjbR5BjjIKN2Ga0emquQDYEyXN3x4O/uU6XC4wvG3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=IGi8crrt; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 4799C4E42AE9;
+	Fri, 24 Apr 2026 08:36:28 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 1BFAF604EB;
+	Fri, 24 Apr 2026 08:36:28 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B9B6110720009;
+	Fri, 24 Apr 2026 10:36:22 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1777019787; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=Osjn5zIzItASdIK1vVSsoI77bcq+prIokLTVS9iqMd8=;
+	b=IGi8crrtSad5zHLVdymz0NZ51Iu6mHyBW10vScIf0bRAmt/H1B/doVIZGVI9w/jC9FMeGJ
+	W3aPDtOqQdqsB3m2XEsbWI6VnQfioxsr6TbF0Ga6C0Xe3sEIsvq1rNRM6uGa/oe2ixfpIs
+	d9CYG+fdEd0cIKjm8vz5aiFDQ2mb79vP5ZU+ZhhiL6gSMgYZOle4HF+j34il26U1x9AeUT
+	tD5j4H76TT/GR54UhLfVdN26TMj0f+TmWtQQyNMILLpeUfYkHh2NzRUA9TBeodyEvtL1xN
+	8b0Ia30CWVThHsIHL+y2ShAXne1gzKcx+BXURkA2z8SxiqjRKQ97thHSxi7vyw==
+Date: Fri, 24 Apr 2026 10:36:18 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Corey Leavitt via B4 Relay <devnull+corey.leavitt.info@kernel.org>
+Cc: corey@leavitt.info, Oleksij Rempel <o.rempel@pengutronix.de>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>, Russell
+ King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 1/4] net: pse-pd: scope pse_control
+ regulator handle to kref lifetime
+Message-ID: <20260424103618.4c6ee35e@kmaincent-XPS-13-7390>
+In-Reply-To: <20260423-pse-notifier-decouple-v1-1-86ed750a9d62@leavitt.info>
+References: <20260423-pse-notifier-decouple-v1-0-86ed750a9d62@leavitt.info>
+	<20260423-pse-notifier-decouple-v1-1-86ed750a9d62@leavitt.info>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260423185530.GI900403@horms.kernel.org>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
-X-Rspamd-Queue-Id: 2A06945B8CA
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: BB83B45B96B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280965-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,calimero.vinschen.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	TAGGED_FROM(0.00)[bounces-280966-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	FREEMAIL_CC(0.00)[leavitt.info,pengutronix.de,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vinschen@redhat.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[kory.maincent@bootlin.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev,corey.leavitt.info];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,leavitt.info:email]
 
-On Apr 23 19:55, Simon Horman wrote:
-> On Tue, Apr 21, 2026 at 01:12:36PM +0200, Corinna Vinschen wrote:
-> > This is just a simple cleanup fix.  Commit 35a2443d0910f ("iavf: Add
-> > waiting for response from PF in set mac") introduced a duplicate
-> > ether_addr_equal() check, so the current code tests the new MAC twice
-> > against the former MAC.
-> > 
-> > Remove the outer ether_addr_equal() test, remnant of commit c5c922b3e09b
-> > ("iavf: fix MAC address setting for VFs when filter is rejected")
-> > 
-> > Signed-off-by: Corinna Vinschen <vinschen@redhat.com>
-> > Fixes: 35a2443d0910f ("iavf: Add waiting for response from PF in set mac")
-> > Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> > ---
-> > Added CC: stable@vger.kernel.org
-> 
-> Hi,
-> 
-> This feels more like a cleanup for net-next (without a Fixes tag)
-> than a fix for net. I'm missing where the bug is here.
+On Thu, 23 Apr 2026 01:42:14 -0600
+Corey Leavitt via B4 Relay <devnull+corey.leavitt.info@kernel.org> wrote:
 
-Yeah, it's not a bug, the "Fixes" tag was just supposed to point out the
-patch introducing the duplicate test.
+> From: Corey Leavitt <corey@leavitt.info>
+>=20
+> __pse_control_release() drops psec->ps via devm_regulator_put(), which
+> only succeeds if the devres entry added by the matching
+> devm_regulator_get_exclusive() is still present on pcdev->dev at the
+> time the pse_control's kref hits zero.
+>=20
+> In practice that assumption does not hold when the controller is
+> unbound while any pse_control still has consumers: pcdev->dev's
+> devres list is released LIFO, so every per-attach regulator-GET
+> devres runs (and regulator_put()s the underlying regulator) before
+> pse_controller_unregister() itself is invoked. Any later
+> pse_control_put() from that unbind path then reads psec->ps as a
+> dangling pointer inside devm_regulator_put() and WARNs at
+> drivers/regulator/devres.c:232 (devres_release() fails to find the
+> already-released match).
+>=20
+> The pse_control's consumer handle is logically scoped to the
+> pse_control's refcount, not to pcdev->dev's devres lifetime. Switch
+> to the plain regulator_get_exclusive() / regulator_put() pair so
+> __pse_control_release() does the right put regardless of whether
+> the controller's devres has already been unwound.
+>=20
+> No change to the regulator-framework-visible refcount or lifetime of
+> the underlying regulator: a single get paired with a single put. The
+> existing devm_regulator_register() for the per-PI rails is unchanged
+> (those ARE correctly scoped to the controller's lifetime).
 
-Shall I create a v3 or is it ok as is and just goes to net-next instead
-of net?
+Acked-by: Kory Maincent <kory.maincent@bootlin.com>
 
-
-Thanks,
-Corinna
-
+Thank you!
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
