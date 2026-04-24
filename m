@@ -1,198 +1,149 @@
-Return-Path: <netdev+bounces-280995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280996-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kCjoHeR262kQNAAAu9opvQ
-	(envelope-from <netdev+bounces-280995-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 15:57:56 +0200
+	id oPKxMw1362kQNAAAu9opvQ
+	(envelope-from <netdev+bounces-280996-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 15:58:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC4EE45FE2B
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 15:57:55 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7196F45FE3C
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 15:58:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C19D7300FEF8
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 13:57:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 378E13001338
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 13:58:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 349593D9DB9;
-	Fri, 24 Apr 2026 13:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F15923D904F;
+	Fri, 24 Apr 2026 13:58:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IW5umCQo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ojp6IXyl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
+Received: from mail-qk1-f193.google.com (mail-qk1-f193.google.com [209.85.222.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A2F3BA232
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 13:57:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB6C3570C1
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 13:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777039032; cv=none; b=Ln3bAYGh3dWzqfek/gWBfzH/ZAqHPPkp+WT4p4jdlhLBWOGM7020r/3Kt6LHcVxLqZyrQf7EVDc4goPoADoAszOR9aVBtXDb+Fa5dUhQQEarvJd5AX2uLbHp3RmaAugVqW2tTKwGlR5ZNDNUmVzdE3aYJUySPeiUCktpU2h/L4U=
+	t=1777039111; cv=none; b=Eo3207MoEUmHg0OkWGRe7XjKd+hLaq4quhY7U8upbF++13spASs6YSTEU4RpxnrabeKWmxE6/gf6xGs2rhWdR6tJzlmzFE0Z5iD3OWE3FFB81vvxy5ILiskPmsNoZjn3z5PSMrCb82CKS4nkositTs0yiUSAPp1pB0rSP1bGFPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777039032; c=relaxed/simple;
-	bh=YkV/gmu/iRF0QtidaJru1TGFWT+3DjghSB2koHn0JDo=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=InvixpZhpxDg+lfOL4fcDjbYKfVvzX4Ni3i32hZu8WavDK4VPlgxyMNlJF7/276EsMqGpxJfEtSEuo1t7huedn4dJnb4uZoJV1dvQB5VVQPDddyOkHy/WdOWE229uNwFX06xE2b3rKJnCHSgY2yLiiV3yWO3L/Ty1kT4slaColY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IW5umCQo; arc=none smtp.client-ip=209.85.210.51
+	s=arc-20240116; t=1777039111; c=relaxed/simple;
+	bh=0Z+CWB+qdcZOEp5cOyO7jH6G/XktPWmtPtKts55rcqU=;
+	h=Message-ID:Date:From:To:Subject; b=ETQaq5cIevMVxeztjck1XBhYmvVvW7eo72kxMb0LDY6s9znL0XaUKR+3cqaswnO7U3eO8k0SIDBMENvdsAsg1urEqp+wO04KdcuYv81gTFeKBSvBe9iw7vcEZZ3M2uHkqc5am1aKUTdHMs4So8zOdR/I15LUFTC/99hiky0dFRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ojp6IXyl; arc=none smtp.client-ip=209.85.222.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-7dcdca9dd6cso3802591a34.3
-        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 06:57:09 -0700 (PDT)
+Received: by mail-qk1-f193.google.com with SMTP id af79cd13be357-8d6d5e45c43so898199885a.3
+        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 06:58:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777039028; x=1777643828; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J4lmyNqo07GvwFuIjU1VCEb9Ql2ZQ/Si0G3lWH77Zr8=;
-        b=IW5umCQoqLETi2iYdYdIhV8l5n/rEvRFo6Ou1Dw/d9co91mDhom5bx5teNAErLcps3
-         AfMBtNjrjws9oBcVBXd/+IH//OYGLe63sBQUbc3zZIsA3TB4CV+IXj0jHhD+Lf213TLt
-         RsVMDNE7+EVdvPd16ewRxrjVr6wEg9lXNkTGVOMClnHk+11Fq73BaWpzQAlIfJd0w9UE
-         YqYHGbUwqXXKz2h4ipD8huBUF6XDX2AYCMcki6d8j9hPMTMQcS1Jdp26yIxgvdlIw60r
-         ARQaqKTLZFxsyBFWxYPH41ah9qoj1fCXzZ5EhR0SezofxQR4gE1SuzAZbAh5jaYZkL+Q
-         pGHg==
+        d=gmail.com; s=20251104; t=1777039108; x=1777643908; darn=vger.kernel.org;
+        h=subject:to:from:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0Z+CWB+qdcZOEp5cOyO7jH6G/XktPWmtPtKts55rcqU=;
+        b=ojp6IXylXPVLXYxYYsoDmzVs4JgwN5PN5Z5T4kGqsqppELlitXCnCdO9opOv8+KOU5
+         MHgR1IkCfYSwhEfco63tqPvVHtE6in8vHPgy6scuu23EIhEkgiCflzo3cEwnEDpz3a9f
+         Vo1J5nQmHHZ+7vD3fitq9XNLbJIh0loHkYsPrkO/RYrvjQaSwoaSGlY3JYux/i8MzhyN
+         XC8cIXN3BQnWzmyW5RURlTlidsZ+XSRh5YHtUg6/tcAYyskwAJ6kKcqOXbNgg+1Ai6MW
+         txbSo7l0ZT9XUmNtM0lwTLeHXp9rX4jLJYGyZKq5lv1P41WfIX3PEk1uZ9LnNmXauZ+X
+         bCdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777039028; x=1777643828;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=J4lmyNqo07GvwFuIjU1VCEb9Ql2ZQ/Si0G3lWH77Zr8=;
-        b=KRgYN5XS5e/YkVgW7eaaXrNIITySeqgr6kZAh8a0Z441DRO6OEdp/8hzAnjWDPTt4e
-         8RmdXD/VASDF6Vyfo7n2KypZH1hkCEEQv3EgKgfE5xKB1JduFAbg/+DVrSg+RZrv1hAE
-         r1pi50QTdOk/+/maezXLfwskH5JmjFNAcMdSbtEdZCuzG3ZYxVUkO8uIN2zX4de83ice
-         qJajUtG50W/OGWPBKkxzBTX6HwLzyPcRkYYoTBIXlv/mhQl0cukGrD6vY23uVZMlnft0
-         TgmAMpSfpxhF+JlRXEoJjOsbCjViEv89I/GA29qymq2nMwSBdI68UmrRaxjTOygqK2BB
-         ssAQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+ujOoJi2LcMnjoTBIZzly2DL8S2C8KmL1tkheX16WmWR/IIHWuJDduZUvm1wiNm/B6trsPCZo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwFX+YKguGdXDa3p6xmBktz+ylK0sk8/orHJi9ytTQuqVVVauF
-	jEqPfY30i8Cayiy3tWgkGCKmYtrO9gmAeDPZh5rCWr0vQDcNCU7Du/Fn
-X-Gm-Gg: AeBDietPYxl23OyBDHn6C+YIWx1viHevSj/m57IUaWkb/cM++Jgm9TXLqHYSgTyEYk3
-	moL3uqFfkzD7zFbZzuGR9r3gwKsvcf6FgC3skiX2zXM9omoGS4gfYcNwV9OCPgazPEukFQ+N6hC
-	qzz1N9jou1XKkR1Q3iUQa6tKK3hfxxwJeVvlSzyLLTxRSE9nzp6Q6xKInWFooIL6K5Xnob0tpi8
-	pl28vSUqx0TSGlrr75c1gdGgv1Yhj5owwz97Q283w2AfDTeAQqXkVBHerOeEdQdTRGtmXK0IGnf
-	YWu6AmAJecv3sdtwY0aWTqrfMvt2UnPSw1ZlqL9MVX41009ejlZTAM90BaoUHRQS/3qyCecF6vR
-	790F6tohfIeCWrd4Ohi51aZFSajoffWTSYETjhr3BjoinXSpAax61gIQ73NfS0TVm7xeTZ1D8vm
-	zG8M43xLUTPDflmjZfh3x/V4hEyycECG72IlJiwaabBs6N7UzEtRU2wAv6kJisyngxZJ8RSjYhZ
-	vf7bkpKO0Cp+3Vwhez5BoPMwfz9
-X-Received: by 2002:a05:6830:439f:b0:7dc:da80:42be with SMTP id 46e09a7af769-7dcda80470bmr11350922a34.21.1777039028015;
-        Fri, 24 Apr 2026 06:57:08 -0700 (PDT)
-Received: from localhost ([2a03:2880:10ff:40::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7dc9759bfa3sm19510471a34.13.2026.04.24.06.57.06
+        d=1e100.net; s=20251104; t=1777039108; x=1777643908;
+        h=subject:to:from:date:message-id:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=0Z+CWB+qdcZOEp5cOyO7jH6G/XktPWmtPtKts55rcqU=;
+        b=LHZeHqNtCQFbxfJYwqPDA0nnuEve52c6o+MGGBo9At077m7+iJKrTz58GT2O972aRw
+         +lrM05xcMgfL604RK+k+lnh8UaBkMylfPb9DrCTVkxmkCAvz848kJHBl4p7QUcAqgFpa
+         La1pegzhl6DoQEVIUkMoBeH0O0nplgt1BhAy1eG0K2ts1adXBIYhaSNVr3XekYOU/8ln
+         OeqavNV4KVj9R/M7dA1J48pU52ngm7nXNrv96A7gkTpv6fV6gAq28cYTukjVwCCocJFq
+         1cZfqO1BuiQAJaqReA8uOwnWNRNFJytVluCH3Ipz2ONH1ypU36b1KqiJgEGehCyy9J7p
+         2pcg==
+X-Gm-Message-State: AOJu0YxQZ7yi2CmWGM3pnOapX+9DC4JEBQ70fiIypSFltUW4sdsicfKd
+	anS2aSn01ZfBT9qqEJTewVdH/NgAcUPE6fGn0eGG/uLjrQ7wyMLBdiCRJeUyMNtM1xIvYw==
+X-Gm-Gg: AeBDievGVIYvrG+9fnGmtJboAqD7qi4mNii7G6YeR49HwjDi1tkc0eaGsWKg+8uQ8XH
+	UUrDnwlKSkt2rRAkgeKvZ3RwIDrs3iEpukp77kH2cLMerQSSTA/+TaUPdZQqg1IAAOC07p3D7RN
+	bAU3kYjnMVROz6RJMNIwiHIuok5CB+ZRlZqeLgGRWJ1NNQegIs9bhCnJfdjmUQrAZWGj+upK96J
+	f/L5SLJ4UGw54dXqjm+B24FDulGIuy7WEuO/ErOLM9njMjUZjVs8jMrBt7zn7GIvBp85LN3jvYr
+	6le0lR5OUhp2zq90vh0dv2Efn3jjTWt5Z/0+cdk0dpXZgs8W3onjgn6hCo2hFGJTYQDqJrLxvLG
+	OHlxqg+0yWoDyiRW5zE+o2ArWiOR17gbcFCCjavc+MJMesFq6k1tcXlO+Z2qc0IyvMKQYi7pqXs
+	vlV7FvMlJTUALX+tVyhccw7bC3EMywOPG/8SBGBpDgJxL9KpENgroEfdtElHqJ2pICpCxlKRY39
+	Hkl75Js6vlptvtuAYTD8lTuKMHJX9hnfeqfFH8Eju+KrzO60nIumBAoVVAWwBQ=
+X-Received: by 2002:a05:620a:4403:b0:8ed:d6df:c778 with SMTP id af79cd13be357-8edd6ef1bfamr2706519285a.37.1777039107999;
+        Fri, 24 Apr 2026 06:58:27 -0700 (PDT)
+Received: from localhost (ec2-3-148-253-139.us-east-2.compute.amazonaws.com. [3.148.253.139])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-8eb9becc72dsm1469246485a.34.2026.04.24.06.58.27
+        for <netdev@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Apr 2026 06:57:07 -0700 (PDT)
+        Fri, 24 Apr 2026 06:58:27 -0700 (PDT)
+Message-ID: <69eb7703.050a0220.ef548.07c1@mx.google.com>
+Date: Fri, 24 Apr 2026 06:58:27 -0700 (PDT)
+From: anithambabazi1983@gmail.com
+X-Google-Original-From: PayPal,Inc.
+To: netdev@vger.kernel.org
+Subject: netdev, Your order EBFA0471GF was processed
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 24 Apr 2026 06:57:05 -0700
-Message-Id: <DI1FREJRMGWT.M8JZJADKO6WJ@gmail.com>
-Cc: "Yinhao Hu" <dddddd@hust.edu.cn>, "Kaiyan Mei" <M202472210@hust.edu.cn>,
- "Dongliang Mu" <dzm91@hust.edu.cn>, "Daniel Borkmann"
- <daniel@iogearbox.net>, "Nikolay Aleksandrov" <razor@blackwall.org>,
- "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Martin
- KaFai Lau" <martin.lau@linux.dev>, "John Fastabend"
- <john.fastabend@gmail.com>, "Stanislav Fomichev" <sdf@fomichev.me>, "Alexei
- Starovoitov" <ast@kernel.org>, "Andrii Nakryiko" <andrii@kernel.org>,
- "Eduard Zingerman" <eddyz87@gmail.com>, "Kumar Kartikeya Dwivedi"
- <memxor@gmail.com>, "Song Liu" <song@kernel.org>, "Yonghong Song"
- <yonghong.song@linux.dev>, "Jiri Olsa" <jolsa@kernel.org>, "Simon Horman"
- <horms@kernel.org>, "Jesper Dangaard Brouer" <hawk@kernel.org>, "Willem de
- Bruijn" <willemb@google.com>, "Samiullah Khawaja" <skhawaja@google.com>,
- "Hangbin Liu" <liuhangbin@gmail.com>, "Krishna Kumar" <krikku@gmail.com>,
- "Kuniyuki Iwashima" <kuniyu@google.com>,
- =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH bpf v2 1/3] bpf, tcx: reject offloaded programs on
- attach
-From: "Alexei Starovoitov" <alexei.starovoitov@gmail.com>
-To: "Jiayuan Chen" <jiayuan.chen@linux.dev>, <bpf@vger.kernel.org>
-X-Mailer: aerc
-References: <20260424104201.217604-1-jiayuan.chen@linux.dev>
- <20260424104201.217604-2-jiayuan.chen@linux.dev>
-In-Reply-To: <20260424104201.217604-2-jiayuan.chen@linux.dev>
-X-Rspamd-Queue-Id: CC4EE45FE2B
+X-Rspamd-Queue-Id: 7196F45FE3C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.15 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [3.34 / 15.00];
+	R_BAD_CTE_7BIT(3.50)[unknown];
+	BROKEN_CONTENT_TYPE(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280995-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280996-lists,netdev=lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_ONE(0.00)[1];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[32];
-	FREEMAIL_CC(0.00)[hust.edu.cn,iogearbox.net,blackwall.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.dev,gmail.com,fomichev.me,vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NO_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alexeistarovoitov@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[anithambabazi1983@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email,hust.edu.cn:email]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mx.google.com:mid]
 
-On Fri Apr 24, 2026 at 3:41 AM PDT, Jiayuan Chen wrote:
-> An offloaded prog's bpf_func is replaced by bpf_prog_warn_on_exec(),
-> since it's supposed to run on the NIC, not the host. But tcx doesn't
-> check this and happily attaches it to the software path, so the first
-> packet hits the WARN.
->
-> XDP already guards this in dev_xdp_attach(); tcx just never got the
-> same check. Add it to tcx_prog_attach(), tcx_link_attach() and also
-> tcx_link_update() so the fix cannot be bypassed by loading a normal
-> program and then swapping it out via BPF_LINK_UPDATE.
->
-> Use bpf_prog_is_offloaded() rather than bpf_prog_is_dev_bound() +
-> bpf_offload_dev_match() (as XDP does): bpf_prog_dev_bound_init()
-> already rejects BPF_F_XDP_DEV_BOUND_ONLY for BPF_PROG_TYPE_SCHED_CLS,
-> so a dev-bound SCHED_CLS program is always offloaded. The simpler
-> check is sufficient and also rejects attaching a program offloaded to
-> device A onto device B.
->
-> Fixes: e420bed025071 ("bpf: Add fd-based tcx multi-prog infra with link s=
-upport")
-> Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
-> Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
-> Reported-by: Dongliang Mu <dzm91@hust.edu.cn>
-> Closes: https://lore.kernel.org/bpf/64d8e2b5-a214-4f3c-b9e8-bcedbcb2c602@=
-hust.edu.cn/
-> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-> ---
->  kernel/bpf/tcx.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/kernel/bpf/tcx.c b/kernel/bpf/tcx.c
-> index 02db0113b8e7c..1144627483d53 100644
-> --- a/kernel/bpf/tcx.c
-> +++ b/kernel/bpf/tcx.c
-> @@ -16,6 +16,9 @@ int tcx_prog_attach(const union bpf_attr *attr, struct =
-bpf_prog *prog)
->  	struct net_device *dev;
->  	int ret;
-> =20
-> +	if (bpf_prog_is_offloaded(prog->aux))
-> +		return -EINVAL;
-> +
+Sub: Your PayPal,Inc. Account is Now Verified
 
-instead of sprinkling the check everywhere do it at the source of the bug.
+Dear Account Holder,
 
-pw-bot: cr
+We've successfully completed your account verification. Your PayPal,Inc. account is now fully active.
+
+Verification Details
+• Process: Standard authentication
+• Authorization: $261.6 (temporary hold)
+• Reference: ZKXPWQMT91
+
+About the Authorization
+
+Temporary hold only (not a charge)
+
+Automatically released in 1-3 business days
+
+No action required on your part
+
+Customer Support
+For any questions:
+📞 (803)-886-5964 (24/7)
+
+Welcome to the PayPal,Inc. community!
+
+Best regards,
+The PayPal,Inc. Team
 
