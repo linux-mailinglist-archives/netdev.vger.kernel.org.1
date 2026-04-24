@@ -1,170 +1,189 @@
-Return-Path: <netdev+bounces-280934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280935-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GCvXCLL56mmBGwAAu9opvQ
-	(envelope-from <netdev+bounces-280934-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 07:03:46 +0200
+	id mY3NFwD96mltHAAAu9opvQ
+	(envelope-from <netdev+bounces-280935-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 07:17:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A3C9459DD5
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 07:03:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B004459E40
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 07:17:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3165B300917F
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:03:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 43282300A391
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:17:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D67929BD9A;
-	Fri, 24 Apr 2026 05:03:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEE8B33A9E8;
+	Fri, 24 Apr 2026 05:17:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sojw9rLS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cg8ekBbk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1F4C5477E;
-	Fri, 24 Apr 2026 05:03:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C391BBBE5
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 05:17:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777007004; cv=none; b=DMAdBXlPKwE+D8Op7VL40U6ZODm9wCNr2EyrCoZksSh6axJgYPt1N8RPTtrUN8o5x2bvyVOPBpczxZXzHx/GZWVzKhPi/oG3/dAhmeAWTk8LNCml3dlUT+MTsNrtlycX83vDJbdrXJg7wvdr8cNKmk2BCsf4a2geNiRbteBCoQ0=
+	t=1777007867; cv=none; b=iGSq42fzBI20uY9LgE2bd0rmLAw8fpV0kOijbC55N7UoxUIyma0oyBHjRqBBmN4+OOBprqH8CubJ/Jm60slGGvn6+hVtAHWiIgd//svafz7hJJj+ycUKcjL8K/jtAG7r4R/aQoefP0HfpEOs7CwW/MqSFtBnOcXzM2rIQXGbyzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777007004; c=relaxed/simple;
-	bh=57H4gANWDMAmt9deBhVyAfxC3itsNV6V+s8eADe2NOk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kanKyiMhssDbxDkNAUpMJTrEBZwX2jMVbOkiytxZMNE/ycs34eU5qidD3vnYNRFAlLpe+F3Gf422YuDUgrrWLbxn/JcfQu3cJt0OAkMwdwHs5k1G3eIJP/EsUxCgJPzez5Br0TtUPdMn+Mv7xoXqqlEt5zVoChZmJNyFScgKtUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=sojw9rLS; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63NIYDYK3107496;
-	Fri, 24 Apr 2026 05:03:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=I9eGPf
-	6zLKqBoMQknTPdetZAYdwFTfVyWh7vjSqEfbQ=; b=sojw9rLSsu4UlBm6QE2neg
-	/he7MeW1q29fkBY0IS+phwpyC6hBnhedTuA9FfMOZMJ6bcGYHBadJygyhFuhqgsS
-	i4/NeEMLmYhv7/LW1BZKiv6K7gQSnLBfTq1UroIWGD+moMhIYQtlrUTIG/gvFiV4
-	EcD+PU0D2Zq3FK50B1S58nYFHjEYpBgXncjTW/Cg/jBgaclzdWmMDm7uDxqRNyJa
-	XbaWRf+fdl3hc1LsztHKN3mwukQV8Tp4zGe6cd1ERuu4SKeQQn6PpDo8NOu8feqz
-	Dt5IK7PKV0B93F2sZlaRfSfhrA9zOZ9neKDqJECfvfIViZP3T4aR46zKq2J/j3zQ
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dpeu6kdmj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Apr 2026 05:03:14 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 63O4ZVfX029119;
-	Fri, 24 Apr 2026 05:03:13 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4dpjky1f3v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Apr 2026 05:03:13 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63O53CR032637582
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 24 Apr 2026 05:03:12 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2F13C5807C;
-	Fri, 24 Apr 2026 05:03:12 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EB68758084;
-	Fri, 24 Apr 2026 05:03:06 +0000 (GMT)
-Received: from [9.124.217.59] (unknown [9.124.217.59])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 24 Apr 2026 05:03:06 +0000 (GMT)
-Message-ID: <473b85ad-215e-4395-acbe-e1f674de7855@linux.ibm.com>
-Date: Fri, 24 Apr 2026 10:33:03 +0530
+	s=arc-20240116; t=1777007867; c=relaxed/simple;
+	bh=cy+jfZevRl4qnhUm8i+XX7pD88aruLbn13jduBtEK9A=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=HRuTtbFoko9W++GJZv5JrLQsqN0CR1j+uj50b5QCfkRYcpV0oKD90uCS2cAtaBWTZqhe1NuttldK11CON5sLSf/3vKfLsExizcKtEAUbLD8Cr/YNAcp1Oi9XlMJSzDT7TzjA4EBd57v+i5rAhCXfGLg6WPuCAz+1dJbwUvF1Rho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cg8ekBbk; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-43eb012ac4fso4450852f8f.0
+        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 22:17:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777007864; x=1777612664; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CmJCiO+yYPwYPiaZsf/z2HrFYMaHB6ygscvb77nduZw=;
+        b=cg8ekBbke8nLR/dTyiTx0wOeHvkvRy8LEMx10KCPHZhaZBpuUCc8O7CbmwOrg3O1Bn
+         vR3TasWpwFCGavVNuy9DgYXq26+AutWxLFpbd5l7TD6u3wsSQAJ9FcVR9HlwttjOqtuC
+         1L2dDCsh5ev3zhtaRpC6+HWFUqWWTFcx2W+fzQWP/P9EQBBhUU0uaWrmbrdJn37jMeTw
+         h/bP+4h2PRShhxg69DOWdaLABVaTWSN6TbtbtdquEbrOgTmPQeyeqVmxfmY0e5kiwz/V
+         237z7drNldS74xi4R4v6lPt5Lv8+YnPAzVRoSt9+heEUXOszsMze5Q9GoXFk45pjd7wm
+         3kaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777007864; x=1777612664;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CmJCiO+yYPwYPiaZsf/z2HrFYMaHB6ygscvb77nduZw=;
+        b=F7rjDZfCi4IPb4oN3tSiewe/LAOKjiMfr/vfN03df74APFwoqZHE1QfF3o7o+zN9MD
+         urMudQU9gHn4NYIBO0CNu0uZVZ8tZsRNNDj0kuMgmm8aaXljlwKEPL7Plb5Ziqvv+yFM
+         SR5lwBUaiNRxBTsJLe7IAGzmZqxmrndYOlZBtai2gYKa7tGGr7RUF4B4YSl8il0p8/SG
+         XYCt1W2adx3HzkIska/cEjRnJEJjai8DQWnDag7ZyKD19S3GqwUGKhu0i5ikitpGDW7o
+         eKXK4Jx/y264B8/vWYz1QN9/DI0uGmWgM5nqm5h4tdTec8n7ltD3mNOVGLsHvTDhc502
+         PeQg==
+X-Forwarded-Encrypted: i=1; AFNElJ8cZhpW2UKfC73pg9yA7xWQWjpvaYbbuJDGGTTeUSlGVQrZhW8w4JVMofOieafvtl3Rdm2SKhg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YytqAHbYUYG4YBC5eDJ6gozfqlDJMbkKz6Lmss0PFCyCOpi2qn1
+	Ahp1Wwi5JMoR0ORfxev6gPnOPHKseGmsjIXe0nMW7w2GQYTISc6woSe7JXXicI+vMUc=
+X-Gm-Gg: AeBDieuo8SjgCYSif6C+bBnQnLYyCDqtfiON6txsvhJ2q/cpbW2Lx5xZrsbAQV3dKMN
+	U1NU7s1R9BjpC9M6Zne4Q9mnDTCIqhehcNZMStsNxSiSx+XQEC0adK3kq3pf7Uw5w0516WN6XsI
+	fmHuSZQM5km+BljPUtfiiDAVcKOPDMeU8MYRYVKyFK/anQ0K+KHT38zLsu/gO/1uixvOpFAvdSJ
+	Umd8V/AIgscU3EqRLmn2deF0kQN4qzEhBQ/LFjqhK9YWsh0sKVRIG8oDPAoNIrGaXyyatTkpSmV
+	07f6QeFug48sl9l6VOCFBiwoOWzL+WAFerr48cO5uc7hVTTBmfbNe5OWcyLqBxOZ/WoQ0dKbZFr
+	jDKTdAvulg4CahNu4mTSwFdOBclftX7Hfm2dLLFfCnieThH+YpI0+YZigifPjwCZcFa9Dg3QGEi
+	3yLbgrc9aS4B+C9FncNnzXg7AoJobzgQ==
+X-Received: by 2002:a05:6000:184d:b0:43d:e31:68d1 with SMTP id ffacd0b85a97d-43fe3dd958amr47249130f8f.21.1777007864389;
+        Thu, 23 Apr 2026 22:17:44 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4cb1365sm61414871f8f.7.2026.04.23.22.17.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Apr 2026 22:17:43 -0700 (PDT)
+Date: Fri, 24 Apr 2026 08:17:39 +0300
+From: Dan Carpenter <error27@gmail.com>
+To: Longxuan Yu <ylong030@ucr.edu>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+Subject: [bug report] 8021q: delete cleared egress QoS mappings
+Message-ID: <aer889IeBHjL8na0@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] Documentation: net/smc: correct old value of
- smcr_max_recv_wr
-To: Alexandra Winter <wintera@linux.ibm.com>, andrew+netdev@lunn.ch,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, alibuda@linux.alibaba.com,
-        dust.li@linux.alibaba.com, sidraya@linux.ibm.com, wenjia@linux.ibm.com
-Cc: pasic@linux.ibm.com, horms@kernel.org, tonylu@linux.alibaba.com,
-        guwen@linux.alibaba.com, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20260422085159.459678-1-mjambigi@linux.ibm.com>
- <b095898f-96b9-4211-aa99-58cfd5d4e538@linux.ibm.com>
-Content-Language: en-US
-From: Mahanta Jambigi <mjambigi@linux.ibm.com>
-In-Reply-To: <b095898f-96b9-4211-aa99-58cfd5d4e538@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI0MDA0MCBTYWx0ZWRfX2yfKjcd1QBLY
- /7aI+tmVRCeT5RdEURTFW5GvhkINiOWdm/cYlJtWWu7OmNyShi7y7SPkWvLogXmVeJ23optMgsy
- +kaKdJGSdWlxkh3tang5VULGOXbGFo/Bc3D9iOTloLZHQSkpU7VhYnmAnKkPPXq9ZFHpX7gN2qT
- hXUd8gRMlCpbF4ZDEahh3aKKsh7xuGYgb8TrPjBdZCl5EODH5EnpV08wVEm61uXG9fhkPI2FSvb
- apV87FWxLDKktYCCdo8emUGBn/LCVgYF4qfwJp4ne9D5omrDrTKp2JNFglGaTBWKuArJ+gqX7tO
- abACEKhPz3bMQHOnNV/DS7dhWh3d8Upsdk9hHxkLXLPjN2AZN0UJgTYMLZ2SEB7ITp4Gi93uw+3
- L2F/YD2QBUEIYtVJ+sKwJ+0lQvMNdQ90OXV6YFwopvTUDAbFW0gJWO6lkcnGFEfdQ2t6tw6ZbJo
- wJi7KqPMM5TeasbuceA==
-X-Proofpoint-ORIG-GUID: fa8-GKUUkPuvbM16_TZBVQX_zpgmduPf
-X-Proofpoint-GUID: yg4oFcU_8zA6ENyTbzlEZ4ffAN_0PTLI
-X-Authority-Analysis: v=2.4 cv=BYfoFLt2 c=1 sm=1 tr=0 ts=69eaf993 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=Q623sgFOHVwvUY2QT94A:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-23_03,2026-04-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 impostorscore=0 malwarescore=0 suspectscore=0
- lowpriorityscore=0 adultscore=0 spamscore=0 clxscore=1015 bulkscore=0
- phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2604200000
- definitions=main-2604240040
-X-Rspamd-Queue-Id: 7A3C9459DD5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Rspamd-Queue-Id: 9B004459E40
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280934-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.ibm.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mjambigi@linux.ibm.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280935-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[error27@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[3];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[11]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
+Hello Longxuan Yu,
 
+Commit 7dddc74af369 ("8021q: delete cleared egress QoS mappings")
+from Apr 20, 2026 (linux-next), leads to the following Smatch static
+checker warning:
 
-On 22/04/26 5:38 pm, Alexandra Winter wrote:
-> net-next is closed!
-> 
-> On 22.04.26 10:51, Mahanta Jambigi wrote:
->> The smc-sysctl.rst documentation incorrectly stated that the previous
->> hardcoded maximum number of WR buffers on the receive path (smcr_max_recv_wr)
->> was 16. The correct historical value used before the introduction of the sysctl
->> control was 48. Update the documentation to reflect the accurate default value.
-> 
-> s/default/historical/
-> or remove the last sentence
+	net/8021q/vlan_dev.c:211 vlan_dev_set_egress_priority()
+	warn: duplicate zero check 'vlan_qos' (previous on line 200)
 
-I'll replace default with historical in v2.
+net/8021q/vlan_dev.c
+    171 int vlan_dev_set_egress_priority(const struct net_device *dev,
+    172                                  u32 skb_prio, u16 vlan_prio)
+    173 {
+    174         struct vlan_dev_priv *vlan = vlan_dev_priv(dev);
+    175         struct vlan_priority_tci_mapping __rcu **mpp;
+    176         struct vlan_priority_tci_mapping *mp;
+    177         struct vlan_priority_tci_mapping *np;
+    178         u32 bucket = skb_prio & 0xF;
+    179         u32 vlan_qos = (vlan_prio << VLAN_PRIO_SHIFT) & VLAN_PRIO_MASK;
+    180 
+    181         /* See if a priority mapping exists.. */
+    182         mpp = &vlan->egress_priority_map[bucket];
+    183         mp = rtnl_dereference(*mpp);
+    184         while (mp) {
+    185                 if (mp->priority == skb_prio) {
+    186                         if (!vlan_qos) {
+    187                                 rcu_assign_pointer(*mpp, rtnl_dereference(mp->next));
+    188                                 vlan->nr_egress_mappings--;
+    189                                 kfree_rcu(mp, rcu);
+    190                         } else {
+    191                                 WRITE_ONCE(mp->vlan_qos, vlan_qos);
+    192                         }
+    193                         return 0;
+    194                 }
+    195                 mpp = &mp->next;
+    196                 mp = rtnl_dereference(*mpp);
+    197         }
+    198 
+    199         /* Create a new mapping then. */
+    200         if (!vlan_qos)
+                ^^^^^^^^^^^^^^
+The commit adds this check
+
+    201                 return 0;
+    202 
+    203         np = kmalloc_obj(struct vlan_priority_tci_mapping);
+    204         if (!np)
+    205                 return -ENOBUFS;
+    206 
+    207         np->priority = skb_prio;
+    208         np->vlan_qos = vlan_qos;
+    209         RCU_INIT_POINTER(np->next, rtnl_dereference(vlan->egress_priority_map[bucket]));
+    210         rcu_assign_pointer(vlan->egress_priority_map[bucket], np);
+--> 211         if (vlan_qos)
+                ^^^^^^^^^^^^^
+So now this old one could be deleted.
+
+    212                 vlan->nr_egress_mappings++;
+    213         return 0;
+    214 }
+
+This email is a free service from the Smatch-CI project [smatch.sf.net].
+
+regards,
+dan carpenter
 
