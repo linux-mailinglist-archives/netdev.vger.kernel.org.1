@@ -1,152 +1,156 @@
-Return-Path: <netdev+bounces-280966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280967-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QJC+NLkr62mBJgAAu9opvQ
-	(envelope-from <netdev+bounces-280966-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:37:13 +0200
+	id gDGCAxsx62lfJwAAu9opvQ
+	(envelope-from <netdev+bounces-280967-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 11:00:11 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB83B45B96B
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:37:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 48A5B45BCF5
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 11:00:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0EE283009FAC
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 08:36:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7786A3014542
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 08:59:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7181731A7F6;
-	Fri, 24 Apr 2026 08:36:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 074E13644A3;
+	Fri, 24 Apr 2026 08:59:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="IGi8crrt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lGn5NZG3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FED729ACF6;
-	Fri, 24 Apr 2026 08:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5D4135DA7F;
+	Fri, 24 Apr 2026 08:59:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777019792; cv=none; b=d68As199DmXtL5i5LcigN4ETO3g+yBjbtDo2/yKjzWZhOxmx95lQnGG4VtKnIx9PrRiCPTrO0hjSf4l4aM1X2wC2S5Kg0a8DvJwTCAU7ZAXEE6kgozHCV9pRBIiw27tkz8aw8ghKaNsX/4m8L5+MuTIIXUtUaBp1fMgHuulniDQ=
+	t=1777021169; cv=none; b=qqGMAXugDrEZVwmoC/W4vn3OfjuD751PI197bTh5s0V+6jrp/GYHqTqsP1iiirJZ/XmA4t+04PHag0vyWCB8GfCtDFIOOHpwNE5lfWvqbV4lc4FivlLiV1uR3FrzOZJzb4Q7bEeKbn9xafpq+YlH1hVryUy7atxIEzCJ2wIMag0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777019792; c=relaxed/simple;
-	bh=Osjn5zIzItASdIK1vVSsoI77bcq+prIokLTVS9iqMd8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ELx9XY4X2Sa4jxd1lpUp6mK2GJkmHhwQd/24ivdLOErNFWraTsAiODw0QaC9SZGiSj16m1UFwGQhQqAfK4kiXbzLkNWl+XK06nyHEwHZO/86ixILN4rVK81U7yxnWcnpixjbR5BjjIKN2Ga0emquQDYEyXN3x4O/uU6XC4wvG3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=IGi8crrt; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 4799C4E42AE9;
-	Fri, 24 Apr 2026 08:36:28 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 1BFAF604EB;
-	Fri, 24 Apr 2026 08:36:28 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B9B6110720009;
-	Fri, 24 Apr 2026 10:36:22 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1777019787; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=Osjn5zIzItASdIK1vVSsoI77bcq+prIokLTVS9iqMd8=;
-	b=IGi8crrtSad5zHLVdymz0NZ51Iu6mHyBW10vScIf0bRAmt/H1B/doVIZGVI9w/jC9FMeGJ
-	W3aPDtOqQdqsB3m2XEsbWI6VnQfioxsr6TbF0Ga6C0Xe3sEIsvq1rNRM6uGa/oe2ixfpIs
-	d9CYG+fdEd0cIKjm8vz5aiFDQ2mb79vP5ZU+ZhhiL6gSMgYZOle4HF+j34il26U1x9AeUT
-	tD5j4H76TT/GR54UhLfVdN26TMj0f+TmWtQQyNMILLpeUfYkHh2NzRUA9TBeodyEvtL1xN
-	8b0Ia30CWVThHsIHL+y2ShAXne1gzKcx+BXURkA2z8SxiqjRKQ97thHSxi7vyw==
-Date: Fri, 24 Apr 2026 10:36:18 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Corey Leavitt via B4 Relay <devnull+corey.leavitt.info@kernel.org>
-Cc: corey@leavitt.info, Oleksij Rempel <o.rempel@pengutronix.de>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>, Russell
- King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC net-next 1/4] net: pse-pd: scope pse_control
- regulator handle to kref lifetime
-Message-ID: <20260424103618.4c6ee35e@kmaincent-XPS-13-7390>
-In-Reply-To: <20260423-pse-notifier-decouple-v1-1-86ed750a9d62@leavitt.info>
-References: <20260423-pse-notifier-decouple-v1-0-86ed750a9d62@leavitt.info>
-	<20260423-pse-notifier-decouple-v1-1-86ed750a9d62@leavitt.info>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1777021169; c=relaxed/simple;
+	bh=DEoY8VRsnprsvGDeBUko4eOnwJrwDG98t8XxFVl0mqE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WNKVCqz9Mp8qGxhAa2WbjmXhhSSfDvBpwoavKiBBPrh3fyHVzSdCjKOeflsbLgDMTbS6DlF33kKCo/IjOGpQJMKQM7LbadxwCTtWNEp7DRAEtmXOGFLdDIED9e5ZqRw5gmbgP7sOvukTHSi5nWHmzyBV1N4YXUP53AHoKTQEucw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lGn5NZG3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAC5EC19425;
+	Fri, 24 Apr 2026 08:59:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777021169;
+	bh=DEoY8VRsnprsvGDeBUko4eOnwJrwDG98t8XxFVl0mqE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lGn5NZG35eMgsFLA4+s/v+zgVoRgkXnP4w5shd2SAl8ZoQQ5B5MrNS+eKhDJ02u07
+	 GVEYoLHxhefV4iSoNh+jGALNdKqIw6enmE0aWB4S5xDcYKZI74L+cWlBVqNxcXu5VC
+	 Uy195vvaXSA5m7MtmWO0cKuLrLeqBb6kbruy4tvgwlLFcU613Rc30RwXtVbttWVdIN
+	 1CB3UJxhCMHJPez8bxMac+miFJwp92SQ91c112nM4bTE1GcPCXdITIcILnmTuIZ5Oa
+	 UYR6y2FufJ7D39XQ6xJZ1VxJgqhVjsGLusWQW+O8IPbm2GCZWe9wbjFL8AnVCmVSrU
+	 Oa9GXIQ0xtBHQ==
+Date: Fri, 24 Apr 2026 09:59:25 +0100
+From: Simon Horman <horms@kernel.org>
+To: Titouan Ameline de Cadeville <titouan.ameline@gmail.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ne2k-pci: fix missing residual byte in block output
+ for 32-bit IO
+Message-ID: <20260424085925.GK900403@horms.kernel.org>
+References: <20260421145736.15949-1-titouan.ameline@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: BB83B45B96B
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260421145736.15949-1-titouan.ameline@gmail.com>
+X-Rspamd-Queue-Id: 48A5B45BCF5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280966-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	FREEMAIL_CC(0.00)[leavitt.info,pengutronix.de,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kory.maincent@bootlin.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-280967-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev,corey.leavitt.info];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,leavitt.info:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid]
 
-On Thu, 23 Apr 2026 01:42:14 -0600
-Corey Leavitt via B4 Relay <devnull+corey.leavitt.info@kernel.org> wrote:
+On Tue, Apr 21, 2026 at 04:57:36PM +0200, Titouan Ameline de Cadeville wrote:
+> ne2k_pci_block_output() handles residual bytes after the main outsl()
+> loop when the transfer count is not a multiple of 4. It correctly
+> handles the 2-byte residual case with outw(),  but is missingg the
+> 1 byte residual case. This means for packets where count % 4 == 1 or
+> count % 4 == 3,  the final byte is never written to the NIC's data
+> port.
+> 
+> In practice, this is masked by the count being rounded up to a 4-byte
+> boundary earlier in the function for ONLY_32BIT_IO cards, but that
+> rounding itself causes a little information leak by sending
+> uninitialized kernel buffer bytes on the wire
 
-> From: Corey Leavitt <corey@leavitt.info>
->=20
-> __pse_control_release() drops psec->ps via devm_regulator_put(), which
-> only succeeds if the devres entry added by the matching
-> devm_regulator_get_exclusive() is still present on pcdev->dev at the
-> time the pse_control's kref hits zero.
->=20
-> In practice that assumption does not hold when the controller is
-> unbound while any pse_control still has consumers: pcdev->dev's
-> devres list is released LIFO, so every per-attach regulator-GET
-> devres runs (and regulator_put()s the underlying regulator) before
-> pse_controller_unregister() itself is invoked. Any later
-> pse_control_put() from that unbind path then reads psec->ps as a
-> dangling pointer inside devm_regulator_put() and WARNs at
-> drivers/regulator/devres.c:232 (devres_release() fails to find the
-> already-released match).
->=20
-> The pse_control's consumer handle is logically scoped to the
-> pse_control's refcount, not to pcdev->dev's devres lifetime. Switch
-> to the plain regulator_get_exclusive() / regulator_put() pair so
-> __pse_control_release() does the right put regardless of whether
-> the controller's devres has already been unwound.
->=20
-> No change to the regulator-framework-visible refcount or lifetime of
-> the underlying regulator: a single get paired with a single put. The
-> existing devm_regulator_register() for the per-PI rails is unchanged
-> (those ARE correctly scoped to the controller's lifetime).
+It seems to me that the code being updated by this patch is for
+!ONLY_32BIT_IO cards. And in that case count is rounded up to
+the next even value if it is odd.
 
-Acked-by: Kory Maincent <kory.maincent@bootlin.com>
+	if (ei_status.ne2k_flags & ONLY_32BIT_IO)
+			count = (count + 3) & 0xFFFC;
+		else
+			if (count & 0x01)
+				count++;
 
-Thank you!
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+
+Regarding the information leak. I believe this is only from
+the Kernel to the device. But not from the device onto the wire
+as the device doesn't send data beyond the end of the packet data.
+
+It isn't at obvious to me that this is a problem that warrants fixing.
+
+> 
+> Add the missing outb() call for the odd byte case, mirroring what
+> ne2k_pci_block_input() already does correctly.
+> 
+> Signed-off-by: Titouan Ameline de Cadeville <titouan.ameline@gmail.com>
+> ---
+>  drivers/net/ethernet/8390/ne2k-pci.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/8390/ne2k-pci.c b/drivers/net/ethernet/8390/ne2k-pci.c
+> index 1a34da07c0db..1bd5b94b5d22 100644
+> --- a/drivers/net/ethernet/8390/ne2k-pci.c
+> +++ b/drivers/net/ethernet/8390/ne2k-pci.c
+> @@ -632,6 +632,8 @@ static void ne2k_pci_block_output(struct net_device *dev, int count,
+>  				outw(le16_to_cpu(*b++), NE_BASE + NE_DATAPORT);
+>  				buf = (char *)b;
+>  			}
+> +			if (count & 1)
+> +				outb(*buf, NE_BASE + NE_DATAPORT);
+
+Because count is even this condition will never be met.
+
+>  		}
+>  	}
+
+-- 
+pw-bot: changes-requested
 
