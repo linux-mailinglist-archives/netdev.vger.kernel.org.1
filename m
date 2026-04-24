@@ -1,67 +1,106 @@
-Return-Path: <netdev+bounces-281051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281053-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uK8eLg/A62ngQwAAu9opvQ
-	(envelope-from <netdev+bounces-281051-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 21:10:07 +0200
+	id MGpoKijD62msRAAAu9opvQ
+	(envelope-from <netdev+bounces-281053-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 21:23:20 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E5DD462AFD
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 21:10:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A329462D58
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 21:23:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DBFF33055800
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 19:06:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D4CF0300B9C8
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 19:18:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A08B3FA5D4;
-	Fri, 24 Apr 2026 19:06:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6595034DCE3;
+	Fri, 24 Apr 2026 19:18:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="XXi4FfPd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oZqyNv6S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6690F35AC19;
-	Fri, 24 Apr 2026 19:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AA993659FD
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 19:18:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777057563; cv=none; b=fSBiJSSbO+nJ1bydibJp7qcdjj8tglPUTdz67CIomMuTmD+wyvjHtml7D5AfJ9/snbOzjL3iSLQ4M0G46d4Nt+6C9t6OYhKoehwswUWF58043gAEBgAPYjQohPvHSk+wF2hiRYrYntN+xQh32NrRnilICVETu67WAlTBAhqDHdM=
+	t=1777058321; cv=none; b=OdcxeIIuZxA2FqulawzhyOmDzBUEo72EPv3iaoTovvjrnkN5pBGldr1s8sfdZ7/xLTtSewmdUOmReV2taG+9t9W/3MeFPZQgPYSL4NEbxLpGZId/EPEkZ84tjs0C6uwtJa55r4RCVGpjzyFu/hP5Xf9vEYnLYnD2qlX1trbVsik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777057563; c=relaxed/simple;
-	bh=CvKUyzG4xOLNVTgoxxq7GPtF3UVmlvmYN65uLGVH9TA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G5xV0CEebKhSdK6GRzAMYwkTkTj1inwXlVPbIvO9uPqS1NWFlZ6pHvO13OTVercqKzEJl86AJUjMSAX0hq7PkuHI8sfvEafIykGAJ7q1611mLEfl1/oyiiEYPeHfidsL9fOVlAQlVyZA1n9zzywcjp6RsTWVAsG3ZaUpDmWhXPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=XXi4FfPd; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from localhost.localdomain (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 3461E60284;
-	Fri, 24 Apr 2026 21:05:59 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1777057559;
-	bh=rbtKElw/LZcbhhYls6Gb7oYe+cPZR1+xaNk5gqRvTs8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XXi4FfPdxjUtuZUX9m2weu3Loqt62MpLtWeJQWh2ewAODOHvkXj9zTAPpW1468bBN
-	 +xrV04CYlxMI6RjjIELpQtAoIzpmZ9w8fh/RSvd3DydubCiMuP4ac59P3lG4xnvMOQ
-	 nFQe43m+UmRTNzwlodqfQGV8lTcigokHuvS76TTegmE7pbtYYfUNc72wqCPNhidTsv
-	 vVrOmfk8Z/kcuW9yzDbV9LFfRNboM2r39u2A14OTwtDqjSyLG2oX8I3dk27ikg/ifv
-	 IwXP7diQ8ImAoo3Ik0QXxxDPbyKvQh533uZUqzH8ocP7uzP0sELnvOkNyWb/I0xRUN
-	 PiUlMRE+wYqIA==
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
+	s=arc-20240116; t=1777058321; c=relaxed/simple;
+	bh=bVTg7g/DgY21o4JRsmGKmk0kP2qQqkrlnZU2sa3maDc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mzTXiTdfVyOSl9ET9WZzNoFcK+/8JspPp1n4Rs9gK608gjXVnub2WVEjHMpNgJGrZ7oO/NluPPr139zfQbebjffQOl2uQ61iVlVkKqoj3eepAVxQI11dzKto4aszUecolIOT0tLJoIucseV6+oaVHEvNp1ED+YLZKAlhc/eCLF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oZqyNv6S; arc=none smtp.client-ip=74.125.82.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-12dbd0f7ecaso1259235c88.0
+        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 12:18:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777058319; x=1777663119; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NsjhhZdX0yxy3kgINItwDji3KGNUTwxF928253yyINA=;
+        b=oZqyNv6Saw2P8WkXhAfhkkQEvJvRtnFuOod/+TNOshIqn1tGk+hu6mMVVVrEvZcH3E
+         QqGEgw7xgmcRcg4CGAkPFI4PN7qk8tvvOCU8xI7mHthQP6fBBBt3k15Qy6lKn+sETuhE
+         48XElsXsmqI12UYFVZnYgVR15RDkSSCJsCO6ThGBFW69W7G8IV9n7a/OkYDzWr9IzhaN
+         yxpgeFOPlwGlhgY6QCochBfXehLUwGvkHkeboObqqok+8IFePCEGAwJMDqFcrSQj2Z+9
+         JaenZPofulJDn7ry1tolLf212LTKO5PXmq5WM4itCS5GX/y8suJgzw/O+JVwz3Oredwi
+         joMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777058319; x=1777663119;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NsjhhZdX0yxy3kgINItwDji3KGNUTwxF928253yyINA=;
+        b=JOuz4nera2ridhKh2DbY7egKo5Dg4223pSQ2fLbKobi/Llz8QOOWZOEhpk7hzAw3cL
+         OcY1FCcTgVQEW0siO9pIpzh+7CgIR9cAjj8Hkkeb0b1cys1dL3iZ/duEkN5zSKnQfs1G
+         AfhYoXX1WKhBSdgMGg81NPMXDiGZCSifqzRI8oyWE2Gf0R5Cazx3pf+1LdPUKI+JK8e1
+         PPwG1/086GZgWxHMKxzcSzebOyxyIF1fLBb9BiEyj96z4cpb1Fdz+pJjS06uJ/KOTbMX
+         8T2QtOAuts/rIXxt2OEPM8aanz5qRN7k+HkzEla779gcosB9SR1Ki9khXaZKj18oG8Tg
+         +ljg==
+X-Forwarded-Encrypted: i=1; AFNElJ+lj9jeinzw6UuatA7XqS/5MurIzwv/llPm1G4hjppMJyDVLKYubjmkdHev+O+D3F3PK4Ecy3E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YziEL+hdo4Yh7qvQ8s7r7Ez/djiQTTe30I54G+q0c9Snu2lNTfN
+	Pi280ayqIIcVGithszx+rz4gZw71uDhS4BgOvpXr519T5mhHjjV+siO1
+X-Gm-Gg: AeBDiesj0Vs353cjYQnPUt/smt7SMuxGqcWyx5mpVivqXjgIzYCDIoxpcylJp3gL74k
+	jzYCikZMddytS6ufMDd+iFE/n/UaCDiBscxWI9Hnw+bYVA4kDHsKgPwbBPaVHq8Mx0EhbBkwTUd
+	LPvF9Fl6G0/uat+pfPF5SM2QSH1QSzfVnac7dMUjgZTrO1fDCpJeizrGu+niRN3+gYjmW7c88Tx
+	vBSGtdCGELq2ZkWEHQIu63/1q41EYU6yHqBd591Ix1Sg5+bhuxNYKLIhW1u+Oieed3Ba60rqMw4
+	rj6of7ZHY5/ly7hKkF6YAQgqQd2zSl62nGS7QKtlwz+koCcOHluBKL9xYkfg48vp9rx+JO+4tPa
+	XNXIB7El/A5i4rJwo0/BAeHYwGA4J/uOwVZARTyA2SqbEyZUEZdVVVo/gDoFrwMscBodCiKVY48
+	qAFahmp2Ng02tsu1MNT5ViisCVkVPugn0dnCkL2SlOOkLUqcJPQme6X4vIsAdwNW9Qc8aOhwWaI
+	Mc1Nbeueeu64b5WDDmd
+X-Received: by 2002:a05:7022:383:b0:12b:ebb9:1c18 with SMTP id a92af1059eb24-12c73fa739fmr19364941c88.31.1777058318879;
+        Fri, 24 Apr 2026 12:18:38 -0700 (PDT)
+Received: from efaec68ba852.tailc0aff1.ts.net ([206.206.192.132])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12db8684f90sm15312204c88.13.2026.04.24.12.18.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Apr 2026 12:18:38 -0700 (PDT)
+From: Weiming Shi <bestswngs@gmail.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	bpf@vger.kernel.org,
 	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de,
-	horms@kernel.org
-Subject: [PATCH net 11/11] ipvs: fix the spin_lock usage for RT build
-Date: Fri, 24 Apr 2026 21:05:13 +0200
-Message-ID: <20260424190513.32823-12-pablo@netfilter.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260424190513.32823-1-pablo@netfilter.org>
-References: <20260424190513.32823-1-pablo@netfilter.org>
+	Xiang Mei <xmei5@asu.edu>,
+	Weiming Shi <bestswngs@gmail.com>,
+	Xinyu Ma <mmmxny@gmail.com>
+Subject: [PATCH bpf] bpf, sockmap: reject overflowing copy + len in bpf_msg_push_data()
+Date: Fri, 24 Apr 2026 12:16:04 -0700
+Message-ID: <20260424191602.1522411-3-bestswngs@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,282 +108,88 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 1E5DD462AFD
-X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: 1A329462D58
+X-Rspamd-Action: add header
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [6.34 / 15.00];
+	SEM_URIBL(3.50)[asu.edu:email];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-281053-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281051-lists,netdev=lfdr.de];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[netfilter.org];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	R_DKIM_ALLOW(0.00)[gmail.com:s=20251104];
+	FREEMAIL_TO(0.00)[linux.dev,iogearbox.net,kernel.org,gmail.com,davemloft.net,google.com,redhat.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,fomichev.me,kernel.org,linux.dev,vger.kernel.org,asu.edu];
+	GREYLIST(0.00)[pass,meta];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
+	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_SPAM(0.00)[0.646];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FROM_HAS_DN(0.00)[]
+X-Spam: Yes
 
-From: Julian Anastasov <ja@ssi.bg>
+When the scatterlist ring is full or nearly full, bpf_msg_push_data()
+enters a copy fallback path and computes copy + len for the page
+allocation size. Since len comes from BPF with arg3_type = ARG_ANYTHING
+and both are u32, a crafted len can wrap the sum to a small value,
+causing an undersized allocation followed by an out-of-bounds memcpy.
 
-syzbot reports for sleeping function called from invalid context [1].
-The recently added code for resizable hash tables uses
-hlist_bl bit locks in combination with spin_lock for
-the connection fields (cp->lock).
+ BUG: unable to handle page fault for address: ffffed104089a402
+ Oops: Oops: 0000 [#1] SMP KASAN NOPTI
+ Call Trace:
+  __asan_memcpy (mm/kasan/shadow.c:105)
+  bpf_msg_push_data (net/core/filter.c:2852 net/core/filter.c:2788)
+  bpf_prog_9ed8b5711920a7d7+0x2e/0x36
+  sk_psock_msg_verdict (net/core/skmsg.c:934)
+  tcp_bpf_sendmsg (net/ipv4/tcp_bpf.c:421 net/ipv4/tcp_bpf.c:584)
+  __sys_sendto (net/socket.c:2206)
+  do_syscall_64 (arch/x86/entry/syscall_64.c:94)
+  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
 
-Fix the following problems:
+Add an overflow check before the allocation.
 
-* avoid using spin_lock(&cp->lock) under locked bit lock
-because it sleeps on PREEMPT_RT
-
-* as the recent changes call ip_vs_conn_hash() only for newly
-allocated connection, the spin_lock can be removed there because
-the connection is still not linked to table and does not need
-cp->lock protection.
-
-* the lock can be removed also from ip_vs_conn_unlink() where we
-are the last connection user.
-
-* the last place that is fixed is ip_vs_conn_fill_cport()
-where now the cp->lock is locked before the other locks to
-ensure other packets do not modify the cp->flags in non-atomic
-way. Here we make sure cport and flags are changed only once
-if two or more packets race to fill the cport. Also, we fill
-cport early, so that if we race with resizing there will be
-valid cport key for the hashing. Add a warning if too many
-hash table changes occur for our RCU read-side critical
-section which is error condition but minor because the
-connection still can expire gracefully. Problems reported
-by Sashiko.
-
-[1]:
-BUG: sleeping function called from invalid context at kernel/locking/spinlock_rt.c:48
-in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 16, name: ktimers/0
-preempt_count: 2, expected: 0
-RCU nest depth: 3, expected: 3
-8 locks held by ktimers/0/16:
- #0: ffffffff8de5f260 (local_bh){.+.+}-{1:3}, at: __local_bh_disable_ip+0x3c/0x420 kernel/softirq.c:163
- #1: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: __local_bh_disable_ip+0x3c/0x420 kernel/softirq.c:163
- #2: ffff8880b8826360 (&base->expiry_lock){+...}-{3:3}, at: spin_lock include/linux/spinlock_rt.h:45 [inline]
- #2: ffff8880b8826360 (&base->expiry_lock){+...}-{3:3}, at: timer_base_lock_expiry kernel/time/timer.c:1502 [inline]
- #2: ffff8880b8826360 (&base->expiry_lock){+...}-{3:3}, at: __run_timer_base+0x120/0x9f0 kernel/time/timer.c:2384
- #3: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
- #3: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:838 [inline]
- #3: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: __rt_spin_lock kernel/locking/spinlock_rt.c:50 [inline]
- #3: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: rt_spin_lock+0x1e0/0x400 kernel/locking/spinlock_rt.c:57
- #4: ffffc90000157a80 ((&cp->timer)){+...}-{0:0}, at: call_timer_fn+0xd4/0x5e0 kernel/time/timer.c:1745
- #5: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
- #5: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:838 [inline]
- #5: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: ip_vs_conn_unlink net/netfilter/ipvs/ip_vs_conn.c:315 [inline]
- #5: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: ip_vs_conn_expire+0x257/0x2390 net/netfilter/ipvs/ip_vs_conn.c:1260
- #6: ffffffff8de5f260 (local_bh){.+.+}-{1:3}, at: __local_bh_disable_ip+0x3c/0x420 kernel/softirq.c:163
- #7: ffff888068d4c3f0 (&cp->lock#2){+...}-{3:3}, at: spin_lock include/linux/spinlock_rt.h:45 [inline]
- #7: ffff888068d4c3f0 (&cp->lock#2){+...}-{3:3}, at: ip_vs_conn_unlink net/netfilter/ipvs/ip_vs_conn.c:324 [inline]
- #7: ffff888068d4c3f0 (&cp->lock#2){+...}-{3:3}, at: ip_vs_conn_expire+0xd4a/0x2390 net/netfilter/ipvs/ip_vs_conn.c:1260
-Preemption disabled at:
-[<ffffffff898a6358>] bit_spin_lock include/linux/bit_spinlock.h:38 [inline]
-[<ffffffff898a6358>] hlist_bl_lock+0x18/0x110 include/linux/list_bl.h:149
-CPU: 0 UID: 0 PID: 16 Comm: ktimers/0 Tainted: G        W    L      syzkaller #0 PREEMPT_{RT,(full)}
-Tainted: [W]=WARN, [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/18/2026
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- __might_resched+0x329/0x480 kernel/sched/core.c:9162
- __rt_spin_lock kernel/locking/spinlock_rt.c:48 [inline]
- rt_spin_lock+0xc2/0x400 kernel/locking/spinlock_rt.c:57
- spin_lock include/linux/spinlock_rt.h:45 [inline]
- ip_vs_conn_unlink net/netfilter/ipvs/ip_vs_conn.c:324 [inline]
- ip_vs_conn_expire+0xd4a/0x2390 net/netfilter/ipvs/ip_vs_conn.c:1260
- call_timer_fn+0x192/0x5e0 kernel/time/timer.c:1748
- expire_timers kernel/time/timer.c:1799 [inline]
- __run_timers kernel/time/timer.c:2374 [inline]
- __run_timer_base+0x6a3/0x9f0 kernel/time/timer.c:2386
- run_timer_base kernel/time/timer.c:2395 [inline]
- run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2405
- handle_softirqs+0x1de/0x6d0 kernel/softirq.c:622
- __do_softirq kernel/softirq.c:656 [inline]
- run_ktimerd+0x69/0x100 kernel/softirq.c:1151
- smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
- kthread+0x388/0x470 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-
-Reported-by: syzbot+504e778ddaecd36fdd17@syzkaller.appspotmail.com
-Link: https://sashiko.dev/#/patchset/20260415200216.79699-1-ja%40ssi.bg
-Link: https://sashiko.dev/#/patchset/20260420165539.85174-4-ja%40ssi.bg
-Link: https://sashiko.dev/#/patchset/20260422135823.50489-4-ja%40ssi.bg
-Fixes: 2fa7cc9c7025 ("ipvs: switch to per-net connection table")
-Signed-off-by: Julian Anastasov <ja@ssi.bg>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+Link: https://lore.kernel.org/all/20260424155913.A19FDC19425@smtp.kernel.org
+Fixes: 6fff607e2f14 ("bpf: sk_msg program helper bpf_msg_push_data")
+Tested-by: Xiang Mei <xmei5@asu.edu>
+Tested-by: Xinyu Ma <mmmxny@gmail.com>
+Signed-off-by: Weiming Shi <bestswngs@gmail.com>
 ---
- net/netfilter/ipvs/ip_vs_conn.c | 69 +++++++++++++++++----------------
- 1 file changed, 36 insertions(+), 33 deletions(-)
+ net/core/filter.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs_conn.c
-index 84a4921a7865..9e23cda84825 100644
---- a/net/netfilter/ipvs/ip_vs_conn.c
-+++ b/net/netfilter/ipvs/ip_vs_conn.c
-@@ -267,27 +267,20 @@ static inline int ip_vs_conn_hash(struct ip_vs_conn *cp)
- 		hash_key2 = hash_key;
- 		use2 = false;
- 	}
+diff --git a/net/core/filter.c b/net/core/filter.c
+index bc96c18df4e0..4f5a00ade2d3 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -2820,6 +2820,9 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
+ 	if (!space || (space == 1 && start != offset))
+ 		copy = msg->sg.data[i].length;
+ 
++	if (unlikely(copy + len < copy))
++		return -EINVAL;
 +
- 	conn_tab_lock(t, cp, hash_key, hash_key2, use2, true /* new_hash */,
- 		      &head, &head2);
--	spin_lock(&cp->lock);
--
--	if (!(cp->flags & IP_VS_CONN_F_HASHED)) {
--		cp->flags |= IP_VS_CONN_F_HASHED;
--		WRITE_ONCE(cp->hn0.hash_key, hash_key);
--		WRITE_ONCE(cp->hn1.hash_key, hash_key2);
--		refcount_inc(&cp->refcnt);
--		hlist_bl_add_head_rcu(&cp->hn0.node, head);
--		if (use2)
--			hlist_bl_add_head_rcu(&cp->hn1.node, head2);
--		ret = 1;
--	} else {
--		pr_err("%s(): request for already hashed, called from %pS\n",
--		       __func__, __builtin_return_address(0));
--		ret = 0;
--	}
- 
--	spin_unlock(&cp->lock);
-+	cp->flags |= IP_VS_CONN_F_HASHED;
-+	WRITE_ONCE(cp->hn0.hash_key, hash_key);
-+	WRITE_ONCE(cp->hn1.hash_key, hash_key2);
-+	refcount_inc(&cp->refcnt);
-+	hlist_bl_add_head_rcu(&cp->hn0.node, head);
-+	if (use2)
-+		hlist_bl_add_head_rcu(&cp->hn1.node, head2);
-+
- 	conn_tab_unlock(head, head2);
-+	ret = 1;
- 
- 	/* Schedule resizing if load increases */
- 	if (atomic_read(&ipvs->conn_count) > t->u_thresh &&
-@@ -321,7 +314,6 @@ static inline bool ip_vs_conn_unlink(struct ip_vs_conn *cp)
- 
- 	conn_tab_lock(t, cp, hash_key, hash_key2, use2, false /* new_hash */,
- 		      &head, &head2);
--	spin_lock(&cp->lock);
- 
- 	if (cp->flags & IP_VS_CONN_F_HASHED) {
- 		/* Decrease refcnt and unlink conn only if we are last user */
-@@ -334,7 +326,6 @@ static inline bool ip_vs_conn_unlink(struct ip_vs_conn *cp)
- 		}
- 	}
- 
--	spin_unlock(&cp->lock);
- 	conn_tab_unlock(head, head2);
- 
- 	rcu_read_unlock();
-@@ -637,6 +628,7 @@ void ip_vs_conn_fill_cport(struct ip_vs_conn *cp, __be16 cport)
- 	struct ip_vs_conn_hnode *hn;
- 	u32 hash_key, hash_key_new;
- 	struct ip_vs_conn_param p;
-+	bool by_me = false;
- 	int ntbl;
- 	int dir;
- 
-@@ -664,8 +656,11 @@ void ip_vs_conn_fill_cport(struct ip_vs_conn *cp, __be16 cport)
- 		t = rcu_dereference(t->new_tbl);
- 		ntbl++;
- 		/* We are lost? */
--		if (ntbl >= 2)
-+		if (ntbl >= 2) {
-+			IP_VS_ERR_RL("%s(): Too many ht changes for dir %d\n",
-+				     __func__, dir);
- 			return;
-+		}
- 	}
- 
- 	/* Rehashing during resize? Use the recent table for adds */
-@@ -683,10 +678,13 @@ void ip_vs_conn_fill_cport(struct ip_vs_conn *cp, __be16 cport)
- 	if (head > head2 && t == t2)
- 		swap(head, head2);
- 
-+	/* Protect the cp->flags modification */
-+	spin_lock_bh(&cp->lock);
-+
- 	/* Lock seqcount only for the old bucket, even if we are on new table
- 	 * because it affects the del operation, not the adding.
- 	 */
--	spin_lock_bh(&t->lock[hash_key & t->lock_mask].l);
-+	spin_lock(&t->lock[hash_key & t->lock_mask].l);
- 	preempt_disable_nested();
- 	write_seqcount_begin(&t->seqc[hash_key & t->seqc_mask]);
- 
-@@ -704,14 +702,23 @@ void ip_vs_conn_fill_cport(struct ip_vs_conn *cp, __be16 cport)
- 		hlist_bl_unlock(head);
- 		write_seqcount_end(&t->seqc[hash_key & t->seqc_mask]);
- 		preempt_enable_nested();
--		spin_unlock_bh(&t->lock[hash_key & t->lock_mask].l);
-+		spin_unlock(&t->lock[hash_key & t->lock_mask].l);
-+		spin_unlock_bh(&cp->lock);
- 		hash_key = hash_key_new;
- 		goto retry;
- 	}
- 
--	spin_lock(&cp->lock);
--	if ((cp->flags & IP_VS_CONN_F_NO_CPORT) &&
--	    (cp->flags & IP_VS_CONN_F_HASHED)) {
-+	/* Fill cport once, even if multiple packets try to do it */
-+	if (cp->flags & IP_VS_CONN_F_NO_CPORT && (!cp->cport || by_me)) {
-+		/* If we race with resizing make sure cport is set for dir 1 */
-+		if (!cp->cport) {
-+			cp->cport = cport;
-+			by_me = true;
-+		}
-+		if (!dir) {
-+			atomic_dec(&ipvs->no_cport_conns[af_id]);
-+			cp->flags &= ~IP_VS_CONN_F_NO_CPORT;
-+		}
- 		/* We do not recalc hash_key_r under lock, we assume the
- 		 * parameters in cp do not change, i.e. cport is
- 		 * the only possible change.
-@@ -726,21 +733,17 @@ void ip_vs_conn_fill_cport(struct ip_vs_conn *cp, __be16 cport)
- 			hlist_bl_del_rcu(&hn->node);
- 			hlist_bl_add_head_rcu(&hn->node, head_new);
- 		}
--		if (!dir) {
--			atomic_dec(&ipvs->no_cport_conns[af_id]);
--			cp->flags &= ~IP_VS_CONN_F_NO_CPORT;
--			cp->cport = cport;
--		}
- 	}
--	spin_unlock(&cp->lock);
- 
- 	if (head != head2)
- 		hlist_bl_unlock(head2);
- 	hlist_bl_unlock(head);
- 	write_seqcount_end(&t->seqc[hash_key & t->seqc_mask]);
- 	preempt_enable_nested();
--	spin_unlock_bh(&t->lock[hash_key & t->lock_mask].l);
--	if (dir--)
-+	spin_unlock(&t->lock[hash_key & t->lock_mask].l);
-+
-+	spin_unlock_bh(&cp->lock);
-+	if (dir-- && by_me)
- 		goto next_dir;
- }
- 
+ 	page = alloc_pages(__GFP_NOWARN | GFP_ATOMIC | __GFP_COMP,
+ 			   get_order(copy + len));
+ 	if (unlikely(!page))
 -- 
-2.47.3
+2.43.0
 
 
