@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-280979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280980-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OFt3BHBJ62mWKgAAu9opvQ
-	(envelope-from <netdev+bounces-280979-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:44:00 +0200
+	id CGd0NbJJ62ntKgAAu9opvQ
+	(envelope-from <netdev+bounces-280980-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:45:06 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0A7945D4D3
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:43:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 50AFA45D4FE
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:45:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AFEC0302A7CF
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:42:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E08013039F57
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:43:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D06BA38BF81;
-	Fri, 24 Apr 2026 10:42:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7653238C2D5;
+	Fri, 24 Apr 2026 10:42:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TJ2F6pv8"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="skpCDb1F"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0131D5AD4
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 10:42:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04BE2D9EFB;
+	Fri, 24 Apr 2026 10:42:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777027364; cv=none; b=RU8CUOIDt2eNn4uUDtqkMkCxGBSTpnOiDqxM4wRfjhVDuH+7oFIQLNIOauoI8WprCHeVvutme9C7EvOG8EzRvR0KQBRj458nZefpC/JysVqu7AmD1s4DIJJ1gw935e+9XJ8qqbRH2h9U5rvPE6IKK3vb3qW75f31egyVtaah6ew=
+	t=1777027378; cv=none; b=O1E1dt41GJzX3RFa2TIzNO3UFUa527rkM/HjCyYAfgUgFo/Zb0a1WQXl8xKqlQarcCyWVeOVJLDUng3G20xnj4OzbJhSAoCET7QSXZXNWFqJbW15hMYySI/FTphO83H5jR+Uv+MQEX50pLva+KQ2+Hw3W0MkvxcVMoUqFPVO9S0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777027364; c=relaxed/simple;
-	bh=wpabQn1ol/qItAAjOBPAvpNVjKrZhE/WdQTRvEr4a78=;
+	s=arc-20240116; t=1777027378; c=relaxed/simple;
+	bh=J6qvBnUnGRiCjvCO3qjwKnrny5t6sSycWD3gPp2ZMVk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MAcNzK7/K2dBQhzs0O73WFL4FoddnlD86+upPip8Mjr/u+y0hJYcDwDvYwVJNNO/VpIJ89ZRwHoksuUdUrIwA0vodfGcKqPIJQhcs683C6oUIJz55sA3dEQjP3Xw1wxRDcalLgO5lP3o493XLskX1yQwSuntYchLf3atj7F2n5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TJ2F6pv8; arc=none smtp.client-ip=91.218.175.174
+	 MIME-Version; b=TYegv+a11gw+XODyDYWHKHDL0HQM+0Sd7U2wCAugzlWMYRug+g/qrWKg0yEPVpPoKHGJRX68tjwTlGjb4YczlCyUt9t7FaLDkWsUKsGlbdhjFMeYICok5TW+OojphBVcGyNWzCi8ZE//CKsV87hMjqoq95JPJqrMR4+mhrltQTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=skpCDb1F; arc=none smtp.client-ip=91.218.175.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1777027361;
+	t=1777027373;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Jk7ozpk8BJdqj1K1xG4zup/ZZJh6Q5ZPNMKI0G/5YVU=;
-	b=TJ2F6pv8tfnL3d8biVvAVVopk33/6mK7bR+gtjdDvF0cBiNmG9u+ahJPTZn934Ig7jbqWE
-	An/JgFz9B4Mq6XI99mwkUdJs2KxvH9f17sMaz2lni0DvKZxZDnnyJoMq0gzvlePjsmVim1
-	TdVkc0i7rlyroI+gnDdGNGddffpa/TY=
+	bh=5gmf5JLyBQRilWmxu/Ad4jSduwr5kfWqh68zcLQ0kQs=;
+	b=skpCDb1FaAOVr4mBDpYBEGhYX/Edi8xM8T45kPJxvYawq/JTXP9aqyipHWmbjlB//UYh1b
+	mZQFt9/IBgiB7SvtBLeBaqRXZryxVh5CvvqFkhSRWv3MgBHPfYneRQGjtp6/z287GYXvJv
+	wgDC6WJKu9IN568nCXRQ9zCQlu/993s=
 From: Jiayuan Chen <jiayuan.chen@linux.dev>
 To: bpf@vger.kernel.org
 Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
@@ -75,9 +75,9 @@ Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
 	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH bpf v2 2/3] bpf, netkit: reject offloaded programs on attach
-Date: Fri, 24 Apr 2026 18:41:41 +0800
-Message-ID: <20260424104201.217604-3-jiayuan.chen@linux.dev>
+Subject: [PATCH bpf v2 3/3] bpf, xdp: reject offloaded programs on link update
+Date: Fri, 24 Apr 2026 18:41:42 +0800
+Message-ID: <20260424104201.217604-4-jiayuan.chen@linux.dev>
 In-Reply-To: <20260424104201.217604-1-jiayuan.chen@linux.dev>
 References: <20260424104201.217604-1-jiayuan.chen@linux.dev>
 Precedence: bulk
@@ -88,7 +88,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: C0A7945D4D3
+X-Rspamd-Queue-Id: 50AFA45D4FE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
@@ -105,7 +105,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[linux.dev,iogearbox.net,blackwall.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,fomichev.me,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[3];
 	RCPT_COUNT_TWELVE(0.00)[29];
-	TAGGED_FROM(0.00)[bounces-280979-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280980-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -119,57 +119,40 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:email,linux.dev:dkim,linux.dev:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-Same issue as the tcx fix: netkit accepts SCHED_CLS programs but never
-checks if they were loaded for hardware offload. If someone loads a
-program with prog_ifindex pointing to an offload-capable device and then
-attaches it to a netkit peer, the bpf_func is bpf_prog_warn_on_exec()
-and the first packet triggers the WARN.
+Same class of bug as the tcx/netkit fixes: bpf_xdp_link_update() calls
+dev_xdp_install() directly and bypasses dev_xdp_attach(), so the offload
+check in dev_xdp_attach() is skipped. A user can create an XDP link in
+SKB or native mode with a regular program and then replace it via
+BPF_LINK_UPDATE with an offloaded program, whose bpf_func is
+bpf_prog_warn_on_exec(), tripping the WARN on the first packet.
 
-Reject offloaded programs in netkit_prog_attach(), netkit_link_attach()
-and netkit_link_update().
+Mirror the check from dev_xdp_attach(): reject when the link is not in
+HW mode and the new program is offloaded.
 
-Fixes: 35dfaad7188cd ("netkit, bpf: Add bpf programmable net device")
+Fixes: 026a4c28e1db3 ("bpf, xdp: Implement LINK_UPDATE for BPF XDP link")
 Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 ---
- drivers/net/netkit.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ net/core/dev.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
-index 5c0e01396e064..dae4d7b24d80e 100644
---- a/drivers/net/netkit.c
-+++ b/drivers/net/netkit.c
-@@ -533,6 +533,9 @@ int netkit_prog_attach(const union bpf_attr *attr, struct bpf_prog *prog)
- 	struct net_device *dev;
- 	int ret;
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 831129f2a69b5..984d44b2a626d 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -10648,6 +10648,11 @@ static int bpf_xdp_link_update(struct bpf_link *link, struct bpf_prog *new_prog,
  
-+	if (bpf_prog_is_offloaded(prog->aux))
-+		return -EINVAL;
-+
- 	rtnl_lock();
- 	dev = netkit_dev_fetch(current->nsproxy->net_ns, attr->target_ifindex,
- 			       attr->attach_type);
-@@ -683,6 +686,9 @@ static int netkit_link_update(struct bpf_link *link, struct bpf_prog *nprog,
- 	struct net_device *dev;
- 	int ret = 0;
- 
-+	if (bpf_prog_is_offloaded(nprog->aux))
-+		return -EINVAL;
-+
- 	rtnl_lock();
- 	dev = nkl->dev;
- 	if (!dev) {
-@@ -788,6 +794,9 @@ int netkit_link_attach(const union bpf_attr *attr, struct bpf_prog *prog)
- 	struct net_device *dev;
- 	int ret;
- 
-+	if (bpf_prog_is_offloaded(prog->aux))
-+		return -EINVAL;
-+
- 	rtnl_lock();
- 	dev = netkit_dev_fetch(current->nsproxy->net_ns,
- 			       attr->link_create.target_ifindex,
+ 	netdev_lock_ops(xdp_link->dev);
+ 	mode = dev_xdp_mode(xdp_link->dev, xdp_link->flags);
++	if (mode != XDP_MODE_HW && bpf_prog_is_offloaded(new_prog->aux)) {
++		netdev_unlock_ops(xdp_link->dev);
++		err = -EINVAL;
++		goto out_unlock;
++	}
+ 	bpf_op = dev_xdp_bpf_op(xdp_link->dev, mode);
+ 	err = dev_xdp_install(xdp_link->dev, mode, bpf_op, NULL,
+ 			      xdp_link->flags, new_prog);
 -- 
 2.43.0
 
