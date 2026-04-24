@@ -1,234 +1,169 @@
-Return-Path: <netdev+bounces-280924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280926-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4Ih7FRnj6mkbFQAAu9opvQ
-	(envelope-from <netdev+bounces-280924-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:27:21 +0200
+	id cBfIMpDj6mkbFQAAu9opvQ
+	(envelope-from <netdev+bounces-280926-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:29:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E536459706
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:27:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B1DF459735
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:29:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EEFA130075C6
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 03:27:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5B8E03007ADB
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 03:29:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 661C2332906;
-	Fri, 24 Apr 2026 03:27:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 391E633986F;
+	Fri, 24 Apr 2026 03:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="s62oztTN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D528933067F
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 03:27:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8005333710F;
+	Fri, 24 Apr 2026 03:28:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777001237; cv=none; b=avuiaXsTJLrDl9oOyetixgM3wpDBGzpCrlqUfJOypfFWq0+c6AKZI4nErds2nmqJIdcOG1xgjEKIA6p+65r0GvMC34I4t18vccBHzBZz+k7z8HPK5EPddSC5PdMGovN0CdcuRAJLPjSiaaV9rWSiboKq0URXF0r8NzCu3KZhs7A=
+	t=1777001337; cv=none; b=nEJC+rummXbh4//IUWihWaYNlTRqI4Wn7aUiHXMEOZS/X5D3nqslGKKbOwq4XiLQH3HAK6XkCX7hOJaH89TAJRru17s+mi/28aMlr1kmfngijtm/jmQf/LK25yg7sLKHXywSfGyPOZX+oFV186LAuiNi5TJ5eGpA9iPbguTGVg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777001237; c=relaxed/simple;
-	bh=0AoTguzBN8mKKCDCJ82u/RQxCwI2CsHGJNhMtrhiwYY=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=bJihRm+b2l8WJIzce4bZ5uVXfURNrUpHcyzdsonmgSPM3wK/GZ9oJ/mRx9YgivnmyR3dKRxw8fm6XLSIgKxLh601u152rBSlj0UIuBG6Pozz8CkB2ZN79fYFUM5YgF+po3Yp2hbxG2o7v3slQ7EwT//jaCIRl/n8D5AfovPLSdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-694885643e1so9364498eaf.3
-        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 20:27:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777001235; x=1777606035;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:in-reply-to
-         :date:mime-version:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9H9/taI5CUrg1eJFWKBiLdIg5ptElOQYy3iuN3iNMrM=;
-        b=snPz1sn+KRDm+6HiSHBPSIIz3zYZQG1NdBvIUsfJHrJNbMRzWaHHK9CT/4dbIjfj86
-         L+aqb1LbbVa7xO9CgfvGyedIjZP+a14gIZfoOAHi3w1wx9M7zNeD9K5QbAEulLUbJFEV
-         /aU7wocX5cf/6Ve3UIU3vvMY30Rd/YF22+GyEp+wZdp3GbX3uFdIO/BXyYmDHRFHroHZ
-         t9qt9w3PShlLrnZBtKcz9tux9+P2gikAka9I5ZRbhK2Uj4jYRDUUy0XZfAfM5Izmo7v8
-         XAVASLD2fE3aGMgWCLDztTh5OISFLFH9RSNZIcOQrv5kOGN3XyG+CNmoM5udGowDxL84
-         NZ3g==
-X-Forwarded-Encrypted: i=1; AFNElJ+o+NrvQ+GAk+fRDqumPVhjgKtUBvw02fXlikQ+mNk2CRd35UK6wukW3+jZ4VyalU3U9t5Z6Yo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIcdqzTUgnYr3N5BEvaNMonQyUsPc9FqXhH6uPY+xk5GrmauPm
-	MW7kQpLafztKYfHcIcHjrHPNNLNzKVT4yF0WBI0y59bBQEuyqMViyRDWS6z/YYtMbwRzD4jpz5C
-	w44t10J15bBuIOyCF0Hy8U9S6Awzb3cXA+sGYTkhygAh9O+iiVsq3vyPcD+Y=
+	s=arc-20240116; t=1777001337; c=relaxed/simple;
+	bh=8KbY4d9Sc1hur3MrKTEc3ePr/WWJlpdT80t8kvm2Slo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QTF7i3SXlKSqzYZaX/fCZEZCDG/l6Eqp2hw28X7t3W2TEgVb9Rg6ZfmOZCwEfcchMH8x2E2BB5/mfgJqk5TNA1ctEnZuysvy/Oocb+1x/QUy2nOIt6yNBaOb29mRFM1xaOG0t5TTBXvcQgXz/9c1T77MnCj1Mg1kiQj8/pjWwfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=s62oztTN; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 5EFDF20B7165; Thu, 23 Apr 2026 20:28:55 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5EFDF20B7165
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1777001335;
+	bh=hozJVYNbCa3wzecJn7QvQ9EMZSOZzc1JqZvHkZlE9Zo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=s62oztTNxMqGVuyaG2gEvGu12rVs6B0C5CMdSYnyxlsFB9uJ03pN+q5zWKBEuMwx5
+	 L6UvbtEEU07uN8K57dKz84WtwOg7rV1dbI1AVqLbiwG1FU5chgJDIbxLQMbNXw72HA
+	 TpEcyo9QNs20D6sNbK8Gaa/FamMqDPv9Yz/F83EU=
+Date: Thu, 23 Apr 2026 20:28:55 -0700
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	leon@kernel.org, longli@microsoft.com, kotaranov@microsoft.com,
+	horms@kernel.org, shradhagupta@linux.microsoft.com,
+	ssengar@linux.microsoft.com, ernis@linux.microsoft.com,
+	shirazsaleem@microsoft.com, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, stephen@networkplumber.org,
+	jacob.e.keller@intel.com, dipayanroy@microsoft.com,
+	leitao@debian.org, kees@kernel.org, john.fastabend@gmail.com,
+	hawk@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net,
+	ast@kernel.org, sdf@fomichev.me, yury.norov@gmail.com
+Subject: Re: [PATCH net] net: mana: hardening: Validate SHM offset from BAR0
+ register to prevent crash due to alignment fault
+Message-ID: <aerjdzgetiIeiBto@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <aepF3NwyANeklkfD@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <edccaafd-73f3-421d-a48e-a6cb704d39e6@lunn.ch>
+ <aepviNMszMBtiB/H@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <7c4dbe89-9b51-45d6-ae89-39d4183e66b1@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:1629:b0:67e:dab:7cf5 with SMTP id
- 006d021491bc7-69462e4892fmr18137490eaf.17.1777001234878; Thu, 23 Apr 2026
- 20:27:14 -0700 (PDT)
-Date: Thu, 23 Apr 2026 20:27:14 -0700
-In-Reply-To: <5eabb1a1.7642.19dbd869da3.Coremail.25181214217@stu.xidian.edu.cn>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69eae312.a00a0220.9259.0030.GAE@google.com>
-Subject: Re: Re: Re: [PATCH v2] ipv6: fix memory leak in __ip6_make_skb() when
- queue is empty
-From: syzbot <syzbot@syzkaller.appspotmail.com>
-To: 25181214217@stu.xidian.edu.cn
-Cc: 25181214217@stu.xidian.edu.cn, davem@davemloft.net, dsahern@kernel.org, 
-	edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	sd@queasysnail.net, willemdebruijn.kernel@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 7E536459706
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7c4dbe89-9b51-45d6-ae89-39d4183e66b1@lunn.ch>
+X-Rspamd-Queue-Id: 2B1DF459735
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [4.94 / 15.00];
-	SEM_URIBL(3.50)[xidian.edu.cn:email];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	BAD_REP_POLICIES(0.10)[];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[stu.xidian.edu.cn,davemloft.net,kernel.org,google.com,vger.kernel.org,redhat.com,queasysnail.net,gmail.com];
-	TAGGED_FROM(0.00)[bounces-280924-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	GREYLIST(0.00)[pass,meta];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280926-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TO_DN_NONE(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[davemloft.net:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,queasysnail.net:email,xidian.edu.cn:email,appspotmail.com:email]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.microsoft.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid]
 
-> Hi Sabrina and Jakub,
->
-> Before sending out the v3 patch, I synced my tree to the latest mainline =
-and checked the current state of `ip6_make_skb()`.=20
->
-> It turns out that the missing `ip6_cork_release(cork)` in the error path =
-was already naturally resolved by Eric Dumazet's recent refactoring commit:
-> b409a7f7176b ("ipv6: colocate inet6_cork in inet_cork_full")
->
-> With Eric's changes, the error handling now correctly calls `ip6_cork_rel=
-ease(cork)` if `ip6_setup_cork()` fails, meaning the memory leak is no long=
-er present in the latest tree.
->
-> Please disregard my v1 and v2 patches. I am also telling syzbot to close =
-this report based on Eric's commit.
->
-> Thank you all again for your time, the deep code review, and for guiding =
-me to find the true root cause. I learned a huge amount from this discussio=
-n!
->
-> #syz fix: ipv6: colocate inet6_cork in inet_cork_full
+On Thu, Apr 23, 2026 at 09:44:04PM +0200, Andrew Lunn wrote:
+> On Thu, Apr 23, 2026 at 12:14:16PM -0700, Dipayaan Roy wrote:
+> > On Thu, Apr 23, 2026 at 06:37:04PM +0200, Andrew Lunn wrote:
+> > > > The root cause is in mana_gd_init_vf_regs(), which computes:
+> > > > 
+> > > >   gc->shm_base = gc->bar0_va + mana_gd_r64(gc, GDMA_REG_SHM_OFFSET);
+> > > > 
+> > > > without validating the offset read from hardware. If the register
+> > > > returns a garbage value that is neither within bar 0 bounds nor aligned
+> > > > to the 4-byte granularity, thus causing the alignment fault.
+> > > 
+> > > Is GDMA_REG_SHM_OFFSET special?
+> > Hi Andrew,
+> > GDMA_REG_SHM_OFFSET is not special. It was simply the only register
+> > read that had no validation at all. The other two registers
+> > (GDMA_REG_DB_PAGE_SIZE, GDMA_REG_DB_PAGE_OFFSET) already have checks
+> > in place.
+> 
+> I must be missing something:
+> 
+> grep page_size *
+> 
+> gdma_main.c:	gc->db_page_size = mana_gd_r32(gc, GDMA_PF_REG_DB_PAGE_SIZE) & 0xFFFF;
+> gdma_main.c:	gc->db_page_size = mana_gd_r32(gc, GDMA_REG_DB_PAGE_SIZE) & 0xFFFF;
+> gdma_main.c:	void __iomem *addr = gc->db_page_base + gc->db_page_size * db_index;
+> 
 
-I see the command but can't find the corresponding bug.
-The email is sent to  syzbot+HASH@syzkaller.appspotmail.com address
-but the HASH does not correspond to any known bug.
-Please double check the address.
+Hi Andrew,
+There are 2 upstream commits regarding these, I think you missed
+them please check once:
 
->
-> Best regards,
-> Mingyu Wang
->
-> 2026-04-24 11:16:30 "=E7=8E=8B=E6=98=8E=E7=85=9C" <25181214217@stu.xidian=
-.edu.cn> =E5=86=99=E9=81=93=EF=BC=9A
->> Hi,
->>=20
->> Thank you so much for the review and for pointing me to the correct Fixe=
-s tag!
->>=20
->> You hit the nail on the head regarding `__ip6_append_data()`. After re-e=
-valuating the code path based on your question, I realize my assumption in =
-v2 was incorrect. `__ip6_append_data()` does indeed guarantee that an skb i=
-s queued upon success, making the `skb =3D=3D NULL` path dead code in this =
-context.
->>=20
->> I traced the `failslab` memory leak back to its true origin: the lockles=
-s fast path wrapper `ip6_make_skb()`.
->>=20
->> Sabrina previously noted that `ip6_setup_cork()` failures correctly rele=
-ase the dst. That is absolutely true for the slow path, where `udp_v6_flush=
-_pending_frames()` eventually handles the cleanup.=20
->>=20
->> However, in the fast path, `ip6_make_skb()` calls `ip6_setup_cork()`. In=
-side `ip6_setup_cork()`, `cork->base.dst` is assigned early. If a subsequen=
-t memory allocation fails (e.g., `v6_cork->opt =3D kzalloc(...)` failing du=
-e to failslab), it returns an error. `ip6_make_skb()` then directly returns=
- `ERR_PTR(err)` WITHOUT calling `ip6_cork_release(cork)`.
->>=20
->> Since `udpv6_sendmsg()` assumes the `dst` reference is stolen by `ip6_ma=
-ke_skb()` and unconditionally jumps to `out_no_dst`, the `dst` is completel=
-y leaked.
->>=20
->> The fix is simply to add `ip6_cork_release(cork)` in the `ip6_setup_cork=
-()` error path inside `ip6_make_skb()`.
->>=20
->> I will submit a v3 patch shortly addressing this true root cause and usi=
-ng your suggested Fixes tag. Thank you again for steering me in the exact r=
-ight direction!
->>=20
->> Best regards,
->> Mingyu Wang
->>=20
->>=20
->> > -----=E5=8E=9F=E5=A7=8B=E9=82=AE=E4=BB=B6-----
->> > =E5=8F=91=E4=BB=B6=E4=BA=BA: "Willem de Bruijn" <willemdebruijn.kernel=
-@gmail.com>
->> > =E5=8F=91=E9=80=81=E6=97=B6=E9=97=B4:2026-04-23 22:59:45 (=E6=98=9F=E6=
-=9C=9F=E5=9B=9B)
->> > =E6=94=B6=E4=BB=B6=E4=BA=BA: "Mingyu Wang" <25181214217@stu.xidian.edu=
-.cn>, willemdebruijn.kernel@gmail.com, davem@davemloft.net, dsahern@kernel.=
-org, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
->> > =E6=8A=84=E9=80=81: sd@queasysnail.net, horms@kernel.org, netdev@vger.=
-kernel.org, linux-kernel@vger.kernel.org, "Mingyu Wang" <25181214217@stu.xi=
-dian.edu.cn>, syzbot+e5d6936b9f4545fd88ab@syzkaller.appspotmail.com
->> > =E4=B8=BB=E9=A2=98: Re: [PATCH v2] ipv6: fix memory leak in __ip6_make=
-_skb() when queue is empty
->> >=20
->> > Mingyu Wang wrote:
->> > > During fuzzing with failslab enabled, a memory leak was observed in =
-the
->> > > IPv6 UDP send path.
->> > >=20
->> > > The root cause resides in __ip6_make_skb(). In extremely rare cases
->> > > (such as fault injection or specific empty payload conditions),
->> >=20
->> > Can you elaborate on this? Which fault injection lets
->> > __ip6_append_data succeed without writing data?
->> >=20
->> > > __ip6_append_data() may succeed but leave the socket's write queue
->> > > empty.
->> > >=20
->> > > When __ip6_make_skb() is subsequently called, __skb_dequeue(queue)
->> > > returns NULL. The previous logic handled this by executing a 'goto o=
-ut;',
->> > > which completely bypassed the call to ip6_cork_release(cork).
->> > >=20
->> > > Since the 'cork' structure actively holds a reference to the routing
->> > > entry (dst_entry) and potentially other allocated options, skipping
->> > > the release cleanly leaks these resources.
->> > >=20
->> > > Fix this by introducing an 'out_cork_release' label and jumping to i=
-t
->> > > when skb is NULL, ensuring the cork state is always properly cleaned=
- up.
->> > > The now-unused 'out' label is also removed to prevent compiler warni=
-ngs.
->> > >=20
->> > > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
->> >=20
->> > I think this is=20
->> >=20
->> > Fixes: 6422398c2ab0 ("ipv6: introduce ipv6_make_skb")
->> >=20
->> > > Reported-by: syzbot+e5d6936b9f4545fd88ab@syzkaller.appspotmail.com
->> > > Signed-off-by: Mingyu Wang <25181214217@stu.xidian.edu.cn>
+commit fb4b4a05aeeb8b0f253c5ddce21f4635dadc9550
+Author: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Date:   Wed Mar 25 11:04:17 2026 -0700
+ 
+    net: mana: Use at least SZ_4K in doorbell ID range check
+
+commit 89fe91c65992a37863241e35aec151210efc53ce
+Author: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Date:   Fri Mar 6 13:12:06 2026 -0800
+ 
+    net: mana: hardening: Validate doorbell ID from GDMA_REGISTER_DEVICE response
+
+> So if GDMA_REG_DB_PAGE_SIZE returns garbage, it is at least masked,
+> but it is still a random number.
+> 
+> mana_gd_ring_doorbell() takes this random number, multiples by
+> db_index, adds, gc->db_page_base and then does:
+> 
+> writeq(e.as_uint64, addr);
+> 
+> So you write to a random address. 
+> 
+> I don't see any sanity checks here. Cannot you check that db_page_size
+> is at least one of the expected page sizes?
+As mentioned above checks are already present in this commit: 89fe91c65992a37863241e35aec151210efc53ce
+> 
+>    Andrew
+
+Regards
+Dipayaan Roy
 
