@@ -1,248 +1,239 @@
-Return-Path: <netdev+bounces-281021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281022-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SDx2FHua62nAPAAAu9opvQ
-	(envelope-from <netdev+bounces-281021-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:29:47 +0200
+	id KBJXLf+b62naPAAAu9opvQ
+	(envelope-from <netdev+bounces-281022-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:36:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C644E4614FA
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:29:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 629A246156B
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:36:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A16043018C11
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 16:29:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EE691300BC86
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 16:36:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 256D72139C9;
-	Fri, 24 Apr 2026 16:29:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFD053DEAD8;
+	Fri, 24 Apr 2026 16:36:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZMEyTdGE"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="VxGZRanX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011023.outbound.protection.outlook.com [40.93.194.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B44123DF00B;
-	Fri, 24 Apr 2026 16:29:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777048183; cv=none; b=qBuM60OWxKE0QZMshlX+U/YlyhzNJavpYXQb0QUd02hTJWlsDwKIFckcxsFQX3IbIPU8XpPYJSPbA9tP7VDUM29PZxHr8Qf0QkhPIcxSHYpuDSKoXovM1z4fYRvJuJfItqOVQzPDcYMXhz2E7SYKR0xdrtVp4TooXp7DUCoPN9Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777048183; c=relaxed/simple;
-	bh=XDZUFB8kr3dFYOphD8u88HxzUJXW5VyTqkHnu3N12ss=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rC5n9mzGiSUetFVGlDyDbeadpVuEPiplTVOpX70Z5vgAsd80+jetn2w1aVmMDuPoZEhtmUVoaA5LiKkzIEtb6yjbQaYCLxJSoGnlmtlZhgkpcwng0rKd0FTVFgmaF64XBiW2BCXGOuFOIFhNEZrXIXo6ZkbBhtjKZ2tDg3Hv0Tc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ZMEyTdGE; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63OAqZpa3292244;
-	Fri, 24 Apr 2026 16:29:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=ckwhgSUaP7LH9m/h4L7W5HcS4Chg6ISwqU+JO7cot
-	Mo=; b=ZMEyTdGExiivj2XALhSOiS3lnICOjFyO+ZrsLHKWvX3v+EYgYFlRXGiJp
-	ZIIIQLChwfEnbAHTUTsbOW32baOrQBSPebbqfbQRGT89/31fYZ1LN3JQccxt5zqo
-	ilsO+IPRZRqNw82T28peHBmDMRkLOIVY4HCj9lZD3gwdpemOIyGRNwfWpav54Ve2
-	bXTVBVEd6JPrWtC0w0gsOgT6zSbf+h5gaUC6BQ6etyz4HJt3qVL8fmShx3ayNsDt
-	jn2HM8+Wky5VGGUXcP07jzW08I9D61OjJYJXvSlqInULUd0+T6Fw7lR9LuUe28Xe
-	76A+lwg4mc9yvaN2F2cNswy7IVoIQ==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dphfrp659-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Apr 2026 16:29:27 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 63OGKLYv032021;
-	Fri, 24 Apr 2026 16:29:26 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4dpjkybjad-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Apr 2026 16:29:26 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63OGSufB28377822
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 24 Apr 2026 16:28:56 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 99CAF5805C;
-	Fri, 24 Apr 2026 16:29:22 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 86A7058058;
-	Fri, 24 Apr 2026 16:29:20 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.67.24.140])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 24 Apr 2026 16:29:20 +0000 (GMT)
-From: Mingming Cao <mmc@linux.ibm.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-        pabeni@redhat.com, horms@kernel.org, bjking1@linux.ibm.com,
-        maddy@linux.ibm.com, mpe@ellerman.id.au, linuxppc-dev@lists.ozlabs.org,
-        stable@vger.kernel.org, Mingming Cao <mmc@linux.ibm.com>,
-        Shaik Abdulla <shaik.abdulla1@ibm.com>,
-        Naveed Ahmed <naveedaus@in.ibm.com>
-Subject: [PATCH v3] ibmveth: Disable GSO for packets with small MSS
-Date: Fri, 24 Apr 2026 09:29:17 -0700
-Message-Id: <20260424162917.65725-1-mmc@linux.ibm.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE541D86FF;
+	Fri, 24 Apr 2026 16:36:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.23
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777048570; cv=fail; b=i3ce28oNwhDYwdIZMU9TreII7Nze9hBGHUjjJPb1djsR38xHvMCon2u1jAWhfNlP3M3YxCc+yYPr29Ivu5rp7uFHztnwvsyPRRTj0VVDpuXb3ysqKX0UUweYn/zIpVhFQKK1kG2X6//ls3XKkUovwOMSLU17PXEr/k0+7kq9Meg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777048570; c=relaxed/simple;
+	bh=rtqEgDEg0wYwmodn5b0xuw/f/sCyQK8PHl0fepZNzgY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=f8ISj7QxofR7Y55jsfnJf6Jv8UoP20ymVIKpPr37KadLIYXWRssQfM70LHezeuVL7gX2suWCrXDpy/zgbl35/AXEB3eEyNQsnzzGLCKhIrXAXzI5981yQUSffEx+301qOL6EgSus8iDEaD7Rj/1ijos/j7/IlCMYBXFBiS0Da6A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=VxGZRanX; arc=fail smtp.client-ip=40.93.194.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=mkfpVRbVolm4i05TrER/BLNlsDVryYRPpMKMDAahdSWV75HIVh61JbOdtfTHNqrmGhYr338UDKJLpfFvC/DoqyuDlOzTgBVPMwaaQ76ZVh4B/uAwfZD4Qb1/ugp0cKFZTaOCjmDsAkWwN15qaOpjBQjNaEqGgU7ziSdWl4SuEcGdE7Guy/Q6jJgO6+HmFzO1BLOXV/21ds5IfUk64dx33453Ie37Pe7nMzaJLnUfeWR5pA9742uXEywgVs+ylxGOFeKOrsGro5LSFS1WuoZSHecOTJf08rCBI3SbHG9QKFlUWvthuh79yn7soNdQPLUnnoK9K+q+4QrnI3RNE+RJ6g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BLYvFsjOjEovp7bvMElUOz+ZB8S9t/ziyB2zy0jC6Gs=;
+ b=YYFhNqItJu3HnpFmPJ69oBqsTzS7XeLZllZ4Voppwgw7D719kXBz9VDhHMS5EfLhrmqFeTy+XJzOwLPaL4cd5+N916QeoSE7DtKNoGYy0hEbus3j5FQ/dttjXjlmKM1o0mnq0v1xzXDMKsLXdSLMZal+Q5rd+8DKXHbZKzp7lqSM6mCertdABElV1Tz55JtqmBQj5uVVoWtokxYnicQqM+O4Jk7/W+C+uJ3/BTfIN80NVnDFIhb4g3x5lD9QrFz08+buCGeZT2AukQBtMbHuQkWE7LGqDA+dOIuaRX085ImYpoxEPr6oPIr/3TpD8kuv/azGAVjRRjmSLjRJt2r8NA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BLYvFsjOjEovp7bvMElUOz+ZB8S9t/ziyB2zy0jC6Gs=;
+ b=VxGZRanXZlsiTU39hQwFKZYhNopwhVYB7XYhdfDtDg9gM1OQdbaPxWLUM4lroUBN+39SVyw1y3x22/zZnDxy4ng3BOWd4CHy97KuNWjZuRU6rHxsOok4QHiLFMi8dsc6d2RVqQdhgjMEMw68dpTlhnQvKX/Ysl7xkYG1XkGE217l0mGOepcJ7CdPQ/J+PwrFOArVxmr4qayuHz0EQKdANn8pb1SYOQDfoS/oI1bSIZ6lNdg7n8NDnarkPcAKK+mnHXuy/ntSu8I/LwgC9UDPCrAhwS9150Y2SODtMijaTJ0KYbWR1YW1YXoNwK3zahBbk3ktMZQmKv4gT2P5D7XmuA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY8PR12MB8300.namprd12.prod.outlook.com (2603:10b6:930:7d::16)
+ by DS2PR12MB9639.namprd12.prod.outlook.com (2603:10b6:8:27a::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.22; Fri, 24 Apr
+ 2026 16:35:54 +0000
+Received: from CY8PR12MB8300.namprd12.prod.outlook.com
+ ([fe80::ce75:8187:3ac3:c5de]) by CY8PR12MB8300.namprd12.prod.outlook.com
+ ([fe80::ce75:8187:3ac3:c5de%3]) with mapi id 15.20.9846.021; Fri, 24 Apr 2026
+ 16:35:54 +0000
+Date: Fri, 24 Apr 2026 12:35:51 -0400
+From: Yury Norov <ynorov@nvidia.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Jonathan Cameron <jic23@kernel.org>,
+	David Lechner <dlechner@baylibre.com>,
+	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
+	Andy Shevchenko <andy@kernel.org>,
+	Ping-Ke Shih <pkshih@realtek.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Hans de Goede <hansg@kernel.org>, Linus Walleij <linusw@kernel.org>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Salah Triki <salah.triki@gmail.com>,
+	Achim Gratz <Achim.Gratz@stromeko.de>,
+	Ben Collins <bcollins@watter.com>, linux-kernel@vger.kernel.org,
+	linux-iio@vger.kernel.org, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org, linux-rtc@vger.kernel.org
+Subject: Re: [PATCH 1/9] bitfield: add FIELD_GET_SIGNED()
+Message-ID: <aeub59FBHbCy-KKP@yury>
+References: <20260417173621.368914-1-ynorov@nvidia.com>
+ <20260417173621.368914-2-ynorov@nvidia.com>
+ <6170788fcab2ec835597e3d7411928d36850c20a.camel@sipsolutions.net>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6170788fcab2ec835597e3d7411928d36850c20a.camel@sipsolutions.net>
+X-ClientProxiedBy: BY3PR03CA0019.namprd03.prod.outlook.com
+ (2603:10b6:a03:39a::24) To CY8PR12MB8300.namprd12.prod.outlook.com
+ (2603:10b6:930:7d::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-GUID: Ezjy5Ob4oUAQdfX0fVUxoRkGAaFCfE-r
-X-Proofpoint-ORIG-GUID: VHY8sa6bnoQIzbYQJcpzf9tct2Oza9zB
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI0MDE1OCBTYWx0ZWRfX2UAHSO8Otbyd
- vFiSyn9IcJegoYyPSC7QQKDHdc5MawBeuaO1AjvEGHDrCGoZknvMKba6e+rgpJUIoBNttAmiJ4b
- AlUsVxHTV6Yk3BnmDAKF4WozMd3H+mobd1QQiEBMg/mN0pqQC3BAGxqOPpxRp2lFsLdcK2Si5+3
- fRnTR/OLSQPBYPv42546i6NQFQp8cI1bI9OL1jG410Hf1RlzncxdBD1UtXe9cbLnrsR+YchZYC+
- xDTkuDvad3DgWsA2yi0Jj6T56PmAiXaj1lSxohz9aarjJ1QnIDK9EkKnO0EiJ4bqRTQRxJH1POt
- ZfE0RmMeR8Q7vQaVStVqf8et8YpKL8sGn9Tg3OpiM+RXRdU17Ptzsvf/OglBGINwQoj7v/EiEO0
- lWt6W3Mx0UvcfUuJ/Wrvrfb+nnAMPpEmhXoGD34U50pJ+zzeqt+dOYAyyp/hBEb5Owh+DBgHeiP
- zRFvDuA0VGAEQ81Sxtg==
-X-Authority-Analysis: v=2.4 cv=SJxykuvH c=1 sm=1 tr=0 ts=69eb9a68 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=uAbxVGIbfxUO_5tXvNgY:22 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8
- a=pS6RR9H1IJa285FGuL8A:9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-24_02,2026-04-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 suspectscore=0 malwarescore=0 impostorscore=0 bulkscore=0
- lowpriorityscore=0 phishscore=0 clxscore=1015 adultscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2604240158
-X-Rspamd-Queue-Id: C644E4614FA
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY8PR12MB8300:EE_|DS2PR12MB9639:EE_
+X-MS-Office365-Filtering-Correlation-Id: e61c90e6-18e9-4ecf-6232-08dea21f8dc6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|10070799003|366016|1800799024|376014|7416014|22082099003|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	pVPX/RD1af2OYm5bbSUuNF05wTwzeAAQmEh7/xfDV1uF+LVqzfU7SsatxFuuRGCixTe5tX5NojRUGSCeo3AGwbfJwRZqeRQ60XpffuSJ3ORlHhyTbB+Nhedm5Un+w0onWDkHYIv0lOXxAHdSWImpCjBK5k4tPw1BPbVu3jiOKb0qhmn2BThd5iIWKzQ03FpJSDqBTcLm2pcD0qQftuSF7gMlG6JPKUzeHSA2IAkAhTNtNvx4xtY2VPO43FLTQiJoJTZGIkirZXhcXEjBH7V2VZOsZ7xBTpztDQ2X4mDuz59a1XoKrxpi601sL5NTn0xk8SRT196OkH8/Ip29nqnLtC39Rgd//6k13+vIwNq2lXW0lkqxlMZ4R1/Ylx02ZOIs3j+YJCwi82ND+bbUSrT2EtnlEz+vPDnq5UvxZbAWboszLkb3bxNijQUFl6cnRFrRtQTZEqqN27Krl7+3Fu9eComq6sAytxT3KyDIsCUv4T8mLwht2z6IKW0wweNfg148mbJ2001v32oXcQmMpjyPzjvjQQ7byfmyZHRNnlTgmukzByy+hmTMHD2Tu3tMQQBABm5FXEjiwtAZfWRaZrpzPiu7QxyZzSsS8Bjhx2WUq04CGKSGzIidNtiGvs4EhhdEyL/94jzvhKL1xs7rOtv9yuHzpkP2hmb3tty+oq43m3f5NUw357Y7axS0B6yVkeXwzchg6DTKzPLfwP7rx6r0k1HUw/1N8aJ6TqXPyacpFeY=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB8300.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(366016)(1800799024)(376014)(7416014)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?nFLMKUjX2yOzEvqSqBbH1OqzmUS02hIV/5qGip7hSPsG/ERP8GR819HfBWCU?=
+ =?us-ascii?Q?yBZ0ZjcL42WztSfqg3rs8LyK+ua2uuB57y6+XbN+YTNgp9L4NcbBhRxdVJq2?=
+ =?us-ascii?Q?QPW170OAJbEDfKwQJEExVfG0ezQ5m24chx8zcaycdt6WbD6dPpRgUdHi1Kk6?=
+ =?us-ascii?Q?6f9tLrRspROfKCTfV8m0LqXsNLyomTAOFFoOJc0UKt7Q2rit/fWebHLztRLV?=
+ =?us-ascii?Q?ZX4PXdap93h9QoUM1KurUMLK3OgFRoF/EZFi/sRYh2LS6E7hXrrTt0NuxFK3?=
+ =?us-ascii?Q?YnrZ3gUQN3JUt+36S4TlSP3pAQhQN/8xc+qp7KbEnqNfSuZFwpgvyxjV12lE?=
+ =?us-ascii?Q?XfQKvE5ziijGEvdYQ8TMeaZdyLufuDOhZnDGrfVM90fYX3t6C/O3GgmE0VZg?=
+ =?us-ascii?Q?NAQk8GcJdPFXGfDqGBVzlS9L2GLfk4yqYgVHusXYOHIb5Xs7V+3bNSp77o3Y?=
+ =?us-ascii?Q?Y0vvmgicLET0ljGDtsSJDIXItwl6N+lvNYlsRpig7Q0e6w/6YEGOvspLMx4t?=
+ =?us-ascii?Q?+ggmM0qTFOYEK5SV2uOcUOmKOC+w7iZoM0r4uG+ZC2tfCu4ivClcwyN92PdI?=
+ =?us-ascii?Q?mZ9MOLVCu2v/nEBRqll1gwfehfFLSvrx3MliTHP3cTHGZjUQEpLLGIc7rnD4?=
+ =?us-ascii?Q?03voRVzGvB8zy7TJnVqjSrkXMxp9WA/I6ZVCdNknb1r/D5ZrRuapP9678Hf9?=
+ =?us-ascii?Q?6QfsdkphmfMByl5sd9ECKh/OpHTj0LVBP9miEOsBI45IxfIOjajbO6Y2xMhS?=
+ =?us-ascii?Q?qal5CR/nExX+mXYeqG0rZ6cfwm/JplzTO81nRv4Mx16sK0+GVqW8bZodybiC?=
+ =?us-ascii?Q?AidMawU/Xxk4dKdJ92r1/E0VWStzGEYFF9GsrMKPZCF04uUYxIm0zLeYrHN2?=
+ =?us-ascii?Q?4u/LHW6epFcYWoCHiYKwt7E/ueyP3Ixo4qlx/tfUmwP2JvTwkmKN0QKV7L7K?=
+ =?us-ascii?Q?tlRhQ8mBLptbzlSU28Fti5KSwvPK/3h5o8XeMUTN0v+lk8r9nMIvo81yw1lf?=
+ =?us-ascii?Q?VYSDYdzmdqgze1MD4LOjPCu7Pz3TEyCF8c/J5pn/Gqus0IDSTC3dy3ZbSIuJ?=
+ =?us-ascii?Q?G8IX40xUiGXoSdcfEKpSYV/Jf7l6J/0Pou/B7yD9lf2R6KjUGV88Bz+xSWFr?=
+ =?us-ascii?Q?X7jiMH+DyOgEx7pjSvbETgKvzm++ar1a7MtZNF0MdrsqIwwapbbxNpAQqJ0S?=
+ =?us-ascii?Q?SQvQQS2ydYD9bwiA4sJGh7GZT0Q0e051HK+F7/ct3XA125JxaceNFdFL6rgI?=
+ =?us-ascii?Q?9SOeJatjQSBF0iP+sT5epuRcbvRpS8mAZzaljVhUASViaT7Of0UrTlOKlVkz?=
+ =?us-ascii?Q?cnX4OjoVe+5icw3RVWLiGIU8AccX+SOcTvaqBexGBYHUor0VyTGRrltoCpQp?=
+ =?us-ascii?Q?150svoKWAdiBudOUb5Pf0OEm6QlTFcmxQgw5CXr5yhIZ8Hkr4zcfssUGUSd8?=
+ =?us-ascii?Q?loXw5tTHYEF2iRF2vj3ti9ozDrQtW3kCb+l6IG5AAoiE+rOpU96ebsy7xZPg?=
+ =?us-ascii?Q?ax9L5cIOZmzf3cIMXF8NuKbHv06/suuSUpooIwyiOpbC60YfCHNyI0rY+cfE?=
+ =?us-ascii?Q?l/Ix/NaLPzATOqIDLF0tf3fYSjV2CNsvIq5LmZAsAdA3F1SJfMkGNsI7gYEu?=
+ =?us-ascii?Q?qdNsoYS6iPFMso5px/XSEnjiaEL6drLfMgyV3fg/cjiiTYnkPXptffILcS+I?=
+ =?us-ascii?Q?gBfj5rxW/kff98mcA0G+SoRCbz3zonU6Pe03iN0jXr7izkQ7VEsoyRQuBgA7?=
+ =?us-ascii?Q?YXAI+MS3+eNnY0XVaKRahbB/HXGrQyi6jAQalg4Cy3UIz4Ktkl6V?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e61c90e6-18e9-4ecf-6232-08dea21f8dc6
+X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB8300.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2026 16:35:54.1314
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ypME0rP2986j0Y6zp56pi7eCy3SeNOj2/ZdSQrU29fssNEbsDJPNZC9MKlf3chL3K5wWEcTdM35YCCr5ichnHg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS2PR12MB9639
+X-Rspamd-Queue-Id: 629A246156B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+X-Spamd-Result: default: False [1.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-281022-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281021-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,alien8.de,linux.intel.com,zytor.com,infradead.org,baylibre.com,analog.com,realtek.com,gmail.com,lunn.ch,davemloft.net,google.com,bootlin.com,rasmusvillemoes.dk,stromeko.de,watter.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmc@linux.ibm.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[ynorov@nvidia.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[11]
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,Nvidia.com:dkim]
 
-Some physical adapters on Power systems do not support segmentation
-offload when the MSS is less than 224 bytes. Attempting to send such
-packets causes the adapter to freeze, stopping all traffic until
-manually reset.
+On Mon, Apr 20, 2026 at 10:43:08AM +0200, Johannes Berg wrote:
+> On Fri, 2026-04-17 at 13:36 -0400, Yury Norov wrote:
+> > The bitfields are designed in assumption that fields contain unsigned
+> > integer values, thus extracting the values from the field implies
+> > zero-extending.
+> > 
+> > Some drivers need to sign-extend their fields, and currently do it like:
+> > 
+> > 	dc_re += sign_extend32(FIELD_GET(0xfff000, tmp), 11);
+> > 	dc_im += sign_extend32(FIELD_GET(0xfff, tmp), 11);
+> 
+> That's indeed pretty awful...
+> 
+> 
+> > +#define FIELD_GET_SIGNED(mask, reg)					\
+> > 
+> 
+> [...]
+> 
+> I (personally) tend to prefer the "__MAKE_OP" versions (*_get_bits()
+> etc.), in particular because WiFi and firmware interfaces deal a lot
+> with fixed endian fields.
 
-Implement ndo_features_check to disable GSO for packets with small MSS
-values. The network stack will perform software segmentation instead.
+I don't like that __MAKE_OP magic because whatever it generates is not
+greppable. And because we disable strict type checks for kernel, but
+this API claims to typecheck the parameters for the user. So, the
+following compiles well:
 
-The 224-byte minimum matches ibmvnic
-commit <f10b09ef687f> ("ibmvnic: Enforce stronger sanity checks
-on GSO packets")
-which uses the same physical adapters in SEA configurations.
+        u64 val = 0;
+        ret = le16_get_bits(val, GENMASK(15, 10));
 
-The issue occurs specifically when the hardware attempts to perform
-segmentation (gso_segs > 1) with a small MSS. Single-segment GSO packets
-(gso_segs == 1) do not trigger the problematic LSO code path and are
-transmitted normally without segmentation.
-
-Add an ndo_features_check callback to disable GSO when MSS < 224 bytes.
-Also call vlan_features_check() to ensure proper handling of VLAN packets,
-particularly QinQ (802.1ad) configurations where the hardware parser may
-not support certain offload features.
-
-Validated using iptables to force small MSS values. Without the fix,
-the adapter freezes. With the fix, packets are segmented in software
-and transmission succeeds. Comprehensive regression testing completedd 
-(MSS tests, performance, stability).
-
-Fixes: 8641dd85799f ("ibmveth: Add support for TSO")
-Cc: stable@vger.kernel.org
-Reviewed-by: Brian King <bjking1@linux.ibm.com>
-Tested-by: Shaik Abdulla <shaik.abdulla1@ibm.com>
-Tested-by: Naveed Ahmed <naveedaus@in.ibm.com>
-Signed-off-by: Mingming Cao <mmc@linux.ibm.com>
----
-Changes in v3:
-- Call vlan_features_check() to handle VLAN packets correctly
-- Clarified that gso_segs == 1 check is not needed for ibmveth
-  (unlike ibmvnic, single-segment packets don't enter LSO path)
-- Updated commit message to explain the difference
-
-Changes in v2:
-- Add Fixes tag as requested by automated checks
----
- drivers/net/ethernet/ibm/ibmveth.c | 22 ++++++++++++++++++++++
- drivers/net/ethernet/ibm/ibmveth.h |  1 +
- 2 files changed, 23 insertions(+)
-
-diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
-index 58cc3147afe2..73e051d26b9d 100644
---- a/drivers/net/ethernet/ibm/ibmveth.c
-+++ b/drivers/net/ethernet/ibm/ibmveth.c
-@@ -1756,6 +1756,27 @@ static int ibmveth_set_mac_addr(struct net_device *dev, void *p)
- 	return 0;
- }
+I don't like autogeneration in general. We generate, for example,
+be32_get_bits(), but never use it. We don't even know the level of
+the bloat.
  
-+static netdev_features_t ibmveth_features_check(struct sk_buff *skb,
-+						struct net_device *dev,
-+						netdev_features_t features)
-+{
-+	/* Some physical adapters do not support segmentation offload with
-+	 * MSS < 224. Disable GSO for such packets to avoid adapter freeze.
-+	 * Note: Single-segment packets (gso_segs == 1) don't need this check
-+	 * as they bypass the LSO path and are transmitted without segmentation.
-+	 */
-+	if (skb_is_gso(skb)) {
-+		if (skb_shinfo(skb)->gso_size < IBMVETH_MIN_LSO_MSS) {
-+			netdev_warn_once(dev,
-+					 "MSS %u too small for LSO, disabling GSO\n",
-+					 skb_shinfo(skb)->gso_size);
-+			features &= ~NETIF_F_GSO_MASK;
-+		}
-+	}
-+
-+	return vlan_features_check(skb, features);
-+}
-+
- static const struct net_device_ops ibmveth_netdev_ops = {
- 	.ndo_open		= ibmveth_open,
- 	.ndo_stop		= ibmveth_close,
-@@ -1767,6 +1788,7 @@ static const struct net_device_ops ibmveth_netdev_ops = {
- 	.ndo_set_features	= ibmveth_set_features,
- 	.ndo_validate_addr	= eth_validate_addr,
- 	.ndo_set_mac_address    = ibmveth_set_mac_addr,
-+	.ndo_features_check	= ibmveth_features_check,
- #ifdef CONFIG_NET_POLL_CONTROLLER
- 	.ndo_poll_controller	= ibmveth_poll_controller,
- #endif
-diff --git a/drivers/net/ethernet/ibm/ibmveth.h b/drivers/net/ethernet/ibm/ibmveth.h
-index 068f99df133e..d87713668ed3 100644
---- a/drivers/net/ethernet/ibm/ibmveth.h
-+++ b/drivers/net/ethernet/ibm/ibmveth.h
-@@ -37,6 +37,7 @@
- #define IBMVETH_ILLAN_IPV4_TCP_CSUM		0x0000000000000002UL
- #define IBMVETH_ILLAN_ACTIVE_TRUNK		0x0000000000000001UL
- 
-+#define IBMVETH_MIN_LSO_MSS		224	/* Minimum MSS for LSO */
- /* hcall macros */
- #define h_register_logical_lan(ua, buflst, rxq, fltlst, mac) \
-   plpar_hcall_norets(H_REGISTER_LOGICAL_LAN, ua, buflst, rxq, fltlst, mac)
--- 
-2.39.3 (Apple Git-146)
+> Any chance it'd be simple to generate u32_get_bits_signed() etc.? Could
+> be especially useful for le32_get_bits_signed() for example, to have the
+> endian conversion built-in unlike FIELD_GET_SIGNED().
 
+Maybe this:
+
+        FIELD_GET_SIGNED(mask, le32_to_cpu(reg))
+
+Thanks,
+Yury
 
