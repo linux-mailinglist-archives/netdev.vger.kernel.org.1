@@ -1,193 +1,163 @@
-Return-Path: <netdev+bounces-280971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280972-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IBvhEJc162nRJwAAu9opvQ
-	(envelope-from <netdev+bounces-280971-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 11:19:19 +0200
+	id IHbUIY0662nRJwAAu9opvQ
+	(envelope-from <netdev+bounces-280972-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 11:40:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6503D45C0E5
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 11:19:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E404645C56B
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 11:40:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 710F03006380
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 09:16:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 146C93008787
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 09:39:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2BF3372B24;
-	Fri, 24 Apr 2026 09:16:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 728D038AC75;
+	Fri, 24 Apr 2026 09:39:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="kgRUGpzz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ISwcaTfF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E9137DE81;
-	Fri, 24 Apr 2026 09:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F07737CD55;
+	Fri, 24 Apr 2026 09:39:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777022165; cv=none; b=ki6QvzMveXWnbjlr25+0EA0TgFQtxyQfKwx/oRCjixrznD8rrDs4culJR/yIfB/5NhOno8zjTgqJYP2n9foVgL0VJVSPyMlZUojOKwC06MRWPDd0alB6dtf/wiu3Q/QAz8XBRTOaNR8n2w8uy7LSdebxmUjhYAUb+rzmKG/+baU=
+	t=1777023580; cv=none; b=kkUlwjwW9js4SBy1B/XDPmQSw2DMpwt0oVoN/ZONTVpCxJXOtdF84Q4x1aVTP8B2HjF0teeWx0C9KK7EJBIZsxOD9Vfy5WgTjPUwTeop/xdw3DlRYFbOSQPXJP32Nfv8W/RgVSh2PgLUOsaRo1BVAY+SkTWTBNW2qEtbyxJydWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777022165; c=relaxed/simple;
-	bh=fWeeeVPtWnE0+HSYXdY4IxI/CPHOOJS8MLT16fJ27bk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=refn+d2BET/isYmGNQM1+f17wsuHP7qms2YeTdQrcy0Y21iUWcJZvU4WolLwwo181b3CZeCPhECsgHJwvcQTzOF2ef6fZvDIzMfatjPdehF0URWyD6uqP9hFSfvm2CtV2fb/Y7jGrKes5+am3hgWlyohiOqg7RVbv6pW7BxXXXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=kgRUGpzz; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63O6qK0p3306706;
-	Fri, 24 Apr 2026 02:15:55 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=N+gMqrISiHyV5eYqXkr9AhRbq
-	f6YcTWo2lJn31gHHak=; b=kgRUGpzzKCsGNCzPDW+f2M3X4TGz3n5D1r2RzeCXX
-	jPtm/FQcBZIYr1B4JDRTYZ4bC9/NeN0qy7PadFL5tL28ZlNI7c56qQgR7wMwRzEL
-	AjqaB6yVvqZ7P1PPi2iERTepLneAjmf440p7J49j1wKbk7D0hgTyvp7as2BB7dGq
-	ox0UkPL0siSF/spldwfNZZ7hH4Zjq7MdmorRp75Y/jDCBQXBKxcyyQ86WOhWsPaP
-	JLe8Wjv7m3RrXgnGg0pvqJWWabZQJWcJfQ1cBBvOaQIAgclTy14AtTKfv0RfZy45
-	u90jl7YiU+8Q2FyNq8MGxdYAVeIFPh0hFGaqcQUxVlaXg==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4dqpk2a3xp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Apr 2026 02:15:55 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Fri, 24 Apr 2026 02:15:54 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Fri, 24 Apr 2026 02:15:54 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id A86933F7071;
-	Fri, 24 Apr 2026 02:15:51 -0700 (PDT)
-Date: Fri, 24 Apr 2026 14:45:50 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-        Suman Ghosh
-	<sumang@marvell.com>
-Subject: Re: [PATCH v3 net 11/11] octeontx2-af: npc: cn20k: Reject missing
- default-rule MCAM indices
-Message-ID: <aes0xm-2CtCdExMe@rkannoth-OptiPlex-7090>
-References: <20260423104317.2707923-1-rkannoth@marvell.com>
- <20260423104317.2707923-12-rkannoth@marvell.com>
+	s=arc-20240116; t=1777023580; c=relaxed/simple;
+	bh=7petuLofLdd2ZXeL3b1eIY4YZW0OIFBBgP9QdW66Wvg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=txtEPn4Mw/NsP2v1F67Sv7qvh1wUnpIFtEGiSvv1sXuEgNBf5iL5cFiYO+iFNFor6lULg7Ta7UvMWRs9RVBC1Tko1CgYGHOaug9sLLJwTdEvvs14cboAiVaT2v9/R/sil9CG3MWQ3ExT1V2XPK5UweWnnRpDCnGOfAynNKBNpBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ISwcaTfF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58801C19425;
+	Fri, 24 Apr 2026 09:39:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777023580;
+	bh=7petuLofLdd2ZXeL3b1eIY4YZW0OIFBBgP9QdW66Wvg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ISwcaTfF4JttQou7FYrCNQvfQ8tjGvDwJN1NTrBmPiAqnlZgwNNiIgxNZEB66McuC
+	 TrVQ/mi68T9KWS2R/X3ua+F4yEo9Bc0sipKCrT696Q7E6qSO2kYNU2OFmTrQxyjImv
+	 0nGZTiC0iP+6JiN325Jf0IiXBZMECfxsRiC7j+zVBvPexmAvkOA9Ix9UmJHu8O/qPA
+	 neUQeGSDigxsOzpcdkW2D1n653cxUqUPWoGNn8CfJv4Fu+547oJunHQn6aabNFXMUY
+	 qfnsNf/kdvr0vwwFmuG5VeqxGEy7Hlx5wKTTctmTLXS6+hdQqRdmAgxaSxA0QaUtvb
+	 SLwF/vgAZcySA==
+Message-ID: <0e274aa3-84a7-498e-a4ba-c677cda3e4df@kernel.org>
+Date: Fri, 24 Apr 2026 11:39:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260423104317.2707923-12-rkannoth@marvell.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI0MDA4NSBTYWx0ZWRfX+IhxtaVXCc6y
- e0vlc2QCKGIMLlvbCTbdqFzCrBgl/iliDkRCmR2Z9Y9S3tu8EmlruPnP5CTmuwWDZgNWA/WJCo1
- 4uHjcoLrfj5ngwwF9p93JeHgFLg5s+qYW4yu2/iiifG+dodhEsaZqq51Rd2VFmw+c7oL0Qg6FIg
- pa1NzANX9A4UY8igXpWFor8GM9Jra8+ZnVaNJ1uGTZqM+omLFL7zMHPYkMKfjwjSjH9VrxSFZCL
- Ub6Bcofi3T+0+wnxUuZNHASj1RdIV4Guy4yDLHQf2XPPe2BBklYzk8L5elad2dvhI5t8z27OFE5
- VLja0VjQod5pxkXSHQm7Lypr1B77pkGNzp3zdpGwHbEGKoksLYM1yAUjdn18OCdr+MQ2O6SUUYW
- ExHpDpLtyeuS9k98OPaOcL1G1dVHKrAyzrkwttHMKmHmwjoi4aPn+jFuhS8rkzlimt0YIlzfeXx
- CQx7yuN0QBgR4/V1ITA==
-X-Authority-Analysis: v=2.4 cv=IPAyzAvG c=1 sm=1 tr=0 ts=69eb34cb cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=EAYMVhzMl8SCOHhVQcBL:22 a=9R54UkLUAAAA:8
- a=M5GUcnROAAAA:8 a=D3U6KnTYFKdaAklCq_8A:9 a=CjuIK1q_8ugA:10
- a=YTcpBFlVQWkNscrzJ_Dz:22 a=OBjm3rFKGHvpk9ecZwUJ:22 a=Oh551-UHZqmTy8JkqTUo:22
-X-Proofpoint-ORIG-GUID: vOf1E6MaMovZSgudWAc-2CeYfof4wzDv
-X-Proofpoint-GUID: vOf1E6MaMovZSgudWAc-2CeYfof4wzDv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-23_03,2026-04-21_02,2025-10-01_01
-X-Rspamd-Queue-Id: 6503D45C0E5
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] NFC: trf7970a: Ignore antenna noise when checking for RF
+ field
+To: Paul Geurts <paul.geurts@prodrive-technologies.com>,
+ mgreer@animalcreek.com, sameo@linux.intel.com,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: martijn.de.gouw@prodrive-technologies.com
+References: <20260422100930.581237-1-paul.geurts@prodrive-technologies.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20260422100930.581237-1-paul.geurts@prodrive-technologies.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: E404645C56B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280971-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:dkim,marvell.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280972-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[prodrive-technologies.com:email,qualcomm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On 2026-04-23 at 16:13:17, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
+On 22/04/2026 12:09, Paul Geurts wrote:
+> The main channel Received Signal Strength Indicator (RSSI) measurement
+> is used to determine whether an RF field is present or not. RSSI != 0
+> is interpreted as an RF Field is present. This does not take RF noise
+> and measurement inaccuracy into account, and results in false positives
+> in the field.
+> 
+> Define a noise level and make sure the RF field is only interpreted as
+> present when the RSSI is above the noise level.
+> 
+> Fixes: 851ee3cbf850 ("NFC: trf7970a: Don't turn on RF if there is already an RF field")
+> Signed-off-by: Paul Geurts <paul.geurts@prodrive-technologies.com>
+> ---
+>  drivers/nfc/trf7970a.c | 3 ++-
 
->> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
->> index 5d349d131fdb..611cd7fce245 100644
->> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
->> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
->
->[ ... ]
->
->> @@ -3897,6 +4006,13 @@ int rvu_mbox_handler_npc_read_base_steer_rule(struct rvu *rvu,
->>  	/* Read the default ucast entry if there is no pkt steering rule */
->>  	index = npc_get_nixlf_mcam_index(mcam, pcifunc, nixlf,
->>  					 NIXLF_UCAST_ENTRY);
->> +	if (index < 0) {
->> +		dev_err(rvu->dev,
->> +			"%s: Error to get ucast entry for pcifunc=%#x\n",
->> +			__func__, pcifunc);
->> +		goto out;
->> +	}
->> +
->>  read_entry:
->>  	/* Read the mcam entry */
->>  	npc_read_mcam_entry(rvu, mcam, blkaddr, index, &rsp->entry, &intf,
->
->Does this 'goto out' leak mcam->lock?  Looking at the function entry,
->the lock is acquired before the for-loop:
->
->rvu_mbox_handler_npc_read_base_steer_rule() {
->    ...
->    mutex_lock(&mcam->lock);
->
->    for (idx = 0; idx < pfvf->def_ucast_rule.count; idx++) {
->        ...
->    }
->
->    /* Read the default ucast entry if there is no pkt steering rule */
->    index = npc_get_nixlf_mcam_index(...);
->    if (index < 0) {
->        goto out;
->    }
->
->and the 'out' label just returns without unlocking:
->
->out:
->    return rc;
->
->The nix_get_nixlf() failure path just before this does:
->
->    if (rc) {
->        mutex_unlock(&mcam->lock);
->        goto out;
->    }
->
->Should this new error path match that pattern?
+Looks reasonable so a poor man's review:
 
-AI review report: https://netdev-ai.bots.linux.dev/ai-review.html?id=9923f145-31df-46b0-84e8-b15f1e307ad2#patch-10
-pw-bot: changes-requested
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
 
-Will fix in next version.
+Best regards,
+Krzysztof
 
