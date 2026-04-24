@@ -1,171 +1,257 @@
-Return-Path: <netdev+bounces-280986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280987-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YIL+Ho9d62lGLwAAu9opvQ
-	(envelope-from <netdev+bounces-280986-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 14:09:51 +0200
+	id IE04D0hg62kuMAAAu9opvQ
+	(envelope-from <netdev+bounces-280987-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 14:21:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C0F045E361
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 14:09:50 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4F7F45E573
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 14:21:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 396DE3001587
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:09:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DE5623009B3F
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:21:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E42403C3433;
-	Fri, 24 Apr 2026 12:09:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A57A3C457F;
+	Fri, 24 Apr 2026 12:21:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Km+siIRS"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="a7e1g3P4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04473C279B;
-	Fri, 24 Apr 2026 12:09:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 682463C343E;
+	Fri, 24 Apr 2026 12:21:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777032585; cv=none; b=eKe9Tm3NRxNye0X5tOXz1M//7mkX0+WuqYYvD4V57INkhFy7C5aY6dnsROc25gsWlpYSEnD7/5sThraavKdUhVm1S0mGJwi3dA7NyZ2Qr1/qcf2oLhbepQtFtGm6shYvvQPdBS4ByiqKeVhhL7glQ2xgioehL1fE4yc4HMNAm4E=
+	t=1777033285; cv=none; b=bvm8c0NLUUapjed/M5UvHOoJsFTiRG+bgEiOXbdwXKKfF4WLVMlp1BudCFuIu51r6hbDw3gsJ0NDK8EfElhetb1q2xKdNiyulfyRmvVLoikkC395jIXrQvg1Xz73PlwtLh+vbIdhjg4z8WHQN8HekbYgxdOyY7LfFt+Rzp/8/Es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777032585; c=relaxed/simple;
-	bh=rRaSkeKhlvpU4tWi8hdt4ujoWHjih8+/eulMWmIEvI8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bNsc2jKZC6IURwpMbfm6cbdfdpmudgH0zfBh3g8/4LPTOh5l8H0mgT4+WCdsPWSPc0vZ445ZW0P3VsgUvnP0QmRWsxGpREboLxJztVAByw5S4VZMAFjtpju+QHjBuDiGkeq2TvS3U9C0ODmM3E7XrPs2a3lVWlA3/Eck9c3WIhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Km+siIRS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77D64C19425;
-	Fri, 24 Apr 2026 12:09:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777032585;
-	bh=rRaSkeKhlvpU4tWi8hdt4ujoWHjih8+/eulMWmIEvI8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Km+siIRSuoDTa3nXOPBrNIscTm6Udb4rIj9eJRYWafziUy3gUVXZlj3UmWYvd0tUb
-	 4oO1dWzyHJ9SUCNIov620+KeDrw8mKfNwpqK9sCoIHdlPu5MDd3V5HKgQ5lzaj+y70
-	 oJ0qID4VKZK2Xq9F6l1p/bff0ZxHNSSXgCStxzgvoIq4X3Om3dS4bga6VK24rEXTHC
-	 I/EhE+CDjHynmxgsnMUMGbYMU3TmjLj0Sb+v2nVAlspbLWthFhbI+kAB2cDIK2Crmd
-	 PYbVxjlF+F40zzKQX9DH/H5i854t1XPwlIHlOY7FbAWJAOQtxbyFe82jhT6xZjLdj7
-	 bEOyJVLK+yP/A==
-Date: Fri, 24 Apr 2026 13:09:27 +0100
-From: Jonathan Cameron <jic23@kernel.org>
-To: Yury Norov <ynorov@nvidia.com>
-Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski
- <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, David Lechner
- <dlechner@baylibre.com>, Nuno =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>, Andy
- Shevchenko <andy@kernel.org>, Ping-Ke Shih <pkshih@realtek.com>, Richard
- Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes
- <linux@rasmusvillemoes.dk>, Hans de Goede <hansg@kernel.org>, Linus Walleij
- <linusw@kernel.org>, Sakari Ailus <sakari.ailus@linux.intel.com>, Salah
- Triki <salah.triki@gmail.com>, Achim Gratz <Achim.Gratz@Stromeko.DE>, Ben
- Collins <bcollins@watter.com>, linux-kernel@vger.kernel.org,
- linux-iio@vger.kernel.org, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, linux-rtc@vger.kernel.org
-Subject: Re: [PATCH 0/9] bitfield: add FIELD_GET_SIGNED()
-Message-ID: <20260424130927.349ad3ae@jic23-huawei>
-In-Reply-To: <20260417173621.368914-1-ynorov@nvidia.com>
-References: <20260417173621.368914-1-ynorov@nvidia.com>
-X-Mailer: Claws Mail 4.4.0 (GTK 3.24.52; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1777033285; c=relaxed/simple;
+	bh=7of1kJsvzdpEsSZJeO17x5YeTfnIvMKbWpeoSZwJixs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VCBWmrS2rN0a/AvdZhfnu0p3r85Dpu/tD/EHkeE2YXUoNidjUl2rZtp2E8GhRLX63xad/t3/AgHBpJW9sxI38O9NOUHMv7nmuDV3fO1HgEwbL3Jw9bDuLAIlDuPmtJmLp6UB27/jEN8zLIDzrHepApg5agAazME+4R26Jbs/r6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=a7e1g3P4; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 8B05620B7165; Fri, 24 Apr 2026 05:21:23 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8B05620B7165
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1777033283;
+	bh=b7zfRNW0UNlPkhYc2JrkSF24b0gzNF9MAngEWRuE3dE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=a7e1g3P45gfCXvk9AzIi/j9ubyrUUDJKWp+9SZSKsZtb2WJTQ0ZAQQCFDdOcQ9xb3
+	 JTS0nzgcWMyk7Jaxu6i5b+TqLH5i6NetoqVsLogT6iHWcJTyu+uUhhw3KoxCxE4SS8
+	 MUKfVxEeqKVtgY807cb95moUdjTRrpJW4UFyU99k=
+Date: Fri, 24 Apr 2026 05:21:23 -0700
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Cc: Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Simon Horman <horms@kernel.org>,
+	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+	Shiraz Saleem <shirazsaleem@microsoft.com>,
+	Michael Kelley <mhklinux@outlook.com>,
+	Long Li <longli@microsoft.com>, Yury Norov <yury.norov@gmail.com>,
+	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Paul Rosswurm <paulros@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>,
+	Saurabh Singh Sengar <ssengar@microsoft.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net] net: mana: Optimize irq affinity for low vcpu configs
+Message-ID: <aetgQ1gCYlGJjiKk@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20260424061702.1442618-1-shradhagupta@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 6C0F045E361
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260424061702.1442618-1-shradhagupta@linux.microsoft.com>
+X-Rspamd-Queue-Id: A4F7F45E573
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280986-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280987-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[33];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jic23@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,redhat.com,alien8.de,linux.intel.com,zytor.com,infradead.org,baylibre.com,analog.com,realtek.com,gmail.com,lunn.ch,davemloft.net,google.com,bootlin.com,rasmusvillemoes.dk,Stromeko.DE,watter.com,vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,outlook.com,gmail.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,nvidia.com:email]
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-On Fri, 17 Apr 2026 13:36:11 -0400
-Yury Norov <ynorov@nvidia.com> wrote:
-
-> The bitfields are designed in assumption that fields contain unsigned
-> integer values, thus extracting the values from the field implies
-> zero-extending.
+On Thu, Apr 23, 2026 at 11:17:00PM -0700, Shradha Gupta wrote:
+> In mana driver, the number of IRQs allocated are capped by the
+> min(num_cpu + 1, queue count). In cases, where the IRQ count is greater
+> than the vcpu count, we want to utilize all the vcpus, irrespective of
+> their NUMA/core bindings.
 > 
-> Some drivers need to sign-extend their fields, and currently do it like:
+> This is important, especially in the envs where number of vcpus are so
+> few that the softIRQ handling overhead on two IRQs on the same vcpu is
+> much more than their overheads if they were spread across sibling vcpus
 > 
-> 	dc_re += sign_extend32(FIELD_GET(0xfff000, tmp), 11);
-> 	dc_im += sign_extend32(FIELD_GET(0xfff, tmp), 11);
+> This behaviour is more evident with dynamic IRQ allocation. Since MANA
+> IRQs are assigned at a later stage compared to static allocation, other
+> device IRQs may already be affinitized to the vCPUs. As a result, IRQ
+> weights become imbalanced, causing multiple MANA IRQs to land on the
+> same vCPU.
 > 
-> It's error-prone because it relies on user to provide the correct
-> index of the most significant bit.
+> In such cases when many parallel TCP connections are tested, the
+> throughput drops significantly
 > 
-> This series adds a signed version of FIELD_GET(), which is the more
-> convenient and compiles (on x86_64) to just a couple instructions:
-> shl and sar.
+> Test envs:
+> =======================================================
+> Case 1: without this patch
+> =======================================================
+> 4 vcpu(2 cores), 5 MANA IRQs (1 HWC + 4 Queue)
 > 
-> Patch #1 adds FIELD_GET_SIGNED(), and the rest of the series applies it
-> tree-wide.
+> 	TYPE		effective vCPU aff
+> =======================================================
+> IRQ0:	HWC		0
+> IRQ1:	mana_q1		0
+> IRQ2:	mana_q2		2
+> IRQ3:	mana_q3		0
+> IRQ4:	mana_q4		3
 > 
-
-Just a quick heads up that I'm beginning to assume that this series
-will land in some form.  If it does can we do it as an immutable branch
-as I'm suggesting it gets used in some other patches in that should land
-in the new cycle.
-
-Thanks,
-
-Jonathan
-
-> Yury Norov (9):
->   bitfield: add FIELD_GET_SIGNED()
->   x86/extable: switch to using FIELD_GET_SIGNED()
->   iio: intel_dc_ti_adc: switch to using
->   iio: magnetometer: yas530: switch to using FIELD_GET_SIGNED()
->   iio: pressure: bmp280: switch to using
->   iio: mcp9600: switch to using FIELD_GET_SIGNED()
->   wifi: rtw89: switch to using FIELD_GET_SIGNED()
->   rtc: rv3032: switch to using FIELD_GET_SIGNED()
->   ptp: switch to using FIELD_GET_SIGNED()
+> %soft on each vCPU(mpstat -P ALL 1) on receiver
+> vCPU		0	1	2	3
+> =======================================================
+> pass 1:		38.85	0.03	24.89	24.65
+> pass 2:		39.15	0.03	24.57	25.28
+> pass 3:		40.36	0.03	23.20	23.17
 > 
->  arch/x86/include/asm/extable_fixup_types.h       | 13 ++++---------
->  arch/x86/mm/extable.c                            |  2 +-
->  drivers/iio/adc/intel_dc_ti_adc.c                |  4 ++--
->  drivers/iio/magnetometer/yamaha-yas530.c         | 12 ++++++------
->  drivers/iio/pressure/bmp280-core.c               |  2 +-
->  drivers/iio/temperature/mcp9600.c                |  2 +-
->  .../net/wireless/realtek/rtw89/rtw8852a_rfk.c    |  4 ++--
->  .../net/wireless/realtek/rtw89/rtw8852b_common.c |  4 ++--
->  .../net/wireless/realtek/rtw89/rtw8852b_rfk.c    |  4 ++--
->  drivers/net/wireless/realtek/rtw89/rtw8852c.c    |  4 ++--
->  drivers/ptp/ptp_fc3.c                            |  4 ++--
->  drivers/rtc/rtc-rv3032.c                         |  2 +-
->  include/linux/bitfield.h                         | 16 ++++++++++++++++
->  13 files changed, 42 insertions(+), 31 deletions(-)
+> =======================================================
+> Case 2: with this patch
+> =======================================================
+> 4 vcpu(2 cores), 5 MANA IRQs (1 HWC + 4 Queue)
 > 
-
+>         TYPE            effective vCPU aff
+> =======================================================
+> IRQ0:   HWC             0
+> IRQ1:   mana_q1         0
+> IRQ2:   mana_q2         1
+> IRQ3:   mana_q3         2
+> IRQ4:   mana_q4         3
+> 
+> %soft on each vCPU(mpstat -P ALL 1) on receiver
+> vCPU            0       1       2       3
+> =======================================================
+> pass 1:         15.42	15.85	14.99	14.51
+> pass 2:         15.53	15.94	15.81	15.93
+> pass 3:         16.41	16.35	16.40	16.36
+> 
+> =======================================================
+> Throughput Impact(in Gbps, same env)
+> =======================================================
+> TCP conn	with patch	w/o patch
+> 20480		15.65		7.73
+> 10240		15.63		8.93
+> 8192		15.64		9.69
+> 6144		15.64		13.16
+> 4096		15.69		15.75
+> 2048		15.69		15.83
+> 1024		15.71		15.28
+> 
+> Fixes: 755391121038 ("net: mana: Allocate MSI-X vectors dynamically")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+> ---
+>  .../net/ethernet/microsoft/mana/gdma_main.c   | 35 +++++++++++++++++--
+>  1 file changed, 33 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> index 098fbda0d128..433c044d53c6 100644
+> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> @@ -1672,6 +1672,23 @@ static int irq_setup(unsigned int *irqs, unsigned int len, int node,
+>  	return 0;
+>  }
+>  
+> +static int irq_setup_linear(unsigned int *irqs, unsigned int len)
+> +{
+> +	int cpu;
+> +
+> +	rcu_read_lock();
+We do not need to call rcu_read_lock here, as the caller of this
+function has already acquired cpus_read_lock.
+> +	for_each_online_cpu(cpu) {
+> +		if (len <= 0)
+len is unsigned here so <= doesnot makes sense. PLease change it to int
+or better use if(!len)
+> +			break;
+> +
+> +		irq_set_affinity_and_hint(*irqs++, cpumask_of(cpu));
+> +		len--;
+> +	}
+> +	rcu_read_unlock();
+> +
+> +	return 0;
+> +}
+> +
+>  static int mana_gd_setup_dyn_irqs(struct pci_dev *pdev, int nvec)
+>  {
+>  	struct gdma_context *gc = pci_get_drvdata(pdev);
+> @@ -1722,10 +1739,24 @@ static int mana_gd_setup_dyn_irqs(struct pci_dev *pdev, int nvec)
+>  	 * first CPU sibling group since they are already affinitized to HWC IRQ
+>  	 */
+>  	cpus_read_lock();
+> -	if (gc->num_msix_usable <= num_online_cpus())
+> +	if (gc->num_msix_usable <= num_online_cpus()) {
+>  		skip_first_cpu = true;
+> +		err = irq_setup(irqs, nvec, gc->numa_node, skip_first_cpu);
+> +	} else {
+> +		/*
+> +		 * In case our IRQs are more than num_online_cpus, we try to
+> +		 * make sure we are using all vcpus. In such a case NUMA or
+> +		 * CPU core affinity does not matter.
+> +		 * Note that in this case the total mana IRQ should always be
+> +		 * num_online_cpu + 1. The first HWC IRQ is already handled
+> +		 * in HWC setup calls
+> +		 * So, the nvec value in this path should always be equal to
+> +		 * num_online_cpu
+nit: typo: should be num_online_cpus
+> +		 */
+> +		WARN_ON(nvec > num_online_cpus());
+> +		err = irq_setup_linear(irqs, nvec);
+> +	}
+>  
+> -	err = irq_setup(irqs, nvec, gc->numa_node, skip_first_cpu);
+>  	if (err) {
+>  		cpus_read_unlock();
+>  		goto free_irq;
+> 
+> base-commit: e728258debd553c95d2e70f9cd97c9fde27c7130
+> -- 
+> 2.34.1
+> 
+Regards
+Dipayaan Roy
 
