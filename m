@@ -1,160 +1,142 @@
-Return-Path: <netdev+bounces-280963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280961-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kKCwIzYo62muJAAAu9opvQ
-	(envelope-from <netdev+bounces-280963-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:22:14 +0200
+	id 8GIFJe4l62muJAAAu9opvQ
+	(envelope-from <netdev+bounces-280961-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:12:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC17445B5DF
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:22:13 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDB5345B3FE
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:12:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4245130120C9
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 08:22:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 212153011C40
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 08:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BFF231691C;
-	Fri, 24 Apr 2026 08:22:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nlXR83Rb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D49473815C3;
+	Fri, 24 Apr 2026 08:12:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE6C11A683D;
-	Fri, 24 Apr 2026 08:22:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+Received: from ursule.remlab.net (vps-a2bccee9.vps.ovh.net [51.75.19.47])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B51722256F;
+	Fri, 24 Apr 2026 08:11:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.75.19.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777018931; cv=none; b=SqWQS2fpNHqnPlrMSlPpZrPQdapdFAkHS6h0ebHYFm+nieEtrEwJ/NLO0Zb/bLmKdPsfdOrjgYBF3Ps5LG6Qk8OdNeRex0Ea8nARz/+I37h4H6Yoa43U5j+G8uKWg5K8WBjjcpN2dOG9vAkyvTpxx1KVL+h8OFF4Kb3HrrEnek8=
+	t=1777018322; cv=none; b=FYVnNwkvid7/MJxhHASq15bNXyQo6k03vLQy1KepBA//nKa9uWTGKhu7Jndh2Zvua/ehkXKRiZMB9MtXzSAx/dZW/A3i1scb5b9GatdFOe57xBCBS6nrRxQ75rRZZ6XB3FPt6Gts4xG5JM7HCj4yzl5RL5/lZM34O7TpiVnYxMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777018931; c=relaxed/simple;
-	bh=BP1jtlFzuy/jbBYrDe/iU+3cgpfGhVIi+xBQHeCU6P8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=vA4faMhn7Q4h4W/YlnCitKF6KuzgGo50q5lCLnR+v0ZsPJdhJ0gbMK8e7K2Bg65lTdWrpl0VkpXrZTaztf974vxWFc1Le/GIksfxMtbNcjTrUYhopfAMXWTBbpFSqi9O6Mdp5XxDvOLcSF0JE+3zcVhx5B4AMmvU1UZMjtNjHRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nlXR83Rb; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777018930; x=1808554930;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=BP1jtlFzuy/jbBYrDe/iU+3cgpfGhVIi+xBQHeCU6P8=;
-  b=nlXR83RbSm+2Fru0p4HzcpVuAYqTE2Uqz7sFMTOmXd2OU9eTNEwVmKaB
-   qzPKHGxEKRom1+vPmqqk68EJFIQ04adUfqyPu1dWSUrZvmSjEmunpkRTs
-   jv25pr2GuICwdwKMOIV3luBZ1190yYWO6Yuc0Orpyf5Us8r65sRYEOKf4
-   eEhQO+vMZaambCt6hqNg5LclUUI0vqllPAELaC35n1W6TCG1oj7q5kb5w
-   Ulh1zLlDK/iSkKu9aZYQ1oGolVWqIYOf3Tk+g16pS9CTX8KoZvj2WaK+I
-   KKTOHRrb0zuOJ9zVN3dlpDmjjh55Jq4dRfsji8yL/AFkI+RD6iu+0h9xu
-   w==;
-X-CSE-ConnectionGUID: 30q9tRLfSjW8C7f8XvGDkg==
-X-CSE-MsgGUID: e6te3ISYRoG0oVRdWkxHYg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11765"; a="89379234"
-X-IronPort-AV: E=Sophos;i="6.23,196,1770624000"; 
-   d="scan'208";a="89379234"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2026 01:22:09 -0700
-X-CSE-ConnectionGUID: KA9DsLuUT36JWraU6AZaMQ==
-X-CSE-MsgGUID: /vhcOBMyRaiY/wX48777yw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,196,1770624000"; 
-   d="scan'208";a="228330450"
-Received: from unknown (HELO localhost.png.intel.com) ([10.107.255.61])
-  by fmviesa006.fm.intel.com with ESMTP; 24 Apr 2026 01:22:05 -0700
-From: KhaiWenTan <khai.wen.tan@linux.intel.com>
-To: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	chwee.lin.choong@intel.com,
-	vladimir.oltean@nxp.com,
-	vinicius.gomes@intel.com
-Cc: faizal.abdul.rahim@linux.intel.com,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	khai.wen.tan@intel.com,
-	hong.aun.looi@intel.com,
-	faizal.abdul.rahim@intel.com,
-	KhaiWenTan <khai.wen.tan@linux.intel.com>
-Subject: [PATCH iwl-net 1/1] igc: skip RX timestamp header for frame preemption verification
-Date: Fri, 24 Apr 2026 15:59:07 +0800
-Message-ID: <20260424075907.310456-1-khai.wen.tan@linux.intel.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1777018322; c=relaxed/simple;
+	bh=wkbcj40A5IvpdOg9HaOB/QavQjZwK4YHCEYvQnGoZdE=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=EciNyFCSs6zu4PcvMXTpPtHXzf9lCbdIL6QS3Ewcy/h/h7yj243xegwmedRBp/wYIn49R5bo3CgZE69qt4cSqZBeCADerReurMwBk1ycsG3ZJ9n7GPRqCtiB2ymAFJNo3ZOJM1ASYMSDBY9S/lgmN84nxBx154I2xODbuxxwn5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=remlab.net; spf=pass smtp.mailfrom=remlab.net; arc=none smtp.client-ip=51.75.19.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=remlab.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=remlab.net
+Received: from ursule.remlab.net (localhost [IPv6:::1])
+	by ursule.remlab.net (Postfix) with ESMTP id C5AF3C016E;
+	Fri, 24 Apr 2026 11:01:51 +0300 (EEST)
+Received: from ehlo.thunderbird.net ([2001:14bb:cc:dede::4701:b01])
+	by ursule.remlab.net with ESMTPSA
+	id zvk6H28j62mujgMAwZXkwQ
+	(envelope-from <remi@remlab.net>); Fri, 24 Apr 2026 11:01:51 +0300
+Date: Fri, 24 Apr 2026 11:01:51 +0300
+From: =?ISO-8859-1?Q?R=E9mi_Denis-Courmont?= <remi@remlab.net>
+To: Morduan Zang <zhangdandan@uniontech.com>,
+ Remi Denis-Courmont <courmisch@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+ syzbot+706f5eb79044e686c794@syzkaller.appspotmail.com, zhanjun@uniontech.com
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_net_v2=5D_net=3A_phonet=3A_do_not_BUG=5F?=
+ =?US-ASCII?Q?ON=28=29_in_pn=5Fsocket=5Fautobind=28=29_on_failed_bind?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <87A8960A2045AF3C+20260423010557.138124-1-zhangdandan@uniontech.com>
+References: <81A6570B633FF6FE+20260422013807.63087-1-zhangdandan@uniontech.com> <87A8960A2045AF3C+20260423010557.138124-1-zhangdandan@uniontech.com>
+Message-ID: <2EF979DF-C8DA-4691-A699-E3EA58A21E17@remlab.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: AC17445B5DF
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: BDB5345B3FE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.24 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	SUBJ_EXCESS_QP(1.20)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-280961-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[remlab.net];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-280963-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[khai.wen.tan@linux.intel.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[uniontech.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,linux.intel.com:mid]
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[remi@remlab.net,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.990];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,706f5eb79044e686c794];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,syzkaller.appspot.com:url,remlab.net:mid,remlab.net:email]
 
-When RX hardware timestamping is enabled, a 16-byte inline timestamp header
-is added to the start of the packet buffer, causing FPE handshake
-verification to fail.
 
-Because an incorrect packet buffer is passed to igc_fpe_handle_mpacket(),
-the mem_is_zero() check inspects the timestamp metadata instead of the
-actual mPacket payload. As a result, valid Verify/Response mPackets can be
-missed when inline RX timestamps are present.
 
-Pass pktbuf + pkt_offset to igc_fpe_handle_mpacket() so it inspects the
-actual mPacket payload instead of the timestamp header.
+Le 23 avril 2026 04:05:57 GMT+03:00, Morduan Zang <zhangdandan@uniontech=
+=2Ecom> a =C3=A9crit=C2=A0:
+>syzbot reported a kernel BUG triggered from pn_socket_sendmsg() via
+>pn_socket_autobind():
+>
+>  kernel BUG at net/phonet/socket=2Ec:213!
+>  RIP: 0010:pn_socket_autobind net/phonet/socket=2Ec:213 [inline]
+>  RIP: 0010:pn_socket_sendmsg+0x240/0x250 net/phonet/socket=2Ec:421
+>  Call Trace:
+>   sock_sendmsg_nosec+0x112/0x150 net/socket=2Ec:797
+>   __sock_sendmsg net/socket=2Ec:812 [inline]
+>   __sys_sendto+0x402/0x590 net/socket=2Ec:2280
+>   =2E=2E=2E
+>
+>pn_socket_autobind() calls pn_socket_bind() with port 0 and, on
+>-EINVAL, assumes the socket was already bound and asserts that the
+>port is non-zero:
+>
+>  err =3D pn_socket_bind(sock, =2E=2E=2E, sizeof(struct sockaddr_pn));
+>  if (err !=3D -EINVAL)
+>          return err;
+>  BUG_ON(!pn_port(pn_sk(sock->sk)->sobject));
+>  return 0; /* socket was already bound */
+>
+>However pn_socket_bind() also returns -EINVAL when sk->sk_state is not
+>TCP_CLOSE, even when the socket has never been bound and pn_port() is
+>still 0=2E  In that case the BUG_ON() fires and panics the kernel from a
+>user-triggerable path=2E
+>
+>Treat the "bind returned -EINVAL but pn_port() is still 0" case as a
+>regular error and propagate -EINVAL to the caller instead of crashing=2E
+>Existing callers already translate a non-zero return from
+>pn_socket_autobind() into -ENOBUFS/-EAGAIN, so returning -EINVAL here
+>only changes behaviour from panic to a normal errno=2E
+>
+>Fixes: ba113a94b750 ("Phonet: common socket glue")
+>Reported-by: syzbot+706f5eb79044e686c794@syzkaller=2Eappspotmail=2Ecom
+>Closes: https://syzkaller=2Eappspot=2Ecom/bug?extid=3D706f5eb79044e686c79=
+4
+>Suggested-by: Remi Denis-Courmont <courmisch@gmail=2Ecom>
+>Signed-off-by: Morduan Zang <zhangdandan@uniontech=2Ecom>
+>Signed-off-by: zhanjun <zhanjun@uniontech=2Ecom>
 
-Fixes: 5422570c0010 ("igc: add support for frame preemption verification")
-Co-developed-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-Signed-off-by: KhaiWenTan <khai.wen.tan@linux.intel.com>
----
- drivers/net/ethernet/intel/igc/igc_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 8ac16808023c..c470d2354ce8 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -2649,7 +2649,7 @@ static int igc_clean_rx_irq(struct igc_q_vector *q_vector, const int budget)
- 		}
- 
- 		if (igc_fpe_is_pmac_enabled(adapter) &&
--		    igc_fpe_handle_mpacket(adapter, rx_desc, size, pktbuf)) {
-+		    igc_fpe_handle_mpacket(adapter, rx_desc, size, pktbuf + pkt_offset)) {
- 			/* Advance the ring next-to-clean */
- 			igc_is_non_eop(rx_ring, rx_desc);
- 			cleaned_count++;
--- 
-2.43.0
-
+Acked-by: R=C3=A9mi Denis-Courmont <remi@remlab=2Enet>
 
