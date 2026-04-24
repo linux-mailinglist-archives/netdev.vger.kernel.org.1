@@ -1,119 +1,116 @@
-Return-Path: <netdev+bounces-281054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281055-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 9/XaKOLE62n2RAAAu9opvQ
-	(envelope-from <netdev+bounces-281054-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 21:30:42 +0200
+	id WCr/HhPF62liRAAAu9opvQ
+	(envelope-from <netdev+bounces-281055-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 21:31:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F6A6462ED6
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 21:30:42 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03382462EEC
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 21:31:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 26BC7301B178
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 19:30:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ECB76300617A
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 19:31:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D4702F1FDE;
-	Fri, 24 Apr 2026 19:30:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jkJTJONu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE93826A0B9;
+	Fri, 24 Apr 2026 19:31:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6633E2BE026
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 19:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED6827453;
+	Fri, 24 Apr 2026 19:31:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777059038; cv=none; b=rGv6wbIyJD4BVoqEvPXdyw2EnP2Sx2n+UwOK3w5nSNtwkRlVli6kLJVGWmYVB8ScCEj8dMn8R1I84CCh5zhTq9pP3pzfcDbX8IAKyeQ8bUlO4Kk8oWRXQHrnxRzlvchKoT91QAX1wRQwCFLeowOSfzxaVl9W/Qd/a6d3FjedstM=
+	t=1777059071; cv=none; b=dS6nVsrmzQ+noA95SuRelM2PpcBi0p0bxsmAM1U9MD75VXoY0J6QZjdNL6weOA8SwhWDYhpuVZJjGu1eh+I3E9RjOLSHF5FwgJHeB5KsHG02gf2dDPZ0AK+5EEq883wyr5RX1hMo+TKhyRus9a4x+Jlz39d8mbRoY/etiOVFTtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777059038; c=relaxed/simple;
-	bh=nJ/U44d1I6NWvb8arGyA3HNe5F7J9VbTfGirfCbggfk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HSkiogfMSpGElhc1RqXyhv0/Xqw7KpqqDlP4VmbV5n5qY8yhak/c4Y23O9Jt4Om2XjDRiwxDB4u1a3TjzwpR+OSo6gReXr17Nu22DZXLtwuOU5ffC31EXxLEK1A8Ds5cE37TEGkHCb2DkiOnGz0UnokmG3YTIWfddt9jBJXdAYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jkJTJONu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81E82C19425;
-	Fri, 24 Apr 2026 19:30:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777059037;
-	bh=nJ/U44d1I6NWvb8arGyA3HNe5F7J9VbTfGirfCbggfk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=jkJTJONuTmagNZLW6PXM23Ih0FhnLm5w3ru4sgB1NXcwV59/VU5zYHBGE7QOEWikm
-	 1bUTZMcZXdMHp04Nj1++m0CbN6yszjNisuNvpY8ON64/2Nk7iDVs9eYFoPqzN9vLEg
-	 gJ/L3zmzqzjaoelSKrX3wb02dygPoSislAZ59QdHzsNyRcJGPwa8ZdyCnFjBql4WnE
-	 UxJyP3jEN5ehvWWdVYGy2+sG7QFV1rxODx8Jtku8OgsvBX4rs/sbsGUmovCO9PkJEQ
-	 g87nk4bu+vp4xgR5eLaRNZbK0fUEHbWrwbCVGO+2gVMyDixVf3U/3Mn+ubRwhK6z6q
-	 9tFyjMiH3Xp+Q==
-Message-ID: <9a8c7687-d264-495b-9cb1-0bac85a7082a@kernel.org>
-Date: Fri, 24 Apr 2026 13:30:36 -0600
+	s=arc-20240116; t=1777059071; c=relaxed/simple;
+	bh=EYaf/JhqL+ccTdvuXaqxnjG9DW6oirUSaJ9T3K1PNlg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PddLKnaeBxcC8aCoSafLFhcX2kN7T25xmMHWU9G39V4lXo9iQqvegIMNr4huUlojhzkS/8NTuy+7s1XCaGnAvW2A+R0WAetuUHnCuDotxVHjTaOM8UmP5u3OavQZlqJ/NBkbPeSrdMIfaFh/vBYENaW2SUovGVXWi+7WmPT+YJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id A479D60425; Fri, 24 Apr 2026 21:31:01 +0200 (CEST)
+Date: Fri, 24 Apr 2026 21:31:00 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Ginger <ginger.jzllee@gmail.com>
+Cc: steffen.klassert@secunet.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [bug report] Potential order bug in 'net/xfrm/xfrm_state.c',
+ primarily in 'xfrm_state_walk_done()'
+Message-ID: <aevE9IXgvj_Gx0gD@strlen.de>
+References: <CAGp+u1autEHVxgs1pdqxz0kwExuKE3+XmQOtTC5bv-R7WU8nBw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2-next] utils: add fflush_monitor() helper
-To: Eric Dumazet <edumazet@google.com>,
- Stephen Hemminger <stephen@networkplumber.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com
-References: <20260424171151.1190882-1-edumazet@google.com>
-Content-Language: en-US
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20260424171151.1190882-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 2F6A6462ED6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAGp+u1autEHVxgs1pdqxz0kwExuKE3+XmQOtTC5bv-R7WU8nBw@mail.gmail.com>
+X-Rspamd-Queue-Id: 03382462EEC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com];
+	RCPT_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-281055-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-281054-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[strlen.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
 	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
 
-On 4/24/26 11:11 AM, Eric Dumazet wrote:
-> @@ -399,4 +400,10 @@ FILE *generic_proc_open(const char *env, const char *name);
->  int open_fds_add(int fd);
->  void open_fds_close(void);
->  
-> +static inline void fflush_monitor(FILE *fp)
-> +{
-> +	if (monitor_mode)
-> +		fflush_monitor(fp);
+Ginger <ginger.jzllee@gmail.com> wrote:
+> Potential concurrent triggering executions:
+> T0:
+> xfrm_state_walk_done
+>     --> kfree(walk->filter); [t0]
+>     --> list_del(&walk->all); [t3]
 
-Circular call?
+list_del() uses same spinlock as iterator.
 
+> T1:
+> xfrm_state_walk
 
-> +}
-> +
->  #endif /* __UTILS_H__ */
+2652 int xfrm_state_walk(struct net *net, struct xfrm_state_walk *walk,
+2653                     int (*func)(struct xfrm_state *, int, void*),
+2654                     void *data)
+2655 {
+[..]
+2663         spin_lock_bh(&net->xfrm.xfrm_state_lock);
+2668         list_for_each_entry_from(x, &net->xfrm.state_all, all) {
+2669                 if (x->state == XFRM_STATE_DEAD)
+2670                         continue;
 
+... and walker has STATE_DEAD, no? So I don't see how UaF is possible.
 
+Even if parallel invocation (pfkey+netlink?) is possible, then we have:
 
+T0: walk_done() -> free filter -> blocks on spinlock for list_del
+T1: list_for_each ... -> walker is valid memory, checks x->state -> SKIP
+to next entry
+
+(or list_del already finished, but then _walk() is blocked on
+spinlock).
 
