@@ -1,112 +1,235 @@
-Return-Path: <netdev+bounces-281035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281036-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OBXmK2y362kJQgAAu9opvQ
-	(envelope-from <netdev+bounces-281035-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:33:16 +0200
+	id kBhuFqW362kJQgAAu9opvQ
+	(envelope-from <netdev+bounces-281036-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:34:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3A0A46276C
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:33:15 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7C4D4627AA
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:34:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4F4543004061
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:33:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4CAD83031F3F
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:33:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C0D33F0AA7;
-	Fri, 24 Apr 2026 18:33:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F2123F23D4;
+	Fri, 24 Apr 2026 18:33:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bbzdVqjZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YCvbU/1G"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 392423E8C70;
-	Fri, 24 Apr 2026 18:33:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31E373F23B9
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 18:33:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777055584; cv=none; b=HF/5Hn1sfbMoB34tujcB6uwQ6G9zB+2k4wKSfGIKy9t7jmS7B/bMSatECU0EyH6PXU+wBB3ug626y1vgUVbnIAkPZ/2XGacmZ26Kf1/+/pnx68kCoK4slQawAE/Tejked4oXcsDbnUgwxqsroPVfJaHP8jOG9xLU7BlLsDSLLo0=
+	t=1777055594; cv=none; b=eduPln4d/82DYjDKkGXotZ4OUtjfPpV4/pzzporeA5vlKuU0OvBjRq8K01gele7UZqVy8AkrwmEUFzvVicfK4GYbBEdcXjn9cTLJ8YbrKugOA/Uq0bUOodJYlDsE0F07kW2AXCQe5NPtOeHBljoGsgljTz65hXh/Olw5/GwlE+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777055584; c=relaxed/simple;
-	bh=1RY6xTLCQIlYQWFEWI0JsJnlcICY/pbYu4T3FNl+wBc=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=b/pr2CZqbrleO4UnQhM8EDkFXW1TRqXaZ+NuC05q95VnVZL+3pJ5LzLeQQFqEPmajRouqpu/2elEOB2n3ABnab+GDMPMhBKtlip3HcRWpqhEWwLWrDpDEh8Do//g3tLlla+Dh+up7Qcc7QLEKQGS/Jex7Hp8Jrb3qr8nGkZupnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bbzdVqjZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18891C19425;
-	Fri, 24 Apr 2026 18:33:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777055584;
-	bh=1RY6xTLCQIlYQWFEWI0JsJnlcICY/pbYu4T3FNl+wBc=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=bbzdVqjZFvbFqYKX52U2ig+SfSYf7THYiGwC4GqWXiIlhKfL++y9ZU1QyEAmsNpy0
-	 ffK/XXE00xO2Atc3mozEs+5MHcHmKrtH8wQilM6rg2U28Hz9N9jZW3fvlI4fps9PMy
-	 PzHTEuTpC9hnb7kFIOEa3j075otpIWIfcBReh3a3LQudvtmq8SRzWILxx8U2M4vQum
-	 Gb5KIw0EDfZiFQ9SN5dedmy1x3tFrUWU9rf/5idmxkky8b+t02YGc5UYGrIXBJlNrA
-	 tDez7Czq0ApPCPNWRaEOAMrR8VoahvWXUBQsoIkuB+xcOG7zQ+cZqxC6t994UTf4W8
-	 gCG5ssOCmr7oQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id BA17538119C3;
-	Fri, 24 Apr 2026 18:32:25 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking deletions for 7.1
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20260423235422.1541768-1-kuba@kernel.org>
-References: <20260423235422.1541768-1-kuba@kernel.org>
-X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20260423235422.1541768-1-kuba@kernel.org>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git tags/net-deletions
-X-PR-Tracked-Commit-Id: 0c22ed0fadcad620277a56c0ba2867d4850d053a
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 64edfa65062dc4509ba75978116b2f6d392346f5
-Message-Id: <177705554440.1656274.3849780963665058916.pr-tracker-bot@kernel.org>
-Date: Fri, 24 Apr 2026 18:32:24 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
+	s=arc-20240116; t=1777055594; c=relaxed/simple;
+	bh=5KKtAI6jaBrVREHQpySmvtkbvTyy3jqrl7fEoimPtZY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Fn2+Et7FMVTJNbFW/ecf2j6owqQOffBZpaFXE3matXWBjljLeFCHychulptAVr6E1N2Z+UiciyM6d3KRdkP4I578ogKmYywcflbZJRZVAgnBM6rEa+W0ouCM293ebvw8w1hz3VEqKZKi1WXGqWNXzH9UWL5+0cT9QVwpxxp/Z5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YCvbU/1G; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777055587;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/+Ofdg4jOEN9y2ToBzvsak04ExFbOMNwCGnfdG4OLXM=;
+	b=YCvbU/1GAz/DJsA74fru/qeM1ldkg5IqTOq5LneRNbiS+Axz6fEFM/1rxQN7t7e8tcD1dE
+	wBdJkD71kfGPMRkGWm7XesNBkY7CUGg/Mv2Y5p0W75u6IXi4ZALwWtiJgFJ1kUGs/5nMtZ
+	3w9xQMA4dqSK3A6fNoWiAzDfa9fz2JY=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-665-wNN_jrdwPo6U_kJxLlYKOg-1; Fri,
+ 24 Apr 2026 14:33:03 -0400
+X-MC-Unique: wNN_jrdwPo6U_kJxLlYKOg-1
+X-Mimecast-MFC-AGG-ID: wNN_jrdwPo6U_kJxLlYKOg_1777055577
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D7825195608B;
+	Fri, 24 Apr 2026 18:32:55 +0000 (UTC)
+Received: from [10.22.88.143] (unknown [10.22.88.143])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4304319560AB;
+	Fri, 24 Apr 2026 18:32:45 +0000 (UTC)
+Message-ID: <2658f7a3-5156-4cc5-86c4-b23627e4b5f2@redhat.com>
+Date: Fri, 24 Apr 2026 14:32:45 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-X-Rspamd-Queue-Id: B3A0A46276C
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 19/23] cgroup/cpuset: Improve check for calling
+ housekeeping_update()
+To: Chen Ridong <chenridong@huaweicloud.com>, Tejun Heo <tj@kernel.org>,
+ Johannes Weiner <hannes@cmpxchg.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
+ <mkoutny@suse.com>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
+ Guenter Roeck <linux@roeck-us.net>, Frederic Weisbecker
+ <frederic@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>,
+ Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+ Joel Fernandes <joelagnelf@nvidia.com>, Josh Triplett
+ <josh@joshtriplett.org>, Boqun Feng <boqun@kernel.org>,
+ Uladzislau Rezki <urezki@gmail.com>, Steven Rostedt <rostedt@goodmis.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Lai Jiangshan <jiangshanlai@gmail.com>, Zqiang <qiang.zhang@linux.dev>,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>, Ingo Molnar
+ <mingo@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+ Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>,
+ Vincent Guittot <vincent.guittot@linaro.org>,
+ Dietmar Eggemann <dietmar.eggemann@arm.com>, Ben Segall
+ <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+ Valentin Schneider <vschneid@redhat.com>,
+ K Prateek Nayak <kprateek.nayak@amd.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>
+Cc: cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-hyperv@vger.kernel.org, linux-hwmon@vger.kernel.org,
+ rcu@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Costa Shulyupin <cshulyup@redhat.com>,
+ Qiliang Yuan <realwujing@gmail.com>
+References: <20260421030351.281436-1-longman@redhat.com>
+ <20260421030351.281436-20-longman@redhat.com>
+ <e8824498-f8ec-496a-a21c-d1dc594f4c8e@huaweicloud.com>
+Content-Language: en-US
+From: Waiman Long <longman@redhat.com>
+In-Reply-To: <e8824498-f8ec-496a-a21c-d1dc594f4c8e@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Rspamd-Queue-Id: C7C4D4627AA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-281035-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FREEMAIL_TO(0.00)[huaweicloud.com,kernel.org,cmpxchg.org,suse.com,lwn.net,linuxfoundation.org,arm.com,microsoft.com,roeck-us.net,nvidia.com,joshtriplett.org,gmail.com,goodmis.org,efficios.com,linux.dev,linutronix.de,infradead.org,redhat.com,linaro.org,google.com,suse.de,amd.com,davemloft.net];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,redhat.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-281036-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[longman@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_GT_50(0.00)[52];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pr-tracker-bot@kernel.org,netdev@vger.kernel.org]
+	TO_DN_SOME(0.00)[]
 
-The pull request you sent on Thu, 23 Apr 2026 16:54:22 -0700:
+On 4/22/26 9:10 PM, Chen Ridong wrote:
+>
+> On 2026/4/21 11:03, Waiman Long wrote:
+>> By making sure that isolated_hk_cpus matches isolated_cpus at boot time,
+>> we can more accurately determine if calling housekeeping_update()
+>> is needed by comparing if the two cpumasks are equal. The
+>> update_housekeeping flag still have a use in cpuset_handle_hotplug()
+>> to determine if a work function should be queued to invoke
+>> cpuset_update_sd_hk_unlock() as it is not supposed to look at
+>> isolated_hk_cpus without holding cpuset_top_mutex.
+>>
+> Currently, isolated_hk_cpus is updated within the cpuset_mutex critical section
+> (before mutex_unlock(&cpuset_mutex)) in cpuset_update_sd_hk_unlock. Therefore, I
+> think update_housekeeping can now be removed.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git tags/net-deletions
+That is true. I will remove in the next version.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/64edfa65062dc4509ba75978116b2f6d392346f5
+Thanks,
+Longman
 
-Thank you!
+>
+>> Signed-off-by: Waiman Long <longman@redhat.com>
+>> ---
+>>   kernel/cgroup/cpuset.c | 36 ++++++++++++++++++++----------------
+>>   1 file changed, 20 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
+>> index a4eccb0ec0d1..1b0c50b46a49 100644
+>> --- a/kernel/cgroup/cpuset.c
+>> +++ b/kernel/cgroup/cpuset.c
+>> @@ -1339,26 +1339,29 @@ static void cpuset_update_sd_hk_unlock(void)
+>>   	__releases(&cpuset_mutex)
+>>   	__releases(&cpuset_top_mutex)
+>>   {
+>> +	update_housekeeping = false;
+>> +
+>>   	/* force_sd_rebuild will be cleared in rebuild_sched_domains_locked() */
+>>   	if (force_sd_rebuild)
+>>   		rebuild_sched_domains_locked();
+>>   
+>> -	if (update_housekeeping) {
+>> -		update_housekeeping = false;
+>> -		cpumask_copy(isolated_hk_cpus, isolated_cpus);
+>> -
+>> -		/*
+>> -		 * housekeeping_update() is now called without holding
+>> -		 * cpus_read_lock and cpuset_mutex. Only cpuset_top_mutex
+>> -		 * is still being held for mutual exclusion.
+>> -		 */
+>> -		mutex_unlock(&cpuset_mutex);
+>> -		cpus_read_unlock();
+>> -		WARN_ON_ONCE(housekeeping_update(isolated_hk_cpus, BIT(HK_TYPE_DOMAIN)));
+>> -		mutex_unlock(&cpuset_top_mutex);
+>> -	} else {
+>> +	if (cpumask_equal(isolated_hk_cpus, isolated_cpus)) {
+>> +		/* No housekeeping cpumask update needed */
+>>   		cpuset_full_unlock();
+>> +		return;
+>>   	}
+>> +
+>> +	cpumask_copy(isolated_hk_cpus, isolated_cpus);
+>> +
+>> +	/*
+>> +	 * housekeeping_update() is now called without holding
+>> +	 * cpus_read_lock and cpuset_mutex. Only cpuset_top_mutex
+>> +	 * is still being held for mutual exclusion.
+>> +	 */
+>> +	mutex_unlock(&cpuset_mutex);
+>> +	cpus_read_unlock();
+>> +	WARN_ON_ONCE(housekeeping_update(isolated_hk_cpus, BIT(HK_TYPE_DOMAIN)));
+>> +	mutex_unlock(&cpuset_top_mutex);
+>>   }
+>>   
+>>   /*
+>> @@ -3692,10 +3695,11 @@ int __init cpuset_init(void)
+>>   
+>>   	BUG_ON(!alloc_cpumask_var(&cpus_attach, GFP_KERNEL));
+>>   
+>> -	if (housekeeping_enabled(HK_TYPE_DOMAIN_BOOT))
+>> +	if (housekeeping_enabled(HK_TYPE_DOMAIN_BOOT)) {
+>>   		cpumask_andnot(isolated_cpus, cpu_possible_mask,
+>>   			       housekeeping_cpumask(HK_TYPE_DOMAIN_BOOT));
+>> -
+>> +		cpumask_copy(isolated_hk_cpus, isolated_cpus);
+>> +	}
+>>   	return 0;
+>>   }
+>>   
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
 
