@@ -1,189 +1,253 @@
-Return-Path: <netdev+bounces-280948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280949-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YGVfIT4D62lsHQAAu9opvQ
-	(envelope-from <netdev+bounces-280948-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 07:44:30 +0200
+	id mMUmHO4K62lJHwAAu9opvQ
+	(envelope-from <netdev+bounces-280949-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 08:17:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 162A145A039
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 07:44:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D250F45A2DB
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 08:17:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6DB7A3003D2E
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:44:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E78F33013D56
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 06:17:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20D8D3451AA;
-	Fri, 24 Apr 2026 05:44:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A09734C9AC;
+	Fri, 24 Apr 2026 06:17:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PA7NYMxA"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="pW5s0dH0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D961D0DEE
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 05:44:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.179
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777009467; cv=pass; b=Lko+mmFc8phicQVQNE5qgyaf7ift8T7ImG3mzL8KkHMHgIi7eWpstPuoUFrOHBc2kzDiNvAgBOCpbbmruhsXxmlHDS0pQ1xAGZe9rYTJitIgibv7kItfTDtABeo5E2PRNtAUpWKMaN86vRVPJgr72aL45fRCz0DmuIWP0XAswFE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777009467; c=relaxed/simple;
-	bh=Me7PVnkzRUpuaMgGPE1fIikIY9kc5geMAE1gyIQR3no=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cmEGoSbEqeoCFPirN5Z3ec0lBYdmQ5Lqj2rCC2Cyua9aDADe7sw6lMlFxi6aTfMpZWpE31K9cZdVKAoOElV0US/o5z6mqfL/mHVvHkZ4p0yz5lB1SubODxAHBMYwtryWYDZmpQonn/G0ZD6e0kKgk6iErenjuPBoNsfrrV4yzBc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PA7NYMxA; arc=pass smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-7982c3b7dfcso70036757b3.0
-        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 22:44:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777009465; cv=none;
-        d=google.com; s=arc-20240605;
-        b=HK0AieUxRMBXw++eyhqEWwUZlQuMcfZiS4WDSmoyb2ywjt7iY0kumlBSxJ2xYLr5K2
-         AwooOeM4hkcYvYMaEGNI773wiogFxUZYH5idmaOMh+W9Msy/vgSgTvnSO/fTvr27LHrZ
-         eoAROdrbrZ2FTL+94j+zkrIxYe0UplCKrYByVsFWTR36ipas46Ar+9CF9GaT+HJmDSwC
-         ykL67JQE7JQ+FRClw/Jfnaz6HBtY+VqPmN5ar2NkIdRM8NE0L6mpfRuhcjWdrV2+d1ml
-         XMX4fCXPFDp4ovSr3NJT/TeScOu+KQTkUIXDAnSSxic6Ovdi8liTlHXJKLXKrf5Nzc9t
-         V2eg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ceqdbW/Ut0IoYJeEG5SB9dp/Q2HqRJQ/cXBZaU3ZGNY=;
-        fh=Uk66vtNJq7teY5orj956puKgAYrtWupbg4LJtvvnMdQ=;
-        b=EDxwDWvu6JJWiZ/c/WzofKW5g4Ea8YNzTuDyZVqDhTJCJXeQjyRNAEBMVk/XWneapx
-         Q/Y6UL6Zin3IzEFGBh4a29jFU6BkwJspwaqPD/afGv1fQ6x/F9xGz7g7xKF7Bem8Oxyd
-         +VbluAtDkiEArVqwwW41/rtH6NhWPvuYCCS8tCn6l6ITXnsjFGQyKgADxUiMv2+3blj3
-         WavbWZOU5Y0920FYQdt09e7rlrIKp9ergt0pa70wtLPx1GuQLyBGj1nh6hRKkxiqNvKV
-         pyHowtV73+jsK9nWlG0m84LgcG50Fy0f24IkRYSLv/1Pok34kt9T1KG8HVvJXoZIsFfg
-         5aJA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777009465; x=1777614265; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ceqdbW/Ut0IoYJeEG5SB9dp/Q2HqRJQ/cXBZaU3ZGNY=;
-        b=PA7NYMxAWUww/37eepXNDGa2uE7SJolndXF3DUgWaKV1BjeZWx1KyzLdIfGDCH6LbF
-         d8HeZcBx/wMQVSw8cs2epGgioSPMYABWxuK2LjyfD6e7oq0ChmbNZAeUrAspIsgii3dD
-         NOsQ/egCS7B01DnWUorYUdfXZAd2jQLLkJeh4Co1hCX1gsfz2QEWeo0L0K8bnk46K+qr
-         VFi17+PQfwZ79kciRY6VS43VXX35Yqf6iKTlrR0FPxoyW78Ns0pM+tfRX3p2hd8YfdcJ
-         v+D5tj057e2X/RdF0ivaPqb20DcxNs+KSqMhNknnZEFJuSwmPu/MKOs9v2DXt37ufRjD
-         ATUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777009465; x=1777614265;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ceqdbW/Ut0IoYJeEG5SB9dp/Q2HqRJQ/cXBZaU3ZGNY=;
-        b=YH/R1osdJDTi47bpJnwkLxuWv5JzIA/rFxLcOehhkA2C9Xlml0wP96RRMzkkVDpYfe
-         TgvESR4hX6K3Cou5k58CRm2YMon3JyVN8lQf6KQ2ADl+MaMwUBHB/1Qc1Fl54n7PCBq/
-         6es8a2hJ4zE4DFComh28bNd02++4gCvd8ywEgk8BZQ2so5szftf/nBf5vAY22DWVMiX/
-         QAe3NnBCuiPieTXb9xt5b7N09RX88ZWj4YVeFZuZazmocvosWxPqEjMoqeJNiX/Jm75q
-         ohadRSSpi8cDFtmIHrRXUhlQtkCmgTFCz8jF+u8P6CDLrrh1Bbw1uFHe7j4Ura7JKRei
-         3QUA==
-X-Forwarded-Encrypted: i=1; AFNElJ9Uae45vRrg7pzT9sY90a3TNH6UXVFWsqG0XKfIO3y6WbBQByZ/JISCGpsMoeRqVwqC6WXmePo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEPwjWALxaov1yr+zmP++L0rU1kf/ppoK38VnxBhOxRVhwVohE
-	gbN+RQ1SVRF6LZukrdIMGNRUpe5H0imP1zHvLaLK78bhkdTd+apRbMTErwCwo1qN7VDWAjDsFuy
-	UjI1+9te384Dfqo3TIvq682FlBo9Xu9nT26Ke
-X-Gm-Gg: AeBDieuaHnkD3i/DFOynsxyiGZ2Utf2HGAmY3DU4DtqdP4h4A/UxHes9Lg03hpUBaZd
-	zghK4J+VM9v6ECIR4TrnnwFyiNcEW8DPtOEKm3Lj3JePi2rcdntxj/EUPCEJg5uvlXrgxP1NgN2
-	YYxeDZovc+jq8yHVTh9hLzrCc7q7udAzqvFBU63xgdCUNCdOeZ9jLoba0hKuLLj1dTQqCjRY94w
-	28j4k0YOcxveUoxdHM059yCum8C2Zw69Z7EilFp9vNSWMdoBOfXXI0YWtZV/6r8QoROMUA6xxaT
-	oEOn1QGXxRE9Jt9iRA==
-X-Received: by 2002:a05:690c:3482:b0:7ba:ded4:df58 with SMTP id
- 00721157ae682-7baded4e83cmr256598867b3.49.1777009464910; Thu, 23 Apr 2026
- 22:44:24 -0700 (PDT)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC8FF19E7F7;
+	Fri, 24 Apr 2026 06:17:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777011428; cv=none; b=gBZXm+KeTLSyQvnLMa99lx5yPy8ErwM6mOBaVJsCd7aRIVBNi301KDZ7TLXc7pv1zw7f8dFaeYhnKZxoEFkvydWngFeMLaxlvObOD+BDnsbQ50cUzo1YqPlehwJVWzqWtVCvitWUFspIMIOKtIEuZi7r4n8PI4K8ZFT2+DszLhk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777011428; c=relaxed/simple;
+	bh=vJCZbmCN9ikb6EAz9PzXqsYAY2hNnM/b8swTEOTbwdA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cnc7C3DlVKeOiwNdQM3sPa5Q7/0EI9eZ0bSIi6214im5q604ah1sJNQ3ma5z5+X0BMGUQAef+px8dIc3er7mWB2DgStZvGAS+Pm3VfGdwteRAmeEnjgue35lRchI+FQajFmJJugI1JiPnBOV8WvMHs+n7vGNIVfz2nfEWa4g98E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=pW5s0dH0; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id C741920B7165; Thu, 23 Apr 2026 23:17:06 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C741920B7165
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1777011426;
+	bh=9HBq+z9XRcq8ufOpr4qgjO+oq4+Q+22OPqnEnhpd96I=;
+	h=From:To:Cc:Subject:Date:From;
+	b=pW5s0dH0RzCxOfvuJdm7FZa8ekzh1+hE/qSsjZgzV+5ypgl1JQqgMdoGJDQ58cXBN
+	 cYIxr7a1GYSTpQMiDTaKRmySRwKv5HcJMsWWthg11e0zMsMP4yzh2Js8c3HbcbEE2U
+	 VjtAphlhSkzBj8BxErQEwPVa5X/Q/IM26biiV5Ik=
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: Dexuan Cui <decui@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Simon Horman <horms@kernel.org>,
+	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+	Dipayaan Roy <dipayanroy@linux.microsoft.com>,
+	Shiraz Saleem <shirazsaleem@microsoft.com>,
+	Michael Kelley <mhklinux@outlook.com>,
+	Long Li <longli@microsoft.com>,
+	Yury Norov <yury.norov@gmail.com>
+Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Paul Rosswurm <paulros@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>,
+	Saurabh Singh Sengar <ssengar@microsoft.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net] net: mana: Optimize irq affinity for low vcpu configs
+Date: Thu, 23 Apr 2026 23:17:00 -0700
+Message-ID: <20260424061702.1442618-1-shradhagupta@linux.microsoft.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260421221016.2967924-1-ameryhung@gmail.com> <DI0Z4SJ0TXOA.2N0IY94AF254F@gmail.com>
-In-Reply-To: <DI0Z4SJ0TXOA.2N0IY94AF254F@gmail.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Thu, 23 Apr 2026 22:44:14 -0700
-X-Gm-Features: AQROBzDvPO80brxTqh36WjUyhCJaCY53u6TVux_Thos3y4ABLNBHhCXV1MZzfE8
-Message-ID: <CAMB2axMg=Y5q=9CEFs=8rHLQJipT-5rYkg3wp2BhWgDwVvOUQw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v3 0/9] Refactor verifier object relationship tracking
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, andrii@kernel.org, 
-	daniel@iogearbox.net, eddyz87@gmail.com, memxor@gmail.com, 
-	martin.lau@kernel.org, mykyta.yatsenko5@gmail.com, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 162A145A039
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: D250F45A2DB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-280949-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[25];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280948-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,gmail.com,meta.com];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,outlook.com,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[shradhagupta@linux.microsoft.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-0.997];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.microsoft.com:dkim,linux.microsoft.com:mid]
 
-On Thu, Apr 23, 2026 at 5:55=E2=80=AFPM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Tue Apr 21, 2026 at 3:10 PM PDT, Amery Hung wrote:
-> >
-> > (3) Referenced dynptr with referenced parent:
-> >
-> >                      file (1,1,0)
-> >                            ^ ^
-> >      bpf_dynptr_from_file  | +-------------------------------+
-> >                            |       bpf_dynptr_clone(A, C)    |
-> >              dynptr A (2,3,1)                  dynptr C (4,3,1)
-> >                          ^                                 ^
-> >                          |                                 |
-> >                          dynptr A and C have the same lifetime
->
-> If I understand the proposal correctly above should be:
->
->                      file (1,0,0)
->                            ^
->      bpf_dynptr_from_file  +-------------------------------+
->
-> ref_obj_id will be inited bpf_dynptr_clone() as 3 into A and C.
-> but original file->ref_obj_id will be zero.
->
-> ?
+In mana driver, the number of IRQs allocated are capped by the
+min(num_cpu + 1, queue count). In cases, where the IRQ count is greater
+than the vcpu count, we want to utilize all the vcpus, irrespective of
+their NUMA/core bindings.
 
-This is the existing behavior. bpf_get_task_exe_file() is tagged with
-(KF_ACQUIRE | KF_RET_NULL). Therefore, file will have id and
-ref_obj_id both initialized to the same value. Here is the
-corresponding verifier code:
+This is important, especially in the envs where number of vcpus are so
+few that the softIRQ handling overhead on two IRQs on the same vcpu is
+much more than their overheads if they were spread across sibling vcpus
 
-if (is_kfunc_acquire(&meta)) {
-        int id =3D acquire_reference(env, insn_idx);
+This behaviour is more evident with dynamic IRQ allocation. Since MANA
+IRQs are assigned at a later stage compared to static allocation, other
+device IRQs may already be affinitized to the vCPUs. As a result, IRQ
+weights become imbalanced, causing multiple MANA IRQs to land on the
+same vCPU.
 
-        if (id < 0)
-                return id;
-        if (is_kfunc_ret_null(&meta))
-                regs[BPF_REG_0].id =3D id;
-        regs[BPF_REG_0].ref_obj_id =3D id;
+In such cases when many parallel TCP connections are tested, the
+throughput drops significantly
+
+Test envs:
+=======================================================
+Case 1: without this patch
+=======================================================
+4 vcpu(2 cores), 5 MANA IRQs (1 HWC + 4 Queue)
+
+	TYPE		effective vCPU aff
+=======================================================
+IRQ0:	HWC		0
+IRQ1:	mana_q1		0
+IRQ2:	mana_q2		2
+IRQ3:	mana_q3		0
+IRQ4:	mana_q4		3
+
+%soft on each vCPU(mpstat -P ALL 1) on receiver
+vCPU		0	1	2	3
+=======================================================
+pass 1:		38.85	0.03	24.89	24.65
+pass 2:		39.15	0.03	24.57	25.28
+pass 3:		40.36	0.03	23.20	23.17
+
+=======================================================
+Case 2: with this patch
+=======================================================
+4 vcpu(2 cores), 5 MANA IRQs (1 HWC + 4 Queue)
+
+        TYPE            effective vCPU aff
+=======================================================
+IRQ0:   HWC             0
+IRQ1:   mana_q1         0
+IRQ2:   mana_q2         1
+IRQ3:   mana_q3         2
+IRQ4:   mana_q4         3
+
+%soft on each vCPU(mpstat -P ALL 1) on receiver
+vCPU            0       1       2       3
+=======================================================
+pass 1:         15.42	15.85	14.99	14.51
+pass 2:         15.53	15.94	15.81	15.93
+pass 3:         16.41	16.35	16.40	16.36
+
+=======================================================
+Throughput Impact(in Gbps, same env)
+=======================================================
+TCP conn	with patch	w/o patch
+20480		15.65		7.73
+10240		15.63		8.93
+8192		15.64		9.69
+6144		15.64		13.16
+4096		15.69		15.75
+2048		15.69		15.83
+1024		15.71		15.28
+
+Fixes: 755391121038 ("net: mana: Allocate MSI-X vectors dynamically")
+Cc: stable@vger.kernel.org
+Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+---
+ .../net/ethernet/microsoft/mana/gdma_main.c   | 35 +++++++++++++++++--
+ 1 file changed, 33 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index 098fbda0d128..433c044d53c6 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -1672,6 +1672,23 @@ static int irq_setup(unsigned int *irqs, unsigned int len, int node,
+ 	return 0;
+ }
+ 
++static int irq_setup_linear(unsigned int *irqs, unsigned int len)
++{
++	int cpu;
++
++	rcu_read_lock();
++	for_each_online_cpu(cpu) {
++		if (len <= 0)
++			break;
++
++		irq_set_affinity_and_hint(*irqs++, cpumask_of(cpu));
++		len--;
++	}
++	rcu_read_unlock();
++
++	return 0;
++}
++
+ static int mana_gd_setup_dyn_irqs(struct pci_dev *pdev, int nvec)
+ {
+ 	struct gdma_context *gc = pci_get_drvdata(pdev);
+@@ -1722,10 +1739,24 @@ static int mana_gd_setup_dyn_irqs(struct pci_dev *pdev, int nvec)
+ 	 * first CPU sibling group since they are already affinitized to HWC IRQ
+ 	 */
+ 	cpus_read_lock();
+-	if (gc->num_msix_usable <= num_online_cpus())
++	if (gc->num_msix_usable <= num_online_cpus()) {
+ 		skip_first_cpu = true;
++		err = irq_setup(irqs, nvec, gc->numa_node, skip_first_cpu);
++	} else {
++		/*
++		 * In case our IRQs are more than num_online_cpus, we try to
++		 * make sure we are using all vcpus. In such a case NUMA or
++		 * CPU core affinity does not matter.
++		 * Note that in this case the total mana IRQ should always be
++		 * num_online_cpu + 1. The first HWC IRQ is already handled
++		 * in HWC setup calls
++		 * So, the nvec value in this path should always be equal to
++		 * num_online_cpu
++		 */
++		WARN_ON(nvec > num_online_cpus());
++		err = irq_setup_linear(irqs, nvec);
++	}
+ 
+-	err = irq_setup(irqs, nvec, gc->numa_node, skip_first_cpu);
+ 	if (err) {
+ 		cpus_read_unlock();
+ 		goto free_irq;
+
+base-commit: e728258debd553c95d2e70f9cd97c9fde27c7130
+-- 
+2.34.1
+
 
