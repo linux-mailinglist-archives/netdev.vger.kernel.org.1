@@ -1,215 +1,238 @@
-Return-Path: <netdev+bounces-280936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280937-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gIRLN2z+6mnEHAAAu9opvQ
-	(envelope-from <netdev+bounces-280936-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 07:23:56 +0200
+	id GGgzMwgB62kzHQAAu9opvQ
+	(envelope-from <netdev+bounces-280937-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 07:35:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BFCA459E73
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 07:23:56 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1D43459EDF
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 07:35:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B44FB300A753
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:23:54 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 90AFB300383E
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:35:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D60533FE26;
-	Fri, 24 Apr 2026 05:23:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A899934253B;
+	Fri, 24 Apr 2026 05:34:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="U8bwX7e+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MuOlUEPP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB7781A6810;
-	Fri, 24 Apr 2026 05:23:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777008233; cv=none; b=qraWATjwWCKfpP2+a8IJPK8AD3S0qz3n7EbTKfmMTGCDkrd08qoHXm5yg43Bm0n2e1TGfOVaUzLgi0E9A9pKUCzTQycwQOCzf4fEEYvZ98TmmwQF5oVcyaHgMtz43Lzf9/eHFN7jqjdab7Ga3qskQMS4il4pQyzk/X6ZbczSv70=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777008233; c=relaxed/simple;
-	bh=AMpqD3jJWGeBhZV7IR4TXunOBsGwB4TmJSwuYV7sTPI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CcQAHqConNVWRikxXUhk1XO0fLizY755EIhy4TlREB1XF5YoL8Z2wBon/0hT/UCIGl/V1d8fWK+Kofa351ZWqic+gvluNZHpRIV1EssknXAIW8tROVFam13j+XJUp2RcdsHKQAc+lqKSYjh1Q7NAoPCPko6Jydp+eWivBjTSKAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=U8bwX7e+; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63NJ0mU13291923;
-	Fri, 24 Apr 2026 05:23:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=cOFHgr5aOL1G48JRBbJNYttBKipfGte8kTv2A3cqD
-	Fs=; b=U8bwX7e+4XiivLMfH216gG6lnhJUdYE8kAIutVlO7Sw9zo+emEr0a36vB
-	5FaOsZSVKrteHR7nOx4n2qTi+AMJW3WuGa3UZkVJ+GGnvpILd7Lue7NwCpSDvjkd
-	Ir5MDw1GsfT9cibVXEJjHdimydoPciX3lkxq0hukbOm7T0Yid5VNcmI9Fb+0YBvJ
-	6X+gGU6BIeJ3/lbP1FnciAYf/dEKWqTTyzhEuB4J+AWRydiNlkODgV7Yfa6mF9Ci
-	C5PSy/jbxltsZ3f8RJgdIr+J1lEa2Tb3ljBrJDwteo9ry5cK7nwb7pRkipc2buWP
-	ZwBH2zm17BOqVpXuTz0HL6LZlP3Ow==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dphfrkkgv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Apr 2026 05:23:43 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 63O5KTp4001297;
-	Fri, 24 Apr 2026 05:23:42 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4dpjky9h5q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Apr 2026 05:23:41 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63O5NcA262325192
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 24 Apr 2026 05:23:38 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1D5FF2004B;
-	Fri, 24 Apr 2026 05:23:38 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D700520043;
-	Fri, 24 Apr 2026 05:23:37 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Fri, 24 Apr 2026 05:23:37 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 56341)
-	id C00E3E09D6; Fri, 24 Apr 2026 07:23:37 +0200 (CEST)
-From: Mahanta Jambigi <mjambigi@linux.ibm.com>
-To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, alibuda@linux.alibaba.com,
-        dust.li@linux.alibaba.com, sidraya@linux.ibm.com, wenjia@linux.ibm.com,
-        wintera@linux.ibm.com
-Cc: pasic@linux.ibm.com, horms@kernel.org, tonylu@linux.alibaba.com,
-        guwen@linux.alibaba.com, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, Mahanta Jambigi <mjambigi@linux.ibm.com>
-Subject: [PATCH net-next v2] Documentation: net/smc: correct old value of smcr_max_recv_wr
-Date: Fri, 24 Apr 2026 07:23:36 +0200
-Message-ID: <20260424052336.3262350-1-mjambigi@linux.ibm.com>
-X-Mailer: git-send-email 2.51.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A63A33031C
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 05:34:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.170
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777008899; cv=pass; b=Ho7efKfzzkJpTmC0TSL/i5doY0HPO33AjFZcWGjoRkRplO+9rMCuRsA057QVulgyQwDFuikJI9aa1BbNLYFCpOI58DIiAE3oD/p9dtUwX/7xgi7RJ2i79ZpHmO6GDR3CxC12W3afv1tHRj8WFrlIhS3i4FfKMatkZN6xXs++T4o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777008899; c=relaxed/simple;
+	bh=nJMfrq4tRFpvzrW37H2S2vo5RQzb38ojM1/0Nck60UQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MSEhpKsKMHB/gwMNHSwbN7ozbmaSGos7AO5kVvLKPZq/w2375fglmS6stkJbeYF+DTUq33beNEw73OBc4+Y8IoPp5JSHGi4slogjY5D0a2C17Nzn5OZxYmVGzGgHHHseXoGlgOGTZdHEvFchoirDvRVoi9KjthUaM9So/pZPmLs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MuOlUEPP; arc=pass smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-7986e0553bdso71347707b3.2
+        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 22:34:58 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777008897; cv=none;
+        d=google.com; s=arc-20240605;
+        b=e5L8sSkMadQ9jIpxvA1PRJQAvqGcCeydBbcMWj7yO05jeWX3uj9uPyJLDhBIlNbq8p
+         4wpAi5yv3UdZWH4J4+4oiCWbeWUbySkA+LknbXuXgClLKk8sIrMJGQ/1kX3LN+6mAE6N
+         E6+PN+Ec5qrvosPcIrnfeQwQ9WCJxd82imBNSiKHBmtcOQ2NH/B6QW3E7pMD8wduz27/
+         qjluEusXmMYNcQUL+6/o1DacXhbC0ihjaHQnneaj39KAZcj3w6PegyyreYJ7an4v2mYw
+         MpspRELU5JL1oK0v1/FNePa4o7nmQhPfnR3QEkYaJ+IxkJe0KGRCBGgWZKXkh24q8Wxy
+         fqbQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=8Mco96ugiiVLyRZYUFRtNHTAzHRl/YzNAOoenKfciLs=;
+        fh=W+6T116vhGiNmRJmn6cHv2FqP/oZ5KgMeSHpHGHMnuQ=;
+        b=C0h/btWfUC/czypLixOW6PdZ0cZsjHG6suigofuzXDX+yRr5ssBe2usbh3q6lvnx4G
+         ofWDSX8Lzp2UlFIfRcMmdVn+GCnvUAlZ1pJEuYnA9eCv8WJsqNiCrVF8PlCbU82XvA7S
+         9VzI+/KnZk8AVZ6e/HGlkgtMXTKR3dUX0/tq0OEoZDMLSFHUUU3DTDXP82RY8S+Hfwv1
+         veR9uh6zzKLtRU55s67Tf1ZcqzLfXZ7jKNPs2L5E7qKy3UFA1qEeD4oYOAChGXbYirOA
+         2oumr8bMdWbuSTftJRCRHC71/AhdIw0Z2Cb66a8B/B2xh5jg3WYUBJpixTkCtTJ/2b+9
+         qdzw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777008897; x=1777613697; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8Mco96ugiiVLyRZYUFRtNHTAzHRl/YzNAOoenKfciLs=;
+        b=MuOlUEPPa8OBQ985mfstEuLGKdIhww073pDFlYJrwYQLpgs+vlfgHsAl8rXw1IMTfZ
+         eIzbe6WNZjYYAKhSR7PFMesln0DPD0cY/bk69pc4Xx4GZBWRuLn522mJPVHHQgvlxPQL
+         2DEB//oxlUsOePHixZvgzOD8kAddq8yqf3/Hy7jdeWEp02nnlSw2AjBlW/NLJGof+HgP
+         tjeOyY8XZTrUL+rcehQldRRAw0fEXcMZ7ZTc/O9yrHSkEUYRIM+tPX4kIpnuFgHA5+dq
+         pdsGlnlgnZb+nWq+NtiJ36Ly6nXQ4TeXWNRZQUJLf1ww7LML3MhPW88fU6vm6G+yb/aR
+         s35g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777008897; x=1777613697;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=8Mco96ugiiVLyRZYUFRtNHTAzHRl/YzNAOoenKfciLs=;
+        b=cL5xeTuIzU+cWCSk2mzd5tnknnf6P/mzI46n/YKsOIfWuZjfKJ7AF9CMaQfxUzFLxM
+         LRKKaOHuwNvu9CTCjsH1lZWxQnIdbQndgslNZ6S7Pwz2vKh+KPc8lB0nshzgFNFbm1jR
+         9ziMTq66P3NwOPbDTxQSBgNSHFQaICxUK3lMx1euMjDWG3/DGbDnNE7khShkXEOlifvS
+         dpjyUs+PS4kntUPUSW4vS0JxylAjH+65BjtQdcRjOUdpoJJqVxMeHSV/rVmYZHD69Ji3
+         /3pO2XTSYNrS+8rAQfPUiMeh8Vk2zPUR7+Y9VXLguqAaRdxP1iKf83/Uc87p1yENnsgS
+         nE1w==
+X-Forwarded-Encrypted: i=1; AFNElJ+NiFQ6bCM3svyFZedIwIW8TTlk26xM+zNOoqSelTBkSQyBxtUOLCD3p2mXEk2PaskiHJPfBTE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YywjeH7mKAWEfNPrzHEsZ7gWpjBTWC3eDqbhM8VeHX4zY8bIp2D
+	lwKpMs6uvBrUc8j7hId77UBdToEO6lcbMft6UVyI1a28jkjpSx8xPh9SXkR8051OIto1ocz/qWe
+	lxO470Ho8IWNOeGtfIT0CFBRyxJwKZxo=
+X-Gm-Gg: AeBDievF3mPbsYDfYY76V1joVbCaKNqBgkGuO+Mio9rKqvPyKPH2SbQdP///V//BUyC
+	fIUGTnPgw6VRMPiG6+cBC8NFOZ1YO05OFb71lzvS/DzyVcZSQHRDO+DJxOqGAQrtqpLY6eXF4Ce
+	AAA/OKJOYhR9n1lIDYk/OLH2tP48G2+9nWcWRt0lIC9MEVLNyWdrUzR7hckvKkN8ww14+M33L3x
+	SeXzXtxPlUOAqUt51iYY88X4cuOQP+/eHj0WiPgWwgEFitXE06IheZdHqgvwIk27fDbykI1gNme
+	RZUVsAccSGfWOK3b+WF0zBrdzhim
+X-Received: by 2002:a05:690c:941c:b0:79f:d961:47bf with SMTP id
+ 00721157ae682-7b9eceb5c27mr256699517b3.8.1777008897374; Thu, 23 Apr 2026
+ 22:34:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20260421221016.2967924-1-ameryhung@gmail.com> <20260421221016.2967924-2-ameryhung@gmail.com>
+ <CAEf4BzZGg1EKwYFG6QKrkNbiE6RwWKew_Zz8mz9rjshKjWzcKA@mail.gmail.com>
+In-Reply-To: <CAEf4BzZGg1EKwYFG6QKrkNbiE6RwWKew_Zz8mz9rjshKjWzcKA@mail.gmail.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Thu, 23 Apr 2026 22:34:46 -0700
+X-Gm-Features: AQROBzAECWMJ15GcfaCGgs5nF8PZG0BrwMnhTANNSqKOcTnjKUnZMafn0Ia7ElQ
+Message-ID: <CAMB2axMw7mOs8kTFZG8Z1wn8fX4D0Si3Ge4F58DXKkBBQwrjyw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 1/9] bpf: Unify dynptr handling in the verifier
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, eddyz87@gmail.com, memxor@gmail.com, 
+	martin.lau@kernel.org, mykyta.yatsenko5@gmail.com, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-GUID: Z28CPBAV4-S7sGOdNPTx9zF1f8UI8aMr
-X-Proofpoint-ORIG-GUID: Cygo8PD4LyyGIlXczw7XCXUbFkjUF24f
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI0MDA0NSBTYWx0ZWRfX15fAlfHgG1Tx
- /RVarDNwhhVzLHDGdGgDpp9WPxFu8izECo8IX2NjKB4BaonpeKHJbe7vmYXIXus15brjuWKpRXe
- xqIfsiPFej4ngAX8FFdcNAEhq2NRUbdhPGRnK0fAqCP5RF2B1B2fiTe7x65kt6kUIN6lCCCx00u
- 5eHxpdeczTSiU1aAK2TwJwzZqgOTHOPobQ6ZITHMcCOohwG43HbTc7whZLCCCLOhdf1RR9LLY/X
- Y4SC5nAKdy66OuVY809+oDRZSO3q5lyPmnLT9n69OULIu7G8P0D0gqi5xlLoxg7Jr3RUZxxOw+k
- zkk/Valo5PE0y92yFH5pNDpPU2xvPD4EwdSsGvBCtKM1QbHU3wg/tNv2BENwzvOKB6INAWiB7IR
- h3nkopNlJYX4Swk2cCqySraNCxYRrx4DFkUNQJ6fjXCRggTvlFTbaLxcc3T/mHpleKznUecPk77
- gRF+O9RdS924qMNs+nA==
-X-Authority-Analysis: v=2.4 cv=SJxykuvH c=1 sm=1 tr=0 ts=69eafe5f cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8 a=BZQz5A-QrOPzpkkcf3QA:9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-23_03,2026-04-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 suspectscore=0 malwarescore=0 impostorscore=0 bulkscore=0
- lowpriorityscore=0 phishscore=0 clxscore=1015 adultscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2604240045
-X-Rspamd-Queue-Id: 3BFCA459E73
+X-Rspamd-Queue-Id: B1D43459EDF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-280937-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280936-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mjambigi@linux.ibm.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	RCVD_COUNT_TWELVE(0.00)[12];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.ibm.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-The smc-sysctl.rst documentation incorrectly stated that the previous
-hardcoded maximum number of WR buffers on the receive path (smcr_max_recv=
-_wr)
-was 16. The correct historical value used before the introduction of the =
-sysctl
-control was 48. Update the documentation to reflect the accurate historic=
-al
-value. Also fix a couple of minor typos.
+On Thu, Apr 23, 2026 at 5:04=E2=80=AFPM Andrii Nakryiko
+<andrii.nakryiko@gmail.com> wrote:
+>
+> On Tue, Apr 21, 2026 at 3:10=E2=80=AFPM Amery Hung <ameryhung@gmail.com> =
+wrote:
+> >
+> > Simplify dynptr checking for helper and kfunc by unifying it. Remember
+> > the initialized dynptr (i.e.,g !(arg_type |=3D MEM_UNINIT)) pass to a
+> > dynptr kfunc during process_dynptr_func() so that we can easily
+> > retrieve the information for verification later. By saving it in
+> > meta->dynptr, there is no need to call dynptr helpers such as
+> > dynptr_id(), dynptr_ref_obj_id() and dynptr_type() in check_func_arg().
+> >
+> > Remove and open code the helpers in process_dynptr_func() when
+> > saving id, ref_obj_id, and type. It is okay to drop spi < 0 check as
+> > is_dynptr_reg_valid_init() has made sure the dynptr is valid.
+> >
+> > Besides, since dynptr ref_obj_id information is now pass around in
+> > meta->bpf_dynptr_desc, drop the check in helper_multiple_ref_obj_use.
+> >
+> > Acked-by: Eduard Zingerman <eddyz87@gmail.com>
+> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> > ---
+> >  include/linux/bpf_verifier.h |  12 ++-
+> >  kernel/bpf/verifier.c        | 178 +++++++----------------------------
+> >  2 files changed, 41 insertions(+), 149 deletions(-)
+> >
+>
+> [...]
+>
+> > @@ -7433,7 +7426,8 @@ static int process_kptr_func(struct bpf_verifier_=
+env *env, int regno,
+> >   * and checked dynamically during runtime.
+> >   */
+> >  static int process_dynptr_func(struct bpf_verifier_env *env, int regno=
+, int insn_idx,
+> > -                              enum bpf_arg_type arg_type, int clone_re=
+f_obj_id)
+> > +                              enum bpf_arg_type arg_type, int clone_re=
+f_obj_id,
+> > +                              struct bpf_dynptr_desc *dynptr)
+> >  {
+> >         struct bpf_reg_state *reg =3D reg_state(env, regno);
+> >         int err;
+> > @@ -7499,6 +7493,20 @@ static int process_dynptr_func(struct bpf_verifi=
+er_env *env, int regno, int insn
+> >                 }
+> >
+> >                 err =3D mark_dynptr_read(env, reg);
+>
+> if mark_dynptr_read() fails, should we exit instead of proceeding to
+> fill out dynptr info?.. even if mark_dynptr_read() cannot fail because
+> of is_dynptr_reg_valid_init(), it still looks wrong and error-prone
 
-Fixes: aef3cdb47bbb net/smc: make wr buffer count configurable
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-Reviewed-by: Sidraya Jayagond <sidraya@linux.ibm.com>
-Signed-off-by: Mahanta Jambigi <mjambigi@linux.ibm.com>
----
-v2: Addressed few minor comments from Alexandra Winter.
----
- Documentation/networking/smc-sysctl.rst | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+I think I will change mark_dynptr_read() to receive spi from the
+caller and make the function return void (It is technically nofail
+after liveness tracking code is removed). Then, move dynptr_get_spi()
+before it and don't error out. A comment seems to be enough.
 
-diff --git a/Documentation/networking/smc-sysctl.rst b/Documentation/netw=
-orking/smc-sysctl.rst
-index a8b4f357174e..93cc6244f6c8 100644
---- a/Documentation/networking/smc-sysctl.rst
-+++ b/Documentation/networking/smc-sysctl.rst
-@@ -86,7 +86,7 @@ smcr_max_send_wr - INTEGER
- 	Please be aware that all the buffers need to be allocated as a physical=
-ly
- 	continuous array in which each element is a single buffer and has the s=
-ize
- 	of SMC_WR_BUF_SIZE (48) bytes. If the allocation fails, we keep retryin=
-g
--	with half of the buffer count until it is ether successful or (unlikely=
-)
-+	with half of the buffer count until it is either successful or (unlikel=
-y)
- 	we dip below the old hard coded value which is 16 where we give up much
- 	like before having this control.
-=20
-@@ -100,14 +100,14 @@ smcr_max_recv_wr - INTEGER
- 	depending on the workload it can be a bottleneck in a sense that thread=
-s
- 	have to wait for work request buffers to become available. Before the
- 	introduction of this control the maximal number of work request buffers
--	available on the receive path used to be hard coded to 16. With this co=
-ntrol
-+	available on the receive path used to be hard coded to 48. With this co=
-ntrol
- 	it becomes configurable. The acceptable range is between 2 and 2048.
-=20
- 	Please be aware that all the buffers need to be allocated as a physical=
-ly
- 	continuous array in which each element is a single buffer and has the s=
-ize
- 	of SMC_WR_BUF_SIZE (48) bytes. If the allocation fails, we keep retryin=
-g
--	with half of the buffer count until it is ether successful or (unlikely=
-)
--	we dip below the old hard coded value which is 16 where we give up much
-+	with half of the buffer count until it is either successful or (unlikel=
-y)
-+	we dip below the old hard coded value which is 48 where we give up much
- 	like before having this control.
-=20
- 	Default: 48
---=20
-2.51.0
+/* Cannot fail as we already make sure reg is valid dynptr */
+spi =3D dynptr_get_spi(env, reg);
 
+mark_dynptr_read(env, reg, spi);
+
+>
+> > +
+> > +               if (dynptr) {
+> > +                       struct bpf_func_state *state =3D bpf_func(env, =
+reg);
+> > +                       int spi;
+> > +
+> > +                       if (reg->type !=3D CONST_PTR_TO_DYNPTR) {
+> > +                               spi =3D dynptr_get_spi(env, reg);
+
+^ move this up
+
+> > +                               reg =3D &state->stack[spi].spilled_ptr;
+> > +                       }
+> > +
+> > +                       dynptr->id =3D reg->id;
+> > +                       dynptr->type =3D reg->dynptr.type;
+> > +                       dynptr->ref_obj_id =3D reg->ref_obj_id;
+> > +               }
+> >         }
+> >         return err;
+> >  }
+>
+> [...]
 
