@@ -1,247 +1,208 @@
-Return-Path: <netdev+bounces-281019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281020-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qDyELe+Y62lSPAAAu9opvQ
-	(envelope-from <netdev+bounces-281019-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:23:11 +0200
+	id SFaPHTyZ62l9PAAAu9opvQ
+	(envelope-from <netdev+bounces-281020-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:24:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F0DE461452
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:23:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9CFF461488
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:24:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 55362300C938
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 16:23:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 39F5E3009FB6
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 16:24:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D9703E1223;
-	Fri, 24 Apr 2026 16:23:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AB283E123A;
+	Fri, 24 Apr 2026 16:24:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XaOX3lfh"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20251104.gappssmtp.com header.i=@davidwei-uk.20251104.gappssmtp.com header.b="K+S9Wv+L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24ADB3CFF52
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 16:23:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.172
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777047785; cv=pass; b=Nj08SvR6zSzS4ao8tuo10bQlkUFoxu3ara0XFLbJDBcYQT+kT1pgIfJJtMXhkIQIK2nZp+WuMbEaaNlDVuNe83d2Ryq3TMMfV8+Rbf3AxXtiQu8DmEjIsAzViq6s2bPnDbijmcyw9PEagDHKeBpgO1BFskBvjcw+y7CrMCApWQk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777047785; c=relaxed/simple;
-	bh=3m4VXaMs4n4EPq3GLOSR3itDAfPEZGkQPOTO8GJSpCY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q3KTjQYLjjf4L8k7wtgRvhUHsAZfownA+WoDV7Urlh3xC+Kc9TVXNOr/bRqbT4rDtk+3cHUw+DOIv+KQL1kFHjK3SeZvZaVEq6rEHqqxjlJjpmc7PMM4GbuJA/AWoNysQF1icmlrAnfEYEkCpcaGh+0K5L83Pokv/FSiPpWzjN8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XaOX3lfh; arc=pass smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2aae146b604so54000755ad.3
-        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 09:23:02 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777047782; cv=none;
-        d=google.com; s=arc-20240605;
-        b=JP8i7ezwk20ekauC6GjDBY5NsX223yuIP43w/X/1EvvSOT7XxhEZ0oO7e8StDeW0op
-         0LR4kqwbqzaeWchhUechzQBFh3iHdgwVBqXW9lhSN86r0A8oo2yTIdsBGX2jjko88C9T
-         Gggu4d/bM3e9bBxG5j/EiomEli72nWuHNgwk72DjlmB0CrhdbXvINl01zuW0q70F23e7
-         jSsAsf3aT24W664A4+OIfsgY0mpRuzuwnf2iggAEZIul8sNtwOprMeWWjujO1ACSMiKt
-         acPbjLS5BNRoBKM/rKMvfFzquVgU18aC94KnhdE9/3RKlkziJGVrepWotAYEobZGr9eH
-         MLLQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=uZSOT1Xpo8svsF0lfHeXNdp2/Y1pp+xVy0pY5P0ySGQ=;
-        fh=c9dAXvwCgMiqHUqvGQII8kt4P6bp3M04Y7KOP1qyXn8=;
-        b=edG+edE1HkEkTqCG4f6scq2ArY1ZU/3lpFUqODFsXcDUpDF/74KubP7VlptSBrF2nI
-         BOSLrYwvfFjK3wWJFVai+zsyCEkSN4h4ia7CqzyNDvM4X5qWJ0lmJddMDuM4BFbt7oV/
-         uGRrrdVO7SEQaXat6pekBzTs7WwXfC53aboD3PkxQ+3WuHwRfcypU5KiilF32XsQvpJC
-         og0tJQuuIGaoz7KTDl/9oD7fG4Q8dPGgPm8E+6Vuf2XiFypshqTRb9i39jnUVGTkmjpk
-         fgRlVT4zk9PJw8SPWTrzkWg9Y0wFH26Bzf3ZrgXjTR3qqxXYUDI19gOhtB3CTcQAbv01
-         berA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453A93DF01C
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 16:24:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777047864; cv=none; b=lV6yla5+f5NyMpuoYBO0oxA9DKnwQFRW+Q9dRqD5amWSWlqVX6t2ZzQ6ZH/6A+P16etPaLJNwiPubBjJ9CuiesSDbaLn34ZgQpSf5h8qmiYGwUGEGS9UxF/GG07hX/o1WG1xeLqeNQ1xIqSUBOGIK1iedabcmeGeuUkDPL0dNJ0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777047864; c=relaxed/simple;
+	bh=rKnGZyadXRPn7+yUgtk6UZv9kH+5IP0bOXa8EOkSS0U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I+IrSDwKx1CMdFR2jB+CcDg8/VCHNxHJ6i5v+rvXITyD0N8U4OmOJszbacfU3XsHfeDHiyFk6RVE9Mz5ALa58URblsmVyBnHazMz5unCXqWdiFd8T8w2EnTDQdWlxvGE6D6tmJIuYu1T4UX1inUb/QOYwVf/GzRkeG9GbPJdsys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20251104.gappssmtp.com header.i=@davidwei-uk.20251104.gappssmtp.com header.b=K+S9Wv+L; arc=none smtp.client-ip=74.125.82.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-12dca45ca21so468289c88.1
+        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 09:24:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777047782; x=1777652582; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uZSOT1Xpo8svsF0lfHeXNdp2/Y1pp+xVy0pY5P0ySGQ=;
-        b=XaOX3lfhIPP1oCKWEcYqGQIlR4o33LR6uIcpT+k4JsMHw+fqDi7zAEpJEYW275teDS
-         kc2ALhpBkWbeF7GVyEjyNuRaJskgpONreNAq1Fp20smkPNjqn5vuozbNwvanDYJPlSHx
-         XUKNdEW3sj0uv4CxFVi6ZDu00/4aODwkPj/yYL/YvnPTlhiPRoePnqZ20bh5yUAq7uIH
-         tMMfNvMxYMhxQEZcnCHtHPHtBhayjRpSuj08XTjYsapWi8RqgO5uOg16gDyYXCuvuTNd
-         ZTvG9MO0afLoLf8qyyemi5/Wf9ZJYjNODXGPGSx2aFqfxoxuwPl0PymRYUC1aL6QSTt7
-         jVRQ==
+        d=davidwei-uk.20251104.gappssmtp.com; s=20251104; t=1777047862; x=1777652662; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+6Od9QgYAcJsV8ihusavCJrmScuqDKBApgvlcBNX0xU=;
+        b=K+S9Wv+Lx4FumHi/iwwLlqeJdpw1H/kIa67Ay1IH9c7VEfD9bxGb5GuxgZFG3t7Id0
+         evelc8FXc/RrUozpk/zeh/xh/Iyai7lcZFpXCDee9MiXz5FsVAuKVBgx19sXIAnW4Ppu
+         7xJvG9VedojkNJv9FIerT5jXcPSaIGrNqHEQZBCdUjqJ9iwv5391yJRpj6UAaQnYw9JZ
+         nakVc6pI+56xRCFObv/yLpGfDu1KwP/hJroI1F7A+zg+m5Van15pmgTQb9m9JccOgaFz
+         E2cCUiFEb0Cna/QKzCEqkJXaYf3a16j0VKx36CAC2AWPQ8iSCrHg37alSbRwgHy4fEfw
+         101A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777047782; x=1777652582;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=uZSOT1Xpo8svsF0lfHeXNdp2/Y1pp+xVy0pY5P0ySGQ=;
-        b=JlpkRZT+fHDsI7b2W+MmsN6CtEiO0377OQMDSfr9Hj4yDDeXK8GvWNZ58x4w1YrezS
-         aD49SWmfwpM3TPFvXvqi52mSdCiM7FqiQLqTVssrRJleLQ68A0Q/o5Bfn9eWapbip4r4
-         4x3C2ly+EoQanP11g7VIV+cO8ZbLEWFnKpSKxL7MljPyvSJ7jZrwNWLYSLHgAOH8iQNL
-         Q8rALrKD2A70yDMtIOSnDG3R3PVIvR4f0Co7lhARJcTIyFC8GVY1GiB170kx704Q4Stu
-         S3INISu0Y1Ovhf+V8xh03X7W1Wvav15lTrPZSgbITLRn6AEg4k6rc7FQUrPFbO/ZTn1U
-         MmKw==
-X-Forwarded-Encrypted: i=1; AFNElJ9u6yYDAkD83X4B7FCrLglTfm8bThnXhoe2bQCmRck5PYwreiDDMZiNEv7fzQFRa8Rvj6eNs5k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1mKVo2i0rFSuMTADlkAW/2gOMAP2ZMDPpyTVQUmi+GPel2vQn
-	UZLxHhm8Qs6xCi++yUh3LzQLBN6JI+w0P7aW2cWlbgM2Ao06OcHp72Qwn6pv8JpIenFZ2sR54TA
-	hbeUWXhVGRwKOhDIE/Ip0/M/2gbOjVaM=
-X-Gm-Gg: AeBDieuy6ocBLGVID53SikJspfaXVhi9E9ZIxpqixHZalmChszfAaMtLJ1Ua5xRavpN
-	ypFiVbpTB/1QZF7LyP7ulxYt1amR9tDfMJcD7ujdHVRuGcmrdV9Db4zgicb9FI1Sfzt3aq98AYJ
-	8zwFZ6Jx6QMspTbhHGEFr9Lf+FFbfpuey3a1DWJWuYRqyaC2TFY5Nygkvfw+6/EMDGgtrw74eUJ
-	RzTMaGQHWHKIZRIbCAB+5Srk2Fs974QA6pZZAk6NuDWCvz35a5Uhab4Ih+FtJ28/PpH2foU015/
-	eVCkNnLUEs10pSG8dg==
-X-Received: by 2002:a17:903:3db3:b0:2b2:58a2:c8a with SMTP id
- d9443c01a7336-2b5f9d68827mr230869715ad.0.1777047782298; Fri, 24 Apr 2026
- 09:23:02 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1777047862; x=1777652662;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+6Od9QgYAcJsV8ihusavCJrmScuqDKBApgvlcBNX0xU=;
+        b=iVCsU74rrJNjsFu8UzCDsG8R24weY2LLPvdS4GbmxnBpPABEI1rfvvyfKyzuzjuDp7
+         ZJTWt0zcPC+uYQ2E5VY++UzKLuNnHDF73EDX7KJntfPm6RKNXmNYKybKRaDdrHmfadZH
+         8NVwd3mRBLTHiHT51dUF611of/jOf5ar4v7OS0z6/fixOWQH04C+1uSQcp9zGKdjGu9w
+         shfg3CVcLr7B1qnfDhI5ZMB9+kgf0knxME3I4VBxrDMt0FQkkeBG0atVZRXTR4jI6Sti
+         H3n9KL1iL3zuVqntalJx7WkbDGhKnOnYA93ULbBPLRoMmlpYUum1844olpYO74kDXGb8
+         mnvQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+xSSa1g+bBlzXdz3OadrovZvKmpaaR1KVf5jKqpDjJ3g818NLk73vCo4cSw/xRJFF5g4/qH4U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxGsu5flCU/8skr5FQpCE5C99S2R6BTceXSKDnLN2c87+RTPZH
+	WYMNJYTn+vmT8KtQ/QZQYJsbzWrwWDktb9hLaGGpIhMBdmZQXk5MqNzzC5h9RmVUBqs=
+X-Gm-Gg: AeBDiesq1WG4D47BXqJdTTSoLj+cBBomndIxxWx/KKh31Bzo5TyckZw8ikfDwhmM2rR
+	N7/JyvAo0vkzLd+mySN29spIi5QknDQwcyVrYOqHttIVCcTr5ZJJD7dCMOoUk70aQn+kGbxGN73
+	65bkUAUZoJIZWz0b2PcJ4dZoTxCzLtZOTSzGhVGNP2MtmXhNT5ee0BBUTs1CksqORhZBZ+1adMK
+	OLuzA/fb49jr0lNDToow6tx87RwdqPl9C2j0N68GEBIYkbhQuH9ni+hCGrBl3FVLT2llFkVyKea
+	nE0mifzzt8UKpRTIl1J91/AbPyXdOmHKKVXdO4M0byFEPqjgH42wN+yrfboAVEoafmq61H7y8Ng
+	h7eB3ejJZk1TBQVkvB16b4jFHADCceG72xhBEF1SWdTJ4aUZurAXHWv7ofy7mnKhicSLfGd8gu0
+	8d9vELIRibdxBDNYtrPtq8KvBS+FqRMMU0g6yKxeRFa2VTzZfInU+fchXVoglr6+yuLcfAVUEgK
+	4GcQuX9yr4Oi9DnxaJTIn5666jrx5Bykbg=
+X-Received: by 2002:a05:7300:8607:b0:2d4:94cc:eebb with SMTP id 5a478bee46e88-2e477c9bc50mr17941859eec.13.1777047862086;
+        Fri, 24 Apr 2026 09:24:22 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1156:1:c8f:b917:4342:fa09? ([2620:10d:c090:500::1:eae7])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2e53d8aed43sm32348927eec.26.2026.04.24.09.24.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Apr 2026 09:24:21 -0700 (PDT)
+Message-ID: <fa0b5704-21ae-4011-be0c-97fab3a026c5@davidwei.uk>
+Date: Fri, 24 Apr 2026 09:24:18 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260421221016.2967924-1-ameryhung@gmail.com> <20260421221016.2967924-2-ameryhung@gmail.com>
- <CAEf4BzZGg1EKwYFG6QKrkNbiE6RwWKew_Zz8mz9rjshKjWzcKA@mail.gmail.com> <CAMB2axMw7mOs8kTFZG8Z1wn8fX4D0Si3Ge4F58DXKkBBQwrjyw@mail.gmail.com>
-In-Reply-To: <CAMB2axMw7mOs8kTFZG8Z1wn8fX4D0Si3Ge4F58DXKkBBQwrjyw@mail.gmail.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Fri, 24 Apr 2026 09:22:49 -0700
-X-Gm-Features: AQROBzA4gxdMlVVwbP4QziFaumqbNPLGu0rKNfr3k9Zf5X-mR78Ckn8Sj18mJ3I
-Message-ID: <CAEf4BzZ1LjRhh2DyQ8gPNKDh9fY+yOJrH0Ly9RoakBL2nOuxaw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v3 1/9] bpf: Unify dynptr handling in the verifier
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, eddyz87@gmail.com, memxor@gmail.com, 
-	martin.lau@kernel.org, mykyta.yatsenko5@gmail.com, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 1F0DE461452
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 0/2] net: mana: add ethtool private flag for
+ full-page RX buffers
+To: Dipayaan Roy <dipayanroy@linux.microsoft.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, leon@kernel.org,
+ longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+ shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+ ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ stephen@networkplumber.org, jacob.e.keller@intel.com, leitao@debian.org,
+ kees@kernel.org, john.fastabend@gmail.com, hawk@kernel.org,
+ bpf@vger.kernel.org, daniel@iogearbox.net, ast@kernel.org, sdf@fomichev.me,
+ dipayanroy@microsoft.com
+References: <20260407200216.272659-1-dipayanroy@linux.microsoft.com>
+ <20260409183509.0b24dea6@kernel.org> <20260412125917.4fa8fc8d@kernel.org>
+ <ad5kuCZz+gR1TlSh@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20260416083146.0bb94d2b@kernel.org>
+ <aeoVC27mIzoKytqA@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+Content-Language: en-US
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <aeoVC27mIzoKytqA@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: C9CFF461488
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[davidwei-uk.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281019-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281020-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[davidwei.uk];
+	DKIM_TRACE(0.00)[davidwei-uk.20251104.gappssmtp.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andriinakryiko@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dw@davidwei.uk,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
 
-On Thu, Apr 23, 2026 at 10:34=E2=80=AFPM Amery Hung <ameryhung@gmail.com> w=
-rote:
->
-> On Thu, Apr 23, 2026 at 5:04=E2=80=AFPM Andrii Nakryiko
-> <andrii.nakryiko@gmail.com> wrote:
-> >
-> > On Tue, Apr 21, 2026 at 3:10=E2=80=AFPM Amery Hung <ameryhung@gmail.com=
-> wrote:
-> > >
-> > > Simplify dynptr checking for helper and kfunc by unifying it. Remembe=
-r
-> > > the initialized dynptr (i.e.,g !(arg_type |=3D MEM_UNINIT)) pass to a
-> > > dynptr kfunc during process_dynptr_func() so that we can easily
-> > > retrieve the information for verification later. By saving it in
-> > > meta->dynptr, there is no need to call dynptr helpers such as
-> > > dynptr_id(), dynptr_ref_obj_id() and dynptr_type() in check_func_arg(=
-).
-> > >
-> > > Remove and open code the helpers in process_dynptr_func() when
-> > > saving id, ref_obj_id, and type. It is okay to drop spi < 0 check as
-> > > is_dynptr_reg_valid_init() has made sure the dynptr is valid.
-> > >
-> > > Besides, since dynptr ref_obj_id information is now pass around in
-> > > meta->bpf_dynptr_desc, drop the check in helper_multiple_ref_obj_use.
-> > >
-> > > Acked-by: Eduard Zingerman <eddyz87@gmail.com>
-> > > Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> > > ---
-> > >  include/linux/bpf_verifier.h |  12 ++-
-> > >  kernel/bpf/verifier.c        | 178 +++++++--------------------------=
---
-> > >  2 files changed, 41 insertions(+), 149 deletions(-)
-> > >
-> >
-> > [...]
-> >
-> > > @@ -7433,7 +7426,8 @@ static int process_kptr_func(struct bpf_verifie=
-r_env *env, int regno,
-> > >   * and checked dynamically during runtime.
-> > >   */
-> > >  static int process_dynptr_func(struct bpf_verifier_env *env, int reg=
-no, int insn_idx,
-> > > -                              enum bpf_arg_type arg_type, int clone_=
-ref_obj_id)
-> > > +                              enum bpf_arg_type arg_type, int clone_=
-ref_obj_id,
-> > > +                              struct bpf_dynptr_desc *dynptr)
-> > >  {
-> > >         struct bpf_reg_state *reg =3D reg_state(env, regno);
-> > >         int err;
-> > > @@ -7499,6 +7493,20 @@ static int process_dynptr_func(struct bpf_veri=
-fier_env *env, int regno, int insn
-> > >                 }
-> > >
-> > >                 err =3D mark_dynptr_read(env, reg);
-> >
-> > if mark_dynptr_read() fails, should we exit instead of proceeding to
-> > fill out dynptr info?.. even if mark_dynptr_read() cannot fail because
-> > of is_dynptr_reg_valid_init(), it still looks wrong and error-prone
->
-> I think I will change mark_dynptr_read() to receive spi from the
-> caller and make the function return void (It is technically nofail
-> after liveness tracking code is removed). Then, move dynptr_get_spi()
-> before it and don't error out. A comment seems to be enough.
+On 2026-04-23 05:48, Dipayaan Roy wrote:
+> On Thu, Apr 16, 2026 at 08:31:46AM -0700, Jakub Kicinski wrote:
+>> On Tue, 14 Apr 2026 09:00:56 -0700 Dipayaan Roy wrote:
+>>> I still see roughly a 5% overhead from the atomic refcount operation
+>>> itself, but on that platform there is no throughput drop when using
+>>> page fragments versus full-page mode.
+>>
+>> That seems to contradict your claim that it's a problem with a specific
+>> platform.. Since we're in the merge window I asked David Wei to try to
+>> experiment with disabling page fragmentation on the ARM64 platforms we
+>> have at Meta. If it repros we should use the generic rx-buf-len
+>> ringparam because more NICs may want to implement this strategy.
+> 
+> Hi Jakub,
+> 
+> Thanks. I think I was not precise enough in my previous reply.
+> 
+> What I meant is that the atomic refcount cost itself does not appear to
+> be unique to the affected platform. I see a similar ~5% overhead on
+> another ARM64 platformi (different vendor) as well. However, on that platform
+> there is no throughput delta between fragment mode and full-page mode; both reach
+> line rate.
+> 
+> On the affected platform, fragment mode shows an additional ~15%
+> throughput drop versus full-page mode. So the current data suggests that
+> the atomic overhead is common, but the throughput regression is not
+> explained by that overhead alone and likely depends on an additional
+> platform-specific factor.
+> 
+> Separately, the hardware team collected PCIe traces on the affected
+> platform and reported stalls in the fragment-mode case that are not seen
+> in full-page mode. They are still investigating the root cause, but
+> their current hypothesis is that this is related to that platform’s
+> PCIe/root-port microarchitecture rather than to page_pool refcounting
+> alone.
+> 
+> That said, I agree the right direction depends on whether this
+> reproduces on other ARM64 platforms. If David is able to reproduce the
+> same behavior, then using the generic rx-buf-len ringparam sounds like
+> the better direction.
+> 
+> Please let me know what David finds, and I can rework the patch
+> accordingly.
 
-yep, makes sense
+Hi Dipayaan. Can you please share more details on your testing setup?
 
->
-> /* Cannot fail as we already make sure reg is valid dynptr */
-> spi =3D dynptr_get_spi(env, reg);
->
-> mark_dynptr_read(env, reg, spi);
->
-> >
-> > > +
-> > > +               if (dynptr) {
-> > > +                       struct bpf_func_state *state =3D bpf_func(env=
-, reg);
-> > > +                       int spi;
-> > > +
-> > > +                       if (reg->type !=3D CONST_PTR_TO_DYNPTR) {
-> > > +                               spi =3D dynptr_get_spi(env, reg);
->
-> ^ move this up
->
-> > > +                               reg =3D &state->stack[spi].spilled_pt=
-r;
-> > > +                       }
-> > > +
-> > > +                       dynptr->id =3D reg->id;
-> > > +                       dynptr->type =3D reg->dynptr.type;
-> > > +                       dynptr->ref_obj_id =3D reg->ref_obj_id;
-> > > +               }
-> > >         }
-> > >         return err;
-> > >  }
-> >
-> > [...]
+* What are you using as the test client/server? iperf3 or something
+   else?
+* What do you mean specifically by "5% overhead from the atomic refcount
+   operation"? Some specific function?
+* What are you using to measure? perf?
+* How many queues, what is the napi softirq affinity?
+* How many NUMA nodes? Does the problem only appear when crossing?
+
+Thanks,
+David
+
+> 
+> 
+> Regards
+> Dipayaan Roy
 
