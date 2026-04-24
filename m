@@ -1,142 +1,200 @@
-Return-Path: <netdev+bounces-280990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280991-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2LMZI+dk62mtMAAAu9opvQ
-	(envelope-from <netdev+bounces-280990-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 14:41:11 +0200
+	id EKAvGwBl62mtMAAAu9opvQ
+	(envelope-from <netdev+bounces-280991-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 14:41:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB65C45E91C
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 14:41:10 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9BCF45E92C
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 14:41:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D1AE6300D94D
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:40:47 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E22E13005AA0
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:41:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7301C36F413;
-	Fri, 24 Apr 2026 12:40:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 307C5370D56;
+	Fri, 24 Apr 2026 12:41:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h+SAXkBp"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="P1PNjD6k"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1733329C60
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 12:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F60363C72
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 12:41:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777034446; cv=none; b=ZwnqLPuA0GjLfHFAt1MekIuMcZ5/6WHpP7lnZSH4vn+lc9dGAbyVhf2xXMMwkOIVI2mX/rJVdjcVliS+AgNZmzWoSRgBIeVS+bPnJbF3jPYqwnJ5qrMLeaitxSpRPvHCivqCyiiTB258RUhsCI0NGPx+uo/TF04V/rGrnYqz0+Q=
+	t=1777034493; cv=none; b=K4vXm5ikWTHram5JUp8MiIbuhwQMFpcpbfbJKolO4zb755JdPHbkZ4re7LJDYRgYr0+o49/FSQkhoqfl+HyfM9+8aIEq9jorY7xXDfqU6wLQ7JtpuXRncDeqVKtVXH3zRwdQkJzGrVr6Mwk9PfxhPsgrPl2lSszvb2OA/UybjLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777034446; c=relaxed/simple;
-	bh=Os6slKuiLGxBWiHsIraIVXqi+PiGactCEycWMtcaDv8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ja0PYL6JlL0ZoAn2H+U+afBLNpgVPveHRBgCwoDHe3rMb5U89mY/nrIhmAIuKEUgTzklJCtKZ3Ls0D68OAk8kXLoVHQwkqkJ8i8cpsyphmoX8PwEJk0OWvW6TmtoYBBbx/JLVbZx0EvhdOBstgHqR+YOR8V6fyiABuE3ixbCz94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h+SAXkBp; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777034444;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Os6slKuiLGxBWiHsIraIVXqi+PiGactCEycWMtcaDv8=;
-	b=h+SAXkBpJm+asdboB9Mkae32R5TC7fNP8IaVzvyciucf7OtJjffyPK1Zum659bdghrD/J0
-	kkWLmrrAwHjcVvPfQgePo2TrbERY55qFw+srwy30AsSjW2zV6AWjDFv85NWat5FTk3KUu5
-	GbdNotURPsmIuJpa+3ZU849zlhFlLxA=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-99-KXYT9KXtN8O36aMG-Drc7w-1; Fri,
- 24 Apr 2026 08:40:40 -0400
-X-MC-Unique: KXYT9KXtN8O36aMG-Drc7w-1
-X-Mimecast-MFC-AGG-ID: KXYT9KXtN8O36aMG-Drc7w_1777034438
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 84E00180034F;
-	Fri, 24 Apr 2026 12:40:38 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.44.32.29])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5FFE519560AB;
-	Fri, 24 Apr 2026 12:40:32 +0000 (UTC)
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-To: aleksandr.loktionov@intel.com
-Cc: anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	jacob.e.keller@intel.com,
-	jesse.brandeburg@intel.com,
-	jtornosm@redhat.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	przemyslaw.kitszel@intel.com
-Subject: RE: [PATCH net v4 4/4] ice: skip unnecessary VF reset when setting trust
-Date: Fri, 24 Apr 2026 14:40:31 +0200
-Message-ID: <20260424124031.834241-1-jtornosm@redhat.com>
-In-Reply-To: <IA3PR11MB89861630A18B1BE712F14E68E52B2@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <IA3PR11MB89861630A18B1BE712F14E68E52B2@IA3PR11MB8986.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1777034493; c=relaxed/simple;
+	bh=hEicbs1wzBY7rUjJ3eZCitqtz5d1kvB3rwSDToMHJ30=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=s1NiKtsi+cTRFcWSnfkgDB7HvI0ZjpmIcaq2JaO23LBsRTnMgvHsH4/kXs0ewQmq2qYrqPr71ZE6tGTI3NQ+40JWB/xQN1SGXB5jP/JfwusPrhMAZF780oxjQX8WzRUo35TpPFWCM0YqeoJ1OUqp7dhLZc03Qyf6I6lceoSr0X0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=P1PNjD6k; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 48D221A33F7;
+	Fri, 24 Apr 2026 12:41:29 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 1799D604EB;
+	Fri, 24 Apr 2026 12:41:29 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A8CD31072051C;
+	Fri, 24 Apr 2026 14:41:25 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1777034488; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=GSmC6zgf5uWdJlGUklCdCmL76WRr4s3hDP8boQgIebU=;
+	b=P1PNjD6kj7oo8tpGBNbwwbNWe+EJfegHwMsAdyiDwFuwpUuaSLISiLe6sicbzo9b5pRw+u
+	u0QnW/GCkWC5JI8lzL5krztUqWP9seEnJwDLnJOHMksuz9EXEG4HucgMIFnwUft9Q58bJP
+	8cQaxIgkj0jVcYGVpHVcWR626XN23XhJ46EHu0HZMKw1wZKx2Q60jM2vi36ifFC7aXM5bI
+	tas3SUDO1dScHyDphdM7ocO5AaG8obyRR4TICF9WXl1jvqzbakXRsvoyItfOanaZDy7WWC
+	d0Cnigbl/VzBLaV86i4sAaFVbK7WGmLdA0QYHu/tyEK1Tn+GgjaMf/DvGJT+bg==
+Date: Fri, 24 Apr 2026 14:41:24 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Corey Leavitt <corey@leavitt.info>
+Cc: Carlo Szelinsky <github@szelinsky.de>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, Andrew Lunn <andrew+netdev@lunn.ch>, Andrew Lunn
+ <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 0/4] net: pse-pd: decouple controller
+ lookup from MDIO probe
+Message-ID: <20260424144124.131837c7@kmaincent-XPS-13-7390>
+In-Reply-To: <177693772506.254295.6378636892307427408@leavitt.info>
+References: <20260423-pse-notifier-decouple-v1-0-86ed750a9d62@leavitt.info>
+	<20260423110544.052f631e@kmaincent-XPS-13-7390>
+	<177693772506.254295.6378636892307427408@leavitt.info>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
-X-Rspamd-Queue-Id: DB65C45E91C
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: E9BCF45E92C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	HAS_ORG_HEADER(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[szelinsky.de,pengutronix.de,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-280991-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280990-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jtornosm@redhat.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kory.maincent@bootlin.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	RCVD_COUNT_FIVE(0.00)[6];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_HAS_DN(0.00)[]
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
 
-Hello Aleksandr,
+On Thu, 23 Apr 2026 09:48:53 +0000
+Corey Leavitt <corey@leavitt.info> wrote:
 
->>> You declare ice_vf_clear_all_promisc_modes() returning int, but
->>> ignore the return value.
->>> Looks suspicious isn't it?
->> Well, it is used like that when the funciton is called locally (the
->> function is not modifiedi, just made public), and really my intention
->> was to clean as much as possible (so error checking is not necessary).
->> In my opinion it would be enough to warn about the possible problems
->> (already done in the existing function).
-> Can you go extra mile and add error code handling?
-> Or at least document it in the code why you don't do it?
-Ok, I can add the error handling in ice_setup_vf_trust and an extra warning
-to indicate that promiscuous mode clear failed when revoking trust.
-Just let me wait a bit longer for more possible reviews to create the next
-version of the series.
+> Hi Kory,
+>=20
+> Thanks for the pointer -- I had not seen Carlo's thread; I should have
+> searched lore before sending and will do so before v2. Adding Carlo on
+> cc.
+>=20
+> Having read it end-to-end, my read of the state as of 2026-04-13 was
+> that the conversation had narrowed to two open directions: propagate
+> EPROBE_DEFER further up into phylink/MAC probe (Andrew/Russell), or
+> resolve psec at PSE controller register time (your msg on 9 Apr,
+> "save the phandle ... then at PSE register time look for each PHY and
+> try to resolve every unresolved phandle"). Nothing concrete had been
+> posted for either.
+>=20
+> This RFC implements the second direction. pse_core publishes a
+> BLOCKING_NOTIFIER chain with REGISTERED / UNREGISTERED events,
+> phy_device subscribes, and psec ownership moves from fwnode_mdio probe
+> into the notifier handler. Concretely with respect to points raised in
+> the earlier thread:
+>=20
+>   - fwnode_mdio loses PSE awareness entirely, so the MDIO bus scan no
+>     longer sees -EPROBE_DEFER from PSE lookup. Consistent with
+>     Andrew's point that bus and device lifecycles are separate.
+>=20
+>   - psec is acquired at PSE register time, before
+>     regulator_late_cleanup (30s) can run. Carlo's admin_state_synced
+>     guard (his patch 1) therefore isn't needed in this model. psec
+>     resolution happens eagerly on the REGISTERED event rather than
+>     lazily on first ethtool access, so his patch 2 is also not needed.
+>     And because fwnode_mdio no longer looks up PSE at all, the
+>     non-fatal EPROBE_DEFER handling there (patch 3) drops out. This
+>     series is a different architectural shape, not an increment on
+>     his v2.
+>=20
+>   - Oleksij's concern about lazy resolution dropping UAPI
+>     notifications is addressed: the notifier fires at register time,
+>     so boot-time observer semantics are preserved.
+>=20
+>   - One caveat I already owe a fix for in v2: the attach helper in
+>     phy_device currently treats every error from of_pse_control_get()
+>     as retry-on-notifier, including non-transient ones. Carlo's v2
+>     patch 3 was careful to differentiate -EPROBE_DEFER from bad-DT
+>     errors at the fwnode_mdio lookup site (which matches his msg 1
+>     concern about catching broken bindings at boot rather than
+>     silently later). I need to preserve that discrimination at the
+>     notifier-handler site -- phydev_warn() on anything other than
+>     -EPROBE_DEFER. Trivial, but worth flagging.
+>=20
+>   - The DSA genphy force-bind sequence Carlo hit
+>     (phy_attach_direct -> device_bind_driver -> deferred retry
+>     skipped) does not apply, because psec attachment is not tied to
+>     phy_probe.
+>=20
+>   - Patch 1 of this series scopes the regulator handle held by
+>     pse_control to its own kref lifetime, fixing a latent
+>     dangling-handle sequence that the notifier unregister path makes
+>     reachable. This is a separate regulator-lifetime bug from the one
+>     Carlo's patch 1 addresses.
 
-Thanks
+This seems to provide a solution to all our problems, and it is well design=
+ed.
+Carlo, it would be nice if you could test it on your side.
 
-Best regards
-Jose Ignacio
+> Validated end-to-end on a Cudy C200P (MT7621 DSA + i2c IP804AR as
+> module), with lockdep active, across the i2c driver unbind/rebind
+> cycle that triggers UNREGISTERED -> REGISTERED on the live system.
+> The cover letter has the full evidence.
+>=20
+> I would welcome your view on whether this is the shape you had in
+> mind on 9 Apr, or whether the MDI-based binding you raised with
+> Maxime is the better endpoint and we should be reshaping around that.
+> Happy to keep this RFC as the scaffolding either way.
 
+After a second thought, MDI-based binding is currently not in the pipe and =
+we
+should solve this without it for now.
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
