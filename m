@@ -1,212 +1,157 @@
-Return-Path: <netdev+bounces-281001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281002-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8Ia5BgGH62lBNwAAu9opvQ
-	(envelope-from <netdev+bounces-281001-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:06:41 +0200
+	id 0C4NHEyH62lBNwAAu9opvQ
+	(envelope-from <netdev+bounces-281002-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:07:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 727BB4607EC
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:06:40 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79A2846082D
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:07:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 38006300C024
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 15:03:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DF4A4300EC40
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 15:07:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D06A92848AD;
-	Fri, 24 Apr 2026 15:03:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BCDB149C6F;
+	Fri, 24 Apr 2026 15:07:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ea9yJbyH"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="to4xshY9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84BFD281369
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 15:03:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BDBD26C385
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 15:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777043024; cv=none; b=XgeNAVlYEoT4jhEljUtsaRMDzgnHGjN4JaZ9DEMh4qMSQfscoah2bZKrm0yo2vN6kRcuQkM88t6yF1cLxKhjJweISNwKPWcuEF6kaCDKlyj+4iJ352atmfkR8vM8qFFXGPhzAKKQnJZuocF4McQbcqC6MLzHsyrtsMYzLoyLvgY=
+	t=1777043225; cv=none; b=SEvp3zHYhdSKUo3qJcKrHp3Iueo5aeRPiTq8FJIJzfpB/QcxSyQRpZ5OiT3Zwo6nQU98IxVUe8q/X9lSNuY/CeGfznnreUkRAwseuakzkYaoLgsnVjHT8frOW9NQQw81fW87YraatWhElhNKorRJepna6PKRnYFdJwCGg+SYw0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777043024; c=relaxed/simple;
-	bh=sam5CzX7hUFWo2rSuIUY9jL5rVRI1ZwRvCUUTaLpc/8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YYWXTzcbUJ06AFn4ZzK2kIyUZoIy0BdBWPtQtWhjgoyRN3VCtb5jaEpbtBOj5jBZKI/d3S3b1yvyPx8kJgvZSn6vVWNtxJNEN0mPC+wNC36WuRDpnVHUPpLeSq9I/olfyQA/w8UNKc/E/jOpFtFNPmckcfjk5ctBHxwNFuScl7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ea9yJbyH; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2b24fede2acso52973695ad.3
-        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 08:03:43 -0700 (PDT)
+	s=arc-20240116; t=1777043225; c=relaxed/simple;
+	bh=5jT5H/QG6L8I7pYvk2YQPYQtGs4o9CQ5dFTXrvJ4tmE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Z6YYoSduwAhHLRlTC6RAumElleR1p+JVcFGhlRQSIzp/en1tntvlmPlEsJvn9yc6Gbpup/k4E7/KRUbnhOaO4GYXw0gIb9XQDq4Sh9HHteB/kgw0NXjvyRu3BDDCuONpqoBk8eM+2/vmmdkFT+WaaoDjmbseH6dKx1pemQn+9v0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=to4xshY9; arc=none smtp.client-ip=74.125.82.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-2ba9c484e5eso8369443eec.1
+        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 08:07:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777043023; x=1777647823; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gdnOmdvYkq1xF25fAEazaVF6DIg+bGDl6V2EYI1zKDU=;
-        b=Ea9yJbyHQe82ThmrdwNs9z9RSGsQMh08rJfRXjLI0A/EKGyvxSHOcseDdXM8enl6aw
-         ZTTE4RgSUOgs28it5Xj47AdbqXFfnfjxTjCqoSLHoLDWCLF/gzepeIxoT0C1I4ew68i2
-         C7W1+PsA1CdnUczpB3Ux94tUjJNRv9qFeQUP+lRHljHIuAH9dwb8jrIZa7sIOoOsTAEB
-         l5QVAHuVcUimynAFtMPqEnNnaUiWDQSj3tYB9gw4UYAVW7nwpuWLJ9fJyZ6U938PL4aj
-         gkheKpepmyTGJ2zQulMx4AkRR1XobfJbzNnYZOPr0m5KLLgIlst2xk2VxRuZdQ9GoIn1
-         9M8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777043023; x=1777647823;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1777043223; x=1777648023; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gdnOmdvYkq1xF25fAEazaVF6DIg+bGDl6V2EYI1zKDU=;
-        b=JioczUUXbIGdmbWDSlY4mQ3sHpICNyKE1gcQaMtt/abNoEKIWpBpNYEAFeX0fjbhhO
-         W7Q8BsVIStbunnmx5NZinZuF+Jl1jlkeOHTb5CPA5O/m+PYLVuO/xYqYLkQc8lS4obPQ
-         JQNfI5BQh4D66+YXbiVshxGR9VWMZcxe1rPf3L87FBQmnR96s4MY1pariInXZ14A0/0k
-         JVlafXmQvdjKVRlTxnhpaGWO6EoCWXS/dzU/2Hrq+eSyh98OYqbAgTFn9Pbq8le6DvRC
-         TSAGgW+maSHe76TU3X+M4m3d0j55gG9rRG0u3G3PL0P8a4wCOMLRPEnV5+lmWNsbMWBq
-         IxaQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+nUyBwUVYfHnLZFIQNsEKVI+WOP5SsO0byJipAW6qvNkqqUqqZ1WQFejtNHCRY0XIwvZXiE14=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDIPeL2y1TrqxkKSkT08NavlGn+2naoKt+3cUF0sf3JL05IPYw
-	06W+PSKW2udow/2TYJeyT8nyDAzspt42zBnD1xQZLZWC6KttO9PhunFc
-X-Gm-Gg: AeBDieuNewCOr+eTeECadWm8Q9uLUh1aYJ/TE8CB5oKN8xDiMSMm1EpzUWOMN8fqQPI
-	3N9etBiFGpvA+3kqVqICKhwvMxUFlNrRTLwejw20assMju8qAVRF6RLG2OXsQq3UlkEcEZXFhgT
-	MnhlEGrrJsVp/p+uM3Qh0Xmx5eRvLecoPiOqsIOBflEe0j1hxDbASGsoFdWeuXGTqBizBLgKZDe
-	KEZh34GrdmDIRxj9gUmlFMVtVxlYOI02gE8WG3vM5dEFIajwDjncC6j1bfdrZXY7Fs7ImaB+o9m
-	fYRX6Y4ARASQypAFBzeiqKLNyenlk0xQN/2BGjgbBtNOU6II+mU21C28tIMQmNpfv+XJpC0JUkJ
-	nqrH3sA+QN6wi+jg8TvBQq87XdJZvGXOKxPaZhqmj8KxVELgtO+MzG49Qr9r69+9Xu5IsjdVYND
-	y6V8xahQ1w63FuxGxWjoFyarHH/VSNw4lmnztB+q3+CMb1UoCyNFjA/Rbgcs3N7yaJ09E1wIowW
-	81RZIs43AciFXL6
-X-Received: by 2002:a17:903:286:b0:2b2:680c:2193 with SMTP id d9443c01a7336-2b5f9f64affmr349377755ad.31.1777043022350;
-        Fri, 24 Apr 2026 08:03:42 -0700 (PDT)
-Received: from deepanshu-kernel-hacker.. ([2405:201:682f:383f:ba99:851:d885:8271])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b5fab4cc47sm233257465ad.82.2026.04.24.08.03.35
+        bh=tSKuWY7Ef5OGzeiVa7TUsQxq3w/z1Yph+U/asFLajis=;
+        b=to4xshY9++AO/BH+ZGLP1wz7DOZP3rFR0avrxXjGECg6HN4sXJ7brhbk9670dUY3Jj
+         BUhWvMv3B4DFbMHKgx43fXG5aTpQ+v6wB5bAFD7J6YEcahYZtWdLW1/7vWvAcoxTbpJj
+         cXo0N+LriMuCkTPZkQPc0+nz0S2WtySVL2WqZz48ihe8d7YkLD3S/Doo7NrdGV8JlCBU
+         +Dhekva67pr4R12HAF+kN8U+9GNb7OtBr6BveR1CBLmD80K8st1ypF8OXf59WrYWdiC8
+         kz2isPNXQ+/Jg17TovX9dL6upfx2FTDbdXXnV62qMHFeMDbdYYa0kqs2MTe9AaWQyXB8
+         QBHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777043223; x=1777648023;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=tSKuWY7Ef5OGzeiVa7TUsQxq3w/z1Yph+U/asFLajis=;
+        b=UclJjXwLQZ9fxi70brw+PfzakTFzcUnXf7OU8umXh6/kur2QSNfAjiihAA5rvzVmtl
+         No9R/81F7fq/IzI5o4wOnenv63RZkhXrc7i1lu/sXMuPdw53wDXIRjTP9bu4PimLR3im
+         NfXmrziFXuOiFtT9d0sQAeN4cPjtpsCRnnOQR70w2FxQk+S8IJ9XhDk4frJKyfr+8EpZ
+         fcXDUx4wgjSc6pznfYRIAX5BTbfIVklDQxpq0LgEJEpZnFeDdDlYoUIf622u13eOy1i6
+         yqy6IwCWR9ZJwm44CVqNtkHBTYltFBgfzGQKDTNBvkajDltv9lUkYESFDarFnFp6PkAC
+         9FQw==
+X-Forwarded-Encrypted: i=1; AFNElJ+q80ePEcFVQvjbUCH70s9ktwSq3NKEOz62Nu8WSWZ8uYofwNaGQo7LJipEPMzzr3HKAT5n/30=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwW4o+7wzBDUmT3jdGrL4m03dW/BhGXGGL/GZSpWtt337H+0bLH
+	LfhZM9icupDdYgyff/M76gab1r9Ix14t6kSMDrL9Co5vu9jkiDq4BU8fmq3LuInnkGo=
+X-Gm-Gg: AeBDiet3nhBke3Ecdkq5LwhliqHGumvAnJ2StvhFPJos1XPmYwRGJalq/BjIyEJf26f
+	9y0FYKLRHUVw0y/SsLmRiCHpjRmQLRoBSS6mcDJ35KuSU1dG7UIkQjK78pK6qzCikYEuKpZwIGH
+	zXG34/fCMx8fFwKrw2kW6ypx9ZQLqrgfwtmwgzLhnNoVyXInABGGQDpNHyjgLl2mWgN4JA3sQ23
+	h7YVf3hWhZemkiZbRXmdSM0E/B+aFrSOTS80zbt4cyLU2vf4q9jIyeSkJ/sHQb3DHAHI6iSbu1K
+	QEXbGpypIdfgFs3u6pcvYKcBpRAPhOJpkfJa0qqduyERl5EAz0m0WjRFBjQrG4Cyd/za2a/LvQG
+	dM4jG6hngj+TtSn2rXp5ex9lWAjj4a0wLLcjFgNSFmfEZ6f/LZCFZnuFoO92m7dNikE/ZDemsof
+	/U3kMTRj7+lboZ+kCBWnMA/7LIDY2/Yr3s+QueeCH5zE/dfg==
+X-Received: by 2002:a05:7300:3252:b0:2c4:ec89:bc7 with SMTP id 5a478bee46e88-2e464dacc71mr18361550eec.10.1777043223045;
+        Fri, 24 Apr 2026 08:07:03 -0700 (PDT)
+Received: from phoenix.local ([104.202.41.210])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2e539fa244csm31704854eec.2.2026.04.24.08.07.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Apr 2026 08:03:41 -0700 (PDT)
-From: Deepanshu Kartikey <kartikey406@gmail.com>
-To: mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com,
-	stefanha@redhat.com,
-	sgarzare@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: virtualization@lists.linux.dev,
-	kvm@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Deepanshu Kartikey <kartikey406@gmail.com>,
-	syzbot+1b2c9c4a0f8708082678@syzkaller.appspotmail.com
-Subject: [PATCH] vsock/virtio: fix memory leak in virtio_transport_recv_listen()
-Date: Fri, 24 Apr 2026 20:33:10 +0530
-Message-ID: <20260424150310.57228-1-kartikey406@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Fri, 24 Apr 2026 08:07:02 -0700 (PDT)
+Date: Fri, 24 Apr 2026 08:07:00 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ jiri@resnulli.us, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Dave Taht
+ <dave.taht@gmail.com>, open list <linux-kernel@vger.kernel.org>, Simon
+ Horman <horms@kernel.org>
+Subject: Re: [PATCH net v8 4/6] net/sched: netem: validate slot
+ configuration
+Message-ID: <20260424080700.6846dfcb@phoenix.local>
+In-Reply-To: <CAM0EoMmnHfUiKP1PO19sHJZpeGN5tdL7ds=_8Nma7Y-4XoSczg@mail.gmail.com>
+References: <20260418032027.900913-1-stephen@networkplumber.org>
+	<20260418032027.900913-5-stephen@networkplumber.org>
+	<20260421131039.GA651125@horms.kernel.org>
+	<87f5e94e-d354-423d-9976-6cf3fb0710b1@redhat.com>
+	<CAM0EoMmnHfUiKP1PO19sHJZpeGN5tdL7ds=_8Nma7Y-4XoSczg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 727BB4607EC
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 79A2846082D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.06 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,gmail.com,syzkaller.appspotmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_FROM(0.00)[bounces-281001-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kartikey406@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[redhat.com,vger.kernel.org,resnulli.us,davemloft.net,google.com,kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-281002-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,1b2c9c4a0f8708082678];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,syzkaller.appspot.com:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[networkplumber-org.20251104.gappssmtp.com:dkim,phoenix.local:mid,mojatatu.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-Two bugs exist in virtio_transport_recv_listen():
+On Thu, 23 Apr 2026 17:12:15 -0400
+Jamal Hadi Salim <jhs@mojatatu.com> wrote:
 
-1. On the transport assignment error path, sk_acceptq_added() is called
-   but sk_acceptq_removed() is never called when vsock_assign_transport()
-   fails or assigns a different transport than expected. This causes the
-   parent listener's accept backlog counter to be permanently inflated,
-   eventually causing sk_acceptq_is_full() to reject legitimate incoming
-   connections.
+> > > This is intended and explicitly explained in the cover letter.  
+> > Jamal, given the uAPI implication, could you please double check that
+> > the change is fine?
+> >  
+> 
+> It should be fine; at least iproute2 will never allow the kernel to
+> receive a negative number.
+> Stephen brought up the fact that strtod() could return a -ve number
+> (but at least iproute2 makes sure negative numbers are not carried
+> forward to the kernel).
+> 
+> cheers,
+> jamal
 
-2. There is a race between __vsock_release() and vsock_enqueue_accept().
-   __vsock_release() sets sk->sk_shutdown to SHUTDOWN_MASK and flushes
-   the accept queue under the parent socket lock. However,
-   virtio_transport_recv_listen() checks sk_shutdown and subsequently
-   calls vsock_enqueue_accept() without holding the parent socket lock.
-   This means a child socket can be enqueued after __vsock_release() has
-   already flushed the queue, causing the child socket and its associated
-   resources to leak
-   permanently. The existing comment in the code hints at this race but
-   the fix was never implemented.
-
-Fix both issues: add sk_acceptq_removed() on the transport error path,
-and re-check sk->sk_shutdown under the parent socket lock before calling
-vsock_enqueue_accept() to close the race window. The child socket lock
-is released before acquiring the parent socket lock to maintain correct
-lock ordering (parent before child).
-
-Reported-by: syzbot+1b2c9c4a0f8708082678@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=1b2c9c4a0f8708082678
-Tested-by: syzbot+1b2c9c4a0f8708082678@syzkaller.appspotmail.com
-Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
----
- net/vmw_vsock/virtio_transport_common.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
-
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 416d533f493d..fad5fa4a4296 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -1578,6 +1578,7 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
- 	 */
- 	if (ret || vchild->transport != &t->transport) {
- 		release_sock(child);
-+		sk_acceptq_removed(sk);
- 		virtio_transport_reset_no_sock(t, skb, sock_net(sk));
- 		sock_put(child);
- 		return ret;
-@@ -1588,11 +1589,19 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
- 		child->sk_write_space(child);
- 
- 	vsock_insert_connected(vchild);
-+	release_sock(child);
-+	lock_sock(sk);
-+	if (sk->sk_shutdown == SHUTDOWN_MASK) {
-+		release_sock(sk);
-+		sk_acceptq_removed(sk);
-+		virtio_transport_reset_no_sock(t, skb, sock_net(sk));
-+		sock_put(child);
-+		return -ESHUTDOWN;
-+	}
- 	vsock_enqueue_accept(sk, child);
-+	release_sock(sk);
- 	virtio_transport_send_response(vchild, skb);
- 
--	release_sock(child);
--
- 	sk->sk_data_ready(sk);
- 	return 0;
- }
--- 
-2.43.0
-
+Iproute2 blocks negative values kind of by accident.
+The NEXT_IS_NUMBER() macro looks for digit at start of arg.
+To hit this you need to either use raw netlink or change NEXT_IS_NUMBER()
+to NEXT_IS_SIGNED_NUMBER() where slot values are parsed.
 
