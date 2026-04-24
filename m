@@ -1,169 +1,142 @@
-Return-Path: <netdev+bounces-280926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280927-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cBfIMpDj6mkbFQAAu9opvQ
-	(envelope-from <netdev+bounces-280926-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:29:20 +0200
+	id 4A/eC6fk6mleFQAAu9opvQ
+	(envelope-from <netdev+bounces-280927-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:33:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B1DF459735
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:29:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7778945977A
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:33:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5B8E03007ADB
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 03:29:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 81BB230071EF
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 03:33:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 391E633986F;
-	Fri, 24 Apr 2026 03:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE6521B4F1F;
+	Fri, 24 Apr 2026 03:33:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="s62oztTN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="badu0HUU"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8005333710F;
-	Fri, 24 Apr 2026 03:28:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEFB519B5B1
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 03:33:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777001337; cv=none; b=nEJC+rummXbh4//IUWihWaYNlTRqI4Wn7aUiHXMEOZS/X5D3nqslGKKbOwq4XiLQH3HAK6XkCX7hOJaH89TAJRru17s+mi/28aMlr1kmfngijtm/jmQf/LK25yg7sLKHXywSfGyPOZX+oFV186LAuiNi5TJ5eGpA9iPbguTGVg8=
+	t=1777001635; cv=none; b=Er8vaMEbTPlML7NJobVYtzKcwv0Cqqgv8HAlcCcCjcw6sx3KQPYTuX4Z3sL32wWSln3tYaTjEGkMtKVd3bqPa04mAfndsdOpbcUvf9xVqaQLdb2HsApRenMMDjzkvr4pzNnESs0k/9dZ3zqEFPqC0uwOZzRAHxtiMxdEYWxuBo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777001337; c=relaxed/simple;
-	bh=8KbY4d9Sc1hur3MrKTEc3ePr/WWJlpdT80t8kvm2Slo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QTF7i3SXlKSqzYZaX/fCZEZCDG/l6Eqp2hw28X7t3W2TEgVb9Rg6ZfmOZCwEfcchMH8x2E2BB5/mfgJqk5TNA1ctEnZuysvy/Oocb+1x/QUy2nOIt6yNBaOb29mRFM1xaOG0t5TTBXvcQgXz/9c1T77MnCj1Mg1kiQj8/pjWwfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=s62oztTN; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1204)
-	id 5EFDF20B7165; Thu, 23 Apr 2026 20:28:55 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5EFDF20B7165
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1777001335;
-	bh=hozJVYNbCa3wzecJn7QvQ9EMZSOZzc1JqZvHkZlE9Zo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=s62oztTNxMqGVuyaG2gEvGu12rVs6B0C5CMdSYnyxlsFB9uJ03pN+q5zWKBEuMwx5
-	 L6UvbtEEU07uN8K57dKz84WtwOg7rV1dbI1AVqLbiwG1FU5chgJDIbxLQMbNXw72HA
-	 TpEcyo9QNs20D6sNbK8Gaa/FamMqDPv9Yz/F83EU=
-Date: Thu, 23 Apr 2026 20:28:55 -0700
-From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+	s=arc-20240116; t=1777001635; c=relaxed/simple;
+	bh=jJhyc6teF16Az0idq5ISRmXI9fjFyPjhRnFbLUL5Vz8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mNAEUhpMDdvueBAEG2jHED4FLfsGrwq7mBgPSajVEfV6lulxb2YGE4Oh+armq14nJeqMFUDWvcmpHX89QY2JoZTB0in/xnmm4dyT4HrvFtiKe+b1fFx340GOmbERWvE6x6zr4ZOr4Z3gYXkQmAs9tk3QgI1a2lJ2zFyD5U0Jv0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=badu0HUU; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-82f4a53ae20so5419243b3a.3
+        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 20:33:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777001634; x=1777606434; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4XT7jL0qVorV9DqZaeP2X21NLLxxWTXoipmOJgcSPnM=;
+        b=badu0HUU1J/K/hPJMuPXn0bYhO+Z7o9s1iDCapvSt10QmopGO/zcz1rCwLlJl8CLq+
+         TfcIS2sJP49/FHhw4YN1luppxtEnze3d/2cq6x5Tob3rIJtuZrFaNQwbqXDv0ZrMSnGm
+         qyjQQUOh02Ypq3Fkf2uXIERoLh9fvHiRruypzvjEdhgC2QpxtT/swZewGrUJD1Or2JAD
+         PqU7yl1qp+eCiIo4tmFj6SSSmXJzhJE+bU4WL/nYBBrOlqAUD3Pa/3djwkR39ehmfS0e
+         mgivHEGdAxgSyXVW8wzqg7U6o6s040r5oCVVCvcFp55/ROke0U2aYcHZs+H5V7SWLynW
+         /Brg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777001634; x=1777606434;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4XT7jL0qVorV9DqZaeP2X21NLLxxWTXoipmOJgcSPnM=;
+        b=EPgCOApOy/1Ht35GBgMk22GVje/F/6QsT7z0BMW9VRGf49n7qACndMZIskEKHdjbUo
+         UxDs2u9mmReHPPbXK++PFLtPrbrCHcHTktu4GHt8glqhxCh9Y4H4fKPJDVEKxi/+dkDY
+         ZR6O960AaKUsm8uw4L4veM/AR886ytmp0/CIUerbINHaw6kPNXO8CLqUvWmHL1534u8u
+         vkxriR0ygKI0Xd8TeY7IJ1xyJ9c8ZvLegOTmm0UUxoYxKOp3K2QRnqZ0Iz6vEy252MQP
+         7CazQWRQXfjj01TYQui4xgcBgjTiQKQnRDnrFgIf0fx+xRMX+vDD6J8fXuDDfU3VDvj2
+         4FUg==
+X-Gm-Message-State: AOJu0YzmkWSKiWJQLpMlHWLUXA2Lc3kjwKOhXGZinduKkrZG+TqaTD1C
+	aSp/v3EW6C9VF9Vs+lgFZ15JeXXvO6n8MT1Vb2riSq24FxDBdKvtfbAEO/BVBtKI
+X-Gm-Gg: AeBDietcrTKZdP0OMqx5SE1lJFQFq25c2FN5mdR6BMqBYkmHCAOJzlifDRdCIh7zaIZ
+	pT4BMorV/86f5N4c3I3/CtMPfYPCgiFyoLh4IfmOXvEZbieNvxWj1BzOdYZpJA8BlAl8KYr4NAa
+	eSWIae/mq88I0cS3RhZB66P7KoHdCpGpyJfQgFh5lbRWvzOPguP2Jw02+hRPMDFV0gCIGtLaiK3
+	MGXbKPhfwwHoyi0ZLzUPRSwNjkQTjHrqW8joJ61+SdVcWM600WRuowg5jaK+kEVQObNPIDzE1qv
+	4w7A6H7AijXQLfY0Xe0+OWghFPCIl1R9PnsfjGuZqI6SzJnASAwRHIGy56TUjXWF+j0wrAJyIjq
+	pl1kRVBrzJ1O39LUGAQFOlROIvL1I6rtxLHkVIhjM+7r2PFQTriYf8Qo4XkHpg1kzYQ2Uu546+f
+	4DD27XJPgLDblMMNQpTmTOclapzff0RXzxBt56ro0RFta8iQnF1NuG+Ja3kWXDawoPN3H9yPPEL
+	MpFMR5+xCw=
+X-Received: by 2002:a05:6a00:80c6:b0:82f:8e9f:bdd5 with SMTP id d2e1a72fcca58-82f8e9fc333mr23566538b3a.1.1777001633897;
+        Thu, 23 Apr 2026 20:33:53 -0700 (PDT)
+Received: from ubunut-vm.. (c-73-240-82-137.hsd1.or.comcast.net. [73.240.82.137])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f8e9cbb1dsm23797624b3a.14.2026.04.23.20.33.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Apr 2026 20:33:53 -0700 (PDT)
+From: Joel <joelcrouch@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	leon@kernel.org, longli@microsoft.com, kotaranov@microsoft.com,
-	horms@kernel.org, shradhagupta@linux.microsoft.com,
-	ssengar@linux.microsoft.com, ernis@linux.microsoft.com,
-	shirazsaleem@microsoft.com, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, stephen@networkplumber.org,
-	jacob.e.keller@intel.com, dipayanroy@microsoft.com,
-	leitao@debian.org, kees@kernel.org, john.fastabend@gmail.com,
-	hawk@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net,
-	ast@kernel.org, sdf@fomichev.me, yury.norov@gmail.com
-Subject: Re: [PATCH net] net: mana: hardening: Validate SHM offset from BAR0
- register to prevent crash due to alignment fault
-Message-ID: <aerjdzgetiIeiBto@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <aepF3NwyANeklkfD@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <edccaafd-73f3-421d-a48e-a6cb704d39e6@lunn.ch>
- <aepviNMszMBtiB/H@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <7c4dbe89-9b51-45d6-ae89-39d4183e66b1@lunn.ch>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Joel <joelcrouch@gmail.com>
+Subject: [PATCH v2 0/2] sungem: PHY initialization fixes and style cleanup
+Date: Fri, 24 Apr 2026 03:33:46 +0000
+Message-ID: <20260424033348.1917-1-joelcrouch@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7c4dbe89-9b51-45d6-ae89-39d4183e66b1@lunn.ch>
-X-Rspamd-Queue-Id: 2B1DF459735
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 7778945977A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280926-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280927-lists,netdev=lfdr.de];
+	RCPT_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	FROM_NEQ_ENVFROM(0.00)[joelcrouch@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.microsoft.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[]
 
-On Thu, Apr 23, 2026 at 09:44:04PM +0200, Andrew Lunn wrote:
-> On Thu, Apr 23, 2026 at 12:14:16PM -0700, Dipayaan Roy wrote:
-> > On Thu, Apr 23, 2026 at 06:37:04PM +0200, Andrew Lunn wrote:
-> > > > The root cause is in mana_gd_init_vf_regs(), which computes:
-> > > > 
-> > > >   gc->shm_base = gc->bar0_va + mana_gd_r64(gc, GDMA_REG_SHM_OFFSET);
-> > > > 
-> > > > without validating the offset read from hardware. If the register
-> > > > returns a garbage value that is neither within bar 0 bounds nor aligned
-> > > > to the 4-byte granularity, thus causing the alignment fault.
-> > > 
-> > > Is GDMA_REG_SHM_OFFSET special?
-> > Hi Andrew,
-> > GDMA_REG_SHM_OFFSET is not special. It was simply the only register
-> > read that had no validation at all. The other two registers
-> > (GDMA_REG_DB_PAGE_SIZE, GDMA_REG_DB_PAGE_OFFSET) already have checks
-> > in place.
-> 
-> I must be missing something:
-> 
-> grep page_size *
-> 
-> gdma_main.c:	gc->db_page_size = mana_gd_r32(gc, GDMA_PF_REG_DB_PAGE_SIZE) & 0xFFFF;
-> gdma_main.c:	gc->db_page_size = mana_gd_r32(gc, GDMA_REG_DB_PAGE_SIZE) & 0xFFFF;
-> gdma_main.c:	void __iomem *addr = gc->db_page_base + gc->db_page_size * db_index;
-> 
+This series splits the previous monolithic patch per feedback from Andrew Lunn.
 
-Hi Andrew,
-There are 2 upstream commits regarding these, I think you missed
-them please check once:
+Patch 1 cleans up pointer formatting and indentation to align with kernel coding standards across the file.
 
-commit fb4b4a05aeeb8b0f253c5ddce21f4635dadc9550
-Author: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Date:   Wed Mar 25 11:04:17 2026 -0700
- 
-    net: mana: Use at least SZ_4K in doorbell ID range check
+Patch 2 implements hardware validation for the BCM5411 PHY initialization and adds error reporting to the core gem_init_phy logic
 
-commit 89fe91c65992a37863241e35aec151210efc53ce
-Author: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Date:   Fri Mar 6 13:12:06 2026 -0800
- 
-    net: mana: hardening: Validate doorbell ID from GDMA_REGISTER_DEVICE response
+Joel (2):
+  sungem: fix pointer formatting and indentation
+  sungem: validate BCM5411 PHY register reads
 
-> So if GDMA_REG_DB_PAGE_SIZE returns garbage, it is at least masked,
-> but it is still a random number.
-> 
-> mana_gd_ring_doorbell() takes this random number, multiples by
-> db_index, adds, gc->db_page_base and then does:
-> 
-> writeq(e.as_uint64, addr);
-> 
-> So you write to a random address. 
-> 
-> I don't see any sanity checks here. Cannot you check that db_page_size
-> is at least one of the expected page sizes?
-As mentioned above checks are already present in this commit: 89fe91c65992a37863241e35aec151210efc53ce
-> 
->    Andrew
+ drivers/net/ethernet/sun/sungem.c |  8 +++--
+ drivers/net/sungem_phy.c          | 60 +++++++++++++++++--------------
+ 2 files changed, 39 insertions(+), 29 deletions(-)
 
-Regards
-Dipayaan Roy
+-- 
+2.43.0
+
 
