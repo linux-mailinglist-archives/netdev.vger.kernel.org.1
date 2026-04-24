@@ -1,349 +1,148 @@
-Return-Path: <netdev+bounces-281025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281026-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KKX8A9um62mrPwAAu9opvQ
-	(envelope-from <netdev+bounces-281025-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 19:22:35 +0200
+	id IDK1L+Sr62nfQAAAu9opvQ
+	(envelope-from <netdev+bounces-281026-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 19:44:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85D3F461E1B
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 19:22:34 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 409D2462139
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 19:44:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BCB01303E2CA
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:11:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BD965300A50C
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:44:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A7D93E1CFC;
-	Fri, 24 Apr 2026 17:11:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE7253624CE;
+	Fri, 24 Apr 2026 17:44:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IJXfrJ4X"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CJZQvsCa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f202.google.com (mail-vk1-f202.google.com [209.85.221.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A852B33F5B4
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 17:11:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 321701D5AD4
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 17:43:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777050715; cv=none; b=HgcuhqOXxA54bz9sN/0ofG+MvEbbsZCwl/idA/O04WlBWhJx9WZb2AUtNVIi5J97FrNHW6yxUrzyBuNdtLSBhDbvzRNslgsas6n95xI63fnBfiGvvBSGDLf3NnO2+PVBbXEPhDlqLQJXnSgd0U7T13qmTArbvlId3X+kgxx5MIM=
+	t=1777052641; cv=none; b=BYgFNm9LF9XMPDmmPi4X7yo1NBIgIbhOsYfHgxx/+4YWteywKmolgRxf2hHe9WWB+mDS+s+zLgmHErKwDS8x315v5Yzoum+4YXmSPMiu/sP+FqgHRr6uWNLAnq77cjXjjZTdYbqESDIiYIn5ev2BJy3EJdCdLESwW7M4wXnIidE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777050715; c=relaxed/simple;
-	bh=elQA6kRFOKbGu7xOg9UXrVrdKp5uBfSiC+BcGbjl/gI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jeVO4R0EDpDeR0NuCaMzrOW2r1xCc8l2VcC/bGeES7dFgwoxynEnVRM5daQ3E8Mp6uT/brwkRm4Q1fKbUzYw6Jl6oOuEF1io6L3/zX4aPCEgD/022NGeJ5adc+hhv0YE5Q+VurO6r1YzgqL1jshYBRm5RjXAZlzNcmr82GKi9JE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IJXfrJ4X; arc=none smtp.client-ip=209.85.221.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-vk1-f202.google.com with SMTP id 71dfb90a1353d-56f6ef62af1so11913720e0c.1
-        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 10:11:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777050712; x=1777655512; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=BO2e9ngnshBPgV593HwtW/OHEvo1XShHa8R218xO+tU=;
-        b=IJXfrJ4XpIG0yVN7ens/dQnrdEqBHJ8PMHKZTpQ5Pw6SK1tR5gkNbIGgWBVaBPJkeA
-         BMlyiJafNECINmqHmONncA7gNTQiwYzgC/BOmvQXiLGFBsFLkjtd7JOd2dggqsiv5UHR
-         JVay562GrgXryPJEGOatKOMr8LveqnX4qhDgk/9ch8mqXusuD3RzuI0uYCrmAnM6yvfp
-         H0TBM4rLLILqowjkq+GzDOgZpGDhLxuX24K2NXcP7wWi1iSzB7T2GpnNcQS7QzkXH85T
-         faBdFTjldFYq6HIfD8ARZR1R5Myf0cX6ViQ+muEw9wbYLP6WJT7HF1VgUO6Tsq4jB1fJ
-         AUNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777050712; x=1777655512;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BO2e9ngnshBPgV593HwtW/OHEvo1XShHa8R218xO+tU=;
-        b=Y0IsYhHWcu+XBL0gILadhSjhJG3fttgLGOfuiGaK6G6a0arK9h2Rs5d6wNp0db3d55
-         EW0n3EmwaUVOVbY1zihhc4hjZqJV2rwV18t9cIOo3T9bzKrulv8FPxvdQdCKiz76U9G7
-         hhqVMY4VposmHtu9x0w1srCEYe4cdx0xvK78H7pj+m24D0o14a2kTINnbv9cClZPjguy
-         14XWbdCIW+ufKc9/OehjRQWlvsZTlY62SDdhJOvraVoGOHVO5Z5KA31nw/fTOpOQX7TN
-         SFyxuxD3EyT58Qaf/A91e00mWUhEBH7Ucnr+PkimnTC5rSTp4qtCh4PX0YJXG9xFtPnW
-         6NgA==
-X-Forwarded-Encrypted: i=1; AFNElJ8+tKGFF/+X6x+tBCx8X1Xgaggm9/FmEnFiQjFdhNKWEcvCthSyBeD80SBfS7Scq2sjJ07Mp60=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnnipN0ZQlMqlgkpRbI0l4twILLcHU8ISYnAWWyhnVPH7Qa1NK
-	s1LXP25cqLbxb4J1MKQvHdtMrxZXNh7+aho9ahg7aV+KS18DP+mCjELrHnbPk3OB7mpyyOZisVM
-	JNNynlKXRkMn6oQ==
-X-Received: from uabep9.prod.google.com ([2002:a05:6130:2d89:b0:94d:4d9e:686f])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6123:2e3:b0:56b:579c:82e with SMTP id 71dfb90a1353d-56fa58c0c9fmr17704826e0c.5.1777050712330;
- Fri, 24 Apr 2026 10:11:52 -0700 (PDT)
-Date: Fri, 24 Apr 2026 17:11:51 +0000
+	s=arc-20240116; t=1777052641; c=relaxed/simple;
+	bh=uEovCLyUlP+vQ43bmLfSPRWiIERStlsQm1hCynuai2I=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=NUh8VxIpFUZfjj0wGez3KuX1+CRWN71e8aNk4Ig9ZSxik4H1z6+FZZbyTtf5tttjkSBIqokh2r1NKUt18/H4r0eTjC0Qd0NtHuqoc9LClENc3ss6QyDlLzdSFvaN6UH5yzF4WRDYJdUMU8dU6O3NVTZJA+Vgqi/SaWHwuTAqSAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CJZQvsCa; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1777052628;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DWCu4wxPcDh4wGenYXek8cabQgd3EbdJF9AepYB3owg=;
+	b=CJZQvsCaHjoGNETf/ROZqt1o4J7g39Gh1xZxEjdnHe9LGwjVGjyXvL3NJj0rlVrcjU1lfX
+	t7L98fzYO1JkyrALmsPh0JaAjSU5xobarXzd56bkDTyxG9aF4iYaSLddM3C9/05PTrlZ7K
+	8Qq3Spyq45h2R/e7dn/BbRtcBnv3NJw=
+From: Roman Gushchin <roman.gushchin@linux.dev>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net,  netdev@vger.kernel.org,
+  linux-kernel@vger.kernel.org,  Paolo Abeni <pabeni@redhat.com>,  Linus
+ Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [GIT PULL] Networking deletions for 7.1
+In-Reply-To: <20260423201029.64927aba@kernel.org> (Jakub Kicinski's message of
+	"Thu, 23 Apr 2026 20:10:29 -0700")
+References: <20260423235422.1541768-1-kuba@kernel.org>
+	<7ia4se8lb0vf.fsf@castle.c.googlers.com>
+	<20260423201029.64927aba@kernel.org>
+Date: Fri, 24 Apr 2026 17:43:29 +0000
+Message-ID: <7ia4ldecb6f2.fsf@castle.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260424171151.1190882-1-edumazet@google.com>
-Subject: [PATCH iproute2-next] utils: add fflush_monitor() helper
-From: Eric Dumazet <edumazet@google.com>
-To: David Ahern <dsahern@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 85D3F461E1B
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 409D2462139
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281025-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-281026-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[roman.gushchin@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[]
+	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_HAS_DN(0.00)[]
 
-Some fflush() calls only make sense for monitor programs.
+Jakub Kicinski <kuba@kernel.org> writes:
 
-For other cases, forcing a flush is expensive.
+> On Fri, 24 Apr 2026 01:31:00 +0000 Roman Gushchin wrote:
+>> 2c on Sashiko:
+>
+> Did I say Sashiko 3 times? ;)
+> FTR - thanks a lot for the awesome work on that project!
 
-After this patch, ip, tc and ss are correctly buffering their
-output when redirected to a file.
+You certainly did :)
+Thank you and really appreciate your contributions to Sashiko!
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/utils.h |  7 +++++++
- ip/ipaddress.c  | 12 +++++++-----
- ip/iplink.c     |  4 ++--
- ip/ipmonitor.c  |  1 +
- ip/iproute.c    |  4 ++--
- lib/utils.c     |  1 +
- misc/ss.c       |  3 ++-
- tc/tc_class.c   |  2 +-
- tc/tc_filter.c  |  2 +-
- tc/tc_monitor.c |  1 +
- tc/tc_qdisc.c   |  2 +-
- 11 files changed, 26 insertions(+), 13 deletions(-)
+>
+>> 1) I'm working on an infrastructure to separate pre-existing issues from
+>> new issues. My current thinking is to stop reporting these issues with
+>> reviews of new patches and instead put them into some database and give
+>> maintainers access to it. Sashiko will automatically deduplicate issues
+>> and index them by the source file/subsystem. Hopefully it will mean that
+>> maintainers will see only a limited number of issues in source files
+>> they support. But I have yet to see how it works in practice.
+>> 
+>> But I'm somewhat concerned that this way many of these issues will
+>> remain there forever and by reporting them with new material we actually
+>> have better chances to get them fixes. Maybe it should be configurable
+>> per-subsystem. I'm very open for ideas here.
+>
+> After a couple of hours of glasswing-inspired hacking today I wonder
+> if we can close the loop on patch generation without blowing the budget.
+> Or maybe a better question would be - how many of the issues are simple
+> enough for the LLM to pop out a patch for, once it has all the context
+> from the review.
 
-diff --git a/include/utils.h b/include/utils.h
-index b68d6bc4edcf9ca335148f731cd240871b6c809b..9099a78b1593738c5ba181274d784d0a1913407a 100644
---- a/include/utils.h
-+++ b/include/utils.h
-@@ -38,6 +38,7 @@ extern int numeric;
- extern bool do_all;
- extern int echo_request;
- extern int use_iec;
-+extern int monitor_mode;
- 
- #define SPRINT_BSIZE 64
- #define SPRINT_BUF(x)	char x[SPRINT_BSIZE]
-@@ -399,4 +400,10 @@ FILE *generic_proc_open(const char *env, const char *name);
- int open_fds_add(int fd);
- void open_fds_close(void);
- 
-+static inline void fflush_monitor(FILE *fp)
-+{
-+	if (monitor_mode)
-+		fflush_monitor(fp);
-+}
-+
- #endif /* __UTILS_H__ */
-diff --git a/ip/ipaddress.c b/ip/ipaddress.c
-index 4d93a04a8555e141ae30a4aaeb42ac607a181c9b..14aa98e77452c9681c9d3660f6a882df56b44f1c 100644
---- a/ip/ipaddress.c
-+++ b/ip/ipaddress.c
-@@ -894,7 +894,7 @@ static int print_linkinfo_brief(FILE *fp, const char *name,
- 		print_string(PRINT_FP, NULL, "%s", "\n");
- 	}
- 
--	fflush(fp);
-+	fflush_monitor(fp);
- 	return 0;
- }
- 
-@@ -1346,10 +1346,12 @@ int print_linkinfo(struct nlmsghdr *n, void *arg)
- 	}
- 
- 	print_string(PRINT_FP, NULL, "%s", "\n");
--	fflush(fp);
-+	fflush_monitor(fp);
- 	/* prettier here if stderr and stdout go to the same place */
--	if (truncated_vfs)
-+	if (truncated_vfs) {
-+		fflush(fp);
- 		fprintf(stderr, "Truncated VF list: %s\n", name);
-+	}
- 	return 1;
- }
- 
-@@ -1732,7 +1734,7 @@ int print_addrinfo(struct nlmsghdr *n, void *arg)
- 	}
- 	print_string(PRINT_FP, NULL, "%s", "\n");
- brief_exit:
--	fflush(fp);
-+	fflush_monitor(fp);
- 	return 0;
- }
- 
-@@ -1768,7 +1770,7 @@ static int print_selected_addrinfo(struct ifinfomsg *ifi,
- 
- 	if (brief) {
- 		print_string(PRINT_FP, NULL, "%s", "\n");
--		fflush(fp);
-+		fflush_monitor(fp);
- 	}
- 	return 0;
- }
-diff --git a/ip/iplink.c b/ip/iplink.c
-index fce6631d2d821a8739d28805e13d98f6804bda30..806f86987ed7c8af5ddd40f04a44fb8ce8debfaf 100644
---- a/ip/iplink.c
-+++ b/ip/iplink.c
-@@ -1296,7 +1296,7 @@ static void print_mpls_stats(FILE *fp, struct rtattr *attr)
- 	print_nl();
- 	print_mpls_link_stats(fp, stats, "        ");
- 	print_string(PRINT_FP, NULL, "%s", "\n");
--	fflush(fp);
-+	fflush_monitor(fp);
- }
- 
- static void print_af_stats_attr(FILE *fp, int ifindex, struct rtattr *attr)
-@@ -1359,7 +1359,7 @@ static int print_af_stats(struct nlmsghdr *n, void *arg)
- 	if (tb[IFLA_STATS_AF_SPEC])
- 		print_af_stats_attr(fp, ifsm->ifindex, tb[IFLA_STATS_AF_SPEC]);
- 
--	fflush(fp);
-+	fflush_monitor(fp);
- 	return 0;
- }
- 
-diff --git a/ip/ipmonitor.c b/ip/ipmonitor.c
-index 1f4e860f8d6726edffcf9bf81636c6555757dd09..23bd667a2f7a27e620d0f6dd13a16476c1ac0d08 100644
---- a/ip/ipmonitor.c
-+++ b/ip/ipmonitor.c
-@@ -324,6 +324,7 @@ int do_ipmonitor(int argc, char **argv)
- 		return err;
- 	}
- 
-+	monitor_mode = 1;
- 	if (rtnl_open(&rth, groups) < 0)
- 		exit(1);
- 
-diff --git a/ip/iproute.c b/ip/iproute.c
-index c2538894da633b56f5b926ecafda4960a48e9fbd..c6a6ba9dd37076acfceb9b259874a50e7cd3c3d0 100644
---- a/ip/iproute.c
-+++ b/ip/iproute.c
-@@ -1012,7 +1012,7 @@ int print_route(struct nlmsghdr *n, void *arg)
- 
- 	print_string(PRINT_FP, NULL, "\n", NULL);
- 	close_json_object();
--	fflush(fp);
-+	fflush_monitor(fp);
- 	return 0;
- }
- 
-@@ -2035,7 +2035,7 @@ static int iproute_list_flush_or_save(int argc, char **argv, int action)
- 	}
- 
- 	delete_json_obj();
--	fflush(stdout);
-+	fflush_monitor(stdout);
- 	return 0;
- }
- 
-diff --git a/lib/utils.c b/lib/utils.c
-index 1215fe31cb3f63c0fa768fef60da77a641c51581..7017b0e6afacd8e770fb9f8b26aa5a319c1279e7 100644
---- a/lib/utils.c
-+++ b/lib/utils.c
-@@ -41,6 +41,7 @@ int timestamp_short;
- int pretty;
- int use_iec;
- int human_readable;
-+int monitor_mode;
- const char *_SL_ = "\n";
- 
- static int open_fds[5];
-diff --git a/misc/ss.c b/misc/ss.c
-index 14e9f27a75321556240a5f290b8bcf51c605a4c2..0f9b37177d375ddf70cb34674992723b5c4883be 100644
---- a/misc/ss.c
-+++ b/misc/ss.c
-@@ -5544,7 +5544,7 @@ static int generic_show_sock(struct nlmsghdr *nlh, void *arg)
- 
- 	render();
- 
--	fflush(stdout);
-+	fflush_monitor(stdout);
- 	return ret;
- }
- 
-@@ -5580,6 +5580,7 @@ static int handle_follow_request(struct filter *f)
- 		f->rth_for_killing = &rth2;
- 	}
- 
-+	monitor_mode = 1;
- 	if (rtnl_dump_filter(&rth, generic_show_sock, f))
- 		ret = -1;
- 
-diff --git a/tc/tc_class.c b/tc/tc_class.c
-index 6d707d8c924f4b5e90201d4de8e9779f82ce17f3..8197566281fad47d4efcf4768ed406ab809dd08a 100644
---- a/tc/tc_class.c
-+++ b/tc/tc_class.c
-@@ -380,7 +380,7 @@ int print_class(struct nlmsghdr *n, void *arg)
- 		close_json_object();
- 	}
- 	close_json_object();
--	fflush(fp);
-+	fflush_monitor(fp);
- 	return 0;
- }
- 
-diff --git a/tc/tc_filter.c b/tc/tc_filter.c
-index 7db850bda11a3408ec66b457c9fc590f3a734f65..633f027d79865d98ba1ccba48af71d247dfc7a48 100644
---- a/tc/tc_filter.c
-+++ b/tc/tc_filter.c
-@@ -374,7 +374,7 @@ int print_filter(struct nlmsghdr *n, void *arg)
- 
- 	print_ext_msg(tb);
- 	close_json_object();
--	fflush(fp);
-+	fflush_monitor(fp);
- 	return 0;
- }
- 
-diff --git a/tc/tc_monitor.c b/tc/tc_monitor.c
-index 5b9bccbed4140241a4d7a5cffc50865106224867..49bd4b6a460fbfe41a35e06f92f07dbe56a6be2d 100644
---- a/tc/tc_monitor.c
-+++ b/tc/tc_monitor.c
-@@ -100,6 +100,7 @@ int do_tcmonitor(int argc, char **argv)
- 		return ret;
- 	}
- 
-+	monitor_mode = 1;
- 	if (rtnl_open(&rth, groups) < 0)
- 		exit(1);
- 
-diff --git a/tc/tc_qdisc.c b/tc/tc_qdisc.c
-index 7eb9a31baa31fb91a8141c9eca1135e76a52fa8b..a8ef8fc9f70d91609d6ed61c2a46b29120512fd2 100644
---- a/tc/tc_qdisc.c
-+++ b/tc/tc_qdisc.c
-@@ -344,7 +344,7 @@ int print_qdisc(struct nlmsghdr *n, void *arg)
- 
- 	print_ext_msg(tb);
- 	close_json_object();
--	fflush(fp);
-+	fflush_monitor(fp);
- 	return 0;
- }
- 
--- 
-2.54.0.545.g6539524ca2-goog
+My bet is <50% as of now, but I might be wildly off.
 
+Even for human maintainers or very experienced kernel developers it's
+common to have long discussions on what's the best approach, go through
+multiple revisions etc. Current generation of LLMs is definitely worse
+at code generation, so...
+
+>> 2) Re false positives vs finding more bugs I had the same experience.
+>> It's easy to tweak it to be more conservative or creative, but it comes
+>> at a price. It seems like the real answer is simple a better model. We
+>> saw a big improvement internally switching from Gemini Pro 3.0 to 3.1.
+>
+> Makes sense. What didn't really land for me until now is that at least
+> for now different models are better at catching different types of bugs.
+> Off the top of my head, Gemini does short work of misuses of DMA API
+> without much context. Claude/codex/whatever the Meta one is called
+> externally - none of them catch those.
+
+Yeah, in a perfect world we would run code reviews using all best models
+and combine results...
 
