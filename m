@@ -1,163 +1,169 @@
-Return-Path: <netdev+bounces-280972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280973-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IHbUIY0662nRJwAAu9opvQ
-	(envelope-from <netdev+bounces-280972-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 11:40:29 +0200
+	id uFBtIGJA62nZKAAAu9opvQ
+	(envelope-from <netdev+bounces-280973-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:05:22 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E404645C56B
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 11:40:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D11FE45CB92
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:05:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 146C93008787
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 09:39:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 55EF23060AD0
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:01:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 728D038AC75;
-	Fri, 24 Apr 2026 09:39:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 539EE3624CC;
+	Fri, 24 Apr 2026 10:01:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ISwcaTfF"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hNIS1fBb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F07737CD55;
-	Fri, 24 Apr 2026 09:39:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67116362133;
+	Fri, 24 Apr 2026 10:01:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777023580; cv=none; b=kkUlwjwW9js4SBy1B/XDPmQSw2DMpwt0oVoN/ZONTVpCxJXOtdF84Q4x1aVTP8B2HjF0teeWx0C9KK7EJBIZsxOD9Vfy5WgTjPUwTeop/xdw3DlRYFbOSQPXJP32Nfv8W/RgVSh2PgLUOsaRo1BVAY+SkTWTBNW2qEtbyxJydWg=
+	t=1777024881; cv=none; b=dgH72pNz7uCe7uwIvDGvX4ldrbqxRbl+1mQs7pEedS4Bm+3PFTVpTUnHkwAV6ivkMTjCnTR6FLxsoprDs/KbraDvahALRUh72Y0qgsyClcSL58quh7xuuj2yUkAxrRtp4Jq9lj2mFQ7epftmYy7KQa5TTtpXBBkvnE4GzG4e/d4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777023580; c=relaxed/simple;
-	bh=7petuLofLdd2ZXeL3b1eIY4YZW0OIFBBgP9QdW66Wvg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=txtEPn4Mw/NsP2v1F67Sv7qvh1wUnpIFtEGiSvv1sXuEgNBf5iL5cFiYO+iFNFor6lULg7Ta7UvMWRs9RVBC1Tko1CgYGHOaug9sLLJwTdEvvs14cboAiVaT2v9/R/sil9CG3MWQ3ExT1V2XPK5UweWnnRpDCnGOfAynNKBNpBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ISwcaTfF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58801C19425;
-	Fri, 24 Apr 2026 09:39:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777023580;
-	bh=7petuLofLdd2ZXeL3b1eIY4YZW0OIFBBgP9QdW66Wvg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ISwcaTfF4JttQou7FYrCNQvfQ8tjGvDwJN1NTrBmPiAqnlZgwNNiIgxNZEB66McuC
-	 TrVQ/mi68T9KWS2R/X3ua+F4yEo9Bc0sipKCrT696Q7E6qSO2kYNU2OFmTrQxyjImv
-	 0nGZTiC0iP+6JiN325Jf0IiXBZMECfxsRiC7j+zVBvPexmAvkOA9Ix9UmJHu8O/qPA
-	 neUQeGSDigxsOzpcdkW2D1n653cxUqUPWoGNn8CfJv4Fu+547oJunHQn6aabNFXMUY
-	 qfnsNf/kdvr0vwwFmuG5VeqxGEy7Hlx5wKTTctmTLXS6+hdQqRdmAgxaSxA0QaUtvb
-	 SLwF/vgAZcySA==
-Message-ID: <0e274aa3-84a7-498e-a4ba-c677cda3e4df@kernel.org>
-Date: Fri, 24 Apr 2026 11:39:36 +0200
+	s=arc-20240116; t=1777024881; c=relaxed/simple;
+	bh=Yy2WannBX4lvU7zWsEb5b+r7/XwUG2n+24zBsfypLiY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=kPsCMX7SmvTNQDpPUwi9XJoXitsVoRxMQXU8ypSoESIDPc76NgUKib1urmDQXIAooupSH99fujmGdpKmAgpGovr53a8fYC7Vv3FIzytHLKWjiB3T4CoftmQm3rhxKrH1HDaW/qsRMdbAKQgQuXjzuWlTKm/MPPRsxQYFZSwCPjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hNIS1fBb; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 428B9C5EF25;
+	Fri, 24 Apr 2026 10:01:57 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 7E950604EB;
+	Fri, 24 Apr 2026 10:01:15 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 70DD31072077B;
+	Fri, 24 Apr 2026 12:01:01 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1777024874; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=Zj0vqNHZ44r/6iCMJXkPmXsULWpgIxSih4Gcje05/Qo=;
+	b=hNIS1fBbL2jmpGnQpvm8pSLTr6wUeBb7FYn8g/hM9ONaWwZgtLnl8tgi6qQeCYtGrpY6D2
+	d3vUaAkJhOEo2xrNWcU0FbCgqCkTpg+hkLqjUiqEQAITtdKNhJqIouY6tvkrsk/Vm7Vu9A
+	xM73KELBCLRWzOVD3XNrqumcmmLxBRU44MdnVbsEvUm+cB0O18j9AYqoaraVlV2Pd0Zq9X
+	iLindmxk1IbAUiSWKTSYL5AuBmFLWiOhCIPjlwVyLVS1JVIsfr29Sed+uwnOL3smieQD2w
+	kgvOgF6TNN5jsPwblGZYa52vwkoj+QTNcGhQGKgV9jmruhpZdsCBaUSz/OKaCQ==
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Date: Fri, 24 Apr 2026 12:01:01 +0200
+Subject: [PATCH net] net: macb: drop in-flight Tx SKBs on close
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] NFC: trf7970a: Ignore antenna noise when checking for RF
- field
-To: Paul Geurts <paul.geurts@prodrive-technologies.com>,
- mgreer@animalcreek.com, sameo@linux.intel.com,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: martijn.de.gouw@prodrive-technologies.com
-References: <20260422100930.581237-1-paul.geurts@prodrive-technologies.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20260422100930.581237-1-paul.geurts@prodrive-technologies.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: E404645C56B
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20260424-macb-drop-tx-v1-1-b3ecb787d84d@bootlin.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWMzQqDMBAGX0W+swtx+yP6KtKDJmu7hUZJ0iKI7
+ 96oxxmYWRElqES0xYogP406+QxVWcC+ev8UUpcZbPhurnyhT28HcmGaKS00NlZqrtk4c0NO5iC
+ jLseug5eExynjd3iLTfsI2/YH5Ttx6XUAAAA=
+X-Change-ID: 20260423-macb-drop-tx-f9ce72720d05
+To: Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Haavard Skinnemoen <hskinnemoen@atmel.com>, Jeff Garzik <jeff@garzik.org>
+Cc: Paolo Valerio <pvalerio@redhat.com>, Conor Dooley <conor@kernel.org>, 
+ Nicolai Buchwitz <nb@tipi-net.de>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, 
+ Gregory CLEMENT <gregory.clement@bootlin.com>, 
+ =?utf-8?q?Beno=C3=AEt_Monin?= <benoit.monin@bootlin.com>, 
+ Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+X-Mailer: b4 0.15.2
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: D11FE45CB92
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280972-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280973-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[prodrive-technologies.com:email,qualcomm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On 22/04/2026 12:09, Paul Geurts wrote:
-> The main channel Received Signal Strength Indicator (RSSI) measurement
-> is used to determine whether an RF field is present or not. RSSI != 0
-> is interpreted as an RF Field is present. This does not take RF noise
-> and measurement inaccuracy into account, and results in false positives
-> in the field.
-> 
-> Define a noise level and make sure the RF field is only interpreted as
-> present when the RSSI is above the noise level.
-> 
-> Fixes: 851ee3cbf850 ("NFC: trf7970a: Don't turn on RF if there is already an RF field")
-> Signed-off-by: Paul Geurts <paul.geurts@prodrive-technologies.com>
-> ---
->  drivers/nfc/trf7970a.c | 3 ++-
+The MACB driver has since forever leaked the outgoing SKBs that have not
+yet been marked as completed. They live in queue->tx_skb which gets
+freed without remorse nor checking.
 
-Looks reasonable so a poor man's review:
+macb_free_consistent() gets called in a few codepaths, but only
+close will trigger the added expressions. In macb_open() and
+macb_alloc_consistent() failure cases, tx_skb just got allocated
+and is empty.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+Fixes: 89e5785fc8a6 ("[PATCH] Atmel MACB ethernet driver")
+Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
+---
+ drivers/net/ethernet/cadence/macb_main.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index a12aa21244e8..3ffd60b852f8 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -2649,6 +2649,7 @@ static unsigned int macb_rx_ring_size_per_queue(struct macb *bp)
+ static void macb_free_consistent(struct macb *bp)
+ {
+ 	struct device *dev = &bp->pdev->dev;
++	unsigned int dropped, tail;
+ 	struct macb_queue *queue;
+ 	unsigned int q;
+ 	size_t size;
+@@ -2668,6 +2669,14 @@ static void macb_free_consistent(struct macb *bp)
+ 	dma_free_coherent(dev, size, bp->queues[0].rx_ring, bp->queues[0].rx_ring_dma);
+ 
+ 	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
++		dropped = CIRC_CNT(queue->tx_head, queue->tx_tail,
++				   bp->tx_ring_size);
++		queue->stats.tx_dropped += dropped;
++		bp->dev->stats.tx_dropped += dropped;
++
++		for (tail = queue->tx_tail; tail != queue->tx_head; tail++)
++			macb_tx_unmap(bp, macb_tx_skb(queue, tail), 0);
++
+ 		kfree(queue->tx_skb);
+ 		queue->tx_skb = NULL;
+ 		queue->tx_ring = NULL;
+
+---
+base-commit: 41517b5a932a35c6f59a997ab3b7fa7746c273bd
+change-id: 20260423-macb-drop-tx-f9ce72720d05
 
 Best regards,
-Krzysztof
+--  
+Théo Lebrun <theo.lebrun@bootlin.com>
+
 
