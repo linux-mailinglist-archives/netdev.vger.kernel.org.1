@@ -1,107 +1,115 @@
-Return-Path: <netdev+bounces-280907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280909-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YGz1LnjH6mlhDgAAu9opvQ
-	(envelope-from <netdev+bounces-280907-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 03:29:28 +0200
+	id CPvwOP3H6mmtDgAAu9opvQ
+	(envelope-from <netdev+bounces-280909-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 03:31:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F953458BB2
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 03:29:27 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E5CC458BC9
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 03:31:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 132F3300C5BB
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 01:29:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 941CD300233B
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 01:31:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F29D5243956;
-	Fri, 24 Apr 2026 01:29:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 020A01E8826;
+	Fri, 24 Apr 2026 01:31:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leavitt.info header.i=@leavitt.info header.b="iZE1Y5+7"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qh8aY4EA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-4317.protonmail.ch (mail-4317.protonmail.ch [185.70.43.17])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E15E5191;
-	Fri, 24 Apr 2026 01:29:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8027941C71
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 01:31:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776994158; cv=none; b=PqRT330CgnM1EwrBsVnj8Qj4fxM0L36N9ERk6Vv/19glFkME8CuQpW8QHngUrRG6JV/UapUGRdjVZzMtS7zjSj12YPOLOXwgI9GKycslOpZg6OfO6pgTzO9kiOSXzpfrcvVwHr/4RlBPqXJQ26nqZH/dnFpLt9ShdEaUrQIQNkU=
+	t=1776994298; cv=none; b=EOUE6Y0O6H526bZqFpG5cFzCt+cpEzJUXjdW+4apyAAp/u72sy+Loxgs59F/HWslLKYpbQdnZTSixTKkLeLGeHlypMqVRvMdnvABPODI4cO3wtr8P57FTIVL11nQ5Q5ayVxtUdY2bBozW4G8gAZIvuFXeTQmxAdsiXl5d+qgLKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776994158; c=relaxed/simple;
-	bh=bnJguPtwmXOuffyM1PpjdiFxgRQ142HPq/SPox5OEZY=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b9zokDQntzwB6EmzOuVh+ijq1pddFXuv2hqvzMl1K99M/90nNDqaTCw8PcU+qXJMDNKmrKR/cRq7b2CvD4HfyNBEr3P2sMDJ79XgfOGK1Vdd0lnFsENUPheyTvmKcW1lkinY80bySn9ZO+rXOj5z/ic+wFWYfw6DNAOZLRK3joo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=leavitt.info; spf=pass smtp.mailfrom=leavitt.info; dkim=pass (2048-bit key) header.d=leavitt.info header.i=@leavitt.info header.b=iZE1Y5+7; arc=none smtp.client-ip=185.70.43.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=leavitt.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leavitt.info
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=leavitt.info;
-	s=protonmail2; t=1776994150; x=1777253350;
-	bh=bnJguPtwmXOuffyM1PpjdiFxgRQ142HPq/SPox5OEZY=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=iZE1Y5+7Nh1WMn23xX5ccicJdsRDssOxliNiid1LZJk2nihgp1D3FcRA5B3IcrU/2
-	 FLekvWukbo6wXe+n0E6efwFwTg9+pWljbtZt2mcD7+qmRfhPoUPMUAqqfwpEX/1JgH
-	 nt0buz+z0jPO8F2z4nGowy6HHBMddQi+1raCrJWNDl/JLqpbR0f5gVeUiA8j+Sn3bO
-	 H08ZqlBHrElPmc9rnqIWdncX3js8Kn2Mu3uaTikCTgLGJtk5eGLeikk57zB2wD2Cw2
-	 h7auSqpS3k/KLBIOLwbhzQPVA0C1LgJoIf2SxNNzMTm2FYZkPhmmZ/DpI+6FmaJhnB
-	 ubIlZtuJgzYUw==
-Date: Fri, 24 Apr 2026 01:28:58 +0000
-To: Jonas Gorski <jonas.gorski@gmail.com>
-From: Corey Leavitt <corey@leavitt.info>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Kory Maincent <kory.maincent@bootlin.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC net-next 0/4] net: pse-pd: decouple controller lookup from MDIO probe
-Message-ID: <177699413027.883911.15023948003450400155@leavitt.info>
-In-Reply-To: <c346ac78-3e33-4062-a459-b83d845dc2eb@gmail.com>
-References: <20260423-pse-notifier-decouple-v1-0-7d4856f686f6@leavitt.info> <177693362253.84762.6848519898058872632@leavitt.info> <c346ac78-3e33-4062-a459-b83d845dc2eb@gmail.com>
-Feedback-ID: 22087991:user:proton
-X-Pm-Message-ID: 937c3192439e169ec053f26b48210c50b93281eb
+	s=arc-20240116; t=1776994298; c=relaxed/simple;
+	bh=/CZsYzL7FiUaap0Zezv0hM4EPym3OQbyrrCdLMfTuYw=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:MIME-Version:
+	 Content-Type; b=JtOCUtjMF+rGIhssZN7xs7pUUQb468BeBBfIoFE6hTC3FhmOMYq6QZ0DpwEocCQ4VinuhOzs+puWX54QAVxWmLktWXf4OazY49MXVWaOCIMNP8bUo4p5mPLXxjRE5nbBihND3pCGvnBvyW2cgNggCv9+PfxYf3sEHYi4R7W2+So=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qh8aY4EA; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1776994294;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to; bh=/CZsYzL7FiUaap0Zezv0hM4EPym3OQbyrrCdLMfTuYw=;
+	b=qh8aY4EAjYKRn+jdJkra9YnQNlON6MFRdoUjFONw5GtDaz0N9we2LhzquYENy3I/RDeawK
+	foNbED3nr9c0F/wLq8vnhn68F9HE6vUXhedBPrOxZD6URTFUYtLawCwN1hjCu68iLILAmq
+	YD24FHiSmPlWIzCzkKmFpOZPy+1ywjw=
+From: Roman Gushchin <roman.gushchin@linux.dev>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Linus
+ Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [GIT PULL] Networking deletions for 7.1
+In-Reply-To: <20260423235422.1541768-1-kuba@kernel.org>
+Date: Fri, 24 Apr 2026 01:31:00 +0000
+Message-ID: <7ia4se8lb0vf.fsf@castle.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 0F953458BB2
+Content-Type: text/plain
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 4E5CC458BC9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[leavitt.info,quarantine];
-	R_DKIM_ALLOW(-0.20)[leavitt.info:s=protonmail2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280907-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[pengutronix.de,bootlin.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-280909-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[corey@leavitt.info,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[leavitt.info:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[roman.gushchin@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-Apologies, bad wording in that quick apology. v2 will be a fresh
-thread with a Link: trailer to v1, per the docs you linked. Thanks
-for flagging it.
 
-Best regards,
-Corey
+2c on Sashiko:
 
+1) I'm working on an infrastructure to separate pre-existing issues from
+new issues. My current thinking is to stop reporting these issues with
+reviews of new patches and instead put them into some database and give
+maintainers access to it. Sashiko will automatically deduplicate issues
+and index them by the source file/subsystem. Hopefully it will mean that
+maintainers will see only a limited number of issues in source files
+they support. But I have yet to see how it works in practice.
+
+But I'm somewhat concerned that this way many of these issues will
+remain there forever and by reporting them with new material we actually
+have better chances to get them fixes. Maybe it should be configurable
+per-subsystem. I'm very open for ideas here.
+
+2) Re false positives vs finding more bugs I had the same experience.
+It's easy to tweak it to be more conservative or creative, but it comes
+at a price. It seems like the real answer is simple a better model. We
+saw a big improvement internally switching from Gemini Pro 3.0 to 3.1.
+
+Thanks
 
