@@ -1,161 +1,150 @@
-Return-Path: <netdev+bounces-280976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280974-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aCjyCa9J62ntKgAAu9opvQ
-	(envelope-from <netdev+bounces-280976-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:45:03 +0200
+	id OPg7G2ZH62kmKgAAu9opvQ
+	(envelope-from <netdev+bounces-280974-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:35:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C71A345D4F7
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:44:57 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5845945D2A0
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:35:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 51599300737E
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:40:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DF9DD300F2A6
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:32:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA56D35DA77;
-	Fri, 24 Apr 2026 10:40:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAD7A36BCF5;
+	Fri, 24 Apr 2026 10:32:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="XpcOZbkv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SmV9njz5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8851838B7A6;
-	Fri, 24 Apr 2026 10:40:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42AB3364EA5
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 10:32:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777027256; cv=none; b=NbWZMmhyjyvaMNPWV4M8xvmkUKx6cMGK0LSdppmFB8lAOtBrhcK+aEywF8g1sz08JmRyukkmsp2nGRWphnbLHxwJs8EX+CENRtySCpgnglnnUr144AdAtmw0/4KLyFxkp+S28TkXfG9jgKXkRwu2CDGiQ8vZ7t0wCNqUN5eQ1Zg=
+	t=1777026767; cv=none; b=riapW3uwQObKyhfPrQu1BCSYqG+irii6fHGkfowvmMWMJcwitdq2Q/lZb7UxdeEKWFpwEaVSDpygudaKZVZKLdbt2YZUVxhl++9omXvxjKr+OcrpkIbUB2/oLDisrBUTwqK0ZSqm0jFT5jHhMwA2ypc/3iPULKQZcDzelRiiB38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777027256; c=relaxed/simple;
-	bh=ra0spWUlavd514SMAgukniVNiGyiBJxnDLGWIrKLAF4=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=hNoywO/l+AdNADfkPmJn5ij/EmCy+Hk2oC3mQXb/zNCuIAUxh4eAtnIR+0XZJhof3FHKIu1ekbIfpkvGpiks9fErhsMv3A7Y57snrmvgMwZ+PMGzYdLlT7BkxTVDDYi+/xkDkAQiP6DNPG8FhdnWkQBgIEVyzCMyVEiSf26uY2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=XpcOZbkv; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id DFB1CA3C20;
-	Fri, 24 Apr 2026 12:30:36 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1777026648; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=vjSNcas3jlFNxzs2kV/iQLiDHeyejuhQ73BS26aMrqQ=;
-	b=XpcOZbkv3qb3uEFOeHObHiYznmzpFnQxIClQpmlGv+qmxmz/+6R4MfTAlfsd0IOKtcROtl
-	kvUQyA99CO8D3ROOLbslmNyR1xcuWkXE4nWmA6LSWkwp2gM+X+kKggk2NeIHiCji6rC4U0
-	iYGVyjQDXs/Qvcyy4h/lAjvck834AgUVCZie01BS2XHnzRdWbkeuPWUxkRiQ/vRer7I64I
-	Dc1R6DYY5nMwL/fX56pnshGRnKGxz71X7E8Ng4vCps3G5zk4oUzyKJ9YQ4KhnY/ntY3gTV
-	fmD+calkQvnxPZ/oR1Ha07kq0NvVbNTdBhMpbCPBwZpKmPKdTh/IvoLPKPvUCA==
+	s=arc-20240116; t=1777026767; c=relaxed/simple;
+	bh=FdOO5ZJKpunXt8R9oWk6B4rgl/tR+89ai4r1VJJ6pgo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=YjArQtEDVYSw2bl61gl1jJyPR9OweXHngyXc2+1ecLlSn2yytT8OGfgIZkZ3H4d/ltbwHIenttzT3ZSy83XK+6InbdvDya3EvHrMAHJYMg9eEcmC7az21qfOS7FJ2JojL5NkOKG/7M2XKdaZsc1XkKkYW1NDhb2AmLbzEAilNOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SmV9njz5; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777026765;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j8BpQcTU/HrFkQ0+UuHlyLaR2zAA5vDMBO2MGcO/oD4=;
+	b=SmV9njz5Ccuknz8SZJc2EggTZmWIdO+TCnenqk0QBEKIzERC+SGBinSQca42h+nOj4LIAj
+	cslWlJU/fTZAr73rP4VbQKFAZ2tuF+aAaWLYM5j0Bfcq0fqTnu3MDUdc2O+fS0+Rm3RE16
+	BXl/A76t0FByEGEtKgHB+nV491tIXZI=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-572-Bb_4hFO_PMqekvjZMqwVzw-1; Fri,
+ 24 Apr 2026 06:32:41 -0400
+X-MC-Unique: Bb_4hFO_PMqekvjZMqwVzw-1
+X-Mimecast-MFC-AGG-ID: Bb_4hFO_PMqekvjZMqwVzw_1777026759
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3576E19560AF;
+	Fri, 24 Apr 2026 10:32:39 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.44.32.29])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0D9631800348;
+	Fri, 24 Apr 2026 10:32:34 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: aleksandr.loktionov@intel.com
+Cc: anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	horms@kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	jacob.e.keller@intel.com,
+	jesse.brandeburg@intel.com,
+	jtornosm@redhat.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	przemyslaw.kitszel@intel.com
+Subject: RE: [PATCH net v4 4/4] ice: skip unnecessary VF reset when setting trust
+Date: Fri, 24 Apr 2026 12:32:33 +0200
+Message-ID: <20260424103233.622318-1-jtornosm@redhat.com>
+In-Reply-To: <IA3PR11MB89862412A9F682D59474841DE52A2@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <IA3PR11MB89862412A9F682D59474841DE52A2@IA3PR11MB8986.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Fri, 24 Apr 2026 12:30:36 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea
- <claudiu.beznea@tuxon.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Haavard
- Skinnemoen <hskinnemoen@atmel.com>, Jeff Garzik <jeff@garzik.org>, Paolo
- Valerio <pvalerio@redhat.com>, Conor Dooley <conor@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Vladimir Kondratiev
- <vladimir.kondratiev@mobileye.com>, Gregory CLEMENT
- <gregory.clement@bootlin.com>, =?UTF-8?Q?Beno=C3=AEt_Monin?=
- <benoit.monin@bootlin.com>, Tawfik Bayouk <tawfik.bayouk@mobileye.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Maxime Chevallier
- <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net] net: macb: drop in-flight Tx SKBs on close
-In-Reply-To: <20260424-macb-drop-tx-v1-1-b3ecb787d84d@bootlin.com>
-References: <20260424-macb-drop-tx-v1-1-b3ecb787d84d@bootlin.com>
-Message-ID: <1030f36978e299123c914917a15b934b@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
 Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: C71A345D4F7
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Rspamd-Queue-Id: 5845945D2A0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280976-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280974-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	FROM_NEQ_ENVFROM(0.00)[jtornosm@redhat.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MISSING_XM_UA(0.00)[];
-	DMARC_DNSFAIL(0.00)[tipi-net.de : query timed out];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-Hi Théo,
+Hello Aleksandr,
 
-thanks for your patch.
+> For me it looks like  cc: stable@vger.kernel.org must be added
+I am not sure about that, because the bugs fixed  here (vf->trusted
+ordering and race condition) only trigger when MAC LLDP filters exist,
+which is an uncommon scenario.
+And most users will benefit from the performance improvement that is an
+optimization rather than the bug fixes.
+I mean, I included the commit fixed as a reference but due to optimization
+as the main reason, I didn't dare to request this for older versions.
 
-On 24.4.2026 12:01, Théo Lebrun wrote:
-> [...]
+> You declare ice_vf_clear_all_promisc_modes() returning int, but ignore
+> the return value.
+> Looks suspicious isn't it?
+Well, it is used like that when the funciton is called locally (the
+function is not modifiedi, just made public), and really my intention was
+to clean as much as possible (so error checking is not necessary).
+In my opinion it would be enough to warn about the possible problems
+(already done in the existing function).
 
-> 
->  	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
-> +		dropped = CIRC_CNT(queue->tx_head, queue->tx_tail,
-> +				   bp->tx_ring_size);
-> +		queue->stats.tx_dropped += dropped;
-> +		bp->dev->stats.tx_dropped += dropped;
+Anyway, if, despite the reasons I have tried to explain, you still think
+the same way, please let me know so I can adjust them (if you don't mind,
+I would wait for more reviews to include them in a next version).
 
-AFAIUI CIRC_CNT counts descriptor slots, not packets. A fragmented
-skb uses multiple slots so tx_dropped would be overcounted?
+Thanks
 
-> +
-> +		for (tail = queue->tx_tail; tail != queue->tx_head; tail++)
-> +			macb_tx_unmap(bp, macb_tx_skb(queue, tail), 0);
+Best regards
+Jose Ignacio
 
-I might be missing something, but couldn't this crash on the
-macb_alloc_consistent() -> out_err path after a previous close
-with in-flight frames?
-
-1. First close: the new loop runs and frees skbs, but tx_head and
-    tx_tail are not reset. kfree(tx_skb) sets it to NULL.
-2. Second open: macb_alloc_consistent() fails early (e.g. the tx
-    dma_alloc_coherent on the first line) and jumps to out_err.
-3. macb_free_consistent() runs again. CIRC_CNT is non-zero (stale
-    from previous session). macb_tx_skb() dereferences queue->tx_skb
-    which is NULL.
-
-Or if the failure happens later, the loop would iterate over a
-freshly kmalloc'd (uninitialized) tx_skb array and macb_tx_unmap()
-would read garbage mapping/skb pointers.
-
-Maybe reset tx_head = tx_tail = 0 after the loop, or guard with
-if (queue->tx_skb)?
-
-> +
->  		kfree(queue->tx_skb);
->  		queue->tx_skb = NULL;
->  		queue->tx_ring = NULL;
-> 
-
-> [...]
-
-Thanks,
-Nicolai
 
