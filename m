@@ -1,235 +1,349 @@
-Return-Path: <netdev+bounces-281024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281025-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EMY5Oyil62nIPgAAu9opvQ
-	(envelope-from <netdev+bounces-281024-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 19:15:20 +0200
+	id KKX8A9um62mrPwAAu9opvQ
+	(envelope-from <netdev+bounces-281025-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 19:22:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98079461BB0
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 19:15:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85D3F461E1B
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 19:22:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9AC363018404
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:10:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BCB01303E2CA
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E153E1226;
-	Fri, 24 Apr 2026 17:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A7D93E1CFC;
+	Fri, 24 Apr 2026 17:11:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="tDQaIHry"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IJXfrJ4X"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010001.outbound.protection.outlook.com [52.101.61.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f202.google.com (mail-vk1-f202.google.com [209.85.221.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EEDB3E3C6B;
-	Fri, 24 Apr 2026 17:10:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.1
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777050640; cv=fail; b=SyOwnOwBzh0pxOQdP3CrjklSOma3+k1hAIfe6T/GsjYsziZi39shJB2hpZMlV5+C5WXF6azxv08gQLju4IdCh+tFX0LUnrBVcNTaER9+IIHZ0etNnTklXTmjC02tQ3bK7fbvcXVBVoQWqcCfdBI4EIx8mIQXEDz8OWkTg1TVW5o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777050640; c=relaxed/simple;
-	bh=FeY9rp9KvvLyA2rwZSagBAgtriTz5KK05A40yzGERhw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=JpLwVr9o2Gyd1GOrMuOx7uH3+4qFPGrXM7GXpVW5/hJWLeVZWTzP+VUaRPHSpqaAQEaB6CGmmR4C/dPS7V0pSb8TGGBjRHUcmTQCj/4NacG5eSvQ03zSi/axpadJFGIODXvbdbUjN+kVUsk6oxJaPgIQvsTTNaU3Jctn7i6PARE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=tDQaIHry; arc=fail smtp.client-ip=52.101.61.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fq0BDmg7SBVBms/46bqVKlTnJwGrFUIH8nCjODSV96COAzW8FioMJm0BRGDPbu0FhKGjoZ9AnAlNhklXw/xyVLK0Hmj+GBECBauTBTfJvC+6ugWJaTcoPEO343UNpBWS2mSqY2/NrWJ31kKcI+8u2M14MOfxapDk5BAUN0kmnT/11SyLkhwBGfWPCxshcURaNxlBesdZJjJJjwucg9biRTFg+fpclci0v4MAm1BB34kyvdtUa/CaTgp6xPBvHmkHWPh2GE972fbYz8rlGP0CF3QO+PbEHOdViH4gVqLpPoxVcs58sTFxX+9b7d2MrHNdfbVMaKqyXA+T4tGqhVHSJA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WWAABuooCiucJa5zGXEH2MBSsxDi0td7jvJLT0FcsHY=;
- b=lIVzWDxKwNeypHMTFDXz6H2Q4HGfSv8P8zCD6sX5fmx+sPWFBrZLthnWjSPQsXWfvddBbuoZoqt4cRIES/pcWRZEAuaIwPOxobTDOgDCs9AbgojLWy82iGsshHOULTLlOHY3RCF5dfA7we67Zra4iSSdhpqYivVsnWIMZpJg0+8srB28BHYWm2cNWRiBLzipuuE1qfLXT/dhshQZA7LVNKjUwh6BKMdkUwFiisi7/cdO/oPTgcYJC8/DOnmkTalVYLgz7XiecUnQmMjHLpsrNNZKqgYF6meSFwynQQkLDocaYZ4scb4XCkkyd7i+RDUA4TPlOWG+RrcWK1Vs7d6vZQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WWAABuooCiucJa5zGXEH2MBSsxDi0td7jvJLT0FcsHY=;
- b=tDQaIHry3LEKxekwbT9ZwMiV7/5DN580lg222W+dMitdtgVvJW61uiE5qHFKmCbj/jttjVXzgAdRjXt8PZ2C5bNg5WymM6w6H4wLWrGJuI9wzNswWg8VBQEJHJYhZLP1C5tc6cWq744ghETr9AqgMT6f7gzKbWSwdtMZ4guxi34JMhRt+tldJy9Nb3Ua2pSoHHGiutIFzsSburWecDzQrsgc2y4M7ce2fou2ldFTTF3G5Yl2uCNDo13qspsfp6UOxuCMoxo+FGNJpQHj92NrAJZuje1l2WL7XTREVf4wBNk2gtJYR0Mu6Y7qS/gELwBYolKBxsuPfVeh3Pyr0QminA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY8PR12MB8300.namprd12.prod.outlook.com (2603:10b6:930:7d::16)
- by MW4PR12MB7166.namprd12.prod.outlook.com (2603:10b6:303:224::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.20; Fri, 24 Apr
- 2026 17:10:27 +0000
-Received: from CY8PR12MB8300.namprd12.prod.outlook.com
- ([fe80::ce75:8187:3ac3:c5de]) by CY8PR12MB8300.namprd12.prod.outlook.com
- ([fe80::ce75:8187:3ac3:c5de%3]) with mapi id 15.20.9846.021; Fri, 24 Apr 2026
- 17:10:27 +0000
-Date: Fri, 24 Apr 2026 13:10:25 -0400
-From: Yury Norov <ynorov@nvidia.com>
-To: Jonathan Cameron <jic23@kernel.org>
-Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	David Lechner <dlechner@baylibre.com>,
-	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
-	Andy Shevchenko <andy@kernel.org>,
-	Ping-Ke Shih <pkshih@realtek.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Hans de Goede <hansg@kernel.org>, Linus Walleij <linusw@kernel.org>,
-	Sakari Ailus <sakari.ailus@linux.intel.com>,
-	Salah Triki <salah.triki@gmail.com>,
-	Achim Gratz <Achim.Gratz@stromeko.de>,
-	Ben Collins <bcollins@watter.com>, linux-kernel@vger.kernel.org,
-	linux-iio@vger.kernel.org, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org, linux-rtc@vger.kernel.org
-Subject: Re: [PATCH 0/9] bitfield: add FIELD_GET_SIGNED()
-Message-ID: <aeukAef3c6eq-dLK@yury>
-References: <20260417173621.368914-1-ynorov@nvidia.com>
- <20260424130927.349ad3ae@jic23-huawei>
- <aeuRMiws8zCdkGXX@yury>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aeuRMiws8zCdkGXX@yury>
-X-ClientProxiedBy: BY3PR04CA0012.namprd04.prod.outlook.com
- (2603:10b6:a03:217::17) To CY8PR12MB8300.namprd12.prod.outlook.com
- (2603:10b6:930:7d::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A852B33F5B4
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 17:11:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777050715; cv=none; b=HgcuhqOXxA54bz9sN/0ofG+MvEbbsZCwl/idA/O04WlBWhJx9WZb2AUtNVIi5J97FrNHW6yxUrzyBuNdtLSBhDbvzRNslgsas6n95xI63fnBfiGvvBSGDLf3NnO2+PVBbXEPhDlqLQJXnSgd0U7T13qmTArbvlId3X+kgxx5MIM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777050715; c=relaxed/simple;
+	bh=elQA6kRFOKbGu7xOg9UXrVrdKp5uBfSiC+BcGbjl/gI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jeVO4R0EDpDeR0NuCaMzrOW2r1xCc8l2VcC/bGeES7dFgwoxynEnVRM5daQ3E8Mp6uT/brwkRm4Q1fKbUzYw6Jl6oOuEF1io6L3/zX4aPCEgD/022NGeJ5adc+hhv0YE5Q+VurO6r1YzgqL1jshYBRm5RjXAZlzNcmr82GKi9JE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IJXfrJ4X; arc=none smtp.client-ip=209.85.221.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-vk1-f202.google.com with SMTP id 71dfb90a1353d-56f6ef62af1so11913720e0c.1
+        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 10:11:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777050712; x=1777655512; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BO2e9ngnshBPgV593HwtW/OHEvo1XShHa8R218xO+tU=;
+        b=IJXfrJ4XpIG0yVN7ens/dQnrdEqBHJ8PMHKZTpQ5Pw6SK1tR5gkNbIGgWBVaBPJkeA
+         BMlyiJafNECINmqHmONncA7gNTQiwYzgC/BOmvQXiLGFBsFLkjtd7JOd2dggqsiv5UHR
+         JVay562GrgXryPJEGOatKOMr8LveqnX4qhDgk/9ch8mqXusuD3RzuI0uYCrmAnM6yvfp
+         H0TBM4rLLILqowjkq+GzDOgZpGDhLxuX24K2NXcP7wWi1iSzB7T2GpnNcQS7QzkXH85T
+         faBdFTjldFYq6HIfD8ARZR1R5Myf0cX6ViQ+muEw9wbYLP6WJT7HF1VgUO6Tsq4jB1fJ
+         AUNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777050712; x=1777655512;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BO2e9ngnshBPgV593HwtW/OHEvo1XShHa8R218xO+tU=;
+        b=Y0IsYhHWcu+XBL0gILadhSjhJG3fttgLGOfuiGaK6G6a0arK9h2Rs5d6wNp0db3d55
+         EW0n3EmwaUVOVbY1zihhc4hjZqJV2rwV18t9cIOo3T9bzKrulv8FPxvdQdCKiz76U9G7
+         hhqVMY4VposmHtu9x0w1srCEYe4cdx0xvK78H7pj+m24D0o14a2kTINnbv9cClZPjguy
+         14XWbdCIW+ufKc9/OehjRQWlvsZTlY62SDdhJOvraVoGOHVO5Z5KA31nw/fTOpOQX7TN
+         SFyxuxD3EyT58Qaf/A91e00mWUhEBH7Ucnr+PkimnTC5rSTp4qtCh4PX0YJXG9xFtPnW
+         6NgA==
+X-Forwarded-Encrypted: i=1; AFNElJ8+tKGFF/+X6x+tBCx8X1Xgaggm9/FmEnFiQjFdhNKWEcvCthSyBeD80SBfS7Scq2sjJ07Mp60=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnnipN0ZQlMqlgkpRbI0l4twILLcHU8ISYnAWWyhnVPH7Qa1NK
+	s1LXP25cqLbxb4J1MKQvHdtMrxZXNh7+aho9ahg7aV+KS18DP+mCjELrHnbPk3OB7mpyyOZisVM
+	JNNynlKXRkMn6oQ==
+X-Received: from uabep9.prod.google.com ([2002:a05:6130:2d89:b0:94d:4d9e:686f])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6123:2e3:b0:56b:579c:82e with SMTP id 71dfb90a1353d-56fa58c0c9fmr17704826e0c.5.1777050712330;
+ Fri, 24 Apr 2026 10:11:52 -0700 (PDT)
+Date: Fri, 24 Apr 2026 17:11:51 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY8PR12MB8300:EE_|MW4PR12MB7166:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9ccd5fdb-f724-4141-4e6e-08dea224617e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|10070799003|376014|7416014|56012099003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	8km69BRC2NhcHkWnvhJ75sKsWeETgo4/eC7xW1GPqU6GDiJHPq2YSdpryXOwl20Wk7tBNRWubs+/iyHBDOH7q3QP2LiDAHD+GLfzoirRjJ41cfxONZ4BecX9BwSxfGelWQ/lYOL57ZPbs2CUhondTa4pX1m7YjN3STUnRpo/5bv2clAyouJDyDLyYvfKeeENKbBkvM2U2eT2ADMe3M8KnAJO1gAFhKj3IXB6Cd/l3OLRL599PpOGmLWmBHOG053YjJUHfDy9pEvIraFOnbgv1Uu7bxySEvmNTCkEh9TdRXmltsSLXXzKLef/j6zfK2OM1sh/C329go+4Q0vSpJ7yVibpN4qQknaW/P+BFPRvLHKBiLOC14Qe32NHAv9smeudNQ8Z7naKbWQ1qcflYFPBymtAtbEMR2sT/to0rIshRpFb/LJdHK11xOCharCPiBs72aI/AMeKeF3alvJFGCxWxSN1L9MosCw98tTieqmru0bkANLCaTcPLwwY8OhaaQs8sfNWBzyx4S94z4Hvs59iu5GxsekdtDq1EzHCV4jLiwBfb5DZbRpW/STlcS12X9+02iLVfjrfVZTN/nC3BGG+JVUoJtlzilWbdqnvQEZPwmNxL/SXZ2lfIA69ttpcc8hCNzrgz1ejFEJXtK3ZtdbmDwqm3eicnhEX7R3WbdASJuJHd8iTsrglla88HYRKSY7ikGyABf8IBQVZNCEtxVaiF6KtxjYn/2HglBi6qLMxF4E=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB8300.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(10070799003)(376014)(7416014)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?QrGbEZiCGkt5+0E62n4kNjnH0QUqxEp0JtjygEWQNxWQBd48Z3efSgDbwgsx?=
- =?us-ascii?Q?Jrpb7YNsB3qNLNx+OHo99CZzJ3o4vjtUPyK8WgRCV5C4IBBIEOrK538XfUIZ?=
- =?us-ascii?Q?bBlqd9X6YpkB0HcRmJ/XrAgcMlphJvC7n9IwC85kkbPFjoF09yE/o0V39K6t?=
- =?us-ascii?Q?Y+N/GsEvmS5RJuuqeGZRo0EjPXumMsofA+kEOQy+Z+D72RS5DAwq2GzRpBRG?=
- =?us-ascii?Q?Mdps6Hbym8Xeo0HQ2L47v0t6DOf5gttowa6bjdp9ZUX9J77nliPoRV1o2UGm?=
- =?us-ascii?Q?Dyc/FQMYjd62Sd66S4ScR1Bcup+TewNJ+RAJL7bD10J5Sju22osxBdUVR/wO?=
- =?us-ascii?Q?3CydLcC+2CGEztwWy0KK18pmPp+G0JBXKN+KyIdPTBc/N1S75YV7zaZUXI7q?=
- =?us-ascii?Q?tcF7orXKuZ5ZfTANSoTJYqqXkO3VDwW6oOJm5Aoq5UEcK4U0DMfRk1ubhJPT?=
- =?us-ascii?Q?FhVLGpsIK3+bPaAcOzzeuw9UVhKu3oGb9Z3EsXWKGBZ1ujvkjeKmxGKPSuDV?=
- =?us-ascii?Q?LP+jfKs20rI25Dt50q9HvVu2y2JaJJ5Cc5OJ20L+oGV5cx8fW2VB17qm7iJk?=
- =?us-ascii?Q?jhNX0MlCMDUBnGTxMCr1RQ6RQeyOg/8glif6LymKTIn+iN2hMYPlhC8NdcVx?=
- =?us-ascii?Q?ivvsrzxcm83SFVVRwsNmUAs66FHy51YsGn3pjab5cJVPoLpYYI3ntqmIwM56?=
- =?us-ascii?Q?3ABGzq1gaOKPT6Dc+jz0Up0uspvd0p2zTeSZ9Cfz09u5yMV1/4AiK0i9z45O?=
- =?us-ascii?Q?lRvjVQm7AxtbU3PLHd4gsvLnUuOlIbrfO5fBfb/wUnENgp1xE+U2vPn2wKwE?=
- =?us-ascii?Q?riOONOWb2SzYzsZsawzSbe5NWnjWstTj6GiSDW2xlrZxhyMhVyIDVqNa5WN0?=
- =?us-ascii?Q?7bwyLvOK1xg86vl5VOpJEzBexrKLpXTrQsqqWI3qZnk9HNI/BrBJWko0crEA?=
- =?us-ascii?Q?KW9pe0RtFNPogpD4qu02MEObVIIX0pwHa7nWUatmqbcRODDKrQMsKRBd0+rS?=
- =?us-ascii?Q?TLTN4SeynsKVGg21cUiSi3THDP2M21xH8AeyIQo/YcCG3PK53K+MohXV0pyO?=
- =?us-ascii?Q?DOA+bx7WF09oBccapbx+ASCwW+aXakTnEoJ60CuCiHzTFAbTJhOuXdhi5Brq?=
- =?us-ascii?Q?v1o75zkWvd4EA02GWV5q6/oSH5XIZpnuv0aFtsJs75dBYkq9SbElS1nmyTA0?=
- =?us-ascii?Q?G4DnTZYpBs/j5ArtzqUj/637quk7NJPzRVEiNPkffFkiDfoUG6INzp5bdIvt?=
- =?us-ascii?Q?vN9ExG4qJ4GMXW4VDYxH3R2jW6aPRNSbcWcWW7hMqkCb/NWWZC5tUvxNP6Y5?=
- =?us-ascii?Q?nt5ip18DG17RdpkqGVQ1vm55RnyaffbUUdFl/WtjWC52gWYLVAS1dYBUFk2N?=
- =?us-ascii?Q?HX34n2jEU+aVpmEVxnwyuaYYQzSD6I9kmUFhfg3DgOicn4//w7/+0rsu4FXP?=
- =?us-ascii?Q?mFMbceuU62RssbIeiNehBF8R0VjaEMJAm533r4V8WQ7E2g4N5v9coN1e8b+Z?=
- =?us-ascii?Q?IIfPVgR1vc2jHPHwNNESbnIcrz1FTrEG2ofHReSri+FtnsFTlG+Ixwuk5S6/?=
- =?us-ascii?Q?IZq+9VpqwK+G2/5cJySmZfY2jEkgceBpZz1dz6irc/yn3+E0cDJT/oODodKA?=
- =?us-ascii?Q?FHzdtc9T+8nwITOj2Ok3HRE8ZRej0itPNdxqxuQy452LNmY/w8R3ukvY9FVr?=
- =?us-ascii?Q?UO0KxrKjRwtEEgB6yrb2HXsccHUQqFVZcuVj/4Aii86y5+ilNRR28MWT0jJ6?=
- =?us-ascii?Q?bR9tfOtsP4x7nUufDJVQGQZMJa4Am5eUzFgzcm5eOUVjh5iA/TZH?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9ccd5fdb-f724-4141-4e6e-08dea224617e
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB8300.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2026 17:10:27.3312
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KrALK0mNZtB5pYzqRhiWgPYYVvzbXAkBFicnj/J4JFReBCGCJM3SRa956fIKk23i6ceRmILArytC8ABm3XIUWQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7166
-X-Rspamd-Queue-Id: 98079461BB0
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
+Message-ID: <20260424171151.1190882-1-edumazet@google.com>
+Subject: [PATCH iproute2-next] utils: add fflush_monitor() helper
+From: Eric Dumazet <edumazet@google.com>
+To: David Ahern <dsahern@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 85D3F461E1B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.84 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,redhat.com,alien8.de,linux.intel.com,zytor.com,infradead.org,baylibre.com,analog.com,realtek.com,gmail.com,lunn.ch,davemloft.net,google.com,bootlin.com,rasmusvillemoes.dk,stromeko.de,watter.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281024-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281025-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[33];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ynorov@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[]
 
-On Fri, Apr 24, 2026 at 11:50:10AM -0400, Yury Norov wrote:
-> On Fri, Apr 24, 2026 at 01:09:27PM +0100, Jonathan Cameron wrote:
-> > On Fri, 17 Apr 2026 13:36:11 -0400
-> > Yury Norov <ynorov@nvidia.com> wrote:
-> > 
-> > > The bitfields are designed in assumption that fields contain unsigned
-> > > integer values, thus extracting the values from the field implies
-> > > zero-extending.
-> > > 
-> > > Some drivers need to sign-extend their fields, and currently do it like:
-> > > 
-> > > 	dc_re += sign_extend32(FIELD_GET(0xfff000, tmp), 11);
-> > > 	dc_im += sign_extend32(FIELD_GET(0xfff, tmp), 11);
-> > > 
-> > > It's error-prone because it relies on user to provide the correct
-> > > index of the most significant bit.
-> > > 
-> > > This series adds a signed version of FIELD_GET(), which is the more
-> > > convenient and compiles (on x86_64) to just a couple instructions:
-> > > shl and sar.
-> > > 
-> > > Patch #1 adds FIELD_GET_SIGNED(), and the rest of the series applies it
-> > > tree-wide.
-> > > 
-> > 
-> > Just a quick heads up that I'm beginning to assume that this series
-> > will land in some form.  If it does can we do it as an immutable branch
-> > as I'm suggesting it gets used in some other patches in that should land
-> > in the new cycle.
-> 
-> I'm going to submit v2 soon, as seemingly the discussion is boiled
-> down, and then will likely merge it with my tree. I'll create an
-> immutable branch for you before the end of day.
+Some fflush() calls only make sense for monitor programs.
 
-Here it is:
+For other cases, forcing a flush is expensive.
 
-https://github.com/norov/linux/pull/new/fgsv2
+After this patch, ip, tc and ss are correctly buffering their
+output when redirected to a file.
 
-It builds well for me, but I'll wait for a while for robots feedback
-before making it 'officially' immutable.
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/utils.h |  7 +++++++
+ ip/ipaddress.c  | 12 +++++++-----
+ ip/iplink.c     |  4 ++--
+ ip/ipmonitor.c  |  1 +
+ ip/iproute.c    |  4 ++--
+ lib/utils.c     |  1 +
+ misc/ss.c       |  3 ++-
+ tc/tc_class.c   |  2 +-
+ tc/tc_filter.c  |  2 +-
+ tc/tc_monitor.c |  1 +
+ tc/tc_qdisc.c   |  2 +-
+ 11 files changed, 26 insertions(+), 13 deletions(-)
 
-Thanks,
-Yury
+diff --git a/include/utils.h b/include/utils.h
+index b68d6bc4edcf9ca335148f731cd240871b6c809b..9099a78b1593738c5ba181274d784d0a1913407a 100644
+--- a/include/utils.h
++++ b/include/utils.h
+@@ -38,6 +38,7 @@ extern int numeric;
+ extern bool do_all;
+ extern int echo_request;
+ extern int use_iec;
++extern int monitor_mode;
+ 
+ #define SPRINT_BSIZE 64
+ #define SPRINT_BUF(x)	char x[SPRINT_BSIZE]
+@@ -399,4 +400,10 @@ FILE *generic_proc_open(const char *env, const char *name);
+ int open_fds_add(int fd);
+ void open_fds_close(void);
+ 
++static inline void fflush_monitor(FILE *fp)
++{
++	if (monitor_mode)
++		fflush_monitor(fp);
++}
++
+ #endif /* __UTILS_H__ */
+diff --git a/ip/ipaddress.c b/ip/ipaddress.c
+index 4d93a04a8555e141ae30a4aaeb42ac607a181c9b..14aa98e77452c9681c9d3660f6a882df56b44f1c 100644
+--- a/ip/ipaddress.c
++++ b/ip/ipaddress.c
+@@ -894,7 +894,7 @@ static int print_linkinfo_brief(FILE *fp, const char *name,
+ 		print_string(PRINT_FP, NULL, "%s", "\n");
+ 	}
+ 
+-	fflush(fp);
++	fflush_monitor(fp);
+ 	return 0;
+ }
+ 
+@@ -1346,10 +1346,12 @@ int print_linkinfo(struct nlmsghdr *n, void *arg)
+ 	}
+ 
+ 	print_string(PRINT_FP, NULL, "%s", "\n");
+-	fflush(fp);
++	fflush_monitor(fp);
+ 	/* prettier here if stderr and stdout go to the same place */
+-	if (truncated_vfs)
++	if (truncated_vfs) {
++		fflush(fp);
+ 		fprintf(stderr, "Truncated VF list: %s\n", name);
++	}
+ 	return 1;
+ }
+ 
+@@ -1732,7 +1734,7 @@ int print_addrinfo(struct nlmsghdr *n, void *arg)
+ 	}
+ 	print_string(PRINT_FP, NULL, "%s", "\n");
+ brief_exit:
+-	fflush(fp);
++	fflush_monitor(fp);
+ 	return 0;
+ }
+ 
+@@ -1768,7 +1770,7 @@ static int print_selected_addrinfo(struct ifinfomsg *ifi,
+ 
+ 	if (brief) {
+ 		print_string(PRINT_FP, NULL, "%s", "\n");
+-		fflush(fp);
++		fflush_monitor(fp);
+ 	}
+ 	return 0;
+ }
+diff --git a/ip/iplink.c b/ip/iplink.c
+index fce6631d2d821a8739d28805e13d98f6804bda30..806f86987ed7c8af5ddd40f04a44fb8ce8debfaf 100644
+--- a/ip/iplink.c
++++ b/ip/iplink.c
+@@ -1296,7 +1296,7 @@ static void print_mpls_stats(FILE *fp, struct rtattr *attr)
+ 	print_nl();
+ 	print_mpls_link_stats(fp, stats, "        ");
+ 	print_string(PRINT_FP, NULL, "%s", "\n");
+-	fflush(fp);
++	fflush_monitor(fp);
+ }
+ 
+ static void print_af_stats_attr(FILE *fp, int ifindex, struct rtattr *attr)
+@@ -1359,7 +1359,7 @@ static int print_af_stats(struct nlmsghdr *n, void *arg)
+ 	if (tb[IFLA_STATS_AF_SPEC])
+ 		print_af_stats_attr(fp, ifsm->ifindex, tb[IFLA_STATS_AF_SPEC]);
+ 
+-	fflush(fp);
++	fflush_monitor(fp);
+ 	return 0;
+ }
+ 
+diff --git a/ip/ipmonitor.c b/ip/ipmonitor.c
+index 1f4e860f8d6726edffcf9bf81636c6555757dd09..23bd667a2f7a27e620d0f6dd13a16476c1ac0d08 100644
+--- a/ip/ipmonitor.c
++++ b/ip/ipmonitor.c
+@@ -324,6 +324,7 @@ int do_ipmonitor(int argc, char **argv)
+ 		return err;
+ 	}
+ 
++	monitor_mode = 1;
+ 	if (rtnl_open(&rth, groups) < 0)
+ 		exit(1);
+ 
+diff --git a/ip/iproute.c b/ip/iproute.c
+index c2538894da633b56f5b926ecafda4960a48e9fbd..c6a6ba9dd37076acfceb9b259874a50e7cd3c3d0 100644
+--- a/ip/iproute.c
++++ b/ip/iproute.c
+@@ -1012,7 +1012,7 @@ int print_route(struct nlmsghdr *n, void *arg)
+ 
+ 	print_string(PRINT_FP, NULL, "\n", NULL);
+ 	close_json_object();
+-	fflush(fp);
++	fflush_monitor(fp);
+ 	return 0;
+ }
+ 
+@@ -2035,7 +2035,7 @@ static int iproute_list_flush_or_save(int argc, char **argv, int action)
+ 	}
+ 
+ 	delete_json_obj();
+-	fflush(stdout);
++	fflush_monitor(stdout);
+ 	return 0;
+ }
+ 
+diff --git a/lib/utils.c b/lib/utils.c
+index 1215fe31cb3f63c0fa768fef60da77a641c51581..7017b0e6afacd8e770fb9f8b26aa5a319c1279e7 100644
+--- a/lib/utils.c
++++ b/lib/utils.c
+@@ -41,6 +41,7 @@ int timestamp_short;
+ int pretty;
+ int use_iec;
+ int human_readable;
++int monitor_mode;
+ const char *_SL_ = "\n";
+ 
+ static int open_fds[5];
+diff --git a/misc/ss.c b/misc/ss.c
+index 14e9f27a75321556240a5f290b8bcf51c605a4c2..0f9b37177d375ddf70cb34674992723b5c4883be 100644
+--- a/misc/ss.c
++++ b/misc/ss.c
+@@ -5544,7 +5544,7 @@ static int generic_show_sock(struct nlmsghdr *nlh, void *arg)
+ 
+ 	render();
+ 
+-	fflush(stdout);
++	fflush_monitor(stdout);
+ 	return ret;
+ }
+ 
+@@ -5580,6 +5580,7 @@ static int handle_follow_request(struct filter *f)
+ 		f->rth_for_killing = &rth2;
+ 	}
+ 
++	monitor_mode = 1;
+ 	if (rtnl_dump_filter(&rth, generic_show_sock, f))
+ 		ret = -1;
+ 
+diff --git a/tc/tc_class.c b/tc/tc_class.c
+index 6d707d8c924f4b5e90201d4de8e9779f82ce17f3..8197566281fad47d4efcf4768ed406ab809dd08a 100644
+--- a/tc/tc_class.c
++++ b/tc/tc_class.c
+@@ -380,7 +380,7 @@ int print_class(struct nlmsghdr *n, void *arg)
+ 		close_json_object();
+ 	}
+ 	close_json_object();
+-	fflush(fp);
++	fflush_monitor(fp);
+ 	return 0;
+ }
+ 
+diff --git a/tc/tc_filter.c b/tc/tc_filter.c
+index 7db850bda11a3408ec66b457c9fc590f3a734f65..633f027d79865d98ba1ccba48af71d247dfc7a48 100644
+--- a/tc/tc_filter.c
++++ b/tc/tc_filter.c
+@@ -374,7 +374,7 @@ int print_filter(struct nlmsghdr *n, void *arg)
+ 
+ 	print_ext_msg(tb);
+ 	close_json_object();
+-	fflush(fp);
++	fflush_monitor(fp);
+ 	return 0;
+ }
+ 
+diff --git a/tc/tc_monitor.c b/tc/tc_monitor.c
+index 5b9bccbed4140241a4d7a5cffc50865106224867..49bd4b6a460fbfe41a35e06f92f07dbe56a6be2d 100644
+--- a/tc/tc_monitor.c
++++ b/tc/tc_monitor.c
+@@ -100,6 +100,7 @@ int do_tcmonitor(int argc, char **argv)
+ 		return ret;
+ 	}
+ 
++	monitor_mode = 1;
+ 	if (rtnl_open(&rth, groups) < 0)
+ 		exit(1);
+ 
+diff --git a/tc/tc_qdisc.c b/tc/tc_qdisc.c
+index 7eb9a31baa31fb91a8141c9eca1135e76a52fa8b..a8ef8fc9f70d91609d6ed61c2a46b29120512fd2 100644
+--- a/tc/tc_qdisc.c
++++ b/tc/tc_qdisc.c
+@@ -344,7 +344,7 @@ int print_qdisc(struct nlmsghdr *n, void *arg)
+ 
+ 	print_ext_msg(tb);
+ 	close_json_object();
+-	fflush(fp);
++	fflush_monitor(fp);
+ 	return 0;
+ }
+ 
+-- 
+2.54.0.545.g6539524ca2-goog
+
 
