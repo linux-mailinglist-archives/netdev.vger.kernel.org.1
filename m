@@ -1,189 +1,215 @@
-Return-Path: <netdev+bounces-280935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280936-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mY3NFwD96mltHAAAu9opvQ
-	(envelope-from <netdev+bounces-280935-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 07:17:52 +0200
+	id gIRLN2z+6mnEHAAAu9opvQ
+	(envelope-from <netdev+bounces-280936-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 07:23:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B004459E40
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 07:17:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BFCA459E73
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 07:23:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 43282300A391
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:17:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B44FB300A753
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:23:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEE8B33A9E8;
-	Fri, 24 Apr 2026 05:17:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D60533FE26;
+	Fri, 24 Apr 2026 05:23:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cg8ekBbk"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="U8bwX7e+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C391BBBE5
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 05:17:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB7781A6810;
+	Fri, 24 Apr 2026 05:23:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777007867; cv=none; b=iGSq42fzBI20uY9LgE2bd0rmLAw8fpV0kOijbC55N7UoxUIyma0oyBHjRqBBmN4+OOBprqH8CubJ/Jm60slGGvn6+hVtAHWiIgd//svafz7hJJj+ycUKcjL8K/jtAG7r4R/aQoefP0HfpEOs7CwW/MqSFtBnOcXzM2rIQXGbyzU=
+	t=1777008233; cv=none; b=qraWATjwWCKfpP2+a8IJPK8AD3S0qz3n7EbTKfmMTGCDkrd08qoHXm5yg43Bm0n2e1TGfOVaUzLgi0E9A9pKUCzTQycwQOCzf4fEEYvZ98TmmwQF5oVcyaHgMtz43Lzf9/eHFN7jqjdab7Ga3qskQMS4il4pQyzk/X6ZbczSv70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777007867; c=relaxed/simple;
-	bh=cy+jfZevRl4qnhUm8i+XX7pD88aruLbn13jduBtEK9A=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=HRuTtbFoko9W++GJZv5JrLQsqN0CR1j+uj50b5QCfkRYcpV0oKD90uCS2cAtaBWTZqhe1NuttldK11CON5sLSf/3vKfLsExizcKtEAUbLD8Cr/YNAcp1Oi9XlMJSzDT7TzjA4EBd57v+i5rAhCXfGLg6WPuCAz+1dJbwUvF1Rho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cg8ekBbk; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-43eb012ac4fso4450852f8f.0
-        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 22:17:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777007864; x=1777612664; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CmJCiO+yYPwYPiaZsf/z2HrFYMaHB6ygscvb77nduZw=;
-        b=cg8ekBbke8nLR/dTyiTx0wOeHvkvRy8LEMx10KCPHZhaZBpuUCc8O7CbmwOrg3O1Bn
-         vR3TasWpwFCGavVNuy9DgYXq26+AutWxLFpbd5l7TD6u3wsSQAJ9FcVR9HlwttjOqtuC
-         1L2dDCsh5ev3zhtaRpC6+HWFUqWWTFcx2W+fzQWP/P9EQBBhUU0uaWrmbrdJn37jMeTw
-         h/bP+4h2PRShhxg69DOWdaLABVaTWSN6TbtbtdquEbrOgTmPQeyeqVmxfmY0e5kiwz/V
-         237z7drNldS74xi4R4v6lPt5Lv8+YnPAzVRoSt9+heEUXOszsMze5Q9GoXFk45pjd7wm
-         3kaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777007864; x=1777612664;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CmJCiO+yYPwYPiaZsf/z2HrFYMaHB6ygscvb77nduZw=;
-        b=F7rjDZfCi4IPb4oN3tSiewe/LAOKjiMfr/vfN03df74APFwoqZHE1QfF3o7o+zN9MD
-         urMudQU9gHn4NYIBO0CNu0uZVZ8tZsRNNDj0kuMgmm8aaXljlwKEPL7Plb5Ziqvv+yFM
-         SR5lwBUaiNRxBTsJLe7IAGzmZqxmrndYOlZBtai2gYKa7tGGr7RUF4B4YSl8il0p8/SG
-         XYCt1W2adx3HzkIska/cEjRnJEJjai8DQWnDag7ZyKD19S3GqwUGKhu0i5ikitpGDW7o
-         eKXK4Jx/y264B8/vWYz1QN9/DI0uGmWgM5nqm5h4tdTec8n7ltD3mNOVGLsHvTDhc502
-         PeQg==
-X-Forwarded-Encrypted: i=1; AFNElJ8cZhpW2UKfC73pg9yA7xWQWjpvaYbbuJDGGTTeUSlGVQrZhW8w4JVMofOieafvtl3Rdm2SKhg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YytqAHbYUYG4YBC5eDJ6gozfqlDJMbkKz6Lmss0PFCyCOpi2qn1
-	Ahp1Wwi5JMoR0ORfxev6gPnOPHKseGmsjIXe0nMW7w2GQYTISc6woSe7JXXicI+vMUc=
-X-Gm-Gg: AeBDieuo8SjgCYSif6C+bBnQnLYyCDqtfiON6txsvhJ2q/cpbW2Lx5xZrsbAQV3dKMN
-	U1NU7s1R9BjpC9M6Zne4Q9mnDTCIqhehcNZMStsNxSiSx+XQEC0adK3kq3pf7Uw5w0516WN6XsI
-	fmHuSZQM5km+BljPUtfiiDAVcKOPDMeU8MYRYVKyFK/anQ0K+KHT38zLsu/gO/1uixvOpFAvdSJ
-	Umd8V/AIgscU3EqRLmn2deF0kQN4qzEhBQ/LFjqhK9YWsh0sKVRIG8oDPAoNIrGaXyyatTkpSmV
-	07f6QeFug48sl9l6VOCFBiwoOWzL+WAFerr48cO5uc7hVTTBmfbNe5OWcyLqBxOZ/WoQ0dKbZFr
-	jDKTdAvulg4CahNu4mTSwFdOBclftX7Hfm2dLLFfCnieThH+YpI0+YZigifPjwCZcFa9Dg3QGEi
-	3yLbgrc9aS4B+C9FncNnzXg7AoJobzgQ==
-X-Received: by 2002:a05:6000:184d:b0:43d:e31:68d1 with SMTP id ffacd0b85a97d-43fe3dd958amr47249130f8f.21.1777007864389;
-        Thu, 23 Apr 2026 22:17:44 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4cb1365sm61414871f8f.7.2026.04.23.22.17.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Apr 2026 22:17:43 -0700 (PDT)
-Date: Fri, 24 Apr 2026 08:17:39 +0300
-From: Dan Carpenter <error27@gmail.com>
-To: Longxuan Yu <ylong030@ucr.edu>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-Subject: [bug report] 8021q: delete cleared egress QoS mappings
-Message-ID: <aer889IeBHjL8na0@stanley.mountain>
+	s=arc-20240116; t=1777008233; c=relaxed/simple;
+	bh=AMpqD3jJWGeBhZV7IR4TXunOBsGwB4TmJSwuYV7sTPI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CcQAHqConNVWRikxXUhk1XO0fLizY755EIhy4TlREB1XF5YoL8Z2wBon/0hT/UCIGl/V1d8fWK+Kofa351ZWqic+gvluNZHpRIV1EssknXAIW8tROVFam13j+XJUp2RcdsHKQAc+lqKSYjh1Q7NAoPCPko6Jydp+eWivBjTSKAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=U8bwX7e+; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63NJ0mU13291923;
+	Fri, 24 Apr 2026 05:23:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=cOFHgr5aOL1G48JRBbJNYttBKipfGte8kTv2A3cqD
+	Fs=; b=U8bwX7e+4XiivLMfH216gG6lnhJUdYE8kAIutVlO7Sw9zo+emEr0a36vB
+	5FaOsZSVKrteHR7nOx4n2qTi+AMJW3WuGa3UZkVJ+GGnvpILd7Lue7NwCpSDvjkd
+	Ir5MDw1GsfT9cibVXEJjHdimydoPciX3lkxq0hukbOm7T0Yid5VNcmI9Fb+0YBvJ
+	6X+gGU6BIeJ3/lbP1FnciAYf/dEKWqTTyzhEuB4J+AWRydiNlkODgV7Yfa6mF9Ci
+	C5PSy/jbxltsZ3f8RJgdIr+J1lEa2Tb3ljBrJDwteo9ry5cK7nwb7pRkipc2buWP
+	ZwBH2zm17BOqVpXuTz0HL6LZlP3Ow==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dphfrkkgv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 24 Apr 2026 05:23:43 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 63O5KTp4001297;
+	Fri, 24 Apr 2026 05:23:42 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4dpjky9h5q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 24 Apr 2026 05:23:41 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63O5NcA262325192
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 24 Apr 2026 05:23:38 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1D5FF2004B;
+	Fri, 24 Apr 2026 05:23:38 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D700520043;
+	Fri, 24 Apr 2026 05:23:37 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Fri, 24 Apr 2026 05:23:37 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 56341)
+	id C00E3E09D6; Fri, 24 Apr 2026 07:23:37 +0200 (CEST)
+From: Mahanta Jambigi <mjambigi@linux.ibm.com>
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, alibuda@linux.alibaba.com,
+        dust.li@linux.alibaba.com, sidraya@linux.ibm.com, wenjia@linux.ibm.com,
+        wintera@linux.ibm.com
+Cc: pasic@linux.ibm.com, horms@kernel.org, tonylu@linux.alibaba.com,
+        guwen@linux.alibaba.com, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, Mahanta Jambigi <mjambigi@linux.ibm.com>
+Subject: [PATCH net-next v2] Documentation: net/smc: correct old value of smcr_max_recv_wr
+Date: Fri, 24 Apr 2026 07:23:36 +0200
+Message-ID: <20260424052336.3262350-1-mjambigi@linux.ibm.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Rspamd-Queue-Id: 9B004459E40
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-GUID: Z28CPBAV4-S7sGOdNPTx9zF1f8UI8aMr
+X-Proofpoint-ORIG-GUID: Cygo8PD4LyyGIlXczw7XCXUbFkjUF24f
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI0MDA0NSBTYWx0ZWRfX15fAlfHgG1Tx
+ /RVarDNwhhVzLHDGdGgDpp9WPxFu8izECo8IX2NjKB4BaonpeKHJbe7vmYXIXus15brjuWKpRXe
+ xqIfsiPFej4ngAX8FFdcNAEhq2NRUbdhPGRnK0fAqCP5RF2B1B2fiTe7x65kt6kUIN6lCCCx00u
+ 5eHxpdeczTSiU1aAK2TwJwzZqgOTHOPobQ6ZITHMcCOohwG43HbTc7whZLCCCLOhdf1RR9LLY/X
+ Y4SC5nAKdy66OuVY809+oDRZSO3q5lyPmnLT9n69OULIu7G8P0D0gqi5xlLoxg7Jr3RUZxxOw+k
+ zkk/Valo5PE0y92yFH5pNDpPU2xvPD4EwdSsGvBCtKM1QbHU3wg/tNv2BENwzvOKB6INAWiB7IR
+ h3nkopNlJYX4Swk2cCqySraNCxYRrx4DFkUNQJ6fjXCRggTvlFTbaLxcc3T/mHpleKznUecPk77
+ gRF+O9RdS924qMNs+nA==
+X-Authority-Analysis: v=2.4 cv=SJxykuvH c=1 sm=1 tr=0 ts=69eafe5f cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
+ a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8 a=BZQz5A-QrOPzpkkcf3QA:9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-23_03,2026-04-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 suspectscore=0 malwarescore=0 impostorscore=0 bulkscore=0
+ lowpriorityscore=0 phishscore=0 clxscore=1015 adultscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2604240045
+X-Rspamd-Queue-Id: 3BFCA459E73
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280935-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-280936-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[error27@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[3];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mjambigi@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[ibm.com:+];
+	RCVD_COUNT_TWELVE(0.00)[12];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.ibm.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Hello Longxuan Yu,
+The smc-sysctl.rst documentation incorrectly stated that the previous
+hardcoded maximum number of WR buffers on the receive path (smcr_max_recv=
+_wr)
+was 16. The correct historical value used before the introduction of the =
+sysctl
+control was 48. Update the documentation to reflect the accurate historic=
+al
+value. Also fix a couple of minor typos.
 
-Commit 7dddc74af369 ("8021q: delete cleared egress QoS mappings")
-from Apr 20, 2026 (linux-next), leads to the following Smatch static
-checker warning:
+Fixes: aef3cdb47bbb net/smc: make wr buffer count configurable
+Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+Reviewed-by: Sidraya Jayagond <sidraya@linux.ibm.com>
+Signed-off-by: Mahanta Jambigi <mjambigi@linux.ibm.com>
+---
+v2: Addressed few minor comments from Alexandra Winter.
+---
+ Documentation/networking/smc-sysctl.rst | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-	net/8021q/vlan_dev.c:211 vlan_dev_set_egress_priority()
-	warn: duplicate zero check 'vlan_qos' (previous on line 200)
+diff --git a/Documentation/networking/smc-sysctl.rst b/Documentation/netw=
+orking/smc-sysctl.rst
+index a8b4f357174e..93cc6244f6c8 100644
+--- a/Documentation/networking/smc-sysctl.rst
++++ b/Documentation/networking/smc-sysctl.rst
+@@ -86,7 +86,7 @@ smcr_max_send_wr - INTEGER
+ 	Please be aware that all the buffers need to be allocated as a physical=
+ly
+ 	continuous array in which each element is a single buffer and has the s=
+ize
+ 	of SMC_WR_BUF_SIZE (48) bytes. If the allocation fails, we keep retryin=
+g
+-	with half of the buffer count until it is ether successful or (unlikely=
+)
++	with half of the buffer count until it is either successful or (unlikel=
+y)
+ 	we dip below the old hard coded value which is 16 where we give up much
+ 	like before having this control.
+=20
+@@ -100,14 +100,14 @@ smcr_max_recv_wr - INTEGER
+ 	depending on the workload it can be a bottleneck in a sense that thread=
+s
+ 	have to wait for work request buffers to become available. Before the
+ 	introduction of this control the maximal number of work request buffers
+-	available on the receive path used to be hard coded to 16. With this co=
+ntrol
++	available on the receive path used to be hard coded to 48. With this co=
+ntrol
+ 	it becomes configurable. The acceptable range is between 2 and 2048.
+=20
+ 	Please be aware that all the buffers need to be allocated as a physical=
+ly
+ 	continuous array in which each element is a single buffer and has the s=
+ize
+ 	of SMC_WR_BUF_SIZE (48) bytes. If the allocation fails, we keep retryin=
+g
+-	with half of the buffer count until it is ether successful or (unlikely=
+)
+-	we dip below the old hard coded value which is 16 where we give up much
++	with half of the buffer count until it is either successful or (unlikel=
+y)
++	we dip below the old hard coded value which is 48 where we give up much
+ 	like before having this control.
+=20
+ 	Default: 48
+--=20
+2.51.0
 
-net/8021q/vlan_dev.c
-    171 int vlan_dev_set_egress_priority(const struct net_device *dev,
-    172                                  u32 skb_prio, u16 vlan_prio)
-    173 {
-    174         struct vlan_dev_priv *vlan = vlan_dev_priv(dev);
-    175         struct vlan_priority_tci_mapping __rcu **mpp;
-    176         struct vlan_priority_tci_mapping *mp;
-    177         struct vlan_priority_tci_mapping *np;
-    178         u32 bucket = skb_prio & 0xF;
-    179         u32 vlan_qos = (vlan_prio << VLAN_PRIO_SHIFT) & VLAN_PRIO_MASK;
-    180 
-    181         /* See if a priority mapping exists.. */
-    182         mpp = &vlan->egress_priority_map[bucket];
-    183         mp = rtnl_dereference(*mpp);
-    184         while (mp) {
-    185                 if (mp->priority == skb_prio) {
-    186                         if (!vlan_qos) {
-    187                                 rcu_assign_pointer(*mpp, rtnl_dereference(mp->next));
-    188                                 vlan->nr_egress_mappings--;
-    189                                 kfree_rcu(mp, rcu);
-    190                         } else {
-    191                                 WRITE_ONCE(mp->vlan_qos, vlan_qos);
-    192                         }
-    193                         return 0;
-    194                 }
-    195                 mpp = &mp->next;
-    196                 mp = rtnl_dereference(*mpp);
-    197         }
-    198 
-    199         /* Create a new mapping then. */
-    200         if (!vlan_qos)
-                ^^^^^^^^^^^^^^
-The commit adds this check
-
-    201                 return 0;
-    202 
-    203         np = kmalloc_obj(struct vlan_priority_tci_mapping);
-    204         if (!np)
-    205                 return -ENOBUFS;
-    206 
-    207         np->priority = skb_prio;
-    208         np->vlan_qos = vlan_qos;
-    209         RCU_INIT_POINTER(np->next, rtnl_dereference(vlan->egress_priority_map[bucket]));
-    210         rcu_assign_pointer(vlan->egress_priority_map[bucket], np);
---> 211         if (vlan_qos)
-                ^^^^^^^^^^^^^
-So now this old one could be deleted.
-
-    212                 vlan->nr_egress_mappings++;
-    213         return 0;
-    214 }
-
-This email is a free service from the Smatch-CI project [smatch.sf.net].
-
-regards,
-dan carpenter
 
