@@ -1,215 +1,125 @@
-Return-Path: <netdev+bounces-280997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280998-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0KEVFGh362kQNAAAu9opvQ
-	(envelope-from <netdev+bounces-280997-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 16:00:08 +0200
+	id 8EM9IPt+62lLNgAAu9opvQ
+	(envelope-from <netdev+bounces-280998-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 16:32:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAF8D45FE88
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 16:00:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D63E14603FA
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 16:32:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DE70F30022C3
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 14:00:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 57D1D3007AC8
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 14:28:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB2233DA5BE;
-	Fri, 24 Apr 2026 14:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D9243DC4A1;
+	Fri, 24 Apr 2026 14:28:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nsfc9I4A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tm35pa+h"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9740F3DA5A2;
-	Fri, 24 Apr 2026 14:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49F2C3DA5C1;
+	Fri, 24 Apr 2026 14:28:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777039204; cv=none; b=aK436DzGKWVtm8Rd587Ekk9lTWM1lSODqy/BGYVTqF3/NVJHkso1drcBYbTrxHtUOsYtezZHkdV+kiWUaQUfjEsN9hm5kJcj0jKyuhUe7masU14rk8yKzvl93mpoUeyX/8H4QjuyQ/POvtECWwJAVThHwR67KbrvEago+cHKu5E=
+	t=1777040919; cv=none; b=Sf0sE11txyAPpmYTI1K0Ns4psrpA9qYMN0QG+8PROjzXD5P4dR0PPm4rDy0siwXtlz5mR8No08qn+/oYeEesNLxzQ+eYFpyqGAHvwLkdObf9cEJTLpcJhcowqvuhZlz/hP8OzANOsztgKsg5SxIK9j7Fy9DPta3yjxv9owfHbmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777039204; c=relaxed/simple;
-	bh=RjPXRwAeTtKHltjAE51ItOPdDhf9jKLVKaPyYVF/kmU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qSSY3jr9DGCLPL5kZ+4fFO8Dz1NyKT5NAcuxRTcOh/L1hkTt+utEEJzkOMxpnp3h2tjoHE499/PaAdKyFPMjLAzMweh3elM3mqgblWl+oAXpaYFw5FtsMsBRrN/DzYmRGrwCM+V+2IZgRVyF3p4JMuogutJ/yQ711OPw9eJDHJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nsfc9I4A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79FE5C19425;
-	Fri, 24 Apr 2026 14:00:01 +0000 (UTC)
+	s=arc-20240116; t=1777040919; c=relaxed/simple;
+	bh=5cK6KrlDmS/euLYLqiKC/eqNlSFxvmx1H/+AC2Flb/4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uNO5jIdDJzU/v8JoGYEuxsoHx31Uzf1rGXDw3kUbgP5/UEQcyYtEAOLfaFf0oC9XObhv5xDo1ZfYBAmqn2L83GHhP5rwBaxTjGKu0Lsx28R70YX/LwzOiqZcFCeK5ll99/Fc28YQSxm03LjOnV2lvfs/P3b65kfm+nvg4WkyHVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tm35pa+h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B504EC19425;
+	Fri, 24 Apr 2026 14:28:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777039204;
-	bh=RjPXRwAeTtKHltjAE51ItOPdDhf9jKLVKaPyYVF/kmU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Nsfc9I4AdaKxHCRy2KFb+Y9+EwjnpX/Y3Yee7SewGiwoqUS87ru385v9QS+AC9Tlu
-	 Ev3ri/Dr7iQBhFV+L87rM+SimKLIGXXiM6UYXxJXYsmB/Vp/QaHyqvL4mZkRFAkFxQ
-	 9rCN98ZbQK56Q+a87wdUSZ1mrSU1olCyLjOmPqGFQt+KtgeG0fLKk/zyMepzkf/02g
-	 QZnfzl65gmd34GvAzunuH8Yuc/JYGIcQSKSaAfFPrFgkUImH1kZjq0LkSeyj9r6J4P
-	 P1CnBYb9FuNWtgSbosp6yrG30e0rB5gR6m5tPWIVQdMiLJ9kvAERwJuo140yk0GKsK
-	 DMleeFOSEzqGw==
-Date: Fri, 24 Apr 2026 14:59:58 +0100
-From: Simon Horman <horms@kernel.org>
-To: KhaiWenTan <khai.wen.tan@linux.intel.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	faizal.abdul.rahim@intel.com, hong.aun.looi@intel.com,
-	khai.wen.tan@intel.com,
-	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
-	Looi@web.codeaurora.org
-Subject: Re: [PATCH iwl-next v3 3/3] igc: add support for forcing link speed
- without autonegotiation
-Message-ID: <20260424135958.GL900403@horms.kernel.org>
-References: <20260422155701.7420-1-khai.wen.tan@linux.intel.com>
- <20260422155701.7420-4-khai.wen.tan@linux.intel.com>
+	s=k20201202; t=1777040919;
+	bh=5cK6KrlDmS/euLYLqiKC/eqNlSFxvmx1H/+AC2Flb/4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tm35pa+ham4eETf4/QLKs1RGbPM1SuCNESiibWSSJtnA2to6bx2bDySoAVFBE+e+P
+	 OgYRk4zrnuqy7AUgieSZ0Jxjp+QDHM4ZJhB+WeyVerhYdtC0XtkWQPOZz2Sa6z8icP
+	 PUS/9CZZ+HLMhQG6n9K0os5ExnNRySQ1I6t1E27+o2dBcgJKe9Ga6H9GnqygyLISzh
+	 YYFPBSAt4K4OVPKQU5qtLmuNTGvZpaLyz8KpgzNUzh3wC7Zgudy39cP5ekRTlrOtFs
+	 cTWIreWpKt/M3ZEF6vhHaCOe1UjHAQc1rjJ+Th3J/Dpt6vzxhgMbgx+pCVarQ1NIpd
+	 WidMHTp+EUfcA==
+Date: Fri, 24 Apr 2026 07:28:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Daniel Palmer <daniel@0x0f.com>
+Cc: torvalds@linux-foundation.org, davem@davemloft.net,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
+Subject: Re: [GIT PULL] Networking deletions for 7.1
+Message-ID: <20260424072837.674f9066@kernel.org>
+In-Reply-To: <CAFr9PXnNVL4mUEu19jMu2sPkOucGK7Q32iB-7FY8eUpKZY_XJA@mail.gmail.com>
+References: <20260423235422.1541768-1-kuba@kernel.org>
+	<CAFr9PXnNVL4mUEu19jMu2sPkOucGK7Q32iB-7FY8eUpKZY_XJA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260422155701.7420-4-khai.wen.tan@linux.intel.com>
-X-Rspamd-Queue-Id: DAF8D45FE88
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: D63E14603FA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	R_DKIM_REJECT(0.00)[kernel.org:s=k20201202];
-	TAGGED_FROM(0.00)[bounces-280997-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280998-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:-];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.968];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:email,horms.kernel.org:mid]
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Wed, Apr 22, 2026 at 11:57:01PM +0800, KhaiWenTan wrote:
-> From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+On Fri, 24 Apr 2026 20:14:51 +0900 Daniel Palmer wrote:
+> > ----------------------------------------------------------------
+> > Andrew Lunn (12):
+> >       drivers: net: 3com: 3c509: Remove this driver
+> >       drivers: net: 3com: 3c515: Remove this driver
+> >       drivers: net: 3com: 3c574: Remove this driver
+> >       drivers: net: 3com: 3c589: Remove this driver
+> >       drivers: net: amd: lance: Remove this driver
+> >       drivers: net: amd: nmclan: Remove this driver
+> >       drivers: net: smsc: smc9194: Remove this driver
+> >       drivers: net: smsc: smc91c92: Remove this driver
+> >       drivers: net: fujitsu: fmvj18x: Remove this driver
+> >       drivers: net: 8390: AX88190: Remove this driver
+> >       drivers: net: 8390: ultra: Remove this driver
+> >       drivers: net: 8390: wd80x3: Remove this driver  
 > 
-> Allow users to force 10/100 Mb/s link speed and duplex via ethtool
-> when autonegotiation is disabled. Previously, the driver rejected
-> these requests with "Force mode currently not supported.".
-> 
-> Forcing at 1000 Mb/s and 2500 Mb/s is not supported.
-> 
-> Reviewed-by: Looi, Hong Aun <hong.aun.looi@intel.com>
-> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-> Signed-off-by: KhaiWenTan <khai.wen.tan@linux.intel.com>
+> For the drivers I really don't think enough time was given for people
+> to come out of the woodwork and say they are using one of them and if
+> they'd be willing to maintain it or not.
 
-...
+Real users show up a few releases later. Waiting for more responses on
+the ML has little value.
 
-> diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+> If this does get merged and someone wants to put one of them back will
+> it be as simple as sending a revert?
 
-...
-
-> @@ -2000,6 +2013,41 @@ static int igc_ethtool_get_link_ksettings(struct net_device *netdev,
->  	return 0;
->  }
->  
-> +/**
-> + * igc_handle_autoneg_disabled - Configure forced speed/duplex settings
-> + * @adapter: private driver structure
-> + * @speed: requested speed (must be SPEED_10 or SPEED_100)
-> + * @duplex: requested duplex
-> + *
-> + * Records forced speed/duplex when autoneg is disabled.
-> + * Caller must validate speed before calling this function.
-> + */
-> +static void igc_handle_autoneg_disabled(struct igc_adapter *adapter, u32 speed,
-> +					u8 duplex)
-> +{
-> +	struct igc_mac_info *mac = &adapter->hw.mac;
-> +
-> +	switch (speed) {
-> +	case SPEED_10:
-> +		mac->forced_speed_duplex = (duplex == DUPLEX_FULL) ?
-> +			IGC_FORCED_10F : IGC_FORCED_10H;
-> +		break;
-> +	case SPEED_100:
-> +		mac->forced_speed_duplex = (duplex == DUPLEX_FULL) ?
-> +			IGC_FORCED_100F : IGC_FORCED_100H;
-> +		break;
-> +	default:
-> +		WARN_ONCE(1, "Unsupported speed %u\n", speed);
-> +		return;
-> +	}
-> +
-> +	mac->autoneg_enabled = false;
-> +
-> +	/* Half-duplex cannot support flow control per IEEE 802.3 */
-> +	if (duplex != DUPLEX_FULL)
-> +		adapter->hw.fc.requested_mode = igc_fc_none;
-> +}
-> +
->  /**
->   * igc_handle_autoneg_enabled - Configure autonegotiation advertisement
->   * @adapter: private driver structure
-> @@ -2038,6 +2086,7 @@ static void igc_handle_autoneg_enabled(struct igc_adapter *adapter,
->  						  10baseT_Half))
->  		advertised |= ADVERTISE_10_HALF;
->  
-> +	hw->mac.autoneg_enabled = true;
->  	hw->phy.autoneg_advertised = advertised;
->  	if (adapter->fc_autoneg)
->  		hw->fc.requested_mode = igc_fc_default;
-> @@ -2071,14 +2120,20 @@ igc_ethtool_set_link_ksettings(struct net_device *netdev,
->  		}
->  	}
->  
-> +	if (cmd->base.autoneg == AUTONEG_DISABLE &&
-> +	    cmd->base.speed != SPEED_10 && cmd->base.speed != SPEED_100) {
-> +		netdev_info(dev, "Unsupported speed for forced link\n");
-> +		return -EINVAL;
-> +	}
-
-The condition above verifies speed only if autoneg is AUTONEG_DISABLE.
-
-> +
->  	while (test_and_set_bit(__IGC_RESETTING, &adapter->state))
->  		usleep_range(1000, 2000);
->  
-> -	if (cmd->base.autoneg == AUTONEG_ENABLE) {
-> +	if (cmd->base.autoneg == AUTONEG_ENABLE)
->  		igc_handle_autoneg_enabled(adapter, cmd);
-> -	} else {
-> -		netdev_info(dev, "Force mode currently not supported\n");
-> -	}
-> +	else
-> +		igc_handle_autoneg_disabled(adapter, cmd->base.speed,
-> +					    cmd->base.duplex);
-
-But here igc_handle_autoneg_disabled, which relies on speed having been
-verified, is called if autoneg is not AUTONEG_ENABLE.
-
-If autoneg is AUTONEG_DISABLE here, then all is good.
-But if it is neither AUTONEG_DISABLE nor AUTONEG_ENABLE then we
-are in trouble.
-
-I suggest verifying autoneg is either AUTONEG_ENABLE or AUTONEG_DISABLE
-earlier in this function.
-
-The above is based on my analysis of review AI generated review from Sashiko.
-I believe that addressing autoneg verification address the review by
-Sashiko that is relevant to the progress of this patch.
-
-...
+For the users? Normally they just send an email and we handle 
+the reverts. It happened multiple times in the past, we remove 
+a few drivers in each release.
 
