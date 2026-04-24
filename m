@@ -1,191 +1,247 @@
-Return-Path: <netdev+bounces-281018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281019-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 3DAtKGuY62lSPAAAu9opvQ
-	(envelope-from <netdev+bounces-281018-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:20:59 +0200
+	id qDyELe+Y62lSPAAAu9opvQ
+	(envelope-from <netdev+bounces-281019-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:23:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D48CA46141D
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:20:58 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F0DE461452
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:23:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B4149301411A
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 16:20:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 55362300C938
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 16:23:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 267C53DB652;
-	Fri, 24 Apr 2026 16:20:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D9703E1223;
+	Fri, 24 Apr 2026 16:23:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=animalcreek.com header.i=@animalcreek.com header.b="qr4ABPVY";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Ihkj5RWx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XaOX3lfh"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE603C3452;
-	Fri, 24 Apr 2026 16:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777047655; cv=none; b=dPE2xbx4oJ3Xd5p6iFsqIpqTemusKe/+5mLjtYBQqYep6RzamcZu24RkqEInv+yDpfaYsOv1mKywD7aXbNh8nrGaADA/WFdh8PEvvlDHOzLhm7vr9wM5VoEP1InWQTK48r6SFGQBPTJN05btwOQWFL1czgLx2KjoH68uF7ndZ3c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777047655; c=relaxed/simple;
-	bh=1IqN3myNGyn5/4h0I7QYnz3X9j3NjD0M7B3fzq6u5iA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e2FLI+a21D5aaxWKj6QJcyy0bNt3J9H5lqulvqb+8ZQEyOPBQTc9Ov6ZhHftFdJBZr1Ut3m1alEjcawtiQKP5rJZOHgiU5HUDdEaJw6yG2fksm9sZkrqFn192qA4yPfzY8s9PFn5uaEfRa95400nveD5MRV/uUTz5daPwrVyMwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=animalcreek.com; spf=pass smtp.mailfrom=animalcreek.com; dkim=pass (2048-bit key) header.d=animalcreek.com header.i=@animalcreek.com header.b=qr4ABPVY; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Ihkj5RWx; arc=none smtp.client-ip=202.12.124.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=animalcreek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=animalcreek.com
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.stl.internal (Postfix) with ESMTP id 27C891D0018A;
-	Fri, 24 Apr 2026 12:20:52 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Fri, 24 Apr 2026 12:20:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=animalcreek.com;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm3;
-	 t=1777047651; x=1777134051; bh=LVq2Kle+d/Y+s8+bCyU5/Eq5sWVprcwc
-	qu5fxzL/SA0=; b=qr4ABPVY2RkcECGGD8eFZH1q1LrnWqK0e3l7XmXxnQ94VQqu
-	6voxw1I0W/qLeQZtCyP93cRJYLEDWsjYjc/Ba2zIRKMO8/nfWtDj/GgenhBg6oCs
-	ToPMyHSUTmboXy2QMBhcZrJibFTWLwU82qz40EGwdV8KKdB2TLLlRT/t8xpA7DzN
-	KxNszKKEadpDpUk5UpcCpVi3LUAuzGhINSQIvZSF0X6igeBSkEAfZEoaXzwFdpOn
-	Z+8StpEltJMqbpdxl9fIjdb59iC6RZ1/QIbW3S67CAon/ZgAZ0Z9CXiKmTDhISgm
-	sDxxJMcfQ5o/nTKBOIwN3IJPtVCO9ksL2OaUsg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1777047651; x=
-	1777134051; bh=LVq2Kle+d/Y+s8+bCyU5/Eq5sWVprcwcqu5fxzL/SA0=; b=I
-	hkj5RWxKSeKr45/vvp+bOY3+Ld1/rDtDDNLIZ7Dye417ajQz/s6tXevPY7DQuV+N
-	nzfymizGIHJ9K2UD8LPSUkcYOPNL4tXUsDUyRHcytueWSqH04NBmbL/SmUmTIAep
-	VlFou40B4cFFNdYUVm7U/r4YztTdj5TuCgXd8PzRK1r465nQyzkIrJijM/ZQXYea
-	R+c/tgdNnB8vlFu9xN90ESWj31SGQHKv0zaBE8oOCDDsVCkweObHKwiWhS8VPFHe
-	u/p0iQJ5soitAXOEoYrDsZdzdUwCbMaOskBuysSGlmAIoStnARQ/JvXt5p9zrKiA
-	AWvxiGx7yuvc2hpaGxu/A==
-X-ME-Sender: <xms:Y5jraRupid-aT-GnFYzOuSMPWZZLb56laterazZhVwt6kiKjlee7UA>
-    <xme:Y5jraZg92Li_Ht_O4Mtzjiwr76mTAi_P6suseaBswEnb67N6rUVTO0HUInQJPmITv
-    BaI97v3Q0wF2cNEAN4WGz2XTH82uS0aCuMhK6Wvc_UxK6wgJufOOYk>
-X-ME-Received: <xmr:Y5jraa-HFSdFwzMREf8oExpIm0-TA_aNeJZbCrBIxKJ24JGQ9fgxhlkUYM2GHgF_OCvTytztkbJrq858JDOk5FfPCAGT>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdejtdehtdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefkffggfgfuvfevfhfhohgjtgfgsehtjeertddtvdejnecuhfhrohhmpeforghrkhcu
-    ifhrvggvrhcuoehmghhrvggvrhesrghnihhmrghltghrvggvkhdrtghomheqnecuggftrf
-    grthhtvghrnhephfduteehueffkeelfeefkeefjeeuffdtuedvffeftdettdfhleduvddu
-    tdefheeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epmhhgrhgvvghrsegrnhhimhgrlhgtrhgvvghkrdgtohhmpdhnsggprhgtphhtthhopeej
-    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehprghulhdrghgvuhhrthhssehprh
-    houghrihhvvgdqthgvtghhnhholhhoghhivghsrdgtohhmpdhrtghpthhtohepshgrmhgv
-    oheslhhinhhugidrihhnthgvlhdrtghomhdprhgtphhtthhopehlihhnuhigqdifihhrvg
-    hlvghsshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhes
-    vhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlh
-    esvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehmrghrthhijhhnrdguvgdr
-    ghhouhifsehprhhoughrihhvvgdqthgvtghhnhholhhoghhivghsrdgtohhmpdhrtghpth
-    htohepmhhgrhgvvghrsegrnhhimhgrlhgtrhgvvghkrdgtohhm
-X-ME-Proxy: <xmx:Y5jraUsdT0jL6MLd8sfKFnEw10lHU0gR1Gdqqhu1INX2tyKmBnrYzw>
-    <xmx:Y5jraWppYxFxR-1mNc64JXvsREAIckp3NOKi_Ag7HGiwlBySvo1VPQ>
-    <xmx:Y5jraQocebJFWW-TzE3WT4Q28mvQgXDcUDTrGxdudTZ2tWvrpDE5Aw>
-    <xmx:Y5jradY8vdRgphujM9TRUV3I7N3XfFf5IQxYZY0p9xFb9JAngBePqA>
-    <xmx:Y5jraSAqwnYdx8tvNd-cQ0rVkAaSgT78_nXthbO-ytNkGWEDfvjvA9Aa>
-Feedback-ID: i9cc843c7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 24 Apr 2026 12:20:50 -0400 (EDT)
-Message-ID: <19fae358-acc4-4b9e-8dec-b83af066a97d@animalcreek.com>
-Date: Fri, 24 Apr 2026 09:20:50 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24ADB3CFF52
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 16:23:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.172
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777047785; cv=pass; b=Nj08SvR6zSzS4ao8tuo10bQlkUFoxu3ara0XFLbJDBcYQT+kT1pgIfJJtMXhkIQIK2nZp+WuMbEaaNlDVuNe83d2Ryq3TMMfV8+Rbf3AxXtiQu8DmEjIsAzViq6s2bPnDbijmcyw9PEagDHKeBpgO1BFskBvjcw+y7CrMCApWQk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777047785; c=relaxed/simple;
+	bh=3m4VXaMs4n4EPq3GLOSR3itDAfPEZGkQPOTO8GJSpCY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q3KTjQYLjjf4L8k7wtgRvhUHsAZfownA+WoDV7Urlh3xC+Kc9TVXNOr/bRqbT4rDtk+3cHUw+DOIv+KQL1kFHjK3SeZvZaVEq6rEHqqxjlJjpmc7PMM4GbuJA/AWoNysQF1icmlrAnfEYEkCpcaGh+0K5L83Pokv/FSiPpWzjN8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XaOX3lfh; arc=pass smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2aae146b604so54000755ad.3
+        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 09:23:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777047782; cv=none;
+        d=google.com; s=arc-20240605;
+        b=JP8i7ezwk20ekauC6GjDBY5NsX223yuIP43w/X/1EvvSOT7XxhEZ0oO7e8StDeW0op
+         0LR4kqwbqzaeWchhUechzQBFh3iHdgwVBqXW9lhSN86r0A8oo2yTIdsBGX2jjko88C9T
+         Gggu4d/bM3e9bBxG5j/EiomEli72nWuHNgwk72DjlmB0CrhdbXvINl01zuW0q70F23e7
+         jSsAsf3aT24W664A4+OIfsgY0mpRuzuwnf2iggAEZIul8sNtwOprMeWWjujO1ACSMiKt
+         acPbjLS5BNRoBKM/rKMvfFzquVgU18aC94KnhdE9/3RKlkziJGVrepWotAYEobZGr9eH
+         MLLQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=uZSOT1Xpo8svsF0lfHeXNdp2/Y1pp+xVy0pY5P0ySGQ=;
+        fh=c9dAXvwCgMiqHUqvGQII8kt4P6bp3M04Y7KOP1qyXn8=;
+        b=edG+edE1HkEkTqCG4f6scq2ArY1ZU/3lpFUqODFsXcDUpDF/74KubP7VlptSBrF2nI
+         BOSLrYwvfFjK3wWJFVai+zsyCEkSN4h4ia7CqzyNDvM4X5qWJ0lmJddMDuM4BFbt7oV/
+         uGRrrdVO7SEQaXat6pekBzTs7WwXfC53aboD3PkxQ+3WuHwRfcypU5KiilF32XsQvpJC
+         og0tJQuuIGaoz7KTDl/9oD7fG4Q8dPGgPm8E+6Vuf2XiFypshqTRb9i39jnUVGTkmjpk
+         fgRlVT4zk9PJw8SPWTrzkWg9Y0wFH26Bzf3ZrgXjTR3qqxXYUDI19gOhtB3CTcQAbv01
+         berA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777047782; x=1777652582; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uZSOT1Xpo8svsF0lfHeXNdp2/Y1pp+xVy0pY5P0ySGQ=;
+        b=XaOX3lfhIPP1oCKWEcYqGQIlR4o33LR6uIcpT+k4JsMHw+fqDi7zAEpJEYW275teDS
+         kc2ALhpBkWbeF7GVyEjyNuRaJskgpONreNAq1Fp20smkPNjqn5vuozbNwvanDYJPlSHx
+         XUKNdEW3sj0uv4CxFVi6ZDu00/4aODwkPj/yYL/YvnPTlhiPRoePnqZ20bh5yUAq7uIH
+         tMMfNvMxYMhxQEZcnCHtHPHtBhayjRpSuj08XTjYsapWi8RqgO5uOg16gDyYXCuvuTNd
+         ZTvG9MO0afLoLf8qyyemi5/Wf9ZJYjNODXGPGSx2aFqfxoxuwPl0PymRYUC1aL6QSTt7
+         jVRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777047782; x=1777652582;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=uZSOT1Xpo8svsF0lfHeXNdp2/Y1pp+xVy0pY5P0ySGQ=;
+        b=JlpkRZT+fHDsI7b2W+MmsN6CtEiO0377OQMDSfr9Hj4yDDeXK8GvWNZ58x4w1YrezS
+         aD49SWmfwpM3TPFvXvqi52mSdCiM7FqiQLqTVssrRJleLQ68A0Q/o5Bfn9eWapbip4r4
+         4x3C2ly+EoQanP11g7VIV+cO8ZbLEWFnKpSKxL7MljPyvSJ7jZrwNWLYSLHgAOH8iQNL
+         Q8rALrKD2A70yDMtIOSnDG3R3PVIvR4f0Co7lhARJcTIyFC8GVY1GiB170kx704Q4Stu
+         S3INISu0Y1Ovhf+V8xh03X7W1Wvav15lTrPZSgbITLRn6AEg4k6rc7FQUrPFbO/ZTn1U
+         MmKw==
+X-Forwarded-Encrypted: i=1; AFNElJ9u6yYDAkD83X4B7FCrLglTfm8bThnXhoe2bQCmRck5PYwreiDDMZiNEv7fzQFRa8Rvj6eNs5k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1mKVo2i0rFSuMTADlkAW/2gOMAP2ZMDPpyTVQUmi+GPel2vQn
+	UZLxHhm8Qs6xCi++yUh3LzQLBN6JI+w0P7aW2cWlbgM2Ao06OcHp72Qwn6pv8JpIenFZ2sR54TA
+	hbeUWXhVGRwKOhDIE/Ip0/M/2gbOjVaM=
+X-Gm-Gg: AeBDieuy6ocBLGVID53SikJspfaXVhi9E9ZIxpqixHZalmChszfAaMtLJ1Ua5xRavpN
+	ypFiVbpTB/1QZF7LyP7ulxYt1amR9tDfMJcD7ujdHVRuGcmrdV9Db4zgicb9FI1Sfzt3aq98AYJ
+	8zwFZ6Jx6QMspTbhHGEFr9Lf+FFbfpuey3a1DWJWuYRqyaC2TFY5Nygkvfw+6/EMDGgtrw74eUJ
+	RzTMaGQHWHKIZRIbCAB+5Srk2Fs974QA6pZZAk6NuDWCvz35a5Uhab4Ih+FtJ28/PpH2foU015/
+	eVCkNnLUEs10pSG8dg==
+X-Received: by 2002:a17:903:3db3:b0:2b2:58a2:c8a with SMTP id
+ d9443c01a7336-2b5f9d68827mr230869715ad.0.1777047782298; Fri, 24 Apr 2026
+ 09:23:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] NFC: trf7970a: Ignore antenna noise when checking for RF
- field
-To: Paul Geurts <paul.geurts@prodrive-technologies.com>,
- sameo@linux.intel.com, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: martijn.de.gouw@prodrive-technologies.com
-References: <20260422100930.581237-1-paul.geurts@prodrive-technologies.com>
-Content-Language: en-US
-From: Mark Greer <mgreer@animalcreek.com>
-Organization: Animal Creek Technologies, Inc.
-In-Reply-To: <20260422100930.581237-1-paul.geurts@prodrive-technologies.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: D48CA46141D
+References: <20260421221016.2967924-1-ameryhung@gmail.com> <20260421221016.2967924-2-ameryhung@gmail.com>
+ <CAEf4BzZGg1EKwYFG6QKrkNbiE6RwWKew_Zz8mz9rjshKjWzcKA@mail.gmail.com> <CAMB2axMw7mOs8kTFZG8Z1wn8fX4D0Si3Ge4F58DXKkBBQwrjyw@mail.gmail.com>
+In-Reply-To: <CAMB2axMw7mOs8kTFZG8Z1wn8fX4D0Si3Ge4F58DXKkBBQwrjyw@mail.gmail.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Fri, 24 Apr 2026 09:22:49 -0700
+X-Gm-Features: AQROBzA4gxdMlVVwbP4QziFaumqbNPLGu0rKNfr3k9Zf5X-mR78Ckn8Sj18mJ3I
+Message-ID: <CAEf4BzZ1LjRhh2DyQ8gPNKDh9fY+yOJrH0Ly9RoakBL2nOuxaw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 1/9] bpf: Unify dynptr handling in the verifier
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, eddyz87@gmail.com, memxor@gmail.com, 
+	martin.lau@kernel.org, mykyta.yatsenko5@gmail.com, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 1F0DE461452
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[animalcreek.com:s=fm3,messagingengine.com:s=fm2];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281018-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-281019-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[animalcreek.com];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[animalcreek.com:+,messagingengine.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mgreer@animalcreek.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andriinakryiko@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com]
 
+On Thu, Apr 23, 2026 at 10:34=E2=80=AFPM Amery Hung <ameryhung@gmail.com> w=
+rote:
+>
+> On Thu, Apr 23, 2026 at 5:04=E2=80=AFPM Andrii Nakryiko
+> <andrii.nakryiko@gmail.com> wrote:
+> >
+> > On Tue, Apr 21, 2026 at 3:10=E2=80=AFPM Amery Hung <ameryhung@gmail.com=
+> wrote:
+> > >
+> > > Simplify dynptr checking for helper and kfunc by unifying it. Remembe=
+r
+> > > the initialized dynptr (i.e.,g !(arg_type |=3D MEM_UNINIT)) pass to a
+> > > dynptr kfunc during process_dynptr_func() so that we can easily
+> > > retrieve the information for verification later. By saving it in
+> > > meta->dynptr, there is no need to call dynptr helpers such as
+> > > dynptr_id(), dynptr_ref_obj_id() and dynptr_type() in check_func_arg(=
+).
+> > >
+> > > Remove and open code the helpers in process_dynptr_func() when
+> > > saving id, ref_obj_id, and type. It is okay to drop spi < 0 check as
+> > > is_dynptr_reg_valid_init() has made sure the dynptr is valid.
+> > >
+> > > Besides, since dynptr ref_obj_id information is now pass around in
+> > > meta->bpf_dynptr_desc, drop the check in helper_multiple_ref_obj_use.
+> > >
+> > > Acked-by: Eduard Zingerman <eddyz87@gmail.com>
+> > > Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> > > ---
+> > >  include/linux/bpf_verifier.h |  12 ++-
+> > >  kernel/bpf/verifier.c        | 178 +++++++--------------------------=
+--
+> > >  2 files changed, 41 insertions(+), 149 deletions(-)
+> > >
+> >
+> > [...]
+> >
+> > > @@ -7433,7 +7426,8 @@ static int process_kptr_func(struct bpf_verifie=
+r_env *env, int regno,
+> > >   * and checked dynamically during runtime.
+> > >   */
+> > >  static int process_dynptr_func(struct bpf_verifier_env *env, int reg=
+no, int insn_idx,
+> > > -                              enum bpf_arg_type arg_type, int clone_=
+ref_obj_id)
+> > > +                              enum bpf_arg_type arg_type, int clone_=
+ref_obj_id,
+> > > +                              struct bpf_dynptr_desc *dynptr)
+> > >  {
+> > >         struct bpf_reg_state *reg =3D reg_state(env, regno);
+> > >         int err;
+> > > @@ -7499,6 +7493,20 @@ static int process_dynptr_func(struct bpf_veri=
+fier_env *env, int regno, int insn
+> > >                 }
+> > >
+> > >                 err =3D mark_dynptr_read(env, reg);
+> >
+> > if mark_dynptr_read() fails, should we exit instead of proceeding to
+> > fill out dynptr info?.. even if mark_dynptr_read() cannot fail because
+> > of is_dynptr_reg_valid_init(), it still looks wrong and error-prone
+>
+> I think I will change mark_dynptr_read() to receive spi from the
+> caller and make the function return void (It is technically nofail
+> after liveness tracking code is removed). Then, move dynptr_get_spi()
+> before it and don't error out. A comment seems to be enough.
 
-On 4/22/26 3:09 AM, Paul Geurts wrote:
-> The main channel Received Signal Strength Indicator (RSSI) measurement
-> is used to determine whether an RF field is present or not. RSSI != 0
-> is interpreted as an RF Field is present. This does not take RF noise
-> and measurement inaccuracy into account, and results in false positives
-> in the field.
-> 
-> Define a noise level and make sure the RF field is only interpreted as
-> present when the RSSI is above the noise level.
-> 
-> Fixes: 851ee3cbf850 ("NFC: trf7970a: Don't turn on RF if there is already an RF field")
-> Signed-off-by: Paul Geurts <paul.geurts@prodrive-technologies.com>
-> ---
->   drivers/nfc/trf7970a.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/nfc/trf7970a.c b/drivers/nfc/trf7970a.c
-> index d17c701c7888..08c27bb438b5 100644
-> --- a/drivers/nfc/trf7970a.c
-> +++ b/drivers/nfc/trf7970a.c
-> @@ -317,6 +317,7 @@
->   #define TRF7970A_RSSI_OSC_STATUS_RSSI_MASK	(BIT(2) | BIT(1) | BIT(0))
->   #define TRF7970A_RSSI_OSC_STATUS_RSSI_X_MASK	(BIT(5) | BIT(4) | BIT(3))
->   #define TRF7970A_RSSI_OSC_STATUS_RSSI_OSC_OK	BIT(6)
-> +#define TRF7970A_RSSI_OSC_STATUS_RSSI_NOISE_LEVEL	1
->   
->   #define TRF7970A_SPECIAL_FCN_REG1_COL_7_6		BIT(0)
->   #define TRF7970A_SPECIAL_FCN_REG1_14_ANTICOLL		BIT(1)
-> @@ -1300,7 +1301,7 @@ static int trf7970a_is_rf_field(struct trf7970a *trf, bool *is_rf_field)
->   	if (ret)
->   		return ret;
->   
-> -	if (rssi & TRF7970A_RSSI_OSC_STATUS_RSSI_MASK)
-> +	if ((rssi & TRF7970A_RSSI_OSC_STATUS_RSSI_MASK) > TRF7970A_RSSI_OSC_STATUS_RSSI_NOISE_LEVEL)
->   		*is_rf_field = true;
->   	else
->   		*is_rf_field = false;
+yep, makes sense
 
-Given that false positives are happening in the field and assuming that 
-a value of 1 is enough to filter out those false positives, this seems 
-like a reasonable solution.
-
-Reviewed-by: Mark Greer <mgreer@animalcreek.com>
+>
+> /* Cannot fail as we already make sure reg is valid dynptr */
+> spi =3D dynptr_get_spi(env, reg);
+>
+> mark_dynptr_read(env, reg, spi);
+>
+> >
+> > > +
+> > > +               if (dynptr) {
+> > > +                       struct bpf_func_state *state =3D bpf_func(env=
+, reg);
+> > > +                       int spi;
+> > > +
+> > > +                       if (reg->type !=3D CONST_PTR_TO_DYNPTR) {
+> > > +                               spi =3D dynptr_get_spi(env, reg);
+>
+> ^ move this up
+>
+> > > +                               reg =3D &state->stack[spi].spilled_pt=
+r;
+> > > +                       }
+> > > +
+> > > +                       dynptr->id =3D reg->id;
+> > > +                       dynptr->type =3D reg->dynptr.type;
+> > > +                       dynptr->ref_obj_id =3D reg->ref_obj_id;
+> > > +               }
+> > >         }
+> > >         return err;
+> > >  }
+> >
+> > [...]
 
