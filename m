@@ -1,217 +1,188 @@
-Return-Path: <netdev+bounces-281010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281011-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iKv3H6WS62lGOgAAu9opvQ
-	(envelope-from <netdev+bounces-281010-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:56:21 +0200
+	id OPsrKP+S62lGOgAAu9opvQ
+	(envelope-from <netdev+bounces-281011-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:57:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE99C4610EC
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:56:20 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42DE3461112
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:57:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 42F5D3008D0D
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 15:56:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A1F3E3006B45
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 15:57:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FAEE3C2794;
-	Fri, 24 Apr 2026 15:56:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9530F3D564E;
+	Fri, 24 Apr 2026 15:57:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NZhC0SGd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ajfozHwD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF0EB3CF697
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 15:56:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E24F1DED5B;
+	Fri, 24 Apr 2026 15:57:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777046169; cv=none; b=ILiXLSajOAV1u44PXfCfpu5dm4F0ZlNE1Gxh9u1AYRuwYlhzjWjeU6BMP0OwcIieRy/BWkrhmitwLBss8OMOiwdcqNNiaAJ7Dx22tYzvj4reEF/l21jscnCzV7sE74/V+dihHmxkZxLPHEmPWT82/vQWDCBhnAAjuxX1f3AGskU=
+	t=1777046267; cv=none; b=fHlddOl9rDzcTI3iweNdh2/A0a3gcyDUwndX0+yYkehoFwPlG394VWDZsxJ4oY79w9JUsx8zRpsJJfsqCF7KcTNfaaXfxByFk2H6jI8GFw5RPl5mswihr2Ei83UqmHgDOJWkKjF1QwNrU7wTw/cnLiIWfscyjU8t+9I3xc79edU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777046169; c=relaxed/simple;
-	bh=8/pA7xf/cW18UNiyVoPNBFYLDRY5aiSy+Q13RphUShg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mmqkeEIWR1aKG0U55n6g/709gqsd6cmx+DcDiKoBa/qhwoe61BGKo6Q+4XjCbrIvJzdS30Os5YDiVUPnLI2n/BfwhOSJBvkroWZGRAoNz6WSvUDqv1TIk4WOjw9DXPorfbUP+tDqZqNgmHeI4Nqxts/FQlj97k7S+JSDLR9OtCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NZhC0SGd; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-c7971d0d97dso4739295a12.1
-        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 08:56:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777046167; x=1777650967; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=M6apAuausA1UMgxW+RA+bbqT9q3F9cbab1NfTivqhaU=;
-        b=NZhC0SGdXHWnQ15lirxbe7C9HBMFzZXG3eciYRML0F4BmkKSHpfaHS9Aub5fOoZfc7
-         rPAatT8qS+S9ZU7TekpNFsXU+66mMuAGibTuQlPGd6a0uchnVUGzvLI+wQihFJ3kiLnD
-         NiYUck204rdTtz41xGFuJPPtLWmcpNQ79671hC7xWlF0VcbHJyN2ewFBTnoXUeTbU2Tf
-         h3SeSLiKLL0k19hF7kzFJDQbr+vy+8UzCdq7B+Zb/KRhtkdWlCfaLMWPo+8aSf1gmy9A
-         4Wo0hW8uub0un4nI4zaNe1NFtMxQ1n0r+8d0v4oVr2xWrR07GW+kk0bmNzcafPwQJdxk
-         vw0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777046167; x=1777650967;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=M6apAuausA1UMgxW+RA+bbqT9q3F9cbab1NfTivqhaU=;
-        b=DfnY35xTn8aBje3Yh6wKsVnZYMpLTTgHOX09r2MOM93HrZphLu4LHaVHgFgQIcE881
-         DqmokwTLba15uAk7ra+RbG7LB0Dh4wnfAHU3q4Fs7FFXJo7o5CFUwGFihXYxASldZiLO
-         MYgGKa3gwlL/38WOlJnWc8VBXwZ4QHOw/eS4t7Txi6ZRErwB48412nm55tflhhNHKgNz
-         Ycd4elnog1P/Yv2v+R79uwNTgFlk3KnXL4VtfzceFs/xXZ7aI26M7FrUKeBmUadkHkqo
-         6dzmMVdxZOTyuFZi9TDLgcA62CEbGlfpyQ6iKGcwrC641bV3tbo/fmBHlQNOnXiV4+cw
-         3Lkg==
-X-Forwarded-Encrypted: i=1; AFNElJ9nGABIEXX3VAW58V8iGd8BWdIQ/upkNbxNNkxG9pxU6xTv6NL/1xMTjIeS86KFPbTFMFHb3/s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzT5JtFBr1Gw9BeMAlS0Vv2a6lmyi5XkVwLQ0rncRd6mtLbNZNS
-	L3HbuA4XXrDSHgEHlCWvEJ6pGJdjMFb2wEFQOmeSUO9KhKrAScRW5pi4IfLlhQ==
-X-Gm-Gg: AeBDieuMG+6HrSRm3uvnmauGmn+eh2j0M2qS/tIjsiptQPOrCWXykD5qbc3aclR/JH2
-	VRcKYT03NL/H+SERDD1nqyZlZTxRDEDFeORWMSlMrixD4ucJ4KkGkBIBRPyy+7D+BGjPZaRTOCp
-	OcKVAb+HrV8TrfU8J0+xXEI5zs2W2pxNmDMt1DLz50V2sMlGtu3G+wqAaUGgZW90FopEcllqJjJ
-	2Ln9owEc9HvQS9EKB5tktdWVqRbmDz7gwh0poNr8r+0/uuhWIKE2K3I9AUPskYNPhAjmiTeWfmM
-	/CZE+Wkv2RmejY/YCzlimUVZYjzUvcCJ7Anm5CPeckm/77ld1TtSVlX7FdLADylJnxn0yrhtDq2
-	a5wFRnTdkWBMcOkbTL+Sz/1qp1YVLakuw3gode/YeCIBVKtuGkPsslYts3yh/cOWyAR2LXPS2zs
-	HAB3jmncrIXMKiP1r5EJ5vM61+Yss2k0YqRU6ZhesjJazN7XBwRWz8cCxHHVDR5Zx0aHztkJM2/
-	8Ai3tqrLg0uUJhjmCQzZA==
-X-Received: by 2002:a05:6a20:9149:b0:3a2:dfb2:f03d with SMTP id adf61e73a8af0-3a2dfb2fe0cmr24796895637.56.1777046167242;
-        Fri, 24 Apr 2026 08:56:07 -0700 (PDT)
-Received: from [192.168.0.5] (124-218-201-66.cm.dynamic.apol.com.tw. [124.218.201.66])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f8ec037e1sm28692658b3a.54.2026.04.24.08.56.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Apr 2026 08:56:06 -0700 (PDT)
-Message-ID: <ca04bbdf-c964-478e-9ab0-cf5ee5452348@gmail.com>
-Date: Fri, 24 Apr 2026 23:56:03 +0800
+	s=arc-20240116; t=1777046267; c=relaxed/simple;
+	bh=qO/MAUTAHfRFlyhPD2rItuN3QmG4P8rtxuTLbkxNwL0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JmsT/jq26HBpxr2QofPWP7j6OCG74VoZYZYRz0K8pR7nNuSaHcDzA8ABv1ZVHOTwZO/ncQpwAIY0Ff1mUGMSWhXRFfVjSKN7Ihq+S0sZZAc4JslppF/gpgS3FR+4jIbnoJUYJY8lXWFUoS50mYdlf1xk0YCqPyMPcu308pk15dA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ajfozHwD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84C95C2BCB6;
+	Fri, 24 Apr 2026 15:57:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777046267;
+	bh=qO/MAUTAHfRFlyhPD2rItuN3QmG4P8rtxuTLbkxNwL0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ajfozHwD1fCyxVIfcezb1FBnsxwPft4s+SO1HNKvMY5sayIllGVwXOVtVSslBiMZF
+	 iBATPF8Gcw9+n7ropEBl/64VF34ptpNInOVsEsJkrETPnxJJKygFlN1VYMgsTk/aYJ
+	 gYUvbgp7JalTMlmRCPOXSELTijM0xY26ZJKLVNhvwHiNjYbLxtQV/g5iAlxMKVWK29
+	 RGgC4BQzNUj5QUpG0M5muBCkcgoXJy+cqEnzLKsOM+NOcQcatVhMlBI26zUciOzkDE
+	 k9Zm/lBjzIrlUV4Mjw8X3a4NKdoQ0/dEMltXuRb3fUxMSZ+xWpW5L0buiDsXXrS+bR
+	 AlN0XSo5XZv8Q==
+Date: Fri, 24 Apr 2026 17:57:43 +0200
+From: Frederic Weisbecker <frederic@kernel.org>
+To: Waiman Long <longman@redhat.com>
+Cc: Thomas Gleixner <tglx@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Long Li <longli@microsoft.com>, Guenter Roeck <linux@roeck-us.net>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun@kernel.org>, Uladzislau Rezki <urezki@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang@linux.dev>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	Ingo Molnar <mingo@kernel.org>,
+	Chen Ridong <chenridong@huaweicloud.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+	Valentin Schneider <vschneid@redhat.com>,
+	K Prateek Nayak <kprateek.nayak@amd.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, cgroups@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-hyperv@vger.kernel.org,
+	linux-hwmon@vger.kernel.org, rcu@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Costa Shulyupin <cshulyup@redhat.com>,
+	Qiliang Yuan <realwujing@gmail.com>
+Subject: Re: [PATCH 03/23] tick/nohz: Make nohz_full parameter optional
+Message-ID: <aeuS98a-u899PBmR@pavilion.home>
+References: <20260421030351.281436-1-longman@redhat.com>
+ <20260421030351.281436-4-longman@redhat.com>
+ <875x5kd88d.ffs@tglx>
+ <3b796360-81e4-4f90-9b19-8a9f21cbac07@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] net: phy: air_en8811h: add AN8811HB MCU
- assert/deassert support
-To: Paolo Abeni <pabeni@redhat.com>, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- bjorn@mork.no
-Cc: ericwouds@gmail.com, frank-w@public-files.de, daniel@makrotopia.org,
- lucien.jheng@airoha.com, albert-al.lee@airoha.com
-References: <20260420134506.35164-1-lucienzx159@gmail.com>
- <2f6fd850-e187-4e63-9a32-6b4b72c09905@redhat.com>
-Content-Language: en-US
-From: "Lucien.Jheng" <lucienzx159@gmail.com>
-In-Reply-To: <2f6fd850-e187-4e63-9a32-6b4b72c09905@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: AE99C4610EC
+In-Reply-To: <3b796360-81e4-4f90-9b19-8a9f21cbac07@redhat.com>
+X-Rspamd-Queue-Id: 42DE3461112
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281010-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,public-files.de,makrotopia.org,airoha.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_TO(0.00)[redhat.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,vger.kernel.org,mork.no];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,cmpxchg.org,suse.com,lwn.net,linuxfoundation.org,arm.com,microsoft.com,roeck-us.net,nvidia.com,joshtriplett.org,gmail.com,goodmis.org,efficios.com,linux.dev,linutronix.de,huaweicloud.com,infradead.org,redhat.com,linaro.org,google.com,suse.de,amd.com,davemloft.net,vger.kernel.org,lists.infradead.org];
+	TAGGED_FROM(0.00)[bounces-281011-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[52];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lucienzx159@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[frederic@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
+Le Tue, Apr 21, 2026 at 10:14:09AM -0400, Waiman Long a �crit :
+11;rgb:2e2e/3434/3636> On 4/21/26 4:32 AM, Thomas Gleixner wrote:
+> > On Mon, Apr 20 2026 at 23:03, Waiman Long wrote:
+> > > To provide nohz_full tick support, there is a set of tick dependency
+> > > masks that need to be evaluated on every IRQ and context switch.
+> > s/IRQ/interrupt/
+> > 
+> > This is a changelog and not a SMS service.
+> > > Switching on nohz_full tick support at runtime will be problematic
+> > > as some of the tick dependency masks may not be properly set causing
+> > > problem down the road.
+> > That's useless blurb with zero content.
+> > 
+> > > Allow nohz_full boot option to be specified without any
+> > > parameter to force enable nohz_full tick support without any
+> > > CPU in the tick_nohz_full_mask yet. The context_tracking_key and
+> > > tick_nohz_full_running flag will be enabled in this case to make
+> > > tick_nohz_full_enabled() return true.
+> > I kinda can crystal-ball what you are trying to say here, but that does
+> > not make it qualified as a proper change log.
+> > 
+> > > There is still a small performance overhead by force enable nohz_full
+> > > this way. So it should only be used if there is a chance that some
+> > > CPUs may become isolated later via the cpuset isolated partition
+> > > functionality and better CPU isolation closed to nohz_full is desired.
+> > Why has this key to be enabled on boot if there are no CPUs in the
+> > isolated mask?
+> > 
+> > If you want to manage this dynamically at runtime then enable the key
+> > once CPUs are isolated. Yes, it's more work, but that avoids the "should
+> > only be used" nonsense and makes this more robust down the road.
+> 
+> OK, I will try to make it fully dynamic. Of course, it will be more work.
 
-Paolo Abeni 於 2026/4/23 下午 07:19 寫道:
-> On 4/20/26 3:45 PM, Lucien.Jheng wrote:
->> AN8811HB needs a MCU soft-reset cycle before firmware loading begins.
->> Assert the MCU (hold it in reset) and immediately deassert (release)
->> via a dedicated PBUS register pair (0x5cf9f8 / 0x5cf9fc), accessed
->> through a registered mdio_device at PHY-addr+8.
->>
->> Add __air_pbus_reg_write() as a low-level helper taking a struct
->> mdio_device *, create and register the PBUS mdio_device in
->> an8811hb_probe() and store it in priv->pbusdev, then implement
->> an8811hb_mcu_assert() / _deassert() on top of it. Add
->> an8811hb_remove() to unregister the PBUS device on teardown. Wire
->> both calls into an8811hb_load_firmware() and en8811h_restart_mcu()
->> so every firmware load or MCU restart on AN8811HB correctly sequences
->> the reset control registers.
->>
->> Fixes: 0a55766b7711 ("net: phy: air_en8811h: add Airoha AN8811HB support")
-> The hash is incorrect, should be 5afda1d734ed
-I will fix it in the next patch.
->
-> [...]
->> @@ -254,6 +267,31 @@ static int air_phy_write_page(struct phy_device *phydev, int page)
->>   	return __phy_write(phydev, AIR_EXT_PAGE_ACCESS, page);
->>   }
->>   
->> +static int __air_pbus_reg_write(struct mdio_device *mdiodev,
->> +				u32 pbus_reg, u32 pbus_data)
->> +{
->> +	int ret;
->> +
->> +	ret = __mdiobus_write(mdiodev->bus, mdiodev->addr, AIR_EXT_PAGE_ACCESS,
->> +			      upper_16_bits(pbus_reg));
->> +	if (ret < 0)
->> +		return ret;
->> +
->> +	ret = __mdiobus_write(mdiodev->bus, mdiodev->addr, AIR_PBUS_ADDR_HIGH,
->> +			      (pbus_reg & GENMASK(15, 6)) >> 6);
->> +	if (ret < 0)
->> +		return ret;
->> +
->> +	ret = __mdiobus_write(mdiodev->bus, mdiodev->addr,
->> +			      (pbus_reg & GENMASK(5, 2)) >> 2,
->> +			      lower_16_bits(pbus_data));
->> +	if (ret < 0)
->> +		return ret;
->> +
->> +	return __mdiobus_write(mdiodev->bus, mdiodev->addr, AIR_PBUS_DATA_HIGH,
->> +			       upper_16_bits(pbus_data));
-> Sashiko says:
->
-> Will writing the lower 16 bits before the upper 16 bits cause the
-> hardware transaction to fire with stale upper data?
-> The __air_buckpbus_reg_write() helper triggers the 32-bit transaction
-> using the lower 16 bits as the execution trigger. If this hardware
-> behaves similarly, should AIR_PBUS_DATA_HIGH be populated before writing
-> the lower 16 bits?
-This is an8811hb pbus sequence. Therefore, it doesn't need to be modified.
-> [...]
->> @@ -1175,10 +1281,22 @@ static int an8811hb_probe(struct phy_device *phydev)
->>   		return -ENOMEM;
->>   	phydev->priv = priv;
->>   
->> +	mdiodev = mdio_device_create(phydev->mdio.bus,
->> +				     phydev->mdio.addr + EN8811H_PBUS_ADDR_OFFS);
-> Sashiko says:
->
-> Can this create an out-of-bounds array access if the base PHY address is
-> high?
-> The mdio_map array in struct mii_bus has a fixed size of PHY_MAX_ADDR (32).
-> If phydev->mdio.addr is 24 or higher, adding EN8811H_PBUS_ADDR_OFFS (8)
-> will result in an address of 32 or more.
-> Neither mdio_device_create() nor mdio_device_register() validate that
-> the address is within PHY_MAX_ADDR. When mdiobus_register_device()
-> executes mdiodev->bus->mdio_map[mdiodev->addr] = mdiodev, could this
-> write past the end of the array and corrupt adjacent memory?
->
-> /P
->
+Since the target CPUs will be offline, it should be fine to just enable/disable
+the static key and masks on runtime. The only issue I see right now is posix
+CPU timers because the tick dependency is per task/process group. And those
+tasks could migrate to nohz_full CPUs by careless users (even though that's
+nonsense) once the target become online. So the per task/process tick dependency
+must be set up unconditionally. I don't think this should bring much noticeable
+overhead though.
+
+Oh and the other way to go, that is removing TICK_DEP_BIT_POSIX_TIMER and forbid to
+run posix cpu timers on nohz_full CPUs, would be even more painful to implement
+so I don't have a better idea.
+
+Thanks.
+
+-- 
+Frederic Weisbecker
+SUSE Labs
 
