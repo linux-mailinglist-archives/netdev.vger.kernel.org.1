@@ -1,52 +1,102 @@
-Return-Path: <netdev+bounces-281000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281001-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wGYeGlCG62lBNwAAu9opvQ
-	(envelope-from <netdev+bounces-281000-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:03:44 +0200
+	id 8Ia5BgGH62lBNwAAu9opvQ
+	(envelope-from <netdev+bounces-281001-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:06:41 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9836E460793
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:03:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 727BB4607EC
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:06:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A8D8E301724C
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 15:00:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 38006300C024
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 15:03:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D6F0238D27;
-	Fri, 24 Apr 2026 15:00:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D06A92848AD;
+	Fri, 24 Apr 2026 15:03:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ea9yJbyH"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922AD26C385
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 15:00:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84BFD281369
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 15:03:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777042816; cv=none; b=lm23BcVR6ICtBugVrwDCvi3Pg6Y5gwfrZISsmhDow+4P2T0lVq1tCFWsY1+jU2xtYSiiwJ85tbko8pLuoOtUn/+Yn94Eas45uth3sxeEt+RLgNVt1sj7qlr2dAqrDbepuDuh9qSZIKT4iQPdm4iBAdchKvpranPMkTbsFZ5vezg=
+	t=1777043024; cv=none; b=XgeNAVlYEoT4jhEljUtsaRMDzgnHGjN4JaZ9DEMh4qMSQfscoah2bZKrm0yo2vN6kRcuQkM88t6yF1cLxKhjJweISNwKPWcuEF6kaCDKlyj+4iJ352atmfkR8vM8qFFXGPhzAKKQnJZuocF4McQbcqC6MLzHsyrtsMYzLoyLvgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777042816; c=relaxed/simple;
-	bh=KnV8A7uoQR7tKKdLB+y/zBG6+2zJeX6PqGeDf3dd5so=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Tunw78J6cBHpKhoTITY6RUODhYyzDC9fclos4ZaJ+Q+BRe9UlOonTYwOEb6DWzAuKv2WjvkT9qSDgUtMBFuCrBCH2s8pJFJLX3e1CbVISzPw8oZumCcOW418aPiVCVEXDbaGFZrFoa28Et+9CJERxvEG/peGnA/++ka5ak4nqus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 4213560425; Fri, 24 Apr 2026 17:00:11 +0200 (CEST)
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	horms@kernel.org,
-	kuniyu@google.com,
-	idosch@nvidia.com,
-	Florian Westphal <fw@strlen.de>
-Subject: [PATCH net] neigh: let neigh_xmit take skb ownership
-Date: Fri, 24 Apr 2026 16:58:38 +0200
-Message-ID: <20260424145843.74055-1-fw@strlen.de>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1777043024; c=relaxed/simple;
+	bh=sam5CzX7hUFWo2rSuIUY9jL5rVRI1ZwRvCUUTaLpc/8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YYWXTzcbUJ06AFn4ZzK2kIyUZoIy0BdBWPtQtWhjgoyRN3VCtb5jaEpbtBOj5jBZKI/d3S3b1yvyPx8kJgvZSn6vVWNtxJNEN0mPC+wNC36WuRDpnVHUPpLeSq9I/olfyQA/w8UNKc/E/jOpFtFNPmckcfjk5ctBHxwNFuScl7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ea9yJbyH; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2b24fede2acso52973695ad.3
+        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 08:03:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777043023; x=1777647823; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gdnOmdvYkq1xF25fAEazaVF6DIg+bGDl6V2EYI1zKDU=;
+        b=Ea9yJbyHQe82ThmrdwNs9z9RSGsQMh08rJfRXjLI0A/EKGyvxSHOcseDdXM8enl6aw
+         ZTTE4RgSUOgs28it5Xj47AdbqXFfnfjxTjCqoSLHoLDWCLF/gzepeIxoT0C1I4ew68i2
+         C7W1+PsA1CdnUczpB3Ux94tUjJNRv9qFeQUP+lRHljHIuAH9dwb8jrIZa7sIOoOsTAEB
+         l5QVAHuVcUimynAFtMPqEnNnaUiWDQSj3tYB9gw4UYAVW7nwpuWLJ9fJyZ6U938PL4aj
+         gkheKpepmyTGJ2zQulMx4AkRR1XobfJbzNnYZOPr0m5KLLgIlst2xk2VxRuZdQ9GoIn1
+         9M8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777043023; x=1777647823;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gdnOmdvYkq1xF25fAEazaVF6DIg+bGDl6V2EYI1zKDU=;
+        b=JioczUUXbIGdmbWDSlY4mQ3sHpICNyKE1gcQaMtt/abNoEKIWpBpNYEAFeX0fjbhhO
+         W7Q8BsVIStbunnmx5NZinZuF+Jl1jlkeOHTb5CPA5O/m+PYLVuO/xYqYLkQc8lS4obPQ
+         JQNfI5BQh4D66+YXbiVshxGR9VWMZcxe1rPf3L87FBQmnR96s4MY1pariInXZ14A0/0k
+         JVlafXmQvdjKVRlTxnhpaGWO6EoCWXS/dzU/2Hrq+eSyh98OYqbAgTFn9Pbq8le6DvRC
+         TSAGgW+maSHe76TU3X+M4m3d0j55gG9rRG0u3G3PL0P8a4wCOMLRPEnV5+lmWNsbMWBq
+         IxaQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+nUyBwUVYfHnLZFIQNsEKVI+WOP5SsO0byJipAW6qvNkqqUqqZ1WQFejtNHCRY0XIwvZXiE14=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDIPeL2y1TrqxkKSkT08NavlGn+2naoKt+3cUF0sf3JL05IPYw
+	06W+PSKW2udow/2TYJeyT8nyDAzspt42zBnD1xQZLZWC6KttO9PhunFc
+X-Gm-Gg: AeBDieuNewCOr+eTeECadWm8Q9uLUh1aYJ/TE8CB5oKN8xDiMSMm1EpzUWOMN8fqQPI
+	3N9etBiFGpvA+3kqVqICKhwvMxUFlNrRTLwejw20assMju8qAVRF6RLG2OXsQq3UlkEcEZXFhgT
+	MnhlEGrrJsVp/p+uM3Qh0Xmx5eRvLecoPiOqsIOBflEe0j1hxDbASGsoFdWeuXGTqBizBLgKZDe
+	KEZh34GrdmDIRxj9gUmlFMVtVxlYOI02gE8WG3vM5dEFIajwDjncC6j1bfdrZXY7Fs7ImaB+o9m
+	fYRX6Y4ARASQypAFBzeiqKLNyenlk0xQN/2BGjgbBtNOU6II+mU21C28tIMQmNpfv+XJpC0JUkJ
+	nqrH3sA+QN6wi+jg8TvBQq87XdJZvGXOKxPaZhqmj8KxVELgtO+MzG49Qr9r69+9Xu5IsjdVYND
+	y6V8xahQ1w63FuxGxWjoFyarHH/VSNw4lmnztB+q3+CMb1UoCyNFjA/Rbgcs3N7yaJ09E1wIowW
+	81RZIs43AciFXL6
+X-Received: by 2002:a17:903:286:b0:2b2:680c:2193 with SMTP id d9443c01a7336-2b5f9f64affmr349377755ad.31.1777043022350;
+        Fri, 24 Apr 2026 08:03:42 -0700 (PDT)
+Received: from deepanshu-kernel-hacker.. ([2405:201:682f:383f:ba99:851:d885:8271])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b5fab4cc47sm233257465ad.82.2026.04.24.08.03.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Apr 2026 08:03:41 -0700 (PDT)
+From: Deepanshu Kartikey <kartikey406@gmail.com>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com,
+	stefanha@redhat.com,
+	sgarzare@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: virtualization@lists.linux.dev,
+	kvm@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Deepanshu Kartikey <kartikey406@gmail.com>,
+	syzbot+1b2c9c4a0f8708082678@syzkaller.appspotmail.com
+Subject: [PATCH] vsock/virtio: fix memory leak in virtio_transport_recv_listen()
+Date: Fri, 24 Apr 2026 20:33:10 +0530
+Message-ID: <20260424150310.57228-1-kartikey406@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,98 +104,109 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 9836E460793
+X-Rspamd-Queue-Id: 727BB4607EC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281000-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[strlen.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,gmail.com,syzkaller.appspotmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-281001-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kartikey406@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,1b2c9c4a0f8708082678];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,syzkaller.appspot.com:url]
 
-neigh_xmit always releases the skb, except when no neighbour table is
-found. But even the first added user of neigh_xmit (mpls) relied on
-neigh_xmit to release the skb (or queue it for tx).
+Two bugs exist in virtio_transport_recv_listen():
 
-sashiko reported:
- If neigh_xmit() is called with an uninitialized neighbor table (for
- example, NEIGH_ND_TABLE when IPv6 is disabled), it returns -EAFNOSUPPORT
- and bypasses its internal out_kfree_skb error path.  Because the return
- value of neigh_xmit() is ignored here, does this leak the SKB?
+1. On the transport assignment error path, sk_acceptq_added() is called
+   but sk_acceptq_removed() is never called when vsock_assign_transport()
+   fails or assigns a different transport than expected. This causes the
+   parent listener's accept backlog counter to be permanently inflated,
+   eventually causing sk_acceptq_is_full() to reject legitimate incoming
+   connections.
 
-Assume full ownership and remove the last code path that doesn't
-xmit or free skb.
+2. There is a race between __vsock_release() and vsock_enqueue_accept().
+   __vsock_release() sets sk->sk_shutdown to SHUTDOWN_MASK and flushes
+   the accept queue under the parent socket lock. However,
+   virtio_transport_recv_listen() checks sk_shutdown and subsequently
+   calls vsock_enqueue_accept() without holding the parent socket lock.
+   This means a child socket can be enqueued after __vsock_release() has
+   already flushed the queue, causing the child socket and its associated
+   resources to leak
+   permanently. The existing comment in the code hints at this race but
+   the fix was never implemented.
 
-Fixes: 4fd3d7d9e868 ("neigh: Add helper function neigh_xmit")
-Signed-off-by: Florian Westphal <fw@strlen.de>
+Fix both issues: add sk_acceptq_removed() on the transport error path,
+and re-check sk->sk_shutdown under the parent socket lock before calling
+vsock_enqueue_accept() to close the race window. The child socket lock
+is released before acquiring the parent socket lock to maintain correct
+lock ordering (parent before child).
+
+Reported-by: syzbot+1b2c9c4a0f8708082678@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=1b2c9c4a0f8708082678
+Tested-by: syzbot+1b2c9c4a0f8708082678@syzkaller.appspotmail.com
+Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
 ---
- could followup in -next to make it "void", existing
- callers either ignore retval or do:
- if (err)
- 	net_dbg_ratelimited("%s: ...
+ net/vmw_vsock/virtio_transport_common.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
- net/core/neighbour.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index c56a4e7bf790..5a9cc7268521 100644
---- a/net/core/neighbour.c
-+++ b/net/core/neighbour.c
-@@ -3211,8 +3211,10 @@ int neigh_xmit(int index, struct net_device *dev,
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index 416d533f493d..fad5fa4a4296 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -1578,6 +1578,7 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
+ 	 */
+ 	if (ret || vchild->transport != &t->transport) {
+ 		release_sock(child);
++		sk_acceptq_removed(sk);
+ 		virtio_transport_reset_no_sock(t, skb, sock_net(sk));
+ 		sock_put(child);
+ 		return ret;
+@@ -1588,11 +1589,19 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
+ 		child->sk_write_space(child);
  
- 		rcu_read_lock();
- 		tbl = rcu_dereference(neigh_tables[index]);
--		if (!tbl)
--			goto out_unlock;
-+		if (!tbl) {
-+			rcu_read_unlock();
-+			goto out_kfree_skb;
-+		}
- 		if (index == NEIGH_ARP_TABLE) {
- 			u32 key = *((u32 *)addr);
+ 	vsock_insert_connected(vchild);
++	release_sock(child);
++	lock_sock(sk);
++	if (sk->sk_shutdown == SHUTDOWN_MASK) {
++		release_sock(sk);
++		sk_acceptq_removed(sk);
++		virtio_transport_reset_no_sock(t, skb, sock_net(sk));
++		sock_put(child);
++		return -ESHUTDOWN;
++	}
+ 	vsock_enqueue_accept(sk, child);
++	release_sock(sk);
+ 	virtio_transport_send_response(vchild, skb);
  
-@@ -3228,7 +3230,6 @@ int neigh_xmit(int index, struct net_device *dev,
- 			goto out_kfree_skb;
- 		}
- 		err = READ_ONCE(neigh->output)(neigh, skb);
--out_unlock:
- 		rcu_read_unlock();
- 	}
- 	else if (index == NEIGH_LINK_TABLE) {
-@@ -3238,11 +3239,10 @@ int neigh_xmit(int index, struct net_device *dev,
- 			goto out_kfree_skb;
- 		err = dev_queue_xmit(skb);
- 	}
--out:
- 	return err;
- out_kfree_skb:
- 	kfree_skb(skb);
--	goto out;
-+	return err;
+-	release_sock(child);
+-
+ 	sk->sk_data_ready(sk);
+ 	return 0;
  }
- EXPORT_SYMBOL(neigh_xmit);
- 
 -- 
-2.53.0
+2.43.0
 
 
