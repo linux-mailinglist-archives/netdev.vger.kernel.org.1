@@ -1,187 +1,150 @@
-Return-Path: <netdev+bounces-280964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280965-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8PhSFDop62mPJQAAu9opvQ
-	(envelope-from <netdev+bounces-280964-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:26:34 +0200
+	id ABuBCSwr62keJgAAu9opvQ
+	(envelope-from <netdev+bounces-280965-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:34:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B75BB45B740
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:26:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A06945B8CA
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:34:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 93EF530120C9
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 08:26:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 239B73020A53
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 08:32:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3781832A3FD;
-	Fri, 24 Apr 2026 08:26:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D917730F7F8;
+	Fri, 24 Apr 2026 08:32:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Wwn7wEhn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cijdMRBm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAB9C244687;
-	Fri, 24 Apr 2026 08:26:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F4B33C19E
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 08:32:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777019191; cv=none; b=dvdPO7K9CFE5XEfoSiyTbkySIf/opRY8haxkAB5Zp2Oy1Y6aYn+DAgtHleMOqY1thjnB+sIpMq7+QDZPlxiEoBzdhTOUGCr+Sr1ja+KRAHodQ3KmVgHZb650pMwUEWhYMXvS2TEGZ0oQOOhsGOwIAXdDO7Y5XX8nvYrN3RBjBBc=
+	t=1777019546; cv=none; b=gVMBsGSDm4AFxXURcEvno+CvG9g/bdaHtpgahIH1HsOh+LJduMn7H+7qo0W1dmB11V1iYJHXZpIsKbURg4GccSrEjlD9rJ3IE6GIKM3SKdXXvIrPnQCQ66YVLoJtBVWRgMUHa8P4piNgC5e/pZ+6D31ZZ5/zOArgOVA3mQzEP/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777019191; c=relaxed/simple;
-	bh=r6UwaujmmA34X05ARd2oY0WcRCAWhL4Vghc8FhMyeTo=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j3UC4f+HjPAxs1nzLqgkeJDxMiZKe1eWmrqSf8xXLnyDggWJWT86U/sg+3DByLVnQVMUW9LAyFutSXAl4CWu2Rga9n6zz0xShT8GD1fxwotwY5iu4pWFpM3d1QbWNukTEjIhtjGcIFovdNcSCKuweJ8QUGLPzuuDdcEMMd39QAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Wwn7wEhn; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63O771V11922659;
-	Fri, 24 Apr 2026 01:26:20 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=TLDmDwIinwnU1WuZsd+E6cxzH
-	IjQG9Et0UwIndVSXNY=; b=Wwn7wEhnDlay2+8HnPNZfHcF1Y8YWftLgxQBGqRTg
-	VxCkvBlkQnYmBd+gxz3+N9HEBKER9AP+NDhKbx3YmI4BkFsLCtqQMTEli0jYjqhJ
-	83i7bivBMPimPkI3T6+jb1KtoV7+mW/3Bgl1sBriTR3EeS5m0r3EqMujy5FA2Y7U
-	93w13OH8qZb3ZtJ80IqdP77QyeSuKumf69RKhlWQmad0uLenlfWQvFjcsSfpZieK
-	XNH1AIiS85l76PePlRN6HXXfaC2BQLCt6LSl19Mkw3kPCKzW4hmZ9Ps9GO/FvBDk
-	yh8Y5W0IhiFIQVpEeT8Jw+ndCAmfSK82cjxL5I0dpj/QQ==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4dqc06ur7p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Apr 2026 01:26:20 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Fri, 24 Apr 2026 01:26:19 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Fri, 24 Apr 2026 01:26:19 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 5EAB83F7082;
-	Fri, 24 Apr 2026 01:26:16 -0700 (PDT)
-Date: Fri, 24 Apr 2026 13:56:15 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>
-Subject: Re: [PATCH v3 net 04/11] octeontx2-af: npc: cn20k: Make default
- entries as x4.
-Message-ID: <aespJ5nvW-pfeMFo@rkannoth-OptiPlex-7090>
-References: <20260423104317.2707923-1-rkannoth@marvell.com>
- <20260423104317.2707923-5-rkannoth@marvell.com>
+	s=arc-20240116; t=1777019546; c=relaxed/simple;
+	bh=pJkzSL/k+5TGVlKtzz3sl7/5vEzJQCMbHMekVJ4welw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FLiE3N3ezePJ5MuwF+OqTSgFsr5mLA1C5AY+FUSLxZej/3nJteYXxGnE0SHlj1jGvXHSb0KRYtFx4IodIj5Htb/u3soN8rJ/srynwk9y7ksXRnCZmreJsWDg7nts/dE4b3SMIWA0spGHmnpK4odYuZKV0Obiqwq+lH9IHV3K1JI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cijdMRBm; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777019542;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VJsfL0ZYr6ksiH6VKINKLh9cflWXlJdEnCTwwmMW534=;
+	b=cijdMRBmY62jxMxlWJ39bAtadDmv7b7OsxT7WwuruEvf9Cz+tt0ZDzx6CVBOwE/MYEe7/h
+	TxuztRWkf7s6r/ekx5sU0h7tVnQbN74dspnNA02iNEcbBosPX67xpSysnlJ7ljdY3wgKpL
+	SMjOjn6vWMF4OP5Kprkbl6UPJYoWuMM=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-192-ewUZX9sePIKYDg19RBQe5A-1; Fri,
+ 24 Apr 2026 04:32:19 -0400
+X-MC-Unique: ewUZX9sePIKYDg19RBQe5A-1
+X-Mimecast-MFC-AGG-ID: ewUZX9sePIKYDg19RBQe5A_1777019538
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EB87E1800578;
+	Fri, 24 Apr 2026 08:32:17 +0000 (UTC)
+Received: from calimero.vinschen.de (unknown [10.44.32.45])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 68CDB19560AB;
+	Fri, 24 Apr 2026 08:32:17 +0000 (UTC)
+Received: by calimero.vinschen.de (Postfix, from userid 500)
+	id C0469A80BFD; Fri, 24 Apr 2026 10:32:14 +0200 (CEST)
+Date: Fri, 24 Apr 2026 10:32:14 +0200
+From: Corinna Vinschen <vinschen@redhat.com>
+To: Simon Horman <horms@kernel.org>
+Cc: intel-wired-lan@osuosl.org, stable@vger.kernel.org,
+	Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
+	netdev@vger.kernel.org, Corinna Vinschen <vinschen@redhat.com>
+Subject: Re: [Intel-wired-lan] [PATCH net] iavf: iavf_virtchnl_completion:
+ drop duplicate ether_addr_equal() test
+Message-ID: <aesqjovwYNeLlfX4@calimero.vinschen.de>
+Mail-Followup-To: Simon Horman <horms@kernel.org>,
+	intel-wired-lan@osuosl.org, stable@vger.kernel.org,
+	Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
+	netdev@vger.kernel.org
+References: <IA3PR11MB898664A49E614F197D4FED6EE52C2@IA3PR11MB8986.namprd11.prod.outlook.com>
+ <20260421111236.875379-1-vinschen@redhat.com>
+ <20260423185530.GI900403@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260423104317.2707923-5-rkannoth@marvell.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI0MDA3NyBTYWx0ZWRfX2aYmJPhjouVE
- SkLf0/gW5BU2FlU30I3L/vrajzvsoRHr3O49mGXa2Wlu7l2O1EXdbR8RgKcmQeoa7QKCwnoUxS0
- 80u7ycVCT49cnCFjEyhgHUDoDydjkE+Red3ol6ZYnIudMGDoOzzmpqh368qaSjnBIzhS884sE79
- 9uSYxiAMZHhacfGANiHHFEsD1o1bSD6sp5HTQDbIHun48j6HcrOsfkaoJ1/IbfnxcKrPo7or/KF
- M0AWpv/i+clNTRsgvXcCajx3JhkxtBgLTfrRjxkyEy3gV10+cvUhjymiUD0zRk6bxHvYzK000x9
- sAmmBflwQYmNGs6ZKSa6aMHDDfV3ecSxwC7pLpLTR5uzcjTu/SQoqPfHW0R4q00TGtEOHDHWlEP
- /QGlF2YBoWB9bHBUC/qAQq/hrabWbPiqPo6ZRfI10ktEl1ub3dzdxRo3oXVxHE+7wVAHGTavv4b
- vQR32BoX07zFbr9IhEQ==
-X-Proofpoint-GUID: f6Pi8vNwbC-4amU_j6ypsEqC815eY_3z
-X-Authority-Analysis: v=2.4 cv=N84Z0W9B c=1 sm=1 tr=0 ts=69eb292c cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=qit2iCtTFQkLgVSMPQTB:22 a=9R54UkLUAAAA:8
- a=M5GUcnROAAAA:8 a=tFNJmSkQzRgE3DcoZz0A:9 a=CjuIK1q_8ugA:10
- a=YTcpBFlVQWkNscrzJ_Dz:22 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: f6Pi8vNwbC-4amU_j6ypsEqC815eY_3z
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-23_03,2026-04-21_02,2025-10-01_01
-X-Rspamd-Queue-Id: B75BB45B740
+In-Reply-To: <20260423185530.GI900403@horms.kernel.org>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Rspamd-Queue-Id: 2A06945B8CA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280965-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280964-lists,netdev=lfdr.de];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:dkim,marvell.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,calimero.vinschen.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vinschen@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_SEVEN(0.00)[7]
 
-On 2026-04-23 at 16:13:10, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
-> X4 profile users won't alloc x2 entries. Allocating x2 entries
-> would cause under utilized subbanks(X2). Avoid this in X4 kex
-> profile, all allocations will be from x4 subbank.
->
-> Fixes: 09d3b7a1403f ("octeontx2-af: npc: cn20k: Allocate default MCAM indexes")
-> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+On Apr 23 19:55, Simon Horman wrote:
+> On Tue, Apr 21, 2026 at 01:12:36PM +0200, Corinna Vinschen wrote:
+> > This is just a simple cleanup fix.  Commit 35a2443d0910f ("iavf: Add
+> > waiting for response from PF in set mac") introduced a duplicate
+> > ether_addr_equal() check, so the current code tests the new MAC twice
+> > against the former MAC.
+> > 
+> > Remove the outer ether_addr_equal() test, remnant of commit c5c922b3e09b
+> > ("iavf: fix MAC address setting for VFs when filter is rejected")
+> > 
+> > Signed-off-by: Corinna Vinschen <vinschen@redhat.com>
+> > Fixes: 35a2443d0910f ("iavf: Add waiting for response from PF in set mac")
+> > Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> > ---
+> > Added CC: stable@vger.kernel.org
+> 
+> Hi,
+> 
+> This feels more like a cleanup for net-next (without a Fixes tag)
+> than a fix for net. I'm missing where the bug is here.
 
->> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
->> index 8630a6a73387..97acba77ff88 100644
->> --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
->> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
->
->[ ... ]
->
->> @@ -4274,10 +4289,16 @@ int npc_cn20k_dft_rules_alloc(struct rvu *rvu, u16 pcifunc)
->>  	pfvf = rvu_get_pfvf(rvu, pcifunc);
->>  	pfvf->hw_prio = NPC_DFT_RULE_PRIO;
->>
->> +	if (npc_priv.kw == NPC_MCAM_KEY_X4) {
->> +		req.kw_type = NPC_MCAM_KEY_X4;
->> +		req.ref_entry = eidx & (npc_priv.bank_depth - 1);
->> +	} else {
->> +		req.kw_type = NPC_MCAM_KEY_X2;
->> +		req.ref_entry = eidx;
->> +	}
->> +
->>  	req.contig = false;
->>  	req.ref_prio = NPC_MCAM_HIGHER_PRIO;
->> -	req.ref_entry = eidx;
->> -	req.kw_type = NPC_MCAM_KEY_X2;
->>  	req.count = cnt;
->>  	req.hdr.pcifunc = pcifunc;
->>
->> @@ -4299,8 +4320,9 @@ int npc_cn20k_dft_rules_alloc(struct rvu *rvu, u16 pcifunc)
->>
->>  		req = otx2_mbox_alloc_msg_npc_mcam_alloc_entry(&pf->mbox);
->>  		req->contig = false;
->> -		req->ref_entry = eidx + 1;
->>  		req->kw_type = NPC_MCAM_KEY_X2;
->> +		req->ref_entry = eidx + 1;
->
->The VF fallback path still hardcodes req.kw_type = NPC_MCAM_KEY_X2. Does this
->violate the commit message's claim that "X4 profile users won't alloc x2
->entries"? When the first allocation attempt fails for a VF on an X4 system,
->wouldn't this retry path still allocate from X2 subbanks?
->
->Also, should the ref_entry here be masked with (npc_priv.bank_depth - 1)
->similar to the primary allocation path for X4 profiles?
+Yeah, it's not a bug, the "Fixes" tag was just supposed to point out the
+patch introducing the duplicate test.
 
-AI review report: https://netdev-ai.bots.linux.dev/ai-review.html?id=9923f145-31df-46b0-84e8-b15f1e307ad2#patch-10
-pw-bot: changes-requested
+Shall I create a v3 or is it ok as is and just goes to net-next instead
+of net?
 
-Simon suggested to remove this from net, and post it as enhancement when net-next opens. So Dropping it for now.
-Will post it in net-next after fixing this comment.
+
+Thanks,
+Corinna
+
 
