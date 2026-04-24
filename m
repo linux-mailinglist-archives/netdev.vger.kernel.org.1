@@ -1,141 +1,140 @@
-Return-Path: <netdev+bounces-281059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281060-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6VGGLGrT62mQRwAAu9opvQ
-	(envelope-from <netdev+bounces-281059-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 22:32:42 +0200
+	id 0CbTF4fW62lISAAAu9opvQ
+	(envelope-from <netdev+bounces-281060-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 22:45:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 243BE463343
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 22:32:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03CC5463473
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 22:45:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 77FEC301939E
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:32:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5E5A1300D162
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:45:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11B8B284881;
-	Fri, 24 Apr 2026 20:32:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5EE63FBED0;
+	Fri, 24 Apr 2026 20:45:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OfuBunUC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zt1liQyH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953AD1F1932
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 20:32:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8201F3D6475
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 20:45:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777062757; cv=none; b=LXtJHi3EYtGQyfwKA60/1lSiX6S1GoFRlhONKJ0ETHlqdEncRlGz10XmSTDg/XAawgJogM2fhzPvsGKZo0jyEpSFK5e2XxIDYQHvSAaiI0bk+fq+YX/cEq69MK9KnBq/8ZrhTpDKbqRCu5GVmk+WVMC93qvK3UTu9Lo7fjfsW2Q=
+	t=1777063552; cv=none; b=SQ5g95676mNNfTp2RR14+oxQEJvtbbuLZtwSJoEWrDq4It1yaAVhQhKuXfoH225FQqUccBmrWrVnu1xDEFTSH/lHN/H3CaOTc4jE/+Gjw2aGcCxkokKM59m2MgTs/73TlJtRq21utJphg5zvOqfMGUFFoCqaA85ocbUTWy2HelI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777062757; c=relaxed/simple;
-	bh=FU6p+3POBVRSERpP8ZtkiWJilhhPLhJzicOB/M0qIzM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=PHuQaTqFXxNkUS+dK2MpLCaylz5PA/j1Kf0dis/OlTky0Pvl4ae/4gg4TedrkJ20hybM450jNg0wCp/t5d9G7M9AXbXwLAEuZFBIxpPBWfrSFD4IuqOt1IzmLlN/Iu02YyYZououSjXVVyY76qNqUJgQcS1ZOJ+sOcTdstv/ILs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OfuBunUC; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4891cd41959so63866995e9.3
-        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 13:32:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777062755; x=1777667555; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
-         :from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IfJjmhDHLMekoHwDHXYTkJMasD4cWdKh/MUO+Y7u60o=;
-        b=OfuBunUCmyihcWA0Lmn8GCMd9+HX5t6nkI9wRto7i49QQWDtdHhtxnQHL0U4wN+yYh
-         dmVJvPQJO2wzcILEE5Lg+Xgj1CWvIeCxq1pEPEr0yL8LjwiHiocN5ESVq/boWHXtkLuM
-         zG33S0pm8hj4gRUMymlu1hAecN/z3uiFVQg9j/RohGUIUMAdfdKalVYcfZ2yXdMV+gWU
-         qb0IpFh0RbFAuXLtrREg5J6bvmFe99bYl1lj0Zh7QYF0rkkzvy+QHS8cq3NwcFdZubXo
-         lyYUHyshTU8YNJUAqs8TXPe40xPcIEz8C9nbeSlyi5hxNmLu0m5zvyomO9kgR/akQ7ul
-         kLew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777062755; x=1777667555;
-        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
-         :from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IfJjmhDHLMekoHwDHXYTkJMasD4cWdKh/MUO+Y7u60o=;
-        b=tHzK3dF7h9RgOkgTDYwfYr3kLa3uD1B3dRi/aY8Yo2Aug6emITdy+yUcVqSq033aQB
-         L8UXVuTqAE6dXrFMvIvn2dUi23z9xi6HuL2qBN12xC3vxXrPIyPds4b6NeQlLLIKhB71
-         6KxL3petJ4LgnWtky0pmmeS9EFPxcZE3JnRTVYJbb1gMQ87JV1q7vnr+/uzwnW+YxA++
-         V1sReE0hes335SnkuwJhLg4gKT7A+easyD6JAAfb1GWRqbzMKcCA7/bzfAnV8VHFAkh/
-         DpaIXuUB8202rdZuyBVSFVr/lAnXlFelMla7PGj4lmwXhWWaS8n0vr0MExRopGis1ErY
-         PaQQ==
-X-Gm-Message-State: AOJu0YytrD+TYljAVXhxWscTVmTibfP8uxC9no0Ql77cfHkwSUdRxVu0
-	oA76VsHlEpQ8V1IIH1RFcFTYSHpWm8wqGkfeBlz050f5sC2Z0mETR923SBymsw==
-X-Gm-Gg: AeBDies+8LmzdGGdN913v7++dwJpMAZO9nyDr+Tl719ALhVOo8Ok7EADUu8UjXmwLVn
-	ag11wMzkHWtVqhHO0SfuyTbpptbIykCwmQga9ErB2g0xGqkz1fWHN9WqJuGao+MbCXHHqK/F0F4
-	wgNM/TrSmeNrH3nSq7snpcDaNcEKvOUrnEntGA0YLW6+NhfIrRE621C31SQ81S6VueuyYOz8F+p
-	461kO67Ga1LaK9M0ubpjNpAMgdkAV/TL8NdMpxYvtxaLUXZ8xAc1kCSWOnTGvMuTJH980L6MEg1
-	1h16tYuz4oFlV3BP6I/p4gaxXJ6MXdolbuRT3UB4MDc54iEzN1QZDbV6bfqWtSBf4A/dWmgKqtj
-	Y23JEglEXKexSBOHEZPzBrrVZbI6ysAzHhLsN8dls08W/jYCAlJUnNQYR7TSnEmQm7q3k5tJT/T
-	6HN15EDv+xuVFLadGcBGvu6Fbt
-X-Received: by 2002:a05:600c:8115:b0:488:8577:d9cc with SMTP id 5b1f17b1804b1-488fb77faacmr421763485e9.20.1777062754784;
-        Fri, 24 Apr 2026 13:32:34 -0700 (PDT)
-Received: from nz.home ([2a00:23c8:a613:101:6a07:6835:efe8:e43])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4891ffd2030sm114009535e9.20.2026.04.24.13.32.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Apr 2026 13:32:34 -0700 (PDT)
-Date: Fri, 24 Apr 2026 21:32:33 +0100
-From: Sergei Trofimovich <slyich@gmail.com>
-To: stephen@networkplumber.org
-Cc: netdev@vger.kernel.org
-Subject: Re: [ANNOUNCE] iproute2 7.0 release
-Message-ID: <20260424213233.4dabf6bf@nz.home>
-X-Mailer: Claws Mail 4.4.0 (GTK 3.24.52; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1777063552; c=relaxed/simple;
+	bh=QQVPbAJe1D/rdWVbB8sLL4cm+7ydyjVeQVpTo63Bf8Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pu68quoqTFy4LNb9Nev+zAEmi4ei3KMn4bgF4obhlR9ePi7ObEHkpoUtonBJD69zCA17J04UqHk27f5vZ34UsAiggxEMrIhIHO/0m4KJL7HOBdV0pZAM7wOadz8ExQ19qa3oKy/VtDpq1osqwQt01YZtOT+2/8b7X0F+EkTezk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zt1liQyH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48FA2C2BCB9
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 20:45:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777063552;
+	bh=QQVPbAJe1D/rdWVbB8sLL4cm+7ydyjVeQVpTo63Bf8Q=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Zt1liQyHojBEDzgt/4Y58/4Uce4XcufB6/jvkWkLfjSg7du7b+DzcD9pM7igFAChV
+	 u1ymyZL/X7H+cESfBujV8Ilr+0PnhuyPzwtGu+XKAhq8VimCjWeUb3jlgY5FrLw+8D
+	 dz8QNb71x67yilXALKaZMLsxwdTWiLnBl5Lj37Bo3XMbS0ArYojF/XysRaX/Pf3mBo
+	 R+ELy4AfVNscYmkCfIhY5fDEKvmdcUgl+EHczvVbAfrjj7JXUoou0tVDo2Tp4qQGuy
+	 p3sOUq1I/57RxCV+dylRgjG94a/vkOpO7Vq4uLn5qz0ryr5t9a9C5oElEmT/BVSzxv
+	 kbxAgLzSX3NxA==
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-59dea72099eso8738067e87.0
+        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 13:45:52 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ+VCMj2vSkNezXwm9JNApe1UBvDJURCL5yd14ZWDA58XwBG9UQDNjoKCXjclRpIxfFK95MDK1c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlfoSCKLYxeC4YCX6MZO4S/fBKlXJMabNN+vMAo6i2RNrFqslA
+	fxmwAIH4gnrqNZeZaSZSJTwgxzDjWE4pgsl3N5Mh+GVGps/X34kyN2PUgdZKuF9s4ni0Dm7G3d7
+	5fwWKylIOiRWXlTGeuWuVV2tYbjhjr7A=
+X-Received: by 2002:a05:6512:3190:b0:5a7:3c4a:cf24 with SMTP id
+ 2adb3069b0e04-5a73c4ad073mr697853e87.42.1777063550924; Fri, 24 Apr 2026
+ 13:45:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 243BE463343
+References: <20260421-mainline-send-v1-sending-v1-0-bcb0857724de@alex-min.fr> <20260421-mainline-send-v1-sending-v1-8-bcb0857724de@alex-min.fr>
+In-Reply-To: <20260421-mainline-send-v1-sending-v1-8-bcb0857724de@alex-min.fr>
+From: Linus Walleij <linusw@kernel.org>
+Date: Fri, 24 Apr 2026 22:45:38 +0200
+X-Gmail-Original-Message-ID: <CAD++jLns8oZiT2f=xygyQpW7M4K8uK+1b69mnttVdyyFPvsZcg@mail.gmail.com>
+X-Gm-Features: AQROBzBoXAy-C0CrQerj336vDfFiZhyjD7Ifx3DKS-loH9I1fUGk0cwOK9RXNKM
+Message-ID: <CAD++jLns8oZiT2f=xygyQpW7M4K8uK+1b69mnttVdyyFPvsZcg@mail.gmail.com>
+Subject: Re: [PATCH 8/8] ARM: dts: qcom: Add Samsung Galaxy S4
+To: contact@alex-min.fr
+Cc: Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	MyungJoo Ham <myungjoo.ham@samsung.com>, Chanwoo Choi <cw00.choi@samsung.com>, 
+	Guru Das Srinagesh <linux@gurudas.dev>, Rob Clark <robin.clark@oss.qualcomm.com>, 
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, 
+	Kees Cook <kees@kernel.org>, Tony Luck <tony.luck@intel.com>, 
+	"Guilherme G. Piccoli" <gpiccoli@igalia.com>, linux-arm-msm@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, iommu@lists.linux.dev, 
+	phone-devel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 03CC5463473
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	FAKE_REPLY(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281059-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-281060-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[slyich@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nz.home:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[]
 
-> Download:
->    https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-7.0.0.tar.gz
+Hi Alexandre,
 
-This URL is 404. Looking at https://www.kernel.org/pub/linux/utils/net/iproute2/
-it looks like tarballs slightly changed their naming and now prepend `v`:
+On Tue, Apr 21, 2026 at 11:45=E2=80=AFAM Alexandre MINETTE via B4 Relay
+<devnull+contact.alex-min.fr@kernel.org> wrote:
 
-iproute2-6.19.0.tar.gz                             18-Feb-2026 15:36      1M
-iproute2-6.19.0.tar.sign                           18-Feb-2026 15:36     566
-iproute2-6.19.0.tar.xz                             18-Feb-2026 15:36    936K
-...
-iproute2-v7.0.0.tar.gz                             13-Apr-2026 19:31      1M
-iproute2-v7.0.0.tar.sign                           13-Apr-2026 19:31     566
-iproute2-v7.0.0.tar.xz                             13-Apr-2026 19:31    940K
+> From: Alexandre MINETTE <contact@alex-min.fr>
+>
+> Add a device tree for the Samsung Galaxy S4, codenamed jflte.
+>
+> This has been tested on a Samsung Galaxy S4 GT-I9505. The initial support
+> covers UART, USB peripheral mode with USB networking, the front LED and
+> the physical buttons.
+>
+> Signed-off-by: Alexandre MINETTE <contact@alex-min.fr>
 
-Should `v` be there? Worth removing at least for next releases?
+Which modem is in this phone?
 
--- 
+I just briefly mentione the S4 in this message:
+https://lore.kernel.org/phone-devel/CAD++jLmBxH1Zubh2avWrvMs4L0zv1NU7WEO3D8=
+aeGiiVZo5AdQ@mail.gmail.com/T/#u
 
-  Sergei
+If this phone has one of the Ericsson CAIF modems it feels weird if
+we add the DTS at the same time as we delete the modem support
+code... (it can be resurrected easily of course)
+
+Yours,
+Linus Walleij
 
