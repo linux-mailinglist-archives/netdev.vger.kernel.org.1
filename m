@@ -1,189 +1,309 @@
-Return-Path: <netdev+bounces-280913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280914-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CEkVHPTN6mkfEAAAu9opvQ
-	(envelope-from <netdev+bounces-280913-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 03:57:08 +0200
+	id EHe6M0DP6mnAEAAAu9opvQ
+	(envelope-from <netdev+bounces-280914-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 04:02:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E3D8458EE4
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 03:57:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA94C458F0B
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 04:02:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0A2AB3014BED
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 01:57:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 10D303014557
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 02:02:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A833A1E2858;
-	Fri, 24 Apr 2026 01:57:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="CqFWV5Y2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33AFA1DED5B;
+	Fri, 24 Apr 2026 02:02:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f80.google.com (mail-oo1-f80.google.com [209.85.161.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D61876025;
-	Fri, 24 Apr 2026 01:56:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F95486334
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 02:02:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776995824; cv=none; b=fLm/FoszpzG5Fp69jHgLtsaKdSh2XJorEocu+kCMlJDeKdiON9I5GlqkvjBrgkDlocQPz7HYnVOlprmWdCDEEYQPEnAIDGx9KtISCHI9tRtroWvfKJJJnuB4NXmA19xm9gNAO1dU68PUwimR+HxS/zsqAK5J0dQ56KXbl3PXk1w=
+	t=1776996156; cv=none; b=jWgGk/kelevHVpOFg2sopB6/6d7xFnXWifWaUu0AzZ6573ZcLKxn10cuHpVRzMYT7S4MjNkhwIIt32autdLLXO4N2iXUQ0Th2AXwO8SVwY+eoSjuK0F/rYSW7oTtF6FPjDToSfQkuisqlwDVh2lBTXz0IYY/lPfUgeANoEY+jls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776995824; c=relaxed/simple;
-	bh=HdOtbwdk9FpqvYfnRdX3mN0oIsQ5L+ZuvG2V0TIlPyQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CWDpCsyszMn4PRtEuOCBhf6DlH5m4QQygIOcIclxTbLrBhZKQRIIUbNX83Q4RRAx/DghVQGYJ3NRSYUgiRzGRhZAJVASunzEI7ET8Lh9iL6Ctunxd9Up05CMqdhPqgheTc9dwG4iYRYNMeQ3qC/u6AoQajxYYBso9kNjciDjfg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=CqFWV5Y2; arc=none smtp.client-ip=54.92.39.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1776995739;
-	bh=/WbhmryfbR5rTtIxz68wt1Q3jNDu5a6qDNLkLdm52qE=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=CqFWV5Y22diwVcsdaCir4tuD+VmAIrzkTzw01PdL1jbg2ER4Maw9RFzCc0i3h5WPa
-	 +xCPYOXqnZ6iOl5Ra1Orsh9kkzr/r6jhI6awo4EZlRlzpeoXNwTwXivKWFP2OHH8gX
-	 F+OZTd7WwcKIhblVphw2ztsPslHZ/GccGdyd9iBY=
-X-QQ-mid: zesmtpip2t1776995722t1f251fe9
-X-QQ-Originating-IP: U4i7rVTqbazz0Zv0ycg9ZtpkPwmjJiTQyT/w9lb7LYE=
-Received: from uos-PC ( [localhost])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 24 Apr 2026 09:55:19 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 15541475564338445808
-EX-QQ-RecipientCnt: 11
-From: Morduan Zang <zhangdandan@uniontech.com>
-To: Jakub Kicinski <kuba@kernel.org>,
-	Petko Manolov <petkan@nucleusys.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Morduan Zang <zhangdandan@uniontech.com>,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: [PATCH net v2] net: usb: rtl8150: free skb on usb_submit_urb() failure in xmit
-Date: Fri, 24 Apr 2026 09:55:17 +0800
-Message-ID: <E7D3E1C013C5A859+20260424015517.9574-1-zhangdandan@uniontech.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <678BC10BB9E39322+20260421111025.15833-1-zhangdandan@uniontech.com>
-References: <678BC10BB9E39322+20260421111025.15833-1-zhangdandan@uniontech.com>
+	s=arc-20240116; t=1776996156; c=relaxed/simple;
+	bh=Ix1ii9fXrEzTcqkCz+c0607KCuN/OSfpHXVOLLAAlk8=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=HiKvI4EVdQ3XlTSofxNtQP2VmOv5Y7Qp4tiFqiRQKvxtXyb+voeS19AFD+bN0BQwCkqSaIRKqacPcQkimdEDl4L7MuyJVlAeVe9cUiEO1eNxDvK8upifpCDQHagpQlYq8lXEWWOXooyGsEQOoYeytM0mU8+qkbFoAB/BjTRNrPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f80.google.com with SMTP id 006d021491bc7-66b612efb4aso11712292eaf.0
+        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 19:02:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776996153; x=1777600953;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=d3uC8NU4AwArWZSQvkNDOrhg+SGZrdOSXtX1ixWx9v0=;
+        b=EsVuOQ+QU27N2STAWhiiKMgKH6I13/ul8fDq0ATm4gpRijK5rt7loEecoH4atpyjsb
+         BcQQ338Q92FTzr/h5rqHLn9Zy1yOTeI6tGEsNNB0r49zBRMBNSJ3wVjSOOy7N31vrQD+
+         rf8LsW0Gcv1HqZ5/MEG4cK7698dxnjyiZF+3qvfttWMQt8FEzdHZq4Z5iRyUkiC6f6vR
+         FN1s/62LVtdFyn1f0m4OQQzr8dbdZ8uQmjMO4q90K80GNB0855dHU5Q6RANmiF7XUI84
+         jo9/BXSeTNz8B6V2viPnCCdQLHnnTR2IrcbF/SyuNz6IRXV+3UNDcIk/7ecNBp6a+beC
+         39yg==
+X-Forwarded-Encrypted: i=1; AFNElJ/b7PM3G+W2YhF/lbc2v8bFLKXy5trFib+78v/ciza2EHLbU5TI1WGG7vxkOPR3sCepqU8PnJE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOz7Mv3cQw0U0mXeSCPtEexzlqDL1NOn1qDGmwGKFCz3U9+3m+
+	ZmqXTQYRHaHnkncnH845cKHzULqM/3Ep4BaP73E7amHDUnc/tKsH6PxgjcWnoUQx5JT8aDN6Vxd
+	pS/D39gPGPDYw/+JVwvy/0nq8I1OuQn/d9f0BddksdPQSClKn/Lr1gyfv1Es=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: MDGUoPnBmw7sPREF4YgrfPnyBu3MQcPuA2pnCLNq9yHGg1Ilh5cXONuO
-	v2wjzIt+Jx7HqIOJNWrstpwJEwo87K9czI72fV4lXYMDoGVBnA1Cs/FBjoprIIMg3WD8/wR
-	XfiHBHPRF5hRNARXksculVzd6W43pStWvtBvkdEqZQ9mAiYObl2EujjGE3g1W7b1j0Yb9GI
-	crUXUxEhHAlwU8th96SFpliQzj68g1ku+wxGLLe3m/x2LTcLXRdrTiFrm4DaJF3oO+kmCQ/
-	7d3xrl96eWD/3NhV5M0Dkyz170H/IZhaqjBI24WUDZQprbALw14njFpjEhByYWqkT9hddBh
-	vASGk11V9gI9hiyAlarBCANTsY7Cve8aEvJGUGpPe+inxLLw32lyBdE6yxobPnbJ6tVjo/a
-	VCpKmPrAuIeKWDlM+myeFIeQxB+FOJkwrlXBO8pzTPUcNO6ZdF1RQAVr0rcfCt5ykNRLDRp
-	3bpydjRw6mpJAA4C/g9hJvawg00sKwccookIgadqqVZW1qX2Z9bY9MNhnfqINyguhoP27ii
-	Hdqnr7xx2C8uhOH/N9/R7ra+YLFtHH7NqNhcd+BLqI7v9m8vUOmbDDgs2AmKTy+0GPGF+i+
-	+ilESa9F2lLTCCzc/W/yS8t5reicxbcG+sYT2Q782nno3Nwq/UpyJqh1YlOXNk5M21jnrPM
-	nN6QO8IHtiopp4IQb7t0vUZ0gDUIeDcBrtdu6A1xB1bpY8LncR8r1yAnkvTSs/4JQKDUET1
-	hgLUTgup8qYRbLJRgX+7xa8Qpnj4g6umZDFZM+yRRKet4IDWvhGedBezSKFkgVVolfKLy9f
-	EeXGSmiVzLevvLziCHwOFCJo/ujFO7sei1Dbv4WFPbqzcKGjKpXlA0kLEIK0DXB5UvZF0LT
-	usXezy1zIfpyzjvxGr4sPKa8bPTmI6IXi4vul/ky6caxOwQhV+s/E9Xyh4eFLu8uJsXajkI
-	6nphfoFtsZVTfuue8l0UjlNd5rNpy2Yeeioos5Y4XQ1pI12vCxNZ3PUO2i8VJjvv68hPwze
-	5SGParR4Ax38oFsKTu/s121+qyXIqfH929CGBLnQ==
-X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
-X-QQ-RECHKSPAM: 0
-X-Rspamd-Queue-Id: 4E3D8458EE4
+X-Received: by 2002:a05:6820:8589:20b0:687:5a16:dea1 with SMTP id
+ 006d021491bc7-6946381984emr10914198eaf.28.1776996153506; Thu, 23 Apr 2026
+ 19:02:33 -0700 (PDT)
+Date: Thu, 23 Apr 2026 19:02:33 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69eacf39.a00a0220.17a17.004d.GAE@google.com>
+Subject: [syzbot] [virt?] [net?] memory leak in __vsock_create (2)
+From: syzbot <syzbot+1b2c9c4a0f8708082678@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, sgarzare@redhat.com, syzkaller-bugs@googlegroups.com, 
+	virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: CA94C458F0B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[uniontech.com,none];
-	R_DKIM_ALLOW(-0.20)[uniontech.com:s=onoh2408];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=2c6ad6fefffa76b1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-280913-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhangdandan@uniontech.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[uniontech.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_FROM(0.00)[bounces-280914-lists,netdev=lfdr.de,1b2c9c4a0f8708082678];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,uniontech.com:email,uniontech.com:dkim,uniontech.com:mid]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,storage.googleapis.com:url,goo.gl:url]
 
-When rtl8150_start_xmit() fails to submit the tx URB, the URB is never
-handed to the USB core and write_bulk_callback() will not run.  The
-driver returns NETDEV_TX_OK, which tells the networking stack that the
-skb has been consumed, but nothing actually frees the skb on this
-error path:
+Hello,
 
-  dev->tx_skb = skb;
-  ...
-  if ((res = usb_submit_urb(dev->tx_urb, GFP_ATOMIC))) {
-          ...
-          /* no kfree_skb here */
-  }
-  return NETDEV_TX_OK;
+syzbot found the following issue on:
 
-This leaks the skb on every submit failure and also leaves dev->tx_skb
-pointing at memory that the driver itself may later free, which is
-fragile.
+HEAD commit:    1f318b96cc84 Linux 7.0-rc3
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=14db28ba580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=2c6ad6fefffa76b1
+dashboard link: https://syzkaller.appspot.com/bug?extid=1b2c9c4a0f8708082678
+compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12db28ba580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1215175a580000
 
-Free the skb with dev_kfree_skb_any() in the error path and clear
-dev->tx_skb so no stale pointer is left behind.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/d4ebd240d832/disk-1f318b96.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/9548f49a7dec/vmlinux-1f318b96.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4e16f2bcfc7d/bzImage-1f318b96.xz
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Morduan Zang <zhangdandan@uniontech.com>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1b2c9c4a0f8708082678@syzkaller.appspotmail.com
+
+2026/03/09 23:37:29 executed programs: 5
+BUG: memory leak
+unreferenced object 0xffff888128bb6d00 (size 1272):
+  comm "kworker/0:1", pid 10, jiffies 4294944453
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    28 00 0b 40 00 00 00 00 00 00 00 00 00 00 00 00  (..@............
+  backtrace (crc 31367ed9):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4547 [inline]
+    slab_alloc_node mm/slub.c:4869 [inline]
+    kmem_cache_alloc_noprof+0x372/0x480 mm/slub.c:4876
+    sk_prot_alloc+0x3e/0x1b0 net/core/sock.c:2239
+    sk_alloc+0x36/0x460 net/core/sock.c:2301
+    __vsock_create.constprop.0+0x38/0x2f0 net/vmw_vsock/af_vsock.c:893
+    virtio_transport_recv_listen net/vmw_vsock/virtio_transport_common.c:1557 [inline]
+    virtio_transport_recv_pkt+0x855/0xfc0 net/vmw_vsock/virtio_transport_common.c:1685
+    vsock_loopback_work+0x104/0x140 net/vmw_vsock/vsock_loopback.c:142
+    process_one_work+0x26c/0x5d0 kernel/workqueue.c:3275
+    process_scheduled_works kernel/workqueue.c:3358 [inline]
+    worker_thread+0x243/0x490 kernel/workqueue.c:3439
+    kthread+0x14e/0x1a0 kernel/kthread.c:436
+    ret_from_fork+0x23c/0x4b0 arch/x86/kernel/process.c:158
+    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+BUG: memory leak
+unreferenced object 0xffff8881141e93a0 (size 32):
+  comm "kworker/0:1", pid 10, jiffies 4294944453
+  hex dump (first 32 bytes):
+    f8 6e 0a 00 81 88 ff ff 00 00 00 00 00 00 00 00  .n..............
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc e7f5c8b3):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4547 [inline]
+    slab_alloc_node mm/slub.c:4869 [inline]
+    __do_kmalloc_node mm/slub.c:5262 [inline]
+    __kmalloc_noprof+0x3bd/0x560 mm/slub.c:5275
+    kmalloc_noprof include/linux/slab.h:954 [inline]
+    kzalloc_noprof include/linux/slab.h:1188 [inline]
+    lsm_blob_alloc+0x4d/0x80 security/security.c:192
+    lsm_sock_alloc security/security.c:4375 [inline]
+    security_sk_alloc+0x2d/0x290 security/security.c:4391
+    sk_prot_alloc+0x8f/0x1b0 net/core/sock.c:2248
+    sk_alloc+0x36/0x460 net/core/sock.c:2301
+    __vsock_create.constprop.0+0x38/0x2f0 net/vmw_vsock/af_vsock.c:893
+    virtio_transport_recv_listen net/vmw_vsock/virtio_transport_common.c:1557 [inline]
+    virtio_transport_recv_pkt+0x855/0xfc0 net/vmw_vsock/virtio_transport_common.c:1685
+    vsock_loopback_work+0x104/0x140 net/vmw_vsock/vsock_loopback.c:142
+    process_one_work+0x26c/0x5d0 kernel/workqueue.c:3275
+    process_scheduled_works kernel/workqueue.c:3358 [inline]
+    worker_thread+0x243/0x490 kernel/workqueue.c:3439
+    kthread+0x14e/0x1a0 kernel/kthread.c:436
+    ret_from_fork+0x23c/0x4b0 arch/x86/kernel/process.c:158
+    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+BUG: memory leak
+unreferenced object 0xffff888128bfa8a0 (size 96):
+  comm "kworker/0:1", pid 10, jiffies 4294944453
+  hex dump (first 32 bytes):
+    00 6d bb 28 81 88 ff ff 00 00 00 00 00 00 00 00  .m.(............
+    00 00 00 00 00 00 00 00 00 00 04 00 00 00 00 00  ................
+  backtrace (crc 1fd60988):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4547 [inline]
+    slab_alloc_node mm/slub.c:4869 [inline]
+    __kmalloc_cache_noprof+0x377/0x480 mm/slub.c:5378
+    kmalloc_noprof include/linux/slab.h:950 [inline]
+    kzalloc_noprof include/linux/slab.h:1188 [inline]
+    virtio_transport_do_socket_init+0x2b/0xf0 net/vmw_vsock/virtio_transport_common.c:923
+    vsock_assign_transport+0x309/0x3a0 net/vmw_vsock/af_vsock.c:642
+    virtio_transport_recv_listen net/vmw_vsock/virtio_transport_common.c:1575 [inline]
+    virtio_transport_recv_pkt+0x8bc/0xfc0 net/vmw_vsock/virtio_transport_common.c:1685
+    vsock_loopback_work+0x104/0x140 net/vmw_vsock/vsock_loopback.c:142
+    process_one_work+0x26c/0x5d0 kernel/workqueue.c:3275
+    process_scheduled_works kernel/workqueue.c:3358 [inline]
+    worker_thread+0x243/0x490 kernel/workqueue.c:3439
+    kthread+0x14e/0x1a0 kernel/kthread.c:436
+    ret_from_fork+0x23c/0x4b0 arch/x86/kernel/process.c:158
+    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+BUG: memory leak
+unreferenced object 0xffff888129e1e800 (size 1272):
+  comm "kworker/1:3", pid 5832, jiffies 4294944454
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    28 00 0b 40 00 00 00 00 00 00 00 00 00 00 00 00  (..@............
+  backtrace (crc 4bfb7c57):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4547 [inline]
+    slab_alloc_node mm/slub.c:4869 [inline]
+    kmem_cache_alloc_noprof+0x372/0x480 mm/slub.c:4876
+    sk_prot_alloc+0x3e/0x1b0 net/core/sock.c:2239
+    sk_alloc+0x36/0x460 net/core/sock.c:2301
+    __vsock_create.constprop.0+0x38/0x2f0 net/vmw_vsock/af_vsock.c:893
+    virtio_transport_recv_listen net/vmw_vsock/virtio_transport_common.c:1557 [inline]
+    virtio_transport_recv_pkt+0x855/0xfc0 net/vmw_vsock/virtio_transport_common.c:1685
+    vsock_loopback_work+0x104/0x140 net/vmw_vsock/vsock_loopback.c:142
+    process_one_work+0x26c/0x5d0 kernel/workqueue.c:3275
+    process_scheduled_works kernel/workqueue.c:3358 [inline]
+    worker_thread+0x243/0x490 kernel/workqueue.c:3439
+    kthread+0x14e/0x1a0 kernel/kthread.c:436
+    ret_from_fork+0x23c/0x4b0 arch/x86/kernel/process.c:158
+    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+BUG: memory leak
+unreferenced object 0xffff888114372e80 (size 32):
+  comm "kworker/1:3", pid 5832, jiffies 4294944454
+  hex dump (first 32 bytes):
+    f8 6e 0a 00 81 88 ff ff 00 00 00 00 00 00 00 00  .n..............
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc e7f5c8b3):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4547 [inline]
+    slab_alloc_node mm/slub.c:4869 [inline]
+    __do_kmalloc_node mm/slub.c:5262 [inline]
+    __kmalloc_noprof+0x3bd/0x560 mm/slub.c:5275
+    kmalloc_noprof include/linux/slab.h:954 [inline]
+    kzalloc_noprof include/linux/slab.h:1188 [inline]
+    lsm_blob_alloc+0x4d/0x80 security/security.c:192
+    lsm_sock_alloc security/security.c:4375 [inline]
+    security_sk_alloc+0x2d/0x290 security/security.c:4391
+    sk_prot_alloc+0x8f/0x1b0 net/core/sock.c:2248
+    sk_alloc+0x36/0x460 net/core/sock.c:2301
+    __vsock_create.constprop.0+0x38/0x2f0 net/vmw_vsock/af_vsock.c:893
+    virtio_transport_recv_listen net/vmw_vsock/virtio_transport_common.c:1557 [inline]
+    virtio_transport_recv_pkt+0x855/0xfc0 net/vmw_vsock/virtio_transport_common.c:1685
+    vsock_loopback_work+0x104/0x140 net/vmw_vsock/vsock_loopback.c:142
+    process_one_work+0x26c/0x5d0 kernel/workqueue.c:3275
+    process_scheduled_works kernel/workqueue.c:3358 [inline]
+    worker_thread+0x243/0x490 kernel/workqueue.c:3439
+    kthread+0x14e/0x1a0 kernel/kthread.c:436
+    ret_from_fork+0x23c/0x4b0 arch/x86/kernel/process.c:158
+    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+BUG: memory leak
+unreferenced object 0xffff8881054d0ea0 (size 96):
+  comm "kworker/1:3", pid 5832, jiffies 4294944454
+  hex dump (first 32 bytes):
+    00 e8 e1 29 81 88 ff ff 00 00 00 00 00 00 00 00  ...)............
+    00 00 00 00 00 00 00 00 00 00 04 00 00 00 00 00  ................
+  backtrace (crc 72501265):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4547 [inline]
+    slab_alloc_node mm/slub.c:4869 [inline]
+    __kmalloc_cache_noprof+0x377/0x480 mm/slub.c:5378
+    kmalloc_noprof include/linux/slab.h:950 [inline]
+    kzalloc_noprof include/linux/slab.h:1188 [inline]
+    virtio_transport_do_socket_init+0x2b/0xf0 net/vmw_vsock/virtio_transport_common.c:923
+    vsock_assign_transport+0x309/0x3a0 net/vmw_vsock/af_vsock.c:642
+    virtio_transport_recv_listen net/vmw_vsock/virtio_transport_common.c:1575 [inline]
+    virtio_transport_recv_pkt+0x8bc/0xfc0 net/vmw_vsock/virtio_transport_common.c:1685
+    vsock_loopback_work+0x104/0x140 net/vmw_vsock/vsock_loopback.c:142
+    process_one_work+0x26c/0x5d0 kernel/workqueue.c:3275
+    process_scheduled_works kernel/workqueue.c:3358 [inline]
+    worker_thread+0x243/0x490 kernel/workqueue.c:3439
+    kthread+0x14e/0x1a0 kernel/kthread.c:436
+    ret_from_fork+0x23c/0x4b0 arch/x86/kernel/process.c:158
+    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+connection error: failed to recv *flatrpc.ExecutorMessageRawT: EOF
+
+
 ---
-Changes in v2:
- - Rebase on net/main as requested (Jakub Kicinski).  v1 was based on
-   a tree that also carried the pending UAF fix ("net: usb: rtl8150:
-   fix use-after-free in rtl8150_start_xmit()"), so v1 did not apply
-   on net/main.  v2 is an independent fix that applies cleanly to
-   net/main on its own; it does not depend on the UAF fix being
-   applied first.
- - No code change besides the rebase context.
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-v1: https://lore.kernel.org/all/678BC10BB9E39322+20260421111025.15833-1-zhangdandan@uniontech.com/
----
- drivers/net/usb/rtl8150.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-diff --git a/drivers/net/usb/rtl8150.c b/drivers/net/usb/rtl8150.c
-index 4cda0643afb6..9999484d2c5e 100644
---- a/drivers/net/usb/rtl8150.c
-+++ b/drivers/net/usb/rtl8150.c
-@@ -707,6 +707,13 @@ static netdev_tx_t rtl8150_start_xmit(struct sk_buff *skb,
- 			netdev->stats.tx_errors++;
- 			netif_start_queue(netdev);
- 		}
-+		/*
-+		 * The URB was not submitted, so write_bulk_callback() will
-+		 * never run to free dev->tx_skb.  Drop the skb here and
-+		 * clear tx_skb to avoid leaving a stale pointer.
-+		 */
-+		dev->tx_skb = NULL;
-+		dev_kfree_skb_any(skb);
- 	} else {
- 		netdev->stats.tx_packets++;
- 		netdev->stats.tx_bytes += skb->len;
--- 
-2.50.1
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
