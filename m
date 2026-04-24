@@ -1,202 +1,166 @@
-Return-Path: <netdev+bounces-281005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281006-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sHuvFduM62k+OQAAu9opvQ
-	(envelope-from <netdev+bounces-281005-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:31:39 +0200
+	id 8DBJIsyO62k+OQAAu9opvQ
+	(envelope-from <netdev+bounces-281006-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:39:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59AB5460C9F
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:31:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E607E460DC5
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:39:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 826FA3008093
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 15:31:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C06C530056FF
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 15:38:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FF5231E820;
-	Fri, 24 Apr 2026 15:31:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 409FB3C944A;
+	Fri, 24 Apr 2026 15:38:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="IIslq6yL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QvNpa1Xr"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF91F78C9C;
-	Fri, 24 Apr 2026 15:31:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777044694; cv=none; b=ZZ6gGZxSUcyvsWTjLEQQQog8ilwBSAG9X0qdCyhIseBIo9SX4WWsPpR5iSu5Wkdr5vmtWKJbXkMG2y5GOY6L3r6OzvHLI1BxNIm1ciY7NwgyJA0jl0zyU4sZOCWOwtp2p5tcHulj8C2mqYIhQaMhAyqZ0qykk1cvqoNfyWIAaRY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777044694; c=relaxed/simple;
-	bh=3HzOGWPVD9l+Z39MN570g5qRFFqQa0VcnYpa0ZzfrDA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=YsD4gKjWxj/nYBYUiNeymkUt+XKwWLA2wQwhKvJ9nYgL3kZ490YBxtP3/fXuUfkMCGfUBRB+h7BZoSqcA617y/WJyePH0mk1dP1pAlXF0uCNmAosYD9J3JIsoVv3ooYvUUvu4WjKrYU5/FLrTYCIaTn8jrWSuYHXlc+mcopaR+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=IIslq6yL; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:
-	Reply-To:Content-ID:Content-Description:In-Reply-To:References;
-	bh=i9bJYBiYJbGZAYwtJkfIVM54rCO1rb/ZEIOc49bK8H4=; b=IIslq6yLCHl9c76QRgnx10KVyb
-	GcRTKfZ5N1tfUIgLNo512dbhx8mq60/f2taXj+KM94S+L1TPi4vEoAGypP6u8sqnCYSikilE2q0fz
-	UtlL9CTyDKMyjG6X9zYcX5nOa1L9YMjYZfRnNBnmJxYjyVoqvyulwkEzqYiGn26s3gfo+VTR+qfgj
-	SeIdKzSgW+3D8FaZo8ySDJNhKt3ZROaCYms+S11Xl1z1uTlgxinKuC2k5gJpO0HsUvZ9aoVAh03V2
-	qmrSeaNdopjyJWL3opleC+bfTneFgn+/SHBYMTZ6mr47PcpB1BnCgWsURt9DSXWTk+eHTA8sOYtX5
-	VegzABWQ==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wGIV4-003Ggi-0q;
-	Fri, 24 Apr 2026 15:31:26 +0000
-From: Breno Leitao <leitao@debian.org>
-Date: Fri, 24 Apr 2026 08:31:16 -0700
-Subject: [PATCH] netpoll: fix IPv6 local-address corruption
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0577375F67
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 15:38:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777045118; cv=pass; b=cKgXSxZ+VAgT3O42I/HWK1FLMYJOQ2V9lq7r1XxXStXqnCVzBjokIxB/gWIatO7OeoqqkwLIY010cxGEZprrQ60OntrUSz8v85uSUR/pQiHcPBURMgkb5Ut+XtxW2GMb2+CP9gjNF9W1gSflYf5QgDYChyP1sSqoTpFbcC3nEDs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777045118; c=relaxed/simple;
+	bh=t2s8TOYKzXfm5hu2EobCVmvlkuIXHiKwz45fcRLOMeM=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=krTx0GAldI4ftSQnYnt+jGXhcoKmKYTbDAUtPpxv5JURnNVl1ja7nM0F7b8dxTz1EhkdPRz83TaTmhhwqq5SIhLx9ekYM0EwLbdTx6b5tE1yvnIajq/yxjsdlyiiHI5SSPA8RCNpteL7qxRzbtFzEpuZHUvaT55Jm2XhF4sIp+w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QvNpa1Xr; arc=pass smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-7b186dfc1d0so116138327b3.1
+        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 08:38:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777045116; cv=none;
+        d=google.com; s=arc-20240605;
+        b=lYl0ZXFgSzG0m/FPov6A3rRr/jsSwj05BpLoJY1WzBkaqWHqFyzZhUJwdibXqfoScS
+         oPmTdhoIWoG+iONySs5LY1IELS8tjtl6HgRvSV5zj/3JTzuCHLR6c26Bt0MKS02GPd+O
+         q7WHbdpr4612n90AO4rjO1FRtmpxadwYIHnq6F9RmaNzkzLTCNdBky3Styz5r0ITfNtc
+         /7YKChu+/1+bQGyV+f8u/dfL14xhBHf/tQxyqtgPDVaXDenxIRg+WfxjduSmMNG/mtDE
+         6VwdjBKswehkd1jxE8qDcZwEUAhexZJgOtKnUDdODI5NEC1+ToWSq7jp08/hsIPq0mxm
+         2kUA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=lFIO3uQpbUozDPauVGMEhXnxUhDHFob+Eqm+rPUSPpE=;
+        fh=qjnuJwxat15Ik7BDKodJDPh6nS4+1Noq0e1B2tj8WKE=;
+        b=CgHwADardn8oRPq76ZrriEn5WMi29Tqyqul+GjfOhYj7M/fyR4kewmJ2GyFm8hX71e
+         4SOBK6lCciSa827kYhYRDLlWZX0d6GngJI1flZbMZkuTYUPR+oI4dyq4yCUN9djyR47/
+         oSj5I7YXTI8y3SbnincNjPq4IiZ/oFfczH9CzyZp/8CC0SwcY3VI4zA3SVId7bBnA2oB
+         CwRJr4c16eR7ble1Kwr3KSKobSeNTc+BSPQwDK8jPt2ilZXaDyGMkZcYsYVeYRc9Gz5Z
+         /QnDogp36bfD9wvoVQE80TrPzxDUVVCDZJiYr1341CgEbg3yTlafSxi55oPl3RwW7It1
+         YE8g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777045116; x=1777649916; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=lFIO3uQpbUozDPauVGMEhXnxUhDHFob+Eqm+rPUSPpE=;
+        b=QvNpa1XrZ8Y+Ned+cnHbten96mIUvqNqfXOLyrebXWgXzYfPtfnDj7X5JffNmOFPuN
+         9GXiFRjIg/YNfJz4BdTfIySR8bGXjS/qFvrvPtFSU0IlaOEndHrOmcCXkbtqQfVdXdL9
+         ak2z9SEIjHsH6iPWY1n7iANlVdkyR7UUH8ztwEFyBQbueS0ezOW0UbXtxy8VwvO5rfPX
+         1RTU9wcwQxcjFN/WOcsWeeMPg6e+oYp3JjYHtOyBQYrbZdF//uqBBcjiqc0ku8UrX210
+         A9ir838S0Qd8J1ZieFC/HWkGqJE5o2DlirQJtKc3XwtvPR6khLZ+zZG1VnOD5D4zCi1y
+         q5NQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777045116; x=1777649916;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lFIO3uQpbUozDPauVGMEhXnxUhDHFob+Eqm+rPUSPpE=;
+        b=IoMnU+JhQYcovucp5oyT0EJKHtF1DBzLd07hCOxvmaP0302dltcaayq4zIvQAL87YD
+         wK0VO3qx9sx0WwtA9GDGzqV7N8wQ4tKd4mP0Ps/nG7JG2IuSyZ6h9TbXgMjT15eFCAtg
+         iBf1NoasyUZGkGPq6MThx5Lq5LjR971vgZVh9bMbyLTYEv8M2LpYjKn+hieZwO2UBZKI
+         AiuNtKbPTqpQPSQVejzdGkv7r2TkkD4W5Q7BZIEZA9T3PtfF2gM4YlCsYZkGj6yU9I+B
+         lyolm4xk/3rq8WHLU+gMdwZvKzLK7GqLHzD2yfMeJSzjeeZoUNHwtkTyrkoRbgXPsMVc
+         WtDg==
+X-Gm-Message-State: AOJu0YxB3KE2r7p6F4JmqCcXkJrO1qmcr59taJEBrZPFjrZQRuvTVa8l
+	DCUs3Rap+NF1UzUJjV71/B/qcjC++8Gk5jz0qFOVCrlzQdzfaFUT1f2FsepWo8yEwwj/8CBD6Lp
+	i4c3ayF2/26iC3hUYNEsv8ZQEkIyO4og=
+X-Gm-Gg: AeBDievr+5lc+YpNQaCfxodNhbMhkH4TURuxkyKMRj/lFJ/l6oF+MY1YPjXVi01Bm0w
+	nJugj8Z1F6NFSF7XY9iZhfCj9tYaheAhrzAqfCWj+o7E0k6SJ6d1PRytCFyCH/R3gtW1c43bag/
+	ZTJHE9vpDsN0GeA8y7dp3epsxWutjZ3yNuKSdfaTy2CTXshVFzClJnMbd5nXqko6QRBwcr8m/jx
+	kBaYsMlc/ZQhIb59/xSQlQFGoJ0JuZURM6j1N2jlWIwhVJpwP52MT72KDWsgXl1ddoBwThpXUt2
+	KOyzFfOlglozizBypQ==
+X-Received: by 2002:a05:690c:60c1:b0:796:335a:895 with SMTP id
+ 00721157ae682-7b9ed276d80mr249748887b3.6.1777045116040; Fri, 24 Apr 2026
+ 08:38:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260424-netpoll_fix-v1-1-3a55348c625f@debian.org>
-X-B4-Tracking: v=1; b=H4sIAMOM62kC/yXMTQqDMBAG0KsM39qAjSGmuUop4s+oUyRKYkUQ7
- y6ty7d5BxJH4QRPByJvkmQO8PTICO1Yh4GVdPAEnWubG21U4HWZp6nqZVfOOaPr8umsLZARlsi
- 97P/t9b6dvs2H2/VX4DwvAkKXUG8AAAA=
-X-Change-ID: 20260424-netpoll_fix-88842a798663
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Cong Wang <amwang@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, clm@fb.com, 
- gustavold@gmail.com, kernel-team@meta.com, Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.16-dev-453a6
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2671; i=leitao@debian.org;
- h=from:subject:message-id; bh=3HzOGWPVD9l+Z39MN570g5qRFFqQa0VcnYpa0ZzfrDA=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBp64zKRfCMQXAECH95j3oQzhA3UZZm37udE0kHZ
- r2wz3sKkSiJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaeuMygAKCRA1o5Of/Hh3
- bVS3D/4iCZQmkXmKHEUGtMH7G9B+nLjO14nSPQ6AX9zFvgY9LfIMsaGESq7QUvPJqeCEXX0t5tY
- c7k/ZKJ9SgL4kKD04oRsyL2k82fGlc2JvzCe9tIZ+itPGWKqWEjoT+ROuB9S5UeV3L8RhQSsEEX
- fIIgwKILF57av8ph5bfeUKuW/7AVxiT//q7/UYw0x7ntB7Fk4SCXoBYZfGwqiWsQ5yhSC+71mgS
- U0bI0PKaESDBh4PLqaxqSaqWy4mAroiITdDSyrhd7DPW530z1w7b0//UpeZZvKEpqdvFjqyFOk7
- j/1iELaFtEYrmMACeiw960PTNNXBaEcb4zqcGrUhmblCb8alaF1I2DLyAI7Ek/60TUqjrhdoU8Y
- jYpZhKpIDxwLp6uktVowHz6BDl5gqZ52lUSBn02dynPZgNuTJ8zTK5K3wHmMXoFbBB5dft7t9w+
- lc0Kzf5DdsurPBcHHBD+9bFkrLh1jYJ6n2FCVPGy8iR9SinPbSTKrpKfIlhNWu0fPiwuEVhj1Np
- +NT7CZuQcyYQygcvtzfuZHZkX1bRKUDHshhMd36eZm6c6OLdkAKtFdv9/cforznSmIKOVz0JjKE
- yRg8GBgNMF3G4v4WaqNudJovEWK1xe734j7YDd5MlMBZVK4vLD9q70qjCxFA7qVoMH3nHolptW1
- yh5J4Ko/uh82JdA==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
-X-Debian-User: leitao
-X-Rspamd-Queue-Id: 59AB5460C9F
+From: Ginger <ginger.jzllee@gmail.com>
+Date: Fri, 24 Apr 2026 23:38:25 +0800
+X-Gm-Features: AQROBzDa-ba3rxrcGLluwm_UKDLvPUDqU6X4wB1CkviEyhJRfKGAD_27cMY0vDs
+Message-ID: <CAGp+u1autEHVxgs1pdqxz0kwExuKE3+XmQOtTC5bv-R7WU8nBw@mail.gmail.com>
+Subject: [bug report] Potential order bug in 'net/xfrm/xfrm_state.c',
+ primarily in 'xfrm_state_walk_done()'
+To: steffen.klassert@secunet.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: E607E460DC5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281005-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,fb.com,gmail.com,meta.com,debian.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281006-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[debian.org:+];
+	FROM_NEQ_ENVFROM(0.00)[gingerjzllee@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[3];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
 
-netpoll_setup() decides whether to auto-populate the local source
-address by testing np->local_ip.ip, which only inspects the first 4
-bytes of the union inet_addr storage.
+Dear Linux kernel maintainers,
 
-For an IPv6 netpoll whose caller-supplied local address has a zero
-high-32 bits (::1, ::<suffix>, IPv4-mapped ::ffff:a.b.c.d, etc.), this
-misdetects the address as unset (which they are not, but the first
-4 bytes are empty), calls netpoll_take_ipv6() and overwrites it with
-whatever matching link-local/global address the device happens to expose
-first.
+My research-based static analyzer found a potential orderbug within
+the 'net/xfrm' subsystem, more specifically, in
+'net/xfrm/xfrm_state.c'.
 
-Introduce a helper netpoll_local_ip_unset() that picks the correct
-family-aware test (ipv6_addr_any() for IPv6, !.ip for IPv4) and use it
-from netpoll_setup().
+Kernel version: long-term kernel v6.18.9
 
-Reproducer is something like:
+Potential concurrent triggering executions:
+T0:
+xfrm_state_walk_done
+    --> kfree(walk->filter); [t0]
+    --> list_del(&walk->all); [t3]
 
-  echo "::2" > local_ip
-  echo 1     > enabled
-  cat local_ip
-  # before this fix: 2001:db8::1   (caller-supplied ::2 was clobbered)
-  # after  this fix: ::2
+T1:
+xfrm_state_walk
+   --> list_for_each_entry_from(x, &net->xfrm.state_all, all) [t1]
+   --> __xfrm_state_filter_match(state, walk->filter) [t2]
 
-Fixes: b7394d2429c1 ("netpoll: prepare for ipv6")
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
-I've found this problem while using Chris' new AI toy (kres - Kernel
-code RESearch agent), against netpoll code.
+In T0, 'walk->filter' is free before the parent 'walk' gets removed
+from the global list. Thus, it is possible for T1 to still get the
+same 'walk' by iterating through the list linked via 'walk->all' and
+access the 'filter' field, which has already been freed.
+The concurrent buggy order is t0 -> t1 -> t2 -> t3.
 
-https://github.com/masoncl/kres
----
- net/core/netpoll.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+Thank you for your time and consideration.
 
-diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-index cd74beffd209c..4381e0fc25bf4 100644
---- a/net/core/netpoll.c
-+++ b/net/core/netpoll.c
-@@ -704,6 +704,23 @@ static int netpoll_take_ipv4(struct netpoll *np, struct net_device *ndev)
- 	return 0;
- }
- 
-+/*
-+ * Test whether the caller left np->local_ip unset, so that
-+ * netpoll_setup() should auto-populate it from the egress device.
-+ *
-+ * np->local_ip is a union of __be32 (IPv4) and struct in6_addr (IPv6),
-+ * so an IPv6 address whose first 4 bytes are zero (e.g. ::1, ::2,
-+ * IPv4-mapped ::ffff:a.b.c.d) must not be tested via the IPv4 arm —
-+ * doing so would misclassify a caller-supplied address as unset and
-+ * silently overwrite it with whatever address the device exposes.
-+ */
-+static bool netpoll_local_ip_unset(const struct netpoll *np)
-+{
-+	if (np->ipv6)
-+		return ipv6_addr_any(&np->local_ip.in6);
-+	return !np->local_ip.ip;
-+}
-+
- int netpoll_setup(struct netpoll *np)
- {
- 	struct net *net = current->nsproxy->net_ns;
-@@ -747,7 +764,7 @@ int netpoll_setup(struct netpoll *np)
- 		rtnl_lock();
- 	}
- 
--	if (!np->local_ip.ip) {
-+	if (netpoll_local_ip_unset(np)) {
- 		if (!np->ipv6) {
- 			err = netpoll_take_ipv4(np, ndev);
- 			if (err)
-
----
-base-commit: e728258debd553c95d2e70f9cd97c9fde27c7130
-change-id: 20260424-netpoll_fix-88842a798663
-
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
-
+Sincerely,
+Ginger
 
