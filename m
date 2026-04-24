@@ -1,166 +1,171 @@
-Return-Path: <netdev+bounces-280985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280986-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QL6JBCVZ62nkKwAAu9opvQ
-	(envelope-from <netdev+bounces-280985-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 13:51:01 +0200
+	id YIL+Ho9d62lGLwAAu9opvQ
+	(envelope-from <netdev+bounces-280986-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 14:09:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C60F45E06B
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 13:51:00 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C0F045E361
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 14:09:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B9B0A301724B
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 11:49:05 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 396DE3001587
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:09:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16E513BED11;
-	Fri, 24 Apr 2026 11:49:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E42403C3433;
+	Fri, 24 Apr 2026 12:09:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k6XJYsNZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Km+siIRS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C341D1862
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 11:49:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.177
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777031345; cv=pass; b=eSPQKyk3nw1X9Pb57r553+gFWdw55QI0XMJfpMNJ+vp8VwUvoitloPxQyrbznzBHBGR9kgIh/+m5BFSXn1rnIvACUdEVvYZkqjyJHsShBUkPST0yCN3CBdBh5etYxOezI93hUyJdprBqJrwpDbFxt1YLftCaCM+jEVCCQJKxF7g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777031345; c=relaxed/simple;
-	bh=S25RK4nMTAK9VP15fEcfR7N70e8eXdnyNRlIPU4OH/0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D8v0pNAbdIPbJx7SFF6kL/Xoo+Xi2RZ5Dul65HCW58YVWA7KbHEsuFILi37MRzSfB6Dr+LVxaVpr0PTJs+RjQf+YUaFKIXyOaE+fHcw2RL7irN7Ax4wpWTxX2yyA2nMd8Oc2ZpYWfz71+PCzo7WJT5OQrnZjNLhS5r19aW+HlsM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k6XJYsNZ; arc=pass smtp.client-ip=209.85.128.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-7b6ae2ea4a1so77059807b3.2
-        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 04:49:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777031343; cv=none;
-        d=google.com; s=arc-20240605;
-        b=XN7F6M8hkQFEzm5fGz5J2wFo0dKZpWiezjQ6I4i++uCQUs0R6v5GpUpyULqZhY1bl6
-         2LQ3to8m6Q6SCU9ah0uimsIw6BybPrcv3IKVzkjpdhpnM7AuZ96l/ACBJ6Ws/L+B18zi
-         oxsKO3oBngTC9rMjg8sH5C0vxFZ4qomXowl5fUq6YbQTVG21dzhsq40dki6EpBOngfla
-         wNDwI5e8XzRMejTKcxIci1T1W6cOptizurYr4yFrYMs8rjUl9akokK84ts8miAQX3PfN
-         wLiP6HKG8AGmFUu+Qp1scwouvvf3qqTNhfTIewuO39Jm7O164dwnCnwG27wn8BI0ANUF
-         lQsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=D1K+7EGQkqRwyCBLZKYkV8W/AQWx4PeXqw/cCw4zx5c=;
-        fh=hmPCaNnJ9MqPel2rOaPo7bcc1Q96xaoLIBFiYO9oCsY=;
-        b=gEU9cVPggoo52OJMiZ1vQROk7e2HW0Qb091Q+CrxF4R0J3zZulbnJZMfFnb1XlPeqZ
-         qd44tFRmdlmFv40a51lXbtcPaWmuBGSaIafLbeO0Od5BauKbFYVC42MmBgTKkofyu0tW
-         LicfTZ3F0JijFSheSBFhNnS2C4DEib1kAp4kFgPGhM79TtmzektlUr1Zl4UAmbs3eiZR
-         jIczgMd6ZjtQHgu4Sodrlz30OEDWwFZiwNWRqDmqOCf4/7cNszBOBes6E/ZxJ82lEolF
-         Qr2829VvfX8b3pdLQt39UIo8k4OgaBaYSf+edKxxpB5Giko1V2yLFFssn2Fy+5X9Ppum
-         uHvA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777031343; x=1777636143; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D1K+7EGQkqRwyCBLZKYkV8W/AQWx4PeXqw/cCw4zx5c=;
-        b=k6XJYsNZMLHY1IGexCfkiJ/PK1hS/fAglwniI5NBv1tHpe7lRTgnaRjAqBF8dOJWFY
-         AazECwOF1v6YdVd0zvShiGUe5U2sb0FlBYUWY/mVrkU+EQvc+XxU0jl2FcWE+nC8uFTM
-         gaOuGc0V9pUhlYmtf6TkIT7QRtupt36IN1CtRIk4uV5pPxwv0eWOtof2AsyFSXKG/J6s
-         QvZ4i41Lf3t+gHKnHP9E1pUiyr3HVkHN0mKIioB0qMOc8TjGrZSL25NTsQB/iZ+klJMF
-         R0PNOytZ+/Yk3IrFyLiwzYqul+x6e2EBcDIICw5t3s1Q8XO4evdsUHBp8ljC2ouiD1x6
-         Th0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777031343; x=1777636143;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=D1K+7EGQkqRwyCBLZKYkV8W/AQWx4PeXqw/cCw4zx5c=;
-        b=sDJcwc8sc9uihN8LICLr/M6008yAKYSQ+nOWG6p3LebDTnc/tjhlHYwwtk9+KWhG07
-         38aspTt5cFnDhSpbuPxLAi94Dm2mFjZs9Tk75IKaypOl+RPr0uzDzG1++5ewU++GVOs/
-         3cKNfDBOSzdX8/MFiDtu7WPVajup+faMBk2Wlurk9DuJfiASQvAiW9kyzh2Lq1czltXf
-         Zgrl95y+b7Qkpi/YilZ4tr+2UQALtMznnLjfL1iMnnqI9onyH9haWxCzh6IojOGP3YJo
-         JjvluwYgzY8IO8ZJ5c6wpshYgtU16W06HKn3UQqbF+Y+nZbi/gjSQmTgM2yEmkMGrrk8
-         DriA==
-X-Forwarded-Encrypted: i=1; AFNElJ8uXh8ZTGhOqEHq9hXnQkOXM23qNbDBVHdZYg15yaCh5hNZ7Dumw1iPkRAOFREln/mDABt77tg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuKg/GzgKCcKUwRmb60PCsTZQHzkWONBjIvm5836E6ESIR0Kci
-	VxeV2yS7uq4wDMquBoKN1iLVVthQXaVMR8lDZpytub1ECohSJeavgZnN4PSbwP68yMZZdksIcZo
-	oXuJ7P3/DiP8EUwATsilQZqcCftUjiYQ=
-X-Gm-Gg: AeBDieseX95QgCnaZA2uJt6p43+/2ZWCbGyVafFrGqxYbdkQM5MOBYA5SwDSnDKfIJr
-	Wcx1eT61/A/oIDi7E+06D5yyEa4XhFHNLdoGGoUXFs/Kf+xM+VnVQeCHKELz6c4cNDzCQC8LQ6M
-	Mg5eqYkbH4kgzL610ke5Yhjo17T+rVk8nwA8vRpHa+B7pMOAlN2F9BrYsdHdNqi0/rr1R9KigzC
-	68iTedBYtITiYoDkCByurUR4r+towqAjU6RptWfwcq5st4Sol0dViSc3UdDGzUXwuPKn1ElxYva
-	lxG8BAF/GFho0WSXXouTHKpdkwC1xI0G+VR/Go/entK4Yao=
-X-Received: by 2002:a05:690c:4990:b0:7ba:e315:d8c9 with SMTP id
- 00721157ae682-7bae315d8f7mr240564787b3.36.1777031342730; Fri, 24 Apr 2026
- 04:49:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04473C279B;
+	Fri, 24 Apr 2026 12:09:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777032585; cv=none; b=eKe9Tm3NRxNye0X5tOXz1M//7mkX0+WuqYYvD4V57INkhFy7C5aY6dnsROc25gsWlpYSEnD7/5sThraavKdUhVm1S0mGJwi3dA7NyZ2Qr1/qcf2oLhbepQtFtGm6shYvvQPdBS4ByiqKeVhhL7glQ2xgioehL1fE4yc4HMNAm4E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777032585; c=relaxed/simple;
+	bh=rRaSkeKhlvpU4tWi8hdt4ujoWHjih8+/eulMWmIEvI8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bNsc2jKZC6IURwpMbfm6cbdfdpmudgH0zfBh3g8/4LPTOh5l8H0mgT4+WCdsPWSPc0vZ445ZW0P3VsgUvnP0QmRWsxGpREboLxJztVAByw5S4VZMAFjtpju+QHjBuDiGkeq2TvS3U9C0ODmM3E7XrPs2a3lVWlA3/Eck9c3WIhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Km+siIRS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77D64C19425;
+	Fri, 24 Apr 2026 12:09:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777032585;
+	bh=rRaSkeKhlvpU4tWi8hdt4ujoWHjih8+/eulMWmIEvI8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Km+siIRSuoDTa3nXOPBrNIscTm6Udb4rIj9eJRYWafziUy3gUVXZlj3UmWYvd0tUb
+	 4oO1dWzyHJ9SUCNIov620+KeDrw8mKfNwpqK9sCoIHdlPu5MDd3V5HKgQ5lzaj+y70
+	 oJ0qID4VKZK2Xq9F6l1p/bff0ZxHNSSXgCStxzgvoIq4X3Om3dS4bga6VK24rEXTHC
+	 I/EhE+CDjHynmxgsnMUMGbYMU3TmjLj0Sb+v2nVAlspbLWthFhbI+kAB2cDIK2Crmd
+	 PYbVxjlF+F40zzKQX9DH/H5i854t1XPwlIHlOY7FbAWJAOQtxbyFe82jhT6xZjLdj7
+	 bEOyJVLK+yP/A==
+Date: Fri, 24 Apr 2026 13:09:27 +0100
+From: Jonathan Cameron <jic23@kernel.org>
+To: Yury Norov <ynorov@nvidia.com>
+Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski
+ <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, David Lechner
+ <dlechner@baylibre.com>, Nuno =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>, Andy
+ Shevchenko <andy@kernel.org>, Ping-Ke Shih <pkshih@realtek.com>, Richard
+ Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes
+ <linux@rasmusvillemoes.dk>, Hans de Goede <hansg@kernel.org>, Linus Walleij
+ <linusw@kernel.org>, Sakari Ailus <sakari.ailus@linux.intel.com>, Salah
+ Triki <salah.triki@gmail.com>, Achim Gratz <Achim.Gratz@Stromeko.DE>, Ben
+ Collins <bcollins@watter.com>, linux-kernel@vger.kernel.org,
+ linux-iio@vger.kernel.org, linux-wireless@vger.kernel.org,
+ netdev@vger.kernel.org, linux-rtc@vger.kernel.org
+Subject: Re: [PATCH 0/9] bitfield: add FIELD_GET_SIGNED()
+Message-ID: <20260424130927.349ad3ae@jic23-huawei>
+In-Reply-To: <20260417173621.368914-1-ynorov@nvidia.com>
+References: <20260417173621.368914-1-ynorov@nvidia.com>
+X-Mailer: Claws Mail 4.4.0 (GTK 3.24.52; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260420162734.854587-1-michael.bommarito@gmail.com>
- <20260423212827.1177552-1-michael.bommarito@gmail.com> <20260423185014.08269f73@kernel.org>
-In-Reply-To: <20260423185014.08269f73@kernel.org>
-From: Michael Bommarito <michael.bommarito@gmail.com>
-Date: Fri, 24 Apr 2026 07:48:51 -0400
-X-Gm-Features: AQROBzBh4hC9NTAGbXjRk4_Ku1BLAEhdjkZWkM2-BUNuPjFEK99NdqrNAtxXAuU
-Message-ID: <CAJJ9bXy2e6kHKW=Un5JcNaO8u-Yj3Esyum3sjVtCq8F2mOc5kw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] netlink: clean up failed initial dump-start state
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Kees Cook <kees@kernel.org>, Feng Yang <yangfeng@kylinos.cn>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 8C60F45E06B
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 6C0F045E361
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280985-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280986-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jic23@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,alien8.de,linux.intel.com,zytor.com,infradead.org,baylibre.com,analog.com,realtek.com,gmail.com,lunn.ch,davemloft.net,google.com,bootlin.com,rasmusvillemoes.dk,Stromeko.DE,watter.com,vger.kernel.org];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,nvidia.com:email]
 
-On Thu, Apr 23, 2026 at 9:50=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
-> Looks like this changes existing behavior :(
-> The tools/testing/selftests/net/netlink-dumps.c test used to always
-> see a NLMSG_DONE now it doesn't. Maybe this change is more risk
-> than reward?
->
-> process nit: please don't post new versions in reply to previous
+On Fri, 17 Apr 2026 13:36:11 -0400
+Yury Norov <ynorov@nvidia.com> wrote:
 
-Sorry about both of those.  And yes, I think you're right about
-risk-reward.  While it's fully unprivileged and could cause issues on
-very small devices, it's probably only worth addressing if someone is
-touching errout_skb and related branches for some other bigger reason.
-Maybe the shared cleanup pattern is helpful in the future but I'll
-drop this unless you say otherwise
+> The bitfields are designed in assumption that fields contain unsigned
+> integer values, thus extracting the values from the field implies
+> zero-extending.
+> 
+> Some drivers need to sign-extend their fields, and currently do it like:
+> 
+> 	dc_re += sign_extend32(FIELD_GET(0xfff000, tmp), 11);
+> 	dc_im += sign_extend32(FIELD_GET(0xfff, tmp), 11);
+> 
+> It's error-prone because it relies on user to provide the correct
+> index of the most significant bit.
+> 
+> This series adds a signed version of FIELD_GET(), which is the more
+> convenient and compiles (on x86_64) to just a couple instructions:
+> shl and sar.
+> 
+> Patch #1 adds FIELD_GET_SIGNED(), and the rest of the series applies it
+> tree-wide.
+> 
+
+Just a quick heads up that I'm beginning to assume that this series
+will land in some form.  If it does can we do it as an immutable branch
+as I'm suggesting it gets used in some other patches in that should land
+in the new cycle.
 
 Thanks,
-Mike Bommarito
+
+Jonathan
+
+> Yury Norov (9):
+>   bitfield: add FIELD_GET_SIGNED()
+>   x86/extable: switch to using FIELD_GET_SIGNED()
+>   iio: intel_dc_ti_adc: switch to using
+>   iio: magnetometer: yas530: switch to using FIELD_GET_SIGNED()
+>   iio: pressure: bmp280: switch to using
+>   iio: mcp9600: switch to using FIELD_GET_SIGNED()
+>   wifi: rtw89: switch to using FIELD_GET_SIGNED()
+>   rtc: rv3032: switch to using FIELD_GET_SIGNED()
+>   ptp: switch to using FIELD_GET_SIGNED()
+> 
+>  arch/x86/include/asm/extable_fixup_types.h       | 13 ++++---------
+>  arch/x86/mm/extable.c                            |  2 +-
+>  drivers/iio/adc/intel_dc_ti_adc.c                |  4 ++--
+>  drivers/iio/magnetometer/yamaha-yas530.c         | 12 ++++++------
+>  drivers/iio/pressure/bmp280-core.c               |  2 +-
+>  drivers/iio/temperature/mcp9600.c                |  2 +-
+>  .../net/wireless/realtek/rtw89/rtw8852a_rfk.c    |  4 ++--
+>  .../net/wireless/realtek/rtw89/rtw8852b_common.c |  4 ++--
+>  .../net/wireless/realtek/rtw89/rtw8852b_rfk.c    |  4 ++--
+>  drivers/net/wireless/realtek/rtw89/rtw8852c.c    |  4 ++--
+>  drivers/ptp/ptp_fc3.c                            |  4 ++--
+>  drivers/rtc/rtc-rv3032.c                         |  2 +-
+>  include/linux/bitfield.h                         | 16 ++++++++++++++++
+>  13 files changed, 42 insertions(+), 31 deletions(-)
+> 
+
 
