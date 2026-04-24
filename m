@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-281067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281064-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mOlQFGHx62nWTAAAu9opvQ
-	(envelope-from <netdev+bounces-281067-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 00:40:33 +0200
+	id YMPkJPHw62nWTAAAu9opvQ
+	(envelope-from <netdev+bounces-281064-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 00:38:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7CD6463D81
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 00:40:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF6AE463D4D
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 00:38:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 52C4C303010A
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 22:38:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0D1FC300E265
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 22:38:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DA1D37D115;
-	Fri, 24 Apr 2026 22:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14E18341ADD;
+	Fri, 24 Apr 2026 22:38:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=raczylo.com header.i=@raczylo.com header.b="jXiZTnWY";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lhr1.rp.oracleemaildelivery.com header.i=@lhr1.rp.oracleemaildelivery.com header.b="6Gah3koJ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=raczylo.com header.i=@raczylo.com header.b="TSogRzS1";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lhr1.rp.oracleemaildelivery.com header.i=@lhr1.rp.oracleemaildelivery.com header.b="K6Lrzat6"
 X-Original-To: netdev@vger.kernel.org
-Received: from acj35aaf126.lhr1.oracleemaildelivery.com (acj35aaf126.lhr1.oracleemaildelivery.com [130.35.116.126])
+Received: from acj35aaf125.lhr1.oracleemaildelivery.com (acj35aaf125.lhr1.oracleemaildelivery.com [130.35.116.125])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E73535AC29
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 22:38:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.35.116.126
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39079337688
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 22:38:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.35.116.125
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777070321; cv=none; b=FRbShPjzFfc4nuZieajPdTQDdEzUObeDItCtnFTe0+SKNLlHlvGtVHAqxU31cmqrS+QtPnomSttI5hpfPEzdvEZbab990PlrAFT2BpVj+qxle6Hb65xxVDF63RSPfYSoYo6O4YDfnLWwJIFsZQ2r49AM3peuTFpfcp1CwXy13oQ=
+	t=1777070318; cv=none; b=opaeCeJSVjnfIWujaPZ7P+d1tiGV38Je9aSEUqJFbBveEoP7UVZH69Z6hDRzNZ1pkf61inZnUYNTqfZXd3zNks2k5GaaY+Cxkwkl0zPJTXHVqfDH99jOpy4oc7StcOKd1qSdomykd4ZTfdzhhQ7IRkxPm0z0dFK/pJuWwkiP94A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777070321; c=relaxed/simple;
-	bh=xUJwXvMkpWSDYRXgzCZLsd+EsgdoCgW8I52ZPmglP2Y=;
-	h=From:To:Cc:Subject:Date:Message-id:MIME-version; b=JkbzPQMw2qqg49SCGALTFV0CpOchy+4Jvb6qEoejKgfh3Qee4AWxHldcqezpIyLSkXR1VUii41r5DXQDZOMmQ5nqYRmyNtG79I3VXONU39GoyVrS1p29VcsCiEZFXG4wTrJ7ew4XCVeXAYWcbxPqmiJUX1Dv0khAl5ikhyWERJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raczylo.com; spf=pass smtp.mailfrom=lhr1.rp.oracleemaildelivery.com; dkim=pass (2048-bit key) header.d=raczylo.com header.i=@raczylo.com header.b=jXiZTnWY; dkim=pass (2048-bit key) header.d=lhr1.rp.oracleemaildelivery.com header.i=@lhr1.rp.oracleemaildelivery.com header.b=6Gah3koJ; arc=none smtp.client-ip=130.35.116.126
+	s=arc-20240116; t=1777070318; c=relaxed/simple;
+	bh=7xxX0CkMupQcfPTzee8ry5FcQlhHy6640eeW3exSrBA=;
+	h=From:To:Cc:Subject:Date:Message-id:In-reply-to:References:
+	 MIME-version; b=OPET/3VJGY5ociaWd7XIUDKARQXqtanIvnACQRbHLAn+hu5rlbl4Vb9bNATY6k+zFjHjLw0Zj1kAwGeBaDmnaiur72VEWnW7Z2OwWl3wYF2+xqj+wz7s0rCbbkGteKjzx07WgTWhADVdSiQXZbFTwCb8bd5Yfj1vqtXr6xPS19o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raczylo.com; spf=pass smtp.mailfrom=lhr1.rp.oracleemaildelivery.com; dkim=pass (2048-bit key) header.d=raczylo.com header.i=@raczylo.com header.b=TSogRzS1; dkim=pass (2048-bit key) header.d=lhr1.rp.oracleemaildelivery.com header.i=@lhr1.rp.oracleemaildelivery.com header.b=K6Lrzat6; arc=none smtp.client-ip=130.35.116.125
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raczylo.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lhr1.rp.oracleemaildelivery.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=oracle-uk-012026;
  d=raczylo.com;
  h=Date:To:From:Subject:Message-Id:MIME-Version:Sender:List-Unsubscribe:List-Unsubscribe-Post;
- bh=PuNCSuhDY3aqUFt5mHJ3ZpNiytDxGYxQFnYjsTy8j+M=;
- b=jXiZTnWYwDGQ7gZeSDBaYTeQocXetHQYnnQme7EA1hzK/HZ+0qOVmutX1s9PrFB+TIb+cFib1KUJ
-   +s2iTQ04y7CEcdiWgqGRnerRPRv3yCImBicHqFk7LQ+2hU4HdwtQos+JGCM+cGYtoUtnQ3SLd0wE
-   Yo592gtEGOJqX5graM22O8MAdlyuBD6gGQwEaJB8RaAd3C04HX7M2SGHRMyd1UWgpaNZk3/J/+cX
-   Mep/3Bhzaie6foC0FNDJrRUTcwbZ2zSfRW8OEqRxr+NzKUxFqFPXMHP1fIWRruKhg3+d5HmNIzEy
-   1UbaF/LxbbF9WPbXnVTc7AykFOyzI32HTMlhlA==
+ bh=G7jLGar8TG1IVsYdC7k9CyHPoJnsdAXy6l5eRrUEDPc=;
+ b=TSogRzS1n1mycUmGkpmYO5lL143T5F2DMNbAzHxby4VN9n+lBPx4X1pxHYIWS4Yz8SWQ6CxJhGZp
+   mm/8BqKibo+dj2yRBdedcLA7b3fh5EPg+ccD2MMR9an2M4CXHNs7UV2eDjHsh13BfbU/V9WAztdV
+   iQ+UCZbuIDOCD2svSrwc+XP1hA3zPF1JfEFtnsRbmoTbyqaNwR+M2bHurgFh/NwbUpTVAS9PzpKV
+   49+Ck2rXbp3S1gSsRSxK0f5GM/VQ31HtHoOgAuMp0g4AksPZ26Ni8tw8rp4fMr0+Oiu1r8J3bwk7
+   Ib1HCo+M/ZkbT6nEqruSNs3pw2KtTfHwfLJxxA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=prod-lhr-20191104;
  d=lhr1.rp.oracleemaildelivery.com;
  h=Date:To:From:Subject:Message-Id:MIME-Version:Sender:List-Unsubscribe:List-Unsubscribe-Post;
- bh=PuNCSuhDY3aqUFt5mHJ3ZpNiytDxGYxQFnYjsTy8j+M=;
- b=6Gah3koJuEV9uqe2DPZ1BnhNLS8s3c3xt7AMdVbF+XlkyCT6nQGzt03pKDt6O7p2oUXbPZaKcljZ
-   V2GHm1mBvPttH0jpnHEihJih5SjDn+jSXXbIsckXNRdBU6Li4z8KFaxDmdJ/HE/VHmh4WLYJKXqO
-   vRWoY7Y1lY7khHNlQAgQ4i45aXKCfG8Q54gEN6cGpTlO7rD3Kg5MqxYHZEHZnLjtqwVGU+WJhgYF
-   1yrxQ3MH9mDw39/Ea7a6AO2KYBpx/DktQlOYTjCxQkYnjZ1xNrLoK+fVEWFTPfPp2RAWvD3TEfMU
-   B3n5QnDjtQ2DnpX5eNmHcSkpBCHmMdBzkI3zkw==
-Received: by omta-ad1-fd1-402-uk-london-1.omtaad1.vcndplhr.oraclevcn.com
+ bh=G7jLGar8TG1IVsYdC7k9CyHPoJnsdAXy6l5eRrUEDPc=;
+ b=K6Lrzat6IjmF3/fCzjVKWErIcKFurJsh9BWs8qg6DrOLMapseRWURZaUGx6w96Wni29md4zpbZBS
+   igEXTi9UTIqixe0TH+Si302yJzZvWxDZmaNukN69ndI8duiBJTo5KFH3Uj3nTX6xHNRRHROj64hH
+   jLnPYeDKqfMgy7vkPSfdHB9+kmvL+8VdEMZbXtjTLn9WgygrW24yatazGbmd+ltBuNkxUQ+Exccg
+   eC4ICio5PYR5w/PbN7uS+xVEaW4xBj0qOyMPraOY+jwNO5eqT392nfo/5ml6VahfCNonp/k+Iqww
+   h7dLoLOkHIHdFmxKv1lOuQasu8vsL7i/cwfOkQ==
+Received: by omta-ad1-fd2-401-uk-london-1.omtaad1.vcndplhr.oraclevcn.com
  (Oracle Communications Messaging Server 8.1.0.1.20260212 64bit (built Feb 12
  2026))
- with ESMTPS id <0TE0001IRS8AB850@omta-ad1-fd1-402-uk-london-1.omtaad1.vcndplhr.oraclevcn.com> for
+ with ESMTPS id <0TE0005VUS8A7ZE0@omta-ad1-fd2-401-uk-london-1.omtaad1.vcndplhr.oraclevcn.com> for
  netdev@vger.kernel.org; Fri, 24 Apr 2026 22:38:34 +0000 (GMT)
 List-Unsubscribe-Post: List-Unsubscribe=One-Click
 From: Lukasz Raczylo <lukasz@raczylo.com>
@@ -66,11 +67,14 @@ Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
 	Eric Dumazet <edumazet@google.com>,	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,	linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,	linux-rpi-kernel@lists.infradead.org
-Subject: [RFC PATCH net-next 0/3] net: macb: candidate fixes for silent TX
- stall on BCM2712/RP1
-Date: Fri, 24 Apr 2026 23:38:30 +0100
-Message-id: <cover.1777064117.git.lukasz@raczylo.com>
+Subject: [RFC PATCH net-next 1/3] net: macb: flush PCIe posted write after
+ TSTART doorbell
+Date: Fri, 24 Apr 2026 23:38:31 +0100
+Message-id:
+ <3106d546d494f2f52ec832e7f7d04f534286e254.1777064117.git.lukasz@raczylo.com>
 X-Mailer: git-send-email 2.53.0
+In-reply-to: <cover.1777064117.git.lukasz@raczylo.com>
+References: <cover.1777064117.git.lukasz@raczylo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,13 +84,13 @@ MIME-version: 1.0
 Content-transfer-encoding: 8bit
 Reporting-Meta:
  AAFzDiYTuS9jvqSCDQoXiqVnkU2yDl7DFh57yZB8VktRLO86c1eFyO5ekvNWCLwV
- PHyd9gw8WA5srfV/TRD60HPcqN0ckK5QcJL8GxoA66ySSfFo1PcOK2lmmEbtUZw5
- PiAmw5/lJh5no0aLuB1SPnuvKcHlQ2Gm6Cy97g5ocVN/a69uZW69m4pRsqFnUGLp
- DvzMrxjfu8rd+J9GyYMD7Cq0Y4N1mnotj19RrXunseXJyWXRxQj5zFaH01Ln95Ja
- UOq+zonMcrYjihIVuuCRABOhGMpd0ca4AQdA3DBzcQ/muCjmmQGFcSIkmCisx+Ot
- ICiewyf8d8fpB6ZsJGir6DwMwR61Hh42uctgnzcfrUHwfB6WwBzX+RlPo+I6k5Wv
- GzPWVXfSbdD6wStUq7S5mIYEEOLTHtEnCDMh0/HqxGZ4L766Y7vXjBrS4Bu0KA==
-X-Rspamd-Queue-Id: A7CD6463D81
+ PHyd9gw8WA5srfV/TRAF0XPcqN0ckK5QcJIF7eobe03u2sRYs57fa3Mgmg2gAtMw
+ 1CT7xUBuqHay+QGcBkLVevgREbdvX1cGfWq/pj43bFZqOKH7jp3vStUCpFn3WnqV
+ TyGYwGpmpEoP9tMuixXrpE2OujxyjmkJjmge/RsB5fLCB/drQzdkkH4AuS/ipJKk
+ 0RySA/KdV3OpQ2gZrrNZCCa3WiCohIFMCKYGaLEacN0QZBrdCcc8iPUNce3IAcGf
+ fxWvkC+id2HOacV04teARomQrNeXUQmRGPKZ/ZT3wcfkMLKNdUE7efBM/EkwoXJw
+ XV9gjqUV6s/ge8dwcHoSco74Y2yDf7H3Ua+uDwEQX9UaKavseF06+TkUOp99
+X-Rspamd-Queue-Id: DF6AE463D4D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [4.54 / 15.00];
@@ -96,7 +100,7 @@ X-Spamd-Result: default: False [4.54 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -105,133 +109,88 @@ X-Spamd-Result: default: False [4.54 / 15.00];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	GREYLIST(0.00)[pass,meta];
-	TAGGED_FROM(0.00)[bounces-281067-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-281064-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lukasz@raczylo.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lukasz@raczylo.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[raczylo.com:-,lhr1.rp.oracleemaildelivery.com:-];
-	NEURAL_HAM(-0.00)[-0.759];
+	NEURAL_HAM(-0.00)[-0.812];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[raczylo.com:mid,launchpad.net:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,launchpad.net:url,raczylo.com:mid,raczylo.com:email]
 
-Hi netdev, Nicolas, Claudiu, linux-rpi,
+macb_start_xmit() and macb_tx_restart() kick transmission by
+OR-ing MACB_BIT(TSTART) into NCR.  On PCIe-attached macb instances
+(BCM2712 + RP1 PCIe south bridge on Raspberry Pi 5 is the setup we
+have in front of us), writes to NCR are posted PCIe writes: they
+are not guaranteed to reach the device before the issuing CPU
+returns.  If the TSTART doorbell does not reach the MAC, no TX
+begins, no TCOMP completion arrives, and the ring remains
+quiescent without any kernel-visible indication.
 
-This series proposes three candidate fixes for the silent TX stall
-observed on Raspberry Pi 5 (BCM2712 SoC, Cadence GEM via RP1 PCIe
-south bridge).  The bug has been reported, with reproducers, at:
+Note that the raspberrypi/linux vendor fork carries a local patch
+around the TSTART site (a queue->tx_pending breadcrumb that is
+promoted to queue->txubr_pending by the next TCOMP interrupt,
+triggering macb_tx_restart()).  That workaround makes the loss
+recoverable under traffic, but it cannot help if TCOMP itself is
+not raised because no TX started -- which is exactly the case we
+are targeting here.  The handshake is not present in mainline.
 
-  * https://github.com/cilium/cilium/issues/43198
-  * https://bugs.launchpad.net/ubuntu/+source/linux-raspi/+bug/2133877
+Add a read-back of NCR after each TSTART write in macb_start_xmit()
+and macb_tx_restart().  The read is an architected PCIe read
+barrier for earlier posted writes on the same path; it ensures the
+doorbell has reached the MAC before the functions return.
 
-Cilium #43198 reports reproduction on linux-raspi 6.17.0-1004, and
-explicitly notes reproduction with both Cilium/eBPF and
-Calico/nftables dataplanes (i.e. not CNI-specific).  We observe the
-same failure mode on kernel 6.18.24 built from raspberrypi/linux
-rpi-6.18.y @ f2f68e79f16f, across a 24-node Raspberry Pi 5 fleet.
-The 6.17/6.18 commonality and the two-CNI reproduction together
-put the root cause below the packet-scheduling layer, in the macb
-driver or the RP1 PCIe path.
+We do not yet have direct hardware evidence that TSTART is being
+lost on the RP1 path (that would require a PCIe protocol analyser,
+or at minimum a before/after counter on queue->tx_stall_last_tail
+with and without this patch applied in isolation).  This patch is
+one of a three-patch series ("candidate fixes for silent TX stall
+on BCM2712/RP1"); see the cover letter for context.  We have
+verified the series compiles and applies cleanly against mainline
+HEAD and against raspberrypi/linux rpi-6.18.y @ f2f68e79f16f;
+runtime verification is pending.
 
-Observed symptoms (our side, 6.18.24; consistent with the linked
-reports):
+Link: https://github.com/cilium/cilium/issues/43198
+Link: https://bugs.launchpad.net/ubuntu/+source/linux-raspi/+bug/2133877
+Signed-off-by: Lukasz Raczylo <lukasz@raczylo.com>
+---
+ drivers/net/ethernet/cadence/macb_main.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-  * queue->tx_tail stops advancing at a single second;
-  * /sys/class/net/<iface>/statistics/tx_packets stops incrementing;
-  * qdisc backlog grows past zero; netif_stop_subqueue() is called;
-  * RX counters continue advancing; the MAC IRQ line continues to
-    fire (RX completions are handled);
-  * no kernel log line is produced for the duration of the stall;
-  * dev_watchdog does not fire: macb_netdev_ops has no
-    .ndo_tx_timeout, and our reading is that trans_start is kept
-    fresh by successful xmit prior to the ring filling;
-  * recovery on our side has required `ip link set <iface> down/up`
-    via an out-of-band watchdog DaemonSet.
-
-Reading the current driver we identified three plausible races
-between driver and hardware, each of which could independently
-produce the observed behaviour.  We did not determine which is the
-actual root cause -- that likely requires either BCM2712/RP1
-documentation we do not have, or dynamic tracing of the driver
-during an in-situ stall.  The series therefore attempts to close
-all three, with each commit message stating which specific race
-that patch is targeting.
-
-  Patch 1/3 -- flush PCIe posted write after TSTART doorbell.
-  Writes to NCR are posted PCIe writes and may not reach the MAC
-  before the driver returns.  If the TSTART doorbell is lost, no
-  TX starts, no TCOMP arrives, and the ring goes quiescent.  A
-  read-back of NCR after the write is a standard read-after-write
-  PCIe flush.
-
-  Patch 2/3 -- re-check ISR after IER re-enable in macb_tx_poll().
-  An existing comment in macb_tx_poll() notes that completions
-  raised while TCOMP is masked do not re-fire when IER is
-  re-enabled, and mitigates the window with macb_tx_complete_pending(),
-  which inspects driver-visible ring state only (after rmb()).  On
-  PCIe-attached parts the descriptor DMA write that sets TX_USED
-  can remain in flight when that check runs; the rmb() orders CPU
-  writes but does not retire peripheral DMA.  Reading ISR directly
-  after IER re-enable addresses this in two ways: (a) the MMIO read
-  is an architected PCIe read barrier for prior DMA writes, so a
-  subsequent macb_tx_complete_pending() sees up-to-date TX_USED
-  state; (b) it directly observes a pending TCOMP bit if the
-  hardware has one set.  Either signal reschedules NAPI.
-
-  Patch 3/3 -- TX stall watchdog.  Defence-in-depth.  If patches
-  1 and 2 close the races we identified, this patch performs a
-  single spin_lock_irqsave/unlock and a branch per queue per
-  second with no other effect.  If a further race remains that we
-  have not identified, it invokes the driver's own existing
-  macb_tx_restart(), which already verifies that TBQP is behind
-  tx_head before re-asserting TSTART.  We include this patch
-  because we have empirically observed multi-minute stalls on this
-  hardware; we are willing to drop it if the preference is for
-  1 and 2 to stand alone.
-
-Status and testing:
-
-  * Apply-tested against Linux net-next HEAD (this series is
-    generated from it) and against raspberrypi/linux rpi-6.18.y @
-    f2f68e79f16f (the fork our fleet runs): all three apply
-    cleanly on net-next; the rpi fork carries an additional local
-    `bool tx_pending` field on `struct macb_queue` that is not in
-    mainline, so we maintain a small rebased patch 3 hunk for it.
-  * Build-tested: the series compiles cleanly as part of our Talos
-    image build pipeline on arm64.
-  * Runtime-tested, early signal: ~4 h 20 min of post-patch uptime
-    on the canary node, ~3 h 15 min on the slowest (last master to
-    upgrade), ~95 node-hours cumulative across the 24-node fleet at
-    the time this cover letter was written.  During that window the
-    fleet-wide counts are zero RECOVER events, zero `[tx-stall]`
-    partial markers (an out-of-band userspace detector that records
-    even transient one-second freezes that recover before the
-    3-second threshold), and zero ping-failure markers.  Pre-patch
-    reference window (2026-04-24 14:00-18:10 UTC, when proper
-    monitoring was in place) observed multiple stalls per hour at
-    fleet level; at that rate we would expect on the order of 50
-    stalls in 95 node-hours, actual is zero.  We will follow up
-    with a 24 h and a 1-week data point as the same observability
-    runs forward; the direction so far is consistent with patches
-    1 and 2 closing the underlying race(s) and patch 3 correctly
-    being a no-op on healthy hardware.
-
-The series does not depend on any other in-flight work we are
-aware of.  Happy to split, rebase, or drop individual patches on
-feedback.  All three are independently revertable.
-
-Lukasz Raczylo (3):
-  net: macb: flush PCIe posted write after TSTART doorbell
-  net: macb: re-check ISR after IER re-enable in macb_tx_poll
-  net: macb: add TX stall watchdog as defence-in-depth safety net
-
- drivers/net/ethernet/cadence/macb.h      |  5 ++
- drivers/net/ethernet/cadence/macb_main.c | 99 +++++++++++++++++++++---
- 2 files changed, 94 insertions(+), 10 deletions(-)
-
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index a12aa2124..b6cca55ad 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -1922,6 +1922,13 @@ static void macb_tx_restart(struct macb_queue *queue)
+ 
+ 	spin_lock(&bp->lock);
+ 	macb_writel(bp, NCR, macb_readl(bp, NCR) | MACB_BIT(TSTART));
++	/*
++	 * Flush the PCIe posted-write queue so the TSTART doorbell
++	 * reliably reaches the MAC.  Without this, the write can sit
++	 * in the fabric and the MAC never advances, causing a silent
++	 * TX stall.
++	 */
++	(void)macb_readl(bp, NCR);
+ 	spin_unlock(&bp->lock);
+ 
+ out_tx_ptr_unlock:
+@@ -2560,6 +2567,11 @@ static netdev_tx_t macb_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	spin_lock(&bp->lock);
+ 	macb_tx_lpi_wake(bp);
+ 	macb_writel(bp, NCR, macb_readl(bp, NCR) | MACB_BIT(TSTART));
++	/*
++	 * Flush the PCIe posted-write queue; see the comment in
++	 * macb_tx_restart() for the reasoning.
++	 */
++	(void)macb_readl(bp, NCR);
+ 	spin_unlock(&bp->lock);
+ 
+ 	if (CIRC_SPACE(queue->tx_head, queue->tx_tail, bp->tx_ring_size) < 1)
 -- 
 2.53.0
 
