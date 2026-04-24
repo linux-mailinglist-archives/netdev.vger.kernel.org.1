@@ -1,148 +1,149 @@
-Return-Path: <netdev+bounces-281026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281027-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IDK1L+Sr62nfQAAAu9opvQ
-	(envelope-from <netdev+bounces-281026-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 19:44:04 +0200
+	id 8AlZFk+w62mRQQAAu9opvQ
+	(envelope-from <netdev+bounces-281027-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:02:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 409D2462139
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 19:44:03 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E46CD46237C
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:02:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BD965300A50C
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:44:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9B9EC300C822
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:02:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE7253624CE;
-	Fri, 24 Apr 2026 17:44:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC7573DC4AD;
+	Fri, 24 Apr 2026 18:02:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CJZQvsCa"
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="eAVUPugT"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from outbound.ms.icloud.com (p-west3-cluster3-host12-snip4-10.eps.apple.com [57.103.72.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 321701D5AD4
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 17:43:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E5423E717F
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 18:02:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.72.231
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777052641; cv=none; b=BYgFNm9LF9XMPDmmPi4X7yo1NBIgIbhOsYfHgxx/+4YWteywKmolgRxf2hHe9WWB+mDS+s+zLgmHErKwDS8x315v5Yzoum+4YXmSPMiu/sP+FqgHRr6uWNLAnq77cjXjjZTdYbqESDIiYIn5ev2BJy3EJdCdLESwW7M4wXnIidE=
+	t=1777053733; cv=none; b=Bvo+/EGVkTIm9sR+GERzmWXeKfb+W3/2x/FBmSwvjnkSJzrWiriBj6euVGYCQQgw0RYy1+4/XKBoNHHTTBVHZ6qHEVCKHXLbtqs0HuxeqWoIUZgCD2xNxv2j9Iddmf/t0ERhH44gYaa0ADz7kWUmSiwM4ls7oZXRhjCZR2O/mQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777052641; c=relaxed/simple;
-	bh=uEovCLyUlP+vQ43bmLfSPRWiIERStlsQm1hCynuai2I=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=NUh8VxIpFUZfjj0wGez3KuX1+CRWN71e8aNk4Ig9ZSxik4H1z6+FZZbyTtf5tttjkSBIqokh2r1NKUt18/H4r0eTjC0Qd0NtHuqoc9LClENc3ss6QyDlLzdSFvaN6UH5yzF4WRDYJdUMU8dU6O3NVTZJA+Vgqi/SaWHwuTAqSAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CJZQvsCa; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1777052628;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DWCu4wxPcDh4wGenYXek8cabQgd3EbdJF9AepYB3owg=;
-	b=CJZQvsCaHjoGNETf/ROZqt1o4J7g39Gh1xZxEjdnHe9LGwjVGjyXvL3NJj0rlVrcjU1lfX
-	t7L98fzYO1JkyrALmsPh0JaAjSU5xobarXzd56bkDTyxG9aF4iYaSLddM3C9/05PTrlZ7K
-	8Qq3Spyq45h2R/e7dn/BbRtcBnv3NJw=
-From: Roman Gushchin <roman.gushchin@linux.dev>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,
-  linux-kernel@vger.kernel.org,  Paolo Abeni <pabeni@redhat.com>,  Linus
- Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [GIT PULL] Networking deletions for 7.1
-In-Reply-To: <20260423201029.64927aba@kernel.org> (Jakub Kicinski's message of
-	"Thu, 23 Apr 2026 20:10:29 -0700")
-References: <20260423235422.1541768-1-kuba@kernel.org>
-	<7ia4se8lb0vf.fsf@castle.c.googlers.com>
-	<20260423201029.64927aba@kernel.org>
-Date: Fri, 24 Apr 2026 17:43:29 +0000
-Message-ID: <7ia4ldecb6f2.fsf@castle.c.googlers.com>
+	s=arc-20240116; t=1777053733; c=relaxed/simple;
+	bh=f2wOVFiwASDq9Qjkkn83Qnffy6owmf2HGb1oVRNDljY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RXLs1Xhphs+gQOsB8hVGvNbvMppyvD0bL3TwZYhNAyHaZ3cYqkWv8ZekETIT64YcerqV2UlSocFm5tXKwuTLkOGOAUJNQQMuG4dUt8xj4uAsH4i93uPlqC3pnsfhE9OeUO4I5FzaEiImaOIG3emSI5cCnz34kplh5AetbhkpNVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=eAVUPugT; arc=none smtp.client-ip=57.103.72.231
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+Received: from outbound.ms.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-west-3a-100-percent-10 (Postfix) with ESMTPS id EAF3C18009D4;
+	Fri, 24 Apr 2026 18:02:10 +0000 (UTC)
+X-ICL-Out-Info: HUtFAUMEWwJACUgBTUQeDx5WFlZNRAJCTQ1OHVQORQNFF0sCTVIPDwNXF0QaWwpZFXkRUAFYHlZeWhdeTVEPDwNXF0QaWwpZFXkRUAFYHlZeWhdeTUUID0EJWFsIWwQPH0wMUQJCBVZeVAsdBFQHXQVdVlACWktCBEtFaFwFXBxAF0gdX2pLVhQEEVABWB5WXloXXk1aAlZNBUoDXwFbBkINSQtdBl4DXgpAA1UCXgVdCFVAA1gcRRxYE1YtXgheH0wcHQ5YBgxQTQFDCAoCURxWDVc=
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com; s=1a1hai; t=1777053731; x=1779645731; bh=t4GIyWmTQJ1ec4FYSzAsx4+JeosbEvUchHbVxJOqpnM=; h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=eAVUPugTUGsSX/+8uCn0DNz4bDSjhPUGvfDy/UjhtweRviP9bJr0AjF4cH+l8ytReDe4akeKuvmURMsNc+/0BCIxFd3kOUGhIaAiUryc5FxU167iBXIq4i66zey3BdJFodzxUk57iCHRkkAAw4X38z5/rhUDULgmo9x3agxF/5yEqIitSpOr7FdFmAokI1uuqpHfNVulNJ5gP4aPjqsh3gAUnvuXrwm39v7e5OzUdwXEWTHiwDcJmWi/T56HKTqngDAl1fxG3q7ze0lioHeD5zNCBKtYC+S+wd7JRjGcJmzKW6cuxf/iR9mrJj+T6Kv3vJ5e0PPWGQWuNEIKT7lZRQ==
+Received: from mainframe.tailfb0f7b.ts.net (unknown [17.57.154.37])
+	by p00-icloudmta-asmtp-us-west-3a-100-percent-10 (Postfix) with ESMTPSA id 7E81318002F3;
+	Fri, 24 Apr 2026 18:02:08 +0000 (UTC)
+From: =?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <snowwlake@icloud.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	krzk@kernel.org,
+	horms@kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	=?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <snowwlake@icloud.com>
+Subject: [PATCH net v4 0/5] nfc: fix multiple OOB reads in NCI and LLCP parsing paths
+Date: Fri, 24 Apr 2026 20:01:46 +0200
+Message-ID: <20260424180151.3808557-1-snowwlake@icloud.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 409D2462139
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Authority-Info-Out: v=2.4 cv=GP0F0+NK c=1 sm=1 tr=0 ts=69ebb023
+ cx=c_apl:c_pps:t_out a=qkKslKyYc0ctBTeLUVfTFg==:117 a=IkcTkHD0fZMA:10
+ a=A5OVakUREuEA:10 a=M51BFTxLslgA:10 a=x7bEGLp0ZPQA:10 a=LbuW6tbUWPcA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=65b706y0IOD3bZGX9pQA:9 a=3ZKOabzyN94A:10
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: 8U-qltqzgrOVxWXo80Lb3_f0tqExWn2r
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI0MDE3NSBTYWx0ZWRfXxVoEXlLq2yha
+ JJuOFZX7MB4NZ24gPIhpYeQLMIflvzskrzRkAivVDgQOSLt9dL6XjlaitzdN9qHo+zjz+Tt/Cpv
+ pzMuoXg6Ir164wNTbHTUIywG1jY800EO/oPibHmTICZkYb42/JAI3QThzM7Mh+P0IrxTCqoL47b
+ xvpxcPjWfe52WhGRNer5AyfLv4o6SFuBUV/BhnPWdWUXMZZpBls+nRu0fedoAEeBl7Gatj4eeN9
+ hC/dr+D6zhK9QiwcSeKEjk2Ue7/1pmLb6wfs1RsxTjlGjWN3GqKqdzc11WPSPrejAclV2ue27JH
+ 7HHgbFlB4y3RLwuXyhGRypAWNlxqv1CM+kL6C+T1zNniwTDs1BffZBPuetWLG0=
+X-Proofpoint-ORIG-GUID: 8U-qltqzgrOVxWXo80Lb3_f0tqExWn2r
+X-Rspamd-Queue-Id: E46CD46237C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.63 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MIXED_CHARSET(0.53)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[icloud.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[icloud.com:s=1a1hai];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	TAGGED_FROM(0.00)[bounces-281026-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[icloud.com:+];
+	TAGGED_FROM(0.00)[bounces-281027-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,icloud.com];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[roman.gushchin@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[snowwlake@icloud.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FROM_HAS_DN(0.00)[]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[icloud.com]
 
-Jakub Kicinski <kuba@kernel.org> writes:
+This series fixes five out-of-bounds / underflow bugs in the kernel NFC
+stack.  All are reachable from a remote NFC peer that the local stack
+has already associated with; in the LLCP cases the peer only needs to
+send a malformed frame.
 
-> On Fri, 24 Apr 2026 01:31:00 +0000 Roman Gushchin wrote:
->> 2c on Sashiko:
->
-> Did I say Sashiko 3 times? ;)
-> FTR - thanks a lot for the awesome work on that project!
+  1/5  nci: u8 underflow in nci_store_general_bytes_nfc_dep() lets the
+       attacker-controlled atr_res_len skip the GT-offset subtraction
+       and cause an OOB read/write against general_bytes[].
+  2/5  llcp: parse_gb_tlv() / parse_connection_tlv() trust the TLV
+       length byte without checking remaining buffer, and the tlv16
+       accessors read past the end when length < 2.
+  3/5  llcp: nfc_llcp_recv_snl() has the same TLV-length trust bug, and
+       its SDRES handler uses an unbounded "%.16s" pr_debug() that
+       walks past service_name_len.
+  4/5  llcp: nfc_llcp_recv_dm() reads skb->data[3] without checking
+       skb->len, giving a 1-byte heap OOB read.
+  5/5  llcp: nfc_llcp_connect_sn() walks the TLV array with no length
+       validation; a crafted CONNECT frame drops it into OOB reads /
+       an unbounded service-name pointer.
 
-You certainly did :)
-Thank you and really appreciate your contributions to Sashiko!
+The series applies on top of net/main.
 
->
->> 1) I'm working on an infrastructure to separate pre-existing issues from
->> new issues. My current thinking is to stop reporting these issues with
->> reviews of new patches and instead put them into some database and give
->> maintainers access to it. Sashiko will automatically deduplicate issues
->> and index them by the source file/subsystem. Hopefully it will mean that
->> maintainers will see only a limited number of issues in source files
->> they support. But I have yet to see how it works in practice.
->> 
->> But I'm somewhat concerned that this way many of these issues will
->> remain there forever and by reporting them with new material we actually
->> have better chances to get them fixes. Maybe it should be configurable
->> per-subsystem. I'm very open for ideas here.
->
-> After a couple of hours of glasswing-inspired hacking today I wonder
-> if we can close the loop on patch generation without blowing the budget.
-> Or maybe a better question would be - how many of the issues are simple
-> enough for the LLM to pop out a patch for, once it has all the context
-> from the review.
+Lekë Hapçiu (5):
+  nfc: nci: fix u8 underflow in nci_store_general_bytes_nfc_dep
+  nfc: llcp: fix TLV parsing in parse_gb_tlv and parse_connection_tlv
+  nfc: llcp: fix TLV parsing OOB in nfc_llcp_recv_snl
+  nfc: llcp: fix OOB read of DM reason byte in nfc_llcp_recv_dm
+  nfc: llcp: fix TLV parsing OOB in nfc_llcp_connect_sn
 
-My bet is <50% as of now, but I might be wildly off.
+ net/nfc/llcp_commands.c | 24 ++++++++++++++++++++++--
+ net/nfc/llcp_core.c     | 35 ++++++++++++++++++++++++++++++++---
+ net/nfc/nci/ntf.c       |  6 ++++++
+ 3 files changed, 60 insertions(+), 5 deletions(-)
 
-Even for human maintainers or very experienced kernel developers it's
-common to have long discussions on what's the best approach, go through
-multiple revisions etc. Current generation of LLMs is definitely worse
-at code generation, so...
+-- 
+2.51.0
 
->> 2) Re false positives vs finding more bugs I had the same experience.
->> It's easy to tweak it to be more conservative or creative, but it comes
->> at a price. It seems like the real answer is simple a better model. We
->> saw a big improvement internally switching from Gemini Pro 3.0 to 3.1.
->
-> Makes sense. What didn't really land for me until now is that at least
-> for now different models are better at catching different types of bugs.
-> Off the top of my head, Gemini does short work of misuses of DMA API
-> without much context. Claude/codex/whatever the Meta one is called
-> externally - none of them catch those.
-
-Yeah, in a perfect world we would run code reviews using all best models
-and combine results...
 
