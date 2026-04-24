@@ -1,591 +1,1079 @@
-Return-Path: <netdev+bounces-280959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280960-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qCf1Okwd62mRIgAAu9opvQ
-	(envelope-from <netdev+bounces-280959-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 09:35:40 +0200
+	id wJ4bEqcd62mRIgAAu9opvQ
+	(envelope-from <netdev+bounces-280960-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 09:37:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44B8045AC0F
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 09:35:40 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 937C245AC3D
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 09:37:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8EA1A301E979
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 07:34:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6883C300CCA6
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 07:37:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73A9B31352B;
-	Fri, 24 Apr 2026 07:34:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF2B132AAC6;
+	Fri, 24 Apr 2026 07:36:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928633033FC
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 07:34:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.30.148.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED023264F6
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 07:36:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777016095; cv=none; b=UWDYIkFaqULB81+uU5VM5GPuqB9nXj6aAIr9nsdbmx3DB0Kmhb6mxxUb/CCZQoiM78w9HllbGP4OJWhtLK0hBrKx6dIzv8F/8kJsc8ZAcBOFUo1bnhmOnpL/nSBkadWkgULWJwO553wfSvQZPMv3W53TUkRbV7+BDVcjer9UhiI=
+	t=1777016217; cv=none; b=gfeS2vjCYUUyiWceRqim3gJG1s+dB0iNaUf1Hq7RaLLmyEWEskUOvLJq6Te9nHZUn7VWy5trMt6qY+TDJKBLnsDyyzDW8VH6WKmiR63yi6VbpWleX/3NKct4Ygww7TigjTyr3VEJS+72GENLRbIoyY5pPvrXVjILeXrZr4lawCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777016095; c=relaxed/simple;
-	bh=Z7DqUIZ4WLvxS4CQcS1OlHsRXZ5xe9uGEdd59NomtmQ=;
-	h=Message-ID:In-Reply-To:References:Date:Mime-Version:From:To:Cc:
-	 Subject:Content-Type; b=kva+GJ1v0U8CbrlEMfGd5tNcUQF7I5RF6Ufi86jZ/4Bwew+Zs05VumilNU7x+xm7gLwoScgpouCUXRMcoZK01Igq49GI3loxdv9HYf5j16MpE1muaaQGVpE+PSAQgi36S022WK8I8ct2IRW6MIoVTEiXc+0QJdAljjVoHzI+62Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4g24VG03FYz4yjjB;
-	Fri, 24 Apr 2026 15:34:46 +0800 (CST)
-Received: from njy2app04.zte.com.cn ([10.40.12.64])
-	by mse-fl1.zte.com.cn with SMTP id 63O7YWS2024978;
-	Fri, 24 Apr 2026 15:34:33 +0800 (+08)
-	(envelope-from han.junyang@zte.com.cn)
-Received: from mapi (njy2app04[null])
-	by mapi (Zmail) with MAPI id mid204;
-	Fri, 24 Apr 2026 15:34:35 +0800 (CST)
-X-Zmail-TransId: 2afc69eb1d0bf69-3b925
-X-Mailer: Zmail v1.0
-Message-ID: <2026042415343509889BXpzsG4oFCoFVlV_MAR@zte.com.cn>
-In-Reply-To: <39e6d965-44ee-4edb-a558-859a902ffe54@lunn.ch>
-References: 20260422144901.2403456-1-han.junyang@zte.com.cn,39e6d965-44ee-4edb-a558-859a902ffe54@lunn.ch
-Date: Fri, 24 Apr 2026 15:34:35 +0800 (CST)
+	s=arc-20240116; t=1777016217; c=relaxed/simple;
+	bh=o8UHLUbWeWpMlsLAV4gVoQW7YABEa2MpvHZrTM3Qb0M=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=a3gi5iOCzmyTWSgt5n7Wigie29EBEwzu+emwtPcVz+pYcJWZbVU2nF8GRQ0iiBvztdq3z02Rzn2TD/nSF9kwQlHnttrecMOOheIU5S1EruPTuTQnTsGI88D9dZkouVutUo/HgzRcdtnhp3jVlPDrtrYdZFQ5cLBC25UDFEpniJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-672c40f3873so15692616eaf.2
+        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 00:36:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777016214; x=1777621014;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XQLZ8Awv8yuGT4+ZHdaCZfOzoNFYUF6+opN36xgxrdw=;
+        b=PZcyxU6szYpA+rHTVsTcJmu31ZSc59DkbDMa7GvdyOqH9+r132Z+Ii6PM8EyNJCOuK
+         cXMmwBIkDPX0IaDi88MnP2X6zZrPSczYVpSIOp4+bZKC1kcVJLfOLHe4RCxW+93SixSl
+         IUmo2zecP43nFo0QWpRfTDRNUTa5QiT7rRIdvVre4rMCFkGzcdDdNwJ6ClPy1sxLM5Gy
+         Ac0j1WcSUwzibhiuYZYMHX9ACqbCSxoesZdlnSagW4lHC0CePP9BYDxqIpf3rngSx9HY
+         r9AueFVaU65XZXTisON9VEJte8k25Ji09mYeTPqXouVt/NjgFz54dcwI/VW3HV1632UE
+         urqQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/DeUMXQVnEfPoVLeXiTXy7l1k9erAWAvBJhIpqF+5+N1FZIVDiPN1YTJ8WbT5eZfppzSz6y94=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmdmeA/4DJSFoSTeJDgR7zUTwCFiNneZbjkGZmPibVSpKWJ4uo
+	jd3/m4y2WEju694j7o++llm8Y3KlzI91mrxaxh4lXY3Vm3duk5cjM4dP7cNe+9ygKvrnXCNe3SL
+	wZgcy9ByxUcdJpg3l5a3iTtuI3qG27Aekv+0IWKeIQVu7NK19JcVElyNV/DA=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <han.junyang@zte.com.cn>
-To: <andrew+netdev@lunn.ch>
-Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <ran.ming@zte.com.cn>, <han.chengfei@zte.com.cn>,
-        <zhang.yanze@zte.com.cn>, <han.junyang@zte.com.cn>
-Subject: =?UTF-8?B?UmU6IFtQQVRDSCBuZXQtbmV4dCB2MiAwLzNdIEFkZCBaVEUgRGluZ0hhaSBFdGhlcm5ldCBQRiBkcml2ZXI=?=
-Content-Type: multipart/mixed;
-	boundary="=====_001_next====="
-X-MAIL:mse-fl1.zte.com.cn 63O7YWS2024978
-X-TLS: YES
-X-SPF-DOMAIN: zte.com.cn
-X-ENVELOPE-SENDER: han.junyang@zte.com.cn
-X-SPF: None
-X-SOURCE-IP: 10.5.228.132 unknown Fri, 24 Apr 2026 15:34:46 +0800
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 69EB1D15.001/4g24VG03FYz4yjjB
-X-Rspamd-Queue-Id: 44B8045AC0F
+MIME-Version: 1.0
+X-Received: by 2002:a05:6820:1b18:b0:696:1e45:9011 with SMTP id
+ 006d021491bc7-6961e459310mr2814533eaf.28.1777016213844; Fri, 24 Apr 2026
+ 00:36:53 -0700 (PDT)
+Date: Fri, 24 Apr 2026 00:36:53 -0700
+In-Reply-To: <20260423212827.1177552-1-michael.bommarito@gmail.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69eb1d95.a00a0220.17a17.0055.GAE@google.com>
+Subject: [syzbot ci] Re: netlink: clean up failed initial dump-start state
+From: syzbot ci <syzbot+ci626f5a21876c3609@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kees@kernel.org, kuba@kernel.org, kuniyu@google.com, 
+	linux-kernel@vger.kernel.org, michael.bommarito@gmail.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, yangfeng@kylinos.cn
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 937C245AC3D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.24 / 15.00];
+X-Spamd-Result: default: False [0.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	SUBJ_EXCESS_BASE64(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
-	DMARC_POLICY_SOFTFAIL(0.10)[zte.com.cn : SPF not aligned (relaxed), No valid DKIM,none];
-	MIME_GOOD(-0.10)[multipart/mixed,multipart/related,multipart/alternative,text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280959-lists,netdev=lfdr.de];
-	NEURAL_SPAM(0.00)[0.117];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280960-lists,netdev=lfdr.de,ci626f5a21876c3609];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[han.junyang@zte.com.cn,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+,1:+,2:+,3:+,4:~,5:~,6:~];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,vger.kernel.org,gmail.com,redhat.com,kylinos.cn];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
 	R_DKIM_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[davemloft.net:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:email,zte.com.cn:url,zte.com.cn:mid,zte.com.cn:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[googlegroups.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,appspotmail.com:email]
+
+syzbot ci has tested the following series
+
+[v2] netlink: clean up failed initial dump-start state
+https://lore.kernel.org/all/20260423212827.1177552-1-michael.bommarito@gmail.com
+* [PATCH net-next v2] netlink: clean up failed initial dump-start state
+
+and found the following issues:
+* KASAN: slab-use-after-free Read in inet_diag_dump_done
+* KASAN: slab-use-after-free Read in netlink_dump_done
+* KASAN: slab-use-after-free Read in netlink_rcv_skb
+* KASAN: slab-use-after-free Read in rdma_nl_rcv
+* KASAN: slab-use-after-free Write in genl_done
+
+Full report is available here:
+https://ci.syzbot.org/series/d76773fc-9b84-4669-b27e-791385b0b902
+
+***
+
+KASAN: slab-use-after-free Read in inet_diag_dump_done
+
+tree:      torvalds
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux
+base:      0b5e8d7999076ac3c490fc18376a404e2626abff
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/cb46a152-33c1-4b5e-bb75-bab2ecb45113/config
+syz repro: https://ci.syzbot.org/findings/546e718b-5aa2-4705-85d2-51b88eb73b34/syz_repro
+
+==================================================================
+BUG: KASAN: slab-use-after-free in inet_diag_dump_done+0x54/0x90 net/ipv4/inet_diag.c:893
+Read of size 8 at addr ffff888110c9a1a0 by task syz.1.18/6001
+
+CPU: 0 UID: 0 PID: 6001 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_address_description+0x55/0x1e0 mm/kasan/report.c:378
+ print_report+0x58/0x70 mm/kasan/report.c:482
+ kasan_report+0x117/0x150 mm/kasan/report.c:595
+ inet_diag_dump_done+0x54/0x90 net/ipv4/inet_diag.c:893
+ netlink_dump_cleanup+0x99/0x120 net/netlink/af_netlink.c:2259
+ netlink_dump+0xbe9/0xf40 net/netlink/af_netlink.c:2385
+ __netlink_dump_start+0x5cb/0x7e0 net/netlink/af_netlink.c:2455
+ netlink_dump_start include/linux/netlink.h:341 [inline]
+ inet_diag_handler_cmd+0x1e0/0x2c0 net/ipv4/inet_diag.c:978
+ sock_diag_rcv_msg+0x4cc/0x600 net/core/sock_diag.c:-1
+ netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2565
+ netlink_unicast_kernel net/netlink/af_netlink.c:1314 [inline]
+ netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1340
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1890
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x972/0x9f0 net/socket.c:2592
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fe80d39c819
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fe80e220028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fe80d616090 RCX: 00007fe80d39c819
+RDX: 0000000000000000 RSI: 0000200000000200 RDI: 0000000000000003
+RBP: 00007fe80d432c91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fe80d616128 R14: 00007fe80d616090 R15: 00007ffc5edf12b8
+ </TASK>
+
+Allocated by task 6001:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ poison_kmalloc_redzone mm/kasan/common.c:398 [inline]
+ __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:415
+ kasan_kmalloc include/linux/kasan.h:263 [inline]
+ __kmalloc_cache_noprof+0x31c/0x660 mm/slub.c:5380
+ kmalloc_noprof include/linux/slab.h:950 [inline]
+ kzalloc_noprof include/linux/slab.h:1188 [inline]
+ __inet_diag_dump_start+0x8b/0xbf0 net/ipv4/inet_diag.c:848
+ __netlink_dump_start+0x469/0x7e0 net/netlink/af_netlink.c:2446
+ netlink_dump_start include/linux/netlink.h:341 [inline]
+ inet_diag_handler_cmd+0x1e0/0x2c0 net/ipv4/inet_diag.c:978
+ sock_diag_rcv_msg+0x4cc/0x600 net/core/sock_diag.c:-1
+ netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2565
+ netlink_unicast_kernel net/netlink/af_netlink.c:1314 [inline]
+ netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1340
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1890
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x972/0x9f0 net/socket.c:2592
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 5995:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:584
+ poison_slab_object mm/kasan/common.c:253 [inline]
+ __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:285
+ kasan_slab_free include/linux/kasan.h:235 [inline]
+ slab_free_hook mm/slub.c:2685 [inline]
+ slab_free mm/slub.c:6165 [inline]
+ kfree+0x1c5/0x640 mm/slub.c:6483
+ inet_diag_dump_done+0x73/0x90 net/ipv4/inet_diag.c:894
+ netlink_dump_cleanup+0x99/0x120 net/netlink/af_netlink.c:2259
+ netlink_dump+0xbe9/0xf40 net/netlink/af_netlink.c:2385
+ netlink_recvmsg+0x690/0xa50 net/netlink/af_netlink.c:1972
+ sock_recvmsg_nosec net/socket.c:1078 [inline]
+ sock_recvmsg+0x172/0x1b0 net/socket.c:1100
+ ____sys_recvmsg+0x1e6/0x4a0 net/socket.c:2812
+ ___sys_recvmsg+0x215/0x590 net/socket.c:2854
+ __sys_recvmsg net/socket.c:2887 [inline]
+ __do_sys_recvmsg net/socket.c:2893 [inline]
+ __se_sys_recvmsg net/socket.c:2890 [inline]
+ __x64_sys_recvmsg+0x1ba/0x2a0 net/socket.c:2890
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+The buggy address belongs to the object at ffff888110c9a180
+ which belongs to the cache kmalloc-64 of size 64
+The buggy address is located 32 bytes inside of
+ freed 64-byte region [ffff888110c9a180, ffff888110c9a1c0)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x110c9a
+flags: 0x17ff00000000000(node=0|zone=2|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 017ff00000000000 ffff8881000418c0 dead000000000100 dead000000000122
+raw: 0000000000000000 0000000800200020 00000000f5000000 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0xd2cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 26, tgid 26 (kworker/u9:0), ts 20518825132, free_ts 20518815181
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x231/0x280 mm/page_alloc.c:1868
+ prep_new_page mm/page_alloc.c:1876 [inline]
+ get_page_from_freelist+0x24ba/0x2540 mm/page_alloc.c:3956
+ __alloc_frozen_pages_noprof+0x18d/0x380 mm/page_alloc.c:5236
+ alloc_slab_page mm/slub.c:3292 [inline]
+ allocate_slab+0x77/0x660 mm/slub.c:3481
+ new_slab mm/slub.c:3539 [inline]
+ refill_objects+0x331/0x3c0 mm/slub.c:7175
+ refill_sheaf mm/slub.c:2812 [inline]
+ __pcs_replace_empty_main+0x2e6/0x730 mm/slub.c:4615
+ alloc_from_pcs mm/slub.c:4717 [inline]
+ slab_alloc_node mm/slub.c:4851 [inline]
+ __do_kmalloc_node mm/slub.c:5259 [inline]
+ __kmalloc_node_noprof+0x577/0x7c0 mm/slub.c:5266
+ kmalloc_node_noprof include/linux/slab.h:1081 [inline]
+ __vmalloc_area_node mm/vmalloc.c:3857 [inline]
+ __vmalloc_node_range_noprof+0x5ef/0x1750 mm/vmalloc.c:4064
+ __vmalloc_node_noprof+0xc2/0x100 mm/vmalloc.c:4124
+ alloc_thread_stack_node kernel/fork.c:355 [inline]
+ dup_task_struct+0x27b/0x800 kernel/fork.c:924
+ copy_process+0x508/0x3cd0 kernel/fork.c:2050
+ kernel_clone+0x248/0x8e0 kernel/fork.c:2653
+ user_mode_thread+0x110/0x180 kernel/fork.c:2729
+ call_usermodehelper_exec_work+0x5c/0x230 kernel/umh.c:171
+ process_one_work kernel/workqueue.c:3276 [inline]
+ process_scheduled_works+0xb6e/0x18c0 kernel/workqueue.c:3359
+ worker_thread+0xa53/0xfc0 kernel/workqueue.c:3440
+page last free pid 26 tgid 26 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ __free_pages_prepare mm/page_alloc.c:1412 [inline]
+ __free_frozen_pages+0xbc7/0xd30 mm/page_alloc.c:2953
+ __kasan_populate_vmalloc_do mm/kasan/shadow.c:393 [inline]
+ __kasan_populate_vmalloc+0x1b2/0x1d0 mm/kasan/shadow.c:424
+ kasan_populate_vmalloc include/linux/kasan.h:580 [inline]
+ alloc_vmap_area+0xd73/0x14b0 mm/vmalloc.c:2123
+ __get_vm_area_node+0x1f8/0x300 mm/vmalloc.c:3226
+ __vmalloc_node_range_noprof+0x36a/0x1750 mm/vmalloc.c:4024
+ __vmalloc_node_noprof+0xc2/0x100 mm/vmalloc.c:4124
+ alloc_thread_stack_node kernel/fork.c:355 [inline]
+ dup_task_struct+0x27b/0x800 kernel/fork.c:924
+ copy_process+0x508/0x3cd0 kernel/fork.c:2050
+ kernel_clone+0x248/0x8e0 kernel/fork.c:2653
+ user_mode_thread+0x110/0x180 kernel/fork.c:2729
+ call_usermodehelper_exec_work+0x5c/0x230 kernel/umh.c:171
+ process_one_work kernel/workqueue.c:3276 [inline]
+ process_scheduled_works+0xb6e/0x18c0 kernel/workqueue.c:3359
+ worker_thread+0xa53/0xfc0 kernel/workqueue.c:3440
+ kthread+0x388/0x470 kernel/kthread.c:436
+ ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+Memory state around the buggy address:
+ ffff888110c9a080: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+ ffff888110c9a100: 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc fc
+>ffff888110c9a180: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+                               ^
+ ffff888110c9a200: 00 00 00 00 00 fc fc fc fc fc fc fc fc fc fc fc
+ ffff888110c9a280: 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc fc
+==================================================================
 
 
+***
 
---=====_001_next=====
-Content-Type: multipart/related;
-	boundary="=====_002_next====="
+KASAN: slab-use-after-free Read in netlink_dump_done
 
+tree:      torvalds
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux
+base:      0b5e8d7999076ac3c490fc18376a404e2626abff
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/cb46a152-33c1-4b5e-bb75-bab2ecb45113/config
+syz repro: https://ci.syzbot.org/findings/86101c1f-0d2b-420f-a6bb-cd0260a6b2f5/syz_repro
 
---=====_002_next=====
-Content-Type: multipart/alternative;
-	boundary="=====_003_next====="
+==================================================================
+BUG: KASAN: slab-use-after-free in nlmsg_put_answer include/net/netlink.h:1041 [inline]
+BUG: KASAN: slab-use-after-free in netlink_dump_done+0x54d/0x890 net/netlink/af_netlink.c:2228
+Read of size 4 at addr ffff8881bb35b9b4 by task syz.0.279/6738
 
+CPU: 0 UID: 0 PID: 6738 Comm: syz.0.279 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_address_description+0x55/0x1e0 mm/kasan/report.c:378
+ print_report+0x58/0x70 mm/kasan/report.c:482
+ kasan_report+0x117/0x150 mm/kasan/report.c:595
+ nlmsg_put_answer include/net/netlink.h:1041 [inline]
+ netlink_dump_done+0x54d/0x890 net/netlink/af_netlink.c:2228
+ netlink_dump+0xacb/0xf40 net/netlink/af_netlink.c:2365
+ netlink_recvmsg+0x690/0xa50 net/netlink/af_netlink.c:1972
+ sock_recvmsg_nosec net/socket.c:1078 [inline]
+ sock_recvmsg+0x172/0x1b0 net/socket.c:1100
+ sock_read_iter+0x251/0x320 net/socket.c:1170
+ new_sync_read fs/read_write.c:493 [inline]
+ vfs_read+0x582/0xa70 fs/read_write.c:574
+ ksys_read+0x150/0x270 fs/read_write.c:717
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fb5eaf9c819
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fb5ebe08028 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
+RAX: ffffffffffffffda RBX: 00007fb5eb215fa0 RCX: 00007fb5eaf9c819
+RDX: 000000000000009b RSI: 00002000000003c0 RDI: 0000000000000004
+RBP: 00007fb5eb032c91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fb5eb216038 R14: 00007fb5eb215fa0 R15: 00007ffc181c9c68
+ </TASK>
 
---=====_003_next=====
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
+Allocated by task 6739:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ unpoison_slab_object mm/kasan/common.c:340 [inline]
+ __kasan_slab_alloc+0x6c/0x80 mm/kasan/common.c:366
+ kasan_slab_alloc include/linux/kasan.h:253 [inline]
+ slab_post_alloc_hook mm/slub.c:4538 [inline]
+ slab_alloc_node mm/slub.c:4866 [inline]
+ kmem_cache_alloc_node_noprof+0x384/0x690 mm/slub.c:4918
+ __alloc_skb+0x1d0/0x7d0 net/core/skbuff.c:702
+ netlink_sendmsg+0x5d4/0xb40 net/netlink/af_netlink.c:1865
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x972/0x9f0 net/socket.c:2592
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-SGkgQW5kcmV3LA0KDQpUaGFua3MgZm9yIHBvaW50aW5nIG1lIHRvIHRoZSBkb2N1bWVudGF0aW9u
-LiBJIHVuZGVyc3RhbmQgbm93IHRoYXQNCm5ldC1uZXh0IGlzIGN1cnJlbnRseSBjbG9zZWQgYW5k
-IEkgc2hvdWxkIG5vdCBoYXZlIHBvc3RlZCBuZXcgZmVhdHVyZQ0KcGF0Y2hlcyBkdXJpbmcgdGhp
-cyBwZXJpb2QuIEkgYXBvbG9naXplIGZvciB0aGUgb3ZlcnNpZ2h0Lg0KDQpJIG5vdGljZWQgdGhh
-dCBSRkMgcGF0Y2hlcyBhcmUgd2VsY29tZSBhdCBhbnkgdGltZS4gV291bGQgaXQgYmUNCmFjY2Vw
-dGFibGUgaWYgSSByZXN1Ym1pdCB0aGlzIHNlcmllcyBhcyBSRkMgaW4gdGhlIG1lYW50aW1lLCBz
-byB0aGF0DQpJIGNhbiBnZXQgZWFybHkgZmVlZGJhY2sgYW5kIGFkZHJlc3MgYW55IGNvZGUgaXNz
-dWVzIGJlZm9yZSBuZXQtbmV4dA0KcmVvcGVucz8NCg0KSSB3aWxsIG1ha2Ugc3VyZSB0byBzZW5k
-IHRoZSBwcm9wZXIgW1BBVENIIG5ldC1uZXh0XSB2ZXJzaW9uIG9uY2UNCnRoZSB0cmVlIHJlb3Bl
-bnMuDQoNClRoYW5rIHlvdSBmb3IgeW91ciBwYXRpZW5jZSBhbmQgZ3VpZGFuY2UuDQoNCkJlc3Qg
-cmVnYXJkcywNCkp1bnlhbmcgSGFuDQoNCg0KDQoNCg0KDQoNCumfqeWQm+mYsyBIYW5qdW55YW5n
-DQpJVOW8gOWPkeW3peeoi+W4iCAgSVQgRGV2ZWxvcG1lbnQgRW5naW5lZXIgDQpJQ0blm5vpg6gv
-5peg57q/5Y+K566X5Yqb56CU56m26ZmiL+ezu+e7n+S6p+WTgV/ml6Dnur/lj4rnrpflipvkuqfl
-k4Hnu4/okKXpg6ggIE5JViBEZXB0LiBJVi9XaXJlbGVzcyBQcm9kdWN0IFLvvIZEIEluc3RpdHV0
-ZS9XaXJlbGVzcyBQcm9kdWN0IE9wZXJhdGlvbiBEaXZpc2lvbg0KIA0KDQoNCg0KDQrljZfkuqzl
-uILpm6joirHlj7DljLrlroHkuLnot68xODnlj7fkuK3lhbTkuInljLpBNuagizLmpbwNCk5vLjYg
-SHVhU2hlbiBSb2FkLFl1aHVhdGFpIERpc3RyaWN0LE5hbmppbmcgUC5SLkNoaW5hDQpNOiArODYt
-MTg2NTE5MDk1MjAgIEU6IGhhbi5qdW55YW5nQHp0ZS5jb20uY24NCnd3dy56dGUuY29tLmNuIA0K
-DQoNCg0KDQoNCg0KT3JpZ2luYWwNCg0KDQpGcm9tOiBBbmRyZXdMdW5uIDxhbmRyZXdAbHVubi5j
-aD4NClRvOiDpn6nlkJvpmLMxMDI5NTIzMTsNCkNjOiBuZXRkZXZAdmdlci5rZXJuZWwub3JnIDxu
-ZXRkZXZAdmdlci5rZXJuZWwub3JnPjtkYXZlbUBkYXZlbWxvZnQubmV0IDxkYXZlbUBkYXZlbWxv
-ZnQubmV0PjthbmRyZXcrbmV0ZGV2QGx1bm4uY2ggPGFuZHJldytuZXRkZXZAbHVubi5jaD47ZWR1
-bWF6ZXRAZ29vZ2xlLmNvbSA8ZWR1bWF6ZXRAZ29vZ2xlLmNvbT47a3ViYUBrZXJuZWwub3JnIDxr
-dWJhQGtlcm5lbC5vcmc+O3BhYmVuaUByZWRoYXQuY29tIDxwYWJlbmlAcmVkaGF0LmNvbT475YaJ
-5piOMTAwMzMzMzk76Z+p5oiQ6aOeMTAzMzM3MDg75byg5bu25rO9MTAzMjc0MTc7DQpEYXRlOiAy
-MDI25bm0MDTmnIgyM+aXpSAwMDoyMA0KU3ViamVjdDogUmU6IFtQQVRDSCBuZXQtbmV4dCB2MiAw
-LzNdIEFkZCBaVEUgRGluZ0hhaSBFdGhlcm5ldCBQRiBkcml2ZXINCg0KT24gV2VkLCBBcHIgMjIs
-IDIwMjYgYXQgMTA6NDg6NThQTSArMDgwMCwgSnVueWFuZyBIYW4gd3JvdGU6DQo+IFRoaXMgc2Vy
-aWVzIGFkZHMgaW5pdGlhbCBzdXBwb3J0IGZvciB0aGUgWlRFIERpbmdIYWkgRXRoZXJuZXQgY29u
-dHJvbGxlciwNCj4gYSBoaWdoLXBlcmZvcm1hbmNlIFBDSWUgRXRoZXJuZXQgZGV2aWNlIHN1cHBv
-cnRpbmcgU1ItSU9WLCBoYXJkd2FyZQ0KPiBvZmZsb2FkaW5nLCBhbmQgYWR2YW5jZWQgdmlydHVh
-bGl6YXRpb24gZmVhdHVyZXMuDQogDQpodHRwczovL3d3dy5rZXJuZWwub3JnL2RvYy9odG1sL2xh
-dGVzdC9wcm9jZXNzL21haW50YWluZXItbmV0ZGV2Lmh0bWwNCiANClBsZWFzZSByZWFkIHNlY3Rp
-b25zIDEuMyBhbmQgMS40LCBwYXJ0aWN1bGFybHkgdGhlIGJpdCBpbiByZWQuDQogDQogICAgQW5k
-cmV3DQogDQotLS0NCnB3LWJvdDogY3I=
+Freed by task 6739:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:584
+ poison_slab_object mm/kasan/common.c:253 [inline]
+ __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:285
+ kasan_slab_free include/linux/kasan.h:235 [inline]
+ slab_free_hook mm/slub.c:2685 [inline]
+ slab_free mm/slub.c:6165 [inline]
+ kmem_cache_free+0x189/0x630 mm/slub.c:6295
+ netlink_unicast_kernel net/netlink/af_netlink.c:1315 [inline]
+ netlink_unicast+0x817/0x9b0 net/netlink/af_netlink.c:1340
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1890
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x972/0x9f0 net/socket.c:2592
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
+The buggy address belongs to the object at ffff8881bb35b980
+ which belongs to the cache skbuff_head_cache of size 240
+The buggy address is located 52 bytes inside of
+ freed 240-byte region [ffff8881bb35b980, ffff8881bb35ba70)
 
---=====_003_next=====
-Content-Type: text/html ;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0xffff8881bb35b200 pfn:0x1bb35a
+head: order:1 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+flags: 0x57ff00000000240(workingset|head|node=1|zone=2|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 057ff00000000240 ffff888160417a00 ffff88816041db88 ffffea0005cae210
+raw: ffff8881bb35b200 000000080015000f 00000000f5000000 0000000000000000
+head: 057ff00000000240 ffff888160417a00 ffff88816041db88 ffffea0005cae210
+head: ffff8881bb35b200 000000080015000f 00000000f5000000 0000000000000000
+head: 057ff00000000001 ffffffffffffff81 00000000ffffffff 00000000ffffffff
+head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000002
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 1, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5552, tgid 5552 (dhcpcd), ts 37959428622, free_ts 37819349212
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x231/0x280 mm/page_alloc.c:1868
+ prep_new_page mm/page_alloc.c:1876 [inline]
+ get_page_from_freelist+0x24ba/0x2540 mm/page_alloc.c:3956
+ __alloc_frozen_pages_noprof+0x18d/0x380 mm/page_alloc.c:5236
+ alloc_slab_page mm/slub.c:3292 [inline]
+ allocate_slab+0x77/0x660 mm/slub.c:3481
+ new_slab mm/slub.c:3539 [inline]
+ refill_objects+0x331/0x3c0 mm/slub.c:7175
+ refill_sheaf mm/slub.c:2812 [inline]
+ __pcs_replace_empty_main+0x2e6/0x730 mm/slub.c:4615
+ alloc_from_pcs mm/slub.c:4717 [inline]
+ slab_alloc_node mm/slub.c:4851 [inline]
+ kmem_cache_alloc_node_noprof+0x441/0x690 mm/slub.c:4918
+ __alloc_skb+0x1d0/0x7d0 net/core/skbuff.c:702
+ alloc_skb include/linux/skbuff.h:1383 [inline]
+ alloc_skb_with_frags+0xc8/0x760 net/core/skbuff.c:6763
+ sock_alloc_send_pskb+0x878/0x990 net/core/sock.c:2995
+ unix_dgram_sendmsg+0x460/0x18e0 net/unix/af_unix.c:2127
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ sock_write_iter+0x49b/0x4f0 net/socket.c:1195
+ do_iter_readv_writev+0x619/0x8c0 fs/read_write.c:-1
+ vfs_writev+0x33c/0x990 fs/read_write.c:1059
+ do_writev+0x154/0x2e0 fs/read_write.c:1105
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+page last free pid 5552 tgid 5552 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ __free_pages_prepare mm/page_alloc.c:1412 [inline]
+ __free_frozen_pages+0xbc7/0xd30 mm/page_alloc.c:2953
+ mm_free_pgd kernel/fork.c:585 [inline]
+ __mmdrop+0xb5/0x750 kernel/fork.c:727
+ mmdrop include/linux/sched/mm.h:55 [inline]
+ mmdrop_sched include/linux/sched/mm.h:83 [inline]
+ mmdrop_lazy_tlb_sched include/linux/sched/mm.h:110 [inline]
+ finish_task_switch+0x449/0x920 kernel/sched/core.c:5180
+ context_switch kernel/sched/core.c:5301 [inline]
+ __schedule+0x15e5/0x52d0 kernel/sched/core.c:6911
+ __schedule_loop kernel/sched/core.c:6993 [inline]
+ schedule+0x164/0x360 kernel/sched/core.c:7008
+ schedule_hrtimeout_range_clock+0x1e7/0x320 kernel/time/sleep_timeout.c:207
+ poll_schedule_timeout+0xd0/0x1a0 fs/select.c:241
+ do_poll fs/select.c:954 [inline]
+ do_sys_poll+0x7e8/0x1120 fs/select.c:1004
+ __do_sys_ppoll fs/select.c:1106 [inline]
+ __se_sys_ppoll+0x209/0x2b0 fs/select.c:1086
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-PGRpdiBjbGFzcz0iemNvbnRlbnRSb3ciPjxwIHN0eWxlPSJib3gtc2l6aW5nOiBib3JkZXItYm94
-OyBvdXRsaW5lOiAwcHg7IG1hcmdpbjogdW5zZXQ7IHBhZGRpbmc6IHVuc2V0OyB3aGl0ZS1zcGFj
-ZTogbm9ybWFsOyBtaW4taGVpZ2h0OiAxNHB4OyBmb250LWZhbWlseTogQXJpYWwsICZxdW90O01p
-Y3Jvc29mdCBZYWhlaSZxdW90OywgJnF1b3Q7THVjaWRhIEdyYW5kZSZxdW90OywgVmVyZGFuYSwg
-THVjaWRhLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWY7IGJhY2tncm91bmQtY29sb3I6IHJnYigyNTUs
-IDI1NSwgMjU1KTsiPkhpIEFuZHJldyw8L3A+PHAgc3R5bGU9ImJveC1zaXppbmc6IGJvcmRlci1i
-b3g7IG91dGxpbmU6IDBweDsgbWFyZ2luOiB1bnNldDsgcGFkZGluZzogdW5zZXQ7IHdoaXRlLXNw
-YWNlOiBub3JtYWw7IG1pbi1oZWlnaHQ6IDE0cHg7IGZvbnQtZmFtaWx5OiBBcmlhbCwgJnF1b3Q7
-TWljcm9zb2Z0IFlhaGVpJnF1b3Q7LCAmcXVvdDtMdWNpZGEgR3JhbmRlJnF1b3Q7LCBWZXJkYW5h
-LCBMdWNpZGEsIEhlbHZldGljYSwgc2Fucy1zZXJpZjsgYmFja2dyb3VuZC1jb2xvcjogcmdiKDI1
-NSwgMjU1LCAyNTUpOyI+PGJyIHN0eWxlPSJib3gtc2l6aW5nOiBib3JkZXItYm94OyBvdXRsaW5l
-OiAwcHg7Ij48L3A+PHAgc3R5bGU9ImJveC1zaXppbmc6IGJvcmRlci1ib3g7IG91dGxpbmU6IDBw
-eDsgbWFyZ2luOiB1bnNldDsgcGFkZGluZzogdW5zZXQ7IHdoaXRlLXNwYWNlOiBub3JtYWw7IG1p
-bi1oZWlnaHQ6IDE0cHg7IGZvbnQtZmFtaWx5OiBBcmlhbCwgJnF1b3Q7TWljcm9zb2Z0IFlhaGVp
-JnF1b3Q7LCAmcXVvdDtMdWNpZGEgR3JhbmRlJnF1b3Q7LCBWZXJkYW5hLCBMdWNpZGEsIEhlbHZl
-dGljYSwgc2Fucy1zZXJpZjsgYmFja2dyb3VuZC1jb2xvcjogcmdiKDI1NSwgMjU1LCAyNTUpOyI+
-VGhhbmtzIGZvciBwb2ludGluZyBtZSB0byB0aGUgZG9jdW1lbnRhdGlvbi4gSSB1bmRlcnN0YW5k
-IG5vdyB0aGF0PC9wPjxwIHN0eWxlPSJib3gtc2l6aW5nOiBib3JkZXItYm94OyBvdXRsaW5lOiAw
-cHg7IG1hcmdpbjogdW5zZXQ7IHBhZGRpbmc6IHVuc2V0OyB3aGl0ZS1zcGFjZTogbm9ybWFsOyBt
-aW4taGVpZ2h0OiAxNHB4OyBmb250LWZhbWlseTogQXJpYWwsICZxdW90O01pY3Jvc29mdCBZYWhl
-aSZxdW90OywgJnF1b3Q7THVjaWRhIEdyYW5kZSZxdW90OywgVmVyZGFuYSwgTHVjaWRhLCBIZWx2
-ZXRpY2EsIHNhbnMtc2VyaWY7IGJhY2tncm91bmQtY29sb3I6IHJnYigyNTUsIDI1NSwgMjU1KTsi
-Pm5ldC1uZXh0IGlzIGN1cnJlbnRseSBjbG9zZWQgYW5kIEkgc2hvdWxkIG5vdCBoYXZlIHBvc3Rl
-ZCBuZXcgZmVhdHVyZTwvcD48cCBzdHlsZT0iYm94LXNpemluZzogYm9yZGVyLWJveDsgb3V0bGlu
-ZTogMHB4OyBtYXJnaW46IHVuc2V0OyBwYWRkaW5nOiB1bnNldDsgd2hpdGUtc3BhY2U6IG5vcm1h
-bDsgbWluLWhlaWdodDogMTRweDsgZm9udC1mYW1pbHk6IEFyaWFsLCAmcXVvdDtNaWNyb3NvZnQg
-WWFoZWkmcXVvdDssICZxdW90O0x1Y2lkYSBHcmFuZGUmcXVvdDssIFZlcmRhbmEsIEx1Y2lkYSwg
-SGVsdmV0aWNhLCBzYW5zLXNlcmlmOyBiYWNrZ3JvdW5kLWNvbG9yOiByZ2IoMjU1LCAyNTUsIDI1
-NSk7Ij5wYXRjaGVzIGR1cmluZyB0aGlzIHBlcmlvZC4gSSBhcG9sb2dpemUgZm9yIHRoZSBvdmVy
-c2lnaHQuPC9wPjxwIHN0eWxlPSJib3gtc2l6aW5nOiBib3JkZXItYm94OyBvdXRsaW5lOiAwcHg7
-IG1hcmdpbjogdW5zZXQ7IHBhZGRpbmc6IHVuc2V0OyB3aGl0ZS1zcGFjZTogbm9ybWFsOyBtaW4t
-aGVpZ2h0OiAxNHB4OyBmb250LWZhbWlseTogQXJpYWwsICZxdW90O01pY3Jvc29mdCBZYWhlaSZx
-dW90OywgJnF1b3Q7THVjaWRhIEdyYW5kZSZxdW90OywgVmVyZGFuYSwgTHVjaWRhLCBIZWx2ZXRp
-Y2EsIHNhbnMtc2VyaWY7IGJhY2tncm91bmQtY29sb3I6IHJnYigyNTUsIDI1NSwgMjU1KTsiPjxi
-ciBzdHlsZT0iYm94LXNpemluZzogYm9yZGVyLWJveDsgb3V0bGluZTogMHB4OyI+PC9wPjxwIHN0
-eWxlPSJib3gtc2l6aW5nOiBib3JkZXItYm94OyBvdXRsaW5lOiAwcHg7IG1hcmdpbjogdW5zZXQ7
-IHBhZGRpbmc6IHVuc2V0OyB3aGl0ZS1zcGFjZTogbm9ybWFsOyBtaW4taGVpZ2h0OiAxNHB4OyBm
-b250LWZhbWlseTogQXJpYWwsICZxdW90O01pY3Jvc29mdCBZYWhlaSZxdW90OywgJnF1b3Q7THVj
-aWRhIEdyYW5kZSZxdW90OywgVmVyZGFuYSwgTHVjaWRhLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWY7
-IGJhY2tncm91bmQtY29sb3I6IHJnYigyNTUsIDI1NSwgMjU1KTsiPkkgbm90aWNlZCB0aGF0IFJG
-QyBwYXRjaGVzIGFyZSB3ZWxjb21lIGF0IGFueSB0aW1lLiBXb3VsZCBpdCBiZTwvcD48cCBzdHls
-ZT0iYm94LXNpemluZzogYm9yZGVyLWJveDsgb3V0bGluZTogMHB4OyBtYXJnaW46IHVuc2V0OyBw
-YWRkaW5nOiB1bnNldDsgd2hpdGUtc3BhY2U6IG5vcm1hbDsgbWluLWhlaWdodDogMTRweDsgZm9u
-dC1mYW1pbHk6IEFyaWFsLCAmcXVvdDtNaWNyb3NvZnQgWWFoZWkmcXVvdDssICZxdW90O0x1Y2lk
-YSBHcmFuZGUmcXVvdDssIFZlcmRhbmEsIEx1Y2lkYSwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmOyBi
-YWNrZ3JvdW5kLWNvbG9yOiByZ2IoMjU1LCAyNTUsIDI1NSk7Ij5hY2NlcHRhYmxlIGlmIEkgcmVz
-dWJtaXQgdGhpcyBzZXJpZXMgYXMgUkZDIGluIHRoZSBtZWFudGltZSwgc28gdGhhdDwvcD48cCBz
-dHlsZT0iYm94LXNpemluZzogYm9yZGVyLWJveDsgb3V0bGluZTogMHB4OyBtYXJnaW46IHVuc2V0
-OyBwYWRkaW5nOiB1bnNldDsgd2hpdGUtc3BhY2U6IG5vcm1hbDsgbWluLWhlaWdodDogMTRweDsg
-Zm9udC1mYW1pbHk6IEFyaWFsLCAmcXVvdDtNaWNyb3NvZnQgWWFoZWkmcXVvdDssICZxdW90O0x1
-Y2lkYSBHcmFuZGUmcXVvdDssIFZlcmRhbmEsIEx1Y2lkYSwgSGVsdmV0aWNhLCBzYW5zLXNlcmlm
-OyBiYWNrZ3JvdW5kLWNvbG9yOiByZ2IoMjU1LCAyNTUsIDI1NSk7Ij5JIGNhbiBnZXQgZWFybHkg
-ZmVlZGJhY2sgYW5kIGFkZHJlc3MgYW55IGNvZGUgaXNzdWVzIGJlZm9yZSBuZXQtbmV4dDwvcD48
-cCBzdHlsZT0iYm94LXNpemluZzogYm9yZGVyLWJveDsgb3V0bGluZTogMHB4OyBtYXJnaW46IHVu
-c2V0OyBwYWRkaW5nOiB1bnNldDsgd2hpdGUtc3BhY2U6IG5vcm1hbDsgbWluLWhlaWdodDogMTRw
-eDsgZm9udC1mYW1pbHk6IEFyaWFsLCAmcXVvdDtNaWNyb3NvZnQgWWFoZWkmcXVvdDssICZxdW90
-O0x1Y2lkYSBHcmFuZGUmcXVvdDssIFZlcmRhbmEsIEx1Y2lkYSwgSGVsdmV0aWNhLCBzYW5zLXNl
-cmlmOyBiYWNrZ3JvdW5kLWNvbG9yOiByZ2IoMjU1LCAyNTUsIDI1NSk7Ij5yZW9wZW5zPzwvcD48
-cCBzdHlsZT0iYm94LXNpemluZzogYm9yZGVyLWJveDsgb3V0bGluZTogMHB4OyBtYXJnaW46IHVu
-c2V0OyBwYWRkaW5nOiB1bnNldDsgd2hpdGUtc3BhY2U6IG5vcm1hbDsgbWluLWhlaWdodDogMTRw
-eDsgZm9udC1mYW1pbHk6IEFyaWFsLCAmcXVvdDtNaWNyb3NvZnQgWWFoZWkmcXVvdDssICZxdW90
-O0x1Y2lkYSBHcmFuZGUmcXVvdDssIFZlcmRhbmEsIEx1Y2lkYSwgSGVsdmV0aWNhLCBzYW5zLXNl
-cmlmOyBiYWNrZ3JvdW5kLWNvbG9yOiByZ2IoMjU1LCAyNTUsIDI1NSk7Ij48YnIgc3R5bGU9ImJv
-eC1zaXppbmc6IGJvcmRlci1ib3g7IG91dGxpbmU6IDBweDsiPjwvcD48cCBzdHlsZT0iYm94LXNp
-emluZzogYm9yZGVyLWJveDsgb3V0bGluZTogMHB4OyBtYXJnaW46IHVuc2V0OyBwYWRkaW5nOiB1
-bnNldDsgd2hpdGUtc3BhY2U6IG5vcm1hbDsgbWluLWhlaWdodDogMTRweDsgZm9udC1mYW1pbHk6
-IEFyaWFsLCAmcXVvdDtNaWNyb3NvZnQgWWFoZWkmcXVvdDssICZxdW90O0x1Y2lkYSBHcmFuZGUm
-cXVvdDssIFZlcmRhbmEsIEx1Y2lkYSwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmOyBiYWNrZ3JvdW5k
-LWNvbG9yOiByZ2IoMjU1LCAyNTUsIDI1NSk7Ij5JIHdpbGwgbWFrZSBzdXJlIHRvIHNlbmQgdGhl
-IHByb3BlciBbUEFUQ0ggbmV0LW5leHRdIHZlcnNpb24gb25jZTwvcD48cCBzdHlsZT0iYm94LXNp
-emluZzogYm9yZGVyLWJveDsgb3V0bGluZTogMHB4OyBtYXJnaW46IHVuc2V0OyBwYWRkaW5nOiB1
-bnNldDsgd2hpdGUtc3BhY2U6IG5vcm1hbDsgbWluLWhlaWdodDogMTRweDsgZm9udC1mYW1pbHk6
-IEFyaWFsLCAmcXVvdDtNaWNyb3NvZnQgWWFoZWkmcXVvdDssICZxdW90O0x1Y2lkYSBHcmFuZGUm
-cXVvdDssIFZlcmRhbmEsIEx1Y2lkYSwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmOyBiYWNrZ3JvdW5k
-LWNvbG9yOiByZ2IoMjU1LCAyNTUsIDI1NSk7Ij50aGUgdHJlZSByZW9wZW5zLjwvcD48cCBzdHls
-ZT0iYm94LXNpemluZzogYm9yZGVyLWJveDsgb3V0bGluZTogMHB4OyBtYXJnaW46IHVuc2V0OyBw
-YWRkaW5nOiB1bnNldDsgd2hpdGUtc3BhY2U6IG5vcm1hbDsgbWluLWhlaWdodDogMTRweDsgZm9u
-dC1mYW1pbHk6IEFyaWFsLCAmcXVvdDtNaWNyb3NvZnQgWWFoZWkmcXVvdDssICZxdW90O0x1Y2lk
-YSBHcmFuZGUmcXVvdDssIFZlcmRhbmEsIEx1Y2lkYSwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmOyBi
-YWNrZ3JvdW5kLWNvbG9yOiByZ2IoMjU1LCAyNTUsIDI1NSk7Ij48YnIgc3R5bGU9ImJveC1zaXpp
-bmc6IGJvcmRlci1ib3g7IG91dGxpbmU6IDBweDsiPjwvcD48cCBzdHlsZT0iYm94LXNpemluZzog
-Ym9yZGVyLWJveDsgb3V0bGluZTogMHB4OyBtYXJnaW46IHVuc2V0OyBwYWRkaW5nOiB1bnNldDsg
-d2hpdGUtc3BhY2U6IG5vcm1hbDsgbWluLWhlaWdodDogMTRweDsgZm9udC1mYW1pbHk6IEFyaWFs
-LCAmcXVvdDtNaWNyb3NvZnQgWWFoZWkmcXVvdDssICZxdW90O0x1Y2lkYSBHcmFuZGUmcXVvdDss
-IFZlcmRhbmEsIEx1Y2lkYSwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmOyBiYWNrZ3JvdW5kLWNvbG9y
-OiByZ2IoMjU1LCAyNTUsIDI1NSk7Ij5UaGFuayB5b3UgZm9yIHlvdXIgcGF0aWVuY2UgYW5kIGd1
-aWRhbmNlLjwvcD48cCBzdHlsZT0iYm94LXNpemluZzogYm9yZGVyLWJveDsgb3V0bGluZTogMHB4
-OyBtYXJnaW46IHVuc2V0OyBwYWRkaW5nOiB1bnNldDsgd2hpdGUtc3BhY2U6IG5vcm1hbDsgbWlu
-LWhlaWdodDogMTRweDsgZm9udC1mYW1pbHk6IEFyaWFsLCAmcXVvdDtNaWNyb3NvZnQgWWFoZWkm
-cXVvdDssICZxdW90O0x1Y2lkYSBHcmFuZGUmcXVvdDssIFZlcmRhbmEsIEx1Y2lkYSwgSGVsdmV0
-aWNhLCBzYW5zLXNlcmlmOyBiYWNrZ3JvdW5kLWNvbG9yOiByZ2IoMjU1LCAyNTUsIDI1NSk7Ij48
-YnIgc3R5bGU9ImJveC1zaXppbmc6IGJvcmRlci1ib3g7IG91dGxpbmU6IDBweDsiPjwvcD48cCBz
-dHlsZT0iYm94LXNpemluZzogYm9yZGVyLWJveDsgb3V0bGluZTogMHB4OyBtYXJnaW46IHVuc2V0
-OyBwYWRkaW5nOiB1bnNldDsgd2hpdGUtc3BhY2U6IG5vcm1hbDsgbWluLWhlaWdodDogMTRweDsg
-Zm9udC1mYW1pbHk6IEFyaWFsLCAmcXVvdDtNaWNyb3NvZnQgWWFoZWkmcXVvdDssICZxdW90O0x1
-Y2lkYSBHcmFuZGUmcXVvdDssIFZlcmRhbmEsIEx1Y2lkYSwgSGVsdmV0aWNhLCBzYW5zLXNlcmlm
-OyBiYWNrZ3JvdW5kLWNvbG9yOiByZ2IoMjU1LCAyNTUsIDI1NSk7Ij5CZXN0IHJlZ2FyZHMsPC9w
-PjxwIHN0eWxlPSJib3gtc2l6aW5nOiBib3JkZXItYm94OyBvdXRsaW5lOiAwcHg7IG1hcmdpbjog
-dW5zZXQ7IHBhZGRpbmc6IHVuc2V0OyB3aGl0ZS1zcGFjZTogbm9ybWFsOyBtaW4taGVpZ2h0OiAx
-NHB4OyBmb250LWZhbWlseTogQXJpYWwsICZxdW90O01pY3Jvc29mdCBZYWhlaSZxdW90OywgJnF1
-b3Q7THVjaWRhIEdyYW5kZSZxdW90OywgVmVyZGFuYSwgTHVjaWRhLCBIZWx2ZXRpY2EsIHNhbnMt
-c2VyaWY7IGJhY2tncm91bmQtY29sb3I6IHJnYigyNTUsIDI1NSwgMjU1KTsiPkp1bnlhbmcgSGFu
-PC9wPjxwIHN0eWxlPSJmb250LXNpemU6MTRweDtmb250LWZhbWlseTrlvq7ova/pm4Xpu5EsTWlj
-cm9zb2Z0IFlhSGVpOyI+PGJyPjwvcD48cCBzdHlsZT0iZm9udC1zaXplOjE0cHg7Zm9udC1mYW1p
-bHk65b6u6L2v6ZuF6buRLE1pY3Jvc29mdCBZYUhlaTsiPjxicj48L3A+PHAgc3R5bGU9ImZvbnQt
-c2l6ZToxNHB4O2ZvbnQtZmFtaWx5OuW+rui9r+mbhem7kSxNaWNyb3NvZnQgWWFIZWk7Ij48YnI+
-PC9wPjxwIHN0eWxlPSJmb250LXNpemU6MTRweDtmb250LWZhbWlseTrlvq7ova/pm4Xpu5EsTWlj
-cm9zb2Z0IFlhSGVpOyI+PGJyPjwvcD48ZGl2IHVub25hbWVlbj0iSGFuIEp1bnlhbmcxMDI5NTIz
-MSIgdW5vbmFtZWNoPSLpn6nlkJvpmLMxMDI5NTIzMSIgY2xhc3M9InpNYWlsU2lnbiI+PHAgc3R5
-bGU9ImRpc3BsYXk6IG5vbmU7IiB1bm9uYW1lZW49IkhhbiBKdW55YW5nMTAyOTUyMzEiIHVub25h
-bWVjaD0i6Z+p5ZCb6ZizMTAyOTUyMzEiIGNsYXNzPSJ6TWFpbFNpZ25UaXRsZSI+PGxhYmVsIGNs
-YXNzPSJzaWduX25hbWVVbm8iPjwvbGFiZWw+PHNwYW4gY2xhc3M9InNpZ25fYXJyb3ciPjwvc3Bh
-bj48L3A+PGRpdiBjbGFzcz0iek1haWxTaWduQ29udGVudCI+PHAgc3R5bGU9Im1hcmdpbjowO2xp
-bmUtaGVpZ2h0OjIwcHg7Ij48c3BhbiBzdHlsZT0iZm9udC1mYW1pbHk6IOW+rui9r+mbhem7kSxN
-aWNyb3NvZnQgWWFIZWk7Y29sb3I6ICMwMDhlZDM7Zm9udC1zaXplOiAxNHB4IiBpZD0ic2lnbl9u
-YW1lIiBjbGFzcz0ic2lnbmVkaXQiPumfqeWQm+mYsyBIYW5qdW55YW5nPC9zcGFuPjwvcD48cCBz
-dHlsZT0ibWFyZ2luOjA7bGluZS1oZWlnaHQ6MjBweDsiPjxzcGFuIHN0eWxlPSJmb250LWZhbWls
-eTog5b6u6L2v6ZuF6buRLE1pY3Jvc29mdCBZYUhlaTtmb250LXNpemU6IDE0cHgiIGlkPSJzaWdu
-X3Bvc2l0aW9uIiBjbGFzcz0ic2lnbmVkaXQiPklU5byA5Y+R5bel56iL5biIPC9zcGFuPjxzcGFu
-IHN0eWxlPSJmb250LWZhbWlseTog5b6u6L2v6ZuF6buRLE1pY3Jvc29mdCBZYUhlaTtjb2xvcjog
-IzAwOGVkMztmb250LXNpemU6IDEycHgiPiZuYnNwOzxzcGFuIHN0eWxlPSJmb250LWZhbWlseTog
-5b6u6L2v6ZuF6buRLCAmcXVvdDtNaWNyb3NvZnQgWWFIZWkmcXVvdDs7IGNvbG9yOiByZ2IoMCwg
-MTQyLCAyMTEpOyBmb250LXNpemU6IDE0cHg7Ij4mbmJzcDs8c3BhbiBzdHlsZT0iZm9udC1zaXpl
-OiAxNHB4OyBmb250LWZhbWlseTogQXJpYWw7IHdpZG93czogMTsgYmFja2dyb3VuZC1jb2xvcjog
-cmdiKDI1NSwgMjU1LCAyNTUpOyBjb2xvcjogcmdiKDAsIDAsIDApOyI+SVQgRGV2ZWxvcG1lbnQg
-RW5naW5lZXI8L3NwYW4+Jm5ic3A7PC9zcGFuPjwvc3Bhbj48L3A+PHAgc3R5bGU9Im1hcmdpbjow
-O2xpbmUtaGVpZ2h0OjIwcHg7Ij48c3BhbiBzdHlsZT0iZm9udC1mYW1pbHk6IOW+rui9r+mbhem7
-kSxNaWNyb3NvZnQgWWFIZWk7Zm9udC1zaXplOiAxNHB4IiBpZD0ic2lnbl9kZXB0IiBjbGFzcz0i
-c2lnbmVkaXQiPklDRuWbm+mDqC/ml6Dnur/lj4rnrpflipvnoJTnqbbpmaIv57O757uf5Lqn5ZOB
-X+aXoOe6v+WPiueul+WKm+S6p+WTgee7j+iQpemDqDwvc3Bhbj48c3BhbiBzdHlsZT0iZm9udC1m
-YW1pbHk6IOW+rui9r+mbhem7kSwgJnF1b3Q7TWljcm9zb2Z0IFlhSGVpJnF1b3Q7OyBmb250LXNp
-emU6IDEycHg7IGNvbG9yOiByZ2IoMCwgMTQyLCAyMTEpOyIgY2xhc3M9InNpZ25lZGl0Ij4mbmJz
-cDsmbmJzcDs8c3BhbiBzdHlsZT0iY29sb3I6IHJnYig4OCwgODksIDkxKTsgZm9udC1mYW1pbHk6
-IEFyaWFsOyB3aWRvd3M6IDE7IGJhY2tncm91bmQtY29sb3I6IHJnYigyNTUsIDI1NSwgMjU1KTsg
-Zm9udC1zaXplOiAxNHB4OyI+TklWIERlcHQuIElWL1dpcmVsZXNzIFByb2R1Y3QgUu+8hkQgSW5z
-dGl0dXRlL1dpcmVsZXNzIFByb2R1Y3QgT3BlcmF0aW9uIERpdmlzaW9uPC9zcGFuPjwvc3Bhbj48
-L3A+PHAgc3R5bGU9Im1hcmdpbjowO2xpbmUtaGVpZ2h0OjIwcHg7Ij48c3Ryb25nPjxzcGFuIHN0
-eWxlPSJmb250LWZhbWlseTogQXJpYWw7Zm9udC1zaXplOiAxNHB4Ij4mbmJzcDs8L3NwYW4+PC9z
-dHJvbmc+PC9wPjxwIHN0eWxlPSJtYXJnaW46MDtsaW5lLWhlaWdodDoyMHB4OyI+PHNwYW4gc3R5
-bGU9ImZvbnQtZmFtaWx5OiDlvq7ova/pm4Xpu5EsTWljcm9zb2Z0IFlhSGVpO2NvbG9yOiAjMDA4
-ZWQzO2ZvbnQtc2l6ZTogMTRweCI+PGltZyBzdHlsZT0iZmxvYXQ6IGxlZnQ7IiBzaWduPSJzaWdu
-OjNkZjdjNWY4YWE1MzQ4Y2I4YTc0MmRhNzljNGM5YjY0IiBzcmM9ImNpZDozZGY3YzVmOGFhNTM0
-OGNiOGE3NDJkYTc5YzRjOWI2NCI+PC9zcGFuPjwvcD48cCBzdHlsZT0ibWFyZ2luOjA7bGluZS1o
-ZWlnaHQ6MjBweDsiPjxzcGFuIHN0eWxlPSJmb250LWZhbWlseTog5b6u6L2v6ZuF6buRLE1pY3Jv
-c29mdCBZYUhlaTtjb2xvcjogIzAwOGVkMztmb250LXNpemU6IDE0cHgiPjwvc3Bhbj48L3A+PHAg
-c3R5bGU9Im1hcmdpbi10b3A6IDBweDsgbWFyZ2luLWJvdHRvbTogMHB4OyBsaW5lLWhlaWdodDog
-MjBweDsgd2hpdGUtc3BhY2U6IG5vcm1hbDsiPjxzcGFuIHN0eWxlPSJmb250LWZhbWlseTog5b6u
-6L2v6ZuF6buRLCAmcXVvdDtNaWNyb3NvZnQgWWFIZWkmcXVvdDs7IGNvbG9yOiByZ2IoMCwgMTQy
-LCAyMTEpOyI+PC9zcGFuPjwvcD48cCBzdHlsZT0ibWFyZ2luLXRvcDogMHB4OyBtYXJnaW4tYm90
-dG9tOiAwcHg7IGxpbmUtaGVpZ2h0OiAyMHB4OyB3aGl0ZS1zcGFjZTogbm9ybWFsOyI+PHNwYW4g
-c3R5bGU9ImZvbnQtZmFtaWx5OiDlvq7ova/pm4Xpu5EsICZxdW90O01pY3Jvc29mdCBZYUhlaSZx
-dW90OzsgY29sb3I6IHJnYigwLCAxNDIsIDIxMSk7Ij48aW1nIHNpZ249InNpZ246YTFlOTVlMTY3
-MmZkNGJhM2I1ODlkMjM1NGRhYjMxNWMiIHNyYz0iY2lkOmExZTk1ZTE2NzJmZDRiYTNiNTg5ZDIz
-NTRkYWIzMTVjIj48L3NwYW4+PC9wPjxwPjxzcGFuIHN0eWxlPSJib3gtc2l6aW5nOiBib3JkZXIt
-Ym94OyB3aWRvd3M6IDE7IGJhY2tncm91bmQtY29sb3I6IHJnYigyNTUsIDI1NSwgMjU1KTsgZm9u
-dC1mYW1pbHk6IOW+rui9r+mbhem7kTsgY29sb3I6IHJnYigwLCAwLCAwKTsgb3V0bGluZTogbm9u
-ZSAhaW1wb3J0YW50OyI+5Y2X5Lqs5biC6Zuo6Iqx5Y+w5Yy6PC9zcGFuPuWugeS4uei3rzE4OeWP
-t+S4reWFtOS4ieWMukE25qCLMualvDxzcGFuIHN0eWxlPSJib3gtc2l6aW5nOiBib3JkZXItYm94
-OyB3aWRvd3M6IDE7IGJhY2tncm91bmQtY29sb3I6IHJnYigyNTUsIDI1NSwgMjU1KTsgY29sb3I6
-IHJnYig4OCwgODksIDkxKTsgZm9udC1mYW1pbHk6IOW+rui9r+mbhem7kTsgb3V0bGluZTogbm9u
-ZSAhaW1wb3J0YW50OyI+PGJyIHN0eWxlPSJib3gtc2l6aW5nOiBib3JkZXItYm94OyBvdXRsaW5l
-OiBub25lICFpbXBvcnRhbnQ7Ij48L3NwYW4+PC9wPjxwIHN0eWxlPSJib3gtc2l6aW5nOiBib3Jk
-ZXItYm94OyBtYXJnaW4tdG9wOiAwcHg7IG1hcmdpbi1ib3R0b206IDBweDsgd2hpdGUtc3BhY2U6
-IG5vcm1hbDsgbWluLWhlaWdodDogMTRweDsgZm9udC1mYW1pbHk6IOWui+S9kzsgd2lkb3dzOiAx
-OyBiYWNrZ3JvdW5kLWNvbG9yOiByZ2IoMjU1LCAyNTUsIDI1NSk7IG91dGxpbmU6IG5vbmUgIWlt
-cG9ydGFudDsiPjxzcGFuIHN0eWxlPSJib3gtc2l6aW5nOiBib3JkZXItYm94OyBmb250LWZhbWls
-eTogQXJpYWw7IGNvbG9yOiByZ2IoMCwgMCwgMCk7IG91dGxpbmU6IG5vbmUgIWltcG9ydGFudDsi
-Pk5vLjYgSHVhU2hlbiBSb2FkLFl1aHVhdGFpIERpc3RyaWN0LE5hbmppbmcgUC5SLkNoaW5hPC9z
-cGFuPjwvcD48cCBzdHlsZT0ibWFyZ2luLXRvcDogMHB4OyBtYXJnaW4tYm90dG9tOiAwcHg7IGxp
-bmUtaGVpZ2h0OiAyMHB4OyB3aGl0ZS1zcGFjZTogbm9ybWFsOyI+PHNwYW4gc3R5bGU9ImZvbnQt
-ZmFtaWx5OiBBcmlhbDsgY29sb3I6IHJnYigwLCAxNDIsIDIxMSk7Ij48L3NwYW4+PHNwYW4gc3R5
-bGU9ImJveC1zaXppbmc6IGJvcmRlci1ib3g7IGZvbnQtZmFtaWx5OiBBcmlhbDsgd2lkb3dzOiAx
-OyBiYWNrZ3JvdW5kLWNvbG9yOiByZ2IoMjU1LCAyNTUsIDI1NSk7IGNvbG9yOiByZ2IoMCwgMTQz
-LCAyMTIpOyBvdXRsaW5lOiBub25lICFpbXBvcnRhbnQ7Ij5NPC9zcGFuPjxzcGFuIHN0eWxlPSJj
-b2xvcjogcmdiKDg4LCA4OSwgOTEpOyBmb250LWZhbWlseTogQXJpYWw7IHdpZG93czogMTsgYmFj
-a2dyb3VuZC1jb2xvcjogcmdiKDI1NSwgMjU1LCAyNTUpOyI+OiZuYnNwOzwvc3Bhbj48c3BhbiBz
-dHlsZT0iYm94LXNpemluZzogYm9yZGVyLWJveDsgZm9udC1mYW1pbHk6IEFyaWFsOyB3aWRvd3M6
-IDE7IGJhY2tncm91bmQtY29sb3I6IHJnYigyNTUsIDI1NSwgMjU1KTsgY29sb3I6IHJnYigwLCAw
-LCAwKTsgb3V0bGluZTogbm9uZSAhaW1wb3J0YW50OyI+Kzg2LTE4NjUxOTA5NTIwPC9zcGFuPjxz
-cGFuIHN0eWxlPSJjb2xvcjogcmdiKDg4LCA4OSwgOTEpOyBmb250LWZhbWlseTogQXJpYWw7IHdp
-ZG93czogMTsgYmFja2dyb3VuZC1jb2xvcjogcmdiKDI1NSwgMjU1LCAyNTUpOyI+Jm5ic3A7Jm5i
-c3A7PC9zcGFuPjxzcGFuIHN0eWxlPSJib3gtc2l6aW5nOiBib3JkZXItYm94OyBmb250LWZhbWls
-eTogQXJpYWw7IHdpZG93czogMTsgYmFja2dyb3VuZC1jb2xvcjogcmdiKDI1NSwgMjU1LCAyNTUp
-OyBjb2xvcjogcmdiKDAsIDE0MywgMjEyKTsgb3V0bGluZTogbm9uZSAhaW1wb3J0YW50OyI+RTwv
-c3Bhbj48c3BhbiBzdHlsZT0iY29sb3I6IHJnYig4OCwgODksIDkxKTsgZm9udC1mYW1pbHk6IEFy
-aWFsOyB3aWRvd3M6IDE7IGJhY2tncm91bmQtY29sb3I6IHJnYigyNTUsIDI1NSwgMjU1KTsiPjog
-PC9zcGFuPjxzcGFuIHN0eWxlPSJjb2xvcjogcmdiKDAsIDAsIDApOyI+PHNwYW4gc3R5bGU9ImZv
-bnQtZmFtaWx5OiBBcmlhbDsgd2lkb3dzOiAxOyBiYWNrZ3JvdW5kLWNvbG9yOiByZ2IoMjU1LCAy
-NTUsIDI1NSk7Ij5oYW4uanVueWFuZzwvc3Bhbj48c3BhbiBzdHlsZT0iYm94LXNpemluZzogYm9y
-ZGVyLWJveDsgZm9udC1mYW1pbHk6IEFyaWFsOyB3aWRvd3M6IDE7IGJhY2tncm91bmQtY29sb3I6
-IHJnYigyNTUsIDI1NSwgMjU1KTsgb3V0bGluZTogbm9uZSAhaW1wb3J0YW50OyIgaWQ9InNpZ25f
-ZW1haWwiIGNsYXNzPSJzaWduZWRpdCI+QHp0ZS5jb20uY248L3NwYW4+PC9zcGFuPjwvcD48cCBz
-dHlsZT0ibWFyZ2luLXRvcDogMHB4OyBtYXJnaW4tYm90dG9tOiAwcHg7IGxpbmUtaGVpZ2h0OiAy
-MHB4OyB3aGl0ZS1zcGFjZTogbm9ybWFsOyI+PHNwYW4gc3R5bGU9ImNvbG9yOiByZ2IoODgsIDg5
-LCA5MSk7IGZvbnQtZmFtaWx5OiBBcmlhbDsgd2lkb3dzOiAxOyBiYWNrZ3JvdW5kLWNvbG9yOiBy
-Z2IoMjU1LCAyNTUsIDI1NSk7Ij48L3NwYW4+PHNwYW4gc3R5bGU9ImJveC1zaXppbmc6IGJvcmRl
-ci1ib3g7IGZvbnQtZmFtaWx5OiBBcmlhbDsgd2lkb3dzOiAxOyBiYWNrZ3JvdW5kLWNvbG9yOiBy
-Z2IoMjU1LCAyNTUsIDI1NSk7IGNvbG9yOiByZ2IoMCwgMTQzLCAyMTIpOyBvdXRsaW5lOiBub25l
-ICFpbXBvcnRhbnQ7Ij48YSBocmVmPSJodHRwOi8vd3d3Lnp0ZS5jb20uY24vIiBzdHlsZT0iYm94
-LXNpemluZzogYm9yZGVyLWJveDsgYmFja2dyb3VuZC1jb2xvcjogdHJhbnNwYXJlbnQ7IGNvbG9y
-OiByZ2IoNTEsIDEyMiwgMTgzKTsgdGV4dC1kZWNvcmF0aW9uLWxpbmU6IHVuZGVybGluZTsgb3V0
-bGluZTogbm9uZSAhaW1wb3J0YW50OyI+d3d3Lnp0ZS5jb20uY248L2E+Jm5ic3A7PC9zcGFuPjxz
-cGFuIHN0eWxlPSJmb250LWZhbWlseTogQXJpYWw7IiBpZD0ic2lnbl9lbWFpbCIgY2xhc3M9InNp
-Z25lZGl0Ij48YSBocmVmPSJtYWlsdG86aGFuLmp1bnlhbmdAenRlLmNvbS5jbiI+PC9hPjwvc3Bh
-bj48L3A+PHAgc3R5bGU9Im1hcmdpbi10b3A6IDBweDsgbWFyZ2luLWJvdHRvbTogMHB4OyBsaW5l
-LWhlaWdodDogMjBweDsgd2hpdGUtc3BhY2U6IG5vcm1hbDsiPjxicj48L3A+PHAgc3R5bGU9Im1h
-cmdpbjogMHB4OyBsaW5lLWhlaWdodDogMjBweDsgdGV4dC1hbGlnbjogbGVmdDsiPjxicj48L3A+
-PC9kaXY+PC9kaXY+PGRpdiBjbGFzcz0iemhpc3RvcnlSb3ciIHN0eWxlPSJkaXNwbGF5OmJsb2Nr
-Ij48ZGl2IGNsYXNzPSJ6aGlzdG9yeURlcyIgc3R5bGU9IndpZHRoOiAxMDAlOyBoZWlnaHQ6IDI4
-cHg7IGxpbmUtaGVpZ2h0OiAyOHB4OyBiYWNrZ3JvdW5kLWNvbG9yOiAjRTBFNUU5OyBjb2xvcjog
-IzEzODhGRjsgdGV4dC1hbGlnbjogY2VudGVyOyI+T3JpZ2luYWw8L2Rpdj48ZGl2IGlkPSJ6d3Jp
-dGVIaXN0b3J5Q29udGFpbmVyIj48ZGl2IGNsYXNzPSJjb250cm9sLWdyb3VwIHpoaXN0b3J5UGFu
-ZWwiPjxkaXYgY2xhc3M9InpoaXN0b3J5SGVhZGVyIiBzdHlsZT0icGFkZGluZzogOHB4OyBiYWNr
-Z3JvdW5kLWNvbG9yOiAjRjVGNkY4OyI+PGRpdj48c3Ryb25nPkZyb206Jm5ic3A7PC9zdHJvbmc+
-PHNwYW4gY2xhc3M9InpyZWFkVXNlck5hbWUiPkFuZHJld0x1bm4gJmx0O2FuZHJld0BsdW5uLmNo
-Jmd0Ozwvc3Bhbj48L2Rpdj48ZGl2PjxzdHJvbmc+VG86Jm5ic3A7PC9zdHJvbmc+PHNwYW4gY2xh
-c3M9InpyZWFkVXNlck5hbWUiIHN0eWxlPSJkaXNwbGF5OiBpbmxpbmU7Ij7pn6nlkJvpmLMxMDI5
-NTIzMTs8L3NwYW4+PC9kaXY+PGRpdj48c3Ryb25nPkNjOiZuYnNwOzwvc3Ryb25nPjxzcGFuIGNs
-YXNzPSJ6cmVhZFVzZXJOYW1lIiBzdHlsZT0iZGlzcGxheTogaW5saW5lOyI+bmV0ZGV2QHZnZXIu
-a2VybmVsLm9yZyAmbHQ7bmV0ZGV2QHZnZXIua2VybmVsLm9yZyZndDs7PC9zcGFuPjxzcGFuIGNs
-YXNzPSJ6cmVhZFVzZXJOYW1lIiBzdHlsZT0iZGlzcGxheTogaW5saW5lOyI+ZGF2ZW1AZGF2ZW1s
-b2Z0Lm5ldCAmbHQ7ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldCZndDs7PC9zcGFuPjxzcGFuIGNsYXNzPSJ6
-cmVhZFVzZXJOYW1lIiBzdHlsZT0iZGlzcGxheTogaW5saW5lOyI+YW5kcmV3K25ldGRldkBsdW5u
-LmNoICZsdDthbmRyZXcrbmV0ZGV2QGx1bm4uY2gmZ3Q7Ozwvc3Bhbj48c3BhbiBjbGFzcz0ienJl
-YWRVc2VyTmFtZSIgc3R5bGU9ImRpc3BsYXk6IGlubGluZTsiPmVkdW1hemV0QGdvb2dsZS5jb20g
-Jmx0O2VkdW1hemV0QGdvb2dsZS5jb20mZ3Q7Ozwvc3Bhbj48c3BhbiBjbGFzcz0ienJlYWRVc2Vy
-TmFtZSIgc3R5bGU9ImRpc3BsYXk6IGlubGluZTsiPmt1YmFAa2VybmVsLm9yZyAmbHQ7a3ViYUBr
-ZXJuZWwub3JnJmd0Ozs8L3NwYW4+PHNwYW4gY2xhc3M9InpyZWFkVXNlck5hbWUiIHN0eWxlPSJk
-aXNwbGF5OiBpbmxpbmU7Ij5wYWJlbmlAcmVkaGF0LmNvbSAmbHQ7cGFiZW5pQHJlZGhhdC5jb20m
-Z3Q7Ozwvc3Bhbj48c3BhbiBjbGFzcz0ienJlYWRVc2VyTmFtZSIgc3R5bGU9ImRpc3BsYXk6IGlu
-bGluZTsiPuWGieaYjjEwMDMzMzM5Ozwvc3Bhbj48c3BhbiBjbGFzcz0ienJlYWRVc2VyTmFtZSIg
-c3R5bGU9ImRpc3BsYXk6IGlubGluZTsiPumfqeaIkOmjnjEwMzMzNzA4Ozwvc3Bhbj48c3BhbiBj
-bGFzcz0ienJlYWRVc2VyTmFtZSIgc3R5bGU9ImRpc3BsYXk6IGlubGluZTsiPuW8oOW7tuazvTEw
-MzI3NDE3Ozwvc3Bhbj48L2Rpdj48ZGl2PjxzdHJvbmc+RGF0ZTombmJzcDs8L3N0cm9uZz48c3Bh
-biBjbGFzcz0iIj4yMDI25bm0MDTmnIgyM+aXpSAwMDoyMDwvc3Bhbj48L2Rpdj48ZGl2PjxzdHJv
-bmc+U3ViamVjdDombmJzcDs8L3N0cm9uZz48c3BhbiBjbGFzcz0ienJlYWRUaXRsZSI+PHN0cm9u
-Zz5SZTogW1BBVENIIG5ldC1uZXh0IHYyIDAvM10gQWRkIFpURSBEaW5nSGFpIEV0aGVybmV0IFBG
-IGRyaXZlcjwvc3Ryb25nPjwvc3Bhbj48L2Rpdj48L2Rpdj48ZGl2IGNsYXNzPSJ6aGlzdG9yeUNv
-bnRlbnQiPk9uJm5ic3A7V2VkLCZuYnNwO0FwciZuYnNwOzIyLCZuYnNwOzIwMjYmbmJzcDthdCZu
-YnNwOzEwOjQ4OjU4UE0mbmJzcDsrMDgwMCwmbmJzcDtKdW55YW5nJm5ic3A7SGFuJm5ic3A7d3Jv
-dGU6PGJyPiZndDsmbmJzcDtUaGlzJm5ic3A7c2VyaWVzJm5ic3A7YWRkcyZuYnNwO2luaXRpYWwm
-bmJzcDtzdXBwb3J0Jm5ic3A7Zm9yJm5ic3A7dGhlJm5ic3A7WlRFJm5ic3A7RGluZ0hhaSZuYnNw
-O0V0aGVybmV0Jm5ic3A7Y29udHJvbGxlciw8YnI+Jmd0OyZuYnNwO2EmbmJzcDtoaWdoLXBlcmZv
-cm1hbmNlJm5ic3A7UENJZSZuYnNwO0V0aGVybmV0Jm5ic3A7ZGV2aWNlJm5ic3A7c3VwcG9ydGlu
-ZyZuYnNwO1NSLUlPViwmbmJzcDtoYXJkd2FyZTxicj4mZ3Q7Jm5ic3A7b2ZmbG9hZGluZywmbmJz
-cDthbmQmbmJzcDthZHZhbmNlZCZuYnNwO3ZpcnR1YWxpemF0aW9uJm5ic3A7ZmVhdHVyZXMuPGJy
-PiA8YnI+aHR0cHM6Ly93d3cua2VybmVsLm9yZy9kb2MvaHRtbC9sYXRlc3QvcHJvY2Vzcy9tYWlu
-dGFpbmVyLW5ldGRldi5odG1sPGJyPiA8YnI+UGxlYXNlJm5ic3A7cmVhZCZuYnNwO3NlY3Rpb25z
-Jm5ic3A7MS4zJm5ic3A7YW5kJm5ic3A7MS40LCZuYnNwO3BhcnRpY3VsYXJseSZuYnNwO3RoZSZu
-YnNwO2JpdCZuYnNwO2luJm5ic3A7cmVkLjxicj4gPGJyPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-O0FuZHJldzxicj4gPGJyPi0tLTxicj5wdy1ib3Q6Jm5ic3A7Y3I8L2Rpdj48L2Rpdj48L2Rpdj48
-L2Rpdj48cD48YnI+PC9wPjwvZGl2Pg==
+Memory state around the buggy address:
+ ffff8881bb35b880: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc
+ ffff8881bb35b900: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff8881bb35b980: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                     ^
+ ffff8881bb35ba00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc
+ ffff8881bb35ba80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+==================================================================
 
 
---=====_003_next=====--
+***
 
---=====_002_next=====
-Content-Type: image/jpeg;
-	 name="=?UTF-8?B?M2RmN2M1ZjhhYTUzNDhjYjhhNzQyZGE3OWM0YzliNjQuanBn?="
-Content-Disposition: inline;
-	filename="=?UTF-8?B?M2RmN2M1ZjhhYTUzNDhjYjhhNzQyZGE3OWM0YzliNjQuanBn?="
-Content-Transfer-Encoding: base64
-Content-ID: <3df7c5f8aa5348cb8a742da79c4c9b64>
+KASAN: slab-use-after-free Read in netlink_rcv_skb
 
-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
+tree:      torvalds
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux
+base:      0b5e8d7999076ac3c490fc18376a404e2626abff
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/cb46a152-33c1-4b5e-bb75-bab2ecb45113/config
+syz repro: https://ci.syzbot.org/findings/584da8f1-c227-495f-aa8f-564d0bcc212f/syz_repro
+
+==================================================================
+BUG: KASAN: slab-use-after-free in netlink_rcv_skb+0x395/0x4b0 net/netlink/af_netlink.c:2574
+Read of size 4 at addr ffff8881753dc700 by task syz.2.60/6106
+
+CPU: 1 UID: 0 PID: 6106 Comm: syz.2.60 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_address_description+0x55/0x1e0 mm/kasan/report.c:378
+ print_report+0x58/0x70 mm/kasan/report.c:482
+ kasan_report+0x117/0x150 mm/kasan/report.c:595
+ netlink_rcv_skb+0x395/0x4b0 net/netlink/af_netlink.c:2574
+ nfnetlink_rcv+0x2c0/0x27b0 net/netfilter/nfnetlink.c:669
+ netlink_unicast_kernel net/netlink/af_netlink.c:1314 [inline]
+ netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1340
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1890
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x972/0x9f0 net/socket.c:2592
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f4d3a59c819
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f4d3b3b8028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f4d3a816090 RCX: 00007f4d3a59c819
+RDX: 0000000000000080 RSI: 0000200000000100 RDI: 0000000000000003
+RBP: 00007f4d3a632c91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f4d3a816128 R14: 00007f4d3a816090 R15: 00007ffd69453fe8
+ </TASK>
+
+Allocated by task 6106:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ unpoison_slab_object mm/kasan/common.c:340 [inline]
+ __kasan_slab_alloc+0x6c/0x80 mm/kasan/common.c:366
+ kasan_slab_alloc include/linux/kasan.h:253 [inline]
+ slab_post_alloc_hook mm/slub.c:4538 [inline]
+ slab_alloc_node mm/slub.c:4866 [inline]
+ kmem_cache_alloc_node_noprof+0x384/0x690 mm/slub.c:4918
+ kmalloc_reserve net/core/skbuff.c:613 [inline]
+ __alloc_skb+0x27d/0x7d0 net/core/skbuff.c:713
+ netlink_sendmsg+0x5d4/0xb40 net/netlink/af_netlink.c:1865
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x972/0x9f0 net/socket.c:2592
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 6106:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:584
+ poison_slab_object mm/kasan/common.c:253 [inline]
+ __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:285
+ kasan_slab_free include/linux/kasan.h:235 [inline]
+ slab_free_hook mm/slub.c:2685 [inline]
+ slab_free mm/slub.c:6165 [inline]
+ kmem_cache_free+0x189/0x630 mm/slub.c:6295
+ skb_kfree_head net/core/skbuff.c:1087 [inline]
+ skb_free_head net/core/skbuff.c:1101 [inline]
+ skb_release_data+0x81c/0xa80 net/core/skbuff.c:1128
+ skb_release_all net/core/skbuff.c:1203 [inline]
+ __kfree_skb+0x5d/0x210 net/core/skbuff.c:1217
+ netlink_dump+0xbe9/0xf40 net/netlink/af_netlink.c:2385
+ __netlink_dump_start+0x5cb/0x7e0 net/netlink/af_netlink.c:2455
+ netlink_dump_start include/linux/netlink.h:341 [inline]
+ ip_set_dump+0x15b/0x1f0 net/netfilter/ipset/ip_set_core.c:1717
+ nfnetlink_rcv_msg+0xc00/0x12c0 net/netfilter/nfnetlink.c:302
+ netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2565
+ nfnetlink_rcv+0x2c0/0x27b0 net/netfilter/nfnetlink.c:669
+ netlink_unicast_kernel net/netlink/af_netlink.c:1314 [inline]
+ netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1340
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1890
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x972/0x9f0 net/socket.c:2592
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+The buggy address belongs to the object at ffff8881753dc700
+ which belongs to the cache skbuff_small_head of size 704
+The buggy address is located 0 bytes inside of
+ freed 704-byte region [ffff8881753dc700, ffff8881753dc9c0)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0xffff8881753dfb80 pfn:0x1753dc
+head: order:2 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+flags: 0x57ff00000000240(workingset|head|node=1|zone=2|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 057ff00000000240 ffff888160419140 ffffea0005d40010 ffffea0006e4bb10
+raw: ffff8881753dfb80 000000080012000f 00000000f5000000 0000000000000000
+head: 057ff00000000240 ffff888160419140 ffffea0005d40010 ffffea0006e4bb10
+head: ffff8881753dfb80 000000080012000f 00000000f5000000 0000000000000000
+head: 057ff00000000002 ffffffffffffff01 00000000ffffffff 00000000ffffffff
+head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000004
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 2, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5839, tgid 5839 (syz-executor), ts 58323168360, free_ts 35463810625
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x231/0x280 mm/page_alloc.c:1868
+ prep_new_page mm/page_alloc.c:1876 [inline]
+ get_page_from_freelist+0x24ba/0x2540 mm/page_alloc.c:3956
+ __alloc_frozen_pages_noprof+0x18d/0x380 mm/page_alloc.c:5236
+ alloc_slab_page mm/slub.c:3292 [inline]
+ allocate_slab+0x77/0x660 mm/slub.c:3481
+ new_slab mm/slub.c:3539 [inline]
+ refill_objects+0x331/0x3c0 mm/slub.c:7175
+ refill_sheaf mm/slub.c:2812 [inline]
+ __pcs_replace_empty_main+0x2e6/0x730 mm/slub.c:4615
+ alloc_from_pcs mm/slub.c:4717 [inline]
+ slab_alloc_node mm/slub.c:4851 [inline]
+ kmem_cache_alloc_node_noprof+0x441/0x690 mm/slub.c:4918
+ kmalloc_reserve net/core/skbuff.c:613 [inline]
+ __alloc_skb+0x27d/0x7d0 net/core/skbuff.c:713
+ alloc_skb include/linux/skbuff.h:1383 [inline]
+ nlmsg_new include/net/netlink.h:1055 [inline]
+ inet6_netconf_notify_devconf+0x10f/0x1d0 net/ipv6/addrconf.c:592
+ __addrconf_sysctl_register+0x45a/0x4d0 net/ipv6/addrconf.c:7338
+ addrconf_sysctl_register+0x168/0x1c0 net/ipv6/addrconf.c:7375
+ ipv6_add_dev+0xd26/0x13a0 net/ipv6/addrconf.c:459
+ addrconf_notify+0x771/0x1050 net/ipv6/addrconf.c:3654
+ notifier_call_chain+0x1be/0x400 kernel/notifier.c:85
+ call_netdevice_notifiers_extack net/core/dev.c:2287 [inline]
+ call_netdevice_notifiers net/core/dev.c:2301 [inline]
+ register_netdevice+0x173a/0x1cf0 net/core/dev.c:11462
+ register_netdev+0x40/0x60 net/core/dev.c:11540
+page last free pid 5256 tgid 5256 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ __free_pages_prepare mm/page_alloc.c:1412 [inline]
+ __free_frozen_pages+0xbc7/0xd30 mm/page_alloc.c:2953
+ __slab_free+0x263/0x2b0 mm/slub.c:5573
+ qlink_free mm/kasan/quarantine.c:163 [inline]
+ qlist_free_all+0x99/0x100 mm/kasan/quarantine.c:179
+ kasan_quarantine_reduce+0x148/0x160 mm/kasan/quarantine.c:286
+ __kasan_slab_alloc+0x22/0x80 mm/kasan/common.c:350
+ kasan_slab_alloc include/linux/kasan.h:253 [inline]
+ slab_post_alloc_hook mm/slub.c:4538 [inline]
+ slab_alloc_node mm/slub.c:4866 [inline]
+ kmem_cache_alloc_node_noprof+0x384/0x690 mm/slub.c:4918
+ __alloc_skb+0x1d0/0x7d0 net/core/skbuff.c:702
+ netlink_sendmsg+0x5d4/0xb40 net/netlink/af_netlink.c:1865
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x972/0x9f0 net/socket.c:2592
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Memory state around the buggy address:
+ ffff8881753dc600: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+ ffff8881753dc680: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff8881753dc700: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                   ^
+ ffff8881753dc780: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff8881753dc800: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
 
 
---=====_002_next=====
-Content-Type: image/jpeg;
-	 name="=?UTF-8?B?YTFlOTVlMTY3MmZkNGJhM2I1ODlkMjM1NGRhYjMxNWMuanBn?="
-Content-Disposition: inline;
-	filename="=?UTF-8?B?YTFlOTVlMTY3MmZkNGJhM2I1ODlkMjM1NGRhYjMxNWMuanBn?="
-Content-Transfer-Encoding: base64
-Content-ID: <a1e95e1672fd4ba3b589d2354dab315c>
+***
 
-R0lGODlhcwAmAPcAAAAAAP///wCP1QCP1Pf7/vL5/QCP1gWR1gqT1gyU2AyU1w6V1xWY2BeZ2R6c
-2iGd2iyi3C6j3TOl3Tqo3kWt4Emv4Uyw4U2x4lOz4ly35F645GO65WW75me85m6/53XC6IHH64XJ
-64bK7IzM7I/N7JXQ7ZfR7pnS7pzT7p3U76PW8KPW76XX8K7b8bDc8rff87vh9Lzh9L7i9cnn9tLr
-+Nnu+eDx+uf0++n1++33/PD4/PT6/fj8/gKQ1AWR1QeS1QiT1QmT1g+W1xCW1xOX1xia2Bub2Ryb
-2R+d2SCd2SKe2iSf2iag2ymh2yqh2yui3DSm3Tio3Typ3j2q3j6q3kCr30Os30eu4Euw4U6x4U+y
-4k+y4VGz4lCy4Va141W04li241q341245F+55GW75Ga85Wm95mi95Gq+5Wu+5m2/5m/A53HB6HDA
-53HB5nLB53PC53XC53bD53nE6HvF6X3G6X/H6YHI6oHI6YLI6oLI6YbK64TJ6YnL64rM64zM65HP
-7JPQ7ZbR7ZrT7qXX76bY8KfY76jZ8Kra8azb8a/c8bDc8bHd8rLd8rXe8rXe8bjg87zi9Lzh873i
-88Dj9MPl9cXm9cfm9cnn9c3p9s/q987p9tHr99Lr99Xt+Nbt+Nrv+d/x+eDx+eX0++Tz+u/4/OHy
-+ePz+ur2+/b7/fr9/vz+/v7//////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAK0ALAAAAABzACYA
-Rwj/AAMIHEiwoMGDCBMqXMiwoUOGiti0mUhxopcBAgZoHKAglcATFaVg3DgAC0U2hgKsKkJyiZqK
-FUV4bHijx4AHDFmN0BiJ4A2NRFYRJKAAo6WFKzJibOCQEclMB1WxxOgDUQEeqbKm2sEDoQaMhAqS
-sonE4B2MeQ7WmGlwj0YKCv0oHeDkIUGnAvJCNShVowA7dgXyyXKhsGEJG6kYNqxFUEImGSsQDJFR
-gOSClUj61cx5wAmEBKJk9JIwTefTaxzaGNnQxhIBex0WAUPwRZoOZnLr3q27Q6CBKXgL742mhUBW
-e3AP771HlcNSaDjQCVwwByQc1A2+9vtbodONsQn2/8UI2O6F03lP+/1QcEpeJgMbabwyMEzeOQuJ
-bBSAyC5ejeENNN5GQzBAxIEHNgAGAQZ9JQAlBvUggBIGlYDWQBtYoKGGW1yw4YZacPGhBVjsIRAB
-B4xEV3YCfZdRgAKNJ0ATLBo01gBlOXSIARgpohAEeQkgSo1EFmnkkUgmqeSSCKkxl3qaMRUBZ5V1
-llcHAaQ40lxP+uXQWALkmB0HGplhECYHWADDQ24oJYAVClHilwCgRMVSXiYGhgIZG/TZZxlXaNTD
-F2X4+adxA+Fg0wBkEGTfACkQhNgAKzR0iop0MvQdgHZu5EdgXw0AYUE2UViQhQKkVdAcQZYSAA9D
-GP/xxQ4B1KHRFg1h4OYYDzHiJowBDKgiSZXlSZAGeYVFEJhiDnRHXnoM5EOXxO7HmQMGdRJkRtj5
-txmwMqoRWBZPplftuXEkxIUJBj2CxUJSVPkGi5sOAO5UA6hqJCql2sVKEBilcRCyAxhQB0GFqEet
-X3IglAhJlxzEAwPoaSaABV+S1VAmQ+RlREOTBHkGkySXbPLJKKes8sosC6TJllCS9JshC8NsbSUB
-eFAzZ244FIpSNfrRxADsGoRKQS/ETCWWIShspSMBUGyteu82dGOzCr3AR0EyaESFQU4OAJdDcBC7
-SEJjuJmuQTzg+0SSNmG7ECuQDZBAQUlo9AlBg2D/BMVDm2wpQA4KOUISJ53mpa9DJVRmLkZcUgv1
-QDRjRMNAI2SUmkAzYDSEcw3xMVcEmj7VqUblPSRGRl2ooMIKK6hAh0Y/kMBC7K9PkBceBeGwUaUB
-gLKRc/xqZIpD7vkFR0Obwna6AGiAqlEhBY1iUxIG5YFRtAZh1IYOAh090AIY9cRQAUBALsBRzM91
-734CICDEAvQvoMAQGNBaELICKDvQ1Wa5kEBi4IJGNMITmTCgAhvhgg8o5QsvMKALcHaQSKRHAAro
-SlO+ZafHQQ5mAuhDg8AiFo0VBAQCDAAIMWWuKlWGKQZJg5vg5C2/vI92LujKKna4CtAdRAwa8QIL
-7YY4xLPErwREHGIVMMI7km0nL4CgjovsdboBiNAumbPYsKpkLUQZRAZ5+dtAOrEAAXwtITjgkiey
-U68bDiB1RSKARo4QmEOkR3wDOUNlMnCQQrgJPvQyHV+KUCwkAfAhYMjLD4RyECxUJhEESeRmBCAB
-mMCkBAlpnhsHwAQPWHIifWCQ1UzIEFAEqQsLwQEQ8gIBgWiBS0qbI0JeMJcaHGQV04plXr6kEbkp
-hBVTEkAPjtcQOWSEVwGQxBw+wMxmOvOZHxiEQnIAgj1o8JZ/gKY2SeDDhejgDW1YnEI+AUm7fIKR
-LUunOtfJThYFBAA7
+KASAN: slab-use-after-free Read in rdma_nl_rcv
+
+tree:      torvalds
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux
+base:      0b5e8d7999076ac3c490fc18376a404e2626abff
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/cb46a152-33c1-4b5e-bb75-bab2ecb45113/config
+syz repro: https://ci.syzbot.org/findings/5022ea7e-727a-4c37-8ae5-0c7f5d43822c/syz_repro
+
+==================================================================
+BUG: KASAN: slab-use-after-free in rdma_nl_rcv_skb drivers/infiniband/core/netlink.c:248 [inline]
+BUG: KASAN: slab-use-after-free in rdma_nl_rcv+0x867/0xa10 drivers/infiniband/core/netlink.c:259
+Read of size 4 at addr ffff8881a4036a00 by task syz.1.18/5983
+
+CPU: 1 UID: 0 PID: 5983 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_address_description+0x55/0x1e0 mm/kasan/report.c:378
+ print_report+0x58/0x70 mm/kasan/report.c:482
+ kasan_report+0x117/0x150 mm/kasan/report.c:595
+ rdma_nl_rcv_skb drivers/infiniband/core/netlink.c:248 [inline]
+ rdma_nl_rcv+0x867/0xa10 drivers/infiniband/core/netlink.c:259
+ netlink_unicast_kernel net/netlink/af_netlink.c:1314 [inline]
+ netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1340
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1890
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x972/0x9f0 net/socket.c:2592
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f737179c819
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f73725f1028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f7371a16090 RCX: 00007f737179c819
+RDX: 0000000020008000 RSI: 0000200000000000 RDI: 0000000000000003
+RBP: 00007f7371832c91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f7371a16128 R14: 00007f7371a16090 R15: 00007ffeff477318
+ </TASK>
+
+Allocated by task 5983:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ unpoison_slab_object mm/kasan/common.c:340 [inline]
+ __kasan_slab_alloc+0x6c/0x80 mm/kasan/common.c:366
+ kasan_slab_alloc include/linux/kasan.h:253 [inline]
+ slab_post_alloc_hook mm/slub.c:4538 [inline]
+ slab_alloc_node mm/slub.c:4866 [inline]
+ kmem_cache_alloc_node_noprof+0x384/0x690 mm/slub.c:4918
+ kmalloc_reserve net/core/skbuff.c:613 [inline]
+ __alloc_skb+0x27d/0x7d0 net/core/skbuff.c:713
+ netlink_sendmsg+0x5d4/0xb40 net/netlink/af_netlink.c:1865
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x972/0x9f0 net/socket.c:2592
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 5983:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:584
+ poison_slab_object mm/kasan/common.c:253 [inline]
+ __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:285
+ kasan_slab_free include/linux/kasan.h:235 [inline]
+ slab_free_hook mm/slub.c:2685 [inline]
+ slab_free mm/slub.c:6165 [inline]
+ kmem_cache_free+0x189/0x630 mm/slub.c:6295
+ skb_kfree_head net/core/skbuff.c:1087 [inline]
+ skb_free_head net/core/skbuff.c:1101 [inline]
+ skb_release_data+0x81c/0xa80 net/core/skbuff.c:1128
+ skb_release_all net/core/skbuff.c:1203 [inline]
+ __kfree_skb+0x5d/0x210 net/core/skbuff.c:1217
+ netlink_dump+0xbe9/0xf40 net/netlink/af_netlink.c:2385
+ __netlink_dump_start+0x5cb/0x7e0 net/netlink/af_netlink.c:2455
+ netlink_dump_start include/linux/netlink.h:341 [inline]
+ rdma_nl_rcv_msg drivers/infiniband/core/netlink.c:190 [inline]
+ rdma_nl_rcv_skb drivers/infiniband/core/netlink.c:239 [inline]
+ rdma_nl_rcv+0x78b/0xa10 drivers/infiniband/core/netlink.c:259
+ netlink_unicast_kernel net/netlink/af_netlink.c:1314 [inline]
+ netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1340
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1890
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x972/0x9f0 net/socket.c:2592
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+The buggy address belongs to the object at ffff8881a4036a00
+ which belongs to the cache skbuff_small_head of size 704
+The buggy address is located 0 bytes inside of
+ freed 704-byte region [ffff8881a4036a00, ffff8881a4036cc0)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1a4034
+head: order:2 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+flags: 0x57ff00000000040(head|node=1|zone=2|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 057ff00000000040 ffff888160416c80 dead000000000100 dead000000000122
+raw: 0000000000000000 0000000800120012 00000000f5000000 0000000000000000
+head: 057ff00000000040 ffff888160416c80 dead000000000100 dead000000000122
+head: 0000000000000000 0000000800120012 00000000f5000000 0000000000000000
+head: 057ff00000000002 ffffffffffffff01 00000000ffffffff 00000000ffffffff
+head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000004
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 2, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5931, tgid 5931 (syz-executor), ts 61730251789, free_ts 58082311635
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x231/0x280 mm/page_alloc.c:1868
+ prep_new_page mm/page_alloc.c:1876 [inline]
+ get_page_from_freelist+0x24ba/0x2540 mm/page_alloc.c:3956
+ __alloc_frozen_pages_noprof+0x18d/0x380 mm/page_alloc.c:5236
+ alloc_slab_page mm/slub.c:3292 [inline]
+ allocate_slab+0x77/0x660 mm/slub.c:3481
+ new_slab mm/slub.c:3539 [inline]
+ refill_objects+0x331/0x3c0 mm/slub.c:7175
+ refill_sheaf mm/slub.c:2812 [inline]
+ __pcs_replace_empty_main+0x2e6/0x730 mm/slub.c:4615
+ alloc_from_pcs mm/slub.c:4717 [inline]
+ slab_alloc_node mm/slub.c:4851 [inline]
+ kmem_cache_alloc_node_noprof+0x441/0x690 mm/slub.c:4918
+ kmalloc_reserve net/core/skbuff.c:613 [inline]
+ __alloc_skb+0x27d/0x7d0 net/core/skbuff.c:713
+ alloc_skb include/linux/skbuff.h:1383 [inline]
+ nlmsg_new include/net/netlink.h:1055 [inline]
+ netlink_ack+0x146/0xa50 net/netlink/af_netlink.c:2502
+ netlink_rcv_skb+0x2b6/0x4b0 net/netlink/af_netlink.c:2571
+ netlink_unicast_kernel net/netlink/af_netlink.c:1314 [inline]
+ netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1340
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1890
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ __sys_sendto+0x672/0x710 net/socket.c:2206
+ __do_sys_sendto net/socket.c:2213 [inline]
+ __se_sys_sendto net/socket.c:2209 [inline]
+ __x64_sys_sendto+0xde/0x100 net/socket.c:2209
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+page last free pid 5865 tgid 5865 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ __free_pages_prepare mm/page_alloc.c:1412 [inline]
+ __free_frozen_pages+0xbc7/0xd30 mm/page_alloc.c:2953
+ vfree+0x1d1/0x2f0 mm/vmalloc.c:3472
+ kcov_put kernel/kcov.c:442 [inline]
+ kcov_close+0x28/0x50 kernel/kcov.c:543
+ __fput+0x44f/0xa70 fs/file_table.c:469
+ task_work_run+0x1d9/0x270 kernel/task_work.c:233
+ exit_task_work include/linux/task_work.h:40 [inline]
+ do_exit+0x70f/0x22c0 kernel/exit.c:976
+ do_group_exit+0x21b/0x2d0 kernel/exit.c:1118
+ get_signal+0x1284/0x1330 kernel/signal.c:3034
+ arch_do_signal_or_restart+0xbc/0x830 arch/x86/kernel/signal.c:337
+ __exit_to_user_mode_loop kernel/entry/common.c:64 [inline]
+ exit_to_user_mode_loop+0x86/0x480 kernel/entry/common.c:98
+ __exit_to_user_mode_prepare include/linux/irq-entry-common.h:226 [inline]
+ syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:256 [inline]
+ syscall_exit_to_user_mode include/linux/entry-common.h:325 [inline]
+ do_syscall_64+0x32d/0xf80 arch/x86/entry/syscall_64.c:100
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Memory state around the buggy address:
+ ffff8881a4036900: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff8881a4036980: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff8881a4036a00: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                   ^
+ ffff8881a4036a80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff8881a4036b00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
 
 
---=====_002_next=====--
+***
 
---=====_001_next=====--
+KASAN: slab-use-after-free Write in genl_done
 
+tree:      torvalds
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux
+base:      0b5e8d7999076ac3c490fc18376a404e2626abff
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/cb46a152-33c1-4b5e-bb75-bab2ecb45113/config
+syz repro: https://ci.syzbot.org/findings/5600aed0-e730-40d2-943c-84f525e427c6/syz_repro
+
+==================================================================
+BUG: KASAN: slab-use-after-free in genl_done+0x76/0x220 net/netlink/genetlink.c:1038
+Write of size 8 at addr ffff88811b796788 by task syz.0.34/6007
+
+CPU: 0 UID: 0 PID: 6007 Comm: syz.0.34 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_address_description+0x55/0x1e0 mm/kasan/report.c:378
+ print_report+0x58/0x70 mm/kasan/report.c:482
+ kasan_report+0x117/0x150 mm/kasan/report.c:595
+ genl_done+0x76/0x220 net/netlink/genetlink.c:1038
+ netlink_dump_cleanup+0x99/0x120 net/netlink/af_netlink.c:2259
+ netlink_dump+0xbe9/0xf40 net/netlink/af_netlink.c:2385
+ __netlink_dump_start+0x5cb/0x7e0 net/netlink/af_netlink.c:2455
+ genl_family_rcv_msg_dumpit+0x213/0x310 net/netlink/genetlink.c:1075
+ genl_family_rcv_msg net/netlink/genetlink.c:1191 [inline]
+ genl_rcv_msg+0x5e8/0x7a0 net/netlink/genetlink.c:1209
+ netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2565
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
+ netlink_unicast_kernel net/netlink/af_netlink.c:1314 [inline]
+ netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1340
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1890
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x972/0x9f0 net/socket.c:2592
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fe33999c819
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fe33a8da028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fe339c16090 RCX: 00007fe33999c819
+RDX: 0000000000000000 RSI: 0000200000000040 RDI: 0000000000000004
+RBP: 00007fe339a32c91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fe339c16128 R14: 00007fe339c16090 R15: 00007ffe15e728b8
+ </TASK>
+
+Allocated by task 6007:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ poison_kmalloc_redzone mm/kasan/common.c:398 [inline]
+ __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:415
+ kasan_kmalloc include/linux/kasan.h:263 [inline]
+ __kmalloc_cache_noprof+0x31c/0x660 mm/slub.c:5380
+ kmalloc_noprof include/linux/slab.h:950 [inline]
+ genl_dumpit_info_alloc net/netlink/genetlink.c:915 [inline]
+ genl_start+0x1c9/0x6c0 net/netlink/genetlink.c:985
+ __netlink_dump_start+0x469/0x7e0 net/netlink/af_netlink.c:2446
+ genl_family_rcv_msg_dumpit+0x213/0x310 net/netlink/genetlink.c:1075
+ genl_family_rcv_msg net/netlink/genetlink.c:1191 [inline]
+ genl_rcv_msg+0x5e8/0x7a0 net/netlink/genetlink.c:1209
+ netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2565
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
+ netlink_unicast_kernel net/netlink/af_netlink.c:1314 [inline]
+ netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1340
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1890
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x972/0x9f0 net/socket.c:2592
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 6006:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:584
+ poison_slab_object mm/kasan/common.c:253 [inline]
+ __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:285
+ kasan_slab_free include/linux/kasan.h:235 [inline]
+ slab_free_hook mm/slub.c:2685 [inline]
+ slab_free mm/slub.c:6165 [inline]
+ kfree+0x1c5/0x640 mm/slub.c:6483
+ genl_dumpit_info_free net/netlink/genetlink.c:920 [inline]
+ genl_done+0x1c8/0x220 net/netlink/genetlink.c:1046
+ netlink_dump_cleanup+0x99/0x120 net/netlink/af_netlink.c:2259
+ netlink_dump+0xbe9/0xf40 net/netlink/af_netlink.c:2385
+ netlink_recvmsg+0x690/0xa50 net/netlink/af_netlink.c:1972
+ sock_recvmsg_nosec net/socket.c:1078 [inline]
+ sock_recvmsg+0x172/0x1b0 net/socket.c:1100
+ sock_read_iter+0x251/0x320 net/socket.c:1170
+ new_sync_read fs/read_write.c:493 [inline]
+ vfs_read+0x582/0xa70 fs/read_write.c:574
+ ksys_read+0x150/0x270 fs/read_write.c:717
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+The buggy address belongs to the object at ffff88811b796700
+ which belongs to the cache kmalloc-192 of size 192
+The buggy address is located 136 bytes inside of
+ freed 192-byte region [ffff88811b796700, ffff88811b7967c0)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x11b796
+flags: 0x17ff00000000000(node=0|zone=2|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 017ff00000000000 ffff8881000413c0 dead000000000100 dead000000000122
+raw: 0000000000000000 0000000800100010 00000000f5000000 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0xd2cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5922, tgid 5922 (syz-executor), ts 64892204905, free_ts 61400269257
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x231/0x280 mm/page_alloc.c:1868
+ prep_new_page mm/page_alloc.c:1876 [inline]
+ get_page_from_freelist+0x24ba/0x2540 mm/page_alloc.c:3956
+ __alloc_frozen_pages_noprof+0x18d/0x380 mm/page_alloc.c:5236
+ alloc_slab_page mm/slub.c:3292 [inline]
+ allocate_slab+0x77/0x660 mm/slub.c:3481
+ new_slab mm/slub.c:3539 [inline]
+ refill_objects+0x331/0x3c0 mm/slub.c:7175
+ refill_sheaf mm/slub.c:2812 [inline]
+ __pcs_replace_empty_main+0x2e6/0x730 mm/slub.c:4615
+ alloc_from_pcs mm/slub.c:4717 [inline]
+ slab_alloc_node mm/slub.c:4851 [inline]
+ __do_kmalloc_node mm/slub.c:5259 [inline]
+ __kmalloc_node_noprof+0x577/0x7c0 mm/slub.c:5266
+ kmalloc_node_noprof include/linux/slab.h:1081 [inline]
+ alloc_slab_obj_exts+0xbf/0x250 mm/slub.c:2167
+ __memcg_slab_post_alloc_hook+0x5c4/0xe80 mm/memcontrol.c:3466
+ memcg_slab_post_alloc_hook mm/slub.c:2457 [inline]
+ slab_post_alloc_hook mm/slub.c:4549 [inline]
+ slab_alloc_node mm/slub.c:4866 [inline]
+ kmem_cache_alloc_noprof+0x347/0x650 mm/slub.c:4873
+ vm_area_dup+0x2b/0x680 mm/vma_init.c:123
+ dup_mmap+0x8b1/0x1d90 mm/mmap.c:1786
+ dup_mm kernel/fork.c:1531 [inline]
+ copy_mm+0x13b/0x4a0 kernel/fork.c:1583
+ copy_process+0x18b6/0x3cd0 kernel/fork.c:2223
+ kernel_clone+0x248/0x8e0 kernel/fork.c:2653
+ __do_sys_clone kernel/fork.c:2794 [inline]
+ __se_sys_clone kernel/fork.c:2778 [inline]
+ __x64_sys_clone+0x1b6/0x230 kernel/fork.c:2778
+page last free pid 10 tgid 10 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ __free_pages_prepare mm/page_alloc.c:1412 [inline]
+ __free_frozen_pages+0xbc7/0xd30 mm/page_alloc.c:2953
+ kasan_depopulate_vmalloc_pte+0x6d/0x90 mm/kasan/shadow.c:484
+ apply_to_pte_range mm/memory.c:3322 [inline]
+ apply_to_pmd_range mm/memory.c:3366 [inline]
+ apply_to_pud_range mm/memory.c:3402 [inline]
+ apply_to_p4d_range mm/memory.c:3438 [inline]
+ __apply_to_page_range+0xbdc/0x1420 mm/memory.c:3474
+ __kasan_release_vmalloc+0xa2/0xd0 mm/kasan/shadow.c:602
+ kasan_release_vmalloc include/linux/kasan.h:593 [inline]
+ kasan_release_vmalloc_node mm/vmalloc.c:2284 [inline]
+ purge_vmap_node+0x220/0x960 mm/vmalloc.c:2306
+ __purge_vmap_area_lazy+0x779/0xb70 mm/vmalloc.c:2396
+ drain_vmap_area_work+0x27/0x40 mm/vmalloc.c:2430
+ process_one_work kernel/workqueue.c:3276 [inline]
+ process_scheduled_works+0xb6e/0x18c0 kernel/workqueue.c:3359
+ worker_thread+0xa53/0xfc0 kernel/workqueue.c:3440
+ kthread+0x388/0x470 kernel/kthread.c:436
+ ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+Memory state around the buggy address:
+ ffff88811b796680: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff88811b796700: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff88811b796780: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+                      ^
+ ffff88811b796800: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ ffff88811b796880: 00 00 00 00 00 fc fc fc fc fc fc fc fc fc fc fc
+==================================================================
+
+
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+
+To test a patch for this bug, please reply with `#syz test`
+(should be on a separate line).
+
+The patch should be attached to the email.
+Note: arguments like custom git repos and branches are not supported.
 
