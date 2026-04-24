@@ -1,247 +1,235 @@
-Return-Path: <netdev+bounces-281023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281024-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0HynFVqe62mFPQAAu9opvQ
-	(envelope-from <netdev+bounces-281023-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:46:18 +0200
+	id EMY5Oyil62nIPgAAu9opvQ
+	(envelope-from <netdev+bounces-281024-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 19:15:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C44C4615EA
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:46:17 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98079461BB0
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 19:15:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EB40C3006941
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 16:46:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9AC363018404
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9002222CC;
-	Fri, 24 Apr 2026 16:46:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E153E1226;
+	Fri, 24 Apr 2026 17:10:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JKTzX9eq"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="tDQaIHry"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010001.outbound.protection.outlook.com [52.101.61.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3627083C;
-	Fri, 24 Apr 2026 16:46:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777049175; cv=none; b=uFgCbBzYaRkbvbWdMC7Jazs/b97R6YYLUc2Cf7e+JELd12KIHgXxveDUWZMTKC+suoHjloC4R/GLDAOFJBBYWvndb0PIQp/YfBH3fCJ8mN/cB9hDN+crteCdbanWeSIohaa3i4PMtmoZb3PMIv487P8OwChmtA08BgTkPgGriYU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777049175; c=relaxed/simple;
-	bh=1ZxVkCZkdOMj1e5Rit2RD7kElzYAiwzaV8stRbjw6uU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=N9UDBdF/AQp0uiQIwfhhpovtGCypEczHTJW+2XUEVuzpbJQAyIl8nI+caeNLPWfZmgxfYQWAk7zLbi1IIb2Wns0aAJZiC5xVK+FjH9BN5/6C3VPxUTlo2m2yczmExueZuksnQA5j/nlq4JXexOayta3Lju7S+AFRjxwcG6p2Afk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JKTzX9eq; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777049173; x=1808585173;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=1ZxVkCZkdOMj1e5Rit2RD7kElzYAiwzaV8stRbjw6uU=;
-  b=JKTzX9eqPM+2M7qQvtGJlV/g3voKT6VqWjYTU3l00AdjtbTZ/3ew2S+M
-   pNXjutUoi+yHVZr/L63jo1wAzby6z5A0KS1vmr2IXcBeQUNwFFSdB6AGy
-   RGEqT48rO5Nbdqr5iEuIdaQjBwcpAXtzIpA5R9RBst60vCtz15pwe7m7/
-   bDG9AdB3Csy+gLDsjaFH3eE2wsFeFgzlDGf2iCdmfIpWrDoLX0OYRvAQN
-   RH23Mb1hU/cvaln0Cn3BZ0FmWaMXPqJTMMYkHK1UJSdsvxWQ8sjubwpf9
-   soXr/QOjhq4ALpRzPxXuYkCqH+2l7ZkrWrNUh+bOmVjTFzn/kVnCzokMs
-   Q==;
-X-CSE-ConnectionGUID: Zgir9zHNQdqbi4qqcfltCw==
-X-CSE-MsgGUID: rUwYFlGeTNaSzJtVTCoghg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11766"; a="95595392"
-X-IronPort-AV: E=Sophos;i="6.23,196,1770624000"; 
-   d="scan'208";a="95595392"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2026 09:46:12 -0700
-X-CSE-ConnectionGUID: TgpTLu0fTJScrpNryqOe/A==
-X-CSE-MsgGUID: DmeG5Bk2RjeAqoQriW3ubQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,196,1770624000"; 
-   d="scan'208";a="233290857"
-Received: from arjan-box.jf.intel.com ([10.88.27.153])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2026 09:46:11 -0700
-From: Arjan van de Ven <arjan@linux.intel.com>
-To: netdev@vger.kernel.org
-Cc: syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] general protection fault in kernel_sock_shutdown (4)
-Date: Fri, 24 Apr 2026 09:47:17 -0700
-Message-ID: <20260424164733.356003-1-arjan@linux.intel.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <69ea344f.a00a0220.17a17.0040.GAE@google.com>
-References: <69ea344f.a00a0220.17a17.0040.GAE@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EEDB3E3C6B;
+	Fri, 24 Apr 2026 17:10:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.1
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777050640; cv=fail; b=SyOwnOwBzh0pxOQdP3CrjklSOma3+k1hAIfe6T/GsjYsziZi39shJB2hpZMlV5+C5WXF6azxv08gQLju4IdCh+tFX0LUnrBVcNTaER9+IIHZ0etNnTklXTmjC02tQ3bK7fbvcXVBVoQWqcCfdBI4EIx8mIQXEDz8OWkTg1TVW5o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777050640; c=relaxed/simple;
+	bh=FeY9rp9KvvLyA2rwZSagBAgtriTz5KK05A40yzGERhw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=JpLwVr9o2Gyd1GOrMuOx7uH3+4qFPGrXM7GXpVW5/hJWLeVZWTzP+VUaRPHSpqaAQEaB6CGmmR4C/dPS7V0pSb8TGGBjRHUcmTQCj/4NacG5eSvQ03zSi/axpadJFGIODXvbdbUjN+kVUsk6oxJaPgIQvsTTNaU3Jctn7i6PARE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=tDQaIHry; arc=fail smtp.client-ip=52.101.61.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fq0BDmg7SBVBms/46bqVKlTnJwGrFUIH8nCjODSV96COAzW8FioMJm0BRGDPbu0FhKGjoZ9AnAlNhklXw/xyVLK0Hmj+GBECBauTBTfJvC+6ugWJaTcoPEO343UNpBWS2mSqY2/NrWJ31kKcI+8u2M14MOfxapDk5BAUN0kmnT/11SyLkhwBGfWPCxshcURaNxlBesdZJjJJjwucg9biRTFg+fpclci0v4MAm1BB34kyvdtUa/CaTgp6xPBvHmkHWPh2GE972fbYz8rlGP0CF3QO+PbEHOdViH4gVqLpPoxVcs58sTFxX+9b7d2MrHNdfbVMaKqyXA+T4tGqhVHSJA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WWAABuooCiucJa5zGXEH2MBSsxDi0td7jvJLT0FcsHY=;
+ b=lIVzWDxKwNeypHMTFDXz6H2Q4HGfSv8P8zCD6sX5fmx+sPWFBrZLthnWjSPQsXWfvddBbuoZoqt4cRIES/pcWRZEAuaIwPOxobTDOgDCs9AbgojLWy82iGsshHOULTLlOHY3RCF5dfA7we67Zra4iSSdhpqYivVsnWIMZpJg0+8srB28BHYWm2cNWRiBLzipuuE1qfLXT/dhshQZA7LVNKjUwh6BKMdkUwFiisi7/cdO/oPTgcYJC8/DOnmkTalVYLgz7XiecUnQmMjHLpsrNNZKqgYF6meSFwynQQkLDocaYZ4scb4XCkkyd7i+RDUA4TPlOWG+RrcWK1Vs7d6vZQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WWAABuooCiucJa5zGXEH2MBSsxDi0td7jvJLT0FcsHY=;
+ b=tDQaIHry3LEKxekwbT9ZwMiV7/5DN580lg222W+dMitdtgVvJW61uiE5qHFKmCbj/jttjVXzgAdRjXt8PZ2C5bNg5WymM6w6H4wLWrGJuI9wzNswWg8VBQEJHJYhZLP1C5tc6cWq744ghETr9AqgMT6f7gzKbWSwdtMZ4guxi34JMhRt+tldJy9Nb3Ua2pSoHHGiutIFzsSburWecDzQrsgc2y4M7ce2fou2ldFTTF3G5Yl2uCNDo13qspsfp6UOxuCMoxo+FGNJpQHj92NrAJZuje1l2WL7XTREVf4wBNk2gtJYR0Mu6Y7qS/gELwBYolKBxsuPfVeh3Pyr0QminA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY8PR12MB8300.namprd12.prod.outlook.com (2603:10b6:930:7d::16)
+ by MW4PR12MB7166.namprd12.prod.outlook.com (2603:10b6:303:224::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.20; Fri, 24 Apr
+ 2026 17:10:27 +0000
+Received: from CY8PR12MB8300.namprd12.prod.outlook.com
+ ([fe80::ce75:8187:3ac3:c5de]) by CY8PR12MB8300.namprd12.prod.outlook.com
+ ([fe80::ce75:8187:3ac3:c5de%3]) with mapi id 15.20.9846.021; Fri, 24 Apr 2026
+ 17:10:27 +0000
+Date: Fri, 24 Apr 2026 13:10:25 -0400
+From: Yury Norov <ynorov@nvidia.com>
+To: Jonathan Cameron <jic23@kernel.org>
+Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	David Lechner <dlechner@baylibre.com>,
+	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
+	Andy Shevchenko <andy@kernel.org>,
+	Ping-Ke Shih <pkshih@realtek.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Hans de Goede <hansg@kernel.org>, Linus Walleij <linusw@kernel.org>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Salah Triki <salah.triki@gmail.com>,
+	Achim Gratz <Achim.Gratz@stromeko.de>,
+	Ben Collins <bcollins@watter.com>, linux-kernel@vger.kernel.org,
+	linux-iio@vger.kernel.org, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org, linux-rtc@vger.kernel.org
+Subject: Re: [PATCH 0/9] bitfield: add FIELD_GET_SIGNED()
+Message-ID: <aeukAef3c6eq-dLK@yury>
+References: <20260417173621.368914-1-ynorov@nvidia.com>
+ <20260424130927.349ad3ae@jic23-huawei>
+ <aeuRMiws8zCdkGXX@yury>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aeuRMiws8zCdkGXX@yury>
+X-ClientProxiedBy: BY3PR04CA0012.namprd04.prod.outlook.com
+ (2603:10b6:a03:217::17) To CY8PR12MB8300.namprd12.prod.outlook.com
+ (2603:10b6:930:7d::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 3C44C4615EA
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY8PR12MB8300:EE_|MW4PR12MB7166:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9ccd5fdb-f724-4141-4e6e-08dea224617e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|10070799003|376014|7416014|56012099003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	8km69BRC2NhcHkWnvhJ75sKsWeETgo4/eC7xW1GPqU6GDiJHPq2YSdpryXOwl20Wk7tBNRWubs+/iyHBDOH7q3QP2LiDAHD+GLfzoirRjJ41cfxONZ4BecX9BwSxfGelWQ/lYOL57ZPbs2CUhondTa4pX1m7YjN3STUnRpo/5bv2clAyouJDyDLyYvfKeeENKbBkvM2U2eT2ADMe3M8KnAJO1gAFhKj3IXB6Cd/l3OLRL599PpOGmLWmBHOG053YjJUHfDy9pEvIraFOnbgv1Uu7bxySEvmNTCkEh9TdRXmltsSLXXzKLef/j6zfK2OM1sh/C329go+4Q0vSpJ7yVibpN4qQknaW/P+BFPRvLHKBiLOC14Qe32NHAv9smeudNQ8Z7naKbWQ1qcflYFPBymtAtbEMR2sT/to0rIshRpFb/LJdHK11xOCharCPiBs72aI/AMeKeF3alvJFGCxWxSN1L9MosCw98tTieqmru0bkANLCaTcPLwwY8OhaaQs8sfNWBzyx4S94z4Hvs59iu5GxsekdtDq1EzHCV4jLiwBfb5DZbRpW/STlcS12X9+02iLVfjrfVZTN/nC3BGG+JVUoJtlzilWbdqnvQEZPwmNxL/SXZ2lfIA69ttpcc8hCNzrgz1ejFEJXtK3ZtdbmDwqm3eicnhEX7R3WbdASJuJHd8iTsrglla88HYRKSY7ikGyABf8IBQVZNCEtxVaiF6KtxjYn/2HglBi6qLMxF4E=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB8300.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(10070799003)(376014)(7416014)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?QrGbEZiCGkt5+0E62n4kNjnH0QUqxEp0JtjygEWQNxWQBd48Z3efSgDbwgsx?=
+ =?us-ascii?Q?Jrpb7YNsB3qNLNx+OHo99CZzJ3o4vjtUPyK8WgRCV5C4IBBIEOrK538XfUIZ?=
+ =?us-ascii?Q?bBlqd9X6YpkB0HcRmJ/XrAgcMlphJvC7n9IwC85kkbPFjoF09yE/o0V39K6t?=
+ =?us-ascii?Q?Y+N/GsEvmS5RJuuqeGZRo0EjPXumMsofA+kEOQy+Z+D72RS5DAwq2GzRpBRG?=
+ =?us-ascii?Q?Mdps6Hbym8Xeo0HQ2L47v0t6DOf5gttowa6bjdp9ZUX9J77nliPoRV1o2UGm?=
+ =?us-ascii?Q?Dyc/FQMYjd62Sd66S4ScR1Bcup+TewNJ+RAJL7bD10J5Sju22osxBdUVR/wO?=
+ =?us-ascii?Q?3CydLcC+2CGEztwWy0KK18pmPp+G0JBXKN+KyIdPTBc/N1S75YV7zaZUXI7q?=
+ =?us-ascii?Q?tcF7orXKuZ5ZfTANSoTJYqqXkO3VDwW6oOJm5Aoq5UEcK4U0DMfRk1ubhJPT?=
+ =?us-ascii?Q?FhVLGpsIK3+bPaAcOzzeuw9UVhKu3oGb9Z3EsXWKGBZ1ujvkjeKmxGKPSuDV?=
+ =?us-ascii?Q?LP+jfKs20rI25Dt50q9HvVu2y2JaJJ5Cc5OJ20L+oGV5cx8fW2VB17qm7iJk?=
+ =?us-ascii?Q?jhNX0MlCMDUBnGTxMCr1RQ6RQeyOg/8glif6LymKTIn+iN2hMYPlhC8NdcVx?=
+ =?us-ascii?Q?ivvsrzxcm83SFVVRwsNmUAs66FHy51YsGn3pjab5cJVPoLpYYI3ntqmIwM56?=
+ =?us-ascii?Q?3ABGzq1gaOKPT6Dc+jz0Up0uspvd0p2zTeSZ9Cfz09u5yMV1/4AiK0i9z45O?=
+ =?us-ascii?Q?lRvjVQm7AxtbU3PLHd4gsvLnUuOlIbrfO5fBfb/wUnENgp1xE+U2vPn2wKwE?=
+ =?us-ascii?Q?riOONOWb2SzYzsZsawzSbe5NWnjWstTj6GiSDW2xlrZxhyMhVyIDVqNa5WN0?=
+ =?us-ascii?Q?7bwyLvOK1xg86vl5VOpJEzBexrKLpXTrQsqqWI3qZnk9HNI/BrBJWko0crEA?=
+ =?us-ascii?Q?KW9pe0RtFNPogpD4qu02MEObVIIX0pwHa7nWUatmqbcRODDKrQMsKRBd0+rS?=
+ =?us-ascii?Q?TLTN4SeynsKVGg21cUiSi3THDP2M21xH8AeyIQo/YcCG3PK53K+MohXV0pyO?=
+ =?us-ascii?Q?DOA+bx7WF09oBccapbx+ASCwW+aXakTnEoJ60CuCiHzTFAbTJhOuXdhi5Brq?=
+ =?us-ascii?Q?v1o75zkWvd4EA02GWV5q6/oSH5XIZpnuv0aFtsJs75dBYkq9SbElS1nmyTA0?=
+ =?us-ascii?Q?G4DnTZYpBs/j5ArtzqUj/637quk7NJPzRVEiNPkffFkiDfoUG6INzp5bdIvt?=
+ =?us-ascii?Q?vN9ExG4qJ4GMXW4VDYxH3R2jW6aPRNSbcWcWW7hMqkCb/NWWZC5tUvxNP6Y5?=
+ =?us-ascii?Q?nt5ip18DG17RdpkqGVQ1vm55RnyaffbUUdFl/WtjWC52gWYLVAS1dYBUFk2N?=
+ =?us-ascii?Q?HX34n2jEU+aVpmEVxnwyuaYYQzSD6I9kmUFhfg3DgOicn4//w7/+0rsu4FXP?=
+ =?us-ascii?Q?mFMbceuU62RssbIeiNehBF8R0VjaEMJAm533r4V8WQ7E2g4N5v9coN1e8b+Z?=
+ =?us-ascii?Q?IIfPVgR1vc2jHPHwNNESbnIcrz1FTrEG2ofHReSri+FtnsFTlG+Ixwuk5S6/?=
+ =?us-ascii?Q?IZq+9VpqwK+G2/5cJySmZfY2jEkgceBpZz1dz6irc/yn3+E0cDJT/oODodKA?=
+ =?us-ascii?Q?FHzdtc9T+8nwITOj2Ok3HRE8ZRej0itPNdxqxuQy452LNmY/w8R3ukvY9FVr?=
+ =?us-ascii?Q?UO0KxrKjRwtEEgB6yrb2HXsccHUQqFVZcuVj/4Aii86y5+ilNRR28MWT0jJ6?=
+ =?us-ascii?Q?bR9tfOtsP4x7nUufDJVQGQZMJa4Am5eUzFgzcm5eOUVjh5iA/TZH?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9ccd5fdb-f724-4141-4e6e-08dea224617e
+X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB8300.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2026 17:10:27.3312
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KrALK0mNZtB5pYzqRhiWgPYYVvzbXAkBFicnj/J4JFReBCGCJM3SRa956fIKk23i6ceRmILArytC8ABm3XIUWQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7166
+X-Rspamd-Queue-Id: 98079461BB0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281023-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	TAGGED_RCPT(0.00)[netdev,d8f76778263ab65c2b21];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[arjan@linux.intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,alien8.de,linux.intel.com,zytor.com,infradead.org,baylibre.com,analog.com,realtek.com,gmail.com,lunn.ch,davemloft.net,google.com,bootlin.com,rasmusvillemoes.dk,stromeko.de,watter.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281024-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[33];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ynorov@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	SUBJECT_HAS_QUESTION(0.00)[]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[]
 
-This report was analysed with the help of an automated kernel crash
-analysis assistant. The analysis below is tentative and should be
-reviewed by a human before any action is taken.
+On Fri, Apr 24, 2026 at 11:50:10AM -0400, Yury Norov wrote:
+> On Fri, Apr 24, 2026 at 01:09:27PM +0100, Jonathan Cameron wrote:
+> > On Fri, 17 Apr 2026 13:36:11 -0400
+> > Yury Norov <ynorov@nvidia.com> wrote:
+> > 
+> > > The bitfields are designed in assumption that fields contain unsigned
+> > > integer values, thus extracting the values from the field implies
+> > > zero-extending.
+> > > 
+> > > Some drivers need to sign-extend their fields, and currently do it like:
+> > > 
+> > > 	dc_re += sign_extend32(FIELD_GET(0xfff000, tmp), 11);
+> > > 	dc_im += sign_extend32(FIELD_GET(0xfff, tmp), 11);
+> > > 
+> > > It's error-prone because it relies on user to provide the correct
+> > > index of the most significant bit.
+> > > 
+> > > This series adds a signed version of FIELD_GET(), which is the more
+> > > convenient and compiles (on x86_64) to just a couple instructions:
+> > > shl and sar.
+> > > 
+> > > Patch #1 adds FIELD_GET_SIGNED(), and the rest of the series applies it
+> > > tree-wide.
+> > > 
+> > 
+> > Just a quick heads up that I'm beginning to assume that this series
+> > will land in some form.  If it does can we do it as an immutable branch
+> > as I'm suggesting it gets used in some other patches in that should land
+> > in the new cycle.
+> 
+> I'm going to submit v2 soon, as seemingly the discussion is boiled
+> down, and then will likely merge it with my tree. I'll create an
+> immutable branch for you before the end of day.
 
-Decoded Backtrace
------------------
+Here it is:
 
-1. kernel_sock_shutdown -- crash site (net/socket.c:3785)
+https://github.com/norov/linux/pull/new/fgsv2
 
-  3783  int kernel_sock_shutdown(struct socket *sock, enum sock_shutdown_cmd how)
-  3784  {
-  3785      return READ_ONCE(sock->ops)->shutdown(sock, how);
-              /* CRASH: sock->ops is NULL (R12 = 0x0); KASAN traps
-                 null-ptr-deref at offset 0x68 = offsetof(proto_ops, shutdown) */
-  3786  }
+It builds well for me, but I'll wait for a while for robots feedback
+before making it 'officially' immutable.
 
-  Register context at crash:
-    RBX = 0xffff888058587240  (struct socket *sock)
-    R12 = 0x0000000000000000  (sock->ops, loaded from RBX+0x20 -- NULL)
-    RDI = 0x0000000000000068  (= NULL + 0x68, address of shutdown fn ptr)
-    RBP = 0x0000000000000002  (how = SHUT_RDWR)
-
-2. udp_tunnel_sock_release (net/ipv4/udp_tunnel_core.c:196-202)
-
-  196  void udp_tunnel_sock_release(struct socket *sock)
-  197  {
-  198      rcu_assign_sk_user_data(sock->sk, NULL);
-  199      synchronize_rcu();
-  200      kernel_sock_shutdown(sock, SHUT_RDWR);  /* <- calls crash site */
-  201      sock_release(sock);
-  202  }
-
-3. rxe_release_udp_tunnel inlined (drivers/infiniband/sw/rxe/rxe_net.c:290-293)
-
-  290  static void rxe_release_udp_tunnel(struct socket *sk)
-  291  {
-  292      if (sk)
-  293          udp_tunnel_sock_release(sk);
-  294  }
-
-4. rxe_sock_put (drivers/infiniband/sw/rxe/rxe_net.c:632-643)
-
-  632  static void rxe_sock_put(struct sock *sk,
-  633                            void (*set_sk)(struct net *, struct sock *),
-  634                            struct net *net)
-  635  {
-  636      if (refcount_read(&sk->sk_refcnt) > SK_REF_FOR_TUNNEL) {
-  637          __sock_put(sk);
-  638      } else {
-  639          rxe_release_udp_tunnel(sk->sk_socket);  /* <- release BEFORE clear */
-  640          sk = NULL;
-  641          set_sk(net, sk);                         /* <- clear AFTER (too late) */
-  642      }
-  643  }
-
-  Caller: rxe_net_del (rxe_net.c:644-666), triggered via:
-    nldev_dellink -> rxe_dellink -> rxe_net_del -> rxe_sock_put
-
-Tentative Analysis
-------------------
-
-sock->ops is set to NULL by sock_release() (net/socket.c:726) after
-calling ops->release(sock). The crash in kernel_sock_shutdown() means
-the socket was already passed to sock_release() before this call.
-
-Two independent code paths can release the same UDP tunnel socket stored
-in the per-network-namespace rxe_ns_sock structure:
-
- Path 1 -- namespace teardown (rxe_ns.c, rxe_ns_exit()):
-   rcu_assign_pointer(ns_sk->rxe_sk4, NULL);   /* clears pointer FIRST */
-   udp_tunnel_sock_release(sk->sk_socket);      /* then releases */
-
- Path 2 -- RDMA link delete (rxe_net.c, rxe_net_del() -> rxe_sock_put()):
-   sk = rxe_ns_pernet_sk4(net);                 /* reads pointer (no ownership) */
-   rxe_release_udp_tunnel(sk->sk_socket);       /* releases FIRST */
-   set_sk(net, NULL);                           /* clears AFTER */
-
-The following TOCTOU (time-of-check time-of-use) race is possible when
-namespace teardown and RDMA link deletion occur concurrently:
-
-  Thread A (rxe_net_del):
-    rxe_ns_pernet_sk4() -> sk = X  (non-NULL)
-
-  Thread B (rxe_ns_exit):
-    rcu_assign_pointer(sk4, NULL)
-    udp_tunnel_sock_release(X->sk_socket)
-      sock_release(X->sk_socket)
-        X->sk_socket->ops = NULL       <- clears ops
-
-  Thread A (rxe_net_del) continues:
-    rxe_sock_put(sk=X, ...)
-      rxe_release_udp_tunnel(X->sk_socket)
-        kernel_sock_shutdown(X->sk_socket, SHUT_RDWR)
-          READ_ONCE(sock->ops)->shutdown(...)
-                                       <- CRASH: sock->ops == NULL
-
-The bug was introduced by two commits in March 2026 that added
-per-network-namespace support to the Soft RoCE (RXE) driver:
-
-  13f2a53c2a71e  RDMA/rxe: Add net namespace support for IPv4/IPv6 sockets
-  f1327abd6abed  RDMA/rxe: Support RDMA link creation and destruction per
-                 net namespace
-
-Neither commit provides synchronisation between the two teardown paths.
-
-Potential Solution
-------------------
-
-Replace rxe_ns_pernet_sk4() calls in rxe_net_del() (and rxe_notify())
-with an atomic exchange that simultaneously reads and clears the pernet
-pointer, so only one of the two teardown paths can ever obtain a
-non-NULL socket pointer:
-
-  struct sock *rxe_ns_pernet_take_sk4(struct net *net)
-  {
-      struct rxe_ns_sock *ns_sk = net_generic(net, rxe_pernet_id);
-      return unrcu_pointer(xchg(&ns_sk->rxe_sk4, RCU_INITIALIZER(NULL)));
-  }
-
-Whichever path (rxe_ns_exit or rxe_net_del) wins the xchg gets the
-socket and releases it; the loser gets NULL and skips the release.
-
-More information
-----------------
-
-Oops-Analysis: https://lore.kernel.org/r/69ea344f.a00a0220.17a17.0040.GAE@google.com
-Assisted-by: linux-kernel-oops-x86 skill (Claude Sonnet 4.6)
+Thanks,
+Yury
 
