@@ -1,200 +1,164 @@
-Return-Path: <netdev+bounces-280991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280992-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EKAvGwBl62mtMAAAu9opvQ
-	(envelope-from <netdev+bounces-280991-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 14:41:36 +0200
+	id gEhFEFZu62l2MwAAu9opvQ
+	(envelope-from <netdev+bounces-280992-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 15:21:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9BCF45E92C
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 14:41:35 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D17C45EEDD
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 15:21:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E22E13005AA0
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:41:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 31CAE3005179
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 13:21:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 307C5370D56;
-	Fri, 24 Apr 2026 12:41:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E275377000;
+	Fri, 24 Apr 2026 13:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="P1PNjD6k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WMkWpvEn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F60363C72
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 12:41:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE56366558;
+	Fri, 24 Apr 2026 13:21:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777034493; cv=none; b=K4vXm5ikWTHram5JUp8MiIbuhwQMFpcpbfbJKolO4zb755JdPHbkZ4re7LJDYRgYr0+o49/FSQkhoqfl+HyfM9+8aIEq9jorY7xXDfqU6wLQ7JtpuXRncDeqVKtVXH3zRwdQkJzGrVr6Mwk9PfxhPsgrPl2lSszvb2OA/UybjLI=
+	t=1777036878; cv=none; b=kBSwg70pU0xSUwpOENKZjvPcMnijnkZwfSWYacg/wXkOzhlaKmY7YaUuVNPkANhJiediZvPOSp/dDFUk/rV2MISgHkDsLDpNUTU0fCKgOHPX1clRK1grK+gHCJ6rluNAtknA1sgB/x07pgaaWVjonanatb9a+m1/JbZyiZPtiTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777034493; c=relaxed/simple;
-	bh=hEicbs1wzBY7rUjJ3eZCitqtz5d1kvB3rwSDToMHJ30=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=s1NiKtsi+cTRFcWSnfkgDB7HvI0ZjpmIcaq2JaO23LBsRTnMgvHsH4/kXs0ewQmq2qYrqPr71ZE6tGTI3NQ+40JWB/xQN1SGXB5jP/JfwusPrhMAZF780oxjQX8WzRUo35TpPFWCM0YqeoJ1OUqp7dhLZc03Qyf6I6lceoSr0X0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=P1PNjD6k; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 48D221A33F7;
-	Fri, 24 Apr 2026 12:41:29 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 1799D604EB;
-	Fri, 24 Apr 2026 12:41:29 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A8CD31072051C;
-	Fri, 24 Apr 2026 14:41:25 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1777034488; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=GSmC6zgf5uWdJlGUklCdCmL76WRr4s3hDP8boQgIebU=;
-	b=P1PNjD6kj7oo8tpGBNbwwbNWe+EJfegHwMsAdyiDwFuwpUuaSLISiLe6sicbzo9b5pRw+u
-	u0QnW/GCkWC5JI8lzL5krztUqWP9seEnJwDLnJOHMksuz9EXEG4HucgMIFnwUft9Q58bJP
-	8cQaxIgkj0jVcYGVpHVcWR626XN23XhJ46EHu0HZMKw1wZKx2Q60jM2vi36ifFC7aXM5bI
-	tas3SUDO1dScHyDphdM7ocO5AaG8obyRR4TICF9WXl1jvqzbakXRsvoyItfOanaZDy7WWC
-	d0Cnigbl/VzBLaV86i4sAaFVbK7WGmLdA0QYHu/tyEK1Tn+GgjaMf/DvGJT+bg==
-Date: Fri, 24 Apr 2026 14:41:24 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Corey Leavitt <corey@leavitt.info>
-Cc: Carlo Szelinsky <github@szelinsky.de>, Oleksij Rempel
- <o.rempel@pengutronix.de>, Andrew Lunn <andrew+netdev@lunn.ch>, Andrew Lunn
- <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC net-next 0/4] net: pse-pd: decouple controller
- lookup from MDIO probe
-Message-ID: <20260424144124.131837c7@kmaincent-XPS-13-7390>
-In-Reply-To: <177693772506.254295.6378636892307427408@leavitt.info>
-References: <20260423-pse-notifier-decouple-v1-0-86ed750a9d62@leavitt.info>
-	<20260423110544.052f631e@kmaincent-XPS-13-7390>
-	<177693772506.254295.6378636892307427408@leavitt.info>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1777036878; c=relaxed/simple;
+	bh=M1D7kI8zdMSMgAR3ek5eSiS/trHp74trKeuUDZ2Wblc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=jv+btmSbYs67HvwR3o8QqjqtuwaF1aqCzkqnZsWXULEVN0Ej73yQtV6OOxJYiBZ7ZKjx2hFQcvoP5HOrIZNiYOEaf/mMSU47DcyCMogN48gaMlieYYJZ+X4sj4GOMI4f51avbutEtg3r5IfCHzwUFGDcGlx6nANeWhI2EgDCs6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WMkWpvEn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9DAEC19425;
+	Fri, 24 Apr 2026 13:21:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777036878;
+	bh=M1D7kI8zdMSMgAR3ek5eSiS/trHp74trKeuUDZ2Wblc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=WMkWpvEn3tvwvFRB2F3yHj24YoM8zRxN5fRUooShcWXFvCzJJxU7Mo+rg1zhPnXPX
+	 oTcFLddEd2yI5B2Q32n6nSQbcpzyRcZBp3NbvyH0ZwNCHHgCDJwZiB2cjjF8uec329
+	 euyYJW2gjHAswXX6Tsv85a580gqhmv/wbSxyhat4u67WaW2NBztKbfLW2BclZygAn5
+	 /rFzneImy0h1sZ/vQTmDrYaum7/Y7sRgmX322ZxFGlRV6h32Qpky4aUHXZjS+hUh6+
+	 RlNdYflh9rMfafJyOhYQkMZRmWZ4rkNEIqYFo0IvUcMIdQnxLhciODLNsBKkLfzM6f
+	 4Yc3xHni6DEbA==
+From: Simon Horman <horms@kernel.org>
+To: shardulsb08@gmail.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	pabeni@redhat.com,
+	matttbe@kernel.org,
+	martineau@kernel.org,
+	geliang@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	mptcp@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	janak@mpiric.us,
+	kalpan.jani@mpiricsoftware.com,
+	shardul.b@mpiricsoftware.com
+Subject: Re: [PATCH v2] mptcp: do not drop partial packets
+Date: Fri, 24 Apr 2026 14:20:52 +0100
+Message-ID: <20260424132052.1066934-1-horms@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260422143931.43281-1-shardul.b@mpiricsoftware.com>
+References: <20260422143931.43281-1-shardul.b@mpiricsoftware.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: E9BCF45E92C
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 2D17C45EEDD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	HAS_ORG_HEADER(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[szelinsky.de,pengutronix.de,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-280991-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-280992-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kory.maincent@bootlin.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-On Thu, 23 Apr 2026 09:48:53 +0000
-Corey Leavitt <corey@leavitt.info> wrote:
+From: 'Simon Horman' <horms@kernel.org>
 
-> Hi Kory,
->=20
-> Thanks for the pointer -- I had not seen Carlo's thread; I should have
-> searched lore before sending and will do so before v2. Adding Carlo on
-> cc.
->=20
-> Having read it end-to-end, my read of the state as of 2026-04-13 was
-> that the conversation had narrowed to two open directions: propagate
-> EPROBE_DEFER further up into phylink/MAC probe (Andrew/Russell), or
-> resolve psec at PSE controller register time (your msg on 9 Apr,
-> "save the phandle ... then at PSE register time look for each PHY and
-> try to resolve every unresolved phandle"). Nothing concrete had been
-> posted for either.
->=20
-> This RFC implements the second direction. pse_core publishes a
-> BLOCKING_NOTIFIER chain with REGISTERED / UNREGISTERED events,
-> phy_device subscribes, and psec ownership moves from fwnode_mdio probe
-> into the notifier handler. Concretely with respect to points raised in
-> the earlier thread:
->=20
->   - fwnode_mdio loses PSE awareness entirely, so the MDIO bus scan no
->     longer sees -EPROBE_DEFER from PSE lookup. Consistent with
->     Andrew's point that bus and device lifecycles are separate.
->=20
->   - psec is acquired at PSE register time, before
->     regulator_late_cleanup (30s) can run. Carlo's admin_state_synced
->     guard (his patch 1) therefore isn't needed in this model. psec
->     resolution happens eagerly on the REGISTERED event rather than
->     lazily on first ethtool access, so his patch 2 is also not needed.
->     And because fwnode_mdio no longer looks up PSE at all, the
->     non-fatal EPROBE_DEFER handling there (patch 3) drops out. This
->     series is a different architectural shape, not an increment on
->     his v2.
->=20
->   - Oleksij's concern about lazy resolution dropping UAPI
->     notifications is addressed: the notifier fires at register time,
->     so boot-time observer semantics are preserved.
->=20
->   - One caveat I already owe a fix for in v2: the attach helper in
->     phy_device currently treats every error from of_pse_control_get()
->     as retry-on-notifier, including non-transient ones. Carlo's v2
->     patch 3 was careful to differentiate -EPROBE_DEFER from bad-DT
->     errors at the fwnode_mdio lookup site (which matches his msg 1
->     concern about catching broken bindings at boot rather than
->     silently later). I need to preserve that discrimination at the
->     notifier-handler site -- phydev_warn() on anything other than
->     -EPROBE_DEFER. Trivial, but worth flagging.
->=20
->   - The DSA genphy force-bind sequence Carlo hit
->     (phy_attach_direct -> device_bind_driver -> deferred retry
->     skipped) does not apply, because psec attachment is not tied to
->     phy_probe.
->=20
->   - Patch 1 of this series scopes the regulator handle held by
->     pse_control to its own kref lifetime, fixing a latent
->     dangling-handle sequence that the notifier unregister path makes
->     reachable. This is a separate regulator-lifetime bug from the one
->     Carlo's patch 1 addresses.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
+---
+mptcp: do not drop partial packets
 
-This seems to provide a solution to all our problems, and it is well design=
-ed.
-Carlo, it would be nice if you could test it on your side.
+This commit modifies the handling of out-of-order packets where
+map_seq < ack_seq < end_seq. Instead of dropping the entire packet,
+it skips the already-acknowledged bytes and enqueues the remainder.
 
-> Validated end-to-end on a Cudy C200P (MT7621 DSA + i2c IP804AR as
-> module), with lockdep active, across the i2c driver unbind/rebind
-> cycle that triggers UNREGISTERED -> REGISTERED on the live system.
-> The cover letter has the full evidence.
->=20
-> I would welcome your view on whether this is the shape you had in
-> mind on 9 Apr, or whether the MDI-based binding you raised with
-> Maxime is the better endpoint and we should be reshaping around that.
-> Happy to keep this RFC as the scaffolding either way.
+Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/600
 
-After a second thought, MDI-based binding is currently not in the pipe and =
-we
-should solve this without it for now.
+> diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+> index fbffd3a43fe86..4e9fba692a701 100644
+> --- a/net/mptcp/protocol.c
+> +++ b/net/mptcp/protocol.c
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+[ ... ]
+
+> @@ -397,12 +397,24 @@ static bool __mptcp_move_skb(struct sock *sk, struct sk_buff *skb)
+
+[ ... ]
+
+> +	/* Partial packet: map_seq < ack_seq < end_seq.
+> +	 * Skip the already-acked bytes and enqueue the new data.
+> +	 */
+> +	copy_len = MPTCP_SKB_CB(skb)->end_seq - msk->ack_seq;
+> +	MPTCP_SKB_CB(skb)->offset += msk->ack_seq - MPTCP_SKB_CB(skb)->map_seq;
+> +	msk->bytes_received += copy_len;
+> +	WRITE_ONCE(msk->ack_seq, msk->ack_seq + copy_len);
+
+Should MPTCP_SKB_CB(skb)->map_seq also be advanced here to reflect the newly
+adjusted offset?
+
+If map_seq remains stale after skipping the already-acked bytes, does this
+cause mptcp_inq_hint() to overestimate the amount of unread data? 
+
+Looking at the hint calculation, it calculates the unread bytes using
+READ_ONCE(msk->ack_seq) - MPTCP_SKB_CB(skb)->map_seq for the first
+enqueued SKB.
+
+If inq_hint is artificially large, could this corrupt the ioctl(FIONREAD)
+and TCP_INQ cmsg values returned to userspace?
+
+Furthermore, could this suppress receive window auto-tuning? In
+mptcp_rcv_space_adjust(), an artificially large inq_hint might cause
+the calculation copied -= mptcp_inq_hint(sk) to become negative, which
+would stall window growth.
+
+> +
+> +	skb_set_owner_r(skb, sk);
+> +	__skb_queue_tail(&sk->sk_receive_queue, skb);
+> +	return true;
+>  }
 
