@@ -1,265 +1,219 @@
-Return-Path: <netdev+bounces-280975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280977-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uKhrEA9I62mWKgAAu9opvQ
-	(envelope-from <netdev+bounces-280975-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:38:07 +0200
+	id QCWeJBpJ62mWKgAAu9opvQ
+	(envelope-from <netdev+bounces-280977-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:42:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9053F45D35E
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:38:06 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29CD845D44C
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:42:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 29A893013703
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:38:05 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 882FC30022CA
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:42:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B058A3845AA;
-	Fri, 24 Apr 2026 10:38:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A397338B147;
+	Fri, 24 Apr 2026 10:42:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Tv5ppao4"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WMuV4qtq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14CA0385515
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 10:38:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777027082; cv=fail; b=kkJVqkzMrcFCCuPvpLVNj4e/WnAseidMNIIe5s83+1yhs6jhcCZmNyNwG416/nLOfj9cSkcaVKfxxCBtoIXy8OOiC1Q86hFh3ftfqSxgLX67GfbsKsldaxejMuzD4E5b3Eo/8gNMjNYCkjL3XHp1HvEV+S+4kd1WX2udKf7xSTQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777027082; c=relaxed/simple;
-	bh=viexRPkEMzzAsgxEiY54QT4qmUYtZ08d79C5mi5J9cw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cfzJpVDvDze/e8th9XtNUh1uyx0baGMLLbNe9j8Fxv3SeA4SfHDdsKmvdLOsxkPBRSmSdkIkiZcu9vvkFgbKIAKJsf47RDnrJWVhmf/5IHOd9lk8kQ7rgMYwmsUC8M022Bl8aG3peNI7VzSqZzFZnsv3To1KPFd0/BDJdsCTi5I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Tv5ppao4; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777027081; x=1808563081;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=viexRPkEMzzAsgxEiY54QT4qmUYtZ08d79C5mi5J9cw=;
-  b=Tv5ppao4qmaLhQtSE1QeDqb2241+azt56Q3jEc/HZQpx9XyZ6dLG6eX2
-   80a5GElj3BBOm32JnUiaTthz/zSUN4EFdh8vmACYXsjE98FK5kTdvyohD
-   h0u+I6Qtse72X6J6LMfTAIGGs6l3sL0ov2GBHxscKZ1ffoazyM3Yf+6a1
-   3TQ72oKCSLqG8ad/x0XT9rMu7QMr+5jl5IqdpWsYmjjjL1WXd1rHB3H1F
-   x63Qzv4sdiFZaGdyI3FxPvIO9ba+ih9kbSMpoLDuswMZx+XNxAMLxMOE2
-   knOoZ6nd50xn8ZIMjnC8Qox6ch1St2ktTgYPXJpjsnh2O7pwYhfCvZ2Y5
-   w==;
-X-CSE-ConnectionGUID: uMukGPvYTUStYoYTlQ4oTA==
-X-CSE-MsgGUID: eEuhvqVxS5ikw2X1kdHkeg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11765"; a="88313977"
-X-IronPort-AV: E=Sophos;i="6.23,196,1770624000"; 
-   d="scan'208";a="88313977"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2026 03:38:01 -0700
-X-CSE-ConnectionGUID: sDWvKO7TRKSiuwtMZMwyxg==
-X-CSE-MsgGUID: OMAtQWBzT4KLUUwPY7KXsA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,196,1770624000"; 
-   d="scan'208";a="237976089"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2026 03:38:01 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Fri, 24 Apr 2026 03:38:00 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Fri, 24 Apr 2026 03:38:00 -0700
-Received: from PH7PR06CU001.outbound.protection.outlook.com (52.101.201.68) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Fri, 24 Apr 2026 03:37:58 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XDM+wOz8DcANprKGZPAAPKdlW+5rpLtjyI6+iK98V8tFJrp0yNg7dcSdDLSBL29PwqtXhl6tGa1iyvuPaHgTnm8abfyNXBOn5S0jtDvZO1cy38XiDSOFljs614A0hMtFgZNi4ZjS82r/2P1merom8CJycgt7IRItGoW6+BlAJh8CNkoSWskHP7CLma+Pez/AoMQpjmxjqnC4mDroEkAu5aff0mnPIClszXs63RO+ZPWqNmuL79RsmLzBQSWIk3soahNo2FODPZ6OSEJaeXXa222V7yxtFZ4xRsNG/76Lwy/oYxpbPAvJXTOyRRPa3T2NaiBkKGy5c3VSL0+TPmCkmQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iO1sYbcn/msW/Ul7ce3AFMDMBhI6wYUhUo/j2L9C2H0=;
- b=UVI7h592z7VvMMJmJiUE9xzH+MbwFwuR+w0KKAOPm2tJKg88vULkkO4ixzaVqSjeo5jAyC+q0FTlJrJaZ5AxFOeIWfBVcMiAONJdF252WOR+U4CcSnEdbvMyTKGWEpcmTeCLxfkqeL3YIRF36x1nMSZ7dlP7SgqTFuTpROkvJjXXt01lbX5WYe+WG72XJJ0W+xoxKB5CK4khXYB8R2aCYJUOCyo6ZVBHCuM8+gUnEOY/M3imsDqHgpzwFomCiS4Kzmhl5xeAwMtqCE5Z8+qzP0JtQq4c2cnzzcU56TBJgf1LYb73jqwXx7kzoyc8ThjSgH4S+zVxdhmg4KLTr7M3Og==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by SA3PR11MB7611.namprd11.prod.outlook.com (2603:10b6:806:304::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.22; Fri, 24 Apr
- 2026 10:37:56 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c%5]) with mapi id 15.20.9846.021; Fri, 24 Apr 2026
- 10:37:56 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"horms@kernel.org" <horms@kernel.org>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "Keller, Jacob E"
-	<jacob.e.keller@intel.com>, "jesse.brandeburg@intel.com"
-	<jesse.brandeburg@intel.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
-Subject: RE: [PATCH net v4 4/4] ice: skip unnecessary VF reset when setting
- trust
-Thread-Topic: [PATCH net v4 4/4] ice: skip unnecessary VF reset when setting
- trust
-Thread-Index: AQHc0yHPL3usVtJTakKErPoC2Bf5x7XsoCewgAFk54CAAADToA==
-Date: Fri, 24 Apr 2026 10:37:56 +0000
-Message-ID: <IA3PR11MB89861630A18B1BE712F14E68E52B2@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <IA3PR11MB89862412A9F682D59474841DE52A2@IA3PR11MB8986.namprd11.prod.outlook.com>
- <20260424103233.622318-1-jtornosm@redhat.com>
-In-Reply-To: <20260424103233.622318-1-jtornosm@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|SA3PR11MB7611:EE_
-x-ms-office365-filtering-correlation-id: eb756e35-0379-4165-d5ed-08dea1ed8c03
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700021|56012099003|22082099003|18002099003;
-x-microsoft-antispam-message-info: vWvzTTc7WlUvHATo91tglhVivkgTierlakRFX5GUtZaU/fBJegKvsbWP+KtoTbdehFTlhhAnrhkFdam75Ej4E9QV1egLZIArvvM+gUF9vZUMU/KoQn9rNReFDOFk8P/THoe2VPYhx+jgxZ03ooBAyapjzJ7jQppiA+LXAatPdGAV3DtMg8jfk3UEJNHKbD9nLGJTSsGe8RYRZw/P4LoKv3eQOkVkon3jGoQmqbI+jr0jznMqKDJStJQySXZH/GUNk581pSXWDtZxw7+3/VzQpvQwmv8ErTbF/r03nXFMl/PG4neXXNc5V+WBbpkevhsdvjjmd4m7EYBjZQRZzk9p8uH3tgeavlAXUF97uVCPkc6GOm7nwbNcw0KyUqx5CJUiUo+co/dOFpBA1jQYP+CYRfpmI3YoX1mDK8v/O1AN+cn4X6HjrOYjmU74lQnkJkTCdwoN8AK7BVhXsthXuXhUSb9/QxaGDpQrCMuMp3zRX8MzM2hh2AhdB6m3dvbQKhNyj4uXQEuydFailORfiXBug3gLsSa1ucColDhANm2+5znDC/pIYOibF1+ZZW5wcqQlvCfSqTKrdDfNIZ11jXvpmBnClBGXQa9JCz5yjoayF7JY3A4W+dTprSHaL7BBWHpOpUXymD0QuMV7bkYryrP2jrOlaSVCaD0D/dOGNbkSvDwHHi1gBU+/PG5LToD1zaS8NdkfRmLkPQlgFTjSCp8UHNjTvwKqL5CLvuK8bhPSV2OgpBSw4cK/XcXY5xwf1i5amH0RZn/JiTMxI/M6d7fKVXSh8m45MZ2Z9G2D82g+xmc=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700021)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?j7ofIKbbnzaP/rHIsPVte0Ou0rLqNMURSzT4PJmDcZxT/nekmcQaavl/YCG6?=
- =?us-ascii?Q?TA68aGIrGAjw0k+R1JE+Os2OyfCEIVIBMKKzqmRa4t2HIz1qwwUvfuQBLW/P?=
- =?us-ascii?Q?xxPw2ra33EEDf1Qp5kN+FqrGY5AIp6zm4pH9XoyKlPEvhIgVlCcNIRClu8QE?=
- =?us-ascii?Q?mt+P9j6+EHKhKxUYFR+HZ1wiCfrjoqXdRQKfuQoRMnE/VzxMJbDfQ0v4iRTn?=
- =?us-ascii?Q?uIP9ZUxJB/qYtlcXMPpB+Wv60qqdUZyj1KZJzD7t81/s22qtFfTV6nqiSU+K?=
- =?us-ascii?Q?5M8tS3tBE9KNThAs+cArJOn5jtZZmCmKdZqlqWRqyGgX8qKLx0nkJn79b0CM?=
- =?us-ascii?Q?LdXBbCCgTayKt9yOBIQdHYfBoo1ksZTSLFruKHpN3LDm5/UWHhzkOJwUWbDR?=
- =?us-ascii?Q?BuIEC8PkR7Rj16dmZa7MUxA4LXHKqq+idtiyRGkPfbTyZZyWYPgWlc68NYEt?=
- =?us-ascii?Q?TcNb4DTPXhyYzYijnR9nM/9sz9Y0vy7eIWv/M3B5m99YWMyaSe63PAUQItHR?=
- =?us-ascii?Q?jEojVlW4re6H6Daif9IfsF8JLboozoVykM3wdEUFHA849uo/NxR0Bh36sToJ?=
- =?us-ascii?Q?F9KQq8BnhLtBF5giNEuDCOq/GzwhNAC5e7uaS8NlndLB2I3P+RT/MeMGFPBY?=
- =?us-ascii?Q?SV0C8ZbuSvyOvCOcv8cZwi0zDLRlNi4UYRmSQ7gyM91NsGljcuk527Im57W5?=
- =?us-ascii?Q?gKWi+8J0LgbmYGIAzF2ClPGdmJ+BFz/WNrXSpSGU4bvwnOm6RGCFsg2n7lR0?=
- =?us-ascii?Q?oDzHhU9fgOlU2epz0sFDBlMkMSvJYPWNf3IH6UYiGsrhllMpnacOz8wn8wqq?=
- =?us-ascii?Q?H2vSKH3ci08k/N0mtR1Q+fVUgtQxfqHQ2n7djCOSD1fS1pgxewoNnJg4eiwT?=
- =?us-ascii?Q?VbPcgpd+lz9idOVTQNHJGr2C2lcqJV9KI9TObDcfZyy6aNzSarHyasatewlD?=
- =?us-ascii?Q?Aca71vHnGehZGY/o9QyS4gF/ntNYj6hBwuVQO6PLxHMIamHvcPEOmO9H5hNW?=
- =?us-ascii?Q?eXrVaG27o6uHoUw08vnDgf95h0ef8frHdPMdOhP4ompx1H66LFGmlv24m3II?=
- =?us-ascii?Q?tG/zipxdjVegrsml68NlrkS6K4N6nBG13cdV0tuwAVStrrBpwkX4ISPSPqtY?=
- =?us-ascii?Q?AbvKbQ7oujYael+jWC8wCo7BdRx8rLzExHSvLbfokmB5hUENbJ3uTkXOnLm1?=
- =?us-ascii?Q?MTXG82RshKf6FqQtxtpaX9p4DxMcg8tJC0fET8+2nzvFmK/ToT8oY6L68anr?=
- =?us-ascii?Q?C5O1L0ShGQwq1Nj/vjnVgTM9gYBlUrOGbjf2lKpQpLAQM9emtQ1t8wz8SsdD?=
- =?us-ascii?Q?EUFMC/mA6xAi/rzBOP13OzSgdUYTZlzvynL8trBTitkf7AIlZBSDh90MmpQY?=
- =?us-ascii?Q?2Ek+zFtOjvyHVA80cetxZWyhNsm0UKydoEo7Z2k0cFhysS3tm8UrNiPFU5zf?=
- =?us-ascii?Q?QhuKWfrRnDr2ydKVWOox++xkn+H5hR7l2CssxQX7V/C8RAR494v5FyW6xmuQ?=
- =?us-ascii?Q?owP6zkMQhtsTeWXrJen8LU4C739DNVhboF55NVgR0wMUftYdziGKeRYWnvQG?=
- =?us-ascii?Q?4wz7be4ydD5/+Yme0c4tDBIIUbp8FDo9B71azRXf6TmL9bugbu2guWkxaGar?=
- =?us-ascii?Q?HsLJQ6i1naIWVGu/00iUoabPf5GZKJpaue/hrz8fQ/7qt1zIcY7LmkEDZ4Ly?=
- =?us-ascii?Q?DScQTXXA1ubfOLfYWW7cXpS7VYnVxC9dbITo2mx1Iw6ZQXFXhmSrAwWczVLg?=
- =?us-ascii?Q?LQ3ygv8qFMMZDLPANE30ERSYCSv9fLY=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E2531CA4A
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 10:42:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777027350; cv=none; b=NG3o/3K83/rkpjnx5cmjBVTcJ/LH6mEnOKFEg/MkED3QHN3PimtDc32p6/Nw/PqN5V3qxxn+wj0gRV7DEKZG7p0XYtoRxQFd8CSgoYbXPrqQr86T5DIoBxu4a3WhvyeZ+Unn8nwrdvoGiMkcugwZlJj5AJMyDyGNbju7+qa9JII=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777027350; c=relaxed/simple;
+	bh=ez4VVdO/VSviVbmZuyiFLrXnOYIYcP313wHNFyeXYik=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AfXCafcpDFISaxnaerOBfcswphkGTBkgZ21K15IhUE7yAjGGKZmAEpi2uR/u/bwSOaU5+QFNvP7oFHiapEZurTvLE+Gl3Y3N6tnCy9nWZgdbKwUCL6RLiSe+aT2X+/RV3XI0wvqKLU2LV1/O5X/GVG2DGRXdm2shiywqjrFWmFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WMuV4qtq; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1777027336;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=sgPLYlv+HFxJwO7ObHauc3C6krKvylpLcAmiSauPpoY=;
+	b=WMuV4qtqYMkxdgWQs9EcmzEWE/MflGO1cu2W4XlG8Jblf5s+P9vz0gg7FRTRXpM5/4lVFj
+	JGAwJmkHkO0R4eNYKvlOE5yiOy4Koq1OwL6HJVz8KhExUCt40cpm0HQTDqlCC/soJ2UkQY
+	SRCwT1XhyLpEohVBTIEJD6z6SIs51NU=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: bpf@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Krishna Kumar <krikku@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH bpf v2 0/3] bpf: prevent offloaded programs from running on host via tcx/netkit
+Date: Fri, 24 Apr 2026 18:41:39 +0800
+Message-ID: <20260424104201.217604-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: qvcQiX7KSDuR/H583uNpfIWkdCWiN2z/cc19MrtiKa8QRVMD44Uv2dTncn2bQs8WudYUkOb8CUnMPOOgYYIkTBBapAndIShmmmx+qh3vyinILM+huZZxfthCfCCXU4qdjP89tQqrFI7rNmqgwXeTjAGkQ2Gz3M/O8wV7vTGcMwB/c+Wh0ioUtfoXJz4/K0a/a8EFj8VnIqbr+XQ4ut0+XH7Cg3fZPSMnRmfotiGlyOMIwetUpzxMokvC+0CGF5AinU+1YtWrIeg7ZLN852hFAtaZspXNuG8wHrZ0PMi8bvl69iRqhuN/KO1Nkbfm/JkeX4iRdclnuvz9S+HcLPQkRQ==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eb756e35-0379-4165-d5ed-08dea1ed8c03
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Apr 2026 10:37:56.1531
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 0T20kNMTqNlR/Q5YcZjDK2yQ4lPYrUgEY+JeSRUbMdKtJH9DOel2bNlVSbJEaHwtsWfR3c84se339seGkWSDOEBibfHEBDTf/n2UKHJTqNc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR11MB7611
-X-OriginatorOrg: intel.com
-X-Rspamd-Queue-Id: 9053F45D35E
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 29CD845D44C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280975-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[linux.dev,iogearbox.net,blackwall.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,fomichev.me,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	TAGGED_FROM(0.00)[bounces-280977-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,osuosl.org:email];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
+Yinhao reported a splat [1] when attaching a BPF program loaded with
+prog_ifindex (targeted at an offload-capable device such as netdevsim)
+to the software path via BPF_TCX_EGRESS. The program's bpf_func had
+already been replaced by bpf_prog_warn_on_exec() during offload compile,
+so the first packet that reaches tcx_run() trips the WARN:
 
+[   19.592982] ------------[ cut here ]------------
+[   19.594654] attempt to execute device eBPF program on the host!
+[   19.594659] WARNING: kernel/bpf/offload.c:420 at 0x0, CPU#0: poc/337
+[   19.599906] Modules linked in:
+[   19.600680] CPU: 0 UID: 0 PID: 337 Comm: poc Not tainted
+6.18.0-rc7-next-20251125 #10 PREEMPT(none)
+[   19.601659] Hardware name: QEMU Ubuntu 24.04 PC (i440FX + PIIX,
+1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+[   19.602684] RIP: 0010:bpf_prog_warn_on_exec+0xc/0x20
+[   19.603241] Code: 28 00 48 89 ef e8 74 44 2f 00 eb d7 66 90 90 90 90
+90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 48 8d 3d a4 eb 95
+06 <67> 48 0f b9 3a 31 c0 e9 83 76 44 ff 0f 1f 84 00 00 00 00 00 90 90
+[   19.605093] RSP: 0018:ffff8881066e73d8 EFLAGS: 00010246
+[   19.605663] RAX: ffffffff81cbca70 RBX: ffff8881013c4210 RCX:
+0000000000000004
+[   19.606378] RDX: 1ffff11020278842 RSI: ffffc90000563060 RDI:
+ffffffff8861b620
+[   19.607107] RBP: ffff8881010d0640 R08: ffff8881013c4210 R09:
+ffff8881010d06b0
+[   19.607827] R10: ffff8881010d06c3 R11: ffffc90000563000 R12:
+ffffc90000563000
+[   19.608751] R13: ffff8881010d06b4 R14: ffff888115eb1a34 R15:
+dffffc0000000000
+[   19.609478] FS:  000000000294c380(0000) GS:ffff8881911e9000(0000)
+knlGS:0000000000000000
+[   19.610316] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   19.610943] CR2: 000057f6b9eb38c0 CR3: 00000001010ea000 CR4:
+0000000000750ef0
+[   19.611712] PKRU: 55555554
+[   19.612006] Call Trace:
+[   19.612281]  <TASK>
+[   19.612523]  __dev_queue_xmit+0x22cb/0x3530
+[   19.617607]  ip_finish_output2+0x621/0x1a60
+[   19.621371]  ip_output+0x170/0x2e0
+[   19.624586]  ip_send_skb+0x129/0x180
+[   19.624940]  udp_send_skb+0x65d/0x1300
+[   19.625316]  udp_sendmsg+0x13bf/0x2000
+[   19.629960]  __sys_sendto+0x396/0x470
+[   19.633720]  __x64_sys_sendto+0xdc/0x1b0
+[   19.635066]  do_syscall_64+0x76/0x10a0
+[   19.641701]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[   19.642240] RIP: 0033:0x4240d7
+[   19.642597] Code: 00 89 01 e9 c1 fe ff ff e8 f6 03 00 00 66 0f 1f 44
+00 00 f3 0f 1e fa 80 3d 8d 3f 09 00 00 41 89 ca 74 10 b8 2c 00 00 00 0f
+05 <48> 3d 00 f0 ff ff 77 69 c3 55 48 89 e5 53 48 83 ec 38 44 89 4d d0
+[   19.646088] RSP: 002b:00007fffcb9ecb68 EFLAGS: 00000202 ORIG_RAX:
+000000000000002c
+[   19.648938] RAX: ffffffffffffffda RBX: 0000000000000001 RCX:
+00000000004240d7
+[   19.652116] RDX: 0000000000000008 RSI: 00007fffcb9ecce0 RDI:
+0000000000000005
+[   19.653148] RBP: 00007fffcb9eccf0 R08: 00007fffcb9ecbb0 R09:
+0000000000000010
+[   19.653951] R10: 0000000000000000 R11: 0000000000000202 R12:
+00007fffcb9ece08
+[   19.654760] R13: 00007fffcb9ece18 R14: 00000000004b2868 R15:
+0000000000000001
+[   19.657462]  </TASK>
+[   19.657703] ---[ end trace 0000000000000000 ]---
 
-> -----Original Message-----
-> From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-> Sent: Friday, April 24, 2026 12:33 PM
-> To: Loktionov, Aleksandr <aleksandr.loktionov@intel.com>
-> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>;
-> davem@davemloft.net; edumazet@google.com; horms@kernel.org; intel-
-> wired-lan@lists.osuosl.org; Keller, Jacob E
-> <jacob.e.keller@intel.com>; jesse.brandeburg@intel.com;
-> jtornosm@redhat.com; kuba@kernel.org; netdev@vger.kernel.org;
-> pabeni@redhat.com; Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>
-> Subject: RE: [PATCH net v4 4/4] ice: skip unnecessary VF reset when
-> setting trust
->=20
-> Hello Aleksandr,
->=20
-> > For me it looks like  cc: stable@vger.kernel.org must be added
-> I am not sure about that, because the bugs fixed  here (vf->trusted
-> ordering and race condition) only trigger when MAC LLDP filters exist,
-> which is an uncommon scenario.
-> And most users will benefit from the performance improvement that is
-> an optimization rather than the bug fixes.
-> I mean, I included the commit fixed as a reference but due to
-> optimization as the main reason, I didn't dare to request this for
-> older versions.
-Ok I see your point. As it's optimization, you are right.
+The reason is that tcx and netkit never checked for offloaded programs
+on attach, unlike XDP which already rejects this in dev_xdp_attach().
+While auditing the other link entry points, bpf_xdp_link_update() turned
+out to have the same gap: it calls dev_xdp_install() directly and skips
+the dev_xdp_attach() offload check, so an XDP link created in SKB/native
+mode can still be swapped to an offloaded program via BPF_LINK_UPDATE.
 
+This series adds the same guard to all three so offloaded programs can't
+be attached to (or swapped into) the software path.
 
->=20
-> > You declare ice_vf_clear_all_promisc_modes() returning int, but
-> ignore
-> > the return value.
-> > Looks suspicious isn't it?
-> Well, it is used like that when the funciton is called locally (the
-> function is not modifiedi, just made public), and really my intention
-> was to clean as much as possible (so error checking is not necessary).
-> In my opinion it would be enough to warn about the possible problems
-> (already done in the existing function).
-Can you go extra mile and add error code handling?
-Or at least document it in the code why you don't do it?
+v1 -> v2:
+  - tcx/netkit: also reject offloaded progs in the link update callback
+    (tcx_link_update/netkit_link_update), not just attach; pointed out
+    by the AI review on v1.
+  - Add patch 3/3 for the same hole in bpf_xdp_link_update().
 
->=20
-> Anyway, if, despite the reasons I have tried to explain, you still
-> think the same way, please let me know so I can adjust them (if you
-> don't mind, I would wait for more reviews to include them in a next
-> version).
->=20
-> Thanks
->=20
-> Best regards
-> Jose Ignacio
+v1: https://lore.kernel.org/bpf/20260423033609.252464-1-jiayuan.chen@linux.dev/
 
-Thank you
-Alex
+[1]: https://lore.kernel.org/bpf/64d8e2b5-a214-4f3c-b9e8-bcedbcb2c602@hust.edu.cn/
+
+Jiayuan Chen (3):
+  bpf, tcx: reject offloaded programs on attach
+  bpf, netkit: reject offloaded programs on attach
+  bpf, xdp: reject offloaded programs on link update
+
+ drivers/net/netkit.c | 9 +++++++++
+ kernel/bpf/tcx.c     | 9 +++++++++
+ net/core/dev.c       | 5 +++++
+ 3 files changed, 23 insertions(+)
+
+-- 
+2.43.0
+
 
