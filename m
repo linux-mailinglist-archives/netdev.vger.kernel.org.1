@@ -1,88 +1,91 @@
-Return-Path: <netdev+bounces-280927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280928-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4A/eC6fk6mleFQAAu9opvQ
-	(envelope-from <netdev+bounces-280927-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:33:59 +0200
+	id +Ei+HtXk6mleFQAAu9opvQ
+	(envelope-from <netdev+bounces-280928-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:34:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7778945977A
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:33:58 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4E5E459792
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:34:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 81BB230071EF
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 03:33:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 34976301A1C0
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 03:34:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE6521B4F1F;
-	Fri, 24 Apr 2026 03:33:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10AAC1B4F1F;
+	Fri, 24 Apr 2026 03:34:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="badu0HUU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ipGVJrgs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEFB519B5B1
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 03:33:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F274232395
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 03:33:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777001635; cv=none; b=Er8vaMEbTPlML7NJobVYtzKcwv0Cqqgv8HAlcCcCjcw6sx3KQPYTuX4Z3sL32wWSln3tYaTjEGkMtKVd3bqPa04mAfndsdOpbcUvf9xVqaQLdb2HsApRenMMDjzkvr4pzNnESs0k/9dZ3zqEFPqC0uwOZzRAHxtiMxdEYWxuBo8=
+	t=1777001640; cv=none; b=L9Hgpd1KZwsUPrrBadH20BKn3xMVqFJQ8rCYxO7UaZsBA5ep8LP7Fn/3nN/Wg2XS1rrrWeoMIoFycwRg1Xp877sjeaCEnXlhhNwPaOfAyVnqDKF94cVkLd6ZACRuzvq1WEAaHGae76jLvqYoJtXK2wDed5WIaX9l3ChtlAjfmNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777001635; c=relaxed/simple;
-	bh=jJhyc6teF16Az0idq5ISRmXI9fjFyPjhRnFbLUL5Vz8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mNAEUhpMDdvueBAEG2jHED4FLfsGrwq7mBgPSajVEfV6lulxb2YGE4Oh+armq14nJeqMFUDWvcmpHX89QY2JoZTB0in/xnmm4dyT4HrvFtiKe+b1fFx340GOmbERWvE6x6zr4ZOr4Z3gYXkQmAs9tk3QgI1a2lJ2zFyD5U0Jv0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=badu0HUU; arc=none smtp.client-ip=209.85.210.174
+	s=arc-20240116; t=1777001640; c=relaxed/simple;
+	bh=3g6vPL5+/PxV4UaI5AcFZF+A9nSA/8Iqy3bMWU0IT9c=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=h5ly6SrRbHwk2X/Aklm18UcLZ3CGhUO/4IWZFlPHSX7MvJ+F8ytL3PONFKcYJruiyCGOgd4c0OFLN94FNR0X0DUJAV4K31x8pWgAfCEdsKLHAJeEdU4gleeRVoIMKUsNzhiT80R/rBtS6vmtO4FHLjDjg8VthhzWBIdnQMe2d6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ipGVJrgs; arc=none smtp.client-ip=209.85.215.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-82f4a53ae20so5419243b3a.3
-        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 20:33:54 -0700 (PDT)
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-c76b994f7a8so2893193a12.3
+        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 20:33:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777001634; x=1777606434; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4XT7jL0qVorV9DqZaeP2X21NLLxxWTXoipmOJgcSPnM=;
-        b=badu0HUU1J/K/hPJMuPXn0bYhO+Z7o9s1iDCapvSt10QmopGO/zcz1rCwLlJl8CLq+
-         TfcIS2sJP49/FHhw4YN1luppxtEnze3d/2cq6x5Tob3rIJtuZrFaNQwbqXDv0ZrMSnGm
-         qyjQQUOh02Ypq3Fkf2uXIERoLh9fvHiRruypzvjEdhgC2QpxtT/swZewGrUJD1Or2JAD
-         PqU7yl1qp+eCiIo4tmFj6SSSmXJzhJE+bU4WL/nYBBrOlqAUD3Pa/3djwkR39ehmfS0e
-         mgivHEGdAxgSyXVW8wzqg7U6o6s040r5oCVVCvcFp55/ROke0U2aYcHZs+H5V7SWLynW
-         /Brg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777001634; x=1777606434;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1777001638; x=1777606438; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4XT7jL0qVorV9DqZaeP2X21NLLxxWTXoipmOJgcSPnM=;
-        b=EPgCOApOy/1Ht35GBgMk22GVje/F/6QsT7z0BMW9VRGf49n7qACndMZIskEKHdjbUo
-         UxDs2u9mmReHPPbXK++PFLtPrbrCHcHTktu4GHt8glqhxCh9Y4H4fKPJDVEKxi/+dkDY
-         ZR6O960AaKUsm8uw4L4veM/AR886ytmp0/CIUerbINHaw6kPNXO8CLqUvWmHL1534u8u
-         vkxriR0ygKI0Xd8TeY7IJ1xyJ9c8ZvLegOTmm0UUxoYxKOp3K2QRnqZ0Iz6vEy252MQP
-         7CazQWRQXfjj01TYQui4xgcBgjTiQKQnRDnrFgIf0fx+xRMX+vDD6J8fXuDDfU3VDvj2
-         4FUg==
-X-Gm-Message-State: AOJu0YzmkWSKiWJQLpMlHWLUXA2Lc3kjwKOhXGZinduKkrZG+TqaTD1C
-	aSp/v3EW6C9VF9Vs+lgFZ15JeXXvO6n8MT1Vb2riSq24FxDBdKvtfbAEO/BVBtKI
-X-Gm-Gg: AeBDietcrTKZdP0OMqx5SE1lJFQFq25c2FN5mdR6BMqBYkmHCAOJzlifDRdCIh7zaIZ
-	pT4BMorV/86f5N4c3I3/CtMPfYPCgiFyoLh4IfmOXvEZbieNvxWj1BzOdYZpJA8BlAl8KYr4NAa
-	eSWIae/mq88I0cS3RhZB66P7KoHdCpGpyJfQgFh5lbRWvzOPguP2Jw02+hRPMDFV0gCIGtLaiK3
-	MGXbKPhfwwHoyi0ZLzUPRSwNjkQTjHrqW8joJ61+SdVcWM600WRuowg5jaK+kEVQObNPIDzE1qv
-	4w7A6H7AijXQLfY0Xe0+OWghFPCIl1R9PnsfjGuZqI6SzJnASAwRHIGy56TUjXWF+j0wrAJyIjq
-	pl1kRVBrzJ1O39LUGAQFOlROIvL1I6rtxLHkVIhjM+7r2PFQTriYf8Qo4XkHpg1kzYQ2Uu546+f
-	4DD27XJPgLDblMMNQpTmTOclapzff0RXzxBt56ro0RFta8iQnF1NuG+Ja3kWXDawoPN3H9yPPEL
-	MpFMR5+xCw=
-X-Received: by 2002:a05:6a00:80c6:b0:82f:8e9f:bdd5 with SMTP id d2e1a72fcca58-82f8e9fc333mr23566538b3a.1.1777001633897;
-        Thu, 23 Apr 2026 20:33:53 -0700 (PDT)
+        bh=HjcmI+vdIFbJbnXF21GNXemf/C/ERw0Tr8dDCWxWsys=;
+        b=ipGVJrgs6/ZJZaaFA8ghhLEcqSDnfMJOEi2e6Y6jGCjvy74rj8ccCzMEQrSauIlR2R
+         pNPigBXr7s6kPasx9KntXU7v7BDpFrV/KEB815gacpT3tYUs1zd1ZEtUmQFsL2n28CBM
+         yB86gf/wxO/9EwYgCxad3QeLF2X8GI7s340O1Qak6mVJwtAaeCj0y7JcKDuCn7JlpDM5
+         EGhKCJgpppvUtp2kAaOIzvzwePySugRfiyxlg5s1OCRDljP4TGoQJUoQOTW4cxXqzdwY
+         si31WZOet0KO+R7nS0PhD5M+w2G/jdyKIu9OnzXepS9916awvViAM/SEMxV18fU24IgU
+         YJqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777001638; x=1777606438;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=HjcmI+vdIFbJbnXF21GNXemf/C/ERw0Tr8dDCWxWsys=;
+        b=tBAF3F8CzIK/7C3Lwry3S32pipJ3ariolTL//vdPF6UradJ/ubseAtOvX0TE9W8yVx
+         eXC0hK5VFi1WsE+eBYBt61infWrlkOTbmLgiobKBad0FlcnfqYPo1HxX4tpHR05QhsPC
+         CO/w4LPhih+gp68YFHyCvH+sxxN7EkVjrtPB5Vtbu/9T5bBLC10eyTlLKxM0HqBkVgJJ
+         Ppj3zOXOxsAdyif/0Yd79k0K4AktPsG6pgpiusXbeHPGoDCaCi50sGQvevSRa3uYEkBz
+         VJ4tuVHChCgBcbVE0kMP5bFBowesyCuxv9FLPWoobE+/bQcqMraYVnoSd+VIUGAOsdrg
+         9t4w==
+X-Gm-Message-State: AOJu0Yw4Ytkfn43IvlspS/hUMsGJQLTWTpO/xB8zcVDAnXO5vDvMwWBV
+	W5UfSL2jog8tR5EhrsBcngaN9r4Hh4hpALepCh4yGcaCoSvkiT6ZlrjeLfCdl/qs
+X-Gm-Gg: AeBDiev7C4hyycoNlSwzzJ3D2YwPcabcAJvlHn0EIOVFXcABT4pLLHVJpqefSbiV0fa
+	IsQAKL52zs4VfJJnHcXSWZs5mRagOLC/7td3wkqwfUBYtO54YwK07/AhUnx8AZbKGTrIPV1BvbV
+	3miL3QGDSrvL7kyBD7JNVEpd2wHytv2sBSw8BWwy0ELfL+zO/2NJzT5SKcod/m73sAqmE1jfG6H
+	DAdS1p9Lme6zmKv9qY+DVHCNYXvyVDIs9Vfqx5FxkETniEvyuQcYoSNgJRXp7jCWYqDLlJ8D+hn
+	aegbhHFKHlxrkBdnmizvZ7ArUSv1noyr+kMlYRFpDKh5JpaOrHO0iIGCdN1mUwwUr4XIjSU0Cgp
+	J9Uv4O0B+/H/iccM109QgLIdBfELlMA4N5nOEh/3fOR1NIWh3I8wUcDcnOwvQzOb3LMX6qlwZQ/
+	9o2eiPApuI7eMFfQVdqU0dZWMYhAl0qf4MwNk5o/u/JLGpYzfDp5CHjqgHQiXGYoICL2tUAZZA
+X-Received: by 2002:a05:6a00:2993:b0:7e8:4471:ae55 with SMTP id d2e1a72fcca58-82f8c92a621mr30886720b3a.33.1777001637956;
+        Thu, 23 Apr 2026 20:33:57 -0700 (PDT)
 Received: from ubunut-vm.. (c-73-240-82-137.hsd1.or.comcast.net. [73.240.82.137])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f8e9cbb1dsm23797624b3a.14.2026.04.23.20.33.53
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f8e9cbb1dsm23797624b3a.14.2026.04.23.20.33.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Apr 2026 20:33:53 -0700 (PDT)
+        Thu, 23 Apr 2026 20:33:57 -0700 (PDT)
 From: Joel <joelcrouch@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Joel <joelcrouch@gmail.com>
-Subject: [PATCH v2 0/2] sungem: PHY initialization fixes and style cleanup
-Date: Fri, 24 Apr 2026 03:33:46 +0000
-Message-ID: <20260424033348.1917-1-joelcrouch@gmail.com>
+Subject: [PATCH v2 1/2] sungem: fix pointer formatting and indentation
+Date: Fri, 24 Apr 2026 03:33:47 +0000
+Message-ID: <20260424033348.1917-2-joelcrouch@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260424033348.1917-1-joelcrouch@gmail.com>
+References: <20260424033348.1917-1-joelcrouch@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,7 +93,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 7778945977A
+X-Rspamd-Queue-Id: D4E5E459792
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -99,43 +102,262 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280927-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280928-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCPT_COUNT_THREE(0.00)[4];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[joelcrouch@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
+	NEURAL_HAM(-0.00)[-1.000];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-This series splits the previous monolithic patch per feedback from Andrew Lunn.
+Align with Linux Kernel Coding Style by placing the asterisk with the variable name and correcting indentation in bcm54xx_read_link.
+---
+ drivers/net/sungem_phy.c | 53 ++++++++++++++++++++--------------------
+ 1 file changed, 27 insertions(+), 26 deletions(-)
 
-Patch 1 cleans up pointer formatting and indentation to align with kernel coding standards across the file.
-
-Patch 2 implements hardware validation for the BCM5411 PHY initialization and adds error reporting to the core gem_init_phy logic
-
-Joel (2):
-  sungem: fix pointer formatting and indentation
-  sungem: validate BCM5411 PHY register reads
-
- drivers/net/ethernet/sun/sungem.c |  8 +++--
- drivers/net/sungem_phy.c          | 60 +++++++++++++++++--------------
- 2 files changed, 39 insertions(+), 29 deletions(-)
-
+diff --git a/drivers/net/sungem_phy.c b/drivers/net/sungem_phy.c
+index c10198d44..44cbe1938 100644
+--- a/drivers/net/sungem_phy.c
++++ b/drivers/net/sungem_phy.c
+@@ -44,27 +44,27 @@ static const int phy_BCM5400_link_table[8][3] = {
+ 	{ 1, 0, 1 },	/* 1000BT */
+ };
+ 
+-static inline int __sungem_phy_read(struct mii_phy* phy, int id, int reg)
++static inline int __sungem_phy_read(struct mii_phy *phy, int id, int reg)
+ {
+ 	return phy->mdio_read(phy->dev, id, reg);
+ }
+ 
+-static inline void __sungem_phy_write(struct mii_phy* phy, int id, int reg, int val)
++static inline void __sungem_phy_write(struct mii_phy *phy, int id, int reg, int val)
+ {
+ 	phy->mdio_write(phy->dev, id, reg, val);
+ }
+ 
+-static inline int sungem_phy_read(struct mii_phy* phy, int reg)
++static inline int sungem_phy_read(struct mii_phy *phy, int reg)
+ {
+ 	return phy->mdio_read(phy->dev, phy->mii_id, reg);
+ }
+ 
+-static inline void sungem_phy_write(struct mii_phy* phy, int reg, int val)
++static inline void sungem_phy_write(struct mii_phy *phy, int reg, int val)
+ {
+ 	phy->mdio_write(phy->dev, phy->mii_id, reg, val);
+ }
+ 
+-static int reset_one_mii_phy(struct mii_phy* phy, int phy_id)
++static int reset_one_mii_phy(struct mii_phy *phy, int phy_id)
+ {
+ 	u16 val;
+ 	int limit = 10000;
+@@ -88,7 +88,7 @@ static int reset_one_mii_phy(struct mii_phy* phy, int phy_id)
+ 	return limit <= 0;
+ }
+ 
+-static int bcm5201_init(struct mii_phy* phy)
++static int bcm5201_init(struct mii_phy *phy)
+ {
+ 	u16 data;
+ 
+@@ -101,7 +101,7 @@ static int bcm5201_init(struct mii_phy* phy)
+ 	return 0;
+ }
+ 
+-static int bcm5201_suspend(struct mii_phy* phy)
++static int bcm5201_suspend(struct mii_phy *phy)
+ {
+ 	sungem_phy_write(phy, MII_BCM5201_INTERRUPT, 0);
+ 	sungem_phy_write(phy, MII_BCM5201_MULTIPHY, MII_BCM5201_MULTIPHY_SUPERISOLATE);
+@@ -109,7 +109,7 @@ static int bcm5201_suspend(struct mii_phy* phy)
+ 	return 0;
+ }
+ 
+-static int bcm5221_init(struct mii_phy* phy)
++static int bcm5221_init(struct mii_phy *phy)
+ {
+ 	u16 data;
+ 
+@@ -132,7 +132,7 @@ static int bcm5221_init(struct mii_phy* phy)
+ 	return 0;
+ }
+ 
+-static int bcm5221_suspend(struct mii_phy* phy)
++static int bcm5221_suspend(struct mii_phy *phy)
+ {
+ 	u16 data;
+ 
+@@ -147,7 +147,7 @@ static int bcm5221_suspend(struct mii_phy* phy)
+ 	return 0;
+ }
+ 
+-static int bcm5241_init(struct mii_phy* phy)
++static int bcm5241_init(struct mii_phy *phy)
+ {
+ 	u16 data;
+ 
+@@ -170,7 +170,7 @@ static int bcm5241_init(struct mii_phy* phy)
+ 	return 0;
+ }
+ 
+-static int bcm5241_suspend(struct mii_phy* phy)
++static int bcm5241_suspend(struct mii_phy *phy)
+ {
+ 	u16 data;
+ 
+@@ -185,7 +185,7 @@ static int bcm5241_suspend(struct mii_phy* phy)
+ 	return 0;
+ }
+ 
+-static int bcm5400_init(struct mii_phy* phy)
++static int bcm5400_init(struct mii_phy *phy)
+ {
+ 	u16 data;
+ 
+@@ -214,7 +214,7 @@ static int bcm5400_init(struct mii_phy* phy)
+ 	return 0;
+ }
+ 
+-static int bcm5400_suspend(struct mii_phy* phy)
++static int bcm5400_suspend(struct mii_phy *phy)
+ {
+ #if 0 /* Commented out in Darwin... someone has those dawn docs ? */
+ 	sungem_phy_write(phy, MII_BMCR, BMCR_PDOWN);
+@@ -222,7 +222,7 @@ static int bcm5400_suspend(struct mii_phy* phy)
+ 	return 0;
+ }
+ 
+-static int bcm5401_init(struct mii_phy* phy)
++static int bcm5401_init(struct mii_phy *phy)
+ {
+ 	u16 data;
+ 	int rev;
+@@ -270,7 +270,7 @@ static int bcm5401_init(struct mii_phy* phy)
+ 	return 0;
+ }
+ 
+-static int bcm5401_suspend(struct mii_phy* phy)
++static int bcm5401_suspend(struct mii_phy *phy)
+ {
+ #if 0 /* Commented out in Darwin... someone has those dawn docs ? */
+ 	sungem_phy_write(phy, MII_BMCR, BMCR_PDOWN);
+@@ -278,8 +278,9 @@ static int bcm5401_suspend(struct mii_phy* phy)
+ 	return 0;
+ }
+ 
+-static int bcm5411_init(struct mii_phy* phy)
++static int bcm5411_init(struct mii_phy *phy)
+ {
++	int val;
+ 	u16 data;
+ 
+ 	/* Here's some more Apple black magic to setup
+@@ -408,14 +409,14 @@ static int genmii_read_link(struct mii_phy *phy)
+ 	return 0;
+ }
+ 
+-static int generic_suspend(struct mii_phy* phy)
++static int generic_suspend(struct mii_phy *phy)
+ {
+ 	sungem_phy_write(phy, MII_BMCR, BMCR_PDOWN);
+ 
+ 	return 0;
+ }
+ 
+-static int bcm5421_init(struct mii_phy* phy)
++static int bcm5421_init(struct mii_phy *phy)
+ {
+ 	u16 data;
+ 	unsigned int id;
+@@ -548,7 +549,7 @@ static int bcm54xx_read_link(struct mii_phy *phy)
+ 	u16 val;
+ 
+ 	if (phy->autoneg) {
+-	    	val = sungem_phy_read(phy, MII_BCM5400_AUXSTATUS);
++		val = sungem_phy_read(phy, MII_BCM5400_AUXSTATUS);
+ 		link_mode = ((val & MII_BCM5400_AUXSTATUS_LINKMODE_MASK) >>
+ 			     MII_BCM5400_AUXSTATUS_LINKMODE_SHIFT);
+ 		phy->duplex = phy_BCM5400_link_table[link_mode][0] ?
+@@ -568,7 +569,7 @@ static int bcm54xx_read_link(struct mii_phy *phy)
+ 	return 0;
+ }
+ 
+-static int marvell88e1111_init(struct mii_phy* phy)
++static int marvell88e1111_init(struct mii_phy *phy)
+ {
+ 	u16 rev;
+ 
+@@ -592,7 +593,7 @@ static int marvell88e1111_init(struct mii_phy* phy)
+ 
+ #define BCM5421_MODE_MASK	(1 << 5)
+ 
+-static int bcm5421_poll_link(struct mii_phy* phy)
++static int bcm5421_poll_link(struct mii_phy *phy)
+ {
+ 	u32 phy_reg;
+ 	int mode;
+@@ -616,7 +617,7 @@ static int bcm5421_poll_link(struct mii_phy* phy)
+ 		return 1;
+ }
+ 
+-static int bcm5421_read_link(struct mii_phy* phy)
++static int bcm5421_read_link(struct mii_phy *phy)
+ {
+ 	u32 phy_reg;
+ 	int mode;
+@@ -644,7 +645,7 @@ static int bcm5421_read_link(struct mii_phy* phy)
+ 	return 0;
+ }
+ 
+-static int bcm5421_enable_fiber(struct mii_phy* phy, int autoneg)
++static int bcm5421_enable_fiber(struct mii_phy *phy, int autoneg)
+ {
+ 	/* enable fiber mode */
+ 	sungem_phy_write(phy, MII_NCONFIG, 0x9020);
+@@ -665,7 +666,7 @@ static int bcm5421_enable_fiber(struct mii_phy* phy, int autoneg)
+ #define BCM5461_FIBER_LINK	(1 << 2)
+ #define BCM5461_MODE_MASK	(3 << 1)
+ 
+-static int bcm5461_poll_link(struct mii_phy* phy)
++static int bcm5461_poll_link(struct mii_phy *phy)
+ {
+ 	u32 phy_reg;
+ 	int mode;
+@@ -691,7 +692,7 @@ static int bcm5461_poll_link(struct mii_phy* phy)
+ 
+ #define BCM5461_FIBER_DUPLEX	(1 << 3)
+ 
+-static int bcm5461_read_link(struct mii_phy* phy)
++static int bcm5461_read_link(struct mii_phy *phy)
+ {
+ 	u32 phy_reg;
+ 	int mode;
+@@ -720,7 +721,7 @@ static int bcm5461_read_link(struct mii_phy* phy)
+ 	return 0;
+ }
+ 
+-static int bcm5461_enable_fiber(struct mii_phy* phy, int autoneg)
++static int bcm5461_enable_fiber(struct mii_phy *phy, int autoneg)
+ {
+ 	/* select fiber mode, enable 1000 base-X registers */
+ 	sungem_phy_write(phy, MII_NCONFIG, 0xfc0b);
 -- 
 2.43.0
 
