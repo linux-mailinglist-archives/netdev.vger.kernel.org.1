@@ -1,294 +1,227 @@
-Return-Path: <netdev+bounces-281007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281009-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MBt+LDuQ62k+OQAAu9opvQ
-	(envelope-from <netdev+bounces-281007-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:46:03 +0200
+	id YLLHEYGR62lGOgAAu9opvQ
+	(envelope-from <netdev+bounces-281009-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:51:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A3B7460ED8
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:46:01 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42189461020
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:51:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F3454300749B
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 15:40:47 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5A2223009F0B
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 15:50:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 494963CF045;
-	Fri, 24 Apr 2026 15:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2C01371CE4;
+	Fri, 24 Apr 2026 15:50:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Zf2iNEWJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013010.outbound.protection.outlook.com [40.93.196.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 959BC364021
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 15:40:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.69
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777045245; cv=none; b=EFbS1v435UxD3dBGSvgNPnaAFfSamZRGgEJsqXfmf+0FuGDEE41LzZ7BoYmhzal9j7kgfnUpUCeceraxPoxW8jlGoQuTnNaS5QVW33e1IEWseweQfwNHi0St4O9+qLhFjncCyS9Ly9OUvm+ZomYkyw8MgVrP0t8ptyvx+WHpDj4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777045245; c=relaxed/simple;
-	bh=7fSIjeraM9Ech3knnZfdxx6ZTw19M1mSL+9l+VL2Iy8=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=ktT1WGyaOULN0/e7uU+FYvXFr5xQLVTO2dxjKIWkgTPK0HYhNft7BaIctnAwxGetzeGHPqWpZLcBFlNBN5EZcmoFnuBXxUiolaiUfco9MwqeyH4T8j59yS8KrVyGPHN7YzsaUPglF73P9J8aMM2y56DJO2FolnEB8+dSzs83W+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-7dbbb806e10so16515075a34.1
-        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 08:40:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777045242; x=1777650042;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:in-reply-to
-         :date:mime-version:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ozZqfUgHbG5YT/ysMNliibcNAY4cXM7ckBYYcrMJsJI=;
-        b=BUuO7Qls8TXej9oOFoISO4UteH9i4UIM2XmBJDuM0hJdPc+NqCbBsQbwodBQarDOsB
-         CzNUyocP9sz5B9JNJxjuZYNZ3D6K/KyRBWh18WrKabf9XDYk78nr/DP2M+DWahFZMXmA
-         1SmxIeEhx33ju7XyriHCH/3M8uY5sk6oEC/URcIJ+i6n72N8vepcwjHOYXOMm1YeDVl1
-         lirTnC4YjqccKmzCqZRlzkGKFtnslT91gcse+sdRoawazmnedS/vPcZGggLoCDNyRXYX
-         X5k6zaOf0FssFhdlmO6yqreWAlyzR6Wz7Rfnp/xinmunStxtawbJyjZ0wZ2+f7dmVxb7
-         CWaw==
-X-Forwarded-Encrypted: i=1; AFNElJ8zoGmL1Ci8DadLMiveL9XGB/2uSZl1sn+9izQqZYIdF7ASosgjcbPCpHQsQVZtLoSGHYFqlEA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBXZHYg/3Ap3RkTCbgrOdmMUDLl2Sum0t8zsjNwvUOtSje2Wqx
-	IxiaHp0iAAdUQ9bpa6qHW6g5ejjKsdeWoa9KwEK6ydjtzB8WpgBOeS6l0EQl+7708uAx5lkDdyF
-	eznT+rtuoN1luTvM2NYAMWK9WirH+6m05kmMfuaWVvi1tgmaOheIxv5KcOsk=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C8C634752D;
+	Fri, 24 Apr 2026 15:50:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777045819; cv=fail; b=ojzToXfo5u3qcCvoJWB3mp6K5zs1hRs1PIGDmDGurLVAOCWPoM1SWLvpIr5p3756QDHGffr3rO5tNuw0C4e2QSP+bxmk12y07ExEAtdnxSbsUhQYveYPpJS6EN5Z1287Z1gS/JtTsj57uu/ane2jmiWQBapukErHmLdeosIvfzE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777045819; c=relaxed/simple;
+	bh=4SwFeVDrMrDEPhg+Pv2NUAcMQiZBMWUlY4FH8TQf3Kw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=UrszgXE9ShVAPwUxwbLS1rWA7C24aox9m1qYC6GRqB76ZUEZ82IzUO0zL0n/lWc69F6FS6mcOuc5pyQQngkZL87d6Fe5mA/JTLGYKeHoTGnGCZgw045sAvfz24snTsTok38QxmoePLGP7LJ2mO0xISewGiu/egBuatNdsQflODQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Zf2iNEWJ; arc=fail smtp.client-ip=40.93.196.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bXHvintndVGh7SOrzPsS+g3y9VXRNsBhDvwxCfb3R1Et1w9wg6LSuoMBMiUtMTxFYW01AHLdKLYEkOFShWv1+wyOgXVon5hoZjw7xR1Zh6Qf4AxSDQDj0XWRmT+Tlc32T/2EI6Y1pDNn8NbODWt5THMRhxZT8Z3SYatdDoZ1ktiX8N3wr8nGhJYreUyx6ZhJIaDkLanLjBXwIQ4AaDCq4wA0gnti52rhd4dV8eLabvQxUAAVYpmRJsc6NptZjZQzJaGeYVYojWnlWdZx5JRD9Cm8c9rjUtsyWDs7/hoFuniNKaUJLOL/CDPasyZSnhnQXKET6Z0ew7qyishYgohm2Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wltxVI/e7H6RNN8uqDmUfNU6ngytttCHXv6hlW0A67M=;
+ b=EXBQvjzC9PDtcrOFw6YvWaXDmhN8V15t/h0AlrRllHkDPVrnDteHS2JP4udNXG6XvT6O745+Pg6uLV6Ks6qZN/32HD1GmDz/Txgj/jv8y87PG8AhBFCgYmIQjEajfvGt6iy128HqzaDEqSe9R9rdDAMpE0lptEvL1CyrmppCLY+jvzvDCyvzTs9RRB1NozRk627ABsIgUWQ0w7+hyYIhpuZkvHxqO3ZAiGyWVX/Q3HBzsY0rB/7J2LH4HF58RvDJmdePWp2A8D1ZoHgbOXFS+Wa4Whp6vFL160bEBht2yRt6z6sqXFkTHXERZt0SxGpRudYNWRCgvyjbJFrkiNzYrg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wltxVI/e7H6RNN8uqDmUfNU6ngytttCHXv6hlW0A67M=;
+ b=Zf2iNEWJ4TJ7yFjppUdUsUDlca/whnvYZSY0phb1Qy8eNCPxZIRbgD9zJKCbvbqN90d8D1dBkc5cBmSbwBn5hdWFlPpx/JjsArn+xZCLwD6sHH7K4trJxVfo5ChTX46sVQHMZzg6LNH1KiydaInrLNB/zt33MvXItwmMLSQa1rTl3MoFg5mSoTHPy7QBANE2YZxG2THo/vtVIzPmIs9wFRjxOUf3kPcNjRTXwwxI+n8V54n1xJxWdbc3fuflUmi5xARsqo6xzTpUp79QOQ/iarPhCrFt+wKjwmknz9Qj04LepTGcLpDuZe2IPkV2mVrPjSmRkGoe39h4S3sHV4VmEA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY8PR12MB8300.namprd12.prod.outlook.com (2603:10b6:930:7d::16)
+ by PH0PR12MB7816.namprd12.prod.outlook.com (2603:10b6:510:28c::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.22; Fri, 24 Apr
+ 2026 15:50:13 +0000
+Received: from CY8PR12MB8300.namprd12.prod.outlook.com
+ ([fe80::ce75:8187:3ac3:c5de]) by CY8PR12MB8300.namprd12.prod.outlook.com
+ ([fe80::ce75:8187:3ac3:c5de%3]) with mapi id 15.20.9846.021; Fri, 24 Apr 2026
+ 15:50:13 +0000
+Date: Fri, 24 Apr 2026 11:50:10 -0400
+From: Yury Norov <ynorov@nvidia.com>
+To: Jonathan Cameron <jic23@kernel.org>
+Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	David Lechner <dlechner@baylibre.com>,
+	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
+	Andy Shevchenko <andy@kernel.org>,
+	Ping-Ke Shih <pkshih@realtek.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Hans de Goede <hansg@kernel.org>, Linus Walleij <linusw@kernel.org>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Salah Triki <salah.triki@gmail.com>,
+	Achim Gratz <Achim.Gratz@stromeko.de>,
+	Ben Collins <bcollins@watter.com>, linux-kernel@vger.kernel.org,
+	linux-iio@vger.kernel.org, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org, linux-rtc@vger.kernel.org
+Subject: Re: [PATCH 0/9] bitfield: add FIELD_GET_SIGNED()
+Message-ID: <aeuRMiws8zCdkGXX@yury>
+References: <20260417173621.368914-1-ynorov@nvidia.com>
+ <20260424130927.349ad3ae@jic23-huawei>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260424130927.349ad3ae@jic23-huawei>
+X-ClientProxiedBy: SJ0PR05CA0119.namprd05.prod.outlook.com
+ (2603:10b6:a03:334::34) To CY8PR12MB8300.namprd12.prod.outlook.com
+ (2603:10b6:930:7d::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:2227:b0:695:aea7:8c1a with SMTP id
- 006d021491bc7-695aea79107mr7138880eaf.54.1777045242618; Fri, 24 Apr 2026
- 08:40:42 -0700 (PDT)
-Date: Fri, 24 Apr 2026 08:40:42 -0700
-In-Reply-To: <378c89ac.7c26.19dc0263038.Coremail.25181214217@stu.xidian.edu.cn>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69eb8efa.050a0220.37931.0001.GAE@google.com>
-Subject: Re: Re: Re: Re: [PATCH v2] ipv6: fix memory leak in __ip6_make_skb()
- when queue is empty
-From: syzbot <syzbot@syzkaller.appspotmail.com>
-To: 25181214217@stu.xidian.edu.cn
-Cc: 25181214217@stu.xidian.edu.cn, davem@davemloft.net, dsahern@kernel.org, 
-	edumazet@google.com, florian.bezdeka@siemens.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, sd@queasysnail.net, willemdebruijn.kernel@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 7A3B7460ED8
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY8PR12MB8300:EE_|PH0PR12MB7816:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2594ba65-cc19-4e93-c1bd-08dea2192be5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|1800799024|10070799003|366016|56012099003|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	H38jSwjsaKZj/z0L+WwisHJiG9Lhpdvcb5yAY57PksPLvhve6MZEMheO5bfreN6a0pFMRQXSnv36S/EpHZ+gknUqcpdIDYdNbEsLoA79ona+Qa8WkBNtdaaKrrktbKk2MUgjSCpl2lAAIsKovicV3ZZHVPyMRxxoQbw1j2mJldllivkx2N9pG5SaOgjbJmekZsMs3uIIvdQQSqz5J/jTKKzrxD5U1pDBpuORFOp5rvssDSNwzQOAj7XaJs4IuDcV2+dk9cE1kutmUgKjV2jzQUoSFKLDO3HIYIvZjFJLd2mLLej6SRdb30dw07JGVeJ9pk9OcFWJtqxwgb7doQOVwH4cEWjPkApyQZg2Kvn1zUEY2nHITQVxo9LDTP9ODqBrNhWrY2gT8YxP8suIUJ5VNEiEEP+q1mYCszNr7No+WByVqElAw6qKEoQ1ysspDNCAkgzFFqtEZOTN6Hk1HiYOKdNP3YyMiLO9PRvk37qRUp7QbD/MFHoLraW9BC40G82jLsu+myR9k0BGQP1Qo+E3YR9zr/upTJq1YucrXAy2+Pb0QgccjjTkfdihCfmqDJxoGYzzlZT6BPIKkml95GM4+1BQOQ/qZSSTmFhFMA5EPH6DtM0bYkW/9JEM3lHnAFU2++pqinShwAi0bX5LGYaO8KXKFrTjSPe0/oDYfw5OZfJtNj2fViRpuTc3tiupHH9lZXVmjobRBBjCvxBIOP9hofqO355giRID5WieAUUXFqM=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB8300.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(10070799003)(366016)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?pN/xJq2+cUNLCBYNmfNq6x/beR/b3Ibt6Rx1ee8olLh+mkszFQrF0NRCiRuS?=
+ =?us-ascii?Q?QJViQYbK3mN8wxuuyqzWnRHk4RZFI6ebozPQlBkrA/Y7mM4TzXg1wbcjAsni?=
+ =?us-ascii?Q?xAIjOWY9jg2CzvCrUJKyrjYVBWVgyeGPJ1d6hLp5/I/WPtDA1maLWFLNr5RT?=
+ =?us-ascii?Q?4KV22dE74PCLlyYZBLYtPsABJLriyFXdAKnSILRkbpG81WBmhsEhw2TfgpOZ?=
+ =?us-ascii?Q?RJkjmVmp4hCYsT0NTPbuPnziY706R3lLK7vYWl456tQtSY0i+JEPsgrD3s9X?=
+ =?us-ascii?Q?/VerzRllEs7Mx830iha/cshewJzQdGmoSG9up5MWJ1grQN+ae/S1o1NTJPJF?=
+ =?us-ascii?Q?MGE188V6afmv96WbK5Zd9RRVQEtlWFp0I7nl8geX9t6BLCqQdWZbXQXMryqq?=
+ =?us-ascii?Q?VsyHa6QRPDWHdGQ4UmnNFKltCkzygU+ERKXhxO72/lDZLvntsspNfp4jsCIb?=
+ =?us-ascii?Q?NweA/Dp1pdDdx7VpnTxJ3ClqYyh7jka7Vkr7qyMUVNss//WImeYG9MKgh8bR?=
+ =?us-ascii?Q?jPkhaUb3UKJQCW0v7dldgSB6GtLtv/kGcrNlZ2Ghf4NUQYU41ag0qq1D/I3z?=
+ =?us-ascii?Q?OV506nR0Ahh0KLzEMyOsZpeasNADGVCnbbJEyYM236INm2YCbIdgDp/TH0az?=
+ =?us-ascii?Q?d3UwWiaSCFyqm61J5GgB6ZUhXRyVl84I6TzmqNStGOWUKY+7T++iWTv1YRpU?=
+ =?us-ascii?Q?o/QEtViO5EqSwsb5YVaKTneqTJqVeeQFmc3klxU0xzSw8s8AtvgVVNZjOc4o?=
+ =?us-ascii?Q?3lMMKzwMY21OpWpl4Lx1tMZD56G/+zUJqXsrk6c1BAFKFjw04rBDp+DrEp1w?=
+ =?us-ascii?Q?ACxkaAC+z5eG5u3t9x0LNcc66XQZ97KbzOEmQCOaR7X0Iy21XABYh05+/KRu?=
+ =?us-ascii?Q?PN6sCsn4fYjE94eliq0E03Wduxi1U17FxrJwJJy/2+UYty9T8usOW0NzHMvk?=
+ =?us-ascii?Q?RToB5ovTfUuqBNREAHVbqZ8OJ2+SEjEkMo1dSn4KH+FkcsMJposMGTQy32+J?=
+ =?us-ascii?Q?PnJXUpkx5BSDd1mL+5bim4EwvK+ugY7Oo0R/d8RbYjmf3WtPwEqYorayDLDA?=
+ =?us-ascii?Q?Kh8KmEzr7+Z3WNNILEE1Ofk9jJPtuQ/gyy8kjz+xwVe3UMTo8NGgxadwQ+WB?=
+ =?us-ascii?Q?dxfUuimIP6nLas05PDg2tqKlAGaxvasYBSwbYhjAPPDeJF2O3cWE0NDGeBYb?=
+ =?us-ascii?Q?HHFPTefVnYM0/inomKmtyXhnuGavyAYBDldvBcKk+gwNAdZ93JZ/wye74JbP?=
+ =?us-ascii?Q?252qDTf5t1UQhDdtQ9xaui9cUlckxWW4MAKnCETtm7hFrZbelM0q+YsyMSm4?=
+ =?us-ascii?Q?mY9w8r+if5Ha1xR5bjXeYdB3cTWnMQlHbMdiE4gIJNfGzzsH4a1Idl/kBQTj?=
+ =?us-ascii?Q?GiyPEtXwSv+TToqIj+Ur7ggItM2S4vXgpmqbQenojS1uNleXGAq/Fyl1aruj?=
+ =?us-ascii?Q?RVyiLriQe8U7YO1894prgWlkQU/8NYZALzUa8H/bgKBpT3eEj5Wz9NFK3U/Y?=
+ =?us-ascii?Q?mcb3AipCis4WL4j3aOxnr3fWAoIIAtNxaBhpK9oV/r95Zfq3p7lhDiU0MWmO?=
+ =?us-ascii?Q?2no2BjlsyLrvJrM0wisfi0cFSDQg1quhBl3qh+6Q00UM298ZbISxvDYD5cK/?=
+ =?us-ascii?Q?peszfj7I9Hni7hZjcjCF+ecoh02rVR6yFW7R1dZL1wB2+gbWOQM0T1YUj6hu?=
+ =?us-ascii?Q?j0IZl0GyR6vkcjTGJStd6oMVXLYEsXypN+KK9/WTvGAgVdm4GWqNMJLLHEqc?=
+ =?us-ascii?Q?PUkRU4Y9k/ZoPhyEbKMTCV8bVRXmQg+xkeX/ALDAFvCq64Cau/SC?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2594ba65-cc19-4e93-c1bd-08dea2192be5
+X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB8300.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2026 15:50:12.9665
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kc8RpdInEUsWPjOBbt8oWY7Vv06+ngm+EeSGAiqqcYAROkDOdauLgoxTwy0sVB1318yBfTURUDV+DCwwl3Xtqg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7816
+X-Rspamd-Queue-Id: 42189461020
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [4.94 / 15.00];
-	SEM_URIBL(3.50)[xidian.edu.cn:email];
+X-Spamd-Result: default: False [1.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	BAD_REP_POLICIES(0.10)[];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[stu.xidian.edu.cn,davemloft.net,kernel.org,google.com,siemens.com,vger.kernel.org,redhat.com,queasysnail.net,gmail.com];
-	TAGGED_FROM(0.00)[bounces-281007-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	GREYLIST(0.00)[pass,body];
+	TAGGED_FROM(0.00)[bounces-281009-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,alien8.de,linux.intel.com,zytor.com,infradead.org,baylibre.com,analog.com,realtek.com,gmail.com,lunn.ch,davemloft.net,google.com,bootlin.com,rasmusvillemoes.dk,stromeko.de,watter.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ynorov@nvidia.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(0.00)[+ip4:172.232.135.74:c];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,siemens.com:email,davemloft.net:email]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-> Hi Florian and Sabrina,
->
-> I checked the stable branches for a potential backport. It turns out no b=
-ackport is needed because the stable trees are not affected by this specifi=
-c leak path.
->
-> Looking closely at `ip6_setup_cork()` in the stable trees, `cork->base.ds=
-t =3D &rt->dst;` is assigned at the very beginning of the function.=20
->
-> If a subsequent memory allocation fails (e.g., `kzalloc` failing due to f=
-ailslab), it returns `-ENOBUFS`, but the `dst` reference is already linked =
-to the cork. When `ip6_make_skb()` catches this error, it calls `ip6_cork_r=
-elease(cork, &v6_cork)`, which successfully frees the `dst`.
->
-> As Sabrina correctly pointed out regarding my v1, adding an explicit `dst=
-_release()` here would actually cause a double free.
->
-> The original syzbot memory leak report under `failslab` seems to be a fal=
-se positive or related to a different object entirely. The `dst_entry` hand=
-ling in this error path is already robust.=20
->
-> This issue can be closed without any patches. Thanks for the discussion.
->
-> Best regards,
-> Mingyu Wang
->
->
->> -----=E5=8E=9F=E5=A7=8B=E9=82=AE=E4=BB=B6-----
->> =E5=8F=91=E4=BB=B6=E4=BA=BA: "Bezdeka, Florian" <florian.bezdeka@siemens=
-.com>
->> =E5=8F=91=E9=80=81=E6=97=B6=E9=97=B4:2026-04-24 14:56:35 (=E6=98=9F=E6=
-=9C=9F=E4=BA=94)
->> =E6=94=B6=E4=BB=B6=E4=BA=BA: "willemdebruijn.kernel@gmail.com" <willemde=
-bruijn.kernel@gmail.com>, "25181214217@stu.xidian.edu.cn" <25181214217@stu.=
-xidian.edu.cn>
->> =E6=8A=84=E9=80=81: "syzbot+e5d6936b9f4545fd88ab@syzkaller.appspotmail.c=
-om" <syzbot+e5d6936b9f4545fd88ab@syzkaller.appspotmail.com>, "davem@davemlo=
-ft.net" <davem@davemloft.net>, "dsahern@kernel.org" <dsahern@kernel.org>, "=
-sd@queasysnail.net" <sd@queasysnail.net>, "linux-kernel@vger.kernel.org" <l=
-inux-kernel@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.=
-org>, "horms@kernel.org" <horms@kernel.org>, "edumazet@google.com" <edumaze=
-t@google.com>, "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pa=
-beni@redhat.com>
->> =E4=B8=BB=E9=A2=98: Re: Re: Re: [PATCH v2] ipv6: fix memory leak in __ip=
-6_make_skb() when queue is empty
->>=20
->> On Fri, 2026-04-24 at 11:26 +0800, =E7=8E=8B=E6=98=8E=E7=85=9C wrote:
->> > Hi Sabrina and Jakub,
->> >=20
->> > Before sending out the v3 patch, I synced my tree to the latest mainli=
-ne and checked the current state of `ip6_make_skb()`.=20
->> >=20
->> > It turns out that the missing `ip6_cork_release(cork)` in the error pa=
-th was already naturally resolved by Eric Dumazet's recent refactoring comm=
-it:
->> > b409a7f7176b ("ipv6: colocate inet6_cork in inet_cork_full")
->> >=20
->> > With Eric's changes, the error handling now correctly calls `ip6_cork_=
-release(cork)` if `ip6_setup_cork()` fails, meaning the memory leak is no l=
-onger present in the latest tree.
->>=20
->> Fine, so mainline is correct now. What about the stable trees? Did you
->> check them already?
->>=20
->> Florian
->>=20
->> >=20
->> > Please disregard my v1 and v2 patches. I am also telling syzbot to clo=
-se this report based on Eric's commit.
->> >=20
->> > Thank you all again for your time, the deep code review, and for guidi=
-ng me to find the true root cause. I learned a huge amount from this discus=
-sion!
->> >=20
->> > #syz fix: ipv6: colocate inet6_cork in inet_cork_full
->> >=20
->> > Best regards,
->> > Mingyu Wang
->> >=20
->> > 2026-04-24 11:16:30 "=E7=8E=8B=E6=98=8E=E7=85=9C" <25181214217@stu.xid=
-ian.edu.cn> =E5=86=99=E9=81=93=EF=BC=9A
->> > > Hi,
->> > >=20
->> > > Thank you so much for the review and for pointing me to the correct =
-Fixes tag!
->> > >=20
->> > > You hit the nail on the head regarding `__ip6_append_data()`. After =
-re-evaluating the code path based on your question, I realize my assumption=
- in v2 was incorrect. `__ip6_append_data()` does indeed guarantee that an s=
-kb is queued upon success, making the `skb =3D=3D NULL` path dead code in t=
-his context.
->> > >=20
->> > > I traced the `failslab` memory leak back to its true origin: the loc=
-kless fast path wrapper `ip6_make_skb()`.
->> > >=20
->> > > Sabrina previously noted that `ip6_setup_cork()` failures correctly =
-release the dst. That is absolutely true for the slow path, where `udp_v6_f=
-lush_pending_frames()` eventually handles the cleanup.=20
->> > >=20
->> > > However, in the fast path, `ip6_make_skb()` calls `ip6_setup_cork()`=
-. Inside `ip6_setup_cork()`, `cork->base.dst` is assigned early. If a subse=
-quent memory allocation fails (e.g., `v6_cork->opt =3D kzalloc(...)` failin=
-g due to failslab), it returns an error. `ip6_make_skb()` then directly ret=
-urns `ERR_PTR(err)` WITHOUT calling `ip6_cork_release(cork)`.
->> > >=20
->> > > Since `udpv6_sendmsg()` assumes the `dst` reference is stolen by `ip=
-6_make_skb()` and unconditionally jumps to `out_no_dst`, the `dst` is compl=
-etely leaked.
->> > >=20
->> > > The fix is simply to add `ip6_cork_release(cork)` in the `ip6_setup_=
-cork()` error path inside `ip6_make_skb()`.
->> > >=20
->> > > I will submit a v3 patch shortly addressing this true root cause and=
- using your suggested Fixes tag. Thank you again for steering me in the exa=
-ct right direction!
->> > >=20
->> > > Best regards,
->> > > Mingyu Wang
->> > >=20
->> > >=20
->> > > > -----=E5=8E=9F=E5=A7=8B=E9=82=AE=E4=BB=B6-----
->> > > > =E5=8F=91=E4=BB=B6=E4=BA=BA: "Willem de Bruijn" <willemdebruijn.ke=
-rnel@gmail.com>
->> > > > =E5=8F=91=E9=80=81=E6=97=B6=E9=97=B4:2026-04-23 22:59:45 (=E6=98=
-=9F=E6=9C=9F=E5=9B=9B)
->> > > > =E6=94=B6=E4=BB=B6=E4=BA=BA: "Mingyu Wang" <25181214217@stu.xidian=
-.edu.cn>, willemdebruijn.kernel@gmail.com, davem@davemloft.net, dsahern@ker=
-nel.org, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
->> > > > =E6=8A=84=E9=80=81: sd@queasysnail.net, horms@kernel.org, netdev@v=
-ger.kernel.org, linux-kernel@vger.kernel.org, "Mingyu Wang" <25181214217@st=
-u.xidian.edu.cn>, syzbot+e5d6936b9f4545fd88ab@syzkaller.appspotmail.com
->> > > > =E4=B8=BB=E9=A2=98: Re: [PATCH v2] ipv6: fix memory leak in __ip6_=
-make_skb() when queue is empty
->> > > >=20
->> > > > Mingyu Wang wrote:
->> > > > > During fuzzing with failslab enabled, a memory leak was observed=
- in the
->> > > > > IPv6 UDP send path.
->> > > > >=20
->> > > > > The root cause resides in __ip6_make_skb(). In extremely rare ca=
-ses
->> > > > > (such as fault injection or specific empty payload conditions),
->> > > >=20
->> > > > Can you elaborate on this? Which fault injection lets
->> > > > __ip6_append_data succeed without writing data?
->> > > >=20
->> > > > > __ip6_append_data() may succeed but leave the socket's write que=
-ue
->> > > > > empty.
->> > > > >=20
->> > > > > When __ip6_make_skb() is subsequently called, __skb_dequeue(queu=
-e)
->> > > > > returns NULL. The previous logic handled this by executing a 'go=
-to out;',
->> > > > > which completely bypassed the call to ip6_cork_release(cork).
->> > > > >=20
->> > > > > Since the 'cork' structure actively holds a reference to the rou=
-ting
->> > > > > entry (dst_entry) and potentially other allocated options, skipp=
-ing
->> > > > > the release cleanly leaks these resources.
->> > > > >=20
->> > > > > Fix this by introducing an 'out_cork_release' label and jumping =
-to it
->> > > > > when skb is NULL, ensuring the cork state is always properly cle=
-aned up.
->> > > > > The now-unused 'out' label is also removed to prevent compiler w=
-arnings.
->> > > > >=20
->> > > > > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
->> > > >=20
->> > > > I think this is=20
->> > > >=20
->> > > > Fixes: 6422398c2ab0 ("ipv6: introduce ipv6_make_skb")
->> > > >=20
->> > > > > Reported-by: syzbot+e5d6936b9f4545fd88ab@syzkaller.appspotmail.c=
-om
->> > > > > Signed-off-by: Mingyu Wang <25181214217@stu.xidian.edu.cn>
+On Fri, Apr 24, 2026 at 01:09:27PM +0100, Jonathan Cameron wrote:
+> On Fri, 17 Apr 2026 13:36:11 -0400
+> Yury Norov <ynorov@nvidia.com> wrote:
+> 
+> > The bitfields are designed in assumption that fields contain unsigned
+> > integer values, thus extracting the values from the field implies
+> > zero-extending.
+> > 
+> > Some drivers need to sign-extend their fields, and currently do it like:
+> > 
+> > 	dc_re += sign_extend32(FIELD_GET(0xfff000, tmp), 11);
+> > 	dc_im += sign_extend32(FIELD_GET(0xfff, tmp), 11);
+> > 
+> > It's error-prone because it relies on user to provide the correct
+> > index of the most significant bit.
+> > 
+> > This series adds a signed version of FIELD_GET(), which is the more
+> > convenient and compiles (on x86_64) to just a couple instructions:
+> > shl and sar.
+> > 
+> > Patch #1 adds FIELD_GET_SIGNED(), and the rest of the series applies it
+> > tree-wide.
+> > 
+> 
+> Just a quick heads up that I'm beginning to assume that this series
+> will land in some form.  If it does can we do it as an immutable branch
+> as I'm suggesting it gets used in some other patches in that should land
+> in the new cycle.
 
-I see the command but can't find the corresponding bug.
-The email is sent to  syzbot+HASH@syzkaller.appspotmail.com address
-but the HASH does not correspond to any known bug.
-Please double check the address.
+I'm going to submit v2 soon, as seemingly the discussion is boiled
+down, and then will likely merge it with my tree. I'll create an
+immutable branch for you before the end of day.
 
+Thanks,
+Yury
 
