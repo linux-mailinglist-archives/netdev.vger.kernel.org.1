@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-281012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281013-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YP9qDQ+T62lGOgAAu9opvQ
-	(envelope-from <netdev+bounces-281012-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:58:07 +0200
+	id KH3HBn+T62m7OgAAu9opvQ
+	(envelope-from <netdev+bounces-281013-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:59:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DD7246113F
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:58:06 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D87BA461173
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:59:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C1443300616C
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 15:58:04 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 09ED030098A2
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 15:59:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AFA03D564E;
-	Fri, 24 Apr 2026 15:58:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D12883D9DD0;
+	Fri, 24 Apr 2026 15:59:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sTYRviJr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cgotbT65"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41AB83CFF65
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 15:58:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54A642D595D
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 15:59:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777046283; cv=none; b=a1CkGWOGbh1Rdqn4EafBmzp9z37vcvbiGcs+vC3eHFqMWKpqMe8kXayyJIHxD8edfb54yttnGEGYZBN6/l92/wn9UUiMKz1eOKDCla1ZLLaV6ILe2ieLomfW6mLJow3XH7t2sZYy6jt5YxmyrsVimKTlYuLuwn9uwUTHukv2SyM=
+	t=1777046392; cv=none; b=QlFNXYYD1FgSeTFau4h5rtqY/OFCur6mkSFhyqEbCjevS5Iq/WWkAnTT/lMBRbWp8AMXiNu+uq79/d9sqGtdPV5cxOdQFIe2MXKLifkncq7efW5HVB7jrr0IYH83H9YQDntPz9w1/E+NguyC6J6MX5EcQQDQRRR2TXk+TUEb/mQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777046283; c=relaxed/simple;
-	bh=+1ftvCaFRzsm43wGy5+bwp8fcU4UHrSJINM9bARr8GM=;
+	s=arc-20240116; t=1777046392; c=relaxed/simple;
+	bh=fLLA0XV7k5kScW1c0vuL4Q3cMsBVX5C6LlJN3+uWFro=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kWcrqIY8rYUmvABvXk/EN8SrTaihXJBaaauyUq52oj/s4IIHu8nCMBESx9taq/V6q5K1bbEjlQg7AqpuImD+kz52d8NHPxUxV3Rohk4Z+e4pvckv5PF1L8WA5++bCte/SiNG3frWTNoCGLrKPd6ywqHLSjEzHo6Q4hyl/1H0DNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sTYRviJr; arc=none smtp.client-ip=209.85.216.54
+	 In-Reply-To:Content-Type; b=QW3wNrqC3hJOCFnnURAW8Trw+7U00WeOvVyY+hakG+BO8jvHqEoQDy6G1nid7zRdWV6yV6n6aIMmw+Zcg7i+q0/jt3BJUnXl8J3SOwMEvYc9NLr8bvGOplIM4V+rJeftaDTHiTRD0LuMVMrKZgMM2VaQg9P/P8sNBwv/FdpOlrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cgotbT65; arc=none smtp.client-ip=209.85.216.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-35da1af3e10so7548869a91.3
-        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 08:58:02 -0700 (PDT)
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-35da2d35eccso5612989a91.0
+        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 08:59:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777046282; x=1777651082; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1777046389; x=1777651189; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=6d9O+EApwiYusXJ1DgeMKm21JvxKbBPp2Rt3rYT/6rc=;
-        b=sTYRviJrZzO26EMVgFdwPya/sQ5ESVKvDUPT/XLbVk6n/kI8Y3iZtd+tnNjFQK4qAO
-         ZmAG68R8SOd8J4LIq/Uhtz52P1w9zJEi6qOig7Q/LVRLNQxFXNhkdu3Ck9PXQzVssQi4
-         +J752KmcowEB6pDO0mZlev8aps1L5MWLLsnydQUEEq0CLPc0Z4h1uBMD8lrmsdyAR+Md
-         sGEM7pbYgehiNtrXheqpUmVJipHUsde27NMUutdl44iUx3+w3g4rqLDCp5rwqjHAeodF
-         lVfM637cUy3MdApjLNvHJptbfgEEPHkJ4mcjPegloCzp3OSFyiQksCC5fh4EXsCs4nuo
-         WgWw==
+        bh=n7PO/ZXw0zVFmSU0lsST4kh3s+Ob34J+JzxOTnEfe2A=;
+        b=cgotbT65j+mpgiOta8/gmMccIbo63UELAgU2TcF2xwPMZ7ATeVXhSmTWOYAUyG6sFy
+         6h1RJKIYU79ktW2RVZ4e4mZ+Q15ng9swMll4/LH9TQStgULzC5ucMGobo6KK85yWONpK
+         ezZLFSJhQFPSMqES/qJA85kNxRAhfwhYb3E8CY0+ewqY621NXXGmzO4aYqDUIfgilvNX
+         oYb9KXIXs5Vke7PNGIoKc6ZRS3vL0upuOweqACBbWHyX82Hxyw3GV5W8QXnJO+71/WQF
+         lyhn4HPbOVxo42hLvZIhEnKTGxPr9IFbImzWagwQTB00NQ4ZqLfHjf8t4WLzuadUs13B
+         1r+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777046282; x=1777651082;
+        d=1e100.net; s=20251104; t=1777046389; x=1777651189;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=6d9O+EApwiYusXJ1DgeMKm21JvxKbBPp2Rt3rYT/6rc=;
-        b=sgFi00LsJRgHfGF0Qm0Mhf7GZP4zy2iRRTSkC6wcF7fwPTgAOHy8l22qUu9i3xDUF4
-         VOJ4FzBdbGxIhFL9Y8k7KwCA93V/0rhKbLCaVfhAgghgRftA//oMinmF86Pg0MIOkgNI
-         nMFFxjg4cBFmG6wk/IZRVHPfV1bBdt67gQOZgmoAEMTIARYt7FfcXKw8vNwwk+gAgUFV
-         mMwIhD/15cmP9YPD/tKsYz4m0STUScBmPxTZe0exytnK1PpNQJX0VHGnNrCt4MqSLmpr
-         6nDWHDgvKjDXV4Ivr/y85T2wH9XliW1Kr6TatYkmjyHxpAuLQw1BP06Fl6gPIhvAyGsY
-         lP7A==
-X-Forwarded-Encrypted: i=1; AFNElJ9DzMdpM0DvgD9pdn8DT91zAn3nqtj53J5qUhhTfBOY7Ob86uSGsujmBoIsfMRCMj504wVOLTY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzioaWS4BwocOgZNew300awLdPbste4X4hbqkYL9FjMF/hoH9Hj
-	00yejupGVsUbfYazaJOAQgxMgQjj6gfwSE55HckK3K2Oj708jvgu7GYB
-X-Gm-Gg: AeBDiev79O2JRmL5ZimasQeI5pmVSjtifejw8hWFv5iKKBWDZArI8rhQdKhyJVelUps
-	ozMaMH8Vzxepv7FT/V00ITMKCDkKXdvMXEd1F3kF+2zDWWTVpxNoqZrX1zdx2Ty9uMtlafjucx2
-	oVhAhvsPicdbYeigJtNB5oFWzSUXbjPo8JKnb8A8+yCGhQS0oilyaIv0dq8j8OiM6CroZSqljTU
-	LiCUFMsif2niCw62HjuU5wa9GeViFDX+ISpugvk8bYdl3IuDHR7JTb4eWRiP0qXVxksnGPUav7x
-	s5tMSgPX5sDHbPVV5mtsCSNq0NytZqxzCG134A74GbxTfQHdWOjRMcGQKBHchSmfRG+nPZscJ5C
-	dvcS0I4uj468eSZRwPBscDKV6zX4ltJTQWavidKw4z2dq5844+Gurj/wgLAKWEdwfHIPfva0HjE
-	KOWuMaT/31s+pPZzXmQJZI76YiOJCl5Z9DsCUrsc+llYqcVusy3oBFygmatd+z/geAFkPFTlrRP
-	PzNq0pOyzjsnw2irEEVOw==
-X-Received: by 2002:a17:90b:4fcc:b0:35f:b293:7ac6 with SMTP id 98e67ed59e1d1-361403bd8camr35057922a91.6.1777046281644;
-        Fri, 24 Apr 2026 08:58:01 -0700 (PDT)
+        bh=n7PO/ZXw0zVFmSU0lsST4kh3s+Ob34J+JzxOTnEfe2A=;
+        b=X62lupf2iq06WMI5gcymx8eLHCt5QhA2+zZ2+yQICT1KdI7lKz2Iod8Jx/K6rUZERr
+         IYM5/8/Uk6yME+LO/VWw8td/6GxCjY4/EjsU+xsK2vRemJL7e2xqrATYqNzuRslk1mP4
+         JfDgbV4THxrqDV2qHdomjRuQ3DJKOf63j5sKy23bR99WIkFwVkTz6gRMXr6KGShNkNrC
+         wMPVcwfEg6XutwgnlRwB0gcPnfoh2L1jstJHdNz/eyDqKECjEgIfMu0chQFuMd5KS3um
+         yMB/mw1fM1+fu4ZznADLUt0cUn+wW6WIJAgkhZWobMehNiHhrvG/qDEQOk2OfdMprgo+
+         1uPA==
+X-Forwarded-Encrypted: i=1; AFNElJ+Q4Yn5GS5WnTr1Nm9L3aFak1JadIo2HHuwpo102tdhJDRGZZmiWd5luWKjqnEr/es8C588SMY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywdxrio2WLJn79Yk0QG/JAiwbrbVn6cdS3a0PQis4fMo4He3qF+
+	KoRa97D8goC81pKvTl5tKwdsfUn5fDlcWKPYbnXObTj52FUV5B7y/gUW
+X-Gm-Gg: AeBDieuN5mR3hAxJwtASr6jTkkub4J8VO0kYu/pQeDhr5N3zp1yWmRBzei3fns0Tnb7
+	o7LfLKiZx21KlUMMaLCS9vQe9ICyfD1tfQZvD819OxZYDlGtCLcxr9aRZFC9iJrY4015cakLfRQ
+	A3EFtTqyWnUSCa0jVwjG02Y/NPTC4yRCElPOdsL27BXPSxXClU2gzJoxZqB5GSwL9LsLyOYpVyG
+	wT3SAYsSwtrumhP/NbwM0pBQ8+x1N6eqzlDiWlJgN+8HynwQn0FjDS22/PySjXvGGjhlwuwdjB4
+	CHvuJUpYnh8ZeOq8/Qu0jY1KnaB7PlA1C/5meNqwvMkhiU/Pn7NWE/53w9I9iiy7uJVBkuiWWGg
+	oNji5eQlncO2/s0hAaLM07jDAhXwgAw2Y00++bUbLTb91bBBBInxrb7uNFZy7gnP4p5jLNKoqtw
+	rQUM9KexrwdiuMvurbxR6BolSE3yD3Ch7hCOH1Mg5Q+CUwADV2QlXo9uvaRJTBdv+kX788hwddb
+	PSdyOb7rQ1m4mOLrQq/1Q==
+X-Received: by 2002:a17:90b:5865:b0:35b:929f:7e8d with SMTP id 98e67ed59e1d1-3614046cdb7mr35181395a91.14.1777046389576;
+        Fri, 24 Apr 2026 08:59:49 -0700 (PDT)
 Received: from [192.168.0.5] (124-218-201-66.cm.dynamic.apol.com.tw. [124.218.201.66])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36141973c57sm23333233a91.14.2026.04.24.08.57.58
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36140ff2e1esm23005042a91.8.2026.04.24.08.59.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Apr 2026 08:58:01 -0700 (PDT)
-Message-ID: <6da66e31-3843-478c-9dd3-b2a9205026fd@gmail.com>
-Date: Fri, 24 Apr 2026 23:57:57 +0800
+        Fri, 24 Apr 2026 08:59:49 -0700 (PDT)
+Message-ID: <00d5a8f8-64e3-4943-9082-51d4ceb1792a@gmail.com>
+Date: Fri, 24 Apr 2026 23:59:45 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,33 +89,32 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v3] net: phy: air_en8811h: add AN8811HB MCU
  assert/deassert support
-To: Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bjorn@mork.no, ericwouds@gmail.com,
- frank-w@public-files.de, daniel@makrotopia.org, lucien.jheng@airoha.com,
- albert-al.lee@airoha.com
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bjorn@mork.no,
+ ericwouds@gmail.com, frank-w@public-files.de, daniel@makrotopia.org,
+ lucien.jheng@airoha.com, albert-al.lee@airoha.com
 References: <20260420134506.35164-1-lucienzx159@gmail.com>
- <2f6fd850-e187-4e63-9a32-6b4b72c09905@redhat.com>
- <18d653c9-e8fe-48ed-9524-869f79a63121@lunn.ch>
+ <20260423102102.0192b7de@kernel.org>
 Content-Language: en-US
 From: "Lucien.Jheng" <lucienzx159@gmail.com>
-In-Reply-To: <18d653c9-e8fe-48ed-9524-869f79a63121@lunn.ch>
+In-Reply-To: <20260423102102.0192b7de@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 8DD7246113F
+X-Rspamd-Queue-Id: D87BA461173
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,vger.kernel.org,mork.no,public-files.de,makrotopia.org,airoha.com];
-	TAGGED_FROM(0.00)[bounces-281012-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,redhat.com,vger.kernel.org,mork.no,public-files.de,makrotopia.org,airoha.com];
+	TAGGED_FROM(0.00)[bounces-281013-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -123,7 +122,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCPT_COUNT_TWELVE(0.00)[15];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -133,34 +132,79 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
 
-Andrew Lunn 於 2026/4/23 下午 07:58 寫道:
->>> @@ -1175,10 +1281,22 @@ static int an8811hb_probe(struct phy_device *phydev)
->>>   		return -ENOMEM;
->>>   	phydev->priv = priv;
->>>   
->>> +	mdiodev = mdio_device_create(phydev->mdio.bus,
->>> +				     phydev->mdio.addr + EN8811H_PBUS_ADDR_OFFS);
->> Sashiko says:
->>
->> Can this create an out-of-bounds array access if the base PHY address is
->> high?
->> The mdio_map array in struct mii_bus has a fixed size of PHY_MAX_ADDR (32).
->> If phydev->mdio.addr is 24 or higher, adding EN8811H_PBUS_ADDR_OFFS (8)
->> will result in an address of 32 or more.
->> Neither mdio_device_create() nor mdio_device_register() validate that
->> the address is within PHY_MAX_ADDR. When mdiobus_register_device()
->> executes mdiodev->bus->mdio_map[mdiodev->addr] = mdiodev, could this
->> write past the end of the array and corrupt adjacent memory?
-> This has been discussed once, but Sashiko has a shorter memory than a
-> goldfish. It is guaranteed by hardware design that + 8 will work.
-
-Got it
-
-Thanks
-
+Jakub Kicinski 於 2026/4/24 上午 01:21 寫道:
+> Since you need to repost to fix the fixes tag, plaese also improve the
+> error handling
 >
-> 	  Andrew
+> On Mon, 20 Apr 2026 21:45:06 +0800 Lucien.Jheng wrote:
+>>   static int an8811hb_probe(struct phy_device *phydev)
+>>   {
+>> +	struct mdio_device *mdiodev;
+>>   	struct en8811h_priv *priv;
+>>   	int ret;
+>>   
+>> @@ -1175,10 +1281,22 @@ static int an8811hb_probe(struct phy_device *phydev)
+>>   		return -ENOMEM;
+>>   	phydev->priv = priv;
+>>   
+>> +	mdiodev = mdio_device_create(phydev->mdio.bus,
+>> +				     phydev->mdio.addr + EN8811H_PBUS_ADDR_OFFS);
+>> +	if (IS_ERR(mdiodev))
+>> +		return PTR_ERR(mdiodev);
+>> +
+>> +	ret = mdio_device_register(mdiodev);
+>> +	if (ret) {
+> goto err_dev_free;
+>
+>> +		mdio_device_free(mdiodev);
+>> +		return ret;
+>> +	}
+>> +	priv->pbusdev = mdiodev;
+>> +
+>>   	ret = an8811hb_load_firmware(phydev);
+>>   	if (ret < 0) {
+>>   		phydev_err(phydev, "Load firmware failed: %d\n", ret);
+>> -		return ret;
+>> +		goto error;
+> goto err_dev_create;
+>
+>>   	}
+>>   
+>>   	en8811h_print_fw_version(phydev);
+>> @@ -1191,22 +1309,27 @@ static int an8811hb_probe(struct phy_device *phydev)
+>>   
+>>   	ret = en8811h_leds_setup(phydev);
+>>   	if (ret < 0)
+>> -		return ret;
+>> +		goto error;
+>>   
+>>   	priv->phydev = phydev;
+>>   	/* Co-Clock Output */
+>>   	ret = an8811hb_clk_provider_setup(&phydev->mdio.dev, &priv->hw);
+>>   	if (ret)
+>> -		return ret;
+>> +		goto error;
+>>   
+>>   	/* Configure led gpio pins as output */
+>>   	ret = air_buckpbus_reg_modify(phydev, AN8811HB_GPIO_OUTPUT,
+>>   				      AN8811HB_GPIO_OUTPUT_345,
+>>   				      AN8811HB_GPIO_OUTPUT_345);
+>>   	if (ret < 0)
+>> -		return ret;
+>> +		goto error;
+>>   
+>>   	return 0;
+>> +
+>> +error:
+> err_dev_free:
+>
+>> +	mdio_device_remove(priv->pbusdev);
+> err_dev_create:
+>
+>> +	mdio_device_free(priv->pbusdev);
+>> +	return ret;
+I will include this in the next patch.
 
