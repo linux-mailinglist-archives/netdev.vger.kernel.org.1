@@ -1,286 +1,208 @@
-Return-Path: <netdev+bounces-281030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281031-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uFhhBmOx62mRQQAAu9opvQ
-	(envelope-from <netdev+bounces-281030-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:07:31 +0200
+	id 4DgoAMqy62kJQgAAu9opvQ
+	(envelope-from <netdev+bounces-281031-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:13:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6901462450
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:07:29 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 993F04624C7
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:13:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 842443011C51
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:07:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8A5B63002B15
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:13:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA773ED5DB;
-	Fri, 24 Apr 2026 18:07:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 624303EDAA5;
+	Fri, 24 Apr 2026 18:13:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Sa+iDPnT"
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="uH/CYjPi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from outbound.ms.icloud.com (p-west3-cluster1-host11-snip4-6.eps.apple.com [57.103.73.237])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 560FF3ED128;
-	Fri, 24 Apr 2026 18:07:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2276F342C9E
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 18:13:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.73.237
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777054041; cv=none; b=rU4tryWPP3lYWhNLf6VeOyOovtK6vOZ5onmmrOaiVrD1BZVwEqeJBrXYS8bqSbzd4cy+xRptu54elWG8qpUtcUoSUz9BiQvvzyJeC5ou1swtC96Dz3CDMsZe14NWAknNQovIH6OCxUhOFaozC3NNgn0ZJOyNVo25PJRV1tWeYu0=
+	t=1777054407; cv=none; b=bsnAUZ9hmgNfpQdgvphtlaCvmcsVrjAJlkbTkKkvHomoMtY4xpGlEl+15CvuLvAR1ke2aQzuKqnVrtQ/ZADazxgF2dTfiQUiZ3Rcq3xQ86uML7WeQR+P+gTmpqGooqzJPuMEFoxVJOnTJtn211qjYEk9eCVYi7rCgUQ2JxxBS7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777054041; c=relaxed/simple;
-	bh=Uwb+zIgMoJhu4VicNyQxcRWEEOfzcAwZNp6AJGN+IwE=;
+	s=arc-20240116; t=1777054407; c=relaxed/simple;
+	bh=5ADZvk8Zd+jjdNBYIpeTUZKKotpgMX+iHrYLUf1skjE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ALW1MWMKxI+9MDE9UAJ49Z4RS/wo5axh8MTPkqaxwvFZh8N6roIBDFxYdcjustCPKJHiYLHWifE8owIhMBfTmKv+e5SylUCMoR3hDc1+/iqBYJgosJiCDTKjjshcp9OJRXz/luxluEQohHz84lDzIp8IQFcKbBYGEecsZZRjHTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Sa+iDPnT; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777054040; x=1808590040;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Uwb+zIgMoJhu4VicNyQxcRWEEOfzcAwZNp6AJGN+IwE=;
-  b=Sa+iDPnTu49BaKlgbkj9eJ+dInzI8CaPbgMsVyvy0oBs4JO3X12rl6B0
-   +FNHd/YCrbCVpAV9UyXeefEwp0sVoj08D9SwVLHHkjc/OStVXawud2Sjq
-   VxxyueWmXW7156EEjIOMQJ5AlvvNuYdXGwxHHlmARULI+ysc7G+3aIyZH
-   YqHJSzqU31eUWYAU765IKagLlSgAkXleleZlvWi16KXjf3dCT9yt/VSZc
-   GMdInup8tNWtP2E9h/h+yg7Oao23Hoyieg8b5G1836TnZAUpfBd2w/4N1
-   mFYVO4POv4wLco6UyN/zBEJnAOfB0ruXiGqQojV7wkzXDRbtjTzsYG1GE
-   A==;
-X-CSE-ConnectionGUID: 5LQO5MpoRliMbWjb8T/GWA==
-X-CSE-MsgGUID: 4BCGh9+yRhO1e+0lcCV3rQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11766"; a="100693265"
-X-IronPort-AV: E=Sophos;i="6.23,197,1770624000"; 
-   d="scan'208";a="100693265"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2026 11:07:19 -0700
-X-CSE-ConnectionGUID: MXBCtw1pT9S+dRCNA+vhiA==
-X-CSE-MsgGUID: /bxsZXZIRK6ESMr9tTn3jw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,197,1770624000"; 
-   d="scan'208";a="256524742"
-Received: from arjan-box.jf.intel.com ([10.88.27.153])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2026 11:07:18 -0700
-From: Arjan van de Ven <arjan@linux.intel.com>
+	 MIME-Version:Content-Type; b=Z7n8bgYHB/PhiiEsPmp/PcXmlXOIZauZld3UnogGosqZxVoWg+8kiPVleuCL6/THiClEaBbEebapa1h1HZ8dzMuGJSTbAMYu5W7JG63xorPyPfr2yGs2G8GETD8yQfUHbHxG6pEgo7oK5o3ZmTmchjNpfHDXmV6sNoX2vmTHuLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=uH/CYjPi; arc=none smtp.client-ip=57.103.73.237
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+Received: from outbound.ms.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-west-3a-60-percent-9 (Postfix) with ESMTPS id 6E3D7180041D;
+	Fri, 24 Apr 2026 18:13:23 +0000 (UTC)
+X-ICL-Out-Info: HUtFAUMEWwJACUgBTUQeDx5WFlZNRAJCTQ1OHVQORQNFF0sCTVIPDwNXF0QaWwpZFXkRUAFYHlZeWhdeTVEPDwNXF0QaWwpZFXkRUAFYHlZeWhdeTUUID0EJWFsIWwQPH0wMUQJCBVZeVAsdBFQHXQVdVlACWktCBEtFaFwFXBxAF0gdX2pLVhQEEVABWB5WXloXXk1aAlZNBUoDXwFbBkINSQtcBFsFXgpAAl0AWQVdCFVAA1gcRRxYE1YtXgheH0wcHQ5YBgxQTQFDCAoCURxWDVc=
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com; s=1a1hai; t=1777054405; x=1779646405; bh=on9dJlf7WQp626I4hkgi8ojcmtfnVM3S5RjDwvQLF9U=; h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=uH/CYjPiO4Mch2ET0AhBtWsqpuKQ6/Cb0prllo+KqM3jkeffaLqe0yd7zQ9GLG+QxgGx8ldXsH2GA19KmDLN6SBkxCtCW7gM6niP5vO6Hko0G4ocZn15TjUwZKS5d4KjZHLNZ0WCZ48I0ffvZrKQn+dhAOFx29FksZVwD/6Z9T0ihTJlAab3wD800AVkq8kZ0alQrbjLQVs/IXrWv5HRjL4h77zaH79wcNc0GaB4g7tdzbOl8tNtklhv/P/tpPBppQoqlr68Fw7MljxlVnulGC+4swionqTZ/pLeeC84yIiUMy4vb3qVtlhAg9TttCfqlqQXRYCzYiywaaRUG4VcrQ==
+Received: from mainframe.tailfb0f7b.ts.net (unknown [17.57.154.37])
+	by p00-icloudmta-asmtp-us-west-3a-60-percent-9 (Postfix) with ESMTPSA id C98741800149;
+	Fri, 24 Apr 2026 18:13:20 +0000 (UTC)
+From: =?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <snowwlake@icloud.com>
 To: netdev@vger.kernel.org
-Cc: syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com,
-	dsahern@kernel.org,
+Cc: davem@davemloft.net,
 	edumazet@google.com,
-	akpm@linux-foundation.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	krzk@kernel.org,
+	horms@kernel.org,
 	linux-kernel@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	Arjan van de Ven <arjan@linux.intel.com>,
-	linux-rdma@vger.kernel.org,
-	Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>
-Subject: Re: [syzbot] [net?] general protection fault in kernel_sock_shutdown (4)
-Date: Fri, 24 Apr 2026 11:08:21 -0700
-Message-ID: <20260424180835.357916-1-arjan@linux.intel.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <69ea344f.a00a0220.17a17.0040.GAE@google.com>
-References: <69ea344f.a00a0220.17a17.0040.GAE@google.com>
+	stable@vger.kernel.org,
+	=?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <snowwlake@icloud.com>
+Subject: [PATCH net v4 3/5] nfc: llcp: fix TLV parsing OOB in nfc_llcp_recv_snl
+Date: Fri, 24 Apr 2026 20:13:05 +0200
+Message-ID: <20260424181307.3810727-1-snowwlake@icloud.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260424180151.3808557-1-snowwlake@icloud.com>
+References: <20260424180151.3808557-1-snowwlake@icloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: C6901462450
+X-Proofpoint-GUID: so7tkkE6baDjJJZv6oLPwr-5jdl7X9_e
+X-Proofpoint-ORIG-GUID: so7tkkE6baDjJJZv6oLPwr-5jdl7X9_e
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI0MDE3NyBTYWx0ZWRfXwkxpS8rmGmfq
+ QGW6NOCtJxL9T3BxKC9CBUSTiHRhx2YDkFmHvF8bAbkCiPGNkaHJPyEPzpcyIUKfelwA8YvxirQ
+ v+qzDabcw3O7y/4oATa8/bAoniT4JUq4ft4Cp+LZOe8//lTT/mEdCZYoR2/ugoDenonrEtFsHsg
+ D8BFL3/nzL6A1MkTfkJjs9v/w7bjG4LszdXmdnKS+xqKy7SAzE1a6Wy0apdMBd3o8wp4lxE4hdp
+ MisglbvD9CwS1j/Jo0OtOI8b7uUGAt3NRetwNFHfeERJmSBEh5ymgDwOAqTjVoBew3GXUb/flfu
+ jipDGaMyL36lJWEQovrF1bOThrVTLIFsKA/4O226+B0zqrWEDIVY5/4HSr0pEA=
+X-Authority-Info-Out: v=2.4 cv=fd6gCkQF c=1 sm=1 tr=0 ts=69ebb2c4
+ cx=c_apl:c_pps:t_out a=qkKslKyYc0ctBTeLUVfTFg==:117 a=IkcTkHD0fZMA:10
+ a=A5OVakUREuEA:10 a=M51BFTxLslgA:10 a=x7bEGLp0ZPQA:10 a=LbuW6tbUWPcA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=v3ZZPjhaAAAA:8
+ a=7u9s_NCwlmaW5FMPgJwA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Rspamd-Queue-Id: 993F04624C7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.53 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_MIXED_CHARSET(0.63)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[icloud.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[icloud.com:s=1a1hai];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[syzkaller.appspotmail.com,kernel.org,google.com,linux-foundation.org,vger.kernel.org,googlegroups.com,linux.intel.com,gmail.com,ziepe.ca];
-	TAGGED_FROM(0.00)[bounces-281030-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	URIBL_MULTI_FAIL(0.00)[sea.lore.kernel.org:server fail,intel.com:server fail,fenrus.org:server fail,ziepe.ca:server fail,linux.intel.com:server fail];
+	DKIM_TRACE(0.00)[icloud.com:+];
+	TAGGED_FROM(0.00)[bounces-281031-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,icloud.com];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[arjan@linux.intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,d8f76778263ab65c2b21];
+	FROM_NEQ_ENVFROM(0.00)[snowwlake@icloud.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	SUBJECT_HAS_QUESTION(0.00)[]
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[icloud.com]
 
+nfc_llcp_recv_snl() has five problems when handling a hostile peer:
 
-Unfortunately the AI had a burp and did not write out the proper URL
-for analysis data; it should have been
+ 1. nfc_llcp_dsap()/nfc_llcp_ssap() dereference skb->data[0..1] without
+    verifying skb->len; a 0- or 1-byte frame leads to an OOB read.
+    Additionally tlv_len = skb->len - LLCP_HEADER_SIZE wraps when
+    skb->len < 2, causing the following loop to run far past the
+    buffer.
 
-http://oops.fenrus.org/reports/lkml/69ea344f.a00a0220.17a17.0040.GAE_google.com/report.html
+ 2. The per-iteration loop guard `offset < tlv_len` only proves one
+    byte is available, but the body reads tlv[0] and tlv[1].
 
-and in addition, it made a candidate patch (below)
+ 3. The peer-supplied `length` field is used to advance `tlv` without
+    being checked against the remaining array space.
 
+ 4. The SDREQ handler reads tid (tlv[2]) and the first byte of
+    service_name (tlv[3]) whenever length >= 1, so length == 1 reads
+    one byte past the TLV.  A length of 2 is required to cover both
+    accesses and to yield a non-empty service_name.
 
+    The pr_debug("Looking for %.16s\n", service_name) additionally
+    treats the buffer as a NUL-terminated string and can read up to
+    15 bytes past service_name_len.  Use a length-bounded format
+    ("%.*s") so the print cannot escape the validated TLV region.
 
+ 5. The SDRES handler reads tlv[2] (tid) and tlv[3] (sap) without
+    checking length.  A length of 0 or 1 therefore triggers the same
+    1- or 2-byte OOB read as SDREQ; require length >= 2 here as well.
 
+Fix: reject frames smaller than LLCP_HEADER_SIZE up front; add TLV
+header and TLV value guards at the top of each iteration; require
+length >= 2 for SDREQ and SDRES; bound the pr_debug of service_name
+with %.*s.
 
-
-
-
-
-
-
-
-
-
-
-
-
-From: Arjan van de Ven <arjan@linux.intel.com>
-Subject: [PATCH] RDMA/rxe: fix double-release race on UDP tunnel socket teardown
-
-This patch is based on a BUG as reported at
-https://lore.kernel.org/r/69ea344f.a00a0220.17a17.0040.GAE@google.com.
-
-The Soft RoCE (RXE) driver stores per-network-namespace UDP tunnel
-sockets for IPv4 and IPv6 encapsulation. Two independent code paths
-tear these sockets down: rxe_ns_exit(), called when a network
-namespace is destroyed, and rxe_net_del(), called when an RDMA link
-is deleted via netlink. Both paths read the per-namespace socket
-pointer and call udp_tunnel_sock_release() on it.
-
-A time-of-check/time-of-use (TOCTOU) race exists in rxe_net_del().
-It reads the socket pointer via rxe_ns_pernet_sk4(), then passes it
-to rxe_sock_put() for release. If rxe_ns_exit() runs concurrently
-between the read and the release, it clears the pointer and calls
-udp_tunnel_sock_release() first, causing sock_release() to set
-sock->ops = NULL. When rxe_net_del() then calls
-udp_tunnel_sock_release() on the same socket, kernel_sock_shutdown()
-dereferences the now-NULL sock->ops, triggering a KASAN null-ptr-deref
-at offset 0x68 (the shutdown function pointer in struct proto_ops).
-
-A minimal alternative would guard against NULL sock->ops inside
-udp_tunnel_sock_release() before calling kernel_sock_shutdown(). That
-treats the symptom rather than the root cause and leaves the
-double-release of socket state intact.
-
-Add rxe_ns_pernet_take_sk4() and rxe_ns_pernet_take_sk6() which use
-xchg() to atomically swap the per-namespace socket pointer to NULL
-and return the old value. Replace the non-atomic reads in
-rxe_net_del() with these take variants, and release the socket
-directly via udp_tunnel_sock_release() without going through
-rxe_sock_put().
-
-Whichever teardown path executes take first claims ownership of the
-socket; the second caller gets NULL and skips the release, closing
-the double-release window.
-
-Link: https://lore.kernel.org/r/69ea344f.a00a0220.17a17.0040.GAE@google.com
-Oops-Analysis: http://oops.fenrus.org/reports/lkml/69ea344f.a00a0220.17a17.0040.GAE_google.com/report.html
-Fixes: 13f2a53c2a71 ("RDMA/rxe: Add net namespace support for IPv4/IPv6 sockets")
-Fixes: f1327abd6abe ("RDMA/rxe: Support RDMA link creation and destruction per net namespace")
-Assisted-by: GitHub Copilot patcher:claude linux-kernel-oops-x86.
-Signed-off-by: Arjan van de Ven <arjan@linux.intel.com>
-Cc: linux-rdma@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: Zhu Yanjun <zyjzyj2000@gmail.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Leon Romanovsky <leon@kernel.org>
-
+Fixes: 19cfe5843e86 ("NFC: Initial SNL support")
+Cc: stable@vger.kernel.org
+Signed-off-by: Lekë Hapçiu <snowwlake@icloud.com>
 ---
- drivers/infiniband/sw/rxe/rxe_net.c |    8 ++++----
- drivers/infiniband/sw/rxe/rxe_ns.c  |   14 ++++++++++++++
- drivers/infiniband/sw/rxe/rxe_ns.h  |    7 +++++++
- 3 files changed, 25 insertions(+), 4 deletions(-)
+ net/nfc/llcp_core.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/infiniband/sw/rxe/rxe_net.c b/drivers/infiniband/sw/rxe/rxe_net.c
-index 50a2cb5405e22..4f604636cb7b4 100644
---- a/drivers/infiniband/sw/rxe/rxe_net.c
-+++ b/drivers/infiniband/sw/rxe/rxe_net.c
-@@ -655,13 +655,13 @@ void rxe_net_del(struct ib_device *dev)
+diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+index db5bc6a878dd..3284be517204 100644
+--- a/net/nfc/llcp_core.c
++++ b/net/nfc/llcp_core.c
+@@ -1284,6 +1284,11 @@ static void nfc_llcp_recv_snl(struct nfc_llcp_local *local,
+ 	size_t sdres_tlvs_len;
+ 	HLIST_HEAD(nl_sdres_list);
  
- 	net = dev_net(ndev);
- 
--	sk = rxe_ns_pernet_sk4(net);
-+	sk = rxe_ns_pernet_take_sk4(net);
- 	if (sk)
--		rxe_sock_put(sk, rxe_ns_pernet_set_sk4, net);
-+		udp_tunnel_sock_release(sk->sk_socket);
- 
--	sk = rxe_ns_pernet_sk6(net);
-+	sk = rxe_ns_pernet_take_sk6(net);
- 	if (sk)
--		rxe_sock_put(sk, rxe_ns_pernet_set_sk6, net);
-+		udp_tunnel_sock_release(sk->sk_socket);
- 
- 	dev_put(ndev);
- }
-diff --git a/drivers/infiniband/sw/rxe/rxe_ns.c b/drivers/infiniband/sw/rxe/rxe_ns.c
-index 8b9d734229b24..d9d376e3c670f 100644
---- a/drivers/infiniband/sw/rxe/rxe_ns.c
-+++ b/drivers/infiniband/sw/rxe/rxe_ns.c
-@@ -91,6 +91,13 @@ void rxe_ns_pernet_set_sk4(struct net *net, struct sock *sk)
- 	synchronize_rcu();
- }
- 
-+struct sock *rxe_ns_pernet_take_sk4(struct net *net)
-+{
-+	struct rxe_ns_sock *ns_sk = net_generic(net, rxe_pernet_id);
++	if (skb->len < LLCP_HEADER_SIZE) {
++		pr_err("Malformed SNL PDU\n");
++		return;
++	}
 +
-+	return xchg((__force struct sock **)&ns_sk->rxe_sk4, NULL);
-+}
-+
- #if IS_ENABLED(CONFIG_IPV6)
- struct sock *rxe_ns_pernet_sk6(struct net *net)
- {
-@@ -111,6 +118,13 @@ void rxe_ns_pernet_set_sk6(struct net *net, struct sock *sk)
- 	rcu_assign_pointer(ns_sk->rxe_sk6, sk);
- 	synchronize_rcu();
- }
-+
-+struct sock *rxe_ns_pernet_take_sk6(struct net *net)
-+{
-+	struct rxe_ns_sock *ns_sk = net_generic(net, rxe_pernet_id);
-+
-+	return xchg((__force struct sock **)&ns_sk->rxe_sk6, NULL);
-+}
- #endif /* IPV6 */
+ 	dsap = nfc_llcp_dsap(skb);
+ 	ssap = nfc_llcp_ssap(skb);
  
- int rxe_namespace_init(void)
-diff --git a/drivers/infiniband/sw/rxe/rxe_ns.h b/drivers/infiniband/sw/rxe/rxe_ns.h
-index 4da2709e6b714..9d9a5106b77c8 100644
---- a/drivers/infiniband/sw/rxe/rxe_ns.h
-+++ b/drivers/infiniband/sw/rxe/rxe_ns.h
-@@ -5,10 +5,17 @@
+@@ -1300,16 +1305,23 @@ static void nfc_llcp_recv_snl(struct nfc_llcp_local *local,
+ 	sdres_tlvs_len = 0;
  
- struct sock *rxe_ns_pernet_sk4(struct net *net);
- void rxe_ns_pernet_set_sk4(struct net *net, struct sock *sk);
-+struct sock *rxe_ns_pernet_take_sk4(struct net *net);
+ 	while (offset < tlv_len) {
++		if (tlv_len - offset < 2)
++			break;
+ 		type = tlv[0];
+ 		length = tlv[1];
++		if (tlv_len - offset - 2 < length)
++			break;
  
- #if IS_ENABLED(CONFIG_IPV6)
- void rxe_ns_pernet_set_sk6(struct net *net, struct sock *sk);
- struct sock *rxe_ns_pernet_sk6(struct net *net);
-+struct sock *rxe_ns_pernet_take_sk6(struct net *net);
- #else /* IPv6 */
- static inline struct sock *rxe_ns_pernet_sk6(struct net *net)
- {
-@@ -18,6 +25,10 @@ static inline void rxe_ns_pernet_set_sk6(struct net *net, struct sock *sk)
- {
- }
+ 		switch (type) {
+ 		case LLCP_TLV_SDREQ:
++			if (length < 2)
++				break;
+ 			tid = tlv[2];
+ 			service_name = (char *) &tlv[3];
+ 			service_name_len = length - 1;
  
-+static inline struct sock *rxe_ns_pernet_take_sk6(struct net *net)
-+{
-+	return NULL;
-+}
- #endif /* IPv6 */
+-			pr_debug("Looking for %.16s\n", service_name);
++			pr_debug("Looking for %.*s\n",
++				 (int)service_name_len, service_name);
  
- int rxe_namespace_init(void);
+ 			if (service_name_len == strlen("urn:nfc:sn:sdp") &&
+ 			    !strncmp(service_name, "urn:nfc:sn:sdp",
+@@ -1369,6 +1381,8 @@ static void nfc_llcp_recv_snl(struct nfc_llcp_local *local,
+ 			break;
+ 
+ 		case LLCP_TLV_SDRES:
++			if (length < 2)
++				break;
+ 			mutex_lock(&local->sdreq_lock);
+ 
+ 			pr_debug("LLCP_TLV_SDRES: searching tid %d\n", tlv[2]);
+-- 
+2.51.0
+
 
