@@ -1,188 +1,219 @@
-Return-Path: <netdev+bounces-281040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281041-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ELATO42+62ngQwAAu9opvQ
-	(envelope-from <netdev+bounces-281040-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 21:03:41 +0200
+	id KJ9bHvq+62ngQwAAu9opvQ
+	(envelope-from <netdev+bounces-281041-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 21:05:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EC43462A52
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 21:03:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF71A462A60
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 21:05:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D45623007AF0
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 19:03:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7B72D30086CE
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 19:05:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AD53364023;
-	Fri, 24 Apr 2026 19:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CE9B3F164A;
+	Fri, 24 Apr 2026 19:05:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="heWT7L4n"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="tYeZBxP9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B7213F9F54
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 19:03:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02993E3172;
+	Fri, 24 Apr 2026 19:05:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777057418; cv=none; b=ptJ4erKzKrCGxgPI3xFuwanaljsrXJktRyZzKJy8t2bGzuRxFkmKv74SZrcnDKhz84Ob/IjoXyEGpBpmwFVDd/XPTWz0AxxeKH05YoGz3KDrFN6pw/F/GjR3RC6U7RXp8/8e2aToj0h7aKaqjXtmq+02rxfn9f0EBnSyuEqqdoM=
+	t=1777057527; cv=none; b=bJdp4fg5fDmBw3pKEkX9x2js387DuN3lh+I7F2Khb2pp9z5SH7H4ej2yMFG2POS/yXHJORAG34TNLupkbLP/7Auc8JIpPsGVQ+aJ3gycQMPX5lVgH4C9qsl63g1xqXBL6HuYXrLjUruqtXzusXK9qrxlKNjJl5IA4H9kvmgTp3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777057418; c=relaxed/simple;
-	bh=TbKzAKxcSUe8NnXwGkLYa8oxQYUI5of8nFXqsMfDQOo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oJS3HIbh7pG06arDhy5KGwIL2xY7pKeEWCCu/PzbLIv0bWkHjc1LzDufS0hwbm1iqBYR4gFwsm4VXiGdZ4Ik4egFXjch5nfBji2zg3eho3JDB5extP4MuAqIdJJ/2ReHPBXMScI7LqlHIsNOrsR9B3lNpIhYyuIbmCrNlQx6rMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=heWT7L4n; arc=none smtp.client-ip=74.125.82.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-2bdcf5970cdso6780324eec.0
-        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 12:03:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777057415; x=1777662215; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JKQY+wUxFz1qr4YidrTiuAid6P1a4VOteLmmLttjMCE=;
-        b=heWT7L4np98DsMm2AwEVnWGGx7x9Zcu/OF6N6cpVuwicgybUx1SyPKt+gGWKjDI9SF
-         ajSQxmjdD3Zt3rQQBC+w1PZLfkLEotDy7zpAijxI7o5/LzHF0Zk6Zn/ZbWJ32/nNE6GS
-         ZmnFCYEJoKcj1FD+/KT16SRr7cWgmLIFuOvYXRxkO9gbd1KBIS0N7Fccr5daiMx6x++8
-         Sw1hL1Iy3yJrURBD5PQzZTixHwB99F+TvS4xWtAaXi+QlykEdy9IQmuD7bSxaWrDvblk
-         7ulZBlRcp791JzdFepkJYy7IKqUVKanx76JleCzSb/n4P6hn/TEQxGNAPYh+/xr0HlWk
-         lrCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777057415; x=1777662215;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JKQY+wUxFz1qr4YidrTiuAid6P1a4VOteLmmLttjMCE=;
-        b=e8xGwMXBocHSxLZQIf8R7PUiTPdwiqqRGV0c5XXLIAJU3kLsnUzxlOzHZsHE+v4jBA
-         dw8v6P0YwGA4Vl8P0QON7Umd9ux6pGDQn1sVhVMaSBwSIJOsscUylzZRwqk0bTHSgYnp
-         djBLsEj1XcQ/PIbnMmGwqHNei1wCRlki6IM4mCAH9QZmiUVS/GTWxu/f42rON0fTciNI
-         wLDD/SNwSbKDytt4rOgrg+f7A+woPqqIHhYk/YTEq7+VIot3LOvZMuW5e4X8kZnUXg7c
-         acjp2o68cVr8LRv18DJ/r/IaeN3NV0OjfYwdiC/aOKgJN7AhVccOr2pRd/IBO0IT1N/6
-         hPCw==
-X-Forwarded-Encrypted: i=1; AFNElJ/fRwqDz+dDIUPjh/tP00i0S1RDI7I42FKtR9ljpdfoaa4xE3HXcr04pb3NwXa8B+U7lrU6Hq8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLvHOYqPAynFQFdwCuHeJaVrm5+tgoMdVluOpjCs6ryM5VeLYF
-	5IScJ1dT7DrJJXkSeEHF8KOjzyehP2bJs7C42nxIEc+Z/FZJsbnsgKf4
-X-Gm-Gg: AeBDieup48wHlTSYBs8XCF36KWPdmfPZrqZqQCJo39VhGj5Jii2LV7qw99uOANgzGjG
-	LQvGGnnf7UNt3PYKqBrkyDw5CIcQibskdRaeKbxP13kBmfiJflsT2QSMdDN7tnaWgDzX7VUC0Jg
-	+b7jceB3e7tpQWLvH8bijTy8/eGZSBm6XnDWcOLnA47vEr6fyJR71h3GYZpyIlN46MSQ0FJr8eF
-	f6O0YeDzkb0dHWMikt3oqH7POs7EO94HkI2tdfQ/nmLtKE3QtAYEcKgj98BCxATWd0yrR3Np/ip
-	MMuHbXTdKIrL0V62A1kTXHsYAZFswP0DoIFjhQI1nbsJRu9fG8THZg6YrsT/be8NjjtSJzmPwvn
-	dWf/FkVww7oM1JSBWFN9C/Fmehr7AwAaR12I0aq9pF8/kFy5s02PcJ1uGox2ihFmnuZnoHOixXS
-	NvDoETw939fRjsE37tYLFfKPNiPYjrX8ohu+Ux+j2U41lnYAxMWiYVtNWpTr3mUKNadXcM7HDLq
-	NkU56F0kGg4ag3sc5/c
-X-Received: by 2002:a05:7301:3d19:b0:2d1:9b35:4edb with SMTP id 5a478bee46e88-2e41a1e3fb6mr13143549eec.0.1777057415164;
-        Fri, 24 Apr 2026 12:03:35 -0700 (PDT)
-Received: from efaec68ba852.tailc0aff1.ts.net ([206.206.192.132])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2e53a4a7ff1sm33082081eec.9.2026.04.24.12.03.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Apr 2026 12:03:34 -0700 (PDT)
-From: Weiming Shi <bestswngs@gmail.com>
-To: Martin KaFai Lau <martin.lau@linux.dev>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	bpf@vger.kernel.org,
+	s=arc-20240116; t=1777057527; c=relaxed/simple;
+	bh=Ad5r06sCwO1/aatRHb6He45AvYPfO9m5ELuf+y2fzwc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Xf8SoBKRdMFutoBn0Qpivm+isij64GokQdj5HsB6OCF0+3dnTXZNHCa9bKlEX4STCFBhVNzPcwVqJ4FoayP4yCch8ekFdiccimr96HCcuB0ltNKuamEjLzpodVra0u4To7FooQEZhh0eYcb+a4JVorCNTVVR24a/Avs/8awTx3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=tYeZBxP9; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from localhost.localdomain (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id DA68760178;
+	Fri, 24 Apr 2026 21:05:21 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1777057522;
+	bh=/0/KtJBrhZnTGCQeHQRR7kXaLmPrAka7XZTGDprQ2YI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=tYeZBxP9Aez6teFhmWoiCcNHcTr/B2Bprt2ecU7x8MDUF8xdMNH8o6KNRjayUhOQa
+	 uEuJk2hSggijVLsDYykpDqod54n+KK1+eg78lJWOAI/vuC5j8LJpSU2/U0850VnC8l
+	 oh4qnlvfpEUOoU9JC/nmskufoIan0L9d+4CsUaOoJ+nKbvsgSOy8Xl9D6AbB9FEqWz
+	 W3Yr3qtEVNyqviyzT/0D2f7VQyDkVrous3hUccl8YIyeZPANcB1viqrpvN4zacA8a1
+	 28XTJZk3HSOKpA4+PNqzqkcnLsho7/2YFaKRoLVN/KNfwOSxQwTTIcQdV6ufigLnCy
+	 LQu6lawFFyqGQ==
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
 	netdev@vger.kernel.org,
-	Xiang Mei <xmei5@asu.edu>,
-	Weiming Shi <bestswngs@gmail.com>,
-	Xinyu Ma <mmmxny@gmail.com>
-Subject: [PATCH bpf] bpf, sockmap: zero-initialize pages allocated in bpf_msg_push_data
-Date: Fri, 24 Apr 2026 12:03:11 -0700
-Message-ID: <20260424190310.1520555-2-bestswngs@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de,
+	horms@kernel.org
+Subject: [PATCH net 00/11] Netfilter/IPVS fixes for net
+Date: Fri, 24 Apr 2026 21:05:02 +0200
+Message-ID: <20260424190513.32823-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4EC43462A52
-X-Rspamd-Action: add header
+X-Rspamd-Queue-Id: CF71A462A60
+X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [6.34 / 15.00];
-	SEM_URIBL(3.50)[asu.edu:email];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281040-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	TAGGED_FROM(0.00)[bounces-281041-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	R_DKIM_ALLOW(0.00)[gmail.com:s=20251104];
-	FREEMAIL_TO(0.00)[linux.dev,iogearbox.net,kernel.org,gmail.com,davemloft.net,google.com,redhat.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,fomichev.me,kernel.org,linux.dev,vger.kernel.org,asu.edu];
-	GREYLIST(0.00)[pass,meta];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
-	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_NA(0.00)[netfilter.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	NEURAL_SPAM(0.00)[0.668];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Spam: Yes
+	FORGED_SENDER_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+]
 
-bpf_msg_push_data() allocates pages via alloc_pages() without
-__GFP_ZERO. In the non-copy path, the entire page of uninitialized
-heap content is added directly to the sk_msg scatterlist, which is
-then transmitted over TCP to userspace via tcp_bpf_push(). In the
-copy path, a gap of len bytes between the front and back memcpy
-regions is similarly left uninitialized.
+Hi,
 
-This leads to a kernel heap information leak: stale page content
-including kernel pointers from the direct-map and vmemmap regions
-is transmitted to userspace, which can be used to defeat KASLR.
+The following patchset contains Netfilter/IPVS fixes for net:
 
-Add __GFP_ZERO to the alloc_pages() call to ensure the allocated
-page is always zeroed before it enters the scatterlist.
+1) IEEE1394 ARP payload contains no target hardware address in the
+   ARP packet. Apparently, arp_tables was never updated to deal with
+   IEEE1394 ARP properly. To deal with this, return no match in case
+   the target hardware address selector is used, either for inverse or
+   normal match. Moreover, arpt_mangle disallows mangling of the target
+   hardware and IP address because, it is not worth to adjust the
+   offset calculation to fix this, we suspect no users of arp_tables
+   for this family.
 
-Link: https://lore.kernel.org/all/20260424155913.A19FDC19425@smtp.kernel.org
-Fixes: 6fff607e2f14 ("bpf: sk_msg program helper bpf_msg_push_data")
-Tested-by: Xiang Mei <xmei5@asu.edu>
-Tested-by: Xinyu Ma <mmmxny@gmail.com>
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
----
- net/core/filter.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+2) Use list_del_rcu() to delete device hooks in nf_tables, this hook
+   list is RCU protected, concurrent netlink dump readers can be
+   walking on this list, fix it by adding a helper function and use it
+   for consistency. From Florian Westphal.
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index bc96c18df4e0..ea02239892fd 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -2820,7 +2820,7 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
- 	if (!space || (space == 1 && start != offset))
- 		copy = msg->sg.data[i].length;
- 
--	page = alloc_pages(__GFP_NOWARN | GFP_ATOMIC | __GFP_COMP,
-+	page = alloc_pages(__GFP_NOWARN | GFP_ATOMIC | __GFP_COMP | __GFP_ZERO,
- 			   get_order(copy + len));
- 	if (unlikely(!page))
- 		return -ENOMEM;
--- 
-2.43.0
+3) Add list_splice_rcu(), this is useful for joining the local list of
+   new device hooks to the RCU protected hook list in chain and
+   flowtable. Reviewed by Paul E. McKenney.
 
+4) Use list_splice_rcu() to publish the new device hooks in chain and
+   flowtable to fix concurrent netlink dump traversal.
+
+5) Add a new hook transaction object to track device hook deletions.
+   The current approach moves device hooks to be deleted around during
+   the preparation phase, this breaks concurrent RCU reader via netlink
+   dump. This new hook transaction is combined with NFT_HOOK_REMOVE
+   flag to annotate hooks for removal in the preparation phase.
+
+6) xt_policy inbound policy check in strict mode can lead to
+   out-of-bound access of the secpath array due to incorrect.
+   The iteration over the secpath needs to be reversed in the inbound
+   to check for the human readable policy, expecting inner in first
+   position and outer in second position, the secpath from inbound
+   actually stores outer in first position then in second position.
+   From Jiexun Wang.
+
+7) Fix possible zero shift in nft_bitwise triggering UBSAN splat,
+   reject zero shift from control plane, from Kai Ma.
+
+8) Replace simple_strtoul() in the conntrack SIP helper since it relies
+   on nul-terminated strings. From Florian Westphal.
+
+The IPVS fixes for recent net-next updates, from Julian Anastasov:
+
+9) Fix several issues in the new /proc/net/ip_vs_status interface:
+   prevent use-after-free by properly updating svc_table_changes
+   during service deletion/flushing; bound bucket traversal and add
+   loop detection to prevent infinite loops and overflows; use div_u64
+   for safer 32-bit math; and restrict file permissions to 0440 to
+   protect hash distribution info from non-root users.
+
+10) Fix a race condition between the sysctl interface and the teardown
+    of IPVS hash tables. Specifically, it prevents the system from
+    trying to schedulework on a table that has already been destroyed.
+
+11) Fix sleeping function called from invalid context bug. On RT
+    kernels, standard spinlocks can sleep, but "bit locks" (used by the
+    new hash table) do not. Holding a sleeping lock while a non-sleeping
+    bit lock is held is illegal.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-26-04-24
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit 711987ba281fd806322a7cd244e98e2a81903114:
+
+  netfilter: nfnetlink_osf: fix potential NULL dereference in ttl check (2026-04-20 23:45:44 +0200)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-26-04-24
+
+for you to fetch changes up to b51edb039b1dbcdc83e00c31cf5887bd75486dcc:
+
+  ipvs: fix the spin_lock usage for RT build (2026-04-24 20:09:57 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 26-04-24
+
+----------------------------------------------------------------
+Florian Westphal (2):
+      netfilter: nf_tables: use list_del_rcu for netlink hooks
+      netfilter: nf_conntrack_sip: don't use simple_strtoul
+
+Jiexun Wang (1):
+      netfilter: xt_policy: fix strict mode inbound policy matching
+
+Julian Anastasov (3):
+      ipvs: fixes for the new ip_vs_status info
+      ipvs: fix races around the conn_lfactor and svc_lfactor sysctl vars
+      ipvs: fix the spin_lock usage for RT build
+
+Kai Ma (1):
+      netfilter: reject zero shift in nft_bitwise
+
+Pablo Neira Ayuso (4):
+      netfilter: arp_tables: fix IEEE1394 ARP payload parsing
+      rculist: add list_splice_rcu() for private lists
+      netfilter: nf_tables: join hook list via splice_list_rcu() in commit phase
+      netfilter: nf_tables: add hook transactions for device deletions
+
+ include/linux/rculist.h           |  29 ++++
+ include/net/netfilter/nf_tables.h |  13 ++
+ net/ipv4/netfilter/arp_tables.c   |  18 ++-
+ net/ipv4/netfilter/arpt_mangle.c  |   8 +
+ net/netfilter/ipvs/ip_vs_conn.c   |  71 ++++-----
+ net/netfilter/ipvs/ip_vs_ctl.c    |  63 +++++---
+ net/netfilter/nf_conntrack_sip.c  | 152 +++++++++++++-----
+ net/netfilter/nf_nat_sip.c        |   1 +
+ net/netfilter/nf_tables_api.c     | 314 +++++++++++++++++++++++++++-----------
+ net/netfilter/nft_bitwise.c       |   3 +-
+ net/netfilter/xt_policy.c         |   2 +-
+ 11 files changed, 494 insertions(+), 180 deletions(-)
 
