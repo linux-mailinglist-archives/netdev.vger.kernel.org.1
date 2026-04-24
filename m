@@ -1,56 +1,53 @@
-Return-Path: <netdev+bounces-280978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280979-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AAr9G0VJ62mWKgAAu9opvQ
-	(envelope-from <netdev+bounces-280978-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:43:17 +0200
+	id OFt3BHBJ62mWKgAAu9opvQ
+	(envelope-from <netdev+bounces-280979-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:44:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C214845D488
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:43:16 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0A7945D4D3
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:43:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D09D6301F4A1
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:42:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AFEC0302A7CF
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 10:42:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A55338D019;
-	Fri, 24 Apr 2026 10:42:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D06BA38BF81;
+	Fri, 24 Apr 2026 10:42:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uvDVvc/A"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TJ2F6pv8"
 X-Original-To: netdev@vger.kernel.org
 Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1A4838B7D9
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 10:42:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0131D5AD4
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 10:42:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777027354; cv=none; b=N2QMUxLI6WqYx2brIOn/tktfZiGjCiVj8tIoJGp/mOO7KcO5J3RL+gUiue6tOXQZPHgGbeVvKsllAg9Nh4+zwoqasqRevhig+KMY11zja0iC2WdJE62BCVpGisUPgocv/K5ZtKTKswA1HW4fyrXOlhZj8Tjta4ERBE2MXIehbz0=
+	t=1777027364; cv=none; b=RU8CUOIDt2eNn4uUDtqkMkCxGBSTpnOiDqxM4wRfjhVDuH+7oFIQLNIOauoI8WprCHeVvutme9C7EvOG8EzRvR0KQBRj458nZefpC/JysVqu7AmD1s4DIJJ1gw935e+9XJ8qqbRH2h9U5rvPE6IKK3vb3qW75f31egyVtaah6ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777027354; c=relaxed/simple;
-	bh=KYN5vQK9o4itUNm01aqvLz11z6UGNL1p5CAu4M7+vn0=;
+	s=arc-20240116; t=1777027364; c=relaxed/simple;
+	bh=wpabQn1ol/qItAAjOBPAvpNVjKrZhE/WdQTRvEr4a78=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BCHAwE00QztJeJ87AuRxnU6T0wfbahxOxqfsHtjO9bAnrUjubWgo2sX0YYgn5cPHSimQCym8MGguzxMAzCVjNhyUc6q0fOaRBCij1Wu1BywnJwsfsgAg+RqqLu5bwJlnCUCbGtJILLNBAhcCOj3CRUU331TbYjmAyfJJ/29BXJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uvDVvc/A; arc=none smtp.client-ip=91.218.175.174
+	 MIME-Version; b=MAcNzK7/K2dBQhzs0O73WFL4FoddnlD86+upPip8Mjr/u+y0hJYcDwDvYwVJNNO/VpIJ89ZRwHoksuUdUrIwA0vodfGcKqPIJQhcs683C6oUIJz55sA3dEQjP3Xw1wxRDcalLgO5lP3o493XLskX1yQwSuntYchLf3atj7F2n5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TJ2F6pv8; arc=none smtp.client-ip=91.218.175.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1777027349;
+	t=1777027361;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/a9gKZ5swoURq09zQknYGoxq1uz7/i9spgkhwJ2l2tQ=;
-	b=uvDVvc/A3ArsBiQ6LZAuJ35hbQrJfEwtrbrZr8Q94B3hiLudKd1nEAVKVtfF8TGMq+wZVM
-	+Ucx0nJ3s7Q8x/Gs38jO8ngmmiSsq81avcxF0phDu/uGKElmmE/0a+NW4kLQynFcneu4hk
-	9a8LI6WRj3YmFJc4I3YvEPQ3jKcEsDs=
+	bh=Jk7ozpk8BJdqj1K1xG4zup/ZZJh6Q5ZPNMKI0G/5YVU=;
+	b=TJ2F6pv8tfnL3d8biVvAVVopk33/6mK7bR+gtjdDvF0cBiNmG9u+ahJPTZn934Ig7jbqWE
+	An/JgFz9B4Mq6XI99mwkUdJs2KxvH9f17sMaz2lni0DvKZxZDnnyJoMq0gzvlePjsmVim1
+	TdVkc0i7rlyroI+gnDdGNGddffpa/TY=
 From: Jiayuan Chen <jiayuan.chen@linux.dev>
 To: bpf@vger.kernel.org
 Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Yinhao Hu <dddddd@hust.edu.cn>,
-	Kaiyan Mei <M202472210@hust.edu.cn>,
-	Dongliang Mu <dzm91@hust.edu.cn>,
 	Daniel Borkmann <daniel@iogearbox.net>,
 	Nikolay Aleksandrov <razor@blackwall.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -78,9 +75,9 @@ Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
 	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH bpf v2 1/3] bpf, tcx: reject offloaded programs on attach
-Date: Fri, 24 Apr 2026 18:41:40 +0800
-Message-ID: <20260424104201.217604-2-jiayuan.chen@linux.dev>
+Subject: [PATCH bpf v2 2/3] bpf, netkit: reject offloaded programs on attach
+Date: Fri, 24 Apr 2026 18:41:41 +0800
+Message-ID: <20260424104201.217604-3-jiayuan.chen@linux.dev>
 In-Reply-To: <20260424104201.217604-1-jiayuan.chen@linux.dev>
 References: <20260424104201.217604-1-jiayuan.chen@linux.dev>
 Precedence: bulk
@@ -91,7 +88,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: C214845D488
+X-Rspamd-Queue-Id: C0A7945D4D3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
@@ -101,14 +98,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux.dev,hust.edu.cn,iogearbox.net,blackwall.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,fomichev.me,vger.kernel.org];
+	FREEMAIL_CC(0.00)[linux.dev,iogearbox.net,blackwall.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,fomichev.me,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[32];
-	TAGGED_FROM(0.00)[bounces-280978-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	TAGGED_FROM(0.00)[bounces-280979-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -119,43 +116,31 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,linux.dev:mid,hust.edu.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:email,linux.dev:dkim,linux.dev:mid]
 
-An offloaded prog's bpf_func is replaced by bpf_prog_warn_on_exec(),
-since it's supposed to run on the NIC, not the host. But tcx doesn't
-check this and happily attaches it to the software path, so the first
-packet hits the WARN.
+Same issue as the tcx fix: netkit accepts SCHED_CLS programs but never
+checks if they were loaded for hardware offload. If someone loads a
+program with prog_ifindex pointing to an offload-capable device and then
+attaches it to a netkit peer, the bpf_func is bpf_prog_warn_on_exec()
+and the first packet triggers the WARN.
 
-XDP already guards this in dev_xdp_attach(); tcx just never got the
-same check. Add it to tcx_prog_attach(), tcx_link_attach() and also
-tcx_link_update() so the fix cannot be bypassed by loading a normal
-program and then swapping it out via BPF_LINK_UPDATE.
+Reject offloaded programs in netkit_prog_attach(), netkit_link_attach()
+and netkit_link_update().
 
-Use bpf_prog_is_offloaded() rather than bpf_prog_is_dev_bound() +
-bpf_offload_dev_match() (as XDP does): bpf_prog_dev_bound_init()
-already rejects BPF_F_XDP_DEV_BOUND_ONLY for BPF_PROG_TYPE_SCHED_CLS,
-so a dev-bound SCHED_CLS program is always offloaded. The simpler
-check is sufficient and also rejects attaching a program offloaded to
-device A onto device B.
-
-Fixes: e420bed025071 ("bpf: Add fd-based tcx multi-prog infra with link support")
-Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
-Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
-Reported-by: Dongliang Mu <dzm91@hust.edu.cn>
-Closes: https://lore.kernel.org/bpf/64d8e2b5-a214-4f3c-b9e8-bcedbcb2c602@hust.edu.cn/
+Fixes: 35dfaad7188cd ("netkit, bpf: Add bpf programmable net device")
 Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 ---
- kernel/bpf/tcx.c | 9 +++++++++
+ drivers/net/netkit.c | 9 +++++++++
  1 file changed, 9 insertions(+)
 
-diff --git a/kernel/bpf/tcx.c b/kernel/bpf/tcx.c
-index 02db0113b8e7c..1144627483d53 100644
---- a/kernel/bpf/tcx.c
-+++ b/kernel/bpf/tcx.c
-@@ -16,6 +16,9 @@ int tcx_prog_attach(const union bpf_attr *attr, struct bpf_prog *prog)
+diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
+index 5c0e01396e064..dae4d7b24d80e 100644
+--- a/drivers/net/netkit.c
++++ b/drivers/net/netkit.c
+@@ -533,6 +533,9 @@ int netkit_prog_attach(const union bpf_attr *attr, struct bpf_prog *prog)
  	struct net_device *dev;
  	int ret;
  
@@ -163,9 +148,9 @@ index 02db0113b8e7c..1144627483d53 100644
 +		return -EINVAL;
 +
  	rtnl_lock();
- 	dev = __dev_get_by_index(net, attr->target_ifindex);
- 	if (!dev) {
-@@ -209,6 +212,9 @@ static int tcx_link_update(struct bpf_link *link, struct bpf_prog *nprog,
+ 	dev = netkit_dev_fetch(current->nsproxy->net_ns, attr->target_ifindex,
+ 			       attr->attach_type);
+@@ -683,6 +686,9 @@ static int netkit_link_update(struct bpf_link *link, struct bpf_prog *nprog,
  	struct net_device *dev;
  	int ret = 0;
  
@@ -173,18 +158,18 @@ index 02db0113b8e7c..1144627483d53 100644
 +		return -EINVAL;
 +
  	rtnl_lock();
- 	dev = tcx->dev;
+ 	dev = nkl->dev;
  	if (!dev) {
-@@ -315,6 +321,9 @@ int tcx_link_attach(const union bpf_attr *attr, struct bpf_prog *prog)
- 	struct tcx_link *tcx;
+@@ -788,6 +794,9 @@ int netkit_link_attach(const union bpf_attr *attr, struct bpf_prog *prog)
+ 	struct net_device *dev;
  	int ret;
  
 +	if (bpf_prog_is_offloaded(prog->aux))
 +		return -EINVAL;
 +
  	rtnl_lock();
- 	dev = __dev_get_by_index(net, attr->link_create.target_ifindex);
- 	if (!dev) {
+ 	dev = netkit_dev_fetch(current->nsproxy->net_ns,
+ 			       attr->link_create.target_ifindex,
 -- 
 2.43.0
 
