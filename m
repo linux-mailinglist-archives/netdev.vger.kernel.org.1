@@ -1,225 +1,286 @@
-Return-Path: <netdev+bounces-281029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281030-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MAPFDJGw62mRQQAAu9opvQ
-	(envelope-from <netdev+bounces-281029-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:04:01 +0200
+	id uFhhBmOx62mRQQAAu9opvQ
+	(envelope-from <netdev+bounces-281030-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:07:31 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 956334623BF
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:04:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C6901462450
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:07:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 542063014C07
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:03:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 842443011C51
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:07:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB72D345CB0;
-	Fri, 24 Apr 2026 18:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA773ED5DB;
+	Fri, 24 Apr 2026 18:07:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="Q8PxS9h4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Sa+iDPnT"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.ms.icloud.com (p-west3-cluster6-host7-snip4-1.eps.apple.com [57.103.75.44])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76CC51B6D1A
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 18:03:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.75.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 560FF3ED128;
+	Fri, 24 Apr 2026 18:07:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777053786; cv=none; b=rVnNFnyKLVuxLlmkNJF3G7Fqjp1yYEzOWCK9kfNqanpMzT8RsDwKTmXG07ossIBt3oeuBBP/xgRd2SkWgfJgChptbMpYCVFryiZIC6OzTXqIHLOedFDTqqoklNFnk2PUcorpaqszrBKu4fs+o81GTtLZQqwYWysfROaS5dS9ESk=
+	t=1777054041; cv=none; b=rU4tryWPP3lYWhNLf6VeOyOovtK6vOZ5onmmrOaiVrD1BZVwEqeJBrXYS8bqSbzd4cy+xRptu54elWG8qpUtcUoSUz9BiQvvzyJeC5ou1swtC96Dz3CDMsZe14NWAknNQovIH6OCxUhOFaozC3NNgn0ZJOyNVo25PJRV1tWeYu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777053786; c=relaxed/simple;
-	bh=wk6jxo0ixtins3iKYFIbBO+IaQ3FUKR0X6l4zbnfgQ4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=S0hmd0ExCOMMMcbR7t0eaAyfOXnOHjfiZ9NM99w8bBFmVW+Od8hth6AMqjZM4N2wxDw2f5bXfEWYBUu2iPbEDS8A5EA+YnbFtKcIou3iI1b4ttmLWZ9oqruOfU0+qWAKLQcLXfq+73bVKY3ZRzE9ZSPMyk2n7l429djyEjGK4mU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=Q8PxS9h4; arc=none smtp.client-ip=57.103.75.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-Received: from outbound.ms.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-west-3a-100-percent-10 (Postfix) with ESMTPS id EE81D1800E80;
-	Fri, 24 Apr 2026 18:03:02 +0000 (UTC)
-X-ICL-Out-Info: HUtFAUMEWwJACUgBTUQeDx5WFlZNRAJCTQ1OHVQORQNFF0sCTVIPDwNXF0QaWwpZFXkRUAFYHlZeWhdeTVEPDwNXF0QaWwpZFXkRUAFYHlZeWhdeTUUID0EJWFsIWwQPH0wMUQJCBVZeVAsdBFQHXQVdVlACWktCBEtFaFwFXBxAF0gdX2pLVhQEEVABWB5WXloXXk1aAlZNBUoDXwFbBkINSQtdBl4DXgpAA1UCXgVdClVAA1gcRRxYE1YtXgheH0wcHQ5YBgxQTQFDCAoCURxWDVc=
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com; s=1a1hai; t=1777053785; x=1779645785; bh=8cTGoIG5Y+5O2PKMucfn2HjFrCCY/5lL7OPhN39fMkc=; h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=Q8PxS9h43H3UTAE2DV7gPekkDtAECmCADT7LofolmCUSJDOF1PTKoADbf/buJhfQGXev77WwST48cJPtzx+GYcxPoAtu+MR1Gs9bUykKlE46CDZQRP4uvAsbfeT7L4OcS+X8Fm9eB5op/Q/dRky2Gr8GRp/gsYA18f1+2D1Ry3EbOkOD++Cr4VvR4Qhm2ulHs5ybS7PKTq8sQToKMXRc0csvK5a2LTu0NgDB3n4QkOjadOntK/16gRjeNC6XoC/FENR9G/F4g2/efn4gbDdsgLMnR/9DyonQKYlbWdp6M9WsIOgt/agtnzFft0/juZGlUd+T4r+jeNb0Jk7zO5uXwg==
-Received: from mainframe.tailfb0f7b.ts.net (unknown [17.57.154.37])
-	by p00-icloudmta-asmtp-us-west-3a-100-percent-10 (Postfix) with ESMTPSA id 5B4A71800E90;
-	Fri, 24 Apr 2026 18:02:59 +0000 (UTC)
-From: =?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <snowwlake@icloud.com>
+	s=arc-20240116; t=1777054041; c=relaxed/simple;
+	bh=Uwb+zIgMoJhu4VicNyQxcRWEEOfzcAwZNp6AJGN+IwE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ALW1MWMKxI+9MDE9UAJ49Z4RS/wo5axh8MTPkqaxwvFZh8N6roIBDFxYdcjustCPKJHiYLHWifE8owIhMBfTmKv+e5SylUCMoR3hDc1+/iqBYJgosJiCDTKjjshcp9OJRXz/luxluEQohHz84lDzIp8IQFcKbBYGEecsZZRjHTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Sa+iDPnT; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777054040; x=1808590040;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Uwb+zIgMoJhu4VicNyQxcRWEEOfzcAwZNp6AJGN+IwE=;
+  b=Sa+iDPnTu49BaKlgbkj9eJ+dInzI8CaPbgMsVyvy0oBs4JO3X12rl6B0
+   +FNHd/YCrbCVpAV9UyXeefEwp0sVoj08D9SwVLHHkjc/OStVXawud2Sjq
+   VxxyueWmXW7156EEjIOMQJ5AlvvNuYdXGwxHHlmARULI+ysc7G+3aIyZH
+   YqHJSzqU31eUWYAU765IKagLlSgAkXleleZlvWi16KXjf3dCT9yt/VSZc
+   GMdInup8tNWtP2E9h/h+yg7Oao23Hoyieg8b5G1836TnZAUpfBd2w/4N1
+   mFYVO4POv4wLco6UyN/zBEJnAOfB0ruXiGqQojV7wkzXDRbtjTzsYG1GE
+   A==;
+X-CSE-ConnectionGUID: 5LQO5MpoRliMbWjb8T/GWA==
+X-CSE-MsgGUID: 4BCGh9+yRhO1e+0lcCV3rQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11766"; a="100693265"
+X-IronPort-AV: E=Sophos;i="6.23,197,1770624000"; 
+   d="scan'208";a="100693265"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2026 11:07:19 -0700
+X-CSE-ConnectionGUID: MXBCtw1pT9S+dRCNA+vhiA==
+X-CSE-MsgGUID: /bxsZXZIRK6ESMr9tTn3jw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,197,1770624000"; 
+   d="scan'208";a="256524742"
+Received: from arjan-box.jf.intel.com ([10.88.27.153])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2026 11:07:18 -0700
+From: Arjan van de Ven <arjan@linux.intel.com>
 To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
+Cc: syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com,
+	dsahern@kernel.org,
 	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	krzk@kernel.org,
-	horms@kernel.org,
+	akpm@linux-foundation.org,
 	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	=?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <snowwlake@icloud.com>
-Subject: [PATCH net v4 2/5] nfc: llcp: fix TLV parsing in parse_gb_tlv and parse_connection_tlv
-Date: Fri, 24 Apr 2026 20:01:48 +0200
-Message-ID: <20260424180151.3808557-3-snowwlake@icloud.com>
-X-Mailer: git-send-email 2.51.0
+	syzkaller-bugs@googlegroups.com,
+	Arjan van de Ven <arjan@linux.intel.com>,
+	linux-rdma@vger.kernel.org,
+	Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>
+Subject: Re: [syzbot] [net?] general protection fault in kernel_sock_shutdown (4)
+Date: Fri, 24 Apr 2026 11:08:21 -0700
+Message-ID: <20260424180835.357916-1-arjan@linux.intel.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <69ea344f.a00a0220.17a17.0040.GAE@google.com>
+References: <69ea344f.a00a0220.17a17.0040.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Authority-Info-Out: v=2.4 cv=H4TWAuYi c=1 sm=1 tr=0 ts=69ebb057
- cx=c_apl:c_pps:t_out a=qkKslKyYc0ctBTeLUVfTFg==:117 a=IkcTkHD0fZMA:10
- a=A5OVakUREuEA:10 a=M51BFTxLslgA:10 a=x7bEGLp0ZPQA:10 a=LbuW6tbUWPcA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=v3ZZPjhaAAAA:8
- a=xt1Mke5GkH6e2Q2BLK4A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI0MDE3NiBTYWx0ZWRfX+oOZNkFYjhoz
- 5k+PqNV2QRJK9YbrsuN+WSzRvkv5TVSJvw0w+wW52nsb4voKzIQkijNi7Ey0MppNTMn9cosy+aK
- vsI+ePxBfvoJqkJj381dGcvurzhHp8fc/Wx2BVa2MG/5hKZaACUuHa5BML4/aEVo89vWDW/UdJL
- kXD9yOK6+Q7+GYSiaAR8PvOSWyo8EpVAJzx0q2sJfR+pReH90Z78aiFOnLuEojScD+HddPUTmhW
- ZE5y6VEKrIpg72XKqNX53D2TnHk8di+wrmLgvkBunGdmFFWeBbDOfI33d4qoUC8ELJHL27pKHt9
- vY/h0lxYdAsrlxGgjJPxhgwzgtY3S5fC8qCEDal21qoLO0avkFULKHIV2/FPgI=
-X-Proofpoint-GUID: W8ViIE_GHFq-ET-fGKftx6Run2wTPLgG
-X-Proofpoint-ORIG-GUID: W8ViIE_GHFq-ET-fGKftx6Run2wTPLgG
-X-Rspamd-Queue-Id: 956334623BF
+X-Rspamd-Queue-Id: C6901462450
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.57 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MIXED_CHARSET(0.59)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[icloud.com,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[icloud.com:s=1a1hai];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[syzkaller.appspotmail.com,kernel.org,google.com,linux-foundation.org,vger.kernel.org,googlegroups.com,linux.intel.com,gmail.com,ziepe.ca];
+	TAGGED_FROM(0.00)[bounces-281030-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[icloud.com:+];
-	TAGGED_FROM(0.00)[bounces-281029-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,icloud.com];
+	URIBL_MULTI_FAIL(0.00)[sea.lore.kernel.org:server fail,intel.com:server fail,fenrus.org:server fail,ziepe.ca:server fail,linux.intel.com:server fail];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[arjan@linux.intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[snowwlake@icloud.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,d8f76778263ab65c2b21];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[icloud.com]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	SUBJECT_HAS_QUESTION(0.00)[]
 
-nfc_llcp_parse_gb_tlv() and nfc_llcp_parse_connection_tlv() walk TLV
-arrays whose length and content come from a peer-supplied frame.  The
-parsing loop has three weaknesses:
 
- 1. `offset` is declared u8 while `tlv_array_len` is u16.  In
-    parse_connection_tlv() the TLV array can reach ~2173 bytes (MIUX
-    up to 0x7FF), so 128 zero-length TLVs wrap `offset` back to 0 and
-    the loop never terminates while `tlv` advances past the buffer.
+Unfortunately the AI had a burp and did not write out the proper URL
+for analysis data; it should have been
 
- 2. The guard `offset < tlv_array_len` only proves one byte is
-    available, but the body reads tlv[0] (type) and tlv[1] (length).
-    When one byte remains, tlv[1] is out of bounds.
+http://oops.fenrus.org/reports/lkml/69ea344f.a00a0220.17a17.0040.GAE_google.com/report.html
 
- 3. `length` is read from peer data and used to advance `tlv` without
-    being checked against the remaining array space.  A crafted length
-    walks `tlv` past the buffer; the next iteration reads tlv[0]/tlv[1]
-    from adjacent memory.
+and in addition, it made a candidate patch (below)
 
-The llcp_tlv8() and llcp_tlv16() accessors additionally read tlv[2]
-and tlv[2..3]; a zero-length TLV makes those reads out of bounds.
 
-Fix: promote `offset` to u16; add two per-iteration guards, one for
-the TLV header and one for the TLV value; require length >= 1 for all
-TLVs before the type dispatch and length >= 2 for the llcp_tlv16()
-accessors (MIUX, WKS).  Return -EINVAL on malformed input.
 
-Reported-by: Simon Horman <horms@kernel.org>
-Closes: https://lore.kernel.org/netdev/20260417160438.GH31784@horms.kernel.org/
-Fixes: d646960f7986 ("NFC: Initial LLCP support")
-Cc: stable@vger.kernel.org
-Signed-off-by: Lekë Hapçiu <snowwlake@icloud.com>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+From: Arjan van de Ven <arjan@linux.intel.com>
+Subject: [PATCH] RDMA/rxe: fix double-release race on UDP tunnel socket teardown
+
+This patch is based on a BUG as reported at
+https://lore.kernel.org/r/69ea344f.a00a0220.17a17.0040.GAE@google.com.
+
+The Soft RoCE (RXE) driver stores per-network-namespace UDP tunnel
+sockets for IPv4 and IPv6 encapsulation. Two independent code paths
+tear these sockets down: rxe_ns_exit(), called when a network
+namespace is destroyed, and rxe_net_del(), called when an RDMA link
+is deleted via netlink. Both paths read the per-namespace socket
+pointer and call udp_tunnel_sock_release() on it.
+
+A time-of-check/time-of-use (TOCTOU) race exists in rxe_net_del().
+It reads the socket pointer via rxe_ns_pernet_sk4(), then passes it
+to rxe_sock_put() for release. If rxe_ns_exit() runs concurrently
+between the read and the release, it clears the pointer and calls
+udp_tunnel_sock_release() first, causing sock_release() to set
+sock->ops = NULL. When rxe_net_del() then calls
+udp_tunnel_sock_release() on the same socket, kernel_sock_shutdown()
+dereferences the now-NULL sock->ops, triggering a KASAN null-ptr-deref
+at offset 0x68 (the shutdown function pointer in struct proto_ops).
+
+A minimal alternative would guard against NULL sock->ops inside
+udp_tunnel_sock_release() before calling kernel_sock_shutdown(). That
+treats the symptom rather than the root cause and leaves the
+double-release of socket state intact.
+
+Add rxe_ns_pernet_take_sk4() and rxe_ns_pernet_take_sk6() which use
+xchg() to atomically swap the per-namespace socket pointer to NULL
+and return the old value. Replace the non-atomic reads in
+rxe_net_del() with these take variants, and release the socket
+directly via udp_tunnel_sock_release() without going through
+rxe_sock_put().
+
+Whichever teardown path executes take first claims ownership of the
+socket; the second caller gets NULL and skips the release, closing
+the double-release window.
+
+Link: https://lore.kernel.org/r/69ea344f.a00a0220.17a17.0040.GAE@google.com
+Oops-Analysis: http://oops.fenrus.org/reports/lkml/69ea344f.a00a0220.17a17.0040.GAE_google.com/report.html
+Fixes: 13f2a53c2a71 ("RDMA/rxe: Add net namespace support for IPv4/IPv6 sockets")
+Fixes: f1327abd6abe ("RDMA/rxe: Support RDMA link creation and destruction per net namespace")
+Assisted-by: GitHub Copilot patcher:claude linux-kernel-oops-x86.
+Signed-off-by: Arjan van de Ven <arjan@linux.intel.com>
+Cc: linux-rdma@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: Zhu Yanjun <zyjzyj2000@gmail.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Leon Romanovsky <leon@kernel.org>
+
 ---
- net/nfc/llcp_commands.c | 24 ++++++++++++++++++++++--
- 1 file changed, 22 insertions(+), 2 deletions(-)
+ drivers/infiniband/sw/rxe/rxe_net.c |    8 ++++----
+ drivers/infiniband/sw/rxe/rxe_ns.c  |   14 ++++++++++++++
+ drivers/infiniband/sw/rxe/rxe_ns.h  |    7 +++++++
+ 3 files changed, 25 insertions(+), 4 deletions(-)
 
-diff --git a/net/nfc/llcp_commands.c b/net/nfc/llcp_commands.c
-index 291f26facbf3..b6dcfb2d175c 100644
---- a/net/nfc/llcp_commands.c
-+++ b/net/nfc/llcp_commands.c
-@@ -193,7 +193,8 @@ int nfc_llcp_parse_gb_tlv(struct nfc_llcp_local *local,
- 			  const u8 *tlv_array, u16 tlv_array_len)
+diff --git a/drivers/infiniband/sw/rxe/rxe_net.c b/drivers/infiniband/sw/rxe/rxe_net.c
+index 50a2cb5405e22..4f604636cb7b4 100644
+--- a/drivers/infiniband/sw/rxe/rxe_net.c
++++ b/drivers/infiniband/sw/rxe/rxe_net.c
+@@ -655,13 +655,13 @@ void rxe_net_del(struct ib_device *dev)
+ 
+ 	net = dev_net(ndev);
+ 
+-	sk = rxe_ns_pernet_sk4(net);
++	sk = rxe_ns_pernet_take_sk4(net);
+ 	if (sk)
+-		rxe_sock_put(sk, rxe_ns_pernet_set_sk4, net);
++		udp_tunnel_sock_release(sk->sk_socket);
+ 
+-	sk = rxe_ns_pernet_sk6(net);
++	sk = rxe_ns_pernet_take_sk6(net);
+ 	if (sk)
+-		rxe_sock_put(sk, rxe_ns_pernet_set_sk6, net);
++		udp_tunnel_sock_release(sk->sk_socket);
+ 
+ 	dev_put(ndev);
+ }
+diff --git a/drivers/infiniband/sw/rxe/rxe_ns.c b/drivers/infiniband/sw/rxe/rxe_ns.c
+index 8b9d734229b24..d9d376e3c670f 100644
+--- a/drivers/infiniband/sw/rxe/rxe_ns.c
++++ b/drivers/infiniband/sw/rxe/rxe_ns.c
+@@ -91,6 +91,13 @@ void rxe_ns_pernet_set_sk4(struct net *net, struct sock *sk)
+ 	synchronize_rcu();
+ }
+ 
++struct sock *rxe_ns_pernet_take_sk4(struct net *net)
++{
++	struct rxe_ns_sock *ns_sk = net_generic(net, rxe_pernet_id);
++
++	return xchg((__force struct sock **)&ns_sk->rxe_sk4, NULL);
++}
++
+ #if IS_ENABLED(CONFIG_IPV6)
+ struct sock *rxe_ns_pernet_sk6(struct net *net)
  {
- 	const u8 *tlv = tlv_array;
--	u8 type, length, offset = 0;
-+	u8 type, length;
-+	u16 offset = 0;
+@@ -111,6 +118,13 @@ void rxe_ns_pernet_set_sk6(struct net *net, struct sock *sk)
+ 	rcu_assign_pointer(ns_sk->rxe_sk6, sk);
+ 	synchronize_rcu();
+ }
++
++struct sock *rxe_ns_pernet_take_sk6(struct net *net)
++{
++	struct rxe_ns_sock *ns_sk = net_generic(net, rxe_pernet_id);
++
++	return xchg((__force struct sock **)&ns_sk->rxe_sk6, NULL);
++}
+ #endif /* IPV6 */
  
- 	pr_debug("TLV array length %d\n", tlv_array_len);
+ int rxe_namespace_init(void)
+diff --git a/drivers/infiniband/sw/rxe/rxe_ns.h b/drivers/infiniband/sw/rxe/rxe_ns.h
+index 4da2709e6b714..9d9a5106b77c8 100644
+--- a/drivers/infiniband/sw/rxe/rxe_ns.h
++++ b/drivers/infiniband/sw/rxe/rxe_ns.h
+@@ -5,10 +5,17 @@
  
-@@ -201,8 +202,14 @@ int nfc_llcp_parse_gb_tlv(struct nfc_llcp_local *local,
- 		return -ENODEV;
+ struct sock *rxe_ns_pernet_sk4(struct net *net);
+ void rxe_ns_pernet_set_sk4(struct net *net, struct sock *sk);
++struct sock *rxe_ns_pernet_take_sk4(struct net *net);
  
- 	while (offset < tlv_array_len) {
-+		if (tlv_array_len - offset < 2)
-+			return -EINVAL;
- 		type = tlv[0];
- 		length = tlv[1];
-+		if (tlv_array_len - offset - 2 < length)
-+			return -EINVAL;
-+		if (length < 1)
-+			return -EINVAL;
- 
- 		pr_debug("type 0x%x length %d\n", type, length);
- 
-@@ -211,9 +218,13 @@ int nfc_llcp_parse_gb_tlv(struct nfc_llcp_local *local,
- 			local->remote_version = llcp_tlv_version(tlv);
- 			break;
- 		case LLCP_TLV_MIUX:
-+			if (length < 2)
-+				return -EINVAL;
- 			local->remote_miu = llcp_tlv_miux(tlv) + 128;
- 			break;
- 		case LLCP_TLV_WKS:
-+			if (length < 2)
-+				return -EINVAL;
- 			local->remote_wks = llcp_tlv_wks(tlv);
- 			break;
- 		case LLCP_TLV_LTO:
-@@ -243,7 +254,8 @@ int nfc_llcp_parse_connection_tlv(struct nfc_llcp_sock *sock,
- 				  const u8 *tlv_array, u16 tlv_array_len)
+ #if IS_ENABLED(CONFIG_IPV6)
+ void rxe_ns_pernet_set_sk6(struct net *net, struct sock *sk);
+ struct sock *rxe_ns_pernet_sk6(struct net *net);
++struct sock *rxe_ns_pernet_take_sk6(struct net *net);
+ #else /* IPv6 */
+ static inline struct sock *rxe_ns_pernet_sk6(struct net *net)
  {
- 	const u8 *tlv = tlv_array;
--	u8 type, length, offset = 0;
-+	u8 type, length;
-+	u16 offset = 0;
+@@ -18,6 +25,10 @@ static inline void rxe_ns_pernet_set_sk6(struct net *net, struct sock *sk)
+ {
+ }
  
- 	pr_debug("TLV array length %d\n", tlv_array_len);
++static inline struct sock *rxe_ns_pernet_take_sk6(struct net *net)
++{
++	return NULL;
++}
+ #endif /* IPv6 */
  
-@@ -251,13 +263,21 @@ int nfc_llcp_parse_connection_tlv(struct nfc_llcp_sock *sock,
- 		return -ENOTCONN;
- 
- 	while (offset < tlv_array_len) {
-+		if (tlv_array_len - offset < 2)
-+			return -EINVAL;
- 		type = tlv[0];
- 		length = tlv[1];
-+		if (tlv_array_len - offset - 2 < length)
-+			return -EINVAL;
-+		if (length < 1)
-+			return -EINVAL;
- 
- 		pr_debug("type 0x%x length %d\n", type, length);
- 
- 		switch (type) {
- 		case LLCP_TLV_MIUX:
-+			if (length < 2)
-+				return -EINVAL;
- 			sock->remote_miu = llcp_tlv_miux(tlv) + 128;
- 			break;
- 		case LLCP_TLV_RW:
--- 
-2.51.0
-
+ int rxe_namespace_init(void);
 
