@@ -1,169 +1,243 @@
-Return-Path: <netdev+bounces-281076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281077-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cJpjGTgB7GnuTgAAu9opvQ
-	(envelope-from <netdev+bounces-281076-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 01:48:08 +0200
+	id w9wdLFgC7GkZTwAAu9opvQ
+	(envelope-from <netdev+bounces-281077-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 01:52:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2DEA464293
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 01:48:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 015094642AE
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 01:52:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C699E3018D5B
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 23:43:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 26F1E301053D
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 23:52:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7D8C325714;
-	Fri, 24 Apr 2026 23:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B884B302146;
+	Fri, 24 Apr 2026 23:52:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Re+yzXAH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IenHmcKB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A293B2F5485
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 23:43:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777074199; cv=pass; b=TqkBgOuD7tBgiqyhRPh2ht/hZlMJiEotgBRNkbM7s0Cxe06TXZuq6mTd7Pb/2XV5i6XPDyRVwhytPvDqV92aUkDdQZSGneSfez/mkvjjMun0fGeE5Kl6S+1CvJ8v9tK6uiS52ceM99M1se4VFoUJZPnvn329zgfb/yPbEIiw1r8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777074199; c=relaxed/simple;
-	bh=Syw3mAyVgAzWD/0LIQLcwHvIMw7PDmmqjwD+SpLpDBQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NEnTgqJyF4CvMIScOCA2uFxk8ntC4PJKgfx3Z7xlI6UDP/u6XQSHU0BJzElUNYve7P1XIAc2KTo5UV0PAKKFTVoHsnDMQXI/d9R6VJ4WGXGv61VQt0Dc0HIKqCW32opMScIxG/F3nZUx+eOZWJdvIwBjC6W6+aU4H9IeZLz8Hbw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Re+yzXAH; arc=pass smtp.client-ip=74.125.82.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43A32274FD1
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 23:52:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777074772; cv=none; b=FRDT9ZwcGSdJb4NYK0JNR8Y2mwKcMWer0uMbDmHQw65DKWXCnN6Di26QxQ5SXivOeEKQCSZe8PJ4DpkxML79WF1KxxjdykCDdWN1is31R+HXDIWmVW1ZrQWshaXjGvGWA1vLLYP2DDOGD6MtVDIjL/oIZDjmEihTGF0BRJe79Og=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777074772; c=relaxed/simple;
+	bh=QJ6YINPJxDE8ce/SSg+gEPEuZCMMootlW1RL0db12+E=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=LB/jb3c/XYYSTPBCHEgggEmYZMBUsmok0F0G2X1C7sWVtwXPViwoirqlTUOH/UTlcImX7xgKPDl0ZtHAOI5KVdmk0Ac50XS74e81JDckRO6rotmmXvDgjL0urGNfoukEuqjz92wg34+BoYqM+um6tFPergPfxSHQ8110s358iwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IenHmcKB; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-12c8f9846c8so8225663c88.0
-        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 16:43:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777074198; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Cvv68r7DtD8vY6v0cJrSVRlPKvBZ8SXIf6wi1wxzfU+CU84NEqQM8ubO/3G4kgASy2
-         wObmEEcy+UyPIdRItjur6Oog+7YldHcqFpGXwRn5CoasvHSgW6osJeuk01/GKzNhECUq
-         aWWc11dus4CKGswsRUl3udR+XyvWMP8okrdinrQYv/x2rwttK+knZa88kXwmZjhJ9Xkv
-         bZCoqW7m7Ut2LchL+cKGQOcxEy27G9wVN2EWpsqgM4XBEUr2JEBmbZnkFsxQ/lzdXHWj
-         ze/KfkaZ5U7N64TYiGX72WeZiFoQRuIM3RR539XHr7wIa4TFqrnzKki/kY4kbu0re4d3
-         cU3Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ESB/gBxbgV7rGZ/8pNR7vuAzFSz0pZYdHaWbNc/1QUY=;
-        fh=t1KBct2X9hARvc03fGuPXySaMBrFHGolkRFhGXc8h4Y=;
-        b=kER1yq7zsxB1NSp3E+FwDnqN8TyIWE4ZTUmepXiYsg+oWq3+4GvKwGOGRxSAWfwz6Q
-         HQo0/dKALyHexOCJIQ7j8AwTirllZaYQpSpDd+wcSXw1UhrOE112UIAocxN54QU/imix
-         rjjSbZfCLcvNpFSDt1RY/TK/qN+cOJu7VA7vrKe7VhjIYKlDmXAvx6rdNQoqa/BbmP7E
-         6nrzwhbXVCDgsGPkAyTps9EitB2/texF8mlVlSzjf9DKLsGpX9bpoFC1ZhUqMN1BW7jb
-         BIx3W3k7pNtWnlDQc45pe2BoDONPF7/doZlT+uKTAdAizlF7KO7zpbeMMAoE06fHJUBv
-         JKkQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c7977177675so4302256a12.0
+        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 16:52:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777074198; x=1777678998; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ESB/gBxbgV7rGZ/8pNR7vuAzFSz0pZYdHaWbNc/1QUY=;
-        b=Re+yzXAH2rQo3QjJzrOphGj8oaYF9lEm7OZQJX+8HbhT5lLezjRXwq2+tGVNuCY4h8
-         SOBKogU88Mrm7Yb2WvM4zP1Psv7hV5Z/PQGIHCUm+VF3IC5+UXIeurLRoE9cC9Qpo9eZ
-         0mwlfuBBi+emD/HkeB6Xl06R2CUEzQfeiM1bOruG8ykZwyEqm/AJII4t1SNjXew7GWkx
-         nzbOKkSwQaM4sB3npqPYXqPnWnaRhwUhbAIBrIvt0Sw0rekF3/gK2HCCOcrAyzR+0Un7
-         b5skQAQgLHk2Q1mfWqg1X8YTcHlKBhkXcsL0ZD+yx1AaNVMjp0RErt0LdVaJQPHJYfPK
-         01iw==
+        d=google.com; s=20251104; t=1777074770; x=1777679570; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XnVmcqSWgBrIZOINeFfkUbMwryuHt4PzyHkF5OrKAp4=;
+        b=IenHmcKBm55oIXWcqHCofMdfnNkKQtFd8L5ctrIa1JcWbhwwR84MMehyDcu8HD+09t
+         aF+uqSC25up2kaL0BmhCB874PRjsaqmKa85Rh5Led/MpVAraUVEUmsOHAdbFb8Fm5ESK
+         iwMv042uE6vWmby9U27B0GHDpM4JnNWOzaqsFD3d4hhbi4gNCfbPkkfJ3Adz/7OiVxZ6
+         axc9Dy66Ys+aC6uEsOQW+gVzFsYvgdQbmjfkaocZPxmP4aDofxtMoHhzqhK3FiPB2obM
+         JBlvYWNV1bhondobioFcDMisOcYjNgB5J1XNkisioT8bnoXVo6uAO4DBWZs2vcR0pR3O
+         8K0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777074198; x=1777678998;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ESB/gBxbgV7rGZ/8pNR7vuAzFSz0pZYdHaWbNc/1QUY=;
-        b=Eh3+xu3ECFLdyQzE9el+p8BK14jiVOXesuELXzgSZIsWz769U7Wn0fITUoLqIFiRSV
-         O0kd1TiNLyZozYTLTYrncMp3rd1djlFR+ogrQR450wnTd+mHkvI9dPlCmkSRn0MiHS3S
-         HlPOqKk0D8Q4+lzLtJDw6Uyiht/Ep02AI0WpWYdrEHCjv9m03Vwt7SOKULoAPPYNjsfz
-         eM/PHtgLj9E6EPhOpSkkksaFpewj2pvYdelPp92mTMgojj/8QHZxGyY7gksRHSY8YqaP
-         Hhj0ODC1CQFPx543BieeX3A2p48medJGO0Xbe3vtATm/NUXe67x5H+WoUGTdGUP4UeC1
-         K/dw==
-X-Gm-Message-State: AOJu0YzhAAcMXtdun6CesFN8hixoM6fifwANiYTrH4osRImz/oujiY21
-	U+KOvDlF01LaiOCEMnGkRNdcdmehJbdHjJOoujR83dwcFW1EpP48FGbbG5XDL/b9gxXzLn0trX2
-	3EGhr4Upy6jEMSoMuA3qK8iDyROqdnDWTEUWUFJ4j
-X-Gm-Gg: AeBDietwzOcYGM7XWBr4GMLQhGAHyedgmJwBvVRtduIL5mqb98vF0mF/F2Nr4wOOW+0
-	+L4a6X4NjmUVKn1L35PJRN/sqLU43drMqRF90IZglOwJlBdw3Hvj6DZ9ZD+wJ9Hz6tFHrnyR8NL
-	asfbshC7bRYu6fibcDJeGYOmaT0R3XQ+ryW7w1EbTtf9TYfsjQtwusr6NKF1stvEGDrxhtazhac
-	WI8ifR/zMrJ/boQGocW2tgHxzbFORtsJ6jCVCrvvMo9oG6/CQD+Vqg+bZG0jmoVPSM5D3/2xsun
-	n64eV8ZBZ8wROi3SFSeVzhFNEZdJaUfvfZ1GqsXCQ0CDXEIX+augWjpWMYgr4OlBuA8vC1Bnx0a
-	lDSHmdp3gL/V2AQ2a63FN79G7LSgjsRD9sVWgG7HUyJBB6TAmWQQRkUtKalxuH1/Elq55aQKezA
-	==
-X-Received: by 2002:a05:7022:12b:b0:128:d5bd:357f with SMTP id
- a92af1059eb24-12c73fa779fmr17941532c88.30.1777074197134; Fri, 24 Apr 2026
- 16:43:17 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1777074770; x=1777679570;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XnVmcqSWgBrIZOINeFfkUbMwryuHt4PzyHkF5OrKAp4=;
+        b=g+rG6uGmUQdxiXxcY/L6r/CUGsAg8suoBr6sxYVQFDaz6upBqybnRlTKfN2AlEgPKg
+         4IlhiitQnl1z50o1hh7PRkWS/3l/5oU4LTrpeC4hEAnpn7LDwNeCe6PIj7AmmxuOnRaU
+         kziXNhaLQcL+Mq2AFWt2feLTnEVrsmHa8Sw0MpQIbnunoJGdUkpBZHyB9qljTC9T0Dls
+         LrWAgPUYsst9dVoD3UWW+GAoGthX4vga5mUmGwlSENnoJLO4m34RixbAVSEpS6tzUSNi
+         oItIvHPRtktUMXmEZcVe3+eUfknS8+FgMnIEFHJ3BxV0DSYBXxi5Tqdqsaexha9Gq4Gb
+         VsoQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9McAiAQtPhZvTXE2h641P572ekFZu14hdehKyg6pIXgipI8p9LaK54GXQSTUDv8SNHxsHe3gk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+WLy2Bc3wwZsg1+nzoWVMEkQpzXU98wD7trOqvUQU5kfjnuxc
+	Jx7Fd+1SMC3LG1JN9IrNdMrw6qo7u5jfs2lCUOvKubPLRenvjFPwwOlHysnueCdZEyDBrBi1Fcp
+	LD0whNQ==
+X-Received: from pfblu1.prod.google.com ([2002:a05:6a00:7481:b0:82f:24a1:2b5a])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:22c5:b0:82f:316:3206
+ with SMTP id d2e1a72fcca58-82f8c92997fmr35230164b3a.34.1777074770298; Fri, 24
+ Apr 2026 16:52:50 -0700 (PDT)
+Date: Fri, 24 Apr 2026 23:52:46 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260424145843.74055-1-fw@strlen.de>
-In-Reply-To: <20260424145843.74055-1-fw@strlen.de>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.rc2.544.gc7ae2d5bb8-goog
+Message-ID: <20260424235247.1990272-1-kuniyu@google.com>
+Subject: [PATCH v1 bpf] bpf: Free reuseport cBPF prog after RCU grace period.
 From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Fri, 24 Apr 2026 16:43:06 -0700
-X-Gm-Features: AQROBzAR6ie_z1WPiopOr7AnsFJE2zb2uxDTN9Sj5BgcF5yWqjbQxZddD0rNeqA
-Message-ID: <CAAVpQUA6R6Bbw94=kh6uywErLgbAixVgCpjVhToLHFbGDa9uOw@mail.gmail.com>
-Subject: Re: [PATCH net] neigh: let neigh_xmit take skb ownership
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	horms@kernel.org, idosch@nvidia.com
+To: Martin KaFai Lau <martin.lau@linux.dev>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Eulgyu Kim <eulgyukim@snu.ac.kr>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: D2DEA464293
+X-Rspamd-Queue-Id: 015094642AE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281076-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[google.com,gmail.com,vger.kernel.org,snu.ac.kr];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281077-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[linux.dev,kernel.org,iogearbox.net,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,strlen.de:email]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Fri, Apr 24, 2026 at 8:00=E2=80=AFAM Florian Westphal <fw@strlen.de> wro=
-te:
->
-> neigh_xmit always releases the skb, except when no neighbour table is
-> found. But even the first added user of neigh_xmit (mpls) relied on
-> neigh_xmit to release the skb (or queue it for tx).
->
-> sashiko reported:
->  If neigh_xmit() is called with an uninitialized neighbor table (for
->  example, NEIGH_ND_TABLE when IPv6 is disabled), it returns -EAFNOSUPPORT
->  and bypasses its internal out_kfree_skb error path.  Because the return
->  value of neigh_xmit() is ignored here, does this leak the SKB?
->
-> Assume full ownership and remove the last code path that doesn't
-> xmit or free skb.
->
-> Fixes: 4fd3d7d9e868 ("neigh: Add helper function neigh_xmit")
-> Signed-off-by: Florian Westphal <fw@strlen.de>
-> ---
->  could followup in -next to make it "void",
+Eulgyu Kim reported the splat below with a repro. [0]
 
-Makes sense.
+The repro sets up a UDP reuseport group with a cBPF prog and
+replaces it with a new one while another thread is sending
+a UDP packet to the group.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+The reuseport prog is freed by sk_reuseport_prog_free().
+bpf_prog_put() is called for "e"BPF prog to destruct through
+multiple stages while cBPF prog is freed immediately by
+bpf_release_orig_filter() and bpf_prog_free().
+
+If a reuseport prog is detached from the setsockopt() path
+(reuseport_attach_prog() or reuseport_detach_prog()),
+sk_reuseport_prog_free() is called without waiting for RCU
+readers to complete, resulting in various bugs.
+
+Let's defer freeing the reuseport cBPF prog after one RCU
+grace period.
+
+Note "e"BPF prog is safe as is unless the fast path starts
+to touch fields destroyed in bpf_prog_put_deferred() and
+__bpf_prog_put_noref().
+
+[0]:
+BUG: KASAN: vmalloc-out-of-bounds in reuseport_select_sock+0xedc/0x1220 net/core/sock_reuseport.c:596
+Read of size 4 at addr ffffc9000051e004 by task slowme/10208
+CPU: 6 UID: 1000 PID: 10208 Comm: slowme Not tainted 7.0.0-geb7ac95ff75e #32 PREEMPT(full)
+Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+Call Trace:
+ <IRQ>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0xca/0x240 mm/kasan/report.c:482
+ kasan_report+0x118/0x150 mm/kasan/report.c:595
+ reuseport_select_sock+0xedc/0x1220 net/core/sock_reuseport.c:596
+ udp4_lib_lookup2+0x3bc/0x950 net/ipv4/udp.c:495
+ __udp4_lib_lookup+0x768/0xe20 net/ipv4/udp.c:723
+ __udp4_lib_lookup_skb+0x297/0x390 net/ipv4/udp.c:752
+ __udp4_lib_rcv+0x1312/0x2620 net/ipv4/udp.c:2752
+ ip_protocol_deliver_rcu+0x282/0x440 net/ipv4/ip_input.c:207
+ ip_local_deliver_finish+0x3bb/0x6f0 net/ipv4/ip_input.c:241
+ NF_HOOK+0x30c/0x3a0 include/linux/netfilter.h:318
+ NF_HOOK+0x30c/0x3a0 include/linux/netfilter.h:318
+ __netif_receive_skb_one_core net/core/dev.c:6181 [inline]
+ __netif_receive_skb net/core/dev.c:6294 [inline]
+ process_backlog+0xaa4/0x1960 net/core/dev.c:6645
+ __napi_poll+0xae/0x340 net/core/dev.c:7709
+ napi_poll net/core/dev.c:7772 [inline]
+ net_rx_action+0x5d7/0xf50 net/core/dev.c:7929
+ handle_softirqs+0x22b/0x870 kernel/softirq.c:622
+ do_softirq+0x76/0xd0 kernel/softirq.c:523
+ </IRQ>
+ <TASK>
+ __local_bh_enable_ip+0xf8/0x130 kernel/softirq.c:450
+ local_bh_enable include/linux/bottom_half.h:33 [inline]
+ rcu_read_unlock_bh include/linux/rcupdate.h:924 [inline]
+ __dev_queue_xmit+0x1dd7/0x3710 net/core/dev.c:4890
+ neigh_output include/net/neighbour.h:556 [inline]
+ ip_finish_output2+0xca9/0x1070 net/ipv4/ip_output.c:237
+ NF_HOOK_COND include/linux/netfilter.h:307 [inline]
+ ip_output+0x29f/0x450 net/ipv4/ip_output.c:438
+ ip_send_skb+0x45/0xc0 net/ipv4/ip_output.c:1508
+ udp_send_skb+0xb04/0x1510 net/ipv4/udp.c:1195
+ udp_sendmsg+0x1a71/0x2350 net/ipv4/udp.c:1485
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ __sys_sendto+0x554/0x680 net/socket.c:2206
+ __do_sys_sendto net/socket.c:2213 [inline]
+ __se_sys_sendto net/socket.c:2209 [inline]
+ __x64_sys_sendto+0xde/0x100 net/socket.c:2209
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x160/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x415a2d
+Code: b3 66 2e 0f 1f 84 00 00 00 00 00 66 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f6bc31e41e8 EFLAGS: 00000212 ORIG_RAX: 000000000000002c
+RAX: ffffffffffffffda RBX: 00007f6bc31e4cdc RCX: 0000000000415a2d
+RDX: 0000000000000001 RSI: 00007f6bc31e421f RDI: 0000000000000003
+RBP: 00007f6bc31e4240 R08: 00007f6bc31e4220 R09: 0000000000000010
+R10: 0000000000000000 R11: 0000000000000212 R12: 00007f6bc31e46c0
+R13: ffffffffffffffb8 R14: 0000000000000000 R15: 00007ffc9b0d70b0
+ </TASK>
+
+Fixes: 538950a1b752 ("soreuseport: setsockopt SO_ATTACH_REUSEPORT_[CE]BPF")
+Reported-by: Eulgyu Kim <eulgyukim@snu.ac.kr>
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+ net/core/filter.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/net/core/filter.c b/net/core/filter.c
+index bc96c18df4e0..dba4c9340bb7 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -1654,15 +1654,24 @@ int sk_reuseport_attach_bpf(u32 ufd, struct sock *sk)
+ 	return err;
+ }
+ 
+-void sk_reuseport_prog_free(struct bpf_prog *prog)
++static void sk_reuseport_prog_free_rcu(struct rcu_head *rcu)
++{
++	struct bpf_prog_aux *aux = container_of(rcu, struct bpf_prog_aux, rcu);
++	struct bpf_prog *prog = aux->prog;
++
++	bpf_release_orig_filter(prog);
++	bpf_prog_free(prog);
++}
++
++void sk_reuseport_prog_free(struct bpf_prog *prog, bool wait_rcu)
+ {
+ 	if (!prog)
+ 		return;
+ 
+-	if (prog->type == BPF_PROG_TYPE_SK_REUSEPORT)
+-		bpf_prog_put(prog);
++	if (bpf_prog_was_classic(prog))
++		call_rcu(&prog->aux->rcu, sk_reuseport_prog_free_rcu);
+ 	else
+-		bpf_prog_destroy(prog);
++		bpf_prog_put(prog);
+ }
+ 
+ static inline int __bpf_try_make_writable(struct sk_buff *skb,
+-- 
+2.54.0.rc2.544.gc7ae2d5bb8-goog
+
 
