@@ -1,186 +1,151 @@
-Return-Path: <netdev+bounces-280999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281000-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2JoyI1qD62kONwAAu9opvQ
-	(envelope-from <netdev+bounces-280999-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 16:51:06 +0200
+	id wGYeGlCG62lBNwAAu9opvQ
+	(envelope-from <netdev+bounces-281000-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:03:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15E8D460627
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 16:51:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9836E460793
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 17:03:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 15C3E30067AD
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 14:51:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A8D8E301724C
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 15:00:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 010313E0C40;
-	Fri, 24 Apr 2026 14:51:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d8dBtik0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D6F0238D27;
+	Fri, 24 Apr 2026 15:00:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 782A73E024F
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 14:51:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922AD26C385
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 15:00:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777042261; cv=none; b=ZXFrtP9LDfWhBBWQrpWch41Sp3tnVQ37jT/WK277wwy5R3f2ddqmlIE1gHr6hABHtd8hN42va/7OdLmpbzzxN2i4evuCW6A0lcXcLKKxJj+iB97ZtKqMp1hXv/0oUl0qD2MGYu0A3BDwAv21D3tTjG4zcEpXQgYb/Ckxh8O3J64=
+	t=1777042816; cv=none; b=lm23BcVR6ICtBugVrwDCvi3Pg6Y5gwfrZISsmhDow+4P2T0lVq1tCFWsY1+jU2xtYSiiwJ85tbko8pLuoOtUn/+Yn94Eas45uth3sxeEt+RLgNVt1sj7qlr2dAqrDbepuDuh9qSZIKT4iQPdm4iBAdchKvpranPMkTbsFZ5vezg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777042261; c=relaxed/simple;
-	bh=5DpfGg/7I3GkVZMMzWWKANoH36KXXpBqp0CbqHEpqqM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GttOr9LtJBsWreE01z2i5tn6GeVzusc4r4FNiOgzrcIyYiA+O0gDe+onkwXYRHU2SW7cCpbaIRwRDXVwahnsm1QgPBOgCNGlFiOQuLRRCryqmf0PD0k0tryhkLpI0yGqHVE31r2mbxNr6U/3krL1nbNqgmpx1q2R4/Q0KxQLEK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d8dBtik0; arc=none smtp.client-ip=209.85.217.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-60fbbac2938so3142040137.1
-        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 07:51:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777042259; x=1777647059; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SBAWISZQQ83B65zp3ZGw7r9K/PhyBwFKKHiTM7zEE8s=;
-        b=d8dBtik0Wi2WX9fYplTr1J5vYxjM5ADq55TEHUXUwHS9NwhvPg+t7YdNG4txUCB42W
-         KMc6/OxMWVZuVwojSfwW1n3d59v+hXy92Djl6DMDzFeK2STgOEJIZ8uKl+9dRsAgYRRz
-         wyp/mnlhIqfrVPRpaPeVdFdBIsGnVo2MIBmMy4np5tEDBf8kXG4AoIq/pa41xyzHYzuE
-         gCEFsLIDufzX9kbBUBmY6iBcxl2l/gg2kikD0Z2iutF/wOzDE30FeT5mQLyxKmnm4lFn
-         ugu1XxES3ZuL0syK7bBbnm/eZu3hTlReuc8RMc2h930+SRHIzcSztqI1FIC08bxxJZWI
-         RCpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777042259; x=1777647059;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=SBAWISZQQ83B65zp3ZGw7r9K/PhyBwFKKHiTM7zEE8s=;
-        b=kBJi+4vbCjfq3tsxziLrcd0PhfRpCdrBG7r/AJTUSvczizTX7RSss07MEp77lBAvN+
-         geSnQDisRsLNz8xjuQsAvnZ+5kIVo3Ajitu/MP48ECtcX72Cg4S3sD934+Oi/3PrxsYf
-         nXWdsqBdILt+eqxKeCV5CZUS9Urtc3Udf2+XHZeIQn/Lq+N5riYpJLleCovZ3SibjL5C
-         rc5uwjiVbu2bYs2t4RbdaN5WAxKIjRXUSEPNxcE2C1dLvwdI+nguS80wkw4MlIo4GhWc
-         vL8ZkS8I6tGVUSqUNdnKleUNY3zkw6OjW/VZfIorUig7F2wcG8IHHJsj8CRGr1LO9PMK
-         fejA==
-X-Forwarded-Encrypted: i=1; AFNElJ8SU41m+pbB9l90yTvDymWtyJySUJAPCAcMV6VOtZ1pIZ232KJy54cy4+h9+KEwU0OxGFN+dZE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysV/fVX7V/38mrhkRF8A6oaPKU+/Fm/A/+FTiJoTQwOCEiZN/v
-	6vxk9GNTgqF3gpJamZyyO7UsiXXclpABCPXUfP7+7+YU5qSJ46tZNaPe
-X-Gm-Gg: AeBDietCbV0vcK2baizX42NNuFncGNWV8ILfmUlCwl37N/n8Mv39GCX1VvBIg8kGJgU
-	LyEqiaPjx0nPp0GER9E+/SiMdHYQmpm9WU90SYL2qs3hTJjuOW9rQ+Tzs9r+ryXGfT5E+dLU0Qb
-	JJWzNfoUlP8Qu9v6QBZSpPL7Z+jSLGXNYceTB/OhiRlgFlCBv5W8L40UPN7+OzO/R3mYyz9OZKS
-	J301rqNMOwje56ZzZhUQKrET8AkYpm13zkSyyNqTD9mJEO8EgRbzchKkbi5zn0ba+nqtAm3BWqu
-	l5v8YMuyNCYRNunx6mGLw8DOnW5xiDWx+aM1tfMT66siuTbMNkXf2W0s4IZyq39kY5dvsEipHbQ
-	QLIyNNdnLZJ7QvdwniZQ5CdZyJuzN5+OMFSji7HoDS1PjgfLSwYDFos5+nAxnTdJicff9KjtNPB
-	sjQ3rrccJSx1SQ0EdOA8Uh1utI9tqmgFYlA7lZ5xNc/OVpgprylZEM+G0fOZaENNi6xy1bd6ao3
-	d0=
-X-Received: by 2002:a67:e711:0:b0:604:f849:462e with SMTP id ada2fe7eead31-616f8182663mr15135336137.25.1777042259406;
-        Fri, 24 Apr 2026 07:50:59 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-6174272f752sm11448711137.0.2026.04.24.07.50.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Apr 2026 07:50:58 -0700 (PDT)
-Date: Fri, 24 Apr 2026 15:50:53 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: Yury Norov <ynorov@nvidia.com>, Thomas Gleixner <tglx@kernel.org>, Ingo
- Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen	
- <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
- <hpa@zytor.com>, Andy Lutomirski	 <luto@kernel.org>, Peter Zijlstra
- <peterz@infradead.org>, Jonathan Cameron	 <jic23@kernel.org>, David Lechner
- <dlechner@baylibre.com>, Nuno =?UTF-8?B?U8Oh?=	 <nuno.sa@analog.com>, Andy
- Shevchenko <andy@kernel.org>, Ping-Ke Shih	 <pkshih@realtek.com>, Richard
- Cochran <richardcochran@gmail.com>, Andrew Lunn	 <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet	
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni	
- <pabeni@redhat.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes
- <linux@rasmusvillemoes.dk>, Hans de Goede	 <hansg@kernel.org>, Linus
- Walleij <linusw@kernel.org>, Sakari Ailus	 <sakari.ailus@linux.intel.com>,
- Salah Triki <salah.triki@gmail.com>, Achim Gratz <Achim.Gratz@Stromeko.DE>,
- Ben Collins <bcollins@watter.com>, linux-kernel@vger.kernel.org,
- linux-iio@vger.kernel.org, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, linux-rtc@vger.kernel.org
-Subject: Re: [PATCH 1/9] bitfield: add FIELD_GET_SIGNED()
-Message-ID: <20260424155053.1a98bf61@pumpkin>
-In-Reply-To: <6170788fcab2ec835597e3d7411928d36850c20a.camel@sipsolutions.net>
-References: <20260417173621.368914-1-ynorov@nvidia.com>
-	<20260417173621.368914-2-ynorov@nvidia.com>
-	<6170788fcab2ec835597e3d7411928d36850c20a.camel@sipsolutions.net>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1777042816; c=relaxed/simple;
+	bh=KnV8A7uoQR7tKKdLB+y/zBG6+2zJeX6PqGeDf3dd5so=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Tunw78J6cBHpKhoTITY6RUODhYyzDC9fclos4ZaJ+Q+BRe9UlOonTYwOEb6DWzAuKv2WjvkT9qSDgUtMBFuCrBCH2s8pJFJLX3e1CbVISzPw8oZumCcOW418aPiVCVEXDbaGFZrFoa28Et+9CJERxvEG/peGnA/++ka5ak4nqus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 4213560425; Fri, 24 Apr 2026 17:00:11 +0200 (CEST)
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	horms@kernel.org,
+	kuniyu@google.com,
+	idosch@nvidia.com,
+	Florian Westphal <fw@strlen.de>
+Subject: [PATCH net] neigh: let neigh_xmit take skb ownership
+Date: Fri, 24 Apr 2026 16:58:38 +0200
+Message-ID: <20260424145843.74055-1-fw@strlen.de>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 15E8D460627
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 9836E460793
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-281000-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280999-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[strlen.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[35];
-	FREEMAIL_CC(0.00)[nvidia.com,kernel.org,redhat.com,alien8.de,linux.intel.com,zytor.com,infradead.org,baylibre.com,analog.com,realtek.com,gmail.com,lunn.ch,davemloft.net,google.com,bootlin.com,rasmusvillemoes.dk,Stromeko.DE,watter.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Mon, 20 Apr 2026 10:43:08 +0200
-Johannes Berg <johannes@sipsolutions.net> wrote:
+neigh_xmit always releases the skb, except when no neighbour table is
+found. But even the first added user of neigh_xmit (mpls) relied on
+neigh_xmit to release the skb (or queue it for tx).
 
-...
-> I (personally) tend to prefer the "__MAKE_OP" versions (*_get_bits()
-> etc.), in particular because WiFi and firmware interfaces deal a lot
-> with fixed endian fields.
-> 
-> Any chance it'd be simple to generate u32_get_bits_signed() etc.? Could
-> be especially useful for le32_get_bits_signed() for example, to have the
-> endian conversion built-in unlike FIELD_GET_SIGNED().
+sashiko reported:
+ If neigh_xmit() is called with an uninitialized neighbor table (for
+ example, NEIGH_ND_TABLE when IPv6 is disabled), it returns -EAFNOSUPPORT
+ and bypasses its internal out_kfree_skb error path.  Because the return
+ value of neigh_xmit() is ignored here, does this leak the SKB?
 
-The problem is that the number of options explodes.
-You need PREP/GET/GET_SIGNED functions x_64() x_64le() x_64be() x_32() x_32le()
-x_32be() x_16le() and x_16be().
-I make that 24 functions.
-For UPDATE you also need x_16() and x_8() for another 10.
-So at least 34 definitions - it is all getting silly.
-(And I've excluded the pointless 8/16 bit functions where the result
-is promoted to signed int.)
+Assume full ownership and remove the last code path that doesn't
+xmit or free skb.
 
-Then you have the problem that some (common) architectures don't have
-byteswap instructions, but do have byteswapping memory accesses (maybe not
-16bit). Which means that is it generally better to byteswap the value
-before passing to FIELD_GET() and after building the full 'word' using
-FIELD_PREP() (and just | for single bits).
-(Except it is probably always better to byteswap constants.)
+Fixes: 4fd3d7d9e868 ("neigh: Add helper function neigh_xmit")
+Signed-off-by: Florian Westphal <fw@strlen.de>
+---
+ could followup in -next to make it "void", existing
+ callers either ignore retval or do:
+ if (err)
+ 	net_dbg_ratelimited("%s: ...
 
-It is also worth nothing that FIELD_PREP() will reject requests to
-fill signed fields with negative constants.
+ net/core/neighbour.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-	David
-
-> 
-> johannes
-> 
+diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+index c56a4e7bf790..5a9cc7268521 100644
+--- a/net/core/neighbour.c
++++ b/net/core/neighbour.c
+@@ -3211,8 +3211,10 @@ int neigh_xmit(int index, struct net_device *dev,
+ 
+ 		rcu_read_lock();
+ 		tbl = rcu_dereference(neigh_tables[index]);
+-		if (!tbl)
+-			goto out_unlock;
++		if (!tbl) {
++			rcu_read_unlock();
++			goto out_kfree_skb;
++		}
+ 		if (index == NEIGH_ARP_TABLE) {
+ 			u32 key = *((u32 *)addr);
+ 
+@@ -3228,7 +3230,6 @@ int neigh_xmit(int index, struct net_device *dev,
+ 			goto out_kfree_skb;
+ 		}
+ 		err = READ_ONCE(neigh->output)(neigh, skb);
+-out_unlock:
+ 		rcu_read_unlock();
+ 	}
+ 	else if (index == NEIGH_LINK_TABLE) {
+@@ -3238,11 +3239,10 @@ int neigh_xmit(int index, struct net_device *dev,
+ 			goto out_kfree_skb;
+ 		err = dev_queue_xmit(skb);
+ 	}
+-out:
+ 	return err;
+ out_kfree_skb:
+ 	kfree_skb(skb);
+-	goto out;
++	return err;
+ }
+ EXPORT_SYMBOL(neigh_xmit);
+ 
+-- 
+2.53.0
 
 
