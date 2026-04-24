@@ -1,235 +1,118 @@
-Return-Path: <netdev+bounces-281036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281037-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kBhuFqW362kJQgAAu9opvQ
-	(envelope-from <netdev+bounces-281036-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:34:13 +0200
+	id kCBtD0O762lpQwAAu9opvQ
+	(envelope-from <netdev+bounces-281037-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:49:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7C4D4627AA
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:34:12 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id A86C74628E0
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:49:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4CAD83031F3F
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:33:15 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6E67D3006207
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 18:49:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F2123F23D4;
-	Fri, 24 Apr 2026 18:33:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E7243D16EB;
+	Fri, 24 Apr 2026 18:49:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YCvbU/1G"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mR77e+kg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31E373F23B9
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 18:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 919F93F23CE
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 18:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777055594; cv=none; b=eduPln4d/82DYjDKkGXotZ4OUtjfPpV4/pzzporeA5vlKuU0OvBjRq8K01gele7UZqVy8AkrwmEUFzvVicfK4GYbBEdcXjn9cTLJ8YbrKugOA/Uq0bUOodJYlDsE0F07kW2AXCQe5NPtOeHBljoGsgljTz65hXh/Olw5/GwlE+Q=
+	t=1777056573; cv=none; b=MXovzBTvJ7xJ/UHFFE5Oym28ePB/YI3e0ZvHP98VH8YKHC7KFA1rgJwvvBbi2Z//ZsLT758AAqpZ6Ttfjyr+rmpdAkjltcIcgllPEgZAXGpJHMMrQahmUVx9MmfsU+Vh58S5FeDI+DsNeu6YQlTrejeH11j9XYTryRy8v94d2DE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777055594; c=relaxed/simple;
-	bh=5KKtAI6jaBrVREHQpySmvtkbvTyy3jqrl7fEoimPtZY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Fn2+Et7FMVTJNbFW/ecf2j6owqQOffBZpaFXE3matXWBjljLeFCHychulptAVr6E1N2Z+UiciyM6d3KRdkP4I578ogKmYywcflbZJRZVAgnBM6rEa+W0ouCM293ebvw8w1hz3VEqKZKi1WXGqWNXzH9UWL5+0cT9QVwpxxp/Z5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YCvbU/1G; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777055587;
+	s=arc-20240116; t=1777056573; c=relaxed/simple;
+	bh=6IOZ5fpZbuwuN9Ze3ZwE4QuHE/XPBHxy1JSI0V89eYs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fdxCTzyzr08LI6aprnXjUWcY2x4dD5kLZd0Ko7mmfnP3qoI/0Pm9CKxnzWV2Hm8aTEZGNGfR7ls8ESwEwTqzGqWkWTVEcmAfhrgH6NOTcdx8nZ2ki84vV0D29U1mbfSF1TSNHkbbLEKl1hJZHux8HYbM6xzzP2ySxZJV3ZxthEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mR77e+kg; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Fri, 24 Apr 2026 11:49:20 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1777056568;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/+Ofdg4jOEN9y2ToBzvsak04ExFbOMNwCGnfdG4OLXM=;
-	b=YCvbU/1GAz/DJsA74fru/qeM1ldkg5IqTOq5LneRNbiS+Axz6fEFM/1rxQN7t7e8tcD1dE
-	wBdJkD71kfGPMRkGWm7XesNBkY7CUGg/Mv2Y5p0W75u6IXi4ZALwWtiJgFJ1kUGs/5nMtZ
-	3w9xQMA4dqSK3A6fNoWiAzDfa9fz2JY=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-665-wNN_jrdwPo6U_kJxLlYKOg-1; Fri,
- 24 Apr 2026 14:33:03 -0400
-X-MC-Unique: wNN_jrdwPo6U_kJxLlYKOg-1
-X-Mimecast-MFC-AGG-ID: wNN_jrdwPo6U_kJxLlYKOg_1777055577
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D7825195608B;
-	Fri, 24 Apr 2026 18:32:55 +0000 (UTC)
-Received: from [10.22.88.143] (unknown [10.22.88.143])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4304319560AB;
-	Fri, 24 Apr 2026 18:32:45 +0000 (UTC)
-Message-ID: <2658f7a3-5156-4cc5-86c4-b23627e4b5f2@redhat.com>
-Date: Fri, 24 Apr 2026 14:32:45 -0400
+	bh=BSZgyp08bC/BsjWgJ2L5WaVTAHLbGzENzzPVS9GKMN4=;
+	b=mR77e+kgFV+3RQ1z3gkmr4d4Bpa0qyPIrOe6JnrjHLKcDyMgrNCpcqpgZRR8jSTQb+Lo8e
+	tbdEdPTcAX0lef4UKk8Xphf3tDJEY+Mxz97XOQxtLFo3LthWAPWLg+Ozo4fD5zCh7/9OXU
+	TXxdLhXqWVKwI/Pfen2rCS7HUy3ERj4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+To: Mykyta Yatsenko <mykyta.yatsenko5@gmail.com>
+Cc: Amery Hung <ameryhung@gmail.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org, 
+	daniel@iogearbox.net, eddyz87@gmail.com, memxor@gmail.com, martin.lau@kernel.org, 
+	kernel-team@meta.com
+Subject: Re: [PATCH bpf v1 1/1] bpf: Fix sk_local_storage diag dumping
+ uninitialized special fields
+Message-ID: <2026424184430.ui0Q.martin.lau@linux.dev>
+References: <20260423222356.155387-1-ameryhung@gmail.com>
+ <8cc73c03-afb6-4b7d-97ea-e05d9cc56c2d@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 19/23] cgroup/cpuset: Improve check for calling
- housekeeping_update()
-To: Chen Ridong <chenridong@huaweicloud.com>, Tejun Heo <tj@kernel.org>,
- Johannes Weiner <hannes@cmpxchg.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
- <mkoutny@suse.com>, Jonathan Corbet <corbet@lwn.net>,
- Shuah Khan <skhan@linuxfoundation.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- "K. Y. Srinivasan" <kys@microsoft.com>,
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
- Guenter Roeck <linux@roeck-us.net>, Frederic Weisbecker
- <frederic@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>,
- Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
- Joel Fernandes <joelagnelf@nvidia.com>, Josh Triplett
- <josh@joshtriplett.org>, Boqun Feng <boqun@kernel.org>,
- Uladzislau Rezki <urezki@gmail.com>, Steven Rostedt <rostedt@goodmis.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Lai Jiangshan <jiangshanlai@gmail.com>, Zqiang <qiang.zhang@linux.dev>,
- Anna-Maria Behnsen <anna-maria@linutronix.de>, Ingo Molnar
- <mingo@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
- Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>,
- Dietmar Eggemann <dietmar.eggemann@arm.com>, Ben Segall
- <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
- Valentin Schneider <vschneid@redhat.com>,
- K Prateek Nayak <kprateek.nayak@amd.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>
-Cc: cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-hyperv@vger.kernel.org, linux-hwmon@vger.kernel.org,
- rcu@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Costa Shulyupin <cshulyup@redhat.com>,
- Qiliang Yuan <realwujing@gmail.com>
-References: <20260421030351.281436-1-longman@redhat.com>
- <20260421030351.281436-20-longman@redhat.com>
- <e8824498-f8ec-496a-a21c-d1dc594f4c8e@huaweicloud.com>
-Content-Language: en-US
-From: Waiman Long <longman@redhat.com>
-In-Reply-To: <e8824498-f8ec-496a-a21c-d1dc594f4c8e@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
-X-Rspamd-Queue-Id: C7C4D4627AA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8cc73c03-afb6-4b7d-97ea-e05d9cc56c2d@gmail.com>
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: A86C74628E0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,kernel.org,iogearbox.net,meta.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FREEMAIL_TO(0.00)[huaweicloud.com,kernel.org,cmpxchg.org,suse.com,lwn.net,linuxfoundation.org,arm.com,microsoft.com,roeck-us.net,nvidia.com,joshtriplett.org,gmail.com,goodmis.org,efficios.com,linux.dev,linutronix.de,infradead.org,redhat.com,linaro.org,google.com,suse.de,amd.com,davemloft.net];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,redhat.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-281036-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281037-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[longman@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_GT_50(0.00)[52];
-	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[]
 
-On 4/22/26 9:10 PM, Chen Ridong wrote:
->
-> On 2026/4/21 11:03, Waiman Long wrote:
->> By making sure that isolated_hk_cpus matches isolated_cpus at boot time,
->> we can more accurately determine if calling housekeeping_update()
->> is needed by comparing if the two cpumasks are equal. The
->> update_housekeeping flag still have a use in cpuset_handle_hotplug()
->> to determine if a work function should be queued to invoke
->> cpuset_update_sd_hk_unlock() as it is not supposed to look at
->> isolated_hk_cpus without holding cpuset_top_mutex.
->>
-> Currently, isolated_hk_cpus is updated within the cpuset_mutex critical section
-> (before mutex_unlock(&cpuset_mutex)) in cpuset_update_sd_hk_unlock. Therefore, I
-> think update_housekeeping can now be removed.
+On Fri, Apr 24, 2026 at 12:50:34AM +0100, Mykyta Yatsenko wrote:
+> > diff --git a/net/core/bpf_sk_storage.c b/net/core/bpf_sk_storage.c
+> > index 14eb7812bda4..b50d26a542ed 100644
+> > --- a/net/core/bpf_sk_storage.c
+> > +++ b/net/core/bpf_sk_storage.c
+> > @@ -558,6 +558,7 @@ static int diag_get(struct bpf_local_storage_data *sdata, struct sk_buff *skb)
+> >   				      sdata->data, true);
+> >   	else
+> >   		copy_map_value(&smap->map, nla_data(nla_value), sdata->data);
+> > +	check_and_init_map_value(&smap->map, nla_data(nla_value));
+> 
+> I think check_and_init_map_value() should be moved before the
+> copy_map_value(), because copy_map_value_locked() already uses
+> spin lock special field, which if uninitialized can deadlock?
 
-That is true. I will remove in the next version.
-
-Thanks,
-Longman
-
->
->> Signed-off-by: Waiman Long <longman@redhat.com>
->> ---
->>   kernel/cgroup/cpuset.c | 36 ++++++++++++++++++++----------------
->>   1 file changed, 20 insertions(+), 16 deletions(-)
->>
->> diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
->> index a4eccb0ec0d1..1b0c50b46a49 100644
->> --- a/kernel/cgroup/cpuset.c
->> +++ b/kernel/cgroup/cpuset.c
->> @@ -1339,26 +1339,29 @@ static void cpuset_update_sd_hk_unlock(void)
->>   	__releases(&cpuset_mutex)
->>   	__releases(&cpuset_top_mutex)
->>   {
->> +	update_housekeeping = false;
->> +
->>   	/* force_sd_rebuild will be cleared in rebuild_sched_domains_locked() */
->>   	if (force_sd_rebuild)
->>   		rebuild_sched_domains_locked();
->>   
->> -	if (update_housekeeping) {
->> -		update_housekeeping = false;
->> -		cpumask_copy(isolated_hk_cpus, isolated_cpus);
->> -
->> -		/*
->> -		 * housekeeping_update() is now called without holding
->> -		 * cpus_read_lock and cpuset_mutex. Only cpuset_top_mutex
->> -		 * is still being held for mutual exclusion.
->> -		 */
->> -		mutex_unlock(&cpuset_mutex);
->> -		cpus_read_unlock();
->> -		WARN_ON_ONCE(housekeeping_update(isolated_hk_cpus, BIT(HK_TYPE_DOMAIN)));
->> -		mutex_unlock(&cpuset_top_mutex);
->> -	} else {
->> +	if (cpumask_equal(isolated_hk_cpus, isolated_cpus)) {
->> +		/* No housekeeping cpumask update needed */
->>   		cpuset_full_unlock();
->> +		return;
->>   	}
->> +
->> +	cpumask_copy(isolated_hk_cpus, isolated_cpus);
->> +
->> +	/*
->> +	 * housekeeping_update() is now called without holding
->> +	 * cpus_read_lock and cpuset_mutex. Only cpuset_top_mutex
->> +	 * is still being held for mutual exclusion.
->> +	 */
->> +	mutex_unlock(&cpuset_mutex);
->> +	cpus_read_unlock();
->> +	WARN_ON_ONCE(housekeeping_update(isolated_hk_cpus, BIT(HK_TYPE_DOMAIN)));
->> +	mutex_unlock(&cpuset_top_mutex);
->>   }
->>   
->>   /*
->> @@ -3692,10 +3695,11 @@ int __init cpuset_init(void)
->>   
->>   	BUG_ON(!alloc_cpumask_var(&cpus_attach, GFP_KERNEL));
->>   
->> -	if (housekeeping_enabled(HK_TYPE_DOMAIN_BOOT))
->> +	if (housekeeping_enabled(HK_TYPE_DOMAIN_BOOT)) {
->>   		cpumask_andnot(isolated_cpus, cpu_possible_mask,
->>   			       housekeeping_cpumask(HK_TYPE_DOMAIN_BOOT));
->> -
->> +		cpumask_copy(isolated_hk_cpus, isolated_cpus);
->> +	}
->>   	return 0;
->>   }
->>   
-
+The src (sdata->data) lock is used instead of
+the dst (nla_data(nla_value)) lock, so it should be fine.
 
