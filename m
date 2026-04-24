@@ -1,76 +1,75 @@
-Return-Path: <netdev+bounces-280949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280950-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mMUmHO4K62lJHwAAu9opvQ
-	(envelope-from <netdev+bounces-280949-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 08:17:18 +0200
+	id 8O9EIZYL62lJHwAAu9opvQ
+	(envelope-from <netdev+bounces-280950-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 08:20:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D250F45A2DB
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 08:17:17 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A0D045A309
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 08:20:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E78F33013D56
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 06:17:08 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0D76B30039BE
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 06:20:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A09734C9AC;
-	Fri, 24 Apr 2026 06:17:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCE6F342523;
+	Fri, 24 Apr 2026 06:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="pW5s0dH0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KkZwKtJM"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC8FF19E7F7;
-	Fri, 24 Apr 2026 06:17:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FB719C556
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 06:20:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777011428; cv=none; b=gBZXm+KeTLSyQvnLMa99lx5yPy8ErwM6mOBaVJsCd7aRIVBNi301KDZ7TLXc7pv1zw7f8dFaeYhnKZxoEFkvydWngFeMLaxlvObOD+BDnsbQ50cUzo1YqPlehwJVWzqWtVCvitWUFspIMIOKtIEuZi7r4n8PI4K8ZFT2+DszLhk=
+	t=1777011603; cv=none; b=WNYvZ3T2I+Kylh4d+Oq37NS75XZvEh4Kkphwr+lVZkRFoqJ/l0qCDJoexhseT/Kw7S9kQk8Hts0pbSI6nJqoymQMlcX+VH0AlQ/c6FWW0g+uN74F25GG75L2q9KUlOOxHsMmZV/FsEP1p7J5qCGYHzPSLdMCIBPZtlo8PeC0jL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777011428; c=relaxed/simple;
-	bh=vJCZbmCN9ikb6EAz9PzXqsYAY2hNnM/b8swTEOTbwdA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cnc7C3DlVKeOiwNdQM3sPa5Q7/0EI9eZ0bSIi6214im5q604ah1sJNQ3ma5z5+X0BMGUQAef+px8dIc3er7mWB2DgStZvGAS+Pm3VfGdwteRAmeEnjgue35lRchI+FQajFmJJugI1JiPnBOV8WvMHs+n7vGNIVfz2nfEWa4g98E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=pW5s0dH0; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id C741920B7165; Thu, 23 Apr 2026 23:17:06 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C741920B7165
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1777011426;
-	bh=9HBq+z9XRcq8ufOpr4qgjO+oq4+Q+22OPqnEnhpd96I=;
-	h=From:To:Cc:Subject:Date:From;
-	b=pW5s0dH0RzCxOfvuJdm7FZa8ekzh1+hE/qSsjZgzV+5ypgl1JQqgMdoGJDQ58cXBN
-	 cYIxr7a1GYSTpQMiDTaKRmySRwKv5HcJMsWWthg11e0zMsMP4yzh2Js8c3HbcbEE2U
-	 VjtAphlhSkzBj8BxErQEwPVa5X/Q/IM26biiV5Ik=
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Dexuan Cui <decui@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Simon Horman <horms@kernel.org>,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	Dipayaan Roy <dipayanroy@linux.microsoft.com>,
-	Shiraz Saleem <shirazsaleem@microsoft.com>,
-	Michael Kelley <mhklinux@outlook.com>,
-	Long Li <longli@microsoft.com>,
-	Yury Norov <yury.norov@gmail.com>
-Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Paul Rosswurm <paulros@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>,
-	Saurabh Singh Sengar <ssengar@microsoft.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net] net: mana: Optimize irq affinity for low vcpu configs
-Date: Thu, 23 Apr 2026 23:17:00 -0700
-Message-ID: <20260424061702.1442618-1-shradhagupta@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.7
+	s=arc-20240116; t=1777011603; c=relaxed/simple;
+	bh=8FCSqw0T65YwOTutmJofsBTnijCoHEsSgp28t0Ta0y8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a3wPXig5t1i4HVuX5ASy7Ly+43ERMBZ1TmAKVg7PAI8sLmz6aTvL2rMN7oBUPeRA5B1UeewPeXQcXDAETK6zpr/bCoDJxcj33zvBtan/3HZbtWTJSp0SKKRJWa6VlhGwk/TNE31qkBAdUSnbkz0g+iZ5qp7qKHGXDk0EH77kmRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KkZwKtJM; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777011603; x=1808547603;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8FCSqw0T65YwOTutmJofsBTnijCoHEsSgp28t0Ta0y8=;
+  b=KkZwKtJMCsVWBCOzwxf/Bcvawk9JzX3Wj0JEEOMym0B7vUxx9nKDNM0R
+   7Rt1lSXuno1Qcq4q+C1c0WlmnI7Ln9xybq/e3P3seu94WtDbIPLLXo/qC
+   i5L/8XDj2h4UC1R5ULD2tdXGA+bh4F2qmiKHLc7IGpWtENeRZOsa2qE+k
+   lF5XyjGp8kispvdanVmR3FJpZ8N9vh6scMxZZX3qyegfna/DhODvfG9Bv
+   qcHgtv9O3og52jZQG18SMiRqPB/oKu2skDcjDPhTL14D5LdIuMSrH++Q/
+   tU0dJ0dMHVKVhSTBgl0wBlwJkKqAku0h9x1afFiKnAYYlT+QMrYT9uKZS
+   g==;
+X-CSE-ConnectionGUID: vvTpqjsMT+2r6QXZGTQJ1g==
+X-CSE-MsgGUID: 6WWgrC6FSmOCXZHCXmp8bw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11765"; a="77873869"
+X-IronPort-AV: E=Sophos;i="6.23,196,1770624000"; 
+   d="scan'208";a="77873869"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2026 23:20:02 -0700
+X-CSE-ConnectionGUID: mEILhK05RXm4qLMwAgUi1Q==
+X-CSE-MsgGUID: xV8i61CmSK25qX6dTMnf4g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,196,1770624000"; 
+   d="scan'208";a="232776879"
+Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
+  by orviesa008.jf.intel.com with ESMTP; 23 Apr 2026 23:20:01 -0700
+From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	aleksandr.loktionov@intel.com
+Cc: netdev@vger.kernel.org,
+	Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+Subject: [PATCH iwl-net] ice: only free LL TS IRQ when the handler is present
+Date: Fri, 24 Apr 2026 08:19:58 +0200
+Message-ID: <20260424061958.918404-1-aleksandr.loktionov@intel.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,176 +77,107 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: D250F45A2DB
+X-Rspamd-Queue-Id: 1A0D045A309
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280949-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,outlook.com,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shradhagupta@linux.microsoft.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280950-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.microsoft.com:dkim,linux.microsoft.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-In mana driver, the number of IRQs allocated are capped by the
-min(num_cpu + 1, queue count). In cases, where the IRQ count is greater
-than the vcpu count, we want to utilize all the vcpus, irrespective of
-their NUMA/core bindings.
+From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
 
-This is important, especially in the envs where number of vcpus are so
-few that the softIRQ handling overhead on two IRQs on the same vcpu is
-much more than their overheads if they were spread across sibling vcpus
+Free LL TS IRQ handler only when the handler was previously installed.
+Unguarded calls to ice_free_irq_msix_ll_ts() may result in a double
+free when the LL TS interrupt is not supported by the firmware because
+ll_ts_irq.index is zero-initialised and would pass the index >= 0 check.
 
-This behaviour is more evident with dynamic IRQ allocation. Since MANA
-IRQs are assigned at a later stage compared to static allocation, other
-device IRQs may already be affinitized to the vCPUs. As a result, IRQ
-weights become imbalanced, causing multiple MANA IRQs to land on the
-same vCPU.
+Track whether the LL TS IRQ was successfully requested by initialising
+ll_ts_irq.index to -ENOENT in ice_init_pf() and when taking the
+"not supported" skip path or on request failure, then guard the free
+paths with ll_ts_irq.index >= 0.
 
-In such cases when many parallel TCP connections are tested, the
-throughput drops significantly
-
-Test envs:
-=======================================================
-Case 1: without this patch
-=======================================================
-4 vcpu(2 cores), 5 MANA IRQs (1 HWC + 4 Queue)
-
-	TYPE		effective vCPU aff
-=======================================================
-IRQ0:	HWC		0
-IRQ1:	mana_q1		0
-IRQ2:	mana_q2		2
-IRQ3:	mana_q3		0
-IRQ4:	mana_q4		3
-
-%soft on each vCPU(mpstat -P ALL 1) on receiver
-vCPU		0	1	2	3
-=======================================================
-pass 1:		38.85	0.03	24.89	24.65
-pass 2:		39.15	0.03	24.57	25.28
-pass 3:		40.36	0.03	23.20	23.17
-
-=======================================================
-Case 2: with this patch
-=======================================================
-4 vcpu(2 cores), 5 MANA IRQs (1 HWC + 4 Queue)
-
-        TYPE            effective vCPU aff
-=======================================================
-IRQ0:   HWC             0
-IRQ1:   mana_q1         0
-IRQ2:   mana_q2         1
-IRQ3:   mana_q3         2
-IRQ4:   mana_q4         3
-
-%soft on each vCPU(mpstat -P ALL 1) on receiver
-vCPU            0       1       2       3
-=======================================================
-pass 1:         15.42	15.85	14.99	14.51
-pass 2:         15.53	15.94	15.81	15.93
-pass 3:         16.41	16.35	16.40	16.36
-
-=======================================================
-Throughput Impact(in Gbps, same env)
-=======================================================
-TCP conn	with patch	w/o patch
-20480		15.65		7.73
-10240		15.63		8.93
-8192		15.64		9.69
-6144		15.64		13.16
-4096		15.69		15.75
-2048		15.69		15.83
-1024		15.71		15.28
-
-Fixes: 755391121038 ("net: mana: Allocate MSI-X vectors dynamically")
+Fixes: 82e71b226e0e ("ice: Enable SW interrupt from FW for LL TS")
+Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
 Cc: stable@vger.kernel.org
-Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
- .../net/ethernet/microsoft/mana/gdma_main.c   | 35 +++++++++++++++++--
- 1 file changed, 33 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_main.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 098fbda0d128..433c044d53c6 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -1672,6 +1672,23 @@ static int irq_setup(unsigned int *irqs, unsigned int len, int node,
- 	return 0;
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 3c36e36..cc3743a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -3389,7 +3389,7 @@ static void ice_free_irq_msix_misc(struct ice_pf *pf)
+ 	devm_free_irq(ice_pf_to_dev(pf), misc_irq_num, pf);
+ 
+ 	ice_free_irq(pf, pf->oicr_irq);
+-	if (pf->hw.dev_caps.ts_dev_info.ts_ll_int_read)
++	if (pf->ll_ts_irq.index >= 0)
+ 		ice_free_irq_msix_ll_ts(pf);
  }
  
-+static int irq_setup_linear(unsigned int *irqs, unsigned int len)
-+{
-+	int cpu;
-+
-+	rcu_read_lock();
-+	for_each_online_cpu(cpu) {
-+		if (len <= 0)
-+			break;
-+
-+		irq_set_affinity_and_hint(*irqs++, cpumask_of(cpu));
-+		len--;
-+	}
-+	rcu_read_unlock();
-+
-+	return 0;
-+}
-+
- static int mana_gd_setup_dyn_irqs(struct pci_dev *pdev, int nvec)
- {
- 	struct gdma_context *gc = pci_get_drvdata(pdev);
-@@ -1722,10 +1739,24 @@ static int mana_gd_setup_dyn_irqs(struct pci_dev *pdev, int nvec)
- 	 * first CPU sibling group since they are already affinitized to HWC IRQ
- 	 */
- 	cpus_read_lock();
--	if (gc->num_msix_usable <= num_online_cpus())
-+	if (gc->num_msix_usable <= num_online_cpus()) {
- 		skip_first_cpu = true;
-+		err = irq_setup(irqs, nvec, gc->numa_node, skip_first_cpu);
-+	} else {
-+		/*
-+		 * In case our IRQs are more than num_online_cpus, we try to
-+		 * make sure we are using all vcpus. In such a case NUMA or
-+		 * CPU core affinity does not matter.
-+		 * Note that in this case the total mana IRQ should always be
-+		 * num_online_cpu + 1. The first HWC IRQ is already handled
-+		 * in HWC setup calls
-+		 * So, the nvec value in this path should always be equal to
-+		 * num_online_cpu
-+		 */
-+		WARN_ON(nvec > num_online_cpus());
-+		err = irq_setup_linear(irqs, nvec);
+@@ -3473,8 +3473,10 @@ static int ice_req_irq_msix_misc(struct ice_pf *pf)
+ 	}
+ 
+ 	/* reserve one vector in irq_tracker for ll_ts interrupt */
+-	if (!pf->hw.dev_caps.ts_dev_info.ts_ll_int_read)
++	if (!pf->hw.dev_caps.ts_dev_info.ts_ll_int_read) {
++		pf->ll_ts_irq.index = -ENOENT;
+ 		goto skip_req_irq;
 +	}
  
--	err = irq_setup(irqs, nvec, gc->numa_node, skip_first_cpu);
+ 	irq = ice_alloc_irq(pf, false);
+ 	if (irq.index < 0)
+@@ -3487,6 +3489,7 @@ static int ice_req_irq_msix_misc(struct ice_pf *pf)
+ 		dev_err(dev, "devm_request_irq for %s failed: %d\n",
+ 			pf->int_name_ll_ts, err);
+ 		ice_free_irq(pf, pf->ll_ts_irq);
++		pf->ll_ts_irq.index = -ENOENT;
+ 		return err;
+ 	}
+ 
+@@ -3496,7 +3499,7 @@ static int ice_req_irq_msix_misc(struct ice_pf *pf)
+ 	ice_ena_ctrlq_interrupts(hw, pf->oicr_irq.index);
+ 	/* This enables LL TS interrupt */
+ 	pf_intr_start_offset = rd32(hw, PFINT_ALLOC) & PFINT_ALLOC_FIRST;
+-	if (pf->hw.dev_caps.ts_dev_info.ts_ll_int_read)
++	if (pf->ll_ts_irq.index >= 0)
+ 		wr32(hw, PFINT_SB_CTL,
+ 		     ((pf->ll_ts_irq.index + pf_intr_start_offset) &
+ 		      PFINT_SB_CTL_MSIX_INDX_M) | PFINT_SB_CTL_CAUSE_ENA_M);
+@@ -4090,6 +4093,7 @@ int ice_init_pf(struct ice_pf *pf)
+ 	 * the misc functionality and queue processing is combined in
+ 	 * the same vector and that gets setup at open.
+ 	 */
++	pf->ll_ts_irq.index = -ENOENT;
+ 	err = ice_req_irq_msix_misc(pf);
  	if (err) {
- 		cpus_read_unlock();
- 		goto free_irq;
-
-base-commit: e728258debd553c95d2e70f9cd97c9fde27c7130
+ 		dev_err(dev, "setup of misc vector failed: %d\n", err);
 -- 
-2.34.1
+2.52.0
 
 
