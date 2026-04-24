@@ -1,202 +1,141 @@
-Return-Path: <netdev+bounces-281058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281059-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GA3PHyzQ62nfRgAAu9opvQ
-	(envelope-from <netdev+bounces-281058-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 22:18:52 +0200
+	id 6VGGLGrT62mQRwAAu9opvQ
+	(envelope-from <netdev+bounces-281059-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 22:32:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF7044632AF
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 22:18:51 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 243BE463343
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 22:32:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 526EC302AC0D
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:17:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 77FEC301939E
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 20:32:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DC2437B40E;
-	Fri, 24 Apr 2026 20:17:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11B8B284881;
+	Fri, 24 Apr 2026 20:32:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OfuBunUC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com [209.85.161.71])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF8A37C107
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 20:17:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953AD1F1932
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 20:32:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777061871; cv=none; b=bqq5lY8T+2WNbwYD2qaEmdMVByYgQXO4sFEZAFoHONBBfosoDxhz/IyEX5CzXrHvSs+TwuZN4FW+zizSIw15BcXhwALP+C7FCe7Ojatzpf4AITuoAhW4oYEc2RNDDvs2Xc6QiRIKF7cdduaDZUaVitFEF/aV+VlJDhoOkr7GD90=
+	t=1777062757; cv=none; b=LXtJHi3EYtGQyfwKA60/1lSiX6S1GoFRlhONKJ0ETHlqdEncRlGz10XmSTDg/XAawgJogM2fhzPvsGKZo0jyEpSFK5e2XxIDYQHvSAaiI0bk+fq+YX/cEq69MK9KnBq/8ZrhTpDKbqRCu5GVmk+WVMC93qvK3UTu9Lo7fjfsW2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777061871; c=relaxed/simple;
-	bh=qQxl11pEiuSHAksUCACQvi1ky2YjfwOu6r0yo/RCIFg=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=H4sfRJNAqEodja+SGJxaQzRKMtgycAgibKUsg+drK8HKQCjp8JdVT0SVM6BdoWI/XnYZrI7dgZHZzaOJdPUzrgZnHbd0RruhJOadjyD/BjqAP69gzC4tyhp1opVOByKJaVEUTVTv4RxLp/MhzcgMI0angsNYFM/PoAdlydre3s0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-679c5ed0942so12591451eaf.1
-        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 13:17:49 -0700 (PDT)
+	s=arc-20240116; t=1777062757; c=relaxed/simple;
+	bh=FU6p+3POBVRSERpP8ZtkiWJilhhPLhJzicOB/M0qIzM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=PHuQaTqFXxNkUS+dK2MpLCaylz5PA/j1Kf0dis/OlTky0Pvl4ae/4gg4TedrkJ20hybM450jNg0wCp/t5d9G7M9AXbXwLAEuZFBIxpPBWfrSFD4IuqOt1IzmLlN/Iu02YyYZououSjXVVyY76qNqUJgQcS1ZOJ+sOcTdstv/ILs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OfuBunUC; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4891cd41959so63866995e9.3
+        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 13:32:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777062755; x=1777667555; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IfJjmhDHLMekoHwDHXYTkJMasD4cWdKh/MUO+Y7u60o=;
+        b=OfuBunUCmyihcWA0Lmn8GCMd9+HX5t6nkI9wRto7i49QQWDtdHhtxnQHL0U4wN+yYh
+         dmVJvPQJO2wzcILEE5Lg+Xgj1CWvIeCxq1pEPEr0yL8LjwiHiocN5ESVq/boWHXtkLuM
+         zG33S0pm8hj4gRUMymlu1hAecN/z3uiFVQg9j/RohGUIUMAdfdKalVYcfZ2yXdMV+gWU
+         qb0IpFh0RbFAuXLtrREg5J6bvmFe99bYl1lj0Zh7QYF0rkkzvy+QHS8cq3NwcFdZubXo
+         lyYUHyshTU8YNJUAqs8TXPe40xPcIEz8C9nbeSlyi5hxNmLu0m5zvyomO9kgR/akQ7ul
+         kLew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777061868; x=1777666668;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FtDPKkTm6UEDeYWPpWSRzW9tqH24Rk9NxnYdpKkM4Nc=;
-        b=Z5li6iVc6ffgxRyIJSOkaxr157YPj/2DAEaez/hh/94sYHDIV9df4rzW0LWLq92VGJ
-         UinTlexUDPM5RkZE5UP1HxZYdanZvbAJZlUFDSEvcaArgGAxRYxXruTFWSkFsn2jc3TZ
-         rQhFYeBYN8AOoqM/P7zDtrrt9+dxJztIukKtGWqeL+jbDG5TbPJtKVg3Lew+71AefG7a
-         RP2jVGMt5LmOQVPDgn3GnvOo03J0qvD3Ee4gglFNlONYj3+yfQl+t3LNv6pNtZ0Mv7Mv
-         9RgzdTW6QfG1eG1OygqT27u2PJKNZTTmBLrZSMFHTSwepJBa0IYh35wGf/BmTY7Xb8bf
-         qDWA==
-X-Forwarded-Encrypted: i=1; AFNElJ/qOgCDrQq2r4e13srGU5OtyvZMNu0w39tSL03OIlFR8Q0L0rBTw0lXte2qqFOhY5MOnQKERak=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLm/Xb3Sg12je7IXFDkhK8dlO6OgrNLUFohOxJ4y00BynarbX7
-	xMLSPX8mgfHuRlcDu5aSdrSvtXlgrRFulTvw8ZbyXTJSWN8R+ZPoXNGi6x//kcUqyDNyGnPTXgr
-	zZI3pn9SRyFk4Z+2nPJKQzSxXy1DRvJzthlqNsPEqv0Lbg5VacBjTFkIXrqM=
+        d=1e100.net; s=20251104; t=1777062755; x=1777667555;
+        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
+         :from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IfJjmhDHLMekoHwDHXYTkJMasD4cWdKh/MUO+Y7u60o=;
+        b=tHzK3dF7h9RgOkgTDYwfYr3kLa3uD1B3dRi/aY8Yo2Aug6emITdy+yUcVqSq033aQB
+         L8UXVuTqAE6dXrFMvIvn2dUi23z9xi6HuL2qBN12xC3vxXrPIyPds4b6NeQlLLIKhB71
+         6KxL3petJ4LgnWtky0pmmeS9EFPxcZE3JnRTVYJbb1gMQ87JV1q7vnr+/uzwnW+YxA++
+         V1sReE0hes335SnkuwJhLg4gKT7A+easyD6JAAfb1GWRqbzMKcCA7/bzfAnV8VHFAkh/
+         DpaIXuUB8202rdZuyBVSFVr/lAnXlFelMla7PGj4lmwXhWWaS8n0vr0MExRopGis1ErY
+         PaQQ==
+X-Gm-Message-State: AOJu0YytrD+TYljAVXhxWscTVmTibfP8uxC9no0Ql77cfHkwSUdRxVu0
+	oA76VsHlEpQ8V1IIH1RFcFTYSHpWm8wqGkfeBlz050f5sC2Z0mETR923SBymsw==
+X-Gm-Gg: AeBDies+8LmzdGGdN913v7++dwJpMAZO9nyDr+Tl719ALhVOo8Ok7EADUu8UjXmwLVn
+	ag11wMzkHWtVqhHO0SfuyTbpptbIykCwmQga9ErB2g0xGqkz1fWHN9WqJuGao+MbCXHHqK/F0F4
+	wgNM/TrSmeNrH3nSq7snpcDaNcEKvOUrnEntGA0YLW6+NhfIrRE621C31SQ81S6VueuyYOz8F+p
+	461kO67Ga1LaK9M0ubpjNpAMgdkAV/TL8NdMpxYvtxaLUXZ8xAc1kCSWOnTGvMuTJH980L6MEg1
+	1h16tYuz4oFlV3BP6I/p4gaxXJ6MXdolbuRT3UB4MDc54iEzN1QZDbV6bfqWtSBf4A/dWmgKqtj
+	Y23JEglEXKexSBOHEZPzBrrVZbI6ysAzHhLsN8dls08W/jYCAlJUnNQYR7TSnEmQm7q3k5tJT/T
+	6HN15EDv+xuVFLadGcBGvu6Fbt
+X-Received: by 2002:a05:600c:8115:b0:488:8577:d9cc with SMTP id 5b1f17b1804b1-488fb77faacmr421763485e9.20.1777062754784;
+        Fri, 24 Apr 2026 13:32:34 -0700 (PDT)
+Received: from nz.home ([2a00:23c8:a613:101:6a07:6835:efe8:e43])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4891ffd2030sm114009535e9.20.2026.04.24.13.32.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Apr 2026 13:32:34 -0700 (PDT)
+Date: Fri, 24 Apr 2026 21:32:33 +0100
+From: Sergei Trofimovich <slyich@gmail.com>
+To: stephen@networkplumber.org
+Cc: netdev@vger.kernel.org
+Subject: Re: [ANNOUNCE] iproute2 7.0 release
+Message-ID: <20260424213233.4dabf6bf@nz.home>
+X-Mailer: Claws Mail 4.4.0 (GTK 3.24.52; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:6ad0:b0:696:29be:abd9 with SMTP id
- 006d021491bc7-69629beb9d6mr1743278eaf.22.1777061868159; Fri, 24 Apr 2026
- 13:17:48 -0700 (PDT)
-Date: Fri, 24 Apr 2026 13:17:48 -0700
-In-Reply-To: <20260424150310.57228-1-kartikey406@gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69ebcfec.a00a0220.7773.0006.GAE@google.com>
-Subject: [syzbot ci] Re: vsock/virtio: fix memory leak in virtio_transport_recv_listen()
-From: syzbot ci <syzbot+ciff083ac8f264c29f@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, eperezma@redhat.com, 
-	horms@kernel.org, jasowang@redhat.com, kartikey406@gmail.com, kuba@kernel.org, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mst@redhat.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, sgarzare@redhat.com, 
-	stefanha@redhat.com, syzbot@syzkaller.appspotmail.com, 
-	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: CF7044632AF
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 243BE463343
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.36 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	FAKE_REPLY(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-281059-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-281058-lists,netdev=lfdr.de,ciff083ac8f264c29f];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[davemloft.net,google.com,redhat.com,kernel.org,gmail.com,vger.kernel.org,syzkaller.appspotmail.com,lists.linux.dev,linux.alibaba.com];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWO(0.00)[2];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[slyich@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email]
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nz.home:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-syzbot ci has tested the following series
+> Download:
+>    https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-7.0.0.tar.gz
 
-[v1] vsock/virtio: fix memory leak in virtio_transport_recv_listen()
-https://lore.kernel.org/all/20260424150310.57228-1-kartikey406@gmail.com
-* [PATCH] vsock/virtio: fix memory leak in virtio_transport_recv_listen()
+This URL is 404. Looking at https://www.kernel.org/pub/linux/utils/net/iproute2/
+it looks like tarballs slightly changed their naming and now prepend `v`:
 
-and found the following issue:
-possible deadlock in virtio_transport_recv_listen
+iproute2-6.19.0.tar.gz                             18-Feb-2026 15:36      1M
+iproute2-6.19.0.tar.sign                           18-Feb-2026 15:36     566
+iproute2-6.19.0.tar.xz                             18-Feb-2026 15:36    936K
+...
+iproute2-v7.0.0.tar.gz                             13-Apr-2026 19:31      1M
+iproute2-v7.0.0.tar.sign                           13-Apr-2026 19:31     566
+iproute2-v7.0.0.tar.xz                             13-Apr-2026 19:31    940K
 
-Full report is available here:
-https://ci.syzbot.org/series/e5f3f5f1-8e83-492f-833b-dc526b61d0ef
+Should `v` be there? Worth removing at least for next releases?
 
-***
+-- 
 
-possible deadlock in virtio_transport_recv_listen
-
-tree:      net-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
-base:      e728258debd553c95d2e70f9cd97c9fde27c7130
-arch:      amd64
-compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-config:    https://ci.syzbot.org/builds/bcc67f3f-b441-4d11-8573-f26ca268da65/config
-syz repro: https://ci.syzbot.org/findings/fce9fa9b-692a-420c-956f-12c7e6d75e2e/syz_repro
-
-============================================
-WARNING: possible recursive locking detected
-syzkaller #0 Not tainted
---------------------------------------------
-kworker/1:5/6007 is trying to acquire lock:
-ffff88817492e2a0 (sk_lock-AF_VSOCK){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1713 [inline]
-ffff88817492e2a0 (sk_lock-AF_VSOCK){+.+.}-{0:0}, at: virtio_transport_recv_listen+0x13a5/0x2230 net/vmw_vsock/virtio_transport_common.c:1593
-
-but task is already holding lock:
-ffff88817492e2a0 (sk_lock-AF_VSOCK){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1713 [inline]
-ffff88817492e2a0 (sk_lock-AF_VSOCK){+.+.}-{0:0}, at: virtio_transport_recv_pkt+0xfde/0x2bb0 net/vmw_vsock/virtio_transport_common.c:1671
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(sk_lock-AF_VSOCK);
-  lock(sk_lock-AF_VSOCK);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-3 locks held by kworker/1:5/6007:
- #0: ffff888112391940 ((wq_completion)vsock-loopback){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3277 [inline]
- #0: ffff888112391940 ((wq_completion)vsock-loopback){+.+.}-{0:0}, at: process_scheduled_works+0xa35/0x1860 kernel/workqueue.c:3385
- #1: ffffc900030dfc40 ((work_completion)(&vsock->pkt_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3278 [inline]
- #1: ffffc900030dfc40 ((work_completion)(&vsock->pkt_work)){+.+.}-{0:0}, at: process_scheduled_works+0xa70/0x1860 kernel/workqueue.c:3385
- #2: ffff88817492e2a0 (sk_lock-AF_VSOCK){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1713 [inline]
- #2: ffff88817492e2a0 (sk_lock-AF_VSOCK){+.+.}-{0:0}, at: virtio_transport_recv_pkt+0xfde/0x2bb0 net/vmw_vsock/virtio_transport_common.c:1671
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 6007 Comm: kworker/1:5 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Workqueue: vsock-loopback vsock_loopback_work
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- print_deadlock_bug+0x279/0x290 kernel/locking/lockdep.c:3041
- check_deadlock kernel/locking/lockdep.c:3093 [inline]
- validate_chain kernel/locking/lockdep.c:3895 [inline]
- __lock_acquire+0x253f/0x2cf0 kernel/locking/lockdep.c:5237
- lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5868
- lock_sock_nested+0x41/0x100 net/core/sock.c:3783
- lock_sock include/net/sock.h:1713 [inline]
- virtio_transport_recv_listen+0x13a5/0x2230 net/vmw_vsock/virtio_transport_common.c:1593
- virtio_transport_recv_pkt+0x174b/0x2bb0 net/vmw_vsock/virtio_transport_common.c:1695
- vsock_loopback_work+0x32c/0x3f0 net/vmw_vsock/vsock_loopback.c:142
- process_one_work kernel/workqueue.c:3302 [inline]
- process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3385
- worker_thread+0xa53/0xfc0 kernel/workqueue.c:3466
- kthread+0x388/0x470 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
-
-To test a patch for this bug, please reply with `#syz test`
-(should be on a separate line).
-
-The patch should be attached to the email.
-Note: arguments like custom git repos and branches are not supported.
+  Sergei
 
