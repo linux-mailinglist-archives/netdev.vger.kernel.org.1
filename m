@@ -1,185 +1,199 @@
-Return-Path: <netdev+bounces-280918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280919-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iPOpKhzY6mnAEgAAu9opvQ
-	(envelope-from <netdev+bounces-280918-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 04:40:28 +0200
+	id NLZmE7Ld6mkNFAAAu9opvQ
+	(envelope-from <netdev+bounces-280919-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:04:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0624C459087
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 04:40:27 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B711C459475
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 05:04:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 524F53018D72
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 02:40:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CAAAA300A4C9
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 03:04:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D70A277C96;
-	Fri, 24 Apr 2026 02:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72B183191CA;
+	Fri, 24 Apr 2026 03:04:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ar+WVo12"
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="eFBn2lKV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954C325F7A5
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 02:40:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776998407; cv=pass; b=VAHK7zclg96BcXVUfQPeLgtI0CjsVZF5OJglRfJQHEGBJ9bcu676U/gM0IRn2AXvWSr4+U4sTYT/0V1TOedk+RrFALq9KrY1qp9txBua90A8UP82iGJsQoUHdQXEH3I7qC62ogspm5qYNaSewpk7fHFIqZt+gg7jioO2ltAmClg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776998407; c=relaxed/simple;
-	bh=ncQrS+AzLmUOPluS5pHJNbUBX63csa/EN+EfVF6+O8s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ffEC0Zld6i1o6ncV6hOB/nD6HZN4cAg6424TpY2gGsvzMxbw7eOlgtqXmtoZVjtF5UMhhqmLRNbfdqyM6H5jW+bv5dILeEawe1tVzrqylemVBJcTsx9dm40+hNOkmF8L8NhtDX1+h2qw5LX9foMVUvtDBSkwF1ZvTvHk1hN5EYo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ar+WVo12; arc=pass smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-59e4a04f059so8693581e87.2
-        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 19:40:06 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776998405; cv=none;
-        d=google.com; s=arc-20240605;
-        b=JOI56KgcVEEEyqVRKTE1Rn6o4uizY6b9fiiDbB0UQzKQZr2M3IvIrgByODx9ZhQ1fv
-         ddIZr6CsAnvIxpP70Sqhv0GAlnYVFLcrHZNOVaY2jd4HdNAQtOiA6l4a/5y0Pxj3gq+h
-         S0KTjSQz9QQ2iodyv3Bcp3wpzCXrk96dmdmIy4tAZccBM30ARGrRKln4O1aVhKksMtU1
-         yh44Qty0FIBE/4tFUpfpDz/oNobbBEKEbnvbCRvviw+TaipEMFbON0McD1SgV756x1wE
-         olQCwikRHYh7bJQxVMEjcORhX2uMiwW0zACpTPpavm9/wPNzPxeWhIGQVZS8AefxJqPb
-         bhqw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ncQrS+AzLmUOPluS5pHJNbUBX63csa/EN+EfVF6+O8s=;
-        fh=JNYGIOjvlqAWUXCoaVptU0A5i6vfTCP+Q0GJ2PIHBO8=;
-        b=XbRToQtZH/0CoIPy62ll4iljSzdBMbSphCuPRRxG46AZ6s+rRFmevPibfbk5X6ObAF
-         6RuoHoz07aL2eCT9kwiphpGGPdqX9cwN7bMexfFewuMxvTtUR7yF7JPanu8IAXvJYA4p
-         H6oAp6ZMa8GSQJAUPX/nZ9bzK1L4oumZSf85SJ1kyVHY7MyvVTTEnfmlQ4fr1bk2Kewv
-         oZvShVUnVpatSlYSQNxW7ehfYUdVo+sW6BThoqGKWIh8YVCdM7Korf92IJYodRmWihBl
-         ntVbT5uTGuguwXtX8b+nr6aCZJDSTdLpK8SdRpgNnyTPMwtBqhyvobtCw0Es5qCrpaZU
-         U44w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776998405; x=1777603205; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ncQrS+AzLmUOPluS5pHJNbUBX63csa/EN+EfVF6+O8s=;
-        b=ar+WVo12K+O4eJXHSNXL9uKCkxMhEQrgPnwWxg44NPIhu3b1n7aBkCZkcWPTeG5+9t
-         SgoAuExonWSNldbcZT8eCgx7Cf4PTWkc9aRLjp5NHfxJHDm2rtHCpHZdSudOyM4XfahZ
-         00PmdWI+sWA7ghNL5XKpYlweKdw4u5a3BL3CiRMHCi7Mxge+L2Ba6qaQVecR0ND22IH/
-         0JPAETXMwPDVp8ZjOs6vK3C08wYpMIHtZXzvRUZG0Srg6i9NDN10FjrYEkQuzqJG+vfg
-         nklXhgxFYdmFmFuNssO0ucWucFh6GpqJ3A2vXLnizrYgE4kshyOE9TsLckNqUISXfR6U
-         0rkA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E93D309EFC
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 03:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776999855; cv=none; b=U5hFyrxtnVgdiM3xaAwavuqBSJnNJM3hjCW9hhv9VpDr33m1v6vfxUPmJkVj6Htw4wVMKSa1wQKFDTF0NP5tIBcQ8jZMLgtPm6U8pYYppcM3otMPx6tiLvSVZ+tXg7by01oIjgj5eOv9RvoMdbiAicLmJKvP4py9kWMJJ91F7vc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776999855; c=relaxed/simple;
+	bh=hwtjZPe3kNPIuozWzzhgCt7AfHLeFa0m1BfVNrT8+ek=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BRElIzlVUy3wIRAenv8ojOq74/nke8UV7zwFzJmdK8J/EhvZPI4UJIo0dnOHVxYVWumW2rpjI9WTPLJbFP5zVIWF1x+LBK+AljAqMmhxRRTkxuBjZhDIDVNp8DchAZ4/ta2KXx8fBUc8a9naBLUX9v8/nJWL48hYDA/pHzElDCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=eFBn2lKV; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 73C4A3F9CE
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 03:04:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20251003; t=1776999849;
+	bh=fE6/Ks26kVTyFQ0eNTbStdq7kzWJK58GKRv4GCZ9rSE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
+	b=eFBn2lKVreUFfWrnDbTwASagI0zYxXvEMBpF8AxQlaJDNqdlP+rsv+SFZxj7YV2qd
+	 INlS3eI0SmTGc+jEiOc119bfWdVY75w/T3vzW4zk2UY2zmRoSVD1zbXpPq6R0GYbAS
+	 toncHdfHEpo9F+kZwJvNucOe3uTpOgDuSG9N98Y/dSY3AhKgUb7eHzhw2pnCzTifbB
+	 nE2phv8ey3gfrpbD8HPvPL5c5fx0MfKGJFkJXygqkUOgnQjvsAUz1KnjazX3zf5YKi
+	 TuGt8FmFnNka7mbOaxgyqbl0yj1s9ZhIoZDlKCusppacNLC0qF2Cs08mLiIA8czdsr
+	 Nlyu1SanV1MPAkRtW5tNiW8ioNszq5DsPL7y9F2wEN/mQ1P4jwOTREsc+VtTQBg3+/
+	 NN8v6eT8dJnBDVe9+bcB9w4qSdLLTU00KxJjR6gGQ+sHnnfecgW9t7YtMMYzJm/Hur
+	 IpYG3LHizyd7KgRyTj8fxwm62Qcb9jmMHnwO6OYCLVdpPMdoDbjwOv+HbSY4xkD7la
+	 gaddGyugrtVDk8AeKdUWLRR9MaiRXVtXqMjRHlGtMXECmSBV5CW+1Ufu6Lck0s/Esj
+	 /f3X5Jj6ymbQQoZz4cI+pl+6nivpQ0jehqNsaLGH1L1Ay50EvRRVi6VFk2DtWDGi+w
+	 NysMQ3q6HDnXiKxQkFaOH3YM=
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2aad5fec175so103737975ad.2
+        for <netdev@vger.kernel.org>; Thu, 23 Apr 2026 20:04:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776998405; x=1777603205;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ncQrS+AzLmUOPluS5pHJNbUBX63csa/EN+EfVF6+O8s=;
-        b=Ya1i5UGYoUFKLMeiZeX9JVvjWYnyNowkffPHidojJq5mUfeOqLI/hBTlf5BeZq4B7+
-         o64QkEZp4ReTxe0cLUA6xdZnCncgYrapW/gWJnTtZpeX/1t5AA5ujgs9ugHlYLIJmYlu
-         0m0yWYt+mZiUEdpBQJYIiyH6UAuS2cX+/8LPVBxIYLvjlqWfcjVTKBva8zSf85tWEggS
-         yNo3tn3Fkov455wZBr6AU/GIwvXW7oFG0LlvHLz3RpUXhL+pOC+QY2joXH+GlcUUvNgq
-         tlTFsqMR99BFGX59mmv0PJmXsV5F83XdMSBqWJjpS9tWTYuSLh1vby0wnwGmeUKHhZua
-         /Ggw==
-X-Forwarded-Encrypted: i=1; AFNElJ/F/gFeg2MspzE5vqzpjDrQNOq+1v5uqm2f85pUp8uDxlHjXULdUkpu49GCF2ka0Zt27T/Lezg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqOdDmZZVuYmXPzUer+STaHuVMPePozsunqSOSwifNwXvhHJcX
-	85Tckp0NpgADvPzJxDrGhPezvf82/lvO5DCLBrn6GC0Q2KZw/cCb0R7MCluBOC6HjDPtzb/rT+v
-	BI5U2+hGZCu7HpO/n7M7yG/dIzh5uNlI=
-X-Gm-Gg: AeBDieuAjXb+ZS6rTd7JTfy1MPPzbWnxMUwjVReZfSBDOpYUtlU4RcO2AUoVOrZLhlc
-	yhKJUGbopbxr+CSlkotDw8213wTyIeTQ3hP+7EKTQ7GTNK3c2dtTAmV7Xuvql1NCyXhGSn1jPfB
-	u6+S+g8aLuwGVrRpTXFm42B09rE2mQMiTRcMe2ljFQfL2PtjKDWQmQr3bD/Frh2lOVEVtJmPK7Z
-	JA3D2uh1TGuFYai1atnaxymRg/v/7mIpmmONuiXvZ7eBTk8QDZfnGtGObifIVldJ3RNvBaFC488
-	9lxrr7gt2Q1edxW+isgCLLMwqTm4yCgooSz8hC0F3r30J4mMXa8=
-X-Received: by 2002:a05:6512:b99:b0:5a3:cc81:efdb with SMTP id
- 2adb3069b0e04-5a4172de867mr9140040e87.21.1776998404445; Thu, 23 Apr 2026
- 19:40:04 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776999848; x=1777604648;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fE6/Ks26kVTyFQ0eNTbStdq7kzWJK58GKRv4GCZ9rSE=;
+        b=R7rF1rf6MIeqawc9ylDzen+6HMxMP7uknwrraTnlO8sdj2GqCuPeK3K2q2p8YQ8pf+
+         /fvHKYTuydg9oMBDgre6gFh7y38RNGSTlloVaLraqrgCtWJn/HNSgSOMieo3kFOolK+v
+         paNpOs4wg/TEGcChUIebzT2s6z0ZVYm0gQ4IPHypao148G8d5gjb/yEy4LCYrbnUB61L
+         bDSZjMHTKaXge0o8gybWwIMfztnsuNLOiNlBpFAfMMBgcpTpqUX+qblB6JhX0Fqutwy3
+         WxYOTYBGQsbYoQ2i5LTtLJ+RvPqXwYcTFNCdKHgr4VxmjIBH5szLE4XIEWuhs5UM53fT
+         nJEQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/dV3Uq7rgymFKFFo9mb9oFpRBMBh+4uTpo9cvvJ0953ZSNYQxYpXVs5uvCirvjQJWAhfn0obM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yysj6vH0pg3QikpNGNmBb5HyFr61WEbW0ClFXz/eAiFdOW9TFXQ
+	PWPRDTCoIHJmgtE6CKUlwQQLw6FPqMkHcFtXUsMiAaGfmcsx/P23ihDInAfwENjqzWV2V76ORgH
+	Qy0JVJAiNaTbqQ3tDL9Vt5/ORr8ebqqY32WgwZZ8IkxYOfFUsTuwrWwfSZAczUX/lJW5jvNJOlw
+	==
+X-Gm-Gg: AeBDieuHO3ZfU3cT+X+Z9Lh4BcGx3nC3EIuUt9Lbbd4xDhNbS4vvGliNZI+USjeXpTX
+	TYAfFYebqBwTk/kpdl34JyrEYKxyo0L+u2XRakjyeYOh90qzkLDHZQd1lNyGMvzHZbU5ZmvUsHO
+	FjUEVoGAeodRj80DKhk5Wm7UWUCd+RTSIubxFs0mpZqjcjk2O1uojlJQcUCy7GY97emNFzHarDj
+	BUBcr0Ug3i86k6TWz3CPBAwwYDDNhF3v8Eiao8Bc6emDxzgrPQdKyfepc6st8boUSoqzVVxB5ZO
+	3BJwY6mZEN8Rw8J5yDRTzRaWlNoy9Uwrip5ztDHhLlyxB4Tcm6T82CmJHikscZz2mU2RNNnnn1s
+	/W1GqiLJ9xGkcNBqyvfjOwmtZb+IRZhLWJyFcJUbzGAV0ixYo
+X-Received: by 2002:a17:902:ffce:b0:2b7:ade8:2407 with SMTP id d9443c01a7336-2b7ade826f8mr55540175ad.19.1776999848129;
+        Thu, 23 Apr 2026 20:04:08 -0700 (PDT)
+X-Received: by 2002:a17:902:ffce:b0:2b7:ade8:2407 with SMTP id d9443c01a7336-2b7ade826f8mr55539845ad.19.1776999847810;
+        Thu, 23 Apr 2026 20:04:07 -0700 (PDT)
+Received: from localhost.localdomain ([103.155.100.1])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b5fab0caa9sm206428625ad.40.2026.04.23.20.04.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Apr 2026 20:04:07 -0700 (PDT)
+From: Aaron Ma <aaron.ma@canonical.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Akeem G Abodunrin <akeem.g.abodunrin@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	intel-wired-lan@lists.osuosl.org,
+	Kohei Enju <kohei@enjuk.jp>
+Subject: [PATCH v2] ice: wait for reset completion in ice_resume()
+Date: Fri, 24 Apr 2026 11:03:45 +0800
+Message-ID: <20260424030345.1140665-1-aaron.ma@canonical.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260423235422.1541768-1-kuba@kernel.org> <7ia4se8lb0vf.fsf@castle.c.googlers.com>
-In-Reply-To: <7ia4se8lb0vf.fsf@castle.c.googlers.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 24 Apr 2026 10:39:25 +0800
-X-Gm-Features: AQROBzAvx4d7CcF8GXaCg13ddTQn2ODtR3RVqyAvkaqKxwx7HWCG97wDtc16dus
-Message-ID: <CAL+tcoA7RF2LDbOUaFz-06+w=azpizTMTi0E8v_geE2TWCSArA@mail.gmail.com>
-Subject: Re: [GIT PULL] Networking deletions for 7.1
-To: Roman Gushchin <roman.gushchin@linux.dev>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
-	Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 0624C459087
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: B711C459475
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[canonical.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[canonical.com:s=20251003];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280918-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280919-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[canonical.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[aaron.ma@canonical.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,mail.gmail.com:mid,linux.dev:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,canonical.com:email,canonical.com:dkim,canonical.com:mid]
 
-On Fri, Apr 24, 2026 at 9:31=E2=80=AFAM Roman Gushchin <roman.gushchin@linu=
-x.dev> wrote:
->
->
-> 2c on Sashiko:
->
-> 1) I'm working on an infrastructure to separate pre-existing issues from
-> new issues. My current thinking is to stop reporting these issues with
-> reviews of new patches and instead put them into some database and give
-> maintainers access to it. Sashiko will automatically deduplicate issues
-> and index them by the source file/subsystem. Hopefully it will mean that
-> maintainers will see only a limited number of issues in source files
-> they support. But I have yet to see how it works in practice.
->
-> But I'm somewhat concerned that this way many of these issues will
-> remain there forever and by reporting them with new material we actually
-> have better chances to get them fixes. Maybe it should be configurable
-> per-subsystem. I'm very open for ideas here.
+ice_resume() schedules an asynchronous PF reset and returns
+immediately. The reset runs later in ice_service_task(). If
+userspace tries to bring up the net device before the reset
+finishes, ice_open() fails with -EBUSY:
 
-I reckon reporting pre-existing bugs is very meaningful, especially
-for maintainers/reviewers/key developers who are trying so hard to
-improve this area. But it's a burden for a one-time developer to
-understand and fix those pre-existing buggy behavior.
+  ice_resume()
+    ice_schedule_reset()          # sets ICE_PFR_REQ, returns
+  ...
+  ice_open()
+    ice_is_reset_in_progress()    # ICE_PFR_REQ still set, -EBUSY
+  ...
+  ice_service_task()
+    ice_do_reset()
+      ice_rebuild()               # clears ICE_PFR_REQ, too late
 
-Syzbot has its standalone place for people who are willing to keep
-track of known reports: https://syzkaller.appspot.com/upstream/s/net.
-Maybe we could do something quite similar?
+Reproduced on E800 series NICs during suspend/resume with irdma
+enabled, where the aux device probe widens the race window.
 
-Thanks,
-Jason
+Wait for the reset to complete before returning from ice_resume().
 
->
-> 2) Re false positives vs finding more bugs I had the same experience.
-> It's easy to tweak it to be more conservative or creative, but it comes
-> at a price. It seems like the real answer is simple a better model. We
-> saw a big improvement internally switching from Gemini Pro 3.0 to 3.1.
->
-> Thanks
->
+Fixes: 769c500dcc1e ("ice: Add advanced power mgmt for WoL")
+Cc: stable@vger.kernel.org
+Signed-off-by: Aaron Ma <aaron.ma@canonical.com>
+---
+v2: reword comment to clarify best-effort semantics (Kohei Enju)
+
+ drivers/net/ethernet/intel/ice/ice_main.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 5f92377d4dfc2..a81eb21ea87c1 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -5635,6 +5635,15 @@ static int ice_resume(struct device *dev)
+ 	/* Restart the service task */
+ 	mod_timer(&pf->serv_tmr, round_jiffies(jiffies + pf->serv_tmr_period));
+ 
++	/* Best-effort wait for the scheduled reset to finish so that the
++	 * device is operational before returning. Without this, userspace
++	 * (e.g. NetworkManager) may try to open the net device while the
++	 * asynchronous reset is still in progress, hitting -EBUSY.
++	 */
++	ret = ice_wait_for_reset(pf, 10 * HZ);
++	if (ret)
++		dev_err(dev, "Wait for reset failed during resume: %d\n", ret);
++
+ 	return 0;
+ }
+ 
+-- 
+2.43.0
+
 
