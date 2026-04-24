@@ -1,200 +1,168 @@
-Return-Path: <netdev+bounces-281074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281075-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yHBwOJD962mMTgAAu9opvQ
-	(envelope-from <netdev+bounces-281074-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 01:32:32 +0200
+	id WCZCDTMB7GnuTgAAu9opvQ
+	(envelope-from <netdev+bounces-281075-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 01:48:03 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42D2E46410D
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 01:32:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C82F846428C
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 01:48:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D66C830142B5
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 23:32:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E83073015E0A
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 23:42:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53E0830EF75;
-	Fri, 24 Apr 2026 23:32:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E8DF305E3B;
+	Fri, 24 Apr 2026 23:42:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FWyOdMQC"
+	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="Q9/wSQCx"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA8526B2DA
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 23:31:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E3B0194C96
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 23:42:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777073521; cv=none; b=oevu10zutzu8SVFs8ljqNFO8+GLxOMVy9Vr1Ou27iro7/LBtFR0q11tdT1Nl/mZScdyTZDtVLOtrg98X6khYUPcAZz7ZhhJEiqelkH/FgUcRq66gMoUUbNRPgpchEVaasBPawTfdhWr+awVNbgkzbSngUHcOmuq4Xh/EBH/7Obk=
+	t=1777074176; cv=none; b=syk82BBYVnPGk3heZ0U523Kyq/NbIUcYZiF3cFtz6B0Z9VeMy6hixDptNo0b7gna76ZsxVheOfLTn6biF6HOhGr8fLN2BdAEj+li7G/+2lJA3s4rMH1kBBAPOnaVyAJoHcxU+fiw6bJXS9ecfYWm7fW9+9Ia1HnK50hazejmuoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777073521; c=relaxed/simple;
-	bh=HblVc0QZVcSH+BEhdYmIe+eu3V5O05SC87J/OgoXbNg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ouuxexNJObo7J5HoVlroFQxrcZu4UNdoJ/P5VDNQXts/Z2ux9VB7zBT7swLGetaeO0Rj36YopDCYGs3HaMSsCWLTCvAteGGwfvpkkXj7zDDdQGGrdIngA1tMnXnqbutdtT5tiL2+Zf07qkIzkf6MpjoCrTCsz7j7cskPWAQgN/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FWyOdMQC; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <d8fccecd-5418-46ff-8e9f-065d1dee6d98@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1777073506;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zyUuyE7w6pvvtI2U755rVQDGqOG1TjZmAAoWkbcJ3pw=;
-	b=FWyOdMQChNJACKlHSUigRbF+UkaZINGXAnfgG0l27LLGRf/hYjHu/Lxkyy0R7Svov/3cgV
-	ca7lKrp+oJsiAffpgj9aIdrEaU8SwwAp8RbrsigFrfnx1EjvABSU63IFjcjHzxaGMsifyR
-	FfCrsxV2p8KUbJc33PxkbcHVFDmYG7c=
-Date: Fri, 24 Apr 2026 16:31:29 -0700
+	s=arc-20240116; t=1777074176; c=relaxed/simple;
+	bh=xshFMf2VMY7SoGs7/xFtNCry5wCfXIwmGTZ7cqC1L9A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PZdqNMOW9zQsk7fCivulpW7KtlSsaqCAX00Ze7BO9asK6wX1o780Go7RqU+bmKuJcht/szTXUDboNlUFvVRo2BIe/yd7j+xS+Z0FiOKQFTQobdcMBfgSFRiSvc5QdqC5c0x8rA58FyVeaUQcB4EKq7L0ZfdFZdvU3oSNjWh6GtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=Q9/wSQCx; arc=none smtp.client-ip=49.212.198.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
+Received: from x1 (130.4.31.150.dy.iij4u.or.jp [150.31.4.130])
+	(authenticated bits=0)
+	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 63ONg3iG088695
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Sat, 25 Apr 2026 08:42:05 +0900 (JST)
+	(envelope-from kohei@enjuk.jp)
+DKIM-Signature: a=rsa-sha256; bh=+FK47/YVSXCzd/k8sYv3lFTZMqjyAVmDEZ/iJ1TVHxk=;
+        c=relaxed/relaxed; d=enjuk.jp;
+        h=From:Message-ID:To:Subject:Date;
+        s=rs20251215; t=1777074127; v=1;
+        b=Q9/wSQCxMei5CVr8QdHvKLXJdkEUKGKTV3t0F7DuavvKztDEAZBRyX74OJARZPTN
+         eKDLcgXNzGZuDNc/3XnL3hXJodwxJB1f3Idp40f64ksQSe1owdVEtQ8kX4d4mxnD
+         xlsZZOWbua2zqoqMcsbuQzB0TlJ9AUZ5SS1iA9Z97VcAtTxymkVHtYEhGalQRzcm
+         vYVQgMqqJp8G+vxIdMxo87KziIyy5leyOOqsAvwuE9cGniDUXoDHcAOcScsyeYJI
+         Kb7+msiI/HtRfxJdey7nTk9CIDp20k2B5qimIIEezZuq+emmpzi0M6XShYw63qph
+         dWejcHyui2IrDZEJDHGT3g==
+Date: Sat, 25 Apr 2026 08:42:03 +0900
+From: Kohei Enju <kohei@enjuk.jp>
+To: Aaron Ma <aaron.ma@canonical.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Akeem G Abodunrin <akeem.g.abodunrin@intel.com>,
+        Jesse Brandeburg <jesse.brandeburg@intel.com>,
+        intel-wired-lan@lists.osuosl.org
+Subject: Re: [PATCH v2] ice: wait for reset completion in ice_resume()
+Message-ID: <aev_lixRClDKAvFg@x1>
+References: <20260424030345.1140665-1-aaron.ma@canonical.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH RFC bpf-next 1/8] kasan: expose generic kasan helpers
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
- Andrey Konovalov <andreyknvl@gmail.com>
-Cc: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Kumar Kartikeya Dwivedi <memxor@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
- Shuah Khan <shuah@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrey Ryabinin <ryabinin.a.a@gmail.com>,
- Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>,
- Vincenzo Frascino <vincenzo.frascino@arm.com>,
- Andrew Morton <akpm@linux-foundation.org>, ebpf@linuxfoundation.org,
- Bastien Curutchet <bastien.curutchet@bootlin.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- Xu Kuohai <xukuohai@huawei.com>, bpf <bpf@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>,
- Network Development <netdev@vger.kernel.org>,
- "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
- kasan-dev <kasan-dev@googlegroups.com>, linux-mm <linux-mm@kvack.org>
-References: <20260413-kasan-v1-0-1a5831230821@bootlin.com>
- <20260413-kasan-v1-1-1a5831230821@bootlin.com>
- <CA+fCnZfubV6LgRjO3NQvhrG2Q5o0ftkFFupLWVYS50XDnmCaog@mail.gmail.com>
- <DHSWK17EZUDP.GIJ6BX2NFR6U@bootlin.com>
- <CAADnVQLJ=fJ7t1i2+_RYqU1gqYqiLP9Zrwo4vdZsgzjK_yzJTQ@mail.gmail.com>
- <CA+fCnZd31GzdpEqR8VhfK4JtUKyyRMgbBoAbeGACJgm7WvB6Vw@mail.gmail.com>
- <CAADnVQKv5y+gq=TnOAEXSqgBRpmHNjwqCfxpLaw5XkcbQ+23bg@mail.gmail.com>
- <CA+fCnZe-b0Qqbo5gGv3HN20twquQETDfYYkE1r9tPr9zUFbW9Q@mail.gmail.com>
- <CAADnVQKuptG_opA12O=Xb9_+cHf3f=ycAZdfUp17P2HBYQzdsg@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Ihor Solodrai <ihor.solodrai@linux.dev>
-In-Reply-To: <CAADnVQKuptG_opA12O=Xb9_+cHf3f=ycAZdfUp17P2HBYQzdsg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 42D2E46410D
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260424030345.1140665-1-aaron.ma@canonical.com>
+X-Rspamd-Queue-Id: C82F846428C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281074-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[41];
+	TAGGED_FROM(0.00)[bounces-281075-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[bootlin.com,kernel.org,iogearbox.net,linux.dev,gmail.com,davemloft.net,redhat.com,alien8.de,linux.intel.com,zytor.com,foss.st.com,google.com,arm.com,linux-foundation.org,linuxfoundation.org,huawei.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,googlegroups.com,kvack.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ihor.solodrai@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[enjuk.jp:+];
 	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,qemu-project.gitlab.io:url,arxiv.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,enjuk.jp:dkim,enjuk.jp:email,canonical.com:email]
 
-On 4/19/26 3:51 PM, Alexei Starovoitov wrote:
-> On Sun, Apr 19, 2026 at 2:49 PM Andrey Konovalov <andreyknvl@gmail.com> wrote:
->>
->> On Tue, Apr 14, 2026 at 5:58 PM Alexei Starovoitov
->> <alexei.starovoitov@gmail.com> wrote:
->>>
->>> I think we're talking past each other.
->>> We're not interested in KASAN_SW_TAGS or KASAN_HW_TAGS.
->>> We're not going to modify arm64 JIT at all.
->>>
->>> This is purely KASAN_GENRIC and only on x86-64.
->>> JIT will emit exactly what compilers emit for generic
->>> which is __asan_load/store. This is as stable ABI as it can get
->>> and we don't want to deviate from it.
->>
->> OK, I supposed that's fair. You did throw me off point with your
->> performance comment. But if you decide to add SW_TAGS support at some
->> point, I think this discussion needs to be revisited.
->>
->> But please add a comment saying that those functions are only exposed
->> for BPF JIT and they are not supposed to be used by other parts of the
->> kernel. And in case you do end up adding a new config option, guard
->> the public declarations by a corresponding ifdef.
+On 04/24 11:03, Aaron Ma wrote:
+> ice_resume() schedules an asynchronous PF reset and returns
+> immediately. The reset runs later in ice_service_task(). If
+> userspace tries to bring up the net device before the reset
+> finishes, ice_open() fails with -EBUSY:
 > 
-> I feel concerns of misuse are overblown.
-> Being in include/linux/kasan.h doesn't make them free-for-all
-> all of a sudden, but if you prefer we can just copy paste:
-> +void __asan_load1(void *p);
-> +void __asan_store1(void *p);
-> into bpf_jit_comp.c
+>   ice_resume()
+>     ice_schedule_reset()          # sets ICE_PFR_REQ, returns
+>   ...
+>   ice_open()
+>     ice_is_reset_in_progress()    # ICE_PFR_REQ still set, -EBUSY
+>   ...
+>   ice_service_task()
+>     ice_do_reset()
+>       ice_rebuild()               # clears ICE_PFR_REQ, too late
 > 
->>> The goal here is to find bugs in the verifier.
->>> If something got past it, that shouldn't have,
->>> kasan generic on x86-64 is enough.
->>
->> FWIW, I suspect HW_TAGS KASAN already just works with JITed BPF code.
+> Reproduced on E800 series NICs during suspend/resume with irdma
+> enabled, where the aux device probe widens the race window.
 > 
-> Ohh. Good point. Looks like modern arm64 cpus in public clouds
-> don't have that enabled, so one would need pixel phone to
-> catch verifier bugs via hw_tags.
+> Wait for the reset to complete before returning from ice_resume().
+> 
+> Fixes: 769c500dcc1e ("ice: Add advanced power mgmt for WoL")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Aaron Ma <aaron.ma@canonical.com>
+> ---
+> v2: reword comment to clarify best-effort semantics (Kohei Enju)
+> 
+>  drivers/net/ethernet/intel/ice/ice_main.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+> index 5f92377d4dfc2..a81eb21ea87c1 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_main.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
+> @@ -5635,6 +5635,15 @@ static int ice_resume(struct device *dev)
+>  	/* Restart the service task */
+>  	mod_timer(&pf->serv_tmr, round_jiffies(jiffies + pf->serv_tmr_period));
+>  
+> +	/* Best-effort wait for the scheduled reset to finish so that the
+> +	 * device is operational before returning. Without this, userspace
+> +	 * (e.g. NetworkManager) may try to open the net device while the
+> +	 * asynchronous reset is still in progress, hitting -EBUSY.
+> +	 */
 
-This comment got me curious, and acckktually if we *really* want to,
-we can get some KASAN_HW_TAGS testing for BPF already.
+Thanks for the update!
 
-The first option is emulation, since QEMU supports MTE [1], e.g.:
+Reviewed-by: Kohei Enju <kohei@enjuk.jp>
 
-    qemu-system-aarch64 -machine virt,mte=on ...
-
-This is of course slow, because it runs in software, so it's
-infeasible to run this for every signle patch on BPF CI. But we could
-run it on schedule on the base branches or smth like that.
-
-[1] https://qemu-project.gitlab.io/qemu/system/arm/virt.html
-
-The second option is set up an AmpereOne machine on Oracle Cloud
-(assuming they are available, haven't checked), because apparently [2]
-those CPUs run with MTE.
-
-It's a bunch of infra work and spending, but it is doable if it was
-a priority.
-
-[2] https://arxiv.org/abs/2511.17773
-
-
-> So we still need this x86-specific jit kasan.
-> I guess eventually it can be removed when hw_tags support is widespread.
-
+> +	ret = ice_wait_for_reset(pf, 10 * HZ);
+> +	if (ret)
+> +		dev_err(dev, "Wait for reset failed during resume: %d\n", ret);
+> +
+>  	return 0;
+>  }
+>  
+> -- 
+> 2.43.0
+> 
 
