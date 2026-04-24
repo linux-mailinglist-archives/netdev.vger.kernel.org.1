@@ -1,257 +1,220 @@
-Return-Path: <netdev+bounces-280987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280988-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IE04D0hg62kuMAAAu9opvQ
-	(envelope-from <netdev+bounces-280987-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 14:21:28 +0200
+	id eFQ7Fs5j62mtMAAAu9opvQ
+	(envelope-from <netdev+bounces-280988-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 14:36:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4F7F45E573
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 14:21:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3DDB45E7DF
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 14:36:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DE5623009B3F
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:21:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0E83E3013277
+	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 12:36:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A57A3C457F;
-	Fri, 24 Apr 2026 12:21:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD5673CEBB8;
+	Fri, 24 Apr 2026 12:36:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="a7e1g3P4"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="R5NKlaaB"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 682463C343E;
-	Fri, 24 Apr 2026 12:21:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9956B3CEB9F
+	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 12:36:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777033285; cv=none; b=bvm8c0NLUUapjed/M5UvHOoJsFTiRG+bgEiOXbdwXKKfF4WLVMlp1BudCFuIu51r6hbDw3gsJ0NDK8EfElhetb1q2xKdNiyulfyRmvVLoikkC395jIXrQvg1Xz73PlwtLh+vbIdhjg4z8WHQN8HekbYgxdOyY7LfFt+Rzp/8/Es=
+	t=1777034187; cv=none; b=VeLyfSlZUz0ntmVLMuSP/kHtNC3mRjUpHkVI6fgF5EOterYDdAPiaBxUoMkxSfxFZNZ/Ue+oN/YlXuZvSLEwzWSVXtZuN/PEtpUA6MUylUe950mXpniwURTx5fIAXWJTmmrImMcB5bUqlk5IhagjxqHj2Cb12D0Rd835ZkYGdTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777033285; c=relaxed/simple;
-	bh=7of1kJsvzdpEsSZJeO17x5YeTfnIvMKbWpeoSZwJixs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VCBWmrS2rN0a/AvdZhfnu0p3r85Dpu/tD/EHkeE2YXUoNidjUl2rZtp2E8GhRLX63xad/t3/AgHBpJW9sxI38O9NOUHMv7nmuDV3fO1HgEwbL3Jw9bDuLAIlDuPmtJmLp6UB27/jEN8zLIDzrHepApg5agAazME+4R26Jbs/r6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=a7e1g3P4; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1204)
-	id 8B05620B7165; Fri, 24 Apr 2026 05:21:23 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8B05620B7165
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1777033283;
-	bh=b7zfRNW0UNlPkhYc2JrkSF24b0gzNF9MAngEWRuE3dE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=a7e1g3P45gfCXvk9AzIi/j9ubyrUUDJKWp+9SZSKsZtb2WJTQ0ZAQQCFDdOcQ9xb3
-	 JTS0nzgcWMyk7Jaxu6i5b+TqLH5i6NetoqVsLogT6iHWcJTyu+uUhhw3KoxCxE4SS8
-	 MUKfVxEeqKVtgY807cb95moUdjTRrpJW4UFyU99k=
-Date: Fri, 24 Apr 2026 05:21:23 -0700
-From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Cc: Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Simon Horman <horms@kernel.org>,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	Shiraz Saleem <shirazsaleem@microsoft.com>,
-	Michael Kelley <mhklinux@outlook.com>,
-	Long Li <longli@microsoft.com>, Yury Norov <yury.norov@gmail.com>,
-	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Paul Rosswurm <paulros@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>,
-	Saurabh Singh Sengar <ssengar@microsoft.com>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] net: mana: Optimize irq affinity for low vcpu configs
-Message-ID: <aetgQ1gCYlGJjiKk@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20260424061702.1442618-1-shradhagupta@linux.microsoft.com>
+	s=arc-20240116; t=1777034187; c=relaxed/simple;
+	bh=gxWumiCJCpeXt9x50ql7v5zeB8+ofgYmO/9NRVvuUI4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QSKQnwOHMpXIDXLWiMjwWzrDyJPa573w2i4VwaAxOg3r98K/4jH083we12nZiaZlPWbbKylaeLeOq8/57zHCNIsr2MxIpFaxdjvjtkQB8youW3otTC5PUpFBLwH9NL8rjKkHMK+AdlCKUraJl0EavUHEmlg0EDo/DXKDn+sGHFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=R5NKlaaB; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 1F2F71A33F8;
+	Fri, 24 Apr 2026 12:36:24 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id E04B3604EB;
+	Fri, 24 Apr 2026 12:36:23 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id AF4A91072080A;
+	Fri, 24 Apr 2026 14:36:17 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1777034182; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=l/Z7RaBfk4abnuZIMA2JBc8wyVjjcleD84iRjwCiDZ0=;
+	b=R5NKlaaB9SQtMd/C7N9zedU+KBASICGSlRLBmGUPW+n1G2rBAtrSsKjCQ9CzTkKdnz15ub
+	3engU3+2FY2wZe408AsJKPlzmKW6bJdougmej8oAMc6UFRd7oTLJ2meNatO91nKse/OGOX
+	VsEOMhdjqbVZpy3+W2++Y1tZVBGqDVYMD/n+9ocePYO1EyjIKTfCsxl/4QNQVfHONzhGy2
+	9YILOpYou4Z3qvDuhn/uW6mLzEgK3/STs72C0DCP7cn++6CRIckRkcLUhDJVTbhRDe0xpF
+	D/62Nz5uVvEuP5PLByZn5LpMsehwp2tK9Pt20i8zQFtENZ9uc0nejXo4gRXdFg==
+Date: Fri, 24 Apr 2026 14:36:16 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Corey Leavitt via B4 Relay <devnull+corey.leavitt.info@kernel.org>
+Cc: corey@leavitt.info, Oleksij Rempel <o.rempel@pengutronix.de>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>, Russell
+ King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 4/4] net: phy: own phydev->psec via PSE
+ notifier and remove fwnode_mdio hook
+Message-ID: <20260424143616.54d747a8@kmaincent-XPS-13-7390>
+In-Reply-To: <20260423-pse-notifier-decouple-v1-4-86ed750a9d62@leavitt.info>
+References: <20260423-pse-notifier-decouple-v1-0-86ed750a9d62@leavitt.info>
+	<20260423-pse-notifier-decouple-v1-4-86ed750a9d62@leavitt.info>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260424061702.1442618-1-shradhagupta@linux.microsoft.com>
-X-Rspamd-Queue-Id: A4F7F45E573
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: A3DDB45E7DF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280987-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	HAS_ORG_HEADER(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[leavitt.info,pengutronix.de,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-280988-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,outlook.com,gmail.com,vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	FROM_NEQ_ENVFROM(0.00)[kory.maincent@bootlin.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev,corey.leavitt.info];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
 
-On Thu, Apr 23, 2026 at 11:17:00PM -0700, Shradha Gupta wrote:
-> In mana driver, the number of IRQs allocated are capped by the
-> min(num_cpu + 1, queue count). In cases, where the IRQ count is greater
-> than the vcpu count, we want to utilize all the vcpus, irrespective of
-> their NUMA/core bindings.
-> 
-> This is important, especially in the envs where number of vcpus are so
-> few that the softIRQ handling overhead on two IRQs on the same vcpu is
-> much more than their overheads if they were spread across sibling vcpus
-> 
-> This behaviour is more evident with dynamic IRQ allocation. Since MANA
-> IRQs are assigned at a later stage compared to static allocation, other
-> device IRQs may already be affinitized to the vCPUs. As a result, IRQ
-> weights become imbalanced, causing multiple MANA IRQs to land on the
-> same vCPU.
-> 
-> In such cases when many parallel TCP connections are tested, the
-> throughput drops significantly
-> 
-> Test envs:
-> =======================================================
-> Case 1: without this patch
-> =======================================================
-> 4 vcpu(2 cores), 5 MANA IRQs (1 HWC + 4 Queue)
-> 
-> 	TYPE		effective vCPU aff
-> =======================================================
-> IRQ0:	HWC		0
-> IRQ1:	mana_q1		0
-> IRQ2:	mana_q2		2
-> IRQ3:	mana_q3		0
-> IRQ4:	mana_q4		3
-> 
-> %soft on each vCPU(mpstat -P ALL 1) on receiver
-> vCPU		0	1	2	3
-> =======================================================
-> pass 1:		38.85	0.03	24.89	24.65
-> pass 2:		39.15	0.03	24.57	25.28
-> pass 3:		40.36	0.03	23.20	23.17
-> 
-> =======================================================
-> Case 2: with this patch
-> =======================================================
-> 4 vcpu(2 cores), 5 MANA IRQs (1 HWC + 4 Queue)
-> 
->         TYPE            effective vCPU aff
-> =======================================================
-> IRQ0:   HWC             0
-> IRQ1:   mana_q1         0
-> IRQ2:   mana_q2         1
-> IRQ3:   mana_q3         2
-> IRQ4:   mana_q4         3
-> 
-> %soft on each vCPU(mpstat -P ALL 1) on receiver
-> vCPU            0       1       2       3
-> =======================================================
-> pass 1:         15.42	15.85	14.99	14.51
-> pass 2:         15.53	15.94	15.81	15.93
-> pass 3:         16.41	16.35	16.40	16.36
-> 
-> =======================================================
-> Throughput Impact(in Gbps, same env)
-> =======================================================
-> TCP conn	with patch	w/o patch
-> 20480		15.65		7.73
-> 10240		15.63		8.93
-> 8192		15.64		9.69
-> 6144		15.64		13.16
-> 4096		15.69		15.75
-> 2048		15.69		15.83
-> 1024		15.71		15.28
-> 
-> Fixes: 755391121038 ("net: mana: Allocate MSI-X vectors dynamically")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-> ---
->  .../net/ethernet/microsoft/mana/gdma_main.c   | 35 +++++++++++++++++--
->  1 file changed, 33 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> index 098fbda0d128..433c044d53c6 100644
-> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> @@ -1672,6 +1672,23 @@ static int irq_setup(unsigned int *irqs, unsigned int len, int node,
->  	return 0;
->  }
->  
-> +static int irq_setup_linear(unsigned int *irqs, unsigned int len)
-> +{
-> +	int cpu;
-> +
-> +	rcu_read_lock();
-We do not need to call rcu_read_lock here, as the caller of this
-function has already acquired cpus_read_lock.
-> +	for_each_online_cpu(cpu) {
-> +		if (len <= 0)
-len is unsigned here so <= doesnot makes sense. PLease change it to int
-or better use if(!len)
-> +			break;
-> +
-> +		irq_set_affinity_and_hint(*irqs++, cpumask_of(cpu));
-> +		len--;
-> +	}
-> +	rcu_read_unlock();
-> +
-> +	return 0;
-> +}
-> +
->  static int mana_gd_setup_dyn_irqs(struct pci_dev *pdev, int nvec)
->  {
->  	struct gdma_context *gc = pci_get_drvdata(pdev);
-> @@ -1722,10 +1739,24 @@ static int mana_gd_setup_dyn_irqs(struct pci_dev *pdev, int nvec)
->  	 * first CPU sibling group since they are already affinitized to HWC IRQ
->  	 */
->  	cpus_read_lock();
-> -	if (gc->num_msix_usable <= num_online_cpus())
-> +	if (gc->num_msix_usable <= num_online_cpus()) {
->  		skip_first_cpu = true;
-> +		err = irq_setup(irqs, nvec, gc->numa_node, skip_first_cpu);
-> +	} else {
-> +		/*
-> +		 * In case our IRQs are more than num_online_cpus, we try to
-> +		 * make sure we are using all vcpus. In such a case NUMA or
-> +		 * CPU core affinity does not matter.
-> +		 * Note that in this case the total mana IRQ should always be
-> +		 * num_online_cpu + 1. The first HWC IRQ is already handled
-> +		 * in HWC setup calls
-> +		 * So, the nvec value in this path should always be equal to
-> +		 * num_online_cpu
-nit: typo: should be num_online_cpus
-> +		 */
-> +		WARN_ON(nvec > num_online_cpus());
-> +		err = irq_setup_linear(irqs, nvec);
-> +	}
->  
-> -	err = irq_setup(irqs, nvec, gc->numa_node, skip_first_cpu);
->  	if (err) {
->  		cpus_read_unlock();
->  		goto free_irq;
-> 
-> base-commit: e728258debd553c95d2e70f9cd97c9fde27c7130
-> -- 
-> 2.34.1
-> 
-Regards
-Dipayaan Roy
+On Thu, 23 Apr 2026 01:42:17 -0600
+Corey Leavitt via B4 Relay <devnull+corey.leavitt.info@kernel.org> wrote:
+
+> From: Corey Leavitt <corey@leavitt.info>
+>=20
+> Transfer ownership of phydev->psec from fwnode_mdio to the phy
+> subsystem itself. The phy subsystem now subscribes to the pse-pd
+> notifier chain and manages psec attach/detach in response to PSE
+> controller lifecycle events, while fwnode_mdio loses its PSE
+> awareness entirely.
+>=20
+> Split phy_device_register() into a public entry point that takes
+> rtnl_lock() and a phy_device_register_locked() variant that assumes
+> rtnl is already held. Callers that already hold rtnl (the SFP
+> module state machine via __sfp_sm_event) use the _locked form to
+> avoid deadlock; all other callers use the unchanged public API.
+> This pair mirrors the register_netdevice() / register_netdev()
+> split convention already established in the core networking stack.
+> rtnl must span the full registration sequence through device_add(),
+> not just phy_try_attach_pse(): a PSE_REGISTERED event firing between
+> a narrow attach lock and device_add() would walk mdio_bus_type, find
+> the phy not yet on the bus, and leave it permanently unattached.
+>=20
+> With rtnl held across the full registration sequence:
+>=20
+>   - At phy_device_register_locked(), phy_try_attach_pse() attempts
+>     an of_pse_control_get() for phys whose DT pses phandle resolves
+>     now. If the controller is already registered, psec is attached
+>     before device_add() makes the phy visible on mdio_bus_type.
+>     If the controller is not yet registered, the swallow-error path
+>     leaves psec NULL and relies on the subsequent notifier event.
+>=20
+>   - On PSE_REGISTERED: an rtnl-guarded bus walk retries the attach
+>     for every registered phy whose psec is still NULL. This is the
+>     "phy was enumerated before the PSE controller loaded" case,
+>     which is the root cause of the boot-time probe-retry storm on
+>     systems with a modular PSE controller driver. Because the
+>     pse_controller_notifier is fired synchronously, a concurrent
+>     pse_controller_register() either (a) completes list_add and
+>     releases pse_list_mutex before this function takes rtnl, in
+>     which case phy_try_attach_pse() finds the controller in the
+>     list and attaches; or (b) fires its notifier during this
+>     function, in which case the callback blocks on rtnl until this
+>     function returns, then walks the bus and finds the phy fully
+>     registered (attaching if psec is still NULL).
+>=20
+>   - On PSE_UNREGISTERED: an rtnl-guarded bus walk releases every
+>     phydev->psec that targets the departing controller before
+>     pse_release_pis() frees pcdev->pi. Without this, a phy still
+>     holding a pse_control reference would cause a use-after-free
+>     in __pse_control_release's pcdev->pi[psec->id] access, and the
+>     PSE driver module could not finish unloading while any phy
+>     still held a reference via module_put().
+>=20
+> Introduce phy_try_attach_pse() as the rtnl-guarded helper used by
+> both the register path and the notifier walk. Holding rtnl across
+> of_pse_control_get() is safe because pse_list_mutex is never held
+> in the opposite order.
+>=20
+> Expose pse_control_matches_pcdev() as a predicate so subscribers
+> can identify which of their held pse_control references target a
+> given controller, without leaking the struct pse_controller_dev *
+> out of pse_control opacity.
+>=20
+> Move the final pse_control_put() of phydev->psec from
+> phy_device_remove() to phy_device_release(). The kobject release
+> callback runs only after every reference on the device has been
+> dropped, including the bus iterator references taken by
+> bus_for_each_dev() in the notifier walk, which means by the time
+> release fires no concurrent reader or writer of phydev->psec can
+> exist. The mdio_bus_type klist is set up in bus_register() with
+> klist_devices_get() / klist_devices_put() (drivers/base/bus.c),
+> which bracket each iteration step with get_device() / put_device()
+> on the underlying struct device; that reference defers the release
+> callback from firing until the walk has advanced past this phy.
+> Keeping phy_device_remove() unchanged avoids introducing a new
+> locking contract on its many callers (sfp, fixed_phy, xgbe, hns,
+> netsec, bcm_sf2, mdiobus_unregister).
+>=20
+> Finally, delete fwnode_find_pse_control() and its call site in
+> fwnode_mdiobus_register_phy(), and drop the PSE header from
+> fwnode_mdio.c. This removes the probe-time -EPROBE_DEFER coupling
+> between mdio and pse-pd that caused the boot-hang regression on
+> systems with a modular PSE controller driver and a DT phy with a
+> pses phandle: the MDIO/DSA probe no longer sees any PSE-originated
+> -EPROBE_DEFER, so the probe-retry storm is gone. fwnode_mdio is
+> now PSE-agnostic.
+>=20
+> Fixes: fa2f0454174c ("net: pse-pd: Introduce attached_phydev to pse contr=
+ol")
+
+This patch depends on the other patches (2 and 3) which do not have any fix=
+es
+tag. So either all of them have the fixes tag or none of them have it.
+
+Except from this, your design seems a great idea!
+The only thing that puzzle me is to have the RTNLOCK hold in the
+phy_device_register function. This is an important change but I am not a ne=
+tdev
+sufficient expert to know if that could break things.
+Jakub, Russell what do you think?
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
