@@ -1,243 +1,166 @@
-Return-Path: <netdev+bounces-281077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281078-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id w9wdLFgC7GkZTwAAu9opvQ
-	(envelope-from <netdev+bounces-281077-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 01:52:56 +0200
+	id YKk5NtwJ7GnNTwAAu9opvQ
+	(envelope-from <netdev+bounces-281078-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 02:25:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 015094642AE
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 01:52:55 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E42446437E
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 02:25:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 26F1E301053D
-	for <lists+netdev@lfdr.de>; Fri, 24 Apr 2026 23:52:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 76C6C300683B
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 00:24:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B884B302146;
-	Fri, 24 Apr 2026 23:52:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 057E513DDA4;
+	Sat, 25 Apr 2026 00:24:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IenHmcKB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BCdO4Ntb"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43A32274FD1
-	for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 23:52:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CBA2E65D
+	for <netdev@vger.kernel.org>; Sat, 25 Apr 2026 00:24:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777074772; cv=none; b=FRDT9ZwcGSdJb4NYK0JNR8Y2mwKcMWer0uMbDmHQw65DKWXCnN6Di26QxQ5SXivOeEKQCSZe8PJ4DpkxML79WF1KxxjdykCDdWN1is31R+HXDIWmVW1ZrQWshaXjGvGWA1vLLYP2DDOGD6MtVDIjL/oIZDjmEihTGF0BRJe79Og=
+	t=1777076695; cv=none; b=fVL8CmdUTmZpMqZK7cveRY+s85wYjtGyVa1Iq4wg070yjplnrqafLOnzGCSvsB7swUH8vNjg/Ak6K3resteyZwQJqqgTAjg1JFyHNG6eaY+ZR5Mmu1ey1TF+IJ1Ul6x0Pg/gtiBJQyDyFSl4LH6hbt+m04MTdn9BFM+VivzQ714=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777074772; c=relaxed/simple;
-	bh=QJ6YINPJxDE8ce/SSg+gEPEuZCMMootlW1RL0db12+E=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=LB/jb3c/XYYSTPBCHEgggEmYZMBUsmok0F0G2X1C7sWVtwXPViwoirqlTUOH/UTlcImX7xgKPDl0ZtHAOI5KVdmk0Ac50XS74e81JDckRO6rotmmXvDgjL0urGNfoukEuqjz92wg34+BoYqM+um6tFPergPfxSHQ8110s358iwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IenHmcKB; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1777076695; c=relaxed/simple;
+	bh=WIiyS90pJo/dq1FBk/ThSR2bm4kIjajfTMjARat9LQM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=j6XKgSBq4HfaD4UiuxZGHNsYJ3PnzkQfZMHceFaA31sdajgFXp0yWFVg+m2dyUQ1CyZlAWH+dcfIz0B+hg4rdVABBLDoFUCETvDNzGnobbgIc6htLRJEpavMtpDbN1tsZJWWz1PLNM/k2R/s165dMCKHF0n1iDY3hd8CW3Sinw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BCdO4Ntb; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c7977177675so4302256a12.0
-        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 16:52:51 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c79281bd14cso3303073a12.3
+        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 17:24:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777074770; x=1777679570; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1777076694; x=1777681494; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=XnVmcqSWgBrIZOINeFfkUbMwryuHt4PzyHkF5OrKAp4=;
-        b=IenHmcKBm55oIXWcqHCofMdfnNkKQtFd8L5ctrIa1JcWbhwwR84MMehyDcu8HD+09t
-         aF+uqSC25up2kaL0BmhCB874PRjsaqmKa85Rh5Led/MpVAraUVEUmsOHAdbFb8Fm5ESK
-         iwMv042uE6vWmby9U27B0GHDpM4JnNWOzaqsFD3d4hhbi4gNCfbPkkfJ3Adz/7OiVxZ6
-         axc9Dy66Ys+aC6uEsOQW+gVzFsYvgdQbmjfkaocZPxmP4aDofxtMoHhzqhK3FiPB2obM
-         JBlvYWNV1bhondobioFcDMisOcYjNgB5J1XNkisioT8bnoXVo6uAO4DBWZs2vcR0pR3O
-         8K0A==
+        bh=PYg1g2whAdToCIlCbKeMv8kVRwwvGZDddkpfcq7roXM=;
+        b=BCdO4NtbnrvKNxthjoIzNIv9MiH2umkkpsBrD0n/AD2YSMn6gYps2w1S8QT/J1JYhd
+         xsUJXKm7uP9dueAl8DOJbhnii6QVsQebh9djFjsvydca9veFIEJgJFg3gBkwWEMYBUOo
+         fsK/i7lQxD5cjou5hnucdfPInhRD0deGfaJBCdp0Pp9wIHs2iXMW56ydwvEG1wVSqZGZ
+         ssIkPKj5bz6yVv9OWwqyF+ciM43rUx5Ep61J5jHjeWvaXvl09/Hvbpvet9ZqObmlNPmL
+         jwBm9ph7HHdB1OdEEBU19vWiDQnvvreJoKGTwG2xc/90VX7YGyIMvealrWmgLG2VJieU
+         tHbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777074770; x=1777679570;
+        d=1e100.net; s=20251104; t=1777076694; x=1777681494;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=XnVmcqSWgBrIZOINeFfkUbMwryuHt4PzyHkF5OrKAp4=;
-        b=g+rG6uGmUQdxiXxcY/L6r/CUGsAg8suoBr6sxYVQFDaz6upBqybnRlTKfN2AlEgPKg
-         4IlhiitQnl1z50o1hh7PRkWS/3l/5oU4LTrpeC4hEAnpn7LDwNeCe6PIj7AmmxuOnRaU
-         kziXNhaLQcL+Mq2AFWt2feLTnEVrsmHa8Sw0MpQIbnunoJGdUkpBZHyB9qljTC9T0Dls
-         LrWAgPUYsst9dVoD3UWW+GAoGthX4vga5mUmGwlSENnoJLO4m34RixbAVSEpS6tzUSNi
-         oItIvHPRtktUMXmEZcVe3+eUfknS8+FgMnIEFHJ3BxV0DSYBXxi5Tqdqsaexha9Gq4Gb
-         VsoQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9McAiAQtPhZvTXE2h641P572ekFZu14hdehKyg6pIXgipI8p9LaK54GXQSTUDv8SNHxsHe3gk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+WLy2Bc3wwZsg1+nzoWVMEkQpzXU98wD7trOqvUQU5kfjnuxc
-	Jx7Fd+1SMC3LG1JN9IrNdMrw6qo7u5jfs2lCUOvKubPLRenvjFPwwOlHysnueCdZEyDBrBi1Fcp
-	LD0whNQ==
-X-Received: from pfblu1.prod.google.com ([2002:a05:6a00:7481:b0:82f:24a1:2b5a])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:22c5:b0:82f:316:3206
- with SMTP id d2e1a72fcca58-82f8c92997fmr35230164b3a.34.1777074770298; Fri, 24
- Apr 2026 16:52:50 -0700 (PDT)
-Date: Fri, 24 Apr 2026 23:52:46 +0000
+        bh=PYg1g2whAdToCIlCbKeMv8kVRwwvGZDddkpfcq7roXM=;
+        b=KTdcOpEfsEx/c3wSrWhZDcZIclynUN9fUqhy4Lp4q3fLY/oU7nErdc+++WG9thZoRk
+         Mu+EwHDW2wnAa38dSyHeyu4Cp1PuvfJHqXyQNogKBGWsPpC7gTQ89LOnTlcJeumHuf/X
+         CR8C6aE9m2OqzF6VYo7LUEZooRNAmPjomz0RRhlxx5KE+ZXJajUBwYYxLDJy36RfLfYX
+         TmE0cmwX2VuQZrVKOXw+VJ1kWIiyPcQ+375umfkCGhmpf3STihoadrgwAIzEjqAQvhVQ
+         2cYuMGSd7CRfkQQp36PmJiKbezQp/Rdye2JXJAlXFKP5pLmTcOoZJ6ynKrIwYZQOlVca
+         aZiw==
+X-Gm-Message-State: AOJu0YxxyhJOb7OsM7+QtAjr8i+umNqfqDKFwdSZfw+MI8H4LCcWol9I
+	gqDdhiwI1W8kGlrNAJ8e81jtBtbQV8xoZF12nkYPeZCMZ9SC+fG5r/O6WOmaqWjO0lShaeMTbMR
+	byFGQOOlqQVyH72BjfAxHee2Vhl4bTVEhDwUdUdLT+3tyw3nPmBcp6z3cEdJdtcl+8kvOmJ7EED
+	a13Xdf9wcf2MMp9BFU8hkVDnttL8EH98r8SjZwRgzLYt7ZAWBR7+HwCwvWbYHynEo=
+X-Received: from pgde3.prod.google.com ([2002:a05:6a02:303:b0:c76:af01:d1a7])
+ (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a20:72a1:b0:39c:cdb:5d81 with SMTP id adf61e73a8af0-3a08d8a4436mr40480650637.32.1777076693728;
+ Fri, 24 Apr 2026 17:24:53 -0700 (PDT)
+Date: Sat, 25 Apr 2026 00:24:46 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.rc2.544.gc7ae2d5bb8-goog
-Message-ID: <20260424235247.1990272-1-kuniyu@google.com>
-Subject: [PATCH v1 bpf] bpf: Free reuseport cBPF prog after RCU grace period.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Martin KaFai Lau <martin.lau@linux.dev>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Eulgyu Kim <eulgyukim@snu.ac.kr>
+X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
+Message-ID: <20260425002450.163421-1-hramamurthy@google.com>
+Subject: [PATCH net v2 0/4] gve: Fixes for issues discovered via net selftests
+From: Harshitha Ramamurthy <hramamurthy@google.com>
+To: netdev@vger.kernel.org
+Cc: joshwash@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	willemb@google.com, maolson@google.com, nktgrg@google.com, jfraker@google.com, 
+	ziweixiao@google.com, jacob.e.keller@intel.com, pkaligineedi@google.com, 
+	shailend@google.com, jordanrhee@google.com, stable@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Pin-yen Lin <treapking@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 015094642AE
+X-Rspamd-Queue-Id: 6E42446437E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[google.com,gmail.com,vger.kernel.org,snu.ac.kr];
+	TAGGED_FROM(0.00)[bounces-281078-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281077-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[linux.dev,kernel.org,iogearbox.net,gmail.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-Eulgyu Kim reported the splat below with a repro. [0]
+From: Pin-yen Lin <treapking@google.com>
 
-The repro sets up a UDP reuseport group with a cBPF prog and
-replaces it with a new one while another thread is sending
-a UDP packet to the group.
+This patch series addresses several issues in the gve driver. All four of
+these fixes were uncovered by running the net selftests.
 
-The reuseport prog is freed by sk_reuseport_prog_free().
-bpf_prog_put() is called for "e"BPF prog to destruct through
-multiple stages while cBPF prog is freed immediately by
-bpf_release_orig_filter() and bpf_prog_free().
+The series includes the following changes:
 
-If a reuseport prog is detached from the setsockopt() path
-(reuseport_attach_prog() or reuseport_detach_prog()),
-sk_reuseport_prog_free() is called without waiting for RCU
-readers to complete, resulting in various bugs.
+- Patch 1 adds NULL pointer checks for the per-queue statistics code to
+  prevent crashes when the rings are queried while the link is down. This
+  was discovered by the drivers/net/stats.py selftest.
+- Patch 2 fixes an issue where interface stats would go backwards when the
+  interface was brought down or its configuration was adjusted. This was
+  also discovered by the drivers/net/stats.py selftest.
+- Patch 3 ensures the driver falls back to the default minimum ring size if
+  the corresponding device option values are exposed as 0. This prevents
+  userspace from configuring unexpectedly small ring sizes. This was
+  discovered by the drivers/net/ring_reconfig.py selftest.
+- Patch 4 makes sure ethtool configuration modifications are done
+  synchronously before returning to the userspace. This was discovered by
+  the drivers/net/ping.py selftest.
 
-Let's defer freeing the reuseport cBPF prog after one RCU
-grace period.
 
-Note "e"BPF prog is safe as is unless the fast path starts
-to touch fields destroyed in bpf_prog_put_deferred() and
-__bpf_prog_put_noref().
+Changes in v2:
+- Link to v1: https://lore.kernel.org/netdev/20260420171837.455487-1-hramamurthy@google.com/
+- Add a NULL pointer check in gve_get_ring_err_stats() (Sashiko)
+- Use local variable to prevent inflates from u64_stats_fetch_retry()
+  (Sashiko)
+- Add u64_stats_fetch/begin to protect base stats (Sashiko)
 
-[0]:
-BUG: KASAN: vmalloc-out-of-bounds in reuseport_select_sock+0xedc/0x1220 net/core/sock_reuseport.c:596
-Read of size 4 at addr ffffc9000051e004 by task slowme/10208
-CPU: 6 UID: 1000 PID: 10208 Comm: slowme Not tainted 7.0.0-geb7ac95ff75e #32 PREEMPT(full)
-Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-Call Trace:
- <IRQ>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xca/0x240 mm/kasan/report.c:482
- kasan_report+0x118/0x150 mm/kasan/report.c:595
- reuseport_select_sock+0xedc/0x1220 net/core/sock_reuseport.c:596
- udp4_lib_lookup2+0x3bc/0x950 net/ipv4/udp.c:495
- __udp4_lib_lookup+0x768/0xe20 net/ipv4/udp.c:723
- __udp4_lib_lookup_skb+0x297/0x390 net/ipv4/udp.c:752
- __udp4_lib_rcv+0x1312/0x2620 net/ipv4/udp.c:2752
- ip_protocol_deliver_rcu+0x282/0x440 net/ipv4/ip_input.c:207
- ip_local_deliver_finish+0x3bb/0x6f0 net/ipv4/ip_input.c:241
- NF_HOOK+0x30c/0x3a0 include/linux/netfilter.h:318
- NF_HOOK+0x30c/0x3a0 include/linux/netfilter.h:318
- __netif_receive_skb_one_core net/core/dev.c:6181 [inline]
- __netif_receive_skb net/core/dev.c:6294 [inline]
- process_backlog+0xaa4/0x1960 net/core/dev.c:6645
- __napi_poll+0xae/0x340 net/core/dev.c:7709
- napi_poll net/core/dev.c:7772 [inline]
- net_rx_action+0x5d7/0xf50 net/core/dev.c:7929
- handle_softirqs+0x22b/0x870 kernel/softirq.c:622
- do_softirq+0x76/0xd0 kernel/softirq.c:523
- </IRQ>
- <TASK>
- __local_bh_enable_ip+0xf8/0x130 kernel/softirq.c:450
- local_bh_enable include/linux/bottom_half.h:33 [inline]
- rcu_read_unlock_bh include/linux/rcupdate.h:924 [inline]
- __dev_queue_xmit+0x1dd7/0x3710 net/core/dev.c:4890
- neigh_output include/net/neighbour.h:556 [inline]
- ip_finish_output2+0xca9/0x1070 net/ipv4/ip_output.c:237
- NF_HOOK_COND include/linux/netfilter.h:307 [inline]
- ip_output+0x29f/0x450 net/ipv4/ip_output.c:438
- ip_send_skb+0x45/0xc0 net/ipv4/ip_output.c:1508
- udp_send_skb+0xb04/0x1510 net/ipv4/udp.c:1195
- udp_sendmsg+0x1a71/0x2350 net/ipv4/udp.c:1485
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg net/socket.c:742 [inline]
- __sys_sendto+0x554/0x680 net/socket.c:2206
- __do_sys_sendto net/socket.c:2213 [inline]
- __se_sys_sendto net/socket.c:2209 [inline]
- __x64_sys_sendto+0xde/0x100 net/socket.c:2209
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x160/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x415a2d
-Code: b3 66 2e 0f 1f 84 00 00 00 00 00 66 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f6bc31e41e8 EFLAGS: 00000212 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 00007f6bc31e4cdc RCX: 0000000000415a2d
-RDX: 0000000000000001 RSI: 00007f6bc31e421f RDI: 0000000000000003
-RBP: 00007f6bc31e4240 R08: 00007f6bc31e4220 R09: 0000000000000010
-R10: 0000000000000000 R11: 0000000000000212 R12: 00007f6bc31e46c0
-R13: ffffffffffffffb8 R14: 0000000000000000 R15: 00007ffc9b0d70b0
- </TASK>
+Debarghya Kundu (2):
+  gve: Add NULL pointer checks for per-queue statistics
+  gve: Fix backward stats when interface goes down or configuration is
+    adjusted
 
-Fixes: 538950a1b752 ("soreuseport: setsockopt SO_ATTACH_REUSEPORT_[CE]BPF")
-Reported-by: Eulgyu Kim <eulgyukim@snu.ac.kr>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- net/core/filter.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+Pin-yen Lin (2):
+  gve: Use default min ring size when device option values are 0
+  gve: Make ethtool config changes synchronous
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index bc96c18df4e0..dba4c9340bb7 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -1654,15 +1654,24 @@ int sk_reuseport_attach_bpf(u32 ufd, struct sock *sk)
- 	return err;
- }
- 
--void sk_reuseport_prog_free(struct bpf_prog *prog)
-+static void sk_reuseport_prog_free_rcu(struct rcu_head *rcu)
-+{
-+	struct bpf_prog_aux *aux = container_of(rcu, struct bpf_prog_aux, rcu);
-+	struct bpf_prog *prog = aux->prog;
-+
-+	bpf_release_orig_filter(prog);
-+	bpf_prog_free(prog);
-+}
-+
-+void sk_reuseport_prog_free(struct bpf_prog *prog, bool wait_rcu)
- {
- 	if (!prog)
- 		return;
- 
--	if (prog->type == BPF_PROG_TYPE_SK_REUSEPORT)
--		bpf_prog_put(prog);
-+	if (bpf_prog_was_classic(prog))
-+		call_rcu(&prog->aux->rcu, sk_reuseport_prog_free_rcu);
- 	else
--		bpf_prog_destroy(prog);
-+		bpf_prog_put(prog);
- }
- 
- static inline int __bpf_try_make_writable(struct sk_buff *skb,
+ drivers/net/ethernet/google/gve/gve.h        |   7 +
+ drivers/net/ethernet/google/gve/gve_adminq.c |   4 +-
+ drivers/net/ethernet/google/gve/gve_main.c   | 152 ++++++++++++++-----
+ 3 files changed, 125 insertions(+), 38 deletions(-)
+
 -- 
 2.54.0.rc2.544.gc7ae2d5bb8-goog
 
+base-commit: e728258debd553c95d2e70f9cd97c9fde27c7130
+branch: gve-misc-fixes
 
