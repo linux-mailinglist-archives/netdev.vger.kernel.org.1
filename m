@@ -1,289 +1,374 @@
-Return-Path: <netdev+bounces-281101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281102-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id h04gOE1i7Gm/YAAAu9opvQ
-	(envelope-from <netdev+bounces-281101-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 08:42:21 +0200
+	id XpupFHpz7Gl0YwAAu9opvQ
+	(envelope-from <netdev+bounces-281102-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 09:55:38 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BA92465303
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 08:42:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 96F4A46576C
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 09:55:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 10248300D85D
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 06:42:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CC019300C58D
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 07:55:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71B5C2D8378;
-	Sat, 25 Apr 2026 06:42:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3822B2C21E8;
+	Sat, 25 Apr 2026 07:55:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="KPM26vpK"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="NSeHWaFM"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11DA81E5714;
-	Sat, 25 Apr 2026 06:42:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183EF2BEC43
+	for <netdev@vger.kernel.org>; Sat, 25 Apr 2026 07:55:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777099339; cv=none; b=UcBhZ2IIJHQTkIaVjpfBbcU4F2eyFWrkyxjEq//7V0imxWSeC65VMHb2W7gBDPEwBsmRDjiMzeHprp66weB6pnFMdpEY/XrkYDp/zqxXbuYdIahSdxPrpEeetWt/TCNKfsGmsQT1oBzMNkrH+9EnHy1XyjQbXQulfjwrnJZnQC4=
+	t=1777103735; cv=none; b=TIr3qOl0HuqyaVukiZA7PmRehGjGHAQl7H+ohOEhCI+ryUR18rl8AmYRHuFokVpakDp84fgxw99upUX7P8QOAieAvydICGTrGBz8742tJCpuNJJjtyAwP8lwwDdoaDOva+KD2zscqJoqj6SDA8UOzleMPQ17QtPjTW2Y/DUyavM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777099339; c=relaxed/simple;
-	bh=P9ABtZEK2zRknPKO2eUm6AkuiDkVBXD8N0/YqF3cSRI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=extdGI2Jvx/cfQA0N61Y/+ipXC7c1aheB2Yes9ViEIKINYo+PfRSbXINU++4ubImT9Xt8kcF97tviRl2Pceje98TMXWXDA0ieLfJcfbyAtVRPAKfQ9NaZGyTyY+6n0UkXdzV7rd4fJHUgtrD/MPZ3hzJYtbhB78p6U/nxjYeMXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=KPM26vpK; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id 3060B20B7165; Fri, 24 Apr 2026 23:42:18 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3060B20B7165
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1777099338;
-	bh=JACy4zho5+LcJ4MYRD+nPRw42+DhJCPLKvqrrwdpRYM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KPM26vpKU7MHILgV8/zEeAMWRZgk7iCkGOuh+J1wctv5PSGgclSG/Lif8KdnZdGAA
-	 Zl/uP6aK22wy3HNvFk8PLH/VZm4baxdzQaU1m939vs1bt5DFz6u6pKQEvdOvoQSNjP
-	 jFu9FE/hxALSYNwcpkc/TpadVAW57JrezbR6WYK0=
-Date: Fri, 24 Apr 2026 23:42:18 -0700
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Yury Norov <ynorov@nvidia.com>
-Cc: Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Simon Horman <horms@kernel.org>,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	Dipayaan Roy <dipayanroy@linux.microsoft.com>,
-	Shiraz Saleem <shirazsaleem@microsoft.com>,
-	Michael Kelley <mhklinux@outlook.com>,
-	Long Li <longli@microsoft.com>, Yury Norov <yury.norov@gmail.com>,
-	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Paul Rosswurm <paulros@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>,
-	Saurabh Singh Sengar <ssengar@microsoft.com>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] net: mana: Optimize irq affinity for low vcpu configs
-Message-ID: <aexiSlyxidg3Ekdl@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20260424061702.1442618-1-shradhagupta@linux.microsoft.com>
- <aevf2bPLBiAzX7UC@yury>
+	s=arc-20240116; t=1777103735; c=relaxed/simple;
+	bh=fVBm6wS4L6L1yOivEcfgzQ8WdPmIAhd3oVtjQ+CI6Ak=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dwrT39Qsd74DZje7LUrmTJYG9XWiOpD5DitvsWHGor/p1xmNu2eG4+LmJZorvhaVIQw4Phc1Xxp2vwi7dzBQQTa8d73zIBa8Vq6A2KZMJQub6avV2w00flVPnhQQZ2Er5gXu5MYQiv4k/Kua9mdCjDf77cmzkfK2a4tYmyPhslw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=NSeHWaFM; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=QoRTEGFw9YjoUpYPd7/jNDkMmXXe7dBuLEvV5Qmrx38=; b=NSeHWaFMzC6FbpNadwvf5oaBnV
+	Sh0stp45XVzYuhPf5ZFPkHZRtYkWXvjsgOpXUmqHN6/GSXSWPCI6NtEPBDNea+XeT34tDqXNkfu79
+	z2B00uW8168fK+M6skxgk2KeeXuw34tJP4AGEjZKflxmZ4P+LrcpZMRPdd1YgIMks2uHKkhHKePIE
+	j5xygnUpbhGKBdm+vI07tohk38CJPFdsyVzzHzVYFmhLTW5XYfJVEwZewDVmtGTwbOkwkPvB73dJb
+	TiVxlvmw9tYH+C4Q9uq/xD+a/G14AzE386vChHs9K9srvqwsiTbcxnz3LJafvdyh3GDsaehZV4D5e
+	kZe8yPUw==;
+Received: from localhost ([127.0.0.1])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wGXrH-000FZ8-1g;
+	Sat, 25 Apr 2026 09:55:23 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: kuba@kernel.org
+Cc: edumazet@google.com,
+	dsahern@kernel.org,
+	tom@herbertland.com,
+	willemdebruijn.kernel@gmail.com,
+	idosch@nvidia.com,
+	justin.iurman@gmail.com,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH net v2] ipv6: Implement limits on extension header parsing
+Date: Sat, 25 Apr 2026 09:55:21 +0200
+Message-ID: <20260425075521.736328-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aevf2bPLBiAzX7UC@yury>
-X-Rspamd-Queue-Id: 5BA92465303
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27982/Sat Apr 25 08:24:36 2026)
+X-Rspamd-Queue-Id: 96F4A46576C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,herbertland.com,gmail.com,nvidia.com,redhat.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281101-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281102-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,outlook.com,gmail.com,vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shradhagupta@linux.microsoft.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.microsoft.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iogearbox.net:email,iogearbox.net:dkim,iogearbox.net:mid]
 
-On Fri, Apr 24, 2026 at 05:25:45PM -0400, Yury Norov wrote:
-> On Thu, Apr 23, 2026 at 11:17:00PM -0700, Shradha Gupta wrote:
-> > In mana driver, the number of IRQs allocated are capped by the
-> > min(num_cpu + 1, queue count). In cases, where the IRQ count is greater
-> > than the vcpu count, we want to utilize all the vcpus, irrespective of
-> > their NUMA/core bindings.
-> > 
-> > This is important, especially in the envs where number of vcpus are so
-> > few that the softIRQ handling overhead on two IRQs on the same vcpu is
-> > much more than their overheads if they were spread across sibling vcpus
-> > 
-> > This behaviour is more evident with dynamic IRQ allocation. Since MANA
-> > IRQs are assigned at a later stage compared to static allocation, other
-> > device IRQs may already be affinitized to the vCPUs. As a result, IRQ
-> > weights become imbalanced, causing multiple MANA IRQs to land on the
-> > same vCPU.
-> > 
-> > In such cases when many parallel TCP connections are tested, the
-> > throughput drops significantly
-> > 
-> > Test envs:
-> > =======================================================
-> > Case 1: without this patch
-> > =======================================================
-> > 4 vcpu(2 cores), 5 MANA IRQs (1 HWC + 4 Queue)
-> > 
-> > 	TYPE		effective vCPU aff
-> > =======================================================
-> > IRQ0:	HWC		0
-> > IRQ1:	mana_q1		0
-> > IRQ2:	mana_q2		2
-> > IRQ3:	mana_q3		0
-> > IRQ4:	mana_q4		3
-> > 
-> > %soft on each vCPU(mpstat -P ALL 1) on receiver
-> > vCPU		0	1	2	3
-> > =======================================================
-> > pass 1:		38.85	0.03	24.89	24.65
-> > pass 2:		39.15	0.03	24.57	25.28
-> > pass 3:		40.36	0.03	23.20	23.17
-> > 
-> > =======================================================
-> > Case 2: with this patch
-> > =======================================================
-> > 4 vcpu(2 cores), 5 MANA IRQs (1 HWC + 4 Queue)
-> > 
-> >         TYPE            effective vCPU aff
-> > =======================================================
-> > IRQ0:   HWC             0
-> > IRQ1:   mana_q1         0
-> > IRQ2:   mana_q2         1
-> > IRQ3:   mana_q3         2
-> > IRQ4:   mana_q4         3
-> > 
-> > %soft on each vCPU(mpstat -P ALL 1) on receiver
-> > vCPU            0       1       2       3
-> > =======================================================
-> > pass 1:         15.42	15.85	14.99	14.51
-> > pass 2:         15.53	15.94	15.81	15.93
-> > pass 3:         16.41	16.35	16.40	16.36
-> > 
-> > =======================================================
-> > Throughput Impact(in Gbps, same env)
-> > =======================================================
-> > TCP conn	with patch	w/o patch
-> > 20480		15.65		7.73
-> > 10240		15.63		8.93
-> > 8192		15.64		9.69
-> > 6144		15.64		13.16
-> > 4096		15.69		15.75
-> > 2048		15.69		15.83
-> > 1024		15.71		15.28
-> > 
-> > Fixes: 755391121038 ("net: mana: Allocate MSI-X vectors dynamically")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> > Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-> > Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-> > ---
-> >  .../net/ethernet/microsoft/mana/gdma_main.c   | 35 +++++++++++++++++--
-> >  1 file changed, 33 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > index 098fbda0d128..433c044d53c6 100644
-> > --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > @@ -1672,6 +1672,23 @@ static int irq_setup(unsigned int *irqs, unsigned int len, int node,
-> >  	return 0;
-> >  }
-> >  
-> > +static int irq_setup_linear(unsigned int *irqs, unsigned int len)
-> > +{
-> > +	int cpu;
-> > +
-> > +	rcu_read_lock();
-> > +	for_each_online_cpu(cpu) {
-> > +		if (len <= 0)
-> > +			break;
-> > +
-> > +		irq_set_affinity_and_hint(*irqs++, cpumask_of(cpu));
-> > +		len--;
-> > +	}
-> > +	rcu_read_unlock();
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >  static int mana_gd_setup_dyn_irqs(struct pci_dev *pdev, int nvec)
-> >  {
-> >  	struct gdma_context *gc = pci_get_drvdata(pdev);
-> > @@ -1722,10 +1739,24 @@ static int mana_gd_setup_dyn_irqs(struct pci_dev *pdev, int nvec)
-> >  	 * first CPU sibling group since they are already affinitized to HWC IRQ
-> >  	 */
-> >  	cpus_read_lock();
-> > -	if (gc->num_msix_usable <= num_online_cpus())
-> > +	if (gc->num_msix_usable <= num_online_cpus()) {
-> >  		skip_first_cpu = true;
-> > +		err = irq_setup(irqs, nvec, gc->numa_node, skip_first_cpu);
-> 
-> Then you don't need the 'skip_first_cpu' variable.
+ipv6_{skip_exthdr,find_hdr}() and ip6_{tnl_parse_tlv_enc_lim,
+protocol_deliver_rcu}() iterate over IPv6 extension headers until they
+find a non-extension-header protocol or run out of packet data. The
+loops have no iteration counter, relying solely on the packet length
+to bound them. For a crafted packet with 8-byte extension headers
+filling a 64KB jumbogram, this means a worst case of up to ~8k
+iterations with a skb_header_pointer call each. ipv6_skip_exthdr(),
+for example, is used where it parses the inner quoted packet inside
+an incoming ICMPv6 error:
 
-That's right, let me change that.
+  - icmpv6_rcv
+    - checksum validation
+    - case ICMPV6_DEST_UNREACH
+      - icmpv6_notify
+        - pskb_may_pull()       <- pull inner IPv6 header
+        - ipv6_skip_exthdr()    <- iterates here
+        - pskb_may_pull()
+        - ipprot->err_handler() <- sk lookup
 
-> 
-> > +	} else {
-> > +		/*
-> > +		 * In case our IRQs are more than num_online_cpus, we try to
-> > +		 * make sure we are using all vcpus. In such a case NUMA or
-> > +		 * CPU core affinity does not matter.
-> > +		 * Note that in this case the total mana IRQ should always be
-> > +		 * num_online_cpu + 1. The first HWC IRQ is already handled
-> > +		 * in HWC setup calls
-> > +		 * So, the nvec value in this path should always be equal to
-> > +		 * num_online_cpu
-> > +		 */
-> > +		WARN_ON(nvec > num_online_cpus());
-> 
-> That sounds weird. If you don't support IRQs more than CPUs , and want to
-> warn about it, you'd do that earlier in the function, and align the other
-> logic accordingly. For example:
-> 
->         if (WARN_ON(nvec > num_online_cpus()))
->                 nvec = num_online_cpus();
-> 
->         irqs = kmalloc_objs(int, nvec);
->         if (!irqs)
->                 return -ENOMEM;
-> 
->         ...
-> 
-> So you'll decrease pressure on allocator.
-> 
-> What would happen with those IRQs beyond num_online_cpus()? Can you explain
-> it in the comment? I'm not an expert in your driver, but usually if you pass
-> a vector to function, and the function is able to handle only a part of it,
-> it returns the number of processed elements.
-> 
-> Thanks,
-> Yury
-> 
+The per-iteration cost of ipv6_skip_exthdr itself is generally
+light, but skb_header_pointer becomes more costly on reassembled
+packets: the first ~1232 bytes of the inner packet are in the skb's
+linear area, but the remaining ~63KB are in the frag_list where
+skb_copy_bits is needed to read data.
 
-so, by design the nvec should never exceed num_online_cpus(). I only
-added the WARN_ON as a defensive safegaurd. But I agree with your
-suggestion to move this earlier before the allocations.
+Add a configurable limit via a new sysctl net.ipv6.max_ext_hdrs_number
+(default 8, minimum 1). All four extension header walking functions
+are bound by this limit. The sysctl is in line with commit 47d3d7ac656a
+("ipv6: Implement limits on Hop-by-Hop and Destination options").
+As documented, init_net is used to derive max_ext_hdrs_number to
+be consistent given a net cannot always reliably be retrieved.
 
-Thanks Yury!
+Note that the check in ip6_protocol_deliver_rcu() happens right
+before the goto resubmit, such that we don't have to have a test
+for ipv6_ext_hdr() in the fast-path.
 
-> > +		err = irq_setup_linear(irqs, nvec);
-> > +	}
-> >  
-> > -	err = irq_setup(irqs, nvec, gc->numa_node, skip_first_cpu);
-> >  	if (err) {
-> >  		cpus_read_unlock();
-> >  		goto free_irq;
-> > 
-> > base-commit: e728258debd553c95d2e70f9cd97c9fde27c7130
-> > -- 
-> > 2.34.1
+There's an ongoing IETF draft-iurman-6man-eh-occurrences to enforce
+IPv6 extension headers ordering and occurrence. The latter also
+discusses security implications. As per RFC8200 section 4.1, the
+occurrence rules for extension headers provide a practical upper
+bound, thus 8 was used as the default.
+
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+---
+ v1->v2:
+   - Set the default to 8 (Justin)
+   - Update IETF references (Justin)
+   - Add core path coverage as well (Justin)
+
+ Documentation/networking/ip-sysctl.rst |  7 +++++++
+ include/net/dropreason-core.h          |  6 ++++++
+ include/net/ipv6.h                     |  2 ++
+ include/net/netns/ipv6.h               |  1 +
+ net/ipv6/af_inet6.c                    |  1 +
+ net/ipv6/exthdrs_core.c                | 11 +++++++++++
+ net/ipv6/ip6_input.c                   |  6 ++++++
+ net/ipv6/ip6_tunnel.c                  |  5 +++++
+ net/ipv6/sysctl_net_ipv6.c             |  8 ++++++++
+ 9 files changed, 47 insertions(+)
+
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+index 2e3a746fcc6d..f7412f4049d1 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -2537,6 +2537,13 @@ max_hbh_length - INTEGER
+ 
+ 	Default: INT_MAX (unlimited)
+ 
++max_ext_hdrs_number - INTEGER
++	Maximum number of IPv6 extension headers allowed in a packet.
++	Limits how many extension headers will be traversed. The value
++	is read from the initial netns.
++
++	Default: 8
++
+ skip_notify_on_dev_down - BOOLEAN
+ 	Controls whether an RTM_DELROUTE message is generated for routes
+ 	removed when a device is taken down or deleted. IPv4 does not
+diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+index e0ca3904ff8e..1fd91e59b84e 100644
+--- a/include/net/dropreason-core.h
++++ b/include/net/dropreason-core.h
+@@ -99,6 +99,7 @@
+ 	FN(FRAG_TOO_FAR)		\
+ 	FN(TCP_MINTTL)			\
+ 	FN(IPV6_BAD_EXTHDR)		\
++	FN(IPV6_TOO_MANY_EXTHDRS)	\
+ 	FN(IPV6_NDISC_FRAG)		\
+ 	FN(IPV6_NDISC_HOP_LIMIT)	\
+ 	FN(IPV6_NDISC_BAD_CODE)		\
+@@ -494,6 +495,11 @@ enum skb_drop_reason {
+ 	SKB_DROP_REASON_TCP_MINTTL,
+ 	/** @SKB_DROP_REASON_IPV6_BAD_EXTHDR: Bad IPv6 extension header. */
+ 	SKB_DROP_REASON_IPV6_BAD_EXTHDR,
++	/**
++	 * @SKB_DROP_REASON_IPV6_TOO_MANY_EXTHDRS: Number of IPv6 extension
++	 * headers in the packet exceeds net.ipv6.max_ext_hdrs_number.
++	 */
++	SKB_DROP_REASON_IPV6_TOO_MANY_EXTHDRS,
+ 	/** @SKB_DROP_REASON_IPV6_NDISC_FRAG: invalid frag (suppress_frag_ndisc). */
+ 	SKB_DROP_REASON_IPV6_NDISC_FRAG,
+ 	/** @SKB_DROP_REASON_IPV6_NDISC_HOP_LIMIT: invalid hop limit. */
+diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+index d042afe7a245..c540b750726e 100644
+--- a/include/net/ipv6.h
++++ b/include/net/ipv6.h
+@@ -90,6 +90,8 @@ struct ip_tunnel_info;
+ #define IP6_DEFAULT_MAX_DST_OPTS_LEN	 INT_MAX /* No limit */
+ #define IP6_DEFAULT_MAX_HBH_OPTS_LEN	 INT_MAX /* No limit */
+ 
++#define IP6_DEFAULT_MAX_EXT_HDRS_CNT	 8
++
+ /*
+  *	Addr type
+  *	
+diff --git a/include/net/netns/ipv6.h b/include/net/netns/ipv6.h
+index 499e4288170f..2cea457bddb4 100644
+--- a/include/net/netns/ipv6.h
++++ b/include/net/netns/ipv6.h
+@@ -54,6 +54,7 @@ struct netns_sysctl_ipv6 {
+ 	int max_hbh_opts_cnt;
+ 	int max_dst_opts_len;
+ 	int max_hbh_opts_len;
++	int max_ext_hdrs_cnt;
+ 	int seg6_flowlabel;
+ 	u32 ioam6_id;
+ 	u64 ioam6_id_wide;
+diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
+index 0a88b376141d..19424c3f2dfc 100644
+--- a/net/ipv6/af_inet6.c
++++ b/net/ipv6/af_inet6.c
+@@ -945,6 +945,7 @@ static int __net_init inet6_net_init(struct net *net)
+ 	net->ipv6.sysctl.flowlabel_state_ranges = 0;
+ 	net->ipv6.sysctl.max_dst_opts_cnt = IP6_DEFAULT_MAX_DST_OPTS_CNT;
+ 	net->ipv6.sysctl.max_hbh_opts_cnt = IP6_DEFAULT_MAX_HBH_OPTS_CNT;
++	net->ipv6.sysctl.max_ext_hdrs_cnt = IP6_DEFAULT_MAX_EXT_HDRS_CNT;
+ 	net->ipv6.sysctl.max_dst_opts_len = IP6_DEFAULT_MAX_DST_OPTS_LEN;
+ 	net->ipv6.sysctl.max_hbh_opts_len = IP6_DEFAULT_MAX_HBH_OPTS_LEN;
+ 	net->ipv6.sysctl.fib_notify_on_flag_change = 0;
+diff --git a/net/ipv6/exthdrs_core.c b/net/ipv6/exthdrs_core.c
+index 49e31e4ae7b7..9df892e7f7fb 100644
+--- a/net/ipv6/exthdrs_core.c
++++ b/net/ipv6/exthdrs_core.c
+@@ -4,6 +4,8 @@
+  * not configured or static.
+  */
+ #include <linux/export.h>
++
++#include <net/net_namespace.h>
+ #include <net/ipv6.h>
+ 
+ /*
+@@ -72,7 +74,9 @@ EXPORT_SYMBOL(ipv6_ext_hdr);
+ int ipv6_skip_exthdr(const struct sk_buff *skb, int start, u8 *nexthdrp,
+ 		     __be16 *frag_offp)
+ {
++	int exthdr_max = READ_ONCE(init_net.ipv6.sysctl.max_ext_hdrs_cnt);
+ 	u8 nexthdr = *nexthdrp;
++	int exthdr_cnt = 0;
+ 
+ 	*frag_offp = 0;
+ 
+@@ -82,6 +86,8 @@ int ipv6_skip_exthdr(const struct sk_buff *skb, int start, u8 *nexthdrp,
+ 
+ 		if (nexthdr == NEXTHDR_NONE)
+ 			return -1;
++		if (unlikely(exthdr_cnt++ >= exthdr_max))
++			return -1;
+ 		hp = skb_header_pointer(skb, start, sizeof(_hdr), &_hdr);
+ 		if (!hp)
+ 			return -1;
+@@ -188,8 +194,10 @@ EXPORT_SYMBOL_GPL(ipv6_find_tlv);
+ int ipv6_find_hdr(const struct sk_buff *skb, unsigned int *offset,
+ 		  int target, unsigned short *fragoff, int *flags)
+ {
++	int exthdr_max = READ_ONCE(init_net.ipv6.sysctl.max_ext_hdrs_cnt);
+ 	unsigned int start = skb_network_offset(skb) + sizeof(struct ipv6hdr);
+ 	u8 nexthdr = ipv6_hdr(skb)->nexthdr;
++	int exthdr_cnt = 0;
+ 	bool found;
+ 
+ 	if (fragoff)
+@@ -216,6 +224,9 @@ int ipv6_find_hdr(const struct sk_buff *skb, unsigned int *offset,
+ 			return -ENOENT;
+ 		}
+ 
++		if (unlikely(exthdr_cnt++ >= exthdr_max))
++			return -EBADMSG;
++
+ 		hp = skb_header_pointer(skb, start, sizeof(_hdr), &_hdr);
+ 		if (!hp)
+ 			return -EBADMSG;
+diff --git a/net/ipv6/ip6_input.c b/net/ipv6/ip6_input.c
+index 967b07aeb683..a5bbbc16e8d7 100644
+--- a/net/ipv6/ip6_input.c
++++ b/net/ipv6/ip6_input.c
+@@ -403,8 +403,10 @@ INDIRECT_CALLABLE_DECLARE(int tcp_v6_rcv(struct sk_buff *));
+ void ip6_protocol_deliver_rcu(struct net *net, struct sk_buff *skb, int nexthdr,
+ 			      bool have_final)
+ {
++	int exthdr_max = READ_ONCE(init_net.ipv6.sysctl.max_ext_hdrs_cnt);
+ 	const struct inet6_protocol *ipprot;
+ 	struct inet6_dev *idev;
++	int exthdr_cnt = 0;
+ 	unsigned int nhoff;
+ 	SKB_DR(reason);
+ 	bool raw;
+@@ -487,6 +489,10 @@ void ip6_protocol_deliver_rcu(struct net *net, struct sk_buff *skb, int nexthdr,
+ 				nexthdr = ret;
+ 				goto resubmit_final;
+ 			} else {
++				if (unlikely(exthdr_cnt++ >= exthdr_max)) {
++					SKB_DR_SET(reason, IPV6_TOO_MANY_EXTHDRS);
++					goto discard;
++				}
+ 				goto resubmit;
+ 			}
+ 		} else if (ret == 0) {
+diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
+index c468c83af0f2..4546a60942ab 100644
+--- a/net/ipv6/ip6_tunnel.c
++++ b/net/ipv6/ip6_tunnel.c
+@@ -395,15 +395,20 @@ ip6_tnl_dev_uninit(struct net_device *dev)
+ 
+ __u16 ip6_tnl_parse_tlv_enc_lim(struct sk_buff *skb, __u8 *raw)
+ {
++	int exthdr_max = READ_ONCE(init_net.ipv6.sysctl.max_ext_hdrs_cnt);
+ 	const struct ipv6hdr *ipv6h = (const struct ipv6hdr *)raw;
+ 	unsigned int nhoff = raw - skb->data;
+ 	unsigned int off = nhoff + sizeof(*ipv6h);
+ 	u8 nexthdr = ipv6h->nexthdr;
++	int exthdr_cnt = 0;
+ 
+ 	while (ipv6_ext_hdr(nexthdr) && nexthdr != NEXTHDR_NONE) {
+ 		struct ipv6_opt_hdr *hdr;
+ 		u16 optlen;
+ 
++		if (unlikely(exthdr_cnt++ >= exthdr_max))
++			break;
++
+ 		if (!pskb_may_pull(skb, off + sizeof(*hdr)))
+ 			break;
+ 
+diff --git a/net/ipv6/sysctl_net_ipv6.c b/net/ipv6/sysctl_net_ipv6.c
+index d2cd33e2698d..93f865545a7c 100644
+--- a/net/ipv6/sysctl_net_ipv6.c
++++ b/net/ipv6/sysctl_net_ipv6.c
+@@ -135,6 +135,14 @@ static struct ctl_table ipv6_table_template[] = {
+ 		.extra1		= SYSCTL_ZERO,
+ 		.extra2		= &flowlabel_reflect_max,
+ 	},
++	{
++		.procname	= "max_ext_hdrs_number",
++		.data		= &init_net.ipv6.sysctl.max_ext_hdrs_cnt,
++		.maxlen		= sizeof(int),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec_minmax,
++		.extra1		= SYSCTL_ONE,
++	},
+ 	{
+ 		.procname	= "max_dst_opts_number",
+ 		.data		= &init_net.ipv6.sysctl.max_dst_opts_cnt,
+-- 
+2.43.0
+
 
