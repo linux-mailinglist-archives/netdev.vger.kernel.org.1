@@ -1,193 +1,167 @@
-Return-Path: <netdev+bounces-281092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281093-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id M+LkFvca7GkJUgAAu9opvQ
-	(envelope-from <netdev+bounces-281092-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 03:37:59 +0200
+	id WGsOM6Qd7Gl7UgAAu9opvQ
+	(envelope-from <netdev+bounces-281093-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 03:49:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D20E464736
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 03:37:58 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A93D4647C0
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 03:49:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 10497300E720
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 01:37:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0B9F83013A9F
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 01:49:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E2C620E6E2;
-	Sat, 25 Apr 2026 01:37:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2385022D7A1;
+	Sat, 25 Apr 2026 01:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s9OEdDq+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K4XL1BPe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-dy1-f202.google.com (mail-dy1-f202.google.com [74.125.82.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 216A41F03D9
-	for <netdev@vger.kernel.org>; Sat, 25 Apr 2026 01:37:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 646FA1E9B1A
+	for <netdev@vger.kernel.org>; Sat, 25 Apr 2026 01:48:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777081074; cv=none; b=e7Qew6yGsbH2/ePI0oNr3tKzSQ39E3FNaX5ZFEQv1gtGYKDyk0nw8lBkG5lq9+zkCDUlWOLnRzfukHrnA2PF6doxEHcf3NLpYu196E+FQhHOG4MvhIIZwWPqu6DSOXbWSKEmi03tle4uiDCbE/0xfNul9YNcNBhlbbOCStvpIVI=
+	t=1777081739; cv=none; b=fs7liZav1LTjz0G/ZTJX6Y6eiwRugk7gyXCmv0xQ26e8xVw89a2VhQ7flNDb4Gkryvg/XEkGm8Rq2LnqGUvUJxCec5KoPPwti3iojdJv3m6mZ7CIfSQEvJKDr2bZTRx3Jaf6kQqiZ6TQhyguAmfS45dyQ3iTIGJAI4Pgug+JHo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777081074; c=relaxed/simple;
-	bh=9OmU/2gfzjKgD7nd2TDsC3LPOSB3XfwuhnKxFr1hJmk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MSLvtUPmfP0B9SdoIbdYGUljfJ1Pe+f9dg7xYS2K/7A3M5om9YH/u7FlTzMi+jMTNBemt1zvrqA8Lm3yzbeA7OYEYY8vnEJaYNOsKH8eog1FchZyvQ1cpEq+OVQnNm5HHkN7StrqiZv9qlf7lEYtxelB726vjIBoJkVQhROEDu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=s9OEdDq+; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-35d90833cacso5431947a91.2
-        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 18:37:53 -0700 (PDT)
+	s=arc-20240116; t=1777081739; c=relaxed/simple;
+	bh=7NBLBNCgaPeu8Rt4l2UvtDHFYQtjS37GZUbNuqPQoyg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=iq+IBQjdSd9b6urYdt9q6jwOUQ4Byu05rlSIpkNXu3/iNRs2QIetoiribqUFgulauWYw7bPlMNHOSoG5sacF98O+ra39edcrGysHHOLn1hc5vrMUsZQAJk2f3fjkabcQWTx+5H+XXVCiVs6Lk/jpFwGPakJyh6sd/8KWpAXdr8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--boolli.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K4XL1BPe; arc=none smtp.client-ip=74.125.82.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--boolli.bounces.google.com
+Received: by mail-dy1-f202.google.com with SMTP id 5a478bee46e88-2e60238adb1so19626240eec.0
+        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 18:48:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777081072; x=1777685872; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=CmZzLLJEqyNx+LYpuh9fgC1wzeSSJG9uNkzqlGLsj7g=;
-        b=s9OEdDq+ZmCRaoaLLpJhb7nH/t4kmEhARH0ByaZZuvqVcqje9tR5Br3z0scGiSqBlr
-         YmD3Evyqgo99vW3FW//dv5iodFCu5Zjr92t/uwkYH/HlsBNMVlly0Xbll0OneXQ/HC8h
-         nO/RfwatrHrh2VXzwKMd6RL6Cij3sGmXiSFZS+4cnHMED3FyvPH0VrOluUl3SWMj2jYX
-         +sNMoeLsc06Q6BNeYitKUqSMIgRu/Kf5cJgl/bssXoab42OIAPiRzZ2hhot3t2dJ5U3n
-         0OWsWk6gfgcCRiLDJxXlhWl94Lu9PS5bDtyt3HPGyZvFyb9QTZMX5JFYwMb0jnfES4FU
-         pWxg==
+        d=google.com; s=20251104; t=1777081735; x=1777686535; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=81CODhtfCeY5gOXc4AcZuOqtvysUpw25zIQcp3J/FQg=;
+        b=K4XL1BPeItq311U22poeRHn+C2FQck7Te8YLayTJ8GIDWjK/C7Z9bG5Iob7zdjtvEP
+         FLAvcZjJAtzXo0HLYhx7QK9MNLQK9Vp0ZAyCCq8tlCfm4bP5nWKrNRu9KCR3uo3xHk48
+         My4hUTtlkvAw3yLAclW5J5ghm9zOPydXpOikn5UnMx7YylYtOH987Y0gXEPasZMiNigj
+         GT5BUJ+CXmtOPC0OLGmJfWvxayCEQSkGqxD7VpFWL3210SxWMQwDxqPyqaYBseN8fvTT
+         CYsSRlbe2IyAp0qlN0/auBp3o3bkCpsho2S0OGyt7fXDjpeOYqAZg7D14PaXmufHS6HP
+         +5zA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777081072; x=1777685872;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CmZzLLJEqyNx+LYpuh9fgC1wzeSSJG9uNkzqlGLsj7g=;
-        b=m2t/6WTNSGXiy0aoDkBv7LXBozHlnVfc4flSGK36vB7cReX+GG7IUVFoVpr7t8MmPb
-         QLFifZrSkL6xwcn2Nduhc1vJKkUZ4E4ubMHA6nh/3+TBjvnUur75ZSZIMEb3BeF2UIYc
-         ikGNWKH7JlDgBvi3o/DAi99ocWr3CbvA3CEzYIx4fz2zCRdUWpFSWxtp99uLYlRoFX7C
-         N+D1m8vvRiFNv1z7M5mPcEpXeCCip/dCYocS14VUigRFzcAlWoIjxgYPP97/o5B/tbEE
-         GrHIcv+vzGNHAXmvCY5AlerhcQaHfUDKHw5j/4SqF4G5K9JH5ycdDggr3RNJyCk/oBt3
-         ecuw==
-X-Gm-Message-State: AOJu0YybM3jduJBpKOQ3GQ+4I087qT+gaGBp6X1JCtfgIjwR/SeK5CQD
-	8ZGcnQUaObeapfhsvgCreH6bi50W95RQEHf0lXmm4LcLN0a5E84bHj3LEKQcxQ==
-X-Gm-Gg: AeBDiet+OifYGpEd7sog8yqhSksSPeoi6mdPYF8J0NUwqn+UYETYL8QG0/GXzQ/VNDs
-	R9fF7UuO84Y8gZ9fGvOLVpOLjoa6gNuCk2884rouUbSsX83eSlntw02H6PohA2fg8aJ83tn63EA
-	k02N3XYeTRJ5vIOGzzlY3+OxgQijH68bzieA42iY8IRTy/G3Jm9etSiM5NFYRukh3+D86rxKDH6
-	YRxIHI15Wfzgo4gmfAmn1eo1qAHMq9etXmY0DIrtyyf+ru9v1Xhs1EA9YUOsI/pj2+JVRHSgjUq
-	ojC0gt84CvjIGReoqTlKtWA3oGOHs7o7RlsCv6vEjfn+n9gIIzAaQ4FTWTXs1CPuJPC3aEC2xRN
-	ipkhfbW6HwJIJFhz1+eM39Oui/5UHToAPQgN/Q9skv/92QAfDv7umMapdD+2H0Te8AfKF8f6/L6
-	4+QSAZn5uqlDzkjQZ0QoScVHqf2dN3gSeD8JRWzo0vr6pcWfAzjV4xUT8VXrTRPECb6Jt+Io3oL
-	1AzqLmwKbGJDtM3XlvwQDY+Tm5Xfb2g0rJo
-X-Received: by 2002:a17:90b:5890:b0:35e:5723:85e3 with SMTP id 98e67ed59e1d1-361403f12ddmr35564432a91.9.1777081072129;
-        Fri, 24 Apr 2026 18:37:52 -0700 (PDT)
-Received: from ryzen ([2601:644:8000:5b5d::8bd])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c797701b1a3sm18999441a12.19.2026.04.24.18.37.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Apr 2026 18:37:51 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Justin Chen <justin.chen@broadcom.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	bcm-kernel-feedback-list@broadcom.com (open list:BROADCOM ASP 2.0 ETHERNET DRIVER),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next] net: bcmasp: handle EPROBE_DEFER for MAC retrieval
-Date: Fri, 24 Apr 2026 18:37:34 -0700
-Message-ID: <20260425013734.436147-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.54.0
+        d=1e100.net; s=20251104; t=1777081735; x=1777686535;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=81CODhtfCeY5gOXc4AcZuOqtvysUpw25zIQcp3J/FQg=;
+        b=BfchCs1FtX47okZcvLrjlEq35qm5G/sRf6557156QBCMEzNBbUQ2271mH7R0f3RsDV
+         7Auh1B0ioWIf6Qe3OtMtVrW+7CA4IHSCFarlmagIqaX7qZPpbEGYuJnYyaUe/UrCwa6N
+         81GsULeiBSYdvKNsj991vJtw3oP3UK0YyWLu4NKupOClD8Qza4B7jQpCYg30ZqwU6Zgn
+         9OM2KHU6EkGqo7z/hcCVUaagpN/trrss+VatPpDGypHvxTScIouCKX8gQGfw5J6yJKra
+         7yE2x0SFy8XD4GJFk9beMn7Itss5i61VAT6yleQD1D7biG9JQNt6NwW7+WQ1NsoktsKi
+         97SQ==
+X-Gm-Message-State: AOJu0YxZL+X8EaE99PoiCrm45IEzqpeVJ+LNaFnDDWq2Dtf9HekApIgf
+	Ne07GpE0coInEspd24JTFHdDYDYUpUJcFt7U2bXl0jf/w06cwBwe+rGJ/+7e6g0x+p92anqrYXl
+	a8ieQAQ==
+X-Received: from dlea14-n1.prod.google.com ([2002:a05:701b:420e:10b0:12c:49a5:e4a4])
+ (user=boolli job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7022:60c:b0:12a:713b:8958
+ with SMTP id a92af1059eb24-12c73f7596bmr17260924c88.10.1777081735213; Fri, 24
+ Apr 2026 18:48:55 -0700 (PDT)
+Date: Sat, 25 Apr 2026 01:48:42 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 8D20E464736
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.rc2.544.gc7ae2d5bb8-goog
+Message-ID: <20260425014842.1036981-1-boolli@google.com>
+Subject: [PATCH iwl-next v2] libie: log more info when virtchnl fails
+From: Li Li <boolli@google.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	David Decotigny <decot@google.com>, Anjali Singhai <anjali.singhai@intel.com>, 
+	Sridhar Samudrala <sridhar.samudrala@intel.com>, Brian Vazquez <brianvv@google.com>, 
+	Li Li <boolli@google.com>, emil.s.tantilov@intel.com
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 2A93D4647C0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281092-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-281093-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[boolli@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-of_get_ethdev_address can return EPROBE_DEFER when using nvmem. To
-handle this, encode the error with ERR_PTR for minimal changes. Adjust
-the only place using bcmasp_interface_create.
+Virtchnl failures can be hard to debug without logs. Logging the details
+of virtchnl transactions can be useful for debugging virtchnl-related
+issues.
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
+Tested: Built and booted on a test machine.
+
+Signed-off-by: Li Li <boolli@google.com>
 ---
- drivers/net/ethernet/broadcom/asp2/bcmasp.c      | 4 ++--
- drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c | 6 ++++--
- 2 files changed, 6 insertions(+), 4 deletions(-)
+v2:
+ - Use dev_warn_ratelimited instead of dev_notice_ratelimited based on
+   reviewer feedback.
 
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-index 972474893a6b..31a9560c4aee 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-@@ -1333,10 +1333,10 @@ static int bcmasp_probe(struct platform_device *pdev)
- 	i = 0;
- 	for_each_available_child_of_node_scoped(ports_node, intf_node) {
- 		intf = bcmasp_interface_create(priv, intf_node, i);
--		if (!intf) {
-+		if (IS_ERR(intf)) {
- 			dev_err(dev, "Cannot create eth interface %d\n", i);
- 			of_node_put(ports_node);
--			ret = -EINVAL;
-+			ret = PTR_ERR(intf);
- 			goto err_cleanup;
- 		}
- 		list_add_tail(&intf->list, &priv->intfs);
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-index ec63f50a849e..caf0e408e2f7 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-@@ -1254,7 +1254,7 @@ struct bcmasp_intf *bcmasp_interface_create(struct bcmasp_priv *priv,
- 	struct device *dev = &priv->pdev->dev;
- 	struct bcmasp_intf *intf;
- 	struct net_device *ndev;
--	int ch, port, ret;
-+	int ch, port, ret = -EINVAL;
+ drivers/net/ethernet/intel/libie/controlq.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
- 	if (of_property_read_u32(ndev_dn, "reg", &port)) {
- 		dev_warn(dev, "%s: invalid port number\n", ndev_dn->name);
-@@ -1314,6 +1314,8 @@ struct bcmasp_intf *bcmasp_interface_create(struct bcmasp_priv *priv,
+diff --git a/drivers/net/ethernet/intel/libie/controlq.c b/drivers/net/ethernet/intel/libie/controlq.c
+index ebc05355e39d..bf200fea1e12 100644
+--- a/drivers/net/ethernet/intel/libie/controlq.c
++++ b/drivers/net/ethernet/intel/libie/controlq.c
+@@ -762,6 +762,16 @@ libie_ctlq_xn_process_recv(struct libie_ctlq_xn_recv_params *params,
+ 	status = ctlq_msg->chnl_retval ? -EFAULT : 0;
+ 
+ 	xn = &xnm->ring[xn_index];
++
++	if (ctlq_msg->chnl_retval) {
++		dev_err_ratelimited(
++			params->ctlq->dev,
++			"Non-zero virtchnl ret val (msg op: %u, ret val: %u, msg_cookie: %u, data_len: %u); xn op: %u, id: %u, cookie: %u\n",
++			ctlq_msg->chnl_opcode, ctlq_msg->chnl_retval,
++			msg_cookie, ctlq_msg->data_len, xn->virtchnl_opcode,
++			xn->index, xn->cookie);
++	}
++
+ 	if (ctlq_msg->chnl_opcode != xn->virtchnl_opcode ||
+ 	    msg_cookie != xn->cookie)
+ 		return false;
+@@ -1011,6 +1021,11 @@ int libie_ctlq_xn_send(struct libie_ctlq_xn_send_params *params)
+ 		params->recv_mem = xn->recv_mem;
+ 		break;
+ 	default:
++		dev_warn_ratelimited(
++			params->ctlq->dev,
++			"Transaction failed (op %u, xn state: %d, id: %u, cookie: %u, size: %zu)\n",
++			params->chnl_opcode, xn->state, xn->index, xn->cookie,
++			xn->recv_mem.iov_len);
+ 		ret = -EBADMSG;
+ 		break;
  	}
-
- 	ret = of_get_ethdev_address(ndev_dn, ndev);
-+	if (ret == -EPROBE_DEFER)
-+		return ERR_PTR(-EPROBE_DEFER);
- 	if (ret) {
- 		netdev_warn(ndev, "using random Ethernet MAC\n");
- 		eth_hw_addr_random(ndev);
-@@ -1340,7 +1342,7 @@ struct bcmasp_intf *bcmasp_interface_create(struct bcmasp_priv *priv,
- err_free_netdev:
- 	free_netdev(ndev);
- err:
--	return NULL;
-+	return ERR_PTR(ret);
- }
-
- void bcmasp_interface_destroy(struct bcmasp_intf *intf)
---
-2.54.0
+-- 
+2.54.0.rc2.544.gc7ae2d5bb8-goog
 
 
