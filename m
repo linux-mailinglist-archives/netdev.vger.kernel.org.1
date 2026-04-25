@@ -1,270 +1,227 @@
-Return-Path: <netdev+bounces-281110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281111-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iEyfGC6V7Gl8aAAAu9opvQ
-	(envelope-from <netdev+bounces-281110-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 12:19:26 +0200
+	id oAJEN/Ce7GmtagAAu9opvQ
+	(envelope-from <netdev+bounces-281111-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 13:01:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64D28465DED
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 12:19:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 455F2466063
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 13:01:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C82C530078C2
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 10:19:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B9622300B10F
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 11:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5147A36D9F5;
-	Sat, 25 Apr 2026 10:19:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 415F432D7FF;
+	Sat, 25 Apr 2026 11:00:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FDZsLLNg"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qf1/mXqR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64F6F23AB87
-	for <netdev@vger.kernel.org>; Sat, 25 Apr 2026 10:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B6AE30DEA9
+	for <netdev@vger.kernel.org>; Sat, 25 Apr 2026 11:00:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777112363; cv=none; b=Vg18eajWTkFBmEvXUdRjrCLnoFyGnhtWnIKQgTd90b7xbtKLiHneptgLLF9O452p6Go3grJxU0f2YGW905a8mVIbbYgdef6blC2votNkRk81yy2pfC4FEZWvDNM5lspAvbqcWV9e1OVwJYPMCx+4Avtkz9bZBjvxxF9dhCRNj6Q=
+	t=1777114813; cv=none; b=rkbwk8LUkPUHo/NJj8PI5TqZyRS2e0QOpYjigwUF/J/M7XpVoW+zJFdqmy76n+qa9XJBgQ68C2taU31D+dhj4VneYGMJ5NQA7v4WR9LXHiHhDv9rCBJkykns4fl3xHC49D3yNDtM0yN8GD5TOZp6Ebg4k8l4EHHc/nw7xyNZBOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777112363; c=relaxed/simple;
-	bh=Pve6/3WfmAmsVStynnTLS68HmCRygojwKBJ+abENFQ4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ba1c1vX11OIbavESGbLGnkleDY66x6CFycxvsPx1g5FS8KIPNhhwZ3AfSHtABYl9O8Sk1bdZGpCQ4ibJXEWS8AS+WdTMWElmV79J5nWzDTITfNjLJMh5o5tVH/ouUxIsHaPuafJPKohi0vuShXAmt2c+6ixl+nyqq5n4OYRpyPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FDZsLLNg; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-43d77f6092eso5982736f8f.2
-        for <netdev@vger.kernel.org>; Sat, 25 Apr 2026 03:19:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777112360; x=1777717160; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=P1vrVJbkSkpdjGz4a62tCYDSPc1M8nt/0lFWMWGAuv0=;
-        b=FDZsLLNgpbtTcQMcpj+tgE9YbySjUsARHnX2uRwyUX+CRVdU1iXFLXz2I7BcRyogtJ
-         g7QXz7CDL2soqB/toUFeBRm17FIFKf7juydrRJpEZSkjMOCMfz5qBUJUce6gsG1WlPf+
-         1R8IQZxf6wGn38eceA1QoEYaNBOcb07SiqqY9jSiPtkphNkBhtbYmT7N33qa+OOx8d1o
-         8GrdRH/jrfj/Ep484Lg1XrIkJbe57Z6PvevSMjYHj2dfBoK7khLaKgSyTstEh1hJLUW+
-         Dhkgr/SxVlk3wzi7Bzcb7V0uw06XvV3foStmKxRVft9JtggeoVYOlpDEK6xp8lZ2qlyK
-         L49A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777112360; x=1777717160;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=P1vrVJbkSkpdjGz4a62tCYDSPc1M8nt/0lFWMWGAuv0=;
-        b=Kp0fJmD3HNi/CQZX/9XXSmJ/Ff6Quy37C/ZwfWRIx3Utz7B51OddCkBeNzhWV2hUmj
-         Jsv8v+22P3DHWusTGMrHyU/o1M7xPdt1UcC48AM3lNLUyKDjAqDoyqs6MaOvXfEweDTW
-         nIGIQSBhtYBQTZatX4f1URE3mD4Cyn4Q0tYLV3Kq+qph5Tjv/d931kIMNocTmCmjoGzd
-         LglxyGoPv3cPAWiioMAtQN5E/coxP1bfnH6h2J+gT77bzXtLJib59ojaH5xPPPjGnU+U
-         1GythxKLzwB3foCjJmnp3j4npU2mmvQMf/bqnReTLr5AqfppFdJs1cJgo3wEPckRlMP2
-         ywCw==
-X-Forwarded-Encrypted: i=1; AFNElJ+heviOVzgxOEQ29aC42nSgEcDsAO3kol8MasAPm7f4j20g6V2CsAgUjE5h1JLRNNrFYIISjjE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydGy47R0TMImao629ZmiP5o+Fg1hrfv7itL8Hhi4eDduxLhpbb
-	DVPE+CZaWVQL4xYO606i859R5W99ORbIt4clI6pncC/+DtAk6zdfsL7J
-X-Gm-Gg: AeBDies6KPkzh+5R5wUKuIPTPux4fp/nC10PsufKpmlr0IOobEJSEgEbKOp8BlcEQcR
-	kDthlfaDYwX5um3H2o66UADg2aGbud1RCAjUyUmJk7H7SmdvCAdA7RxWen3F0BJYcwPQ2xL8Gdl
-	WHz+4KzrqrKyoxKYjE56+DZo5HJUdj7vrFZIE2JiCx+i9zcDX+olpQG4chygVZONMQLl0W1kagn
-	WJiK0azGjDu/MQfYde85Fmmxf2+6wuP5O2g31nxAE0FybLmCLIq1AIKOR5fKog7j67m3XQOdVu0
-	4/CzDXR/xuAAiR0IirTjh8L0vaUPGkVsXNOLJgc/BH+ysVOsYLQDpnu5AKDHxkl5I7sHfQxImHw
-	dGqin1KdUjOrKrLdOUSXc+pEThUN0qoEJzVeH32Tp1RCWDa/MsttIB6An8asYOTv7SJc0UnPXwF
-	N+pL2CKw457evFZkAltbdlOJcA2T/2pGPdARPLJnnsy8rnIWKlptSyY+RgNMTu/AbRYTvkwa30r
-	c6x2hqCe9jOIbFt
-X-Received: by 2002:a05:6000:2510:b0:43d:7508:c9c9 with SMTP id ffacd0b85a97d-43fe3e0984bmr56715309f8f.27.1777112359613;
-        Sat, 25 Apr 2026 03:19:19 -0700 (PDT)
-Received: from ?IPV6:2a02:a03f:a75e:9a00:e260:ac9e:635a:575d? ([2a02:a03f:a75e:9a00:e260:ac9e:635a:575d])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4cb1176sm67561640f8f.3.2026.04.25.03.19.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Apr 2026 03:19:19 -0700 (PDT)
-Message-ID: <b50025ba-c59d-4575-a790-fdaf0a48961d@gmail.com>
-Date: Sat, 25 Apr 2026 12:19:18 +0200
+	s=arc-20240116; t=1777114813; c=relaxed/simple;
+	bh=pX3I+Lk6VVItQh4a/LYbVKNchsr6SttcOh8lFjhQlYk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hgwfRfq/sGzoapHcCS9nv8JZWHqPQc31Xdf81m2xWypPJmQUXG1U0WI1oWkHIi/nsvGAbaAmrwFj6YgST11x7I/f6c28bR8wH60QwQN3McvWqW24sFwWRcTwlrkQSTEc3iyrUbNs5s1JxOVMEmxBf729LdTzwPQ4aEkudQHv/Ug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qf1/mXqR; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1777114799;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7x1S8p2qzRXK85k0FNVBep0q+wwaaQ/VD9E9QJxBuok=;
+	b=qf1/mXqR68FazSOoznM/m6QYtuZFwuDkwZ8moly/aW166SBwpSxNrVwjxHRnX1BWxPPLv7
+	cTtm2LeCN+M1Z4YS1iRni0FQMdXgHUqxVqBi6JQ1u5U+mYxiT6uvmvmIgaFu6FDEiA+apf
+	MbvLA72ELlvUCp9qRmm9Xt/CVJe36QI=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: bpf@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Jiri Olsa <jolsa@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Willem de Bruijn <willemb@google.com>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Krishna Kumar <krikku@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH bpf v3 0/2] bpf: prevent offloaded programs from running on host via tcx/netkit
+Date: Sat, 25 Apr 2026 18:59:27 +0800
+Message-ID: <20260425105942.223757-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] ipv6: Implement limits on extension header parsing
-To: Daniel Borkmann <daniel@iogearbox.net>, kuba@kernel.org
-Cc: edumazet@google.com, dsahern@kernel.org, tom@herbertland.com,
- willemdebruijn.kernel@gmail.com, idosch@nvidia.com, pabeni@redhat.com,
- netdev@vger.kernel.org
-References: <20260425075521.736328-1-daniel@iogearbox.net>
-Content-Language: en-US
-From: Justin Iurman <justin.iurman@gmail.com>
-In-Reply-To: <20260425075521.736328-1-daniel@iogearbox.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 64D28465DED
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 455F2466063
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,herbertland.com,gmail.com,nvidia.com,redhat.com,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_FROM(0.00)[bounces-281110-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[26];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281111-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[linux.dev,kernel.org,iogearbox.net,gmail.com,davemloft.net,google.com,redhat.com,fomichev.me,vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justiniurman@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com]
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[]
 
-On 4/25/26 09:55, Daniel Borkmann wrote:
-> ipv6_{skip_exthdr,find_hdr}() and ip6_{tnl_parse_tlv_enc_lim,
-> protocol_deliver_rcu}() iterate over IPv6 extension headers until they
-> find a non-extension-header protocol or run out of packet data. The
-> loops have no iteration counter, relying solely on the packet length
-> to bound them. For a crafted packet with 8-byte extension headers
-> filling a 64KB jumbogram, this means a worst case of up to ~8k
-> iterations with a skb_header_pointer call each. ipv6_skip_exthdr(),
-> for example, is used where it parses the inner quoted packet inside
-> an incoming ICMPv6 error:
-> 
->    - icmpv6_rcv
->      - checksum validation
->      - case ICMPV6_DEST_UNREACH
->        - icmpv6_notify
->          - pskb_may_pull()       <- pull inner IPv6 header
->          - ipv6_skip_exthdr()    <- iterates here
->          - pskb_may_pull()
->          - ipprot->err_handler() <- sk lookup
-> 
-> The per-iteration cost of ipv6_skip_exthdr itself is generally
-> light, but skb_header_pointer becomes more costly on reassembled
-> packets: the first ~1232 bytes of the inner packet are in the skb's
-> linear area, but the remaining ~63KB are in the frag_list where
-> skb_copy_bits is needed to read data.
-> 
-> Add a configurable limit via a new sysctl net.ipv6.max_ext_hdrs_number
-> (default 8, minimum 1). All four extension header walking functions
-> are bound by this limit. The sysctl is in line with commit 47d3d7ac656a
-> ("ipv6: Implement limits on Hop-by-Hop and Destination options").
-> As documented, init_net is used to derive max_ext_hdrs_number to
-> be consistent given a net cannot always reliably be retrieved.
-> 
-> Note that the check in ip6_protocol_deliver_rcu() happens right
-> before the goto resubmit, such that we don't have to have a test
-> for ipv6_ext_hdr() in the fast-path.
-> 
-> There's an ongoing IETF draft-iurman-6man-eh-occurrences to enforce
-> IPv6 extension headers ordering and occurrence. The latter also
-> discusses security implications. As per RFC8200 section 4.1, the
-> occurrence rules for extension headers provide a practical upper
-> bound, thus 8 was used as the default.
-> 
-> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> ---
->   v1->v2:
->     - Set the default to 8 (Justin)
->     - Update IETF references (Justin)
->     - Add core path coverage as well (Justin)
-> 
->   Documentation/networking/ip-sysctl.rst |  7 +++++++
->   include/net/dropreason-core.h          |  6 ++++++
->   include/net/ipv6.h                     |  2 ++
->   include/net/netns/ipv6.h               |  1 +
->   net/ipv6/af_inet6.c                    |  1 +
->   net/ipv6/exthdrs_core.c                | 11 +++++++++++
->   net/ipv6/ip6_input.c                   |  6 ++++++
->   net/ipv6/ip6_tunnel.c                  |  5 +++++
->   net/ipv6/sysctl_net_ipv6.c             |  8 ++++++++
->   9 files changed, 47 insertions(+)
-> 
+Yinhao reported a splat [1] when attaching a BPF program loaded with
+prog_ifindex (targeted at an offload-capable device such as netdevsim)
+to the software path via BPF_TCX_EGRESS. The program's bpf_func had
+already been replaced by bpf_prog_warn_on_exec() during offload compile,
+so the first packet that reaches tcx_run() trips the WARN:
 
-[snip]
+[   19.592982] ------------[ cut here ]------------
+[   19.594654] attempt to execute device eBPF program on the host!
+[   19.594659] WARNING: kernel/bpf/offload.c:420 at 0x0, CPU#0: poc/337
+[   19.599906] Modules linked in:
+[   19.600680] CPU: 0 UID: 0 PID: 337 Comm: poc Not tainted
+6.18.0-rc7-next-20251125 #10 PREEMPT(none)
+[   19.601659] Hardware name: QEMU Ubuntu 24.04 PC (i440FX + PIIX,
+1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+[   19.602684] RIP: 0010:bpf_prog_warn_on_exec+0xc/0x20
+[   19.603241] Code: 28 00 48 89 ef e8 74 44 2f 00 eb d7 66 90 90 90 90
+90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 48 8d 3d a4 eb 95
+06 <67> 48 0f b9 3a 31 c0 e9 83 76 44 ff 0f 1f 84 00 00 00 00 00 90 90
+[   19.605093] RSP: 0018:ffff8881066e73d8 EFLAGS: 00010246
+[   19.605663] RAX: ffffffff81cbca70 RBX: ffff8881013c4210 RCX:
+0000000000000004
+[   19.606378] RDX: 1ffff11020278842 RSI: ffffc90000563060 RDI:
+ffffffff8861b620
+[   19.607107] RBP: ffff8881010d0640 R08: ffff8881013c4210 R09:
+ffff8881010d06b0
+[   19.607827] R10: ffff8881010d06c3 R11: ffffc90000563000 R12:
+ffffc90000563000
+[   19.608751] R13: ffff8881010d06b4 R14: ffff888115eb1a34 R15:
+dffffc0000000000
+[   19.609478] FS:  000000000294c380(0000) GS:ffff8881911e9000(0000)
+knlGS:0000000000000000
+[   19.610316] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   19.610943] CR2: 000057f6b9eb38c0 CR3: 00000001010ea000 CR4:
+0000000000750ef0
+[   19.611712] PKRU: 55555554
+[   19.612006] Call Trace:
+[   19.612281]  <TASK>
+[   19.612523]  __dev_queue_xmit+0x22cb/0x3530
+[   19.617607]  ip_finish_output2+0x621/0x1a60
+[   19.621371]  ip_output+0x170/0x2e0
+[   19.624586]  ip_send_skb+0x129/0x180
+[   19.624940]  udp_send_skb+0x65d/0x1300
+[   19.625316]  udp_sendmsg+0x13bf/0x2000
+[   19.629960]  __sys_sendto+0x396/0x470
+[   19.633720]  __x64_sys_sendto+0xdc/0x1b0
+[   19.635066]  do_syscall_64+0x76/0x10a0
+[   19.641701]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[   19.642240] RIP: 0033:0x4240d7
+[   19.642597] Code: 00 89 01 e9 c1 fe ff ff e8 f6 03 00 00 66 0f 1f 44
+00 00 f3 0f 1e fa 80 3d 8d 3f 09 00 00 41 89 ca 74 10 b8 2c 00 00 00 0f
+05 <48> 3d 00 f0 ff ff 77 69 c3 55 48 89 e5 53 48 83 ec 38 44 89 4d d0
+[   19.646088] RSP: 002b:00007fffcb9ecb68 EFLAGS: 00000202 ORIG_RAX:
+000000000000002c
+[   19.648938] RAX: ffffffffffffffda RBX: 0000000000000001 RCX:
+00000000004240d7
+[   19.652116] RDX: 0000000000000008 RSI: 00007fffcb9ecce0 RDI:
+0000000000000005
+[   19.653148] RBP: 00007fffcb9eccf0 R08: 00007fffcb9ecbb0 R09:
+0000000000000010
+[   19.653951] R10: 0000000000000000 R11: 0000000000000202 R12:
+00007fffcb9ece08
+[   19.654760] R13: 00007fffcb9ece18 R14: 00000000004b2868 R15:
+0000000000000001
+[   19.657462]  </TASK>
+[   19.657703] ---[ end trace 0000000000000000 ]---
 
-> diff --git a/net/ipv6/ip6_input.c b/net/ipv6/ip6_input.c
-> index 967b07aeb683..a5bbbc16e8d7 100644
-> --- a/net/ipv6/ip6_input.c
-> +++ b/net/ipv6/ip6_input.c
-> @@ -403,8 +403,10 @@ INDIRECT_CALLABLE_DECLARE(int tcp_v6_rcv(struct sk_buff *));
->   void ip6_protocol_deliver_rcu(struct net *net, struct sk_buff *skb, int nexthdr,
->   			      bool have_final)
->   {
-> +	int exthdr_max = READ_ONCE(init_net.ipv6.sysctl.max_ext_hdrs_cnt);
->   	const struct inet6_protocol *ipprot;
->   	struct inet6_dev *idev;
-> +	int exthdr_cnt = 0;
->   	unsigned int nhoff;
->   	SKB_DR(reason);
->   	bool raw;
-> @@ -487,6 +489,10 @@ void ip6_protocol_deliver_rcu(struct net *net, struct sk_buff *skb, int nexthdr,
->   				nexthdr = ret;
->   				goto resubmit_final;
->   			} else {
-> +				if (unlikely(exthdr_cnt++ >= exthdr_max)) {
-> +					SKB_DR_SET(reason, IPV6_TOO_MANY_EXTHDRS);
-> +					goto discard;
-> +				}
->   				goto resubmit;
->   			}
->   		} else if (ret == 0) {
+The reason is that tcx, netkit and bpf_xdp_link_update() can install an
+offloaded program onto a software execution path without rejecting it.
+Rather than sprinkling the same check across every attach/update entry
+point, do it at the source:
 
-The hop-by-hop options header (if present) is not taken into account 
-based on the above. However, the max number of extension headers 
-(implicitly 7***, as per RFC 8200 Section 4.1) must include it. I 
-suggest adding this at the beginning of ip6_protocol_deliver_rcu():
+  - bpf_mprog_attach() is the single chokepoint for tcx/netkit (covers
+    all three of attach, link create and link update on both subsystems,
+    six call sites in total).
+  - dev_xdp_install() is the single chokepoint for XDP (covers both the
+    dev_xdp_attach() path and the bpf_xdp_link_update() path which
+    previously bypassed the check).
 
-struct inet6_skb_parm *opt = IP6CB(skb);
+This series adds/moves the check into those two functions so offloaded
+programs can no longer be attached to (or swapped into) the software
+path, regardless of which entry point is used.
 
-if (opt->flags & IP6SKB_HOPBYHOP)
-	exthdr_cnt++;
+v2 -> v3:
+  - Alexei suggested converging the check rather than spreading it
+    across attach entry points. Consolidated into a single check at
+    bpf_mprog_attach() (covers all six tcx/netkit paths) and moved the
+    existing XDP check from dev_xdp_attach() into dev_xdp_install() so
+    the bpf_xdp_link_update() path is also covered. Three patches
+    collapse into two.
+v2: https://lore.kernel.org/bpf/20260424104201.217604-1-jiayuan.chen@linux.dev/
 
-*** FYI, rounding to 8 is fine for this fix
+v1 -> v2:
+  - tcx/netkit: also reject offloaded progs in the link update callback
+    (tcx_link_update/netkit_link_update), not just attach; pointed out
+    by the AI review on v1.
+  - Add patch 3/3 for the same hole in bpf_xdp_link_update().
+v1: https://lore.kernel.org/bpf/20260423033609.252464-1-jiayuan.chen@linux.dev/
 
-> diff --git a/net/ipv6/sysctl_net_ipv6.c b/net/ipv6/sysctl_net_ipv6.c
-> index d2cd33e2698d..93f865545a7c 100644
-> --- a/net/ipv6/sysctl_net_ipv6.c
-> +++ b/net/ipv6/sysctl_net_ipv6.c
-> @@ -135,6 +135,14 @@ static struct ctl_table ipv6_table_template[] = {
->   		.extra1		= SYSCTL_ZERO,
->   		.extra2		= &flowlabel_reflect_max,
->   	},
-> +	{
-> +		.procname	= "max_ext_hdrs_number",
-> +		.data		= &init_net.ipv6.sysctl.max_ext_hdrs_cnt,
-> +		.maxlen		= sizeof(int),
-> +		.mode		= 0644,
-> +		.proc_handler	= proc_dointvec_minmax,
-> +		.extra1		= SYSCTL_ONE,
-> +	},
->   	{
->   		.procname	= "max_dst_opts_number",
->   		.data		= &init_net.ipv6.sysctl.max_dst_opts_cnt,
+[1]: https://lore.kernel.org/bpf/64d8e2b5-a214-4f3c-b9e8-bcedbcb2c602@hust.edu.cn/
 
-I've given it a lot of thought. I came to the conclusion that we should 
-use a hard-coded value here as well (just like we did for 076b8cad77aa, 
-with the same logic), not a sysctl. IMO, the main reason is that it 
-provides as is a suitable security fix to be backported, i.e., the max 
-value is the max number of EHs allowed by RFC 8200, Section 4.1. Also, 
-we remain consistent with draft-iurman-6man-eh-occurrences (I think Tom 
-is about to send a revision of the series soon for net-next). What this 
-series does is not only enforcing ordering, but also verifying the 
-specific number of occurrences for each type of Extension Header. Which 
-is totally compatible with what this patch does, i.e., limiting the 
-total number of Extension Headers (regardless of their types) to 8. I 
-guess what I'm trying to say is that it seems like a good 
-plan/compromise and that the aforementioned series would build perfectly 
-on top of this fix.
+Jiayuan Chen (2):
+  bpf, tcx, netkit: reject offloaded programs
+  bpf, xdp: move offload check into dev_xdp_install()
+
+ kernel/bpf/mprog.c | 11 +++++++++++
+ net/core/dev.c     |  9 +++++----
+ 2 files changed, 16 insertions(+), 4 deletions(-)
+
+-- 
+2.43.0
+
 
