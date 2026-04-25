@@ -1,232 +1,159 @@
-Return-Path: <netdev+bounces-281126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281127-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WG/qLPYh7WnFfwAAu9opvQ
-	(envelope-from <netdev+bounces-281126-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 22:20:06 +0200
+	id cHD0AsU27Wl/gwAAu9opvQ
+	(envelope-from <netdev+bounces-281127-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 23:48:53 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B456467A02
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 22:20:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F1A6467E90
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 23:48:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 73EA13009B15
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 20:20:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F3476300CE57
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 21:48:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF75630B533;
-	Sat, 25 Apr 2026 20:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F9983161AD;
+	Sat, 25 Apr 2026 21:48:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=raczylo.com header.i=@raczylo.com header.b="EkNZ3VcG";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lhr1.rp.oracleemaildelivery.com header.i=@lhr1.rp.oracleemaildelivery.com header.b="q0Tq/clK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com [209.85.221.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from acj35aaf123.lhr1.oracleemaildelivery.com (acj35aaf123.lhr1.oracleemaildelivery.com [130.35.116.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A038155C82
-	for <netdev@vger.kernel.org>; Sat, 25 Apr 2026 20:19:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BEE3016E1
+	for <netdev@vger.kernel.org>; Sat, 25 Apr 2026 21:48:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.35.116.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777148402; cv=none; b=lKzcC+dVnWuP3CvqJttdSOcKLJc4+yEEB5QpvhmYFItS8kLl0YgM+c1xDxvMHFxL9TxxwjppIfDj7tStms6SJ+npHFjNB7WzhArLbMyhG8Hr75y/RHxQWMmHxDIcFRHu9f7QNxGJxYfDjQieM1oPZXUPgoKDtD3fNBD7Y8VkVH0=
+	t=1777153720; cv=none; b=qUlkfodkKjjsr2tERGQU1wWJwHvEQwZ1Vs0p0MM3eUjkvLre00kb4Uu18pc8XFKG5egz5c5E6j0ObtT0DdYsfLlZp6N/o7jJeAZe55qbaTMdyV99PVgFbtAGlzIwylgi210BHPygXsLDaKBpIiE7uO7swzvnPIJopDN38uS2uA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777148402; c=relaxed/simple;
-	bh=r3oKUJOn/iY7WGFD6+RxF8upBEJGQecaixzCKwmyNoA=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=PspPWSHyh9ZSi9OlSBcWfi4afdJ5sHppT/+0v4UqCK8X5JnyFFj2aHeuR5r+jgxX/Jidvh4qCW3I4JdLZ1lBuVPgJBYqqM8ZKsGCgPHkCYJFXh/KI6cVoLP/29tKXP4ZcpEteZaZI4BvML/rpI4jG+XveggetBN9jUNRn2xEpIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f68.google.com with SMTP id ffacd0b85a97d-43fe608cb92so6062761f8f.2
-        for <netdev@vger.kernel.org>; Sat, 25 Apr 2026 13:19:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777148398; x=1777753198;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:cc:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kAFuJtSKoTyiw/XRZANxtlK9dfJ7AerpVvhrCljQA+A=;
-        b=SSs/t6mi7bDVsSbI1dMdEQxLDZxCKXC0kIGVx3kCvK+j0oXflCKNvz6qN7G/6Lcs1S
-         L9509gILpQprvaqFuZt6bITso5CQkkHBjEHNMi9iaraL8WV1O16JzsPHQy1k8ics4sIk
-         Fj78dbGrJzkPSNQfs2xNttO32mP4nsviUg/lMyzwfd48TUhD2zxQP6DYtIoIRb54wyIj
-         QYQX6bclhHGjUiqz6e4l5PJABW7OnCwRLaCpNE/lLi3bwuPOiR6joFQJCAND+12pqafm
-         ksE5Z/BhjRUm/IdXb8Av6yAGflH3JmfMIM8lXWaIOS9VLh01u8bwGhGFF1dLOweexJwX
-         wXZQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8M+C5SsSmyo1Y8xkYFDwzZUdwjJhb7Vm6Uh6eVkfcfOoR7dix1lxcQN7WUZwdUmaPjZocZ1Ew=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+Hn4mJjyfvpB4B51UmuvKbkowCDHJBP8mMzxfWQtm5+PHyNGl
-	2nWpiXBBW2fRc+0PfOCj11J4YEqTFHRoFSY8IHQviv2DYrkR1jCAo2QQ
-X-Gm-Gg: AeBDietVOJaZERaxP+wI1vm7VXdzKqw5HFwK6FLv3XDRkEWWkDTIlKMXLNYVMhHyotL
-	awxycC6cTbNtFwFokjNf9pPwLzLh+tHU+ed2DZPiGm55KZtIv/Ex+/bYueabJ7ANqczaWN8kd3I
-	HmnonS6fa6snccKQxo+VdUrf0TtHc3TLWsgAekum35vL28+zureEEXmbfa4jTNQhULo2pE2ENUL
-	MVmwyO3+RJ6Lpm1A584bDIGTsra0eAIvY4TO48FqkwIikV5vOwtpG6OCWFXEdFBPEqd8HvwKdWj
-	vpbA5YeXedXy5Inpoja1opsIUin7oKAXsJSDRmXpcsmtpISE8T+n10EyaOfE0Fj0BTt1Xgc8apS
-	GceruCXMOY4oCXgQfzlhTb/4L2l6mez5KaH2QggmQtAUGbDVXoGEMM81ugNxxLY9K1Z61oKx/F8
-	3KSCyKt1ZKvhYT5ruWj4dpYMt4nS4B09vJuygeYe+v1dfIcpTDsQdb5xLojCmuGiPVKoI19dfdF
-	YSx
-X-Received: by 2002:a05:6000:18a8:b0:43f:dd91:b022 with SMTP id ffacd0b85a97d-43fe3e0a2a9mr57375947f8f.35.1777148398068;
-        Sat, 25 Apr 2026 13:19:58 -0700 (PDT)
-Received: from [192.168.88.241] (89-24-32-159.nat.epc.tmcz.cz. [89.24.32.159])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4412150a071sm32495435f8f.21.2026.04.25.13.19.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Apr 2026 13:19:57 -0700 (PDT)
-Message-ID: <9c1f6c24-3641-4bef-aad7-8f276def50a8@ovn.org>
-Date: Sat, 25 Apr 2026 22:19:55 +0200
+	s=arc-20240116; t=1777153720; c=relaxed/simple;
+	bh=fCNW8vHxLGHPNlY8yV7CFJ69YAV1qDI58cXP8B9+1bg=;
+	h=From:To:Cc:Subject:Date:Message-id:In-reply-to:References:
+	 MIME-version:Content-type; b=YzabQhDrMm1AWi+4qsEbVAKB/n426PEAYzHmIIH7RMkpFrM4xilwDbwaKst0gtloslM1TvZnPz+jC8pM+i8Jyz8yJ5hglqQdGGxhVcpzFgRVZphwN4baTqKsgccGJU4CTlO0nHxkkuIla3Vw3ZT8L2adgle4cke1rkRF7NM6G9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raczylo.com; spf=pass smtp.mailfrom=lhr1.rp.oracleemaildelivery.com; dkim=pass (2048-bit key) header.d=raczylo.com header.i=@raczylo.com header.b=EkNZ3VcG; dkim=pass (2048-bit key) header.d=lhr1.rp.oracleemaildelivery.com header.i=@lhr1.rp.oracleemaildelivery.com header.b=q0Tq/clK; arc=none smtp.client-ip=130.35.116.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raczylo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lhr1.rp.oracleemaildelivery.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=oracle-uk-012026;
+ d=raczylo.com;
+ h=Date:To:From:Subject:Message-Id:MIME-Version:Sender:List-Unsubscribe:List-Unsubscribe-Post;
+ bh=t9CQ5m3wOhmUWV8If1GVflZNLT7+4pTChH+YanoajiM=;
+ b=EkNZ3VcGfiRWCkqk6kyK7eeHLrLQphTy6OTsYG2WanMLmaVZ2nwdR7EtJNiELMa5JCzQLLSIcZNb
+   +WYkbuluWHxA/d6g9BdhVQ9arpfoA4QH8bcjP8clWhfuADWKNqgydsGUqJwe0HvLz7Qgq0QBjHN7
+   LwUYAKLRj/gQ0ktlwi3uSxYoTuBWq0HvEnkqDWAx8uAip+IHEaJQBhmF6ExOOGj0eBIgcvIZIRWL
+   SG/7enFy4pj+4De9YWgQMCjIl3D3axDP1n1Gvg1SKPypXOKGa/y11o58d0Mih0C4fY82s3Bcmpo6
+   5fugg6t6eyIgDikxvJ0ZLDHiF1P0Uxb6ycSn2A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=prod-lhr-20191104;
+ d=lhr1.rp.oracleemaildelivery.com;
+ h=Date:To:From:Subject:Message-Id:MIME-Version:Sender:List-Unsubscribe:List-Unsubscribe-Post;
+ bh=t9CQ5m3wOhmUWV8If1GVflZNLT7+4pTChH+YanoajiM=;
+ b=q0Tq/clKdT0FqBof2Qrl5StSEq/Y0CyusJHGNjbx+eNdanOtsnONrPbbo1+iCIfNhWawkBdtzm3z
+   Mh9DlKVnQTLEnXX1OfEQngXxLOTTDJZFttX9X2xZkHL/hXqw/aCUSS3FaX0yV79Bi3dD8e8ATuxh
+   kuPpfjZL6ZIFq/RVZ23eQXWk/8njz8Oy0JJY5AqkwL9N13Ri4w6dRhoImoBOT9Ve86LumHNAlJtw
+   7vKylNGiS5UawIrvYU6RFzh8RtzpE9aeJFHtsly+G84Mv65cOVU1JFtmBdKN58kZtTtzg6U66DHM
+   sDCZZTxf13bipM1FmCSSRdGNUWv558WYMkDX1Q==
+Received: by omta-ad2-fd1-401-uk-london-1.omtaad2.vcndplhr.oraclevcn.com
+ (Oracle Communications Messaging Server 8.1.0.1.20260212 64bit (built Feb 12
+ 2026))
+ with ESMTPS id <0TE200LEQKKZ1CD0@omta-ad2-fd1-401-uk-london-1.omtaad2.vcndplhr.oraclevcn.com> for
+ netdev@vger.kernel.org; Sat, 25 Apr 2026 21:48:35 +0000 (GMT)
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+From: Lukasz Raczylo <lukasz@raczylo.com>
+To: netdev@vger.kernel.org
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [RFC PATCH net-next 0/3] net: macb: candidate fixes for silent TX
+ stall on BCM2712/RP1
+Date: Sat, 25 Apr 2026 22:48:25 +0100
+Message-id: <20260425214825.31390-1-lukasz@raczylo.com>
+X-Mailer: git-send-email 2.54.0
+In-reply-to: <cover.1777064117.git.lukasz@raczylo.com>
+References: <cover.1777064117.git.lukasz@raczylo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: i.maximets@ovn.org, aconole@redhat.com, echaudro@redhat.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, jbenc@redhat.com, e@erig.me,
- yi.y.yang@intel.com, yuantan098@gmail.com, yifanwucs@gmail.com,
- tomapufckgml@gmail.com, bird@lzu.edu.cn, ldy3087146292@gmail.com
-Subject: Re: [PATCH net 1/1] openvswitch: reject oversized NSH MD2 metadata in
- push_nsh
-To: Ren Wei <n05ec@lzu.edu.cn>, netdev@vger.kernel.org, dev@openvswitch.org
-References: <cover.1776929256.git.ldy3087146292@gmail.com>
- <9d2b5c6127e149ebd35094d662bfd008c20347c2.1777120226.git.ldy3087146292@gmail.com>
-Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <9d2b5c6127e149ebd35094d662bfd008c20347c2.1777120226.git.ldy3087146292@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 7B456467A02
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
+Content-transfer-encoding: 8bit
+Reporting-Meta:
+ AAGFHUMHCyhz/Y5E0y2VFlm0i9zvAyzdLN9Op57gLgDDSYmpEyUmc63P+pWevRkF
+ S/s8SFa5KPNQyr+28RldTqXqgFU1A33tbQMLtH44ph0MHcSd7XYi61E+0jA+QcQd
+ NE04JaKOvebiYuMMecd3jyvZP/aqo9iH4YU6ORBc67kTkzz/DhCslHS+jBhj4uUe
+ 456vb9uhJe+k+C/wHGkVIyP/XX9uukb3o124apWhiUp/rRyZ3fvUK5CtXf9lL3U5
+ hPjqyfZdQUqoq7O9a7mkFRV4xDyU07OYE4ZR23AyRSB1JsgMybfXM/Z9qEPElOTC
+ c/UVque39CNjafOS+/ok+NL8CX47QYdGV23xMHVN40Mh9HEfKZvOCafWxX/8oXG3
+ oHdTIJtxHuLwAN7GtRt8S0lTVzlKY28rPpNxtoERZ0MwayFjycfR5d47gNfw
+X-Rspamd-Queue-Id: 9F1A6467E90
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [4.04 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[raczylo.com : SPF not aligned (relaxed),reject];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_REJECT(1.00)[raczylo.com:s=oracle-uk-012026,lhr1.rp.oracleemaildelivery.com:s=prod-lhr-20191104];
+	MID_CONTAINS_FROM(1.00)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[ovn.org,redhat.com,davemloft.net,google.com,kernel.org,erig.me,intel.com,gmail.com,lzu.edu.cn];
-	TAGGED_FROM(0.00)[bounces-281126-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[ovn.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-281127-lists,netdev=lfdr.de];
+	GREYLIST(0.00)[pass,meta];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lukasz@raczylo.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[raczylo.com:-,lhr1.rp.oracleemaildelivery.com:-];
+	NEURAL_HAM(-0.00)[-0.974];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ozlabs.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ovn.org:mid,lzu.edu.cn:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[raczylo.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On 4/25/26 6:40 PM, Ren Wei wrote:
-> From: Douya Le <ldy3087146292@gmail.com>
-> 
-> The NSH header length is encoded in 4-byte words in a 6-bit field.
-> The current push_nsh validation only checks the MD2 payload against
-> NSH_CTX_HDRS_MAX_LEN, which still allows metadata sizes that cannot be
-> represented once the base header is included.
-> 
-> Reject MD2 metadata lengths whose total NSH header size cannot be
-> encoded exactly in the NSH length field, whether because the field
-> would wrap or because the length is not a multiple of 4 bytes.
-> 
-> Fixes: b2d0f5d5dc53 ("openvswitch: enable NSH support")
-> Cc: stable@kernel.org
-> Reported-by: Yuan Tan <yuantan098@gmail.com>
-> Reported-by: Yifan Wu <yifanwucs@gmail.com>
-> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-> Reported-by: Xin Liu <bird@lzu.edu.cn>
-> Tested-by: Douya Le <ldy3087146292@gmail.com>
-> Signed-off-by: Douya Le <ldy3087146292@gmail.com>
-> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
-> ---
->  net/openvswitch/flow_netlink.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
-> index 13052408a132..8a1ae5309c2c 100644
-> --- a/net/openvswitch/flow_netlink.c
-> +++ b/net/openvswitch/flow_netlink.c
-> @@ -1432,7 +1432,13 @@ static int nsh_key_put_from_nlattr(const struct nlattr *attr,
->  
->  			has_md2 = true;
->  			mdlen = nla_len(a);
-> -			if (mdlen > NSH_CTX_HDRS_MAX_LEN || mdlen <= 0) {
-> +			/* The NSH length field stores the total header size
-> +			 * in 4-byte words in 6 bits. Reject MD2 metadata
-> +			 * lengths that cannot be encoded exactly or would
-> +			 * make the length field wrap.
-> +			 */
-> +			if (mdlen <= 0 || !IS_ALIGNED(mdlen, 4) ||
-> +			    NSH_BASE_HDR_LEN + mdlen > (NSH_LEN_MASK << 2)) {
->  				OVS_NLERR(
->  				    log,
->  				    "Invalid MD length %d for MD type %d",
+A follow-up runtime data point on this series.
 
-I don't think the check is a problem here, the problem is that the constants
-are not correct.  We actually had them fixed in userspace, but looks like
-no-one ported the change to the kernel side:
-  https://patchwork.ozlabs.org/project/openvswitch/patch/1540503710-23597-1-git-send-email-pkusunyifeng@gmail.com/
+Fleet state at 2026-04-25 21:46 UTC:
 
-Adjusting the macros should solve the potential overflow issue.  However,
-even if the value overflows the 6-bit length, it will just be truncated to
-a smaller value and nothing bad should happen in this case, as far as header
-push is concerned.  The context was wrong already, so pushing a truncated
-context doesn't make it more wrong.  But we should still fix the constants,
-so the checks make sense, of course.
+  * Patched uptime (since staggered rollout 2026-04-24 18:10-19:20 UTC):
+    - shortest: 26h 26m   (last master upgraded)
+    - longest:  27h 34m   (canary)
+    - cumulative across 24 nodes: ~651 node-hours
 
-The same for alignment, if the user provides an invalid header that is not
-multiple of 4, the code will just truncate it to the previous multiple of 4,
-which should not be a problem, as it wasn't correct in the first place.  We
-could add this check just to warn the user that they are doing something wrong,
-but not having it should not cause any real issues.
+  * Macb-attributable event counts (out-of-band userspace watchdog;
+    the [tx-stall] detector watches /sys/class/net/end0/statistics/
+    tx_packets + qdisc backlog every 1 s and would have fired
+    ip link down/up if any node's TX path froze):
+    - RECOVER trigger=tx-stall (actual stalls caught):    0
+    - partial [tx-stall] markers (transient 1 s freezes): 0
 
-Note, the userpace change linked above did fix the real issue in userspace,
-but for the kernel side there seem to be no real memory related issues caused
-by the wrong constants.
+  * Separately: 40 RECOVER events with trigger=ping fired in this
+    window across the fleet, attributable to a brief upstream-network
+    outage (gateway / switch event); each node simultaneously lost ping
+    to gateway, VIP, and NAS within seconds of each other, then
+    recovered.  These are unrelated to the macb hang the patch series
+    targets — distinguishing them from a real TX stall is exactly what
+    the trigger= tag in the watchdog log is for.
 
-Best regards, Ilya Maximets.
+At the pre-patch rate referenced in the cover letter (50 stalls in
+95 node-hours observed in our 2026-04-24 14:00-18:10 UTC reference
+window, ~0.5 per node-hour), the projected stall count in
+651 node-hours is on the order of 342;
+observed is 0.
+
+Same observability runs forward; will reply again after a full week
+of uptime unless something changes.
+
+--
+Lukasz Raczylo
 
