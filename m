@@ -1,235 +1,164 @@
-Return-Path: <netdev+bounces-281082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281083-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +D+NHFYK7GnDTwAAu9opvQ
-	(envelope-from <netdev+bounces-281082-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 02:27:02 +0200
+	id iItbLEQK7GnDTwAAu9opvQ
+	(envelope-from <netdev+bounces-281083-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 02:26:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CBEE4643ED
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 02:27:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1567B4643D8
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 02:26:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 417783004D85
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 00:25:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AB99C300E722
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 00:26:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28E451FE44A;
-	Sat, 25 Apr 2026 00:25:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07F6D14A4CC;
+	Sat, 25 Apr 2026 00:26:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CBRPuchh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TFZ+9q6k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D74551F1534
-	for <netdev@vger.kernel.org>; Sat, 25 Apr 2026 00:25:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D61C754723;
+	Sat, 25 Apr 2026 00:26:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777076704; cv=none; b=j0th3aMT6VGOTsWG966sKoUtcMg/tZBO0ytnrAN6xETp/tcrfalV52+uZHClLuDnoDbxTONlBZxxjD85Ui7YYLeBwxfqBaCiaFJxJyYEdTKf4u7ZvX9grEmShgNJFl8Vb6oyBMfLee939gR7Tr/tsOdtOL3vjAM/7WJD0NtqYtw=
+	t=1777076800; cv=none; b=FZpde1ik5B1KKpW+9dxLSk/5AR1OnnEVnWvBTu9OgAORzqHLPY6knTzL3zeMXhSzBcXy+YTQTcbT7yeYVtIeyvhSEiAs/l0wXcDUN8Nsf2lBR+E8J261KZvpDQ4+drszcuip1euphWQx9J7j5U8H1zwYfeBHBjj2exYFDy19Y4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777076704; c=relaxed/simple;
-	bh=QTNTbvBnSC5EltdyXHhC+I6ndxnglhMXh0Und1seaOc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=krA6/fNtG7WYquCp0vBSo+cRBQNT7piRE/3iS2bICWxMNWRJwT6Z+dCMmVs6EBkSdz/CXPR3EreXuKjAVDFTxzNPWMj5kg/f9+3bhTmvlof5iNaaHZkBu7jvlvh3+De/i8sCm1KtjdZGqQnakqJPPJz3K/3YKmtbnXAlNMES8tI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CBRPuchh; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-362d9dd9a49so2642481a91.0
-        for <netdev@vger.kernel.org>; Fri, 24 Apr 2026 17:25:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777076702; x=1777681502; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7Mr9oFSsC133Mf1hRrHkDLNxZVk8eA36xlUlRpvwFcQ=;
-        b=CBRPuchhYdZYzIvpOG1tcmhpJr0LOe6LO4Y+nWc+j52ZEK2GCg5znzBGIxg6uoFcjW
-         41fl+o5gaExn0reO9/rOKOXIQIXqghV4NfwhqrBz9zEXNSxf2USNeiTXLaefw2OunKql
-         sfmtWTBKsurLmMCS/y+8ey7ECBQQ9y24XvChp11EgUjen1CFFw4JIWFc+53OuspbrgRX
-         VTKX/zF0aWqYFd1BKxH0yqAJ47eTyLtcvGdnsa4Z4/+SRl5FAwCtjLxiGQDwjGQA2nkB
-         OxV3TDR7QWFGWIN+uwj8PhX8VyKEIexQuPm6/j7sVKtPlsIi7WdTKKALX359NHWbVgF4
-         vKZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777076702; x=1777681502;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7Mr9oFSsC133Mf1hRrHkDLNxZVk8eA36xlUlRpvwFcQ=;
-        b=O1uwx6Pk3vX2DpI894h126Qa0GrLgLWbTTq0NSUjKDTZS45H723k58tEYOgLxHi5Zt
-         +hEv91hchrAoU/Qe7GyePhHQjGmC3yCwJNy7GSgl6Q5ASkDmXKc5S4cwz1xFtaTO7VWe
-         hFgI8IDUG5KsLdsY8vTimeDVkDa0KnSvCZ7+iFlJxjGo6g3KWR992EvJMaSqbCELd66b
-         hb67mhz25O7Sde2kLuKyyTTROKvZ7pIJ2dlinAXe9iGq61jLkiWLMVYc2bkavtDN9aYE
-         /9BOdruhlJTr1bMikwmgPMelt6xVnS7oB3VRL3xvL98NPCLaOzcJO0OaxI7+4KmXB25v
-         TLmA==
-X-Gm-Message-State: AOJu0YzSYTkS8X01huE0hby55wrtNcxZPh+Y4jG3oc8xXRNsIVFggNOn
-	eaok004Ce6knU4IW7rTIq83AJ1OhGSYBPwxpTTJe48+FTg3xYxhzKDIyi5GrHlbWmg1yAdxc7J6
-	qYlKg2439rCnapgxBts7ATZ+msTZ6vBwAB/LubwtzdlzNOZS3rMUfidWkrtZN9Q6aZIhFyCYBd2
-	3An7zo4FbVVuijsoW06KzO4EiHLZw7UidqZPoefdVwTSNrGQxIXP1LRs/S0pfTFBk=
-X-Received: from pjh13.prod.google.com ([2002:a17:90b:3f8d:b0:35f:be31:1a85])
- (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:2892:b0:35d:a0b7:9608 with SMTP id 98e67ed59e1d1-361403e8a1bmr33217393a91.7.1777076701965;
- Fri, 24 Apr 2026 17:25:01 -0700 (PDT)
-Date: Sat, 25 Apr 2026 00:24:50 +0000
-In-Reply-To: <20260425002450.163421-1-hramamurthy@google.com>
+	s=arc-20240116; t=1777076800; c=relaxed/simple;
+	bh=T0yCUFyad0Iay4ATupQDxxCtSOQ0P0MgRLUHt6Rh4bk=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=WZMR97uViWuK+UnmjGDdfCjIKpgPTzz/kZtLUVB7TueOl+KNSqd6yvXKakS704/I38dmZm2wrTlWFnLQocLo3WSAQAgoaDBauewm0CqSkdQbcMnG4fvn7j6gqhopHZq+mfS9NGlSz58SgXp7Ct5k5kRQlZvSsnz7ElZePmTa6o0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TFZ+9q6k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34AD3C19425;
+	Sat, 25 Apr 2026 00:26:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777076800;
+	bh=T0yCUFyad0Iay4ATupQDxxCtSOQ0P0MgRLUHt6Rh4bk=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=TFZ+9q6ku2Jbb4Uiqeu9COQuSbnBjobNC44s1qZIpj8OCga/Tbo8X06WSMIWqynyF
+	 zDsVtwp3aIpXX0BZ+o/1zxTlrwgNM/HRrBy1F0by5ngTS+uGD3QPjpbqoVAIvg+x6D
+	 RpYhm2GyWSn3WuRn2s7U5PqPaha+asre0SMOKVapLnLbJ8CxI9KMxpjowhYl1A3Rul
+	 jNNTpiyUMyUtcB4tb9APAqSuMGhIQs6auNvbOCiDzpVIuwUx1uQ6wcG7Nc8KEx+T2t
+	 /DCZPUzxz8sGyBcCzyITSIhb56AZA2AwAvNmV08qvijNok2FDZgBvK+8rBhuSPV9Ip
+	 1qO1PWk6+M6vA==
+Content-Type: multipart/mixed; boundary="===============5951464050820953645=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260425002450.163421-1-hramamurthy@google.com>
-X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260425002450.163421-5-hramamurthy@google.com>
-Subject: [PATCH net v2 4/4] gve: Make ethtool config changes synchronous
-From: Harshitha Ramamurthy <hramamurthy@google.com>
-To: netdev@vger.kernel.org
-Cc: joshwash@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	willemb@google.com, maolson@google.com, nktgrg@google.com, jfraker@google.com, 
-	ziweixiao@google.com, jacob.e.keller@intel.com, pkaligineedi@google.com, 
-	shailend@google.com, jordanrhee@google.com, stable@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Pin-yen Lin <treapking@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 8CBEE4643ED
+MIME-Version: 1.0
+Message-Id: <407178e7c68a87a2a660badc2e4e8e8feae7b1767998649cb278ce4bde14371d@mail.kernel.org>
+In-Reply-To: <20260424235247.1990272-1-kuniyu@google.com>
+References: <20260424235247.1990272-1-kuniyu@google.com>
+Subject: Re: [PATCH v1 bpf] bpf: Free reuseport cBPF prog after RCU grace period.
+From: bot+bpf-ci@kernel.org
+To: kuniyu@google.com,martin.lau@linux.dev,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,eddyz87@gmail.com,memxor@gmail.com
+Cc: kuniyu@google.com,kuni1840@gmail.com,bpf@vger.kernel.org,netdev@vger.kernel.org,eulgyukim@snu.ac.kr,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Sat, 25 Apr 2026 00:26:40 +0000 (UTC)
+X-Rspamd-Queue-Id: 1567B4643D8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281082-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281083-lists,netdev=lfdr.de,bpf-ci];
+	FREEMAIL_CC(0.00)[google.com,gmail.com,vger.kernel.org,snu.ac.kr,kernel.org,iogearbox.net,linux.dev,meta.com];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	MIME_TRACE(0.00)[0:+,1:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[google.com,linux.dev,kernel.org,iogearbox.net,gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[20];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.kernel.org:mid]
 
-From: Pin-yen Lin <treapking@google.com>
+--===============5951464050820953645==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-When modifying device features via ethtool, the driver queues the
-carrier status update to its workqueue (gve_wq). This leads to a
-short link-down state after running the ethtool command.
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index bc96c18df4e0..dba4c9340bb7 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -1654,15 +1654,24 @@ int sk_reuseport_attach_bpf(u32 ufd, struct sock *sk)
+>  	return err;
+>  }
+>
+> -void sk_reuseport_prog_free(struct bpf_prog *prog)
+> +static void sk_reuseport_prog_free_rcu(struct rcu_head *rcu)
+> +{
+> +	struct bpf_prog_aux *aux = container_of(rcu, struct bpf_prog_aux, rcu);
+> +	struct bpf_prog *prog = aux->prog;
+> +
+> +	bpf_release_orig_filter(prog);
+> +	bpf_prog_free(prog);
+> +}
+> +
+> +void sk_reuseport_prog_free(struct bpf_prog *prog, bool wait_rcu)
+>  {
 
-Use `gve_turnup_and_check_status()` instead of `gve_turnup()` in
-`gve_queues_start()` to update the carrier status before returning to
-the userspace.
+The function signature was changed to add a 'bool wait_rcu' parameter, but
+the header file declaration in include/linux/filter.h and all three call
+sites in net/core/sock_reuseport.c were not updated.
 
-This was discovered by drivers/net/ping.py selftest. The test calls
-ping command right after an ethtool configuration, but the interface
-could be down without this fix.
+The three call sites are:
+- reuseport_attach_prog() calling sk_reuseport_prog_free(old_prog)
+- reuseport_free_rcu() calling sk_reuseport_prog_free(...)
+- reuseport_detach_prog() calling sk_reuseport_prog_free(old_prog)
 
-Cc: stable@vger.kernel.org
-Fixes: 5f08cd3d6423 ("gve: Alloc before freeing when adjusting queues")
-Signed-off-by: Pin-yen Lin <treapking@google.com>
-Reviewed-by: Joshua Washington <joshwash@google.com>
-Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+Will this compile? It looks like the callers will fail with 'too few
+arguments to function sk_reuseport_prog_free'.
+
+>  	if (!prog)
+>  		return;
+>
+> -	if (prog->type == BPF_PROG_TYPE_SK_REUSEPORT)
+> -		bpf_prog_put(prog);
+> +	if (bpf_prog_was_classic(prog))
+> +		call_rcu(&prog->aux->rcu, sk_reuseport_prog_free_rcu);
+>  	else
+> -		bpf_prog_destroy(prog);
+> +		bpf_prog_put(prog);
+>  }
+
+The 'wait_rcu' parameter is never used in the function body. The decision
+to defer freeing via RCU is based entirely on bpf_prog_was_classic(prog).
+
+What is the purpose of the wait_rcu parameter? The commit message explains
+the goal is to defer freeing cBPF programs, but doesn't explain why a
+per-call toggle would be needed. With the parameter ignored, callers
+cannot control the behavior even if they wanted to.
+
+>
+>  static inline int __bpf_try_make_writable(struct sk_buff *skb,
+
 ---
- drivers/net/ethernet/google/gve/gve_main.c | 56 +++++++++++-----------
- 1 file changed, 28 insertions(+), 28 deletions(-)
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
-diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index 1fec8e1e4821..2c461be12a75 100644
---- a/drivers/net/ethernet/google/gve/gve_main.c
-+++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -1424,6 +1424,33 @@ static void gve_queues_mem_remove(struct gve_priv *priv)
- 	priv->rx = NULL;
- }
- 
-+static void gve_handle_link_status(struct gve_priv *priv, bool link_status)
-+{
-+	if (!gve_get_napi_enabled(priv))
-+		return;
-+
-+	if (link_status == netif_carrier_ok(priv->dev))
-+		return;
-+
-+	if (link_status) {
-+		netdev_info(priv->dev, "Device link is up.\n");
-+		netif_carrier_on(priv->dev);
-+	} else {
-+		netdev_info(priv->dev, "Device link is down.\n");
-+		netif_carrier_off(priv->dev);
-+	}
-+}
-+
-+static void gve_turnup_and_check_status(struct gve_priv *priv)
-+{
-+	u32 status;
-+
-+	gve_turnup(priv);
-+	status = ioread32be(&priv->reg_bar0->device_status);
-+	gve_handle_link_status(priv,
-+			       GVE_DEVICE_STATUS_LINK_STATUS_MASK & status);
-+}
-+
- /* The passed-in queue memory is stored into priv and the queues are made live.
-  * No memory is allocated. Passed-in memory is freed on errors.
-  */
-@@ -1486,8 +1513,7 @@ static int gve_queues_start(struct gve_priv *priv,
- 			  round_jiffies(jiffies +
- 				msecs_to_jiffies(priv->stats_report_timer_period)));
- 
--	gve_turnup(priv);
--	queue_work(priv->gve_wq, &priv->service_task);
-+	gve_turnup_and_check_status(priv);
- 	priv->interface_up_cnt++;
- 	return 0;
- 
-@@ -1608,23 +1634,6 @@ static int gve_close(struct net_device *dev)
- 	return 0;
- }
- 
--static void gve_handle_link_status(struct gve_priv *priv, bool link_status)
--{
--	if (!gve_get_napi_enabled(priv))
--		return;
--
--	if (link_status == netif_carrier_ok(priv->dev))
--		return;
--
--	if (link_status) {
--		netdev_info(priv->dev, "Device link is up.\n");
--		netif_carrier_on(priv->dev);
--	} else {
--		netdev_info(priv->dev, "Device link is down.\n");
--		netif_carrier_off(priv->dev);
--	}
--}
--
- static int gve_configure_rings_xdp(struct gve_priv *priv,
- 				   u16 num_xdp_rings)
- {
-@@ -2099,15 +2108,6 @@ static void gve_turnup(struct gve_priv *priv)
- 	gve_set_napi_enabled(priv);
- }
- 
--static void gve_turnup_and_check_status(struct gve_priv *priv)
--{
--	u32 status;
--
--	gve_turnup(priv);
--	status = ioread32be(&priv->reg_bar0->device_status);
--	gve_handle_link_status(priv, GVE_DEVICE_STATUS_LINK_STATUS_MASK & status);
--}
--
- static struct gve_notify_block *gve_get_tx_notify_block(struct gve_priv *priv,
- 							unsigned int txqueue)
- {
--- 
-2.54.0.545.g6539524ca2-goog
-
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/24917377520
+--===============5951464050820953645==--
 
