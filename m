@@ -1,374 +1,238 @@
-Return-Path: <netdev+bounces-281102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281103-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id XpupFHpz7Gl0YwAAu9opvQ
-	(envelope-from <netdev+bounces-281102-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 09:55:38 +0200
+	id oD1KI+B17GmxYwAAu9opvQ
+	(envelope-from <netdev+bounces-281103-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 10:05:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96F4A46576C
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 09:55:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 34E8C465785
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 10:05:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CC019300C58D
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 07:55:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5D547300E725
+	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 08:05:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3822B2C21E8;
-	Sat, 25 Apr 2026 07:55:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE6DE346E56;
+	Sat, 25 Apr 2026 08:05:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="NSeHWaFM"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="jIIc3NO6"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183EF2BEC43
-	for <netdev@vger.kernel.org>; Sat, 25 Apr 2026 07:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62CCB1D61BC;
+	Sat, 25 Apr 2026 08:05:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777103735; cv=none; b=TIr3qOl0HuqyaVukiZA7PmRehGjGHAQl7H+ohOEhCI+ryUR18rl8AmYRHuFokVpakDp84fgxw99upUX7P8QOAieAvydICGTrGBz8742tJCpuNJJjtyAwP8lwwDdoaDOva+KD2zscqJoqj6SDA8UOzleMPQ17QtPjTW2Y/DUyavM=
+	t=1777104344; cv=none; b=KJ+PWPJKTd8L7MoogHeooQ+9A7lRbkv8nA7d6woEZIrV1US7R9oLYu2TGuSsrwmCGUULYafQM7Gat/QPcSjhnVHIPdq07C6T618svQzbh4S8KTNOvYpQrE16xHgRVCTZ6iFgGm6Kf1SwSJ5IfM+IaEaAh+9Lo7f1I1KP3rXzJPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777103735; c=relaxed/simple;
-	bh=fVBm6wS4L6L1yOivEcfgzQ8WdPmIAhd3oVtjQ+CI6Ak=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dwrT39Qsd74DZje7LUrmTJYG9XWiOpD5DitvsWHGor/p1xmNu2eG4+LmJZorvhaVIQw4Phc1Xxp2vwi7dzBQQTa8d73zIBa8Vq6A2KZMJQub6avV2w00flVPnhQQZ2Er5gXu5MYQiv4k/Kua9mdCjDf77cmzkfK2a4tYmyPhslw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=NSeHWaFM; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=QoRTEGFw9YjoUpYPd7/jNDkMmXXe7dBuLEvV5Qmrx38=; b=NSeHWaFMzC6FbpNadwvf5oaBnV
-	Sh0stp45XVzYuhPf5ZFPkHZRtYkWXvjsgOpXUmqHN6/GSXSWPCI6NtEPBDNea+XeT34tDqXNkfu79
-	z2B00uW8168fK+M6skxgk2KeeXuw34tJP4AGEjZKflxmZ4P+LrcpZMRPdd1YgIMks2uHKkhHKePIE
-	j5xygnUpbhGKBdm+vI07tohk38CJPFdsyVzzHzVYFmhLTW5XYfJVEwZewDVmtGTwbOkwkPvB73dJb
-	TiVxlvmw9tYH+C4Q9uq/xD+a/G14AzE386vChHs9K9srvqwsiTbcxnz3LJafvdyh3GDsaehZV4D5e
-	kZe8yPUw==;
-Received: from localhost ([127.0.0.1])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wGXrH-000FZ8-1g;
-	Sat, 25 Apr 2026 09:55:23 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: kuba@kernel.org
-Cc: edumazet@google.com,
-	dsahern@kernel.org,
-	tom@herbertland.com,
-	willemdebruijn.kernel@gmail.com,
-	idosch@nvidia.com,
-	justin.iurman@gmail.com,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH net v2] ipv6: Implement limits on extension header parsing
-Date: Sat, 25 Apr 2026 09:55:21 +0200
-Message-ID: <20260425075521.736328-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1777104344; c=relaxed/simple;
+	bh=S0X0pN8srarPwBPkfnx0eU3gnbLxXj9lMASqd+jq/0o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mxlfrXwq8wuPQm2oq4PpeIH9eN12TsHZ2NUEywIGZXDmooywpjuH28o406J+6nhC3VCnU5JGpj363qXz8loIhag85YWs+lKLptp86TDgAUFvjuVquZQmwIfZkfyKX/85jybDlGP+WENZgUuMYuZ7FuGSTKVjICIds25w8jE7pNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=jIIc3NO6; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 5E3E220B7165; Sat, 25 Apr 2026 01:05:43 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5E3E220B7165
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1777104343;
+	bh=IkB9waU1QRQIGvPZnWRyZzWRYRvNT5pe3n4MZbVXQhI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jIIc3NO6qYngtvOses01TkQFruO+Ii5pevg0TCcHPvJBRUFzaF5qs+ZJqneqEElZ0
+	 i0FcK/csMFPU/duYoCuPLHLjjHCpfAIMfQxc1eYOcwTZJy+pU+9lXwyU7WWNXh2LQH
+	 FBkTQVb5twwtc4+KfgD3Kb6VGmogh2WIWmI9yuNA=
+Date: Sat, 25 Apr 2026 01:05:43 -0700
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: David Wei <dw@davidwei.uk>, kuba@kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>, kys@microsoft.com,
+	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, leon@kernel.org, longli@microsoft.com,
+	kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	stephen@networkplumber.org, jacob.e.keller@intel.com,
+	leitao@debian.org, kees@kernel.org, john.fastabend@gmail.com,
+	hawk@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net,
+	ast@kernel.org, sdf@fomichev.me, dipayanroy@microsoft.com
+Subject: Re: [PATCH net-next v6 0/2] net: mana: add ethtool private flag for
+ full-page RX buffers
+Message-ID: <aex119OtL8CEGXkb@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20260407200216.272659-1-dipayanroy@linux.microsoft.com>
+ <20260409183509.0b24dea6@kernel.org>
+ <20260412125917.4fa8fc8d@kernel.org>
+ <ad5kuCZz+gR1TlSh@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20260416083146.0bb94d2b@kernel.org>
+ <aeoVC27mIzoKytqA@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <685d7bf9-062d-4bd2-8448-f7714bb05302@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/27982/Sat Apr 25 08:24:36 2026)
-X-Rspamd-Queue-Id: 96F4A46576C
+In-Reply-To: <685d7bf9-062d-4bd2-8448-f7714bb05302@davidwei.uk>
+X-Rspamd-Queue-Id: 34E8C465785
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,herbertland.com,gmail.com,nvidia.com,redhat.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281102-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-281103-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	FREEMAIL_CC(0.00)[kernel.org,microsoft.com,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iogearbox.net:email,iogearbox.net:dkim,iogearbox.net:mid]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid,linux.microsoft.com:dkim]
 
-ipv6_{skip_exthdr,find_hdr}() and ip6_{tnl_parse_tlv_enc_lim,
-protocol_deliver_rcu}() iterate over IPv6 extension headers until they
-find a non-extension-header protocol or run out of packet data. The
-loops have no iteration counter, relying solely on the packet length
-to bound them. For a crafted packet with 8-byte extension headers
-filling a 64KB jumbogram, this means a worst case of up to ~8k
-iterations with a skb_header_pointer call each. ipv6_skip_exthdr(),
-for example, is used where it parses the inner quoted packet inside
-an incoming ICMPv6 error:
+On Fri, Apr 24, 2026 at 01:05:24PM -0700, David Wei wrote:
+> On 2026-04-23 05:48, Dipayaan Roy wrote:
+> > On Thu, Apr 16, 2026 at 08:31:46AM -0700, Jakub Kicinski wrote:
+> > > On Tue, 14 Apr 2026 09:00:56 -0700 Dipayaan Roy wrote:
+> > > > I still see roughly a 5% overhead from the atomic refcount operation
+> > > > itself, but on that platform there is no throughput drop when using
+> > > > page fragments versus full-page mode.
+> > > 
+> > > That seems to contradict your claim that it's a problem with a specific
+> > > platform.. Since we're in the merge window I asked David Wei to try to
+> > > experiment with disabling page fragmentation on the ARM64 platforms we
+> > > have at Meta. If it repros we should use the generic rx-buf-len
+> > > ringparam because more NICs may want to implement this strategy.
+> > 
+> > Hi Jakub,
+> > 
+> > Thanks. I think I was not precise enough in my previous reply.
+> > 
+> > What I meant is that the atomic refcount cost itself does not appear to
+> > be unique to the affected platform. I see a similar ~5% overhead on
+> > another ARM64 platformi (different vendor) as well. However, on that platform
+> > there is no throughput delta between fragment mode and full-page mode; both reach
+> > line rate.
+> > 
+> > On the affected platform, fragment mode shows an additional ~15%
+> > throughput drop versus full-page mode. So the current data suggests that
+> > the atomic overhead is common, but the throughput regression is not
+> > explained by that overhead alone and likely depends on an additional
+> > platform-specific factor.
+> > 
+> > Separately, the hardware team collected PCIe traces on the affected
+> > platform and reported stalls in the fragment-mode case that are not seen
+> > in full-page mode. They are still investigating the root cause, but
+> > their current hypothesis is that this is related to that platform’s
+> > PCIe/root-port microarchitecture rather than to page_pool refcounting
+> > alone.
+> > 
+> > That said, I agree the right direction depends on whether this
+> > reproduces on other ARM64 platforms. If David is able to reproduce the
+> > same behavior, then using the generic rx-buf-len ringparam sounds like
+> > the better direction.
+> > 
+> > Please let me know what David finds, and I can rework the patch
+> > accordingly.
+> 
+> I ran a test on Grace, 4 KB pages, 72 cores, 1 NUMA node.
+> 
+> Broadcom NIC, bnxt driver, 50 Gbps bandwidth. Hacked it up to either
+> give me 1 or 2 frags per page. No agg ring, no HDS, no HW GRO.
+> 
+> Use 1 combined queue only for the server. Affinitized its net rx softirq
+> to run on core 4.
+> 
+> Ran iperf3 server, taskset onto cpu cores 32-47. The iperf3 client is
+> running on a host w/ same hw in the same region. Using 32 queues, no
+> softirq affinities. The idea is to hammer page->pp_ref_count from
+> different cores.
+> 
+> * 1 frag/page  -> 32.3 Gbps
+> * 2 frags/page -> 36.0 Gbps
+> 
+> Comparing perf, for 2 frags/page the cost of skb_release_data() hitting
+> pp_ref_count goes up, as expected. Is this what you see? When you say
+> there's a +5% overhead, what function?
+> 
+> Overall tput is higher with multiple frags. That's to be expected w/
+> page pool.
 
-  - icmpv6_rcv
-    - checksum validation
-    - case ICMPV6_DEST_UNREACH
-      - icmpv6_notify
-        - pskb_may_pull()       <- pull inner IPv6 header
-        - ipv6_skip_exthdr()    <- iterates here
-        - pskb_may_pull()
-        - ipprot->err_handler() <- sk lookup
+Hi David,
 
-The per-iteration cost of ipv6_skip_exthdr itself is generally
-light, but skb_header_pointer becomes more costly on reassembled
-packets: the first ~1232 bytes of the inner packet are in the skb's
-linear area, but the remaining ~63KB are in the frag_list where
-skb_copy_bits is needed to read data.
+Thanks for running this. Your results are consistent with mine.
 
-Add a configurable limit via a new sysctl net.ipv6.max_ext_hdrs_number
-(default 8, minimum 1). All four extension header walking functions
-are bound by this limit. The sysctl is in line with commit 47d3d7ac656a
-("ipv6: Implement limits on Hop-by-Hop and Destination options").
-As documented, init_net is used to derive max_ext_hdrs_number to
-be consistent given a net cannot always reliably be retrieved.
+I have tested this on 2 ARM64 platforms from different vendors,
+running ntttcp and iperf3 using 4k as base page size.
+In my observation I see both platforms show a 5% overhead in
+napi_pp_put_page (~3.9%) and page_pool_alloc_frag_netmem (~1.9%)
+when running in fragment mode, both stalling on the LSE ldaddal
+atomic that maintains pp_ref_count.
+This seems to be same as your observation as well. However in my
+observation one of the platform shows 15% drop in throughput when
+in fragment mode vs page mode. The other platform I ran the test on
+infact performs slighty better in fragment mode than in full page
+mode (simillar observation as yours).
 
-Note that the check in ip6_protocol_deliver_rcu() happens right
-before the goto resubmit, such that we don't have to have a test
-for ipv6_ext_hdr() in the fast-path.
+So the atomic refcount overhead appears to be common across ARM64
+platforms, but it does not cause a throughput regression.
+The throughput regression seems specific to one platform only for which
+we want to have the full page work around, also the HW team has
+identified PCIe stalls in fragment mode that are absent in full-page mode.
+Their investigation points to a suspected microarchitectural
+issue in the PCIe root port. IMO, there seems to be no issue with
+page_pool itself.
 
-There's an ongoing IETF draft-iurman-6man-eh-occurrences to enforce
-IPv6 extension headers ordering and occurrence. The latter also
-discusses security implications. As per RFC8200 section 4.1, the
-occurrence rules for extension headers provide a practical upper
-bound, thus 8 was used as the default.
+Given that:
+ - Grace shows fragments are faster (your data)
+ - A second ARM64 platform shows no regression (my data)
+ - Only the affected platform shows a throughput drop
+ - The HW team suspects this to a platform-specific PCIe issue,
+   also form our experiment data the drop in throughput seems to
+   be platform specific only.
 
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
----
- v1->v2:
-   - Set the default to 8 (Justin)
-   - Update IETF references (Justin)
-   - Add core path coverage as well (Justin)
+I believe this remains a platform-specific workaround rather than
+a generic issue. Would a private flag still be acceptable for this
+case?
 
- Documentation/networking/ip-sysctl.rst |  7 +++++++
- include/net/dropreason-core.h          |  6 ++++++
- include/net/ipv6.h                     |  2 ++
- include/net/netns/ipv6.h               |  1 +
- net/ipv6/af_inet6.c                    |  1 +
- net/ipv6/exthdrs_core.c                | 11 +++++++++++
- net/ipv6/ip6_input.c                   |  6 ++++++
- net/ipv6/ip6_tunnel.c                  |  5 +++++
- net/ipv6/sysctl_net_ipv6.c             |  8 ++++++++
- 9 files changed, 47 insertions(+)
 
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index 2e3a746fcc6d..f7412f4049d1 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -2537,6 +2537,13 @@ max_hbh_length - INTEGER
- 
- 	Default: INT_MAX (unlimited)
- 
-+max_ext_hdrs_number - INTEGER
-+	Maximum number of IPv6 extension headers allowed in a packet.
-+	Limits how many extension headers will be traversed. The value
-+	is read from the initial netns.
-+
-+	Default: 8
-+
- skip_notify_on_dev_down - BOOLEAN
- 	Controls whether an RTM_DELROUTE message is generated for routes
- 	removed when a device is taken down or deleted. IPv4 does not
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index e0ca3904ff8e..1fd91e59b84e 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -99,6 +99,7 @@
- 	FN(FRAG_TOO_FAR)		\
- 	FN(TCP_MINTTL)			\
- 	FN(IPV6_BAD_EXTHDR)		\
-+	FN(IPV6_TOO_MANY_EXTHDRS)	\
- 	FN(IPV6_NDISC_FRAG)		\
- 	FN(IPV6_NDISC_HOP_LIMIT)	\
- 	FN(IPV6_NDISC_BAD_CODE)		\
-@@ -494,6 +495,11 @@ enum skb_drop_reason {
- 	SKB_DROP_REASON_TCP_MINTTL,
- 	/** @SKB_DROP_REASON_IPV6_BAD_EXTHDR: Bad IPv6 extension header. */
- 	SKB_DROP_REASON_IPV6_BAD_EXTHDR,
-+	/**
-+	 * @SKB_DROP_REASON_IPV6_TOO_MANY_EXTHDRS: Number of IPv6 extension
-+	 * headers in the packet exceeds net.ipv6.max_ext_hdrs_number.
-+	 */
-+	SKB_DROP_REASON_IPV6_TOO_MANY_EXTHDRS,
- 	/** @SKB_DROP_REASON_IPV6_NDISC_FRAG: invalid frag (suppress_frag_ndisc). */
- 	SKB_DROP_REASON_IPV6_NDISC_FRAG,
- 	/** @SKB_DROP_REASON_IPV6_NDISC_HOP_LIMIT: invalid hop limit. */
-diff --git a/include/net/ipv6.h b/include/net/ipv6.h
-index d042afe7a245..c540b750726e 100644
---- a/include/net/ipv6.h
-+++ b/include/net/ipv6.h
-@@ -90,6 +90,8 @@ struct ip_tunnel_info;
- #define IP6_DEFAULT_MAX_DST_OPTS_LEN	 INT_MAX /* No limit */
- #define IP6_DEFAULT_MAX_HBH_OPTS_LEN	 INT_MAX /* No limit */
- 
-+#define IP6_DEFAULT_MAX_EXT_HDRS_CNT	 8
-+
- /*
-  *	Addr type
-  *	
-diff --git a/include/net/netns/ipv6.h b/include/net/netns/ipv6.h
-index 499e4288170f..2cea457bddb4 100644
---- a/include/net/netns/ipv6.h
-+++ b/include/net/netns/ipv6.h
-@@ -54,6 +54,7 @@ struct netns_sysctl_ipv6 {
- 	int max_hbh_opts_cnt;
- 	int max_dst_opts_len;
- 	int max_hbh_opts_len;
-+	int max_ext_hdrs_cnt;
- 	int seg6_flowlabel;
- 	u32 ioam6_id;
- 	u64 ioam6_id_wide;
-diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-index 0a88b376141d..19424c3f2dfc 100644
---- a/net/ipv6/af_inet6.c
-+++ b/net/ipv6/af_inet6.c
-@@ -945,6 +945,7 @@ static int __net_init inet6_net_init(struct net *net)
- 	net->ipv6.sysctl.flowlabel_state_ranges = 0;
- 	net->ipv6.sysctl.max_dst_opts_cnt = IP6_DEFAULT_MAX_DST_OPTS_CNT;
- 	net->ipv6.sysctl.max_hbh_opts_cnt = IP6_DEFAULT_MAX_HBH_OPTS_CNT;
-+	net->ipv6.sysctl.max_ext_hdrs_cnt = IP6_DEFAULT_MAX_EXT_HDRS_CNT;
- 	net->ipv6.sysctl.max_dst_opts_len = IP6_DEFAULT_MAX_DST_OPTS_LEN;
- 	net->ipv6.sysctl.max_hbh_opts_len = IP6_DEFAULT_MAX_HBH_OPTS_LEN;
- 	net->ipv6.sysctl.fib_notify_on_flag_change = 0;
-diff --git a/net/ipv6/exthdrs_core.c b/net/ipv6/exthdrs_core.c
-index 49e31e4ae7b7..9df892e7f7fb 100644
---- a/net/ipv6/exthdrs_core.c
-+++ b/net/ipv6/exthdrs_core.c
-@@ -4,6 +4,8 @@
-  * not configured or static.
-  */
- #include <linux/export.h>
-+
-+#include <net/net_namespace.h>
- #include <net/ipv6.h>
- 
- /*
-@@ -72,7 +74,9 @@ EXPORT_SYMBOL(ipv6_ext_hdr);
- int ipv6_skip_exthdr(const struct sk_buff *skb, int start, u8 *nexthdrp,
- 		     __be16 *frag_offp)
- {
-+	int exthdr_max = READ_ONCE(init_net.ipv6.sysctl.max_ext_hdrs_cnt);
- 	u8 nexthdr = *nexthdrp;
-+	int exthdr_cnt = 0;
- 
- 	*frag_offp = 0;
- 
-@@ -82,6 +86,8 @@ int ipv6_skip_exthdr(const struct sk_buff *skb, int start, u8 *nexthdrp,
- 
- 		if (nexthdr == NEXTHDR_NONE)
- 			return -1;
-+		if (unlikely(exthdr_cnt++ >= exthdr_max))
-+			return -1;
- 		hp = skb_header_pointer(skb, start, sizeof(_hdr), &_hdr);
- 		if (!hp)
- 			return -1;
-@@ -188,8 +194,10 @@ EXPORT_SYMBOL_GPL(ipv6_find_tlv);
- int ipv6_find_hdr(const struct sk_buff *skb, unsigned int *offset,
- 		  int target, unsigned short *fragoff, int *flags)
- {
-+	int exthdr_max = READ_ONCE(init_net.ipv6.sysctl.max_ext_hdrs_cnt);
- 	unsigned int start = skb_network_offset(skb) + sizeof(struct ipv6hdr);
- 	u8 nexthdr = ipv6_hdr(skb)->nexthdr;
-+	int exthdr_cnt = 0;
- 	bool found;
- 
- 	if (fragoff)
-@@ -216,6 +224,9 @@ int ipv6_find_hdr(const struct sk_buff *skb, unsigned int *offset,
- 			return -ENOENT;
- 		}
- 
-+		if (unlikely(exthdr_cnt++ >= exthdr_max))
-+			return -EBADMSG;
-+
- 		hp = skb_header_pointer(skb, start, sizeof(_hdr), &_hdr);
- 		if (!hp)
- 			return -EBADMSG;
-diff --git a/net/ipv6/ip6_input.c b/net/ipv6/ip6_input.c
-index 967b07aeb683..a5bbbc16e8d7 100644
---- a/net/ipv6/ip6_input.c
-+++ b/net/ipv6/ip6_input.c
-@@ -403,8 +403,10 @@ INDIRECT_CALLABLE_DECLARE(int tcp_v6_rcv(struct sk_buff *));
- void ip6_protocol_deliver_rcu(struct net *net, struct sk_buff *skb, int nexthdr,
- 			      bool have_final)
- {
-+	int exthdr_max = READ_ONCE(init_net.ipv6.sysctl.max_ext_hdrs_cnt);
- 	const struct inet6_protocol *ipprot;
- 	struct inet6_dev *idev;
-+	int exthdr_cnt = 0;
- 	unsigned int nhoff;
- 	SKB_DR(reason);
- 	bool raw;
-@@ -487,6 +489,10 @@ void ip6_protocol_deliver_rcu(struct net *net, struct sk_buff *skb, int nexthdr,
- 				nexthdr = ret;
- 				goto resubmit_final;
- 			} else {
-+				if (unlikely(exthdr_cnt++ >= exthdr_max)) {
-+					SKB_DR_SET(reason, IPV6_TOO_MANY_EXTHDRS);
-+					goto discard;
-+				}
- 				goto resubmit;
- 			}
- 		} else if (ret == 0) {
-diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
-index c468c83af0f2..4546a60942ab 100644
---- a/net/ipv6/ip6_tunnel.c
-+++ b/net/ipv6/ip6_tunnel.c
-@@ -395,15 +395,20 @@ ip6_tnl_dev_uninit(struct net_device *dev)
- 
- __u16 ip6_tnl_parse_tlv_enc_lim(struct sk_buff *skb, __u8 *raw)
- {
-+	int exthdr_max = READ_ONCE(init_net.ipv6.sysctl.max_ext_hdrs_cnt);
- 	const struct ipv6hdr *ipv6h = (const struct ipv6hdr *)raw;
- 	unsigned int nhoff = raw - skb->data;
- 	unsigned int off = nhoff + sizeof(*ipv6h);
- 	u8 nexthdr = ipv6h->nexthdr;
-+	int exthdr_cnt = 0;
- 
- 	while (ipv6_ext_hdr(nexthdr) && nexthdr != NEXTHDR_NONE) {
- 		struct ipv6_opt_hdr *hdr;
- 		u16 optlen;
- 
-+		if (unlikely(exthdr_cnt++ >= exthdr_max))
-+			break;
-+
- 		if (!pskb_may_pull(skb, off + sizeof(*hdr)))
- 			break;
- 
-diff --git a/net/ipv6/sysctl_net_ipv6.c b/net/ipv6/sysctl_net_ipv6.c
-index d2cd33e2698d..93f865545a7c 100644
---- a/net/ipv6/sysctl_net_ipv6.c
-+++ b/net/ipv6/sysctl_net_ipv6.c
-@@ -135,6 +135,14 @@ static struct ctl_table ipv6_table_template[] = {
- 		.extra1		= SYSCTL_ZERO,
- 		.extra2		= &flowlabel_reflect_max,
- 	},
-+	{
-+		.procname	= "max_ext_hdrs_number",
-+		.data		= &init_net.ipv6.sysctl.max_ext_hdrs_cnt,
-+		.maxlen		= sizeof(int),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dointvec_minmax,
-+		.extra1		= SYSCTL_ONE,
-+	},
- 	{
- 		.procname	= "max_dst_opts_number",
- 		.data		= &init_net.ipv6.sysctl.max_dst_opts_cnt,
--- 
-2.43.0
+> 
+> There are some 200 Gbps NICs but they're mlx5 so I'd have to redo the
+> driver hack. Are you going to re-implement this change with rx-buf-len
+> instead of a private flag? If so, I won't spend more time running this
+> test.
+> 
+I can go either way depending on what Jakub prefers.
+Hi Jakub,
+with this new data from David, is it convincing enough for a mana driver
+specific private flag, which can be set from user space by a udev rule
+by detecting the underlying platform? If not then I will send the next
+version with the other rxbuflen approach. 
+> > 
+> > 
+> > Regards
+> > Dipayaan Roy
 
+
+Thanks and Regards
+Dipayaan Roy
 
