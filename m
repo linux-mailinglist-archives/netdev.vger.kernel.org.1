@@ -1,324 +1,319 @@
-Return-Path: <netdev+bounces-281147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281148-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8DGaETXt7WnkowAAu9opvQ
-	(envelope-from <netdev+bounces-281147-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 12:47:17 +0200
+	id +EwuKJzv7WmYpAAAu9opvQ
+	(envelope-from <netdev+bounces-281148-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 12:57:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4E414696ED
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 12:47:16 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09C51469776
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 12:57:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 442C53013D60
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 10:46:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6DEB330137A2
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 10:57:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D53D301486;
-	Sun, 26 Apr 2026 10:46:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6674B314A9E;
+	Sun, 26 Apr 2026 10:57:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="PbooRC8O"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P1tZAW6L"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012033.outbound.protection.outlook.com [40.107.209.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD34D14A4F0;
-	Sun, 26 Apr 2026 10:46:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 996E834F24B
+	for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 10:57:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777200396; cv=fail; b=JabHvS6APX6CRFlMbW09DESLzJ0Dj/7JEjKIyvLJlPRDj9MtN3xB9UoNNNRTFkvgwECy0bL9wjZqkjZq2jlyEaTr7Fl9iiHu4Rvx6cN/3luSXM1jHHrJ08H+U2rh6//jVY/BoE+YMeVJGwE2WpNOOuRIiDmG+PxNeU0M7BfSOek=
+	t=1777201026; cv=pass; b=qWZzdUttV7sbl+pWN2RVZss65e0bK6Is8DQOB2ZtYoBaWeLwamZORhhL/17tz/TP5nppE3KC2Cb3mXSMJ5bwxGmnjQYui2NUKj/pw5nZEczjKYtnl8VkkELBTgBIZud8Uuvs4uLZZGLNI2op/vUlS77aAlfxEq9wBjB95lHXG9E=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777200396; c=relaxed/simple;
-	bh=jspGmOaMS2OymPIJEX+g2I9LVib8E5e1QPjGToemjpo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=kdOi7VG27BvPmavWePSz+aj3pMVaKwGGYNEcYMdX3OShZWmgnI0tba6sWgHQguDo/nfoXlGk8fWBft6BXIaCxGG4qUoxRK8DYeoFSygq51QM2X4MxwJT6WU2LxpY60TUZ6Gp/xpyM3m+KLgXXLD5gCHE9QljztpDDAdSDrMiKYk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=PbooRC8O; arc=fail smtp.client-ip=40.107.209.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gEN8jBP0mswdKNYR8LlYfQl5aVHSi00XvW2mba3Js4XEKrsYOfCql4jKUQ20eTLwkYSfUWsSMooRYRUpOJNRbvPAoNA+q7zngO7lG0OAQbKThTiRrfab5N2osaTDz618T4Sm4UVIbYNHLedP7qMDaA1tgiCv5x5aanMdILfXGtbToQlNDz+vBrQo72OKUqBj/a/px31kTNNe3UaQKV2uhAN/xs4sXYh4ejn18Mi4TvLkWjWLlTo7x6C/zS0CQz0RfAOq7EC/XjuWdg84ExDX98DjVjZe5035oEROvaFxiVKlU+oqwt4gfFtLM8/WDTxZCvmDoujClcrh1l1rGuofTA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tIojMW/H5Fi4albKpHkwVkoSBoabZykEG2EKq7d3s+Y=;
- b=I3dJKcARgMpmxCAyUjnSR9+11Sq+6n4KtNLshFQcMsyhl3JC6Ogz9EfkMwFYF6iCxTY6xID76P6j5qzeE4pOcPgIGf53ZgMT5N372kbk0k7U+xzV90P9b45JRGmxwmQoQychH7cg/EIc3i4XTpDWHVCBYD8poOCBm+i7jl/Lmgx/K1hjml37DXEddclgUzpiJtKtOnVep5SUoqPQhuivy2SqeNqA3/MXJdXvfEc9sa5p4p9erNyTRHgIHlePN4nQGlc26xYqaXZkGuCFCk/4JzMr/EEkS0bJf4we+23jCMTkiOwB5VwDDQYR/p3y32Vif9xVD1/0t5fo3Qs9zZVHaA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tIojMW/H5Fi4albKpHkwVkoSBoabZykEG2EKq7d3s+Y=;
- b=PbooRC8OFjJX57AAHSfv7QZs/Kj8ZWa3Tzo6RBw8k95Bt+6FV82nGIjgjgEvO5jivS5kmqjjtTpMxSFCJt6ycuUJE3awPTCuTtM0jZzq7Zc6VotXVeJijlL1VcY/kWPuAAanXTL7kLMir/E8GKDPQCwS42+St8wg8AxwcBgKKXrJuWswqIjTxhD2/bvgbQtMKQqV+A0soaL6euC3oSIwhtLOkzVoCacs1D3TsXHk0qcxIetBbw7qoFE+htdQeAiZU5esvNh0P7k8tafQRqitxev9qFa2GgxjGscOyxl0qdNvShbJ6lBYh0Awsgl+A4wJlQD8auLBojO8SRRdAFqPFg==
-Received: from MN2PR16CA0049.namprd16.prod.outlook.com (2603:10b6:208:234::18)
- by CH2PR12MB4101.namprd12.prod.outlook.com (2603:10b6:610:a8::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.13; Sun, 26 Apr
- 2026 10:46:29 +0000
-Received: from BL6PEPF00022574.namprd02.prod.outlook.com
- (2603:10b6:208:234:cafe::51) by MN2PR16CA0049.outlook.office365.com
- (2603:10b6:208:234::18) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9846.25 via Frontend Transport; Sun,
- 26 Apr 2026 10:46:29 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BL6PEPF00022574.mail.protection.outlook.com (10.167.249.42) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9846.18 via Frontend Transport; Sun, 26 Apr 2026 10:46:29 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 26 Apr
- 2026 03:46:14 -0700
-Received: from [10.221.206.176] (10.126.230.37) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 26 Apr
- 2026 03:46:08 -0700
-Message-ID: <60dbc1e0-97b8-497c-86bf-90a0f75d6d18@nvidia.com>
-Date: Sun, 26 Apr 2026 13:46:07 +0300
+	s=arc-20240116; t=1777201026; c=relaxed/simple;
+	bh=X38cTerivhNHU1J9r4lUFXkdCuAqrMGRnWfCp7e1Rm0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hQ4otj38ODG6IpfRCtevhCUvepY6VZ3a5c4gPazM9TPQO9V4eIsOA0Ww1uf/EMLKQHF0MBvVqf3VxdDtK0t4ORgtQCjE7ufF1DuH4Pti7zu+6Gng6yWcb0HSlNoY/oE5y8zL1fdHERAuVRIETI5uRc2zt24SYuLkuuLLYc1mL20=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P1tZAW6L; arc=pass smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6720c7968e4so6493300a12.0
+        for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 03:57:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777201023; cv=none;
+        d=google.com; s=arc-20240605;
+        b=NwwJrI8YQZ4YJnyp+uzoTQkucivOgO5MRV1xZEDTViXCiMw+eXjjNUUxyoP7aB8j1M
+         jsjRkfy6D7YdrGTxdPxDSjvrbuU1lqzf8cWXHv3PPKYHGt6+gk2R2LaCFM7Lrfax40j0
+         XW5UaEXBtRCVKkhOuoXRxs4CXQHJFi4Jw6VJQa4DccHiy5JKI7y83T5Lb0rAJWtbQK8v
+         ptANnk34lmXlcOrDjTF9cB1K4wEvdK5Gw70YUCWPdPie54LiCc5c5H0roCIoBZwtTZkj
+         a+qWrZMlu1TW/Qjx8l++zp8J6fp4FRp2IN/WySqyKgxN6F9kisms1rHrlCe6UmN7e8ui
+         aXLw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=FAsbbL0BHO216A/DQubjOAaFJLCW1lvrbacZy8+D6FU=;
+        fh=6a5yv+NmAX13BqViXXOV851Ls1DQwledRclEOR2007w=;
+        b=PDVbSJ50QbwzEHzEYzJ9y8fkx8xwZAWk9qFZJK7e8aM/1VchdhQKTFFLXsjgZHaq7H
+         apCuLG/z8dh4opRQIcq6OfEakmJPUcfi4gfJvDuDmtv+8BHa1Xr7jOgyOvkQ/swjHEAw
+         QFBFBReSDIaOWh0+u2k3BPmjjSo1ih85UjQ1LjA6NmqO52PPhqGi4rQ4RzOlR2pcttvY
+         Qsk+A8HhaepqFkKetzUG5mQ+dhDYuSyncVVqGRJGWXX4/XRQoNBGKjw1E+llyO3fApza
+         IpIX9iHDo9a7uFqCmVv0HOCFQZiM7r0OrHPdu+auUp+0UBj8o6UX9t6BjvkbFbNt+sgs
+         IkQQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777201023; x=1777805823; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FAsbbL0BHO216A/DQubjOAaFJLCW1lvrbacZy8+D6FU=;
+        b=P1tZAW6LBUr2sEffaV7MGD5XcdQ2iLSHL3XPDDK4Pw5yR0rncHdPuqWtgiLdWWtbzw
+         c4Flphm1M3X+9hvTB3iZyKwARZCQkxFtwa1FufzOzPnCVFk/G1jGtvJvbiwWwtZxuKij
+         doa1rq1wO1J2F5TtpGuZSYXUK6TZjLeiegEc0AA1nyssZZ7yBVaLutQVA0pD/GjQR8xH
+         w160RCDrEn8olxk+tGlBXGprxdMq/Euy64ylyBKMpXCbST4fvP+TxGbWdIgrfzR3IP1k
+         0xGzRPosUGd0I7Uk/JC9EN4ycXUWz9p9C2B7N6EZKDvRhAQHmvvgrK8DfPE4aQhLlymv
+         auVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777201023; x=1777805823;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=FAsbbL0BHO216A/DQubjOAaFJLCW1lvrbacZy8+D6FU=;
+        b=qk27+vTmh5cyLMge2D/JWPc88locu9Jl2HFcuj2T+VERVrL0DVLTbSiXst1270HNm/
+         AoMCGQDtTdMLual0gL/BYqfNDCioav2Yuw3WnRuojGxlM6WV6b0aWA8ooQU03Zc5XpGr
+         nPJe+dZfM4XZG+yqHJFL/A6ClQbHPXsKk0EjcI+4fw6PzwZu5vQovSvO+EokXM8UYAxX
+         9PoeCk3iYg6lTASb3/eTAIE9RZDSQruA/Zxu3A1Nc9Zzf42/Xj9agRN3xTL31SKR8C81
+         TW3A0dahLMqJVhr2gu1YHYn2E5Bc6J+pAyuoEGjudxF2wDi0JPhpMv0MADhr/G79DUc7
+         R/Gg==
+X-Forwarded-Encrypted: i=1; AFNElJ/CDTSgeDVCAGYIN6M+UFVZ1FqNAdrnEr1iSunJkty7wJVNjxHigOO9qYHVpOpJnaos1iq1tOs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1vN0HoPWeHchZYEvqxnBQ11kBJYXhfAxkmI+d9gWr/qYf48J3
+	HjNOHxI1auOsNMI+jqg7Zr2gt/BIclwE0k2Z6/11fCvNyG3I5jPIi2YJCi70lC0BRgl77l1YZ1y
+	9qk9PF3xvAoZ4GumltfvLROLJeVRAv1k=
+X-Gm-Gg: AeBDieuTQ9nM27AqlMnzyhF+Not5sN6L0gMhffinldaZ/jUvzCY4YV6mzqRgj5eo6JV
+	NSmnyYcOBb09e9sn8GCEAkG1l+j4JN9kE8m91d+jGdESaJOssxLt3DeiphT+X8XBces/9A2p0aX
+	1UC4hrMmnWffhjtpt4fY/gRSRNgPLtUvFFvZtQlF5K+whEBBrF5V+zmNMS/MYSldegAK69KjWAT
+	lPzSEkXV+Y7MBnTXRzdffT2rGaqzwR9t+j88Ky1/z3slTmwsolXRHwalRKJ2U/h1MrOCfmsyPje
+	/IUFww==
+X-Received: by 2002:a05:6402:24d7:b0:672:c664:38d8 with SMTP id
+ 4fb4d7f45d1cf-672c6643c80mr10597594a12.2.1777201022428; Sun, 26 Apr 2026
+ 03:57:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net V3 1/4] net/mlx5: SD: Serialize init/cleanup
-To: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Andrew
- Lunn" <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
-CC: Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, "Leon
- Romanovsky" <leon@kernel.org>, Simon Horman <horms@kernel.org>, Kees Cook
-	<kees@kernel.org>, Patrisious Haddad <phaddad@nvidia.com>, Parav Pandit
-	<parav@nvidia.com>, Gal Pressman <gal@nvidia.com>, <netdev@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Dragos Tatulea
-	<dtatulea@nvidia.com>
-References: <20260423123104.201552-1-tariqt@nvidia.com>
- <20260423123104.201552-2-tariqt@nvidia.com>
-Content-Language: en-US
-From: Shay Drori <shayd@nvidia.com>
-In-Reply-To: <20260423123104.201552-2-tariqt@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF00022574:EE_|CH2PR12MB4101:EE_
-X-MS-Office365-Filtering-Correlation-Id: ba03a3ad-d556-4c5f-b01b-08dea38112ec
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|36860700016|1800799024|82310400026|22082099003|18002099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	vf9j+n/G0ZCTu6iMdUf0TJMZKFn8MhDniDZd+ZWedy4nHsCBLDzg5daV++IOZSSL60WX1lQEH4C/RoVND+Yq/ZslUUvRXv6F0yD4F/jt4uKcTUNSnAjny4bD9vYw29sQsjzZmLgn+0jLG7bAeqwUknBbqROKgV3+0Jba9wBU4o3KZ4UKAO+N4L5GlLcuGcO72mRXudAmOGXErmOk/9lToE7j2DM38PyUW04BuZnULyEmmqioG2gjTkbo0nFlnan5aeUqnT6OnxmSerH0/NBtX/aRFX2pkeWM/89Mjn6cQCcPLtlnG+LnTmagRVozEqyiFKnynYDaa50VF7ultMflOtjtH6Ayxar0qSFCHobo7iuFwg67V2cTD/kA3W5XCfZbneRD5MJePR+jEnvs8/lGGif6EgL0rxLGWqp7Noi/w/VBkPOMFgNfC7Psq50ncJz5N6KUFGDRAjpuldLbIpDGoN+AKHsxP+gJ6xHujhjUIwTpXaXcbEz/r6utrwNojefsxh/GOw3Vk9dvurMtbHCREDWnzeQE08efDUjKaLluGd6zTfP20qZWC+Hpz+1yYEA7XUZKHKhyzbHwrEGPMZDAYzn9IeVwqpOFRSpDmO9+08+sA5qM+2U8BrLT4d0osgmnWqgDxPEPKK8B1Mn2zxPzLRxAkfWNWfXbrFCMbJ6JxFW+21ILfjyBSBsCiJDkc2I9sneVcDspKgdmDNfrIv2Pu9j/JJFxNWhP+4T8ShpbbNwkC6s/C/TDEsxZLTmemq9tQLrexVsEGaCPcUjizjlwaA==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(36860700016)(1800799024)(82310400026)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	vAgX1LB5HLzn5ixLcdYODNiLeP6T6U6myV+/wNOlw6K5gW5x9FLvS22bae6piEQNkL2ulcuKQRZ2IMwOilaQIprZTlSiHwdo1vjupAAyL1M66vLbJIIwFSNnfFBUhQqaJrdl5EnC269WF/LhPSYYxw2aYN69qYaRhuuI358LAoMJDid3DklK0f2Sd00jUoHYXtNjvkvONsrzNYv6rfchQqK74bSPADGB31+a3hlmVODwk556D4Y7lUA6WYTa/43yM7qU074fPH5WYNtSqupDteiz503ab0HygAU33ws0icyg0h2hQOqOcRYysnicQCoVFDknQ5L7hHj1Zjd4TgFhGDNTueYg/Xt3r5EifjX5N7tkdFgyNIYTBjjvFteY2RgIqI2wy/i89yR3Y3PedKPiv5BY18BRV++J6+HjHrkitFmIlsZVJ3lC+7hviNRr4iEL
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Apr 2026 10:46:29.4976
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ba03a3ad-d556-4c5f-b01b-08dea38112ec
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF00022574.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4101
-X-Rspamd-Queue-Id: B4E414696ED
+References: <20260425075521.736328-1-daniel@iogearbox.net> <b50025ba-c59d-4575-a790-fdaf0a48961d@gmail.com>
+ <90c7de29-2641-413d-9d5f-5eb323cf875c@iogearbox.net>
+In-Reply-To: <90c7de29-2641-413d-9d5f-5eb323cf875c@iogearbox.net>
+From: saeed bishara <saeed.bishara.os@gmail.com>
+Date: Sun, 26 Apr 2026 13:56:50 +0300
+X-Gm-Features: AVHnY4JE3FI-RH8cFOZUZUhlgG6FGEpf5tEZ4C2LTLRePqAAsfcg1n2brxTBPL0
+Message-ID: <CAHfVqdVmUf189n0vxZXmzBH0+Cum0m_xZP74Vkdx4OReGyNDBw@mail.gmail.com>
+Subject: Re: [PATCH net v2] ipv6: Implement limits on extension header parsing
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Justin Iurman <justin.iurman@gmail.com>, kuba@kernel.org, edumazet@google.com, 
+	dsahern@kernel.org, tom@herbertland.com, willemdebruijn.kernel@gmail.com, 
+	idosch@nvidia.com, pabeni@redhat.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 09C51469776
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	TAGGED_FROM(0.00)[bounces-281147-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281148-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:mid,nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,google.com,herbertland.com,nvidia.com,redhat.com,vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shayd@nvidia.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[saeedbisharaos@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
 
-
-
-On 23/04/2026 15:31, Tariq Toukan wrote:
-> From: Shay Drory <shayd@nvidia.com>
-> 
-> mlx5_sd_init() / mlx5_sd_cleanup() may run from multiple PFs in the same
-> Socket-Direct group. This can cause the SD bring-up/tear-down sequence
-> to be executed more than once or interleaved across PFs.
-> 
-> Protect SD init/cleanup with mlx5_devcom_comp_lock() and track the SD
-> group state on the primary device. Skip init if the primary is already
-> UP, and skip cleanup unless the primary is UP.
-
-Sashiko:
-"The commit message mentions skipping cleanup unless the primary is UP.
-However, it appears this state check is missing from mlx5_sd_cleanup()
-in the diff below."
-
-The above sentence is leftover and should be removed.
-will drop in next version.
-
-> 
-> In addition, move mlx5_devcom_comp_set_ready(false) from sd_unregister()
-> into the cleanup's locked section. A concurrent init acquiring the
-> devcom lock will now observe devcom is no longer ready and bail out
-> immediately.
-> 
-> Fixes: 381978d28317 ("net/mlx5e: Create single netdev per SD group")
-> Signed-off-by: Shay Drory <shayd@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> ---
->   .../net/ethernet/mellanox/mlx5/core/lib/sd.c  | 32 +++++++++++++++----
->   1 file changed, 26 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
-> index 762c783156b4..96b4316f570e 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
-> @@ -18,6 +18,7 @@ struct mlx5_sd {
->   	u8 host_buses;
->   	struct mlx5_devcom_comp_dev *devcom;
->   	struct dentry *dfs;
-> +	u8 state;
->   	bool primary;
->   	union {
->   		struct { /* primary */
-> @@ -31,6 +32,11 @@ struct mlx5_sd {
->   	};
->   };
->   
-> +enum mlx5_sd_state {
-> +	MLX5_SD_STATE_DOWN = 0,
-> +	MLX5_SD_STATE_UP,
-> +};
-> +
->   static int mlx5_sd_get_host_buses(struct mlx5_core_dev *dev)
->   {
->   	struct mlx5_sd *sd = mlx5_get_sd(dev);
-> @@ -270,9 +276,6 @@ static void sd_unregister(struct mlx5_core_dev *dev)
->   {
->   	struct mlx5_sd *sd = mlx5_get_sd(dev);
->   
-> -	mlx5_devcom_comp_lock(sd->devcom);
-> -	mlx5_devcom_comp_set_ready(sd->devcom, false);
-> -	mlx5_devcom_comp_unlock(sd->devcom);
->   	mlx5_devcom_unregister_component(sd->devcom);
->   }
->   
-> @@ -426,6 +429,7 @@ int mlx5_sd_init(struct mlx5_core_dev *dev)
->   	struct mlx5_core_dev *primary, *pos, *to;
->   	struct mlx5_sd *sd = mlx5_get_sd(dev);
->   	u8 alias_key[ACCESS_KEY_LEN];
-> +	struct mlx5_sd *primary_sd;
->   	int err, i;
->   
->   	err = sd_init(dev);
-> @@ -440,10 +444,15 @@ int mlx5_sd_init(struct mlx5_core_dev *dev)
->   	if (err)
->   		goto err_sd_cleanup;
->   
-> +	mlx5_devcom_comp_lock(sd->devcom);
->   	if (!mlx5_devcom_comp_is_ready(sd->devcom))
-> -		return 0;
-> +		goto out;
-
-Sashiko:
-"Can primary be NULL here?
-In sd_register(), the devcom ready state is published under the devcom
-lock, but the lock is then released before the peer_sd->primary_dev
-pointers are initialized.
-If a concurrent thread executing mlx5_sd_init() or mlx5_sd_cleanup()
-acquires the lock and observes the ready state, could it read an
-uninitialized primary_dev before the loop in sd_register() completes?"
-
-No, this is impossible. concurrent init will always set primary before
-accessing it, and cleanup is always after successful init, so again-
-primary is set.
-and the next comment is also impossible seqence
-
->   
->   	primary = mlx5_sd_get_primary(dev);
-> +	primary_sd = mlx5_get_sd(primary);
-> +
-> +	if (primary_sd->state != MLX5_SD_STATE_DOWN)
-> +		goto out;
->   
->   	for (i = 0; i < ACCESS_KEY_LEN; i++)
->   		alias_key[i] = get_random_u8();
-> @@ -472,6 +481,9 @@ int mlx5_sd_init(struct mlx5_core_dev *dev)
->   		sd->group_id, mlx5_devcom_comp_get_size(sd->devcom));
->   	sd_print_group(primary);
->   
-> +	primary_sd->state = MLX5_SD_STATE_UP;
-> +out:
-> +	mlx5_devcom_comp_unlock(sd->devcom);
->   	return 0;
->   
->   err_unset_secondaries:
-> @@ -481,6 +493,8 @@ int mlx5_sd_init(struct mlx5_core_dev *dev)
->   	sd_cmd_unset_primary(primary);
->   	debugfs_remove_recursive(sd->dfs);
->   err_sd_unregister:
-> +	mlx5_devcom_comp_set_ready(sd->devcom, false);
-> +	mlx5_devcom_comp_unlock(sd->devcom);
->   	sd_unregister(dev);
->   err_sd_cleanup:
->   	sd_cleanup(dev);
-> @@ -491,22 +505,28 @@ void mlx5_sd_cleanup(struct mlx5_core_dev *dev)
->   {
->   	struct mlx5_sd *sd = mlx5_get_sd(dev);
->   	struct mlx5_core_dev *primary, *pos;
-> +	struct mlx5_sd *primary_sd;
->   	int i;
->   
->   	if (!sd)
->   		return;
->   
-> +	mlx5_devcom_comp_lock(sd->devcom);
->   	if (!mlx5_devcom_comp_is_ready(sd->devcom))
-> -		goto out;
-> +		goto out_unlock;
->   
->   	primary = mlx5_sd_get_primary(dev);
-> +	primary_sd = mlx5_get_sd(primary);
->   	mlx5_sd_for_each_secondary(i, primary, pos)
->   		sd_cmd_unset_secondary(pos);
->   	sd_cmd_unset_primary(primary);
->   	debugfs_remove_recursive(sd->dfs);
->   
->   	sd_info(primary, "group id %#x, uncombined\n", sd->group_id);
-> -out:
-> +	primary_sd->state = MLX5_SD_STATE_DOWN;
-> +	mlx5_devcom_comp_set_ready(sd->devcom, false);
-> +out_unlock:
-> +	mlx5_devcom_comp_unlock(sd->devcom);
->   	sd_unregister(dev);
->   	sd_cleanup(dev);
->   }
-
+On Sun, Apr 26, 2026 at 1:38=E2=80=AFPM Daniel Borkmann <daniel@iogearbox.n=
+et> wrote:
+>
+> Hi Justin,
+>
+> On 4/25/26 12:19 PM, Justin Iurman wrote:
+> > On 4/25/26 09:55, Daniel Borkmann wrote:
+> >> ipv6_{skip_exthdr,find_hdr}() and ip6_{tnl_parse_tlv_enc_lim,
+> >> protocol_deliver_rcu}() iterate over IPv6 extension headers until they
+> >> find a non-extension-header protocol or run out of packet data. The
+> >> loops have no iteration counter, relying solely on the packet length
+> >> to bound them. For a crafted packet with 8-byte extension headers
+> >> filling a 64KB jumbogram, this means a worst case of up to ~8k
+> >> iterations with a skb_header_pointer call each. ipv6_skip_exthdr(),
+> >> for example, is used where it parses the inner quoted packet inside
+> >> an incoming ICMPv6 error:
+> >>
+> >>    - icmpv6_rcv
+> >>      - checksum validation
+> >>      - case ICMPV6_DEST_UNREACH
+> >>        - icmpv6_notify
+> >>          - pskb_may_pull()       <- pull inner IPv6 header
+> >>          - ipv6_skip_exthdr()    <- iterates here
+> >>          - pskb_may_pull()
+> >>          - ipprot->err_handler() <- sk lookup
+> >>
+> >> The per-iteration cost of ipv6_skip_exthdr itself is generally
+> >> light, but skb_header_pointer becomes more costly on reassembled
+> >> packets: the first ~1232 bytes of the inner packet are in the skb's
+> >> linear area, but the remaining ~63KB are in the frag_list where
+> >> skb_copy_bits is needed to read data.
+> >>
+> >> Add a configurable limit via a new sysctl net.ipv6.max_ext_hdrs_number
+> >> (default 8, minimum 1). All four extension header walking functions
+> >> are bound by this limit. The sysctl is in line with commit 47d3d7ac656=
+a
+> >> ("ipv6: Implement limits on Hop-by-Hop and Destination options").
+> >> As documented, init_net is used to derive max_ext_hdrs_number to
+> >> be consistent given a net cannot always reliably be retrieved.
+> >>
+> >> Note that the check in ip6_protocol_deliver_rcu() happens right
+> >> before the goto resubmit, such that we don't have to have a test
+> >> for ipv6_ext_hdr() in the fast-path.
+> >>
+> >> There's an ongoing IETF draft-iurman-6man-eh-occurrences to enforce
+> >> IPv6 extension headers ordering and occurrence. The latter also
+> >> discusses security implications. As per RFC8200 section 4.1, the
+> >> occurrence rules for extension headers provide a practical upper
+> >> bound, thus 8 was used as the default.
+> >>
+> >> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> >> ---
+> >>   v1->v2:
+> >>     - Set the default to 8 (Justin)
+> >>     - Update IETF references (Justin)
+> >>     - Add core path coverage as well (Justin)
+> >>
+> >>   Documentation/networking/ip-sysctl.rst |  7 +++++++
+> >>   include/net/dropreason-core.h          |  6 ++++++
+> >>   include/net/ipv6.h                     |  2 ++
+> >>   include/net/netns/ipv6.h               |  1 +
+> >>   net/ipv6/af_inet6.c                    |  1 +
+> >>   net/ipv6/exthdrs_core.c                | 11 +++++++++++
+> >>   net/ipv6/ip6_input.c                   |  6 ++++++
+> >>   net/ipv6/ip6_tunnel.c                  |  5 +++++
+> >>   net/ipv6/sysctl_net_ipv6.c             |  8 ++++++++
+> >>   9 files changed, 47 insertions(+)
+> >>
+> >
+> > [snip]
+> >
+> >> diff --git a/net/ipv6/ip6_input.c b/net/ipv6/ip6_input.c
+> >> index 967b07aeb683..a5bbbc16e8d7 100644
+> >> --- a/net/ipv6/ip6_input.c
+> >> +++ b/net/ipv6/ip6_input.c
+> >> @@ -403,8 +403,10 @@ INDIRECT_CALLABLE_DECLARE(int tcp_v6_rcv(struct s=
+k_buff *));
+> >>   void ip6_protocol_deliver_rcu(struct net *net, struct sk_buff *skb, =
+int nexthdr,
+> >>                     bool have_final)
+> >>   {
+> >> +    int exthdr_max =3D READ_ONCE(init_net.ipv6.sysctl.max_ext_hdrs_cn=
+t);
+> >>       const struct inet6_protocol *ipprot;
+> >>       struct inet6_dev *idev;
+> >> +    int exthdr_cnt =3D 0;
+> >>       unsigned int nhoff;
+> >>       SKB_DR(reason);
+> >>       bool raw;
+> >> @@ -487,6 +489,10 @@ void ip6_protocol_deliver_rcu(struct net *net, st=
+ruct sk_buff *skb, int nexthdr,
+> >>                   nexthdr =3D ret;
+> >>                   goto resubmit_final;
+> >>               } else {
+> >> +                if (unlikely(exthdr_cnt++ >=3D exthdr_max)) {
+from performance perspective, isn't it better to have single variable
+that initialized to max_ext_hdrs_cnt then decremented until reaches
+zero? that will take less cpu cycles and variables
+> >> +                    SKB_DR_SET(reason, IPV6_TOO_MANY_EXTHDRS);
+> >> +                    goto discard;
+> >> +                }
+> >>                   goto resubmit;
+> >>               }
+> >>           } else if (ret =3D=3D 0) {
+> >
+> > The hop-by-hop options header (if present) is not taken into account ba=
+sed on the above. However, the max number of extension headers (implicitly =
+7***, as per RFC 8200 Section 4.1) must include it. I suggest adding this a=
+t the beginning of ip6_protocol_deliver_rcu():
+> >
+> > struct inet6_skb_parm *opt =3D IP6CB(skb);
+> >
+> > if (opt->flags & IP6SKB_HOPBYHOP)
+> >      exthdr_cnt++;
+> >
+> > *** FYI, rounding to 8 is fine for this fix
+>
+> Ok, ack, I'll look into adding that in a v3.
+>
+> >> diff --git a/net/ipv6/sysctl_net_ipv6.c b/net/ipv6/sysctl_net_ipv6.c
+> >> index d2cd33e2698d..93f865545a7c 100644
+> >> --- a/net/ipv6/sysctl_net_ipv6.c
+> >> +++ b/net/ipv6/sysctl_net_ipv6.c
+> >> @@ -135,6 +135,14 @@ static struct ctl_table ipv6_table_template[] =3D=
+ {
+> >>           .extra1        =3D SYSCTL_ZERO,
+> >>           .extra2        =3D &flowlabel_reflect_max,
+> >>       },
+> >> +    {
+> >> +        .procname    =3D "max_ext_hdrs_number",
+> >> +        .data        =3D &init_net.ipv6.sysctl.max_ext_hdrs_cnt,
+> >> +        .maxlen        =3D sizeof(int),
+> >> +        .mode        =3D 0644,
+> >> +        .proc_handler    =3D proc_dointvec_minmax,
+> >> +        .extra1        =3D SYSCTL_ONE,
+> >> +    },
+> >>       {
+> >>           .procname    =3D "max_dst_opts_number",
+> >>           .data        =3D &init_net.ipv6.sysctl.max_dst_opts_cnt,
+> >
+> > I've given it a lot of thought. I came to the conclusion that we should=
+ use a hard-coded value here as well (just like we did for 076b8cad77aa, wi=
+th the same logic), not a sysctl. IMO, the main reason is that it provides =
+as is a suitable security fix to be backported, i.e., the max value is the =
+max number of EHs allowed by RFC 8200, Section 4.1. Also, we remain consist=
+ent with draft-iurman-6man-eh-occurrences (I think Tom is about to send a r=
+evision of the series soon for net-next). What this series does is not only=
+ enforcing ordering, but also verifying the specific number of occurrences =
+for each type of Extension Header. Which is totally compatible with what th=
+is patch does, i.e., limiting the total number of Extension Headers (regard=
+less of their types) to 8. I guess what I'm trying to say is that it seems =
+like a good plan/compromise and that the aforementioned series would build =
+perfectly on top of this fix.
+>
+>
+> Initially, I had a hard-coded constant (when it was still 32), but Eric's=
+ comment
+> was to rather go with a sysctl, such that if someone unexpectedly complai=
+ns, then
+> there is still a chance for that person to fix it up via sysctl without h=
+aving to
+> rebuild the kernel. I'm okay either way, but presumably given we're now b=
+eing more
+> "aggressive" into lowering the default to 8 rather than 32 then having su=
+ch a fall-
+> back is probably better.
+>
+> Thanks,
+> Daniel
+>
 
