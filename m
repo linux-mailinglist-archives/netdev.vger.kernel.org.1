@@ -1,324 +1,168 @@
-Return-Path: <netdev+bounces-281163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281162-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gAqiHtEh7mnJqwAAu9opvQ
-	(envelope-from <netdev+bounces-281163-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 16:31:45 +0200
+	id mK5jD0Ah7mm0qwAAu9opvQ
+	(envelope-from <netdev+bounces-281162-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 16:29:20 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06C6F46A563
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 16:31:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 840DC46A50C
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 16:29:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 04EE1301A931
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 14:31:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A07F0301CCFF
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 14:28:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7248D366046;
-	Sun, 26 Apr 2026 14:31:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53A443612F3;
+	Sun, 26 Apr 2026 14:28:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="GJr6WW1F"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YRBawhXB"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.126.com (m16.mail.126.com [117.135.210.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E35A33EAF9;
-	Sun, 26 Apr 2026 14:31:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19105364953
+	for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 14:28:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777213882; cv=none; b=B4oCBBO6iYDhQ8giyyXVRSDYh7nFHxxmC5tHnCaseh2r23yaOGze81USIKuocMa53Q7oXXR+rkl2ejKCqlgdvSAXI5oemgKUwTmSKoqFCSgucPgl2Op4F+HM6R9c+w1r9dV+AysgYZR/jqr8rMPJtTV1pnQHWiF8AjYogHW77aY=
+	t=1777213713; cv=none; b=BInyZkJMG3SmRkv56ieE2yL8FMHKNEiY7JrUNeUcgNC3OQJMhOdjLlJwad3YWixsq+oboGs8Vjy0CwHuAJRNoM98SzpfqPAthHdN3tZ7cdHy6DTpUOMjOCRd+OxuDQtAhKyHZ3sBql5vXMoRcqvxVkJjmdKwjcnM64XITDREubA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777213882; c=relaxed/simple;
-	bh=+bORunN9DihtZKlWmsbyAGvFX7FDw4aL3SCDlhq8TbQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Iq9JWsNU47zulAjTpwkWEIwLER16AYo9OwggxexnsmZK24z0Yql8/OeoVS6CER/gIXBb6dC6A3qQ/+NKhsAKiNVFK1heGf81ZC4Zv+OLUOuvyDJzbyjCyCYTunE0oZN64Bmuk3cpLSDORbjXDbR0JqMZ/wHKebfn45k23jGSpNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=GJr6WW1F; arc=none smtp.client-ip=117.135.210.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=Message-ID:Date:MIME-Version:Subject:To:From:
-	Content-Type; bh=E9QmRybu2HwGPax/8gg8zi6sH9jkn1UXfiltYEM9caY=;
-	b=GJr6WW1FFj6/yFQO/D5b9Z35SC7l1yTBhxhkj4vkJEDWXnmtfwNBf1YT1GYzae
-	P0Gt/eizsqh6vY6sMw6Mw1boLItuuLSQUjjE1+H0HF3nkXamKKPRxDHvIBIeT+aq
-	TIDE6L1lz40dD6JtPB2Ok5ChCODfw8DCkX8wZ/USbRfTA=
-Received: from [IPV6:2408:8210:480a:2590:ec66:74e8:68a7:a44b] (unknown [])
-	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wD3lxKMIO5pdslVAQ--.7227S2;
-	Sun, 26 Apr 2026 22:26:22 +0800 (CST)
-Message-ID: <c646232a-f2bf-439a-88c9-737dde9b1725@126.com>
-Date: Sun, 26 Apr 2026 22:26:20 +0800
+	s=arc-20240116; t=1777213713; c=relaxed/simple;
+	bh=VZFl5/IU1v4UTxpNq12Cpk26Nokne9p5RJzDQgfLWwQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JKiIDmO1Ynz2tbJsBjxG3tcXVY74ELkJI2YkN3Lwx+EjlYudbqEjbit8WrwSlm3V+A5wYnoQb10es7WNdHnkieywpFgy8cEqfwNSjH3EYjEe8aL4J5Ntzd8k+ldkzrHTr/zKTLB+i/kz1hygtrLs/BrdrtBm97R/XI7q2UOgg04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YRBawhXB; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-82f9fdfc965so3685206b3a.1
+        for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 07:28:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777213711; x=1777818511; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RS8ucX8FcZXkpy4jFipC3+eWnTvqfIiw+EMH9PjAj6g=;
+        b=YRBawhXBm9xLvA4Ua4Im3mLZTvEMURLItTWpm44na0bojRsL/YzTGkYnFhIlt7ctDf
+         52Tin0gKJVv0mSDdp+Y5G7vlpOPkE6xPI1wzfAXrPuomj2uE2ujDDp81yq46AtEGEWYd
+         aH4Kil+HqvW87QyWR0OLYvSZSSgR+ehd3Os+9MWA9YxaMUQfmcr4qUwW8dJOptGs46J0
+         Hb7OxZQWf+SLprBL0cUgdwkHga4OJ450vvGBcXUHMp3e2pFW32MfOS1w+cEWtsWz1hMM
+         3614ys00tnGoTc1g4TDT55HJRKsMgiOP99TRDDYzvP377va6VOjJF+kgVWmLZKF+9hmB
+         Q4KA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777213711; x=1777818511;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RS8ucX8FcZXkpy4jFipC3+eWnTvqfIiw+EMH9PjAj6g=;
+        b=b219iOtg0q+v6K1Vh9YnjJtXU7UXfQS15rAtKY04yWDRoTAH32ylSslPCjjKqGbOs4
+         UsYo05FqlI+8GwgntgUi1/IQTKQ/w+St6/BLM5Prs+cArCqILwZPZbazyB18QI8vWNq4
+         MwP/yj3uqF2HIHlf6y3C8Jn+u/ejjb1t13aK39SqOjuqnHukjDJG4pyO3cC+3Gf9S57v
+         OixdxlcSXyh+apLqD7UC6sX1TKjRz2FCeUmxjdKLRZi+qa/TXO1wFa142WkgxbJ8mzJk
+         kDQRFDnG6VWiSjVw2aUtjduxGXDxFv8kA+vCSIrHxasqk4vmqgD1JSB9Ubma82I/XAXA
+         cuxQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8Cv3NZ2C8esC9VVzkvuAZa3j6C0SJNhLOOHE4H30bNoKhCEfYv8wh4KDVILstNlDAov6urllk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0hDoswHJvw0wD41MG6dBqzJa3xhWNBHUcQvaKLY1YPhlWkEyV
+	8iKB7+7bSE5A0koTQe1o1EfT+/KALLi68xtE2jZ1UCNNSqO+J/ArXnTUoCZAOxvldg==
+X-Gm-Gg: AeBDievJ8n1qbc0BpIC4Iib2Lu/SyQTrxomQlwb7/YFz5qwNx55m7YwQeB8tGwJDhJA
+	dQYkAJanE+U65JzQZoN5xQvuiULwiOPWxJJTqOJZFlEbJFvVzwuOi4PSuYBuZ6nInAB2YBCchOU
+	KljjMM0Hlar/23HJvxNTGkE0Tb7rKi5KlpyaaOf2pZKwRyVytnxSMwMTfYuGbexjz3uGdiP3rbv
+	KqYAyYNNQwg3oRDFlT1Ah7cQH5w9YVAMDnEDI1t9pjgd7vUuw6fCY9v8lXYwkl1gdQQVg8SRSRb
+	ERBdWRk4jEOcY4t0JzGlHp5F2kR4vnfbhArLiqH8Q1YYW+imD18r2b9mdVdV3Ob5878L9Uzlntn
+	rcVc/Js/EEdxc6QyO5Fjwyy/tSfSOCFI95fvMFzTnvo20RTUs8ITqzfm9iNHyjvzHmuTeTv2fX1
+	9Xrwg3ZmE2tRxEuuHbujzkgvumU7TgnuzXrt2T9YvnDwrN1sRp2Ywp1X7SXMwnLo+4qw2foRcLT
+	J3BrURG4g==
+X-Received: by 2002:a05:6a00:a883:b0:829:6f7d:3093 with SMTP id d2e1a72fcca58-82f8c9ece1emr40810968b3a.48.1777213711426;
+        Sun, 26 Apr 2026 07:28:31 -0700 (PDT)
+Received: from localhost.localdomain ([1.226.165.54])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f94204ac8sm28318578b3a.0.2026.04.26.07.28.28
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sun, 26 Apr 2026 07:28:30 -0700 (PDT)
+From: Myeonghun Pak <mhun512@gmail.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ijae Kim <ae878000@gmail.com>
+Cc: Myeonghun Pak <mhun512@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: lan966x: avoid unregistering netdev on register failure
+Date: Sun, 26 Apr 2026 23:27:50 +0900
+Message-ID: <20260426142806.36028-1-mhun512@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 2/2] kernel/module: Decouple klp and ftrace from
- load_module
-To: "Masami Hiramatsu (Google)" <mhiramat@kernel.org>,
- Petr Mladek <pmladek@suse.com>
-Cc: Petr Pavlu <petr.pavlu@suse.com>, rafael@kernel.org, lenb@kernel.org,
- mturquette@baylibre.com, sboyd@kernel.org, viresh.kumar@linaro.org,
- agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com,
- bmarzins@redhat.com, song@kernel.org, yukuai@fnnas.com, linan122@huawei.com,
- jason.wessel@windriver.com, danielt@kernel.org, dianders@chromium.org,
- horms@kernel.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, paulmck@kernel.org, frederic@kernel.org,
- mcgrof@kernel.org, da.gomez@kernel.org, samitolvanen@google.com,
- atomlin@atomlin.com, jpoimboe@kernel.org, jikos@kernel.org, mbenes@suse.cz,
- joe.lawrence@redhat.com, rostedt@goodmis.org, mark.rutland@arm.com,
- mathieu.desnoyers@efficios.com, linux-modules@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linux-acpi@vger.kernel.org, linux-clk@vger.kernel.org,
- linux-pm@vger.kernel.org, live-patching@vger.kernel.org,
- dm-devel@lists.linux.dev, linux-raid@vger.kernel.org,
- kgdb-bugreport@lists.sourceforge.net, netdev@vger.kernel.org
-References: <20260413080701.180976-1-chensong_2000@189.cn>
- <1191caf5-6a61-4622-a15e-854d3701f4fc@suse.com>
- <a35f5f94-7d5a-4347-974b-b270c89ef241@189.cn>
- <1db425bf-58a9-4768-8c38-3ae25d7662a5@suse.com>
- <aeD2_FrFL6E3dbAC@pathway.suse.cz>
- <20260420112707.aa3627ca9f975eeaf7d8ea0e@kernel.org>
-Content-Language: en-US
-From: Song Chen <chensong_2000@126.com>
-In-Reply-To: <20260420112707.aa3627ca9f975eeaf7d8ea0e@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:_____wD3lxKMIO5pdslVAQ--.7227S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW3JrW8Wry8Gr4xKw15uFy3Jwb_yoW3GFWDpF
-	9xWF17Gr4DXr9rCa1Ivw1UZr17K34UGr4jqr15GFyxGryqyFn7JFy8Gr109FykJrWkZry2
-	qr4UAry7A345JrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UG-eOUUUUU=
-X-CM-SenderInfo: xfkh02prqjsjqqqqqiyswou0bp/xtbBsw5BwGnuII7qoQAA3e
-X-Rspamd-Queue-Id: 06C6F46A563
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 840DC46A50C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[126.com,none];
-	R_DKIM_ALLOW(-0.20)[126.com:s=s110527];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-281163-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[126.com];
-	RCPT_COUNT_TWELVE(0.00)[47];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281162-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chensong_2000@126.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[126.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[mhun512@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.com:email,189.cn:email]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Hi,
+lan966x_probe_port() stores the newly allocated net_device in the
+port before calling register_netdev(). If register_netdev() fails,
+the probe error path calls lan966x_cleanup_ports(), which sees
+port->dev and calls unregister_netdev() for a device that was never
+registered.
 
+Destroy the phylink instance created for this port and clear port->dev
+before returning the registration error, matching the existing guard
+used by the common cleanup path.
 
-On 4/20/26 10:27, Masami Hiramatsu (Google) wrote:
-> On Thu, 16 Apr 2026 16:49:32 +0200
-> Petr Mladek <pmladek@suse.com> wrote:
-> 
->> On Thu 2026-04-16 13:18:30, Petr Pavlu wrote:
->>> On 4/15/26 8:43 AM, Song Chen wrote:
->>>> On 4/14/26 22:33, Petr Pavlu wrote:
->>>>> On 4/13/26 10:07 AM, chensong_2000@189.cn wrote:
->>>>>> diff --git a/include/linux/module.h b/include/linux/module.h
->>>>>> index 14f391b186c6..0bdd56f9defd 100644
->>>>>> --- a/include/linux/module.h
->>>>>> +++ b/include/linux/module.h
->>>>>> @@ -308,6 +308,14 @@ enum module_state {
->>>>>>        MODULE_STATE_COMING,    /* Full formed, running module_init. */
->>>>>>        MODULE_STATE_GOING,    /* Going away. */
->>>>>>        MODULE_STATE_UNFORMED,    /* Still setting it up. */
->>>>>> +    MODULE_STATE_FORMED,
->>>>>
->>>>> I don't see a reason to add a new module state. Why is it necessary and
->>>>> how does it fit with the existing states?
->>>>>
->>>> because once notifier fails in state MODULE_STATE_UNFORMED (now only ftrace has someting to do in this state), notifier chain will roll back by calling blocking_notifier_call_chain_robust, i'm afraid MODULE_STATE_GOING is going to jeopardise the notifers which don't handle it appropriately, like:
->>>>
->>>> case MODULE_STATE_COMING:
->>>>       kmalloc();
->>>> case MODULE_STATE_GOING:
->>>>       kfree();
->>>
->>> My understanding is that the current module "state machine" operates as
->>> follows. Transitions marked with an asterisk (*) are announced via the
->>> module notifier.
->>>
->>> ---> UNFORMED --*> COMING --*> LIVE --*> GOING -.
->>>          ^            |                     ^    |
->>>          |            '---------------------*    |
->>>          '---------------------------------------'
->>>
->>> The new code aims to replace the current ftrace_module_init() call in
->>> load_module(). To achieve this, it adds a notification for the UNFORMED
->>> state (only when loading a module) and introduces a new FORMED state for
->>> rollback. FORMED is purely a fake state because it never appears in
->>> module::state. The new structure is as follows:
->>>
->>>          ,--*> (FORMED)
->>>          |
->>> --*> UNFORMED --*> COMING --*> LIVE --*> GOING -.
->>>          ^            |                     ^    |
->>>          |            '---------------------*    |
->>>          '---------------------------------------'
->>>
->>> I'm afraid this is quite complex and inconsistent. Unless it can be kept
->>> simple, we would be just replacing one special handling with a different
->>> complexity, which is not worth it.
->>
->>>>>
->>>>>> +    if (err)
->>>>>> +        goto ddebug_cleanup;
->>>>>>          /* Finally it's fully formed, ready to start executing. */
->>>>>>        err = complete_formation(mod, info);
->>>>>> -    if (err)
->>>>>> +    if (err) {
->>>>>> +        blocking_notifier_call_chain_reverse(&module_notify_list,
->>>>>> +                MODULE_STATE_FORMED, mod);
->>>>>>            goto ddebug_cleanup;
->>>>>> +    }
->>>>>>    -    err = prepare_coming_module(mod);
->>>>>> +    err = prepare_module_state_transaction(mod,
->>>>>> +                MODULE_STATE_COMING, MODULE_STATE_GOING);
->>>>>>        if (err)
->>>>>>            goto bug_cleanup;
->>>>>>    @@ -3522,7 +3519,6 @@ static int load_module(struct load_info *info, const char __user *uargs,
->>>>>>        destroy_params(mod->kp, mod->num_kp);
->>>>>>        blocking_notifier_call_chain(&module_notify_list,
->>>>>>                         MODULE_STATE_GOING, mod);
->>>>>
->>>>> My understanding is that all notifier chains for MODULE_STATE_GOING
->>>>> should be reversed.
->>>> yes, all, from lowest priority notifier to highest.
->>>> I will resend patch 1 which was failed due to my proxy setting.
->>>
->>> What I meant here is that the call:
->>>
->>> blocking_notifier_call_chain(&module_notify_list, MODULE_STATE_GOING, mod);
->>>
->>> should be replaced with:
->>>
->>> blocking_notifier_call_chain_reverse(&module_notify_list, MODULE_STATE_GOING, mod);
->>>
->>>>
->>>>>
->>>>>> -    klp_module_going(mod);
->>>>>>     bug_cleanup:
->>>>>>        mod->state = MODULE_STATE_GOING;
->>>>>>        /* module_bug_cleanup needs module_mutex protection */
->>>>>
->>>>> The patch removes the klp_module_going() cleanup call in load_module().
->>>>> Similarly, the ftrace_release_mod() call under the ddebug_cleanup label
->>>>> should be removed and appropriately replaced with a cleanup via
->>>>> a notifier.
->>>>>
->>>>      err = prepare_module_state_transaction(mod,
->>>>                  MODULE_STATE_UNFORMED, MODULE_STATE_FORMED);
->>>>      if (err)
->>>>          goto ddebug_cleanup;
->>>>
->>>> ftrace will be cleanup in blocking_notifier_call_chain_robust rolling back.
->>>>
->>>>      err = prepare_module_state_transaction(mod,
->>>>                  MODULE_STATE_COMING, MODULE_STATE_GOING);
->>>>
->>>> each notifier including ftrace and klp will be cleanup in blocking_notifier_call_chain_robust rolling back.
->>>>
->>>> if all notifiers are successful in MODULE_STATE_COMING, they all will be clean up in
->>>>   coming_cleanup:
->>>>      mod->state = MODULE_STATE_GOING;
->>>>      destroy_params(mod->kp, mod->num_kp);
->>>>      blocking_notifier_call_chain(&module_notify_list,
->>>>                       MODULE_STATE_GOING, mod);
->>>>
->>>> if  something wrong underneath.
->>>
->>> My point is that the patch leaves a call to ftrace_release_mod() in
->>> load_module(), which I expected to be handled via a notifier.
->>
->> I think that I have got it. The ftrace code needs two notifiers when
->> the module is being loaded and two when it is going.
->>
->> This is why Sond added the new state. But I think that we would
->> need two new states to call:
->>
->>      + ftrace_module_init() in MODULE_STATE_UNFORMED
->>      + ftrace_module_enable() in MODULE_STATE_FORMED
->>
->> and
->>
->>      + ftrace_free_mem() in MODULE_STATE_PRE_GOING
->>      + ftrace_free_mem() in MODULE_STATE_GOING
->>
->>
->> By using the ascii art:
->>
->>   -*> UNFORMED -*> FORMED -> COMING -*> LIVE -*> PRE_GOING -*> GOING -.
->>                |          |         |                ^           ^    ^
->>                |          |         '----------------'           |    |
->>                |          '--------------------------------------'    |
->>                '------------------------------------------------------'
->>
->>
->> But I think that this is not worth it.
-> 
-> Agree.
-> 
-> If this needs to be ordered so strictly, why we will use a "single"
-> module notifier chain for this complex situation?
-> 
-> I think the notifier call chain is just for notice a single signal,
-> instead of sending several different signals, especially if there is
-> any dependency among the callbacks.
-> 
-> If notification callbacks need to be ordered, they are currently
-> sorted by representing priority numerically, but this is quite
-> fragile for updating. It has to look up other registered priorities
-> and adjust the order among dependencies each time. For this reason,
-> this mechanism is not suitable for global ordering. (It's like line
-> numbers in BASIC.)
-> It is probably only useful for representing dependencies between
-> two components maintained by the same maintainer.
-> 
-> I'm against a general-purpose system that makes everything modular.
-> It unnecessarily complicates things. If there are processes that
-> require strict ordering, especially processes that must be performed
-> before each stage as part of the framework, they should be called
-> directly from the framework, not via notification callbacks.
-> 
-> This makes it simpler and more robust to maintain.
-> 
-> Only the framework's end users should utilize notification callbacks.
-> 
-> Thank you,
-> 
-> 
+Fixes: d28d6d2e37d1 ("net: lan966x: add port module support")
+Co-developed-by: Ijae Kim <ae878000@gmail.com>
+Signed-off-by: Ijae Kim <ae878000@gmail.com>
+Signed-off-by: Myeonghun Pak <mhun512@gmail.com>
+---
+ drivers/net/ethernet/microchip/lan966x/lan966x_main.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-my motivation is to decouple ftrace and klp from module loader and make 
-blocking_notifier_chain more generic, but it doesn't become generic 
-completely. I understand your and Petr's comments and agree.
-
-Thanks
-
-Best regards
-
-Song
-
->>
->> Best Regards,
->> Petr
->>
-> 
-> 
-
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+index 47752d3fde..22c496f588 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+@@ -873,6 +873,9 @@ static int lan966x_probe_port(struct lan966x *lan966x, u32 p,
+ 	err = register_netdev(dev);
+ 	if (err) {
+ 		dev_err(lan966x->dev, "register_netdev failed\n");
++		phylink_destroy(phylink);
++		port->phylink = NULL;
++		port->dev = NULL;
+ 		return err;
+ 	}
+ 
 
