@@ -1,221 +1,245 @@
-Return-Path: <netdev+bounces-281131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281132-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0JNAKf5H7WmJhQAAu9opvQ
-	(envelope-from <netdev+bounces-281131-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 01:02:22 +0200
+	id t0RuJeBp7WmujQAAu9opvQ
+	(envelope-from <netdev+bounces-281132-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 03:26:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC77D4683E6
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 01:02:21 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D0D04688AF
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 03:26:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id BE345300809E
-	for <lists+netdev@lfdr.de>; Sat, 25 Apr 2026 22:49:51 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CBB0A3006164
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 01:26:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE04B38C2A0;
-	Sat, 25 Apr 2026 22:49:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE5171F30BB;
+	Sun, 26 Apr 2026 01:26:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="njUgew/0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qClxw5Cq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EEA138838B
-	for <netdev@vger.kernel.org>; Sat, 25 Apr 2026 22:49:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F00714A4F0
+	for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 01:26:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777157390; cv=none; b=HOoXBwrZe4Jw26d+vnZBWCixsYsJOUj+vN/2jnFVs1H+BouGgJBAjxiMMZkTjbe8M+YqZfaMVINjV3474V6aWenOd+aGyyV97aJ1jJohTISYev04EkCKezeqmUagrWFmZp7EO2JD1yivFAu9O3koAqeY3VYjd0s7uHy6JQrE5xA=
+	t=1777166811; cv=none; b=UPKnYBYOw5kU05iyaHBIfDmBRzXQzsR8rAPbzLKk2SiqQhmrjxSXi615uY4grJ7VKo5W42izbGuFIl3Biqa8mdzdtCZBjIjZMgWALTzEMLf7swAwZbj1X0ewh679s1iMHWV2neZnyTo2yIFVNQvVYvdgs62WrKMTjsh6vztb5FE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777157390; c=relaxed/simple;
-	bh=NlJmQ99Eo2O4AE5jLnxX5tS8FjtsFDwC/kEMUdhH/to=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=nknmmRyj25LKuwdEjAJRcB66tmFlAYTFA7OGEw/DL8fQzW0bXjSyHBo8xr6wrQMBQbNtyyFUi/ZB+jbXLAylRrgSeSlsSJ1Uzy3D2QmJ52ybqGRYD4516AaRr7UvGUWfbqv6F3+jnWK9Og/MvqM63FXawACcCakpu9YtcZZ9Rls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=njUgew/0; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-488a88aeec9so112392375e9.2
-        for <netdev@vger.kernel.org>; Sat, 25 Apr 2026 15:49:48 -0700 (PDT)
+	s=arc-20240116; t=1777166811; c=relaxed/simple;
+	bh=Gl+hYW7LqIVC0CINBWs+S5dOrmK6HI24E8dXahLtQBg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=lYvUy1H7MbV6fa1yJDNmAlEiFHgUrNlQW98E9p8ywPWUnJEMdc31R1q+BpRA2SCH0g6GL0Cal2UrExUzOnL+IlEtAoou3QUjUCrK0tZFv6kgngKPqOe9L0JobdUgJH0lLYT/q49SlW6DclwJdLayaHVZDQ7n5O5oXLyCfQmy0Pg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qClxw5Cq; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-358df8fbd1cso11512515a91.0
+        for <netdev@vger.kernel.org>; Sat, 25 Apr 2026 18:26:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777157387; x=1777762187; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ylk6+welFEnDY94rahWQ7HvD0zJjqoxic/dx4PIJEZs=;
-        b=njUgew/0gxIhEm89BpgDShxUIrYjheWBreT15WL/ta4TQe9um/zz0ZtYGzkOXNxm5L
-         IwkT1qUE20boc9rhEXE2Q1JIYGA+bHOOnxG32g10Ja2QKPOEBNLihH5/v1T7MB07D+qZ
-         Z5HmMYKDNZY9yD+88fMS6lJJkmFqefQJbuEBJXtWgYMbqFhtTmPxYHvF4LLthOu7wfnm
-         Bvc2tfZdZmI0v3kBi2PIDuZcUCZab2pjrmWTkndhG0ATKze0s/1iggcM0FvR6PKPleGc
-         MhHmVkmkkTZS2OnhlgS1PFl1WEkmN3bVyR9q7u0O6WvVL6b2NV72boLReMg8Aza6VXwf
-         kQkg==
+        d=google.com; s=20251104; t=1777166810; x=1777771610; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ONWQvj5cDHYA8LVXOFm9Whn8axjzb1Wzfxrs7kxCqxs=;
+        b=qClxw5CqWVBlDq5F0BQkEUrHoI6yvVpJkJYkCQqtz9szmlT94NLt+kwwF6bwPKrXnV
+         yD5W8RS6quyVzTJXr5OgYUHclvnJ9nTiyYHLxlOQImThO3nb306202SExvLxUPrZFMKI
+         fYngIj188NaIq3eIsyNDgnQ4uaCugF3/T/LBMvViLYfmu6E+8iGLc7TIFaBvgosXpyPF
+         xQR8J87IybIoM49PHewVq9ZiNEKZocuQrJnenOQs+JP/8WhXmnhTCKQNz/QQpDw+vH8/
+         MK6G9iZawA/IhNZnXWlV7+OKzhberJDIQAm6Yo151MLksSQNsS8VqoksAi3mExahVebk
+         E5OQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777157387; x=1777762187;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ylk6+welFEnDY94rahWQ7HvD0zJjqoxic/dx4PIJEZs=;
-        b=QhoFddj12boNxP2FCJ7cUO8Pqpzwak8hbM/rXMfS0HWpk+HQxBcpsna5FOrDtpZ/AQ
-         DjW2vb398EivuPwr2clhqXcs4ByFa36HK7mOqaOn+Zqwd/gZft5fbIG59+S1PUYXmFAu
-         yY7HODKCszFjMKRkLckogtsuSu9Ge9AfpuM0hu7v1jkgDtQ7TG/f0/gpe+FSPWp+LApP
-         9wKy/xvn3F8wDuHe6xRYqgGsvhz0O1P6lTLduNxo4QJaH2SyNECeOfyNKXVwanAs/rmz
-         7jAPOGE/l9HcxJX3puPnuma9+T3GPLUotsy+s7n8Yb/WKQayUCNdB5WqBZapQKim/HEt
-         S1iA==
-X-Gm-Message-State: AOJu0YyEeQRCSK9sSE5r/HGszMV/TQk8fRFyfPYL7rRYxk6O71Le9HB3
-	8BGTKgAEabzqGtXVQ6oTt/awS0zsSNNp0W3ZOw/eH+HUTpiPR7gTLRkf
-X-Gm-Gg: AeBDieubtHPXRu9PVR17Zu00izgYImCsXJEtBwTmMbmNKw1c4Ailt3ICjOwmGNu1kqv
-	YEmK/2JURADfgHzDmo25TDApQE47jJVD6OTrAwYHz/QJGMIe0EHMUW+3SoBplXtUHXjI19zQT4f
-	rxstIEUAjM4H/WTh+Rn/wvDfbcWUFCI1VEswjtfx6Pd3Q5CggI6uDyaRA+EHQ3I0TxwvDH9Lqqa
-	tylS2/+hAgjGwS0puS4W4j/isb/qLm47d11HT98DXw8ZRx6u52SkGQHO9Bp9+qvMqANwbePI3a5
-	BK/ymk5wViPGMfckQZ/Anw8+Kv63GwuzzNE7O18Z2AIDhj0ZXDY08ikv4iyw65BQ+CSdZXR3qrw
-	dAEGovVDO3B6GHUJq2Gb/f3xLXXNsmKaNDz+7ZEdMtu0TPe9KY6r9+1DyUzF5tt2AmRv5Gkt8iI
-	7Mwhx4TvXjr/EQoUm67Huq2HXCqpvFEbOlWOirdoI6ChnCPz3LHjcN2hM0InTT1jZHPJZHtfkpd
-	go+tdJFjp3wZdJx0sR502/OSvUqcU7u/JA4AZ6H7zUx15ChWer1GCZY91oZOnQI7CNcPYINU54i
-X-Received: by 2002:a05:600c:8717:b0:48a:568f:ae6d with SMTP id 5b1f17b1804b1-48a568faffemr311297045e9.8.1777157387464;
-        Sat, 25 Apr 2026 15:49:47 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f34:b800:6020:70f3:48c1:ca3e? (p200300ea8f34b800602070f348c1ca3e.dip0.t-ipconnect.de. [2003:ea:8f34:b800:6020:70f3:48c1:ca3e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fb754842sm210753475e9.8.2026.04.25.15.49.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Apr 2026 15:49:47 -0700 (PDT)
-Message-ID: <39a35232-479f-4390-9957-dbafc3f3c468@gmail.com>
-Date: Sun, 26 Apr 2026 00:49:46 +0200
+        d=1e100.net; s=20251104; t=1777166810; x=1777771610;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ONWQvj5cDHYA8LVXOFm9Whn8axjzb1Wzfxrs7kxCqxs=;
+        b=M53KXnupiRB0tibP/TjyD2S17EavhQCvCD+IeLb1leG7y9bYVfmf9uCK8eFMTweDgi
+         dLn3DysJUrEGfwxbu679cWqCud9OHPn8bHSjYoVcq4VtbvEc8VUwEd8gS/ehqtePxyVn
+         1J6z/Z1PckF2X24rvVh7kU03BG9ChiNg5C9bU4Xii9pKWNHM87ew6iqixT2AW8sXfhIY
+         r+4rs6y8u8DpKtqR00BhkJHJc7aaWFej2m2cZt0HdrsuQV3hYnvBsb6M1Xgr6QpD+Pga
+         8dK3ImeCxjbV7wxTOcT5RilzOUQh56RxBHeYVJ4verStdQmR6gMukpAyUiXzW0q7Ihvd
+         JQ5g==
+X-Forwarded-Encrypted: i=1; AFNElJ+YTd2vgg18Vg53rIN3GlWnxqZnTgblohHmsc4UdwdO+PhaLLzss+pEn3mtpDXIvTsqon8wPgg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZAv38cWPQQKv/Rsko1/nqkHh3EzsxrBr/pK7xfesor9hEZFAt
+	EV6nBI3wfw73mN7VG2M3fP9Kgn75CG3+mt6nrm7WE16AZ5KKwrLY0dbVoRYSUJxQl8ujtYp1Lrc
+	yAFdaWQ==
+X-Received: from pjbgz21.prod.google.com ([2002:a17:90b:ed5:b0:35d:a917:a7bf])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3dc8:b0:35f:b6a1:8d23
+ with SMTP id 98e67ed59e1d1-3614040b34bmr41517619a91.11.1777166809512; Sat, 25
+ Apr 2026 18:26:49 -0700 (PDT)
+Date: Sun, 26 Apr 2026 01:26:43 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [RFC Patch net-next v1 0/9] r8169: add RSS support for RTL8127
-To: javen <javen_xu@realsil.com.cn>, nic_swsd@realtek.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260420021957.1756-1-javen_xu@realsil.com.cn>
-Content-Language: en-US
-In-Reply-To: <20260420021957.1756-1-javen_xu@realsil.com.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: AC77D4683E6
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.rc2.544.gc7ae2d5bb8-goog
+Message-ID: <20260426012647.3233119-1-kuniyu@google.com>
+Subject: [PATCH v2 bpf] bpf: Free reuseport cBPF prog after RCU grace period.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Eulgyu Kim <eulgyukim@snu.ac.kr>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 1D0D04688AF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281131-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FREEMAIL_CC(0.00)[google.com,gmail.com,vger.kernel.org,snu.ac.kr];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281132-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[linux.dev,kernel.org,iogearbox.net,gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,realsil.com.cn:email]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-On 20.04.2026 04:19, javen wrote:
-> From: Javen Xu <javen_xu@realsil.com.cn>
-> 
-> This series patch adds RSS support for RTL8127 in the r8169 driver.
-> 
-> Currently, without RSS support, a single CPU core handles all incoming
-> traffic. Under heavy loads, this single core becomes a bottleneck, causing
-> high softirq usage and leading to unstable and degraded network throughput.
-> 
-> As a result, we add rss support for RTL8127. This RFC patch is just for
-> discussing. And we do some experiments on AMD platform. Below is the 
-> result.
-> 
-> Platform: AMD Ryzen Embedded R2514 with Radeon Graphics(4 Cores/8 Threads)
+Eulgyu Kim reported the splat below with a repro. [0]
 
-An older embedded CPU (AFAICS from 2019, refreshed in 2022) in reality is
-unlikely to be used with sustained 10GBit traffic. It would be too weak to
-handle userspace apps making use of this high throughput. This hw edge case
-IMO isn't really an argument for adding 1.000 LoC, blowing up driver structs,
-and adding the complexity of dealing with a register layout changing every
-two chip versions.
+The repro sets up a UDP reuseport group with a cBPF prog and
+replaces it with a new one while another thread is sending
+a UDP packet to the group.
 
-It's really a problem that Realtek frequently changes register layout and/or
-register semantics in a not backward-compatible way (and doesn't provide
-documentation), resulting in ugly versioned stuff like the following.
+The reuseport prog is freed by sk_reuseport_prog_free().
+bpf_prog_put() is called for "e"BPF prog to destruct through
+multiple stages while cBPF prog is freed immediately by
+bpf_release_orig_filter() and bpf_prog_free().
 
-IMR_V2_SET_REG_8125	= 0x0d0c,
-IMR_V2_CLEAR_REG_8125	= 0x0d00,
-IMR_V4_L2_CLEAR_REG_8125 = 0x0d10,
-ISR_V2_8125		= 0x0d04,
-ISR_V4_L2_8125		= 0x0d14,
+If a reuseport prog is detached from the setsockopt() path
+(reuseport_attach_prog() or reuseport_detach_prog()),
+sk_reuseport_prog_free() is called without waiting for RCU
+readers to complete, resulting in various bugs.
 
-case RTL_GIGA_MAC_VER_80:
-	tp->HwSuppIsrVer = 6;
-default:
-	tp->HwSuppIsrVer = 1;
+Let's defer freeing the reuseport cBPF prog after one RCU
+grace period.
 
-This messy hw design makes it hard to develop maintainable drivers.
-This is underlined by the fact that Realtek has separate r8125, r8126,
-r8127 drivers, even though they share most of the code.
+Note "e"BPF prog is safe as is unless the fast path starts
+to touch fields destroyed in bpf_prog_put_deferred() and
+__bpf_prog_put_noref().
 
-> Arch: x86_64
-> Test command: 
->   Server: iperf3 -s
->   Client: iperf3 -c 192.168.2.1 -P 20 -t 3600
-> Monitor: mpstat -P ALL 1
-> 
-> Before this patch (Without RSS):
->   Throughput: Unstable, fluctuating between 3.76 Gbits/sec and
->   8.2 Gbits/sec.
->   CPU Usage: A single CPU core is fully occupied with softirq reaching 
->   up to 96%.
-> 
-> After this patch (With RSS enabled):
->   Throughput: Stable at 9.42 Gbits/sec.
->   CPU Usage: The traffic load is evenly distributed across multiple CPU
->   cores. The maximum softirq on a single core dropped to 63%.
->   
-> Patch summary:
->   Patch 1: Adds necessary macro and register definitions for RSS.
->   Patch 2-4: Support NAPI and multi RX/TX queues.
+[0]:
+BUG: KASAN: vmalloc-out-of-bounds in reuseport_select_sock+0xedc/0x1220 net/core/sock_reuseport.c:596
+Read of size 4 at addr ffffc9000051e004 by task slowme/10208
+CPU: 6 UID: 1000 PID: 10208 Comm: slowme Not tainted 7.0.0-geb7ac95ff75e #32 PREEMPT(full)
+Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+Call Trace:
+ <IRQ>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0xca/0x240 mm/kasan/report.c:482
+ kasan_report+0x118/0x150 mm/kasan/report.c:595
+ reuseport_select_sock+0xedc/0x1220 net/core/sock_reuseport.c:596
+ udp4_lib_lookup2+0x3bc/0x950 net/ipv4/udp.c:495
+ __udp4_lib_lookup+0x768/0xe20 net/ipv4/udp.c:723
+ __udp4_lib_lookup_skb+0x297/0x390 net/ipv4/udp.c:752
+ __udp4_lib_rcv+0x1312/0x2620 net/ipv4/udp.c:2752
+ ip_protocol_deliver_rcu+0x282/0x440 net/ipv4/ip_input.c:207
+ ip_local_deliver_finish+0x3bb/0x6f0 net/ipv4/ip_input.c:241
+ NF_HOOK+0x30c/0x3a0 include/linux/netfilter.h:318
+ NF_HOOK+0x30c/0x3a0 include/linux/netfilter.h:318
+ __netif_receive_skb_one_core net/core/dev.c:6181 [inline]
+ __netif_receive_skb net/core/dev.c:6294 [inline]
+ process_backlog+0xaa4/0x1960 net/core/dev.c:6645
+ __napi_poll+0xae/0x340 net/core/dev.c:7709
+ napi_poll net/core/dev.c:7772 [inline]
+ net_rx_action+0x5d7/0xf50 net/core/dev.c:7929
+ handle_softirqs+0x22b/0x870 kernel/softirq.c:622
+ do_softirq+0x76/0xd0 kernel/softirq.c:523
+ </IRQ>
+ <TASK>
+ __local_bh_enable_ip+0xf8/0x130 kernel/softirq.c:450
+ local_bh_enable include/linux/bottom_half.h:33 [inline]
+ rcu_read_unlock_bh include/linux/rcupdate.h:924 [inline]
+ __dev_queue_xmit+0x1dd7/0x3710 net/core/dev.c:4890
+ neigh_output include/net/neighbour.h:556 [inline]
+ ip_finish_output2+0xca9/0x1070 net/ipv4/ip_output.c:237
+ NF_HOOK_COND include/linux/netfilter.h:307 [inline]
+ ip_output+0x29f/0x450 net/ipv4/ip_output.c:438
+ ip_send_skb+0x45/0xc0 net/ipv4/ip_output.c:1508
+ udp_send_skb+0xb04/0x1510 net/ipv4/udp.c:1195
+ udp_sendmsg+0x1a71/0x2350 net/ipv4/udp.c:1485
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ __sys_sendto+0x554/0x680 net/socket.c:2206
+ __do_sys_sendto net/socket.c:2213 [inline]
+ __se_sys_sendto net/socket.c:2209 [inline]
+ __x64_sys_sendto+0xde/0x100 net/socket.c:2209
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x160/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x415a2d
+Code: b3 66 2e 0f 1f 84 00 00 00 00 00 66 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f6bc31e41e8 EFLAGS: 00000212 ORIG_RAX: 000000000000002c
+RAX: ffffffffffffffda RBX: 00007f6bc31e4cdc RCX: 0000000000415a2d
+RDX: 0000000000000001 RSI: 00007f6bc31e421f RDI: 0000000000000003
+RBP: 00007f6bc31e4240 R08: 00007f6bc31e4220 R09: 0000000000000010
+R10: 0000000000000000 R11: 0000000000000212 R12: 00007f6bc31e46c0
+R13: ffffffffffffffb8 R14: 0000000000000000 R15: 00007ffc9b0d70b0
+ </TASK>
 
-Driver supports NAPI already.
+Fixes: 538950a1b752 ("soreuseport: setsockopt SO_ATTACH_REUSEPORT_[CE]BPF")
+Reported-by: Eulgyu Kim <eulgyukim@snu.ac.kr>
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+v2: Drop unnecessary arg change.
+v1: https://lore.kernel.org/bpf/20260424235247.1990272-1-kuniyu@google.com/
+---
+ net/core/filter.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
->   Patch 5-6: Support MSI-X and enables it specifically for RTL8127.
-
-Also MSI-X is used already.
-
->   Patch 7: Enables RSS for RTL8127.
->   Patch 8-9: Adds ethtool support to configure the number of RX queues.
->   
-> Javen Xu (9):
->   r8169: add some register definitions
->   r8169: add napi and irq support
->   r8169: add support for multi tx queues
->   r8169: add support for multi rx queues
->   r8169: add support for msix
->   r8169: enable msix for RTL8127
->   r8169: add support and enable rss
->   r8169: move struct ethtool_ops
->   r8169: add support for ethtool
-> 
->  drivers/net/ethernet/realtek/r8169_main.c | 1437 ++++++++++++++++++---
->  1 file changed, 1238 insertions(+), 199 deletions(-)
-> 
-
-Series includes functions like rtl8169_desc_quirk() indicating a need to work
-around hw errata. Would be helpful to add comments describing the hw erratum,
-best with a link to documentation.
+diff --git a/net/core/filter.c b/net/core/filter.c
+index bc96c18df4e0..c77caebcf4d0 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -1654,15 +1654,24 @@ int sk_reuseport_attach_bpf(u32 ufd, struct sock *sk)
+ 	return err;
+ }
+ 
++static void sk_reuseport_prog_free_rcu(struct rcu_head *rcu)
++{
++	struct bpf_prog_aux *aux = container_of(rcu, struct bpf_prog_aux, rcu);
++	struct bpf_prog *prog = aux->prog;
++
++	bpf_release_orig_filter(prog);
++	bpf_prog_free(prog);
++}
++
+ void sk_reuseport_prog_free(struct bpf_prog *prog)
+ {
+ 	if (!prog)
+ 		return;
+ 
+-	if (prog->type == BPF_PROG_TYPE_SK_REUSEPORT)
+-		bpf_prog_put(prog);
++	if (bpf_prog_was_classic(prog))
++		call_rcu(&prog->aux->rcu, sk_reuseport_prog_free_rcu);
+ 	else
+-		bpf_prog_destroy(prog);
++		bpf_prog_put(prog);
+ }
+ 
+ static inline int __bpf_try_make_writable(struct sk_buff *skb,
+-- 
+2.54.0.rc2.544.gc7ae2d5bb8-goog
 
 
