@@ -1,169 +1,180 @@
-Return-Path: <netdev+bounces-281164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281165-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GA/yJ1Qj7mnYqwAAu9opvQ
-	(envelope-from <netdev+bounces-281164-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 16:38:12 +0200
+	id MAHEKIwk7mn0qwAAu9opvQ
+	(envelope-from <netdev+bounces-281165-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 16:43:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id A770246A5B9
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 16:38:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03F4846A617
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 16:43:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3A56530055F5
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 14:37:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E52EF300EA96
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 14:43:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 181F1366814;
-	Sun, 26 Apr 2026 14:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B6C136606E;
+	Sun, 26 Apr 2026 14:43:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="blWwUekv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jkcWGcvL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E7A36606E
-	for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 14:37:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777214262; cv=pass; b=mg4PS1Y/c/hRLrOFtpUPCQha620ltit7EnGE8lvJFRdX1e1IiAShChlKU80do/LinzzmYwAnH7+HAVcBVrOgLXU878uG5SZmNRQGBuypAOeyMggE5vBk8540mwnngIBBHAsbE7IOt7J+t1P5qaTsg7B1d3xN4IKadIIkX0hYErw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777214262; c=relaxed/simple;
-	bh=xGs9HlAaWh9UwzzisAubXHC6+wSGCrbckBpvHnDMQBU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f1KxWkkApvjz194vb/Mo3sMcDPdBUn/xOaG49sSj3PddywWX0ZS0DuxlEDtjHm43+zRmq64Nh8HT/YBLnN0gVavw2GhUqpKEnMfXh4NwCP/XSE6b5hbZVNgt/06SzfeCP4GOWMzA8MVPUX3u89JMf2+ZI9ppvLNmvM9bfh0YIX8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=blWwUekv; arc=pass smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F4E364EAA
+	for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 14:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777214590; cv=none; b=jp5bw3BOTzS0mglJL/5M9eNthoW0sZhoy7z/dmZlv2xJPXV3YbOAgx7q/sg+Cr+SEsBd0Nu7UhuIXR10JGcHJYxjsmg6Aw7k9U9Ahc6BtnE4w6G4Ya+IzQDzTynDgrPi+yqgw18ZCa8oOZopVJiCi8qts8/Zh7ptaZJe8TEU30g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777214590; c=relaxed/simple;
+	bh=BkKTDP/QdqV60QGLaKXzoX1Zq58loiHiNgpiGqts+0s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KHmhn3AfFaKp4n0EupWypPBOZb/l8P52HgaTc73CxFYXFrQYg1dXxLKMU8jXYLkTDv7ah0v9kGlhYzKeFQRaa2H31LzeJfCKpu0tEusOhyut45MHSQM0idls2uwHLIzFxnUOwN4I7jLzmC7psMGUaUO10VIqePdCTTEPs4Mihq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jkcWGcvL; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-82f8b60e485so3893980b3a.0
-        for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 07:37:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777214260; cv=none;
-        d=google.com; s=arc-20240605;
-        b=G9IIjKYNCOPgMeaLSufneKyZH3ocNdrLmoIrtPDwC0nt+tZyzqm91GHAnDJvy7GmPi
-         DVFyO52peOSBeGttkAfUjtnRj38d1uLNduPeG94+ovtBPbA/XLwxbIbmz3g6vqLTNXVq
-         TRiU4hWWNRMNU5jWJ0afUAWveFM+7DF1QpXv078WVIljY6O4jMhhDxRutom5TUFktc9K
-         zEK+INQUPdwE7G7+CwbYLRTiuGfWkrBtLP1wR0CBUtEsurh9UYoYODLgUPMBqKLBR8Kh
-         bw7kR/TZpiWmLN7s5dHJH2OP5K1uN1IPk0OwOPxNY2zAobQkXdUkcbDQG7vdI7c0MC9y
-         9ZDA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=VjV9i0zLE+j6+k558H0n59YbfuN4/v5ohF11Cgr5kd8=;
-        fh=Kk3EXimx/NG4LM1rloSW8uclygoFgoufzUaWGBH/MkI=;
-        b=aSqi1lOg8Dl4cjUMh7lKglUkWFDfFNwePz5EWvhzQ1c0asLteSksCKyJy2B7kacOas
-         4TR92xBP6NVpkVbhh+Hr2JDAVccdP7uzk3gkabA5GfkLuCbO0E+dzPD2xqE0kbpOZZr0
-         6NWfpCKwXsPPPO5tTDXMEdPbiPZCAFEdYnY5B49J7g5mB55snzczOetEY/NfsIrE6JDW
-         +ASvZ1FeiPprdjpLNe/Jq3nLA5LeqTZmmdH8ynlG25klD0ghAT9c0mKPFAchmPc0lYqv
-         uIzhhbDtSp3L+xhJr0HAXDJYkrD4D0oxg+7Rl7mgD2dsmnaL9xgZQNGeI/tQiQB0R/pT
-         jRzQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-488ab2db91aso131925325e9.3
+        for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 07:43:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777214260; x=1777819060; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=VjV9i0zLE+j6+k558H0n59YbfuN4/v5ohF11Cgr5kd8=;
-        b=blWwUekvEzmaUp3k30WGpYZ0reVhPhRemF9Z25qnlTtDnm6Saa+B8cYdzgULLRRhHi
-         OZrqoV6Nyxo/Y4HEz2Facp6lRIk26jJQsgPX476rFgdv7FEf6UF9aDq3KI84GIEHCcAo
-         Buch9zWf+BNlAg9DWemG0kxctSROCg5R/tACCDmszbYD+E6ENvjQ+Ae2DyzjDoe7lo0V
-         S/k2klREGDq77fvqdPO6iaEcVOuQ9ObZya7Nbo3k24hsiirubvK2elzQ183ymwElvJ0U
-         qBooSBo1zlNimNyLXEgarIQN1wdsS2fu7qHQG9eDfatNj0elEoVzHcvIEPPWuX1CKPZ1
-         rnrA==
+        d=gmail.com; s=20251104; t=1777214587; x=1777819387; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=N+fDrQ0imKcqjUd0pDltukSNKPmoj5xTHANz+kyGdM0=;
+        b=jkcWGcvLacvY1y6WGFllv6v7k7ED4TRa3i14ALbEC7TghNb9zGdC71BMTJRy9//uvO
+         llYPnBZrm0G7mQbNm/Hv9kF0XDnBEra8D+rHbanRqd68LyB13ee37r2bKC14XdLJX/51
+         EcgKC2RQvE1H8p6pSbepiP4f288z5BWzpJxNKwb+VbrqFys4xF94nK1F7u9D93FpIPaG
+         M1LeienPJrW+cKp2OTPDoVEmQ2fWM7vvkI9jXgxGg9a+SY+AohMYNW/Pui+fWbJcxGXZ
+         5Yq8ovY9UKJHEwdsL9Kbznz1imtVkYkGqvycEuP3jAjoKNTTodjd0GaNQzAxR8ZhBVlr
+         QBNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777214260; x=1777819060;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1777214587; x=1777819387;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VjV9i0zLE+j6+k558H0n59YbfuN4/v5ohF11Cgr5kd8=;
-        b=HuOx/50M+8kJ30ZuaUp4xwsFAXEksfwecODYHbklVhScec59t06Og2B+/9N7IHg4ih
-         xaD2GG06qBC1WpAwGrTZL8OcIn4ss2ZWFKy2a4F5NLxrmWenp1yY2w9RcrZYWPqINUHH
-         SLRNt1SQmsmQbwEqT0nGqJoBFpUMHgzzL7Rrvqfie3Tm3H0zFA3FHzZXACCUAZieJ+Za
-         9avkqsDEbXejWPHroiyWtv6nigsZsUuWazc36fX3ZdXNcVpBKwNkdPeLAC40I8RPSEcr
-         +WEEkOAX3S2O8LnkEDYv38agL3D9DlNKtHHWBgr8pll7ugPW6ANfssh6XDOetaSqKTeb
-         6yWQ==
-X-Gm-Message-State: AOJu0YzPWGuT91Cja18icxPWLw8kc8y+NsdFJgiBaMMaVZZExRbQi5xl
-	5hrhIGCf+ZDu5XIsX7g+Im/FeXhQzhHDoT0I1RRcmCNhDUcz/Bb9n4Bb4m2na0B0LHTBo3TIbU9
-	JY8oGYmGX0Rq5IiTEkOslUuph9PKIJvWvnrnO
-X-Gm-Gg: AeBDieu4cxWh0dSikFW4kG/HeHqKgbzbtxxTIU41T4ePhIggIB70ffupbNQjLd51H7b
-	zLnqaivJS6E4uVkZIYOZ53t1kaJKu2CvGkPxQQb0nUpFLeQ2qNIGOX3LtfhRsVvNnkdsLsmsj0y
-	/rlDBgerTLmNQARw9Mx5qFDaHHUSgqMiGcZC3erI6KdKntwPNf8REpGLbC98LOH8C+qzRq/IZWp
-	17v6BmXXpU0pG99bJU3LyrPSl/1Z8haT9yGhAhtPeUMxZ5AzV67A12eQYq+GycAPhrJh+SH+tpc
-	Z+zG4UXP/4m1NY9bh4nLrI8H33MfRXjglmvy5LGFxwxeTbu572gLegT/1+Y9YgxU98v+0EKIgi4
-	pTxbtos3sBxpIrjuaq4Ymct7bBMvrDLb+dX9StljQaTU5kXXni2c=
-X-Received: by 2002:a05:6a00:992:b0:823:9b7:9c0e with SMTP id
- d2e1a72fcca58-82f8c991215mr40886557b3a.34.1777214259616; Sun, 26 Apr 2026
- 07:37:39 -0700 (PDT)
+        bh=N+fDrQ0imKcqjUd0pDltukSNKPmoj5xTHANz+kyGdM0=;
+        b=mnGAXVYA2OwjC9nWPFTCHFKq7V+Ffo8qzF7FFPoMVZOuxb+cW0F4oNJ0aX95WV5fRq
+         +0xMISob7fkUun2kZKsI/n19BgtyyiTuIrc5sw0g0+1HXi9WM//cLxDHGz0wlEClDrbG
+         caNc24oksa7La+y66isGTGe1yD6EGheGl8dLqbYG8xeWK4CVcm6LcW1NpE5m/y2IWUu4
+         UjXYePjpQHZGuv7Mudrl6rJ0E2oYhPPPSfnn0t4mQLaX/4QqgvSoYz6kU/AmD++diGcF
+         C4oGEFTnhWQlfls7H1jF6y+AZCRBGWk8OaYxTLt+J7Z7nMWFl8Oh3axkgpBD5uC11gQT
+         qs0w==
+X-Gm-Message-State: AOJu0YzWPiEpfcfvPyUZbtKzSKHFKQUVImB2We3t5rAcdrx+lAi+1lE1
+	ktEX/RdZ3wz0jBWDw453Mjf7NYBYQ3llnkgpz/3MWuw/jvN/FJRzIKtNDrTHEA==
+X-Gm-Gg: AeBDievJRjf8j+t3fhvjrY/1wmpQYsR0XVRYii+y6OnIRibfeyoHreJwhhG+qwFzAbz
+	1aTNkRxq7BXPr+I9/fChZ7xH29IhodpbAQXLT8kvVHh1uNmIBCBDrNm+U2foBvHF7rqq7CQl9e7
+	IIOXpZ0ShfBs6ACZbeW7/1ej7BZ/ZgNuQ9+IP1daDu93uZkfSwEnhByXb5GAJG4rwP7BOAd7vo3
+	g9j824UEiubruyCL+YebUgC2huJ4OAW9CDrVT/UOui8BK+O2cI4gLG4qzmleo3cQ6iQ9CvrW2L2
+	txKktzi9n+HjoTWzBBPsm5s6hDtQfwl43pYDRyt43xrkhiMCe6aDQzKqu+4bs/iSkfhXm2ir0Dr
+	/nJ0nTmdC3KN0MWGmSfDLUEemnh/0eOtX1FH46+GWKHZbsK2bi9C/em5xheYbS1+JJT3UbOyoot
+	VSa3T7GQbQEV81nKDWdonG4prmDhHybS37RPX/7d/0hGyJ2S0/yio62mZYa3zo8dqirIqNSE8kA
+	cMOPwLqlXQSkVRRHECqCKDi4w==
+X-Received: by 2002:a05:600c:308a:b0:489:6c22:e081 with SMTP id 5b1f17b1804b1-4896c22e217mr277337225e9.0.1777214586995;
+        Sun, 26 Apr 2026 07:43:06 -0700 (PDT)
+Received: from ubuntu-f6bvp (lfbn-idf1-1-366-193.w86-195.abo.wanadoo.fr. [86.195.82.193])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc18bccfsm658230335e9.8.2026.04.26.07.43.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 Apr 2026 07:43:06 -0700 (PDT)
+From: Bernard Pidoux <bernard.f6bvp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: linux-hams@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	Bernard Pidoux <bernard.f6bvp@gmail.com>
+Subject: [PATCH net 0/5] rose: fix use-after-free and reference counting bugs
+Date: Sun, 26 Apr 2026 16:43:00 +0200
+Message-ID: <20260426144305.984349-1-bernard.f6bvp@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1775847557.git.lucien.xin@gmail.com> <bea8a0dfcc56b9980cb914b54cffa9dd9948ba75.1775847557.git.lucien.xin@gmail.com>
-In-Reply-To: <bea8a0dfcc56b9980cb914b54cffa9dd9948ba75.1775847557.git.lucien.xin@gmail.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Sun, 26 Apr 2026 10:37:27 -0400
-X-Gm-Features: AVHnY4LLUhOITcQWAb8AID_ay9mkKJOFHS3deCCkTNwHYTo-DoTv-l-YqJ2yjo8
-Message-ID: <CADvbK_ebPJqKJJNwPXoYj50QtjCSoeE59M6YWYkqk6qBj96vPw@mail.gmail.com>
-Subject: Re: [PATCH net 2/2] sctp: discard stale INIT after handshake completion
-To: network dev <netdev@vger.kernel.org>, linux-sctp@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Florian Westphal <fw@strlen.de>, Yi Chen <yiche@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: A770246A5B9
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 03F4846A617
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281164-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com,strlen.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281165-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bernardf6bvp@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-> This is an AI-generated review of your patch from:
->
->   https://sashiko.dev/#/patchset/cover.1775847557.git.lucien.xin%40gmail.com
->
-> > @@ -1556,6 +1556,12 @@ static enum sctp_disposition sctp_sf_do_unexpected_init(
-> >   /* Tag the variable length parameters.  */
-> >   chunk->param_hdr.v = skb_pull(chunk->skb, sizeof(struct sctp_inithdr));
-> >
-> > + if (asoc->state >= SCTP_STATE_ESTABLISHED) {
-> > + /* Discard INIT matching peer vtag after handshake completion (stale INIT). */
-> > + if (chunk->subh.init_hdr->init_tag == asoc->peer.i.init_tag)
-> Does this code compare a network-byte-order value directly with a
-> host-byte-order value?
-> Looking at the structures, chunk->subh.init_hdr->init_tag is a __be32
-> extracted directly from the packet, while asoc->peer.i.init_tag is a __u32.
-> During handshake initialization, asoc->peer.i.init_tag is populated using
-> ntohl().
-> On little-endian architectures, will this comparison always fail and allow
-> the stale INIT chunks to pass through instead of discarding them?
+This series fixes several bugs in the ROSE protocol loopback path and
+state machines, all confirmed by KASAN on a live system.
 
-Will post v2 to fix this.
+A long-standing practical consequence of these bugs is that once the
+rose module has been used to establish at least one connection, it can
+no longer be unloaded cleanly: rmmod(8) hangs or causes a kernel crash
+because outstanding references and running timers prevent the module
+from completing its exit path.  Patches 2 and 3 together fix this by
+ensuring the loopback timer stops cleanly and all neighbour references
+are released on module exit.
 
-Thanks.
+Patch 1 fixes a device reference leak in rose_loopback_timer(): dev_put()
+was only called on the failure path of rose_rx_call_request(), leaking a
+reference on every successful loopback CALL_REQUEST.  It also removes a
+dead check that can never be true for the loopback neighbour.
+
+Patch 2 adds hold/put protection around the loopback timer body so that
+rose_loopback_neigh cannot be freed while the callback is running.
+
+Patch 3 fixes a race between the loopback timer and module removal by
+switching rose_loopback_clear() to timer_delete_sync() and adding an
+atomic loopback_stopping flag that prevents the timer from re-arming
+itself after module exit has started.
+
+Patch 4 clears rose->neighbour to NULL after every rose_neigh_put() call
+in the ROSE state machines (rose_in.c), preventing use of a potentially
+freed pointer by later code paths.
+
+Patch 5 guards the rose_neigh_put() call in rose_timer_expiry() STATE_2
+against a NULL pointer that can appear when a concurrent teardown path
+(e.g. rose_kill_by_device()) has already cleared the neighbour pointer
+between a timer re-arm and the next firing.
+
+Bernard Pidoux (5):
+  rose: fix dev_put() leak in rose_loopback_timer()
+  rose: hold loopback neighbour reference across timer callback
+  rose: fix race between loopback timer and module removal
+  rose: clear neighbour pointer after rose_neigh_put() in state machines
+  rose: guard rose_neigh_put() against NULL in timer expiry
+
+ net/rose/rose_in.c       |  6 +++++
+ net/rose/rose_loopback.c | 53 +++++++++++++++++++++++++++-------------
+ net/rose/rose_timer.c    |  5 +++-
+ 3 files changed, 46 insertions(+), 18 deletions(-)
+
+-- 
+2.51.0
+
 
