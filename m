@@ -1,112 +1,112 @@
-Return-Path: <netdev+bounces-281149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281150-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6MSVCA7w7WmYpAAAu9opvQ
-	(envelope-from <netdev+bounces-281149-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 12:59:26 +0200
+	id yC5CA0nw7WmYpAAAu9opvQ
+	(envelope-from <netdev+bounces-281150-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 13:00:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4370046978D
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 12:59:24 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0875B4697C4
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 13:00:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3B496300C03B
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 10:59:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 16EBA30028E3
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 11:00:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C041935028C;
-	Sun, 26 Apr 2026 10:59:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36AC0314A9E;
+	Sun, 26 Apr 2026 11:00:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="B08oLEGj"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="VzNxAK4z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EB612D781B
-	for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 10:59:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 906AB35028C
+	for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 11:00:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.178
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777201158; cv=pass; b=P761u7LWpubxJNpg2AneuX32Bo19zC+6PiOianeJzW/6WjiDJNc1fIA5kOcHeu2Qs6iwkQrZRW2S3IlUWex60jE8H88dVbQfJ1+87ECSAuq/8u+EztXba8l+W6bcFqe+WvqhajRc6vHQ3OIa488RliLb4pEfbLDu3o5sTkr8aP4=
+	t=1777201214; cv=pass; b=ZIHNaM7m02dLW/HLMAJDZQKb+vVXRthlpRBwHDak9/h1kpU/oaEGDPRvbbgKZo7/ycJ5JVz815Ou/u4bKPcGL1F5X4hlzzcq2QpdpS4YNetInKeVUMnvk95oMkcGQuT+ywxwhSdZ9HIJVY/1r2YS3Qm6WVw1a9R0lhNt3Pevcls=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777201158; c=relaxed/simple;
-	bh=QzJaR5J8RyQ1tSvYBbCR8p3++ETasbsBmRkAIgSzkcU=;
+	s=arc-20240116; t=1777201214; c=relaxed/simple;
+	bh=Py2Gmr1ZMZHxlIxxuiTASzT6HalctrDZf2HMocIBGc4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rydun17x3UTv16KDtpNQIkIjEbtQUZVC9EHjOKyeTekjJz8UlfPD74dNjm4URiqWKspsrk3m6PahYm5uZlsCc8kqyxhVB/gxKZdWMGVGXWell7hyftz+Qwwr12jPRi3R5OLU8N7NjjomLcUtDUw4XSdCuheGdqt08gm5UnTiLfE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=B08oLEGj; arc=pass smtp.client-ip=209.85.210.182
+	 To:Cc:Content-Type; b=M9BtuvVK6byZdJAD60yu8UukjRXvykNnsTF/S35vtMidYD0ALZLjDSoEDWAK8riLZXJvgdIkNRG/3qtLJn2dWf9RqwsL6iTjZzh9KrwuMXlKGx9+p+6L2AnMgINHYRNY7ilfQPtWfiW/EG9TaEsreeO++G/ZdnlyUIRgDh8s4lw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=VzNxAK4z; arc=pass smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-824c9da9928so4514484b3a.3
-        for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 03:59:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777201156; cv=none;
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-824c9da9928so4514585b3a.3
+        for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 04:00:12 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777201212; cv=none;
         d=google.com; s=arc-20240605;
-        b=c6DRRVX9aGz6TYQCVUQMIKsxZb1t2BPRZG/cqBOLO1+F73iy6wPQTYVL5RIiZ97NgE
-         llBElXDgutfdCRvJbE4OeeYQdmdCt5vRbCDmHGhh56TBTPoo8ziblmEuqp2q0oNMsbxZ
-         eSuIJajHrf5JtyLZBeUIR8LWGT5bOV2AGGrUHrbRipK5A+l94MVGMg/f8WMBfk0UagdQ
-         575FA/8LlKxorQgNpIM7ZIQVwl9UXAynzZ1aSlspVQOHO4Jsy5CQkEU7vkCLSNbzCYwW
-         JQFPDeD8Ct6RlS5G0uoQB2HRU6uXGlCNXZl5o1VSo+O7Ahy+aWYo9I+Hp6gubPcweonG
-         r7MA==
+        b=LZiDnT9honnz0y/0NblGiUd/cIOVXBMN9hy95JmfBLC5/LoSwck/Q0hZO+JT0CX0sq
+         FtsU+rnnD+TvBj/4BWknTiHbFW9w6ZIoU2NrS2a9sMm8o9AIhZWju2YK9BnG1420qdPL
+         ZM/PWPnOYuX3ndGYqzd5v0A9MyRsVgvpH3lYZ5jVUL9m+bQiMCxgHKIfy+2rpQsIk1Dl
+         CI7rdifLsWcuVu28/us3ZymDk5fKGFoZvT0fY1lQ8pe3D5KJomZiLeKCL4SFMppF/Zr+
+         hf/rK7pjfe6/FGJfp9uZ2H53OrgCaL1En07na6hwv3A4wB9QkHr599wWWY0YoDGV2tG1
+         77vw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=Z43G+siVNfTfqwol+9vvew4HXuMyxWOD6fgODyjOUvQ=;
-        fh=EruPg5Y70NE1t78oFrq3qtkEKbniGc9twGTxhhTnna8=;
-        b=Bdx6lgu27DA/Nu1WB99Fx1NymeN3rSA5aDpCnEJR89PrfMF30G/w4jMn3TvRLsGyMg
-         rKWTzM8fCOQMkyrbucu1SUFpQm2MSKc8rWv00h9q6dqiBKsqXA+Jj//iBiEuzZZbo8L+
-         ULPxlmKY3T3L5IEs/NLtnaPrZrb/2XfaIUwihs2fGwNASrTXSkA28C574USNnfiJx5v6
-         AcJ1+MaQL4MGFjUX7mfinpsl6KM5wokkGBR+7iNPew+0Tr5AOkthtFU4REVwdhtK0DDy
-         g+RW8BaJx3ya2sbGvfzfWBIAtCbq6pSUIxAGJK3FDZwLfulsUdVZ4WrSq293h4EQz49V
-         +8ig==;
+        bh=E8A7gFcKvdyWa++j9tbO0q1d1HYO3JFhanggdfF7mY0=;
+        fh=hqMS+QWXpMW/4ahke8zCMS/9ZfyCrgYFS2He9/5G+0c=;
+        b=F5kx1XALQdThxJvapHRBI2TBYRIewUMmAxvHMwU+39fq9pGRyL90vrJgOwAsFmWcLH
+         4TkfZPDNiX+Eez+9RaLdBVgcQpP2C8DJhymnEM2BdKgtaAsYL4bLl7uRYMMF8cahAIKu
+         McblVHEzUh+FoisfqlkOpNXkJMglfwWXxK/h0bw2XIN++Xs0UVbqsqxSFvlLtgmE9jCd
+         0hTT91WWPUvMPnPI0rlktEZA+EaXU6vDc8ucjVXWC6MEH5xuI8j9fu8cBRMSV4ybrC+G
+         Nacw9Bl6EZO0Nq5qb6L3NOauJhg6IpzCU+yEmoP4JwM1vtNXHdThA0V0kB9y+EPACfLz
+         3Emg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1777201156; x=1777805956; darn=vger.kernel.org;
+        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1777201212; x=1777806012; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Z43G+siVNfTfqwol+9vvew4HXuMyxWOD6fgODyjOUvQ=;
-        b=B08oLEGj/zc12Ig6OaXkOTVYSJcqLydB+YVE9o1A6uO4L1/YnkefZaBQ6W8RNaoHcf
-         vu6XB7WSzmX34fTDGkvo56i8YHnY8lqI15kH+NU5L2chPGStXtdS494PDFvZ3TNBAUju
-         lKqWYgbnAR47FuWb0+nWmGLganAeIAXxYbBCSeFypb9onrsjjIsrOuLbIoNoDKp592DY
-         jXMoCWfIuN5UPNEB6uvx+2opwUOZMwkvCY6wCvjXKzVbLwXSJu9R1lfURZvVigK9rmrU
-         LdSOwGHrtwrlH7fzyjb6AgdJ7XdRh6TgbagRVpTHY8JQ4XvjGdPN/4MwaG0zNgK9ozss
-         dhKQ==
+        bh=E8A7gFcKvdyWa++j9tbO0q1d1HYO3JFhanggdfF7mY0=;
+        b=VzNxAK4zXAptbAJCMyrUSbNd/muLmMFeCoL/F4HV3tdjVCi2Hhave+KBhhd9wyfeY3
+         VBPCM+nPpDgfpAcAXtjiDr2buD+SoOEa9LZC8PARVaEalIASipIbw25HbJynOxaBlcJE
+         jpNE8NzXhAvWRp9DT04qJGdUnmsyj4DT4dpPlASfsj9E+r/irAHMM1WrdVr5fUjbg2Q8
+         AofZCpLDR42ndYSkc7BAxtWrLn+85soY4qkE35LahyopAJJeNVMm5DvU81QgLn0uJqFJ
+         1w2dBMlZzslLOTYEKTR6mpPZUInIa9ZlEv/l1yOKIUKlea7Oen9AAElrHTfrvm4Oadsc
+         hREw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777201156; x=1777805956;
+        d=1e100.net; s=20251104; t=1777201212; x=1777806012;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Z43G+siVNfTfqwol+9vvew4HXuMyxWOD6fgODyjOUvQ=;
-        b=JN8Y2s9GYRBS/crp7VRTqw6u9A55TBdEf9fXhvfnnaNTxG9eEE/P3RkAPdGcIux27t
-         m5d8Fpn9AIObrjkJvNo4kf0b/Bx9fjKjFl8xr5FmdZ6c5FjNxMwjFWbhwqnhypwFCz/q
-         dFA7SZk/1jx8iz7AyKeTX+Tyu9tTMY4duceWwZtJnE707HuzhFFT4NhGXQ5UCKoDtjmE
-         sIQfle5H+q6QD5yw9GK7cu9PVcOOgN6NXIcRJHAwYyrGUldwwyt3AiDfl2syUkx8anKq
-         dqtn+m2HlHac4RYuhNdfNRtRwsmwa4kSXFr5+KlidrkCgnJZm7iOfcWmnyJtCCi6l8Sy
-         lF9g==
-X-Forwarded-Encrypted: i=1; AFNElJ/B894IZJJvxdKZr9ZThBma1aB2+WlFqN6TcQ09WlSBYRRZ6Io6bKY7sGF+K3HkiWA0wxkp7i8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKCA3Nn0RxXFrlORLEy0iNkMfsGMnbNRLq0Z0icOBUpPAJ+Ea+
-	h9Chem2lsdDFUBDJut/X4wY0G+3F9GFwZl+8oiCksgUjmZi0ZpyMuiJ1//x5HB7hc3MnshvoT3k
-	SoHVdYOgbx7DjQQon+bf8JsDZdM1AwJE5xr+WDOlQ
-X-Gm-Gg: AeBDietlHNRzuXKqJjx/x61PURCJsinsZSaLdE2mj5OCar4jWgwEEqYxssIouBVBKz2
-	Nk/R2AMoyAA2B3MA0H5TkYaytZ/UQbHrlhhMPzDUGHGFnt5dGZ4RCBByJOPtID0toAc0qzLaPQM
-	9Vd+cxo+tvn92P43cUnOy0mkMubduWvPOOXJvxEJ7iMJiaSUrgOSjzRKLBhjm6dAJABMP+ssW3b
-	yw2e4Hj4M7vqY0+MWBI6Yemsefkip95xzbWLtBxUwobE+RdesYGWCFwMpy16Vu4bYzBIQ8Vwcpp
-	0D97NsbFDSYQkbE07iWmHEF/yojtUBDUINpNgiDW
-X-Received: by 2002:a05:6a00:1bc6:b0:82f:1b1b:e166 with SMTP id
- d2e1a72fcca58-82f8c99159emr41296406b3a.33.1777201156605; Sun, 26 Apr 2026
- 03:59:16 -0700 (PDT)
+        bh=E8A7gFcKvdyWa++j9tbO0q1d1HYO3JFhanggdfF7mY0=;
+        b=CtFEEI2zZD+ZUyoGpYNaQ2lPGX3eaiYQuEYWESDVX268VUL/+rB2TGODAuIdXofqko
+         kvKiOIJcv7dIIn6xKvmD/ttEUm1QJxEdfgICjeTbXoJ9OxnTbqxSbCnEg8eZr6WOSyUT
+         7op3MgRWAtsou6ND7gEZDe9LAIwtFefOHD4+N+LuU2573UE0lfWi4s54jQggmLOmKKEQ
+         X+Z5GySnLWTvxTw6lUymxFV8HfajI5UZ4yQeDayw9cA9/6iJptbvUeX8H0D0+7s3MVyU
+         HpbPuXJZvyTm2tkz8LiJ0aHXmICyUYFwPVMyX/GIoZduMgZzMq1QaHf8Qly0B0anUcaS
+         dHvg==
+X-Forwarded-Encrypted: i=1; AFNElJ9wKUYDzjKV0a7KaENtRZPk1ogD0YXxRmpaxZAB7d32MUYDZ/CsoxQhD6aVuagL11f3pH4GybQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxZtpSzDEboQ/0nVfOY+Z/AYmR4MLjWG68NrqHPYb086b1zJj8
+	obiZi8jYOdB/SVRFH1LPTz/NNCMYfDEu0cIdyUAgTVY7qwu9D8j2VRgAErrhc0vGpICOsdaQVZO
+	Llm3JmmZxLLcWap1yNbGE0RhlOJSCQMvnYtdomLa0
+X-Gm-Gg: AeBDievF6yOjOudCie8M3Sr0nMS3f5PhqAdcxjTf8Ww7/qo7oeH+mp/fp2wu4C0+nLP
+	96NVamOre7WiuCLtYQU8eqAb6Y5KPnqmG/9sp1vK/BQlcZgXNBLhgAf+MReFnALvY1LDX/Wdopl
+	6BrJIWkOnthFABm2wSulUHcitw2cYnOxv+G0VoboNywZIiIm/+nwINVEIAD7q0FEbIjRHAj07r+
+	FqzrJP/keFoRceopg7AvkxNKZ2SvQkUouoWyjhrmpfDFL71U0EqAF0rFhpqzpCSojSGSceH6cU0
+	HFog+qOIU0PCa+R7klPXFr7YrJYM2A==
+X-Received: by 2002:a05:6a00:27ab:b0:82c:21af:a7bf with SMTP id
+ d2e1a72fcca58-82f8c8a0442mr37056102b3a.13.1777201212002; Sun, 26 Apr 2026
+ 04:00:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260422161958.2517539-2-bestswngs@gmail.com> <20260422161958.2517539-3-bestswngs@gmail.com>
-In-Reply-To: <20260422161958.2517539-3-bestswngs@gmail.com>
+References: <20260422161958.2517539-2-bestswngs@gmail.com> <20260422161958.2517539-4-bestswngs@gmail.com>
+In-Reply-To: <20260422161958.2517539-4-bestswngs@gmail.com>
 From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sun, 26 Apr 2026 06:59:05 -0400
-X-Gm-Features: AQROBzDdlUOYkMaP9cdvY9lBi6RpAH3mvy83bOI6hcc8joAewAsu9FYK5nmnDUU
-Message-ID: <CAM0EoMka18Lsu94wTFZU3ntXP9Z3vNy0Get+=THPdsCafcoPnw@mail.gmail.com>
-Subject: Re: [PATCH net v5 1/2] net/sched: taprio: fix NULL pointer
- dereference in class dump
+Date: Sun, 26 Apr 2026 07:00:00 -0400
+X-Gm-Features: AQROBzAgSdaBXJcboV9nvHChxz5j4Mz83IiN2mpkjN3RKMZV28Q-ZgpRwnfLPEs
+Message-ID: <CAM0EoM=aaPvbDz8SCd_xcUCAmQ9m-aK=ZaQPAN8zUURhs5jmBg@mail.gmail.com>
+Subject: Re: [PATCH net v5 2/2] selftests/tc-testing: add taprio test for
+ class dump after child delete
 To: Weiming Shi <bestswngs@gmail.com>
 Cc: vinicius.gomes@intel.com, jiri@resnulli.us, davem@davemloft.net, 
 	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
@@ -114,161 +114,104 @@ Cc: vinicius.gomes@intel.com, jiri@resnulli.us, davem@davemloft.net,
 	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 4370046978D
+X-Rspamd-Queue-Id: 0875B4697C4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [3.34 / 15.00];
-	SEM_URIBL(3.50)[asu.edu:email];
+	SEM_URIBL(3.50)[0.0.0.0:email];
 	MAILLIST(-0.15)[generic];
 	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	R_DKIM_ALLOW(0.00)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	R_DKIM_ALLOW(0.00)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
 	DMARC_NA(0.00)[mojatatu.com];
 	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281149-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-281150-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.787];
+	NEURAL_HAM(-0.00)[-0.721];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
 	TAGGED_RCPT(0.00)[netdev];
 	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(0.00)[+ip4:104.64.211.4:c];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,asu.edu:email]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
 On Wed, Apr 22, 2026 at 12:20=E2=80=AFPM Weiming Shi <bestswngs@gmail.com> =
 wrote:
 >
-> When a TAPRIO child qdisc is deleted via RTM_DELQDISC, taprio_graft()
-> is called with new =3D=3D NULL and stores NULL into q->qdiscs[cl - 1].
-> Subsequent RTM_GETTCLASS dump operations walk all classes via
-> taprio_walk() and call taprio_dump_class(), which calls taprio_leaf()
-> returning the NULL pointer, then dereferences it to read child->handle,
-> causing a kernel NULL pointer dereference.
+> Add a regression test for the NULL pointer dereference fixed in the
+> previous commit. Before the fix, taprio_graft() stored NULL into
+> q->qdiscs[cl - 1] when an explicitly grafted child qdisc was deleted
+> via RTM_DELQDISC; the next RTM_GETTCLASS dump then crashed the kernel
+> in taprio_dump_class() while reading child->handle.
 >
-> The bug is reachable with namespace-scoped CAP_NET_ADMIN on any kernel
-> with CONFIG_NET_SCH_TAPRIO enabled. On systems with unprivileged user
-> namespaces enabled, an unprivileged local user can trigger a kernel
-> panic by creating a taprio qdisc inside a new network namespace,
-> grafting an explicit child qdisc, deleting it, and requesting a class
-> dump. The RTM_GETTCLASS dump itself requires no capability.
+> The test installs a taprio root qdisc on a multi-queue netdevsim
+> device, grafts a pfifo child onto class 8001:1, deletes that child,
+> and then performs a class dump. On a fixed kernel the dump succeeds
+> and all eight taprio classes are listed; on an unpatched kernel the
+> class dump crashes, which surfaces as a test failure.
 >
->  Oops: general protection fault, probably for non-canonical address 0xdff=
-ffc0000000007: 0000 [#1] SMP KASAN NOPTI
->  KASAN: null-ptr-deref in range [0x0000000000000038-0x000000000000003f]
->  RIP: 0010:taprio_dump_class (net/sched/sch_taprio.c:2478)
->  Call Trace:
->   <TASK>
->   tc_fill_tclass (net/sched/sch_api.c:1966)
->   qdisc_class_dump (net/sched/sch_api.c:2326)
->   taprio_walk (net/sched/sch_taprio.c:2514)
->   tc_dump_tclass_qdisc (net/sched/sch_api.c:2352)
->   tc_dump_tclass_root (net/sched/sch_api.c:2370)
->   tc_dump_tclass (net/sched/sch_api.c:2431)
->   rtnl_dumpit (net/core/rtnetlink.c:6864)
->   netlink_dump (net/netlink/af_netlink.c:2325)
->   rtnetlink_rcv_msg (net/core/rtnetlink.c:6959)
->   netlink_rcv_skb (net/netlink/af_netlink.c:2550)
->   </TASK>
->
-> Fix this by substituting &noop_qdisc when new is NULL in
-> taprio_graft(), a common pattern used by other qdiscs (e.g.,
-> multiq_graft()) to ensure the q->qdiscs[] slots are never NULL.
-> This makes control-plane dump paths safe without requiring individual
-> NULL checks.
->
-> Since the data-plane paths (taprio_enqueue and taprio_dequeue_from_txq)
-> previously had explicit NULL guards that would drop/skip the packet
-> cleanly, update those checks to test for &noop_qdisc instead. Without
-> this, packets would reach taprio_enqueue_one() which increments the root
-> qdisc's qlen and backlog before calling the child's enqueue; noop_qdisc
-> drops the packet but those counters are never rolled back, permanently
-> inflating the root qdisc's statistics.
->
-> After this change *old can be a valid qdisc, NULL, or &noop_qdisc.
-> Only call qdisc_put(*old) in the first case to avoid decreasing
-> noop_qdisc's refcount, which was never increased.
->
-> Fixes: 665338b2a7a0 ("net/sched: taprio: dump class stats for the actual =
-q->qdiscs[]")
-> Reported-by: Xiang Mei <xmei5@asu.edu>
 > Signed-off-by: Weiming Shi <bestswngs@gmail.com>
 > Assisted-by: Claude:claude-opus-4-6
 
 Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
-Please add Tested-by: if you tested it with the tdc patch in 2/2
-
 cheers,
 jamal
 > ---
->  net/sched/sch_taprio.c | 13 ++++++++-----
->  1 file changed, 8 insertions(+), 5 deletions(-)
+>  .../tc-testing/tc-tests/qdiscs/taprio.json    | 26 +++++++++++++++++++
+>  1 file changed, 26 insertions(+)
 >
-> diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-> index 8e37528119506..a7daf34593e07 100644
-> --- a/net/sched/sch_taprio.c
-> +++ b/net/sched/sch_taprio.c
-> @@ -634,7 +634,7 @@ static int taprio_enqueue(struct sk_buff *skb, struct=
- Qdisc *sch,
->         queue =3D skb_get_queue_mapping(skb);
->
->         child =3D q->qdiscs[queue];
-> -       if (unlikely(!child))
-> +       if (unlikely(child =3D=3D &noop_qdisc))
->                 return qdisc_drop(skb, sch, to_free);
->
->         if (taprio_skb_exceeds_queue_max_sdu(sch, skb)) {
-> @@ -717,7 +717,7 @@ static struct sk_buff *taprio_dequeue_from_txq(struct=
- Qdisc *sch, int txq,
->         int len;
->         u8 tc;
->
-> -       if (unlikely(!child))
-> +       if (unlikely(child =3D=3D &noop_qdisc))
->                 return NULL;
->
->         if (TXTIME_ASSIST_IS_ENABLED(q->flags))
-> @@ -2183,6 +2183,9 @@ static int taprio_graft(struct Qdisc *sch, unsigned=
- long cl,
->         if (!dev_queue)
->                 return -EINVAL;
->
-> +       if (!new)
-> +               new =3D &noop_qdisc;
-> +
->         if (dev->flags & IFF_UP)
->                 dev_deactivate(dev, false);
->
-> @@ -2196,14 +2199,14 @@ static int taprio_graft(struct Qdisc *sch, unsign=
-ed long cl,
->         *old =3D q->qdiscs[cl - 1];
->         if (FULL_OFFLOAD_IS_ENABLED(q->flags)) {
->                 WARN_ON_ONCE(dev_graft_qdisc(dev_queue, new) !=3D *old);
-> -               if (new)
-> +               if (new !=3D &noop_qdisc)
->                         qdisc_refcount_inc(new);
-> -               if (*old)
-> +               if (*old && *old !=3D &noop_qdisc)
->                         qdisc_put(*old);
->         }
->
->         q->qdiscs[cl - 1] =3D new;
-> -       if (new)
-> +       if (new !=3D &noop_qdisc)
->                 new->flags |=3D TCQ_F_ONETXQUEUE | TCQ_F_NOPARENT;
->
->         if (dev->flags & IFF_UP)
+> diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/taprio.js=
+on b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/taprio.json
+> index 557fb074acf0c..cd19d05925e40 100644
+> --- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/taprio.json
+> +++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/taprio.json
+> @@ -302,5 +302,31 @@
+>              "$TC qdisc del dev $ETH root",
+>              "echo \"1\" > /sys/bus/netdevsim/del_device"
+>          ]
+> +    },
+> +    {
+> +        "id": "c7e1",
+> +        "name": "Class dump after graft and delete of explicit child qdi=
+sc",
+> +        "category": [
+> +            "qdisc",
+> +            "taprio"
+> +        ],
+> +        "plugins": {
+> +            "requires": "nsPlugin"
+> +        },
+> +        "setup": [
+> +            "echo \"1 1 8\" > /sys/bus/netdevsim/new_device",
+> +            "$TC qdisc replace dev $ETH handle 8001: parent root taprio =
+num_tc 8 map 0 1 2 3 4 5 6 7 queues 1@0 1@1 1@2 1@3 1@4 1@5 1@6 1@7 base-ti=
+me 0 sched-entry S ff 20000000 clockid CLOCK_TAI",
+> +            "$TC qdisc add dev $ETH parent 8001:1 handle 8002: pfifo",
+> +            "$TC qdisc del dev $ETH parent 8001:1 handle 8002:"
+> +        ],
+> +        "cmdUnderTest": "$TC class show dev $ETH",
+> +        "expExitCode": "0",
+> +        "verifyCmd": "$TC class show dev $ETH",
+> +        "matchPattern": "class taprio 8001:[0-9]+ root",
+> +        "matchCount": "8",
+> +        "teardown": [
+> +            "$TC qdisc del dev $ETH root",
+> +            "echo \"1\" > /sys/bus/netdevsim/del_device"
+> +        ]
+>      }
+>  ]
 > --
 > 2.43.0
 >
