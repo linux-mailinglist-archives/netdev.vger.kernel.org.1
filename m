@@ -1,90 +1,69 @@
-Return-Path: <netdev+bounces-281195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281196-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UAl4BqWE7ml1uwAAu9opvQ
-	(envelope-from <netdev+bounces-281195-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 23:33:25 +0200
+	id 4Mf7BjCJ7mlCvAAAu9opvQ
+	(envelope-from <netdev+bounces-281196-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 23:52:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57B1146B3F3
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 23:33:24 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 856E446B515
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 23:52:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 987FD300B103
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 21:33:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 63E283018C00
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 21:49:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CA4F2FBE1F;
-	Sun, 26 Apr 2026 21:33:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8C963043C8;
+	Sun, 26 Apr 2026 21:49:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GfDH3olQ"
+	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="MzOhzEeX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f67.google.com (mail-yx1-f67.google.com [74.125.224.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9A6D4315F
-	for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 21:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F0F4A0C
+	for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 21:49:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777239201; cv=none; b=KM6YdRWxon04LWVT6bcAqahRRBCJInoWvFJoyErxHWU7LKD579XR8YTrb0z3TJzfKZhKq9SUqjhW4MLscU6dXFlUu80LwORbahwDQceEZWrHPQbkIs5jltNKeZ3Uq4dKtV/y5TxmzLb6+mg0/L1wLhDAO83YoQqIFWtTQH3XpGg=
+	t=1777240162; cv=none; b=dDpIv7kyAGBdstAZ4t6jPbTO93ZtoKSM/mYy0hs3g86jkCdpIRzczvfpQmr9YeXkCdeE3UBjTJbz8oFAIcd/LO03J5E7rw/qX0xMBbi/0upVxqdrlFSezqWH8pczlmWijhsh4CJsfA8oIjVPX6JFKnG6+5vnREBHapBNg1oTm9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777239201; c=relaxed/simple;
-	bh=fhO6yFmLqlnWt1ANWbPIEM6tBQGfY4tMH6NF9WdaNJQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DU4OaWpz5MFq7PJ1pAi1jh1DmRyc47E4jb+y+o8dSWqKhtaCeWbjgfNCJViMU5iYcpEqsBwLo7Gt3wA5switLiljRqDMxEpTYl6etf8V+iO1NVgWkHK5leeR2Kyw0YeNJRYOp3D7SsqFPcCN8xWBaC1CZV6YROavo+tefBu04Mw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GfDH3olQ; arc=none smtp.client-ip=74.125.224.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f67.google.com with SMTP id 956f58d0204a3-651c7ddf514so8350391d50.1
-        for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 14:33:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777239199; x=1777843999; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=riLfd2X778N1hCyuOcb+oo3Ssiio1BD6MiO0jYwDdBM=;
-        b=GfDH3olQl7CLDou4xnBm4v7P+1syXKQJd/KQH07heaSOLaM3th+PL7JCeLafrtQ+lp
-         kN64Ms84wyiP9KegQfy4dNY8guQRro8AePbv4AMFkjPhOuU7ehwmuEVYqa1NgE3kqCBO
-         QgYRHZ3agROWUQYL2tgpgcb3s8sYk8teeehfFe+YPsmpCAGwtxkcADCqYplMjKwUvZYR
-         WUEodEjilSyg6j+teS0rR0elv/w7jvc348Rzf43ivw/3+TO+RPGxluWZQ4LXIEs6c9Ur
-         KPloD1kVT/0Pml1TiUNP7jK8fuvF70DOqDJ3Ad5OMkAuEu4vKBLqEuNp/AXa52r65rxi
-         lGAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777239199; x=1777843999;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=riLfd2X778N1hCyuOcb+oo3Ssiio1BD6MiO0jYwDdBM=;
-        b=KEZZwn6KNDe6J/djzrC4bc+k17gH9HbitghSxjEClv3Fwxw8qrJlbD8XzSPJEEtM7x
-         JH77jEPVhGJb5NRji/1ucu/GFAeDqoF4ig8jW/XYU6wz0GC+xpkLE9FTR7CYL2l4ptRm
-         81muXtkVZ7HbCbOd/LXZnSGIUWsnBxKtpn3hb/s+pklEXlzCiNx320R+JIBaTZbPbWIV
-         JLwVKSD+io9itGdJEJL+iZHzMory3Pz0AeHHsDlx+EZFIGYhLiPJI3V1DttrLm6XGe8Z
-         zSzXxB3wPJGlVCoXoKt/pm21E+A1T3UvPZ7qQHaYgVe+/fNNXxpv4g6avTz+HxVQUrl9
-         xITw==
-X-Gm-Message-State: AOJu0YyIWHmSxITtcafYiGVMDrhb5IpeTh0klhI10YZxZO266R/2SQng
-	AIhw0LX1HEMl+8Gj6LCZL8+gpKPdxFGkXlWcJ51IhTu8Omev+IKqfuCDnepxwiC2nOoy8wZD
-X-Gm-Gg: AeBDievT71tJ7c7Bse4MZ1Af/agA7bHRqSs+0V3oDsr6Evh+FKdDnsBZw0M+CPkJ1PE
-	X2Z5qg64PMOsyK6gbCGyXsgjS8WtvHRrGr0Ug7A/10NyI3L7Z8E9X3WRTXx/oDOtdmQTqwe8EIm
-	0m0ARiQuAY0s9633u2IT0xtI5aZPbw018lqGJh+RPc8L2nfdtSqh7rUNkQ6+7N/EFmSqq53RrsB
-	khDmMs2QSsbSZ7LySVu+sI7VUo5EkE6bSMrPaY6ZQQixhUCydceTwgNGtomeZAJxHlP4kbXkBZW
-	/QR5Q7fYeHbFBcg3SyDOlFSCm2tcIrftO3yzwHx35O0zoRj/vOGOlygW+z+UVszEZLAKIYj/yhC
-	nbDm1wr/2ocdyhikAWBcpooEzV3Uv4fEyGzFQhCR5Joh5jgePpDC1NqhqSIBPVd9XAXvUIVubvk
-	La9Y4ZFf581FZbSJdtPncybXqIKhIamlCHL/VUhsN/cgqPMQF2XlII8B5ormkA03ARCXDWa887D
-	w==
-X-Received: by 2002:a05:690e:dc8:b0:651:8ba3:8785 with SMTP id 956f58d0204a3-65310b2023dmr34507162d50.60.1777239199435;
-        Sun, 26 Apr 2026 14:33:19 -0700 (PDT)
-Received: from localhost ([2600:1700:3420:b5d0::d])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-654439d1cb0sm7362633d50.9.2026.04.26.14.33.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Apr 2026 14:33:19 -0700 (PDT)
-From: kernelcoredev <sonionwhat@gmail.com>
-To: netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch,
+	s=arc-20240116; t=1777240162; c=relaxed/simple;
+	bh=hqc/CK0y2YVF3dMMJiIgh0dUs3rUUbZBVUb0oTGFGbI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C3D79XhXA7nTla8CsUhatvmffkqWUYZM+x+KoYqCyMjVvMWzfavsghvLxtB4cZ63Vu1OWgK9xg1v662A7EFLlOLORVNIss/pbNp6/XGg3uHYUOt704VbEyf4dLQVQtKoFi7yfr8w2ba8R/LRfIC6nY/pOww93gPFR3InLcOyo4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=MzOhzEeX; arc=none smtp.client-ip=212.77.101.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
+Received: (wp-smtpd smtp.wp.pl 23436 invoked from network); 26 Apr 2026 23:49:11 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
+          t=1777240151; bh=wNiG3vmaZvmJc/Ed24L3ke+xWsq9YoBhZy8VatvB0CY=;
+          h=From:To:Cc:Subject;
+          b=MzOhzEeX0WBcWZhX5JGkOt/ze9j2PrSpXwWk8+I6idbLvFY59mr/S0KAPo9IYd8eI
+           5X3iDJzMR2ag+YP97YlWQN4S57HwM71TTnVS5rt60X4fdgajMCR2JJdXSbU1kxA6s9
+           TUKYebkCYqzDvswpHHypuu2eylRQaY8dqjQ6l7G9empyiuQM9xBsZs9JkCvtXp9moE
+           E5EihUC/hu7z/lZay+h+4hoxDOhsSlf/iP5c294toQPr/5VaVNLLTblK6MYSXeycUg
+           0HnqVVcjyAT4hPY6RkA2hoOwQT1dDStY1Pj0UZAwp7fr/lhd7jNnbVxbk6PcsobdSn
+           XD0C/O1ssB/5A==
+Received: from 83.24.138.167.ipv4.supernova.orange.pl (HELO abajkowski.lan) (olek2@wp.pl@[83.24.138.167])
+          (envelope-sender <olek2@wp.pl>)
+          by smtp.wp.pl (WP-SMTPD) with TLS_AES_256_GCM_SHA384 encrypted SMTP
+          for <andrew+netdev@lunn.ch>; 26 Apr 2026 23:49:11 +0200
+From: Aleksander Jan Bajkowski <olek2@wp.pl>
+To: andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	kernelcoredev <sonionwhat@gmail.com>
-Subject: [PATCH] net: nixge: fix skb leak and missing bail on DMA mapping error
-Date: Sun, 26 Apr 2026 17:33:16 -0400
-Message-ID: <20260426213316.6164-1-sonionwhat@gmail.com>
+	hayeswang@realtek.com,
+	hsu.chih.kai@realtek.com,
+	kees@kernel.org,
+	mail@birger-koblitz.de,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
+Subject: [PATCH net-next] net: usb: r8152: add TRENDnet TUC-ET2G v2.0
+Date: Sun, 26 Apr 2026 23:49:00 +0200
+Message-ID: <20260426214909.3426105-1-olek2@wp.pl>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -93,71 +72,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 57B1146B3F3
+X-WP-DKIM-Status: good (id: wp.pl)                                                      
+X-WP-MailID: 596669f7ac28c279c4a913887e3b90b9
+X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
+X-WP-SPAM: NO 0000000 [8YMk]                               
+X-Rspamd-Queue-Id: 856E446B515
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[wp.pl,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[wp.pl:s=20241105];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-281196-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[wp.pl];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-281195-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[wp.pl:+];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[sonionwhat@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[olek2@wp.pl,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FREEMAIL_CC(0.00)[wp.pl];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[wp.pl:email,wp.pl:dkim,wp.pl:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-When dma_mapping_error() fires during RX buffer refill in nixge_recv(),
-the skb allocated by netdev_alloc_skb_ip_align() is never freed, and
-execution continues writing a corrupt physical address into the hardware
-descriptor ring.
+The TRENDnet TUC-ET2G V2.0 is an RTL8156B based 2.5G Ethernet controller.
 
-Fix by freeing the skb with dev_kfree_skb() and returning early.
+Add the vendor and product ID values to the driver. This makes Ethernet
+work with the adapter.
 
-Fixes: 492caffa8a1a ("net: ethernet: nixge: Add support for National Instruments XGE netdev")
-
-Signed-off-by: kernelcoredev <sonionwhat@gmail.com>
+Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
 ---
- drivers/net/ethernet/ni/nixge.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/net/usb/r8152.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/ethernet/ni/nixge.c b/drivers/net/ethernet/ni/nixge.c
-index 230d5ff99..b64e2f355 100644
---- a/drivers/net/ethernet/ni/nixge.c
-+++ b/drivers/net/ethernet/ni/nixge.c
-@@ -645,8 +645,9 @@ static int nixge_recv(struct net_device *ndev, int budget)
- 					  NIXGE_MAX_JUMBO_FRAME_SIZE,
- 					  DMA_FROM_DEVICE);
- 		if (dma_mapping_error(ndev->dev.parent, cur_phys)) {
--			/* FIXME: bail out and clean up */
--			netdev_err(ndev, "Failed to map ...\n");
-+			netdev_err(ndev, "Failed to map RX buffer\n");
-+			dev_kfree_skb(new_skb);
-+			return packets;
- 		}
- 		nixge_hw_dma_bd_set_phys(cur_p, cur_phys);
- 		cur_p->cntrl = NIXGE_MAX_JUMBO_FRAME_SIZE;
+diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+index 7337bf1b7d6a..1ace1d2398c9 100644
+--- a/drivers/net/usb/r8152.c
++++ b/drivers/net/usb/r8152.c
+@@ -10138,6 +10138,7 @@ static const struct usb_device_id rtl8152_table[] = {
+ 	{ USB_DEVICE(VENDOR_ID_DELL,    0xb097) },
+ 	{ USB_DEVICE(VENDOR_ID_ASUS,    0x1976) },
+ 	{ USB_DEVICE(VENDOR_ID_TRENDNET, 0xe02b) },
++	{ USB_DEVICE(VENDOR_ID_TRENDNET, 0xe02c) },
+ 	{}
+ };
+ 
 -- 
 2.53.0
 
