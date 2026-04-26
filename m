@@ -1,167 +1,148 @@
-Return-Path: <netdev+bounces-281190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281191-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aEWpA91q7ml7tgAAu9opvQ
-	(envelope-from <netdev+bounces-281190-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 21:43:25 +0200
+	id gItsGRFs7mmltgAAu9opvQ
+	(envelope-from <netdev+bounces-281191-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 21:48:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD0F346AF7B
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 21:43:23 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BAE446AF9E
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 21:48:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7238D3001851
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 19:43:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5941C3004C53
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 19:48:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96B0838B7AA;
-	Sun, 26 Apr 2026 19:43:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2D038B7BB;
+	Sun, 26 Apr 2026 19:48:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="Y7FKMqpY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ksEB8nk1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-07.mail-europe.com (mail-07.mail-europe.com [188.165.51.139])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33FC23542D1
-	for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 19:43:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.165.51.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEC2237F8AE
+	for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 19:48:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777232598; cv=none; b=AMYJc2DriEgjeeOaugZyRG6Ez9pHYjxDXCnm0Z8StDaTqrK904UzsYDFR+/KEZkgtQwJ9yTq1GSEg1Xs+WX8HxOtuvpFqFKIfjIur84wk7IG2QMvCU+XYchFkI0T+p/UKbzR5+Y7sx/nvTY+5JumLeTCNhombLs6nkMhALS/dYo=
+	t=1777232909; cv=none; b=eEaVxTmCgD62V4P8RPjiiLWB+gLwCVstSB8+HJvOehaDKluYZUKVSJSJkKyOYVbdU0WosNlBHSB8dvoh5oohlTXbGXfyQ/0ZO+xzrkEKaD2pO/gwhQkKuTbjc8O4P0yE9F2fg+U2N5FZ25QFmYE9NNt6gW1snyliWc2suVFdng4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777232598; c=relaxed/simple;
-	bh=T+mxDie/2SaX4jvh8Isd+njvb/CGPq8D3xjqupQ/GZo=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b8peLu7cHd0vEoNVxSKl6SlQOazDjt22NY5rK+Ph275K3Xeh5Zya+BaH1tBpEiwKku798jkXr1W/zOTRoqMNt3gRE/S0Xj5RwzCuVkKWu55KDD6+q969IlpuDBw43j2DzHX7/dtQ7XUDzI1pou8pu40xMNlIKps9sl4sYq0gohU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=Y7FKMqpY; arc=none smtp.client-ip=188.165.51.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
-	s=protonmail3; t=1777232585; x=1777491785;
-	bh=/2XKW15+uCUqJELfllQEweH+U+U6x7xmYmX7tfUzQNo=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=Y7FKMqpY5Aa0WeANoB+kV08PZhAUohAjDq884xAkOEBQfjxA2CUHE1/3J0daVllPT
-	 1dVYCw9CCagLt4o82WXp3p7UruRU4QjiD6ol8KcHZwwNhC+zAMo5meSvKD56CySjWq
-	 KqugM1g0w4BpOftP7HgiuD4yFcjbNBADRRZYEJ7YQsigbQncLrQ5fhqF/3zuDnkYr+
-	 NpHbazKaTfz87VUC/n3TP59h5hmUWoeA5VcXr8h+QmH66/Odb2YDhdwSHfooXYSTrM
-	 63xy377MyQzkKU2tJ77WFvwFhARMMe5hNGqggOqsExlkbbS8hV49sih636D36C7kgm
-	 P2ZgK0cxhTatQ==
-Date: Sun, 26 Apr 2026 19:43:00 +0000
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-From: William Liu <will@willsroot.io>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us, stephen@networkplumber.org, victor@mojatatu.com, savy@syst3mfailure.io, xmei5@asu.edu, pctammela@mojatatu.com, kuniyu@google.com, toke@toke.dk, willemdebruijnkernel@gmail.com, hxzene@gmail.com
-Subject: Re: [PATCH net 4/9] net/sched: fix packet loop on netem when duplicate is on
-Message-ID: <PUHC-453MlMVz98UOKJL9XQn9lt4GvN3H9GJ3nR0VnwJmZEHpNuGqUND6bAfANVEu_58JuuVIzlpcrOZWV3WdhNUgKnpjo_lldrBB4dpEdw=@willsroot.io>
-In-Reply-To: <20260426190916.128489-5-jhs@mojatatu.com>
-References: <20260426190916.128489-1-jhs@mojatatu.com> <20260426190916.128489-5-jhs@mojatatu.com>
-Feedback-ID: 42723359:user:proton
-X-Pm-Message-ID: 6a0085da8496bdbe459beef0124fbca6c5edb1f3
+	s=arc-20240116; t=1777232909; c=relaxed/simple;
+	bh=UgNhc2XtPIsCVwwxP/76/PjPGzxLvlQlMmoEYslO3GQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J7Ytaqlm0kFPq7EdDYM09W8YFfBwz1n8OlGQjlbfEs48e6vrBMz5bBxLdhAPKAwSOqgKU1cdEly2tZ/YkgxG/ZfOFZNB+/2F9ANqRU/s2TvvlbwgN/1dUPDFEM6nLRkyTi8rLjxjtPRT2stRUEPF36/sM7NhnPwv4otMGf3dHI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ksEB8nk1; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-488d2079582so112000075e9.2
+        for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 12:48:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777232906; x=1777837706; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BWIZcQP7lzjA6vLYx3LGv7xy3BI2jnI4CCl625QupuE=;
+        b=ksEB8nk1WVUQlao1cP5KnhIvkj/BHb09RvulMurc690BpLsu6f5x/R/K54mPFFF4p8
+         Omkx9UkdxvGyOuh6b6/KhMaEHEYJxkQsUReQfaJ/sQCtLecV3QsuZJNNSCFc1zjrTm9D
+         7ZLznHpRTTSiaLJhquVjCz9iB0fD/o0TEHsLDKVbguGupZ6onJP6F7ulzGKFywlDHVXA
+         0QA209UIgujzMmUdA5IatWCJOG6YH5E9BG2pzcAj6KfkriCHaxKvZr0kgsuNFql7qCX9
+         Pzd0lBIUu7Mv7h4HvOs8as5qxwbVkifnGTxr1dnbxhdTt8u6cYiBH/5MCcJCEVCMeTA8
+         Evug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777232906; x=1777837706;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BWIZcQP7lzjA6vLYx3LGv7xy3BI2jnI4CCl625QupuE=;
+        b=YWxr7/I269KE7MSeGYSpw9yxt8DfR5sy+97/lVA9v95vCp0QLhWkAZagB5Nb0U10s0
+         GsFzahUR6gbw/7QPlicA3L12dTCPSbcvX3rOth2wjHFpp/F3Y7QhiGDRJ4P6pMm3IeUT
+         LflNzBzkSKcoU3F2saSjLNIjPkZc1Ln4zF5s+cMSJLYy+GqnPZLqLNfVlVc7ikCKXTTW
+         N+30k+9uXVvVPhSvf6APPb5KGvtb80yU8+hFLJvfnUYoiMMhjjvur9hbPa3XGezCESe+
+         RyTmxvKLKvOnYsVF4lXJkOLMnDHkVw4XhvIa4wa1GN9KQMIJSfrd88iYapTdaJTu7Lkn
+         vyyQ==
+X-Gm-Message-State: AOJu0YxcGw2EHPVjtV1jEAmYEl5efG33qUwSAacWA/yvZcdvp+TRrXXz
+	40Vuwy8BjBaV/P4ng5ojlihGy2S6QIn4IaO6KcxnuOSg+jhDF0KlYnOG
+X-Gm-Gg: AeBDieufP/HdMffYMUyKS68oBaRWt84vMzna/wSLeVPZLl2tvRo1JEqVSnYDkXxq0s8
+	7xa25tDXxo8MuJqLyHrT/WWExoQv2U0LmA5L6RAhpCWHDXu9TurE3WLTi9jB9TZ/wwLUwus8Wh8
+	cQQGmwytPwsz0uXwo1njQF6eDfhIIe2x1T9ZT6An1yPukXf20p4HkreR+hZ57a+8ZTwk3Yih7+F
+	ooO6E3xXNY0PUJLggGv56Xw8e+xcveGEMHcYc4T/P5AlNQcCGhPPv2RURFxyDnQ12NuURiUxP43
+	ku68NlmwT2Pkw8k3tPgPtEuvcKA7fW6CcQ/Chbg1DZuP6zYas4l7CvFdnBsB8SOfgZWqZlOuo8T
+	Vm11J2sSff/ObsO0BpJZcDWejeTUFVjTbFOlL9ewRBeBmAgA2XkGymZBL/KKwrYORKDtOOrMqxh
+	0AUPy09voXEJ2fq3wpU/hhtZykv6tQSo3JjiwsUKv9esQ5ZWj9cdEqOoKwUHBGVEVxAsayF01l1
+	q7lewZ9Te9TG6jF8UlyTnxm/7YMQkok6+66Cos5QYOEQhjrLH3bXvHE3MUWyQa70jy6OcJHNm+0
+X-Received: by 2002:a05:600c:1e28:b0:483:7903:c3b1 with SMTP id 5b1f17b1804b1-488fb77fbf3mr578841625e9.20.1777232906049;
+        Sun, 26 Apr 2026 12:48:26 -0700 (PDT)
+Received: from ?IPV6:2003:ea:8f05:5f00:78bd:435f:9d9e:b57a? (p200300ea8f055f0078bd435f9d9eb57a.dip0.t-ipconnect.de. [2003:ea:8f05:5f00:78bd:435f:9d9e:b57a])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc1cfbf2sm777227475e9.15.2026.04.26.12.48.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 26 Apr 2026 12:48:25 -0700 (PDT)
+Message-ID: <7ea50189-2114-4b98-8713-8876f071d7af@gmail.com>
+Date: Sun, 26 Apr 2026 21:48:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: BD0F346AF7B
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC Patch net-next v1 3/9] r8169: add support for multi tx
+ queues
+To: javen <javen_xu@realsil.com.cn>, nic_swsd@realtek.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260420021957.1756-1-javen_xu@realsil.com.cn>
+ <20260420021957.1756-4-javen_xu@realsil.com.cn>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+In-Reply-To: <20260420021957.1756-4-javen_xu@realsil.com.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 9BAE446AF9E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[willsroot.io,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[willsroot.io:s=protonmail3];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281190-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,networkplumber.org,mojatatu.com,syst3mfailure.io,asu.edu,toke.dk,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[will@willsroot.io,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[willsroot.io:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[networkplumber.org:email,mojatatu.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,syst3mfailure.io:email]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281191-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Reviewed-by: William Liu <will@willsroot.io>
-
-On Sunday, April 26th, 2026 at 7:09 PM, Jamal Hadi Salim <jhs@mojatatu.com>=
- wrote:
-
-> When netem duplicates a packet it re-enqueues the copy at the root qdisc.
-> If another netem sits in the tree the copy can be duplicated
-> again, recursing until the stack or memory is exhausted.
->=20
-> The original duplication guard temporarily zeroed q->duplicate around
-> the re-enqueue, but that does not cover all cases because it is
-> per-qdisc state shared across all concurrent enqueue paths
-> and is not safe without additional locking.
->=20
-> Use the skb tc_depth field introduced in an earlier patch:
->  - increment it on the duplicate before re-enqueue
->  - skip duplication for any skb whose tc_depth is already non-zero.
->=20
-> This marks the packet itself rather than mutating qdisc state,
-> therefore it is safe regardless of tree topology or concurrency.
->=20
-> Fixes: 0afb51e72855 ("[PKT_SCHED]: netem: reinsert for duplication")
-> Reported-by: William Liu <will@willsroot.io>
-> Reported-by: Savino Dicanosa <savy@syst3mfailure.io>
-> Closes: https://lore.kernel.org/netdev/8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc=
-1ilxsEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=
-=3D@willsroot.io/
-> Co-developed-by: Victor Nogueira <victor@mojatatu.com>
-> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> Reviewed-by: Stephen Hemminger <stephen@networkplumber.org>
-> ---
->  net/sched/sch_netem.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
->=20
-> diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-> index 8c6dea196089..d595eb03dca8 100644
-> --- a/net/sched/sch_netem.c
-> +++ b/net/sched/sch_netem.c
-> @@ -461,7 +461,8 @@ static int netem_enqueue(struct sk_buff *skb, struct =
-Qdisc *sch,
->  =09skb->prev =3D NULL;
->=20
->  =09/* Random duplication */
-> -=09if (q->duplicate && q->duplicate >=3D get_crandom(&q->dup_cor, &q->pr=
-ng))
-> +=09if (q->duplicate && skb->tc_depth =3D=3D 0 &&
-> +=09    q->duplicate >=3D get_crandom(&q->dup_cor, &q->prng))
->  =09=09++count;
->=20
->  =09/* Drop packet? */
-> @@ -540,11 +541,9 @@ static int netem_enqueue(struct sk_buff *skb, struct=
- Qdisc *sch,
->  =09 */
->  =09if (skb2) {
->  =09=09struct Qdisc *rootq =3D qdisc_root_bh(sch);
-> -=09=09u32 dupsave =3D q->duplicate; /* prevent duplicating a dup... */
->=20
-> -=09=09q->duplicate =3D 0;
-> +=09=09skb2->tc_depth++; /* prevent duplicating a dup... */
->  =09=09rootq->enqueue(skb2, rootq, to_free);
-> -=09=09q->duplicate =3D dupsave;
->  =09=09skb2 =3D NULL;
->  =09}
->=20
-> --
-> 2.34.1
->=20
+On 20.04.2026 04:19, javen wrote:
+> From: Javen Xu <javen_xu@realsil.com.cn>
 > 
+> This patch support for multi tx queues. But we still use one tx queue
+> here. More support will be available in rss support patch.
+> 
+> Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
+> ---
+>  drivers/net/ethernet/realtek/r8169_main.c | 278 ++++++++++++++++------
+>  1 file changed, 199 insertions(+), 79 deletions(-)
+> 
+Series is named "add RSS support". So, to reduce complexity of the series,
+multi tx queue should be removed here and may come as a follow-up to
+RSS support.
 
