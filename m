@@ -1,218 +1,232 @@
-Return-Path: <netdev+bounces-281150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281151-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yC5CA0nw7WmYpAAAu9opvQ
-	(envelope-from <netdev+bounces-281150-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 13:00:25 +0200
+	id kJ6kLLPx7Wn6pAAAu9opvQ
+	(envelope-from <netdev+bounces-281151-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 13:06:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0875B4697C4
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 13:00:23 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5EBF469860
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 13:06:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 16EBA30028E3
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 11:00:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9AAC73000884
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 11:06:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36AC0314A9E;
-	Sun, 26 Apr 2026 11:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D680730146C;
+	Sun, 26 Apr 2026 11:06:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="VzNxAK4z"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="m7am0jYb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 906AB35028C
-	for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 11:00:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4306983A14
+	for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 11:06:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.180
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777201214; cv=pass; b=ZIHNaM7m02dLW/HLMAJDZQKb+vVXRthlpRBwHDak9/h1kpU/oaEGDPRvbbgKZo7/ycJ5JVz815Ou/u4bKPcGL1F5X4hlzzcq2QpdpS4YNetInKeVUMnvk95oMkcGQuT+ywxwhSdZ9HIJVY/1r2YS3Qm6WVw1a9R0lhNt3Pevcls=
+	t=1777201580; cv=pass; b=hX/SRcpQE4scTbNEf86oU/Hdr7q1tsgVLHxtsBeNr1N2w/dK2Osd+1JqFAqHp1648eSS808cczjgV7feLQL1BbUeWZK/8HvtbG3/W6+/8EcS24bCEwf1MX+h5l/Bz73zKotWIx4bzwC9CX7xBWX2eP1+J4+q5KZjQVedxTcbreQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777201214; c=relaxed/simple;
-	bh=Py2Gmr1ZMZHxlIxxuiTASzT6HalctrDZf2HMocIBGc4=;
+	s=arc-20240116; t=1777201580; c=relaxed/simple;
+	bh=sf7qoSlP01N8AuSkmq6HcQOlvb7Sd88t23kDLuDirZg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M9BtuvVK6byZdJAD60yu8UukjRXvykNnsTF/S35vtMidYD0ALZLjDSoEDWAK8riLZXJvgdIkNRG/3qtLJn2dWf9RqwsL6iTjZzh9KrwuMXlKGx9+p+6L2AnMgINHYRNY7ilfQPtWfiW/EG9TaEsreeO++G/ZdnlyUIRgDh8s4lw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=VzNxAK4z; arc=pass smtp.client-ip=209.85.210.178
+	 To:Cc:Content-Type; b=SOANb3DaLQbKyL2nbtNOUq6xVVBCV0NZ46lwYj3lcTHjZwI7ds5JVqtT9ikUD6/tohN1Ft1Ar4NzABwsbCgr7wpk9Ri2FqHUlXIF6PrZ/2zBzroyAqGR9DSERsZdQCSjzi92Uj0/mp5DyVYzOS8eDcrPF326vSZTr2SRDAZyTQ8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=m7am0jYb; arc=pass smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-824c9da9928so4514585b3a.3
-        for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 04:00:12 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777201212; cv=none;
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-82f2766905fso4282679b3a.3
+        for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 04:06:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777201578; cv=none;
         d=google.com; s=arc-20240605;
-        b=LZiDnT9honnz0y/0NblGiUd/cIOVXBMN9hy95JmfBLC5/LoSwck/Q0hZO+JT0CX0sq
-         FtsU+rnnD+TvBj/4BWknTiHbFW9w6ZIoU2NrS2a9sMm8o9AIhZWju2YK9BnG1420qdPL
-         ZM/PWPnOYuX3ndGYqzd5v0A9MyRsVgvpH3lYZ5jVUL9m+bQiMCxgHKIfy+2rpQsIk1Dl
-         CI7rdifLsWcuVu28/us3ZymDk5fKGFoZvT0fY1lQ8pe3D5KJomZiLeKCL4SFMppF/Zr+
-         hf/rK7pjfe6/FGJfp9uZ2H53OrgCaL1En07na6hwv3A4wB9QkHr599wWWY0YoDGV2tG1
-         77vw==
+        b=Izo0NuSHKMz1YeN93c3WxZqpFtjDvZJqij3TZGK5iow24sr6xk8RS2puWPZDFu8vGz
+         RfP2CFxRoR/aWwZrlT3VVMF/vYA/noQGqEh62P/QX3qvIJa4jH5WpL9juO/hWbbqYA37
+         kXcqzUKaqjdw85NkVOPlxKgWiBO6+XM1IwCEbiXrurjzYjiVZOaR1bYfe92IZfhpeMRz
+         5BsoPbFvPEQ8TveJYZkGve14ISMDjsjwriPVlqttoURNkkIl4wvDC58APefPMZcyEq5B
+         /ZWOtpsR12jPKnHDe0CYeIvk4HpdWH9WqQ+5GJwehLD7X+MlnwmTFRSq+Jgw+Q7S4cs1
+         lZHg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=E8A7gFcKvdyWa++j9tbO0q1d1HYO3JFhanggdfF7mY0=;
-        fh=hqMS+QWXpMW/4ahke8zCMS/9ZfyCrgYFS2He9/5G+0c=;
-        b=F5kx1XALQdThxJvapHRBI2TBYRIewUMmAxvHMwU+39fq9pGRyL90vrJgOwAsFmWcLH
-         4TkfZPDNiX+Eez+9RaLdBVgcQpP2C8DJhymnEM2BdKgtaAsYL4bLl7uRYMMF8cahAIKu
-         McblVHEzUh+FoisfqlkOpNXkJMglfwWXxK/h0bw2XIN++Xs0UVbqsqxSFvlLtgmE9jCd
-         0hTT91WWPUvMPnPI0rlktEZA+EaXU6vDc8ucjVXWC6MEH5xuI8j9fu8cBRMSV4ybrC+G
-         Nacw9Bl6EZO0Nq5qb6L3NOauJhg6IpzCU+yEmoP4JwM1vtNXHdThA0V0kB9y+EPACfLz
-         3Emg==;
+        bh=NnivsTrpkvDkzjpBT/eTV6LsIBVcfA5R8msWBmbAiQM=;
+        fh=pA2h8hzNSRK5JaNmK0y8qZzhrX1OzoP4S2c1Um5rLe4=;
+        b=aZw+XqAS7/PgSVxFTIcygyHFNh5sj7qohFWDMc4HQ5Yf5Z/Q5MZdnjRzWjwu2zQbDO
+         Uu36IEahPVei10wpq98ISHA1QJra953Xrrm3EaAMhbbIq3XmNNharM3Z8mvuljaoDF7Q
+         r7xENaarD/Y1DIQ9RJ0J8b4N0J/cjC36GHZmwqVcJRFKD3XaAeNr5kdTvqcGea0P/pfw
+         sm1ACytN3vdOCSv5csMyNj7/IBw4faD8SAVbk4vF7zVxJCiNR56qPvdE11y0DwLYpZ0F
+         Pi8BaaAq2b1Za3CdwLP4NJhLDzsPz7XIHCqW7nsNtmDqwerEGgL7llu3kSe2BDD7Pc6p
+         P3Xg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1777201212; x=1777806012; darn=vger.kernel.org;
+        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1777201578; x=1777806378; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=E8A7gFcKvdyWa++j9tbO0q1d1HYO3JFhanggdfF7mY0=;
-        b=VzNxAK4zXAptbAJCMyrUSbNd/muLmMFeCoL/F4HV3tdjVCi2Hhave+KBhhd9wyfeY3
-         VBPCM+nPpDgfpAcAXtjiDr2buD+SoOEa9LZC8PARVaEalIASipIbw25HbJynOxaBlcJE
-         jpNE8NzXhAvWRp9DT04qJGdUnmsyj4DT4dpPlASfsj9E+r/irAHMM1WrdVr5fUjbg2Q8
-         AofZCpLDR42ndYSkc7BAxtWrLn+85soY4qkE35LahyopAJJeNVMm5DvU81QgLn0uJqFJ
-         1w2dBMlZzslLOTYEKTR6mpPZUInIa9ZlEv/l1yOKIUKlea7Oen9AAElrHTfrvm4Oadsc
-         hREw==
+        bh=NnivsTrpkvDkzjpBT/eTV6LsIBVcfA5R8msWBmbAiQM=;
+        b=m7am0jYb72usV6va3QNII6Cd5FAN7mBNuCzxKNrBA0yaQSKn4kOez6P04BczfTPuH8
+         4gnjn9L3MNczbS5xosp3RPAYsBXdmDY/IEFoU83GtiFagaMaBeXaf6e/yuRFv2Y46hJz
+         srD5jimLK+DbgoPQeGh5VfyNNbbpUsLVuoK32axY8k5Q1i/R0jULpS1buaZQNSJ4XwyO
+         yCuPBNDGR56LiQ9MVYnr7fu4+t+lrXd8jU9UiaWKIi9Bk68NUhHhcNJtHZIOEhl75l6I
+         wVPRro1YcFF+kUvLG1IFRbXtwq7Pvv5W5VHGlAIifG+2xQfoTivF8y+EVyDRv44pUHsF
+         KRzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777201212; x=1777806012;
+        d=1e100.net; s=20251104; t=1777201578; x=1777806378;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=E8A7gFcKvdyWa++j9tbO0q1d1HYO3JFhanggdfF7mY0=;
-        b=CtFEEI2zZD+ZUyoGpYNaQ2lPGX3eaiYQuEYWESDVX268VUL/+rB2TGODAuIdXofqko
-         kvKiOIJcv7dIIn6xKvmD/ttEUm1QJxEdfgICjeTbXoJ9OxnTbqxSbCnEg8eZr6WOSyUT
-         7op3MgRWAtsou6ND7gEZDe9LAIwtFefOHD4+N+LuU2573UE0lfWi4s54jQggmLOmKKEQ
-         X+Z5GySnLWTvxTw6lUymxFV8HfajI5UZ4yQeDayw9cA9/6iJptbvUeX8H0D0+7s3MVyU
-         HpbPuXJZvyTm2tkz8LiJ0aHXmICyUYFwPVMyX/GIoZduMgZzMq1QaHf8Qly0B0anUcaS
-         dHvg==
-X-Forwarded-Encrypted: i=1; AFNElJ9wKUYDzjKV0a7KaENtRZPk1ogD0YXxRmpaxZAB7d32MUYDZ/CsoxQhD6aVuagL11f3pH4GybQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxZtpSzDEboQ/0nVfOY+Z/AYmR4MLjWG68NrqHPYb086b1zJj8
-	obiZi8jYOdB/SVRFH1LPTz/NNCMYfDEu0cIdyUAgTVY7qwu9D8j2VRgAErrhc0vGpICOsdaQVZO
-	Llm3JmmZxLLcWap1yNbGE0RhlOJSCQMvnYtdomLa0
-X-Gm-Gg: AeBDievF6yOjOudCie8M3Sr0nMS3f5PhqAdcxjTf8Ww7/qo7oeH+mp/fp2wu4C0+nLP
-	96NVamOre7WiuCLtYQU8eqAb6Y5KPnqmG/9sp1vK/BQlcZgXNBLhgAf+MReFnALvY1LDX/Wdopl
-	6BrJIWkOnthFABm2wSulUHcitw2cYnOxv+G0VoboNywZIiIm/+nwINVEIAD7q0FEbIjRHAj07r+
-	FqzrJP/keFoRceopg7AvkxNKZ2SvQkUouoWyjhrmpfDFL71U0EqAF0rFhpqzpCSojSGSceH6cU0
-	HFog+qOIU0PCa+R7klPXFr7YrJYM2A==
-X-Received: by 2002:a05:6a00:27ab:b0:82c:21af:a7bf with SMTP id
- d2e1a72fcca58-82f8c8a0442mr37056102b3a.13.1777201212002; Sun, 26 Apr 2026
- 04:00:12 -0700 (PDT)
+        bh=NnivsTrpkvDkzjpBT/eTV6LsIBVcfA5R8msWBmbAiQM=;
+        b=ccTprF4aDlYu8HjFGgF0BFzEvl26ZKnw4NOndvXsi2HqKdqPgDD8ldBh24v276XKJJ
+         cyl4MG0FY/XbTHAy4AyLMHXj3pKQQlAYIX4YX9Z2nn3RpaQu58t15ZB782+sK0h7Z+0c
+         H6rKbYgI1WHkz3z80M/oK4OdHtnVRrjZl3/It/k9F9VTBGUgX1Cr70ULf2g6IoGJV1sZ
+         YFD22bnLRB+XSzkqmGAqfIlMx9G72kjtZodb18fl2yEfHQgFEL08StpkGC4dCaxJ5+7N
+         7jBJqR+/7X99Rp2ctKAnQzA8whXzj8M0e3dBjfY9AZd3pcwml49jXWGI7HvJEHPBuq5O
+         xlwQ==
+X-Gm-Message-State: AOJu0YxJ+91nF3eKi2DIZpvYYe5S8EGQh7uYFUdvfvfVTopg1LBgUAmH
+	rQ8sMhC6XdaRv6fnyh1s9Sxb0QEaoevWA5qQopO3FdXp3Yi4u+oDXRC1CpekgBay8LgTAvQAEvC
+	+nMJfNp8mnrZtrNsH1R7weaHT8VZP4biM1rexoAxWaYdt8edTH34=
+X-Gm-Gg: AeBDieuaVhg57itDOCNQy1dAscS8Ru3WCDXFzU+CI0ruv0vURAf0vFB7CtAMss8BtK0
+	fS7maGTHFtJ0uaBGa0lypbQyZwK8zhhPFpSTu1WbvJPXDDI0xrz4ZoYB3QrxI/cjYYG/zNLVp9K
+	jH6InzsIdv0XmSYuERK5nX2isL4Gdxkvf/9JX+sOiVd3kUtENUBX5bLR4t4K832Gds8x3HV2FPf
+	5X3MijxB3fC50Z2Uepg5g2m0qT1yJeDzpkuO0uQ7oVXcyobAS7npRIiRvPkglswdmLWVkcTZkLt
+	wkigzGLce1UG0MCttGkSsMJzVglBfA==
+X-Received: by 2002:a05:6a00:a15:b0:829:8942:2ca4 with SMTP id
+ d2e1a72fcca58-82f8c838f04mr43144993b3a.19.1777201578572; Sun, 26 Apr 2026
+ 04:06:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260422161958.2517539-2-bestswngs@gmail.com> <20260422161958.2517539-4-bestswngs@gmail.com>
-In-Reply-To: <20260422161958.2517539-4-bestswngs@gmail.com>
+References: <20260416130138.38050-1-phx0fer@gmail.com> <CAM0EoMmi0tdhB9ECmcpPea7iSFm5AiLme71cw5zXK+WVUZGEMw@mail.gmail.com>
+ <CAKvCo-zzTSXJ6vTazSLD=G=SekH_f2=hOHVUogoq=CQeuovxZw@mail.gmail.com>
+In-Reply-To: <CAKvCo-zzTSXJ6vTazSLD=G=SekH_f2=hOHVUogoq=CQeuovxZw@mail.gmail.com>
 From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sun, 26 Apr 2026 07:00:00 -0400
-X-Gm-Features: AQROBzAgSdaBXJcboV9nvHChxz5j4Mz83IiN2mpkjN3RKMZV28Q-ZgpRwnfLPEs
-Message-ID: <CAM0EoM=aaPvbDz8SCd_xcUCAmQ9m-aK=ZaQPAN8zUURhs5jmBg@mail.gmail.com>
-Subject: Re: [PATCH net v5 2/2] selftests/tc-testing: add taprio test for
- class dump after child delete
-To: Weiming Shi <bestswngs@gmail.com>
-Cc: vinicius.gomes@intel.com, jiri@resnulli.us, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	vladimir.oltean@nxp.com, shuah@kernel.org, xmei5@asu.edu, 
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+Date: Sun, 26 Apr 2026 07:06:06 -0400
+X-Gm-Features: AQROBzCDXrsvGqPQbKOWYsw0IrsjmtfzOzOhve-sPnkhb93eHNY7gSq4yx10I-s
+Message-ID: <CAM0EoM=NAEr9Ars_HxC0CeS=VwF_fV0_mrU4_y48C12dgv+qwQ@mail.gmail.com>
+Subject: Re: [PATCH net] net/sched: act_ct: fix skb leak on fragment check failure
+To: phx <phx0fer@gmail.com>
+Cc: netdev@vger.kernel.org, jiri@resnulli.us, horms@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 0875B4697C4
+X-Rspamd-Queue-Id: A5EBF469860
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [3.34 / 15.00];
-	SEM_URIBL(3.50)[0.0.0.0:email];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	R_DKIM_ALLOW(0.00)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281150-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[mojatatu.com];
+	TAGGED_FROM(0.00)[bounces-281151-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.721];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
+	RCPT_COUNT_THREE(0.00)[4];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(0.00)[+ip4:104.64.211.4:c];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[]
 
-On Wed, Apr 22, 2026 at 12:20=E2=80=AFPM Weiming Shi <bestswngs@gmail.com> =
-wrote:
+On Thu, Apr 16, 2026 at 11:56=E2=80=AFPM phx <phx0fer@gmail.com> wrote:
 >
-> Add a regression test for the NULL pointer dereference fixed in the
-> previous commit. Before the fix, taprio_graft() stored NULL into
-> q->qdiscs[cl - 1] when an explicitly grafted child qdisc was deleted
-> via RTM_DELQDISC; the next RTM_GETTCLASS dump then crashed the kernel
-> in taprio_dump_class() while reading child->handle.
+> Found it through code review. Reproduced it on a 7.0-rc6 kernel
+> using a veth pair with act_ct on ingress:
 >
-> The test installs a taprio root qdisc on a multi-queue netdevsim
-> device, grafts a pfifo child onto class 8001:1, deletes that child,
-> and then performs a class dump. On a fixed kernel the dump succeeds
-> and all eight taprio classes are listed; on an unpatched kernel the
-> class dump crashes, which surfaces as a test failure.
+>   ip netns add ns_ct
+>   ip link add veth0 type veth peer name veth1
+>   ip link set veth1 netns ns_ct
+>   ip link set veth0 up
+>   ip netns exec ns_ct ip link set veth1 up
+>   tc qdisc add dev veth0 clsact
+>   tc filter add dev veth0 ingress protocol ip flower action ct zone 1
 >
-> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
-> Assisted-by: Claude:claude-opus-4-6
 
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Please create a test case using tdc as a second patch. And look at
+what Sashiko is complaining about and address it if it makes sense...
 
 cheers,
 jamal
-> ---
->  .../tc-testing/tc-tests/qdiscs/taprio.json    | 26 +++++++++++++++++++
->  1 file changed, 26 insertions(+)
+> Then send truncated IP packets (10 bytes IP, need 20 minimum) from
+> the namespace via raw AF_PACKET socket on veth1. This hits
+> pskb_may_pull failure in tcf_ct_ipv4_is_fragment -> -EINVAL ->
+> out_frag -> TC_ACT_CONSUMED. net/core/dev.c handles TC_ACT_CONSUMED
+> by returning NULL without freeing the skb.
 >
-> diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/taprio.js=
-on b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/taprio.json
-> index 557fb074acf0c..cd19d05925e40 100644
-> --- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/taprio.json
-> +++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/taprio.json
-> @@ -302,5 +302,31 @@
->              "$TC qdisc del dev $ETH root",
->              "echo \"1\" > /sys/bus/netdevsim/del_device"
->          ]
-> +    },
-> +    {
-> +        "id": "c7e1",
-> +        "name": "Class dump after graft and delete of explicit child qdi=
-sc",
-> +        "category": [
-> +            "qdisc",
-> +            "taprio"
-> +        ],
-> +        "plugins": {
-> +            "requires": "nsPlugin"
-> +        },
-> +        "setup": [
-> +            "echo \"1 1 8\" > /sys/bus/netdevsim/new_device",
-> +            "$TC qdisc replace dev $ETH handle 8001: parent root taprio =
-num_tc 8 map 0 1 2 3 4 5 6 7 queues 1@0 1@1 1@2 1@3 1@4 1@5 1@6 1@7 base-ti=
-me 0 sched-entry S ff 20000000 clockid CLOCK_TAI",
-> +            "$TC qdisc add dev $ETH parent 8001:1 handle 8002: pfifo",
-> +            "$TC qdisc del dev $ETH parent 8001:1 handle 8002:"
-> +        ],
-> +        "cmdUnderTest": "$TC class show dev $ETH",
-> +        "expExitCode": "0",
-> +        "verifyCmd": "$TC class show dev $ETH",
-> +        "matchPattern": "class taprio 8001:[0-9]+ root",
-> +        "matchCount": "8",
-> +        "teardown": [
-> +            "$TC qdisc del dev $ETH root",
-> +            "echo \"1\" > /sys/bus/netdevsim/del_device"
-> +        ]
->      }
->  ]
-> --
-> 2.43.0
+> Result on unpatched kernel:
+>   Sent: 222 packets
+>   skbuff_head_cache: before=3D6439 after=3D6663 growth=3D224
+>   FAIL: skb leak detected (224 objects leaked)
 >
+> Attached a test script that automates this. With the fix applied
+> (TC_ACT_SHOT for non-EINPROGRESS errors), the skbs get freed and
+> the test passes. The test script is generated by AI.
+>
+> On Thu, Apr 16, 2026 at 11:32=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.c=
+om> wrote:
+>>
+>> On Thu, Apr 16, 2026 at 9:01=E2=80=AFAM Dudu Lu <phx0fer@gmail.com> wrot=
+e:
+>> >
+>> > When tcf_ct_handle_fragments() returns an error other than -EINPROGRES=
+S
+>> > (e.g. -EINVAL from malformed fragments), tcf_ct_act() jumps to out_fra=
+g
+>> > which unconditionally returns TC_ACT_CONSUMED. This tells the caller t=
+he
+>> > skb was consumed, but it was not freed, leaking one skb per malformed
+>> > fragment.
+>> >
+>> > TC_ACT_CONSUMED is only correct for -EINPROGRESS, where defragmentatio=
+n
+>> > is genuinely in progress and the skb has been queued. For all other
+>> > errors the skb is still owned by the caller and must be freed via
+>> > TC_ACT_SHOT.
+>> >
+>> > Fixes: 3f14b377d01d ("net/sched: act_ct: fix skb leak and crash on ooo=
+ frags")
+>> > Signed-off-by: Dudu Lu <phx0fer@gmail.com>
+>>
+>> Do you have a reproducer? Always helps adding at least a tdc test.
+>> Also: How did you find this issue? was it AI? If yes, please add the
+>> tag "Assisted-by:<AI name here>"
+>>
+>> cheers,
+>> jamal
+>>
+>> > ---
+>> >  net/sched/act_ct.c | 4 +++-
+>> >  1 file changed, 3 insertions(+), 1 deletion(-)
+>> >
+>> > diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
+>> > index 7d5e50c921a0..870655f682bd 100644
+>> > --- a/net/sched/act_ct.c
+>> > +++ b/net/sched/act_ct.c
+>> > @@ -1107,8 +1107,10 @@ TC_INDIRECT_SCOPE int tcf_ct_act(struct sk_buff=
+ *skb, const struct tc_action *a,
+>> >         return retval;
+>> >
+>> >  out_frag:
+>> > -       if (err !=3D -EINPROGRESS)
+>> > +       if (err !=3D -EINPROGRESS) {
+>> >                 tcf_action_inc_drop_qstats(&c->common);
+>> > +               return TC_ACT_SHOT;
+>> > +       }
+>> >         return TC_ACT_CONSUMED;
+>> >
+>> >  drop:
+>> > --
+>> > 2.39.3 (Apple Git-145)
+>> >
 
