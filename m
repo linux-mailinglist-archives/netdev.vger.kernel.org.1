@@ -1,319 +1,275 @@
-Return-Path: <netdev+bounces-281148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281149-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +EwuKJzv7WmYpAAAu9opvQ
-	(envelope-from <netdev+bounces-281148-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 12:57:32 +0200
+	id 6MSVCA7w7WmYpAAAu9opvQ
+	(envelope-from <netdev+bounces-281149-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 12:59:26 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09C51469776
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 12:57:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4370046978D
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 12:59:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6DEB330137A2
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 10:57:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3B496300C03B
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 10:59:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6674B314A9E;
-	Sun, 26 Apr 2026 10:57:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C041935028C;
+	Sun, 26 Apr 2026 10:59:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P1tZAW6L"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="B08oLEGj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 996E834F24B
-	for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 10:57:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EB612D781B
+	for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 10:59:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.182
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777201026; cv=pass; b=qWZzdUttV7sbl+pWN2RVZss65e0bK6Is8DQOB2ZtYoBaWeLwamZORhhL/17tz/TP5nppE3KC2Cb3mXSMJ5bwxGmnjQYui2NUKj/pw5nZEczjKYtnl8VkkELBTgBIZud8Uuvs4uLZZGLNI2op/vUlS77aAlfxEq9wBjB95lHXG9E=
+	t=1777201158; cv=pass; b=P761u7LWpubxJNpg2AneuX32Bo19zC+6PiOianeJzW/6WjiDJNc1fIA5kOcHeu2Qs6iwkQrZRW2S3IlUWex60jE8H88dVbQfJ1+87ECSAuq/8u+EztXba8l+W6bcFqe+WvqhajRc6vHQ3OIa488RliLb4pEfbLDu3o5sTkr8aP4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777201026; c=relaxed/simple;
-	bh=X38cTerivhNHU1J9r4lUFXkdCuAqrMGRnWfCp7e1Rm0=;
+	s=arc-20240116; t=1777201158; c=relaxed/simple;
+	bh=QzJaR5J8RyQ1tSvYBbCR8p3++ETasbsBmRkAIgSzkcU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hQ4otj38ODG6IpfRCtevhCUvepY6VZ3a5c4gPazM9TPQO9V4eIsOA0Ww1uf/EMLKQHF0MBvVqf3VxdDtK0t4ORgtQCjE7ufF1DuH4Pti7zu+6Gng6yWcb0HSlNoY/oE5y8zL1fdHERAuVRIETI5uRc2zt24SYuLkuuLLYc1mL20=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P1tZAW6L; arc=pass smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6720c7968e4so6493300a12.0
-        for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 03:57:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777201023; cv=none;
+	 To:Cc:Content-Type; b=rydun17x3UTv16KDtpNQIkIjEbtQUZVC9EHjOKyeTekjJz8UlfPD74dNjm4URiqWKspsrk3m6PahYm5uZlsCc8kqyxhVB/gxKZdWMGVGXWell7hyftz+Qwwr12jPRi3R5OLU8N7NjjomLcUtDUw4XSdCuheGdqt08gm5UnTiLfE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=B08oLEGj; arc=pass smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-824c9da9928so4514484b3a.3
+        for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 03:59:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777201156; cv=none;
         d=google.com; s=arc-20240605;
-        b=NwwJrI8YQZ4YJnyp+uzoTQkucivOgO5MRV1xZEDTViXCiMw+eXjjNUUxyoP7aB8j1M
-         jsjRkfy6D7YdrGTxdPxDSjvrbuU1lqzf8cWXHv3PPKYHGt6+gk2R2LaCFM7Lrfax40j0
-         XW5UaEXBtRCVKkhOuoXRxs4CXQHJFi4Jw6VJQa4DccHiy5JKI7y83T5Lb0rAJWtbQK8v
-         ptANnk34lmXlcOrDjTF9cB1K4wEvdK5Gw70YUCWPdPie54LiCc5c5H0roCIoBZwtTZkj
-         a+qWrZMlu1TW/Qjx8l++zp8J6fp4FRp2IN/WySqyKgxN6F9kisms1rHrlCe6UmN7e8ui
-         aXLw==
+        b=c6DRRVX9aGz6TYQCVUQMIKsxZb1t2BPRZG/cqBOLO1+F73iy6wPQTYVL5RIiZ97NgE
+         llBElXDgutfdCRvJbE4OeeYQdmdCt5vRbCDmHGhh56TBTPoo8ziblmEuqp2q0oNMsbxZ
+         eSuIJajHrf5JtyLZBeUIR8LWGT5bOV2AGGrUHrbRipK5A+l94MVGMg/f8WMBfk0UagdQ
+         575FA/8LlKxorQgNpIM7ZIQVwl9UXAynzZ1aSlspVQOHO4Jsy5CQkEU7vkCLSNbzCYwW
+         JQFPDeD8Ct6RlS5G0uoQB2HRU6uXGlCNXZl5o1VSo+O7Ahy+aWYo9I+Hp6gubPcweonG
+         r7MA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=FAsbbL0BHO216A/DQubjOAaFJLCW1lvrbacZy8+D6FU=;
-        fh=6a5yv+NmAX13BqViXXOV851Ls1DQwledRclEOR2007w=;
-        b=PDVbSJ50QbwzEHzEYzJ9y8fkx8xwZAWk9qFZJK7e8aM/1VchdhQKTFFLXsjgZHaq7H
-         apCuLG/z8dh4opRQIcq6OfEakmJPUcfi4gfJvDuDmtv+8BHa1Xr7jOgyOvkQ/swjHEAw
-         QFBFBReSDIaOWh0+u2k3BPmjjSo1ih85UjQ1LjA6NmqO52PPhqGi4rQ4RzOlR2pcttvY
-         Qsk+A8HhaepqFkKetzUG5mQ+dhDYuSyncVVqGRJGWXX4/XRQoNBGKjw1E+llyO3fApza
-         IpIX9iHDo9a7uFqCmVv0HOCFQZiM7r0OrHPdu+auUp+0UBj8o6UX9t6BjvkbFbNt+sgs
-         IkQQ==;
+        bh=Z43G+siVNfTfqwol+9vvew4HXuMyxWOD6fgODyjOUvQ=;
+        fh=EruPg5Y70NE1t78oFrq3qtkEKbniGc9twGTxhhTnna8=;
+        b=Bdx6lgu27DA/Nu1WB99Fx1NymeN3rSA5aDpCnEJR89PrfMF30G/w4jMn3TvRLsGyMg
+         rKWTzM8fCOQMkyrbucu1SUFpQm2MSKc8rWv00h9q6dqiBKsqXA+Jj//iBiEuzZZbo8L+
+         ULPxlmKY3T3L5IEs/NLtnaPrZrb/2XfaIUwihs2fGwNASrTXSkA28C574USNnfiJx5v6
+         AcJ1+MaQL4MGFjUX7mfinpsl6KM5wokkGBR+7iNPew+0Tr5AOkthtFU4REVwdhtK0DDy
+         g+RW8BaJx3ya2sbGvfzfWBIAtCbq6pSUIxAGJK3FDZwLfulsUdVZ4WrSq293h4EQz49V
+         +8ig==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777201023; x=1777805823; darn=vger.kernel.org;
+        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1777201156; x=1777805956; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FAsbbL0BHO216A/DQubjOAaFJLCW1lvrbacZy8+D6FU=;
-        b=P1tZAW6LBUr2sEffaV7MGD5XcdQ2iLSHL3XPDDK4Pw5yR0rncHdPuqWtgiLdWWtbzw
-         c4Flphm1M3X+9hvTB3iZyKwARZCQkxFtwa1FufzOzPnCVFk/G1jGtvJvbiwWwtZxuKij
-         doa1rq1wO1J2F5TtpGuZSYXUK6TZjLeiegEc0AA1nyssZZ7yBVaLutQVA0pD/GjQR8xH
-         w160RCDrEn8olxk+tGlBXGprxdMq/Euy64ylyBKMpXCbST4fvP+TxGbWdIgrfzR3IP1k
-         0xGzRPosUGd0I7Uk/JC9EN4ycXUWz9p9C2B7N6EZKDvRhAQHmvvgrK8DfPE4aQhLlymv
-         auVw==
+        bh=Z43G+siVNfTfqwol+9vvew4HXuMyxWOD6fgODyjOUvQ=;
+        b=B08oLEGj/zc12Ig6OaXkOTVYSJcqLydB+YVE9o1A6uO4L1/YnkefZaBQ6W8RNaoHcf
+         vu6XB7WSzmX34fTDGkvo56i8YHnY8lqI15kH+NU5L2chPGStXtdS494PDFvZ3TNBAUju
+         lKqWYgbnAR47FuWb0+nWmGLganAeIAXxYbBCSeFypb9onrsjjIsrOuLbIoNoDKp592DY
+         jXMoCWfIuN5UPNEB6uvx+2opwUOZMwkvCY6wCvjXKzVbLwXSJu9R1lfURZvVigK9rmrU
+         LdSOwGHrtwrlH7fzyjb6AgdJ7XdRh6TgbagRVpTHY8JQ4XvjGdPN/4MwaG0zNgK9ozss
+         dhKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777201023; x=1777805823;
+        d=1e100.net; s=20251104; t=1777201156; x=1777805956;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=FAsbbL0BHO216A/DQubjOAaFJLCW1lvrbacZy8+D6FU=;
-        b=qk27+vTmh5cyLMge2D/JWPc88locu9Jl2HFcuj2T+VERVrL0DVLTbSiXst1270HNm/
-         AoMCGQDtTdMLual0gL/BYqfNDCioav2Yuw3WnRuojGxlM6WV6b0aWA8ooQU03Zc5XpGr
-         nPJe+dZfM4XZG+yqHJFL/A6ClQbHPXsKk0EjcI+4fw6PzwZu5vQovSvO+EokXM8UYAxX
-         9PoeCk3iYg6lTASb3/eTAIE9RZDSQruA/Zxu3A1Nc9Zzf42/Xj9agRN3xTL31SKR8C81
-         TW3A0dahLMqJVhr2gu1YHYn2E5Bc6J+pAyuoEGjudxF2wDi0JPhpMv0MADhr/G79DUc7
-         R/Gg==
-X-Forwarded-Encrypted: i=1; AFNElJ/CDTSgeDVCAGYIN6M+UFVZ1FqNAdrnEr1iSunJkty7wJVNjxHigOO9qYHVpOpJnaos1iq1tOs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1vN0HoPWeHchZYEvqxnBQ11kBJYXhfAxkmI+d9gWr/qYf48J3
-	HjNOHxI1auOsNMI+jqg7Zr2gt/BIclwE0k2Z6/11fCvNyG3I5jPIi2YJCi70lC0BRgl77l1YZ1y
-	9qk9PF3xvAoZ4GumltfvLROLJeVRAv1k=
-X-Gm-Gg: AeBDieuTQ9nM27AqlMnzyhF+Not5sN6L0gMhffinldaZ/jUvzCY4YV6mzqRgj5eo6JV
-	NSmnyYcOBb09e9sn8GCEAkG1l+j4JN9kE8m91d+jGdESaJOssxLt3DeiphT+X8XBces/9A2p0aX
-	1UC4hrMmnWffhjtpt4fY/gRSRNgPLtUvFFvZtQlF5K+whEBBrF5V+zmNMS/MYSldegAK69KjWAT
-	lPzSEkXV+Y7MBnTXRzdffT2rGaqzwR9t+j88Ky1/z3slTmwsolXRHwalRKJ2U/h1MrOCfmsyPje
-	/IUFww==
-X-Received: by 2002:a05:6402:24d7:b0:672:c664:38d8 with SMTP id
- 4fb4d7f45d1cf-672c6643c80mr10597594a12.2.1777201022428; Sun, 26 Apr 2026
- 03:57:02 -0700 (PDT)
+        bh=Z43G+siVNfTfqwol+9vvew4HXuMyxWOD6fgODyjOUvQ=;
+        b=JN8Y2s9GYRBS/crp7VRTqw6u9A55TBdEf9fXhvfnnaNTxG9eEE/P3RkAPdGcIux27t
+         m5d8Fpn9AIObrjkJvNo4kf0b/Bx9fjKjFl8xr5FmdZ6c5FjNxMwjFWbhwqnhypwFCz/q
+         dFA7SZk/1jx8iz7AyKeTX+Tyu9tTMY4duceWwZtJnE707HuzhFFT4NhGXQ5UCKoDtjmE
+         sIQfle5H+q6QD5yw9GK7cu9PVcOOgN6NXIcRJHAwYyrGUldwwyt3AiDfl2syUkx8anKq
+         dqtn+m2HlHac4RYuhNdfNRtRwsmwa4kSXFr5+KlidrkCgnJZm7iOfcWmnyJtCCi6l8Sy
+         lF9g==
+X-Forwarded-Encrypted: i=1; AFNElJ/B894IZJJvxdKZr9ZThBma1aB2+WlFqN6TcQ09WlSBYRRZ6Io6bKY7sGF+K3HkiWA0wxkp7i8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKCA3Nn0RxXFrlORLEy0iNkMfsGMnbNRLq0Z0icOBUpPAJ+Ea+
+	h9Chem2lsdDFUBDJut/X4wY0G+3F9GFwZl+8oiCksgUjmZi0ZpyMuiJ1//x5HB7hc3MnshvoT3k
+	SoHVdYOgbx7DjQQon+bf8JsDZdM1AwJE5xr+WDOlQ
+X-Gm-Gg: AeBDietlHNRzuXKqJjx/x61PURCJsinsZSaLdE2mj5OCar4jWgwEEqYxssIouBVBKz2
+	Nk/R2AMoyAA2B3MA0H5TkYaytZ/UQbHrlhhMPzDUGHGFnt5dGZ4RCBByJOPtID0toAc0qzLaPQM
+	9Vd+cxo+tvn92P43cUnOy0mkMubduWvPOOXJvxEJ7iMJiaSUrgOSjzRKLBhjm6dAJABMP+ssW3b
+	yw2e4Hj4M7vqY0+MWBI6Yemsefkip95xzbWLtBxUwobE+RdesYGWCFwMpy16Vu4bYzBIQ8Vwcpp
+	0D97NsbFDSYQkbE07iWmHEF/yojtUBDUINpNgiDW
+X-Received: by 2002:a05:6a00:1bc6:b0:82f:1b1b:e166 with SMTP id
+ d2e1a72fcca58-82f8c99159emr41296406b3a.33.1777201156605; Sun, 26 Apr 2026
+ 03:59:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260425075521.736328-1-daniel@iogearbox.net> <b50025ba-c59d-4575-a790-fdaf0a48961d@gmail.com>
- <90c7de29-2641-413d-9d5f-5eb323cf875c@iogearbox.net>
-In-Reply-To: <90c7de29-2641-413d-9d5f-5eb323cf875c@iogearbox.net>
-From: saeed bishara <saeed.bishara.os@gmail.com>
-Date: Sun, 26 Apr 2026 13:56:50 +0300
-X-Gm-Features: AVHnY4JE3FI-RH8cFOZUZUhlgG6FGEpf5tEZ4C2LTLRePqAAsfcg1n2brxTBPL0
-Message-ID: <CAHfVqdVmUf189n0vxZXmzBH0+Cum0m_xZP74Vkdx4OReGyNDBw@mail.gmail.com>
-Subject: Re: [PATCH net v2] ipv6: Implement limits on extension header parsing
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Justin Iurman <justin.iurman@gmail.com>, kuba@kernel.org, edumazet@google.com, 
-	dsahern@kernel.org, tom@herbertland.com, willemdebruijn.kernel@gmail.com, 
-	idosch@nvidia.com, pabeni@redhat.com, netdev@vger.kernel.org
+References: <20260422161958.2517539-2-bestswngs@gmail.com> <20260422161958.2517539-3-bestswngs@gmail.com>
+In-Reply-To: <20260422161958.2517539-3-bestswngs@gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Sun, 26 Apr 2026 06:59:05 -0400
+X-Gm-Features: AQROBzDdlUOYkMaP9cdvY9lBi6RpAH3mvy83bOI6hcc8joAewAsu9FYK5nmnDUU
+Message-ID: <CAM0EoMka18Lsu94wTFZU3ntXP9Z3vNy0Get+=THPdsCafcoPnw@mail.gmail.com>
+Subject: Re: [PATCH net v5 1/2] net/sched: taprio: fix NULL pointer
+ dereference in class dump
+To: Weiming Shi <bestswngs@gmail.com>
+Cc: vinicius.gomes@intel.com, jiri@resnulli.us, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	vladimir.oltean@nxp.com, shuah@kernel.org, xmei5@asu.edu, 
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 09C51469776
+X-Rspamd-Queue-Id: 4370046978D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [3.34 / 15.00];
+	SEM_URIBL(3.50)[asu.edu:email];
 	MAILLIST(-0.15)[generic];
+	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281148-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	R_DKIM_ALLOW(0.00)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
+	DMARC_NA(0.00)[mojatatu.com];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,google.com,herbertland.com,nvidia.com,redhat.com,vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281149-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.787];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[saeedbisharaos@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,asu.edu:email]
 
-On Sun, Apr 26, 2026 at 1:38=E2=80=AFPM Daniel Borkmann <daniel@iogearbox.n=
-et> wrote:
+On Wed, Apr 22, 2026 at 12:20=E2=80=AFPM Weiming Shi <bestswngs@gmail.com> =
+wrote:
 >
-> Hi Justin,
+> When a TAPRIO child qdisc is deleted via RTM_DELQDISC, taprio_graft()
+> is called with new =3D=3D NULL and stores NULL into q->qdiscs[cl - 1].
+> Subsequent RTM_GETTCLASS dump operations walk all classes via
+> taprio_walk() and call taprio_dump_class(), which calls taprio_leaf()
+> returning the NULL pointer, then dereferences it to read child->handle,
+> causing a kernel NULL pointer dereference.
 >
-> On 4/25/26 12:19 PM, Justin Iurman wrote:
-> > On 4/25/26 09:55, Daniel Borkmann wrote:
-> >> ipv6_{skip_exthdr,find_hdr}() and ip6_{tnl_parse_tlv_enc_lim,
-> >> protocol_deliver_rcu}() iterate over IPv6 extension headers until they
-> >> find a non-extension-header protocol or run out of packet data. The
-> >> loops have no iteration counter, relying solely on the packet length
-> >> to bound them. For a crafted packet with 8-byte extension headers
-> >> filling a 64KB jumbogram, this means a worst case of up to ~8k
-> >> iterations with a skb_header_pointer call each. ipv6_skip_exthdr(),
-> >> for example, is used where it parses the inner quoted packet inside
-> >> an incoming ICMPv6 error:
-> >>
-> >>    - icmpv6_rcv
-> >>      - checksum validation
-> >>      - case ICMPV6_DEST_UNREACH
-> >>        - icmpv6_notify
-> >>          - pskb_may_pull()       <- pull inner IPv6 header
-> >>          - ipv6_skip_exthdr()    <- iterates here
-> >>          - pskb_may_pull()
-> >>          - ipprot->err_handler() <- sk lookup
-> >>
-> >> The per-iteration cost of ipv6_skip_exthdr itself is generally
-> >> light, but skb_header_pointer becomes more costly on reassembled
-> >> packets: the first ~1232 bytes of the inner packet are in the skb's
-> >> linear area, but the remaining ~63KB are in the frag_list where
-> >> skb_copy_bits is needed to read data.
-> >>
-> >> Add a configurable limit via a new sysctl net.ipv6.max_ext_hdrs_number
-> >> (default 8, minimum 1). All four extension header walking functions
-> >> are bound by this limit. The sysctl is in line with commit 47d3d7ac656=
-a
-> >> ("ipv6: Implement limits on Hop-by-Hop and Destination options").
-> >> As documented, init_net is used to derive max_ext_hdrs_number to
-> >> be consistent given a net cannot always reliably be retrieved.
-> >>
-> >> Note that the check in ip6_protocol_deliver_rcu() happens right
-> >> before the goto resubmit, such that we don't have to have a test
-> >> for ipv6_ext_hdr() in the fast-path.
-> >>
-> >> There's an ongoing IETF draft-iurman-6man-eh-occurrences to enforce
-> >> IPv6 extension headers ordering and occurrence. The latter also
-> >> discusses security implications. As per RFC8200 section 4.1, the
-> >> occurrence rules for extension headers provide a practical upper
-> >> bound, thus 8 was used as the default.
-> >>
-> >> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> >> ---
-> >>   v1->v2:
-> >>     - Set the default to 8 (Justin)
-> >>     - Update IETF references (Justin)
-> >>     - Add core path coverage as well (Justin)
-> >>
-> >>   Documentation/networking/ip-sysctl.rst |  7 +++++++
-> >>   include/net/dropreason-core.h          |  6 ++++++
-> >>   include/net/ipv6.h                     |  2 ++
-> >>   include/net/netns/ipv6.h               |  1 +
-> >>   net/ipv6/af_inet6.c                    |  1 +
-> >>   net/ipv6/exthdrs_core.c                | 11 +++++++++++
-> >>   net/ipv6/ip6_input.c                   |  6 ++++++
-> >>   net/ipv6/ip6_tunnel.c                  |  5 +++++
-> >>   net/ipv6/sysctl_net_ipv6.c             |  8 ++++++++
-> >>   9 files changed, 47 insertions(+)
-> >>
-> >
-> > [snip]
-> >
-> >> diff --git a/net/ipv6/ip6_input.c b/net/ipv6/ip6_input.c
-> >> index 967b07aeb683..a5bbbc16e8d7 100644
-> >> --- a/net/ipv6/ip6_input.c
-> >> +++ b/net/ipv6/ip6_input.c
-> >> @@ -403,8 +403,10 @@ INDIRECT_CALLABLE_DECLARE(int tcp_v6_rcv(struct s=
-k_buff *));
-> >>   void ip6_protocol_deliver_rcu(struct net *net, struct sk_buff *skb, =
-int nexthdr,
-> >>                     bool have_final)
-> >>   {
-> >> +    int exthdr_max =3D READ_ONCE(init_net.ipv6.sysctl.max_ext_hdrs_cn=
-t);
-> >>       const struct inet6_protocol *ipprot;
-> >>       struct inet6_dev *idev;
-> >> +    int exthdr_cnt =3D 0;
-> >>       unsigned int nhoff;
-> >>       SKB_DR(reason);
-> >>       bool raw;
-> >> @@ -487,6 +489,10 @@ void ip6_protocol_deliver_rcu(struct net *net, st=
-ruct sk_buff *skb, int nexthdr,
-> >>                   nexthdr =3D ret;
-> >>                   goto resubmit_final;
-> >>               } else {
-> >> +                if (unlikely(exthdr_cnt++ >=3D exthdr_max)) {
-from performance perspective, isn't it better to have single variable
-that initialized to max_ext_hdrs_cnt then decremented until reaches
-zero? that will take less cpu cycles and variables
-> >> +                    SKB_DR_SET(reason, IPV6_TOO_MANY_EXTHDRS);
-> >> +                    goto discard;
-> >> +                }
-> >>                   goto resubmit;
-> >>               }
-> >>           } else if (ret =3D=3D 0) {
-> >
-> > The hop-by-hop options header (if present) is not taken into account ba=
-sed on the above. However, the max number of extension headers (implicitly =
-7***, as per RFC 8200 Section 4.1) must include it. I suggest adding this a=
-t the beginning of ip6_protocol_deliver_rcu():
-> >
-> > struct inet6_skb_parm *opt =3D IP6CB(skb);
-> >
-> > if (opt->flags & IP6SKB_HOPBYHOP)
-> >      exthdr_cnt++;
-> >
-> > *** FYI, rounding to 8 is fine for this fix
+> The bug is reachable with namespace-scoped CAP_NET_ADMIN on any kernel
+> with CONFIG_NET_SCH_TAPRIO enabled. On systems with unprivileged user
+> namespaces enabled, an unprivileged local user can trigger a kernel
+> panic by creating a taprio qdisc inside a new network namespace,
+> grafting an explicit child qdisc, deleting it, and requesting a class
+> dump. The RTM_GETTCLASS dump itself requires no capability.
 >
-> Ok, ack, I'll look into adding that in a v3.
+>  Oops: general protection fault, probably for non-canonical address 0xdff=
+ffc0000000007: 0000 [#1] SMP KASAN NOPTI
+>  KASAN: null-ptr-deref in range [0x0000000000000038-0x000000000000003f]
+>  RIP: 0010:taprio_dump_class (net/sched/sch_taprio.c:2478)
+>  Call Trace:
+>   <TASK>
+>   tc_fill_tclass (net/sched/sch_api.c:1966)
+>   qdisc_class_dump (net/sched/sch_api.c:2326)
+>   taprio_walk (net/sched/sch_taprio.c:2514)
+>   tc_dump_tclass_qdisc (net/sched/sch_api.c:2352)
+>   tc_dump_tclass_root (net/sched/sch_api.c:2370)
+>   tc_dump_tclass (net/sched/sch_api.c:2431)
+>   rtnl_dumpit (net/core/rtnetlink.c:6864)
+>   netlink_dump (net/netlink/af_netlink.c:2325)
+>   rtnetlink_rcv_msg (net/core/rtnetlink.c:6959)
+>   netlink_rcv_skb (net/netlink/af_netlink.c:2550)
+>   </TASK>
 >
-> >> diff --git a/net/ipv6/sysctl_net_ipv6.c b/net/ipv6/sysctl_net_ipv6.c
-> >> index d2cd33e2698d..93f865545a7c 100644
-> >> --- a/net/ipv6/sysctl_net_ipv6.c
-> >> +++ b/net/ipv6/sysctl_net_ipv6.c
-> >> @@ -135,6 +135,14 @@ static struct ctl_table ipv6_table_template[] =3D=
- {
-> >>           .extra1        =3D SYSCTL_ZERO,
-> >>           .extra2        =3D &flowlabel_reflect_max,
-> >>       },
-> >> +    {
-> >> +        .procname    =3D "max_ext_hdrs_number",
-> >> +        .data        =3D &init_net.ipv6.sysctl.max_ext_hdrs_cnt,
-> >> +        .maxlen        =3D sizeof(int),
-> >> +        .mode        =3D 0644,
-> >> +        .proc_handler    =3D proc_dointvec_minmax,
-> >> +        .extra1        =3D SYSCTL_ONE,
-> >> +    },
-> >>       {
-> >>           .procname    =3D "max_dst_opts_number",
-> >>           .data        =3D &init_net.ipv6.sysctl.max_dst_opts_cnt,
-> >
-> > I've given it a lot of thought. I came to the conclusion that we should=
- use a hard-coded value here as well (just like we did for 076b8cad77aa, wi=
-th the same logic), not a sysctl. IMO, the main reason is that it provides =
-as is a suitable security fix to be backported, i.e., the max value is the =
-max number of EHs allowed by RFC 8200, Section 4.1. Also, we remain consist=
-ent with draft-iurman-6man-eh-occurrences (I think Tom is about to send a r=
-evision of the series soon for net-next). What this series does is not only=
- enforcing ordering, but also verifying the specific number of occurrences =
-for each type of Extension Header. Which is totally compatible with what th=
-is patch does, i.e., limiting the total number of Extension Headers (regard=
-less of their types) to 8. I guess what I'm trying to say is that it seems =
-like a good plan/compromise and that the aforementioned series would build =
-perfectly on top of this fix.
+> Fix this by substituting &noop_qdisc when new is NULL in
+> taprio_graft(), a common pattern used by other qdiscs (e.g.,
+> multiq_graft()) to ensure the q->qdiscs[] slots are never NULL.
+> This makes control-plane dump paths safe without requiring individual
+> NULL checks.
 >
+> Since the data-plane paths (taprio_enqueue and taprio_dequeue_from_txq)
+> previously had explicit NULL guards that would drop/skip the packet
+> cleanly, update those checks to test for &noop_qdisc instead. Without
+> this, packets would reach taprio_enqueue_one() which increments the root
+> qdisc's qlen and backlog before calling the child's enqueue; noop_qdisc
+> drops the packet but those counters are never rolled back, permanently
+> inflating the root qdisc's statistics.
 >
-> Initially, I had a hard-coded constant (when it was still 32), but Eric's=
- comment
-> was to rather go with a sysctl, such that if someone unexpectedly complai=
-ns, then
-> there is still a chance for that person to fix it up via sysctl without h=
-aving to
-> rebuild the kernel. I'm okay either way, but presumably given we're now b=
-eing more
-> "aggressive" into lowering the default to 8 rather than 32 then having su=
-ch a fall-
-> back is probably better.
+> After this change *old can be a valid qdisc, NULL, or &noop_qdisc.
+> Only call qdisc_put(*old) in the first case to avoid decreasing
+> noop_qdisc's refcount, which was never increased.
 >
-> Thanks,
-> Daniel
+> Fixes: 665338b2a7a0 ("net/sched: taprio: dump class stats for the actual =
+q->qdiscs[]")
+> Reported-by: Xiang Mei <xmei5@asu.edu>
+> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+> Assisted-by: Claude:claude-opus-4-6
+
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+
+Please add Tested-by: if you tested it with the tdc patch in 2/2
+
+cheers,
+jamal
+> ---
+>  net/sched/sch_taprio.c | 13 ++++++++-----
+>  1 file changed, 8 insertions(+), 5 deletions(-)
+>
+> diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
+> index 8e37528119506..a7daf34593e07 100644
+> --- a/net/sched/sch_taprio.c
+> +++ b/net/sched/sch_taprio.c
+> @@ -634,7 +634,7 @@ static int taprio_enqueue(struct sk_buff *skb, struct=
+ Qdisc *sch,
+>         queue =3D skb_get_queue_mapping(skb);
+>
+>         child =3D q->qdiscs[queue];
+> -       if (unlikely(!child))
+> +       if (unlikely(child =3D=3D &noop_qdisc))
+>                 return qdisc_drop(skb, sch, to_free);
+>
+>         if (taprio_skb_exceeds_queue_max_sdu(sch, skb)) {
+> @@ -717,7 +717,7 @@ static struct sk_buff *taprio_dequeue_from_txq(struct=
+ Qdisc *sch, int txq,
+>         int len;
+>         u8 tc;
+>
+> -       if (unlikely(!child))
+> +       if (unlikely(child =3D=3D &noop_qdisc))
+>                 return NULL;
+>
+>         if (TXTIME_ASSIST_IS_ENABLED(q->flags))
+> @@ -2183,6 +2183,9 @@ static int taprio_graft(struct Qdisc *sch, unsigned=
+ long cl,
+>         if (!dev_queue)
+>                 return -EINVAL;
+>
+> +       if (!new)
+> +               new =3D &noop_qdisc;
+> +
+>         if (dev->flags & IFF_UP)
+>                 dev_deactivate(dev, false);
+>
+> @@ -2196,14 +2199,14 @@ static int taprio_graft(struct Qdisc *sch, unsign=
+ed long cl,
+>         *old =3D q->qdiscs[cl - 1];
+>         if (FULL_OFFLOAD_IS_ENABLED(q->flags)) {
+>                 WARN_ON_ONCE(dev_graft_qdisc(dev_queue, new) !=3D *old);
+> -               if (new)
+> +               if (new !=3D &noop_qdisc)
+>                         qdisc_refcount_inc(new);
+> -               if (*old)
+> +               if (*old && *old !=3D &noop_qdisc)
+>                         qdisc_put(*old);
+>         }
+>
+>         q->qdiscs[cl - 1] =3D new;
+> -       if (new)
+> +       if (new !=3D &noop_qdisc)
+>                 new->flags |=3D TCQ_F_ONETXQUEUE | TCQ_F_NOPARENT;
+>
+>         if (dev->flags & IFF_UP)
+> --
+> 2.43.0
 >
 
