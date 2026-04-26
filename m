@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-281166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281167-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kA6wLqIk7mn0qwAAu9opvQ
-	(envelope-from <netdev+bounces-281166-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 16:43:46 +0200
+	id UE3GBZck7mn0qwAAu9opvQ
+	(envelope-from <netdev+bounces-281167-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 16:43:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2137C46A64A
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 16:43:46 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16E6B46A635
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 16:43:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0201E301A710
-	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 14:43:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4203B3005327
+	for <lists+netdev@lfdr.de>; Sun, 26 Apr 2026 14:43:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25491367F3D;
-	Sun, 26 Apr 2026 14:43:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83EC5366074;
+	Sun, 26 Apr 2026 14:43:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kLZgChtG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D3AqaEBx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99643365A18
-	for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 14:43:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2F6366546
+	for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 14:43:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777214591; cv=none; b=L5Se4VAlreawEEPpKjUAVccVb4+RFJoCd78gexIP/BV7uQ5o+dyF0Ybm/769JF8G1o1qQ0w166uibxu7YsQsgImJhhIezfIxPlCb3l/jIz35gUGMttGJ5s3+oqoj/EPTcwVe0pGMI6wNWM+64y7J/WDDLRQJkKyeC1Rks4LE3ik=
+	t=1777214592; cv=none; b=Ih7oMuMRqC/RJUns2f7rOFdDmigY5JOYgWw7vPPNpMkw8kvng3S3SlRuKSSUEWBjp/Ur96V3igc0zOmKGdhcSe7cIrecw0wAaZBmCoNvCiEEhTByz5yiUQK7jn8JeHP5ShPIF8Ogxh9inw8qg7r7n+bXdGym40+OLMun7CwfeuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777214591; c=relaxed/simple;
-	bh=r6IW2Vxqif4eP3VQmis8+qHG2ez7xshZW7LUio3QdpI=;
+	s=arc-20240116; t=1777214592; c=relaxed/simple;
+	bh=GTNaJU5rfiK/7CNFGset7McFd/fW6p7Tcwie3dvvoTM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Aiwyp2CDKdA/wm69vVtULQXo5HiTO+zb1Y1q8qEBwzG0mCcr02MZnO4JyvoFoPU4JLxma9Fc04KzlgJXVUax9eMFfGBnbcqb3E+msx6tmicWbFvoENl5cnQ55oGGvhr9ZdNl6fp3CFk5665h6/PXZbx/4EcJCpV5Nxi+4EpmlQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kLZgChtG; arc=none smtp.client-ip=209.85.128.42
+	 MIME-Version; b=JmNihbVkOI2mcF6BBdEVvSPQh+fvTOt0DpztEDlpcVf0a8/jJ2Fvb283J6Frw7Dhjh2YEenKjZWu/flIzH8p63m1MBhLCAAV907rtZDAJo8UPYfvBRTqa9yrkb7h6ym217CibfhkBvfoPQN42TGPkVaa2qNtBuSiwVooe5Omnkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D3AqaEBx; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-488a88aeec9so116942995e9.2
-        for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 07:43:09 -0700 (PDT)
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4891e86fabeso98669945e9.1
+        for <netdev@vger.kernel.org>; Sun, 26 Apr 2026 07:43:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777214588; x=1777819388; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1777214589; x=1777819389; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9s1WYxPrrvK/oJoRsHuHHnoI8/Jk8XB2HAvh4QuaKcQ=;
-        b=kLZgChtGfuoe/1fxADWQr+ppuBG7DmX7oteFEIwJ2kQFt0g9FTasPFEpkMVd12FB1p
-         FGo+EWVzli5rhzCWArXoBgXMvSoR0MYk5IMAy7soAj5B0jeHQ2fVdy9q0JusJk0Lllp2
-         3LVYyiuCr8+f9wgifaFQ0r3Q7FbOCzIFuce6t5eAn6u1XuYuV+0bqqWUmPbs3CEYIEnq
-         83l3uhLtuwd6Nt8ImkVTKxlOExHgWuOyjSxCTEePMuDRzpbQl0CtJ2vauN5jn5hxxILs
-         0GffxVEzUrB+z4WERTpFAHPKNE/yF85A6BTG9I3o+oG8ARKNmi2mGOp9cfdIMvs+OIq0
-         PNcg==
+        bh=2KpsmARPAtRSvoDa9ymJ5i0W11MeQfCElgcBQa+2W2k=;
+        b=D3AqaEBxrIgQBPDf2orZ4mLmKmnzyer1H6/PBz8GoahCZHrkm9i201Fe/gpunZ7Gf5
+         suqIcZwmT07Z5Jg5pH/VpelOrgnw51964yiXFNV2jNBBxAUtm2iYms4uigklXOG5fgVX
+         11Aar0tIoMAkyl0+cKCRQr/e/BumPBEsEhbq2o7fpF3dGJnglcojHONwzsW26BHl2bMo
+         qSkEJdAPBqrdxh3UmjMcNzZpNvRokXQ8fSUsTR3D6P1jiFN7VKAzAeJNG+kAu6SzdJ/W
+         NqmjfmcpZnJjaW53FYtN4q+F2GB0S9SJ7SIDDpCphRJzMlPg4bUu4vy8hETUKaLpx+Yk
+         mQiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777214588; x=1777819388;
+        d=1e100.net; s=20251104; t=1777214589; x=1777819389;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=9s1WYxPrrvK/oJoRsHuHHnoI8/Jk8XB2HAvh4QuaKcQ=;
-        b=Gr32M1bJKaKh92txDDs1y2FEq66ZQKwtF32GZ9x1c2WyzkmtkCvP376PX6HPKM/CSy
-         xzoVD6TK2uKFv/lltLJKCMYshEZ/2bczl8+fVug8MCEA+lJkyqok1otgCtZHnZR92wII
-         YGvdtPLDm9nWvwso0T/uBqKTiR46eowlw+Fy2r/MVZISgofgjtgXwH87TTKo4UXJ8Y0B
-         i6tGzOp9hajtTGODzPd/fqADdBV2lJVFN9yctYbRHN9e/3gQfM5amLH5DXFi8BGDuNTk
-         VLVctPAQDLWCVJKxjG+ujO/wPIN4A7bIWyfjhZ4etjxcjRywLZySA1gjwfHrYwGRblD3
-         jN/Q==
-X-Gm-Message-State: AOJu0YxYEocGdfsqsyTNtHRrRbqsqboXiwYrFO5nGsI5mgBc/ERVODMt
-	JF6dk0zaH8Y2yLAztKwPh1ylhjePPA871ozJq2q8VOy6ykAVCRs7ID+ZOnU6yA==
-X-Gm-Gg: AeBDievgwVCzeEaxymsH/Uy96JjAmfnCOfvOSOV//zQLZetmeTAfdRFY6lL2Auv1uJE
-	sOQf8ifddk2tmOZrAN4gcPC4uFL3wDOM7hzt+kFeUdVWivq48iOBP3K5Sr1Kfcw8jqkYWS6rMUZ
-	f/kUao1POfc03A7+nxa1I/BODcQALGxSIfbNMcuCFuNAarZwmox2uCNJ1KDtPB5tJ1iX4ZOS6pH
-	pE4mmevThqsXdH+FcHQDeh8E1wxp+UmhzxboXFPCsQZgSrT87KuzCf/kPVMHtNidtJa3jzzTtsf
-	lRElB1SXPb5tAo+qj91wJ5+aWRlFXCupK9y0L24bKqRdAHtcOAo/eAUBfI4ezhCId+r6G223Y0d
-	qKIKy/GswkEMyB2pBfVIILJ5GN+Zgt5dMD6RNFtTh2J+HNJPEgup1RuEDA+Vt9hLi2GeORDGgRU
-	nIP5koH8CXH3eb04pv73LVKMUqyPipTbDmUoSuMNB+La4gxKFW7g2FiPn1tkwIsoJqJ1xpuZCUd
-	bK0HecpRUvaFSw=
-X-Received: by 2002:a05:600c:c10a:b0:483:2c98:4368 with SMTP id 5b1f17b1804b1-488fb771613mr428687215e9.18.1777214587716;
-        Sun, 26 Apr 2026 07:43:07 -0700 (PDT)
+        bh=2KpsmARPAtRSvoDa9ymJ5i0W11MeQfCElgcBQa+2W2k=;
+        b=s0wep9bBcqdEJHEBpZ6jSdpVf6m5etHMZKA3ynV+sl4xQCSPg8xFa/IUqgGUcdFanQ
+         FQdKjHQ+OarIvroJvPM+bOxpUs/sXk/5VsNFyZ9I0SGIJA710lIm5jZ7uAWAS8Rlyf/d
+         X0BHaWPvQH9quIfzt+TwAARAINojovJ+cEsIjUrfF5Bgvz3eXWkwss4VLt8pyThueSv6
+         6TTlGkkkxuBMvfAutnCIC7LVqe9Gsz4U81GkhphQE2Xo33VMXx2skJtMJt1v1J5WF8fI
+         /DRh0A9mYDxyzToRwc8QS/xIggGNGzkq0PeOyDqJGZWbLRhCuw1kw+Ud+59sUDKELGjj
+         086Q==
+X-Gm-Message-State: AOJu0Yy3wmkw2hf4vHOgMjSK9qVngrg5f1vwAekUjqwyKeVKPyXhfD5S
+	h30sazoXgxxANfUyiZfZiD/7vzNLWC6APh7C8F0qrdwiT97anVQvuP1gPn3JBA==
+X-Gm-Gg: AeBDievTsAAbbN8UPV+Nylz3E8v3f6vx4fEasByuoqntd7CCXQcOJit533FC278olzW
+	uVojvR8AWax8kwCoZQ+3XxKxTJfTvT9dJdOOUr3AGla++H52DtfJoVrgvd8Z2MNRCbOyeCKxmAw
+	qVTXK8aF3qYKlE23bPdIPpHzJJLw7EDKtBj8TJWCicv2DDjRfYu565BCCQKf/ynHNghgv7eGMrV
+	k7ZZZezvV5popn89owp5VusW5Pedm8+4abFtr95FUsXAB8eEXMPO3+hOvn7S8VgpDQWoe0ncPOG
+	aum50RVb9CJaNG9ehorcahrxzWDk5TEIZVPYwVmCJiHOjexj3Wwitp6AB2ENcZyqRsQyLbnr4Qv
+	Mdn8QEl28mxwXpwRvycE9A6/NRadD+HJH/Vjv3NKGxbEDhMxKR+n8VkqkF5bc2UF8ZOX+mE3xEF
+	g4UK/t8EY4qwaXPnmg+jMb+ImEhYSVU+Wc4tavVUx/4vMyqSJVPmQR/YK/KUl0LOaWnYYMwRB9z
+	b9DEBjVPZDULFE=
+X-Received: by 2002:a05:600c:3515:b0:488:8b99:54a1 with SMTP id 5b1f17b1804b1-488fb78e7c5mr542589465e9.28.1777214588545;
+        Sun, 26 Apr 2026 07:43:08 -0700 (PDT)
 Received: from ubuntu-f6bvp (lfbn-idf1-1-366-193.w86-195.abo.wanadoo.fr. [86.195.82.193])
         by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc18bccfsm658230335e9.8.2026.04.26.07.43.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Apr 2026 07:43:07 -0700 (PDT)
+        Sun, 26 Apr 2026 07:43:08 -0700 (PDT)
 From: Bernard Pidoux <bernard.f6bvp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: linux-hams@vger.kernel.org,
@@ -86,9 +86,9 @@ Cc: linux-hams@vger.kernel.org,
 	pabeni@redhat.com,
 	horms@kernel.org,
 	Bernard Pidoux <bernard.f6bvp@gmail.com>
-Subject: [PATCH net 1/5] rose: fix dev_put() leak in rose_loopback_timer()
-Date: Sun, 26 Apr 2026 16:43:01 +0200
-Message-ID: <20260426144305.984349-2-bernard.f6bvp@gmail.com>
+Subject: [PATCH net 2/5] rose: hold loopback neighbour reference across timer callback
+Date: Sun, 26 Apr 2026 16:43:02 +0200
+Message-ID: <20260426144305.984349-3-bernard.f6bvp@gmail.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260426144305.984349-1-bernard.f6bvp@gmail.com>
 References: <20260426144305.984349-1-bernard.f6bvp@gmail.com>
@@ -99,7 +99,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 2137C46A64A
+X-Rspamd-Queue-Id: 16E6B46A635
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
@@ -107,14 +107,14 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281166-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-281167-lists,netdev=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -130,58 +130,58 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-rose_rx_call_request() always consumes or returns the skb but never
-releases the device reference obtained from rose_dev_get().  When
-rose_rx_call_request() succeeds (returns non-zero) dev_put() was never
-called, leaking one reference per loopback CALL_REQUEST.
+rose_loopback_timer() dereferences rose_loopback_neigh throughout its
+body but holds no reference on it.  A concurrent rose_loopback_clear()
+followed by rose_add_loopback_neigh() could free and reallocate the
+neighbour while the timer body is running, causing a use-after-free.
 
-Move dev_put() outside the conditional so it is called unconditionally
-after rose_rx_call_request() in all cases.
+Take a reference with rose_neigh_hold() at the start of the callback
+(bailing out if the pointer is already NULL) and release it with
+rose_neigh_put() at the single exit point.  The neigh cannot be freed
+while the callback holds a reference.
 
-Also remove the dead check (!rose_loopback_neigh->dev &&
-!rose_loopback_neigh->loopback) that immediately precedes it: the
-loopback neighbour always has loopback=1 so this condition can never
-be true.
-
-Fixes: 0453c6824595 ("net/rose: fix unbound loop in rose_loopback_timer()")
+Fixes: d860d1faa6b2 ("net: rose: convert 'use' field to refcount_t")
 Tested-by: Bernard Pidoux <bernard.f6bvp@gmail.com>
 Signed-off-by: Bernard Pidoux <bernard.f6bvp@gmail.com>
 ---
- net/rose/rose_loopback.c | 11 ++---------
- 1 file changed, 2 insertions(+), 9 deletions(-)
+ net/rose/rose_loopback.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/net/rose/rose_loopback.c b/net/rose/rose_loopback.c
-index b538e39b3df5..914c8f453a1d 100644
+index 914c8f453a1d..d66913df360d 100644
 --- a/net/rose/rose_loopback.c
 +++ b/net/rose/rose_loopback.c
-@@ -96,22 +96,15 @@ static void rose_loopback_timer(struct timer_list *unused)
- 		}
+@@ -66,10 +66,15 @@ static void rose_loopback_timer(struct timer_list *unused)
+ 	unsigned int lci_i, lci_o;
+ 	int count;
  
- 		if (frametype == ROSE_CALL_REQUEST) {
--			if (!rose_loopback_neigh->dev &&
--			    !rose_loopback_neigh->loopback) {
--				kfree_skb(skb);
--				continue;
--			}
--
- 			dev = rose_dev_get(dest);
- 			if (!dev) {
- 				kfree_skb(skb);
- 				continue;
- 			}
- 
--			if (rose_rx_call_request(skb, dev, rose_loopback_neigh, lci_o) == 0) {
--				dev_put(dev);
-+			if (rose_rx_call_request(skb, dev, rose_loopback_neigh, lci_o) == 0)
- 				kfree_skb(skb);
--			}
-+			dev_put(dev);
- 		} else {
++	if (rose_loopback_neigh)
++		rose_neigh_hold(rose_loopback_neigh);
++	else
++		return;
++
+ 	for (count = 0; count < ROSE_LOOPBACK_LIMIT; count++) {
+ 		skb = skb_dequeue(&loopback_queue);
+ 		if (!skb)
+-			return;
++			goto out;
+ 		if (skb->len < ROSE_MIN_LEN) {
+ 			kfree_skb(skb);
+ 			continue;
+@@ -109,6 +114,10 @@ static void rose_loopback_timer(struct timer_list *unused)
  			kfree_skb(skb);
  		}
+ 	}
++
++out:
++	rose_neigh_put(rose_loopback_neigh);
++
+ 	if (!skb_queue_empty(&loopback_queue))
+ 		mod_timer(&loopback_timer, jiffies + 1);
+ }
 -- 
 2.51.0
 
