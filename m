@@ -1,302 +1,268 @@
-Return-Path: <netdev+bounces-281490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281491-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2MhaItTJ72knGAEAu9opvQ
-	(envelope-from <netdev+bounces-281490-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:40:52 +0200
+	id cAb/EaTJ72knGAEAu9opvQ
+	(envelope-from <netdev+bounces-281491-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:40:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEED747A26F
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:40:51 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 904DA47A212
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:40:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3BE0430DFDEE
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:34:31 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 16140300861A
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:39:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89073371881;
-	Mon, 27 Apr 2026 20:34:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB89374E47;
+	Mon, 27 Apr 2026 20:39:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EyoAQSF4"
+	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="mXaS/4S2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011019.outbound.protection.outlook.com [52.101.52.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 022E136167F
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 20:34:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15592C3252;
+	Mon, 27 Apr 2026 20:39:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.19
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777322070; cv=pass; b=AWgE3ZLqJ64+XSvKdQpIUsH8ZHavvaLFufSSSDfwfk0fArFA0kquSag3gdlhnFR1X8tdBw+Bgm7bcedTU2UQ+ast5bCo7YKddjZeIlo/CR89kwmCM9NZ+DVFpekIC8NObjGcFaxbkDxQBZwAcbDwb+0J16OvQSZpmvPCFWj/LSw=
+	t=1777322390; cv=fail; b=lEExJoaOBpcgPPXsxS/4cTksStJ/BFsFMhFYRkd3McATXeEFAF86XZ6dbAbxzlLTQ8oHyZ3Gkq14CqfcF+L7hHACUZF0g7hHWVFTqXSbuOC6mvy5aVDdhsk1ElkyCLaQIEJ4tFs9YR7Cdkdn5fHe63tCg+xWtWf533p6MKKYQIg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777322070; c=relaxed/simple;
-	bh=kwy89Iqv8OdEWQx8A5fdRS6NGhOJulrdk+r9Qn4GC2s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CEt9ZzvtAuuIY4osD9X5rSUYfsWj0m+lz915d1i/TVu3h6qSSqS0BwMBfRwmeyRIfh8+i9loZz4jrIE0nUSl6DxtTMlCPOrO5054CkDcMIO4Qgp/Ph2fCuwBb9fJ/dX1CVBDsjc2wawticB4SzE4KWJJqtwlBvYl64ijCB7GZbE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EyoAQSF4; arc=pass smtp.client-ip=209.85.221.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-56f75445470so6119321e0c.2
-        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 13:34:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777322068; cv=none;
-        d=google.com; s=arc-20240605;
-        b=MM9WFcECtYRF/buEuGwH3qceNmhJ84MifLTrl3e0YZ5QVNV3P+OIQs6ZXhYHIqAkWJ
-         r9dq2v7kUiaP+WtjAVc1S5wc3o7ZJX+Bq+LPws1coqRPzEihlCEUJ3ak3T2XDmjincAf
-         O0UBXJylImbhiTJDckS47S+w00qlXrKYP5e4nf6g94KFeoFUUV2W6JnzjPSoMkoMlRFP
-         oWOlbZIvLu7/AIo7NVPJt4DBb3PRPANz/kCG5PwskFwN/Wi1Zpo6r0ulwZzkCN+NLQ/N
-         TJjPXKlR5vW/t9kx1aaZklaWdf3/syq7g7smgl7qxbYw7Re1WVVWpR1f579ih9ko2QbQ
-         2ZuQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=IDhJwqGGs3mH225QoSzcTra69KJK7gVbTJiK2QceQtk=;
-        fh=qtqsRlrOWpeKlb56AuyeLkeJLKMqQPRrK38puJF23Ko=;
-        b=AtWj6RGxY1R+SpK4UbCBB5pD29iLXoNePu1sG+id3FSrc4A6B5bc4301jeEe+vvfG3
-         fTs0+Z8SKtZReUCKjszTYiI3+ApjJ5su5ntzSrrRIvEiHiZmJcchafp0I9MA8ahPjPWM
-         dQBl8btaTTsEyVwlqMSkMzP6QoVVpwqNlQzs13puBjQNpIRbEInbfj9rRvGHnGH+Cay8
-         dpr0Eohv2p2GEA8rJAP7aP8BlP+xL6D8GfEOAHeKRLtbFGSyxk9chSYVFCWHYku5KyPg
-         gnXyIXx7ejunoqkPETtVKd0dSdwLxlx2oiqnzNdy4dVvOaBBsGLOATyJFk77vL5d1mgw
-         FsOA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777322068; x=1777926868; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IDhJwqGGs3mH225QoSzcTra69KJK7gVbTJiK2QceQtk=;
-        b=EyoAQSF4GyKO6q3czEDpoxo6YmQ2qoiaCZ3R/BWtnYfYgDrMAEXI1RxGvvGNa1ZmOa
-         Io0mSBHEd3hEUCd03o8vXHWdxiTnIyFH1KzuzuxCVPkg4R3AaCu9uRpQv7Ap/b/NkQPI
-         MDfjCdAECzxqaauL9wfnfO6dJX4QOP/KD/Ov3qLccuFlu4FigNcppqrbg76qIFwfmkS6
-         HKO2MlSAir5pJF/Ra8sWb3SaUa/7/eXEiyP+LJdqI1GZdU6SC1tVl7r8akv3mlmd8zlw
-         0uBjZjdLqCa3FRqFxuaC6W3+lF701ApTOGQ69sG95H4JF4snh9wqcuThNZfEeQPC4YBl
-         AUcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777322068; x=1777926868;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=IDhJwqGGs3mH225QoSzcTra69KJK7gVbTJiK2QceQtk=;
-        b=qlnEsUmyuT62pAFx77VsQut570DenRNB2BGSkZaF/LndxCskcJaAS0u2vl71M/M7cv
-         8hQXO9o7BTnoYYqkBoKBnp8ISITNFs13WP2zzThw/NgnxAcaFr4VD8SrVNODYoGMgK7I
-         00LTEHMBgXARCt/N0M+iQ4BE6TCb7oCzvUqILsy8Ry5hXc6+IuBMhzl2iBC34pME/eLP
-         L/ro+ovKQJisRw2Fikw4DNQmgX83uOWzGvdYqI++QEBWR3JrxyKqXXeKpS4lI52Z8Sq7
-         vUk3pWr3EXVszBdVPS2by7tk5CrQn6SFZOzrPRla2JPkW2LGW9uP76oW80kovRdMxkXL
-         enWg==
-X-Gm-Message-State: AOJu0YyM7AU2CpCDgxxClWRUjVOjXtZECsMfumerlP9XNJ6aLwFKNPHx
-	08mlqVN6WH77WZo0pzR3qQL9rd8CRQ70stHRqdx7WNJnwP5lXwsEhqgEqGw0ViFWu0ieohl14NA
-	A6g2GMgkMKl5N4Sny6Tfvq2Ym7Cl9Uz2+7qAxea9jTTnSRQlpF4c4N0xQ9SNBrg==
-X-Gm-Gg: AeBDietI5PyELVi/Z07fH0BJaAIeOIiOYSvIn9hEpdAeJBEGgzi/7GxygT+idZOLQmH
-	f+qP8lTNqzzcx0dg14KBBpahDQt4o/uEsDWUNPb+Yuiidht6b8opX4hSEZo6/1nNTvbAZRva5P8
-	IVU8mzIOkrcx6Rn2Wche3prhAqEh600dm3qT85B+bIFWWs0Uu6ZHrvZywnxEYebvfDqS7MyR+0M
-	/+1pwixRPd0Hu1/kYAZeNfFKn5N5Q8rLSfJhnS1kvaPy4dC+WvJUjI9MOHgKKAGD5+XW1T/70vr
-	yW44x6pjETe3gkvZOvmhPJavRF8q/RoRe22VcvNjxpHA1cKx0CZG8ZNQLoA=
-X-Received: by 2002:a05:6122:e272:b0:570:2ace:c14a with SMTP id
- 71dfb90a1353d-573a52ed088mr218565e0c.0.1777322067450; Mon, 27 Apr 2026
- 13:34:27 -0700 (PDT)
+	s=arc-20240116; t=1777322390; c=relaxed/simple;
+	bh=587KSE/mBHlcC1zyB/ZzV6dcer4yy+VvGcgD8lme/jE=;
+	h=Message-ID:Date:Cc:Subject:To:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=uWy9LwhZiKld1VuVbgXZiL4/vpCh74geugiiTvjhn7AWTz9QLFJ6uOr5Thz3cJQpaZYQ/Z5cfyXewVf4QJ3BVVmq4sKUcYwOGGgwPccCt6d7YU9NUBWoBgElgLPfgbMWHPkJgUNtoa5EjZNr2rAMU4YD/iGxgEPzja9tUHsYZXc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=citrix.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=mXaS/4S2; arc=fail smtp.client-ip=52.101.52.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=citrix.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=oUh77Y8MYJlZhKjg7cr9IZMNNqrz/rZ2qa3tNEc+fec4C7Ju2THcWJblbVnRaqWsvyoKQu+dUhBVNp4GpuLjmVm37rB1bK2CCCYDLT4BzK6PrU+SzNHI48mXeHIxXZZ1yckmz04lu6d99FmaPs4HZMLrAY6IoHyP3tghy99Mz1KEnbJuD4AsUgTBdf48+3RcVVgHji2YBIDA5Qvt/o6jqudWrz+L9xONlDtcVp5UYCJO+vJGt1BvCEOiHbDs8Q8H7qSmSnmE5EFe5fDVwFzrriTXjJgTDZFTAjlIDkMhLoj8cX3ZD0mM4vhMDH5j+EBD1cgIeMa5/5R7wZRZN3faMA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=587KSE/mBHlcC1zyB/ZzV6dcer4yy+VvGcgD8lme/jE=;
+ b=JBSBPDWe2m0PUXgGc7whO81nXvxcarqS1U4Y+X8CQYCyQDQp+k4PTYxZYzV+P7o8uGNnzVqUd8ZSEiYQ/X29Gg7jV3JZdkFRu+SLujKDNw5PQ66DfWoCR3smuF4XOShj5DAgGaeS69ZUB2th02krtSFErSEjyLtujddPS1MOz3p/oh4aeeg2pXQXOID0eUQwz4WqzzPzCNJ1VT/xa19Ags3nCGgINqRiR24y1CZmhyqxt81o5jZYYKSWtuFkGu8/MzSQWt7aXGQeUe2HjZ28NR0imAc46B0gAucQ5+9ruoMJw7ZVD1v2RP/rIj8FC5uO9FnXzXmU7m2QSDQXx6aPSg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=citrix.com; dmarc=pass action=none header.from=citrix.com;
+ dkim=pass header.d=citrix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=citrix.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=587KSE/mBHlcC1zyB/ZzV6dcer4yy+VvGcgD8lme/jE=;
+ b=mXaS/4S2ySUjjDWZ0IHnYqwUL9esfa44nwOyfeA3PSxmst6DepNPBSqa3gJjLITYVh03D8R5fmbdXIH3RhlOIPFr37oRxRWcMHUeKl83DVTcXJtcDCT6AgU6UejcOMBE1V143s18p1Wly9dN8WRFl0AoPR/HJoB+cbQxLS8VlD4=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=citrix.com;
+Received: from IA1PR03MB8288.namprd03.prod.outlook.com (2603:10b6:208:59e::6)
+ by PH8PR03MB7197.namprd03.prod.outlook.com (2603:10b6:510:25d::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.26; Mon, 27 Apr
+ 2026 20:39:41 +0000
+Received: from IA1PR03MB8288.namprd03.prod.outlook.com
+ ([fe80::b5ee:28c6:e04b:5599]) by IA1PR03MB8288.namprd03.prod.outlook.com
+ ([fe80::b5ee:28c6:e04b:5599%3]) with mapi id 15.20.9846.025; Mon, 27 Apr 2026
+ 20:39:41 +0000
+Message-ID: <f54c3c2b-33da-42a0-80b7-0f6615d930ce@citrix.com>
+Date: Mon, 27 Apr 2026 21:39:33 +0100
+User-Agent: Mozilla Thunderbird
+Cc: Andrew Cooper <andrew.cooper3@citrix.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ David Laight <david.laight.linux@gmail.com>,
+ Thomas Gleixner <tglx@linutronix.de>, linux-alpha@vger.kernel.org,
+ Yury Norov <yury.norov@gmail.com>, linux-kernel@vger.kernel.org,
+ linux-snps-arc@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ kvm@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-um@lists.infradead.org, dmaengine@vger.kernel.org,
+ linux-efi@vger.kernel.org, linux-fsi@lists.ozlabs.org,
+ amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+ intel-gfx@lists.freedesktop.org, linux-wpan@vger.kernel.org,
+ netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-spi@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-staging@lists.linux.dev, linux-serial@vger.kernel.org,
+ linux-usb@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-fsdevel@vger.kernel.org, ocfs2-devel@lists.linux.dev,
+ bpf@vger.kernel.org, kasan-dev@googlegroups.com, linux-mm@kvack.org,
+ linux-x25@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ linux-sound@vger.kernel.org, sound-open-firmware@alsa-project.org,
+ linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
+ loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+ linux-openrisc@vger.kernel.org, linux-parisc@vger.kernel.org,
+ linux-sh@vger.kernel.org, linux-arch@vger.kernel.org
+Subject: Re: [RFC PATCH v1 2/9] uaccess: Convert INLINE_COPY_{TO/FROM}_USER to
+ kconfig and reduce ifdefery
+To: Yury Norov <ynorov@nvidia.com>,
+ "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
+References: <cover.1777306795.git.chleroy@kernel.org>
+ <9fe875d2f55af59c12708336c571a46038528678.1777306795.git.chleroy@kernel.org>
+ <ae-tVFVfx72oCC_i@yury>
+Content-Language: en-GB
+From: Andrew Cooper <andrew.cooper3@citrix.com>
+Autocrypt: addr=andrew.cooper3@citrix.com; keydata=
+ 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
+ 6+ahAA==
+In-Reply-To: <ae-tVFVfx72oCC_i@yury>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PR3P250CA0028.EURP250.PROD.OUTLOOK.COM
+ (2603:10a6:102:57::33) To IA1PR03MB8288.namprd03.prod.outlook.com
+ (2603:10b6:208:59e::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260425002450.163421-1-hramamurthy@google.com> <20260425002450.163421-5-hramamurthy@google.com>
-In-Reply-To: <20260425002450.163421-5-hramamurthy@google.com>
-From: Pin-yen Lin <treapking@google.com>
-Date: Mon, 27 Apr 2026 13:34:14 -0700
-X-Gm-Features: AVHnY4Jn5PJ26wDuxL6XOxBc41tW0ndGpiH2_vXXGP_iU1dvcZuimxB-Abspnqs
-Message-ID: <CAHwYsiqM0EkCQCYCk9LwEojUKCNr7zO-0iwSTyA5Mku9T3k_3g@mail.gmail.com>
-Subject: Re: [PATCH net v2 4/4] gve: Make ethtool config changes synchronous
-To: Harshitha Ramamurthy <hramamurthy@google.com>
-Cc: netdev@vger.kernel.org, joshwash@google.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	willemb@google.com, maolson@google.com, nktgrg@google.com, jfraker@google.com, 
-	ziweixiao@google.com, jacob.e.keller@intel.com, pkaligineedi@google.com, 
-	shailend@google.com, jordanrhee@google.com, stable@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: DEED747A26F
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR03MB8288:EE_|PH8PR03MB7197:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2c641edc-eb50-4bae-eff2-08dea49d1bca
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|7416014|376014|1800799024|56012099003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	9FY6m28LCnvy2YkNWJMU+RNswXX+UwdsQPdASIMzD4ybDBQF2lnqvw7QSZPd4BDHC6544/xGvr7GB2IBHK0xFm5TP97Q4B1LLrSYLufDx/SF+LLyKnRdZAhIUZNWvNg0Xs5VZ3Y96fvuQgvPSnPxAQkGJsp8+l2efbhOxHp/BdR2lVMpM++TBM4+FCcwak7FFBclmvyZjFF5YMn4tZiem79sc1Btt0cKEs8JPf9TGbKnDGPH/J9Y8EhC24T8KX1ItZRFFeXIU+G6K9NRUWxxrH7jD+OpsX4eWEXPyZJBnTOAua4918teYDpsYCArRx00EqYolosDciYnyZHCFXIVcvwB1j6VfSrJBdoJr9q4FR6IUGHdUZwHvSFkcMyhayrOK9wwb9KMjU6gnMokNDgilgm1hbCSR7oay+ZI0URVG6m2aFFU+eEEPwwe3PGIMvwNRVkUwpwiTyWxaqEmuwLDdZ0Qzn670vzddOnAl8EWaxRrUT6cmlQ/tvguQHMpnV2hNmfeyZUAZ3+5h41r/ERZCpoFCQ5C69bfEUQcbYKr9ym2osWQa1/n5l0sqiSYk/6JECxxCxmcHamWHf7LNL/hcXOMsg/bNvRMqStPCAohY+6JZNi7L0Ar/b4V3ZLBFmWPdpbmlnjlxOXg/5Kda/Bbg+FvpEqD1RRP+5yqOU3Vj/50V74AdZePk80A+r3os1lE5a/QEOkr6z00c3SGyd8xmkOuMWHXsMLEY/YVFSHzUb8=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR03MB8288.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MTdZYld2cGR3RFV6NUZRcm9jVXBRMlhvSlN4K2xTZ1Bkdy9GUWlHTVh6VGxr?=
+ =?utf-8?B?by84cnBsbmVBUzVEaHhsSXFjVEdycnJOcmQwb1JvWE1QMW1Ma2JMWnhXQ3A1?=
+ =?utf-8?B?YU9lV0ZORHllTDZtSVBKQ3RlMnp6dE5LNEhwNE5mL2hJMlZCVk9ZbkRtSDdn?=
+ =?utf-8?B?K29mVGpIY2JkOWpVWnIrYjNyNHh2VFlDdzhadjc5bFJTUDMxbkJQSDZUWit1?=
+ =?utf-8?B?bHNwY2xuWjZWOGNGRVJ0NHl3cEJnN3FmeXlmTVFtTkw0WVFlNkZqTk8zYkda?=
+ =?utf-8?B?RXRsR2VPRHZTaytHeUNYN0l1UkJXV3RxZTA3WStCaE5ObUMxWW4rSmVIb3lj?=
+ =?utf-8?B?Mzh0aXFtSnJ2R3Q3YVBIYVpCSlFjYXR6bGhweXFka0U1TlNOdkxrMjRFK1ZL?=
+ =?utf-8?B?Y0ZDYmFPa1I1STMzdEVSN0dySDNuRlp2U0hiUmZ1ODVCaWtaTlRwVG56ZGhP?=
+ =?utf-8?B?NmpMWWQ3TUlCaVR0ZHBNRkg2dm5BdUtPV1YrcTJyTFpLNXVFMkVqYzk0Y1ZD?=
+ =?utf-8?B?ckIrT0dCc21rdzk0UURPOW41YTRFbGtXeVM1N0VqWEJIWTJEdkFnQjR3Wjlm?=
+ =?utf-8?B?NnZxRkZ0MkFlTjg0SUV5dDVLZFQrN1paTUdzeE51enZYMFRjUlZtODdaOFZy?=
+ =?utf-8?B?a1VFMnNYd1Nac3RWZkUxWlJsNFoxM2g2djFzZW1sM3NJZFd2ZS84WnF3RnJL?=
+ =?utf-8?B?alZQck5OcVdXeklCMkY2WXBOMTM3WEUxSGovdXNwQm9XaDlhRWVFdmdXaEcx?=
+ =?utf-8?B?QUovaFVUQnE5cXY5QUlzWnFjZDNLOXNHKzBtTTRkNVZOK1J2cldwL2dkdnlH?=
+ =?utf-8?B?VWd1YkwzWTZHaWZnb0RrUStuZm1CT2VxM1JoYjladkFVb1M0YlpveS9QRndL?=
+ =?utf-8?B?S0R3VnZTMC9EUzRxb0dodm02eHNKRFdDT1hmWlM3U29yN2ZWOUxBVXJDTHlS?=
+ =?utf-8?B?NkZDRWNnWVEyczlBTC82MUcvM1pKVldDZGgrWkZOU3VnRlh6OHpwQ25ra2Fj?=
+ =?utf-8?B?RjlHMmE2T3VLWUZyRytIR3pqWVdUZWVMSmx5Z1FZTXl1TFFORTNFVXFheFQ2?=
+ =?utf-8?B?WmdlS3F6SnRzbEpzUTZGdkhzRHdpbGVBYUZOZHoweTFsV3ZyZ0swRFhNT3hm?=
+ =?utf-8?B?dWZSYzhCblRHS3BUdzRxRktBZVFpOGplZExETEwzTEVlbktWaGxsYlkySFk4?=
+ =?utf-8?B?WHltVy9EYTVRRktUQWFxSGhNaExjemNLY2YzT1ByaUtEUkhvZWIzaWJVL0Yy?=
+ =?utf-8?B?M3ZoamIvMkpzZTJRSGJWSkdxV3N1c0EwSzFGMU1pNnJmdDJ0OW9sQTdkLzRS?=
+ =?utf-8?B?YWZZRG9WR0loTzFFQy9lL0N0NWxaOFpiYnhXZjdIaFVoenBwMEpFY3VsU2pN?=
+ =?utf-8?B?dUprK2lLRHVEcHpCQklJT0hycSs2K2MrQWNVdFltZ2NPUjFRUU9wakV1QkJa?=
+ =?utf-8?B?YzNKN2FGTnlBUU4yZUdOTTIxd3hpNVFaaytwN3Z4cmhJT2xIVmFIbzdQU2Za?=
+ =?utf-8?B?YzBDOFFld3BCRTB3elU3MWRiS0lkRGJNZ0dvcDR0blZlL0FIYTRLMTJidisz?=
+ =?utf-8?B?T1RQZFM2NWxTcVpJUlpySTdZWFExTlozOTlJTUxqQUgyRUlpM3F4OVdVeDk1?=
+ =?utf-8?B?UmlmaFliTGxkTzB4NmxEVlZUZjdzWUJINzdBWlo3Q3B2cGJCbmoyK2V6K2Jj?=
+ =?utf-8?B?ZlBiVDJHMTY5cGdmeWlvbENXM3diVXN3elMzUEluL1pJY3owUWRmektKaE1Y?=
+ =?utf-8?B?bEpwendKKzRtMVZieHhZamxMK0QzL2JHb3NzYTVvUjZwNjZOREVaWXpwTVNO?=
+ =?utf-8?B?aGdyL2lwZGxoM0Y2b2w1MlhzRVNzUitBVjNTbGJlRkRGZElGV2tXUG5OWmpw?=
+ =?utf-8?B?NmhHYStiK2JsTDlzU0VoMEhRTXJpSVg0T2czNzlrcUlKL2hvdkdFWkhqalF5?=
+ =?utf-8?B?Z25wMitPVGhOMXNJc3J5WFIyRnBqOWttTUg3WTUwNW5HYlZTYmxNTEpVVUU5?=
+ =?utf-8?B?dTFqR1pRMTAvWHFHUFozRHlMdmJUQS9NUHdsQWoxRHRtZUZIdmx4SzNEQkhm?=
+ =?utf-8?B?dFRzTmtvdkZEMS9Ib29YbHNRZmVMZ3dnVWlrWmJMK2tEems3RUZSdGtVZjNB?=
+ =?utf-8?B?eWUweitoQTRvcnBiQnRZSlhSeG9oa2U3MER6NTdyWWY2VE5VazNycmp2YWd4?=
+ =?utf-8?B?T2RCQjBPSVZFL1dMQiswMm95WE5XMkxuMEZnVGt4dmhncWgzb0tuTWhDYWs0?=
+ =?utf-8?B?Uy91T0hVSFpNQS9VSDJsSHNFN3VBR2R0eUI4NkFaTmVRb3JjcXBRWFYrSlZ0?=
+ =?utf-8?B?MVI2V1daUUxINW1OeXdLelV0TDlEYWZKWnZ1TWdZSk5tNS9wVkIyY2d3TGdV?=
+ =?utf-8?Q?Z28RZNN4T+YLRj6w=3D?=
+X-OriginatorOrg: citrix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2c641edc-eb50-4bae-eff2-08dea49d1bca
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR03MB8288.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2026 20:39:41.7379
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 335836de-42ef-43a2-b145-348c2ee9ca5b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7P/OK4nVkYKoOZOPceJ7mFnHteXT+or/VZsK1G7zm1+pF+DiXElHabbIzD2P/Aa25ppayHLm/G+R8tVFazmqVeDsv153yTNZHilISIGWHks=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR03MB7197
+X-Rspamd-Queue-Id: 904DA47A212
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[citrix.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[citrix.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281490-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281491-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[citrix.com,linux-foundation.org,gmail.com,linutronix.de,vger.kernel.org,lists.infradead.org,lists.ozlabs.org,lists.freedesktop.org,lists.linux.dev,lists.xenproject.org,googlegroups.com,kvack.org,alsa-project.org,lists.linux-m68k.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[treapking@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[andrew.cooper3@citrix.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[citrix.com:+];
+	RCPT_COUNT_GT_50(0.00)[51];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-On Fri, Apr 24, 2026 at 5:25=E2=80=AFPM Harshitha Ramamurthy
-<hramamurthy@google.com> wrote:
->
-> From: Pin-yen Lin <treapking@google.com>
->
-> When modifying device features via ethtool, the driver queues the
-> carrier status update to its workqueue (gve_wq). This leads to a
-> short link-down state after running the ethtool command.
->
-> Use `gve_turnup_and_check_status()` instead of `gve_turnup()` in
-> `gve_queues_start()` to update the carrier status before returning to
-> the userspace.
->
-> This was discovered by drivers/net/ping.py selftest. The test calls
-> ping command right after an ethtool configuration, but the interface
-> could be down without this fix.
->
-> Cc: stable@vger.kernel.org
-> Fixes: 5f08cd3d6423 ("gve: Alloc before freeing when adjusting queues")
-> Signed-off-by: Pin-yen Lin <treapking@google.com>
-> Reviewed-by: Joshua Washington <joshwash@google.com>
-> Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
-> ---
->  drivers/net/ethernet/google/gve/gve_main.c | 56 +++++++++++-----------
->  1 file changed, 28 insertions(+), 28 deletions(-)
->
-> diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/eth=
-ernet/google/gve/gve_main.c
-> index 1fec8e1e4821..2c461be12a75 100644
-> --- a/drivers/net/ethernet/google/gve/gve_main.c
-> +++ b/drivers/net/ethernet/google/gve/gve_main.c
-> @@ -1424,6 +1424,33 @@ static void gve_queues_mem_remove(struct gve_priv =
-*priv)
->         priv->rx =3D NULL;
->  }
+On 27/04/2026 7:39 pm, Yury Norov wrote:
+> On Mon, Apr 27, 2026 at 07:13:43PM +0200, Christophe Leroy (CS GROUP) wrote:
+>> Among the 21 architectures supported by the kernel, 16 define both
+>> INLINE_COPY_TO_USER and INLINE_COPY_FROM_USER while the 5 other ones
+>> don't define any of the two.
+>>
+>> To simplify and reduce risk of mistakes, convert them to a single
+>> kconfig item named CONFIG_ARCH_WANTS_NOINLINE_COPY which will be
+> We've got a special word for it: outline. Can you name it
+> CONFIG_OUTLINE_USERCOPY, or similar?
 
-Sashiko says:
+You can't swap the "in" for "out" like this.  "out of line" is the
+opposite of "inline" in this context, while "outline" means something
+different and unrelated.
 
-This isn't a bug introduced by this patch, but is there a pre-existing
-use-after-free risk here involving stats_report_task?
-Looking at gve_stats_report_task(), it iterates over priv->tx and priv->rx
-to collect statistics without holding the rtnl_lock. During teardown,
-gve_queues_stop() deletes the timer via timer_delete_sync(), but it does
-not appear to explicitly cancel the work item with
-cancel_work_sync(&priv->stats_report_task).
-If the timer queues the work item just before timer_delete_sync() executes,
-could the task remain pending on the workqueue?
-When gve_close() then calls gve_queues_mem_remove(), the memory for
-priv->tx and priv->rx is freed and the pointers are set to NULL. If the
-pending stats_report_task runs concurrently and evaluates if (priv->tx)
-right before the memory is freed, could it dereference stale pointers and
-cause a use-after-free?
-Additionally, during module removal, gve_teardown_priv_resources() frees
-priv->stats_report and sets it to NULL. Since destroy_workqueue() is
-called immediately after, could this flush and execute the pending task,
-leading to a NULL pointer dereference?
-
-Sashiko pointed out the same issue at patch 1/4. We will address this in v3=
-.
->
-> +static void gve_handle_link_status(struct gve_priv *priv, bool link_stat=
-us)
-> +{
-> +       if (!gve_get_napi_enabled(priv))
-> +               return;
-> +
-> +       if (link_status =3D=3D netif_carrier_ok(priv->dev))
-> +               return;
-> +
-> +       if (link_status) {
-> +               netdev_info(priv->dev, "Device link is up.\n");
-> +               netif_carrier_on(priv->dev);
-> +       } else {
-> +               netdev_info(priv->dev, "Device link is down.\n");
-> +               netif_carrier_off(priv->dev);
-> +       }
-> +}
-> +
-> +static void gve_turnup_and_check_status(struct gve_priv *priv)
-> +{
-> +       u32 status;
-> +
-> +       gve_turnup(priv);
-> +       status =3D ioread32be(&priv->reg_bar0->device_status);
-> +       gve_handle_link_status(priv,
-> +                              GVE_DEVICE_STATUS_LINK_STATUS_MASK & statu=
-s);
-> +}
-> +
->  /* The passed-in queue memory is stored into priv and the queues are mad=
-e live.
->   * No memory is allocated. Passed-in memory is freed on errors.
->   */
-> @@ -1486,8 +1513,7 @@ static int gve_queues_start(struct gve_priv *priv,
->                           round_jiffies(jiffies +
->                                 msecs_to_jiffies(priv->stats_report_timer=
-_period)));
->
-> -       gve_turnup(priv);
-> -       queue_work(priv->gve_wq, &priv->service_task);
-> +       gve_turnup_and_check_status(priv);
->         priv->interface_up_cnt++;
->         return 0;
->
-> @@ -1608,23 +1634,6 @@ static int gve_close(struct net_device *dev)
->         return 0;
->  }
->
-> -static void gve_handle_link_status(struct gve_priv *priv, bool link_stat=
-us)
-> -{
-> -       if (!gve_get_napi_enabled(priv))
-> -               return;
-> -
-> -       if (link_status =3D=3D netif_carrier_ok(priv->dev))
-> -               return;
-> -
-> -       if (link_status) {
-> -               netdev_info(priv->dev, "Device link is up.\n");
-> -               netif_carrier_on(priv->dev);
-> -       } else {
-> -               netdev_info(priv->dev, "Device link is down.\n");
-> -               netif_carrier_off(priv->dev);
-> -       }
-> -}
-> -
->  static int gve_configure_rings_xdp(struct gve_priv *priv,
->                                    u16 num_xdp_rings)
->  {
-> @@ -2099,15 +2108,6 @@ static void gve_turnup(struct gve_priv *priv)
->         gve_set_napi_enabled(priv);
->  }
->
-> -static void gve_turnup_and_check_status(struct gve_priv *priv)
-> -{
-> -       u32 status;
-> -
-> -       gve_turnup(priv);
-> -       status =3D ioread32be(&priv->reg_bar0->device_status);
-> -       gve_handle_link_status(priv, GVE_DEVICE_STATUS_LINK_STATUS_MASK &=
- status);
-> -}
-> -
->  static struct gve_notify_block *gve_get_tx_notify_block(struct gve_priv =
-*priv,
->                                                         unsigned int txqu=
-eue)
->  {
-> --
-> 2.54.0.545.g6539524ca2-goog
->
-
-Regards,
-Pin-yen
+~Andrew
 
