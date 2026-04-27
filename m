@@ -1,220 +1,215 @@
-Return-Path: <netdev+bounces-281475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281476-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gFnZJHHE72lsFwEAu9opvQ
-	(envelope-from <netdev+bounces-281475-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:17:53 +0200
+	id KEuHGbHE72lsFwEAu9opvQ
+	(envelope-from <netdev+bounces-281476-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:18:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C738479E43
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:17:53 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63B5C479E83
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:18:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2351530ED6ED
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:13:11 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BC17530125A8
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:15:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8226E3469EE;
-	Mon, 27 Apr 2026 20:13:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 599123806D4;
+	Mon, 27 Apr 2026 20:14:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hMJCquiW"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="t4jAgBnY"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012027.outbound.protection.outlook.com [40.107.209.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D594D3043BE;
-	Mon, 27 Apr 2026 20:13:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.27
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777320788; cv=fail; b=l9y6cZMzKu3OsKRpp8KwrpNX1iGww1AXkoGQbn9HlGChl89TEGLzG91JvcGJhZVfSLwhwD+JuJ8nCT4tso9nYwZwVGZ4w9gBK+sNSS+kqW/vhz+SmOdB86KHUaiDogPfAlClbrOgpf6TeTkk8+c83IaCW5R+4UXp0dBp9Eb+04o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777320788; c=relaxed/simple;
-	bh=nxQPkLzoRwgP9w+X7bgNDKStPP5w+ze2qZKtyO5SFGI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=azu3YSO6VRq83U24FrFMDRj2KZmFo/f7PvvXap8GrbSxG9wvZL54Debrzw/12qXVGmKTKGzCDNqkfKs1xYHezvvij3m5q6dfOc4mWaz8H20DSyyAaLmfBQM3oselvBB3sR8BIN6oigal+DI0RL7pQmb1r0qG5yVS/DOnocNs7yQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hMJCquiW; arc=fail smtp.client-ip=40.107.209.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BtrDbDcz6oik0VAePSzg5fGR+cooJsvCiqVpAkRyxjo7tVYcK6FTW120At87PvC2HmYqvF+zAYmUozmBiDpk3obvOrmRqnQu5b4NUoZkF4ujvP7nKdWKNRWeaLOXO5lx22JtfQpfCueE0stod3ZgwyZHZra4CSp8si7hhoGCGMHOU9NRGgQZvWgZxjvpiddt/5heAo5jaUAbusoeb6/N+ctwOqovcjGb3J/PDBJNthLIqytbew6CjsXMgRhp3uIkXxoc2xEaZ44Y9Ktv5ANbxXoHDUfrqejvOg1lxzqXzqzdTsDZXzt8mwjNLgfzVceatnj1bajoVfBGEPtevW6/ow==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UKWQR0wFCYKwd7/WyoEVlZ7dAryoy8A/34DACb4Mweg=;
- b=eIPokbumH3eDN+DqP5Ep1KaEMIWbZhTzgBKsNv19VF/W6X7jjPowB4UntDHWj76GVOLpVErRkTwf2pJ/YrDs45ZN6xDND6686ErEpWA2qQXwRCmtP46ysRgjHvM1NVSf8oin7VwsuXb30pKGJB4D4xu/biMyeV+73vzwzUrpYBXo7hdAidNUQHrxfYLBQEUhcH9MtIkFcqmeakpXHhSDEtl8blygh6QE25OuMpVAmZUWxT7paNvKfjp0MlyKuWB9S5BekJIjYVv4y8EE8wAO9HrTEKcIsKrwKajDUUZC4yUEssV8xNuhIqndzV8atExLn9UGWsZ3+sD76wTjiGaGgw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UKWQR0wFCYKwd7/WyoEVlZ7dAryoy8A/34DACb4Mweg=;
- b=hMJCquiWsKvsKPfnV6x+XewanJiprCXhKZ7l3EnI0mUQee6FHRXLrWa9OPoGIpSx+3ijfDDYf7rNW7PoM7DOSBnLPvsXAImaoD6B98Y7Upx4a9+jmx8qzSA1GldDlcxK8Pewp0jwDRy5JdWZd5Oq81ubXZq43utYi9tCvPcHtbJVcvLFWW/q7KgNksf7InTQ6smdi1OyjYpNmneI+Yx09fiTp08WMkqdpQGjsSSQVU9D7WqLP1BLpIUpVlAs267Rgj9nox2HtSQ5p5eE42gWq/zkifeODpWv1mo/3UxmRXJegCDfavI3oSRox5pAtdJxjEw5pvmed4+9e03qhtyLkg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY8PR12MB8300.namprd12.prod.outlook.com (2603:10b6:930:7d::16)
- by LV3PR12MB9166.namprd12.prod.outlook.com (2603:10b6:408:19c::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.16; Mon, 27 Apr
- 2026 20:12:58 +0000
-Received: from CY8PR12MB8300.namprd12.prod.outlook.com
- ([fe80::ce75:8187:3ac3:c5de]) by CY8PR12MB8300.namprd12.prod.outlook.com
- ([fe80::ce75:8187:3ac3:c5de%3]) with mapi id 15.20.9870.013; Mon, 27 Apr 2026
- 20:12:57 +0000
-Date: Mon, 27 Apr 2026 16:12:55 -0400
-From: Yury Norov <ynorov@nvidia.com>
-To: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	David Laight <david.laight.linux@gmail.com>,
-	Thomas Gleixner <tglx@linutronix.de>, linux-alpha@vger.kernel.org,
-	Yury Norov <yury.norov@gmail.com>, linux-kernel@vger.kernel.org,
-	linux-snps-arc@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-	dmaengine@vger.kernel.org, linux-efi@vger.kernel.org,
-	linux-fsi@lists.ozlabs.org, amd-gfx@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-	linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-spi@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-staging@lists.linux.dev,
-	linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
-	xen-devel@lists.xenproject.org, linux-fsdevel@vger.kernel.org,
-	ocfs2-devel@lists.linux.dev, bpf@vger.kernel.org,
-	kasan-dev@googlegroups.com, linux-mm@kvack.org,
-	linux-x25@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	linux-sound@vger.kernel.org, sound-open-firmware@alsa-project.org,
-	linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
-	linux-openrisc@vger.kernel.org, linux-parisc@vger.kernel.org,
-	linux-sh@vger.kernel.org, linux-arch@vger.kernel.org
-Subject: Re: [RFC PATCH v1 9/9] uaccess: Convert small fixed size
- copy_{to/from}_user() to scoped user access
-Message-ID: <ae_DR6NYwy05mhAe@yury>
-References: <cover.1777306795.git.chleroy@kernel.org>
- <8780eb2ef80575931a339e5225bc80eb13e9be6c.1777306795.git.chleroy@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8780eb2ef80575931a339e5225bc80eb13e9be6c.1777306795.git.chleroy@kernel.org>
-X-ClientProxiedBy: BN9PR03CA0683.namprd03.prod.outlook.com
- (2603:10b6:408:10e::28) To CY8PR12MB8300.namprd12.prod.outlook.com
- (2603:10b6:930:7d::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04ABE364E96
+	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 20:14:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777320873; cv=none; b=JSfXzBrSceWp6CIbVW6sVPR2KDEX3qSsHUe6KLpdXr3fHV+lEpF3w4KBIDnHo7abZHMd9oIH7gbvW29vpTgTT+OMk0uqE5SIdhc5Hdn2GjrbRsI7iIHtQMoIK8pg/P/zNLAlFq6BAAaewF6XRTYiBIVuOi8q+Yb67Z5VCs4n6nk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777320873; c=relaxed/simple;
+	bh=0eSwGvLPvKNKZdcCBScgXn/b5rNFnHLzAqnOQ9r89d8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a2pPW+RTBCusu0GENiqR2U0hU88vHDSrUmWQpuWNU4VzNBNdDtyhj+RVovv8ueAWo1BGTqCLYTmJkpCt+LILfU5gblV3HMG3plNK7QFjFbdd5Tb0su4QU1HX1Zv/itqZ7aUOP89gODqBfVzJF1iTR7ta4RGiI01CHX1qijTjZGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=t4jAgBnY; arc=none smtp.client-ip=74.125.82.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-2eadb000b8cso1040097eec.0
+        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 13:14:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1777320870; x=1777925670; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hZxvHyJNT4nysVkWmWgQJrVxQTcxaWKHnQdHVdMwxcs=;
+        b=t4jAgBnYTJjDOu01WmKv7hTA7r9s/YHIMAwXyJAH1PoqsTwl710gssl+bO6y1OEprh
+         o7Ss5FDe0pVjLcbE2UVgiSHLmlr4FPk/HC3OVOa1lN/cMJOvk7dpT9Y6sApZBNz3T00e
+         AfE1tN5SrT0HdzWFczGmHYrkrUM8PbNfi9yquVKC0W7Drq5CwKKJDM7+syJXOKJxbnPG
+         Ig4jmkOm5lfyzK4lP/nbfl7oWBFrA6zvChfzbnRclMYeujL1OrYoANk5QlAKpR33z2Z+
+         ayXbAFGIMmsj38sBpLsLW7naI/+oH3nGWW+R4/r8S20KqwWWqnpuy0zvbpOJXhWpkHLR
+         hhYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777320870; x=1777925670;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hZxvHyJNT4nysVkWmWgQJrVxQTcxaWKHnQdHVdMwxcs=;
+        b=R8hxrlbDnwDAvjwfBcsNqAxXsmUzou54rUqCDDPIPWcxMpWekFPnj/83RJqq6bipRk
+         3g3OI/wXnBYtjUNUwE9yEqfCfdCqQcln7/1b72u/A/10L0UB495gZnAUe1Mp0hrcj/4n
+         ulADPG7+NIv/kULVRtLWzXHTopbwjcxCkxNU4bogyj6UTdcS7PExRvwc8RTF2UyQHWzN
+         1BA/teakVgpA9bxONLq0vqqe6Minx+E88lnumnDV48CzDFvKOHXuYO++bpZSC9FdUQiz
+         b+1SEh4GNTShZTWPQyxuaRzYhgG8lCLKPofwNH5U2EMzUYQ7Soocgd5x4z8bdOsNdt69
+         VnxQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+G5Kyi20tH9zAkIStIumyyUnZcz1FpNfN5o/uty+rOuLciOGmOcNVf052ft3+S+PCaxA85EaM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1BQ5AQYHBFqK5WBxCF8t/Rx8vlcvlsqGtbXllvvjkAd1+bgwn
+	ZBUh1xQ25TsjzDiwrd+YrN0h/zA6jSUqcK2udex3g/g1cimrcfuoeDZY9XhkKnXl1g==
+X-Gm-Gg: AeBDieuNctz2s3sGeC6SzeR7WLVHmlpuFEoWQeYVeqTn5mmqwF2L02TXsZjmljL/rKo
+	vJC78l7Z4GNBuyTex5OmiRs44G65qSx6bQY57HYKCcbkuR1375FVn+7ZeLEOp36LDXFQP0S/7fA
+	hs9rbavMsz7BgfHuQjsWZzj4q7rwXl/z4kUbpFLJ+2HHDKrOyddwcx6ys0ubADaCBjKb41AyUgd
+	qZzDKpMokAtEEOYiCIFC/CaQNVJeje4slehMBsKdCD7dHbxJm6K8jVgHK99s0upesLJP7Vacnh4
+	oApuPv7NlMC0Q7NYQMEtM0r6XM6tVaj11q52ijlDhv5f99N+WrYsXMtT9DtqV23GAs2v6J7gf8G
+	so2mxehr3ViHvcdANwQXsyrPVsTvKsdMIIEJ+1oOzJCoHZtYLzGRn4Quda+bY1/q8S7xn0C/h7k
+	EqF8ZczEIJPf5X9NH0iobJmtIS6KunbHkoxbmjdUnqrE66
+X-Received: by 2002:a05:7300:5724:b0:2df:919f:ce59 with SMTP id 5a478bee46e88-2ed0a0ce786mr227702eec.19.1777320869990;
+        Mon, 27 Apr 2026 13:14:29 -0700 (PDT)
+Received: from ?IPV6:2804:14d:5c54:4d67::2000? ([2804:14d:5c54:4d67::2000])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ed09fb5a99sm451704eec.7.2026.04.27.13.14.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Apr 2026 13:14:29 -0700 (PDT)
+Message-ID: <ba5ff0fe-862e-44bf-b931-d136faa341b3@mojatatu.com>
+Date: Mon, 27 Apr 2026 17:14:24 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY8PR12MB8300:EE_|LV3PR12MB9166:EE_
-X-MS-Office365-Filtering-Correlation-Id: bdfef69d-b376-4a04-fa4d-08dea4995fc0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|10070799003|1800799024|366016|7416014|376014|22082099003|18002099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	od/438acft25Q7RIva94Fxe/74ILZrpC6Pf2LMgzKavMVDWiDXC8uUoFq51iqUDaeoOUGT2b7TNIfay4ho0beW8vBSY0l8mrYDUcnR7pCpHtvSlyDnRz5/wnwyZGpPSPU6HBMY0s4gTTvMQ7j0VfwxRe5kbixpH2JA3xdZrASXEZ0pDl1d1WJThBE+/uDOUOALBd8YwZ/+eeNpvnwFCD5DW3KE3lR/Xb2wgRjP9OoLwepFg1JjlfF7x6lpvxpSuiwfFobDUXA7Mqqcz9R6V0ZMrYf9s0pCS4lu/upE91liCZMK8a6QVcT7bHE1yqSUEYYdyWzmVdOCGRVsBtyzVPHpVCQ/H/ouWq0d8egAxhDCKXbaYNKhonqrA1fBXpvk7reDl5D9oT4zLApwPnJxjUXjXzFA80TEJcRTmM79P+K2WrN+x//RhjVGYrw5pmVliJLTW6G/qltB//r5oYHnZqjOuThXK718Z7PTqzjJ0ujUCmUN5I3dUam74AL7WiU47YOnjqHI9K4DCSsiwq2QroO6C3f6BX2+0WK07DzbTXOTuRKVwj1Nkp+F2oyodFlbSeL+I1H/MYBrTTz4hFS3IGNmkgEDTZWJeEFpqkCbnH+WC250/oWJ2xTuA6uT0mLue6TD/so+mr20GkqDu2inq+/ILmI9NvNmWVpTgfUNLmDuiIhDW2dC1N/PLuNJVvEX/LdXBnej8nvO2Fm1k4Q6rMCXk86ZerjhL/ymTd8rnhDvA=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB8300.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(1800799024)(366016)(7416014)(376014)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?WIrm7lyr11ondb9zM/aFtj1gKgk8kypk8TAM2g+Ohof+5WQlgtD6zGVPj+Qj?=
- =?us-ascii?Q?Fl/MRzepnMFlWaP+kwU9gjhd02anG8z5ZTflf6LYu+ClIguvgmZIH1trgYIR?=
- =?us-ascii?Q?xpyX4jFk+mQH/otJqXtEelOmF0//lkOX7LVVqlCazvFwry5EU7dmu7JNJT/W?=
- =?us-ascii?Q?IbGi6+a3YEyzdP/EZUUe3nrTxRbrRZDNSHUnwQzjhjLJiSehNgJ8L+6UzAPV?=
- =?us-ascii?Q?dDiNnwHotXKiFihodbBo+fEfI9W9aOKkkT0AlLxUbPwVzVgwuLl/IAV6kHSk?=
- =?us-ascii?Q?Kzy9/VaCvcedh+Ekb8EKVC7l56CzmOv5ObfYMSjBWAnrfSoPrNwnCy5NnRdU?=
- =?us-ascii?Q?+FtCnuU/ZC3EWU1Q5bSAez3Rz0iUWDmQskAPeHnSo6sutK7XR5O2RLiUuC/r?=
- =?us-ascii?Q?TIh2Opz5P54jcYUxkqzjzr+dfuklzkPQHeF1CQUTNTlOgTAHwWNUkyQLDi3E?=
- =?us-ascii?Q?NDPoW5DvCmJyWmxlu3tHIfhbRrBWcq2jwEo4eXMYF6sudilgr+NzPPVAXOBs?=
- =?us-ascii?Q?W6uDfUElRNq/ZzmcZcSEdDnPL0FMBctSTiRLhtrsd3gRRYkZvoBJZH9wsh0x?=
- =?us-ascii?Q?GbgOffPEcvqnuzeH3DQD7hxNGedeVFBu5LMfUDfI8tj0JD0NoO/jMCEwwEGj?=
- =?us-ascii?Q?7Zi4xjZGRB85BK8gVagzsgxl6saeseYWtOB89bfaFHfEn7HIk8Qq6sZMkaUV?=
- =?us-ascii?Q?yJP5GoHZqlylAB4zzpIdOnati8J4GDK/OEUABB6jkmNyPeclWcz3JebExSLH?=
- =?us-ascii?Q?ojb86TGjorvvhaPeWb0Yty2WVHv32UrZhDB58hWeKWGUhdof5c/zfJOiZVOT?=
- =?us-ascii?Q?CJZCc/8139A05YvEL0fjDybsXnGcOzdz+mYd84MuTyf9vfyb2aP1taw2oHX/?=
- =?us-ascii?Q?K0wCh7XR/H/K7aaltZN8NRbRjuDiXGsAQd9dLyhJq4YfT2SK73apbNYHwsJd?=
- =?us-ascii?Q?3zR8++zrasGafDCm+TTNhPJkSJ1MDgMJtjv+Y9PwKG/4VF+yZvV3vgJGVFPt?=
- =?us-ascii?Q?4YicrggVdQoDsPXtMFzhWO14linokl4iwe5aTOUhxYvXZaAyowQpt5wfurCs?=
- =?us-ascii?Q?Ayh9RyF73+nepCUQNc4DUAy07tlFq34oGBkP1+a3753zs4MtmQJulZf3OBuZ?=
- =?us-ascii?Q?8F1Z190YLYL3QKV3jRJoJFKhU2RgBcxzG8PxQBDiQn2AWAUsEQLhYhcpZcuj?=
- =?us-ascii?Q?53L9khHWvM6P9qP8xVFd7/dphsBE6M7uEjQ2JGmn1fKCkKJBY/FtpAUEIEY5?=
- =?us-ascii?Q?dYVWF6lgfU0RkNfTzK7/pit+VVUkKfk4YFbI1g+As9p6XbLpIHR9no3K8oRY?=
- =?us-ascii?Q?v33Wt8tpGQ/3QrvQJMeRlNrgwRWMxq3uLTATB4vDm1ilG0jimpQPBgxrT/2X?=
- =?us-ascii?Q?VPGoCPEn4HUnV1Mf+lE7vxxp/vFpjRqDvwJGbqps0Rn8nFvgrd5mY4EHSgZ6?=
- =?us-ascii?Q?smSLlB6AP2eTUV01HAxRBefOvYtdF0qSe93p9Fi3Qzo4FDMJkG8BRLxDyuov?=
- =?us-ascii?Q?k8rLzPpoXpCwmf+kEClhjVMbMDbLikFkJlonRdZYJawiYwXY05H8rZBhQLWP?=
- =?us-ascii?Q?0feHNzp89zyUqPHP7LbSe0EVRO2Kaec+AqlfTVYtXHhrn6dgv4ER9PjPwQYz?=
- =?us-ascii?Q?SGZWHJfMP3Dwbx/9JF7Ar0+yL48OyXDsjmJqC5FYyMLMeziXXEes+OYa4KgX?=
- =?us-ascii?Q?5okmJIxxdB9AxsqQWPd+OzFWlm0XzrT0CAAYw0BwF9WQUj40YsjQQ+uWqIJ+?=
- =?us-ascii?Q?MlBpJt8puB7ETX/Bjze8q8/K1KeWGNB4KYXANyzSR2LWPBEqi39e?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bdfef69d-b376-4a04-fa4d-08dea4995fc0
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB8300.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2026 20:12:57.8040
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: L4Ck4zF95sPRkpw+1DBvmDDt+EvJGjHXhYAqkKsZVyTO5WLUeoARd7Y3XQH+qd9LnDnkEcQd9xWJtVVZZwcboA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9166
-X-Rspamd-Queue-Id: 3C738479E43
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] ipv6: Implement limits on extension header parsing
+To: Daniel Borkmann <daniel@iogearbox.net>, kuba@kernel.org
+Cc: edumazet@google.com, dsahern@kernel.org, tom@herbertland.com,
+ willemdebruijn.kernel@gmail.com, idosch@nvidia.com, justin.iurman@gmail.com,
+ pabeni@redhat.com, netdev@vger.kernel.org
+References: <20260427101318.750730-1-daniel@iogearbox.net>
+Content-Language: en-US
+From: Victor Nogueira <victor@mojatatu.com>
+In-Reply-To: <20260427101318.750730-1-daniel@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 63B5C479E83
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-281476-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,herbertland.com,gmail.com,nvidia.com,redhat.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281475-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[mojatatu.com];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[49];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ynorov@nvidia.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[linux-foundation.org,gmail.com,linutronix.de,vger.kernel.org,lists.infradead.org,lists.ozlabs.org,lists.freedesktop.org,lists.linux.dev,lists.xenproject.org,googlegroups.com,kvack.org,alsa-project.org,lists.linux-m68k.org];
+	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mojatatu-com.20251104.gappssmtp.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,iogearbox.net:email,mojatatu.com:mid]
 
-On Mon, Apr 27, 2026 at 07:13:50PM +0200, Christophe Leroy (CS GROUP) wrote:
-> copy_{to/from}_user() is a heavy function optimised for copy of large
-> blocs of memory between user and kernel space.
+On 27/04/2026 07:13, Daniel Borkmann wrote:
+> ipv6_{skip_exthdr,find_hdr}() and ip6_{tnl_parse_tlv_enc_lim,
+> protocol_deliver_rcu}() iterate over IPv6 extension headers until they
+> find a non-extension-header protocol or run out of packet data. The
+> loops have no iteration counter, relying solely on the packet length
+> to bound them. For a crafted packet with 8-byte extension headers
+> filling a 64KB jumbogram, this means a worst case of up to ~8k
+> iterations with a skb_header_pointer call each. ipv6_skip_exthdr(),
+> for example, is used where it parses the inner quoted packet inside
+> an incoming ICMPv6 error:
 > 
-> When the number of bytes to be copied is known at build time and small,
-> using scoped user access removes the burden of that optimisation.
+>    - icmpv6_rcv
+>      - checksum validation
+>      - case ICMPV6_DEST_UNREACH
+>        - icmpv6_notify
+>          - pskb_may_pull()       <- pull inner IPv6 header
+>          - ipv6_skip_exthdr()    <- iterates here
+>          - pskb_may_pull()
+>          - ipprot->err_handler() <- sk lookup
 > 
-> Signed-off-by: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
-> ---
->  include/linux/uaccess.h | 47 +++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 47 insertions(+)
+> The per-iteration cost of ipv6_skip_exthdr itself is generally
+> light, but skb_header_pointer becomes more costly on reassembled
+> packets: the first ~1232 bytes of the inner packet are in the skb's
+> linear area, but the remaining ~63KB are in the frag_list where
+> skb_copy_bits is needed to read data.
 > 
-> diff --git a/include/linux/uaccess.h b/include/linux/uaccess.h
-> index 33b7d0f5f808..3ac544527af2 100644
-> --- a/include/linux/uaccess.h
-> +++ b/include/linux/uaccess.h
-> @@ -50,6 +50,8 @@
->   #define mask_user_address(src) (src)
->  #endif
->  
-> +#define SMALL_COPY_USER		64
+> Add a configurable limit via a new sysctl net.ipv6.max_ext_hdrs_number
+> (default 8, minimum 1). All four extension header walking functions
+> are bound by this limit. The sysctl is in line with commit 47d3d7ac656a
+> ("ipv6: Implement limits on Hop-by-Hop and Destination options").
+> As documented, init_net is used to derive max_ext_hdrs_number to
+> be consistent given a net cannot always reliably be retrieved.
+> 
+> Note that the check in ip6_protocol_deliver_rcu() happens right
+> before the goto resubmit, such that we don't have to have a test
+> for ipv6_ext_hdr() in the fast-path.
+> 
+> There's an ongoing IETF draft-iurman-6man-eh-occurrences to enforce
+> IPv6 extension headers ordering and occurrence. The latter also
+> discusses security implications. As per RFC8200 section 4.1, the
+> occurrence rules for extension headers provide a practical upper
+> bound, thus 8 was used as the default.
+> 
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> [...]
+> diff --git a/net/ipv6/exthdrs_core.c b/net/ipv6/exthdrs_core.c
+> index 49e31e4ae7b7..9df892e7f7fb 100644
+> --- a/net/ipv6/exthdrs_core.c
+> +++ b/net/ipv6/exthdrs_core.c
+> [...]
+> @@ -72,7 +74,9 @@ EXPORT_SYMBOL(ipv6_ext_hdr);
+>   int ipv6_skip_exthdr(const struct sk_buff *skb, int start, u8 *nexthdrp,
+>   		     __be16 *frag_offp)
+>   {
+> +	int exthdr_max = READ_ONCE(init_net.ipv6.sysctl.max_ext_hdrs_cnt);
 
-Let's make it L1_CACHE_BYTES, and maybe configurable?
+This seems to be breaking the build when CONFIG_IPV6 is disabled:
 
+net/ipv6/exthdrs_core.c: In function ‘ipv6_skip_exthdr’:
+net/ipv6/exthdrs_core.c:77:45: error: ‘struct net’ has no member named 
+‘ipv6’; did you mean ‘ipv4’?
+    77 |         int exthdr_max = 
+READ_ONCE(init_net.ipv6.sysctl.max_ext_hdrs_cnt);
+
+> [...]
+> @@ -188,8 +194,10 @@ EXPORT_SYMBOL_GPL(ipv6_find_tlv);
+>   int ipv6_find_hdr(const struct sk_buff *skb, unsigned int *offset,
+>   		  int target, unsigned short *fragoff, int *flags)
+>   {
+> +	int exthdr_max = READ_ONCE(init_net.ipv6.sysctl.max_ext_hdrs_cnt);
+
+Here as well:
+
+net/ipv6/exthdrs_core.c: In function ‘ipv6_find_hdr’:
+net/ipv6/exthdrs_core.c:197:45: error: ‘struct net’ has no member named 
+‘ipv6’; did you mean ‘ipv4’?
+   197 |         int exthdr_max = 
+READ_ONCE(init_net.ipv6.sysctl.max_ext_hdrs_cnt);
+
+
+cheers,
+Victor
 
