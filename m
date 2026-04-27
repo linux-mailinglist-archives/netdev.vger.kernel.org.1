@@ -1,203 +1,181 @@
-Return-Path: <netdev+bounces-281447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281448-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YKs8F66r72kCDwEAu9opvQ
-	(envelope-from <netdev+bounces-281447-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:32:14 +0200
+	id QDiMI2ys72lIDwEAu9opvQ
+	(envelope-from <netdev+bounces-281448-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:35:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 077DF478A00
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:32:13 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D8C6478A9F
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:35:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7BF9330A9AE3
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:27:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 708BD300753E
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:35:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C45113EBF06;
-	Mon, 27 Apr 2026 18:27:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DD9239FCB9;
+	Mon, 27 Apr 2026 18:35:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L8HK9Rkg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O1pRr7EI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 426583D9DDD
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 18:27:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2D435F8C9;
+	Mon, 27 Apr 2026 18:35:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777314440; cv=none; b=sHrgnamlTvnPhbh0doq3llOcuvj3JSliHvxk2OwKlfqdWbzhVxHtaYVdNEqYT4ANvUbKXiZ1TBTBq1cjCe230ZYyhoNUezqskKocQWRMOGA8cTVp9zsyi7k5f6pRoJ5xykKM2RAAZwG/JiHYFMZi4iv5aH/JLlLQ+84VeLXMlfQ=
+	t=1777314922; cv=none; b=TbxVWDTXN/AnZqBX4svTev63SRWCgjDMegyjfElNkDA2VL8+gTx6C4QZ5D4ZEiykcdYa6yYrOW8dfUnktcwq/HyfpoWd/jpxEOiRGUpwTjTYJcdzP7xSfNE/z9RF1jml+dhDUXqbUouxi8mPs/WAMOLPvhJaLkALp8Ou3H3Sm4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777314440; c=relaxed/simple;
-	bh=hfkSb5iSK+jnG60DLGgd+UagdkvWshNa7oLEFPu+t10=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bUQlnSDkpNyqB+QgquHNXXtN01mMiL3T7voeLmuhMJghs8fmAFpINd4a3DrcTu3uemE+WqD2V59JswbQjO+uV6sf4bHE6jwfVJKxqe8xwkP2J7de9+sNSYr0DGkhLtC3wxq08/uHwTEVY4c7xyfYffNph1LBfceOmduUiBAP1xE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L8HK9Rkg; arc=none smtp.client-ip=209.85.167.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-479d4df9035so4545047b6e.0
-        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 11:27:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777314437; x=1777919237; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qUxrFoC8fiASca5qWozFg3oZ8Q9N01+/TQY2br6q3VU=;
-        b=L8HK9RkgWrv6nUTzfogIxwsJdEHW+phreVVAqCTMP7+x4J8+w77VbeVmGYbQhtC6hx
-         ZuHPtkESsyJr8hvj5amfMql/9w27Fpc4XBODbQkLXCFtJgDJ5DKod/FxPwk9NVSLkL2Q
-         P5S4x/fgsV0i1w8jilvdxasdIPPQC1T22kdswSWrsMn2kJ+nzejAhTDQeinmc2wgicaI
-         PoihBmqT1g0ozW7vbSyrqNyM6r3BDMZVHid7OFif+iOlzI7x1uM6movOkb8Ly33HutLG
-         MLlbPlPfp+mlopj6hEe2CAgtyPzJOBFl+TUYu38CJ0nebGIA0o0ui3DXRQmvjSGcBZif
-         YqIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777314437; x=1777919237;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qUxrFoC8fiASca5qWozFg3oZ8Q9N01+/TQY2br6q3VU=;
-        b=VxnXxwlyXDOKqxpr3o+cSeRD2hDh1YUGkYCqoDIB/PZojQGTo0E5bc6gk5IrKxcoFx
-         Yz/5hgGtFjgstAv+hFc2jX4L+lsNC3BauC3fnZHullrYuJldqrk3Vf+RLio9bJu3dEaO
-         XonnyFnc8MdetD/mPTdxXv2YVroP144vvl72P9uwOGvuFaoPPa8jAfUmSo4t378WrZ/E
-         JM+fPoKTbTauiDnMrEIsRv4reBb65fiPh9tzW/2tyTL2dfU+cOvt/fxXNcEBHQ4wg+XX
-         ZupRPqXEI1rV5X+HTvFIP8j6by3/O5193amaVJOIQNWJUCKJu52yWzFSGLwGGIoqW6NN
-         RSiQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9msFaQ8jDjyiS0iI7GXJtqIaWIk9msmtLkP8WVmSwxGUg9sN4Z7WYoyyk/w7wiDb0nFw9F5pQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwiMN//QB4v7/HoqLoWeoW56d4rnG8GVKSnh8QZ9XIpBXga2JJJ
-	2fj2e3plxWX2RXPPCDa9f0TS1OCTXYcE81KGcsdc/Y6kbln2XZkji/eB
-X-Gm-Gg: AeBDiet0qX7bAym9vyjysMu2AuCI89o7xOIYVd0gqyhFnHTZ2iQheNkYQAvXTS2RT+1
-	Mk6ZrLKtoukJC/uiHV41tqN2Q6ZEPv/8byeQ53mxx+YK9GTKhGqKbABvKMgD8zMMsnHmHoxUCr/
-	5Aho5NK+HPoqXrivjsNcS3UplFlOAFaxgMeVNw6SGJ7DZeBkBvjzWyuCqGWKAdWsh4G7SIeMS0J
-	dSmwxH/YLh1dl2SmFd/XhTsuA4KLLamG3LdHjYjak4XpcvTSZLH4agSprNwAypdFBCq9NPEHlkt
-	35lhC7ysUSGUVYSAAbfVkWnXHiL/Azt0x9RmdVTGiG5o4Ybw+nco/nSDtf+RYKmffM0B7dIalnJ
-	G1AB5hnRHhgEn4txBAsK/sXcKLrLvP0qKP+F+8kOK6gsM/o+U4mGDQ2Qb8L+O+5GngsGHchJME+
-	yd3tXlF+F7+1T+TOfFvXyACapgJ61IeYdxV8MDQxGvP5zIfJ9dms8+bkG/WXmBQdy2dUo62oy/t
-	qRAVzX7z5p0T4YfivB11AnmQ2RH
-X-Received: by 2002:a05:6808:3448:b0:472:c4ba:32d9 with SMTP id 5614622812f47-47c26cba3fdmr138293b6e.20.1777314437166;
-        Mon, 27 Apr 2026 11:27:17 -0700 (PDT)
-Received: from ?IPV6:2601:282:1e02:1040:7006:cec4:dca9:62e0? ([2601:282:1e02:1040:7006:cec4:dca9:62e0])
-        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-7de986a6da5sm124806a34.20.2026.04.27.11.27.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Apr 2026 11:27:16 -0700 (PDT)
-Message-ID: <77e1a762-e204-497b-b7cb-40d5a93f8ec7@gmail.com>
-Date: Mon, 27 Apr 2026 12:27:15 -0600
+	s=arc-20240116; t=1777314922; c=relaxed/simple;
+	bh=dt17/Yw/X7ftyXzeJoajfSmoBv1aq9SCt2MF5Y2JdVM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r3xipk+L30p/bfFK++jhyiI4jW9xR0FUb2qtsasAtf/UxzUN2/Tn+lQS8xLgrkBV1SN7FwZNv5cNlU5BiE+iVT6LHFhhxCsxPNujKnsMlUJwCRqYDw6JM4j1glwUzdQIYK0JlGUdsJMtEsk0nnIcz0VmwuZSZHTK4zPc+UO6z2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O1pRr7EI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1CFEC19425;
+	Mon, 27 Apr 2026 18:35:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777314921;
+	bh=dt17/Yw/X7ftyXzeJoajfSmoBv1aq9SCt2MF5Y2JdVM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=O1pRr7EI1PG1hjtjKdpAdfc+2s7DW0qoJ5kB20Ugw89Jv80juk123xO1KqCYRJP62
+	 i1fX+6A1M+MoaYEi705G2F+4y73YfmHnG+UYMTpX8UCi5kh9q6fI3dlsDXg6ykxjjO
+	 bnECLzldef1WsMK+ZycKb8ibIoPXIPgZ9PK4xnuQ7JThI9vBxqJAXtG6zLt8N/jYGQ
+	 +mRl8XWRM2a1bPrYVRemksBiIcZUBV2udHlt7IQVsC8VfIGj/3wpN++CXKC1TUxDPE
+	 YcB/RMUHxzycUhlVghl/khiwAz5yC1ETvZpkenO/AJgRmoecHc6DRHmd5Ii60qwPXU
+	 5Cmi32sxE5O6A==
+Date: Mon, 27 Apr 2026 21:35:13 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Zhiping Zhang <zhipingz@meta.com>
+Cc: Alex Williamson <alex@shazbot.org>, Stanislav Fomichev <sdf@meta.com>,
+	Keith Busch <kbusch@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Bjorn Helgaas <helgaas@kernel.org>, linux-rdma@vger.kernel.org,
+	linux-pci@vger.kernel.org, netdev@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, Yochai Cohen <yochai@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [PATCH v1 1/2] vfio: add callback to get tph info for dma-buf
+Message-ID: <20260427183513.GK440345@unreal>
+References: <20260420183920.3626389-1-zhipingz@meta.com>
+ <20260420183920.3626389-2-zhipingz@meta.com>
+ <20260422092327.3f629ad6@shazbot.org>
+ <20260427133746.GJ440345@unreal>
+ <CAH3zFs2Sy0mv=QkK4VSV+MVR=ef_CdoxMhTFgzaqoZ+uSOpxoQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 iproute2-next 1/4] rdma: Update headers
-Content-Language: en-US
-To: Stephen Hemminger <stephen@networkplumber.org>,
- Chiara Meiohas <cmeiohas@nvidia.com>
-Cc: leon@kernel.org, michaelgur@nvidia.com, jgg@nvidia.com,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
- Patrisious Haddad <phaddad@nvidia.com>
-References: <20260330173118.766885-1-cmeiohas@nvidia.com>
- <20260330173118.766885-2-cmeiohas@nvidia.com>
- <20260427112505.684c21f3@phoenix.local>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <20260427112505.684c21f3@phoenix.local>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 077DF478A00
+In-Reply-To: <CAH3zFs2Sy0mv=QkK4VSV+MVR=ef_CdoxMhTFgzaqoZ+uSOpxoQ@mail.gmail.com>
+X-Rspamd-Queue-Id: 2D8C6478A9F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_FROM(0.00)[bounces-281447-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281448-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dsahern@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,meta.com:email]
 
-On 4/27/26 12:25 PM, Stephen Hemminger wrote:
-> On Mon, 30 Mar 2026 20:31:15 +0300
-> Chiara Meiohas <cmeiohas@nvidia.com> wrote:
+On Mon, Apr 27, 2026 at 07:28:57AM -0700, Zhiping Zhang wrote:
+> On Mon, Apr 27, 2026 at 6:37 AM Leon Romanovsky <leon@kernel.org> wrote:
+> >
+> > >
+> > On Wed, Apr 22, 2026 at 09:23:27AM -0600, Alex Williamson wrote:
+> > > On Mon, 20 Apr 2026 11:39:15 -0700
+> > > Zhiping Zhang <zhipingz@meta.com> wrote:
+> > >
+> > > > Add a dma-buf callback that returns raw TPH metadata from the exporter
+> > > > so peer devices can reuse the steering tag and processing hint
+> > > > associated with a VFIO-exported buffer.
+> > > >
+> > > > Keep the existing VFIO_DEVICE_FEATURE_DMA_BUF uAPI layout intact by
+> > > > using a flag plus one extra trailing entries[] object for the optional
+> > > > TPH metadata. Rename the uAPI field dma_ranges to entries. The
+> > > > nr_ranges field remains the DMA range count; when VFIO_DMABUF_FLAG_TPH
+> > > > is set the kernel reads one extra entry beyond nr_ranges for the TPH
+> > > > metadata.
+> > > >
+> > > > Add an st_width parameter to get_tph() so the exporter can reject
+> > > > steering tags that exceed the consumer's supported width (8 vs 16 bit).
+> > > > When no TPH metadata was supplied, make get_tph() return -EOPNOTSUPP.
+> > > >
+> > > > Signed-off-by: Zhiping Zhang <zhipingz@meta.com>
+> > > > ---
+> > > >  drivers/vfio/pci/vfio_pci_dmabuf.c | 62 +++++++++++++++++++++++-------
+> > > >  include/linux/dma-buf.h            | 17 ++++++++
+> > > >  include/uapi/linux/vfio.h          | 28 ++++++++++++--
+> > > >  3 files changed, 89 insertions(+), 18 deletions(-)
+> >
+> > <...>
+> >
+> > > > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > > > index bb7b89330d35..a0bd24623c52 100644
+> > > > --- a/include/uapi/linux/vfio.h
+> > > > +++ b/include/uapi/linux/vfio.h
+> > > > @@ -1490,16 +1490,36 @@ struct vfio_device_feature_bus_master {
+> > > >   * open_flags are the typical flags passed to open(2), eg O_RDWR, O_CLOEXEC,
+> > > >   * etc. offset/length specify a slice of the region to create the dmabuf from.
+> > > >   * nr_ranges is the total number of (P2P DMA) ranges that comprise the dmabuf.
+> > > > + * When VFIO_DMABUF_FLAG_TPH is set, entries[] contains one extra trailing
+> > > > + * object after the nr_ranges DMA ranges carrying the TPH steering tag and
+> > > > + * processing hint.
+> > >
+> > > I really don't think we want to design an API where entries is
+> > > implicitly one-off from what's actually there.  This feeds back into
+> > > the below removal of the __counted by attribute, which is a red flag
+> > > that this is the wrong approach.
+> >
+> > I believe removing `__counted` is a mistake. In my proposal, the intent
+> > was to adjust the meaning of the storage object based on the flag bit.
+> > The size of the array should still be represented correctly.
+> >
+> > Thanks
 > 
->> From: Michael Guralnik <michaelgur@nvidia.com>
->>
->> Update rdma_netlink.h file up to kernel commit dbd0472fd7a5
->> ("RDMA/nldev: Expose kernel-internal FRMR pools in netlink")
->>
->> Signed-off-by: Michael Guralnik <michaelgur@nvidia.com>
->> Reviewed-by: Patrisious Haddad <phaddad@nvidia.com>
->> Reviewed-by: Chiara Meiohas <cmeiohas@nvidia.com>
+> Thanks Leon — you're right that __counted_by should be preserved. In
+> your approach, when the flag is set, the last entry in the array
+> carries the TPH data, so the effective DMA range count is nr_ranges -
+> 1.
+
+It is correct only if you keep the original name *nr_range*. However, the
+variable name is worth changing to something clearer, such as
+*nr_array_elements*.
+
 > 
-> The upstream macro names changed, the iproute2 build is broken after
-> current headers sync.
+> That said, after discussing internally, we're leaning toward
+> introducing a new VFIO device feature with dedicated TPH fields (as
+> Alex suggested too), to avoid overloading vfio_region_dma_range with a
+> union that changes semantics based on position.
 > 
-> In file included from res.c:7:
-> res.h: In function ‘_res_frmr_pools’:
-> res.h:203:26: error: ‘RDMA_NLDEV_CMD_RES_FRMR_POOLS_GET’ undeclared (first use in this function); did you mean ‘RDMA_NLDEV_CMD_FRMR_POOLS_GET’?
->   203 | RES_FUNC(res_frmr_pools, RDMA_NLDEV_CMD_RES_FRMR_POOLS_GET,
->       |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> res.h:56:44: note: in definition of macro ‘RES_FUNC’
->    56 |                 _command = res_get_command(command, rd);                               \
->       |                                            ^~~~~~~
-> res.h:203:26: note: each undeclared identifier is reported only once for each function it appears in
->   203 | RES_FUNC(res_frmr_pools, RDMA_NLDEV_CMD_RES_FRMR_POOLS_GET,
->       |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> res.h:56:44: note: in definition of macro ‘RES_FUNC’
->    56 |                 _command = res_get_command(command, rd);                               \
->       |                                            ^~~~~~~
+> Would you have concerns with that direction? I'll post a v3 with the
+> new approach.
 
+I don’t have any concerns. My only worry was about “stealing” too many  
+bits from the flags variable, and you’ve avoided that here.
 
-Looks like the merged API does not have the _RES part of the uapi:
-
-kernel vs iproute2:
-
-@@ -590,19 +590,19 @@
- 	/*
- 	 * FRMR Pools attributes
- 	 */
--	RDMA_NLDEV_ATTR_FRMR_POOLS,		/* nested table */
--	RDMA_NLDEV_ATTR_FRMR_POOL_ENTRY,	/* nested table */
--	RDMA_NLDEV_ATTR_FRMR_POOL_KEY,		/* nested table */
--	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ATS,	/* u8 */
--	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ACCESS_FLAGS,	/* u32 */
--	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_VENDOR_KEY,	/* u64 */
--	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_NUM_DMA_BLOCKS,	/* u64 */
--	RDMA_NLDEV_ATTR_FRMR_POOL_QUEUE_HANDLES,	/* u32 */
--	RDMA_NLDEV_ATTR_FRMR_POOL_MAX_IN_USE,	/* u64 */
--	RDMA_NLDEV_ATTR_FRMR_POOL_IN_USE,	/* u64 */
--	RDMA_NLDEV_ATTR_FRMR_POOLS_AGING_PERIOD,	/* u32 */
--	RDMA_NLDEV_ATTR_FRMR_POOL_PINNED_HANDLES,	/* u32 */
--	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_KERNEL_VENDOR_KEY,	/* u64 */
-+	RDMA_NLDEV_ATTR_RES_FRMR_POOLS,			/* nested table */
-+	RDMA_NLDEV_ATTR_RES_FRMR_POOL_ENTRY,		/* nested table */
-+	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY,		/* nested table */
-+	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ATS,		/* u8 */
-+	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ACCESS_FLAGS,	/* u32 */
-+	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_VENDOR_KEY,	/* u64 */
-+	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_NUM_DMA_BLOCKS, /* u64 */
-+	RDMA_NLDEV_ATTR_RES_FRMR_POOL_QUEUE_HANDLES,	/* u32 */
-+	RDMA_NLDEV_ATTR_RES_FRMR_POOL_MAX_IN_USE,	/* u64 */
-+	RDMA_NLDEV_ATTR_RES_FRMR_POOL_IN_USE,		/* u64 */
-+	RDMA_NLDEV_ATTR_RES_FRMR_POOL_AGING_PERIOD,	/* u32 */
-+	RDMA_NLDEV_ATTR_RES_FRMR_POOL_PINNED,		/* u32 */
-+	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_KERNEL_VENDOR_KEY, /* u64 */
-
- 	/*
+Thanks
 
