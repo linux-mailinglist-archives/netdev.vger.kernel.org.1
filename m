@@ -1,226 +1,552 @@
-Return-Path: <netdev+bounces-281257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281258-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uONwEX0b72lx6gAAu9opvQ
-	(envelope-from <netdev+bounces-281257-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 10:17:01 +0200
+	id ID+YMEMc72lk6wAAu9opvQ
+	(envelope-from <netdev+bounces-281258-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 10:20:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C48B46EEAE
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 10:17:00 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9145246EF42
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 10:20:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3FD17301FD6E
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 08:16:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1DEC63006115
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 08:20:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF08539A800;
-	Mon, 27 Apr 2026 08:16:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B671F39B489;
+	Mon, 27 Apr 2026 08:19:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="femWp/wI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uvf6G7WG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63A9D1A8F84
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 08:16:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90D239B482
+	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 08:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777277788; cv=none; b=K5Vk39I+z2xFB4ztsY3CZF+M5CUhlGa6LIOaXcCSLzuRmoYVR8lqKmXfq5JtLuCFxa32ezjjqfgQYuiEXYxs7xsgS7mrmj11XH8F1cNFRcz0CZHAvZCzGHrqh4yXtWpILD94FzziveODCehBeo9osvn7xTvXpQX/MmiyKN5G0UY=
+	t=1777277997; cv=none; b=gYubwCm+2UU1gEkLXxx+eZuMrrnDQlmJLh70eBFUE1jgSms9AR4d4wLAHwEs8zH7E+mYSfY1ElbyaLpALDEg/HBN68A8TqUsJMikWrbG2Yaok7t54I5YPqJ0W+IuhQn6gq4styYLaWoZx0dAy16r0qFOm+e2R8bzw/qQC7nUL2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777277788; c=relaxed/simple;
-	bh=hMglcFQSz31hJgpjWEqZO+bMNqVqQrCNw2tIdm+z4D4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WSRGGQKfdgMAPrwwFNG/31/ID0zjtP/T8jv3BvbSzMa3pYqzSt4E0JFWa6uE7DYUMtCxHpLqwLaxLNgcPJRbbbxeRCGyuqC0o1vfsVM1hoq1BxX3CQmg599VS7D473Tze6bwdZEQR4fro8nqoHG6opC+pAMhHiVHLIbUb0+ulx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=femWp/wI; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777277786; x=1808813786;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=hMglcFQSz31hJgpjWEqZO+bMNqVqQrCNw2tIdm+z4D4=;
-  b=femWp/wIDQMxjWkT5nMMZbOwDACwq1JWR/0MbaVebAdmOT9IDGsIGKeT
-   96FOtNXBnQ75TeTQ2tvsQ9xt4uEPfioeG8/zQCY6UnJCVSwvjFJ7eiGPw
-   0d+MJVY2A5sQY25IBsU4Ko0HRZk6onORY5AG6RXEMU1sYnhz6/kq7aZSN
-   vNAEEdrazjZIrfBjiOeHjphOIAlhYzgJ5j/9bA9m3CdRMI4zLAnFb17Ra
-   +FNBMexL6nB547Ex8ZVfBJbKlA8Ns2vwk6e8aV3OBjGEiNaii23BlOA0l
-   Wor12//ImGHWxeE0Dx8W1wZw9UCx+KPyY8E7J0Fs8EGh8sWBJEFyTsitH
-   w==;
-X-CSE-ConnectionGUID: aTd7OkTxQ86spdhB2o7zmw==
-X-CSE-MsgGUID: qD1+/BNSS8GLwvK/W+Qg7w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11768"; a="103621872"
-X-IronPort-AV: E=Sophos;i="6.23,201,1770624000"; 
-   d="scan'208";a="103621872"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2026 01:16:26 -0700
-X-CSE-ConnectionGUID: P2d6FAewS+y9OVEagBh/OA==
-X-CSE-MsgGUID: B+aHVFNHR8GfzE/lhgmy9Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,201,1770624000"; 
-   d="scan'208";a="229252784"
-Received: from black.igk.intel.com ([10.91.253.5])
-  by fmviesa010.fm.intel.com with ESMTP; 27 Apr 2026 01:16:24 -0700
-Received: by black.igk.intel.com (Postfix, from userid 1001)
-	id 2B3E698; Mon, 27 Apr 2026 10:16:23 +0200 (CEST)
-From: Mika Westerberg <mika.westerberg@linux.intel.com>
-To: netdev@vger.kernel.org
-Cc: Yehezkel Bernat <YehezkelShB@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Mika Westerberg <mika.westerberg@linux.intel.com>
-Subject: [PATCH 2/2] net: thunderbolt: Fix lockdep issue during tunnel tear down
-Date: Mon, 27 Apr 2026 10:16:23 +0200
-Message-ID: <20260427081623.2338179-2-mika.westerberg@linux.intel.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20260427081623.2338179-1-mika.westerberg@linux.intel.com>
-References: <20260427081623.2338179-1-mika.westerberg@linux.intel.com>
+	s=arc-20240116; t=1777277997; c=relaxed/simple;
+	bh=U/Da4CG9zyFVhJWXw1IkB5xC0v+HckHQFadw3JJt55Q=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=KdNhmfpqEO5d5omr+dKlFtvn2my2vYFQQhefnzJYhiebsomoC3AqkgafegFBy3eafTo54tcO4AxE0TjAI5N3sw2BeMDuofL4+2ZU3O04TgBthjSDNTMtWEuFqWqEv9/3bjppR4K2bU+uUiuRsVsx3at6TiV5uGVQKbqZtVexpfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uvf6G7WG; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8eaee67d1bcso1355629285a.0
+        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 01:19:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777277995; x=1777882795; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Z+EVm9PgXe4DnSmhH1iRHlGINhe2M5ARvnyMqCcu7Qs=;
+        b=uvf6G7WGn5RerYBlu0Xn6jnBI/mFPGSq5l6uNTmb6aawGz56/ZOpWF3IqJYDU3Qsik
+         yBGJy2I5NWXHQ5oO1I28UvZ5KsKDyHgFM7c74+Z+LA33BhA7sJqeWOBgjrRtNY2cX3le
+         sSP340Odey0JGOmSZ0NMcnPG8HCj1AlyhrWg/nkia9WGiYWdtWeE9cjJMmKyeWuFZwp2
+         6tya/gGim92HEZq0iDC6lQX5O188PPe2Alz3SWFQBTD9UcEGkzCumbegj46T4FEsttm3
+         g26JUchWZWDfbeX9ZN9iyb525BOOL6H3bQFg28rsF2lHyXyTwXumchuuphDobf+Yvwk3
+         vlQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777277995; x=1777882795;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Z+EVm9PgXe4DnSmhH1iRHlGINhe2M5ARvnyMqCcu7Qs=;
+        b=ibLjc3uJGOIe3DwW72nVVYC1E2QKV5HWSuQhuB+cl4DjhiD3ipO6Iz/dLDBp0ZGf/B
+         d6SVksJQInV4sZXzlqE/Nn+ioPBPNGvGlThvnGhZOSDL7qkw7t3yN3Q+Ob1XGvs5aSh6
+         VPF+6rtaTjUCGMTTgIyBfM8ip5uhBrnNdJKIW8GAKPtRQE8sU9x2wNPThhwyJ8BDLXcX
+         ohjw13XFp7Tqwwx3rLDbxjD0xhJHA7Pmsx6y+jvq1XDMYbA5ALRaFQHH01zI7iUaQOQK
+         r+b5dkK1JHuuGEp3dpo7FN5rIy9DC5aXmfeqMl4P+E+4Zo1UFbvvx3B379YntdUweaUB
+         lt5g==
+X-Forwarded-Encrypted: i=1; AFNElJ+twGCyhBlRRJfXH935OVSaynpNzXaGHdywTukQ3TQAVNteeEHiRh/8Ul714aXyxOonLjDWVgM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrFQCbM0hsWZ1OAWj3k/tiAiI5kOHj9A4UPSdxsA+yQD+ld+0T
+	c250tTKhSFOEKkC05jOf1ye3koDGWuPM1yX+ShbqdmCZtnz56xU+en94rl5a7QgaUBaDgUwWI8x
+	MaYtUCTYnJDa4+w==
+X-Received: from qvbkk25.prod.google.com ([2002:a05:6214:5099:b0:8a3:6752:348e])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:ad4:5746:0:b0:89c:4fab:3783 with SMTP id 6a1803df08f44-8b027e76f94mr665037356d6.0.1777277994462;
+ Mon, 27 Apr 2026 01:19:54 -0700 (PDT)
+Date: Mon, 27 Apr 2026 08:19:53 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 8C48B46EEAE
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
+Message-ID: <20260427081953.364819-1-edumazet@google.com>
+Subject: [PATCH v2 iproute2-next] utils: add fflush_monitor() helper
+From: Eric Dumazet <edumazet@google.com>
+To: David Ahern <dsahern@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 9145246EF42
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281257-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,google.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.intel.com];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mika.westerberg@linux.intel.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-281258-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-When unplugging cable with lockdep enabled it triggers following:
+Some fflush() calls only make sense for monitor programs.
 
- ======================================================
- WARNING: possible circular locking dependency detected
- 6.18.0-rc4+ #1636 Tainted: G S
- ------------------------------------------------------
- kworker/u56:2/416 is trying to acquire lock:
- ffff88818642c8a8 ((work_completion)(&ring->work)){+.+.}-{0:0}, at: __flush_work+0x562/0xde0
+For other cases, forcing a flush is expensive.
 
- but task is already holding lock:
- ffff888184b30fa8 (&net->connection_lock){+.+.}-{4:4}, at: tbnet_tear_down+0x110/0x6f0 [thunderbolt_net]
+After this patch, ip, tc and ss are correctly buffering most of their
+output when redirected to a file.
 
-We actually don't need to net->hold the connection_lock any more than
-necessary to figure out if the connection is up or not, and can return
-early if it is not.
-
-Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- drivers/net/thunderbolt/main.c | 59 +++++++++++++++++-----------------
- 1 file changed, 29 insertions(+), 30 deletions(-)
+ include/utils.h  |  7 +++++++
+ ip/ipaddress.c   | 12 +++++++-----
+ ip/iplink.c      |  4 ++--
+ ip/ipmonitor.c   |  1 +
+ ip/ipmptcp.c     | 10 +++++-----
+ ip/ipneigh.c     |  4 ++--
+ ip/ipnetconf.c   |  2 +-
+ ip/ipnetns.c     |  2 +-
+ ip/ipnexthop.c   | 12 ++++++------
+ ip/iproute.c     |  4 ++--
+ ip/iprule.c      |  2 +-
+ ip/iptoken.c     |  2 +-
+ ip/tcp_metrics.c |  2 +-
+ lib/utils.c      |  1 +
+ misc/ss.c        |  3 ++-
+ tc/tc_class.c    |  2 +-
+ tc/tc_filter.c   |  2 +-
+ tc/tc_monitor.c  |  1 +
+ tc/tc_qdisc.c    |  2 +-
+ 19 files changed, 44 insertions(+), 31 deletions(-)
 
-diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/main.c
-index 631af237998d..d8fcf18fc55c 100644
---- a/drivers/net/thunderbolt/main.c
-+++ b/drivers/net/thunderbolt/main.c
-@@ -372,48 +372,47 @@ static void tbnet_free_buffers(struct tbnet_ring *ring)
+diff --git a/include/utils.h b/include/utils.h
+index b68d6bc4edcf9ca335148f731cd240871b6c809b..2ed3b75ebb45e0f0e4aedd9bdf21375f74c2bbef 100644
+--- a/include/utils.h
++++ b/include/utils.h
+@@ -38,6 +38,7 @@ extern int numeric;
+ extern bool do_all;
+ extern int echo_request;
+ extern int use_iec;
++extern int monitor_mode;
  
- static void tbnet_tear_down(struct tbnet *net, bool send_logout)
- {
-+	int ret, retries = TBNET_LOGOUT_RETRIES;
+ #define SPRINT_BSIZE 64
+ #define SPRINT_BUF(x)	char x[SPRINT_BSIZE]
+@@ -399,4 +400,10 @@ FILE *generic_proc_open(const char *env, const char *name);
+ int open_fds_add(int fd);
+ void open_fds_close(void);
+ 
++static inline void fflush_monitor(FILE *fp)
++{
++	if (monitor_mode)
++		fflush(fp);
++}
 +
- 	netif_carrier_off(net->dev);
- 	netif_stop_queue(net->dev);
+ #endif /* __UTILS_H__ */
+diff --git a/ip/ipaddress.c b/ip/ipaddress.c
+index 4d93a04a8555e141ae30a4aaeb42ac607a181c9b..14aa98e77452c9681c9d3660f6a882df56b44f1c 100644
+--- a/ip/ipaddress.c
++++ b/ip/ipaddress.c
+@@ -894,7 +894,7 @@ static int print_linkinfo_brief(FILE *fp, const char *name,
+ 		print_string(PRINT_FP, NULL, "%s", "\n");
+ 	}
  
- 	stop_login(net);
- 
- 	mutex_lock(&net->connection_lock);
-+	if (!net->login_sent || !net->login_received) {
-+		mutex_unlock(&net->connection_lock);
-+		return;
-+	}
-+	net->login_sent = false;
-+	net->login_received = false;
-+	mutex_unlock(&net->connection_lock);
- 
--	if (net->login_sent && net->login_received) {
--		int ret, retries = TBNET_LOGOUT_RETRIES;
-+	while (send_logout && retries-- > 0) {
-+		netdev_dbg(net->dev, "sending logout request %u\n",
-+			   retries);
-+		ret = tbnet_logout_request(net);
-+		if (ret != -ETIMEDOUT)
-+			break;
-+	}
- 
--		while (send_logout && retries-- > 0) {
--			netdev_dbg(net->dev, "sending logout request %u\n",
--				   retries);
--			ret = tbnet_logout_request(net);
--			if (ret != -ETIMEDOUT)
--				break;
--		}
-+	tb_ring_stop(net->rx_ring.ring);
-+	tb_ring_stop(net->tx_ring.ring);
-+	tbnet_free_buffers(&net->rx_ring);
-+	tbnet_free_buffers(&net->tx_ring);
- 
--		tb_ring_stop(net->rx_ring.ring);
--		tb_ring_stop(net->tx_ring.ring);
--		tbnet_free_buffers(&net->rx_ring);
--		tbnet_free_buffers(&net->tx_ring);
--
--		ret = tb_xdomain_disable_paths(net->xd,
--					       net->local_transmit_path,
--					       net->tx_ring.ring->hop,
--					       net->remote_transmit_path,
--					       net->rx_ring.ring->hop);
--		if (ret)
--			netdev_warn(net->dev, "failed to disable DMA paths\n");
--
--		tb_xdomain_release_in_hopid(net->xd, net->remote_transmit_path);
--		net->remote_transmit_path = 0;
--	}
-+	ret = tb_xdomain_disable_paths(net->xd,
-+				       net->local_transmit_path,
-+				       net->tx_ring.ring->hop,
-+				       net->remote_transmit_path,
-+				       net->rx_ring.ring->hop);
-+	if (ret)
-+		netdev_warn(net->dev, "failed to disable DMA paths\n");
- 
--	net->login_retries = 0;
--	net->login_sent = false;
--	net->login_received = false;
-+	tb_xdomain_release_in_hopid(net->xd, net->remote_transmit_path);
-+	net->remote_transmit_path = 0;
- 
- 	netdev_dbg(net->dev, "network traffic stopped\n");
--
--	mutex_unlock(&net->connection_lock);
+-	fflush(fp);
++	fflush_monitor(fp);
+ 	return 0;
  }
  
- static int tbnet_handle_packet(const void *buf, size_t size, void *data)
+@@ -1346,10 +1346,12 @@ int print_linkinfo(struct nlmsghdr *n, void *arg)
+ 	}
+ 
+ 	print_string(PRINT_FP, NULL, "%s", "\n");
+-	fflush(fp);
++	fflush_monitor(fp);
+ 	/* prettier here if stderr and stdout go to the same place */
+-	if (truncated_vfs)
++	if (truncated_vfs) {
++		fflush(fp);
+ 		fprintf(stderr, "Truncated VF list: %s\n", name);
++	}
+ 	return 1;
+ }
+ 
+@@ -1732,7 +1734,7 @@ int print_addrinfo(struct nlmsghdr *n, void *arg)
+ 	}
+ 	print_string(PRINT_FP, NULL, "%s", "\n");
+ brief_exit:
+-	fflush(fp);
++	fflush_monitor(fp);
+ 	return 0;
+ }
+ 
+@@ -1768,7 +1770,7 @@ static int print_selected_addrinfo(struct ifinfomsg *ifi,
+ 
+ 	if (brief) {
+ 		print_string(PRINT_FP, NULL, "%s", "\n");
+-		fflush(fp);
++		fflush_monitor(fp);
+ 	}
+ 	return 0;
+ }
+diff --git a/ip/iplink.c b/ip/iplink.c
+index fce6631d2d821a8739d28805e13d98f6804bda30..806f86987ed7c8af5ddd40f04a44fb8ce8debfaf 100644
+--- a/ip/iplink.c
++++ b/ip/iplink.c
+@@ -1296,7 +1296,7 @@ static void print_mpls_stats(FILE *fp, struct rtattr *attr)
+ 	print_nl();
+ 	print_mpls_link_stats(fp, stats, "        ");
+ 	print_string(PRINT_FP, NULL, "%s", "\n");
+-	fflush(fp);
++	fflush_monitor(fp);
+ }
+ 
+ static void print_af_stats_attr(FILE *fp, int ifindex, struct rtattr *attr)
+@@ -1359,7 +1359,7 @@ static int print_af_stats(struct nlmsghdr *n, void *arg)
+ 	if (tb[IFLA_STATS_AF_SPEC])
+ 		print_af_stats_attr(fp, ifsm->ifindex, tb[IFLA_STATS_AF_SPEC]);
+ 
+-	fflush(fp);
++	fflush_monitor(fp);
+ 	return 0;
+ }
+ 
+diff --git a/ip/ipmonitor.c b/ip/ipmonitor.c
+index 1f4e860f8d6726edffcf9bf81636c6555757dd09..23bd667a2f7a27e620d0f6dd13a16476c1ac0d08 100644
+--- a/ip/ipmonitor.c
++++ b/ip/ipmonitor.c
+@@ -324,6 +324,7 @@ int do_ipmonitor(int argc, char **argv)
+ 		return err;
+ 	}
+ 
++	monitor_mode = 1;
+ 	if (rtnl_open(&rth, groups) < 0)
+ 		exit(1);
+ 
+diff --git a/ip/ipmptcp.c b/ip/ipmptcp.c
+index 3df89db54b4e00f8fe2d18828621999512622d59..37df15ba9b5f2d6974f5fdd2360025ce9a017316 100644
+--- a/ip/ipmptcp.c
++++ b/ip/ipmptcp.c
+@@ -276,7 +276,7 @@ static int print_mptcp_addrinfo(struct rtattr *addrinfo)
+ 
+ 	print_nl();
+ 	close_json_object();
+-	fflush(stdout);
++	fflush_monitor(stdout);
+ 
+ 	return 0;
+ }
+@@ -325,7 +325,7 @@ static int mptcp_addr_dump(void)
+ 	}
+ 
+ 	delete_json_obj();
+-	fflush(stdout);
++	fflush_monitor(stdout);
+ 	return 0;
+ }
+ 
+@@ -349,7 +349,7 @@ static int mptcp_addr_show(int argc, char **argv)
+ 	ret = print_mptcp_addr(answer, stdout);
+ 	delete_json_obj();
+ 	free(answer);
+-	fflush(stdout);
++	fflush_monitor(stdout);
+ 	return ret;
+ }
+ 
+@@ -430,7 +430,7 @@ static int print_mptcp_limit(struct nlmsghdr *n, void *arg)
+ 
+ 	print_nl();
+ 	close_json_object();
+-	fflush(stdout);
++	fflush_monitor(stdout);
+ 
+ 	return 0;
+ }
+@@ -592,7 +592,7 @@ static int mptcp_monitor_msg(struct rtnl_ctrl_data *ctrl,
+ out:
+ 	print_nl();
+ 	close_json_object();
+-	fflush(stdout);
++	fflush_monitor(stdout);
+ 
+ 	return 0;
+ }
+diff --git a/ip/ipneigh.c b/ip/ipneigh.c
+index e678545ad535ad83722d1daef51f08c569df8236..2b74fccdfd9c5e39d675b8d1419e23bf9f6b6e3d 100644
+--- a/ip/ipneigh.c
++++ b/ip/ipneigh.c
+@@ -298,7 +298,7 @@ static int print_neigh_brief(FILE *fp, struct ndmsg *r, struct rtattr *tb[])
+ 
+ 	print_string(PRINT_FP, NULL, "%s", "\n");
+ 	close_json_object();
+-	fflush(fp);
++	fflush_monitor(fp);
+ 
+ 	return 0;
+ }
+@@ -472,7 +472,7 @@ int print_neigh(struct nlmsghdr *n, void *arg)
+ 
+ 	print_string(PRINT_FP, NULL, "\n", "");
+ 	close_json_object();
+-	fflush(fp);
++	fflush_monitor(fp);
+ 
+ 	return 0;
+ }
+diff --git a/ip/ipnetconf.c b/ip/ipnetconf.c
+index 020eff786d0b82f3033a71c2f4fc3d5b1af5f099..efb4da963d463481fa27f41fcb8e65db844381cf 100644
+--- a/ip/ipnetconf.c
++++ b/ip/ipnetconf.c
+@@ -140,7 +140,7 @@ int print_netconf(struct rtnl_ctrl_data *ctrl, struct nlmsghdr *n, void *arg)
+ 
+ 	close_json_object();
+ 	print_string(PRINT_FP, NULL, "\n", NULL);
+-	fflush(fp);
++	fflush_monitor(fp);
+ 	return 0;
+ }
+ 
+diff --git a/ip/ipnetns.c b/ip/ipnetns.c
+index 3a33a3adacee31080c3ea9d0a52e455243423a75..abe5746415176c137c9755a6211cc4b7cbabe4e2 100644
+--- a/ip/ipnetns.c
++++ b/ip/ipnetns.c
+@@ -327,7 +327,7 @@ int print_nsid(struct nlmsghdr *n, void *arg)
+ 
+ 	print_string(PRINT_FP, NULL, "\n", NULL);
+ 	close_json_object();
+-	fflush(fp);
++	fflush_monitor(fp);
+ 	return 0;
+ }
+ 
+diff --git a/ip/ipnexthop.c b/ip/ipnexthop.c
+index d5c429369d10f629823639fa7e6bfb70be5226d6..a9ebffc8e50101c5c4b2480fd4d8e1bb1a3c7588 100644
+--- a/ip/ipnexthop.c
++++ b/ip/ipnexthop.c
+@@ -826,7 +826,7 @@ int print_cache_nexthop(struct nlmsghdr *n, void *arg, bool process_cache)
+ 
+ 	__print_nexthop_entry(fp, NULL, &nhe, n->nlmsg_type == RTM_DELNEXTHOP);
+ 	print_string(PRINT_FP, NULL, "%s", "\n");
+-	fflush(fp);
++	fflush_monitor(fp);
+ 
+ 	if (process_cache)
+ 		ipnh_cache_process_nlmsg(n, &nhe);
+@@ -882,7 +882,7 @@ int print_nexthop_bucket(struct nlmsghdr *n, void *arg)
+ 
+ 	print_string(PRINT_FP, NULL, "%s", "\n");
+ 	close_json_object();
+-	fflush(fp);
++	fflush_monitor(fp);
+ 
+ 	return 0;
+ }
+@@ -1178,7 +1178,7 @@ static int ipnh_get_id(__u32 id)
+ 	}
+ 
+ 	delete_json_obj();
+-	fflush(stdout);
++	fflush_monitor(stdout);
+ 
+ 	free(answer);
+ 
+@@ -1266,7 +1266,7 @@ static int ipnh_list_flush(int argc, char **argv, int action)
+ 	}
+ 
+ 	delete_json_obj();
+-	fflush(stdout);
++	fflush_monitor(stdout);
+ 
+ 	return 0;
+ }
+@@ -1342,7 +1342,7 @@ static int ipnh_bucket_list(int argc, char **argv)
+ 	}
+ 
+ 	delete_json_obj();
+-	fflush(stdout);
++	fflush_monitor(stdout);
+ 
+ 	return 0;
+ }
+@@ -1383,7 +1383,7 @@ static int ipnh_bucket_get_id(__u32 id, __u16 bucket_index)
+ 	}
+ 
+ 	delete_json_obj();
+-	fflush(stdout);
++	fflush_monitor(stdout);
+ 
+ 	free(answer);
+ 
+diff --git a/ip/iproute.c b/ip/iproute.c
+index c2538894da633b56f5b926ecafda4960a48e9fbd..c6a6ba9dd37076acfceb9b259874a50e7cd3c3d0 100644
+--- a/ip/iproute.c
++++ b/ip/iproute.c
+@@ -1012,7 +1012,7 @@ int print_route(struct nlmsghdr *n, void *arg)
+ 
+ 	print_string(PRINT_FP, NULL, "\n", NULL);
+ 	close_json_object();
+-	fflush(fp);
++	fflush_monitor(fp);
+ 	return 0;
+ }
+ 
+@@ -2035,7 +2035,7 @@ static int iproute_list_flush_or_save(int argc, char **argv, int action)
+ 	}
+ 
+ 	delete_json_obj();
+-	fflush(stdout);
++	fflush_monitor(stdout);
+ 	return 0;
+ }
+ 
+diff --git a/ip/iprule.c b/ip/iprule.c
+index 3af02da24950ae224614e8e45e3de400675eee57..5bcafe11986f84f4b1946d758647d909456aeb61 100644
+--- a/ip/iprule.c
++++ b/ip/iprule.c
+@@ -599,7 +599,7 @@ int print_rule(struct nlmsghdr *n, void *arg)
+ 
+ 	print_string(PRINT_FP, NULL, "\n", "");
+ 	close_json_object();
+-	fflush(fp);
++	fflush_monitor(fp);
+ 	return 0;
+ }
+ 
+diff --git a/ip/iptoken.c b/ip/iptoken.c
+index f25a7c8b21f57c941d975a0255b0613f8a38f999..c19f9e0b4fdb282d1835959b025adf5bdf5a14e8 100644
+--- a/ip/iptoken.c
++++ b/ip/iptoken.c
+@@ -85,7 +85,7 @@ static int print_token(struct nlmsghdr *n, void *arg)
+ 			   "ifname", "%s\n",
+ 			   ll_index_to_name(ifi->ifi_index));
+ 	close_json_object();
+-	fflush(fp);
++	fflush_monitor(fp);
+ 
+ 	return 0;
+ }
+diff --git a/ip/tcp_metrics.c b/ip/tcp_metrics.c
+index 9c8fb07240bf01511aa2fc8cc2e80603db3252c9..b69bb282e1f30f53843e2cd9e51bfc3debf4310b 100644
+--- a/ip/tcp_metrics.c
++++ b/ip/tcp_metrics.c
+@@ -334,7 +334,7 @@ static int process_msg(struct nlmsghdr *n, void *arg)
+ 
+ 	print_string(PRINT_FP, NULL, "\n", "");
+ 	close_json_object();
+-	fflush(fp);
++	fflush_monitor(fp);
+ 	return 0;
+ }
+ 
+diff --git a/lib/utils.c b/lib/utils.c
+index 1215fe31cb3f63c0fa768fef60da77a641c51581..7017b0e6afacd8e770fb9f8b26aa5a319c1279e7 100644
+--- a/lib/utils.c
++++ b/lib/utils.c
+@@ -41,6 +41,7 @@ int timestamp_short;
+ int pretty;
+ int use_iec;
+ int human_readable;
++int monitor_mode;
+ const char *_SL_ = "\n";
+ 
+ static int open_fds[5];
+diff --git a/misc/ss.c b/misc/ss.c
+index 14e9f27a75321556240a5f290b8bcf51c605a4c2..0f9b37177d375ddf70cb34674992723b5c4883be 100644
+--- a/misc/ss.c
++++ b/misc/ss.c
+@@ -5544,7 +5544,7 @@ static int generic_show_sock(struct nlmsghdr *nlh, void *arg)
+ 
+ 	render();
+ 
+-	fflush(stdout);
++	fflush_monitor(stdout);
+ 	return ret;
+ }
+ 
+@@ -5580,6 +5580,7 @@ static int handle_follow_request(struct filter *f)
+ 		f->rth_for_killing = &rth2;
+ 	}
+ 
++	monitor_mode = 1;
+ 	if (rtnl_dump_filter(&rth, generic_show_sock, f))
+ 		ret = -1;
+ 
+diff --git a/tc/tc_class.c b/tc/tc_class.c
+index 6d707d8c924f4b5e90201d4de8e9779f82ce17f3..8197566281fad47d4efcf4768ed406ab809dd08a 100644
+--- a/tc/tc_class.c
++++ b/tc/tc_class.c
+@@ -380,7 +380,7 @@ int print_class(struct nlmsghdr *n, void *arg)
+ 		close_json_object();
+ 	}
+ 	close_json_object();
+-	fflush(fp);
++	fflush_monitor(fp);
+ 	return 0;
+ }
+ 
+diff --git a/tc/tc_filter.c b/tc/tc_filter.c
+index 7db850bda11a3408ec66b457c9fc590f3a734f65..633f027d79865d98ba1ccba48af71d247dfc7a48 100644
+--- a/tc/tc_filter.c
++++ b/tc/tc_filter.c
+@@ -374,7 +374,7 @@ int print_filter(struct nlmsghdr *n, void *arg)
+ 
+ 	print_ext_msg(tb);
+ 	close_json_object();
+-	fflush(fp);
++	fflush_monitor(fp);
+ 	return 0;
+ }
+ 
+diff --git a/tc/tc_monitor.c b/tc/tc_monitor.c
+index 5b9bccbed4140241a4d7a5cffc50865106224867..49bd4b6a460fbfe41a35e06f92f07dbe56a6be2d 100644
+--- a/tc/tc_monitor.c
++++ b/tc/tc_monitor.c
+@@ -100,6 +100,7 @@ int do_tcmonitor(int argc, char **argv)
+ 		return ret;
+ 	}
+ 
++	monitor_mode = 1;
+ 	if (rtnl_open(&rth, groups) < 0)
+ 		exit(1);
+ 
+diff --git a/tc/tc_qdisc.c b/tc/tc_qdisc.c
+index 7eb9a31baa31fb91a8141c9eca1135e76a52fa8b..a8ef8fc9f70d91609d6ed61c2a46b29120512fd2 100644
+--- a/tc/tc_qdisc.c
++++ b/tc/tc_qdisc.c
+@@ -344,7 +344,7 @@ int print_qdisc(struct nlmsghdr *n, void *arg)
+ 
+ 	print_ext_msg(tb);
+ 	close_json_object();
+-	fflush(fp);
++	fflush_monitor(fp);
+ 	return 0;
+ }
+ 
 -- 
-2.50.1
+2.54.0.545.g6539524ca2-goog
 
 
