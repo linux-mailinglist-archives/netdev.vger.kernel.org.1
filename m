@@ -1,362 +1,186 @@
-Return-Path: <netdev+bounces-281358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281339-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QMFcAcpr72nFBAEAu9opvQ
-	(envelope-from <netdev+bounces-281358-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 15:59:38 +0200
+	id CImTIdFq72l3BAEAu9opvQ
+	(envelope-from <netdev+bounces-281339-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 15:55:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE098473E6A
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 15:59:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBF3B473D04
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 15:55:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BB9AF305FF0C
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 13:54:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 45C7A3043D60
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 13:51:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C1F63DA7F4;
-	Mon, 27 Apr 2026 13:51:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2D5E3CF69D;
+	Mon, 27 Apr 2026 13:51:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SABeRa2T"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="ZXFFxoIA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 730F33DA7ED;
-	Mon, 27 Apr 2026 13:51:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 568D73BA241;
+	Mon, 27 Apr 2026 13:51:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777297894; cv=none; b=CZdcvmws56rHdLHAzBcdwf1yJ1DwFxLE8R+dDkNF7LlInDQgnusG/A/QXnykQYo6TYr/tyBrNCCnBBxz+3hH2cHU47cR6aQkmLoyp3TrevSER7uHECykZHJqlnmsvHD54baL4WjsOSzvEkrFN9qpoYM8DgCiYqysiBB9ksmeywk=
+	t=1777297863; cv=none; b=poTGdep3JDeYiHpm8LEAP9pxhyLVp2SMezosenH68LDg+s8vhPiPfsc7wW6ugFmggTfb+NU/aZGVLwvdZS87PfxCR5/fgjycrxYFhWbLFTUR5Wn69WnIcAb4yOLHaCdM7KrD3bFjWDceGOCydlTDHjTnrTslJ2RagZrlpIudUe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777297894; c=relaxed/simple;
-	bh=ee48qQ1ebmEk113ksktKi85c/cNBi1NXFBxr5NvstQI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WWrrM47aE+/FfRux8bNHnhl2E0rB9FuNEVvcD9U14Dup5njP3T/oFRJ2KoDBqnNpfobPqXeNtEqvUW0xwMiF+0Kz/Dz7BWIUEhs8qZNn8TanPbM1gRsb0+5YXBPEClm6x+aQIgRZQkvfsgNeWZ1N11Y3FL3nIm8/Wdqn04/fNbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SABeRa2T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E66E8C2BCB4;
-	Mon, 27 Apr 2026 13:51:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777297894;
-	bh=ee48qQ1ebmEk113ksktKi85c/cNBi1NXFBxr5NvstQI=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=SABeRa2TSxwIaGAql/M/N4P/l6kM6uO/b8zYxE0xOTjTFThc5v3FDV3VmRcT3FpvO
-	 gfTxZZIWSSXmWkblbdUkN8NeLztCYTI8KK8q4kFabCQM1X+vsm3pexBRmMZomI/lMV
-	 /ZNK7e9o/NGIfJYKRcOtActYr1n7iBJqa71lDDz6W9m1ikcp6nOsfADUtBIb4XKOQR
-	 fRlC2uRYGtnrwypvHBuY6CFu9ZVwgoFhm6q5omNT69i9hen5qoxXAFVnYb7X/Irlxr
-	 ZY1HXSp2tClzz34YEBwQF6r2NVykYpRbTklwqF/+B9NmfVX+zRrBnYt+4L2P8Gfusv
-	 MvCBLmHaDEdNA==
-From: Chuck Lever <cel@kernel.org>
-Date: Mon, 27 Apr 2026 09:51:02 -0400
-Subject: [PATCH 18/18] SUNRPC: Remove dead rpcsec_gss_krb5 definitions
+	s=arc-20240116; t=1777297863; c=relaxed/simple;
+	bh=+b/XARtL8TTdO5avBV72s4wEqPqZTYtiOCXUOIpscXQ=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=JBbCZYANgPtSguXMwZDSu5OQfx83kTOGtixBQZWI4E1xffcIDzYLi0ncSzBobmSzJMgWESU1/6ecznXOf5NDejb32thoh733ZkN9KabaUCQ6T7rGk17+bSnVXXMqI/8V2VuIxAC4nm5JA0o1aFrFhnDRDGzVm5LxSXPekg8Fsd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=ZXFFxoIA; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 83B4C20B716A; Mon, 27 Apr 2026 06:51:02 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 83B4C20B716A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1777297862;
+	bh=JjVpccUnXnnI/i5ox4+KGA4Y9noeTr3ND10yN1jOoHY=;
+	h=Date:From:To:Subject:From;
+	b=ZXFFxoIAeUD8B7w1wMbldnxsJscValauGXIjdFCs+DaZDXhrsE3Ax5RnuuNodFPmg
+	 9tBYiB2KqkG5snNSJCaLs0//HqRqbwg0CoSNUBBDxv9N5a4hBPrgQbhHsIqPTdTX0A
+	 prAL8T6PMpP8Q9fba0txT8f1BtdkyYulV2QBxzkE=
+Date: Mon, 27 Apr 2026 06:51:02 -0700
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	leon@kernel.org, longli@microsoft.com, kotaranov@microsoft.com,
+	horms@kernel.org, shradhagupta@linux.microsoft.com,
+	ssengar@linux.microsoft.com, ernis@linux.microsoft.com,
+	shirazsaleem@microsoft.com, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, stephen@networkplumber.org,
+	jacob.e.keller@intel.com, dipayanroy@microsoft.com,
+	leitao@debian.org, kees@kernel.org, john.fastabend@gmail.com,
+	hawk@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net,
+	ast@kernel.org, sdf@fomichev.me, yury.norov@gmail.com
+Subject: [PATCH net-next] net: mana: Force single RX buffer per page for
+ CVM/encrypted guest memory
+Message-ID: <ae9pxvJfkAZYfKMf@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260427-crypto-krb5-api-v1-18-1fc1253b64c0@oracle.com>
-References: <20260427-crypto-krb5-api-v1-0-1fc1253b64c0@oracle.com>
-In-Reply-To: <20260427-crypto-krb5-api-v1-0-1fc1253b64c0@oracle.com>
-To: Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
- Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
- NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, 
- Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
- David Howells <dhowells@redhat.com>, Simo Sorce <simo@redhat.com>
-X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=9198;
- i=chuck.lever@oracle.com; h=from:subject:message-id;
- bh=ZcFb+k2n2t58LNAq047I6Ch8sAwnbgJ5yMByohgAJt0=;
- b=owEBbQKS/ZANAwAKATNqszNvZn+XAcsmYgBp72nHhPB1gj2AZ6nAAJsMn+/ZRncpq03Ac9W10
- MSvSQ/KmtOJAjMEAAEKAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCae9pxwAKCRAzarMzb2Z/
- lzFJEACmEB6wjbeS3sPQo2wKLJoy7IJ78ZSAznwmAsX3/ZZiT73a+Yn8Ep400TJPgRPUvoqAGeg
- G4rbAseDMOwI7MK2IQSr9bYi84hPKrL5t8g1XZ9ywFRFBZJlQcE40WDeUnViEJ65yux0KvIZJ9M
- qtNeA4y8hLaYUUawucTgfEfmZmb41zTwOZUPPq8Aad/TDdyjRCr8GhDwd5xAd0Zl2Muy/HH7LNx
- vEi5BqkEteBryuWoNwBJhEpbwoa64WRhE/Zh1Els2r2mqVSMs9zKbHsvIOrS4cOAmtgT07lNKjz
- adZ3tIc9J1a08xg8J5oX0funr/qeWk3Dh4B2TIB6Us4uxie4U1JluqTWe0aQCXGrmhH53OZS0At
- 6F9mAQZLK00pUCynwrUkAkZwqXbLLBJVdWM6taBqnsalWvQ7bHLhQRF+jSiftYBsagyZbxcIsp+
- J5BYoeimKr3JyuGjH2KK7BR8Fq1nwfxpkzn74acYld418hjEAWiI1fcTUGD8WtInr6xu4lRzD7+
- eGMeAVVZg6u+VWkdZYmaVko1d/fQLsnV3Zjm1rIrxDFlTz9YffH18XoNZrhrIV2O0jVFX/8BY9v
- cj/0MI1RdQRIicCGmpG52hrk8jM7QHgIo/d8tVSRGIbFIJXG9/xp1UAVxUS5Q9xDu56drwv/ugB
- Dc/0CqmNvYXt+hg==
-X-Developer-Key: i=chuck.lever@oracle.com; a=openpgp;
- fpr=28B2E5B01286DF243CF23EFE336AB3336F667F97
-X-Rspamd-Queue-Id: DE098473E6A
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Rspamd-Queue-Id: EBF3B473D04
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281358-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-281339-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:mid,oracle.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	RCPT_COUNT_TWELVE(0.00)[33];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.microsoft.com:dkim,linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-From: Chuck Lever <chuck.lever@oracle.com>
+On Confidential VMs (CVMs) such as AMD SEV-SNP or Intel TDX, the guest
+operating system's memory is encrypted. And current hardwares lacks the
+support for TDISP (TEE Device Interface Security Protocol), meaning the
+NIC cannot directly access this encrypted VM memory. Consequently, all
+DMA operations must utilize SWIOTLB bounce buffers.
 
-The migration to crypto/krb5 eliminated the per-enctype
-function dispatch and direct crypto API usage, leaving
-behind a number of orphaned definitions.
+In the MANA driver currently, there are two distinct paths for DMA
+mapping:
 
-Remove the following from gss_krb5.h:
+1. Without PP_FLAG_DMA_MAP: The driver manually maps full pages for each
+packet. This creates standalone, page-aligned mappings where the offset
+is always zero.
 
- - GSS_KRB5_K5CLENGTH, used only by removed key derivation
- - KG_TOK_MIC_MSG and KG_TOK_WRAP_MSG (Kerberos v1 token
-   types; v1 support was dropped earlier)
- - KG2_TOK_INITIAL and KG2_TOK_RESPONSE (context
-   establishment token types; no remaining users)
- - KG2_RESP_FLAG_ERROR and KG2_RESP_FLAG_DELEG_OK
- - enum sgn_alg and enum seal_alg (v1 algorithm constants)
- - All CKSUMTYPE_* definitions, now duplicated by
-   KRB5_CKSUMTYPE_* in <crypto/krb5.h>
- - The KG_ error constants from gssapi_err_krb5.h, which
-   have no remaining users
- - The ENCTYPE_* constant block, replaced by KRB5_ENCTYPE_*
-   from <crypto/krb5.h>
- - KG_USAGE_SEAL/SIGN/SEQ (3DES usage constants)
- - KEY_USAGE_SEED_CHECKSUM/ENCRYPTION/INTEGRITY, duplicated
-   by <crypto/krb5.h>
- - #include <crypto/skcipher.h>, no longer needed
+2. With PP_FLAG_DMA_MAP: Optimizes memory by using page_pool with
+sub-page fragments (e.g., multiple RX buffers sharing a single page).
+When PP_FLAG_DMA_MAP is enabled, page_pool maps the entire page once.
+Subsequent RX buffer allocations use offsets into this pre-mapped area.
 
-Remove the cksum[] field from struct krb5_ctx in
-gss_krb5_internal.h; no code reads or writes it after the
-key derivation removal.
+When page_pool allocates sub-page RX buffer fragments, the bounce buffer
+granularity may not align with these smaller fragment sizes, leading to
+failure in mana driver rx path.
 
-Switch gss_krb5_enctypes[] in gss_krb5_mech.c to the
-canonical KRB5_ENCTYPE_* names from <crypto/krb5.h>.
+Refactor the RX buffer decision into mana_use_single_rxbuf_per_page().
+When cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT) is true, the driver is
+forced to use a single RX buffer per page. This ensures:
+- Each RX buffer is exactly one PAGE_SIZE.
+- The DMA offset is always 0.
+- SWIOTLB maps full, page-aligned blocks.
 
-Remove stale #include directives:
- - <crypto/skcipher.h> from gss_krb5_wrap.c
- - <linux/random.h> and <linux/crypto.h> from
-   gss_krb5_seal.c
-
-Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
 ---
- include/linux/sunrpc/gss_krb5.h         | 105 --------------------------------
- net/sunrpc/auth_gss/gss_krb5_internal.h |   1 -
- net/sunrpc/auth_gss/gss_krb5_mech.c     |  12 ++--
- net/sunrpc/auth_gss/gss_krb5_seal.c     |   2 -
- net/sunrpc/auth_gss/gss_krb5_wrap.c     |   1 -
- 5 files changed, 6 insertions(+), 115 deletions(-)
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 21 +++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/sunrpc/gss_krb5.h b/include/linux/sunrpc/gss_krb5.h
-index 43950b5237c8..1cd452ed1db5 100644
---- a/include/linux/sunrpc/gss_krb5.h
-+++ b/include/linux/sunrpc/gss_krb5.h
-@@ -37,13 +37,9 @@
- #ifndef _LINUX_SUNRPC_GSS_KRB5_H
- #define _LINUX_SUNRPC_GSS_KRB5_H
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index a654b3699c4c..2d44eaf932a8 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -12,6 +12,7 @@
+ #include <linux/pci.h>
+ #include <linux/export.h>
+ #include <linux/skbuff.h>
++#include <linux/cc_platform.h>
  
--#include <crypto/skcipher.h>
- #include <linux/sunrpc/auth_gss.h>
- #include <linux/sunrpc/gss_err.h>
+ #include <net/checksum.h>
+ #include <net/ip6_checksum.h>
+@@ -744,6 +745,23 @@ static void *mana_get_rxbuf_pre(struct mana_rxq *rxq, dma_addr_t *da)
+ 	return va;
+ }
  
--/* Length of constant used in key derivation */
--#define GSS_KRB5_K5CLENGTH (5)
--
- /* Maximum key length (in bytes) for the supported crypto algorithms */
- #define GSS_KRB5_MAX_KEYLEN (32)
++static bool
++mana_use_single_rxbuf_per_page(struct mana_port_context *apc, u32 mtu)
++{
++	/* On confidential VMs with guest memory encryption, all DMA goes
++	 * through SWIOTLB bounce buffers. Sub-page RX fragments may not
++	 * be properly bounce-buffered, so use fullpage buffers.
++	 */
++	if (cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT))
++		return true;
++
++	/* For xdp and jumbo frames make sure only one packet fits per page. */
++	if (mtu + MANA_RXBUF_PAD > PAGE_SIZE / 2 || mana_xdp_get(apc))
++		return true;
++
++	return false;
++}
++
+ /* Get RX buffer's data size, alloc size, XDP headroom based on MTU */
+ static void mana_get_rxbuf_cfg(struct mana_port_context *apc,
+ 			       int mtu, u32 *datasize, u32 *alloc_size,
+@@ -754,8 +772,7 @@ static void mana_get_rxbuf_cfg(struct mana_port_context *apc,
+ 	/* Calculate datasize first (consistent across all cases) */
+ 	*datasize = mtu + ETH_HLEN;
  
-@@ -56,11 +52,6 @@
- /* The length of the Kerberos GSS token header */
- #define GSS_KRB5_TOK_HDR_LEN	(16)
- 
--#define KG_TOK_MIC_MSG    0x0101
--#define KG_TOK_WRAP_MSG   0x0201
--
--#define KG2_TOK_INITIAL     0x0101
--#define KG2_TOK_RESPONSE    0x0202
- #define KG2_TOK_MIC         0x0404
- #define KG2_TOK_WRAP        0x0504
- 
-@@ -68,102 +59,6 @@
- #define KG2_TOKEN_FLAG_SEALED           0x02
- #define KG2_TOKEN_FLAG_ACCEPTORSUBKEY   0x04
- 
--#define KG2_RESP_FLAG_ERROR             0x0001
--#define KG2_RESP_FLAG_DELEG_OK          0x0002
--
--enum sgn_alg {
--	SGN_ALG_DES_MAC_MD5 = 0x0000,
--	SGN_ALG_MD2_5 = 0x0001,
--	SGN_ALG_DES_MAC = 0x0002,
--	SGN_ALG_3 = 0x0003,		/* not published */
--	SGN_ALG_HMAC_SHA1_DES3_KD = 0x0004
--};
--enum seal_alg {
--	SEAL_ALG_NONE = 0xffff,
--	SEAL_ALG_DES = 0x0000,
--	SEAL_ALG_1 = 0x0001,		/* not published */
--	SEAL_ALG_DES3KD = 0x0002
--};
--
--/*
-- * These values are assigned by IANA and published via the
-- * subregistry at the link below:
-- *
-- * https://www.iana.org/assignments/kerberos-parameters/kerberos-parameters.xhtml#kerberos-parameters-2
-- */
--#define CKSUMTYPE_CRC32			0x0001
--#define CKSUMTYPE_RSA_MD4		0x0002
--#define CKSUMTYPE_RSA_MD4_DES		0x0003
--#define CKSUMTYPE_DESCBC		0x0004
--#define CKSUMTYPE_RSA_MD5		0x0007
--#define CKSUMTYPE_RSA_MD5_DES		0x0008
--#define CKSUMTYPE_NIST_SHA		0x0009
--#define CKSUMTYPE_HMAC_SHA1_DES3	0x000c
--#define CKSUMTYPE_HMAC_SHA1_96_AES128   0x000f
--#define CKSUMTYPE_HMAC_SHA1_96_AES256   0x0010
--#define CKSUMTYPE_CMAC_CAMELLIA128	0x0011
--#define CKSUMTYPE_CMAC_CAMELLIA256	0x0012
--#define CKSUMTYPE_HMAC_SHA256_128_AES128	0x0013
--#define CKSUMTYPE_HMAC_SHA384_192_AES256	0x0014
--#define CKSUMTYPE_HMAC_MD5_ARCFOUR      -138 /* Microsoft md5 hmac cksumtype */
--
--/* from gssapi_err_krb5.h */
--#define KG_CCACHE_NOMATCH                        (39756032L)
--#define KG_KEYTAB_NOMATCH                        (39756033L)
--#define KG_TGT_MISSING                           (39756034L)
--#define KG_NO_SUBKEY                             (39756035L)
--#define KG_CONTEXT_ESTABLISHED                   (39756036L)
--#define KG_BAD_SIGN_TYPE                         (39756037L)
--#define KG_BAD_LENGTH                            (39756038L)
--#define KG_CTX_INCOMPLETE                        (39756039L)
--#define KG_CONTEXT                               (39756040L)
--#define KG_CRED                                  (39756041L)
--#define KG_ENC_DESC                              (39756042L)
--#define KG_BAD_SEQ                               (39756043L)
--#define KG_EMPTY_CCACHE                          (39756044L)
--#define KG_NO_CTYPES                             (39756045L)
--
--/* per Kerberos v5 protocol spec crypto types from the wire. 
-- * these get mapped to linux kernel crypto routines.  
-- *
-- * These values are assigned by IANA and published via the
-- * subregistry at the link below:
-- *
-- * https://www.iana.org/assignments/kerberos-parameters/kerberos-parameters.xhtml#kerberos-parameters-1
-- */
--#define ENCTYPE_NULL            0x0000
--#define ENCTYPE_DES_CBC_CRC     0x0001	/* DES cbc mode with CRC-32 */
--#define ENCTYPE_DES_CBC_MD4     0x0002	/* DES cbc mode with RSA-MD4 */
--#define ENCTYPE_DES_CBC_MD5     0x0003	/* DES cbc mode with RSA-MD5 */
--#define ENCTYPE_DES_CBC_RAW     0x0004	/* DES cbc mode raw */
--/* XXX deprecated? */
--#define ENCTYPE_DES3_CBC_SHA    0x0005	/* DES-3 cbc mode with NIST-SHA */
--#define ENCTYPE_DES3_CBC_RAW    0x0006	/* DES-3 cbc mode raw */
--#define ENCTYPE_DES_HMAC_SHA1   0x0008
--#define ENCTYPE_DES3_CBC_SHA1   0x0010
--#define ENCTYPE_AES128_CTS_HMAC_SHA1_96 0x0011
--#define ENCTYPE_AES256_CTS_HMAC_SHA1_96 0x0012
--#define ENCTYPE_AES128_CTS_HMAC_SHA256_128	0x0013
--#define ENCTYPE_AES256_CTS_HMAC_SHA384_192	0x0014
--#define ENCTYPE_ARCFOUR_HMAC            0x0017
--#define ENCTYPE_ARCFOUR_HMAC_EXP        0x0018
--#define ENCTYPE_CAMELLIA128_CTS_CMAC	0x0019
--#define ENCTYPE_CAMELLIA256_CTS_CMAC	0x001A
--#define ENCTYPE_UNKNOWN         0x01ff
--
--/*
-- * Constants used for key derivation
-- */
--/* for 3DES */
--#define KG_USAGE_SEAL (22)
--#define KG_USAGE_SIGN (23)
--#define KG_USAGE_SEQ  (24)
--
--/* from rfc3961 */
--#define KEY_USAGE_SEED_CHECKSUM         (0x99)
--#define KEY_USAGE_SEED_ENCRYPTION       (0xAA)
--#define KEY_USAGE_SEED_INTEGRITY        (0x55)
--
- /* from rfc4121 */
- #define KG_USAGE_ACCEPTOR_SEAL  (22)
- #define KG_USAGE_ACCEPTOR_SIGN  (23)
-diff --git a/net/sunrpc/auth_gss/gss_krb5_internal.h b/net/sunrpc/auth_gss/gss_krb5_internal.h
-index 208f9df9ea96..3b392e96f25d 100644
---- a/net/sunrpc/auth_gss/gss_krb5_internal.h
-+++ b/net/sunrpc/auth_gss/gss_krb5_internal.h
-@@ -26,7 +26,6 @@ struct krb5_ctx {
- 	struct crypto_shash	*initiator_sign_shash;
- 	struct crypto_shash	*acceptor_sign_shash;
- 	u8			Ksess[GSS_KRB5_MAX_KEYLEN]; /* session key */
--	u8			cksum[GSS_KRB5_MAX_KEYLEN];
- 	atomic64_t		seq_send64;
- 	time64_t		endtime;
- 	struct xdr_netobj	mech_used;
-diff --git a/net/sunrpc/auth_gss/gss_krb5_mech.c b/net/sunrpc/auth_gss/gss_krb5_mech.c
-index 996e452b9b3c..c41b5f3e1789 100644
---- a/net/sunrpc/auth_gss/gss_krb5_mech.c
-+++ b/net/sunrpc/auth_gss/gss_krb5_mech.c
-@@ -33,12 +33,12 @@ static struct gss_api_mech gss_kerberos_mech;
-  * enctypes that crypto/krb5 supports are advertised.
-  */
- static const u32 gss_krb5_enctypes[] = {
--	ENCTYPE_AES256_CTS_HMAC_SHA384_192,
--	ENCTYPE_AES128_CTS_HMAC_SHA256_128,
--	ENCTYPE_CAMELLIA256_CTS_CMAC,
--	ENCTYPE_CAMELLIA128_CTS_CMAC,
--	ENCTYPE_AES256_CTS_HMAC_SHA1_96,
--	ENCTYPE_AES128_CTS_HMAC_SHA1_96,
-+	KRB5_ENCTYPE_AES256_CTS_HMAC_SHA384_192,
-+	KRB5_ENCTYPE_AES128_CTS_HMAC_SHA256_128,
-+	KRB5_ENCTYPE_CAMELLIA256_CTS_CMAC,
-+	KRB5_ENCTYPE_CAMELLIA128_CTS_CMAC,
-+	KRB5_ENCTYPE_AES256_CTS_HMAC_SHA1_96,
-+	KRB5_ENCTYPE_AES128_CTS_HMAC_SHA1_96,
- };
- 
- static char gss_krb5_enctype_priority_list[64];
-diff --git a/net/sunrpc/auth_gss/gss_krb5_seal.c b/net/sunrpc/auth_gss/gss_krb5_seal.c
-index 66c179337029..cfe066e89f23 100644
---- a/net/sunrpc/auth_gss/gss_krb5_seal.c
-+++ b/net/sunrpc/auth_gss/gss_krb5_seal.c
-@@ -61,8 +61,6 @@
- #include <linux/types.h>
- #include <linux/jiffies.h>
- #include <linux/sunrpc/gss_krb5.h>
--#include <linux/random.h>
--#include <linux/crypto.h>
- #include <linux/atomic.h>
- #include <linux/scatterlist.h>
- #include <linux/slab.h>
-diff --git a/net/sunrpc/auth_gss/gss_krb5_wrap.c b/net/sunrpc/auth_gss/gss_krb5_wrap.c
-index 93aa7500d032..ac4b32df42b9 100644
---- a/net/sunrpc/auth_gss/gss_krb5_wrap.c
-+++ b/net/sunrpc/auth_gss/gss_krb5_wrap.c
-@@ -28,7 +28,6 @@
-  * SUCH DAMAGES.
-  */
- 
--#include <crypto/skcipher.h>
- #include <linux/types.h>
- #include <linux/jiffies.h>
- #include <linux/sunrpc/gss_krb5.h>
-
+-	/* For xdp and jumbo frames make sure only one packet fits per page */
+-	if (mtu + MANA_RXBUF_PAD > PAGE_SIZE / 2 || mana_xdp_get(apc)) {
++	if (mana_use_single_rxbuf_per_page(apc, mtu)) {
+ 		if (mana_xdp_get(apc)) {
+ 			*headroom = XDP_PACKET_HEADROOM;
+ 			*alloc_size = PAGE_SIZE;
 -- 
-2.53.0
+2.43.0
 
 
