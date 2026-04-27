@@ -1,77 +1,53 @@
-Return-Path: <netdev+bounces-281552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281553-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IGVLIAn072nYMgEAu9opvQ
-	(envelope-from <netdev+bounces-281552-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 01:40:57 +0200
+	id 8FsmOFv272mFMwEAu9opvQ
+	(envelope-from <netdev+bounces-281553-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 01:50:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E529147BE80
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 01:40:56 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5781A47BF23
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 01:50:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 591CA3014512
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 23:40:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CB16E301487D
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 23:50:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76827308F1D;
-	Mon, 27 Apr 2026 23:40:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 262643793BE;
+	Mon, 27 Apr 2026 23:50:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="bE+pno7q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kYvaW8a/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F213248166;
-	Mon, 27 Apr 2026 23:40:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02DDF25EF9C
+	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 23:50:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777333251; cv=none; b=GU/Y0P/q5v08pF6bclC79TCN5iCxnMo/XlLApQx0jYVYPYSRuvhlPZ3R2ES7gUU3WzD9sRtbruhvB1I01ekXiwtdhLD8orO19e02v063iTz3lqjtGcmGCFsAOh1+2GSfzT9Pce2TuH0rShtozQgZM93jFgoDm0+NP6hzegXp4tk=
+	t=1777333849; cv=none; b=B5OsiwEhK4//5St8XYrzv+gwJByiJqlR0kUhpBh9scdhPmFtwzjBKScTvQKVCZYgfs3uHFhDtQL33eQNX3ZS8P0yL+1QF1EnHSaZFHyrLw+mlp9YVdq7KzyjbthDA8W+wqxUtv6foldvZFpjqYHmDnQIrMU8ZWw3VyGF4vOV8gM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777333251; c=relaxed/simple;
-	bh=oUFlTiGYqw73lHnw86juUKMkGTiWASsaJfIxIyDpvY8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W9gmJN2FFfrME48YCCec0V5CM93lu3z6etLkbGPHoiLJ64nfDm9hfo535u0wKU67Jf1Xvi2KQJKxGO/1Jj3AHGgeY/FGLQEHCJ8ARiAjjsZzb5hhXyD5m5cEkOow33V/YkMyXqLAdbj/DFAI3Iat+LhMF5S/FcR9UR3goqYLu+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=bE+pno7q; arc=none smtp.client-ip=193.238.174.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mx.ssi.bg (localhost [127.0.0.1])
-	by mx.ssi.bg (Potsfix) with ESMTP id CD507210CD;
-	Tue, 28 Apr 2026 02:40:43 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
-	:content-transfer-encoding:date:from:from:message-id
-	:mime-version:reply-to:subject:subject:to:to; s=ssi; bh=+N8l8xhO
-	6EweGkIZO6SUeyy8/92nakMTqZK+u/GGXGQ=; b=bE+pno7qsEoY9xS+GdCoyxYr
-	c44u8l1CTEUqU0wbr1dNuIVphKO2353TJcLlFWmHca4bUEM0XAr0ASeA+63Wb2bz
-	OF0kZP4u2DUGpj4Cb+O8u41QndsyDv0J/0pOl1gqs0hRcIqyNP2BsMoL2Yn81xI6
-	QjzWkS0fy+FhRwpQiTe0Bh+O0WDt4IfdAU9x4AMOGpm8bk83Xo3XWlY0ofdYm39/
-	8q2rPJcSVqGk5qAmy8si3oifw0805ynUov3nFRpgaVaS3qeinuKiM2TIlHmWj3nO
-	771+r1VrP1L4RizGi0onE5A4305MHBSRO1sUhbo83o47vrlOvxJB8W8MGyrD1Gnv
-	TiDt8KVKywhVKrWN4wUvNSiyKPSunmw8N8nEuKnHwrqW/MEtBKdsw3ve3+U/CbD2
-	bfWe6Ub95Ta5biJBVM6S8wnTRFJ7WcA+BCYBQOjOODYj74USIRwcuH7G0aoK7Fnz
-	Nw2HMnSb3ymcOdDITk99Pv8RTQeuZKYSTpcYt8dJP1GyqQCg37Fh7nts/nNGC1S4
-	H0RfedQcppXrdJXbproe3JYPUTdDe11da60sT6OARDkjT6MQQv/m7HrEPXNj0z+z
-	gUmnEidXm2noEdjxWIX3NBVJj7zEfsHmv5emZ2hc9xy2aJ042gseH4XKho6Oe2xn
-	QYFiMfQBk18qXYeI2Zo=
-Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
-	by mx.ssi.bg (Potsfix) with ESMTPS;
-	Tue, 28 Apr 2026 02:40:42 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by box.ssi.bg (Potsfix) with ESMTPSA id 07CAE608B8;
-	Tue, 28 Apr 2026 02:40:42 +0300 (EEST)
-Received: from ja.home.ssi.bg (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.1/8.18.1) with ESMTP id 63RNeeG0086275;
-	Tue, 28 Apr 2026 02:40:40 +0300
-Received: (from root@localhost)
-	by ja.home.ssi.bg (8.18.1/8.18.1/Submit) id 63RNeeW0086274;
-	Tue, 28 Apr 2026 02:40:40 +0300
-From: Julian Anastasov <ja@ssi.bg>
-To: Simon Horman <horms@verge.net.au>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>,
-        lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [PATCH net] ipvs: fix shift-out-of-bounds in ip_vs_rht_desired_size
-Date: Tue, 28 Apr 2026 02:40:14 +0300
-Message-ID: <20260427234014.86256-1-ja@ssi.bg>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1777333849; c=relaxed/simple;
+	bh=IdYjohgTVx09f+mjJ1u/bvVoQQIjPnFZABHV6u/XJCs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=TwMlnij8MretXd1hGGivHldjRjxaLYK9CkOQewwa7K0MgnRtKUBusaJKAcSnjseUCDKprc9kqU+i01moYiBV2hOU0XR15Zud3IletbNyMBAFZlGQuxLSWZbEYHfm2wqfKkYRWjg5T7IOO+8s35Ov44hxO7BcP4JTIgFV6cfRncA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kYvaW8a/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C054C19425;
+	Mon, 27 Apr 2026 23:50:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777333848;
+	bh=IdYjohgTVx09f+mjJ1u/bvVoQQIjPnFZABHV6u/XJCs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=kYvaW8a/1XN97UzhMxREqwAJHw2y/J/0U9PNWs0+TeW3W6L7AIJhGpD90cMGXxAHP
+	 czRgJ1JWHH7YdDLqBrvO/3BOnBK5TtPBBOeTwXWuzFIJ3evJjeMd/lfvn0TaVvdZVF
+	 P37wXV5cnXtN8e/PUlvFX9MjWrI+NV2elSo4+ticBjdJAguZ3zX+R61/iPmw1fmtwQ
+	 y5AO7ysHmcaE2UtlN4y1x14V6TDaOsNXEMEiZDiJsB0PWBkOZH8moM4jzPHs9jo1de
+	 UCK2Svkg+WJx8JkDb9A3gs2Q2yi5648+NG5cPqHbdnhML3UHMPTOElLb8zIRYbF9+0
+	 KbVlPjSms3N2A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02AF8392FFCA;
+	Mon, 27 Apr 2026 23:50:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,84 +55,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: E529147BE80
+Subject: Re: [PATCH net] MAINTAINERS: add pcnet_cs to PCMCIA
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177733380580.156599.8648851846420090909.git-patchwork-notify@kernel.org>
+Date: Mon, 27 Apr 2026 23:50:05 +0000
+References: <20260423220857.3490118-1-kuba@kernel.org>
+In-Reply-To: <20260423220857.3490118-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ linux@dominikbrodowski.net
+X-Rspamd-Queue-Id: 5781A47BF23
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
-	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-281553-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281552-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_TRACE(0.00)[ssi.bg:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ssi.bg:email,ssi.bg:dkim,ssi.bg:mid,appspotmail.com:email];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-Calling roundup_pow_of_two() with 0 has undefined result:
+Hello:
 
-UBSAN: shift-out-of-bounds in ./include/linux/log2.h:57:13
-shift exponent 64 is too large for 64-bit type 'unsigned long'
-CPU: 1 UID: 0 PID: 77 Comm: kworker/u8:4 Not tainted syzkaller #0 PREEMPT(full)
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
-Workqueue: events_unbound conn_resize_work_handler
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- ubsan_epilogue+0xa/0x30 lib/ubsan.c:233
- __ubsan_handle_shift_out_of_bounds+0x385/0x410 lib/ubsan.c:494
- __roundup_pow_of_two include/linux/log2.h:57 [inline]
- ip_vs_rht_desired_size+0x2cf/0x410 net/netfilter/ipvs/ip_vs_core.c:240
- ip_vs_conn_desired_size net/netfilter/ipvs/ip_vs_conn.c:765 [inline]
- conn_resize_work_handler+0x1b6/0x14c0 net/netfilter/ipvs/ip_vs_conn.c:822
- process_one_work kernel/workqueue.c:3302 [inline]
- process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3385
- worker_thread+0xa53/0xfc0 kernel/workqueue.c:3466
- kthread+0x388/0x470 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Reported-by: syzbot+217f1db9c791e27fe54a@syzkaller.appspotmail.com
-Fixes: b655388111cf ("ipvs: add resizable hash tables")
-Signed-off-by: Julian Anastasov <ja@ssi.bg>
----
- net/netfilter/ipvs/ip_vs_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, 23 Apr 2026 15:08:57 -0700 you wrote:
+> Per discussion under the Link make sure Dominik can help
+> with the patches to drivers/net/ethernet/8390/pcnet_cs.c
+> 
+> cc: linux@dominikbrodowski.net
+> Link: https://lore.kernel.org/aeomUh5JqFvkLTH7@scops.dominikbrodowski.net
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> 
+> [...]
 
-diff --git a/net/netfilter/ipvs/ip_vs_core.c b/net/netfilter/ipvs/ip_vs_core.c
-index f5b7a2047291..ea450944465f 100644
---- a/net/netfilter/ipvs/ip_vs_core.c
-+++ b/net/netfilter/ipvs/ip_vs_core.c
-@@ -237,7 +237,7 @@ int ip_vs_rht_desired_size(struct netns_ipvs *ipvs, struct ip_vs_rht *t, int n,
- {
- 	if (!t)
- 		return 1 << min_bits;
--	n = roundup_pow_of_two(n);
-+	n = n ? roundup_pow_of_two(n) : 1;
- 	if (lfactor < 0) {
- 		int factor = min(-lfactor, max_bits);
- 
+Here is the summary with links:
+  - [net] MAINTAINERS: add pcnet_cs to PCMCIA
+    https://git.kernel.org/netdev/net/c/3618442d54f3
+
+You are awesome, thank you!
 -- 
-2.53.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
