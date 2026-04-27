@@ -1,290 +1,271 @@
-Return-Path: <netdev+bounces-281416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281417-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WPDTCweW72lyDAEAu9opvQ
-	(envelope-from <netdev+bounces-281416-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:59:51 +0200
+	id 8GmiHKuX72mLDAEAu9opvQ
+	(envelope-from <netdev+bounces-281417-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 19:06:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93E70476BF2
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:59:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3533476D73
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 19:06:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 62DE63037C02
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:58:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 80F90301B90B
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 17:03:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF9513A8752;
-	Mon, 27 Apr 2026 16:58:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EzvFW8zb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2263C3DC4D9;
+	Mon, 27 Apr 2026 17:03:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7004C3ACF0C
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 16:58:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 985983DC4C6
+	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 17:03:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777309112; cv=none; b=eKTJoGPgrsbSi2qwkxUMMoOgXIJAHTOLEAFsq43+gigMo5mkF8NlnkekyynlPXSoXEaZGnTdTx99Y5rUCnROBo1Ec2yDehYR2+ptfFucbBuSeC0LklkEIKs64KNn6VtGxPPXqqDds+aLnBWuX1+qqLs9frLHtohQJ3LXn7BgsXc=
+	t=1777309385; cv=none; b=iZUyuCl7lpz4LmZ7hbi04CK5qZM6yooUEQBINEBO5KZocyiQpLGH78NCe8MhwT2twJHoICPcUSXsq2ilfgy94ROq54OK+lzjkqF4/gleBFv6JlICExgVT2WECXHd34NO+tynMGhPbPsvrlJmZDLtGRPx+JAsa+dva+SOLrfmAD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777309112; c=relaxed/simple;
-	bh=e1/oREPtnTA4wQq1Eo3tpgKolZGF3xNH1nO8YibBpOw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a5zOqhdXdfpjxrpX7Z9Wbw+xH06qjCH3HtbIhL44j7Bi0TGVMcNsOBsBW8v5kNhM7n42kFJfS/41Hu026R46hcLd335FwdoGZ9jSoTYS38RxQ1UmDm0HIFi0LUUR7WTopyAUwtxs+Usyd2P3AaL+NzUXOrhTQXdH7m9S1HVfS1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EzvFW8zb; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2b2589c26e3so97846985ad.1
-        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 09:58:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777309111; x=1777913911; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=luKCj+y68VOjQ8iKhNLUrEYAVZHaivtKkauGwWPaGIs=;
-        b=EzvFW8zbbxdN4KNg0QaQhHuy5DDHEDrJigQfyan5K9LRzVAMEXJEDIY4g7BFTRMnj4
-         V/rsn3P+tqgouoy5ojHnPEb6GpG45FRa7JxKZk8ZwOWZfZEYqSBgsrEKw3lHEfGLB3D5
-         daEMVSt+YwuIXMmhW+mrotm+abHtM6INVVDB4kdFWJnYQqSaZ/YaCl3QtoMRqxjmZuIp
-         89SMf7BAQw+VBU7P6ygtp+G8WnOKkhLA1kDE/OIOmcA9mihhcqB4ldkt4kJI1SZm8LFV
-         os7Nniu3wJtuPONb68leUIqZlU9BWUzMgub9+FW0fTaOHdWjpQI5zT20jeJMTURokh6c
-         12XA==
+	s=arc-20240116; t=1777309385; c=relaxed/simple;
+	bh=luA2KX0Z34rhPkgzK7yNqNk7xkX7wwA6aGAVl+/mfao=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=Fp/O0ICOIVvMJl5eofdTe1ScoAuRUVWMdf9BGLeCPJDao12fsfFz12KeClj6ms7Ix8ght+68BJBH1bGe5k4o9OLDxRoL1O/OBcSmTSzoOtcjxVI6mzmz5STED01sgzW2sjm8d3M1bs/67rBUFeJ9JlJDMiegpgFBNPv+p2CTTWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.216.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-358df8fbd1cso13175265a91.0
+        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 10:03:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777309111; x=1777913911;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=luKCj+y68VOjQ8iKhNLUrEYAVZHaivtKkauGwWPaGIs=;
-        b=kt0XiDIqZNaDXQhOuImomE9xM+Fx9/gCP/hH9JeZsllQzoI9eP62edx3BhgCcwK1ns
-         FNrzATUXu/1fVOF4rDF8Q7VyJAwsrrF4AvwlLwXpRsonR4ab3ALxD5SEuXoohowxOC4J
-         FGU/TnFieq8MumiwoP2xD2FmzG1QuHboHOp3qjTjeNOQwfxMdfuSYTWgv9yQ2EBY85YL
-         b/Y0MUqhZVA+5cospE53mb+i8uYeWXCg7b0xmZXBn24/WVYOmhEG2WCYurx/Czg0WtE2
-         Ma7FW05EIUuxlp5rLRCz5sc9NolHvGFs6okHE+Cut6uAALL6mfdflRoqaU4m47fTAjut
-         1uwg==
-X-Forwarded-Encrypted: i=1; AFNElJ8kkwXYLxM0XfQ5p7FWkGEwIG8ZnfS7k7shBq6d8EQ+oA51OQ23LzvXzhzWsCCMezamEZ2cXg4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0R3pq0xt+4H8nvnmmFofuMaYGzK/isFUfn5f0mk44q6DLpuEp
-	XLPLf67xeExgmYkQ8pSr6+8dqaWFEG/VgH/EIZL06EAn3iS4zoofCqFt
-X-Gm-Gg: AeBDiet62sa153DKR4k4qLBCTkNix7wjRE4Tz94NvIn/orDgTBbaHGBrRkH9MZE7Bpa
-	2zIVHWqwfabZ4zdjlMfsdrv2ScPYAkRYj9cio/iHSObJXPVFEkDO1nLdilGnKHLyRINjfHhvZ3l
-	7kZEk9AobkWqSLtn+bOTKW/YhKMuW755dxXgYVkkrUb9oL3HL0qTuwireSkq8vmOfGsK3sRgPGj
-	HoFm1EYBKgveSejUzFy8S6zgC+PFrMsdjeBUjc4aTxiNVrhSUDAPSlB66H8tmDy5k64WkfWVVTR
-	9FCNtACWf4mEWBQaLg2KOkY9/r24ga09Lc7DKQLkLNQXEbw7vbrEHe9hQhVRdeggHl3W1UqBBTQ
-	xW492FoSiYf9N5gAjhN6kXZxhoHp1//Ye11KFZdS+icfCxIFkduvuxFW0nm3QNaEz3RHkZ+5w+q
-	LeMDmB8SNiwHfWs26xezcNJ5dU5AGf//CdsGAcUQov/2Lw4NJRCw==
-X-Received: by 2002:a17:903:1b2c:b0:2b9:7051:2c18 with SMTP id d9443c01a7336-2b97a6b4984mr895215ad.0.1777309110537;
-        Mon, 27 Apr 2026 09:58:30 -0700 (PDT)
-Received: from localhost ([2a03:2880:7ff:4f::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b5fab32cfasm399066965ad.69.2026.04.27.09.58.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Apr 2026 09:58:30 -0700 (PDT)
-From: Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Dimitri Daskalakis <daskald@meta.com>,
-	David Wei <dw@davidwei.uk>,
-	Joe Damato <joe@dama.to>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	Vishwanath Seshagiri <vishs@fb.com>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Gal Pressman <gal@nvidia.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next] selftests: drv-net: Enable ntuple-filters if supported
-Date: Mon, 27 Apr 2026 09:58:29 -0700
-Message-ID: <20260427165829.3898229-1-dimitri.daskalakis1@gmail.com>
-X-Mailer: git-send-email 2.52.0
+        d=1e100.net; s=20251104; t=1777309383; x=1777914183;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gqkLNi8dFGLs0xZQNCmzoFuZ2bTIPgGk7WM+gkuVShA=;
+        b=MRyQDJAs/Ftqjzkd9JDgO6m+vselFqZjH61pX5xQcBcRd0aJiTUkr+ai+y0fx7uiF9
+         GwVTaz0sRp2bcnuuPoXoTq4BrIOxzxIIzIpXa61MJMBJbuZrdVDnGH8myO5DefOl3UNh
+         4X64Go/UES7vud3YJnEghIW65KGGpHf57CUe4D2j427jY5blEic0y0tr3v9j5XA9kJMg
+         vNXDaMFYiZ2B5jYM5EP8uv6I8ohMsi4GqaWqdk+1d3/mddXdw2Vu2MxuYZmme2HFKPZH
+         7g/YDJXva6jreQsVui/8XWEk58H1ni7D/72XkUMjCNM4tAV84OoSIKwH7MDmijLLSsFs
+         KoxQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/7GXuY8Qv3XhBZCR+Q4vLkI43WAYGPp97Wa/SNLD+aOeiduYjYlsrDnSF2zm0ANo9dwZZ0Q9M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yze/86aH0z7mQ8n+pfgIW5/5SxfV99dL3lvTWaLLswHNqZA6i+I
+	5WwfgtAhuJml2PW3VdC9cqBWv69t6g/rp0JzLsZQInIfRNobNkGGqo+SCIHjZ1vbTAb3oQW9Eqk
+	B/IgkqUSkl5p7SzQ6y8HPQn0oiMMyJ9nCHpCQAWtGrsIGlrigc7TOgLNLRaA=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 93E70476BF2
+X-Received: by 2002:a05:6a20:4311:b0:39b:e40b:fcae with SMTP id
+ adf61e73a8af0-3a398c0323fmr237146637.10.1777309382959; Mon, 27 Apr 2026
+ 10:03:02 -0700 (PDT)
+Date: Mon, 27 Apr 2026 10:03:02 -0700
+In-Reply-To: <ae-MTiL0vf-y7Ygz@sgarzare-redhat>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69ef96c6.a00a0220.38d690.0001.GAE@google.com>
+Subject: Re: [syzbot] [virt?] [net?] memory leak in __vsock_create (2)
+From: syzbot <syzbot+1b2c9c4a0f8708082678@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, sgarzare@redhat.com, syzkaller-bugs@googlegroups.com, 
+	virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: C3533476D73
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=dfcc8f993a958a78];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-281416-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,google.com,kernel.org,redhat.com,meta.com,davidwei.uk,dama.to,nvidia.com,fb.com,gmail.com,broadcom.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[dimitridaskalakis1@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-281417-lists,netdev=lfdr.de,1b2c9c4a0f8708082678];
+	SUBJECT_HAS_QUESTION(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,meta.com:email]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.996];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-From: Dimitri Daskalakis <daskald@meta.com>
+Hello,
 
-Certain devices which support ntuple-filters do not enable the feature
-by default. The existing tests will skip (if they check for the feature),
-or fail if they blindly attempt to install rules. Therefore, attempt to turn
-on ntuple-filters if the device supports them.
+syzbot has tested the proposed patch but the reproducer is still triggering an issue:
+memory leak in prepare_creds
 
-Signed-off-by: Dimitri Daskalakis <daskald@meta.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- tools/testing/selftests/drivers/net/gro.py         | 10 ++++++++++
- tools/testing/selftests/drivers/net/hw/gro_hw.py   | 10 ++++++++++
- tools/testing/selftests/drivers/net/hw/iou-zcrx.py | 12 ++++++++++++
- tools/testing/selftests/drivers/net/hw/ntuple.py   |  5 ++++-
- tools/testing/selftests/drivers/net/hw/rss_ctx.py  |  7 ++++---
- 5 files changed, 40 insertions(+), 4 deletions(-)
+2026/04/27 17:01:37 executed programs: 5
+BUG: memory leak
+unreferenced object 0xffff888103b7b900 (size 184):
+  comm "syz-executor", pid 6458, jiffies 4294946243
+  hex dump (first 32 bytes):
+    01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc 5efbd4bc):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4574 [inline]
+    slab_alloc_node mm/slub.c:4898 [inline]
+    kmem_cache_alloc_noprof+0x36c/0x480 mm/slub.c:4905
+    prepare_creds+0x22/0x600 kernel/cred.c:185
+    copy_creds+0x44/0x290 kernel/cred.c:286
+    copy_process+0x920/0x2cf0 kernel/fork.c:2123
+    kernel_clone+0xde/0x700 kernel/fork.c:2723
+    __do_sys_clone+0x7f/0xb0 kernel/fork.c:2864
+    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+    do_syscall_64+0xee/0xf80 arch/x86/entry/syscall_64.c:94
+    entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-diff --git a/tools/testing/selftests/drivers/net/gro.py b/tools/testing/selftests/drivers/net/gro.py
-index 221f27e57147..5ffaa7bdbff4 100755
---- a/tools/testing/selftests/drivers/net/gro.py
-+++ b/tools/testing/selftests/drivers/net/gro.py
-@@ -132,11 +132,21 @@ def _get_queue_stats(cfg, queue_id):
-     return {}
- 
- 
-+def _require_ntuple(cfg):
-+    features = ethtool(f"-k {cfg.ifname}", json=True)[0]
-+    if not features["ntuple-filters"]["active"]:
-+        if features["ntuple-filters"]["fixed"]:
-+            raise KsftXfailEx("Device does not support ntuple-filters")
-+        ethtool(f"-K {cfg.ifname} ntuple-filters on")
-+        defer(ethtool, f"-K {cfg.ifname} ntuple-filters off")
-+
-+
- def _setup_isolated_queue(cfg):
-     """Set up an isolated queue for testing using ntuple filter.
- 
-     Remove queue 1 from the default RSS context and steer test traffic to it.
-     """
-+    _require_ntuple(cfg)
-     test_queue = 1
- 
-     qcnt = len(glob.glob(f"/sys/class/net/{cfg.ifname}/queues/rx-*"))
-diff --git a/tools/testing/selftests/drivers/net/hw/gro_hw.py b/tools/testing/selftests/drivers/net/hw/gro_hw.py
-index 10e08b22ee0e..70e76e3888bd 100755
---- a/tools/testing/selftests/drivers/net/hw/gro_hw.py
-+++ b/tools/testing/selftests/drivers/net/hw/gro_hw.py
-@@ -51,11 +51,21 @@ def _resolve_dmac(cfg, ipver):
-     return getattr(cfg, attr)
- 
- 
-+def _require_ntuple(cfg):
-+    features = ethtool(f"-k {cfg.ifname}", json=True)[0]
-+    if not features["ntuple-filters"]["active"]:
-+        if features["ntuple-filters"]["fixed"]:
-+            raise KsftSkipEx("Device does not support ntuple-filters")
-+        ethtool(f"-K {cfg.ifname} ntuple-filters on")
-+        defer(ethtool, f"-K {cfg.ifname} ntuple-filters off")
-+
-+
- def _setup_isolated_queue(cfg):
-     """Set up an isolated queue for testing using ntuple filter.
- 
-     Remove queue 1 from the default RSS context and steer test traffic to it.
-     """
-+    _require_ntuple(cfg)
-     test_queue = 1
- 
-     qcnt = len(glob.glob(f"/sys/class/net/{cfg.ifname}/queues/rx-*"))
-diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-index e81724cb5542..d72b76ba0835 100755
---- a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-+++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-@@ -100,12 +100,22 @@ def rss(cfg):
-     defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}")
- 
- 
-+def _require_ntuple(cfg):
-+    features = ethtool(f"-k {cfg.ifname}", json=True)[0]
-+    if not features["ntuple-filters"]["active"]:
-+        if features["ntuple-filters"]["fixed"]:
-+            raise KsftSkipEx("Device does not support ntuple-filters")
-+        ethtool(f"-K {cfg.ifname} ntuple-filters on")
-+        defer(ethtool, f"-K {cfg.ifname} ntuple-filters off")
-+
-+
- @ksft_variants([
-     KsftNamedVariant("single", single),
-     KsftNamedVariant("rss", rss),
- ])
- def test_zcrx(cfg, setup) -> None:
-     cfg.require_ipver('6')
-+    _require_ntuple(cfg)
- 
-     setup(cfg)
-     rx_cmd = f"{cfg.bin_local} -s -p {cfg.port} -i {cfg.ifname} -q {cfg.target}"
-@@ -121,6 +131,7 @@ def test_zcrx(cfg, setup) -> None:
- ])
- def test_zcrx_oneshot(cfg, setup) -> None:
-     cfg.require_ipver('6')
-+    _require_ntuple(cfg)
- 
-     setup(cfg)
-     rx_cmd = f"{cfg.bin_local} -s -p {cfg.port} -i {cfg.ifname} -q {cfg.target} -o 4"
-@@ -134,6 +145,7 @@ def test_zcrx_large_chunks(cfg) -> None:
-     """Test zcrx with large buffer chunks."""
- 
-     cfg.require_ipver('6')
-+    _require_ntuple(cfg)
- 
-     hp_file = "/proc/sys/vm/nr_hugepages"
-     with open(hp_file, 'r+', encoding='utf-8') as f:
-diff --git a/tools/testing/selftests/drivers/net/hw/ntuple.py b/tools/testing/selftests/drivers/net/hw/ntuple.py
-index 232733142c02..ef4604bfa8ef 100755
---- a/tools/testing/selftests/drivers/net/hw/ntuple.py
-+++ b/tools/testing/selftests/drivers/net/hw/ntuple.py
-@@ -22,7 +22,10 @@ class NtupleField(Enum):
- def _require_ntuple(cfg):
-     features = ethtool(f"-k {cfg.ifname}", json=True)[0]
-     if not features["ntuple-filters"]["active"]:
--        raise KsftSkipEx("Ntuple filters not enabled on the device: " + str(features["ntuple-filters"]))
-+        if features["ntuple-filters"]["fixed"]:
-+            raise KsftSkipEx("Device does not support ntuple-filters")
-+        ethtool(f"-K {cfg.ifname} ntuple-filters on")
-+        defer(ethtool, f"-K {cfg.ifname} ntuple-filters off")
- 
- 
- def _get_rx_cnts(cfg, prev=None):
-diff --git a/tools/testing/selftests/drivers/net/hw/rss_ctx.py b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-index 51f4e7bc3e5d..62dbc2ac7841 100755
---- a/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-+++ b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-@@ -57,9 +57,10 @@ def ethtool_create(cfg, act, opts):
- def require_ntuple(cfg):
-     features = ethtool(f"-k {cfg.ifname}", json=True)[0]
-     if not features["ntuple-filters"]["active"]:
--        # ntuple is more of a capability than a config knob, don't bother
--        # trying to enable it (until some driver actually needs it).
--        raise KsftSkipEx("Ntuple filters not enabled on the device: " + str(features["ntuple-filters"]))
-+        if features["ntuple-filters"]["fixed"]:
-+            raise KsftSkipEx("Device does not support ntuple-filters")
-+        ethtool(f"-K {cfg.ifname} ntuple-filters on")
-+        defer(ethtool, f"-K {cfg.ifname} ntuple-filters off")
- 
- 
- def require_context_cnt(cfg, need_cnt):
--- 
-2.52.0
+BUG: memory leak
+unreferenced object 0xffff88810ad103a0 (size 32):
+  comm "syz-executor", pid 6458, jiffies 4294946243
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    f8 56 0a 00 81 88 ff ff 00 00 00 00 00 00 00 00  .V..............
+  backtrace (crc 109407f3):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4574 [inline]
+    slab_alloc_node mm/slub.c:4898 [inline]
+    __do_kmalloc_node mm/slub.c:5294 [inline]
+    __kmalloc_noprof+0x3b7/0x550 mm/slub.c:5307
+    kmalloc_noprof include/linux/slab.h:954 [inline]
+    kzalloc_noprof include/linux/slab.h:1188 [inline]
+    lsm_blob_alloc+0x4d/0x80 security/security.c:218
+    lsm_cred_alloc security/security.c:235 [inline]
+    security_prepare_creds+0x2d/0x290 security/security.c:2866
+    prepare_creds+0x395/0x600 kernel/cred.c:215
+    copy_creds+0x44/0x290 kernel/cred.c:286
+    copy_process+0x920/0x2cf0 kernel/fork.c:2123
+    kernel_clone+0xde/0x700 kernel/fork.c:2723
+    __do_sys_clone+0x7f/0xb0 kernel/fork.c:2864
+    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+    do_syscall_64+0xee/0xf80 arch/x86/entry/syscall_64.c:94
+    entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
+BUG: memory leak
+unreferenced object 0xffff888111516800 (size 1272):
+  comm "kworker/1:3", pid 5684, jiffies 4294946243
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    28 00 0b 40 00 00 00 00 00 00 00 00 00 00 00 00  (..@............
+  backtrace (crc 5e448183):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4574 [inline]
+    slab_alloc_node mm/slub.c:4898 [inline]
+    kmem_cache_alloc_noprof+0x36c/0x480 mm/slub.c:4905
+    sk_prot_alloc+0x3e/0x1b0 net/core/sock.c:2241
+    sk_alloc+0x36/0x460 net/core/sock.c:2303
+    __vsock_create.constprop.0+0x38/0x2f0 net/vmw_vsock/af_vsock.c:907
+    virtio_transport_recv_listen net/vmw_vsock/virtio_transport_common.c:1566 [inline]
+    virtio_transport_recv_pkt+0x88d/0xfb0 net/vmw_vsock/virtio_transport_common.c:1693
+    vsock_loopback_work+0x104/0x140 net/vmw_vsock/vsock_loopback.c:142
+    process_one_work+0x277/0x5b0 kernel/workqueue.c:3302
+    process_scheduled_works kernel/workqueue.c:3385 [inline]
+    worker_thread+0x255/0x4a0 kernel/workqueue.c:3466
+    kthread+0x14e/0x1a0 kernel/kthread.c:436
+    ret_from_fork+0x219/0x490 arch/x86/kernel/process.c:158
+    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+BUG: memory leak
+unreferenced object 0xffff88812daab5e0 (size 32):
+  comm "kworker/1:3", pid 5684, jiffies 4294946243
+  hex dump (first 32 bytes):
+    f8 56 0a 00 81 88 ff ff 00 00 00 00 00 00 00 00  .V..............
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc 79381f4a):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4574 [inline]
+    slab_alloc_node mm/slub.c:4898 [inline]
+    __do_kmalloc_node mm/slub.c:5294 [inline]
+    __kmalloc_noprof+0x3b7/0x550 mm/slub.c:5307
+    kmalloc_noprof include/linux/slab.h:954 [inline]
+    kzalloc_noprof include/linux/slab.h:1188 [inline]
+    lsm_blob_alloc+0x4d/0x80 security/security.c:218
+    lsm_sock_alloc security/security.c:4478 [inline]
+    security_sk_alloc+0x2d/0x290 security/security.c:4494
+    sk_prot_alloc+0x8f/0x1b0 net/core/sock.c:2250
+    sk_alloc+0x36/0x460 net/core/sock.c:2303
+    __vsock_create.constprop.0+0x38/0x2f0 net/vmw_vsock/af_vsock.c:907
+    virtio_transport_recv_listen net/vmw_vsock/virtio_transport_common.c:1566 [inline]
+    virtio_transport_recv_pkt+0x88d/0xfb0 net/vmw_vsock/virtio_transport_common.c:1693
+    vsock_loopback_work+0x104/0x140 net/vmw_vsock/vsock_loopback.c:142
+    process_one_work+0x277/0x5b0 kernel/workqueue.c:3302
+    process_scheduled_works kernel/workqueue.c:3385 [inline]
+    worker_thread+0x255/0x4a0 kernel/workqueue.c:3466
+    kthread+0x14e/0x1a0 kernel/kthread.c:436
+    ret_from_fork+0x219/0x490 arch/x86/kernel/process.c:158
+    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+BUG: memory leak
+unreferenced object 0xffff88810b1a75a0 (size 96):
+  comm "kworker/1:3", pid 5684, jiffies 4294946243
+  hex dump (first 32 bytes):
+    00 68 51 11 81 88 ff ff 00 00 00 00 00 00 00 00  .hQ.............
+    00 00 00 00 00 00 00 00 00 00 04 00 00 00 00 00  ................
+  backtrace (crc 428f2031):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4574 [inline]
+    slab_alloc_node mm/slub.c:4898 [inline]
+    __kmalloc_cache_noprof+0x371/0x480 mm/slub.c:5410
+    kmalloc_noprof include/linux/slab.h:950 [inline]
+    kzalloc_noprof include/linux/slab.h:1188 [inline]
+    virtio_transport_do_socket_init+0x2b/0xf0 net/vmw_vsock/virtio_transport_common.c:925
+    vsock_assign_transport+0x3a3/0x460 net/vmw_vsock/af_vsock.c:656
+    virtio_transport_recv_listen net/vmw_vsock/virtio_transport_common.c:1582 [inline]
+    virtio_transport_recv_pkt+0x8e5/0xfb0 net/vmw_vsock/virtio_transport_common.c:1693
+    vsock_loopback_work+0x104/0x140 net/vmw_vsock/vsock_loopback.c:142
+    process_one_work+0x277/0x5b0 kernel/workqueue.c:3302
+    process_scheduled_works kernel/workqueue.c:3385 [inline]
+    worker_thread+0x255/0x4a0 kernel/workqueue.c:3466
+    kthread+0x14e/0x1a0 kernel/kthread.c:436
+    ret_from_fork+0x219/0x490 arch/x86/kernel/process.c:158
+    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+BUG: memory leak
+unreferenced object 0xffff888111516300 (size 1272):
+  comm "kworker/1:3", pid 5684, jiffies 4294946244
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    28 00 0b 40 00 00 00 00 00 00 00 00 00 00 00 00  (..@............
+  backtrace (crc e1cd45d1):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4574 [inline]
+    slab_alloc_node mm/slub.c:4898 [inline]
+    kmem_cache_alloc_noprof+0x36c/0x480 mm/slub.c:4905
+    sk_prot_alloc+0x3e/0x1b0 net/core/sock.c:2241
+    sk_alloc+0x36/0x460 net/core/sock.c:2303
+    __vsock_create.constprop.0+0x38/0x2f0 net/vmw_vsock/af_vsock.c:907
+    virtio_transport_recv_listen net/vmw_vsock/virtio_transport_common.c:1566 [inline]
+    virtio_transport_recv_pkt+0x88d/0xfb0 net/vmw_vsock/virtio_transport_common.c:1693
+    vsock_loopback_work+0x104/0x140 net/vmw_vsock/vsock_loopback.c:142
+    process_one_work+0x277/0x5b0 kernel/workqueue.c:3302
+    process_scheduled_works kernel/workqueue.c:3385 [inline]
+    worker_thread+0x255/0x4a0 kernel/workqueue.c:3466
+    kthread+0x14e/0x1a0 kernel/kthread.c:436
+    ret_from_fork+0x219/0x490 arch/x86/kernel/process.c:158
+    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+connection error: failed to recv *flatrpc.ExecutorMessageRawT: EOF
+
+
+Tested on:
+
+commit:         39ff9a4a vsock/virtio: fix socket leak on close_timeou..
+git tree:       https://github.com/stefano-garzarella/linux.git fix-syzbot-memleak-vsock-create
+console output: https://syzkaller.appspot.com/x/log.txt?x=1742b896580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=dfcc8f993a958a78
+dashboard link: https://syzkaller.appspot.com/bug?extid=1b2c9c4a0f8708082678
+compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+
+Note: no patches were applied.
 
