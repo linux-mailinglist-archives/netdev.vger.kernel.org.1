@@ -1,348 +1,245 @@
-Return-Path: <netdev+bounces-281237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281238-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IPI8KdgF72ma3wAAu9opvQ
-	(envelope-from <netdev+bounces-281237-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 08:44:40 +0200
+	id 2AQbK4oJ72n14QAAu9opvQ
+	(envelope-from <netdev+bounces-281238-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 09:00:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85D7546DC4E
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 08:44:39 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1172946DF5F
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 09:00:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 51B63300650D
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 06:44:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 91F5430414B3
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 06:56:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1507C371CF4;
-	Mon, 27 Apr 2026 06:44:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7533386C18;
+	Mon, 27 Apr 2026 06:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="uVLEOktU"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.75.44.102])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD2AC36AB5B
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 06:44:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.75.44.102
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F19238F92A;
+	Mon, 27 Apr 2026 06:56:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777272273; cv=none; b=KQB9vfEDFHMQWNGuXQqxQcP5Af+yI4QsRNZpiTFQgGZYRRHjzDKOrfNTukcrI0KVfyoISJomx9FG5YywcAU9t3lALUtnAu3IFmYMA92NdYQ+y5si5C8rK2sIMxGfpzg2A7+uZVplFSM832lx/b6NlEjTtFYksbJiKvZOWbpZTd8=
+	t=1777272972; cv=none; b=K3kMrSud34UMbadLiW3PhNj16eohNWZzDLDL1lGRy6aHIIAJgZFkM6zhZSPBlkfEgdihnYFb8qgPEYLcR/v9TjVzDmtLe+dScPiAI1WhGUluDsrZKXXfMOY4RTZ7i9E8kOz0rWHA6994MDEk+HTtBDdqj06uN3Y5xjgqB7tLQ+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777272273; c=relaxed/simple;
-	bh=+AYWhFpO6hDedcaqJ5rHQTKgTJOJZK9rQiKlBU/Cutg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=duprbTgl4tJlBAJxm0wCSoMPYpYDMJOfdKHTISfkvh0zWGmjUlDsg8VUoGN7iIk+QYBpscsLLFlA1jeFw3i0tJlhKYxVxaKNtBIba2K0S1Ecu2X6NtXDIswjmgbxUZVl/7fGo1vk+3lMZPYITmWI7+i+pWUS9rAvhYy0jKYOkD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=13.75.44.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
-	by app1 (Coremail) with SMTP id ygmowADXTwCaBe9pClLjAA--.56415S3;
-	Mon, 27 Apr 2026 14:43:45 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: b.a.t.m.a.n@lists.open-mesh.org,
-	netdev@vger.kernel.org
-Cc: marek.lindner@mailbox.org,
-	sw@simonwunderlich.de,
-	antonio@mandelbit.com,
-	sven@narfation.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	yuantan098@gmail.com,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	bird@lzu.edu.cn,
-	tr0jan@lzu.edu.cn,
-	wangjiexun2025@gmail.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH net v2 2/2] batman-adv: stop tp_meter sessions during mesh teardown
-Date: Mon, 27 Apr 2026 14:43:34 +0800
-Message-ID: <20260427064338.1526762-2-n05ec@lzu.edu.cn>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260427064338.1526762-1-n05ec@lzu.edu.cn>
-References: <20260427064338.1526762-1-n05ec@lzu.edu.cn>
+	s=arc-20240116; t=1777272972; c=relaxed/simple;
+	bh=7RP8Mg990g5c5EkbLxkMX6Yqm+3OI/fSsM9PChWXejY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Q8J9FVclksRE9GWYgbE8uWgvwPDICsdwyy+wOStm8qcxF+HjP6xYgsIceQ4tTqMRK8irseXZXbQAh/65Rm+8yX0zn88Ii+61hezUR+ZG1kKnFwJEpMa5d0ZLniG3O4CwysBwquEqQxD+sXjPi4BqFmvrp+iNVTZDRtmdBc98mwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=uVLEOktU; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 63R6tkcS73573191, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
+	s=dkim; t=1777272946;
+	bh=AER0ET8ff4x9M+H5SyGinfYoXoQmV4ui+eKR/hLZdXs=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=uVLEOktU2b8vVDpwveswbHGGwCDIFs0aQajkHpHqTtZ6Lj4RCKFtuyPRhFGA7q2KE
+	 nxV/nmut/eqng/ldZldj7Kmx7AUqx7l+JtA2A3bG1ibDqPjQHt42a9Qlwg1KYDPDN5
+	 v3nuVMtBnjqMit5I03yEx+Tr/ypbSPs8/J9nmdHNgBaTnOX2rxzlczVor1LJ+7+DKK
+	 nusv1JdOU+lumTGgRCLDHTJtZYGWEiBPG7VetLH9vALIh8f8BNYCSaKGZKUaqlEAc5
+	 sIEYZBvzC6DTjEG6nbpJ7ifn6r9P+kIpzluGsmBDYxQn1eLDLWHxEgy54uW2iXH49E
+	 jhIHmRj4uuXzw==
+Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
+	by rtits2.realtek.com.tw (8.15.2/3.27/5.94) with ESMTPS id 63R6tkcS73573191
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 27 Apr 2026 14:55:46 +0800
+Received: from RS-EX-MBS3.realsil.com.cn (172.29.17.103) by
+ RS-EX-MBS2.realsil.com.cn (172.29.17.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 27 Apr 2026 14:55:46 +0800
+Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) by
+ RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) with mapi id 15.02.2562.017; Mon,
+ 27 Apr 2026 14:55:46 +0800
+From: Javen <javen_xu@realsil.com.cn>
+To: Heiner Kallweit <hkallweit1@gmail.com>,
+        "nic_swsd@realtek.com"
+	<nic_swsd@realtek.com>,
+        "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "horms@kernel.org"
+	<horms@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [RFC Patch net-next v1 0/9] r8169: add RSS support for RTL8127
+Thread-Topic: [RFC Patch net-next v1 0/9] r8169: add RSS support for RTL8127
+Thread-Index: AQHc0Gw4VGXlOJjkc0CYGLbAqTrfdbXv5KsAgAKSdXA=
+Date: Mon, 27 Apr 2026 06:55:46 +0000
+Message-ID: <ef0af92f796b4c81b02a438ac47228af@realsil.com.cn>
+References: <20260420021957.1756-1-javen_xu@realsil.com.cn>
+ <39a35232-479f-4390-9957-dbafc3f3c468@gmail.com>
+In-Reply-To: <39a35232-479f-4390-9957-dbafc3f3c468@gmail.com>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowADXTwCaBe9pClLjAA--.56415S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxuw4UCry3tw13urW3GFW7Jwb_yoW3ZrW7pF
-	4rWr9xGFsFyw4kXF42yFy5Ar1Yyw4IgFW7G3Wakrn8AFs8tr4Sg34ktFy2vF1FyayUKrsx
-	Zw1jga4UAr4kCrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBY1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
-	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
-	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j
-	6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
-	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
-	n4kS14v26r4a6rW5MxkIecxEwVCm-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6c
-	x26r48MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRi_HU3UUUUU==
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQ0KCWnt0WIMjAAAs4
-X-Rspamd-Queue-Id: 85D7546DC4E
+X-Rspamd-Queue-Id: 1172946DF5F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
+	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281237-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[mailbox.org,simonwunderlich.de,mandelbit.com,narfation.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lzu.edu.cn];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.846];
-	TO_DN_NONE(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281238-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[realsil.com.cn:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lzu.edu.cn:mid,lzu.edu.cn:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[realsil.com.cn:email,realsil.com.cn:dkim,realsil.com.cn:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-From: Jiexun Wang <wangjiexun2025@gmail.com>
+>On 20.04.2026 04:19, javen wrote:
+>> From: Javen Xu <javen_xu@realsil.com.cn>
+>>
+>> This series patch adds RSS support for RTL8127 in the r8169 driver.
+>>
+>> Currently, without RSS support, a single CPU core handles all incoming
+>> traffic. Under heavy loads, this single core becomes a bottleneck,
+>> causing high softirq usage and leading to unstable and degraded network
+>throughput.
+>>
+>> As a result, we add rss support for RTL8127. This RFC patch is just
+>> for discussing. And we do some experiments on AMD platform. Below is
+>> the result.
+>>
+>> Platform: AMD Ryzen Embedded R2514 with Radeon Graphics(4 Cores/8
+>> Threads)
+>
+>An older embedded CPU (AFAICS from 2019, refreshed in 2022) in reality is
+>unlikely to be used with sustained 10GBit traffic. It would be too weak to
+>handle userspace apps making use of this high throughput. This hw edge cas=
+e
+>IMO isn't really an argument for adding 1.000 LoC, blowing up driver struc=
+ts,
+>and adding the complexity of dealing with a register layout changing every=
+ two
+>chip versions.
+>
+>It's really a problem that Realtek frequently changes register layout and/=
+or
+>register semantics in a not backward-compatible way (and doesn't provide
+>documentation), resulting in ugly versioned stuff like the following.
+>
+>IMR_V2_SET_REG_8125     =3D 0x0d0c,
+>IMR_V2_CLEAR_REG_8125   =3D 0x0d00,
+>IMR_V4_L2_CLEAR_REG_8125 =3D 0x0d10,
+>ISR_V2_8125             =3D 0x0d04,
+>ISR_V4_L2_8125          =3D 0x0d14,
+>
+>case RTL_GIGA_MAC_VER_80:
+>        tp->HwSuppIsrVer =3D 6;
+>default:
+>        tp->HwSuppIsrVer =3D 1;
+>
+>This messy hw design makes it hard to develop maintainable drivers.
+>This is underlined by the fact that Realtek has separate r8125, r8126,
+>r8127 drivers, even though they share most of the code.
+>
+>> Arch: x86_64
+>> Test command:
+>>   Server: iperf3 -s
+>>   Client: iperf3 -c 192.168.2.1 -P 20 -t 3600
+>> Monitor: mpstat -P ALL 1
+>>
+>> Before this patch (Without RSS):
+>>   Throughput: Unstable, fluctuating between 3.76 Gbits/sec and
+>>   8.2 Gbits/sec.
+>>   CPU Usage: A single CPU core is fully occupied with softirq reaching
+>>   up to 96%.
+>>
+>> After this patch (With RSS enabled):
+>>   Throughput: Stable at 9.42 Gbits/sec.
+>>   CPU Usage: The traffic load is evenly distributed across multiple CPU
+>>   cores. The maximum softirq on a single core dropped to 63%.
+>>
+>> Patch summary:
+>>   Patch 1: Adds necessary macro and register definitions for RSS.
+>>   Patch 2-4: Support NAPI and multi RX/TX queues.
+>
+>Driver supports NAPI already.
+>
+>>   Patch 5-6: Support MSI-X and enables it specifically for RTL8127.
+>
+>Also MSI-X is used already.
+>
+>>   Patch 7: Enables RSS for RTL8127.
+>>   Patch 8-9: Adds ethtool support to configure the number of RX queues.
+>>
+>> Javen Xu (9):
+>>   r8169: add some register definitions
+>>   r8169: add napi and irq support
+>>   r8169: add support for multi tx queues
+>>   r8169: add support for multi rx queues
+>>   r8169: add support for msix
+>>   r8169: enable msix for RTL8127
+>>   r8169: add support and enable rss
+>>   r8169: move struct ethtool_ops
+>>   r8169: add support for ethtool
+>>
+>>  drivers/net/ethernet/realtek/r8169_main.c | 1437
+>> ++++++++++++++++++---
+>>  1 file changed, 1238 insertions(+), 199 deletions(-)
+>>
+>
+>Series includes functions like rtl8169_desc_quirk() indicating a need to w=
+ork
+>around hw errata. Would be helpful to add comments describing the hw
+>erratum, best with a link to documentation.
 
-TP meter sessions remain linked on bat_priv->tp_list after the netlink
-request has already finished. When the mesh interface is removed,
-batadv_mesh_free() currently tears down the mesh without first draining
-these sessions.
+This is a workaround for a hardware erratum on RTL8127.
+The hardware cannot guarantee that the descriptor OwnBit is fully written t=
+o host memory before interrupt is triggered. If the CPU handles the interru=
+pt very quickly, it might read stale descriptor data where DescOwn is still=
+ set, causing it to incorrectly skip the packet.
+The recheck_desc_ownbit flag and the subsequent rtl8127_desc_quirk() are in=
+troduced to wait for the descriptor write to complete and check it one last=
+ time.
 
-A running sender thread or a late incoming tp_meter packet can then keep
-processing against a mesh instance which is already shutting down.
-Synchronize tp_meter with the mesh lifetime by stopping all active
-sessions from batadv_mesh_free() and waiting for sender threads to exit
-before teardown continues.
 
-Fixes: 33a3bb4a3345 ("batman-adv: throughput meter implementation")
-Cc: stable@kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Co-developed-by: Luxing Yin <tr0jan@lzu.edu.cn>
-Signed-off-by: Luxing Yin <tr0jan@lzu.edu.cn>
-Signed-off-by: Jiexun Wang <wangjiexun2025@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
-Changes in v2:
-- Split the original fix and keep only teardown-side session draining here
-- Change batadv_tp_stop_all() loop indices to size_t
-- Restore blank lines unintentionally removed in v1
+Thanks for your review and suggestions.
 
- net/batman-adv/main.c     |  1 +
- net/batman-adv/tp_meter.c | 93 +++++++++++++++++++++++++++++++--------
- net/batman-adv/tp_meter.h |  1 +
- net/batman-adv/types.h    |  4 ++
- 4 files changed, 81 insertions(+), 18 deletions(-)
+Summary of changes in upcoming v2:
+- remove multi tx queue patch
+- rename some macro definitions, such as RXS_8125B_RSS_UDP_V4
+- convert enum rtl8127_rss_register_content to #define and use BIT() macro
+- run checkpatch, explain the usage of dma_wmb() etc.
+- fix typo errors (e.g., DEAFULT)
 
-diff --git a/net/batman-adv/main.c b/net/batman-adv/main.c
-index 3a35aadd8b41..a4d33ee0fda5 100644
---- a/net/batman-adv/main.c
-+++ b/net/batman-adv/main.c
-@@ -249,6 +249,7 @@ void batadv_mesh_free(struct net_device *mesh_iface)
- 	atomic_set(&bat_priv->mesh_state, BATADV_MESH_DEACTIVATING);
- 
- 	batadv_purge_outstanding_packets(bat_priv, NULL);
-+	batadv_tp_stop_all(bat_priv);
- 
- 	batadv_gw_node_free(bat_priv);
- 
-diff --git a/net/batman-adv/tp_meter.c b/net/batman-adv/tp_meter.c
-index d9a80e459c2e..99dcf9431ad9 100644
---- a/net/batman-adv/tp_meter.c
-+++ b/net/batman-adv/tp_meter.c
-@@ -365,23 +365,38 @@ static void batadv_tp_vars_put(struct batadv_tp_vars *tp_vars)
- }
- 
- /**
-- * batadv_tp_sender_cleanup() - cleanup sender data and drop and timer
-- * @bat_priv: the bat priv with all the mesh interface information
-- * @tp_vars: the private data of the current TP meter session to cleanup
-+ * batadv_tp_list_detach() - remove tp session from mesh session list once
-+ * @tp_vars: the private data of the current TP meter session
-  */
--static void batadv_tp_sender_cleanup(struct batadv_priv *bat_priv,
--				     struct batadv_tp_vars *tp_vars)
-+static void batadv_tp_list_detach(struct batadv_tp_vars *tp_vars)
- {
--	cancel_delayed_work(&tp_vars->finish_work);
-+	bool detached = false;
- 
- 	spin_lock_bh(&tp_vars->bat_priv->tp_list_lock);
--	hlist_del_rcu(&tp_vars->list);
-+	if (!hlist_unhashed(&tp_vars->list)) {
-+		hlist_del_init_rcu(&tp_vars->list);
-+		detached = true;
-+	}
- 	spin_unlock_bh(&tp_vars->bat_priv->tp_list_lock);
- 
-+	if (!detached)
-+		return;
-+
-+	atomic_dec(&tp_vars->bat_priv->tp_num);
-+
- 	/* drop list reference */
- 	batadv_tp_vars_put(tp_vars);
-+}
- 
--	atomic_dec(&tp_vars->bat_priv->tp_num);
-+/**
-+ * batadv_tp_sender_cleanup() - cleanup sender data and drop and timer
-+ * @tp_vars: the private data of the current TP meter session to cleanup
-+ */
-+static void batadv_tp_sender_cleanup(struct batadv_tp_vars *tp_vars)
-+{
-+	cancel_delayed_work_sync(&tp_vars->finish_work);
-+
-+	batadv_tp_list_detach(tp_vars);
- 
- 	/* kill the timer and remove its reference */
- 	timer_delete_sync(&tp_vars->timer);
-@@ -886,7 +901,8 @@ static int batadv_tp_send(void *arg)
- 	batadv_orig_node_put(orig_node);
- 
- 	batadv_tp_sender_end(bat_priv, tp_vars);
--	batadv_tp_sender_cleanup(bat_priv, tp_vars);
-+	batadv_tp_sender_cleanup(tp_vars);
-+	complete(&tp_vars->finished);
- 
- 	batadv_tp_vars_put(tp_vars);
- 
-@@ -918,7 +934,8 @@ static void batadv_tp_start_kthread(struct batadv_tp_vars *tp_vars)
- 		batadv_tp_vars_put(tp_vars);
- 
- 		/* cleanup of failed tp meter variables */
--		batadv_tp_sender_cleanup(bat_priv, tp_vars);
-+		batadv_tp_sender_cleanup(tp_vars);
-+		complete(&tp_vars->finished);
- 		return;
- 	}
- 
-@@ -1024,6 +1041,7 @@ void batadv_tp_start(struct batadv_priv *bat_priv, const u8 *dst,
- 	tp_vars->start_time = jiffies;
- 
- 	init_waitqueue_head(&tp_vars->more_bytes);
-+	init_completion(&tp_vars->finished);
- 
- 	spin_lock_init(&tp_vars->unacked_lock);
- 	INIT_LIST_HEAD(&tp_vars->unacked_list);
-@@ -1126,14 +1144,7 @@ static void batadv_tp_receiver_shutdown(struct timer_list *t)
- 		   "Shutting down for inactivity (more than %dms) from %pM\n",
- 		   BATADV_TP_RECV_TIMEOUT, tp_vars->other_end);
- 
--	spin_lock_bh(&tp_vars->bat_priv->tp_list_lock);
--	hlist_del_rcu(&tp_vars->list);
--	spin_unlock_bh(&tp_vars->bat_priv->tp_list_lock);
--
--	/* drop list reference */
--	batadv_tp_vars_put(tp_vars);
--
--	atomic_dec(&bat_priv->tp_num);
-+	batadv_tp_list_detach(tp_vars);
- 
- 	spin_lock_bh(&tp_vars->unacked_lock);
- 	list_for_each_entry_safe(un, safe, &tp_vars->unacked_list, list) {
-@@ -1496,6 +1507,52 @@ void batadv_tp_meter_recv(struct batadv_priv *bat_priv, struct sk_buff *skb)
- 	consume_skb(skb);
- }
- 
-+/**
-+ * batadv_tp_stop_all() - stop all currently running tp meter sessions
-+ * @bat_priv: the bat priv with all the mesh interface information
-+ */
-+void batadv_tp_stop_all(struct batadv_priv *bat_priv)
-+{
-+	struct batadv_tp_vars *tp_vars[BATADV_TP_MAX_NUM];
-+	struct batadv_tp_vars *tp_var;
-+	size_t count = 0;
-+	size_t i;
-+
-+	spin_lock_bh(&bat_priv->tp_list_lock);
-+	hlist_for_each_entry(tp_var, &bat_priv->tp_list, list) {
-+		if (WARN_ON_ONCE(count >= BATADV_TP_MAX_NUM))
-+			break;
-+
-+		if (!kref_get_unless_zero(&tp_var->refcount))
-+			continue;
-+
-+		tp_vars[count++] = tp_var;
-+	}
-+	spin_unlock_bh(&bat_priv->tp_list_lock);
-+
-+	for (i = 0; i < count; i++) {
-+		tp_var = tp_vars[i];
-+
-+		switch (tp_var->role) {
-+		case BATADV_TP_SENDER:
-+			batadv_tp_sender_shutdown(tp_var,
-+						  BATADV_TP_REASON_CANCEL);
-+			wake_up(&tp_var->more_bytes);
-+			wait_for_completion(&tp_var->finished);
-+			break;
-+		case BATADV_TP_RECEIVER:
-+			batadv_tp_list_detach(tp_var);
-+			if (timer_shutdown_sync(&tp_var->timer))
-+				batadv_tp_vars_put(tp_var);
-+			break;
-+		}
-+
-+		batadv_tp_vars_put(tp_var);
-+	}
-+
-+	synchronize_net();
-+}
-+
- /**
-  * batadv_tp_meter_init() - initialize global tp_meter structures
-  */
-diff --git a/net/batman-adv/tp_meter.h b/net/batman-adv/tp_meter.h
-index f0046d366eac..4e97cd10cd02 100644
---- a/net/batman-adv/tp_meter.h
-+++ b/net/batman-adv/tp_meter.h
-@@ -17,6 +17,7 @@ void batadv_tp_start(struct batadv_priv *bat_priv, const u8 *dst,
- 		     u32 test_length, u32 *cookie);
- void batadv_tp_stop(struct batadv_priv *bat_priv, const u8 *dst,
- 		    u8 return_value);
-+void batadv_tp_stop_all(struct batadv_priv *bat_priv);
- void batadv_tp_meter_recv(struct batadv_priv *bat_priv, struct sk_buff *skb);
- 
- #endif /* _NET_BATMAN_ADV_TP_METER_H_ */
-diff --git a/net/batman-adv/types.h b/net/batman-adv/types.h
-index 8fc5fe0e9b05..daa06f421154 100644
---- a/net/batman-adv/types.h
-+++ b/net/batman-adv/types.h
-@@ -14,6 +14,7 @@
- #include <linux/average.h>
- #include <linux/bitops.h>
- #include <linux/compiler.h>
-+#include <linux/completion.h>
- #include <linux/if.h>
- #include <linux/if_ether.h>
- #include <linux/kref.h>
-@@ -1328,6 +1329,9 @@ struct batadv_tp_vars {
- 	/** @finish_work: work item for the finishing procedure */
- 	struct delayed_work finish_work;
- 
-+	/** @finished: completion signaled when a sender thread exits */
-+	struct completion finished;
-+
- 	/** @test_length: test length in milliseconds */
- 	u32 test_length;
- 
--- 
-2.34.1
+BRs,
+Javen
 
 
