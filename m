@@ -1,146 +1,153 @@
-Return-Path: <netdev+bounces-281532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281534-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CGRPHIXs72mjKgEAu9opvQ
-	(envelope-from <netdev+bounces-281532-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 01:08:53 +0200
+	id QI9MDNns72mjKgEAu9opvQ
+	(envelope-from <netdev+bounces-281534-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 01:10:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C51BD47BB65
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 01:08:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8133047BB83
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 01:10:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D1B7E300C901
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 23:08:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BCC46300DF6A
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 23:10:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2F743ACA7C;
-	Mon, 27 Apr 2026 23:08:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 637953ACA7C;
+	Mon, 27 Apr 2026 23:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MYS5xEOS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UBYheo8w"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C091638A717
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 23:08:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16DEB2DF12F
+	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 23:10:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777331329; cv=none; b=U6X3uxJU6tPnuBerm21NA6K6gfAHSP171Hlr5YVP88Av3WB0OB8JUHa4GCLT79QiwXMtL/GOck0UXnkm7S1pDtCExZL8rxye8u+N8mWQ6TVqa98mjwNqy9mjTtc4ExsRtVRflfhAg3qw7XNBatXqGbuWtJXN39yXlerS/eIqMlU=
+	t=1777331414; cv=none; b=KOf1Bfjs3uD3HPbMfcM1OnzTZyP+eIeUjVZJED3+FO1cKF4pOr9PhzNLWOtRtifa3992XMi2rodmBVs8Yjr55KIteQPsBNSeDTZ4Xq2mKc+FZ7oPZWwS4ZEr6fAYN/qvvjCsm3FJXKDSdQXS7YM9TKZhUxbWrtcicgmu48oq33g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777331329; c=relaxed/simple;
-	bh=EVk/KEdeMlfbcW2aUVxYwK+aQpzkD/QO/L7LRLozs+U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iiTamap1GkU1RZkVJjwUVEPqkrSYVTChxfqdwuhVkpvv5vcaTVxpkr7gTOQiV5QStGb1U83hgXMwwANWrvGLkXqOOcMyaP3WHBsREwz6jjVOVbnioZVLo7IuNlGjEuCMoNEbHyoqTNu098sIUbzwwN4K3/3dKXDC1lGaLGWK/3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MYS5xEOS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEB85C19425;
-	Mon, 27 Apr 2026 23:08:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777331329;
-	bh=EVk/KEdeMlfbcW2aUVxYwK+aQpzkD/QO/L7LRLozs+U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MYS5xEOSxknxqJZAndSbM718c4ESg65SRwOn/zB7mNBDGT0gZJ8VMT2gX0mTDHird
-	 ThC5Z0FjDrK56r6iGf2kU+SHif57ZhpYg9b34k30SVAcNIFxtyhLq9cav2o0x8kKJg
-	 T/qagzTuHDs2zR5UM9y6i8aLdBz3iDJWz9JqFwvMbpfl2RP+5Q7HKONAvblSIaMFzU
-	 1OUJA3o+jwDO6g2ugC+TdHUeNf8hkPZ+fQV4MEFPkeM513g0bCVtOznFq2zOZhQsLk
-	 GQ3zyoH+LEH3nj8SSRi4a8wQO+TVzQWRn01KKBlqA2oFYsS+StF/OgMZrm/qC/sX8w
-	 LTsoO/jDTQvSw==
-Date: Mon, 27 Apr 2026 16:08:47 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jamal Hadi Salim
- <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, Kuniyuki Iwashima
- <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next 2/4] net/sched: tc_dump_qdisc_root() refactor
-Message-ID: <20260427160847.5dbf1915@kernel.org>
-In-Reply-To: <20260427132555.1791636-3-edumazet@google.com>
-References: <20260427132555.1791636-1-edumazet@google.com>
-	<20260427132555.1791636-3-edumazet@google.com>
+	s=arc-20240116; t=1777331414; c=relaxed/simple;
+	bh=CSI7F20F+XmAo5hDjJW5dsCKsqUL5ibHCIcsvBjX510=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=lmSH7+d+YfPpqYy/AFsJ4SEJRMD5en4n1aOAesdKPLYnByATs6s/a4qAmZfP2UZU90BHX3pJ80+pylbfqyPHxIlIzjABeasa1HjBW0ZNjdpn6gaq4wC77cbIUdw+76OOhlBJSJcxY7RLsrMKVN7gmbfUTTfqTh06HijyFaM47C0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UBYheo8w; arc=none smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-79885f4a8ffso114565537b3.3
+        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 16:10:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777331412; x=1777936212; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hJMQ5+ww3M//MOV42Q4uI0oLHRbxuGr+md3DIPOawPw=;
+        b=UBYheo8wsDfEzQpNIkmfgFiMKflLRffCPdp0kR6e+ZYmBfmj8BBMlgM7xuZW7zINH1
+         wWpUyNRM7ise9114JQ0KPkf+KKioRJl+SViKlJWpE0LqYCwqUImUwOGmo6NLXV+1EEhH
+         Z5hET1wQmwVtRYBY8WAt9TF8FF/+weErjb+ra47iewl1HtwHEjFXhxw47CbAb4Cx91j+
+         7Z0E2CK0xN3YhdzJiBy9IGkf7oKuEpML1oAPgcuZgWC7xlmtWvX023k262jJJ1OmXepT
+         ZQeOojUrg/1wjqVFGvjCdyjpZpaQwEzKw1PV0c/ThnynCebIzUcxx0C1nnfic+jjSaOG
+         5MKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777331412; x=1777936212;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hJMQ5+ww3M//MOV42Q4uI0oLHRbxuGr+md3DIPOawPw=;
+        b=scr27bvVClNu0T6Ah2JGTq4bDNni3eYne4qRdGWDjXY7WFe66d3EjCHFAqH7onZmlJ
+         SUvX1ha1Ppe8vTy6tptKNhaZT5p22t9ihk7pf6hw+pmyCwGb95wLjvUJKXsKlReBaiSk
+         Umat/r2jeErh0fLxtmRfykRxSDoVRqRZBmfXPBIzuxAqCmrDRzmCzoV+tJRlmUKYFyE/
+         hCn+FGzGu4Eark/InLzm03XCvZnefmxXbsUHULJJ4T6U91MNmi9/qFf1q/KQII6sra52
+         vJtJHC9GrXlgUc4ErnNiTVB4ZrqzXpI/0VOdOHdCEF+w01HI7t2+Pdcn6jVhBB8J55iF
+         z4gw==
+X-Gm-Message-State: AOJu0YzB1OumjeF4lQ1ewWIYoL5bFozOZtdS4SmvqbQsmcHN3NQEjUWT
+	fk/VMzJRecCZG4DYsAtODqhdBujgd+Q/Oo/Yht3Pp6sk4CiUvs0B1KRh
+X-Gm-Gg: AeBDietvMhm3MAToI0wUEa9eutU8yVPKtMKCIfZ2e/x4bHO8Sv0qFzTBtKUgoDImUJi
+	RqlUb5s6GVqp1U4EVPbONnfMDCHwQ/QFpw+9OqeUa9vXC8ZGaflghciNYnc/8Zir8Lrbv8ng/XU
+	a28bc24VVm31M09JiL7Xog4KTuHHBhHmpjBWt65SBu6Va4X5mb/9KNnHN/PDmNcCECskkurxumr
+	1uRlcV6IQ9/m8sauUiE+1dDUU7Jcybgvgj8MBipHtWayp7L86h3462JQbGy8XURioKtsVpjR09y
+	0I6o6ZyskcS5ag25HcC8n8Uk9ZQ/9uk/NQIfSr++MaQxZKlobIhSIYhErbnJVyRjCU5CQHScOSb
+	gyvXBFzTxyKH0DCJrivJjy0Vwqo6Gn5uyu9mRKpZS6JDUgOQ09DZCUsbgePyMBIYdvLuQXN7STe
+	C1bQhxz6pFIxBZEnGx+auT32K9oUxUeET3g4KUgcwCJvadew5hfDQpUpmi59DSdxY0UC14+OnvN
+	rKQ/Jfm2f3aD16R6U/f6+YUIA==
+X-Received: by 2002:a05:690c:3586:b0:7b8:bc4e:a75 with SMTP id 00721157ae682-7bcf51f29f6mr6511367b3.19.1777331412040;
+        Mon, 27 Apr 2026 16:10:12 -0700 (PDT)
+Received: from gmail.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7bcf0aebe09sm4443907b3.30.2026.04.27.16.10.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Apr 2026 16:10:11 -0700 (PDT)
+Date: Mon, 27 Apr 2026 19:10:10 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ davem@davemloft.net
+Cc: netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ horms@kernel.org, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ daniel.zahka@gmail.com, 
+ willemdebruijn.kernel@gmail.com, 
+ donald.hunter@gmail.com
+Message-ID: <willemdebruijn.kernel.375ee60037335@gmail.com>
+In-Reply-To: <20260427195856.401223-1-kuba@kernel.org>
+References: <20260427195856.401223-1-kuba@kernel.org>
+Subject: Re: [PATCH net] net: psp: require admin permission for dev-set and
+ key-rotate
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: C51BD47BB65
+X-Rspamd-Queue-Id: 8133047BB83
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,kernel.org,mojatatu.com,resnulli.us,google.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-281532-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-281534-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Mon, 27 Apr 2026 13:25:53 +0000 Eric Dumazet wrote:
-> -	if (q_idx < s_q_idx) {
-> -		q_idx++;
-> -	} else {
-> -		if (!tc_qdisc_dump_ignore(q, dump_invisible) &&
-> -		    tc_fill_qdisc(skb, q, q->parent, NETLINK_CB(cb->skb).portid,
-> -				  cb->nlh->nlmsg_seq, NLM_F_MULTI,
-> -				  RTM_NEWQDISC, NULL) <= 0)
-> -			goto done;
-> -		q_idx++;
-> +	if (!(q_idx < s_q_idx) &&
-> +	    !tc_qdisc_dump_ignore(q, dump_invisible)) {
-> +		ret = tc_fill_qdisc(skb, q, q->parent,
-> +				    NETLINK_CB(cb->skb).portid,
-> +				    cb->nlh->nlmsg_seq, NLM_F_MULTI,
-> +				    RTM_NEWQDISC, NULL);
-> +		if (ret < 0)
-> +			goto out;
->  	}
-> +	q_idx++;
+Jakub Kicinski wrote:
+> The dev-set and key-rotate netlink operations modify shared device
+> state (PSP version configuration and cryptographic key material,
+> respectively) but do not require CAP_NET_ADMIN. The only access
+> control is psp_dev_check_access() which merely verifies netns
+> membership.
+> 
+> Fixes: 00c94ca2b99e ("psp: base PSP device support")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Probably subjective but I'm not sure the
-
-	if (!(q_idx < s_q_idx) &&
-
-is more readable than the previous version?
-
-Especially for:
-
->  	hash_for_each(qdisc_dev(root)->qdisc_hash, b, q, hash) {
-> -		if (q_idx < s_q_idx) {
-> -			q_idx++;
-> -			continue;
-> +		if (!(q_idx < s_q_idx) &&
-> +		    !tc_qdisc_dump_ignore(q, dump_invisible)) {
-> +			ret = tc_fill_qdisc(skb, q, q->parent,
-> +					    NETLINK_CB(cb->skb).portid,
-> +					    cb->nlh->nlmsg_seq, NLM_F_MULTI,
-> +					    RTM_NEWQDISC, NULL);
-> +			if (ret < 0)
-> +				goto out;
->  		}
-
-I feel like checking the ID + continue in netlink dump loop is fairly
-idiomatic.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
