@@ -1,79 +1,53 @@
-Return-Path: <netdev+bounces-281202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281203-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aG62GI+p7mkSwgAAu9opvQ
-	(envelope-from <netdev+bounces-281202-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 02:10:55 +0200
+	id cFKrD9uv7mnxwgAAu9opvQ
+	(envelope-from <netdev+bounces-281203-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 02:37:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id A95AB46B9E6
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 02:10:54 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5F5F46BB68
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 02:37:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4E7883002B6E
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 00:10:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A31EE300C912
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 00:37:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F356438DD3;
-	Mon, 27 Apr 2026 00:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1B9D221FC6;
+	Mon, 27 Apr 2026 00:37:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="g6jALT1F"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FJk7is+H"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44F4F40DFCC
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 00:10:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F3921257F;
+	Mon, 27 Apr 2026 00:37:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777248640; cv=none; b=vFHRxtpcab+UbTljP+JK3cgtx+pTOj5LA7XfKjjbLEgf+WO+kWgzWiR+TnTae/1jZg5uarp/pHEe6WQXBJj9w9g9+d7y3gPdsWqeaP+7kpOuDGt8FMvwwZjYlbAfaIvYvhFwZQPr8jYmCSeNb6IDdOatWhQ73566bTW6cs0TbYk=
+	t=1777250261; cv=none; b=XUgJT38dJJ+82r1goTF+4Xxq4frXyoXJSp3M4+OtR2Z0A9o4E4wWaqJVNrFDHKnphMKKeQ5cilRnErs/jSWF+a1l2c8uMi/Mkuh8di2KPxSeN8odLceST14Xk+aiX4QuTm+DM1Ps7tZaM2k5toVG1aiSRLfshSsiIobvyGsJ9Xk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777248640; c=relaxed/simple;
-	bh=p6e2XGgZSjjNTrSHVSgPEC5G2Z45vegMyI/0HX5jKsA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AOjsT0BDmjK/177CLBteLOxKgwzOyu0gqk3kEPjl7Sq0ybQjcRjRyPHg5JVSUcRn04eCJjL6y8sBvCWAj3RxyrWDu2mCeqZtFiT5sc+ln32VFXegxzNPmvzkE8kz5D5DXYHF3E/6bfWvNgUGzkT0Tq8/wZWcGwWu/R4I6RMN+C0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=g6jALT1F; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1777248637;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KTaTeyV4fkdCC2Z7sy1+GXBRRQ6mxdqx//Ymq3ZlT+w=;
-	b=g6jALT1FZTfka9IgXraBhS6YV5MHXVA1S3/2pWR7pOsVdmQwvgLOGwVHlHio7qJFdsC6mz
-	H/LuvTs7iXGKNiLF01wDVrVBb5gGgkk34yniKSkxqdpVXq6f0W1FdUmFKJTT/K+GUZE8Hz
-	BlsftM3s5YcKGD8u6ybu47k7J1VWTwQ=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: bpf@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH bpf-next v3 2/2] selftests/bpf: verify syncookie statistics in tcp_custom_syncookie
-Date: Mon, 27 Apr 2026 08:09:51 +0800
-Message-ID: <20260427001006.14465-3-jiayuan.chen@linux.dev>
-In-Reply-To: <20260427001006.14465-1-jiayuan.chen@linux.dev>
-References: <20260427001006.14465-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1777250261; c=relaxed/simple;
+	bh=/KQyIIXxBANDbJVbULlbyLCLd8t/G3HnMy/6KaTpJyo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ewf2VnwWykc3txzGyP8C0gDbKJr89hQJzL+RvfTH6l/RDd1C3/WYTaAdJLm280RYLhiy/xF1NMNrQx50cOu62+6BX5cbks4uoFDUJGYXAezDR0lqLpoIHKYwN0YlbIXFrmwWYEEKo5hITnZlnlQG7KEb35JG1ylGUiwSEzzB/Wo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FJk7is+H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 406E3C2BCAF;
+	Mon, 27 Apr 2026 00:37:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777250261;
+	bh=/KQyIIXxBANDbJVbULlbyLCLd8t/G3HnMy/6KaTpJyo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=FJk7is+Hy5OEaY3cjP+TfeQwamOc2VwogBDAIxZ6TLjWHWxV8gH6fwuHp/PoxRk2o
+	 oi2tIu9jDq9Jdq3ufB6mAx61Z8FkICyEXZ/lO31S38fUgQN4cbtQmLVhXhcaX6/iM+
+	 IYBbWSWoOUQtVg9Jg8Aa23MXfOA2RDhAPpnmY+A0J5lEZA9Fa+PDIM8n9pWiMEmO97
+	 BQzoIUM8aN6wXZCYhBaoRzEPVIccJ3G7xdcrdnN1dQplAFc7fYwz6i9ME2VIqvrtti
+	 V5DlYGI3OnZIrysDCAa8OJDUlXkLM/wE1BHbCnTf8MbKXVzq2Af3ntEnfcNWt3RRHD
+	 FZ55/2fAgDeug==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id BA06A38119E5;
+	Mon, 27 Apr 2026 00:37:00 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,149 +55,84 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: A95AB46B9E6
+Subject: Re: [PATCH net-deletions v2] net: remove unused ATM protocols and
+ legacy
+ ATM device drivers
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177725021958.2839245.12173011555079376914.git-patchwork-notify@kernel.org>
+Date: Mon, 27 Apr 2026 00:36:59 +0000
+References: <20260422041846.2035118-1-kuba@kernel.org>
+In-Reply-To: <20260422041846.2035118-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, corbet@lwn.net,
+ skhan@linuxfoundation.org, linux@armlinux.org.uk, tsbogend@alpha.franken.de,
+ maddy@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com,
+ chleroy@kernel.org, 3chas3@gmail.com, razor@blackwall.org, idosch@nvidia.com,
+ jani.nikula@intel.com, mchehab+huawei@kernel.org, tytso@mit.edu,
+ herbert@gondor.apana.org.au, geert@linux-m68k.org, ebiggers@kernel.org,
+ johannes.berg@intel.com, jonathan.cameron@huawei.com, kees@kernel.org,
+ kuniyu@google.com, fourier.thomas@gmail.com, andriy.shevchenko@intel.com,
+ rdunlap@infradead.org, akpm@linux-foundation.org, linux-doc@vger.kernel.org,
+ linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ bridge@lists.linux.dev, dwmw2@infradead.org
+X-Rspamd-Queue-Id: D5F5F46BB68
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-281203-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,lwn.net,linuxfoundation.org,armlinux.org.uk,alpha.franken.de,linux.ibm.com,ellerman.id.au,gmail.com,blackwall.org,nvidia.com,intel.com,mit.edu,gondor.apana.org.au,linux-m68k.org,huawei.com,infradead.org,linux-foundation.org,lists.ozlabs.org,lists.linux.dev];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[linux.dev,google.com,davemloft.net,kernel.org,redhat.com,iogearbox.net,gmail.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-281202-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[23];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,linux.dev:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,huawei];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Add read_tcpext_snmp() helper to network_helpers which reads a
-TcpExt SNMP counter via nstat, and use it in the tcp_custom_syncookie
-test to verify that LINUX_MIB_SYNCOOKIESRECV is incremented and
-LINUX_MIB_SYNCOOKIESFAILED stays unchanged across a successful
-BPF custom syncookie validation.
+Hello:
 
-The delta is captured between start_server() and accept(), which
-covers the full SYN/ACK/cookie-check path for one connection.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- tools/testing/selftests/bpf/network_helpers.c | 22 +++++++++++++++++++
- tools/testing/selftests/bpf/network_helpers.h |  1 +
- .../bpf/prog_tests/tcp_custom_syncookie.c     | 20 +++++++++++++++++
- 3 files changed, 43 insertions(+)
+On Tue, 21 Apr 2026 21:18:44 -0700 you wrote:
+> Remove the ATM protocol modules and PCI/SBUS ATM device drivers
+> that are no longer in active use.
+> 
+> The ATM core protocol stack, PPPoATM, BR2684, and USB DSL modem
+> drivers (drivers/usb/atm/) are retained in-tree to maintain PPP
+> over ATM (PPPoA) and PPPoE-over-BR2684 support for DSL connections.
+> 
+> [...]
 
-diff --git a/tools/testing/selftests/bpf/network_helpers.c b/tools/testing/selftests/bpf/network_helpers.c
-index b82f572641b7d..3388dd5112b6f 100644
---- a/tools/testing/selftests/bpf/network_helpers.c
-+++ b/tools/testing/selftests/bpf/network_helpers.c
-@@ -621,6 +621,28 @@ int get_socket_local_port(int sock_fd)
- 	return -1;
- }
- 
-+int read_tcpext_snmp(const char *name, unsigned long *val)
-+{
-+	char cmd[128], buf[128];
-+	int ret = 0;
-+	FILE *f;
-+
-+	snprintf(cmd, sizeof(cmd),
-+		 "nstat -az TcpExt%s | awk '/TcpExt/ {print $2}'", name);
-+	f = popen(cmd, "r");
-+	if (!f)
-+		return -errno;
-+
-+	if (!fgets(buf, sizeof(buf), f)) {
-+		ret = ferror(f) ? -errno : -ENODATA;
-+		goto out;
-+	}
-+	*val = strtoul(buf, NULL, 10);
-+out:
-+	pclose(f);
-+	return ret;
-+}
-+
- int get_hw_ring_size(char *ifname, struct ethtool_ringparam *ring_param)
- {
- 	struct ifreq ifr = {0};
-diff --git a/tools/testing/selftests/bpf/network_helpers.h b/tools/testing/selftests/bpf/network_helpers.h
-index 79a010c88e11c..c53cd781df6e6 100644
---- a/tools/testing/selftests/bpf/network_helpers.h
-+++ b/tools/testing/selftests/bpf/network_helpers.h
-@@ -84,6 +84,7 @@ int make_sockaddr(int family, const char *addr_str, __u16 port,
- 		  struct sockaddr_storage *addr, socklen_t *len);
- char *ping_command(int family);
- int get_socket_local_port(int sock_fd);
-+int read_tcpext_snmp(const char *name, unsigned long *val);
- int get_hw_ring_size(char *ifname, struct ethtool_ringparam *ring_param);
- int set_hw_ring_size(char *ifname, struct ethtool_ringparam *ring_param);
- 
-diff --git a/tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c b/tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c
-index eaf441dc7e79b..00d5c32674fc9 100644
---- a/tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c
-+++ b/tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c
-@@ -91,12 +91,21 @@ static void transfer_message(int sender, int receiver)
- 
- static void create_connection(struct test_tcp_custom_syncookie_case *test_case)
- {
-+	unsigned long failed_before, failed_after;
-+	unsigned long recv_before, recv_after;
- 	int server, client, child;
- 
- 	server = start_server(test_case->family, test_case->type, test_case->addr, 0, 0);
- 	if (!ASSERT_NEQ(server, -1, "start_server"))
- 		return;
- 
-+	if (!ASSERT_OK(read_tcpext_snmp("SyncookiesRecv", &recv_before),
-+		       "read SyncookiesRecv before"))
-+		goto close_server;
-+	if (!ASSERT_OK(read_tcpext_snmp("SyncookiesFailed", &failed_before),
-+		       "read SyncookiesFailed before"))
-+		goto close_server;
-+
- 	client = connect_to_fd(server, 0);
- 	if (!ASSERT_NEQ(client, -1, "connect_to_fd"))
- 		goto close_server;
-@@ -105,9 +114,20 @@ static void create_connection(struct test_tcp_custom_syncookie_case *test_case)
- 	if (!ASSERT_NEQ(child, -1, "accept"))
- 		goto close_client;
- 
-+	if (!ASSERT_OK(read_tcpext_snmp("SyncookiesRecv", &recv_after),
-+		       "read SyncookiesRecv after"))
-+		goto close_child;
-+	if (!ASSERT_OK(read_tcpext_snmp("SyncookiesFailed", &failed_after),
-+		       "read SyncookiesFailed after"))
-+		goto close_child;
-+
-+	ASSERT_EQ(recv_after - recv_before, 1, "SyncookiesRecv delta");
-+	ASSERT_EQ(failed_after - failed_before, 0, "SyncookiesFailed delta");
-+
- 	transfer_message(client, child);
- 	transfer_message(child, client);
- 
-+close_child:
- 	close(child);
- close_client:
- 	close(client);
+Here is the summary with links:
+  - [net-deletions,v2] net: remove unused ATM protocols and legacy ATM device drivers
+    https://git.kernel.org/netdev/net/c/6deb53595092
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
