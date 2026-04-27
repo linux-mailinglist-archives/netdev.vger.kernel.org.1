@@ -1,126 +1,229 @@
-Return-Path: <netdev+bounces-281483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281484-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CJi4ELHF72m4FwEAu9opvQ
-	(envelope-from <netdev+bounces-281483-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:23:13 +0200
+	id WK9LIBHG72m4FwEAu9opvQ
+	(envelope-from <netdev+bounces-281484-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:24:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 905CA479F91
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:23:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D953479FD3
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:24:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2BB343001075
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:22:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5BB91300DE0C
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:23:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FAC329A32D;
-	Mon, 27 Apr 2026 20:22:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F486369972;
+	Mon, 27 Apr 2026 20:23:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aKAtNUM3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m7eTLbkH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFC58207A32
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 20:22:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777321353; cv=none; b=grqPlSFLzvZBKVz91YmD4YzXmSA3ha5P4YatjFK+bKo04sWKAjBtw3UUVWmspTxtzCeEJjRM62/FfPE0BkzqzUl0OxDRWLRHYYgZZZhG5vHhFIfOyrlrg9R0sQAa/03fLe/Cawy8NZnil5sD1idQAc7z7z5lLJQG/D795lWz4us=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777321353; c=relaxed/simple;
-	bh=kHXLUA61nlqyrP7LBjoKHDFEG9Pa+X067JwPtNyRei8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CiapSDbxzr/33ThcicOC1KNeF/vP7ZvN4B9BcZdxLaY2IOgJXVojanIHhaIsWWXb3AtX+cmU077ZfDqzhm+TzV0GfModJvV25RfT8Qb8b4JlyjHxqIIrXBpv1cxF++JsfV9/FzTLlipi7Pg282w0Yre73MpNsjvXQrZoutfewrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aKAtNUM3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58664C19425;
-	Mon, 27 Apr 2026 20:22:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777321352;
-	bh=kHXLUA61nlqyrP7LBjoKHDFEG9Pa+X067JwPtNyRei8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aKAtNUM3Ew773d156KR4mLC90ay8I5UVb9H1N4wnz8B68GIjGlxM3yRNanvhDeeGt
-	 sqNQznsY0HloZEw2/QXGTJgS53P4baOaEw6SfAqbfQ9Lgv12O5VSQcKBfqG5SOX+Py
-	 0F00y+ljCbURR8EqpGYsQbGtF+kc1cC9C6jqdHlHW3nbKe6NLyL+vEEpEVUS1aNpi7
-	 bhYCJ1Vbg2wPIckAnnSHWEF/T1jTYvgcQhHJpH54tEAT2mcAz/W70CjIfDbOuLnEH8
-	 ayUr5SL8ptbwVWzReF4b7jsIBPE6cOhNkhA470IROCwWGFZHq7E3akKdobxyKpKkG8
-	 fyVb+BhCUh/QQ==
-Date: Mon, 27 Apr 2026 13:22:31 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: Antonio Quartulli <antonio@openvpn.net>, netdev@vger.kernel.org, Ralf
- Lici <ralf@mandelbit.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Hyunwoo Kim <imv4bel@gmail.com>
-Subject: Re: [PATCH net 1/1] ovpn: fix race between deleting interface and
- adding new peer
-Message-ID: <20260427132231.2621be72@kernel.org>
-In-Reply-To: <aeqcvgufY0F50rkU@krikkit>
-References: <20260422123242.530882-1-antonio@openvpn.net>
-	<20260422123242.530882-2-antonio@openvpn.net>
-	<20260422192050.7c4ca760@kernel.org>
-	<7481bc31-44f6-43ae-b3aa-07002644d9e6@openvpn.net>
-	<9221605c-ad31-44f9-b3b7-db2237f75eb7@openvpn.net>
-	<aepK3XXc8IFemb1Z@krikkit>
-	<20260423103628.4ce6fc05@kernel.org>
-	<aeqcvgufY0F50rkU@krikkit>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9123366814
+	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 20:23:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.172
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777321383; cv=pass; b=jxYrjrlmFFQo1Y7gcRHP2A0cBhZ14mH+P6axywRHa4ea23HPe4noWVtD8Fg6ONeFD4hCs9/qswO+2eJN4mPqHzB07LnanRtZYOgZRExiUcvfCXegz/+pHORX4QIJNOxHOtLODyRMI7QOb/D0bL7ckzt8xIZlQobayrsFrZQMeJA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777321383; c=relaxed/simple;
+	bh=wLhzACwKAv9l7tovfBKzPDMF7NPXf/fRsDIOmkSEMsk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Yqq4j1SMX3vrwgVUsBlI0NXbMjeAQWkXSusV366auKEWFL4wt37S8Uu0dRvAjq0rwlakkMst6GBPcK8KMIUJel5w09kN01iQaS7kmiFdDr/XDtQdiF8yKnl9K6CSwqhEmgV6O9yK/1jUlDCeK/on6Z3gG29w2BuASu0UupfwlYY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m7eTLbkH; arc=pass smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-82748257f5fso6105255b3a.1
+        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 13:23:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777321381; cv=none;
+        d=google.com; s=arc-20240605;
+        b=gBcSbGImVxP1HXpXReRqXGqMoYcAWNX/GyL3jB65lK+NSEZqFNoW+j0ghcBjmxXkCN
+         UsJT4YHdM6pKQktKUIjAZ38UBZYGqvhHlVw5IZIvMndDK0H5+W4fVSMAQODbCKkcjjll
+         huLc3zpO2qcsrTx1SLQxiYveUrfmQsReFQNvYXcvvyqBFfiX3DUJSb3uVnVKnwyFNrNF
+         fhBGO1Zuar1DFGfjhcG1jg6+ch0AWVvdRPxN7KpYyGl24o5mrWVKU2ZzZ0FK4sXe5gbE
+         OqWd5dKJWrM4oYnSpJ9tWCALygI5MCzK3yR5jd9W2hSCxm6F63/ls2IRwB4EFZrSWH6n
+         VjFQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=glu0c7/GlCCLUBKIwdpH1OtAWRB3GEXQxIqPmsJa7NA=;
+        fh=TFVZDBVv6+uJyaDy9MZH7MSDBxqchq7s8OthFdtphRk=;
+        b=UVhES43GyTryOezSDzzWx31Yja4WWFk7QjCjfBiTnr8hhFppSs1mCsY3/pa/SPfUiS
+         bFG5jJAXW5+eZxlcylnybJEZPyUtLGfKX0aHlywV3bqPrchayu7ZSA7YdH9V5xw4wKZ+
+         FnStIpAAmjqm0jCe1mD3ZhfH5b7wx65qiM4GNrGjKdzx7aRnCVSejXiDIrAFHfdu9x8k
+         C1w4ZhZRvq2lVtrkmfAjOj/cX2J1i6eYpD3QES77fiReupSvwEEzDX+QGDZNbzQFqEVc
+         ST2KJiUuDQ/etbXKfiRdrmnaW7sUI/774avo4uf96+cm5tcFc16lI/HYBa1H8YaSpKoJ
+         jjdQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777321381; x=1777926181; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=glu0c7/GlCCLUBKIwdpH1OtAWRB3GEXQxIqPmsJa7NA=;
+        b=m7eTLbkH4rGKmV79xGg0Cxga+CN6wwsGkoaK8Z0KGimYbSSpay426vMVrkWE383Pri
+         JMrv2+lLL/LwOAy+iGKBvWT1p1s86d9tW1M0oWoP2FBDXkXoMePKSfJ0HovlCmvHS+WU
+         flHog7TbktVYHB4nbzLLTb/o//WS553AHUDUXFo9bV8cXi4EjWdCyLNql8GgOaeW6XwK
+         x7bONS/eMvW1ddjnZe9JVPLH3zOxzTF1x00P6s9EtWz5fMM2Wm5+3dagD3F6IDC9wqEp
+         Cb3ehM2+LSbyxby5Y/YivGTFOEfaRuHuP4RbfPRPw/1OflIacHJTIG7XNnxmC53WtR0l
+         4HMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777321381; x=1777926181;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=glu0c7/GlCCLUBKIwdpH1OtAWRB3GEXQxIqPmsJa7NA=;
+        b=BmFQ9vW2+kaKFs6dloejO7agI7Hj0o6dGxI7299dwUs4EPW7ImU2uhntDOFmnS+iO8
+         E83eVFD6DUgQJUOP1c3jkiXH1NvWVnjSUqavKC0H/xD2Bp2tFDzbh/xBMVZuBgfr+tkk
+         2x7msLH0yB0sOaVlV8f+teImpkEY1wW+kVUT8ixv4KOV+93rlJXVzCP3cz1HaDGsN7/l
+         bPmzBv277vOfcollFJnTto8sN/P8fBRNVm5RiaPdiUGdd5r7UbGwFndeS85lCS1sW8Uv
+         jgm8tNxITsVB3HsX5D5XR4W0/N3ib6YxEWZ5pHKG1D5d8gTHA/DDWiHfFnKvdVAO3RSa
+         RpoA==
+X-Gm-Message-State: AOJu0YzNcSODaViFUGCbEfqPNuEy3qQx97CCj4bi11Dll266dcHkQPkV
+	oek9OWFH0FQDPMg/f7m2LRbUVqJ1i63m39QqSaDmnNAn5VKHeIcWAITcYwpi5FaNUFdUJVnVIfU
+	PB+cIayFOmiP8o26Pe7RhOGiUqmueiUMZfYNU0ZjAHrnLQvlwIhs7QIRhKuv7qw==
+X-Gm-Gg: AeBDietBveyRU5kA0D7ig1H8fTUANOyWs3xxyBWIRAZd24c7UFwNuTNvAwBzpHr3CbK
+	HcKQ0smNIlmVCRwxY1sHcS3nrUgN+vOTGeNJ3J71wD/JtxkmjKM7vGrqL3AIjb/gkMumtHreLGi
+	EkQsW+16uC/mt8v3VOjoGPaNwqrE0nhGMtw/7RHOxsASwLCfUQW3AZM6rmpzcDnIsvMwmzw76iK
+	bYwURevjF9S+KW/UM/df0kkz9sPdyy4x2LV5+/8idYwP8MPsVvl+brKTcgj1LEIlta5m9GQXTBn
+	ex97mbv7uvzmZN4iyM33Si9n+lCZNZ0ObknH++/uwnLC7x++Hd6VRd3ObFk=
+X-Received: by 2002:a05:6a20:4320:b0:399:831:cc29 with SMTP id
+ adf61e73a8af0-3a39c6534c3mr136415637.23.1777321380345; Mon, 27 Apr 2026
+ 13:23:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 905CA479F91
+References: <20260425002450.163421-1-hramamurthy@google.com> <20260425002450.163421-2-hramamurthy@google.com>
+In-Reply-To: <20260425002450.163421-2-hramamurthy@google.com>
+From: Pin-yen Lin <treapking@google.com>
+Date: Mon, 27 Apr 2026 13:22:48 -0700
+X-Gm-Features: AVHnY4Jy3b7j4bR2l3wUV-1eR_7SbH4m6nNRJ84JfpDj5s9hqbp0D9BSMExwtxE
+Message-ID: <CAHwYsiorqB9w3Js+yh+kkCOVEiGjMY=tLNjVc2MePbBWxyKg_Q@mail.gmail.com>
+Subject: Re: [PATCH net v2 1/4] gve: Add NULL pointer checks for per-queue statistics
+To: Harshitha Ramamurthy <hramamurthy@google.com>
+Cc: netdev@vger.kernel.org, joshwash@google.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	willemb@google.com, maolson@google.com, nktgrg@google.com, jfraker@google.com, 
+	ziweixiao@google.com, jacob.e.keller@intel.com, pkaligineedi@google.com, 
+	shailend@google.com, jordanrhee@google.com, stable@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Debarghya Kundu <debarghyak@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 2D953479FD3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[openvpn.net,vger.kernel.org,mandelbit.com,redhat.com,lunn.ch,davemloft.net,google.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-281483-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-281484-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[treapking@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
 
-On Fri, 24 Apr 2026 00:27:10 +0200 Sabrina Dubroca wrote:
-> 2026-04-23, 10:36:28 -0700, Jakub Kicinski wrote:
-> > On Thu, 23 Apr 2026 18:37:49 +0200 Sabrina Dubroca wrote:  
-> > > We could also wrap all of ovpn_peer_add (including the new reg_state
-> > > check) in netdev_lock, since we can't move to NETREG_UNREGISTERING
-> > > until netdev_lock is released (then I think we wouldn't need the
-> > > READ_ONCE(reg_state)). But I don't know if that's an acceptable use of
-> > > netdev_lock.  
-> > 
-> > Yup, fwiw it's a perfectly legitimate use case.  
-> 
-> Ok. There's still a worrying bit in nesting lock_sock under
-> netdev_lock (ovpn_peer_add -> netdev_lock -> ovpn_peer_add_p2p ->
-> unlock_ovpn -> ovpn_socket_release -> lock_sock).
+On Fri, Apr 24, 2026 at 5:24=E2=80=AFPM Harshitha Ramamurthy
+<hramamurthy@google.com> wrote:
+>
+> From: Debarghya Kundu <debarghyak@google.com>
+>
+> gve_get_[tx/rx]_queue_stats references the [tx/rx] null rings when the
+> link is down. Add NULL pointer checks to guard this
+>
+> This was discovered by drivers/net/stats.py selftest.
+>
+> Cc: stable@vger.kernel.org
+> Fixes: 2e5e0932dff5 ("gve: add support for basic queue stats")
+> Signed-off-by: Debarghya Kundu <debarghyak@google.com>
+> Signed-off-by: Pin-yen Lin <treapking@google.com>
+> Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+> ---
+>  drivers/net/ethernet/google/gve/gve_main.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/eth=
+ernet/google/gve/gve_main.c
+> index 424d973c97f2..ef00d9ca1643 100644
+> --- a/drivers/net/ethernet/google/gve/gve_main.c
+> +++ b/drivers/net/ethernet/google/gve/gve_main.c
+> @@ -2746,9 +2746,13 @@ static void gve_get_rx_queue_stats(struct net_devi=
+ce *dev, int idx,
+>                                    struct netdev_queue_stats_rx *rx_stats=
+)
+>  {
+>         struct gve_priv *priv =3D netdev_priv(dev);
+> -       struct gve_rx_ring *rx =3D &priv->rx[idx];
+> +       struct gve_rx_ring *rx;
+>         unsigned int start;
+>
+> +       if (!priv->rx)
+> +               return;
 
-No opinion on socket lock, TBH. It does indeed increase the potential
-for hard to trace deadlocks. But I'd think the ordering is intuitive -
-netdev lock "feels" heavier than socket lock.
+Sashiko says:
+
+Does this NULL check safely prevent a use-after-free regression in lockless
+paths?
+Queue statistics can be accessed locklessly from the core network stack
+(e.g., via ndo_get_stats64 under rcu_read_lock). If gve_close() is called
+concurrently, gve_queues_mem_free() frees priv->rx and priv->tx using
+kvfree() without an RCU grace period (e.g., synchronize_net()).
+A concurrent reader could pass this NULL check, stall briefly, and then
+dereference the freed array memory.
+
+Sashiko also made a similar comment about the tx stats.
+
+While this race between stats and gve_close() is a pre-existing issue,
+we will address it in a separate patch in v3.
+
+> +       rx =3D &priv->rx[idx];
+> +
+>         do {
+>                 start =3D u64_stats_fetch_begin(&rx->statss);
+>                 rx_stats->packets =3D rx->rpackets;
+> @@ -2762,9 +2766,13 @@ static void gve_get_tx_queue_stats(struct net_devi=
+ce *dev, int idx,
+>                                    struct netdev_queue_stats_tx *tx_stats=
+)
+>  {
+>         struct gve_priv *priv =3D netdev_priv(dev);
+> -       struct gve_tx_ring *tx =3D &priv->tx[idx];
+> +       struct gve_tx_ring *tx;
+>         unsigned int start;
+>
+> +       if (!priv->tx)
+> +               return;
+> +       tx =3D &priv->tx[idx];
+> +
+>         do {
+>                 start =3D u64_stats_fetch_begin(&tx->statss);
+>                 tx_stats->packets =3D tx->pkt_done;
+> --
+> 2.54.0.545.g6539524ca2-goog
+>
+
+Regards,
+Pin-yen
 
