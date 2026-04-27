@@ -1,38 +1,40 @@
-Return-Path: <netdev+bounces-281246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281248-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yGroOeUP72kq4wAAu9opvQ
-	(envelope-from <netdev+bounces-281246-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 09:27:33 +0200
+	id ENx+IcwQ72mU5QAAu9opvQ
+	(envelope-from <netdev+bounces-281248-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 09:31:24 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 648D746E572
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 09:27:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EECF046E5FB
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 09:31:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6E1683003EEE
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 07:25:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D18D8300213A
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 07:27:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C70A390CB2;
-	Mon, 27 Apr 2026 07:25:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3563D39184C;
+	Mon, 27 Apr 2026 07:27:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.175.55.52])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98CC937BE84;
-	Mon, 27 Apr 2026 07:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.175.55.52
+Received: from mail.eswincomputing.com (mail.eswincomputing.com [123.124.195.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A22536AB77;
+	Mon, 27 Apr 2026 07:27:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=123.124.195.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777274742; cv=none; b=CdEltnm42Xb+GagA2clHrAjFEhNn0WXOimKbdOC67vqzHEe2fcaSWjaOFEc+30B2DeTgKUBU/A5VBgeECGMIzyIsG/bKEv3zHT9U6n9zzgo79O90abIPBde0yG9pnO4NgRVOzhd3YwAjPpZSBD2V8zLr1ybsSpeAwgYtVtMZ0Cs=
+	t=1777274852; cv=none; b=XYOEBFeytwRzIETNYijJnb7aRHXHVuSpUvDqj30ALFPvjswoSV9iGc8HOZb7O/DDcOGEOidX0tbp8HsqiTJtA5It9y8Qf3EJmkinNWtBZOBN1OTxFyGmt/QWVflxL1ntiWo5Vmuji4rHXLvh0V6qldCAZiINAV4zfonPk4ayQ1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777274742; c=relaxed/simple;
-	bh=z4n3PCrtTDdq36Yvi4h1mo7cmkQTPxqEfzbacDx+P6Y=;
+	s=arc-20240116; t=1777274852; c=relaxed/simple;
+	bh=VWbHMN/Vau/n/YZ4U9o4rE+X3k0yJff0Gk73WPb7DrY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nPubbGq1DxLy0JI5Gv63/nu/feKTMM1qqYpATREb7/kjChXp7hzUx5N5BGcfbzu3OWmQCrv3cAOHCLXwVJnbFwaDM5QsJcNROX8tXkOwBF7bTKdt98nojw6tJ2n1iH9TC33b6lD7FjeN8bxh+IAjjHXIIrBFY1UFen1UIK0HogA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=52.175.55.52
+	 MIME-Version; b=XiuIyAN+SSBcCBhV/uz/n0H9V+ekbcLvWPD66si/rCOwzfhg3GQjl61s6v5R92jvg27v4JYgO1bJ3FLiVwR5yvFBrOoOGUCQJco8+CFPyAN+FJdkfFeGxBqRgpi/R6j1N3in6L2Z/QgG8uW2WQqTrv1Mg4yrcW1IjV9l124bnK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=123.124.195.78
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
 Received: from E0004057DT.eswin.cn (unknown [10.11.96.26])
-	by app1 (Coremail) with SMTP id TAJkCgCHKXNWD+9pehAVAA--.20068S2;
-	Mon, 27 Apr 2026 15:25:11 +0800 (CST)
+	by app1 (Coremail) with SMTP id TAJkCgDHXHF3D+9pgxAVAA--.17532S2;
+	Mon, 27 Apr 2026 15:25:44 +0800 (CST)
 From: lizhi2@eswincomputing.com
 To: devicetree@vger.kernel.org,
 	andrew+netdev@lunn.ch,
@@ -63,9 +65,9 @@ Cc: ningyu@eswincomputing.com,
 	weishangjuan@eswincomputing.com,
 	horms@kernel.org,
 	Zhi Li <lizhi2@eswincomputing.com>
-Subject: [PATCH net-next v7 2/4] net: stmmac: eic7700: enable clocks before syscon access and correct RX sampling timing
-Date: Mon, 27 Apr 2026 15:25:05 +0800
-Message-ID: <20260427072508.1151-1-lizhi2@eswincomputing.com>
+Subject: [PATCH net-next v7 3/4] dt-bindings: mfd: syscon: add ESWIN EIC7700 compatible
+Date: Mon, 27 Apr 2026 15:25:41 +0800
+Message-ID: <20260427072541.1174-1-lizhi2@eswincomputing.com>
 X-Mailer: git-send-email 2.52.0.windows.1
 In-Reply-To: <20260427072353.1114-1-lizhi2@eswincomputing.com>
 References: <20260427072353.1114-1-lizhi2@eswincomputing.com>
@@ -75,356 +77,85 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:TAJkCgCHKXNWD+9pehAVAA--.20068S2
-X-Coremail-Antispam: 1UD129KBjvJXoW3Zw4ktF15AF1xAFyUtrWDArb_yoWDWFy5pF
-	WkAFy5tr1jqr1fG3yvyF4kta4Fkw47WF1rArWfKFnFyF98trn8XayjyasIkF98Wry7Zr13
-	J3yUAFyxuF129rJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBm14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxkF7I0En4kS14v26r4a6rW5MxkIecxEwVCm-wCF04
-	k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18
-	MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr4
-	1lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1U
+X-CM-TRANSID:TAJkCgDHXHF3D+9pgxAVAA--.17532S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7Gw4UtF48uw13KF1kZFW5KFg_yoWDuFgE9r
+	17urn8A39xAFW0g3yvvrZ7JF4fA3WSkr1kZ39ruF1vy34Fv3W5XF97J345Ar47uFs7ur1r
+	W3WkXrW7t3ZrGjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb68FF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwAKzVCY07xG64k0F24lc7CjxVAaw2AFwI0_GFv_Wrylc2xSY4AK6svPMxAIw2
+	8IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4l
+	x2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrw
+	CI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1U
 	MIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I
-	8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRMrWrDUUUU
+	8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7sRiWrW5UUUUU==
 X-CM-SenderInfo: xol2xx2s6h245lqf0zpsxwx03jof0z/
-X-Rspamd-Queue-Id: 648D746E572
+X-Rspamd-Queue-Id: EECF046E5FB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.04 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[lizhi2@eswincomputing.com,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-281248-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	DMARC_NA(0.00)[eswincomputing.com];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,dabbelt.com,eecs.berkeley.edu,ghiti.fr,lists.infradead.org,st-md-mailman.stormreply.com,bootlin.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[29];
-	TAGGED_FROM(0.00)[bounces-281246-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,dabbelt.com,eecs.berkeley.edu,ghiti.fr,lists.infradead.org,st-md-mailman.stormreply.com,bootlin.com];
 	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
-	PRECEDENCE_BULK(0.00)[];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lizhi2@eswincomputing.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.985];
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
 	R_DKIM_NA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[eswincomputing.com:mid,eswincomputing.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,eswincomputing.com:mid,eswincomputing.com:email]
 
 From: Zhi Li <lizhi2@eswincomputing.com>
 
-The second Ethernet controller (eth1) on the Eswin EIC7700 SoC may fail
-to sample RX data correctly at Gigabit speed due to EIC7700-specific
-receive clock to data skew at the MAC input in the silicon.
+Document ESWIN EIC7700 SoC compatible for syscon registers.
 
-The existing internal delay configuration does not provide sufficient
-adjustment range to compensate for this condition at 1000Mbps.
-Update the EIC7700 DWMAC glue driver to apply EIC7700-specific clock
-sampling inversion only during Gigabit operation on MAC instances
-that require it.
-
-TXD and RXD delay registers are explicitly cleared during initialization
-to override any residual configuration left by the bootloader. All HSP
-CSR register accesses are performed only after the required clocks are
-enabled.
-
-Fixes: ea77dbbdbc4e ("net: stmmac: add Eswin EIC7700 glue driver")
 Signed-off-by: Zhi Li <lizhi2@eswincomputing.com>
 ---
- .../ethernet/stmicro/stmmac/dwmac-eic7700.c   | 183 ++++++++++++++----
- 1 file changed, 140 insertions(+), 43 deletions(-)
+ Documentation/devicetree/bindings/mfd/syscon.yaml | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c
-index bcb8e000e720..33144611da8d 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c
-@@ -28,20 +28,40 @@
- 
- /*
-  * TX/RX Clock Delay Bit Masks:
-- * - TX Delay: bits [14:8] — TX_CLK delay (unit: 0.1ns per bit)
-- * - RX Delay: bits [30:24] — RX_CLK delay (unit: 0.1ns per bit)
-+ * - TX Delay: bits [14:8] — TX_CLK delay (unit: 0.02ns per bit)
-+ * - TX Invert : bit  [15]
-+ * - RX Delay: bits [30:24] — RX_CLK delay (unit: 0.02ns per bit)
-+ * - RX Invert : bit  [31]
-  */
- #define EIC7700_ETH_TX_ADJ_DELAY	GENMASK(14, 8)
- #define EIC7700_ETH_RX_ADJ_DELAY	GENMASK(30, 24)
-+#define EIC7700_ETH_TX_INV_DELAY	BIT(15)
-+#define EIC7700_ETH_RX_INV_DELAY	BIT(31)
- 
--#define EIC7700_MAX_DELAY_UNIT 0x7F
-+#define EIC7700_MAX_DELAY_STEPS		0x7F
-+#define EIC7700_DELAY_STEP_PS		20
-+#define EIC7700_MAX_DELAY_PS	\
-+	(EIC7700_MAX_DELAY_STEPS * EIC7700_DELAY_STEP_PS)
- 
- static const char * const eic7700_clk_names[] = {
- 	"tx", "axi", "cfg",
- };
- 
-+struct eic7700_dwmac_data {
-+	bool rgmii_rx_clk_invert;
-+};
-+
- struct eic7700_qos_priv {
-+	struct device *dev;
- 	struct plat_stmmacenet_data *plat_dat;
-+	struct regmap *eic7700_hsp_regmap;
-+	u32 eth_axi_lp_ctrl_offset;
-+	u32 eth_phy_ctrl_offset;
-+	u32 eth_txd_offset;
-+	u32 eth_clk_offset;
-+	u32 eth_rxd_offset;
-+	u32 eth_clk_dly_param;
-+	bool eth_rx_clk_inv;
- };
- 
- static int eic7700_clks_config(void *priv, bool enabled)
-@@ -61,8 +81,28 @@ static int eic7700_clks_config(void *priv, bool enabled)
- static int eic7700_dwmac_init(struct device *dev, void *priv)
- {
- 	struct eic7700_qos_priv *dwc = priv;
-+	int ret;
-+
-+	ret = eic7700_clks_config(dwc, true);
-+	if (ret)
-+		return ret;
-+
-+	ret = regmap_set_bits(dwc->eic7700_hsp_regmap,
-+			      dwc->eth_phy_ctrl_offset,
-+			      EIC7700_ETH_TX_CLK_SEL |
-+			      EIC7700_ETH_PHY_INTF_SELI);
-+	if (ret) {
-+		eic7700_clks_config(dwc, false);
-+		return ret;
-+	}
-+
-+	regmap_write(dwc->eic7700_hsp_regmap, dwc->eth_axi_lp_ctrl_offset,
-+		     EIC7700_ETH_CSYSREQ_VAL);
-+
-+	regmap_write(dwc->eic7700_hsp_regmap, dwc->eth_txd_offset, 0);
-+	regmap_write(dwc->eic7700_hsp_regmap, dwc->eth_rxd_offset, 0);
- 
--	return eic7700_clks_config(dwc, true);
-+	return 0;
- }
- 
- static void eic7700_dwmac_exit(struct device *dev, void *priv)
-@@ -88,18 +128,35 @@ static int eic7700_dwmac_resume(struct device *dev, void *priv)
- 	return ret;
- }
- 
-+static void eic7700_dwmac_fix_speed(void *priv, phy_interface_t interface,
-+				    int speed, unsigned int mode)
-+{
-+	struct eic7700_qos_priv *dwc = (struct eic7700_qos_priv *)priv;
-+	u32 dly_param = dwc->eth_clk_dly_param;
-+
-+	switch (speed) {
-+	case SPEED_1000:
-+		if (dwc->eth_rx_clk_inv)
-+			dly_param |= EIC7700_ETH_RX_INV_DELAY;
-+		break;
-+	case SPEED_100:
-+	case SPEED_10:
-+		break;
-+	default:
-+		dev_err(dwc->dev, "invalid speed %u\n", speed);
-+		break;
-+	}
-+
-+	regmap_write(dwc->eic7700_hsp_regmap, dwc->eth_clk_offset, dly_param);
-+}
-+
- static int eic7700_dwmac_probe(struct platform_device *pdev)
- {
-+	const struct eic7700_dwmac_data *data;
- 	struct plat_stmmacenet_data *plat_dat;
- 	struct stmmac_resources stmmac_res;
- 	struct eic7700_qos_priv *dwc_priv;
--	struct regmap *eic7700_hsp_regmap;
--	u32 eth_axi_lp_ctrl_offset;
--	u32 eth_phy_ctrl_offset;
--	u32 eth_phy_ctrl_regset;
--	u32 eth_rxd_dly_offset;
--	u32 eth_dly_param = 0;
--	u32 delay_ps;
-+	u32 delay_ps, val;
- 	int i, ret;
- 
- 	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
-@@ -116,70 +173,95 @@ static int eic7700_dwmac_probe(struct platform_device *pdev)
- 	if (!dwc_priv)
- 		return -ENOMEM;
- 
-+	dwc_priv->dev = &pdev->dev;
-+
-+	data = device_get_match_data(&pdev->dev);
-+	if (!data)
-+		return dev_err_probe(&pdev->dev,
-+				     -EINVAL, "no match data found\n");
-+
-+	dwc_priv->eth_rx_clk_inv = data->rgmii_rx_clk_invert;
-+
- 	/* Read rx-internal-delay-ps and update rx_clk delay */
- 	if (!of_property_read_u32(pdev->dev.of_node,
- 				  "rx-internal-delay-ps", &delay_ps)) {
--		u32 val = min(delay_ps / 100, EIC7700_MAX_DELAY_UNIT);
-+		if (delay_ps % EIC7700_DELAY_STEP_PS)
-+			return dev_err_probe(&pdev->dev, -EINVAL,
-+				"rx delay must be multiple of %dps\n",
-+				EIC7700_DELAY_STEP_PS);
-+
-+		if (delay_ps > EIC7700_MAX_DELAY_PS)
-+			return dev_err_probe(&pdev->dev, -EINVAL,
-+				"rx delay out of range\n");
- 
--		eth_dly_param &= ~EIC7700_ETH_RX_ADJ_DELAY;
--		eth_dly_param |= FIELD_PREP(EIC7700_ETH_RX_ADJ_DELAY, val);
--	} else {
--		return dev_err_probe(&pdev->dev, -EINVAL,
--			"missing required property rx-internal-delay-ps\n");
-+		val = delay_ps / EIC7700_DELAY_STEP_PS;
-+
-+		dwc_priv->eth_clk_dly_param &= ~EIC7700_ETH_RX_ADJ_DELAY;
-+		dwc_priv->eth_clk_dly_param |=
-+				 FIELD_PREP(EIC7700_ETH_RX_ADJ_DELAY, val);
- 	}
- 
- 	/* Read tx-internal-delay-ps and update tx_clk delay */
- 	if (!of_property_read_u32(pdev->dev.of_node,
- 				  "tx-internal-delay-ps", &delay_ps)) {
--		u32 val = min(delay_ps / 100, EIC7700_MAX_DELAY_UNIT);
-+		if (delay_ps % EIC7700_DELAY_STEP_PS)
-+			return dev_err_probe(&pdev->dev, -EINVAL,
-+				"tx delay must be multiple of %dps\n",
-+				EIC7700_DELAY_STEP_PS);
-+
-+		if (delay_ps > EIC7700_MAX_DELAY_PS)
-+			return dev_err_probe(&pdev->dev, -EINVAL,
-+				"tx delay out of range\n");
-+
-+		val = delay_ps / EIC7700_DELAY_STEP_PS;
- 
--		eth_dly_param &= ~EIC7700_ETH_TX_ADJ_DELAY;
--		eth_dly_param |= FIELD_PREP(EIC7700_ETH_TX_ADJ_DELAY, val);
--	} else {
--		return dev_err_probe(&pdev->dev, -EINVAL,
--			"missing required property tx-internal-delay-ps\n");
-+		dwc_priv->eth_clk_dly_param &= ~EIC7700_ETH_TX_ADJ_DELAY;
-+		dwc_priv->eth_clk_dly_param |=
-+				 FIELD_PREP(EIC7700_ETH_TX_ADJ_DELAY, val);
- 	}
- 
--	eic7700_hsp_regmap = syscon_regmap_lookup_by_phandle(pdev->dev.of_node,
--							     "eswin,hsp-sp-csr");
--	if (IS_ERR(eic7700_hsp_regmap))
-+	dwc_priv->eic7700_hsp_regmap =
-+			syscon_regmap_lookup_by_phandle(pdev->dev.of_node,
-+							"eswin,hsp-sp-csr");
-+	if (IS_ERR(dwc_priv->eic7700_hsp_regmap))
- 		return dev_err_probe(&pdev->dev,
--				PTR_ERR(eic7700_hsp_regmap),
-+				PTR_ERR(dwc_priv->eic7700_hsp_regmap),
- 				"Failed to get hsp-sp-csr regmap\n");
- 
- 	ret = of_property_read_u32_index(pdev->dev.of_node,
- 					 "eswin,hsp-sp-csr",
--					 1, &eth_phy_ctrl_offset);
-+					 1, &dwc_priv->eth_phy_ctrl_offset);
- 	if (ret)
- 		return dev_err_probe(&pdev->dev, ret,
- 				     "can't get eth_phy_ctrl_offset\n");
- 
--	regmap_read(eic7700_hsp_regmap, eth_phy_ctrl_offset,
--		    &eth_phy_ctrl_regset);
--	eth_phy_ctrl_regset |=
--		(EIC7700_ETH_TX_CLK_SEL | EIC7700_ETH_PHY_INTF_SELI);
--	regmap_write(eic7700_hsp_regmap, eth_phy_ctrl_offset,
--		     eth_phy_ctrl_regset);
--
- 	ret = of_property_read_u32_index(pdev->dev.of_node,
- 					 "eswin,hsp-sp-csr",
--					 2, &eth_axi_lp_ctrl_offset);
-+					 2, &dwc_priv->eth_axi_lp_ctrl_offset);
- 	if (ret)
- 		return dev_err_probe(&pdev->dev, ret,
- 				     "can't get eth_axi_lp_ctrl_offset\n");
- 
--	regmap_write(eic7700_hsp_regmap, eth_axi_lp_ctrl_offset,
--		     EIC7700_ETH_CSYSREQ_VAL);
-+	ret = of_property_read_u32_index(pdev->dev.of_node,
-+					 "eswin,hsp-sp-csr",
-+					 3, &dwc_priv->eth_clk_offset);
-+	if (ret)
-+		return dev_err_probe(&pdev->dev, ret,
-+				     "can't get eth_clk_offset\n");
- 
- 	ret = of_property_read_u32_index(pdev->dev.of_node,
- 					 "eswin,hsp-sp-csr",
--					 3, &eth_rxd_dly_offset);
-+					 4, &dwc_priv->eth_txd_offset);
- 	if (ret)
- 		return dev_err_probe(&pdev->dev, ret,
--				     "can't get eth_rxd_dly_offset\n");
-+				     "can't get eth_txd_offset\n");
- 
--	regmap_write(eic7700_hsp_regmap, eth_rxd_dly_offset,
--		     eth_dly_param);
-+	ret = of_property_read_u32_index(pdev->dev.of_node,
-+					 "eswin,hsp-sp-csr",
-+					 5, &dwc_priv->eth_rxd_offset);
-+	if (ret)
-+		return dev_err_probe(&pdev->dev, ret,
-+				     "can't get eth_rxd_offset\n");
- 
- 	plat_dat->num_clks = ARRAY_SIZE(eic7700_clk_names);
- 	plat_dat->clks = devm_kcalloc(&pdev->dev,
-@@ -208,12 +290,27 @@ static int eic7700_dwmac_probe(struct platform_device *pdev)
- 	plat_dat->exit = eic7700_dwmac_exit;
- 	plat_dat->suspend = eic7700_dwmac_suspend;
- 	plat_dat->resume = eic7700_dwmac_resume;
-+	plat_dat->fix_mac_speed = eic7700_dwmac_fix_speed;
- 
- 	return devm_stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
- }
- 
-+static const struct eic7700_dwmac_data eic7700_dwmac_data = {
-+	.rgmii_rx_clk_invert = false,
-+};
-+
-+static const struct eic7700_dwmac_data eic7700_dwmac_data_clk_inversion = {
-+	.rgmii_rx_clk_invert = true,
-+};
-+
- static const struct of_device_id eic7700_dwmac_match[] = {
--	{ .compatible = "eswin,eic7700-qos-eth" },
-+	{	.compatible = "eswin,eic7700-qos-eth",
-+		.data = &eic7700_dwmac_data,
-+	},
-+	{
-+		.compatible = "eswin,eic7700-qos-eth-clk-inversion",
-+		.data = &eic7700_dwmac_data_clk_inversion,
-+	},
- 	{ }
- };
- MODULE_DEVICE_TABLE(of, eic7700_dwmac_match);
+diff --git a/Documentation/devicetree/bindings/mfd/syscon.yaml b/Documentation/devicetree/bindings/mfd/syscon.yaml
+index e22867088063..7d3365601249 100644
+--- a/Documentation/devicetree/bindings/mfd/syscon.yaml
++++ b/Documentation/devicetree/bindings/mfd/syscon.yaml
+@@ -62,6 +62,7 @@ select:
+           - cirrus,ep7209-syscon3
+           - cnxt,cx92755-uc
+           - econet,en751221-chip-scu
++          - eswin,eic7700-syscfg
+           - freecom,fsg-cs2-system-controller
+           - fsl,imx93-aonmix-ns-syscfg
+           - fsl,imx93-wakeupmix-syscfg
+@@ -175,6 +176,7 @@ properties:
+               - cirrus,ep7209-syscon3
+               - cnxt,cx92755-uc
+               - econet,en751221-chip-scu
++              - eswin,eic7700-syscfg
+               - freecom,fsg-cs2-system-controller
+               - fsl,imx93-aonmix-ns-syscfg
+               - fsl,imx93-wakeupmix-syscfg
 -- 
 2.25.1
 
