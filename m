@@ -1,162 +1,131 @@
-Return-Path: <netdev+bounces-281367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281368-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2Jh0H3Vw72mHBQEAu9opvQ
-	(envelope-from <netdev+bounces-281367-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:19:33 +0200
+	id 2EByBn5w72mHBQEAu9opvQ
+	(envelope-from <netdev+bounces-281368-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:19:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20AA247436A
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:19:32 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9CCC474372
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:19:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 04FBB300146D
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 14:19:32 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AD2CD3001320
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 14:19:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFDDE3D3D08;
-	Mon, 27 Apr 2026 14:19:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF5653D16FC;
+	Mon, 27 Apr 2026 14:19:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ecOilbna"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GooT9vkp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCE783D34B2
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 14:19:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 558F83D34A0;
+	Mon, 27 Apr 2026 14:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777299570; cv=none; b=sofb4CY6j/RKkhFUeueVQw0/soyU2ZQ11yrPRoRBo8KHkoo/XaS3ktByLOKLCxZ9zt5TN6HD/WLlPSdi++7gvQwXMMJtao1uXRf14ahgdurHGbGuaFN8a/IqAcM8uO6Pey5Rt82//5iuM/S+7ix2mMlgzik/lrX/bzk7u96QJdg=
+	t=1777299578; cv=none; b=iJsWmE+X4KYunOlAmri80hYOkDJreeb9zI4iwAtirOTROyk+sq8k2NSb7h3IKhQg+yQvG9DA+NGYIWJINHx95+DIGVkzRqQbNdXjejLwrH6WwuN79EhJ1k6doZsG7Z25oyCq7X1FtjVl8yzCR9e2+P6d+cqgOm2UZCbCUfGtvyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777299570; c=relaxed/simple;
-	bh=TUSa+V6fI08d4nOKFeekuHXah98vfOm5LhjsV8D2a0I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=it6frv9YUFFuHoPbJWOs2Onlvzihy5ddmiiZYz2UdGXuVqdyAQ6/G0A464ToO2/Ru2pB+ztKvhj+3rAJUClkd0pGKx6nE+iQSMeaNEfAzGaLwBISPKIA/Mcrl2wakvrKXiMlx/LeNrh9+lliZAaHEc00DN75F25zwdMDipQ1rz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ecOilbna; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C516C2BCC7
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 14:19:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777299570;
-	bh=TUSa+V6fI08d4nOKFeekuHXah98vfOm5LhjsV8D2a0I=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=ecOilbna6gZoiccrPJGCjKvke36KFifFnL6pCaXDfptTLEWOhziexCxQKFJg8iZW7
-	 JiMB0yOZx8T9AWpRRchtAH2XuQUKB4rBIIk92Tq6rGfK7uc4rZgXPsUD2zkRmoNBvj
-	 Jmv7UH0IEB31VW2N66xdHaxxLFlA2azJiypASLwqlm+PRpDiOmvG0SawmA+3ITDVM9
-	 sIveHbq1BuJfyk8BYIli0o5hKX6kpOcZwycXviyHCdYl136uwI6MrDW6HNdi8e9XX6
-	 XBPE9qNhD/NWGq8GeUgbNqh5sDYFKDvBg4c47SScDWcM3VmUEydBPTKZgkyvE96rj7
-	 gI8TlCpCqd19w==
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-38e7b8e3f38so85855421fa.3
-        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 07:19:30 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ85linTGqTuXF4k9liHboNtBu6I9jrgfFzlfGb1NcKmi++Nz7ih7QnKZlGxtG/X788kUDfjX/8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWkTmWG7pREnNI9FKpgsE7MOvDlSVX+Qtgz/VTFa6oRdIiT+E4
-	XLhC8BnmeLrymm2WIx3KDPWcqL/FwTWIlslCiD//kPC2/y2B27mWAeMSePa2rnr/r5NFGKirNWi
-	xb798zIyxRSkTVXq6uhmLss9RIJkzKeWmtejghSSnqw==
-X-Received: by 2002:a05:6512:3e18:b0:5a4:157:5342 with SMTP id
- 2adb3069b0e04-5a4172eeb07mr13066652e87.39.1777299569068; Mon, 27 Apr 2026
- 07:19:29 -0700 (PDT)
+	s=arc-20240116; t=1777299578; c=relaxed/simple;
+	bh=R+582z6KuOZm32OAUc/Aw4Nzhq+aywRFgnNyTKawiqs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q1CX+48rMtTIWOHrEaEZHCQU79V/B2Qy/DK8HJyshk4WL+i0g+4SdbHzbH5ECMRIOYEw3OTMBU3Y0D/2eGVgaLuuYfT0jR8aCOxu/euHU7lzEa1fvtg9u7eQHtVN0tMUFSZAU1YwMflrTjahWl0QN17LfUUBHbRADb+s0REnrnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GooT9vkp; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=GEpkskhKvoKgL3hqgrxpncDprXd6TTl8aeJyXbSaKVI=; b=GooT9vkp6nwOrUMSDoFk8Hh/M1
+	+vI1dozXaD0e38IsyrhmGC3n+tdzzkcRDJBc37up1bLdpZ3OZlrHdCYQCDyy52zvmBhCJuB9LQO5f
+	WdtmueUT1EYGELA+LG9iidR0Wu/ON5CMtrdmRPglAzXqPCdkOwmF7/I0tVGMKgvQ39nQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wHMo5-000Anb-Tl; Mon, 27 Apr 2026 16:19:29 +0200
+Date: Mon, 27 Apr 2026 16:19:29 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: enc28j60: use of_get_ethdev_address
+Message-ID: <b1dcbb65-8fce-40d9-b259-6d9bc9f3d454@lunn.ch>
+References: <20260427052533.960487-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260427-nord-tlmm-v2-0-ade8e0f3d803@oss.qualcomm.com>
- <20260427-nord-tlmm-v2-2-ade8e0f3d803@oss.qualcomm.com> <ae9usgOf-KtgEJ4q@baldur>
-In-Reply-To: <ae9usgOf-KtgEJ4q@baldur>
-From: Bartosz Golaszewski <brgl@kernel.org>
-Date: Mon, 27 Apr 2026 16:19:16 +0200
-X-Gmail-Original-Message-ID: <CAMRc=MedyMb0jCjNtp_Jy-05eHuaZ_gLbLWAQVFuxBk4wxAUPA@mail.gmail.com>
-X-Gm-Features: AVHnY4KLKvQTIww_LmXI9MwhW94zXNui82mwS-N0sdDW_fPy6iQj1PtiDTKMtIA
-Message-ID: <CAMRc=MedyMb0jCjNtp_Jy-05eHuaZ_gLbLWAQVFuxBk4wxAUPA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] pinctrl: qcom: add the TLMM driver for the Nord platforms
-To: Bjorn Andersson <andersson@kernel.org>
-Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, Linus Walleij <linusw@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Richard Cochran <richardcochran@gmail.com>, Shawn Guo <shengchao.guo@oss.qualcomm.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
-	linux-arm-msm@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 20AA247436A
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260427052533.960487-1-rosenp@gmail.com>
+X-Rspamd-Queue-Id: A9CCC474372
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281367-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[oss.qualcomm.com,kernel.org,gmail.com,arndb.de,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-281368-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
 
-On Mon, Apr 27, 2026 at 4:17=E2=80=AFPM Bjorn Andersson <andersson@kernel.o=
-rg> wrote:
->
-> On Mon, Apr 27, 2026 at 04:00:30PM +0200, Bartosz Golaszewski wrote:
-> > diff --git a/drivers/pinctrl/qcom/pinctrl-nord.c b/drivers/pinctrl/qcom=
-/pinctrl-nord.c
-> [..]
-> > +enum nord_functions {
-> > +     msm_mux_gpio,
-> > +     msm_mux_aoss_cti,
-> > +     msm_mux_atest_char0,
-> > +     msm_mux_atest_char1,
-> > +     msm_mux_atest_char2,
-> > +     msm_mux_atest_char3,
-> > +     msm_mux_atest_char_start,
-> > +     msm_mux_atest_usb20,
-> > +     msm_mux_atest_usb21,
-> > +     msm_mux_aud_intfc0_clk,
-> > +     msm_mux_aud_intfc0_data0,
-> > +     msm_mux_aud_intfc0_data1,
-> > +     msm_mux_aud_intfc0_data2,
-> > +     msm_mux_aud_intfc0_data3,
-> > +     msm_mux_aud_intfc0_data4,
-> > +     msm_mux_aud_intfc0_data5,
-> > +     msm_mux_aud_intfc0_data6,
-> > +     msm_mux_aud_intfc0_data7,
-> > +     msm_mux_aud_intfc0_ws,
-> > +     msm_mux_aud_intfc10_clk,
-> > +     msm_mux_aud_intfc10_data0,
-> > +     msm_mux_aud_intfc10_data1,
-> > +     msm_mux_aud_intfc10_ws,
-> > +     msm_mux_aud_intfc1_clk,
-> > +     msm_mux_aud_intfc1_data0,
-> > +     msm_mux_aud_intfc1_data1,
-> > +     msm_mux_aud_intfc1_data2,
-> > +     msm_mux_aud_intfc1_data3,
-> > +     msm_mux_aud_intfc1_data4,
-> > +     msm_mux_aud_intfc1_data5,
-> > +     msm_mux_aud_intfc1_data6,
-> > +     msm_mux_aud_intfc1_data7,
->
-> Is there any reason to keep these 8 "data" lanes as separate pingroups?
->
+On Sun, Apr 26, 2026 at 10:25:33PM -0700, Rosen Penev wrote:
+> Since this is an OF only driver, of_ instead of device_ allows nvmem to
+> be used to specify the MAC address.
 
-The answer here and elsewhere is: no. I just didn't have other states
-in DTS to visualize the resulting nodes and it didn't occur to me to
-update other functions as well. I'll do it in v3.
+Now that is usual, somebody converting device_ to of_. It is normally
+the other way around, for not particularly good reasons. Nice.
 
-Bart
+> -	if (device_get_ethdev_address(&spi->dev, dev))
+> +	ret = of_get_ethdev_address(spi->dev.of_node, dev);
+> +	if (ret == -EPROBE_DEFER)
+> +		return ret;
+
+/**
+ * device_get_mac_address - Get the MAC for a given device
+ * @dev:	Pointer to the device
+ * @addr:	Address of buffer to store the MAC in
+ */
+int device_get_mac_address(struct device *dev, char *addr)
+{
+	if (!fwnode_get_mac_address(dev_fwnode(dev), addr))
+		return 0;
+
+	return nvmem_get_mac_address(dev, addr);
+}
+EXPORT_SYMBOL(device_get_mac_address);
+
+This appears to support nvmem. Would device_get_mac_address() actually
+work? I'm not against swapping to of_get_ethdev_address, but the
+commit message should be accurate.
+
+   Andrew
 
