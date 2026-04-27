@@ -1,209 +1,241 @@
-Return-Path: <netdev+bounces-281443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281444-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EJLjLg2p72kCDwEAu9opvQ
-	(envelope-from <netdev+bounces-281443-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:21:01 +0200
+	id EAOwNzKq72kCDwEAu9opvQ
+	(envelope-from <netdev+bounces-281444-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:25:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DE86478710
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:21:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FE8D478893
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:25:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 333243023066
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:20:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6DA0430864FF
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:22:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CFA83EAC75;
-	Mon, 27 Apr 2026 18:20:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C0D53E1200;
+	Mon, 27 Apr 2026 18:22:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J2scZpbK"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rQlOCa2u"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010021.outbound.protection.outlook.com [52.101.61.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20AD83E274D;
-	Mon, 27 Apr 2026 18:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777314054; cv=none; b=u1/Ds/LwShlIadKzXh+lhNI4gPsN9exef3ie1BjXf1WAoD2miBL1hJLkSmjiQgFnkwueiKw1ZE39Eh5sZqwKyghwgVBf9T+vWcRQ/13dBpNuCMgX9ogM/K0pcG8KWxEesYHqnIe5mg2OvSvN6I6WvoH2aQOhDsmlwbKWSrX6Jow=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777314054; c=relaxed/simple;
-	bh=fSfdZ5/fBIJBn92+lTQ8RknrFiSruKk4Zm5FPbyuhQI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hZjCzRBOdWpzK3uvkI8gRjnAcZaKmKArWlmpDhiw0GgVB4zsMAYIXjZcAWTXdrpnG0sJUq1ajJCjvn36+YUmAjH6Vph2VJw/sM7s7qVdAR8PkRST9bRCOJncBwN1OtrW0UMhsYc5r6fSftL5OFZBrBgih5DvSnSbgr9V0twHDU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J2scZpbK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CCCFC2BCB5;
-	Mon, 27 Apr 2026 18:20:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777314053;
-	bh=fSfdZ5/fBIJBn92+lTQ8RknrFiSruKk4Zm5FPbyuhQI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=J2scZpbKenpOejPaCkxdr8Fr6c4RornKyxLjF0dKFYhSlw+matCdj3SDWlLeqEo9E
-	 a373XI9Iold2YwxLkAFI1OVkbxbR9JLgxu/comiCZJeBJjQK8IiPFbF3a0OQIu5zFJ
-	 z32D8XDVz5Fo00XfpR09lc3WO+fPx7ont3FOA+TL4jxGM7w1J5Z2cHWcv2Vi05coRU
-	 6lIPjD/Eh4XtMiOh4PUlJfQ+hbcnF50oIaF0Y5is14Jb9Uy7pNbq6e4WVWxwPn3QZF
-	 F5175xYuXBtUSK+HvgeuPZTDTXog5e6524IUP62vgqpWl/U/vR5Pqvo+DbOYeGkne+
-	 cSOzK+yVIhXWw==
-Message-ID: <63a4d0f6-0eb3-48cd-9f98-bf7b223b2606@kernel.org>
-Date: Mon, 27 Apr 2026 20:20:38 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4FFB21D590;
+	Mon, 27 Apr 2026 18:22:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777314154; cv=fail; b=i3rQnm2JJ2NZ1BpQAwG09IxTc1YuM0KA85AW5nX4gZbHNBvlOGMxQTCvFs0ztyylfUWeRcWqykr26FErji+Kx24iRu3nXzTxoeaX/X+jeP2+CgOKJIuBaI/Lw/E4P7OEv8kGl3uKB2LYQtLPIID5zC151lzga/ALmvujGcGWmiM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777314154; c=relaxed/simple;
+	bh=f5XyaOBX5ugnMxvW0tHBXO6+WBDnylY+wIF7m6gBKLc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=h1EkvTud12eJNv+i6rPGvtWCK7pvyZPfRKkgzSwzpGUnPpG3viP7djrFKRQpM3Iu3cnGE09RqkhXtifviNBPP7XQjlQ/1yg6grIRcyZiIPYWT0OkV+87Mx2VG0jr3+YsbXgUatEfx4TPM9WL9U0966PgDLB7KMhOfEGGs3BW7dg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rQlOCa2u; arc=fail smtp.client-ip=52.101.61.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=IAnswx0srV0t3gvDwmKw2k64M9jIXBQHj08OhObA8maL1bDdxoaoPfp1iicP+xFcsLEaAvwDv4xwfi6GXeN6e9DlH5PqHYztfrnAtKJNLEmXjOP3Ckrs0GqE4Ugm/d4Tjf+gDDr4lTCIC1qNv8Ni7NT9QgoZfyw3oOWzbPNOKJh1E7bFprRS6qN4DBpDgfNkl6TE3oFbhCFY5lMAMdC3RHagAOuBy9Q9ZBEULEYPwoR6OfkyCRl4NxtOJzcFzYtgUzWSJ1i0GWeZYybjZj5Dh8n1WJ9o0/pXSeoIXBKPId8Wv8CVxRzV8k0VLa03lDqS7HQw492J04dknpT/OxSWig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tHf8CtCbB+qYjAH1n1PiVb/3u2rn5zXqzwIW6UNj4X0=;
+ b=rYgYF1j6Sk9MzMLFeucRs8QSJTD/VhPnH17oIi5O4YEtZfRVKgoUEYwi6I+Mb2XNsGzkAQLYA746KVv3O19XEu9VYxp7yAwMvNifTNz4zaXalmggZ+8bjpZTlHHX+AHmRvut+dZgGO+eEVUSu6Z5YzP4p/BbmXX37BqeMzFLtmNOobsDqV6pYCHi+jJLFaMXApvtuJK+RDSm4BsYXvAKjFDdvBAsg4Wv3s8dMkkpxHiVpFl/MUEOP/j0kyI035tmQfaJ9cVd4xCS123lcArx+Dmc0GOmIkg/JGQsmt2ED55i49Q7dM6FQ+Bjr1wJONtuLssjJhjgx/9U11Di6BuuTA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tHf8CtCbB+qYjAH1n1PiVb/3u2rn5zXqzwIW6UNj4X0=;
+ b=rQlOCa2uJMMm1kInQkj03pAfRfF1PEjHJshFDfzqwABYcxkoAbs496aza/eb3Rt7CedWBy0zRywpY3vRfQ/gX4FmIzSL73dOnqxjqmKRd0rpKglnrTiJtmWGS2kwBxw+vNmeVrR/C09146afGR3ZlnOM9fC2pIl++2aysmzGjViaf1ywPKwdMBV05hM9XTW47utxngfqzr+I/8Ro93pw/Qfx+W31cjiOtDSqv2I51zLTVRQB3RqiuGh6kZQWM8ZEuDAY9/W7DnZ6meKU0mzbfw+pI2fadLZ1jDFits9e6PqXmBZbFAipYb1oS1Lm6c74mdW9ps2+hk7LcqmWWtPMWw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV8PR12MB9620.namprd12.prod.outlook.com (2603:10b6:408:2a1::19)
+ by SN7PR12MB8791.namprd12.prod.outlook.com (2603:10b6:806:32a::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.15; Mon, 27 Apr
+ 2026 18:22:25 +0000
+Received: from LV8PR12MB9620.namprd12.prod.outlook.com
+ ([fe80::299d:f5e0:3550:1528]) by LV8PR12MB9620.namprd12.prod.outlook.com
+ ([fe80::299d:f5e0:3550:1528%5]) with mapi id 15.20.9870.013; Mon, 27 Apr 2026
+ 18:22:24 +0000
+Date: Mon, 27 Apr 2026 15:22:23 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: David Ahern <dsahern@gmail.com>, Chiara Meiohas <cmeiohas@nvidia.com>,
+	leon@kernel.org, michaelgur@nvidia.com, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 iproute2-next 0/4] Introduce FRMR pools
+Message-ID: <20260427182223.GB718365@nvidia.com>
+References: <20260330173118.766885-1-cmeiohas@nvidia.com>
+ <a441f862-1ebe-4fd9-9ef5-aac718fb008c@gmail.com>
+ <20260427112025.49ebbd73@phoenix.local>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260427112025.49ebbd73@phoenix.local>
+X-ClientProxiedBy: BN9PR03CA0629.namprd03.prod.outlook.com
+ (2603:10b6:408:106::34) To LV8PR12MB9620.namprd12.prod.outlook.com
+ (2603:10b6:408:2a1::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 7/9] x86: Add unsafe_copy_from_user()
-To: Yury Norov <ynorov@nvidia.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- David Laight <david.laight.linux@gmail.com>,
- Thomas Gleixner <tglx@linutronix.de>, linux-alpha@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-snps-arc@lists.infradead.org,
- linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
- dmaengine@vger.kernel.org, linux-efi@vger.kernel.org,
- linux-fsi@lists.ozlabs.org, amd-gfx@lists.freedesktop.org,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
- linux-wireless@vger.kernel.org, linux-spi@vger.kernel.org,
- linux-media@vger.kernel.org, linux-staging@lists.linux.dev,
- linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
- xen-devel@lists.xenproject.org, linux-fsdevel@vger.kernel.org,
- ocfs2-devel@lists.linux.dev, bpf@vger.kernel.org,
- kasan-dev@googlegroups.com, linux-mm@kvack.org, linux-x25@vger.kernel.org,
- rust-for-linux@vger.kernel.org, linux-sound@vger.kernel.org,
- sound-open-firmware@alsa-project.org, linux-csky@vger.kernel.org,
- linux-hexagon@vger.kernel.org, loongarch@lists.linux.dev,
- linux-m68k@lists.linux-m68k.org, linux-openrisc@vger.kernel.org,
- linux-parisc@vger.kernel.org, linux-sh@vger.kernel.org,
- linux-arch@vger.kernel.org
-References: <cover.1777306795.git.chleroy@kernel.org>
- <0ee46bb228d97163fbdc14f2a7c52b93d8bc34ce.1777306795.git.chleroy@kernel.org>
- <ae-j2_QirCySZD02@yury>
-Content-Language: fr-FR
-From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-In-Reply-To: <ae-j2_QirCySZD02@yury>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 7DE86478710
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV8PR12MB9620:EE_|SN7PR12MB8791:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3cd1a63b-a1a3-4619-1cb0-08dea489ee0d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|56012099003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	k5LBs4AGvkfVjJsYnUPvwB/jgv2CIUQwFaQvnP/cm6/s0ANfaKDm/pRzWfLAFJGwSORHGqmUB7ee0NTnVNUp764TNPpnnNdcOcKRsajV+p/RPyC7ea/KRboIl/LZbgIMLjsQenXbjHTKrVlRJ7GLjFy/XfdmudjMttNR6skbZWuV4k0gSg35CqM5pWoYgU1c6Z+PDp9qlaWqBfsQdfk+8YL2G1laJNVTMoX0BGzCVqxa1+6JUOoLB2Hg9iQfzCcMMiX/SaGA2ijA1OK+eTkQgV3e7CQLzG4cKFHi38DX1riFr3P4t5JSpEXCRoX8KMEhRXxzuKj0YqKvrOXsHxW0MwBWvEnkGDVYFZqDaMAjQVDGarDrUCA3ip9M3wwGCVpK97bFjZXHFFxhzg1oVM6AePtg+dyYNXCmi61G7AcIp9/pZg1TTH5SS2+jX1UjwlXlbc0XYDgRzdpBsyUN/dcogzquLmWaO0gFS7oGLnL1bEWvlVipx5dT0cGnolgX/PPytyjgCoWPWo0xuDzj7W2LKgIkkPQZnSroHuPt6HtYD/a5gmYF39uNaIHbKhegPPYX6U4gxNtBIcle/q+UFT2XcEHl8m+JknXLakbqFXjF0K+tqlX6qn1TDheFpm5Cea60gYHIuGRB1ElKflo0Z0b8lmKjX7y9DctmnUkwDptec40SnSwVrmK+TBZyLvazfiunabfWl/OmXww95rGaaEFjmZc8aSsT58Dj6IaVLAV7oMhNhjFFYyK+b1iX9dihlMrP
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR12MB9620.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?FoH+1l/OveP6yP4MKbE0pbg0CQUIapUYSpMKR4v7H+0SNqZbbd7QEtKVBOVJ?=
+ =?us-ascii?Q?ynkFYsS8HA07Wm1Nu/R7cGJQ+VieRL2qW1C61Pry1dFtBKzrJD4/SuXwDyaW?=
+ =?us-ascii?Q?9Gca2Mav9VnjxccQHtNuWUOOSx1bhqjPi36GhuG13in8dJzZU/jDqhd8Ug38?=
+ =?us-ascii?Q?lyw8fkdaMW1OdVWXuQMPbNZnapHaPa+R5E02xc8EPsSCeNyNhU+GTHJWeDMp?=
+ =?us-ascii?Q?L7k6Rlz0NWIqUziiYEADAwUgdFkCFu/81HVn/fCcY9ikoADazlqMCg3/kXhV?=
+ =?us-ascii?Q?ewZXFcLgdXvmTYlQBVi6F3E9rN6v/XxLiWpp+pjPEZJfzoISaexIQibye/JA?=
+ =?us-ascii?Q?NgZtFHUuvF7pDz3stRECa3CxcpwFmkc34XJkbzeweUj4rMFeSm1Tyfsm3/B9?=
+ =?us-ascii?Q?+u8OMI3hwpAYlSd6E62e4ihdtnz7SQRMCChMX6TQzOQhgZeKqXqHT+Z9R3mO?=
+ =?us-ascii?Q?bqpW/n+rE920KwahzujsxD5QzWhhmYM5/xmFuvy4snQKQJ3/1OfFk94F287b?=
+ =?us-ascii?Q?n2TzrnklFJHD4DLRm4DQTCfOTSONz6XKOaRVMVntoqUzHNqPldUABpJHAhAB?=
+ =?us-ascii?Q?cGC8gzUX5I1mJ/E3qfvdTOQ/oGD79ipsISH8khR8k9B+EG6SfUkCSFfxXqi3?=
+ =?us-ascii?Q?wz1Oz5KuhXmMD2yvvrPmsetuiDn42nGVNT+mOKbhuPN8vdLoUNwQrwr08ODe?=
+ =?us-ascii?Q?IVYgibTh8rqZPUsCWorWGcXux4WBWyrJ+S49LuwxW455KV+i9wS6u4exy0qy?=
+ =?us-ascii?Q?UTO6UwVNEQuM5Qhw9sDxcL4BOTDm1PyR3HMqtXMhqKlSFk6XktVh+229O3ac?=
+ =?us-ascii?Q?zxBWrehIeLsWkTq3gYK9ZjyU37JsK5QaoPQEEaW0OquL/stK6Yl2f7WA/HY8?=
+ =?us-ascii?Q?7zcIceS850CWDzVRxORwNcK8rl1h9EyPDSd63bOi6/mUWWf0Dtzm8rc6iyqL?=
+ =?us-ascii?Q?fMisKnV6tesNhXmehkWayF6MQJTGw8JRPqEJphadN85TseZncdIe4vCq89vU?=
+ =?us-ascii?Q?8sorpt9aY+ijDbHhgJ+esKbh0WtKBy8tH35Y21tWuNbbqPpo9feAnub7wXwC?=
+ =?us-ascii?Q?nUMxp9nCGMQgCxVMMrChNC8zDl2RB1/UxOqFPPPmeMzBmk7P9qnRl+DVKIct?=
+ =?us-ascii?Q?ceIkhesR5YwV7v2sax7oRfHcATcriHHD0QAMKhA4iPOo2xVxbs1U82GxEuag?=
+ =?us-ascii?Q?T71/J4R4s8QNSC6odVvyeJ6SLgmp7zHej+CcSzru0dqXNMjc6fb8sqd7SDM3?=
+ =?us-ascii?Q?gApaVugB5TJimPMSXK8/SxTwaSdC/mKS/c7BBfuH07d2Y4L/Zr2C0lLtBJF1?=
+ =?us-ascii?Q?cwS/6EcuDFFrEm+uLmwwbbbmIeEwo/Z0P/NNSmsDzgdHdJpjuoKlVeJtLeQj?=
+ =?us-ascii?Q?LRwdGzxx0bfuVCYulbbj8QIn/gtvxiLcEIZwmi5ii21Sxk76gwC2b837q1QF?=
+ =?us-ascii?Q?bp1/CWu4Cp80F8STXZF79mJaZqLsRbeTm0njzpiVQDdr0TDV9L1xU2v0ZLQg?=
+ =?us-ascii?Q?bfR1BRLDAUTY9wkxcnlyjnChJGeOFvgJzHCBmbE8CNydihL606Dh/hAWPCgu?=
+ =?us-ascii?Q?XeN9vOoo9257EnDj1lE9/qYSXIurRnY07Jt5lBW6WZ8NIegdh0716Yc68oMf?=
+ =?us-ascii?Q?s7YUT+MmyJwT0tUcJlqsII8yuJud7/U9AmGBflX3f85TMaDfcJ+iFUSR6UJL?=
+ =?us-ascii?Q?VDdnlMb+SCME5UkCUHuJKE6G0EhZZptYqD/HmM4ctOjL6sAF?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3cd1a63b-a1a3-4619-1cb0-08dea489ee0d
+X-MS-Exchange-CrossTenant-AuthSource: LV8PR12MB9620.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2026 18:22:24.8289
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MNT6mYsmqqF2Prp1A6+Gc7gMb5+47hxdsK7lnGUsoGedKLUvowHUw3L04nSdnue2
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8791
+X-Rspamd-Queue-Id: 3FE8D478893
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281443-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[linux-foundation.org,gmail.com,linutronix.de,vger.kernel.org,lists.infradead.org,lists.ozlabs.org,lists.freedesktop.org,lists.linux.dev,lists.xenproject.org,googlegroups.com,kvack.org,alsa-project.org,lists.linux-m68k.org];
-	RCPT_COUNT_TWELVE(0.00)[48];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,nvidia.com,kernel.org,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	TAGGED_FROM(0.00)[bounces-281444-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chleroy@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[jgg@nvidia.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,Nvidia.com:dkim,msgid.link:url]
 
-
-
-Le 27/04/2026 à 19:58, Yury Norov a écrit :
-> On Mon, Apr 27, 2026 at 07:13:48PM +0200, Christophe Leroy (CS GROUP) wrote:
->> At the time being, x86 and arm64 are missing unsafe_copy_from_user().
+On Mon, Apr 27, 2026 at 11:20:25AM -0700, Stephen Hemminger wrote:
+> On Sun, 5 Apr 2026 11:09:55 -0600
+> David Ahern <dsahern@gmail.com> wrote:
 > 
-> No, they don't. They (should) rely on a generic implementation from
-> linux/uaccess.h, like every other arch, except for  PPC and RISCV.
+> > On 3/30/26 11:31 AM, Chiara Meiohas wrote:
+> > > From Michael: 
+> > > 
+> > > This series adds support for managing Fast Registration Memory Region
+> > > (FRMR) pools in rdma tool, enabling users to monitor and configure FRMR
+> > > pool behavior.
+> > > 
+> > > FRMR pools are used to cache and reuse Fast Registration Memory Region
+> > > handles to improve performance by avoiding the overhead of repeated
+> > > memory region creation and destruction. This series introduces commands
+> > > to view FRMR pool statistics and configure pool parameters such as
+> > > aging time and pinned handle count.
+> > > 
+> > > The 'show' command allows users to display FRMR pools created on
+> > > devices, their properties, and usage statistics. Each pool is identified
+> > > by a unique key (hex-encoded properties) for easy reference in
+> > > subsequent operations.
+> > > 
+> > > The aging 'set' command allows users to modify the aging time parameter,
+> > > which controls how long unused FRMR handles remain in the pool before
+> > > being released.
+> > > 
+> > > The pinned 'set' command allows users to configure the number of pinned
+> > > handles in a pool. Pinned handles are exempt from aging and remain
+> > > permanently available for reuse, which is useful for workloads with
+> > > predictable memory region usage patterns.
+> > > 
+> > > Command usage and examples are included in the commits and man pages.
+> > > 
+> > > These patches are complimentary to the kernel patches:
+> > > https://lore.kernel.org/linux-rdma/20260226-frmr_pools-v4-0-95360b54f15e@nvidia.com/
+> > >   
+> > 
+> > applied after fixing up a few nits.
+> > 
+> > Please clone the ai review prompts from:
+> >   https://github.com/masoncl/review-prompts.git
+> > 
+> > Run the setup scripts and have ai review patches before sending. This
+> > should really be part of both kernel and iproute2 development workflow now.
 > 
-> But they #define arch_unsafe_get_user, and the unsafe_copy_from_user()
-> becomes undefined conditionally on that.
+> I rebased UAPI headers based on 7.1-rc1 and iproute2/rdma will not build.
+> Looks like RDMA did not get merged in 7.1.
 > 
-> So please, fix that bug instead of introducing another arch flavor.
-> We'd always choose generic version, unless there's strong evidence
-> that arch one is better.
+> Will have to back it out if not going in 7.1
 
-But they both implement the exact same unsafe_copy_to_user(). What is 
-the difference here ?
+I see it here:
 
-Should that function become generic too ?
+commit dbd0472fd7a5bdd0b86c21c36f8afa713baa7653
+Author: Michael Guralnik <michaelgur@nvidia.com>
+Date:   Thu Feb 26 15:52:16 2026 +0200
 
-Christophe
+    RDMA/nldev: Expose kernel-internal FRMR pools in netlink
+    
+    Allow netlink users, through the usage of driver-details netlink
+    attribute, to get information about internal FRMR pools that use the
+    kernel_vendor_key FRMR key member.
+    
+    Signed-off-by: Michael Guralnik <michaelgur@nvidia.com>
+    Reviewed-by: Patrisious Haddad <phaddad@nvidia.com>
+    Signed-off-by: Edward Srouji <edwards@nvidia.com>
+    Link: https://patch.msgid.link/20260226-frmr_pools-v4-11-95360b54f15e@nvidia.com
+    Signed-off-by: Leon Romanovsky <leon@kernel.org>
 
-> 
-> 
-> Thanks,
-> Yury
->   
->> Add it.
->>
->> Signed-off-by: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
->> ---
->>   arch/x86/include/asm/uaccess.h | 29 ++++++++++++++++++++++++-----
->>   1 file changed, 24 insertions(+), 5 deletions(-)
->>
->> diff --git a/arch/x86/include/asm/uaccess.h b/arch/x86/include/asm/uaccess.h
->> index 3a0dd3c2b233..10c458ffa399 100644
->> --- a/arch/x86/include/asm/uaccess.h
->> +++ b/arch/x86/include/asm/uaccess.h
->> @@ -598,7 +598,7 @@ _label:									\
->>    * We want the unsafe accessors to always be inlined and use
->>    * the error labels - thus the macro games.
->>    */
->> -#define unsafe_copy_loop(dst, src, len, type, label)				\
->> +#define unsafe_put_loop(dst, src, len, type, label)				\
->>   	while (len >= sizeof(type)) {						\
->>   		unsafe_put_user(*(type *)(src),(type __user *)(dst),label);	\
->>   		dst += sizeof(type);						\
->> @@ -611,10 +611,29 @@ do {									\
->>   	char __user *__ucu_dst = (_dst);				\
->>   	const char *__ucu_src = (_src);					\
->>   	size_t __ucu_len = (_len);					\
->> -	unsafe_copy_loop(__ucu_dst, __ucu_src, __ucu_len, u64, label);	\
->> -	unsafe_copy_loop(__ucu_dst, __ucu_src, __ucu_len, u32, label);	\
->> -	unsafe_copy_loop(__ucu_dst, __ucu_src, __ucu_len, u16, label);	\
->> -	unsafe_copy_loop(__ucu_dst, __ucu_src, __ucu_len, u8, label);	\
->> +	unsafe_put_loop(__ucu_dst, __ucu_src, __ucu_len, u64, label);	\
->> +	unsafe_put_loop(__ucu_dst, __ucu_src, __ucu_len, u32, label);	\
->> +	unsafe_put_loop(__ucu_dst, __ucu_src, __ucu_len, u16, label);	\
->> +	unsafe_put_loop(__ucu_dst, __ucu_src, __ucu_len, u8, label);	\
->> +} while (0)
->> +
->> +#define unsafe_get_loop(dst, src, len, type, label)				\
->> +	while (len >= sizeof(type)) {						\
->> +		unsafe_get_user(*(type __user *)(src),(type *)(dst),label);	\
->> +		dst += sizeof(type);						\
->> +		src += sizeof(type);						\
->> +		len -= sizeof(type);						\
->> +	}
->> +
->> +#define unsafe_copy_from_user(_dst,_src,_len,label)			\
->> +do {									\
->> +	char *__ucu_dst = (_dst);					\
->> +	const char __user *__ucu_src = (_src);				\
->> +	size_t __ucu_len = (_len);					\
->> +	unsafe_get_loop(__ucu_dst, __ucu_src, __ucu_len, u64, label);	\
->> +	unsafe_get_loop(__ucu_dst, __ucu_src, __ucu_len, u32, label);	\
->> +	unsafe_get_loop(__ucu_dst, __ucu_src, __ucu_len, u16, label);	\
->> +	unsafe_get_loop(__ucu_dst, __ucu_src, __ucu_len, u8, label);	\
->>   } while (0)
->>   
->>   #ifdef CONFIG_CC_HAS_ASM_GOTO_OUTPUT
->> -- 
->> 2.49.0
->>
+Did some part get missed?
 
+Jason
 
