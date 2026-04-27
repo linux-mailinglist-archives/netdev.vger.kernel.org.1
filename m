@@ -1,122 +1,177 @@
-Return-Path: <netdev+bounces-281441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281442-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SOm6MTio72mpDgEAu9opvQ
-	(envelope-from <netdev+bounces-281441-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:17:28 +0200
+	id yEP/F4ep72kCDwEAu9opvQ
+	(envelope-from <netdev+bounces-281442-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:23:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60394478607
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:17:28 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AF844787B8
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:23:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B34A1302C766
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:14:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 579E3302C939
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:20:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFED731E84F;
-	Mon, 27 Apr 2026 18:14:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C605A3E3C7E;
+	Mon, 27 Apr 2026 18:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fJORxUaT"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="AyVIkuj3"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f172.google.com (mail-dy1-f172.google.com [74.125.82.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5103E9298
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 18:14:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 431393D6CD9
+	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 18:20:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777313682; cv=none; b=NjDMYfhA3opQjHMBCSt2KYaVRUd4ZtNvnQ6SxXjos1c9Wk6OV6UGeZqFovfXjnvzTjyRyHM7mBUEi2q/5WgXZcumnkmbwvFI/0jc8emzEIslfJBcolW3Jbwc2iTgLf4N2qKJsSOn7spSdBL7tx6s2vOkUnkumKWNI0+BPbBa5WE=
+	t=1777314031; cv=none; b=PDp2oCcuyUcGYChj1EHkOXXpHs7r3fMREVH3V1/u5zaPibFZrvDj+JEZCtS1Yh2rHwSEpSclte1//CVek8V4RESZqCgLiYl7YCFKTX3ahqWoRdCvdLCrPjRO2TaeRGUcMTj0asxCEijblEenfnmrTCXJw06fuU6y7lsw1sC8JhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777313682; c=relaxed/simple;
-	bh=HPkklJMSjDq+plPrDi+PNv7bIYwLDsk27D1D7Ma0l1Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jmyW8YKyf7vOAwBSLY89HcRddjlZ8Yg57wmUaZ2kxyKYsgplqY8LBZ3ju4qRm76K7dWx8aJhxBex1HbtJ3UoWR+RfsVN3tA3ey/z6CbQr+HRBXJxrrvk+bDLMXJi7tXTpZQXjmb9rEfRrHYTukACOeuw/xuZV9fFpuOlykCcqvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fJORxUaT; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5fMY+7qktMp3ALtvvo50hwkE7y/ouSRzuEqm5ukl6zo=; b=fJORxUaTBnYCMOIs0Za8LGeA99
-	t4Gfi7rypiksLK1frPKt7LvpqU9OkMGR1U1t67/4C/GxdoEKtuUIn0IlrJSJKXAsYW/dL++onszFZ
-	0f2es7xPyyWAdsQZp6lwNWj3Ta2iAMhZ0+bnPDWzT6I0+Dr3X/Fh+ff9J2bDrzZFh3c8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wHQTc-000Cl8-55; Mon, 27 Apr 2026 20:14:36 +0200
-Date: Mon, 27 Apr 2026 20:14:36 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: kernelcoredev <sonionwhat@gmail.com>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH] net: nixge: fix skb leak and missing bail on DMA mapping
- error
-Message-ID: <a122c852-8fa1-438d-a22a-800dc1cf5383@lunn.ch>
-References: <20260427174608.8201-1-sonionwhat@gmail.com>
+	s=arc-20240116; t=1777314031; c=relaxed/simple;
+	bh=bN76FJ2v7mzFwUIMDRt7QH0QWQYlu0rTdiySbpZ9Ko8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NrcGj5xVMo8iUyAlg8IPVRkVEp6d7esW7WdAl4Rm2Y48kdZHEZ2yS7bXv9PopPYqHyfhCWXMFu3CNT4CplxXUmixEJ6MmI3xU37WLK0vqBfcKuT+2IYxFu2OPmFEcZ+Q48hmUokhGbtDU7MLiMBlfTGKEkkiQgBV4ZC9DJjRptA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=AyVIkuj3; arc=none smtp.client-ip=74.125.82.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-dy1-f172.google.com with SMTP id 5a478bee46e88-2dec803f9f0so5880326eec.0
+        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 11:20:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1777314029; x=1777918829; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z8RyeeF+uqUFvtkyKIQ0Q0DITbXIoGdPLgiE0VyWQRM=;
+        b=AyVIkuj3STBSQ7TrDYvswGBwgaWkDNeMbrgkIMIubUysGpzSGS1228cnhlp7ETxM64
+         4SDSnxTCrQUGBp+aVa5LxYXLxI0AUA74gHM5HxOT61pmefCDLQeLLyGwg37WllyL6a2p
+         k7z6x4e9WfYF+a73d1fVxsOu/lRHJd6IeUjNILJcb1REhP8JnSre1kbkjMeC4FxXY/nh
+         w3s7nrPO/djX1/VAXLtg1u9AZw63SJrRN20sDOkQotvgp9MfUq//whA4o9qG9sTg+Pv3
+         D1/8IAC4nwZw3fw8aLnjN2vQtEaKSOZm4U+R88f9z58FKi9iMUeZIE2OtamBlT7YJJ9D
+         /MVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777314029; x=1777918829;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Z8RyeeF+uqUFvtkyKIQ0Q0DITbXIoGdPLgiE0VyWQRM=;
+        b=a8PjGZBpcBP9P986o+Xnzr/rWG7mFNG7zWhx7sB43OEqGZ9Mh07rRpFq6kdHt16JMH
+         6yoFeN9l0dFCqFKEg6L3ER0PmLHFVVoAU1wiwwcTTzll1BEPKUhBKKkBXou8PuUB9pgX
+         d8TkGf7K2rnOBCnwIULFLeMzuCk+4/kCYxQbmWnOHjxgvH90YJxIHPpt2zyeZw1jtHEc
+         wfFF++M3t+nrhm33aWrEQ4nxWNzfuTpwBLStEdyoXQYHJlfiZnVqRHknJ7FHo2RPYyuA
+         vxMfaJqX3MMBKln4Z/J6FX3BpgtLhVeywJGbEE/yz0FUYqKF/HX9aHBQlZUjkrZrtvsO
+         4DIA==
+X-Forwarded-Encrypted: i=1; AFNElJ8nJjsj6tASoYSUETb8KFWVxOJZCGx9BHbVP+QD5e63Wi/QNOJp/fNSy4IJApf9KRV1YM69/qA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPvkwgFPtdF7wDrbaTojp2SB9eeczpASLMDROJCcVfAAPVr5lq
+	DCqog8CLR/Y2q2yvAEpNAYQ9k9dK6oIohMW6GHKxXjJGxrtzVwgfNlgKWZgU3CtZPX4=
+X-Gm-Gg: AeBDieuCc/QDHYBxZp0+/U1vFtTGElkGkYVIv4qc+gDERvmSG2rZyq2Qh20yN1hBzaI
+	xHPkae4sxKXKjKmcONWNjpBFnPOo185rA7voNK4uaq1hR8k1LTqMBDX0XTqQQPIEnfiIjc7yb+Q
+	yiyK/IeyNUA24e6QKdwQpeA76BBEIVAJuLV1XYu6N/tn1lOkDPenmmMi28PUYgl/6DVqqJmKr6V
+	BgaVwYOT1dxrxC4TSiULlkkt0JggE5eREG4g6YtTOR7LpJ0fGUPozFIWB7V6XcjhqGr3+zSy9LP
+	AwDexJU+HyMC1hNS+x3L3+VxVBAJ3TuMRLcpLqjXNIvv3capBJEbAY6czGTylwwrVLERXD8CDdg
+	zNAL65/HkGuUcWCRtMlAlzYXyr0hKNo1U981Jat4XnyS1Mkl/6mTI2ZdyVru6SvwEHq+GE6S3Uo
+	MDy/f3pl5vS0L7Zf4Xk8Oqhoq6FqR5k783IZMFmGNzRpQsuA==
+X-Received: by 2002:a05:7300:214f:b0:2de:e194:5fb1 with SMTP id 5a478bee46e88-2ed097ed954mr68059eec.7.1777314029174;
+        Mon, 27 Apr 2026 11:20:29 -0700 (PDT)
+Received: from phoenix.local ([104.202.41.210])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2e53ccce440sm42915897eec.14.2026.04.27.11.20.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Apr 2026 11:20:28 -0700 (PDT)
+Date: Mon, 27 Apr 2026 11:20:25 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: David Ahern <dsahern@gmail.com>
+Cc: Chiara Meiohas <cmeiohas@nvidia.com>, leon@kernel.org,
+ michaelgur@nvidia.com, jgg@nvidia.com, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH v2 iproute2-next 0/4] Introduce FRMR pools
+Message-ID: <20260427112025.49ebbd73@phoenix.local>
+In-Reply-To: <a441f862-1ebe-4fd9-9ef5-aac718fb008c@gmail.com>
+References: <20260330173118.766885-1-cmeiohas@nvidia.com>
+	<a441f862-1ebe-4fd9-9ef5-aac718fb008c@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260427174608.8201-1-sonionwhat@gmail.com>
-X-Rspamd-Queue-Id: 60394478607
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 9AF844787B8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.56 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281441-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-281442-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
 	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,phoenix.local:mid]
 
-On Mon, Apr 27, 2026 at 01:46:07PM -0400, kernelcoredev wrote:
-> When dma_mapping_error() fires during RX buffer refill in nixge_recv(),
-> the skb allocated by netdev_alloc_skb_ip_align() is never freed, and
-> execution continues writing a corrupt physical address into the hardware
-> descriptor ring.
+On Sun, 5 Apr 2026 11:09:55 -0600
+David Ahern <dsahern@gmail.com> wrote:
+
+> On 3/30/26 11:31 AM, Chiara Meiohas wrote:
+> > From Michael: 
+> > 
+> > This series adds support for managing Fast Registration Memory Region
+> > (FRMR) pools in rdma tool, enabling users to monitor and configure FRMR
+> > pool behavior.
+> > 
+> > FRMR pools are used to cache and reuse Fast Registration Memory Region
+> > handles to improve performance by avoiding the overhead of repeated
+> > memory region creation and destruction. This series introduces commands
+> > to view FRMR pool statistics and configure pool parameters such as
+> > aging time and pinned handle count.
+> > 
+> > The 'show' command allows users to display FRMR pools created on
+> > devices, their properties, and usage statistics. Each pool is identified
+> > by a unique key (hex-encoded properties) for easy reference in
+> > subsequent operations.
+> > 
+> > The aging 'set' command allows users to modify the aging time parameter,
+> > which controls how long unused FRMR handles remain in the pool before
+> > being released.
+> > 
+> > The pinned 'set' command allows users to configure the number of pinned
+> > handles in a pool. Pinned handles are exempt from aging and remain
+> > permanently available for reuse, which is useful for workloads with
+> > predictable memory region usage patterns.
+> > 
+> > Command usage and examples are included in the commits and man pages.
+> > 
+> > These patches are complimentary to the kernel patches:
+> > https://lore.kernel.org/linux-rdma/20260226-frmr_pools-v4-0-95360b54f15e@nvidia.com/
+> >   
 > 
-> Fix by freeing the skb with dev_kfree_skb() and returning early.
+> applied after fixing up a few nits.
 > 
-> This was tested via code inspection, as I do not have access to the
-> hardware. If dma_mapping_error() occurs, the current code continues
-> execution, which can leak the skb and program an invalid DMA address
-> into the descriptor ring. This patch ensures proper cleanup and early
-> return on error.
+> Please clone the ai review prompts from:
+>   https://github.com/masoncl/review-prompts.git
+> 
+> Run the setup scripts and have ai review patches before sending. This
+> should really be part of both kernel and iproute2 development workflow now.
 
-Please continue your code inspection. What happens to the ring
-descriptors if you return early?
+I rebased UAPI headers based on 7.1-rc1 and iproute2/rdma will not build.
+Looks like RDMA did not get merged in 7.1.
 
-If the fix was so simple, why do you think there is a FIXME?  This is
-the problem of not testing on hardware. Do you know if your change
-makes the code better or worse? Please argue why it is better,
-including an explanation of what happens to the ring descriptors with
-your fix in place.
-
-	  Andrew
+Will have to back it out if not going in 7.1
 
