@@ -1,176 +1,138 @@
-Return-Path: <netdev+bounces-281414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281415-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uMI3EQOV72ktDAEAu9opvQ
-	(envelope-from <netdev+bounces-281414-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:55:31 +0200
+	id kEmSIKiV72ktDAEAu9opvQ
+	(envelope-from <netdev+bounces-281415-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:58:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98EA1476B20
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:55:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC1F2476B6D
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:58:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 60BE3302AD29
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:52:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E4ED730053EC
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:56:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F8323D9DA7;
-	Mon, 27 Apr 2026 16:52:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FFE6315D43;
+	Mon, 27 Apr 2026 16:56:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TMiD9d/g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n/Y8fswy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE963D6CB6
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 16:52:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D03221FF23;
+	Mon, 27 Apr 2026 16:56:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777308744; cv=none; b=navtfbatZ8Ilksp0auJIeoR+OkfVMnoNbt11evchoCjz8udtBE1gnKZw36FOMG9WPy8htEB6/BLBfqy+llOrqxqonoUJq6JChdhyXzsM2CeBKYyWeOWuJo1F8hdGwxz6mFDPB8qEvZlH9uM4E8ihx540YtOq5huWvxKNC9osCTE=
+	t=1777309013; cv=none; b=oh1S5OwRcZfmr2RlGwxtxfk0W2qDXwJnKzp8jrksfgU/IL5eUiUUIenMtR0hZapRdyL/YXUjit+9wVciQ0FZRwsiKtoVUXGpsZ29OyrqOrqeG3tiVE7uFNGhMJglfO70LNIboiGERJQM+NTvJD7I2qVaz63rv62VRacxy6z3z1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777308744; c=relaxed/simple;
-	bh=ETP5cbZBx5BXdzQHP8lPfMRyGrQXvV0TD9QSKFc4srE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UJnDtjmymjZePwwKje/u8ow0qIj2pSBHIwKLTfX+vaarQ0AzyCcuyWr+iQujMy/IPFnfesvX3pMbkJtr4leZrpBE6eo7rcH3ssu8Uuuu5OLZvSRVXq76dPvEqbtIx4VAXNcVJz+OVt8rJtFg9EAapaH+5flOzgwUGop5TavOtEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TMiD9d/g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D34AAC19425;
-	Mon, 27 Apr 2026 16:52:21 +0000 (UTC)
+	s=arc-20240116; t=1777309013; c=relaxed/simple;
+	bh=f27ZLtfQ2psiLDLiOwH5MCujuxwYVldjPQ50+2ta5yE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ptp7tl/LHv4ECoJN2KO81O00G7ja6vVGka3z9NPB8cq2tCrQRZhpq53SI3STmTtT6BaQHECBvSWtbFeWthfO2toc1WpYDB0Darrdj0EH26IlCuzAJK61LklFje0ZYD+Y1knXIEIutrJhEIG3/PdLpH9YyVLG9PwN9ufryAyBP3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n/Y8fswy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E1D9C19425;
+	Mon, 27 Apr 2026 16:56:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777308744;
-	bh=ETP5cbZBx5BXdzQHP8lPfMRyGrQXvV0TD9QSKFc4srE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TMiD9d/gnr+BdZknfY5sngLMZIcEnTQ7MPCD+wG+GIE8sWtujrLosR3Kg76IoB/x4
-	 RmbsYiy7jF4ZMGnnZvFHxVGjPtlXmooPqIjl8V71nI7qS701xa+NaB1oE2fC9SWotQ
-	 1knxWGrtAjoLGfGNDM1vv/1Mtg5L9p7ISN8ZHrzU7T3IJOOJbEwHwS9Fy7Nr7UwKH+
-	 JFNbLDea0DVJLVqZyZKHYMStfzQBVtoZpIvUv4dwLwepdzy5R89xrykQYPHZZua0Nu
-	 tskggTbfZ64hOS3Ai4xJypY/TDSf2caO6e3fclKV1/mvW2GDHHaJY5A/VXtMyYowHB
-	 eZs1kFyofFi4Q==
-From: Simon Horman <horms@kernel.org>
-To: jtornosm@redhat.com
-Cc: 'Simon Horman' <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	przemyslaw.kitszel@intel.com,
-	aleksandr.loktionov@intel.com,
-	jacob.e.keller@intel.com,
-	jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH net v4 4/4] ice: skip unnecessary VF reset when setting trust
-Date: Mon, 27 Apr 2026 17:50:45 +0100
-Message-ID: <20260427165045.1228721-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260423130405.139568-5-jtornosm@redhat.com>
-References: <20260423130405.139568-5-jtornosm@redhat.com>
+	s=k20201202; t=1777309012;
+	bh=f27ZLtfQ2psiLDLiOwH5MCujuxwYVldjPQ50+2ta5yE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=n/Y8fswyztEfU5UCdECt2vxG0crOGwPn9E+G+IXW5EbYezLN7WziDS06zX+lCHQae
+	 /tQdFN1U9JRfNZ0OB7CUM27yQIoNZ8NXF8svD7CF+krxI2Zm40wsvqPlU3jS7+DJF6
+	 d760vP5NvxKECyVmnb7pqVD9xt2SDF3Vhv7Lx+G/OfMoSBHtTaC+3bd19YomRc9JOM
+	 pRgXUCA5WNS9XPbxGlux4RKADCW8Hkxhzo+uSVMuw8Y2ozmej6oQtENwR/B2EMeHLX
+	 49hgWm6ZXog5gs0VYUXjFS0X5/veSZJxdNuCeUMjLndL9YUhMrkWgMT8tfDV4+G7Qv
+	 jljc+PFP+Mdag==
+From: Pratyush Yadav <pratyush@kernel.org>
+To: Roman Gushchin <roman.gushchin@linux.dev>
+Cc: Jakub Kicinski <kuba@kernel.org>,  davem@davemloft.net,
+	netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Pratyush Yadav <pratyush@kernel.org>
+Subject: Re: [GIT PULL] Networking deletions for 7.1
+In-Reply-To: <7ia4se8lb0vf.fsf@castle.c.googlers.com> (Roman Gushchin's
+	message of "Fri, 24 Apr 2026 01:31:00 +0000")
+References: <7ia4se8lb0vf.fsf@castle.c.googlers.com>
+Date: Mon, 27 Apr 2026 18:56:49 +0200
+Message-ID: <2vxzwlxs4a0e.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 98EA1476B20
+Content-Type: text/plain
+X-Rspamd-Queue-Id: CC1F2476B6D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281414-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281415-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pratyush@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-From: 'Simon Horman' <horms@kernel.org>
+On Fri, Apr 24 2026, Roman Gushchin wrote:
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-ice: skip unnecessary VF reset when setting trust
-
-This patch attempts to optimize VF trust setting changes by skipping the VF
-reset when granting trust, and only resetting when revoking trust if MAC LLDP
-filters are present. It also fixes a race condition by doing the reset before
-clearing the LLDP filters.
-
-> diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
-> index 7e00e091756ddc..8686c382404f3f 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_sriov.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-[ ... ]
-> @@ -1399,11 +1427,16 @@ int ice_set_vf_trust(struct net_device *netdev, int vf_id, bool trusted)
->  
->  	mutex_lock(&vf->cfg_lock);
->  
-> -	while (!trusted && vf->num_mac_lldp)
-> -		ice_vf_update_mac_lldp_num(vf, ice_get_vf_vsi(vf), false);
-> -
-> +	/* Reset only if revoking trust with MAC LLDP filters */
-> +	if (!trusted && vf->num_mac_lldp) {
-> +		ice_reset_vf(vf, ICE_VF_RESET_NOTIFY);
-
-Does ice_reset_vf() clear vf->num_mac_lldp to 0 when it calls
-ice_vf_pre_vsi_rebuild() internally?
-
-If so, does this make the following while loop dead code, bypassing the
-ice_vf_update_mac_lldp_num() calls that cleanly decrement the count and
-trigger ice_vsi_cfg_sw_lldp() to clean up the LLDP software switch rules?
-
-> +		while (vf->num_mac_lldp)
-> +			ice_vf_update_mac_lldp_num(vf, ice_get_vf_vsi(vf), false);
-> +	} else {
-> +		ice_setup_vf_trust(vf, trusted);
-> +	}
-
-If we revoke trust (!trusted) and vf->num_mac_lldp > 0, we enter the if block
-and skip the else block containing ice_setup_vf_trust().
-
-When ice_reset_vf() rebuilds the VSI, vf->trusted is still true. Will the
-rebuild process use this true value to set the ICE_VIRTCHNL_VF_CAP_PRIVILEGE
-bit in vf->vf_caps?
-
-Since ice_setup_vf_trust() is skipped, does this fail to explicitly clear the
-privilege capability bit? Could a malicious VM add a MAC LLDP filter before
-trust is revoked to ensure num_mac_lldp > 0, thereby retaining its privileges?
-
-Furthermore, when revoking trust and vf->num_mac_lldp == 0, we take the else
-branch and skip ice_reset_vf().
-
-Trusted VFs are permitted to allocate more than ICE_MAX_MACADDR_PER_VF or
-ICE_MAX_VLAN_PER_VF limits. Previously, the unconditional ice_reset_vf()
-would tear down the VSI and purge these extra non-default filters.
-
-Without the reset, is there any logic in ice_setup_vf_trust() to prune the
-extra MAC and VLAN filters that were added while the VF was trusted? Will
-skipping the reset allow an untrusted VF to retain excessive hardware filters
-indefinitely and potentially exhaust PF resources?
-
->  	vf->trusted = trusted;
-> -	ice_reset_vf(vf, ICE_VF_RESET_NOTIFY);
-> +
->  	dev_info(ice_pf_to_dev(pf), "VF %u is now %strusted\n",
->  		 vf_id, trusted ? "" : "un");
+> 2c on Sashiko:
 >
+> 1) I'm working on an infrastructure to separate pre-existing issues from
+> new issues. My current thinking is to stop reporting these issues with
+> reviews of new patches and instead put them into some database and give
+> maintainers access to it. Sashiko will automatically deduplicate issues
+> and index them by the source file/subsystem. Hopefully it will mean that
+> maintainers will see only a limited number of issues in source files
+> they support. But I have yet to see how it works in practice.
+>
+> But I'm somewhat concerned that this way many of these issues will
+> remain there forever and by reporting them with new material we actually
+> have better chances to get them fixes. Maybe it should be configurable
+> per-subsystem. I'm very open for ideas here.
+
+Yep, I agree. When I am looking at a series, the context is fresh in my
+mind and if there are small fixes I can write them and send quickly. I
+would be less likely to wade through a database, since it is a lot
+harder to build the mental context. But then I work with subsystems that
+get far fewer patches than something like networking so the noise isn't
+that much of a problem for me.
+
+Maybe you can visually separate the pre-exsiting issues (perhaps also
+allow filtering?) so people can quickly see the problems with the patch
+and don't always have to parse the rest?
+
+>
+> 2) Re false positives vs finding more bugs I had the same experience.
+> It's easy to tweak it to be more conservative or creative, but it comes
+> at a price. It seems like the real answer is simple a better model. We
+> saw a big improvement internally switching from Gemini Pro 3.0 to 3.1.
+>
+> Thanks
+
+-- 
+Regards,
+Pratyush Yadav
 
