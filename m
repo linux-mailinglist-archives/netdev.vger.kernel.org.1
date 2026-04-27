@@ -1,106 +1,375 @@
-Return-Path: <netdev+bounces-281387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281388-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6JkyMgJ272mZBgEAu9opvQ
-	(envelope-from <netdev+bounces-281387-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:43:14 +0200
+	id SLKAFkh272mZBgEAu9opvQ
+	(envelope-from <netdev+bounces-281388-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:44:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3230C47495F
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:43:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B646A4749B0
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:44:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E7AE330F0FB7
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 14:36:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 607D6305BA98
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 14:37:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D3242F5491;
-	Mon, 27 Apr 2026 14:36:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C57382FA0C6;
+	Mon, 27 Apr 2026 14:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hKo4g06f"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bz87cZwg"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B70EB2EFD9B;
-	Mon, 27 Apr 2026 14:36:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777300612; cv=none; b=lvmkUatKpyGByXrHMYtTFGnNjH99ZFqqW7GAP4UXMYNtrM3VS1UkW4d24qaH/HxKDY7ZyHYjAJMiTwCEffHHZ6AVDaheh2grpN2TM93dts4kJsZtgXmXj7dDMrkw/iVMx5ycpNecFWo2/cH8gVPs/tjo8IFkM/aGKgfscq0ZA20=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777300612; c=relaxed/simple;
-	bh=zhj7BefqB70/GWAfwb4qblb+GXfGPk9Ous1fc6wxcUU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tTDdtLVa61iQ9y3BphxPUJFaDurMokbyj51V8mG51WIvU3+JRsm4Bi9jqBUO6nKyNm/cjhh+5Van8REsKYk4CK9OfDnBKNI7itGTDwcZ+MuB98ypM8viwcFebEB41V+A5DDgulhkUk5ZBYuTZ8mL6ux3IQGgs9G6lpYeVkSHZ9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hKo4g06f; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=+CqZeB9Uj+nOMbZEeZioPvECq2KYqxFoLyWyf1YlGvE=; b=hKo4g06fhgnSc9oOcTeBr9jFhs
-	juILaZVqvPzYjVqxvL6u6DJ/Zp0oy8YPsamCQqaWEKGR1acEkYvSzpgWeCUTZLdXBQRn8zMLXMIJe
-	OngQ7r1c6b3QwRZp+U0mmbfweK/bmTFNlJ/X0ys6OUjzJeEgRlDH5M5OJQca6jQqtzO8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wHN4p-000B3V-Er; Mon, 27 Apr 2026 16:36:47 +0200
-Date: Mon, 27 Apr 2026 16:36:47 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Maciej W. Rozycki" <macro@orcam.me.uk>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: MAINTAINERS: Add self for the 3c509 network driver
-Message-ID: <70910fab-7054-48a5-a41f-ffd4c5d429ac@lunn.ch>
-References: <alpine.DEB.2.21.2604271056460.28583@angie.orcam.me.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C852D1916;
+	Mon, 27 Apr 2026 14:37:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777300649; cv=fail; b=YYlm2pbI1x/RqH/CjUZogRQ541b3SB9dvOxxIxpzeGuTzpIOi2zaTjygxOZ0xS2IME77xSfYiFZ39uIov8v5rMNG3TGjELMHMpO2yN80KR97idPc7HJasmsREJb43SQV4yM6+GSEIBfTUjqqYwFcizVeSVAdEaqnIorW9fqjJxA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777300649; c=relaxed/simple;
+	bh=IVOGITvdoyztBqtvAukH++OXedPtU7PXsT5fxmqzy7k=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=XVdLo+E+p+V/5cKHePpttdaiwJ2q+2fKLWyXH2JLwMIOpw2Fki4X+jgpkl+2FkWSgJ3SCkzU9Zv/XuUfTDKxKdAoU0bsIZkCDaAN8gMbh3bTaUC8m6BYA5Mi3EuL5Jn/knVxN+ui35HqO0fC8SRmf8LCYdFObLPYXRHM1nZzQzE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bz87cZwg; arc=fail smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777300648; x=1808836648;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=IVOGITvdoyztBqtvAukH++OXedPtU7PXsT5fxmqzy7k=;
+  b=bz87cZwgctML7ypvtlYiWM446/3VZBOgiPoMXJP78XFo0uil9NSnYRKL
+   614gIST5RG2PmE4A9Q/1vZCSp3dYq5eWAr78PcRTEkbVs7wbRhtiC4kff
+   Nx2OrUV+EVNbIF6mrU1qXBb6Ot1yy3m+SpevDhSWfV1WcTpJ/PX5Klski
+   l3ufhNnkcQNG27EdJEvwjRZwU21DeCbYZf1trcOmNEKJjnUDYSEHj09qS
+   Az9iJTBystLQABABgecyMsc8a4bN9mMH6meaW9H0qcWT7UyisAO2xAVKL
+   yKyjvqQxoDJs0IVZjcFjdFnPNCplKAwAy+R/DtM5QIaCx6INWW1+vDn8H
+   w==;
+X-CSE-ConnectionGUID: pAAr1OQvR1CVN8LzyYwtJw==
+X-CSE-MsgGUID: AvfoSuILRgqd5UwFF8engw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11769"; a="88789145"
+X-IronPort-AV: E=Sophos;i="6.23,202,1770624000"; 
+   d="scan'208";a="88789145"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2026 07:37:27 -0700
+X-CSE-ConnectionGUID: SFBMGP/nQPiAuPDHttY2mw==
+X-CSE-MsgGUID: Rs1TJXE3RlO4fkHS2/DSHg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,202,1770624000"; 
+   d="scan'208";a="227137625"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2026 07:37:26 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 27 Apr 2026 07:37:26 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Mon, 27 Apr 2026 07:37:26 -0700
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.10)
+ by edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 27 Apr 2026 07:37:25 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gg7UQ2BC7u8mJL/XZSHw/SVUK1yYyJ6STUhDnQhB0XCpCByswCOxoiUGJ+nEVbmS0/rbE4Q49TLT27ROn9l8FfUseNo5fT5KJS5fC2avz9zDrUw/WA7xG2i+88DFd92Fv/9l7wtXPMwZXoHSXztXBaBQ4r8YgCK5m4ACuZ5MgNBFZhEoQZpGjKbTo8eBql9IFyE3PoCBgHtdYzq7ekII80wYuxasVdUhjoZckwURD2SH8NS8GiZTg5CcVQXmT9XBLXM1legJ2+K+nfCR4HKa5EByIo9Y9RdknI/YMT6H8yqIhEK1gfbAbbEZe5yfpHk/O0EfRe8RK+mmGD9oiDX16Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1cL5HijaFl6JKekO4lMslvr1Qv1WyMh0RxgIJzF7jQo=;
+ b=bcQ+QZcR7pYsyJiM81fM4tCNToZeLlotrbNrx58cfXlpegyQ+BH0i2Kkb4ZSj5bdfVara9GODV9moHl1wV2j1p8neS8dovC/yOSZ2EzdnE1g83A8zO0qhPNZfFLo7M7Jg5AGpWel6QL3tiLif0pt9scyYVPkl9Aac9pUZ55H17K1GB4qGdP5GMQMdTl+guIwl9OTuTjbmFAOEjs8uxfY49+fs4fP4uZyUYoMRiAX6zNAKaSymOq9N9u4Q9s45I+9cVl19DfeIjTLo2ucHq07Fwd/L8djOXdsDcg2QH1WneTkkePDt9zn+6NBbFy2gi7DM8VSQjamLX3j2htGEVEBFg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA0PR11MB7378.namprd11.prod.outlook.com (2603:10b6:208:432::8)
+ by DS0PR11MB8205.namprd11.prod.outlook.com (2603:10b6:8:162::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.16; Mon, 27 Apr
+ 2026 14:37:15 +0000
+Received: from IA0PR11MB7378.namprd11.prod.outlook.com
+ ([fe80::7b0c:7df:21b8:dbbf]) by IA0PR11MB7378.namprd11.prod.outlook.com
+ ([fe80::7b0c:7df:21b8:dbbf%3]) with mapi id 15.20.9870.013; Mon, 27 Apr 2026
+ 14:37:15 +0000
+From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+To: "Oros, Petr" <poros@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "Oros, Petr" <poros@redhat.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Jiri Pirko <jiri@resnulli.us>, Vadim Fedorenko
+	<vadim.fedorenko@linux.dev>, "Vecera, Ivan" <ivecera@redhat.com>, "Schmidt,
+ Michal" <mschmidt@redhat.com>, "Keller, Jacob E" <jacob.e.keller@intel.com>,
+	"Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>, "Rinitha, SX"
+	<sx.rinitha@intel.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH iwl-net v7 2/3] ice: fix missing dpll notifications for SW
+ pins
+Thread-Topic: [PATCH iwl-net v7 2/3] ice: fix missing dpll notifications for
+ SW pins
+Thread-Index: AQHcznrWSjx4SmzWAUmBkivVXic5vrXzBXlQ
+Date: Mon, 27 Apr 2026 14:37:15 +0000
+Message-ID: <IA0PR11MB737871DFB80675BC510EC38C9B362@IA0PR11MB7378.namprd11.prod.outlook.com>
+References: <20260417145907.696307-1-poros@redhat.com>
+ <20260417145907.696307-3-poros@redhat.com>
+In-Reply-To: <20260417145907.696307-3-poros@redhat.com>
+Accept-Language: en-US, pl-PL
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA0PR11MB7378:EE_|DS0PR11MB8205:EE_
+x-ms-office365-filtering-correlation-id: b4028419-f27c-4264-2edc-08dea46a79db
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024|56012099003|22082099003|18002099003|38070700021;
+x-microsoft-antispam-message-info: DdUro5+SReRzpIy6IxJvIj/B8HEvAf4m5IelmhOwdm4QcxsiqD+NqBrVSkc/lBreB7qQfcu5wTpYXh8RxjLyyp9bXJ0j+aLRTtc5nz/LNLhFklio8UZw4iE4iIrO3qg+CszrD7AjuJBYxmov8ZPCRRZEWXjLI8yOGt8QyuEgWTf2JkKMbiLkCniE6XrcnZhVhPCDgR9PPrEkj9EuMNSxRsRe0M9XhNFRic6+iyi1kmRoFOA4vTWYuwLmruxY49buY7SSmKFdVldHs+yLoLrfvgsLAfwGfTRLLjmiKrGX7o2TxA8PjqRc+MD+diIIcBRm3Wex87FjrHJ5xQFMOvG0abb42E4l4siB+Wzwj0ZqDauQk43H+4G4ZQV/wA+JdbfwlyQVLH9Zmu5TUWXPWRJUnVBtNFPUAOziM7f38ETZEhCcXIl6kwQVXh1BCsXgkzxvLOGSHG/kvKpNj8rSQGF/MaFNaGQK4awt+IaTDEqTNHSLFsivnE/629S0jYEwmEFFpTj03WChnFONagsF9WyVY3l3RzGk2ZKUxk+9JbZ08KdqtG4mRDUrGgFWMEOXQHv3W8CrsyIqyUzdYXUSv7bOeaxtQ+HPCgXdAYg1LBRGInxqUpSiiUoC9WGg74ZCECULgRFjv8/S4KKwCoEOXWNQMqM9bOXwxUsNG0dKFbKBO9GDlarJffqgYRj+Acxur/FJ5PoYi9Pud0D2s2ZDaMB1tGKuIK7lLjcw55kn1pkAHQrO2I4zo5R4jMQCqxWeFVCnwZVAIpkU0iDrWv1ZYnCMyFJvx8J0ZyCKFi16o6Jjs3Y=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PR11MB7378.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(56012099003)(22082099003)(18002099003)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?sl5x/Gw6ZD4gO/29pNIOXE+ynNCTwlhKdcDiSYg71/WOeeW3DKLhcHsYr5qe?=
+ =?us-ascii?Q?KXH9n/zAUc9MvHomxC2Kx5fJB9S1Wlh20tnZlzqMHKAQPndvVDCRIPRKFWgr?=
+ =?us-ascii?Q?jXX3YKHjbsOL7+3hVYw7wo6FmjyzjEa6xgj98HLPv00PqA6XhTkVbaGaH9Xc?=
+ =?us-ascii?Q?P83ZHjbnkCekzl0CB9e3eBf6Tvhi/f1grUitaoNF1QCAFcwUtlXLi5hwrLi1?=
+ =?us-ascii?Q?dpjKInzeE8zQN2VCAQesfinK0iGdSdwQ6m52vheo3LNHSonDfbac4bY4Q9Tx?=
+ =?us-ascii?Q?Padm8l/htFtONls5Z3p6wLUUIlou7EJz271hYTREUpKkkuajTYE5cc4yoP6G?=
+ =?us-ascii?Q?bhPj/Ix/o3eKebt63rLASd5Ju/XIYI/cI6j0arvatWoQlr0/dQaZmh/D3qRp?=
+ =?us-ascii?Q?qzs3dd4HYy/dWEogbi2th9Yt1/k/hMXjP4c190r0POn25+mmgPjiXVHi53ti?=
+ =?us-ascii?Q?LRK+Cz+d2dKkFQvrShKerqzbSrVCr+3OKy4hpmSQwcrz4aYnbY4nS2HqBjvO?=
+ =?us-ascii?Q?p+20H/pRVPcxLDzT8u4/oHtgzJ1qOeKl/scf4cxd6F9mpKW3qB034haYqkD6?=
+ =?us-ascii?Q?YR0peBJ7iuIR+rF42eL2XuLa0pgLSstG1yOttarfuGkWsD9rwBCeDdRvutp/?=
+ =?us-ascii?Q?tCPM3VJ8TEaltnMqMEkVd7v+9cbjGaj5yh4nD63LdrPrOaBkQtfHN4U60kp9?=
+ =?us-ascii?Q?q1TCgWm1UYqMT1wMpm7EhlyAhbOcjgnit6BE7zdlEJJ5MAOIruMNwpgUuvL5?=
+ =?us-ascii?Q?Fk6NowcPG97yT5+iUup3CoHBQAs7nMErYQ1P39nWjrMalHtG7j3rz1OMx9zZ?=
+ =?us-ascii?Q?BUkDiI0Zm32ZZeI3dLUeTvjUuyJXNPC4EZu9epo8W2+P9uzrGP7+Ed4nVNE3?=
+ =?us-ascii?Q?3PHtUCDnvhtsSRjzrXIMU2yV+Yibshg+HPPfW72CUL8YxdXf/XKVIbh+/C52?=
+ =?us-ascii?Q?79ywm3R16nwp5IK4ZksoN/ZEefz08BiUXhPHK0qE2379NTFUQ/QTiXpsVqal?=
+ =?us-ascii?Q?Y4u/p3zX7xOY2bNnHDvtrYHUjrZmGi5txndIqPyGpHH5xaDZ0GavcaxN2oc3?=
+ =?us-ascii?Q?IqoO8NZJ1P5wP29c97i+4wYpJ3W6h75Eyi5d+h76FYAyWJAlWyDBbOLNczI3?=
+ =?us-ascii?Q?WtCzixCbKA4e1FJQZuYN7G1RH1p28Lh2NxLseW0vegtnlQWtKcjg/lNz3EKV?=
+ =?us-ascii?Q?AS9VWB67IW/a/b1wuHaaMmAtlRjoQ/NBMQL9xhnVBv42NYMf7WuyYDTbLKf6?=
+ =?us-ascii?Q?6qNQKeaDcbfg/mebqhtQmfCVadJogYhGuOQO22moAIPlO2q5o3pgIOQSHkBz?=
+ =?us-ascii?Q?KWRltfr7mTV3Xzb8fcSRk4bYMVMHSXtORcBvwE0O99RcKQdLwH8yJ31aNmKN?=
+ =?us-ascii?Q?OaTtZMG97Uvf42QNpcMOjIQ0dGU90kTgHlPIdHKeicphB9AiOAl8htb88fIB?=
+ =?us-ascii?Q?D36iDgwYtFant3bMZNuKnQXwgASkLrRs8g/uhZtxQ5JrXKQWOz+JgS1WzjGD?=
+ =?us-ascii?Q?bVmPWaPktz9X0wuiAiUyx0LeHietSY8jE5+2IlLi2+kLp4hVk+ppP+iGMCIB?=
+ =?us-ascii?Q?/6Ga72dtXI7t87LVA5ls9zKXKQ4wUIOttMBTy+EWaT8ED2BsA7UImmLaRFyb?=
+ =?us-ascii?Q?iPy8Rpm6B6QqLCj8gJFjTCy4n8TX24cXG2QBMVWU+Hzuwh1/aWjmYT3quLt2?=
+ =?us-ascii?Q?hDfPQ/Y0rushNmA+y5GKriaFu13TkMUNl71UK2HGMN9W5aUGKAyEe9wCkTGw?=
+ =?us-ascii?Q?JZWM1A2YSFMlWqJa1htjWUoz3O2EBdM=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.21.2604271056460.28583@angie.orcam.me.uk>
-X-Rspamd-Queue-Id: 3230C47495F
+X-Exchange-RoutingPolicyChecked: FSwyZjas4CXlXoRAYr8ReqzFdb+BuQ/y26iK1lA8Lx2K9jNrGV05S+gAf/Rh4MediDd4ocwyZUn/rQ7duO/U235g6EaEss181a0B6kKhaM1uTGBhx6jgL+DD+toKm/D6xsNsmTqX+twOm97YFmJadAgvRN2qb0lQL8sIChaLam1sEoM7H9GawLvSXwQ035mYt6jAjtDnH6L0S0Jn4TA3Hli9DNE5npqPyzyKwX5lzkmEeBqV6sHATWU7CDOZubB1T/G0oC58MUqfL+O1sFdfa8HxGGTJAFpq1Ik+kKXhPF83GhCJrNhB3oV3KCGpMzbueclJylCOKbNHQMt7noJAMw==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA0PR11MB7378.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b4028419-f27c-4264-2edc-08dea46a79db
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Apr 2026 14:37:15.0833
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: WCMkg2TgYaOjFqepnFm26a5fu7Vuyj6uehLhLVgJGZssZo9IB6lor16xdACvcok9R1PVVyqp/lXVYAfvwRSwXnF2p+mdq+0rdB49Thsr+Ng=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8205
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: B646A4749B0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	TAGGED_FROM(0.00)[bounces-281387-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-281388-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,IA0PR11MB7378.namprd11.prod.outlook.com:mid,intel.com:dkim,intel.com:email];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[arkadiusz.kubalewski@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,orcam.me.uk:email,lunn.ch:email,lunn.ch:dkim,lunn.ch:mid]
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 
-On Mon, Apr 27, 2026 at 11:23:17AM +0100, Maciej W. Rozycki wrote:
-> It appears there's a need for a maintainer for the 3Com EtherLink III 
-> family of Ethernet network adapters.  There is documentation available 
-> and the driver is very mature so the task ought to be of little hassle, 
-> so I think I should be able to squeeze in any issues to be addressed.
-> 
-> Signed-off-by: Maciej W. Rozycki <macro@orcam.me.uk>
+>From: Petr Oros <poros@redhat.com>
+>Sent: Friday, April 17, 2026 4:59 PM
+>
+>The SMA/U.FL pin redesign (commit 2dd5d03c77e2 ("ice: redesign dpll
+>sma/u.fl pins control")) introduced software-controlled pins that wrap
+>backing CGU input/output pins, but never updated the notification and
+>data paths to propagate pin events to these SW wrappers.
+>
+>The periodic work sends dpll_pin_change_ntf() only for direct CGU input
+>pins.  SW pins that wrap these inputs never receive change or phase
+>offset notifications, so userspace consumers such as synce4l monitoring
+>SMA pins via dpll netlink never learn about state transitions or phase
+>offset updates.  Similarly, ice_dpll_phase_offset_get() reads the SW
+>pin's own phase_offset field which is never updated; the PPS monitor
+>writes to the backing CGU input's field instead.
+>
+>Fix by introducing ice_dpll_pin_ntf(), a wrapper around
+>dpll_pin_change_ntf() that also notifies any registered SMA/U.FL pin
+>whose backing CGU input matches.  Replace all direct
+>dpll_pin_change_ntf() calls in the periodic notification paths with
+>this wrapper.  Fix ice_dpll_phase_offset_get() to return the backing
+>CGU input's phase_offset for input-direction SW pins.
+>
+>Fixes: 2dd5d03c77e2 ("ice: redesign dpll sma/u.fl pins control")
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+LGTM,
+Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>=20
 
-    Andrew
+>Signed-off-by: Petr Oros <poros@redhat.com>
+>---
+> drivers/net/ethernet/intel/ice/ice_dpll.c | 47 +++++++++++++++++------
+> 1 file changed, 36 insertions(+), 11 deletions(-)
+>
+>diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c
+>b/drivers/net/ethernet/intel/ice/ice_dpll.c
+>index 3a90a2940fdc6e..11b942b83500fb 100644
+>--- a/drivers/net/ethernet/intel/ice/ice_dpll.c
+>+++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
+>@@ -1963,7 +1963,10 @@ ice_dpll_phase_offset_get(const struct dpll_pin
+>*pin, void *pin_priv,
+> 				       d->active_input =3D=3D p->input->pin))
+> 		*phase_offset =3D d->phase_offset *
+>ICE_DPLL_PHASE_OFFSET_FACTOR;
+> 	else if (d->phase_offset_monitor_period)
+>-		*phase_offset =3D p->phase_offset *
+>ICE_DPLL_PHASE_OFFSET_FACTOR;
+>+		*phase_offset =3D (p->input &&
+>+				 p->direction =3D=3D DPLL_PIN_DIRECTION_INPUT ?
+>+				 p->input->phase_offset :
+>+				 p->phase_offset) * ICE_DPLL_PHASE_OFFSET_FACTOR;
+> 	else
+> 		*phase_offset =3D 0;
+> 	mutex_unlock(&pf->dplls.lock);
+>@@ -2659,6 +2662,27 @@ static u64 ice_generate_clock_id(struct ice_pf *pf)
+> 	return pci_get_dsn(pf->pdev);
+> }
+>
+>+/**
+>+ * ice_dpll_pin_ntf - notify pin change including any SW pin wrappers
+>+ * @dplls: pointer to dplls struct
+>+ * @pin: the dpll_pin that changed
+>+ *
+>+ * Send a change notification for @pin and for any registered SMA/U.FL
+>pin
+>+ * whose backing CGU input matches @pin.
+>+ */
+>+static void ice_dpll_pin_ntf(struct ice_dplls *dplls, struct dpll_pin
+>*pin)
+>+{
+>+	dpll_pin_change_ntf(pin);
+>+	for (int i =3D 0; i < ICE_DPLL_PIN_SW_NUM; i++) {
+>+		if (dplls->sma[i].pin && dplls->sma[i].input &&
+>+		    dplls->sma[i].input->pin =3D=3D pin)
+>+			dpll_pin_change_ntf(dplls->sma[i].pin);
+>+		if (dplls->ufl[i].pin && dplls->ufl[i].input &&
+>+		    dplls->ufl[i].input->pin =3D=3D pin)
+>+			dpll_pin_change_ntf(dplls->ufl[i].pin);
+>+	}
+>+}
+>+
+> /**
+>  * ice_dpll_notify_changes - notify dpll subsystem about changes
+>  * @d: pointer do dpll
+>@@ -2667,6 +2691,7 @@ static u64 ice_generate_clock_id(struct ice_pf *pf)
+>  */
+> static void ice_dpll_notify_changes(struct ice_dpll *d)
+> {
+>+	struct ice_dplls *dplls =3D &d->pf->dplls;
+> 	bool pin_notified =3D false;
+>
+> 	if (d->prev_dpll_state !=3D d->dpll_state) {
+>@@ -2675,17 +2700,17 @@ static void ice_dpll_notify_changes(struct
+>ice_dpll *d)
+> 	}
+> 	if (d->prev_input !=3D d->active_input) {
+> 		if (d->prev_input)
+>-			dpll_pin_change_ntf(d->prev_input);
+>+			ice_dpll_pin_ntf(dplls, d->prev_input);
+> 		d->prev_input =3D d->active_input;
+> 		if (d->active_input) {
+>-			dpll_pin_change_ntf(d->active_input);
+>+			ice_dpll_pin_ntf(dplls, d->active_input);
+> 			pin_notified =3D true;
+> 		}
+> 	}
+> 	if (d->prev_phase_offset !=3D d->phase_offset) {
+> 		d->prev_phase_offset =3D d->phase_offset;
+> 		if (!pin_notified && d->active_input)
+>-			dpll_pin_change_ntf(d->active_input);
+>+			ice_dpll_pin_ntf(dplls, d->active_input);
+> 	}
+> }
+>
+>@@ -2714,6 +2739,7 @@ static bool ice_dpll_is_pps_phase_monitor(struct
+>ice_pf *pf)
+>
+> /**
+>  * ice_dpll_pins_notify_mask - notify dpll subsystem about bulk pin
+>changes
+>+ * @dplls: pointer to dplls struct
+>  * @pins: array of ice_dpll_pin pointers registered within dpll subsystem
+>  * @pin_num: number of pins
+>  * @phase_offset_ntf_mask: bitmask of pin indexes to notify
+>@@ -2723,15 +2749,14 @@ static bool ice_dpll_is_pps_phase_monitor(struct
+>ice_pf *pf)
+>  *
+>  * Context: Must be called while pf->dplls.lock is released.
+>  */
+>-static void ice_dpll_pins_notify_mask(struct ice_dpll_pin *pins,
+>+static void ice_dpll_pins_notify_mask(struct ice_dplls *dplls,
+>+				      struct ice_dpll_pin *pins,
+> 				      u8 pin_num,
+> 				      u32 phase_offset_ntf_mask)
+> {
+>-	int i =3D 0;
+>-
+>-	for (i =3D 0; i < pin_num; i++)
+>-		if (phase_offset_ntf_mask & (1 << i))
+>-			dpll_pin_change_ntf(pins[i].pin);
+>+	for (int i =3D 0; i < pin_num; i++)
+>+		if (phase_offset_ntf_mask & BIT(i))
+>+			ice_dpll_pin_ntf(dplls, pins[i].pin);
+> }
+>
+> /**
+>@@ -2907,7 +2932,7 @@ static void ice_dpll_periodic_work(struct
+>kthread_work *work)
+> 	ice_dpll_notify_changes(de);
+> 	ice_dpll_notify_changes(dp);
+> 	if (phase_offset_ntf)
+>-		ice_dpll_pins_notify_mask(d->inputs, d->num_inputs,
+>+		ice_dpll_pins_notify_mask(d, d->inputs, d->num_inputs,
+> 					  phase_offset_ntf);
+>
+> resched:
+>--
+>2.52.0
+
 
