@@ -1,567 +1,314 @@
-Return-Path: <netdev+bounces-281232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281233-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AP02K5YD72lz3QAAu9opvQ
-	(envelope-from <netdev+bounces-281232-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 08:35:02 +0200
+	id IH+HOGEF72ma3wAAu9opvQ
+	(envelope-from <netdev+bounces-281233-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 08:42:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7165646D989
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 08:35:01 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE04A46DBE5
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 08:42:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E96C63015D2C
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 06:33:39 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2FF7B30046A2
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 06:41:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E88437B40A;
-	Mon, 27 Apr 2026 06:33:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A12537B40A;
+	Mon, 27 Apr 2026 06:41:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="anX4AhZo"
+	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="ls2dhz+0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C955737BE9E;
-	Mon, 27 Apr 2026 06:33:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978FC36F42D;
+	Mon, 27 Apr 2026 06:41:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777271589; cv=none; b=bNwHGHjR4xwWzXB8qooFvPEQqrwLcM+lDjzi7qY71ZQvuYua3+BJc4ST2eU6R8379X9K6z/pPaB4WMwGN7bAHvkuQDwIYJOrLEtdPQNMkiJCcV0jFL5HMSXkgiGQj+ChwVlUaBPPb+iCI++5J/kQBOZotYCmqm0CTzSDzXi0iao=
+	t=1777272096; cv=none; b=uMi2LWQWh+BXjRddTwRWQWK7WRnl+KPUA5lfmp0+PKRnzQYn6C5iwoVImFaM3SJta9nH8Z2jllzf2KT3V8KVfB1L9vRVlelHNCLfc64/rgOvs0aB75x6vHJQY+1icobtJ2nxGFREuGsD9N/tg6vHNvkSD+23ZCsiB8fqOuaZGrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777271589; c=relaxed/simple;
-	bh=nmyPO7/Y1zWOK1XIMADIXUdYYPug0rdPrZL2y0/sVrE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eSw2yc6gXtArM5N8NHB3tEBU5nebSRNcIhQ0fGMzkueos385RodXso4+frVshfEJ4o6BeTzDh6W0rgEJ+47fOs73/ovz+yf4Us1bUDbYIdfal/5mhhExgJj586KWa5iBeR6KKPIM9vpeiW0+STBQZuatiWkVPu1e0Cl2FH6j388=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=anX4AhZo; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63QKclrX3253803;
-	Sun, 26 Apr 2026 23:32:59 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=+
-	IHV70NmTBPkv3J6F0Z+QEaLr/EJWloydskWlRdTX/U=; b=anX4AhZotXrtGkoOt
-	bRzhGwIiVse81oKGTOoKqAQne+cXhxSeL7j/Qf/nMnmj12A0FSDokP5alEctM7x7
-	NPEv3LI6UOjv8jYdvriJ5osq5gVpYfzLZT2km6T4j08It26AU0Bc8WuQE87lNBBP
-	MGR8ta2Lys1joW0AKqyX37XzAooybLUM5CoFZE6Ls2Q8hmydOj7FAdzhnudqsSBK
-	vkN8so2oLE4SkZcB387+1YLSmjRnp3Jn+G/o+rmeEMbS/sW9UUePvzbLReORQaCQ
-	2abDmY9j9MLZsE+9gEatHL21jUWwfByUqGeVcgR9k5r2B/3hpzNNQy0GfGPbu4zW
-	qQXxA==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4dshv89fdb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 26 Apr 2026 23:32:59 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+	s=arc-20240116; t=1777272096; c=relaxed/simple;
+	bh=HigACJFofSl0eRRrwhYh6mfDoLYyP8ar+dikkNbpSUM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=YUMR+TPgSFuSOY2M32ej3qql5MoY2O8qiyAFnm2GIsNdDTrd2/21JDmg9ceI5KtQEPtnphUBaoApXrbAHSLeO8yKSb8UKQN5CDWLRXcsT1bLsgOFegMIKAdE8uSYwy/mu5Sy6iBR/dTCcVIHpIsEZFNSD0dxMUPBPEll1qaMCps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=ls2dhz+0; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 63R6euaoF3559075, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
+	s=dkim; t=1777272056;
+	bh=HigACJFofSl0eRRrwhYh6mfDoLYyP8ar+dikkNbpSUM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=ls2dhz+0w0gobaZn9rrp5K6Gp80qNMWH9PcOP+2UjRnJLMHhp+ME7vuVfKpQgU/m0
+	 SmqD+Wu/tyt5x0ReSzpbztK6V7oXwirAC8FUnF5uEaaHxw/8EzYWq1mL+iscKJjNpC
+	 V4KftExwq7XYXdL9vS63L1iRrPn/HjUIVCkYaCFGlmbIz5WHaD5rv9EWRY8VvrHn1t
+	 y1yaIpjdcagZiTaZICT8fcmtdDKneopRoF/kDOnbVvhXh3+ZDShClYrfxQ32uNqMn/
+	 LmT3WtQCUIWxmD2tgU2dlb2PQh0N0qwtMx8BUlW4jXwk0lksV3bX6Sa1BAbMxpnmsr
+	 fW0blTZ5TBLeg==
+Received: from RS-EX-MBS4.realsil.com.cn ([172.29.17.104])
+	by rtits2.realtek.com.tw (8.15.2/3.27/5.94) with ESMTPS id 63R6euaoF3559075
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 27 Apr 2026 14:40:56 +0800
+Received: from RS-EX-MBS3.realsil.com.cn (172.29.17.103) by
+ RS-EX-MBS4.realsil.com.cn (172.29.17.104) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Sun, 26 Apr 2026 23:32:58 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Sun, 26 Apr 2026 23:32:58 -0700
-Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id BC5C43F70BB;
-	Sun, 26 Apr 2026 23:32:54 -0700 (PDT)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-        "Ratheesh
- Kannoth" <rkannoth@marvell.com>,
-        Suman Ghosh <sumang@marvell.com>
-Subject: [PATCH v4 net 10/10] octeontx2-af: npc: cn20k: Reject missing default-rule MCAM indices
-Date: Mon, 27 Apr 2026 12:02:13 +0530
-Message-ID: <20260427063213.3937451-11-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260427063213.3937451-1-rkannoth@marvell.com>
-References: <20260427063213.3937451-1-rkannoth@marvell.com>
+ 15.2.2562.17; Mon, 27 Apr 2026 14:40:56 +0800
+Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) by
+ RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) with mapi id 15.02.2562.017; Mon,
+ 27 Apr 2026 14:40:56 +0800
+From: Javen <javen_xu@realsil.com.cn>
+To: Heiner Kallweit <hkallweit1@gmail.com>,
+        "nic_swsd@realtek.com"
+	<nic_swsd@realtek.com>,
+        "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "horms@kernel.org"
+	<horms@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [RFC Patch net-next v1 5/9] r8169: add support for msix
+Thread-Topic: [RFC Patch net-next v1 5/9] r8169: add support for msix
+Thread-Index: AQHc0Gw4fERucT/oREGcOC5PYUBGCbXv2r4AgAJu8ZA=
+Date: Mon, 27 Apr 2026 06:40:56 +0000
+Message-ID: <2c7dd30a461944e9bc298d7d8f494dab@realsil.com.cn>
+References: <20260420021957.1756-1-javen_xu@realsil.com.cn>
+ <20260420021957.1756-6-javen_xu@realsil.com.cn>
+ <6345109a-3e87-476a-9abe-b8828e0fe9b6@gmail.com>
+In-Reply-To: <6345109a-3e87-476a-9abe-b8828e0fe9b6@gmail.com>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI3MDA2NyBTYWx0ZWRfX3VhBDTrHjb6X
- f6Tsb2jh1WsJxYd6iZFvdo8U8TDkayPkv+4AzhEueiFENSqSrjH6NerxaH/2ItKhVIwHdJspB+U
- YMC6diZtVRIuOILiOHLdifCYeDU3cubxzbwTgznGHeKdrvlytSc5bj8sl4W9jglGgyQ3TilX37G
- LXVtTmrpG/faDDjW9JfjuhqzzEDR+CVxKdVtPxq3rJDZooTOKkm3Oq2t2aYsZFzN0OTYuoPQmLf
- SQdSQAB+aBX53Js/1rEfLlnTS7ktjZfbXjiLGKn2jgF+j1JiXgQzqPuBJVEEHpTQ4wO8anMdcHw
- gqdO6dNkppSgtfLYGsv0aAfsLWYKPiRL/CBj3SH89W9z4KGgD3ezxH0u2GDNOcAvcu/OaUXMLga
- hAM7DUxhV2/GdprK8EZWAfG7OpykhU6xVVQvhwt3p9z2KzKnkrAWjq1hCKLjSbBQj5eFBHEAhHf
- sJwSYnFlWzGCBsVHJqQ==
-X-Proofpoint-GUID: gsY4GUq5Xe3F4BdgmbaJjMJq5CGbXykT
-X-Authority-Analysis: v=2.4 cv=ILgyzAvG c=1 sm=1 tr=0 ts=69ef031b cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=TtqV-g6YmW1Jfm2GSLaY:22 a=M5GUcnROAAAA:8 a=PwRMgbMYhMs0H2_e3OEA:9
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: gsY4GUq5Xe3F4BdgmbaJjMJq5CGbXykT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-27_01,2026-04-21_02,2025-10-01_01
-X-Rspamd-Queue-Id: 7165646D989
+X-Rspamd-Queue-Id: EE04A46DBE5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.44 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
+	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281232-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.999];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,marvell.com:email,marvell.com:dkim,marvell.com:mid];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-281233-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[realsil.com.cn:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[realsil.com.cn:email,realsil.com.cn:dkim,realsil.com.cn:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-When cn20k default L2 rules are not installed,
-npc_cn20k_dft_rules_idx_get() leaves broadcast, multicast,
-promiscuous, and unicast slots at USHRT_MAX.
-npc_get_nixlf_mcam_index() previously returned that sentinel as a
-valid MCAM index, so callers could program hardware with an invalid
-index.
-
-Return -EINVAL from the cn20k branches of npc_get_nixlf_mcam_index()
-when the requested slot is still USHRT_MAX.  Harden cn20k NPC MCAM
-entry helpers to reject out-of-range indices before touching hardware.
-
-Drop the early bounds check in npc_enable_mcam_entry() for cn20k so
-invalid indices are validated inside npc_cn20k_enable_mcam_entry()
-instead of being silently ignored.
-
-In rvu_npc_update_flowkey_alg_idx(), treat negative MCAM indices like
-out-of-range values, and only update RSS actions for promiscuous and
-all-multi paths when the resolved index is non-negative.
-
-Cc: Suman Ghosh <sumang@marvell.com>
-Fixes: 6d1e70282f76 ("octeontx2-af: npc: cn20k: Use common APIs")
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
----
- .../ethernet/marvell/octeontx2/af/cn20k/npc.c |  14 +-
- .../ethernet/marvell/octeontx2/af/cn20k/npc.h |   1 +
- .../ethernet/marvell/octeontx2/af/rvu_nix.c   |   3 +
- .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 139 +++++++++++++++++-
- .../marvell/octeontx2/af/rvu_npc_fs.c         |  10 +-
- 5 files changed, 157 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-index 15f468a86a46..dfc03ac2bbcc 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-@@ -808,6 +808,9 @@ npc_cn20k_enable_mcam_entry(struct rvu *rvu, int blkaddr,
- 	u64 cfg, hw_prio;
- 	u8 kw_type;
- 
-+	if (index < 0 || index >= mcam->total_entries)
-+		return -EINVAL;
-+
- 	if (npc_mcam_idx_2_key_type(rvu, index, &kw_type))
- 		return -EINVAL;
- 
-@@ -1056,6 +1059,9 @@ int npc_cn20k_config_mcam_entry(struct rvu *rvu, int blkaddr, int index,
- 	int kw = 0;
- 	u8 kw_type;
- 
-+	if (index < 0 || index >= mcam->total_entries)
-+		return -EINVAL;
-+
- 	if (npc_mcam_idx_2_key_type(rvu, index, &kw_type))
- 		return -EINVAL;
- 
-@@ -1148,6 +1154,9 @@ int npc_cn20k_copy_mcam_entry(struct rvu *rvu, int blkaddr, u16 src, u16 dest)
- 	int bank, i, sb, db;
- 	int dbank, sbank;
- 
-+	if (src >= mcam->total_entries || dest >= mcam->total_entries)
-+		return -EINVAL;
-+
- 	dbank = npc_get_bank(mcam, dest);
- 	sbank = npc_get_bank(mcam, src);
- 
-@@ -1213,6 +1222,9 @@ int npc_cn20k_read_mcam_entry(struct rvu *rvu, int blkaddr, u16 index,
- 	int kw = 0, bank;
- 	u8 kw_type;
- 
-+	if (index >= mcam->total_entries)
-+		return -EINVAL;
-+
- 	if (npc_mcam_idx_2_key_type(rvu, index, &kw_type))
- 		return -EINVAL;
- 
-@@ -4156,7 +4168,7 @@ int rvu_mbox_handler_npc_get_dft_rl_idxs(struct rvu *rvu, struct msg_req *req,
- 	return 0;
- }
- 
--static bool npc_is_cgx_or_lbk(struct rvu *rvu, u16 pcifunc)
-+bool npc_is_cgx_or_lbk(struct rvu *rvu, u16 pcifunc)
- {
- 	return is_pf_cgxmapped(rvu, rvu_get_pf(rvu->pdev, pcifunc)) ||
- 		is_lbk_vf(rvu, pcifunc);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
-index 2f761b97f91b..3d5eb952cc07 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
-@@ -335,5 +335,6 @@ int npc_mcam_idx_2_key_type(struct rvu *rvu, u16 mcam_idx, u8 *key_type);
- u16 npc_cn20k_vidx2idx(u16 index);
- u16 npc_cn20k_idx2vidx(u16 idx);
- int npc_cn20k_defrag(struct rvu *rvu);
-+bool npc_is_cgx_or_lbk(struct rvu *rvu, u16 pcifunc);
- 
- #endif /* NPC_CN20K_H */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-index ef5b081162eb..f977734ae712 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-@@ -3577,6 +3577,9 @@ static int nix_update_mce_rule(struct rvu *rvu, u16 pcifunc,
- 	mcam_index = npc_get_nixlf_mcam_index(mcam,
- 					      pcifunc & ~RVU_PFVF_FUNC_MASK,
- 					      nixlf, type);
-+	if (mcam_index < 0)
-+		return -EINVAL;
-+
- 	err = nix_update_mce_list(rvu, pcifunc, mce_list,
- 				  mce_idx, mcam_index, add);
- 	return err;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-index 5d349d131fdb..9e6c79d6fadf 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-@@ -163,14 +163,35 @@ int npc_get_nixlf_mcam_index(struct npc_mcam *mcam,
- 		if (rc)
- 			return -EFAULT;
- 
-+		if (is_lbk_vf(rvu, pcifunc)) {
-+			if (promisc == USHRT_MAX)
-+				return -EINVAL;
-+			return promisc;
-+		}
-+
-+		if (is_cgx_vf(rvu, pcifunc)) {
-+			if (ucast == USHRT_MAX)
-+				return -EINVAL;
-+
-+			return ucast;
-+		}
-+
- 		switch (type) {
- 		case NIXLF_BCAST_ENTRY:
-+			if (bcast == USHRT_MAX)
-+				return -EINVAL;
- 			return bcast;
- 		case NIXLF_ALLMULTI_ENTRY:
-+			if (mcast == USHRT_MAX)
-+				return -EINVAL;
- 			return mcast;
- 		case NIXLF_PROMISC_ENTRY:
-+			if (promisc == USHRT_MAX)
-+				return -EINVAL;
- 			return promisc;
- 		case NIXLF_UCAST_ENTRY:
-+			if (ucast == USHRT_MAX)
-+				return -EINVAL;
- 			return ucast;
- 		default:
- 			return -EINVAL;
-@@ -238,9 +259,6 @@ void npc_enable_mcam_entry(struct rvu *rvu, struct npc_mcam *mcam,
- 	int actbank = bank;
- 
- 	if (is_cn20k(rvu->pdev)) {
--		if (index < 0 || index >= mcam->banksize * mcam->banks)
--			return;
--
- 		if (npc_cn20k_enable_mcam_entry(rvu, blkaddr, index, enable))
- 			dev_err(rvu->dev, "Error to %s mcam %u entry\n",
- 				enable ? "enable" : "disable", index);
-@@ -434,6 +452,15 @@ static u64 npc_get_default_entry_action(struct rvu *rvu, struct npc_mcam *mcam,
- 
- 	index = npc_get_nixlf_mcam_index(mcam, pf_func, nixlf,
- 					 NIXLF_UCAST_ENTRY);
-+
-+	if (index < 0) {
-+		dev_err(rvu->dev,
-+			"%s: failed to get ucast entry pcifunc:0x%x\n",
-+			__func__, pf_func);
-+		/* Action 0 is drop */
-+		return 0;
-+	}
-+
- 	bank = npc_get_bank(mcam, index);
- 	index &= (mcam->banksize - 1);
- 
-@@ -700,6 +727,12 @@ void rvu_npc_install_ucast_entry(struct rvu *rvu, u16 pcifunc,
- 
- 	index = npc_get_nixlf_mcam_index(mcam, pcifunc,
- 					 nixlf, NIXLF_UCAST_ENTRY);
-+	if (index < 0) {
-+		dev_err(rvu->dev,
-+			"%s: Error to get ucast entry for pcifunc=%#x\n",
-+			__func__, pcifunc);
-+		return;
-+	}
- 
- 	/* Don't change the action if entry is already enabled
- 	 * Otherwise RSS action may get overwritten.
-@@ -755,11 +788,21 @@ void rvu_npc_install_promisc_entry(struct rvu *rvu, u16 pcifunc,
- 	index = npc_get_nixlf_mcam_index(mcam, pcifunc,
- 					 nixlf, NIXLF_PROMISC_ENTRY);
- 
-+	/* In cn20k, default indexes are installed only for CGX mapped
-+	 * and lbk interfaces
-+	 */
- 	if (is_cgx_vf(rvu, pcifunc))
- 		index = npc_get_nixlf_mcam_index(mcam,
- 						 pcifunc & ~RVU_PFVF_FUNC_MASK,
- 						 nixlf, NIXLF_PROMISC_ENTRY);
- 
-+	if (index < 0) {
-+		dev_err(rvu->dev,
-+			"%s: Error to get promisc entry for pcifunc=%#x\n",
-+			__func__, pcifunc);
-+		return;
-+	}
-+
- 	/* If the corresponding PF's ucast action is RSS,
- 	 * use the same action for promisc also
- 	 * Please note that for lbk(s) "index" and "ucast_idx"
-@@ -770,6 +813,12 @@ void rvu_npc_install_promisc_entry(struct rvu *rvu, u16 pcifunc,
- 	else
- 		ucast_idx = npc_get_nixlf_mcam_index(mcam, pcifunc,
- 						     nixlf, NIXLF_UCAST_ENTRY);
-+	if (ucast_idx < 0) {
-+		dev_err(rvu->dev,
-+			"%s: Error to get ucast/promisc entry for pcifunc=%#x\n",
-+			__func__, pcifunc);
-+		return;
-+	}
- 
- 	if (is_mcam_entry_enabled(rvu, mcam, blkaddr, ucast_idx))
- 		*(u64 *)&action = npc_get_mcam_action(rvu, mcam,
-@@ -844,6 +893,14 @@ void rvu_npc_enable_promisc_entry(struct rvu *rvu, u16 pcifunc,
- 
- 	index = npc_get_nixlf_mcam_index(mcam, pcifunc,
- 					 nixlf, NIXLF_PROMISC_ENTRY);
-+
-+	if (index < 0) {
-+		dev_err(rvu->dev,
-+			"%s: Error to get promisc entry for pcifunc=%#x\n",
-+			__func__, pcifunc);
-+		return;
-+	}
-+
- 	npc_enable_mcam_entry(rvu, mcam, blkaddr, index, enable);
- }
- 
-@@ -884,6 +941,12 @@ void rvu_npc_install_bcast_match_entry(struct rvu *rvu, u16 pcifunc,
- 
- 	index = npc_get_nixlf_mcam_index(mcam, pcifunc,
- 					 nixlf, NIXLF_BCAST_ENTRY);
-+	if (index < 0) {
-+		dev_err(rvu->dev,
-+			"%s: Error to get bcast entry for pcifunc=%#x\n",
-+			__func__, pcifunc);
-+		return;
-+	}
- 
- 	if (!hw->cap.nix_rx_multicast) {
- 		/* Early silicon doesn't support pkt replication,
-@@ -948,12 +1011,25 @@ void rvu_npc_install_allmulti_entry(struct rvu *rvu, u16 pcifunc, int nixlf,
- 
- 	index = npc_get_nixlf_mcam_index(mcam, pcifunc,
- 					 nixlf, NIXLF_ALLMULTI_ENTRY);
-+	if (index < 0) {
-+		dev_err(rvu->dev,
-+			"%s: Error to get mcast entry for pcifunc=%#x\n",
-+			__func__, pcifunc);
-+		return;
-+	}
- 
- 	/* If the corresponding PF's ucast action is RSS,
- 	 * use the same action for multicast entry also
- 	 */
- 	ucast_idx = npc_get_nixlf_mcam_index(mcam, pcifunc,
- 					     nixlf, NIXLF_UCAST_ENTRY);
-+	if (ucast_idx < 0) {
-+		dev_err(rvu->dev,
-+			"%s: Error to get ucast entry for pcifunc=%#x\n",
-+			__func__, pcifunc);
-+		return;
-+	}
-+
- 	if (is_mcam_entry_enabled(rvu, mcam, blkaddr, ucast_idx))
- 		*(u64 *)&action = npc_get_mcam_action(rvu, mcam,
- 							blkaddr, ucast_idx);
-@@ -1018,6 +1094,13 @@ void rvu_npc_enable_allmulti_entry(struct rvu *rvu, u16 pcifunc, int nixlf,
- 
- 	index = npc_get_nixlf_mcam_index(mcam, pcifunc, nixlf,
- 					 NIXLF_ALLMULTI_ENTRY);
-+	if (index < 0) {
-+		dev_err(rvu->dev,
-+			"%s: Error to get mcast entry for pcifunc=%#x\n",
-+			__func__, pcifunc);
-+		return;
-+	}
-+
- 	npc_enable_mcam_entry(rvu, mcam, blkaddr, index, enable);
- }
- 
-@@ -1130,8 +1213,12 @@ void rvu_npc_update_flowkey_alg_idx(struct rvu *rvu, u16 pcifunc, int nixlf,
- 		index = mcam_index;
- 	}
- 
--	if (index >= mcam->total_entries)
-+	if (index < 0 || index >= mcam->total_entries) {
-+		dev_err(rvu->dev,
-+			"%s: Invalid mcam index, pcifunc=%#x\n",
-+			__func__, pcifunc);
- 		return;
-+	}
- 
- 	bank = npc_get_bank(mcam, index);
- 	index &= (mcam->banksize - 1);
-@@ -1175,16 +1262,18 @@ void rvu_npc_update_flowkey_alg_idx(struct rvu *rvu, u16 pcifunc, int nixlf,
- 		/* If PF's promiscuous  entry is enabled,
- 		 * Set RSS action for that entry as well
- 		 */
--		npc_update_rx_action_with_alg_idx(rvu, action, pfvf, index,
--						  blkaddr, alg_idx);
-+		if (index >= 0)
-+			npc_update_rx_action_with_alg_idx(rvu, action, pfvf, index,
-+							  blkaddr, alg_idx);
- 
- 		index = npc_get_nixlf_mcam_index(mcam, pcifunc,
- 						 nixlf, NIXLF_ALLMULTI_ENTRY);
- 		/* If PF's allmulti  entry is enabled,
- 		 * Set RSS action for that entry as well
- 		 */
--		npc_update_rx_action_with_alg_idx(rvu, action, pfvf, index,
--						  blkaddr, alg_idx);
-+		if (index >= 0)
-+			npc_update_rx_action_with_alg_idx(rvu, action, pfvf, index,
-+							  blkaddr, alg_idx);
- 	}
- }
- 
-@@ -1197,12 +1286,22 @@ void npc_enadis_default_mce_entry(struct rvu *rvu, u16 pcifunc,
- 	int index, blkaddr, mce_idx;
- 	struct rvu_pfvf *pfvf;
- 
-+	/* multicast pkt replication is not enabled for AF's VFs & SDP links */
-+	if (is_lbk_vf(rvu, pcifunc) || is_sdp_pfvf(rvu, pcifunc))
-+		return;
-+
- 	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
- 	if (blkaddr < 0)
- 		return;
- 
- 	index = npc_get_nixlf_mcam_index(mcam, pcifunc & ~RVU_PFVF_FUNC_MASK,
- 					 nixlf, type);
-+	if (index < 0) {
-+		dev_err(rvu->dev,
-+			"%s: Error to get entry for pcifunc=%#x, type=%u\n",
-+			__func__, pcifunc, type);
-+		return;
-+	}
- 
- 	/* disable MCAM entry when packet replication is not supported by hw */
- 	if (!hw->cap.nix_rx_multicast && !is_vf(pcifunc)) {
-@@ -1231,6 +1330,10 @@ static void npc_enadis_default_entries(struct rvu *rvu, u16 pcifunc,
- 	struct npc_mcam *mcam = &rvu->hw->mcam;
- 	int index, blkaddr;
- 
-+	/* only CGX or LBK interfaces have default entries */
-+	if (is_cn20k(rvu->pdev) && !npc_is_cgx_or_lbk(rvu, pcifunc))
-+		return;
-+
- 	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
- 	if (blkaddr < 0)
- 		return;
-@@ -1240,6 +1343,12 @@ static void npc_enadis_default_entries(struct rvu *rvu, u16 pcifunc,
- 				     pfvf->nix_rx_intf)) {
- 		index = npc_get_nixlf_mcam_index(mcam, pcifunc,
- 						 nixlf, NIXLF_UCAST_ENTRY);
-+		if (index < 0) {
-+			dev_err(rvu->dev,
-+				"%s: Error to get ucast entry for pcifunc=%#x\n",
-+				__func__, pcifunc);
-+			return;
-+		}
- 		npc_enable_mcam_entry(rvu, mcam, blkaddr, index, enable);
- 	}
- 
-@@ -3897,6 +4006,14 @@ int rvu_mbox_handler_npc_read_base_steer_rule(struct rvu *rvu,
- 	/* Read the default ucast entry if there is no pkt steering rule */
- 	index = npc_get_nixlf_mcam_index(mcam, pcifunc, nixlf,
- 					 NIXLF_UCAST_ENTRY);
-+	if (index < 0) {
-+		mutex_unlock(&mcam->lock);
-+		dev_err(rvu->dev,
-+			"%s: Error to get ucast entry for pcifunc=%#x\n",
-+			__func__, pcifunc);
-+		goto out;
-+	}
-+
- read_entry:
- 	/* Read the mcam entry */
- 	npc_read_mcam_entry(rvu, mcam, blkaddr, index, &rsp->entry, &intf,
-@@ -3970,6 +4087,12 @@ void rvu_npc_clear_ucast_entry(struct rvu *rvu, int pcifunc, int nixlf)
- 
- 	ucast_idx = npc_get_nixlf_mcam_index(mcam, pcifunc,
- 					     nixlf, NIXLF_UCAST_ENTRY);
-+	if (ucast_idx < 0) {
-+		dev_err(rvu->dev,
-+			"%s: Error to get ucast entry for pcifunc=%#x\n",
-+			__func__, pcifunc);
-+		return;
-+	}
- 
- 	npc_enable_mcam_entry(rvu, mcam, blkaddr, ucast_idx, false);
- 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-index fe10554b1f0e..6ae9cdcb608b 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-@@ -1444,7 +1444,7 @@ static int npc_install_flow(struct rvu *rvu, int blkaddr, u16 target,
- 	struct msg_rsp write_rsp;
- 	struct mcam_entry *entry;
- 	bool new = false;
--	u16 entry_index;
-+	int entry_index;
- 	int err;
- 
- 	installed_features = req->features;
-@@ -1477,6 +1477,14 @@ static int npc_install_flow(struct rvu *rvu, int blkaddr, u16 target,
- 	if (req->default_rule) {
- 		entry_index = npc_get_nixlf_mcam_index(mcam, target, nixlf,
- 						       NIXLF_UCAST_ENTRY);
-+
-+		if (entry_index < 0) {
-+			dev_err(rvu->dev,
-+				"%s: Error to get ucast entry for target=%#x\n",
-+				__func__, target);
-+			return -EINVAL;
-+		}
-+
- 		enable = is_mcam_entry_enabled(rvu, mcam, blkaddr, entry_index);
- 	}
- 
--- 
-2.43.0
-
+Pk9uIDIwLjA0LjIwMjYgMDQ6MTksIGphdmVuIHdyb3RlOg0KPj4gRnJvbTogSmF2ZW4gWHUgPGph
+dmVuX3h1QHJlYWxzaWwuY29tLmNuPg0KPj4NCj4+IFRoaXMgcGF0Y2ggYWRkIHN1cHBvcnQgZm9y
+IG1zaXguIEJ1dCB3ZSBzdGlsbCB1c2UgTVNJIGhlcmUuIEFuZCB3ZQ0KPj4gZm9yY2UgbnZlY3Mg
+dG8gMS4gV2Ugd2lsbCBtb2RpZnkgaXQgaW4gcnNzIHBhdGNoLg0KPg0KPlRoaXMgZGVzY3JpcHRp
+b24gaXMgd3JvbmcuIEFsc28gYXMgb2YgdG9kYXkgcjgxNjkgc3VwcG9ydHMgTVNJWC4NCj5SZWFz
+b24gbGlrZWx5IGlzIHRoYXQgeW91J3JlIGNvcHlpbmcgY29kZSBmcm9tIHZlbmRvciBkcml2ZXIu
+DQo+DQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogSmF2ZW4gWHUgPGphdmVuX3h1QHJlYWxzaWwuY29t
+LmNuPg0KPj4gLS0tDQo+PiAgZHJpdmVycy9uZXQvZXRoZXJuZXQvcmVhbHRlay9yODE2OV9tYWlu
+LmMgfCAxNjINCj4+ICsrKysrKysrKysrKysrKysrKysrLS0NCj4+ICAxIGZpbGUgY2hhbmdlZCwg
+MTUxIGluc2VydGlvbnMoKyksIDExIGRlbGV0aW9ucygtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9k
+cml2ZXJzL25ldC9ldGhlcm5ldC9yZWFsdGVrL3I4MTY5X21haW4uYw0KPj4gYi9kcml2ZXJzL25l
+dC9ldGhlcm5ldC9yZWFsdGVrL3I4MTY5X21haW4uYw0KPj4gaW5kZXggNTJlNjkwZWJhNjQ0Li43
+ZDQ5MzM0MmFiNGIgMTAwNjQ0DQo+PiAtLS0gYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9yZWFsdGVr
+L3I4MTY5X21haW4uYw0KPj4gKysrIGIvZHJpdmVycy9uZXQvZXRoZXJuZXQvcmVhbHRlay9yODE2
+OV9tYWluLmMNCj4+IEBAIC0xNzY0LDI2ICsxNzY0LDQwIEBAIHN0YXRpYyB1MzIgcnRsX2dldF9l
+dmVudHMoc3RydWN0DQo+PiBydGw4MTY5X3ByaXZhdGUgKnRwKQ0KPj4NCj4+ICBzdGF0aWMgdm9p
+ZCBydGxfYWNrX2V2ZW50cyhzdHJ1Y3QgcnRsODE2OV9wcml2YXRlICp0cCwgdTMyIGJpdHMpICB7
+DQo+PiAtICAgICBpZiAocnRsX2lzXzgxMjUodHApKQ0KPj4gKyAgICAgaWYgKHJ0bF9pc184MTI1
+KHRwKSkgew0KPj4gICAgICAgICAgICAgICBSVExfVzMyKHRwLCBJbnRyU3RhdHVzXzgxMjUsIGJp
+dHMpOw0KPj4gLSAgICAgZWxzZQ0KPj4gKyAgICAgICAgICAgICBpZiAodHAtPmZlYXR1cmVzICYg
+UlRMX0ZFQVRVUkVfTVNJWCkgew0KPj4gKyAgICAgICAgICAgICAgICAgICAgIFJUTF9XMzIodHAs
+IElTUl9WMl84MTI1LCAweGZmZmZmZmZmKTsNCj4+ICsgICAgICAgICAgICAgICAgICAgICBSVExf
+VzMyKHRwLCBJU1JfVjRfTDJfODEyNSwgMHhmZmZmZmZmZik7DQo+PiArICAgICAgICAgICAgIH0N
+Cj4+ICsgICAgIH0gZWxzZSB7DQo+PiAgICAgICAgICAgICAgIFJUTF9XMTYodHAsIEludHJTdGF0
+dXMsIGJpdHMpOw0KPj4gKyAgICAgfQ0KPj4gIH0NCj4+DQo+PiAgc3RhdGljIHZvaWQgcnRsX2ly
+cV9kaXNhYmxlKHN0cnVjdCBydGw4MTY5X3ByaXZhdGUgKnRwKSAgew0KPj4gLSAgICAgaWYgKHJ0
+bF9pc184MTI1KHRwKSkNCj4+ICsgICAgIGlmIChydGxfaXNfODEyNSh0cCkpIHsNCj4+ICAgICAg
+ICAgICAgICAgUlRMX1czMih0cCwgSW50ck1hc2tfODEyNSwgMCk7DQo+PiAtICAgICBlbHNlDQo+
+PiArICAgICAgICAgICAgIGlmICh0cC0+ZmVhdHVyZXMgJiBSVExfRkVBVFVSRV9NU0lYKSB7DQo+
+PiArICAgICAgICAgICAgICAgICAgICAgUlRMX1czMih0cCwgSU1SX1YyX0NMRUFSX1JFR184MTI1
+LCAweGZmZmZmZmZmKTsNCj4+ICsgICAgICAgICAgICAgICAgICAgICBSVExfVzMyKHRwLCBJTVJf
+VjRfTDJfQ0xFQVJfUkVHXzgxMjUsIDB4ZmZmZmZmZmYpOw0KPj4gKyAgICAgICAgICAgICB9DQo+
+PiArICAgICB9IGVsc2Ugew0KPj4gICAgICAgICAgICAgICBSVExfVzE2KHRwLCBJbnRyTWFzaywg
+MCk7DQo+PiArICAgICB9DQo+PiAgfQ0KPj4NCj4+ICBzdGF0aWMgdm9pZCBydGxfaXJxX2VuYWJs
+ZShzdHJ1Y3QgcnRsODE2OV9wcml2YXRlICp0cCkgIHsNCj4+IC0gICAgIGlmIChydGxfaXNfODEy
+NSh0cCkpDQo+PiAtICAgICAgICAgICAgIFJUTF9XMzIodHAsIEludHJNYXNrXzgxMjUsIHRwLT5p
+cnFfbWFzayk7DQo+PiAtICAgICBlbHNlDQo+PiArICAgICBpZiAocnRsX2lzXzgxMjUodHApKSB7
+DQo+PiArICAgICAgICAgICAgIGlmICh0cC0+ZmVhdHVyZXMgJiBSVExfRkVBVFVSRV9NU0lYKQ0K
+Pj4gKyAgICAgICAgICAgICAgICAgICAgIFJUTF9XMzIodHAsIElNUl9WMl9TRVRfUkVHXzgxMjUs
+IHRwLT5pcnFfbWFzayk7DQo+PiArICAgICAgICAgICAgIGVsc2UNCj4+ICsgICAgICAgICAgICAg
+ICAgICAgICBSVExfVzMyKHRwLCBJbnRyTWFza184MTI1LCB0cC0+aXJxX21hc2spOw0KPj4gKyAg
+ICAgfSBlbHNlIHsNCj4+ICAgICAgICAgICAgICAgUlRMX1cxNih0cCwgSW50ck1hc2ssIHRwLT5p
+cnFfbWFzayk7DQo+PiArICAgICB9DQo+PiAgfQ0KPj4NCj4+ICBzdGF0aWMgdm9pZCBydGw4MTY5
+X2lycV9tYXNrX2FuZF9hY2soc3RydWN0IHJ0bDgxNjlfcHJpdmF0ZSAqdHApIEBADQo+PiAtMjg5
+NCw2ICsyOTA4LDEwIEBAIHN0YXRpYyB2b2lkIHJ0bF9zb2Z0d2FyZV9wYXJhbWV0ZXJfaW5pdGlh
+bGl6ZShzdHJ1Y3QNCj5ydGw4MTY5X3ByaXZhdGUgKnRwKQ0KPj4gICAgICAgdHAtPkluaXRSeERl
+c2NUeXBlID0gUlhfREVTQ19SSU5HX1RZUEVfREVBRlVMVDsNCj4+ICAgICAgIHRwLT5Id0N1cnJJ
+c3JWZXIgPSB0cC0+SHdTdXBwSXNyVmVyOw0KPj4NCj4+ICsgICAgIC8qIFRoaXMganVzdCBmb3Jj
+ZSBudmVjcywgYW5kIHdpbGwgYmUgcmVtb3ZlIGluIHRoZSBmb2xsb3dpbmcgcGF0Y2gqLw0KPj4g
+KyAgICAgdHAtPm1pbl9pcnFfbnZlY3MgPSAxOw0KPj4gKyAgICAgdHAtPm1heF9pcnFfbnZlY3Mg
+PSAxOw0KPj4gKw0KPj4gICAgICAgcnRsX3NldHVwX21xc19yZWcodHApOw0KPj4gICAgICAgcnRs
+X3NldF9yaW5nX3NpemUodHAsIE5VTV9SWF9ERVNDLCBOVU1fVFhfREVTQyk7ICB9IEBAIC01MzIx
+LDYNCj4+ICs1MzM5LDQ0IEBAIHN0YXRpYyB2b2lkIHJ0bDgxNjlfZnJlZV9pcnEoc3RydWN0IHJ0
+bDgxNjlfcHJpdmF0ZSAqdHApDQo+PiAgICAgICB9DQo+PiAgfQ0KPj4NCj4+ICtzdGF0aWMgdm9p
+ZCBydGw4MTY5X2Rpc2FibGVfaHdfaW50ZXJydXB0X21zaXgoc3RydWN0IHJ0bDgxNjlfcHJpdmF0
+ZQ0KPj4gKyp0cCwgaW50IG1lc3NhZ2VfaWQpIHsNCj4+ICsgICAgIFJUTF9XMzIodHAsIElNUl9W
+Ml9DTEVBUl9SRUdfODEyNSwgQklUKG1lc3NhZ2VfaWQpKTsgfQ0KPj4gKw0KPj4gK3N0YXRpYyB2
+b2lkIHJ0bDgxNjlfY2xlYXJfaHdfaXNyKHN0cnVjdCBydGw4MTY5X3ByaXZhdGUgKnRwLCBpbnQN
+Cj4+ICttZXNzYWdlX2lkKSB7DQo+PiArICAgICBSVExfVzMyKHRwLCBJU1JfVjJfODEyNSwgQklU
+KG1lc3NhZ2VfaWQpKTsgfQ0KPj4gKw0KPj4gK3N0YXRpYyB2b2lkIHJ0bDgxNjlfZW5hYmxlX2h3
+X2ludGVycnVwdF9tc2l4KHN0cnVjdCBydGw4MTY5X3ByaXZhdGUNCj4+ICsqdHAsIGludCBtZXNz
+YWdlX2lkKSB7DQo+PiArICAgICBSVExfVzMyKHRwLCBJTVJfVjJfU0VUX1JFR184MTI1LCBCSVQo
+bWVzc2FnZV9pZCkpOyB9DQo+PiArDQo+PiArc3RhdGljIGlycXJldHVybl90IHJ0bDgxNjlfaW50
+ZXJydXB0X21zaXgoaW50IGlycSwgdm9pZA0KPj4gKypkZXZfaW5zdGFuY2UpIHsNCj4+ICsgICAg
+IHN0cnVjdCBydGw4MTY5X25hcGkgKm5hcGkgPSBkZXZfaW5zdGFuY2U7DQo+PiArICAgICBzdHJ1
+Y3QgcnRsODE2OV9wcml2YXRlICp0cCA9IG5hcGktPnByaXY7DQo+PiArICAgICBpbnQgbWVzc2Fn
+ZV9pZCA9IG5hcGktPmluZGV4Ow0KPj4gKw0KPj4gKyAgICAgcnRsODE2OV9kaXNhYmxlX2h3X2lu
+dGVycnVwdF9tc2l4KHRwLCBtZXNzYWdlX2lkKTsNCj4+ICsNCj4+ICsgICAgIHJ0bDgxNjlfY2xl
+YXJfaHdfaXNyKHRwLCBtZXNzYWdlX2lkKTsNCj4+ICsNCj4+ICsgICAgIGlmIChtZXNzYWdlX2lk
+ID09IE1TSVhfSURfVjRfTElOS0NIRykgew0KPj4gKyAgICAgICAgICAgICBwaHlfbWFjX2ludGVy
+cnVwdCh0cC0+cGh5ZGV2KTsNCj4+ICsgICAgICAgICAgICAgcnRsODE2OV9lbmFibGVfaHdfaW50
+ZXJydXB0X21zaXgodHAsIG1lc3NhZ2VfaWQpOw0KPj4gKyAgICAgICAgICAgICByZXR1cm4gSVJR
+X0hBTkRMRUQ7DQo+PiArICAgICB9DQo+PiArDQo+PiArICAgICB0cC0+cmVjaGVja19kZXNjX293
+bmJpdCA9IHRydWU7DQo+PiArDQo+PiArICAgICBuYXBpX3NjaGVkdWxlKCZuYXBpLT5uYXBpKTsN
+Cj4+ICsNCj4+ICsgICAgIHJldHVybiBJUlFfSEFORExFRDsNCj4+ICt9DQo+PiArDQo+PiAgc3Rh
+dGljIGludCBydGw4MTY5X3JlcXVlc3RfaXJxKHN0cnVjdCBydGw4MTY5X3ByaXZhdGUgKnRwKSAg
+ew0KPj4gICAgICAgc3RydWN0IG5ldF9kZXZpY2UgKmRldiA9IHRwLT5kZXY7IEBAIC01MzMxLDEw
+ICs1Mzg3LDE0IEBAIHN0YXRpYw0KPj4gaW50IHJ0bDgxNjlfcmVxdWVzdF9pcnEoc3RydWN0IHJ0
+bDgxNjlfcHJpdmF0ZSAqdHApDQo+Pg0KPj4gICAgICAgZm9yIChpbnQgaSA9IDA7IGkgPCB0cC0+
+aXJxX252ZWNzOyBpKyspIHsNCj4+ICAgICAgICAgICAgICAgaXJxID0gJnRwLT5pcnFfdGJsW2ld
+Ow0KPj4gKyAgICAgICAgICAgICBpZiAodHAtPmZlYXR1cmVzICYgUlRMX0ZFQVRVUkVfTVNJWCAm
+JiB0cC0+SHdDdXJySXNyVmVyID4gMSkNCj4+ICsgICAgICAgICAgICAgICAgICAgICBpcnEtPmhh
+bmRsZXIgPSBydGw4MTY5X2ludGVycnVwdF9tc2l4Ow0KPj4gKyAgICAgICAgICAgICBlbHNlDQo+
+PiArICAgICAgICAgICAgICAgICAgICAgaXJxLT5oYW5kbGVyID0gcnRsODE2OV9pbnRlcnJ1cHQ7
+DQo+Pg0KPj4gICAgICAgICAgICAgICBuYXBpID0gJnRwLT5yODE2OW5hcGlbaV07DQo+PiAgICAg
+ICAgICAgICAgIHNucHJpbnRmKGlycS0+bmFtZSwgbGVuLCAiJXMtJWQiLCBkZXYtPm5hbWUsIGkp
+Ow0KPj4gLSAgICAgICAgICAgICByYyA9IHBjaV9yZXF1ZXN0X2lycSh0cC0+cGNpX2RldiwgaSwg
+cnRsODE2OV9pbnRlcnJ1cHQsIE5VTEwsIG5hcGksDQo+aXJxLT5uYW1lKTsNCj4+ICsgICAgICAg
+ICAgICAgcmMgPSBwY2lfcmVxdWVzdF9pcnEodHAtPnBjaV9kZXYsIGksIGlycS0+aGFuZGxlciwg
+TlVMTCwNCj4+ICsgbmFwaSwgaXJxLT5uYW1lKTsNCj4+DQo+PiAgICAgICAgICAgICAgIGlmIChy
+YykNCj4+ICAgICAgICAgICAgICAgICAgICAgICBicmVhazsNCj4+IEBAIC01Nzg2LDEwICs1ODQ2
+LDE4IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgbmV0X2RldmljZV9vcHMNCj4+IHJ0bF9uZXRkZXZf
+b3BzID0gew0KPj4NCj4+ICBzdGF0aWMgdm9pZCBydGxfc2V0X2lycV9tYXNrKHN0cnVjdCBydGw4
+MTY5X3ByaXZhdGUgKnRwKSAgew0KPj4gLSAgICAgdHAtPmlycV9tYXNrID0gUnhPSyB8IFJ4RXJy
+IHwgVHhPSyB8IFR4RXJyIHwgTGlua0NoZzsNCj4+ICsgICAgIGlmICh0cC0+ZmVhdHVyZXMgJiBS
+VExfRkVBVFVSRV9NU0lYKSB7DQo+PiArICAgICAgICAgICAgIHRwLT5pcnFfbWFzayA9IElTUklN
+Ul9WNl9MSU5LQ0hHOw0KPj4gKyAgICAgICAgICAgICBmb3IgKGludCBpID0gMDsgaSA8IHRwLT5u
+dW1fdHhfcmluZ3M7IGkrKykNCj4+ICsgICAgICAgICAgICAgICAgICAgICB0cC0+aXJxX21hc2sg
+fD0gSVNSSU1SX1Y2X1RPS19RMCA8PCBpOw0KPj4gKyAgICAgICAgICAgICBmb3IgKGludCBpID0g
+MDsgaSA8IHRwLT5udW1fcnhfcmluZ3M7IGkrKykNCj4+ICsgICAgICAgICAgICAgICAgICAgICB0
+cC0+aXJxX21hc2sgfD0gSVNSSU1SX1Y2X1JPS19RMCA8PCBpOw0KPj4gKyAgICAgfSBlbHNlIHsN
+Cj4+ICsgICAgICAgICAgICAgdHAtPmlycV9tYXNrID0gUnhPSyB8IFJ4RXJyIHwgVHhPSyB8IFR4
+RXJyIHwgTGlua0NoZzsNCj4+DQo+PiAtICAgICBpZiAodHAtPm1hY192ZXJzaW9uIDw9IFJUTF9H
+SUdBX01BQ19WRVJfMDYpDQo+PiAtICAgICAgICAgICAgIHRwLT5pcnFfbWFzayB8PSBTWVNFcnIg
+fCBSeEZJRk9PdmVyOw0KPj4gKyAgICAgICAgICAgICBpZiAodHAtPm1hY192ZXJzaW9uIDw9IFJU
+TF9HSUdBX01BQ19WRVJfMDYpDQo+PiArICAgICAgICAgICAgICAgICAgICAgdHAtPmlycV9tYXNr
+IHw9IFNZU0VyciB8IFJ4RklGT092ZXI7DQo+PiArICAgICB9DQo+PiAgfQ0KPj4NCj4+ICBzdGF0
+aWMgaW50IHJ0bF9hbGxvY19pcnEoc3RydWN0IHJ0bDgxNjlfcHJpdmF0ZSAqdHApIEBAIC01ODE3
+LDYNCj4+ICs1ODg1LDE4IEBAIHN0YXRpYyBpbnQgcnRsX2FsbG9jX2lycShzdHJ1Y3QgcnRsODE2
+OV9wcml2YXRlICp0cCkNCj4+ICAgICAgIGlmIChudmVjcyA8IDApDQo+PiAgICAgICAgICAgICAg
+IG52ZWNzID0gcGNpX2FsbG9jX2lycV92ZWN0b3JzKHBkZXYsIDEsIDEsDQo+PiBQQ0lfSVJRX0FM
+TF9UWVBFUyk7DQo+Pg0KPj4gKyAgICAgdHAtPmZlYXR1cmVzICY9IH4oUlRMX0ZFQVRVUkVfTVNJ
+WCB8IFJUTF9GRUFUVVJFX01TSSk7DQo+PiArDQo+PiArICAgICBpZiAobnZlY3MgPiAwKSB7DQo+
+PiArICAgICAgICAgICAgIHRwLT5pcnFfbnZlY3MgPSBudmVjczsNCj4+ICsgICAgICAgICAgICAg
+dHAtPmlycSA9IHBjaV9pcnFfdmVjdG9yKHBkZXYsIDApOw0KPj4gKyAgICAgICAgICAgICBpZiAo
+bnZlY3MgPiAxKQ0KPj4gKyAgICAgICAgICAgICAgICAgICAgIHRwLT5mZWF0dXJlcyB8PSBSVExf
+RkVBVFVSRV9NU0lYOw0KPj4gKyAgICAgICAgICAgICBlbHNlIGlmIChwY2lfZGV2X21zaV9lbmFi
+bGVkKHBkZXYpKQ0KPj4gKyAgICAgICAgICAgICAgICAgICAgIHRwLT5mZWF0dXJlcyB8PSBSVExf
+RkVBVFVSRV9NU0k7DQo+PiArICAgICAgICAgICAgIHJldHVybiAwOw0KPg0KPlN1Y2ggZmVhdHVy
+ZSBmbGFncywgZXNwZWNpYWxseSBmb3IgTVNJL01TSVgsIGFyZSB1Z2x5Lg0KPldoeSBkb24ndCB5
+b3UgbGVhdmUgdGhlIGludGVycnVwdCB0eXBlIHNlbGVjdGlvbiB0byBQQ0kgY29yZT8NCj5UaGlz
+IG5lZWRzIGF0IGxlYXN0IGFuIGV4cGxhbmF0aW9uLg0KDQpJIGNvbXBsZXRlbHkgYWdyZWUgdGhh
+dCBpdCBpcyBtaXNsZWFkaW5nIGFuZCB1Z2x5LiANClRoZSByZWFzb24gd2h5IEkgdXNlZCB0cC0+
+IGZlYXR1cmVzIGhlcmUgaXMgdGhhdCBJIHdhbnQgdG8gZGlzdGluZ3Vpc2ggbmV3IGludGVycnVw
+dCBtYXBwaW5nIGFuZCBvbGQgaW50ZXJydXB0IG1hcHBpbmcuIEZvciBSVEw4MTI3IHdpdGggcnNz
+IGVuYWJsZWQsIDggcnggcXVldWVzIHJlZmVyIHRvIGludGVycnVwdCAwLTcuIEZvciBvdGhlciBj
+aGlwIHdpdGggcnNzIGRpc2FibGVkLCBhbGwgdHgvcnggcXVldWVzIHNoYXJlIHRoZSBzYW1lIGlu
+dGVycnVwdC4gVGhlIHNwZWNpZmljIGRpZmZlcmVuY2VzIGFyZSBpbiBmdW5jdGlvbiBydGw4MTY5
+X3JlcXVlc3RfaXJxKCkuDQpBbmQgSSB3aWxsIHJlbmFtZSB0aGUgZmxhZyBtb3JlIGFwcHJvcHJp
+YXRlbHkgdG8gaW5kaWNhdGUgdGhlIG1hcHBpbmcgbWV0aG9kLg0KDQo+DQo+PiArICAgICB9DQo+
+PiArDQo+PiAgICAgICB0cC0+aXJxID0gcGRldi0+aXJxOw0KPj4gICAgICAgdHAtPmlycV9udmVj
+cyA9IDE7DQo+Pg0KPj4gQEAgLTYwODcsNiArNjE2Nyw1MiBAQCBzdGF0aWMgYm9vbCBydGxfYXNw
+bV9pc19zYWZlKHN0cnVjdA0KPnJ0bDgxNjlfcHJpdmF0ZSAqdHApDQo+PiAgICAgICByZXR1cm4g
+ZmFsc2U7DQo+PiAgfQ0KPj4NCj4+ICtzdGF0aWMgaW50IHJ0bDgxNjlfcG9sbF9tc2l4X3J4KHN0
+cnVjdCBuYXBpX3N0cnVjdCAqbmFwaSwgaW50IGJ1ZGdldCkNCj4+ICt7DQo+PiArICAgICBzdHJ1
+Y3QgcnRsODE2OV9uYXBpICpyODE2OV9uYXBpID0gY29udGFpbmVyX29mKG5hcGksIHN0cnVjdCBy
+dGw4MTY5X25hcGksDQo+bmFwaSk7DQo+PiArICAgICBzdHJ1Y3QgcnRsODE2OV9wcml2YXRlICp0
+cCA9IHI4MTY5X25hcGktPnByaXY7DQo+PiArICAgICBzdHJ1Y3QgbmV0X2RldmljZSAqZGV2ID0g
+dHAtPmRldjsNCj4+ICsgICAgIGNvbnN0IGludCBtZXNzYWdlX2lkID0gcjgxNjlfbmFwaS0+aW5k
+ZXg7DQo+PiArICAgICBpbnQgd29ya19kb25lID0gMDsNCj4+ICsNCj4+ICsgICAgIGlmIChtZXNz
+YWdlX2lkIDwgdHAtPm51bV9yeF9yaW5ncykNCj4+ICsgICAgICAgICAgICAgd29ya19kb25lICs9
+IHJ0bF9yeChkZXYsIHRwLCAmdHAtPnJ4X3JpbmdbbWVzc2FnZV9pZF0sDQo+PiArIGJ1ZGdldCk7
+DQo+PiArDQo+PiArICAgICBpZiAod29ya19kb25lIDwgYnVkZ2V0ICYmIG5hcGlfY29tcGxldGVf
+ZG9uZShuYXBpLCB3b3JrX2RvbmUpKQ0KPj4gKyAgICAgICAgICAgICBydGw4MTY5X2VuYWJsZV9o
+d19pbnRlcnJ1cHRfbXNpeCh0cCwgbWVzc2FnZV9pZCk7DQo+PiArDQo+PiArICAgICByZXR1cm4g
+d29ya19kb25lOw0KPj4gK30NCj4+ICsNCj4+ICtzdGF0aWMgaW50IHJ0bDgxNjlfcG9sbF9tc2l4
+X3R4KHN0cnVjdCBuYXBpX3N0cnVjdCAqbmFwaSwgaW50IGJ1ZGdldCkNCj4+ICt7DQo+PiArICAg
+ICBzdHJ1Y3QgcnRsODE2OV9uYXBpICpyODE2OV9uYXBpID0gY29udGFpbmVyX29mKG5hcGksIHN0
+cnVjdCBydGw4MTY5X25hcGksDQo+bmFwaSk7DQo+PiArICAgICBzdHJ1Y3QgcnRsODE2OV9wcml2
+YXRlICp0cCA9IHI4MTY5X25hcGktPnByaXY7DQo+PiArICAgICBzdHJ1Y3QgbmV0X2RldmljZSAq
+ZGV2ID0gdHAtPmRldjsNCj4+ICsgICAgIHVuc2lnbmVkIGludCB3b3JrX2RvbmUgPSAwOw0KPj4g
+KyAgICAgY29uc3QgaW50IG1lc3NhZ2VfaWQgPSByODE2OV9uYXBpLT5pbmRleDsNCj4+ICsgICAg
+IGludCB0eF9yaW5nX2lkeCA9IG1lc3NhZ2VfaWQgLSA4Ow0KPj4gKw0KPj4gKyAgICAgaWYgKHR4
+X3JpbmdfaWR4ID49IDAgJiYgdHhfcmluZ19pZHggPCB0cC0+bnVtX3R4X3JpbmdzKQ0KPj4gKyAg
+ICAgICAgICAgICB3b3JrX2RvbmUgKz0gcnRsX3R4KGRldiwgdHAsICZ0cC0+dHhfcmluZ1t0eF9y
+aW5nX2lkeF0sDQo+PiArIGJ1ZGdldCk7DQo+PiArDQo+PiArICAgICBpZiAod29ya19kb25lIDwg
+YnVkZ2V0ICYmIG5hcGlfY29tcGxldGVfZG9uZShuYXBpLCB3b3JrX2RvbmUpKQ0KPj4gKyAgICAg
+ICAgICAgICBydGw4MTY5X2VuYWJsZV9od19pbnRlcnJ1cHRfbXNpeCh0cCwgbWVzc2FnZV9pZCk7
+DQo+PiArDQo+PiArICAgICByZXR1cm4gd29ya19kb25lOw0KPj4gK30NCj4+ICsNCj4+ICtzdGF0
+aWMgaW50IHJ0bDgxNjlfcG9sbF9tc2l4X290aGVyKHN0cnVjdCBuYXBpX3N0cnVjdCAqbmFwaSwg
+aW50DQo+PiArYnVkZ2V0KSB7DQo+PiArICAgICBzdHJ1Y3QgcnRsODE2OV9uYXBpICpyODE2OV9u
+YXBpID0gY29udGFpbmVyX29mKG5hcGksIHN0cnVjdCBydGw4MTY5X25hcGksDQo+bmFwaSk7DQo+
+PiArICAgICBzdHJ1Y3QgcnRsODE2OV9wcml2YXRlICp0cCA9IHI4MTY5X25hcGktPnByaXY7DQo+
+PiArICAgICBjb25zdCBpbnQgbWVzc2FnZV9pZCA9IHI4MTY5X25hcGktPmluZGV4Ow0KPj4gKw0K
+Pj4gKyAgICAgbmFwaV9jb21wbGV0ZV9kb25lKG5hcGksIGJ1ZGdldCk7DQo+PiArICAgICBydGw4
+MTY5X2VuYWJsZV9od19pbnRlcnJ1cHRfbXNpeCh0cCwgbWVzc2FnZV9pZCk7DQo+PiArDQo+PiAr
+ICAgICByZXR1cm4gMTsNCj4+ICt9DQo+Pg0KPj4gIHN0YXRpYyB2b2lkIHI4MTY5X2luaXRfbmFw
+aShzdHJ1Y3QgcnRsODE2OV9wcml2YXRlICp0cCkgIHsgQEAgLTYwOTUsNg0KPj4gKzYyMjEsMjAg
+QEAgc3RhdGljIHZvaWQgcjgxNjlfaW5pdF9uYXBpKHN0cnVjdCBydGw4MTY5X3ByaXZhdGUgKnRw
+KQ0KPj4gICAgICAgICAgICAgICBpbnQgKCpwb2xsKShzdHJ1Y3QgbmFwaV9zdHJ1Y3QgKm5hcGks
+IGludCBidWRnZXQpOw0KPj4NCj4+ICAgICAgICAgICAgICAgcG9sbCA9IHJ0bDgxNjlfcG9sbDsN
+Cj4+ICsgICAgICAgICAgICAgaWYgKHRwLT5mZWF0dXJlcyAmIFJUTF9GRUFUVVJFX01TSVgpIHsN
+Cj4+ICsgICAgICAgICAgICAgICAgICAgICBzd2l0Y2ggKHRwLT5Id0N1cnJJc3JWZXIpIHsNCj4+
+ICsgICAgICAgICAgICAgICAgICAgICBjYXNlIDY6DQo+PiArICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBpZiAoaSA8IFI4MTI3X01BWF9SWF9RVUVVRVMpDQo+PiArICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIHBvbGwgPSBydGw4MTY5X3BvbGxfbXNpeF9yeDsNCj4+ICsg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIGVsc2UgaWYgKGkgPiA3ICYmIGkgPCAxNikNCj4+
+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcG9sbCA9IHJ0bDgxNjlfcG9s
+bF9tc2l4X3R4Ow0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZWxzZQ0KPj4gKyAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBwb2xsID0gcnRsODE2OV9wb2xsX21z
+aXhfb3RoZXI7DQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICBicmVhazsNCj4+ICsg
+ICAgICAgICAgICAgICAgICAgICBkZWZhdWx0Og0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgYnJlYWs7DQo+PiArICAgICAgICAgICAgICAgICAgICAgfQ0KPj4gKyAgICAgICAgICAg
+ICB9DQo+PiAgICAgICAgICAgICAgIG5ldGlmX25hcGlfYWRkKHRwLT5kZXYsICZyODE2OW5hcGkt
+Pm5hcGksIHBvbGwpOw0KPj4gICAgICAgICAgICAgICByODE2OW5hcGktPnByaXYgPSB0cDsNCj4+
+ICAgICAgICAgICAgICAgcjgxNjluYXBpLT5pbmRleCA9IGk7DQoNCg==
 
