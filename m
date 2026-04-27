@@ -1,238 +1,161 @@
-Return-Path: <netdev+bounces-281378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281379-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aGXrBQZ072kcBgEAu9opvQ
-	(envelope-from <netdev+bounces-281378-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:34:46 +0200
+	id 4N0tBTd072kcBgEAu9opvQ
+	(envelope-from <netdev+bounces-281379-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:35:35 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 928A2474744
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:34:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E0CC47477E
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:35:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6292C3046982
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 14:30:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3AE59302260A
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 14:30:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3933826A0DD;
-	Mon, 27 Apr 2026 14:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9857B27B357;
+	Mon, 27 Apr 2026 14:30:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cQ/fOKue"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="E60OZ9Au"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B311E5B63;
-	Mon, 27 Apr 2026 14:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35D5025FA05;
+	Mon, 27 Apr 2026 14:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777300228; cv=none; b=YgT89PGp/pqrvZV1haQ/QcTIycfMe08iNDn93eygl6EjGGE0I0j+8JthhZpc83cwcII2JDMZuduCI+1Sgzd3A/lesZSS5wCTjgwnyNQbdKijeWqEG82ePwE+Om5aCRwYpSAeCBx9Ig++MuM+NaRBUc7TqZMXrJhqX31kNIjKUGM=
+	t=1777300257; cv=none; b=AUuheNQklOvEsjBgxrC6J4mOQwnCT/NXPH9Z8UBKKRzj4BaFIJWDMz8DWHCFSmGdOruPGfrGX2nymDzyu3UYTACOmfKPjps43pNtqzfzW4+ahH5IYrWjPeQQoIhiAP1+GWOPqH5SKOmar+E/G76Ry3KXXeYk9DMdGSNVwcDCzDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777300228; c=relaxed/simple;
-	bh=hhw7ORcJvx+XMfsnPQMXBBhpIaCemzbjzVToiUZbMdI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uu5INcsMRxfynKwl/MN/fpe34n47GKT8i9khgzQDlDDDKzByiV5VkEj/8Ti4BqRAXPZ6WWOtmn5D7tIaC4P3EhyM0GOlz4ruIx+hxM+BOFJalAhw/xXZ33O0dxGCUCmRrdRbut+eZePRLNJYWyDRLkqNSxs+G32kWN5K8N8K0io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cQ/fOKue; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF362C2BCB4;
-	Mon, 27 Apr 2026 14:30:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777300228;
-	bh=hhw7ORcJvx+XMfsnPQMXBBhpIaCemzbjzVToiUZbMdI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=cQ/fOKue37nRo1QbbzH2e/+lr5hpba/j2XAmC/anSZW3kP0EbksKCvrUuO0mS2MTh
-	 L0o5wG5yxu/tON6aS8TWAgr7ixHcVKcgoowXLy89wCgVM2CE7/H3/okfVZkxmRx4Iz
-	 7k955PmOwOdUzfjkLnKCUFH6raG/3li2mgbmu7wZsB08a7eW5Bom9M+fF8R6U+0eAM
-	 QnYYg3ddBrdPE/AxtVwR7QS7hqFMsdKD26jkPXrwQPRnTFaDiDG1gpkORN6PRp4wAy
-	 S4I7YzyT6OfpGvx1NLr4DMozltPFRiBKJH/b9j3IaUiv37mD+QiPvCewqCMDY3VzZ3
-	 IeTkLvcZYF06g==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Jonas Gorski <jonas.gorski@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Linus Walleij <linusw@kernel.org>,
-	Bartosz Golaszewski <brgl@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	=?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>,
-	Kyle Hendry <kylehendrydev@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org
-Subject: [PATCH] dsa: b53: hide legacy gpiolib usage on non-mips
-Date: Mon, 27 Apr 2026 16:30:08 +0200
-Message-Id: <20260427143020.2800317-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1777300257; c=relaxed/simple;
+	bh=7C4AbpIu+P9UrWUnbpxkZXIquXi8ED0PTqMLY8cdaGU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=EGnwZVJJm3GtyuRbXIHAbKs7MlCHFK4zo8haeK03++iQXEHiigOx5sAnenMK/5e5GKrtgIHvVufPH3r5BgH6UjpdlSYMEyXs2Tp8aoAZ2UlcYGPOQQUEKCswA1dUO5NbmRvgw1+8oHdrl/d40tU88Ukz6eTAyAFiVyY3gllQCoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=E60OZ9Au; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:Message-Id:Date:Subject:From:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=f8Ufe+9Z5B1oyMFVF/eK8ivT3EkZAHozTLAdDiuw/g4=; b=E60OZ9AubVYLoVyKBGjBe7CglQ
+	BIpsU5vMtiBK5yypsTMSLtRhgUjs/mIG9+y2GaGj09kPBhNC+ohBRSKCrlvbGnaLDMDtmcS0aem9T
+	JfQf1mHef6r8WlzIlTpLBpzfz40jWH7O+lxLSjDIoGDDa85AN7Z2Q1zJ/q1ZE67m78P04nodizPLV
+	RVE8bMNe802ZCwIk7cTL/B6emr7iH67yeorrcyWHcJu7ueLKLHMDXJ8+EAQFOLsn4e0cOwH4CpvfP
+	gPWKZVNWI6/esvjOVpfSIHPCu8R26aIN5CJm44HK031Kt6603N1WfZBKusC+oEsaWlGVgAfn7YquE
+	Dw+6SIdw==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1wHMz2-005Xwf-0q;
+	Mon, 27 Apr 2026 14:30:49 +0000
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net v2 0/4] netconsole: configfs store callback fixes
+Date: Mon, 27 Apr 2026 07:30:34 -0700
+Message-Id: <20260427-netconsole_ai_fixes-v2-0-59965f29d9cc@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 928A2474744
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAApz72kC/22NQQ6CMBBFr9LM2hoYUGxX3sMQ0pYRxpjWtJVoC
+ Hc3oEu3/7+8N0OiyJRAixkiTZw4eNACdwLcaPxAknvQArDAY1EjSk/ZBZ/CnTrD3ZVflCTWB6W
+ qqjGN6mEn4BFpO0CLC3jK0H7H9LQ3cnn1rdjIKYf43tpTucG/TPU3M5WykArtyTY9KYPu3JNl4
+ /chDtAuy/IB62vLL84AAAA=
+X-Change-ID: 20260422-netconsole_ai_fixes-24599337a79d
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Keiichi Kii <k-keiichi@bx.jp.nec.com>, Satyam Sharma <satyam@infradead.org>, 
+ Andrew Morton <akpm@linux-foundation.org>, 
+ Matthew Wood <thepacketgeek@gmail.com>, asantostc@gmail.com, 
+ gustavold@gmail.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Breno Leitao <leitao@debian.org>, kernel-team@meta.com, 
+ Simon Horman <horms@kernel.org>
+X-Mailer: b4 0.16-dev-453a6
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1353; i=leitao@debian.org;
+ h=from:subject:message-id; bh=7C4AbpIu+P9UrWUnbpxkZXIquXi8ED0PTqMLY8cdaGU=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBp73MSb8Cvsl+jebSCr/xTpotBh3ht/VeRHUDed
+ YfyXIMtefuJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCae9zEgAKCRA1o5Of/Hh3
+ bSeMD/wJ2fzZjnpYI4c+UNnGEH31DOTy4dCwVue4OLW/L3h9c9lWVXqgl0rO+QL70o/jzJ6I0Av
+ BDMq4BCZyIYwpuoZq5Jbm5EkAFyqGmLD/R68lvnamLyP3GNr9B+VkDgHxieKkYFOcINYbe4KX61
+ qCl0k4gDzGzSxXnKND90HR+Nfg2STMFSpm4h1/9v7923v4ZJWv4aq4gagXIlV2kWzys0fG9Anbp
+ BFchK8K7fCDMs2UFK81iQzfHTMUgKuO/cBAGDV7uck5B6fuFph9y/7RfnCa0eqFySWMvcoUJ17p
+ b1RVNkmCnGMRAxEV8/2O0nkDNA/fGLYn1paMpZUU3ZX4yRliW4LKun5JTt9HH61vv9gswJ0sIGf
+ BOUiMEri4cisVvAypOSRD1cp+0UuVsjpg7KbuuJ25i256HUsGBvlCNGYtb9e+2xRaRLungyaJ9N
+ z74JRx/O0+KsDJeC2UWu+XeJ9jah1HXa3SNdmuZCP1otXIeGqyDYKn8fFvMBaKJHw2B2vxhLgQU
+ pDATOL6uxTPp8F/TvNG0bju1jZ4bc3URaELXs7kIJ2wRKX77ru/UiAmuNEbCBpHajYuCT5Po9H0
+ blUKpzZ/GWQlmlwMvFUQ7CHOhlBpcw3GwSlH0dnLRA8lDKZGWLhRh33G/aqaZJX40pvbRS5xdQ4
+ 3D9bgjwL1sMRiVg==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+X-Debian-User: leitao
+X-Rspamd-Queue-Id: 7E0CC47477E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281378-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-281379-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bx.jp.nec.com,infradead.org,linux-foundation.org,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[broadcom.com,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[arndb.de,gmail.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[arnd@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[debian.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[arndb.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-From: Arnd Bergmann <arnd@arndb.de>
+V2 for issues in netconsole's configfs store callbacks.
 
-The MIPS bcm53xx platform still uses the legacy gpiolib interfaces based
-on gpio numbers, but other platforms do not.
+There are still some changes I want to make, such as, having the dynamic
+lock when reading from configfs (_show() callbacks), wich will solve
+other issues, but I will keep it for later.
 
-Hide these interfaces inside of the existing #ifdef block and use the
-modern interfaces in the common parts of the driver to allow building
-it when the gpio_set_value() is left out of the kernel.
-
-Reviewed-by: Jonas Gorski <jonas.gorski@gmail.com>
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- drivers/net/dsa/b53/b53_common.c | 17 +++++------------
- drivers/net/dsa/b53/b53_priv.h   | 25 +++++++++++++++++++------
- 2 files changed, 24 insertions(+), 18 deletions(-)
+Changes in v2:
+- dev_name_store: strip optional trailing newline before length check
+  so 15-char ifnames written via echo aren't rejected (Simon, Sashiko)
+- userdatum_value_store: snapshot and restore udm->value on
+  update_userdata() failure to keep visible state in sync with the live
+  payload (Simon/Sashiko)
+- Link to v1: https://patch.msgid.link/20260423-netconsole_ai_fixes-v1-0-92b8b7de9a2c@debian.org
 
-diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-index 2c4131ed7e30..d838511ae674 100644
---- a/drivers/net/dsa/b53/b53_common.c
-+++ b/drivers/net/dsa/b53/b53_common.c
-@@ -19,7 +19,7 @@
- 
- #include <linux/delay.h>
- #include <linux/export.h>
--#include <linux/gpio.h>
-+#include <linux/gpio/consumer.h>
- #include <linux/kernel.h>
- #include <linux/math.h>
- #include <linux/minmax.h>
-@@ -965,17 +965,17 @@ EXPORT_SYMBOL(b53_configure_vlan);
- 
- static void b53_switch_reset_gpio(struct b53_device *dev)
- {
--	int gpio = dev->reset_gpio;
-+	struct gpio_desc *gpio = dev->reset_gpio;
- 
--	if (gpio < 0)
-+	if (IS_ERR(gpio))
- 		return;
- 
- 	/* Reset sequence: RESET low(50ms)->high(20ms)
- 	 */
--	gpio_set_value(gpio, 0);
-+	gpiod_set_value(gpio, 0);
- 	mdelay(50);
- 
--	gpio_set_value(gpio, 1);
-+	gpiod_set_value(gpio, 1);
- 	mdelay(20);
- 
- 	dev->current_page = 0xff;
-@@ -3092,7 +3092,6 @@ static int b53_switch_init(struct b53_device *dev)
- {
- 	u32 chip_id = dev->chip_id;
- 	unsigned int i;
--	int ret;
- 
- 	if (is63xx(dev))
- 		chip_id = BCM63XX_DEVICE_ID;
-@@ -3173,12 +3172,6 @@ static int b53_switch_init(struct b53_device *dev)
- 		return -ENOMEM;
- 
- 	dev->reset_gpio = b53_switch_get_reset_gpio(dev);
--	if (dev->reset_gpio >= 0) {
--		ret = devm_gpio_request_one(dev->dev, dev->reset_gpio,
--					    GPIOF_OUT_INIT_HIGH, "robo_reset");
--		if (ret)
--			return ret;
--	}
- 
- 	return 0;
- }
-diff --git a/drivers/net/dsa/b53/b53_priv.h b/drivers/net/dsa/b53/b53_priv.h
-index 923d56bbd061..ad0c65a9bdc3 100644
---- a/drivers/net/dsa/b53/b53_priv.h
-+++ b/drivers/net/dsa/b53/b53_priv.h
-@@ -149,7 +149,7 @@ struct b53_device {
- 	u8 duplex_reg;
- 	u8 jumbo_pm_reg;
- 	u8 jumbo_size_reg;
--	int reset_gpio;
-+	struct gpio_desc *reset_gpio;
- 	u8 num_arl_bins;
- 	u16 num_arl_buckets;
- 	enum dsa_tag_protocol tag_protocol;
-@@ -468,23 +468,36 @@ static inline void b53_arl_search_read(struct b53_device *dev, u8 idx,
- #ifdef CONFIG_BCM47XX
- 
- #include <linux/bcm47xx_nvram.h>
-+#include <linux/gpio.h>
- #include <bcm47xx_board.h>
--static inline int b53_switch_get_reset_gpio(struct b53_device *dev)
-+static inline struct gpio_desc *b53_switch_get_reset_gpio(struct b53_device *dev)
- {
- 	enum bcm47xx_board board = bcm47xx_board_get();
-+	int gpio, ret;
- 
- 	switch (board) {
- 	case BCM47XX_BOARD_LINKSYS_WRT300NV11:
- 	case BCM47XX_BOARD_LINKSYS_WRT310NV1:
--		return 8;
-+		gpio = 8;
-+		break;
- 	default:
--		return bcm47xx_nvram_gpio_pin("robo_reset");
-+		gpio = bcm47xx_nvram_gpio_pin("robo_reset");
- 	}
-+
-+	if (!gpio_is_valid(gpio))
-+		return ERR_PTR(-EINVAL);
-+
-+	ret = devm_gpio_request_one(dev->dev, gpio,
-+				    GPIOF_OUT_INIT_HIGH, "robo_reset");
-+	if (ret)
-+		return ERR_PTR(ret);
-+
-+	return gpio_to_desc(gpio);
- }
- #else
--static inline int b53_switch_get_reset_gpio(struct b53_device *dev)
-+static inline struct gpio_desc *b53_switch_get_reset_gpio(struct b53_device *dev)
- {
--	return -ENOENT;
-+	return ERR_PTR(-ENODEV);
- }
- #endif
- 
--- 
-2.39.5
+---
+Breno Leitao (4):
+      netconsole: return count instead of strnlen(buf, count) from store callbacks
+      netconsole: avoid clobbering userdatum value on truncated write
+      netconsole: propagate device name truncation in dev_name_store()
+      netconsole: restore userdatum value on update_userdata() failure
+
+ drivers/net/netconsole.c | 49 +++++++++++++++++++++++++++++-------------------
+ 1 file changed, 30 insertions(+), 19 deletions(-)
+---
+base-commit: 7080e32d3f09d8688c4a87d81bdcc71f7f606b16
+change-id: 20260422-netconsole_ai_fixes-24599337a79d
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
 
