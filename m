@@ -1,270 +1,351 @@
-Return-Path: <netdev+bounces-281496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281497-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KlWSM3HT72mOGgEAu9opvQ
-	(envelope-from <netdev+bounces-281496-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 23:21:53 +0200
+	id gJZONo/V72nXGgEAu9opvQ
+	(envelope-from <netdev+bounces-281497-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 23:30:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41C0C47A95B
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 23:21:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 877C547AA92
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 23:30:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 337B4301A402
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 21:21:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 09D77308B0B3
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 21:29:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E2C535F603;
-	Mon, 27 Apr 2026 21:21:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 786413A6B81;
+	Mon, 27 Apr 2026 21:29:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hX+MPwU+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pM4bEk+K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD6F02EC0A2
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 21:21:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E573845B7
+	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 21:29:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777324909; cv=none; b=XwKM/d10vhTOt4MeQZLvfHuwWIUIvebyRrQKfhicwCksbnjnQTefwk+TEVPiLwB2DdNshuM5UCwOtCtsQ9AyRdYHVTm3w3WoaHBL2DpOHJj5BXliyjweZ5L4ftcREkBBwj0zcmuBPSUHXeeFJB/fCeTZ6s3wdwaF4F7NhtZ1KIw=
+	t=1777325365; cv=none; b=PRfLyK0ZF4uziuacoL8NgcwzlqwgETegNpK+ziWGm4P9e/jD+qjZ59w5QPbygJiWPwue8PlTexTqRTNZJF3+VQTYdK47CGSbHi39K0gvObSR7pEk7c503iafZkLbFgOtbCf69+zwXJ7VhWUNKwihO/y0wu8JOZnIPmBc/VHdfko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777324909; c=relaxed/simple;
-	bh=7YSMzEyxS1XNA4OBd14hMPN7WNfoLFoSVpTmZlsj0jA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NAUsZyonLxX1lOvPaYeJYhHR0Yj1mfTOJjp8N6thB+vynXZVKZhBicjRCMwYHafxlzj2BZhkanoIfTxUe/2OOD2APIk3KHIRTGyrhAp2v8oltMaQ1ymnFF4X97p+X2Uh1t40U71V0vknFgf5dNkNWhOge7Ie7iXhxQnt5Gny/Cs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hX+MPwU+; arc=none smtp.client-ip=209.85.128.50
+	s=arc-20240116; t=1777325365; c=relaxed/simple;
+	bh=c8Xs8XIDe+SZyyGBpFGQP0PqyLAvYREVB87ThsvQG6c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=r79QF4tg8OrJu5D7Dw7nKqdqQG0Oy6Uq9Aij0aefjijKBnPkWmLgjXef3ocZlMqj8uHvsRCY6KRg9k18H3fZ+cyCaKnn3R3fx7Z6hhCmwUA6Oi+bPJZ+oAD8pft2NRGkldz6t6BK/uHrsVnY+0asDxReMv2vzWju2zdNgUCiMuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pM4bEk+K; arc=none smtp.client-ip=209.85.221.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-48374014a77so139009295e9.3
-        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 14:21:47 -0700 (PDT)
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-43fde5b81a1so8031610f8f.0
+        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 14:29:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777324906; x=1777929706; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IOWA3FfEMJaIeIa8gNPCWVPUoEq8yr4UhXyR3DmFLRs=;
-        b=hX+MPwU+HmelqluGEgcNK4J30c4UrHagU27t7Vj/TAjU/n1vibaosVfmTDgRTjb9B2
-         A4GyelrEVQnCf0QOeMlrWZ6eBJDqUdasrqcWzFnbHEPlonc586dUQKf+n8p83eghrVGJ
-         +tqDoUcvJogOek2ux8HXZvtL4vj1jvyvgXg+pB9C1kvXuF9++2Pr//xbJLIXA5Pv+0SU
-         DvOOOd7sdT4hfwcvK2WXqvwKx6SGfXgCfyLwXR+WMExG8Gt/7Zl5MoB1/+VPSiPBxCn4
-         5q3Q9hIR2u2KUjy4D1tRedAP47G09t+bodbcH7okoGBtRzbZPfVoi7OFpsK5rNr847ws
-         fsCA==
+        d=gmail.com; s=20251104; t=1777325358; x=1777930158; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ebg5+i/pOUuQx7xxuERTUppaj1qL6vIxTxgv86V/NC0=;
+        b=pM4bEk+KWuVJs1U70UMTYiYKMTMTofFbWReYwBWyqhmru6Y2DXeQu1JWql0TDyt+VP
+         KU6iTZ27w00J1ijxYV/Il69CxIz0aEodyojX5hvux8QzDCUptjfpO0GxqEopdd5J7LQe
+         xWtNPQshDR5+AecefO+G7XCDnANkqrKF5HDpjRP71LYSISipG8uBZw3Llvrz/plVREw8
+         7hx+6bhgCNzpupXctGieSqZ7959V9vurIkn5LhYgBA0CLbIQE+NEBCLE9iwlyuxnjMVK
+         9ppisP58FPLXgdtkUISOXdh0pbxdbVuAXmsLhiX5O1W4051+CXyd/ZZNlvvioVVvo0G7
+         77DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777324906; x=1777929706;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IOWA3FfEMJaIeIa8gNPCWVPUoEq8yr4UhXyR3DmFLRs=;
-        b=AYBbdJXqOhWLtXR1seVX4+RMlj7O1OwESA/gsMm25PLVZ+d/ie4Xk1QjJLv31+0FB8
-         /78ipshFYziI61r5hnz1wWzXEpwuhhn4RjLnUe9qaslmOgsDGD8E/QCrA2fq5P827CQE
-         W8OQc0QoULVQNkJJOAdQeugWm4PE2yDbTiY5XGc0htK75+pHx1cRoRt2PDbN7r7GCfQi
-         Yx+CGhGvX0qUxuHC68If43xRnHX7HWtXZCC3CtUboW7kHnDs8Pl7x8vihccye8X2ePOs
-         d87dUzVI8mEBymJFUHhv+nVtceXlP467TXL6F+tBdZvwQt5gJMa8iVcdqKBReWy/fcJ1
-         15zQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9kuD2Kg0PUOx7mA6lFUOE2qCPmxGQ4am+TpenOFkzXTFJKU1Dj/QFyogL3+DAFAK/34BETMuQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5IX1hfRx4+JQnjEG6L2e7MVgIK+EPMxI2RZ9rn38ZYddbJrSX
-	6BEBXj1GhO5KCHAbZUTro/N2U4Ww7tUvhSck6xlxy3G1dD96gwJGaE8N
-X-Gm-Gg: AeBDies03llwN05po91jArcwmLrhLYcr4l6rIZjXbCYokLqmSphvGPf34QJEg5PT/nF
-	laxav3TjUHiyD93wYNchAKwrqVvTbEq08aF6hTekTBA2x7EkMiJHXVe9ch/DjxkBsDIMsFURK0T
-	ulgBinhNpgVWdlyNnxGX+zaLGpszXTw3pTSjc/mK0UM/ZwBRaxQT/Hi9e4xetTljXBs6ITESan7
-	4p3Xjl1wZQ9zhenFEBSu4KBgJcSeE9kYd3mpJzBP10zrO1memokTsdzJVIcIFFy1UsLUpgrwQnG
-	tiC5FbcHuub2Y+4GSBgeMkNbKL38iYhy/oHdwALmfR7HCwuVCe0rrRcsqCLu7EVdrURsy1yRBRX
-	YBXeeMH+GmNSUleLIB3UZC+LgWQNiNw5tSOv8AORq0DNBhyy6MlGywIoP8Uxjadyd+cvtk50/PX
-	8T3G7onEXkhBrHQG+ol7qhh5j+F8sFjg6mKOwX2JBAE+u/itKRGdzrIxvGcSaDvWNRN1kXppZ5h
-	gme1eNbaUlMFnneb1q4lyrKX0OXv+rEJLrGAPTOQl+3cJcNhbG9sIIVcxOg3cjzSiDj2hrJCw==
-X-Received: by 2002:a05:600c:1d20:b0:48a:7676:30bc with SMTP id 5b1f17b1804b1-48a77b0a3d6mr5438235e9.14.1777324905841;
-        Mon, 27 Apr 2026 14:21:45 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f37:e300:169:47c9:df3d:396c? (p200300ea8f37e300016947c9df3d396c.dip0.t-ipconnect.de. [2003:ea:8f37:e300:169:47c9:df3d:396c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a76f7f483sm19496465e9.0.2026.04.27.14.21.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Apr 2026 14:21:45 -0700 (PDT)
-Message-ID: <a7b8a496-baf9-4e0e-b1c0-510e24d0bbaa@gmail.com>
-Date: Mon, 27 Apr 2026 23:21:44 +0200
+        d=1e100.net; s=20251104; t=1777325358; x=1777930158;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Ebg5+i/pOUuQx7xxuERTUppaj1qL6vIxTxgv86V/NC0=;
+        b=gNExrxHGZHuqrTcyDeYI1pjYhe9cQume+YfH90bW7qQG2eHPmC7ZQdcmbxANfSOnj3
+         rBXdhmB3NvwWpWQOETDhWk/Ampj0e3qu5Av0eH1etKEp0Zc0FiikWlNNIFBuzi16bs+h
+         eYGBaMuMTENzq7m5hWmzad9yzEJB7M9WKlYlSgMDsG11o3lT4rQ2njEoNlsGLR74yigD
+         FJZkcrmqrqh6vPv7AqXF5E6E1bOlN0trywECENoIJCm9CNzo56o4O4n6CG88PTT0oOYS
+         b81sJmhj5j2pHOdIvoEhGjD9psTy19AmzxBDeUPHXNI52biUu02z/KTNcEDO2RRfq1Yk
+         PCdw==
+X-Forwarded-Encrypted: i=1; AFNElJ/7gqStQktwNrHTm8hQ11xo2MrZ1JGrRTPxJF9TWBAIheksOcMP/gDUQ0ILQGaCthjKex5Rk+I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVNawtDFCWgz2d0dl8qm+SYXEdfiKKSfGu9MfdRoA8R3pvsxwO
+	A4MlHrdauZjqUMw6m81Kt980VJLH6qrKN0/n2wmdv3W0/8tyzayO1cuy
+X-Gm-Gg: AeBDievJkRhq7/27LAZB+wan5U6GFmc9+8sdcZNy97vq7fzX3CFgiR+Uq1fhpVh5AEa
+	7+14d4zGB9ckb5WkBKlRUn+9e79gcBYeAEG11Fv5xC0sMg65DkGJuwYGCfftRzguvJzVtKqKnCY
+	je3lsOHVkeyT2D8MxU+Npjw0VrQzgUWmVTD9RAs/d8UFqI4wMcro6pytdwjNjzHRS4wtM8B0kMC
+	oEzDfDEYHp2eHQQuQM8Vr1r/i8cPU5b/UALDblt5xw/XHbsUpfdQiRofahw3NADrpFXOWBhdHGb
+	BUwX83woGaw/e3rc6/UBN+Iux0CsDp/9fcKQLzGUriOTAukdlBhBXUMYYZdwI17zpvjyvQucfDS
+	Nu1IHiSNXVYoZXiPU9vfNUOID+1KzIk3IWoaAblbVoItTsWAuM9Ff8tczEXm927KhPWLFrLYxxF
+	Cr28PQ1ZuE49DDT6dQrxedLG5XVDgzyDByrlLfDmfUjUsseM5hgKxOac5EHT58OQl45Yb5esdWk
+	PfOFUsmwADfzA==
+X-Received: by 2002:a05:6000:3109:b0:43d:7d6f:f531 with SMTP id ffacd0b85a97d-44649ba1f4amr816127f8f.30.1777325358072;
+        Mon, 27 Apr 2026 14:29:18 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4463d02f270sm1120515f8f.9.2026.04.27.14.29.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Apr 2026 14:29:17 -0700 (PDT)
+Date: Mon, 27 Apr 2026 22:29:14 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, Yury Norov
+ <ynorov@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>, Thomas
+ Gleixner <tglx@linutronix.de>, linux-alpha@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-snps-arc@lists.infradead.org,
+ linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+ dmaengine@vger.kernel.org, linux-efi@vger.kernel.org,
+ linux-fsi@lists.ozlabs.org, amd-gfx@lists.freedesktop.org,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-spi@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-staging@lists.linux.dev,
+ linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
+ xen-devel@lists.xenproject.org, linux-fsdevel@vger.kernel.org,
+ ocfs2-devel@lists.linux.dev, bpf@vger.kernel.org,
+ kasan-dev@googlegroups.com, linux-mm@kvack.org, linux-x25@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, linux-sound@vger.kernel.org,
+ sound-open-firmware@alsa-project.org, linux-csky@vger.kernel.org,
+ linux-hexagon@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-m68k@lists.linux-m68k.org, linux-openrisc@vger.kernel.org,
+ linux-parisc@vger.kernel.org, linux-sh@vger.kernel.org,
+ linux-arch@vger.kernel.org
+Subject: Re: [RFC PATCH v1 5/9] uaccess: Switch to
+ copy_{to/from}_user_partial() when relevant
+Message-ID: <20260427222914.1cb2dd3b@pumpkin>
+In-Reply-To: <CAHk-=whC1DZojwdMB1=sJWG2=dsCdfyU8N6tDE1qx50HRZ-WJQ@mail.gmail.com>
+References: <cover.1777306795.git.chleroy@kernel.org>
+	<289b424e243ba2c4139ea04009cf8b9c448a87ff.1777306795.git.chleroy@kernel.org>
+	<CAHk-=whC1DZojwdMB1=sJWG2=dsCdfyU8N6tDE1qx50HRZ-WJQ@mail.gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] r8169: expose software counters through
- netdev qstats
-To: Gustavo Arantes <dev.gustavoa@gmail.com>, nic_swsd@realtek.com
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Javen Xu <javen_xu@realsil.com.cn>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260427205931.5884-1-dev.gustavoa@gmail.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <20260427205931.5884-1-dev.gustavoa@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 41C0C47A95B
+X-Rspamd-Queue-Id: 877C547AA92
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281496-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,realtek.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_FROM(0.00)[bounces-281497-lists,netdev=lfdr.de];
 	FREEMAIL_FROM(0.00)[gmail.com];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCPT_COUNT_TWELVE(0.00)[48];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux-foundation.org:email]
 
-On 27.04.2026 22:59, Gustavo Arantes wrote:
-> r8169 maintains synchronized per-CPU software counters for packet and
-> byte accounting and exposes them through ndo_get_stats64(), but
-> userspace using the structured netdev qstats API cannot retrieve them from
-> this driver.
-> 
-> Expose the same counters through netdev_stat_ops. r8169 has a single Rx
-> and Tx queue, so report the accumulated counters on queue 0. Use zero
-> base stats so device-scope qstats are derived from the queue counters
-> and match the packet and byte values reported through RTNL.
+On Mon, 27 Apr 2026 12:01:23 -0700
+Linus Torvalds <torvalds@linux-foundation.org> wrote:
 
-What do you mean with RTNL here?
+> On Mon, 27 Apr 2026 at 10:18, Christophe Leroy (CS GROUP)
+> <chleroy@kernel.org> wrote:
+> >
+> > In a subsequent patch, copy_{to/from}_user() will be modified to
+> > return -EFAULT when copy fails.  
+> 
+> Please don't do this.
+> 
+> This is a maintenance nightmare, and changes pretty much three decades
+> of semantics, and will cause *very* subtle backporting issues if
+> somebody happens to rely on the old / new behavior.
+> 
+> I understand the reasoning for the change, but I really don't think
+> the pain of creating yet another user copy interface is worth it.
+> 
+> We already have a lot of different versions of user copies for
+> different reasons, and while they all tend to have a good reason (and
+> some not-so-good, but historical reasons) for existing, this one
+> doesn't seem worth it.
+> 
+> The main - perhaps only - reason for this "partial" version is that
+> you want to do that "automatically inlined and optimized fixed-sized
+> case".
+> 
+> But here's the thing: I think you can already do that. Yes, it
+> requires some improvements to unsafe_copy_from_user(), but *that*
+> interface doesn't have three decades of history associated with it,
+> _and_ you're extending on that one anyway in this series.
+> 
+> "unsafe_copy_from_user()" is very odd, is meant only for small simple
+> copies that can be inlined and it's special-cased for 'objtool' anyway
+> (because objtool would have complained about an out-of-line call,
+> although it could have been special-cased other ways).
+> 
+> In other words: unsafe_copy_from_user() is *very* close to what you
+> want for that "Oh, I noticed that it's a small fixed-size copy, so I
+> want to special-case copy-from-user for that".
+> 
+> The _only_ issue with unsafe_copy_from_user() is that you can't see
+> that there were partial successes. But if *that* was fixed, then this
+> whole "create a new copy_from_user interface" issue would just go
+> away.
+> 
+> So please - let's just change unsafe_copy_from_user() to be usable for
+> the partial case.
+> 
+> And the thing is, all the existing unsafe_copy_from_user()
+> implementations already effectively *have* the "how much did I not
+> copy" internally, and they actually do extra work to hide it, ie they
+> have things like that
+> 
+>         int _i;
+> 
+> that is "how many bytes have I copied" in the powerpc implementation,
+> or the x86 code does
+> 
+>         size_t __ucu_len = (_len);
+> 
+> where that "ucu_len" is updated as you go along and is literally the
+> "how many bytes are left to copy" return value that is missing from
+> this interface.
+> 
+> So what I would suggest is
+> 
+>  - introduce a new user accessor helper that is used for *both*
+> unsafe_copy_to/from_user() *and* the "inline small constant-sized
+> normal copy_to/from_user()" calls
+> 
+>  - it's the same thing as the existing  unsafe_copy_to/from_user()
+> implementation, except it exposes how many bytes are left to be copied
+> to the exception label.
+
+I think there is a slight difference in that the normal copy_to_user()
+will determine the exact offset of the error by retrying with byte copies.
+
+There is also the issue of misaligned copies.
+
+Then there is the 'bugbear' of hardened user copies.
+Chasing down the stack to find whether the kernel buffer crosses
+a stack frame is probably more expensive than the copy for the typically
+small copies that will use on-stack buffers.
+
+	David
 
 > 
-> This does not add new accounting and does not touch the data path. It
-> only makes the existing counters available through the common qstats
-> interface, which lets generic userspace tooling query r8169 the same way
-> it queries other drivers with qstats support.
+> IOW, it would look something like
 > 
-Counters are exposed to userspace already. So what's the benefit of
-duplicating this functionality? To me the patch looks like AI slop.
-
-> Signed-off-by: Gustavo Arantes <dev.gustavoa@gmail.com>
-> ---
-> v2:
->   - Submit again now that net-next has reopened.
->   - Expand commit message to explain the qstats userspace benefit.
+>      #define unsafe_copy_to_user_outlen(_dst,_src,_len,label)...
 > 
-> Tested on a Realtek RTL8111/8168/8211/8411 PCIe Gigabit Ethernet
-> controller using the r8169 driver.
+> which is exactly the same as the current unsafe_copy_to_user(),
+> *except* it changes "_len" as it does along.
 > 
-> v1: https://lore.kernel.org/netdev/20260418021232.5425-1-dev.gustavoa@gmail.com/
+> And then you use that for both the "real" unsafe_copy_user and for the
+> "small constant values" case.
 > 
->  drivers/net/ethernet/realtek/r8169_main.c | 70 +++++++++++++++++++++++
->  1 file changed, 70 insertions(+)
+> Just as an example, attached is a completely stupid rough draft of a
+> patch that does this for x86 and only for unsafe_copy_to_user().
 > 
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index 791277e750ba..9d833b446383 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -5175,6 +5175,75 @@ rtl8169_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats)
->  	pm_runtime_put_noidle(&pdev->dev);
->  }
+> And I made a very very hacky change to kernel/sys.c to see what the
+> code generation looks like.
 > 
-> +static void rtl8169_fetch_sw_stats(struct net_device *dev,
-> +				   struct netdev_queue_stats_rx *rx,
-> +				   struct netdev_queue_stats_tx *tx)
-> +{
-> +	const struct pcpu_sw_netstats *stats;
-> +	unsigned int start;
-> +	int cpu;
-> +
-> +	for_each_possible_cpu(cpu) {
-> +		u64 rx_packets, rx_bytes, tx_packets, tx_bytes;
-> +
-> +		stats = per_cpu_ptr(dev->tstats, cpu);
-> +		do {
-> +			start = u64_stats_fetch_begin(&stats->syncp);
-> +			rx_packets = u64_stats_read(&stats->rx_packets);
-> +			rx_bytes = u64_stats_read(&stats->rx_bytes);
-> +			tx_packets = u64_stats_read(&stats->tx_packets);
-> +			tx_bytes = u64_stats_read(&stats->tx_bytes);
-> +		} while (u64_stats_fetch_retry(&stats->syncp, start));
-> +
-> +		rx->packets += rx_packets;
-> +		rx->bytes += rx_bytes;
-> +		tx->packets += tx_packets;
-> +		tx->bytes += tx_bytes;
-> +	}
-> +}
-
-This is generic, driver-independent code. If exposing dev->tstats this
-way makes sense, then this should go to net core.
-
-> +
-> +static void rtl8169_get_queue_stats_rx(struct net_device *dev, int idx,
-> +				       struct netdev_queue_stats_rx *rx)
-> +{
-> +	struct netdev_queue_stats_tx tx = {};
-> +
-> +	if (idx)
-> +		return;
-> +
-> +	rx->packets = 0;
-> +	rx->bytes = 0;
-> +	rtl8169_fetch_sw_stats(dev, rx, &tx);
-> +}
-> +
-> +static void rtl8169_get_queue_stats_tx(struct net_device *dev, int idx,
-> +				       struct netdev_queue_stats_tx *tx)
-> +{
-> +	struct netdev_queue_stats_rx rx = {};
-> +
-> +	if (idx)
-> +		return;
-> +
-> +	tx->packets = 0;
-> +	tx->bytes = 0;
-> +	rtl8169_fetch_sw_stats(dev, &rx, tx);
-> +}
-> +
-> +static void rtl8169_get_base_stats(struct net_device *dev,
-> +				   struct netdev_queue_stats_rx *rx,
-> +				   struct netdev_queue_stats_tx *tx)
-> +{
-> +	rx->packets = 0;
-> +	rx->bytes = 0;
-> +	tx->packets = 0;
-> +	tx->bytes = 0;
-> +}
-> +
-> +static const struct netdev_stat_ops rtl8169_stat_ops = {
-> +	.get_queue_stats_rx	= rtl8169_get_queue_stats_rx,
-> +	.get_queue_stats_tx	= rtl8169_get_queue_stats_tx,
-> +	.get_base_stats		= rtl8169_get_base_stats,
-> +};
-> +
->  static void rtl8169_net_suspend(struct rtl8169_private *tp)
->  {
->  	netif_device_detach(tp->dev);
-> @@ -5615,6 +5684,7 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+> This is what it results in on x86 with clang (with all the magic
+> .section data edited out):
 > 
->  	SET_NETDEV_DEV(dev, &pdev->dev);
->  	dev->netdev_ops = &rtl_netdev_ops;
-> +	dev->stat_ops = &rtl8169_stat_ops;
->  	tp = netdev_priv(dev);
->  	tp->dev = dev;
->  	tp->pci_dev = pdev;
-> --
-> 2.54.0
+>         ... edited out the code to generate the times
+>         ... this is the actual user copy:
+>         # HERE!
+>         movabsq $81985529216486895, %rcx        # imm = 0x123456789ABCDEF
+>         cmpq    %rcx, %rbx
+>         cmovaq  %rcx, %rbx
+>         stac
+>         movq    %r13, (%rbx)                    # exception to .LBB45_8
+>         movq    %r14, 8(%rbx)                   # exception to .LBB45_8
+>         movq    %r15, 16(%rbx)                  # exception to .LBB45_8
+>         movq    %rax, 24(%rbx)                  # exception to .LBB45_8
+>         clac
+> .LBB45_6:
+>         movq    jiffies(%rip), %rdi
+>         callq   jiffies_64_to_clock_t
+> .LBB45_7:
+>         addq    $16, %rsp
+>         popq    %rbx
+>         popq    %r12
+>         popq    %r13
+>         popq    %r14
+>         popq    %r15
+>         retq
+> .LBB45_8:
+>         clac
+>         movq    $-14, %rax
+>         jmp     .LBB45_7
 > 
+> and notice how the compiler noticed that the 'outlen' isn't actually
+> used, and turned the exception label into just a "return -EFAULT" and
+> never actually generated any code for updating remaining lengths?
+> 
+> That actually looks pretty much optimal for a 32-byte user copy.
+> 
+> And it didn't involve changing the semantics at all.
+> 
+> Just to check, I changed that "times()" system call to return the
+> number of bytes uncopied instead (to emulate the "I actually want to
+> know what's left" case), and it generated this:
+> 
+>         # HERE!
+>         movabsq $81985529216486895, %rcx        # imm = 0x123456789ABCDEF
+>         cmpq    %rcx, %rbx
+>         cmovaq  %rcx, %rbx
+>         stac
+>         movl    $32, %ecx
+>         movq    %r13, (%rbx)                    # exception to .LBB45_7
+>         movl    $24, %ecx
+>         movq    %r15, 8(%rbx)                   # exception to .LBB45_7
+>         movl    $16, %ecx
+>         movq    %r14, 16(%rbx)                  # exception to .LBB45_7
+>         movl    $8, %ecx
+>         movq    %rax, 24(%rbx)                  # exception to .LBB45_7
+>         clac
+>         xorl    %ecx, %ecx
+> .LBB45_8:
+>         movq    %rcx, %rax
+>         addq    $16, %rsp
+>         popq    %rbx
+>         popq    %r12
+>         popq    %r13
+>         popq    %r14
+>         popq    %r15
+>         retq
+> .LBB45_6:
+>         movq    jiffies(%rip), %rdi
+>         jmp     jiffies_64_to_clock_t           # TAILCALL
+> .LBB45_7:
+>         clac
+>         jmp     .LBB45_8
+> 
+> so it all seems to work - although obviously the above is *not* the normal case.
+> 
+> NOTE NOTE NOTE! The attached patch is entirely untested. I obviously
+> did some "test code generation" with it, but I only *looked* at the
+> result, and maybe it has some fundamental problem that I just didn't
+> notice. So treat this as a "how about this approach" patch, not as
+> anything more serious than that.
+> 
+> And the kerrnel/sys.c hack is very obviously just that: a complate
+> hack for testing.
+> 
+> A real patch would do that "for small constant-sized copies, turn
+> copy_to_user() automatically into "_small_copy_to_user()".
+> 
+> The attached is *not* a real patch. Treat it with the contempt it deserves.
+> 
+>              Linus
 
 
