@@ -1,132 +1,144 @@
-Return-Path: <netdev+bounces-281316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281317-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IPhYOfFK72lO/wAAu9opvQ
-	(envelope-from <netdev+bounces-281316-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 13:39:29 +0200
+	id YJPsJNJM72kEAAEAu9opvQ
+	(envelope-from <netdev+bounces-281317-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 13:47:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48A96471DD3
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 13:39:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB93C471F5D
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 13:47:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B164D3032748
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 11:35:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 56C39303A12E
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 11:46:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE5D530AD15;
-	Mon, 27 Apr 2026 11:35:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E75BE314A86;
+	Mon, 27 Apr 2026 11:46:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ccnRk3J+"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="u42SxLhm"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A486D1AA1D2
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 11:35:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A59083128A2;
+	Mon, 27 Apr 2026 11:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777289712; cv=none; b=DAzsQ9XhDyOPX41h2/Erj98tPIIti1l/FniR+aUQRF8ANEAF0Vg7WcXU/IsMOjgZ+NPDr3a1HtNb85twavttS9HUhPm1Bs7akK6SesGg10GSmN8OX5Dgv2CPJk52z7epvndrQg4ZO1Ja6XDOS/9v4LbpCZNv2i8Znwam+0Vclq4=
+	t=1777290390; cv=none; b=qC1XJkQUvJiQOk+R3xvaJ8tRB6RSjNYz55WsnqZR30kgd0NKKbbBI/6XVe/dMpk9Y8wxNElUBIepL/rcvov7xjGwQJVuSR4wp6CfuQLBzt7T1rJyy5BmUEDGmzCqoTQe6k5Y5hg5p1RG0Jle+WtTHRfCxKAIyO3Q3zWtiCTpuNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777289712; c=relaxed/simple;
-	bh=zTmOBQOfI2cC6OKRMtTqpwmhqCYyPD1tqmAV3nNBJko=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HFuQgtYMMclqow+FCOquw9gh6/Zy0+hBlFemEtKpg9+EcRT2zqwuEBFRVlxFQhSUNVttSr3oYquxEgFOHyMES90HLvh8mlbkQJWwFbHdWO1SC87sxdfg+oEm/W9u0hXZ5rfhMwex1SJZd7E10W0mApb50QwaB95FXV+xvgs5ozE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ccnRk3J+; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777289710;
+	s=arc-20240116; t=1777290390; c=relaxed/simple;
+	bh=CTj4QwE1RWL3i8XJdtIRCIYzLjALNk996d85++ya1yw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XtawYUFLIa4yw0S5k3Z58sKWSbf/ju5lpnAcji+OvL0sVmI/R7lgGzkAqEeuzG6uJKa2gmatBj8sO/k0QdvHgxfF2Q/P4cqHNBtx3hkJeRZGrBqrzLmQrL9yp4A4doJVNeC13FB4ha5CQ6bksmNktPCzCEIRXtayKCtK5qUUWBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=u42SxLhm; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1777290386;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zTmOBQOfI2cC6OKRMtTqpwmhqCYyPD1tqmAV3nNBJko=;
-	b=ccnRk3J+T4+UiBaoTOeyP65EOS56N/SmHAX6DT1A2dOq5vgYHlp5FhW/JAhJibGO3DWOvR
-	Oytu5WyQqMxFJcv7vAs+M1cJHgw4ikhHn9ssfET1zYSN11l1IcCADeyudYwj6rtDX+l/37
-	mO9KGb9/N3QYSG3Y/cHjanY1/6TKAFw=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-217-5jr6GjTLMJ-8MlD7OXhyrQ-1; Mon,
- 27 Apr 2026 07:35:05 -0400
-X-MC-Unique: 5jr6GjTLMJ-8MlD7OXhyrQ-1
-X-Mimecast-MFC-AGG-ID: 5jr6GjTLMJ-8MlD7OXhyrQ_1777289703
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 20CDF19560BF;
-	Mon, 27 Apr 2026 11:35:03 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.44.32.96])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A457D19560B7;
-	Mon, 27 Apr 2026 11:34:58 +0000 (UTC)
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-To: przemyslaw.kitszel@intel.com
-Cc: aleksandr.loktionov@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	jacob.e.keller@intel.com,
-	jtornosm@redhat.com,
-	kuba@kernel.org,
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=8BW7GQeRm82gJgeFBqFgMlL65ttm9v5/emTGsqLJjPc=;
+	b=u42SxLhmacDDfSoqTNO7eZKLEI4/AT+EWlfQ70vVOUGJgV2BGvJWs08GcF2zqA9A69iAp6
+	CyTBrphoHtXre1Ecn3a9gTWizlZT/P84UDC/qOXl9aUEdVH9oKZhLOPz0yhC+UIi85pWUC
+	ghzX2OW3Z49wv8eC8wqKyGwa28QJViw=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: David Howells <dhowells@redhat.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	Tim Bird <tim.bird@sony.com>,
+	keyrings@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH net v4 3/4] iavf: send MAC change request synchronously
-Date: Mon, 27 Apr 2026 13:34:56 +0200
-Message-ID: <20260427113456.1267171-1-jtornosm@redhat.com>
-In-Reply-To: <d055ed86-89d9-42fd-a881-0384ebfd24f7@intel.com>
-References: <d055ed86-89d9-42fd-a881-0384ebfd24f7@intel.com>
+	linux-hardening@vger.kernel.org
+Subject: [PATCH net-next v3 1/2] keys, dns: drop unused upayload->data NUL terminator
+Date: Mon, 27 Apr 2026 13:44:23 +0200
+Message-ID: <20260427114422.313356-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1396; i=thorsten.blum@linux.dev; h=from:subject; bh=CTj4QwE1RWL3i8XJdtIRCIYzLjALNk996d85++ya1yw=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJnvfcQUg7vf8P+dzX5OviQ+4rP+j+/zndlcSsy5bwXbH d54ujOyo5SFQYyLQVZMkeXBrB8zfEtrKjeZROyEmcPKBDKEgYtTACZifo/hv9PZgomXW4/nr2Th vHFP5l3aBnHfCR/XVX0WOffhlMnUWQoM/32nTq1+tc6kaAPf9gfKpyr0YlwL5wavEWnqNH9nopo sygIA
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
-X-Rspamd-Queue-Id: 48A96471DD3
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: EB93C471F5D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281316-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jtornosm@redhat.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-281317-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_COUNT_THREE(0.00)[3];
 	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[thorsten.blum@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Hello Przemek,
+->data includes an extra NUL terminator despite never being used as a C
+string and only accessing ->datalen bytes. Remove the redundant NUL
+terminator and allocate one byte less in dns_resolver_preparse().
 
-Thank you again for your comments.
-I will try to include the new ones too in the next version.
-Indeed kdoc "Return:" was already commented by you, I will try to address
-all the occurences now.
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+Changes in v3:
+- Update commit message
+- v2: https://lore.kernel.org/lkml/20260409225703.158552-4-thorsten.blum@linux.dev/
 
-Thanks
+Changes in v2:
+- No changes in patch 1/2
+- v1: https://lore.kernel.org/lkml/20260406175810.1018681-3-thorsten.blum@linux.dev/
+---
+ net/dns_resolver/dns_key.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Best regards
-Jose Ignacio
-
+diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
+index c3c8c3240ef9..451247864a63 100644
+--- a/net/dns_resolver/dns_key.c
++++ b/net/dns_resolver/dns_key.c
+@@ -203,7 +203,7 @@ dns_resolver_preparse(struct key_preparsed_payload *prep)
+ 	kdebug("store result");
+ 	prep->quotalen = result_len;
+ 
+-	upayload = kmalloc_flex(*upayload, data, result_len + 1);
++	upayload = kmalloc_flex(*upayload, data, result_len);
+ 	if (!upayload) {
+ 		kleave(" = -ENOMEM");
+ 		return -ENOMEM;
+@@ -211,7 +211,6 @@ dns_resolver_preparse(struct key_preparsed_payload *prep)
+ 
+ 	upayload->datalen = result_len;
+ 	memcpy(upayload->data, data, result_len);
+-	upayload->data[result_len] = '\0';
+ 
+ 	prep->payload.data[dns_key_data] = upayload;
+ 	kleave(" = 0");
 
