@@ -1,256 +1,396 @@
-Return-Path: <netdev+bounces-281487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281488-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OHUZDDjI72knGAEAu9opvQ
-	(envelope-from <netdev+bounces-281487-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:34:00 +0200
+	id YKmnIW/I72knGAEAu9opvQ
+	(envelope-from <netdev+bounces-281488-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:34:55 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1DAC47A136
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:33:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E294147A16C
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:34:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6A3F030D9BF2
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:28:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 44C50302DB44
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B30C236EA8C;
-	Mon, 27 Apr 2026 20:28:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4FFB370D5C;
+	Mon, 27 Apr 2026 20:30:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nP3MBK2r"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EwEeH74w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E8D36D517;
-	Mon, 27 Apr 2026 20:28:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777321730; cv=none; b=YeVZ0JRjwvh27TFe5M0GeP1laDDk66ewRGmJNzhxJSif+k4gX/4Kw0k7eqBsb75Az1fQD0rG3h4bRzJ6X5WI2vnpFpcjBrI0ZFJ/oGNAIBwrMkit/sQeJ7VydH9PSt3/fxWzt+37TUNyWWUJ0vtUYsSVkyP3P7QrsFAuT5YvuO0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777321730; c=relaxed/simple;
-	bh=WwCEgKmsOv/luKExMIN07wuqqxA5j7fzrpkrBbHAXCU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nBHXQPsVd8VRKYeGXL25qbUMtHvDlXA54TdYYFSoUkpGXAzka3gKkuytn6iNrbe5LTuvzKAAb3UVYU2yLeitFbUn47MIe0YLbolbGP5bAbS4+tP+x9dcNXcLKS7dWiQs8Uvc45XxOpuxESQRMPYgTBgONyxY7Bt+ZkbIkgcMt3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nP3MBK2r; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777321730; x=1808857730;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=WwCEgKmsOv/luKExMIN07wuqqxA5j7fzrpkrBbHAXCU=;
-  b=nP3MBK2rYgjH2Lmu/R37h8cJhXQajk8iLWsLvlFRtdf7hD/rqr10Dz1m
-   Hyf/yaiWN4MpxMsTsFjTwu6r/JjtkFtvBRx2S+aHCitRuVqXT6THEy/Tf
-   kvycxw38vlATbFcxz1xLqbQeZB6cGm8/ril/iaEXSub4wXpyFB+XCwyvz
-   9kd0xcOkkoKpyH/sPx9etAA3HV7A4cjqBniZNeXqCx0Yo39TdDUepl2sQ
-   hkB2jmgqunaytWLF9LIyO/WkQt4802K5c1IfRz78NadU+aThuVIJfHbvz
-   mmkV3BG4NOBuiIR8EJLfW72hFc6sHjGWPc8cSgqRsEmmcUgRvSU4QFMmz
-   g==;
-X-CSE-ConnectionGUID: qrrur1y7TZa6VRMmxlFbaQ==
-X-CSE-MsgGUID: jr3E0PRcQ4CHt21SNiTWlA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11769"; a="78114791"
-X-IronPort-AV: E=Sophos;i="6.23,202,1770624000"; 
-   d="scan'208";a="78114791"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2026 13:28:49 -0700
-X-CSE-ConnectionGUID: 7PuD40s3Rgq6p6e0y8l8fA==
-X-CSE-MsgGUID: +fMDpSQvRQORY1ivZQjeyA==
-X-ExtLoop1: 1
-Received: from arjan-box.jf.intel.com ([10.88.27.153])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2026 13:28:48 -0700
-From: Arjan van de Ven <arjan@linux.intel.com>
-To: linux-wireless@vger.kernel.org
-Cc: syzbot+ca7a2759caaa6cd4e3db@syzkaller.appspotmail.com,
-	johannes@sipsolutions.net,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [wireless?] divide error in mac80211_hwsim_link_info_changed (3)
-Date: Mon, 27 Apr 2026 13:29:54 -0700
-Message-ID: <20260427203005.506192-1-arjan@linux.intel.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <69efb8dd.050a0220.18b4f.0006.GAE@google.com>
-References: <69efb8dd.050a0220.18b4f.0006.GAE@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 156F736167F
+	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 20:30:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777321835; cv=pass; b=BmzHD377/MW+y1bje7CaSdj7fx3YxWm7BiQjOP/mr6phXxh6n1W2rNBQazkaVoY9Vbg1FWIPMb4eQERVgzkUR7xetjIoyHbOZ5WsPlz7b5eX+pTKspJmBQHC38ATvd9W4zzmoZlaK5S5pQiLQvJovLQP/YpKrPXwT9/uZNeKA8Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777321835; c=relaxed/simple;
+	bh=CBdZD0o0xH6S63xgHNjMb6WcEzD+oBN8na7BiQ261sM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WxUPl5Vb33hBUMwziMEkxvSoVPaRwF5Y136lw0nJ5o82/Qb6b0v7bp5EW1d3/FllMZR3Nb8gcKXbqcDi0QFMu0BCbiJOPUEUTCJIQ4Xf8VgO6ikhTx5eN7x2mTYHmCdiTJb6BDRqOyBiWapzozd2m+/pccJmchG6nJuJmBWEwmw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EwEeH74w; arc=pass smtp.client-ip=209.85.217.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-6221c7251e1so1275699137.3
+        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 13:30:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777321833; cv=none;
+        d=google.com; s=arc-20240605;
+        b=NnVhgtW0MnMp+tLWZuqtZRcHLkUu/WteXpDJuzUGQR4dh874CJujJkOi1BYfEDvV3+
+         fqgweAG6DqcPxrPuUML+Cm2HTEruvqyGTG6sogDIiVmLirj0N/7BQhqbLe3rz+E+MJgm
+         qvwrsBcDi1qOUwaG1Z1adA4VdTKJ+Ra4wbMe+gFfAzfEk4JYLXQYXcEp92ALL306sH1U
+         mX+LuBJcM9u4Jhtv0XloGBxrWDB3PZwYlHfif4Saj5sBwOLQxYJe/TBuN5BXZYhLWaBJ
+         pj8m/Md8vCOsrmlfYFyFB21oFLjXGVsWPhWeimApoX1m8QxXtj7Rm9JMylC7pyixfB/B
+         u6pA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=cY52Pc8bna5SJOkKQJ9yeqlkwv7LoY6hzA8k6b64L0E=;
+        fh=TFVZDBVv6+uJyaDy9MZH7MSDBxqchq7s8OthFdtphRk=;
+        b=iBwqpflAeNcOurHTsZbph9U5g6P02ouwHzJ49YND3gCCmXmCmZQIFDux5KvjTnnAUe
+         EiS+r3gLGFRhO3/L8fJkDcr7aigZDAE2vsIXHLYpPMCUMKtZ94pVKRe6+UuATX6ur/Ou
+         MWAOrVdpS/4CrlPyEQyB+9kwscyRiMYxmiGtB8MKkuNIZ7stOlZ+Zrlu8cdYYT3LVj4G
+         0mTvRDiV0zDBslcAOP/OVrkzuam+UDlP7sIE+donyq4oYRxpumQE0B87pY4YDJ4bECbF
+         zTSwy1Q9YNBMelcRDPspg3KwruCenBgFWYm5zgSHJ3U4vzEdj84Rz5H+xlYnKMkSQzhm
+         gslw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777321833; x=1777926633; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cY52Pc8bna5SJOkKQJ9yeqlkwv7LoY6hzA8k6b64L0E=;
+        b=EwEeH74w26HJdAfwdB0cvHTiewHqmSaUtDplpaXXUTbzdwjQkJ2S4PEDlFADN1J6xA
+         uelQT6ZcUNBgaC8hi7GDfG6wc3UzhiNpD6BYMH4wTt0eA8eu7tHDt3zf4Dd85SZHfBkt
+         nwbHWiDAsdWwrRomnxgnzdh38F0e1/wKfqAiq4xe1vRZIcoGQpUnw3I1fgvSQsO46ovT
+         RCB1LGOcuwNm1j3Zc/dwbXEHav3kbahmhqhkUgYW977smN4M4KTC2pbZH/3vIUknRKgC
+         yv07N5geyc0Q2mKaTCxvv3/W3wGjyBCsy+FVQWnU+2aWOWBDmKE9zxnYIoeH/BpNJOPC
+         bmvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777321833; x=1777926633;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=cY52Pc8bna5SJOkKQJ9yeqlkwv7LoY6hzA8k6b64L0E=;
+        b=FtHOWeUUtqcnpxB2ZoFrBII0/P9P5/XeN2KdLcA0vc/p5oAcUF5pRCDvv27+zUUcNf
+         5mz2EG+sk84ZVh7cGaRBe8l/elT5gOHE0/KiuhkLDbGXBzF7c+p/A4DlsGbxHYXvD30Y
+         ljBmwaWAKXDncEj3Fx7MllyNuGBlaCitdlWedvRcnkt16/bkBFIYG4X6sBVTLaOHRq5X
+         w+ALKI9Ngr0Q4Gknc0dAi4Z2V3/736gWMxzZ2y0qT66LhHardA8Y2C1/ZhfFxbmiG2vn
+         f7Qfvl8RcF9H4/f6xqy59c2NAXxHG9enHOGTEZkzsZpA+XHglmUZcShwhXogzMDHXqwu
+         3KOg==
+X-Gm-Message-State: AOJu0YxOG7CoF7R8gpwlinAvUSF5b2VxNybGkF5tTtOo2M4RZ+sUjvkA
+	0Du66eBpZ7lkpWJPqxQqm7CWpDyoHg4BS5YGFkDAZR3+ni83C3F1Q1mTP8swefoLKpl8UMFYRfN
+	lMBZJW6K/S3GwFFDoP1bdJY5Bzx61JaxDkgWC0uKG
+X-Gm-Gg: AeBDieuK2BbT/IxrF3UHwIR1qo6zi8fdK2cvmcI0DEDhzOjbeI/wbG6eZCF6KgCa5jn
+	Q0W8VQ7SndkZ6JDasbNBWS+PypCS650cr2k5eWByoyzF2gasNWuQiawK0ZDdaWh6SAfxoD4z04R
+	z/ByjHYmZ+ZaRswVZgNOcqMtnWDcwryWGyX+civ82kXRcAIhpIVAdQ4a9VyReYJjpHcBD5ZdN0O
+	C494fn8xCkUDl+aamKYHLfosc9DaVGeAaB1avp2tTMt5+VuePIGOsVuBBgyN+wN2qckipfHR0t3
+	Ds1Plptvd4vw+L0mlAU/KzkY5MTqgdVtNiwvkkHEDl3R9h2AlmcBL4MzI78g2Cg9bQr4lQ==
+X-Received: by 2002:a05:6102:2c1c:b0:602:7a74:fbbe with SMTP id
+ ada2fe7eead31-6280957715cmr78081137.9.1777321831899; Mon, 27 Apr 2026
+ 13:30:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: C1DAC47A136
+References: <20260425002450.163421-1-hramamurthy@google.com> <20260425002450.163421-3-hramamurthy@google.com>
+In-Reply-To: <20260425002450.163421-3-hramamurthy@google.com>
+From: Pin-yen Lin <treapking@google.com>
+Date: Mon, 27 Apr 2026 13:30:19 -0700
+X-Gm-Features: AVHnY4JhU_x70BQYQBtGqiCKWI6PJnTqpp26JxQs8TL_ZMA2BaJXIKOffX2Em-Y
+Message-ID: <CAHwYsiotoLU+toZmVzUcSpA+7v+R8PWnm04C1PrPbi29RJavfQ@mail.gmail.com>
+Subject: Re: [PATCH net v2 2/4] gve: Fix backward stats when interface goes
+ down or configuration is adjusted
+To: Harshitha Ramamurthy <hramamurthy@google.com>
+Cc: netdev@vger.kernel.org, joshwash@google.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	willemb@google.com, maolson@google.com, nktgrg@google.com, jfraker@google.com, 
+	ziweixiao@google.com, jacob.e.keller@intel.com, pkaligineedi@google.com, 
+	shailend@google.com, jordanrhee@google.com, stable@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Debarghya Kundu <debarghyak@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: E294147A16C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_MISSING_CHARSET(0.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281487-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-281488-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[arjan@linux.intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.intel.com:mid,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,ca7a2759caaa6cd4e3db];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	SUBJECT_HAS_QUESTION(0.00)[]
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[treapking@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
 
-This email is created by automation to help kernel developers
-deal with a large volume of AI generated bug reports by decoding
-oopses into more actionable information.
+On Fri, Apr 24, 2026 at 5:24=E2=80=AFPM Harshitha Ramamurthy
+<hramamurthy@google.com> wrote:
+>
+> From: Debarghya Kundu <debarghyak@google.com>
+>
+> gve_get_base_stats() sets all the stats to 0, so the stats go backwards
+> when interface goes down or configuration is adjusted.
+>
+> Fix this by persisting baseline stats across interface down.
+>
+> Cc: stable@vger.kernel.org
+> Fixes: 2e5e0932dff5 ("gve: add support for basic queue stats")
+> Signed-off-by: Debarghya Kundu <debarghyak@google.com>
+> Co-developed-by: Pin-yen Lin <treapking@google.com>
+> Signed-off-by: Pin-yen Lin <treapking@google.com>
+> Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+> ---
+> Changes in v2:
+> - Add a NULL pointer check in gve_get_ring_err_stats() (Sashiko)
+> - Use local variable to prevent inflates from u64_stats_fetch_retry()
+>   (Sashiko)
+> - Add u64_stats_fetch/begin to protect base stats (Sashiko)
+>
+>  drivers/net/ethernet/google/gve/gve.h      |  7 ++
+>  drivers/net/ethernet/google/gve/gve_main.c | 88 ++++++++++++++++++++--
+>  2 files changed, 88 insertions(+), 7 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet=
+/google/gve/gve.h
+> index 1d66d3834f7e..702b1641d984 100644
+> --- a/drivers/net/ethernet/google/gve/gve.h
+> +++ b/drivers/net/ethernet/google/gve/gve.h
+> @@ -794,6 +794,10 @@ struct gve_ptp {
+>         struct gve_priv *priv;
+>  };
+>
+> +struct gve_ring_err_stats {
+> +       u64 rx_alloc_fails;
+> +};
+> +
+>  struct gve_priv {
+>         struct net_device *dev;
+>         struct gve_tx_ring *tx; /* array of tx_cfg.num_queues */
+> @@ -883,6 +887,9 @@ struct gve_priv {
+>         unsigned long service_task_flags;
+>         unsigned long state_flags;
+>
+> +       struct gve_ring_err_stats base_ring_err_stats;
+> +       struct rtnl_link_stats64 base_net_stats;
+> +       struct u64_stats_sync base_statss; /* sync stats for 32bit archs =
+*/
 
+Sashiko says:
 
-Decoded Backtrace
+Is u64_stats_init(&priv->base_statss) ever explicitly called during driver
+probe?
+netdev_alloc_priv() zero-allocates the memory, but on 32-bit architectures
+or when lockdep is enabled, the underlying seqcount_t requires explicit
+initialization to set up its lockdep class key.
+Could failing to initialize it trigger a lockdep splat when the interface
+goes down and u64_stats_update_begin() is invoked?
 
-1. mac80211_hwsim_link_info_changed -- crash site
-   (drivers/net/wireless/virtual/mac80211_hwsim.c:2734)
+Yes, this is missing in this series. We will include this in v3.
 
-2701  static void mac80211_hwsim_link_info_changed(struct ieee80211_hw *hw,
-2702  					     struct ieee80211_vif *vif,
-2703  					     struct ieee80211_bss_conf *info,
-2704  					     u64 changed)
-2705  {
-2706  	struct hwsim_vif_priv *vp = (void *)vif->drv_priv;
-2707  	struct mac80211_hwsim_data *data = hw->priv;
-2708  	unsigned int link_id = info->link_id;
-2709  	struct mac80211_hwsim_link_data *link_data = &data->link_data[link_id];
-        ...
-2722  	if (changed & BSS_CHANGED_BEACON_ENABLED) {
-2723  		wiphy_dbg(hw->wiphy, "  BCN EN: %d (BI=%u)\n",
-2724  			  info->enable_beacon, info->beacon_int);
-2725  		vp->bcn_en = info->enable_beacon;
-2726  		if (data->started &&
-2727  		    !hrtimer_active(&link_data->beacon_timer) &&
-2728  		    info->enable_beacon) {
-2729  			u64 tsf, until_tbtt;
-2730  			u32 bcn_int;
-2731  			link_data->beacon_int = info->beacon_int * 1024;
-2732  			tsf = mac80211_hwsim_get_tsf(hw, vif);
-2733  			bcn_int = link_data->beacon_int;
--> 2734  			until_tbtt = bcn_int - do_div(tsf, bcn_int);  // <- bcn_int=0; RSI=0 -> #DE
-2735
-2736  			hrtimer_start(&link_data->beacon_timer,
-2737  				      ns_to_ktime(until_tbtt * NSEC_PER_USEC),
-2738  				      HRTIMER_MODE_REL_SOFT);
-2739  		} else if (!info->enable_beacon) {
-        ...
-2748  				link_data->beacon_int = 0;
-        ...
-2750  		}
-2751  	}
+>         struct gve_stats_report *stats_report;
+>         u64 stats_report_len;
+>         dma_addr_t stats_report_bus; /* dma address for the stats report =
+*/
+> diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/eth=
+ernet/google/gve/gve_main.c
+> index ef00d9ca1643..1fec8e1e4821 100644
+> --- a/drivers/net/ethernet/google/gve/gve_main.c
+> +++ b/drivers/net/ethernet/google/gve/gve_main.c
+> @@ -106,9 +106,34 @@ static netdev_tx_t gve_start_xmit(struct sk_buff *sk=
+b, struct net_device *dev)
+>                 return gve_tx_dqo(skb, dev);
+>  }
+>
+> -static void gve_get_stats(struct net_device *dev, struct rtnl_link_stats=
+64 *s)
+> +static void gve_add_base_stats(struct gve_priv *priv,
+> +                              struct rtnl_link_stats64 *s)
+> +{
+> +       struct rtnl_link_stats64 *base_stats =3D &priv->base_net_stats;
+> +       unsigned int start;
+> +       u64 rx_packets, rx_bytes, rx_dropped, tx_packets, tx_bytes, tx_dr=
+opped;
+> +
+> +       do {
+> +               start =3D u64_stats_fetch_begin(&priv->base_statss);
+> +               rx_packets =3D base_stats->rx_packets;
+> +               rx_bytes =3D base_stats->rx_bytes;
+> +               rx_dropped =3D base_stats->rx_dropped;
+> +               tx_packets =3D base_stats->tx_packets;
+> +               tx_bytes =3D base_stats->tx_bytes;
+> +               tx_dropped =3D base_stats->tx_dropped;
+> +       } while (u64_stats_fetch_retry(&priv->base_statss, start));
+> +
+> +       s->rx_packets +=3D rx_packets;
+> +       s->rx_bytes +=3D rx_bytes;
+> +       s->rx_dropped +=3D rx_dropped;
+> +       s->tx_packets +=3D tx_packets;
+> +       s->tx_bytes +=3D tx_bytes;
+> +       s->tx_dropped +=3D tx_dropped;
+> +}
+> +
+> +static void gve_get_ring_stats(struct gve_priv *priv,
+> +                              struct rtnl_link_stats64 *s)
+>  {
+> -       struct gve_priv *priv =3D netdev_priv(dev);
+>         unsigned int start;
+>         u64 packets, bytes;
+>         int num_tx_queues;
+> @@ -143,6 +168,14 @@ static void gve_get_stats(struct net_device *dev, st=
+ruct rtnl_link_stats64 *s)
+>         }
+>  }
+>
+> +static void gve_get_stats(struct net_device *dev, struct rtnl_link_stats=
+64 *s)
+> +{
+> +       struct gve_priv *priv =3D netdev_priv(dev);
+> +
+> +       gve_get_ring_stats(priv, s);
+> +       gve_add_base_stats(priv, s);
+> +}
+> +
+>  static int gve_alloc_flow_rule_caches(struct gve_priv *priv)
+>  {
+>         struct gve_flow_rules_cache *flow_rules_cache =3D &priv->flow_rul=
+es_cache;
+> @@ -1533,6 +1566,29 @@ static int gve_queues_stop(struct gve_priv *priv)
+>         return gve_reset_recovery(priv, false);
+>  }
+>
+> +static void gve_get_ring_err_stats(struct gve_priv *priv,
+> +                                  struct gve_ring_err_stats *err_stats)
+> +{
+> +       int ring;
+> +
+> +       if (!priv->rx)
+> +               return;
+> +
+> +       for (ring =3D 0; ring < priv->rx_cfg.num_queues; ring++) {
+> +               struct gve_rx_ring *rx =3D &priv->rx[ring];
+> +               unsigned int start;
+> +               u64 rx_alloc_fails;
+> +
+> +               do {
+> +                       start =3D u64_stats_fetch_begin(&rx->statss);
+> +                       rx_alloc_fails =3D rx->rx_skb_alloc_fail +
+> +                                        rx->rx_buf_alloc_fail;
+> +               } while (u64_stats_fetch_retry(&rx->statss, start));
+> +
+> +               err_stats->rx_alloc_fails +=3D rx_alloc_fails;
+> +       }
+> +}
+> +
+>  static int gve_close(struct net_device *dev)
+>  {
+>         struct gve_priv *priv =3D netdev_priv(dev);
+> @@ -1542,6 +1598,12 @@ static int gve_close(struct net_device *dev)
+>         if (err)
+>                 return err;
+>
+> +       /* Save ring queue and err stats before closing the interface */
+> +       u64_stats_update_begin(&priv->base_statss);
 
-2. drv_link_info_changed -- (net/mac80211/driver-ops.c:497)
+Sashiko says:
 
-460  void drv_link_info_changed(struct ieee80211_local *local,
-461  			   struct ieee80211_sub_if_data *sdata,
-462  			   struct ieee80211_bss_conf *info,
-463  			   int link_id, u64 changed)
-464  {
-        ...
-493  	trace_drv_link_info_changed(local, sdata, info, changed);
-494  	if (local->ops->link_info_changed)
-495  		local->ops->link_info_changed(&local->hw, &sdata->vif,
-496  					      info, changed);
--> 497  	else if (local->ops->bss_info_changed)
-498  		local->ops->bss_info_changed(&local->hw, &sdata->vif,
-499  					     info, changed);
-500  	trace_drv_return_void(local);
-501  }
+Is there a risk of a deadlock here on 32-bit platforms?
+ndo_get_stats64 (which calls gve_get_stats()) can execute concurrently in
+softirq context. u64_stats_update_begin() on 32-bit platforms acquires a
+seqcount lock but does not disable bottom halves.
+If a softirq interrupts this update on the same CPU, could the lockless
+reader spin infinitely waiting for the sequence counter to become even,
+causing a hard deadlock?
+Should this update be wrapped in local_bh_disable() and local_bh_enable()?
 
-3. ieee80211_offchannel_return -- (net/mac80211/offchannel.c:160)
+We will add this in v3.
 
-133  void ieee80211_offchannel_return(struct ieee80211_local *local)
-134  {
-135  	struct ieee80211_sub_if_data *sdata;
-136
-137  	lockdep_assert_wiphy(local->hw.wiphy);
-        ...
-142  	list_for_each_entry(sdata, &local->interfaces, list) {
-        ...
-157  		if (test_and_clear_bit(SDATA_STATE_OFFCHANNEL_BEACON_STOPPED,
-158  				       &sdata->state)) {
-159  			sdata->vif.bss_conf.enable_beacon = true;
--> 160  			ieee80211_link_info_change_notify(
-161  				sdata, &sdata->deflink,
-162  				BSS_CHANGED_BEACON_ENABLED);
-163  		}
-164  	}
+> +       gve_get_ring_stats(priv, &priv->base_net_stats);
+> +       gve_get_ring_err_stats(priv, &priv->base_ring_err_stats);
+> +       u64_stats_update_end(&priv->base_statss);
+> +
+>         gve_queues_mem_remove(priv);
 
-4. __ieee80211_scan_completed -- (net/mac80211/scan.c:519)
+Sashiko says:
 
-516  	if (!hw_scan && was_scanning) {
-517  		ieee80211_configure_filter(local);
-518  		drv_sw_scan_complete(local, scan_sdata);
--> 519  		ieee80211_offchannel_return(local);
-520  	}
+Will this sequence cause a transient double-counting of statistics?
+The active ring stats are accumulated into base_net_stats, but the ring
+pointers (priv->rx, priv->tx) remain active and are not cleared until
+gve_queues_mem_remove() executes later.
+If gve_get_stats() executes concurrently during this window, does it sum bo=
+th
+the active ring stats and the newly updated base_net_stats (which now
+incorporates those same ring stats)?
+One additional pre-existing issue related to this code path: does
+gve_queues_mem_remove() leave a window for a use-after-free?
+ndo_get_stats64 executes locklessly under RCU and checks if (priv->rx)
+before reading ring stats. gve_queues_mem_remove() frees priv->rx using
+kvfree(), but sets the pointer to NULL only after the memory is freed.
+If ndo_get_stats64 checks priv->rx, gets preempted, and resumes after
+gve_close() frees the array, could it dereference freed memory?
 
-5. cfg80211_wiphy_work -- (net/wireless/core.c:513)
-   (workqueue dispatch point for scan completion)
+Both point to a pre-existing race between stats and gve_close(). We
+will address this in v3.
 
+>         return 0;
+>  }
+> @@ -2784,12 +2846,24 @@ static void gve_get_base_stats(struct net_device =
+*dev,
+>                                struct netdev_queue_stats_rx *rx,
+>                                struct netdev_queue_stats_tx *tx)
+>  {
+> -       rx->packets =3D 0;
+> -       rx->bytes =3D 0;
+> -       rx->alloc_fail =3D 0;
+> +       const struct gve_ring_err_stats *base_err_stats;
+> +       const struct rtnl_link_stats64 *base_stats;
+> +       struct gve_priv *priv;
+> +       unsigned int start;
+>
+> -       tx->packets =3D 0;
+> -       tx->bytes =3D 0;
+> +       priv =3D netdev_priv(dev);
+> +       base_stats =3D &priv->base_net_stats;
+> +       base_err_stats =3D &priv->base_ring_err_stats;
+> +
+> +       do {
+> +               start =3D u64_stats_fetch_begin(&priv->base_statss);
+> +               rx->packets =3D base_stats->rx_packets;
+> +               rx->bytes =3D base_stats->rx_bytes;
+> +               rx->alloc_fail =3D base_err_stats->rx_alloc_fails;
+> +
+> +               tx->packets =3D base_stats->tx_packets;
+> +               tx->bytes =3D base_stats->tx_bytes;
+> +       } while (u64_stats_fetch_retry(&priv->base_statss, start));
+>  }
+>
+>  static const struct netdev_stat_ops gve_stat_ops =3D {
+> --
+> 2.54.0.545.g6539524ca2-goog
+>
 
-Tentative Analysis
-
-When a software scan completes, __ieee80211_scan_completed calls
-ieee80211_offchannel_return, which iterates active interfaces and
-re-enables beaconing for any interface that had its beacon stopped
-during the scan. It sets bss_conf.enable_beacon = true and issues
-a BSS_CHANGED_BEACON_ENABLED notification, but does NOT update
-bss_conf.beacon_int.
-
-This notification reaches mac80211_hwsim_link_info_changed. The
-condition at lines 2726-2728 (data->started, timer not active,
-enable_beacon) is satisfied, so the function enters the beacon
-timer setup block at line 2731. It sets link_data->beacon_int =
-info->beacon_int * 1024. When info->beacon_int is zero -- which
-syzbot achieved by creating an AP interface with beacon_int=0 --
-this produces link_data->beacon_int = 0 and bcn_int = 0 (line
-2733). The subsequent do_div(tsf, bcn_int) with a zero divisor
-triggers the x86 #DE (divide error) exception (RSI = 0, as
-confirmed by the register dump).
-
-An identical do_div(tsf, bcn_int) expression in
-mac80211_hwsim_config (mac80211_hwsim.c:2635) is protected by a
-guard: "if (!data->started || !link_data->beacon_int)" -- this
-guard is absent from the BSS_CHANGED_BEACON_ENABLED path.
-
-
-Potential Solution
-
-Add a zero check for bcn_int immediately after it is loaded from
-link_data->beacon_int (line 2733), before the do_div call. A
-beacon interval of zero is invalid; when encountered, return
-without starting the timer:
-
-    bcn_int = link_data->beacon_int;
-    if (!bcn_int)
-        return;
-    until_tbtt = bcn_int - do_div(tsf, bcn_int);
-
-This mirrors the guard already present in mac80211_hwsim_config
-for the same expression. The Fixes tag for the commit would be:
-
-    Fixes: c51f878379b1 ("mac80211_hwsim: fix beacon timing")
-
-
-More information
-
-Oops-Analysis: http://oops.fenrus.org/reports/lkml/69efb8dd.050a0220.18b4f.0006.GAE_google.com/
-Assisted-by: Copilot:claude-sonnet-4.6 linux-kernel-oops-x86.
+Regards,
+Pin-yen
 
