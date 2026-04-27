@@ -1,139 +1,122 @@
-Return-Path: <netdev+bounces-281541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281539-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WBJVO97v72nYMgEAu9opvQ
-	(envelope-from <netdev+bounces-281541-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 01:23:10 +0200
+	id MK8YK2Pv72nYMgEAu9opvQ
+	(envelope-from <netdev+bounces-281539-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 01:21:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E13F47BC87
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 01:23:10 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4942847BC36
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 01:21:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 98E34301DACE
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 23:22:11 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A826D300B1A6
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 23:21:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDA633A75AB;
-	Mon, 27 Apr 2026 23:22:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F1E63AE18D;
+	Mon, 27 Apr 2026 23:21:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ay8SLq9g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gEdcdVm7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC9E364E92;
-	Mon, 27 Apr 2026 23:22:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED243221FBB;
+	Mon, 27 Apr 2026 23:21:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777332130; cv=none; b=tjgMh2BQ8X/tMO/RpdmjfL74vz36N+lDwen2tfZzqO6zAnH7V/D+n7FisLq6lUY217nlZfRuv3nqmBcTUqMu9JRgFB6b/hrccRZ0KMfuwzWx3iaL5W8MCFmSNWkQ7JuQzHhWWsgrzPePSELnNPkIKGtTjqVdJ3AfHXZsPPwlRog=
+	t=1777332063; cv=none; b=k2o9YoIrATvuJlnsr8gsx4+cA18NdwGkj2K1OqLZ0klYUCak6AYj5f3MLCCUFKKzpzeEcTAzTeJWittxDIRsXMg09rFzQb28Aln4TRVhN6Q0yDy08nhqZFzLCOBa9NkHbbEx0JtlM6/VRO2Ur/CgllXOfVD7yYboimALt3u9cT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777332130; c=relaxed/simple;
-	bh=81IQ/eYd32l85bdWp0t/7BehSWwgwWIf1MHbUIqakJE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aGNSc8J0cdNjrI/E4GOXIy4uMZ8RCui2brNt+TiQI+2e3D36CiWa5WGO8Euzh7xIGdaAxq6rv5COdsdJrJlfvs+RJzVtOpCt8h4obpIcQk1EulqFUTzD71+L+400/pLgyJPPNTjYoTQNi8QUkJBDlEeSlD6s3rOPmJCwMFqPUH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ay8SLq9g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED307C19425;
-	Mon, 27 Apr 2026 23:22:09 +0000 (UTC)
+	s=arc-20240116; t=1777332063; c=relaxed/simple;
+	bh=kJhtciu421O7ueHQhqPqW6F64apq6WD9S/98PUZ0xhE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hrxSjfwKtVMhpMckRMEjpytiZa9SmP7RhcJ61lV8bYB3Y+O/gITKsEPx9JwgzB/Rql0r8Aopj76NQ5pyNPUbz7fTV8Y71VVDCx0469uFjjvt8KjLbWwi8Q0O2MMvVXqv9C07ZNzC1AxLZHJQdtMj+4oBfl/c+IcbhkfyXV76WIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gEdcdVm7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46B83C19425;
+	Mon, 27 Apr 2026 23:21:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777332130;
-	bh=81IQ/eYd32l85bdWp0t/7BehSWwgwWIf1MHbUIqakJE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ay8SLq9g6MkldlXKvnRMFU99Vo8iswS1DrDib2XLG9qsL6qHOXZXGIaKcYxG40Uto
-	 rvp3d2JItXDwS8t90gTKr11cFTIHECCqADiuld7cwvOQyVivREKIr3ohQ8EU8GOqKp
-	 MnsG2wzgZ6JROXBxJDwnfJMvXI63I2ogcXnEDYt+Mu2GszGjsVW6T9TN+HeQEOP2jT
-	 rSRmD6DfafHweOg5UsR6y6Ly8iZObBOtv70EK+XTtQWVllvU9P2Xm68tCGYlssgOL/
-	 5EbuxWT2iXSo4hq7rY+zt0KwKC9GrSWmVSznfLcQ7/R+PSAziew8pOshkFrFP0RLGU
-	 NUTaXtF6C2svw==
-Date: Mon, 27 Apr 2026 16:20:54 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Dmitry Safonov <0x7f454c46@gmail.com>
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Dmitry Safonov <dima@arista.com>
-Subject: Re: [PATCH net-next v2 0/5] Reimplement TCP-AO using crypto library
-Message-ID: <20260427232054.GA2700@sol>
-References: <20260427172727.9310-1-ebiggers@kernel.org>
- <CAJwJo6Z9oJSMMBUL_pbYWN6ha3n4MRpKV_aVut8E+af3JUDFkw@mail.gmail.com>
- <20260427200116.GA3454259@google.com>
+	s=k20201202; t=1777332062;
+	bh=kJhtciu421O7ueHQhqPqW6F64apq6WD9S/98PUZ0xhE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gEdcdVm7xpKZrEsM+oT2xb2RFKvUXaok9tghYeXA7iP9kB7K+w2s4DbBe5oKKUfrv
+	 fF1d5+1vlcDyPNI6YZtxo4SbLgqcQWZUK4SpZ9ogkpIP8TSoG8nXgzSDFKuLAkZHWL
+	 NSaClz1SmkpxtucZOHTWV7GVqFYV/rTUWOqZd6X/NjG/5+94iIk1kXL9FA2lWrM24d
+	 xgEFYhLjplK8N3sN8lH2QDc72BGF1pmwJPXjQy7WCRrOkunQmRQxnsypD1sK8vz03x
+	 73ppN0ijH8W7S+/IIN/Hd6YbRGLx3ZV/pZv4h+tvRA0sXDDtVJKKrlXaMGkHT0LxO8
+	 5q1Wa9usw9fJw==
+Date: Mon, 27 Apr 2026 16:21:00 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, leon@kernel.org,
+ longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+ shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+ ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ stephen@networkplumber.org, jacob.e.keller@intel.com,
+ dipayanroy@microsoft.com, leitao@debian.org, kees@kernel.org,
+ john.fastabend@gmail.com, hawk@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, ast@kernel.org, sdf@fomichev.me, yury.norov@gmail.com
+Subject: Re: [PATCH net-next] net: mana: Force single RX buffer per page for
+ CVM/encrypted guest memory
+Message-ID: <20260427162100.5f731228@kernel.org>
+In-Reply-To: <ae9pxvJfkAZYfKMf@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <ae9pxvJfkAZYfKMf@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260427200116.GA3454259@google.com>
-X-Rspamd-Queue-Id: 7E13F47BC87
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 4942847BC36
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281539-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281541-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ebiggers@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ietf.org:url]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-On Mon, Apr 27, 2026 at 08:01:16PM +0000, Eric Biggers wrote:
-> > - Ronald P. Bonica (the original RFC5925 author), together with Tony
-> > Li do have an active RFC draft to support the additional algorithms
-[...]
-> > [1] https://www.ietf.org/archive/id/draft-bonica-tcpm-tcp-ao-algs-00.html
+On Mon, 27 Apr 2026 06:51:02 -0700 Dipayaan Roy wrote:
+> When page_pool allocates sub-page RX buffer fragments, the bounce buffer
+> granularity may not align with these smaller fragment sizes, leading to
+> failure in mana driver rx path.
+> 
+> Refactor the RX buffer decision into mana_use_single_rxbuf_per_page().
+> When cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT) is true, the driver is
+> forced to use a single RX buffer per page. This ensures:
+> - Each RX buffer is exactly one PAGE_SIZE.
+> - The DMA offset is always 0.
+> - SWIOTLB maps full, page-aligned blocks.
 
-For what it's worth, that draft makes very little sense.  For example,
-it proposes three variants of HMAC-SHA3, instead of just making the
-modern choice of KMAC256.  And it proposes both HMAC-SHA384 and
-HMAC-SHA512, despite them being redundant with each other after the
-specified truncation to 128 bits.
-
-Thus, it's clear that draft needs some work.  That would include, for
-example, input from people who may be more familiar with best practices
-for choosing cryptographic algorithms in new designs.
-
-So I don't think the Linux kernel's implementation should, or needs to,
-already implement all the algorithms in that unofficial draft.
-
-All that's needed is the flexibility to add new algorithms later,
-whether from a fixed version of that draft or from somewhere else.
-
-We'll still have that with the library.
-
-And to emphasize again, the current code also isn't really generic.  So
-the support for new MACs doesn't necessarily come for free currently.
-It probably works for arbitrary HMACs.  But HMAC != MAC.  If
-AES-256-CMAC, BLAKE2, KMAC256, Poly1305-AES, or just about any other MAC
-is ever needed, the code would have to be changed to support it anyway.
-
-- Eric
+As commented on your RFC - I'm not sure why you need this.
 
