@@ -1,142 +1,203 @@
-Return-Path: <netdev+bounces-281518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281519-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +FcFMu7k72kFHgEAu9opvQ
-	(envelope-from <netdev+bounces-281518-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 00:36:30 +0200
+	id KFvuODfl72kFHgEAu9opvQ
+	(envelope-from <netdev+bounces-281519-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 00:37:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7138B47B88D
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 00:36:30 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id E512147B8C2
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 00:37:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D4531302A6D5
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:36:27 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id F2B2A3002B4E
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:37:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BB913A6F01;
-	Mon, 27 Apr 2026 22:36:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6803E3A9630;
+	Mon, 27 Apr 2026 22:37:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="npN4mFu9"
+	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="ARlm0zc0"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63C5386441
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 22:36:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C09734BA42;
+	Mon, 27 Apr 2026 22:37:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777329387; cv=none; b=Sn+NxjqEhEnRa28n5gQOFpiHSgUY7fxS1NT6KjDWv4aDv4L/VhSFYPL0aDX2gUgLuQ+4b8SAf8pxnS/X744h2ynJ/ZehhqVE2CCWFhBYfBT3c019IykS1nneMyDBaqylYrukN+V3ypw0Sukx+e7npL75gqELZTNsc7Z+V0WoMr8=
+	t=1777329458; cv=none; b=S2F4oXLrydO7yvs3LBu06dnaW9nedoxbW4mVwpmX6YtDx2pESlgYQs1kOz2PD7VOXDDuH0FD9lgDyACHE11PbzXX/jgQcmW8YGGWzSz4JtaSyhybNlM9puYNFjRoN8Ti/R+ugDI4UV0YHhoeGHUZtWBZKixN5u9jh8mHZSTjBMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777329387; c=relaxed/simple;
-	bh=MnOzzzamYXiwghHrVckJNVajr4kLMULxSd8oeLokv0k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NvAgvBmTBZBlqpF65nh2h2m/uBlMa9ngdjG0XIACECARTktK3lpC6BUJAlx1LtsfO8Opkgu2USmIh/mcSTZ6u3vrCqJfiD+1WKjCvdMF7wCd2jDYESikwWVYnVw/UNPtpjRzpsfvzy21KdkXisR2fmUwpxQkG53kHKnF+eiTKik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=npN4mFu9; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 27 Apr 2026 15:36:03 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1777329373;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LsQU2/LjFk+qRAd2b5lbs1cknpmT2BXH5jVMeLp8gG0=;
-	b=npN4mFu9PZrqDAG0R8FzMVWqfso7n+haulHAzPTGd9Rax1uBCE5S/e/on4S6r+8qovHxsa
-	5JNXDhWy0RnO5IQBexuNjeIv5Wcg68hyBJprcoXHFGKpzrnTcm4MAPmjcpwZjLCMtAwuO5
-	/Sm3VA3mUeZh15hz1Jcju3Yft/En86U=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-To: nhudson@akamai.com
-Cc: bot+bpf-ci@kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, memxor@gmail.com, shuah@kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, martin.lau@kernel.org, 
-	yonghong.song@linux.dev, clm@meta.com, ihor.solodrai@linux.dev
-Subject: Re: [PATCH v5 6/6] selftests/bpf: tc_tunnel validate decap GSO state
-Message-ID: <2026427222011._PrH.martin.lau@linux.dev>
-References: <20260420104051.1528843-7-nhudson@akamai.com>
- <2ea5cc41fd138e94dc34b1d4073833118b93ae48d802aabe480e355e27417b62@mail.kernel.org>
+	s=arc-20240116; t=1777329458; c=relaxed/simple;
+	bh=nO/Tj8iF5nAyPzBtqgI5qS/OofEA68ZcXTqD/4QaZmk=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=UA0OG8Hry8VW+l6hqdI45zWj4u2L7hP4kPpsVxasTMqwbEHx9+BbtP8tihOepLdHsBCe1tggUx9UW0x+bVqhH17MnGDc+7KYsCF0/P0wwdGfIa1LPLcQ3SKxtOTJUjviQd56p9dnPterVatXdiz/iPr1KqzF+2Ec9dWpWx0uSe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=ARlm0zc0; arc=none smtp.client-ip=193.238.174.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mx.ssi.bg (localhost [127.0.0.1])
+	by mx.ssi.bg (Potsfix) with ESMTP id DB929210CD;
+	Tue, 28 Apr 2026 01:37:24 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
+	:content-type:content-type:date:from:from:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
+	 bh=OXylDqCnyDvdyturebTNJsAAJcB2rcEPlzI5Tom6Q/4=; b=ARlm0zc0Wgbc
+	YspFirgkui+5YwGbzndgra0A3GsWlq6+kTgbq5GUwYCCsLMAz1CNag/VyvB5Cycf
+	Lw8u0ItNED19jsvcltHk9co/eDPo5mNOIjL+fHbQOaxJlBn1k6UlB38xEHwPIdGj
+	Ft3fJMHdD6Aj+SQ+j6/QLMX5gUKK7UOrHoAVs+Y13OsaoXO7jSN1KDC5qxTdxfjD
+	txkrFKAVfKLxNgvnZE5KR9ClPcjxvVXatuxYQiB+NR3ZbClv/j1qoTl0LsCaZodJ
+	1nVlj9E2soHomGleajYo2wFT5y9cM5ABr0IIsHb/BRCM1h5g9EktMHNv61VmAp+S
+	JD5wQozRlPf/IzEcj/cbDbSIk2vnVjAg3YoblBfBr1g6awtUxFXKadVV7tGwJL+v
+	JoYFQWZTUAdsfJP2Eb+LakyfyML466w1IE4COcqo4yNNKXowpIKuDv5/tKTMf3M+
+	0P7RsweYHXqsXeYeWaLZeBnG9piADVwyWJ11X71IkCZwH6TTpvhnn0+6ynXWzQHD
+	trCQOC+PnQdxe7+mt7zExiyLpZIJzNqKVgEWvC52KbHF0XjBtrkP/unZErdiqZ3h
+	tUMgpLJyi02qU1Hhhqh3j9lKvFfM8CSY5sM1jwWMcCN3WB95OTV0vEoLEMCXhWjV
+	c6c3VG0mL9GLoh7hhROjr6aYlqCH8LI=
+Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
+	by mx.ssi.bg (Potsfix) with ESMTPS;
+	Tue, 28 Apr 2026 01:37:23 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by box.ssi.bg (Potsfix) with ESMTPSA id E595A628C8;
+	Tue, 28 Apr 2026 01:37:19 +0300 (EEST)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.1/8.18.1) with ESMTP id 63RMb8Jl078439;
+	Tue, 28 Apr 2026 01:37:09 +0300
+Date: Tue, 28 Apr 2026 01:37:08 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: syzbot <syzbot+217f1db9c791e27fe54a@syzkaller.appspotmail.com>
+cc: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com,
+        fw@strlen.de, horms@verge.net.au, kuba@kernel.org,
+        linux-kernel@vger.kernel.org, lvs-devel@vger.kernel.org,
+        netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        pabeni@redhat.com, pablo@netfilter.org, phil@nwl.cc,
+        syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [lvs?] UBSAN: shift-out-of-bounds in
+ ip_vs_rht_desired_size
+In-Reply-To: <69ef9c80.050a0220.18b4f.0005.GAE@google.com>
+Message-ID: <415b384c-e797-dc05-cf61-ac407dc08978@ssi.bg>
+References: <69ef9c80.050a0220.18b4f.0005.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2ea5cc41fd138e94dc34b1d4073833118b93ae48d802aabe480e355e27417b62@mail.kernel.org>
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 7138B47B88D
+Content-Type: text/plain; charset=US-ASCII
+X-Rspamd-Queue-Id: E512147B8C2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=ca77bfc4078c8193];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
+	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,google.com,iogearbox.net,gmail.com,linux.dev,meta.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-281518-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281519-lists,netdev=lfdr.de];
+	SUBJECT_HAS_QUESTION(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	DKIM_TRACE(0.00)[ssi.bg:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,ssi.bg:email,ssi.bg:dkim,ssi.bg:mid,syzkaller.appspot.com:url,storage.googleapis.com:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
+	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,bpf-ci];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid]
+	TAGGED_RCPT(0.00)[netdev,217f1db9c791e27fe54a];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
 
-On Mon, Apr 20, 2026 at 11:19:30AM +0000, bot+bpf-ci@kernel.org wrote:
-> > +	if (!shinfo->gso_size)
-> > +		return TC_ACT_OK;
-> > +
-> > +	if ((flags & BPF_F_ADJ_ROOM_DECAP_L4_UDP) &&
-> > +	    (shinfo->gso_type & SKB_GSO_UDP_TUNNEL_MASK))
-> > +		return TC_ACT_SHOT;
-> > +
-> > +	if ((flags & BPF_F_ADJ_ROOM_DECAP_L4_GRE) &&
-> > +	    (shinfo->gso_type & (SKB_GSO_GRE | SKB_GSO_GRE_CSUM)))
-> > +		return TC_ACT_SHOT;
-> > +
-> > +	if ((flags & BPF_F_ADJ_ROOM_DECAP_IPXIP4) &&
-> > +	    (shinfo->gso_type & SKB_GSO_IPXIP4))
-> > +		return TC_ACT_SHOT;
-> > +
-> > +	if ((flags & BPF_F_ADJ_ROOM_DECAP_IPXIP6) &&
-> > +	    (shinfo->gso_type & SKB_GSO_IPXIP6))
-> > +		return TC_ACT_SHOT;
-> 
-> Are these IPXIP4 and IPXIP6 checks reachable?
-> 
-> Looking earlier in decap_internal(), for IPPROTO_IPIP and IPPROTO_IPV6
-> cases, the function only sets BPF_F_ADJ_ROOM_DECAP_L3_IPV4 and
-> BPF_F_ADJ_ROOM_DECAP_L3_IPV6 on the flags variable (around the protocol
-> switch statement).
-> 
-> Because BPF_F_ADJ_ROOM_DECAP_IPXIP4 and BPF_F_ADJ_ROOM_DECAP_IPXIP6 are
-> never added to flags, wouldn't these validation checks always be skipped?
-> 
-> Ref: https://lore.kernel.org/bpf/20260416124324.B0CE6C2BCAF@smtp.kernel.org/
 
-This comment has been mentioned again. It seems legit. Please don't ignore
-the review comment. Otherwise, it will be assumed that the solutions are
-being worked on and patchwork will eventually archive the patches after
-some time.
+	Hello,
 
-Also, there is a 'SYS(fail_close_ns_client, "ethtool -K veth1 tso off");'
-in prog_tests/test_tc_tunnel.c. Is the shinfo->gso_type ever set?
-What will break if tso is kept on?
+On Mon, 27 Apr 2026, syzbot wrote:
+
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    e728258debd5 Merge tag 'net-7.1-rc1' of git://git.kernel.o..
+> git tree:       net-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=169022ce580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=ca77bfc4078c8193
+> dashboard link: https://syzkaller.appspot.com/bug?extid=217f1db9c791e27fe54a
+> compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+> 
+> Unfortunately, I don't have any reproducer for this issue yet.
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/24195bde5d1d/disk-e728258d.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/78131d1b0e14/vmlinux-e728258d.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/836d0dd78c10/bzImage-e728258d.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+217f1db9c791e27fe54a@syzkaller.appspotmail.com
+> 
+> wlan0: No active IBSS STAs - trying to scan for other IBSS networks with same SSID (merge)
+> ------------[ cut here ]------------
+> UBSAN: shift-out-of-bounds in ./include/linux/log2.h:57:13
+> shift exponent 64 is too large for 64-bit type 'unsigned long'
+> CPU: 1 UID: 0 PID: 77 Comm: kworker/u8:4 Not tainted syzkaller #0 PREEMPT(full) 
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+> Workqueue: events_unbound conn_resize_work_handler
+> Call Trace:
+>  <TASK>
+>  dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+>  ubsan_epilogue+0xa/0x30 lib/ubsan.c:233
+>  __ubsan_handle_shift_out_of_bounds+0x385/0x410 lib/ubsan.c:494
+>  __roundup_pow_of_two include/linux/log2.h:57 [inline]
+
+	Looks like roundup_pow_of_two() is called for 0.
+Will provide fix for this...
+
+>  ip_vs_rht_desired_size+0x2cf/0x410 net/netfilter/ipvs/ip_vs_core.c:240
+>  ip_vs_conn_desired_size net/netfilter/ipvs/ip_vs_conn.c:765 [inline]
+>  conn_resize_work_handler+0x1b6/0x14c0 net/netfilter/ipvs/ip_vs_conn.c:822
+>  process_one_work kernel/workqueue.c:3302 [inline]
+>  process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3385
+>  worker_thread+0xa53/0xfc0 kernel/workqueue.c:3466
+>  kthread+0x388/0x470 kernel/kthread.c:436
+>  ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+>  </TASK>
+> ---[ end trace ]---
+> Kernel panic - not syncing: UBSAN: panic_on_warn set ...
+> CPU: 1 UID: 0 PID: 77 Comm: kworker/u8:4 Not tainted syzkaller #0 PREEMPT(full) 
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+> Workqueue: events_unbound conn_resize_work_handler
+> Call Trace:
+>  <TASK>
+>  vpanic+0x56c/0xa60 kernel/panic.c:650
+>  panic+0xc5/0xd0 kernel/panic.c:787
+>  check_panic_on_warn+0x89/0xb0 kernel/panic.c:524
+>  __ubsan_handle_shift_out_of_bounds+0x385/0x410 lib/ubsan.c:494
+>  __roundup_pow_of_two include/linux/log2.h:57 [inline]
+>  ip_vs_rht_desired_size+0x2cf/0x410 net/netfilter/ipvs/ip_vs_core.c:240
+>  ip_vs_conn_desired_size net/netfilter/ipvs/ip_vs_conn.c:765 [inline]
+>  conn_resize_work_handler+0x1b6/0x14c0 net/netfilter/ipvs/ip_vs_conn.c:822
+>  process_one_work kernel/workqueue.c:3302 [inline]
+>  process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3385
+>  worker_thread+0xa53/0xfc0 kernel/workqueue.c:3466
+>  kthread+0x388/0x470 kernel/kthread.c:436
+>  ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+>  </TASK>
+> Kernel Offset: disabled
+> Rebooting in 86400 seconds..
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
+
 
