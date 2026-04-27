@@ -1,552 +1,193 @@
-Return-Path: <netdev+bounces-281258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281259-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ID+YMEMc72lk6wAAu9opvQ
-	(envelope-from <netdev+bounces-281258-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 10:20:19 +0200
+	id 4EzXBZkd72kf7AAAu9opvQ
+	(envelope-from <netdev+bounces-281259-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 10:26:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9145246EF42
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 10:20:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68EC046F0AD
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 10:26:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1DEC63006115
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 08:20:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E26F13027B5E
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 08:23:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B671F39B489;
-	Mon, 27 Apr 2026 08:19:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90FEF36B061;
+	Mon, 27 Apr 2026 08:23:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uvf6G7WG"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="WGL+U6hg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90D239B482
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 08:19:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7EBC39B4A1
+	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 08:23:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777277997; cv=none; b=gYubwCm+2UU1gEkLXxx+eZuMrrnDQlmJLh70eBFUE1jgSms9AR4d4wLAHwEs8zH7E+mYSfY1ElbyaLpALDEg/HBN68A8TqUsJMikWrbG2Yaok7t54I5YPqJ0W+IuhQn6gq4styYLaWoZx0dAy16r0qFOm+e2R8bzw/qQC7nUL2w=
+	t=1777278215; cv=none; b=SBDRfNTywDtFsxfwf2JBh+E0NVLPvLX40T8bcqp+1IDkain9Q1ipLvwwV3myACMq8/lPaQG5kDPi5N/B+N1piBORl0NbYdc4zQAsKQE/fVlaVO/SiZq9NyWvilSdhm3kTGfLHpmRQG8uV206zVVb3hjCd+lrWH/uv12Jwe/LE5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777277997; c=relaxed/simple;
-	bh=U/Da4CG9zyFVhJWXw1IkB5xC0v+HckHQFadw3JJt55Q=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=KdNhmfpqEO5d5omr+dKlFtvn2my2vYFQQhefnzJYhiebsomoC3AqkgafegFBy3eafTo54tcO4AxE0TjAI5N3sw2BeMDuofL4+2ZU3O04TgBthjSDNTMtWEuFqWqEv9/3bjppR4K2bU+uUiuRsVsx3at6TiV5uGVQKbqZtVexpfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uvf6G7WG; arc=none smtp.client-ip=209.85.222.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8eaee67d1bcso1355629285a.0
-        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 01:19:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777277995; x=1777882795; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Z+EVm9PgXe4DnSmhH1iRHlGINhe2M5ARvnyMqCcu7Qs=;
-        b=uvf6G7WGn5RerYBlu0Xn6jnBI/mFPGSq5l6uNTmb6aawGz56/ZOpWF3IqJYDU3Qsik
-         yBGJy2I5NWXHQ5oO1I28UvZ5KsKDyHgFM7c74+Z+LA33BhA7sJqeWOBgjrRtNY2cX3le
-         sSP340Odey0JGOmSZ0NMcnPG8HCj1AlyhrWg/nkia9WGiYWdtWeE9cjJMmKyeWuFZwp2
-         6tya/gGim92HEZq0iDC6lQX5O188PPe2Alz3SWFQBTD9UcEGkzCumbegj46T4FEsttm3
-         g26JUchWZWDfbeX9ZN9iyb525BOOL6H3bQFg28rsF2lHyXyTwXumchuuphDobf+Yvwk3
-         vlQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777277995; x=1777882795;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Z+EVm9PgXe4DnSmhH1iRHlGINhe2M5ARvnyMqCcu7Qs=;
-        b=ibLjc3uJGOIe3DwW72nVVYC1E2QKV5HWSuQhuB+cl4DjhiD3ipO6Iz/dLDBp0ZGf/B
-         d6SVksJQInV4sZXzlqE/Nn+ioPBPNGvGlThvnGhZOSDL7qkw7t3yN3Q+Ob1XGvs5aSh6
-         VPF+6rtaTjUCGMTTgIyBfM8ip5uhBrnNdJKIW8GAKPtRQE8sU9x2wNPThhwyJ8BDLXcX
-         ohjw13XFp7Tqwwx3rLDbxjD0xhJHA7Pmsx6y+jvq1XDMYbA5ALRaFQHH01zI7iUaQOQK
-         r+b5dkK1JHuuGEp3dpo7FN5rIy9DC5aXmfeqMl4P+E+4Zo1UFbvvx3B379YntdUweaUB
-         lt5g==
-X-Forwarded-Encrypted: i=1; AFNElJ+twGCyhBlRRJfXH935OVSaynpNzXaGHdywTukQ3TQAVNteeEHiRh/8Ul714aXyxOonLjDWVgM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrFQCbM0hsWZ1OAWj3k/tiAiI5kOHj9A4UPSdxsA+yQD+ld+0T
-	c250tTKhSFOEKkC05jOf1ye3koDGWuPM1yX+ShbqdmCZtnz56xU+en94rl5a7QgaUBaDgUwWI8x
-	MaYtUCTYnJDa4+w==
-X-Received: from qvbkk25.prod.google.com ([2002:a05:6214:5099:b0:8a3:6752:348e])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ad4:5746:0:b0:89c:4fab:3783 with SMTP id 6a1803df08f44-8b027e76f94mr665037356d6.0.1777277994462;
- Mon, 27 Apr 2026 01:19:54 -0700 (PDT)
-Date: Mon, 27 Apr 2026 08:19:53 +0000
+	s=arc-20240116; t=1777278215; c=relaxed/simple;
+	bh=HtSz29+wsgjtHWN6xK3gwE3W7GZAPuUH5IAu08RhPys=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dOWpvkQPFfJogH0hrWTTv607eUWcjkgk9za4xe5uDJnivSr1ilvj9Kccw1D8nsjHkBPHk19XtEv7U4s0WZsaEEwL71afc+Xx5aYYDu1BWlXUmp4hoAVvCKrdAYba+8kboWg3I4CE2JY6TkvVSVuwRjopgs1KlmtbK4xL/GTc99c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=WGL+U6hg; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=guRgGVEehZHaMs+RNAD5A9r7tWKym9u2Ij+KNNddSmE=; b=WGL+U6hgAukS1SRfi/C7xSC//8
+	/IA/R10Jkslb1uAHtLTS+SSTWOKgFuz8srvja8E4G+DO0dgbpqe8RG8Mu/uCWdx7uppuXO9vDQxA2
+	2FFUQX3SswboZHNZo5noDdMk5GXHB1jl8fbQqe/WRNYR+ozIcHck1FH4GTtNS4QFRER7im4OCEwUh
+	RILUaPneT34VkvTSjyUajLoUDusUr0Uif75q1Jzc6or2q4+74U9iMuCA46U9KqmWhTKdb2hfaDI0G
+	OeazfXENQxbSAzcJLjCO6sdww1vlVt1xACWYWSr4JbZBO6Ny9PUvDN89lP3+fkYIB/URzDUywm7z/
+	k7Z6GW4A==;
+Received: from sslproxy04.your-server.de ([78.46.152.42])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wHHFa-000O8b-0j;
+	Mon, 27 Apr 2026 10:23:30 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy04.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wHHFZ-000517-19;
+	Mon, 27 Apr 2026 10:23:29 +0200
+Message-ID: <55ffdceb-df7e-4bac-8f7a-49cf036f7c50@iogearbox.net>
+Date: Mon, 27 Apr 2026 10:23:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260427081953.364819-1-edumazet@google.com>
-Subject: [PATCH v2 iproute2-next] utils: add fflush_monitor() helper
-From: Eric Dumazet <edumazet@google.com>
-To: David Ahern <dsahern@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 9145246EF42
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] ipv6: Implement limits on extension header parsing
+To: Ido Schimmel <idosch@nvidia.com>, Justin Iurman <justin.iurman@gmail.com>
+Cc: tom@herbertland.com, kuba@kernel.org, edumazet@google.com,
+ dsahern@kernel.org, willemdebruijn.kernel@gmail.com, pabeni@redhat.com,
+ netdev@vger.kernel.org
+References: <20260425075521.736328-1-daniel@iogearbox.net>
+ <b50025ba-c59d-4575-a790-fdaf0a48961d@gmail.com>
+ <90c7de29-2641-413d-9d5f-5eb323cf875c@iogearbox.net>
+ <20260426131714.GA180947@shredder>
+ <dca69fa4-2284-4251-a569-8b26ab9fca07@gmail.com>
+ <20260427060127.GA263748@shredder>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <20260427060127.GA263748@shredder>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27984/Mon Apr 27 08:24:37 2026)
+X-Rspamd-Queue-Id: 68EC046F0AD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,google.com];
-	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[herbertland.com,kernel.org,google.com,gmail.com,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-281259-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[nvidia.com,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281258-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-0.999];
+	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Some fflush() calls only make sense for monitor programs.
+On 4/27/26 8:01 AM, Ido Schimmel wrote:
+> On Sun, Apr 26, 2026 at 05:47:38PM +0200, Justin Iurman wrote:
+>> Ido, Daniel,
+>>
+>> As I said, my vote would definitely go to the solution without a sysctl for
+>> the very reason Ido mentioned. Note that an upper bound of 32 is kind of
+>> unrealistic, although super (SUPER!) safe. Sending more than 8 Extension
+>> Headers (assuming a different type for each) is not standard behavior and
+>> would make you non-RFC-compliant anyway. But I'm happy with 32, as long as
+>> we don't define a sysctl for that.
+> 
+> OK, so given that:
+> 
+> 1. 32 is super safe and solves the issue.
+> 
+> 2. We will likely have to maintain a sysctl forever.
+> 
+> 3. A sysctl has the potential to be incompatible with the upcoming
+> "enforce_ext_hdr_order" sysctl.
+> 
+> I believe we can just go with the simplest solution of hard coding 32 as
+> a limit and drop the sysctl.
 
-For other cases, forcing a flush is expensive.
+Although to be honest, I like it slightly better if we could actually constrain
+it to just 8 by default rather than 32 given 32 is just an arbitrary 'large enough'
+pick vs 8 something sensible derived from the RFC and the sysctl knob is not out
+of place. Eric, what's your pref?
 
-After this patch, ip, tc and ss are correctly buffering most of their
-output when redirected to a file.
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/utils.h  |  7 +++++++
- ip/ipaddress.c   | 12 +++++++-----
- ip/iplink.c      |  4 ++--
- ip/ipmonitor.c   |  1 +
- ip/ipmptcp.c     | 10 +++++-----
- ip/ipneigh.c     |  4 ++--
- ip/ipnetconf.c   |  2 +-
- ip/ipnetns.c     |  2 +-
- ip/ipnexthop.c   | 12 ++++++------
- ip/iproute.c     |  4 ++--
- ip/iprule.c      |  2 +-
- ip/iptoken.c     |  2 +-
- ip/tcp_metrics.c |  2 +-
- lib/utils.c      |  1 +
- misc/ss.c        |  3 ++-
- tc/tc_class.c    |  2 +-
- tc/tc_filter.c   |  2 +-
- tc/tc_monitor.c  |  1 +
- tc/tc_qdisc.c    |  2 +-
- 19 files changed, 44 insertions(+), 31 deletions(-)
-
-diff --git a/include/utils.h b/include/utils.h
-index b68d6bc4edcf9ca335148f731cd240871b6c809b..2ed3b75ebb45e0f0e4aedd9bdf21375f74c2bbef 100644
---- a/include/utils.h
-+++ b/include/utils.h
-@@ -38,6 +38,7 @@ extern int numeric;
- extern bool do_all;
- extern int echo_request;
- extern int use_iec;
-+extern int monitor_mode;
- 
- #define SPRINT_BSIZE 64
- #define SPRINT_BUF(x)	char x[SPRINT_BSIZE]
-@@ -399,4 +400,10 @@ FILE *generic_proc_open(const char *env, const char *name);
- int open_fds_add(int fd);
- void open_fds_close(void);
- 
-+static inline void fflush_monitor(FILE *fp)
-+{
-+	if (monitor_mode)
-+		fflush(fp);
-+}
-+
- #endif /* __UTILS_H__ */
-diff --git a/ip/ipaddress.c b/ip/ipaddress.c
-index 4d93a04a8555e141ae30a4aaeb42ac607a181c9b..14aa98e77452c9681c9d3660f6a882df56b44f1c 100644
---- a/ip/ipaddress.c
-+++ b/ip/ipaddress.c
-@@ -894,7 +894,7 @@ static int print_linkinfo_brief(FILE *fp, const char *name,
- 		print_string(PRINT_FP, NULL, "%s", "\n");
- 	}
- 
--	fflush(fp);
-+	fflush_monitor(fp);
- 	return 0;
- }
- 
-@@ -1346,10 +1346,12 @@ int print_linkinfo(struct nlmsghdr *n, void *arg)
- 	}
- 
- 	print_string(PRINT_FP, NULL, "%s", "\n");
--	fflush(fp);
-+	fflush_monitor(fp);
- 	/* prettier here if stderr and stdout go to the same place */
--	if (truncated_vfs)
-+	if (truncated_vfs) {
-+		fflush(fp);
- 		fprintf(stderr, "Truncated VF list: %s\n", name);
-+	}
- 	return 1;
- }
- 
-@@ -1732,7 +1734,7 @@ int print_addrinfo(struct nlmsghdr *n, void *arg)
- 	}
- 	print_string(PRINT_FP, NULL, "%s", "\n");
- brief_exit:
--	fflush(fp);
-+	fflush_monitor(fp);
- 	return 0;
- }
- 
-@@ -1768,7 +1770,7 @@ static int print_selected_addrinfo(struct ifinfomsg *ifi,
- 
- 	if (brief) {
- 		print_string(PRINT_FP, NULL, "%s", "\n");
--		fflush(fp);
-+		fflush_monitor(fp);
- 	}
- 	return 0;
- }
-diff --git a/ip/iplink.c b/ip/iplink.c
-index fce6631d2d821a8739d28805e13d98f6804bda30..806f86987ed7c8af5ddd40f04a44fb8ce8debfaf 100644
---- a/ip/iplink.c
-+++ b/ip/iplink.c
-@@ -1296,7 +1296,7 @@ static void print_mpls_stats(FILE *fp, struct rtattr *attr)
- 	print_nl();
- 	print_mpls_link_stats(fp, stats, "        ");
- 	print_string(PRINT_FP, NULL, "%s", "\n");
--	fflush(fp);
-+	fflush_monitor(fp);
- }
- 
- static void print_af_stats_attr(FILE *fp, int ifindex, struct rtattr *attr)
-@@ -1359,7 +1359,7 @@ static int print_af_stats(struct nlmsghdr *n, void *arg)
- 	if (tb[IFLA_STATS_AF_SPEC])
- 		print_af_stats_attr(fp, ifsm->ifindex, tb[IFLA_STATS_AF_SPEC]);
- 
--	fflush(fp);
-+	fflush_monitor(fp);
- 	return 0;
- }
- 
-diff --git a/ip/ipmonitor.c b/ip/ipmonitor.c
-index 1f4e860f8d6726edffcf9bf81636c6555757dd09..23bd667a2f7a27e620d0f6dd13a16476c1ac0d08 100644
---- a/ip/ipmonitor.c
-+++ b/ip/ipmonitor.c
-@@ -324,6 +324,7 @@ int do_ipmonitor(int argc, char **argv)
- 		return err;
- 	}
- 
-+	monitor_mode = 1;
- 	if (rtnl_open(&rth, groups) < 0)
- 		exit(1);
- 
-diff --git a/ip/ipmptcp.c b/ip/ipmptcp.c
-index 3df89db54b4e00f8fe2d18828621999512622d59..37df15ba9b5f2d6974f5fdd2360025ce9a017316 100644
---- a/ip/ipmptcp.c
-+++ b/ip/ipmptcp.c
-@@ -276,7 +276,7 @@ static int print_mptcp_addrinfo(struct rtattr *addrinfo)
- 
- 	print_nl();
- 	close_json_object();
--	fflush(stdout);
-+	fflush_monitor(stdout);
- 
- 	return 0;
- }
-@@ -325,7 +325,7 @@ static int mptcp_addr_dump(void)
- 	}
- 
- 	delete_json_obj();
--	fflush(stdout);
-+	fflush_monitor(stdout);
- 	return 0;
- }
- 
-@@ -349,7 +349,7 @@ static int mptcp_addr_show(int argc, char **argv)
- 	ret = print_mptcp_addr(answer, stdout);
- 	delete_json_obj();
- 	free(answer);
--	fflush(stdout);
-+	fflush_monitor(stdout);
- 	return ret;
- }
- 
-@@ -430,7 +430,7 @@ static int print_mptcp_limit(struct nlmsghdr *n, void *arg)
- 
- 	print_nl();
- 	close_json_object();
--	fflush(stdout);
-+	fflush_monitor(stdout);
- 
- 	return 0;
- }
-@@ -592,7 +592,7 @@ static int mptcp_monitor_msg(struct rtnl_ctrl_data *ctrl,
- out:
- 	print_nl();
- 	close_json_object();
--	fflush(stdout);
-+	fflush_monitor(stdout);
- 
- 	return 0;
- }
-diff --git a/ip/ipneigh.c b/ip/ipneigh.c
-index e678545ad535ad83722d1daef51f08c569df8236..2b74fccdfd9c5e39d675b8d1419e23bf9f6b6e3d 100644
---- a/ip/ipneigh.c
-+++ b/ip/ipneigh.c
-@@ -298,7 +298,7 @@ static int print_neigh_brief(FILE *fp, struct ndmsg *r, struct rtattr *tb[])
- 
- 	print_string(PRINT_FP, NULL, "%s", "\n");
- 	close_json_object();
--	fflush(fp);
-+	fflush_monitor(fp);
- 
- 	return 0;
- }
-@@ -472,7 +472,7 @@ int print_neigh(struct nlmsghdr *n, void *arg)
- 
- 	print_string(PRINT_FP, NULL, "\n", "");
- 	close_json_object();
--	fflush(fp);
-+	fflush_monitor(fp);
- 
- 	return 0;
- }
-diff --git a/ip/ipnetconf.c b/ip/ipnetconf.c
-index 020eff786d0b82f3033a71c2f4fc3d5b1af5f099..efb4da963d463481fa27f41fcb8e65db844381cf 100644
---- a/ip/ipnetconf.c
-+++ b/ip/ipnetconf.c
-@@ -140,7 +140,7 @@ int print_netconf(struct rtnl_ctrl_data *ctrl, struct nlmsghdr *n, void *arg)
- 
- 	close_json_object();
- 	print_string(PRINT_FP, NULL, "\n", NULL);
--	fflush(fp);
-+	fflush_monitor(fp);
- 	return 0;
- }
- 
-diff --git a/ip/ipnetns.c b/ip/ipnetns.c
-index 3a33a3adacee31080c3ea9d0a52e455243423a75..abe5746415176c137c9755a6211cc4b7cbabe4e2 100644
---- a/ip/ipnetns.c
-+++ b/ip/ipnetns.c
-@@ -327,7 +327,7 @@ int print_nsid(struct nlmsghdr *n, void *arg)
- 
- 	print_string(PRINT_FP, NULL, "\n", NULL);
- 	close_json_object();
--	fflush(fp);
-+	fflush_monitor(fp);
- 	return 0;
- }
- 
-diff --git a/ip/ipnexthop.c b/ip/ipnexthop.c
-index d5c429369d10f629823639fa7e6bfb70be5226d6..a9ebffc8e50101c5c4b2480fd4d8e1bb1a3c7588 100644
---- a/ip/ipnexthop.c
-+++ b/ip/ipnexthop.c
-@@ -826,7 +826,7 @@ int print_cache_nexthop(struct nlmsghdr *n, void *arg, bool process_cache)
- 
- 	__print_nexthop_entry(fp, NULL, &nhe, n->nlmsg_type == RTM_DELNEXTHOP);
- 	print_string(PRINT_FP, NULL, "%s", "\n");
--	fflush(fp);
-+	fflush_monitor(fp);
- 
- 	if (process_cache)
- 		ipnh_cache_process_nlmsg(n, &nhe);
-@@ -882,7 +882,7 @@ int print_nexthop_bucket(struct nlmsghdr *n, void *arg)
- 
- 	print_string(PRINT_FP, NULL, "%s", "\n");
- 	close_json_object();
--	fflush(fp);
-+	fflush_monitor(fp);
- 
- 	return 0;
- }
-@@ -1178,7 +1178,7 @@ static int ipnh_get_id(__u32 id)
- 	}
- 
- 	delete_json_obj();
--	fflush(stdout);
-+	fflush_monitor(stdout);
- 
- 	free(answer);
- 
-@@ -1266,7 +1266,7 @@ static int ipnh_list_flush(int argc, char **argv, int action)
- 	}
- 
- 	delete_json_obj();
--	fflush(stdout);
-+	fflush_monitor(stdout);
- 
- 	return 0;
- }
-@@ -1342,7 +1342,7 @@ static int ipnh_bucket_list(int argc, char **argv)
- 	}
- 
- 	delete_json_obj();
--	fflush(stdout);
-+	fflush_monitor(stdout);
- 
- 	return 0;
- }
-@@ -1383,7 +1383,7 @@ static int ipnh_bucket_get_id(__u32 id, __u16 bucket_index)
- 	}
- 
- 	delete_json_obj();
--	fflush(stdout);
-+	fflush_monitor(stdout);
- 
- 	free(answer);
- 
-diff --git a/ip/iproute.c b/ip/iproute.c
-index c2538894da633b56f5b926ecafda4960a48e9fbd..c6a6ba9dd37076acfceb9b259874a50e7cd3c3d0 100644
---- a/ip/iproute.c
-+++ b/ip/iproute.c
-@@ -1012,7 +1012,7 @@ int print_route(struct nlmsghdr *n, void *arg)
- 
- 	print_string(PRINT_FP, NULL, "\n", NULL);
- 	close_json_object();
--	fflush(fp);
-+	fflush_monitor(fp);
- 	return 0;
- }
- 
-@@ -2035,7 +2035,7 @@ static int iproute_list_flush_or_save(int argc, char **argv, int action)
- 	}
- 
- 	delete_json_obj();
--	fflush(stdout);
-+	fflush_monitor(stdout);
- 	return 0;
- }
- 
-diff --git a/ip/iprule.c b/ip/iprule.c
-index 3af02da24950ae224614e8e45e3de400675eee57..5bcafe11986f84f4b1946d758647d909456aeb61 100644
---- a/ip/iprule.c
-+++ b/ip/iprule.c
-@@ -599,7 +599,7 @@ int print_rule(struct nlmsghdr *n, void *arg)
- 
- 	print_string(PRINT_FP, NULL, "\n", "");
- 	close_json_object();
--	fflush(fp);
-+	fflush_monitor(fp);
- 	return 0;
- }
- 
-diff --git a/ip/iptoken.c b/ip/iptoken.c
-index f25a7c8b21f57c941d975a0255b0613f8a38f999..c19f9e0b4fdb282d1835959b025adf5bdf5a14e8 100644
---- a/ip/iptoken.c
-+++ b/ip/iptoken.c
-@@ -85,7 +85,7 @@ static int print_token(struct nlmsghdr *n, void *arg)
- 			   "ifname", "%s\n",
- 			   ll_index_to_name(ifi->ifi_index));
- 	close_json_object();
--	fflush(fp);
-+	fflush_monitor(fp);
- 
- 	return 0;
- }
-diff --git a/ip/tcp_metrics.c b/ip/tcp_metrics.c
-index 9c8fb07240bf01511aa2fc8cc2e80603db3252c9..b69bb282e1f30f53843e2cd9e51bfc3debf4310b 100644
---- a/ip/tcp_metrics.c
-+++ b/ip/tcp_metrics.c
-@@ -334,7 +334,7 @@ static int process_msg(struct nlmsghdr *n, void *arg)
- 
- 	print_string(PRINT_FP, NULL, "\n", "");
- 	close_json_object();
--	fflush(fp);
-+	fflush_monitor(fp);
- 	return 0;
- }
- 
-diff --git a/lib/utils.c b/lib/utils.c
-index 1215fe31cb3f63c0fa768fef60da77a641c51581..7017b0e6afacd8e770fb9f8b26aa5a319c1279e7 100644
---- a/lib/utils.c
-+++ b/lib/utils.c
-@@ -41,6 +41,7 @@ int timestamp_short;
- int pretty;
- int use_iec;
- int human_readable;
-+int monitor_mode;
- const char *_SL_ = "\n";
- 
- static int open_fds[5];
-diff --git a/misc/ss.c b/misc/ss.c
-index 14e9f27a75321556240a5f290b8bcf51c605a4c2..0f9b37177d375ddf70cb34674992723b5c4883be 100644
---- a/misc/ss.c
-+++ b/misc/ss.c
-@@ -5544,7 +5544,7 @@ static int generic_show_sock(struct nlmsghdr *nlh, void *arg)
- 
- 	render();
- 
--	fflush(stdout);
-+	fflush_monitor(stdout);
- 	return ret;
- }
- 
-@@ -5580,6 +5580,7 @@ static int handle_follow_request(struct filter *f)
- 		f->rth_for_killing = &rth2;
- 	}
- 
-+	monitor_mode = 1;
- 	if (rtnl_dump_filter(&rth, generic_show_sock, f))
- 		ret = -1;
- 
-diff --git a/tc/tc_class.c b/tc/tc_class.c
-index 6d707d8c924f4b5e90201d4de8e9779f82ce17f3..8197566281fad47d4efcf4768ed406ab809dd08a 100644
---- a/tc/tc_class.c
-+++ b/tc/tc_class.c
-@@ -380,7 +380,7 @@ int print_class(struct nlmsghdr *n, void *arg)
- 		close_json_object();
- 	}
- 	close_json_object();
--	fflush(fp);
-+	fflush_monitor(fp);
- 	return 0;
- }
- 
-diff --git a/tc/tc_filter.c b/tc/tc_filter.c
-index 7db850bda11a3408ec66b457c9fc590f3a734f65..633f027d79865d98ba1ccba48af71d247dfc7a48 100644
---- a/tc/tc_filter.c
-+++ b/tc/tc_filter.c
-@@ -374,7 +374,7 @@ int print_filter(struct nlmsghdr *n, void *arg)
- 
- 	print_ext_msg(tb);
- 	close_json_object();
--	fflush(fp);
-+	fflush_monitor(fp);
- 	return 0;
- }
- 
-diff --git a/tc/tc_monitor.c b/tc/tc_monitor.c
-index 5b9bccbed4140241a4d7a5cffc50865106224867..49bd4b6a460fbfe41a35e06f92f07dbe56a6be2d 100644
---- a/tc/tc_monitor.c
-+++ b/tc/tc_monitor.c
-@@ -100,6 +100,7 @@ int do_tcmonitor(int argc, char **argv)
- 		return ret;
- 	}
- 
-+	monitor_mode = 1;
- 	if (rtnl_open(&rth, groups) < 0)
- 		exit(1);
- 
-diff --git a/tc/tc_qdisc.c b/tc/tc_qdisc.c
-index 7eb9a31baa31fb91a8141c9eca1135e76a52fa8b..a8ef8fc9f70d91609d6ed61c2a46b29120512fd2 100644
---- a/tc/tc_qdisc.c
-+++ b/tc/tc_qdisc.c
-@@ -344,7 +344,7 @@ int print_qdisc(struct nlmsghdr *n, void *arg)
- 
- 	print_ext_msg(tb);
- 	close_json_object();
--	fflush(fp);
-+	fflush_monitor(fp);
- 	return 0;
- }
- 
--- 
-2.54.0.545.g6539524ca2-goog
-
+Thanks,
+Daniel
 
