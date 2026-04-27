@@ -1,1392 +1,629 @@
-Return-Path: <netdev+bounces-281278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281279-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uH/ZJVop72lE8AAAu9opvQ
-	(envelope-from <netdev+bounces-281278-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 11:16:10 +0200
+	id GFsKFNsr72nt8wAAu9opvQ
+	(envelope-from <netdev+bounces-281279-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 11:26:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7ED546FADB
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 11:16:09 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D0A146FE77
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 11:26:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 44BE9301BEE4
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 09:12:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 17E2C3004D29
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 09:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA5B3AEF5F;
-	Mon, 27 Apr 2026 09:12:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B377A39903A;
+	Mon, 27 Apr 2026 09:23:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WUs99Mxy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Wb56PcjF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC413B0AE4
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 09:12:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777281147; cv=none; b=BNTmEzTxfwbzQdqyeeq0wiCimP1Ni06hhDkJlIkXTzDnzoGP9ZjfWDEdHsCE4XGkLK6kHiDvSjk1aZwIyQqSQKyZw+3vltcbWR5Xi6MqZISG6+FFveQRbLM2azpULmfgtg7NieDc8niuUPtWUA2QUPhDtN1mMjFtarZj5wYu8zA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777281147; c=relaxed/simple;
-	bh=QZpLvV3w1ibOzDVso3FjlfsAF7eb0uwHwhzClx2tlIY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pj+vBWNo1uu3lkSJGtzNBfShseNE/xt2Ykscz1OKVNPyG7luuVLzulmADcq7kNjYmSNuDc48KSBafdBnENVNLL6DYJ5fPhospzUae8QLn8zXKCIx7Xic1A73TGnMIPD4p1cG+Oh75pRSjzVYFy/MPYK7RrVfN1mYq4KdRSFn/Go=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WUs99Mxy; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777281143;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fwKBGjfV1r+fQUBVUmNS5djQl//HV1ZBg8Tyat/NBj4=;
-	b=WUs99Mxyf+u0bJ7U6PnVKsY8cVJmsSUA+a+THPMud9cL1MIJ+Mx1cvthydg+AvmDzxmH3D
-	2wKPKcT6kPUYJ9UzYo4xP2jkvGZ81iW2SL0Bx+xx9XJltYUvZbQfswnnso8+4kfvOIPz3w
-	6sbus0veKo+QnFOIdApVtfXstaW3u8o=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-567-ehW92uRnP7uf8eUjzlpw-A-1; Mon,
- 27 Apr 2026 05:12:19 -0400
-X-MC-Unique: ehW92uRnP7uf8eUjzlpw-A-1
-X-Mimecast-MFC-AGG-ID: ehW92uRnP7uf8eUjzlpw-A_1777281138
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 385F7195608D;
-	Mon, 27 Apr 2026 09:12:18 +0000 (UTC)
-Received: from antares.redhat.com (unknown [10.44.33.10])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F02AB1800446;
-	Mon, 27 Apr 2026 09:12:11 +0000 (UTC)
-From: Adrian Moreno <amorenoz@redhat.com>
-To: netdev@vger.kernel.org
-Cc: aconole@redhat.com,
-	pabeni@redhat.com,
-	Adrian Moreno <amorenoz@redhat.com>,
-	Eelco Chaudron <echaudro@redhat.com>,
-	Ilya Maximets <i.maximets@ovn.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	dev@openvswitch.org (open list:OPENVSWITCH),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next v3 2/2] net: openvswitch: decouple flow_table from ovs_mutex
-Date: Mon, 27 Apr 2026 11:11:48 +0200
-Message-ID: <20260427091153.3210301-3-amorenoz@redhat.com>
-In-Reply-To: <20260427091153.3210301-1-amorenoz@redhat.com>
-References: <20260427091153.3210301-1-amorenoz@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C34653750B2
+	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 09:23:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777281808; cv=fail; b=rE6v1dAV7xPx+CqhRpZJabA9ZhCfMw/ZTMQPDDHKhbsGxbyUGHmgr7MSTa+wgpdkz1n873Hs/uVWSitnFirrQ1XAfJSuH2eSOIFR5jy9gZ6Vcarg3Tel2CIN2vkDSgjfaaD03sCNfZ2+5RIdfTm7S3jCMQwDyDUr7TWx0iUWc64=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777281808; c=relaxed/simple;
+	bh=2MuR6EmeH0/H0J1mkMNHdDOejHj9jXuTCfvBkJcxick=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Oa9xYbfKcKexyiBts/nm4XK0EkMMIMF5b7dpJi8ZhEoZ0rCuEZngDPU0qWgFd7XD8nFO4mYYfr0ANqlxFYc+v+cIWKwD4uJYrjeBFyDhHwcNjNC6d34a4jBeLoNDWucT4DxC3wHVr88C9miS3qNE1xaMYW95tpO7m05fGixJf3U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Wb56PcjF; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777281807; x=1808817807;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=2MuR6EmeH0/H0J1mkMNHdDOejHj9jXuTCfvBkJcxick=;
+  b=Wb56PcjFdzH5kDUWjZV4uxSIY1AWweeouuMm7G9NDFfuuN0jewh0QThX
+   K8g4riHAfIG19wZ+7lsApCsRLKWtYhF9KGtJUQWHMr5GPchRywRp0yLye
+   STgNIa3dlwtYVwcW6zy3vBp+3stpS7xV0utmSuZZUDc1pmBnEkrIYFdVn
+   wIimwnYc/0eUhYqzWGu97/fXL/Jz4J1lIs2MSjBrAdIw1Qd/QPDg6dCfM
+   iOiykSGCviiuWnUrXUwadzeHzqFbDMeS8IBqOBNtXULDmr3Hn08D1ka/F
+   TrZNVh1Yq0hN1xRmKpUkMo8UxKls5wqsG9mUGivkvS1hfpAwFt+xJJyZ2
+   g==;
+X-CSE-ConnectionGUID: K/iltXdZSNCwEjdYZLIDRQ==
+X-CSE-MsgGUID: DPyG16gzRa6tWtuoTdAwjA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11768"; a="88478339"
+X-IronPort-AV: E=Sophos;i="6.23,201,1770624000"; 
+   d="scan'208";a="88478339"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2026 02:23:20 -0700
+X-CSE-ConnectionGUID: aw8iF+pMR7uMr8ocSp8htA==
+X-CSE-MsgGUID: KDsx0i6TTI2YpUOFMAes7Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,201,1770624000"; 
+   d="scan'208";a="232706582"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2026 02:23:21 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 27 Apr 2026 02:23:19 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Mon, 27 Apr 2026 02:23:19 -0700
+Received: from CH5PR02CU005.outbound.protection.outlook.com (40.107.200.7) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 27 Apr 2026 02:23:17 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dInBVrlz3bTijCyfGq2zmPvYpk73WRgI54jJ7rTt6ST2Yy+HW+AHw1ScfNiPZrZbQ15bkzppoMF24cyR/GNlN6j2oPN8agORycheCkqbdo5Xxx5jMv8OVWgBKJagMPUF+fak/WsW9+GZgx+7BQoKG2wLGmczId5ZvHQw/Cj92A0jObVzUXMiAqAXByomX46x0q5akRe38oAO1NpwHxSNY0WPyxdLPMrJzjrRltFNRegIBuVTGpAvX59zATRBjNJR6jfThH+KTgo6/PPdMIMD24CafdHRH3IUHRFnMSYNUInbouEBfepYBWLrVdRO7VbD/lB9PfjzINaDPKqRqHECzA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KDjsI1frNgv/ApyL1uALatvAmmiGkV9bM07G9ywuTTw=;
+ b=aK8kYTZl/1GPAeEd7+eXh+l3XkrzN7PDFWHXuJN0wBLipylqZud4o7xW9i8AHK2Iv/lnBG/n+2VoOS23JK2vBtb6kVVI5N8dFl+INmJL72SH/vC/Q9b9IB8j3O3Xxnq9HqltpzUua7Aq8Q1blNPimz1Td/s0khZmtTTsJhAtGJXeM02M7/ue57yeYq5rOG47+oT2NpGohKRCQFDXGJEtKYBvrl8kYmMrDeAtOCytatVz4c8r9ZSCxpwn4+kI4fCMHqszbyS421QsNbCn+RqYUsNyfg7n7fbU0Njl9SNLKAnWYGVbT674wTUGYYSUqSkA35YB552JIA030XdSwflKjQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by PHXPR11MB9637.namprd11.prod.outlook.com (2603:10b6:510:3ce::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.16; Mon, 27 Apr
+ 2026 09:23:15 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::8d98:e538:8d7:6311]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::8d98:e538:8d7:6311%5]) with mapi id 15.20.9870.013; Mon, 27 Apr 2026
+ 09:23:15 +0000
+Message-ID: <d055ed86-89d9-42fd-a881-0384ebfd24f7@intel.com>
+Date: Mon, 27 Apr 2026 11:23:10 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v4 3/4] iavf: send MAC change request synchronously
+To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <aleksandr.loktionov@intel.com>,
+	<jacob.e.keller@intel.com>, <horms@kernel.org>, <anthony.l.nguyen@intel.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>
+References: <20260423130405.139568-1-jtornosm@redhat.com>
+ <20260423130405.139568-4-jtornosm@redhat.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <20260423130405.139568-4-jtornosm@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: DU2P251CA0007.EURP251.PROD.OUTLOOK.COM
+ (2603:10a6:10:230::9) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
-X-Rspamd-Queue-Id: E7ED546FADB
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|PHXPR11MB9637:EE_
+X-MS-Office365-Filtering-Correlation-Id: d04ac0b5-bc69-471a-5ec5-08dea43e9c47
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|22082099003|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info: 9ZNGE3WPHS4QAJYumDq/IaPr23u0R2bduyRkYwdVsy6aUuqF4xMqyZzNlfr5ww69dWLm+81gm3lPb7YJM5kx58RuedBwNXp82/0y+Kep0ef3KYyZzFXT5xB19pNGZOCESFUy3lGyv5RJ3Z0SErir5C9+3ph66Y0mUQQgJrODR55htbhSjE2HFaaQagbOQtTy/k5O/h7T7xrezbXA/gCqnlFD7rPVpKcXUqhyekzrYni8GnJDCz/c+5JBW6vSHU5SkBw8j+MrcaEALj45gyym7Uqk0/hPHG8ZpCSpNC/f58yCIJ7MG4kJ1NxX1tUOkWNtqog4wKOr1X0iH6bHN2RRelm0C4fiAPo+T0V+quYFuiV10Gc9dH/0vzRq5KIoWeOzVufrufOMwCsWmyMZ1QRES+SArRrA9gIXSasp1Amec9sq55L1KMLE6+EnqUWMdT0qdFxFGbuYK2ZUXLd18PXvMqbr/FmDAjwjvZiaSWc4aePRoP9hMKffgwWpld/uSwXFSqEBWegIACfz/oaOfxULHVqjrgq2E8JO01DLPhsfL8iWbt6CNS4vJrQyRevGe4D5yZlIqDUI/j8siQkFM+TKKm7ix5tnooxV+CVLQNSLfn28GRXmpNiwSJy1BTPuGA9IpCM/3JCK+nsh54MgIa5uQL9993SMY9WY4wA1vPtG7Lc35/jNDlBlh8L3VgBV0g4/zTGrmeGbnmP5MAFRz37rrleyWvBB0jYOe9K2U2fIdflldylugQ3feLR/pmyyVK2D
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YktQc3RNL00vQUdOWTN0SGRoVTFSKytSNFgzZTVObmh0U25YY2ExUW82TGdY?=
+ =?utf-8?B?Uk1zT0U4cWhLZUZ2VHJKdm1zSGhXTGtadjNkTEtpK0owRGNaNFVFSnpkMGlQ?=
+ =?utf-8?B?L0RxVUxrZlZjS0lFWjJiNk1UdkpnSi9HRnRXQVgrLzNIMUw0dGJGcUY3MUs5?=
+ =?utf-8?B?WkpNa3BvYTJQbGRYMzM3cFh2UjBCRXBocS84VG9KelRqWEdHUVZzejRRS0tD?=
+ =?utf-8?B?MWFPYitFOWhwWHhhNFJxMnFmK3JNUnE5d1llczRIbFdXVHErUGNURjZyWUN6?=
+ =?utf-8?B?bXozMkNBczBJR2RNQmgvR2Q4UUlhQmc4b0FDaUZOVTdmUUxWVmJwRTl6dzdW?=
+ =?utf-8?B?VFVTNmFEeUhlVFZwUHNDTTZHZTNjY2ZCeEtmV2FRL09zMFFIMWFxN2lyc0Rl?=
+ =?utf-8?B?aGtabkRlTGJESCswNTBIUlQwYW4reS9WdXdBWFJ3WFllc0ZVN2dKZ0VOR0tH?=
+ =?utf-8?B?L3duNUZPUkw1Ykx1MTArWG92M2k1VndpTEdQK0p6MEZmSjRDRG9oOHRIVitB?=
+ =?utf-8?B?VmRiV2dVU0YvbHp2d0VxWE10cExvTUFEWU5GaWZhQTJkY0hTK1FFOEZmd1pu?=
+ =?utf-8?B?ejlNdzJaaVdzTkFXSUVHZFVrMS9RYUJ0d2dmZHIxNHA4WjNIMi9BTjJXd094?=
+ =?utf-8?B?Y0dQWk1NTlg0cTlrcUc5b0tHVFdHRTlFUW10V1JZYXMybGprT2hrMjNrOWl6?=
+ =?utf-8?B?anp3MjUxYmxWK01EU3YwZzFLeUMyRVVjS2xsQVZFSklwSFpSUUl1N3FFR0lo?=
+ =?utf-8?B?aXBmdzRNenl0ZmtLeW15UVJqZjdwZklXcllXSGNXaHRsbTgrN1FZZk45NHB3?=
+ =?utf-8?B?eU9VUy9nUjhTK3JJWWsrWUV3YzZyTnM4bVFUNkdlNGw4Z21oZFhtTE94eDJD?=
+ =?utf-8?B?RzFvaEc2T2NLWnltaFh4ampKTHpXZVNxMGJaWXFpZjJETnNvSVE1VCt5c1JW?=
+ =?utf-8?B?VENnRmwrL0pibmVlMGdvM3hOZGtKbWdvanRObXY1M2xtL3RoSTQ4R3cyYlUz?=
+ =?utf-8?B?OER1UU1hQXpockJ6ZDZheHhOMzV4ZVZRUmJCTzZZZlVUcFM4S1NuZ01ZZjhI?=
+ =?utf-8?B?azFJTDlENHNjR1VndEJkSTZTQUFJUEVkR2xqZzJaOFc2QTZ3YmtWcUNYNHJC?=
+ =?utf-8?B?SWdORGNVUWtJTWFHK0VCbXRNVmR2UDBlWDVaOXJJOThMbUhGaGdhMnVwQzdN?=
+ =?utf-8?B?S1cwT09GclFqZ2JvSHR5dVBPVytKcENmTE1qNitWakdVTXQ5UXBENXJ1RVdB?=
+ =?utf-8?B?U05lb3BVSUY5MUlmcHh1RGJnYXdVSjhuT0RocWZTcXVhZ04zTGJFbGxUYkth?=
+ =?utf-8?B?Sng5YXkxVlM2eEZqNzhXSm85THFQTUVSdWtUZE9FZGRVajYrUVhmYXNDVEts?=
+ =?utf-8?B?ZGZBbGhPSldtSlFUcWF5QTErTjhjTCtaZU5kS1Z6bUg0OFpBZExqWnFTZnNt?=
+ =?utf-8?B?MmI5enRld3RORFlGZzZKbUdCQWJ1K3RVMTFCbUZ3bldNVWlFV2ZwUEJZR3VU?=
+ =?utf-8?B?RFB1cG9Mb1Q1bmtJL3NxUTZVMkpvaEUvUTNuS3FqNlBpaldma2pxeUJyaHUz?=
+ =?utf-8?B?QkdqVm9yWUREMTJESzc1T08zN1JGdUlvdW40cTZwOTU2U3FkZkdUVjdKeXlp?=
+ =?utf-8?B?emRlM3VMY2F2bWQ0dm9lMzJ6d0VsUUtUVlBneEdqeFRqdHo4dkRtNlg4UWdr?=
+ =?utf-8?B?WmdNQTc2blpsTitWYXg2NXJhZHk2dkdMYWhlQmdkU0xwaUVFYU9IbER2ZG44?=
+ =?utf-8?B?ZXhGcnBJVG51RW1zd01yT3pQK2JqS01iOG00aDJ5Rkw5VWNHQmhSV1lhQnVu?=
+ =?utf-8?B?OWJyUklrcUJGamxlcndRbTFhQ0QrOEdua3FublV2MkdYeDRDc2x3SW85VTNk?=
+ =?utf-8?B?cytaQ212ZmRSak1jT0ZONlZobXRBM1FqZm5mQy92dW5mV3lxUWE0Mi9LWG95?=
+ =?utf-8?B?ekRCRUwvS0lHb1gxbHpZSElrMUZWYmN0K2dOSHlDUzJjMnRjcFFSWEx6OVNn?=
+ =?utf-8?B?ZVY4YzFxUVNzcnRaM25jMlNKb1FXTW5Td0hMOTE3dEJhaHVZYzREemFTMEFN?=
+ =?utf-8?B?NmdRVmhtSTlPMld1THZYTHgrTDQrbTByei9DUFNBSnp1a3AxYkJJSFhVUGxk?=
+ =?utf-8?B?MTdEc05zUFNXcnhhU1ZZOFc2RXBKeDJock1ZZTdjTkFQWGtKRzhHb0ovYno0?=
+ =?utf-8?B?QzR0dHlTRjBBbzBVMVZYTS90Q0xBaEJ5alFHakNkaE9xQ3hXWHNXQ2VCcWha?=
+ =?utf-8?B?NTE1STgrMmxHc0JNNnh3Mlc3eFJmblRBUTZJYU4xYit2aW5wbzFJb0NveWY1?=
+ =?utf-8?B?YWt3ejBHV01qbmJ3Q3NURisxOWFSdXBTWWF4U1lVUTQyVW9yQ1dFdFllbTBk?=
+ =?utf-8?Q?I08HM0pTy6fGLNy0=3D?=
+X-Exchange-RoutingPolicyChecked: nNoLE1yYp30Isc4ubmyiUCK6GqLZrZ0v7l/2hWKM/2NFrszdKVjJ/k0OniwY/oAkRg9Rviw+/TLFynYZCg5xa6QAdVJS8KSLlxoKfbM2Q1xtV0dSS4AYPXUI9xaU/oicgf11zNQYpRKU7rLMV9C7C5hr5M9snavvSGGJHBtuR8xHSGbDCyJRBV0aUGXVe04J4yS51Qgopj7dbXdx2P2pThguLuzPDrAS/8EuTQ8c6yCM8J6sD4Aj16U2sQ043VSGPXG3ifykLPj8HKD6P0Nn0bgaI8/eOo3JwmVWntzxMJMZyO/CX1NjlIR/D2aOKBoLVZfN4jQnpOalCJYFLbhh5w==
+X-MS-Exchange-CrossTenant-Network-Message-Id: d04ac0b5-bc69-471a-5ec5-08dea43e9c47
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2026 09:23:15.2313
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6yo+IgFqzIS8LGqQ/LKrYfIg6iW56W6RaCBXviHnWRG0KWk83ZLjEm/5zfLx8fJHzexlXg+6FeLlJQ5MexGX9PE32oFoCBKSadiO3PNBzJ4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PHXPR11MB9637
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: 4D0A146FE77
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-281279-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281278-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[amorenoz@redhat.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:dkim,intel.com:mid];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[przemyslaw.kitszel@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[10]
 
-In order to protect flow operations from RTNL contention, this patch
-decouples flow_table modifications from ovs_mutex by means of the
-following:
+On 4/23/26 15:04, Jose Ignacio Tornos Martinez wrote:
+> After commit ad7c7b2172c3 ("net: hold netdev instance lock during sysfs
+> operations"), iavf_set_mac() is called with the netdev instance lock
+> already held.
+> 
+> The function queues a MAC address change request via
+> iavf_replace_primary_mac() and then waits for completion. However, in
+> the current flow, the actual virtchnl message is sent by the watchdog
+> task, which also needs to acquire the netdev lock to run. Additionally,
+> the adminq_task which processes virtchnl responses also needs the netdev
+> lock.
+> 
+> This creates a deadlock scenario:
+> 1. iavf_set_mac() holds netdev lock and waits for MAC change
+> 2. Watchdog needs netdev lock to send the request -> blocked
+> 3. Even if request is sent, adminq_task needs netdev lock to process
+>     PF response -> blocked
+> 4. MAC change times out after 2.5 seconds
+> 5. iavf_set_mac() returns -EAGAIN
+> 
+> This particularly affects VFs during bonding setup when multiple VFs are
+> enslaved in quick succession.
+> 
+> Fix by implementing a synchronous MAC change operation similar to the
+> approach used in commit fdadbf6e84c4 ("iavf: fix incorrect reset handling
+> in callbacks").
+> 
+> The solution:
+> 1. Send the virtchnl ADD_ETH_ADDR message directly (not via watchdog)
+> 2. Poll the admin queue hardware directly for responses
+> 3. Process all received messages (including non-MAC messages)
+> 4. Return when MAC change completes or times out
+> 
+> A new generic function iavf_poll_virtchnl_response() is introduced that
+> can be reused for any future synchronous virtchnl operations. It takes a
+> callback to check completion, allowing flexible condition checking.
+> 
+> This allows the operation to complete synchronously while holding
+> netdev_lock, without relying on watchdog or adminq_task. The function
+> can sleep for up to 2.5 seconds polling hardware, but this is acceptable
+> since netdev_lock is per-device and only serializes operations on the
+> same interface.
+> 
+> To support this, change iavf_add_ether_addrs() to return an error code
+> instead of void, allowing callers to detect failures. Additionally,
+> export iavf_mac_add_reject() to enable proper rollback on local failures
+> (timeouts, send errors) - PF rejections are already handled automatically
+> by iavf_virtchnl_completion().
+> 
+> Fixes: ad7c7b2172c3 ("net: hold netdev instance lock during sysfs operations")
+> cc: stable@vger.kernel.org
+> Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+> ---
+> v4: Complete with Przemek Kitszel comments:
+>      - Remove vc_waitqueue entirely (not needed any more)
 
-1 - Create a new mutex inside the flow_table that protects it from
-concurrent modifications.
-Putting the mutex inside flow_table makes it easier to consume for
-functions inside flow_table.c that do not currently take pointers to the
-datapath.
-Some function signatures need to be changed to accept flow_table so that
-lockdep checks can be performed.
+nit: I would add a short note to commit message too
+thanks a lot for the rest of changes
+I have a few last nits, please find below
 
-2 - Create a reference count to temporarily extend rcu protection from
-the datapath to the flow_table.
-One reference is held by the datapath, the other is temporarily
-increased during flow modifications.
+>      - Add named parameters to callback function pointer declaration for
+>        clarity
+>      - Simplify callback signature: add v_op parameter so callback
+>        receives the opcode from the processed message to identify which
+>        response was received
+>      - Optimize polling loop to single condition check per iteration
+>        instead of checking both before and after message processing
+>      Address AI review (sashiko.dev) from Simon Horman:
+>      - Complete iavf_add_ether_addrs() error handling
+>      - Skip non-virtchnl hardware events (received_op=VIRTCHNL_OP_UNKNOWN),
+>        these can cause false completion detection
+>      - Complete rollback for local failures (not PF rejection) reusing
+>        iavf_mac_add_reject() to restore the old primary filter
+> v3: https://lore.kernel.org/netdev/20260414110006.124286-4-jtornosm@redhat.com/
+> 
+>   drivers/net/ethernet/intel/iavf/iavf.h        | 10 +-
+>   drivers/net/ethernet/intel/iavf/iavf_main.c   | 70 +++++++++----
+>   .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 99 +++++++++++++++++--
+>   3 files changed, 151 insertions(+), 28 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
+> index e9fb0a0919e3..78fa3df06e11 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf.h
+> +++ b/drivers/net/ethernet/intel/iavf/iavf.h
+> @@ -260,7 +260,6 @@ struct iavf_adapter {
+>   	struct work_struct adminq_task;
+>   	struct work_struct finish_config;
+>   	wait_queue_head_t down_waitqueue;
+> -	wait_queue_head_t vc_waitqueue;
+>   	struct iavf_q_vector *q_vectors;
+>   	struct list_head vlan_filter_list;
+>   	int num_vlan_filters;
+> @@ -589,8 +588,9 @@ void iavf_configure_queues(struct iavf_adapter *adapter);
+>   void iavf_enable_queues(struct iavf_adapter *adapter);
+>   void iavf_disable_queues(struct iavf_adapter *adapter);
+>   void iavf_map_queues(struct iavf_adapter *adapter);
+> -void iavf_add_ether_addrs(struct iavf_adapter *adapter);
+> +int iavf_add_ether_addrs(struct iavf_adapter *adapter);
+>   void iavf_del_ether_addrs(struct iavf_adapter *adapter);
+> +void iavf_mac_add_reject(struct iavf_adapter *adapter);
+>   void iavf_add_vlans(struct iavf_adapter *adapter);
+>   void iavf_del_vlans(struct iavf_adapter *adapter);
+>   void iavf_set_promiscuous(struct iavf_adapter *adapter);
+> @@ -607,6 +607,12 @@ void iavf_disable_vlan_stripping(struct iavf_adapter *adapter);
+>   void iavf_virtchnl_completion(struct iavf_adapter *adapter,
+>   			      enum virtchnl_ops v_opcode,
+>   			      enum iavf_status v_retval, u8 *msg, u16 msglen);
+> +int iavf_poll_virtchnl_response(struct iavf_adapter *adapter,
+> +				bool (*condition)(struct iavf_adapter *adapter,
+> +						  const void *data,
+> +						  enum virtchnl_ops v_op),
+> +				const void *cond_data,
+> +				unsigned int timeout_ms);
+>   int iavf_config_rss(struct iavf_adapter *adapter);
+>   void iavf_cfg_queues_bw(struct iavf_adapter *adapter);
+>   void iavf_cfg_queues_quanta_size(struct iavf_adapter *adapter);
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> index 67aa14350b1b..bc5994bf2cd9 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> @@ -1047,6 +1047,48 @@ static bool iavf_is_mac_set_handled(struct net_device *netdev,
+>   	return ret;
+>   }
+>   
+> +/**
+> + * iavf_mac_change_done - Check if MAC change completed
+> + * @adapter: board private structure
+> + * @data: MAC address being checked (as const void *)
+> + * @v_op: virtchnl opcode from processed message
+> + *
+> + * Callback for iavf_poll_virtchnl_response() to check if MAC change completed.
+> + *
+> + * Returns true if MAC change completed, false otherwise
 
-Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
----
- net/openvswitch/datapath.c   | 230 ++++++++++++++++++++++-------------
- net/openvswitch/flow.c       |  13 +-
- net/openvswitch/flow.h       |   9 +-
- net/openvswitch/flow_table.c | 173 ++++++++++++++++----------
- net/openvswitch/flow_table.h |  53 +++++++-
- 5 files changed, 318 insertions(+), 160 deletions(-)
+I'm not a fan of kdoc, but would rather write kdoc-compilant comments:
+Return: ...
 
-diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
-index b2243ba866a6..0495114012ba 100644
---- a/net/openvswitch/datapath.c
-+++ b/net/openvswitch/datapath.c
-@@ -88,13 +88,17 @@ static void ovs_notify(struct genl_family *family,
-  * DOC: Locking:
-  *
-  * All writes e.g. Writes to device state (add/remove datapath, port, set
-- * operations on vports, etc.), Writes to other state (flow table
-- * modifications, set miscellaneous datapath parameters, etc.) are protected
-- * by ovs_lock.
-+ * operations on vports, etc.) and writes to other datapath parameters
-+ * are protected by ovs_lock.
-+ *
-+ * Writes to the flow table are NOT protected by ovs_lock. Instead, a per-table
-+ * mutex and reference count are used (see comment above "struct flow_table"
-+ * definition). On some few occasions, the per-flow table mutex is nested
-+ * inside ovs_mutex.
-  *
-  * Reads are protected by RCU.
-  *
-- * There are a few special cases (mostly stats) that have their own
-+ * There are a few other special cases (mostly stats) that have their own
-  * synchronization but they nest under all of above and don't interact with
-  * each other.
-  *
-@@ -759,16 +763,19 @@ static struct genl_family dp_packet_genl_family __ro_after_init = {
- static void get_dp_stats(const struct datapath *dp, struct ovs_dp_stats *stats,
- 			 struct ovs_dp_megaflow_stats *mega_stats)
- {
--	struct flow_table *table = ovsl_dereference(dp->table);
-+	struct flow_table *table;
- 	int i;
- 
- 	memset(mega_stats, 0, sizeof(*mega_stats));
- 	memset(stats, 0, sizeof(*stats));
- 
-+	rcu_read_lock();
-+	table = rcu_dereference(dp->table);
- 	if (table) {
- 		stats->n_flows = ovs_flow_tbl_count(table);
- 		mega_stats->n_masks = ovs_flow_tbl_num_masks(table);
- 	}
-+	rcu_read_unlock();
- 
- 	stats->n_hit = stats->n_missed = stats->n_lost = 0;
- 
-@@ -840,15 +847,16 @@ static size_t ovs_flow_cmd_msg_size(const struct sw_flow_actions *acts,
- 		+ nla_total_size_64bit(8); /* OVS_FLOW_ATTR_USED */
- }
- 
--/* Called with ovs_mutex or RCU read lock. */
-+/* Called with table->lock or RCU read lock. */
- static int ovs_flow_cmd_fill_stats(const struct sw_flow *flow,
-+				   const struct flow_table *table,
- 				   struct sk_buff *skb)
- {
- 	struct ovs_flow_stats stats;
- 	__be16 tcp_flags;
- 	unsigned long used;
- 
--	ovs_flow_stats_get(flow, &stats, &used, &tcp_flags);
-+	ovs_flow_stats_get(flow, table, &stats, &used, &tcp_flags);
- 
- 	if (used &&
- 	    nla_put_u64_64bit(skb, OVS_FLOW_ATTR_USED, ovs_flow_used_time(used),
-@@ -868,8 +876,9 @@ static int ovs_flow_cmd_fill_stats(const struct sw_flow *flow,
- 	return 0;
- }
- 
--/* Called with ovs_mutex or RCU read lock. */
-+/* Called with RCU read lock or table->lock held. */
- static int ovs_flow_cmd_fill_actions(const struct sw_flow *flow,
-+				     const struct flow_table *table,
- 				     struct sk_buff *skb, int skb_orig_len)
- {
- 	struct nlattr *start;
-@@ -889,7 +898,7 @@ static int ovs_flow_cmd_fill_actions(const struct sw_flow *flow,
- 	if (start) {
- 		const struct sw_flow_actions *sf_acts;
- 
--		sf_acts = rcu_dereference_ovsl(flow->sf_acts);
-+		sf_acts = rcu_dereference_ovs_tbl(flow->sf_acts, table);
- 		err = ovs_nla_put_actions(sf_acts->actions,
- 					  sf_acts->actions_len, skb);
- 
-@@ -908,8 +917,10 @@ static int ovs_flow_cmd_fill_actions(const struct sw_flow *flow,
- 	return 0;
- }
- 
--/* Called with ovs_mutex or RCU read lock. */
--static int ovs_flow_cmd_fill_info(const struct sw_flow *flow, int dp_ifindex,
-+/* Called with table->lock or RCU read lock. */
-+static int ovs_flow_cmd_fill_info(const struct sw_flow *flow,
-+				  const struct flow_table *table,
-+				  int dp_ifindex,
- 				  struct sk_buff *skb, u32 portid,
- 				  u32 seq, u32 flags, u8 cmd, u32 ufid_flags)
- {
-@@ -940,12 +951,12 @@ static int ovs_flow_cmd_fill_info(const struct sw_flow *flow, int dp_ifindex,
- 			goto error;
- 	}
- 
--	err = ovs_flow_cmd_fill_stats(flow, skb);
-+	err = ovs_flow_cmd_fill_stats(flow, table, skb);
- 	if (err)
- 		goto error;
- 
- 	if (should_fill_actions(ufid_flags)) {
--		err = ovs_flow_cmd_fill_actions(flow, skb, skb_orig_len);
-+		err = ovs_flow_cmd_fill_actions(flow, table, skb, skb_orig_len);
- 		if (err)
- 			goto error;
- 	}
-@@ -979,8 +990,9 @@ static struct sk_buff *ovs_flow_cmd_alloc_info(const struct sw_flow_actions *act
- 	return skb;
- }
- 
--/* Called with ovs_mutex. */
-+/* Called with table->lock. */
- static struct sk_buff *ovs_flow_cmd_build_info(const struct sw_flow *flow,
-+					       const struct flow_table *table,
- 					       int dp_ifindex,
- 					       struct genl_info *info, u8 cmd,
- 					       bool always, u32 ufid_flags)
-@@ -988,12 +1000,12 @@ static struct sk_buff *ovs_flow_cmd_build_info(const struct sw_flow *flow,
- 	struct sk_buff *skb;
- 	int retval;
- 
--	skb = ovs_flow_cmd_alloc_info(ovsl_dereference(flow->sf_acts),
-+	skb = ovs_flow_cmd_alloc_info(ovs_tbl_dereference(flow->sf_acts, table),
- 				      &flow->id, info, always, ufid_flags);
- 	if (IS_ERR_OR_NULL(skb))
- 		return skb;
- 
--	retval = ovs_flow_cmd_fill_info(flow, dp_ifindex, skb,
-+	retval = ovs_flow_cmd_fill_info(flow, table, dp_ifindex, skb,
- 					info->snd_portid, info->snd_seq, 0,
- 					cmd, ufid_flags);
- 	if (WARN_ON_ONCE(retval < 0)) {
-@@ -1076,17 +1088,25 @@ static int ovs_flow_cmd_new(struct sk_buff *skb, struct genl_info *info)
- 		goto err_kfree_acts;
- 	}
- 
--	ovs_lock();
-+	rcu_read_lock();
- 	dp = get_dp(net, ovs_header->dp_ifindex);
- 	if (unlikely(!dp)) {
- 		error = -ENODEV;
--		goto err_unlock_ovs;
-+		rcu_read_unlock();
-+		goto err_kfree_reply;
- 	}
--	table = ovsl_dereference(dp->table);
--	if (!table) {
-+	table = rcu_dereference(dp->table);
-+	if (!table || !ovs_flow_tbl_get(table)) {
- 		error = -ENODEV;
--		goto err_unlock_ovs;
-+		rcu_read_unlock();
-+		goto err_kfree_reply;
- 	}
-+	rcu_read_unlock();
-+
-+	/* It is safe to dereference "table" after leaving rcu read-protected
-+	 * region because it's pinned by refcount.
-+	 */
-+	mutex_lock(&table->lock);
- 
- 	/* Check if this is a duplicate flow */
- 	if (ovs_identifier_is_ufid(&new_flow->id))
-@@ -1100,11 +1120,11 @@ static int ovs_flow_cmd_new(struct sk_buff *skb, struct genl_info *info)
- 		error = ovs_flow_tbl_insert(table, new_flow, &mask);
- 		if (unlikely(error)) {
- 			acts = NULL;
--			goto err_unlock_ovs;
-+			goto err_unlock_tbl;
- 		}
- 
- 		if (unlikely(reply)) {
--			error = ovs_flow_cmd_fill_info(new_flow,
-+			error = ovs_flow_cmd_fill_info(new_flow, table,
- 						       ovs_header->dp_ifindex,
- 						       reply, info->snd_portid,
- 						       info->snd_seq, 0,
-@@ -1112,7 +1132,8 @@ static int ovs_flow_cmd_new(struct sk_buff *skb, struct genl_info *info)
- 						       ufid_flags);
- 			BUG_ON(error < 0);
- 		}
--		ovs_unlock();
-+		mutex_unlock(&table->lock);
-+		ovs_flow_tbl_put(table);
- 	} else {
- 		struct sw_flow_actions *old_acts;
- 
-@@ -1125,7 +1146,7 @@ static int ovs_flow_cmd_new(struct sk_buff *skb, struct genl_info *info)
- 		if (unlikely(info->nlhdr->nlmsg_flags & (NLM_F_CREATE
- 							 | NLM_F_EXCL))) {
- 			error = -EEXIST;
--			goto err_unlock_ovs;
-+			goto err_unlock_tbl;
- 		}
- 		/* The flow identifier has to be the same for flow updates.
- 		 * Look for any overlapping flow.
-@@ -1138,15 +1159,15 @@ static int ovs_flow_cmd_new(struct sk_buff *skb, struct genl_info *info)
- 				flow = NULL;
- 			if (!flow) {
- 				error = -ENOENT;
--				goto err_unlock_ovs;
-+				goto err_unlock_tbl;
- 			}
- 		}
- 		/* Update actions. */
--		old_acts = ovsl_dereference(flow->sf_acts);
-+		old_acts = ovs_tbl_dereference(flow->sf_acts, table);
- 		rcu_assign_pointer(flow->sf_acts, acts);
- 
- 		if (unlikely(reply)) {
--			error = ovs_flow_cmd_fill_info(flow,
-+			error = ovs_flow_cmd_fill_info(flow, table,
- 						       ovs_header->dp_ifindex,
- 						       reply, info->snd_portid,
- 						       info->snd_seq, 0,
-@@ -1154,7 +1175,8 @@ static int ovs_flow_cmd_new(struct sk_buff *skb, struct genl_info *info)
- 						       ufid_flags);
- 			BUG_ON(error < 0);
- 		}
--		ovs_unlock();
-+		mutex_unlock(&table->lock);
-+		ovs_flow_tbl_put(table);
- 
- 		ovs_nla_free_flow_actions_rcu(old_acts);
- 		ovs_flow_free(new_flow, false);
-@@ -1166,8 +1188,10 @@ static int ovs_flow_cmd_new(struct sk_buff *skb, struct genl_info *info)
- 	kfree(key);
- 	return 0;
- 
--err_unlock_ovs:
--	ovs_unlock();
-+err_unlock_tbl:
-+	mutex_unlock(&table->lock);
-+	ovs_flow_tbl_put(table);
-+err_kfree_reply:
- 	kfree_skb(reply);
- err_kfree_acts:
- 	ovs_nla_free_flow_actions(acts);
-@@ -1296,17 +1320,26 @@ static int ovs_flow_cmd_set(struct sk_buff *skb, struct genl_info *info)
- 		}
- 	}
- 
--	ovs_lock();
-+	rcu_read_lock();
- 	dp = get_dp(net, ovs_header->dp_ifindex);
- 	if (unlikely(!dp)) {
- 		error = -ENODEV;
--		goto err_unlock_ovs;
-+		rcu_read_unlock();
-+		goto err_free_reply;
- 	}
--	table = ovsl_dereference(dp->table);
--	if (!table) {
-+	table = rcu_dereference(dp->table);
-+	if (!table || !ovs_flow_tbl_get(table)) {
-+		rcu_read_unlock();
- 		error = -ENODEV;
--		goto err_unlock_ovs;
-+		goto err_free_reply;
- 	}
-+	rcu_read_unlock();
-+
-+	/* It is safe to dereference "table" after leaving rcu read-protected
-+	 * region because it's pinned by refcount.
-+	 */
-+	mutex_lock(&table->lock);
-+
- 	/* Check that the flow exists. */
- 	if (ufid_present)
- 		flow = ovs_flow_tbl_lookup_ufid(table, &sfid);
-@@ -1314,16 +1347,16 @@ static int ovs_flow_cmd_set(struct sk_buff *skb, struct genl_info *info)
- 		flow = ovs_flow_tbl_lookup_exact(table, &match);
- 	if (unlikely(!flow)) {
- 		error = -ENOENT;
--		goto err_unlock_ovs;
-+		goto err_unlock_tbl;
- 	}
- 
- 	/* Update actions, if present. */
- 	if (likely(acts)) {
--		old_acts = ovsl_dereference(flow->sf_acts);
-+		old_acts = ovs_tbl_dereference(flow->sf_acts, table);
- 		rcu_assign_pointer(flow->sf_acts, acts);
- 
- 		if (unlikely(reply)) {
--			error = ovs_flow_cmd_fill_info(flow,
-+			error = ovs_flow_cmd_fill_info(flow, table,
- 						       ovs_header->dp_ifindex,
- 						       reply, info->snd_portid,
- 						       info->snd_seq, 0,
-@@ -1333,20 +1366,22 @@ static int ovs_flow_cmd_set(struct sk_buff *skb, struct genl_info *info)
- 		}
- 	} else {
- 		/* Could not alloc without acts before locking. */
--		reply = ovs_flow_cmd_build_info(flow, ovs_header->dp_ifindex,
-+		reply = ovs_flow_cmd_build_info(flow, table,
-+						ovs_header->dp_ifindex,
- 						info, OVS_FLOW_CMD_SET, false,
- 						ufid_flags);
- 
- 		if (IS_ERR(reply)) {
- 			error = PTR_ERR(reply);
--			goto err_unlock_ovs;
-+			goto err_unlock_tbl;
- 		}
- 	}
- 
- 	/* Clear stats. */
- 	if (a[OVS_FLOW_ATTR_CLEAR])
--		ovs_flow_stats_clear(flow);
--	ovs_unlock();
-+		ovs_flow_stats_clear(flow, table);
-+	mutex_unlock(&table->lock);
-+	ovs_flow_tbl_put(table);
- 
- 	if (reply)
- 		ovs_notify(&dp_flow_genl_family, reply, info);
-@@ -1355,8 +1390,10 @@ static int ovs_flow_cmd_set(struct sk_buff *skb, struct genl_info *info)
- 
- 	return 0;
- 
--err_unlock_ovs:
--	ovs_unlock();
-+err_unlock_tbl:
-+	mutex_unlock(&table->lock);
-+	ovs_flow_tbl_put(table);
-+err_free_reply:
- 	kfree_skb(reply);
- err_kfree_acts:
- 	ovs_nla_free_flow_actions(acts);
-@@ -1394,17 +1431,24 @@ static int ovs_flow_cmd_get(struct sk_buff *skb, struct genl_info *info)
- 	if (err)
- 		return err;
- 
--	ovs_lock();
-+	rcu_read_lock();
- 	dp = get_dp(sock_net(skb->sk), ovs_header->dp_ifindex);
- 	if (!dp) {
--		err = -ENODEV;
--		goto unlock;
-+		rcu_read_unlock();
-+		return -ENODEV;
- 	}
--	table = ovsl_dereference(dp->table);
--	if (!table) {
--		err = -ENODEV;
--		goto unlock;
-+	table = rcu_dereference(dp->table);
-+	if (!table || !ovs_flow_tbl_get(table)) {
-+		rcu_read_unlock();
-+		return -ENODEV;
- 	}
-+	rcu_read_unlock();
-+
-+	/* It is safe to dereference "table" after leaving rcu read-protected
-+	 * region because it's pinned by refcount.
-+	 */
-+	mutex_lock(&table->lock);
-+
- 
- 	if (ufid_present)
- 		flow = ovs_flow_tbl_lookup_ufid(table, &ufid);
-@@ -1415,17 +1459,20 @@ static int ovs_flow_cmd_get(struct sk_buff *skb, struct genl_info *info)
- 		goto unlock;
- 	}
- 
--	reply = ovs_flow_cmd_build_info(flow, ovs_header->dp_ifindex, info,
--					OVS_FLOW_CMD_GET, true, ufid_flags);
-+	reply = ovs_flow_cmd_build_info(flow, table, ovs_header->dp_ifindex,
-+					info, OVS_FLOW_CMD_GET, true,
-+					ufid_flags);
- 	if (IS_ERR(reply)) {
- 		err = PTR_ERR(reply);
- 		goto unlock;
- 	}
- 
--	ovs_unlock();
-+	mutex_unlock(&table->lock);
-+	ovs_flow_tbl_put(table);
- 	return genlmsg_reply(reply, info);
- unlock:
--	ovs_unlock();
-+	mutex_unlock(&table->lock);
-+	ovs_flow_tbl_put(table);
- 	return err;
- }
- 
-@@ -1455,17 +1502,24 @@ static int ovs_flow_cmd_del(struct sk_buff *skb, struct genl_info *info)
- 			return err;
- 	}
- 
--	ovs_lock();
-+	rcu_read_lock();
- 	dp = get_dp(sock_net(skb->sk), ovs_header->dp_ifindex);
- 	if (unlikely(!dp)) {
--		err = -ENODEV;
--		goto unlock;
-+		rcu_read_unlock();
-+		return -ENODEV;
- 	}
--	table = ovsl_dereference(dp->table);
--	if (!table) {
--		err = -ENODEV;
--		goto unlock;
-+	table = rcu_dereference(dp->table);
-+	if (!table || !ovs_flow_tbl_get(table)) {
-+		rcu_read_unlock();
-+		return -ENODEV;
- 	}
-+	rcu_read_unlock();
-+
-+	/* It is safe to dereference "table" after leaving rcu read-protected
-+	 * region because it's pinned by refcount.
-+	 */
-+	mutex_lock(&table->lock);
-+
- 
- 	if (unlikely(!a[OVS_FLOW_ATTR_KEY] && !ufid_present)) {
- 		err = ovs_flow_tbl_flush(table);
-@@ -1482,14 +1536,15 @@ static int ovs_flow_cmd_del(struct sk_buff *skb, struct genl_info *info)
- 	}
- 
- 	ovs_flow_tbl_remove(table, flow);
--	ovs_unlock();
-+	mutex_unlock(&table->lock);
- 
- 	reply = ovs_flow_cmd_alloc_info((const struct sw_flow_actions __force *) flow->sf_acts,
- 					&flow->id, info, false, ufid_flags);
- 	if (likely(reply)) {
- 		if (!IS_ERR(reply)) {
- 			rcu_read_lock();	/*To keep RCU checker happy. */
--			err = ovs_flow_cmd_fill_info(flow, ovs_header->dp_ifindex,
-+			err = ovs_flow_cmd_fill_info(flow, table,
-+						     ovs_header->dp_ifindex,
- 						     reply, info->snd_portid,
- 						     info->snd_seq, 0,
- 						     OVS_FLOW_CMD_DEL,
-@@ -1508,10 +1563,12 @@ static int ovs_flow_cmd_del(struct sk_buff *skb, struct genl_info *info)
- 	}
- 
- out_free:
-+	ovs_flow_tbl_put(table);
- 	ovs_flow_free(flow, true);
- 	return 0;
- unlock:
--	ovs_unlock();
-+	mutex_unlock(&table->lock);
-+	ovs_flow_tbl_put(table);
- 	return err;
- }
- 
-@@ -1537,7 +1594,7 @@ static int ovs_flow_cmd_dump(struct sk_buff *skb, struct netlink_callback *cb)
- 		rcu_read_unlock();
- 		return -ENODEV;
- 	}
--	table = rcu_dereference_ovsl(dp->table);
-+	table = rcu_dereference(dp->table);
- 	if (!table) {
- 		rcu_read_unlock();
- 		return -ENODEV;
-@@ -1554,8 +1611,8 @@ static int ovs_flow_cmd_dump(struct sk_buff *skb, struct netlink_callback *cb)
- 		if (!flow)
- 			break;
- 
--		if (ovs_flow_cmd_fill_info(flow, ovs_header->dp_ifindex, skb,
--					   NETLINK_CB(cb->skb).portid,
-+		if (ovs_flow_cmd_fill_info(flow, table, ovs_header->dp_ifindex,
-+					   skb, NETLINK_CB(cb->skb).portid,
- 					   cb->nlh->nlmsg_seq, NLM_F_MULTI,
- 					   OVS_FLOW_CMD_GET, ufid_flags) < 0)
- 			break;
-@@ -1642,10 +1699,6 @@ static int ovs_dp_cmd_fill_info(struct datapath *dp, struct sk_buff *skb,
- 	struct flow_table *table;
- 	int err, pids_len;
- 
--	table = ovsl_dereference(dp->table);
--	if (!table)
--		return -ENODEV;
--
- 	ovs_header = genlmsg_put(skb, portid, seq, &dp_datapath_genl_family,
- 				 flags, cmd);
- 	if (!ovs_header)
-@@ -1670,8 +1723,12 @@ static int ovs_dp_cmd_fill_info(struct datapath *dp, struct sk_buff *skb,
- 	if (nla_put_u32(skb, OVS_DP_ATTR_USER_FEATURES, dp->user_features))
- 		goto nla_put_failure;
- 
--	if (nla_put_u32(skb, OVS_DP_ATTR_MASKS_CACHE_SIZE,
--			ovs_flow_tbl_masks_cache_size(table)))
-+	rcu_read_lock();
-+	table = rcu_dereference(dp->table);
-+	err = table ? nla_put_u32(skb, OVS_DP_ATTR_MASKS_CACHE_SIZE,
-+				  ovs_flow_tbl_masks_cache_size(table)) : 0;
-+	rcu_read_unlock();
-+	if (err)
- 		goto nla_put_failure;
- 
- 	if (dp->user_features & OVS_DP_F_DISPATCH_UPCALL_PER_CPU && pids) {
-@@ -1809,7 +1866,9 @@ static int ovs_dp_change(struct datapath *dp, struct nlattr *a[])
- 			return -ENODEV;
- 
- 		cache_size = nla_get_u32(a[OVS_DP_ATTR_MASKS_CACHE_SIZE]);
-+		mutex_lock(&table->lock);
- 		err = ovs_flow_tbl_masks_cache_resize(table, cache_size);
-+		mutex_unlock(&table->lock);
- 		if (err)
- 			return err;
- 	}
-@@ -1960,7 +2019,7 @@ static int ovs_dp_cmd_new(struct sk_buff *skb, struct genl_info *info)
- err_destroy_stats:
- 	free_percpu(dp->stats_percpu);
- err_destroy_table:
--	call_rcu(&table->rcu, ovs_flow_tbl_destroy_rcu);
-+	ovs_flow_tbl_put(table);
- err_destroy_dp:
- 	kfree(dp);
- err_destroy_reply:
-@@ -1972,7 +2031,8 @@ static int ovs_dp_cmd_new(struct sk_buff *skb, struct genl_info *info)
- /* Called with ovs_mutex. */
- static void __dp_destroy(struct datapath *dp)
- {
--	struct flow_table *table = ovsl_dereference(dp->table);
-+	struct flow_table *table = rcu_dereference_protected(dp->table,
-+					lockdep_ovsl_is_held());
- 	int i;
- 
- 	if (dp->user_features & OVS_DP_F_TC_RECIRC_SHARING)
-@@ -1994,16 +2054,11 @@ static void __dp_destroy(struct datapath *dp)
- 	 */
- 	ovs_dp_detach_port(ovs_vport_ovsl(dp, OVSP_LOCAL));
- 
--	/* Flush sw_flow in the tables. RCU cb only releases resource
--	 * such as dp, ports and tables. That may avoid some issues
--	 * such as RCU usage warning.
--	 */
--	table_instance_flow_flush(table, ovsl_dereference(table->ti),
--				  ovsl_dereference(table->ufid_ti));
-+	rcu_assign_pointer(dp->table, NULL);
-+	ovs_flow_tbl_put(table);
- 
--	/* RCU destroy the ports, meters and flow tables. */
-+	/* RCU destroy the ports and meters. */
- 	call_rcu(&dp->rcu, destroy_dp_rcu);
--	call_rcu(&table->rcu, ovs_flow_tbl_destroy_rcu);
- }
- 
- static int ovs_dp_cmd_del(struct sk_buff *skb, struct genl_info *info)
-@@ -2616,9 +2671,12 @@ static void ovs_dp_masks_rebalance(struct work_struct *work)
- 	ovs_lock();
- 	list_for_each_entry(dp, &ovs_net->dps, list_node) {
- 		table = ovsl_dereference(dp->table);
--		if (!table)
-+		if (!table || !ovs_flow_tbl_get(table))
- 			continue;
-+		mutex_lock(&table->lock);
- 		ovs_flow_masks_rebalance(table);
-+		mutex_unlock(&table->lock);
-+		ovs_flow_tbl_put(table);
- 	}
- 	ovs_unlock();
- 
-diff --git a/net/openvswitch/flow.c b/net/openvswitch/flow.c
-index 66366982f604..0a748cf20f53 100644
---- a/net/openvswitch/flow.c
-+++ b/net/openvswitch/flow.c
-@@ -124,8 +124,9 @@ void ovs_flow_stats_update(struct sw_flow *flow, __be16 tcp_flags,
- 	spin_unlock(&stats->lock);
- }
- 
--/* Must be called with rcu_read_lock or ovs_mutex. */
-+/* Must be called with rcu_read_lock or table->lock held. */
- void ovs_flow_stats_get(const struct sw_flow *flow,
-+			const struct flow_table *table,
- 			struct ovs_flow_stats *ovs_stats,
- 			unsigned long *used, __be16 *tcp_flags)
- {
-@@ -136,7 +137,8 @@ void ovs_flow_stats_get(const struct sw_flow *flow,
- 	memset(ovs_stats, 0, sizeof(*ovs_stats));
- 
- 	for_each_cpu(cpu, flow->cpu_used_mask) {
--		struct sw_flow_stats *stats = rcu_dereference_ovsl(flow->stats[cpu]);
-+		struct sw_flow_stats *stats =
-+			rcu_dereference_ovs_tbl(flow->stats[cpu], table);
- 
- 		if (stats) {
- 			/* Local CPU may write on non-local stats, so we must
-@@ -153,13 +155,14 @@ void ovs_flow_stats_get(const struct sw_flow *flow,
- 	}
- }
- 
--/* Called with ovs_mutex. */
--void ovs_flow_stats_clear(struct sw_flow *flow)
-+/* Called with table->lock held. */
-+void ovs_flow_stats_clear(struct sw_flow *flow, struct flow_table *table)
- {
- 	unsigned int cpu;
- 
- 	for_each_cpu(cpu, flow->cpu_used_mask) {
--		struct sw_flow_stats *stats = ovsl_dereference(flow->stats[cpu]);
-+		struct sw_flow_stats *stats =
-+			ovs_tbl_dereference(flow->stats[cpu], table);
- 
- 		if (stats) {
- 			spin_lock_bh(&stats->lock);
-diff --git a/net/openvswitch/flow.h b/net/openvswitch/flow.h
-index b5711aff6e76..e05ed6796e4e 100644
---- a/net/openvswitch/flow.h
-+++ b/net/openvswitch/flow.h
-@@ -23,6 +23,7 @@
- #include <net/dst_metadata.h>
- #include <net/nsh.h>
- 
-+struct flow_table;
- struct sk_buff;
- 
- enum sw_flow_mac_proto {
-@@ -280,9 +281,11 @@ static inline bool ovs_identifier_is_key(const struct sw_flow_id *sfid)
- 
- void ovs_flow_stats_update(struct sw_flow *, __be16 tcp_flags,
- 			   const struct sk_buff *);
--void ovs_flow_stats_get(const struct sw_flow *, struct ovs_flow_stats *,
--			unsigned long *used, __be16 *tcp_flags);
--void ovs_flow_stats_clear(struct sw_flow *);
-+void ovs_flow_stats_get(const struct sw_flow *flow,
-+			const struct flow_table *table,
-+			struct ovs_flow_stats *stats, unsigned long *used,
-+			__be16 *tcp_flags);
-+void ovs_flow_stats_clear(struct sw_flow *flow, struct flow_table *table);
- u64 ovs_flow_used_time(unsigned long flow_jiffies);
- 
- int ovs_flow_key_update(struct sk_buff *skb, struct sw_flow_key *key);
-diff --git a/net/openvswitch/flow_table.c b/net/openvswitch/flow_table.c
-index 3b7518e3394d..3934873a44c3 100644
---- a/net/openvswitch/flow_table.c
-+++ b/net/openvswitch/flow_table.c
-@@ -45,6 +45,16 @@
- static struct kmem_cache *flow_cache;
- struct kmem_cache *flow_stats_cache __read_mostly;
- 
-+#ifdef CONFIG_LOCKDEP
-+int lockdep_ovs_tbl_is_held(const struct flow_table *table)
-+{
-+	if (debug_locks)
-+		return lockdep_is_held(&table->lock);
-+	else
-+		return 1;
-+}
-+#endif
-+
- static u16 range_n_bytes(const struct sw_flow_key_range *range)
- {
- 	return range->end - range->start;
-@@ -102,7 +112,7 @@ struct sw_flow *ovs_flow_alloc(void)
- 
- int ovs_flow_tbl_count(const struct flow_table *table)
- {
--	return table->count;
-+	return READ_ONCE(table->count);
- }
- 
- static void flow_free(struct sw_flow *flow)
-@@ -249,12 +259,12 @@ static int tbl_mask_array_realloc(struct flow_table *tbl, int size)
- 	if (!new)
- 		return -ENOMEM;
- 
--	old = ovsl_dereference(tbl->mask_array);
-+	old = ovs_tbl_dereference(tbl->mask_array, tbl);
- 	if (old) {
- 		int i;
- 
- 		for (i = 0; i < old->max; i++) {
--			if (ovsl_dereference(old->masks[i]))
-+			if (ovs_tbl_dereference(old->masks[i], tbl))
- 				new->masks[new->count++] = old->masks[i];
- 		}
- 		call_rcu(&old->rcu, mask_array_rcu_cb);
-@@ -268,7 +278,7 @@ static int tbl_mask_array_realloc(struct flow_table *tbl, int size)
- static int tbl_mask_array_add_mask(struct flow_table *tbl,
- 				   struct sw_flow_mask *new)
- {
--	struct mask_array *ma = ovsl_dereference(tbl->mask_array);
-+	struct mask_array *ma = ovs_tbl_dereference(tbl->mask_array, tbl);
- 	int err, ma_count = READ_ONCE(ma->count);
- 
- 	if (ma_count >= ma->max) {
-@@ -277,7 +287,7 @@ static int tbl_mask_array_add_mask(struct flow_table *tbl,
- 		if (err)
- 			return err;
- 
--		ma = ovsl_dereference(tbl->mask_array);
-+		ma = ovs_tbl_dereference(tbl->mask_array, tbl);
- 	} else {
- 		/* On every add or delete we need to reset the counters so
- 		 * every new mask gets a fair chance of being prioritized.
-@@ -285,7 +295,7 @@ static int tbl_mask_array_add_mask(struct flow_table *tbl,
- 		tbl_mask_array_reset_counters(ma);
- 	}
- 
--	BUG_ON(ovsl_dereference(ma->masks[ma_count]));
-+	WARN_ON_ONCE(ovs_tbl_dereference(ma->masks[ma_count], tbl));
- 
- 	rcu_assign_pointer(ma->masks[ma_count], new);
- 	WRITE_ONCE(ma->count, ma_count + 1);
-@@ -296,12 +306,12 @@ static int tbl_mask_array_add_mask(struct flow_table *tbl,
- static void tbl_mask_array_del_mask(struct flow_table *tbl,
- 				    struct sw_flow_mask *mask)
- {
--	struct mask_array *ma = ovsl_dereference(tbl->mask_array);
-+	struct mask_array *ma = ovs_tbl_dereference(tbl->mask_array, tbl);
- 	int i, ma_count = READ_ONCE(ma->count);
- 
- 	/* Remove the deleted mask pointers from the array */
- 	for (i = 0; i < ma_count; i++) {
--		if (mask == ovsl_dereference(ma->masks[i]))
-+		if (mask == ovs_tbl_dereference(ma->masks[i], tbl))
- 			goto found;
- 	}
- 
-@@ -329,10 +339,10 @@ static void tbl_mask_array_del_mask(struct flow_table *tbl,
- static void flow_mask_remove(struct flow_table *tbl, struct sw_flow_mask *mask)
- {
- 	if (mask) {
--		/* ovs-lock is required to protect mask-refcount and
-+		/* table lock is required to protect mask-refcount and
- 		 * mask list.
- 		 */
--		ASSERT_OVSL();
-+		ASSERT_OVS_TBL(tbl);
- 		BUG_ON(!mask->ref_count);
- 		mask->ref_count--;
- 
-@@ -386,7 +396,8 @@ static struct mask_cache *tbl_mask_cache_alloc(u32 size)
- }
- int ovs_flow_tbl_masks_cache_resize(struct flow_table *table, u32 size)
- {
--	struct mask_cache *mc = rcu_dereference_ovsl(table->mask_cache);
-+	struct mask_cache *mc = rcu_dereference_ovs_tbl(table->mask_cache,
-+							table);
- 	struct mask_cache *new;
- 
- 	if (size == mc->cache_size)
-@@ -416,6 +427,10 @@ struct flow_table *ovs_flow_tbl_alloc(void)
- 	table = kzalloc_obj(*table, GFP_KERNEL);
- 	if (!table)
- 		return ERR_PTR(-ENOMEM);
-+
-+	mutex_init(&table->lock);
-+	refcount_set(&table->refcnt, 1);
-+
- 	mc = tbl_mask_cache_alloc(MC_DEFAULT_HASH_ENTRIES);
- 	if (!mc)
- 		goto free_table;
-@@ -448,6 +463,7 @@ struct flow_table *ovs_flow_tbl_alloc(void)
- free_mask_cache:
- 	__mask_cache_destroy(mc);
- free_table:
-+	mutex_destroy(&table->lock);
- 	kfree(table);
- 	return ERR_PTR(-ENOMEM);
- }
-@@ -466,7 +482,7 @@ static void table_instance_flow_free(struct flow_table *table,
- 				     struct sw_flow *flow)
- {
- 	hlist_del_rcu(&flow->flow_table.node[ti->node_ver]);
--	table->count--;
-+	WRITE_ONCE(table->count, table->count - 1);
- 
- 	if (ovs_identifier_is_ufid(&flow->id)) {
- 		hlist_del_rcu(&flow->ufid_table.node[ufid_ti->node_ver]);
-@@ -476,10 +492,10 @@ static void table_instance_flow_free(struct flow_table *table,
- 	flow_mask_remove(table, flow->mask);
- }
- 
--/* Must be called with OVS mutex held. */
--void table_instance_flow_flush(struct flow_table *table,
--			       struct table_instance *ti,
--			       struct table_instance *ufid_ti)
-+/* Must be called with table mutex held. */
-+static void table_instance_flow_flush(struct flow_table *table,
-+				      struct table_instance *ti,
-+				      struct table_instance *ufid_ti)
- {
- 	int i;
- 
-@@ -499,7 +515,7 @@ void table_instance_flow_flush(struct flow_table *table,
- 
- 	if (WARN_ON(table->count != 0 ||
- 		    table->ufid_count != 0)) {
--		table->count = 0;
-+		WRITE_ONCE(table->count, 0);
- 		table->ufid_count = 0;
- 	}
- }
-@@ -512,7 +528,7 @@ static void table_instance_destroy(struct table_instance *ti,
- }
- 
- /* No need for locking this function is called from RCU callback. */
--void ovs_flow_tbl_destroy_rcu(struct rcu_head *rcu)
-+static void ovs_flow_tbl_destroy_rcu(struct rcu_head *rcu)
- {
- 	struct flow_table *table = container_of(rcu, struct flow_table, rcu);
- 
-@@ -524,9 +540,22 @@ void ovs_flow_tbl_destroy_rcu(struct rcu_head *rcu)
- 	call_rcu(&mc->rcu, mask_cache_rcu_cb);
- 	call_rcu(&ma->rcu, mask_array_rcu_cb);
- 	table_instance_destroy(ti, ufid_ti);
-+	mutex_destroy(&table->lock);
- 	kfree(table);
- }
- 
-+void ovs_flow_tbl_put(struct flow_table *table)
-+{
-+	if (refcount_dec_and_test(&table->refcnt)) {
-+		mutex_lock(&table->lock);
-+		table_instance_flow_flush(table,
-+					  ovs_tbl_dereference(table->ti, table),
-+					  ovs_tbl_dereference(table->ufid_ti, table));
-+		mutex_unlock(&table->lock);
-+		call_rcu(&table->rcu, ovs_flow_tbl_destroy_rcu);
-+	}
-+}
-+
- struct sw_flow *ovs_flow_tbl_dump_next(struct table_instance *ti,
- 				       u32 *bucket, u32 *last)
- {
-@@ -578,7 +607,8 @@ static void ufid_table_instance_insert(struct table_instance *ti,
- 	hlist_add_head_rcu(&flow->ufid_table.node[ti->node_ver], head);
- }
- 
--static void flow_table_copy_flows(struct table_instance *old,
-+static void flow_table_copy_flows(struct flow_table *table,
-+				  struct table_instance *old,
- 				  struct table_instance *new, bool ufid)
- {
- 	int old_ver;
-@@ -595,17 +625,18 @@ static void flow_table_copy_flows(struct table_instance *old,
- 		if (ufid)
- 			hlist_for_each_entry_rcu(flow, head,
- 						 ufid_table.node[old_ver],
--						 lockdep_ovsl_is_held())
-+						 lockdep_ovs_tbl_is_held(table))
- 				ufid_table_instance_insert(new, flow);
- 		else
- 			hlist_for_each_entry_rcu(flow, head,
- 						 flow_table.node[old_ver],
--						 lockdep_ovsl_is_held())
-+						 lockdep_ovs_tbl_is_held(table))
- 				table_instance_insert(new, flow);
- 	}
- }
- 
--static struct table_instance *table_instance_rehash(struct table_instance *ti,
-+static struct table_instance *table_instance_rehash(struct flow_table *table,
-+						    struct table_instance *ti,
- 						    int n_buckets, bool ufid)
- {
- 	struct table_instance *new_ti;
-@@ -614,16 +645,19 @@ static struct table_instance *table_instance_rehash(struct table_instance *ti,
- 	if (!new_ti)
- 		return NULL;
- 
--	flow_table_copy_flows(ti, new_ti, ufid);
-+	flow_table_copy_flows(table, ti, new_ti, ufid);
- 
- 	return new_ti;
- }
- 
-+/* Must be called with flow_table->lock held. */
- int ovs_flow_tbl_flush(struct flow_table *flow_table)
- {
- 	struct table_instance *old_ti, *new_ti;
- 	struct table_instance *old_ufid_ti, *new_ufid_ti;
- 
-+	ASSERT_OVS_TBL(flow_table);
-+
- 	new_ti = table_instance_alloc(TBL_MIN_BUCKETS);
- 	if (!new_ti)
- 		return -ENOMEM;
-@@ -631,8 +665,8 @@ int ovs_flow_tbl_flush(struct flow_table *flow_table)
- 	if (!new_ufid_ti)
- 		goto err_free_ti;
- 
--	old_ti = ovsl_dereference(flow_table->ti);
--	old_ufid_ti = ovsl_dereference(flow_table->ufid_ti);
-+	old_ti = ovs_tbl_dereference(flow_table->ti, flow_table);
-+	old_ufid_ti = ovs_tbl_dereference(flow_table->ufid_ti, flow_table);
- 
- 	rcu_assign_pointer(flow_table->ti, new_ti);
- 	rcu_assign_pointer(flow_table->ufid_ti, new_ufid_ti);
-@@ -700,7 +734,8 @@ static bool ovs_flow_cmp_unmasked_key(const struct sw_flow *flow,
- 	return cmp_key(flow->id.unmasked_key, key, key_start, key_end);
- }
- 
--static struct sw_flow *masked_flow_lookup(struct table_instance *ti,
-+static struct sw_flow *masked_flow_lookup(struct flow_table *tbl,
-+					  struct table_instance *ti,
- 					  const struct sw_flow_key *unmasked,
- 					  const struct sw_flow_mask *mask,
- 					  u32 *n_mask_hit)
-@@ -716,7 +751,7 @@ static struct sw_flow *masked_flow_lookup(struct table_instance *ti,
- 	(*n_mask_hit)++;
- 
- 	hlist_for_each_entry_rcu(flow, head, flow_table.node[ti->node_ver],
--				 lockdep_ovsl_is_held()) {
-+				 lockdep_ovs_tbl_is_held(tbl)) {
- 		if (flow->mask == mask && flow->flow_table.hash == hash &&
- 		    flow_cmp_masked_key(flow, &masked_key, &mask->range))
- 			return flow;
-@@ -743,9 +778,9 @@ static struct sw_flow *flow_lookup(struct flow_table *tbl,
- 	int i;
- 
- 	if (likely(*index < ma->max)) {
--		mask = rcu_dereference_ovsl(ma->masks[*index]);
-+		mask = rcu_dereference_ovs_tbl(ma->masks[*index], tbl);
- 		if (mask) {
--			flow = masked_flow_lookup(ti, key, mask, n_mask_hit);
-+			flow = masked_flow_lookup(tbl, ti, key, mask, n_mask_hit);
- 			if (flow) {
- 				u64_stats_update_begin(&stats->syncp);
- 				stats->usage_cntrs[*index]++;
-@@ -761,11 +796,11 @@ static struct sw_flow *flow_lookup(struct flow_table *tbl,
- 		if (i == *index)
- 			continue;
- 
--		mask = rcu_dereference_ovsl(ma->masks[i]);
-+		mask = rcu_dereference_ovs_tbl(ma->masks[i], tbl);
- 		if (unlikely(!mask))
- 			break;
- 
--		flow = masked_flow_lookup(ti, key, mask, n_mask_hit);
-+		flow = masked_flow_lookup(tbl, ti, key, mask, n_mask_hit);
- 		if (flow) { /* Found */
- 			*index = i;
- 			u64_stats_update_begin(&stats->syncp);
-@@ -852,8 +887,8 @@ struct sw_flow *ovs_flow_tbl_lookup_stats(struct flow_table *tbl,
- struct sw_flow *ovs_flow_tbl_lookup(struct flow_table *tbl,
- 				    const struct sw_flow_key *key)
- {
--	struct table_instance *ti = rcu_dereference_ovsl(tbl->ti);
--	struct mask_array *ma = rcu_dereference_ovsl(tbl->mask_array);
-+	struct table_instance *ti = rcu_dereference_ovs_tbl(tbl->ti, tbl);
-+	struct mask_array *ma = rcu_dereference_ovs_tbl(tbl->mask_array, tbl);
- 	u32 __always_unused n_mask_hit;
- 	u32 __always_unused n_cache_hit;
- 	struct sw_flow *flow;
-@@ -872,21 +907,22 @@ struct sw_flow *ovs_flow_tbl_lookup(struct flow_table *tbl,
- struct sw_flow *ovs_flow_tbl_lookup_exact(struct flow_table *tbl,
- 					  const struct sw_flow_match *match)
- {
--	struct mask_array *ma = ovsl_dereference(tbl->mask_array);
-+	struct mask_array *ma = ovs_tbl_dereference(tbl->mask_array, tbl);
- 	int i;
- 
--	/* Always called under ovs-mutex. */
-+	/* Always called under tbl->lock. */
- 	for (i = 0; i < ma->max; i++) {
--		struct table_instance *ti = rcu_dereference_ovsl(tbl->ti);
-+		struct table_instance *ti =
-+				rcu_dereference_ovs_tbl(tbl->ti, tbl);
- 		u32 __always_unused n_mask_hit;
- 		struct sw_flow_mask *mask;
- 		struct sw_flow *flow;
- 
--		mask = ovsl_dereference(ma->masks[i]);
-+		mask = ovs_tbl_dereference(ma->masks[i], tbl);
- 		if (!mask)
- 			continue;
- 
--		flow = masked_flow_lookup(ti, match->key, mask, &n_mask_hit);
-+		flow = masked_flow_lookup(tbl, ti, match->key, mask, &n_mask_hit);
- 		if (flow && ovs_identifier_is_key(&flow->id) &&
- 		    ovs_flow_cmp_unmasked_key(flow, match)) {
- 			return flow;
-@@ -922,7 +958,7 @@ bool ovs_flow_cmp(const struct sw_flow *flow,
- struct sw_flow *ovs_flow_tbl_lookup_ufid(struct flow_table *tbl,
- 					 const struct sw_flow_id *ufid)
- {
--	struct table_instance *ti = rcu_dereference_ovsl(tbl->ufid_ti);
-+	struct table_instance *ti = rcu_dereference_ovs_tbl(tbl->ufid_ti, tbl);
- 	struct sw_flow *flow;
- 	struct hlist_head *head;
- 	u32 hash;
-@@ -930,7 +966,7 @@ struct sw_flow *ovs_flow_tbl_lookup_ufid(struct flow_table *tbl,
- 	hash = ufid_hash(ufid);
- 	head = find_bucket(ti, hash);
- 	hlist_for_each_entry_rcu(flow, head, ufid_table.node[ti->node_ver],
--				 lockdep_ovsl_is_held()) {
-+				 lockdep_ovs_tbl_is_held(tbl)) {
- 		if (flow->ufid_table.hash == hash &&
- 		    ovs_flow_cmp_ufid(flow, ufid))
- 			return flow;
-@@ -940,28 +976,33 @@ struct sw_flow *ovs_flow_tbl_lookup_ufid(struct flow_table *tbl,
- 
- int ovs_flow_tbl_num_masks(const struct flow_table *table)
- {
--	struct mask_array *ma = rcu_dereference_ovsl(table->mask_array);
-+	struct mask_array *ma = rcu_dereference_ovs_tbl(table->mask_array,
-+							table);
- 	return READ_ONCE(ma->count);
- }
- 
- u32 ovs_flow_tbl_masks_cache_size(const struct flow_table *table)
- {
--	struct mask_cache *mc = rcu_dereference_ovsl(table->mask_cache);
-+	struct mask_cache *mc = rcu_dereference_ovs_tbl(table->mask_cache,
-+							table);
- 
- 	return READ_ONCE(mc->cache_size);
- }
- 
--static struct table_instance *table_instance_expand(struct table_instance *ti,
-+static struct table_instance *table_instance_expand(struct flow_table *table,
-+						    struct table_instance *ti,
- 						    bool ufid)
- {
--	return table_instance_rehash(ti, ti->n_buckets * 2, ufid);
-+	return table_instance_rehash(table, ti, ti->n_buckets * 2, ufid);
- }
- 
--/* Must be called with OVS mutex held. */
-+/* Must be called with table mutex held. */
- void ovs_flow_tbl_remove(struct flow_table *table, struct sw_flow *flow)
- {
--	struct table_instance *ti = ovsl_dereference(table->ti);
--	struct table_instance *ufid_ti = ovsl_dereference(table->ufid_ti);
-+	struct table_instance *ti = ovs_tbl_dereference(table->ti,
-+							table);
-+	struct table_instance *ufid_ti = ovs_tbl_dereference(table->ufid_ti,
-+							     table);
- 
- 	BUG_ON(table->count == 0);
- 	table_instance_flow_free(table, ti, ufid_ti, flow);
-@@ -995,10 +1036,10 @@ static struct sw_flow_mask *flow_mask_find(const struct flow_table *tbl,
- 	struct mask_array *ma;
- 	int i;
- 
--	ma = ovsl_dereference(tbl->mask_array);
-+	ma = ovs_tbl_dereference(tbl->mask_array, tbl);
- 	for (i = 0; i < ma->max; i++) {
- 		struct sw_flow_mask *t;
--		t = ovsl_dereference(ma->masks[i]);
-+		t = ovs_tbl_dereference(ma->masks[i], tbl);
- 
- 		if (t && mask_equal(mask, t))
- 			return t;
-@@ -1036,22 +1077,25 @@ static int flow_mask_insert(struct flow_table *tbl, struct sw_flow *flow,
- 	return 0;
- }
- 
--/* Must be called with OVS mutex held. */
-+/* Must be called with table mutex held. */
- static void flow_key_insert(struct flow_table *table, struct sw_flow *flow)
- {
- 	struct table_instance *new_ti = NULL;
- 	struct table_instance *ti;
- 
-+	ASSERT_OVS_TBL(table);
-+
- 	flow->flow_table.hash = flow_hash(&flow->key, &flow->mask->range);
--	ti = ovsl_dereference(table->ti);
-+	ti = ovs_tbl_dereference(table->ti, table);
- 	table_instance_insert(ti, flow);
--	table->count++;
-+	WRITE_ONCE(table->count, table->count + 1);
- 
- 	/* Expand table, if necessary, to make room. */
- 	if (table->count > ti->n_buckets)
--		new_ti = table_instance_expand(ti, false);
-+		new_ti = table_instance_expand(table, ti, false);
- 	else if (time_after(jiffies, table->last_rehash + REHASH_INTERVAL))
--		new_ti = table_instance_rehash(ti, ti->n_buckets, false);
-+		new_ti = table_instance_rehash(table, ti, ti->n_buckets,
-+					       false);
- 
- 	if (new_ti) {
- 		rcu_assign_pointer(table->ti, new_ti);
-@@ -1060,13 +1104,15 @@ static void flow_key_insert(struct flow_table *table, struct sw_flow *flow)
- 	}
- }
- 
--/* Must be called with OVS mutex held. */
-+/* Must be called with table mutex held. */
- static void flow_ufid_insert(struct flow_table *table, struct sw_flow *flow)
- {
- 	struct table_instance *ti;
- 
-+	ASSERT_OVS_TBL(table);
-+
- 	flow->ufid_table.hash = ufid_hash(&flow->id);
--	ti = ovsl_dereference(table->ufid_ti);
-+	ti = ovs_tbl_dereference(table->ufid_ti, table);
- 	ufid_table_instance_insert(ti, flow);
- 	table->ufid_count++;
- 
-@@ -1074,7 +1120,7 @@ static void flow_ufid_insert(struct flow_table *table, struct sw_flow *flow)
- 	if (table->ufid_count > ti->n_buckets) {
- 		struct table_instance *new_ti;
- 
--		new_ti = table_instance_expand(ti, true);
-+		new_ti = table_instance_expand(table, ti, true);
- 		if (new_ti) {
- 			rcu_assign_pointer(table->ufid_ti, new_ti);
- 			call_rcu(&ti->rcu, flow_tbl_destroy_rcu_cb);
-@@ -1082,12 +1128,14 @@ static void flow_ufid_insert(struct flow_table *table, struct sw_flow *flow)
- 	}
- }
- 
--/* Must be called with OVS mutex held. */
-+/* Must be called with table mutex held. */
- int ovs_flow_tbl_insert(struct flow_table *table, struct sw_flow *flow,
- 			const struct sw_flow_mask *mask)
- {
- 	int err;
- 
-+	ASSERT_OVS_TBL(table);
-+
- 	err = flow_mask_insert(table, flow, mask);
- 	if (err)
- 		return err;
-@@ -1106,10 +1154,11 @@ static int compare_mask_and_count(const void *a, const void *b)
- 	return (s64)mc_b->counter - (s64)mc_a->counter;
- }
- 
--/* Must be called with OVS mutex held. */
-+/* Must be called with table->lock held. */
- void ovs_flow_masks_rebalance(struct flow_table *table)
- {
--	struct mask_array *ma = rcu_dereference_ovsl(table->mask_array);
-+	struct mask_array *ma = rcu_dereference_ovs_tbl(table->mask_array,
-+							table);
- 	struct mask_count *masks_and_count;
- 	struct mask_array *new;
- 	int masks_entries = 0;
-@@ -1124,7 +1173,7 @@ void ovs_flow_masks_rebalance(struct flow_table *table)
- 		struct sw_flow_mask *mask;
- 		int cpu;
- 
--		mask = rcu_dereference_ovsl(ma->masks[i]);
-+		mask = rcu_dereference_ovs_tbl(ma->masks[i], table);
- 		if (unlikely(!mask))
- 			break;
- 
-@@ -1178,7 +1227,7 @@ void ovs_flow_masks_rebalance(struct flow_table *table)
- 	for (i = 0; i < masks_entries; i++) {
- 		int index = masks_and_count[i].index;
- 
--		if (ovsl_dereference(ma->masks[index]))
-+		if (ovs_tbl_dereference(ma->masks[index], table))
- 			new->masks[new->count++] = ma->masks[index];
- 	}
- 
-diff --git a/net/openvswitch/flow_table.h b/net/openvswitch/flow_table.h
-index 6211bcc72655..1b5242a97813 100644
---- a/net/openvswitch/flow_table.h
-+++ b/net/openvswitch/flow_table.h
-@@ -59,7 +59,31 @@ struct table_instance {
- 	u32 hash_seed;
- };
- 
-+/* Locking:
-+ *
-+ * flow_table is _not_ protected by ovs_lock (see comment above ovs_mutex
-+ * in datapath.c).
-+ *
-+ * All writes to flow_table are protected by the embedded "lock".
-+ * In order to ensure datapath destruction does not trigger the destruction
-+ * of the flow_table, "refcnt" is used. Therefore, writers must:
-+ * 1 - Enter rcu read-protected section
-+ * 2 - Increase "table->refcnt"
-+ * 3 - Leave rcu read-protected section (to avoid using mutexes inside rcu)
-+ * 4 - Lock "table->lock"
-+ * 5 - Perform modifications
-+ * 6 - Release "table->lock"
-+ * 7 - Decrease "table->refcnt"
-+ *
-+ * Reads are protected by RCU.
-+ *
-+ * Note with this schema, it's possible that a flow operation is performed on a
-+ * flow_table that is about to be freed.
-+ */
- struct flow_table {
-+	/* Locks flow table writes. */
-+	struct mutex lock;
-+	refcount_t refcnt;
- 	struct rcu_head rcu;
- 	struct table_instance __rcu *ti;
- 	struct table_instance __rcu *ufid_ti;
-@@ -72,6 +96,26 @@ struct flow_table {
- 
- extern struct kmem_cache *flow_stats_cache;
- 
-+#ifdef CONFIG_LOCKDEP
-+int lockdep_ovs_tbl_is_held(const struct flow_table *table);
-+#else
-+static inline int lockdep_ovs_tbl_is_held(const struct flow_table *table
-+					  __always_unused)
-+{
-+	return 1;
-+}
-+#endif
-+
-+#define ASSERT_OVS_TBL(tbl)   WARN_ON(!lockdep_ovs_tbl_is_held(tbl))
-+
-+/* Lock-protected update-allowed dereferences.*/
-+#define ovs_tbl_dereference(p, tbl)	\
-+	rcu_dereference_protected(p, lockdep_ovs_tbl_is_held(tbl))
-+
-+/* Read dereferences can be protected by either RCU, table lock. */
-+#define rcu_dereference_ovs_tbl(p, tbl) \
-+	rcu_dereference_check(p, lockdep_ovs_tbl_is_held(tbl))
-+
- int ovs_flow_init(void);
- void ovs_flow_exit(void);
- 
-@@ -79,7 +123,11 @@ struct sw_flow *ovs_flow_alloc(void);
- void ovs_flow_free(struct sw_flow *, bool deferred);
- 
- struct flow_table *ovs_flow_tbl_alloc(void);
--void ovs_flow_tbl_destroy_rcu(struct rcu_head *table);
-+void ovs_flow_tbl_put(struct flow_table *table);
-+static inline bool ovs_flow_tbl_get(struct flow_table *table)
-+{
-+	return refcount_inc_not_zero(&table->refcnt);
-+}
- int ovs_flow_tbl_count(const struct flow_table *table);
- int ovs_flow_tbl_flush(struct flow_table *flow_table);
- 
-@@ -109,8 +157,5 @@ void ovs_flow_mask_key(struct sw_flow_key *dst, const struct sw_flow_key *src,
- 		       bool full, const struct sw_flow_mask *mask);
- 
- void ovs_flow_masks_rebalance(struct flow_table *table);
--void table_instance_flow_flush(struct flow_table *table,
--			       struct table_instance *ti,
--			       struct table_instance *ufid_ti);
- 
- #endif /* flow_table.h */
--- 
-2.53.0
+> + */
+> +static bool iavf_mac_change_done(struct iavf_adapter *adapter,
+> +				 const void *data, enum virtchnl_ops v_op)
+> +{
+> +	const u8 *addr = data;
+> +
+> +	return iavf_is_mac_set_handled(adapter->netdev, addr);
+> +}
+> +
+> +/**
+> + * iavf_set_mac_sync - Synchronously change MAC address
+> + * @adapter: board private structure
+> + * @addr: MAC address to set
+> + *
+> + * Sends MAC change request to PF and polls admin queue for response.
+> + * Caller must hold netdev_lock. This can sleep for up to 2.5 seconds.
+> + *
+> + * Returns 0 on success, negative on failure
+
+ditto kdoc "Return:"
+
+> + */
+> +static int iavf_set_mac_sync(struct iavf_adapter *adapter, const u8 *addr)
+> +{
+> +	int ret;
+> +
+> +	netdev_assert_locked(adapter->netdev);
+> +
+> +	ret = iavf_add_ether_addrs(adapter);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return iavf_poll_virtchnl_response(adapter, iavf_mac_change_done,
+> +					   addr, 2500);
+> +}
+> +
+>   /**
+>    * iavf_set_mac - NDO callback to set port MAC address
+>    * @netdev: network interface device structure
+> @@ -1067,25 +1109,20 @@ static int iavf_set_mac(struct net_device *netdev, void *p)
+>   		return -EADDRNOTAVAIL;
+>   
+>   	ret = iavf_replace_primary_mac(adapter, addr->sa_data);
+> -
+>   	if (ret)
+>   		return ret;
+>   
+> -	ret = wait_event_interruptible_timeout(adapter->vc_waitqueue,
+> -					       iavf_is_mac_set_handled(netdev, addr->sa_data),
+> -					       msecs_to_jiffies(2500));
+> -
+> -	/* If ret < 0 then it means wait was interrupted.
+> -	 * If ret == 0 then it means we got a timeout.
+> -	 * else it means we got response for set MAC from PF,
+> -	 * check if netdev MAC was updated to requested MAC,
+> -	 * if yes then set MAC succeeded otherwise it failed return -EACCES
+> -	 */
+> -	if (ret < 0)
+> +	ret = iavf_set_mac_sync(adapter, addr->sa_data);
+> +	if (ret) {
+> +		/* Rollback for local failures (timeout, send error, -EBUSY).
+> +		 * Note: If PF rejects the request (sends error response),
+> +		 * iavf_virtchnl_completion() automatically calls
+> +		 * iavf_mac_add_reject(), ret=0, and this is not executed.
+> +		 * Only local failures (no PF response received) need manual rollback.
+> +		 */
+> +		iavf_mac_add_reject(adapter);
+>   		return ret;
+> -
+> -	if (!ret)
+> -		return -EAGAIN;
+> +	}
+>   
+>   	if (!ether_addr_equal(netdev->dev_addr, addr->sa_data))
+>   		return -EACCES;
+> @@ -5415,9 +5452,6 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>   	/* Setup the wait queue for indicating transition to down status */
+>   	init_waitqueue_head(&adapter->down_waitqueue);
+>   
+> -	/* Setup the wait queue for indicating virtchannel events */
+> -	init_waitqueue_head(&adapter->vc_waitqueue);
+> -
+>   	INIT_LIST_HEAD(&adapter->ptp.aq_cmds);
+>   	init_waitqueue_head(&adapter->ptp.phc_time_waitqueue);
+>   	mutex_init(&adapter->ptp.aq_cmd_lock);
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+> index a52c100dcbc5..d1afb8261c24 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+> @@ -2,6 +2,7 @@
+>   /* Copyright(c) 2013 - 2018 Intel Corporation. */
+>   
+>   #include <linux/net/intel/libie/rx.h>
+> +#include <net/netdev_lock.h>
+>   
+>   #include "iavf.h"
+>   #include "iavf_ptp.h"
+> @@ -555,20 +556,23 @@ iavf_set_mac_addr_type(struct virtchnl_ether_addr *virtchnl_ether_addr,
+>    * @adapter: adapter structure
+>    *
+>    * Request that the PF add one or more addresses to our filters.
+> + *
+> + * Return: 0 on success, negative on failure
+>    **/
+
+thank you for also changing the kdoc when touching the function :)
+
+> -void iavf_add_ether_addrs(struct iavf_adapter *adapter)
+> +int iavf_add_ether_addrs(struct iavf_adapter *adapter)
+>   {
+>   	struct virtchnl_ether_addr_list *veal;
+>   	struct iavf_mac_filter *f;
+>   	int i = 0, count = 0;
+>   	bool more = false;
+>   	size_t len;
+> +	int ret;
+>   
+>   	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
+>   		/* bail because we already have a command pending */
+>   		dev_err(&adapter->pdev->dev, "Cannot add filters, command %d pending\n",
+>   			adapter->current_op);
+> -		return;
+> +		return -EBUSY;
+>   	}
+>   
+>   	spin_lock_bh(&adapter->mac_vlan_list_lock);
+> @@ -580,7 +584,7 @@ void iavf_add_ether_addrs(struct iavf_adapter *adapter)
+>   	if (!count) {
+>   		adapter->aq_required &= ~IAVF_FLAG_AQ_ADD_MAC_FILTER;
+>   		spin_unlock_bh(&adapter->mac_vlan_list_lock);
+> -		return;
+> +		return 0;
+>   	}
+>   	adapter->current_op = VIRTCHNL_OP_ADD_ETH_ADDR;
+>   
+> @@ -594,8 +598,9 @@ void iavf_add_ether_addrs(struct iavf_adapter *adapter)
+>   
+>   	veal = kzalloc(len, GFP_ATOMIC);
+>   	if (!veal) {
+> +		adapter->current_op = VIRTCHNL_OP_UNKNOWN;
+>   		spin_unlock_bh(&adapter->mac_vlan_list_lock);
+> -		return;
+> +		return -ENOMEM;
+>   	}
+>   
+>   	veal->vsi_id = adapter->vsi_res->vsi_id;
+> @@ -615,8 +620,15 @@ void iavf_add_ether_addrs(struct iavf_adapter *adapter)
+>   
+>   	spin_unlock_bh(&adapter->mac_vlan_list_lock);
+>   
+> -	iavf_send_pf_msg(adapter, VIRTCHNL_OP_ADD_ETH_ADDR, (u8 *)veal, len);
+> +	ret = iavf_send_pf_msg(adapter, VIRTCHNL_OP_ADD_ETH_ADDR, (u8 *)veal, len);
+>   	kfree(veal);
+> +	if (ret) {
+> +		dev_err(&adapter->pdev->dev,
+> +			"Unable to send ADD_ETH_ADDR message to PF, error %d\n", ret);
+> +		adapter->current_op = VIRTCHNL_OP_UNKNOWN;
+> +	}
+> +
+> +	return ret;
+>   }
+>   
+>   /**
+> @@ -713,7 +725,7 @@ static void iavf_mac_add_ok(struct iavf_adapter *adapter)
+>    *
+>    * Remove filters from list based on PF response.
+>    **/
+> -static void iavf_mac_add_reject(struct iavf_adapter *adapter)
+> +void iavf_mac_add_reject(struct iavf_adapter *adapter)
+>   {
+>   	struct net_device *netdev = adapter->netdev;
+>   	struct iavf_mac_filter *f, *ftmp;
+> @@ -2389,7 +2401,6 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
+>   			iavf_mac_add_reject(adapter);
+>   			/* restore administratively set MAC address */
+>   			ether_addr_copy(adapter->hw.mac.addr, netdev->dev_addr);
+> -			wake_up(&adapter->vc_waitqueue);
+>   			break;
+>   		case VIRTCHNL_OP_DEL_VLAN:
+>   			dev_err(&adapter->pdev->dev, "Failed to delete VLAN filter, error %s\n",
+> @@ -2586,7 +2597,6 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
+>   				eth_hw_addr_set(netdev, adapter->hw.mac.addr);
+>   				netif_addr_unlock_bh(netdev);
+>   			}
+> -		wake_up(&adapter->vc_waitqueue);
+>   		break;
+>   	case VIRTCHNL_OP_GET_STATS: {
+>   		struct iavf_eth_stats *stats =
+> @@ -2956,3 +2966,76 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
+>   	} /* switch v_opcode */
+>   	adapter->current_op = VIRTCHNL_OP_UNKNOWN;
+>   }
+> +
+> +/**
+> + * iavf_poll_virtchnl_response - Poll admin queue for virtchnl response
+> + * @adapter: adapter structure
+> + * @condition: callback to check if desired response received
+> + * @cond_data: context data passed to condition callback
+> + * @timeout_ms: maximum time to wait in milliseconds
+> + *
+> + * Polls the admin queue and processes all incoming virtchnl messages.
+> + * After processing each valid message, calls the condition callback to check
+> + * if the expected response has been received. The callback receives the opcode
+> + * of the processed message to identify which response was received. Continues
+> + * polling until the callback returns true or timeout expires.
+> + * Clear current_op on timeout to prevent permanent -EBUSY state.
+> + * Caller must hold netdev_lock. This can sleep for up to timeout_ms while
+> + * polling hardware.
+> + *
+> + * Return: 0 on success (condition met), -EAGAIN on timeout, or error code
+> + **/
+
+single star for closing coments **/ → */
+
+> +int iavf_poll_virtchnl_response(struct iavf_adapter *adapter,
+> +				bool (*condition)(struct iavf_adapter *adapter,
+> +						  const void *data,
+> +						  enum virtchnl_ops v_op),
+> +				const void *cond_data,
+> +				unsigned int timeout_ms)
+> +{
+> +	struct iavf_hw *hw = &adapter->hw;
+> +	struct iavf_arq_event_info event;
+> +	enum virtchnl_ops received_op;
+> +	unsigned long timeout;
+> +	u32 v_retval;
+> +	u16 pending;
+> +	int ret = -EAGAIN;
+
+RCT violation - we sort lines from longest to shortest
+
+> +
+> +	netdev_assert_locked(adapter->netdev);
+> +
+> +	event.buf_len = IAVF_MAX_AQ_BUF_SIZE;
+> +	event.msg_buf = kzalloc(event.buf_len, GFP_KERNEL);
+> +	if (!event.msg_buf)
+> +		return -ENOMEM;
+> +
+> +	timeout = jiffies + msecs_to_jiffies(timeout_ms);
+> +	do {
+> +		if (iavf_clean_arq_element(hw, &event, &pending) == IAVF_SUCCESS) {
+> +			received_op = (enum virtchnl_ops)le32_to_cpu(event.desc.cookie_high);
+> +			if (received_op != VIRTCHNL_OP_UNKNOWN) {
+> +				v_retval = le32_to_cpu(event.desc.cookie_low);
+> +
+> +				iavf_virtchnl_completion(adapter, received_op,
+> +							 (enum iavf_status)v_retval,
+> +							 event.msg_buf, event.msg_len);
+> +
+> +				if (condition(adapter, cond_data, received_op)) {
+> +					ret = 0;
+> +					break;
+> +				}
+> +			}
+> +
+> +			memset(event.msg_buf, 0, IAVF_MAX_AQ_BUF_SIZE);
+> +
+> +			if (pending)
+> +				continue;
+> +		}
+> +
+> +		usleep_range(50, 75);
+
+we got again to the "sleep then check time" situation
+to resolve that, you could init @pending with 0, and sleep at the very
+begining of each loop step if (!pending)
+
+after that I will be no longer complaining on this patch,
+thank you again for the work!
+
+> +	} while (time_before(jiffies, timeout));
+> +
+> +	if (ret == -EAGAIN && adapter->current_op != VIRTCHNL_OP_UNKNOWN)
+> +		adapter->current_op = VIRTCHNL_OP_UNKNOWN;
+> +
+> +	kfree(event.msg_buf);
+> +	return ret;
+> +}
 
 
