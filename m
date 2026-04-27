@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-281326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281327-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GEJRNjhk72mHAwEAu9opvQ
-	(envelope-from <netdev+bounces-281326-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 15:27:20 +0200
+	id GOvCGz5k72mHAwEAu9opvQ
+	(envelope-from <netdev+bounces-281327-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 15:27:26 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64DCD4735CA
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 15:27:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 26B754735D8
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 15:27:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B47213017252
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 13:26:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A09B83025156
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 13:26:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D27A03C8737;
-	Mon, 27 Apr 2026 13:26:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 487E13C6608;
+	Mon, 27 Apr 2026 13:26:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sPKG0Gbl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e7Emf6UP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85D733C8724
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 13:26:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D42BE3C456B
+	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 13:26:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777296366; cv=none; b=NXqz+OLMQSEHiCN772YqFLjkf1zUZevAT/yfwsnHWIXaJ0kchZNJVQ4LhcLurqZDLLHhmbiXRGaLCW1ptApAQ0fiFIQ5NwR9c2keEDVQ0Qq3r92NPizJqAucx4u4UrKdASzAJxqjOqhJTfDPf0iDFE+RfqJLaeZbmGG7HFKhqgI=
+	t=1777296367; cv=none; b=crXyNftdafHXze0ZSYMGTFJpawTtL0/Q483n+70av1OY757hF4LMedyey2sEw2xBbMdj6+mBIcLQPJDInPW2kP12CE1JX+5E//WQ53fuT58CqobwDnjojDiE6Rx/eWWxMlLuk0U0BCPjytymoIeQ2UTxWk9OknwLh0e5bA0kopo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777296366; c=relaxed/simple;
-	bh=eO6BZaF8tID+HMHZwjDSJTW+C//Sv/VCQY6Y5kdBxc8=;
+	s=arc-20240116; t=1777296367; c=relaxed/simple;
+	bh=Y/cHpTqKmY0n8eiE/c+mHiCzJqCMsCituCZ7btZ/FaQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CAqQmjKcZZLMzyFhFPnN0pgZucu0Ashv3OD1+z7/jsAOBvgoeZbBz19SPsKfBGvUhGDm+krrTAEvqkgwl+KROf+oK8VjCm+v6/zidiHsTk3a3P6KAGfudzMWRu2nNV1Lzz5WFsSBM65e+hwKWuXBbjVJlmk1AvuVevWDPBskwWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sPKG0Gbl; arc=none smtp.client-ip=209.85.222.201
+	 To:Cc:Content-Type; b=OcVAUAEFAwCgAI2OEkRBSKlH9jd2tod2ekbKw48CyLjzoJSb2je3U0pQjybntcinoXOgz3edT0Hs5LvpbThcYBGrX8XrAzq6/SOcdkPeskwjCoa1Z7pdYCnfGo3mNKKUgjADSf6xUwJijPY2zoAl9+XkmS7sQHfguGdhaZZJG6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e7Emf6UP; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8eaaf673eb4so1809148985a.2
-        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 06:26:04 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-79aa3a19ea3so175986897b3.0
+        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 06:26:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777296363; x=1777901163; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1777296365; x=1777901165; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=osIWCfX1fd3cxwlHFPvebubj5N4ZDSqkRS5M1d8scBQ=;
-        b=sPKG0GblWJtee3ieGe3QdV231dPP9EUnpSOuNFQnt4ZINGNMhHw213h6xI/Tdg3Buu
-         4wbn1kIafp/HPpOQumOwbrvdAslXrBbzZl5MzFOgU1cdJNiNgyRK9tJiTKxWko947lM1
-         S2yjC1XvoVHGw2/n1/OE4Wv+5d6819DoVUiL0gjBl98ejxKtzy3XzEa3Luz060g4auhD
-         vKy8nTZPEL0NlGi5osqXjLknTRlPqsCmDQHGWuAuMxKnsFVqeWPcB/3TX+OJE5JHDQ+4
-         dI3lgs5C/Rft+2xzuwJ7qoKXQLK75v8ejGHQ+SYzI8ZJLpzAuzf9/cPaxp+KJ61G6fdL
-         gLGA==
+        bh=sIYNGfPuuyKIwDdMD5kSxfGL6KFegj4pz/UKfqYNwOs=;
+        b=e7Emf6UP0AjxdWl/KOEWPRjwS8pR7atmEQguGTfaSUBiCdk8QbLLy4LFCXGkPjJvMG
+         Y2Cb+fUtNS0Rx0vy5212X5/rBESpkjmrrGyEHrNStng6xQpgqHHyotKNpLmgkm+mkiDz
+         pMY5nEyZXyfnsdvcrjpJHyYGubIT7zjp3eipl6rCMi7IhVJh2FRvr34xJ/k/15pMkSCt
+         Bh8psyy5iq5jTSWEpjMsIlMR2mPJdJk35AR8cirI53/yogaxyqzdtY0t6VDtx8l5Fil1
+         Al2q6juP9pikzRi9njNjGvpHqzRvRC28aVq/5+SpBvnxnhZ+1SniAtM1qdcmftkLnZo/
+         HxDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777296363; x=1777901163;
+        d=1e100.net; s=20251104; t=1777296365; x=1777901165;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=osIWCfX1fd3cxwlHFPvebubj5N4ZDSqkRS5M1d8scBQ=;
-        b=pRDvk7WLw/upyeO3Y5sgU8QcvEI5Qzufettb1D5kVL0NJHKRExwX23kJpZpZZ2r+PA
-         V+x6OQYRwNjaq6auSM7fff/sn6Mjittxaxdse1H3TyQ9fyVTXSEvXmfCzsu/27VruQ++
-         ONhuOP96C7/dgyX+/1gKs7b0B1L5U8JlJuZ2H9TMsLIIuiNW4cDFg/ZxtY7K/4RGbSOL
-         g5YA8h0vLbhaR0Wo2HdiF/kP3jyKXuBaHy1LyT4R6d2ih1xwNy0RWyNdLBVfXakaYlIV
-         vfBvcD+K8IB8PT/Iq3YqGlzwlveVxpKleVXvXyypqHJJStApZh1i6SavsogGWHlulT1O
-         KzLg==
-X-Forwarded-Encrypted: i=1; AFNElJ9E0JvhNvQAq3GvUjlPa9NYoiXrye+AharptAahXDJJQNOaB17ckAV5rWg9/OzFNlWUdQMflBw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwlUP3b0TxXiQ/BF5htBgNVw5JPcfNGkdi/bIszmbvJw66MZteI
-	CNE5WlvX0Jfl+4f11sJj77U901BzzcrmBlLr4XKmqFrzTr4f+E4IT5iFS5F6lS2NJLpvIe3Ftgv
-	4ezxfNX+PJDxf2w==
-X-Received: from qkaw3-n2.prod.google.com ([2002:a05:620a:a2c3:20b0:8cb:4a2d:574d])
+        bh=sIYNGfPuuyKIwDdMD5kSxfGL6KFegj4pz/UKfqYNwOs=;
+        b=s+2qcI95bWpulGyPDjeAKuQECGf6KSw5CxCPcF/yijPs3S2P0YDj+nNxbW38ymQliA
+         P8qYwIUXo7AF8JjutLwde3DpbYbCAmyspf797P2dZM9p37kz0t5AJm+4yti4ATPFWs5X
+         Dg1GCD1tyce8cmeZr/h6wqULiToc1Tg933hjikrpnfa623pdK9xQ9/Sor040ZrR6jJWs
+         7bZcJvM//Zp3WrpziMe1+cP3HqrOyBA8hONsM1IpmdV4spj8M9peTgspg1TzADtEZx/Y
+         t+dr4IV+w2hTwfIjdUGKKCa7CvI9h9BSBokdEqa46xU0Zl87D/Ua4mxmZApCucj15bC2
+         6VXQ==
+X-Forwarded-Encrypted: i=1; AFNElJ89nDzcKrw+9F5OruSJnXQWAfMgrZunw3axmmaygB0yv7kAN8cI1DNVDROpe0zNtMRqPKQRB/s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKSLfKJI1HhZXqWMoUlxML78rdIrNe0laBQjE+jbOVxFY/YKg2
+	Tdutr+tPNttCsEWr2tbytJW2DTawsIzF9Zo036i8+niGEe6zNOg95Tib4cCMv5sBhrXSCam/CUp
+	gaDMMIDG9lgBJGg==
+X-Received: from ywbnj23.prod.google.com ([2002:a05:690c:8e17:b0:7b3:dca5:e065])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:4456:b0:8cf:e1c9:b286 with SMTP id af79cd13be357-8e78ed5dd31mr5918306185a.2.1777296362655;
- Mon, 27 Apr 2026 06:26:02 -0700 (PDT)
-Date: Mon, 27 Apr 2026 13:25:54 +0000
+ 2002:a05:690c:60c1:b0:798:ff2f:2666 with SMTP id 00721157ae682-7b9ecefbc1cmr459071777b3.16.1777296364450;
+ Mon, 27 Apr 2026 06:26:04 -0700 (PDT)
+Date: Mon, 27 Apr 2026 13:25:55 +0000
 In-Reply-To: <20260427132555.1791636-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260427132555.1791636-1-edumazet@google.com>
 X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260427132555.1791636-4-edumazet@google.com>
-Subject: [PATCH net-next 3/4] net/sched: switch tc_dump_qdisc() to for_each_netdev_dump()
+Message-ID: <20260427132555.1791636-5-edumazet@google.com>
+Subject: [PATCH net-next 4/4] net/sched: speedup tc_dump_qdisc() when
+ tcm_ifindex is provided
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -85,7 +86,7 @@ Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri P
 	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 64DCD4735CA
+X-Rspamd-Queue-Id: 26B754735D8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
@@ -104,7 +105,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281326-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-281327-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -117,117 +118,53 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-Use for_each_netdev_dump() instead of for_each_netdev().
+There is no point dumping qdiscs for all devices when user space
+wants them for a single device:
 
-This is more scalable, and will ease RCU conversion.
-
-This also offer better behavior when other threads
-are adding or deleting netdevices concurrently.
-
-This enables dumping qdiscs for a single device
-at user space request in the following patch.
+tc -s -d qdisc show dev eth1
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/sched/sch_api.c | 61 ++++++++++++++++++++++-----------------------
- 1 file changed, 30 insertions(+), 31 deletions(-)
+ net/sched/sch_api.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index 322eab3bd2b1327af323c44333318bdd52c7ee52..c4e8059acdd324441e0d069f6878bbfcab5a0cc7 100644
+index c4e8059acdd324441e0d069f6878bbfcab5a0cc7..8d0e4eb72103d9b074131e13e31830cb266eadba 100644
 --- a/net/sched/sch_api.c
 +++ b/net/sched/sch_api.c
-@@ -1873,18 +1873,18 @@ static int tc_dump_qdisc_root(struct Qdisc *root, struct sk_buff *skb,
- 
+@@ -1874,6 +1874,7 @@ static int tc_dump_qdisc_root(struct Qdisc *root, struct sk_buff *skb,
  static int tc_dump_qdisc(struct sk_buff *skb, struct netlink_callback *cb)
  {
--	struct net *net = sock_net(skb->sk);
--	int idx, q_idx;
--	int s_idx, s_q_idx;
--	struct net_device *dev;
  	const struct nlmsghdr *nlh = cb->nlh;
-+	struct net *net = sock_net(skb->sk);
++	const struct tcmsg *tcm = nlmsg_data(nlh);
+ 	struct net *net = sock_net(skb->sk);
  	struct nlattr *tca[TCA_MAX + 1];
-+	struct {
-+		unsigned long ifindex;
-+		int q_idx;
-+	} *ctx = (void *)cb->ctx;
-+	unsigned long s_ifindex;
-+	struct net_device *dev;
-+	int s_q_idx, q_idx;
- 	int err;
- 
--	s_idx = cb->args[0];
--	s_q_idx = q_idx = cb->args[1];
--
--	idx = 0;
- 	ASSERT_RTNL();
- 
- 	err = nlmsg_parse_deprecated(nlh, sizeof(struct tcmsg), tca, TCA_MAX,
-@@ -1892,42 +1892,41 @@ static int tc_dump_qdisc(struct sk_buff *skb, struct netlink_callback *cb)
+ 	struct {
+@@ -1892,6 +1893,9 @@ static int tc_dump_qdisc(struct sk_buff *skb, struct netlink_callback *cb)
  	if (err < 0)
  		return err;
  
--	for_each_netdev(net, dev) {
-+	s_ifindex = ctx->ifindex;
-+	s_q_idx = ctx->q_idx;
++	if (!ctx->ifindex)
++		ctx->ifindex = tcm->tcm_ifindex;
 +
-+	for_each_netdev_dump(net, dev, ctx->ifindex) {
- 		struct netdev_queue *dev_queue;
-+		struct Qdisc *q;
+ 	s_ifindex = ctx->ifindex;
+ 	s_q_idx = ctx->q_idx;
  
--		if (idx < s_idx)
--			goto cont;
--		if (idx > s_idx)
-+		if (ctx->ifindex > s_ifindex)
+@@ -1899,8 +1903,13 @@ static int tc_dump_qdisc(struct sk_buff *skb, struct netlink_callback *cb)
+ 		struct netdev_queue *dev_queue;
+ 		struct Qdisc *q;
+ 
+-		if (ctx->ifindex > s_ifindex)
++		if (ctx->ifindex > s_ifindex) {
++			if (tcm->tcm_ifindex) {
++				ctx->ifindex = ULONG_MAX;
++				break;
++			}
  			s_q_idx = 0;
++		}
  		q_idx = 0;
  
  		netdev_lock_ops(dev);
--		if (tc_dump_qdisc_root(rtnl_dereference(dev->qdisc),
--				       skb, cb, &q_idx, s_q_idx,
--				       true, tca[TCA_DUMP_INVISIBLE]) < 0) {
--			netdev_unlock_ops(dev);
--			goto done;
--		}
-+		q = rtnl_dereference(dev->qdisc);
-+		err = tc_dump_qdisc_root(q, skb, cb, &q_idx, s_q_idx,
-+					 true, tca[TCA_DUMP_INVISIBLE]);
-+		if (err < 0)
-+			goto error_unlock;
- 
- 		dev_queue = dev_ingress_queue(dev);
--		if (dev_queue &&
--		    tc_dump_qdisc_root(rtnl_dereference(dev_queue->qdisc_sleeping),
--				       skb, cb, &q_idx, s_q_idx, false,
--				       tca[TCA_DUMP_INVISIBLE]) < 0) {
--			netdev_unlock_ops(dev);
--			goto done;
-+		if (dev_queue) {
-+			q = rtnl_dereference(dev_queue->qdisc_sleeping);
-+			err = tc_dump_qdisc_root(q, skb, cb, &q_idx, s_q_idx,
-+						 false, tca[TCA_DUMP_INVISIBLE]);
-+			if (err < 0)
-+				goto error_unlock;
- 		}
- 		netdev_unlock_ops(dev);
--
--cont:
--		idx++;
- 	}
-+	return skb->len;
- 
--done:
--	cb->args[0] = idx;
--	cb->args[1] = q_idx;
-+error_unlock:
-+	netdev_unlock_ops(dev);
-+	ctx->q_idx = q_idx;
- 
--	return skb->len;
-+	return err;
- }
- 
- 
 -- 
 2.54.0.545.g6539524ca2-goog
 
