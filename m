@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-281536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281537-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mFkCJaTt72mjKgEAu9opvQ
-	(envelope-from <netdev+bounces-281536-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 01:13:40 +0200
+	id +c31LNzu72nYMgEAu9opvQ
+	(envelope-from <netdev+bounces-281537-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 01:18:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2134C47BBC4
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 01:13:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 03B6C47BBF2
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 01:18:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6A12C301A1E3
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 23:13:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 726FC300A768
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 23:18:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 057E13AE18D;
-	Mon, 27 Apr 2026 23:13:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7614218AB9;
+	Mon, 27 Apr 2026 23:18:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tjGgC9r3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Et7efEcJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73C8221FBB
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 23:13:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A528D19ADA4
+	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 23:18:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777331616; cv=none; b=WmFhORLsD1NCUGbpupwbDj1thn2+IjlYVwLQunuMWBMR9gdaLGR50Mc6qc6PTmL33mfdVJCD8/3azxTQ16FeM2xGuNyhTfZG7RLnHm6Ugn2ixKasE0fbtB9ArEzLr1nGPOCoclAuTFXZzn0b3go3aGBK+k6JIA4TC0FnDB8qSLQ=
+	t=1777331913; cv=none; b=EJxrbncSqil8XDN2JDfUUiJZ95hXWhH/UdaMUzVkGpXZHqnDGuZ5ZwL4JWN/+xQNC9e1iW2zqHDOWZNfiiCKs6shpNEYUOl/LLdzKtr9qR3zrOSU6N6Q9q4dxujbj6myF4ul5r8ZfirKPWkcLVdzmgocpr4ETVdNwTN3Mc6CUNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777331616; c=relaxed/simple;
-	bh=WuZkZ0lxPeq9fY7/KLT8TxVkxDvCvd+qRE8eCtHmGis=;
+	s=arc-20240116; t=1777331913; c=relaxed/simple;
+	bh=uOUsZHf7MXs88DpVKjVuBJq40n2jLG9bDADPT0ODIqY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gSIu6ilLrCicQdPJA4zgQJVjZAqPiIFsn8kbwLnk0BAOYEdkFehFkDCsLvItFDlfguq52AfBXVbCbQP9hG27NUjB4y4xdvc5uFQf2QTxeEprO0mDZjy5enwIomWqmjugqLjqlorN1wcECBdAeSOoRo8lvNzyGzZCdfYYOCnibqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tjGgC9r3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB97DC19425;
-	Mon, 27 Apr 2026 23:13:35 +0000 (UTC)
+	 MIME-Version:Content-Type; b=bXCvKPL4R0iXjhNAqlxeAzk9Knk4mVLO/xJ33zsujjFb0j+bLIuN1OQlrTFXeY16Jqh6XOO37vWIF/RH4Ssbyukj3RQGNaCm71wy+W7umhbLNLAMV54xTJfrE0P3nZKjq4roX24+en242Pb7Hecaw+p1c+0xQmo2gakLwPZPTvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Et7efEcJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52414C19425;
+	Mon, 27 Apr 2026 23:18:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777331616;
-	bh=WuZkZ0lxPeq9fY7/KLT8TxVkxDvCvd+qRE8eCtHmGis=;
+	s=k20201202; t=1777331913;
+	bh=uOUsZHf7MXs88DpVKjVuBJq40n2jLG9bDADPT0ODIqY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tjGgC9r3rM7HqD0M9uKciF5i1XnlEWOL5Im6HEosJiwFCea0usTlZDE//+SaBTiIY
-	 ceUM7XNWPynkYLtO7LaJqYnHJonUit8y5NWej2k9RzfhSShX8BY8yboruL8RA0mrms
-	 RI1dAOJrKqEphGz0FqoeX3VCFLzJFe47Mek6b4oBYLw5CCUfKZxxXM5Ck2OYTsrb7Q
-	 8urvR/EnUb51JpVOEcKr+hh9N9Z7R95p4WBroD9Mxp+d8SyGc4ibddGnnb/f9gltFe
-	 iFJuZdRv0yOzNDSo4CyZ/KHxwy7rVAq2sleDyR65UarRAwcFeBdftSX5xshSBhtVYw
-	 92cPrS+QHZZBA==
-Date: Mon, 27 Apr 2026 16:13:35 -0700
+	b=Et7efEcJdnktHIBZpiswH6BHqnOMCo/7WEWB4OUssMcN0mqdD3epDsmrRiAbkMXrq
+	 A1LZFM70enBmCylqr83dxZOR+GftRPMdjK+npd3VyeX71LkAQlfMj56QkEjg4jGQ9m
+	 2kvYdgBK+aVcmzCTSaYWQkaU8XoV3LTcUQOF0P3wQkXR/cx8lebyRxXQnpC0nWVTUt
+	 Ch5KMjOOzU+Fyen27q9/ACqOCNe0hLmxfSdf8mvrdsefgv8LZPgIWQvVgF7ZtnWQYP
+	 xl/4jhNT9PM3/IardfC2FyxUCFb6nHhC5JXDc6Iww6ROmWhQ7hlPUfg4zhsas91u1q
+	 CV0UhttaLSu8w==
+Date: Mon, 27 Apr 2026 16:18:30 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Eric Dumazet <edumazet@google.com>
 Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
  <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jamal Hadi Salim
  <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, Kuniyuki Iwashima
  <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next 3/4] net/sched: switch tc_dump_qdisc() to
- for_each_netdev_dump()
-Message-ID: <20260427161335.500f80d3@kernel.org>
-In-Reply-To: <20260427132555.1791636-4-edumazet@google.com>
+Subject: Re: [PATCH net-next 4/4] net/sched: speedup tc_dump_qdisc() when
+ tcm_ifindex is provided
+Message-ID: <20260427161830.78193ed9@kernel.org>
+In-Reply-To: <20260427132555.1791636-5-edumazet@google.com>
 References: <20260427132555.1791636-1-edumazet@google.com>
-	<20260427132555.1791636-4-edumazet@google.com>
+	<20260427132555.1791636-5-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,7 +65,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 2134C47BBC4
+X-Rspamd-Queue-Id: 03B6C47BBF2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -78,7 +78,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,kernel.org,mojatatu.com,resnulli.us,google.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-281536-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-281537-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -99,23 +99,57 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Mon, 27 Apr 2026 13:25:54 +0000 Eric Dumazet wrote:
-> +	for_each_netdev_dump(net, dev, ctx->ifindex) {
->  		struct netdev_queue *dev_queue;
-> +		struct Qdisc *q;
+On Mon, 27 Apr 2026 13:25:55 +0000 Eric Dumazet wrote:
+>  static int tc_dump_qdisc(struct sk_buff *skb, struct netlink_callback *cb)
+>  {
+>  	const struct nlmsghdr *nlh = cb->nlh;
+> +	const struct tcmsg *tcm = nlmsg_data(nlh);
+
+nit: breaks reverse xmas tree
+
+I added this tcm assignment after parsing:
+
+        err = nlmsg_parse_deprecated(nlh, sizeof(struct tcmsg), tca, TCA_MAX,
+                                     rtm_tca_policy, cb->extack);
+        if (err < 0)
+                return err;
++       tcm = nlmsg_data(nlh);
+
+because nlmsg_parse validates the struct is in range of skb->len
+
+>  	struct net *net = sock_net(skb->sk);
+>  	struct nlattr *tca[TCA_MAX + 1];
+>  	struct {
+> @@ -1892,6 +1893,9 @@ static int tc_dump_qdisc(struct sk_buff *skb, struct netlink_callback *cb)
+>  	if (err < 0)
+>  		return err;
 >  
-> -		if (idx < s_idx)
-> -			goto cont;
-> -		if (idx > s_idx)
-> +		if (ctx->ifindex > s_ifindex)
+> +	if (!ctx->ifindex)
+> +		ctx->ifindex = tcm->tcm_ifindex;
+> +
+>  	s_ifindex = ctx->ifindex;
+>  	s_q_idx = ctx->q_idx;
+>  
+> @@ -1899,8 +1903,13 @@ static int tc_dump_qdisc(struct sk_buff *skb, struct netlink_callback *cb)
+>  		struct netdev_queue *dev_queue;
+>  		struct Qdisc *q;
+>  
+> -		if (ctx->ifindex > s_ifindex)
+> +		if (ctx->ifindex > s_ifindex) {
+> +			if (tcm->tcm_ifindex) {
+> +				ctx->ifindex = ULONG_MAX;
+> +				break;
+> +			}
 >  			s_q_idx = 0;
+> +		}
 
-I don't think we need this conditional now that we use for_each_netdev_dump()
-We can just add
+nit2: personal preference but I had before the loop:
 
-	s_q_idx = 0;
+	if (tcm->tcm_ifindex && !ctx->ifindex)
+		ctx->ifindex = tcm->tcm_ifindex;
 
-right before closing bracket of the loop?
+in the loop:
 
->  		q_idx = 0;
+	if (tcm->tcm_ifindex && ctx->ifindex != tcm->tcm_ifindex)
+		break;
 
