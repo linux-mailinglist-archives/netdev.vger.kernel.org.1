@@ -1,177 +1,209 @@
-Return-Path: <netdev+bounces-281442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281443-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yEP/F4ep72kCDwEAu9opvQ
-	(envelope-from <netdev+bounces-281442-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:23:03 +0200
+	id EJLjLg2p72kCDwEAu9opvQ
+	(envelope-from <netdev+bounces-281443-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:21:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AF844787B8
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:23:02 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DE86478710
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:21:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 579E3302C939
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:20:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 333243023066
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:20:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C605A3E3C7E;
-	Mon, 27 Apr 2026 18:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CFA83EAC75;
+	Mon, 27 Apr 2026 18:20:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="AyVIkuj3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J2scZpbK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f172.google.com (mail-dy1-f172.google.com [74.125.82.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 431393D6CD9
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 18:20:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20AD83E274D;
+	Mon, 27 Apr 2026 18:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777314031; cv=none; b=PDp2oCcuyUcGYChj1EHkOXXpHs7r3fMREVH3V1/u5zaPibFZrvDj+JEZCtS1Yh2rHwSEpSclte1//CVek8V4RESZqCgLiYl7YCFKTX3ahqWoRdCvdLCrPjRO2TaeRGUcMTj0asxCEijblEenfnmrTCXJw06fuU6y7lsw1sC8JhM=
+	t=1777314054; cv=none; b=u1/Ds/LwShlIadKzXh+lhNI4gPsN9exef3ie1BjXf1WAoD2miBL1hJLkSmjiQgFnkwueiKw1ZE39Eh5sZqwKyghwgVBf9T+vWcRQ/13dBpNuCMgX9ogM/K0pcG8KWxEesYHqnIe5mg2OvSvN6I6WvoH2aQOhDsmlwbKWSrX6Jow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777314031; c=relaxed/simple;
-	bh=bN76FJ2v7mzFwUIMDRt7QH0QWQYlu0rTdiySbpZ9Ko8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NrcGj5xVMo8iUyAlg8IPVRkVEp6d7esW7WdAl4Rm2Y48kdZHEZ2yS7bXv9PopPYqHyfhCWXMFu3CNT4CplxXUmixEJ6MmI3xU37WLK0vqBfcKuT+2IYxFu2OPmFEcZ+Q48hmUokhGbtDU7MLiMBlfTGKEkkiQgBV4ZC9DJjRptA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=AyVIkuj3; arc=none smtp.client-ip=74.125.82.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-dy1-f172.google.com with SMTP id 5a478bee46e88-2dec803f9f0so5880326eec.0
-        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 11:20:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1777314029; x=1777918829; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z8RyeeF+uqUFvtkyKIQ0Q0DITbXIoGdPLgiE0VyWQRM=;
-        b=AyVIkuj3STBSQ7TrDYvswGBwgaWkDNeMbrgkIMIubUysGpzSGS1228cnhlp7ETxM64
-         4SDSnxTCrQUGBp+aVa5LxYXLxI0AUA74gHM5HxOT61pmefCDLQeLLyGwg37WllyL6a2p
-         k7z6x4e9WfYF+a73d1fVxsOu/lRHJd6IeUjNILJcb1REhP8JnSre1kbkjMeC4FxXY/nh
-         w3s7nrPO/djX1/VAXLtg1u9AZw63SJrRN20sDOkQotvgp9MfUq//whA4o9qG9sTg+Pv3
-         D1/8IAC4nwZw3fw8aLnjN2vQtEaKSOZm4U+R88f9z58FKi9iMUeZIE2OtamBlT7YJJ9D
-         /MVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777314029; x=1777918829;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Z8RyeeF+uqUFvtkyKIQ0Q0DITbXIoGdPLgiE0VyWQRM=;
-        b=a8PjGZBpcBP9P986o+Xnzr/rWG7mFNG7zWhx7sB43OEqGZ9Mh07rRpFq6kdHt16JMH
-         6yoFeN9l0dFCqFKEg6L3ER0PmLHFVVoAU1wiwwcTTzll1BEPKUhBKKkBXou8PuUB9pgX
-         d8TkGf7K2rnOBCnwIULFLeMzuCk+4/kCYxQbmWnOHjxgvH90YJxIHPpt2zyeZw1jtHEc
-         wfFF++M3t+nrhm33aWrEQ4nxWNzfuTpwBLStEdyoXQYHJlfiZnVqRHknJ7FHo2RPYyuA
-         vxMfaJqX3MMBKln4Z/J6FX3BpgtLhVeywJGbEE/yz0FUYqKF/HX9aHBQlZUjkrZrtvsO
-         4DIA==
-X-Forwarded-Encrypted: i=1; AFNElJ8nJjsj6tASoYSUETb8KFWVxOJZCGx9BHbVP+QD5e63Wi/QNOJp/fNSy4IJApf9KRV1YM69/qA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPvkwgFPtdF7wDrbaTojp2SB9eeczpASLMDROJCcVfAAPVr5lq
-	DCqog8CLR/Y2q2yvAEpNAYQ9k9dK6oIohMW6GHKxXjJGxrtzVwgfNlgKWZgU3CtZPX4=
-X-Gm-Gg: AeBDieuCc/QDHYBxZp0+/U1vFtTGElkGkYVIv4qc+gDERvmSG2rZyq2Qh20yN1hBzaI
-	xHPkae4sxKXKjKmcONWNjpBFnPOo185rA7voNK4uaq1hR8k1LTqMBDX0XTqQQPIEnfiIjc7yb+Q
-	yiyK/IeyNUA24e6QKdwQpeA76BBEIVAJuLV1XYu6N/tn1lOkDPenmmMi28PUYgl/6DVqqJmKr6V
-	BgaVwYOT1dxrxC4TSiULlkkt0JggE5eREG4g6YtTOR7LpJ0fGUPozFIWB7V6XcjhqGr3+zSy9LP
-	AwDexJU+HyMC1hNS+x3L3+VxVBAJ3TuMRLcpLqjXNIvv3capBJEbAY6czGTylwwrVLERXD8CDdg
-	zNAL65/HkGuUcWCRtMlAlzYXyr0hKNo1U981Jat4XnyS1Mkl/6mTI2ZdyVru6SvwEHq+GE6S3Uo
-	MDy/f3pl5vS0L7Zf4Xk8Oqhoq6FqR5k783IZMFmGNzRpQsuA==
-X-Received: by 2002:a05:7300:214f:b0:2de:e194:5fb1 with SMTP id 5a478bee46e88-2ed097ed954mr68059eec.7.1777314029174;
-        Mon, 27 Apr 2026 11:20:29 -0700 (PDT)
-Received: from phoenix.local ([104.202.41.210])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2e53ccce440sm42915897eec.14.2026.04.27.11.20.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Apr 2026 11:20:28 -0700 (PDT)
-Date: Mon, 27 Apr 2026 11:20:25 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: David Ahern <dsahern@gmail.com>
-Cc: Chiara Meiohas <cmeiohas@nvidia.com>, leon@kernel.org,
- michaelgur@nvidia.com, jgg@nvidia.com, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH v2 iproute2-next 0/4] Introduce FRMR pools
-Message-ID: <20260427112025.49ebbd73@phoenix.local>
-In-Reply-To: <a441f862-1ebe-4fd9-9ef5-aac718fb008c@gmail.com>
-References: <20260330173118.766885-1-cmeiohas@nvidia.com>
-	<a441f862-1ebe-4fd9-9ef5-aac718fb008c@gmail.com>
+	s=arc-20240116; t=1777314054; c=relaxed/simple;
+	bh=fSfdZ5/fBIJBn92+lTQ8RknrFiSruKk4Zm5FPbyuhQI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hZjCzRBOdWpzK3uvkI8gRjnAcZaKmKArWlmpDhiw0GgVB4zsMAYIXjZcAWTXdrpnG0sJUq1ajJCjvn36+YUmAjH6Vph2VJw/sM7s7qVdAR8PkRST9bRCOJncBwN1OtrW0UMhsYc5r6fSftL5OFZBrBgih5DvSnSbgr9V0twHDU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J2scZpbK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CCCFC2BCB5;
+	Mon, 27 Apr 2026 18:20:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777314053;
+	bh=fSfdZ5/fBIJBn92+lTQ8RknrFiSruKk4Zm5FPbyuhQI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=J2scZpbKenpOejPaCkxdr8Fr6c4RornKyxLjF0dKFYhSlw+matCdj3SDWlLeqEo9E
+	 a373XI9Iold2YwxLkAFI1OVkbxbR9JLgxu/comiCZJeBJjQK8IiPFbF3a0OQIu5zFJ
+	 z32D8XDVz5Fo00XfpR09lc3WO+fPx7ont3FOA+TL4jxGM7w1J5Z2cHWcv2Vi05coRU
+	 6lIPjD/Eh4XtMiOh4PUlJfQ+hbcnF50oIaF0Y5is14Jb9Uy7pNbq6e4WVWxwPn3QZF
+	 F5175xYuXBtUSK+HvgeuPZTDTXog5e6524IUP62vgqpWl/U/vR5Pqvo+DbOYeGkne+
+	 cSOzK+yVIhXWw==
+Message-ID: <63a4d0f6-0eb3-48cd-9f98-bf7b223b2606@kernel.org>
+Date: Mon, 27 Apr 2026 20:20:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 9AF844787B8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 7/9] x86: Add unsafe_copy_from_user()
+To: Yury Norov <ynorov@nvidia.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ David Laight <david.laight.linux@gmail.com>,
+ Thomas Gleixner <tglx@linutronix.de>, linux-alpha@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-snps-arc@lists.infradead.org,
+ linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+ dmaengine@vger.kernel.org, linux-efi@vger.kernel.org,
+ linux-fsi@lists.ozlabs.org, amd-gfx@lists.freedesktop.org,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-spi@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-staging@lists.linux.dev,
+ linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
+ xen-devel@lists.xenproject.org, linux-fsdevel@vger.kernel.org,
+ ocfs2-devel@lists.linux.dev, bpf@vger.kernel.org,
+ kasan-dev@googlegroups.com, linux-mm@kvack.org, linux-x25@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, linux-sound@vger.kernel.org,
+ sound-open-firmware@alsa-project.org, linux-csky@vger.kernel.org,
+ linux-hexagon@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-m68k@lists.linux-m68k.org, linux-openrisc@vger.kernel.org,
+ linux-parisc@vger.kernel.org, linux-sh@vger.kernel.org,
+ linux-arch@vger.kernel.org
+References: <cover.1777306795.git.chleroy@kernel.org>
+ <0ee46bb228d97163fbdc14f2a7c52b93d8bc34ce.1777306795.git.chleroy@kernel.org>
+ <ae-j2_QirCySZD02@yury>
+Content-Language: fr-FR
+From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
+In-Reply-To: <ae-j2_QirCySZD02@yury>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 7DE86478710
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.56 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281442-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281443-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[linux-foundation.org,gmail.com,linutronix.de,vger.kernel.org,lists.infradead.org,lists.ozlabs.org,lists.freedesktop.org,lists.linux.dev,lists.xenproject.org,googlegroups.com,kvack.org,alsa-project.org,lists.linux-m68k.org];
+	RCPT_COUNT_TWELVE(0.00)[48];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[chleroy@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,phoenix.local:mid]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-On Sun, 5 Apr 2026 11:09:55 -0600
-David Ahern <dsahern@gmail.com> wrote:
 
-> On 3/30/26 11:31 AM, Chiara Meiohas wrote:
-> > From Michael: 
-> > 
-> > This series adds support for managing Fast Registration Memory Region
-> > (FRMR) pools in rdma tool, enabling users to monitor and configure FRMR
-> > pool behavior.
-> > 
-> > FRMR pools are used to cache and reuse Fast Registration Memory Region
-> > handles to improve performance by avoiding the overhead of repeated
-> > memory region creation and destruction. This series introduces commands
-> > to view FRMR pool statistics and configure pool parameters such as
-> > aging time and pinned handle count.
-> > 
-> > The 'show' command allows users to display FRMR pools created on
-> > devices, their properties, and usage statistics. Each pool is identified
-> > by a unique key (hex-encoded properties) for easy reference in
-> > subsequent operations.
-> > 
-> > The aging 'set' command allows users to modify the aging time parameter,
-> > which controls how long unused FRMR handles remain in the pool before
-> > being released.
-> > 
-> > The pinned 'set' command allows users to configure the number of pinned
-> > handles in a pool. Pinned handles are exempt from aging and remain
-> > permanently available for reuse, which is useful for workloads with
-> > predictable memory region usage patterns.
-> > 
-> > Command usage and examples are included in the commits and man pages.
-> > 
-> > These patches are complimentary to the kernel patches:
-> > https://lore.kernel.org/linux-rdma/20260226-frmr_pools-v4-0-95360b54f15e@nvidia.com/
-> >   
+
+Le 27/04/2026 à 19:58, Yury Norov a écrit :
+> On Mon, Apr 27, 2026 at 07:13:48PM +0200, Christophe Leroy (CS GROUP) wrote:
+>> At the time being, x86 and arm64 are missing unsafe_copy_from_user().
 > 
-> applied after fixing up a few nits.
+> No, they don't. They (should) rely on a generic implementation from
+> linux/uaccess.h, like every other arch, except for  PPC and RISCV.
 > 
-> Please clone the ai review prompts from:
->   https://github.com/masoncl/review-prompts.git
+> But they #define arch_unsafe_get_user, and the unsafe_copy_from_user()
+> becomes undefined conditionally on that.
 > 
-> Run the setup scripts and have ai review patches before sending. This
-> should really be part of both kernel and iproute2 development workflow now.
+> So please, fix that bug instead of introducing another arch flavor.
+> We'd always choose generic version, unless there's strong evidence
+> that arch one is better.
 
-I rebased UAPI headers based on 7.1-rc1 and iproute2/rdma will not build.
-Looks like RDMA did not get merged in 7.1.
+But they both implement the exact same unsafe_copy_to_user(). What is 
+the difference here ?
 
-Will have to back it out if not going in 7.1
+Should that function become generic too ?
+
+Christophe
+
+> 
+> 
+> Thanks,
+> Yury
+>   
+>> Add it.
+>>
+>> Signed-off-by: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
+>> ---
+>>   arch/x86/include/asm/uaccess.h | 29 ++++++++++++++++++++++++-----
+>>   1 file changed, 24 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/arch/x86/include/asm/uaccess.h b/arch/x86/include/asm/uaccess.h
+>> index 3a0dd3c2b233..10c458ffa399 100644
+>> --- a/arch/x86/include/asm/uaccess.h
+>> +++ b/arch/x86/include/asm/uaccess.h
+>> @@ -598,7 +598,7 @@ _label:									\
+>>    * We want the unsafe accessors to always be inlined and use
+>>    * the error labels - thus the macro games.
+>>    */
+>> -#define unsafe_copy_loop(dst, src, len, type, label)				\
+>> +#define unsafe_put_loop(dst, src, len, type, label)				\
+>>   	while (len >= sizeof(type)) {						\
+>>   		unsafe_put_user(*(type *)(src),(type __user *)(dst),label);	\
+>>   		dst += sizeof(type);						\
+>> @@ -611,10 +611,29 @@ do {									\
+>>   	char __user *__ucu_dst = (_dst);				\
+>>   	const char *__ucu_src = (_src);					\
+>>   	size_t __ucu_len = (_len);					\
+>> -	unsafe_copy_loop(__ucu_dst, __ucu_src, __ucu_len, u64, label);	\
+>> -	unsafe_copy_loop(__ucu_dst, __ucu_src, __ucu_len, u32, label);	\
+>> -	unsafe_copy_loop(__ucu_dst, __ucu_src, __ucu_len, u16, label);	\
+>> -	unsafe_copy_loop(__ucu_dst, __ucu_src, __ucu_len, u8, label);	\
+>> +	unsafe_put_loop(__ucu_dst, __ucu_src, __ucu_len, u64, label);	\
+>> +	unsafe_put_loop(__ucu_dst, __ucu_src, __ucu_len, u32, label);	\
+>> +	unsafe_put_loop(__ucu_dst, __ucu_src, __ucu_len, u16, label);	\
+>> +	unsafe_put_loop(__ucu_dst, __ucu_src, __ucu_len, u8, label);	\
+>> +} while (0)
+>> +
+>> +#define unsafe_get_loop(dst, src, len, type, label)				\
+>> +	while (len >= sizeof(type)) {						\
+>> +		unsafe_get_user(*(type __user *)(src),(type *)(dst),label);	\
+>> +		dst += sizeof(type);						\
+>> +		src += sizeof(type);						\
+>> +		len -= sizeof(type);						\
+>> +	}
+>> +
+>> +#define unsafe_copy_from_user(_dst,_src,_len,label)			\
+>> +do {									\
+>> +	char *__ucu_dst = (_dst);					\
+>> +	const char __user *__ucu_src = (_src);				\
+>> +	size_t __ucu_len = (_len);					\
+>> +	unsafe_get_loop(__ucu_dst, __ucu_src, __ucu_len, u64, label);	\
+>> +	unsafe_get_loop(__ucu_dst, __ucu_src, __ucu_len, u32, label);	\
+>> +	unsafe_get_loop(__ucu_dst, __ucu_src, __ucu_len, u16, label);	\
+>> +	unsafe_get_loop(__ucu_dst, __ucu_src, __ucu_len, u8, label);	\
+>>   } while (0)
+>>   
+>>   #ifdef CONFIG_CC_HAS_ASM_GOTO_OUTPUT
+>> -- 
+>> 2.49.0
+>>
+
 
