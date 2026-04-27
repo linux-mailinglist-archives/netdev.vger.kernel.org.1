@@ -1,59 +1,60 @@
-Return-Path: <netdev+bounces-281530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281531-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yH+uDsHp72m+HgEAu9opvQ
-	(envelope-from <netdev+bounces-281530-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 00:57:05 +0200
+	id kECRFiPr72lEHwEAu9opvQ
+	(envelope-from <netdev+bounces-281531-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 01:02:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD35F47BA70
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 00:57:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFA9B47BAD2
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 01:02:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5D4273032CDC
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:57:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 13E9F30075E7
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 23:02:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 064D93AC0F1;
-	Mon, 27 Apr 2026 22:57:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD543AE1BB;
+	Mon, 27 Apr 2026 23:02:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B8gJm4GS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lp2LGnCQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B37308F1D
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 22:57:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D0203845BD
+	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 23:02:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777330622; cv=none; b=CRSBtlpTsul1fIDQdCT8rRYrCsHD7oiyWtbmVTIQXByummvUFpTIzb/YWEjNi+fZCmP1EnHsX4hatCd4+6f9G0x3UqH5svN4q0BMRFVGztvwGVWxqpfaYSQ9uKgSKlj1JuquBrlQGIZA0ZkYloTCgnhYAvtrilj4j6iDoRkqVrY=
+	t=1777330967; cv=none; b=UHtMatlK0Z/IFzwkr39E+hXBoq61TID3bBX8rfknqZteTr0lsaarF/+jT1/Fxu+ag0x3O8UALDHXwbfWyJ8oUh8tbB11rHnmUT9pkHzJpLVilAJ27a15DOCkDvUkHm3dwnUbRVYxIObntBu7R3B5021uOZFpxogfnVGDI/Qpljw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777330622; c=relaxed/simple;
-	bh=mJlFckTn3CEfwCBeg1MgUufdZ+fSAoKpR5pi4tvRdSU=;
+	s=arc-20240116; t=1777330967; c=relaxed/simple;
+	bh=Txchng0uY3okUD5Nq3Y0b9qGMUL4NLtNd6uafhQ9MSo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JdhktuRxrZQCJ0x7bBa+BRJq4yDzqnLurv0X3E2EG1IdrgYdeGRbFvURvLZ2QFyEMbtaS71DW6grsTK4jxs7WE2lOHJee3LKWIvIzIiVuYfIEO4AtEZemYo3DISYhPGz7Nccp8KTJIS9cnbw59YO7wcDQJbm8c9m9L8a2vRfuIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B8gJm4GS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBD41C19425;
-	Mon, 27 Apr 2026 22:57:01 +0000 (UTC)
+	 MIME-Version:Content-Type; b=YnQW115nUxYRQSYJHQr9Yb/hBIuJTuKe2IQxi0LiAblMPJjM/yLKnvCsgtZlMC3x4wlpO+jZ6UkrG2HrK7A7XixU3wp2nmKfXGqlHFmkJzhL4n97hEvdUwgcFUe9srPW7VNFApcv404R6TRo+fQa8J0ek6irINP1dGoUofTv/hk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lp2LGnCQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71E73C19425;
+	Mon, 27 Apr 2026 23:02:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777330622;
-	bh=mJlFckTn3CEfwCBeg1MgUufdZ+fSAoKpR5pi4tvRdSU=;
+	s=k20201202; t=1777330966;
+	bh=Txchng0uY3okUD5Nq3Y0b9qGMUL4NLtNd6uafhQ9MSo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=B8gJm4GSmzyu5vRTgGMDCTYugCQyh62FPDhNhLbeey3qYahx1Ueo/KHSjr6vT1xb7
-	 MLtM3b79YORjcCFqHBGuFv2TQ8lojYKuNuxBG0CutUdVSKFgsZzBVmd0lPDX3FL0KV
-	 okxpxzeTRFeTheY5aRrqitoSlZGO0Ei/w3V4Mdj9uYX2gcw4ZJz5Kk/rXa99kW/5H1
-	 GRJqDA9yh0SW+0ASycQ4VvwB2q38Q06j/CEIyYgv58JLqZxZPNWwp8VYtcu1Yn4yil
-	 Cq7IubFX/Xmfhey6gtA8iD7iI4+R2qx7qiriYftzh3Dhc6zQhZ7m0vn//rz0Ucgf3j
-	 7ZJxKWyVKRimw==
-Date: Mon, 27 Apr 2026 15:57:01 -0700
+	b=lp2LGnCQDJh41XQhwo3B0sDT0yMiNB9FVM6ri9Fe7VMG/iU9mWlQm0svsKIH40yAu
+	 y+0xw9XaoU28455y0xnjW+22PZES3A07FP7DCRrhTWMbfJmUPvou+U2wIxnVL2MH1A
+	 lxYtGUxbFWl1bAKLE7Muxrs7hnlTatJdeDyaxDycWGasvMxCfZDaqSMG2cDGplSwzY
+	 +ctld+xi/m/N9QYQ3DaaKbxO2aAnM2T5Qqo2Ur8pqLNw+1hwDDQlE9hN1X5481HfSk
+	 VesJsMbjRm1UWIy6WLmi8/vrfRLb5qrhQbWnNVjKwHnPE7p+dUyRSuRiV6QFqtFtPp
+	 BOCOY/LDufFjw==
+Date: Mon, 27 Apr 2026 16:02:45 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Maciek Machnikowski <maciek@machnikowski.net>
-Cc: netdev@vger.kernel.org, richardcochran@gmail.com,
- milena.olech@intel.com, willemdebruijn.kernel@gmail.com, andrew@lunn.ch,
- vadim.fedorenko@linux.dev, horms@kernel.org
-Subject: Re: [PATCH v4 net-next 0/3] Implement PTP support in netdevsim
-Message-ID: <20260427155701.6b535f7e@kernel.org>
-In-Reply-To: <20260427164727.15418-1-maciek@machnikowski.net>
-References: <20260427164727.15418-1-maciek@machnikowski.net>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jamal Hadi Salim
+ <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, Kuniyuki Iwashima
+ <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next 0/4] net/sched: tc_dump_qdisc() optimizations
+Message-ID: <20260427160245.11dea0a5@kernel.org>
+In-Reply-To: <20260427132555.1791636-1-edumazet@google.com>
+References: <20260427132555.1791636-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,7 +63,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: BD35F47BA70
+X-Rspamd-Queue-Id: CFA9B47BAD2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -70,12 +71,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,intel.com,lunn.ch,linux.dev,kernel.org];
-	TAGGED_FROM(0.00)[bounces-281530-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,kernel.org,mojatatu.com,resnulli.us,google.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-281531-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -91,23 +92,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Mon, 27 Apr 2026 18:47:24 +0200 Maciek Machnikowski wrote:
-> This patchset adds support to the PTP HW timestamping emulation in the
-> netdevsim. It uses existing binding between netdevsim and ptp_mock
-> driver to generate transmit and receive timestamps.
+On Mon, 27 Apr 2026 13:25:51 +0000 Eric Dumazet wrote:
+> Before converting tc_dump_qdisc() to RCU, we make the following changes:
 > 
-> It also adds the selftest to verify the hw timestamping functionality
-> running over netdevsim.
+> - Use for_each_netdev_dump() instead of for_each_netdev()
+> 
+> - Only dump qdiscs of a single device at user space request.
 
-net-next wasn't open yet, when you posted.
-Please resubmit in a couple of days.
-
-BTW the patches don't seem to apply.
--- 
-pw-bot: defer
+Hah, what are the chances, I've been sitting on something like patch 4
+since Apr 15th..
 
