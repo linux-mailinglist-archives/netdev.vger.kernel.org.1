@@ -1,205 +1,418 @@
-Return-Path: <netdev+bounces-281452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281454-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YL8xO6uw72lyDwEAu9opvQ
-	(envelope-from <netdev+bounces-281452-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:53:31 +0200
+	id SHMPNday72n5DwEAu9opvQ
+	(envelope-from <netdev+bounces-281454-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 21:02:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72048478E28
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:53:31 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86983478F8C
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 21:02:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1D578301D970
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:53:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DB5FC3026C9B
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 19:02:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45B7E3ED13F;
-	Mon, 27 Apr 2026 18:53:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A69D3EE1DB;
+	Mon, 27 Apr 2026 19:02:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="KL6n4qy1"
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=deller@gmx.de header.b="pvJKKcq2"
 X-Original-To: netdev@vger.kernel.org
-Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11021087.outbound.protection.outlook.com [52.101.57.87])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 049CD3CBE9E;
-	Mon, 27 Apr 2026 18:53:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.87
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777316007; cv=fail; b=YCJyHvPlh/8Z06MDp8mVg9fdwshLXKqMWSqegaR0HpDgmQy05JAbMyqP90/6jkhtF675j25iKm59EDuCjlvQ85TmrLCYlc3WJDdKzVZNwioiF60e8QnYtamMIz0KxbFiPRzkFXcMtN0jBdhu39PdcOyCAZn9YoBWU7ilvy5eTlg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777316007; c=relaxed/simple;
-	bh=4dXeq/ybr4UedfFFZfLN5jCZv6mAaYwYlGldFWOmZC0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Hq+bnlImaKir82MAcxVPKkfa78J7z4/jlyV1wE43vY0s/FzSqquzpJxn95567oNPllZe/N912Ltt58l5rV+s5+TtKIwZK9vYtJCv7A8D730EC65FynHS816W8e8TGvWU6/lPuXeXsOmUASioF2/OFu5LOa4fWOtGinv1BL7nIGI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=KL6n4qy1; arc=fail smtp.client-ip=52.101.57.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Ame+TaJbAdZR5I5350+EhK1eo1JLac3ouhclbRCDyRZzJ+rwR/IqLQ3Z3qrQ3hfyRo+PzVMIFrHh+DxUWI51M5u/j+8xHfI4A2pEfAF1BlHWd6pdVhSPcA/qY0pFilv/oN6peeSMOWt3OATcBZ4re9f4WP9gDGi78wQ+5e8G8juiD4w0EqsfnmhnM8g3Cv9p3WMBYcdibEo015Kx2iKIqNDptc4gUtQmj57/dYk7dJAt/jo35RJbPZ5Nzur7lYrQi9JYphbPd5tP0G5yMLa0Z5sLC8tDTb3ttWmu4p2L3zBZFU4XrCxayT9KsnJwqdyL6LEfDeH1AL5JtBcsC0DUZg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4dXeq/ybr4UedfFFZfLN5jCZv6mAaYwYlGldFWOmZC0=;
- b=Rg+ESjoNkgYYin+uKeD8oxBJ8sbfU3iFzHpIRwXenEFyIHzhS+cPXiOHWYDmoJ4oP4SAZjcPASJH9UrwKhwg/4wFzT7S0p8fntMagaV1m5r+RPc4e0KJT0R5XWrRDc7X21zaFNgcJBBmdZPtfTgDBZYj2t/1udFGbyWGIfZnKtgHAIs07IUZwCTa8nv+8V37PoGv8Dx3P3wbGpUJbwuJYrcS7nvjdXsNczsBDqMlsYXRTXhn0uNZTYEfyiLhTcTvoQNmlT8HCQa4nEFgSh7Z2Gyd8YDdxs12fE4HVI4TInw0mu8QTLrCpjxhZYvDkdNiGDJ7PZKLJavcKBLhb2f8oA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4dXeq/ybr4UedfFFZfLN5jCZv6mAaYwYlGldFWOmZC0=;
- b=KL6n4qy1LjD1MNlyuPqH9j6gjs4+w5G6QxYqJwaTGXLJYsa9Ay0pcBdy7yMxSTBwU15SuKNe8IQlCxTc6vdsObg6MVovek3lD5MjrdLW4pLJC/m0f8bFL+282IzLMiW3qcSfZJq3Rb3vjczT3hyG8K5DvJyImdx5dtPeZRkd/bk=
-Received: from SA1PR21MB6921.namprd21.prod.outlook.com (2603:10b6:806:4a7::11)
- by SA1PR21MB6323.namprd21.prod.outlook.com (2603:10b6:806:4b0::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.15; Mon, 27 Apr
- 2026 18:53:21 +0000
-Received: from SA1PR21MB6921.namprd21.prod.outlook.com
- ([fe80::51cf:497c:e5df:f6d]) by SA1PR21MB6921.namprd21.prod.outlook.com
- ([fe80::51cf:497c:e5df:f6d%2]) with mapi id 15.20.9870.013; Mon, 27 Apr 2026
- 18:53:21 +0000
-From: Dexuan Cui <DECUI@microsoft.com>
-To: Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC: KY Srinivasan <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Long Li <longli@microsoft.com>, Stefano
- Garzarella <sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Himadri Pandya
-	<himadrispandya@gmail.com>, Michael Kelley <mhklinux@outlook.com>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Saurabh Sengar
-	<ssengar@linux.microsoft.com>, Maarten Lankhorst
-	<maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>,
-	Simona Vetter <simona@ffwll.ch>, Deepak Rawat <drawat.floss@gmail.com>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"stable@kernel.vger.org" <stable@kernel.vger.org>
-Subject: RE: [PATCH 1/2] hv_sock: fix ARM64 support
-Thread-Topic: [PATCH 1/2] hv_sock: fix ARM64 support
-Thread-Index: AQHc1N/Qb+eZIwhnXUuV873KWoUDGLXzQyKw
-Date: Mon, 27 Apr 2026 18:53:21 +0000
-Message-ID:
- <SA1PR21MB692194B2BB3816E8DE54A07BBF362@SA1PR21MB6921.namprd21.prod.outlook.com>
-References: <20260425181719.1538483-1-hamzamahfooz@linux.microsoft.com>
-In-Reply-To: <20260425181719.1538483-1-hamzamahfooz@linux.microsoft.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=c4155f11-46ca-47b5-98a6-7acd57c7c012;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2026-04-27T18:48:30Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR21MB6921:EE_|SA1PR21MB6323:EE_
-x-ms-office365-filtering-correlation-id: a6517839-1d47-43be-e3f1-08dea48e40ec
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|376014|366016|7416014|38070700021|18002099003|22082099003|56012099003;
-x-microsoft-antispam-message-info:
- RFjKah0svfQldXB//Gdy5xTHrhWT4mlgYNGiW/2PBhXt+09e0ILwR35+/Z1yZffiV7OzWbdBqZNte03ONOsmDnD3QB9fK9OppmNS6jUX3cEOgpcsV87blQB6buOfFD+h32Bl7ioF4yadWudget2UFHdOsS7LinTVaDQnxV5KZcxhGfG9dEe+Dw6/UjbeMhlbf0c9h0HCwUPySuHZfrSmY6/V5nGb6AlIeYPr6BVaIkVsx3ezHu2lVzk1VR/shkqaIGTLvSIU3+CWeFbSxcd2pmd2lua+O4HJd1bjuDnpAoczh7ZPB5nmXnJ/x9Z2MUS6IcZjnwQxYZ3DNCylsWFkFw+kqDVW+QJ6MDWwvNADerpXLt9cbZBweM9Y34RRYa0rbZnCLujXqTlyD5phZMRc8vAD68nUAkD8iuUkCGma8UMwpCN8o4jEndetyAq6dGgEj1kU1c9rHyv3wtZ5xwJcPkyXeCilIbA9WQz7TB+OuHkvCbgSjwOspqnMeCAza7//1m2ZB7bpF+nUI/1VoNiqJd++htU4nzyWxZ/SiUOrLx3cShdCVQ6aj3BiuPc6FI2xHEAVVsW5sgrstYfdeSgp9kadzJGi1Yjo+mLny4cFN5yN2KcVYLrHVS5MpvfafoZvsPk08UCCXAdgJRbCAFarWT1qLILggszrZuoTHXvSaJaGJ4dFB+bgU93DzW2OHlRAvX6n94TM0uZC8St8eo7sWHOTRJrHVDz9Il/OeT2yTgNHwE0MaN9wLtSV3E5IJiaZYc3g65T2Myd5dI2NXT+V8fJodcKh+1fjdk674uz14K4=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR21MB6921.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7416014)(38070700021)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?VW/HzZb0gNAsCwYld+ZKJQpqftsSqmnIIQUuPyYy2azrADqWb2VvJOeGI6y4?=
- =?us-ascii?Q?h6/Ybh9EqDifzufgfHOU51bHIR3TEwXax4DmSwJoTDB80PLMA3x1tjenG+yK?=
- =?us-ascii?Q?gb1wXS34Oi09wmea29835LaG7JL5ywqdBoNa2BlzCDMZIGg8Dtvs7yOfZaAE?=
- =?us-ascii?Q?jiHY/NKXqcV9cxAeyimWNMjCDnJmh0+uvPrpWNTkjPlSl1s6khl0YZJRnOQP?=
- =?us-ascii?Q?/wQH0KyQILWdB6pnUlTvJzHPAd6N1BGRhdIk40LH6JbsVmU201ofi/fPS+MV?=
- =?us-ascii?Q?XYZInIzAYSrrrJQGHyANXba3S2pEFVg9Rd3Tk6R3a09nSQ/KwXwWbeX0yfZi?=
- =?us-ascii?Q?Z2UNR+BgRnfpGFLQu1+hx2G6yq9PuqtY4nrsvGK5DTB5jvM8suQePnrFwuM2?=
- =?us-ascii?Q?V+c7f5SWlYq01H8A9kl/cCeQYMfLlO8rNURIYtAdSxvkQQymuCGBVNY3Pwcf?=
- =?us-ascii?Q?P5zkuE9iT+kU7TamM9dIrkpFqkgZYesvJvu1gBFTBDb1yArd/ZrAuj1kl6W6?=
- =?us-ascii?Q?Eu1VUIyqF5wrZDoOxIerhMGrgCdPuByL+rjydRBFKpjwXmJYXo+FXJbZvZYk?=
- =?us-ascii?Q?GS/r3xWpVuvETrOfW/8O3PzjbV6YR2gUV36U7RNLlffmgJYH67J2IKmrU1/Y?=
- =?us-ascii?Q?YRoApsN3lMQrbbNMc69Tario/V9K7o5c2RR+H/zDHZsShzkxNScUyKGBViKp?=
- =?us-ascii?Q?QBLFa3S/oj4/gx0xy+TLRjZl7kABbSoeLam1TlTi64Y1a6ybMxLXymXoILrG?=
- =?us-ascii?Q?qcql108qDZEjOMrJ2g3Jh5W0z1X5ygX8zqWQUwjorfs8tt4K8D3/9RcyxeQu?=
- =?us-ascii?Q?wM7jbOEy4oqFyhmcH2L8lO+mZIUvU6gx95nzmu5bBl5X37vZ9Lxi+YjrHoem?=
- =?us-ascii?Q?B0Mrhgxqk9tmNrbP1KKm9XoIvsOHCnWks+VQn18Gqzku10asVAfthDlCP14Q?=
- =?us-ascii?Q?1RAZ6y1jEhJaSZFxg3ZjIs0azVi+cgrLCHLKfyn6I+/tq5D/QBC5VxifnTOJ?=
- =?us-ascii?Q?BpD4RlELfBH/8uUCnq8gTkLwk2rHwomgLUrKz9GMf+uI8TL6iWbEHx4A4NJ5?=
- =?us-ascii?Q?hTXOzZRYsFNHnzeX+z5GuGXkqaias3EGZZvI3WxTi/bc4Rwd3ywzHyxhr59e?=
- =?us-ascii?Q?ttb379jrNRr5sd0ZBVv4pX2MNuLS0zP+wrlpI8XcwPMk4qDIXCI7tsVtEf1N?=
- =?us-ascii?Q?P+wvIrOOPlYz53Hsuu9TpSg7fyR5cJkoZsfgwFev8p6iUoVD3DI+3aNk6Fxs?=
- =?us-ascii?Q?hxe2z+gd5F63UyLSr3pO0EEIwacD4p4E108YftdVpofNGEhqFrp6lLI1vM7D?=
- =?us-ascii?Q?XJQEF2VbrMnGaZ9SYUg+I0fdxsuKv6dNTvrDpwFA12oSKYeizkNFpGK8/jaS?=
- =?us-ascii?Q?4EySzgMq1nS3eizRsqqmsyxFwQsy1dje9cpTPMrHkgXV4qI+5yPqVu5MD5Do?=
- =?us-ascii?Q?DNL8CMdrKePI6Dr3k/nH0mYVLox1uzOfCCaNGTwNdCwVrl8qrBnMzoYBFuwC?=
- =?us-ascii?Q?c4qEb4U4Ki5kG7UnSGhj+uZM/NpyWx+LdZjiEMDubW574veYmk8QRKIolkyy?=
- =?us-ascii?Q?q2le0LMD17C0ChsGroEgpe1v7ACV6oT/PD0nslpjzpI//88pvp/eQYv+4gyQ?=
- =?us-ascii?Q?GIKqlllhowCjKB/zH5wXe0C7GTSg9AJBa7ChESV9MK0aD0xhpRYpDcPcx/nD?=
- =?us-ascii?Q?n8K0I9OAQGZTduRN8Ex2/xHr7UiRPI3+U3hd3kV8TcQ4fEno?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651EE3EF0BC;
+	Mon, 27 Apr 2026 19:02:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777316547; cv=none; b=L9MDPwJ86Vyxxt4NOQNm7EkG9zNTQUrTUWqrYSwwNKv3z/8BZT28n0jgEBJfdqO5CEYlCakkyfJ8Cycx+fhlAN7MgN9Nd+DfO3UQOIxwh8psxNYEbk2DV9CWrXpk7Zuxm/+Fkl7CWeZl3mBH63pn0kueUaZ1xkcJUmqHxOIaBz0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777316547; c=relaxed/simple;
+	bh=liYvxEgR0vdZaID3pK7JG4ARU4i53Phtxf7Vg6VxcPs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=flauyUwT6T7iKtGIWEyHqCDPhguQOixIRz9jdGeZFqizLVC8Ex1MMRk8hqMAkfTDoTp4tMQyt05DAPaozBufbgJv9wo9igOoV0Qq0KYCROACt32KyM49RU0fj/Ju7h7UcJ7ffTLARaFRYXbyV8ozCQNwH3yl/00XIenZJdteZ6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=deller@gmx.de header.b=pvJKKcq2; arc=none smtp.client-ip=212.227.15.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1777316482; x=1777921282; i=deller@gmx.de;
+	bh=Zt1qoBiZgQM1t1btlI0mC79addHEa7yO7OT0uaav6JI=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=pvJKKcq2bvRAhsxjqAkSqPCTHz+c9uXutnBUNfweFC5C6v6Q3EgeOKe/MJanf1Ba
+	 sAehF4t5/xUIpLJRVOl0YNFM0UY2s1ZtmOUE+OxOPa2dZ4N+GaoaNXUJVeKbqUObc
+	 zWTti5uW04mbR8LXlYdWXdzH0idgP2vWBzyha8fXbLatDwnhl5ulQbpKW/B/LIbfq
+	 m9Sk/0zz5Hq5YiFn5LKjsXeE3bvcDSyAbbuH306N8cXcn/B+mqRHa0DLJIfFBgcYb
+	 SPUzS1OgVVxqH7BapIrTRFMwx269SyWfjiAxp4nbh+xegJyY+50MN5oyqjtATSzbv
+	 OtP1eu9OBKhkgrJwaA==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from client.hidden.invalid by mail.gmx.net (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MMXUD-1vxzDK309n-00RQkF; Mon, 27
+ Apr 2026 21:01:21 +0200
+Message-ID: <844ee1e8-e7e2-40ef-a2b1-b7a6b6a44cb2@gmx.de>
+Date: Mon, 27 Apr 2026 21:01:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR21MB6921.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a6517839-1d47-43be-e3f1-08dea48e40ec
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Apr 2026 18:53:21.4554
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4g6ufb/Ni/oFMa4auAVTMxaH/RfvxAe5hKLXXt2y81P5TNKeUBof/zXmJ8Z8ttknfJ6pFyg1NK0cfJ9JYOlQFg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR21MB6323
-X-Rspamd-Queue-Id: 72048478E28
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 0/9] uaccess: Convert small fixed size
+ copy_{to/from}_user() to scoped user access
+To: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+ Yury Norov <ynorov@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ David Laight <david.laight.linux@gmail.com>,
+ Thomas Gleixner <tglx@linutronix.de>
+Cc: linux-alpha@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-snps-arc@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ kvm@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-um@lists.infradead.org, dmaengine@vger.kernel.org,
+ linux-efi@vger.kernel.org, linux-fsi@lists.ozlabs.org,
+ amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+ intel-gfx@lists.freedesktop.org, linux-wpan@vger.kernel.org,
+ netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-spi@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-staging@lists.linux.dev, linux-serial@vger.kernel.org,
+ linux-usb@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-fsdevel@vger.kernel.org, ocfs2-devel@lists.linux.dev,
+ bpf@vger.kernel.org, kasan-dev@googlegroups.com, linux-mm@kvack.org,
+ linux-x25@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ linux-sound@vger.kernel.org, sound-open-firmware@alsa-project.org,
+ linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
+ loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+ linux-openrisc@vger.kernel.org, linux-parisc@vger.kernel.org,
+ linux-sh@vger.kernel.org, linux-arch@vger.kernel.org
+References: <cover.1777306795.git.chleroy@kernel.org>
+Content-Language: en-US
+From: Helge Deller <deller@gmx.de>
+Autocrypt: addr=deller@gmx.de; keydata=
+ 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
+In-Reply-To: <cover.1777306795.git.chleroy@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:1BVGzEnh9ud/z86J5vc3jwqhrUEQaFN9ezvONBNWk23lK0h66Lj
+ 0xrtgBmMIOPcBoDWmEQeS4PXCvzdwIxhn4Pzilub15kM3Feqk0H3eDb2tX/MG5xgU1O6fnx
+ QeGvXu9BfFIEYVIV+dF2H3PKbCBnzALlwBp4AW5heloRv5iuM8nQW3/zjVECVWKsEM94tAo
+ sS/Thsodt5emF3NO5Yt1A==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:0TjjV61NXRM=;CbjUzEi6igRLCIXmnNBp946d8aL
+ 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
+X-Rspamd-Queue-Id: 86983478F8C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[microsoft.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[microsoft.com:s=selector2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmx.de,quarantine];
+	R_DKIM_ALLOW(-0.20)[gmx.de:s=s31663417];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281454-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281452-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,redhat.com,davemloft.net,google.com,gmail.com,outlook.com,vger.kernel.org,lists.linux.dev,linux.microsoft.com,linux.intel.com,suse.de,ffwll.ch,lists.freedesktop.org,kernel.vger.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[kernel.org,nvidia.com,linux-foundation.org,gmail.com,linutronix.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmx.de];
+	RCPT_COUNT_TWELVE(0.00)[49];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[DECUI@microsoft.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[microsoft.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.org:email,SA1PR21MB6921.namprd21.prod.outlook.com:mid]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[deller@gmx.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmx.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,gmx.de:dkim,gmx.de:mid]
 
-> From: Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>
-> Sent: Saturday, April 25, 2026 11:17 AM
-> ...
-> Cc: stable@kernel.vger.org
-> Fixes: 77ffe33363c0 ("hv_sock: use HV_HYP_PAGE_SIZE for Hyper-V
-> communication")
+Hello Christophe,
 
-It looks like 77ffe33363c0 was not tested with
-CONFIG_ARM64_64K_PAGES=3Dy...
+On 4/27/26 19:13, Christophe Leroy (CS GROUP) wrote:
+> A lot of copy_from_user() and copy_to_user() perform copies of small
+> fixed size pieces of data between kernel and userspace, and don't
+> care about partial copies.
+>=20
+> copy_from_user() and copy_to_user() are big functions optimised for
+> copying large amount of data, with cache management, etc ...=20
 
-Thanks for the fix!
+They take care of much more: alignments, exception handling (e.g. if userp=
+age
+is read-only and kernel writes to it), various rules when to return faults
+(e.g. sometime reading from page0 is allowed for other arches not), and
+much more. I've seen so many strange things during the last few years,
+and you would need to get it right if you want to "make small" versions
+of those functions.
 
-> Signed-off-by: Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>
+> This is often overkill for small copies that could just be inlined
+> instead.
 
-Tested-by: Dexuan Cui <decui@microsoft.com>
-Reviewed-by: Dexuan Cui <decui@microsoft.com>
+Isn't put_user() and get_user() for that ?
+And if you inline you need to take care of faults as well, so indirectly
+you will add more fault handlers (or fault pointers) to the generated code=
+,
+effectively making the kernel bigger.
+
+> What makes things a bit more tricky is that those copy functions
+> are designed to handle partial copies in case of page fault. But among
+> the 6000 callers of those functions, only 2% really care about the
+> quantity of no-copied data that those functions return. All other ones
+> fails as soon as the returned value is not 0, returning -EACCESS.
+>=20
+> So first step in this series is to introduce variants called
+> copy_from_user_partial() and copy_to_user_partial() which will be
+> called by the 2% users that care about the partial copy, then the
+> original copy_from_user() and copy_to_user() are changed to return
+> -EFAULT when the copy fails.
+>=20
+> Then the second step is to implement copy of small fixed-size data
+> with scoped user access instead of calling the arch specific heavy
+> user copy functions.
+
+I'm not against your idea or your patch, but I wonder if you
+really gain much from it.
+Have you done some size or speed comparisons ?
+
+Helge
+
+> Patch 5, can be split in different patches for each archicture or
+> subsystem, but let's get a first feedback and agree on the principle.
+>=20
+> Christophe Leroy (CS GROUP) (9):
+>    uaccess: Split check_zeroed_user() out of usercopy.c
+>    uaccess: Convert INLINE_COPY_{TO/FROM}_USER to kconfig and reduce
+>      ifdefery
+>    x86/umip: Be stricter in fixup_umip_exception()
+>    uaccess: Introduce copy_{to/from}_user_partial()
+>    uaccess: Switch to copy_{to/from}_user_partial() when relevant
+>    uaccess: Change copy_{to/from}_user to return -EFAULT
+>    x86: Add unsafe_copy_from_user()
+>    arm64: Add unsafe_copy_from_user()
+>    uaccess: Convert small fixed size copy_{to/from}_user() to scoped use=
+r
+>      access
+>=20
+>   arch/alpha/Kconfig                            |   1 +
+>   arch/alpha/kernel/osf_sys.c                   |   4 +-
+>   arch/alpha/kernel/termios.c                   |   2 +-
+>   arch/arc/include/asm/uaccess.h                |   3 -
+>   arch/arc/kernel/disasm.c                      |   2 +-
+>   arch/arm/include/asm/uaccess.h                |   2 -
+>   arch/arm64/include/asm/gcs.h                  |   2 +-
+>   arch/arm64/include/asm/uaccess.h              |  30 +++--
+>   arch/arm64/kernel/signal32.c                  |   2 +-
+>   arch/csky/Kconfig                             |   1 +
+>   arch/hexagon/include/asm/uaccess.h            |   3 -
+>   arch/loongarch/include/asm/uaccess.h          |   3 -
+>   arch/m68k/include/asm/uaccess.h               |   3 -
+>   arch/microblaze/include/asm/uaccess.h         |   2 -
+>   arch/mips/include/asm/uaccess.h               |   3 -
+>   arch/mips/kernel/rtlx.c                       |   8 +-
+>   arch/mips/kernel/vpe.c                        |   2 +-
+>   arch/nios2/include/asm/uaccess.h              |   2 -
+>   arch/openrisc/include/asm/uaccess.h           |   2 -
+>   arch/parisc/include/asm/uaccess.h             |   3 -
+>   arch/powerpc/Kconfig                          |   1 +
+>   arch/powerpc/kvm/book3s_64_mmu_hv.c           |   4 +-
+>   arch/powerpc/kvm/book3s_64_mmu_radix.c        |   4 +-
+>   arch/powerpc/kvm/book3s_hv.c                  |   2 +-
+>   arch/riscv/Kconfig                            |   1 +
+>   arch/riscv/kernel/signal.c                    |   2 +-
+>   arch/s390/include/asm/idals.h                 |   8 +-
+>   arch/s390/include/asm/uaccess.h               |   3 -
+>   arch/sh/include/asm/uaccess.h                 |   2 -
+>   arch/sparc/include/asm/uaccess_32.h           |   3 -
+>   arch/sparc/include/asm/uaccess_64.h           |   2 -
+>   arch/sparc/kernel/termios.c                   |   2 +-
+>   arch/um/include/asm/uaccess.h                 |   3 -
+>   arch/um/kernel/process.c                      |   2 +-
+>   arch/x86/Kconfig                              |   1 +
+>   arch/x86/include/asm/uaccess.h                |  29 ++++-
+>   arch/x86/kernel/umip.c                        |   2 +-
+>   arch/x86/lib/insn-eval.c                      |   2 +-
+>   arch/x86/um/signal.c                          |   2 +-
+>   arch/xtensa/include/asm/uaccess.h             |   2 -
+>   drivers/android/binder_alloc.c                |   2 +-
+>   drivers/comedi/comedi_fops.c                  |   4 +-
+>   drivers/dma/idxd/cdev.c                       |   2 +-
+>   drivers/firmware/efi/test/efi_test.c          |   2 +-
+>   drivers/fsi/fsi-scom.c                        |   2 +-
+>   .../amd/display/amdgpu_dm/amdgpu_dm_debugfs.c |   2 +-
+>   drivers/gpu/drm/i915/gt/intel_sseu.c          |   4 +-
+>   drivers/gpu/drm/i915/i915_gem.c               |   4 +-
+>   drivers/hwtracing/intel_th/msu.c              |   2 +-
+>   drivers/misc/ibmvmc.c                         |   2 +-
+>   drivers/misc/vmw_vmci/vmci_host.c             |   2 +-
+>   drivers/most/most_cdev.c                      |   2 +-
+>   drivers/net/ieee802154/ca8210.c               |   4 +-
+>   drivers/net/wireless/ath/wil6210/debugfs.c    |   2 +-
+>   .../intel/iwlwifi/pcie/gen1_2/trans.c         |   2 +-
+>   drivers/net/wireless/ti/wlcore/debugfs.c      |   2 +-
+>   drivers/ps3/ps3-lpm.c                         |   2 +-
+>   drivers/s390/crypto/zcrypt_api.h              |   4 +-
+>   drivers/spi/spidev.c                          |   2 +-
+>   .../staging/media/atomisp/pci/atomisp_cmd.c   |   8 +-
+>   drivers/tty/tty_ioctl.c                       |  14 +--
+>   drivers/tty/vt/vc_screen.c                    |   4 +-
+>   drivers/usb/gadget/function/f_hid.c           |   4 +-
+>   drivers/usb/gadget/function/f_printer.c       |   2 +-
+>   drivers/vfio/vfio_iommu_type1.c               |   4 +-
+>   drivers/xen/xenbus/xenbus_dev_frontend.c      |   2 +-
+>   fs/namespace.c                                |   2 +-
+>   fs/ocfs2/dlmfs/dlmfs.c                        |   2 +-
+>   fs/proc/base.c                                |   4 +-
+>   include/asm-generic/uaccess.h                 |   2 -
+>   include/linux/bpfptr.h                        |   2 +-
+>   include/linux/sockptr.h                       |   4 +-
+>   include/linux/uaccess.h                       | 107 ++++++++++++++----
+>   ipc/msg.c                                     |   8 +-
+>   ipc/sem.c                                     |   8 +-
+>   ipc/shm.c                                     |  18 +--
+>   kernel/regset.c                               |   2 +-
+>   kernel/sys.c                                  |   4 +-
+>   lib/Kconfig                                   |   3 +
+>   lib/Makefile                                  |   4 +-
+>   lib/kfifo.c                                   |   8 +-
+>   lib/{usercopy.c =3D> usercheck.c}               |  22 ----
+>   lib/usercopy.c                                |  66 -----------
+>   mm/kasan/kasan_test_c.c                       |   4 +-
+>   mm/memory.c                                   |   2 +-
+>   net/x25/af_x25.c                              |   2 +-
+>   rust/helpers/uaccess.c                        |   6 +-
+>   sound/pci/emu10k1/emufx.c                     |   4 +-
+>   sound/pci/rme9652/hdsp.c                      |   6 +-
+>   sound/soc/intel/avs/probes.c                  |   6 +-
+>   sound/soc/sof/compress.c                      |  12 +-
+>   sound/soc/sof/sof-client-probes.c             |   6 +-
+>   92 files changed, 269 insertions(+), 288 deletions(-)
+>   copy lib/{usercopy.c =3D> usercheck.c} (73%)
+>=20
+
 
