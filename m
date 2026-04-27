@@ -1,377 +1,364 @@
-Return-Path: <netdev+bounces-281523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281517-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WMtwIJDm72lPHgEAu9opvQ
-	(envelope-from <netdev+bounces-281523-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 00:43:28 +0200
+	id iFpUMkfk72kFHgEAu9opvQ
+	(envelope-from <netdev+bounces-281517-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 00:33:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5168A47B947
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 00:43:28 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D456A47B853
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 00:33:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 37748300DEFE
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:43:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5FA3730107F7
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:33:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EAB03ACEF9;
-	Mon, 27 Apr 2026 22:43:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6B8F3043C8;
+	Mon, 27 Apr 2026 22:33:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qvLygrDM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TsMb9PCm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D433ACF13
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 22:43:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9989D2DF12F;
+	Mon, 27 Apr 2026 22:33:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777329802; cv=none; b=fxpFNcVgZjFa5vXXHDZWhImCzH+z48WzgyUXItWd36ujGWEs52i9VMVm7fQpzSzXqlhtNJGOV1UfIqSv3r8ZePW8DJM4pGdJL2p09K7l9P2J+huBp27LEs2/wLo8lg7Ik8LzC1wvT/rZGmRUVZl2iHb20z0bYEa5is+MLPO4JWk=
+	t=1777329220; cv=none; b=ma88TJ48a5R6ZJWp2N6FAEcgBboh1gHaZfNjwTR/q35R5WKCIrYg0V8z9VWUBDjW34PLzMtbDLz9Dq7WnF/iHTGhKKcD+QmTV9jnvswTd8xmT35Lb38ju8NbhM2/L4JLuTbJHAG3FlZhIv4prET33EMqg7xdhfiPLzY9pHm/yVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777329802; c=relaxed/simple;
-	bh=kqmc8mutZhVPL0g0yhueYVg9Bp3rQcwZ+kTbpSu4xNo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=REvltrE12eXDcRPXDBpyFr9ncm0INg6TGqZmAkBDvCGqsew9bpW12kAitE0JGsNy9hFIdu0KoRLre8tNNMT5YWXJZzb9MsXmWtpz5WkAIMQxy1uL1Ln9s8EscCjoal9jOmJRznXN5YeQkTcwvmC8ZWNE1SYcJFOzNB3hfIqyqf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sharmasagarika.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qvLygrDM; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sharmasagarika.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8eb52a22e85so1974731285a.2
-        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 15:43:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777329800; x=1777934600; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=u98KK5H868BOVi1FEwd/gnua8NTHfXkj+waNRa1neWw=;
-        b=qvLygrDMCXQS/p9a4qeH8zzO+Ps8GduU67CbDlnfoswqmehBdHCym0iQwrou0akxXQ
-         PsohNlvaRBEamRRdzj8P2phdBt+bBpMxpN3qVljSYEe2aBNq6dtkISrOKmUbygip+q8R
-         AZWOewGKx4NgwdOosMX9lv5Qy9fc0kNXI7k0SWsLHZtOX63fS0nPWGi6I8Y3VwbPumx9
-         8zYk9MMrSgU8QPEB/t7YJqGZ27QRIrBLI+Z7wq6SXl6Nc0T7HbymRHIcu1cNhr8aN6s7
-         Baj5WXJqhpZy4kmbpf9ikKA7/t9MJRAP/W/JwmUEUBuLxfiPGUwvPkUGAbIdm2CWJrSc
-         G4RA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777329800; x=1777934600;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=u98KK5H868BOVi1FEwd/gnua8NTHfXkj+waNRa1neWw=;
-        b=M1EcTt6cCwTGO0x2SR60N3CFGeYFfWFmwwKtiAix73pRrcbzIQtTOVry7Ta+qbB0wK
-         topQyIn7M3wi6PtmW5j4qnmV1n6W1ICveoyQII60ZDQ0i7qlFnhN/atUOK6591h3m9S1
-         z/xJJZUnwLLyJlVeYJNW3P0WVgQFnYgvMG5rL7LwyLXfC1KYVmCCL7Ku51Z34pOLeAro
-         SSFcBvKN9bRhIrBTkmWroRcG1wywJ6ahvnLlt4AcvyjhLJvs1PrjeDA1Z1jpWBlRTK6H
-         Lp4BVOpbiriBYZi2E4T5ksVoNsLjnDX5VJAIIjoCNKqN0mELAraKnEh4SXeLP/P8jOi+
-         n7JA==
-X-Forwarded-Encrypted: i=1; AFNElJ9NIv6q4cDsTPgjR1ymQRZuH6/tKE5nsAaOQ9s0dZCueCYfEO0eoJRmsIApW6CwIpqJfccVIPY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUHn6bq81x2Pb8gEAfcxVWdeGjSDkurUwhhzb/sRVSOfh+591Q
-	DvE3g8o2EDzUXPbza1oMVoNJs55ck1+Y32cyZbkUGOnLlZd7dphgXlU7Z8KgrG2K2EMteThHHeH
-	dSeSTAcbVw6VSE9wc61V9vUkul1Gy1lwGYKWaAw==
-X-Received: from qkkh6.prod.google.com ([2002:a05:620a:10a6:b0:8d4:b5d7:384d])
- (user=sharmasagarika job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:4049:b0:8ee:4901:70c9 with SMTP id af79cd13be357-8f7d9901400mr87616885a.44.1777329800095;
- Mon, 27 Apr 2026 15:43:20 -0700 (PDT)
-Date: Mon, 27 Apr 2026 22:42:23 +0000
-In-Reply-To: <20260427224243.3499162-1-sharmasagarika@google.com>
+	s=arc-20240116; t=1777329220; c=relaxed/simple;
+	bh=uuG6m9JJzzDuJXg4Q5er1swNxzGNOCZ6GcUTfaZUSNU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WvpyCmjb5b/+z0UpmUWZjOM61JWUHCQ9oBVlBMwR3J9Xd4GWdIdvZ9KuBIuJW2wyoWtnKN1s44mt0uRkODJWM+FW3J1NgtUbhAsSiuX5w3bzfRjDlEZGXKJdVoHaomqv27yE+tQ/Fn5qkuZdlmO4Sd/XSJ/WG5PbTYEPkPqd4To=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TsMb9PCm; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777329218; x=1808865218;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=uuG6m9JJzzDuJXg4Q5er1swNxzGNOCZ6GcUTfaZUSNU=;
+  b=TsMb9PCmDZuwMimTL5ZHX/UqVjoco47TIsR9qTcFLfYzSQ3V34gIU/Of
+   LcHhWqduU4j7JuqO0YGhC1wAEJAqk5BSuh4qbYvJLtHcSlINIRjh7bvrL
+   O3YX5NQ+MN8+mBXZHsUGpZ14b2XwfVze/xvHGHPLxT0/IboxxwG1UXSL+
+   TBW023CCwE5oEjwtk1x31x7gOyHFk3WOpqVtuWBIwoOcpEe7sEOHdk/W4
+   pZ3DbWGbJnh8OUWBHYEN+TQxLCejnrQ61ok4bnPDl6cCmWxfpkBzs49MK
+   MaYxjEsiL6oVYwl9wGClmieDDNp16c78h+ZUDZCgetSjQm7jwBOPXkEXW
+   w==;
+X-CSE-ConnectionGUID: B8g0XgEYREuCpJd9w8MiSg==
+X-CSE-MsgGUID: /Bu913h1TqKwhqK8l7MjXQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11769"; a="95796867"
+X-IronPort-AV: E=Sophos;i="6.23,202,1770624000"; 
+   d="scan'208";a="95796867"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2026 15:33:37 -0700
+X-CSE-ConnectionGUID: XSmbS6lARpKP1U1bYtOGTg==
+X-CSE-MsgGUID: uMrMv8oLQqONyKqB4fVMVw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,202,1770624000"; 
+   d="scan'208";a="257079940"
+Received: from dcskidmo-m40.jf.intel.com ([10.166.241.14])
+  by fmviesa002.fm.intel.com with ESMTP; 27 Apr 2026 15:33:36 -0700
+From: Joshua Hay <joshua.a.hay@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: emil.s.tantilov@intel.com,
+	willemb@google.com,
+	decot@google.com,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	aleksander.lobakin@intel.com,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	stable@vger.kernel.org,
+	Joshua Hay <joshua.a.hay@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: [Intel-wired-lan][PATCH net v3] idpf: fix xdp crash in soft reset error path
+Date: Mon, 27 Apr 2026 15:44:26 -0700
+Message-Id: <20260427224426.3933839-1-joshua.a.hay@intel.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260427224243.3499162-1-sharmasagarika@google.com>
-X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260427224243.3499162-3-sharmasagarika@google.com>
-Subject: [PATCH net v1 2/2] selftest: net: Add test for TCP flow failover with
- ECMP routes.
-From: Sagarika Sharma <sharmasagarika@google.com>
-To: "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Sagarika Sharma <sharmasagarika@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 5168A47B947
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: D456A47B853
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-281517-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281523-lists,netdev=lfdr.de];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sharmasagarika@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.999];
+	FROM_NEQ_ENVFROM(0.00)[joshua.a.hay@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.999];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,tcp_ecmp_failover.sh:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
 
-From: Kuniyuki Iwashima <kuniyu@google.com>
+From: Emil Tantilov <emil.s.tantilov@intel.com>
 
-Without the previous commit, TCP failed to switch to alternative
-IPv6 routes immediately upon carrier loss.
+NULL pointer dereference is reported in cases where idpf_vport_open()
+fails during soft reset:
 
-It would persist with the dead route until reaching the threshold
-net.ipv4.tcp_retries1, leading to unnecessary delays in failover.
+./xdpsock -i <inf> -q -r -N
 
-Let's add a selftest for this scenario to ensure TCP fails over
-immediately upon a carrier loss event.
+[ 3179.186687] idpf 0000:83:00.0: Failed to initialize queue ids for vport 0: -12
+[ 3179.276739] BUG: kernel NULL pointer dereference, address: 0000000000000010
+[ 3179.277636] #PF: supervisor read access in kernel mode
+[ 3179.278470] #PF: error_code(0x0000) - not-present page
+[ 3179.279285] PGD 0
+[ 3179.280083] Oops: Oops: 0000 [#1] SMP NOPTI
+...
+[ 3179.283997] Workqueue: events xp_release_deferred
+[ 3179.284770] RIP: 0010:idpf_find_rxq_vec+0x17/0x30 [idpf]
+...
+[ 3179.291937] Call Trace:
+[ 3179.292392]  <TASK>
+[ 3179.292843]  idpf_qp_switch+0x25/0x820 [idpf]
+[ 3179.293325]  idpf_xsk_pool_setup+0x7c/0x520 [idpf]
+[ 3179.293803]  idpf_xdp+0x59/0x240 [idpf]
+[ 3179.294275]  xp_disable_drv_zc+0x62/0xb0
+[ 3179.294743]  xp_clear_dev+0x40/0xb0
+[ 3179.295198]  xp_release_deferred+0x1f/0xa0
+[ 3179.295648]  process_one_work+0x226/0x730
+[ 3179.296106]  worker_thread+0x19e/0x340
+[ 3179.296557]  ? __pfx_worker_thread+0x10/0x10
+[ 3179.297009]  kthread+0xf4/0x130
+[ 3179.297459]  ? __pfx_kthread+0x10/0x10
+[ 3179.297910]  ret_from_fork+0x32c/0x410
+[ 3179.298361]  ? __pfx_kthread+0x10/0x10
+[ 3179.298702]  ret_from_fork_asm+0x1a/0x30
 
-Before:
-  TEST: TCP IPv4 failover                                             [ OK ]
-  TEST: TCP IPv6 failover                                             [FAIL]
+Fix the error handling of the soft reset in idpf_xdp_setup_prog() by
+restoring the vport->xdp_prog to the old value. This avoids referencing
+the orphaned prog that was copied to vport->xdp_prog in the soft reset
+and prevents subsequent false positive by idpf_xdp_enabled(). Roll back
+the number of queues as well. Also only call put on the program if the
+soft reset was successful. Returning an error will trigger the core XDP
+stack to handle the put otherwise.
 
-After:
-  TEST: TCP IPv4 failover                                             [ OK ]
-  TEST: TCP IPv6 failover                                             [ OK ]
+Update the restart check in idpf_xsk_pool_setup() to use IDPF_VPORT_UP bit
+instead of netif_running(). The idpf_vport_stop/start() calls will not
+update the __LINK_STATE_START bit, making this test a false positive
+should the soft reset fail.
 
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-Signed-off-by: Sagarika Sharma <sharmasagarika@google.com>
+Fixes: 3d57b2c00f09 ("idpf: add XSk pool initialization")
+Cc: stable@vger.kernel.org
+Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
+Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
- tools/testing/selftests/net/Makefile          |   1 +
- .../selftests/net/tcp_ecmp_failover.sh        | 209 ++++++++++++++++++
- 2 files changed, 210 insertions(+)
- create mode 100755 tools/testing/selftests/net/tcp_ecmp_failover.sh
+v3:
+- call idpf_vport_adjust_qs in case of XDP soft reset failure to restore
+  previous queue configuration, including data queue config
+- change idpf_vport_adjust_qs and idpf_vport_calc_total_qs return types
+  to void since they cannot fail
+- only call bpf_prog_put if soft reset succeeds
+---
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    |  4 +---
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 12 ++++--------
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  6 +++---
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 19 ++++---------------
+ .../net/ethernet/intel/idpf/idpf_virtchnl.h   |  4 ++--
+ drivers/net/ethernet/intel/idpf/xdp.c         |  8 +++++---
+ drivers/net/ethernet/intel/idpf/xsk.c         |  4 +++-
+ 7 files changed, 22 insertions(+), 35 deletions(-)
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index a275ed584026..f3da38c54d27 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -96,6 +96,7 @@ TEST_PROGS := \
- 	srv6_hl2encap_red_l2vpn_test.sh \
- 	srv6_iptunnel_cache.sh \
- 	stress_reuseport_listen.sh \
-+	tcp_ecmp_failover.sh \
- 	tcp_fastopen_backup_key.sh \
- 	test_bpf.sh \
- 	test_bridge_backup_port.sh \
-diff --git a/tools/testing/selftests/net/tcp_ecmp_failover.sh b/tools/testing/selftests/net/tcp_ecmp_failover.sh
-new file mode 100755
-index 000000000000..f857d5db84d8
---- /dev/null
-+++ b/tools/testing/selftests/net/tcp_ecmp_failover.sh
-@@ -0,0 +1,209 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Copyright 2026 Google LLC.
-+#
-+# This test verifies TCP flow failover between ECMP routes
-+# upon carrier loss on the active device.
-+#
-+#   socat  ----------------------------->  socat
-+#                        |
-+#           .-- veth-c1 -|- veth-s1 --.
-+#   dummy0 -|            |            |-- dummy0
-+#           '-- veth-c2 -|- veth-s2 --'
-+#                        |
-+#
-+
-+REQUIRE_JQ=no
-+REQUIRE_MZ=no
-+NUM_NETIFS=0
-+
-+source forwarding/lib.sh
-+
-+CLIENT_IP="10.0.59.1"
-+SERVER_IP="10.0.92.1"
-+CLIENT_IP6="2001:db8:5a9a::1"
-+SERVER_IP6="2001:db8:9292::1"
-+
-+setup_server()
-+{
-+	IP="ip -n $server"
-+	NS_EXEC="ip netns exec $server"
-+
-+	$IP link add dummy0 type dummy
-+	$IP link set dummy0 up
-+
-+	$IP -4 addr add $SERVER_IP/32 dev dummy0
-+	$IP -6 addr add $SERVER_IP6/128 dev dummy0 nodad
-+
-+	$IP link set veth-s1 up
-+	$IP link set veth-s2 up
-+
-+	$IP -4 addr add 192.168.1.2/24 dev veth-s1
-+	$IP -4 addr add 192.168.2.2/24 dev veth-s2
-+
-+	$IP -4 route add $CLIENT_IP/32 \
-+		nexthop via 192.168.1.1 dev veth-s1 weight 1 \
-+		nexthop via 192.168.2.1 dev veth-s2 weight 1
-+
-+	$IP -6 addr add 2001:db8:1::2/64 dev veth-s1 nodad
-+	$IP -6 addr add 2001:db8:2::2/64 dev veth-s2 nodad
-+
-+	$IP -6 route add $CLIENT_IP6/128 \
-+		nexthop via 2001:db8:1::1 dev veth-s1 weight 1 \
-+		nexthop via 2001:db8:2::1 dev veth-s2 weight 1
-+}
-+
-+setup_client()
-+{
-+	IP="ip -n $client"
-+	NS_EXEC="ip netns exec $client"
-+
-+	$IP link add dummy0 type dummy
-+	$IP link set dummy0 up
-+
-+	$IP -4 addr add $CLIENT_IP/32 dev dummy0
-+	$IP -6 addr add $CLIENT_IP6/128 dev dummy0 nodad
-+
-+	$IP link set veth-c1 up
-+	$IP link set veth-c2 up
-+
-+	$IP -4 addr add 192.168.1.1/24 dev veth-c1
-+	$IP -4 addr add 192.168.2.1/24 dev veth-c2
-+
-+	$IP -4 route add $SERVER_IP/32 \
-+		nexthop via 192.168.1.2 dev veth-c1 weight 1 \
-+		nexthop via 192.168.2.2 dev veth-c2 weight 1
-+
-+	$IP -6 addr add 2001:db8:1::1/64 dev veth-c1 nodad
-+	$IP -6 addr add 2001:db8:2::1/64 dev veth-c2 nodad
-+
-+	$IP -6 route add $SERVER_IP6/128 \
-+		nexthop via 2001:db8:1::2 dev veth-c1 weight 1 \
-+		nexthop via 2001:db8:2::2 dev veth-c2 weight 1
-+
-+	# By default, tcp_retries1=3 triggers a route refresh
-+	# after 3 retransmits (~5s).  Ensure this never occurs
-+	# for test stability.
-+	$NS_EXEC sysctl -qw net.ipv4.tcp_retries1=100
-+
-+	# When NETDEV_CHANGE is issued for a dev tied to an ECMP
-+	# route, RTNH_F_LINKDOWN is flagged and the sernum is
-+	# bumped to invalidate the route via sk_dst_check().
-+	#
-+	# Without ignore_routes_with_linkdown=1, subsequent
-+	# lookups may still select the same RTNH_F_LINKDOWN route.
-+	$NS_EXEC sysctl -qw net.ipv4.conf.veth-c1.ignore_routes_with_linkdown=1
-+	$NS_EXEC sysctl -qw net.ipv4.conf.veth-c2.ignore_routes_with_linkdown=1
-+
-+	$NS_EXEC sysctl -qw net.ipv6.conf.veth-c1.ignore_routes_with_linkdown=1
-+	$NS_EXEC sysctl -qw net.ipv6.conf.veth-c2.ignore_routes_with_linkdown=1
-+}
-+
-+setup()
-+{
-+	setup_ns client server
-+
-+	ip -n $client link add veth-c1 type veth peer veth-s1 netns $server
-+	ip -n $client link add veth-c2 type veth peer veth-s2 netns $server
-+
-+	setup_server
-+	setup_client
-+}
-+
-+cleanup()
-+{
-+	cleanup_all_ns
-+}
-+
-+tcp_ecmp_failover()
-+{
-+	local pf=$1; shift
-+	local server_ip=$1; shift
-+	local client_ip=$1; shift
-+
-+	RET=0
-+
-+	tcpdump_start veth-s1 $server
-+	tcpdump_start veth-s2 $server
-+
-+	ip netns exec $server \
-+		socat -u TCP-LISTEN:8080,pf=$pf,bind=$server_ip,reuseaddr /dev/null &
-+	server_pid=$!
-+
-+	# Wait for server to start listening.
-+	# Sometimes client fails without this sleep.
-+	sleep 1
-+
-+	ip netns exec $client \
-+		socat -u /dev/zero TCP:$server_ip:8080,pf=$pf,bind=$client_ip &
-+	client_pid=$!
-+
-+	# To capture enough packets.
-+	sleep 3
-+
-+	tcpdump_stop veth-s1
-+	tcpdump_stop veth-s2
-+
-+	pkts_s1=$(tcpdump_show veth-s1 | wc -l)
-+	pkts_s2=$(tcpdump_show veth-s2 | wc -l)
-+
-+	tcpdump_cleanup veth-s1
-+	tcpdump_cleanup veth-s2
-+
-+	# Detect the device chosen by the client
-+	if [ $pkts_s1 -gt $pkts_s2 ]; then
-+		veth_down=veth-s1
-+		veth_up=veth-s2
-+	else
-+		veth_down=veth-s2
-+		veth_up=veth-s1
-+	fi
-+
-+	# Taking down $veth_down causes its peer to lose carrier,
-+	# triggering NETDEV_CHANGE.  This flags RTNH_F_LINKDOWN
-+	# and bumps the sernum for the route associated with that
-+	# peer, invalidating the cached dst in the TCP socket.
-+	#
-+	# Consequently, sk_dst_check() fails, forcing the subsequent
-+	# lookup to select the remaining healthy route via $veth_up.
-+	ip -n $server link set $veth_down down
-+
-+	tcpdump_start $veth_up $server
-+
-+	# To capture enough packets.
-+	sleep  3
-+
-+	tcpdump_stop $veth_up
-+
-+	kill -9 $client_pid 2>&1 > /dev/null
-+	kill -9 $server_pid 2>&1 > /dev/null
-+	wait 2> /dev/null
-+
-+	pkts=$(tcpdump_show $veth_up | wc -l)
-+
-+	tcpdump_cleanup $veth_up
-+
-+	if [ $pkts -lt 10000 ]; then
-+		RET=$ksft_fail
-+	fi
-+}
-+
-+test_ipv4()
-+{
-+	setup
-+	tcp_ecmp_failover IPv4 $SERVER_IP $CLIENT_IP
-+	log_test "TCP IPv4 failover"
-+	cleanup
-+}
-+
-+test_ipv6()
-+{
-+	setup
-+	tcp_ecmp_failover IPv6 "[$SERVER_IP6]" "[$CLIENT_IP6]"
-+	log_test "TCP IPv6 failover"
-+	cleanup
-+}
-+
-+test_ipv4
-+test_ipv6
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+index cf966fe6c759..56198b417c97 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+@@ -2042,9 +2042,7 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
+ 	/* Adjust resource parameters prior to reallocating resources */
+ 	switch (reset_cause) {
+ 	case IDPF_SR_Q_CHANGE:
+-		err = idpf_vport_adjust_qs(new_vport, new_rsrc);
+-		if (err)
+-			goto free_vport;
++		idpf_vport_adjust_qs(new_vport, new_rsrc);
+ 		break;
+ 	case IDPF_SR_Q_DESC_CHANGE:
+ 		/* Update queue parameters before allocating resources */
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index 4fc0bb14c5b1..4e0d31023123 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -1568,12 +1568,10 @@ void idpf_vport_calc_num_q_desc(struct idpf_vport *vport,
+  * @vport_idx: vport idx to retrieve vport pointer
+  * @vport_msg: message to fill with data
+  * @max_q: vport max queue info
+- *
+- * Return: 0 on success, error value on failure.
+  */
+-int idpf_vport_calc_total_qs(struct idpf_adapter *adapter, u16 vport_idx,
+-			     struct virtchnl2_create_vport *vport_msg,
+-			     struct idpf_vport_max_q *max_q)
++void idpf_vport_calc_total_qs(struct idpf_adapter *adapter, u16 vport_idx,
++			      struct virtchnl2_create_vport *vport_msg,
++			      struct idpf_vport_max_q *max_q)
+ {
+ 	int dflt_splitq_txq_grps = 0, dflt_singleq_txqs = 0;
+ 	int dflt_splitq_rxq_grps = 0, dflt_singleq_rxqs = 0;
+@@ -1624,7 +1622,7 @@ int idpf_vport_calc_total_qs(struct idpf_adapter *adapter, u16 vport_idx,
+ 	}
+ 
+ 	if (!vport_config)
+-		return 0;
++		return;
+ 
+ 	user = &vport_config->user_config;
+ 	user->num_req_rx_qs = le16_to_cpu(vport_msg->num_rx_q);
+@@ -1640,8 +1638,6 @@ int idpf_vport_calc_total_qs(struct idpf_adapter *adapter, u16 vport_idx,
+ 	vport_msg->num_tx_q = cpu_to_le16(user->num_req_tx_qs + num_xdpsq);
+ 	if (idpf_is_queue_model_split(le16_to_cpu(vport_msg->txq_model)))
+ 		vport_msg->num_tx_complq = vport_msg->num_tx_q;
+-
+-	return 0;
+ }
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
+index b6836e38f449..22c647d6dd5c 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
+@@ -1084,9 +1084,9 @@ void idpf_vport_init_num_qs(struct idpf_vport *vport,
+ 			    struct idpf_q_vec_rsrc *rsrc);
+ void idpf_vport_calc_num_q_desc(struct idpf_vport *vport,
+ 				struct idpf_q_vec_rsrc *rsrc);
+-int idpf_vport_calc_total_qs(struct idpf_adapter *adapter, u16 vport_index,
+-			     struct virtchnl2_create_vport *vport_msg,
+-			     struct idpf_vport_max_q *max_q);
++void idpf_vport_calc_total_qs(struct idpf_adapter *adapter, u16 vport_index,
++			      struct virtchnl2_create_vport *vport_msg,
++			      struct idpf_vport_max_q *max_q);
+ void idpf_vport_calc_num_q_groups(struct idpf_q_vec_rsrc *rsrc);
+ int idpf_vport_queues_alloc(struct idpf_vport *vport,
+ 			    struct idpf_q_vec_rsrc *rsrc);
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+index be66f9b2e101..91af4f298475 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+@@ -1578,12 +1578,7 @@ int idpf_send_create_vport_msg(struct idpf_adapter *adapter,
+ 	else
+ 		vport_msg->rxq_model = cpu_to_le16(VIRTCHNL2_QUEUE_MODEL_SINGLE);
+ 
+-	err = idpf_vport_calc_total_qs(adapter, idx, vport_msg, max_q);
+-	if (err) {
+-		dev_err(&adapter->pdev->dev, "Enough queues are not available");
+-
+-		return err;
+-	}
++	idpf_vport_calc_total_qs(adapter, idx, vport_msg, max_q);
+ 
+ 	if (!adapter->vport_params_recvd[idx]) {
+ 		adapter->vport_params_recvd[idx] = kzalloc(IDPF_CTLQ_MAX_BUF_LEN,
+@@ -4065,24 +4060,18 @@ int idpf_vport_queue_ids_init(struct idpf_vport *vport,
+  * @vport: virtual port data struct
+  * @rsrc: pointer to queue and vector resources
+  *
+- * Renegotiate queues.  Returns 0 on success, negative on failure.
++ * Renegotiate queues.
+  */
+-int idpf_vport_adjust_qs(struct idpf_vport *vport, struct idpf_q_vec_rsrc *rsrc)
++void idpf_vport_adjust_qs(struct idpf_vport *vport, struct idpf_q_vec_rsrc *rsrc)
+ {
+ 	struct virtchnl2_create_vport vport_msg;
+-	int err;
+ 
+ 	vport_msg.txq_model = cpu_to_le16(rsrc->txq_model);
+ 	vport_msg.rxq_model = cpu_to_le16(rsrc->rxq_model);
+-	err = idpf_vport_calc_total_qs(vport->adapter, vport->idx, &vport_msg,
+-				       NULL);
+-	if (err)
+-		return err;
++	idpf_vport_calc_total_qs(vport->adapter, vport->idx, &vport_msg, NULL);
+ 
+ 	idpf_vport_init_num_qs(vport, &vport_msg, rsrc);
+ 	idpf_vport_calc_num_q_groups(rsrc);
+-
+-	return 0;
+ }
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.h b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.h
+index 6876e3ed9d1b..76d238fc660c 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.h
++++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.h
+@@ -169,8 +169,8 @@ int idpf_send_destroy_vport_msg(struct idpf_adapter *adapter, u32 vport_id);
+ int idpf_send_enable_vport_msg(struct idpf_adapter *adapter, u32 vport_id);
+ int idpf_send_disable_vport_msg(struct idpf_adapter *adapter, u32 vport_id);
+ 
+-int idpf_vport_adjust_qs(struct idpf_vport *vport,
+-			 struct idpf_q_vec_rsrc *rsrc);
++void idpf_vport_adjust_qs(struct idpf_vport *vport,
++			  struct idpf_q_vec_rsrc *rsrc);
+ int idpf_vport_alloc_max_qs(struct idpf_adapter *adapter,
+ 			    struct idpf_vport_max_q *max_q);
+ void idpf_vport_dealloc_max_qs(struct idpf_adapter *adapter,
+diff --git a/drivers/net/ethernet/intel/idpf/xdp.c b/drivers/net/ethernet/intel/idpf/xdp.c
+index dcd867517a5f..f6e6b72169fd 100644
+--- a/drivers/net/ethernet/intel/idpf/xdp.c
++++ b/drivers/net/ethernet/intel/idpf/xdp.c
+@@ -488,11 +488,13 @@ static int idpf_xdp_setup_prog(struct idpf_vport *vport,
+ 				   "Could not reopen the vport after XDP setup");
+ 
+ 		cfg->user_config.xdp_prog = old;
+-		old = prog;
+-	}
++		vport->xdp_prog = old;
+ 
+-	if (old)
++		/* Restore previous queue config */
++		idpf_vport_adjust_qs(vport, &vport->dflt_qv_rsrc);
++	} else if (old) {
+ 		bpf_prog_put(old);
++	}
+ 
+ 	libeth_xdp_set_redirect(vport->netdev, vport->xdp_prog);
+ 
+diff --git a/drivers/net/ethernet/intel/idpf/xsk.c b/drivers/net/ethernet/intel/idpf/xsk.c
+index d95d3efdfd36..3d8c430efd2b 100644
+--- a/drivers/net/ethernet/intel/idpf/xsk.c
++++ b/drivers/net/ethernet/intel/idpf/xsk.c
+@@ -553,6 +553,7 @@ int idpf_xskrq_poll(struct idpf_rx_queue *rxq, u32 budget)
+ 
+ int idpf_xsk_pool_setup(struct idpf_vport *vport, struct netdev_bpf *bpf)
+ {
++	const struct idpf_netdev_priv *np = netdev_priv(vport->netdev);
+ 	struct xsk_buff_pool *pool = bpf->xsk.pool;
+ 	u32 qid = bpf->xsk.queue_id;
+ 	bool restart;
+@@ -568,7 +569,8 @@ int idpf_xsk_pool_setup(struct idpf_vport *vport, struct netdev_bpf *bpf)
+ 		return -EINVAL;
+ 	}
+ 
+-	restart = idpf_xdp_enabled(vport) && netif_running(vport->netdev);
++	restart = idpf_xdp_enabled(vport) &&
++		  test_bit(IDPF_VPORT_UP, np->state);
+ 	if (!restart)
+ 		goto pool;
+ 
 -- 
-2.54.0.545.g6539524ca2-goog
+2.39.2
 
 
