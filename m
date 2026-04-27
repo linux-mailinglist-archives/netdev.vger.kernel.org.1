@@ -1,92 +1,69 @@
-Return-Path: <netdev+bounces-281405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281407-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2FMME8CN72mhCwEAu9opvQ
-	(envelope-from <netdev+bounces-281405-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:24:32 +0200
+	id UArlGlaS72nRCwEAu9opvQ
+	(envelope-from <netdev+bounces-281407-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:44:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08216476502
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:24:31 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB61F4769D0
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:44:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3C1D23022407
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:20:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9BFF8301D4D0
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:43:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EF2335970F;
-	Mon, 27 Apr 2026 16:20:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 529CC3D646C;
+	Mon, 27 Apr 2026 16:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GmrdXLXT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uVfMjh1c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f193.google.com (mail-yw1-f193.google.com [209.85.128.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D11352F85
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 16:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 304F43C73EA
+	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 16:43:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777306845; cv=none; b=ZGJbmNxWrpdIFvI4C8jXJbbdMw15TctJIM1i65SSKiUAhqe30XYWZ3yWHdIHD5azsXpL7H4SmsGB8Dsxlmjr83t5gxa5QWiDVwNcxZQcm4aDJ5Dfj5oqYD0QQpm9fntwAUAJm7O20qCkn1X8kmrT9OD7tU/SQk5OkDICzk+S5vc=
+	t=1777308191; cv=none; b=gK2tv+3GENNOsj8MSpuIvldeQpSAKl456QF3vH44FrfFX0hqQfy2Wze9HzT3xasyekEKfRPgh6nYfav5V6YVKt34FN64oj/Us0EekLsPKX/xEjpNNra2M9mIZRvh0gA6GZ/uk+wThJuTN26hRcyZBRmuC6RiTPEpej2jcYD5wdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777306845; c=relaxed/simple;
-	bh=7Y3TJuZg/L0ifkW1rtLCRvc0YmCGJffnw+RQpsp3yYk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k7mEBGrDFV02CVXhJ4h+bRBPSsv3vliBN+4FFTDCBaMlR9X9EBPQDSC4rXUbkQWfyndBpYUDQqTTwJySOpJJGpMkhf9BLiDxOWg5HyDeKR5Qk36HbrDq2nU0ll35cpbB8lrR2iBLpaqWGpTPf7r8NXf4AV8+3D0v8L9tQ26Pg2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GmrdXLXT; arc=none smtp.client-ip=209.85.128.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f193.google.com with SMTP id 00721157ae682-79ea87af213so159369427b3.0
-        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 09:20:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777306842; x=1777911642; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6R1SX8mfYaQyk9uLV5N24I5+ak1Z8uoCYi8CcuK4+lU=;
-        b=GmrdXLXTz515EDEHjo3UlyvnBe6nIXvalhFcOtz3okn6+g9FZJcSYyD7VonqyqlAR7
-         +xB5rpM8G/Vkr7Fo3Jb0k90hP+Pyi88NHciKbPKCZm2W5sOsplMFwZXeWmxLXvWpqEgH
-         gS4C61qCG3fSkIZqQjiFkTiNzhcupvSapAVcgQ7Lw7BeKPx584ah+3dehRqfQ+u2Ag0R
-         AihPELSepM7tgysOFmR2PVB7t9Pl9M9tCYzLIBxEJ9PkirKGmWT70WK77xtDYZ4eBH6y
-         l/U/lxQxRu6q/7zLm8VyJByobUM5siPjYKlyi2MMstfS9T9iM6JVZOTFOmyVghIU4CPu
-         Ji5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777306842; x=1777911642;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6R1SX8mfYaQyk9uLV5N24I5+ak1Z8uoCYi8CcuK4+lU=;
-        b=GGNZZNRSUrIZ9AEgsXhhgBgHin3t2d3BZiW1HzTPds19S5871Zgvm5kMH3n/GEyefX
-         PBGjMTBrMLzU6YYCUT/Hg5GgYWbaiyU26kpSWNzBTpX3Ct7o/MUSaB3Q79bviN6VgX1v
-         UQkWvi+M7JNAG0HY4aPJ4H48MFU7JMJnqMLCd8kLRnGEqGd6/MV+3VcUxs7FNSztBo6N
-         L7v8Y+97L8zOajaa8t8sU8VuVJQifSHNuwZnKqOu9+etB2gMPLCS/LVpULANMgAM0oez
-         Iqx38eTxGMf1Yx7hp4oTBqL8Xku4pezAw+kym74pWRu1WWjHxMOKNvUJZ/LYsQ+Dyqr9
-         waeg==
-X-Gm-Message-State: AOJu0Ywyb0PiedDF7QaT4qqjqI8h4ESPTXRbI6L6rZm1f1AYBM/K4tdg
-	a7tyoh0CBq1zLDJ9NmZZmOUbBa/d9tqgKaX8y9bhAK7NmCD8olS6Fyq3nA6kWkvhwUDozsZc
-X-Gm-Gg: AeBDieu2x+LV9zk9WhwftQGDmFV4/jVfu2Yu//D8nEg6m4LVhPvfkuGDTacrhmpErFl
-	6B25o2ios5tmg5Fp5X/G2+BZ+taBgumCCXYO29ek6g9WtgysvXCFtwi/iAdhmsu2W4L5ycvonVF
-	DpsI+qCEnuxnqqJTa7qUy5jApr8OydWe9IqpMaL1U7meYNIrkd+cDFRTZklIGKb8+uecK8gYefP
-	5CEqoMypEI6PlfDr6JWdLt7inHCTVXsaz2frzgTD1bt8a/9l4d2plTqlbbiDzklFclQC3Cv77lH
-	+DifVWJoMnVz72yigyvyjdmVJ6svGTtJA5eobopLzi1SpPj+1/8Iu7hG1Ap7/c/yimNr2WjbAvh
-	orMRwook9xkTo2iI83zKChvrlnfdw5YqSQJpCQ0cz63NOBi47hS6K4ffzKKThUVTwuVZ59F11VM
-	7iOt+xZ+Vy+615o6l1yIvsTyusjoj8aXKjmgmxwWB+hco8Sg7xcrkfrZ+HUL3znaYhrIlGUH2vV
-	vQ=
-X-Received: by 2002:a05:690c:e3cb:b0:7a2:ce0e:8641 with SMTP id 00721157ae682-7b9ed4195admr339771827b3.18.1777306842374;
-        Mon, 27 Apr 2026 09:20:42 -0700 (PDT)
-Received: from localhost ([2600:1700:3420:b5d0::45])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7b9ee89ac09sm131196407b3.3.2026.04.27.09.20.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Apr 2026 09:20:41 -0700 (PDT)
-From: kernelcoredev <sonionwhat@gmail.com>
-To: netdev@vger.kernel.org
-Cc: andrew@lunn.ch,
-	andrew+netdev@lunn.ch,
+	s=arc-20240116; t=1777308191; c=relaxed/simple;
+	bh=sop+jYumr5WtvqsHY9B185SKGiwtvPmTo1JFw0Tpae8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=QL6w53R0nIHOsM2rDsKnAXOTTNa3H1XpfMW4YtBQBnGnW/4TYgI8D0dniG343VWpPWFa/kGUyqqkiATTTFGAyTLaKgkWvhxsPK02o8IxzfWEQgknDSMkORjhdsPv6Uh8HFNFqKq0klofE2NE19KPuaEi6k41WQvnr7BCdB541lE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uVfMjh1c; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84A9CC19425;
+	Mon, 27 Apr 2026 16:43:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777308190;
+	bh=sop+jYumr5WtvqsHY9B185SKGiwtvPmTo1JFw0Tpae8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=uVfMjh1cSBeqXGQ1jpCQ9zi8y+sTNtFMx7uFJIqELSbHlu3wvQxMojZMmnqDmqbfI
+	 tFjd2V+4VIB0HgXqW1NBUPrSi6+cDpagxMVB+g47/MnI2pxC0xiASjCYRIbeTKkNJe
+	 MKCj29fZj+er3mkIukGaLhf9e4b776AdAPqs/T6DDrbkq66nQX4GZBi1XYd4G5S60z
+	 OLZXEVb4aXabZiunIscGt6OQBGWvSuQNwlaIJbRrhUD6keCnQ+OmH/W8rpdHDMMCT9
+	 NihTpn9E5yhPUptzF+iUMSD7arywiQ+u7rg+2jcqUHfvEIPsJz3yQyrqOeE1R3ICVz
+	 dbFc7rxsS052Q==
+From: Simon Horman <horms@kernel.org>
+To: jtornosm@redhat.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	przemyslaw.kitszel@intel.com,
+	aleksandr.loktionov@intel.com,
+	jacob.e.keller@intel.com,
+	jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com,
-	kernelcoredev <sonionwhat@gmail.com>
-Subject: [PATCH] net: nixge: fix skb leak and missing bail on DMA mapping error
-Date: Mon, 27 Apr 2026 12:20:34 -0400
-Message-ID: <20260427162034.7502-1-sonionwhat@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	pabeni@redhat.com
+Subject: Re: [PATCH net v4 2/4] i40e: skip unnecessary VF reset when setting trust
+Date: Mon, 27 Apr 2026 17:25:48 +0100
+Message-ID: <20260427162548.1221245-2-horms@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260423130405.139568-3-jtornosm@redhat.com>
+References: <20260423130405.139568-3-jtornosm@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,78 +71,150 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 08216476502
+X-Rspamd-Queue-Id: DB61F4769D0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281407-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-281405-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[sonionwhat@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sashiko.dev:url]
 
-When dma_mapping_error() fires during RX buffer refill in nixge_recv(),
-the skb allocated by netdev_alloc_skb_ip_align() is never freed, and
-execution continues writing a corrupt physical address into the hardware
-descriptor ring.
+From: 'Simon Horman' <horms@kernel.org>
 
-Fix by freeing the skb with dev_kfree_skb() and returning early.
-
-This was tested via code inspection, as I do not have access to the
-hardware. If dma_mapping_error() occurs, the current code continues
-execution, which can leak the skb and program an invalid DMA address
-into the descriptor ring. This patch ensures proper cleanup and early
-return on error.
-
-Fixes: 492caffa8a1a ("net: ethernet: nixge: Add support for National Instruments XGE netdev")
-
-Signed-off-by: Bentley Blacketer <sonionwhat@gmail.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
 ---
- drivers/net/ethernet/ni/nixge.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+i40e: skip unnecessary VF reset when setting trust
 
-diff --git a/drivers/net/ethernet/ni/nixge.c b/drivers/net/ethernet/ni/nixge.c
-index 230d5ff99..b64e2f355 100644
---- a/drivers/net/ethernet/ni/nixge.c
-+++ b/drivers/net/ethernet/ni/nixge.c
-@@ -645,8 +645,9 @@ static int nixge_recv(struct net_device *ndev, int budget)
- 					  NIXGE_MAX_JUMBO_FRAME_SIZE,
- 					  DMA_FROM_DEVICE);
- 		if (dma_mapping_error(ndev->dev.parent, cur_phys)) {
--			/* FIXME: bail out and clean up */
--			netdev_err(ndev, "Failed to map ...\n");
-+			netdev_err(ndev, "Failed to map RX buffer\n");
-+			dev_kfree_skb(new_skb);
-+			return packets;
- 		}
- 		nixge_hw_dma_bd_set_phys(cur_p, cur_phys);
- 		cur_p->cntrl = NIXGE_MAX_JUMBO_FRAME_SIZE;
--- 
-2.54.0
+This commit attempts to reduce the bonding setup delay by skipping the
+synchronous VF reset when changing the trust setting, manually handling
+the capability flag and promiscuous mode instead.
 
+> When we do reset (ADQ case), we reset first to clear VF_STATE_ACTIVE
+> (which blocks new cloud filter additions), then delete existing cloud
+> filters safely. This avoids the race condition where VF could add filters
+> during deletion.
+
+Is this description accurate?
+
+i40e_vc_reset_vf() is synchronous and restores I40E_VF_STATE_ACTIVE before
+returning. When i40e_del_all_cloud_filters() traverses
+vf->cloud_filter_list locklessly afterwards, the VF is already active again.
+
+Could a concurrent VIRTCHNL_OP_ADD_CLOUD_FILTER message from the guest be
+processed asynchronously and corrupt the list?
+
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> index a26c3d47ec1561..26b62650aac9aa 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+[ ... ]
+> @@ -4943,6 +4943,30 @@ int i40e_ndo_set_vf_spoofchk(struct net_device *netdev, int vf_id, bool enable)
+>  	return ret;
+>  }
+>  
+> +/**
+> + * i40e_setup_vf_trust - Enable/disable VF trust mode without reset
+> + * @vf: VF to configure
+> + * @setting: trust setting
+> + *
+> + * Manually handle capability flag and promiscuous mode when changing trust
+> + * without performing a VF reset.
+> + * When reset is performed, this is not necessary as the reset procedure
+> + * already handles this.
+> + **/
+> +static void i40e_setup_vf_trust(struct i40e_vf *vf, bool setting)
+> +{
+> +	if (setting) {
+> +		set_bit(I40E_VIRTCHNL_VF_CAP_PRIVILEGE, &vf->vf_caps);
+> +	} else {
+> +		clear_bit(I40E_VIRTCHNL_VF_CAP_PRIVILEGE, &vf->vf_caps);
+> +
+> +		if (test_bit(I40E_VF_STATE_UC_PROMISC, &vf->vf_states) ||
+> +		    test_bit(I40E_VF_STATE_MC_PROMISC, &vf->vf_states))
+> +			i40e_config_vf_promiscuous_mode(vf, vf->lan_vsi_idx,
+> +							false, false);
+
+Does this pass the internal software array index (vf->lan_vsi_idx) instead of
+the firmware VSI ID (vf->lan_vsi_id)?
+
+i40e_config_vf_promiscuous_mode() uses i40e_find_vsi_from_id() which matches
+against the firmware ID. Could this cause the lookup to fail and silently
+leave promiscuous mode enabled on the hardware?
+
+Also, should this clear the I40E_VF_STATE_UC_PROMISC and
+I40E_VF_STATE_MC_PROMISC flags from vf->vf_states?
+
+If an untrusted VF performs a valid operation like adding a new VLAN, could
+i40e_vc_add_vlan_msg() check the uncleared state bit and automatically issue
+an AdminQ command to re-enable promiscuous mode, bypassing the revocation?
+
+> +	}
+> +}
+> +
+>  /**
+>   * i40e_ndo_set_vf_trust
+>   * @netdev: network interface device structure of the pf
+> @@ -4987,19 +5011,17 @@ int i40e_ndo_set_vf_trust(struct net_device *netdev, int vf_id, bool setting)
+>  	set_bit(__I40E_MACVLAN_SYNC_PENDING, pf->state);
+>  	pf->vsi[vf->lan_vsi_idx]->flags |= I40E_VSI_FLAG_FILTER_CHANGED;
+>  
+> -	i40e_vc_reset_vf(vf, true);
+> +	/* Reset only if revoking trust with ADQ (for cloud filter cleanup) */
+> +	if (vf->adq_enabled && !setting) {
+> +		i40e_vc_reset_vf(vf, true);
+> +		i40e_del_all_cloud_filters(vf);
+
+Could this lead to a memory leak of the cloud filters?
+
+The synchronous reset in i40e_vc_reset_vf() destroys the VF's VSI and
+allocates a new one with a new firmware SEID. When
+i40e_del_all_cloud_filters() executes afterwards, it looks up the VSI using
+the old SEID from the filters, which might fail and cause it to skip the
+free operation entirely.
+
+> +	} else {
+> +		i40e_setup_vf_trust(vf, setting);
+> +	}
+
+By skipping the reset when revoking trust for non-ADQ VFs, do we leave excess
+hardware filters intact? Trusted VFs can configure MAC and VLAN filters
+beyond standard limits. Without a reset to flush them, does the untrusted
+VF retain its configured spoofed MAC addresses and excessive VLANs
+indefinitely?
+
+Furthermore, when granting trust, skipping the reset prevents sending the
+VIRTCHNL_EVENT_RESET_IMPENDING event to the guest. Since virtchnl VF drivers
+negotiate their capabilities and resource requests during initialization,
+does this mean the guest driver remains unaware of its newly granted
+privileges until the interface is manually restarted?
+
+> +
+>  	dev_info(&pf->pdev->dev, "VF %u is now %strusted\n",
+>  		 vf_id, setting ? "" : "un");
+>
 
