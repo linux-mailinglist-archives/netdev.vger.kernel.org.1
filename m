@@ -1,133 +1,256 @@
-Return-Path: <netdev+bounces-281486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281487-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2IGIBH3H72knGAEAu9opvQ
-	(envelope-from <netdev+bounces-281486-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:30:53 +0200
+	id OHUZDDjI72knGAEAu9opvQ
+	(envelope-from <netdev+bounces-281487-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:34:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A55B147A08B
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:30:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1DAC47A136
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 22:33:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5F52C31151AB
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:26:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6A3F030D9BF2
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:28:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7ED136DA1C;
-	Mon, 27 Apr 2026 20:26:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B30C236EA8C;
+	Mon, 27 Apr 2026 20:28:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cLp1nX9I"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nP3MBK2r"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D3536D506
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 20:26:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E8D36D517;
+	Mon, 27 Apr 2026 20:28:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777321566; cv=none; b=fmAA+gxIIiAKfFYujkw4LkcETEUuu39T7I/ZlUQALrxxdClm+ZqUiS+ZAp07JNETPc5zQKkFhkrJBIybl2GxUr0a/0FAQnlFNkFKs35xD0eKFqnWTMiXPY09e5Fyqc44yLEMwN9ix64TmwFj1WCqgNfI3Ur7CepaLCGVx7xuodU=
+	t=1777321730; cv=none; b=YeVZ0JRjwvh27TFe5M0GeP1laDDk66ewRGmJNzhxJSif+k4gX/4Kw0k7eqBsb75Az1fQD0rG3h4bRzJ6X5WI2vnpFpcjBrI0ZFJ/oGNAIBwrMkit/sQeJ7VydH9PSt3/fxWzt+37TUNyWWUJ0vtUYsSVkyP3P7QrsFAuT5YvuO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777321566; c=relaxed/simple;
-	bh=IJpREljCv+tCpa781iljVxrdidqfIWDfk9Kom6HM/kI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CI3xf8y6GcoglqMqCFymCwe0lPANtpgaKhequu9wnp5PQFGfIc35Amls5HZuP1lSTtlAzwttgSbRdrKkIQ48scFEs/j84YOAuOYAvC1ZtbMo2DBXtElX+hXQJ2JdqC5yj9pxEc1S8B5RrZLOj4pVg93o5+FxmC0mZWtptj8W04o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cLp1nX9I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B6F3C2BCB8
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 20:26:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777321566;
-	bh=IJpREljCv+tCpa781iljVxrdidqfIWDfk9Kom6HM/kI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=cLp1nX9IP0AAxlM54rpfQSxvMtM0GJuKgJ0Rr7uahgmmifGFPAq9ZYsJuTZ9b+q65
-	 bNyVcBmpZqK7nVld/6mypC8uGCCSli40mbn8yO8vhshOh6/deK5ltUJOR3txLDm4Fy
-	 OeKfIINot/T4hfAtyJ4mNQpxM+6bmK6OHpuRFBj9f398XRR53PjQR3X+hG77N2sCd+
-	 ESlNbVKXs7Gneam50UUYItDfGlSyVTRRsxwBCeYzy7ssVbouxBNE4+jtC0i1FKQSCQ
-	 TNnSrGuCJYVrtTiG1K1xW2wDY5bvzH/yTuBIymW7aYRWPMm3dXTrNSkdtPfA0Iapm7
-	 f/xT8+KBPGk+Q==
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5a415fd6bceso11759153e87.1
-        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 13:26:06 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ9p429VF3Y1awxJp8FnwltgoVBsDkC/9QoFHsWo4btt79g+AUSUnnSNxIREPVMDEefL5bEG/X0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxScWi93PWbWveMOScBgPx2ImVwY/u6SyBQ1x79eFQielYAV8ze
-	1mr1/pixiYTl4BXYUyALVV+L++tAmqOOe8eCyuvnj7b6Wwq9CFUlfYKnghT+hDxNPTMuVy5JccP
-	3PqIGsI820A5lpaEBVpbxRlyMvCdNb4M=
-X-Received: by 2002:a05:6512:3dab:b0:5a4:178c:62b7 with SMTP id
- 2adb3069b0e04-5a7468b5f60mr46249e87.20.1777321564779; Mon, 27 Apr 2026
- 13:26:04 -0700 (PDT)
+	s=arc-20240116; t=1777321730; c=relaxed/simple;
+	bh=WwCEgKmsOv/luKExMIN07wuqqxA5j7fzrpkrBbHAXCU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=nBHXQPsVd8VRKYeGXL25qbUMtHvDlXA54TdYYFSoUkpGXAzka3gKkuytn6iNrbe5LTuvzKAAb3UVYU2yLeitFbUn47MIe0YLbolbGP5bAbS4+tP+x9dcNXcLKS7dWiQs8Uvc45XxOpuxESQRMPYgTBgONyxY7Bt+ZkbIkgcMt3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nP3MBK2r; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777321730; x=1808857730;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=WwCEgKmsOv/luKExMIN07wuqqxA5j7fzrpkrBbHAXCU=;
+  b=nP3MBK2rYgjH2Lmu/R37h8cJhXQajk8iLWsLvlFRtdf7hD/rqr10Dz1m
+   Hyf/yaiWN4MpxMsTsFjTwu6r/JjtkFtvBRx2S+aHCitRuVqXT6THEy/Tf
+   kvycxw38vlATbFcxz1xLqbQeZB6cGm8/ril/iaEXSub4wXpyFB+XCwyvz
+   9kd0xcOkkoKpyH/sPx9etAA3HV7A4cjqBniZNeXqCx0Yo39TdDUepl2sQ
+   hkB2jmgqunaytWLF9LIyO/WkQt4802K5c1IfRz78NadU+aThuVIJfHbvz
+   mmkV3BG4NOBuiIR8EJLfW72hFc6sHjGWPc8cSgqRsEmmcUgRvSU4QFMmz
+   g==;
+X-CSE-ConnectionGUID: qrrur1y7TZa6VRMmxlFbaQ==
+X-CSE-MsgGUID: jr3E0PRcQ4CHt21SNiTWlA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11769"; a="78114791"
+X-IronPort-AV: E=Sophos;i="6.23,202,1770624000"; 
+   d="scan'208";a="78114791"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2026 13:28:49 -0700
+X-CSE-ConnectionGUID: 7PuD40s3Rgq6p6e0y8l8fA==
+X-CSE-MsgGUID: +fMDpSQvRQORY1ivZQjeyA==
+X-ExtLoop1: 1
+Received: from arjan-box.jf.intel.com ([10.88.27.153])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2026 13:28:48 -0700
+From: Arjan van de Ven <arjan@linux.intel.com>
+To: linux-wireless@vger.kernel.org
+Cc: syzbot+ca7a2759caaa6cd4e3db@syzkaller.appspotmail.com,
+	johannes@sipsolutions.net,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [wireless?] divide error in mac80211_hwsim_link_info_changed (3)
+Date: Mon, 27 Apr 2026 13:29:54 -0700
+Message-ID: <20260427203005.506192-1-arjan@linux.intel.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <69efb8dd.050a0220.18b4f.0006.GAE@google.com>
+References: <69efb8dd.050a0220.18b4f.0006.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260427143020.2800317-1-arnd@kernel.org>
-In-Reply-To: <20260427143020.2800317-1-arnd@kernel.org>
-From: Linus Walleij <linusw@kernel.org>
-Date: Mon, 27 Apr 2026 22:25:52 +0200
-X-Gmail-Original-Message-ID: <CAD++jLnLDTe6eP7UP7ryRwC9R7=7PNMuaqYzsVezsKFRpZtS8g@mail.gmail.com>
-X-Gm-Features: AVHnY4K-oubdFI7rdfxfc9VDXytCd_jxlAbKESpT-vV_8bgvOKkOnhWhSdHLMnw
-Message-ID: <CAD++jLnLDTe6eP7UP7ryRwC9R7=7PNMuaqYzsVezsKFRpZtS8g@mail.gmail.com>
-Subject: Re: [PATCH] dsa: b53: hide legacy gpiolib usage on non-mips
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Jonas Gorski <jonas.gorski@gmail.com>, 
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Bartosz Golaszewski <brgl@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	=?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6IFJvamFz?= <noltari@gmail.com>, 
-	Kyle Hendry <kylehendrydev@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: A55B147A08B
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: C1DAC47A136
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281486-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-281487-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TO_DN_NONE(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[broadcom.com,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,arndb.de,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[arjan@linux.intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,arndb.de:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.intel.com:mid,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,ca7a2759caaa6cd4e3db];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	SUBJECT_HAS_QUESTION(0.00)[]
 
-On Mon, Apr 27, 2026 at 4:30=E2=80=AFPM Arnd Bergmann <arnd@kernel.org> wro=
-te:
+This email is created by automation to help kernel developers
+deal with a large volume of AI generated bug reports by decoding
+oopses into more actionable information.
 
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> The MIPS bcm53xx platform still uses the legacy gpiolib interfaces based
-> on gpio numbers, but other platforms do not.
->
-> Hide these interfaces inside of the existing #ifdef block and use the
-> modern interfaces in the common parts of the driver to allow building
-> it when the gpio_set_value() is left out of the kernel.
->
-> Reviewed-by: Jonas Gorski <jonas.gorski@gmail.com>
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Reviewed-by: Linus Walleij <linusw@kernel.org>
+Decoded Backtrace
 
-Yours,
-Linus Walleij
+1. mac80211_hwsim_link_info_changed -- crash site
+   (drivers/net/wireless/virtual/mac80211_hwsim.c:2734)
+
+2701  static void mac80211_hwsim_link_info_changed(struct ieee80211_hw *hw,
+2702  					     struct ieee80211_vif *vif,
+2703  					     struct ieee80211_bss_conf *info,
+2704  					     u64 changed)
+2705  {
+2706  	struct hwsim_vif_priv *vp = (void *)vif->drv_priv;
+2707  	struct mac80211_hwsim_data *data = hw->priv;
+2708  	unsigned int link_id = info->link_id;
+2709  	struct mac80211_hwsim_link_data *link_data = &data->link_data[link_id];
+        ...
+2722  	if (changed & BSS_CHANGED_BEACON_ENABLED) {
+2723  		wiphy_dbg(hw->wiphy, "  BCN EN: %d (BI=%u)\n",
+2724  			  info->enable_beacon, info->beacon_int);
+2725  		vp->bcn_en = info->enable_beacon;
+2726  		if (data->started &&
+2727  		    !hrtimer_active(&link_data->beacon_timer) &&
+2728  		    info->enable_beacon) {
+2729  			u64 tsf, until_tbtt;
+2730  			u32 bcn_int;
+2731  			link_data->beacon_int = info->beacon_int * 1024;
+2732  			tsf = mac80211_hwsim_get_tsf(hw, vif);
+2733  			bcn_int = link_data->beacon_int;
+-> 2734  			until_tbtt = bcn_int - do_div(tsf, bcn_int);  // <- bcn_int=0; RSI=0 -> #DE
+2735
+2736  			hrtimer_start(&link_data->beacon_timer,
+2737  				      ns_to_ktime(until_tbtt * NSEC_PER_USEC),
+2738  				      HRTIMER_MODE_REL_SOFT);
+2739  		} else if (!info->enable_beacon) {
+        ...
+2748  				link_data->beacon_int = 0;
+        ...
+2750  		}
+2751  	}
+
+2. drv_link_info_changed -- (net/mac80211/driver-ops.c:497)
+
+460  void drv_link_info_changed(struct ieee80211_local *local,
+461  			   struct ieee80211_sub_if_data *sdata,
+462  			   struct ieee80211_bss_conf *info,
+463  			   int link_id, u64 changed)
+464  {
+        ...
+493  	trace_drv_link_info_changed(local, sdata, info, changed);
+494  	if (local->ops->link_info_changed)
+495  		local->ops->link_info_changed(&local->hw, &sdata->vif,
+496  					      info, changed);
+-> 497  	else if (local->ops->bss_info_changed)
+498  		local->ops->bss_info_changed(&local->hw, &sdata->vif,
+499  					     info, changed);
+500  	trace_drv_return_void(local);
+501  }
+
+3. ieee80211_offchannel_return -- (net/mac80211/offchannel.c:160)
+
+133  void ieee80211_offchannel_return(struct ieee80211_local *local)
+134  {
+135  	struct ieee80211_sub_if_data *sdata;
+136
+137  	lockdep_assert_wiphy(local->hw.wiphy);
+        ...
+142  	list_for_each_entry(sdata, &local->interfaces, list) {
+        ...
+157  		if (test_and_clear_bit(SDATA_STATE_OFFCHANNEL_BEACON_STOPPED,
+158  				       &sdata->state)) {
+159  			sdata->vif.bss_conf.enable_beacon = true;
+-> 160  			ieee80211_link_info_change_notify(
+161  				sdata, &sdata->deflink,
+162  				BSS_CHANGED_BEACON_ENABLED);
+163  		}
+164  	}
+
+4. __ieee80211_scan_completed -- (net/mac80211/scan.c:519)
+
+516  	if (!hw_scan && was_scanning) {
+517  		ieee80211_configure_filter(local);
+518  		drv_sw_scan_complete(local, scan_sdata);
+-> 519  		ieee80211_offchannel_return(local);
+520  	}
+
+5. cfg80211_wiphy_work -- (net/wireless/core.c:513)
+   (workqueue dispatch point for scan completion)
+
+
+Tentative Analysis
+
+When a software scan completes, __ieee80211_scan_completed calls
+ieee80211_offchannel_return, which iterates active interfaces and
+re-enables beaconing for any interface that had its beacon stopped
+during the scan. It sets bss_conf.enable_beacon = true and issues
+a BSS_CHANGED_BEACON_ENABLED notification, but does NOT update
+bss_conf.beacon_int.
+
+This notification reaches mac80211_hwsim_link_info_changed. The
+condition at lines 2726-2728 (data->started, timer not active,
+enable_beacon) is satisfied, so the function enters the beacon
+timer setup block at line 2731. It sets link_data->beacon_int =
+info->beacon_int * 1024. When info->beacon_int is zero -- which
+syzbot achieved by creating an AP interface with beacon_int=0 --
+this produces link_data->beacon_int = 0 and bcn_int = 0 (line
+2733). The subsequent do_div(tsf, bcn_int) with a zero divisor
+triggers the x86 #DE (divide error) exception (RSI = 0, as
+confirmed by the register dump).
+
+An identical do_div(tsf, bcn_int) expression in
+mac80211_hwsim_config (mac80211_hwsim.c:2635) is protected by a
+guard: "if (!data->started || !link_data->beacon_int)" -- this
+guard is absent from the BSS_CHANGED_BEACON_ENABLED path.
+
+
+Potential Solution
+
+Add a zero check for bcn_int immediately after it is loaded from
+link_data->beacon_int (line 2733), before the do_div call. A
+beacon interval of zero is invalid; when encountered, return
+without starting the timer:
+
+    bcn_int = link_data->beacon_int;
+    if (!bcn_int)
+        return;
+    until_tbtt = bcn_int - do_div(tsf, bcn_int);
+
+This mirrors the guard already present in mac80211_hwsim_config
+for the same expression. The Fixes tag for the commit would be:
+
+    Fixes: c51f878379b1 ("mac80211_hwsim: fix beacon timing")
+
+
+More information
+
+Oops-Analysis: http://oops.fenrus.org/reports/lkml/69efb8dd.050a0220.18b4f.0006.GAE_google.com/
+Assisted-by: Copilot:claude-sonnet-4.6 linux-kernel-oops-x86.
 
