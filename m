@@ -1,215 +1,176 @@
-Return-Path: <netdev+bounces-281393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281394-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sAv9Ge5572kmBwEAu9opvQ
-	(envelope-from <netdev+bounces-281393-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:59:58 +0200
+	id aDSpAOWA72moBwEAu9opvQ
+	(envelope-from <netdev+bounces-281394-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 17:29:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0E96474CC8
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:59:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4084C47530E
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 17:29:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9D247305E2DD
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 14:55:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 440773022632
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 15:18:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8CB83A7F55;
-	Mon, 27 Apr 2026 14:55:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7040733123F;
+	Mon, 27 Apr 2026 15:18:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FYpZK5Qn";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="AglcN+tI";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FYpZK5Qn";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="AglcN+tI"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="urpxGyNL";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Seb0oU1H"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E822FE060
-	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 14:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B51330649;
+	Mon, 27 Apr 2026 15:18:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777301710; cv=none; b=S3AJougKLCBUybqn48cIAqIcfrSZLpO3HYl2ZgKJL6IF33UA82nIUAvf/oaJv6WX+/SSfEixDRD9jkKin9q4+u/Foyaqnmel5dom+4HPlSYskC8B910EKASC0nFk0WW74chY3cdEEDMGpuuQLy2wb4hT663oCj6uiki6b1utjFw=
+	t=1777303087; cv=none; b=tzDeo3M29ztb+6NpSWzxN5F1veJUNaE18XSpzPreb/O6EGcKUs4jvx7bR5uZcfguJWmaH9qZ/Vf19MYHtUKogzjRE978kRc48/+NpFA1onkX2chD9GJxYAIRa9SHfzqzgXr3idcPc7Ur7lDT4wP5PQEt9S73d96ZPc34TigIpFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777301710; c=relaxed/simple;
-	bh=maiQCo2pd6oEY4KL+KoezrB8LhVhRD/jO8Z/2oZgWFY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=OUB8eRA0H2lODW0x1bCOLLMAER9TmBPAvoniIA42X8ApaO35vnFRhyYE8hGTP1c5B19rOTprS7RPPrp1g12zrpqWOJu6wYyi1Py3ru3CJGEDjaeicCYoCLfh5XN+yuSjxEfvNFGu0tA0hte4FV4GG9y0AyarhBAuJZQiRvqrS6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FYpZK5Qn; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=AglcN+tI; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FYpZK5Qn; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=AglcN+tI; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 221AD6A89C;
-	Mon, 27 Apr 2026 14:55:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1777301707; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HtmRvUM3l7Tv+HOfvCFWieqqSlQ69RarAZQb9FX5flg=;
-	b=FYpZK5Qn3V96SwofixbCfDje5Axs3aZfS7Xg7fYMVmlQuZvbR136DuAXeozLIA4TUCExOh
-	7SqzZQJHQpUMqqOnWAEmAQahe2QatlVEDtieCZxKi2D01CTfiC2FXZAwBXHd7uIDJtew7W
-	fwwXfK1/pmMtIF3aPyTZZ80nXUjtr/o=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1777301707;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HtmRvUM3l7Tv+HOfvCFWieqqSlQ69RarAZQb9FX5flg=;
-	b=AglcN+tITejzYhWTF9NBEqeRpeNTS1K63PlodMZQajDDHh30iV0jUw3DARbwNZ2buFcUbY
-	6fyUU+NoSOASZkDA==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=FYpZK5Qn;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=AglcN+tI
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1777301707; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HtmRvUM3l7Tv+HOfvCFWieqqSlQ69RarAZQb9FX5flg=;
-	b=FYpZK5Qn3V96SwofixbCfDje5Axs3aZfS7Xg7fYMVmlQuZvbR136DuAXeozLIA4TUCExOh
-	7SqzZQJHQpUMqqOnWAEmAQahe2QatlVEDtieCZxKi2D01CTfiC2FXZAwBXHd7uIDJtew7W
-	fwwXfK1/pmMtIF3aPyTZZ80nXUjtr/o=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1777301707;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HtmRvUM3l7Tv+HOfvCFWieqqSlQ69RarAZQb9FX5flg=;
-	b=AglcN+tITejzYhWTF9NBEqeRpeNTS1K63PlodMZQajDDHh30iV0jUw3DARbwNZ2buFcUbY
-	6fyUU+NoSOASZkDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id EE038593B0;
-	Mon, 27 Apr 2026 14:55:06 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id oTw+N8p472mGMQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Mon, 27 Apr 2026 14:55:06 +0000
-Message-ID: <8d648645-0352-4657-9cf0-c39a5cdc13ee@suse.de>
-Date: Mon, 27 Apr 2026 16:55:00 +0200
+	s=arc-20240116; t=1777303087; c=relaxed/simple;
+	bh=T5XnkGRAYWWNEx8qLlTAVkCmcLueRVg4qlTxLgiNMu4=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=IzphD/cYXNNjByCAujiOc7Bc5PykHI0HzPyvwwuOg2JdEOKlIBx5McyYuyPMvI5sUuCgETevu8mTGc2nF/xfZbDYMBfK4S+226og4fdw1ir7Z1KAX+0zbidqjgOiu3mI8Ngjj3mUr1iS4FuCz1hBCDQv+4RI+LOe6YPFosNdi6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=urpxGyNL; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Seb0oU1H; arc=none smtp.client-ip=103.168.172.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.phl.internal (Postfix) with ESMTP id F1657EC0266;
+	Mon, 27 Apr 2026 11:18:04 -0400 (EDT)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-04.internal (MEProxy); Mon, 27 Apr 2026 11:18:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1777303084;
+	 x=1777389484; bh=hYaRI0SZPudNmDi+HcLT6SMoYtUdnCImkMZqOGOuwVU=; b=
+	urpxGyNLaw3xhjYZ1L2ak1EMQ8L5kfMuAtqFyNeVZfOrwo4BMKpJybxOAqA0XhrM
+	zMyyAIdhXOzVcpjY4Ge4eUIIihf72sqMfpek2v0jxf99c6FR6RQDvtS6NEv44B76
+	+I3eXWF1PxLE2ctZ766VhcSnKvtqHl3i4OCoBaMS9GHHiyFcZr9G7P8tO0z7w+a7
+	kwKmishaXE1MVXS5/lD0dnp1Yh8zwhltPgCZMuRxs1pj9TsuqKYadz9g15n91DOM
+	56vSvCqwAjgFDsKWPWM7ga1QIVUqcjzR5L9bI8bp6mZC7lB/OR9yvmPF66s7KkGv
+	6RmxMk1y9s6l5+slnKoWCw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1777303084; x=
+	1777389484; bh=hYaRI0SZPudNmDi+HcLT6SMoYtUdnCImkMZqOGOuwVU=; b=S
+	eb0oU1HBqBNiu7vcT0Za+Oj7MfhwBtnKaCzUoH4ZIJxc/VRBuzoS4sCnzlaBs3to
+	r4JgTuZwbgvzZbDPIf2DudIvM+iuXz+6b9HQH0szD56ytd1HsvdRdhkms45mbT8y
+	rAvm9+PeUAP597Fv2Gh/l0/QIuS1Q56Gj6bJ1rFrb6Ivf8zD0V7/kzfd6AsdxL9M
+	Dd4xV4njDd+FbMfS0HOTSlcth996i7ddawnvMMmhQ4EbWUbezUgcQdycHQwzkn1j
+	xEbB8JfT4uEobo+vAEL89pAkblTp90HzbRU+Y5lYzyK1QE8/CDcZAqhxAX3VHkRf
+	HPh1c7JvsEbJ+yxVUxt8w==
+X-ME-Sender: <xms:LH7vaT30mNlPc8k6Cng2HK-BYht7yOcNa-qb8E7M5VH2PIBfmuy1vQ>
+    <xme:LH7vac6fWfsSNjA-nNNcWcM8po51DjDfV6PRzMQnLO65T7xq-miOZL5KNvdhrRZ1s
+    43CEAt4ld4EdFoQMsPYE-g5n_aITY0-HPThxaUZdFNeoRbq8B2W8Pc>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdejledtfecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdetrhhnugcu
+    uegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtthgvrh
+    hnpefhtdfhvddtfeehudekteeggffghfejgeegteefgffgvedugeduveelvdekhfdvieen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnug
+    esrghrnhgusgdruggvpdhnsggprhgtphhtthhopeduiedpmhhouggvpehsmhhtphhouhht
+    pdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhope
+    gvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoheprghrnhgusehkvghr
+    nhgvlhdrohhrghdprhgtphhtthhopegsrhhglheskhgvrhhnvghlrdhorhhgpdhrtghpth
+    htoheptghonhhorhdoughtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkrhiikhdo
+    ughtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorh
+    hgpdhrtghpthhtoheplhhinhhushifsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehr
+    ohgshheskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:LH7vaZ4tyWlV4nb0qrtVIWk1Q9mLdZTuOum2j8EBpJX1cyQgFyxqBA>
+    <xmx:LH7vaQSssqy_Krxa6I2p1stX4UIrJEkhl90EpQWN8srFnuaKI5oA7Q>
+    <xmx:LH7vaY8TTuox_2cqZhf1SEbbGo3nLaBq1Fz95YhehXNoFXsMg7LcPQ>
+    <xmx:LH7vaRpM3S5-mEp1vmkbZL0eElgoKnn4gCjORGtcbL36Y4YxACfsyw>
+    <xmx:LH7vaZejMoqI0NTe_McnHrYqmHBEn7cSoJS82ald1iBNwj3kv2O5hZQo>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 7E48D700065; Mon, 27 Apr 2026 11:18:04 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [BUG] some temporary IPv6 address don't get regenerated
-To: =?UTF-8?Q?=C5=81ukasz_Stelmach?= <steelman@post.pl>,
- netdev@vger.kernel.org
-References: <87340td30q.fsf%steelman@post.pl>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <87340td30q.fsf%steelman@post.pl>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Spam-Level: 
-X-Rspamd-Queue-Id: C0E96474CC8
+X-ThreadId: A5-Su42ZZeGF
+Date: Mon, 27 Apr 2026 17:17:24 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Rob Herring" <robh@kernel.org>, "Arnd Bergmann" <arnd@kernel.org>
+Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>,
+ "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
+ "Conor Dooley" <conor+dt@kernel.org>, "Linus Walleij" <linusw@kernel.org>,
+ "Bartosz Golaszewski" <brgl@kernel.org>,
+ "Marco Crivellari" <marco.crivellari@suse.com>,
+ Netdev <netdev@vger.kernel.org>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>
+Message-Id: <57297b41-0f08-43eb-a73c-21a5461a4eb4@app.fastmail.com>
+In-Reply-To: <20260427145010.GA2502144-robh@kernel.org>
+References: <20260427142924.2702598-1-arnd@kernel.org>
+ <20260427145010.GA2502144-robh@kernel.org>
+Subject: Re: [PATCH] [v4] wiznet: convert to GPIO descriptors
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 4084C47530E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.65 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DMARC_POLICY_ALLOW(-0.50)[arndb.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[arndb.de:s=fm2,messagingengine.com:s=fm2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-281393-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWO(0.00)[2];
+	XM_UA_NO_VERSION(0.01)[];
+	TAGGED_FROM(0.00)[bounces-281394-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[arnd@arndb.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[arndb.de:+,messagingengine.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,arndb.de:dkim,messagingengine.com:dkim]
 
-On 4/17/26 5:23 PM, Łukasz Stelmach wrote:
-> Hi,
-> 
-> Apparently, something in addrconf.c can go wrong and a temporary
-> addresses may not get regenerated leaving users who wish to use them
-> with only the stable ones. Below, 2a01:110f:4321:1002:abcc:78d7:2055:94ec
-> while still valid is not preferred anymore. Even if it's not the only
-> global temporary address it is the only usable to contact hosts on the
-> Internet because the other temporary addresses are ULA.
-> 
+On Mon, Apr 27, 2026, at 16:50, Rob Herring wrote:
+> On Mon, Apr 27, 2026 at 04:28:29PM +0200, Arnd Bergmann wrote:
+>> 
+>> The CONFIG_WIZNET_BUS_SHIFT value was apparently meant to be set
+>> at compile time to a machine specific value. This was always broken
+>> for multiplatform configurations with conflicting requirements, and
+>> in the mainline kernel it was set to 0 anyway. Leave it defined
+>> locally as 0 but rename it to something without the CONFIG_ prefix.
+>> 
+>> Acked-by: Rob Herring <robh@kernel.org>
+>
+> Well, 3 years later and I'm a bit grumpier seeing .txt binding 
+> additions. A new compatible plus new property we generally require 
+> converting the binding first. But I'm not going to revoke my ack here.
+>
+> Is there even a known user for this new compatible?
 
-Hi,
+No, I'm not aware of any users neither the old nor the new
+compatible, it only popped up from my backlog of patches
+because of its usage of legacy GPIOs. From what I can
+tell, the only users of the non-DT MMIO interface were
+out of tree arch/blackfin/ boards.
 
-I managed to reproduce this, it took me quite some time. It looks like a 
-race condition somewhere. I am working on a fix and I will add a 
-selftest covering this too.
-
-Ideally, I will send a fix this week. I am now checking if this was 
-introduced recently or was always broken.
-
-> Neither received RAs nor adding and removing an address manually (one
-> with a different prefix unrelated to these below) which as far as I
-> understand, should trigger address maintenance code.
-> 
-
-Yup, same situation here.
-
-Thanks,
-Fernando.
-
-> I noticed this phenomenon once or twice before. It seems to be very
-> rare, yet quite undesirable I'd say. What might have triggered it today
-> is a reboot of my router and (possible?) change in lifetime values it
-> announced.
-> 
-> Even stranger is that there is a preferred fd89:: (ULA), but not 2a01::.
-> 
-> accept_ra as well as use_tempaddr are set to 2.
-> 
-> Of course, this ma be get fixed by a suspend/resume (no, it may not) or
-> manual ifdown/ifup (of course it helped), but nevertheless I thought it
-> was worth reporting.
-> 
-> --8<---------------cut here---------------start------------->8---
-> 107: bond0: <BROADCAST,MULTICAST,MASTER,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
->      link/ether b8:ca:3a:d4:1e:97 brd ff:ff:ff:ff:ff:ff
->      inet 192.168.2.122/24 brd 192.168.2.255 scope global dynamic bond0
->         valid_lft 165585sec preferred_lft 165585sec
-> 
->      inet6 fd89:82bb:420:2:cab3:d2d6:aeeb:e250/64 scope global temporary dynamic
->         valid_lft 597079sec preferred_lft 78177sec
-> 
->      inet6 2a01:110f:4321:1002:abcc:78d7:2055:94ec/64 scope global temporary deprecated dynamic
->         valid_lft 60815sec preferred_lft 0sec
-> 
->      inet6 2a01:110f:4321:1002:abac:3aff:fed4:beef/64 scope global dynamic mngtmpaddr proto kernel_ra
->         valid_lft 60815sec preferred_lft 60815sec
-> 
->      inet6 fd89:82bb:420:2:24bf:fe8f:5c9c:c753/64 scope global temporary deprecated dynamic
->         valid_lft 511186sec preferred_lft 0sec
-> 
->      inet6 fd89:82bb:420:2:abac:3aff:fed4:beef/64 scope global dynamic mngtmpaddr proto kernel_ra
->         valid_lft 2591805sec preferred_lft 604605sec
-> 
->      inet6 fe80::abac:3aff:fed4:beef/64 scope link proto kernel_ll
->         valid_lft forever preferred_lft forever
-> --8<---------------cut here---------------end--------------->8---
-> 
-
+       Arnd
 
