@@ -1,581 +1,193 @@
-Return-Path: <netdev+bounces-281434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281428-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YMCmJNuc72kbDQEAu9opvQ
-	(envelope-from <netdev+bounces-281434-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 19:28:59 +0200
+	id MLq7E1md72mfDQEAu9opvQ
+	(envelope-from <netdev+bounces-281428-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 19:31:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BA6F47795C
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 19:28:59 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7B53477A3A
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 19:31:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id EC21C3017651
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 17:28:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 09F6F304465C
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 17:27:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 344FC3E63BD;
-	Mon, 27 Apr 2026 17:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YpP4LBmC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E723E3C46;
+	Mon, 27 Apr 2026 17:27:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f80.google.com (mail-oa1-f80.google.com [209.85.160.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F42D3E63B5;
-	Mon, 27 Apr 2026 17:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 939B83E314C
+	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 17:27:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777310873; cv=none; b=OnHREuH5368nH5QLd5y6DYYvp7Bor0wHav31MEOuqSf4Eq0w3x05lhLDEcTLsBu7dCqluTzBAP8MAZZSV1MY9a9wKzUEs6nnEqSSRo6nB2l9rukMDt8omdRg/eOZwGcJEESLEUP8BGGuLpBGNOrnO/LLf3sHFDTbCxSZIYApqiU=
+	t=1777310851; cv=none; b=kWC42o+lHHEg4xyk7CJbvhbDdQb0JEc1hIIb8Kym3nWqI9d4SLzkgiIpe2J9lDcVTFnXEeFvkb39JhPeu1NeQkzVAbIX7WIxGPZvRbOy3QNRRN7c2/ahaEQNiwtB6wCoxs+yxrKDY7zTDgGo4ZbXk5rc5vQqOdtMxj2IR+0W6tY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777310873; c=relaxed/simple;
-	bh=+NrWvMgiVvlEudVsw7+IRDB0fGeSLZsPN3zldOZaqqo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hqfYkNe3yQKUc68tF98RwtR3JZ7jQPfMNyCyfFgNgVaUwhIchg6lR3zX0eW98G/3rHwP1dxQY3IS+qVhvG8M5tzpvlBCbSZcnQeQtnQD9EzaL2PoKzIdHk9fYoB7HjcT6zFSi/p6hzIdfsEqDrKDWODqL6rVJ6pjiW5E+8OgNNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YpP4LBmC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C62AC2BCB9;
-	Mon, 27 Apr 2026 17:27:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777310872;
-	bh=+NrWvMgiVvlEudVsw7+IRDB0fGeSLZsPN3zldOZaqqo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YpP4LBmCGZHspJLD+2JNirRNPwOdffnXFVxWNXDIPBER45CMZ2UxWs8snY6g1jesw
-	 isScPYoccE6JSVmSmF8tz3fnY7TDSZFEpMfQSGMlAe6diHp1OD8OZUI/6f/kSU76Qp
-	 hkG15fppU8+75p5COCMAIBZ1ODj6YRNNY7dIWFbt4gwmjDeGSpzObx+jdlRgFko0A8
-	 xB24qm985vJTyal9g74Bbg8a0AKIZqUPRj0BEdhK/7yhZh6GXn3XX1J5XMLkhuduQG
-	 021P3oYePofglP6vRUsL3ZWqCwuBMiJ/o6Gz+mw+5ITcEmQ/V2b9xaLQGfz0zMf/MC
-	 eVopHRYOeqv4w==
-From: Eric Biggers <ebiggers@kernel.org>
-To: netdev@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Dmitry Safonov <0x7f454c46@gmail.com>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH net-next v2 5/5] net/tcp: Remove tcp_sigpool
-Date: Mon, 27 Apr 2026 10:27:27 -0700
-Message-ID: <20260427172727.9310-6-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260427172727.9310-1-ebiggers@kernel.org>
-References: <20260427172727.9310-1-ebiggers@kernel.org>
+	s=arc-20240116; t=1777310851; c=relaxed/simple;
+	bh=cshR2R8EYWLHnttddvuQPhrhTqxK3mfBoXOPWgeDAtI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=fE3+lWIk8M8IlB79ngd3gPqW1OKcyYMMsOCxbXVimynBLYjUJEG9xVWpMTg86mWEcvzBCf0noEmcpLJgLoZ/NT9gg517Uk0mgOQDt1EPpLJRhNwn9/fgqvag+gn4PvgpI21vMguqlNueH1Sg9QhtiOcfcPYwwR3aWoXCd49He4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oa1-f80.google.com with SMTP id 586e51a60fabf-40ea48ccbd2so5972492fac.3
+        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 10:27:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777310848; x=1777915648;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CYjopPpYaJxYSiyLuTK+YXWn9hsUD1ElXWVwEnYsnlo=;
+        b=UoOaALZBTEqGilYZMKoTmL2NDSeK/GVNZfB5yqumjBn5G7sH2fyekG8qnHePqLgMhk
+         /uEDMQ+7upnZnV2le4cu9UHEGts0M5yr728iebx5wB6hXhwrkaOGDUr1k6OnB4ivOlcE
+         gkOzO2vXNTVvNGozHrCvChiYfkQNAI+hBUghRPcAcCcZaOIEAR3UeG3+G5M6qoP9laBy
+         m/EMr+k8/R0jRrLD7LjSUyi3A7jDjYwzEOwHgbvR0QiHYWQUol3YduBnUKxleMeylx64
+         gsvFOIXiPXxb60W1Vj0mutkfLhCk5GV1bKdHd36j1KjX57JWuJxA26/gahrQ7lWD7TZr
+         R2jA==
+X-Forwarded-Encrypted: i=1; AFNElJ/LX+Lr29K4fMxbP+s9SEF3ctCJBcZyXpqECVPtAmzsnxkSsnbnZYS+YZt+UKPlmL3Up2W9sjk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0xrJpt9/7L0rthyd4zKKb45LqdfVh+7kGlA9y+6arIRamNtoG
+	Vwz73bVHgYtuOTWWEYe9VECBmOYxpeyhB6KVkxd30KO9k9Hcm1rj24LCOhh3GbsLveC/dCv70eM
+	RvtqLkjThrXpb5vUsg7/IhpnFgh93nhrHH0/xu2l0hGfUmvBYLuCsB5ZbE+I=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 7BA6F47795C
+X-Received: by 2002:a05:6820:1987:b0:696:21ad:a4f0 with SMTP id
+ 006d021491bc7-69621ada98fmr10066287eaf.36.1777310848618; Mon, 27 Apr 2026
+ 10:27:28 -0700 (PDT)
+Date: Mon, 27 Apr 2026 10:27:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69ef9c80.050a0220.18b4f.0005.GAE@google.com>
+Subject: [syzbot] [lvs?] UBSAN: shift-out-of-bounds in ip_vs_rht_desired_size
+From: syzbot <syzbot+217f1db9c791e27fe54a@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	fw@strlen.de, horms@verge.net.au, ja@ssi.bg, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, lvs-devel@vger.kernel.org, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
+	pablo@netfilter.org, phil@nwl.cc, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: C7B53477A3A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=ca77bfc4078c8193];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,davemloft.net,kernel.org,redhat.com,zx2c4.com,gondor.apana.org.au,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-281434-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-281428-lists,netdev=lfdr.de,217f1db9c791e27fe54a];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ebiggers@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,googlegroups.com:email,storage.googleapis.com:url,syzkaller.appspot.com:url,goo.gl:url]
 
-tcp_sigpool is no longer used.  It existed only as a workaround for
-issues in the design of the crypto_ahash API, which have been avoided by
-switching to the much easier-to-use library APIs instead.  Remove it.
+Hello,
 
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+syzbot found the following issue on:
+
+HEAD commit:    e728258debd5 Merge tag 'net-7.1-rc1' of git://git.kernel.o..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=169022ce580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ca77bfc4078c8193
+dashboard link: https://syzkaller.appspot.com/bug?extid=217f1db9c791e27fe54a
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/24195bde5d1d/disk-e728258d.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/78131d1b0e14/vmlinux-e728258d.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/836d0dd78c10/bzImage-e728258d.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+217f1db9c791e27fe54a@syzkaller.appspotmail.com
+
+wlan0: No active IBSS STAs - trying to scan for other IBSS networks with same SSID (merge)
+------------[ cut here ]------------
+UBSAN: shift-out-of-bounds in ./include/linux/log2.h:57:13
+shift exponent 64 is too large for 64-bit type 'unsigned long'
+CPU: 1 UID: 0 PID: 77 Comm: kworker/u8:4 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+Workqueue: events_unbound conn_resize_work_handler
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ ubsan_epilogue+0xa/0x30 lib/ubsan.c:233
+ __ubsan_handle_shift_out_of_bounds+0x385/0x410 lib/ubsan.c:494
+ __roundup_pow_of_two include/linux/log2.h:57 [inline]
+ ip_vs_rht_desired_size+0x2cf/0x410 net/netfilter/ipvs/ip_vs_core.c:240
+ ip_vs_conn_desired_size net/netfilter/ipvs/ip_vs_conn.c:765 [inline]
+ conn_resize_work_handler+0x1b6/0x14c0 net/netfilter/ipvs/ip_vs_conn.c:822
+ process_one_work kernel/workqueue.c:3302 [inline]
+ process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3385
+ worker_thread+0xa53/0xfc0 kernel/workqueue.c:3466
+ kthread+0x388/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+---[ end trace ]---
+Kernel panic - not syncing: UBSAN: panic_on_warn set ...
+CPU: 1 UID: 0 PID: 77 Comm: kworker/u8:4 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+Workqueue: events_unbound conn_resize_work_handler
+Call Trace:
+ <TASK>
+ vpanic+0x56c/0xa60 kernel/panic.c:650
+ panic+0xc5/0xd0 kernel/panic.c:787
+ check_panic_on_warn+0x89/0xb0 kernel/panic.c:524
+ __ubsan_handle_shift_out_of_bounds+0x385/0x410 lib/ubsan.c:494
+ __roundup_pow_of_two include/linux/log2.h:57 [inline]
+ ip_vs_rht_desired_size+0x2cf/0x410 net/netfilter/ipvs/ip_vs_core.c:240
+ ip_vs_conn_desired_size net/netfilter/ipvs/ip_vs_conn.c:765 [inline]
+ conn_resize_work_handler+0x1b6/0x14c0 net/netfilter/ipvs/ip_vs_conn.c:822
+ process_one_work kernel/workqueue.c:3302 [inline]
+ process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3385
+ worker_thread+0xa53/0xfc0 kernel/workqueue.c:3466
+ kthread+0x388/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+Kernel Offset: disabled
+Rebooting in 86400 seconds..
+
+
 ---
- include/net/tcp.h      |  34 ----
- net/ipv4/Kconfig       |   3 -
- net/ipv4/Makefile      |   1 -
- net/ipv4/tcp_sigpool.c | 366 -----------------------------------------
- 4 files changed, 404 deletions(-)
- delete mode 100644 net/ipv4/tcp_sigpool.c
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 8817e7b8cc67..660ad8c63395 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -2015,44 +2015,10 @@ struct tcp6_pseudohdr {
- 	struct in6_addr daddr;
- 	__be32		len;
- 	__be32		protocol;	/* including padding */
- };
- 
--/*
-- * struct tcp_sigpool - per-CPU pool of ahash_requests
-- * @scratch: per-CPU temporary area, that can be used between
-- *	     tcp_sigpool_start() and tcp_sigpool_end() to perform
-- *	     crypto request
-- * @req: pre-allocated ahash request
-- */
--struct tcp_sigpool {
--	void *scratch;
--	struct ahash_request *req;
--};
--
--int tcp_sigpool_alloc_ahash(const char *alg, size_t scratch_size);
--void tcp_sigpool_get(unsigned int id);
--void tcp_sigpool_release(unsigned int id);
--int tcp_sigpool_hash_skb_data(struct tcp_sigpool *hp,
--			      const struct sk_buff *skb,
--			      unsigned int header_len);
--
--/**
-- * tcp_sigpool_start - disable bh and start using tcp_sigpool_ahash
-- * @id: tcp_sigpool that was previously allocated by tcp_sigpool_alloc_ahash()
-- * @c: returned tcp_sigpool for usage (uninitialized on failure)
-- *
-- * Returns: 0 on success, error otherwise.
-- */
--int tcp_sigpool_start(unsigned int id, struct tcp_sigpool *c);
--/**
-- * tcp_sigpool_end - enable bh and stop using tcp_sigpool
-- * @c: tcp_sigpool context that was returned by tcp_sigpool_start()
-- */
--void tcp_sigpool_end(struct tcp_sigpool *c);
--size_t tcp_sigpool_algo(unsigned int id, char *buf, size_t buf_len);
--/* - functions */
- void tcp_v4_md5_hash_skb(char *md5_hash, const struct tcp_md5sig_key *key,
- 			 const struct sock *sk, const struct sk_buff *skb);
- int tcp_md5_do_add(struct sock *sk, const union tcp_md5_addr *addr,
- 		   int family, u8 prefixlen, int l3index, u8 flags,
- 		   const u8 *newkey, u8 newkeylen);
-diff --git a/net/ipv4/Kconfig b/net/ipv4/Kconfig
-index 77b053b445a0..301b47660305 100644
---- a/net/ipv4/Kconfig
-+++ b/net/ipv4/Kconfig
-@@ -739,13 +739,10 @@ config DEFAULT_TCP_CONG
- 	default "dctcp" if DEFAULT_DCTCP
- 	default "cdg" if DEFAULT_CDG
- 	default "bbr" if DEFAULT_BBR
- 	default "cubic"
- 
--config TCP_SIGPOOL
--	tristate
--
- config TCP_AO
- 	bool "TCP: Authentication Option (RFC5925)"
- 	select CRYPTO_LIB_AES_CBC_MACS
- 	select CRYPTO_LIB_SHA1
- 	select CRYPTO_LIB_SHA256
-diff --git a/net/ipv4/Makefile b/net/ipv4/Makefile
-index 7f9f98813986..7964234f0d08 100644
---- a/net/ipv4/Makefile
-+++ b/net/ipv4/Makefile
-@@ -58,11 +58,10 @@ obj-$(CONFIG_TCP_CONG_NV) += tcp_nv.o
- obj-$(CONFIG_TCP_CONG_VENO) += tcp_veno.o
- obj-$(CONFIG_TCP_CONG_SCALABLE) += tcp_scalable.o
- obj-$(CONFIG_TCP_CONG_LP) += tcp_lp.o
- obj-$(CONFIG_TCP_CONG_YEAH) += tcp_yeah.o
- obj-$(CONFIG_TCP_CONG_ILLINOIS) += tcp_illinois.o
--obj-$(CONFIG_TCP_SIGPOOL) += tcp_sigpool.o
- obj-$(CONFIG_NET_SOCK_MSG) += tcp_bpf.o
- obj-$(CONFIG_BPF_SYSCALL) += udp_bpf.o
- obj-$(CONFIG_NETLABEL) += cipso_ipv4.o
- 
- obj-$(CONFIG_XFRM) += xfrm4_policy.o xfrm4_state.o xfrm4_input.o \
-diff --git a/net/ipv4/tcp_sigpool.c b/net/ipv4/tcp_sigpool.c
-deleted file mode 100644
-index 10b2e5970c40..000000000000
---- a/net/ipv4/tcp_sigpool.c
-+++ /dev/null
-@@ -1,366 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
--
--#include <crypto/hash.h>
--#include <linux/cpu.h>
--#include <linux/kref.h>
--#include <linux/module.h>
--#include <linux/mutex.h>
--#include <linux/percpu.h>
--#include <linux/workqueue.h>
--#include <net/tcp.h>
--
--static size_t __scratch_size;
--struct sigpool_scratch {
--	local_lock_t bh_lock;
--	void __rcu *pad;
--};
--
--static DEFINE_PER_CPU(struct sigpool_scratch, sigpool_scratch) = {
--	.bh_lock = INIT_LOCAL_LOCK(bh_lock),
--};
--
--struct sigpool_entry {
--	struct crypto_ahash	*hash;
--	const char		*alg;
--	struct kref		kref;
--	uint16_t		needs_key:1,
--				reserved:15;
--};
--
--#define CPOOL_SIZE (PAGE_SIZE / sizeof(struct sigpool_entry))
--static struct sigpool_entry cpool[CPOOL_SIZE];
--static unsigned int cpool_populated;
--static DEFINE_MUTEX(cpool_mutex);
--
--/* Slow-path */
--struct scratches_to_free {
--	struct rcu_head rcu;
--	unsigned int cnt;
--	void *scratches[];
--};
--
--static void free_old_scratches(struct rcu_head *head)
--{
--	struct scratches_to_free *stf;
--
--	stf = container_of(head, struct scratches_to_free, rcu);
--	while (stf->cnt--)
--		kfree(stf->scratches[stf->cnt]);
--	kfree(stf);
--}
--
--/**
-- * sigpool_reserve_scratch - re-allocates scratch buffer, slow-path
-- * @size: request size for the scratch/temp buffer
-- */
--static int sigpool_reserve_scratch(size_t size)
--{
--	struct scratches_to_free *stf;
--	size_t stf_sz = struct_size(stf, scratches, num_possible_cpus());
--	int cpu, err = 0;
--
--	lockdep_assert_held(&cpool_mutex);
--	if (__scratch_size >= size)
--		return 0;
--
--	stf = kmalloc(stf_sz, GFP_KERNEL);
--	if (!stf)
--		return -ENOMEM;
--	stf->cnt = 0;
--
--	size = max(size, __scratch_size);
--	cpus_read_lock();
--	for_each_possible_cpu(cpu) {
--		void *scratch, *old_scratch;
--
--		scratch = kmalloc_node(size, GFP_KERNEL, cpu_to_node(cpu));
--		if (!scratch) {
--			err = -ENOMEM;
--			break;
--		}
--
--		old_scratch = rcu_replace_pointer(per_cpu(sigpool_scratch.pad, cpu),
--					scratch, lockdep_is_held(&cpool_mutex));
--		if (!cpu_online(cpu) || !old_scratch) {
--			kfree(old_scratch);
--			continue;
--		}
--		stf->scratches[stf->cnt++] = old_scratch;
--	}
--	cpus_read_unlock();
--	if (!err)
--		__scratch_size = size;
--
--	call_rcu(&stf->rcu, free_old_scratches);
--	return err;
--}
--
--static void sigpool_scratch_free(void)
--{
--	int cpu;
--
--	for_each_possible_cpu(cpu)
--		kfree(rcu_replace_pointer(per_cpu(sigpool_scratch.pad, cpu),
--					  NULL, lockdep_is_held(&cpool_mutex)));
--	__scratch_size = 0;
--}
--
--static int __cpool_try_clone(struct crypto_ahash *hash)
--{
--	struct crypto_ahash *tmp;
--
--	tmp = crypto_clone_ahash(hash);
--	if (IS_ERR(tmp))
--		return PTR_ERR(tmp);
--
--	crypto_free_ahash(tmp);
--	return 0;
--}
--
--static int __cpool_alloc_ahash(struct sigpool_entry *e, const char *alg)
--{
--	struct crypto_ahash *cpu0_hash;
--	int ret;
--
--	e->alg = kstrdup(alg, GFP_KERNEL);
--	if (!e->alg)
--		return -ENOMEM;
--
--	cpu0_hash = crypto_alloc_ahash(alg, 0, CRYPTO_ALG_ASYNC);
--	if (IS_ERR(cpu0_hash)) {
--		ret = PTR_ERR(cpu0_hash);
--		goto out_free_alg;
--	}
--
--	e->needs_key = crypto_ahash_get_flags(cpu0_hash) & CRYPTO_TFM_NEED_KEY;
--
--	ret = __cpool_try_clone(cpu0_hash);
--	if (ret)
--		goto out_free_cpu0_hash;
--	e->hash = cpu0_hash;
--	kref_init(&e->kref);
--	return 0;
--
--out_free_cpu0_hash:
--	crypto_free_ahash(cpu0_hash);
--out_free_alg:
--	kfree(e->alg);
--	e->alg = NULL;
--	return ret;
--}
--
--/**
-- * tcp_sigpool_alloc_ahash - allocates pool for ahash requests
-- * @alg: name of async hash algorithm
-- * @scratch_size: reserve a tcp_sigpool::scratch buffer of this size
-- */
--int tcp_sigpool_alloc_ahash(const char *alg, size_t scratch_size)
--{
--	int i, ret;
--
--	/* slow-path */
--	mutex_lock(&cpool_mutex);
--	ret = sigpool_reserve_scratch(scratch_size);
--	if (ret)
--		goto out;
--	for (i = 0; i < cpool_populated; i++) {
--		if (!cpool[i].alg)
--			continue;
--		if (strcmp(cpool[i].alg, alg))
--			continue;
--
--		/* pairs with tcp_sigpool_release() */
--		if (!kref_get_unless_zero(&cpool[i].kref))
--			kref_init(&cpool[i].kref);
--		ret = i;
--		goto out;
--	}
--
--	for (i = 0; i < cpool_populated; i++) {
--		if (!cpool[i].alg)
--			break;
--	}
--	if (i >= CPOOL_SIZE) {
--		ret = -ENOSPC;
--		goto out;
--	}
--
--	ret = __cpool_alloc_ahash(&cpool[i], alg);
--	if (!ret) {
--		ret = i;
--		if (i == cpool_populated)
--			cpool_populated++;
--	}
--out:
--	mutex_unlock(&cpool_mutex);
--	return ret;
--}
--EXPORT_SYMBOL_GPL(tcp_sigpool_alloc_ahash);
--
--static void __cpool_free_entry(struct sigpool_entry *e)
--{
--	crypto_free_ahash(e->hash);
--	kfree(e->alg);
--	memset(e, 0, sizeof(*e));
--}
--
--static void cpool_cleanup_work_cb(struct work_struct *work)
--{
--	bool free_scratch = true;
--	unsigned int i;
--
--	mutex_lock(&cpool_mutex);
--	for (i = 0; i < cpool_populated; i++) {
--		if (kref_read(&cpool[i].kref) > 0) {
--			free_scratch = false;
--			continue;
--		}
--		if (!cpool[i].alg)
--			continue;
--		__cpool_free_entry(&cpool[i]);
--	}
--	if (free_scratch)
--		sigpool_scratch_free();
--	mutex_unlock(&cpool_mutex);
--}
--
--static DECLARE_WORK(cpool_cleanup_work, cpool_cleanup_work_cb);
--static void cpool_schedule_cleanup(struct kref *kref)
--{
--	schedule_work(&cpool_cleanup_work);
--}
--
--/**
-- * tcp_sigpool_release - decreases number of users for a pool. If it was
-- * the last user of the pool, releases any memory that was consumed.
-- * @id: tcp_sigpool that was previously allocated by tcp_sigpool_alloc_ahash()
-- */
--void tcp_sigpool_release(unsigned int id)
--{
--	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg))
--		return;
--
--	/* slow-path */
--	kref_put(&cpool[id].kref, cpool_schedule_cleanup);
--}
--EXPORT_SYMBOL_GPL(tcp_sigpool_release);
--
--/**
-- * tcp_sigpool_get - increases number of users (refcounter) for a pool
-- * @id: tcp_sigpool that was previously allocated by tcp_sigpool_alloc_ahash()
-- */
--void tcp_sigpool_get(unsigned int id)
--{
--	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg))
--		return;
--	kref_get(&cpool[id].kref);
--}
--EXPORT_SYMBOL_GPL(tcp_sigpool_get);
--
--int tcp_sigpool_start(unsigned int id, struct tcp_sigpool *c) __cond_acquires(0, RCU_BH)
--{
--	struct crypto_ahash *hash;
--
--	rcu_read_lock_bh();
--	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg)) {
--		rcu_read_unlock_bh();
--		return -EINVAL;
--	}
--
--	hash = crypto_clone_ahash(cpool[id].hash);
--	if (IS_ERR(hash)) {
--		rcu_read_unlock_bh();
--		return PTR_ERR(hash);
--	}
--
--	c->req = ahash_request_alloc(hash, GFP_ATOMIC);
--	if (!c->req) {
--		crypto_free_ahash(hash);
--		rcu_read_unlock_bh();
--		return -ENOMEM;
--	}
--	ahash_request_set_callback(c->req, 0, NULL, NULL);
--
--	/* Pairs with tcp_sigpool_reserve_scratch(), scratch area is
--	 * valid (allocated) until tcp_sigpool_end().
--	 */
--	local_lock_nested_bh(&sigpool_scratch.bh_lock);
--	c->scratch = rcu_dereference_bh(*this_cpu_ptr(&sigpool_scratch.pad));
--	return 0;
--}
--EXPORT_SYMBOL_GPL(tcp_sigpool_start);
--
--void tcp_sigpool_end(struct tcp_sigpool *c) __releases(RCU_BH)
--{
--	struct crypto_ahash *hash = crypto_ahash_reqtfm(c->req);
--
--	local_unlock_nested_bh(&sigpool_scratch.bh_lock);
--	rcu_read_unlock_bh();
--	ahash_request_free(c->req);
--	crypto_free_ahash(hash);
--}
--EXPORT_SYMBOL_GPL(tcp_sigpool_end);
--
--/**
-- * tcp_sigpool_algo - return algorithm of tcp_sigpool
-- * @id: tcp_sigpool that was previously allocated by tcp_sigpool_alloc_ahash()
-- * @buf: buffer to return name of algorithm
-- * @buf_len: size of @buf
-- */
--size_t tcp_sigpool_algo(unsigned int id, char *buf, size_t buf_len)
--{
--	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg))
--		return -EINVAL;
--
--	return strscpy(buf, cpool[id].alg, buf_len);
--}
--EXPORT_SYMBOL_GPL(tcp_sigpool_algo);
--
--/**
-- * tcp_sigpool_hash_skb_data - hash data in skb with initialized tcp_sigpool
-- * @hp: tcp_sigpool pointer
-- * @skb: buffer to add sign for
-- * @header_len: TCP header length for this segment
-- */
--int tcp_sigpool_hash_skb_data(struct tcp_sigpool *hp,
--			      const struct sk_buff *skb,
--			      unsigned int header_len)
--{
--	const unsigned int head_data_len = skb_headlen(skb) > header_len ?
--					   skb_headlen(skb) - header_len : 0;
--	const struct skb_shared_info *shi = skb_shinfo(skb);
--	const struct tcphdr *tp = tcp_hdr(skb);
--	struct ahash_request *req = hp->req;
--	struct sk_buff *frag_iter;
--	struct scatterlist sg;
--	unsigned int i;
--
--	sg_init_table(&sg, 1);
--
--	sg_set_buf(&sg, ((u8 *)tp) + header_len, head_data_len);
--	ahash_request_set_crypt(req, &sg, NULL, head_data_len);
--	if (crypto_ahash_update(req))
--		return 1;
--
--	for (i = 0; i < shi->nr_frags; ++i) {
--		const skb_frag_t *f = &shi->frags[i];
--		unsigned int offset = skb_frag_off(f);
--		struct page *page;
--
--		page = skb_frag_page(f) + (offset >> PAGE_SHIFT);
--		sg_set_page(&sg, page, skb_frag_size(f), offset_in_page(offset));
--		ahash_request_set_crypt(req, &sg, NULL, skb_frag_size(f));
--		if (crypto_ahash_update(req))
--			return 1;
--	}
--
--	skb_walk_frags(skb, frag_iter)
--		if (tcp_sigpool_hash_skb_data(hp, frag_iter, 0))
--			return 1;
--
--	return 0;
--}
--EXPORT_SYMBOL(tcp_sigpool_hash_skb_data);
--
--MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("Per-CPU pool of crypto requests");
--- 
-2.54.0
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
