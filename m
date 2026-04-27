@@ -1,65 +1,70 @@
-Return-Path: <netdev+bounces-281390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281391-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cALgOal272mZBgEAu9opvQ
-	(envelope-from <netdev+bounces-281390-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:46:01 +0200
+	id AH2HKJt372mZBgEAu9opvQ
+	(envelope-from <netdev+bounces-281391-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:50:03 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE70B474A3F
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:46:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BBD3474AF1
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 16:50:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2B8AA3011A72
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 14:41:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 010883015892
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 14:48:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16DBE317165;
-	Mon, 27 Apr 2026 14:41:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E93F33793BD;
+	Mon, 27 Apr 2026 14:48:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="csTIdDLz"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="an+CbRDC"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B62CC2FFDEA;
-	Mon, 27 Apr 2026 14:41:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C671FBEB0;
+	Mon, 27 Apr 2026 14:48:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777300873; cv=none; b=baXNCZU9ZOQ5/eC8VoarKHX20nzCalJgx4VHGtpcub9IvC/Y8FUgtesC4mEq0Iq2aKP6fX6XoOgHUZGMo/D1ovNt+pqDib1kVtrsa8mRkft7BFeVZ0rQeRIErkdw3wi1W3Yne+Au1Q6h+YzLybIBMN6fKKxm/p7TaRDDdo+dr0s=
+	t=1777301328; cv=none; b=VTPinHMnigMfl6XwXmygj9bU8625O8obHrVF0u3U0QS+OUAoWpeGwsvmnXjFSuOZfVK0BE8jiVUWpJ9kjMZb0Db3x0lrplcTnGPtKWkuveY+g52QR1Mq5hQ7NCCAkZ7An8izikK+cSnOTyS9Vgh6mbAus44hlHKMrvG+tAgzxQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777300873; c=relaxed/simple;
-	bh=ioUDgHPMl7Xm1/uI6POTPcCuZqtDh6bmNp4MdAuzb5Q=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ReJbqatGXVmVKKQN73ZVC2YqbVrhVnpJkFJaAThJnGVkDCqjzwkJnX/2QC4X4+NK5rePwL+2mHVVt9qEQ4Lm+J+0/RF9kGFl+PDlsrtz/nfBbtH4tCE1qhli+pQrUGBjAh+dQmpFtGs6a85swk4rVvmMyJ6jBGdvEVPy98oqz9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=csTIdDLz; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1204)
-	id D742F20B716A; Mon, 27 Apr 2026 07:41:11 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D742F20B716A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1777300871;
-	bh=1ydId8wXKijO3hYYEvou/zSy628grXYbkuTuuuh3SVU=;
-	h=Date:From:To:Subject:From;
-	b=csTIdDLzK18d/vry1oY7iqYPttyOaNtlf+ofN6xwSKHktch72FoDWco6ASeOLAJvM
-	 DE7XNcltdOGwl+zlZRGlXkkqXDziwesS8EVhp5sqEWrTMLHFf7lgcJYnF4ruVrlutx
-	 0i4AICDqEwBEOwSDyDj74qayDaGfbDBeBbWov/40=
-Date: Mon, 27 Apr 2026 07:41:11 -0700
-From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	leon@kernel.org, longli@microsoft.com, kotaranov@microsoft.com,
-	horms@kernel.org, shradhagupta@linux.microsoft.com,
-	ssengar@linux.microsoft.com, ernis@linux.microsoft.com,
-	shirazsaleem@microsoft.com, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, stephen@networkplumber.org,
-	jacob.e.keller@intel.com, dipayanroy@microsoft.com,
-	leitao@debian.org, kees@kernel.org, john.fastabend@gmail.com,
-	hawk@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net,
-	ast@kernel.org, sdf@fomichev.me, yury.norov@gmail.com
-Subject: [RFC PATCH net-next] net: mana: Force single RX buffer per page
- under SWIOTLB bounce modes
-Message-ID: <ae91hyrLf4n23XE6@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	s=arc-20240116; t=1777301328; c=relaxed/simple;
+	bh=xELjnsD2nntviaMuLAcUvc9vtT3nPDW/+I9+DmI4Gxg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=su0ffDxZMUpYFmrMW/y/zArDN87H4AKpRhVdqXXlufsn7xDW83Njxm2sicdAAzL7Klga1J/xIiivo43976XMJVI2vIfjZMCS+LYwTXtlMLbc0+s7G5yY6gbzjNNZuS897RW4IKuF0g9tXz8OYg5/hFe7KefyVsnQnhTUgQ87cnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=an+CbRDC; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=VQGiL/B5rHD7mVT0Vt1EvekIqOlhDKRdgOwOAyd+KjY=; b=an+CbRDC38HI8tK+uxf1lSSodM
+	Wm0PvtoJ8z/d+bEgWSI2Wy0bLkYqSxJZC2BR6zUmrn/JMmW+P/rVt99baJlcU+6nL3v5TgeSt+Zha
+	p8mK41WNsruOm+VP07RTxD3MkebIYLvY+crpLMTz8Eh7tcZHVepkrW51SVXntSkawSm0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wHNGJ-000B9v-Kq; Mon, 27 Apr 2026 16:48:39 +0200
+Date: Mon, 27 Apr 2026 16:48:39 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Arnd Bergmann <arnd@kernel.org>,
+	Nicolas Saenz Julienne <nsaenz@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Linus Walleij <linusw@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org
+Subject: Re: [PATCH] [v4] wiznet: convert to GPIO descriptors
+Message-ID: <bcf1d4a1-e99b-4ce2-8849-8cb1d10aa3f2@lunn.ch>
+References: <20260427142924.2702598-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,103 +73,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Rspamd-Queue-Id: AE70B474A3F
+In-Reply-To: <20260427142924.2702598-1-arnd@kernel.org>
+X-Rspamd-Queue-Id: 3BBD3474AF1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281390-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-281391-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[33];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.microsoft.com:dkim,linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,arndb.de:email,lunn.ch:dkim,lunn.ch:mid]
 
-The MANA driver has two distinct DMA paths for RX buffers:
+On Mon, Apr 27, 2026 at 04:28:29PM +0200, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> The w5100/w5300 drivers only support probing with old platform data in
+> MMIO mode, or probing with DT in SPI mode. There are no users of this
+> platform data in tree, and from the git history it appears that the only
+> users of MMIO mode were on the (since removed) blackfin architecture.
 
-1. Without PP_FLAG_DMA_MAP: The driver maps full pages manually,
-   creating page-aligned mappings where the DMA offset is always zero.
+A quick grep does not find any .dts files referencing the compatible.
 
-2. With PP_FLAG_DMA_MAP: page_pool uses sub-page fragments, where
-   multiple RX buffers share a single page. The pool maps the whole
-   page once, and subsequent allocations use offsets into that region.
+> It would probably be possible to just remove the MMIO mode driver
+> completely, but it seems fine otherwise, and fixing it to use the modern
+> interface seems easy enough.
 
-Path 2 is problematic in two scenarios where DMA must go through
-SWIOTLB bounce buffers:
+Last real development work on this driver was:
 
-- Confidential VMs (AMD SEV-SNP, Intel TDX): guest memory is encrypted
-  and the NIC cannot access it directly due to lack of TDISP support.
-  All DMA must use SWIOTLB bounce buffers.
+Author: Nicolas Saenz Julienne <nsaenz@kernel.org>
+Date:   Wed Jun 12 14:25:25 2019 +0200
 
-- Force-bounce mode (swiotlb=force): all DMA is routed through bounce
-  buffers regardless of whether the system is a CVM.
+    net: ethernet: wiznet: w5X00 add device tree support
+    
+    The w5X00 chip provides an SPI to Ethernet inteface. This patch allows
+    platform devices to be defined through the device tree.
 
-In both cases, sub-page RX buffer fragments allocated via page_pool may
-not be compatible with bounce buffering in this mode, leading to failures
-in the RX path.
+Nicolas, are you still using it?
 
-Add a check using is_swiotlb_force_bounce() in
-mana_use_single_rxbuf_per_page() to detect when force-bounce is active
-for the device and force single RX buffer per page allocation.
-
-Note: This issue likely affects any NIC driver using page_pool with
-sub-page fragment allocation under SWIOTLB. A more general fix at
-the page_pool level may be desirable. Seeking feedback on the
-preferred approach.
-
-Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
----
- drivers/net/ethernet/microsoft/mana/mana_en.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 2d44eaf932a8..841421baf0de 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -12,6 +12,7 @@
- #include <linux/pci.h>
- #include <linux/export.h>
- #include <linux/skbuff.h>
-+#include <linux/swiotlb.h>
- #include <linux/cc_platform.h>
- 
- #include <net/checksum.h>
-@@ -748,10 +749,15 @@ static void *mana_get_rxbuf_pre(struct mana_rxq *rxq, dma_addr_t *da)
- static bool
- mana_use_single_rxbuf_per_page(struct mana_port_context *apc, u32 mtu)
- {
-+	struct gdma_context *gc = apc->ac->gdma_dev->gdma_context;
-+
- 	/* On confidential VMs with guest memory encryption, all DMA goes
- 	 * through SWIOTLB bounce buffers. Sub-page RX fragments may not
- 	 * be properly bounce-buffered, so use fullpage buffers.
- 	 */
-+	if (is_swiotlb_force_bounce(gc->dev))
-+		return true;
-+
- 	if (cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT))
- 		return true;
- 
--- 
-2.43.0
-
+	Andrew
 
