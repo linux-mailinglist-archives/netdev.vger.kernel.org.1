@@ -1,140 +1,203 @@
-Return-Path: <netdev+bounces-281446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281447-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QBU8GTqt72lIDwEAu9opvQ
-	(envelope-from <netdev+bounces-281446-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:38:50 +0200
+	id YKs8F66r72kCDwEAu9opvQ
+	(envelope-from <netdev+bounces-281447-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:32:14 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 883C3478B20
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:38:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 077DF478A00
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 20:32:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0ECEC302C92C
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:27:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7BF9330A9AE3
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 18:27:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A30833EBF06;
-	Mon, 27 Apr 2026 18:26:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C45113EBF06;
+	Mon, 27 Apr 2026 18:27:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fq1mkcXu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L8HK9Rkg"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0F022EC0A7;
-	Mon, 27 Apr 2026 18:26:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 426583D9DDD
+	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 18:27:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777314418; cv=none; b=XxBgHizMAxUPZ9gaN9O/xbnTdky7tX9X+6/VGysDWmL/kBS4YBYYbFw5RPk7MJjuZVoz2iuLZ8nlhLF3TdyMobD8PxcfyKDSBohO2OvXja/Bej1fI2k7wJtbtJOKgKRBCgz9bGRnZNwgCmtzPVwXLE1m4ZXuHmvOi1mBQtCpAB4=
+	t=1777314440; cv=none; b=sHrgnamlTvnPhbh0doq3llOcuvj3JSliHvxk2OwKlfqdWbzhVxHtaYVdNEqYT4ANvUbKXiZ1TBTBq1cjCe230ZYyhoNUezqskKocQWRMOGA8cTVp9zsyi7k5f6pRoJ5xykKM2RAAZwG/JiHYFMZi4iv5aH/JLlLQ+84VeLXMlfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777314418; c=relaxed/simple;
-	bh=mBk1EgAT19wL6bdZ5pqnxKIy8oKBJcRqqcMmbFytKa8=;
+	s=arc-20240116; t=1777314440; c=relaxed/simple;
+	bh=hfkSb5iSK+jnG60DLGgd+UagdkvWshNa7oLEFPu+t10=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=apBzWGQktG/AJO6GvZ4B0OHNuT28ThTsvK08P0bSKOPzlICE5vx5u9ZdNx2O2C83KRYnWETnU4uZUBgAewP9rrS5RD4Dh8KZx+o5LCRf9AAHxkpYNaLoiPTKGBel55y6QTXiTds3VISnZfoMlmE1b5w3WcQW3Ex54a+k2POjZ/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fq1mkcXu; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <cdce7fbb-671d-48b0-95ff-56b882d3e9a5@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1777314405;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7ZxsQZ4URB57FsMrtoaktWFHoc/WtO77TGk8yqurP68=;
-	b=fq1mkcXuqiFr9btfrrj/BIueSgTsSnNGEj3109scN+WwRJF3SwCFT8X5/d/Vsz+gPirt2h
-	Z9U+CXYptnFH2/TEtInnMMTYKO6qLcg9kJ6fAFjOUqC98YZXGCcoX3ZTE4y2Emvvxo2J0v
-	65oia3H8rziMqxJHqUekrqBcmkEm+O8=
-Date: Mon, 27 Apr 2026 11:26:36 -0700
+	 In-Reply-To:Content-Type; b=bUQlnSDkpNyqB+QgquHNXXtN01mMiL3T7voeLmuhMJghs8fmAFpINd4a3DrcTu3uemE+WqD2V59JswbQjO+uV6sf4bHE6jwfVJKxqe8xwkP2J7de9+sNSYr0DGkhLtC3wxq08/uHwTEVY4c7xyfYffNph1LBfceOmduUiBAP1xE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L8HK9Rkg; arc=none smtp.client-ip=209.85.167.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-479d4df9035so4545047b6e.0
+        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 11:27:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777314437; x=1777919237; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qUxrFoC8fiASca5qWozFg3oZ8Q9N01+/TQY2br6q3VU=;
+        b=L8HK9RkgWrv6nUTzfogIxwsJdEHW+phreVVAqCTMP7+x4J8+w77VbeVmGYbQhtC6hx
+         ZuHPtkESsyJr8hvj5amfMql/9w27Fpc4XBODbQkLXCFtJgDJ5DKod/FxPwk9NVSLkL2Q
+         P5S4x/fgsV0i1w8jilvdxasdIPPQC1T22kdswSWrsMn2kJ+nzejAhTDQeinmc2wgicaI
+         PoihBmqT1g0ozW7vbSyrqNyM6r3BDMZVHid7OFif+iOlzI7x1uM6movOkb8Ly33HutLG
+         MLlbPlPfp+mlopj6hEe2CAgtyPzJOBFl+TUYu38CJ0nebGIA0o0ui3DXRQmvjSGcBZif
+         YqIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777314437; x=1777919237;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qUxrFoC8fiASca5qWozFg3oZ8Q9N01+/TQY2br6q3VU=;
+        b=VxnXxwlyXDOKqxpr3o+cSeRD2hDh1YUGkYCqoDIB/PZojQGTo0E5bc6gk5IrKxcoFx
+         Yz/5hgGtFjgstAv+hFc2jX4L+lsNC3BauC3fnZHullrYuJldqrk3Vf+RLio9bJu3dEaO
+         XonnyFnc8MdetD/mPTdxXv2YVroP144vvl72P9uwOGvuFaoPPa8jAfUmSo4t378WrZ/E
+         JM+fPoKTbTauiDnMrEIsRv4reBb65fiPh9tzW/2tyTL2dfU+cOvt/fxXNcEBHQ4wg+XX
+         ZupRPqXEI1rV5X+HTvFIP8j6by3/O5193amaVJOIQNWJUCKJu52yWzFSGLwGGIoqW6NN
+         RSiQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9msFaQ8jDjyiS0iI7GXJtqIaWIk9msmtLkP8WVmSwxGUg9sN4Z7WYoyyk/w7wiDb0nFw9F5pQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwiMN//QB4v7/HoqLoWeoW56d4rnG8GVKSnh8QZ9XIpBXga2JJJ
+	2fj2e3plxWX2RXPPCDa9f0TS1OCTXYcE81KGcsdc/Y6kbln2XZkji/eB
+X-Gm-Gg: AeBDiet0qX7bAym9vyjysMu2AuCI89o7xOIYVd0gqyhFnHTZ2iQheNkYQAvXTS2RT+1
+	Mk6ZrLKtoukJC/uiHV41tqN2Q6ZEPv/8byeQ53mxx+YK9GTKhGqKbABvKMgD8zMMsnHmHoxUCr/
+	5Aho5NK+HPoqXrivjsNcS3UplFlOAFaxgMeVNw6SGJ7DZeBkBvjzWyuCqGWKAdWsh4G7SIeMS0J
+	dSmwxH/YLh1dl2SmFd/XhTsuA4KLLamG3LdHjYjak4XpcvTSZLH4agSprNwAypdFBCq9NPEHlkt
+	35lhC7ysUSGUVYSAAbfVkWnXHiL/Azt0x9RmdVTGiG5o4Ybw+nco/nSDtf+RYKmffM0B7dIalnJ
+	G1AB5hnRHhgEn4txBAsK/sXcKLrLvP0qKP+F+8kOK6gsM/o+U4mGDQ2Qb8L+O+5GngsGHchJME+
+	yd3tXlF+F7+1T+TOfFvXyACapgJ61IeYdxV8MDQxGvP5zIfJ9dms8+bkG/WXmBQdy2dUo62oy/t
+	qRAVzX7z5p0T4YfivB11AnmQ2RH
+X-Received: by 2002:a05:6808:3448:b0:472:c4ba:32d9 with SMTP id 5614622812f47-47c26cba3fdmr138293b6e.20.1777314437166;
+        Mon, 27 Apr 2026 11:27:17 -0700 (PDT)
+Received: from ?IPV6:2601:282:1e02:1040:7006:cec4:dca9:62e0? ([2601:282:1e02:1040:7006:cec4:dca9:62e0])
+        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-7de986a6da5sm124806a34.20.2026.04.27.11.27.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Apr 2026 11:27:16 -0700 (PDT)
+Message-ID: <77e1a762-e204-497b-b7cb-40d5a93f8ec7@gmail.com>
+Date: Mon, 27 Apr 2026 12:27:15 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [REGRESSION] aquantia: Sunshine/Moonlight UDP video streaming
- broken since 5b4015ad833c ("net: aquantia: Remove redundant UDP length
- adjustment with GSO_PARTIAL")
-To: Gal Pressman <gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: regressions@lists.linux.dev, netdev@vger.kernel.org,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <6c3fb15e-711d-4b8d-b152-e03d9b05293f@linux.dev>
- <5293b717-6a8e-40b6-bd6b-61043a062451@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 iproute2-next 1/4] rdma: Update headers
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Matthew Schwartz <matthew.schwartz@linux.dev>
-In-Reply-To: <5293b717-6a8e-40b6-bd6b-61043a062451@nvidia.com>
+To: Stephen Hemminger <stephen@networkplumber.org>,
+ Chiara Meiohas <cmeiohas@nvidia.com>
+Cc: leon@kernel.org, michaelgur@nvidia.com, jgg@nvidia.com,
+ linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+ Patrisious Haddad <phaddad@nvidia.com>
+References: <20260330173118.766885-1-cmeiohas@nvidia.com>
+ <20260330173118.766885-2-cmeiohas@nvidia.com>
+ <20260427112505.684c21f3@phoenix.local>
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <20260427112505.684c21f3@phoenix.local>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 883C3478B20
-X-Rspamd-Action: add header
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 077DF478A00
+X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [7.34 / 15.00];
-	URIBL_BLACK(7.50)[lizardbyte.dev:url];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281446-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	R_DKIM_ALLOW(0.00)[linux.dev:s=key1];
-	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_FROM(0.00)[bounces-281447-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	GREYLIST(0.00)[pass,body];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[linux.dev,none];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dsahern@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matthew.schwartz@linux.dev,netdev@vger.kernel.org];
-	RCPT_COUNT_FIVE(0.00)[6];
-	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	NEURAL_SPAM(0.00)[0.460];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lizardbyte.dev:url,linux.dev:dkim,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Spam: Yes
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
 
-On 4/27/26 11:09 AM, Gal Pressman wrote:
-> Hello Matthew,
+On 4/27/26 12:25 PM, Stephen Hemminger wrote:
+> On Mon, 30 Mar 2026 20:31:15 +0300
+> Chiara Meiohas <cmeiohas@nvidia.com> wrote:
 > 
-> On 27/04/2026 2:20, Matthew Schwartz wrote:
->> Hello,
+>> From: Michael Guralnik <michaelgur@nvidia.com>
 >>
->> When using a previously working setup of remote streaming from my workstation to another device via Sunshine (the host server) and Moonlight (the client app) on my home network, I no longer receive any video output on the client app after upgrading my host workstation to kernel 7.0. Reverting back to kernel 6.19 on the host restored my setup to a working state.
+>> Update rdma_netlink.h file up to kernel commit dbd0472fd7a5
+>> ("RDMA/nldev: Expose kernel-internal FRMR pools in netlink")
 >>
->> After bisecting, I landed on 5b4015ad833c ("net: aquantia: Remove redundant UDP length adjustment with GSO_PARTIAL") as the first bad commit. I confirmed this by moving the cable to my second on-board NIC (Intel) on the same workstation, which restored video output without any other kernel changes. My affected on-board NIC is Aquantia AQC113 [1d6a:04c0] (rev 03), atlantic driver, firmware 1.3.34, MTU 1500.
->>
->> Looking into it a bit further, ethtool -K enp97s0 tx-udp-segmentation off also serves as a workaround on my Aquantia port without changing to my other ethernet port. The working Intel NIC reports tx-udp-segmentation as "off [fixed]", so traffic falls back to software UDP segmentation on there.
->>
->> Please let me know if there's any additional info I can provide.
->>
->> Thanks,
->> Matt
->>
->> #regzbot introduced: 5b4015ad833c
+>> Signed-off-by: Michael Guralnik <michaelgur@nvidia.com>
+>> Reviewed-by: Patrisious Haddad <phaddad@nvidia.com>
+>> Reviewed-by: Chiara Meiohas <cmeiohas@nvidia.com>
 > 
-> Thank you for the report and the bisect!
+> The upstream macro names changed, the iproute2 build is broken after
+> current headers sync.
 > 
-> I will take a look and try to figure out what's wrong (though I don't
-> have real hardware to test on).
-> Is the userspace app open source? can I see its code and try to run it
-> myself?
+> In file included from res.c:7:
+> res.h: In function ‘_res_frmr_pools’:
+> res.h:203:26: error: ‘RDMA_NLDEV_CMD_RES_FRMR_POOLS_GET’ undeclared (first use in this function); did you mean ‘RDMA_NLDEV_CMD_FRMR_POOLS_GET’?
+>   203 | RES_FUNC(res_frmr_pools, RDMA_NLDEV_CMD_RES_FRMR_POOLS_GET,
+>       |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> res.h:56:44: note: in definition of macro ‘RES_FUNC’
+>    56 |                 _command = res_get_command(command, rd);                               \
+>       |                                            ^~~~~~~
+> res.h:203:26: note: each undeclared identifier is reported only once for each function it appears in
+>   203 | RES_FUNC(res_frmr_pools, RDMA_NLDEV_CMD_RES_FRMR_POOLS_GET,
+>       |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> res.h:56:44: note: in definition of macro ‘RES_FUNC’
+>    56 |                 _command = res_get_command(command, rd);                               \
+>       |                                            ^~~~~~~
 
-Thanks for the reply. The code for Sunshine is available here: https://github.com/LizardByte/Sunshine and the code for Moonlight is here: https://github.com/moonlight-stream/moonlight-qt.
 
-I have been using the Arch Linux Sunshine package which I installed by following the Linux instructions here: https://docs.lizardbyte.dev/projects/sunshine/latest/md_docs_2getting__started.html, but there are also binaries for other distros or it's buildable from source. For Moonlight, I have been using the Flatpak distributed on Flathub because the client device runs an atomic rootfs, but you can also use any other device that Moonlight supports.
+Looks like the merged API does not have the _RES part of the uapi:
 
-> 
-> I will be OOO for the rest of the week, hope to have some meaningful
-> reply by the end of next week.
+kernel vs iproute2:
 
+@@ -590,19 +590,19 @@
+ 	/*
+ 	 * FRMR Pools attributes
+ 	 */
+-	RDMA_NLDEV_ATTR_FRMR_POOLS,		/* nested table */
+-	RDMA_NLDEV_ATTR_FRMR_POOL_ENTRY,	/* nested table */
+-	RDMA_NLDEV_ATTR_FRMR_POOL_KEY,		/* nested table */
+-	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ATS,	/* u8 */
+-	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ACCESS_FLAGS,	/* u32 */
+-	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_VENDOR_KEY,	/* u64 */
+-	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_NUM_DMA_BLOCKS,	/* u64 */
+-	RDMA_NLDEV_ATTR_FRMR_POOL_QUEUE_HANDLES,	/* u32 */
+-	RDMA_NLDEV_ATTR_FRMR_POOL_MAX_IN_USE,	/* u64 */
+-	RDMA_NLDEV_ATTR_FRMR_POOL_IN_USE,	/* u64 */
+-	RDMA_NLDEV_ATTR_FRMR_POOLS_AGING_PERIOD,	/* u32 */
+-	RDMA_NLDEV_ATTR_FRMR_POOL_PINNED_HANDLES,	/* u32 */
+-	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_KERNEL_VENDOR_KEY,	/* u64 */
++	RDMA_NLDEV_ATTR_RES_FRMR_POOLS,			/* nested table */
++	RDMA_NLDEV_ATTR_RES_FRMR_POOL_ENTRY,		/* nested table */
++	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY,		/* nested table */
++	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ATS,		/* u8 */
++	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ACCESS_FLAGS,	/* u32 */
++	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_VENDOR_KEY,	/* u64 */
++	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_NUM_DMA_BLOCKS, /* u64 */
++	RDMA_NLDEV_ATTR_RES_FRMR_POOL_QUEUE_HANDLES,	/* u32 */
++	RDMA_NLDEV_ATTR_RES_FRMR_POOL_MAX_IN_USE,	/* u64 */
++	RDMA_NLDEV_ATTR_RES_FRMR_POOL_IN_USE,		/* u64 */
++	RDMA_NLDEV_ATTR_RES_FRMR_POOL_AGING_PERIOD,	/* u32 */
++	RDMA_NLDEV_ATTR_RES_FRMR_POOL_PINNED,		/* u32 */
++	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_KERNEL_VENDOR_KEY, /* u64 */
+
+ 	/*
 
