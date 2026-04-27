@@ -1,229 +1,274 @@
-Return-Path: <netdev+bounces-281286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281287-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YADxCPox72mb8wAAu9opvQ
-	(envelope-from <netdev+bounces-281286-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 11:52:58 +0200
+	id OGB/Bksz72mb8wAAu9opvQ
+	(envelope-from <netdev+bounces-281287-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 11:58:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7891B4702BA
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 11:52:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7178947044A
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 11:58:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2972B301D06E
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 09:52:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A7BDC3047417
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 09:56:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D7F3B3884;
-	Mon, 27 Apr 2026 09:52:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15E283B3C1D;
+	Mon, 27 Apr 2026 09:56:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eGJTX6Ow"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NGZ6W8hz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D17652FFDE1;
-	Mon, 27 Apr 2026 09:52:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5783B3C13;
+	Mon, 27 Apr 2026 09:56:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777283531; cv=none; b=BfO8th1ioKPcewPZ10v3I6JLLMMv4pL+qEnugAtMQvfv3VFmSQ3pWhtzgo2agHsd09KGH2QW4TTJP6prPs2SSTxVx1ml4NhMNHQqjq/BARGY9qjpEbhuTESWZVvCHKglOD4v8qd2WZwkQkKlXBQhSgKHIvxUn7lSYTU1K6U8DX4=
+	t=1777283786; cv=none; b=qnP+r+ZcUrg2VjgewV9ITqT06+LjsoVPatmOhjHeAjTLQW3XUXiyP1iaDeYwAWMqQdk+cGmPw4FPttFXWq3JFHAr6a54wR6DHaNmcVwLGbA6KPW6Y5XRMvbGaZjOuOVamcMqZwqgyuR5pEwVrh6NtK+urx0FWKVn74ENc91q/5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777283531; c=relaxed/simple;
-	bh=3ScpVu6cd+qG8bDqwMH9nLLo7ljJEm+ttcCR8fkeroc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=O3LCG2yxOulLXQPy1LdXhJeoYiDWNB5yFv5ShavNDBPnYkl5J7qDQ1MglorBO23jQtkj5iLhaxzNAvRjVgc5XluAzBodJa8F8kehRvv7jdAFDBGyXEtp1thB4EsTTBQrmt0IXPS2YeOmUnQq4A1N4kNGnBso5zPIqkQ+e3WWpSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eGJTX6Ow; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777283530; x=1808819530;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=3ScpVu6cd+qG8bDqwMH9nLLo7ljJEm+ttcCR8fkeroc=;
-  b=eGJTX6OwZL70AybYuQkg8EkqIya8P1IU5fynQ86fd91jrB56kzKmKxq4
-   JeiKT7Dl/fJQsLKUOYoJNR/Y8/N35G2hUQd+jreDXWoWmv/VyyTIUlSWr
-   qgsiKheoFAn9ITkE+xaGeP9KVasuP3XZnvLw3LPw7IXkrmCQO6FsK9JqJ
-   ObsZSvDOJQH/Cl/xDndSMBOlVlNRgy06yhUP/uHcXqPj/XRoNnfG+/t+U
-   McMxElDxGD1kPopsFInJL4nqR83s8cfsxLfLvJquwWVkVhKPAPRzosUEe
-   B/mhdxJaPsf47zyPkhngnbQwiMllngfN1RWkLgOPm9OIN416s1cv+R86w
-   A==;
-X-CSE-ConnectionGUID: eMJ3aHQkTZa4nY+mcm2oXQ==
-X-CSE-MsgGUID: kU9HqWK3QHGRdDdsxLdxIw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11768"; a="81775654"
-X-IronPort-AV: E=Sophos;i="6.23,201,1770624000"; 
-   d="scan'208";a="81775654"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2026 02:52:10 -0700
-X-CSE-ConnectionGUID: x6YF+sgUTPGQwgPOysOEng==
-X-CSE-MsgGUID: 34g8Pw/aRW+Zn8ka784p5g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,201,1770624000"; 
-   d="scan'208";a="237916743"
-Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.80.101]) ([10.247.80.101])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2026 02:52:05 -0700
-Message-ID: <7b10fe32-4f3f-4473-ae69-82af901b7a1f@linux.intel.com>
-Date: Mon, 27 Apr 2026 17:52:03 +0800
+	s=arc-20240116; t=1777283786; c=relaxed/simple;
+	bh=jMmit9CI2GuOx6nGL6l6rT3WoEmoOZljdXM257fv1rY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LfDPTBH3ZGHKFWBN747vacoTurcwKKc6ALFxYAhlo2S5+wr5n0YgPIGGHTvo4AdTwVQryYcp2//IR11VC+puKVLGdIWnz4wFDjBciILZAXYRAtE7HpG3ZuytLM2Ht6E4UtTyR43Rg+Tg090p6h3921hlFzt466lURB22mYYCpgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NGZ6W8hz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FFCAC2BCB4;
+	Mon, 27 Apr 2026 09:56:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777283786;
+	bh=jMmit9CI2GuOx6nGL6l6rT3WoEmoOZljdXM257fv1rY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=NGZ6W8hzd02dc31RtbeTvU87c03i2+XoFfsp8ZKY5Q/b2GXEgjW/xF1Ba8XN7CaOH
+	 PCWma2I8ZKKvkL7PZ0b4BibO4z28yI72/3kDCmEmKeshL3iDj//WegAQPz1br0RZAS
+	 Rwl8L4IMw4kuCIlgkhryicOMKmFePXxy5qZa1nBP/dIV8eVkHbfwEJonyLtVbrfhz5
+	 ikl1vcieK1wpgMCKLyvqW5aaAchex4l6hJBXfMZf7PLZVX0s2j45genoCtPX2VZKV2
+	 JmnjtGuFa7E9j0yVlbaGgR+TNTfVDErPpTjxLEqkDIk9sO7m//9XuS5SbdRyYD3V1E
+	 c+2N4UaG01lgg==
+From: Sumit Garg <sumit.garg@kernel.org>
+To: andersson@kernel.org,
+	konradybcio@kernel.org
+Cc: linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	freedreno@lists.freedesktop.org,
+	linux-media@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	ath12k@lists.infradead.org,
+	linux-remoteproc@vger.kernel.org,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	robin.clark@oss.qualcomm.com,
+	sean@poorly.run,
+	akhilpo@oss.qualcomm.com,
+	lumag@kernel.org,
+	abhinav.kumar@linux.dev,
+	jesszhan0024@gmail.com,
+	marijn.suijten@somainline.org,
+	airlied@gmail.com,
+	simona@ffwll.ch,
+	vikash.garodia@oss.qualcomm.com,
+	dikshita.agarwal@oss.qualcomm.com,
+	bod@kernel.org,
+	mchehab@kernel.org,
+	elder@kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jjohnson@kernel.org,
+	mathieu.poirier@linaro.org,
+	trilokkumar.soni@oss.qualcomm.com,
+	mukesh.ojha@oss.qualcomm.com,
+	pavan.kondeti@oss.qualcomm.com,
+	jorge.ramirez@oss.qualcomm.com,
+	tonyh@qti.qualcomm.com,
+	vignesh.viswanathan@oss.qualcomm.com,
+	srinivas.kandagatla@oss.qualcomm.com,
+	amirreza.zarrabi@oss.qualcomm.com,
+	jens.wiklander@linaro.org,
+	op-tee@lists.trustedfirmware.org,
+	apurupa@qti.qualcomm.com,
+	skare@qti.qualcomm.com,
+	linux-kernel@vger.kernel.org,
+	Sumit Garg <sumit.garg@oss.qualcomm.com>
+Subject: [PATCH v4 00/15] firmware: qcom: Add OP-TEE PAS service support
+Date: Mon, 27 Apr 2026 15:25:48 +0530
+Message-ID: <20260427095603.1157963-1-sumit.garg@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v3 3/3] igc: add support for forcing link speed
- without autonegotiation
-To: Simon Horman <horms@kernel.org>, KhaiWenTan <khai.wen.tan@linux.intel.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- faizal.abdul.rahim@intel.com, hong.aun.looi@intel.com,
- khai.wen.tan@intel.com, Looi@web.codeaurora.org
-References: <20260422155701.7420-1-khai.wen.tan@linux.intel.com>
- <20260422155701.7420-4-khai.wen.tan@linux.intel.com>
- <20260424135958.GL900403@horms.kernel.org>
-Content-Language: en-US
-From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
-In-Reply-To: <20260424135958.GL900403@horms.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 7891B4702BA
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 7178947044A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281286-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[49];
+	TAGGED_FROM(0.00)[bounces-281287-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[faizal.abdul.rahim@linux.intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email]
+	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,qualcomm.com:email]
 
+From: Sumit Garg <sumit.garg@oss.qualcomm.com>
 
+Qcom platforms has the legacy of using non-standard SCM calls
+splintered over the various kernel drivers. These SCM calls aren't
+compliant with the standard SMC calling conventions which is a
+prerequisite to enable migration to the FF-A specifications from Arm.
 
-On 24/4/2026 9:59 pm, Simon Horman wrote:
-> On Wed, Apr 22, 2026 at 11:57:01PM +0800, KhaiWenTan wrote:
->> From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
->>
->> Allow users to force 10/100 Mb/s link speed and duplex via ethtool
->> when autonegotiation is disabled. Previously, the driver rejected
->> these requests with "Force mode currently not supported.".
->>
->> Forcing at 1000 Mb/s and 2500 Mb/s is not supported.
->>
->> Reviewed-by: Looi, Hong Aun <hong.aun.looi@intel.com>
->> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
->> Signed-off-by: KhaiWenTan <khai.wen.tan@linux.intel.com>
-> 
-> ...
-> 
->> diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-> 
-> ...
-> 
->> @@ -2000,6 +2013,41 @@ static int igc_ethtool_get_link_ksettings(struct net_device *netdev,
->>   	return 0;
->>   }
->>   
->> +/**
->> + * igc_handle_autoneg_disabled - Configure forced speed/duplex settings
->> + * @adapter: private driver structure
->> + * @speed: requested speed (must be SPEED_10 or SPEED_100)
->> + * @duplex: requested duplex
->> + *
->> + * Records forced speed/duplex when autoneg is disabled.
->> + * Caller must validate speed before calling this function.
->> + */
->> +static void igc_handle_autoneg_disabled(struct igc_adapter *adapter, u32 speed,
->> +					u8 duplex)
->> +{
->> +	struct igc_mac_info *mac = &adapter->hw.mac;
->> +
->> +	switch (speed) {
->> +	case SPEED_10:
->> +		mac->forced_speed_duplex = (duplex == DUPLEX_FULL) ?
->> +			IGC_FORCED_10F : IGC_FORCED_10H;
->> +		break;
->> +	case SPEED_100:
->> +		mac->forced_speed_duplex = (duplex == DUPLEX_FULL) ?
->> +			IGC_FORCED_100F : IGC_FORCED_100H;
->> +		break;
->> +	default:
->> +		WARN_ONCE(1, "Unsupported speed %u\n", speed);
->> +		return;
->> +	}
->> +
->> +	mac->autoneg_enabled = false;
->> +
->> +	/* Half-duplex cannot support flow control per IEEE 802.3 */
->> +	if (duplex != DUPLEX_FULL)
->> +		adapter->hw.fc.requested_mode = igc_fc_none;
->> +}
->> +
->>   /**
->>    * igc_handle_autoneg_enabled - Configure autonegotiation advertisement
->>    * @adapter: private driver structure
->> @@ -2038,6 +2086,7 @@ static void igc_handle_autoneg_enabled(struct igc_adapter *adapter,
->>   						  10baseT_Half))
->>   		advertised |= ADVERTISE_10_HALF;
->>   
->> +	hw->mac.autoneg_enabled = true;
->>   	hw->phy.autoneg_advertised = advertised;
->>   	if (adapter->fc_autoneg)
->>   		hw->fc.requested_mode = igc_fc_default;
->> @@ -2071,14 +2120,20 @@ igc_ethtool_set_link_ksettings(struct net_device *netdev,
->>   		}
->>   	}
->>   
->> +	if (cmd->base.autoneg == AUTONEG_DISABLE &&
->> +	    cmd->base.speed != SPEED_10 && cmd->base.speed != SPEED_100) {
->> +		netdev_info(dev, "Unsupported speed for forced link\n");
->> +		return -EINVAL;
->> +	}
-> 
-> The condition above verifies speed only if autoneg is AUTONEG_DISABLE.
-> 
->> +
->>   	while (test_and_set_bit(__IGC_RESETTING, &adapter->state))
->>   		usleep_range(1000, 2000);
->>   
->> -	if (cmd->base.autoneg == AUTONEG_ENABLE) {
->> +	if (cmd->base.autoneg == AUTONEG_ENABLE)
->>   		igc_handle_autoneg_enabled(adapter, cmd);
->> -	} else {
->> -		netdev_info(dev, "Force mode currently not supported\n");
->> -	}
->> +	else
->> +		igc_handle_autoneg_disabled(adapter, cmd->base.speed,
->> +					    cmd->base.duplex);
-> 
-> But here igc_handle_autoneg_disabled, which relies on speed having been
-> verified, is called if autoneg is not AUTONEG_ENABLE.
-> 
-> If autoneg is AUTONEG_DISABLE here, then all is good.
-> But if it is neither AUTONEG_DISABLE nor AUTONEG_ENABLE then we
-> are in trouble.
-> 
-> I suggest verifying autoneg is either AUTONEG_ENABLE or AUTONEG_DISABLE
-> earlier in this function.
+OP-TEE as an alternative trusted OS to Qualcomm TEE (QTEE) can't
+support these non-standard SCM calls. And even for newer architectures
+using S-EL2 with Hafnium support, QTEE won't be able to support SCM
+calls either with FF-A requirements coming in. And with both OP-TEE
+and QTEE drivers well integrated in the TEE subsystem, it makes further
+sense to reuse the TEE bus client drivers infrastructure.
 
-Will update, thanks.
+The added benefit of TEE bus infrastructure is that there is support
+for discoverable/enumerable services. With that client drivers don't
+have to manually invoke a special SCM call to know the service status.
+
+So enable the generic Peripheral Authentication Service (PAS) provided
+by the firmware. It acts as the common layer with different TZ
+backends plugged in whether it's an SCM implementation or a proper
+TEE bus based PAS service implementation.
+
+The TEE PAS service ABI is designed to be extensible with additional API
+as PTA_QCOM_PAS_CAPABILITIES. This allows to accommodate any future
+extensions of the PAS service needed while still maintaining backwards
+compatibility.
+
+Currently OP-TEE support is being added to provide the backend PAS
+service implementation which can be found as part of this PR [1].
+This implementation has been tested on Kodiak/RB3Gen2 board with lemans
+EVK board being the next target. In addition to that WIN/IPQ targets
+planning to use OP-TEE will use this service too. Surely the backwards
+compatibility is maintained and tested for SCM backend.
+
+Note that kernel PAS service support while running in EL2 is at parity
+among OP-TEE vs QTEE. Especially the media (venus/iris) support depends
+on proper IOMMU support being worked out on the PAS client end.
+
+Patch summary:
+- Patch #1: adds Kodiak EL2 overlay since boot stack with TF-A/OP-TEE
+  only allow UEFI and Linux to boot in EL2.
+- Patch #2: adds generic PAS service.
+- Patch #3: migrates SCM backend to generic PAS service.
+- Patch #4: adds TEE/OP-TEE backend for generic PAS service.
+- Patch #5-#13: migrates all client drivers to generic PAS service.
+- Patch #14: drops legacy PAS SCM exported APIs.
+
+The patch-set is based on v7.1-rc1 tag and can be found in git tree here
+[2].
+
+Merge strategy:
+
+It is expected due to APIs dependency, the entire patch-set to go via
+the Qcom tree. All other subsystem maintainers, it will be great if I
+can get acks for the corresponding subsystem patches.
+
+[1] https://github.com/OP-TEE/optee_os/pull/7721
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/sumit.garg/linux.git/log/?h=qcom-pas-v4
+
+---
+Changes in v4:
+- Incorporate misc. comments on patch #4.
+- Picked up an ack for patch #10.
+- Clarify in cover letter about state of media support.
+
+Changes in v3:
+- Incorporated some style and misc. comments for patch #2, #3 and #4.
+- Add QCOM_PAS Kconfig dependency for various subsystems.
+- Switch from pseudo TA to proper TA invoke commands.
+
+Changes in v2:
+- Fixed kernel doc warnings.
+- Polish commit message and comments for patch #2.
+- Pass proper PAS ID in set_remote_state API for media firmware drivers.
+- Added Maintainer entry and dropped MODULE_AUTHOR.
+
+Mukesh Ojha (1):
+  arm64: dts: qcom: kodiak: Add EL2 overlay
+
+Sumit Garg (14):
+  firmware: qcom: Add a generic PAS service
+  firmware: qcom_scm: Migrate to generic PAS service
+  firmware: qcom: Add a PAS TEE service
+  remoteproc: qcom_q6v5_pas: Switch over to generic PAS TZ APIs
+  remoteproc: qcom_q6v5_mss: Switch to generic PAS TZ APIs
+  soc: qcom: mdtloader: Switch to generic PAS TZ APIs
+  remoteproc: qcom_wcnss: Switch to generic PAS TZ APIs
+  remoteproc: qcom: Select QCOM_PAS generic service
+  drm/msm: Switch to generic PAS TZ APIs
+  media: qcom: Switch to generic PAS TZ APIs
+  net: ipa: Switch to generic PAS TZ APIs
+  wifi: ath12k: Switch to generic PAS TZ APIs
+  firmware: qcom_scm: Remove SCM PAS wrappers
+  MAINTAINERS: Add maintainer entry for Qualcomm PAS TZ service
+
+ MAINTAINERS                                   |   9 +
+ arch/arm64/boot/dts/qcom/Makefile             |   2 +
+ arch/arm64/boot/dts/qcom/kodiak-el2.dtso      |  35 ++
+ drivers/firmware/qcom/Kconfig                 |  19 +
+ drivers/firmware/qcom/Makefile                |   2 +
+ drivers/firmware/qcom/qcom_pas.c              | 288 +++++++++++
+ drivers/firmware/qcom/qcom_pas.h              |  50 ++
+ drivers/firmware/qcom/qcom_pas_tee.c          | 479 ++++++++++++++++++
+ drivers/firmware/qcom/qcom_scm.c              | 302 ++++-------
+ drivers/gpu/drm/msm/Kconfig                   |   1 +
+ drivers/gpu/drm/msm/adreno/a5xx_gpu.c         |   4 +-
+ drivers/gpu/drm/msm/adreno/adreno_gpu.c       |  11 +-
+ drivers/media/platform/qcom/iris/Kconfig      |  25 +-
+ .../media/platform/qcom/iris/iris_firmware.c  |   9 +-
+ drivers/media/platform/qcom/venus/Kconfig     |   1 +
+ drivers/media/platform/qcom/venus/firmware.c  |  11 +-
+ drivers/net/ipa/Kconfig                       |   2 +-
+ drivers/net/ipa/ipa_main.c                    |  13 +-
+ drivers/net/wireless/ath/ath12k/Kconfig       |   2 +-
+ drivers/net/wireless/ath/ath12k/ahb.c         |   8 +-
+ drivers/remoteproc/Kconfig                    |   1 +
+ drivers/remoteproc/qcom_q6v5_mss.c            |   5 +-
+ drivers/remoteproc/qcom_q6v5_pas.c            |  51 +-
+ drivers/remoteproc/qcom_wcnss.c               |  12 +-
+ drivers/soc/qcom/mdt_loader.c                 |  12 +-
+ include/linux/firmware/qcom/qcom_pas.h        |  43 ++
+ include/linux/firmware/qcom/qcom_scm.h        |  29 --
+ include/linux/soc/qcom/mdt_loader.h           |   6 +-
+ 28 files changed, 1115 insertions(+), 317 deletions(-)
+ create mode 100644 arch/arm64/boot/dts/qcom/kodiak-el2.dtso
+ create mode 100644 drivers/firmware/qcom/qcom_pas.c
+ create mode 100644 drivers/firmware/qcom/qcom_pas.h
+ create mode 100644 drivers/firmware/qcom/qcom_pas_tee.c
+ create mode 100644 include/linux/firmware/qcom/qcom_pas.h
+
+-- 
+2.51.0
+
 
