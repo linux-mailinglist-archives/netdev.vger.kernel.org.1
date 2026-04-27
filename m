@@ -1,176 +1,248 @@
-Return-Path: <netdev+bounces-281394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281395-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aDSpAOWA72moBwEAu9opvQ
-	(envelope-from <netdev+bounces-281394-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 17:29:41 +0200
+	id wIURA06B72nmBwEAu9opvQ
+	(envelope-from <netdev+bounces-281395-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 17:31:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4084C47530E
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 17:29:39 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 087B5475358
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 17:31:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 440773022632
-	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 15:18:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 72BFF3042809
+	for <lists+netdev@lfdr.de>; Mon, 27 Apr 2026 15:19:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7040733123F;
-	Mon, 27 Apr 2026 15:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70000330B22;
+	Mon, 27 Apr 2026 15:18:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="urpxGyNL";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Seb0oU1H"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ei/P92ia"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B51330649;
-	Mon, 27 Apr 2026 15:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF8B232D7D9
+	for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 15:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777303087; cv=none; b=tzDeo3M29ztb+6NpSWzxN5F1veJUNaE18XSpzPreb/O6EGcKUs4jvx7bR5uZcfguJWmaH9qZ/Vf19MYHtUKogzjRE978kRc48/+NpFA1onkX2chD9GJxYAIRa9SHfzqzgXr3idcPc7Ur7lDT4wP5PQEt9S73d96ZPc34TigIpFE=
+	t=1777303130; cv=none; b=W0Uzfvq2ipboYTlKwymECVbwAbz7I1MGX2rrFxIKQRZ3FjBEHlga/FBcweyxIdvw2MnYkwjuJVG4Cnfr+TlbXaD923jhctNGsoW4/CGKdNjd5g7KR0UiBmfB5YgVSFOYcKr1le9PRTFnZlHWuZu6gzvxZOQRZ9Ln+cfQWTSXTiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777303087; c=relaxed/simple;
-	bh=T5XnkGRAYWWNEx8qLlTAVkCmcLueRVg4qlTxLgiNMu4=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=IzphD/cYXNNjByCAujiOc7Bc5PykHI0HzPyvwwuOg2JdEOKlIBx5McyYuyPMvI5sUuCgETevu8mTGc2nF/xfZbDYMBfK4S+226og4fdw1ir7Z1KAX+0zbidqjgOiu3mI8Ngjj3mUr1iS4FuCz1hBCDQv+4RI+LOe6YPFosNdi6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=urpxGyNL; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Seb0oU1H; arc=none smtp.client-ip=103.168.172.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.phl.internal (Postfix) with ESMTP id F1657EC0266;
-	Mon, 27 Apr 2026 11:18:04 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-04.internal (MEProxy); Mon, 27 Apr 2026 11:18:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1777303084;
-	 x=1777389484; bh=hYaRI0SZPudNmDi+HcLT6SMoYtUdnCImkMZqOGOuwVU=; b=
-	urpxGyNLaw3xhjYZ1L2ak1EMQ8L5kfMuAtqFyNeVZfOrwo4BMKpJybxOAqA0XhrM
-	zMyyAIdhXOzVcpjY4Ge4eUIIihf72sqMfpek2v0jxf99c6FR6RQDvtS6NEv44B76
-	+I3eXWF1PxLE2ctZ766VhcSnKvtqHl3i4OCoBaMS9GHHiyFcZr9G7P8tO0z7w+a7
-	kwKmishaXE1MVXS5/lD0dnp1Yh8zwhltPgCZMuRxs1pj9TsuqKYadz9g15n91DOM
-	56vSvCqwAjgFDsKWPWM7ga1QIVUqcjzR5L9bI8bp6mZC7lB/OR9yvmPF66s7KkGv
-	6RmxMk1y9s6l5+slnKoWCw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1777303084; x=
-	1777389484; bh=hYaRI0SZPudNmDi+HcLT6SMoYtUdnCImkMZqOGOuwVU=; b=S
-	eb0oU1HBqBNiu7vcT0Za+Oj7MfhwBtnKaCzUoH4ZIJxc/VRBuzoS4sCnzlaBs3to
-	r4JgTuZwbgvzZbDPIf2DudIvM+iuXz+6b9HQH0szD56ytd1HsvdRdhkms45mbT8y
-	rAvm9+PeUAP597Fv2Gh/l0/QIuS1Q56Gj6bJ1rFrb6Ivf8zD0V7/kzfd6AsdxL9M
-	Dd4xV4njDd+FbMfS0HOTSlcth996i7ddawnvMMmhQ4EbWUbezUgcQdycHQwzkn1j
-	xEbB8JfT4uEobo+vAEL89pAkblTp90HzbRU+Y5lYzyK1QE8/CDcZAqhxAX3VHkRf
-	HPh1c7JvsEbJ+yxVUxt8w==
-X-ME-Sender: <xms:LH7vaT30mNlPc8k6Cng2HK-BYht7yOcNa-qb8E7M5VH2PIBfmuy1vQ>
-    <xme:LH7vac6fWfsSNjA-nNNcWcM8po51DjDfV6PRzMQnLO65T7xq-miOZL5KNvdhrRZ1s
-    43CEAt4ld4EdFoQMsPYE-g5n_aITY0-HPThxaUZdFNeoRbq8B2W8Pc>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdejledtfecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdetrhhnugcu
-    uegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtthgvrh
-    hnpefhtdfhvddtfeehudekteeggffghfejgeegteefgffgvedugeduveelvdekhfdvieen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnug
-    esrghrnhgusgdruggvpdhnsggprhgtphhtthhopeduiedpmhhouggvpehsmhhtphhouhht
-    pdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhope
-    gvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoheprghrnhgusehkvghr
-    nhgvlhdrohhrghdprhgtphhtthhopegsrhhglheskhgvrhhnvghlrdhorhhgpdhrtghpth
-    htoheptghonhhorhdoughtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkrhiikhdo
-    ughtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorh
-    hgpdhrtghpthhtoheplhhinhhushifsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehr
-    ohgshheskhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:LH7vaZ4tyWlV4nb0qrtVIWk1Q9mLdZTuOum2j8EBpJX1cyQgFyxqBA>
-    <xmx:LH7vaQSssqy_Krxa6I2p1stX4UIrJEkhl90EpQWN8srFnuaKI5oA7Q>
-    <xmx:LH7vaY8TTuox_2cqZhf1SEbbGo3nLaBq1Fz95YhehXNoFXsMg7LcPQ>
-    <xmx:LH7vaRpM3S5-mEp1vmkbZL0eElgoKnn4gCjORGtcbL36Y4YxACfsyw>
-    <xmx:LH7vaZejMoqI0NTe_McnHrYqmHBEn7cSoJS82ald1iBNwj3kv2O5hZQo>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 7E48D700065; Mon, 27 Apr 2026 11:18:04 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1777303130; c=relaxed/simple;
+	bh=6Jdv3cqBkQD//yDzmKZiisg1VQ1oAmgqLU48pGDosGY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cuhJebOFnbNonPFkhw/pAF9Qyp1w2E9XcLyUEZjZ2nnpmYxqn4ob93bHTwJCwmQdhphIouSwwYtPBvH/E0LWS2f+KAKDCWu1O5mYR1gZlTbuhrzwXqGXyEDIerJ8EcR5mL7tj/86+wQXrYYm4ZclNGPLf9FhmTiSCWgHDXOprn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ei/P92ia; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777303128;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=eP255AJKi20CdWJSLl90PUo6dc/xnZcS6fxVydD/CJk=;
+	b=Ei/P92iaF7jS50llvw7T5MI2TfAZk27M7ELho574O1VI+8g9N1G74nGmdR1cPeOoeNq2US
+	8Llq2iIy1gtQaxcK5tOe6+C9Ffhaf7gvrpvLU0oUlXgoA6iAAOkZdPgbn3kViEH8rkY+Ti
+	txF2i65nDQoVuA0rCf6+Tef6pIl0gS4=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-551-fctzMtMrNLG8LE1L4Putxw-1; Mon,
+ 27 Apr 2026 11:18:41 -0400
+X-MC-Unique: fctzMtMrNLG8LE1L4Putxw-1
+X-Mimecast-MFC-AGG-ID: fctzMtMrNLG8LE1L4Putxw_1777303120
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E4DA01956059;
+	Mon, 27 Apr 2026 15:18:39 +0000 (UTC)
+Received: from mschmidt-thinkpadp1gen4i.tpbc.com (unknown [10.44.34.211])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A9401195608E;
+	Mon, 27 Apr 2026 15:18:35 +0000 (UTC)
+From: Michal Schmidt <mschmidt@redhat.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Petr Oros <poros@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] ice: fix stats array overflow when VF requests more queues
+Date: Mon, 27 Apr 2026 17:18:26 +0200
+Message-ID: <20260427151827.43342-1-mschmidt@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: A5-Su42ZZeGF
-Date: Mon, 27 Apr 2026 17:17:24 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Rob Herring" <robh@kernel.org>, "Arnd Bergmann" <arnd@kernel.org>
-Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>,
- "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
- "Conor Dooley" <conor+dt@kernel.org>, "Linus Walleij" <linusw@kernel.org>,
- "Bartosz Golaszewski" <brgl@kernel.org>,
- "Marco Crivellari" <marco.crivellari@suse.com>,
- Netdev <netdev@vger.kernel.org>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>
-Message-Id: <57297b41-0f08-43eb-a73c-21a5461a4eb4@app.fastmail.com>
-In-Reply-To: <20260427145010.GA2502144-robh@kernel.org>
-References: <20260427142924.2702598-1-arnd@kernel.org>
- <20260427145010.GA2502144-robh@kernel.org>
-Subject: Re: [PATCH] [v4] wiznet: convert to GPIO descriptors
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 4084C47530E
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Rspamd-Queue-Id: 087B5475358
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.65 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[arndb.de,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[arndb.de:s=fm2,messagingengine.com:s=fm2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	XM_UA_NO_VERSION(0.01)[];
-	TAGGED_FROM(0.00)[bounces-281394-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281395-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[arnd@arndb.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[arndb.de:+,messagingengine.com:+];
+	FROM_NEQ_ENVFROM(0.00)[mschmidt@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,arndb.de:dkim,messagingengine.com:dkim]
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,atlassian.net:url]
 
-On Mon, Apr 27, 2026, at 16:50, Rob Herring wrote:
-> On Mon, Apr 27, 2026 at 04:28:29PM +0200, Arnd Bergmann wrote:
->> 
->> The CONFIG_WIZNET_BUS_SHIFT value was apparently meant to be set
->> at compile time to a machine specific value. This was always broken
->> for multiplatform configurations with conflicting requirements, and
->> in the mainline kernel it was set to 0 anyway. Leave it defined
->> locally as 0 but rename it to something without the CONFIG_ prefix.
->> 
->> Acked-by: Rob Herring <robh@kernel.org>
->
-> Well, 3 years later and I'm a bit grumpier seeing .txt binding 
-> additions. A new compatible plus new property we generally require 
-> converting the binding first. But I'm not going to revoke my ack here.
->
-> Is there even a known user for this new compatible?
+When a VF increases its queue count via VIRTCHNL_OP_REQUEST_QUEUES,
+ice_vc_request_qs_msg() sets vf->num_req_qs and triggers a VF reset.
+The reset calls ice_vf_reconfig_vsi(), which does ice_vsi_decfg()
+followed by ice_vsi_cfg(). ice_vsi_decfg() does not free the per-ring
+stats arrays. Inside ice_vsi_cfg_def(), ice_vsi_set_num_qs() updates
+alloc_txq/alloc_rxq to the new larger value, but
+ice_vsi_alloc_stat_arrays() returns early because the stats already
+exist. ice_vsi_alloc_ring_stats() then iterates using the new larger
+alloc_txq and writes beyond the bounds of the old, smaller
+tx_ring_stats/rx_ring_stats pointer arrays, corrupting adjacent SLUB
+metadata.
 
-No, I'm not aware of any users neither the old nor the new
-compatible, it only popped up from my backlog of patches
-because of its usage of legacy GPIOs. From what I can
-tell, the only users of the non-DT MMIO interface were
-out of tree arch/blackfin/ boards.
+KASAN detects the bug:
+ ==================================================================
+ BUG: KASAN: slab-out-of-bounds in ice_vsi_alloc_ring_stats+0x385/0x4a0 [ice]
+ Read of size 8 at addr ffff88810affea60 by task kworker/u131:7/221
 
-       Arnd
+ CPU: 24 UID: 0 PID: 221 Comm: kworker/u131:7 Not tainted 7.1.0-rc1+ #1 PREEMPT(lazy)
+ ...
+ Workqueue: ice ice_service_task [ice]
+ Call Trace:
+  <TASK>
+  ...
+  kasan_report+0xd7/0x120
+  ice_vsi_alloc_ring_stats+0x385/0x4a0 [ice]
+  ice_vsi_cfg_def+0x12e2/0x2060 [ice]
+  ice_vsi_cfg+0xb5/0x3c0 [ice]
+  ice_reset_vf+0x858/0xf80 [ice]
+  ice_vc_request_qs_msg+0x1da/0x290 [ice]
+  ice_vc_process_vf_msg+0xb15/0x1430 [ice]
+  __ice_clean_ctrlq+0x70d/0x9d0 [ice]
+  ice_service_task+0x840/0xf20 [ice]
+  process_one_work+0x690/0xff0
+  worker_thread+0x4d9/0xd20
+  kthread+0x322/0x410
+  ret_from_fork+0x332/0x660
+  ret_from_fork_asm+0x1a/0x30
+  </TASK>
+
+ Allocated by task 2439:
+  kasan_save_stack+0x1c/0x40
+  kasan_save_track+0x10/0x30
+  __kasan_kmalloc+0x96/0xb0
+  __kmalloc_noprof+0x1d8/0x580
+  ice_vsi_cfg_def+0x115c/0x2060 [ice]
+  ice_vsi_cfg+0xb5/0x3c0 [ice]
+  ice_vsi_setup+0x180/0x320 [ice]
+  ice_start_vfs+0x1f3/0x590 [ice]
+  ice_ena_vfs+0x66d/0x798 [ice]
+  ice_sriov_configure.cold+0xe4/0x121 [ice]
+  sriov_numvfs_store+0x279/0x480
+  kernfs_fop_write_iter+0x331/0x4f0
+  vfs_write+0x4c4/0xe40
+  ksys_write+0x10c/0x240
+  do_syscall_64+0xd9/0x650
+  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+ The buggy address belongs to the object at ffff88810affea40
+                which belongs to the cache kmalloc-32 of size 32
+ The buggy address is located 0 bytes to the right of
+                allocated 32-byte region [ffff88810affea40, ffff88810affea60)
+ ...
+ ==================================================================
+
+ice_vsi_rebuild() handles this correctly by calling
+ice_vsi_realloc_stat_arrays() before reconfiguration, but
+ice_vf_reconfig_vsi() was missing this call.
+
+Fix by calling ice_vsi_realloc_stat_arrays() in ice_vf_reconfig_vsi()
+before ice_vsi_decfg(), mirroring the ice_vsi_rebuild() pattern. Set
+vsi->req_txq/req_rxq from vf->num_req_qs so the realloc function knows
+the target array size.
+
+See the linked RHEL Jira item for a reproducer.
+
+Fixes: 2a2cb4c6c181 ("ice: replace ice_vf_recreate_vsi() with ice_vf_reconfig_vsi()")
+Closes: https://redhat.atlassian.net/browse/RHEL-164321
+Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+Assisted-by: Claude:claude-opus-4-6 semcode
+---
+ drivers/net/ethernet/intel/ice/ice_lib.c    | 2 +-
+ drivers/net/ethernet/intel/ice/ice_lib.h    | 1 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c | 7 +++++++
+ 3 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index 837b71b7b2b7..fc78176a2a8d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -3015,7 +3015,7 @@ ice_vsi_rebuild_set_coalesce(struct ice_vsi *vsi,
+  * ice_vsi_realloc_stat_arrays - Frees unused stat structures or alloc new ones
+  * @vsi: VSI pointer
+  */
+-static int
++int
+ ice_vsi_realloc_stat_arrays(struct ice_vsi *vsi)
+ {
+ 	u16 req_txq = vsi->req_txq ? vsi->req_txq : vsi->alloc_txq;
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.h b/drivers/net/ethernet/intel/ice/ice_lib.h
+index 49454d98dcfe..6f7da84384e5 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.h
++++ b/drivers/net/ethernet/intel/ice/ice_lib.h
+@@ -66,6 +66,7 @@ int ice_ena_vsi(struct ice_vsi *vsi, bool locked);
+ void ice_vsi_decfg(struct ice_vsi *vsi);
+ void ice_dis_vsi(struct ice_vsi *vsi, bool locked);
+ 
++int ice_vsi_realloc_stat_arrays(struct ice_vsi *vsi);
+ int ice_vsi_rebuild(struct ice_vsi *vsi, u32 vsi_flags);
+ int ice_vsi_cfg(struct ice_vsi *vsi);
+ struct ice_vsi *ice_vsi_alloc(struct ice_pf *pf);
+diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+index 772f6b07340d..9edb2c14f553 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+@@ -268,6 +268,13 @@ static int ice_vf_reconfig_vsi(struct ice_vf *vf)
+ 
+ 	vsi->flags = ICE_VSI_FLAG_NO_INIT;
+ 
++	vsi->req_txq = vf->num_req_qs;
++	vsi->req_rxq = vf->num_req_qs;
++
++	err = ice_vsi_realloc_stat_arrays(vsi);
++	if (err)
++		return err;
++
+ 	ice_vsi_decfg(vsi);
+ 	ice_fltr_remove_all(vsi);
+ 
+-- 
+2.54.0
+
 
