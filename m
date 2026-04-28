@@ -1,162 +1,259 @@
-Return-Path: <netdev+bounces-281920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281921-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AHOEDVvC8GloYQEAu9opvQ
-	(envelope-from <netdev+bounces-281920-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:21:15 +0200
+	id HqX6BnLW8GnJZwEAu9opvQ
+	(envelope-from <netdev+bounces-281921-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:46:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C392F486D07
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:21:14 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 481974882BC
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:46:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5DD1D3003835
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 14:21:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A1EE330B9003
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 14:23:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD4BB43E9D5;
-	Tue, 28 Apr 2026 14:21:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE1A44418D8;
+	Tue, 28 Apr 2026 14:23:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="vxjVaeVo"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="C9wFGBxw";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="N5qAoWPK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC1B4418DF;
-	Tue, 28 Apr 2026 14:20:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5FC4439005
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 14:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777386063; cv=none; b=tDYXD7zWE5Agld29ASOFeQfJ9lNxP/b9yPEfP9sLY6VaLMaN3FoDsjnVrdK/Abx8cSPuar36LfBHEhBaLoG1o+8xVcwARVH1BrsrzmU8bvIAyHmYoRQx6xCE54vphbLKHiSE6AI+31ZGre+36t7UquLl/HkLLC66brFOQcOWHlE=
+	t=1777386195; cv=none; b=reYvO/kRjCz0ZS92t774ZmPz5Ufc71pxFkIqJCKVlEYCXK3WHzTSiJ+zF2SjGJz6Lgy7hq8+RPTqG7IlNlGLiCO3zqF5ySmJuRF7kd1KdSfzlqVuXc/z5DM1kJ4Zpgt1BU9EF29NELBHwjcM+CeU9LobxsNJm0o2X8liV/RBRWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777386063; c=relaxed/simple;
-	bh=Gf+XrcYgPenGEIKbsoSDcC9F+FbyEhYGvpS57tMlaI0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OICK6HWQNvOkkcFe8gi4Y6kzK/6UhiwJYkhBL68KsniClzJrJ/Bte5Gr7hBiU5TTFTIZctUAeiC3eZFW1pIqCw4IKKd03Buq2cozsYau22kuLiMSbGYn16za2S/4DIRuxJ1eimZ+hT2x+9gTZ1uDZ3uODbsmaZhYlhgrHXyYZgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=vxjVaeVo; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id A3A204E42B56;
-	Tue, 28 Apr 2026 14:20:52 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 71025601D0;
-	Tue, 28 Apr 2026 14:20:52 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C9BD910728AA4;
-	Tue, 28 Apr 2026 16:20:40 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1777386050; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=Se88myibkKEKJupqIWVDpzFA5fJPWlqZId0UB7SQ3r8=;
-	b=vxjVaeVoViKGSjmy7yA8GP/7DlUObLqX7S8zv6rcnNtDxwGmIJXvVzu3v4mrrviqaY5A9e
-	LJp++FMBsE1rBNkgf+gPOlF7M4dmIf8dfvFsZ8mr/BXasf4iWnFFBYk6V5+ocpAxJmQclD
-	dqAoNv2o6aTuDlojzUMk7cANEAVzmJvw9SwcZ66z57zpBrriy/fe+UhXu8x6GUD8ItAIjn
-	5OwX3oTmK5ouLl/du3JxUfurO0KeigVf4PiX8ZzxgUeGMefgok2tSohk1VICdEGxouRQs/
-	QVYdzCGuyaj+yMIMPX6HUQ2HwIPF/1GVumnQAW14Vjlp9xzAmcvW2MbU7oEcvg==
-Date: Tue, 28 Apr 2026 16:20:40 +0200
-From: Alexandre Belloni <alexandre.belloni@bootlin.com>
-To: Yury Norov <ynorov@nvidia.com>
-Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Jonathan Cameron <jic23@kernel.org>,
-	David Lechner <dlechner@baylibre.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	David Laight <david.laight.linux@gmail.com>,
-	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
-	Andy Shevchenko <andy@kernel.org>,
-	Ping-Ke Shih <pkshih@realtek.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Hans de Goede <hansg@kernel.org>, Linus Walleij <linusw@kernel.org>,
-	Sakari Ailus <sakari.ailus@linux.intel.com>,
-	Salah Triki <salah.triki@gmail.com>,
-	Achim Gratz <Achim.Gratz@stromeko.de>,
-	Ben Collins <bcollins@watter.com>, x86@kernel.org,
-	linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	linux-rtc@vger.kernel.org
-Subject: Re: [PATCH v2 8/9] rtc: rv3032: switch to using FIELD_GET_SIGNED()
-Message-ID: <202604281420408aa2e078@mail.local>
-References: <20260427214127.406067-1-ynorov@nvidia.com>
- <20260427214127.406067-9-ynorov@nvidia.com>
+	s=arc-20240116; t=1777386195; c=relaxed/simple;
+	bh=LijrkjFJMpmtl0RFSav1RQXDYuIS2GNEp12OlC/fnQU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=n58e3t/n0y6pdPBMluZAxrsKS1Z/Kke1WEjjyQGvAMMTr354tkXFOX2bdJADwJlM5OxefOIWTY8uGOVqtGOigxBdvisDOHqZwpgrW+CpYe/keRDrFCsfJOpH/nmd7/tyOkzpQKS3ICbDFdkbY5GVLyrrEopMiELtvKaUvZkWIL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=C9wFGBxw; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=N5qAoWPK; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63SA2vBY985077
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 14:23:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=n4/CmuMpXrsR4zeR3KixXM
+	kaiDP4I+U9UFoAoRmEES8=; b=C9wFGBxwZbGqSpHYgzveA7EzaOmjjhvoKBHZZ8
+	EZIfHBft9olSpK+OhwZGiP8bPv1yK+KpIVsBI5PUL5E+mu9jB6if/7LVM4B6xmv5
+	3hCmLavmsPtblF2qJN5Z1NOuhRr0Qnbt34yW5yE/2skFuZby1sOPsBSR5O7KO0DW
+	gLXSq7zvnCVtvzb3q7hj48z9bx1EFTSYAM3m3VgSDG4yMqCqRNW+5hMfKXeZITx8
+	nU+eLTWivLYFiAH3TbfvvXf60/bZevkdcOt22fWAwFXS1Q5IfmAaVvBcgp00F08e
+	h2DNFP5BZWUTJ1aBVvOKg7Oc1ynB5HzYRSI7gVi2vr4rmqig==
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dttt2s283-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 14:23:11 +0000 (GMT)
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-6961bda4505so5745685eaf.3
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 07:23:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1777386191; x=1777990991; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=n4/CmuMpXrsR4zeR3KixXMkaiDP4I+U9UFoAoRmEES8=;
+        b=N5qAoWPKOWvmN7/XT95+5mHqC85xQtO4FyTcWhG0A6lZSOdalWGFzKopMwVKZxWF7I
+         cSTbfOhLa/a4+NqasONV6MSBPVWk2bIOdBwImacuG53+KCcdMG9JagefA/r+vDJBhxue
+         E9Un6ln62OnBdD+yvCZC7cQT4SMWsm2vg+3Osr3jzUVllXE9kpq5FT8V8wesItkAacef
+         KOAfcK9Nv2G9JFeOiVGd81/kC00XQirgO/9PeeyWE2l7xKv0jASOxBVjeEJym9w1UYJf
+         ja/ofkXvYIN5Kl0BiKbi6EyamR87IHQ3gXr1ZuEm6JrwtDnMJXCTilPcVmVoorFd2Pe8
+         LPAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777386191; x=1777990991;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=n4/CmuMpXrsR4zeR3KixXMkaiDP4I+U9UFoAoRmEES8=;
+        b=EwrCmIRn61ReGmc1lj4BeS4i0s8PGRdym1kXqD7B1Qn687DWvnUjclARzNAUedve3/
+         mvbqaigj9phYMz7RpcLZpIFkMYJxIn2CP9fIPW7w4Xr/vnTj2Og6tDNuFd3hw9F19hTb
+         jbw5om15zLKpFOH4H5OK1QBq1FZ7KKyX01xWmDlJWD7O9uB6d7xtybe12X9TVp4UIh/0
+         A38K/po3Vun31GQLr7oK/ZN1hzMzVo4nMJnlhH2xX/4iJfHK7EpsW/r4hbXau5+vqCqg
+         JotNAahVLSY5Ay16S4gwmjM68owNVcCRvlsC1LicNZ3lyUYLBBWZN9cxmwNeT+a9Lqs7
+         P0Ng==
+X-Forwarded-Encrypted: i=1; AFNElJ8mHerHQiXZAWc0RKzarvnoky5J5h9+XvxN1vC6Yw6VuEQ5NSlILlIYwh0SscMjYMkL33VQF0I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwM7YFtVMobqQnQb/0mdDRvIk0lhim1A6zHMmgze36t8vZAlBEC
+	ELtv56qwuW26e8/PHChzRc1llO+F5PqmNdX1oDF0djrS9RmwSF9fuzCOsI93pf9AyjOWI9xVOMX
+	uTMz5GriN+LgvwFn7DIpv9Y/FhgiTQDrVtOI2pxRfqViKPu0a558+g46mxKo=
+X-Gm-Gg: AeBDies6Za1nmvZL+1BVJlYNXr97iit6FV9X2/rLZ7Ak3p25F40Fpuh+5iO1RnbeR5R
+	S2GjMcmeJ1hWHQ7Giy6QDpnJKhpzeabSqzSiC0RV9EmlDga/EATDXRRB9wEqlpJEeEBfuYcLZTb
+	kVSTGHaGWCucik6CFNvpS7Pp47uX9EjaTBfZk12bHXm6x4KoivxFYZ4C+i+BHGHdbzTB2imdmiF
+	Ykvu2GirgmeEiJ2Y7fkTYe6BsKHYby/sfqkcg/MGf62R2FUYd2G8wKIzcGF2x4yW/Tg2nLgIMws
+	9rB3Sb1qFDS2bSKGOk10yYU+Q+9zS1MHsFEQDpmUgSxWqX2DiEi0Adwiz4OWDP+by58REHwslBS
+	7p4vm5SEShOAb1r7nwwZIYe5D8FMeTgnqJisSCabWVFa/RMS8o8I4GvvPH8uYwki7lM7QZonfto
+	tSOf4GLJa7CrvmY3fgWA2OpGSOE34=
+X-Received: by 2002:a05:6820:1ca6:b0:694:a339:43ac with SMTP id 006d021491bc7-6965cb8b5fdmr1505726eaf.42.1777386190985;
+        Tue, 28 Apr 2026 07:23:10 -0700 (PDT)
+X-Received: by 2002:a05:6820:1ca6:b0:694:a339:43ac with SMTP id 006d021491bc7-6965cb8b5fdmr1505690eaf.42.1777386190463;
+        Tue, 28 Apr 2026 07:23:10 -0700 (PDT)
+Received: from QCOM-eG0v1AUPpu.na.qualcomm.com ([2a01:e0a:830:450:653f:4d28:6a78:a6ca])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bb80ba9b8c8sm107072666b.48.2026.04.28.07.23.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Apr 2026 07:23:09 -0700 (PDT)
+From: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Subject: [PATCH 0/9] Support for block device NVMEM providers
+Date: Tue, 28 Apr 2026 16:23:05 +0200
+Message-Id: <20260428-block-as-nvmem-v1-0-6ad23e75190a@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260427214127.406067-9-ynorov@nvidia.com>
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: C392F486D07
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMnC8GkC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzMDEyML3aSc/ORs3cRi3byy3NRcXZMkYwOLVIuklETLRCWgpoKi1LTMCrC
+ B0bG1tQDuQjwMYAAAAA==
+X-Change-ID: 20260428-block-as-nvmem-4b308e8bda9a
+To: Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jeff Johnson <jjohnson@kernel.org>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+        ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, daniel@makrotopia.org,
+        Loic Poulain <loic.poulain@oss.qualcomm.com>
+X-Mailer: b4 0.14.2
+X-Authority-Analysis: v=2.4 cv=HbIkiCE8 c=1 sm=1 tr=0 ts=69f0c2cf cx=c_pps
+ a=lkkFf9KBb43tY3aOjL++dA==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=YMgV9FUhrdKAYTUUvYB2:22 a=VwQbUJbxAAAA:8
+ a=VT4XjZGOAAAA:8 a=EUspDBNiAAAA:8 a=d2RCo21-rtVxI0NFAHcA:9 a=QEXdDO2ut3YA:10
+ a=k4UEASGLJojhI9HsvVT1:22 a=6CpsfURP9XNmmWg3j1mJ:22
+X-Proofpoint-ORIG-GUID: Of7oacddRKp1OzyNCa3fdlNPoHIBjKyT
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI4MDEzNiBTYWx0ZWRfX94IxwjjCjpHD
+ k9uAq//dfc9zcurtptt4t6HbieeKNiLHjKLY3s32BeUeaF6EQjMVmkC1q3fCukLVCPdaBGkfaiq
+ igvDD6Bypn326jPfkjbTVy8yHTkG1vfXFSG3fwEsRpZYpBhquvPMDmX3ZO4osoUVFjJnAQKvWY5
+ vHkBaPn4Ve82+Oyn2H6zEPu0/p8x98N7aCxvH5Bcz4T+v5QdDmTH2Qrpe93FowWxHHpvyRoj4GV
+ ls9TNp4qKANsudO+vApcpMJb3EopGJqEbn1Sxzs9TD69RfFxCkO/dgb9znEJPXN/opXIQa1YhKq
+ 9oqh77NQ1WSpuaDFt/4TAjVlDq8YR73hznWav+oIJQmGHZGm8q8vv3EYI2OtFigXx2w1jocsrPq
+ zSb6fDxycU8oDGQbFX7nxvBJOg31mhknAoIGPYl4Y4mXfXOeZfZJR490PBkk1bpUw9hzwTUlOvL
+ Fb+oIon5aMo98MI6TKg==
+X-Proofpoint-GUID: Of7oacddRKp1OzyNCa3fdlNPoHIBjKyT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-28_04,2026-04-28_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 malwarescore=0 suspectscore=0 adultscore=0 clxscore=1015
+ bulkscore=0 lowpriorityscore=0 spamscore=0 impostorscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2604280136
+X-Rspamd-Queue-Id: 481974882BC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281920-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281921-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:dkim,qualcomm.com:email,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
+	FREEMAIL_TO(0.00)[kernel.org,kernel.dk,sipsolutions.net,holtmann.org,gmail.com,quicinc.com,davemloft.net,google.com,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,redhat.com,alien8.de,linux.intel.com,zytor.com,infradead.org,baylibre.com,sipsolutions.net,gmail.com,analog.com,realtek.com,lunn.ch,davemloft.net,google.com,rasmusvillemoes.dk,stromeko.de,watter.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[35];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[30];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alexandre.belloni@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,mail.local:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[loic.poulain@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
 
-On 27/04/2026 17:41:25-0400, Yury Norov wrote:
-> Switch from sign_extend32(FIELD_GET()) to the dedicated
-> FIELD_GET_SIGNED() and don't calculate the fields length explicitly.
-> 
-> Signed-off-by: Yury Norov <ynorov@nvidia.com>
-Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+On embedded devices, it is common for factory provisioning to store
+device-specific information, such as Ethernet or WiFi MAC addresses,
+in a dedicated area of an eMMC partition. This avoids the need for
+and additional EEPROM/OTP and leverages the persistence of eMMC.
 
-> ---
->  drivers/rtc/rtc-rv3032.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/rtc/rtc-rv3032.c b/drivers/rtc/rtc-rv3032.c
-> index 6c09da7738e1..6bafdec637ae 100644
-> --- a/drivers/rtc/rtc-rv3032.c
-> +++ b/drivers/rtc/rtc-rv3032.c
-> @@ -376,7 +376,7 @@ static int rv3032_read_offset(struct device *dev, long *offset)
->  	if (ret < 0)
->  		return ret;
->  
-> -	steps = sign_extend32(FIELD_GET(RV3032_OFFSET_MSK, value), 5);
-> +	steps = FIELD_GET_SIGNED(RV3032_OFFSET_MSK, value);
->  
->  	*offset = DIV_ROUND_CLOSEST(steps * OFFSET_STEP_PPT, 1000);
->  
-> -- 
-> 2.51.0
-> 
+One example is the Arduino UNO-Q, where the WiFi MAC address and the
+Bluetooth Device address are stored in the eMMC Boot1 partition.
 
+Until now, accessing this information required a custom bootloader
+to read the data and inject it into the Device Tree before handing
+control over to the kernel. This approach is fragile and leads to
+device-specific workarounds.
+
+Rather than adding a new NVMEM provider specifically to the eMMC
+subsystem, the new support operates at the block layer, allowing any
+block device to behave like other non-volatile memories such as EEPROM
+or OTP.
+
+This series builds on earlier work by Daniel Golle that enables block
+devices to act as NVMEM providers:
+https://lore.kernel.org/all/6061aa4201030b9bb2f8d03ef32a564fdb786ed1.1709667858.git.daniel@makrotopia.org/
+
+It also introduces an NVMEM layout description for the Arduino UNO-Q,
+allowing device-specific data stored in the eMMC Boot1 partition to
+be accessed in a standard way.
+
+WiFi and Ethernet already support retrieving MAC addresses from NVMEM.
+Bluetooth requires similar support, which is also addressed.
+
+Note that this is currently limited to eMMC-backed block devices, as
+only the eMMC core associates a firmware node with the block device
+(add_disk_fwnode). This can be easily extended in the future to
+support additional block drivers.
+
+Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+---
+Daniel Golle (1):
+      block: implement NVMEM provider
+
+Loic Poulain (8):
+      dt-bindings: mmc: Document support for nvmem-layout
+      arm64: dts: qcom: arduino-imola: Describe boot1 NVMEM layout
+      dt-bindings: net: wireless: qcom,ath10k: Add NVMEM MAC address cell
+      arm64: dts: qcom: arduino-imola: Get WiFi MAC from NVMEM
+      dt-bindings: bluetooth: qcom: Add NVMEM BD address cell
+      Bluetooth: hci_sync: Add NVMEM-backed BD address retrieval
+      Bluetooth: qca: Set NVMEM BD address quirks when address is invalid
+      arm64: dts: qcom: arduino-imola: Get Bluetooth BD address from NVMEM
+
+ .../devicetree/bindings/mmc/mmc-card.yaml          |  20 +++
+ .../net/bluetooth/qcom,bluetooth-common.yaml       |  10 ++
+ .../bindings/net/wireless/qcom,ath10k.yaml         |  10 ++
+ arch/arm64/boot/dts/qcom/qrb2210-arduino-imola.dts |  30 ++++
+ block/Kconfig                                      |   9 ++
+ block/Makefile                                     |   1 +
+ block/blk-nvmem.c                                  | 164 +++++++++++++++++++++
+ drivers/bluetooth/btqca.c                          |   5 +-
+ include/net/bluetooth/hci.h                        |  18 +++
+ net/bluetooth/hci_sync.c                           |  56 ++++++-
+ 10 files changed, 321 insertions(+), 2 deletions(-)
+---
+base-commit: 47c4835fc0fed583d01d90387b67633950eba2b2
+change-id: 20260428-block-as-nvmem-4b308e8bda9a
+
+Best regards,
 -- 
-Alexandre Belloni, co-owner and COO, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+Loic Poulain <loic.poulain@oss.qualcomm.com>
+
 
