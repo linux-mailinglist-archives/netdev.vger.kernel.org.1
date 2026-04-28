@@ -1,69 +1,70 @@
-Return-Path: <netdev+bounces-281618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281619-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mCmTIywu8GkHPgEAu9opvQ
-	(envelope-from <netdev+bounces-281618-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 05:49:00 +0200
+	id cEppNvEt8GkHPgEAu9opvQ
+	(envelope-from <netdev+bounces-281619-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 05:48:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E145B47D298
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 05:48:59 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89A2447D282
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 05:48:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3E7DF305022B
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 03:47:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 90F6C30254BE
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 03:47:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B78612FB969;
-	Tue, 28 Apr 2026 03:47:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22079327C00;
+	Tue, 28 Apr 2026 03:47:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="UYkNN7t2";
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="fD3N5uIf"
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="DeA8bs+V";
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="nKUSUSu+"
 X-Original-To: netdev@vger.kernel.org
 Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5124F3246F4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B593254A9;
 	Tue, 28 Apr 2026 03:47:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777348058; cv=none; b=L7sVWyivTasLAbW00Tmld560JmL2BoaCl/KZNMh0aRST9mGpzUOtBIE50OlTSnvkNeHkfGjo+O1RAe21xw55ork6zjmr9pQSltGlEg0mCHmodhfk9V4b4xxKIKLsL596KaAUaQ0pcuf8NPhf/Sc+unNo73eDvZaNW23JZ2o48nk=
+	t=1777348059; cv=none; b=gLeSJr4Opz3wYfjalw1rBurBbsbVmNlQpC7TOZ2mscKeTU2b4j94hTZjQLjnKYYVKHRML3tmTmtokWmq9k46OkYwc00M+43fD6UxPJeOgm2uJyY4QLAM8V1PcbpiXZrgUPmPxmmXI6oh3sJhge97xS2I9Ozgxp2ZHMjrEh4TUpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777348058; c=relaxed/simple;
-	bh=2HeLRS+9Oy1I9V2GqKYRBj5SGf5uOCzP41BzpxFObe0=;
+	s=arc-20240116; t=1777348059; c=relaxed/simple;
+	bh=Ue/Yt2sNqpCKF/L65QQ7e6/PWVKVomQsIcdBCjnAhBg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=F32v0JD1H8wtUbwh6zFjP4e63yI7fbq8kUfwpZ9837pEGSKg6nBdCCS/QTm6M3y92j+8WBmhF9ysnX8CN/El/f10ZKA46wEOgTNmPJFVjVP2p/0JsSBIvV8sST5H6UXd/nALTJ3a0e4/4tNZJoUsn5rlmbnuMnDop6kzjsP55wE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=UYkNN7t2; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=fD3N5uIf; arc=none smtp.client-ip=23.88.97.239
+	 In-Reply-To:To:Cc; b=ZTu1PHhS/H6ElfpuZWydJMQduLs4rxiYeXRL1d87t1KkBInF0IO7SNLwCh+0bdFSplM2v33blE2hKv5NG50x0sONwF7LFlu78Fbgf+q50HLMRdVX5rh+f5iRVMYzlipAgxOyaJFUMo4AxPq609sonSSUBEFwf048hK8ovcNKYH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=DeA8bs+V; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=nKUSUSu+; arc=none smtp.client-ip=23.88.97.239
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1777348055;
-	bh=2HeLRS+9Oy1I9V2GqKYRBj5SGf5uOCzP41BzpxFObe0=;
+	s=default; t=1777348056;
+	bh=Ue/Yt2sNqpCKF/L65QQ7e6/PWVKVomQsIcdBCjnAhBg=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=UYkNN7t2LQkn3p9T6I5yv9i5t5xas+rc+zr8WXr5bMssLH0uCi3FPQfijPWol/ptO
-	 X6z93UY4PNsBWMPE/4SRBclCOBUXmp5UFAaDeyBsptrNOHty4Thfh4D6F75mPdGP74
-	 iqI74YJWDDzkE/koWxYYP3M/cxp04qeHD+IbmEUeiOatLFLSOTCqr2PNIBWj31xa4w
-	 nXfZxdGGbZQuJISEscwrzXXDImY5nTnU/NC5NU+XpIke6DvugatCKKK3S9Peov1KCe
-	 9GcCwt7M8fMAh/RElVEH83Ys8UHpuOx1d8afuw7YsHPD4PmYjTl4AefUWFw6joT0WQ
-	 PoeozyDEo9rew==
+	b=DeA8bs+V0BwFJSH+slVrBkXgg8xopZrWEnAz1GswLkD79kYDAFdBqQATTB8S4Y12D
+	 RXWIQ4rDkIq1ZUPKb08PgQi/XtVdyFE/QBR4XlNNO30023AJ7LrQneTHMnZMdBRg9X
+	 e36wRWdWHZWep1I7QnY3NA2kaeC6pDvV4x7xKa1TXNkuQ2u4lmdTF3xEWDFXK1m6dq
+	 c3mcfSkJDKM9HnQsjKW5X9hO6S0rEJY5dl1GnoIGjsZnI5BLcmr8xsHcNQgIsfp1KN
+	 jd7D9E4H8wbORL2cFxvvfRtFRzyyO1rtv8ROypw8YNclVo6QBIlRc/PBE9NcLfuItC
+	 hfrRfBaT1sUQg==
 Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
-	id BA87347DAF; Tue, 28 Apr 2026 03:47:35 +0000 (UTC)
+	id 2BA2147DDE; Tue, 28 Apr 2026 03:47:36 +0000 (UTC)
 X-Spam-Level: 
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
 	s=default; t=1777348053;
-	bh=2HeLRS+9Oy1I9V2GqKYRBj5SGf5uOCzP41BzpxFObe0=;
+	bh=Ue/Yt2sNqpCKF/L65QQ7e6/PWVKVomQsIcdBCjnAhBg=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=fD3N5uIfZHG5/9rPASI0npkl99iPphEv5Gwh58r2jLXFv47URbXmCAkp1ixpNc1ef
-	 qTeuCJqaSI0wekaoky2Bwa/ks4mJqoZ/fyb977glNNuvsD5bfJHjec05cNmr+QjzP+
-	 SUSvxmcuITR8E4TXrjafqhhuBfVFeethnXm9dY4m8PHBV4C5EbghM25QSjUAWoA8UU
-	 V3nO7unAhH1iMVCYtTBZuFCh9vRRqoq6sRVaMigKzUoOrLWU9tvCSqbYfC5amrZj/4
-	 15ecIqObiiK++9LnR3DJPDd3lKt4tDgoCDQrWB9XxISQJOutCyc46KjMYWRN12T4eT
-	 BH7hnWK+OBULg==
+	b=nKUSUSu+Bq418rAZ7H7gyVQ2wC+QS7eAVZTXTHj7Y428SfRk2vr/lo4Kaj3irdyOK
+	 9PZmHIiUmyrosEoAZYEypEEguG2Qa3tF8OnL7qMiPawmeZqaEN+blTIZUu4NwfHn2P
+	 1r2heINekU13pjBrNZHrQ8+J0hMfBSobLoS6BRiKaU5jDrHChb9D4rhCquKjY7AhQy
+	 CPZMDtBTPe7xL9TrcCwJzck9POBqfYqg9PgnepgHrhKPCowyZmDH2AlQUBd9+ThB/V
+	 J9gAGISGH63aFNllpbloocoWcQ+pMfR2GeCz3fesEIOqBq62cq5+SV7sEinkzX2IOE
+	 QsOLuiTQW9LSw==
 Received: from AMDDesktop.lan (unknown [IPv6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb])
-	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id F181E476A4;
-	Tue, 28 Apr 2026 03:47:32 +0000 (UTC)
+	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 3912547DAB;
+	Tue, 28 Apr 2026 03:47:33 +0000 (UTC)
 From: Birger Koblitz <mail@birger-koblitz.de>
-Date: Tue, 28 Apr 2026 05:47:23 +0200
-Subject: [PATCH net-next 3/4] r8152: Add irq mitigation for RTL8157/9
+Date: Tue, 28 Apr 2026 05:47:24 +0200
+Subject: [PATCH net-next 4/4] r8152: Add firmware upload capability for
+ RTL8157/RTL8159
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,7 +73,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260428-rtl8159_net_next-v1-3-52d03927b46f@birger-koblitz.de>
+Message-Id: <20260428-rtl8159_net_next-v1-4-52d03927b46f@birger-koblitz.de>
 References: <20260428-rtl8159_net_next-v1-0-52d03927b46f@birger-koblitz.de>
 In-Reply-To: <20260428-rtl8159_net_next-v1-0-52d03927b46f@birger-koblitz.de>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -82,19 +83,19 @@ Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, Chih Kai Hsu <hsu.chih.kai@realtek.com>, 
  Birger Koblitz <mail@birger-koblitz.de>
 X-Mailer: b4 0.14.2
-X-Rspamd-Queue-Id: E145B47D298
+X-Rspamd-Queue-Id: 89A2447D282
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	DKIM_TRACE(0.00)[birger-koblitz.de:+];
-	TAGGED_FROM(0.00)[bounces-281618-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-281619-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	DMARC_NA(0.00)[birger-koblitz.de];
 	RCVD_TLS_LAST(0.00)[];
@@ -106,41 +107,90 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,birger-koblitz.de:email,birger-koblitz.de:dkim,birger-koblitz.de:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[birger-koblitz.de:email,birger-koblitz.de:dkim,birger-koblitz.de:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-Add interrupt mitigation code for both RTL8157 and RTL8159 that prevents
-USB interrupt callbacks with urb->status ESHUTDOWN being triggered. While the
-issue is rarely seen on the RTL8157, without the mitigation, it is
-common on the RTL8159:
-[273.561863] r8152 7-1:1.0 enx88c9b3b5xxxx: Stop submitting intr, status -108
+The RTL8159 requires firmware for its PHY in order to work at
+connection speeds > 5GBit. Add support for uploading firmware for
+the PHYs using the existing rtl8152_apply_firmware() function
+in r8157_hw_phy_cfg() and set up the correct names for the firmware
+files.
+
+If no firmware is found, both the RTL8157 and the RTL8159 will continue
+to work.
 
 Signed-off-by: Birger Koblitz <mail@birger-koblitz.de>
 ---
- drivers/net/usb/r8152.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/net/usb/r8152.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index 8255261d73148a7b4dabe0188faf07cb1f356437..08cc3c1dae0facb2400890ba4d093c97ed56d40b 100644
+index 08cc3c1dae0facb2400890ba4d093c97ed56d40b..56e00fe6f32405ce753df3e03e54a7daaf1a29ac 100644
 --- a/drivers/net/usb/r8152.c
 +++ b/drivers/net/usb/r8152.c
-@@ -8444,6 +8444,12 @@ static void r8156_init(struct r8152 *tp)
- 	else
- 		r8153_u2p3en(tp, false);
+@@ -4663,10 +4663,11 @@ static bool rtl8152_is_fw_phy_speed_up_ok(struct r8152 *tp, struct fw_phy_speed_
+ 	case RTL_VER_11:
+ 	case RTL_VER_12:
+ 	case RTL_VER_14:
+-	case RTL_VER_16:
+ 		goto out;
+ 	case RTL_VER_13:
+ 	case RTL_VER_15:
++	case RTL_VER_16:
++	case RTL_VER_17:
+ 	default:
+ 		break;
+ 	}
+@@ -7996,12 +7997,14 @@ static void r8157_hw_phy_cfg(struct r8152 *tp)
+ 	data = r8153_phy_status(tp, 0);
+ 	switch (data) {
+ 	case PHY_STAT_EXT_INIT:
++		rtl8152_apply_firmware(tp, true);
+ 		ocp_reg_clr_bits(tp, 0xa466, BIT(0));
+ 		ocp_reg_clr_bits(tp, 0xa468, BIT(3) | BIT(1));
+ 		break;
+ 	case PHY_STAT_LAN_ON:
+ 	case PHY_STAT_PWRDN:
+ 	default:
++		rtl8152_apply_firmware(tp, false);
+ 		break;
+ 	}
  
-+	if (tp->version >= RTL_VER_16) {
-+		/* Disable Interrupt Mitigation */
-+		ocp_byte_clr_bits(tp, MCU_TYPE_USB, 0xcf04,
-+				  BIT(0) | BIT(1) | BIT(2) | BIT(7));
-+	}
-+
- 	/* MSC timer = 0xfff * 8ms = 32760 ms */
- 	ocp_write_word(tp, MCU_TYPE_USB, USB_MSC_TIMER, 0x0fff);
+@@ -9941,6 +9944,8 @@ static int rtl_ops_init(struct r8152 *tp)
+ #define FIRMWARE_8153C_1	"rtl_nic/rtl8153c-1.fw"
+ #define FIRMWARE_8156A_2	"rtl_nic/rtl8156a-2.fw"
+ #define FIRMWARE_8156B_2	"rtl_nic/rtl8156b-2.fw"
++#define FIRMWARE_8157_1		"rtl_nic/rtl8157-1.fw"
++#define FIRMWARE_8159_1		"rtl_nic/rtl8159-1.fw"
  
+ MODULE_FIRMWARE(FIRMWARE_8153A_2);
+ MODULE_FIRMWARE(FIRMWARE_8153A_3);
+@@ -9949,6 +9954,8 @@ MODULE_FIRMWARE(FIRMWARE_8153B_2);
+ MODULE_FIRMWARE(FIRMWARE_8153C_1);
+ MODULE_FIRMWARE(FIRMWARE_8156A_2);
+ MODULE_FIRMWARE(FIRMWARE_8156B_2);
++MODULE_FIRMWARE(FIRMWARE_8157_1);
++MODULE_FIRMWARE(FIRMWARE_8159_1);
+ 
+ static int rtl_fw_init(struct r8152 *tp)
+ {
+@@ -9987,6 +9994,12 @@ static int rtl_fw_init(struct r8152 *tp)
+ 		rtl_fw->pre_fw		= r8153b_pre_firmware_1;
+ 		rtl_fw->post_fw		= r8153c_post_firmware_1;
+ 		break;
++	case RTL_VER_16:
++		rtl_fw->fw_name		= FIRMWARE_8157_1;
++		break;
++	case RTL_VER_17:
++		rtl_fw->fw_name		= FIRMWARE_8159_1;
++		break;
+ 	default:
+ 		break;
+ 	}
 
 -- 
 2.47.3
