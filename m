@@ -1,228 +1,194 @@
-Return-Path: <netdev+bounces-282063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282064-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mPRpE34V8WkcdAEAu9opvQ
-	(envelope-from <netdev+bounces-282063-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 22:15:58 +0200
+	id YJRZOdQY8Wm6dAEAu9opvQ
+	(envelope-from <netdev+bounces-282064-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 22:30:12 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAAEB48B951
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 22:15:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5935748BC46
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 22:30:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 42AE8303EFC6
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 20:15:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0B6FD3055E1C
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 20:30:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED55F313277;
-	Tue, 28 Apr 2026 20:15:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FAAE39768A;
+	Tue, 28 Apr 2026 20:30:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KlhTZCEL"
+	dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b="O86fvf0n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9CB2E62D9
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 20:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.172
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777407354; cv=pass; b=JcLHc0CrPvDGcADcvHV8/VkKufWWN8bmShmFL/HRPtFKF0fOMfI00E+sklIgskDm0GPupGTfH+lOXbYJ4wr1WSnY3mcokkw0F8XGmR03Jp73Z7J77IEb3hvtps4KcLwhVTX0F0VcXmpa+6BrcJoZXPywTocZ/OGiB+DzJTAYbms=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777407354; c=relaxed/simple;
-	bh=jubsY6PGHnTXGhA5KKyDi/LWS9PbjTsPha5xbgCuu/I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CcjcT6rr2t5oltJf5MBanZGTM+8puySF1Nora7X8u/Jt6IlU2oMecEHGCajrIDWl16RJjGWVhlmyayMnLa9Snh90On0TdmWUHRiRtgBHypMzMkj+wz7iRIK7Yk8oeKqMtRm8Bz+XHiPuaHBNNYAfHB2i7GFIkSTiXeECFlvCvok=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KlhTZCEL; arc=pass smtp.client-ip=209.85.215.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-c795f096fa5so4671611a12.3
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 13:15:53 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777407353; cv=none;
-        d=google.com; s=arc-20240605;
-        b=UjoamGob5Dijh7aiy3mw6RZPUhsSeruPb3B3Va6YG+iB+khnVe02hvuM5nUqp3ObGw
-         DXwuesukw+3V+Z0XpFQLuvX+z+ayRufcdGsfRwlfviWGj/2VCjQ56oFMkcWS8dQnSYev
-         AeoI/aRWu8lcu25R4De6mGvlSGJUCqatAHIfA6wvyAFjK2Qbzk7m/bCSH1tPiqlBwuiW
-         ekjdHgg+oy/R5CySNzDJnbnx7j3dAnr6nPsYfAGMY89i1MxEPswizv7KnZtkOwE7AoGm
-         cox74Vx5SdhfNnKCQ/fimgxWOhNAv6DXssZ0HdU7oIVSlq1RS3zMHcxymZQXrrzKyDaP
-         0r0w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=uQV+ZUo0kltumkkS/38YnBQvpZ5Ru0K+aNTeRpdyz74=;
-        fh=CdWhJh0s9Y46zmTSEuMX3wHnoe0TR5j5iR2YOdFtK44=;
-        b=OfVJcDPGnBzdMbvSo3fKOmKIQDLCFTUf01OyyNDb8aOx7IBJ5WdZ3P1xNzqQQjJcXs
-         oh7aR3PNeWSdGo5kSdLclrgFwlbt1WJ+NJorYRcUsYia+FsewGVMeL7+mAXjN4YsyWP6
-         Zr8dXO8DYsyhURtPDC8EbaKnTqj6CFELI7NtVaV5B2aWf5RlR9yM5I2bGuk2i68MqPS6
-         rIbun5F52gknAGoODuXOBVlt5r9Yzbm9Bke3TI5yQSJdU/Ry9j0sqAEg6OkHrHkEaz9G
-         5pUpBR5vfUrV3OGbZLePLo4ChHZfeZkUcbTmRMHwRN0KY/dAAAJk0wgrYPlQTuV2XCg8
-         oH/w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 080262DFA3A
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 20:30:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777408206; cv=none; b=U7XxC8Yjjw6T/unaI38NN54fW7CSbKd9bUkcrLDN9j7GJgsjlQX9wELU4AjeFH6BU6cOIdehgAaFo7hdx8h2UQ+jvaE96sxFThstEoDOmowWtMjtayUN01Zf1qAUGzCZO9toO6Dwd+7xwAhj87F3F0mkdICJyMinL08J14xdkls=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777408206; c=relaxed/simple;
+	bh=YehqAfqF13ddP+X2+d1JomqRj+37J2/q9EvejNym0Cc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MM0z83GY7SdfvVNRo1PUi1pVeRx+tT6C0DG5nA0rAZ1UmUSCaQFu2yRXaHpF+fYxF5FHWIT9zItQ54xVfReC1y1rH40/2njBVkhlncdXl0VuGGY2WITgYOqWtiYYT84jMcsfmFhcdoQtcs0oFvW8/e/wgKbsrs+h4GPl3gb+OKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu; spf=fail smtp.mailfrom=g.harvard.edu; dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b=O86fvf0n; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=g.harvard.edu
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-50e614fdb42so94417931cf.3
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 13:30:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777407353; x=1778012153; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uQV+ZUo0kltumkkS/38YnBQvpZ5Ru0K+aNTeRpdyz74=;
-        b=KlhTZCELSkeBlc2IBRjM/spYNSJcZEx+XzogZUf8EXFJF3JgePK7hmDvz5NuTFJiJv
-         0BK3ai6GXs6Ba5FV/d4g1cdK/BL6ls/W71AfgslX1RqhbkmZGwqATBsS3wGqmGeH6nb/
-         xNU61DVSE4tbJYhfIKjDVbPYfQHKGcxwSbWUEqeSX2GlYVe7n1TWGmwLyTSdTy2lzZnj
-         VNdG2g0+RgBVVsWPCECBHC8P2dK1ajWkNZH/0ZwWaclyCSZEiTKU6Gl1JhiyMvC/Ti3k
-         KiEHqJicHui4HFNs3+FoX2afrvltIR+2kaN7IlVkx5wnlKskFTKJ6aVIH+p0ujd5d0bl
-         zUXg==
+        d=rowland.harvard.edu; s=google; t=1777408202; x=1778013002; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/MkENzSVBbBTjs3fyFaBN9uibCTbN0NN0fiY/kA8lms=;
+        b=O86fvf0nYILzN0+XGCxvgZ0k128liB+EFDtn31k2luD8to9BYsAnogPo+gJVmGaVnw
+         lXVWFTjXid/vXh3CMjkOHk4nFGypMua2MF9Fek4kPTzSlCFj6DDu6Eno4r+S8SBIl4kV
+         /sla+gRFtMaVoJKgMBWgAp0ZxyTuotzLHg4d5PfpooI87f2qy/BdNn4jUrFmyD3RNST6
+         8ExR+2LSYhORrSeS5Ud+BMNitk17ZuhFnFC4kXMr/3AL8KUS867fSKxqFg0+CnsRyV/u
+         zEvQaSUBsaM8uYEdlG6qKzEgn5EyqN5tdouuHAbMBQgvNGjL+zJOSy3oyyAlFZ6yaMEW
+         T05g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777407353; x=1778012153;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=uQV+ZUo0kltumkkS/38YnBQvpZ5Ru0K+aNTeRpdyz74=;
-        b=BdpI7W5IVUQI/RvZrZSJj2fjqKuAapLoIo4dYz5L/jvGEVteghPSxcmWITMIj9dDsj
-         R312AZD3HjOwqcV/0xnhgA2DjOHufAPE+hM9uyB1QrvMcgsCY+Gx6h7qdcKWoL56tT9z
-         W5yRLBXzxBh4ZSTy/p0oX3q+fF5TlE1A4eUey73aU1jd6jfrOkIaRzGQ4SiGN9ERbt5+
-         ZC2TtiZzt+XAsbUHca+7QBabLKrzpXZlFsoQVb5RQ8Be/TZyVTnZEpOUfPsz1zeYyM9t
-         M2rv6Lk6UX9fRwKtTLrJinnv0Pj9JxEjvmruTBCNAITiQcPFVA68jp8eLgRthJ7f9qWS
-         wryA==
-X-Gm-Message-State: AOJu0YxddZF8RCQqJAMOnRHfq0RkD2MSTWffkmNkE/s5DIPagK6XHtQB
-	h2/dwBHYRhFkcMdvNFDXb6N72SwQ7NndhP0qIy0d6edtNdUUWe8J1iJTX2V/HB8KPcpDAYwORGT
-	Wist5GCgBfuetYst7yH1eLiOFhSRF8EU=
-X-Gm-Gg: AeBDiet7BEr4WIYxkqLGLTHwxXoo12+fegUN3Z7Xj+XSdF2X3oXCoxGkuj2p3sNEGtk
-	Om76BBbkYg3dwzDsldXnzQS/5HKal1zr0rkF6pN10wwHfXB2CR091HmAf8YpZ4Zni1nqwzIBpVh
-	nc8t2nTDxXsB8NaKIUBnBBNoWGqou5XR5rqPvA1s+GS9qfHbWxvfIxdxohBNrOtk54IKNkT8pTN
-	yU2X8oayue0pUFddFwJWzrEa9APi1R1VNP5lp/afI3S+p0rpjMhY6aVK/cZJOrp+VqPecclOBIv
-	pttxQTYNcPzrvkPzXYfaTMBhh6jhj/dZgWQQzgo749CyWbDG0Ils8C+05w1KTjeW/zHwSAoybTp
-	3c9VesUxU3eXOsnIuE3ZFA5m/tMy50K7ViXlsR0sDKSiYEBX7Hw==
-X-Received: by 2002:a05:6a00:f9a:b0:82c:2155:5b6d with SMTP id
- d2e1a72fcca58-834ddabdb7dmr4872052b3a.12.1777407352913; Tue, 28 Apr 2026
- 13:15:52 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1777408202; x=1778013002;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/MkENzSVBbBTjs3fyFaBN9uibCTbN0NN0fiY/kA8lms=;
+        b=AUYGCNyBTbJ3TpTF7rKOvNpBjVDqFCp7b1S0JSAM9SiqV3hLFbb0QCcutZLE7SHi1z
+         gApd92xJ+/t14U2iFHdE2CnHqAjounl3TkaBshiO8oCwVsW1lcG+HAs5qkp8ayr3AERK
+         1raaH86FwYzlD5kP8e3a9fxI4xMc3QhxQpw+3nvhl57KbLzW9wnjLl3mdM0dtYljN6DS
+         +h7a7tAZWwIkW1gqNOIYazvcuvsm/8seEZyxF4oM0LjYwp6I+pWSA5+8njqagZmxhw9T
+         3CSo0c7Vs8KR+AUA9PKiIx5bPOrqknjJ67axsyyx3xM5ZWxqiXOfFK0EaopfYXDlVwTn
+         TC4Q==
+X-Forwarded-Encrypted: i=1; AFNElJ+FUVoal0AmhKr5diimZeOypTdoaRqEG7BrSM8C6073+7HoDSLZomv0a/I9y10H6yGPjdN5cUU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7Mg2HQ343kWV2mB60pA/FXNvY2V2XoAmg3v/oEsYsjwP1Gs9I
+	QQPIDvpguH2Es0eEFezsk2m2eEBHe5LrGPDDe/drIG95CnmE3wezLdtjY9soHa2GNQ==
+X-Gm-Gg: AeBDiesVGb517v9m9+YRy7OFYNKFeIE0eHDre8IsXEEHnEzw2kOrsHO2zicnqtvaKsz
+	+iaeTKcM2tyHxqU9j7yI8fwBhqwaqFLPbs4uCuQTKx7cCD2e7wDqkVm1pNv2rU0maQcNp3L4/TM
+	ghp6qX5wWzEVL95ensCLb+8D5BzgYnyUu+YyWmrJtGWdRuJYNhOU4s9GYMArMVd1CJDoTS7knvO
+	eKlAAo83mrc0kLOUt1LePZ5g1wZ5TgkqS/yfJ62z+c2e2ltrcqIdvA6+7Ss1YtpFRkBVf1UdT7W
+	/zagmJ1TcegypfJHkqXdHqyGoaATuaMrG6+yiC20T46TdDCUItZCEAjRdiLS7lQc+CECJKi7bbv
+	6t8T7lIEsSkhs6OUbhi1YJdRk1R09+joQF75WZYF1fuO7QZsT6m1CFahFy53iJhVb9YfJkR/5No
+	NKr27Vlfbv0o0oiLx3O8tsolFzfalAgm+qHB8=
+X-Received: by 2002:a05:622a:507:b0:50d:82db:773e with SMTP id d75a77b69052e-5100e1e0c5amr65265071cf.47.1777408202030;
+        Tue, 28 Apr 2026 13:30:02 -0700 (PDT)
+Received: from rowland.harvard.edu ([2601:19b:d01:d210::a0bd])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51014182afesm14843261cf.28.2026.04.28.13.30.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Apr 2026 13:30:01 -0700 (PDT)
+Date: Tue, 28 Apr 2026 16:29:59 -0400
+From: Alan Stern <stern@rowland.harvard.edu>
+To: Greg KH <greg@kroah.com>
+Cc: Mika Westerberg <mika.westerberg@linux.intel.com>,
+	Andrew Lunn <andrew@lunn.ch>, linux-usb@vger.kernel.org,
+	Yehezkel Bernat <YehezkelShB@gmail.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Andreas Noever <andreas.noever@gmail.com>,
+	Alan Borzeszkowski <alan.borzeszkowski@linux.intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 5/9] thunderbolt / net: Let the service drivers configure
+ interrupt throttling
+Message-ID: <4f71abbd-0faf-4aaa-9aa3-8816251b84a4@rowland.harvard.edu>
+References: <20260428072209.3084930-1-mika.westerberg@linux.intel.com>
+ <20260428072209.3084930-6-mika.westerberg@linux.intel.com>
+ <a0d3eec7-4c11-404f-804c-fa46515d25fe@lunn.ch>
+ <20260428172629.GW557136@black.igk.intel.com>
+ <2026042827-pep-deeply-edc9@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1777214801.git.lucien.xin@gmail.com> <20260428140642.GT900403@horms.kernel.org>
-In-Reply-To: <20260428140642.GT900403@horms.kernel.org>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Tue, 28 Apr 2026 16:15:40 -0400
-X-Gm-Features: AVHnY4Kx985VXS0AEmk_DrhzVNCcnQW-CWSjNlk5dYUnFRn6jZWfAV-j5B80K0Q
-Message-ID: <CADvbK_dNRkb8UeGi+x=HhH+tJZSpUTDyHdQLDxUQA1dinbaFNg@mail.gmail.com>
-Subject: Re: [PATCH net v2 0/2] sctp: fix a vtag verification failure caused
- by stale INITs
-To: Simon Horman <horms@kernel.org>
-Cc: network dev <netdev@vger.kernel.org>, netfilter-devel@vger.kernel.org, 
-	linux-sctp@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Yi Chen <yiche.cy@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: AAAEB48B951
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2026042827-pep-deeply-edc9@gregkh>
+X-Rspamd-Queue-Id: 5935748BC46
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[rowland.harvard.edu,none];
+	R_DKIM_ALLOW(-0.20)[rowland.harvard.edu:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282063-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[linux.intel.com,lunn.ch,vger.kernel.org,gmail.com,wunner.de,davemloft.net,google.com,kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-282064-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,google.com,redhat.com,netfilter.org,strlen.de,nwl.cc,gmail.com];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[rowland.harvard.edu:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sashiko.dev:url]
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stern@rowland.harvard.edu,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email]
 
-On Tue, Apr 28, 2026 at 10:06=E2=80=AFAM Simon Horman <horms@kernel.org> wr=
-ote:
->
-> On Sun, Apr 26, 2026 at 10:46:39AM -0400, Xin Long wrote:
-> > Similar to Scenario B in commit 8e56b063c865 ( netfilter: handle the
-> > connecting collision properly in nf_conntrack_proto_sctp"):
-> >
-> > Scenario B: INIT_ACK is delayed until the peer completes its own handsh=
-ake
-> >
-> >   192.168.1.2 > 192.168.1.1: sctp (1) [INIT] [init tag: 3922216408]
-> >     192.168.1.1 > 192.168.1.2: sctp (1) [INIT] [init tag: 144230885]
-> >     192.168.1.2 > 192.168.1.1: sctp (1) [INIT ACK] [init tag: 392221640=
-8]
-> >     192.168.1.1 > 192.168.1.2: sctp (1) [COOKIE ECHO]
-> >     192.168.1.2 > 192.168.1.1: sctp (1) [COOKIE ACK]
-> >   192.168.1.1 > 192.168.1.2: sctp (1) [INIT ACK] [init tag: 3914796021]=
- *
-> >
-> > There is another case:
-> >
-> > Scenario F: INIT is delayed until the peer completes its own handshake
-> >
-> >   192.168.1.2 > 192.168.1.1: sctp (1) [INIT] [init tag: 3922216408]
-> >   (OVS upcall)
-> >     192.168.1.1 > 192.168.1.2: sctp (1) [INIT] [init tag: 144230885]
-> >     192.168.1.2 > 192.168.1.1: sctp (1) [INIT ACK] [init tag: 392221640=
-8]
-> >     192.168.1.1 > 192.168.1.2: sctp (1) [COOKIE ECHO]
-> >     192.168.1.2 > 192.168.1.1: sctp (1) [COOKIE ACK]
-> >   192.168.1.2 > 192.168.1.1: sctp (1) [INIT] [init tag: 3922216408]
-> >   (delayed)
-> >   192.168.1.1 > 192.168.1.2: sctp (1) [INIT ACK] [init tag: 3914796021]=
- *
-> >
-> > In this case, the delayed INIT (e.g. due to OVS upcall) is recorded by
-> > conntrack, which prevents vtag verification from dropping the unexpecte=
-d
-> > INIT-ACK in nf_conntrack_sctp_packet():
-> >
-> >   vtag =3D ct->proto.sctp.vtag[!dir];
-> >   if (!ct->proto.sctp.init[!dir] && vtag && vtag !=3D ih->init_tag)
-> >           goto out_unlock;
-> >
-> > This happens because ct->proto.sctp.init[!dir] is set by the delayed IN=
-IT,
-> > even though it is stale.
-> >
-> > Fix this in two parts:
-> >
-> > - In netfilter: Do not record INITs whose init_tag matches the peer vta=
-g,
-> >   as they carry no new handshake state in the 1st patch.
-> >
-> > - In SCTP: Prevent endpoints from responding to such INITs with INIT-AC=
-K,
-> >   ensuring correctness even when middleboxes lack the netfilter fix in
-> >   the 2nd patch.
-> >
-> > A follow-up selftest for this scenario will be posted in a separate pat=
-ch
-> > by Yi Chen.
->
-> Hi Xin,
->
-> FTR: There is an AI generated review of this patchset available on
-> sashiko.dev. I have looked over this and I do not believe the feedback
-> there should block progress of this patchset.
-Right, the feedback is false in practice::
+On Tue, Apr 28, 2026 at 12:10:49PM -0600, Greg KH wrote:
+> On Tue, Apr 28, 2026 at 07:26:29PM +0200, Mika Westerberg wrote:
+> > On Tue, Apr 28, 2026 at 04:59:58PM +0200, Andrew Lunn wrote:
+> > > On Tue, Apr 28, 2026 at 09:22:05AM +0200, Mika Westerberg wrote:
+> > > > Instead of the core driver programming fixed value for throttling let
+> > > > the service drivers to specify the interval if they need this. We also
+> > > > allow user to tune this through a module parameter if the default is not
+> > > > good fit.
+> > > > 
+> > > > Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+> > > > ---
+> > > >  drivers/net/thunderbolt/main.c |  7 ++++
+> > > >  drivers/thunderbolt/dma_test.c |  5 +++
+> > > >  drivers/thunderbolt/nhi.c      | 58 ++++++++++++++++++----------------
+> > > >  drivers/thunderbolt/nhi_regs.h |  3 +-
+> > > >  include/linux/thunderbolt.h    |  5 +++
+> > > >  5 files changed, 50 insertions(+), 28 deletions(-)
+> > > > 
+> > > > diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/main.c
+> > > > index 49673f7e0055..8771ca807933 100644
+> > > > --- a/drivers/net/thunderbolt/main.c
+> > > > +++ b/drivers/net/thunderbolt/main.c
+> > > > @@ -218,6 +218,10 @@ static bool tbnet_e2e = true;
+> > > >  module_param_named(e2e, tbnet_e2e, bool, 0444);
+> > > >  MODULE_PARM_DESC(e2e, "USB4NET full end-to-end flow control (default: true)");
+> > > >  
+> > > > +static unsigned int tbnet_throttling = 128000;
+> > > > +module_param_named(throttling, tbnet_throttling, uint, 0444);
+> > > > +MODULE_PARM_DESC(throttling, "Interrupt throttling rate in ns (default: 128000)");
+> > > 
+> > > As i mentioned elsewhere, netdev does not allow module
+> > > parameters. They are hard to use, especially when you have lots of
+> > > instances of a device, or you need to set it on the kernel command
+> > > line because by the time the kernel has booted, it is too late, etc.
+> > > And they are undocumented, and every driver does it differently.
+> > 
+> > Right. This was meant to be a "chicken bit" or "escape hatch" not something
+> > used in daily basis.
+> 
+> Put it in configfs if you really want it.
 
-- "No response" is not a clean signal
-  (could be loss, firewall, rate limiting, etc.).
-- Even guessing this init_tag does not let attackers hijack the association
-  (they still lack the correct verification tag and state).
+Or even debugfs, if that's appropriate for the use case.
 
-Thanks.
+Alan Stern
+
+> You shouldn't need any new module parameters.
+> 
+> thanks,
+> 
+> greg k-h
+> 
 
