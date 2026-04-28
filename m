@@ -1,345 +1,237 @@
-Return-Path: <netdev+bounces-281802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281803-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4BW/Dsam8GlAWgEAu9opvQ
-	(envelope-from <netdev+bounces-281802-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 14:23:34 +0200
+	id MCzdNP2a8Gl3WAEAu9opvQ
+	(envelope-from <netdev+bounces-281803-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 13:33:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13A4A484C93
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 14:23:33 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74140483CF0
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 13:33:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 15EF131C5FF0
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:14:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 63165304D8E8
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:27:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C4B03FF8B0;
-	Tue, 28 Apr 2026 11:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 437E73FAE12;
+	Tue, 28 Apr 2026 11:19:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b="0mkWO+3P"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Uuq0/E9a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011009.outbound.protection.outlook.com [40.93.194.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F53A3F0ABA
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 11:10:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777374615; cv=none; b=uWV8+NN7j+Jww4XJ2azdcEUVe2bZj6bdVAutmdPasHJNynu68anxtdPuPf4JE9oAkiN/U1+8f0vxwWnh8CMARO8LizEjatqBThP6q9mDryRewDt+YhaXH2IaCkkMs/wdomE8M2NrihlkwNWdKkCwp3YRKMellmp5HUMsOUODtK4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777374615; c=relaxed/simple;
-	bh=3XqS4aA1y9roSOcUi6mHTs40VlyveF0LeaRBE2YSip4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l0TISRpxYEtMzIxLlz1QMGPtP58nS4cje/lcAIkPd3ulw3ubPHbnEOF7/Ku8FMacxbfdDgGCmolfXf6D9ckUV0GYclti6nRNKgZeLWzS721EWo28Du1OBGjut+wrt1m4bslawYerTI5LZFsbwAtyxkp19AvhdCSyy8wJ0I6ovAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=0mkWO+3P; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4891c0620bcso77459655e9.1
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 04:10:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1777374607; x=1777979407; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=O1AkPynYqIymYpL+Gq8gW6WV8NTbD1Q/jdfJ1I78mNE=;
-        b=0mkWO+3P71FoAkvpobSCLqJbVKVgFbNVU/4NuRVFQDf4n2v1edZRRKELmT6Ar5Dwgu
-         6WPF6y3rHN+e7sMdr48PJWq624H1suSigbc0mfFbCeHmB5QV+7Ydp/iMRQvqaSzYKwQB
-         ejelJG5UML1fcfEWDtWNPGgj22iq8Q+7pK1zayjWQf55Ph7wxyZn+NJCETp2ovNVIFT7
-         2eBnTh1D/Wz6W6Ktdp8zFQMvOeLSC5KMBtPfEFZjbr9TdhFCRVIZ29yRZfjm7ChqDOU3
-         rO6IZpM5P6x9BbYkBEnYqmvvHGCvkpIBxaBLnTdmQhUHcd/hUBKCZDqVKUYQ9F31PSCt
-         buaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777374607; x=1777979407;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O1AkPynYqIymYpL+Gq8gW6WV8NTbD1Q/jdfJ1I78mNE=;
-        b=rS73QAgFeJ1/Vn4hvPnfDSxVpS48R9w/OXBf0SXHxUXc13/c7U6AFM2NegWjRFCdAl
-         3p+C6a+feYzbAVeQ4TScjQVwsJB9avpIeA3FBJ94YnnzZpdorZK4Ch4Vc7MUCHmoK6MV
-         tuctAmi3QCiU4L7+1gcJB5BJrJsIXoo2h6Uvakp1TCzeB4TnfGMT0aCBZzrYek2fLFgB
-         SpwvmOVuCoEuEavHS1BEoXZr5LNA6Q2OrBL1FyFnyqrdZStFv3GRpX5OL3vbtcYesDFZ
-         77T1ipdBQVVaT8eRwoCkNhSClTtQuJJ3fkmIYu9WBHdrC7stjP5Z9wu5/J4w8qrgxAQ3
-         2UAg==
-X-Gm-Message-State: AOJu0YxUbO3LvlwNmnW640nQ1bHCsCUOXg+R0VvUExiRgfcZmmELvV1u
-	T9BfXPpY2Xz9QJxlAfPTCvEff69EfCr2yzYj8NTR0BtdUgniv+ic2XBHvoYNlAAZpqk=
-X-Gm-Gg: AeBDiev5SVaVWrZwASJIZLhcHO4U3haTPTa4g5Q5fjgcI3Ay811w/eU/P72xVqOSSA9
-	DG0zPYaU0Uf1iIvN4VSy91bnEaYImJSoopVxyF07kfiNZw5SxNOvvoPwBXe0di9c/B717WiOKXZ
-	HBdYe6+8XalHhTM8UlgRWdPFr1LKHO7TgEH30SLyfYLRai42h3ft33A2DLVsIqYKfuVkp0q7hGE
-	o96CYAPByDkq9XX3mJa5R2h6kEQRIPBG/L4/WzZkr2kQr5tRbAgVGuiGOSPPv18qywvoqgw2e3D
-	q+98L2Q5PazUiIs4bX1sKSt3yAHDZvxkxAlSJJcTDbRuC8TIOmFNPVWslhhWvMyggEIlzXAXkb1
-	aUXkjDGcZGkgjG028cQylkOEy0ui5vYn1DysTeculAv3sZZiOq9438X2RkZ5kT1zQ0PnWoar994
-	XFwRPJwlQJX8+8ACmMUqjA27VmGEoJjD/6jImKduHJyQ==
-X-Received: by 2002:a05:600c:3208:b0:486:fb0b:ad79 with SMTP id 5b1f17b1804b1-48a77e64f4cmr23425765e9.20.1777374606361;
-        Tue, 28 Apr 2026 04:10:06 -0700 (PDT)
-Received: from FV6GYCPJ69 ([85.163.81.98])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a773aeb49sm48738645e9.4.2026.04.28.04.10.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Apr 2026 04:10:05 -0700 (PDT)
-Date: Tue, 28 Apr 2026 13:10:01 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	intel-wired-lan@lists.osuosl.org, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Jacob Keller <jacob.e.keller@intel.com>, Lukasz Czapnik <lukasz.czapnik@intel.com>, 
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
-	Simon Horman <horms@kernel.org>, Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: Re: [PATCH net-next 1/2] devlink, mlx5: add init/fini ops for shared
- devlink
-Message-ID: <afCU-3Xmole6v4X4@FV6GYCPJ69>
-References: <20260428090912.3461-1-przemyslaw.kitszel@intel.com>
- <20260428090912.3461-2-przemyslaw.kitszel@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D33AA3FA5DE;
+	Tue, 28 Apr 2026 11:19:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777375154; cv=fail; b=lp8EWa6Ot5E8fjoVKZlf3FR9jXDylI8siZIsXTEuH5mLy1dutoQckzkUpahqopWVfIARiBuzYq5O580JSHBXoWWG5xmkwCxe1HRV6qfo1fE3gb5GHxaAFB9vVqZDE9xzWXDGJnx+Zy8Bo1a7QaE96O+9upz8Am1tX87809X5Jr0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777375154; c=relaxed/simple;
+	bh=brA7hfodFlvVZXH4gv/l94NDddZvq+gui9jZNqYn5ws=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=c6vYT8MycCaTjmz+EhFZ8RCGYBP2WVFsQGWRHt44LpAUfX3AsDlRvhcLR96RJwmlaH1FwYg1dD6PHZ6u0wfXAau8bnKVnHPcupkCodUf3QSljEu9saeLZQCD7uOPAdNxbZ3f2E0ZKRqSrRB6ejrVI3aV2HAAg6RhpOdFEyAq2cU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Uuq0/E9a; arc=fail smtp.client-ip=40.93.194.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=YDfc5296Jm1z606w6wNdgtSIZ+gv5Ho/87V9w1jJH1DrT3g2no7YvrOb93rsmcgpIGt7yZgzS9CSfOQp+1Lzd8cI5Km35aWfoOFZrDsZ4240WNG0Mk9P7q/LIjI91ILOTKK9VHib98emZhZYIfQZWf4Qif2gs7w7OlNIGZ29j82vOhs2BrHtOLB5jP8LCZAmwZy7q3luJpkCk8HOlN4B6bmugJ2IzhVIY0MzDNP4DgEwEHJlVlLq4AILxg3JjpOBwkCJHgA1PQxhLPHYnDPngHhlxYRMNvcBB+C5NVlzYEzqLdfpJa1RiT3Q55zzG7t0sBW93PUcNrbvJQHybSW60w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mjsXSEDgz+DAsopriQynm1mzZENGulrOCDCG/Vufeh0=;
+ b=cHAvgGNrJ1365FY+nmWt4EQmqmjLWKrVYp8dopS5wp0dc/EybCnq55XjHm04hlGganhvHnCBqsMPvDXi/2NWCGdHyelamaM+TqJsxHVqgwfTngQk2FGYiEIFME38gQ4v5xj4llJC4cjO2/cxJFW38mVCYPnO13RzyOaFaIkoEud16aKN6TqN1EbtMgxSMfF9x0J58b4EjcnvQfU0SNsI68mLcfui8RCZJRWP8FcexonW65xd6hSSg9qpe7vYK8mXFJICBmoR4Ml13Yg9i4G/JLsJCCQ2Um2LOZSfUkaAG+qDC0pkwxmo2UlXSMVjIjWQg2EYJtBo/69UGdT13woeYg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mjsXSEDgz+DAsopriQynm1mzZENGulrOCDCG/Vufeh0=;
+ b=Uuq0/E9auLOtQkw5DKBK7Tt+XcmwCF8URipJL7PA1N27wZvCPo8a5EIEvZx5uDMn6kiGgWcqcRm9yCm5pO33eJU0wkp6FXeD4CIOfXZsuDfZL40vmn05jn17i37FP57PWYAUCmzL/8YBvIPgLGYkKfps4njt8ZX6q9+JiZtAKwZB45sYenj3QJearn3Y/KRsGW9d28H7C1lNQLR25TuHKXkbolbXGMBy99dd9LQQKOcUaMJ1PtBCPelSnoTS4cY7hpwe4UhhN8iPdqwdi2u7Wd3Q8geGbDmBx7f3/dw8qmV/QF2e1WS/WhKu+gkO62vos/d1dE01Xd5nE5W9B0XuNA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by BY5PR12MB4180.namprd12.prod.outlook.com (2603:10b6:a03:213::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.18; Tue, 28 Apr
+ 2026 11:19:07 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.20.9870.013; Tue, 28 Apr 2026
+ 11:19:06 +0000
+Date: Tue, 28 Apr 2026 14:18:55 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Sagarika Sharma <sharmasagarika@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net v1 2/2] selftest: net: Add test for TCP flow failover
+ with ECMP routes.
+Message-ID: <20260428111855.GB571865@shredder>
+References: <20260427224243.3499162-1-sharmasagarika@google.com>
+ <20260427224243.3499162-3-sharmasagarika@google.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260427224243.3499162-3-sharmasagarika@google.com>
+X-ClientProxiedBy: FR0P281CA0213.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:ac::7) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260428090912.3461-2-przemyslaw.kitszel@intel.com>
-X-Rspamd-Queue-Id: 13A4A484C93
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|BY5PR12MB4180:EE_
+X-MS-Office365-Filtering-Correlation-Id: 88b659e1-a6e8-4e58-cf08-08dea517f62a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|18002099003|22082099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	P7Km8dQcoeEhTWeyvhL5fc4m6pIZw4dSvhBmy0panvBr9YhrJqr67GDzHybGlENgTcdoeoO6uKNoMb2gkCutioA4VIpvskcEHCKHBOEqv3bcycPuHvBOFQ77eOv/5T8o54fVMS/riWae12TMYQiioih/IF5ggiMOwbzNOEfgzKIT2YXsQaVf1w63ts1x9nU0Z3dZtmpMH4OGdlopkRNTjnNjtnqhQQ4TmHzs56z4SKN9mB+krmr5S1E5pko1EmbNcgqfFhqxGYF4891rFee1/gBFTXXAiH/jdmfqy2oOjZm8jsmnxwRogg+fCg7mJ3638Y0WuBydMTzD5T5cUyB962Cm495Ihkj9Sx/iLZLNEiJn9lSlj/Uc/fhA0IdB6YvTBM/x6u7qAET1W9usonvpH0PfYfdifIJ1RvzX5T4olE/VqQ2ckikzxkdGs/moMWy3VqdSU3HoXIwoOJMOrYERXHdkJfeMtPOKa6ZmgpaRsLeGPTpZ7kA9wFZhI1m1X0VJBdgZD0vC9VcUnEdQ4SPSR/Kev0wESQ3AXWQTmzrz/yaH/D3pbsBuQBL8xYtoVAdT8CZP+DpAb0cGP0UxL/ncr4JA35QWbpNllPXcewJw01IQlcJwO/ldSlcxdxpTyad9lE4Kc7/zCh7zqsdfR4SvEM0EyuOBK+D/UgCoQw3Vz9Jq3QjNuooK2yXVYXnJKRrg6sGzAhooaTvCJeo6yvaNr6BlFSFP92quF9QG4vIXLxM=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?B85jmDssCejxLiQHbSVkxMOrGVfBhI0t28DpmDSItFoAp9N75u94DpYLmY45?=
+ =?us-ascii?Q?jdNSFaNbzqkXiqzOFGoZNE9LO65cCF2ghrhY6f19rGa7SS7W3qzYGX5ARvP9?=
+ =?us-ascii?Q?/Zjzv/37ktLswqplhGjeNdvYYC59c+T4I0wAMOD5y+MwZ7Xw0wY/rQxEFjyr?=
+ =?us-ascii?Q?+HSkPxRHQrGjVotPtPqHt/L3cycEswGt2N86m1RQccvWkMHAAlTR45OFdL23?=
+ =?us-ascii?Q?8wb1B7ZFSvdCP5ObTxNp2GIC2u4sJipC9hizxaUDwSvBTkgkg7gVQSSGkYmE?=
+ =?us-ascii?Q?e5nxSaYHkbcK0I6QD79wsMW5KEVMRFuMfdAwDgXv7uZBZqClWooOq04AgjRk?=
+ =?us-ascii?Q?gFhuxcyIJI6fosEThIA2FZPaQS/J8GJElTDa2+fFkjSMYVYi1TQXhN8o43lU?=
+ =?us-ascii?Q?F8To4DPdgkyo5iQYxD72Dx0b2/5ETdUcwMZX5bPSCt2mn+pQZfTO8NWPMs3x?=
+ =?us-ascii?Q?/DvKP2kNbFnVr2sI8Yr+og0Y8ZdYXWkLDCdUNHNr7Zjp4CSkAMO/jAekDQDs?=
+ =?us-ascii?Q?XASoUCCpnkwJchu0Y99B5aFh2Hzff7h+ZxNRFli2epVG/o1T6jHey3VvAKFt?=
+ =?us-ascii?Q?N4ZizthC4vSYbltX7R7UXVb92YbxjBYMIyQ6vp/ereBr0VFfqDZ9vj1E8fzv?=
+ =?us-ascii?Q?wHvNY3gbix8l5uN6lReSF7GGqmzfjeOJu6+lAUNf3/D8VEx7zuPoIhSiGGeB?=
+ =?us-ascii?Q?mxbcwYUDomX2PaFsewyvUws4aJJ7ZEWplT0ezm7WSbrQUxHUowfkEv7GZ0uS?=
+ =?us-ascii?Q?Ca5rH5DwTwWoaXCmCOKaKDRcMw3iNgipnHbAXFqVYDXoC45M74WOcfw5/J/d?=
+ =?us-ascii?Q?8b6jlI9B66wPpmcWFjs8Ytes5sbQsrGPzekl42ev33oU3dCBypJWGq/fZ9ni?=
+ =?us-ascii?Q?Pog5YRwVox3GVwKOFIZwsYwn52ZfpaCR3u4xar/eDgk4lS8EwtXDLR8DPobP?=
+ =?us-ascii?Q?Ey8hZghTPY/oYcNUfOhCsXGBMBC/0n9JNWEf4BsOYj1O7csZr04LU1omLv5o?=
+ =?us-ascii?Q?wpgTjaYNJ4ENnMS1oUq0Ev/acPtVPz+kLOvzOrU06hmKH27OCkbPTmNIH6WD?=
+ =?us-ascii?Q?9pPpPW/pPYm0LeBaU0j2BZ4Ya1Rl5DVUGm+ywYgrQO69J6Wjdt/haf5FEjTH?=
+ =?us-ascii?Q?BB16vp4WNAEsezgvJWqbm+htotdjqvW9zPbEKBPlIOzLQbYysRv7iG5nOiXj?=
+ =?us-ascii?Q?YGnyEb29tntfEHoQ1BVd6zNcxpAwIZfnFvG0zBlTfla7P/X7NpSqIkWN5+nN?=
+ =?us-ascii?Q?B5URwQXah0hVihNwn1buHoHtrZRWeZM8fMpimbrtn9h67+1sTYKTRMsgXTDA?=
+ =?us-ascii?Q?AqvhzNJ7uHA9o4BkVLTACbutkN4LAp5uZuIwtiSX0VMnThZDcP/MsP5jjaqQ?=
+ =?us-ascii?Q?qOA7PGYH8SItjVyuqyrNi17LAcdDZ9fpkf9vGbNIm37AISGeFy4A9lWUwmYR?=
+ =?us-ascii?Q?FRLHyz8xZONdLw1J8TXi8USujZkvwoT2TrwhdnSqpCCAcZXwSOJsZA79Qhy+?=
+ =?us-ascii?Q?hCYz6Umd86egrersZsHDz6XwFPxeB0Lxhe5N7ZI+EChb6USFPZLD1rmX5QhN?=
+ =?us-ascii?Q?cW+Br2ZpJfaE1X7PEUzgppBIxdmuZitWfp3TsJKlYM8NgNvSa1lyle36KrV7?=
+ =?us-ascii?Q?rC0Yx0Bcr7Sb1cknWI4He+Dx97tpfzfbrUuD0EmC7S0T/5QwX5/n3twKeSjg?=
+ =?us-ascii?Q?nIl/UH7NbJ42tSXH3mPQoFSJx09chPJGiIZUdVPAt8b+JahV?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 88b659e1-a6e8-4e58-cf08-08dea517f62a
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2026 11:19:06.8837
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BFBt2v7XLh9fmEMFLXgaebcADJK33kBsSLMSYHj9OXepuMND7l3A4qR5f3riF4iAa1nu7nh0E/p7kDL6otA2ew==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4180
+X-Rspamd-Queue-Id: 74140483CF0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281802-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-281803-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[resnulli.us];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:email,resnulli-us.20251104.gappssmtp.com:dkim]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-Tue, Apr 28, 2026 at 11:09:11AM +0200, przemyslaw.kitszel@intel.com wrote:
->Add .shd_init() and .shd_fini() ops, that will be called for the first
->devlink_shd_get() (to initialize driver' priv data) and on the last
->devlink_shd_put() (to allow for the cleanup). Both ops are optional.
->
->.shd_init() could return an error, which will stop creation of shd
->instance. The initializer also gets an additional, optional param,
->that driver could use for any needs.
->
->If any of the callbacks will need to get devlink instance, it could
->be accessed by shd_priv_to_devlink().
->
->Both callbacks are called with devl_lock held and devlink registered.
->
->Next commit will make use of the callbacks, another one will make use also
->of the non-null additional param (outside of this series).
->
->Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
->Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->---
->first discussed at:
->https://lore.kernel.org/netdev/20260325063143.261806-3-przemyslaw.kitszel@intel.com
->
->Sashiko suggested to convert devlink_shd_create() to return ERR_PTR(),
->and propagate that up to the driver. It think it will just make code more
->verbose for not much benefit. And drivers could just store err if they
->want in the passed @init_param.
->
->---
-> include/net/devlink.h                         | 26 +++++++++++++
-> .../ethernet/mellanox/mlx5/core/sh_devlink.c  |  2 +-
-> net/devlink/sh_dev.c                          | 39 ++++++++++++++++++-
-> 3 files changed, 64 insertions(+), 3 deletions(-)
->
->diff --git a/include/net/devlink.h b/include/net/devlink.h
->index bcd31de1f890..5d3a1337bfa1 100644
->--- a/include/net/devlink.h
->+++ b/include/net/devlink.h
->@@ -1586,6 +1586,30 @@ struct devlink_ops {
-> 				    struct devlink_rate *parent,
-> 				    void *priv_child, void *priv_parent,
-> 				    struct netlink_ext_ack *extack);
->+
->+	/**
->+	 * shd_init: Shared devlink instance initializer
->+	 * @priv: shd_devlink' priv
->+	 * @init_param: additional param to pass to driver callback
->+	 *
->+	 * Called once when the shared instance is first created (by the first
->+	 * devlink_shd_get() call).
->+	 * Should initialize the driver's private data embedded in the shared
->+	 * devlink. May be NULL.
->+	 *
->+	 * Return: 0 on success, negative to prevent shared instance usage.
->+	 */
->+	int (*shd_init)(void *priv, void *init_param);
+On Mon, Apr 27, 2026 at 10:42:23PM +0000, Sagarika Sharma wrote:
+> From: Kuniyuki Iwashima <kuniyu@google.com>
+> 
+> Without the previous commit, TCP failed to switch to alternative
+> IPv6 routes immediately upon carrier loss.
+> 
+> It would persist with the dead route until reaching the threshold
+> net.ipv4.tcp_retries1, leading to unnecessary delays in failover.
+> 
+> Let's add a selftest for this scenario to ensure TCP fails over
+> immediately upon a carrier loss event.
+> 
+> Before:
+>   TEST: TCP IPv4 failover                                             [ OK ]
+>   TEST: TCP IPv6 failover                                             [FAIL]
+> 
+> After:
+>   TEST: TCP IPv4 failover                                             [ OK ]
+>   TEST: TCP IPv6 failover                                             [ OK ]
+> 
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> Signed-off-by: Sagarika Sharma <sharmasagarika@google.com>
 
-1. "param" has specific meaning in devlink context
-2. You don't use the arg in driver
+Thanks for the test. LGTM. A couple of nits below.
 
-Care to drop it?
+[...]
 
-Otherwise, this looks fine to me. Thanks! (small nitpick below)
+> diff --git a/tools/testing/selftests/net/tcp_ecmp_failover.sh b/tools/testing/selftests/net/tcp_ecmp_failover.sh
+> new file mode 100755
+> index 000000000000..f857d5db84d8
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/tcp_ecmp_failover.sh
 
+[...]
 
->+	/**
->+	 * shd_fini: Shared devlink instance finalizer
->+	 * @priv: shd_devlink' priv
->+	 *
->+	 * Called once when the last reference is dropped and the shared
->+	 * instance is destroyed. Should clean up the driver's private data.
->+	 * May be NULL.
->+	 */
->+	void (*shd_fini)(void *priv);
->+
-> 	/**
-> 	 * selftests_check() - queries if selftest is supported
-> 	 * @devlink: devlink instance
->@@ -1651,9 +1675,11 @@ void devlink_free(struct devlink *devlink);
-> struct devlink *devlink_shd_get(const char *id,
-> 				const struct devlink_ops *ops,
-> 				size_t priv_size,
->+				void *init_param,
-> 				const struct device_driver *driver);
-> void devlink_shd_put(struct devlink *devlink);
-> void *devlink_shd_get_priv(struct devlink *devlink);
->+struct devlink *shd_priv_to_devlink(void *priv);
-> 
-> /**
->  * struct devlink_port_ops - Port operations
->diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
->index b925364765ac..1b8b1ce7e72d 100644
->--- a/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
->+++ b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
->@@ -43,7 +43,7 @@ int mlx5_shd_init(struct mlx5_core_dev *dev)
-> 	*end = '\0';
-> 
-> 	/* Get or create shared devlink instance */
->-	devlink = devlink_shd_get(sn, &mlx5_shd_ops, 0, pdev->dev.driver);
->+	devlink = devlink_shd_get(sn, &mlx5_shd_ops, 0, NULL, pdev->dev.driver);
-> 	kfree(sn);
-> 	if (!devlink)
-> 		return -ENOMEM;
->diff --git a/net/devlink/sh_dev.c b/net/devlink/sh_dev.c
->index 85acce97e788..048a2a6adc9e 100644
->--- a/net/devlink/sh_dev.c
->+++ b/net/devlink/sh_dev.c
->@@ -34,6 +34,7 @@ static struct devlink_shd *devlink_shd_lookup(const char *id)
-> static struct devlink_shd *devlink_shd_create(const char *id,
-> 					      const struct devlink_ops *ops,
-> 					      size_t priv_size,
->+					      void *init_param,
-> 					      const struct device_driver *driver)
-> {
-> 	struct devlink_shd *shd;
->@@ -49,16 +50,30 @@ static struct devlink_shd *devlink_shd_create(const char *id,
-> 	if (!shd->id)
-> 		goto err_devlink_free;
-> 	shd->priv_size = priv_size;
->-	refcount_set(&shd->refcount, 1);
-> 
-> 	devl_lock(devlink);
-> 	devl_register(devlink);
->+
->+	if (ops->shd_init) {
->+		int err;
->+
->+		err = ops->shd_init(shd->priv, init_param);
->+		if (err)
->+			goto err_unregister;
->+	}
->+
-> 	devl_unlock(devlink);
-> 
->+	refcount_set(&shd->refcount, 1);
-> 	list_add_tail(&shd->list, &shd_list);
-> 
-> 	return shd;
-> 
->+err_unregister:
->+	devl_unregister(devlink);
->+	devl_unlock(devlink);
->+	kfree(shd->id);
->+
-> err_devlink_free:
-> 	devlink_free(devlink);
-> 	return NULL;
->@@ -69,7 +84,12 @@ static void devlink_shd_destroy(struct devlink_shd *shd)
-> 	struct devlink *devlink = priv_to_devlink(shd);
-> 
-> 	list_del(&shd->list);
->+
+> +
+> +test_ipv4
+> +test_ipv6
 
-Not sure why to add empty line here.
+Maybe squash something like [1]? I ran the test without the first patch
+and I get:
 
+# ./tcp_ecmp_failover.sh 
+TEST: TCP IPv4 failover                                             [ OK ]
+TEST: TCP IPv6 failover                                             [FAIL]
+# echo $?
+0
 
-> 	devl_lock(devlink);
->+
->+	if (devlink->ops->shd_fini)
->+		devlink->ops->shd_fini(shd->priv);
->+
-> 	devl_unregister(devlink);
-> 	devl_unlock(devlink);
-> 	kfree(shd->id);
->@@ -81,6 +101,7 @@ static void devlink_shd_destroy(struct devlink_shd *shd)
->  * @id: Identifier string (e.g., serial number) for the shared instance
->  * @ops: Devlink operations structure
->  * @priv_size: Size of private data structure
->+ * @init_param: Passed to .shd_init() callback alongside driver's priv
->  * @driver: Driver associated with the shared devlink instance
->  *
->  * Get an existing shared devlink instance identified by @id, or create
->@@ -96,16 +117,17 @@ static void devlink_shd_destroy(struct devlink_shd *shd)
-> struct devlink *devlink_shd_get(const char *id,
-> 				const struct devlink_ops *ops,
-> 				size_t priv_size,
->+				void *init_param,
-> 				const struct device_driver *driver)
-> {
-> 	struct devlink *devlink;
-> 	struct devlink_shd *shd;
-> 
-> 	mutex_lock(&shd_mutex);
-> 
-> 	shd = devlink_shd_lookup(id);
-> 	if (!shd) {
->-		shd = devlink_shd_create(id, ops, priv_size, driver);
->+		shd = devlink_shd_create(id, ops, priv_size, init_param, driver);
-> 		goto unlock;
-> 	}
-> 
->@@ -159,3 +181,16 @@ void *devlink_shd_get_priv(struct devlink *devlink)
-> 	return shd->priv;
-> }
-> EXPORT_SYMBOL_GPL(devlink_shd_get_priv);
->+
->+/** shd_priv_to_devlink - Get devlink instance from shd_devlink's priv
->+ * @priv: Driver's priv data
->+ *
->+ * Return: pointer to shared devlink instance the @priv belongs to.
->+ */
->+struct devlink *shd_priv_to_devlink(void *priv)
->+{
->+	struct devlink_shd *shd = container_of(priv, struct devlink_shd, priv);
->+
->+	return priv_to_devlink(shd);
->+}
->+EXPORT_SYMBOL_GPL(shd_priv_to_devlink);
->-- 
->2.39.3
->
+[1]
+diff --git a/tools/testing/selftests/net/tcp_ecmp_failover.sh b/tools/testing/selftests/net/tcp_ecmp_failover.sh
+index f857d5db84d8..8b7a2d82c442 100755
+--- a/tools/testing/selftests/net/tcp_ecmp_failover.sh
++++ b/tools/testing/selftests/net/tcp_ecmp_failover.sh
+@@ -205,5 +205,10 @@ test_ipv6()
+ 	cleanup
+ }
+ 
++require_command socat
++require_command tcpdump
++
+ test_ipv4
+ test_ipv6
++
++exit "$EXIT_STATUS"
 
