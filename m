@@ -1,121 +1,244 @@
-Return-Path: <netdev+bounces-282047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282048-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kIEkFW358GlpbgEAu9opvQ
-	(envelope-from <netdev+bounces-282047-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 20:16:13 +0200
+	id AM5ZI5f58GlpbgEAu9opvQ
+	(envelope-from <netdev+bounces-282048-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 20:16:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 905DE48A8B4
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 20:16:12 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id F336548A8D4
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 20:16:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1CCB4302BBA5
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:16:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DA77A300E5D1
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:16:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 194E94779A3;
-	Tue, 28 Apr 2026 18:16:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84C2747A0D8;
+	Tue, 28 Apr 2026 18:16:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="QAq1Tekj"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="OYlFN2hL"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CDEC472775;
-	Tue, 28 Apr 2026 18:16:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5820A1F91E3
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 18:16:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777400170; cv=none; b=NESgBYsW38ayIWlUVCC3rCoSYEm9vUtonGNsOa48Js9GqxvHkNHjCRBMaeS1CEmeOK84CUWqUFkKlCE3jOpLmdQM+hxwNNpF/iuepftKSCac/mXlGX+YfUKwtDCvWGPzC0NtOtq1u36KhAp/Nl1PJz+GntZDDFVgUtTbKjBdgwY=
+	t=1777400211; cv=none; b=UOF2TL38vqij/oZwl2nSoO/li3o7UgHGb0D7nnnj+XyfvS0wyrKI95PpAon7gPPZICIkwurrpMwjrGU7brFZ+8NMilI9SwwLFm5iZ2rYjMh8Wbqu+t3Pcvg0Mx/X6yradnr40NEb6i1Fta4x3GpHxyj8TV/+ReBXPhTjOdI7id4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777400170; c=relaxed/simple;
-	bh=CfnuGNVtvyVkIg4D6XoyH2upeat/Ucvt1FLvXNoJdGM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hic19L9j29/fdf7Y/jcwldtSeNxPyWuuqWRl5kCcS0PJ7+JEhOvaPtikNn7tpCMN94DUV/sJyPMMSntHyC48WGl2J7kt8t8RnWcWmh5zWrVM/JTKKvmpuUSc6YGVBQq+ZLfWN4f6USTaFmH9d+p+rteWpYCSBQ9/MIMRVsJHQjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=QAq1Tekj; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=PZVQ4OViT35E/GKZrXOrPA6LRYR+VLf98sqtL5tsCUY=; b=QAq1Tekjvhqt60dGv+jGdw8oMO
-	0I7aJEHFLzOwHThqdvDDyXZ3mO7HQEpTg0dtdeHfiyxIQVrUX4mGZr6QMzvILUiSQowyhUzm3MuiU
-	luzh8kosSBCQOTH3VoqK7nIwigwnT3GnjB87QQrVTpHQpClKNuMKoq+v7YKQZjYCitwQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wHmyU-000O3Z-PX; Tue, 28 Apr 2026 20:15:58 +0200
-Date: Tue, 28 Apr 2026 20:15:58 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: mike.marciniszyn@gmail.com
-Cc: Alexander Duyck <alexanderduyck@fb.com>,
-	Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Mohsin Bashir <mohsin.bashr@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/4] net: mdio: Add support for RSFEC Control
- register for PMA
-Message-ID: <8b662c6b-696f-4402-b736-f2a20f0c7500@lunn.ch>
-References: <20260428172810.175077-1-mike.marciniszyn@gmail.com>
- <20260428172810.175077-3-mike.marciniszyn@gmail.com>
+	s=arc-20240116; t=1777400211; c=relaxed/simple;
+	bh=avy8KB/Y1ZmTqSobfdHRXzXD6RLCOnDrofqclj4rbA4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Hf4QxBYdSbpfgR8oCvih4K6b+JPBDQGLeQESp1oqE9nL+XmqDpIWbPDZ+rgRc3RDgv23D1Rldc5c8LlppBiR2WUkvbyftwxE7dymAkzKXNVdVMAEibXgdOcvWck8RJLxPy5oRew1mB3lw4ufOeBizjE6XQ7ztLOEiC1t8qxuyXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=OYlFN2hL; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=R0qUEn2Dd06vmy9EFxtD79q8oQiKBS+lcr7thOXLo2w=; b=OYlFN2hL+bIiHh53NN2q+hr0A6
+	HETh8J1wi4IT/x53V4RyjoZgw+foUXgvIK++eJM3/J3trcTtbYst+bw2PYNgiJjnhwi0UIYhYaPrD
+	7Iw2WNcI7JyVXtR9FfNMkCSajZ1lSUE3Je1eRBlrg9kbJkO9w7b5Kw77zmaoNAjR02VFlYLxehkyJ
+	NcKCWfxQGwAqFjO/qIqA1PzgYcHAgKwONkE8zJTRQ1D94ScEJPl1vioEqXsoDv14ly/GwW5JPfQVl
+	exsB1UNT29M+U0gBPasTq3nsJCyfJ+amPvo69wiurY48j98TOb4FgEjN1ravlYN26/TJM8K1AXJQD
+	zcBaHwtw==;
+Received: from sslproxy07.your-server.de ([78.47.199.104])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wHmzF-000Pnh-38;
+	Tue, 28 Apr 2026 20:16:46 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wHmzF-0008Oj-1f;
+	Tue, 28 Apr 2026 20:16:45 +0200
+Message-ID: <34f6054f-5d5d-47c8-b06d-f7b40d74c3f0@iogearbox.net>
+Date: Tue, 28 Apr 2026 20:16:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260428172810.175077-3-mike.marciniszyn@gmail.com>
-X-Rspamd-Queue-Id: 905DE48A8B4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v4] ipv6: Implement limits on extension header parsing
+To: Justin Iurman <justin.iurman@gmail.com>, kuba@kernel.org
+Cc: edumazet@google.com, dsahern@kernel.org, tom@herbertland.com,
+ willemdebruijn.kernel@gmail.com, idosch@nvidia.com, pabeni@redhat.com,
+ netdev@vger.kernel.org
+References: <20260428153749.785611-1-daniel@iogearbox.net>
+ <4497a340-b48e-4615-81eb-90ebc7a0b5d2@gmail.com>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <4497a340-b48e-4615-81eb-90ebc7a0b5d2@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27985/Tue Apr 28 08:25:02 2026)
+X-Rspamd-Queue-Id: F336548A8D4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282047-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-282048-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,herbertland.com,gmail.com,nvidia.com,redhat.com,vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[fb.com,kernel.org,meta.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,armlinux.org.uk,intel.com,vger.kernel.org];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,lunn.ch:dkim,lunn.ch:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.997];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,iana.org:url,iogearbox.net:email,iogearbox.net:dkim,iogearbox.net:mid]
 
-On Tue, Apr 28, 2026 at 01:28:08PM -0400, mike.marciniszyn@gmail.com wrote:
-> From: "Mike Marciniszyn (Meta)" <mike.marciniszyn@gmail.com>
+On 4/28/26 7:58 PM, Justin Iurman wrote:
+> On 4/28/26 17:37, Daniel Borkmann wrote:
+>> ipv6_{skip_exthdr,find_hdr}() and ip6_{tnl_parse_tlv_enc_lim,
+>> protocol_deliver_rcu}() iterate over IPv6 extension headers until they
+>> find a non-extension-header protocol or run out of packet data. The
+>> loops have no iteration counter, relying solely on the packet length
+>> to bound them. For a crafted packet with 8-byte extension headers
+>> filling a 64KB jumbogram, this means a worst case of up to ~8k
+>> iterations with a skb_header_pointer call each. ipv6_skip_exthdr(),
+>> for example, is used where it parses the inner quoted packet inside
+>> an incoming ICMPv6 error:
+>>
+>>    - icmpv6_rcv
+>>      - checksum validation
+>>      - case ICMPV6_DEST_UNREACH
+>>        - icmpv6_notify
+>>          - pskb_may_pull()       <- pull inner IPv6 header
+>>          - ipv6_skip_exthdr()    <- iterates here
+>>          - pskb_may_pull()
+>>          - ipprot->err_handler() <- sk lookup
+>>
+>> The per-iteration cost of ipv6_skip_exthdr itself is generally
+>> light, but skb_header_pointer becomes more costly on reassembled
+>> packets: the first ~1232 bytes of the inner packet are in the skb's
+>> linear area, but the remaining ~63KB are in the frag_list where
+>> skb_copy_bits is needed to read data.
+>>
+>> Initially, the idea was to add a configurable limit via a new
+>> sysctl knob with default 8, in line with knobs from commit
+>> 47d3d7ac656a ("ipv6: Implement limits on Hop-by-Hop and Destination
+>> options"), but two reasons eventually argued against it:
+>>
+>> - It adds to UAPI that needs to be maintained forever, and
+>>    upcoming work is restricting extension header ordering anyway,
+>>    leaving little reason for another sysctl knob
+>> - exthdrs_core.c is always built-in even when CONFIG_IPV6=n,
+>>    where struct net has no .ipv6 member, so the read site would
+>>    need an ifdef'd fallback to a constant anyway
+>>
+>> Therefore, just use a constant (IP6_MAX_EXT_HDRS_CNT). All four
+>> extension header walking functions are now bound by this limit.
+>>
+>> Note that the check in ip6_protocol_deliver_rcu() happens right
+>> before the goto resubmit, such that we don't have to have a test
+>> for ipv6_ext_hdr() in the fast-path.
+>>
+>> There's an ongoing IETF draft-iurman-6man-eh-occurrences to enforce
+>> IPv6 extension headers ordering and occurrence. The latter also
+>> discusses security implications. As per RFC8200 section 4.1, the
+>> occurrence rules for extension headers provide a practical upper
+>> bound which is 8. In order to be conservative, let's define
+>> IP6_MAX_EXT_HDRS_CNT as 4x that to leave enough room for quirky
+>> setups. In the unlikely event that this is still not enough, then
+>> we might need to reconsider a sysctl.
+>>
+>> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
 > 
-> Add the constants associated with RS-FEC configuration
-> and status as well as the indicated separated bits for
-> DEVS1 to convey a separated PMA.
+> Reviewed-by: Justin Iurman <justin.iurman@gmail.com>
 > 
-> Signed-off-by: Mike Marciniszyn (Meta) <mike.marciniszyn@gmail.com>
+> FWIW, I prefer v4 over v3. I didn't like the idea of a new sysctl for several reasons I already mentioned. So, thanks for this new version, Daniel.
+> 
+> However, I can't help but think 8 would pose absolutely no problem. I would be very surprised to see someone complain. We're choosing 32 over 8 to be extra safe, at the price of security. RFC8200 provides the following ordered list which is recommended for senders (without normative language, though, which was a mistake):
+> 
+>        Hop-by-Hop Options header
+>        Destination Options header
+>        Routing header
+>        Fragment header
+>        Authentication header
+>        Encapsulating Security Payload header
+>        Destination Options header
+> 
+> So this is the maximum you can have theoretically***, although you wouldn't for instance use the Authentication header with ESP. I'm not even talking about ordering or specific number of occurrences here, just the total number of Extension Headers in a packet (as your patch does). It's also worth mentioning that it's highly unlikely to see someone use them all at the same time (in production, of course). This is why I still think that 8 is safe too, and would provide security as expected.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+What do you think if we fix this at 12 then to also have the exotic cases
+below covered just in case to be conservative? Would still be an improvement
+over 32 fwiw. I'm also fine if you think straight to 8 is the better choice.
+Either option I can spin a v5, np.
 
-    Andrew
+Thanks,
+Daniel
+
+> ***well, you also have 3 others [1] (Mobility Header, Host Identity Protocol, Shim6 Protocol), but they're not widely used (not to say dead). And they would probably not be used with other Extension Headers anyway, as they are not specified to be present with a layer-4 in most cases.
+> 
+>   [1] https://www.iana.org/assignments/ipv6-parameters/ipv6-parameters.xhtml#extension-header
 
