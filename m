@@ -1,57 +1,76 @@
-Return-Path: <netdev+bounces-281951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281952-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aN2lN+rR8GnDYwEAu9opvQ
-	(envelope-from <netdev+bounces-281951-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:27:38 +0200
+	id iJv5LQzS8GnDYwEAu9opvQ
+	(envelope-from <netdev+bounces-281952-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:28:12 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8073B487D0C
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:27:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C040487D3B
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:28:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8299C301703F
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 15:27:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 044B43045A88
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 15:27:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0746E3B52FE;
-	Tue, 28 Apr 2026 15:27:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 658F03B3BE5;
+	Tue, 28 Apr 2026 15:27:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kaR6Sspa"
+	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="NncjKPWn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F223B27F3
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 15:27:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1450235836B;
+	Tue, 28 Apr 2026 15:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777390028; cv=none; b=lMW/zfPkvblWee2EkUdX3mB5+GdaLOmlTPciCvFYLAMH91wHb0ozHieVvrnw0/27l1ebuXzDpOK6Q7R+bC9M34p2HeMxffhvkohm02zt62RfZvfyJ/+zPlsaw5dvcMl3PXAdaWHF25he57/unMa0JmCWpQNnAGySxbPSWYSp/Pc=
+	t=1777390063; cv=none; b=jgwkyx05aRVbgSMzJAEUaiDnFYBeQfGM3ZkhUpZZrKFQUK0M+qgBLOmphqiv2BMQTxJ965VNTdHEeKIKYy3998qvQ+wB3lrNZ8Y3bIaHvhRcJwvrJBFFfJScVsDZTrZBnqRjtASYHf+vyGuWQXutmWvmj2bxjibg2jayRVKjjCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777390028; c=relaxed/simple;
-	bh=A8XtxfWYhNGKyD7aPL9zb7Vkmi6ASiCZ1zxx/Oi3BTc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZxO27748u4d44o3hapXpPqVYeYyjn32ylVDtF4UJG1eyiz6RYGOw7ka+PE5mvBD6PypjMByBOx3zjVxgloIHz0qOut+tiJNSI7JQhKO9piKfDNDd7b7au3bfrM4k/4/l3btAb6VOplLEi+PmhJANDGY3YkbmEXAK6upv0v9yasg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kaR6Sspa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56EC9C2BCAF;
-	Tue, 28 Apr 2026 15:27:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777390028;
-	bh=A8XtxfWYhNGKyD7aPL9zb7Vkmi6ASiCZ1zxx/Oi3BTc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kaR6Sspa+oaPFkMoT0cMu3BDu4Xw6e9WjanAdjlE2NDZl0xPb/RpFj9YNdfhQqnqr
-	 pfmU0+q0v8RX5AYSe6BoCwSG94Wm5P22fp7Eao+xmONhoqQZ1iQkRtF29GuDJg42RJ
-	 z7K5kqdKcI3REXhhD7DhOLcuYmhUR+B5RlVkonIVLNV/VRu+7ykzr90Lzfd2nu1PP1
-	 SC+djjuEDBtMPb5EtDVEpBZBLslkbYPahCfKGvFTo7hcDFwuB8sWkVVU9S8f36nmVw
-	 /hXU+ubVqv128YRfUMadLRN5XqKxUa/8N/zpEdw/K6UFelZh8vLGQ/Jl++HIQyUQ/A
-	 hFzKgd/EBXW1g==
-Date: Tue, 28 Apr 2026 08:27:07 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Satish Kharat <satishkh@cisco.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: Recommended local LLM-assisted review for netdev submissions?
-Message-ID: <20260428082707.606e7a94@kernel.org>
-In-Reply-To: <20260428151755.1310712-1-satishkh@cisco.com>
-References: <20260428151755.1310712-1-satishkh@cisco.com>
+	s=arc-20240116; t=1777390063; c=relaxed/simple;
+	bh=lsjtwml+YyGG0YaI8ATuHSZR2T/x/VtRiCX7ZflwJ8o=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=kMQqedn1+v2KgCr2PVRFE1K1fU0S9XFO3/UwKvwDVBpP8GLzvq+6PeUZgNKh9DmkKXwj4X1a77hydBhc81K5IY+CdMR5BZxA/39qXBK4VoKo8HRyzvUgp5sqF9AkecwbA+UBWyMdZPFe5UntkS55aonVfFAukqskQkzBFDdd6BQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=NncjKPWn; arc=none smtp.client-ip=193.238.174.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mx.ssi.bg (localhost [127.0.0.1])
+	by mx.ssi.bg (Potsfix) with ESMTP id 874BB211C1;
+	Tue, 28 Apr 2026 18:27:37 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
+	:content-type:content-type:date:from:from:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
+	 bh=pjpyrc4xMqg+uJtCyIqcY2E8Dl2BnGTrVI0ieQmBu9o=; b=NncjKPWnt8Dn
+	sCea/Lc99bDQo+rHD8TYU9Hti7z1M3TdQ1y1RpHhSIQ0/qopds1BHlgmvumxZnov
+	+dq+vXj+wEFWwI5OfQ8aws7+2MAoV0LZdR1Yp4RwzG9N0yNPwodxLeRKJ0xvshCA
+	7lGwFq++hoeN8Gpr3N7wvI9Wcy9DZF3sL3Q+slHBp2A8T4DgOB6UHnf/5glX3g1L
+	XRfWpmEs8k3dGInTKVf169ABNgR0ZoZg6CvsAc+SKgJBKlbwxRXOvF7A4uZJXU3S
+	sa78uGEHVqc9Qh7L1qSlD1Cw9yN5vuTM2mzGj+NbqARzMTEYhIx1xwaHpeBi5XVN
+	gl/S9T9HiOC3jeSk7GBcMpX8+57f4o0xfMjC1HXUZb7Wgjvbe5gwG0rXdP6tESV1
+	I8Itp67FuWUc5LIDtoJCZZvfH3jYzubjjmSLOtzKyO1AKNYEsFB6C1h7LsjA893T
+	Oh+gggyUbISD6S9mT1kdNuU5y0/b67rZycIuZNj031/8L9EBX0TKNzbEcyOdLHqW
+	WAC25/QSGWlgDh9CxuOrg7HL6g9YwNHw8ez78xS6f0Pp0vdhb8R9lxm7Z8RT5DTC
+	wSel0dbylDleAA16orVy7YepBapWyxhpuhvf7j8CgCRcxxXSHyPhjj/6DjRfUfwP
+	nDmi59T8ek9mwihbHhVnvCnAWpbf7Oc=
+Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
+	by mx.ssi.bg (Potsfix) with ESMTPS;
+	Tue, 28 Apr 2026 18:27:36 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by box.ssi.bg (Potsfix) with ESMTPSA id 901096089E;
+	Tue, 28 Apr 2026 18:27:35 +0300 (EEST)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.1/8.18.1) with ESMTP id 63SFRYQE053671;
+	Tue, 28 Apr 2026 18:27:34 +0300
+Date: Tue, 28 Apr 2026 18:27:34 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: Jakub Kicinski <kuba@kernel.org>
+cc: pablo@netfilter.org, netfilter-devel@vger.kernel.org, davem@davemloft.net,
+        netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+        fw@strlen.de, horms@kernel.org
+Subject: Re: [PATCH net 11/11] ipvs: fix the spin_lock usage for RT build
+In-Reply-To: <20260428021343.793695-1-kuba@kernel.org>
+Message-ID: <b50e8ade-41ba-ab49-b1e4-81ebe8df03c2@ssi.bg>
+References: <20260424190513.32823-12-pablo@netfilter.org> <20260428021343.793695-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,72 +78,143 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 8073B487D0C
+X-Rspamd-Queue-Id: 4C040487D3B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	SUBJECT_ENDS_QUESTION(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
+	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281951-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[ssi.bg:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281952-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
 
-On Tue, 28 Apr 2026 08:17:55 -0700 Satish Kharat wrote:
-> I'm the author of the in-flight enic SR-IOV series. Before posting
-> revisions I run checkpatch --strict, make W=1 C=1 on touched files,
-> scripts/kernel-doc -none, and `b4 prep --check`.
+
+	Hello,
+
+On Mon, 27 Apr 2026, Jakub Kicinski wrote:
+
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> ---
+> ipvs: fix the spin_lock usage for RT build
 > 
-> I've read Jesse's Netdev 0x18 talk on AI-enhanced reviews [1], the
-> LWN coverage [2][3], and looked at sashiko [4]. What I haven't been
-> able to tell from the public material:
+> This commit fixes spin_lock sleeping issues on PREEMPT_RT by adjusting the
+> use of cp->lock in combination with hlist_bl bit locks. It removes the
+> spin_lock from ip_vs_conn_hash() and ip_vs_conn_unlink(), and changes the
+> lock ordering in ip_vs_conn_fill_cport().
 > 
->   - Is sashiko (or a successor) what's currently producing the
->     LLM-style review replies showing up on netdev, or is that a
->     different pipeline?
->   - For contributors who'd like to self-review with the same
->     prompt/ruleset before posting, is there a recommended setup,
->     or is sashiko-as-is the closest thing today?
+> Link: https://sashiko.dev/#/patchset/20260415200216.79699-1-ja%40ssi.bg
+> Link: https://sashiko.dev/#/patchset/20260420165539.85174-4-ja%40ssi.bg
+> Link: https://sashiko.dev/#/patchset/20260422135823.50489-4-ja%40ssi.bg
+> 
+> > diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs_conn.c
+> > index 84a4921a7865a9..9e23cda8482588 100644
+> > --- a/net/netfilter/ipvs/ip_vs_conn.c
+> > +++ b/net/netfilter/ipvs/ip_vs_conn.c
+> 
+> [ ... ]
+> 
+> > @@ -704,14 +702,23 @@ void ip_vs_conn_fill_cport(struct ip_vs_conn *cp, __be16 cport)
+> >  		hlist_bl_unlock(head);
+> >  		write_seqcount_end(&t->seqc[hash_key & t->seqc_mask]);
+> >  		preempt_enable_nested();
+> > -		spin_unlock_bh(&t->lock[hash_key & t->lock_mask].l);
+> > +		spin_unlock(&t->lock[hash_key & t->lock_mask].l);
+> > +		spin_unlock_bh(&cp->lock);
+> >  		hash_key = hash_key_new;
+> >  		goto retry;
+> >  	}
+> >  
+> > -	spin_lock(&cp->lock);
+> > -	if ((cp->flags & IP_VS_CONN_F_NO_CPORT) &&
+> > -	    (cp->flags & IP_VS_CONN_F_HASHED)) {
+> > +	/* Fill cport once, even if multiple packets try to do it */
+> > +	if (cp->flags & IP_VS_CONN_F_NO_CPORT && (!cp->cport || by_me)) {
+> 
+> Does removing the IP_VS_CONN_F_HASHED check here lead to a NULL pointer
+> dereference for IP_VS_CONN_F_ONE_PACKET connections?
+> 
+> Connections flagged with IP_VS_CONN_F_ONE_PACKET bypass hashing:
+> 
+> ip_vs_conn_hash() {
+>     if (cp->flags & IP_VS_CONN_F_ONE_PACKET)
+>         return 0;
+>     ...
+> }
+> 
+> Because they bypass hashing, their hash list nodes (hn->node) are never
+> linked, leaving hn->node.pprev as NULL. If such a connection is created
+> with a source port of 0, it gets the IP_VS_CONN_F_NO_CPORT flag.
+> 
+> When ip_vs_conn_fill_cport() is later invoked to populate the port, the
+> missing IP_VS_CONN_F_HASHED check allows the execution to proceed.
 
-Our current recommendation for "individual" contributors is to use
-the review prompts directly:
-https://netdev-ai.bots.linux.dev/ai-local.html
+	But ip_vs_conn_fill_cport() is called for connection
+that is hashed and later found by lookup. If IP_VS_CONN_F_ONE_PACKET
+is set the conn is not hashed and is released immediately after
+creation by ip_vs_conn_put(). Both flags can not coexist, one or
+the other wins.
 
-If you have / can get LLM API keys sashiko seems to be producing
-better results (although not strictly better). Ideally you'd want
-to run Sashiko on all three of the major LLM models and then another
-sweep to coalesce the results. We can't do this at netdev today because
-it's cost prohibitive. But Google's Sashiko runs on Gemini, ours runs
-on Claude and they find different things..
+	As for IP_VS_CONN_F_NO_CPORT, ip_vs_bind_dest() clears the
+IP_VS_CONN_F_ONE_PACKET flag if not UDP and we use NO_CPORT for TCP.
+So, IP_VS_CONN_F_ONE_PACKET is simply ignored for TCP. If one day
+we start to use IP_VS_CONN_F_NO_CPORT for UDP and use
+IP_VS_CONN_F_ONE_PACKET then it will not work because the conn will
+not be hashed and as result never found to fill the cport.
+This time IP_VS_CONN_F_ONE_PACKET will win the game.
 
-I tried to improve Sashiko + CLI models but from my limited
-experimentation it's worse than just using the review prompts.
+> 
+> > +		/* If we race with resizing make sure cport is set for dir 1 */
+> > +		if (!cp->cport) {
+> > +			cp->cport = cport;
+> > +			by_me = true;
+> > +		}
+> > +		if (!dir) {
+> > +			atomic_dec(&ipvs->no_cport_conns[af_id]);
+> > +			cp->flags &= ~IP_VS_CONN_F_NO_CPORT;
+> > +		}
+> >  		/* We do not recalc hash_key_r under lock, we assume the
+> >  		 * parameters in cp do not change, i.e. cport is
+> >  		 * the only possible change.
+> > @@ -726,21 +733,17 @@ void ip_vs_conn_fill_cport(struct ip_vs_conn *cp, __be16 cport)
+> >  			hlist_bl_del_rcu(&hn->node);
+> 
+> If head != head2 here, hlist_bl_del_rcu(&hn->node) is called. Since
+> hn->node.pprev is NULL, wouldn't this cause a panic when __hlist_bl_del()
+> executes *pprev = next?
+> 
+> Is it possible to retain the IP_VS_CONN_F_HASHED check or otherwise
+> ensure unhashed nodes aren't unlinked?
 
-> Happy with a one-line pointer if it's already documented somewhere
-> I missed.
+	As IP_VS_CONN_F_ONE_PACKET conns are not hashed,
+ip_vs_conn_unlink() has check not to unlink the conn nodes from
+tables. The conn is invisible to others except the packet
+that created it. And the hash nodes are not touched.
 
-Sorry for not having the source of truth. The space is rapidly
-evolving :(
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
+
 
