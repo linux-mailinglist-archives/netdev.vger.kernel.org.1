@@ -1,259 +1,201 @@
-Return-Path: <netdev+bounces-281871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281872-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YHPOHJK38GlwXgEAu9opvQ
-	(envelope-from <netdev+bounces-281871-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 15:35:14 +0200
+	id wGaECaK78Gn+XwEAu9opvQ
+	(envelope-from <netdev+bounces-281872-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 15:52:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8F6F485F18
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 15:35:13 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8ACFB4864A3
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 15:52:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D8F88321C2AB
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 13:12:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E821332FFEBE
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 13:15:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0AF544B672;
-	Tue, 28 Apr 2026 13:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 431FD19992C;
+	Tue, 28 Apr 2026 13:12:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ePgWc4Fs";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="osYpFarW"
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B1F44A708;
-	Tue, 28 Apr 2026 13:10:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA233EFD3E
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 13:12:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777381857; cv=none; b=c1nlmAzvYVCgpRzhQAeMVgaZ3hlEkY22Ax2Sd05IqTK11feDdYqfxhARGwOW/QTlYL3L8y4NE86wV1dQ2WuMqGIFcdwL/rRw+rVZ2YjeC8zEd/J7b+G+Zl/RQvrQbvNZn5GulzccHrsjuyfEuo3iSG4FgkPA18+3PFJB4pgy29U=
+	t=1777381975; cv=none; b=RXHopbloOqCzI2vJQKrWDRPtXcKomnIlM1uOAmBEEtYPNAal0iNOzXgun3r+1gWCcvjo+me/a6JLjanw8dYdKNxgHHDIRApw+5z1rTRrtCZhcsYXTTicog43y71S4Lnv3r58LVji1PAoVyNf4/5aK6gLAiiQByyT8EKgTlfqchs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777381857; c=relaxed/simple;
-	bh=nmszbhvlmW6fCGQOwQbFQYvBDmzyGhtjk20ogqwaHEE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mWnkvLQjYbnJpDCdrOG9eo7xEKghlTsesQ7zAhNkwL9V8Vmv+XtblzzocDggGIF3gRLKFKAJ2ib64aNhStLFMfvxlVEnnv/N7yreBDFO6UtfsZGI9Mhoimsr1Fk17g0ZcEh/Zhmfu6nGOKeNJikK6X/cJmFSiR9R5RmM2gsMv1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from [129.217.186.62] ([129.217.186.62])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.2/8.18.2) with ESMTPSA id 63SDAig6017192
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 28 Apr 2026 15:10:45 +0200 (CEST)
-Message-ID: <cdc3cbc8-cf6a-437c-b34c-dd8ced65d7f8@tu-dortmund.de>
-Date: Tue, 28 Apr 2026 15:10:44 +0200
+	s=arc-20240116; t=1777381975; c=relaxed/simple;
+	bh=ENP0+US9+uoSMKwsdCFAUa8StYi9uiDiDLxaqDcJiMg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hp09uIi9YUeBxP/57HNCIGLOeIwJmwRV58ouFt+/gNq6tQoDF6mrVj34ZUBHmlEYyUL1k1dQYKG6EN91s9TSSHZs4l36/kN6CiR1ROzqCcy+8uDQU6uNZiy8paVVujmmgYdsVidn3SIjNHZOAwN4dYwiiUwhrZaWS8JHmIZbsa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ePgWc4Fs; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=osYpFarW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777381973;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j7GdUrfWfNS9OpD5GGiftL2t6uJKybTSHgDqr3QHoPs=;
+	b=ePgWc4FsEKSvIGT8d8UPpYA3d1ygcT8H14YcDuaG9AkbVgJzd9ssvzwGLJRBcGTSUCw6X2
+	cmnL0AqCRGNBil3tGy3bNxWAys5Da9uYiyjwqC6Pcg2dPrmqwV7dn7eyKYN1p5JPkqjSsT
+	Ks//biiSeOxVo34rVQ5CJcdHV/gAzrM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-121-Rd0AwdWHMSORBVHfZIxGkA-1; Tue, 28 Apr 2026 09:12:51 -0400
+X-MC-Unique: Rd0AwdWHMSORBVHfZIxGkA-1
+X-Mimecast-MFC-AGG-ID: Rd0AwdWHMSORBVHfZIxGkA_1777381970
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-488d2cd2674so88917425e9.0
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 06:12:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1777381970; x=1777986770; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=j7GdUrfWfNS9OpD5GGiftL2t6uJKybTSHgDqr3QHoPs=;
+        b=osYpFarW/+gzfYCnP1vTXAPp26eIN9gv09kD6jmCwFhEjrdjHL9bDatZ7kgtoBmneE
+         i0DCcbUIBnHuIo12V1SPplpe6Z26XvcKYy9SViSMhj+eIp+c4O4anS4lrsKjgrVST1we
+         j2XW+fUimi1of09xNwQ6uWS9st5TIvtXiSmEkiDL4Y+RVq1/WyKv3dl4CQh8BF+o61KX
+         7zlOlSP5v73kvyoZqsZoMtBkRC5rjFzj3qwEoCSnjm14lST0Lwtmx+CAxi9NlAHEbtBH
+         jmQZOWIA9bH9aT7ShbgTGGC1yPY5A4NN831cxIm9RGV4wVhsxZZWvbTz/UpjvkwseQxz
+         hMdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777381970; x=1777986770;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=j7GdUrfWfNS9OpD5GGiftL2t6uJKybTSHgDqr3QHoPs=;
+        b=KgxAsJXMp1ZPTzJtsR4DC5mafo2/Z3LUhoIs8Syc4gSRDVnRFrgD75bqEFlEJo6TrJ
+         dbitu5PukkyXkpf6Ijr8pPsDX+5UKXHsgvoDiwHj2UmYLkjKSufjNS45DxTp62Lrf5Ve
+         eMqteGivZrdV89JSAuN5K0O4g01zxnk0nrs4gDx/6KaY1UY88QC3ktG4m81qlHt8u3Qn
+         6pC5ZHDshiOkHZPp8qcmCzhsBI2A7DJZG/p3JtE9iu39Q+AekG+jvc0F1mxfCeQ+J0v9
+         KA5zjXPN/kF52I/mNrzOkvvqa7RBLIob2nruGtv/IzO7ZcxKfSJTguunKnAf8OL5BiLi
+         Xkkg==
+X-Gm-Message-State: AOJu0Yy9bpL8Z6fRpX4U+7an68/mEwQZbb9yJlSHdb4XVKRiHJKJHOTv
+	1vXYFIRD3ozAcLlKA3ubl52XWlRsdxopQSsksN06UWZJLhrATCPj9TtzSAnmqCsLQyzNbUjKn84
+	wPXxDzof/seXpKQM9nH+SEyyRLfoZhdPn74mf5In4H57ExSa64EdJcJDaAw==
+X-Gm-Gg: AeBDievACAqSLlpPoFq6QejJ6E3vpU4mH3ps17/Ib8s8hN/M7m79DgFdeh4hZwjR+Ef
+	F8yuAlTLZvrvgGLWn11BarKws2lp9L5gwMqRMRh4vdxKMFaSb1yU6g90tnnE7F1uT5kIuWtKL7m
+	f+SJ2sB0BonVRMklHcD0WLz0cyaWd1RvtOtojsosBESzQZPAgptld1dSyPrz4KDEOAGtr35K1NX
+	8VdHhHm9AQ03+ophgIXO0YIglBS/lTq6QuVZea9uWPDEj87q8VB/JVnQ4NJAkYBN7MWLL4JiwLW
+	CT7hv6aVx/lRrRBdiwGrqqD7i9kb8QL2IVnHvtFz0eU2emyovFy2bYGZEsgQIpdowZjisIKiS53
+	Gnf+aqaD54uuHaNW/zacA3F2MtF22VNHZzpRp/GG3vAO16WYsO01QCKUnS9qyOSg/VbWPSEvlf0
+	P2F6/Acw==
+X-Received: by 2002:a05:600c:8b57:b0:489:1a65:dd6e with SMTP id 5b1f17b1804b1-48a77aed628mr53248745e9.8.1777381969863;
+        Tue, 28 Apr 2026 06:12:49 -0700 (PDT)
+X-Received: by 2002:a05:600c:8b57:b0:489:1a65:dd6e with SMTP id 5b1f17b1804b1-48a77aed628mr53248255e9.8.1777381969380;
+        Tue, 28 Apr 2026 06:12:49 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-16-204-83.retail.telecomitalia.it. [87.16.204.83])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4463d02f270sm6398058f8f.9.2026.04.28.06.12.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Apr 2026 06:12:48 -0700 (PDT)
+Date: Tue, 28 Apr 2026 15:12:40 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>
+Cc: netdev@vger.kernel.org, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Long Li <longli@microsoft.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Michael Kelley <mhklinux@outlook.com>, Himadri Pandya <himadrispandya@gmail.com>, 
+	linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] hv_sock: fix ARM64 support
+Message-ID: <afCxfHKA7hJilGM3@sgarzare-redhat>
+References: <20260428125339.13963-1-hamzamahfooz@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 4/4] tun/tap & vhost-net: avoid ptr_ring
- tail-drop when a qdisc is present
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
-        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
-        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux.dev
-References: <20260428123859.19578-1-simon.schippers@tu-dortmund.de>
- <20260428123859.19578-5-simon.schippers@tu-dortmund.de>
- <20260428084851-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <20260428084851-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: C8F6F485F18
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260428125339.13963-1-hamzamahfooz@linux.microsoft.com>
+X-Rspamd-Queue-Id: 8ACFB4864A3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[tu-dortmund.de : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-281872-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,microsoft.com,kernel.org,davemloft.net,google.com,redhat.com,outlook.com,gmail.com,lists.linux.dev];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281871-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_CC(0.00)[gmail.com,redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_SPAM(0.00)[0.601];
-	R_DKIM_NA(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-On 4/28/26 14:50, Michael S. Tsirkin wrote:
-> On Tue, Apr 28, 2026 at 02:38:59PM +0200, Simon Schippers wrote:
->> This commit prevents tail-drop when a qdisc is present and the ptr_ring
->> becomes full. Once an entry is successfully produced and the ptr_ring
->> reaches capacity, the netdev queue is stopped instead of dropping
->> subsequent packets.
->>
->> If producing an entry fails anyways due to a race, tun_net_xmit returns
->> NETDEV_TX_BUSY, again avoiding a drop. Such races are expected because
->> LLTX is enabled and the transmit path operates without the usual locking.
->>
->> If no qdisc is present, the previous tail-drop behavior is preserved.
->>
->> The existing __tun_wake_queue() function of the consumer races with the
->> producer for waking/stopping the netdev queue: the consumer may drain
->> the ring just as the producer stops the queue, leading to a permanent
->> stall. To avoid this, the producer re-checks the ring after stopping
->> and wakes the queue itself if space was just made. An
->> smp_mb__after_atomic() is required so the re-peek of the ring sees any
->> drain that the consumer performed.
->> smp_mb__after_atomic() pairs with the test_and_clear_bit() inside of
->> netif_wake_subqueue():
->>
->> Consumer CPU                  Producer CPU
->> ========================      =========================
->> __ptr_ring_consume()
->> netif_wake_subqueue()         netif_tx_stop_queue()
->>           /\                  smp_mb__after_atomic()
->>           ||                  __ptr_ring_produce_peek()
->> contains RMW operation
->>  test_and_clear_bit()
->>           /\
->>           ||
->>  "Fully ordered RMW:
->> smp_mb() before + after"
->>     - atomic_t.txt
->>
->> Benchmarks:
->> The benchmarks show a slight regression in raw transmission performance,
->> though no packets are lost anymore.
-> 
-> Could you include the packets received as well?
-> To demonstrate the gains/lack of loss. 
-> 
+No version number in the subject?
 
-Do you mean the number of packets received by the VM?
-They should just be the same as the number sent (shown below), right?
+Please next time follow 
+https://docs.kernel.org/process/submitting-patches.html#subject-line
 
-I assume they would be visible as RX-DRP for TAP.
-For TAP + vhost-net I would have to rewrite the XDP drop
-program to count the number of dropped packets...
-And I would have to automate it...
+   Common tags might include a version descriptor if the multiple 
+   versions of the patch have been sent out in response to comments 
+   (i.e., “v1, v2, v3”), or “RFC” to indicate a request for comments.
 
->>
->> The previously introduced threshold to only wake after the queue stopped
->> and half of the ring was consumed showed to be a descent choice:
->> Waking the queue whenever a consume made space in the ring strongly
->> degrades performance for tap, while waking only when the ring is empty
->> is too late and also hurts throughput for tap & tap+vhost-net.
->> Other ratios (3/4, 7/8) showed similar results (not shown here), so
->> 1/2 was chosen for the sake of simplicity for both tun/tap and
->> tun/tap+vhost-net.
->>
->> Test setup:
->> AMD Ryzen 5 5600X at 4.3 GHz, 3200 MHz RAM, isolated QEMU threads;
->> Average over 50 runs @ 100,000,000 packets. SRSO and spectre v2
->> mitigations disabled.
->>
->> Note for tap+vhost-net:
->> XDP drop program active in VM -> ~2.5x faster, slower for tap due to
->> more syscalls (high utilization of entry_SYSRETQ_unsafe_stack in perf)
->>
->> +--------------------------+--------------+----------------+----------+
->> | 1 thread                 | Stock        | Patched with   | diff     |
->> | sending                  |              | fq_codel qdisc |          |
->> +------------+-------------+--------------+----------------+----------+
->> | TAP        | Transmitted | 1.136 Mpps   | 1.130 Mpps     | -0.6%    |
->> |            +-------------+--------------+----------------+----------+
->> |            | Lost/s      | 3.758 Mpps   | 0 pps          |          |
->> +------------+-------------+--------------+----------------+----------+
->> | TAP        | Transmitted | 3.858 Mpps   | 3.816 Mpps     | -1.1%    |
->> |            +-------------+--------------+----------------+----------+
->> | +vhost-net | Lost/s      | 789.8 Kpps   | 0 pps          |          |
->> +------------+-------------+--------------+----------------+----------+
->>
->> +--------------------------+--------------+----------------+----------+
->> | 2 threads                | Stock        | Patched with   | diff     |
->> | sending                  |              | fq_codel qdisc |          |
->> +------------+-------------+--------------+----------------+----------+
->> | TAP        | Transmitted | 1.117 Mpps   | 1.087 Mpps     | -2.7%    |
->> |            +-------------+--------------+----------------+----------+
->> |            | Lost/s      | 8.476 Mpps   | 0 pps          |          |
->> +------------+-------------+--------------+----------------+----------+
->> | TAP        | Transmitted | 3.679 Mpps   | 3.464 Mpps     | -5.8%    |
->> |            +-------------+--------------+----------------+----------+
->> | +vhost-net | Lost/s      | 5.306 Mpps   | 0 pps          |          |
->> +------------+-------------+--------------+----------------+----------+
->>
->> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
->> ---
->>  drivers/net/tun.c | 30 ++++++++++++++++++++++++++++--
->>  1 file changed, 28 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
->> index efe809597622..c2a1618cc9db 100644
->> --- a/drivers/net/tun.c
->> +++ b/drivers/net/tun.c
->> @@ -1011,6 +1011,8 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
->>  	struct netdev_queue *queue;
->>  	struct tun_file *tfile;
->>  	int len = skb->len;
->> +	bool qdisc_present;
->> +	int ret;
->>  
->>  	rcu_read_lock();
->>  	tfile = rcu_dereference(tun->tfiles[txq]);
->> @@ -1065,13 +1067,37 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
->>  
->>  	nf_reset_ct(skb);
->>  
->> -	if (ptr_ring_produce(&tfile->tx_ring, skb)) {
->> +	queue = netdev_get_tx_queue(dev, txq);
->> +	qdisc_present = !qdisc_txq_has_no_queue(queue);
->> +
->> +	spin_lock(&tfile->tx_ring.producer_lock);
->> +	ret = __ptr_ring_produce(&tfile->tx_ring, skb);
->> +	if (__ptr_ring_produce_peek(&tfile->tx_ring) && qdisc_present) {
->> +		netif_tx_stop_queue(queue);
->> +		/* Re-peek and wake if the consumer drained the ring
->> +		 * concurrently in a race. smp_mb__after_atomic() pairs
->> +		 * with the test_and_clear_bit() of netif_wake_subqueue()
->> +		 * in __tun_wake_queue().
->> +		 */
->> +		smp_mb__after_atomic();
->> +		if (!__ptr_ring_produce_peek(&tfile->tx_ring))
->> +			netif_tx_wake_queue(queue);
->> +	}
->> +	spin_unlock(&tfile->tx_ring.producer_lock);
->> +
->> +	if (ret) {
->> +		/* If a qdisc is attached to our virtual device,
->> +		 * returning NETDEV_TX_BUSY is allowed.
->> +		 */
->> +		if (qdisc_present) {
->> +			rcu_read_unlock();
->> +			return NETDEV_TX_BUSY;
->> +		}
->>  		drop_reason = SKB_DROP_REASON_FULL_RING;
->>  		goto drop;
->>  	}
->>  
->>  	/* dev->lltx requires to do our own update of trans_start */
->> -	queue = netdev_get_tx_queue(dev, txq);
->>  	txq_trans_cond_update(queue);
->>  
->>  	/* Notify and wake up reader process */
->> -- 
->> 2.43.0
-> 
+On Tue, Apr 28, 2026 at 08:53:39AM -0400, Hamza Mahfooz wrote:
+>VMBUS ring buffers must be page aligned. Therefore, the current value of
+>24K presents a challenge on ARM64 kernels (with 64K pages). So, use
+>VMBUS_RING_SIZE() to ensure they are always aligned and large enough to
+>hold all of the relevant data.
+>
+>Cc: stable@vger.kernel.org
+>Fixes: 77ffe33363c0 ("hv_sock: use HV_HYP_PAGE_SIZE for Hyper-V communication")
+>Tested-by: Dexuan Cui <decui@microsoft.com>
+>Reviewed-by: Dexuan Cui <decui@microsoft.com>
+>Signed-off-by: Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>
+>---
+> net/vmw_vsock/hyperv_transport.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
+
+Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+
+>
+>diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
+>index 069386a74557..40f09b23efa3 100644
+>--- a/net/vmw_vsock/hyperv_transport.c
+>+++ b/net/vmw_vsock/hyperv_transport.c
+>@@ -375,10 +375,10 @@ static void hvs_open_connection(struct vmbus_channel *chan)
+> 	} else {
+> 		sndbuf = max_t(int, sk->sk_sndbuf, RINGBUFFER_HVS_SND_SIZE);
+> 		sndbuf = min_t(int, sndbuf, RINGBUFFER_HVS_MAX_SIZE);
+>-		sndbuf = ALIGN(sndbuf, HV_HYP_PAGE_SIZE);
+>+		sndbuf = VMBUS_RING_SIZE(sndbuf);
+> 		rcvbuf = max_t(int, sk->sk_rcvbuf, RINGBUFFER_HVS_RCV_SIZE);
+> 		rcvbuf = min_t(int, rcvbuf, RINGBUFFER_HVS_MAX_SIZE);
+>-		rcvbuf = ALIGN(rcvbuf, HV_HYP_PAGE_SIZE);
+>+		rcvbuf = VMBUS_RING_SIZE(rcvbuf);
+> 	}
+>
+> 	chan->max_pkt_size = HVS_MAX_PKT_SIZE;
+>-- 
+>2.54.0
+>
+
 
