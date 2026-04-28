@@ -1,141 +1,440 @@
-Return-Path: <netdev+bounces-282123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282140-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YGd8KhI/8WmhfAEAu9opvQ
-	(envelope-from <netdev+bounces-282123-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 01:13:22 +0200
+	id WMH6LCNB8WlsfQEAu9opvQ
+	(envelope-from <netdev+bounces-282140-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 01:22:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06E1748CE93
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 01:13:21 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B19148CF99
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 01:22:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5812E3034BF0
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 23:13:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 96464303A09B
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 23:21:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC7A133ADAE;
-	Tue, 28 Apr 2026 23:13:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2885B38B7C3;
+	Tue, 28 Apr 2026 23:21:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Ca41f8tj"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="SfZQ3lC2"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B9842C08DC;
-	Tue, 28 Apr 2026 23:13:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47FE238AC9E
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 23:21:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777417998; cv=none; b=N0lsOY17m3WAqPRNBNpFoEEsxBOWUl1apZsMr3M8gVlfs0JjRhx4+ZX8uZWdarAL2qILkENXGARYgVaiTSCjWk2TsxIxhjR/75PeZG8Q3HgdSZcczmiXDgBfo0Zx88X16OBP12h+Zb0KhJZZSGqUZNksNWoWWV+jEN1hgH+dZko=
+	t=1777418484; cv=none; b=tuA+J9z9IjBH6XfQ4hN5958qhprrvEjnLDdxZCMYHiPpvRnEt0U7OYHPuxTi6o3VWRaUnxQGHszZ3DhHR1HFG4m9kpVsE1L8FMJRTXw8TzU4+pbTsnmL6Uc3k+2cH2TznblA8Q9MwMHcXLBPXRlCAI8EwGakCWmLZciI/PneLNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777417998; c=relaxed/simple;
-	bh=2n4qSOg2jbpexL50UfpGrOX+XcF388VT5jDUb87M9LE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A8TMdZWNAatcq/FVSIvnOeszLy11G089N2l4EdiDtTBCdOGiChZJtXT+mT8d3zx/bcNYmNICUB/k3ikrAowjsgy1bhS73YwXFaAcbkpm57pe98YIw9myC44e1Gky5wz7kmQ6D29sOMrAjuibJed4xuyG8yWyjDPdLlRzLI6Va3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Ca41f8tj; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/YKeeC5igUYtrX1cdVwe4XIBHgS8EWnZYDlr+hLRE3E=; b=Ca41f8tjj/nPZzGCoeW0P8dKAD
-	vG5Qdzl++c8Z6AbzTukIzz4pcFhQ6e9te7xw546JioOYwAtq3tKxrQTVGZ4pVYlp94uyci1eDrDEe
-	zCLyrEhIUVejTnlvdMFK11OCF4rqkhb7v+ezXl6EpoRxCaQpT3awvDdK5MpMHT6ukbAg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wHrc3-000QTs-Pl; Wed, 29 Apr 2026 01:13:07 +0200
-Date: Wed, 29 Apr 2026 01:13:07 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: gianfar: use alloc_ethdev_mqs
-Message-ID: <0f704ce2-e936-4bc1-8ab2-144de9e74af8@lunn.ch>
-References: <20260428223058.113013-1-rosenp@gmail.com>
+	s=arc-20240116; t=1777418484; c=relaxed/simple;
+	bh=ViLfLZioxnZ/dqeUPejmpQflTBKs9ejsmDhyClBi7zo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mJRUclpbgL6tt6CrYDsolSJMbi7CbmlBJlvqAU9hfqYUZEhNV4oHVByUJWLeAZhZX9RoFprLhuXtzMGPDFaR/zsnk/SBVOxrsxUke/tKW8R+X8zKfa5hbmtHhu96M6UY6fIx+NPs3l3yYP3tmu+6maK//Fnd6MYAUnGb2fbQKOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=SfZQ3lC2; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=zhcOF1x+TAu6g8VA/9hjiK57zsWI6iWNrhIN3bsqWKc=; t=1777418482; x=1778282482; 
+	b=SfZQ3lC2DOOlQwp2FZhR+KXoyXi60Ufu/4Cn79E3wAYUTyyMsnI6XfS6xJND0f/ImWuhv7HF3S+
+	DdCW+vFTziq4PQNEkP7QO06aK07wKAIBGPukNDgdT+wvmhV7yKZJ/4HXdu/UOpq/Nxu6Nfz5YPE1G
+	SeMJ2XhT36JKd5BOE0j6Wz20spl10V4eCenKrCwCnvtaEmOnNttoJKPZCUTW+NahTQnBZvtaHZ2+8
+	60jfdFZBDrmMNlSFmIPJRX1x45tz/TbrogQXslrQMUULNHGX/FB6y27+FTgyqwSHjSgxBqe98EE2v
+	u9E6oysx35W9hvw5MDoDdrPyTi0HLdFCeAcw==;
+Received: from ouster448.stanford.edu ([172.24.72.71]:54475 helo=ouster2022)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1wHreH-0005UM-TX; Tue, 28 Apr 2026 16:15:27 -0700
+From: John Ousterhout <ouster@cs.stanford.edu>
+To: netdev@vger.kernel.org
+Cc: pabeni@redhat.com,
+	edumazet@google.com,
+	horms@kernel.org,
+	kuba@kernel.org,
+	John Ousterhout <ouster@cs.stanford.edu>
+Subject: [PATCH net-next v19 00/15] Begin upstreaming Homa transport protocol
+Date: Tue, 28 Apr 2026 16:15:03 -0700
+Message-ID: <20260428231520.1857-1-ouster@cs.stanford.edu>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260428223058.113013-1-rosenp@gmail.com>
-X-Rspamd-Queue-Id: 06E1748CE93
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: -101.0
+X-Scan-Signature: a002f5d58179857bbce2dca226433d87
+X-Rspamd-Queue-Id: 2B19148CF99
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_DKIM_REJECT(1.00)[cs.stanford.edu:s=cs2308];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[cs.stanford.edu : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282123-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	TAGGED_FROM(0.00)[bounces-282140-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[ouster@cs.stanford.edu,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[cs.stanford.edu:-];
+	NEURAL_HAM(-0.00)[-0.734];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,cs.stanford.edu:mid,atlassian.net:url,checkpatch.pl:url]
 
-On Tue, Apr 28, 2026 at 03:30:58PM -0700, Rosen Penev wrote:
-> >From looking at git history, mqs was introduced after mq and after this
-> code was written. Having said that, mqs can be used as there is already
-> an RX queue variable in place. Not only that, mqs already sets the
-> num_xx_queues members. No need to open code this.
-> 
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> ---
->  drivers/net/ethernet/freescale/gianfar.c | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/freescale/gianfar.c b/drivers/net/ethernet/freescale/gianfar.c
-> index 3271de5844f8..7b47c7c49c08 100644
-> --- a/drivers/net/ethernet/freescale/gianfar.c
-> +++ b/drivers/net/ethernet/freescale/gianfar.c
-> @@ -669,7 +669,7 @@ static int gfar_of_init(struct platform_device *ofdev, struct net_device **pdev)
->  		return -EINVAL;
->  	}
->  
-> -	*pdev = alloc_etherdev_mq(sizeof(*priv), num_tx_qs);
-> +	*pdev = alloc_etherdev_mqs(sizeof(*priv), num_tx_qs, num_rx_qs);
->  	dev = *pdev;
->  	if (NULL == dev)
->  		return -ENOMEM;
-> @@ -679,10 +679,6 @@ static int gfar_of_init(struct platform_device *ofdev, struct net_device **pdev)
->  
->  	priv->mode = mode;
->  
-> -	priv->num_tx_queues = num_tx_qs;
-> -	netif_set_real_num_rx_queues(dev, num_rx_qs);
-> -	priv->num_rx_queues = num_rx_qs;
+This patch series begins the process of upstreaming the Homa transport
+protocol. Homa is an alternative to TCP for use in datacenter
+environments. It provides 10-100x reductions in tail latency for short
+messages relative to TCP. Its benefits are greatest for mixed workloads
+containing both short and long messages running under high network loads.
+Homa is not API-compatible with TCP: it is connectionless and message-
+oriented (but still reliable and flow-controlled). Homa's new API not
+only contributes to its performance gains, but it also eliminates the
+massive amount of connection state required by TCP for highly connected
+datacenter workloads (Homa uses ~ 1 socket per application, whereas
+TCP requires a separate socket for each peer).
 
-Please add to the commit message an explanation of why these two
-assignments can be removed, because it is not obvious.
+For more details on Homa, please consult the Homa Wiki:
+https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview
+The Wiki has pointers to two papers on Homa (one of which describes
+this implementation) as well as man pages describing the application
+API and other information.
 
-    Andrew
+There is also a GitHub repo for Homa:
+https://github.com/PlatformLab/HomaModule
+The GitHub repo contains a superset of this patch set, including:
+* Additional source code that will eventually be upstreamed
+* Extensive unit tests (which will also be upstreamed eventually)
+* Application-level library functions (which need to go in glibc?)
+* Man pages (which need to be upstreamed as well)
+* Benchmarking and instrumentation code
 
----
-pw-bot: cr
+For this patch series, Homa has been stripped down to the bare minimum
+functionality capable of actually executing remote procedure calls. (about
+8000 lines of source code, compared to 20000 lines in the complete Homa).
+The remaining code will be upstreamed in smaller batches once this patch
+series has been accepted. Note: the code in this patch series is
+functional but its performance is not very interesting (about the same
+as TCP).
+
+The patch series is arranged to introduce the major functional components
+of Homa. Until the last patch has been applied, the code is inert (it
+will not be compiled).
+
+Note: this implementation of Homa supports both IPv4 and IPv6.
+
+Major changes for v19:
+* Change ioctl numbers to use numbers not currently in use.
+* Fix several bugs found by AI review.
+
+Major changes for v18:
+* Fix 2 synchronization issues in homa_peer.c related to reclamation.
+* Make sure unused fields of outgoing packets are zeroes.
+* Fix types to conform to Linux standards (e.g. __u64 instead of size_t).
+* Use functions like kzalloc_obj instead of kzalloc.
+* Use skb_attempt_defer_free for incoming skbs instead of consume_skb.
+
+Changes for v17:
+* This revision contains only minor changes to reflect changes elsewhere
+  in the kernel, such as the addition of kmalloc_obj and
+  struct sockaddr_unsized.
+
+Major changes for v16 (see individual patches for additional details):
+* Remove homa_pacer.c
+* Refactor homa_peer.c to simplify and clean up reference counting
+* Implement HOMAIOCINFO ioctl.
+* Use refcount_t instead of atomic_t for reference counts
+* Use consume_skb and kfree_skb_reason instead of kfree_skb
+* Use set_bit, clear_bit, etc. for flag bits
+
+Changes for v15:
+* This series is a resubmit of the v14 series to repair broken Author
+  email addresses in the commits. There are no other changes.
+
+Changes for v14:
+* There were no comments on the v13 patch series.
+* Fix a couple of bugs and clean up a few APIs (see individual patches for
+  details).
+
+Changes for v13:
+* Modify all files to include GPL-2.0+ as an option in the SPDX license line
+* Fix a couple of bugs in homa_outgoing.c and one bug in homa_plumbing.c
+
+Major changes for v12:
+* There were no comments on the v11 patch series, so there are no major
+  changes in this version. See individual patch files for a few small
+  local changes.
+
+Major changes for v11 (see individual patches for additional details):
+* There were no comments on the v10 patch series, so there are not many
+  changes in this version
+* Rework the mechanism for waking up RPCs that stalled waiting for
+  buffer pool space (the old approach deprioritized waking RPCs, which
+  led to starvation and server overload).
+* Cleanup and simplify use of RPC reference counts. Before, references were
+  only acquired to bridge gaps in lock ownership; this was complicated and
+  error-prone. Now, reference counts are acquired at the "top level" when
+  an RPC is selected for working on. Any function that receives a homa_rpc as
+  argument can assume it is protected with a reference.
+* Clean up sparse annotations (use name of lock variable, not address)
+
+Major changes for v10 (see individual patches for additional details):
+- Refactor resend mechanism: consolidate code for sending RESEND packets
+  in new function homa_request_retrans (simplifies homa_timer.c); a few
+  bug fixes (updating "granted" field in homa_resend_pkt, etc.)
+- Revise sparse annotations to eliminate __context__ definition
+- Use the destroy function from struct proto properly (fixes races in
+  socket cleanup)
+
+Major changes for v9 (see individual patches for additional details):
+- Introduce homa_net objects; there is now a single global struct homa
+  shared by all network namespaces, with one homa_net per network namespace
+  with netns-specific information. Most info, including socket table and
+  peer table, is stored in the struct homa.
+- Introduce homa_clock as an abstraction layer for the fine-grain clock.
+- Implement limits on the number of active homa_peer objects. This includes
+  adding reference counts in homa_peers and adding code to release peers
+  where there are too many.
+- Switch to using rhashtable to store homa_peers; the table is shared
+  across all network namespaces, though individual peers are namespace-
+  specific.
+
+v8 changes:
+- There were no reviews of the v7 patch series, so there are not many changes
+  in this version
+- Pull out pacer code into separate files pacer.h and pacer.c
+- Refactor homa_pool APIs (move allocation/deallocation into homa_pool.c,
+  move locking responsibility out)
+- Fix various problems from sparse, checkpatch, and kernel-doc
+
+v7 changes:
+- Add documentation files reap.txt and sync.txt.
+- Replace __u64 with _u64 (and __s64 with s64) in non-uapi settings.
+- Replace '__aligned(L1_CACHE_BYTES)' with '____cacheline_aligned_in_smp'.
+- Use alloc_percpu_gfp for homa_pool::cores.
+- Extract bool homa_bpage_available from homa_pool_get_pages.
+- Rename homa_rpc_free to homa_rpc_end.
+- Use skb_queue_purge in homa_rpc_reap instead of hand-coding.
+- Clean up RCU usage in several places:
+  - Eliminate unnecessary use of RCU for homa_sock::dead_rpcs.
+  - Eliminate use of RCU for homa::throttled_rpcs (unnecessary, unclear
+    that it would have worked). Added return value from homa_pacer_xmit.
+  - Call rcu_read_lock/unlock in homa_peer_find (just to be safe; probably
+    isn't necessary)
+  - Eliminate extraneous use of RCU in homa_pool_allocate.
+  - Cleaned up RCU usage around homa_sock::active_rpcs.
+  - Change homa_sock_find to take a reference on the returned socket;
+    caller no longer has to worry about RCU issues.
+- Remove "locker" arguments from homa_lock_rpc, homa_lock_sock,
+  homa_rpc_try_lock, and homa_bucket_lock (shouldn't be needed, given
+  CONFIG_PROVE_LOCKING).
+- Use __GFP_ZERO in *alloc calls instead of initializing individual
+  struct fields to zero.
+- Don't use raw_smp_processor_id; use smp_processor_id instead.
+- Remove homa_peertab_get_peers from this patch series (and also fix
+  problems in it related to RCU usage).
+- Add annotation to homa_peertab_gc_dsts requiring write_lock.
+- Remove "lock_slow" functions, which don't add functionality in this patch
+  series.
+- Remove unused fields from homa_peer structs.
+- Reorder fields in homa_rpc_bucket to squeeze out padding.
+- Refactor homa_sock_start_scan etc.
+  - Take a reference on the current socket to keep it from being freed.
+  - No need now for homa_socktab::active_scans or struct homa_socktab_links.
+  - rcu_read_lock/unlock is now entirely in the homa_sock scan methods;
+    no need for callers to worry about this.
+- Add homa_rpc_hold and homa_rpc_put. Replaces several ad-hoc mechanisms,
+  such as RPC_COPYING_FROM_USER and RPC_COPYING_TO_USER, with a single
+  general-purpose mechanism.
+- Use __skb_queue_purge instead of skb_queue_purge (locking isn't needed
+  because Homa has its own locks).
+- Rename UNKNOWN packet type to RPC_UNKNOWN.
+- Add hsk->is_server plus SO_HOMA_SERVER setsockopt: by default, sockets
+  will not accept incoming RPCs unless they have been bound.
+- Refactor waiting mechanism for incoming packets: simplify wait
+  criteria and use standard mechanisms (wait_event_*) for blocking
+  threads. Create homa_interest.c and homa_interest.h.
+* Add memory accounting for outbound messages (e.g. new sysctl value
+  wmem_max); senders now block when memory limit is exceeded.
+* Made Homa a pernet subsystem (a separate Homa transport for each
+  network namespace).
+
+v6 changes:
+- Make hrtimer variable in homa_timer_main static instead of stack-allocated
+  (avoids complaints when in debug mode).
+- Remove unnecessary cast in homa_dst_refresh.
+- Replace erroneous uses of GFP_KERNEL with GFP_ATOMIC.
+- Check for "all ports in use" in homa_sock_init.
+- Refactor API for homa_rpc_reap to incorporate "reap all" feature,
+  eliminate need for callers to specify exact amount of work to do
+  when in "reap a few" mode.
+- Fix bug in homa_rpc_reap (wasn't resetting rx_frees for each iteration
+  of outer loop).
+
+v5 changes:
+- Change type of start in struct homa_rcvbuf_args from void* to __u64;
+  also add more __user annotations.
+- Refactor homa_interest: replace awkward ready_rpc field with two
+  fields: rpc and rpc_ready. Added new functions homa_interest_get_rpc
+  and homa_interest_set_rpc to encapsulate/clarify access to
+  interest->rpc_ready.
+- Eliminate use of LIST_POISON1 etc. in homa_interests (use list_del_init
+  instead of list_del).
+- Remove homa_next_skb function, which is obsolete, unused, and incorrect
+- Eliminate ipv4_to_ipv6 function (use ipv6_addr_set_v4mapped instead)
+- Eliminate is_mapped_ipv4 function (use ipv6_addr_v4mapped instead)
+- Use __u64 instead of uint64_t in homa.h
+- Remove 'extern "C"' from homa.h
+- Various fixes from patchwork checks (checkpatch.pl, etc.)
+- A few improvements to comments
+
+v4 changes:
+- Remove sport argument for homa_find_server_rpc (unneeded). Also
+  remove client_port field from struct homa_ack
+- Refactor ICMP packet handling (v6 was incorrect)
+- Check for socket shutdown in homa_poll
+- Fix potential for memory garbling in homa_symbol_for_type
+- Remove unused ETHERNET_MAX_PAYLOAD declaration
+- Rename classes in homa_wire.h so they all have "homa_" prefixes
+- Various fixes from patchwork checks (checkpatch.pl, etc.)
+- A few improvements to comments
+
+v3 changes:
+- Fix formatting in Kconfig
+- Set ipv6_pinfo_offset in struct proto
+- Check return value of inet6_register_protosw
+- In homa_load cleanup, don't cleanup things that haven't been
+  initialized
+- Add MODULE_ALIAS_NET_PF_PROTO_TYPE to auto-load module
+- Check return value from kzalloc call in homa_sock_init
+- Change SO_HOMA_SET_BUF to SO_HOMA_RCVBUF
+- Change struct homa_set_buf_args to struct homa_rcvbuf_args
+- Implement getsockopt for SO_HOMA_RCVBUF
+- Return ENOPROTOOPT instead of EINVAL where appropriate in
+  setsockopt and getsockopt
+- Fix crash in homa_pool_check_waiting if pool has no region yet
+- Check for NULL msg->msg_name in homa_sendmsg
+- Change addr->in6.sin6_family to addr->sa.sa_family in homa_sendmsg
+  for clarity
+- For some errors in homa_recvmsg, return directly rather than "goto done"
+- Return error from recvmsg if offsets of returned read buffers are bogus
+- Added comments to clarify lock-unlock pairs for RPCs
+- Renamed homa_try_bucket_lock to homa_try_rpc_lock
+- Fix issues found by test robot and checkpatch.pl
+- Ensure first argument to do_div is 64 bits
+- Remove C++ style comments
+- Removed some code that will only be relevant in future patches that
+  fill in missing Homa functionality
+
+v2 changes:
+- Remove sockaddr_in_union declaration from public API in homa.h
+- Remove kernel wrapper functions (homa_send, etc.) from homa.h
+- Fix many sparse warnings (still more work to do here) and other issues
+  uncovered by test robot
+- Fix checkpatch.pl issues
+- Remove residual code related to unit tests
+- Remove references to tt_record from comments
+- Make it safe to delete sockets during homa_socktab scans
+- Use uintptr_t for portability fo 32-bit platforms
+- Use do_div instead of "/" for portability
+- Remove homa->busy_usecs and homa->gro_busy_usecs (not needed in
+  this stripped down version of Homa)
+- Eliminate usage of cpu_khz, use sched_clock instead of get_cycles
+- Add missing checks of kmalloc return values
+- Remove "inline" qualifier from functions in .c files
+- Document that pad fields must be zero
+- Use more precise type "uint32_t" rather than "int"
+- Remove unneeded #include of linux/version.h
+
+John Ousterhout (15):
+  net: homa: define user-visible API for Homa
+  net: homa: create homa_wire.h
+  net: homa: create shared Homa header files
+  net: homa: create homa_pool.h and homa_pool.c
+  net: homa: create homa_peer.h and homa_peer.c
+  net: homa: create homa_sock.h and homa_sock.c
+  net: homa: create homa_interest.h and homa_interest.c
+  net: homa: create homa_rpc.h and homa_rpc.c
+  net: homa: create homa_outgoing.c
+  net: homa: create homa_utils.c
+  net: homa: export skb_attempt_defer_free
+  net: homa: create homa_incoming.c
+  net: homa: create homa_timer.c
+  net: homa: create homa_plumbing.c
+  net: homa: create Makefile and Kconfig
+
+ .../userspace-api/ioctl/ioctl-number.rst      |    1 +
+ MAINTAINERS                                   |    7 +
+ include/uapi/linux/homa.h                     |  300 ++++
+ net/Kconfig                                   |    1 +
+ net/Makefile                                  |    1 +
+ net/core/skbuff.c                             |    1 +
+ net/homa/Kconfig                              |   21 +
+ net/homa/Makefile                             |   15 +
+ net/homa/homa_impl.h                          |  585 ++++++++
+ net/homa/homa_incoming.c                      |  902 ++++++++++++
+ net/homa/homa_interest.c                      |  114 ++
+ net/homa/homa_interest.h                      |   93 ++
+ net/homa/homa_outgoing.c                      |  573 ++++++++
+ net/homa/homa_peer.c                          |  558 +++++++
+ net/homa/homa_peer.h                          |  303 ++++
+ net/homa/homa_plumbing.c                      | 1303 +++++++++++++++++
+ net/homa/homa_pool.c                          |  514 +++++++
+ net/homa/homa_pool.h                          |  166 +++
+ net/homa/homa_rpc.c                           |  697 +++++++++
+ net/homa/homa_rpc.h                           |  535 +++++++
+ net/homa/homa_sock.c                          |  448 ++++++
+ net/homa/homa_sock.h                          |  446 ++++++
+ net/homa/homa_stub.h                          |   91 ++
+ net/homa/homa_timer.c                         |  136 ++
+ net/homa/homa_utils.c                         |  110 ++
+ net/homa/homa_wire.h                          |  360 +++++
+ net/homa/murmurhash3.h                        |   44 +
+ 27 files changed, 8325 insertions(+)
+ create mode 100644 include/uapi/linux/homa.h
+ create mode 100644 net/homa/Kconfig
+ create mode 100644 net/homa/Makefile
+ create mode 100644 net/homa/homa_impl.h
+ create mode 100644 net/homa/homa_incoming.c
+ create mode 100644 net/homa/homa_interest.c
+ create mode 100644 net/homa/homa_interest.h
+ create mode 100644 net/homa/homa_outgoing.c
+ create mode 100644 net/homa/homa_peer.c
+ create mode 100644 net/homa/homa_peer.h
+ create mode 100644 net/homa/homa_plumbing.c
+ create mode 100644 net/homa/homa_pool.c
+ create mode 100644 net/homa/homa_pool.h
+ create mode 100644 net/homa/homa_rpc.c
+ create mode 100644 net/homa/homa_rpc.h
+ create mode 100644 net/homa/homa_sock.c
+ create mode 100644 net/homa/homa_sock.h
+ create mode 100644 net/homa/homa_stub.h
+ create mode 100644 net/homa/homa_timer.c
+ create mode 100644 net/homa/homa_utils.c
+ create mode 100644 net/homa/homa_wire.h
+ create mode 100644 net/homa/murmurhash3.h
+
+--
+2.43.0
+
 
