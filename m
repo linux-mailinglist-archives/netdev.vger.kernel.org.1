@@ -1,321 +1,184 @@
-Return-Path: <netdev+bounces-281948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281949-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aFPhHO/Q8GlpZAEAu9opvQ
-	(envelope-from <netdev+bounces-281948-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:23:27 +0200
+	id oAgCLXjR8GnDYwEAu9opvQ
+	(envelope-from <netdev+bounces-281949-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:25:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7388487BF2
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:23:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0398C487C7E
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:25:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D261D3053CC4
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 15:21:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4A386303BB21
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 15:24:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79EA2313298;
-	Tue, 28 Apr 2026 15:21:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D18DD3793D0;
+	Tue, 28 Apr 2026 15:24:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MbctiBo/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vJZFUSIC"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC22C395D8B
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 15:21:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777389691; cv=none; b=UpsDhe/P8F5Q6aIGYxHwkgG35IfapBUNlf0rJy7a2QVguqkpo8Hg24DjCnkVEscks20CngR2lekXZlQNfIafhQOaXZg5bODfp/T0nr6vQPZEOrLe4nmQdeFb987cXIAmLhXMdM0e00w0b7tMLdgSLdZeSXuNKcREevQscKUeUwY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777389691; c=relaxed/simple;
-	bh=ouyM7NMwaC73seyX5OtU4PkMzWA7HJQj271PXbXZhZw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pe905EboZQQLkPTwmmhKqk1yiB8I4vxnl/545293lgK+/zrdMAAtyuclBp5zAPyPaZyiGlup6waLf+cap7qh+KwM/m8RsPnJ4HhDiyn1fmzAySifHu4YndFcwcBHXig3aApp3Gjmgat1zqBmRxwh1yy89Ebp1Qcrefp2RKf3cv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MbctiBo/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777389688;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LngOVqkgAQYIYscWAk3WuyZjE2QNDFJUpv4XnHa99Xk=;
-	b=MbctiBo/6qjk2h87OJ+ZspJC0knZtHOhNtOu3JzMMpH4r3U+Roh51P9yCs07q54GWZmbFP
-	ksZyTUJ2xdGvkmJ7DZMxsSWHfPqiLG0WTLPnIiQaYqI4BuH1pMRtbSu6Rfha2jYxkdgYzN
-	OEyjnHLcCzTs7DQ99n2hrSf4tWkeuBA=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-691-V32rblDONQiZZfcLnHzTBw-1; Tue,
- 28 Apr 2026 11:21:24 -0400
-X-MC-Unique: V32rblDONQiZZfcLnHzTBw-1
-X-Mimecast-MFC-AGG-ID: V32rblDONQiZZfcLnHzTBw_1777389683
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5D36F195608F;
-	Tue, 28 Apr 2026 15:21:23 +0000 (UTC)
-Received: from p16v.redhat.com (unknown [10.44.49.234])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A0D8C195608E;
-	Tue, 28 Apr 2026 15:21:21 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: David Ahern <dsahern@kernel.org>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Petr Oros <poros@redhat.com>
-Subject: [PATCH iproute2-next 2/2] dpll: add frequency monitoring support
-Date: Tue, 28 Apr 2026 17:21:15 +0200
-Message-ID: <20260428152115.2815860-3-ivecera@redhat.com>
-In-Reply-To: <20260428152115.2815860-1-ivecera@redhat.com>
-References: <20260428152115.2815860-1-ivecera@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777503ACEF1
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 15:24:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777389852; cv=pass; b=HhQtPwPA83tw13twBVJAyieUw62HeLTEvgIzvC7C4kkuDEEDy4eWV6/WJ7Bjj5H4Ioyrn/+oU1Rszn21oNOdla8gnroB2uWVIUMbPlzMjcktMbRuueiQkWQoutgZxtXYOhWnemDRuCgqN02yxTA6GsJqLnO3EmFVIJFYiBVZriI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777389852; c=relaxed/simple;
+	bh=9AyvW0eHFQ0T1vrhlMVDtiVf9P1skRo4JRIODXHN8eU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N5ez10NEcAx08B5iL6pxyB7Ft+P5aOg7cm+zpI5dkiKUwa71OyX98N63VvPXGFKo3MowzmBZ295Hn8uTW2dx8pPwAPuJwsUfD410HmzrNCh8lvmA+W70s+wqMeoMiPf7UlvwPqsfnL1inmzxIKbJstVizMZ27V4AG5hDDqHyAVc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vJZFUSIC; arc=pass smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-8aca0469204so111054186d6.2
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 08:24:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777389850; cv=none;
+        d=google.com; s=arc-20240605;
+        b=R4v04AGv8wa2nn5Qsz9kHoqVQOLLw14NBsaYFLsvSUWe7/6fMpRw2Zot/jNvuLumf9
+         qu+y2oOm7kvX39t0FS0VZP9Ln28Qxk83zCGiCV2Qik+V+lVxqmo8KXdz4lflS2OLDn9g
+         yBO7RCqpGxzJEgHDw8jd7YhfywnJANPA3mKS+NlwKK5u0YlqLB/gT4/yECgISsR1oHhH
+         7cnOFTPxEib9Y2UnWVN6IonM5Q1UvioFHByiGO1kB8ekJG7w6XkUan/bspJU2df27G7n
+         XicZNilanBRU9NKmbONWhpM1qOoFI7PJl4Ps6ujWKo4lIxpEH8hFqEDjQrej/p/qr8wU
+         au/A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=4cn1QZMqxEODDfUtBVouh5tkVnN3cpzhVnp+VJgXwwY=;
+        fh=yGppE8XE/bgKs6tCxffDcGfX/Ruj0AWr3hZ8RKmpTRs=;
+        b=MWbt9efaQGYIXgbehzRwBAFlKFXOXFUhtzMJ1Jp2gJhvlgqSrdNx89+Szr4lKvqP+h
+         9JaMrh+lrV+VBui6FSL9G6PTb6kJdAoknTtVj+iRom/0VfSBeidJZ2RqTKf9YLsaFQNk
+         yAOgl7CVTVA+IZzxQ/eJJS6mPy+3fnlxrDJmGR1zO8R+vcWFsMYmg/Or9UoLfXD6Zcsd
+         E5zUvA0vSCSfbzK9BmakP5GEFUPxhv0cNRAhMOhrI+5LM6p3ME4VkAlAH5HoGnsuqrPJ
+         o7IAzE1DjKWimV14M4xsIxsLf5i4/pAGrFWP42YjRT5YoE1/fajAn7XyEsJtS76ggpLd
+         V7hg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777389850; x=1777994650; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4cn1QZMqxEODDfUtBVouh5tkVnN3cpzhVnp+VJgXwwY=;
+        b=vJZFUSICBuuqStfUOFqHw6ZWCpvNB2SrWDtqRGsNfPK5GUw3XocNCwDk1A1F+h5sMm
+         To9y+NNV/dHaf0gXt9gLbST4m8T3z1nK4m1otnjutHRRwkkK/Cu0scQ+obFNfi3joCXh
+         tSZsV4rUiDSUlJfZn5bK54ypUy1wIdAA357c5mx03OEUzleZ2vakfPhh0/hcF09Qwc2e
+         aifWquswx5eTUp3n6cFdm8dD10zRoDh/numBVsGVqIkE6Q1Sj+Sl5sQ79RjVwW12QsZa
+         qvROrdSIfsFsgk48yD50ki/C2t/wYg+j06cJJtPWIIfEqgogbgzXwQeD2SGpn91t4nKm
+         s9kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777389850; x=1777994650;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=4cn1QZMqxEODDfUtBVouh5tkVnN3cpzhVnp+VJgXwwY=;
+        b=lZZkoDglhhTwdC8srbk6YK82UPUjDLaKmQLTj9AQyZG9YNXM1nPtHM9nKKt7NTUjyJ
+         XUoQuPtcO2CtH+l3haLEzhE2b9vWA1aJ8T1FC/0dVOUUq7YVaPdSAOZBe1ICptGhK2Ya
+         prqe9tp+6gbjCQQRrJ88AKTyzr+zvJXJlSG1cWw7O2y2R19QeU08qvmSSdEh7Wncszwv
+         vt2Zt7jYppxBZ9ZWMTEa7gBoZLutE9MDhTCIjo9UqfyTNAZRXxHc3hzjxv2iZV6BLdkn
+         aAM8RSbnnTgRsHbv4cJMKLiaAUhAn+2tznMq9kt/A/eQ6oPCQm1dD8bpMEfoMKUSnBpL
+         LhyQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9B7+KWbWIn75BCEzut5Fo1sqxhrjqLu4nI6Be175GDC5n+5l9U92nySZtbbGKkotNKxgq3nqk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPRBx1hlDZCQ+c/Lu2YwG0YR1cg17TJpyJfYNf5Rea2A7TuHdM
+	YmYac83iBLYkrf1/6Se6DictjpO2RefnPA7PEsWeLyP+BX/ZEli7p6fUfNKdXSp86zm5ncMgNTD
+	u9mQfVv4kuwoVY/g1VN0lE+7kkWObsNy0pGme0NRR
+X-Gm-Gg: AeBDieulQJQduFWnBX2oQrL6Weq36C4GZigxbyy9686cib7Hu3crQ8O6FSWzMBc1qjh
+	YLFSMfrgu2tpP0RZQnaCobTm89v7HCtRIWEO3Mgshn0RCwhBVMUdw1NDJeA83jrMw8dSTdekKnX
+	gkmV4lvToiL+xo4a8dnYpdwCPTUUQc/4ltUGKvKlLJyZQRzCfqLbFRs/oWjMBYX5RTfIY1BZltQ
+	5IzzMbaHjmMFo6rky9k8SPJ+K2+f5HS72Bm7qp1//Sxv/ToTQwBaldfBp8rkxXjrcgRWzNYE7fN
+	jYY4NGLp95OQ/4tD1wpKUuoIIGeRB0Paf3lq/I8KVtp6pYxsYTf6RptvVFmLXLbJ691yfDbDZwg
+	a5MSoJJPB
+X-Received: by 2002:a05:622a:1e8c:b0:509:1b76:e9b2 with SMTP id
+ d75a77b69052e-5100e1e8c8cmr51932451cf.55.1777389849779; Tue, 28 Apr 2026
+ 08:24:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
-X-Rspamd-Queue-Id: C7388487BF2
+References: <20260427093633.979310-1-edumazet@google.com>
+In-Reply-To: <20260427093633.979310-1-edumazet@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 28 Apr 2026 08:23:58 -0700
+X-Gm-Features: AVHnY4L23Zx3CEHh5yaHSGZ7jcxnL3vK_Y0q0NAb8kEVIbMpyBmjCCzl1A1PU3w
+Message-ID: <CANn89iKtmRcw2RsoofCnSf7kQhBWMYNhjkhSyqdaPcuQw3ZyyA@mail.gmail.com>
+Subject: Re: [PATCH net-next] ipvlan: use netif_receive_skb() in ipvlan_process_multicast()
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 0398C487C7E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281948-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-281949-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.997];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Add support for the new frequency monitoring feature from the kernel
-patch series "dpll: add actual frequency monitoring feature". This
-includes:
+On Mon, Apr 27, 2026 at 2:36=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> ipvlan_process_multicast() runs from process context, there is no
+> risk of stack overflow if we call netif_receive_skb() instead
+> of netif_rx().
+>
+> This avoids some overhead adding/removing skbs to/from a per-cpu
+> backlog and raising/processing NET_RX softirqs.
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  drivers/net/ipvlan/ipvlan_core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/ipvlan/ipvlan_core.c b/drivers/net/ipvlan/ipvlan=
+_core.c
+> index 1be8620ad3971d281fb36fd0770efd67b566ae60..7ad12dc7845c836bdd04395f1=
+53b2b4b397797d6 100644
+> --- a/drivers/net/ipvlan/ipvlan_core.c
+> +++ b/drivers/net/ipvlan/ipvlan_core.c
+> @@ -286,7 +286,7 @@ void ipvlan_process_multicast(struct work_struct *wor=
+k)
+>                                 if (tx_pkt)
+>                                         ret =3D dev_forward_skb(ipvlan->d=
+ev, nskb);
+>                                 else
+> -                                       ret =3D netif_rx(nskb);
+> +                                       ret =3D netif_receive_skb(nskb);
+>                         }
+>                         ipvlan_count_rx(ipvlan, len, ret =3D=3D NET_RX_SU=
+CCESS, true);
+>                         local_bh_enable();
 
-- DPLL_A_FREQUENCY_MONITOR device attribute (enable/disable)
-- DPLL_A_PIN_MEASURED_FREQUENCY pin attribute displayed as fractional Hz
-  using DPLL_PR_MEASURED_FREQUENCY macro (kernel reports in mHz)
-- device set: frequency-monitor { enable | disable }
-- Refactor phase-offset-monitor to use new dpll_parse_attr_feature_state
-  helper shared with frequency-monitor
-- Update man page and bash-completion
+I will send a V2, to limit the number of netif_receive_skb() in
+presence of large number of ipvlans.
 
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- bash-completion/dpll |  4 +--
- dpll/dpll.c          | 62 ++++++++++++++++++++++++++++++++++----------
- man/man8/dpll.8      | 19 ++++++++++++--
- 3 files changed, 68 insertions(+), 17 deletions(-)
-
-diff --git a/bash-completion/dpll b/bash-completion/dpll
-index 542b99c2fce2..7ddcf529d429 100644
---- a/bash-completion/dpll
-+++ b/bash-completion/dpll
-@@ -100,7 +100,7 @@ _dpll_device()
-                     COMPREPLY=( $( compgen -W "automatic manual" -- "$cur" ) )
-                     return 0
-                     ;;
--                phase-offset-monitor)
-+                phase-offset-monitor|frequency-monitor)
-                     COMPREPLY=( $( compgen -W "enable disable true false 0 1" -- "$cur" ) )
-                     return 0
-                     ;;
-@@ -110,7 +110,7 @@ _dpll_device()
-                     ;;
-                 *)
-                     COMPREPLY=( $( compgen -W "id mode phase-offset-monitor \
--                        phase-offset-avg-factor" -- "$cur" ) )
-+                        phase-offset-avg-factor frequency-monitor" -- "$cur" ) )
-                     return 0
-                     ;;
-             esac
-diff --git a/dpll/dpll.c b/dpll/dpll.c
-index e8056ff6a24b..6d8c0cbb8a34 100644
---- a/dpll/dpll.c
-+++ b/dpll/dpll.c
-@@ -313,6 +313,26 @@ static int dpll_parse_attr_str(struct dpll *dpll, struct nlmsghdr *nlh,
- 	return 0;
- }
- 
-+static int dpll_parse_attr_feature_state(struct dpll *dpll,
-+					struct nlmsghdr *nlh,
-+					const char *arg_name, int attr_id)
-+{
-+	const char *str = dpll_argv_next(dpll);
-+	bool val;
-+
-+	if (!str) {
-+		pr_err("%s requires an argument\n", arg_name);
-+		return -EINVAL;
-+	}
-+	if (str_to_bool(str, &val)) {
-+		pr_err("invalid %s value: %s (use enable/disable)\n",
-+		       arg_name, str);
-+		return -EINVAL;
-+	}
-+	mnl_attr_put_u32(nlh, attr_id, val ? 1 : 0);
-+	return 0;
-+}
-+
- static int dpll_parse_attr_enum(struct dpll *dpll, struct nlmsghdr *nlh,
- 				const char *arg_name, int attr_id,
- 				int (*parse_func)(struct dpll *, __u32 *))
-@@ -425,6 +445,21 @@ static __s64 mnl_attr_get_sint(const struct nlattr *attr)
- 		}                                                              \
- 	} while (0)
- 
-+/* Measured frequency - JSON prints raw mHz value, FP prints fractional Hz */
-+#define DPLL_PR_MEASURED_FREQUENCY(tb, attr_id)                                \
-+	do {                                                                   \
-+		if (tb[attr_id]) {                                             \
-+			__u64 val = mnl_attr_get_u64(tb[attr_id]);             \
-+			lldiv_t d = lldiv(val,                                 \
-+				DPLL_PIN_MEASURED_FREQUENCY_DIVIDER);           \
-+			print_lluint(PRINT_JSON, "measured-frequency",         \
-+				     NULL, val);                                \
-+			print_s64(PRINT_FP, NULL,                              \
-+				  "  measured-frequency: %lld.", d.quot);       \
-+			print_s64(PRINT_FP, NULL, "%03lld Hz\n", d.rem);       \
-+		}                                                              \
-+	} while (0)
-+
- /* Generic version with custom format */
- #define DPLL_PR_ENUM_STR_FMT(tb, attr_id, name, format_str, name_func)         \
- 	do {                                                                   \
-@@ -657,6 +692,7 @@ static void cmd_device_help(void)
- 	pr_err("       dpll device set id DEVICE_ID [ mode { automatic | manual } ]\n");
- 	pr_err("                                    [ phase-offset-monitor { enable | disable } ]\n");
- 	pr_err("                                    [ phase-offset-avg-factor NUM ]\n");
-+	pr_err("                                    [ frequency-monitor { enable | disable } ]\n");
- 	pr_err("       dpll device id-get [ module-name NAME ] [ clock-id ID ] [ type TYPE ]\n");
- }
- 
-@@ -1058,6 +1094,10 @@ static void dpll_device_print_attrs(const struct nlmsghdr *nlh,
- 			     str_enable_disable);
- 	DPLL_PR_UINT(tb, DPLL_A_PHASE_OFFSET_AVG_FACTOR,
- 		     "phase-offset-avg-factor");
-+	DPLL_PR_ENUM_STR_FMT(tb, DPLL_A_FREQUENCY_MONITOR,
-+			     "frequency-monitor",
-+			     "  frequency-monitor: %s\n",
-+			     str_enable_disable);
- }
- 
- /* Netlink callback - device get (single device) */
-@@ -1219,25 +1259,20 @@ static int cmd_device_set(struct dpll *dpll)
- 						 dpll_parse_mode))
- 				return -EINVAL;
- 		} else if (dpll_argv_match(dpll, "phase-offset-monitor")) {
--			const char *str = dpll_argv_next(dpll);
--			bool val;
--
--			if (!str) {
--				pr_err("phase-offset-monitor requires an argument\n");
--				return -EINVAL;
--			}
--			if (str_to_bool(str, &val)) {
--				pr_err("invalid phase-offset-monitor value: %s (use enable/disable)\n",
--				       str);
-+			if (dpll_parse_attr_feature_state(dpll, nlh,
-+							  "phase-offset-monitor",
-+							  DPLL_A_PHASE_OFFSET_MONITOR))
- 				return -EINVAL;
--			}
--			mnl_attr_put_u32(nlh, DPLL_A_PHASE_OFFSET_MONITOR,
--					 val ? 1 : 0);
- 		} else if (dpll_argv_match(dpll, "phase-offset-avg-factor")) {
- 			if (dpll_parse_attr_u32(dpll, nlh,
- 						"phase-offset-avg-factor",
- 						DPLL_A_PHASE_OFFSET_AVG_FACTOR))
- 				return -EINVAL;
-+		} else if (dpll_argv_match(dpll, "frequency-monitor")) {
-+			if (dpll_parse_attr_feature_state(dpll, nlh,
-+							  "frequency-monitor",
-+							  DPLL_A_FREQUENCY_MONITOR))
-+				return -EINVAL;
- 		} else {
- 			pr_err("unknown option: %s\n", dpll_argv(dpll));
- 			return -EINVAL;
-@@ -1601,6 +1636,7 @@ static void dpll_pin_print_attrs(struct nlattr **tb)
- 	DPLL_PR_ENUM_STR(tb, DPLL_A_PIN_TYPE, "type", dpll_pin_type_name);
- 	DPLL_PR_U64_FMT(tb, DPLL_A_PIN_FREQUENCY, "frequency",
- 			"  frequency: %" PRIu64 " Hz\n");
-+	DPLL_PR_MEASURED_FREQUENCY(tb, DPLL_A_PIN_MEASURED_FREQUENCY);
- 
- 	dpll_pin_print_freq_supported(tb[DPLL_A_PIN_FREQUENCY_SUPPORTED]);
- 
-diff --git a/man/man8/dpll.8 b/man/man8/dpll.8
-index 89f17af74923..59ec4208f251 100644
---- a/man/man8/dpll.8
-+++ b/man/man8/dpll.8
-@@ -111,7 +111,7 @@ Temperature (if supported)
- Type (PPS or EEC)
- .RE
- 
--.SS dpll device set id ID [ mode { automatic | manual } ] [ phase-offset-monitor { enable | disable } ] [ phase-offset-avg-factor FACTOR ]
-+.SS dpll device set id ID [ mode { automatic | manual } ] [ phase-offset-monitor { enable | disable } ] [ phase-offset-avg-factor FACTOR ] [ frequency-monitor { enable | disable } ]
- 
- Configure DPLL device parameters.
- 
-@@ -140,6 +140,14 @@ When enabled, the kernel continuously measures and reports phase differences.
- Set the averaging factor (1-255) applied to phase offset calculations.
- Higher values provide smoother but slower-responding measurements.
- 
-+.TP
-+.BI frequency-monitor " { enable | disable | true | false | 0 | 1 }"
-+Enable or disable frequency monitoring on the device. When enabled, the
-+kernel continuously measures and reports actual pin frequencies, which can
-+be read via the
-+.B measured-frequency
-+field in pin show output.
-+
- .SS dpll device id-get [ module-name NAME ] [ clock-id ID ] [ type TYPE ]
- 
- Retrieve the device ID based on identifying attributes. Useful for scripting
-@@ -233,7 +241,9 @@ Board label (hardware label from device tree or ACPI)
- .IP \[bu]
- Pin type (mux, ext, synce-eth-port, int-oscillator, gnss)
- .IP \[bu]
--Frequency and supported frequency ranges
-+Configured frequency and supported frequency ranges
-+.IP \[bu]
-+Measured frequency in Hz (when frequency monitoring is enabled)
- .IP \[bu]
- Capabilities (state-can-change, priority-can-change, direction-can-change)
- .IP \[bu]
-@@ -372,6 +382,11 @@ Press Ctrl+C to stop monitoring.
- .B dpll device set id 0 phase-offset-monitor enable
- .fi
- 
-+.SS Enable frequency monitoring on device 0
-+.nf
-+.B dpll device set id 0 frequency-monitor enable
-+.fi
-+
- .SS Show all EEC devices
- .nf
- .B dpll device show type eec
--- 
-2.53.0
-
+pw-bot: cr
 
