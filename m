@@ -1,160 +1,192 @@
-Return-Path: <netdev+bounces-281849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281851-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2Bg9CU+48GlwXgEAu9opvQ
-	(envelope-from <netdev+bounces-281849-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 15:38:23 +0200
+	id +PwMDYq48GkyXwEAu9opvQ
+	(envelope-from <netdev+bounces-281851-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 15:39:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id E554548602E
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 15:38:21 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D0A1486089
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 15:39:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 67038346EC0E
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 12:58:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 988B2307ABB4
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 12:59:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A986A44B690;
-	Tue, 28 Apr 2026 12:55:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AB5843CED7;
+	Tue, 28 Apr 2026 12:55:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="K7ZXU0pL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hF58UUFv"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 794FB42EEDE;
-	Tue, 28 Apr 2026 12:55:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C056C44D6A9
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 12:55:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777380918; cv=none; b=PBUXw2oD+QnztDbi6IibjpSmAOjvo/1tASHwJ4p4yfKfyylPr1ab4ihXpUoXHFY/Cv9NQdcO4Ti4nK7+Dh2U1EOJFmF56CFWorBzi1apawVu2PUv3KAhaNEJCyqKlkKO2o05xGHJS/YGZAluQiUWq+eTQdQIIqR+U1KsRVwgRLM=
+	t=1777380949; cv=none; b=G5UgV1FmduiDXkfGRH0K5dHk7IvvZucbQt6akWADONvNXhSo8wGookRtHFw9qYX7Yj6JrFtGcdsnWzgWemJIhzwJgNOWpDgu6ZMu34Qv6vqKcIICi8udv7xPT75G0unwOVL29Qwnc/ACQF4IGKmKCUd24cph4gZEPOBfJqq/dK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777380918; c=relaxed/simple;
-	bh=a1ZZm/Iozun+ZbTEhHDPr3ej5NSHii1BqGtjixoOkL4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=StQ+mXeVju8FAudw6zQw9mSu0ZKuo7bfZh6lI0AmkBoEEJxgCnbciXalUmAbsqmfI41Mrk3g2LfQ2WHDR5DQCC8kXEdzYi6F9CSWXXqFTo/wazsDk0ITtHqJs8lzUv+A/neXQLoNiww9daYRVPEeFg7z60WiZ3UQFsIVwLWJXiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=K7ZXU0pL; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=fUaCObTGRM6UBfBvOpQYGdHAf6QVLe7Kbol2ukJsrC0=; b=K7ZXU0pLa/LfeR89XUrfMS/bCU
-	o7bgwA7P2X0VpFw48MCbjA5Fs5VkQu9jWOnqrQWYJDc311ji5jHvvtzaEOMVv2A4MRylDBBpELMzO
-	jdOn63t3LxkOQv+x4FGwD1Mg/xDpCHow4Rk/Cz7g/qMhNPyYJBGd9lR3zGdnHJKNS+Xc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wHhxq-000Kod-J7; Tue, 28 Apr 2026 14:54:58 +0200
-Date: Tue, 28 Apr 2026 14:54:58 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Mika Westerberg <mika.westerberg@linux.intel.com>
-Cc: Benjamin Berman <benjamin.s.berman@gmail.com>,
-	Andreas Noever <andreas.noever@gmail.com>,
-	Mika Westerberg <westeri@kernel.org>,
-	Yehezkel Bernat <YehezkelShB@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: thunderbolt: enlarge RX/TX ring and set NAPI
- weight for sustained load
-Message-ID: <e6a249d5-8b11-43cf-89ee-14d436c70cf8@lunn.ch>
-References: <20260428015521.3454006-1-benjamin.s.berman@gmail.com>
- <20260428015521.3454006-3-benjamin.s.berman@gmail.com>
- <20260428074253.GP557136@black.igk.intel.com>
+	s=arc-20240116; t=1777380949; c=relaxed/simple;
+	bh=47qUe5iD0anvdWaqTf9AsGaa0trp/rCOtUxo2FmvnEU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=crqra0KId8Wg4gf+4n4c84Sq438HrKzmNb83R1RC5MndSeAtBpNyYZTgquBx9j0pUWkzxPucDDPyG69QSadQKi5cjJOnBN4NRMF0VxEdfDDVQZf73RKOEXF6VG2GMU60RIA+og4Ol0uajQpgnuer/2JuTh3vDYIoHVN3v/GfW4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hF58UUFv; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-35e563b0ee7so5441850a91.1
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 05:55:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777380940; x=1777985740; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=slN5/hMTVlDaMpg5JpMzTWkk/vo41vVvsEaBCnd8nHM=;
+        b=hF58UUFvzV2IB93MalYDmlii2PA03+Wb9RjeFNw40uS/NAE+c96pQXf8/2iUcQRF6T
+         eJBjpitUZeWVq9SlXXkEngJ38tNAK15KJcLzhx3L6tFUFKLWPpdZhmzlufd/fCnb4f5h
+         vImFYEud7tdMuAeCTKSy3tKTTaMJQ2PuVggA3O0/Hfrf1lokJ50vBrTs3fpwGpFuFTXi
+         bff+1k/WYPH9FKTH3NJ2yiLhlFKExFxU8pXjmZNJnfIDHdf3kobQEvjaMybjOpXDc6Cm
+         8wdOEx7Iw58zYpfccrzzLo22swzHasWIWbFVHGG0yoVzmkkMZG49x2FRXjxdG9ATUd3r
+         lyXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777380940; x=1777985740;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=slN5/hMTVlDaMpg5JpMzTWkk/vo41vVvsEaBCnd8nHM=;
+        b=oVXaC0CzgjHPxd54mmnYs84ZQ3cxzWQ/HwKHFbqLMnMnU78rjJ0Edg968jFc5TTcEh
+         T6Lj2vgpeJ1grW123hlvxWdgD5PmnyxnBk8m/z2xttqNvM609JAjPcTjB2s/plntNGzB
+         6zg5v8gYZqLAkZqd2e64O5USMP3uBXKKOWFuGIjxnu+3jLx/kR3FMcwQ6XIVNMSDl0Ft
+         CuS3PxuK8L+6lh4XhhW2DVE9QcQgAWpa5NvSgQBbkzig+ZR6hUsqOWbgtkSNcMOI1IoI
+         YgO7ap4iizpAbzxROB9UIhq0ksM0q4JhOfWPpyGXRt6WO7f7R22R2egGcMKTdHNHR9SB
+         2yvA==
+X-Forwarded-Encrypted: i=1; AFNElJ+MWW395kZPckGaPVWvW4zlYz/MZWLOOqsjp8zu31PFCbqYR/yFa7cVr4t0CxigcgIhOGAoCEU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwobmoTcbwt8R5141gTKFdw+0qzwmMV06TNVeRgpIXZdJSJ4DDW
+	hq7sAD5O+oql5TBCGR1dY5Ya8YvjAItNHa9kB8/9UT1JlT2/RT/qcimD
+X-Gm-Gg: AeBDies823qakCcp2Mw1oExkyF8exbJHHlTP/q1URRs70x0XpnBFXpKY7VjjD+YAX40
+	2U7+eyKxbMAF4iPQMSbSYX83m1xIqUCdQpmV4UO4Qq40ZPS/SYwfk9GgiLJcTt9ksCfLVpWTN0U
+	D0t+GAGCe4OyvwvUO16uW/o8Ahvept2yvDXATWDOPorE0ms/GQwhfX0jBXsaOJFthvyL6k26jQP
+	ZxyL1hlGEscVdyExy1pGDBj5ae9WaZH+nM+okLppXB3OP7Eeq/+Xu9G/bTL6TQnlJSegpK5O2TH
+	A/83hgHy0waHCSVyiuHRL699OaxmN8h9zKKHLpLcYVWDAxR9zcvr+XGi29n57UOdA+mLJEuTZAd
+	39JevmgA1eVQ9R3J/W3J5ofC6XZVKsdvGk6VzUbbbh76q28UnLC9dFjR+QeGUt8FqXxLqm3rzzY
+	uMRl6y0b8zdB+j3/ppaohs8Xlvxv+QWwxcmvzRpaD0esbMe3p/9wk18AcH6UxFDDuDqg==
+X-Received: by 2002:a17:90b:3947:b0:35b:d795:cf5d with SMTP id 98e67ed59e1d1-36491ccb41dmr2618794a91.5.1777380940062;
+        Tue, 28 Apr 2026 05:55:40 -0700 (PDT)
+Received: from hyj0824TXAir.sustech.edu.cn ([2001:da8:201d:1103:3367:a44:8d5a:228a])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36490f9a304sm2912298a91.9.2026.04.28.05.55.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Apr 2026 05:55:39 -0700 (PDT)
+From: Linpu Yu <linpu5433@gmail.com>
+To: kerneljasonxing@gmail.com,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: sdf@fomichev.me,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	bjorn@kernel.org,
+	linux-kernel@vger.kernel.org,
+	tanyuan98@outlook.com,
+	yifanwucs@gmail.com
+Subject: [PATCH bpf-next v3] xskmap: reject TX-only AF_XDP sockets
+Date: Tue, 28 Apr 2026 20:54:58 +0800
+Message-ID: <20260428125518.4556-1-linpu5433@gmail.com>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <2b156bc4277a9e891f3399935416701d1f9efd7c.1777276241.git.linpu5433@gmail.com>
+References: <2b156bc4277a9e891f3399935416701d1f9efd7c.1777276241.git.linpu5433@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260428074253.GP557136@black.igk.intel.com>
-X-Rspamd-Queue-Id: E554548602E
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 9D0A1486089
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281849-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[fomichev.me,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,vger.kernel.org,outlook.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,intel.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-281851-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linpu5433@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,anthropic.com:email]
+	NEURAL_HAM(-0.00)[-0.997];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-On Tue, Apr 28, 2026 at 09:42:53AM +0200, Mika Westerberg wrote:
-> On Mon, Apr 27, 2026 at 06:55:21PM -0700, Benjamin Berman wrote:
-> > The default TBNET_RING_SIZE of 256 and the NAPI_POLL_WEIGHT of 64
-> > implicit in netif_napi_add() are too small for host-to-host Thunderbolt
-> > networking under sustained bulk traffic.  Running NCCL all-reduce over
-> > tb-lo on a three-node chain (two TB3 endpoints plus a TB4 Maple Ridge
-> > transit) produces rx_missed_errors at ~1 % of rx_packets on the transit
-> > and ~0.6 % on the endpoints, with rx_packets stalling against a peer's
-> > continuing tx_packets.
-> > 
-> > Raise TBNET_RING_SIZE to 2048 (8x) and use netif_napi_add_weight() with
-> > a per-NAPI weight of 256 so tbnet_poll() drains more frames per softirq
-> > invocation.  With matching sysctls (net.core.netdev_budget=1024,
-> > net.core.netdev_budget_usecs=8000) rx_missed_errors stays below 0.005 %
-> > over a 192 GB all-reduce workload on the same hardware.
-> > 
-> > Generated-by: Claude Opus 4.7 <claude-opus-4-7@anthropic.com>
-> > Tested-by: Benjamin Berman <benjamin.s.berman@gmail.com>
-> > Signed-off-by: Benjamin Berman <benjamin.s.berman@gmail.com>
-> 
-> For ring size I don't have any objections. The current ring size 256 is
-> arbitrary and at the time seemed reasonable.
-> 
-> For the poll weigth there is the comment in netdevice.h:
-> 
-> /* Default NAPI poll() weight
->  * Device drivers are strongly advised to not use bigger value
->  */
-> #define NAPI_POLL_WEIGHT 64
-> 
-> But if you see improvement using 256 here I'm fine with that unless the
-> network folks advice otherwise.
+XSKMAP entries are used as redirect targets for incoming XDP frames.
+A TX-only AF_XDP socket lacks an Rx ring and cannot handle redirected
+traffic, but xsk_map_update_elem() currently allows such sockets to
+be inserted into the map.
 
-I just did a quick sample of other drivers which change the NAPI
-weight. Of the 10 i looked at, 9 reduced the weight. Only one
-increased it.
+Redirecting packets to such a socket on the veth generic-XDP path
+causes a kernel crash in xsk_generic_rcv().
 
-I would like the core netdev people to comment on this, before it is
-accepted.
+This became possible after xsk_is_setup_for_bpf_map() was removed from
+the XSKMAP update path, which allowed bound TX-only sockets to be
+inserted into the map.
 
-Questions which come to mind:
+Reject TX-only sockets during XSKMAP updates to avoid the crash.
+They remain fully operational for pure Tx purposes outside XSKMAP.
 
-Why is the polling not happening frequently enough? 
+Fixes: 968be23ceaca ("xsk: Fix possible segfault at xskmap entry insertion")
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Signed-off-by: Yifan Wu <yifanwucs@gmail.com>
+Signed-off-by: Linpu Yu <linpu5433@gmail.com>
+---
+Changes in v3:
+- fix the Fixes tag to point to 968be23ceaca
 
-Is it frequently swapping between polling and interrupts?
+ net/xdp/xskmap.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Is there interrupt coalesce going on, and the coalesce time set too
-high, so that by the time the interrupt fires the ring is full? Can
-you play with ethtool -C?
-
-	Andrew
-
+diff --git a/net/xdp/xskmap.c b/net/xdp/xskmap.c
+index afa457506274..3bff346308d0 100644
+--- a/net/xdp/xskmap.c
++++ b/net/xdp/xskmap.c
+@@ -184,6 +184,10 @@ static long xsk_map_update_elem(struct bpf_map *map, void *key, void *value,
+ 	}
+ 
+ 	xs = (struct xdp_sock *)sock->sk;
++	if (!READ_ONCE(xs->rx)) {
++		sockfd_put(sock);
++		return -ENOBUFS;
++	}
+ 
+ 	map_entry = &m->xsk_map[i];
+ 	node = xsk_map_node_alloc(m, map_entry);
+-- 
+2.54.0
 
