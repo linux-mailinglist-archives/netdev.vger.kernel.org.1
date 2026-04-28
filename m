@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-281720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281721-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qBc2AFtx8Gn9TQEAu9opvQ
-	(envelope-from <netdev+bounces-281720-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 10:35:39 +0200
+	id 2A/nIWxx8GldTgEAu9opvQ
+	(envelope-from <netdev+bounces-281721-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 10:35:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59CA94803F8
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 10:35:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E145748040D
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 10:35:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 992EE31375EB
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 08:29:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 20CAD3141C48
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 08:29:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 622613DCD90;
-	Tue, 28 Apr 2026 08:27:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB97F3DEAFB;
+	Tue, 28 Apr 2026 08:27:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kt1oPGl4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g6YD63q+"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A6A3D9DA4;
-	Tue, 28 Apr 2026 08:27:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BB43DB632;
+	Tue, 28 Apr 2026 08:27:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777364853; cv=none; b=jBMh4imQdF1ej5KZS5S3bMRVJ1/ZWnnYhPvwUlNFXlop/YPmnzuB7LxWHTE5gPlRXgpMFshx8wViW/8SH6TaTN7whyigRt1Li2RurCYY2GHswHRklN0dVlnCZapv3Sj5jh9HhWRly4aVgsIuK6oCmEl4MO4iKjkf0qDC1jzujvQ=
+	t=1777364854; cv=none; b=Utel9d/ordhscBYl3huK2Ku0fZlpXKTSSGBKMyYOg5uss3z2CJUsHkzaGEmi3qRB67TE+J8L7Yp7+BXsuo12JHb8iOoicxm0i/ktECzXEJ/Qco508LqEP5fkdft94P9nTetMvsCcqOCxEMz8q03zwt2Wj8AYY3gEZ9/dExuDKoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777364853; c=relaxed/simple;
-	bh=le8Kmb/QzPGAJBqY7DdGpvSBZYPZX5O27jJ7mzB/0jk=;
+	s=arc-20240116; t=1777364854; c=relaxed/simple;
+	bh=N+j5bFBQG7IVgb+U+Km1XXCsm7Ik726163g4RGJlU5w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eZQ4fXjqrGLymPcY68TMJrVEfCzflTgZZqlNdLgnKPUG9LQ3X5AUiaa6z0CYLgS1bqDOssLhUUx/FcLb+10Za8XIPO0j3k+XWNk0nFrlklWvF5ZW2DdZ2xa/1K236GSidLxc/e9Tup4XxGBKPTnb1jFRJoRC9kDy5ucy6PLrtlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kt1oPGl4; arc=none smtp.client-ip=192.198.163.15
+	 MIME-Version; b=ojRM8WrXxXxDPsU+09C8wahHvM2L2B7/Vr5G/8HVYXIpwqENeT5gOdPRbhNgZA1Duy81hSuSzxhPki1ny2O9PRjBU4+jAWsl58jp6/gQMlKCW/qJ6dswCdq+pgsHQRaQYrxD4UbBYGaerVhtfiVc/qvjqAnl/X861mbfi4ncPjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g6YD63q+; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777364850; x=1808900850;
+  t=1777364852; x=1808900852;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=le8Kmb/QzPGAJBqY7DdGpvSBZYPZX5O27jJ7mzB/0jk=;
-  b=kt1oPGl46cMoJ1qf339kMJtwHpUeVG5xt2epW7okttX6WqPUKIpjIFkM
-   EWHyzjux96DdhB/cGY7qHIKXf1KuQy9Fr3kO4VLcuHpXmturRBxcA5Fl5
-   6z+cqK4Wil6b6SX9MCnwv8c2kbkDm8zECBOvurP2goypQsXNLgEoU0lGZ
-   8eVA8buGI5Mo6DVn5dg0VkEqHxB8iFa87ZyjuWehYGKPwn9D0dtuBLXMk
-   pjx3KoK9iEasOvvVjBSNEwRFHR4yF/ZC17nt4u+dJh+oSQaaddiqqLXk4
-   8E6YVqjTNVyXKdwf0jVDRK352qLiFOX+MK/ITQkw++CZO/Wg7/LiH98CS
-   A==;
-X-CSE-ConnectionGUID: B6rz+tIBRgeF7TwvRWqVAg==
-X-CSE-MsgGUID: 8Olt1IrNSnyy78gxWZTb3A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11769"; a="78377004"
+  bh=N+j5bFBQG7IVgb+U+Km1XXCsm7Ik726163g4RGJlU5w=;
+  b=g6YD63q+GO/ZxaAtUCvs2i4d+ht46W8FvdzIwQ+b+n9LzbgJcHrO6OPe
+   VUZeLBV6hz8GT+MGJN4lteSAQBYgxDhyk8cEzmHC83t9HzNuwnhk4k2IY
+   SUaC2yH9HegtfNNQ2xU8D2lgIQbc0Ozt1qqXsZQqXx+NrEV5b8riHYHfQ
+   smk/BYL5ZO8Tkxbu3Ukb1arFXaRkAxRB0iWoe4WbdN0ukh8DZAL1N0YxI
+   cmWR8qILlslSABtwwtyMj9BsKwlVEbZ3JvIXPkF/QhcPjDK7PKf73WmZd
+   cPg4HQ27V7HE5DOXCxgOeguEo42Iyfcxsel5WcucJdmO8Y36mNuAa7ZuQ
+   Q==;
+X-CSE-ConnectionGUID: eK/4zLcfS+mO+MULEpDXUQ==
+X-CSE-MsgGUID: QRuaqRilS6i0qDFNJ4mqog==
+X-IronPort-AV: E=McAfee;i="6800,10657,11769"; a="78377015"
 X-IronPort-AV: E=Sophos;i="6.23,203,1770624000"; 
-   d="scan'208";a="78377004"
+   d="scan'208";a="78377015"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2026 01:27:26 -0700
-X-CSE-ConnectionGUID: i7RIUr9RQ2Cg+8InhVww4g==
-X-CSE-MsgGUID: J+/YOQFIQTSF98yIZMxpTw==
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2026 01:27:28 -0700
+X-CSE-ConnectionGUID: sLJz5nTwRf20Nlp3MoZN4Q==
+X-CSE-MsgGUID: ne4yKJJeRcitz7ACmpKFhQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,203,1770624000"; 
-   d="scan'208";a="232881591"
+   d="scan'208";a="232881594"
 Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa006.jf.intel.com with ESMTP; 28 Apr 2026 01:27:21 -0700
+  by orviesa006.jf.intel.com with ESMTP; 28 Apr 2026 01:27:23 -0700
 Received: from mglak.igk.intel.com (mglak.igk.intel.com [10.237.112.146])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 1F9A027BA3;
-	Tue, 28 Apr 2026 09:27:19 +0100 (IST)
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id D93F627BA6;
+	Tue, 28 Apr 2026 09:27:20 +0100 (IST)
 From: Larysa Zaremba <larysa.zaremba@intel.com>
 To: intel-wired-lan@lists.osuosl.org,
 	Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -91,9 +91,9 @@ Cc: aleksander.lobakin@intel.com,
 	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Bharath R <Bharath.r@intel.com>
-Subject: [PATCH iwl-next v7 13/14] ixd: add the core initialization
-Date: Tue, 28 Apr 2026 10:26:47 +0200
-Message-ID: <20260428082654.44364-14-larysa.zaremba@intel.com>
+Subject: [PATCH iwl-next v7 14/14] ixd: add devlink support
+Date: Tue, 28 Apr 2026 10:26:48 +0200
+Message-ID: <20260428082654.44364-15-larysa.zaremba@intel.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20260428082654.44364-1-larysa.zaremba@intel.com>
 References: <20260428082654.44364-1-larysa.zaremba@intel.com>
@@ -104,7 +104,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 59CA94803F8
+X-Rspamd-Queue-Id: E145748040D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
@@ -113,7 +113,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -121,7 +121,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[intel.com,linux.intel.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,gmail.com,lunn.ch,vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[26];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-281720-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-281721-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -132,574 +132,339 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mbx_task.work:url,intel.com:email,intel.com:dkim,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-As the mailbox is setup, initialize the core. This makes use of the send
-and receive mailbox message framework for virtchnl communication between
-the driver and device Control Plane (CP).
+From: Amritha Nambiar <amritha.nambiar@intel.com>
 
-To start with, driver confirms the virtchnl version with the CP. Once that
-is done, it requests and gets the required capabilities and resources
-needed such as max vectors, queues, vports etc.
+Enable initial support for the devlink interface with the ixd driver. The
+ixd hardware is a single function PCIe device. So, the PCIe adapter gets
+its own devlink instance to manage device-wide resources or configuration.
 
-Use a unified way of handling the virtchnl messages, where a single
-function handles all related memory management and the caller only provides
-the callbacks to fill the send buffer and to handle the response.
+$ devlink dev show
+pci/0000:83:00.6
 
-Place generic control queue message handling separately to facilitate the
-addition of protocols other than virtchannel in the future.
+$ devlink dev info pci/0000:83:00.6
+pci/0000:83:00.6:
+  driver ixd
+  serial_number 00-a0-c9-ff-ff-23-45-67
+  versions:
+      fixed:
+        device.type MEV
+      running:
+        virtchnl 2.0
 
-Co-developed-by: Amritha Nambiar <amritha.nambiar@intel.com>
 Signed-off-by: Amritha Nambiar <amritha.nambiar@intel.com>
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
 Tested-by: Bharath R <Bharath.r@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ixd/Makefile       |   2 +
- drivers/net/ethernet/intel/ixd/ixd.h          |  10 +
- drivers/net/ethernet/intel/ixd/ixd_ctlq.c     | 149 +++++++++++++++
- drivers/net/ethernet/intel/ixd/ixd_ctlq.h     |  33 ++++
- drivers/net/ethernet/intel/ixd/ixd_lib.c      |  25 ++-
- drivers/net/ethernet/intel/ixd/ixd_main.c     |   3 +
- drivers/net/ethernet/intel/ixd/ixd_virtchnl.c | 178 ++++++++++++++++++
- drivers/net/ethernet/intel/ixd/ixd_virtchnl.h |  12 ++
- 8 files changed, 411 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/ethernet/intel/ixd/ixd_ctlq.c
- create mode 100644 drivers/net/ethernet/intel/ixd/ixd_ctlq.h
- create mode 100644 drivers/net/ethernet/intel/ixd/ixd_virtchnl.c
- create mode 100644 drivers/net/ethernet/intel/ixd/ixd_virtchnl.h
+ Documentation/networking/devlink/index.rst   |  1 +
+ Documentation/networking/devlink/ixd.rst     | 30 ++++++
+ drivers/net/ethernet/intel/ixd/Kconfig       |  1 +
+ drivers/net/ethernet/intel/ixd/Makefile      |  1 +
+ drivers/net/ethernet/intel/ixd/ixd_devlink.c | 97 ++++++++++++++++++++
+ drivers/net/ethernet/intel/ixd/ixd_devlink.h | 44 +++++++++
+ drivers/net/ethernet/intel/ixd/ixd_main.c    | 16 +++-
+ 7 files changed, 187 insertions(+), 3 deletions(-)
+ create mode 100644 Documentation/networking/devlink/ixd.rst
+ create mode 100644 drivers/net/ethernet/intel/ixd/ixd_devlink.c
+ create mode 100644 drivers/net/ethernet/intel/ixd/ixd_devlink.h
 
+diff --git a/Documentation/networking/devlink/index.rst b/Documentation/networking/devlink/index.rst
+index f7ba7dcf477d..f0c077843fa7 100644
+--- a/Documentation/networking/devlink/index.rst
++++ b/Documentation/networking/devlink/index.rst
+@@ -88,6 +88,7 @@ parameters, info versions, and other features it supports.
+    ionic
+    iosm
+    ixgbe
++   ixd
+    kvaser_pciefd
+    kvaser_usb
+    mlx4
+diff --git a/Documentation/networking/devlink/ixd.rst b/Documentation/networking/devlink/ixd.rst
+new file mode 100644
+index 000000000000..17b63c8425aa
+--- /dev/null
++++ b/Documentation/networking/devlink/ixd.rst
+@@ -0,0 +1,30 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++===================
++ixd devlink support
++===================
++
++This document describes the devlink features implemented by the ``ixd``
++device driver.
++
++Info versions
++=============
++
++The ``ixd`` driver reports the following versions
++
++.. list-table:: devlink info versions implemented
++    :widths: 5 5 5 90
++
++    * - Name
++      - Type
++      - Example
++      - Description
++    * - ``device.type``
++      - fixed
++      - MEV
++      - The hardware type for this device
++    * - ``virtchnl``
++      - running
++      - 2.0
++      - 2-digit version number (major.minor) of the communication channel
++        (virtchnl) used by the device.
+diff --git a/drivers/net/ethernet/intel/ixd/Kconfig b/drivers/net/ethernet/intel/ixd/Kconfig
+index 24510c50070e..34181c59dcdc 100644
+--- a/drivers/net/ethernet/intel/ixd/Kconfig
++++ b/drivers/net/ethernet/intel/ixd/Kconfig
+@@ -7,6 +7,7 @@ config IXD
+ 	select LIBETH
+ 	select LIBIE_CP
+ 	select LIBIE_PCI
++	select NET_DEVLINK
+ 	help
+ 	  This driver supports Intel(R) Control Plane PCI Function
+ 	  of Intel E2100 and later IPUs and FNICs.
 diff --git a/drivers/net/ethernet/intel/ixd/Makefile b/drivers/net/ethernet/intel/ixd/Makefile
-index 164b2c86952f..90abf231fb16 100644
+index 90abf231fb16..03760a2580b9 100644
 --- a/drivers/net/ethernet/intel/ixd/Makefile
 +++ b/drivers/net/ethernet/intel/ixd/Makefile
-@@ -6,5 +6,7 @@
- obj-$(CONFIG_IXD) += ixd.o
- 
+@@ -8,5 +8,6 @@ obj-$(CONFIG_IXD) += ixd.o
  ixd-y := ixd_main.o
-+ixd-y += ixd_ctlq.o
+ ixd-y += ixd_ctlq.o
  ixd-y += ixd_dev.o
++ixd-y += ixd_devlink.o
  ixd-y += ixd_lib.o
-+ixd-y += ixd_virtchnl.o
-diff --git a/drivers/net/ethernet/intel/ixd/ixd.h b/drivers/net/ethernet/intel/ixd/ixd.h
-index 99c44f2aa659..98d1f22534b5 100644
---- a/drivers/net/ethernet/intel/ixd/ixd.h
-+++ b/drivers/net/ethernet/intel/ixd/ixd.h
-@@ -10,19 +10,29 @@
-  * struct ixd_adapter - Data structure representing a CPF
-  * @cp_ctx: Control plane communication context
-  * @init_task: Delayed initialization after reset
-+ * @mbx_task: Control queue Rx handling
-  * @xnm: virtchnl transaction manager
-  * @asq: Send control queue info
-  * @arq: Receive control queue info
-+ * @vc_ver: Negotiated virtchnl version
-+ * @caps: Negotiated virtchnl capabilities
-  */
- struct ixd_adapter {
- 	struct libie_ctlq_ctx cp_ctx;
- 	struct {
- 		struct delayed_work init_work;
- 		u8 reset_retries;
-+		u8 vc_retries;
- 	} init_task;
-+	struct delayed_work mbx_task;
- 	struct libie_ctlq_xn_manager *xnm;
- 	struct libie_ctlq_info *asq;
- 	struct libie_ctlq_info *arq;
-+	struct {
-+		u32 major;
-+		u32 minor;
-+	} vc_ver;
-+	struct virtchnl2_get_capabilities caps;
- };
- 
- /**
-diff --git a/drivers/net/ethernet/intel/ixd/ixd_ctlq.c b/drivers/net/ethernet/intel/ixd/ixd_ctlq.c
+ ixd-y += ixd_virtchnl.o
+diff --git a/drivers/net/ethernet/intel/ixd/ixd_devlink.c b/drivers/net/ethernet/intel/ixd/ixd_devlink.c
 new file mode 100644
-index 000000000000..216aa5c02122
+index 000000000000..23ab11226978
 --- /dev/null
-+++ b/drivers/net/ethernet/intel/ixd/ixd_ctlq.c
-@@ -0,0 +1,149 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* Copyright (C) 2025 Intel Corporation */
++++ b/drivers/net/ethernet/intel/ixd/ixd_devlink.c
+@@ -0,0 +1,97 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (c) 2025, Intel Corporation. */
 +
 +#include "ixd.h"
-+#include "ixd_ctlq.h"
-+#include "ixd_virtchnl.h"
++#include "ixd_devlink.h"
++
++#define IXD_DEVLINK_INFO_LEN	128
 +
 +/**
-+ * ixd_ctlq_clean_sq - Clean the send control queue after sending the message
-+ * @adapter: The adapter that sent the messages
-+ * @num_sent: Number of sent messages to be released
-+ *
-+ * Free the libie send resources after sending the message and handling
-+ * the response.
++ * ixd_fill_dsn - Get the serial number for the ixd device
++ * @adapter: adapter to query
++ * @buf: storage buffer for the info request
 + */
-+static void ixd_ctlq_clean_sq(struct ixd_adapter *adapter, u16 num_sent)
++static void ixd_fill_dsn(struct ixd_adapter *adapter, char *buf)
 +{
-+	if (!num_sent)
-+		return;
++	u8 dsn[8];
 +
-+	struct libie_ctlq_xn_clean_params params = {
-+		.ctlq = adapter->asq,
-+		.ctx = &adapter->cp_ctx,
-+		.num_msgs = num_sent,
-+		.rel_tx_buf = kfree,
-+	};
++	/* Copy the DSN into an array in Big Endian format */
++	put_unaligned_be64(pci_get_dsn(adapter->cp_ctx.mmio_info.pdev), dsn);
 +
-+	libie_ctlq_xn_send_clean(&params);
++	snprintf(buf, IXD_DEVLINK_INFO_LEN, "%8phD", dsn);
 +}
 +
 +/**
-+ * ixd_ctlq_init_sparams - Initialize control queue send parameters
-+ * @adapter: The adapter with initialized mailbox
-+ * @sparams: Parameters to initialize
-+ * @msg_buf: DMA-mappable pointer to the message being sent
-+ * @msg_size: Message size
++ * ixd_fill_device_name - Get the name of the underlying hardware
++ * @adapter: adapter to query
++ * @buf: storage buffer for the info request
++ * @buf_size: size of the storage buffer
 + */
-+static void ixd_ctlq_init_sparams(struct ixd_adapter *adapter,
-+				  struct libie_ctlq_xn_send_params *sparams,
-+				  void *msg_buf, size_t msg_size)
++static void ixd_fill_device_name(struct ixd_adapter *adapter, char *buf,
++				 size_t buf_size)
 +{
-+	*sparams = (struct libie_ctlq_xn_send_params) {
-+		.rel_tx_buf = kfree,
-+		.xnm = adapter->xnm,
-+		.ctlq = adapter->asq,
-+		.timeout_ms = IXD_CTLQ_TIMEOUT,
-+		.send_buf = (struct kvec) {
-+			.iov_base = msg_buf,
-+			.iov_len = msg_size,
-+		},
-+	};
++	if (adapter->caps.device_type == cpu_to_le32(VIRTCHNL2_MEV_DEVICE))
++		snprintf(buf, buf_size, "%s", "MEV");
++	else
++		snprintf(buf, buf_size, "%s", "UNKNOWN");
 +}
 +
 +/**
-+ * ixd_ctlq_do_req - Perform a standard virtchnl request
-+ * @adapter: The adapter with initialized mailbox
-+ * @req: virtchnl request description
++ * ixd_devlink_info_get - .info_get devlink handler
++ * @devlink: devlink instance structure
++ * @req: the devlink info request
++ * @extack: extended netdev ack structure
 + *
-+ * Return: %0 if a message was sent and received a response
-+ * that was successfully handled by the custom callback,
-+ * negative error otherwise.
++ * Callback for the devlink .info_get operation. Reports information about the
++ * device.
++ *
++ * Return: zero on success or an error code on failure.
 + */
-+int ixd_ctlq_do_req(struct ixd_adapter *adapter, const struct ixd_ctlq_req *req)
++static int ixd_devlink_info_get(struct devlink *devlink,
++				struct devlink_info_req *req,
++				struct netlink_ext_ack *extack)
 +{
-+	struct libie_ctlq_xn_send_params send_params = {};
-+	u8 onstack_send_buff[LIBIE_CP_TX_COPYBREAK] = {};
-+	struct kvec *recv_mem;
-+	void *send_buff;
++	struct ixd_adapter *adapter = devlink_priv(devlink);
++	char buf[IXD_DEVLINK_INFO_LEN];
 +	int err;
 +
-+	send_buff = libie_cp_can_send_onstack(req->send_size) ?
-+		    &onstack_send_buff : kzalloc(req->send_size, GFP_KERNEL);
-+	if (!send_buff)
-+		return -ENOMEM;
-+
-+	ixd_ctlq_init_sparams(adapter, &send_params, send_buff,
-+			      req->send_size);
-+
-+	send_params.chnl_opcode = req->opcode;
-+
-+	if (req->send_buff_init)
-+		req->send_buff_init(adapter, send_buff, req->ctx);
-+
-+	err = libie_ctlq_xn_send(&send_params);
++	ixd_fill_dsn(adapter, buf);
++	err = devlink_info_serial_number_put(req, buf);
 +	if (err)
 +		return err;
 +
-+	recv_mem = &send_params.recv_mem;
-+	if (req->recv_process)
-+		err = req->recv_process(adapter, recv_mem->iov_base,
-+					recv_mem->iov_len, req->ctx);
++	ixd_fill_device_name(adapter, buf, IXD_DEVLINK_INFO_LEN);
++	err = devlink_info_version_fixed_put(req, "device.type", buf);
++	if (err)
++		return err;
 +
-+	ixd_ctlq_clean_sq(adapter, 1);
-+	libie_ctlq_release_rx_buf(recv_mem);
++	snprintf(buf, sizeof(buf), "%u.%u",
++		 adapter->vc_ver.major, adapter->vc_ver.minor);
 +
-+	return err;
++	return devlink_info_version_running_put(req, "virtchnl", buf);
 +}
 +
-+/**
-+ * ixd_ctlq_handle_msg - Default control queue message handler
-+ * @ctx: Control plane communication context
-+ * @msg: Message received
-+ */
-+static void ixd_ctlq_handle_msg(struct libie_ctlq_ctx *ctx,
-+				struct libie_ctlq_msg *msg)
-+{
-+	struct ixd_adapter *adapter = pci_get_drvdata(ctx->mmio_info.pdev);
-+
-+	if (ixd_vc_can_handle_msg(msg))
-+		ixd_vc_recv_event_msg(adapter, msg);
-+	else
-+		dev_dbg_ratelimited(ixd_to_dev(adapter),
-+				    "Received an unsupported opcode 0x%x from the CP\n",
-+				    msg->chnl_opcode);
-+
-+	libie_ctlq_release_rx_buf(&msg->recv_mem);
-+}
-+
-+/**
-+ * ixd_ctlq_recv_mb_msg - Receive a potential message over mailbox periodically
-+ * @adapter: The adapter with initialized mailbox
-+ */
-+static void ixd_ctlq_recv_mb_msg(struct ixd_adapter *adapter)
-+{
-+	struct libie_ctlq_xn_recv_params xn_params = {
-+		.xnm = adapter->xnm,
-+		.ctlq = adapter->arq,
-+		.ctlq_msg_handler = ixd_ctlq_handle_msg,
-+		.budget = LIBIE_CTLQ_MAX_XN_ENTRIES,
-+	};
-+
-+	libie_ctlq_xn_recv(&xn_params);
-+}
-+
-+/**
-+ * ixd_ctlq_rx_task - Periodically check for mailbox responses and events
-+ * @work: work handle
-+ */
-+void ixd_ctlq_rx_task(struct work_struct *work)
-+{
-+	struct ixd_adapter *adapter;
-+
-+	adapter = container_of(work, struct ixd_adapter, mbx_task.work);
-+
-+	queue_delayed_work(system_unbound_wq, &adapter->mbx_task,
-+			   msecs_to_jiffies(300));
-+
-+	ixd_ctlq_recv_mb_msg(adapter);
-+}
-diff --git a/drivers/net/ethernet/intel/ixd/ixd_ctlq.h b/drivers/net/ethernet/intel/ixd/ixd_ctlq.h
-new file mode 100644
-index 000000000000..f450a3a0828f
---- /dev/null
-+++ b/drivers/net/ethernet/intel/ixd/ixd_ctlq.h
-@@ -0,0 +1,33 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/* Copyright (C) 2025 Intel Corporation */
-+
-+#ifndef _IXD_CTLQ_H_
-+#define _IXD_CTLQ_H_
-+
-+#include "linux/intel/virtchnl2.h"
-+
-+#define IXD_CTLQ_TIMEOUT 2000
-+
-+/**
-+ * struct ixd_ctlq_req - Standard virtchnl request description
-+ * @opcode: protocol opcode, only virtchnl2 is needed for now
-+ * @send_size: required length of the send buffer
-+ * @send_buff_init: function to initialize the allocated send buffer
-+ * @recv_process: function to handle the CP response
-+ * @ctx: additional context for callbacks
-+ */
-+struct ixd_ctlq_req {
-+	enum virtchnl2_op opcode;
-+	size_t send_size;
-+	void (*send_buff_init)(struct ixd_adapter *adapter, void *send_buff,
-+			       void *ctx);
-+	int (*recv_process)(struct ixd_adapter *adapter, void *recv_buff,
-+			    size_t recv_size, void *ctx);
-+	void *ctx;
++static const struct devlink_ops ixd_devlink_ops = {
++	.info_get = ixd_devlink_info_get,
 +};
 +
-+int ixd_ctlq_do_req(struct ixd_adapter *adapter,
-+		    const struct ixd_ctlq_req *req);
-+void ixd_ctlq_rx_task(struct work_struct *work);
++/**
++ * ixd_adapter_alloc - Allocate devlink and return adapter pointer
++ * @dev: the device to allocate for
++ *
++ * Allocate a devlink instance for this device and return the private area as
++ * the adapter structure.
++ *
++ * Return: adapter structure on success, NULL on failure
++ */
++struct ixd_adapter *ixd_adapter_alloc(struct device *dev)
++{
++	struct devlink *devlink;
 +
-+#endif /* _IXD_CTLQ_H_ */
-diff --git a/drivers/net/ethernet/intel/ixd/ixd_lib.c b/drivers/net/ethernet/intel/ixd/ixd_lib.c
-index afc413d3650f..24080cb30c43 100644
---- a/drivers/net/ethernet/intel/ixd/ixd_lib.c
-+++ b/drivers/net/ethernet/intel/ixd/ixd_lib.c
-@@ -2,6 +2,7 @@
- /* Copyright (C) 2025 Intel Corporation */
- 
- #include "ixd.h"
-+#include "ixd_virtchnl.h"
- 
- #define IXD_DFLT_MBX_Q_LEN 64
- 
-@@ -67,6 +68,8 @@ static void ixd_adapter_fill_dflt_ctlqs(struct ixd_adapter *adapter)
-  */
- void ixd_deinit_dflt_mbx(struct ixd_adapter *adapter)
- {
-+	cancel_delayed_work_sync(&adapter->mbx_task);
++	devlink = devlink_alloc(&ixd_devlink_ops, sizeof(struct ixd_adapter),
++				dev);
++	if (!devlink)
++		return NULL;
 +
- 	if (adapter->xnm)
- 		libie_ctlq_xn_deinit(adapter->xnm, &adapter->cp_ctx);
- 
-@@ -108,6 +111,8 @@ int ixd_init_dflt_mbx(struct ixd_adapter *adapter)
- 		return -ENOENT;
- 	}
- 
-+	queue_delayed_work(system_unbound_wq, &adapter->mbx_task, 0);
++	return devlink_priv(devlink);
++}
+diff --git a/drivers/net/ethernet/intel/ixd/ixd_devlink.h b/drivers/net/ethernet/intel/ixd/ixd_devlink.h
+new file mode 100644
+index 000000000000..c43ce0655de2
+--- /dev/null
++++ b/drivers/net/ethernet/intel/ixd/ixd_devlink.h
+@@ -0,0 +1,44 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright (c) 2025, Intel Corporation. */
 +
- 	return 0;
- }
- 
-@@ -136,8 +141,26 @@ void ixd_init_task(struct work_struct *work)
- 
- 	adapter->init_task.reset_retries = 0;
- 	err = ixd_init_dflt_mbx(adapter);
--	if (err)
-+	if (err) {
- 		dev_err(ixd_to_dev(adapter),
- 			"Failed to initialize the default mailbox: %pe\n",
- 			ERR_PTR(err));
-+		return;
-+	}
++#ifndef _IXD_DEVLINK_H_
++#define _IXD_DEVLINK_H_
++#include <net/devlink.h>
 +
-+	if (!ixd_vc_dev_init(adapter)) {
-+		adapter->init_task.vc_retries = 0;
-+		return;
-+	}
++struct ixd_adapter *ixd_adapter_alloc(struct device *dev);
 +
-+	ixd_deinit_dflt_mbx(adapter);
-+	if (++adapter->init_task.vc_retries > 5) {
-+		dev_err(ixd_to_dev(adapter),
-+			"Failed to establish mailbox communications with the hardware\n");
-+		return;
-+	}
++/**
++ * ixd_devlink_free - teardown the devlink
++ * @adapter: the adapter structure to free
++ *
++ */
++static inline void ixd_devlink_free(struct ixd_adapter *adapter)
++{
++	struct devlink *devlink = priv_to_devlink(adapter);
 +
-+	ixd_trigger_reset(adapter);
-+	queue_delayed_work(system_unbound_wq, &adapter->init_task.init_work,
-+			   msecs_to_jiffies(500));
- }
++	devlink_free(devlink);
++}
++
++/**
++ * ixd_devlink_unregister - Unregister devlink resources for this adapter.
++ * @adapter: the adapter structure to cleanup
++ *
++ * Releases resources used by devlink and cleans up associated memory.
++ */
++static inline void ixd_devlink_unregister(struct ixd_adapter *adapter)
++{
++	devlink_unregister(priv_to_devlink(adapter));
++}
++
++/**
++ * ixd_devlink_register - Register devlink interface for this adapter
++ * @adapter: pointer to ixd adapter structure to be associated with devlink
++ *
++ * Register the devlink instance associated with this adapter
++ */
++static inline void ixd_devlink_register(struct ixd_adapter *adapter)
++{
++	devlink_register(priv_to_devlink(adapter));
++}
++
++#endif /* _IXD_DEVLINK_H_ */
 diff --git a/drivers/net/ethernet/intel/ixd/ixd_main.c b/drivers/net/ethernet/intel/ixd/ixd_main.c
-index b4d4000b63ed..6d5e6aca77df 100644
+index 6d5e6aca77df..ea6aa793a6a7 100644
 --- a/drivers/net/ethernet/intel/ixd/ixd_main.c
 +++ b/drivers/net/ethernet/intel/ixd/ixd_main.c
-@@ -2,6 +2,7 @@
- /* Copyright (C) 2025 Intel Corporation */
- 
+@@ -4,6 +4,7 @@
  #include "ixd.h"
-+#include "ixd_ctlq.h"
+ #include "ixd_ctlq.h"
  #include "ixd_lan_regs.h"
++#include "ixd_devlink.h"
  
  MODULE_DESCRIPTION("Intel(R) Control Plane Function Device Driver");
-@@ -19,6 +20,7 @@ static void ixd_remove(struct pci_dev *pdev)
- 
+ MODULE_IMPORT_NS("LIBIE_CP");
+@@ -21,11 +22,14 @@ static void ixd_remove(struct pci_dev *pdev)
  	/* Do not mix removal with (re)initialization */
  	cancel_delayed_work_sync(&adapter->init_task.init_work);
+ 
++	ixd_devlink_unregister(adapter);
 +
  	/* Leave the device clean on exit */
  	ixd_trigger_reset(adapter);
  	ixd_deinit_dflt_mbx(adapter);
-@@ -110,6 +112,7 @@ static int ixd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 
+ 	libie_pci_unmap_all_mmio_regions(&adapter->cp_ctx.mmio_info);
++	ixd_devlink_free(adapter);
+ }
+ 
+ /**
+@@ -93,7 +97,7 @@ static int ixd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	if (WARN_ON(ent->device != IXD_DEV_ID_CPF))
+ 		return -EINVAL;
+ 
+-	adapter = devm_kzalloc(&pdev->dev, sizeof(*adapter), GFP_KERNEL);
++	adapter = ixd_adapter_alloc(&pdev->dev);
+ 	if (!adapter)
+ 		return -ENOMEM;
+ 
+@@ -102,13 +106,13 @@ static int ixd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 
+ 	err = libie_pci_init_dev(pdev);
+ 	if (err)
+-		return err;
++		goto free_adapter;
+ 
+ 	pci_set_drvdata(pdev, adapter);
+ 
+ 	err = ixd_iomap_regions(adapter);
+ 	if (err)
+-		return err;
++		goto free_adapter;
  
  	INIT_DELAYED_WORK(&adapter->init_task.init_work,
  			  ixd_init_task);
-+	INIT_DELAYED_WORK(&adapter->mbx_task, ixd_ctlq_rx_task);
- 
- 	ixd_trigger_reset(adapter);
+@@ -118,7 +122,13 @@ static int ixd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
  	queue_delayed_work(system_unbound_wq, &adapter->init_task.init_work,
-diff --git a/drivers/net/ethernet/intel/ixd/ixd_virtchnl.c b/drivers/net/ethernet/intel/ixd/ixd_virtchnl.c
-new file mode 100644
-index 000000000000..66049d1b1d15
---- /dev/null
-+++ b/drivers/net/ethernet/intel/ixd/ixd_virtchnl.c
-@@ -0,0 +1,178 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* Copyright (C) 2025 Intel Corporation */
+ 			   msecs_to_jiffies(500));
+ 
++	ixd_devlink_register(adapter);
 +
-+#include "ixd.h"
-+#include "ixd_ctlq.h"
-+#include "ixd_virtchnl.h"
+ 	return 0;
 +
-+/**
-+ * ixd_vc_recv_event_msg - Handle virtchnl event message
-+ * @adapter: The adapter handling the message
-+ * @ctlq_msg: Message received
-+ */
-+void ixd_vc_recv_event_msg(struct ixd_adapter *adapter,
-+			   struct libie_ctlq_msg *ctlq_msg)
-+{
-+	int payload_size = ctlq_msg->data_len;
-+	struct virtchnl2_event *v2e;
-+
-+	if (payload_size < sizeof(*v2e)) {
-+		dev_warn_ratelimited(ixd_to_dev(adapter),
-+				     "Failed to receive valid payload for event msg (op 0x%X len %u)\n",
-+				     ctlq_msg->chnl_opcode,
-+				     payload_size);
-+		return;
-+	}
-+
-+	v2e = (struct virtchnl2_event *)ctlq_msg->recv_mem.iov_base;
-+
-+	dev_dbg(ixd_to_dev(adapter), "Got event 0x%X from the CP\n",
-+		le32_to_cpu(v2e->event));
-+}
-+
-+/**
-+ * ixd_vc_can_handle_msg - Decide if an event has to be handled by virtchnl code
-+ * @ctlq_msg: Message received
-+ *
-+ * Return: %true if virtchnl code can handle the event, %false otherwise
-+ */
-+bool ixd_vc_can_handle_msg(struct libie_ctlq_msg *ctlq_msg)
-+{
-+	return ctlq_msg->chnl_opcode == VIRTCHNL2_OP_EVENT;
-+}
-+
-+/**
-+ * ixd_handle_caps - Handle VIRTCHNL2_OP_GET_CAPS response
-+ * @adapter: The adapter for which the capabilities are being updated
-+ * @recv_buff: Buffer containing the response
-+ * @recv_size: Response buffer size
-+ * @ctx: unused
-+ *
-+ * Return: %0 if the response format is correct and was handled as expected,
-+ * negative error otherwise.
-+ */
-+static int ixd_handle_caps(struct ixd_adapter *adapter, void *recv_buff,
-+			   size_t recv_size, void *ctx)
-+{
-+	if (recv_size < sizeof(adapter->caps))
-+		return -EBADMSG;
-+
-+	adapter->caps = *(typeof(adapter->caps) *)recv_buff;
-+
-+	return 0;
-+}
-+
-+/**
-+ * ixd_req_vc_caps - Request and save device capability
-+ * @adapter: The adapter to get the capabilities for
-+ *
-+ * Return: success or error if sending the get capability message fails
-+ */
-+static int ixd_req_vc_caps(struct ixd_adapter *adapter)
-+{
-+	const struct ixd_ctlq_req req = {
-+		.opcode = VIRTCHNL2_OP_GET_CAPS,
-+		.send_size = sizeof(struct virtchnl2_get_capabilities),
-+		.ctx = NULL,
-+		.send_buff_init = NULL,
-+		.recv_process = ixd_handle_caps,
-+	};
-+
-+	return ixd_ctlq_do_req(adapter, &req);
-+}
-+
-+/**
-+ * ixd_get_vc_ver - Get version info from adapter
-+ *
-+ * Return: filled in virtchannel2 version info, ready for sending
-+ */
-+static struct virtchnl2_version_info ixd_get_vc_ver(void)
-+{
-+	return (struct virtchnl2_version_info) {
-+		.major = cpu_to_le32(VIRTCHNL2_VERSION_MAJOR_2),
-+		.minor = cpu_to_le32(VIRTCHNL2_VERSION_MINOR_0),
-+	};
-+}
-+
-+static void ixd_fill_vc_ver(struct ixd_adapter *adapter, void *send_buff,
-+			    void *ctx)
-+{
-+	*(struct virtchnl2_version_info *)send_buff = ixd_get_vc_ver();
-+}
-+
-+/**
-+ * ixd_handle_vc_ver - Handle VIRTCHNL2_OP_VERSION response
-+ * @adapter: The adapter for which the version is being updated
-+ * @recv_buff: Buffer containing the response
-+ * @recv_size: Response buffer size
-+ * @ctx: Unused
-+ *
-+ * Return: %0 if the response format is correct and was handled as expected,
-+ * negative error otherwise.
-+ */
-+static int ixd_handle_vc_ver(struct ixd_adapter *adapter, void *recv_buff,
-+			     size_t recv_size, void *ctx)
-+{
-+	struct virtchnl2_version_info need_ver = ixd_get_vc_ver();
-+	struct virtchnl2_version_info *recv_ver;
-+
-+	if (recv_size < sizeof(need_ver))
-+		return -EBADMSG;
-+
-+	recv_ver = recv_buff;
-+	if (le32_to_cpu(need_ver.major) > le32_to_cpu(recv_ver->major))
-+		return -EOPNOTSUPP;
-+
-+	adapter->vc_ver.major = le32_to_cpu(recv_ver->major);
-+	adapter->vc_ver.minor = le32_to_cpu(recv_ver->minor);
-+
-+	return 0;
-+}
-+
-+/**
-+ * ixd_req_vc_version - Request and save Virtchannel2 version
-+ * @adapter: The adapter to get the version for
-+ *
-+ * Return: success or error if sending fails or the response was not as expected
-+ */
-+static int ixd_req_vc_version(struct ixd_adapter *adapter)
-+{
-+	const struct ixd_ctlq_req req = {
-+		.opcode = VIRTCHNL2_OP_VERSION,
-+		.send_size = sizeof(struct virtchnl2_version_info),
-+		.ctx = NULL,
-+		.send_buff_init = ixd_fill_vc_ver,
-+		.recv_process = ixd_handle_vc_ver,
-+	};
-+
-+	return ixd_ctlq_do_req(adapter, &req);
-+}
-+
-+/**
-+ * ixd_vc_dev_init - virtchnl device core initialization
-+ * @adapter: device information
-+ *
-+ * Return: %0 on success or error if any step of the initialization fails
-+ */
-+int ixd_vc_dev_init(struct ixd_adapter *adapter)
-+{
-+	int err;
-+
-+	err = ixd_req_vc_version(adapter);
-+	if (err) {
-+		dev_warn(ixd_to_dev(adapter),
-+			 "Getting virtchnl version failed, error=%pe\n",
-+			 ERR_PTR(err));
-+		return err;
-+	}
-+
-+	err = ixd_req_vc_caps(adapter);
-+	if (err) {
-+		dev_warn(ixd_to_dev(adapter),
-+			 "Getting virtchnl capabilities failed, error=%pe\n",
-+			 ERR_PTR(err));
-+		return err;
-+	}
-+
++free_adapter:
++	ixd_devlink_free(adapter);
 +	return err;
-+}
-diff --git a/drivers/net/ethernet/intel/ixd/ixd_virtchnl.h b/drivers/net/ethernet/intel/ixd/ixd_virtchnl.h
-new file mode 100644
-index 000000000000..1a53da8b545c
---- /dev/null
-+++ b/drivers/net/ethernet/intel/ixd/ixd_virtchnl.h
-@@ -0,0 +1,12 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/* Copyright (C) 2025 Intel Corporation */
-+
-+#ifndef _IXD_VIRTCHNL_H_
-+#define _IXD_VIRTCHNL_H_
-+
-+int ixd_vc_dev_init(struct ixd_adapter *adapter);
-+bool ixd_vc_can_handle_msg(struct libie_ctlq_msg *ctlq_msg);
-+void ixd_vc_recv_event_msg(struct ixd_adapter *adapter,
-+			   struct libie_ctlq_msg *ctlq_msg);
-+
-+#endif /* _IXD_VIRTCHNL_H_ */
+ }
+ 
+ static const struct pci_device_id ixd_pci_tbl[] = {
 -- 
 2.47.0
 
