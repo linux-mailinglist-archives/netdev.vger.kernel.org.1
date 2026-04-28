@@ -1,223 +1,249 @@
-Return-Path: <netdev+bounces-282030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282031-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aLPFHs7x8Gn9bAEAu9opvQ
-	(envelope-from <netdev+bounces-282030-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 19:43:42 +0200
+	id KNL8IY7z8GnUbQEAu9opvQ
+	(envelope-from <netdev+bounces-282031-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 19:51:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 130C848A23F
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 19:43:42 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D8D248A31F
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 19:51:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3BB94301D150
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:43:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 585513022553
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:50:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D819F44B67D;
-	Tue, 28 Apr 2026 17:43:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7414A4508F9;
+	Tue, 28 Apr 2026 17:50:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KPnc7a5k"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="RICjasz4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f97.google.com (mail-vs1-f97.google.com [209.85.217.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11020100.outbound.protection.outlook.com [52.101.201.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44BFA44DB95
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 17:43:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.97
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777398220; cv=none; b=lAEFMLAimuBY6U4+PX/rBLVRPP5wLpMEonVFkzPbOxp0HQaT1NhzmELo/6Jb4rADnPuwJn1WOTb66rctFmE959tB1sqbTbjpgCvqc5S+CD5dNBvD9aEJCO8gFdhGjoT8iyqtrRPWxL+HsM2VdXkan+KxnCWKQCsHLjk/5BRUI4o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777398220; c=relaxed/simple;
-	bh=rOxrS3ATkBXcYQlvpQQZGZoXlMvDMFOeqqLHTohAREY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PpDdN6mCCl/45dnqOyUdXWxVwzG2TvzthOJC3w5ESGZ7wTVLtjwLzSOK+9LtegP8sfbR/2EXEQAl9fl3yEftSyIT0QHvpIM8pCiqbrc7bVKsfVWvH6hZ9/OdwsSelc9a270W8aIdrirkEiEdC5jUlBxR6enmJk77OwS1tyjay/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=KPnc7a5k; arc=none smtp.client-ip=209.85.217.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-vs1-f97.google.com with SMTP id ada2fe7eead31-612d8a59cc0so3785103137.3
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 10:43:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777398218; x=1778003018;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9u+qF+6aqxOyi7By7zQC9W/ZP4APPc4fxmJWF1UKk6A=;
-        b=aUBKQX8pZxksHpaoDK3Qbc2u2jE6gLmpUOsmdMzbgjjJfHsb2lX/vosnRSfgBTj0hr
-         lDRTJTt3vHNEdL3tBygWBkCup7YixNpbHyM0WEUcg6htAepSOAXWt81bi03WlqbCeQvO
-         RKT8xPRUAJMQyG/nlD6jrHPKV3LwVWI4H3IUfbaVqtgyPfH+77J6YwVv+1K8/kXMQqBx
-         VM2BvwQxcw6PGZP+HYNsTcC7PoeRv/ZiI9B8hnaOrI0QlZAOpOpCZd3y7/RQo8m30oux
-         68WmY0EaXXEfwHOte+xV05zzIJJ1FvcT69/Tz2+RqU1zEUf6M7XoNb4OGbX34971fT47
-         U43w==
-X-Forwarded-Encrypted: i=1; AFNElJ/qaV5I0wY4+b+1F8sVz/fdvrq0469MeC0P2H8SGgyX3KaOGzPFyFf1zW0zZ+RKoOy21TmEE84=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2S+xFYumprwmCTfj5eG8gFhrjEhXTxtZ67KwWm/zGwEx3u8N6
-	oJyBme2WvHoG4RGWYEZ86IJvc9CssaOaG/vmx7QccrLiJ7JQ7cFPgktcz/NGhHmU8xl4dPWT+s3
-	QBXpuxSF80w5tMQrK1ic62GB2OdOR6NPD/OZb7QzNk98Z3V+e0OZOHocm4deJ/+IwVE2Dmn+lV2
-	xbQcI3U3+yaL7bRSx8neoNkFRdsZxKTPbNHhx06ZfON0cTduvYZ3AjvUvWe5Brg0TsPlXaqExv3
-	k4vLBfziw==
-X-Gm-Gg: AeBDietMp8+yzOx8+z/vL7otHDA5QDDJMQC0FSeZ2NeUUQo51irKmeRkQ8edFLv7tEY
-	Zj/0s5Khos9Z5w9KU+MMjS55007UyafAzoB9CsbDN/GgiNfbvh4FmrYirgYbeYM/SFFPyHwJM3h
-	m0oA7m7G+PD2PSbwmtnDJ6HN30eu27XMLKsuiSqvxYt3xUHLYNzM2+br1Y2IHf9oQwuzCax00Hc
-	XVmFDb6hmD9KNPCepNN2/4H2iuM3UaN7EKbDbQgCqzq2g/fs/A6thXdelMikFtFMyTJaC5dKNEh
-	oIQMHbdxgZhrCFj2to9/dpLXQSVpHsQaJ9wrHbYiRjv1y2d7BgTsSckHUVeFBrEXZWbgkTZ1Y8l
-	3466T9rsAlBVGfnfrlX+ZjCfaXdKimXZ8nIp/LWHs6D9HpSwg03kTETaDA930ThFc4hLoV+06dC
-	JnVT4Mc2P5skv3wg==
-X-Received: by 2002:a05:6102:4245:b0:5ff:cee8:660c with SMTP id ada2fe7eead31-6280b6f1eb6mr2442267137.31.1777398218057;
-        Tue, 28 Apr 2026 10:43:38 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com ([144.49.247.127])
-        by smtp-relay.gmail.com with ESMTPS id ada2fe7eead31-627f5176038sm233526137.3.2026.04.28.10.43.37
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 28 Apr 2026 10:43:38 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dl1-f69.google.com with SMTP id a92af1059eb24-12c35f2c09dso15020247c88.0
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 10:43:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1777398217; x=1778003017; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9u+qF+6aqxOyi7By7zQC9W/ZP4APPc4fxmJWF1UKk6A=;
-        b=KPnc7a5kSoml4u3LUH0wM5e/WBSJNy5VfI6VeZJyUaps5ldIBD7CNl27s3NsrFPXRe
-         LkraMFvYrZHJCmXH6eH5t2TyhOCQGFUM5dRh1mQpxpEid9soSerePISqJsJlvDiStkQM
-         7PUQeV4h6LqgF579UJeahhJRQi2Czw2YvgL5k=
-X-Forwarded-Encrypted: i=1; AFNElJ/nKB6+IQ1sE1ugNpqSInQ8BEXjwEfh5WO9Uv2W5FPkpG/pydKQqsLLOXpV7zQXJiJdNuQT6Cc=@vger.kernel.org
-X-Received: by 2002:a05:7022:438e:b0:12d:b175:2573 with SMTP id a92af1059eb24-12ddd943b7emr1949511c88.7.1777398216675;
-        Tue, 28 Apr 2026 10:43:36 -0700 (PDT)
-X-Received: by 2002:a05:7022:438e:b0:12d:b175:2573 with SMTP id a92af1059eb24-12ddd943b7emr1949486c88.7.1777398215982;
-        Tue, 28 Apr 2026 10:43:35 -0700 (PDT)
-Received: from [10.14.6.173] ([192.19.161.248])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12ddd93c1c0sm2500439c88.7.2026.04.28.10.43.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Apr 2026 10:43:35 -0700 (PDT)
-Message-ID: <df793a62-b0a6-4500-94e1-05ad54ba830f@broadcom.com>
-Date: Tue, 28 Apr 2026 10:43:33 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FCE633D4EC;
+	Tue, 28 Apr 2026 17:50:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.100
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777398654; cv=fail; b=tp4hbzoEw/nrpAy6JPZjmiuPEBgr2TFZoJ7DwYi5ztJxtgQ7lOnmDIWhMyzpSc7mOclONIooUEU+pTyj4EiuC30z/xpArtWTQnZfHtcx1RCZVm/BMj3Lxv7LP7aFExMMg6b8PBfPl2Ab71gL75D17xtCzxQ4Lx28lnOudJnRGKc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777398654; c=relaxed/simple;
+	bh=LgHXjUDLTwDIgN96BTA3iUO2f9/63JG8IO/b+GYUJMk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Uj1Gi9SOzMYkn4TLOU9Vx0mXzrzr3KRbDRCyYDjGRr5E3IEg++ZNG8vrns9dgXaBXbelsDPaVbeog5HhU9koq5yLUMkqrE28g1IRMkPJavTAoN3t9ih0ZbUdDAP17qwdIYz/i5h7TLuHfFDACdDQ9tBxbNeGqxLVJdRGfCJPMaU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=RICjasz4; arc=fail smtp.client-ip=52.101.201.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=V7dCKJTHRefYP6ajha/Rse57f6Gjmb32vQNaYR2jrMUs45nQnvYVU0FCylqNGWRUTuSRYvA9l9YMJ5j8nWiFQM3sIM/GR2EnFREeVKFnFuLIKVhhaQcFFlK76wBx4vZG5BIlGp4brIXJ+8jLEKpSetzAYlFG8Pj2WyAtDXf8bnFrRu62LT7tyifAcIYKrklFG6N5XyVGmN8HNeAn02mfKht1V3yMxVG/Te+gcZrAMAPcYeSZEVQyg1aHz0nRWbq8pgPWFH5sBwAdZjUZmTX/xgv1iNdTrSxFNUpS6wCt+tSyp67bZjc57crv/yLWDnbnKyD2oxVIucVyx3Nc9jsg4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=M5hlJ+dHZWU06oWcJfM6YjfZ18tabUNrQO3Ivo9bhls=;
+ b=ApzUOshXHg6uJxIj0ASAayu4Ctbo0plg84n9AyOIXpLjDPHz5RcqX7UAuisNJ3mgllGcnkRoHbdXPV/4Of4aR9hchWi+ESKj+6TVrpEzyGVscDZY+Bsa8VZSiUl/WmngLdcbztIW2XitvAcamPfiXUNS/H4P5TMzO4iIUwhKCl79TKh7XAqsASySU7L6NBh4v2hTYpJRwcDskYi7o/BGkxzuPFwCcoTlvM/GDSwp9ZVN7YmP4ciwny2k4oTy53YkOrwxjKYiAn82VkQ3fUTBGU+jq0hOd8d+r0IkQWUU7OQQ+p3Y/9/QCaO4BVCJvDdYw5938SHa+GIgjQc9JIgYjg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=M5hlJ+dHZWU06oWcJfM6YjfZ18tabUNrQO3Ivo9bhls=;
+ b=RICjasz4iYy24rXzu40sdgSIGuy1x5HJsVBh4gJWkLyEpfd4KrSzOVbZ/M9/ammd3Ojxw+DJaeWVvln30gP/eDVx2qZMOwI3HNLaoApwB3oMIpP1cNnYtmrpamMNuMlRSXqlIE5v+hXdHo9Y7j6OmQetNzdJa+LxQOZSGkeQ2xc=
+Received: from SA1PR21MB6683.namprd21.prod.outlook.com (2603:10b6:806:4a4::6)
+ by SA1PR21MB6874.namprd21.prod.outlook.com (2603:10b6:806:4a4::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.3; Tue, 28 Apr
+ 2026 17:50:47 +0000
+Received: from SA1PR21MB6683.namprd21.prod.outlook.com
+ ([fe80::879f:eec1:ca0e:d219]) by SA1PR21MB6683.namprd21.prod.outlook.com
+ ([fe80::879f:eec1:ca0e:d219%6]) with mapi id 15.20.9870.013; Tue, 28 Apr 2026
+ 17:50:46 +0000
+From: Long Li <longli@microsoft.com>
+To: Jason Gunthorpe <jgg@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>, Eric Dumazet <edumazet@google.com>,
+	Junxian Huang <huangjunxian6@hisilicon.com>, Konstantin Taranov
+	<kotaranov@microsoft.com>, Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky
+	<leon@kernel.org>, "linux-hyperv@vger.kernel.org"
+	<linux-hyperv@vger.kernel.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, Selvin Xavier
+	<selvin.xavier@broadcom.com>, Chengchang Tang <tangchengchang@huawei.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Yishai Hadas <yishaih@nvidia.com>
+CC: Abhijit Gangurde <abhijit.gangurde@amd.com>, Adit Ranadive
+	<aditr@vmware.com>, Allen Hubbe <allen.hubbe@amd.com>, Andrew Boyer
+	<andrew.boyer@amd.com>, Aditya Sarwade <asarwade@vmware.com>, Brad Spengler
+	<brad.spengler@opensrcsec.com>, Bryan Tan <bryantan@vmware.com>, "David S.
+ Miller" <davem@davemloft.net>, Dexuan Cui <DECUI@microsoft.com>, Doug Ledford
+	<dledford@redhat.com>, George Zhang <georgezhang@vmware.com>, Jorgen Hansen
+	<jhansen@vmware.com>, Jianbo Liu <jianbol@nvidia.com>, Kai Aizen
+	<kai.aizen.dev@gmail.com>, Leon Romanovsky <leonro@mellanox.com>, Leon
+ Romanovsky <leonro@nvidia.com>, Yixian Liu <liuyixian@huawei.com>, Lijun Ou
+	<oulijun@huawei.com>, Parav Pandit <parav.pandit@emulex.com>,
+	"patches@lists.linux.dev" <patches@lists.linux.dev>, Roland Dreier
+	<roland@purestorage.com>, Roland Dreier <rolandd@cisco.com>, Sagi Grimberg
+	<sagi@grimberg.me>, Ajay Sharma <sharmaajay@microsoft.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>, Tariq Toukan
+	<tariqt@mellanox.com>, "Wei Hu (Xavier)" <xavier.huwei@huawei.com>, Shaobo Xu
+	<xushaobo2@huawei.com>, Nenglong Zhao <zhaonenglong@hisilicon.com>
+Subject: RE: [EXTERNAL] [PATCH rc 04/15] RDMA/mana: Validate rx_hash_key_len
+Thread-Topic: [EXTERNAL] [PATCH rc 04/15] RDMA/mana: Validate rx_hash_key_len
+Thread-Index: AQHc1yqZbIeto+s8zkOL9g+3b4o0xbX0wCqg
+Date: Tue, 28 Apr 2026 17:50:46 +0000
+Message-ID:
+ <SA1PR21MB6683AABEEE1BD8F8504A110FCE372@SA1PR21MB6683.namprd21.prod.outlook.com>
+References: <0-v1-41f3135e5565+9d2-rdma_ai_fixes1_jgg@nvidia.com>
+ <4-v1-41f3135e5565+9d2-rdma_ai_fixes1_jgg@nvidia.com>
+In-Reply-To: <4-v1-41f3135e5565+9d2-rdma_ai_fixes1_jgg@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=71903384-ec74-46dc-a993-3f07a25be251;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2026-04-28T17:48:40Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR21MB6683:EE_|SA1PR21MB6874:EE_
+x-ms-office365-filtering-correlation-id: 7a5f89c6-e1e6-4426-83a2-08dea54ead54
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|7416014|376014|366016|1800799024|56012099003|18002099003|22082099003|38070700021|921020;
+x-microsoft-antispam-message-info:
+ sFzNDQWqic4cPB7LD9qmLruXf5ZijrJaZ/D2+RIolt/dqKu56ax9JVz6WFdd35edNiOnOkIZoay2zcmuiP95P+AHWCZI9jDC8V6dURs7vT1TLKSvtn0JhEItW0Gi2IB2wRiKv3HAO0N8yvt+EnW5oXVlluEk3mslu/EgmI9o9UuWnj2tEFjc6dgjN4jicIV84VfpfVWBQoIOGNupzw6SvRvSo/KLaOVPlflaR04N2wpqvvWp+DtzG0k588xq9xVpSzUiQ2ztnUoDCBnf1CmOCEuK6QuFNzmumFfaQG1LlafVfwmXQYAVTzKk5DbSv3FB4bmVkRfGTCXo4yVEAO0y+B6mxBKfnJtA6XyiYbbtLP0A8nGdzVvITGP9EZr/g7dDF4WIONpjsQ9jEYTI64yIRkMxSBy9M2FYd8i/RDa1f7sh/t6Gor1WF3vps/3mvZcOFoqweCEpdZdsno5jXAhvKZByGOFukNjwun81d7lDKSXyJbGtLCEHcnJxG2rvpXuc7Y07V+t5KARAu350za3WP8IEWqgmmswjSeSB0d0DlpIyyzEBxAZmfOvKvsRAFhZPnn2pcSH67Tvcbtsw79I9Xniq7tpE5r4fySab+UjJp5uShZN4qikWJgsZ6l9/XrHkvgUA3xTeZNBUTmRnApvpR+cMiGBxCTVuMopXpGYU2ky5cJ0zEq8A0JO8agNHoVkFU/LZ+Vxa93ZhuIMv4cemj76TYOzwbt5J2uy8AqILvy1oRaQTHy65hYW+EwACgPCm
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR21MB6683.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(56012099003)(18002099003)(22082099003)(38070700021)(921020);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?4B3LGs1CeHcEyi893AGzNxOHjEG6GNnN2aIRz7HJNHyIDurkM8F791DwiNyW?=
+ =?us-ascii?Q?rPubHylqY1sXGRDEWnr2DPvfuiM5OUhDDUqj7zhcF0xwLZNvPO+Bue0jsIuQ?=
+ =?us-ascii?Q?KHCZvQDh3wT/pZhg/L7lBkCiZVxGNlUP6HpoUZ0upTumpqd1vcdUaaXpEFvf?=
+ =?us-ascii?Q?+iAKLjDyU4r7n8JpgkE6/bUhpwCZRLiYBceFtNYP4hdaJTpOZVDavjv9uulf?=
+ =?us-ascii?Q?MGYw/ocCDus4lSGfDeeu/+zkemyJg+/lWyRYR4nxSBOiXzNNyHuqceg7AL38?=
+ =?us-ascii?Q?044vyDUJoh6cfqvg72rtmBR2gm5VFLXOnwJxLMqNlf8tlWHZ95RsCksw2tmj?=
+ =?us-ascii?Q?SZONXF5YNCs/+8PyyYU5U8n2YQoC9wGiFVdd6GELQzXt3WBxA0C6/h+EbqS4?=
+ =?us-ascii?Q?CG1b9ca+KLaNphBR1uYh67S0PGwxMg0kDIq/QpUWGKMLvhMGQNcMu/Y/a5Ws?=
+ =?us-ascii?Q?MYd3Z7dV+EjgTcfYl3L3OnX3trzBfGfnIFqWc1aQgLYZ+nZapyx562cj2+FG?=
+ =?us-ascii?Q?5WM8pOhwfg89x70vssWYu2J5JwlNP43Qbl9zp2ISfc/jAtpWcBwTJ5qBWXjn?=
+ =?us-ascii?Q?oAvty3OxYZPIZv0CrWTsA3GFOUtbk7dn8vXBcRzbZe5+Sc59nIh62vzeoJVT?=
+ =?us-ascii?Q?IhuaiJqBupKKOsNtLSwIUsCtoQHVg5LrqRiCvEM4isdcKKiWWWYQX3bl9S1R?=
+ =?us-ascii?Q?1XUO8AZhe3lgr+MIqsp0snHX/E3fl/iwOev2ESfK338swEGq5FqoTIM+j9AZ?=
+ =?us-ascii?Q?fvZ/UKgoerMdPG7S3ceK9YptCnWYRjwFk4lygzOnfFnAnGT5ZWdH8gFFZKp0?=
+ =?us-ascii?Q?apO+zkpb4N7vQWJhXcZndtYf1ENIi1H7J5deu6N07aIZAr7MMtlTAxbWl0HU?=
+ =?us-ascii?Q?3sHz6qwcsyCHiXACE6bV9hf/nxJ3XMOnwBYavvkZKuUcwBGfvD1IO08NnLvY?=
+ =?us-ascii?Q?J2pYcXKrx+zP2kVJloHCFw9Hqkc3ZMGPD8kYKtP/AK07qQR2UoRxq0gwR6nR?=
+ =?us-ascii?Q?VTmDr5ztQZl5nwgW9ZZi9dnOA1jX2XcyXshR1o8Hn7Gamikz3XVQffm+vtT3?=
+ =?us-ascii?Q?PzdYrt1RdultBURkvZ/0kAGO3vfBXpV0xHxxX+uNJuzXM1P2BCKZ6rkc0Y+3?=
+ =?us-ascii?Q?S1ld+Joi3QQEBbi3in5LCqhzBuK6lp2aFgAx55oY7yjIWW58DfCsNsE+p9th?=
+ =?us-ascii?Q?3fOlvh5F08DLW7eeonz0wzMWAnDlLkRMk8dGoMwnw95FIddsjEqRG9t7LEK9?=
+ =?us-ascii?Q?XnkhcFRggH9en4zZNRGTl0gODBScfdKlevodMWycqdVJ1ilB6ak+8ZUtDyFS?=
+ =?us-ascii?Q?bLZKWrRtxs89fwiApzGA9ed8ZjJb51wpyVCtZZpeEniHNiRRykvi4Wc+VBPO?=
+ =?us-ascii?Q?uLYQQt30+sC4zarbiqw7KEt8zAQnEOOcGK8b3EbI0UZY419azSJSdYsQksqz?=
+ =?us-ascii?Q?6vni7VnoxJg/5oBUVB6YjuEZnrQqcnuoa9IaMEVfB68B0hPQ/7zd4UfNszQ9?=
+ =?us-ascii?Q?/GcD6bVmpMvPFZgzt2d1IfgmLiqKF1MaFZO+04BbqHzKO0HyLAc9+EI7Dq38?=
+ =?us-ascii?Q?QNdXSxbByiGPXE7ruj6jF3v2MUfVgzTKAxveea13qudFNQI4aA3Q89xn7LrV?=
+ =?us-ascii?Q?CkCFkKAbf9bN3TJC1tbZ4ZzMTe/ij/eRDeLOAipJZuHHSuPKe1MDK0VV+r9w?=
+ =?us-ascii?Q?UBtESoS6KK7jpzilmLXLZaR+lIovTJdE7kS0yrFRP12mQoZC?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 net-next] net: bcmasp: handle EPROBE_DEFER for MAC
- retrieval
-To: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "open list:BROADCOM ASP 2.0 ETHERNET DRIVER"
- <bcm-kernel-feedback-list@broadcom.com>,
- open list <linux-kernel@vger.kernel.org>
-References: <20260428014329.779779-1-rosenp@gmail.com>
-Content-Language: en-US
-From: Justin Chen <justin.chen@broadcom.com>
-In-Reply-To: <20260428014329.779779-1-rosenp@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-X-Rspamd-Queue-Id: 130C848A23F
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR21MB6683.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7a5f89c6-e1e6-4426-83a2-08dea54ead54
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Apr 2026 17:50:46.6654
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: shdMu8Bw2E4OU21E/245kDFYfMEUJqc//hBF/YpDsZPP7l6OKjTEjELnxJPry2h39R2l1zSosLlh/MyWAPvEbg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR21MB6874
+X-Rspamd-Queue-Id: 2D8D248A31F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[microsoft.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[microsoft.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282030-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_TRACE(0.00)[broadcom.com:+];
+	TAGGED_FROM(0.00)[bounces-282031-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[47];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[amd.com,vmware.com,opensrcsec.com,davemloft.net,microsoft.com,redhat.com,nvidia.com,gmail.com,mellanox.com,huawei.com,emulex.com,lists.linux.dev,purestorage.com,cisco.com,grimberg.me,vger.kernel.org,hisilicon.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,broadcom.com:dkim,broadcom.com:mid];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justin.chen@broadcom.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[longli@microsoft.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[microsoft.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email,SA1PR21MB6683.namprd21.prod.outlook.com:mid]
 
+>
+> Sashiko points out that rx_hash_key_len comes from a uAPI structure and i=
+s
+> blindly passed to memcpy, allowing the userspace to trash kernel memory.
+> Bounds check it so the memcpy cannot overflow.
+>
+> Cc: stable@vger.kernel.org
+> Fixes: 0266a177631d ("RDMA/mana_ib: Add a driver for Microsoft Azure
+> Network Adapter")
+> Link:
+> https://sashiko.d/
+> ev%2F%23%2Fpatchset%2F0-v2-1c49eeb88c48%252B91-
+> rdma_udata_rep_jgg%2540nvidia.com%3Fpart%3D1&data=3D05%7C02%7Clongli%
+> 40microsoft.com%7C12e76b7833a74fb98a8208dea541b8cd%7C72f988bf86f141
+> af91ab2d7cd011db47%7C1%7C0%7C639129898875053924%7CUnknown%7CT
+> WFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4
+> zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=3D75tKj32YfU
+> uN7KdnsW63AjlwgnSLt2KXz34EUbXp2wI%3D&reserved=3D0
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 
+Reviewed-by: Long Li <longli@microsoft.com>
 
-On 4/27/26 6:43 PM, Rosen Penev wrote:
-> of_get_ethdev_address can return EPROBE_DEFER when using nvmem. To
-> handle this, encode the error with ERR_PTR for minimal changes. Adjust
-> the only place using bcmasp_interface_create.
-> 
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
 > ---
->   v2: use dev_err_probe.
->   drivers/net/ethernet/broadcom/asp2/bcmasp.c      | 6 +++---
->   drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c | 6 ++++--
->   2 files changed, 7 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-> index 972474893a6b..e9b11b956344 100644
-> --- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-> +++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-> @@ -1333,10 +1333,10 @@ static int bcmasp_probe(struct platform_device *pdev)
->   	i = 0;
->   	for_each_available_child_of_node_scoped(ports_node, intf_node) {
->   		intf = bcmasp_interface_create(priv, intf_node, i);
-> -		if (!intf) {
-> -			dev_err(dev, "Cannot create eth interface %d\n", i);
-> +		if (IS_ERR(intf)) {
->   			of_node_put(ports_node);
-> -			ret = -EINVAL;
-> +			ret = dev_err_probe(dev, PTR_ERR(intf), "Cannot create eth interface %d\n",
-> +					    i);
->   			goto err_cleanup;
->   		}
->   		list_add_tail(&intf->list, &priv->intfs);
-> diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-> index ec63f50a849e..caf0e408e2f7 100644
-> --- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-> +++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-> @@ -1254,7 +1254,7 @@ struct bcmasp_intf *bcmasp_interface_create(struct bcmasp_priv *priv,
->   	struct device *dev = &priv->pdev->dev;
->   	struct bcmasp_intf *intf;
->   	struct net_device *ndev;
-> -	int ch, port, ret;
-> +	int ch, port, ret = -EINVAL;
->   
->   	if (of_property_read_u32(ndev_dn, "reg", &port)) {
->   		dev_warn(dev, "%s: invalid port number\n", ndev_dn->name);
-> @@ -1314,6 +1314,8 @@ struct bcmasp_intf *bcmasp_interface_create(struct bcmasp_priv *priv,
->   	}
->   
->   	ret = of_get_ethdev_address(ndev_dn, ndev);
-> +	if (ret == -EPROBE_DEFER)
-> +		return ERR_PTR(-EPROBE_DEFER);
-
-Do we need to hit unwind here? i.e. goto err_deregister_fixed_link.
-
-Thanks,
-Justin
-
->   	if (ret) {
->   		netdev_warn(ndev, "using random Ethernet MAC\n");
->   		eth_hw_addr_random(ndev);
-> @@ -1340,7 +1342,7 @@ struct bcmasp_intf *bcmasp_interface_create(struct bcmasp_priv *priv,
->   err_free_netdev:
->   	free_netdev(ndev);
->   err:
-> -	return NULL;
-> +	return ERR_PTR(ret);
->   }
->   
->   void bcmasp_interface_destroy(struct bcmasp_intf *intf)
+>  drivers/infiniband/hw/mana/qp.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/drivers/infiniband/hw/mana/qp.c b/drivers/infiniband/hw/mana=
+/qp.c
+> index 645581359cee0b..f7bb0d1f0f8034 100644
+> --- a/drivers/infiniband/hw/mana/qp.c
+> +++ b/drivers/infiniband/hw/mana/qp.c
+> @@ -21,6 +21,9 @@ static int mana_ib_cfg_vport_steering(struct mana_ib_de=
+v
+> *dev,
+>
+>       gc =3D mdev_to_gc(dev);
+>
+> +     if (rx_hash_key_len > sizeof(req->hashkey))
+> +             return -EINVAL;
+> +
+>       req_buf_size =3D struct_size(req, indir_tab,
+> MANA_INDIRECT_TABLE_DEF_SIZE);
+>       req =3D kzalloc(req_buf_size, GFP_KERNEL);
+>       if (!req)
+> --
+> 2.43.0
 
 
