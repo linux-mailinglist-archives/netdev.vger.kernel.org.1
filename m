@@ -1,65 +1,92 @@
-Return-Path: <netdev+bounces-282105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282107-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UPhHC0E18WltegEAu9opvQ
-	(envelope-from <netdev+bounces-282105-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 00:31:29 +0200
+	id aOVAFz818WltegEAu9opvQ
+	(envelope-from <netdev+bounces-282107-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 00:31:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82B7948C9F1
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 00:31:28 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57A6C48C9EA
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 00:31:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4F1C7311CA37
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 22:27:27 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2115830131AF
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 22:31:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1399387599;
-	Tue, 28 Apr 2026 22:27:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8336037FF4B;
+	Tue, 28 Apr 2026 22:31:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WJ4oQ55x"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rZNjp57y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E7F37F728;
-	Tue, 28 Apr 2026 22:27:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3957D37B030
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 22:31:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777415243; cv=none; b=AE6JA8IYPyrDr1kZ9eOWTz2mY56QLe9YvnLaCyt/vQJ+Txd4HKNsm3u7kbT2tFEs073ADg2y/nqb84XuRKGISoiJoO7ocHWvGsmNlkHSHFUrQ56kpAOkeNJM1KhZ2NjLMaBmsDAbqaz+EzMVOonY0run206Tnt7SiOfrsn2odeM=
+	t=1777415479; cv=none; b=AkxNV8I7xg2hyZnohjHS9qPEfgnrC1Iv4nA5GgkA0r8OkEEkkJ8UI2BnhQA8kaw8B7ielKt0SJPNAIuwJZgYBybSnlyF2/T2UF0N1JU/8IrC8IWLZG13IqjYQXeEfSghsub+7lyvrUHVm0slI0dortrAuqhQJU96JZIr20Yv1Pc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777415243; c=relaxed/simple;
-	bh=4n2kKgEphFG3liuH2VGMUuhJ/xFkobdIxnWp8con/vc=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LGm/0KKy0HuwTnEiQvRLI621w/hbi1uJ0y9qUzx7VkFTfHSaIdFi2m0Z5xQtT1bT3thnrSglKkzEDMwXiUjrt5c3fNdUezk05GQ7KyLaVGgvhEk+QJR5I6oUXDsepRonPsUDdg5NUsPX8wet1yJStq8AVoYqNgnwuj2lHz730BE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WJ4oQ55x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08297C2BCB3;
-	Tue, 28 Apr 2026 22:27:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777415243;
-	bh=4n2kKgEphFG3liuH2VGMUuhJ/xFkobdIxnWp8con/vc=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=WJ4oQ55x6t8RsZhcAbCef1RmUe3o9tAegBhqy8BI0k+mi487sOQpt1K3oUMTAwugk
-	 t/8DDlXS56JclAuWo0zyztY7UW6fIVBrmHaD0dHZA5J5YFvDsTQRHi4J+7Rt4OeqIi
-	 ltOWX/AYZooQL2DkTeW4ABVv+l5miWP/RYKGUj+Tgm6yVyS3xTabpXdqPN3KIoietM
-	 57upJRvLH7qWfs1jnjq7lWah9kD4ZNSv+0oJRMEXyI4Idrm72VdSllMP9i76UilTr6
-	 l0uo/Czyh8w5iWWdYZG5gY4vPQQlC9tug8g8apHMMHelbHHDSIWjzZVWGJZTv02aMQ
-	 00osBnQqL8sHg==
-From: Allison Henderson <achender@kernel.org>
-To: netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	horms@kernel.org,
-	linux-rdma@vger.kernel.org,
-	achender@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	shuah@kernel.org
-Subject: [PATCH net-next v2 7/7] selftests: rds: Make rds selftests TAP compliant
-Date: Tue, 28 Apr 2026 15:27:16 -0700
-Message-Id: <20260428222716.2960871-8-achender@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260428222716.2960871-1-achender@kernel.org>
-References: <20260428222716.2960871-1-achender@kernel.org>
+	s=arc-20240116; t=1777415479; c=relaxed/simple;
+	bh=Afdookp9zil2VtHeQbBPiJ6JrqKRSbgNe+scVywFeJQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uvfrHmf9fLOd2InPqXH+3JbiJSC/JCGuw0cyh/dd+qu5REsqnIEf0daRMgIlrJWPIbmy5EfvpabFaFt/gJ74e/kTnR3tDbqk1oHkiZ4NkhbLoe5BNOC1Y+fD9t9yYt1hmuY/QcZhN0ftP630gnAFEkVlqdYSG2BIubBDUh9uAyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rZNjp57y; arc=none smtp.client-ip=209.85.219.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-8acb3dab8dfso74717136d6.1
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 15:31:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777415477; x=1778020277; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YY6FTulJBSPvlfGVmGfJuioC6VTkKeDBKn6rrD6zw1I=;
+        b=rZNjp57yscktkgFUy8xNu/U7g1meWA8gFU8DzFfaVrNEh/UFhCeaCV8AeP/8O4DT2A
+         HK61ZAij8FWUGANsd2LGZNd/sOzH5dGmlP+QxkwDzFCsvkzGpj3pUTrckAZis4ZBLVD/
+         e7jjwctama7txqzIU/eKIwr+xGSxR7VDbdGVap25H64Gnh/v1p0OndP0yjp3B7EwN+8g
+         WTf6+U7vWD65Er5ps3pBzA8aLcgqr+FZdpTl+abemAjcoMAASNSKjk9Fjyi/R1yYR8Ii
+         bSbI5IJU1eXz9T3p8JjYf65jSNTK/l5KCjZ0Aw/hXjVs3WpSiugkzQyabNEbd7IE7a4o
+         zeUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777415477; x=1778020277;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YY6FTulJBSPvlfGVmGfJuioC6VTkKeDBKn6rrD6zw1I=;
+        b=kI8dL1JjXddBImGRC6Rh/yXWKDDWcI1tvQ4vj9ggGuRjYVnmlFYgV1dKWCQZodpcH4
+         3g0pVD8j/1JBueMnHdxz+f0aqgFFmZDyJdv3vWEP5FmUYvgM3h/YvWgtaxRsj3/GQYd8
+         m+M0hf5v/EKOXyajeAKdi+0/xPLLaxegH96wdC+WV08ZXLyxDAAo5ZpxomD6Uvs4E1oM
+         rNGGMLAXOLMP+cecRpMOvFTzvZ0KN92irmxNs/OKSsB4F3F2h/LznTMIQ/QWlgszJLfu
+         S4fOBdIEfvhFP2y352L6zVqIU7GZbjLIdgsP9+LkOUQ6hwwyt5FedNv0+FffTsnHkFx5
+         CGbA==
+X-Gm-Message-State: AOJu0Yz0J2Yi71rYAg1WJcI8ye2MPytIifVbiXziZFb1qkK+jvI0vXUy
+	nGApO/G2ztoyto2iGPSr8gbriUBHLQVZ46cPlh3cSr3rofzLC7PKcLY7FFc0Ag==
+X-Gm-Gg: AeBDievbz6hMKgpILreAjMJOghINT2ByP85TJqCQJG26BNflqQt7WBJFD01lH5MFN29
+	7XKcWoTfkdaznH8j2fI1Va5+mDDpNG7POnJuwaob38UK3IGtseR7jxJEbUVqy1lI9AsO1e5P3uC
+	Dd+l8uBAJ8MowRhunCC8NgGP2V8k/RzIJd3N77/o4bKawz3aytQFJYLheVMSN/hfatb4/ZAcW0L
+	uxpVSkxtZI7uw+5idx83E4//ILX9AqXfq1CkjJSxuhKZTCkK087rMx/3yrQGxHR4OV6l0i0HcpF
+	PSCHzF71T+sjA9NpC24eMovAqnflXiCiXy6jp2wAVG+rN6LsqOB8QL4MXNV3mmiEydORmfW3d8V
+	Da4Rm3gNCpwvLeC2adRkVP1sJ4BUtQxYh/z+4JbcAtJZQw/wpmRhqz2S8KrHvRoN5MjG6+rEdbu
+	USSy6Gm+ua5JtH/2nr1/jB4w0NLSb09KpMGG2HrueN+ffyUoKoAwmw7LaZSaRFETdiF71M/Lj5G
+	aWxq3rJafOC9fGTy6xSTVmJHnAl2fu9qNpm
+X-Received: by 2002:a05:6214:8119:b0:89f:97cc:b8d2 with SMTP id 6a1803df08f44-8b3edd30efcmr21727386d6.17.1777415476801;
+        Tue, 28 Apr 2026 15:31:16 -0700 (PDT)
+Received: from ryzen ([2601:644:8000:5b5d::8bd])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b3ef81f156sm2874916d6.37.2026.04.28.15.31.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Apr 2026 15:31:16 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next] net: gianfar: use alloc_ethdev_mqs
+Date: Tue, 28 Apr 2026 15:30:58 -0700
+Message-ID: <20260428223058.113013-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,243 +94,75 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 82B7948C9F1
+X-Rspamd-Queue-Id: 57A6C48C9EA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282105-lists,netdev=lfdr.de];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282107-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-This patch updates the rds selftests output to be TAP compliant.
+From looking at git history, mqs was introduced after mq and after this
+code was written. Having said that, mqs can be used as there is already
+an RX queue variable in place. Not only that, mqs already sets the
+num_xx_queues members. No need to open code this.
 
-Use ksft_pr() to mark debug output with a leading '# ' so that TAP
-parsers treat it as commentary, and convert all informational print()
-calls to use ksft_pr(). sys.exit(0) is changed to os._exit(0) to
-avoid duplicate prints from the buffered TAP output. The console
-output from the tcpdump subprocess is silenced, and the gcov console
-output is redirected to a gcovr.log.
-
-Finally adjust the exit path so that the hash check loop sets a
-return code instead exiting directly. Then print the TAP results
-and totals lines before exiting.
-
-Signed-off-by: Allison Henderson <achender@kernel.org>
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- tools/testing/selftests/net/rds/run.sh  | 18 +++++----
- tools/testing/selftests/net/rds/test.py | 54 ++++++++++++++++---------
- 2 files changed, 45 insertions(+), 27 deletions(-)
+ drivers/net/ethernet/freescale/gianfar.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/tools/testing/selftests/net/rds/run.sh b/tools/testing/selftests/net/rds/run.sh
-index 3fc116d23410..805cd0915585 100755
---- a/tools/testing/selftests/net/rds/run.sh
-+++ b/tools/testing/selftests/net/rds/run.sh
-@@ -205,8 +205,8 @@ if ! mountpoint -q /tmp 2>/dev/null; then
- fi
+diff --git a/drivers/net/ethernet/freescale/gianfar.c b/drivers/net/ethernet/freescale/gianfar.c
+index 3271de5844f8..7b47c7c49c08 100644
+--- a/drivers/net/ethernet/freescale/gianfar.c
++++ b/drivers/net/ethernet/freescale/gianfar.c
+@@ -669,7 +669,7 @@ static int gfar_of_init(struct platform_device *ofdev, struct net_device **pdev)
+ 		return -EINVAL;
+ 	}
  
- set +e
--echo running RDS tests...
--echo Traces will be logged to "$TRACE_FILE"
-+echo "# running RDS tests..."
-+echo "# Traces will be logged to $TRACE_FILE"
- rm -f "$TRACE_FILE"
- strace -T -tt -o "$TRACE_FILE" python3 "$(dirname "$0")/test.py" \
- 	-t "$TIMEOUT" -d "$LOG_DIR" -l "$PLOSS" -c "$PCORRUPT" \
-@@ -216,7 +216,7 @@ test_rc=$?
- dmesg > "${LOG_DIR}/dmesg.out"
+-	*pdev = alloc_etherdev_mq(sizeof(*priv), num_tx_qs);
++	*pdev = alloc_etherdev_mqs(sizeof(*priv), num_tx_qs, num_rx_qs);
+ 	dev = *pdev;
+ 	if (NULL == dev)
+ 		return -ENOMEM;
+@@ -679,10 +679,6 @@ static int gfar_of_init(struct platform_device *ofdev, struct net_device **pdev)
  
- if [ "$GENERATE_GCOV_REPORT" -eq 1 ]; then
--       echo saving coverage data...
-+       echo "# saving coverage data..."
+ 	priv->mode = mode;
  
-        # Ensure debugfs is mounted
-        if ! test -d /sys/kernel/debug/gcov; then
-@@ -229,17 +229,19 @@ if [ "$GENERATE_GCOV_REPORT" -eq 1 ]; then
-                cat < "/sys/kernel/debug/gcov/$f" > "/$f"
-        done)
- 
--       echo running gcovr...
-+       echo "# running gcovr..."
-        gcovr -s --html-details --gcov-executable "$GCOV_CMD" --gcov-ignore-parse-errors \
--             --root "${ksrc_dir}" -o "${COVR_DIR}/gcovr" "${ksrc_dir}/net/rds/"
-+             --root "${ksrc_dir}" -o "${COVR_DIR}/gcovr" "${ksrc_dir}/net/rds/" \
-+             > "${LOG_DIR}/gcovr.log" 2>&1
-+       echo "# gcovr log: ${LOG_DIR}/gcovr.log"
- else
--       echo "Coverage report will be skipped"
-+       echo "# Coverage report will be skipped"
- fi
- 
- if [ "$test_rc" -eq 0 ]; then
--	echo "PASS: Test completed successfully"
-+	echo "# PASS: Test completed successfully"
- else
--	echo "FAIL: Test failed"
-+	echo "# FAIL: Test failed"
- fi
- 
- exit "$test_rc"
-diff --git a/tools/testing/selftests/net/rds/test.py b/tools/testing/selftests/net/rds/test.py
-index 1c7aebddeb61..530ad9f9acba 100755
---- a/tools/testing/selftests/net/rds/test.py
-+++ b/tools/testing/selftests/net/rds/test.py
-@@ -22,6 +22,8 @@ this_dir = os.path.dirname(os.path.realpath(__file__))
- sys.path.append(os.path.join(this_dir, "../"))
- # pylint: disable-next=wrong-import-position,import-error,no-name-in-module
- from lib.py.utils import ip # noqa: E402
-+# pylint: disable-next=wrong-import-position,import-error,no-name-in-module
-+from lib.py.ksft import ksft_pr # noqa: E402
- 
- libc = ctypes.cdll.LoadLibrary('libc.so.6')
- setns = libc.setns
-@@ -61,7 +63,7 @@ def netns_socket(netns, *sock_args):
-         # send resulting socket to parent
-         socket.send_fds(u0, [], [sock.fileno()])
- 
--        sys.exit(0)
-+        os._exit(0)
- 
-     # receive socket from child
-     _, fds, _, _ = socket.recv_fds(u1, 0, 1)
-@@ -72,7 +74,7 @@ def netns_socket(netns, *sock_args):
- 
- def collect_pcaps():
-     """Stop tcpdump processes and move their pcaps into the log dir."""
--    print("Stopping network packet captures")
-+    ksft_pr("Stopping network packet captures")
-     for proc, tmp_path, dest_path, fno in tcpdump_procs:
-         proc.terminate()
-         proc.wait()
-@@ -83,8 +85,9 @@ def signal_handler(_sig, _frame):
-     """
-     Test timed out signal handler
-     """
--    print('Test timed out')
-+    ksft_pr("Test timed out")
-     collect_pcaps()
-+    print("not ok 1 rds selftest")
-     sys.exit(1)
- 
- #Parse out command line arguments.  We take an optional
-@@ -146,7 +149,8 @@ for net in [NET0, NET1]:
-     # pylint: disable-next=consider-using-with
-     p = subprocess.Popen(
-         ['ip', 'netns', 'exec', net,
--         '/usr/sbin/tcpdump', '-i', 'any', '-w', pcap_tmp])
-+         '/usr/sbin/tcpdump', '-i', 'any', '-w', pcap_tmp],
-+         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-     tcpdump_procs.append((p, pcap_tmp, pcap, fd))
- 
- # simulate packet loss, duplication and corruption
-@@ -155,6 +159,9 @@ for net, iface in [(NET0, VETH0), (NET1, VETH1)]:
-          corrupt {PACKET_CORRUPTION} loss {PACKET_LOSS} duplicate  \
-          {PACKET_DUPLICATE}")
- 
-+print("TAP version 13")
-+print("1..1")
-+
- # add a timeout
- if args.timeout > 0:
-     signal.alarm(args.timeout)
-@@ -193,7 +200,7 @@ nr_recv = 0
- 
- while nr_send < NUM_PACKETS:
-     # Send as much as we can without blocking
--    print("sending...", nr_send, nr_recv)
-+    ksft_pr("sending...", nr_send, nr_recv)
-     while nr_send < NUM_PACKETS:
-         send_data = hashlib.sha256(
-             f'packet {nr_send}'.encode('utf-8')).hexdigest().encode('utf-8')
-@@ -215,7 +222,7 @@ while nr_send < NUM_PACKETS:
-             raise
- 
-     # Receive as much as we can without blocking
--    print("receiving...", nr_send, nr_recv)
-+    ksft_pr("receiving...", nr_send, nr_recv)
-     while nr_recv < nr_send:
-         for fileno, eventmask in ep.poll():
-             receiver = fileno_to_socket[fileno]
-@@ -237,7 +244,7 @@ while nr_send < NUM_PACKETS:
-         ip(f"netns exec {net} /usr/sbin/sysctl net.rds.tcp.rds_tcp_rcvbuf=10000")
-         ip(f"netns exec {net} /usr/sbin/sysctl net.rds.tcp.rds_tcp_sndbuf=10000")
- 
--print("done", nr_send, nr_recv)
-+ksft_pr("done", nr_send, nr_recv)
- 
- # the Python socket module doesn't know these
- RDS_INFO_FIRST = 10000
-@@ -260,25 +267,34 @@ for s in sockets:
-                 # ignore
-                 pass
- 
--print(f"getsockopt(): {nr_success}/{nr_error}")
-+ksft_pr(f"getsockopt(): {nr_success}/{nr_error}")
- collect_pcaps()
- 
- # We're done sending and receiving stuff, now let's check if what
- # we received is what we sent.
-+ret = 0
- for (sender, receiver), send_hash in send_hashes.items():
-     recv_hash = recv_hashes.get((sender, receiver))
- 
-     if recv_hash is None:
--        print("FAIL: No data received")
--        sys.exit(1)
-+        ksft_pr("FAIL: No data received")
-+        ret = 1
-+        break
- 
-     if send_hash.hexdigest() != recv_hash.hexdigest():
--        print("FAIL: Send/recv mismatch")
--        print("hash expected:", send_hash.hexdigest())
--        print("hash received:", recv_hash.hexdigest())
--        sys.exit(1)
+-	priv->num_tx_queues = num_tx_qs;
+-	netif_set_real_num_rx_queues(dev, num_rx_qs);
+-	priv->num_rx_queues = num_rx_qs;
 -
--    print(f"{sender}/{receiver}: ok")
--
--print("Success")
--sys.exit(0)
-+        ksft_pr("FAIL: Send/recv mismatch")
-+        ksft_pr("hash expected:", send_hash.hexdigest())
-+        ksft_pr("hash received:", recv_hash.hexdigest())
-+        ret = 1
-+        break
-+
-+    ksft_pr(f"{sender}/{receiver}: ok")
-+
-+if ret == 0:
-+    ksft_pr("Success")
-+    print("ok 1 rds selftest")
-+else:
-+    print("not ok 1 rds selftest")
-+
-+ksft_pr(f"Totals: pass:{1-ret} fail:{ret} skip:0")
-+sys.exit(ret)
+ 	err = gfar_alloc_tx_queues(priv);
+ 	if (err)
+ 		goto tx_alloc_failed;
 -- 
-2.25.1
+2.54.0
 
 
