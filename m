@@ -1,149 +1,144 @@
-Return-Path: <netdev+bounces-281702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281703-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aNA7Ditp8GkITAEAu9opvQ
-	(envelope-from <netdev+bounces-281702-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 10:00:43 +0200
+	id IPd5N1Fo8GkITAEAu9opvQ
+	(envelope-from <netdev+bounces-281703-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 09:57:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3B8F47F80B
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 10:00:37 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 876B747F680
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 09:57:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BA0E3306882B
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 07:53:56 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4FD9130089BD
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 07:56:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C8E72F532F;
-	Tue, 28 Apr 2026 07:53:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E28C313520;
+	Tue, 28 Apr 2026 07:56:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PnArU3iX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WqtVNFWp"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f73.google.com (mail-ua1-f73.google.com [209.85.222.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45572EA48F
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 07:53:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56D81F4181
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 07:56:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777362835; cv=none; b=NwE0JJ4Dzz7mdnhNN2I17xZG7Bm2fyk200rlWlbSBD6BX5u3L9KJ/WQYa4ng1Ir1tRfN977z6PQdO23Pf4pu/0CF4a/wSaLGIZBgOZ2tdWHZyCTPM4qVZNt+2VEZWyI470mWH7dPyUMo8jvomHhip/3YoRK2mh/logLKY4xu1D4=
+	t=1777363017; cv=none; b=Z4fWrOx37yjUgKevxkid6p6hIwKIb3gvMTRIYxBhh9ANMfSwew2nVj1p/toiGL+P9LebTC4gd6dQgfJuUT1BEnkdLkE0z0PffzuGB6LmlRjorpuQ4nUgkq7HggqYrWMF4KEyYici9ub84Iv+Jp3ctfG9w67WkCBdXf6y5CEuOQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777362835; c=relaxed/simple;
-	bh=W2ux99vm/YR+fWjrnwRiZup/PYxG31SHUrlOrY3Sk+k=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=eVTiu09LcgMre+8rMh+HBeyM0y51Hl+dSqP+Hk7uT3axu/nMATtn2eIySmG4Q+YWM0R6pd+BzUzFNEWgojtvUlYcSmaL/P1Lo/bfKl3SDEoH7spmq2biq0cirW7oad0UoxImAezyIm5gXs3RPKZxD6jF/5w0kbH4I+8Ntyl93Vk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PnArU3iX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777362832;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2t/FQHBc4YwiSUDHUyxx0oj6pNb+ROc36MbcJMBmi8w=;
-	b=PnArU3iXndl5/Aeu4z3kvaIEI1fYQnri6vMqhGWlpcIvFlwEMiXDBtnIOvXt68PwfuHL3a
-	pwixevJcPMxCQ6HtMMyq46sqU7UmB+bTfzc2HuSfkeYHavHicv8Dk+qqpY1P3C0IdQOXK+
-	J5sdNVLI3F2zm6XxaOQ3I4tNDGN2RVM=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-536-qsX_92UiPIah9O2Y47wL1A-1; Tue,
- 28 Apr 2026 03:53:49 -0400
-X-MC-Unique: qsX_92UiPIah9O2Y47wL1A-1
-X-Mimecast-MFC-AGG-ID: qsX_92UiPIah9O2Y47wL1A_1777362827
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 07E78195609F;
-	Tue, 28 Apr 2026 07:53:47 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.32.126])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 49B09195608E;
-	Tue, 28 Apr 2026 07:53:42 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20260428024400.123337-1-ebiggers@kernel.org>
-References: <20260428024400.123337-1-ebiggers@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: dhowells@redhat.com, netdev@vger.kernel.org,
-    linux-afs@lists.infradead.org,
-    Marc Dionne <marc.dionne@auristor.com>, linux-crypto@vger.kernel.org,
-    linux-kernel@vger.kernel.org,
-    "David S . Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next 0/5] Consolidate FCrypt and PCBC code into net/rxrpc/
+	s=arc-20240116; t=1777363017; c=relaxed/simple;
+	bh=D02i9B/3K0svXTWT3+HTVy7iiU7dDftgrHhsn6yyDIQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=eq3cmw2KlpZCS2PYb7XdQ7DEkkHYDthjBXYX2daqrmevY8uZR+0DRvuDr8C4S3A3pZbA0O8amJeB7fxPE9NPnuVNx5FeiEsDyRTWdaWLy1IAcHEJEjojS+07MQkh9WJ9GNd/W/ARGfRtkjzfFvuZofOyTP/uUS6SI1pv4sUlCUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WqtVNFWp; arc=none smtp.client-ip=209.85.222.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-ua1-f73.google.com with SMTP id a1e0cc1a2514c-953e9d7ba08so4931738241.0
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 00:56:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777363011; x=1777967811; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YxJE6nEhuOle2E7GTG6uCrQ/Tnnsutz6TiuiHWgFoFg=;
+        b=WqtVNFWpVK/BcjmoIDU1glSPts14JjB/YfrawLs2775vLhr1aAanCosIgIxydtuZtW
+         4zoOpwtULEnPfftDLnTstFy0pcJ6PSWm1enERpF+cDZkaGwHKno0csfdjt55DlDyPTYC
+         ikRsul57PkuH2hBmOJa8UHJL90PWuwciO125Nu+8Xilhinb/DRcUsG4qoHVzaBw6fPGj
+         /BeWmP86dsV08OsEK7BIud/8FLyyylILcO1g5siF4h/blymg/Ci1FcO/BZVHwKefCyc1
+         nZs9YMRB0Lt3AzynFi2s6ySGg+nu2r4me3zBMGzkgTeWqm/viGlyqF9eJ+XYckwu8uXw
+         HtPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777363011; x=1777967811;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YxJE6nEhuOle2E7GTG6uCrQ/Tnnsutz6TiuiHWgFoFg=;
+        b=ERuhWJc1D4nqqEAHhELlLqoFCMk4HQlcSM2ikkh+g7fZckQrc7uYrlIHCpoHzwlwsM
+         ZdUxSLk9TZj1e7nX617CfBW7/QhcdCyj537R5Y8dTPpRqHzze7JCI7vsg0bPdwPEwwYc
+         Rj2eygk+yDuMckiP9rCytIfP938E78Y4eeBg3jqDnRJDnDZT1TK0bIiAhU3KBDfDvl58
+         RS/jf14jKQMaJJBLkHaP9aE0lLEQgnW/TAmEvoPfb1zpASiSwlGlI3SDpMkEG/u06o/W
+         NTQz0fzmVQUdXHsR6MdOxOQuqqH+17Cj19yd+yARGkYUo9GM83LKNv0rdVAKuzgylvo5
+         Petw==
+X-Forwarded-Encrypted: i=1; AFNElJ+OOBS04al1UqJSck4bSyOWl+t3MKX4vpRCMqA6LdQlykBGynRKmc7Qu4Fhet7UZMBf8xa1Oio=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUnwvdqfBsyR/NfgxfC1p9P3c5I0jcVa+Ws9NzYugmcUiHdnsj
+	2MN5wvjvqKD1Iovsl6xDYt4WZCbyhaZ4fOGJF6A66W5I69NdSMbkDcNqHQ0p2lvBTwzj2EHNPj+
+	libryvYbTsaK28g==
+X-Received: from uabiq10.prod.google.com ([2002:a05:6130:628a:b0:954:990d:c8d3])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a67:e709:0:b0:607:97ef:4dae with SMTP id ada2fe7eead31-6280a3a7ea9mr602717137.16.1777363011269;
+ Tue, 28 Apr 2026 00:56:51 -0700 (PDT)
+Date: Tue, 28 Apr 2026 07:56:47 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <772373.1777362820.1@warthog.procyon.org.uk>
-Date: Tue, 28 Apr 2026 08:53:40 +0100
-Message-ID: <772374.1777362820@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
-X-Rspamd-Queue-Id: F3B8F47F80B
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
+Message-ID: <20260428075647.3206962-1-edumazet@google.com>
+Subject: [PATCH iproute2-next] ll_map: add RTEXT_FILTER_SKIP_STATS to ll_init_map()
+From: Eric Dumazet <edumazet@google.com>
+To: David Ahern <dsahern@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 876B747F680
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281702-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,google.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281703-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RSPAMD_EMAILBL_FAIL(0.00)[dhowells.redhat.com:query timed out];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[warthog.procyon.org.uk:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-Eric Biggers <ebiggers@kernel.org> wrote:
+ll_init_map() only cares about names and ifindex.
 
-> [This series applies to v7.1-rc1 and is intended to be taken via
-> net-next.  Patches 4-5 could be left for later if desired.]
-> 
-> The FCrypt "block cipher" and the PCBC mode of operation are obsolete
-> and insecure.  Since their only user is net/rxrpc/, they belong there,
-> not in the crypto API.
-> 
-> Therefore, this series removes these algorithms from the crypto API and
-> replaces them with local implementations in net/rxrpc/.
-> 
-> The local implementations are simpler too, as they avoid the crypto API
-> boilerplate.
-> 
-> I don't know how to test all the code in net/rxrpc/, but everything
-> should still work.  I added a KUnit test for the crypto functions.
+We can save ~300 bytes per device if we ask the kernel to skip stats,
+not counting many cpu cycles if per-cpu stats are involved.
 
-It seems to work, so apart from the two points I noted, you can add:
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ lib/ll_map.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-	Acked-by: David Howells <dhowells@redhat.com>
-
-It looks like it might be slightly faster, but I think the overhead reduction
-is not that visible with all the other things the filesystem and protocol do
-plus I/O overhead.  RxGK is a lot faster and more secure, so we should be
-moving that way anyway.
-
-David
+diff --git a/lib/ll_map.c b/lib/ll_map.c
+index 8970c20f3cddedcdd1a6f522858fa350d2df8e5b..07937e27d4f6fb5506a3da6e9318270635224364 100644
+--- a/lib/ll_map.c
++++ b/lib/ll_map.c
+@@ -391,7 +391,9 @@ void ll_init_map(struct rtnl_handle *rth)
+ 	if (initialized)
+ 		return;
+ 
+-	if (rtnl_linkdump_req(rth, AF_UNSPEC) < 0) {
++	if (rtnl_linkdump_req_filter(rth, AF_UNSPEC,
++				     RTEXT_FILTER_VF |
++				     RTEXT_FILTER_SKIP_STATS) < 0) {
+ 		perror("Cannot send dump request");
+ 		exit(1);
+ 	}
+-- 
+2.54.0.545.g6539524ca2-goog
 
 
