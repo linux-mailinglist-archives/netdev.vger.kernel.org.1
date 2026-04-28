@@ -1,222 +1,182 @@
-Return-Path: <netdev+bounces-281642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281643-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qGxMNT1F8Gn2QwEAu9opvQ
-	(envelope-from <netdev+bounces-281642-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 07:27:25 +0200
+	id WxCeFF1F8GkyRAEAu9opvQ
+	(envelope-from <netdev+bounces-281643-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 07:27:57 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FAB047D8EF
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 07:27:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C18B947D906
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 07:27:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0ECB2306966A
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 05:23:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 76D6F3027B6C
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 05:24:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F0ED324B31;
-	Tue, 28 Apr 2026 05:23:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0B633128B6;
+	Tue, 28 Apr 2026 05:24:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=malat-biz.20251104.gappssmtp.com header.i=@malat-biz.20251104.gappssmtp.com header.b="CAKoDJv+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j/QxpjUs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE86B2F39C2
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 05:23:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777353819; cv=pass; b=G3JjZIozy47F3m2xCWnDWwOeyjFezqNHh2RSCUfJeOMfxBwCAH9pX7e9N/oFl5XX1ppAIeeHQuipW9xBgwY9JQHP3uT+ct7a+RSx/a/Xzm7ah2B8vHqrC0Cthgo83yC8fnB7B2ooJvhYMgiSpRs1st5VWJx4XjLVRJmChuIerHE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777353819; c=relaxed/simple;
-	bh=uajCEi49W2h0HvEuTqtnXBGCBBSENxiSGia3jyoNuCg=;
-	h=From:MIME-Version:Date:Message-ID:Subject:To:Cc:Content-Type; b=dpUusL9xG9FMbPPwgJWcrfuWEjUXwr6sdgRbG2V9oeGKIyeym9BPKchWkg6G31SLshWlgJ8Ba8x+Ls0Njvh9UHRYWAGCGclH9+3XmKYxlK/3W3L7PSM9wWonPfHl0uFVD7Ry07IzaZnNf964Mc90oAt9qm5iQZ4EX3No1DUJQPc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=malat.biz; spf=none smtp.mailfrom=malat.biz; dkim=pass (2048-bit key) header.d=malat-biz.20251104.gappssmtp.com header.i=@malat-biz.20251104.gappssmtp.com header.b=CAKoDJv+; arc=pass smtp.client-ip=209.85.221.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=malat.biz
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=malat.biz
-Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-56f72d27e7eso10074942e0c.0
-        for <netdev@vger.kernel.org>; Mon, 27 Apr 2026 22:23:36 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777353815; cv=none;
-        d=google.com; s=arc-20240605;
-        b=LKr0tV15izuVlbR1PWkvhMLgb9qXjc/kSvb8piEOqk9ODq9RJfJAm8mI12GWwH7Ido
-         DcvCshEdJQMkVpbxz1uPxZ7ddt8mO+/8JCKWZRhztkl51VoUgL4Uz8p+OqJsbQMNAvfH
-         T2OhZcvpwRB2VS9BkfBKVSYo/V14KUACjqSaACeNcKpYv0wjovkecY/HiRzSBpTe57CF
-         TYaDn0Pn8SrPhLTxV++vuG+nB/3LmIbrNebbKJ/oa3DH7KciV2fE1OUJ2acWO23+m33u
-         0BUQTWRKt6lF72Z4TqwG8VHUqfa+L56gqs35qPPlSHNRVJa7FEPwLCssyT+PzQN06s9T
-         zERA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:mime-version:from:dkim-signature;
-        bh=qv9GGMzP087RibmUlugnFmVc/vUOGPhG1CWzpjoEmjk=;
-        fh=n5o73Ao9bYK01CZd698aS12kaMs4gS0V2lVzY7Ebm6A=;
-        b=ZyEl6v3ZtZGKl6y/yhAKqc4LjpsbwOgJ9rA6soa0GAmvH5TafZvKriGgcjbHtqyOv0
-         WvFh+na8hP+574Z4XN9fMjR8fCokWcAYT4QrZllu/zbqUZCLeKOMGsZddMI4mpK9PXi7
-         z2y4Dyr9QMR53Huj6edxyuITj3zti4Bte6oJIFVWpZXBSzu9TOyYzPulndywD2rGnnL2
-         b7u3VCyAREMis2J3+Z20jdsDCtsJb2/R2F1xY2b7GJu43XogwsZq/J28J0wvK6HwU2Zj
-         wqgvTsZjnKg3g1Nf5iGBh5LWszakYZHN4Tac1yZZp4t+kjLnujc3qgsJzz1TvJ8mxt8/
-         33tA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=malat-biz.20251104.gappssmtp.com; s=20251104; t=1777353815; x=1777958615; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:mime-version:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=qv9GGMzP087RibmUlugnFmVc/vUOGPhG1CWzpjoEmjk=;
-        b=CAKoDJv+lczM/xjMp9ntPyTsPnytxGD9ds4/OjcEyZkx0k3BdAqgybK7bmlGpOX2Uo
-         otqF7NyG7KWR+pUYwnq+WPkf99IsFQV0F4c3GOkFnSxIRMgE5+TUsdYyPXDwux39BUjI
-         RFskbh/54Ba+oxGtmE+lD1UFetHPd4e0rkCDYHXyuSIO0B6Luu8Cs07rQqHtemm1J3MU
-         ku+B/CrOwbk8yLEOvtFtaMmrep/uYzVAXY1IiZCBIiG6b03zzDNsZf9cUZTYlsNVNcZa
-         5eIiw8H89kCa7UlhNWXsstp6DVigvriKnENYuKoDrF907uvyCgInQEojUjMCKhmb0HAB
-         bN7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777353815; x=1777958615;
-        h=cc:to:subject:message-id:date:mime-version:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qv9GGMzP087RibmUlugnFmVc/vUOGPhG1CWzpjoEmjk=;
-        b=JJfAw06+DejOMWmTrU6/li+uE8Xdf6Au+DKOD4+t1fXDFbcaE7wsMOp2S4/KOuvDrK
-         Mm9hz1mTTNa1SwJVPb9JnMsTRn3wsjdcc+iWIoFndW5htkx5y01AbreUOjvJPowesvPv
-         5FMO4yW+MLc1yCydT1j1s+zL/rR6M0rNXw+ArkknijjbT524NXYk00eL7n/yCkff3+/K
-         7WR6B5udNpJRuShmpC2oKaUMEjYi6tlGnxA1q2EecqDFr/mgK+nJu2aO3R2mxIvULb3s
-         ycK3Iq42j67nSoZmajgegu3IP35HTxW2iCGpPhMWtH3GUgZ/NzM+0E7xgDD6k709Vwqg
-         MM1w==
-X-Gm-Message-State: AOJu0YzHYeinzSO06cpu91h3n0UyyaiF8x31ZnT+ElomIwUFN5lNG1dG
-	7N1e47JigoiLLfe22i/RA6zJ3ctHX8z9JFVJncuxYA8wgjeOUq5v79GSYzQBSMCX6I2KKn2RiuN
-	vfTE2f+WYP4+fkXjI0HN5xYnFhQIIeKH0AU7bF5Ao5uVFUexFi0Q=
-X-Gm-Gg: AeBDiev8gBuW0+HbTLdsMzZw6kXdIL4h/8WlNIW9mFz+T64COgmF+B8nSuw8KW6Qd01
-	Sehvb6azLBotv5zjty6zHLYQt+KtlxDWLe0nf66etfMgY/3vrUFYL8uuUauyaMc3fKS3wFZbMaB
-	z83CI+vM5z0p/QDteV7PqBs3lSUVyRfBnWQKEnAXBtGnRIinE+RIxsH1CY1+/+CY2xjL5dT1vno
-	NlTrPm4/2ZOaOLxBrEmH603F8YWb0D71bMIUpeBXQFs/ksRxANFdhpY9wsXXgwfYTjO/s72p69Z
-	2cOWBFxmuzwuhxLbGw==
-X-Received: by 2002:a05:6102:f83:b0:5fd:eacf:27df with SMTP id
- ada2fe7eead31-6280720b3f6mr501659137.10.1777353815543; Mon, 27 Apr 2026
- 22:23:35 -0700 (PDT)
-Received: from 753933720722 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 27 Apr 2026 22:23:33 -0700
-Received: from 753933720722 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 27 Apr 2026 22:23:33 -0700
-From: Petr Malat <oss@malat.biz>
-X-Mailer: git-send-email 2.47.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE04130C62E
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 05:24:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777353866; cv=none; b=ECaLhXwEzMm1JBVpDlBqPk+zdFGVc7nIwhct4nzyFC2KJd19UYTudGcULPdOh1rzDG8lIQFme/fn5COJ627zIr9QX5I2zq2DVwoVND6qvNQS1uN4j9HfCv01PlH4uqDK0nbtqZBl2FB/E9zEkYq9welR5TyvF739jQ+M0B8MYKg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777353866; c=relaxed/simple;
+	bh=1UkRQ1r97l+xc61Uq3I8d6KMQlkth8YQu7hGa3Ydr5M=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=hosp2jZEavS7mJPHerxRbikWckl2d0L0IkJivP8qzVeYolxTtCESY0/WoymW/R6gtcBY8YwF3H8fJOhd7bqqUKxDs61LpLu+XdqLfhUwnu5oQ1Sqati4kPTSGVMiPz5qgvOB+/vAV7PfH4kZDnp6h8xefV5lyIYx+tQTQ1wUOYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j/QxpjUs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB5B1C2BCAF;
+	Tue, 28 Apr 2026 05:24:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777353866;
+	bh=1UkRQ1r97l+xc61Uq3I8d6KMQlkth8YQu7hGa3Ydr5M=;
+	h=From:Date:Subject:To:Cc:From;
+	b=j/QxpjUsfYCizp9tzn4Wf73emzAquwIAOatTVkshO+HVt9Z7TzmvHCnywq0UK1XJH
+	 8b22M8Wcrlf9V+mMHB/1hzp0r1PIGOGzxoH+Ao/NwML/A5OLna/miDqaAG8Pp8Cxnl
+	 N9Zf0lkAx5IlWID0kWWKwzWH+1kjHT3P/d3VPJZ/RZ8Vl5+U1y9WkAAeXDHjPMxoEF
+	 nn9MPyGtylN2mXgVVbNYZPPAFr1PXgq2OYfG5IsxByvRsvy0bVI+s8Y0oKkKvRVLEc
+	 ZeQTIGJGHCRiEgdXa4xnObotSz0w6W7zQdBwWQvO54ZyqmSmkm+JuWcPV/x0BpKum2
+	 ULuGkKgMR1+mg==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Tue, 28 Apr 2026 07:23:38 +0200
+Subject: [PATCH net-next] net: airoha: Rename get_src_port_id callback in
+ get_sport
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 27 Apr 2026 22:23:33 -0700
-X-Gm-Features: AVHnY4JN5qqSjHJColGZxCF2Ql4mCiCtCmhkouhZmiKr2RG1FWucysWVZaWZoe4
-Message-ID: <CANMuvJn15HHBrq8EEbhSfCk-Sn33WEEovRa-yVWF5huTKfoOYA@mail.gmail.com>
-Subject: [PATCH] net: datagram: Drain queue before reporting EOF or ENOTCONN
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, ebiggers@google.com, 
-	Petr Malat <oss@malat.biz>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 7FAB047D8EF
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260428-airoha-get_src_port_id-callback-v1-1-3f765c91c1e8@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3N0QqDMAxA0V+RPC/gwuzcfmVIiTXTMGklLUMQ/
+ 31lj+fl3gOymEqGZ3OAyVezplhxvTQQFo6zoE7VQC259kY9slpaGGcpPlvwW7LidcLA6zpy+KD
+ ryElPIz+6O9TKZvLW/X94QZSCUfYCw3n+AOhPGEN7AAAA
+X-Change-ID: 20260428-airoha-get_src_port_id-callback-6526e82ba957
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.3
+X-Rspamd-Queue-Id: C18B947D906
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[malat-biz.20251104.gappssmtp.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DMARC_NA(0.00)[malat.biz];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,malat-biz.20251104.gappssmtp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281643-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[oss@malat.biz,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281642-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[malat-biz.20251104.gappssmtp.com:+]
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-If a packet is queued and RCV_SHUTDOWN flag is set after the function
-__skb_wait_for_more_packets() checked the queue, the function returns
-EOF, which is then propagated by __unix_dgram_recvmsg() and the user
-reads EOF although there is a message or messages still pending.
+For code consistency, rename get_src_port_id callback in get_sport.
+Please note this patch does not introduce any logical change and it is
+just a cosmetic patch.
 
-The function should check if the queue is empty before returning EOF.
-As the same is true for disconnect and it's also reasonable for a pending
-signal, check in a common place before returning from the function.
-
-Signed-off-by: Petr Malat <oss@malat.biz>
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- net/core/datagram.c | 38 +++++++++++++++++++++-----------------
- 1 file changed, 21 insertions(+), 17 deletions(-)
+ drivers/net/ethernet/airoha/airoha_eth.c | 10 +++++-----
+ drivers/net/ethernet/airoha/airoha_eth.h |  2 +-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/net/core/datagram.c b/net/core/datagram.c
-index c285c6465923..5952950f7233 100644
---- a/net/core/datagram.c
-+++ b/net/core/datagram.c
-@@ -98,40 +98,44 @@ int __skb_wait_for_more_packets(struct sock *sk,
-struct sk_buff_head *queue,
- 	/* Socket errors? */
- 	error = sock_error(sk);
- 	if (error)
--		goto out_err;
-+		goto out;
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index 2bb0a3ff9810..56441b99448a 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -1813,7 +1813,7 @@ static int airoha_set_gdm2_loopback(struct airoha_gdm_port *port)
+ 	airoha_fe_clear(eth, REG_FE_VIP_PORT_EN, BIT(AIROHA_GDM2_IDX));
+ 	airoha_fe_clear(eth, REG_FE_IFC_PORT_EN, BIT(AIROHA_GDM2_IDX));
+ 
+-	src_port = eth->soc->ops.get_src_port_id(port, port->nbq);
++	src_port = eth->soc->ops.get_sport(port, port->nbq);
+ 	if (src_port < 0)
+ 		return src_port;
+ 
+@@ -3187,7 +3187,7 @@ static const char * const en7581_xsi_rsts_names[] = {
+ 	"xfp-mac",
+ };
+ 
+-static int airoha_en7581_get_src_port_id(struct airoha_gdm_port *port, int nbq)
++static int airoha_en7581_get_sport(struct airoha_gdm_port *port, int nbq)
+ {
+ 	switch (port->id) {
+ 	case AIROHA_GDM3_IDX:
+@@ -3240,7 +3240,7 @@ static const char * const an7583_xsi_rsts_names[] = {
+ 	"xfp-mac",
+ };
+ 
+-static int airoha_an7583_get_src_port_id(struct airoha_gdm_port *port, int nbq)
++static int airoha_an7583_get_sport(struct airoha_gdm_port *port, int nbq)
+ {
+ 	switch (port->id) {
+ 	case AIROHA_GDM3_IDX:
+@@ -3288,7 +3288,7 @@ static const struct airoha_eth_soc_data en7581_soc_data = {
+ 	.num_xsi_rsts = ARRAY_SIZE(en7581_xsi_rsts_names),
+ 	.num_ppe = 2,
+ 	.ops = {
+-		.get_src_port_id = airoha_en7581_get_src_port_id,
++		.get_sport = airoha_en7581_get_sport,
+ 		.get_vip_port = airoha_en7581_get_vip_port,
+ 	},
+ };
+@@ -3299,7 +3299,7 @@ static const struct airoha_eth_soc_data an7583_soc_data = {
+ 	.num_xsi_rsts = ARRAY_SIZE(an7583_xsi_rsts_names),
+ 	.num_ppe = 1,
+ 	.ops = {
+-		.get_src_port_id = airoha_an7583_get_src_port_id,
++		.get_sport = airoha_an7583_get_sport,
+ 		.get_vip_port = airoha_an7583_get_vip_port,
+ 	},
+ };
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
+index e389d2fe3b86..1a052b898816 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.h
++++ b/drivers/net/ethernet/airoha/airoha_eth.h
+@@ -578,7 +578,7 @@ struct airoha_eth_soc_data {
+ 	int num_xsi_rsts;
+ 	int num_ppe;
+ 	struct {
+-		int (*get_src_port_id)(struct airoha_gdm_port *port, int nbq);
++		int (*get_sport)(struct airoha_gdm_port *port, int nbq);
+ 		u32 (*get_vip_port)(struct airoha_gdm_port *port, int nbq);
+ 	} ops;
+ };
 
- 	if (READ_ONCE(queue->prev) != skb)
- 		goto out;
+---
+base-commit: 790ead9394860e7d70c5e0e50a35b243e909a618
+change-id: 20260428-airoha-get_src_port_id-callback-6526e82ba957
 
- 	/* Socket shut down? */
--	if (sk->sk_shutdown & RCV_SHUTDOWN)
--		goto out_noerr;
-+	if (sk->sk_shutdown & RCV_SHUTDOWN) {
-+		error = 1;
-+		goto check_queue;
-+	}
-
- 	/* Sequenced packets can come disconnected.
- 	 * If so we report the problem
- 	 */
--	error = -ENOTCONN;
- 	if (connection_based(sk) &&
--	    !(sk->sk_state == TCP_ESTABLISHED || sk->sk_state == TCP_LISTEN))
--		goto out_err;
-+	    !(sk->sk_state == TCP_ESTABLISHED || sk->sk_state == TCP_LISTEN)) {
-+		error = -ENOTCONN;
-+		goto check_queue;
-+	}
-
- 	/* handle signals */
--	if (signal_pending(current))
--		goto interrupted;
-+	if (signal_pending(current)) {
-+		error = sock_intr_errno(*timeo_p);
-+		goto check_queue;
-+	}
-
--	error = 0;
- 	*timeo_p = schedule_timeout(*timeo_p);
- out:
-+	*err = error < 0 ? error : 0;
- 	finish_wait(sk_sleep(sk), &wait);
- 	return error;
--interrupted:
--	error = sock_intr_errno(*timeo_p);
--out_err:
--	*err = error;
--	goto out;
--out_noerr:
--	*err = 0;
--	error = 1;
-+check_queue:
-+	/* A packet may have arrived between the initial queue check and any
-+	 * of the early-exit conditions above.  Return 0 to let the caller
-+	 * drain the queue before acting on the shutdown / disconnect / signal.
-+	 */
-+	if (READ_ONCE(queue->prev) != skb)
-+		error = 0;
- 	goto out;
- }
- EXPORT_SYMBOL(__skb_wait_for_more_packets);
+Best regards,
 -- 
-2.47.3
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
