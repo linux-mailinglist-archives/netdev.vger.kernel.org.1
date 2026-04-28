@@ -1,389 +1,261 @@
-Return-Path: <netdev+bounces-281748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281740-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EM/GBGB/8GlSUAEAu9opvQ
-	(envelope-from <netdev+bounces-281748-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:35:28 +0200
+	id GMF7KMGC8GlwUQEAu9opvQ
+	(envelope-from <netdev+bounces-281740-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:49:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 900D1481883
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:35:27 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id B496B481D70
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:49:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 79DAE30B0C49
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 09:27:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 93F4C306BE2A
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 09:11:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FF0738CFFE;
-	Tue, 28 Apr 2026 09:26:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B063E2764;
+	Tue, 28 Apr 2026 09:09:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AyiXbNuO"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="oxd16e8J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9535388380
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 09:26:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E383E1CE6
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 09:09:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777368410; cv=none; b=bkNJDWWrX+kdi+GOFw/GCP6mudP5IBnToGR6ytN3WtEtEGBSv+htHY7bLB93mCVe7FUcRF/kLy1toVsxjnx7MnRXDbPkV6PsXyYO3i1ZF0iSodTytLy/UHtJ4tQBP5SrtiW2mhqPpSOBQdnB3l4RHOM1RQRDiVzwdlr/xL0T5pQ=
+	t=1777367388; cv=none; b=jUhCb7kAHAaF3c3CkViuwlAZaQM6tM+bnzZ0PkE03zJtgkjUt8mtmHgJOV4z8d40iuiG4meGCeJz92i/5Cl5hQvhro6XZS/9qKbHnwF8iF4guuIUW+dpfEt+JEk/Xh8u+juYKo1N+gjhrMFKtIvEsoJfPmKe2AotsDBC1jhGkSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777368410; c=relaxed/simple;
-	bh=NYUhNoy1ne+FsvmNjLoXVWXCjfK5z2wSkDTMyfF8clo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=sT7iUElqwwGmAitY7zPqWZShwFLJAYPBcY90w2Rjm7JFafBAzDfY/SGdJm315EBzIua5uiVPsK8Sv0P0M3LgoYXkxIsdyINmRN3yg3z10TQx7MFe0WWQnlzydMICdvltLji2nWMtvsba1CTY7tbyemsW3dUPcyk3ur9Tp2PRMc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AyiXbNuO; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777368403; x=1808904403;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=NYUhNoy1ne+FsvmNjLoXVWXCjfK5z2wSkDTMyfF8clo=;
-  b=AyiXbNuOyIIt6a6Ek87gTi4yc9DZinrY2Y12wVhKs6SDmY9klvWuL36g
-   ACi4XWxxrE14rXyY92YtpMi4nXyZ7BWtNwyyw5RsumPk+GHRdDSfd9jtb
-   0x7LkuTJ7L0ioPKH5CseVJoT5qSd2pXwSd7PMA6hLXLXpyDglWPtCVNnF
-   RjbbJFdKYILyO8GpoDWUQ0Aop4FCnp4JDOMBF+9JLOPaIV03GPMpCoCLH
-   DDFSVMf8vMUAhGAAU0ktAqYVA5acpwsN5I6E0Rly433erBCpCy+x/5ZSE
-   n69wYBGOH0/YzwMQ64ryviLlau5rOLLJATFE6WzGKdjsARXeC5/qNkn1x
-   Q==;
-X-CSE-ConnectionGUID: kxDoo5EMSuuW5sle8Ju1gQ==
-X-CSE-MsgGUID: utSD97R2Q9G+8dB8pOugLw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11769"; a="103731769"
-X-IronPort-AV: E=Sophos;i="6.23,203,1770624000"; 
-   d="scan'208";a="103731769"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2026 02:26:38 -0700
-X-CSE-ConnectionGUID: B8+rAFe9SRCrZ80f3/XrXw==
-X-CSE-MsgGUID: r/yyPObMSe6dG0p16Q4vpg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,203,1770624000"; 
-   d="scan'208";a="237861395"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa003.jf.intel.com with ESMTP; 28 Apr 2026 02:26:34 -0700
-Received: from vecna.igk.intel.com (vecna.igk.intel.com [10.123.220.17])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 1CC4428194;
-	Tue, 28 Apr 2026 10:26:32 +0100 (IST)
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-To: netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>
-Cc: intel-wired-lan@lists.osuosl.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Lukasz Czapnik <lukasz.czapnik@intel.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>,
-	Simon Horman <horms@kernel.org>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-Subject: [PATCH net-next 2/2] ice: use shared devlink to store ice_adapters instead of custom xarray
-Date: Tue, 28 Apr 2026 11:09:12 +0200
-Message-Id: <20260428090912.3461-3-przemyslaw.kitszel@intel.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20260428090912.3461-1-przemyslaw.kitszel@intel.com>
-References: <20260428090912.3461-1-przemyslaw.kitszel@intel.com>
+	s=arc-20240116; t=1777367388; c=relaxed/simple;
+	bh=ndV9HO4TrB7UH4OQaqRqhxadXpb2M84IgFY4mR7mxMY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=l6Ns22vGkTx1kIktNM7ykJ8MLakAjs5Wc9Aw3ukHszFC8kdc8lHYWTvXsqs8Zb9SHd/KtEkhTlN5NyK/8GFPsw/UmIt2a1w6zdjRp8Usu+S/r57tMSpk1pjU6FiHO5Hb6TRaqL7AaUTtmmDaKkXoHinbIKboaVB1pRya3L/SWWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=oxd16e8J; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4891e5b9c1fso96001215e9.2
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 02:09:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=grsecurity.net; s=grsec; t=1777367384; x=1777972184; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uv+T7Qd810LVMbQvEtvpybibnpScTbWBpv7OZ6oXHZE=;
+        b=oxd16e8JM587DpH50wb73izUKuxGy6KNMTHCm0SnzHK9useMwvOq913/8vzpeiZUNH
+         s6q1s/yrWI/C3elj1lF+DrvrgMnSeURx5pIi9SyTXsn2k3OjEXTBkfKXabQNDBel8CGS
+         g9+4rWSTOYN1sDRr45Y6pWnAYmDUYtKx47v1JElDdv1yQXg2oAtBgsGt9rfRNtxrjOmk
+         rr1WO2LfqavyJPvrOoukwdnx4S04P3jhK4+vHZerVIgPIABYM2uCgNaTbCjct3UBACeq
+         AbaugpzsOAQe1eGu4XddPK+bT7iwZu7GQF6gZtJ+V3pqilFk5zIqexJT5Q7kA+QeFPo4
+         0oVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777367384; x=1777972184;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uv+T7Qd810LVMbQvEtvpybibnpScTbWBpv7OZ6oXHZE=;
+        b=o9YispK1pAF6Ss0wp4ZjZDzjLbNjI9w3XfTRQmULHTe/O4Mopw8yf6cMc4ULD0HBXw
+         Y+m3rNP8GA9c+KDpxVSk9IB5+KAj6zscrnYM77kpK6stNLfOQmdr8zMCkqJ9wFz8Pxbz
+         U5pekNCj5A2j0BmNox4Y8ctT8S7lZh2Zv65rj2/BG2eaC4zkxzT5yQTS/3IBiXNqtoMv
+         yOOcNgSvSUhRGDM0Qi79Qyz5BDD+f+psVuZ0H3rx7sMsOOANfe7Yb2M/iQTAaMXWLqG4
+         5IoPzGo2Tx1XZqa9VOiIxNtA3SQVv2wxtYtd+BbqHUSGjkIRKVxk/RycyKRpHPyL9T5G
+         Vy+A==
+X-Forwarded-Encrypted: i=1; AFNElJ9ZoV2KE0DsNGuBHpN6gJ4ukrdoE/mF3hFi/n0UkJBldi0mbbMTcoNuhRlseyojnx+fDm9uzIc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeG85T1ylkKAeb/kTfvVxj8nZ9XjhidJsMswaAFCWnT7vFrvbK
+	Mx/XuHSDXLR+7gcj993ew3QyZsEJ0ZaWEpU2hoV9JgMo0pBpTFUuxonJTI/GScwbQQU=
+X-Gm-Gg: AeBDievuokIJVMZlBfXy6DsNRgOLNyapM/YB7PNIXBCpaszOe78/CF8chIso5Od23Fe
+	mYrkoCwWwnRIwnd5gAicX8vo384E+R6p57DBCaLShI6sT+18MzyD4fnm8pOarB5Nr7wXj7VMoNO
+	+4ks/7yDzZ2ocEL1bTzfUo551KtNxG/R3y1h2za9brJscHvoezg97DY52oYJLYJu2zeZWisjpHC
+	WVC29K7wnruqbv6sy9pKWBo1iPBk5kzo+lFmKD2s95Pv1qopDEoVJDoBJtr2intAJ+cfwxajVI7
+	jkz4TD3gaNyQEcmlyaiFZWt6uMOl/6dlRG9AAVhTmVKSgB90VAjWldtBcJ8FHqNVawGIN/YM4CO
+	RzYb8EfLvQkvfFhqVxOXJeRnTlyq6kWI+MCKYnOL/s7Uqz79e92+qBAN28CF0IYbOKA4V2gZ4JY
+	s+0cREUScEem8w+2sTp/sZBenJb3vXam/uPttXDeg/kIrnbb8qRUjlMXFV3SYnPacsTn5yIDE6o
+	Z9pACf05LMNUl11M+u6H6XB4odHEQ==
+X-Received: by 2002:a05:600c:c177:b0:48a:5301:bb5c with SMTP id 5b1f17b1804b1-48a77b12a49mr30418175e9.16.1777367383438;
+        Tue, 28 Apr 2026 02:09:43 -0700 (PDT)
+Received: from bell.fritz.box (p200300faaf260200051aef03a698a1fc.dip0.t-ipconnect.de. [2003:fa:af26:200:51a:ef03:a698:a1fc])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a775defe4sm29070145e9.7.2026.04.28.02.09.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Apr 2026 02:09:42 -0700 (PDT)
+From: Mathias Krause <minipli@grsecurity.net>
+To: netfilter-devel@vger.kernel.org
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	netdev@vger.kernel.org,
+	Mathias Krause <minipli@grsecurity.net>
+Subject: [PATCH net] netfilter: nf_nat: avoid invalid nat_net pointer use on failed nf_nat_init()
+Date: Tue, 28 Apr 2026 11:09:17 +0200
+Message-ID: <20260428090917.3851366-1-minipli@grsecurity.net>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 900D1481883
+X-Rspamd-Queue-Id: B496B481D70
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[grsecurity.net,none];
+	R_DKIM_ALLOW(-0.20)[grsecurity.net:s=grsec];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-281740-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-281748-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[przemyslaw.kitszel@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[grsecurity.net:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[minipli@grsecurity.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,grsecurity.net:email,grsecurity.net:dkim,grsecurity.net:mid]
 
-Refactor our storage and deduplication logic of ice_adapters by moving
-it to be handled by shared devlink instance, recently added by
-Jiri Pirko [1].
+We ran into below KASAN splat, which is mostly uninteresting, beside
+for having nf_nat_register_fn() in the call chain as a cause for the
+offending access:
 
-We wanted the devlink instance for whole device anyway - later in the
-series I will add devlink resources under it.
+==================================================================
+BUG: KASAN: slab-out-of-bounds in nf_nat_register_fn+0x5f9/0x640
+Read of size 8 at addr ffff890031e54c20 by task iptables/9510
 
-Make the shared devlink a parent (wrt. nesting) of the actual PF devices.
+CPU: 0 UID: 0 PID: 9510 Comm: iptables Not tainted 6.18.18-grsec-full-20260320181326 #1 PREEMPT(voluntary)
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+Call Trace:
+ <TASK>
+ […] dump_stack_lvl+0xee/0x160 ffff88004117eeb8
+ […] print_report+0x6e/0x640 ffff88004117eee0
+ […] ? __phys_addr+0x8e/0x140 ffff88004117eef0
+ […] ? kasan_addr_to_slab+0x51/0xe0 ffff88004117ef08
+ […] ? complete_report_info+0xec/0x1c0 ffff88004117ef20
+ […] ? nf_nat_register_fn+0x5f9/0x640 ffff88004117ef48
+ […] kasan_report+0xbc/0x140 ffff88004117ef50
+ […] ? nf_nat_register_fn+0x5f9/0x640 ffff88004117ef90
+ […] nf_nat_register_fn+0x5f9/0x640 ffff88004117eff8
+ […] ? nf_nat_icmp_reply_translation+0x6e0/0x6e0 ffff88004117f070
+ […] nf_tables_register_hook.part.0+0xa0/0x220 ffff88004117f080
+ […] nf_tables_addchain.constprop.0+0x1054/0x1fc0 ffff88004117f0b8
+ […] ? nft_chain_lookup.part.0+0x4ce/0xac0 ffff88004117f130
+ […] ? nf_tables_abort+0x3d80/0x3d80 ffff88004117f190
+ […] ? nf_tables_dumpreset_obj+0x100/0x100 ffff88004117f1c8
+ […] ? nft_table_lookup.part.0+0x255/0x300 ffff88004117f310
+ […] ? nf_tables_newchain+0x21a4/0x2fa0 ffff88004117f358
+ […] nf_tables_newchain+0x21a4/0x2fa0 ffff88004117f360
+ […] ? nf_tables_addchain.constprop.0+0x1fc0/0x1fc0 ffff88004117f458
+ […] ? nla_get_range_signed+0x4a0/0x4a0 ffff88004117f488
+ […] ? lock_acquire+0x16f/0x320 ffff88004117f490
+ […] ? find_held_lock+0x3b/0xe0 ffff88004117f4b0
+ […] ? __nla_parse+0x45/0x80 ffff88004117f500
+ […] nfnetlink_rcv_batch+0xbca/0x19a0 ffff88004117f550
+ […] ? nfnetlink_net_exit_batch+0x120/0x120 ffff88004117f618
+ […] ? __sanitizer_cov_trace_switch+0x63/0xe0 ffff88004117f720
+ […] ? gr_acl_handle_mmap+0x1c4/0x320 ffff88004117f7c0
+ […] ? nla_get_range_signed+0x4a0/0x4a0 ffff88004117f7e8
+ […] ? gr_is_capable+0x6f/0xe0 ffff88004117f830
+ […] ? __nla_parse+0x45/0x80 ffff88004117f860
+ […] ? skb_pull+0x103/0x1a0 ffff88004117f880
+ […] nfnetlink_rcv+0x3db/0x4a0 ffff88004117f8b0
+ […] ? nfnetlink_rcv_batch+0x19a0/0x19a0 ffff88004117f8d8
+ […] ? netlink_lookup+0xe2/0x240 ffff88004117f900
+ […] netlink_unicast+0x74b/0xb00 ffff88004117f930
+ […] ? netlink_attachskb+0xb20/0xb20 ffff88004117f980
+ […] ? __check_object_size+0x3e/0xaa0 ffff88004117f998
+ […] ? security_netlink_send+0x51/0x160 ffff88004117f9c8
+ […] netlink_sendmsg+0xa03/0x1200 ffff88004117f9f8
+ […] ? netlink_unicast+0xb00/0xb00 ffff88004117fa70
+ […] ? netlink_unicast+0xb00/0xb00 ffff88004117fac8
+ […] ? ____sys_sendmsg+0xe2a/0x1040 ffff88004117faf8
+ […] ____sys_sendmsg+0xe2a/0x1040 ffff88004117fb00
+ […] ? kernel_recvmsg+0x300/0x300 ffff88004117fb60
+ […] ? reacquire_held_locks+0xe9/0x260 ffff88004117fbc8
+ […] ___sys_sendmsg+0x138/0x200 ffff88004117fbf8
+ […] ? do_recvmmsg+0x7e0/0x7e0 ffff88004117fc30
+ […] ? lockdep_hardirqs_on_prepare+0x101/0x1e0 ffff88004117fc50
+ […] ? lock_acquire+0x16f/0x320 ffff88004117fd20
+ […] ? lock_acquire+0x16f/0x320 ffff88004117fd58
+ […] ? find_held_lock+0x3b/0xe0 ffff88004117fd70
+ […] __sys_sendmsg+0x17a/0x260 ffff88004117fdc8
+ […] ? __sys_sendmsg_sock+0x80/0x80 ffff88004117fdf0
+ […] ? syscall_trace_enter+0x15e/0x2c0 ffff88004117fe98
+ […] do_syscall_64+0x7d/0x400 ffff88004117fec8
+ […] entry_SYSCALL_64_safe_stack+0x4a/0x60 ffff88004117fef8
+ </TASK>
+==================================================================
 
-[1] commit 411ad0605875 ("Merge branch 'devlink-introduce-shared-devlink-instance-for-pfs-on-same-chip'")
-[1]  https://lore.kernel.org/all/20260312100407.551173-1-jiri@resnulli.us
-Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+The out-of-bounds report, though, is a red herring as it is for an
+access that shouldn't have happened in the first place.
+
+When nf_nat_init() fails to register its BPF kfuncs, it'll unwind and,
+among others, call unregister_pernet_subsys() to deregister its per-net
+ops. This makes the previously allocated net id available for reuse by
+the next caller of register_pernet_subsys(), in our case, synproxy.
+However, 'nat_net_id' will still hold the previously allocated value.
+
+If nf_nat.o gets build as a module, all this doesn't matter. A failed
+initialization routine makes the module fail to load and any dependent
+module won't be able to load either. However, if nf_nat.o is built-in,
+a failing init won't /completely/ make its functionality unavailable to
+dependent modules, namely the code and static data is still there, free
+to be called by modules like nft_chain_nat.ko.
+
+Case in point, nft_chain_nat registers hooks that'll call into nf_nat
+which, in our case, failed to initialize and therefore won't have a
+valid net id nor related net_nat object any more.
+
+Code in nf_nat, namely nf_nat_register_fn() and nf_nat_unregister_fn(),
+still making use of the reallocated net id, lead to a type confusion as
+the call to net_generic() will no longer return memory belonging to an
+object suited to fit 'struct nat_net' but 'struct synproxy_net' instead.
+The latter is only 24 bytes on 64-bit systems, much smaller than struct
+nat_net which is 176 bytes, perfectly explaining the OOB KASAN report.
+
+Detect and handle a failed nf_nat_init() by testing the 'nf_nat_hook'
+pointer which will be reset to NULL on initialization errors to prevent
+the usage of an invalid nat_net pointer.
+
+As this check is only needed when nf_nat.o is built-in, guard it by
+'#ifndef MODULE...'.
+
+Fixes: cbc1dd5b659f ("netfilter: nf_nat: Fix possible memory leak in nf_nat_init()")
+Signed-off-by: Mathias Krause <minipli@grsecurity.net>
 ---
-CC: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_adapter.h  | 13 +--
- .../net/ethernet/intel/ice/devlink/devlink.c  |  3 +
- drivers/net/ethernet/intel/ice/ice_adapter.c  | 95 ++++++-------------
- drivers/net/ethernet/intel/ice/ice_main.c     |  4 +-
- 4 files changed, 42 insertions(+), 73 deletions(-)
+ net/netfilter/nf_nat_core.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.h b/drivers/net/ethernet/intel/ice/ice_adapter.h
-index e95266c7f20b..d4ec7e78abb4 100644
---- a/drivers/net/ethernet/intel/ice/ice_adapter.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adapter.h
-@@ -6,7 +6,8 @@
+diff --git a/net/netfilter/nf_nat_core.c b/net/netfilter/nf_nat_core.c
+index 3b5434e4ec9c..76a150b9d418 100644
+--- a/net/netfilter/nf_nat_core.c
++++ b/net/netfilter/nf_nat_core.c
+@@ -1187,6 +1187,16 @@ int nf_nat_register_fn(struct net *net, u8 pf, const struct nf_hook_ops *ops,
+ 	struct nf_hook_ops *nat_ops;
+ 	int i, ret;
  
- #include <linux/types.h>
- #include <linux/spinlock_types.h>
--#include <linux/refcount_types.h>
++#ifndef MODULE
++	/* If nf_nat_core is built-in and nf_nat_init() fails, dependent
++	 * modules like nft_chain_nat.ko may still call this function.
++	 * However, nat_net would be invalid, likely pointing to some other
++	 * per-net structure.
++	 */
++	if (WARN_ON_ONCE(!nf_nat_hook))
++		return -EOPNOTSUPP;
++#endif
 +
-+#include <net/devlink.h>
+ 	if (WARN_ON_ONCE(pf >= ARRAY_SIZE(nat_net->nat_proto_net)))
+ 		return -EINVAL;
  
- struct pci_dev;
- struct ice_pf;
-@@ -27,27 +28,26 @@ struct ice_port_list {
- 
- /**
-  * struct ice_adapter - PCI adapter resources shared across PFs
-- * @refcount: Reference count. struct ice_pf objects hold the references.
-+ * @devlink: ice adapter's devlink (whole dev devlink)
-  * @ptp_gltsyn_time_lock: Spinlock protecting access to the GLTSYN_TIME
-  *                        register of the PTP clock.
-  * @txq_ctx_lock: Spinlock protecting access to the GLCOMM_QTX_CNTX_CTL register
-  * @ctrl_pf: Control PF of the adapter
-  * @ports: Ports list
-- * @index: 64-bit index cached for collision detection on 32bit systems
-  */
- struct ice_adapter {
--	refcount_t refcount;
-+	struct devlink *devlink;
-+
- 	/* For access to the GLTSYN_TIME register */
- 	spinlock_t ptp_gltsyn_time_lock;
- 	/* For access to GLCOMM_QTX_CNTX_CTL register */
- 	spinlock_t txq_ctx_lock;
- 
- 	struct ice_pf *ctrl_pf;
- 	struct ice_port_list ports;
--	u64 index;
- };
- 
- struct ice_adapter *ice_adapter_get(struct pci_dev *pdev);
--void ice_adapter_put(struct pci_dev *pdev);
-+void ice_adapter_put(struct ice_adapter *adapter);
- 
- #endif /* _ICE_ADAPTER_H */
-diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-index 641d6e289d5c..f6382d038048 100644
---- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-@@ -1750,7 +1750,10 @@ struct ice_sf_priv *ice_allocate_sf(struct device *dev, struct ice_pf *pf)
- void ice_devlink_register(struct ice_pf *pf)
- {
- 	struct devlink *devlink = priv_to_devlink(pf);
-+	struct ice_adapter *adapter = pf->adapter;
- 
-+	if (adapter)
-+		devl_nested_devlink_set(adapter->devlink, devlink);
- 	devl_register(devlink);
- }
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/ethernet/intel/ice/ice_adapter.c
-index cbb57060bd56..8ec1b600905f 100644
---- a/drivers/net/ethernet/intel/ice/ice_adapter.c
-+++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
-@@ -1,18 +1,13 @@
- // SPDX-License-Identifier: GPL-2.0-only
- // SPDX-FileCopyrightText: Copyright Red Hat
- 
--#include <linux/cleanup.h>
--#include <linux/mutex.h>
- #include <linux/pci.h>
- #include <linux/slab.h>
- #include <linux/spinlock.h>
--#include <linux/xarray.h>
-+
- #include "ice_adapter.h"
- #include "ice.h"
- 
--static DEFINE_XARRAY(ice_adapters);
--static DEFINE_MUTEX(ice_adapters_mutex);
--
- #define ICE_ADAPTER_FIXED_INDEX	BIT_ULL(63)
- 
- #define ICE_ADAPTER_INDEX_E825C	\
-@@ -40,44 +35,36 @@ static u64 ice_adapter_index(struct pci_dev *pdev)
- 	}
- }
- 
--static unsigned long ice_adapter_xa_index(struct pci_dev *pdev)
--{
--	u64 index = ice_adapter_index(pdev);
--
--#if BITS_PER_LONG == 64
--	return index;
--#else
--	return (u32)index ^ (u32)(index >> 32);
--#endif
--}
--
--static struct ice_adapter *ice_adapter_new(struct pci_dev *pdev)
-+static int ice_adapter_init(void *priv, void *init_param)
- {
--	struct ice_adapter *adapter;
-+	struct ice_adapter *adapter = priv;
-+	struct devlink *devlink;
- 
--	adapter = kzalloc_obj(*adapter);
--	if (!adapter)
--		return NULL;
-+	devlink = shd_priv_to_devlink(adapter);
-+	adapter->devlink = devlink;
- 
--	adapter->index = ice_adapter_index(pdev);
- 	spin_lock_init(&adapter->ptp_gltsyn_time_lock);
- 	spin_lock_init(&adapter->txq_ctx_lock);
--	refcount_set(&adapter->refcount, 1);
- 
- 	mutex_init(&adapter->ports.lock);
- 	INIT_LIST_HEAD(&adapter->ports.ports);
- 
--	return adapter;
-+	return 0;
- }
- 
--static void ice_adapter_free(struct ice_adapter *adapter)
-+static void ice_adapter_fini(void *priv)
- {
-+	struct ice_adapter *adapter = priv;
-+
- 	WARN_ON(!list_empty(&adapter->ports.ports));
- 	mutex_destroy(&adapter->ports.lock);
--
--	kfree(adapter);
- }
- 
-+static const struct devlink_ops ice_adapter_devlink_ops = {
-+	.shd_init = ice_adapter_init,
-+	.shd_fini = ice_adapter_fini,
-+};
-+
- /**
-  * ice_adapter_get - Get a shared ice_adapter structure.
-  * @pdev: Pointer to the pci_dev whose driver is getting the ice_adapter.
-@@ -94,28 +81,19 @@ static void ice_adapter_free(struct ice_adapter *adapter)
- struct ice_adapter *ice_adapter_get(struct pci_dev *pdev)
- {
- 	struct ice_adapter *adapter;
--	unsigned long index;
--	int err;
--
--	index = ice_adapter_xa_index(pdev);
--	scoped_guard(mutex, &ice_adapters_mutex) {
--		adapter = xa_load(&ice_adapters, index);
--		if (adapter) {
--			refcount_inc(&adapter->refcount);
--			WARN_ON_ONCE(adapter->index != ice_adapter_index(pdev));
--			return adapter;
--		}
--		err = xa_reserve(&ice_adapters, index, GFP_KERNEL);
--		if (err)
--			return ERR_PTR(err);
--
--		adapter = ice_adapter_new(pdev);
--		if (!adapter) {
--			xa_release(&ice_adapters, index);
--			return ERR_PTR(-ENOMEM);
--		}
--		xa_store(&ice_adapters, index, adapter, GFP_KERNEL);
--	}
-+	struct devlink *devlink;
-+	char devlink_id[32];
-+	u64 index;
-+
-+	index = ice_adapter_index(pdev);
-+	snprintf(devlink_id, sizeof(devlink_id), "%llx", index);
-+	devlink = devlink_shd_get(devlink_id, &ice_adapter_devlink_ops,
-+				  sizeof(*adapter), NULL, pdev->dev.driver);
-+	if (!devlink)
-+		return ERR_PTR(-ENOMEM);
-+
-+	adapter = devlink_shd_get_priv(devlink);
-+
- 	return adapter;
- }
- 
-@@ -128,20 +106,7 @@ struct ice_adapter *ice_adapter_get(struct pci_dev *pdev)
-  *
-  * Context: Process, may sleep.
-  */
--void ice_adapter_put(struct pci_dev *pdev)
-+void ice_adapter_put(struct ice_adapter *adapter)
- {
--	struct ice_adapter *adapter;
--	unsigned long index;
--
--	index = ice_adapter_xa_index(pdev);
--	scoped_guard(mutex, &ice_adapters_mutex) {
--		adapter = xa_load(&ice_adapters, index);
--		if (WARN_ON(!adapter))
--			return;
--		if (!refcount_dec_and_test(&adapter->refcount))
--			return;
--
--		WARN_ON(xa_erase(&ice_adapters, index) != adapter);
--	}
--	ice_adapter_free(adapter);
-+	devlink_shd_put(adapter->devlink);
- }
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 6ebaa41127a4..6e257ad13bd1 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -5349,7 +5349,7 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
- unroll_dev_init:
- 	need_dev_deinit = true;
- unroll_adapter:
--	ice_adapter_put(pdev);
-+	ice_adapter_put(adapter);
- unroll_hw_init:
- 	ice_deinit_hw(hw);
- 	if (need_dev_deinit)
-@@ -5462,7 +5462,7 @@ static void ice_remove(struct pci_dev *pdev)
- 	ice_setup_mc_magic_wake(pf);
- 	ice_set_wake(pf);
- 
--	ice_adapter_put(pdev);
-+	ice_adapter_put(pf->adapter);
- 	ice_deinit_hw(&pf->hw);
- 
- 	ice_deinit_dev(pf);
 -- 
-2.39.3
+2.47.3
 
 
