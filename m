@@ -1,147 +1,230 @@
-Return-Path: <netdev+bounces-281992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281993-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MDwADM3m8GmoagEAu9opvQ
-	(envelope-from <netdev+bounces-281992-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:56:45 +0200
+	id 4EacD+vl8Gm+awEAu9opvQ
+	(envelope-from <netdev+bounces-281993-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:52:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93D80489727
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:56:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F50F4895F3
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:52:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 916FC32361D8
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:34:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9AC44303103E
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:39:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C87D833F369;
-	Tue, 28 Apr 2026 16:33:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C03563264F4;
+	Tue, 28 Apr 2026 16:39:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JUAPbehr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LbWgqLM0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73EDC33D6D5
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 16:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC583254BD;
+	Tue, 28 Apr 2026 16:39:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777394019; cv=none; b=UveT9wsPt7T7rfDyOOmyRSJJOlzsgSfxrsijI5msI5vTOFoNNvY/vJJMQQ7X84c8lpP09v4ffKOV7j3OpfLutIP4FqZP3aSaIbJEynbGCH9QKiD2+Em76Xpo3bJAooHWebdKoH78IF78ka5Y4At0zCPUMrjMnaFK+R3R+P2ZxhQ=
+	t=1777394353; cv=none; b=QQig1OQN+byHI8gJMMNikIZF3ErcsYtn3V/uAYg4j+ib4iyUS/tcG1WaUITKGWxccSuxbj8d54TApJoMEsDplzXsABPuF4/CG9FB7ynLp5+eSLFGn3kGHzLRhxCXYANd3iT9fgyAAaW6yn8TxQTl4lgTV5cqetd7yoKbUskuQb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777394019; c=relaxed/simple;
-	bh=LJcDzkbzMgg8a2Np1026O9dXp+J1K4xRgXPvw4T8nj8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=JD4KErH8My1YVgmeAV+2qNXSA7+PPTg/hx5Cfnyr95zpR2RMskfpErdNtQvRKxUZbY/LNAtF7PgbDQHzsoKm3pO/0sN3KEx185rcadOH5m7poygzSV7eeH8EPJ8Y8fSyj4v0IirXxYTF/uj+eb3VPJ4EuR5uGnTGNSUmyx5San0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JUAPbehr; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 1D2994E42B61;
-	Tue, 28 Apr 2026 16:33:37 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id DED77601DF;
-	Tue, 28 Apr 2026 16:33:36 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8B6AB10728F25;
-	Tue, 28 Apr 2026 18:33:33 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1777394015; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=F+fWRHMku/NSooDweeu7yQQBqEo3+O1KjKNJurnc3pg=;
-	b=JUAPbehrAEqoCKk6RRoYgY0gTNvrT88yQJNJ0tcYE4KQBuAaAYSUZuLgx9kP8/3z5V99+l
-	i3EDiPwoCTEh76Io3nH/OyHHZHL+TA4Fjof/0CgM539l4cOaBXHRDwCW07dV2gpm4HT7gS
-	sVUpht/NHaJtCbYL398M0UVCztFD/IIQXKf/sJ79R/Sbw+x8QqmKJoYSLeAgoY8NJU6JDp
-	DPbYgkWgVNE3i8EfB4pdTTIK9Kx0dyjpKx03mUHKSqQdryYUjq9slpNsuhW8zy0VdV+WvH
-	YQBqyfpO9Ou5WOByLNRiThaeEa6JDW/SrkRCQCazT/It+mQUZBhsw6W35DK5xQ==
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Date: Tue, 28 Apr 2026 18:33:00 +0200
-Subject: [PATCH net v2 4/4] net: macb: increment stats.tx_dropped on DMA
- map error
+	s=arc-20240116; t=1777394353; c=relaxed/simple;
+	bh=8BKRz7v9LJXyy81HqR7ppCe82BxQLZvK6fQh/te99Q0=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=crvzRtRMqflujVaNgmXrazT6NqvM59VKwAHYk+K7JV6JBpoX0DI1x8eJeIytY0ZVVJZugSqSe5qQUjT6lvRoq3xPqloFbIb/2cZKvIkcB8Q8UaZ0eTs18GRLTTer4r2NG0coWnBARkcgY2wErMT3AfrtaAal+YCTmt4HOyyKDpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LbWgqLM0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5F11C2BCB5;
+	Tue, 28 Apr 2026 16:39:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777394353;
+	bh=8BKRz7v9LJXyy81HqR7ppCe82BxQLZvK6fQh/te99Q0=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=LbWgqLM0EZUA3GY/PMsHH/Li2bl6tAUr8o+6EKI/37s3xsX0kRxRkc1JwrODF7O6o
+	 DsXZ0J8INB2Ei944mX5Fw7v46MiMD33pV85U9ArSmmtgsjzQ3Bz/aqjaMk2+a6Hwaj
+	 IkgtRDtRFLscvTXN5oGtOAui5LM+oku48d4v6kfXKQC6ZEq0Zd19qiZRwz8L3NissX
+	 RwocNvXABE8PgS6Inc9WYqIJiAQCg04T7q/mg8uGhfKLWLdFzcnBFmua+2XDJ9Ynq8
+	 1oeKBZCU/DEQKDXtI8Ct3L7QtZ4iWtAi6cIot+ZTXIcf1oMR/D5M0hxaNjNB6wzl52
+	 kA5kARZQsU/Ag==
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 02F36F4006C;
+	Tue, 28 Apr 2026 12:39:12 -0400 (EDT)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-01.internal (MEProxy); Tue, 28 Apr 2026 12:39:12 -0400
+X-ME-Sender: <xms:r-LwaZJ9VwAYp-HSd9E_zA4pIem45ubJmK8OK2RgGxW6NCOgLF_9OA>
+    <xme:r-Lwaf92OPqSMaRr0cREjOJkJHga95mYbrt3gKVLVgc4Pfa5iUfP_WDwHEEhmkxR1
+    lAK1a8YzabvglCrbQqIgPa4vIA_qUr3CHa6Ty5fMXrBbIrd7pV4GXye>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdekvddtiecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdetrhguuceu
+    ihgvshhhvghuvhgvlhdfuceorghruggssehkvghrnhgvlhdrohhrgheqnecuggftrfgrth
+    htvghrnhepvdeuheeitdevtdelkeduudetgffftdelteefteevjeevjeeiheefhfejieej
+    fedunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hrugdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeijedthedttdejledq
+    feefvdduieegudehqdgrrhgusgeppehkvghrnhgvlhdrohhrghesfihorhhkohhfrghrug
+    drtghomhdpnhgspghrtghpthhtohepudeipdhmohguvgepshhmthhpohhuthdprhgtphht
+    thhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheptdigjehfge
+    ehgegtgeeisehgmhgrihhlrdgtohhmpdhrtghpthhtohepuggrvhhiugdrlhgrihhghhht
+    rdhlihhnuhigsehgmhgrihhlrdgtohhmpdhrtghpthhtohephhgvrhgsvghrthesghhonh
+    guohhrrdgrphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopegvughumhgriigvthesghho
+    ohhglhgvrdgtohhmpdhrtghpthhtohepkhhunhhihihusehgohhoghhlvgdrtghomhdprh
+    gtphhtthhopehntggrrhgufigvlhhlsehgohhoghhlvgdrtghomhdprhgtphhtthhopegu
+    shgrhhgvrhhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvsghighhgvghrsheskh
+    gvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:r-LwaVRAuC3uv127vQ7lJ1MJgW-jXmLqlqb2qsKmWVBy0lCOA_Hhew>
+    <xmx:r-LwaftZ52LBe-9Orv4CyFF4bgOXPbHTVL01UUxU_eVZWYl5lbpBBw>
+    <xmx:r-LwabLXaXN57PSJKh1HqVB1rYE0nv7kvUornNc2H0D6HNddG3K2Tw>
+    <xmx:r-LwabeMdB1294RwC4CL_kIqG8QbXAQ9UZBkChGvTq1L4BBYPlJapQ>
+    <xmx:r-LwaVX2tWXAx8guspGyT7cwDA33mexqWXt9TRTD3S4dt7C5WvDCBPRx>
+Feedback-ID: ice86485a:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id D66AE700065; Tue, 28 Apr 2026 12:39:11 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260428-macb-drop-tx-v2-4-647f5199d8df@bootlin.com>
-References: <20260428-macb-drop-tx-v2-0-647f5199d8df@bootlin.com>
-In-Reply-To: <20260428-macb-drop-tx-v2-0-647f5199d8df@bootlin.com>
-To: Nicolas Ferre <nicolas.ferre@microchip.com>, 
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Haavard Skinnemoen <hskinnemoen@atmel.com>, Jeff Garzik <jeff@garzik.org>
-Cc: Paolo Valerio <pvalerio@redhat.com>, Conor Dooley <conor@kernel.org>, 
- Nicolai Buchwitz <nb@tipi-net.de>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, 
- Gregory CLEMENT <gregory.clement@bootlin.com>, 
- =?utf-8?q?Beno=C3=AEt_Monin?= <benoit.monin@bootlin.com>, 
- Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, 
- stable@vger.kernel.org
-X-Mailer: b4 0.15.2
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: 93D80489727
+Date: Tue, 28 Apr 2026 18:38:51 +0200
+From: "Ard Biesheuvel" <ardb@kernel.org>
+To: "David Laight" <david.laight.linux@gmail.com>
+Cc: "Eric Biggers" <ebiggers@kernel.org>, netdev@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ "Eric Dumazet" <edumazet@google.com>, "Neal Cardwell" <ncardwell@google.com>,
+ "Kuniyuki Iwashima" <kuniyu@google.com>,
+ "David S . Miller" <davem@davemloft.net>, "David Ahern" <dsahern@kernel.org>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Simon Horman" <horms@kernel.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>,
+ "Herbert Xu" <herbert@gondor.apana.org.au>,
+ "Dmitry Safonov" <0x7f454c46@gmail.com>
+Message-Id: <97b79659-5fa1-4085-8c2b-3140fb663acc@app.fastmail.com>
+In-Reply-To: <20260428111008.6ab7981b@pumpkin>
+References: <20260427172727.9310-1-ebiggers@kernel.org>
+ <20260427172727.9310-3-ebiggers@kernel.org> <20260428022445.65e14a27@pumpkin>
+ <bab8b5b6-6ee7-4e0b-9999-becf8f28ce71@app.fastmail.com>
+ <20260428111008.6ab7981b@pumpkin>
+Subject: Re: [PATCH net-next v2 2/5] net/tcp-ao: Use crypto library API instead of
+ crypto_ahash
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 9F50F4895F3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.65 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281992-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281993-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[app.fastmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,google.com,davemloft.net,redhat.com,zx2c4.com,gondor.apana.org.au,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ardb@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:email,bootlin.com:dkim,bootlin.com:mid]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
 
-On .ndo_start_xmit() and DMA mapping failure, increment the Tx dropped
-statistics counter by one.
 
-Fixes: 89e5785fc8a6 ("[PATCH] Atmel MACB ethernet driver")
-Cc: stable@vger.kernel.org
-Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
----
- drivers/net/ethernet/cadence/macb_main.c | 2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index ba7cbb10dc2c..353b4bd61aae 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -2567,6 +2567,8 @@ static netdev_tx_t macb_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	/* Map socket buffer for DMA transfer */
- 	if (macb_tx_map(bp, queue, skb, hdrlen)) {
- 		dev_kfree_skb_any(skb);
-+		queue->stats.tx_dropped++;
-+		bp->dev->stats.tx_dropped++;
- 		goto unlock;
- 	}
- 
+On Tue, 28 Apr 2026, at 12:10, David Laight wrote:
+> On Tue, 28 Apr 2026 08:34:47 +0200
+> "Ard Biesheuvel" <ardb@kernel.org> wrote:
+>
+>> On Tue, 28 Apr 2026, at 03:24, David Laight wrote:
+>> > On Mon, 27 Apr 2026 10:27:24 -0700
+>> > Eric Biggers <ebiggers@kernel.org> wrote:
+>> >  
+>> >> Currently the kernel's TCP-AO implementation does the MAC and KDF
+>> >> computations using the crypto_ahash API.  This API is inefficient and
+>> >> difficult to use, and it has required extensive workarounds in the form
+>> >> of per-CPU preallocated objects (tcp_sigpool) to work at all.
+>> >> 
+>> >> Let's use lib/crypto/ instead.  This means switching to straightforward
+>> >> stack-allocated structures, virtually addressed buffers, and direct
+>> >> function calls.  It also means removing quite a bit of error handling.
+>> >> This makes TCP-AO quite a bit faster.
+>> >> 
+>> >> This also enables many additional cleanups, which later commits will
+>> >> handle: removing tcp-sigpool, removing support for crypto_tfm cloning,
+>> >> removing more error handling, and replacing more dynamically-allocated
+>> >> buffers with stack buffers based on the now-statically-known limits.
+>> >> 
+>> >> Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+>> >> Signed-off-by: Eric Biggers <ebiggers@kernel.org>  
+>> > ...  
+>> >> @@ -344,33 +444,26 @@ static int tcp_v4_ao_calc_key(struct tcp_ao_key *mkt, u8 *key,
+>> >>  	struct kdf_input_block {
+>> >>  		u8                      counter;
+>> >>  		u8                      label[6];
+>> >>  		struct tcp4_ao_context	ctx;
+>> >>  		__be16                  outlen;
+>> >> -	} __packed * tmp;  
+>> >
+>> > That looks a bit horrid.
+>> > I also had a feeling that the compiler sometimes rejects non-packed structures
+>> > inside packed ones.
+>> > Perhaps nest the whole thing inside another structure that has an initial
+>> > u8 pad and is marked __packed __aligned(4).
+>> > Then the assignments to the fields of 'ctx' will be known to be aligned
+>> > even when tcp4_ao_context is also __packed.
+>> >  
+>> 
+>> Agree with Eric that this has no bearing on this patch,
+>
+> true - just the in the same code.
+>
+>> but I'm not sure
+>> I see the problem here. 'ctx' will not be packed, and appear misaligned
+>> in struct kdf_input_block, but that would only matter if the address of
+>> the ctx field were taken and passed to a function taking a pointer to
+>> struct tcp4_ao_context (which would expect it to appear naturally
+>> aligned).
+>> 
+>> Having a feeling about what the compiler sometimes rejects is not
+>> actionable feedback - could you be more specific about which problem
+>> you think needs to be solved here? Are you concerned about unaligned
+>> accesses when populating the struct?
+>
+> (It was 2am and the side effects of a cold were stopping me sleeping...)
+>
+> I tend to double-check __packed because it gets misused in places
+> where you really want the compiler to error implicit padding rather
+> than generate expensive misaligned access code.
+>
+> But I am sure I remember some build warning that needed __packed added
+> to the definition of a structure embedded in a __packed structure.
+> I don't think it was only the arm OABI (which pads structures to 2 bytes).
+> Historically this has never mattered (even the 'address of packed member'
+> error is moderately recent - well sometime in the last 20 years).
+>
+> In this case (and the ipv6 code) 'struct tcp4_ao_context' can just be
+> marked __packed.
+> Or, since this is the only place it is used, possibly just inlined
+> into 'struct kdf_input_block' - which may not even need to be named.
+>
 
--- 
-2.54.0
+What would that achieve, exactly? You still haven't explained what is
+wrong with the code. Or are you really claiming that structs lacking
+the packed attribute are not permitted as fields in __packed structs?
+
+
+
+
 
 
