@@ -1,240 +1,164 @@
-Return-Path: <netdev+bounces-281765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281766-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oNDgOpyG8GnuUQEAu9opvQ
-	(envelope-from <netdev+bounces-281765-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 12:06:20 +0200
+	id GCGzMcSG8GnuUQEAu9opvQ
+	(envelope-from <netdev+bounces-281766-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 12:07:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74DB1482354
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 12:06:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 482EA482383
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 12:07:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EE9FC3042BA1
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 10:02:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 90A10301F15B
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 10:03:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F9273E3DA2;
-	Tue, 28 Apr 2026 10:02:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="vZ+vV/f/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9D8A3E0C52;
+	Tue, 28 Apr 2026 10:03:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5689B3E276B;
-	Tue, 28 Apr 2026 10:02:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7866C346ADE
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 10:03:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777370529; cv=none; b=PWd254C5aHad+gZcZw3/QfUvioEHybQ5txMkzZtsfrUju2OStek0jrIaRqaVblTTv1s9pGxbUjE7Cyzh5CtenzMdNgeGFoqKlCz8fehZDkMuukFPu5p3RqzVF0rgZjr0ciQRRNT6P+jC51LcgjJKHDS11JzBgBcYhu7CM6fV33I=
+	t=1777370609; cv=none; b=Zl9fVWm2zXpKh9c4fCjUtY58KNHQ1s3cxUq7Fx3jqU9Cfep300msDB2DXIvv5uo/ufCc6tAhslIz60WHFpctqI+goPNSUjir9t2fBXAd8udRjS3zFafxllV+2rzk3o71SZN2T8yFxGa/ac3dKFVnUH4vbTf7qt+LK3njRPJDZmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777370529; c=relaxed/simple;
-	bh=7wZnek3T2WzkDUClNEn0Q4evHVM7o6mrY/FfK1YGXAs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EcwXk62Smy6N+veuvBpW0D20QncBq/vvs6C4QqGEAeUbCwIFgOBv92Oo3ay9UuFZqaN4JuiTSfpmXgt5FFL90izsISUNlUjP+AdiPfwgM5BEVzwylyGWfEB1q7eh6E3SYW/5qH745fzUtkrMRVH4cml8/1/wECGOjXNfPyKvmGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=vZ+vV/f/; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id EF79060254;
-	Tue, 28 Apr 2026 12:02:01 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1777370522;
-	bh=mX1aKSwyKUDAIurw50IRSKGuAlkO8nsP16/ASR0ldxs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=vZ+vV/f/JRxh0cPRGa3wlOvfVbLbtsfxjccG0rLLOfkFly+ptt3Hr2F08V7vcuJtT
-	 Bi0Pf+eDbdOxgxv+MQiFSGOAqeOfBvvwNgsBU1tHuy9jU866+0p1iaGscWN0SOkRZs
-	 EhXE++jtayzlJt701JfwctW4Lzp/dWNw3ZvDFh5oD1vdNqzA73xalIp4IE235lFXeA
-	 Xhj4iEmbhVopTbpWNdl/z1q4f0nUEal3n7lp0ymDiQSSvqeyZOTGn47xG26KsfGEy7
-	 VJc+NDuOng9gTbNohkziirJf7igXPXzGtzJZiu6a0qlSH3Rc2vUq6FSl4KBHLwzyni
-	 IwvG20crSREsg==
-Date: Tue, 28 Apr 2026 12:01:59 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Mathias Krause <minipli@grsecurity.net>
-Cc: netfilter-devel@vger.kernel.org, Florian Westphal <fw@strlen.de>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] netfilter: nf_nat: avoid invalid nat_net pointer use
- on failed nf_nat_init()
-Message-ID: <afCFlxjOiEs2ouKY@chamomile>
-References: <20260428090917.3851366-1-minipli@grsecurity.net>
+	s=arc-20240116; t=1777370609; c=relaxed/simple;
+	bh=nE2kTc46EAtHp+hzkKm/fM0pnbhHAPrXksUwFRqrq6Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PJ0Do9IFZdChMw32jJHXwDpnHHWt3y/44bPk1n6w294Bp5QEjCEy9ZbE+PRcOe6b5iSCRtDK+G6I/sAm0Qd46wm5FjtTNcm9zXKzQU152Dhf7A3XVTl5HPBZS9erUTDtPM/o8X4I96B/7gaplYhRkASmlypzoCFyZ9/BzZ+FVwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-56d93355337so6871341e0c.0
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 03:03:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777370607; x=1777975407;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gRyHSlueZ2yIa5nhGJ3DTVlj1ZKdcYhWGe6E+g/f2HU=;
+        b=mzCsOwPn64XntBSyJf1GGef0hbKFJWjipJ0RoCYIOAWNjDGo5HQuzM0TgGOgkQvRmy
+         5aMCouyQtn9lNWFHnL/eHOwQ2LmYjNH3Yunuzs2r0wgTEU1WyTdN4sO/oi7YxHmKLueE
+         wUC0YhRjWIiSu6cHc2y7Cu7k6LuIZDyKVDRu/CDAemjJ2P7ycUUQEZk3h2whuR1bfyO+
+         V04Tc9SVXYL7QqILYIxwkJ0JU1kiEjzHEYeyuAAzqo4/MIZLc1AR+JgCIml3rr2dLOi8
+         v2YQHc3tp8hnYJPZdzzC1OEiYBGmNR+2e2+0gc7Kb79nMa6k1FAxgvUtJrQIXP/WLsI3
+         dFgg==
+X-Gm-Message-State: AOJu0YyMLFWYPxQlQhgJm42s72wcRu41yLY2fnCITeyCvYwWX5P0v1GG
+	Qw93X0SAHOzN6ABww37fhV4PvJ8cPpEhE5sGMFeS3mgZHW5upCzRQmyiOoSp9CVY0s0=
+X-Gm-Gg: AeBDiesAJtloWvwhqaHP2HOdc8LWvMJEhS4zjT9hK9s9W0wQXzUFVbpHawnWVgzgnYP
+	UKJxIZpT1RVtht/pD5bDUcvvk6JtSmGPcGFwR+c6TGbQdjWw5kNC12CkypYyu0TvjMvj1jrAdQt
+	mgRP475TLe+FZbtdjsHtoD8qMxi6251Mn7JpzPxQnlGjDppLrjzryoWoYq3OYndL8pc5Ufih+TG
+	9n9QSK08HdrKwgt3zdswETOTQSNZbH+3D3LJqbcakzreHgOi4sNN1TQdgGwrpu/v5poplZ+WqB+
+	EFsVg8Ga7tbcFaBUBzgxXd9WC7h4Y1t8WnPD2ATh4PhhgqzHAiRn1RZX1PWyoKgYw551nzRyJWw
+	3a09AceQwZ5z8Fpo2xYCsshPoEGWY13DvpQw7Fo2fCRu+2x7NBbsblbTclsm/4H2+5Vt+rWhEF6
+	T4cv+cb8wqAEvbl9fG+lAJD1rw5gASJkteQ3vpDxX3oKsdMVWAAo6rWq8gdyR4UVh4K6JjGxguT
+	TgWceboN+64NA==
+X-Received: by 2002:a05:6122:1b8d:b0:56c:3a57:aee2 with SMTP id 71dfb90a1353d-573a557eeedmr990428e0c.6.1777370607234;
+        Tue, 28 Apr 2026 03:03:27 -0700 (PDT)
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com. [209.85.221.176])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-573a3ec0da3sm1398154e0c.0.2026.04.28.03.03.26
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Apr 2026 03:03:26 -0700 (PDT)
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-56f8c77ca6aso7620705e0c.2
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 03:03:26 -0700 (PDT)
+X-Received: by 2002:a05:6102:8029:b0:609:444:eda3 with SMTP id
+ ada2fe7eead31-6280aab5390mr872346137.17.1777370606595; Tue, 28 Apr 2026
+ 03:03:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260428090917.3851366-1-minipli@grsecurity.net>
-X-Rspamd-Queue-Id: 74DB1482354
+References: <20260428024400.123337-1-ebiggers@kernel.org> <20260428024400.123337-5-ebiggers@kernel.org>
+In-Reply-To: <20260428024400.123337-5-ebiggers@kernel.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 28 Apr 2026 12:03:15 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdVc4_1hfrX5_qTrNmz8dpe=H37i-N0xy9_M3ZkzUTO3Mg@mail.gmail.com>
+X-Gm-Features: AVHnY4IhVtJeI5bzqGCht8kP6KzDoM5sv9OtFI_ZUfpavb2rJ-ZtQSNVRJUngeM
+Message-ID: <CAMuHMdVc4_1hfrX5_qTrNmz8dpe=H37i-N0xy9_M3ZkzUTO3Mg@mail.gmail.com>
+Subject: Re: [PATCH net-next 4/5] crypto: fcrypt - Remove support for FCrypt
+ block cipher
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: netdev@vger.kernel.org, linux-afs@lists.infradead.org, 
+	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 482EA482383
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[netfilter.org];
-	TAGGED_FROM(0.00)[bounces-281765-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[netfilter.org:+];
+	TAGGED_FROM(0.00)[bounces-281766-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[linux-m68k.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[4];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.829];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux-m68k.org:email,openafs.org:url,mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-On Tue, Apr 28, 2026 at 11:09:17AM +0200, Mathias Krause wrote:
-> We ran into below KASAN splat, which is mostly uninteresting, beside
-> for having nf_nat_register_fn() in the call chain as a cause for the
-> offending access:
-> 
-> ==================================================================
-> BUG: KASAN: slab-out-of-bounds in nf_nat_register_fn+0x5f9/0x640
-> Read of size 8 at addr ffff890031e54c20 by task iptables/9510
-> 
-> CPU: 0 UID: 0 PID: 9510 Comm: iptables Not tainted 6.18.18-grsec-full-20260320181326 #1 PREEMPT(voluntary)
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-> Call Trace:
->  <TASK>
->  […] dump_stack_lvl+0xee/0x160 ffff88004117eeb8
->  […] print_report+0x6e/0x640 ffff88004117eee0
->  […] ? __phys_addr+0x8e/0x140 ffff88004117eef0
->  […] ? kasan_addr_to_slab+0x51/0xe0 ffff88004117ef08
->  […] ? complete_report_info+0xec/0x1c0 ffff88004117ef20
->  […] ? nf_nat_register_fn+0x5f9/0x640 ffff88004117ef48
->  […] kasan_report+0xbc/0x140 ffff88004117ef50
->  […] ? nf_nat_register_fn+0x5f9/0x640 ffff88004117ef90
->  […] nf_nat_register_fn+0x5f9/0x640 ffff88004117eff8
->  […] ? nf_nat_icmp_reply_translation+0x6e0/0x6e0 ffff88004117f070
->  […] nf_tables_register_hook.part.0+0xa0/0x220 ffff88004117f080
->  […] nf_tables_addchain.constprop.0+0x1054/0x1fc0 ffff88004117f0b8
->  […] ? nft_chain_lookup.part.0+0x4ce/0xac0 ffff88004117f130
->  […] ? nf_tables_abort+0x3d80/0x3d80 ffff88004117f190
->  […] ? nf_tables_dumpreset_obj+0x100/0x100 ffff88004117f1c8
->  […] ? nft_table_lookup.part.0+0x255/0x300 ffff88004117f310
->  […] ? nf_tables_newchain+0x21a4/0x2fa0 ffff88004117f358
->  […] nf_tables_newchain+0x21a4/0x2fa0 ffff88004117f360
->  […] ? nf_tables_addchain.constprop.0+0x1fc0/0x1fc0 ffff88004117f458
->  […] ? nla_get_range_signed+0x4a0/0x4a0 ffff88004117f488
->  […] ? lock_acquire+0x16f/0x320 ffff88004117f490
->  […] ? find_held_lock+0x3b/0xe0 ffff88004117f4b0
->  […] ? __nla_parse+0x45/0x80 ffff88004117f500
->  […] nfnetlink_rcv_batch+0xbca/0x19a0 ffff88004117f550
->  […] ? nfnetlink_net_exit_batch+0x120/0x120 ffff88004117f618
->  […] ? __sanitizer_cov_trace_switch+0x63/0xe0 ffff88004117f720
->  […] ? gr_acl_handle_mmap+0x1c4/0x320 ffff88004117f7c0
->  […] ? nla_get_range_signed+0x4a0/0x4a0 ffff88004117f7e8
->  […] ? gr_is_capable+0x6f/0xe0 ffff88004117f830
->  […] ? __nla_parse+0x45/0x80 ffff88004117f860
->  […] ? skb_pull+0x103/0x1a0 ffff88004117f880
->  […] nfnetlink_rcv+0x3db/0x4a0 ffff88004117f8b0
->  […] ? nfnetlink_rcv_batch+0x19a0/0x19a0 ffff88004117f8d8
->  […] ? netlink_lookup+0xe2/0x240 ffff88004117f900
->  […] netlink_unicast+0x74b/0xb00 ffff88004117f930
->  […] ? netlink_attachskb+0xb20/0xb20 ffff88004117f980
->  […] ? __check_object_size+0x3e/0xaa0 ffff88004117f998
->  […] ? security_netlink_send+0x51/0x160 ffff88004117f9c8
->  […] netlink_sendmsg+0xa03/0x1200 ffff88004117f9f8
->  […] ? netlink_unicast+0xb00/0xb00 ffff88004117fa70
->  […] ? netlink_unicast+0xb00/0xb00 ffff88004117fac8
->  […] ? ____sys_sendmsg+0xe2a/0x1040 ffff88004117faf8
->  […] ____sys_sendmsg+0xe2a/0x1040 ffff88004117fb00
->  […] ? kernel_recvmsg+0x300/0x300 ffff88004117fb60
->  […] ? reacquire_held_locks+0xe9/0x260 ffff88004117fbc8
->  […] ___sys_sendmsg+0x138/0x200 ffff88004117fbf8
->  […] ? do_recvmmsg+0x7e0/0x7e0 ffff88004117fc30
->  […] ? lockdep_hardirqs_on_prepare+0x101/0x1e0 ffff88004117fc50
->  […] ? lock_acquire+0x16f/0x320 ffff88004117fd20
->  […] ? lock_acquire+0x16f/0x320 ffff88004117fd58
->  […] ? find_held_lock+0x3b/0xe0 ffff88004117fd70
->  […] __sys_sendmsg+0x17a/0x260 ffff88004117fdc8
->  […] ? __sys_sendmsg_sock+0x80/0x80 ffff88004117fdf0
->  […] ? syscall_trace_enter+0x15e/0x2c0 ffff88004117fe98
->  […] do_syscall_64+0x7d/0x400 ffff88004117fec8
->  […] entry_SYSCALL_64_safe_stack+0x4a/0x60 ffff88004117fef8
->  </TASK>
-> ==================================================================
-> 
-> The out-of-bounds report, though, is a red herring as it is for an
-> access that shouldn't have happened in the first place.
-> 
-> When nf_nat_init() fails to register its BPF kfuncs, it'll unwind and,
-> among others, call unregister_pernet_subsys() to deregister its per-net
-> ops. This makes the previously allocated net id available for reuse by
-> the next caller of register_pernet_subsys(), in our case, synproxy.
-> However, 'nat_net_id' will still hold the previously allocated value.
-> 
-> If nf_nat.o gets build as a module, all this doesn't matter. A failed
-> initialization routine makes the module fail to load and any dependent
-> module won't be able to load either. However, if nf_nat.o is built-in,
-> a failing init won't /completely/ make its functionality unavailable to
-> dependent modules, namely the code and static data is still there, free
-> to be called by modules like nft_chain_nat.ko.
-> 
-> Case in point, nft_chain_nat registers hooks that'll call into nf_nat
-> which, in our case, failed to initialize and therefore won't have a
-> valid net id nor related net_nat object any more.
-> 
-> Code in nf_nat, namely nf_nat_register_fn() and nf_nat_unregister_fn(),
-> still making use of the reallocated net id, lead to a type confusion as
-> the call to net_generic() will no longer return memory belonging to an
-> object suited to fit 'struct nat_net' but 'struct synproxy_net' instead.
-> The latter is only 24 bytes on 64-bit systems, much smaller than struct
-> nat_net which is 176 bytes, perfectly explaining the OOB KASAN report.
-> 
-> Detect and handle a failed nf_nat_init() by testing the 'nf_nat_hook'
-> pointer which will be reset to NULL on initialization errors to prevent
-> the usage of an invalid nat_net pointer.
-> 
-> As this check is only needed when nf_nat.o is built-in, guard it by
-> '#ifndef MODULE...'.
-> 
-> Fixes: cbc1dd5b659f ("netfilter: nf_nat: Fix possible memory leak in nf_nat_init()")
-> Signed-off-by: Mathias Krause <minipli@grsecurity.net>
-> ---
->  net/netfilter/nf_nat_core.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/net/netfilter/nf_nat_core.c b/net/netfilter/nf_nat_core.c
-> index 3b5434e4ec9c..76a150b9d418 100644
-> --- a/net/netfilter/nf_nat_core.c
-> +++ b/net/netfilter/nf_nat_core.c
-> @@ -1187,6 +1187,16 @@ int nf_nat_register_fn(struct net *net, u8 pf, const struct nf_hook_ops *ops,
->  	struct nf_hook_ops *nat_ops;
->  	int i, ret;
->  
-> +#ifndef MODULE
-> +	/* If nf_nat_core is built-in and nf_nat_init() fails, dependent
-> +	 * modules like nft_chain_nat.ko may still call this function.
-> +	 * However, nat_net would be invalid, likely pointing to some other
-> +	 * per-net structure.
+On Tue, 28 Apr 2026 at 04:49, Eric Biggers <ebiggers@kernel.org> wrote:
+> Remove the insecure FCrypt block cipher from the crypto API.  Its only
+> user was net/rxrpc/, but now net/rxrpc/ implements it locally.  The
+> crypto API implementation is no longer needed.
+>
+> For some additional context: FCrypt was designed in 1988 and is
+> essentially a weakened version of DES.  It has the same 56-bit key size
+> as DES, which is easily brute forced.  Moreover, it's cryptographically
+> weak and doesn't even provide the intended 56-bit security level.  Its
+> author considers it to be a mistake, as well
+> (https://lists.openafs.org/pipermail/openafs-devel/2000-December/005320.html).
+>
+> But fortunately this 1980s-era homebrew block cipher was never adopted
+> outside of net/rxrpc/.  So its code can just be kept there.
+>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 
-Hm, if nf_nat_init() fails, then nft_chain_nat should fail to load.
+>  arch/m68k/configs/amiga_defconfig           |   1 -
+>  arch/m68k/configs/apollo_defconfig          |   1 -
+>  arch/m68k/configs/atari_defconfig           |   1 -
+>  arch/m68k/configs/bvme6000_defconfig        |   1 -
+>  arch/m68k/configs/hp300_defconfig           |   1 -
+>  arch/m68k/configs/mac_defconfig             |   1 -
+>  arch/m68k/configs/multi_defconfig           |   1 -
+>  arch/m68k/configs/mvme147_defconfig         |   1 -
+>  arch/m68k/configs/mvme16x_defconfig         |   1 -
+>  arch/m68k/configs/q40_defconfig             |   1 -
+>  arch/m68k/configs/sun3_defconfig            |   1 -
+>  arch/m68k/configs/sun3x_defconfig           |   1 -
 
-Maybe there is a different way to validate this dependency?
+Acked-by: Geert Uytterhoeven <geert@linux-m68k.org> # m68k
 
-> +	 */
-> +	if (WARN_ON_ONCE(!nf_nat_hook))
-> +		return -EOPNOTSUPP;
-> +#endif
-> +
->  	if (WARN_ON_ONCE(pf >= ARRAY_SIZE(nat_net->nat_proto_net)))
->  		return -EINVAL;
->  
-> -- 
-> 2.47.3
-> 
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
