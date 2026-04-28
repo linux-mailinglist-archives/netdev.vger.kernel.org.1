@@ -1,131 +1,245 @@
-Return-Path: <netdev+bounces-281705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281724-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EPhvANFs8GmgTQEAu9opvQ
-	(envelope-from <netdev+bounces-281705-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 10:16:17 +0200
+	id 6B8qFE9y8GldTgEAu9opvQ
+	(envelope-from <netdev+bounces-281724-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 10:39:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A89D47FCD0
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 10:16:16 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E8954804AF
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 10:39:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 37A8F3051904
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 08:09:15 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4E6543019631
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 08:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BE3D382299;
-	Tue, 28 Apr 2026 08:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jepGfRi6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C505B344D9B;
+	Tue, 28 Apr 2026 08:30:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A8437F733
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 08:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4C3829B20A;
+	Tue, 28 Apr 2026 08:30:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777363731; cv=none; b=MM61UqmTj+rZ2c+1DT1vGFUf2sKdKvUAl/GZor5Z1Kiqc+mbp5yCiZymjSsz2Yr9lN9raN+5V+2EQrf/8U6bacJ42B6ChO6eemMQvi9aA4XRXUIoYyNNMyDsZdY+6kdqS9uGK0wdkIFmL4zyQhpQT8GBsUipVdhAX+yiqYgrHek=
+	t=1777365014; cv=none; b=SfZcqKfSmTMxTX3jweimw28Dx3SznGpXmg7+DFEUif4Oa+mpNICDNQHqLM+G1BThoMFuzQRPTdfePTjex8Q5hXasWm/KZ8aHrVxJV0KYZHLP497xuTOq0WkhWCYjmr+reauMezidGwFfcwsr0+z3atmRp2sCfL4inJEOUmWAVts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777363731; c=relaxed/simple;
-	bh=8WckjIGBpN8uweObFU6ZpNlrFPmJCuLAesHgfKGWP8Y=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o6hXHD0ChOuNmEFi/6TJCAaJH0nN+8qBUxs89PTheV6CXNUWnwhX6MYfkotncSodjc+en83geqtkmhSxwd93gPzb2+c9ADvM1H2JHqBVFEtUemskOfVHuU4EZSQVn/LVSlzDWYNvdZSRYVFRtSbbbb/GMQMo9q/3DwfPwiRgdgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jepGfRi6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FE55C2BCB5
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 08:08:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777363730;
-	bh=8WckjIGBpN8uweObFU6ZpNlrFPmJCuLAesHgfKGWP8Y=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc:From;
-	b=jepGfRi6IhY/3zGLVb6usMUwKJVv4r9hjApXRjyHUIXNJansjuRWFWqu/ROuE47HK
-	 ufasfbci967aYKTzs8AGA7P6h658HfbYjX9ZOGG8axLRha8hLhGkpzAQ2Z5uBf+spC
-	 gXqxQg7tzvOB3PP+dPY8Aiev2n0eTcULr7T/SvoZLJK6WgrftXAAQJUbsnn8M6FLLY
-	 b/jcZDxmUPtLaVbOQzykoLVpzK07zboSD/0DtUrDu90vImr/Q/SVOQ2U2hq+ynu+xq
-	 sb+WmRaueS0UjmPesExixfG8DgePDvfB+LnETIpIt1DC+Ir37WiMQIG59HlysAaFz6
-	 a6aRjMMbpU/dw==
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-38c620f1699so97513371fa.0
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 01:08:50 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ+k1AMoL6sXa+aone/iiXiYSHn2KoTDtMFtSLuNXNOknMW6lYIOuKAI400CNG6qWdSq5iGZfmg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyo9ksMstBXSBK2jeVhZPDzMm1LIiJMEfg0P6a0RRZFrWE3LE4z
-	cJ4KHdMw7AVK7bY1YLP2//V42D+AtYm3zPACpj8dirdoRPRlhqwer9UwlPYItb6G3k7A0Z34ih2
-	kF3+rSRxNasPSxQZUdw9En6wAez5M2ypyIdJAsq7H+g==
-X-Received: by 2002:a2e:a590:0:b0:38d:fca1:4a6c with SMTP id
- 38308e7fff4ca-39240fc94e0mr7301931fa.17.1777363729159; Tue, 28 Apr 2026
- 01:08:49 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 28 Apr 2026 01:08:47 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 28 Apr 2026 01:08:47 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260427143020.2800317-1-arnd@kernel.org>
+	s=arc-20240116; t=1777365014; c=relaxed/simple;
+	bh=06IdvlqN3C6rUqlYelqWPtkHcy6SOnAqVKtcRw4LPmw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sXpQpgueEVmf0h3F+vB96ACkovI2cxUbni2co0gHnUWYXkCxSx14dp/Trm7iS2Wt2u3qjmR03ShcLEpVcP+7iU0pvQhUVR1SrzGb02WF/1om5XU75noR7kbzc4Rw6Qou1yaJGS0IZ6/qyp5qkhpgYcPA7qgPYgFBPARX6uWyhAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-c2dff70000001609-83-69f06c832b09
+Date: Tue, 28 Apr 2026 17:14:53 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, asml.silence@gmail.com,
+	axboe@kernel.dk, almasrymina@google.com, sdf@fomichev.me,
+	hawk@kernel.org, akpm@linux-foundation.org, rppt@kernel.org,
+	io-uring@vger.kernel.org, kernel_team@skhynix.com
+Subject: Re: [PATCH net] net: add net_iov_init() and use it to initialize
+ ->page_type
+Message-ID: <20260428081453.GA29789@system.software.com>
+References: <20260428025320.853452-1-kuba@kernel.org>
+ <6dcbee42-df9b-4c0a-b153-aad953441fad@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260427143020.2800317-1-arnd@kernel.org>
-Date: Tue, 28 Apr 2026 01:08:47 -0700
-X-Gmail-Original-Message-ID: <CAMRc=Med9Uph384ULUyyU+CDFGm6MfLdv5RU_wirr12p8=pPkQ@mail.gmail.com>
-X-Gm-Features: AVHnY4LY46ocRRPnvuEcEfnfO-MExxALHfh8FrBE1LiHDloCjMtkmNNOXHQEo-M
-Message-ID: <CAMRc=Med9Uph384ULUyyU+CDFGm6MfLdv5RU_wirr12p8=pPkQ@mail.gmail.com>
-Subject: Re: [PATCH] dsa: b53: hide legacy gpiolib usage on non-mips
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, =?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6IFJvamFz?= <noltari@gmail.com>, 
-	Kyle Hendry <kylehendrydev@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	Florian Fainelli <florian.fainelli@broadcom.com>, Jonas Gorski <jonas.gorski@gmail.com>, 
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Linus Walleij <linusw@kernel.org>, 
-	Bartosz Golaszewski <brgl@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 8A89D47FCD0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6dcbee42-df9b-4c0a-b153-aad953441fad@kernel.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprGIsWRmVeSWpSXmKPExsXC9ZZnoW5zzodMg4OtWhZz1q9hs1j9o8Ji
+	+YMdrBZzVm1jtFh9t5/NYs75FhaLp8cesVvsad/ObPGo/wSbxbvWcywWF7b1sVocWyBm8e30
+	G0aLI+u3M1lcnbmLyaLj5X0WBwGPLStvMnnc2HeKyWPnrLvsHgs2lXpcPlvqsWlVJ5vHiRm/
+	WTx27vjM5PF+31U2j8+b5AK4orhsUlJzMstSi/TtErgyPs2ezFawSLdi9v7LjA2Mi5S6GDk5
+	JARMJLbcWsrSxcgBZh/tFgEJswioSjxonsQMYrMJqEvcuPETzBYRMJDYvfk8K4jNLPCOSeLT
+	wSQQW1ggXGLHo33sIGN4BSwkWnpVQMJCApkSC+5/AmvlFRCUODnzCQtEq5bEjX8vmUDKmQWk
+	JZb/4wAJcwrYSfz/3s4IYosKKEsc2HYcqIQL6LB+dokzbx6xQlwsKXFwxQ2WCYwCs5CMnYVk
+	7CyEsQsYmVcxCmXmleUmZuaY6GVU5mVW6CXn525iBMbWsto/0TsYP10IPsQowMGoxMN7Iux9
+	phBrYllxZe4hRgkOZiUR3iv/3mYK8aYkVlalFuXHF5XmpBYfYpTmYFES5zX6Vp4iJJCeWJKa
+	nZpakFoEk2Xi4JRqYPTXSDFcvlO8uGteQMTRC64su+ru+9g3mbKUvy/4m7ckrfPRlnq/Szzt
+	0/KzAo4Hfaxi3a51rpjJfhFPvP1hr8BrB+vk/cwTDFaGvfm3z3XNiqY5W8v2bb+q7DPxx+0d
+	Kxq2bZ3hUDTLY02G8tawLfLPhKqDeb8W3xDw/7v4YM0H/TsHvz59lKbEUpyRaKjFXFScCACJ
+	EHK5qQIAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrLLMWRmVeSWpSXmKPExsXC5WfdrNuc8yHT4Pc+OYs569ewWaz+UWGx
+	/MEOVos5q7YxWqy+289mMed8C4vF02OP2C32tG9ntnjUf4LN4l3rORaLw3NPslpc2NbHanFs
+	gZjFt9NvGC2OrN/OZHF15i4mi46X91kcBD22rLzJ5HFj3ykmj52z7rJ7LNhU6nH5bKnHplWd
+	bB4nZvxm8di54zOTx/t9V9k8Fr/4wOTxeZNcAHcUl01Kak5mWWqRvl0CV8an2ZPZChbpVsze
+	f5mxgXGRUhcjB4eEgInE0W6RLkZODhYBVYkHzZOYQWw2AXWJGzd+gtkiAgYSuzefZwWxmQXe
+	MUl8OpgEYgsLhEvseLSPHWQMr4CFREuvCkhYSCBTYsH9T2CtvAKCEidnPmGBaNWSuPHvJRNI
+	ObOAtMTyfxwgYU4BO4n/39sZQWxRAWWJA9uOM01g5J2FpHsWku5ZCN0LGJlXMYpk5pXlJmbm
+	mOoVZ2dU5mVW6CXn525iBEbKsto/E3cwfrnsfohRgINRiYf3RNj7TCHWxLLiytxDjBIczEoi
+	vFf+vc0U4k1JrKxKLcqPLyrNSS0+xCjNwaIkzusVnpogJJCeWJKanZpakFoEk2Xi4JRqYFy8
+	bSfbNYemnRw77si2bexc7mn2eOO3euv2iwFSIiUPfuaEpszSMfp59seb576/1pRItUeJabK1
+	LWL4FqHZetqr/cXnvLQra7xmqx1oOCh8s2fzg+KK1w/nfNh5tONNGR/H1LZjOvOXOX86d+no
+	vOt/Nh8t7OSWv/GspnOTnevDu3vm/03j9J6hxFKckWioxVxUnAgA3mk5z5ACAAA=
+X-CFilter-Loop: Reflected
+X-Rspamd-Queue-Id: 4E8954804AF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281705-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[arndb.de,gmail.com,vger.kernel.org,broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,arndb.de:email,qualcomm.com:email];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[sk.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281724-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[byungchul@sk.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,gmail.com,kernel.dk,fomichev.me,linux-foundation.org,skhynix.com];
+	NEURAL_HAM(-0.00)[-0.982];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	R_DKIM_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux-foundation.org:email]
 
-On Mon, 27 Apr 2026 16:30:08 +0200, Arnd Bergmann <arnd@kernel.org> said:
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> The MIPS bcm53xx platform still uses the legacy gpiolib interfaces based
-> on gpio numbers, but other platforms do not.
->
-> Hide these interfaces inside of the existing #ifdef block and use the
-> modern interfaces in the common parts of the driver to allow building
-> it when the gpio_set_value() is left out of the kernel.
->
-> Reviewed-by: Jonas Gorski <jonas.gorski@gmail.com>
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
+On Tue, Apr 28, 2026 at 09:57:08AM +0200, Vlastimil Babka (SUSE) wrote:
+> +Cc Byungchul
+> 
+> On 4/28/26 04:53, Jakub Kicinski wrote:
+> > Commit db359fccf212 ("mm: introduce a new page type for page pool in
+> > page type") added a page_type field to struct net_iov at the same
+> > offset as struct page::page_type, so that page_pool_set_pp_info() can
+> > call __SetPageNetpp() uniformly on both pages and net_iovs.
+> >
+> > The page-type API requires the field to hold the UINT_MAX "no type"
+> > sentinel before a type can be set; for real struct page that invariant
+> > is established by the page allocator on free. struct net_iov is not
+> > allocated through the page allocator, so the field is left as zero
 
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+My bad.  Overlooked the point.  Thanks for the fix.
+
+Acked-by: Byungchul Park <byungchul@sk.com>
+
+	Byungchul
+
+> > (io_uring zcrx, which uses __GFP_ZERO) or as slab garbage (devmem,
+> > which uses kvmalloc_objs() without zeroing). When the page pool then
+> > calls page_pool_set_pp_info() on a freshly-bound niov,
+> > __SetPageNetpp()'s VM_BUG_ON_PAGE(page->page_type != UINT_MAX) fires
+> > and the kernel BUGs. Triggered in selftests by io_uring zcrx setup
+> > through the fbnic queue restart path:
+> >
+> >  kernel BUG at ./include/linux/page-flags.h:1062!
+> >  RIP: 0010:page_pool_set_pp_info (./include/linux/page-flags.h:1062
+> >                                   net/core/page_pool.c:716)
+> >  Call Trace:
+> >   <TASK>
+> >   net_mp_niov_set_page_pool (net/core/page_pool.c:1360)
+> >   io_pp_zc_alloc_netmems (io_uring/zcrx.c:1089 io_uring/zcrx.c:1110)
+> >   fbnic_fill_bdq (./include/net/page_pool/helpers.h:160
+> >                   drivers/net/ethernet/meta/fbnic/fbnic_txrx.c:906)
+> >   __fbnic_nv_restart (drivers/net/ethernet/meta/fbnic/fbnic_txrx.c:2470
+> >                       drivers/net/ethernet/meta/fbnic/fbnic_txrx.c:2874)
+> >   fbnic_queue_start (drivers/net/ethernet/meta/fbnic/fbnic_txrx.c:2903)
+> >   netdev_rx_queue_reconfig (net/core/netdev_rx_queue.c:137)
+> >   __netif_mp_open_rxq (net/core/netdev_rx_queue.c:234)
+> >   io_register_zcrx (io_uring/zcrx.c:818 io_uring/zcrx.c:903)
+> >   __io_uring_register (io_uring/register.c:931)
+> >   __do_sys_io_uring_register (io_uring/register.c:1029)
+> >   do_syscall_64 (arch/x86/entry/syscall_64.c:63
+> >                  arch/x86/entry/syscall_64.c:94)
+> >   </TASK>
+> >
+> > The same path is reachable through devmem dmabuf binding via
+> > netdev_nl_bind_rx_doit() -> net_devmem_bind_dmabuf_to_queue().
+> >
+> > Add a net_iov_init() helper that stamps ->owner, ->type and the
+> > ->page_type sentinel, and use it from both the devmem and io_uring
+> > zcrx niov init loops.
+> >
+> > Fixes: db359fccf212 ("mm: introduce a new page type for page pool in page type")
+> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> 
+> Acked-by: Vlastimil Babka (SUSE) <vbabka@kernel.org>
+> 
+> > ---
+> > CC: asml.silence@gmail.com
+> > CC: axboe@kernel.dk
+> > CC: almasrymina@google.com
+> > CC: sdf@fomichev.me
+> > CC: hawk@kernel.org
+> > CC: akpm@linux-foundation.org
+> > CC: rppt@kernel.org
+> > CC: vbabka@kernel.org
+> > CC: io-uring@vger.kernel.org
+> > ---
+> >  include/net/netmem.h | 15 +++++++++++++++
+> >  io_uring/zcrx.c      |  3 +--
+> >  net/core/devmem.c    |  3 +--
+> >  3 files changed, 17 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/include/net/netmem.h b/include/net/netmem.h
+> > index 507b74c9f52d..78fe51e5756b 100644
+> > --- a/include/net/netmem.h
+> > +++ b/include/net/netmem.h
+> > @@ -127,6 +127,21 @@ static inline unsigned int net_iov_idx(const struct net_iov *niov)
+> >       return niov - net_iov_owner(niov)->niovs;
+> >  }
+> >
+> > +/* Initialize a niov: stamp the owning area, the memory provider type,
+> > + * and the page_type "no type" sentinel expected by the page-type API
+> > + * (see PAGE_TYPE_OPS in <linux/page-flags.h>) so that
+> > + * page_pool_set_pp_info() can later call __SetPageNetpp() on a niov
+> > + * cast to struct page.
+> > + */
+> > +static inline void net_iov_init(struct net_iov *niov,
+> > +                             struct net_iov_area *owner,
+> > +                             enum net_iov_type type)
+> > +{
+> > +     niov->owner = owner;
+> > +     niov->type = type;
+> > +     niov->page_type = UINT_MAX;
+> > +}
+> > +
+> >  /* netmem */
+> >
+> >  /**
+> > diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+> > index 7b93c87b8371..19837e0b5e91 100644
+> > --- a/io_uring/zcrx.c
+> > +++ b/io_uring/zcrx.c
+> > @@ -495,10 +495,9 @@ static int io_zcrx_create_area(struct io_zcrx_ifq *ifq,
+> >       for (i = 0; i < nr_iovs; i++) {
+> >               struct net_iov *niov = &area->nia.niovs[i];
+> >
+> > -             niov->owner = &area->nia;
+> > +             net_iov_init(niov, &area->nia, NET_IOV_IOURING);
+> >               area->freelist[i] = i;
+> >               atomic_set(&area->user_refs[i], 0);
+> > -             niov->type = NET_IOV_IOURING;
+> >       }
+> >
+> >       if (ifq->dev) {
+> > diff --git a/net/core/devmem.c b/net/core/devmem.c
+> > index cde4c89bc146..468344739db2 100644
+> > --- a/net/core/devmem.c
+> > +++ b/net/core/devmem.c
+> > @@ -297,8 +297,7 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+> >
+> >               for (i = 0; i < owner->area.num_niovs; i++) {
+> >                       niov = &owner->area.niovs[i];
+> > -                     niov->type = NET_IOV_DMABUF;
+> > -                     niov->owner = &owner->area;
+> > +                     net_iov_init(niov, &owner->area, NET_IOV_DMABUF);
+> >                       page_pool_set_dma_addr_netmem(net_iov_to_netmem(niov),
+> >                                                     net_devmem_get_dma_addr(niov));
+> >                       if (direction == DMA_TO_DEVICE)
 
