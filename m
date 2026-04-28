@@ -1,166 +1,234 @@
-Return-Path: <netdev+bounces-282013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282014-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YLT8Fkjq8Gn2awEAu9opvQ
-	(envelope-from <netdev+bounces-282013-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 19:11:36 +0200
+	id +H4PECHr8GmBbAEAu9opvQ
+	(envelope-from <netdev+bounces-282014-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 19:15:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B718E489AC0
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 19:11:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A424B489BD0
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 19:15:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ECDF73044810
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:06:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3C0023032740
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:09:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82FB633AD9D;
-	Tue, 28 Apr 2026 17:06:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 300B533F583;
+	Tue, 28 Apr 2026 17:09:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v9qEbz1Z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SCEoS+cb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284262D73A6
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 17:06:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804DF37BE8E
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 17:09:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777395979; cv=none; b=XO9jICZyGtNE4MEEqf4En2HAqnAiNHG8esiFqzr1LBUnTpF9AsJ0c+arXGRJ6wFUySHOtG102Q+K0RFjSFsKiUXoU/KHPPLpc9ZYvv18l1Oe5a8SJF1me+eH6NQ6w/fDJ7PxNQ10mPePKiQi6ZlWJbkK+vdFukR4hgoOUD/wi+c=
+	t=1777396142; cv=none; b=OHgQvPtNzizij6LCzOrmOYsmVeXymaI0JXMlmgphkzzpc2ABbOClPQ/pg6OMvwe2Y0muBgZGfn9Lw7HpTPqiWNcXmCO0ZZbAbGF3fzTEEmGdM8RhJWZF6GbpcF9ybI23qtNFbvEi1wPAVaV2RX+n8c0FK5OgcnjsFVjpmJgMWxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777395979; c=relaxed/simple;
-	bh=CFMy6HyyTVAnjI4i+ocHbnkW6tJx4Pakyoj0eEMJfSY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SbOFpltq9yOyTQoHV/zGS/Py8Rvvtr++lowpcXE6Ys0GjG1Hhn68kkiOUfATP/iqgOWQS/5m/FIZOMHYi3bXMN4Hok2TeRH3+A8PZYt2OCFwW80XS6/J90dojJgIlCVKpDwboqDZj+5WOwPLd7shWRWZiQG1laG4vblBIhinmFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v9qEbz1Z; arc=none smtp.client-ip=209.85.219.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-8aca14d1faaso96471506d6.3
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 10:06:17 -0700 (PDT)
+	s=arc-20240116; t=1777396142; c=relaxed/simple;
+	bh=8YLyXNnB0oYjgxp9TiGj9qYD9V/WfHzuABJsa8B7mgA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dv4smHk4gFZl/DEAu1yBOOR8Nvi8G3n09sHAiG4SyUHztW2WQ6YxuWv4f1xT9XxDQAt81jrkc2YQsZzRw693pOsWImUnAP7AHX+zqaGZtE8BVs9QXCoXAsiQSo/ixpjEUz5gMQAyq7n2lqmfpMv7wGkEKm/E2qYqjyq/LZBuCZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SCEoS+cb; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-488a88aeec9so143243055e9.2
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 10:08:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777395977; x=1778000777; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=L7bFKNxN8MC3qE6vGhSgi0Khm0EeMo+n1gm5R184X1I=;
-        b=v9qEbz1Z915KWLGJX/5RkX/9E6JSRCL4HvDKctEn7R/+yn6xBB4owRk6KcLiNNogub
-         7Zjjz48PhHdfMrp87eX3dOIhdBganGmfV+79Knm7JtzrvJbMQV+YunU4Dkigv5HxSrZp
-         VxGMVEihZikF1yPUn0fcFKhSN/FVlxl+NAsaIkS8UXZdIDXKpz7upyjoSMLlzK5kYRU8
-         Zw8/h5YJ5QZa+L8SBYSs6N73sPl8v8QyfxvGp0h90FwhznnZWUfVH9taNgkHJ4+BemTs
-         49AVaTyJ3h1pG/OL+yB90cn1SEsfcsMYqZr3jhiluHmguP/Y8CkT6VwtTqWX6bet0sZY
-         +BWg==
+        d=gmail.com; s=20251104; t=1777396138; x=1778000938; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hEFzS30I0lxmmb31xtJed7NArW5qRhMX/2eez5xcs/I=;
+        b=SCEoS+cbU6ObFK6WGRhzkb6PpPXU+9cyRJEa+HN+OLzMlvSC43z3ce9FqL7E2NBvJ6
+         3umfXA2UyhyV3Z/ZI5w9EA8elMb3psSUY3CKK67YgXyljZSJL9ENsR6WrHbdmByM6rUu
+         a19XT626XFFl6dCrd5etugSvDE+J9TjNmOSj57kULA6I0AzWfmfhdxCNzhIdbj/EyW+N
+         KrrEM/lNaTShp4d4U2RqUcTrccj5AIAp/naUp9NieXROI0VVY8g03ndyIfLB1mKLDnUY
+         oeHEIFVIM0Z8CEQV6xkmxJ2Mef4lWW0Y9yTqXTstHPNnMMwYXQwoalhpRSXKkRyGQnP9
+         mcyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777395977; x=1778000777;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L7bFKNxN8MC3qE6vGhSgi0Khm0EeMo+n1gm5R184X1I=;
-        b=Rb6QNfX7j7+QLwe/nIYPzO5180KsVK8jvXxeX3wqR7lABACQFH4eRIjHeb1kERpoBd
-         f9aTAPaUMlbWHPLfd6drgjnpu/ZV4ZpFY9ElkXznd1e45mo8/N/Jyv7HAir7ksLQwXIB
-         3FC3DGD0jXILNtARQijYzRnveD/pjKeN56dHn2dI9rz8hesUZGOJRbtquUqkxEq3qjTl
-         Q71NVCaiZfBTgSC/FBQQYJWaf4LjFOEzU9vG7ArqueMtf448K7ZRC51JcAyeBcgy/P/x
-         I3A7gSk+m/JFhoHLsk5KFUuTP48Js/LJKx0d7KkdpQiQtKFzDrE0LFmj/ICT4Dzkm1nT
-         G1Tg==
-X-Forwarded-Encrypted: i=1; AFNElJ872Y613ffqvO9YNQRndDNkcV9xsAzTinbjoergVBOARbHWbm6s5CfCUl1JWfjaqJI4GtuQyp4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZRVlNVXTwfEashkgFV14jug6nNTiwSDo2z4BWB7LN9GbZKlGm
-	Inz2Y+3XhYYGxVNUeEMYJOoJuB/fHyzfeYff6ZXdh1ay4yJw8MckxzQE16SH6OTmemcqiEdOKxr
-	o8Z/ySl9vaQhUjA==
-X-Received: from qvbpt9.prod.google.com ([2002:a05:6214:489:b0:89c:6104:2e8f])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:410a:b0:899:fd80:f79f with SMTP id 6a1803df08f44-8b3e3061c6emr62925886d6.23.1777395976611;
- Tue, 28 Apr 2026 10:06:16 -0700 (PDT)
-Date: Tue, 28 Apr 2026 17:04:14 +0000
-In-Reply-To: <20260428170414.250566-1-edumazet@google.com>
+        d=1e100.net; s=20251104; t=1777396138; x=1778000938;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hEFzS30I0lxmmb31xtJed7NArW5qRhMX/2eez5xcs/I=;
+        b=YCCoiPvPn2A+2EvkeLqnCSdEQyZb7gDj1eagZSL98szqP9RfYpX16JigLfviKcxvjr
+         AqsHyG6sIp2N5pe2zsD5KhRPJTzsk4TTDt7SoXz1AYW8zqwsX2J/6osk63vv81EQ13Kj
+         WtIohdHjZqtclahi30tahizFy80mQAe7pf9xRqNsdbmGETBJ2BzMlzA11LgVTuOAHFqi
+         S+1jW/sHLvlIerzNNNFzN5CTOqKo/sgXPeaz8gad8YFX8zbtd3DKS+aHEs6Lgqcbd/hD
+         g5sBteZUfrZAFUhETLvdE5llle3i/lrcIHmRhGjKedf6UINzd39pn84jcR8VLI+oG5uQ
+         s2Nw==
+X-Forwarded-Encrypted: i=1; AFNElJ+mJOgtCoFaTvzva6bGXPKCa4fydFvGuqdWJZ+omAqQSadw8hqywdi7E8foZAMHKpg1QPEqj4E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlpHFZiXgypcni6mAzwtpRQgP7mCALy+RfyYSEs25VTKG8RxEJ
+	GN5r8dMky1+Sx8ZVWUNuFtEf/Om9nQTUsMlY6CsRyO8TFZLn8cIZ5ZF8
+X-Gm-Gg: AeBDiesnnQxjM6zv9oxsJrBucspm/X90d+3SjiGCPlUZJ0ofxmV2wFEQkJXmzdneetk
+	tez/BSu+HMg+gufwLFrbLrH3m2bO6FGhY7VgjHljvdUopInW12MxrdOgcdsiCU1yv37GyKr+q+7
+	5RsEuBQIYBmZ12SUY3lpQWMVTLj2Vm7XWg1zE6s9US3Q+CwmcBnnvdshLyBJAMcFM9jPsOxVeDP
+	I5cf947x002vpoiKqiuK3EHyu6jJ0p/evIE2+8HWkk9DRT9uVVvo+jfe9nC20reFQ+RMG3TD1f2
+	WCYeWIT2W5l3ol0OI+8J+9tAoy4zSZXs9jz4DnFNPvW89kXKgptcHkv4oFvsFHgyZ+u4YmkPM+w
+	uwfXmsxS/Pe2wHeolvcYKKkjGlKKQL5KtLKBRO/T2MUGOpg3jwhrzY3txz/Je02OFl0QT57WdIP
+	2VuM89XhIC0e5XB9gOYYuL3vqxbbgLmDY33zF0MYUR+0205L36weZSAhQnIer0u4ce3P1Wm4/IJ
+	BWLswuu3K3jFOeyEHBBvQ==
+X-Received: by 2002:a05:600c:630c:b0:486:d76c:fa57 with SMTP id 5b1f17b1804b1-48a77b0a60emr66577485e9.17.1777396138318;
+        Tue, 28 Apr 2026 10:08:58 -0700 (PDT)
+Received: from localhost.localdomain (200.178.141.77.rev.sfr.net. [77.141.178.200])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4463d02f2a2sm7943324f8f.10.2026.04.28.10.08.57
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 28 Apr 2026 10:08:57 -0700 (PDT)
+From: Hasan Basbunar <basbunarhasan@gmail.com>
+To: hawk@kernel.org,
+	ilias.apalodimas@linaro.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	davem@davemloft.net
+Cc: horms@kernel.org,
+	almasrymina@google.com,
+	asml.silence@gmail.com,
+	kaiyuanz@google.com,
+	willemb@google.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Hasan Basbunar <basbunarhasan@gmail.com>
+Subject: [PATCH] page_pool: fix memory-provider leak in page_pool_create_percpu() error path
+Date: Tue, 28 Apr 2026 19:07:39 +0200
+Message-ID: <20260428170739.34881-1-basbunarhasan@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260428170414.250566-1-edumazet@google.com>
-X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260428170414.250566-5-edumazet@google.com>
-Subject: [PATCH v2 net-next 4/4] net/sched: speedup tc_dump_qdisc() when
- tcm_ifindex is provided
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
-	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: B718E489AC0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: A424B489BD0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com,google.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282013-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-282014-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.982];
+	FROM_NEQ_ENVFROM(0.00)[basbunarhasan@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.998];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-There is no point dumping qdiscs for all devices when user space
-wants them for a single device:
+When page_pool_create_percpu() fails on page_pool_list(), it falls
+through to its err_uninit: label, which calls page_pool_uninit().
+At that point page_pool_init() has already taken two references
+when the user requested PP_FLAG_ALLOW_UNREADABLE_NETMEM:
 
-tc -s -d qdisc show dev eth1
+	pool->mp_ops->init(pool)
+	static_branch_inc(&page_pool_mem_providers);
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+Neither is undone by page_pool_uninit(); both are only undone by
+__page_pool_destroy() (success-side teardown). The error path
+therefore leaks the per-provider reference taken by mp_ops->init
+(io_zcrx_ifq->refs in the io_uring zcrx provider, the dmabuf
+binding refcount in the devmem provider) plus one increment of
+the page_pool_mem_providers static branch on every failure of
+xa_alloc_cyclic() inside page_pool_list().
+
+The leaked io_zcrx_ifq->refs in turn pins everything
+io_zcrx_ifq_free() would release on cleanup: ifq->user (uid),
+ifq->mm_account (mmdrop), ifq->dev (device refcount),
+ifq->netdev_tracker (netdev refcount), and the rbuf region.
+The leaked static branch increment forces all subsequent
+page_pool_alloc_netmems() and page_pool_return_page() callers to
+take the slow mp_ops branch for the lifetime of the kernel.
+
+Reachable via the io_uring zcrx path:
+
+	io_uring_register(IORING_REGISTER_ZCRX_IFQ)  /* CAP_NET_ADMIN */
+	  -> __io_uring_register
+	  -> io_register_zcrx
+	  -> zcrx_register_netdev
+	  -> netif_mp_open_rxq
+	  -> driver ndo_queue_mem_alloc
+	  -> page_pool_create_percpu
+	    -> page_pool_init succeeds (mp_ops->init runs, branch++)
+	    -> page_pool_list fails (xa_alloc_cyclic -ENOMEM)
+	    -> goto err_uninit         <-- leak
+
+The same shape applies to the devmem dmabuf provider via
+mp_dmabuf_devmem_init()/mp_dmabuf_devmem_destroy().
+
+Restore the cleanup symmetry by moving the mp_ops->destroy() and
+static_branch_dec() calls out of __page_pool_destroy() and into
+page_pool_uninit(), so page_pool_uninit() is again the strict
+inverse of page_pool_init(). page_pool_uninit() has only two
+callers (the err_uninit: path and __page_pool_destroy()), so this
+preserves the single-call invariant on the success path while
+fixing the err path. The error path of page_pool_init() itself
+still skips the mp_ops cleanup correctly: mp_ops->init is the
+last action that takes a reference before page_pool_init() returns
+0, so when it returns an error neither the refcount nor the static
+branch has been touched.
+
+Triggering the bug requires xa_alloc_cyclic() to fail with -ENOMEM,
+which under normal GFP_KERNEL retry behaviour is rare. It is
+deterministic under CONFIG_FAULT_INJECTION with fail_page_alloc /
+xa fault injection, or under sustained memory pressure. The leak
+is silent: there is no warning, and the released kernel build
+continues running with a permanently-incremented static branch.
+
+Fixes: 0f9214046893 ("memory-provider: dmabuf devmem memory provider")
+Signed-off-by: Hasan Basbunar <basbunarhasan@gmail.com>
 ---
- net/sched/sch_api.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ net/core/page_pool.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index 641f5a01aca167dd230173078f2db5801dca58da..80827ef8f4f6b0b27391da7c866f5da15f830b2d 100644
---- a/net/sched/sch_api.c
-+++ b/net/sched/sch_api.c
-@@ -1885,6 +1885,7 @@ static int tc_dump_qdisc(struct sk_buff *skb, struct netlink_callback *cb)
- 		int q_idx;
- 	} *ctx = (void *)cb->ctx;
- 	unsigned long s_ifindex;
-+	const struct tcmsg *tcm;
- 	struct net_device *dev;
- 	int s_q_idx, q_idx;
- 	int err;
-@@ -1895,6 +1896,9 @@ static int tc_dump_qdisc(struct sk_buff *skb, struct netlink_callback *cb)
- 				     rtm_tca_policy, cb->extack);
- 	if (err < 0)
- 		return err;
-+	tcm = nlmsg_data(nlh);
-+	if (tcm->tcm_ifindex && !ctx->ifindex)
-+		ctx->ifindex = tcm->tcm_ifindex;
- 
- 	s_ifindex = ctx->ifindex;
- 	s_q_idx = ctx->q_idx;
-@@ -1903,6 +1907,9 @@ static int tc_dump_qdisc(struct sk_buff *skb, struct netlink_callback *cb)
- 		struct netdev_queue *dev_queue;
- 		struct Qdisc *q;
- 
-+		if (tcm->tcm_ifindex && ctx->ifindex != tcm->tcm_ifindex)
-+			break;
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 877bbf7a1938..6e576dec80db 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -327,6 +327,11 @@ static void page_pool_uninit(struct page_pool *pool)
+ 	if (!pool->system)
+ 		free_percpu(pool->recycle_stats);
+ #endif
 +
- 		q_idx = 0;
++	if (pool->mp_ops) {
++		pool->mp_ops->destroy(pool);
++		static_branch_dec(&page_pool_mem_providers);
++	}
+ }
  
- 		netdev_lock_ops(dev);
+ /**
+@@ -1146,11 +1151,6 @@ static void __page_pool_destroy(struct page_pool *pool)
+ 	page_pool_unlist(pool);
+ 	page_pool_uninit(pool);
+ 
+-	if (pool->mp_ops) {
+-		pool->mp_ops->destroy(pool);
+-		static_branch_dec(&page_pool_mem_providers);
+-	}
+-
+ 	kfree(pool);
+ }
+ 
 -- 
-2.54.0.545.g6539524ca2-goog
+2.53.0
 
 
