@@ -1,166 +1,328 @@
-Return-Path: <netdev+bounces-281935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281936-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4J9rLc7J8GmfYgEAu9opvQ
-	(envelope-from <netdev+bounces-281935-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:53:02 +0200
+	id MJu2LTTL8GkKYwEAu9opvQ
+	(envelope-from <netdev+bounces-281936-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:59:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32DFD4875BF
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:53:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 237E448775F
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:59:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 344A4304F220
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 14:47:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2F81A301E6DF
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 14:55:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 599E243E498;
-	Tue, 28 Apr 2026 14:47:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CValI+4L"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E37944102B;
+	Tue, 28 Apr 2026 14:55:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3639343DA4F;
-	Tue, 28 Apr 2026 14:47:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AD4E429823;
+	Tue, 28 Apr 2026 14:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777387642; cv=none; b=L2YMubDEWx+AYTQy6rKiGIdLnMScE+TZHeJgT83xjG4fcuILA5jPWkuvZJ+JVmleZvbX5aS2TNNr4XqSOgB5e0yRcSZKWLOAodE2iR9Xdpa0K09g1Fag+5IJkLyBZ06soE3nVbOJxBFAhNR1vIiSqECdxMnMomSP3Avj2veOVYo=
+	t=1777388142; cv=none; b=eYehzskjZk+jS8kUzb9033L/HviA1e86JkJiWe5AJ8JPKcylJWq6XQozHt2ciy6f09TOewNOgZPKse2f/C8A97De8dfTjxha0e66/qYDglQHxMyxqXxCNAISsr6IQJ4Tp5r1AqfOGPmompWMigwJUGqooRpzAZXOGSbzME6PkNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777387642; c=relaxed/simple;
-	bh=1fYfsj4yZWZDDBERVik02Ea+1v3rF+nqDOOTddpHTY8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EWTW6nKvWa8MAnsMCRfq8vhvUqM2hFpZN3e84kDx3RSsFMrhC/6oWN+Afky8rfgzb/QBdj8RLhsk2j3uXKUHqtj9vJQTGrE92MGpSPCrdPVP1zF5sfHK9KiMyi4hdHyXKOFcz8t3PmWt5MOcHSpaxTTnHfIS6CwlNRPBf3Al9ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CValI+4L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EDD4C2BCB7;
-	Tue, 28 Apr 2026 14:47:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777387642;
-	bh=1fYfsj4yZWZDDBERVik02Ea+1v3rF+nqDOOTddpHTY8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CValI+4LuVwcLzwIIJWeWWj2KnaCv8LSGUFBnpeAO5fiE/s6oTnTLzZG8XwwxQgB4
-	 PhppZCZnPf54VgwAd2xhoGAlblRyaLjDrMlmUrP/NJSpfJ/JA4DLdsciJy4Lb+dW+C
-	 oCTYFsaSzxVz4c71UldGeF/8FRdOq9eW8HJdjEQGMAeAo4v+ALNva6W+pgsoAR5bDc
-	 zvpuX/w58GLIzIulpz9BCrYYXmyyLd4rMxVzdmi2XE1fvcT6YKRW5nElllOlcTa+sj
-	 1puv1mtSgqfffmN2yFluKOBn+VQzC53fdP8trwcC+jzxLGVKp1ZQQ+x00RNTb80hfE
-	 jq7mDHFsUs5/g==
-Date: Tue, 28 Apr 2026 17:47:15 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>, Nimrod Oren <noren@nvidia.com>
-Subject: Re: [PATCH net-next 3/3] net/mlx5: use internal dma pools for frag
- buf alloc
-Message-ID: <20260428144715.GR440345@unreal>
-References: <20260428052920.219201-1-tariqt@nvidia.com>
- <20260428052920.219201-4-tariqt@nvidia.com>
+	s=arc-20240116; t=1777388142; c=relaxed/simple;
+	bh=27Qj0L1bYq0NpLObQdRlTr5GoATPfAvr9ry0F3cAVMA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ka4qB0rDH0bWpZ2kRNEhDbK69wXXcSuGflN8NXumYd65n7l87JKh+ENmRqba/94mhWvN4qsX9sfvnojEXVBogKrp18YEe/PkS8XJK5soAjolMe82Hixu3s3aDlhNE1gQewK2BV+cNQVDl015IRDalAvO9BfUxbglP2T/XSRQIBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [129.217.186.62] ([129.217.186.62])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.2/8.18.2) with ESMTPSA id 63SEtS0V010868
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 28 Apr 2026 16:55:28 +0200 (CEST)
+Message-ID: <40165e87-2019-4644-8c0e-4343be2df03e@tu-dortmund.de>
+Date: Tue, 28 Apr 2026 16:55:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260428052920.219201-4-tariqt@nvidia.com>
-X-Rspamd-Queue-Id: 32DFD4875BF
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 4/4] tun/tap & vhost-net: avoid ptr_ring
+ tail-drop when a qdisc is present
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+References: <20260428123859.19578-1-simon.schippers@tu-dortmund.de>
+ <20260428123859.19578-5-simon.schippers@tu-dortmund.de>
+ <20260428084851-mutt-send-email-mst@kernel.org>
+ <cdc3cbc8-cf6a-437c-b34c-dd8ced65d7f8@tu-dortmund.de>
+ <20260428092150-mutt-send-email-mst@kernel.org>
+ <d00bea39-7748-46ad-9c31-27326041f03c@tu-dortmund.de>
+ <20260428100731-mutt-send-email-mst@kernel.org>
+ <f4274173-23ef-43c3-aab4-b64678b440ec@tu-dortmund.de>
+ <20260428103108-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <20260428103108-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 237E448775F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[tu-dortmund.de : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281935-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-281936-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[gmail.com,redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_SPAM(0.00)[0.843];
+	R_DKIM_NA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tu-dortmund.de:mid,tu-dortmund.de:email]
 
-On Tue, Apr 28, 2026 at 08:29:20AM +0300, Tariq Toukan wrote:
-> From: Nimrod Oren <noren@nvidia.com>
+On 4/28/26 16:32, Michael S. Tsirkin wrote:
+> On Tue, Apr 28, 2026 at 04:18:54PM +0200, Simon Schippers wrote:
+>> On 4/28/26 16:10, Michael S. Tsirkin wrote:
+>>> On Tue, Apr 28, 2026 at 03:41:20PM +0200, Simon Schippers wrote:
+>>>> On 4/28/26 15:22, Michael S. Tsirkin wrote:
+>>>>> On Tue, Apr 28, 2026 at 03:10:44PM +0200, Simon Schippers wrote:
+>>>>>> On 4/28/26 14:50, Michael S. Tsirkin wrote:
+>>>>>>> On Tue, Apr 28, 2026 at 02:38:59PM +0200, Simon Schippers wrote:
+>>>>>>>> This commit prevents tail-drop when a qdisc is present and the ptr_ring
+>>>>>>>> becomes full. Once an entry is successfully produced and the ptr_ring
+>>>>>>>> reaches capacity, the netdev queue is stopped instead of dropping
+>>>>>>>> subsequent packets.
+>>>>>>>>
+>>>>>>>> If producing an entry fails anyways due to a race, tun_net_xmit returns
+>>>>>>>> NETDEV_TX_BUSY, again avoiding a drop. Such races are expected because
+>>>>>>>> LLTX is enabled and the transmit path operates without the usual locking.
+>>>>>>>>
+>>>>>>>> If no qdisc is present, the previous tail-drop behavior is preserved.
+>>>>>>>>
+>>>>>>>> The existing __tun_wake_queue() function of the consumer races with the
+>>>>>>>> producer for waking/stopping the netdev queue: the consumer may drain
+>>>>>>>> the ring just as the producer stops the queue, leading to a permanent
+>>>>>>>> stall. To avoid this, the producer re-checks the ring after stopping
+>>>>>>>> and wakes the queue itself if space was just made. An
+>>>>>>>> smp_mb__after_atomic() is required so the re-peek of the ring sees any
+>>>>>>>> drain that the consumer performed.
+>>>>>>>> smp_mb__after_atomic() pairs with the test_and_clear_bit() inside of
+>>>>>>>> netif_wake_subqueue():
+>>>>>>>>
+>>>>>>>> Consumer CPU                  Producer CPU
+>>>>>>>> ========================      =========================
+>>>>>>>> __ptr_ring_consume()
+>>>>>>>> netif_wake_subqueue()         netif_tx_stop_queue()
+>>>>>>>>           /\                  smp_mb__after_atomic()
+>>>>>>>>           ||                  __ptr_ring_produce_peek()
+>>>>>>>> contains RMW operation
+>>>>>>>>  test_and_clear_bit()
+>>>>>>>>           /\
+>>>>>>>>           ||
+>>>>>>>>  "Fully ordered RMW:
+>>>>>>>> smp_mb() before + after"
+>>>>>>>>     - atomic_t.txt
+>>>>>>>>
+>>>>>>>> Benchmarks:
+>>>>>>>> The benchmarks show a slight regression in raw transmission performance,
+>>>>>>>> though no packets are lost anymore.
+>>>>>>>
+>>>>>>> Could you include the packets received as well?
+>>>>>>> To demonstrate the gains/lack of loss. 
+>>>>>>>
+>>>>>>
+>>>>>> Do you mean the number of packets received by the VM?
+>>>>>> They should just be the same as the number sent (shown below), right?
+>>>>>
+>>>>> Minus the loss? Which this is about, right?
+>>>>
+>>>> Yes. I simply calculated "Lost/s":
+>>>>
+>>>> elapsed_time = 100e6 / sent_pps
+>>>> Lost/s = total_errors / elapsed_time
+>>>>
+>>>>
+>>>> To get back total_errors for example for TAP
+>>>> 1 thread sending:
+>>>>
+>>>> elapsed_time = 100e6 / 1.136Mpps = 88s
+>>>>
+>>>> 3758 Mpps = total_errors / 88s
+>>>> <=> total_errors = 331 million packets
+>>>>
+>>>> So, out of 431 million packets sent, 100 million were successfully
+>>>> delivered and 331 million were lost.
+>>>
+>>> That is my issue.
+>>>
+>>> I kind of have trouble mapping that to the table below.
+>>> For example:
+>>>
+>>>  | TAP        | Transmitted | 1.136 Mpps   | 1.130 Mpps     | -0.6%    |
+>>>  |            +-------------+--------------+----------------+----------+
+>>>  |            | Lost/s      | 3.758 Mpps   | 0 pps          |          |
+>>>
+>>> how can # of lost packets exceed the # of transmitted packets?
+>>>
+>>> Thanks!
+>>
+>> I just do use the sample script [1]:
+>>
+>> ./pktgen_sample02_multiqueue.sh -n 100000000 ...
+>>
+>> ... and this runs until 100_000_000 packets were sucessfully
+>> transmitted, independently of the lost packets/errors.
+>>
+>> [1] Link: https://www.kernel.org/doc/html/latest/networking/pktgen.html#sample-scripts
 > 
-> Add mlx5_dma_pool alloc/free paths, and wire mlx5_frag_buf allocation
-> and free paths to use them.
+> Confused. Are you saying "transmitted" is actually "received"? And the #
+> of packets sent is Transmitted + Lost?
+
+Sorry for my confusing answer.
+
+Yes, "transmitted" in the table should be changed to "received".
+And yes, as you said, the real # transmitted then is:
+Received + Lost = 1.136 + 3.758 = 4.894 Mpps.
+
 > 
-> mlx5_frag_buf_alloc_node() now selects an mlx5_dma_pool to allocate
-> fragments from, instead of directly allocating full coherent pages.
+>>>
+>>>
+>>>>>
+>>>>>> I assume they would be visible as RX-DRP for TAP.
+>>>>>> For TAP + vhost-net I would have to rewrite the XDP drop
+>>>>>> program to count the number of dropped packets...
+>>>>>> And I would have to automate it...
+>>>>>>
+>>>>>>>>
+>>>>>>>> The previously introduced threshold to only wake after the queue stopped
+>>>>>>>> and half of the ring was consumed showed to be a descent choice:
+>>>>>>>> Waking the queue whenever a consume made space in the ring strongly
+>>>>>>>> degrades performance for tap, while waking only when the ring is empty
+>>>>>>>> is too late and also hurts throughput for tap & tap+vhost-net.
+>>>>>>>> Other ratios (3/4, 7/8) showed similar results (not shown here), so
+>>>>>>>> 1/2 was chosen for the sake of simplicity for both tun/tap and
+>>>>>>>> tun/tap+vhost-net.
+>>>>>>>>
+>>>>>>>> Test setup:
+>>>>>>>> AMD Ryzen 5 5600X at 4.3 GHz, 3200 MHz RAM, isolated QEMU threads;
+>>>>>>>> Average over 50 runs @ 100,000,000 packets. SRSO and spectre v2
+>>>>>>>> mitigations disabled.
+>>>>>>>>
+>>>>>>>> Note for tap+vhost-net:
+>>>>>>>> XDP drop program active in VM -> ~2.5x faster, slower for tap due to
+>>>>>>>> more syscalls (high utilization of entry_SYSRETQ_unsafe_stack in perf)
+>>>>>>>>
+>>>>>>>> +--------------------------+--------------+----------------+----------+
+>>>>>>>> | 1 thread                 | Stock        | Patched with   | diff     |
+>>>>>>>> | sending                  |              | fq_codel qdisc |          |
+>>>>>>>> +------------+-------------+--------------+----------------+----------+
+>>>>>>>> | TAP        | Transmitted | 1.136 Mpps   | 1.130 Mpps     | -0.6%    |
+>>>>>>>> |            +-------------+--------------+----------------+----------+
+>>>>>>>> |            | Lost/s      | 3.758 Mpps   | 0 pps          |          |
+>>>>>>>> +------------+-------------+--------------+----------------+----------+
+>>>>>>>> | TAP        | Transmitted | 3.858 Mpps   | 3.816 Mpps     | -1.1%    |
+>>>>>>>> |            +-------------+--------------+----------------+----------+
+>>>>>>>> | +vhost-net | Lost/s      | 789.8 Kpps   | 0 pps          |          |
+>>>>>>>> +------------+-------------+--------------+----------------+----------+
+>>>>>>>>
+>>>>>>>> +--------------------------+--------------+----------------+----------+
+>>>>>>>> | 2 threads                | Stock        | Patched with   | diff     |
+>>>>>>>> | sending                  |              | fq_codel qdisc |          |
+>>>>>>>> +------------+-------------+--------------+----------------+----------+
+>>>>>>>> | TAP        | Transmitted | 1.117 Mpps   | 1.087 Mpps     | -2.7%    |
+>>>>>>>> |            +-------------+--------------+----------------+----------+
+>>>>>>>> |            | Lost/s      | 8.476 Mpps   | 0 pps          |          |
+>>>>>>>> +------------+-------------+--------------+----------------+----------+
+>>>>>>>> | TAP        | Transmitted | 3.679 Mpps   | 3.464 Mpps     | -5.8%    |
+>>>>>>>> |            +-------------+--------------+----------------+----------+
+>>>>>>>> | +vhost-net | Lost/s      | 5.306 Mpps   | 0 pps          |          |
+>>>>>>>> +------------+-------------+--------------+----------------+----------+
+>>>>>>>>
+>>>>>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>>>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>>>>>> ---
+>>>>>>>>  drivers/net/tun.c | 30 ++++++++++++++++++++++++++++--
+>>>>>>>>  1 file changed, 28 insertions(+), 2 deletions(-)
+>>>>>>>>
+>>>>>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>>>>>>>> index efe809597622..c2a1618cc9db 100644
+>>>>>>>> --- a/drivers/net/tun.c
+>>>>>>>> +++ b/drivers/net/tun.c
+>>>>>>>> @@ -1011,6 +1011,8 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+>>>>>>>>  	struct netdev_queue *queue;
+>>>>>>>>  	struct tun_file *tfile;
+>>>>>>>>  	int len = skb->len;
+>>>>>>>> +	bool qdisc_present;
+>>>>>>>> +	int ret;
+>>>>>>>>  
+>>>>>>>>  	rcu_read_lock();
+>>>>>>>>  	tfile = rcu_dereference(tun->tfiles[txq]);
+>>>>>>>> @@ -1065,13 +1067,37 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+>>>>>>>>  
+>>>>>>>>  	nf_reset_ct(skb);
+>>>>>>>>  
+>>>>>>>> -	if (ptr_ring_produce(&tfile->tx_ring, skb)) {
+>>>>>>>> +	queue = netdev_get_tx_queue(dev, txq);
+>>>>>>>> +	qdisc_present = !qdisc_txq_has_no_queue(queue);
+>>>>>>>> +
+>>>>>>>> +	spin_lock(&tfile->tx_ring.producer_lock);
+>>>>>>>> +	ret = __ptr_ring_produce(&tfile->tx_ring, skb);
+>>>>>>>> +	if (__ptr_ring_produce_peek(&tfile->tx_ring) && qdisc_present) {
+>>>>>>>> +		netif_tx_stop_queue(queue);
+>>>>>>>> +		/* Re-peek and wake if the consumer drained the ring
+>>>>>>>> +		 * concurrently in a race. smp_mb__after_atomic() pairs
+>>>>>>>> +		 * with the test_and_clear_bit() of netif_wake_subqueue()
+>>>>>>>> +		 * in __tun_wake_queue().
+>>>>>>>> +		 */
+>>>>>>>> +		smp_mb__after_atomic();
+>>>>>>>> +		if (!__ptr_ring_produce_peek(&tfile->tx_ring))
+>>>>>>>> +			netif_tx_wake_queue(queue);
+>>>>>>>> +	}
+>>>>>>>> +	spin_unlock(&tfile->tx_ring.producer_lock);
+>>>>>>>> +
+>>>>>>>> +	if (ret) {
+>>>>>>>> +		/* If a qdisc is attached to our virtual device,
+>>>>>>>> +		 * returning NETDEV_TX_BUSY is allowed.
+>>>>>>>> +		 */
+>>>>>>>> +		if (qdisc_present) {
+>>>>>>>> +			rcu_read_unlock();
+>>>>>>>> +			return NETDEV_TX_BUSY;
+>>>>>>>> +		}
+>>>>>>>>  		drop_reason = SKB_DROP_REASON_FULL_RING;
+>>>>>>>>  		goto drop;
+>>>>>>>>  	}
+>>>>>>>>  
+>>>>>>>>  	/* dev->lltx requires to do our own update of trans_start */
+>>>>>>>> -	queue = netdev_get_tx_queue(dev, txq);
+>>>>>>>>  	txq_trans_cond_update(queue);
+>>>>>>>>  
+>>>>>>>>  	/* Notify and wake up reader process */
+>>>>>>>> -- 
+>>>>>>>> 2.43.0
+>>>>>>>
+>>>>>
+>>>
 > 
-> mlx5_frag_buf_free() frees from the respective pool.
-> 
-> mlx5_dma_pool_alloc() keeps allocation fast by maintaining pages with
-> available indexes at the head of the list, so the common allocation path
-> can take a free index immediately. New backing pages are allocated only
-> when no free index is available.
-> 
-> mlx5_dma_pool_free() returns released indexes to the pool and frees a
-> backing page once all of its indexes become free. This avoids keeping
-> fully free pages for the lifetime of the pool and reduces coherent DMA
-> memory footprint.
-> 
-> Signed-off-by: Nimrod Oren <noren@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> ---
->  .../net/ethernet/mellanox/mlx5/core/alloc.c   | 185 ++++++++++++++----
->  include/linux/mlx5/driver.h                   |   2 +
->  2 files changed, 154 insertions(+), 33 deletions(-)
-
-<...>
-
-> +	if (WARN_ONCE(idx >= blocks_per_page,
-> +		      "mlx5 dma pool invalid idx: %lu (max %d)\n",
-> +		      idx, blocks_per_page - 1))
-> +		return;
-
-<...>
-
-> +	if (WARN_ONCE(test_bit(idx, page->bitmap),
-> +		      "mlx5 dma pool double free: idx=%lu block_shift=%u\n",
-> +		      idx, pool->block_shift))
-> +		goto unlock;
-
-<...>
-
-> +	if (WARN_ONCE(size <= 0, "mlx5_frag_buf non-positive size: %d\n", size))
-> +		return -EINVAL;
-
-<...>
-
-> +	if (WARN_ONCE(node < 0 || node >= nr_node_ids || !node_possible(node),
-> +		      "mlx5_frag_buf invalid node ID: %d\n", node))
-> +		return -EINVAL;
-
-All WARN_ONCE() instances in this patch and the previous one are not
-reachable. WARN_ONCE() should be used to detect states that are truly
-impossible, not cases where the internal API is being misused.
-
-There is no need for defensive programming when dealing with
-in-kernel or in-driver APIs.
-
-Thanks
 
