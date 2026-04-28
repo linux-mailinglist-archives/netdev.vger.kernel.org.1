@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-281664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281665-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id tnK0IVVS8Gk3RwEAu9opvQ
-	(envelope-from <netdev+bounces-281664-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 08:23:17 +0200
+	id i3noHuBU8GndRwEAu9opvQ
+	(envelope-from <netdev+bounces-281665-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 08:34:08 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A77CF47E036
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 08:23:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 236C147E18D
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 08:34:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 36A66301C3C6
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 06:23:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A506B3056140
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 06:23:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E0E4345CBF;
-	Tue, 28 Apr 2026 06:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28233346A01;
+	Tue, 28 Apr 2026 06:23:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TAVK2NVN"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CK4XLYrk"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A3C262FC1;
-	Tue, 28 Apr 2026 06:23:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA256262FC1;
+	Tue, 28 Apr 2026 06:23:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777357392; cv=none; b=ByM1JgQlq1v4+24Hq03/bpedCc7bglTyIdTJsZfSsHXs8nQPqc7o5hk3aAKNFZ5wtfDF0vmxJXYkzMyvJVL0MpYkggqwwdM3ue32oY9zfNyUB2Ky3MbND/f4TGhfMjXG66zZsRelxQo2Tor9yLr2gyGrZbzkUSkiyRpsllRpErI=
+	t=1777357397; cv=none; b=Dr6cfKCBBEOkzhSMUa9C494D+lHD50rI5kpBlaRh/IC5ug+qoknzt5w9UJgblqTUmGSnMv1yHQdQfNRyBmrMOpv+O7ANHZc1sdxV6WfQ9dWeLOpi5NKFJdGJ0ZnZuNN6YDpI4FCNzahO8qNcrAU/l4QnPNJQdeou7bPjvwBWKsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777357392; c=relaxed/simple;
-	bh=EfOOrxhNAc002gBQ2b94VR1M0iDD4MM8+CD2KGS9Miw=;
+	s=arc-20240116; t=1777357397; c=relaxed/simple;
+	bh=dLjvwNQGbgsihw8eMls+gO1zacDih/y1JKuhzvrV16g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZPXTir8cvAxz1RZbyA+1oLDfQGaZrrrvG56l7TGhxoOzuBmWPWV3QxOwvhtmrPbWD1FvY3kU+d1igQKenP5dPQI/ZbGloryR1TqZpzszRYiKU1NB92sJ/pCLxBFdRKBr/0+F2pb6ZwchX7ZhQOkr3poegeS1XYOAjqIDXbKwbik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TAVK2NVN; arc=none smtp.client-ip=192.198.163.15
+	 MIME-Version; b=PLgq7FeSb2WxFqODHzwPjaDbyNxyd5n8mIePy8rlYUQkXPR6y9dNsKwWhWsPkiLpPCVTRhi0xCnfmsPHYc6w0jwXv7pH592uFvXtGPfEADPiqNx7k8a7/IvPotRisU7NvNr0tUxI6Yd41Dv7U4WomqpXrZVJHhM2qv4m9B26G/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CK4XLYrk; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777357391; x=1808893391;
+  t=1777357395; x=1808893395;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=EfOOrxhNAc002gBQ2b94VR1M0iDD4MM8+CD2KGS9Miw=;
-  b=TAVK2NVN2dBE3tr/RYhSbhgQ6kWUt+IHKNGcDYeziW7YcPsxOoR3BhU4
-   CVG6EuCRw8FNkswRxR1xeHEqpU7SheWqWjgN9hXVAnMNc4gc/wYshwjUD
-   XE/r0ZKTchh5ytnCpYmF8a32g9UMNw7XrwdcG+wIHGOIBZ7jc8Sot9cKl
-   RTS5ajTPnvq0nuuDWlV9ygpNTZZfzgspnyvlhYgaBCBCnhjr5BGl8Cbj1
-   p9iYSI3ymRAX20324HKVIqCLcEQb7ejfwTeebq/QbSblPplkUiyyQdTbR
-   Nh7secQJLLPOETOPXpp0vCCp7APELkikBFtxAdAqSCr8JUe0tZ0j0JjE1
-   Q==;
-X-CSE-ConnectionGUID: D/qxDttaTkC3kdBPf3W6kw==
-X-CSE-MsgGUID: oOw79rs7QIWYTowLm7qLyQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11769"; a="78366121"
+  bh=dLjvwNQGbgsihw8eMls+gO1zacDih/y1JKuhzvrV16g=;
+  b=CK4XLYrk5KxFUJDZMCp2MN2BKP1A7zClBKZKEmW1Yzr3Hfm5oDUVa94z
+   aoHvPo+gz2P+99mr/XZQ78kCoZd4PxdB7+pmix1D6Ftcyl0zpjUy6fFQF
+   IJtyHLwmBzG2JR0p4NWVrCHGXgSrlTCb5TG7X/yCc/nXlKUC2YyuVyHOk
+   C1AJ6TAy4n3mTgDZBNtF/cbAwPekv215U5zbC7Toe5XvZDoCcj4TZB6vc
+   7zrk4qVs+oFSATNBTLpFCqkim9orWMvthGE4+xCz495oecLPDQB8DbFWN
+   o5qdCYqAPfAPgUqGY6h06xuFi04IfcRqaPPcSjyD8fgZEQW5AWHmM8B6P
+   A==;
+X-CSE-ConnectionGUID: vz8xq+ncRKuHCfQmdoXCrA==
+X-CSE-MsgGUID: MeaCeuoTRjiKHudk8K4VMw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11769"; a="78366129"
 X-IronPort-AV: E=Sophos;i="6.23,203,1770624000"; 
-   d="scan'208";a="78366121"
+   d="scan'208";a="78366129"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2026 23:23:10 -0700
-X-CSE-ConnectionGUID: 7PGtAfTESOi1tVLNFHwETg==
-X-CSE-MsgGUID: lErCAqfdR8CQT9jWMbfbMQ==
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2026 23:23:15 -0700
+X-CSE-ConnectionGUID: nDjG1kawTeu7Vob6m1z6RA==
+X-CSE-MsgGUID: v/kKMP4zS/KtoH1GEteb8Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,203,1770624000"; 
-   d="scan'208";a="232986893"
+   d="scan'208";a="232986927"
 Received: from unknown (HELO localhost.png.intel.com) ([10.107.255.61])
-  by orviesa010.jf.intel.com with ESMTP; 27 Apr 2026 23:23:07 -0700
+  by orviesa010.jf.intel.com with ESMTP; 27 Apr 2026 23:23:12 -0700
 From: KhaiWenTan <khai.wen.tan@linux.intel.com>
 To: anthony.l.nguyen@intel.com,
 	andrew+netdev@lunn.ch,
@@ -75,9 +75,9 @@ Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
 	Looi@web.codeaurora.org,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
 	KhaiWenTan <khai.wen.tan@linux.intel.com>
-Subject: [PATCH iwl-next v4 1/3] igc: remove unused autoneg_failed field
-Date: Tue, 28 Apr 2026 14:00:07 +0800
-Message-ID: <20260428060009.311393-2-khai.wen.tan@linux.intel.com>
+Subject: [PATCH iwl-next v4 2/3] igc: move autoneg-enabled settings into igc_handle_autoneg_enabled()
+Date: Tue, 28 Apr 2026 14:00:08 +0800
+Message-ID: <20260428060009.311393-3-khai.wen.tan@linux.intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260428060009.311393-1-khai.wen.tan@linux.intel.com>
 References: <20260428060009.311393-1-khai.wen.tan@linux.intel.com>
@@ -88,7 +88,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: A77CF47E036
+X-Rspamd-Queue-Id: 236C147E18D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [4.64 / 15.00];
@@ -104,9 +104,9 @@ X-Spamd-Result: default: False [4.64 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-281664-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-281665-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	GREYLIST(0.00)[pass,meta];
+	GREYLIST(0.00)[pass,body];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[intel.com:-];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -116,71 +116,123 @@ X-Spamd-Result: default: False [4.64 / 15.00];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.536];
+	NEURAL_HAM(-0.00)[-0.560];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,linux.intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
 From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
 
-autoneg_failed in struct igc_mac_info is never set in the igc driver.
-Remove the field and the dead code checking it in
-igc_config_fc_after_link_up().
+Move the advertised link modes and flow control configuration from
+igc_ethtool_set_link_ksettings() into igc_handle_autoneg_enabled().
+
+No functional change.
 
 Reviewed-by: Looi, Hong Aun <hong.aun.looi@intel.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
 Signed-off-by: KhaiWenTan <khai.wen.tan@linux.intel.com>
 ---
- drivers/net/ethernet/intel/igc/igc_hw.h  |  1 -
- drivers/net/ethernet/intel/igc/igc_mac.c | 16 +---------------
- 2 files changed, 1 insertion(+), 16 deletions(-)
+ drivers/net/ethernet/intel/igc/igc_ethtool.c | 72 ++++++++++++--------
+ 1 file changed, 44 insertions(+), 28 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_hw.h b/drivers/net/ethernet/intel/igc/igc_hw.h
-index be8a49a86d09..86ab8f566f44 100644
---- a/drivers/net/ethernet/intel/igc/igc_hw.h
-+++ b/drivers/net/ethernet/intel/igc/igc_hw.h
-@@ -92,7 +92,6 @@ struct igc_mac_info {
- 	bool asf_firmware_present;
- 	bool arc_subsystem_valid;
+diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+index 0122009bedd0..cfcbf2fdad6e 100644
+--- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
++++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+@@ -2000,6 +2000,49 @@ static int igc_ethtool_get_link_ksettings(struct net_device *netdev,
+ 	return 0;
+ }
 
--	bool autoneg_failed;
- 	bool get_link_status;
- };
++/**
++ * igc_handle_autoneg_enabled - Configure autonegotiation advertisement
++ * @adapter: private driver structure
++ * @cmd: ethtool link ksettings from user
++ *
++ * Records advertised speeds and flow control settings when autoneg
++ * is enabled.
++ */
++static void igc_handle_autoneg_enabled(struct igc_adapter *adapter,
++				       const struct ethtool_link_ksettings *cmd)
++{
++	struct igc_hw *hw = &adapter->hw;
++	u16 advertised = 0;
++
++	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
++						  2500baseT_Full))
++		advertised |= ADVERTISE_2500_FULL;
++
++	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
++						  1000baseT_Full))
++		advertised |= ADVERTISE_1000_FULL;
++
++	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
++						  100baseT_Full))
++		advertised |= ADVERTISE_100_FULL;
++
++	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
++						  100baseT_Half))
++		advertised |= ADVERTISE_100_HALF;
++
++	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
++						  10baseT_Full))
++		advertised |= ADVERTISE_10_FULL;
++
++	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
++						  10baseT_Half))
++		advertised |= ADVERTISE_10_HALF;
++
++	hw->phy.autoneg_advertised = advertised;
++	if (adapter->fc_autoneg)
++		hw->fc.requested_mode = igc_fc_default;
++}
++
+ static int
+ igc_ethtool_set_link_ksettings(struct net_device *netdev,
+ 			       const struct ethtool_link_ksettings *cmd)
+@@ -2007,7 +2050,6 @@ igc_ethtool_set_link_ksettings(struct net_device *netdev,
+ 	struct igc_adapter *adapter = netdev_priv(netdev);
+ 	struct net_device *dev = adapter->netdev;
+ 	struct igc_hw *hw = &adapter->hw;
+-	u16 advertised = 0;
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_mac.c b/drivers/net/ethernet/intel/igc/igc_mac.c
-index 7ac6637f8db7..142beb9ae557 100644
---- a/drivers/net/ethernet/intel/igc/igc_mac.c
-+++ b/drivers/net/ethernet/intel/igc/igc_mac.c
-@@ -438,28 +438,14 @@ void igc_config_collision_dist(struct igc_hw *hw)
-  * Checks the status of auto-negotiation after link up to ensure that the
-  * speed and duplex were not forced.  If the link needed to be forced, then
-  * flow control needs to be forced also.  If auto-negotiation is enabled
-- * and did not fail, then we configure flow control based on our link
-- * partner.
-+ * then we configure flow control based on our link partner.
-  */
- s32 igc_config_fc_after_link_up(struct igc_hw *hw)
- {
- 	u16 mii_status_reg, mii_nway_adv_reg, mii_nway_lp_ability_reg;
--	struct igc_mac_info *mac = &hw->mac;
- 	u16 speed, duplex;
- 	s32 ret_val = 0;
+ 	/* When adapter in resetting mode, autoneg/speed/duplex
+ 	 * cannot be changed
+@@ -2032,34 +2074,8 @@ igc_ethtool_set_link_ksettings(struct net_device *netdev,
+ 	while (test_and_set_bit(__IGC_RESETTING, &adapter->state))
+ 		usleep_range(1000, 2000);
 
--	/* Check for the case where we have fiber media and auto-neg failed
--	 * so we had to force link.  In this case, we need to force the
--	 * configuration of the MAC to match the "fc" parameter.
--	 */
--	if (mac->autoneg_failed)
--		ret_val = igc_force_mac_fc(hw);
+-	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
+-						  2500baseT_Full))
+-		advertised |= ADVERTISE_2500_FULL;
 -
--	if (ret_val) {
--		hw_dbg("Error forcing flow control settings\n");
--		goto out;
--	}
+-	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
+-						  1000baseT_Full))
+-		advertised |= ADVERTISE_1000_FULL;
 -
- 	/* In auto-neg, we need to check and see if Auto-Neg has completed,
- 	 * and if so, how the PHY and link partner has flow control
- 	 * configured.
+-	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
+-						  100baseT_Full))
+-		advertised |= ADVERTISE_100_FULL;
+-
+-	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
+-						  100baseT_Half))
+-		advertised |= ADVERTISE_100_HALF;
+-
+-	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
+-						  10baseT_Full))
+-		advertised |= ADVERTISE_10_FULL;
+-
+-	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
+-						  10baseT_Half))
+-		advertised |= ADVERTISE_10_HALF;
+-
+ 	if (cmd->base.autoneg == AUTONEG_ENABLE) {
+-		hw->phy.autoneg_advertised = advertised;
+-		if (adapter->fc_autoneg)
+-			hw->fc.requested_mode = igc_fc_default;
++		igc_handle_autoneg_enabled(adapter, cmd);
+ 	} else {
+ 		netdev_info(dev, "Force mode currently not supported\n");
+ 	}
 --
 2.43.0
 
