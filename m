@@ -1,164 +1,261 @@
-Return-Path: <netdev+bounces-281766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281768-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GCGzMcSG8GnuUQEAu9opvQ
-	(envelope-from <netdev+bounces-281766-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 12:07:00 +0200
+	id ILD/NPWJ8GloUgEAu9opvQ
+	(envelope-from <netdev+bounces-281768-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 12:20:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 482EA482383
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 12:07:00 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9B774827C4
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 12:20:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 90A10301F15B
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 10:03:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 28237305BAA1
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 10:06:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9D8A3E0C52;
-	Tue, 28 Apr 2026 10:03:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C163E5573;
+	Tue, 28 Apr 2026 10:06:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="nXYLVpB9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013002.outbound.protection.outlook.com [40.107.201.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7866C346ADE
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 10:03:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777370609; cv=none; b=Zl9fVWm2zXpKh9c4fCjUtY58KNHQ1s3cxUq7Fx3jqU9Cfep300msDB2DXIvv5uo/ufCc6tAhslIz60WHFpctqI+goPNSUjir9t2fBXAd8udRjS3zFafxllV+2rzk3o71SZN2T8yFxGa/ac3dKFVnUH4vbTf7qt+LK3njRPJDZmg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777370609; c=relaxed/simple;
-	bh=nE2kTc46EAtHp+hzkKm/fM0pnbhHAPrXksUwFRqrq6Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PJ0Do9IFZdChMw32jJHXwDpnHHWt3y/44bPk1n6w294Bp5QEjCEy9ZbE+PRcOe6b5iSCRtDK+G6I/sAm0Qd46wm5FjtTNcm9zXKzQU152Dhf7A3XVTl5HPBZS9erUTDtPM/o8X4I96B/7gaplYhRkASmlypzoCFyZ9/BzZ+FVwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-56d93355337so6871341e0c.0
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 03:03:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777370607; x=1777975407;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gRyHSlueZ2yIa5nhGJ3DTVlj1ZKdcYhWGe6E+g/f2HU=;
-        b=mzCsOwPn64XntBSyJf1GGef0hbKFJWjipJ0RoCYIOAWNjDGo5HQuzM0TgGOgkQvRmy
-         5aMCouyQtn9lNWFHnL/eHOwQ2LmYjNH3Yunuzs2r0wgTEU1WyTdN4sO/oi7YxHmKLueE
-         wUC0YhRjWIiSu6cHc2y7Cu7k6LuIZDyKVDRu/CDAemjJ2P7ycUUQEZk3h2whuR1bfyO+
-         V04Tc9SVXYL7QqILYIxwkJ0JU1kiEjzHEYeyuAAzqo4/MIZLc1AR+JgCIml3rr2dLOi8
-         v2YQHc3tp8hnYJPZdzzC1OEiYBGmNR+2e2+0gc7Kb79nMa6k1FAxgvUtJrQIXP/WLsI3
-         dFgg==
-X-Gm-Message-State: AOJu0YyMLFWYPxQlQhgJm42s72wcRu41yLY2fnCITeyCvYwWX5P0v1GG
-	Qw93X0SAHOzN6ABww37fhV4PvJ8cPpEhE5sGMFeS3mgZHW5upCzRQmyiOoSp9CVY0s0=
-X-Gm-Gg: AeBDiesAJtloWvwhqaHP2HOdc8LWvMJEhS4zjT9hK9s9W0wQXzUFVbpHawnWVgzgnYP
-	UKJxIZpT1RVtht/pD5bDUcvvk6JtSmGPcGFwR+c6TGbQdjWw5kNC12CkypYyu0TvjMvj1jrAdQt
-	mgRP475TLe+FZbtdjsHtoD8qMxi6251Mn7JpzPxQnlGjDppLrjzryoWoYq3OYndL8pc5Ufih+TG
-	9n9QSK08HdrKwgt3zdswETOTQSNZbH+3D3LJqbcakzreHgOi4sNN1TQdgGwrpu/v5poplZ+WqB+
-	EFsVg8Ga7tbcFaBUBzgxXd9WC7h4Y1t8WnPD2ATh4PhhgqzHAiRn1RZX1PWyoKgYw551nzRyJWw
-	3a09AceQwZ5z8Fpo2xYCsshPoEGWY13DvpQw7Fo2fCRu+2x7NBbsblbTclsm/4H2+5Vt+rWhEF6
-	T4cv+cb8wqAEvbl9fG+lAJD1rw5gASJkteQ3vpDxX3oKsdMVWAAo6rWq8gdyR4UVh4K6JjGxguT
-	TgWceboN+64NA==
-X-Received: by 2002:a05:6122:1b8d:b0:56c:3a57:aee2 with SMTP id 71dfb90a1353d-573a557eeedmr990428e0c.6.1777370607234;
-        Tue, 28 Apr 2026 03:03:27 -0700 (PDT)
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com. [209.85.221.176])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-573a3ec0da3sm1398154e0c.0.2026.04.28.03.03.26
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Apr 2026 03:03:26 -0700 (PDT)
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-56f8c77ca6aso7620705e0c.2
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 03:03:26 -0700 (PDT)
-X-Received: by 2002:a05:6102:8029:b0:609:444:eda3 with SMTP id
- ada2fe7eead31-6280aab5390mr872346137.17.1777370606595; Tue, 28 Apr 2026
- 03:03:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA7803DA7DB;
+	Tue, 28 Apr 2026 10:06:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.2
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777370780; cv=fail; b=Mnr4Le2VMM2DrTvOhxWTdS5qLkA8Uj23XcjgdgROrfKCOMkRpR3b8LMe3CDFjtpATJXmybOdTt2Pt95vYRLrjPejAh5cDgtIOQWLBvJrQsXddUqx/XGWc7mYmk4ih3jq9XW9mlxBME5c7HISIs3YEM+wl2NqhLoI5gTpNltGwjU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777370780; c=relaxed/simple;
+	bh=af3QgH6n0m9iYqKghbd3ggFYJ9UIezo8lj4fuYHsJ60=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=l5krQmPR7zh41QdZpNwveqQG/YekMIC51W1LSWeVa16M2ORdOfyNoUEw2EWE8MHV12igfMnOtgPcb1KlDeLKyMbxOrd2hQt7CUmI+Qz6uNmTVhYpDfv5I6H1mhgKnf8O+AuJezwKG8BYfJoGA3drjm5epLPA3lc0fSV3TX9O698=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=nXYLVpB9; arc=fail smtp.client-ip=40.107.201.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=EnREC9faOCZVMD5PC+HhEojyxqg+ivd9xkY4gndT8RrfXj9s1N5CLkeL7+zC7+CQdf8fZRTMbV5Ko2wI/M/rg/TPghRa9x5amV7azhQ/4uAdzoMcUUW1wbCOSA1UdloEGqW8+pV5ZTDRmQCNCAsTbTC6/05PniuBlAiLq9wVTRpf0QAQDy1T3Qb05BgG2QmXVJ+7hj22oDAKZ+sz14SaJqUthRAhgdGwYVfjGM2g0mE1Ufom4zRQ/mnNKnUUKt2zB/pKiYudUw8+xd2PtPRKFxd1xXwJWsHOc8F2LK7G0qYFLyImteDbJRrbOZsylBiPxzDFleZQWf2pOhl4LwbycA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mc1Uvwfs4unQLAxIUhD35HCLQ0eCBMI0ZD7xNXuv2pw=;
+ b=nDaPNbLZp2h+gTlfhFxGkO+YnhKYAA35JvScAzknSLauIzpP/ptJZOPKOwMvzx9ldTw3WXfn3xqkhPQ5cP1ayWkOjiYmlHNxeYRnjQhfprxqcmu9fb5cu+ES2hWTYpL4dNOGXgu+auu7EXTQUUuhkMnG5IcCqRV5wnYqBGKJS1IXrDJBni49cSVIB3X3Sw7QmyO44Y5wxcYi13zuxVfbnYh2PwSCPin9CQhXTzkNZWrhOJwTVQjlIbfQqFmfi20b5tL5erioFl8dMUWlzuu1bFw1l2fm5aePpyM2pCFPGA9fl8bM+CrI3igoE7As1jonESICOxJgzGJBuKCE4gyQEw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mc1Uvwfs4unQLAxIUhD35HCLQ0eCBMI0ZD7xNXuv2pw=;
+ b=nXYLVpB9TbTUXuvFwGwiOcUR4kSCEXvcxHhqw76U4hJVGUJmrXIMqvY/xX64krlBDAOFcQNMyZ0Wo3kLzhWMYCSZmabg6eXJMH7ywR/zk0frF+Yy4/wmrERDr8HGqA7iNv7rJZhZZAkcgclkxAWeOjO7kTe1lTKFDYwLJe87rAZ+HSLsZgrTycl0CnzemgIz48QQlxT7ulaCQC+iKkRmSXgv65K//KxsWJ6gXQDHsJuoiMWU5+0DRmF6vP4TfGN1BrbaBTAvuGCGoU6iqlW9v+X7ykwTTYyOGlkS3ahDh3MDqaGhcBDStGXu+aY6atTnnnFQwaZxraZdh1RDucj5Cw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SN7PR12MB7023.namprd12.prod.outlook.com (2603:10b6:806:260::16)
+ by SA3PR12MB7903.namprd12.prod.outlook.com (2603:10b6:806:307::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.16; Tue, 28 Apr
+ 2026 10:05:55 +0000
+Received: from SN7PR12MB7023.namprd12.prod.outlook.com
+ ([fe80::e329:4fcc:313d:2e3e]) by SN7PR12MB7023.namprd12.prod.outlook.com
+ ([fe80::e329:4fcc:313d:2e3e%5]) with mapi id 15.20.9870.013; Tue, 28 Apr 2026
+ 10:05:55 +0000
+Message-ID: <98c17c60-6747-4c2b-bfe4-ce9bbe560f6d@nvidia.com>
+Date: Tue, 28 Apr 2026 13:05:49 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 iproute2-next 1/4] rdma: Update headers
+To: David Ahern <dsahern@gmail.com>,
+ Stephen Hemminger <stephen@networkplumber.org>
+Cc: leon@kernel.org, michaelgur@nvidia.com, jgg@nvidia.com,
+ linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+ Patrisious Haddad <phaddad@nvidia.com>
+References: <20260330173118.766885-1-cmeiohas@nvidia.com>
+ <20260330173118.766885-2-cmeiohas@nvidia.com>
+ <20260427112505.684c21f3@phoenix.local>
+ <77e1a762-e204-497b-b7cb-40d5a93f8ec7@gmail.com>
+Content-Language: en-US
+From: Chiara Meiohas <cmeiohas@nvidia.com>
+In-Reply-To: <77e1a762-e204-497b-b7cb-40d5a93f8ec7@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR3P281CA0063.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:4b::13) To SN7PR12MB7023.namprd12.prod.outlook.com
+ (2603:10b6:806:260::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260428024400.123337-1-ebiggers@kernel.org> <20260428024400.123337-5-ebiggers@kernel.org>
-In-Reply-To: <20260428024400.123337-5-ebiggers@kernel.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 28 Apr 2026 12:03:15 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdVc4_1hfrX5_qTrNmz8dpe=H37i-N0xy9_M3ZkzUTO3Mg@mail.gmail.com>
-X-Gm-Features: AVHnY4IhVtJeI5bzqGCht8kP6KzDoM5sv9OtFI_ZUfpavb2rJ-ZtQSNVRJUngeM
-Message-ID: <CAMuHMdVc4_1hfrX5_qTrNmz8dpe=H37i-N0xy9_M3ZkzUTO3Mg@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/5] crypto: fcrypt - Remove support for FCrypt
- block cipher
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: netdev@vger.kernel.org, linux-afs@lists.infradead.org, 
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 482EA482383
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR12MB7023:EE_|SA3PR12MB7903:EE_
+X-MS-Office365-Filtering-Correlation-Id: 10a5940a-291a-48bd-b79d-08dea50dbcab
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|366016|1800799024|18002099003|22082099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	ca+5UGBUcS16wDOHnCCZG2llvavz+1DHmy2F5/KTMwzdW7uSs4kBfPSs9jphHXXcC9Dh3LzQb1J1coLmI9E6jCvfrMBAWymzNdH0Vxal+bILxhNFmVUCzFhNDyKEwD3dGz8+kWr2pyXD+VNOoolFA54eHKTy6796zrTxmtTMILruibKQZtVvNPX581kxcivn3+jqUdcmJ/DpTeTqbsyblgdjlxGXBtuICJIqdSJI2jAoKv6p79Wrcal5/huaqzErIyFxX+9tBtv8zdYvDVcoxW2LBL9aFXBnvYNwVIBchp789/RImmyQ6af9exg71d9R4PaB2Vs5YMmKQfEfxRWduNhKLoPrTggz28FidB0ziPRmsRak991arcPHMF15jLwmdzwI3SQggNlx1Lw0Hg19EQLp3952I6s7AHyfADoOBhTKVIB4IwBCIs4RAA39huF0PrShK3Dfm/ffqjxqVXU8EjPqh3IuQbVWAQnWOcj6ToUOV6RBG9v+juYljsihtzLWMVNG/Dn70osWo2CMDFwjvodGjvXXLICdbfZ+/ueu8IR948h/124YMncX9khc0mNib36bWJVPg0CqQxxvNuQ3fOV9s5AIjjo7PfZSJhWeHqyTU1qst0MItNcGkL/FEMcGTtjfkA5iwJd00PJ+cRIpxFrza2gZhTaE/RGiJWTEb8EmYm1qnVVQS5LmNp8XSzAiv4kkXlUctSiDtcQOsHNs9ZU/+/u3s1YDHSx8ysXYjYw=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR12MB7023.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cDNRMVVHeW9nYkFSeFduSHh6NzlGL0wyT3c4S0t1czR4MG5aSGl0MnVYbmZL?=
+ =?utf-8?B?Rk5FRmZYV3FkYmlMOUw1RDBSQTRHK3QvSEhYYndETVpuOWcvWlhnVHVNK3hn?=
+ =?utf-8?B?amNiT1FzUmRsemJGZHErazl0WXJBSVdNQ3Y2RW45L3ZLUzh6dkl6bS9md1JB?=
+ =?utf-8?B?WFdCOXorTUZhNnFTUFpibFl5bWpjVnNMa2VNNnFBeWkxQVVsc05yKyt4UDRC?=
+ =?utf-8?B?M1ZYWm1DTG9lMFJ3V2czZDhkNmQvOEt6d1NzSGwvOGd1c1pFS0d3MGpzWktR?=
+ =?utf-8?B?RGdZY2w4WXJSQkxFaEdyTm8wMTBaSjd2SDJrWDJCMXNCYVQ2OWdhQjVPV1Nq?=
+ =?utf-8?B?RUtmYUNGY1NqTSsvUENmRDdLdWJFb2V2OGtFOVFZZjBJbjhoQzVkUlhHTlBH?=
+ =?utf-8?B?c1BHckhMeFIxVG56bE9pcHlETkw5QlBrNFduTjdRbVpSWk4vS1d1U3dyd2VY?=
+ =?utf-8?B?U0lIWmpMVThwVVZOQ3Zib0dZTjMwMVpZbkN5eG5LR1VoeTdWbERjRmpFZ2N6?=
+ =?utf-8?B?TmJtTFlSNnFCS0tsYm55cndpNUZoODJHbmJBM3BjMUJMbU1lQjdlaDNvbHJP?=
+ =?utf-8?B?RGhOYzZ0WXpGWHRDQUxFSTBud3ZxdmYyOWxWYmkybjlpamtIb1BxOFJ5cjZv?=
+ =?utf-8?B?dEg2U1NVQTYrYnJwTmlmajV3Z09SVkRrQkZrMHFuSVErS1FPS1ZHR1ZIUmV1?=
+ =?utf-8?B?alg3VTVOQjJVMkZzSzVRRWxjOGFBcnhxVTEyN2p4SHhJZEg4SGxMUjdOaVpu?=
+ =?utf-8?B?ZWhOU0dhZ2h2N2dTcFFLNFczbjhlYWUxT1RnZkJ6VTdTM0MyK0w3c1B2N29T?=
+ =?utf-8?B?UDlQa1QxbVVUOVZpMG9nWXhWMGdrM2U3R1k4STUxYUlleHpkYUxFNzQxZzN3?=
+ =?utf-8?B?ZGh0SncxbUdxcU5Sc0xvTXZXNS8vRkJyQzR2dithbDVYRWFlYXg2d1lnYVdV?=
+ =?utf-8?B?WFNSNWRoTEpFakJrcitlNGxYT3c1US9zUzNGN0RUOHBJeW1IZk9jeGlrR1lm?=
+ =?utf-8?B?RXJCbWRkZFo3cjBBbTIvSkF2MnZrR2JOYzV2YVRReExDcUVBTE8zYy9lUzhG?=
+ =?utf-8?B?QUFYdG0xSjBYcGpJVGcySlJNWXZNb1JyUngrdVozSEwwbG9ULzV3NEtiVGEw?=
+ =?utf-8?B?emc4QUx4V3RacC9tWVVqWXRQaENCRFZ1TTFGZmVITmRmZkpWR3p2MFg5SXd2?=
+ =?utf-8?B?a2hVR0FHblZlbmorcmlhYzBqaHB5Nlk4NkUyWkU2and0Y1NyUUVDc0xZK1Jl?=
+ =?utf-8?B?cHROdjNoUTFRZEFleWpuUTNtaHNuZmRuZXdRT3RTWExuUlV3a1FaeVhna3g0?=
+ =?utf-8?B?NUlpc3EraG9ON3lmT0ovS20ycXBJMDNncXhJS3licGVJK05UK1luVWtDT0Z1?=
+ =?utf-8?B?ZVNSL1JxMTk0akhYMFhaODk3M2c4QVlHeVNkMkpYVzQwc2sxSEdPaW5xdmlD?=
+ =?utf-8?B?THZ4bWVnbDlJZmtMc1MzUWdyT3EveTV0YWIwQytyNFJETXYzQmU3TEhjVUoy?=
+ =?utf-8?B?emFUQUxSVW9DOXVabE5wUnpVZ1Nzb3BQTmlXTkk3QXI1M1Z3Zm9NV0RJMStU?=
+ =?utf-8?B?TlJrM0d6SmFSNVhrZkJZdTN1TC9sdlgwcFF1NVNyYUx6bVNqamZrRGhFZTZq?=
+ =?utf-8?B?cUVSTzRsay9lSmE0UzR2QnVKeDU4NWM3eDhXVGR1eTN1d0dMVUJHdE9XQjNB?=
+ =?utf-8?B?ZUIvcDVkYmJadGxHTG1IU3NCdGNKdGdaaTNlWE54NEN5SkhMaW8weHFYVzdI?=
+ =?utf-8?B?clNhdnExWFptNW4yZVY1amNIZW84dXpkY3RCUU9VMGFvTW5XejZIdlZKcmQ4?=
+ =?utf-8?B?VkpzZFRTa3h1NUUzVGRaY01ndUJ1TWhRb3JySVlwVWtZbldjUXNMZUJ5YVZG?=
+ =?utf-8?B?Sko1eW5SY0ZLeU84aHpGZGcxNGQ2L21rVTJpNk9YbkZMZHdmWk8vWS96Rk96?=
+ =?utf-8?B?VzFUa1BPN1ZLMVkrcDVLaXBVWklyUlJ4aUwzRE9pMUlzL2xMdjJkS04zOGtW?=
+ =?utf-8?B?MER0ZXg2Sndlalp1T3JvSkNBa1Z0TzFtdlRPRklVeThWSDdLQkxrOVY2SGZ0?=
+ =?utf-8?B?c0ZzRWNlZmxmdEI3QncxVTNHamRodW9oNVZhaWN4QVZibVZVOElhRVQvclF1?=
+ =?utf-8?B?N3d4TEdtZFpUbmh3T2VjR1BZRW5PbjNZcjYwY2ZPVVQrSzVZdWo5LzJhRUht?=
+ =?utf-8?B?MzEzRDJoMlI2cHZTNDJvZFpITTc3LzNnWFV4Z2E3WHJPQ0FiTzEzT0h1OXlH?=
+ =?utf-8?B?Y3greHNaaVlXUVJyYjdtR0VPcEdwWTYxYnZmYUVPbTVRZ2NpK2pYQXdxbm55?=
+ =?utf-8?B?YVdxL2FEakErRllvOEJpdTdnVjYwQWE0UC9tVEVpdm9mUU05eHJGUT09?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 10a5940a-291a-48bd-b79d-08dea50dbcab
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR12MB7023.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2026 10:05:55.3887
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: c9WGNdZ7bFCA9dhJVuBdfZ6d80nesAze1xLtweb1O4MJC9IkSbCNjtdERN2gbLgosSJzUBEFnRwATeqU33AW8g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7903
+X-Rspamd-Queue-Id: D9B774827C4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281766-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281768-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[linux-m68k.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.829];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,networkplumber.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[cmeiohas@nvidia.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux-m68k.org:email,openafs.org:url,mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,nvidia.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,Nvidia.com:dkim]
 
-On Tue, 28 Apr 2026 at 04:49, Eric Biggers <ebiggers@kernel.org> wrote:
-> Remove the insecure FCrypt block cipher from the crypto API.  Its only
-> user was net/rxrpc/, but now net/rxrpc/ implements it locally.  The
-> crypto API implementation is no longer needed.
+On 27/04/2026 21:27, David Ahern wrote:
+
+> On 4/27/26 12:25 PM, Stephen Hemminger wrote:
+>> On Mon, 30 Mar 2026 20:31:15 +0300
+>> Chiara Meiohas <cmeiohas@nvidia.com> wrote:
+>>
+>>> From: Michael Guralnik <michaelgur@nvidia.com>
+>>>
+>>> Update rdma_netlink.h file up to kernel commit dbd0472fd7a5
+>>> ("RDMA/nldev: Expose kernel-internal FRMR pools in netlink")
+>>>
+>>> Signed-off-by: Michael Guralnik <michaelgur@nvidia.com>
+>>> Reviewed-by: Patrisious Haddad <phaddad@nvidia.com>
+>>> Reviewed-by: Chiara Meiohas <cmeiohas@nvidia.com>
+>> The upstream macro names changed, the iproute2 build is broken after
+>> current headers sync.
+>>
+>> In file included from res.c:7:
+>> res.h: In function ‘_res_frmr_pools’:
+>> res.h:203:26: error: ‘RDMA_NLDEV_CMD_RES_FRMR_POOLS_GET’ undeclared (first use in this function); did you mean ‘RDMA_NLDEV_CMD_FRMR_POOLS_GET’?
+>>   203 | RES_FUNC(res_frmr_pools, RDMA_NLDEV_CMD_RES_FRMR_POOLS_GET,
+>>       |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> res.h:56:44: note: in definition of macro ‘RES_FUNC’
+>>    56 |                 _command = res_get_command(command, rd);                               \
+>>       |                                            ^~~~~~~
+>> res.h:203:26: note: each undeclared identifier is reported only once for each function it appears in
+>>   203 | RES_FUNC(res_frmr_pools, RDMA_NLDEV_CMD_RES_FRMR_POOLS_GET,
+>>       |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> res.h:56:44: note: in definition of macro ‘RES_FUNC’
+>>    56 |                 _command = res_get_command(command, rd);                               \
+>>       |                                            ^~~~~~~
 >
-> For some additional context: FCrypt was designed in 1988 and is
-> essentially a weakened version of DES.  It has the same 56-bit key size
-> as DES, which is easily brute forced.  Moreover, it's cryptographically
-> weak and doesn't even provide the intended 56-bit security level.  Its
-> author considers it to be a mistake, as well
-> (https://lists.openafs.org/pipermail/openafs-devel/2000-December/005320.html).
+> Looks like the merged API does not have the _RES part of the uapi:
 >
-> But fortunately this 1980s-era homebrew block cipher was never adopted
-> outside of net/rxrpc/.  So its code can just be kept there.
+> kernel vs iproute2:
 >
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> @@ -590,19 +590,19 @@
+>  	/*
+>  	 * FRMR Pools attributes
+>  	 */
+> -	RDMA_NLDEV_ATTR_FRMR_POOLS,		/* nested table */
+> -	RDMA_NLDEV_ATTR_FRMR_POOL_ENTRY,	/* nested table */
+> -	RDMA_NLDEV_ATTR_FRMR_POOL_KEY,		/* nested table */
+> -	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ATS,	/* u8 */
+> -	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ACCESS_FLAGS,	/* u32 */
+> -	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_VENDOR_KEY,	/* u64 */
+> -	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_NUM_DMA_BLOCKS,	/* u64 */
+> -	RDMA_NLDEV_ATTR_FRMR_POOL_QUEUE_HANDLES,	/* u32 */
+> -	RDMA_NLDEV_ATTR_FRMR_POOL_MAX_IN_USE,	/* u64 */
+> -	RDMA_NLDEV_ATTR_FRMR_POOL_IN_USE,	/* u64 */
+> -	RDMA_NLDEV_ATTR_FRMR_POOLS_AGING_PERIOD,	/* u32 */
+> -	RDMA_NLDEV_ATTR_FRMR_POOL_PINNED_HANDLES,	/* u32 */
+> -	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_KERNEL_VENDOR_KEY,	/* u64 */
+> +	RDMA_NLDEV_ATTR_RES_FRMR_POOLS,			/* nested table */
+> +	RDMA_NLDEV_ATTR_RES_FRMR_POOL_ENTRY,		/* nested table */
+> +	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY,		/* nested table */
+> +	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ATS,		/* u8 */
+> +	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ACCESS_FLAGS,	/* u32 */
+> +	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_VENDOR_KEY,	/* u64 */
+> +	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_NUM_DMA_BLOCKS, /* u64 */
+> +	RDMA_NLDEV_ATTR_RES_FRMR_POOL_QUEUE_HANDLES,	/* u32 */
+> +	RDMA_NLDEV_ATTR_RES_FRMR_POOL_MAX_IN_USE,	/* u64 */
+> +	RDMA_NLDEV_ATTR_RES_FRMR_POOL_IN_USE,		/* u64 */
+> +	RDMA_NLDEV_ATTR_RES_FRMR_POOL_AGING_PERIOD,	/* u32 */
+> +	RDMA_NLDEV_ATTR_RES_FRMR_POOL_PINNED,		/* u32 */
+> +	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_KERNEL_VENDOR_KEY, /* u64 */
+>
+>  	/*
 
->  arch/m68k/configs/amiga_defconfig           |   1 -
->  arch/m68k/configs/apollo_defconfig          |   1 -
->  arch/m68k/configs/atari_defconfig           |   1 -
->  arch/m68k/configs/bvme6000_defconfig        |   1 -
->  arch/m68k/configs/hp300_defconfig           |   1 -
->  arch/m68k/configs/mac_defconfig             |   1 -
->  arch/m68k/configs/multi_defconfig           |   1 -
->  arch/m68k/configs/mvme147_defconfig         |   1 -
->  arch/m68k/configs/mvme16x_defconfig         |   1 -
->  arch/m68k/configs/q40_defconfig             |   1 -
->  arch/m68k/configs/sun3_defconfig            |   1 -
->  arch/m68k/configs/sun3x_defconfig           |   1 -
+Thanks for catching this.
 
-Acked-by: Geert Uytterhoeven <geert@linux-m68k.org> # m68k
+We will prepare a sync patch to align the names with the kernel and send it shortly.
 
-Gr{oetje,eeting}s,
 
-                        Geert
+Best regards,
 
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+Chiara
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
 
