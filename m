@@ -1,261 +1,233 @@
-Return-Path: <netdev+bounces-281740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281741-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GMF7KMGC8GlwUQEAu9opvQ
-	(envelope-from <netdev+bounces-281740-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:49:53 +0200
+	id mLogBQF+8Gl8UAEAu9opvQ
+	(envelope-from <netdev+bounces-281741-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:29:37 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B496B481D70
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:49:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 35E884816DA
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:29:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 93F4C306BE2A
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 09:11:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 34DDB313B722
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 09:14:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B063E2764;
-	Tue, 28 Apr 2026 09:09:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D03E33ADB9;
+	Tue, 28 Apr 2026 09:14:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="oxd16e8J"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HMOrnfeR";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="JGnA+kXX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E383E1CE6
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 09:09:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC55374198
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 09:14:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777367388; cv=none; b=jUhCb7kAHAaF3c3CkViuwlAZaQM6tM+bnzZ0PkE03zJtgkjUt8mtmHgJOV4z8d40iuiG4meGCeJz92i/5Cl5hQvhro6XZS/9qKbHnwF8iF4guuIUW+dpfEt+JEk/Xh8u+juYKo1N+gjhrMFKtIvEsoJfPmKe2AotsDBC1jhGkSA=
+	t=1777367663; cv=none; b=J1+Sfi7Tb8HqvdyomhvgGtCcLuiNRswxmyZgLkMAADDcApXURzpbt8oIP6JDu2M3z5tOE2ncK3HUBvJosHCtCW1lISqnEPiZ7P4Hfg+m7pQoAFdHf/eXOS9CNz3CoCCivw9WEB7o+9KqSDrnoC4pA2ztoHNXzv6rFnelK+WpUSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777367388; c=relaxed/simple;
-	bh=ndV9HO4TrB7UH4OQaqRqhxadXpb2M84IgFY4mR7mxMY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=l6Ns22vGkTx1kIktNM7ykJ8MLakAjs5Wc9Aw3ukHszFC8kdc8lHYWTvXsqs8Zb9SHd/KtEkhTlN5NyK/8GFPsw/UmIt2a1w6zdjRp8Usu+S/r57tMSpk1pjU6FiHO5Hb6TRaqL7AaUTtmmDaKkXoHinbIKboaVB1pRya3L/SWWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=oxd16e8J; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4891e5b9c1fso96001215e9.2
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 02:09:45 -0700 (PDT)
+	s=arc-20240116; t=1777367663; c=relaxed/simple;
+	bh=4GkDVVEv08AkmrNXJY3nxp8e2TsLCNnF8yTHag+O6bg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EOA3Aad5qkZJincqIfE7MIXBYkb9wn9WV4EdeNRiPEJmdxDg8mG1gNbWQUqF+ayf9CE4SQoe+yA7f9k6RhUvm1InOxQhc6zYshPNfyGrWi67GKsjezFP6groiHLUEaqhthpaFHi+5GG+gnwLwKWDD6SFH4IXR5Ctrc+tYx8UvyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HMOrnfeR; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=JGnA+kXX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777367661;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/jdccpIy7hv3+DluffTpSfC70lKLfgOcLkHxN6neGN8=;
+	b=HMOrnfeRG71sV8y5jDg7KVt1unMmcKc9ITRD6VP5u6Y1TleWve0uj2D/EXa4i4vxEClN7o
+	dWy4FLIk8H2Ip698rheu4fjRla3MVANu3YAk6M/S+tsu0nWWmPDjYrTfyt1KhZnY4f7xXR
+	V6v3MLdk2tFLxQytFoWVfJIO+G26WYM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-292-agzs9CtANiKHj5yCyxVLjw-1; Tue, 28 Apr 2026 05:14:20 -0400
+X-MC-Unique: agzs9CtANiKHj5yCyxVLjw-1
+X-Mimecast-MFC-AGG-ID: agzs9CtANiKHj5yCyxVLjw_1777367659
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-44696b11265so455217f8f.0
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 02:14:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1777367384; x=1777972184; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=uv+T7Qd810LVMbQvEtvpybibnpScTbWBpv7OZ6oXHZE=;
-        b=oxd16e8JM587DpH50wb73izUKuxGy6KNMTHCm0SnzHK9useMwvOq913/8vzpeiZUNH
-         s6q1s/yrWI/C3elj1lF+DrvrgMnSeURx5pIi9SyTXsn2k3OjEXTBkfKXabQNDBel8CGS
-         g9+4rWSTOYN1sDRr45Y6pWnAYmDUYtKx47v1JElDdv1yQXg2oAtBgsGt9rfRNtxrjOmk
-         rr1WO2LfqavyJPvrOoukwdnx4S04P3jhK4+vHZerVIgPIABYM2uCgNaTbCjct3UBACeq
-         AbaugpzsOAQe1eGu4XddPK+bT7iwZu7GQF6gZtJ+V3pqilFk5zIqexJT5Q7kA+QeFPo4
-         0oVA==
+        d=redhat.com; s=google; t=1777367659; x=1777972459; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/jdccpIy7hv3+DluffTpSfC70lKLfgOcLkHxN6neGN8=;
+        b=JGnA+kXXFTQCh1znoikaAsEly669RudeuB8YNBsLio4363kypED6u0iGkbTW7ludzY
+         VpiNSGMzKiKWhEcgx5tQ5nYNvGl79rjnY90gyuBRh9w1ambS2bk+q4DaHggPExp0vr3k
+         FnFWfzbKswgIwK+XYBtMTlfT0kLj6HWkQQyGNsveg4w8f7Kw+vLv+wQmED/bQZfUSIDR
+         m5poowyKmFnQq2zy5QHuVdKz1Lqc85+BvuHdY2FRBOyCTtNS2mPYt1LqXYoEcGGRshCX
+         Kmf6JyEomS/WS1JPvARMbSyvKSeSNZMk4B+WFlPkigY/PmQXmufc6+Ot8fI+3LV2I7W7
+         UGDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777367384; x=1777972184;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uv+T7Qd810LVMbQvEtvpybibnpScTbWBpv7OZ6oXHZE=;
-        b=o9YispK1pAF6Ss0wp4ZjZDzjLbNjI9w3XfTRQmULHTe/O4Mopw8yf6cMc4ULD0HBXw
-         Y+m3rNP8GA9c+KDpxVSk9IB5+KAj6zscrnYM77kpK6stNLfOQmdr8zMCkqJ9wFz8Pxbz
-         U5pekNCj5A2j0BmNox4Y8ctT8S7lZh2Zv65rj2/BG2eaC4zkxzT5yQTS/3IBiXNqtoMv
-         yOOcNgSvSUhRGDM0Qi79Qyz5BDD+f+psVuZ0H3rx7sMsOOANfe7Yb2M/iQTAaMXWLqG4
-         5IoPzGo2Tx1XZqa9VOiIxNtA3SQVv2wxtYtd+BbqHUSGjkIRKVxk/RycyKRpHPyL9T5G
-         Vy+A==
-X-Forwarded-Encrypted: i=1; AFNElJ9ZoV2KE0DsNGuBHpN6gJ4ukrdoE/mF3hFi/n0UkJBldi0mbbMTcoNuhRlseyojnx+fDm9uzIc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyeG85T1ylkKAeb/kTfvVxj8nZ9XjhidJsMswaAFCWnT7vFrvbK
-	Mx/XuHSDXLR+7gcj993ew3QyZsEJ0ZaWEpU2hoV9JgMo0pBpTFUuxonJTI/GScwbQQU=
-X-Gm-Gg: AeBDievuokIJVMZlBfXy6DsNRgOLNyapM/YB7PNIXBCpaszOe78/CF8chIso5Od23Fe
-	mYrkoCwWwnRIwnd5gAicX8vo384E+R6p57DBCaLShI6sT+18MzyD4fnm8pOarB5Nr7wXj7VMoNO
-	+4ks/7yDzZ2ocEL1bTzfUo551KtNxG/R3y1h2za9brJscHvoezg97DY52oYJLYJu2zeZWisjpHC
-	WVC29K7wnruqbv6sy9pKWBo1iPBk5kzo+lFmKD2s95Pv1qopDEoVJDoBJtr2intAJ+cfwxajVI7
-	jkz4TD3gaNyQEcmlyaiFZWt6uMOl/6dlRG9AAVhTmVKSgB90VAjWldtBcJ8FHqNVawGIN/YM4CO
-	RzYb8EfLvQkvfFhqVxOXJeRnTlyq6kWI+MCKYnOL/s7Uqz79e92+qBAN28CF0IYbOKA4V2gZ4JY
-	s+0cREUScEem8w+2sTp/sZBenJb3vXam/uPttXDeg/kIrnbb8qRUjlMXFV3SYnPacsTn5yIDE6o
-	Z9pACf05LMNUl11M+u6H6XB4odHEQ==
-X-Received: by 2002:a05:600c:c177:b0:48a:5301:bb5c with SMTP id 5b1f17b1804b1-48a77b12a49mr30418175e9.16.1777367383438;
-        Tue, 28 Apr 2026 02:09:43 -0700 (PDT)
-Received: from bell.fritz.box (p200300faaf260200051aef03a698a1fc.dip0.t-ipconnect.de. [2003:fa:af26:200:51a:ef03:a698:a1fc])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a775defe4sm29070145e9.7.2026.04.28.02.09.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Apr 2026 02:09:42 -0700 (PDT)
-From: Mathias Krause <minipli@grsecurity.net>
-To: netfilter-devel@vger.kernel.org
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	netdev@vger.kernel.org,
-	Mathias Krause <minipli@grsecurity.net>
-Subject: [PATCH net] netfilter: nf_nat: avoid invalid nat_net pointer use on failed nf_nat_init()
-Date: Tue, 28 Apr 2026 11:09:17 +0200
-Message-ID: <20260428090917.3851366-1-minipli@grsecurity.net>
-X-Mailer: git-send-email 2.47.3
+        d=1e100.net; s=20251104; t=1777367659; x=1777972459;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/jdccpIy7hv3+DluffTpSfC70lKLfgOcLkHxN6neGN8=;
+        b=euSqg2PHUEYkellxLnfbOjjVYZIQm7RADqOlVqsvduDL8Rde6wmeU0dXtfBN4nCQNG
+         47W6EjWkRbs74nXAbSNt7SI3LY6wAWzaap9IOxbVOi9rZzjebZUfv9RNUUnUUe5IBt4y
+         EeW99/og7FRZ67/i34U6TccisxfVeV3x5hhnVlxNSUDyO6YDNVhDl1o/ghu9W3IJThCi
+         mn6gy5bsECqoq/rirNxElYqu/SJv3ecCqJEVg7gabjltDKUN6/HgT/at6ACiQ67SeICM
+         al46AVUAQlYx4b/8BX2tSMXHcialX3YEdLOpx5Srv1H/mITgTZYiSyKx1HEDYzWnlaVN
+         uAlA==
+X-Forwarded-Encrypted: i=1; AFNElJ89zB3EMt/gcuW0sgfptkdj5fvkBFYq5NBC18Zl68wxHJ37ICSd8V8wnI58NWYSpiD/rleUzUA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7hxIsOHtV/X7cQX8FTHuCXc7n+xTOdKihSq14VcM5FETijQPK
+	GaH6d7RGpT7jXfncNk2LrigqBdROb91BeYiHJH7yaMf4oxSYmDzEiSxZuT17BrnU9JCu9/xSUvS
+	OXEYgnVs5iag5HSfWzJto0tdgWJ0YPKGZE+MVItNn1jKJ93LfBH12jqFD/w==
+X-Gm-Gg: AeBDieu7q3yNd228TuY9/3mlhr9ALyC0Z8IpnuOt5cy8cgmPAWXQsMld5bQLvr66C/8
+	PWcx2dmB3d5a7Z/Z4Bl1PcKFrXCcCI6IX6CWdzgtVdqugyl0q9AfHHh1ytcv8VTMbQR6yRGSxvg
+	hBLjtui1bmzh7Lib5uFEF/ALdzxJ+9dePXjC99tMAy1FJPD6u9zCNXjroSb8KVPsi4fOgIIbeK9
+	vQjAGUpp2JKzI49tPNxuL5qCoXsL5CRZuZvdg8Lsgkf22dmsAkZJtkY1tJO8o/Vkidsngq/51/U
+	nrffARtVzrCsSduIa6aQyKzjOJDwk7GMUEAA0pESTHT0xZq5SctMF0MznF+cYJZ9tP3Gte9ronV
+	aIyouoberNDBGxK/ZICtfAcMsAlfwbgJq6qPFWsUDrXuDwJ5EgCX6kZmEudiQZCrj0A==
+X-Received: by 2002:a5d:5f51:0:b0:441:1df5:480c with SMTP id ffacd0b85a97d-4464a070032mr4183703f8f.42.1777367658520;
+        Tue, 28 Apr 2026 02:14:18 -0700 (PDT)
+X-Received: by 2002:a5d:5f51:0:b0:441:1df5:480c with SMTP id ffacd0b85a97d-4464a070032mr4183660f8f.42.1777367658030;
+        Tue, 28 Apr 2026 02:14:18 -0700 (PDT)
+Received: from [192.168.88.32] ([216.128.9.114])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4463fa89140sm4764422f8f.27.2026.04.28.02.14.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Apr 2026 02:14:17 -0700 (PDT)
+Message-ID: <efe42959-81c4-4d35-a3d0-fd084c9cda25@redhat.com>
+Date: Tue, 28 Apr 2026 11:14:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: ipv6: fix NOREF dst use in seg6 and rpl
+ lwtunnels
+To: Andrea Mayer <andrea.mayer@uniroma2.it>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, horms@kernel.org, clrkwllms@kernel.org,
+ rostedt@goodmis.org, david.lebrun@uclouvain.be, alex.aring@gmail.com,
+ Justin Iurman <justin.iurman@gmail.com>, stefano.salsano@uniroma2.it,
+ netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20260421094735.20997-1-andrea.mayer@uniroma2.it>
+ <20260423080056.KgHlh9Oa@linutronix.de>
+ <20260425160856.8cebade5eae1dcaec7af8bfe@uniroma2.it>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260425160856.8cebade5eae1dcaec7af8bfe@uniroma2.it>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: B496B481D70
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 35E884816DA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[grsecurity.net,none];
-	R_DKIM_ALLOW(-0.20)[grsecurity.net:s=grsec];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281740-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,goodmis.org,uclouvain.be,gmail.com,uniroma2.it,vger.kernel.org,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-281741-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[grsecurity.net:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[minipli@grsecurity.net,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,grsecurity.net:email,grsecurity.net:dkim,grsecurity.net:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-We ran into below KASAN splat, which is mostly uninteresting, beside
-for having nf_nat_register_fn() in the call chain as a cause for the
-offending access:
+On 4/25/26 4:08 PM, Andrea Mayer wrote:
+> On Thu, 23 Apr 2026 10:00:56 +0200
+> Sebastian Andrzej Siewior <bigeasy@linutronix.de> wrote:
+> 
+> Hi Sebastian,
+> 
+> thanks for the review, and to Simon and Justin as well.
+> 
+> 
+>> On 2026-04-21 11:47:35 [+0200], Andrea Mayer wrote:
+>>>
+>>> [snip]
+>>
+>> So the dst passed to skb_dst_set_noref() has no reference count. The fix
+>> is to use skb_dst_force() to increment the refcount on it. But this
+>> requires that we are in the same RCU section. And I guess we are since
+>> none of the warnings are visible.
+>  
+> Yes. lwtunnel_input() holds rcu_read_lock() around ops->input(), which is
+> where seg6_input_core()/rpl_input() execute. The skb_dst_force() is called
+> within that RCU section.
+>  
+> 
+>> Doesn't this make ip6_route_input() on RT fragile in general due to the
+>> RT6_LOOKUP_F_DST_NOREF usage or here something special about the two
+>> files that are patched?
+>> Based on your explanation it all makes sense, I am just not sure if this
+>> race is limited to those two are if there is more to it.
+> 
+> seg6_input_core() and rpl_input() cache the dst via dst_cache_set_ip6(), which
+> invokes dst_hold(). The dst_hold() calls rcuref_get(), failing on a zero
+> refcount and triggering a WARN, but the pointer is still stored in the cache.
+> After the RCU grace period completes the dst is freed, and a subsequent
+> dst_cache_get() returns a dangling pointer.
+>  
+> The other callers of ip6_route_input() (e.g., ipv6_srh_rcv, ipv6_rpl_srh_rcv,
+> ip6_rcv_finish_core) consume the NOREF dst without caching it. Even if the
+> pcpu_rt's refcount is concurrently dropped to zero, the dst memory remains
+> valid because dst_release() defers the actual free via call_rcu_hurry() and the
+> caller is still inside the RCU read-side critical section.
+> 
+> 
+>>> [snip]
+>>>
+>>> Fixes: af4a2209b134 ("ipv6: sr: use dst_cache in seg6_input")
+>>> Fixes: a7a29f9c361f ("net: ipv6: add rpl sr tunnel")
+>>
+>> If having PREEMPT_RT_NEEDS_BH_LOCK unset is the requirement then the
+>> right fixes: would be
+>> Fixes: 3253cb49cbad4 ("softirq: Allow to drop the softirq-BKL lock on PREEMPT_RT")
+>>
+>> as prior this commit the race is not possible, right?
+> 
+> I built and tested kernels at 3253cb49cbad and its parent fd4e876f59b7 (both
+> CONFIG_PREEMPT_RT=y, without the fix): no issues at fd4e876f59b7.
+> At 3253cb49cbad, a pcpu_rt cmpxchg contention in rt6_make_pcpu_route() shows
+> up, which was addressed in 1adaea51c61b. I also tested at 1adaea51c61b, and at
+> that point the dst_hold() race described in this patch appears.
+>  
+> The seg6/rpl code obtains a NOREF dst from ip6_route_input(), does not promote
+> it via skb_dst_force(), and passes it to dst_cache_set_ip6() which calls
+> dst_hold(). This pattern has been present since af4a2209b134 and a7a29f9c361f,
+> and the current Fixes: tags point to the commits where it was introduced.
+> Does that seem reasonable?
 
-==================================================================
-BUG: KASAN: slab-out-of-bounds in nf_nat_register_fn+0x5f9/0x640
-Read of size 8 at addr ffff890031e54c20 by task iptables/9510
+I think the above is correct, but also pointing to 3253cb49cbad4 would
+be correct, since the latter is required to exploit the problem. I also
+think cases like this one it's better to avoid the repost (since the
+constant ML flood) and to err on the conservative side (older hash). So
+I'm applying the patch as-is.
 
-CPU: 0 UID: 0 PID: 9510 Comm: iptables Not tainted 6.18.18-grsec-full-20260320181326 #1 PREEMPT(voluntary)
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-Call Trace:
- <TASK>
- […] dump_stack_lvl+0xee/0x160 ffff88004117eeb8
- […] print_report+0x6e/0x640 ffff88004117eee0
- […] ? __phys_addr+0x8e/0x140 ffff88004117eef0
- […] ? kasan_addr_to_slab+0x51/0xe0 ffff88004117ef08
- […] ? complete_report_info+0xec/0x1c0 ffff88004117ef20
- […] ? nf_nat_register_fn+0x5f9/0x640 ffff88004117ef48
- […] kasan_report+0xbc/0x140 ffff88004117ef50
- […] ? nf_nat_register_fn+0x5f9/0x640 ffff88004117ef90
- […] nf_nat_register_fn+0x5f9/0x640 ffff88004117eff8
- […] ? nf_nat_icmp_reply_translation+0x6e0/0x6e0 ffff88004117f070
- […] nf_tables_register_hook.part.0+0xa0/0x220 ffff88004117f080
- […] nf_tables_addchain.constprop.0+0x1054/0x1fc0 ffff88004117f0b8
- […] ? nft_chain_lookup.part.0+0x4ce/0xac0 ffff88004117f130
- […] ? nf_tables_abort+0x3d80/0x3d80 ffff88004117f190
- […] ? nf_tables_dumpreset_obj+0x100/0x100 ffff88004117f1c8
- […] ? nft_table_lookup.part.0+0x255/0x300 ffff88004117f310
- […] ? nf_tables_newchain+0x21a4/0x2fa0 ffff88004117f358
- […] nf_tables_newchain+0x21a4/0x2fa0 ffff88004117f360
- […] ? nf_tables_addchain.constprop.0+0x1fc0/0x1fc0 ffff88004117f458
- […] ? nla_get_range_signed+0x4a0/0x4a0 ffff88004117f488
- […] ? lock_acquire+0x16f/0x320 ffff88004117f490
- […] ? find_held_lock+0x3b/0xe0 ffff88004117f4b0
- […] ? __nla_parse+0x45/0x80 ffff88004117f500
- […] nfnetlink_rcv_batch+0xbca/0x19a0 ffff88004117f550
- […] ? nfnetlink_net_exit_batch+0x120/0x120 ffff88004117f618
- […] ? __sanitizer_cov_trace_switch+0x63/0xe0 ffff88004117f720
- […] ? gr_acl_handle_mmap+0x1c4/0x320 ffff88004117f7c0
- […] ? nla_get_range_signed+0x4a0/0x4a0 ffff88004117f7e8
- […] ? gr_is_capable+0x6f/0xe0 ffff88004117f830
- […] ? __nla_parse+0x45/0x80 ffff88004117f860
- […] ? skb_pull+0x103/0x1a0 ffff88004117f880
- […] nfnetlink_rcv+0x3db/0x4a0 ffff88004117f8b0
- […] ? nfnetlink_rcv_batch+0x19a0/0x19a0 ffff88004117f8d8
- […] ? netlink_lookup+0xe2/0x240 ffff88004117f900
- […] netlink_unicast+0x74b/0xb00 ffff88004117f930
- […] ? netlink_attachskb+0xb20/0xb20 ffff88004117f980
- […] ? __check_object_size+0x3e/0xaa0 ffff88004117f998
- […] ? security_netlink_send+0x51/0x160 ffff88004117f9c8
- […] netlink_sendmsg+0xa03/0x1200 ffff88004117f9f8
- […] ? netlink_unicast+0xb00/0xb00 ffff88004117fa70
- […] ? netlink_unicast+0xb00/0xb00 ffff88004117fac8
- […] ? ____sys_sendmsg+0xe2a/0x1040 ffff88004117faf8
- […] ____sys_sendmsg+0xe2a/0x1040 ffff88004117fb00
- […] ? kernel_recvmsg+0x300/0x300 ffff88004117fb60
- […] ? reacquire_held_locks+0xe9/0x260 ffff88004117fbc8
- […] ___sys_sendmsg+0x138/0x200 ffff88004117fbf8
- […] ? do_recvmmsg+0x7e0/0x7e0 ffff88004117fc30
- […] ? lockdep_hardirqs_on_prepare+0x101/0x1e0 ffff88004117fc50
- […] ? lock_acquire+0x16f/0x320 ffff88004117fd20
- […] ? lock_acquire+0x16f/0x320 ffff88004117fd58
- […] ? find_held_lock+0x3b/0xe0 ffff88004117fd70
- […] __sys_sendmsg+0x17a/0x260 ffff88004117fdc8
- […] ? __sys_sendmsg_sock+0x80/0x80 ffff88004117fdf0
- […] ? syscall_trace_enter+0x15e/0x2c0 ffff88004117fe98
- […] do_syscall_64+0x7d/0x400 ffff88004117fec8
- […] entry_SYSCALL_64_safe_stack+0x4a/0x60 ffff88004117fef8
- </TASK>
-==================================================================
+Thanks,
 
-The out-of-bounds report, though, is a red herring as it is for an
-access that shouldn't have happened in the first place.
-
-When nf_nat_init() fails to register its BPF kfuncs, it'll unwind and,
-among others, call unregister_pernet_subsys() to deregister its per-net
-ops. This makes the previously allocated net id available for reuse by
-the next caller of register_pernet_subsys(), in our case, synproxy.
-However, 'nat_net_id' will still hold the previously allocated value.
-
-If nf_nat.o gets build as a module, all this doesn't matter. A failed
-initialization routine makes the module fail to load and any dependent
-module won't be able to load either. However, if nf_nat.o is built-in,
-a failing init won't /completely/ make its functionality unavailable to
-dependent modules, namely the code and static data is still there, free
-to be called by modules like nft_chain_nat.ko.
-
-Case in point, nft_chain_nat registers hooks that'll call into nf_nat
-which, in our case, failed to initialize and therefore won't have a
-valid net id nor related net_nat object any more.
-
-Code in nf_nat, namely nf_nat_register_fn() and nf_nat_unregister_fn(),
-still making use of the reallocated net id, lead to a type confusion as
-the call to net_generic() will no longer return memory belonging to an
-object suited to fit 'struct nat_net' but 'struct synproxy_net' instead.
-The latter is only 24 bytes on 64-bit systems, much smaller than struct
-nat_net which is 176 bytes, perfectly explaining the OOB KASAN report.
-
-Detect and handle a failed nf_nat_init() by testing the 'nf_nat_hook'
-pointer which will be reset to NULL on initialization errors to prevent
-the usage of an invalid nat_net pointer.
-
-As this check is only needed when nf_nat.o is built-in, guard it by
-'#ifndef MODULE...'.
-
-Fixes: cbc1dd5b659f ("netfilter: nf_nat: Fix possible memory leak in nf_nat_init()")
-Signed-off-by: Mathias Krause <minipli@grsecurity.net>
----
- net/netfilter/nf_nat_core.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/net/netfilter/nf_nat_core.c b/net/netfilter/nf_nat_core.c
-index 3b5434e4ec9c..76a150b9d418 100644
---- a/net/netfilter/nf_nat_core.c
-+++ b/net/netfilter/nf_nat_core.c
-@@ -1187,6 +1187,16 @@ int nf_nat_register_fn(struct net *net, u8 pf, const struct nf_hook_ops *ops,
- 	struct nf_hook_ops *nat_ops;
- 	int i, ret;
- 
-+#ifndef MODULE
-+	/* If nf_nat_core is built-in and nf_nat_init() fails, dependent
-+	 * modules like nft_chain_nat.ko may still call this function.
-+	 * However, nat_net would be invalid, likely pointing to some other
-+	 * per-net structure.
-+	 */
-+	if (WARN_ON_ONCE(!nf_nat_hook))
-+		return -EOPNOTSUPP;
-+#endif
-+
- 	if (WARN_ON_ONCE(pf >= ARRAY_SIZE(nat_net->nat_proto_net)))
- 		return -EINVAL;
- 
--- 
-2.47.3
+Paolo
 
 
