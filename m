@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-281811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281812-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OFBXG06c8GmGVwEAu9opvQ
-	(envelope-from <netdev+bounces-281811-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 13:38:54 +0200
+	id gI/KJYKq8GnOWwEAu9opvQ
+	(envelope-from <netdev+bounces-281812-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 14:39:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF587483FC2
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 13:38:53 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82732484F5F
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 14:39:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C4ACD3266B99
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:30:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9D78A31F7B63
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:30:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 476B53F65E5;
-	Tue, 28 Apr 2026 11:26:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E95F73FE652;
+	Tue, 28 Apr 2026 11:26:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g6w1i7Ea"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KUP7IviK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA7BA3FE375
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 11:26:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29EFF3FE653
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 11:26:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777375605; cv=none; b=SrErzEv5F3EUxKoU8/A71F7gCR40kzvV0hM8IpOa0XZdOTkHpKOi8FlXSKv5SRugPOUGP4zS2VWYqCWZpZxseksAQ9aKFEdw4Q0ODeQuUDsRe7RsoN1i29VHr6k6xMo58O38kyk6GwI358g7krGSz8nyNa7tmPcZMw61lGivbFY=
+	t=1777375608; cv=none; b=FOpM3E5rahoYRfzE/6c8FeYBpWTG/cbxcgm8QhMyB0FlkItnfHXZY1ZlZp/QgPvvD2CfbaItj2Q3+nw0NGYy0wTgOISna4bBmueunHjb3boenRJqLMEhkR33rwn92i+vu82RgAkPktlMQJsgC430C8rmijUVtWKNCliurmCPPqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777375605; c=relaxed/simple;
-	bh=33BKGtv99YCHlFC84RXU206UHS5feYZDByPIWJfGB4U=;
+	s=arc-20240116; t=1777375608; c=relaxed/simple;
+	bh=dQD+q7Upq8Sn2zCkvYkWmsdL2sSDnFnXiKg2BR1/cOo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PH2jqV0I72grFlwEEAQafHCrlIcVYdtnCg/FDzjy1PsYJiYwUjtFFlDRLtASx7O3otlnqbGihwiKRfM5ZdZ+sCaZfbyuBmNH2nBfu7yomzi9gDusF8NJ15nVbKYVMkIHz1n9BrKDUyMmgL5g+mHxkqsePU5Car66DWE/Jr63ks0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g6w1i7Ea; arc=none smtp.client-ip=209.85.210.181
+	 MIME-Version; b=p4jRfZpAJ9O/LpeidX40XyMYrR9mgJiqvs6+3feBbJFEXajFdeEHhtqBnL2Tu6KjTSZX91p6EyL77qxXskU2unt0PFvAQwi+5bADk/ppZIfhzWoRlj3calhzoXwb4IM748R9VZ3Y1G7ilV0kkRxGfk6zaY8K8kqj+DdUf2ZverA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KUP7IviK; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-82f1f6103afso5237737b3a.1
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 04:26:43 -0700 (PDT)
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-8296d553142so6345273b3a.3
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 04:26:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777375603; x=1777980403; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1777375606; x=1777980406; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vVudMn5DOWAnraSt8EcXAJqKne+FmaKhjEXBR4n3BFY=;
-        b=g6w1i7EaCq3dnuWyzyqRURIn89868Z0iqqv9BN/K9x+Lr860QN30TRMk7TnfXOxD8a
-         d6F2KMgVm5kx7onsp9NKwquyOAju48uikh0e3JSJeul7dxobHYSDdzvab/07YDJNA+cD
-         9o/x/7RvMgnSfYhYoWA8i004934hgYtm13c1VywMzZsodshPgH+JctDzdlsGY5wy4x2w
-         561qSQ9iML8qdfkTriMsUymxaiAqxcr/fxhhT+OxVWEnQeDT+8C5hkVMPRbY+HChrvDw
-         EfedSjKN9NNeeKG7ytXhVv3q1L5QRBQwz6ZyA1b4g/yXkeYSFkrQcwBv+d/EKGJ4MsMq
-         hWEg==
+        bh=13ko0EGi1d5MwYTMjgeOX/JxXQYMOi59NTgO/q3LFT4=;
+        b=KUP7IviK+12uyzLNV+ICTt//tnMhUDC6qLFX+1VYvwa8ylORU5f/qyciD5vjuROaLd
+         OonZXfPdXrZRf7Wj1S38WaxT94zRC8UbN+1wPi70ol0RmwPFFOkO4a0ru/TWGIjPqrub
+         tiN1efSXB3FFzau4/w7/QcLgIavmo6AnmOwVqXSU2ER3R/mL5dB8XM/wWD4/VdOyxVWP
+         OniKYvHhMFbFxoN9u3Lc/54185ureASbm9dOdqT+Hd/ZOSUsjrP9LeKgh+/iDxZVwEBA
+         +JUeQsAmR3OJ36BiKCQY2R1EFFSRC95+cQXl2c219bl9yVrP+BGtfKUKsRvhIWcATJNS
+         FOPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777375603; x=1777980403;
+        d=1e100.net; s=20251104; t=1777375606; x=1777980406;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=vVudMn5DOWAnraSt8EcXAJqKne+FmaKhjEXBR4n3BFY=;
-        b=cpVkhwDXUVieK9n+lAOA50rZL809z/S4BtMQFVL/b3GA+eV+PhAGXa741l9IJNVWge
-         2iHid9h055wOSU9b4hCntGh7tYeqlbMvejYF4RDmboMlLhH35yb+CfUwmSj/tqaVLnj0
-         ar0hXqdNci1/Rkrynqqd3IwdetY3E6hR8ESyATtIa7TB/j8xLUfuGfabiQukRKrVz9tT
-         e2A+6PfCLdKMoCg4wiDxA0Ersf2uQw1UYsKDfw5xnwdFSk9a+vbKqcm8+nQlF7p5z917
-         iejFFGRoZSlnbZHGPOKVsJS4WRcyskfU5+r35UZrAnb2LsTixEhDjyvQEyoFOfStTPZL
-         BNhg==
-X-Gm-Message-State: AOJu0YwAL02p6N/JpYPyzmLY+dXU8U28/yiRvce2QOpgW/UHyRyu18s2
-	lCQ/SIBSGNVudJaXNHl0qY90kyvQ3tYNp5YhAR4iUHcKdj8oMwqPz8ZaCJutWhzK
-X-Gm-Gg: AeBDievVvpwPUyoFxankMqs094nZpwYadgN9/jcLvXnTPBr2CVShbthAoF2Q7IaeeI3
-	QHXYCeXsIcNK4J6N8QMSxkOsgGnGX6NNwtIbouVmIsKFRyGykfI0fbYLUUHI73CtYsOKrJWrHV0
-	FdbEeMkbUD6Ke/YIBDzTFYDhEXu3cXCfd1ZdrP8gwMSqR556DyDT52mHMqC/zG+VWfosOBkDE77
-	dNZlqgTiNRKAQA6i2q1EATgdECP+Mil6fM8skyGjG3j5MyuwpKSC8UDEICmcV3e1G3us/puI9mI
-	ct0ZWCk47p+MyElRS3TDKmBxoDzWXzq/ceskOddsMsddqLD0E63Rob2hntplUWVJEeFPgSRBV5P
-	yEmh+gEarZpBeJWGlOOJYzmsmUI00gos4di+cfemZY2gU3vSRLWQdFn+9yV16dXvBK8aGWwwkwB
-	HDHnshbcduvXyN8YLxEmfvpoq/RGmgs10qnY/CAZd9RjkirU+8/z147kyN19FGoXZeJ/n4e1o=
-X-Received: by 2002:a05:6a00:3902:b0:82c:1cd0:2f5e with SMTP id d2e1a72fcca58-834ddc75743mr2956194b3a.44.1777375602851;
-        Tue, 28 Apr 2026 04:26:42 -0700 (PDT)
+        bh=13ko0EGi1d5MwYTMjgeOX/JxXQYMOi59NTgO/q3LFT4=;
+        b=O4kbCnvI9dqCcbWAh7FGfeL0zl094b3GefP9jbGPibuhqTmMA+kTueTNCReILGSSUn
+         NqlUKTwPFffBL5L+m9bNslRuszuKTpBD2MwKqDuLQ4VDTT+k9WgeVfIKW7UIzYOrqMmY
+         kEeZFXkrzvu44Jqb7Vw2S1diXFVaiCLT1ZTpOGzoJpz7PcYhyqurl+ci12ysMbPM0jSP
+         ulCd9QtZ7yVd/q2fZQjXJoeQldDggn+GBx81n4pfE2WZav2GiAchP9hU1yyY515OX9RF
+         NR6JLuIXT14acLBGDIXnDs/h1XzdnQnCjJm6XOO6G0H5+YD+elJFY6TDHBbPKSNkoHDS
+         zJCw==
+X-Gm-Message-State: AOJu0YxaFjteP+d6Tz1btL/tAR/ny09Jqp1cgF5XWiu1K3BaGki+KVIg
+	ESStnasWemnRbUhGc3fBNc6+yyqI5CegTwH2zmZRd8zU/5riS7WoamgFRI2UL6sE
+X-Gm-Gg: AeBDievBAuPr55RjtsALGlO1T1qppkWOAiXQEJw15SMvF+dSmMD/4DFsRVZA8s6ahZu
+	79nj3C/f7Or3HqUxT4DYpOt4gBSn9tg6ye0Ib2iRsfczV24E30VxKjt5JYlkynciA2HVhZ7LWyP
+	yM82ENxLMaRSkLfMN/nkdtqZukcPdx+Tq4LBNHWm02N+PDccq1Jg082Xr9M7hAxsejuw2cBLsQ5
+	APEJzG0rsyUXRrYju9NSNMyh2L7Rpi/Sslhs9gZ91EjUlGIfNj8MCnwVt4BVIAk5aDwxzpxbHYI
+	xUg2FTZfkz+DRPrGLYPLWZwriG9DtyzqfzXmt65OAq9bFVCaE+68iydM9h5e1RNIx+7SuLh537k
+	V61TO+asWqaNmGWbj5Cyau+/a5sd656UHSk9+uHWMOG9LHKxVrD+ae7GhhZEvqjQkvRdTbw3Dra
+	zDCXvMHX9W1Xfkylmjr/4FcbhyGzgWC/80qLSLQZ2h90vk+r84rCyloXJBzKNC
+X-Received: by 2002:a05:6a00:99f:b0:82c:ded1:261f with SMTP id d2e1a72fcca58-834ddbe7be7mr2673646b3a.27.1777375606276;
+        Tue, 28 Apr 2026 04:26:46 -0700 (PDT)
 Received: from d.home.yangfl.dn42 ([2a09:bac5:6619:3046::4cf:90])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-834dae36b4bsm2284327b3a.27.2026.04.28.04.26.39
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-834dae36b4bsm2284327b3a.27.2026.04.28.04.26.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Apr 2026 04:26:42 -0700 (PDT)
+        Tue, 28 Apr 2026 04:26:45 -0700 (PDT)
 From: David Yang <mmyangfl@gmail.com>
 To: netdev@vger.kernel.org
 Cc: David Yang <mmyangfl@gmail.com>,
@@ -85,9 +85,9 @@ Cc: David Yang <mmyangfl@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v5 2/3] net: dsa: yt921x: Refactor long register helpers
-Date: Tue, 28 Apr 2026 19:26:02 +0800
-Message-ID: <20260428112606.1917230-3-mmyangfl@gmail.com>
+Subject: [PATCH net-next v5 3/3] net: dsa: yt921x: Add port police support
+Date: Tue, 28 Apr 2026 19:26:03 +0800
+Message-ID: <20260428112606.1917230-4-mmyangfl@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260428112606.1917230-1-mmyangfl@gmail.com>
 References: <20260428112606.1917230-1-mmyangfl@gmail.com>
@@ -98,7 +98,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: BF587483FC2
+X-Rspamd-Queue-Id: 82732484F5F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -107,13 +107,13 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-281811-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-281812-lists,netdev=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -128,325 +128,513 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-Dealing long registers with u64 is good, until you realize there are
-longer 96-bit registers.
-
-Refactor reg64 helpers to use u32 arrays instead of u64 values, in
-preparation for 96-bit registers. We do not keep the separate u64
-version for reg64 to avoid duplicated wrappers, although it looks better
-when dealing with reg64 *only*.
-
-Helpers for reg96 should be added when they are actually used to avoid
-function unused warnings.
+Enable rate meter ability and support limiting the rate of incoming
+traffic.
 
 Signed-off-by: David Yang <mmyangfl@gmail.com>
 ---
- drivers/net/dsa/yt921x.c | 162 +++++++++++++++++++++++++++------------
- drivers/net/dsa/yt921x.h |  36 ++++-----
- 2 files changed, 129 insertions(+), 69 deletions(-)
+ drivers/net/dsa/yt921x.c | 323 ++++++++++++++++++++++++++++++++++++++-
+ drivers/net/dsa/yt921x.h |  51 +++++++
+ 2 files changed, 373 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
-index 87139448bec3..0c07b903fd68 100644
+index 0c07b903fd68..d93674d567d7 100644
 --- a/drivers/net/dsa/yt921x.c
 +++ b/drivers/net/dsa/yt921x.c
-@@ -255,63 +255,122 @@ yt921x_reg_toggle_bits(struct yt921x_priv *priv, u32 reg, u32 mask, bool set)
- 	return yt921x_reg_update_bits(priv, reg, mask, !set ? 0 : mask);
- }
- 
--/* Some registers, like VLANn_CTRL, should always be written in 64-bit, even if
-- * you are to write only the lower / upper 32 bits.
-+/* Some multi-word registers, like VLANn_CTRL, should be treated as a single
-+ * long register. More specifically, writes to parts of its words won't become
-+ * visible, until the last word is written.
-  *
-- * There is no such restriction for reading, but we still provide 64-bit read
-- * wrappers so that we always handle u64 values.
-+ * Here we require full read and write operations over these registers to
-+ * eliminate potential issues, although partial reads/writes are also possible.
+@@ -263,6 +263,14 @@ yt921x_reg_toggle_bits(struct yt921x_priv *priv, u32 reg, u32 mask, bool set)
+  * eliminate potential issues, although partial reads/writes are also possible.
   */
  
--static int yt921x_reg64_read(struct yt921x_priv *priv, u32 reg, u64 *valp)
-+static int
-+yt921x_regs_read(struct yt921x_priv *priv, u32 reg, u32 *vals,
-+		 unsigned int num_regs)
- {
--	u32 lo;
--	u32 hi;
- 	int res;
++static void update_ctrls_unaligned(u32 *lo, u32 *hi, u64 mask, u64 val)
++{
++	*lo &= ~lower_32_bits(mask);
++	*hi &= ~upper_32_bits(mask);
++	*lo |= lower_32_bits(val);
++	*hi |= upper_32_bits(val);
++}
++
+ static int
+ yt921x_regs_read(struct yt921x_priv *priv, u32 reg, u32 *vals,
+ 		 unsigned int num_regs)
+@@ -373,6 +381,12 @@ yt921x_reg64_clear_bits(struct yt921x_priv *priv, u32 reg, const u32 *masks)
+ 	return yt921x_regs_clear_bits(priv, reg, masks, 2);
+ }
  
--	res = yt921x_reg_read(priv, reg, &lo);
--	if (res)
--		return res;
--	res = yt921x_reg_read(priv, reg + 4, &hi);
--	if (res)
--		return res;
-+	for (unsigned int i = 0; i < num_regs; i++) {
-+		res = yt921x_reg_read(priv, reg + 4 * i, &vals[i]);
-+		if (res)
-+			return res;
++static int
++yt921x_reg96_write(struct yt921x_priv *priv, u32 reg, const u32 *vals)
++{
++	return yt921x_regs_write(priv, reg, vals, 3);
++}
++
+ static int yt921x_reg_mdio_read(void *context, u32 reg, u32 *valp)
+ {
+ 	struct yt921x_reg_mdio *mdio = context;
+@@ -1066,6 +1080,13 @@ yt921x_dsa_set_mac_eee(struct dsa_switch *ds, int port, struct ethtool_keee *e)
+ 	return res;
+ }
+ 
++static int yt921x_mtu_fetch(struct yt921x_priv *priv, int port)
++{
++	struct dsa_port *dp = dsa_to_port(&priv->ds, port);
++
++	return dp->user ? READ_ONCE(dp->user->mtu) : ETH_DATA_LEN;
++}
++
+ static int
+ yt921x_dsa_port_change_mtu(struct dsa_switch *ds, int port, int new_mtu)
+ {
+@@ -1097,6 +1118,266 @@ static int yt921x_dsa_port_max_mtu(struct dsa_switch *ds, int port)
+ 	return YT921X_FRAME_SIZE_MAX - ETH_HLEN - ETH_FCS_LEN - YT921X_TAG_LEN;
+ }
+ 
++/* v * 2^e */
++static u64 ldexpu64(u64 v, int e)
++{
++	return e >= 0 ? v << e : v >> -e;
++}
++
++/* slot (ns) * rate (/s) / 10^9 (ns/s) = 2^C * token * 4^unit */
++static u32 rate2token(u64 rate, unsigned int slot_ns, int unit, int C)
++{
++	int e = 2 * unit + C + YT921X_TOKEN_RATE_C;
++
++	return div_u64(ldexpu64(slot_ns * rate, -e), 1000000000);
++}
++
++static u64 token2rate(u32 token, unsigned int slot_ns, int unit, int C)
++{
++	int e = 2 * unit + C + YT921X_TOKEN_RATE_C;
++
++	return div_u64(ldexpu64(mul_u32_u32(1000000000, token), e), slot_ns);
++}
++
++/* burst = 2^C * token * 4^unit */
++static u32 burst2token(u64 burst, int unit, int C)
++{
++	return ldexpu64(burst, -(2 * unit + C));
++}
++
++static u64 token2burst(u32 token, int unit, int C)
++{
++	return ldexpu64(token, 2 * unit + C);
++}
++
++struct yt921x_marker {
++	u32 cir;
++	u32 cbs;
++	u32 ebs;
++	int unit;
++	bool pkt_mode;
++};
++
++#define YT921X_MARKER_PKT_MODE		BIT(0)
++#define YT921X_MARKER_SINGLE_BUCKET	BIT(1)
++
++static int
++yt921x_marker_tfm(struct yt921x_marker *marker, u64 rate, u64 burst,
++		  unsigned int flags, unsigned int slot_ns, u32 cir_max,
++		  u32 cbs_max, int unit_max, struct yt921x_priv *priv, int port,
++		  struct netlink_ext_ack *extack)
++{
++	const int C = flags & YT921X_MARKER_PKT_MODE ? YT921X_TOKEN_PKT_C :
++		      YT921X_TOKEN_BYTE_C;
++	struct device *dev = to_device(priv);
++	struct yt921x_marker m;
++	u64 burst_est;
++	u64 burst_sug;
++	u64 burst_max;
++	u64 rate_max;
++
++	m.unit = unit_max;
++	rate_max = token2rate(cir_max, slot_ns, m.unit, C);
++	burst_max = token2burst(cbs_max, m.unit, C);
++
++	/* Check for unusual values */
++	if (rate > rate_max || burst > burst_max) {
++		NL_SET_ERR_MSG_MOD(extack, "Unexpected tremendous rate");
++		return -ERANGE;
++	}
++
++	/* Check for matching burst */
++	burst_est = div_u64(slot_ns * rate, 1000000000);
++	burst_sug = burst_est;
++	if (flags & YT921X_MARKER_PKT_MODE)
++		burst_sug++;
++	else
++		burst_sug += ETH_HLEN + yt921x_mtu_fetch(priv, port) +
++			     ETH_FCS_LEN;
++	if (burst_sug > burst)
++		NL_SET_ERR_MSG_FMT_MOD(extack,
++				      "Consider burst at least %llu to match rate %llu\n",
++				      burst_sug, rate);
++
++	/* Select unit */
++	for (; m.unit > 0; m.unit--) {
++		if (rate > (rate_max >> 2) || burst > (burst_max >> 2))
++			break;
++		rate_max >>= 2;
++		burst_max >>= 2;
++	}
++
++	/* Calculate information rate and bucket size */
++	m.cir = rate2token(rate, slot_ns, m.unit, C);
++	if (!m.cir)
++		m.cir = 1;
++	else if (WARN_ON(m.cir > cir_max))
++		m.cir = cir_max;
++	m.cbs = burst2token(burst, m.unit, C);
++	if (!m.cbs)
++		m.cbs = 1;
++	else if (WARN_ON(m.cbs > cbs_max))
++		m.cbs = cbs_max;
++
++	/* Cut EBS */
++	m.ebs = 0;
++	if (!(flags & YT921X_MARKER_SINGLE_BUCKET)) {
++		/* We don't have a chance to adjust rate when MTU is changed */
++		if (flags & YT921X_MARKER_PKT_MODE)
++			burst_est++;
++		else
++			burst_est += YT921X_FRAME_SIZE_MAX;
++
++		if (burst_est < burst) {
++			u32 pbs = m.cbs;
++
++			m.cbs = burst2token(burst_est, m.unit, C);
++			if (!m.cbs)
++				m.cbs = 1;
++			else if (WARN_ON(m.cbs > cbs_max))
++				m.cbs = cbs_max;
++
++			if (pbs > m.cbs)
++				m.ebs = pbs - m.cbs;
++		}
++	}
++
++	dev_dbg(dev,
++		"slot %u ns, rate %llu, burst %llu -> unit %d, cir %u, cbs %u, ebs %u\n",
++		slot_ns, rate, burst, m.unit, m.cir, m.cbs, m.ebs);
++
++	m.pkt_mode = flags & YT921X_MARKER_PKT_MODE;
++	*marker = m;
++	return 0;
++}
++
++static int
++yt921x_marker_tfm_police(struct yt921x_marker *marker,
++			 const struct flow_action_police *police,
++			 unsigned int flags, struct yt921x_priv *priv, int port,
++			 struct netlink_ext_ack *extack)
++{
++	bool pkt_mode = !!police->rate_pkt_ps;
++	u64 burst;
++	u64 rate;
++
++	rate = pkt_mode ? police->rate_pkt_ps : police->rate_bytes_ps;
++	burst = pkt_mode ? police->burst_pkt : police->burst;
++	if (pkt_mode)
++		flags |= YT921X_MARKER_PKT_MODE;
++
++	return yt921x_marker_tfm(marker, rate, burst, flags,
++				 priv->meter_slot_ns, YT921X_METER_CIR_MAX,
++				 YT921X_METER_CBS_MAX, YT921X_METER_UNIT_MAX,
++				 priv, port, extack);
++}
++
++static int
++yt921x_police_validate(const struct flow_action_police *police,
++		       const struct flow_action *action,
++		       const struct flow_action_entry *act,
++		       struct netlink_ext_ack *extack)
++{
++	if (police->exceed.act_id != FLOW_ACTION_DROP) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "Offload not supported when exceed action is not drop");
++		return -EOPNOTSUPP;
++	}
++
++	if (police->notexceed.act_id != FLOW_ACTION_PIPE &&
++	    police->notexceed.act_id != FLOW_ACTION_ACCEPT) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "Offload not supported when conform action is not pipe or ok");
++		return -EOPNOTSUPP;
++	}
++
++	if (police->notexceed.act_id == FLOW_ACTION_ACCEPT && action && act &&
++	    !flow_action_is_last_entry(action, act)) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "Offload not supported when conform action is ok, but action is not last");
++		return -EOPNOTSUPP;
++	}
++
++	/* mtu defaults to unlimited but we got 2040 here, don't know why */
++	if (police->peakrate_bytes_ps || police->avrate || police->overhead) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "Offload not supported when peakrate/avrate/overhead is configured");
++		return -EOPNOTSUPP;
 +	}
 +
 +	return 0;
 +}
 +
 +static int
-+yt921x_regs_write(struct yt921x_priv *priv, u32 reg, const u32 *vals,
-+		  unsigned int num_regs)
++yt921x_meter_config(struct yt921x_priv *priv, unsigned int id,
++		    const struct yt921x_marker *marker)
 +{
++	u32 ctrls[3];
++
++	ctrls[0] = 0;
++	ctrls[1] = YT921X_METER_CTRLb_CIR(marker->cir);
++	ctrls[2] = YT921X_METER_CTRLc_UNIT(marker->unit) |
++		   YT921X_METER_CTRLc_DROP_R |
++		   YT921X_METER_CTRLc_TOKEN_OVERFLOW_EN |
++		   YT921X_METER_CTRLc_METER_EN;
++	if (marker->pkt_mode)
++		ctrls[2] |= YT921X_METER_CTRLc_PKT_MODE;
++	update_ctrls_unaligned(&ctrls[0], &ctrls[1],
++			       YT921X_METER_CTRLab_EBS_M,
++			       YT921X_METER_CTRLab_EBS(marker->ebs));
++	update_ctrls_unaligned(&ctrls[1], &ctrls[2],
++			       YT921X_METER_CTRLbc_CBS_M,
++			       YT921X_METER_CTRLbc_CBS(marker->cbs));
++
++	return yt921x_reg96_write(priv, YT921X_METERn_CTRL(id), ctrls);
++}
++
++static void yt921x_dsa_port_policer_del(struct dsa_switch *ds, int port)
++{
++	struct yt921x_priv *priv = to_yt921x_priv(ds);
++	struct device *dev = to_device(priv);
 +	int res;
 +
-+	for (unsigned int i = 0; i < num_regs; i++) {
-+		res = yt921x_reg_write(priv, reg + 4 * i, vals[i]);
-+		if (res)
-+			return res;
-+	}
- 
--	*valp = ((u64)hi << 32) | lo;
- 	return 0;
- }
- 
--static int yt921x_reg64_write(struct yt921x_priv *priv, u32 reg, u64 val)
-+static int
-+yt921x_regs_update_bits(struct yt921x_priv *priv, u32 reg, const u32 *masks,
-+			const u32 *vals, unsigned int num_regs)
- {
-+	bool changed = false;
-+	u32 vs[4];
- 	int res;
- 
--	res = yt921x_reg_write(priv, reg, (u32)val);
-+	BUILD_BUG_ON(num_regs > ARRAY_SIZE(vs));
++	mutex_lock(&priv->reg_lock);
++	res = yt921x_reg_write(priv, YT921X_PORTn_METER(port), 0);
++	mutex_unlock(&priv->reg_lock);
 +
-+	res = yt921x_regs_read(priv, reg, vs, num_regs);
- 	if (res)
- 		return res;
--	return yt921x_reg_write(priv, reg + 4, (u32)(val >> 32));
-+
-+	for (unsigned int i = 0; i < num_regs; i++) {
-+		u32 u = vs[i];
-+
-+		u &= ~masks[i];
-+		u |= vals[i];
-+		if (u != vs[i])
-+			changed = true;
-+
-+		vs[i] = u;
-+	}
-+
-+	if (!changed)
-+		return 0;
-+
-+	return yt921x_regs_write(priv, reg, vs, num_regs);
- }
- 
- static int
--yt921x_reg64_update_bits(struct yt921x_priv *priv, u32 reg, u64 mask, u64 val)
-+yt921x_regs_clear_bits(struct yt921x_priv *priv, u32 reg, const u32 *masks,
-+		       unsigned int num_regs)
- {
-+	bool changed = false;
-+	u32 vs[4];
- 	int res;
--	u64 v;
--	u64 u;
- 
--	res = yt921x_reg64_read(priv, reg, &v);
-+	BUILD_BUG_ON(num_regs > ARRAY_SIZE(vs));
-+
-+	res = yt921x_regs_read(priv, reg, vs, num_regs);
- 	if (res)
- 		return res;
- 
--	u = v;
--	u &= ~mask;
--	u |= val;
--	if (u == v)
-+	for (unsigned int i = 0; i < num_regs; i++) {
-+		u32 u = vs[i];
-+
-+		u &= ~masks[i];
-+		if (u != vs[i])
-+			changed = true;
-+
-+		vs[i] = u;
-+	}
-+
-+	if (!changed)
- 		return 0;
- 
--	return yt921x_reg64_write(priv, reg, u);
-+	return yt921x_regs_write(priv, reg, vs, num_regs);
++	if (res)
++		dev_err(dev, "Failed to %s port %d: %i\n", "delete policer on",
++			port, res);
 +}
 +
 +static int
-+yt921x_reg64_write(struct yt921x_priv *priv, u32 reg, const u32 *vals)
++yt921x_dsa_port_policer_add(struct dsa_switch *ds, int port,
++			    const struct flow_action_police *police,
++			    struct netlink_ext_ack *extack)
 +{
-+	return yt921x_regs_write(priv, reg, vals, 2);
- }
- 
--static int yt921x_reg64_clear_bits(struct yt921x_priv *priv, u32 reg, u64 mask)
-+static int
-+yt921x_reg64_update_bits(struct yt921x_priv *priv, u32 reg, const u32 *masks,
-+			 const u32 *vals)
- {
--	return yt921x_reg64_update_bits(priv, reg, mask, 0);
-+	return yt921x_regs_update_bits(priv, reg, masks, vals, 2);
++	struct yt921x_priv *priv = to_yt921x_priv(ds);
++	struct yt921x_marker marker;
++	u32 ctrl;
++	int res;
++
++	res = yt921x_police_validate(police, NULL, NULL, extack);
++	if (res)
++		return res;
++
++	res = yt921x_marker_tfm_police(&marker, police, 0, priv, port, extack);
++	if (res)
++		return res;
++
++	mutex_lock(&priv->reg_lock);
++	res = yt921x_meter_config(priv, port + YT921X_METER_NUM, &marker);
++	if (res)
++		goto end;
++
++	ctrl = YT921X_PORT_METER_ID(port) | YT921X_PORT_METER_EN;
++	res = yt921x_reg_write(priv, YT921X_PORTn_METER(port), ctrl);
++end:
++	mutex_unlock(&priv->reg_lock);
++
++	return res;
 +}
 +
-+static int
-+yt921x_reg64_clear_bits(struct yt921x_priv *priv, u32 reg, const u32 *masks)
-+{
-+	return yt921x_regs_clear_bits(priv, reg, masks, 2);
- }
+ static int
+ yt921x_mirror_del(struct yt921x_priv *priv, int port, bool ingress)
+ {
+@@ -3052,6 +3333,7 @@ static int yt921x_chip_detect(struct yt921x_priv *priv)
+ 	u32 chipid;
+ 	u32 major;
+ 	u32 mode;
++	u32 val;
+ 	int res;
  
- static int yt921x_reg_mdio_read(void *context, u32 reg, u32 *valp)
-@@ -1844,33 +1903,31 @@ yt921x_vlan_filtering(struct yt921x_priv *priv, int port, bool vlan_filtering)
+ 	res = yt921x_reg_read(priv, YT921X_CHIP_ID, &chipid);
+@@ -3086,12 +3368,27 @@ static int yt921x_chip_detect(struct yt921x_priv *priv)
+ 		return -ENODEV;
+ 	}
+ 
++	res = yt921x_reg_read(priv, YT921X_SYS_CLK, &val);
++	if (res)
++		return res;
++	switch (FIELD_GET(YT921X_SYS_CLK_SEL_M, val)) {
++	case 0:
++		priv->cycle_ns = info->major == YT9215_MAJOR ? 8 : 6;
++		break;
++	case YT921X_SYS_CLK_143M:
++		priv->cycle_ns = 7;
++		break;
++	default:
++		priv->cycle_ns = 8;
++	}
++
+ 	/* Print chipid here since we are interested in lower 16 bits */
+ 	dev_info(dev,
+ 		 "Motorcomm %s ethernet switch, chipid: 0x%x, chipmode: 0x%x 0x%x\n",
+ 		 info->name, chipid, mode, extmode);
+ 
+ 	priv->info = info;
++
  	return 0;
  }
  
--static int
--yt921x_vlan_del(struct yt921x_priv *priv, int port, u16 vid)
-+static int yt921x_vlan_del(struct yt921x_priv *priv, int port, u16 vid)
- {
--	u64 mask64;
-+	u32 masks[2];
- 
--	mask64 = YT921X_VLAN_CTRL_PORTS(port) |
--		 YT921X_VLAN_CTRL_UNTAG_PORTn(port);
-+	masks[0] = YT921X_VLAN_CTRLa_PORTn(port);
-+	masks[1] = YT921X_VLAN_CTRLb_UNTAG_PORTn(port);
- 
--	return yt921x_reg64_clear_bits(priv, YT921X_VLANn_CTRL(vid), mask64);
-+	return yt921x_reg64_clear_bits(priv, YT921X_VLANn_CTRL(vid), masks);
+@@ -3213,6 +3510,23 @@ static int yt921x_chip_setup_dsa(struct yt921x_priv *priv)
+ 	return 0;
  }
  
- static int
- yt921x_vlan_add(struct yt921x_priv *priv, int port, u16 vid, bool untagged)
++static int yt921x_chip_setup_tc(struct yt921x_priv *priv)
++{
++	unsigned int op_ns;
++	u32 ctrl;
++	int res;
++
++	op_ns = 8 * priv->cycle_ns;
++
++	ctrl = max(priv->meter_slot_ns / op_ns, YT921X_METER_SLOT_MIN);
++	res = yt921x_reg_write(priv, YT921X_METER_SLOT, ctrl);
++	if (res)
++		return res;
++	priv->meter_slot_ns = ctrl * op_ns;
++
++	return 0;
++}
++
+ static int __maybe_unused yt921x_chip_setup_qos(struct yt921x_priv *priv)
  {
--	u64 mask64;
--	u64 ctrl64;
-+	u32 masks[2];
-+	u32 ctrls[2];
- 
--	mask64 = YT921X_VLAN_CTRL_PORTn(port) |
--		 YT921X_VLAN_CTRL_PORTS(priv->cpu_ports_mask);
--	ctrl64 = mask64;
-+	masks[0] = YT921X_VLAN_CTRLa_PORTn(port) |
-+		   YT921X_VLAN_CTRLa_PORTS(priv->cpu_ports_mask);
-+	ctrls[0] = masks[0];
- 
--	mask64 |= YT921X_VLAN_CTRL_UNTAG_PORTn(port);
--	if (untagged)
--		ctrl64 |= YT921X_VLAN_CTRL_UNTAG_PORTn(port);
-+	masks[1] = YT921X_VLAN_CTRLb_UNTAG_PORTn(port);
-+	ctrls[1] = untagged ? masks[1] : 0;
- 
- 	return yt921x_reg64_update_bits(priv, YT921X_VLANn_CTRL(vid),
--					mask64, ctrl64);
-+					masks, ctrls);
- }
- 
- static int
-@@ -2318,8 +2375,8 @@ yt921x_dsa_vlan_msti_set(struct dsa_switch *ds, struct dsa_bridge bridge,
- 			 const struct switchdev_vlan_msti *msti)
- {
- 	struct yt921x_priv *priv = to_yt921x_priv(ds);
--	u64 mask64;
--	u64 ctrl64;
-+	u32 masks[2];
-+	u32 ctrls[2];
- 	int res;
- 
- 	if (!msti->vid)
-@@ -2327,12 +2384,14 @@ yt921x_dsa_vlan_msti_set(struct dsa_switch *ds, struct dsa_bridge bridge,
- 	if (!msti->msti || msti->msti >= YT921X_MSTI_NUM)
- 		return -EINVAL;
- 
--	mask64 = YT921X_VLAN_CTRL_STP_ID_M;
--	ctrl64 = YT921X_VLAN_CTRL_STP_ID(msti->msti);
-+	masks[0] = 0;
-+	ctrls[0] = 0;
-+	masks[1] = YT921X_VLAN_CTRLb_STP_ID_M;
-+	ctrls[1] = YT921X_VLAN_CTRLb_STP_ID(msti->msti);
- 
- 	mutex_lock(&priv->reg_lock);
- 	res = yt921x_reg64_update_bits(priv, YT921X_VLANn_CTRL(msti->vid),
--				       mask64, ctrl64);
-+				       masks, ctrls);
- 	mutex_unlock(&priv->reg_lock);
- 
- 	return res;
-@@ -3084,7 +3143,7 @@ static int yt921x_chip_setup_dsa(struct yt921x_priv *priv)
- {
- 	struct dsa_switch *ds = &priv->ds;
- 	unsigned long cpu_ports_mask;
--	u64 ctrl64;
-+	u32 ctrls[2];
  	u32 ctrl;
- 	int port;
+@@ -3259,7 +3573,7 @@ static int yt921x_chip_setup(struct yt921x_priv *priv)
+ 	u32 ctrl;
  	int res;
-@@ -3145,8 +3204,9 @@ static int yt921x_chip_setup_dsa(struct yt921x_priv *priv)
- 	/* Tagged VID 0 should be treated as untagged, which confuses the
- 	 * hardware a lot
- 	 */
--	ctrl64 = YT921X_VLAN_CTRL_LEARN_DIS | YT921X_VLAN_CTRL_PORTS_M;
--	res = yt921x_reg64_write(priv, YT921X_VLANn_CTRL(0), ctrl64);
-+	ctrls[0] = YT921X_VLAN_CTRLa_LEARN_DIS | YT921X_VLAN_CTRLa_PORTS_M;
-+	ctrls[1] = 0;
-+	res = yt921x_reg64_write(priv, YT921X_VLANn_CTRL(0), ctrls);
+ 
+-	ctrl = YT921X_FUNC_MIB;
++	ctrl = YT921X_FUNC_MIB | YT921X_FUNC_METER;
+ 	res = yt921x_reg_set_bits(priv, YT921X_FUNC, ctrl);
+ 	if (res)
+ 		return res;
+@@ -3268,6 +3582,10 @@ static int yt921x_chip_setup(struct yt921x_priv *priv)
  	if (res)
  		return res;
  
++	res = yt921x_chip_setup_tc(priv);
++	if (res)
++		return res;
++
+ #if IS_ENABLED(CONFIG_DCB)
+ 	res = yt921x_chip_setup_qos(priv);
+ 	if (res)
+@@ -3359,6 +3677,9 @@ static const struct dsa_switch_ops yt921x_dsa_switch_ops = {
+ 	/* mtu */
+ 	.port_change_mtu	= yt921x_dsa_port_change_mtu,
+ 	.port_max_mtu		= yt921x_dsa_port_max_mtu,
++	/* rate */
++	.port_policer_del	= yt921x_dsa_port_policer_del,
++	.port_policer_add	= yt921x_dsa_port_policer_add,
+ 	/* hsr */
+ 	.port_hsr_leave		= dsa_port_simple_hsr_leave,
+ 	.port_hsr_join		= dsa_port_simple_hsr_join,
 diff --git a/drivers/net/dsa/yt921x.h b/drivers/net/dsa/yt921x.h
-index 3f129b8d403f..4989d87c2492 100644
+index 4989d87c2492..546b12a8994a 100644
 --- a/drivers/net/dsa/yt921x.h
 +++ b/drivers/net/dsa/yt921x.h
-@@ -429,24 +429,24 @@ enum yt921x_app_selector {
- #define  YT921X_FDB_HW_FLUSH_ON_LINKDOWN	BIT(0)
+@@ -23,6 +23,7 @@
+ #define  YT921X_RST_HW				BIT(31)
+ #define  YT921X_RST_SW				BIT(1)
+ #define YT921X_FUNC			0x80004
++#define  YT921X_FUNC_METER			BIT(4)
+ #define  YT921X_FUNC_MIB			BIT(1)
+ #define YT921X_CHIP_ID			0x80008
+ #define  YT921X_CHIP_ID_MAJOR			GENMASK(31, 16)
+@@ -239,6 +240,11 @@
+ #define  YT921X_EDATA_DATA_STATUS_M		GENMASK(3, 0)
+ #define   YT921X_EDATA_DATA_STATUS(x)			FIELD_PREP(YT921X_EDATA_DATA_STATUS_M, (x))
+ #define   YT921X_EDATA_DATA_IDLE			YT921X_EDATA_DATA_STATUS(3)
++#define YT921X_SYS_CLK			0xe0040
++#define  YT921X_SYS_CLK_SEL_M			GENMASK(1, 0)  /* unknown: 167M */
++#define   YT9215_SYS_CLK_125M				0
++#define   YT9218_SYS_CLK_167M				0
++#define   YT921X_SYS_CLK_143M				1
  
- #define YT921X_VLANn_CTRL(vlan)		(0x188000 + 8 * (vlan))
--#define  YT921X_VLAN_CTRL_UNTAG_PORTS_M		GENMASK_ULL(50, 40)
--#define   YT921X_VLAN_CTRL_UNTAG_PORTS(x)		FIELD_PREP(YT921X_VLAN_CTRL_UNTAG_PORTS_M, (x))
--#define  YT921X_VLAN_CTRL_UNTAG_PORTn(port)	BIT_ULL((port) + 40)
--#define  YT921X_VLAN_CTRL_STP_ID_M		GENMASK_ULL(39, 36)
--#define   YT921X_VLAN_CTRL_STP_ID(x)			FIELD_PREP(YT921X_VLAN_CTRL_STP_ID_M, (x))
--#define  YT921X_VLAN_CTRL_SVLAN_EN		BIT_ULL(35)
--#define  YT921X_VLAN_CTRL_FID_M			GENMASK_ULL(34, 23)
--#define   YT921X_VLAN_CTRL_FID(x)			FIELD_PREP(YT921X_VLAN_CTRL_FID_M, (x))
--#define  YT921X_VLAN_CTRL_LEARN_DIS		BIT_ULL(22)
--#define  YT921X_VLAN_CTRL_PRIO_EN		BIT_ULL(21)
--#define  YT921X_VLAN_CTRL_PRIO_M		GENMASK_ULL(20, 18)
--#define   YT921X_VLAN_CTRL_PRIO(x)			FIELD_PREP(YT921X_VLAN_CTRL_PRIO_M, (x))
--#define  YT921X_VLAN_CTRL_PORTS_M		GENMASK_ULL(17, 7)
--#define   YT921X_VLAN_CTRL_PORTS(x)			FIELD_PREP(YT921X_VLAN_CTRL_PORTS_M, (x))
--#define  YT921X_VLAN_CTRL_PORTn(port)		BIT_ULL((port) + 7)
--#define  YT921X_VLAN_CTRL_BYPASS_1X_AC		BIT_ULL(6)
--#define  YT921X_VLAN_CTRL_METER_EN		BIT_ULL(5)
--#define  YT921X_VLAN_CTRL_METER_ID_M		GENMASK_ULL(4, 0)
-+#define  YT921X_VLAN_CTRLb_UNTAG_PORTS_M	GENMASK(18, 8)
-+#define   YT921X_VLAN_CTRLb_UNTAG_PORTS(x)		FIELD_PREP(YT921X_VLAN_CTRLb_UNTAG_PORTS_M, (x))
-+#define  YT921X_VLAN_CTRLb_UNTAG_PORTn(port)	BIT((port) + 8)
-+#define  YT921X_VLAN_CTRLb_STP_ID_M		GENMASK(7, 4)
-+#define   YT921X_VLAN_CTRLb_STP_ID(x)			FIELD_PREP(YT921X_VLAN_CTRLb_STP_ID_M, (x))
-+#define  YT921X_VLAN_CTRLb_SVLAN_EN		BIT(3)
-+#define  YT921X_VLAN_CTRLab_FID_M		GENMASK_ULL(34, 23)
-+#define   YT921X_VLAN_CTRLab_FID(x)			FIELD_PREP(YT921X_VLAN_CTRLab_FID_M, (x))
-+#define  YT921X_VLAN_CTRLa_LEARN_DIS		BIT(22)
-+#define  YT921X_VLAN_CTRLa_PRIO_EN		BIT(21)
-+#define  YT921X_VLAN_CTRLa_PRIO_M		GENMASK(20, 18)
-+#define   YT921X_VLAN_CTRLa_PRIO(x)			FIELD_PREP(YT921X_VLAN_CTRLa_PRIO_M, (x))
-+#define  YT921X_VLAN_CTRLa_PORTS_M		GENMASK(17, 7)
-+#define   YT921X_VLAN_CTRLa_PORTS(x)			FIELD_PREP(YT921X_VLAN_CTRLa_PORTS_M, (x))
-+#define  YT921X_VLAN_CTRLa_PORTn(port)		BIT((port) + 7)
-+#define  YT921X_VLAN_CTRLa_BYPASS_1X_AC		BIT(6)
-+#define  YT921X_VLAN_CTRLa_METER_EN		BIT(5)
-+#define  YT921X_VLAN_CTRLa_METER_ID_M		GENMASK(4, 0)
+ #define YT921X_EXT_MBUS_OP		0x6a000
+ #define YT921X_INT_MBUS_OP		0xf0000
+@@ -465,6 +471,39 @@ enum yt921x_app_selector {
+ #define  YT921X_LAG_HASH_MAC_DA			BIT(1)
+ #define  YT921X_LAG_HASH_SRC_PORT		BIT(0)
  
- #define YT921X_TPID_IGRn(x)		(0x210000 + 4 * (x))	/* [0, 3] */
- #define  YT921X_TPID_IGR_TPID_M			GENMASK(15, 0)
++#define YT921X_PORTn_RATE(port)		(0x220000 + 4 * (port))
++#define  YT921X_PORT_RATE_GAP_VALUE		GENMASK(4, 0)	/* default 20 */
++#define YT921X_METER_SLOT		0x220104
++#define  YT921X_METER_SLOT_SLOT_M		GENMASK(11, 0)
++#define YT921X_PORTn_METER(port)	(0x220108 + 4 * (port))
++#define  YT921X_PORT_METER_EN			BIT(4)
++#define  YT921X_PORT_METER_ID_M			GENMASK(3, 0)
++#define   YT921X_PORT_METER_ID(x)			FIELD_PREP(YT921X_PORT_METER_ID_M, (x))
++#define YT921X_METERn_CTRL(x)		(0x220800 + 0x10 * (x))
++#define  YT921X_METER_CTRLc_METER_EN		BIT(14)
++#define  YT921X_METER_CTRLc_TOKEN_OVERFLOW_EN	BIT(13)	/* RFC4115: yellow use unused green bw */
++#define  YT921X_METER_CTRLc_DROP_M		GENMASK(12, 11)
++#define   YT921X_METER_CTRLc_DROP(x)			FIELD_PREP(YT921X_METER_CTRLc_DROP_M, (x))
++#define   YT921X_METER_CTRLc_DROP_GYR			YT921X_METER_CTRLc_DROP(0)
++#define   YT921X_METER_CTRLc_DROP_YR			YT921X_METER_CTRLc_DROP(1)
++#define   YT921X_METER_CTRLc_DROP_R			YT921X_METER_CTRLc_DROP(2)
++#define   YT921X_METER_CTRLc_DROP_NONE			YT921X_METER_CTRLc_DROP(3)
++#define  YT921X_METER_CTRLc_COLOR_BLIND		BIT(10)
++#define  YT921X_METER_CTRLc_UNIT_M		GENMASK(9, 7)
++#define   YT921X_METER_CTRLc_UNIT(x)			FIELD_PREP(YT921X_METER_CTRLc_UNIT_M, (x))
++#define  YT921X_METER_CTRLc_BYTE_MODE_INCLUDE_GAP	BIT(6)	/* +GAP_VALUE bytes each packet */
++#define  YT921X_METER_CTRLc_PKT_MODE		BIT(5)	/* 0: byte rate mode */
++#define  YT921X_METER_CTRLc_RFC2698		BIT(4)	/* 0: RFC4115 */
++#define  YT921X_METER_CTRLbc_CBS_M		GENMASK_ULL(35, 20)
++#define   YT921X_METER_CTRLbc_CBS(x)			FIELD_PREP(YT921X_METER_CTRLbc_CBS_M, (x))
++#define  YT921X_METER_CTRLb_CIR_M		GENMASK(19, 2)
++#define   YT921X_METER_CTRLb_CIR(x)			FIELD_PREP(YT921X_METER_CTRLb_CIR_M, (x))
++#define  YT921X_METER_CTRLab_EBS_M		GENMASK_ULL(33, 18)
++#define   YT921X_METER_CTRLab_EBS(x)			FIELD_PREP(YT921X_METER_CTRLab_EBS_M, (x))
++#define  YT921X_METER_CTRLa_EIR_M		GENMASK(17, 0)
++#define   YT921X_METER_CTRLa_EIR(x)			FIELD_PREP(YT921X_METER_CTRLa_EIR_M, (x))
++#define YT921X_METERn_STAT(x)		(0x221000 + 8 * (x))
++
+ #define YT921X_PORTn_VLAN_CTRL(port)	(0x230010 + 4 * (port))
+ #define  YT921X_PORT_VLAN_CTRL_SVLAN_PRIO_EN	BIT(31)
+ #define  YT921X_PORT_VLAN_CTRL_CVLAN_PRIO_EN	BIT(30)
+@@ -508,6 +547,16 @@ enum yt921x_fdb_entry_status {
+ 
+ #define YT921X_MSTI_NUM		16
+ 
++#define YT921X_TOKEN_BYTE_C	1	/* 1 token = 2^1 byte */
++#define YT921X_TOKEN_PKT_C	-6	/* 1 token = 2^-6 packets */
++#define YT921X_TOKEN_RATE_C	-15
++/* Custom meters only, not including dedicated port meters (11) */
++#define YT921X_METER_NUM	64
++#define YT921X_METER_SLOT_MIN	80
++#define YT921X_METER_UNIT_MAX	((1 << 3) - 1)
++#define YT921X_METER_CIR_MAX	((1 << 18) - 1)
++#define YT921X_METER_CBS_MAX	((1 << 16) - 1)
++
+ #define YT921X_LAG_NUM		2
+ #define YT921X_LAG_PORT_NUM	4
+ 
+@@ -602,8 +651,10 @@ struct yt921x_priv {
+ 	struct dsa_switch ds;
+ 
+ 	const struct yt921x_info *info;
++	unsigned int meter_slot_ns;
+ 	/* cache of dsa_cpu_ports(ds) */
+ 	u16 cpu_ports_mask;
++	unsigned char cycle_ns;
+ 
+ 	/* protect the access to the switch registers */
+ 	struct mutex reg_lock;
 -- 
 2.53.0
 
