@@ -1,140 +1,182 @@
-Return-Path: <netdev+bounces-281676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281677-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WLV5LVBa8Gn/SAEAu9opvQ
-	(envelope-from <netdev+bounces-281676-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 08:57:20 +0200
+	id CDsqCxVb8GlQSAEAu9opvQ
+	(envelope-from <netdev+bounces-281677-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 09:00:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 273E047E582
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 08:57:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4283A47E609
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 09:00:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1FE3F3003633
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 06:53:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4C3033019064
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 06:56:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFF2635AC31;
-	Tue, 28 Apr 2026 06:53:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CEFyPsVG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C4BE34D91F;
+	Tue, 28 Apr 2026 06:56:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DDF634F24E
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 06:53:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D836348883;
+	Tue, 28 Apr 2026 06:56:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777359221; cv=none; b=scz418BH+lEvIJC3di/ohjtikXb0ehkGJZ7wtVRMm+wOUQRppaZBy5qMervlUidpJt7wi8KB59OeIDCI5sfMdaXHPOF5KdV1L5H0pk4SgC4f3q4FUdzhw3nBPjIxJkHvpHMg6RNv35ZLqI4na52OZ6bweTKbx0U4hg9xManaU2k=
+	t=1777359416; cv=none; b=WOZKdEUbSKdjbR2hPY6i53WGSElc/9R+ysdZmDXMr1r2X4YUSsGDGa2xz2H2/ns1j1SSeNUC0FDS7nqgMMcBe1Gxq3wXRjwIYDx6HDz6dGccPkXoLHibJBc5shKo+zXL6W2hDd0/AT2FtdP4UNHYqKFUHkTtSzCR4aUekJ+52SM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777359221; c=relaxed/simple;
-	bh=PcMY8rNtk+alf5ERoe5UCqYOPg+SjVnTOq5lid6Morc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=gtwYJjTR2ywV65NI8MzgXUT94P8rqqWmlvkOisv+OF+OCSQO5VfTjCWyw7Nm+aruB3ZgIJo8fIa+8XfyKytS0F2+Lwm8zl0Nh+p78byodTAyuh5zmBRBsLf+5sAlPCLLMOJa5swgtEjxtIreIQ17d9MTHQFixasivKWZq4xlwc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CEFyPsVG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07E74C2BCAF;
-	Tue, 28 Apr 2026 06:53:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777359221;
-	bh=PcMY8rNtk+alf5ERoe5UCqYOPg+SjVnTOq5lid6Morc=;
-	h=From:Date:Subject:To:Cc:From;
-	b=CEFyPsVGr+7/LKa3Rq5imoYzwrjQKMUGio1kkxw2EmP/ynlOFMfyFt78g+XZDlkoF
-	 CGTaPvu9Shf3OKYSy2j6eCRTWi9ydgVv76LInuNK69Z1IEnPnWrAPcPABHHKSsvS3s
-	 DC+09hFOWxDpHGDfuY3sm2TuivkqqUJKRdqEaVWuKwEKfUT39TUlfp17wnAxTRpvNi
-	 z1rJeCHWASPJM21YXNkSRtdwY4U2JKzMgzeNW7V1ok/QuCyGIu/f+KQgab8+cZsbxJ
-	 T3hDk4jjy2jeJx7M2ONVg0agSdCuj/prjDfQLLeWC7oZXvPqVmlp6cI4prOPUmxX6K
-	 DRDBVJZOArY9g==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Tue, 28 Apr 2026 08:53:16 +0200
-Subject: [PATCH net] net: airoha: Do not return err in ndo_stop() callback
+	s=arc-20240116; t=1777359416; c=relaxed/simple;
+	bh=CS4pBdzNh3NZsCPmjXr1Y9IgwAuRv4L39KxS3qol8L8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CM3SY92BochZkEr0TCy/6GP6S7lWyO/sQ4bmOVwmesezkUGFSxM2NA7nHwTBXWQDus5sIVAKL2XLelx0ANHtElE1Ky7DJd7MbFmyh8klgK9FHhwJ+OO/3VyQCOnm3XJxuKqncZ8WknzrWgiAYc7kNbLOR7lVAkVgjmZP+MrWZOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.192] (ip5f5af76e.dynamic.kabel-deutschland.de [95.90.247.110])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id EA5054C288718F;
+	Tue, 28 Apr 2026 08:56:02 +0200 (CEST)
+Message-ID: <a9cfe2dc-f4dc-48fb-a374-0d2902baa0c5@molgen.mpg.de>
+Date: Tue, 28 Apr 2026 08:56:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260428-airoha-ndo-stop-not-err-v1-1-674506d29a91@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3MTQqDQAxA4atI1g04YfpDryJdxBprNolkBhHEu
- zt0+S3eO6BIqBR4dweEbFrUrSHdOvgubD9BnZqBenr0mV7IGr4w2uRYqq9oXlEikNM9c5qfNGa
- CVq8hs+7/8wAmFT7neQGmoir4bgAAAA==
-X-Change-ID: 20260428-airoha-ndo-stop-not-err-a154a1f72b42
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.3
-X-Rspamd-Queue-Id: 273E047E582
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 1/3] igc: remove unused
+ autoneg_failed field
+To: khai.wen.tan@linux.intel.com
+Cc: anthony.l.nguyen@intel.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, faizal.abdul.rahim@intel.com,
+ hong.aun.looi@intel.com, khai.wen.tan@intel.com,
+ Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+References: <20260428060009.311393-1-khai.wen.tan@linux.intel.com>
+ <20260428060009.311393-2-khai.wen.tan@linux.intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20260428060009.311393-2-khai.wen.tan@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 4283A47E609
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281676-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281677-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[mpg.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.995];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,molgen.mpg.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Always complete the airoha_dev_stop() routine regardless of the
-airoha_set_vip_for_gdm_port() return value, since errors from
-ndo_stop() are ignored by the networking stack and the interface is
-always considered down after the call.
+[Cc: Removed stray *Looi*]
 
-Fixes: 23020f049327 ("net: airoha: Introduce ethernet support for EN7581 SoC")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/airoha/airoha_eth.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+Dear Khai Wen Tan,
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 5effb4a4ae84..f8b3d53bccad 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -1747,13 +1747,10 @@ static int airoha_dev_stop(struct net_device *dev)
- {
- 	struct airoha_gdm_port *port = netdev_priv(dev);
- 	struct airoha_qdma *qdma = port->qdma;
--	int i, err;
-+	int i;
- 
- 	netif_tx_disable(dev);
--	err = airoha_set_vip_for_gdm_port(port, false);
--	if (err)
--		return err;
--
-+	airoha_set_vip_for_gdm_port(port, false);
- 	for (i = 0; i < dev->num_tx_queues; i++)
- 		netdev_tx_reset_subqueue(dev, i);
- 
 
----
-base-commit: 3bc179bc7146c26c9dff75d2943d10528274e301
-change-id: 20260428-airoha-ndo-stop-not-err-a154a1f72b42
+Thank you for your patch.
 
-Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
 
+Am 28.04.26 um 08:00 schrieb KhaiWenTan:
+
+(Should spaces be added in your name?)
+
+> From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+> 
+> autoneg_failed in struct igc_mac_info is never set in the igc driver.
+> Remove the field and the dead code checking it in
+> igc_config_fc_after_link_up().
+
+Could you please elaborate. Why is removal the correct fix, and it’s not 
+an incomplete feature? Does auto-negotiation always succeed?
+
+> Reviewed-by: Looi, Hong Aun <hong.aun.looi@intel.com>
+
+Please order it to not use the comma: Hong Aun Looi
+
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+> Signed-off-by: KhaiWenTan <khai.wen.tan@linux.intel.com>
+> ---
+>   drivers/net/ethernet/intel/igc/igc_hw.h  |  1 -
+>   drivers/net/ethernet/intel/igc/igc_mac.c | 16 +---------------
+>   2 files changed, 1 insertion(+), 16 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/igc/igc_hw.h b/drivers/net/ethernet/intel/igc/igc_hw.h
+> index be8a49a86d09..86ab8f566f44 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_hw.h
+> +++ b/drivers/net/ethernet/intel/igc/igc_hw.h
+> @@ -92,7 +92,6 @@ struct igc_mac_info {
+>   	bool asf_firmware_present;
+>   	bool arc_subsystem_valid;
+> 
+> -	bool autoneg_failed;
+>   	bool get_link_status;
+>   };
+> 
+> diff --git a/drivers/net/ethernet/intel/igc/igc_mac.c b/drivers/net/ethernet/intel/igc/igc_mac.c
+> index 7ac6637f8db7..142beb9ae557 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_mac.c
+> +++ b/drivers/net/ethernet/intel/igc/igc_mac.c
+> @@ -438,28 +438,14 @@ void igc_config_collision_dist(struct igc_hw *hw)
+>    * Checks the status of auto-negotiation after link up to ensure that the
+>    * speed and duplex were not forced.  If the link needed to be forced, then
+>    * flow control needs to be forced also.  If auto-negotiation is enabled
+> - * and did not fail, then we configure flow control based on our link
+> - * partner.
+> + * then we configure flow control based on our link partner.
+>    */
+>   s32 igc_config_fc_after_link_up(struct igc_hw *hw)
+>   {
+>   	u16 mii_status_reg, mii_nway_adv_reg, mii_nway_lp_ability_reg;
+> -	struct igc_mac_info *mac = &hw->mac;
+>   	u16 speed, duplex;
+>   	s32 ret_val = 0;
+> 
+> -	/* Check for the case where we have fiber media and auto-neg failed
+> -	 * so we had to force link.  In this case, we need to force the
+> -	 * configuration of the MAC to match the "fc" parameter.
+> -	 */
+> -	if (mac->autoneg_failed)
+> -		ret_val = igc_force_mac_fc(hw);
+> -
+> -	if (ret_val) {
+> -		hw_dbg("Error forcing flow control settings\n");
+> -		goto out;
+> -	}
+> -
+>   	/* In auto-neg, we need to check and see if Auto-Neg has completed,
+>   	 * and if so, how the PHY and link partner has flow control
+>   	 * configured.
+
+
+Kind regards,
+
+Paul
 
