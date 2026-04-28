@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-282069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282070-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yICvNG0e8WlmdgEAu9opvQ
-	(envelope-from <netdev+bounces-282069-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 22:54:05 +0200
+	id EHfCFYge8WmRdgEAu9opvQ
+	(envelope-from <netdev+bounces-282070-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 22:54:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6222E48C13E
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 22:54:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7BA048C169
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 22:54:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5FBCB3067760
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 20:53:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4A0383086D3C
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 20:53:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA860379EE6;
-	Tue, 28 Apr 2026 20:53:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EF5F37C90D;
+	Tue, 28 Apr 2026 20:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g+LLoKfj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p8dqEVrX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82E23644A4
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 20:53:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BDE937BE7C
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 20:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777409637; cv=none; b=ZKNiuHiDdLuf0Ax6H+IXrdEvEMEyjSKdYvAk8vKsPGA0S6yaNNfdEMApt8iwPALoXBAfWgUX+pmAVaXNlgpARBYrdCeEA/2U3SOBbKK5Qzs00zjQEB2S1H22w0bz81RG6YWqJWvVRCJDjMsVj1Cf65TMrmRA1GmZ02dpQxoD8zs=
+	t=1777409638; cv=none; b=OLQF1jzQPXJ7fC53gW0n/J+ld54SmrTxRmzt1t0l+OItNEkt16MFEYkfJc/KMR0QVZnA6+/YYRyHejprQhr2yL6IY1Djh8cJiP9MvCEthic5HRdU+f3BmVbRCnqT4/vedwIkWJIzhtcNc0bf+MUFLmC7YnafaVN9VoBlyOBTIeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777409637; c=relaxed/simple;
-	bh=IB6CLdot/1t2KBAZHoMsvVQS75ShQpHfi3cvDKVXg8c=;
+	s=arc-20240116; t=1777409638; c=relaxed/simple;
+	bh=kq/0J+Ftl468joYkW8fhfnGSH/A+B110vMVnKoQ0GOA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=e5APh2xgX4WVXOws41abvlKzpqCQ0Vfb8pjA5czYhp4o/nkcLr5+ZfJZFCk5njLzSZjmb6M5EipAWQOQfmme0Ww3xQZH76cI/A5JoiMULAw6C5S9NUa+rDBv0x+deQJ53DVH5Pd7tfXgTF529kNXT4OpY8BLOvAtzbAC3DTvaME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g+LLoKfj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D251C2BCB7;
+	 MIME-Version; b=NQWnDux7Gffr3Ahsrdm3y7+RPZ7k3pXgVr32ndSE/nE3GNaAIBEdQXiIOkfhz+lh3ueCc6aR707JNdowfPxwNKum3kkF5J561Ed2sMbVvBkam3Vi9JsYygnAleai//KKz5l5NlOOEhABF1LnrXOHAtqZs0+mHLjH+WYepZgKONc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p8dqEVrX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD15DC2BCB8;
 	Tue, 28 Apr 2026 20:53:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777409637;
-	bh=IB6CLdot/1t2KBAZHoMsvVQS75ShQpHfi3cvDKVXg8c=;
+	s=k20201202; t=1777409638;
+	bh=kq/0J+Ftl468joYkW8fhfnGSH/A+B110vMVnKoQ0GOA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=g+LLoKfj0uIPQlYKXzTGuFfklaVN0PRo/5UCSAVaLOc0UHd0y/vHS9oQC01VFuTJT
-	 Xxm9TVGBX/gasSt+NnPaHlDzYAukcyQKdqTdRfHiOhkyoNA6eD2d3H6fobWfzQ1C8p
-	 2PW6OIfFKaSwFiNQPLA/Ya4k1vrShK3cjhtWEmLK7obXG9jdWHiJZHFP8+caFGmPla
-	 vPN8Uh/cOwZky8UjviAC8wttlF/nK3S/xrSCYiSnozfDp/U1GH9Iyebw9CRL0VO+Ru
-	 LqtzxDwRpusm8RXkSxFhX/CPTn6W57TA/R7YVCXVqUVCmAv9kCO3ifcwZbEafTlN9b
-	 n32xNpXVe0B9w==
+	b=p8dqEVrXc0arQ5yKrG6zb8AUi72R46mhUHFkD1z8G8cVPEL/otV8b7w6et4lYzyzi
+	 oj5HDwVN8jOXUgT5k2FEibW6tGBjCeZBL0JR0Wpw6xFIqNC+x3cPE2UdSy+tvy7N2i
+	 u+bqDKlpyhdQRcB6VueGE7XT+9FwikSQ88X/xGoicMDAg163+TysE/46WOHT4k0/QI
+	 Zxrw14bbMm2MWu5k6UzRJWdHOHgTBmtteMHLp/UpEGXwIqpwZ1HJRCRqb/IHKjuDNL
+	 YbO1DOCH/HGq+if3AINogIQru+O7eL8lhPPB3Hp1Cx06KDyX7mfln2+/WN/8gMVY3t
+	 Fma03hsq9PZ3g==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -54,9 +54,9 @@ Cc: netdev@vger.kernel.org,
 	willemdebruijn.kernel@gmail.com,
 	daniel.zahka@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 1/3] psp: validate protocol before mutating skb in psp_dev_encapsulate()
-Date: Tue, 28 Apr 2026 13:53:50 -0700
-Message-ID: <20260428205352.1247325-2-kuba@kernel.org>
+Subject: [PATCH net-next 2/3] psp: add a comment about a psp_dev add netlink notification
+Date: Tue, 28 Apr 2026 13:53:51 -0700
+Message-ID: <20260428205352.1247325-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260428205352.1247325-1-kuba@kernel.org>
 References: <20260428205352.1247325-1-kuba@kernel.org>
@@ -67,7 +67,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 6222E48C13E
+X-Rspamd-Queue-Id: A7BA048C169
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
@@ -77,14 +77,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282069-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-282070-lists,netdev=lfdr.de];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -94,59 +94,40 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.926];
+	NEURAL_HAM(-0.00)[-0.982];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Code checkers / AI scans will complain that we have already modified
-the packet by the time we realize that protocol is not IP.
-
-Move the skb->protocol check to before skb_push()/memmove() so that
-the skb is not left in a corrupted state when the function returns
-false for an unsupported protocol. psp_dev_rcv() follows similar
-pattern.
-
-Today this path is unreachable because both in-tree callers (mlx5 and
-netdevsim) only reach psp_dev_encapsulate() from TCP socket TX paths
-where skb->protocol is always ETH_P_IP or ETH_P_IPV6, and both drop
-the skb on a false return, anyway.
+In psp_dev_create(), the DEV_ADD_NTF netlink notification is sent
+before the device is published to the netdev via rcu_assign_pointer().
+IIRC this is intentional because a single PSP device is expected
+to be shared with multiple netdevs. So we are trying to default to
+not having the netdev info. We can change it if someone complains
+but for now just add a comment that it's intentional.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/psp/psp_main.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ net/psp/psp_main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/net/psp/psp_main.c b/net/psp/psp_main.c
-index 9508b6c38003..652ec8a9c8a4 100644
+index 652ec8a9c8a4..f069117c867a 100644
 --- a/net/psp/psp_main.c
 +++ b/net/psp/psp_main.c
-@@ -228,6 +228,10 @@ bool psp_dev_encapsulate(struct net *net, struct sk_buff *skb, __be32 spi,
- 	u32 ethr_len = skb_mac_header_len(skb);
- 	u32 bufflen = ethr_len + network_len;
+@@ -90,6 +90,10 @@ psp_dev_create(struct net_device *netdev,
+ 	mutex_lock(&psd->lock);
+ 	mutex_unlock(&psp_devs_lock);
  
-+	if (skb->protocol != htons(ETH_P_IP) &&
-+	    skb->protocol != htons(ETH_P_IPV6))
-+		return false;
-+
- 	if (skb_cow_head(skb, PSP_ENCAP_HLEN))
- 		return false;
++	/* notify before netdev assignment
++	 * There's no strong reason for it, but thinking is to avoid creating
++	 * implicit expectations about the PSP dev <> netdev relationship.
++	 */
+ 	psp_nl_notify_dev(psd, PSP_CMD_DEV_ADD_NTF);
  
-@@ -243,11 +247,9 @@ bool psp_dev_encapsulate(struct net *net, struct sk_buff *skb, __be32 spi,
- 		ip_hdr(skb)->check = 0;
- 		ip_hdr(skb)->check =
- 			ip_fast_csum((u8 *)ip_hdr(skb), ip_hdr(skb)->ihl);
--	} else if (skb->protocol == htons(ETH_P_IPV6)) {
-+	} else {
- 		ipv6_hdr(skb)->nexthdr = IPPROTO_UDP;
- 		be16_add_cpu(&ipv6_hdr(skb)->payload_len, PSP_ENCAP_HLEN);
--	} else {
--		return false;
- 	}
- 
- 	skb_set_inner_ipproto(skb, IPPROTO_TCP);
+ 	rcu_assign_pointer(netdev->psp_dev, psd);
 -- 
 2.54.0
 
