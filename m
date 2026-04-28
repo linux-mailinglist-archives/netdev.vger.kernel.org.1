@@ -1,116 +1,195 @@
-Return-Path: <netdev+bounces-281997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281998-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QHsgBirn8GmoagEAu9opvQ
-	(envelope-from <netdev+bounces-281997-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:58:18 +0200
+	id OKnhBV7n8Gn2awEAu9opvQ
+	(envelope-from <netdev+bounces-281998-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:59:10 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66F6B489794
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:58:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 619574897C2
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:59:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D2E8731A2063
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:46:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CB0B630C8AFC
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:47:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 493BB32ED27;
-	Tue, 28 Apr 2026 16:45:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AEF6331A7E;
+	Tue, 28 Apr 2026 16:47:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RfMOU6cX"
+	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="XfiIGnuM"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D247633BBB1;
-	Tue, 28 Apr 2026 16:45:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B209328B71
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 16:47:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777394749; cv=none; b=iXF5R5HG7eeijVNXUvhyh1zGtIn7qsGbqVGMGji9GDHyGu+GMR/8N9SZMApYzRQgf+DxlATrf4BrvuwKSPUh+FkfLo7EuAYr+RIuL9z9WELRyOciHQdeDLk2vlDpIZboI4WPRt+UvW2dlBid93tecmoBnKEFPr16pz64ZKfY924=
+	t=1777394853; cv=none; b=Q5cyfxtHrCY9X5EgEc+mfpSlUZqfXR3CyBNA/cd4Ns17sX65zzpChe4nfX6jyh3VbwAzpTFFK5pGEJqKs/oTFQlrRmmF2zptU53GL2ODhB7Rc0NdlIxS0+UGr1sksC1cPo12k/5cI3fRdQg2t6CQj/bhsKS75GO3MV1P9lhl8mg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777394749; c=relaxed/simple;
-	bh=44UzHHp3Vg6kLMVVpxMVtoUkOpmBtpHyCKbwCaI8IsU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jFDPpsjZB3z3SzZd6i3tm8duguW8KWF7zNfGxOUFec2s6nZIsgSTUA28K+YKKz7o2ifqAmlvUg4CQsDMLcFyLbBN45EMj8tlEKNBJxqTM5eL5iUXYCUGPoB0FhFpqvfA8wsluoaku3PynbbOna3B9r+Pxh+vYSZpzF5aXu43Gyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RfMOU6cX; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=hZtkJkwAYBJj/dqcDVYkgzF9zSMWomEH526AyV+zG04=; b=RfMOU6cXjNAnIu3PbmEWC3pa5F
-	imfiBALyYzUGur5fW+7sDl0L2eWPuiPey1o1owZIR3Xk6i1euB7pWhlHoSXn0flqybX7NPhpqgUP0
-	dohBO/ES1nVu3jTUPtiuiiLsW8wvBcEzpi4RSclCaDL9j+K1OctaDr4i7sEbdCbi2OH4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wHlZ0-000NKU-TT; Tue, 28 Apr 2026 18:45:34 +0200
-Date: Tue, 28 Apr 2026 18:45:34 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Mika Westerberg <mika.westerberg@linux.intel.com>
-Cc: linux-usb@vger.kernel.org, Yehezkel Bernat <YehezkelShB@gmail.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	Andreas Noever <andreas.noever@gmail.com>,
-	Alan Borzeszkowski <alan.borzeszkowski@linux.intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 9/9] thunderbolt: Add support for USB4STREAM
-Message-ID: <e38bb396-748f-435d-9d17-5e7799edcc64@lunn.ch>
-References: <20260428072209.3084930-1-mika.westerberg@linux.intel.com>
- <20260428072209.3084930-10-mika.westerberg@linux.intel.com>
- <ef5411f4-0e4c-4ac1-8ae0-0d557fc0ebd2@lunn.ch>
- <20260428151311.GU557136@black.igk.intel.com>
+	s=arc-20240116; t=1777394853; c=relaxed/simple;
+	bh=9S9GoA2wdMOKBwQUq6uU4RsjDD9B9w9gbFBChUNcp5Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BJnZlt9NOyXffvP78fRQ38ezUiTU1azCqEY7d9Y6a0YW+qZBUgSel//Vh96QQ5tlxS79q+0tKHpk34Ttgkmh1wE9+gxLzt59ge8V1D6c3Ql57kZrFZw9LgL+h0wu3c2ZO6pZF83GHKjBgJjK0R26KLVwOPHWZrIBmJVWHp39WQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=XfiIGnuM; arc=none smtp.client-ip=209.85.160.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ieee.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-4042fe53946so5208367fac.3
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 09:47:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ieee.org; s=google; t=1777394849; x=1777999649; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lsaS50fJFWEgKS/X3mmwXYg/L5d5/h6qIX6nFemmP8U=;
+        b=XfiIGnuMwfnSZxVU2xMgiQkpcZx9aOzJFtBz/g7B0AIMVtPkX6kMu59YPBadlEyBuM
+         FQF2p+kRwFoecg5nfEGOocMnL5tUqrba1mQGA9Vfuqpjh/BsagGOYnQzCwHt7+h5XFOb
+         xfmVVCQ4cXKEpESLS4Di0RDcO629CVyZPLD6k=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777394849; x=1777999649;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lsaS50fJFWEgKS/X3mmwXYg/L5d5/h6qIX6nFemmP8U=;
+        b=kQp3RsRmn9y07QutIlEL6kzUaU9/4GaP/m7GoClVLczmJJeCh2k0rs9iaLXEiHwXHd
+         +Hk7F0OAS56Q+UX2TIWewtOq/Bzub7JVLJ6PUahMp7TJ+7wbqlKicGJ6VRMA61vPZwKp
+         EBZar1pzAVM4oNHp81tC6EDebjiryL0xvpK5Ybg9qCsGz9o3QQo1eIi9gjvOKBMrlTz2
+         p8KvGR+uJcB/fWDoYHckCsg3RrGUVHRFdUF8/17DzLgw50cPrqEhX/J+oITnxSGj4jXN
+         U3msH7rwji5Qi6DymlsjlZ/q41bkv3wgOflYCUL8wjblI9R0P26VyBktJaRgmKgnwdHK
+         Rbzw==
+X-Forwarded-Encrypted: i=1; AFNElJ8JjOjAwHgThtgCrEgFsMkX09j1CXoQi1FrNDA/PA+UmhOEuUUAlqt5/3f3/YfVhhDYWW6AvlE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/J76hA219cexudyVowO/+N3wwB/uVIqX8LHKlzN2nMF8iRg8s
+	2BfayjRGM7kfwmhFl8zYsJcIyP9SM2I9+0bIqbBQyhnkXl5hEZfkZ+vxuT7LtjEpow==
+X-Gm-Gg: AeBDiesDNx79yc851jcCug14UJR7yZhL9d7d7Wds0h78P0Ivc5H9AAtKKYf9pLDIt3X
+	bpgFoiZWThRFhaGucxKIKuWLqxzRWoYezPhVJzBHGMrpZZnd/PCwZNf9I+pCNcfMbC4spbxB3/o
+	3JFYWpVqWwAxMNXoFCHZuDZLPKP8CZoQtZYanS148q6KKQcxanRrmHR0SeQwVb1WGXHiK0HgDmx
+	b2EVcMRJxP3v5NrART2k8V5VhBXLgEtbTCjaCNPFDXYsm09dBZjAj9mulPuvJcbG6SNtPXFFYGX
+	nGMwn6kRVOakh2QH/sTE42gdDmGPVuXoj0QDJOPgockl2zL67/zKBD9tJJ4qYFFlPEbrreOdOdE
+	oN35uIKc/cP0PtlYVe90V2fyzyhTnKczti5XUntmQlqwOgAdtZ5bjiYTnxBH305VaJBdQrenlPn
+	XQ3ZvEfduM04NGp+MD4sV3S+K7+ZZGkiUQsLj2aS4YObZVHqNCs2ju8eemEj7pfi4qZym1
+X-Received: by 2002:a05:6871:e78f:b0:42f:ba47:36f5 with SMTP id 586e51a60fabf-433f396963emr2135147fac.17.1777394849189;
+        Tue, 28 Apr 2026 09:47:29 -0700 (PDT)
+Received: from [172.22.22.28] (c-75-72-117-212.hsd1.mn.comcast.net. [75.72.117.212])
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-433efbf1d8dsm2255892fac.6.2026.04.28.09.47.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Apr 2026 09:47:28 -0700 (PDT)
+Message-ID: <bf380b65-1513-4792-9e3c-d03bff17c141@ieee.org>
+Date: Tue, 28 Apr 2026 11:47:26 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260428151311.GU557136@black.igk.intel.com>
-X-Rspamd-Queue-Id: 66F6B489794
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/4] net: ipa: Use the unified QMI service ID instead
+ of defining it locally
+To: Daniel Lezcano <daniel.lezcano@oss.qualcomm.com>, konradybcio@kernel.org,
+ andersson@kernel.org
+Cc: linux-kernel@vger.kernel.org, Alex Elder <elder@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jeff Johnson <jjohnson@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>,
+ Srinivas Kandagatla <srini@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, Kees Cook <kees@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Arnd Bergmann <arnd@arndb.de>, Mark Brown <broonie@kernel.org>,
+ Wesley Cheng <quic_wcheng@quicinc.com>, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
+ ath11k@lists.infradead.org, ath12k@lists.infradead.org,
+ linux-arm-msm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+ linux-sound@vger.kernel.org,
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+References: <20260316171419.2619620-1-daniel.lezcano@oss.qualcomm.com>
+ <20260316171419.2619620-2-daniel.lezcano@oss.qualcomm.com>
+Content-Language: en-US
+From: Alex Elder <elder@ieee.org>
+In-Reply-To: <20260316171419.2619620-2-daniel.lezcano@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 619574897C2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[ieee.org,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[ieee.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281997-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,wunner.de,linux.intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281998-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[ieee.org:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[elder@ieee.org,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[riscstar.com:email,ieee.org:dkim,ieee.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,qualcomm.com:email]
 
-> > Is this mutually exclusive to networking, on a device?
+On 3/16/26 12:14 PM, Daniel Lezcano wrote:
+> Instead of defining a local macro with a custom name for the QMI
+> service identifier, use the one provided in qmi.h and remove the
+> locally defined macro.
 > 
-> No - they can co-exist.
+> Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+> Signed-off-by: Daniel Lezcano <daniel.lezcano@oss.qualcomm.com>
 
-Do they have there own rings? So that ethtool -C on the netdev will
-not conflict with your configfs setting of the interrupt coalescing
-for the stream?
+Looks good!
 
-	Andrew
+Reviewed-by: Alex Elder <elder@riscstar.com>
+
+> ---
+>   drivers/net/ipa/ipa_qmi.c | 6 ++----
+>   1 file changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ipa/ipa_qmi.c b/drivers/net/ipa/ipa_qmi.c
+> index d771f3a71f94..37936ad132a2 100644
+> --- a/drivers/net/ipa/ipa_qmi.c
+> +++ b/drivers/net/ipa/ipa_qmi.c
+> @@ -66,11 +66,9 @@
+>    *   determination of when things are "ready"
+>    */
+>   
+> -#define IPA_HOST_SERVICE_SVC_ID		0x31
+>   #define IPA_HOST_SVC_VERS		1
+>   #define IPA_HOST_SERVICE_INS_ID		1
+>   
+> -#define IPA_MODEM_SERVICE_SVC_ID	0x31
+>   #define IPA_MODEM_SERVICE_INS_ID	2
+>   #define IPA_MODEM_SVC_VERS		1
+>   
+> @@ -484,7 +482,7 @@ int ipa_qmi_setup(struct ipa *ipa)
+>   	if (ret)
+>   		return ret;
+>   
+> -	ret = qmi_add_server(&ipa_qmi->server_handle, IPA_HOST_SERVICE_SVC_ID,
+> +	ret = qmi_add_server(&ipa_qmi->server_handle, QMI_SERVICE_ID_IPA,
+>   			     IPA_HOST_SVC_VERS, IPA_HOST_SERVICE_INS_ID);
+>   	if (ret)
+>   		goto err_server_handle_release;
+> @@ -501,7 +499,7 @@ int ipa_qmi_setup(struct ipa *ipa)
+>   	/* We need this ready before the service lookup is added */
+>   	INIT_WORK(&ipa_qmi->init_driver_work, ipa_client_init_driver_work);
+>   
+> -	ret = qmi_add_lookup(&ipa_qmi->client_handle, IPA_MODEM_SERVICE_SVC_ID,
+> +	ret = qmi_add_lookup(&ipa_qmi->client_handle, QMI_SERVICE_ID_IPA,
+>   			     IPA_MODEM_SVC_VERS, IPA_MODEM_SERVICE_INS_ID);
+>   	if (ret)
+>   		goto err_client_handle_release;
+
 
