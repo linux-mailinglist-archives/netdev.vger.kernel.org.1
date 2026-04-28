@@ -1,84 +1,99 @@
-Return-Path: <netdev+bounces-281666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281656-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KC9uF8hS8Gk7RwEAu9opvQ
-	(envelope-from <netdev+bounces-281666-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 08:25:12 +0200
+	id EJGTKnpN8GncRQEAu9opvQ
+	(envelope-from <netdev+bounces-281656-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 08:02:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE89047E076
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 08:25:11 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29B1D47DD88
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 08:02:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B617E30048E6
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 06:23:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1EFA03016D32
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 06:02:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55DED345CBC;
-	Tue, 28 Apr 2026 06:23:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61BE92E5B21;
+	Tue, 28 Apr 2026 06:02:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XtYW84eA"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qI4a/GzL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013019.outbound.protection.outlook.com [40.107.201.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567CA18871F;
-	Tue, 28 Apr 2026 06:23:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777357404; cv=none; b=gYrd2756WpAGtsSyqO8PYWRfZ8wahvRexyXHIGQQgouapC73pb9z+MnVnSc/N3RiCgaKYTNSUsXE3LtmEqcCP4xULd3l6hwq6r3sK1UGciC+ckbgt08tE0zLsLFrpGg+FZVJutOzwykB3vVxeGVUhMN8GUFO6hxLOFlqkm9jELU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777357404; c=relaxed/simple;
-	bh=ngOqkFz4/KywAaT2HNTWswNlmtqtG2tHpo5YyZBBXi0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pNvYneoZCbeVZ5K57PHU1mCvoMkGIgC0Hh94lMaKgXJgVy4e/Pf2PqBlWDndY+v+DQBzBxlyH+vUZGdVM5NmHxpaal3sCD004lXavu6Sn7r+DapsuTHDGSvKQ0+cj5Nn+EJr+o2lXc/Uwmve3ZWDxJIcmMkURgdKibOSNKGVO8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XtYW84eA; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777357402; x=1808893402;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ngOqkFz4/KywAaT2HNTWswNlmtqtG2tHpo5YyZBBXi0=;
-  b=XtYW84eAzVWORZoouGTvWbw+otZMDXMk/o8+No1Xh5wzWkXY8InY9vRm
-   b8Fc6NyyoovGq+e7BIAULiwxcO6CE9ulP6UTuwU3I3+/hFOlovqgVu5A/
-   pvgOwLkYKeDgwVkMqTV3Xj9QEbbovm/vrj/Aav9G0XRd60G/JmGnI7VKL
-   ct4TWpsnFM+vSzZO2iHOMVFmXQwVpMukTKMimHHV17X6EBe0bffcigMdr
-   jZdgvr6Vc2l0htjtkSkwjHOuEODrbkbhtKjkm6cdNyJSHfY9ww6g3OEHh
-   bgjMIFIrOThlV2yacCgPnmoWGDhI7/WIoZpMgE2jS/k5K4QG40YiDx0T+
-   A==;
-X-CSE-ConnectionGUID: h+WV8uxhTHSz6RJ+LivNkA==
-X-CSE-MsgGUID: vxKNs0kjR3aejh655ybg+w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11769"; a="78366137"
-X-IronPort-AV: E=Sophos;i="6.23,203,1770624000"; 
-   d="scan'208";a="78366137"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2026 23:23:20 -0700
-X-CSE-ConnectionGUID: tDf7MWWCTJ2R14c6sGV1Tw==
-X-CSE-MsgGUID: hhw5zzcSRryL21uosaEK2w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,203,1770624000"; 
-   d="scan'208";a="232986951"
-Received: from unknown (HELO localhost.png.intel.com) ([10.107.255.61])
-  by orviesa010.jf.intel.com with ESMTP; 27 Apr 2026 23:23:17 -0700
-From: KhaiWenTan <khai.wen.tan@linux.intel.com>
-To: anthony.l.nguyen@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, faizal.abdul.rahim@intel.com,
-	hong.aun.looi@intel.com, khai.wen.tan@intel.com,
-	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
-	Looi@web.codeaurora.org, KhaiWenTan <khai.wen.tan@linux.intel.com>
-Subject: [PATCH iwl-next v4 3/3] igc: add support for forcing link speed without autonegotiation
-Date: Tue, 28 Apr 2026 14:00:09 +0800
-Message-ID: <20260428060009.311393-4-khai.wen.tan@linux.intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260428060009.311393-1-khai.wen.tan@linux.intel.com>
-References: <20260428060009.311393-1-khai.wen.tan@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1946E22A4E9;
+	Tue, 28 Apr 2026 06:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777356150; cv=fail; b=BZOTwGrbe2wdEcVJjqhZvdUcms7KLGbJ1RvNez3RZtKbLN5k06qxCY4yKIo34nWQPJdm82YrwFkzF6tVCsYmRDAOJgDxOWmOyOzI5+S1ue4ChKLm1juvH9sD62ejOfP1x9DnAzYwLIhtr/sqi31wT3dYBr/JprGxvLmrulMb2mE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777356150; c=relaxed/simple;
+	bh=C7mLojFuEzZXWCw3O8ZK0TPKsw3yz5n6smzf5C3+6uc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hMR1lsgyHfszjxg806EbwidsZEix6a8nPfC5WZyY04UNOc1jgWJ8bi+AnYwYdLf8YkT/nkBkDanFqv9X/zzeOTPc9Rtnf8NCHcXC9pHRRjK1ID/ctYrM9Lyzl3NF63IcAliGRKa2W/6Tp+xi068tfHLFM+yh2XH1fqMu0XlRBJA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qI4a/GzL; arc=fail smtp.client-ip=40.107.201.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=IMNrhF/tXoFGKyKsKHErLBrbHwlp7PGSWNVafIXMqfNowuRnUenJj++VmQRIO/VqHjkpJiBuXs7Y2cuipxN+smzqd5SiBaOZrfJAF/h1I9NmsogAIr31nHhblogt5rjfbxRqj202q2ao7PYdguVlb6kILEvfcsgP5BYtPl9jI+YXpLFtDxa/BCXSg/5ROP/dDITEIblEJnVrhbFFAnsME5dcQvXqTYKNK8EVcYFwoLUA7GBH5CAbhw3dJQqkcST7tN5lcayTTjdbczeM+e3fnNYlFVmT/JrK/5cfv329eMQUuuaDymsbbhf/pgX7YCougB1KTT54nZp+2BHj87aRlQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CyVMvuCwL1Vglw4UJ0HGLHLoqnbpu5NalBS2NQH2IOs=;
+ b=TlwXdWb/HKLV3zbx3jVDRXTumOrv78UMWaXO18kbLE31WyNcC3OeUqo/nyE67QXv8b0sdpB3+zvO4KJq+sGEDYDQUOvImG1ED/0R/Xh3GB+SsKDVPrUGUBbBk9xTstd7SPJAcA4EkbtZUNFfmlUpjA/3yv9mnqseLT/4XYOAV1FWXtUDaah7bhblUzJ4/Xp8I6gIzjWQ6O54BMKN6kEsr1tXDwOZQ5chVfCC4NdDtVYZ4tvsaddaNy3zYfJoz6tQwxr0Wf3G5e/+YvjxjtZASPybr/I4klfX7litKBxVFx3T3ftLTXARXz1MVsuHh+0EKfzgJsrPKw7PfUeAvVr80w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CyVMvuCwL1Vglw4UJ0HGLHLoqnbpu5NalBS2NQH2IOs=;
+ b=qI4a/GzLzRif+5Yn7ktXLik7HV8o9Iv8gzstRyRhP2E2Rs97uuT+ZuKkoynZIgivTSe9LmaUMSj1jThTK4PDzbgWJvL6AA5TRC1/vMthedE1pz+g05EOd/49CKlO7vTWQKFp6cDcf00UE4J7KqcT3uuszx5E6bUnULhFohLHj1jSmlZUQT4MJdvxImv0AV0g5SiQl7kaNJU6moAwT+VfIttdnmtg1tY0sxm/cc+rOrjMW7Pyetx1p0A/dJ+50ogJ9Xm2Ql+UV1ggv05qCx6H5DaE8pcRuu343iofSWs4znvZjKcKJV8X+gA2hgdIAbfg5zT83lZGA9ShwTJ8iMaXYA==
+Received: from MW4PR04CA0109.namprd04.prod.outlook.com (2603:10b6:303:83::24)
+ by DS7PR12MB6117.namprd12.prod.outlook.com (2603:10b6:8:9b::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9870.16; Tue, 28 Apr 2026 06:02:23 +0000
+Received: from CO1PEPF000066E8.namprd05.prod.outlook.com
+ (2603:10b6:303:83:cafe::94) by MW4PR04CA0109.outlook.office365.com
+ (2603:10b6:303:83::24) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9846.26 via Frontend Transport; Tue,
+ 28 Apr 2026 06:02:22 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CO1PEPF000066E8.mail.protection.outlook.com (10.167.249.6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9846.18 via Frontend Transport; Tue, 28 Apr 2026 06:02:22 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 27 Apr
+ 2026 23:02:01 -0700
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 27 Apr
+ 2026 23:02:00 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.9)
+ with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Mon, 27
+ Apr 2026 23:01:56 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>
+CC: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+	"Mark Bloch" <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Shay
+ Drory <shayd@nvidia.com>, Simon Horman <horms@kernel.org>, Patrisious Haddad
+	<phaddad@nvidia.com>, Kees Cook <kees@kernel.org>, Parav Pandit
+	<parav@nvidia.com>, Gal Pressman <gal@nvidia.com>, <netdev@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Dragos Tatulea
+	<dtatulea@nvidia.com>
+Subject: [PATCH net V4 0/4] net/mlx5: Fixes for Socket-Direct
+Date: Tue, 28 Apr 2026 09:01:07 +0300
+Message-ID: <20260428060111.221086-1-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,488 +101,114 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: AE89047E076
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000066E8:EE_|DS7PR12MB6117:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2da45a03-1b75-48f4-5d18-08dea4ebb704
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|36860700016|82310400026|1800799024|13003099007|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	ryFjvid1/G5aWuejWG8YbeLmh7gdgt1VUp9PciyPIoCeau2KVxyCjU3mS6JjvIos5VwiOgUVR4ebsgQTQrTVM4T3I5i/Cs1Vp1mFzstnGMus9L4byXKBzJwJM7s9Pqxhdr4uXvHr71v0eZIExJTR3xAOhaUGeOoXEYd+gkBUopdGSyYgMjOav64SmpBAlDtjXfUl+sk3cUqCH5F+JRl+UkutHNCFypubGzevpigYoDahvzttXmtQFIlRiesnz3Zel7/JP/L0CEaoB0VG+Hi+n47aIz/nK1KjHBKknBkrVlUwQGV2nalN0ZgDn72D9Jg/LgouKA+9uu10bH0acBRCktucgkGZkkrFSXb9mNpPhI3bU8GEg92nH+sQBa8BRUyXOS29B2lg0D4o9J7Pq1RIJCDNvk6HjuE2zpUdv+El4aV0IEFhrxJJiF2VU1hkr3/FgOmt3bDlknEqIEmawzeAei/TA0OFnDa9OaOIhNTKeufdqyUwij/q0uwlJ/GwZ9FMuuMfT58I8eXIAJxir6fvz58opoPcIF+2G7FX7hbdlQit+pyn5unURgeNk6d9yD57jEGaCv+hnbV6fqV5Qh+umWlqWprXtsMGzO2doKQ+usE6B68+snvE0Dw/nckuKAghGfsfOYG/fU4Pk6+xqI2R/ZjLIoeEhZDNGsCd+CaeNabJ563+wvIfdYCyTNn+tXnxkBr2rOpm80lI1KK2Tgt3Y1VGQTKb+vy77dFlkQp86zoFU0arGyht4W/cYmaHhxMa5wDYSDokUke3pjeVIA0YVA==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(36860700016)(82310400026)(1800799024)(13003099007)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	5gGj0ZTI/oArfTXXb/jpygRu1lQ9X7bL3Ig5Sr30KQ6PbCBLmT9nGrOZZC9oVghebSEP+2pZXz37sWg4swo2yJGQyNGdH8V9ZAxx63WXGZGSTpcnHkGv4lsREmvgl305BtwkBQXQKz4Ib11lmONRHY4pVUVeVwc4N23C6aUlEst2Kog6LnSuVvdtWVFXK8Xrnch17SmkW32eU+BqCKbXhtTONnYvnxdq2ls3iQExlR2AvWW+Kt7Rso1MP3l7optyri6FT6gSYT+KwIicXhTGtU/d3+758DJDqZFefjKtgFVREQfRzUosb29oK5Z82DR4rfFi1462zZra9dXeuC+BU0ylQWsWWBteoGf/9ARgp4O1pi8LnsOWOOhS+buNv4vcXjU8chpPdS9Ipu0BdX6UB/v+IpqqhShrZZqTbgWT0nV7umm3+Pjfy2s2mrnVz0hj
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2026 06:02:22.6559
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2da45a03-1b75-48f4-5d18-08dea4ebb704
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000066E8.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6117
+X-Rspamd-Queue-Id: 29B1D47DD88
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [4.64 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
-	R_DKIM_REJECT(1.00)[intel.com:s=Intel];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[intel.com : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-281666-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	GREYLIST(0.00)[pass,meta];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:-];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-281656-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[khai.wen.tan@linux.intel.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:mid,Nvidia.com:dkim];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.530];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.intel.com:mid]
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[9]
 
-From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+Hi,
 
-Allow users to force 10/100 Mb/s link speed and duplex via ethtool
-when autonegotiation is disabled. Previously, the driver rejected
-these requests with "Force mode currently not supported.".
+This series fixes several race conditions and bugs in the mlx5
+Socket-Direct (SD) single netdev flow.
 
-Forcing at 1000 Mb/s and 2500 Mb/s is not supported.
+Patch 1 serializes mlx5_sd_init()/mlx5_sd_cleanup() with
+mlx5_devcom_comp_lock() and tracks the SD group state on the primary
+device, preventing concurrent or duplicate bring-up/tear-down.
 
-Reviewed-by: Looi, Hong Aun <hong.aun.looi@intel.com>
-Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-Signed-off-by: KhaiWenTan <khai.wen.tan@linux.intel.com>
----
- drivers/net/ethernet/intel/igc/igc_base.c    |  35 ++++-
- drivers/net/ethernet/intel/igc/igc_defines.h |   9 +-
- drivers/net/ethernet/intel/igc/igc_ethtool.c | 137 ++++++++++++++-----
- drivers/net/ethernet/intel/igc/igc_hw.h      |   9 ++
- drivers/net/ethernet/intel/igc/igc_mac.c     |  10 ++
- drivers/net/ethernet/intel/igc/igc_main.c    |   2 +-
- drivers/net/ethernet/intel/igc/igc_phy.c     |  65 ++++++++-
- drivers/net/ethernet/intel/igc/igc_phy.h     |   1 +
- 8 files changed, 217 insertions(+), 51 deletions(-)
+Patch 2 fixes the debugfs "multi-pf" directory being stored on the
+calling device's sd struct instead of the primary's, which caused
+memory leaks and recreation errors when cleanup ran from a different PF.
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_base.c b/drivers/net/ethernet/intel/igc/igc_base.c
-index 1613b562d17c..ab9120a3127f 100644
---- a/drivers/net/ethernet/intel/igc/igc_base.c
-+++ b/drivers/net/ethernet/intel/igc/igc_base.c
-@@ -114,11 +114,35 @@ static s32 igc_setup_copper_link_base(struct igc_hw *hw)
- 	u32 ctrl;
- 
- 	ctrl = rd32(IGC_CTRL);
--	ctrl |= IGC_CTRL_SLU;
--	ctrl &= ~(IGC_CTRL_FRCSPD | IGC_CTRL_FRCDPX);
--	wr32(IGC_CTRL, ctrl);
--
--	ret_val = igc_setup_copper_link(hw);
-+	ctrl &= ~(IGC_CTRL_FRCSPD | IGC_CTRL_FRCDPX |
-+		  IGC_CTRL_SPEED_MASK | IGC_CTRL_FD);
-+
-+	if (hw->mac.autoneg_enabled) {
-+		ctrl |= IGC_CTRL_SLU;
-+		wr32(IGC_CTRL, ctrl);
-+		ret_val = igc_setup_copper_link(hw);
-+	} else {
-+		ctrl |= IGC_CTRL_SLU | IGC_CTRL_FRCSPD | IGC_CTRL_FRCDPX;
-+
-+		switch (hw->mac.forced_speed_duplex) {
-+		case IGC_FORCED_10H:
-+			ctrl |= IGC_CTRL_SPEED_10;
-+			break;
-+		case IGC_FORCED_10F:
-+			ctrl |= IGC_CTRL_SPEED_10 | IGC_CTRL_FD;
-+			break;
-+		case IGC_FORCED_100H:
-+			ctrl |= IGC_CTRL_SPEED_100;
-+			break;
-+		case IGC_FORCED_100F:
-+			ctrl |= IGC_CTRL_SPEED_100 | IGC_CTRL_FD;
-+			break;
-+		default:
-+			return -IGC_ERR_CONFIG;
-+		}
-+		wr32(IGC_CTRL, ctrl);
-+		ret_val = igc_setup_copper_link(hw);
-+	}
- 
- 	return ret_val;
- }
-@@ -443,6 +467,7 @@ static const struct igc_phy_operations igc_phy_ops_base = {
- 	.reset			= igc_phy_hw_reset,
- 	.read_reg		= igc_read_phy_reg_gpy,
- 	.write_reg		= igc_write_phy_reg_gpy,
-+	.force_speed_duplex	= igc_force_speed_duplex,
- };
- 
- const struct igc_info igc_base_info = {
-diff --git a/drivers/net/ethernet/intel/igc/igc_defines.h b/drivers/net/ethernet/intel/igc/igc_defines.h
-index 9482ab11f050..3f504751c2d9 100644
---- a/drivers/net/ethernet/intel/igc/igc_defines.h
-+++ b/drivers/net/ethernet/intel/igc/igc_defines.h
-@@ -129,10 +129,13 @@
- #define IGC_ERR_SWFW_SYNC		13
- 
- /* Device Control */
-+#define IGC_CTRL_FD		BIT(0)  /* Full Duplex */
- #define IGC_CTRL_RST		0x04000000  /* Global reset */
--
- #define IGC_CTRL_PHY_RST	0x80000000  /* PHY Reset */
- #define IGC_CTRL_SLU		0x00000040  /* Set link up (Force Link) */
-+#define IGC_CTRL_SPEED_MASK	GENMASK(10, 8)
-+#define IGC_CTRL_SPEED_10	FIELD_PREP(IGC_CTRL_SPEED_MASK, 0)
-+#define IGC_CTRL_SPEED_100	FIELD_PREP(IGC_CTRL_SPEED_MASK, 1)
- #define IGC_CTRL_FRCSPD		0x00000800  /* Force Speed */
- #define IGC_CTRL_FRCDPX		0x00001000  /* Force Duplex */
- #define IGC_CTRL_VME		0x40000000  /* IEEE VLAN mode enable */
-@@ -673,6 +676,10 @@
- #define IGC_GEN_POLL_TIMEOUT	1920
- 
- /* PHY Control Register */
-+#define MII_CR_SPEED_MASK	(BIT(6) | BIT(13))
-+#define MII_CR_SPEED_10		0x0000	/* SSM=0, SSL=0: 10 Mb/s */
-+#define MII_CR_SPEED_100	BIT(13)	/* SSM=0, SSL=1: 100 Mb/s */
-+#define MII_CR_DUPLEX_EN	BIT(8)	/* 0 = Half Duplex, 1 = Full Duplex */
- #define MII_CR_RESTART_AUTO_NEG	0x0200  /* Restart auto negotiation */
- #define MII_CR_POWER_DOWN	0x0800  /* Power down */
- #define MII_CR_AUTO_NEG_EN	0x1000  /* Auto Neg Enable */
-diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-index cfcbf2fdad6e..9997ebbdf778 100644
---- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -1914,44 +1914,58 @@ static int igc_ethtool_get_link_ksettings(struct net_device *netdev,
- 	ethtool_link_ksettings_add_link_mode(cmd, supported, TP);
- 	ethtool_link_ksettings_add_link_mode(cmd, advertising, TP);
- 
--	/* advertising link modes */
--	if (hw->phy.autoneg_advertised & ADVERTISE_10_HALF)
--		ethtool_link_ksettings_add_link_mode(cmd, advertising, 10baseT_Half);
--	if (hw->phy.autoneg_advertised & ADVERTISE_10_FULL)
--		ethtool_link_ksettings_add_link_mode(cmd, advertising, 10baseT_Full);
--	if (hw->phy.autoneg_advertised & ADVERTISE_100_HALF)
--		ethtool_link_ksettings_add_link_mode(cmd, advertising, 100baseT_Half);
--	if (hw->phy.autoneg_advertised & ADVERTISE_100_FULL)
--		ethtool_link_ksettings_add_link_mode(cmd, advertising, 100baseT_Full);
--	if (hw->phy.autoneg_advertised & ADVERTISE_1000_FULL)
--		ethtool_link_ksettings_add_link_mode(cmd, advertising, 1000baseT_Full);
--	if (hw->phy.autoneg_advertised & ADVERTISE_2500_FULL)
--		ethtool_link_ksettings_add_link_mode(cmd, advertising, 2500baseT_Full);
--
- 	/* set autoneg settings */
- 	ethtool_link_ksettings_add_link_mode(cmd, supported, Autoneg);
--	ethtool_link_ksettings_add_link_mode(cmd, advertising, Autoneg);
-+	if (hw->mac.autoneg_enabled) {
-+		ethtool_link_ksettings_add_link_mode(cmd, advertising, Autoneg);
-+		cmd->base.autoneg = AUTONEG_ENABLE;
-+
-+		/* advertising link modes only apply when autoneg is on */
-+		if (hw->phy.autoneg_advertised & ADVERTISE_10_HALF)
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     10baseT_Half);
-+		if (hw->phy.autoneg_advertised & ADVERTISE_10_FULL)
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     10baseT_Full);
-+		if (hw->phy.autoneg_advertised & ADVERTISE_100_HALF)
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     100baseT_Half);
-+		if (hw->phy.autoneg_advertised & ADVERTISE_100_FULL)
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     100baseT_Full);
-+		if (hw->phy.autoneg_advertised & ADVERTISE_1000_FULL)
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     1000baseT_Full);
-+		if (hw->phy.autoneg_advertised & ADVERTISE_2500_FULL)
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     2500baseT_Full);
-+
-+		/* Set pause flow control advertising */
-+		switch (hw->fc.requested_mode) {
-+		case igc_fc_full:
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     Pause);
-+			break;
-+		case igc_fc_rx_pause:
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     Pause);
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     Asym_Pause);
-+			break;
-+		case igc_fc_tx_pause:
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     Asym_Pause);
-+			break;
-+		default:
-+			break;
-+		}
-+	} else {
-+		cmd->base.autoneg = AUTONEG_DISABLE;
-+	}
- 
--	/* Set pause flow control settings */
-+	/* Pause is always supported */
- 	ethtool_link_ksettings_add_link_mode(cmd, supported, Pause);
- 
--	switch (hw->fc.requested_mode) {
--	case igc_fc_full:
--		ethtool_link_ksettings_add_link_mode(cmd, advertising, Pause);
--		break;
--	case igc_fc_rx_pause:
--		ethtool_link_ksettings_add_link_mode(cmd, advertising, Pause);
--		ethtool_link_ksettings_add_link_mode(cmd, advertising,
--						     Asym_Pause);
--		break;
--	case igc_fc_tx_pause:
--		ethtool_link_ksettings_add_link_mode(cmd, advertising,
--						     Asym_Pause);
--		break;
--	default:
--		break;
--	}
--
- 	status = pm_runtime_suspended(&adapter->pdev->dev) ?
- 		 0 : rd32(IGC_STATUS);
- 
-@@ -1983,7 +1997,6 @@ static int igc_ethtool_get_link_ksettings(struct net_device *netdev,
- 		cmd->base.duplex = DUPLEX_UNKNOWN;
- 	}
- 	cmd->base.speed = speed;
--	cmd->base.autoneg = AUTONEG_ENABLE;
- 
- 	/* MDI-X => 2; MDI =>1; Invalid =>0 */
- 	if (hw->phy.media_type == igc_media_type_copper)
-@@ -2000,6 +2013,41 @@ static int igc_ethtool_get_link_ksettings(struct net_device *netdev,
- 	return 0;
- }
- 
-+/**
-+ * igc_handle_autoneg_disabled - Configure forced speed/duplex settings
-+ * @adapter: private driver structure
-+ * @speed: requested speed (must be SPEED_10 or SPEED_100)
-+ * @duplex: requested duplex
-+ *
-+ * Records forced speed/duplex when autoneg is disabled.
-+ * Caller must validate speed before calling this function.
-+ */
-+static void igc_handle_autoneg_disabled(struct igc_adapter *adapter, u32 speed,
-+					u8 duplex)
-+{
-+	struct igc_mac_info *mac = &adapter->hw.mac;
-+
-+	switch (speed) {
-+	case SPEED_10:
-+		mac->forced_speed_duplex = (duplex == DUPLEX_FULL) ?
-+			IGC_FORCED_10F : IGC_FORCED_10H;
-+		break;
-+	case SPEED_100:
-+		mac->forced_speed_duplex = (duplex == DUPLEX_FULL) ?
-+			IGC_FORCED_100F : IGC_FORCED_100H;
-+		break;
-+	default:
-+		WARN_ONCE(1, "Unsupported speed %u\n", speed);
-+		return;
-+	}
-+
-+	mac->autoneg_enabled = false;
-+
-+	/* Half-duplex cannot support flow control per IEEE 802.3 */
-+	if (duplex != DUPLEX_FULL)
-+		adapter->hw.fc.requested_mode = igc_fc_none;
-+}
-+
- /**
-  * igc_handle_autoneg_enabled - Configure autonegotiation advertisement
-  * @adapter: private driver structure
-@@ -2038,6 +2086,7 @@ static void igc_handle_autoneg_enabled(struct igc_adapter *adapter,
- 						  10baseT_Half))
- 		advertised |= ADVERTISE_10_HALF;
- 
-+	hw->mac.autoneg_enabled = true;
- 	hw->phy.autoneg_advertised = advertised;
- 	if (adapter->fc_autoneg)
- 		hw->fc.requested_mode = igc_fc_default;
-@@ -2059,6 +2108,12 @@ igc_ethtool_set_link_ksettings(struct net_device *netdev,
- 		return -EINVAL;
- 	}
- 
-+	if (cmd->base.autoneg != AUTONEG_ENABLE &&
-+	    cmd->base.autoneg != AUTONEG_DISABLE) {
-+		netdev_info(dev, "Unsupported autoneg setting\n");
-+		return -EINVAL;
-+	}
-+
- 	/* MDI setting is only allowed when autoneg enabled because
- 	 * some hardware doesn't allow MDI setting when speed or
- 	 * duplex is forced.
-@@ -2071,14 +2126,20 @@ igc_ethtool_set_link_ksettings(struct net_device *netdev,
- 		}
- 	}
- 
-+	if (cmd->base.autoneg == AUTONEG_DISABLE &&
-+	    cmd->base.speed != SPEED_10 && cmd->base.speed != SPEED_100) {
-+		netdev_info(dev, "Unsupported speed for forced link\n");
-+		return -EINVAL;
-+	}
-+
- 	while (test_and_set_bit(__IGC_RESETTING, &adapter->state))
- 		usleep_range(1000, 2000);
- 
--	if (cmd->base.autoneg == AUTONEG_ENABLE) {
-+	if (cmd->base.autoneg == AUTONEG_ENABLE)
- 		igc_handle_autoneg_enabled(adapter, cmd);
--	} else {
--		netdev_info(dev, "Force mode currently not supported\n");
--	}
-+	else
-+		igc_handle_autoneg_disabled(adapter, cmd->base.speed,
-+					    cmd->base.duplex);
- 
- 	/* MDI-X => 2; MDI => 1; Auto => 3 */
- 	if (cmd->base.eth_tp_mdix_ctrl) {
-diff --git a/drivers/net/ethernet/intel/igc/igc_hw.h b/drivers/net/ethernet/intel/igc/igc_hw.h
-index 86ab8f566f44..62aaee55668a 100644
---- a/drivers/net/ethernet/intel/igc/igc_hw.h
-+++ b/drivers/net/ethernet/intel/igc/igc_hw.h
-@@ -73,6 +73,13 @@ struct igc_info {
- 
- extern const struct igc_info igc_base_info;
- 
-+enum igc_forced_speed_duplex {
-+	IGC_FORCED_10H,
-+	IGC_FORCED_10F,
-+	IGC_FORCED_100H,
-+	IGC_FORCED_100F,
-+};
-+
- struct igc_mac_info {
- 	struct igc_mac_operations ops;
- 
-@@ -93,6 +100,8 @@ struct igc_mac_info {
- 	bool arc_subsystem_valid;
- 
- 	bool get_link_status;
-+	bool autoneg_enabled;
-+	enum igc_forced_speed_duplex forced_speed_duplex;
- };
- 
- struct igc_nvm_operations {
-diff --git a/drivers/net/ethernet/intel/igc/igc_mac.c b/drivers/net/ethernet/intel/igc/igc_mac.c
-index 142beb9ae557..8bbb6d5581c7 100644
---- a/drivers/net/ethernet/intel/igc/igc_mac.c
-+++ b/drivers/net/ethernet/intel/igc/igc_mac.c
-@@ -446,6 +446,16 @@ s32 igc_config_fc_after_link_up(struct igc_hw *hw)
- 	u16 speed, duplex;
- 	s32 ret_val = 0;
- 
-+	/* When autoneg is disabled, force the MAC flow control settings
-+	 * to match the "fc" parameter.
-+	 */
-+	if (!hw->mac.autoneg_enabled) {
-+		ret_val = igc_force_mac_fc(hw);
-+		if (ret_val)
-+			hw_dbg("Error forcing flow control settings\n");
-+		goto out;
-+	}
-+
- 	/* In auto-neg, we need to check and see if Auto-Neg has completed,
- 	 * and if so, how the PHY and link partner has flow control
- 	 * configured.
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 72bc5128d8b8..437e1d1ef1e4 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -7298,7 +7298,7 @@ static int igc_probe(struct pci_dev *pdev,
- 	/* Initialize link properties that are user-changeable */
- 	adapter->fc_autoneg = true;
- 	hw->phy.autoneg_advertised = 0xaf;
--
-+	hw->mac.autoneg_enabled = true;
- 	hw->fc.requested_mode = igc_fc_default;
- 	hw->fc.current_mode = igc_fc_default;
- 
-diff --git a/drivers/net/ethernet/intel/igc/igc_phy.c b/drivers/net/ethernet/intel/igc/igc_phy.c
-index 6c4d204aecfa..4cf737fb3b21 100644
---- a/drivers/net/ethernet/intel/igc/igc_phy.c
-+++ b/drivers/net/ethernet/intel/igc/igc_phy.c
-@@ -494,12 +494,20 @@ s32 igc_setup_copper_link(struct igc_hw *hw)
- 	s32 ret_val = 0;
- 	bool link;
- 
--	/* Setup autoneg and flow control advertisement and perform
--	 * autonegotiation.
--	 */
--	ret_val = igc_copper_link_autoneg(hw);
--	if (ret_val)
--		goto out;
-+	if (hw->mac.autoneg_enabled) {
-+		/* Setup autoneg and flow control advertisement and perform
-+		 * autonegotiation.
-+		 */
-+		ret_val = igc_copper_link_autoneg(hw);
-+		if (ret_val)
-+			goto out;
-+	} else {
-+		ret_val = hw->phy.ops.force_speed_duplex(hw);
-+		if (ret_val) {
-+			hw_dbg("Error Forcing Speed/Duplex\n");
-+			goto out;
-+		}
-+	}
- 
- 	/* Check link status. Wait up to 100 microseconds for link to become
- 	 * valid.
-@@ -778,3 +786,48 @@ u16 igc_read_phy_fw_version(struct igc_hw *hw)
- 
- 	return gphy_version;
- }
-+
-+/**
-+ * igc_force_speed_duplex - Force PHY speed and duplex settings
-+ * @hw: pointer to the HW structure
-+ *
-+ * Programs the GPY PHY control register to disable autonegotiation
-+ * and force the speed/duplex indicated by hw->mac.forced_speed_duplex.
-+ */
-+s32 igc_force_speed_duplex(struct igc_hw *hw)
-+{
-+	struct igc_phy_info *phy = &hw->phy;
-+	u16 phy_ctrl;
-+	s32 ret_val;
-+
-+	ret_val = phy->ops.read_reg(hw, PHY_CONTROL, &phy_ctrl);
-+	if (ret_val)
-+		return ret_val;
-+
-+	phy_ctrl &= ~(MII_CR_SPEED_MASK | MII_CR_DUPLEX_EN |
-+		      MII_CR_AUTO_NEG_EN | MII_CR_RESTART_AUTO_NEG);
-+
-+	switch (hw->mac.forced_speed_duplex) {
-+	case IGC_FORCED_10H:
-+		phy_ctrl |= MII_CR_SPEED_10;
-+		break;
-+	case IGC_FORCED_10F:
-+		phy_ctrl |= MII_CR_SPEED_10 | MII_CR_DUPLEX_EN;
-+		break;
-+	case IGC_FORCED_100H:
-+		phy_ctrl |= MII_CR_SPEED_100;
-+		break;
-+	case IGC_FORCED_100F:
-+		phy_ctrl |= MII_CR_SPEED_100 | MII_CR_DUPLEX_EN;
-+		break;
-+	default:
-+		return -IGC_ERR_CONFIG;
-+	}
-+
-+	ret_val = phy->ops.write_reg(hw, PHY_CONTROL, phy_ctrl);
-+	if (ret_val)
-+		return ret_val;
-+
-+	hw->mac.get_link_status = true;
-+	return 0;
-+}
-diff --git a/drivers/net/ethernet/intel/igc/igc_phy.h b/drivers/net/ethernet/intel/igc/igc_phy.h
-index 832a7e359f18..d37a89174826 100644
---- a/drivers/net/ethernet/intel/igc/igc_phy.h
-+++ b/drivers/net/ethernet/intel/igc/igc_phy.h
-@@ -18,5 +18,6 @@ void igc_power_down_phy_copper(struct igc_hw *hw);
- s32 igc_write_phy_reg_gpy(struct igc_hw *hw, u32 offset, u16 data);
- s32 igc_read_phy_reg_gpy(struct igc_hw *hw, u32 offset, u16 *data);
- u16 igc_read_phy_fw_version(struct igc_hw *hw);
-+s32 igc_force_speed_duplex(struct igc_hw *hw);
- 
- #endif
+Patch 3 fixes a race where a secondary PF could access the primary's
+auxiliary device after it had been unbound, by holding the primary's
+device lock while operating on its auxiliary device.
+
+Patch 4 fixes missing cleanup on ETH probe errors. The analogous gap on
+the resume path requires introducing sd_suspend/resume APIs that only
+destroy FW resources and is left for a follow-up series.
+
+Regards,
+Tariq
+
+V4:
+- Link to V3:
+  https://lore.kernel.org/all/20260423123104.201552-1-tariqt@nvidia.com/
+- Adjust "net/mlx5e: SD, Fix missing cleanup on probe/resume error" to
+  cleanup SD only on probe; the resume gap is deferred to a follow-up
+  series that will introduce sd_suspend/resume APIs.
+- Fix concurrent cleanup vs. init race in
+  "net/mlx5: SD: Serialize init/cleanup".
+- Remove leftover sentence in commit message of
+  "net/mlx5: SD: Serialize init/cleanup"
+
+Shay Drory (4):
+  net/mlx5: SD: Serialize init/cleanup
+  net/mlx5: SD, Keep multi-pf debugfs entries on primary
+  net/mlx5e: SD, Fix missing cleanup on probe error
+  net/mlx5e: SD, Fix race condition in secondary device probe/remove
+
+ .../net/ethernet/mellanox/mlx5/core/en_main.c | 26 +++++--
+ .../net/ethernet/mellanox/mlx5/core/lib/sd.c  | 76 ++++++++++++++++---
+ .../net/ethernet/mellanox/mlx5/core/lib/sd.h  |  2 +
+ 3 files changed, 87 insertions(+), 17 deletions(-)
+
+
+base-commit: 3bc179bc7146c26c9dff75d2943d10528274e301
 -- 
-2.43.0
+2.44.0
 
 
