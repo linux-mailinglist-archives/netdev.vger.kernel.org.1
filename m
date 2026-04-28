@@ -1,81 +1,82 @@
-Return-Path: <netdev+bounces-281998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281999-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OKnhBV7n8Gn2awEAu9opvQ
-	(envelope-from <netdev+bounces-281998-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:59:10 +0200
+	id aPCtCPHn8Gn2awEAu9opvQ
+	(envelope-from <netdev+bounces-281999-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 19:01:37 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 619574897C2
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:59:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B0C2A489871
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 19:01:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CB0B630C8AFC
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:47:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4EE0F303D2E5
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:54:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AEF6331A7E;
-	Tue, 28 Apr 2026 16:47:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C246533A9E9;
+	Tue, 28 Apr 2026 16:54:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="XfiIGnuM"
+	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="gVFY5SGd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
+Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B209328B71
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 16:47:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D562B672
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 16:54:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777394853; cv=none; b=Q5cyfxtHrCY9X5EgEc+mfpSlUZqfXR3CyBNA/cd4Ns17sX65zzpChe4nfX6jyh3VbwAzpTFFK5pGEJqKs/oTFQlrRmmF2zptU53GL2ODhB7Rc0NdlIxS0+UGr1sksC1cPo12k/5cI3fRdQg2t6CQj/bhsKS75GO3MV1P9lhl8mg=
+	t=1777395247; cv=none; b=U5weI1Btu4tcWyPj+mVRYEY7573y4yhTOiAjjgo+mj6CZT57KBPhz97dFIAxux02nOGudT1saApIiQHZ8CNfJGO8vGgRnoO0HdW9saeHEv2ljivE4XvOgi48sZ3hJTbfySyE1slak4DhHwD3K3qnyS1iMYoDw2PpAvK2vGyGvwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777394853; c=relaxed/simple;
-	bh=9S9GoA2wdMOKBwQUq6uU4RsjDD9B9w9gbFBChUNcp5Q=;
+	s=arc-20240116; t=1777395247; c=relaxed/simple;
+	bh=rzWf/oQSHbkLcV8GwzpmrSWI0KfR0fCQpV3xi0rt5Og=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BJnZlt9NOyXffvP78fRQ38ezUiTU1azCqEY7d9Y6a0YW+qZBUgSel//Vh96QQ5tlxS79q+0tKHpk34Ttgkmh1wE9+gxLzt59ge8V1D6c3Ql57kZrFZw9LgL+h0wu3c2ZO6pZF83GHKjBgJjK0R26KLVwOPHWZrIBmJVWHp39WQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=XfiIGnuM; arc=none smtp.client-ip=209.85.160.54
+	 In-Reply-To:Content-Type; b=eOJzkMpXnS6BXFuqdaGHjBE5U4c12r2UFE3yxZ3zoOJxXirXpxuI2ODCcr9f3Gt+n7gRbZKdi3hhVhGO6bQgQPT0eaSpUairmrfGhacu8Pc/WrmGC0EuqwsxL/ZqXzlhAbBaOXWXWlLdydUwiOnw0uVzVRneIsw5cImQCfwWBEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=gVFY5SGd; arc=none smtp.client-ip=209.85.161.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ieee.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-4042fe53946so5208367fac.3
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 09:47:30 -0700 (PDT)
+Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-662efd1bdd4so18547eaf.0
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 09:54:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ieee.org; s=google; t=1777394849; x=1777999649; darn=vger.kernel.org;
+        d=ieee.org; s=google; t=1777395244; x=1778000044; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=lsaS50fJFWEgKS/X3mmwXYg/L5d5/h6qIX6nFemmP8U=;
-        b=XfiIGnuMwfnSZxVU2xMgiQkpcZx9aOzJFtBz/g7B0AIMVtPkX6kMu59YPBadlEyBuM
-         FQF2p+kRwFoecg5nfEGOocMnL5tUqrba1mQGA9Vfuqpjh/BsagGOYnQzCwHt7+h5XFOb
-         xfmVVCQ4cXKEpESLS4Di0RDcO629CVyZPLD6k=
+        bh=m3Z9r4IpEjJMUHPOqoRO6rW4qYst7QOqGLcntOF/K5A=;
+        b=gVFY5SGdeZ2JrpdQhfBOXtmU5OBrbNQbhEkaFelzzC8oIWbT3S+tNOJrkfLM9fewnq
+         Oh9d14toNjEhcJm8pUr4qhRqyuMFBdQBuJLymgs//dxzGjLfe2/k7B/8mJIT7/lci9eY
+         lJMTxKnO9jwE194fEOlgT0QYHkmt9cDMVFPYQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777394849; x=1777999649;
+        d=1e100.net; s=20251104; t=1777395244; x=1778000044;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=lsaS50fJFWEgKS/X3mmwXYg/L5d5/h6qIX6nFemmP8U=;
-        b=kQp3RsRmn9y07QutIlEL6kzUaU9/4GaP/m7GoClVLczmJJeCh2k0rs9iaLXEiHwXHd
-         +Hk7F0OAS56Q+UX2TIWewtOq/Bzub7JVLJ6PUahMp7TJ+7wbqlKicGJ6VRMA61vPZwKp
-         EBZar1pzAVM4oNHp81tC6EDebjiryL0xvpK5Ybg9qCsGz9o3QQo1eIi9gjvOKBMrlTz2
-         p8KvGR+uJcB/fWDoYHckCsg3RrGUVHRFdUF8/17DzLgw50cPrqEhX/J+oITnxSGj4jXN
-         U3msH7rwji5Qi6DymlsjlZ/q41bkv3wgOflYCUL8wjblI9R0P26VyBktJaRgmKgnwdHK
-         Rbzw==
-X-Forwarded-Encrypted: i=1; AFNElJ8JjOjAwHgThtgCrEgFsMkX09j1CXoQi1FrNDA/PA+UmhOEuUUAlqt5/3f3/YfVhhDYWW6AvlE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/J76hA219cexudyVowO/+N3wwB/uVIqX8LHKlzN2nMF8iRg8s
-	2BfayjRGM7kfwmhFl8zYsJcIyP9SM2I9+0bIqbBQyhnkXl5hEZfkZ+vxuT7LtjEpow==
-X-Gm-Gg: AeBDiesDNx79yc851jcCug14UJR7yZhL9d7d7Wds0h78P0Ivc5H9AAtKKYf9pLDIt3X
-	bpgFoiZWThRFhaGucxKIKuWLqxzRWoYezPhVJzBHGMrpZZnd/PCwZNf9I+pCNcfMbC4spbxB3/o
-	3JFYWpVqWwAxMNXoFCHZuDZLPKP8CZoQtZYanS148q6KKQcxanRrmHR0SeQwVb1WGXHiK0HgDmx
-	b2EVcMRJxP3v5NrART2k8V5VhBXLgEtbTCjaCNPFDXYsm09dBZjAj9mulPuvJcbG6SNtPXFFYGX
-	nGMwn6kRVOakh2QH/sTE42gdDmGPVuXoj0QDJOPgockl2zL67/zKBD9tJJ4qYFFlPEbrreOdOdE
-	oN35uIKc/cP0PtlYVe90V2fyzyhTnKczti5XUntmQlqwOgAdtZ5bjiYTnxBH305VaJBdQrenlPn
-	XQ3ZvEfduM04NGp+MD4sV3S+K7+ZZGkiUQsLj2aS4YObZVHqNCs2ju8eemEj7pfi4qZym1
-X-Received: by 2002:a05:6871:e78f:b0:42f:ba47:36f5 with SMTP id 586e51a60fabf-433f396963emr2135147fac.17.1777394849189;
-        Tue, 28 Apr 2026 09:47:29 -0700 (PDT)
+        bh=m3Z9r4IpEjJMUHPOqoRO6rW4qYst7QOqGLcntOF/K5A=;
+        b=IkZrSiRbj8UN7T/ZZBinSYYODFG3YdOKMVlK6lxj5pdxKp9RjHtLgy4911HMhMnFDh
+         LsN6SNZ/ryn9INpaVTEEMGk45Tub9rBtbctf0RR2AeQleNYIszAX77hwYQcb2o7miuS0
+         BX3Ir3IQcE8bvJy7/2AzZIUs+E2SVyKWN7X1ZW0047d94vycRT/y1MR5P89u9bL7vBYi
+         7alBOf8AMuveX8aDQIgCIx8xV5bdsO1lzYmwWa99/4Uy6RoqYTwrtEwFWFMp/8jrRBoz
+         p/5U3i2ye6phQn01jeYDJmmITLljIYWa6al3bs+MhyqCIU9G4rpg4zeO/Yzk1GxASjUX
+         Z+VA==
+X-Forwarded-Encrypted: i=1; AFNElJ9AzEGNNnwH3E0iJ259ylV6XPDHKesjzJJ+K8bRp4pVlUeZO4ENHNdhAwHZSfgCv+EhjmT401g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDSXZgRnGMs1P35T+wbTo0HYIWgnKpG7LIiZ2f1mfPd5IfeLB7
+	N5d7T2HmbmJblluvJuvO6vhtuyPrdajiaQzFOKp+/pidwsJoR250RofgbjOFVJoXaQ==
+X-Gm-Gg: AeBDievBCyNa0chiUy38XzexM9lWjlhA2WxE1bcsK/Yw1MxQHuga2XJowlnxOML5/Ru
+	WYg1a4g3G73ptidgFeAkYSA9ZF7UC93snuQnr3LIJOMIpFwvU5eDDQgfXrHBl6gr/bIOSm+Yxyy
+	f02NEHj6ptKXDUUQEbLJFqTAFzQkG4ZfY9zMORyYXWJRUAKMQGLLnlmLxY1ygNUwNntd9pnf4AT
+	VGndVYyMo20XIDlwOwYaHJr6n+47iOcscQVdYIBr6ui65scNpodS7RhyvjokAjtLecPl6PcWRSZ
+	CBNZr+CfSzT4gXX9S3vdqLziL5RWXo8GXhblsmkDCY9UTSGCYPUuzhp9TYVuY0wjiGrhbNudv0n
+	rkYQH34BLW0Mr1hbWXQFjj1CX5emojAGY4+sO5TN4OIdNOXfyfcL+do0P9oVBundWdE4Sttqgek
+	0UKhw9sRV1bkE1HpIOot1TTnhnClN5eJei+roEkHl4Bl4wB7bnUN14nOI/kUcaAoFGh7I5Z7x+m
+	yVce4g=
+X-Received: by 2002:a05:6820:4b05:b0:696:13e9:6863 with SMTP id 006d021491bc7-6965c5ee294mr1871158eaf.2.1777395244239;
+        Tue, 28 Apr 2026 09:54:04 -0700 (PDT)
 Received: from [172.22.22.28] (c-75-72-117-212.hsd1.mn.comcast.net. [75.72.117.212])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-433efbf1d8dsm2255892fac.6.2026.04.28.09.47.27
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-433effdc79bsm2240677fac.18.2026.04.28.09.54.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Apr 2026 09:47:28 -0700 (PDT)
-Message-ID: <bf380b65-1513-4792-9e3c-d03bff17c141@ieee.org>
-Date: Tue, 28 Apr 2026 11:47:26 -0500
+        Tue, 28 Apr 2026 09:54:03 -0700 (PDT)
+Message-ID: <aa2b2823-05b2-49a6-bdd3-622523497a0d@ieee.org>
+Date: Tue, 28 Apr 2026 11:54:00 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,51 +84,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] net: ipa: Use the unified QMI service ID instead
- of defining it locally
-To: Daniel Lezcano <daniel.lezcano@oss.qualcomm.com>, konradybcio@kernel.org,
- andersson@kernel.org
-Cc: linux-kernel@vger.kernel.org, Alex Elder <elder@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jeff Johnson <jjohnson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- Srinivas Kandagatla <srini@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>, Kees Cook <kees@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Arnd Bergmann <arnd@arndb.de>, Mark Brown <broonie@kernel.org>,
- Wesley Cheng <quic_wcheng@quicinc.com>, netdev@vger.kernel.org,
- linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
- ath11k@lists.infradead.org, ath12k@lists.infradead.org,
- linux-arm-msm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
- linux-sound@vger.kernel.org,
- Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-References: <20260316171419.2619620-1-daniel.lezcano@oss.qualcomm.com>
- <20260316171419.2619620-2-daniel.lezcano@oss.qualcomm.com>
+Subject: Re: [PATCH v4 12/15] net: ipa: Switch to generic PAS TZ APIs
+To: Sumit Garg <sumit.garg@kernel.org>, andersson@kernel.org,
+ konradybcio@kernel.org
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+ linux-media@vger.kernel.org, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
+ linux-remoteproc@vger.kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
+ akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
+ jesszhan0024@gmail.com, marijn.suijten@somainline.org, airlied@gmail.com,
+ simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
+ dikshita.agarwal@oss.qualcomm.com, bod@kernel.org, mchehab@kernel.org,
+ elder@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ jjohnson@kernel.org, mathieu.poirier@linaro.org,
+ trilokkumar.soni@oss.qualcomm.com, mukesh.ojha@oss.qualcomm.com,
+ pavan.kondeti@oss.qualcomm.com, jorge.ramirez@oss.qualcomm.com,
+ tonyh@qti.qualcomm.com, vignesh.viswanathan@oss.qualcomm.com,
+ srinivas.kandagatla@oss.qualcomm.com, amirreza.zarrabi@oss.qualcomm.com,
+ jens.wiklander@linaro.org, op-tee@lists.trustedfirmware.org,
+ apurupa@qti.qualcomm.com, skare@qti.qualcomm.com,
+ linux-kernel@vger.kernel.org, Sumit Garg <sumit.garg@oss.qualcomm.com>
+References: <20260427095603.1157963-1-sumit.garg@kernel.org>
+ <20260427095603.1157963-13-sumit.garg@kernel.org>
 Content-Language: en-US
 From: Alex Elder <elder@ieee.org>
-In-Reply-To: <20260316171419.2619620-2-daniel.lezcano@oss.qualcomm.com>
+In-Reply-To: <20260427095603.1157963-13-sumit.garg@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 619574897C2
+X-Rspamd-Queue-Id: B0C2A489871
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[ieee.org,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[ieee.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[29];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281998-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[ieee.org:+];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
+	DKIM_TRACE(0.00)[ieee.org:+];
+	TAGGED_FROM(0.00)[bounces-281999-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -135,61 +139,83 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[elder@ieee.org,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_GT_50(0.00)[50];
 	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[riscstar.com:email,ieee.org:dkim,ieee.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,qualcomm.com:email]
 
-On 3/16/26 12:14 PM, Daniel Lezcano wrote:
-> Instead of defining a local macro with a custom name for the QMI
-> service identifier, use the one provided in qmi.h and remove the
-> locally defined macro.
+On 4/27/26 4:56 AM, Sumit Garg wrote:
+> From: Sumit Garg <sumit.garg@oss.qualcomm.com>
 > 
-> Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-> Signed-off-by: Daniel Lezcano <daniel.lezcano@oss.qualcomm.com>
+> Switch ipa client driver over to generic PAS TZ APIs. Generic PAS TZ
+> service allows to support multiple TZ implementation backends like QTEE
+> based SCM PAS service, OP-TEE based PAS service and any further future TZ
+> backend service.
+> 
+> Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
 
-Looks good!
+Looks good to me.
 
 Reviewed-by: Alex Elder <elder@riscstar.com>
 
 > ---
->   drivers/net/ipa/ipa_qmi.c | 6 ++----
->   1 file changed, 2 insertions(+), 4 deletions(-)
+>   drivers/net/ipa/Kconfig    |  2 +-
+>   drivers/net/ipa/ipa_main.c | 13 ++++++++-----
+>   2 files changed, 9 insertions(+), 6 deletions(-)
 > 
-> diff --git a/drivers/net/ipa/ipa_qmi.c b/drivers/net/ipa/ipa_qmi.c
-> index d771f3a71f94..37936ad132a2 100644
-> --- a/drivers/net/ipa/ipa_qmi.c
-> +++ b/drivers/net/ipa/ipa_qmi.c
-> @@ -66,11 +66,9 @@
->    *   determination of when things are "ready"
->    */
+> diff --git a/drivers/net/ipa/Kconfig b/drivers/net/ipa/Kconfig
+> index 01d219d3760c..a9aff1b7977d 100644
+> --- a/drivers/net/ipa/Kconfig
+> +++ b/drivers/net/ipa/Kconfig
+> @@ -6,7 +6,7 @@ config QCOM_IPA
+>   	depends on QCOM_RPROC_COMMON || (QCOM_RPROC_COMMON=n && COMPILE_TEST)
+>   	depends on QCOM_AOSS_QMP || QCOM_AOSS_QMP=n
+>   	select QCOM_MDT_LOADER
+> -	select QCOM_SCM
+> +	select QCOM_PAS
+>   	select QCOM_QMI_HELPERS
+>   	help
+>   	  Choose Y or M here to include support for the Qualcomm
+> diff --git a/drivers/net/ipa/ipa_main.c b/drivers/net/ipa/ipa_main.c
+> index 788dd99af2a4..3cd9e44680e9 100644
+> --- a/drivers/net/ipa/ipa_main.c
+> +++ b/drivers/net/ipa/ipa_main.c
+> @@ -14,7 +14,7 @@
+>   #include <linux/pm_runtime.h>
+>   #include <linux/types.h>
 >   
-> -#define IPA_HOST_SERVICE_SVC_ID		0x31
->   #define IPA_HOST_SVC_VERS		1
->   #define IPA_HOST_SERVICE_INS_ID		1
+> -#include <linux/firmware/qcom/qcom_scm.h>
+> +#include <linux/firmware/qcom/qcom_pas.h>
+>   #include <linux/soc/qcom/mdt_loader.h>
 >   
-> -#define IPA_MODEM_SERVICE_SVC_ID	0x31
->   #define IPA_MODEM_SERVICE_INS_ID	2
->   #define IPA_MODEM_SVC_VERS		1
+>   #include "ipa.h"
+> @@ -624,10 +624,13 @@ static int ipa_firmware_load(struct device *dev)
+>   	}
 >   
-> @@ -484,7 +482,7 @@ int ipa_qmi_setup(struct ipa *ipa)
->   	if (ret)
->   		return ret;
+>   	ret = qcom_mdt_load(dev, fw, path, IPA_PAS_ID, virt, phys, size, NULL);
+> -	if (ret)
+> +	if (ret) {
+>   		dev_err(dev, "error %d loading \"%s\"\n", ret, path);
+> -	else if ((ret = qcom_scm_pas_auth_and_reset(IPA_PAS_ID)))
+> -		dev_err(dev, "error %d authenticating \"%s\"\n", ret, path);
+> +	} else {
+> +		ret = qcom_pas_auth_and_reset(IPA_PAS_ID);
+> +		if (ret)
+> +			dev_err(dev, "error %d authenticating \"%s\"\n", ret, path);
+> +	}
 >   
-> -	ret = qmi_add_server(&ipa_qmi->server_handle, IPA_HOST_SERVICE_SVC_ID,
-> +	ret = qmi_add_server(&ipa_qmi->server_handle, QMI_SERVICE_ID_IPA,
->   			     IPA_HOST_SVC_VERS, IPA_HOST_SERVICE_INS_ID);
->   	if (ret)
->   		goto err_server_handle_release;
-> @@ -501,7 +499,7 @@ int ipa_qmi_setup(struct ipa *ipa)
->   	/* We need this ready before the service lookup is added */
->   	INIT_WORK(&ipa_qmi->init_driver_work, ipa_client_init_driver_work);
+>   	memunmap(virt);
+>   out_release_firmware:
+> @@ -758,7 +761,7 @@ static enum ipa_firmware_loader ipa_firmware_loader(struct device *dev)
+>   		return IPA_LOADER_INVALID;
+>   out_self:
+>   	/* We need Trust Zone to load firmware; make sure it's available */
+> -	if (qcom_scm_is_available())
+> +	if (qcom_pas_is_available())
+>   		return IPA_LOADER_SELF;
 >   
-> -	ret = qmi_add_lookup(&ipa_qmi->client_handle, IPA_MODEM_SERVICE_SVC_ID,
-> +	ret = qmi_add_lookup(&ipa_qmi->client_handle, QMI_SERVICE_ID_IPA,
->   			     IPA_MODEM_SVC_VERS, IPA_MODEM_SERVICE_INS_ID);
->   	if (ret)
->   		goto err_client_handle_release;
+>   	return IPA_LOADER_DEFER;
 
 
