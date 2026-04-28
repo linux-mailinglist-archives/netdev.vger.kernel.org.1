@@ -1,228 +1,232 @@
-Return-Path: <netdev+bounces-282050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282051-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iLj+GokA8WnubgEAu9opvQ
-	(envelope-from <netdev+bounces-282050-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 20:46:33 +0200
+	id NaywKsIC8WmgbwEAu9opvQ
+	(envelope-from <netdev+bounces-282051-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 20:56:02 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E240748ACF3
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 20:46:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 31A0F48AE70
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 20:55:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 962133037EEC
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:46:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F296B300DE13
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:54:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B2C847B435;
-	Tue, 28 Apr 2026 18:46:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA6A32939C;
+	Tue, 28 Apr 2026 18:54:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Nly10/IP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xw00sgar"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB2547B403
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 18:46:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777401987; cv=pass; b=SHSgecWlrvQUAPNxXv34yVUIObLDhXZWUqSpKn8ltqNihxbeSihkaMjL6zffNtVfQ9zASiU45xUkCiDS+p9iykzCo0gjk7lTV++rUBiTc86U4aptPtHpGWJj5MsZOCRz2msChle3ZbFSiX3l2XcgGnyJrQkhzTrwuW1G3oH/0JA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777401987; c=relaxed/simple;
-	bh=rEtiQB7F3yfpKTXtDE6xOEkZoEUEpURybsk0EzNN1vQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Bn+IYm5GenxHHGocG1v6QUoJVP/xr/EAm2Lo4GrnbuVXjY8wNDIyNyo32kjvuXvudny/DRExQ+NJhFxUIgXa3u/0vZSkEvLzez8VtXBQMoijf0Ak59DtUthxaLYsc4IJcZyRGt4Pc8jw+5uBhLIIoiM9nxB7YzZ6gO9OYVM4OvU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Nly10/IP; arc=pass smtp.client-ip=74.125.82.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-12c45281a06so16191274c88.1
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 11:46:24 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777401984; cv=none;
-        d=google.com; s=arc-20240605;
-        b=XQCSJG/FJWSaeshLMqrMHA4Fal8KnMnN7ajkAGvIzVsnzaur2vCKNBl0e4vYP0mQ0w
-         LCt/jDPqokFLHVflaXntJeL0LuWZVHVCrKR1Q8mllpkNA1RWZaPUBd2AltcXTRDC/ek2
-         nPql54xUQ/4cHgVwQr3tf7rAHM7/aoPkchPjFW1jGNDwbS0IEFYo4w+ptXDzwFNGqRTt
-         uwxz3LoXjxs4iCmqe+C5vb+/5kzhrPOjd0vX9VM4UTbJAfhVgjBeKgfTgUpmjCaX3kmf
-         33FTyxNZWJr8Lqe69tmeOvF6tgt66p7s06qhid2Gsn+jgqGJx93l41cyYpCPtPVP62i5
-         zpXQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=dtWL2Nmofu08jaaEHqPK+HWLFx++QkkniP+LH/qTdYE=;
-        fh=fdOD5GA4QRGl0HS4prJpRqNNildzPqSTsY6QEHb2L9k=;
-        b=PrHoIcxADxqzvkm11W12JtM3GgrJYRRY9Zn3RUY9K/GtiJNDqSt+waIgrWHDtPhFyy
-         FCF2Ny1qCshT5V/Dn3Or9/rI+0AAp3TCaFdlzeCnJm2yxtOZT5oQr4m1CcH8M8QqkN37
-         S9MjULRtakSMYmH7ku0jS3JgcovEyqOxVWc7TzLrTZV5KbqHQLXzpMJB9eBmOCX7WRk1
-         O74x6I8848K7sQjHw2VOo7NUscPub/Tu42XImSvCRBR+GSVA+7/ACm+5YYg4xFbC1I2r
-         buGzx3XDPDthFJV3rC/KWJ3qJb3BkPBQficJICInI9J3YbXEOZ3ZUSTbqzqKLdfWr5TK
-         gaHw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76D21DB551
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 18:54:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777402493; cv=none; b=UINrZ6+dUwLdUdx46LMocePXUchjVX27/wq9OKPC3rfeDYDyeM94OzrvSfdJljYYtsuFjTjGYHS+r2Q9nq/fhXawdIva4DcbhL3mtocLeyT9KVkTphEv7R2aMoyBC5U/t74tdT2nMf6RFFDwjr5IFv8I8xtGiQpAPEezQrltx3k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777402493; c=relaxed/simple;
+	bh=kY6weZtPmLXKIlpCWJmdY//kQQkChIPvVjk1GsCc5ww=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CpNOkU4Pq5nN+X1Gamy92NyP9JKm92hiY07cd9NeAtUgSvVz6L8StjjeECXSaMu6KcR/q689F1OgKoqmzYi58l9eEzGDn6ZnBGqWeDsJoLh3G4RhtZzwuUAuN2njHP27ClhqIExOuAoQQ168qQiEwnP/YD3bd2xv0YbJvlISUqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xw00sgar; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-488ab2db91aso166090305e9.3
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 11:54:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777401984; x=1778006784; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dtWL2Nmofu08jaaEHqPK+HWLFx++QkkniP+LH/qTdYE=;
-        b=Nly10/IPrXGK0xUIyGHWhiMIa0B70CRVp4Yqm+ey7CL5w6LEtPzKz+TX3E8UjwQSKF
-         thFpdCUgYEFoK/4PuJhdCrpGUkqki59kBsf1vsMW8zxufiDZRi2yNu1FD9AI3HeaAwQL
-         tov0T//mvg4Z/L/J702qfseCMaQzFWiuuRTr5Zk0H9QbJMskp5iReiuvy5Rzo7gBsWhu
-         2btWboWQfpEAgow/HGf4eYzxLVB3DkRNtUsiok+x2bpjTkJszmwYsHkiN2xksjaNTV6y
-         CDVvGg+UR9CSLBAzGBTIYUq7s70zp9Qld9IDaTYaaXf6+dCahLo5DsCkQsdQsu51IML3
-         5Wug==
+        d=gmail.com; s=20251104; t=1777402490; x=1778007290; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=g8GtQWzkgfdJFAZ9yR9PSi0GHYtSw+aReGuyyBvgSD8=;
+        b=Xw00sgarVN0xfkci67UwjolC2IiI4DoP+B0+l7NDxDQ/RLkfeY5NbKtf5Mv+ziNAcz
+         yyz0lZNU4e3RhzQI2dQOWM/OZAZuOVVdJPYJKiV85RpVfokdAA2gcaY29PgZMDTEmqy1
+         UFa9KO0jfssPsy+bBhfQ95cdc5egiOBMM9jEAhoJg1Y0I+u1Mm+JBIh3MEXG9bF6Tm1q
+         ALPWTs35gqZvkGaqxHnH/heByRgSOMwNuE1nNr2PN4lcjhFXElu3rl8d/pm4FKkAkoK5
+         kJ7ztRDSrhFg0/buwGiUufyv3NEPZGdJo5NixQkw3xgK8yX5wur7lh48Bv/ehkZLDnpw
+         p5NQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777401984; x=1778006784;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=dtWL2Nmofu08jaaEHqPK+HWLFx++QkkniP+LH/qTdYE=;
-        b=DIspQ4NR8TO6lT2VlhTFAlUXRYcIuS4Bedk2+FY44jrdsy+tsynqOODzipYjktLPKF
-         VqEKz/TDDrhyAxmhzLMfYUfvMGb6CobQDWr9G1JXBOy6vX4dGkdcdEi9vuYLiG/F83ew
-         z4/nNUQuHriry2A9rQo3XTWcAWx0OXzbhBJGNAvNjt1Jq8tA/XTeGBVoN5Rughraqvb0
-         oDBNp6G8J1/wzxt09SUZme0dfaqBXpX+951sGq0C037eYH+iYNPjEZpQW/T7DVpYuENz
-         8bVVB0vmTlvGgdhN8InhaJ9pSkP3e9b1JfVrybxX6rgUhQwgdcf1UhZkUrc1RAj17dLU
-         V9fg==
-X-Forwarded-Encrypted: i=1; AFNElJ/Zjoj9T9ydXYsxVOUDfZUgCwPwcFzeb9R5hZA88t2ce0mJSC7TAcBHpODe9F1iRnoVwSSyxiQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywe/eMdcnUZ/QUjkaSPOH8wJfGg3bSrWe+EqgFQBCO4uN1Q/2b6
-	yu2Bki2Za+FQtwpKkJLyqH6bfmTmXARSFOfSlyqaII4iCKdilsI0zPRpJPbfykt0L8VbomZWY7z
-	omt/F+OU8bUtMQbwStfoBFrsU5LdLQK0X18oJ4bYsk62sMAruSbfNf79/KP4=
-X-Gm-Gg: AeBDiesDDllnCAMn3K/xyJVqdR8SII7EclOX9EbPgf8whSpV3yQpgdNdBphtfXkaLC/
-	+pBTErBCVEniE1NMZ6uvjCXO6ykHOuy+3g7lRoqydtyEBWe7LetbWXgtsc5fMCXe6PNlJpRm83h
-	+a4nF7oprdzpV/XNAacZVHAKd8nSAiZwdWqOMePPfI9EAj6t8IugkwiL1Q7z0a9GN83zWlkmuYz
-	uyKnWkT9DuWnW+UANU3Ty90PhNUcf87u/RqSua2472nNs2ZiRanZdudFtZIv25sjtXxIwTBGdxN
-	DK2SOx/xEPhKV/OAmEaFa2mb2uUA3NUHmf39T66xW29wPrLV9HpdE3/Lpx+uKdjPy3wJrnvk5tk
-	Qww9kYW4jxdhCwYFDiVSU0AbT8QoXyrOWSRzziO7bHAMz7ZG/0V55UnZMNYsRZ6/h23JsiA==
-X-Received: by 2002:a05:7022:4188:b0:11a:342e:8a98 with SMTP id
- a92af1059eb24-12ddd8b02f6mr2077359c88.0.1777401982374; Tue, 28 Apr 2026
- 11:46:22 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1777402490; x=1778007290;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=g8GtQWzkgfdJFAZ9yR9PSi0GHYtSw+aReGuyyBvgSD8=;
+        b=kmVPPBsOTs2RI+dOcKPZrlKhAqW7wJ4m0VZ9YPPSFB7fASu9pS0NTvUamVrkZLWCtN
+         a7wO0I7lkEk063ifr2Akq2/7lDelVPYc0tWyOg5brjz5YBswbTzhxYAug4jPq8RRv7IT
+         7pGl3In0Mk3GV/42bngGk6cQm+p98FY5ciWR+LH0dyS3ROzelsJ607zDie5wwBXdLCgi
+         SOdFsG5vbL7QQOuEjomgTuCr1oWOb7CprBSs3XxqKf3Ng7HUL2bnlCmNbapaes7jN+AD
+         0kdJCB/DcfTx4q6/ImOAC6p+RxGehXPSNh2YWk96XuKQ1Hdjg/RgRSLcV1VT44j9xzpu
+         /JSQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8G6mAjDpOdMUb+7iTrnzUpZpiDQCfoSv3seS4AqTZANI6dqmb8fR9RQFhWaXLb+uxgi67Ad3Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIK/iemlOVIeQNYxNpfTn3k4KUyC9Un6CbFrKg4Dq1Ar7QY8JF
+	1uK6skqEpyceym3JxRIO9Od6TJpMw5gc3qTr3UdxvFyUSc9P9MxOy/wC
+X-Gm-Gg: AeBDieseqalz/83LQ8gy+LAVIFypE//5le4qQcufAfJDNCE8e2LmNQwsKb7whuqXV0A
+	u6XKn1Ar1luepicPcLAXNLtFtIO7ypwS9HUyNeh/VrZ+YakXAyAWN4u6FL4i6wZNcz+bmwI+ZSN
+	JzRp4pmDh3R360xzRCN37FtO7YJrP55FRl9OBDupFvBd2n8Wpuhs2jZV1po+ySdDOzYe9s01AOQ
+	swyloJc0rOvrhZf1igWfFGFCjoTWO3Q14t5YmsB4wlIAlbiGbY+eIVhLPFGQ2ryCy6N8S113mAv
+	ibtOy8Xqt94F0nhDMdvsF+uaNEuDRy+ranvx7JKftcOm8eCZgCh3x8UrSNmPtXIXFQL//rACwE1
+	L4cqrZgDgV7js5e0KYsKUskALsb1hSPVgywNkfQzJRIsgIx6AJQu6WvNDxYHyX9f50Q9v9Ngt6r
+	k8MFx2O1IQLVPrpUX7OUSvvMyIvQgOgBvip3dfypZjmHpv5UY7YbMzcrpKB3W5mRF0bYhFgRJH6
+	dXAsYPyTP/BJcwU
+X-Received: by 2002:a05:600c:138b:b0:488:8b99:54a1 with SMTP id 5b1f17b1804b1-48a7b5488ffmr13845835e9.28.1777402489754;
+        Tue, 28 Apr 2026 11:54:49 -0700 (PDT)
+Received: from ?IPV6:2a02:a03f:a75e:9a00:2419:61a4:ae0d:bc43? ([2a02:a03f:a75e:9a00:2419:61a4:ae0d:bc43])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a7beb1581sm3660975e9.15.2026.04.28.11.54.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Apr 2026 11:54:49 -0700 (PDT)
+Message-ID: <61387501-77a7-49b8-8124-7fca5168901c@gmail.com>
+Date: Tue, 28 Apr 2026 20:54:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260427224243.3499162-1-sharmasagarika@google.com>
- <20260427224243.3499162-3-sharmasagarika@google.com> <20260428111855.GB571865@shredder>
-In-Reply-To: <20260428111855.GB571865@shredder>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 28 Apr 2026 11:46:09 -0700
-X-Gm-Features: AVHnY4LIPo9NRXAYKNpP_C7ZD7DyMGfYzFjap98K_N3B6fceOtmrPZDLKWUIZM8
-Message-ID: <CAAVpQUCY_OEUj8UyrAz+RYfxL1konQGs4xKZQLdRMBxW-4kqDg@mail.gmail.com>
-Subject: Re: [PATCH net v1 2/2] selftest: net: Add test for TCP flow failover
- with ECMP routes.
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: Sagarika Sharma <sharmasagarika@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: E240748ACF3
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v4] ipv6: Implement limits on extension header parsing
+To: Daniel Borkmann <daniel@iogearbox.net>, kuba@kernel.org
+Cc: edumazet@google.com, dsahern@kernel.org, tom@herbertland.com,
+ willemdebruijn.kernel@gmail.com, idosch@nvidia.com, pabeni@redhat.com,
+ netdev@vger.kernel.org
+References: <20260428153749.785611-1-daniel@iogearbox.net>
+ <4497a340-b48e-4615-81eb-90ebc7a0b5d2@gmail.com>
+ <34f6054f-5d5d-47c8-b06d-f7b40d74c3f0@iogearbox.net>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@gmail.com>
+In-Reply-To: <34f6054f-5d5d-47c8-b06d-f7b40d74c3f0@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 31A0F48AE70
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282050-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,herbertland.com,gmail.com,nvidia.com,redhat.com,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-282051-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[justiniurman@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iogearbox.net:email]
 
-On Tue, Apr 28, 2026 at 4:19=E2=80=AFAM Ido Schimmel <idosch@nvidia.com> wr=
-ote:
->
-> On Mon, Apr 27, 2026 at 10:42:23PM +0000, Sagarika Sharma wrote:
-> > From: Kuniyuki Iwashima <kuniyu@google.com>
-> >
-> > Without the previous commit, TCP failed to switch to alternative
-> > IPv6 routes immediately upon carrier loss.
-> >
-> > It would persist with the dead route until reaching the threshold
-> > net.ipv4.tcp_retries1, leading to unnecessary delays in failover.
-> >
-> > Let's add a selftest for this scenario to ensure TCP fails over
-> > immediately upon a carrier loss event.
-> >
-> > Before:
-> >   TEST: TCP IPv4 failover                                             [=
- OK ]
-> >   TEST: TCP IPv6 failover                                             [=
-FAIL]
-> >
-> > After:
-> >   TEST: TCP IPv4 failover                                             [=
- OK ]
-> >   TEST: TCP IPv6 failover                                             [=
- OK ]
-> >
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> > Signed-off-by: Sagarika Sharma <sharmasagarika@google.com>
->
-> Thanks for the test. LGTM. A couple of nits below.
->
-> [...]
->
-> > diff --git a/tools/testing/selftests/net/tcp_ecmp_failover.sh b/tools/t=
-esting/selftests/net/tcp_ecmp_failover.sh
-> > new file mode 100755
-> > index 000000000000..f857d5db84d8
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/net/tcp_ecmp_failover.sh
->
-> [...]
->
-> > +
-> > +test_ipv4
-> > +test_ipv6
->
-> Maybe squash something like [1]? I ran the test without the first patch
-> and I get:
->
-> # ./tcp_ecmp_failover.sh
-> TEST: TCP IPv4 failover                                             [ OK =
-]
-> TEST: TCP IPv6 failover                                             [FAIL=
-]
-> # echo $?
-> 0
+On 4/28/26 20:16, Daniel Borkmann wrote:
+> On 4/28/26 7:58 PM, Justin Iurman wrote:
+>> On 4/28/26 17:37, Daniel Borkmann wrote:
+>>> ipv6_{skip_exthdr,find_hdr}() and ip6_{tnl_parse_tlv_enc_lim,
+>>> protocol_deliver_rcu}() iterate over IPv6 extension headers until they
+>>> find a non-extension-header protocol or run out of packet data. The
+>>> loops have no iteration counter, relying solely on the packet length
+>>> to bound them. For a crafted packet with 8-byte extension headers
+>>> filling a 64KB jumbogram, this means a worst case of up to ~8k
+>>> iterations with a skb_header_pointer call each. ipv6_skip_exthdr(),
+>>> for example, is used where it parses the inner quoted packet inside
+>>> an incoming ICMPv6 error:
+>>>
+>>>    - icmpv6_rcv
+>>>      - checksum validation
+>>>      - case ICMPV6_DEST_UNREACH
+>>>        - icmpv6_notify
+>>>          - pskb_may_pull()       <- pull inner IPv6 header
+>>>          - ipv6_skip_exthdr()    <- iterates here
+>>>          - pskb_may_pull()
+>>>          - ipprot->err_handler() <- sk lookup
+>>>
+>>> The per-iteration cost of ipv6_skip_exthdr itself is generally
+>>> light, but skb_header_pointer becomes more costly on reassembled
+>>> packets: the first ~1232 bytes of the inner packet are in the skb's
+>>> linear area, but the remaining ~63KB are in the frag_list where
+>>> skb_copy_bits is needed to read data.
+>>>
+>>> Initially, the idea was to add a configurable limit via a new
+>>> sysctl knob with default 8, in line with knobs from commit
+>>> 47d3d7ac656a ("ipv6: Implement limits on Hop-by-Hop and Destination
+>>> options"), but two reasons eventually argued against it:
+>>>
+>>> - It adds to UAPI that needs to be maintained forever, and
+>>>    upcoming work is restricting extension header ordering anyway,
+>>>    leaving little reason for another sysctl knob
+>>> - exthdrs_core.c is always built-in even when CONFIG_IPV6=n,
+>>>    where struct net has no .ipv6 member, so the read site would
+>>>    need an ifdef'd fallback to a constant anyway
+>>>
+>>> Therefore, just use a constant (IP6_MAX_EXT_HDRS_CNT). All four
+>>> extension header walking functions are now bound by this limit.
+>>>
+>>> Note that the check in ip6_protocol_deliver_rcu() happens right
+>>> before the goto resubmit, such that we don't have to have a test
+>>> for ipv6_ext_hdr() in the fast-path.
+>>>
+>>> There's an ongoing IETF draft-iurman-6man-eh-occurrences to enforce
+>>> IPv6 extension headers ordering and occurrence. The latter also
+>>> discusses security implications. As per RFC8200 section 4.1, the
+>>> occurrence rules for extension headers provide a practical upper
+>>> bound which is 8. In order to be conservative, let's define
+>>> IP6_MAX_EXT_HDRS_CNT as 4x that to leave enough room for quirky
+>>> setups. In the unlikely event that this is still not enough, then
+>>> we might need to reconsider a sysctl.
+>>>
+>>> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+>>
+>> Reviewed-by: Justin Iurman <justin.iurman@gmail.com>
+>>
+>> FWIW, I prefer v4 over v3. I didn't like the idea of a new sysctl for 
+>> several reasons I already mentioned. So, thanks for this new version, 
+>> Daniel.
+>>
+>> However, I can't help but think 8 would pose absolutely no problem. I 
+>> would be very surprised to see someone complain. We're choosing 32 
+>> over 8 to be extra safe, at the price of security. RFC8200 provides 
+>> the following ordered list which is recommended for senders (without 
+>> normative language, though, which was a mistake):
+>>
+>>        Hop-by-Hop Options header
+>>        Destination Options header
+>>        Routing header
+>>        Fragment header
+>>        Authentication header
+>>        Encapsulating Security Payload header
+>>        Destination Options header
+>>
+>> So this is the maximum you can have theoretically***, although you 
+>> wouldn't for instance use the Authentication header with ESP. I'm not 
+>> even talking about ordering or specific number of occurrences here, 
+>> just the total number of Extension Headers in a packet (as your patch 
+>> does). It's also worth mentioning that it's highly unlikely to see 
+>> someone use them all at the same time (in production, of course). This 
+>> is why I still think that 8 is safe too, and would provide security as 
+>> expected.
+> 
+> What do you think if we fix this at 12 then to also have the exotic cases
+> below covered just in case to be conservative? Would still be an 
+> improvement
+> over 32 fwiw. I'm also fine if you think straight to 8 is the better 
+> choice.
+> Either option I can spin a v5, np.
 
-Thanks Ido, I completely missed the exit code.
-I'll fold the diff and fix some shellcheck warnings.
-
-
->
-> [1]
-> diff --git a/tools/testing/selftests/net/tcp_ecmp_failover.sh b/tools/tes=
-ting/selftests/net/tcp_ecmp_failover.sh
-> index f857d5db84d8..8b7a2d82c442 100755
-> --- a/tools/testing/selftests/net/tcp_ecmp_failover.sh
-> +++ b/tools/testing/selftests/net/tcp_ecmp_failover.sh
-> @@ -205,5 +205,10 @@ test_ipv6()
->         cleanup
->  }
->
-> +require_command socat
-> +require_command tcpdump
-> +
->  test_ipv4
->  test_ipv6
-> +
-> +exit "$EXIT_STATUS"
+I'm fine either way. IMO, 12 seems like a good compromise to keep 
+everyone happy.
 
