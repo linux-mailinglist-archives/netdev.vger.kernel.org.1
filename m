@@ -1,320 +1,312 @@
-Return-Path: <netdev+bounces-281738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281739-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wGhwL7Z48GlgTwEAu9opvQ
-	(envelope-from <netdev+bounces-281738-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:07:02 +0200
+	id AEqGNKWA8Gn6UAEAu9opvQ
+	(envelope-from <netdev+bounces-281739-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:40:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 618DB480EB8
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:07:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30EDB481AD5
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:40:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F12CC30771A0
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 08:59:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 28712308E145
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 09:00:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3153A3D6CD7;
-	Tue, 28 Apr 2026 08:58:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59A8D3D6673;
+	Tue, 28 Apr 2026 09:00:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BuGktwg/";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="OAwM32SR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oJOV5/p6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80712313E07
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 08:57:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777366681; cv=none; b=bt8XSFQtc2UwgEvnOpZAUC2l/2eQVaizNVyNxTjqKmZntgbJL1Qt0yGFbVpgrdhTsUnMzk3SahDXsAQxPKA0J6TNC7GbMyx1rXX4KHvdpF6C8LARWh+tcG3FloLs7BGHy41ljlAWs7tTMWuoNZlM1RoK5yGjDhybqTPsubo2NUk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777366681; c=relaxed/simple;
-	bh=uRW8e72Rqzipki+9LHRLNLqQmu5KdCJEOG4HG3wjS9Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YH2n2Tt//o0/N3bPQlTXGWwxiR1lalnh2JxENCA14AGmhq309LHcJpBBPhrO+j3rlNclfHxaj6urbw6pM3hV6u+ZDA6jfFHF/GemdiXC3yJyRIxQjc2L0oHRpaurJ8LqNUHdRUK8+YMzFn3mboquuWf66fWL6kMecNN2Jz27JMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BuGktwg/; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=OAwM32SR; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777366678;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eq86QjeYlD20o4XVhJa8zSjeSJAedvnhgfqIHlBbJ8s=;
-	b=BuGktwg/HaFhg0M3grsaQnjUvw25RgE6THKapGAucrtmnvDamKCDyNf/6s5ec9+3gIcrLI
-	K5KnpMdPAWd+5FALQmQ3AvhQBgQd6ukPOX+Pw06WDuN1taAiGJx9bcEY30R68FieKqFANU
-	AiRbTi20jvrMD38nxF3AbuS//T44dw4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-679-srQiH-J4PCOaYzjB0NBH2Q-1; Tue, 28 Apr 2026 04:57:57 -0400
-X-MC-Unique: srQiH-J4PCOaYzjB0NBH2Q-1
-X-Mimecast-MFC-AGG-ID: srQiH-J4PCOaYzjB0NBH2Q_1777366676
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-43efc93e4f6so9028835f8f.3
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 01:57:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1777366674; x=1777971474; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=eq86QjeYlD20o4XVhJa8zSjeSJAedvnhgfqIHlBbJ8s=;
-        b=OAwM32SRVUIL37zmjCtBd49J8Q3ecj9VpYAuKE/n947vXGaniH1Gyy7cJR5mQw6Ake
-         SB1m/ewoTHsEUYt1VHUn9zsf4PPmZd1nM5e723O61RdUCV/QGLjO0bHDdA9hct7VqlXS
-         LrX2n8Z4QVhp9fqRVaHTzt+nLpAkBgNBg3YcUcQqWb0L25CIOY3Yi62EKmjb3f/d/INq
-         sCznr/pjENHq5VYyhAVneyWUyrVA9FIPdUBMXBdg77xnx+sEPLf6DT0yX57SREB8bRcH
-         6LV1DDZldR7O3ja9+Mz8SCaWj+zWqLj8Ek/tCGS1zBni044cG9w8i2Erq18CTDGPlTUy
-         yq3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777366674; x=1777971474;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eq86QjeYlD20o4XVhJa8zSjeSJAedvnhgfqIHlBbJ8s=;
-        b=DVZ0O/s3Jp1xNmrJhAgngXybnP2EOWVrTn2VCcyqiu3EouhLwyyS/VDra4hEswW0hT
-         hIoZduXwg30QwwNvNnyNcg4PBTSPmjSEH8ULSDZ8mQHte5VWXZEaAQZyb6MDagNm8xu/
-         xQqYvvDS2aD2h70BTwxwqzjfx1Ex/yP8iscA08+FIZJaTMIs5f3nM2q4h44FacEBT1w4
-         X5XVNkbhdAye8P+WFDKaqm/CtXHujjN1M8KBxsf9I1RLh2yjHeUMjqd/vmzq9ck9OQlo
-         VnaRcYoJC8824sQzHsJ0oqcE80SfUE1DEwNgzf/BX6aI6x32qajN6YkIMRoVXdIc/Jj5
-         nYWQ==
-X-Forwarded-Encrypted: i=1; AFNElJ85qeouRshJYzfJffXb/lf+lqqQ/VC7dlGrkggnL81zXr/jgdUAdKW2SZbfj6wtOxa0z5RI3Us=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVQdv8n0v6irm5l6sq4j8zEcIyR34EpTmE+HstRlPxLx5/rcss
-	qsZrAvzXpsJsPvnxx6Y7kl+kS8Eny0/G1qKU8DKlA1dYdK2a+XeHy0FOfdQA6IeW+U4zZ1EHAby
-	rEhD2YFjaj7NUljo7TposW2y9SSavW6x+AoH3kjp8RYQgY1XWBpOqvU1rvg==
-X-Gm-Gg: AeBDiespMy6585CxDCmLAFQrCI3fIqaMyN9MTG7J1/OGKSJkBJr1cl9tYxErVsmAQr8
-	1W/YXhCfWpxgQBVbt2Y87Xd1Edp1B3gaJioTFPq1i0ObHwP54YWK+93d1koiMqo6Hesjwpxt0f/
-	sSHH6IJvxYtuIjwiSKvKi5e8AHYs4WlM8oK1LpjFaAanwaB1rjDc0VPtTkRs730nMVwsoj1IZN9
-	SrIs8wF+LS+JEemerlG/KfHbfO5Pi10GjSe8JuLG5/9rOEEqmaNK/S5bOccQi7T188LkqRvzSC7
-	DXP8io2iRxY65mcHgkIIaevClAH8Zok/XYPSEGyLRnLpwSsm4vdNq5ONAbqzRgoYT7UmGqxk4Hz
-	meqNzIIS9nJTdeW9Bkd9W9oH15rgd2zdOXkAN2mzW5Qpijk21GbIgtOzxg996qDtOauNPRbuOU+
-	VUkqY6qQ==
-X-Received: by 2002:a05:6000:2481:b0:441:362c:39c1 with SMTP id ffacd0b85a97d-4464a913403mr3894575f8f.33.1777366674226;
-        Tue, 28 Apr 2026 01:57:54 -0700 (PDT)
-X-Received: by 2002:a05:6000:2481:b0:441:362c:39c1 with SMTP id ffacd0b85a97d-4464a913403mr3894514f8f.33.1777366673658;
-        Tue, 28 Apr 2026 01:57:53 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-16-204-83.retail.telecomitalia.it. [87.16.204.83])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4463fb7e2afsm4634086f8f.28.2026.04.28.01.57.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Apr 2026 01:57:53 -0700 (PDT)
-Date: Tue, 28 Apr 2026 10:57:47 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Deepanshu Kartikey <kartikey406@gmail.com>
-Cc: mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com, 
-	eperezma@redhat.com, stefanha@redhat.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, syzbot+1b2c9c4a0f8708082678@syzkaller.appspotmail.com
-Subject: Re: [PATCH] vsock/virtio: fix memory leak in
- virtio_transport_recv_listen()
-Message-ID: <afB2QCHtoREOV6ml@sgarzare-redhat>
-References: <20260424150310.57228-1-kartikey406@gmail.com>
- <ae9ilWoZI_-EMdWQ@sgarzare-redhat>
- <CADhLXY6APdmMQLSxN9b66pV5mp5sDwJRR7_BJAh13BaK-qoa=w@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9440371D13;
+	Tue, 28 Apr 2026 09:00:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777366840; cv=fail; b=hwdGdkCArOWCIXT14fl3rUZr7ad3ZumQxnOy4cSVF0DYXBoU/jpBX1QO4FgEKD95YhBbSeA/3L8wncywTeRpgx+/Pvp0FVOk0dXMPbfsDr/8zs4UhnnpHhAbsYxhqc5b7vsin7hukn/KmKoRkBjFXxhZ1eMKR6uOEAkp15TDiGw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777366840; c=relaxed/simple;
+	bh=bZJddvxg46huEo/ervGSz2Yh9gc6A1gDHKEMwYybPAU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=UvKLUbw/JdEEeJ9WnCfeqF127wz8D6FRc6mp2N9C5o8JMt8oAyTTrBGZ7u/vgZdBcmY9Kk2BaEn6/VROn0zOnD+BIJV7omx/I28UTCHiJORTe2l9EeyugGHpYxnSkdLIY5bja9qjmG1Tbc+Hb6Q8PY2tQnHksqhfLweCTyf82jU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oJOV5/p6; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777366839; x=1808902839;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=bZJddvxg46huEo/ervGSz2Yh9gc6A1gDHKEMwYybPAU=;
+  b=oJOV5/p6vwYjefuieeCHo+MqRLEwPlgc/IqzKKqFA8Tz+bkDVFeM0f2u
+   5IJPIA749kWIJwbNg5Ld4YloJBdlfUEtbUMX/wo5XKkGUv+rt5kOANVbp
+   V6p/5j6aMmJGtehvaVM6ILwg93p2MWj1QlhcqR7Fq/8KTj67umBuJ3vYI
+   TsmqSleX9GuokmYoInoN12jUxTbd+/51E8O37bkI0m0DKUGKZ7eFni7ka
+   0kFVP6PFbsqZchsPwtZfPNEQ/a46kUG6qzQeRu2ZOQZxTXQRLY1hZ0+/K
+   AF5M1Kgz3xjKVcGnSNTJrx76pQ7TeG2x6cHO9qCbkWtm1jA4VtsrreoX8
+   g==;
+X-CSE-ConnectionGUID: nbOQezaKSBK9gorh3l7vKg==
+X-CSE-MsgGUID: vptpgZdyRNGxnhQZDAFMAQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11769"; a="89730561"
+X-IronPort-AV: E=Sophos;i="6.23,203,1770624000"; 
+   d="scan'208";a="89730561"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2026 02:00:36 -0700
+X-CSE-ConnectionGUID: xpInJJxuQfOzcTGbrO7OOA==
+X-CSE-MsgGUID: fVs8EXbgQpWRiKksyGDcTw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,203,1770624000"; 
+   d="scan'208";a="233032799"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2026 02:00:35 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Tue, 28 Apr 2026 02:00:34 -0700
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Tue, 28 Apr 2026 02:00:34 -0700
+Received: from CH1PR05CU001.outbound.protection.outlook.com (52.101.193.65) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Tue, 28 Apr 2026 02:00:33 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=LplGLx6ZIYmpEEXxiMxtI7CFOvPBjqhRWxeNsVMH9cy972JrDY23asuJwePxBkC33088nl2a3CU5RVSmKl+tRDjDGXmxX3M22N69C+2r2zrwZ4pdtvm/lW6Wz3yw0Go4dZWUma8V1Tx75XR7Qxo9dhecBZFoVYqAhr3mdfl70XLY0dXKIIuQ8dTbHCYbHpnncTaI9YSKJs9toPSSlM6MvX6GXRxDhumwT7dICKuTpRPDtQDZl59/NR3LiBM/ZF4vncUr+zmphwn+f2i2XsExEGLj4vDL0tyR08jaHg2mb3XCQ71SAuR/AkMqm87D+FIWEIbddGmC4xOWh0MSBWZUpA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YncHHcyu20s0zyjZHUmW5LDWNr0caKlBi5bFg37Vg8c=;
+ b=QCTczbGLfnvHTDXrl6GNnphsjm8TJ6FxN+GjGNS00nPNciObDbvxWuUkP7UG2i3sJwiwa7Etebmb49mUH7fQNT+nCkw5faY1heYBHEG9N3RoAnM17GvkW23Y1WEQfADpKLJP2eCURq6Pop2P/Negwdu/Mf7/ZkiG4qe9mcM9YHquxvK2nPZS82idHqsbeJzOtgdJm3mmlo3Bs+CXfRa1S7yIDjM0ZdnoSfXNkf0D7+wbkTy15RUFQLcT/EzRiUCp3gW/iiI8OspC+MrBXpcVOFEm3YPcC9iBqdAjOzIYyoXZSIxaSchL4INiyLVW1VQkQb5/PS0EJtlGU3Thbo7NKA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by PH8PR11MB8016.namprd11.prod.outlook.com (2603:10b6:510:250::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.16; Tue, 28 Apr
+ 2026 09:00:23 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c%5]) with mapi id 15.20.9870.013; Tue, 28 Apr 2026
+ 09:00:22 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: "Zaremba, Larysa" <larysa.zaremba@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>
+CC: "Lobakin, Aleksander" <aleksander.lobakin@intel.com>, "Samudrala, Sridhar"
+	<sridhar.samudrala@intel.com>, Michal Swiatkowski
+	<michal.swiatkowski@linux.intel.com>, "Zaremba, Larysa"
+	<larysa.zaremba@intel.com>, "Fijalkowski, Maciej"
+	<maciej.fijalkowski@intel.com>, "Tantilov, Emil S"
+	<emil.s.tantilov@intel.com>, "Chittim, Madhu" <madhu.chittim@intel.com>,
+	"Hay, Joshua A" <joshua.a.hay@intel.com>, "Keller, Jacob E"
+	<jacob.e.keller@intel.com>, "Shanmugam, Jayaprakash"
+	<jayaprakash.shanmugam@intel.com>, Jiri Pirko <jiri@resnulli.us>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Richard Cochran
+	<richardcochran@gmail.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Salin,
+ Samuel" <samuel.salin@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v7 07/14] idpf: refactor idpf
+ to use libie_pci APIs
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v7 07/14] idpf: refactor idpf
+ to use libie_pci APIs
+Thread-Index: AQHc1ujyZSMaxGI7NE+CoLBnF9lmm7X0K2Rw
+Date: Tue, 28 Apr 2026 09:00:22 +0000
+Message-ID: <IA3PR11MB89866811B05E0CF99A6BA98CE5372@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20260428082654.44364-1-larysa.zaremba@intel.com>
+ <20260428082654.44364-8-larysa.zaremba@intel.com>
+In-Reply-To: <20260428082654.44364-8-larysa.zaremba@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|PH8PR11MB8016:EE_
+x-ms-office365-filtering-correlation-id: ea91255f-1aa1-467c-4cbe-08dea50494a8
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024|18002099003|56012099003|22082099003|38070700021;
+x-microsoft-antispam-message-info: 0EzuEiBMu4nEAj6m2W96+Is2y+IinJ9my4vf4yZSJ9+O/fp3ZlxfzclM5eM1hJcnLLbU+rCImKiyQzYUxhUWbMCpsnC/G4rgO9bcMNTkAgsnk7mI98NG4kTus0j03NrnvA+CX55AoE2/kwU416Mnq8kuqnOV0/7QVBWovhVWi4msmVrS9H55L1AQ4Y4CMJb7wu3fAVCLHg+l5/SJv9+AybLg8fLQauZUgzI+o4pS03jjV0wVr3pwP0YIxmQdSZ0AvAIZ8bNRJ03hNhIfXPNKPY3Scb4fhb0uKcHnowxnLapgP3SygleQFf5eLb0gzcyWwhMKioG2JkoRh3SG6pLOfl8e4pxLYiXlwwwW6qj5MCxYzATCc2IB384YngJHUtUZTiOfDMoF98HZCMRufAXC8wrjL9scSgfTH9Wu1drDNpHCiS2+CUFekyODRwDaTe2Th1vEJr+q8gJa0FhAfYqxQmO1llSo0HYnsDrTjwr/MyEXhdNx5PDsCqOjJr8YT6S82b80aIdFaGtgkBwT7eW8VeVw6L/yhmFwyYqZCOVG38b5yCkgk2119Yt2owz3tzhhP8M9LEinORiaqsnUk4f58z5iftSRztWakJBGEUiTE3NXBM3MZGac7ySkUVog+06ugWAF4DwI6JFSPk1xn9y0O1a4+eTAiFh4BRo1ljbZKLQ/SPl/88cXOofuvLnpe/Mp83PKTiXPbg+Vw0ZgGgF9OX+hoWe2blazYV1saSNuIw8IHiBbFpelrNJFL0iitgrdsDF73kGZKkC5b8yGa63kLXQgpBU2M/4CJ8UluWUwcSk=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(18002099003)(56012099003)(22082099003)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?7GIr3kzFb0r6Tx5ojtWUvYOXVVIJMwS/I5Bls9k1rOIVh2vMsQRwIkqXY1GG?=
+ =?us-ascii?Q?Ux1zj1DSqB6808UCSQXfJVXcE1AadisWuElthDbn74f1r0yBC2JCH5afzgDg?=
+ =?us-ascii?Q?MmofhCIv5oWp6X8cIug4QiWBXF6hhUbkZ8InlqQVDGbuDBbMP7MzVmkst8sS?=
+ =?us-ascii?Q?klKIVluDUBff9mpiQ+0oZ9yzRNTFYCstG+LW2/zzC3WysRHd8GcQvDVQ7O4L?=
+ =?us-ascii?Q?Aoj4m6NJFimM8qUPVMxloUfT1cA1DJcQziGUNsiDmHAzDbGdi5R+eb+wYmzx?=
+ =?us-ascii?Q?w2OIazxjm/nwdNm+fp1v7tQ/9lSbPvl1eDk+Fg8vDSc5B+K2ilUxIDZnx2cB?=
+ =?us-ascii?Q?0jDtiWRprrYkAGS9QgnmJzvBFUN9nT6SLKF53hnyJeXmizd8ceBlMDtbnW7e?=
+ =?us-ascii?Q?mJ9LTBwRqCbFDrwa1i0kUve6ab2hXQHozivjaqoMAdFNfg4w44Rg1qoze32M?=
+ =?us-ascii?Q?m8fjJ/ffBXFPfjjCO1W7aC3tBwm7iXQSXKGldGJLs//bR8JtSIkVT/aiL86a?=
+ =?us-ascii?Q?YVIVaRUbxSrUKN7t+ZIqHq6lcvKeUBtX8fOdDE4R6vkCSFGAccZ77+WOu5PQ?=
+ =?us-ascii?Q?gJEyNTY1HqxuAocATQZLbCRjUkJjrozGjJQxOOQtl+D3xCGLWvXrR9fODATu?=
+ =?us-ascii?Q?71SgmhrHCUl5t7sxJ/802/cQduv918rUPPe6xAOx7VPWIq20mPxuJDVBUUGI?=
+ =?us-ascii?Q?vebv15SLsBpl6yCE8HAfe+diPTM8hR88uG1zx/jn+rryUSXrUOMmlhjNG1yh?=
+ =?us-ascii?Q?vM1Cit/KCs4ULV3jyW6azZD03XRMu6ZkGl6p+X9gKpH44Q0w14gKlDh1U/O0?=
+ =?us-ascii?Q?OiPzssdRWwB60chAEe5jQywINblittPp5dSqTI30IeuF/xKSJbwsqcTPkaaw?=
+ =?us-ascii?Q?LsUr5Qh75ySC4x/6QDgCiBqyie8QclXJlfQ+7tBqpfh5Zv4tD3FoE98Hp9eo?=
+ =?us-ascii?Q?1s9f1EN5m7oy0UwbJBXzCUI5GH6KMU/NYFMkCL8msmz7PuI8x34qBV/L3yas?=
+ =?us-ascii?Q?U4Wq8ac8FhCnpdtCT/hvDvnmbMcwEn6bpVGsyleZgDzzz/czl7uOvufwiYwo?=
+ =?us-ascii?Q?D4SjbvzYFOhclvVqkua5NvBbQbz4ukZ7fC+rsEwAZMcix8Q6sAkehgDGzvSY?=
+ =?us-ascii?Q?OYB/bIiJ0gbDuus1QHA30vulAMhgNS+J807MGyEr9u8bsuBuLffUILaom0W8?=
+ =?us-ascii?Q?K3TyDJPN26Xxn5V7UbQcOgOjvOGFirg0ug1D3uusHGPxDO2YQqn4ud998044?=
+ =?us-ascii?Q?HM2vnFig3dq2FUQ/l6E72OYK2+Up33ggwboYg3bp8bFiYybzeQKOg/20RsGP?=
+ =?us-ascii?Q?3AskR4SIkFhmMUbvw74uaaA7WRaUd3XHloVNmVviig6b9UOqFng2X89LEo8W?=
+ =?us-ascii?Q?lUHeddO4OlfWxJ7sn5hncUtNKPdezbtcKlllOyL+KlzbDBSqjwkjPbBeRX64?=
+ =?us-ascii?Q?2evOtWwW/J/wCcHtu68zkyDX0aJ9PDiDBVML4ajBt3arUNY+QRTR6/daVEi+?=
+ =?us-ascii?Q?INvmdxxTfNe12oLXdwdZAjrzFd0FKxMRTGCiXOziLj4VaEmOAx3vD69C5ofd?=
+ =?us-ascii?Q?/I3B7AXFwfwBofkQK5ko0841Ur7JIwzX6qzOc0TaQ+WJqBKXsiuVLumI5I97?=
+ =?us-ascii?Q?GBc0kK+EeK/vPJaDgZLWmYh8c8hGWV5P7RG8/BdktNmIH/UlAnS9ubCM39mZ?=
+ =?us-ascii?Q?lNc0YHBsgOD2WUFVZAybX8AYbAid2ijIX07hlazOqWQ2GjQTW9VbuS7HKvit?=
+ =?us-ascii?Q?1OeFISGaB9P9TYc8+wLHY/yQD/zJDOE=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADhLXY6APdmMQLSxN9b66pV5mp5sDwJRR7_BJAh13BaK-qoa=w@mail.gmail.com>
-X-Rspamd-Queue-Id: 618DB480EB8
+X-Exchange-RoutingPolicyChecked: VsSTY9je1lJ50ezDb5Yk0RPWW+m7sn6idJADffNLWg32VjbLpk5F74EK3aT5RJ/535aGrWkUonE7UdCrmvrABdWu2aHOP2wluxZKfxsR0EhCD6MeCFZIRNNxiw9sQ6eBHEoJ3RhlqxdjpKV9/lIRenUudfBDHAn+zLQQqNDxeN6mWnYB/m2t+0NG/1Frqz59oly3oJwTOyKKqqR3nKBNP94NU2UBe8HkQRhHF395NksQPrmP70nsF3xHvJxlbwxitd9Eon1b0L+pPkBdUNLbmtPnv7W+8AuK5hpY7vahQhq41fNSPCOfut8SktVvL16DgyTl/rkqzyOfrN9Z/7wskg==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ea91255f-1aa1-467c-4cbe-08dea50494a8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Apr 2026 09:00:22.5515
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 9g9LhI+DVJotBr0r1eYyz5vVEY+xlQYNy60JEDFFVxOJDDOVG/DhyDUgVe75St8pO7c/sN34hlXjxsC5jOOkvoFHs4RncDEjMCP3yOXVN+o=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB8016
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: 30EDB481AD5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281738-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281739-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[intel.com,linux.intel.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,gmail.com,lunn.ch,vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,1b2c9c4a0f8708082678];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,syzkaller.appspot.com:url]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 
-On Tue, Apr 28, 2026 at 01:54:36PM +0530, Deepanshu Kartikey wrote:
->On Mon, Apr 27, 2026 at 7:15 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
->>
->> On Fri, Apr 24, 2026 at 08:33:10PM +0530, Deepanshu Kartikey wrote:
->> >Two bugs exist in virtio_transport_recv_listen():
->>
->> Two bugs, two fixes, two patches usually.
->>
->> >
->> >1. On the transport assignment error path, sk_acceptq_added() is called
->> >   but sk_acceptq_removed() is never called when vsock_assign_transport()
->> >   fails or assigns a different transport than expected. This causes the
->> >   parent listener's accept backlog counter to be permanently inflated,
->> >   eventually causing sk_acceptq_is_full() to reject legitimate incoming
->> >   connections.
->>
->> Wait, I can't see this issue. sk_acceptq_added() is called after the
->> vsock_assign_transport(), so why we should call sk_acceptq_removed()
->> in the error path of vsock_assign_transport()?
->>
->> Maybe I'm missing something.
->>
->> >
->> >2. There is a race between __vsock_release() and vsock_enqueue_accept().
->> >   __vsock_release() sets sk->sk_shutdown to SHUTDOWN_MASK and flushes
->> >   the accept queue under the parent socket lock. However,
->> >   virtio_transport_recv_listen() checks sk_shutdown and subsequently
->> >   calls vsock_enqueue_accept() without holding the parent socket lock.
->>
->> Are you sure about this?
->>
->> virtio_transport_recv_listen() is called only by
->> virtio_transport_recv_pkt() after calling lock_sock(sk), so I'm really
->> confused.
->>
->> >   This means a child socket can be enqueued after __vsock_release() has
->> >   already flushed the queue, causing the child socket and its associated
->> >   resources to leak
->> >   permanently. The existing comment in the code hints at this race but
->> >   the fix was never implemented.
->>
->> Are you referring to:
->>         /* __vsock_release() might have already flushed accept_queue.
->>          * Subsequent enqueues would lead to a memory leak.
->>          */
->>         if (sk->sk_shutdown == SHUTDOWN_MASK) {
->>                 virtio_transport_reset_no_sock(t, skb, sock_net(sk));
->>                 return -ESHUTDOWN;
->>         }
->>
->> In this case I think we are saying that we are doing this check exactly
->> to avoid that issue.
->>
->> >
->> >Fix both issues: add sk_acceptq_removed() on the transport error path,
->>
->> Again, better to fix the 2 issues with 2 patches (same series is fine).
->>
->> >and re-check sk->sk_shutdown under the parent socket lock before calling
->> >vsock_enqueue_accept() to close the race window. The child socket lock
->> >is released before acquiring the parent socket lock to maintain correct
->> >lock ordering (parent before child).
->> >
->>
->> We are missing the Fixes tag, and I think we can target the `net` tree
->> with this patch (i.e. [PATCH net]), see:
->> https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
->>
->> >Reported-by: syzbot+1b2c9c4a0f8708082678@syzkaller.appspotmail.com
->> >Closes: https://syzkaller.appspot.com/bug?extid=1b2c9c4a0f8708082678
->> >Tested-by: syzbot+1b2c9c4a0f8708082678@syzkaller.appspotmail.com
->> >Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
->> >---
->> > net/vmw_vsock/virtio_transport_common.c | 13 +++++++++++--
->> > 1 file changed, 11 insertions(+), 2 deletions(-)
->> >
->> >diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->> >index 416d533f493d..fad5fa4a4296 100644
->> >--- a/net/vmw_vsock/virtio_transport_common.c
->> >+++ b/net/vmw_vsock/virtio_transport_common.c
->> >@@ -1578,6 +1578,7 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
->> >        */
->> >       if (ret || vchild->transport != &t->transport) {
->> >               release_sock(child);
->> >+              sk_acceptq_removed(sk);
->>
->> Ditto, are we sure about this?
->>
->> >               virtio_transport_reset_no_sock(t, skb, sock_net(sk));
->> >               sock_put(child);
->> >               return ret;
->> >@@ -1588,11 +1589,19 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
->> >               child->sk_write_space(child);
->> >
->> >       vsock_insert_connected(vchild);
->> >+      release_sock(child);
->> >+      lock_sock(sk);
->>
->> IMO this is a deadlock with the lock_sock(sk) called by the caller.
->>
->> Also a comment would be helpful here to explain why we're doing this.
->>
->> >+      if (sk->sk_shutdown == SHUTDOWN_MASK) {
->> >+              release_sock(sk);
->> >+              sk_acceptq_removed(sk);
->> >+              virtio_transport_reset_no_sock(t, skb, sock_net(sk));
->> >+              sock_put(child);
->> >+              return -ESHUTDOWN;
->>
->> Since this is very similar to the error path of
->> vsock_assign_transport(), I think it would be better to start by
->> defining a common error path for the function and use labels to exit, so
->> we can avoid duplicating the code multiple times.
->>
->> >+      }
->> >       vsock_enqueue_accept(sk, child);
->> >+      release_sock(sk);
->> >       virtio_transport_send_response(vchild, skb);
->> >
->> >-      release_sock(child);
->> >-
->>
->> TBH I'm really worried about this patch since both fixes are completely
->> wrong IMO.
->>
->> Thanks,
->> Stefano
->>
->> >       sk->sk_data_ready(sk);
->> >       return 0;
->> > }
->> >--
->> >2.43.0
->> >
->>
->
->
->Hi Stefano,
->
->Thank you for the detailed review!
->
->You are correct on both points. I apologize for the confusion — I was
->looking at an older version of the code where sk_acceptq_added() was
->called BEFORE vsock_assign_transport(), which made the
->sk_acceptq_removed() fix appear necessary. In the current kernel,
->sk_acceptq_added() is already moved to after vsock_assign_transport(),
->so that issue no longer exists.
->
->Regarding the lock_sock(sk) fix — you are also correct that
->virtio_transport_recv_pkt() already holds lock_sock(sk) before calling
->virtio_transport_recv_listen(), so our second fix would indeed cause a
->deadlock. I missed that completely.
->
->I am still investigating the root cause of the memory leak reported by
->syzbot. The backtrace points to the vsock loopback path
->(vsock_loopback_work), so I am looking there next. I will send a v2
->once I have a correct analysis and fix.
 
-Okay, thanks for looking into that issue, feel free to chat here, or in 
-reply to the syzbot report if you have some new findings.
 
-Thanks,
-Stefano
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Larysa Zaremba
+> Sent: Tuesday, April 28, 2026 10:27 AM
+> To: intel-wired-lan@lists.osuosl.org; Nguyen, Anthony L
+> <anthony.l.nguyen@intel.com>
+> Cc: Lobakin, Aleksander <aleksander.lobakin@intel.com>; Samudrala,
+> Sridhar <sridhar.samudrala@intel.com>; Michal Swiatkowski
+> <michal.swiatkowski@linux.intel.com>; Zaremba, Larysa
+> <larysa.zaremba@intel.com>; Fijalkowski, Maciej
+> <maciej.fijalkowski@intel.com>; Tantilov, Emil S
+> <emil.s.tantilov@intel.com>; Chittim, Madhu <madhu.chittim@intel.com>;
+> Hay, Joshua A <joshua.a.hay@intel.com>; Keller, Jacob E
+> <jacob.e.keller@intel.com>; Shanmugam, Jayaprakash
+> <jayaprakash.shanmugam@intel.com>; Jiri Pirko <jiri@resnulli.us>;
+> David S. Miller <davem@davemloft.net>; Eric Dumazet
+> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
+> <pabeni@redhat.com>; Simon Horman <horms@kernel.org>; Jonathan Corbet
+> <corbet@lwn.net>; Richard Cochran <richardcochran@gmail.com>; Kitszel,
+> Przemyslaw <przemyslaw.kitszel@intel.com>; Andrew Lunn
+> <andrew+netdev@lunn.ch>; netdev@vger.kernel.org; linux-
+> doc@vger.kernel.org; linux-kernel@vger.kernel.org; Salin, Samuel
+> <samuel.salin@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-next v7 07/14] idpf: refactor
+> idpf to use libie_pci APIs
+>=20
+> From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+>=20
+> Use libie_pci init and MMIO APIs where possible, struct idpf_hw cannot
+> be deleted for now as it also houses control queues that will be
+> refactored later. Use libie_cp header for libie_ctlq_ctx that contains
+> mmio info from the start in order to not increase the diff later.
+>=20
+> Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
+> Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
+> Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+> Co-developed-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> Tested-by: Samuel Salin <Samuel.salin@intel.com>
+> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+> ---
+>  drivers/net/ethernet/intel/idpf/Kconfig       |   1 +
+>  drivers/net/ethernet/intel/idpf/idpf.h        |  70 +-------
+>  .../net/ethernet/intel/idpf/idpf_controlq.c   |  26 ++-
+>  .../net/ethernet/intel/idpf/idpf_controlq.h   |   2 -
+>  drivers/net/ethernet/intel/idpf/idpf_dev.c    |  61 ++++---
+>  drivers/net/ethernet/intel/idpf/idpf_idc.c    |  38 ++--
+>  drivers/net/ethernet/intel/idpf/idpf_lib.c    |   7 +-
+>  drivers/net/ethernet/intel/idpf/idpf_main.c   | 114 ++++++------
+>  drivers/net/ethernet/intel/idpf/idpf_vf_dev.c |  57 +++---
+>  .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 169 +++++++++--------
+> -
+>  .../ethernet/intel/idpf/idpf_virtchnl_ptp.c   |  58 +++---
+>  11 files changed, 288 insertions(+), 315 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/idpf/Kconfig
+> b/drivers/net/ethernet/intel/idpf/Kconfig
+> index adab2154125b..586df3a4afe9 100644
+> --- a/drivers/net/ethernet/intel/idpf/Kconfig
+> +++ b/drivers/net/ethernet/intel/idpf/Kconfig
+> @@ -6,6 +6,7 @@ config IDPF
+>  	depends on PCI_MSI
+>  	depends on PTP_1588_CLOCK_OPTIONAL
+>  	select DIMLIB
+
+...
+
+> >dev_ops.static_reg_info;
+> +		bool is_static =3D false;
+> +
+> +		for (uint j =3D 0; j < IDPF_MMIO_REG_NUM_STATIC; j++)
+I think you need to use here unsigned int, didn't checkpach.pl complain abo=
+ut it?
+
+
+> +			if (mr->offset =3D=3D static_regs[j].start)
+> +				is_static =3D true;
+
+...
+
+>=20
+>  	return 0;
+>  }
+> --
+> 2.47.0
 
 
