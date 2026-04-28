@@ -1,155 +1,190 @@
-Return-Path: <netdev+bounces-281753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281754-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mNNyCGuB8Gn6UAEAu9opvQ
-	(envelope-from <netdev+bounces-281753-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:44:11 +0200
+	id mDbsOleI8GnuUQEAu9opvQ
+	(envelope-from <netdev+bounces-281754-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 12:13:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E740481BDC
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:44:10 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7C134825E9
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 12:13:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 03A1130C30CE
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 09:37:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8B57A315A441
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 09:39:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D4463A9D9F;
-	Tue, 28 Apr 2026 09:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C957C3D47BC;
+	Tue, 28 Apr 2026 09:39:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=unstable.cc header.i=@unstable.cc header.b="Q855GIKM"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fQZ+sdHr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C10E3A9615
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 09:36:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29E12EF653;
+	Tue, 28 Apr 2026 09:39:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777369001; cv=none; b=LbSe60BH5OhKUu/9IVJHJCOss9DOdpmuFkD8Jp6+HeCGc7Pdll7x7QsUgdjPzIqFn4Dq84iSAdFw3qvTwmKLlA3+iLEOWuXRmjz0TtdLMReWaefv2ryvPf0uaE3WpTkVK6RLViDtzLLm5oZ7oAXzSJfIfg6ZY6LT8uVpBemzzX8=
+	t=1777369171; cv=none; b=tk2jMhMJMFLzMi83k6fp/ispo4oxQm1JGrHVtTfd86W9gpCeR2DIwPb9DtVN1c0P4SpJO154l3tQqkfo8hoHD7z3vcSPUJlG3WeuITJu8ukgN15QchClWYEFwY33J7rJkL2okSmkSMN+LejqnyQ5XNu0IS97nY8gwzMke7e6rck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777369001; c=relaxed/simple;
-	bh=VdTq7BMhAxvRxFJvh+UKpS1siHUnJe1p6mcoI/3iKGQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UAy+EjCHwtz7k+o9v8/XkFyvO5OLmyNu2bxc0KE4AqZ7WzhZkfucfoWj8NDGLm7IfjDUwK8yG2tA5SUao5dLgyjMlpEfQIUABQhzbuckBALU8aIhM369RRaWJ/fqarxpGDArE7S4q3nRWJgIV5qiYA5H9TxGxDnR5YViJTV9bJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unstable.cc; spf=pass smtp.mailfrom=unstable.cc; dkim=pass (2048-bit key) header.d=unstable.cc header.i=@unstable.cc header.b=Q855GIKM; arc=none smtp.client-ip=80.241.56.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unstable.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unstable.cc
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4g4b0q3jFyz9vRT;
-	Tue, 28 Apr 2026 11:36:27 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unstable.cc; s=MBO0001;
-	t=1777368987;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=23/XY4dp+qH/wtxbXh6d/rrGCv8XMFb6m9syD0CClM8=;
-	b=Q855GIKMVKCMWJsVY57lTQN1nbuLC0TV6YmthbcEVk0mWnjGfyc4lLn2cNjWp/pO7sFAaB
-	PY8h4KQO4mMzZPqxutxCfSmdCGoqFGZZ7rTPSxsvERu4Ito7sUehsVX7cLxXKk6y2Rt1v/
-	351mBl1vKV9yyxkAQnPFj4Ne1XICoDJSEoTO4658G8AusmYIFJfJbe3xb+cw6Cq4TnpoV2
-	bgawd62fAJOXppvokIR2zTqEyQcSyYrcTotIvVC9gELzAbAVEZEWB/UL6CxsNrxjPL8jSZ
-	i4bqa11r3ccTMYehRnEbuLd9eJF7L2orxCtZTGzCeHaEzaEkM3NiV978A4Sefg==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=none;
-	spf=pass (outgoing_mbo_mout: domain of a@unstable.cc designates 2001:67c:2050:b231:465::202 as permitted sender) smtp.mailfrom=a@unstable.cc
-Message-ID: <d2074fd5-9e15-461a-8c1b-61c60879854d@unstable.cc>
-Date: Tue, 28 Apr 2026 11:36:25 +0200
+	s=arc-20240116; t=1777369171; c=relaxed/simple;
+	bh=p7IdvtVE/evm+N22/Y2mzoWyYve0mGB/apLJBPbltXs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hcg319DMARvWXMsSU6quW2AYj7pmOZZ47JDfWy8+1ZFMInM7qaLU/YCXXPtKmyEiL/izP6k26XzNq9vQLBVzL9DHvqJaoFJBm3H24Yh1buAmQQb9ge9zqV1sXxRlhiXKDq9IqnI5d5X3mnzT7e8s2ht1PCusW6VX8sYXYWldCBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=fQZ+sdHr; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=PSRhFVtT2RWFdp856Xk+KYQvTFkIYWnEyy7wWGqEW4M=; b=fQZ+sdHr/DxtXPOoTa0/PXsoq7
+	akesGkU6rpfZ8ktRkjQ7tb4j3wfiY2oC0JpAxpcj5J6QSH+4/QdbiyWoNvPOhdc3ymvaX15Tlsf6U
+	+jDrDT9XWlUxaHuLTcM6FRz60Ez8QHwalzwaPVTo1RDVxgD8UnM9wteHViwqyt1dw0Y0Z82bUVQ5G
+	LHZC0upELm//PQd4zJFQwM7yY1xBvPQOp7Z6Qxt3H5FLYzMbwmnUx+DgPPNFKttx2uYW4nflxpdsh
+	ftGz7lpw550Tda7nMjz+4g78gSeB0NfhUtv97VPsSjZsAhQvGEgVhgTCmMoVY8FxA/dRDpdIVYyGQ
+	1O7O0eKQ==;
+Received: from 2001-1c00-8d85-4b00-266e-96ff-fe07-7dcc.cable.dynamic.v6.ziggo.nl ([2001:1c00:8d85:4b00:266e:96ff:fe07:7dcc] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1wHeuJ-00000002bvc-0jGo;
+	Tue, 28 Apr 2026 09:39:07 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id A1C1C30330B; Tue, 28 Apr 2026 11:39:05 +0200 (CEST)
+Date: Tue, 28 Apr 2026 11:39:05 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Yury Norov <ynorov@nvidia.com>
+Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
+	Jonathan Cameron <jic23@kernel.org>,
+	David Lechner <dlechner@baylibre.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	David Laight <david.laight.linux@gmail.com>,
+	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
+	Andy Shevchenko <andy@kernel.org>,
+	Ping-Ke Shih <pkshih@realtek.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Hans de Goede <hansg@kernel.org>, Linus Walleij <linusw@kernel.org>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Salah Triki <salah.triki@gmail.com>,
+	Achim Gratz <Achim.Gratz@stromeko.de>,
+	Ben Collins <bcollins@watter.com>, x86@kernel.org,
+	linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org,
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+	linux-rtc@vger.kernel.org
+Subject: Re: [PATCH v2 2/9] x86/extable: switch to using FIELD_GET_SIGNED()
+Message-ID: <20260428093905.GA1026330@noisy.programming.kicks-ass.net>
+References: <20260427214127.406067-1-ynorov@nvidia.com>
+ <20260427214127.406067-3-ynorov@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [Openvpn-devel] [PATCH ovpn-net-next] ovpn: reset MAC header
- before passing skb up
-To: Qingfang Deng <qingfang.deng@linux.dev>,
- openvpn-devel@lists.sourceforge.net
-Cc: Minqiang Chen <ptpt52@gmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
- netdev@vger.kernel.org, antonio@openvpn.net
-References: <20260427040011.2107748-1-qingfang.deng@linux.dev>
- <101221c8-8e47-4fc1-9791-2ef3a0ae8312@unstable.cc>
- <501fb5d6-3247-40aa-aaa5-ce9dacb17255@linux.dev>
-Content-Language: en-US
-From: Antonio Quartulli <a@unstable.cc>
-In-Reply-To: <501fb5d6-3247-40aa-aaa5-ce9dacb17255@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 8E740481BDC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260427214127.406067-3-ynorov@nvidia.com>
+X-Rspamd-Queue-Id: E7C134825E9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[unstable.cc:s=MBO0001];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=desiato.20200630];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-281754-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,alien8.de,linux.intel.com,zytor.com,baylibre.com,sipsolutions.net,gmail.com,analog.com,realtek.com,lunn.ch,davemloft.net,google.com,bootlin.com,rasmusvillemoes.dk,stromeko.de,watter.com,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[unstable.cc];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281753-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[35];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,queasysnail.net,vger.kernel.org,openvpn.net];
+	DKIM_TRACE(0.00)[infradead.org:+];
 	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[peterz@infradead.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[a@unstable.cc,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[unstable.cc:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,nvidia.com:email,infradead.org:dkim,infradead.org:email,noisy.programming.kicks-ass.net:mid]
 
-Hi,
-
-On 28/04/2026 04:08, Qingfang Deng wrote:
-> Hi,
+On Mon, Apr 27, 2026 at 05:41:19PM -0400, Yury Norov wrote:
+> The EX_DATA register is laid out such that EX_DATA_IMM occupied MSB.
+> It's done to make sure that FIELD_GET() will sign-extend the IMM
+> field during extraction.
 > 
-> On 2026/4/27 17:45, Antonio Quartulli wrote:
->> Hi Qingfang,
->>
->> thanks for the patch!
->>
->> On 27/04/2026 06:00, Qingfang Deng wrote:
->>> After decapsulating a packet, the skb->mac_header still points to the
->>> outer transport header. Call skb_reset_mac_header() in
->>> ovpn_netdev_write() to ensure the MAC header points to the beginning of
->>> the inner IP packet.
->>
->> May you elaborate on what this is exactly fixing?
->> Did you encounter a bug triggered by this missing line?
->>
->> I am asking because I wonder what is "expected" as MAC header for a 
->> packet not having one at all (packets delivered to the ovpn interface 
->> are L3 only, as per the interface type itself).
+> To enforce that, all EX_DATA masks are made signed integers. This
+> works, but relies on the particular implementation of FIELD_GET(),
+> i.e. masking then shifting, not vice versa; and the particular
+> placement of the fields in the register.
 > 
-> For L3-only devices, the net core expects skb->mac_header == skb- 
->  >network_header.
+> Switch to using the dedicated FIELD_GET_SIGNED(), and relax those
+> limitations.
 > 
-> For example, in __netif_receive_skb_core(), skb_reset_mac_len() sets 
-> skb->mac_len to (skb->network_header - skb->mac_header).
-> If skb->mac_header still has a stale value, this will incorrectly assign 
-> a non-zero value to skb->mac_len.
+> Signed-off-by: Yury Norov <ynorov@nvidia.com>
+
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+
+> ---
+>  arch/x86/include/asm/extable_fixup_types.h | 13 ++++---------
+>  arch/x86/mm/extable.c                      |  2 +-
+>  2 files changed, 5 insertions(+), 10 deletions(-)
 > 
-> Also, if generic XDP or SOCK_PACKET is used, either will do
->    skb_push(skb, skb->data - skb_mac_header(skb));
-
-Thanks a lot! This makes sense!
-
-I'm applying the patch to my tree.
-
-Regards,
-
-
--- 
-Antonio Quartulli
-
+> diff --git a/arch/x86/include/asm/extable_fixup_types.h b/arch/x86/include/asm/extable_fixup_types.h
+> index 906b0d5541e8..fd0cfb472103 100644
+> --- a/arch/x86/include/asm/extable_fixup_types.h
+> +++ b/arch/x86/include/asm/extable_fixup_types.h
+> @@ -2,15 +2,10 @@
+>  #ifndef _ASM_X86_EXTABLE_FIXUP_TYPES_H
+>  #define _ASM_X86_EXTABLE_FIXUP_TYPES_H
+>  
+> -/*
+> - * Our IMM is signed, as such it must live at the top end of the word. Also,
+> - * since C99 hex constants are of ambiguous type, force cast the mask to 'int'
+> - * so that FIELD_GET() will DTRT and sign extend the value when it extracts it.
+> - */
+> -#define EX_DATA_TYPE_MASK		((int)0x000000FF)
+> -#define EX_DATA_REG_MASK		((int)0x00000F00)
+> -#define EX_DATA_FLAG_MASK		((int)0x0000F000)
+> -#define EX_DATA_IMM_MASK		((int)0xFFFF0000)
+> +#define EX_DATA_TYPE_MASK		(0x000000FF)
+> +#define EX_DATA_REG_MASK		(0x00000F00)
+> +#define EX_DATA_FLAG_MASK		(0x0000F000)
+> +#define EX_DATA_IMM_MASK		(0xFFFF0000)
+>  
+>  #define EX_DATA_REG_SHIFT		8
+>  #define EX_DATA_FLAG_SHIFT		12
+> diff --git a/arch/x86/mm/extable.c b/arch/x86/mm/extable.c
+> index 6b9ff1c6cafa..ceb8d03191ab 100644
+> --- a/arch/x86/mm/extable.c
+> +++ b/arch/x86/mm/extable.c
+> @@ -322,7 +322,7 @@ int fixup_exception(struct pt_regs *regs, int trapnr, unsigned long error_code,
+>  
+>  	type = FIELD_GET(EX_DATA_TYPE_MASK, e->data);
+>  	reg  = FIELD_GET(EX_DATA_REG_MASK,  e->data);
+> -	imm  = FIELD_GET(EX_DATA_IMM_MASK,  e->data);
+> +	imm  = FIELD_GET_SIGNED(EX_DATA_IMM_MASK, e->data);
+>  
+>  	switch (type) {
+>  	case EX_TYPE_DEFAULT:
+> -- 
+> 2.51.0
+> 
 
