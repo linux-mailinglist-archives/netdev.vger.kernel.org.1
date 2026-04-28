@@ -1,133 +1,163 @@
-Return-Path: <netdev+bounces-281944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281945-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KCQ4CPHe8GmLagEAu9opvQ
-	(envelope-from <netdev+bounces-281944-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:23:13 +0200
+	id 6N0iFynS8GnDYwEAu9opvQ
+	(envelope-from <netdev+bounces-281945-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:28:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E06B488CBE
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:23:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DE5D487D54
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:28:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EFF1330E2646
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 15:13:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8D35430ECC5F
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 15:18:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 648E5426D25;
-	Tue, 28 Apr 2026 15:13:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EBA039FCB4;
+	Tue, 28 Apr 2026 15:18:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lwScEoKi"
+	dkim=pass (2048-bit key) header.d=cisco.com header.i=@cisco.com header.b="HqRy3DiL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from alln-iport-1.cisco.com (alln-iport-1.cisco.com [173.37.142.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 079BB38F251;
-	Tue, 28 Apr 2026 15:13:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B553793D0
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 15:18:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.142.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777389197; cv=none; b=larOQGcic7701EpiNHM4JkCIBcAFY2/5qc9cVUU6P+C6WXExMJThoPtGE62pt1vpeNOfb8z1b3j4iQrc9PbsFtBHclrTDhG8vkPUc/dHLpXGbJu3B9V3Vo2F7BhxhJfjzv47PCW3qvMJjqvKrhx2k0qcj4YXw2O70NIv7zdvbzc=
+	t=1777389486; cv=none; b=SxonLmPFbNjYo9Uh1rEiDnzK3ajEwZEzTj2A0wJ+0o4cQUwVMNZH9o6/68KUvu6j+6rdy3Cl9I3XxuV+Q47tkC4WTvlomw5VKywI/z1Lpi88C7kKYrwCT6Cv5YlEmqjTyHRi8I4ko79JQSbq+VydoQD1Ldwl9tTjenKr9o9FjZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777389197; c=relaxed/simple;
-	bh=6fFHNJC7+5kKW56ZhJcKHcNKRLt3YELgG+gR/jUoZxQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hz/I25mZOM2pobdT2YyFiuEFva72HBcvKw8Ey9RMyKspDs8AYj32p5xJ9aqXJRi9Q37UyOKtIMHDmNZ5Y86NjPziLdX0Gai6nklZzXGxMhaSSgvnP9pT4O0zCQQ2ZkSr+6gTlnn1nOmJJ2jNEjJNxRuN2w71vEzFc2AyhxCR3c8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lwScEoKi; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777389196; x=1808925196;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=6fFHNJC7+5kKW56ZhJcKHcNKRLt3YELgG+gR/jUoZxQ=;
-  b=lwScEoKiFvfAWz55lUcwFi4bp9w371mp0t5LRMbUDfU0O9eOOk6ocsEx
-   1GmVlc6BmJxS3BD4KNCwML4u0rrAIOoHaFWHmI3P3KV9aCFOz9zT7sBS3
-   xrbh+d5lIjWeM+CS1Wt3UysrTUAMJRbImTx5gSJ1DpawXGfdZEYazvqCy
-   wqTV717+11LhgqC8OZPGpoG4NsMViByRDSaKPS6ktuvwphdb7vI7pmehm
-   eR1ZQtfOE8IIEo6msJSxZoT/4zK03DkXmYSv5aow3OZe2QGCinwvpPO4O
-   ZIuM9C+7k0S3fNHq+7ZBw2pvSoAJbukPuY+hXgLplUTX7u0ryrVQ+n7/a
+	s=arc-20240116; t=1777389486; c=relaxed/simple;
+	bh=S5929zWErGM/tIRNdkb61VAXR1zUXL05Jyyv0rDozQE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nhWkeRIhyPnFFmX7ygTF5irIsOraOhutn8CahVUhdsyhjLr5/5oHAzhdMdP+QuClJKTYzdV1R5x0smSAj6q2/+J+j4ltdo2Ki55Npuess2ByLJ6gWRJBYyrRZMtw2lR8LQIjS7nCaUcV71x75JVvdSj+DDZsItUx1GMIJkVQX7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (2048-bit key) header.d=cisco.com header.i=@cisco.com header.b=HqRy3DiL; arc=none smtp.client-ip=173.37.142.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=cisco.com; i=@cisco.com; l=1016; q=dns/txt;
+  s=iport01; t=1777389483; x=1778599083;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=P4gqXWoMRLYCKhdcRf8k183VKWHh2WPzSSuvO5wezUA=;
+  b=HqRy3DiLH5KtoCc2P9lTg+TOgzZ9gNeM8NuKvwNZThCy2nWpgpx0zHm4
+   7eVrOHNfOomiUH5thlboJJNIjQ3zG7vqmbmyDE3PcTAbx9fY1otojOHpT
+   El9DBNvOWA0Y+ujhWyu0t0plk7i6fUnfgKZZRopfkm9dPeuscI+pEw9Jt
+   eDIZP8kMD6IVsQ+JgAzo9VCCh/eefZ86VrH8DLT0yzXM54wHpZAj+ue5K
+   y3/9jrvfh4AqEIpchMqaD9U/C21dIzdnzM/qK7TScwNUWgFKwiYL9DEpf
+   l25qBQ3OV0/ITP3mjW4wazyHtn4F88DHLsD0u35JyzW33g7q3uC0wT5zD
    w==;
-X-CSE-ConnectionGUID: RYv6iywuQgGWB+eti7FrTw==
-X-CSE-MsgGUID: +5GL9bgDS26lfqZWW4CQ3A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11770"; a="78216045"
-X-IronPort-AV: E=Sophos;i="6.23,204,1770624000"; 
-   d="scan'208";a="78216045"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2026 08:13:16 -0700
-X-CSE-ConnectionGUID: oeIz82csT92U4pNTOoVXmQ==
-X-CSE-MsgGUID: s21mIPu1RreP3ubRGO3BYA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,204,1770624000"; 
-   d="scan'208";a="234280367"
-Received: from black.igk.intel.com ([10.91.253.5])
-  by orviesa007.jf.intel.com with ESMTP; 28 Apr 2026 08:13:13 -0700
-Received: by black.igk.intel.com (Postfix, from userid 1001)
-	id B998C95; Tue, 28 Apr 2026 17:13:11 +0200 (CEST)
-Date: Tue, 28 Apr 2026 17:13:11 +0200
-From: Mika Westerberg <mika.westerberg@linux.intel.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: linux-usb@vger.kernel.org, Yehezkel Bernat <YehezkelShB@gmail.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	Andreas Noever <andreas.noever@gmail.com>,
-	Alan Borzeszkowski <alan.borzeszkowski@linux.intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 9/9] thunderbolt: Add support for USB4STREAM
-Message-ID: <20260428151311.GU557136@black.igk.intel.com>
-References: <20260428072209.3084930-1-mika.westerberg@linux.intel.com>
- <20260428072209.3084930-10-mika.westerberg@linux.intel.com>
- <ef5411f4-0e4c-4ac1-8ae0-0d557fc0ebd2@lunn.ch>
+X-CSE-ConnectionGUID: SHw2VDxnQDuSgZ2VHigp4w==
+X-CSE-MsgGUID: oaSaAP3gTN2PNpee4c4zEQ==
+X-IPAS-Result: =?us-ascii?q?A0BpBAAgzvBp/4//Ja1aHgE8DAILgWWDSF5DSZZLnh2Bf?=
+ =?us-ascii?q?w8BAQEPRA0EAQGFBo0zAiY2Bw4BAgQBAQEBAwIDAQEBAQEBAQEBAQELAQEFA?=
+ =?us-ascii?q?QEBAgEHBYEOE4ZPDYZdNgFGKYEUgxUBgnMDEQa4L4IsgQGDYgEMD3/ZQ4FqB?=
+ =?us-ascii?q?oFNhXKHaYEPhF8nG4FJRIQOMYFDAYFbAQEBAYgiBIINFYEOggOMbUiBHgNZL?=
+ =?us-ascii?q?AFVEw0KCwcFgWYDNRIqFW4yHYEjPheBDBsHBYFLgx5taoEGhGB4IywDGwMLG?=
+ =?us-ascii?q?A1IESwUIxQbBD5uB4oTGR4Pgi+BDikCc3goApQQkXuhDoQmBYFfijqVOhozh?=
+ =?us-ascii?q?ASUFZJSmQaIc4UWllCEaIFvATSBWTMaCBsVgyIfNBkPjjiDa4JZgX/BLSEmM?=
+ =?us-ascii?q?j0CBwIHDQMLk2UBAQ?=
+IronPort-Data: A9a23:JZa9YaKBHElynN13FE+Rh5QlxSXFcZb7ZxGr2PjKsXjdYENShjwDz
+ zccDz2OPfrcZGOgf9snPYq2/UoB7MCGnNBhHVEd+CA2RRqmiyZq6fd1j6vUF3nPRiEWZBs/t
+ 63yUvGZcoZsCCSa/kvxWlTYhSEU/bmSQbbhA/LzNCl0RAt1IA8skhsLd9QR2uaEuvDnRVnW0
+ T/Oi5eHYgH9h2Qkajt8B5+r8XuDgtyj4Fv0gXRmDRx7lAe2v2UYCpsZOZawIxPQKqFIHvS3T
+ vr017qw+GXU5X8FUrtJRZ6iLyXm6paLVeS/oiI+t5qK23CulQRuukoPD8fwXG8M49m/c3+d/
+ /0W3XC4YV9B0qQhA43xWTEAe811FfUuFLMqvRFTvOTLp3AqfUcAzN1VLF5sA6EI/N9bHFpBx
+ 6YmCDECdkyc0rfeLLKTEoGAh+w5J8XteYdasXZ6wHSBU7AtQIvIROPB4towMDUY358VW62BI
+ ZBENHw2ME+ojx5nYj/7DLollfupnXn8cxVTqUmeouw85G27IAlZj+O2a4OKIYXULSlTtkGRn
+ Wvvxz/2PjdADPqHxDfZ+S6+q9aayEsXX6pXTtVU7MVCg0CZz0QQBQcQWF/9puO24ma4Vs5TJ
+ lI85CUjt+4x+VatQ927WAe3yENopTYGUNZWVul/4waXx++MvUCSB3MPSXhKb9lOWNIKeAHGH
+ 2Shx7vBbQGDepXOIZ5B3t94dQ+PBBU=
+IronPort-HdrOrdr: A9a23:O7xpl6j11sd9TUdCkisj6IzA53BQXu4ji2hC6mlwRA09TyVXra
+ yTdZMgpH3JYVkqNk3I9errBEDiewK+yXcW2+gs1N6ZNWGMhILCFu5fBOXZrgEIYxefysdtkY
+ F9bqN5FNr8SXJ+jcr8/U2ENuxI+qjjzEht7t2uqEuEimpRGsVd0zs=
+X-Talos-CUID: 9a23:Y7zguG1PpzPZ2vXEL+Hd0bxfIeA6KEPx3HHpD1KDBlQzdp2URkfM5/Yx
+X-Talos-MUID: =?us-ascii?q?9a23=3ARnNICw9cBdp0CQPn0aIsKQ2Qf8Bh2K2HMBsCrbN?=
+ =?us-ascii?q?cg++cOCEsMGuPoQ3iFw=3D=3D?=
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-AV: E=Sophos;i="6.23,204,1770595200"; 
+   d="scan'208";a="733317316"
+Received: from rcdn-l-core-06.cisco.com ([173.37.255.143])
+  by alln-iport-1.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 28 Apr 2026 15:17:56 +0000
+Received: from satishkh-l-mj0bbv6x.cisco.com (unknown [10.25.128.216])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by rcdn-l-core-06.cisco.com (Postfix) with ESMTPS id CED46180000B5;
+	Tue, 28 Apr 2026 15:17:55 +0000 (GMT)
+From: Satish Kharat <satishkh@cisco.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org,
+	satishkh@cisco.com
+Subject: Recommended local LLM-assisted review for netdev submissions?
+Date: Tue, 28 Apr 2026 08:17:55 -0700
+Message-ID: <20260428151755.1310712-1-satishkh@cisco.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ef5411f4-0e4c-4ac1-8ae0-0d557fc0ebd2@lunn.ch>
-X-Rspamd-Queue-Id: 4E06B488CBE
+Content-Transfer-Encoding: 8bit
+X-Outbound-Client-TLS: ANONYMOUS;unknown [10.25.128.216];TLSv1.3;TLS_AES_256_GCM_SHA384;256
+X-Outbound-SMTP-Client: 10.25.128.216, [10.25.128.216]
+X-Outbound-Node: rcdn-l-core-06.cisco.com
+X-Rspamd-Queue-Id: 9DE5D487D54
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MID_CONTAINS_FROM(1.00)[];
+	SUBJECT_ENDS_QUESTION(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[cisco.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[cisco.com:s=iport01];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,wunner.de,linux.intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-281944-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mika.westerberg@linux.intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281945-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[satishkh@cisco.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[cisco.com:+];
+	RCPT_COUNT_THREE(0.00)[3];
+	PRECEDENCE_BULK(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:dkim,black.igk.intel.com:mid]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,cisco.com:dkim,cisco.com:mid]
 
-On Tue, Apr 28, 2026 at 05:08:55PM +0200, Andrew Lunn wrote:
-> On Tue, Apr 28, 2026 at 09:22:09AM +0200, Mika Westerberg wrote:
-> > Introduce USB4STREAM protocol and Linux implementation. This allows two
-> > (or more) hosts to transfer data directly over Thunderbolt/USB4 cable
-> > through a character device without need to go through the network stack.
-> 
-> Is this mutually exclusive to networking, on a device?
+Hi Jakub,
 
-No - they can co-exist.
+I'm the author of the in-flight enic SR-IOV series. Before posting
+revisions I run checkpatch --strict, make W=1 C=1 on touched files,
+scripts/kernel-doc -none, and `b4 prep --check`.
+
+I've read Jesse's Netdev 0x18 talk on AI-enhanced reviews [1], the
+LWN coverage [2][3], and looked at sashiko [4]. What I haven't been
+able to tell from the public material:
+
+  - Is sashiko (or a successor) what's currently producing the
+    LLM-style review replies showing up on netdev, or is that a
+    different pipeline?
+  - For contributors who'd like to self-review with the same
+    prompt/ruleset before posting, is there a recommended setup,
+    or is sashiko-as-is the closest thing today?
+
+Happy with a one-line pointer if it's already documented somewhere
+I missed.
+
+Thanks,
+Satish
+
+[1] https://netdevconf.info/0x18/sessions/talk/ai-enhanced-reviews-for-linux-networking.html
+[2] https://lwn.net/Articles/987319/
+[3] https://lwn.net/Articles/1032612/
+[4] https://github.com/sashiko-dev/sashiko
 
