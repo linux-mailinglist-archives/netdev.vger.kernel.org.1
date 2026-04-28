@@ -1,328 +1,161 @@
-Return-Path: <netdev+bounces-281936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281937-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MJu2LTTL8GkKYwEAu9opvQ
-	(envelope-from <netdev+bounces-281936-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:59:00 +0200
+	id eJY2FX7Q8GlVZAEAu9opvQ
+	(envelope-from <netdev+bounces-281937-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:21:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 237E448775F
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:59:00 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7013487B7B
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:21:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2F81A301E6DF
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 14:55:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F01AE300A4FA
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 14:57:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E37944102B;
-	Tue, 28 Apr 2026 14:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A1E2FF65B;
+	Tue, 28 Apr 2026 14:57:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LxHi9u/j"
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AD4E429823;
-	Tue, 28 Apr 2026 14:55:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C84B32AADE
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 14:57:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777388142; cv=none; b=eYehzskjZk+jS8kUzb9033L/HviA1e86JkJiWe5AJ8JPKcylJWq6XQozHt2ciy6f09TOewNOgZPKse2f/C8A97De8dfTjxha0e66/qYDglQHxMyxqXxCNAISsr6IQJ4Tp5r1AqfOGPmompWMigwJUGqooRpzAZXOGSbzME6PkNc=
+	t=1777388272; cv=none; b=Zb4NvkcF8zO7m164MK6XjNOxO4FNDfGGs/k9u4ApSynO0qjFbvDwKBrOOyWkximBO/fyI/7zvP9iIbf4SKI5LsTCIx6lY3Ef7EVOiw4O0O/Xze3gYoOdMm8CF1SzKznZWrhS5BYWZX61hMFdNUS9Tz5pgqYbNP1RfZgnRIIQ0Y4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777388142; c=relaxed/simple;
-	bh=27Qj0L1bYq0NpLObQdRlTr5GoATPfAvr9ry0F3cAVMA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ka4qB0rDH0bWpZ2kRNEhDbK69wXXcSuGflN8NXumYd65n7l87JKh+ENmRqba/94mhWvN4qsX9sfvnojEXVBogKrp18YEe/PkS8XJK5soAjolMe82Hixu3s3aDlhNE1gQewK2BV+cNQVDl015IRDalAvO9BfUxbglP2T/XSRQIBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from [129.217.186.62] ([129.217.186.62])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.2/8.18.2) with ESMTPSA id 63SEtS0V010868
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 28 Apr 2026 16:55:28 +0200 (CEST)
-Message-ID: <40165e87-2019-4644-8c0e-4343be2df03e@tu-dortmund.de>
-Date: Tue, 28 Apr 2026 16:55:28 +0200
+	s=arc-20240116; t=1777388272; c=relaxed/simple;
+	bh=vUmBN7ysT7cMsEZ/akVA56U/xX3hVHiiL7r5zeDPk2s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aa7IsnDVy7jRJGzWFJsbApjFT17fpZ5I3i7Dus9RpD2PJVKOT7xXFN3yTabmpWwemdA3cXVgNycT3ZuqflSQ9GH/8n2/1/kOYyXUEphcZ6ux0ze4tZop0UrqObIMouKhQscLt3FqsDl6nuIHbc7/lEJmVFOv/1S05w5TP89kRWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LxHi9u/j; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2b2503753efso118731085ad.0
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 07:57:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777388270; x=1777993070; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bFUk8datTypjawkPIlOc1SYezMUIN63Uxev+tDnIiuU=;
+        b=LxHi9u/jjQybejxpq3qK09pvcP4BNVP6Yw05dcVN7u/a6nPnmfrGLZaHXOkWSLnkc7
+         2MXZACX+1edZcrMTdNSxQhwpe0I2GJ4WFvvy60bOZ3y6V2tmXVcs1z+rSJr8DGnYa7ao
+         e4jA5jsCOBZ9ZzAMFrTxn0OekyjaEwwVDmIAj5yTkpApwItYwMEn3LqWwtNggBZ9O5+G
+         Bb7uxrRdAp2UHC0/MYuTVtn9GxvI+NGKwTedhTmo2qqxmrNlonRAoaVlXioDzwfEZH3o
+         h7+FUfKFnH3Y6eReBXlf6IMia0QH23zDhFMxu/dRNOe0e8hbL2vsLLBVO2x4FfGtUISx
+         L2FA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777388270; x=1777993070;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bFUk8datTypjawkPIlOc1SYezMUIN63Uxev+tDnIiuU=;
+        b=L3lgjbBbalUxxTVcGXTStXWOzPKWQOVPME10/Yezm8rJjLMH3PZN22+y84HFkOf3gG
+         TrqJvu5ZjXRvI5hzv6SOWTH2JnNLCs1/tH33BhAEEmmuX8/Qx7CTk8tTYoz0f1rqqkq7
+         ZUvNbTm5SNfJnDExcw0IgJzsvM52GFUTDyNanvksvkaHojtdrjLQHDbFHmBCp9Yz8pWB
+         q9jYDSAErltA3mbVlJDvps/7gr7js3eHwtCQz2C8VYiuE0ZhKd9TiA/lJM/1MwehecjN
+         EPHFOoJp/l623VCRmiRwXQS2KoXbf4klybUJrMw0wqAwJJ3USdYC/X141HexO2kZdeBc
+         E/IQ==
+X-Gm-Message-State: AOJu0Yy2ODoFZAiNSvCaxI0hNwb/ZENfOS6plbZ/5SaqgCIgT88ItoFj
+	u6hQ6tLus71mQNVonpYOzz4lp+8KSS0FIVxrgyi+bvcBeGiiIpB3lHlE
+X-Gm-Gg: AeBDieuoA4w7V3nGU7AHR/adEnXxz6e+3Ugt9VysfoMnX487pV1kVs9PAq1jcY92o50
+	agvekaNqUKFSuNQYT+GBpv1QeNEPW9MulypUrEL7PptLXJxJu49erajH1iPwbmz6pz3YbBo571p
+	tHIupzTPM8r2xDARFBWYnRSdCVHfr1WDR781t/3ILJJqeUmI/paYAiIJr2OCJ5J2IcnndCK7CYP
+	vieOPA3A3UVxa4SuQzbA1K45bU2DvMhG/iSAC9z4FvH+o4j4J4afMyZASOYRQNZtw3KxUrmJCkK
+	vymbj8lzeMAMxgbxYb97ugb972+igXairLBbSfhnswB6AhLr+MSMCHOfV5ujOqTAIMRYnmklFiG
+	YBbUX8BDFau4jr1n65TFHSiq0HuqRVSy8FkVS6KZgBnNxT64FJXVMpftfxt//yPp4NUwCJ8xG/t
+	6GfDpxMQsJfffD4TRadGUTLmKaVv5DMkOv2jRhnM+C
+X-Received: by 2002:a17:902:da81:b0:2b0:62dd:3a80 with SMTP id d9443c01a7336-2b97c4396e6mr39454135ad.17.1777388270383;
+        Tue, 28 Apr 2026 07:57:50 -0700 (PDT)
+Received: from lmao.. ([2405:201:2c:5868:93f1:2c21:e056:f551])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b97aa7b858sm28796665ad.8.2026.04.28.07.57.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Apr 2026 07:57:50 -0700 (PDT)
+From: Manas <ghandatmanas@gmail.com>
+To: jhs@mojatatu.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	rakshitawasthi17@gmail.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Manas <ghandatmanas@gmail.com>
+Subject: [PATCH] net/sched: sch_dualpi2: Add missing skb check
+Date: Tue, 28 Apr 2026 20:27:30 +0530
+Message-ID: <20260428145730.26375-1-ghandatmanas@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 4/4] tun/tap & vhost-net: avoid ptr_ring
- tail-drop when a qdisc is present
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
-        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
-        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux.dev
-References: <20260428123859.19578-1-simon.schippers@tu-dortmund.de>
- <20260428123859.19578-5-simon.schippers@tu-dortmund.de>
- <20260428084851-mutt-send-email-mst@kernel.org>
- <cdc3cbc8-cf6a-437c-b34c-dd8ced65d7f8@tu-dortmund.de>
- <20260428092150-mutt-send-email-mst@kernel.org>
- <d00bea39-7748-46ad-9c31-27326041f03c@tu-dortmund.de>
- <20260428100731-mutt-send-email-mst@kernel.org>
- <f4274173-23ef-43c3-aab4-b64678b440ec@tu-dortmund.de>
- <20260428103108-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <20260428103108-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 237E448775F
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: B7013487B7B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[tu-dortmund.de : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281936-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_CC(0.00)[gmail.com,redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_SPAM(0.00)[0.843];
-	R_DKIM_NA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281937-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[mojatatu.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[ghandatmanas@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tu-dortmund.de:mid,tu-dortmund.de:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-On 4/28/26 16:32, Michael S. Tsirkin wrote:
-> On Tue, Apr 28, 2026 at 04:18:54PM +0200, Simon Schippers wrote:
->> On 4/28/26 16:10, Michael S. Tsirkin wrote:
->>> On Tue, Apr 28, 2026 at 03:41:20PM +0200, Simon Schippers wrote:
->>>> On 4/28/26 15:22, Michael S. Tsirkin wrote:
->>>>> On Tue, Apr 28, 2026 at 03:10:44PM +0200, Simon Schippers wrote:
->>>>>> On 4/28/26 14:50, Michael S. Tsirkin wrote:
->>>>>>> On Tue, Apr 28, 2026 at 02:38:59PM +0200, Simon Schippers wrote:
->>>>>>>> This commit prevents tail-drop when a qdisc is present and the ptr_ring
->>>>>>>> becomes full. Once an entry is successfully produced and the ptr_ring
->>>>>>>> reaches capacity, the netdev queue is stopped instead of dropping
->>>>>>>> subsequent packets.
->>>>>>>>
->>>>>>>> If producing an entry fails anyways due to a race, tun_net_xmit returns
->>>>>>>> NETDEV_TX_BUSY, again avoiding a drop. Such races are expected because
->>>>>>>> LLTX is enabled and the transmit path operates without the usual locking.
->>>>>>>>
->>>>>>>> If no qdisc is present, the previous tail-drop behavior is preserved.
->>>>>>>>
->>>>>>>> The existing __tun_wake_queue() function of the consumer races with the
->>>>>>>> producer for waking/stopping the netdev queue: the consumer may drain
->>>>>>>> the ring just as the producer stops the queue, leading to a permanent
->>>>>>>> stall. To avoid this, the producer re-checks the ring after stopping
->>>>>>>> and wakes the queue itself if space was just made. An
->>>>>>>> smp_mb__after_atomic() is required so the re-peek of the ring sees any
->>>>>>>> drain that the consumer performed.
->>>>>>>> smp_mb__after_atomic() pairs with the test_and_clear_bit() inside of
->>>>>>>> netif_wake_subqueue():
->>>>>>>>
->>>>>>>> Consumer CPU                  Producer CPU
->>>>>>>> ========================      =========================
->>>>>>>> __ptr_ring_consume()
->>>>>>>> netif_wake_subqueue()         netif_tx_stop_queue()
->>>>>>>>           /\                  smp_mb__after_atomic()
->>>>>>>>           ||                  __ptr_ring_produce_peek()
->>>>>>>> contains RMW operation
->>>>>>>>  test_and_clear_bit()
->>>>>>>>           /\
->>>>>>>>           ||
->>>>>>>>  "Fully ordered RMW:
->>>>>>>> smp_mb() before + after"
->>>>>>>>     - atomic_t.txt
->>>>>>>>
->>>>>>>> Benchmarks:
->>>>>>>> The benchmarks show a slight regression in raw transmission performance,
->>>>>>>> though no packets are lost anymore.
->>>>>>>
->>>>>>> Could you include the packets received as well?
->>>>>>> To demonstrate the gains/lack of loss. 
->>>>>>>
->>>>>>
->>>>>> Do you mean the number of packets received by the VM?
->>>>>> They should just be the same as the number sent (shown below), right?
->>>>>
->>>>> Minus the loss? Which this is about, right?
->>>>
->>>> Yes. I simply calculated "Lost/s":
->>>>
->>>> elapsed_time = 100e6 / sent_pps
->>>> Lost/s = total_errors / elapsed_time
->>>>
->>>>
->>>> To get back total_errors for example for TAP
->>>> 1 thread sending:
->>>>
->>>> elapsed_time = 100e6 / 1.136Mpps = 88s
->>>>
->>>> 3758 Mpps = total_errors / 88s
->>>> <=> total_errors = 331 million packets
->>>>
->>>> So, out of 431 million packets sent, 100 million were successfully
->>>> delivered and 331 million were lost.
->>>
->>> That is my issue.
->>>
->>> I kind of have trouble mapping that to the table below.
->>> For example:
->>>
->>>  | TAP        | Transmitted | 1.136 Mpps   | 1.130 Mpps     | -0.6%    |
->>>  |            +-------------+--------------+----------------+----------+
->>>  |            | Lost/s      | 3.758 Mpps   | 0 pps          |          |
->>>
->>> how can # of lost packets exceed the # of transmitted packets?
->>>
->>> Thanks!
->>
->> I just do use the sample script [1]:
->>
->> ./pktgen_sample02_multiqueue.sh -n 100000000 ...
->>
->> ... and this runs until 100_000_000 packets were sucessfully
->> transmitted, independently of the lost packets/errors.
->>
->> [1] Link: https://www.kernel.org/doc/html/latest/networking/pktgen.html#sample-scripts
-> 
-> Confused. Are you saying "transmitted" is actually "received"? And the #
-> of packets sent is Transmitted + Lost?
+A packed is dequeued using the function `dequeue_packet()` but there is
+no check to see if a packet is dequeued. The assignment is always
+considered as true resulting in null-ptr-deref
 
-Sorry for my confusing answer.
+Fixes: 8f9516daedd6 ("sched: Add enqueue/dequeue of dualpi2 qdisc")
+Reported-by: Manas <ghandatmanas@gmail.com>
+Reported-by: Rakshit Awasthi <rakshitawasthi17@gmail.com>
+Signed-off-by: Manas <ghandatmanas@gmail.com>
+---
+ net/sched/sch_dualpi2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Yes, "transmitted" in the table should be changed to "received".
-And yes, as you said, the real # transmitted then is:
-Received + Lost = 1.136 + 3.758 = 4.894 Mpps.
+diff --git a/net/sched/sch_dualpi2.c b/net/sched/sch_dualpi2.c
+index 241e6a46bd00..e360bf16d617 100644
+--- a/net/sched/sch_dualpi2.c
++++ b/net/sched/sch_dualpi2.c
+@@ -588,7 +588,7 @@ static struct sk_buff *dualpi2_qdisc_dequeue(struct Qdisc *sch)
+ 
+ 	now = ktime_get_ns();
+ 
+-	while ((skb = dequeue_packet(sch, q, &credit_change, now))) {
++	while ((skb = dequeue_packet(sch, q, &credit_change, now)) && skb) {
+ 		if (!q->drop_early && must_drop(sch, q, skb)) {
+ 			drop_and_retry(q, skb, sch, QDISC_DROP_CONGESTED);
+ 			continue;
+-- 
+2.43.0
 
-> 
->>>
->>>
->>>>>
->>>>>> I assume they would be visible as RX-DRP for TAP.
->>>>>> For TAP + vhost-net I would have to rewrite the XDP drop
->>>>>> program to count the number of dropped packets...
->>>>>> And I would have to automate it...
->>>>>>
->>>>>>>>
->>>>>>>> The previously introduced threshold to only wake after the queue stopped
->>>>>>>> and half of the ring was consumed showed to be a descent choice:
->>>>>>>> Waking the queue whenever a consume made space in the ring strongly
->>>>>>>> degrades performance for tap, while waking only when the ring is empty
->>>>>>>> is too late and also hurts throughput for tap & tap+vhost-net.
->>>>>>>> Other ratios (3/4, 7/8) showed similar results (not shown here), so
->>>>>>>> 1/2 was chosen for the sake of simplicity for both tun/tap and
->>>>>>>> tun/tap+vhost-net.
->>>>>>>>
->>>>>>>> Test setup:
->>>>>>>> AMD Ryzen 5 5600X at 4.3 GHz, 3200 MHz RAM, isolated QEMU threads;
->>>>>>>> Average over 50 runs @ 100,000,000 packets. SRSO and spectre v2
->>>>>>>> mitigations disabled.
->>>>>>>>
->>>>>>>> Note for tap+vhost-net:
->>>>>>>> XDP drop program active in VM -> ~2.5x faster, slower for tap due to
->>>>>>>> more syscalls (high utilization of entry_SYSRETQ_unsafe_stack in perf)
->>>>>>>>
->>>>>>>> +--------------------------+--------------+----------------+----------+
->>>>>>>> | 1 thread                 | Stock        | Patched with   | diff     |
->>>>>>>> | sending                  |              | fq_codel qdisc |          |
->>>>>>>> +------------+-------------+--------------+----------------+----------+
->>>>>>>> | TAP        | Transmitted | 1.136 Mpps   | 1.130 Mpps     | -0.6%    |
->>>>>>>> |            +-------------+--------------+----------------+----------+
->>>>>>>> |            | Lost/s      | 3.758 Mpps   | 0 pps          |          |
->>>>>>>> +------------+-------------+--------------+----------------+----------+
->>>>>>>> | TAP        | Transmitted | 3.858 Mpps   | 3.816 Mpps     | -1.1%    |
->>>>>>>> |            +-------------+--------------+----------------+----------+
->>>>>>>> | +vhost-net | Lost/s      | 789.8 Kpps   | 0 pps          |          |
->>>>>>>> +------------+-------------+--------------+----------------+----------+
->>>>>>>>
->>>>>>>> +--------------------------+--------------+----------------+----------+
->>>>>>>> | 2 threads                | Stock        | Patched with   | diff     |
->>>>>>>> | sending                  |              | fq_codel qdisc |          |
->>>>>>>> +------------+-------------+--------------+----------------+----------+
->>>>>>>> | TAP        | Transmitted | 1.117 Mpps   | 1.087 Mpps     | -2.7%    |
->>>>>>>> |            +-------------+--------------+----------------+----------+
->>>>>>>> |            | Lost/s      | 8.476 Mpps   | 0 pps          |          |
->>>>>>>> +------------+-------------+--------------+----------------+----------+
->>>>>>>> | TAP        | Transmitted | 3.679 Mpps   | 3.464 Mpps     | -5.8%    |
->>>>>>>> |            +-------------+--------------+----------------+----------+
->>>>>>>> | +vhost-net | Lost/s      | 5.306 Mpps   | 0 pps          |          |
->>>>>>>> +------------+-------------+--------------+----------------+----------+
->>>>>>>>
->>>>>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->>>>>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->>>>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
->>>>>>>> ---
->>>>>>>>  drivers/net/tun.c | 30 ++++++++++++++++++++++++++++--
->>>>>>>>  1 file changed, 28 insertions(+), 2 deletions(-)
->>>>>>>>
->>>>>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
->>>>>>>> index efe809597622..c2a1618cc9db 100644
->>>>>>>> --- a/drivers/net/tun.c
->>>>>>>> +++ b/drivers/net/tun.c
->>>>>>>> @@ -1011,6 +1011,8 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
->>>>>>>>  	struct netdev_queue *queue;
->>>>>>>>  	struct tun_file *tfile;
->>>>>>>>  	int len = skb->len;
->>>>>>>> +	bool qdisc_present;
->>>>>>>> +	int ret;
->>>>>>>>  
->>>>>>>>  	rcu_read_lock();
->>>>>>>>  	tfile = rcu_dereference(tun->tfiles[txq]);
->>>>>>>> @@ -1065,13 +1067,37 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
->>>>>>>>  
->>>>>>>>  	nf_reset_ct(skb);
->>>>>>>>  
->>>>>>>> -	if (ptr_ring_produce(&tfile->tx_ring, skb)) {
->>>>>>>> +	queue = netdev_get_tx_queue(dev, txq);
->>>>>>>> +	qdisc_present = !qdisc_txq_has_no_queue(queue);
->>>>>>>> +
->>>>>>>> +	spin_lock(&tfile->tx_ring.producer_lock);
->>>>>>>> +	ret = __ptr_ring_produce(&tfile->tx_ring, skb);
->>>>>>>> +	if (__ptr_ring_produce_peek(&tfile->tx_ring) && qdisc_present) {
->>>>>>>> +		netif_tx_stop_queue(queue);
->>>>>>>> +		/* Re-peek and wake if the consumer drained the ring
->>>>>>>> +		 * concurrently in a race. smp_mb__after_atomic() pairs
->>>>>>>> +		 * with the test_and_clear_bit() of netif_wake_subqueue()
->>>>>>>> +		 * in __tun_wake_queue().
->>>>>>>> +		 */
->>>>>>>> +		smp_mb__after_atomic();
->>>>>>>> +		if (!__ptr_ring_produce_peek(&tfile->tx_ring))
->>>>>>>> +			netif_tx_wake_queue(queue);
->>>>>>>> +	}
->>>>>>>> +	spin_unlock(&tfile->tx_ring.producer_lock);
->>>>>>>> +
->>>>>>>> +	if (ret) {
->>>>>>>> +		/* If a qdisc is attached to our virtual device,
->>>>>>>> +		 * returning NETDEV_TX_BUSY is allowed.
->>>>>>>> +		 */
->>>>>>>> +		if (qdisc_present) {
->>>>>>>> +			rcu_read_unlock();
->>>>>>>> +			return NETDEV_TX_BUSY;
->>>>>>>> +		}
->>>>>>>>  		drop_reason = SKB_DROP_REASON_FULL_RING;
->>>>>>>>  		goto drop;
->>>>>>>>  	}
->>>>>>>>  
->>>>>>>>  	/* dev->lltx requires to do our own update of trans_start */
->>>>>>>> -	queue = netdev_get_tx_queue(dev, txq);
->>>>>>>>  	txq_trans_cond_update(queue);
->>>>>>>>  
->>>>>>>>  	/* Notify and wake up reader process */
->>>>>>>> -- 
->>>>>>>> 2.43.0
->>>>>>>
->>>>>
->>>
-> 
 
