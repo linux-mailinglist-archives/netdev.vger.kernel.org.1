@@ -1,127 +1,158 @@
-Return-Path: <netdev+bounces-281804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281805-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UM5rGy6b8Gl3WAEAu9opvQ
-	(envelope-from <netdev+bounces-281804-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 13:34:06 +0200
+	id OGTXE0qb8Gl3WAEAu9opvQ
+	(envelope-from <netdev+bounces-281805-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 13:34:34 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E50E483D54
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 13:34:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C632B483D9A
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 13:34:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 61554305060A
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:28:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 00A553051BE2
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:28:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48DAB3FBEAA;
-	Tue, 28 Apr 2026 11:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="asPmjCR4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59DFE37F733;
+	Tue, 28 Apr 2026 11:21:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D4F3FB7EE;
-	Tue, 28 Apr 2026 11:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from gate.crashing.org (gate.crashing.org [63.228.1.57])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D44FE3E639B;
+	Tue, 28 Apr 2026 11:21:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.228.1.57
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777375248; cv=none; b=qSIfLNeMORSJIg1JNRT3rlbcIzaOQDs3EY/n1vT8+uI9NwfWBwtsAQ3PeBo/B9ucCdpIyluLUMRsN11aHDVUKYEAzOqBNKrYRDrERqpYBw7eKmmRfu1hZL9lVptVP6EoX4kejzDEq+CzQheQfDLIB8k0AmZdr4byMQSjNNRFp1Q=
+	t=1777375287; cv=none; b=rsLv5ksg+pZccawDdmqPDJtrde+qLU4mI+UjlpegBcAMMWRV+pcpyRQdnHPCcQR4zxv9unPXU9QkuPaQjm7B8GoMYylO7ATav9HNfdZZLS3ZV2quCKKN36PvemkmRjlawVOQjlR6tHRs3rWhre5HFI2q9XrRRcFu0VMUyBaPZMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777375248; c=relaxed/simple;
-	bh=KGFKAgwtRz2K/CMIbzYXDZhvuYsQPZQI/mpsU/tkeeA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=d1RtQEqzhiM7PwjTiJDekNpRF66h50+SpDs/XpVpvjzjYNnnZ5lkvDbdDNepIPuJYq3siTGCgC+PfzmT3YrmCtGbRXrq71dGRRkBPfzJ+2dT6bQn7HJ5J+NfVdtOJj5UUL7IfREOdMzD/U5CS0Vn1vnNr6iM0kKYvGfScUV5RFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=asPmjCR4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04296C2BCAF;
-	Tue, 28 Apr 2026 11:20:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777375248;
-	bh=KGFKAgwtRz2K/CMIbzYXDZhvuYsQPZQI/mpsU/tkeeA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=asPmjCR4od7z0Ai4puGIBiWoLcVJPYAFcG+t5nLLW7egn97QELviIthENLmLO8vee
-	 I8j2H1xfrCWzde4/KOnQ4NKK/lDAsw/AGDqTeq9SgMM1E2izG8jDflNkzXBe+3/0Wf
-	 0bskO84RHfmGs2qcVR5ujo3yBmcFfgVcKEQOUDqvVEFpJtV3SGcZ1Zss62XiQk+QEn
-	 6TB8TTC2DytrTPXlZ4iUi21QjyFRhMPf9pcgqfJlMjfCrwZ51caHNfeoNDoRpNbPCy
-	 YKQCDXIGK9GVVFIz5iRhi8IMI4PqdpgszjIY1KnGqJzQizkT6Q9TdIeQ5MOXxUKY7O
-	 cJlJN/4+EvL7Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02CC7393019D;
-	Tue, 28 Apr 2026 11:20:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1777375287; c=relaxed/simple;
+	bh=5DkX/L9B3d/cRrLHprvgAdk9AfWqqBG9xKTQLL8w4bk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ifTVo8zGagZ/MdjS/wuYsnorXKSpevC5JrwBnXijCGbLDkP4n0uhlrMnDm5YbFML5zbc/ed6U1ZpueaIm5J+BoI9Q68K4BirJZ1cHKBEdd09J0VmkeuTJuvVmAyjq1vl2EUPTwOpOaF/9cyCGZ3sr9duv3ZqHA/bN7RVjE4yzSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.crashing.org; spf=pass smtp.mailfrom=kernel.crashing.org; arc=none smtp.client-ip=63.228.1.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.crashing.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.crashing.org
+Received: from gate.crashing.org (localhost [127.0.0.1])
+	by gate.crashing.org (8.18.1/8.18.1/Debian-2) with ESMTP id 63SBKIxF1057213;
+	Tue, 28 Apr 2026 06:20:18 -0500
+Received: (from segher@localhost)
+	by gate.crashing.org (8.18.1/8.18.1/Submit) id 63SBKHXo1057211;
+	Tue, 28 Apr 2026 06:20:17 -0500
+X-Authentication-Warning: gate.crashing.org: segher set sender to segher@kernel.crashing.org using -f
+Date: Tue, 28 Apr 2026 06:20:17 -0500
+From: Segher Boessenkool <segher@kernel.crashing.org>
+To: Yury Norov <ynorov@nvidia.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+        "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        David Laight <david.laight.linux@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>, linux-alpha@vger.kernel.org,
+        Yury Norov <yury.norov@gmail.com>, linux-kernel@vger.kernel.org,
+        linux-snps-arc@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        dmaengine@vger.kernel.org, linux-efi@vger.kernel.org,
+        linux-fsi@lists.ozlabs.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linux-spi@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-fsdevel@vger.kernel.org,
+        ocfs2-devel@lists.linux.dev, bpf@vger.kernel.org,
+        kasan-dev@googlegroups.com, linux-mm@kvack.org,
+        linux-x25@vger.kernel.org, rust-for-linux@vger.kernel.org,
+        linux-sound@vger.kernel.org, sound-open-firmware@alsa-project.org,
+        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@vger.kernel.org,
+        linux-openrisc@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linux-sh@vger.kernel.org, linux-arch@vger.kernel.org
+Subject: Re: [RFC PATCH v1 7/9] x86: Add unsafe_copy_from_user()
+Message-ID: <afCX8WlnEFUei1y6@gate>
+References: <cover.1777306795.git.chleroy@kernel.org>
+ <0ee46bb228d97163fbdc14f2a7c52b93d8bc34ce.1777306795.git.chleroy@kernel.org>
+ <ae-j2_QirCySZD02@yury>
+ <63a4d0f6-0eb3-48cd-9f98-bf7b223b2606@kernel.org>
+ <ae-2yLWSGnfeTvh1@yury>
+ <CAHk-=wgPrLy0FR3sEWBYQuNAac1axDASYMnTuPuxEU0WytzL7w@mail.gmail.com>
+ <ae_jeJLlVWjJ4sOY@yury>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: mctp i2c: check length before marking flow
- active
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177737520480.421689.2467854297040801595.git-patchwork-notify@kernel.org>
-Date: Tue, 28 Apr 2026 11:20:04 +0000
-References: <20260423074741.201460-1-william@wkennington.com>
-In-Reply-To: <20260423074741.201460-1-william@wkennington.com>
-To: William A. Kennington III <william@wkennington.com>
-Cc: jk@codeconstruct.com.au, matt@codeconstruct.com.au, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- wsa@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-X-Rspamd-Queue-Id: 0E50E483D54
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ae_jeJLlVWjJ4sOY@yury>
+X-Rspamd-Queue-Id: C632B483D9A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281804-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[linux-foundation.org,kernel.org,gmail.com,linutronix.de,vger.kernel.org,lists.infradead.org,lists.ozlabs.org,lists.freedesktop.org,lists.linux.dev,lists.xenproject.org,googlegroups.com,kvack.org,alsa-project.org];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[crashing.org];
+	TAGGED_FROM(0.00)[bounces-281805-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
+	HAS_XAW(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[segher@kernel.crashing.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.877];
+	RCPT_COUNT_GT_50(0.00)[50];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	R_DKIM_NA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-Hello:
+Hi!
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Thu, 23 Apr 2026 00:46:52 -0700 you wrote:
-> Currently, mctp_i2c_get_tx_flow_state() is called before the packet length
-> sanity check. This function marks a new flow as active in the MCTP core.
+On Mon, Apr 27, 2026 at 06:30:16PM -0400, Yury Norov wrote:
+> On Mon, Apr 27, 2026 at 02:52:05PM -0700, Linus Torvalds wrote:
+> > On Mon, 27 Apr 2026 at 12:19, Yury Norov <ynorov@nvidia.com> wrote:
+> > >
+> > > This is what Linus said when added x86 implementation for copy_from_user()
+> > > in c512c69187197:
+> > 
+> > Note that some things have happily changed in the six+ years since...
+> > 
+> > >   That's partly because we have no current users of it, but also partly
+> > >   because the copy_from_user() case is slightly different and cannot
+> > >   efficiently be implemented in terms of a unsafe_get_user() loop (because
+> > >   gcc can't do asm goto with outputs).
+> > 
+> > now everybody can do asm goto with outputs.
+> > 
+> > Yes, it's disabled on older versions, so it's not *always* available,
+> > but all modern versions do it. And if you care about performance, you
+> > won't be using an old compiler.
 > 
-> If the sanity check fails, mctp_i2c_xmit() returns early without calling
-> mctp_i2c_lock_nest(). This results in a mismatched locking state: the
-> flow is active, but the I2C bus lock was never acquired for it.
+> The minimal GCC version is 8.1, and asm goto with outputs is supported
+> since GCC-11. That would brake the build, if we just switch to using it
+> without "CC_IS_GCC && (GCC_VERSION >= 110100)" guard.
 > 
-> [...]
+> Is it worth to maintain 2 version of the function? I don't know...
 
-Here is the summary with links:
-  - [net,v2] net: mctp i2c: check length before marking flow active
-    https://git.kernel.org/netdev/net/c/4ca07b9239bd
+GCC 11 was released five years and a day ago.  The last GCC 11 release
+(that of 11.5) is not even two years ago though (but there will be no
+more!)
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+So it would be not conservative at all to require GCC 11 as minimum now,
+some people might even call it a bit aggressive.  But in a year (or
+maybe two) the lay of the land will be rather different.
 
 
+Segher
 
