@@ -1,275 +1,195 @@
-Return-Path: <netdev+bounces-282085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282086-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SHuvKJUl8Wn4dwEAu9opvQ
-	(envelope-from <netdev+bounces-282085-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 23:24:37 +0200
+	id UIwvErgl8Wn4dwEAu9opvQ
+	(envelope-from <netdev+bounces-282086-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 23:25:12 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CDCF48C49F
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 23:24:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8041248C4A7
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 23:25:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 94970300531D
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 21:24:33 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 890D430074CB
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 21:25:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A84337B00C;
-	Tue, 28 Apr 2026 21:24:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D75383B52FE;
+	Tue, 28 Apr 2026 21:25:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="M3/cPfNF"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="e9lH51TV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f97.google.com (mail-pj1-f97.google.com [209.85.216.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11020078.outbound.protection.outlook.com [52.101.46.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B3F831E823
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 21:24:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.97
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777411472; cv=none; b=kcds9JcFUeMaUCYMmmVZakwhr7uOBPxYV+Qgw5Lo9+6Z1YqKZgeoVD5ZtWQMZJbW4Ohk1mLtEnYALz4bkVCKbQle1G+xzjdmfdWVKH5Nm3a6dPpTNbiCWLUYUzwpCueGzBGyq3mHEx7nD35Uk5cIeWjatls049Wf5MJ3QtfSg5U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777411472; c=relaxed/simple;
-	bh=9UtQJV/EaPNCkW27ERqANqV/XXm7voiuKSqVPBwhE38=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=azTaQc26F0kU7BQoJYq3ucm1azE7tgPNSD0MDfD2igdLWxnLYlMZ5klJEQ144Jlw76p6VTxKWxhCROQxEE4AED7pru6tnVmcvKyogQjEeTJcQ5Fc0EUH4+uPsDYvQa9j20HTJogfgmENsxgTeXDxCPiLdC31DBI6W/z9KXgY5EI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=M3/cPfNF; arc=none smtp.client-ip=209.85.216.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f97.google.com with SMTP id 98e67ed59e1d1-35da1af3e10so11029442a91.3
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 14:24:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777411470; x=1778016270;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vLLG/iOyKBL5v4qoBeyIwKuIHOm9UBqU8GzKiHlJvF8=;
-        b=Z+aOHHzHYolPNII6TSD4FaLPnnhxstnTfgjZUN208nV8pbtgD63wVYovNA2i2uLUOR
-         gv2aunEEaIOi9G6HZomBbalBMTc7T8mJFQ/cQh06PYJJDYsTmZmPxUYt1CW9c0XRCLG0
-         /nlF/XVkOjRbbeZ4AtYq1+T0KKe0Pp0Hpx4jpOpz/DSG6HhBPXBNh5bdhYXgLk6I8jTB
-         pe6Gi0C0TI22qP05cy/HWxIaGuKmcO8rPhkU3Ngsl4hRGd0lQTrN8Am60cShcUvTFuwj
-         hwdU8MijYmQMsuZlzc/D6lsVy2DRnGy89cq/aSYCCrBoeBVGKp4CcP5xcjywTZBCZ7U6
-         3s9w==
-X-Gm-Message-State: AOJu0YxCP2gpHT4JumblWwbcAfyw7K9WBQrix79o2Tsj1WLDh0kkF8gl
-	XbcKbPvRSTlK0EKLBU5r/R16q6qPG6NB+ghmJ75MA3joM6qB8ozazkU8PXyXiPf+RoEmZ2+1Bzk
-	kKqiawa8BtN1kUo0cWN+wu5Dm0/YQRn9AE1M2FUhY0FnlRw8cUHNcPOD4hyR75F8+woq5nD1y6b
-	twKOnmnilMX62AnHdJmbRLfHfsLn9Hhm/pYeCmoPLS+Su544Fy+PCJ++NZkU+SDpzNUxmPpSKQ/
-	G4nnHi24A==
-X-Gm-Gg: AeBDiesr+eb2tx4vEXnGsAhTE0P5aIKWPyDnUxLwgtE0F6wsmYu5EWZW1tfhK3pWlX0
-	M76bEAmKvYs1ynBpYJi2xEpVWmUYCGpD7ksQ1N/kvXdsx0rGRdJ4mAQDwWpticCC6K1pl7Pzpxl
-	YXr3dAk/uNXlQnuzuw4MYwj5TXpS83Px7KBQ5N9xU55ukX9C6oGShKA0YPp7tCnvBXVu8jnAQvW
-	NOOaLXMjns5qNySaXWhGt4JnY59OB9EJ9TpNq3oO0Qoyu3sp3SIRq+aLSVgvx6DyD8rC4P34jZd
-	RnOLx6hjZK+oggeUsPt6Nlv7uIcI1Jq8XPD+2j0CNCXEQW02O8ro2KWJcY3sbgJj0ZON8ud65Mt
-	/QQ/6Ws/x8LJZB8ghiB8QjyNOGu6BCT0OjjBAFWkb0duH6hhQCe+wwbAnaSFo1dC9Rs5LjElrpX
-	6jlIaOHoJhoOFHeA==
-X-Received: by 2002:a17:90b:3d11:b0:362:ef2e:5ff6 with SMTP id 98e67ed59e1d1-3649207ac4dmr4844682a91.27.1777411470396;
-        Tue, 28 Apr 2026 14:24:30 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com ([144.49.247.127])
-        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-364a02e54cfsm87984a91.7.2026.04.28.14.24.30
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 28 Apr 2026 14:24:30 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dl1-f71.google.com with SMTP id a92af1059eb24-12c66fdd4aeso17917607c88.0
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 14:24:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1777411468; x=1778016268; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vLLG/iOyKBL5v4qoBeyIwKuIHOm9UBqU8GzKiHlJvF8=;
-        b=M3/cPfNFo/+5lcFepQhnbHVpAkkYEaZQ7QHJsaL2dp2c8pnHpbdatfDsO9NrescTh2
-         ua0DeXLJKM7my2+yq3+MQpN2Kr8agoi1+Z+oWMFc7396beoJAYm70acBfs0frnE7brT7
-         kh5v6exEHwP2PiMRoqkItAhMo80YeUEX98ZCM=
-X-Received: by 2002:a05:7022:ec18:b0:12a:713b:8953 with SMTP id a92af1059eb24-12ddd99afaamr1828157c88.12.1777411468129;
-        Tue, 28 Apr 2026 14:24:28 -0700 (PDT)
-X-Received: by 2002:a05:7022:ec18:b0:12a:713b:8953 with SMTP id a92af1059eb24-12ddd99afaamr1828133c88.12.1777411467433;
-        Tue, 28 Apr 2026 14:24:27 -0700 (PDT)
-Received: from stbsdo-bld-1.sdg.broadcom.net ([192.19.161.248])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12de3216e81sm159506c88.4.2026.04.28.14.24.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Apr 2026 14:24:26 -0700 (PDT)
-From: Justin Chen <justin.chen@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	linux@armlinux.org.uk,
-	hkallweit1@gmail.com,
-	andrew@lunn.ch,
-	bcm-kernel-feedback-list@broadcom.com,
-	Justin Chen <justin.chen@broadcom.com>
-Subject: [PATCH net-next] net: phy: broadcom: Save PHY counters during suspend
-Date: Tue, 28 Apr 2026 14:24:24 -0700
-Message-Id: <20260428212424.1828999-1-justin.chen@broadcom.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6A637F8DB;
+	Tue, 28 Apr 2026 21:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.78
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777411506; cv=fail; b=p43X6CtequFn/XcQ1xiQZ/FfhQ+xINCQ2b7XLNZucw8LUayQixs19IruynIUg4hX7ecHDnzEkGu+Hn2cQfWxq9ou6o50tUNiTv+ARBXJY7e6Sy7MZnZzdswoOCU1BFFPn9vDX0EQtmSwkPBTL8PkC6jwuklC70ONGeJgjyRGEnY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777411506; c=relaxed/simple;
+	bh=wTQqV1cKlFSGaBtUj7EpjXCDCIT/6OzAwV/1n8q1BAM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=jeQuAND4qy8EShutXwu88/y7gqedbGo7ybazOLj6O/iOOn5EwoUiPR5LEHhBl4djqqv+xGDTsaHbrlUam3sGoxtrM9aM5sBiSxhwj0N1Z0EkYyYv8lw2yBsNoRPd3ZDm++W7h5dMwQXt+inwrNTwClVHyqXB7YoiVjosQAJHCYs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=e9lH51TV; arc=fail smtp.client-ip=52.101.46.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Sc2iVxNCMoxVieDu9sAnklh2ykH/XfeUu6DsJ/z/zpiYEKHfVxHW3rp7JUwZlRfGon3ARXwZr0NkeF/w6NtjuONvJOjubtj22Be8hHhMOevh13CJyhF8x12UapAeD9EtvuBVSFN0PaXQqOG6LE+QanC18kVyI4ZC8igu9cbX5EYty64PXJcYkZB76Mmd9ICo+1Segsffts2xMZ9K/RAYtZ91n6Bx3Yi5HNHMlZCXsOpfvNhHUcTzRkJg31Cv4134GV2jsJdX2KQW84UIWVTovVL1vrXuXYGiPNrYsuH/Ie0B1r7+p+OCPDFsxATdyJSXgYjh/dUnHHKtuvKnK8Un2g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wTQqV1cKlFSGaBtUj7EpjXCDCIT/6OzAwV/1n8q1BAM=;
+ b=kMlsZvPR/zhD7WgDvw+3P4qoUpTUKPQMz4I4PQamIxg6HiaPn0owu2YaFlRYOWYOtxm7fbJo331IP3Slqg4O/YiuXg3HqYtgpRdX+cMa6mv43tM7Gyg0b5ShtUGDMrcqZ0GWkyR3LeHvCNchl0HSIWReT98JTF1cMSkQ8KwkFMI/ugfg8PYkCFVjVk20KojuzHl3w36+0oVLL1cRA1GKv5UafNpKRZpEvR/iEBfCshZCpBPD6AqWdbe3Nxfep+M7nbgU9bNNJ7pdfP4QQ3QCixcT7076ocfJiA+ywNxe38ttPU7vxWVSLsQD5hRbYGpDesD9dc0P1ze9GDVhLC3Lxw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wTQqV1cKlFSGaBtUj7EpjXCDCIT/6OzAwV/1n8q1BAM=;
+ b=e9lH51TVGRC6AVfIXPKmKURBDY9MPZpMx1h1JSoUdF0PV3/wG44BWeTcOArD8TWoRbkNbFUnhTYydsnX6z9TXgHGLzi2LqTP4JMnlzmLOV8KD8cOv31GNEZ0FMpbyoi8D7kfj+2EipovFQQqsk6070XTWuZMsIRb2REnsWWwGAU=
+Received: from SA1PR21MB6921.namprd21.prod.outlook.com (2603:10b6:806:4a7::11)
+ by SA1PR21MB6608.namprd21.prod.outlook.com (2603:10b6:806:4aa::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.3; Tue, 28 Apr
+ 2026 21:24:59 +0000
+Received: from SA1PR21MB6921.namprd21.prod.outlook.com
+ ([fe80::51cf:497c:e5df:f6d]) by SA1PR21MB6921.namprd21.prod.outlook.com
+ ([fe80::51cf:497c:e5df:f6d%2]) with mapi id 15.20.9870.013; Tue, 28 Apr 2026
+ 21:24:59 +0000
+From: Dexuan Cui <DECUI@microsoft.com>
+To: Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: KY Srinivasan <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Long Li <longli@microsoft.com>, Stefano
+ Garzarella <sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Michael Kelley
+	<mhklinux@outlook.com>, Himadri Pandya <himadrispandya@gmail.com>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] hv_sock: fix ARM64 support
+Thread-Topic: [PATCH] hv_sock: fix ARM64 support
+Thread-Index: AQHc1w4VcMw9r4DcdUu19JrBvAZyHbX0+55A
+Date: Tue, 28 Apr 2026 21:24:59 +0000
+Message-ID:
+ <SA1PR21MB69211500C7F60FC29F1BAA79BF372@SA1PR21MB6921.namprd21.prod.outlook.com>
+References: <20260428125339.13963-1-hamzamahfooz@linux.microsoft.com>
+In-Reply-To: <20260428125339.13963-1-hamzamahfooz@linux.microsoft.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=2abdef9e-2f78-4b65-bb68-708d7e661849;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2026-04-28T21:20:40Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR21MB6921:EE_|SA1PR21MB6608:EE_
+x-ms-office365-filtering-correlation-id: 97d55ced-21dc-4318-9150-08dea56c9a2d
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|376014|7416014|18002099003|22082099003|56012099003|38070700021;
+x-microsoft-antispam-message-info:
+ QFWKgXgqzCOVwTCttl+WlPI71Iuxq3uz8XZ2P6/GbB0YRGLwqLMdVQDXT49Mqo3nl1/SJCpgrmWdmGTir/OBLcJoU79yIvXFyuQqTGumKZ6cJUbMVxA9zNNGM9ShfATOBNf2Hl+VZoWtsUcDyd6BrWZ7X2KoX0K+Cyz1XogQ85+eU9ZBR0YN1Iku+09Z6oWbcYPJZPyQ2Q+Yw7dNhrQlmBFVSAV4P6sw9mVwnd17hwMk3919BYfZgSN13maF2zd9/NG2nWlAIAKas1pEGlK8BfAphDwHap6JihfwC2tpXdWPtPWHJoG2tU2pDmOz3vuBXRFQnDk+xKZh6niF5kQsY9Dn2UeV6o3xXEBKjOMZJj8TZlxrTkMBGNClZBUJBTR3o9ySf3HFQVr+xkE/GwiaMmAFaQX02HAUlAclknfWAnSL3NIDUYGayLRUPWjGmucfcf+f/d2wR9GZnWor2lsgxoUxIaPLpSiZ/Y5PUPOmYUN+52LEZtI3JONbm0/ekZWU+WktMutUcYbxCwlRnrUhZSoQ7UUGBja5s/HuvjYakbSrHhrmqAaDmyt1NpwyKtWOmFEYVzi47CMVHnSy7Oc9wxoSEhw+JkbJMTfRSb1Ebs/ZvmZ9oYzbjApHLwImKKhf4jE2WYVC3xxa9Gzti6VeADeTuhb8oj9OuEs5SRvtJDGXZU0Q+6oVAOxkmNNxGhAzlOdiYjcu89cIVFEoA8kKZpsJrzs2DhuZgk4OsD4VounCPftElI4JyaEXUAxkEmg5guO+R3oPdwNuuORMHb5hcrOKW3UAZBj4Zv0Xlc47mjA=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR21MB6921.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(18002099003)(22082099003)(56012099003)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?6A+3TQcjNF5IXb+gI0eiO0BqS7t1z5RXyyRkhajwbiahVqLYFo0peegboER8?=
+ =?us-ascii?Q?c27j98HSxZRos2hUWh8Fj3YCrAONCeQ6T99tO9VT9L3C0r8/fB5117PPJxX/?=
+ =?us-ascii?Q?8hT1JPOIa/R6pxBSPK4rZFm+O3jSL+DNFdI8CNaU91McZ0xsr1PiIEuCbkxz?=
+ =?us-ascii?Q?jmXeQPJkc2X+y/xNX0mI9m6aDsWx2nnE+sos3+kXhP0kTeR2AFczQKoPEfLj?=
+ =?us-ascii?Q?TKUr094OtZO4SpLqlt+Mee/8Ow646NS+6/dMBRJE2G8ghz55J7KL0LdFU5SF?=
+ =?us-ascii?Q?amYH3RmR+0tkQLIndn7PpkZfCE/uVP65HV09lK3y7YS61xInn6chzeYFR/lU?=
+ =?us-ascii?Q?1LrrLnFtX44ukJGz0tXYSCDJxtMfGs1wCfitKQ/4NvPCIkfO97ZoAyxYJUb0?=
+ =?us-ascii?Q?JdinXT1tvcQ4ks0k/j8Fs7mKVQAUxRvgHXHtlC0SWtmN+u2vaDKFQ7TFFFtt?=
+ =?us-ascii?Q?zVHxxGowGZkao6fieoFEAO+QXtlAEJmGj8yHY7H+XBuWupJifly+REmikcRv?=
+ =?us-ascii?Q?LbceSRWhzzlMjosMWr/eUI3/vfbgBeo79cTp+YT4pvQ+ZnWRvwFDitP7sm99?=
+ =?us-ascii?Q?h5Sfr2zxLuuWVMupbPVpZaVtI5gux68IMfWT4bp0nj3anx3aw2KsS4FAlwxi?=
+ =?us-ascii?Q?yW3lYGAU1oKG6jlJGFmywMGmQH0OBKFQimfCqEWm4dCZmnJex2g5uPlkcxeC?=
+ =?us-ascii?Q?WMapleLPF4rToQc43wmc9AVjDRy0fY9EwStTyk09aua16PIBQMld31bNriFx?=
+ =?us-ascii?Q?cNArl1NBJshjQl4bhHAlYCmaLlKKyhM1YkHZC9aTtq75vAcsxni43B56E787?=
+ =?us-ascii?Q?P9H1aynOprrjg/Dc+BVtl+88EKyyWaq94NybsdbZkgKyXzoulNg07rzNen/A?=
+ =?us-ascii?Q?rAZ9eW/ge9pcTn+qahbuScDMwqcxnsz7A6bQ40WNS7dth5MgqqQrlgeppog9?=
+ =?us-ascii?Q?h4fyt2Qkz8l326upT2pfdaMBOwML6ykMaFI4J91pwSMeGfMZ7X/s5SkHH6qM?=
+ =?us-ascii?Q?snMUzZbOi08qL/Est84b3R1g2UwJTlpHuD5k+t4/O+y39WaJSLAZZZlvL4bf?=
+ =?us-ascii?Q?W4Jj3RWY0FIElg9VUmgqNmkSgniphbUUz/j9hLPkfOUVZZQeIoesgJajTqLl?=
+ =?us-ascii?Q?hcQDc6KDfUplUhrymweq2ROXY2AS/jUdXjbre381EmsU7lrAdZuDSalsXYpb?=
+ =?us-ascii?Q?KFHp1EWHHIL5zEvt0X4/HMu3KGHZGa/V1gjDZESuvnQm9bNhTI26jbtw21sS?=
+ =?us-ascii?Q?/HrnZ451a2IXDHGmI/iSOt1ub7IPEekLYZ7sdTeXN2Lia+5U0H2hQps9Aedg?=
+ =?us-ascii?Q?+lZErZ9kYnU9ogyUGclBGquLsHvRoVMxMpd6iMcI2cvdhKhziPeClO7boGsx?=
+ =?us-ascii?Q?2g6ubFzC7JbxYP7QidlrERg8irOIjpDkWWkPyV1svPfRV+XyHDNtVovO5IcG?=
+ =?us-ascii?Q?7K2mBP0SC57cztwL0QaVE2PNpDxoS8RBFGBf+jIJKWr00KLHPjhuSPWjGRut?=
+ =?us-ascii?Q?GRwgq0lJgcsR5+FGLNUUVWyfi8ROJfLFToJ/wT/DGU4k/0z1ODMcg7IVcy4g?=
+ =?us-ascii?Q?pmqhqll866tn6Vzgat0wKBBs4/6J+2sEno0i5cSpel2G1+7cw65YEB8HBUlA?=
+ =?us-ascii?Q?3J7imX2f2aW8POXEdCNmKzP7NllsHLwOXyBA5fZaPSYgPjzrEem6Fh3lzcqO?=
+ =?us-ascii?Q?D8oguNM9M7MUFIrmTiqGZNME34w+6OxT5cYjS9JbVZcoGpRR?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-X-Rspamd-Queue-Id: 9CDCF48C49F
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR21MB6921.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 97d55ced-21dc-4318-9150-08dea56c9a2d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Apr 2026 21:24:59.4805
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: yYvdvOBMHdpnz7xnzAd2CimSipR7gjqZ7lExdT51MX4aIhz8fjUUiAAAvQUgzzVa0P7Oe0sZbWkYKsUwpM97qA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR21MB6608
+X-Rspamd-Queue-Id: 8041248C4A7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[microsoft.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[microsoft.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,kernel.org,google.com,davemloft.net,armlinux.org.uk,gmail.com,lunn.ch,broadcom.com];
-	TAGGED_FROM(0.00)[bounces-282085-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,broadcom.com:email,broadcom.com:dkim,broadcom.com:mid];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282086-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[justin.chen@broadcom.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,redhat.com,davemloft.net,google.com,outlook.com,gmail.com,vger.kernel.org,lists.linux.dev];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[DECUI@microsoft.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[microsoft.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[SA1PR21MB6921.namprd21.prod.outlook.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-The PHY counters can be lost if the PHY is reset during suspend. We
-need to save the values into the shadow counters or the accounting
-will be incorrect over multiple suspend and resume cycles.
+> From: Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>
+> Sent: Tuesday, April 28, 2026 5:54 AM
+> Subject: [PATCH] hv_sock: fix ARM64 support
 
-Signed-off-by: Justin Chen <justin.chen@broadcom.com>
----
- drivers/net/phy/bcm-phy-lib.c |  9 +++++++++
- drivers/net/phy/bcm-phy-lib.h |  1 +
- drivers/net/phy/bcm7xxx.c     | 19 +++++++++++++++++++
- drivers/net/phy/broadcom.c    |  5 +++++
- 4 files changed, 34 insertions(+)
+Typically, for a change to net/, you'd want to add a "net" or "net-next"
+after the "PATCH", i.e.
 
-diff --git a/drivers/net/phy/bcm-phy-lib.c b/drivers/net/phy/bcm-phy-lib.c
-index 5198d66dbbc0..b64beade8dd9 100644
---- a/drivers/net/phy/bcm-phy-lib.c
-+++ b/drivers/net/phy/bcm-phy-lib.c
-@@ -563,6 +563,15 @@ void bcm_phy_get_stats(struct phy_device *phydev, u64 *shadow,
- }
- EXPORT_SYMBOL_GPL(bcm_phy_get_stats);
- 
-+void bcm_phy_update_stats_shadow(struct phy_device *phydev, u64 *shadow)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(bcm_phy_hw_stats); i++)
-+		bcm_phy_get_stat(phydev, shadow, i);
-+}
-+EXPORT_SYMBOL_GPL(bcm_phy_update_stats_shadow);
-+
- void bcm_phy_r_rc_cal_reset(struct phy_device *phydev)
- {
- 	/* Reset R_CAL/RC_CAL Engine */
-diff --git a/drivers/net/phy/bcm-phy-lib.h b/drivers/net/phy/bcm-phy-lib.h
-index bceddbc860eb..bba94ce96195 100644
---- a/drivers/net/phy/bcm-phy-lib.h
-+++ b/drivers/net/phy/bcm-phy-lib.h
-@@ -85,6 +85,7 @@ int bcm_phy_get_sset_count(struct phy_device *phydev);
- void bcm_phy_get_strings(struct phy_device *phydev, u8 *data);
- void bcm_phy_get_stats(struct phy_device *phydev, u64 *shadow,
- 		       struct ethtool_stats *stats, u64 *data);
-+void bcm_phy_update_stats_shadow(struct phy_device *phydev, u64 *shadow);
- void bcm_phy_r_rc_cal_reset(struct phy_device *phydev);
- int bcm_phy_28nm_a0b0_afe_config_init(struct phy_device *phydev);
- int bcm_phy_enable_jumbo(struct phy_device *phydev);
-diff --git a/drivers/net/phy/bcm7xxx.c b/drivers/net/phy/bcm7xxx.c
-index 00e8fa14aa77..6cfcf039494e 100644
---- a/drivers/net/phy/bcm7xxx.c
-+++ b/drivers/net/phy/bcm7xxx.c
-@@ -733,6 +733,7 @@ static int bcm7xxx_config_init(struct phy_device *phydev)
-  */
- static int bcm7xxx_suspend(struct phy_device *phydev)
- {
-+	struct bcm7xxx_phy_priv *priv = phydev->priv;
- 	int ret;
- 	static const struct bcm7xxx_regs {
- 		int reg;
-@@ -747,6 +748,10 @@ static int bcm7xxx_suspend(struct phy_device *phydev)
- 	};
- 	unsigned int i;
- 
-+	mutex_lock(&phydev->lock);
-+	bcm_phy_update_stats_shadow(phydev, priv->stats);
-+	mutex_unlock(&phydev->lock);
-+
- 	for (i = 0; i < ARRAY_SIZE(bcm7xxx_suspend_cfg); i++) {
- 		ret = phy_write(phydev,
- 				bcm7xxx_suspend_cfg[i].reg,
-@@ -807,6 +812,17 @@ static void bcm7xxx_28nm_get_phy_stats(struct phy_device *phydev,
- 	bcm_phy_get_stats(phydev, priv->stats, stats, data);
- }
- 
-+static int bcm7xxx_28nm_suspend(struct phy_device *phydev)
-+{
-+	struct bcm7xxx_phy_priv *priv = phydev->priv;
-+
-+	mutex_lock(&phydev->lock);
-+	bcm_phy_update_stats_shadow(phydev, priv->stats);
-+	mutex_unlock(&phydev->lock);
-+
-+	return genphy_suspend(phydev);
-+}
-+
- static int bcm7xxx_28nm_probe(struct phy_device *phydev)
- {
- 	struct bcm7xxx_phy_priv *priv;
-@@ -849,6 +865,7 @@ static int bcm7xxx_28nm_probe(struct phy_device *phydev)
- 	.flags		= PHY_IS_INTERNAL,				\
- 	.config_init	= bcm7xxx_28nm_config_init,			\
- 	.resume		= bcm7xxx_28nm_resume,				\
-+	.suspend	= bcm7xxx_28nm_suspend,				\
- 	.get_tunable	= bcm7xxx_28nm_get_tunable,			\
- 	.set_tunable	= bcm7xxx_28nm_set_tunable,			\
- 	.get_sset_count	= bcm_phy_get_sset_count,			\
-@@ -866,6 +883,7 @@ static int bcm7xxx_28nm_probe(struct phy_device *phydev)
- 	.flags		= PHY_IS_INTERNAL,				\
- 	.config_init	= bcm7xxx_28nm_ephy_config_init,		\
- 	.resume		= bcm7xxx_28nm_ephy_resume,			\
-+	.suspend	= bcm7xxx_28nm_suspend,				\
- 	.get_sset_count	= bcm_phy_get_sset_count,			\
- 	.get_strings	= bcm_phy_get_strings,				\
- 	.get_stats	= bcm7xxx_28nm_get_phy_stats,			\
-@@ -902,6 +920,7 @@ static int bcm7xxx_28nm_probe(struct phy_device *phydev)
- 	.config_aneg	= genphy_config_aneg,				\
- 	.read_status	= genphy_read_status,				\
- 	.resume		= bcm7xxx_16nm_ephy_resume,			\
-+	.suspend	= bcm7xxx_28nm_suspend,				\
- }
- 
- static struct phy_driver bcm7xxx_driver[] = {
-diff --git a/drivers/net/phy/broadcom.c b/drivers/net/phy/broadcom.c
-index bf0c6a04481e..d1a4edb34ad2 100644
---- a/drivers/net/phy/broadcom.c
-+++ b/drivers/net/phy/broadcom.c
-@@ -592,8 +592,13 @@ static int bcm54xx_set_wakeup_irq(struct phy_device *phydev, bool state)
- 
- static int bcm54xx_suspend(struct phy_device *phydev)
- {
-+	struct bcm54xx_phy_priv *priv = phydev->priv;
- 	int ret = 0;
- 
-+	mutex_lock(&phydev->lock);
-+	bcm_phy_update_stats_shadow(phydev, priv->stats);
-+	mutex_unlock(&phydev->lock);
-+
- 	bcm54xx_ptp_stop(phydev);
- 
- 	/* Acknowledge any Wake-on-LAN interrupt prior to suspend */
--- 
-2.34.1
+[PATCH net]=20
+or=20
+[PATCH net v2]
 
+See "Documentation/process/maintainer-netdev.rst"
 
