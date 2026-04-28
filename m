@@ -1,213 +1,200 @@
-Return-Path: <netdev+bounces-282118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282120-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KNBoF0E58Wm/egEAu9opvQ
-	(envelope-from <netdev+bounces-282118-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 00:48:33 +0200
+	id MO+RHGw48Wm/egEAu9opvQ
+	(envelope-from <netdev+bounces-282120-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 00:45:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E29E248CCE3
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 00:48:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF25548CBF6
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 00:44:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B4FCE30BA41F
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 22:43:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 248443021B25
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 22:44:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1A193A5E71;
-	Tue, 28 Apr 2026 22:42:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0D0384239;
+	Tue, 28 Apr 2026 22:44:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hGfmujBj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KtUy9M9+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-dy1-f201.google.com (mail-dy1-f201.google.com [74.125.82.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AFE73A4527
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 22:42:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069D83815F0
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 22:44:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777416149; cv=none; b=XpZwa3j9pN24hWj3ZmxFXLfJjEAish+4bLuDn7XDkZW3GIupGJoV78gWQwgzDo2i7hoMFqcJGUl5ByEMAAkt17hs+6RPVTgI/ocDqJnxcyU9S+W32VQWsc4AxYbYNWONsUWtVKgYB1LSavb8yDPOSb9v9gnzGedYzK3Cxr2+Pq4=
+	t=1777416297; cv=none; b=ahI65ByTDi2sfXDula5Me312MbEpfnzfIpKnyEoeakVPLeD0vhFGVgvl0pq1BBe0jrYBUOR9HxLjP3O/RZZVBa1bl4u3xYet5aQ1J74s4kv2xDMMLxpMYCavXrE3k1tElXKYbXwJ/a1sUBBpOjNlKA7+Pmu3QptHW8riRmxYQZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777416149; c=relaxed/simple;
-	bh=9CfxHHUrdkC2HOcb/TS/DNlnMmhpx5XoMYQJ/X3bIM4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=SGJ4+IZiw9kEyhWpk1ZfaVNfp3/NBumoRD3xFY48jhWUmG6NYAbTOFwXh01fzKC1/NHTlZdu7shouOOvkse32IMjYcplrs+lxD54C+FfzEPmUGFAPWQ1oG55OGxhSWCPib5411dirZuRANjT33+WPkx66os6qDgACStLT7FgAKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hGfmujBj; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-82f33d28c1dso6583669b3a.3
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 15:42:27 -0700 (PDT)
+	s=arc-20240116; t=1777416297; c=relaxed/simple;
+	bh=ai8QUQpe+eGBNcBYzX5wgc4QtQufT5uTE6GhpsaCC0Y=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ghit+WOszhVUGAqNfELp8CNKHU2d98/OQWQmfuW4Hd9OPuE+LJw4Pkr6jD4VoANif0V0uQHFVsWttP0UBZJDlsHjAWIizDaH/fU8ifkHFo9hXknC102ni2/S8sOX1UCoAKpoMuX/lbbH01ncmWJas1eWlvi7obqc5eGizwtafq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KtUy9M9+; arc=none smtp.client-ip=74.125.82.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com
+Received: by mail-dy1-f201.google.com with SMTP id 5a478bee46e88-2bdf6fe90a9so19318728eec.1
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 15:44:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777416146; x=1778020946; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Zt/Ht0RhxHPOrumBmtiIhgjoCgVfyyPmVo07gYfbsYg=;
-        b=hGfmujBjsi0UAKT5A5kn25OWHhAw/fm3DjX64xC4UnCz3jAyX5jh4JWEgFH5t0MzTf
-         eajqeA9H5ffJbcCpdVL6uLHgsNotDrLRYznyCJL12e/ZMN8SLF9cYh9vPLymTCcJobuo
-         mJUPdI7UU7q1xOt0hYXkf8Ru/V9n2MZWXr5NLPVkm1xHLciBqVTYLL1tnBsQqoaCKx8X
-         WgOngXUC6m7ngdctRG5Ci1gJBNUF5QV+V4rYbK7Oqxn+l3uMmC8FBPbQzTonmXB5HruU
-         7tZQcDrDh5e8xb0jLA7yjlDwr5xvc4VJAbuBV5K7lK+/ADlF2rjpF7yrQQi7r49OGhSp
-         UTyQ==
+        d=google.com; s=20251104; t=1777416295; x=1778021095; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=4TUkxWmkceVVg+Z+lQyOtJ2XfCE43FvOGg/yLxop1NU=;
+        b=KtUy9M9+B3xni5dI9gUq6zNtsKaHFeC6cQ/4AOe6tKCbZa1OrIMPu/TORV23hCT73O
+         t4N34CU8YoLuUwuv5sG8UKGA1gkGqr4wMUfN8T9fiY5ZJfZrQ918UJCzKCjeEJdfW/0A
+         Ab/LCF0AMzU1xQ01TKSmz9xhXTxyik2JZxC+CE7dvsucEb5eS13nXKHPzVXEsegOBwwM
+         HShdGQqJxsKEAinIqalGUFQZpnt/9cz489ZMZVsVRNKAyLYVEa0+hYGi1TqbS8ake+2Z
+         nEKdkJ2CDyFicx8Qkt9pxA4awa2QZTBoP4OB0FrpFTPIyNHZ3vfsPmlZErR6aXq9N03A
+         ZVBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777416146; x=1778020946;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Zt/Ht0RhxHPOrumBmtiIhgjoCgVfyyPmVo07gYfbsYg=;
-        b=VWR1SU0MyH3ovgyblxRpUbJWH2zVNG+CL94lJVffv/pl1/O3SolMi2HgoPu1FrRXDy
-         bm1PhKEZ09e7ramATLhjMYKm7Q6pSfxV/bsEnsqad9MrIL+TiZZSo5wvkjzpG85QsApg
-         1hvEOF6daVMIdqTHFl/i1WDwAZylWbFhMtZQS+tGjbhQfmq0O2gI7pwxCwi2IrIkRY5r
-         3K2J+9v2oqQ/7qqBJtUIKXdD4FgoySQpIrrq+ywt6d+6k2AmJ+3XkdEJwBpHcuZrf1xE
-         1DM8VIrCTvSLqqlP3IRArXUakQVZgGoqr4ezmt+NdO5HIaH0QqlYYwNe41rLlBWLMtJK
-         +jBw==
-X-Gm-Message-State: AOJu0Yy7ntKiya7KhyE6mMBc3Iq5qZ2NTq6Q6J6e21x7a1wyheoSUC8r
-	Q//p3LV1dv4Lk/+X6CJejy65jmTF0eGeByTTJI+NUpkGBBBjpbXT1FEz
-X-Gm-Gg: AeBDietEcAx0iZHacaOEQSIKc4XrgXLkNKbipo2+S+LukapLrcatUKo5Xsmn/hdsj/f
-	STwFECF2W+U8duiKSDad8wTmW2ja+xNYXHUhaCjcg3hM7U3RyIO5RjWkMdF8dIEss1WSd+m1zIq
-	JRtV6850g5N1XmDGNqjqurc8NhdqzQEyS9d/vrcr2/MQTj6RNu3zwZ1zpfBAGelYm9lsxZyuwqu
-	9p9ELTwFNU9aU6x1pyGbvC37mAB/AXyl82RlgbaHd/BCxIQLbgErciFwLs+p8biGgUqJREAVV4r
-	iGW9hWAirtO/AhgnwIWoPkQteAWoM2LwI6nUVsvhj4AY8GG7lVKqlyCU/U7UB8nICvRw/uIDgT5
-	7dPH/uTbC/yUnT9491FmfMSVwjvn9beVUNZUVT9rhwlgQR05X+c2KaMwWvL3X5/5G3Tr4PeJsFB
-	iijc2LUxEZAbxgyp4tKSeZk+i1RaL1Sg==
-X-Received: by 2002:aa7:88c1:0:b0:82f:1973:4b96 with SMTP id d2e1a72fcca58-834ddc14602mr5517283b3a.26.1777416146426;
-        Tue, 28 Apr 2026 15:42:26 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:70::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-834ed80f906sm96681b3a.60.2026.04.28.15.42.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Apr 2026 15:42:26 -0700 (PDT)
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Date: Tue, 28 Apr 2026 15:42:08 -0700
-Subject: [PATCH net-next 11/11] selftests: drv-net: add netkit devmem tests
+        d=1e100.net; s=20251104; t=1777416295; x=1778021095;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4TUkxWmkceVVg+Z+lQyOtJ2XfCE43FvOGg/yLxop1NU=;
+        b=A99VwAfySgkake0K998HPObm1zCJCu3M5z3I4GjXqnj36Y6sTNTnsQrUdwXWHZ4nhT
+         0NpzuaxVxBXwgIeY6YYHCWWk+59V1QKO94/UMLqXod8VhfxPniqKV7ZMx78tBEmj8JoM
+         58GJH1rQVX5Mig9nGGKxzTLJJSfAT2sMM76DeZwqnAI0MNLAqtNg7CD52CJUZEmvfVnt
+         y1Hq63rwqGqAQkF9tVpazYi6SAmT7npqL7CIweA9a+Zut8VJoYsTI5xNnnCXqPMyB+Yx
+         WxqDGP0uTAnDszk/D830+1AvQqvuBZUxPQtk+eTJo47zyu7TUmG/aDnGLpR+trkLl1KU
+         ellg==
+X-Gm-Message-State: AOJu0Ywx4hdCBaR5MBSMq9uyuBVxWN11Vxd9L5vkrcAagKQSfMgt8l/H
+	1yxrs+AkpBMIrn/badL+PRGDx/SRojOrVM2cpd1cvjun5rK7mSINsrIrXEbMGcSyyiXQGqWuH1l
+	/+tt0hfjrZTVwVxAG91O3mg==
+X-Received: from dycoh5.prod.google.com ([2002:a05:7301:da05:b0:2d8:4599:1d20])
+ (user=marcharvey job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:7301:d8f:b0:2d8:b814:29af with SMTP id 5a478bee46e88-2ed19716925mr687253eec.3.1777416294853;
+ Tue, 28 Apr 2026 15:44:54 -0700 (PDT)
+Date: Tue, 28 Apr 2026 22:44:34 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260428-tcp-dm-netkit-v1-11-719280eba4d2@meta.com>
-References: <20260428-tcp-dm-netkit-v1-0-719280eba4d2@meta.com>
-In-Reply-To: <20260428-tcp-dm-netkit-v1-0-719280eba4d2@meta.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <skhan@linuxfoundation.org>, Alex Shi <alexs@kernel.org>, 
- Yanteng Si <si.yanteng@linux.dev>, Dongliang Mu <dzm91@hust.edu.cn>, 
- Michael Chan <michael.chan@broadcom.com>, 
- Pavan Chebbi <pavan.chebbi@broadcom.com>, 
- Joshua Washington <joshwash@google.com>, 
- Harshitha Ramamurthy <hramamurthy@google.com>, 
- Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, 
- Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
- Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Nikolay Aleksandrov <razor@blackwall.org>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- Stanislav Fomichev <sdf@fomichev.me>, Mina Almasry <almasrymina@google.com>, 
- Bobby Eshleman <bobbyeshleman@meta.com>
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAFI48WkC/x3MTQqAIBBA4avErBNKsr+rRITWVAM1hUoI4d2Tl
+ t/ivRccWkIHffaCxYccXZxQ5hnMu+YNBS3JIAtZF5VsxHkENT3h0CyaUtVdZ1pjUEMKbosrhX8 2AKMXjMHDGOMHGgZed2YAAAA=
+X-Change-Id: 20260427-mlx5_vxlan-715699b8bbea
+X-Developer-Key: i=marcharvey@google.com; a=ed25519; pk=OzOeciadbfF5Bug/4/hyEAwfrruSY4tn0Q0LocyYUL0=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1777416293; l=3018;
+ i=marcharvey@google.com; s=20260401; h=from:subject:message-id;
+ bh=ai8QUQpe+eGBNcBYzX5wgc4QtQufT5uTE6GhpsaCC0Y=; b=vg5g7vP2EM46YpgEoKVKKpCPrEdNIlWCVg6lGbsIIfELTu4gk8o+Fa/nww2xQIL96DpvPEsWc
+ eoaHiL67gr0DIzm5DhBIKIZ4TR7fBMGOajPs2Xar5rRs+twXcU0iEgS
 X-Mailer: b4 0.14.3
-X-Rspamd-Queue-Id: E29E248CCE3
+Message-ID: <20260428-mlx5_vxlan-v1-1-cf666d042618@google.com>
+Subject: [PATCH net-next] net/mlx5: Add MLX5_VXLAN config option
+From: Marc Harvey <marcharvey@google.com>
+To: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
+	Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Marc Harvey <marcharvey@google.com>
+Content-Type: text/plain; charset="utf-8"
+X-Rspamd-Queue-Id: AF25548CBF6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282118-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282120-lists,netdev=lfdr.de];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[33];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marcharvey@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nk_devmem.py:url,lib.py:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,meta.com:mid,meta.com:email]
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-From: Bobby Eshleman <bobbyeshleman@meta.com>
+Currently, there is no way to disable mlx5 vxlan offloading if vxlan
+is enabled. We've (possibly) seen some minor udp rr and udp stream
+regressions when enabling vxlan, and want a way to disable this
+offloading. Also coupling vxlan offloading with vxlan enablement
+generally limits the flexability of vxlan setups.
 
-Add nk_devmem.py with four tests for TCP devmem through a netkit device:
+Add a new config option for mlx5 vxlan offloading specifically, so
+that users can use vxlan without automatically opting in to the
+offloading.
 
-These tests are just duplicates of the original devmem tests, with some
-adjusted parameters such as telling ncdevmem to avoid device setup
-(since it only has access to netkit, not a phys device).
+To keep the same behavior as before, the new config option is enabled
+by default if vxlan is enabled.
 
-Each test uses NetDrvContEnv with primary_rx_redirect=True to set up the
-BPF redirect program on the primary netkit interface.
-
-Assisted-by: Claude Code:claude-sonnet-4-6
-Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+Signed-off-by: Marc Harvey <marcharvey@google.com>
 ---
- .../testing/selftests/drivers/net/hw/nk_devmem.py  | 40 ++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ drivers/net/ethernet/mellanox/mlx5/core/Kconfig     | 11 +++++++++++
+ drivers/net/ethernet/mellanox/mlx5/core/Makefile    |  2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/lib/vxlan.h |  2 +-
+ 3 files changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/hw/nk_devmem.py b/tools/testing/selftests/drivers/net/hw/nk_devmem.py
-new file mode 100755
-index 000000000000..c069d525798b
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/nk_devmem.py
-@@ -0,0 +1,40 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+"""Test devmem TCP with netkit."""
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Kconfig b/drivers/net/ethernet/mellanox/mlx5/core/Kconfig
+index 3c3e84100d5a..d2e091bdbafc 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/Kconfig
++++ b/drivers/net/ethernet/mellanox/mlx5/core/Kconfig
+@@ -218,3 +218,14 @@ config MLX5_EN_PSP
+ 	  interfaces to PSP Stack which supports PSP crypto offload.
+ 
+ 	  If unsure, say Y.
 +
-+from os import path
-+from lib.py import ksft_run, ksft_exit, ksft_disruptive
-+from lib.py import NetDrvContEnv
-+from lib.py.devmem import setup_test, run_rx, run_tx, run_tx_chunks, run_rx_hds
++config MLX5_VXLAN
++	bool "Mellanox Technologies vxlan offloading"
++	depends on VXLAN
++	depends on MLX5_CORE_EN
++	default y
++	help
++	  mlx5 device offload support for vxlan. Makes the mlx5 driver always
++	  attempt to initialize device handling of vxlan packets.
 +
-+
-+@ksft_disruptive
-+def check_nk_rx(cfg) -> None:
-+    run_rx(cfg)
-+
-+
-+@ksft_disruptive
-+def check_nk_tx(cfg) -> None:
-+    run_tx(cfg)
-+
-+
-+@ksft_disruptive
-+def check_nk_tx_chunks(cfg) -> None:
-+    run_tx_chunks(cfg)
-+
-+
-+@ksft_disruptive
-+def check_nk_rx_hds(cfg) -> None:
-+    run_rx_hds(cfg)
-+
-+
-+def main() -> None:
-+    with NetDrvContEnv(__file__, rxqueues=2, primary_rx_redirect=True) as cfg:
-+        setup_test(cfg, path.abspath(path.dirname(__file__) + "/ncdevmem"))
-+        ksft_run([check_nk_rx, check_nk_tx, check_nk_tx_chunks, check_nk_rx_hds],
-+                 args=(cfg,))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
++	  If unsure, say Y.
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Makefile b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
+index d39fe9c4a87c..6f2cc5414d07 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
++++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
+@@ -86,7 +86,7 @@ mlx5_core-$(CONFIG_MLX5_BRIDGE)    += esw/bridge.o esw/bridge_mcast.o esw/bridge
+ 
+ mlx5_core-$(CONFIG_HWMON)          += hwmon.o
+ mlx5_core-$(CONFIG_MLX5_MPFS)      += lib/mpfs.o
+-ifneq ($(CONFIG_VXLAN),)
++ifneq ($(CONFIG_MLX5_VXLAN),)
+ 	mlx5_core-y		   += lib/vxlan.o
+ endif
+ mlx5_core-$(CONFIG_PTP_1588_CLOCK) += lib/clock.o
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/vxlan.h b/drivers/net/ethernet/mellanox/mlx5/core/lib/vxlan.h
+index 34ef662da35e..67d0c126c2ae 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/vxlan.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/vxlan.h
+@@ -50,7 +50,7 @@ static inline bool mlx5_vxlan_allowed(struct mlx5_vxlan *vxlan)
+ 	return !IS_ERR_OR_NULL(vxlan);
+ }
+ 
+-#if IS_ENABLED(CONFIG_VXLAN)
++#if IS_ENABLED(CONFIG_MLX5_VXLAN)
+ struct mlx5_vxlan *mlx5_vxlan_create(struct mlx5_core_dev *mdev);
+ void mlx5_vxlan_destroy(struct mlx5_vxlan *vxlan);
+ int mlx5_vxlan_add_port(struct mlx5_vxlan *vxlan, u16 port);
 
+---
+base-commit: 790ead9394860e7d70c5e0e50a35b243e909a618
+change-id: 20260427-mlx5_vxlan-715699b8bbea
+
+Best regards,
 -- 
-2.52.0
+Marc Harvey <marcharvey@google.com>
 
 
