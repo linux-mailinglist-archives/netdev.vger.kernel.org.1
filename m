@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-282003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282004-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sK/oEU/n8Gn2awEAu9opvQ
-	(envelope-from <netdev+bounces-282003-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:58:55 +0200
+	id sBtfJcjo8Gn2awEAu9opvQ
+	(envelope-from <netdev+bounces-282004-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 19:05:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D490C4897BB
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:58:54 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 193FC489910
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 19:05:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A371E301651F
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:58:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2293B30C52B3
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:58:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D8DD33C1B7;
-	Tue, 28 Apr 2026 16:58:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3287033D50F;
+	Tue, 28 Apr 2026 16:58:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="nc/asKT9"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="eVY+rAF+"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.155.198.111])
+Received: from pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com [50.112.246.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B533333C18E
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 16:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.155.198.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4D832C94A
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 16:58:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=50.112.246.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777395511; cv=none; b=fJJO1rJRHLld3H4O+HfZaHAeyEtS+ugabpa2I273VVZr8hHlLQqFQOwsv+xIWe/8mxlClLmgIARHZHuJxTgjPXWhfv1WGu+d1K/LrvbBIJXe13Ca7eYNu/hfPvuPB7QOkB77znsM5wF6CgWCnNxtG7iDg4ZXld7UPcrAh0RCQy8=
+	t=1777395524; cv=none; b=TbpsVKaTg+FIs9ZHcXdTH25t7aIZWJnS0mdUJPSgdtjYdug4Hr2qyuedhrLkU8KmA0J/77eSarU4fTCd9azwEhZukq46mIXl99GFbY37F2U9JoORjbnkPlUsl7laVl+rFbwM9usv7JJD5BonNTgxJl/vZKhMo9DQ4Qg9MO7gOP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777395511; c=relaxed/simple;
-	bh=fhQVGn8eCoyqgWZRFpQIKMnhVqGyNWNReSidO871/aw=;
+	s=arc-20240116; t=1777395524; c=relaxed/simple;
+	bh=BHTt+he5N9a+zLLU83GpIHXc8tF3BhLNKLWAQBLisCQ=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Hwnkhcuc8rdlmNrAJyfVo6vZ3uOUBCyFBNNbi++00SecYDm/w4gMi+bfbZexGEneo7cRdsQJopq6XzCyL5orsbQFcypL8jPvyZFaZNu0Fr1JL9B8eTf47RCkeQXBNqShtSQCZZw6ziU8W/92vZIi6x4yvePq04R+VnhanymJ6Zg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=nc/asKT9; arc=none smtp.client-ip=35.155.198.111
+	 MIME-Version:Content-Type; b=NLR1ZB3VjrOR909RdaqVJdMPhJkEu4uFKzpIcomsfKQchYLskjn5L6HOsTRosQ905mJCY5rY9iI6vvAxNHScWC3NngWCidco5O5r8IXf+MoXq00OZpsEJ38A+2VKIaLZ6E6PT8QOKNfAGetXyI2wXM5vtzRn99NVLQmVLckkt3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=eVY+rAF+; arc=none smtp.client-ip=50.112.246.219
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1777395509; x=1808931509;
+  t=1777395522; x=1808931522;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=wdV9Q0EwyYv6Y1Cx4DKYff4Ebn/kaxIhmn6o8hitAW0=;
-  b=nc/asKT9ItJn2QqejjR/a4dOGEs1CIHJwm7In4QP0UdSroxsyafTxoNX
-   61kw3kSGtWODLV0qfsz6sTcSiGr2ypKNy8BwZA70el2Ke21xUtsFj8OKO
-   FISu+p4kq+GJcNUeei77A6VuMi8erwNyqR36DlvNv4/6EPcbt1bpzAV6D
-   5hm+myI+u/IJ2c/7kKpOqvNyDla+ceCyGuUcYT6XsCrN68ee3tBNc9h58
-   ofgMdrrhXdtbsTBB09yRfdRIU+E1BGFG0faRqAqBWuryaFzhUUQGFKsZh
-   fVEfeXn1wEkxusozYOafLJzeZpztDO2xzsKTe0SSi3mNxcBC0TfrI4euC
+  bh=rGX5QNwZzInt+kB82jPHt8Xpn2CTP9L9elkuHkUDpdw=;
+  b=eVY+rAF+kHDOT+xAf24vHdXfkLAqP0nItJWUn05OgnlYLkB5cF9lfH7m
+   9TzaHdFgoJmhB9tICG3ApaMdckQ8fUeq692GM1KF2zNd5fEM23G4uAeco
+   K6mapukUIRUESqJaamFHQzGaj3VQRaDY/Zogefz0oOSE31MSa5N/a+bW7
+   7N1YQEfF7s1HaoF6o7h/Rug007objsLvGL5S4B11PnFoTf+9yAw+z7Vav
+   a2Zqxo5cbZ0CxEW5QAZocpxGmOnSIn/0tVRHvviS0GrIlJtoDgPfN+VtJ
+   i0zI7B1omX+0dXTDExai08XY5eGrobkdAEsL62FoxAzu2Ol7qjnfv0NdQ
    A==;
-X-CSE-ConnectionGUID: xLiODDXoQOu9vBXCh2DpIw==
-X-CSE-MsgGUID: mzxXHUOdRAKX/zt0R+elNQ==
+X-CSE-ConnectionGUID: YfsBXXhpS7CaSLmIQXtQxQ==
+X-CSE-MsgGUID: pkIaM4FMQCeJCuSdB8+GfA==
 X-IronPort-AV: E=Sophos;i="6.23,204,1770595200"; 
-   d="scan'208";a="18276025"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2026 16:58:27 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [205.251.233.53:25361]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.37.224:2525] with esmtp (Farcaster)
- id 53bc9453-6f43-4c5a-bc51-2ac598195858; Tue, 28 Apr 2026 16:58:27 +0000 (UTC)
-X-Farcaster-Flow-ID: 53bc9453-6f43-4c5a-bc51-2ac598195858
+   d="scan'208";a="18212445"
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2026 16:58:40 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.234:23852]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.50.165:2525] with esmtp (Farcaster)
+ id c02738b1-7265-49bb-96ed-ca424c11038a; Tue, 28 Apr 2026 16:58:39 +0000 (UTC)
+X-Farcaster-Flow-ID: c02738b1-7265-49bb-96ed-ca424c11038a
 Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Tue, 28 Apr 2026 16:58:25 +0000
+ Tue, 28 Apr 2026 16:58:39 +0000
 Received: from dev-dsk-akiyano-1c-2138b29d.eu-west-1.amazon.com (172.19.83.6)
  by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Tue, 28 Apr 2026 16:58:20 +0000
+ Tue, 28 Apr 2026 16:58:35 +0000
 From: Arthur Kiyanovski <akiyano@amazon.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	<netdev@vger.kernel.org>
@@ -82,10 +82,10 @@ CC: Arthur Kiyanovski <akiyano@amazon.com>, Richard Cochran
 	"Saidi, Ali" <alisaidi@amazon.com>, "Herrenschmidt, Benjamin"
 	<benh@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Arinzon, David"
 	<darinzon@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik,
- Ofir" <ofirt@amazon.com>, Amit Bernstein <amitbern@amazon.com>
-Subject: [PATCH net-next 3/8] selftests/ptp: Add testptp support for attributes ioctls
-Date: Tue, 28 Apr 2026 16:54:21 +0000
-Message-ID: <20260428165659.2811-4-akiyano@amazon.com>
+ Ofir" <ofirt@amazon.com>
+Subject: [PATCH net-next 4/8] ptp: ptp_vmclock: Implement attributes ioctls
+Date: Tue, 28 Apr 2026 16:54:22 +0000
+Message-ID: <20260428165659.2811-5-akiyano@amazon.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260428165659.2811-1-akiyano@amazon.com>
 References: <20260428165659.2811-1-akiyano@amazon.com>
@@ -95,250 +95,375 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D035UWA003.ant.amazon.com (10.13.139.86) To
+X-ClientProxiedBy: EX19D038UWB002.ant.amazon.com (10.13.139.185) To
  EX19D001UWA001.ant.amazon.com (10.13.138.214)
-X-Rspamd-Queue-Id: D490C4897BB
+X-Rspamd-Queue-Id: 193FC489910
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-6.16 / 15.00];
+X-Spamd-Result: default: False [-6.66 / 15.00];
 	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-282004-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[amazon.com,gmail.com,google.com,redhat.com,infradead.org,linutronix.de,lunn.ch,linux.alibaba.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282003-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[30];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[akiyano@amazon.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[amazon.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.995];
-	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[7]
 
-Add support for testing the new PTP_SYS_OFFSET_EXTENDED_ATTRS and
-PTP_SYS_OFFSET_PRECISE_ATTRS ioctls in the testptp utility.
+Implement the gettimexattrs64 and getcrosststampattrs callbacks in the
+ptp_vmclock driver to provide clock quality attributes through the new
+PTP_SYS_OFFSET_EXTENDED_ATTRS and PTP_SYS_OFFSET_PRECISE_ATTRS ioctls.
 
-New command-line options:
-  -a: Get extended offset with attributes (error_bound, clock_status,
-      timescale)
-  -A: Get precise cross-timestamp with attributes
+The ptp_vmclock device exposes:
+- error_bound: Derived from time_maxerror_nanosec, accumulated with
+  counter frequency error (counter_period_maxerror_rate_frac_sec) over
+  elapsed counter ticks
+- clock_status: Mapped from the device's clock_status field
+- timescale: Determined from time_type (UTC, TAI, monotonic, etc.)
 
-These options allow testing and validation of PHC devices that provide
-clock quality information alongside timestamps.
+The legacy ioctls return -EINVAL when clock_status is UNRELIABLE since
+they have no way to communicate clock state to userspace. The attrs
+ioctls have a status field for this purpose, so they treat UNRELIABLE
+as success and let userspace check the status field.
 
-Also display the new clock_attrs capability in the -c output, and
-update print_system_timestamp to print unrecognized clock types instead
-of silently dropping them.
+To avoid a race where the hypervisor could update clock_status between
+the timestamp call and the UNRELIABLE check, the clock state is captured
+inside the seq_count loop for a consistent snapshot with the timestamp.
 
-Signed-off-by: Amit Bernstein <amitbern@amazon.com>
 Signed-off-by: Arthur Kiyanovski <akiyano@amazon.com>
 ---
- tools/testing/selftests/ptp/testptp.c | 105 +++++++++++++++++++++++++-
- 1 file changed, 103 insertions(+), 2 deletions(-)
+ drivers/ptp/ptp_vmclock.c | 195 ++++++++++++++++++++++++++++++++++----
+ 1 file changed, 179 insertions(+), 16 deletions(-)
 
-diff --git a/tools/testing/selftests/ptp/testptp.c b/tools/testing/selftests/ptp/testptp.c
-index d3bcfd0..99eb346 100644
---- a/tools/testing/selftests/ptp/testptp.c
-+++ b/tools/testing/selftests/ptp/testptp.c
-@@ -147,10 +147,13 @@ static void usage(char *progname)
- 		" -t val     shift the ptp clock time by 'val' seconds\n"
- 		" -T val     set the ptp clock time to 'val' seconds\n"
- 		" -x val     get an extended ptp clock time with the desired number of samples (up to %d)\n"
-+		" -a val     get extended timestamps with attributes (error_bound,\n"
-+		"            clock_status, timescale, counter), up to %d samples\n"
- 		" -X         get a ptp clock cross timestamp\n"
-+		" -A         get a precise cross timestamp with attributes\n"
- 		" -y val     pre/post tstamp timebase to use {realtime|monotonic|monotonic-raw}\n"
- 		" -z         test combinations of rising/falling external time stamp flags\n",
--		progname, PTP_MAX_SAMPLES);
-+		progname, PTP_MAX_SAMPLES, PTP_MAX_SAMPLES);
+diff --git a/drivers/ptp/ptp_vmclock.c b/drivers/ptp/ptp_vmclock.c
+index 8b630eb..5657c06 100644
+--- a/drivers/ptp/ptp_vmclock.c
++++ b/drivers/ptp/ptp_vmclock.c
+@@ -53,6 +53,17 @@ struct vmclock_state {
+ 	char *name;
+ };
+ 
++/**
++ * struct vmclock_crosststamp_ctx - context for get_device_system_crosststamp()
++ * @st: vmclock device state
++ * @attrs: optional output for PTP clock attributes, populated inside the
++ *         seq_count loop for a consistent snapshot with the timestamp
++ */
++struct vmclock_crosststamp_ctx {
++	struct vmclock_state *st;
++	struct ptp_clock_attributes *attrs;
++};
++
+ #define VMCLOCK_MAX_WAIT ms_to_ktime(100)
+ 
+ /* Require at least the flags field to be present. All else can be optional. */
+@@ -95,14 +106,109 @@ static bool tai_adjust(struct vmclock_abi *clk, uint64_t *sec)
+ 	return false;
  }
  
- static void print_system_timestamp(int sample_num, __kernel_clockid_t clockid,
-@@ -171,6 +174,8 @@ static void print_system_timestamp(int sample_num, __kernel_clockid_t clockid,
- 		       sample_num, when, sec, nsec);
- 		break;
- 	default:
-+		printf("sample #%2d: unknown clock %d %s: %lld.%09u\n",
-+		       sample_num, clockid, when, sec, nsec);
- 		break;
++static uint8_t vmclock_get_ptp_timescale(uint8_t vmclock_time_type)
++{
++	switch (vmclock_time_type) {
++	case VMCLOCK_TIME_UTC:
++		return PTP_TIMESCALE_UTC;
++	case VMCLOCK_TIME_TAI:
++		return PTP_TIMESCALE_TAI;
++	case VMCLOCK_TIME_MONOTONIC:
++		return PTP_TIMESCALE_MONOTONIC;
++	default:
++		return PTP_TIMESCALE_UNKNOWN;
++	}
++}
++
++static uint8_t vmclock_get_ptp_status(uint8_t vmclock_status)
++{
++	switch (vmclock_status) {
++	case VMCLOCK_STATUS_UNKNOWN:
++		return PTP_CLOCK_STATUS_UNKNOWN;
++	case VMCLOCK_STATUS_INITIALIZING:
++		return PTP_CLOCK_STATUS_INITIALIZING;
++	case VMCLOCK_STATUS_SYNCHRONIZED:
++		return PTP_CLOCK_STATUS_SYNCED;
++	case VMCLOCK_STATUS_FREERUNNING:
++		return PTP_CLOCK_STATUS_FREE_RUNNING;
++	case VMCLOCK_STATUS_UNRELIABLE:
++		return PTP_CLOCK_STATUS_UNRELIABLE;
++	default:
++		return PTP_CLOCK_STATUS_UNKNOWN;
++	}
++}
++
++static void vmclock_populate_ptp_attributes(struct vmclock_state *st,
++					    struct ptp_clock_attributes *att,
++					    uint64_t delta,
++					    uint64_t cycle)
++{
++	uint64_t maxerror_ns = UINT_MAX;
++
++	if (!att)
++		return;
++
++	/* Only calculate if the base error is flagged as valid
++	 * by the hypervisor.
++	 */
++	if (VMCLOCK_FIELD_PRESENT(st->clk, time_maxerror_nanosec) &&
++	    (le64_to_cpu(st->clk->flags) & VMCLOCK_FLAG_TIME_MAXERROR_VALID)) {
++		maxerror_ns = le64_to_cpu(st->clk->time_maxerror_nanosec);
++
++		/* If frequency error is also valid, accumulate it
++		 * over the delta.
++		 */
++		if (VMCLOCK_FIELD_PRESENT(st->clk, counter_period_maxerror_rate_frac_sec) &&
++		    (le64_to_cpu(st->clk->flags) & VMCLOCK_FLAG_PERIOD_MAXERROR_VALID)) {
++			uint64_t maxerror_rate, err_hi, err_frac, growth_ns;
++
++			maxerror_rate = le64_to_cpu(st->clk->counter_period_maxerror_rate_frac_sec);
++			err_frac = mul_u64_u64_shr_add_u64(&err_hi, delta,
++							   maxerror_rate,
++							   st->clk->counter_period_shift,
++							   0);
++
++			growth_ns = (err_hi * NSEC_PER_SEC) +
++				    mul_u64_u64_shr(err_frac, NSEC_PER_SEC, 64);
++
++			/* Guard against overflow */
++			if (U64_MAX - growth_ns < maxerror_ns)
++				maxerror_ns = U64_MAX;
++			else
++				maxerror_ns += growth_ns;
++		}
++	}
++
++	/* PTP UAPI error_bound is 32-bit nanoseconds */
++	att->error_bound = (maxerror_ns > UINT_MAX) ?
++		UINT_MAX : (uint32_t)maxerror_ns;
++	att->timescale = vmclock_get_ptp_timescale(st->clk->time_type);
++	att->status = vmclock_get_ptp_status(st->clk->clock_status);
++
++	att->counter_value = cycle;
++	switch (st->cs_id) {
++	case CSID_X86_TSC:
++		att->counter_id = PTP_COUNTER_X86_TSC;
++		break;
++	case CSID_ARM_ARCH_COUNTER:
++		att->counter_id = PTP_COUNTER_ARM_ARCH;
++		break;
++	default:
++		att->counter_id = PTP_COUNTER_UNKNOWN;
++		break;
++	}
++}
++
+ static int vmclock_get_crosststamp(struct vmclock_state *st,
+ 				   struct ptp_system_timestamp *sts,
+ 				   struct system_counterval_t *system_counter,
+-				   struct timespec64 *tspec)
++				   struct timespec64 *tspec,
++				   struct ptp_clock_attributes *attrs)
+ {
+ 	ktime_t deadline = ktime_add(ktime_get(), VMCLOCK_MAX_WAIT);
+ 	struct system_time_snapshot systime_snapshot;
+ 	uint64_t cycle, delta, seq, frac_sec;
++	uint8_t clock_status = VMCLOCK_STATUS_UNKNOWN;
+ 
+ #ifdef CONFIG_X86
+ 	/*
+@@ -122,9 +228,6 @@ static int vmclock_get_crosststamp(struct vmclock_state *st,
+ 		 */
+ 		virt_rmb();
+ 
+-		if (st->clk->clock_status == VMCLOCK_STATUS_UNRELIABLE)
+-			return -EINVAL;
+-
+ 		/*
+ 		 * When invoked for gettimex64(), fill in the pre/post system
+ 		 * times. The simple case is when system time is based on the
+@@ -163,6 +266,18 @@ static int vmclock_get_crosststamp(struct vmclock_state *st,
+ 		if (!tai_adjust(st->clk, &tspec->tv_sec))
+ 			return -EINVAL;
+ 
++		/*
++		 * Capture clock state inside the seq_count loop for a
++		 * consistent snapshot with the timestamp. The attrs path
++		 * reports it to userspace via the status field; the legacy
++		 * path saves it for the UNRELIABLE check after the loop.
++		 */
++		if (attrs)
++			vmclock_populate_ptp_attributes(st, attrs, delta,
++							cycle);
++		else
++			clock_status = st->clk->clock_status;
++
+ 		/*
+ 		 * This pairs with a write barrier in the hypervisor
+ 		 * which populates this structure.
+@@ -186,6 +301,17 @@ static int vmclock_get_crosststamp(struct vmclock_state *st,
+ 			sts->post_ts = sts->pre_ts;
  	}
+ 
++	/*
++	 * If attrs is set, attributes were already populated inside the
++	 * seq_count loop. Return success even for UNRELIABLE — the attrs
++	 * ioctl can report the status to userspace.
++	 */
++	if (attrs)
++		return 0;
++
++	if (clock_status == VMCLOCK_STATUS_UNRELIABLE)
++		return -EINVAL;
++
+ 	return 0;
  }
-@@ -188,6 +193,8 @@ int main(int argc, char *argv[])
- 	struct ptp_sys_offset *sysoff;
- 	struct ptp_sys_offset_extended *soe;
- 	struct ptp_sys_offset_precise *xts;
-+	struct ptp_sys_offset_precise_attrs *xtsa;
-+	struct ptp_sys_offset_extended_attrs *soea;
  
- 	char *progname;
- 	unsigned int i;
-@@ -208,7 +215,9 @@ int main(int argc, char *argv[])
- 	int list_pins = 0;
- 	int pct_offset = 0;
- 	int getextended = 0;
-+	int getextendedattrs = 0;
- 	int getcross = 0;
-+	int getcrossattrs = 0;
- 	int n_samples = 0;
- 	int pin_index = -1, pin_func;
- 	int pps = -1;
-@@ -226,7 +235,7 @@ int main(int argc, char *argv[])
+@@ -198,7 +324,8 @@ static int vmclock_get_crosststamp(struct vmclock_state *st,
+ static int vmclock_get_crosststamp_kvmclock(struct vmclock_state *st,
+ 					    struct ptp_system_timestamp *sts,
+ 					    struct system_counterval_t *system_counter,
+-					    struct timespec64 *tspec)
++					    struct timespec64 *tspec,
++					    struct ptp_clock_attributes *attrs)
+ {
+ 	struct pvclock_vcpu_time_info *pvti = this_cpu_pvti();
+ 	unsigned int pvti_ver;
+@@ -209,7 +336,8 @@ static int vmclock_get_crosststamp_kvmclock(struct vmclock_state *st,
+ 	do {
+ 		pvti_ver = pvclock_read_begin(pvti);
  
- 	progname = strrchr(argv[0], '/');
- 	progname = progname ? 1+progname : argv[0];
--	while (EOF != (c = getopt(argc, argv, "cd:e:E:f:F:ghH:i:k:lL:n:o:p:P:rsSt:T:w:x:Xy:z"))) {
-+	while (EOF != (c = getopt(argc, argv, "a:Acd:e:E:f:F:ghH:i:k:lL:n:o:p:P:rsSt:T:w:x:Xy:z"))) {
- 		switch (c) {
- 		case 'c':
- 			capabilities = 1;
-@@ -311,9 +320,22 @@ int main(int argc, char *argv[])
- 				return -1;
- 			}
+-		ret = vmclock_get_crosststamp(st, sts, system_counter, tspec);
++		ret = vmclock_get_crosststamp(st, sts, system_counter, tspec,
++					     attrs);
+ 		if (ret)
  			break;
-+		case 'a':
-+			getextendedattrs = atoi(optarg);
-+			if (getextendedattrs < 1 ||
-+			    getextendedattrs > PTP_MAX_SAMPLES) {
-+				fprintf(stderr,
-+					"number of extended attrs timestamp samples must be between 1 and %d; was asked for %d\n",
-+					PTP_MAX_SAMPLES, getextendedattrs);
-+				return -1;
-+			}
-+			break;
- 		case 'X':
- 			getcross = 1;
- 			break;
-+		case 'A':
-+			getcrossattrs = 1;
-+			break;
- 		case 'y':
- 			if (!strcasecmp(optarg, "realtime"))
- 				ext_clockid = CLOCK_REALTIME;
-@@ -367,6 +389,7 @@ int main(int argc, char *argv[])
- 			       "  %d programmable pins\n"
- 			       "  %d cross timestamping\n"
- 			       "  %d adjust_phase\n"
-+			       "  %d clock_attrs\n"
- 			       "  %d maximum phase adjustment (ns)\n",
- 			       caps.max_adj,
- 			       caps.n_alarm,
-@@ -376,6 +399,7 @@ int main(int argc, char *argv[])
- 			       caps.n_pins,
- 			       caps.cross_timestamping,
- 			       caps.adjust_phase,
-+			       caps.clock_attrs,
- 			       caps.max_phase_adj);
+ 
+@@ -238,17 +366,19 @@ static int ptp_vmclock_get_time_fn(ktime_t *device_time,
+ 				   struct system_counterval_t *system_counter,
+ 				   void *ctx)
+ {
+-	struct vmclock_state *st = ctx;
++	struct vmclock_crosststamp_ctx *vctx = ctx;
++	struct vmclock_state *st = vctx->st;
+ 	struct timespec64 tspec;
+ 	int ret;
+ 
+ #ifdef SUPPORT_KVMCLOCK
+ 	if (READ_ONCE(st->sys_cs_id) == CSID_X86_KVM_CLK)
+ 		ret = vmclock_get_crosststamp_kvmclock(st, NULL, system_counter,
+-						       &tspec);
++						       &tspec, vctx->attrs);
+ 	else
+ #endif
+-		ret = vmclock_get_crosststamp(st, NULL, system_counter, &tspec);
++		ret = vmclock_get_crosststamp(st, NULL, system_counter, &tspec,
++					     vctx->attrs);
+ 
+ 	if (!ret)
+ 		*device_time = timespec64_to_ktime(tspec);
+@@ -256,12 +386,11 @@ static int ptp_vmclock_get_time_fn(ktime_t *device_time,
+ 	return ret;
+ }
+ 
+-static int ptp_vmclock_getcrosststamp(struct ptp_clock_info *ptp,
+-				      struct system_device_crosststamp *xtstamp)
++static int ptp_vmclock_do_getcrosststamp(struct vmclock_crosststamp_ctx *vctx,
++					 struct system_device_crosststamp *xtstamp)
+ {
+-	struct vmclock_state *st = container_of(ptp, struct vmclock_state,
+-						ptp_clock_info);
+-	int ret = get_device_system_crosststamp(ptp_vmclock_get_time_fn, st,
++	struct vmclock_state *st = vctx->st;
++	int ret = get_device_system_crosststamp(ptp_vmclock_get_time_fn, vctx,
+ 						NULL, xtstamp);
+ #ifdef SUPPORT_KVMCLOCK
+ 	/*
+@@ -278,13 +407,23 @@ static int ptp_vmclock_getcrosststamp(struct ptp_clock_info *ptp,
+ 		    systime_snapshot.cs_id == CSID_X86_KVM_CLK) {
+ 			WRITE_ONCE(st->sys_cs_id, systime_snapshot.cs_id);
+ 			ret = get_device_system_crosststamp(ptp_vmclock_get_time_fn,
+-							    st, NULL, xtstamp);
++							    vctx, NULL, xtstamp);
  		}
  	}
-@@ -648,6 +672,50 @@ int main(int argc, char *argv[])
- 		free(soe);
- 	}
+ #endif
+ 	return ret;
+ }
  
-+	if (getextendedattrs) {
-+		soea = calloc(1, sizeof(*soea));
-+		if (!soea) {
-+			perror("calloc");
-+			return -1;
-+		}
++static int ptp_vmclock_getcrosststamp(struct ptp_clock_info *ptp,
++				      struct system_device_crosststamp *xtstamp)
++{
++	struct vmclock_state *st = container_of(ptp, struct vmclock_state,
++						ptp_clock_info);
++	struct vmclock_crosststamp_ctx vctx = { .st = st };
 +
-+		soea->n_samples = getextendedattrs;
-+		soea->clockid = ext_clockid;
++	return ptp_vmclock_do_getcrosststamp(&vctx, xtstamp);
++}
 +
-+		if (ioctl(fd, PTP_SYS_OFFSET_EXTENDED_ATTRS, soea)) {
-+			perror("PTP_SYS_OFFSET_EXTENDED_ATTRS");
-+		} else {
-+			printf("extended timestamp request returned %d samples\n",
-+			       getextendedattrs);
-+
-+			for (i = 0; i < getextendedattrs; i++) {
-+				print_system_timestamp(i, ext_clockid,
-+						       soea->ts[i][0].pct.sec,
-+						       soea->ts[i][0].pct.nsec,
-+						       "before");
-+
-+				printf("            phc time: %lld.%09u, error bound: %u, clock status: %u, timescale: %u\n",
-+				       soea->ts[i][1].pct.sec,
-+				       soea->ts[i][1].pct.nsec,
-+				       soea->ts[i][1].att.error_bound,
-+				       soea->ts[i][1].att.status,
-+				       soea->ts[i][1].att.timescale);
-+
-+				if (soea->ts[i][1].att.counter_id)
-+					printf("            counter: %llu (id: %u)\n",
-+					       (unsigned long long)soea->ts[i][1].att.counter_value,
-+					       soea->ts[i][1].att.counter_id);
-+
-+				print_system_timestamp(i, ext_clockid,
-+						       soea->ts[i][2].pct.sec,
-+						       soea->ts[i][2].pct.nsec,
-+						       "after");
-+			}
-+		}
-+
-+		free(soea);
-+	}
-+
- 	if (getcross) {
- 		xts = calloc(1, sizeof(*xts));
- 		if (!xts) {
-@@ -671,6 +739,39 @@ int main(int argc, char *argv[])
- 		free(xts);
- 	}
+ /*
+  * PTP clock operations
+  */
+@@ -311,7 +450,29 @@ static int ptp_vmclock_gettimex(struct ptp_clock_info *ptp, struct timespec64 *t
+ 	struct vmclock_state *st = container_of(ptp, struct vmclock_state,
+ 						ptp_clock_info);
  
-+	if (getcrossattrs) {
-+		xtsa = calloc(1, sizeof(*xtsa));
-+		if (!xtsa) {
-+			perror("calloc");
-+			return -1;
-+		}
+-	return vmclock_get_crosststamp(st, sts, NULL, ts);
++	return vmclock_get_crosststamp(st, sts, NULL, ts, NULL);
++}
 +
-+		if (ioctl(fd, PTP_SYS_OFFSET_PRECISE_ATTRS, xtsa)) {
-+			perror("PTP_SYS_OFFSET_PRECISE_ATTRS");
-+		} else {
-+			puts("system and phc crosstimestamping with attributes request okay");
++static int ptp_vmclock_gettimexattrs(struct ptp_clock_info *ptp,
++				     struct timespec64 *ts,
++				     struct ptp_system_timestamp *sts,
++				     struct ptp_clock_attributes *att)
++{
++	struct vmclock_state *st = container_of(ptp, struct vmclock_state,
++						ptp_clock_info);
 +
-+			printf("device time: %lld.%09u\n",
-+			       xtsa->device.pct.sec, xtsa->device.pct.nsec);
-+			printf("error_bound: %u ns\n",
-+			       xtsa->device.att.error_bound);
-+			printf("status: %u\n",
-+			       xtsa->device.att.status);
-+			printf("timescale: %u\n",
-+			       xtsa->device.att.timescale);
-+			if (xtsa->device.att.counter_id)
-+				printf("counter: %llu (id: %u)\n",
-+				       (unsigned long long)xtsa->device.att.counter_value,
-+				       xtsa->device.att.counter_id);
-+			printf("system time: %lld.%09u\n",
-+			       xtsa->sys_realtime.sec, xtsa->sys_realtime.nsec);
-+			printf("monoraw time: %lld.%09u\n",
-+			       xtsa->sys_monoraw.sec, xtsa->sys_monoraw.nsec);
-+		}
++	return vmclock_get_crosststamp(st, sts, NULL, ts, att);
++}
 +
-+		free(xtsa);
-+	}
++static int ptp_vmclock_getcrosststampattrs(struct ptp_clock_info *ptp,
++					   struct system_device_crosststamp *xtstamp,
++					   struct ptp_clock_attributes *att)
++{
++	struct vmclock_state *st = container_of(ptp, struct vmclock_state,
++						ptp_clock_info);
++	struct vmclock_crosststamp_ctx vctx = { .st = st, .attrs = att };
 +
- 	if (channel >= 0) {
- 		if (ioctl(fd, PTP_MASK_CLEAR_ALL)) {
- 			perror("PTP_MASK_CLEAR_ALL");
++	return ptp_vmclock_do_getcrosststamp(&vctx, xtstamp);
+ }
+ 
+ static int ptp_vmclock_enable(struct ptp_clock_info *ptp,
+@@ -329,9 +490,11 @@ static const struct ptp_clock_info ptp_vmclock_info = {
+ 	.adjfine	= ptp_vmclock_adjfine,
+ 	.adjtime	= ptp_vmclock_adjtime,
+ 	.gettimex64	= ptp_vmclock_gettimex,
++	.gettimexattrs64 = ptp_vmclock_gettimexattrs,
+ 	.settime64	= ptp_vmclock_settime,
+ 	.enable		= ptp_vmclock_enable,
+ 	.getcrosststamp = ptp_vmclock_getcrosststamp,
++	.getcrosststampattrs = ptp_vmclock_getcrosststampattrs,
+ };
+ 
+ static struct ptp_clock *vmclock_ptp_register(struct device *dev,
 -- 
 2.47.3
 
