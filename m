@@ -1,699 +1,210 @@
-Return-Path: <netdev+bounces-282034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282035-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oDJ+LDf08GnUbQEAu9opvQ
-	(envelope-from <netdev+bounces-282034-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 19:53:59 +0200
+	id wG3kH3b08GnUbQEAu9opvQ
+	(envelope-from <netdev+bounces-282035-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 19:55:02 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 034F248A3C0
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 19:53:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D798248A3ED
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 19:55:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 452FF30C05F6
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:51:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 79ABC3037980
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:52:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F76144E047;
-	Tue, 28 Apr 2026 17:51:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE57244E05A;
+	Tue, 28 Apr 2026 17:52:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b="guVqxSzh"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="XZgNfEIA"
 X-Original-To: netdev@vger.kernel.org
-Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.170])
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010019.outbound.protection.outlook.com [40.93.198.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEECF4508E4
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 17:51:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777398712; cv=none; b=fQXL/2XX2wj81/teGNgaYhfyzF8koMNlYa4dE0CoMa7KFMMcFqZTDz0Y9MsODCJ2XM7WeXTY3PbJR8N3017vffDcWdBWrMBqFbbqj4o7F9K+HIzAWexPDGkZy6L5EeOoSpIZ1zmAOYOBInaRqUH9LcZy/EBygJunEUXIZxILi80=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777398712; c=relaxed/simple;
-	bh=eDqNHvMjMCCfhHrRctWkRRY8LOuOq1ldKu8zEZ0Bf+E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cf6aQ0piJVyn7xvhlMsggWuH5G+/W1PJNHytdQ6mmyC6ZozZyWdwzmkA4i5r7kTh8wYQoDWNls+BjrfK0dkoMSSzVIfJgLXhhvMhKMk0kaR033RZsa5VpH6w13Fxadj7jEtfqwd/UHNYf7Gyqy1ajmvJJP/GZIRqmBcmU4pIjNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=guVqxSzh; arc=none smtp.client-ip=195.121.94.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xs4all.nl
-X-KPN-MessageId: ea401a27-432a-11f1-8a9e-005056ab378f
-Received: from smtp.kpnmail.nl (unknown [10.31.155.40])
-	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
-	id ea401a27-432a-11f1-8a9e-005056ab378f;
-	Tue, 28 Apr 2026 19:51:42 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=xs4all.nl; s=xs4all01;
-	h=mime-version:message-id:date:subject:to:from;
-	bh=rlU/JIk+hJwSw/A8PF9iW2EbbrCOIQ1gz040uJI6hHI=;
-	b=guVqxSzhkzNN9TUUIMAopWmLuToTADj9qrpI7XwN8CiiU8iJ4F7kOBMgptwMQ8tdZKAmF+oqgbmeI
-	 QAUzWp8Y+bkjs/IJUbGeMObda5aysl9Fpis9mCD6BUI2qrv8PdSB4TnQURpLf5syRH46dxtp6f0qQq
-	 lonQdTzI0HsUnfQI6FKkbC5KUJ+otVwAKBr75I8UnVle5dJw3fRD/pU8EypbqLIw8mIkXL3KDNmpEx
-	 mgwHhGHvF/4ZnE4g9yRCvw0PBazB3VHtP1LrCB39xldo2aCnL6x/zM8T783pkGh7frhCC43Kbluy1i
-	 IkOVU7ND0UPH0xtNHZ3TicsY+FuMlyg==
-X-KPN-MID: 33|XYALgN2CzSLAKwGuvXzQt5/gMsMFjRJ7JC/m4LtV9I1033UcFLulCyFgGW/+8tT
- gQF4OFHY4JvGTBtXG+RDG7XlatdfHj/x+JgkClJxqD8g=
-X-KPN-VerifiedSender: Yes
-X-CMASSUN: 33|3HpaWLzlAfQmJH7mU1utHDRG2EW3gK78wcUoydhqAznoBGwB/xPPmr2d8OEAwrs
- xCPhxytR5W8XeOn0ZE16TXQ==
-Received: from daedalus.home (unknown [178.227.109.38])
-	by smtp.xs4all.nl (Halon) with ESMTPSA
-	id e9795b76-432a-11f1-b8eb-005056ab7584;
-	Tue, 28 Apr 2026 19:51:42 +0200 (CEST)
-From: Jori Koolstra <jkoolstra@xs4all.nl>
-To: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Jan Kara <jack@suse.cz>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970BC33D4FA;
+	Tue, 28 Apr 2026 17:52:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777398721; cv=fail; b=T2BpedRKa6/9EmBVzeZEJ/7/lDuf3PATtvO3LY3WvPe3vBQBaPm61PDIjvIzGNKpiogoRVWNsAIDldMTinYEZIIDEnHhi6PRUxmD1pDoRtqAM6GEs4qI/R4m4+eQ1DF0kX7KpLTCQjziGRvuMD6bhbFeUSuY50VnGYKAhNbIm1s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777398721; c=relaxed/simple;
+	bh=O/G87Enji2UqoqfWgo+JD0NkYNtZZ8q9AkrM22geCrA=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=LGea+rxRRjULaMzim4A9xnTzyO7aku7FOylK/fFqF5Iw+gIWWUaVt+FrOPr2jEIZtmZcn9HIYuhrx/JxxViO+oVonxmDUjDskAk4l8PAQEkqxstxNfFh5oPprsh9BwfXgd/VQY3POsQqJRcHdLfZPQuxQilpZS+Q1NEQsLWh1CI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=XZgNfEIA; arc=fail smtp.client-ip=40.93.198.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=egWAn+0IFJNy9UuNJodkiaa/6MjPTVjzva9BTO1MgpXNBjB1xP2QjfroeWPq/6BLGTkp4gpD1OVj2V5vdOD3zEozDl2HM7GzyzV7wHzp4SL6LtHhwV9yFF0KhBMJsHdBlmjtjl0axjbk+365opmgQtzuM0jbecl4+h1dj1crzVbc/yxZBpY7oDOOJaQ6aBj4Lgfbb4KSBxiRGEz32kIwVDVRhy7Na4igWOsNBmyNFMzqFbRwSN7382nd/KTMtxNSkKyHMLPkukTr+UJS/pEdEnm+LJvneYFjalismO2aQ0k7/rhRrLMJepR8XOwsM0Bz8oRlRebmqnS0gEAno1A7SQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Q60+A0867gDkmnWVuMUm6FddyWly9G3RhupCL8tKSOw=;
+ b=d9pM5lBDHxGW19Muigp5CVhfOkslIz4ar8dbr2BusLQ7UYKFvD6NnVxTHgcBaDH7/1Ozdu+3ruwg/WMe0QmBWaJupMwocMwSmAcQ2NKHKpWeEnFYY8vgiRoiENHCkw8S8L/9ZaetiQ9dbUK9khcrNOzFqZHJxFcnv7QNml+5s5FXtGlX0RH5kD2GI9tv0WojXGgTwEIm0kC+IDQJKG9oFFgz8iGpklgHIPIfGt0vbl/pssNVDUDEe1vsHT0+nBEYcio3hGBna6rek3/CiXTCY3hqGJlUkQRyjiQHRV/hewK1hzeDeJsldhLnQyVc/OGxf5eRd9cvqcr5XTtIuJMwwQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Q60+A0867gDkmnWVuMUm6FddyWly9G3RhupCL8tKSOw=;
+ b=XZgNfEIAHzmbUNrD6b6TozNCuL3PaoNntc0wurQ6fFZpUi2lekDwIZhj3x4a62HfqIbMXVCsePesY4Wui1hfCaJfVvNuZjXnvg0PiR1nYcEvqhy53X7z0DDh09H6B0vu9uUtl4Q5FJaYUIa4OXNxuErOZIsnRlO7yRDaf7O9rRjeUNKgyzs7nkL90b53FV4mXTJEe7KJJ5UKa1rGxRAgiaR1VsO2knStOB8Eu9GGcSYyneuGqUgy7UARs+O0hvv1TR9JnJQ6Rlbr6jbVp187w0W3rvmuOUzlFdk1alOuTBBSw69nvgBSE7dmOt8+pqU64FLb6cJB29mqnYZBcpUrZQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8728.namprd12.prod.outlook.com (2603:10b6:610:171::12)
+ by PHXPR12MB999232.namprd12.prod.outlook.com (2603:10b6:510:3cd::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.16; Tue, 28 Apr
+ 2026 17:51:57 +0000
+Received: from CH3PR12MB8728.namprd12.prod.outlook.com
+ ([fe80::2641:1046:bdf3:93d7]) by CH3PR12MB8728.namprd12.prod.outlook.com
+ ([fe80::2641:1046:bdf3:93d7%7]) with mapi id 15.20.9870.013; Tue, 28 Apr 2026
+ 17:51:57 +0000
+From: Dragos Tatulea <dtatulea@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Kees Cook <kees@kernel.org>
-Cc: Simon Horman <horms@kernel.org>,
-	Andy Lutomirski <luto@amacapital.net>,
-	Will Drewry <wad@chromium.org>,
-	Jeff Layton <jlayton@kernel.org>,
-	Jori Koolstra <jkoolstra@xs4all.nl>,
-	Oleg Nesterov <oleg@redhat.com>,
-	Andrei Vagin <avagin@gmail.com>,
-	Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
-	Mateusz Guzik <mjguzik@gmail.com>,
-	Joel Granados <joel.granados@kernel.org>,
-	Charlie Mirabile <cmirabil@redhat.com>,
-	Aleksa Sarai <cyphar@cyphar.com>,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>
+Cc: Martin Karsten <mkarsten@uwaterloo.ca>,
+	dtatulea@nvidia.com,
+	Gal Pressman <gal@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Joe Damato <joe@dama.to>,
+	Frederik Deweerdt <fdeweerdt@fastly.com>,
 	netdev@vger.kernel.org,
-	io-uring@vger.kernel.org
-Subject: [RFC PATCH 2/2] selftest: Add tests for useful handling of LSM denials on SCM_RIGHTS
-Date: Tue, 28 Apr 2026 19:51:25 +0200
-Message-ID: <20260428175125.2705296-3-jkoolstra@xs4all.nl>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260428175125.2705296-1-jkoolstra@xs4all.nl>
-References: <20260428175125.2705296-1-jkoolstra@xs4all.nl>
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH net-next 0/2] net: napi: Fix timer arming during busy poll timeout
+Date: Tue, 28 Apr 2026 17:51:29 +0000
+Message-ID: <20260428175134.1197036-2-dtatulea@nvidia.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: FR3P281CA0119.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a3::19) To CH3PR12MB8728.namprd12.prod.outlook.com
+ (2603:10b6:610:171::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 034F248A3C0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8728:EE_|PHXPR12MB999232:EE_
+X-MS-Office365-Filtering-Correlation-Id: 91d04949-c15c-4dad-a10c-08dea54ed78e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|1800799024|366016|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	Xr44zr7g/sAAqaFDj2bbBHU8wzw++66lxSDdP3h5Ceie8+fGBhh1bzp7d3EmBVZ3AeXQxIwRgAgWIDC2Kc7VVWvFcktf0vD7euaSfMgvzDFJ3lso4zpJ+W1bTtGDopVl2QZCtZy9yRF3//omhWD39LE3u3FVVicAGYcr/xGJbmXxYUx3dT1nOddoiwI0mbkt+FdAeJ7DPVd2f8avKOOq+Lvzvm0H8F0xPxqvVPbESlLk5FYsnW3S8m1ig4ejXNFf+aBVICpPBMx+ypMAeKT15e91/ef/i2w86ZK04UJFVJ1QTTGRuXh3EXTq6gU/5KQr9J4s9EN4HM/snH7u2k4P+GHq05l4V0rlMGxMP43riKcc6rDYqPgrgEZSwZBs0dw8TuxiL6WrNuuyPjAN35IqGXH1PAro4WEG1vfi/5INgcL37fVO/fP17SLv6TICB72LKyB0WCaMVWgDHDK+1FTcIqaYSDt0EHFtQw5hlsT9tPttY0zXgyM79AbUMjoj2IPBJsUbKnQOrj/woqDfuG8fjDIIEtPDEZuzhaRn7v5CMnYYyvVhws2MdBmmslqdNbCmL/CQLfm12rZDSnsMM2/B4lKqgC7KtXH9KTAwnvGmpSLm96rH3wElXtKELGHamXequ0zWfm8J0nJG68epBX3yRlyjL6oF+F2U1e+xl5W/ofTRRF8o9CEHvSxyjZ+6eFt0BT5FuaU28dHy9bDoDcQtYCcQA8IxXi/16WcEj2e1jmc56TiCqs6N9DMKaJ8FYNW5
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8728.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?r+mAk14OichlDUNcbO26ULWGYKJ5AaCRFAx/QU4zdZ3GkEAChrbjeXGy9GZu?=
+ =?us-ascii?Q?KUjDgVmsVHCDmd+v+oxKHT9yxI6MXvSDqTzFb9n5khy+sWoMhq+dhPDn0Irz?=
+ =?us-ascii?Q?XATXxOmaY1lpe1okUjUe7MJc11ObluzPGB9wKqHq7uPfX5coUDdA4z1JJnoy?=
+ =?us-ascii?Q?tEDAqKZb3cswiXPSH3xZt7j8oMhhBCNQB4/+qY59Un6pT0AE7DGYQTVpcRDI?=
+ =?us-ascii?Q?w2TJ2mV22SbW9DYO7CeYSEGQK0zXXJ5gXB4TozSzDf8sWqB8vV+hZNA7Hijk?=
+ =?us-ascii?Q?G/4aechnIcBNsJc44x6iBI1tvHByhHk2rZL43mKy4MCrMMXBn8ALgJy+d61y?=
+ =?us-ascii?Q?rfIuNXtBfHFgq3EDiNeVDhs+onbcTR3HUZMaBTvALZ8UKj7jk73vJl9oQMHc?=
+ =?us-ascii?Q?weraphepW8gKcw/C3i8b9M3m5pDcQd5WFPK4rwhOknivD4S1Yuzn0kTLDudB?=
+ =?us-ascii?Q?H7ZSjnmOFvaZtUrsFw9S8rYBJA+UxxTBrMQ5WcCfkXjMU57Iv+yHeXE9k1vY?=
+ =?us-ascii?Q?YAMZYs3MuACBt+NcfQ8njn1Nv+wuEpDU0lhzBz4XkCB+1yLTxSdr/aNMsi9n?=
+ =?us-ascii?Q?dZogaL0vBdoMVnHtGm97/NY5ExgzMLpGXFs8pOTozOATuJ3cpu3FVtELfq7j?=
+ =?us-ascii?Q?otlQ36F4XFjAdLxwRD2WlH5JoYYTceNSWTxW0XW841kBRE0znAHuv2KW1Pn9?=
+ =?us-ascii?Q?66hoUR8CxLGBBstRHjOhXoTnkpOS0NMSWv42nF3fQ/oJizke/cg8+QRQLMDy?=
+ =?us-ascii?Q?xC+hYnb+XTCETctr5ZdQS9yeCvS0Fk89tH5JkXZQPT6HqbEwdUgV5LH60LYO?=
+ =?us-ascii?Q?Yfiep7uItMqv7ggeKYQcBWUHDyj1NLajK8C+BrfqBn0rCvVv6OW7mKAgBXRI?=
+ =?us-ascii?Q?Fgx4w+PdzOshgsl6pbPzueCAfXMsmps3CMLffaNxpdMHcnQpJaIWwdyCbPHZ?=
+ =?us-ascii?Q?6V7wUocTrRhqoBMCry3pfkWrjv7o1OBGTX/8fdAJLVROX2bPRdtqUNC7Hqpt?=
+ =?us-ascii?Q?g2XbxP/DLwViDhQo1LmrTS07oYiGOJ2RspdpgYooDVW6AFPya7nIUBPmAnjl?=
+ =?us-ascii?Q?BUNix/g6j/YuneGwxbpb7Ujj3dYTffX6c63b2CgSHbTqcv8FXJcWkFJ7HHrL?=
+ =?us-ascii?Q?Tdb53UARhg/YhmbmAch2RTOikgRtugJlezCRnYFJL86gdw6hkpob6uqPG4iR?=
+ =?us-ascii?Q?006wLw77478L+bennUX/oH2JPGbWCidiy5QuHME/ZxCZyY1nLJyA1Blo9BAw?=
+ =?us-ascii?Q?XA+3kVuBLdgkuLBbgksa1pGqaHbQAXhQ3buCOahU07iKuUbqSBiWTrODmMrU?=
+ =?us-ascii?Q?xdQAdlI/oZTb8lSEzJ7pK6bVD3kfdVmKjMbAVQgy7PQE8DyjfntY8xFVYnLO?=
+ =?us-ascii?Q?F3KFn3D3wLGG6r6NfdcGkUtihtyxc/zh3orgNt73Fi9seCpI/hMXF3rxgd+A?=
+ =?us-ascii?Q?Jah18ZTBgWdLiaWRkCgnkiltV09iVrUqYNC9+xGTOlX+DuGZ3xQTBG+jchjx?=
+ =?us-ascii?Q?qJwg4latGS+F8GT+EV8PLJIyD34Ucn6srimcjzlfPBB9BbJJIEUh4yWFTAJ7?=
+ =?us-ascii?Q?ZOi+4luBf5UU+CC50DK7L37bJgdsLLlphUgcm11zlDzv4qNLRkEPyVT7Pd/V?=
+ =?us-ascii?Q?gnV59/P/Zb8fGunZt2UjiQNw3aeUHknzLPb3L3gzJv2g0QLILIe0mT206FCu?=
+ =?us-ascii?Q?BmsKmEz5HLpU99+YePn/VaKA4YhvPKJpMbASCbKtlfK3P/albj0F1B5wuvaL?=
+ =?us-ascii?Q?N2zC+j9ZTQ=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 91d04949-c15c-4dad-a10c-08dea54ed78e
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8728.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2026 17:51:57.7016
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XSSkjLfYXnsK2i1nRln6KxzuO6KsSSZxCy6DUKgq2NhUvCR/niqq+U8X89V6QQsoLqFDfvXXXEgHLvO5slQ+Yg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PHXPR12MB999232
+X-Rspamd-Queue-Id: D798248A3ED
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[xs4all.nl,reject];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[xs4all.nl:s=xs4all01];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282034-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,amacapital.net,chromium.org,xs4all.nl,redhat.com,gmail.com,virtuozzo.com,cyphar.com,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[xs4all.nl];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-282035-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jkoolstra@xs4all.nl,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[dtatulea@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[xs4all.nl:+];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,xs4all.nl:email,xs4all.nl:dkim,xs4all.nl:mid,test_scm_rights_smack.sh:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:mid,Nvidia.com:dkim]
 
-Tests SCM_RIGHTS fd passing using Smack LSM blocking in combination with
-the MSG_RIGHTS_FILTER flag.
+Under certain conditions a queue can be left out with interrupts
+disabled and with the napi re-scheduling timer permanently stopped.
+This behaviour is triggered by the napi busy poll path when
+gro-flush-timeout and defer-hard-irq are set.
 
-Signed-off-by: Jori Koolstra <jkoolstra@xs4all.nl>
----
- .../net/af_unix/lsm_blocking/helper.h         |  37 ++++
- .../net/af_unix/lsm_blocking/receiver.c       | 187 ++++++++++++++++++
- .../net/af_unix/lsm_blocking/sender.c         | 126 ++++++++++++
- .../lsm_blocking/test_scm_rights_smack.sh     | 172 ++++++++++++++++
- 4 files changed, 522 insertions(+)
- create mode 100644 tools/testing/selftests/net/af_unix/lsm_blocking/helper.h
- create mode 100644 tools/testing/selftests/net/af_unix/lsm_blocking/receiver.c
- create mode 100644 tools/testing/selftests/net/af_unix/lsm_blocking/sender.c
- create mode 100644 tools/testing/selftests/net/af_unix/lsm_blocking/test_scm_rights_smack.sh
+The first patch is a fix and has a more detailed description of how
+the issue can occur.
 
-diff --git a/tools/testing/selftests/net/af_unix/lsm_blocking/helper.h b/tools/testing/selftests/net/af_unix/lsm_blocking/helper.h
-new file mode 100644
-index 000000000000..e827560ee78d
---- /dev/null
-+++ b/tools/testing/selftests/net/af_unix/lsm_blocking/helper.h
-@@ -0,0 +1,37 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <unistd.h>
-+#include <fcntl.h>
-+
-+#define MSG_RIGHTS_DENIAL 0x200000
-+#define MSG_RIGHTS_FILTER 0x400000
-+
-+#define CMSG_IS_SCM_RIGHTS(cmsg) ({		\
-+	typeof(cmsg) _cmsg = (cmsg);		\
-+	_cmsg &&				\
-+	_cmsg->cmsg_level == SOL_SOCKET &&	\
-+	_cmsg->cmsg_type == SCM_RIGHTS;		\
-+})
-+
-+#define MIN(a, b) ({ \
-+	typeof(a) _a = (a); \
-+	typeof(b) _b = (b); \
-+	_a < _b ? _a : _b; \
-+})
-+
-+#define MAX_FDS 10
-+
-+static inline int read_current_label(char *label, size_t size)
-+{
-+	int fd = open("/proc/self/attr/current", O_RDONLY);
-+	if (fd < 0)
-+		return fd;
-+
-+	ssize_t r = read(fd, label, size - 1);
-+	close(fd);
-+	if (r <= 0)
-+		return r;
-+
-+	label[r] = '\0';
-+
-+	return 0;
-+}
-diff --git a/tools/testing/selftests/net/af_unix/lsm_blocking/receiver.c b/tools/testing/selftests/net/af_unix/lsm_blocking/receiver.c
-new file mode 100644
-index 000000000000..f5af9dcddc22
---- /dev/null
-+++ b/tools/testing/selftests/net/af_unix/lsm_blocking/receiver.c
-@@ -0,0 +1,187 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+/*
-+ * receiver.c - Receive a file descriptor over a Unix domain socket via SCM_RIGHTS
-+ *
-+ * Usage: ./receiver <socket_path>
-+ *
-+ * Listens on the given Unix socket path, accepts a connection, and
-+ * attempts to receive file descriptors via SCM_RIGHTS. Reports
-+ * whether the fds were delivered or blocked.
-+ *
-+ * Used for testing LSM (Smack) blocking of fd passing.
-+ */
-+
-+#include <sys/socket.h>
-+#include <sys/un.h>
-+#include <sys/xattr.h>
-+#include <unistd.h>
-+#include <string.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <fcntl.h>
-+
-+#include "helper.h"
-+
-+#define RECV_LOG(fmt, ...) printf("receiver: " fmt, ##__VA_ARGS__)
-+#define RECV_ERR(fmt, ...) fprintf(stderr, "receiver: " fmt, ##__VA_ARGS__)
-+
-+static int recv_fds(int sock, int *fds)
-+{
-+	char buf[1];
-+	char ctrl[CMSG_SPACE(MAX_FDS * sizeof(int))];
-+
-+	struct iovec iov = {
-+		.iov_base = buf,
-+		.iov_len  = sizeof(buf),
-+	};
-+	struct msghdr msg = {
-+		.msg_iov        = &iov,
-+		.msg_iovlen     = 1,
-+		.msg_control    = ctrl,
-+		.msg_controllen = sizeof(ctrl),
-+	};
-+
-+	ssize_t bytes_read = recvmsg(sock, &msg, MSG_RIGHTS_FILTER);
-+	if (bytes_read < 0) {
-+		perror("receiver: recvmsg");
-+		return -1;
-+	}
-+	if (bytes_read == 0) {
-+		RECV_ERR("connection closed, no data received\n");
-+		return -1;
-+	}
-+
-+	if (msg.msg_flags & MSG_RIGHTS_DENIAL)
-+		RECV_LOG("MSG_RIGHTS_DENIAL set - some fds were blocked by the LSM!\n");
-+
-+	struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
-+	if (!CMSG_IS_SCM_RIGHTS(cmsg)) {
-+		RECV_ERR("no SCM_RIGHTS in control message\n");
-+		return -1;
-+	}
-+
-+	int num_fd_slots = (cmsg->cmsg_len - CMSG_LEN(0)) / sizeof(int);
-+	memcpy(fds, CMSG_DATA(cmsg), num_fd_slots  * sizeof(int));
-+
-+	RECV_LOG("got %d fd slots:", num_fd_slots);
-+	for (int i = 0; i < num_fd_slots ; i++)
-+		printf(" %d", fds[i]);
-+	putchar('\n');
-+
-+	return num_fd_slots;
-+}
-+
-+static inline int print_current_label(void)
-+{
-+	char label[256];
-+	if (!read_current_label(label, sizeof(label))) {
-+		RECV_LOG("running with Smack label '%s'\n", label);
-+		return 0;
-+	}
-+	return -1;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	if (argc != 2) {
-+		fprintf(stderr, "Usage: %s <socket_path>\n", argv[0]);
-+		return -1;
-+	}
-+
-+	if (print_current_label()) {
-+		RECV_ERR("cannot read process Smack label");
-+		return -1;
-+	}
-+
-+	int listen_sock = socket(AF_UNIX, SOCK_STREAM, 0);
-+	if (listen_sock < 0) {
-+		perror("receiver: socket");
-+		return -1;
-+	}
-+
-+	struct sockaddr_un addr = {};
-+	addr.sun_family = AF_UNIX;
-+	strncpy(addr.sun_path, argv[1], sizeof(addr.sun_path) - 1);
-+
-+	/* Remove any stale socket file */
-+	unlink(argv[1]);
-+
-+	if (bind(listen_sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-+		perror("receiver: bind");
-+		return -1;
-+	}
-+
-+	if (listen(listen_sock, 1) < 0) {
-+		perror("receiver: listen");
-+		return -1;
-+	}
-+
-+	RECV_LOG("listening on '%s'\n", argv[1]);
-+
-+	int conn_sock = accept(listen_sock, NULL, NULL);
-+	if (conn_sock < 0) {
-+		perror("receiver: accept");
-+		return -1;
-+	}
-+
-+	RECV_LOG("connection accepted\n");
-+
-+	/* Try to receive the fds */
-+	int fds[MAX_FDS];
-+	int num_fds = recv_fds(conn_sock, fds);
-+	if (num_fds < 0)
-+		goto out_sock;
-+
-+	/* Try to use the received fds -- read and print their contents */
-+	RECV_LOG("attempting to read from received fds...\n");
-+	int i;
-+	for (i = 0; i < num_fds; ++i) {
-+		char readbuf[256];
-+
-+		if (fds[i] < 0) {
-+			RECV_LOG("fd in position %i blocked\n", i);
-+			continue;
-+		} else if (fds[i] == 0) {
-+			RECV_LOG("bad fd in position %i\n", i);
-+			goto out_recv;
-+		}
-+
-+		ssize_t n = read(fds[i], readbuf, sizeof(readbuf) - 1);
-+		if (n < 0) {
-+			perror("receiver: read from received fd");
-+			goto out_recv;
-+		}
-+
-+		readbuf[n] = '\0';
-+		RECV_LOG("read %zd bytes from fd at position %i: '%s'\n", n, i, readbuf);
-+	}
-+
-+	RECV_LOG("final result:\n");
-+	for (int j = 0; j < num_fds; ++j) {
-+		if (fds[j] < 0) {
-+			printf("BLOCKED");
-+		} else {
-+			printf("PASSED");
-+			close(fds[j]);
-+		}
-+		putchar(' ');
-+	}
-+
-+	close(conn_sock);
-+	close(listen_sock);
-+	unlink(argv[1]);
-+	return 0;
-+
-+out_recv:
-+	for (int j = 0; j < num_fds; ++j) {
-+		if (fds[j] > 0)
-+			close(fds[j]);
-+	}
-+
-+out_sock:
-+	close(conn_sock);
-+	close(listen_sock);
-+	unlink(argv[1]);
-+	return -1;
-+}
-diff --git a/tools/testing/selftests/net/af_unix/lsm_blocking/sender.c b/tools/testing/selftests/net/af_unix/lsm_blocking/sender.c
-new file mode 100644
-index 000000000000..b1c76d23b8bd
---- /dev/null
-+++ b/tools/testing/selftests/net/af_unix/lsm_blocking/sender.c
-@@ -0,0 +1,126 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+/*
-+ * sender.c - Send file descriptors over a Unix domain socket via SCM_RIGHTS
-+ *
-+ * Usage: ./sender <socket_path> <file_to_send> [<file_to_send>...]
-+ *
-+ * Opens the specified files and sends their fds to a receiver connected
-+ * on the given Unix socket path. Used for testing LSM blocking of fd
-+ * passing.
-+ */
-+
-+#include <sys/socket.h>
-+#include <sys/un.h>
-+#include <unistd.h>
-+#include <string.h>
-+#include <stdio.h>
-+#include <fcntl.h>
-+
-+#include "helper.h"
-+
-+#define SEND_LOG(fmt, ...) fprintf(stdout, "sender: " fmt, ##__VA_ARGS__)
-+#define SEND_ERR(fmt, ...) fprintf(stderr, "sender: " fmt, ##__VA_ARGS__)
-+
-+static int send_fds(int sock, int *fds, int num_fds)
-+{
-+	if (num_fds > MAX_FDS)
-+		return -1;
-+
-+	char buf[1] = { 'X' };
-+	char ctrl[CMSG_SPACE(MAX_FDS * sizeof(int))] = { 0 };
-+
-+	struct iovec iov = {
-+		.iov_base = buf,
-+		.iov_len  = sizeof(buf),
-+	};
-+	struct msghdr msg = {
-+		.msg_iov        = &iov,
-+		.msg_iovlen     = 1,
-+		.msg_control    = ctrl,
-+		.msg_controllen = CMSG_SPACE(num_fds * sizeof(int)),
-+	};
-+
-+	struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
-+	cmsg->cmsg_level = SOL_SOCKET;
-+	cmsg->cmsg_type  = SCM_RIGHTS;
-+	cmsg->cmsg_len   = CMSG_LEN(num_fds * sizeof(int));
-+	memcpy(CMSG_DATA(cmsg), fds, num_fds * sizeof(int));
-+
-+	ssize_t bytes_send = sendmsg(sock, &msg, 0);
-+	if (bytes_send < 0) {
-+		perror("sender: sendmsg");
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
-+static inline int print_current_label(void)
-+{
-+	char label[256];
-+	if (!read_current_label(label, sizeof(label))) {
-+		SEND_LOG("running with Smack label '%s'\n", label);
-+		return 0;
-+	}
-+	return -1;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	if (argc < 3 || argc > 2 + MAX_FDS) {
-+		fprintf(stderr, "Usage: %s <socket_path> <file_to_send> [<file_to_send>...]\\n",
-+			argv[0]);
-+		fprintf(stderr, "Up to a maximum of %d files", MAX_FDS);
-+		return -1;
-+	}
-+
-+	if (print_current_label()) {
-+		SEND_ERR("cannot read process Smack label");
-+		return -1;
-+	}
-+
-+	int sock = socket(AF_UNIX, SOCK_STREAM, 0);
-+	if (sock < 0) {
-+		perror("sender: socket");
-+		return -1;
-+	}
-+
-+	struct sockaddr_un addr = {};
-+	addr.sun_family = AF_UNIX;
-+	strncpy(addr.sun_path, argv[1], sizeof(addr.sun_path) - 1);
-+
-+	if (connect(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-+		perror("sender: connect");
-+		goto out_sock;
-+	}
-+
-+	SEND_LOG("connected to '%s'\n", argv[1]);
-+
-+	int num_files = argc - 2;
-+	int fds[MAX_FDS];
-+	int i;
-+	for (i = 0; i < num_files; i++) {
-+		fds[i] = open(argv[2 + i], O_RDONLY);
-+		if (fds[i] < 0) {
-+			perror("sender: open file");
-+			goto out_opened;
-+		}
-+		SEND_LOG("opened '%s' as fd %d\n", argv[2 + i], fds[i]);
-+	}
-+
-+	if (send_fds(sock, fds, num_files) < 0)
-+		goto out_opened;
-+
-+	SEND_LOG("fds successfully sent:");
-+	for (int j = 0; j < num_files; j++)
-+		printf(" %d", fds[j]);
-+	putchar('\n');
-+
-+out_opened:
-+	for (int j = 0; j < i; j++)
-+		close(fds[j]);
-+out_sock:
-+	close(sock);
-+	return -1;
-+}
-diff --git a/tools/testing/selftests/net/af_unix/lsm_blocking/test_scm_rights_smack.sh b/tools/testing/selftests/net/af_unix/lsm_blocking/test_scm_rights_smack.sh
-new file mode 100644
-index 000000000000..76fcfdd2cd4a
---- /dev/null
-+++ b/tools/testing/selftests/net/af_unix/lsm_blocking/test_scm_rights_smack.sh
-@@ -0,0 +1,172 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+#
-+# test_scm_rights_smack.sh - Test SCM_RIGHTS fd passing using Smack LSM blocking
-+#
-+# Must be run as root on a kernel with Smack enabled (security=smack).
-+# Requires: capsh (libcap), setfattr/getfattr (attr)
-+#
-+# We use the following Smack labels:
-+#   "Sender"   - label for the sending process
-+#   "Receiver" - label for the receiving process
-+#   "SecretX"   - labels for the files being passed
-+#
-+# Socket communication (Sender <-> Receiver) is always allowed.
-+# The test controls whether Receiver can access "SecretX"-labeled fds.
-+#
-+
-+
-+readonly SOCK="/tmp/scm_test.sock"
-+readonly TESTFILE1="/tmp/scm_test_secret_1"
-+readonly TESTFILE2="/tmp/scm_test_secret_2"
-+readonly SENDER="./sender"
-+readonly RECEIVER="./receiver"
-+
-+set -e
-+
-+run_tests() {
-+
-+	preflight
-+	setup
-+
-+	run_test "TEST 1" \
-+		"Receiver should NOT have access to Secret1." \
-+		"Receiver Secret1 ---
-+Receiver Secret2 ---" \
-+		"$TESTFILE1" \
-+		"BLOCKED"
-+
-+	run_test "TEST 2" \
-+		"Receiver should have access to Secret1." \
-+		"Receiver Secret1 r--
-+Receiver Secret2 ---" \
-+		"$TESTFILE1" \
-+		"PASSED"
-+
-+	run_test "TEST 3" \
-+		"Receiver should have access to Secret2, but NOT Secret1." \
-+		"Receiver Secret1 ---
-+Receiver Secret2 r--" \
-+		"$TESTFILE1 $TESTFILE2" \
-+		"BLOCKED PASSED"
-+}
-+
-+run_test() {
-+	local name="$1"
-+	local description="$2"
-+	local rules="$3"
-+	local files="$4"
-+	local expected="$5"
-+
-+	echo ""
-+	echo "$name: $description"
-+	echo "Rules:"
-+	echo "$rules"
-+	echo "Expected: $expected"
-+	echo ""
-+
-+	while IFS= read -r rule; do
-+		[ -n "$rule" ] && echo "$rule" > /sys/fs/smackfs/load2
-+	done <<< "$rules"
-+
-+	local output status last_line
-+	output=$(send_fds "$SOCK" $files)
-+	status=$?
-+	echo "$output"
-+	last_line=$(echo "$output" | tail -n 1 | xargs)
-+
-+	if [ "$status" -ne 0 ]; then
-+		echo "TEST FAILED: receiver returned $status"
-+		return 1
-+	fi
-+
-+	if [[ "$last_line" == "$expected" ]]; then
-+		echo "TEST PASSED: outcome was $expected as expected"
-+		return 0
-+	else
-+		echo "TEST FAILED: expected $expected, got '$last_line'"
-+		return 1
-+	fi
-+}
-+
-+setup() {
-+
-+	printf "Secret 1" > "$TESTFILE1"
-+	printf "Secret 2" > "$TESTFILE2"
-+
-+	setfattr -n security.SMACK64 -v "Secret1" "$TESTFILE1"
-+	setfattr -n security.SMACK64 -v "Secret2" "$TESTFILE2"
-+	setfattr -n security.SMACK64 -v "Tmp" /tmp
-+
-+	echo "Sender	Receiver	-w-" > /sys/fs/smackfs/load2
-+	echo "Receiver	Sender		-w-" > /sys/fs/smackfs/load2
-+	echo "Sender	Tmp 		rwx" > /sys/fs/smackfs/load2
-+	echo "Receiver	Tmp		rwx" > /sys/fs/smackfs/load2
-+	echo "Sender	Secret1		r--" > /sys/fs/smackfs/load2
-+	echo "Sender	Secret2		r--" > /sys/fs/smackfs/load2
-+}
-+
-+send_fds() {
-+
-+	local sk="$1"
-+	shift
-+	local files="$*"
-+
-+	(
-+	    echo "Receiver" > /proc/self/attr/current
-+	    exec capsh --drop=cap_mac_override,cap_mac_admin -- -c "$RECEIVER $sk"
-+	) &
-+	local recv_pid=$!
-+	sleep 1
-+
-+	(
-+	    echo "Sender" > /proc/self/attr/current
-+	    exec capsh --drop=cap_mac_override,cap_mac_admin -- -c "$SENDER $sk $files"
-+	) || true
-+
-+	local recv_status=0
-+	wait "$recv_pid" || recv_status=$?
-+
-+	if [ "$recv_status" -ne 0 ]; then
-+	    echo "receiver exited with $recv_status"
-+	fi
-+	return "$recv_status"
-+}
-+
-+preflight() {
-+
-+	if [ "$(id -u)" -ne 0 ]; then
-+	    echo "ERROR: must be run as root"
-+	    exit 1
-+	fi
-+
-+	if ! grep -q smack /sys/kernel/security/lsm 2>/dev/null; then
-+	    echo "ERROR: Smack is not active"
-+	    echo "  Check: cat /sys/kernel/security/lsm"
-+	    echo "  Boot with: security=smack"
-+	    exit 1
-+	fi
-+
-+	if ! mountpoint -q /sys/fs/smackfs 2>/dev/null; then
-+	    echo "Mounting smackfs..."
-+	    mount -t smackfs smackfs /sys/fs/smackfs
-+	fi
-+
-+	if ! command -v capsh &>/dev/null; then
-+	    echo "ERROR: capsh not found (install libcap)"
-+	    exit 1
-+	fi
-+
-+	# Build the test programs if needed
-+	if [ ! -x "$SENDER" ]; then
-+	    echo "Building sender..."
-+	    gcc -Wall -o sender sender.c
-+	fi
-+	if [ ! -x "$RECEIVER" ]; then
-+	    echo "Building receiver..."
-+	    gcc -Wall -o receiver receiver.c
-+	fi
-+
-+}
-+
-+run_tests
+The second patch represents an improvement which needs additional
+review (hence the RFC).
+
+The strategy for the non-RFC version is to send the first patch
+as a fix to net and then send the improvement to net-next because
+of the behavioral change (skipping the poll).
+
+Is this the right way to go or should the 2 patches be squashed into
+a fix for net?
+
+[1] https://lore.kernel.org/netdev/20241105210338.5364375d@kernel.org/
+
+Dragos Tatulea (1):
+  net: napi: Fix interrupts permanently disabled during busy poll
+
+Martin Karsten (1):
+  net: napi: Skip poll when arming GRO timer in busy poll
+
+ net/core/dev.c | 49 ++++++++++++++++++++++++++++---------------------
+ 1 file changed, 28 insertions(+), 21 deletions(-)
+
 -- 
-2.54.0
+2.43.0
 
 
