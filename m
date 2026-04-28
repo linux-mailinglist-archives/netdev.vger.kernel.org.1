@@ -1,190 +1,284 @@
-Return-Path: <netdev+bounces-281890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281889-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UPssBUjC8GloYQEAu9opvQ
-	(envelope-from <netdev+bounces-281890-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:20:56 +0200
+	id qLXkK2nA8GlPYQEAu9opvQ
+	(envelope-from <netdev+bounces-281889-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:12:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D5B2486CDD
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:20:55 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E578486A97
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:12:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DCBEE308AA46
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 13:43:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 93C3F317C8AD
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 13:42:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E42C421884;
-	Tue, 28 Apr 2026 13:41:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="PeUAuQm9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60AE43DA7CA;
+	Tue, 28 Apr 2026 13:41:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB9D23504B
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 13:41:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B3FB38AC9A;
+	Tue, 28 Apr 2026 13:41:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777383717; cv=none; b=tBEv4rfuiRHRvmLEkpIfzqG9N7xr8BpHO5L+TtltpSdKKPKIgCef7MCJSB4AbZwdnHPp4wXlzo17jniK3vrlAHrIW0Es9XdlkISO8/FKFR/gltmuEzJnXiuqCI2hjDP7gVsO6gpViaXQj6HD/KgXp655rUAUhZ7lTew9uMt8N+4=
+	t=1777383695; cv=none; b=f42owSQlP9yGQYloKTEy9At3ERkDrvvcNs1BJT68kutH1/Q+3cXhpSNrGZRC9SYlsnMVZstns6H+ynj+6rhRBjjFn7EsaqoebyxCVO0yebXrresnsoWBWtSWkCU659CAgA1UDYSuU0kx+mwU9ZFAMYFVqaiFbKCjZbp2n0kjo8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777383717; c=relaxed/simple;
-	bh=jqBLOubZ4mXa84mx2wvU/yh4dktQrLifIrEBEEYBwaI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K22P9g6fxiakbtTbTdxVHpXqDXcniPWBVXgHGfg9mty9K1OEPGslT692hO/B+eAhW985OlifQ8aGzJTtXUlkx1oVSNTywwblAFftQ82cN75ToYICux8+4wxjZHPmBAhukLOs3dcwIw/QecOC8USNEFgtPhJ5IcjPa7N/KgztRzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=PeUAuQm9; arc=none smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-89fc4147f2eso126705646d6.3
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 06:41:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1777383712; x=1777988512; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=TqQCQriovYDSHEdS4S+0Ixb7G/LoMFE2Kp0rbzZf96A=;
-        b=PeUAuQm9wN4GtTfHdKXy5iax09XbMHVUpSG2IzKJuMDaq+z0+s4q+h7CPexUcow/SH
-         2HVJVxhxlTST5oSh0KhXw0FXsPdBxIR2AZ/u+JojOK5KR8eh7ZlmfJrjSWi23AJj1AAm
-         ZUAm81p+A5HRQjEpFnKzFo+iCDfBmPHEX91KV2jM9/2l8AxlLLoFGkztlEHgloPOlBu9
-         GgOfHlMTQVJ/IJk1m47Qr1TrtXiIg8CDV0UTJIWmv3a8W4U7lGYwQSU0xW0FlNB52Tbf
-         YNC79Gdswyha6kurkepNpTUUbggzhgpg/YVI1NibeIBPVTopk8U1/vobYhuOE/nGLFoh
-         zogA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777383712; x=1777988512;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TqQCQriovYDSHEdS4S+0Ixb7G/LoMFE2Kp0rbzZf96A=;
-        b=VJNVbbYdiN4Udz0Kfqc2FKGaSwq68hT1e25k1ZDiQrU9QO3d/HyF5vXiVEeCqz0DC6
-         5Yy6t/YR+DDE4uoYmiq2X4CdBr64YQX0285wOK6BSV7TROcmAK/LL1vIzH//bx7qaFgH
-         CU5FduPdPJCSVvspmS0y76dkY0Z3xtNzznHdKf1LZX20o7MTx7wsfRBw+yD9TSZ3v7pI
-         +9IGhX45+Cz01OqlOWrWPV2ToJXMXaQIjkLPGLY9UTO2K0ApP12K+Py021tDfl5Gu+zs
-         k0W17z9TNJqtOQcxdyptCwCQWKgIF8/kykslSVTauIYh5OTN34rx/5MuOTdl+dRt00JD
-         HUHg==
-X-Forwarded-Encrypted: i=1; AFNElJ8wlGYhSFne2EftTpnCeBtOvidn1WaJRDNKOwy/jkBHt2ldwsqo6vOJkmZTsdi7NhKCRdMwYB8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1F2Hn8RQp46GKKm0XAMOxYU1AzyqiNLD3uSeQdBHIDLuqGzzK
-	0z7qV1RSXjMif/QZ7C1TA0ncK/OWPVM9/KlOiz77tjtk3ajTUth/Kot+gYuE9r8HsBU=
-X-Gm-Gg: AeBDieugUlXbzuxHcNlfEFqN4EuY0HDGaJsL0a2NlJlTQKKfpAu9WhMzBcX6682H+nW
-	up/j0RwefsbeQfy5JMJjgVr2uUPKUyGu6cJ9sg+ZPDIAClbnq/PiKzgcB6Us630b9aHhFT2DvDH
-	YVzMKHUAp+C+MfcCXh7cerHPkSzLLue7GskpMcopBqGvlPhKzZ2KGV6D0O6yDsYp/2lDu884Nm6
-	CEs+aRZQew2B9bKqcJ0wGwQWHiK3jRK/ng20sFgTKmnPx5PwYT11SPYTrf4NvkD+qvGqi8lQ0BV
-	b8P+bVMEhoV1As8roIobbjZeAA6resWlb+ie/ZsmggxqH8ENyETqJuZ8HN1yTvp3ve9ke3PEMGh
-	BRksf12JNsZuIXsqtNZiZyP9TfCCG65gBhYKKexIyodTJEzFW7FNzC2bhkXn4OOl+hhu87nBPOl
-	QC4CBPMa/4Jk962S+u3ECsPkBa1n6IjpckwrVJPWOG0NJSHSDDHgxeFBJH9/HwYCPvRnAqKdNbv
-	ivXBytW9HsYbmuBI5hOGvlIW3tgi/lA+UThWQ==
-X-Received: by 2002:a05:6214:29c9:b0:89c:e38f:6b6c with SMTP id 6a1803df08f44-8b3e301a9f9mr45799576d6.3.1777383712343;
-        Tue, 28 Apr 2026 06:41:52 -0700 (PDT)
-Received: from fedora (d-zg1-128.globalnet.hr. [213.149.36.142])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b3e28623dasm20732486d6.19.2026.04.28.06.41.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Apr 2026 06:41:51 -0700 (PDT)
-From: Robert Marko <robert.marko@sartura.hr>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Divya.Koppera@microchip.com,
-	horatiu.vultur@microchip.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Robert Marko <robert.marko@sartura.hr>
-Subject: [PATCH net] net: phy: micrel: fix LAN8814 QSGMII soft reset
-Date: Tue, 28 Apr 2026 15:41:01 +0200
-Message-ID: <20260428134138.1741253-1-robert.marko@sartura.hr>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1777383695; c=relaxed/simple;
+	bh=zicy1VoOoqWTu9mSATtC6N+HthFHLjJWRfjwkNJc2OM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fQGqMz6IlwWfcPcrf/flnfU/Hg8UMeTM7BgZD8Ss44hpvgp1i6R3wMfeLnwiSLbGfgJcPXFnJfiTlfX5q4DDNHlMaIZel9D0ArDli9GwCeyZUuL6o9aZbLbt+qFBiPKzD2L6sV3i+Q0YXXuKrmwalV4mB4/zNiB8BjKUQZvjcw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [129.217.186.62] ([129.217.186.62])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.2/8.18.2) with ESMTPSA id 63SDfKAD018334
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 28 Apr 2026 15:41:20 +0200 (CEST)
+Message-ID: <d00bea39-7748-46ad-9c31-27326041f03c@tu-dortmund.de>
+Date: Tue, 28 Apr 2026 15:41:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 7D5B2486CDD
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 4/4] tun/tap & vhost-net: avoid ptr_ring
+ tail-drop when a qdisc is present
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+References: <20260428123859.19578-1-simon.schippers@tu-dortmund.de>
+ <20260428123859.19578-5-simon.schippers@tu-dortmund.de>
+ <20260428084851-mutt-send-email-mst@kernel.org>
+ <cdc3cbc8-cf6a-437c-b34c-dd8ced65d7f8@tu-dortmund.de>
+ <20260428092150-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <20260428092150-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 2E578486A97
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[sartura.hr,reject];
-	R_DKIM_ALLOW(-0.20)[sartura.hr:s=sartura];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[tu-dortmund.de : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-281890-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[sartura.hr:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[robert.marko@sartura.hr,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-281889-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[gmail.com,redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_SPAM(0.00)[0.572];
+	R_DKIM_NA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sartura.hr:email,sartura.hr:dkim,sartura.hr:mid]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tu-dortmund.de:mid,tu-dortmund.de:email]
 
-LAN8814 QSGMII soft reset was moved into the probe function to avoid
-triggering it for each of 4 PHY-s in the package.
+On 4/28/26 15:22, Michael S. Tsirkin wrote:
+> On Tue, Apr 28, 2026 at 03:10:44PM +0200, Simon Schippers wrote:
+>> On 4/28/26 14:50, Michael S. Tsirkin wrote:
+>>> On Tue, Apr 28, 2026 at 02:38:59PM +0200, Simon Schippers wrote:
+>>>> This commit prevents tail-drop when a qdisc is present and the ptr_ring
+>>>> becomes full. Once an entry is successfully produced and the ptr_ring
+>>>> reaches capacity, the netdev queue is stopped instead of dropping
+>>>> subsequent packets.
+>>>>
+>>>> If producing an entry fails anyways due to a race, tun_net_xmit returns
+>>>> NETDEV_TX_BUSY, again avoiding a drop. Such races are expected because
+>>>> LLTX is enabled and the transmit path operates without the usual locking.
+>>>>
+>>>> If no qdisc is present, the previous tail-drop behavior is preserved.
+>>>>
+>>>> The existing __tun_wake_queue() function of the consumer races with the
+>>>> producer for waking/stopping the netdev queue: the consumer may drain
+>>>> the ring just as the producer stops the queue, leading to a permanent
+>>>> stall. To avoid this, the producer re-checks the ring after stopping
+>>>> and wakes the queue itself if space was just made. An
+>>>> smp_mb__after_atomic() is required so the re-peek of the ring sees any
+>>>> drain that the consumer performed.
+>>>> smp_mb__after_atomic() pairs with the test_and_clear_bit() inside of
+>>>> netif_wake_subqueue():
+>>>>
+>>>> Consumer CPU                  Producer CPU
+>>>> ========================      =========================
+>>>> __ptr_ring_consume()
+>>>> netif_wake_subqueue()         netif_tx_stop_queue()
+>>>>           /\                  smp_mb__after_atomic()
+>>>>           ||                  __ptr_ring_produce_peek()
+>>>> contains RMW operation
+>>>>  test_and_clear_bit()
+>>>>           /\
+>>>>           ||
+>>>>  "Fully ordered RMW:
+>>>> smp_mb() before + after"
+>>>>     - atomic_t.txt
+>>>>
+>>>> Benchmarks:
+>>>> The benchmarks show a slight regression in raw transmission performance,
+>>>> though no packets are lost anymore.
+>>>
+>>> Could you include the packets received as well?
+>>> To demonstrate the gains/lack of loss. 
+>>>
+>>
+>> Do you mean the number of packets received by the VM?
+>> They should just be the same as the number sent (shown below), right?
+> 
+> Minus the loss? Which this is about, right?
 
-However, that broke QSGMII link between the MAC and PHY on most LAN8814
-PHY-s, specificaly for us on the Microchip LAN969x switch.
-Reading the QSGMII status registers it was visible that lanes were only
-partially synced.
+Yes. I simply calculated "Lost/s":
 
-It looks like the reset timing is crucial, so lets move the reset back
-into the .config_init function but guard it with phy_package_init_once()
-to avoid it being triggered on each of 4 PHY-s in the package.
-Change the probe function to use phy_package_probe_once() for coma and PtP
-setup.
+elapsed_time = 100e6 / sent_pps
+Lost/s = total_errors / elapsed_time
 
-Fixes: 96a9178a29a6 ("net: phy: micrel: lan8814 fix reset of the QSGMII interface")
-Signed-off-by: Robert Marko <robert.marko@sartura.hr>
----
- drivers/net/phy/micrel.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 2aa1dedd21b8..e211a523c258 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -4548,6 +4548,13 @@ static int lan8814_config_init(struct phy_device *phydev)
- 	struct kszphy_priv *lan8814 = phydev->priv;
- 	int ret;
- 
-+	if (phy_package_init_once(phydev))
-+		/* Reset the PHY */
-+		lanphy_modify_page_reg(phydev, LAN8814_PAGE_COMMON_REGS,
-+				       LAN8814_QSGMII_SOFT_RESET,
-+				       LAN8814_QSGMII_SOFT_RESET_BIT,
-+				       LAN8814_QSGMII_SOFT_RESET_BIT);
-+
- 	/* Based on the interface type select how the advertise ability is
- 	 * encoded, to set as SGMII or as USGMII.
- 	 */
-@@ -4655,13 +4662,7 @@ static int lan8814_probe(struct phy_device *phydev)
- 	priv->is_ptp_available = err == LAN8814_REV_LAN8814 ||
- 				 err == LAN8814_REV_LAN8818;
- 
--	if (phy_package_init_once(phydev)) {
--		/* Reset the PHY */
--		lanphy_modify_page_reg(phydev, LAN8814_PAGE_COMMON_REGS,
--				       LAN8814_QSGMII_SOFT_RESET,
--				       LAN8814_QSGMII_SOFT_RESET_BIT,
--				       LAN8814_QSGMII_SOFT_RESET_BIT);
--
-+	if (phy_package_probe_once(phydev)) {
- 		err = lan8814_release_coma_mode(phydev);
- 		if (err)
- 			return err;
--- 
-2.54.0
+To get back total_errors for example for TAP
+1 thread sending:
 
+elapsed_time = 100e6 / 1.136Mpps = 88s
+
+3758 Mpps = total_errors / 88s
+<=> total_errors = 331 million packets
+
+So, out of 431 million packets sent, 100 million were successfully
+delivered and 331 million were lost.
+
+> 
+>> I assume they would be visible as RX-DRP for TAP.
+>> For TAP + vhost-net I would have to rewrite the XDP drop
+>> program to count the number of dropped packets...
+>> And I would have to automate it...
+>>
+>>>>
+>>>> The previously introduced threshold to only wake after the queue stopped
+>>>> and half of the ring was consumed showed to be a descent choice:
+>>>> Waking the queue whenever a consume made space in the ring strongly
+>>>> degrades performance for tap, while waking only when the ring is empty
+>>>> is too late and also hurts throughput for tap & tap+vhost-net.
+>>>> Other ratios (3/4, 7/8) showed similar results (not shown here), so
+>>>> 1/2 was chosen for the sake of simplicity for both tun/tap and
+>>>> tun/tap+vhost-net.
+>>>>
+>>>> Test setup:
+>>>> AMD Ryzen 5 5600X at 4.3 GHz, 3200 MHz RAM, isolated QEMU threads;
+>>>> Average over 50 runs @ 100,000,000 packets. SRSO and spectre v2
+>>>> mitigations disabled.
+>>>>
+>>>> Note for tap+vhost-net:
+>>>> XDP drop program active in VM -> ~2.5x faster, slower for tap due to
+>>>> more syscalls (high utilization of entry_SYSRETQ_unsafe_stack in perf)
+>>>>
+>>>> +--------------------------+--------------+----------------+----------+
+>>>> | 1 thread                 | Stock        | Patched with   | diff     |
+>>>> | sending                  |              | fq_codel qdisc |          |
+>>>> +------------+-------------+--------------+----------------+----------+
+>>>> | TAP        | Transmitted | 1.136 Mpps   | 1.130 Mpps     | -0.6%    |
+>>>> |            +-------------+--------------+----------------+----------+
+>>>> |            | Lost/s      | 3.758 Mpps   | 0 pps          |          |
+>>>> +------------+-------------+--------------+----------------+----------+
+>>>> | TAP        | Transmitted | 3.858 Mpps   | 3.816 Mpps     | -1.1%    |
+>>>> |            +-------------+--------------+----------------+----------+
+>>>> | +vhost-net | Lost/s      | 789.8 Kpps   | 0 pps          |          |
+>>>> +------------+-------------+--------------+----------------+----------+
+>>>>
+>>>> +--------------------------+--------------+----------------+----------+
+>>>> | 2 threads                | Stock        | Patched with   | diff     |
+>>>> | sending                  |              | fq_codel qdisc |          |
+>>>> +------------+-------------+--------------+----------------+----------+
+>>>> | TAP        | Transmitted | 1.117 Mpps   | 1.087 Mpps     | -2.7%    |
+>>>> |            +-------------+--------------+----------------+----------+
+>>>> |            | Lost/s      | 8.476 Mpps   | 0 pps          |          |
+>>>> +------------+-------------+--------------+----------------+----------+
+>>>> | TAP        | Transmitted | 3.679 Mpps   | 3.464 Mpps     | -5.8%    |
+>>>> |            +-------------+--------------+----------------+----------+
+>>>> | +vhost-net | Lost/s      | 5.306 Mpps   | 0 pps          |          |
+>>>> +------------+-------------+--------------+----------------+----------+
+>>>>
+>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>> ---
+>>>>  drivers/net/tun.c | 30 ++++++++++++++++++++++++++++--
+>>>>  1 file changed, 28 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>>>> index efe809597622..c2a1618cc9db 100644
+>>>> --- a/drivers/net/tun.c
+>>>> +++ b/drivers/net/tun.c
+>>>> @@ -1011,6 +1011,8 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+>>>>  	struct netdev_queue *queue;
+>>>>  	struct tun_file *tfile;
+>>>>  	int len = skb->len;
+>>>> +	bool qdisc_present;
+>>>> +	int ret;
+>>>>  
+>>>>  	rcu_read_lock();
+>>>>  	tfile = rcu_dereference(tun->tfiles[txq]);
+>>>> @@ -1065,13 +1067,37 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+>>>>  
+>>>>  	nf_reset_ct(skb);
+>>>>  
+>>>> -	if (ptr_ring_produce(&tfile->tx_ring, skb)) {
+>>>> +	queue = netdev_get_tx_queue(dev, txq);
+>>>> +	qdisc_present = !qdisc_txq_has_no_queue(queue);
+>>>> +
+>>>> +	spin_lock(&tfile->tx_ring.producer_lock);
+>>>> +	ret = __ptr_ring_produce(&tfile->tx_ring, skb);
+>>>> +	if (__ptr_ring_produce_peek(&tfile->tx_ring) && qdisc_present) {
+>>>> +		netif_tx_stop_queue(queue);
+>>>> +		/* Re-peek and wake if the consumer drained the ring
+>>>> +		 * concurrently in a race. smp_mb__after_atomic() pairs
+>>>> +		 * with the test_and_clear_bit() of netif_wake_subqueue()
+>>>> +		 * in __tun_wake_queue().
+>>>> +		 */
+>>>> +		smp_mb__after_atomic();
+>>>> +		if (!__ptr_ring_produce_peek(&tfile->tx_ring))
+>>>> +			netif_tx_wake_queue(queue);
+>>>> +	}
+>>>> +	spin_unlock(&tfile->tx_ring.producer_lock);
+>>>> +
+>>>> +	if (ret) {
+>>>> +		/* If a qdisc is attached to our virtual device,
+>>>> +		 * returning NETDEV_TX_BUSY is allowed.
+>>>> +		 */
+>>>> +		if (qdisc_present) {
+>>>> +			rcu_read_unlock();
+>>>> +			return NETDEV_TX_BUSY;
+>>>> +		}
+>>>>  		drop_reason = SKB_DROP_REASON_FULL_RING;
+>>>>  		goto drop;
+>>>>  	}
+>>>>  
+>>>>  	/* dev->lltx requires to do our own update of trans_start */
+>>>> -	queue = netdev_get_tx_queue(dev, txq);
+>>>>  	txq_trans_cond_update(queue);
+>>>>  
+>>>>  	/* Notify and wake up reader process */
+>>>> -- 
+>>>> 2.43.0
+>>>
+> 
 
