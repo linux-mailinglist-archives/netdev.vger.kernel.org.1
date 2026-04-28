@@ -1,471 +1,302 @@
-Return-Path: <netdev+bounces-281721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281723-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2A/nIWxx8GldTgEAu9opvQ
-	(envelope-from <netdev+bounces-281721-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 10:35:56 +0200
+	id aK02Nsxx8GldTgEAu9opvQ
+	(envelope-from <netdev+bounces-281723-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 10:37:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E145748040D
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 10:35:55 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69E7C48044A
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 10:37:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 20CAD3141C48
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 08:29:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 972A93175E66
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 08:30:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB97F3DEAFB;
-	Tue, 28 Apr 2026 08:27:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B1643D75DD;
+	Tue, 28 Apr 2026 08:28:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g6YD63q+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mguRKT73"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BB43DB632;
-	Tue, 28 Apr 2026 08:27:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C1523D75C6
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 08:28:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777364854; cv=none; b=Utel9d/ordhscBYl3huK2Ku0fZlpXKTSSGBKMyYOg5uss3z2CJUsHkzaGEmi3qRB67TE+J8L7Yp7+BXsuo12JHb8iOoicxm0i/ktECzXEJ/Qco508LqEP5fkdft94P9nTetMvsCcqOCxEMz8q03zwt2Wj8AYY3gEZ9/dExuDKoI=
+	t=1777364935; cv=none; b=uOU3Fm84lxYuhdfctEF4+2N+F4rJnmU6DBfsDPc8AiflNhBbY76lUD+i9yuNs8t17Yy+EHdc2j/C5kVuKdwalWQ7VqaXHFY5svKwnGXB9w/vXyV751g+ghm55b/m0nnYzJ38G9GymD12pstuw3UXRyHMOemUkQWpNys+Asqm5+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777364854; c=relaxed/simple;
-	bh=N+j5bFBQG7IVgb+U+Km1XXCsm7Ik726163g4RGJlU5w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ojRM8WrXxXxDPsU+09C8wahHvM2L2B7/Vr5G/8HVYXIpwqENeT5gOdPRbhNgZA1Duy81hSuSzxhPki1ny2O9PRjBU4+jAWsl58jp6/gQMlKCW/qJ6dswCdq+pgsHQRaQYrxD4UbBYGaerVhtfiVc/qvjqAnl/X861mbfi4ncPjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g6YD63q+; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777364852; x=1808900852;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=N+j5bFBQG7IVgb+U+Km1XXCsm7Ik726163g4RGJlU5w=;
-  b=g6YD63q+GO/ZxaAtUCvs2i4d+ht46W8FvdzIwQ+b+n9LzbgJcHrO6OPe
-   VUZeLBV6hz8GT+MGJN4lteSAQBYgxDhyk8cEzmHC83t9HzNuwnhk4k2IY
-   SUaC2yH9HegtfNNQ2xU8D2lgIQbc0Ozt1qqXsZQqXx+NrEV5b8riHYHfQ
-   smk/BYL5ZO8Tkxbu3Ukb1arFXaRkAxRB0iWoe4WbdN0ukh8DZAL1N0YxI
-   cmWR8qILlslSABtwwtyMj9BsKwlVEbZ3JvIXPkF/QhcPjDK7PKf73WmZd
-   cPg4HQ27V7HE5DOXCxgOeguEo42Iyfcxsel5WcucJdmO8Y36mNuAa7ZuQ
-   Q==;
-X-CSE-ConnectionGUID: eK/4zLcfS+mO+MULEpDXUQ==
-X-CSE-MsgGUID: QRuaqRilS6i0qDFNJ4mqog==
-X-IronPort-AV: E=McAfee;i="6800,10657,11769"; a="78377015"
-X-IronPort-AV: E=Sophos;i="6.23,203,1770624000"; 
-   d="scan'208";a="78377015"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2026 01:27:28 -0700
-X-CSE-ConnectionGUID: sLJz5nTwRf20Nlp3MoZN4Q==
-X-CSE-MsgGUID: ne4yKJJeRcitz7ACmpKFhQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,203,1770624000"; 
-   d="scan'208";a="232881594"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa006.jf.intel.com with ESMTP; 28 Apr 2026 01:27:23 -0700
-Received: from mglak.igk.intel.com (mglak.igk.intel.com [10.237.112.146])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id D93F627BA6;
-	Tue, 28 Apr 2026 09:27:20 +0100 (IST)
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: aleksander.lobakin@intel.com,
-	sridhar.samudrala@intel.com,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Larysa Zaremba <larysa.zaremba@intel.com>,
-	"Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>,
-	Emil Tantilov <emil.s.tantilov@intel.com>,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Josh Hay <joshua.a.hay@intel.com>,
-	"Keller, Jacob E" <jacob.e.keller@intel.com>,
-	jayaprakash.shanmugam@intel.com,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bharath R <Bharath.r@intel.com>
-Subject: [PATCH iwl-next v7 14/14] ixd: add devlink support
-Date: Tue, 28 Apr 2026 10:26:48 +0200
-Message-ID: <20260428082654.44364-15-larysa.zaremba@intel.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20260428082654.44364-1-larysa.zaremba@intel.com>
-References: <20260428082654.44364-1-larysa.zaremba@intel.com>
+	s=arc-20240116; t=1777364935; c=relaxed/simple;
+	bh=XhJcrSJ5j1XR3kI25yvETY77CY8uis/clrpe5Cu19ns=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Z0i2vAjwUDnK0TCemhIWxHajlNTMV9Zs3DX4QELbj1+iUsHOVGLk/NuzO7M73eFrEU2j7oUjkjGu4Ld0XPD1Z2lueByK3TvdW8CXzOS3+X1BAxpA3SMbepZ03dkTyYhRZ19BVs6xqeqD6Ux6MyYNRh764DPr65tvDWmzGRfMvxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mguRKT73; arc=none smtp.client-ip=209.85.160.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-50d812c898cso295212701cf.1
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 01:28:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777364933; x=1777969733; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=AZ7AM4sUTj1CsDlwy22BwmLFhBvxq226uLWhzfZ1iUw=;
+        b=mguRKT73Lhrp131LzAIOUjvp4Ra1iQQPciutSrlWS/29TZuPmowgk2DU4PQjht+kvh
+         HyP84aY+xIwBnLjNTWtduvxas5uJlSYKq1xdCQSe0q/LKO5dHSQ5lHck3hxlIyjDuNie
+         GMAMt6og/Su+GVumFy40dJmqploPmfgnVQFOU3lfc2zVgO5icow4+n9jdfF2yeWnHwg5
+         4s2cGP237A9Sd34hqyGqE0h4XO2ekPgCp047B+DJgyQHXFDrG5kicmffluXaxzV+OhQK
+         oFt24/AyRMRNSO6sSJXtGv4blkii/ZbUft0c6Rhcf8oRATE9X2kbhjeFmJYQOUCrgzaf
+         b0ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777364933; x=1777969733;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AZ7AM4sUTj1CsDlwy22BwmLFhBvxq226uLWhzfZ1iUw=;
+        b=Ixh+bNz6iwf7mebeNxfPGTqqJgtbn2VQ116aNB/risWnsujkmwWBA5CTQuB6IGw2IZ
+         MfxdAEL3cUHhudS5Klwz2LH2lzDKf5RtA0pvZYVaHhSp0sCOSWmfGYjMiMeDd95qqBOd
+         jS7vv64IUYPZKnkr/LSj+f6WGPtw/d8mk13QdrkKyzZvmJ0Qk0nwfblk0Yhdqs9DZTtG
+         4J2FtuxpUkzK1ucemKKEi9pDBUzm//2QJxRrpdXe27cDWLtrTUC4L1UOgBNd+Ifx9gpd
+         dDsgyprXoqGg2Nr+hOI3ngZLVUtFe1kwckxiFvhh75hpYkBEioDDQFU7MVB+FvVz7r0q
+         QZ2Q==
+X-Forwarded-Encrypted: i=1; AFNElJ9n0iHAHuebmWYHoW3dclUgpT48g1qOeBCfoBwlloyaIprhh3l544SLa1qGYxi1HVajMD0nvMk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSFop5gZtcOBrwo/a5/EfLE0WPtVt6Ya0ThojTEuFswXNmZ2kb
+	0+SfJ7n4X64VSa2yebQgK+FL2wfrqDMHqQEwEh0kNNsicpPATp20/Ql8zSPlePrq1gvMneQVKda
+	lDPss1qmdt3tTMw==
+X-Received: from qtbce13.prod.google.com ([2002:a05:622a:41cd:b0:50f:c3ab:2ee9])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:10a:b0:50d:efc1:841d with SMTP id d75a77b69052e-5100e13f4e3mr25680781cf.23.1777364932985;
+ Tue, 28 Apr 2026 01:28:52 -0700 (PDT)
+Date: Tue, 28 Apr 2026 08:28:51 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: E145748040D
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
+Message-ID: <20260428082851.3240821-1-edumazet@google.com>
+Subject: [PATCH iproute2-next] tc: use ll_init_map() only when needed
+From: Eric Dumazet <edumazet@google.com>
+To: David Ahern <dsahern@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 69E7C48044A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[intel.com,linux.intel.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,gmail.com,lunn.ch,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[26];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,google.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-281721-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-281723-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[larysa.zaremba@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-From: Amritha Nambiar <amritha.nambiar@intel.com>
+Some setups can have thousands of devices.
 
-Enable initial support for the devlink interface with the ixd driver. The
-ixd hardware is a single function PCIe device. So, the PCIe adapter gets
-its own devlink instance to manage device-wide resources or configuration.
+ll_init_map() is rather expensive for them.
 
-$ devlink dev show
-pci/0000:83:00.6
+Only call ll_init_map() in the following cases:
 
-$ devlink dev info pci/0000:83:00.6
-pci/0000:83:00.6:
-  driver ixd
-  serial_number 00-a0-c9-ff-ff-23-45-67
-  versions:
-      fixed:
-        device.type MEV
-      running:
-        virtchnl 2.0
+1) tc runs in batch mode.
+2) tc runs in monitor mode.
+3) tc dumps qdiscs/classes/filters for all netdev.
 
-Signed-off-by: Amritha Nambiar <amritha.nambiar@intel.com>
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-Tested-by: Bharath R <Bharath.r@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+This greatly reduces RTNL pressure on common operations.
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- Documentation/networking/devlink/index.rst   |  1 +
- Documentation/networking/devlink/ixd.rst     | 30 ++++++
- drivers/net/ethernet/intel/ixd/Kconfig       |  1 +
- drivers/net/ethernet/intel/ixd/Makefile      |  1 +
- drivers/net/ethernet/intel/ixd/ixd_devlink.c | 97 ++++++++++++++++++++
- drivers/net/ethernet/intel/ixd/ixd_devlink.h | 44 +++++++++
- drivers/net/ethernet/intel/ixd/ixd_main.c    | 16 +++-
- 7 files changed, 187 insertions(+), 3 deletions(-)
- create mode 100644 Documentation/networking/devlink/ixd.rst
- create mode 100644 drivers/net/ethernet/intel/ixd/ixd_devlink.c
- create mode 100644 drivers/net/ethernet/intel/ixd/ixd_devlink.h
+ tc/f_route.c   |  1 -
+ tc/m_mirred.c  |  2 --
+ tc/tc.c        |  1 +
+ tc/tc_class.c  |  6 ++----
+ tc/tc_filter.c | 32 ++++++++++++++++----------------
+ tc/tc_qdisc.c  |  5 ++---
+ 6 files changed, 21 insertions(+), 26 deletions(-)
 
-diff --git a/Documentation/networking/devlink/index.rst b/Documentation/networking/devlink/index.rst
-index f7ba7dcf477d..f0c077843fa7 100644
---- a/Documentation/networking/devlink/index.rst
-+++ b/Documentation/networking/devlink/index.rst
-@@ -88,6 +88,7 @@ parameters, info versions, and other features it supports.
-    ionic
-    iosm
-    ixgbe
-+   ixd
-    kvaser_pciefd
-    kvaser_usb
-    mlx4
-diff --git a/Documentation/networking/devlink/ixd.rst b/Documentation/networking/devlink/ixd.rst
-new file mode 100644
-index 000000000000..17b63c8425aa
---- /dev/null
-+++ b/Documentation/networking/devlink/ixd.rst
-@@ -0,0 +1,30 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+===================
-+ixd devlink support
-+===================
-+
-+This document describes the devlink features implemented by the ``ixd``
-+device driver.
-+
-+Info versions
-+=============
-+
-+The ``ixd`` driver reports the following versions
-+
-+.. list-table:: devlink info versions implemented
-+    :widths: 5 5 5 90
-+
-+    * - Name
-+      - Type
-+      - Example
-+      - Description
-+    * - ``device.type``
-+      - fixed
-+      - MEV
-+      - The hardware type for this device
-+    * - ``virtchnl``
-+      - running
-+      - 2.0
-+      - 2-digit version number (major.minor) of the communication channel
-+        (virtchnl) used by the device.
-diff --git a/drivers/net/ethernet/intel/ixd/Kconfig b/drivers/net/ethernet/intel/ixd/Kconfig
-index 24510c50070e..34181c59dcdc 100644
---- a/drivers/net/ethernet/intel/ixd/Kconfig
-+++ b/drivers/net/ethernet/intel/ixd/Kconfig
-@@ -7,6 +7,7 @@ config IXD
- 	select LIBETH
- 	select LIBIE_CP
- 	select LIBIE_PCI
-+	select NET_DEVLINK
- 	help
- 	  This driver supports Intel(R) Control Plane PCI Function
- 	  of Intel E2100 and later IPUs and FNICs.
-diff --git a/drivers/net/ethernet/intel/ixd/Makefile b/drivers/net/ethernet/intel/ixd/Makefile
-index 90abf231fb16..03760a2580b9 100644
---- a/drivers/net/ethernet/intel/ixd/Makefile
-+++ b/drivers/net/ethernet/intel/ixd/Makefile
-@@ -8,5 +8,6 @@ obj-$(CONFIG_IXD) += ixd.o
- ixd-y := ixd_main.o
- ixd-y += ixd_ctlq.o
- ixd-y += ixd_dev.o
-+ixd-y += ixd_devlink.o
- ixd-y += ixd_lib.o
- ixd-y += ixd_virtchnl.o
-diff --git a/drivers/net/ethernet/intel/ixd/ixd_devlink.c b/drivers/net/ethernet/intel/ixd/ixd_devlink.c
-new file mode 100644
-index 000000000000..23ab11226978
---- /dev/null
-+++ b/drivers/net/ethernet/intel/ixd/ixd_devlink.c
-@@ -0,0 +1,97 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2025, Intel Corporation. */
-+
-+#include "ixd.h"
-+#include "ixd_devlink.h"
-+
-+#define IXD_DEVLINK_INFO_LEN	128
-+
-+/**
-+ * ixd_fill_dsn - Get the serial number for the ixd device
-+ * @adapter: adapter to query
-+ * @buf: storage buffer for the info request
-+ */
-+static void ixd_fill_dsn(struct ixd_adapter *adapter, char *buf)
-+{
-+	u8 dsn[8];
-+
-+	/* Copy the DSN into an array in Big Endian format */
-+	put_unaligned_be64(pci_get_dsn(adapter->cp_ctx.mmio_info.pdev), dsn);
-+
-+	snprintf(buf, IXD_DEVLINK_INFO_LEN, "%8phD", dsn);
-+}
-+
-+/**
-+ * ixd_fill_device_name - Get the name of the underlying hardware
-+ * @adapter: adapter to query
-+ * @buf: storage buffer for the info request
-+ * @buf_size: size of the storage buffer
-+ */
-+static void ixd_fill_device_name(struct ixd_adapter *adapter, char *buf,
-+				 size_t buf_size)
-+{
-+	if (adapter->caps.device_type == cpu_to_le32(VIRTCHNL2_MEV_DEVICE))
-+		snprintf(buf, buf_size, "%s", "MEV");
-+	else
-+		snprintf(buf, buf_size, "%s", "UNKNOWN");
-+}
-+
-+/**
-+ * ixd_devlink_info_get - .info_get devlink handler
-+ * @devlink: devlink instance structure
-+ * @req: the devlink info request
-+ * @extack: extended netdev ack structure
-+ *
-+ * Callback for the devlink .info_get operation. Reports information about the
-+ * device.
-+ *
-+ * Return: zero on success or an error code on failure.
-+ */
-+static int ixd_devlink_info_get(struct devlink *devlink,
-+				struct devlink_info_req *req,
-+				struct netlink_ext_ack *extack)
-+{
-+	struct ixd_adapter *adapter = devlink_priv(devlink);
-+	char buf[IXD_DEVLINK_INFO_LEN];
-+	int err;
-+
-+	ixd_fill_dsn(adapter, buf);
-+	err = devlink_info_serial_number_put(req, buf);
-+	if (err)
-+		return err;
-+
-+	ixd_fill_device_name(adapter, buf, IXD_DEVLINK_INFO_LEN);
-+	err = devlink_info_version_fixed_put(req, "device.type", buf);
-+	if (err)
-+		return err;
-+
-+	snprintf(buf, sizeof(buf), "%u.%u",
-+		 adapter->vc_ver.major, adapter->vc_ver.minor);
-+
-+	return devlink_info_version_running_put(req, "virtchnl", buf);
-+}
-+
-+static const struct devlink_ops ixd_devlink_ops = {
-+	.info_get = ixd_devlink_info_get,
-+};
-+
-+/**
-+ * ixd_adapter_alloc - Allocate devlink and return adapter pointer
-+ * @dev: the device to allocate for
-+ *
-+ * Allocate a devlink instance for this device and return the private area as
-+ * the adapter structure.
-+ *
-+ * Return: adapter structure on success, NULL on failure
-+ */
-+struct ixd_adapter *ixd_adapter_alloc(struct device *dev)
-+{
-+	struct devlink *devlink;
-+
-+	devlink = devlink_alloc(&ixd_devlink_ops, sizeof(struct ixd_adapter),
-+				dev);
-+	if (!devlink)
-+		return NULL;
-+
-+	return devlink_priv(devlink);
-+}
-diff --git a/drivers/net/ethernet/intel/ixd/ixd_devlink.h b/drivers/net/ethernet/intel/ixd/ixd_devlink.h
-new file mode 100644
-index 000000000000..c43ce0655de2
---- /dev/null
-+++ b/drivers/net/ethernet/intel/ixd/ixd_devlink.h
-@@ -0,0 +1,44 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (c) 2025, Intel Corporation. */
-+
-+#ifndef _IXD_DEVLINK_H_
-+#define _IXD_DEVLINK_H_
-+#include <net/devlink.h>
-+
-+struct ixd_adapter *ixd_adapter_alloc(struct device *dev);
-+
-+/**
-+ * ixd_devlink_free - teardown the devlink
-+ * @adapter: the adapter structure to free
-+ *
-+ */
-+static inline void ixd_devlink_free(struct ixd_adapter *adapter)
-+{
-+	struct devlink *devlink = priv_to_devlink(adapter);
-+
-+	devlink_free(devlink);
-+}
-+
-+/**
-+ * ixd_devlink_unregister - Unregister devlink resources for this adapter.
-+ * @adapter: the adapter structure to cleanup
-+ *
-+ * Releases resources used by devlink and cleans up associated memory.
-+ */
-+static inline void ixd_devlink_unregister(struct ixd_adapter *adapter)
-+{
-+	devlink_unregister(priv_to_devlink(adapter));
-+}
-+
-+/**
-+ * ixd_devlink_register - Register devlink interface for this adapter
-+ * @adapter: pointer to ixd adapter structure to be associated with devlink
-+ *
-+ * Register the devlink instance associated with this adapter
-+ */
-+static inline void ixd_devlink_register(struct ixd_adapter *adapter)
-+{
-+	devlink_register(priv_to_devlink(adapter));
-+}
-+
-+#endif /* _IXD_DEVLINK_H_ */
-diff --git a/drivers/net/ethernet/intel/ixd/ixd_main.c b/drivers/net/ethernet/intel/ixd/ixd_main.c
-index 6d5e6aca77df..ea6aa793a6a7 100644
---- a/drivers/net/ethernet/intel/ixd/ixd_main.c
-+++ b/drivers/net/ethernet/intel/ixd/ixd_main.c
-@@ -4,6 +4,7 @@
- #include "ixd.h"
- #include "ixd_ctlq.h"
- #include "ixd_lan_regs.h"
-+#include "ixd_devlink.h"
+diff --git a/tc/f_route.c b/tc/f_route.c
+index 96b99b06be179c90dfb0d24d9577b5206dd98ef1..c234ddf0cb9309556844c85047d0f9ef53a2fd7b 100644
+--- a/tc/f_route.c
++++ b/tc/f_route.c
+@@ -76,7 +76,6 @@ static int route_parse_opt(const struct filter_util *qu, char *handle, int argc,
+ 			__u32 id;
  
- MODULE_DESCRIPTION("Intel(R) Control Plane Function Device Driver");
- MODULE_IMPORT_NS("LIBIE_CP");
-@@ -21,11 +22,14 @@ static void ixd_remove(struct pci_dev *pdev)
- 	/* Do not mix removal with (re)initialization */
- 	cancel_delayed_work_sync(&adapter->init_task.init_work);
+ 			NEXT_ARG();
+-			ll_init_map(&rth);
+ 			if ((id = ll_name_to_index(*argv)) <= 0) {
+ 				fprintf(stderr, "Illegal \"fromif\"\n");
+ 				return -1;
+diff --git a/tc/m_mirred.c b/tc/m_mirred.c
+index f4da3c76284460d7f4bb73c7c3c172732f054632..e9ae5199432e828026f15ce226c5f5f84998c660 100644
+--- a/tc/m_mirred.c
++++ b/tc/m_mirred.c
+@@ -213,8 +213,6 @@ parse_direction(const struct action_util *a, int *argc_p, char ***argv_p,
+ 	if (d[0])  {
+ 		int idx;
  
-+	ixd_devlink_unregister(adapter);
-+
- 	/* Leave the device clean on exit */
- 	ixd_trigger_reset(adapter);
- 	ixd_deinit_dflt_mbx(adapter);
+-		ll_init_map(&rth);
+-
+ 		idx = ll_name_to_index(d);
+ 		if (!idx)
+ 			return nodev(d);
+diff --git a/tc/tc.c b/tc/tc.c
+index 0fc658c881f0f553f1f1f8d87b46943d4d0eed8f..7d69e4d533a98b9c071cb954443a049a52252f2c 100644
+--- a/tc/tc.c
++++ b/tc/tc.c
+@@ -243,6 +243,7 @@ static int batch(const char *name)
+ 		return -1;
+ 	}
  
- 	libie_pci_unmap_all_mmio_regions(&adapter->cp_ctx.mmio_info);
-+	ixd_devlink_free(adapter);
- }
++	ll_init_map(&rth);
+ 	ret = do_batch(name, force, tc_batch_cmd, NULL);
  
- /**
-@@ -93,7 +97,7 @@ static int ixd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	if (WARN_ON(ent->device != IXD_DEV_ID_CPF))
- 		return -EINVAL;
+ 	rtnl_close(&rth);
+diff --git a/tc/tc_class.c b/tc/tc_class.c
+index 6d707d8c924f4b5e90201d4de8e9779f82ce17f3..9aace019e6c8b96fb51edb4fe89bea5b7469beed 100644
+--- a/tc/tc_class.c
++++ b/tc/tc_class.c
+@@ -136,11 +136,11 @@ static int tc_class_modify(int cmd, unsigned int flags, int argc, char **argv)
+ 	}
  
--	adapter = devm_kzalloc(&pdev->dev, sizeof(*adapter), GFP_KERNEL);
-+	adapter = ixd_adapter_alloc(&pdev->dev);
- 	if (!adapter)
- 		return -ENOMEM;
+ 	if (d[0])  {
+-		ll_init_map(&rth);
+-
+ 		req.t.tcm_ifindex = ll_name_to_index(d);
+ 		if (!req.t.tcm_ifindex)
+ 			return -nodev(d);
++	} else {
++		ll_init_map(&rth);
+ 	}
  
-@@ -102,13 +106,13 @@ static int ixd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	if (rtnl_talk(&rth, &req.n, NULL) < 0)
+@@ -437,8 +437,6 @@ static int tc_class_list(int argc, char **argv)
+ 		argc--; argv++;
+ 	}
  
- 	err = libie_pci_init_dev(pdev);
- 	if (err)
--		return err;
-+		goto free_adapter;
+-	ll_init_map(&rth);
+-
+ 	if (d[0]) {
+ 		t.tcm_ifindex = ll_name_to_index(d);
+ 		if (!t.tcm_ifindex)
+diff --git a/tc/tc_filter.c b/tc/tc_filter.c
+index 7db850bda11a3408ec66b457c9fc590f3a734f65..be70e360849e5058192640da0f061810a99e2ea8 100644
+--- a/tc/tc_filter.c
++++ b/tc/tc_filter.c
+@@ -188,16 +188,17 @@ static int tc_filter_modify(int cmd, unsigned int flags, int argc, char **argv)
+ 		addattr_l(&req.n, sizeof(req), TCA_KIND, k, strlen(k)+1);
  
- 	pci_set_drvdata(pdev, adapter);
+ 	if (d[0])  {
+-		ll_init_map(&rth);
+-
+ 		req.t.tcm_ifindex = ll_name_to_index(d);
+ 		if (req.t.tcm_ifindex == 0) {
+ 			fprintf(stderr, "Cannot find device \"%s\"\n", d);
+ 			return 1;
+ 		}
+-	} else if (block_index) {
+-		req.t.tcm_ifindex = TCM_IFINDEX_MAGIC_BLOCK;
+-		req.t.tcm_block_index = block_index;
++	} else {
++		ll_init_map(&rth);
++		if (block_index) {
++			req.t.tcm_ifindex = TCM_IFINDEX_MAGIC_BLOCK;
++			req.t.tcm_block_index = block_index;
++		}
+ 	}
  
- 	err = ixd_iomap_regions(adapter);
- 	if (err)
--		return err;
-+		goto free_adapter;
+ 	if (q) {
+@@ -539,8 +540,6 @@ static int tc_filter_get(int cmd, unsigned int flags, int argc, char **argv)
+ 	}
  
- 	INIT_DELAYED_WORK(&adapter->init_task.init_work,
- 			  ixd_init_task);
-@@ -118,7 +122,13 @@ static int ixd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	queue_delayed_work(system_unbound_wq, &adapter->init_task.init_work,
- 			   msecs_to_jiffies(500));
+ 	if (d[0])  {
+-		ll_init_map(&rth);
+-
+ 		req.t.tcm_ifindex = ll_name_to_index(d);
+ 		if (!req.t.tcm_ifindex)
+ 			return -nodev(d);
+@@ -704,21 +703,22 @@ static int tc_filter_list(int cmd, int argc, char **argv)
  
-+	ixd_devlink_register(adapter);
-+
- 	return 0;
-+
-+free_adapter:
-+	ixd_devlink_free(adapter);
-+	return err;
- }
+ 	req.t.tcm_info = TC_H_MAKE(prio<<16, protocol);
  
- static const struct pci_device_id ixd_pci_tbl[] = {
+-	ll_init_map(&rth);
+-
+ 	if (d[0]) {
+ 		req.t.tcm_ifindex = ll_name_to_index(d);
+ 		if (!req.t.tcm_ifindex)
+ 			return -nodev(d);
+ 		filter_ifindex = req.t.tcm_ifindex;
+-	} else if (block_index) {
+-		if (!tc_qdisc_block_exists(block_index)) {
+-			fprintf(stderr, "Cannot find block \"%u\"\n", block_index);
+-			return 1;
++	} else {
++		ll_init_map(&rth);
++		if (block_index) {
++			if (!tc_qdisc_block_exists(block_index)) {
++				fprintf(stderr, "Cannot find block \"%u\"\n", block_index);
++				return 1;
++			}
++			req.t.tcm_ifindex = TCM_IFINDEX_MAGIC_BLOCK;
++			req.t.tcm_block_index = block_index;
++			filter_block_index = block_index;
+ 		}
+-		req.t.tcm_ifindex = TCM_IFINDEX_MAGIC_BLOCK;
+-		req.t.tcm_block_index = block_index;
+-		filter_block_index = block_index;
+ 	}
+ 
+ 	if (filter_chain_index_set)
+diff --git a/tc/tc_qdisc.c b/tc/tc_qdisc.c
+index 7eb9a31baa31fb91a8141c9eca1135e76a52fa8b..252ea861f249a5a71cf782389776e68c3e48c6cc 100644
+--- a/tc/tc_qdisc.c
++++ b/tc/tc_qdisc.c
+@@ -193,8 +193,6 @@ static int tc_qdisc_modify(int cmd, unsigned int flags, int argc, char **argv)
+ 	if (d[0])  {
+ 		int idx;
+ 
+-		ll_init_map(&rth);
+-
+ 		idx = ll_name_to_index(d);
+ 		if (!idx)
+ 			return -nodev(d);
+@@ -411,13 +409,14 @@ static int tc_qdisc_list(int argc, char **argv)
+ 		argc--; argv++;
+ 	}
+ 
+-	ll_init_map(&rth);
+ 
+ 	if (d[0]) {
+ 		req.t.tcm_ifindex = ll_name_to_index(d);
+ 		if (!req.t.tcm_ifindex)
+ 			return -nodev(d);
+ 		filter_ifindex = req.t.tcm_ifindex;
++	} else {
++		ll_init_map(&rth);
+ 	}
+ 
+ 	if (dump_invisible) {
 -- 
-2.47.0
+2.54.0.545.g6539524ca2-goog
 
 
