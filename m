@@ -1,268 +1,191 @@
-Return-Path: <netdev+bounces-282090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282091-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0HBDJsYo8WmteAEAu9opvQ
-	(envelope-from <netdev+bounces-282090-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 23:38:14 +0200
+	id wLfrAKEt8WleeQEAu9opvQ
+	(envelope-from <netdev+bounces-282091-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 23:58:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5281648C5B7
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 23:38:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7553148C6CC
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 23:58:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ECC69304B34B
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 21:38:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3429B30413BA
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 21:58:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90DA3C6606;
-	Tue, 28 Apr 2026 21:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC0941FF7C7;
+	Tue, 28 Apr 2026 21:58:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BKpyABXY"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="II5N2TYo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f228.google.com (mail-qt1-f228.google.com [209.85.160.228])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F23853B8D4A;
-	Tue, 28 Apr 2026 21:38:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E20D2550D5
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 21:58:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777412284; cv=none; b=RlSR1lG4oWMoP5AIDU9O27xXke7c+vYVGrqXwslZF6YRl0zYoW3qAIvg5HEzU+QVU4wnfNYkC1ZqwoEsY9YrSMpjK2CyZ7M+gfiRPGFCqR89jRs7i3JAPVR+aZw0TcPYGMttY8xWAR3xj794rchSNuONmbIQufV32NXwXafl51A=
+	t=1777413514; cv=none; b=f/p2E+pCad4R2tv9EDZhut7eSSynepl8UAwV/NRqsx/c0TqHBud1LKUVmcZOzLGmlPnp+ktk/lhvDS0s/KJtumDHcTO1V2Dq3g8Z0Au7PBRKq2IN+U/beMgl2cdz8+PO5O+lKlZJlp8z6d1vAqbpeoI0w0pc031GkFE5T0kWzPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777412284; c=relaxed/simple;
-	bh=3DHxrurPMXhWs/+VFuk5zRg5OApGCHvlQgCxsQ6X7vM=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:From:To:
-	 References:In-Reply-To; b=aIjr5uI1rhGCOJmtyaxNULWLg2bdjl3c3hyktUD8bSQMJeE/0v0jTbasvz4uv44ZmHLba9x6jjfoPFQLG4R4oheCIpm5fIh9J+m+bQ554xXKE3pIknP8Ih0jPiScB23uSG4Hk8kOGCr+mrP6dxzqHW84lp84YcbkMSZeh9eW8oA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BKpyABXY; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 4CDAD4E42B64;
-	Tue, 28 Apr 2026 21:37:59 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id E94DD601D0;
-	Tue, 28 Apr 2026 21:37:58 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 049BC1072939F;
-	Tue, 28 Apr 2026 23:37:43 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1777412276; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=m2SIkG8G4dme99QjBJF700FHzCmI2Nw1YXi++Sm72C8=;
-	b=BKpyABXYUA3W1yBGbOawA4h4lg+xP/ujDg9fnM/GDmfVvQtFe4V86zv2jRnYLbIW85egeu
-	gzsW7by84jCsCEyDe38rcP0G9Lu0O5PyhiJVlX1VH0lqEiLpLLVqCPQ6zb2WFjm+11Eb5Y
-	n8RhoTuzI6NlP3mUu2V0iIjtY0wmrD64vrUUDjJFf8c9e/GfSIul/+IfTbDMPsSiDwMCw7
-	iSMV2XUHFoLSDmaAwdjiKsMThFnyCYBB9t0d5djhof0yNcYWt/373RotXiqc8RA8Tj6M7F
-	lFivzfSQqW2W19Ln1HG5awMplQ6C4gwNMrAWCyzv+PL9twiFGEXnUYVU/us/rQ==
+	s=arc-20240116; t=1777413514; c=relaxed/simple;
+	bh=VfbO3ulILKZSKYtafxSYwqcmFKGkNhAfq6v4srABHOQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ToeKQV+Y7W1o2Tipxty37r3mRZdDaADknfidJ092dKqHsCVc//+AYR2kbgZEJFwCP6wkjjKSX4CKNnMmrFzGUp10U11LD+U+cqkXtggo05JetU8gcRmjRXPBxA4uXxTotj7uaCwU6ykeLCN67UE7cK3nbN6zyyvmJsrTLfK9FDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=II5N2TYo; arc=none smtp.client-ip=209.85.160.228
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qt1-f228.google.com with SMTP id d75a77b69052e-50fae4d1f85so128159921cf.3
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 14:58:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777413512; x=1778018312;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:dkim-signature:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xZzMF7chzXg26f4EN6q7nTamGI5Xk5AAzqyFBI37U9s=;
+        b=CcCCHOB+W3l3Ipd0mM5zBZJTdgsGH6034wGvAA8hSRSvtewONS5KNeUCxvHJIa5kHe
+         OuzNYZknP1KhcnBG6iEPXcDPb7WU6ZFhZxeZFLC6ggdGHN5kS39fQJoH2P3D9Za+Rfz9
+         EagcYlJGsNniGH33NhaQf8M3y2wqagjT4wjVoGDb1k3UZ+OH9iER/ESISWn4CUO+30Kb
+         zngqW40xvkFyndWCBmZpRPJmFxPO0xPO63U2hx2M0M57rPXpVb0waRGqIXCjz4ARjERV
+         7IyDNdcJn+iAZZ4FDQj0dJ4cviC/5LvZa52lDg44mz9E5Kvejy0IKJK5gd2GgYTa4wvB
+         72BA==
+X-Forwarded-Encrypted: i=1; AFNElJ9vL6q3sDsEYCzJq6fkSL8ytiXcKBLsshoLXsqZlcME/j035hIlb/n6NkAwcIRmFrhFs9cQQhI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfiModeHLXLaMZTHKpfIFW0qlfgwVc9pL1uCyQKaGv/EsS7Aer
+	I8vEDVoX8wiJN5ioS6kN8Q6N6vHMZ5bHWqYzJRmk/mM92zRE83AEPwXJYe8jc7l8bPZyzD8gLO3
+	JqnyRs6fpMzKGIMfkn54mNxZvOtNFdQCovfC32VumyEMOEi5C8iKMaNjFipD0G/nE89fwdWznxl
+	aCQyFWTXyvMw7iB6FFtkjDMpO0ybYeTXDyAnFd/WVBf8viK4S4gaC9h85haxK28DLSt/csCKBEU
+	eqqUSBKa1P83fKQ
+X-Gm-Gg: AeBDiesfkrK78SkRfjWSaSAQThdwN9BEiz6M1oh/R8XGvthznr1bS7b1APKr9/CzkuX
+	rJ70GNB+5qLquEkTbxBkSf1eHiHZTg64Zu63PdUVQBhFkPf7a3/Xxy5CHTpyG7Go0xVkzmAW/I6
+	RXgLsyOOEf0FAkCx8PG38NH/gXBBjygWjJvdgju7V0ScUZHW3S5VRjcw2Oro/gBt1VdP4eCfvj7
+	upAus7a9xHpa8SBc/iB5EXJnLgR6DItvQMLnuZJawmNgIlLi+4DDKk/3enkSBosQNliA+WgF3JE
+	dCkTGkgWgL6HJrgFPs3UoPPc1gKqluZCuW7oeMtJVpdrK1t5u0w693aPTvp0BgJ7LJGqsDPO4j0
+	juZQC9ZDRg/NQnoNaIWq/wY7f8fOoI1Beo16BP+75CSWI9JpNtqVwAJ3Ar5QxabmVcdw9LVKBwI
+	aAKunfPvbMV56GiFumG4jNRRVQTI4FEq7ufJc1pOgIYLs8eCS8ebwISMjhg4jYqj/mpko9SWIYm
+	bw=
+X-Received: by 2002:a05:622a:4a8d:b0:50d:71fe:85aa with SMTP id d75a77b69052e-5100e11936amr70025321cf.16.1777413512020;
+        Tue, 28 Apr 2026 14:58:32 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-121.dlp.protect.broadcom.com. [144.49.247.121])
+        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-8b3ef7c58f3sm134916d6.13.2026.04.28.14.58.31
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 28 Apr 2026 14:58:32 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-8a3bc7f5d43so70196106d6.2
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 14:58:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1777413511; x=1778018311; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=xZzMF7chzXg26f4EN6q7nTamGI5Xk5AAzqyFBI37U9s=;
+        b=II5N2TYom/LCXWS66vqV+hlj5I4YzSqzxEHvANucndoyftxqE3YLZ9Yv8ndH7OBg3I
+         z2oMUMIJFW//5vCVsnpUj7/dvlv9BlzzXirpVciE63iP7gdE0/mnu0lxxznEFGJWf1vR
+         L9ERMk1m/3bg0xI6QDKmWI29hneBzQzlzmpAA=
+X-Forwarded-Encrypted: i=1; AFNElJ/Xqbo6YZHVt+q11pQ9kbwqi3TepSoWmEck33D2Mrw7dVmsNIeyU5VyNCbzuAa3vQo2EbLmfxM=@vger.kernel.org
+X-Received: by 2002:ad4:594d:0:b0:89c:e7b9:56d4 with SMTP id 6a1803df08f44-8b3e302c18fmr77072536d6.9.1777413511273;
+        Tue, 28 Apr 2026 14:58:31 -0700 (PDT)
+X-Received: by 2002:ad4:594d:0:b0:89c:e7b9:56d4 with SMTP id 6a1803df08f44-8b3e302c18fmr77072216d6.9.1777413510786;
+        Tue, 28 Apr 2026 14:58:30 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b3ef71b89fsm2441396d6.21.2026.04.28.14.58.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Apr 2026 14:58:30 -0700 (PDT)
+Message-ID: <4f13d8ca-7757-4952-863f-a79d10b37185@broadcom.com>
+Date: Tue, 28 Apr 2026 14:58:28 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 28 Apr 2026 23:37:43 +0200
-Message-Id: <DI5429HR7UGP.IJHX75ZB16AZ@bootlin.com>
-Subject: Re: [PATCH RFC bpf-next 2/8] bpf: mark instructions accessing
- program stack
-Cc: <ebpf@linuxfoundation.org>, "Bastien Curutchet"
- <bastien.curutchet@bootlin.com>, "Thomas Petazzoni"
- <thomas.petazzoni@bootlin.com>, "Xu Kuohai" <xukuohai@huawei.com>,
- <bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
- <linux-stm32@st-md-mailman.stormreply.com>,
- <linux-arm-kernel@lists.infradead.org>, <kasan-dev@googlegroups.com>,
- <linux-mm@kvack.org>
-From: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-To: "Ihor Solodrai" <ihor.solodrai@linux.dev>,
- =?utf-8?b?QWxleGlzIExvdGhvcsOpIChlQlBGIEZvdW5kYXRpb24p?=
- <alexis.lothore@bootlin.com>, "Alexei Starovoitov" <ast@kernel.org>,
- "Daniel Borkmann" <daniel@iogearbox.net>, "Andrii Nakryiko"
- <andrii@kernel.org>, "Martin KaFai Lau" <martin.lau@linux.dev>, "Eduard
- Zingerman" <eddyz87@gmail.com>, "Kumar Kartikeya Dwivedi"
- <memxor@gmail.com>, "Song Liu" <song@kernel.org>, "Yonghong Song"
- <yonghong.song@linux.dev>, "Jiri Olsa" <jolsa@kernel.org>, "John Fastabend"
- <john.fastabend@gmail.com>, "David S. Miller" <davem@davemloft.net>, "David
- Ahern" <dsahern@kernel.org>, "Thomas Gleixner" <tglx@kernel.org>, "Ingo
- Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>, "Dave Hansen"
- <dave.hansen@linux.intel.com>, <x86@kernel.org>, "H. Peter Anvin"
- <hpa@zytor.com>, "Shuah Khan" <shuah@kernel.org>, "Maxime Coquelin"
- <mcoquelin.stm32@gmail.com>, "Alexandre Torgue"
- <alexandre.torgue@foss.st.com>, "Andrey Ryabinin" <ryabinin.a.a@gmail.com>,
- "Alexander Potapenko" <glider@google.com>, "Andrey Konovalov"
- <andreyknvl@gmail.com>, "Dmitry Vyukov" <dvyukov@google.com>, "Vincenzo
- Frascino" <vincenzo.frascino@arm.com>, "Andrew Morton"
- <akpm@linux-foundation.org>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260413-kasan-v1-0-1a5831230821@bootlin.com>
- <20260413-kasan-v1-2-1a5831230821@bootlin.com>
- <7dd64547-25a4-46de-a896-98fcec04468e@linux.dev>
-In-Reply-To: <7dd64547-25a4-46de-a896-98fcec04468e@linux.dev>
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: 5281648C5B7
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: phy: broadcom: Save PHY counters during
+ suspend
+To: Justin Chen <justin.chen@broadcom.com>, netdev@vger.kernel.org
+Cc: pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+ davem@davemloft.net, linux@armlinux.org.uk, hkallweit1@gmail.com,
+ andrew@lunn.ch, bcm-kernel-feedback-list@broadcom.com
+References: <20260428212424.1828999-1-justin.chen@broadcom.com>
+Content-Language: en-US, fr-FR
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <20260428212424.1828999-1-justin.chen@broadcom.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+X-Rspamd-Queue-Id: 7553148C6CC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282090-lists,netdev=lfdr.de];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FREEMAIL_TO(0.00)[linux.dev,bootlin.com,kernel.org,iogearbox.net,gmail.com,davemloft.net,redhat.com,alien8.de,linux.intel.com,zytor.com,foss.st.com,google.com,arm.com,linux-foundation.org];
-	RCPT_COUNT_TWELVE(0.00)[41];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_CC(0.00)[redhat.com,kernel.org,google.com,davemloft.net,armlinux.org.uk,gmail.com,lunn.ch,broadcom.com];
+	TAGGED_FROM(0.00)[bounces-282091-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	DKIM_TRACE(0.00)[broadcom.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alexis.lothore@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.995];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:email,broadcom.com:dkim,broadcom.com:mid];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[florian.fainelli@broadcom.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:mid,bootlin.com:email,bootlin.com:dkim,bootlin.com:url]
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
 
-On Sat Apr 25, 2026 at 1:18 AM CEST, Ihor Solodrai wrote:
-> On 4/13/26 11:28 AM, Alexis Lothor=C3=83=C2=A9 (eBPF Foundation) wrote:
->> In order to prepare to emit KASAN checks in JITed programs, JIT
->> compilers need to be aware about whether some load/store instructions
->> are targeting the bpf program stack, as those should not be monitored
->> (we already have guard pages for that, and it is difficult anyway to
->> correctly monitor any kind of data passed on stack).
->>=20
->> To support this need, make the BPF verifier mark the instructions that
->> access program stack:
->> - add a setter that allows the verifier to mark instructions accessing
->>   the program stack
->> - add a getter that allows JIT compilers to check whether instructions
->>   being JITed are accessing the stack
->>=20
->> Signed-off-by: Alexis Lothor=C3=A9 (eBPF Foundation) <alexis.lothore@boo=
-tlin.com>
->> ---
->>  include/linux/bpf.h          |  2 ++
->>  include/linux/bpf_verifier.h |  2 ++
->>  kernel/bpf/core.c            | 10 ++++++++++
->>  kernel/bpf/verifier.c        |  7 +++++++
->>  4 files changed, 21 insertions(+)
->>=20
->> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
->> index b4b703c90ca9..774a0395c498 100644
->> --- a/include/linux/bpf.h
->> +++ b/include/linux/bpf.h
->> @@ -1543,6 +1543,8 @@ void bpf_jit_uncharge_modmem(u32 size);
->>  bool bpf_prog_has_trampoline(const struct bpf_prog *prog);
->>  bool bpf_insn_is_indirect_target(const struct bpf_verifier_env *env, co=
-nst struct bpf_prog *prog,
->>  				 int insn_idx);
->> +bool bpf_insn_accesses_stack(const struct bpf_verifier_env *env,
->> +			     const struct bpf_prog *prog, int insn_idx);
->>  #else
->>  static inline int bpf_trampoline_link_prog(struct bpf_tramp_link *link,
->>  					   struct bpf_trampoline *tr,
->> diff --git a/include/linux/bpf_verifier.h b/include/linux/bpf_verifier.h
->> index b148f816f25b..ab99ed4c4227 100644
->> --- a/include/linux/bpf_verifier.h
->> +++ b/include/linux/bpf_verifier.h
->> @@ -660,6 +660,8 @@ struct bpf_insn_aux_data {
->>  	u16 const_reg_map_mask;
->>  	u16 const_reg_subprog_mask;
->>  	u32 const_reg_vals[10];
->> +	/* instruction accesses stack */
->> +	bool accesses_stack;
->>  };
->> =20
->>  #define MAX_USED_MAPS 64 /* max number of maps accessed by one eBPF pro=
-gram */
->> diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
->> index 8b018ff48875..340abfdadbed 100644
->> --- a/kernel/bpf/core.c
->> +++ b/kernel/bpf/core.c
->> @@ -1582,6 +1582,16 @@ bool bpf_insn_is_indirect_target(const struct bpf=
-_verifier_env *env, const struc
->>  	insn_idx +=3D prog->aux->subprog_start;
->>  	return env->insn_aux_data[insn_idx].indirect_target;
->>  }
->> +
->> +bool bpf_insn_accesses_stack(const struct bpf_verifier_env *env,
->> +			     const struct bpf_prog *prog, int insn_idx)
->> +{
->> +	if (!env)
->> +		return false;
->> +	insn_idx +=3D prog->aux->subprog_start;
->> +	return env->insn_aux_data[insn_idx].accesses_stack;
->> +}
->> +
->>  #endif /* CONFIG_BPF_JIT */
->> =20
->>  /* Base function for offset calculation. Needs to go into .text section=
-,
->> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
->> index 1e36b9e91277..7bce4fb4e540 100644
->> --- a/kernel/bpf/verifier.c
->> +++ b/kernel/bpf/verifier.c
->> @@ -3502,6 +3502,11 @@ static void mark_indirect_target(struct bpf_verif=
-ier_env *env, int idx)
->>  	env->insn_aux_data[idx].indirect_target =3D true;
->>  }
->> =20
->> +static void mark_insn_accesses_stack(struct bpf_verifier_env *env, int =
-idx)
->> +{
->> +	env->insn_aux_data[idx].accesses_stack =3D true;
->> +}
->> +
->>  #define LR_FRAMENO_BITS	3
->>  #define LR_SPI_BITS	6
->>  #define LR_ENTRY_BITS	(LR_SPI_BITS + LR_FRAMENO_BITS + 1)
->> @@ -6490,6 +6495,8 @@ static int check_mem_access(struct bpf_verifier_en=
-v *env, int insn_idx, u32 regn
->>  		else
->>  			err =3D check_stack_write(env, regno, off, size,
->>  						value_regno, insn_idx);
->> +
->> +		mark_insn_accesses_stack(env, insn_idx);
->
-> I am not sure this can be done unconditionally here.
->
-> It may be possible in different states to have different pointer
-> types for the affected reg (PTR_TO_STACK in one execution path and say
-> PTR_TO_MAP_VALUE in another). And if set uncoditionally,
-> instrumentation may be skipped for legitimate targets.
->
-> Maybe reset by default in check_mem_access()?
+On 4/28/26 14:24, Justin Chen wrote:
+> The PHY counters can be lost if the PHY is reset during suspend. We
+> need to save the values into the shadow counters or the accounting
+> will be incorrect over multiple suspend and resume cycles.
+> 
+> Signed-off-by: Justin Chen <justin.chen@broadcom.com>
 
-Hmm, ok, thanks, I missed this subtlety. I still need to dig in there to
-make sure to really understand how the verifier handles those states,
-but if I understand correctly your point, I guess that just resetting
-the "accesses stack" flag at the entry of check_mem_access is not
-enough: it would make the final result depend on the order of the states
-being checked, eg:
-- first state being checked result in PTR_TO_MAP_VALUE, no flag set
-- second (and final) state being checked result in PTR_TO_STACK, flag is
-  now set
-- if no other state: insn ends up being (wrongly) marked to be ignored=20
-
-So unless I am misunderstanding things here, the question rather becomes
-"for this specific insn, is there any state in which the accessed memory
-is anything else other than PTR_TO_STACK". The flag could just be
-inverted (ie set to true by default), and reset by any state resulting
-in something other than PTR_TO_STACK.
-
-Alexis
---=20
-Alexis Lothor=C3=A9, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+-- 
+Florian
 
