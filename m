@@ -1,220 +1,201 @@
-Return-Path: <netdev+bounces-281952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281953-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iJv5LQzS8GnDYwEAu9opvQ
-	(envelope-from <netdev+bounces-281952-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:28:12 +0200
+	id 4OvpCD7U8GkSZQEAu9opvQ
+	(envelope-from <netdev+bounces-281953-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:37:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C040487D3B
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:28:12 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5208488026
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 17:37:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 044B43045A88
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 15:27:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C8A6E30027EF
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 15:33:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 658F03B3BE5;
-	Tue, 28 Apr 2026 15:27:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E34B638758F;
+	Tue, 28 Apr 2026 15:33:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="NncjKPWn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lef/ZpEv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1450235836B;
-	Tue, 28 Apr 2026 15:27:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777390063; cv=none; b=jgwkyx05aRVbgSMzJAEUaiDnFYBeQfGM3ZkhUpZZrKFQUK0M+qgBLOmphqiv2BMQTxJ965VNTdHEeKIKYy3998qvQ+wB3lrNZ8Y3bIaHvhRcJwvrJBFFfJScVsDZTrZBnqRjtASYHf+vyGuWQXutmWvmj2bxjibg2jayRVKjjCc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777390063; c=relaxed/simple;
-	bh=lsjtwml+YyGG0YaI8ATuHSZR2T/x/VtRiCX7ZflwJ8o=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=kMQqedn1+v2KgCr2PVRFE1K1fU0S9XFO3/UwKvwDVBpP8GLzvq+6PeUZgNKh9DmkKXwj4X1a77hydBhc81K5IY+CdMR5BZxA/39qXBK4VoKo8HRyzvUgp5sqF9AkecwbA+UBWyMdZPFe5UntkS55aonVfFAukqskQkzBFDdd6BQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=NncjKPWn; arc=none smtp.client-ip=193.238.174.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mx.ssi.bg (localhost [127.0.0.1])
-	by mx.ssi.bg (Potsfix) with ESMTP id 874BB211C1;
-	Tue, 28 Apr 2026 18:27:37 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
-	:content-type:content-type:date:from:from:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
-	 bh=pjpyrc4xMqg+uJtCyIqcY2E8Dl2BnGTrVI0ieQmBu9o=; b=NncjKPWnt8Dn
-	sCea/Lc99bDQo+rHD8TYU9Hti7z1M3TdQ1y1RpHhSIQ0/qopds1BHlgmvumxZnov
-	+dq+vXj+wEFWwI5OfQ8aws7+2MAoV0LZdR1Yp4RwzG9N0yNPwodxLeRKJ0xvshCA
-	7lGwFq++hoeN8Gpr3N7wvI9Wcy9DZF3sL3Q+slHBp2A8T4DgOB6UHnf/5glX3g1L
-	XRfWpmEs8k3dGInTKVf169ABNgR0ZoZg6CvsAc+SKgJBKlbwxRXOvF7A4uZJXU3S
-	sa78uGEHVqc9Qh7L1qSlD1Cw9yN5vuTM2mzGj+NbqARzMTEYhIx1xwaHpeBi5XVN
-	gl/S9T9HiOC3jeSk7GBcMpX8+57f4o0xfMjC1HXUZb7Wgjvbe5gwG0rXdP6tESV1
-	I8Itp67FuWUc5LIDtoJCZZvfH3jYzubjjmSLOtzKyO1AKNYEsFB6C1h7LsjA893T
-	Oh+gggyUbISD6S9mT1kdNuU5y0/b67rZycIuZNj031/8L9EBX0TKNzbEcyOdLHqW
-	WAC25/QSGWlgDh9CxuOrg7HL6g9YwNHw8ez78xS6f0Pp0vdhb8R9lxm7Z8RT5DTC
-	wSel0dbylDleAA16orVy7YepBapWyxhpuhvf7j8CgCRcxxXSHyPhjj/6DjRfUfwP
-	nDmi59T8ek9mwihbHhVnvCnAWpbf7Oc=
-Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
-	by mx.ssi.bg (Potsfix) with ESMTPS;
-	Tue, 28 Apr 2026 18:27:36 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by box.ssi.bg (Potsfix) with ESMTPSA id 901096089E;
-	Tue, 28 Apr 2026 18:27:35 +0300 (EEST)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.1/8.18.1) with ESMTP id 63SFRYQE053671;
-	Tue, 28 Apr 2026 18:27:34 +0300
-Date: Tue, 28 Apr 2026 18:27:34 +0300 (EEST)
-From: Julian Anastasov <ja@ssi.bg>
-To: Jakub Kicinski <kuba@kernel.org>
-cc: pablo@netfilter.org, netfilter-devel@vger.kernel.org, davem@davemloft.net,
-        netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
-        fw@strlen.de, horms@kernel.org
-Subject: Re: [PATCH net 11/11] ipvs: fix the spin_lock usage for RT build
-In-Reply-To: <20260428021343.793695-1-kuba@kernel.org>
-Message-ID: <b50e8ade-41ba-ab49-b1e4-81ebe8df03c2@ssi.bg>
-References: <20260424190513.32823-12-pablo@netfilter.org> <20260428021343.793695-1-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6925386422
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 15:33:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777390415; cv=pass; b=D1p3AaRX9PAIU5IZgNGKfCtdXMymwCZiFxTFNg6z50UfNryWutG3CX3bbWWrHwBggk7YyDAU3RcSa5NGq0Zr4z8cz9JwJiu61tFXHS2mPLwWVLZuohUTzwS8hbG0u3r6XZsxffG1/mUyWeYGB5F4Zn45mh594I9noJtBZkU3Y38=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777390415; c=relaxed/simple;
+	bh=MdqJE/paQ+GYzGBWedFogSl27/iJu5Afpjz3TOknRvc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=u/B6xjCzamNZnjpiUJqcg8SQ/w4pbfq3YNoP1WVDNiz4eT51dVaA/W1jdeja/JzXpLyqEBhsffMJKehlfdSQUuwy2jLkO/l603ME0xVJBcg3SeC8FoILRyUcopVGQmzQzg3C/BAAwsF5NcvZnUdjWfHi5HM6YJ4qudSaezo7ytE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lef/ZpEv; arc=pass smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-506aa68065eso84057111cf.1
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 08:33:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777390412; cv=none;
+        d=google.com; s=arc-20240605;
+        b=gB8AgrWHwXWGDeeAMDxdLvArtstaHmoAFFN2bz6NisofXIzqoOZ0t+H/Z+8AJ1lfNf
+         xQ/dL6Y615or5kjlXsnag/Pp5vlQr+vZh9MLJrWYTaDHJPNDADUL4QFf0DFT1YNcutUZ
+         w2hSg9gIr5bKr2k7jyfiXYu4C4HUmekpYLv7+SuFkmxNV/VkVgmmUW3xdr7GcHwI6Hrs
+         NMUjFfgTKJzK5jf0MoSZwOrDiFtgj4XQ5QODUMkbntvOiyb98JB38dTPAemoAveH9rIZ
+         NIE6izc1i2zvGLROkI2iwMAQ2qfJLSucUo9yoL01OxJ1PGmuzGTy+dmUyQqwlj6FxO3F
+         wL5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=BqDK5u4Q6rxKPP3wwLMG4J/TFKsDJUQ1qgzCozPPlXQ=;
+        fh=WpNXIWbyIJTW2QpXzvPVbHTG1oJrgCJrAejjEy93E1M=;
+        b=Qoh8pG5h27hGx+EkLqOXVXeZLwvJB0K4HHTdYFK9fA+kHGlygvj43I75DZVxq+W3bj
+         SxLyAUZdHBuu6n5HrvAqJTsmK95MKLKzvnmjMM9combGm95J7fn+v8UzG1tf4vSJckTY
+         YQcyUfD1XPmXwqynGeywRjg9Se6uabqpcsQDEHLSiO0NeEcjhmutg8pGoUQ8bwflNpSm
+         Pq56/ajGrXzyv+HU+nFp4qS6bGX68UQxjxzuKTY9TXVDDtPqMmuUjT4XLjLlYRmtoIjV
+         ro5IK6P2yVFn1zZGWbOz11B7KsPF8zEt+GShhJx4Kd4365BEiEOxm/piXzjcZyECkRg2
+         NwhQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777390412; x=1777995212; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BqDK5u4Q6rxKPP3wwLMG4J/TFKsDJUQ1qgzCozPPlXQ=;
+        b=Lef/ZpEv8cAB5Lh1Vhg2GJeWy9nPYm2Q3hm9WkChpoIkahM+y+rxyxiYqvIs5Rrupf
+         G5EXupvMiAi1qPj0vBHIq0gZIXRRUEngSRZfySs0bupBfvC3UXhHfETafhZbcjLRULBw
+         eUi1Q381bhsY7RujLXlkzzbh1Xp+FZCojeRPSIUn2T6eQJZ+YWaybfvOe156kN67F2nb
+         OawNWz1VZrIqfeIDHOnYhNEsb4SHOR9bSWbXpMs79qVgXudZs4u0TzXUKtbV7eH7Hjkf
+         yyBVN5GJkDHzJL6NmY9XqA0uLX65yK03aHCS8Un2kdxu2zYpVLVspn0Oe3C+q3fdQB4+
+         TrYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777390412; x=1777995212;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=BqDK5u4Q6rxKPP3wwLMG4J/TFKsDJUQ1qgzCozPPlXQ=;
+        b=gTa9Jd7HoRDv5kkVIOruWk/uILKdSnW47Im7+m6xQR1shgtRIeCa/sU70q9Idfj2Kx
+         KPC+LyofD1Cs6+qyes5uep4HggETio84FNgmrNWaPwUo9P3AZr48qzjNhU9r4UuidOlx
+         pmBwfQWNdjwDn1wEgcerLuL9doMZ3CdV85m+hpK1Tbw0g6afitpk8AwEVdk54XvoWNHV
+         GYemX76wbQq5nD9w61q5SqsMaHjgfBA+R0LAel/I4h9NP3A3j75G9kAFiXn+h5toeegB
+         3lQUT+8XXwkBclKAyj/LdoS9+1UvbkapeEM6v99BW0553T/b1Fx35cz1XN4A2l4ssHYV
+         rgnQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9fbYZnLosMHVKJG0iOdKm1MQkfZzBEINdaZNmVptxBWadmBukS/Imol7YBjpzYTQEeJTQCgKY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwN39deNxthcKfLfL2sDU3lEXNK38klOLJMRLMn4bhO4oKHnwe6
+	wKDWihJGd0Mswl6joNi3Sv47e8lISpVIRHXDudmzXN0/hmzCuCHYREc/5cP8OBrTHubnCQZP+v1
+	xj1zSnkD1uiRiZsq13ET8n2/UQXIrxoXiEetQNzK0
+X-Gm-Gg: AeBDievICxo4ZDPDZqBjW506sNiwrcribFK8FfUsl4XpaDIWs0Ky70QGI/V71saIUd/
+	GwSsSabXLlKyPeAou58+VepNfLwt5jniNjbjHYGU/htAiT6C3ZeoTfmoEmMn8pv0EYQGHiZukDK
+	5Gu8a8xPwz+GlDpjDT8AaV5z5rk8xcBFL1oVwlNCpr8EpCux9D6kX+5NQoa8T0mPi4F4b/0MfWq
+	xJL0u1BgKyAEM752mwXQCI1iF1eV/bdEI6G/YOi1ubycjO71FUS5a2uO9cvsWwis5TgiKd4yFFN
+	Obkpl1IoqQqnc1YVWS3RPPVU4VgYRbJiFXqUZxbBGV0jl3AFduVzqXX28m5QUU40jZvDBVyZmQg
+	bgiiDsCAK
+X-Received: by 2002:a05:622a:5147:b0:50f:de06:45e2 with SMTP id
+ d75a77b69052e-51018a39d3dmr32231cf.31.1777390411344; Tue, 28 Apr 2026
+ 08:33:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Rspamd-Queue-Id: 4C040487D3B
+References: <20260427093633.979310-1-edumazet@google.com> <CANn89iKtmRcw2RsoofCnSf7kQhBWMYNhjkhSyqdaPcuQw3ZyyA@mail.gmail.com>
+In-Reply-To: <CANn89iKtmRcw2RsoofCnSf7kQhBWMYNhjkhSyqdaPcuQw3ZyyA@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 28 Apr 2026 08:33:20 -0700
+X-Gm-Features: AVHnY4KF71KNebvxU8Sb4Wi1IP_NA4lM8F7BfSJOdyWCY7loy7QMji-TZ7ie0KA
+Message-ID: <CANn89iJfj-U58PKk7H7wR=ZLVBPS=a_CXxPFQx5Wct0fv+JPvA@mail.gmail.com>
+Subject: Re: [PATCH net-next] ipvlan: use netif_receive_skb() in ipvlan_process_multicast()
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: A5208488026
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
-	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[ssi.bg:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-281952-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-281953-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
 
+On Tue, Apr 28, 2026 at 8:23=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Mon, Apr 27, 2026 at 2:36=E2=80=AFAM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > ipvlan_process_multicast() runs from process context, there is no
+> > risk of stack overflow if we call netif_receive_skb() instead
+> > of netif_rx().
+> >
+> > This avoids some overhead adding/removing skbs to/from a per-cpu
+> > backlog and raising/processing NET_RX softirqs.
+> >
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > ---
+> >  drivers/net/ipvlan/ipvlan_core.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/ipvlan/ipvlan_core.c b/drivers/net/ipvlan/ipvl=
+an_core.c
+> > index 1be8620ad3971d281fb36fd0770efd67b566ae60..7ad12dc7845c836bdd04395=
+f153b2b4b397797d6 100644
+> > --- a/drivers/net/ipvlan/ipvlan_core.c
+> > +++ b/drivers/net/ipvlan/ipvlan_core.c
+> > @@ -286,7 +286,7 @@ void ipvlan_process_multicast(struct work_struct *w=
+ork)
+> >                                 if (tx_pkt)
+> >                                         ret =3D dev_forward_skb(ipvlan-=
+>dev, nskb);
+> >                                 else
+> > -                                       ret =3D netif_rx(nskb);
+> > +                                       ret =3D netif_receive_skb(nskb)=
+;
+> >                         }
+> >                         ipvlan_count_rx(ipvlan, len, ret =3D=3D NET_RX_=
+SUCCESS, true);
+> >                         local_bh_enable();
+>
+> I will send a V2, to limit the number of netif_receive_skb() in
+> presence of large number of ipvlans.
 
-	Hello,
+Well, this was caused this sashiko report:
 
-On Mon, 27 Apr 2026, Jakub Kicinski wrote:
+Because netif_receive_skb() traverses the networking stack synchronously, i=
+t
+bypasses the backlog and softirq processing budgets. In environments with m=
+any
+IPVLAN sub-interfaces, delivering a broadcast or multicast packet could
+monopolize the CPU for an unbounded amount of time before reaching
+rcu_read_unlock().
 
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> ---
-> ipvs: fix the spin_lock usage for RT build
-> 
-> This commit fixes spin_lock sleeping issues on PREEMPT_RT by adjusting the
-> use of cp->lock in combination with hlist_bl bit locks. It removes the
-> spin_lock from ip_vs_conn_hash() and ip_vs_conn_unlink(), and changes the
-> lock ordering in ip_vs_conn_fill_cport().
-> 
-> Link: https://sashiko.dev/#/patchset/20260415200216.79699-1-ja%40ssi.bg
-> Link: https://sashiko.dev/#/patchset/20260420165539.85174-4-ja%40ssi.bg
-> Link: https://sashiko.dev/#/patchset/20260422135823.50489-4-ja%40ssi.bg
-> 
-> > diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs_conn.c
-> > index 84a4921a7865a9..9e23cda8482588 100644
-> > --- a/net/netfilter/ipvs/ip_vs_conn.c
-> > +++ b/net/netfilter/ipvs/ip_vs_conn.c
-> 
-> [ ... ]
-> 
-> > @@ -704,14 +702,23 @@ void ip_vs_conn_fill_cport(struct ip_vs_conn *cp, __be16 cport)
-> >  		hlist_bl_unlock(head);
-> >  		write_seqcount_end(&t->seqc[hash_key & t->seqc_mask]);
-> >  		preempt_enable_nested();
-> > -		spin_unlock_bh(&t->lock[hash_key & t->lock_mask].l);
-> > +		spin_unlock(&t->lock[hash_key & t->lock_mask].l);
-> > +		spin_unlock_bh(&cp->lock);
-> >  		hash_key = hash_key_new;
-> >  		goto retry;
-> >  	}
-> >  
-> > -	spin_lock(&cp->lock);
-> > -	if ((cp->flags & IP_VS_CONN_F_NO_CPORT) &&
-> > -	    (cp->flags & IP_VS_CONN_F_HASHED)) {
-> > +	/* Fill cport once, even if multiple packets try to do it */
-> > +	if (cp->flags & IP_VS_CONN_F_NO_CPORT && (!cp->cport || by_me)) {
-> 
-> Does removing the IP_VS_CONN_F_HASHED check here lead to a NULL pointer
-> dereference for IP_VS_CONN_F_ONE_PACKET connections?
-> 
-> Connections flagged with IP_VS_CONN_F_ONE_PACKET bypass hashing:
-> 
-> ip_vs_conn_hash() {
->     if (cp->flags & IP_VS_CONN_F_ONE_PACKET)
->         return 0;
->     ...
-> }
-> 
-> Because they bypass hashing, their hash list nodes (hn->node) are never
-> linked, leaving hn->node.pprev as NULL. If such a connection is created
-> with a source port of 0, it gets the IP_VS_CONN_F_NO_CPORT flag.
-> 
-> When ip_vs_conn_fill_cport() is later invoked to populate the port, the
-> missing IP_VS_CONN_F_HASHED check allows the execution to proceed.
+But using netif_rx(nskb) had the same problem.
+Each packet was immediately processed at the local_bh_enable() time.
 
-	But ip_vs_conn_fill_cport() is called for connection
-that is hashed and later found by lookup. If IP_VS_CONN_F_ONE_PACKET
-is set the conn is not hashed and is released immediately after
-creation by ip_vs_conn_put(). Both flags can not coexist, one or
-the other wins.
-
-	As for IP_VS_CONN_F_NO_CPORT, ip_vs_bind_dest() clears the
-IP_VS_CONN_F_ONE_PACKET flag if not UDP and we use NO_CPORT for TCP.
-So, IP_VS_CONN_F_ONE_PACKET is simply ignored for TCP. If one day
-we start to use IP_VS_CONN_F_NO_CPORT for UDP and use
-IP_VS_CONN_F_ONE_PACKET then it will not work because the conn will
-not be hashed and as result never found to fill the cport.
-This time IP_VS_CONN_F_ONE_PACKET will win the game.
-
-> 
-> > +		/* If we race with resizing make sure cport is set for dir 1 */
-> > +		if (!cp->cport) {
-> > +			cp->cport = cport;
-> > +			by_me = true;
-> > +		}
-> > +		if (!dir) {
-> > +			atomic_dec(&ipvs->no_cport_conns[af_id]);
-> > +			cp->flags &= ~IP_VS_CONN_F_NO_CPORT;
-> > +		}
-> >  		/* We do not recalc hash_key_r under lock, we assume the
-> >  		 * parameters in cp do not change, i.e. cport is
-> >  		 * the only possible change.
-> > @@ -726,21 +733,17 @@ void ip_vs_conn_fill_cport(struct ip_vs_conn *cp, __be16 cport)
-> >  			hlist_bl_del_rcu(&hn->node);
-> 
-> If head != head2 here, hlist_bl_del_rcu(&hn->node) is called. Since
-> hn->node.pprev is NULL, wouldn't this cause a panic when __hlist_bl_del()
-> executes *pprev = next?
-> 
-> Is it possible to retain the IP_VS_CONN_F_HASHED check or otherwise
-> ensure unhashed nodes aren't unlinked?
-
-	As IP_VS_CONN_F_ONE_PACKET conns are not hashed,
-ip_vs_conn_unlink() has check not to unlink the conn nodes from
-tables. The conn is invisible to others except the packet
-that created it. And the hash nodes are not touched.
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
-
+So I do not think a V2 is needed.
 
