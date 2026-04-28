@@ -1,287 +1,248 @@
-Return-Path: <netdev+bounces-282060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282061-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gE73B2AP8WmXcQEAu9opvQ
-	(envelope-from <netdev+bounces-282060-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 21:49:52 +0200
+	id gHquCyAP8WmXcQEAu9opvQ
+	(envelope-from <netdev+bounces-282061-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 21:48:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA02B48B59C
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 21:49:47 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CA8B48B566
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 21:48:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 356B7300A7F0
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 19:45:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0A2CC300A24F
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 19:47:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF3AD3A6F08;
-	Tue, 28 Apr 2026 19:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06F6A3A9612;
+	Tue, 28 Apr 2026 19:47:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sFdoelWr"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="XywkDYu9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39CD8381B1F
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 19:45:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777405527; cv=pass; b=mWcKZLUTViKk5ALmM43dK3P+jOIdli4QUYRppPrW2uLB8ZetLEn7xwaiXaEZU5NVbYiWrzzu+vJ0nMdqTSgxPZ71yeX+Gld69R0t/SoCuQCsjFTcykKGkaaqyddOXdc/BN0G1CI98yvhHMlOkOKX/I6Y3rtD2akWRRe8c6L5sIg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777405527; c=relaxed/simple;
-	bh=niTCSYgXiuK52f4OJc1x6IbOfcZREZ6j2c3HGQ8Hcq4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KOXUvRs0VEEu06BpOEHU1PltXgg0+Wy4RLV2UId1dm9W/EEL3PkAz9MiS1DO9CYfZ5bQsdL6VeCYeqbqFN2UV7Tusg5tngWYBmFNaTErdYUCQ4zbylwoWEZG2/+TRUsucCv8Ee0GuuKXV0HNYecPuQFjyPSWDvEr/XnbMwBSxFU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sFdoelWr; arc=pass smtp.client-ip=74.125.82.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-12c726f46baso15177754c88.1
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 12:45:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777405525; cv=none;
-        d=google.com; s=arc-20240605;
-        b=UZJFwuKclKtLz8kA55e+p+DULqV7NSLMO3G9la7oQJ/QquiwO/e8b0EOU/s2jmdRn5
-         hSun14KbHH5E5Jta3yFwtZ6RTXifDfyqlbmGBv48ilkTO2XrRJ0UJp9XMYu/x1Twsazt
-         uAoU99PMt6S3Du1K1gNj9kfQZFDdEJ5DYubb14xVMp/bC310nzF+96T771b/G3i8C7Bc
-         HoBgRCLbHKfkBfCsdGzM1ZSn3ri7fOnJJ8Pxr1w+ln6PfXGkY8oK4NlEnbtunJU29yyB
-         GrKAO8qcRSh5SOAfOEVfWfZ/pMyilCZAMYZq9UbZOgytK5hNhPD4XUuzkMzJ73fCsixq
-         YBiw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=yyV3MujfaBj/kLXiIUgXJ2Am8aJcc81DIFMhB75KLDk=;
-        fh=VQSH2zGr4LOaUWAe0VJ2EN24npfjMiEWHtDf8pNUtQk=;
-        b=Gs2RmrBO8l6zUSPBBSFyVoMPFuBAa/3m2dFwsRZ5W+GSB24OPBHZOZXSp/vQk+AXYH
-         5UnJ9hUD3TBjeRLiqw3/+IYO465I8F5RNZIGyXJymb7y63GPH0//T8PHQ+rOhFCdvmAR
-         c5Nt5vVGbyx0/yvHUevJ+F/JpFCgu1gOkU/PW1NbS/fqqklAu2Zn9mwZBhQApCsGc3Gc
-         /HWNnYhVLCiE9iT0fPBm4r/cYrBsWf3ZCnyEZ7VVMkmULOKfd9Nke27rFQur4qEbURpR
-         A4hG0wrgODgADPxvNl/RSrIUQxB1gnstIoURLQoM9VyrQ4CIQ4sSMxZe0mpzaLZXkCY4
-         +wcA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777405525; x=1778010325; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yyV3MujfaBj/kLXiIUgXJ2Am8aJcc81DIFMhB75KLDk=;
-        b=sFdoelWrM+KQaplQf+z1vN+ZBA8iz8JjOxNM/nrpKfZKrlIc+qUohp8BpfBvI7myeQ
-         oELTrCcUNgLtzFrJZ0Z0RbcfjQapTgkfZxkHa9Zf4jk5ov2oUJtRlSzpSHroFoFxbOQH
-         ccbBZ5E0Bi2ale4mmj4V3L5EDzmvkmr4XrBfK96V7l3rZX91ehnJIFN9T6A33CDDzMJK
-         wuXsiaO2QER23vzDSKqsaWKWdqHLpUeOlfIMO3/npregB86DIHbRaDk2wnRttfWAH2cr
-         L+8O6ce1a/QVEd5/T5qYRQsTe/zX77gfiBpAYaAXumDSgTdaRSBz9BAtyVSjpDeB2MJG
-         dl5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777405525; x=1778010325;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=yyV3MujfaBj/kLXiIUgXJ2Am8aJcc81DIFMhB75KLDk=;
-        b=b/OCtZMMzG/Hn+G8i+Rr6Tz9tWXWE4lwSSZkvWN5XeqksV9UIWqSSt8Hr8DwOck1qi
-         Eg3aCIel1rg1DGpIlUPt5CiMrL9z1br5jsDWq2r/NsWCFAGrHtcEm7uv3LlrSNjuMe5/
-         e7mbZhcaANqSRgOwmBoIvxELW+ziXiRLSqAyJxt7Va4/yOkJ1x1G3BUM5iTZmBnVtlNz
-         fb+tuP2dI+djaCenLFdcdrDmyQqf2/lBv8Go2ceJhyrOqykRL9CxaVWTqBk9sbbe2P9/
-         w8xWKcN6G5JMDR1zVuVRzyvBVuGfR06+j/nS6+ZXpjiGIiA0ykzHy5BbvH0V9I9XVRYO
-         52sw==
-X-Forwarded-Encrypted: i=1; AFNElJ+kfyDFoI/X8tzWWjJzCYD8H13fqew33UrUXblUCsAJ4i+PJSF3+HydxMHNYm+U/HiJ6/RUvvk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyvHjVVFX8aYMs45feNKvpxaatpZrIPvJgJb4etL2Nb0yskK2c
-	xHsD+rVbKgQqEFg8aOdYAsPyYjHChUvzbRD4SzGSg+XE0Bivvr6tFHVybGpuE+BTcygvjhjy72n
-	dUGoaaScxSSZLAzjlRZydTC33af1y1DYVbTnpI8rSjZjnjrQuM1v8Z/Qa
-X-Gm-Gg: AeBDieu5SBD1WE2d8jAh4ANwLqf/H+B9cc6PEbURakIKYPO1LMmwZU5BWJzi3BUPV1b
-	oPRDZ+ie/AZUUTEoycSJaQMj+LJMmk6OdzrVPl9Okdfn4QyZ2EpSqD9NFli93Y6Op51M2eQVXI5
-	+pS9us2P81C3LXTeE/wQw/ADCM51s2vTBBWsftFDVP/+Glr5IZFwnEByTdOVjZgRQSwCxGn62P7
-	ZkWyq8BYYFenvg98IWEuZMcqmJua/tHYkrbRGZQp4BRYQa/2p8QqLKfNnmx09NUWtQhRvLD4Z5V
-	ESEgToearj13l4k3Efj0H+qbttdLCJ8SHCR8GBXPpyDqBkt8jZfsZclOksG9GYpcn6yOUnJUG08
-	M+ljlaOjovGndgdAPbGXrwcxDwonJIWECQ2MepbiJNMKad/4xvbPrrqpqtRSuoQNM/vp4EA==
-X-Received: by 2002:a05:7022:43a6:b0:12d:b654:8176 with SMTP id
- a92af1059eb24-12ddd943b73mr1893851c88.1.1777405524558; Tue, 28 Apr 2026
- 12:45:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06383282F1F
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 19:47:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777405659; cv=none; b=hofMPD/J5MbHF1ELVFy1YQ7BWS54koeptrKcxv9MIarfbi/naEna/pLxeWRaW47GYrZngkm+hXT4WT2f9XlY2hVNZNNo0hg+SGtyDJSlmGM6f8ZvRjDKZ0rDfpeXb+YsbLsCAXtI58RwBRgqP3EZ1O4kHRoLkc/JvYRDq3LQMw4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777405659; c=relaxed/simple;
+	bh=LT0egybVhlL2Fg6NhI1vkNVlZv6pZw/7SLdXWtlWleA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QuJwAaODKDUcf5b9dhVvkP0v69MfEOUiDSrOINKKKWC6YZy4VPZEQdfSg9mg+kb2ob8qsSCYoygindGPEmgIDhax8xiq9/+zzCjibW58MEIynamY4nK+fjZi9pa0zRhUkn7Z1hXxaZLZ+ZJZua/ntJO1ChyszJfWJ2BHSqtoSz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=XywkDYu9; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=eqWCOe1xfgqfRBn1e+kMhnAbNjljI2zLW/qsW5lfQlo=; b=XywkDYu9CXyMZzxEjF5f9i97Zd
+	jh/6VMW5SisMcWkddKZwcddRZ4mnxH7m1bChXlVqCVGMZzNWQGuNV5qZR72Yk5Ami9PjsOhOZ3szx
+	W/Wi1qOSbIFOi6L0kiBcxPg7lR5kQ26uhS/PkF2Xt9sePuUgRjSv3dHnLjT35furzE9AT3SossFPp
+	VzQeheOEdaxgUXfa2CXBa2fSFmRnV3wDzHJO8k7dQIQtM6PFSoQMdgeygfvGXyKytah+nHi2nwMkw
+	UE0M6ONmZoZGraGvQZt6hWU2UPHhlBQDKityu01BJmQzAIZvcrMABxn+zq7WCWlfgMdvonRpRY247
+	fNVKKIcg==;
+Received: from sslproxy05.your-server.de ([78.46.172.2])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wHoP9-000BWE-1J;
+	Tue, 28 Apr 2026 21:47:35 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy05.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wHoP9-0008bh-0i;
+	Tue, 28 Apr 2026 21:47:34 +0200
+Message-ID: <4d85df62-b4be-4929-841a-a844217a42ad@iogearbox.net>
+Date: Tue, 28 Apr 2026 21:47:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANMuvJn15HHBrq8EEbhSfCk-Sn33WEEovRa-yVWF5huTKfoOYA@mail.gmail.com>
- <20260428055851.2204248-1-kuniyu@google.com> <CANMuvJngCeUSEZEkm-xSEEgiA-dVxqyuB4SJikw7ppePNYtm5Q@mail.gmail.com>
-In-Reply-To: <CANMuvJngCeUSEZEkm-xSEEgiA-dVxqyuB4SJikw7ppePNYtm5Q@mail.gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 28 Apr 2026 12:45:12 -0700
-X-Gm-Features: AVHnY4KqtxnfmP7ASzTNuoAnjvIR_NTHQmk-5YncgKqDCRCIZZYvb7E_i-YEKmU
-Message-ID: <CAAVpQUCueaur49EhBgHO-NsMV9Oxmu66mRjTqKvnVdHSYXZpgA@mail.gmail.com>
-Subject: Re: [PATCH] net: datagram: Drain queue before reporting EOF or ENOTCONN
-To: Petr Malat <oss@malat.biz>
-Cc: davem@davemloft.net, ebiggers@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: BA02B48B59C
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v4] ipv6: Implement limits on extension header parsing
+To: Justin Iurman <justin.iurman@gmail.com>, kuba@kernel.org
+Cc: edumazet@google.com, dsahern@kernel.org, tom@herbertland.com,
+ willemdebruijn.kernel@gmail.com, idosch@nvidia.com, pabeni@redhat.com,
+ netdev@vger.kernel.org
+References: <20260428153749.785611-1-daniel@iogearbox.net>
+ <4497a340-b48e-4615-81eb-90ebc7a0b5d2@gmail.com>
+ <34f6054f-5d5d-47c8-b06d-f7b40d74c3f0@iogearbox.net>
+ <61387501-77a7-49b8-8124-7fca5168901c@gmail.com>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <61387501-77a7-49b8-8124-7fca5168901c@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27985/Tue Apr 28 08:25:02 2026)
+X-Rspamd-Queue-Id: 4CA8B48B566
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282060-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282061-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,herbertland.com,gmail.com,nvidia.com,redhat.com,vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,man7.org:url,malat.biz:email]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-On Mon, Apr 27, 2026 at 11:49=E2=80=AFPM Petr Malat <oss@malat.biz> wrote:
->
-> On Tue, Apr 28, 2026 at 05:58:41AM +0000, Kuniyuki Iwashima wrote:
-> > From: Petr Malat <oss@malat.biz>
-> > Date: Mon, 27 Apr 2026 22:23:33 -0700
-> > > If a packet is queued and RCV_SHUTDOWN flag is set after the function
-> > > __skb_wait_for_more_packets() checked the queue, the function returns
-> > > EOF, which is then propagated by __unix_dgram_recvmsg() and the user
-> > > reads EOF although there is a message or messages still pending.
-> > >
-> > > The function should check if the queue is empty before returning EOF.
-> > > As the same is true for disconnect and it's also reasonable for a pen=
-ding
-> > > signal, check in a common place before returning from the function.
-> > >
-> > > Signed-off-by: Petr Malat <oss@malat.biz>
-> > > ---
-> > >  net/core/datagram.c | 38 +++++++++++++++++++++-----------------
-> > >  1 file changed, 21 insertions(+), 17 deletions(-)
-> > >
-> > > diff --git a/net/core/datagram.c b/net/core/datagram.c
-> > > index c285c6465923..5952950f7233 100644
-> > > --- a/net/core/datagram.c
-> > > +++ b/net/core/datagram.c
-> > > @@ -98,40 +98,44 @@ int __skb_wait_for_more_packets(struct sock *sk,
-> > > struct sk_buff_head *queue,
-> > >     /* Socket errors? */
-> > >     error =3D sock_error(sk);
-> > >     if (error)
-> > > -           goto out_err;
-> > > +           goto out;
-> > >
-> > >     if (READ_ONCE(queue->prev) !=3D skb)
-> > >             goto out;
-> > >
-> > >     /* Socket shut down? */
-> > > -   if (sk->sk_shutdown & RCV_SHUTDOWN)
-> > > -           goto out_noerr;
-> > > +   if (sk->sk_shutdown & RCV_SHUTDOWN) {
-> > > +           error =3D 1;
-> > > +           goto check_queue;
-> >
-> > We already have checked the same condition just above, and this
-> > is a matter of timing.
-> Yes, but both a message followed by RCV_SHUTDOWN can arrive after the
-> condition has been checked and in which case returning the message
-> must be prefered.
->
->
-> > Even after the duplicated check is evaluated to false, there is
-> > a small chance that the concurrent sendmsg() enqueues a new skb.
-> No, there isn't, because the sendmsg checks the state and the sender
-> gets error in that case. This is done udner a lock, so the situation
-> you described is not possible, see unix_dgram_sendmsg():
+On 4/28/26 8:54 PM, Justin Iurman wrote:
+> On 4/28/26 20:16, Daniel Borkmann wrote:
+>> On 4/28/26 7:58 PM, Justin Iurman wrote:
+>>> On 4/28/26 17:37, Daniel Borkmann wrote:
+>>>> ipv6_{skip_exthdr,find_hdr}() and ip6_{tnl_parse_tlv_enc_lim,
+>>>> protocol_deliver_rcu}() iterate over IPv6 extension headers until they
+>>>> find a non-extension-header protocol or run out of packet data. The
+>>>> loops have no iteration counter, relying solely on the packet length
+>>>> to bound them. For a crafted packet with 8-byte extension headers
+>>>> filling a 64KB jumbogram, this means a worst case of up to ~8k
+>>>> iterations with a skb_header_pointer call each. ipv6_skip_exthdr(),
+>>>> for example, is used where it parses the inner quoted packet inside
+>>>> an incoming ICMPv6 error:
+>>>>
+>>>>    - icmpv6_rcv
+>>>>      - checksum validation
+>>>>      - case ICMPV6_DEST_UNREACH
+>>>>        - icmpv6_notify
+>>>>          - pskb_may_pull()       <- pull inner IPv6 header
+>>>>          - ipv6_skip_exthdr()    <- iterates here
+>>>>          - pskb_may_pull()
+>>>>          - ipprot->err_handler() <- sk lookup
+>>>>
+>>>> The per-iteration cost of ipv6_skip_exthdr itself is generally
+>>>> light, but skb_header_pointer becomes more costly on reassembled
+>>>> packets: the first ~1232 bytes of the inner packet are in the skb's
+>>>> linear area, but the remaining ~63KB are in the frag_list where
+>>>> skb_copy_bits is needed to read data.
+>>>>
+>>>> Initially, the idea was to add a configurable limit via a new
+>>>> sysctl knob with default 8, in line with knobs from commit
+>>>> 47d3d7ac656a ("ipv6: Implement limits on Hop-by-Hop and Destination
+>>>> options"), but two reasons eventually argued against it:
+>>>>
+>>>> - It adds to UAPI that needs to be maintained forever, and
+>>>>    upcoming work is restricting extension header ordering anyway,
+>>>>    leaving little reason for another sysctl knob
+>>>> - exthdrs_core.c is always built-in even when CONFIG_IPV6=n,
+>>>>    where struct net has no .ipv6 member, so the read site would
+>>>>    need an ifdef'd fallback to a constant anyway
+>>>>
+>>>> Therefore, just use a constant (IP6_MAX_EXT_HDRS_CNT). All four
+>>>> extension header walking functions are now bound by this limit.
+>>>>
+>>>> Note that the check in ip6_protocol_deliver_rcu() happens right
+>>>> before the goto resubmit, such that we don't have to have a test
+>>>> for ipv6_ext_hdr() in the fast-path.
+>>>>
+>>>> There's an ongoing IETF draft-iurman-6man-eh-occurrences to enforce
+>>>> IPv6 extension headers ordering and occurrence. The latter also
+>>>> discusses security implications. As per RFC8200 section 4.1, the
+>>>> occurrence rules for extension headers provide a practical upper
+>>>> bound which is 8. In order to be conservative, let's define
+>>>> IP6_MAX_EXT_HDRS_CNT as 4x that to leave enough room for quirky
+>>>> setups. In the unlikely event that this is still not enough, then
+>>>> we might need to reconsider a sysctl.
+>>>>
+>>>> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+>>>
+>>> Reviewed-by: Justin Iurman <justin.iurman@gmail.com>
+>>>
+>>> FWIW, I prefer v4 over v3. I didn't like the idea of a new sysctl for several reasons I already mentioned. So, thanks for this new version, Daniel.
+>>>
+>>> However, I can't help but think 8 would pose absolutely no problem. I would be very surprised to see someone complain. We're choosing 32 over 8 to be extra safe, at the price of security. RFC8200 provides the following ordered list which is recommended for senders (without normative language, though, which was a mistake):
+>>>
+>>>        Hop-by-Hop Options header
+>>>        Destination Options header
+>>>        Routing header
+>>>        Fragment header
+>>>        Authentication header
+>>>        Encapsulating Security Payload header
+>>>        Destination Options header
+>>>
+>>> So this is the maximum you can have theoretically***, although you wouldn't for instance use the Authentication header with ESP. I'm not even talking about ordering or specific number of occurrences here, just the total number of Extension Headers in a packet (as your patch does). It's also worth mentioning that it's highly unlikely to see someone use them all at the same time (in production, of course). This is why I still think that 8 is safe too, and would provide security as expected.
+>>
+>> What do you think if we fix this at 12 then to also have the exotic cases
+>> below covered just in case to be conservative? Would still be an improvement
+>> over 32 fwiw. I'm also fine if you think straight to 8 is the better choice.
+>> Either option I can spin a v5, np.
+> 
+> I'm fine either way. IMO, 12 seems like a good compromise to keep everyone happy.
 
-Note the function is not AF_UNIX specific and reused by
-a bunch of other protocols as skb_recv_datagram().
+Ack, sounds good, I'll do that in a v5 tomorrow.
 
-
->   unix_state_lock(other);
->   ....
->   if (other->sk_shutdown & RCV_SHUTDOWN) {
->      err =3D -EPIPE;
->      goto out_unlock;
->   }
->
-> > Considering __skb_wait_for_more_packets() is called only when
-> > the queue is empty, it's not worth another round when shutdown()ed.
-> This breaks the interface as POSIX is quite clear here:
->   If no messages are available to be received and the peer has
->   performed an orderly shutdown, recv() shall return 0.
-
-Even if we think about only AF_UNIX, once the SEQPACKET peer
-close()s, it triggers sock_error(sk) even though skb was queued before
-__skb_wait_for_more_packets().  It seems "broken" in terms of POSIX,
-but rather the application is too fragile if it's broken by a sudden close(=
-)
-by peer.  These are dgram-based sockets.
-
-Except for close() (so not limited to AF_UNIX), if you see the race,
-it means the application is calling shutdown() while recvmsg() is in
-progress, and such an application must be prepared for the race
-that it creates by itself, and that's how it has worked for decades.
-
-
-> In this case messages were available, but 0 was returned. This
-> behavior breaks even the simple example in unix(7), if you run it long
-> enough (https://man7.org/linux/man-pages/man7/unix.7.html).
-
-Example is just an example, even it doesn't use epoll.
-
->
-> > > +   }
-> > >
-> > >     /* Sequenced packets can come disconnected.
-> > >      * If so we report the problem
-> > >      */
-> > > -   error =3D -ENOTCONN;
-> > >     if (connection_based(sk) &&
-> > > -       !(sk->sk_state =3D=3D TCP_ESTABLISHED || sk->sk_state =3D=3D =
-TCP_LISTEN))
-> > > -           goto out_err;
-> > > +       !(sk->sk_state =3D=3D TCP_ESTABLISHED || sk->sk_state =3D=3D =
-TCP_LISTEN)) {
-> > > +           error =3D -ENOTCONN;
-> >
-> > Also, the queue is always empty if SOCK_SEQPACKET sk is at TCP_CLOSE.
-> In my opinion this is not true if UDS reconnects, see the code
-
-See connection_based() above.
-
-
-> at unix_dgram_connect(), section "If it was connected, reconnect.",
-> where it sets TCP_CLOSE without checking the queue is empty. I haven't
-> checked other cases as it's enough to have one to justify the change.
->
-> Also, it makes the whole function simpler and one doesn't have to
-> review all callers or be afraid a future change could break it.
->
-> >
-> >
-> > > +           goto check_queue;
-> > > +   }
-> > >
-> > >     /* handle signals */
-> > > -   if (signal_pending(current))
-> > > -           goto interrupted;
-> > > +   if (signal_pending(current)) {
-> > > +           error =3D sock_intr_errno(*timeo_p);
-> > > +           goto check_queue;
-> >
-> > and we don't want to delay signal if it arrived first.
->  - We already do it anyway, if a signal followed by a message is
->    delivered before the initial queue check, the message handling gets
->    prefered.
->  - The signal is handled the same way, the only difference is the
->    user gets the message instead EINTR afterwards if he had a
->    nonrestartable handler set up. If the signal leads to the process,
->    termination, the syscal never returns. So, there is no delay.
->
-> Regards,
->   Petr
+Thanks,
+Daniel
 
