@@ -1,189 +1,280 @@
-Return-Path: <netdev+bounces-281985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281987-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mIhpFoLg8GmoagEAu9opvQ
-	(envelope-from <netdev+bounces-281985-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:29:54 +0200
+	id eJZkNwLy8Gn9bAEAu9opvQ
+	(envelope-from <netdev+bounces-281987-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 19:44:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A7F9488E93
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:29:50 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB34048A270
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 19:44:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 75624303C330
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:27:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 058453190222
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0E533033F5;
-	Tue, 28 Apr 2026 16:26:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 642AE2F549C;
+	Tue, 28 Apr 2026 16:28:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JYh+wyVH";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="GswFMkIv"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="WEZQmucu";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Pph9b58S"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48F0C1C860C
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 16:26:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18367DDA9
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 16:28:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777393611; cv=none; b=o2/TYoh8nw1tQKUfyZuIij68NFTQtXq+AX7k8uURQbgnNRH+46cG413QnhqfI5w622cKhOSCJZGi5iYN1F5k6vv+OGJjl4ywlqzmdTH3lfaCkDpnUEuciPDANAr8JUsSByY1kWvOspV+HF3+pvXdlatJQVSnSOa2RPSBCwxN7+U=
+	t=1777393713; cv=none; b=O42V0BMpT30Pbez306HVsYAjtIPgAWuC0+jL0wtWnVsqmMoeO17KIiMyThrzMxX6wMSoA6Qe/Dy6Zo7EtbE1qSBUbWI5e9tjt2uX4BQRnb4gueh2aZu1XfG9X0OTs88uYFp1g5uLpE41u8XGcLkkIwgg5F2yYHX97rHwfcPQRQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777393611; c=relaxed/simple;
-	bh=YOxrYOW2XiUYIkrw5Ws4BEeoJlv7piRCf57Qrembd30=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Tnl0Olf5i3u50vWC9zsz3QV37RVuPLyPFYgXxi76M6GX1fMspD7SLrWHv44V0hl3AlZvQpnyuuZjNCWp37zKFrsT3bY0oPJ+gtiaAQ+4I2hJuIqJGyDHGmasUZSeDRCa6Gamk4rTf4fMmPRXMEh+BXmSNwcMnfpITBlO4CkPPcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JYh+wyVH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=GswFMkIv; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777393609;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xrFHh+IXnC+/GYwS6dyvxdLC3SMZIfTMFwt74S3Tudw=;
-	b=JYh+wyVHyA0poGbEghbO0T6zKPF8c2X0vr+FdDH4QyGuIxJ/+XpJpaCpY5GCsAvS1WrGTz
-	+PUEPo14MRz4lDKYhL2BEoBXJtATpsPsOo2whlE3k41XzOY5QbG5QgQaXjrHmuottkeD7r
-	geNVfodFsy+a+3XoQqnjRQ/JRfXL7l8=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-410-4knaj0vZNjqdQKj2MR0TXQ-1; Tue, 28 Apr 2026 12:26:48 -0400
-X-MC-Unique: 4knaj0vZNjqdQKj2MR0TXQ-1
-X-Mimecast-MFC-AGG-ID: 4knaj0vZNjqdQKj2MR0TXQ_1777393608
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-8eb52a22e85so2149598885a.2
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 09:26:48 -0700 (PDT)
+	s=arc-20240116; t=1777393713; c=relaxed/simple;
+	bh=WeFVN8lacIizVOvd6uFGFEcGw/lCDKJvgHmgBE5IRkk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AwhO9rssCLEp3jAfQhODCEQ0nmbb+G1HYB8EleaRLB+L5PLuRF4L+69WDxTSBfDP75NZjERr0EJwn8YKztXIpugQyqYFHsUHTYNbZpVpLJbNm9Tfl9qIdjp+deYog2oZhrgcZm9jdjzj0a+I0Oa1XO1NWy1VDK4rRRkl9bWGlFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=WEZQmucu; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Pph9b58S; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63SFskL13979449
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 16:28:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	r9kcVg/HkpAwIzD7YQoLEOQSsRjWP+XxJbORsXGW8B8=; b=WEZQmucu4azp0yHd
+	dmAI78aN9OLQ/CUAVBHJate84WC+2bAxJScHOJCD+CtTz5Wzc0DOMO0gLPAgN0fL
+	RB8NHWTr4ms6SuIjVnyB8qxkOuS8LYrpfXsVTicGeycFayKCQg1BJ1HdkjEPtOzg
+	YjdWk7snb77ErJDpwrmKHKdqE58jrjEUW++hGluBTO9yX6EQIkjLiSsEHODlUMUB
+	TABDt5EVmMDSSjJkzpbk65c7pSWBay1IVy1NfkxKSVaAdL5HUTLhz6c9FJCatv4G
+	SizezklbWzU7BOBAxwO70sfzBEtsOsXxdb8DNtG6L6OPA/bw3rjWVkRXsIH7rmkE
+	VS+9lQ==
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com [209.85.160.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dtgmsc0bn-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 16:28:31 +0000 (GMT)
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-50d8e8c47a3so316636921cf.0
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 09:28:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1777393608; x=1777998408; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:organization
-         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=xrFHh+IXnC+/GYwS6dyvxdLC3SMZIfTMFwt74S3Tudw=;
-        b=GswFMkIvYXD978xkY2uOlsE4scUqi8x2dBD8jSVxKtl54ackU0dVtRIC+fbSbomHMJ
-         jGZX2FwrVpnkRF+7NRtfP5J1oB2lx2mrhld1whT9VuoQff1qfMlYx89wqMB567ipvcSb
-         wGFx6+mSoILq5c0MHkLstzOvzdLV1yiQ/ZrT1YqaUrD3VCckIb2bvw7LwRmwJa2085BX
-         6GQ0BHGrGYS+axJ0ArCN6rkrJsKWqz8bQyqw/gK98t3F2KDLFjaJI32HpbyZU4T9jDFk
-         CMwwX0mo8CnH+L/ZbndeKtsiwYmu5wZpQg9MZG6IPhTvhAP0MHmc6+Vfk26r3vjbsIqR
-         qYfQ==
+        d=oss.qualcomm.com; s=google; t=1777393710; x=1777998510; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=r9kcVg/HkpAwIzD7YQoLEOQSsRjWP+XxJbORsXGW8B8=;
+        b=Pph9b58SVhZgOJ1VLoJzX/smslS5Bfgy5fv8DpLsa58SSoQMfhYPrdFIT4r48uAOKJ
+         0HZrKfErEOnysp6URaKry8iMk2x4DoGRpyjeSuo0Ij4kkCJuoE2DJxUkkMkFrZO0LMuX
+         j2uch2u00QTIJhAoavFHFlkZOhFhDpen0ToDIR2vXgBnOLTv7jUW8846WwG0OOsfF69z
+         PVTbIsJEq8acq0um3AnaE/RiMg5AJObxImb+cbxUiVCdn3mcp2vdCER+vbEm3BvgSC8K
+         muMil8q/yzeH16wJCjtFGkp1EMdiZ720yNj+WAyfYmcISK4iaHrYh9Hmrvsb3vWR91GT
+         g4Rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777393608; x=1777998408;
-        h=mime-version:user-agent:content-transfer-encoding:organization
-         :references:in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xrFHh+IXnC+/GYwS6dyvxdLC3SMZIfTMFwt74S3Tudw=;
-        b=iYAbuHf+XnM7d8kpGDJ2v4Mdytn3X/SVabCJ5fEDwWAbrINeR6/+XrUuM8GXkPN9+D
-         EhgNN4hDbrN9X7ylB8ieti1MD5cx/mtlNJkKcqnoA32IU2kNJ3EPtQ2upyMTnTOo+QbO
-         St8bMJTSdiAn46Zb4wp4LCmu3foIrSpzotVmAjzYhXu6ZXkwuKKwRrtnouf+4U8KdSCP
-         I4RJAAosrdCB69QZi9NWWl9i9baU6MmDxBxl0RkbLFYvf2Z3kw2tHcRHxKpmcrgjovUt
-         vlJA2snmtkwIEAsiW0vL9y89XsxnSEbEdbBSICZi6mfP2V+uLRwt+x9c3D5kIFBvSiyc
-         U0gw==
-X-Gm-Message-State: AOJu0YwtXrvVs7gEMKrx8+f0GoYO0T5lKaw+nsisOcT3nsYIpLkAlvFb
-	43HRbr+caV7OvcPgnO/M97jBBvdsUkgaa1xax4J2DPj2PfrxrdcOzVKovuk91JV1+WAk1OlCrIC
-	Fq6rMDusd4Q6kaFixyb3azIgdfE7fnv0sI6nF+auuSpvT8ldWNdGAjrtJCA==
-X-Gm-Gg: AeBDieu8l35qH2QSaLlmXXPSM+GqJ4XW06FxOC9HP8Ff7PGzEgPzKBrwNqYVRA/ez9O
-	fwvjjfkJqRbPqTSNXqqWJhdbYEJ1leYDbpTYVgyBOfYL+R4w7NnGJiEO6ayFpvFZzrchxI94Xqb
-	Gr0FnVSjjd1yU2gge0J+RJ99ZH5pk7iQbo4CS2ylniJlHXf3zxG6q3BfTca8q8kRMSCheeqAynX
-	/EoMf5/CJDcUccczAZUsaEIr13L5NWGLidnrv6ieyBnjQg9rvXgYrWjepd5Orom2DYx8+djbObg
-	6eroDWK7uwnMuPXXrKU7kzRkygjyAHy2YlqLp5u9ZBXta0j4NQQBv0wYU4gaGTSIIO1JId9Ea6V
-	s+z65OBaOu+JqNjVn01kYFiBeGV4=
-X-Received: by 2002:a05:620a:17ac:b0:8eb:f3c7:2248 with SMTP id af79cd13be357-8f7d98fdd73mr490612385a.42.1777393607446;
-        Tue, 28 Apr 2026 09:26:47 -0700 (PDT)
-X-Received: by 2002:a05:620a:17ac:b0:8eb:f3c7:2248 with SMTP id af79cd13be357-8f7d98fdd73mr490605285a.42.1777393606834;
-        Tue, 28 Apr 2026 09:26:46 -0700 (PDT)
-Received: from m8.users.ipa.redhat.com ([2603:7000:9400:fe80::fc6])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8f7c7cd2c68sm233679985a.22.2026.04.28.09.26.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Apr 2026 09:26:45 -0700 (PDT)
-Message-ID: <33613b11328d830f8683fc6ec6900da2b479ae27.camel@redhat.com>
-Subject: Re: [PATCH net-next v2 0/5] Reimplement TCP-AO using crypto library
-From: Simo Sorce <simo@redhat.com>
-To: Eric Biggers <ebiggers@kernel.org>, Dmitry Safonov <0x7f454c46@gmail.com>
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Neal
- Cardwell	 <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,  "Jason A .
- Donenfeld"	 <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- Dmitry Safonov	 <dima@arista.com>
-Date: Tue, 28 Apr 2026 12:26:44 -0400
-In-Reply-To: <20260427232054.GA2700@sol>
-References: <20260427172727.9310-1-ebiggers@kernel.org>
-	 <CAJwJo6Z9oJSMMBUL_pbYWN6ha3n4MRpKV_aVut8E+af3JUDFkw@mail.gmail.com>
-	 <20260427200116.GA3454259@google.com> <20260427232054.GA2700@sol>
-Organization: Red Hat
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+        d=1e100.net; s=20251104; t=1777393710; x=1777998510;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r9kcVg/HkpAwIzD7YQoLEOQSsRjWP+XxJbORsXGW8B8=;
+        b=QGWS7ww8lQ1Ww+26FYzFhZw1JcU/v7ooX2ejY33gjZL4sIuw9XnHRgfX8Oubn+us+5
+         nXGjl/6hyt4ufSZ+j6YI7OFwTOCmbEXVmNMiBDqSJuy8Bfrtl8cSAR9K71KKmZdlNbLQ
+         VBGOvB5SPjEGVjyMHdFJHIPrytyVYxumislISClGP+ex3IQYdRhrXeTerFSOtoHwNMvO
+         lvVeIDWobD7i+o38h9v/lkQF7s2p9JgNRtm7oPiI/1v7EFcdUBWI1ltUTJ8TM+lTJUqD
+         A9LeqeA11BvdbOk04bqjnIt3+RrO7OO1hRSFXD9UeUvxlGSQ3ytz8/3SB9Z6DzLmEDCU
+         zPjQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9OAvikyszsgazKLfTpUlzTyYcXQtTq9wglzWsKgYK8eLPi78b1GFrhncs7iU9DZD62FeppFEA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxK2H9EX2V9bBYSJgJLPt94a+qnAxqAMP02eQ9CFNx24+ePzy30
+	fsPESlxY/S+pXtbP/i4I72QF/UBswR0d23XZYR1DpOSS1piSv+OfoCrXJMUb0KFh58mtIJkKJQG
+	LOxqLZEsxuhMuRtmHCbSSaDrDH4je851UPPIJuIzI1AZ7tqsZwof7N5P0gv0=
+X-Gm-Gg: AeBDiev6G0gpYL0GMYaYfqyUqyCyqOp5lFfSQnqDJX1y4nfZ6Wftqoq904fxrZuqdqW
+	ATBq2MV2FQop4ccQrBYjB5kOBQgv4RQ9tWxvLOLUSPp0Hb68/amJ8s3xOmGI8ckPAYChCu1LBnC
+	lHo+nKKmLNsWNxV8LVSv4DGznsAOgqZTD0xNrSbxah7TIBE52MGsk4m2BrURJH4zaMFkt4eLMF3
+	UHSrJrm4hnPURFAWuQPr1qv4WaXnpCO2bsngdeFUzE6FFhuhdHyMUdN6TCmueDQZm/O2W+B3YhK
+	ijPspJT2QIWfw3Q3NmnwUuPRZCTN5bnZHUNysQLTkTs82ovwUyxEBr8uLi7tVkc4+HopauXcWBW
+	RRfAeckcelQGKoUEFtB/iQquSd1g22d0lzPfY4euJ0YbW1WaZiCXd8QRA6x4=
+X-Received: by 2002:a05:622a:1a93:b0:509:26f4:64e9 with SMTP id d75a77b69052e-51018a861c9mr3528301cf.51.1777393710339;
+        Tue, 28 Apr 2026 09:28:30 -0700 (PDT)
+X-Received: by 2002:a05:622a:1a93:b0:509:26f4:64e9 with SMTP id d75a77b69052e-51018a861c9mr3527651cf.51.1777393709727;
+        Tue, 28 Apr 2026 09:28:29 -0700 (PDT)
+Received: from [192.168.1.29] ([178.197.219.94])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5100dbaa48asm20225371cf.29.2026.04.28.09.28.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Apr 2026 09:28:29 -0700 (PDT)
+Message-ID: <ac91a635-4aeb-4fa2-a00a-0e3425caaea4@oss.qualcomm.com>
+Date: Tue, 28 Apr 2026 18:28:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: 5A7F9488E93
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: Unify user-visible "Qualcomm" name
+To: Simon Horman <horms@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Loic Poulain <loic.poulain@oss.qualcomm.com>,
+        Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+        Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, =Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, linux-arm-msm@vger.kernel.org
+References: <20260427070127.18471-2-krzysztof.kozlowski@oss.qualcomm.com>
+ <20260428161444.GU900403@horms.kernel.org>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+Content-Language: en-US
+Autocrypt: addr=krzysztof.kozlowski@oss.qualcomm.com; keydata=
+ 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
+ cwzYbmi/Et7T2+47PN9NZAOyb771QoVr8A==
+In-Reply-To: <20260428161444.GU900403@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: ZyAFUL4ZPQrL3h0ivUfBRSYDBJj0J91l
+X-Authority-Analysis: v=2.4 cv=R4gz39RX c=1 sm=1 tr=0 ts=69f0e02f cx=c_pps
+ a=JbAStetqSzwMeJznSMzCyw==:117 a=gOEeR9iKwsj33Yj5oN/cWg==:17
+ a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=Um2Pa8k9VHT-vaBCBUpS:22
+ a=EUspDBNiAAAA:8 a=MpKeM0OtTd53jt1D06MA:9 a=QEXdDO2ut3YA:10
+ a=uxP6HrT_eTzRwkO_Te1X:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI4MDE1OCBTYWx0ZWRfX07QA9xQn4IeT
+ DIaTWm+K8QMfDOx/mWUg2/UTjtt59kG6Q2weapVA+0vcI7oqbXkav+roS13f+Ndzglk1PIx4Z0x
+ vCclZ/gKYxCnOdFseGVWBzjfZY8IDvJJBkB87tIdpHi5knjpTsr2pN6dTjorI9xt3/BKd4kCmvI
+ wef91kh6xx1HY2Oh4BXilk+NLaiIMRTNHPr1eVoTzZ7gibzLjKIAY+WLzN+0qFI4F02H0kiY4HO
+ rUR04e/JUii5Gg92/3URVfacJLyiglfuXkhvUq+XNtg3Il7Fc6j82Q5ob2T+44xVzY8LtuaDMTE
+ 07vj3jnm1F3plx2TO9Bk7nfyDqydVCAFfRtDsau9gQjaWmfsbP3zqZvqcdXWrhTngmaaxJOuGZ2
+ vvo5zLITp/+/QFIzanGrCHHbnx6u1zrF3wIs1o/bWlsYLWWgfsPgKrwxvCg59yjUZ3MRK7VWyaj
+ RQV6rYGAF9rKTUDIA1w==
+X-Proofpoint-ORIG-GUID: ZyAFUL4ZPQrL3h0ivUfBRSYDBJj0J91l
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-28_05,2026-04-28_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 priorityscore=1501 malwarescore=0 clxscore=1015
+ impostorscore=0 spamscore=0 adultscore=0 bulkscore=0 phishscore=0
+ lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2604200000
+ definitions=main-2604280158
+X-Rspamd-Queue-Id: DB34048A270
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_FROM(0.00)[bounces-281985-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-281987-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,oss.qualcomm.com,gmail.com,sipsolutions.net,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,qualcomm.com:dkim,qualcomm.com:email,oss.qualcomm.com:dkim,oss.qualcomm.com:mid];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simo@redhat.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[krzysztof.kozlowski@oss.qualcomm.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,ietf.org:url]
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
 
-On Mon, 2026-04-27 at 16:20 -0700, Eric Biggers wrote:
-> On Mon, Apr 27, 2026 at 08:01:16PM +0000, Eric Biggers wrote:
-> > > - Ronald P. Bonica (the original RFC5925 author), together with Tony
-> > > Li do have an active RFC draft to support the additional algorithms
-> [...]
-> > > [1] https://www.ietf.org/archive/id/draft-bonica-tcpm-tcp-ao-algs-00.=
-html
->=20
-> For what it's worth, that draft makes very little sense.  For example,
-> it proposes three variants of HMAC-SHA3, instead of just making the
-> modern choice of KMAC256.  And it proposes both HMAC-SHA384 and
-> HMAC-SHA512, despite them being redundant with each other after the
-> specified truncation to 128 bits.
+On 28/04/2026 18:14, Simon Horman wrote:
+> On Mon, Apr 27, 2026 at 09:01:27AM +0200, Krzysztof Kozlowski wrote:
+>> Various names for Qualcomm as a company are used in user-visible config
+>> options: QCOM, Qualcomm and Qualcomm Technologies.  Switch to unified
+>> "Qualcomm" so it will be easier for users to identify the options when
+>> for example running menuconfig.
+>>
+>> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+> 
+> ...
+> 
+>> diff --git a/drivers/net/wwan/Kconfig b/drivers/net/wwan/Kconfig
+>> index 88df55d78d90..958dbc7347fa 100644
+>> --- a/drivers/net/wwan/Kconfig
+>> +++ b/drivers/net/wwan/Kconfig
+>> @@ -38,7 +38,7 @@ config WWAN_HWSIM
+>>  	  called wwan_hwsim.  If unsure, say N.
+>>  
+>>  config MHI_WWAN_CTRL
+>> -	tristate "MHI WWAN control driver for QCOM-based PCIe modems"
+>> +	tristate "MHI WWAN control driver for Qualcomm-based PCIe modems"
+>>  	depends on MHI_BUS
+>>  	help
+>>  	  MHI WWAN CTRL allows QCOM-based PCIe modems to expose different modem
+> 
+> Hi Krzysztof,
+> 
+> Sashiko points out that QCOM is still used on the line above.
+> 
+>> @@ -51,7 +51,7 @@ config MHI_WWAN_CTRL
+>>  	  called mhi_wwan_ctrl.
+>>  
+>>  config MHI_WWAN_MBIM
+>> -        tristate "MHI WWAN MBIM network driver for QCOM-based PCIe modems"
+>> +        tristate "MHI WWAN MBIM network driver for Qualcomm-based PCIe modems"
+>>          depends on MHI_BUS
+>>          help
+>>            MHI WWAN MBIM is a WWAN network driver for QCOM-based PCIe modems.
+> 
+> And here too.
 
-Which is bogus in itself without proper security considerations, the
-only considerations cited is an RFC from 1997 ... clearly the pinnacle
-of cryptography advice ...
+Yes, I did not unify every single text because I believe that might be
+more churn and not that much benefit. I think it is more important to
+have a list of drivers in xconfig or menuconfig nicely organized and the
+help message matters less.
 
-If they need a shorter hash they should make themselves a favor and use
-SHAKE and then define the desired output length and desired key size.
-That draft is just a disaster as written.
+But if you wish, I can replace it there as well.
 
-Specifically they should use KMAC128 as defined in NIST SP 800-185
-(which uses cSHAKE128 underneath).
-
-Simo.
-
---=20
-Simo Sorce
-Distinguished Engineer
-RHEL Crypto Team
-Red Hat, Inc
-
+Best regards,
+Krzysztof
 
