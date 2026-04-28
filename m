@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-281636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281637-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +BIgJahE8Gn2QwEAu9opvQ
-	(envelope-from <netdev+bounces-281636-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 07:24:56 +0200
+	id yPuOAtFE8Gn2QwEAu9opvQ
+	(envelope-from <netdev+bounces-281637-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 07:25:37 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB9CA47D8A1
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 07:24:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 543B547D8AA
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 07:25:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 496093045475
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 05:23:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9B9E4304C945
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 05:23:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BD9C340A6A;
-	Tue, 28 Apr 2026 05:23:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 039AC3382F0;
+	Tue, 28 Apr 2026 05:23:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nEHWqVuI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H5Rm7tdf"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA2A334695
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 05:23:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0697933A014
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 05:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777353803; cv=none; b=fiKKiPeTrFSBqq6/vUPUtCatCf4QBYNhRr4tBs5AGuK9kAA8i6WbymzDKNrBLqFbqUmJeqi6DpJ9QmNEup9JQC1V/ZZEa8yIAsZTjSM3z4XsKKZwdseaAKK2gFzu69NLtoC+UKJ+rnF4fEsKq7MFRXabsnXNG7Xkov/WbZ+alEg=
+	t=1777353803; cv=none; b=QK2paG2o0xGcfJ3cOEani/SwluwiCsdvQNlolpL6jhZN3dTMoCj7GMympAgnD4TS2y8md7Bmjod2HJOqQHa8uEur5Ep82ATnS4tsaewiqahggpeETAcvqkRBaDUpgk/vK6/qlt5mI3QnPat91djl0+149S9FftD5shq4kC8ORHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1777353803; c=relaxed/simple;
-	bh=ZBzbfMJqu4EXxZqctCPprlTwmnYrISSB7mGEmW8Gl/w=;
+	bh=u/OiWeUb1xI4knNRa06YhkTxQjXiITwhmCdk3EIs6kM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DVEwOWf6ffC6iUTZOfDKYpTjDKyrAhjxKKfKxKdz87m1dy/JhpNriYtkNXbHx43NeEVMWBcYgJb+bfVhV37Y+s+Zh8iSUFrjPwLjsOi1MFwiCGU5SR+tTIzexX0z6MrKW+PRGr1+kDH5yAfSyQSmSA0n/ru1B+AnfPgWUCF/gFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nEHWqVuI; arc=none smtp.client-ip=198.175.65.9
+	 In-Reply-To:To:Cc; b=aoKFx0cgvi5ZOpUDN8uQj30GiV7qXwkCyO9xQirPpPCdAZ4JcLD0boI0eqJBoj00F71l4qI6Lif/Ugecn07fZCj5M44ZlpEhJ3sVKlXN/A+Fje5MpNCDRIfyiWfqKdIU9xgLIvrboQI3BfVg2VEuNcWcQPsnuByDOAFvwvm4bs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=H5Rm7tdf; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777353801; x=1808889801;
+  t=1777353802; x=1808889802;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=ZBzbfMJqu4EXxZqctCPprlTwmnYrISSB7mGEmW8Gl/w=;
-  b=nEHWqVuIGgFOV48iqgkAomDp5K0pjbM544Cvi1pN7oO/RO3CvtqX0qFN
-   E6j4SxPWb2Uaq7/EP9zXtf9gW+i7PBrE0JOESfx9v5uY/tbSipJapJqA5
-   ws9220Pbzg0w/JM4AOc8+AhA0+ebIbfZySE2tmL1sB5KWP8blyfS/3oNQ
-   T8Ydgy2P6/Z9PXrXN269Z7IlJo0O9UGDXuDQcfehkHt4eiX3536mDMf/p
-   VSiXv6uSGMWjDfYNSzTZ/Z/dzVgY/G2Vei+HhkK1+grUI2pvC7BEbDKxd
-   a3Fiwjlg9nSmTP6LwfucqhsgCIJGCAD9yWUx175ZzfvGDZgRqLqviDi+7
+  bh=u/OiWeUb1xI4knNRa06YhkTxQjXiITwhmCdk3EIs6kM=;
+  b=H5Rm7tdfrXMuN7OXqxu9SCM5JTTvybZqCjzqDnokfSYgoOfJIvow1Dtm
+   44ESpLYmEkkTmhefhNExzefr393QHEw5J+nlSQ5u3ZH4KH8o7bjQ9iGjk
+   38aaqgnI8fb/IVwGEzyhCH9qlRbN5YuKHumUEKu1E70EkpRmtZgYlqh3i
+   f6Q4dsrFb1pwJ21qIL2dc3J8MHtVHrdAkEkUfE53cb3CikH25DL9ZXz0W
+   fZ8PwP8VSGL990MJwW79bpRi1LARko3CJxRVTPInxk6N8xkMxWscDn2od
+   ypffeIykxq8EmBsuqkJW9CRytrmFLy4rQB9jIsEaC18O1wPcTIMMbTNmc
    w==;
-X-CSE-ConnectionGUID: CXaBWk/qS0ONe4X63ZLMBQ==
-X-CSE-MsgGUID: PPug8W7kQIiR0ScEYKKqkQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11769"; a="100910549"
+X-CSE-ConnectionGUID: yEwtrIozS5GnS1GF/IHUGQ==
+X-CSE-MsgGUID: 3hFe0RDIRJqw4kQKd39e9g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11769"; a="100910554"
 X-IronPort-AV: E=Sophos;i="6.23,203,1770624000"; 
-   d="scan'208";a="100910549"
+   d="scan'208";a="100910554"
 Received: from orviesa003.jf.intel.com ([10.64.159.143])
   by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2026 22:23:16 -0700
-X-CSE-ConnectionGUID: /qBTpBa5RIyucZyP8iv//g==
-X-CSE-MsgGUID: ghGKacgLRG2h6cp/J9xraw==
+X-CSE-ConnectionGUID: yWdbYKDSST2YyWqQE1herw==
+X-CSE-MsgGUID: de0MTZhsT4ecdGhY1SzQMA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,203,1770624000"; 
-   d="scan'208";a="237800209"
+   d="scan'208";a="237800213"
 Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.109]) ([10.166.28.109])
   by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2026 22:23:16 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Mon, 27 Apr 2026 22:22:18 -0700
-Subject: [PATCH net 06/11] ice: fix infinite recursion in ice_cfg_tx_topo
- via ice_init_dev_hw
+Date: Mon, 27 Apr 2026 22:22:19 -0700
+Subject: [PATCH net 07/11] ice: fix missing SMA pin initialization in DPLL
+ subsystem
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,8 +72,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260427-jk-iwl-net-petr-oros-fixes-v1-6-cdcb48303fd8@intel.com>
+Content-Transfer-Encoding: 8bit
+Message-Id: <20260427-jk-iwl-net-petr-oros-fixes-v1-7-cdcb48303fd8@intel.com>
 References: <20260427-jk-iwl-net-petr-oros-fixes-v1-0-cdcb48303fd8@intel.com>
 In-Reply-To: <20260427-jk-iwl-net-petr-oros-fixes-v1-0-cdcb48303fd8@intel.com>
 To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
@@ -84,19 +84,20 @@ To: Tony Nguyen <anthony.l.nguyen@intel.com>,
  Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
  Simon Horman <horms@kernel.org>, Jiri Pirko <jiri@resnulli.us>
 Cc: netdev@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
- Petr Oros <poros@redhat.com>, Paul Menzel <pmenzel@molgen.mpg.de>, 
+ Petr Oros <poros@redhat.com>, Ivan Vecera <ivecera@redhat.com>, 
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, 
  Alexander Nowlin <alexander.nowlin@intel.com>
 X-Mailer: b4 0.16-dev-ea14f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3909;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3150;
  i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=FH7e+VDJUmxBBBdCvhgvRyfswmsNqpSnWWCAUugsb5M=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhswPLo6nJ207wXSjl2knr624t3mNYF31zdiThaVNCjbn+
- 8Lse493lLIwiHExyIopsig4hKy8bjwhTOuNsxzMHFYmkCEMXJwCcJN3MfxTPs7XHrRVX01q6/wf
- Sw6c4tykZ7dbt/xOqcoJHykT07NbGRnmPXV8u0zswd8rU0IOcL++Oil/+9xtu4u+31P6/PMsu5I
- YGwA=
+ bh=2334wDsm+QZIYHl9YbbnW/nY/RHkfu4WygIEfr6Ds+s=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhswPLk76xTJBHZ1Z5+/vMTDbUWr4jFs+/rVinnLtTSmvp
+ tufPMM6SlkYxLgYZMUUWRQcQlZeN54QpvXGWQ5mDisTyBAGLk4BmMirToa/Mqtm8H7hbOt+ln8k
+ /Fto3O9Vin8mT9SMEdXY8t7Ox/nNW0aGCeWrFt27mXp3+any/8trLu3senLAwH7xbB7dwOqa57O
+ 6WQA=
 X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
  fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
-X-Rspamd-Queue-Id: DB9CA47D8A1
+X-Rspamd-Queue-Id: 543B547D8AA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -104,15 +105,15 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281636-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-281637-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[intel.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
@@ -124,100 +125,80 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mpg.de:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
 From: Petr Oros <poros@redhat.com>
 
-On certain E810 configurations where firmware supports Tx scheduler
-topology switching (tx_sched_topo_comp_mode_en), ice_cfg_tx_topo()
-may need to apply a new 5-layer or 9-layer topology from the DDP
-package. If the AQ command to set the topology fails (e.g. due to
-invalid DDP data or firmware limitations), the global configuration
-lock must still be cleared via a CORER reset.
+The DPLL SMA/U.FL pin redesign introduced ice_dpll_sw_pin_frequency_get()
+which gates frequency reporting on the pin's active flag. This flag is
+determined by ice_dpll_sw_pins_update() from the PCA9575 GPIO expander
+state. Before the redesign, SMA pins were exposed as direct HW
+input/output pins and ice_dpll_frequency_get() returned the CGU
+frequency unconditionally — the PCA9575 state was never consulted.
 
-Commit 86aae43f21cf ("ice: don't leave device non-functional if Tx
-scheduler config fails") correctly fixed this by refactoring
-ice_cfg_tx_topo() to always trigger CORER after acquiring the global
-lock and re-initialize hardware via ice_init_hw() afterwards.
+The PCA9575 powers on with all outputs high, setting ICE_SMA1_DIR_EN,
+ICE_SMA1_TX_EN, ICE_SMA2_DIR_EN and ICE_SMA2_TX_EN. Nothing in the
+driver writes the register during initialization, so
+ice_dpll_sw_pins_update() sees all pins as inactive and
+ice_dpll_sw_pin_frequency_get() permanently returns 0 Hz for every
+SW pin.
 
-However, commit 8a37f9e2ff40 ("ice: move ice_deinit_dev() to the end
-of deinit paths") later moved ice_init_dev_hw() into ice_init_hw(),
-breaking the reinit path introduced by 86aae43f21cf. This creates an
-infinite recursive call chain:
+Fix this by writing a default SMA configuration in
+ice_dpll_init_info_sw_pins(): clear all SMA bits, then set SMA1 and
+SMA2 as active inputs (DIR_EN=0) with U.FL1 output and U.FL2 input
+disabled. Each SMA/U.FL pair shares a physical signal path so only
+one pin per pair can be active at a time. U.FL pins still report
+frequency 0 after this fix: U.FL1 (output-only) is disabled by
+ICE_SMA1_TX_EN which keeps the TX output buffer off, and U.FL2
+(input-only) is disabled by ICE_SMA2_UFL2_RX_DIS. They can be
+activated by changing the corresponding SMA pin direction via dpll
+netlink.
 
-  ice_init_hw()
-    ice_init_dev_hw()
-      ice_cfg_tx_topo()         # topology change needed
-        ice_deinit_hw()
-        ice_init_hw()           # reinit after CORER
-          ice_init_dev_hw()     # recurse
-            ice_cfg_tx_topo()
-              ...               # stack overflow
-
-Fix by moving ice_init_dev_hw() back out of ice_init_hw() and calling
-it explicitly from ice_probe() and ice_devlink_reinit_up(). The third
-caller, ice_cfg_tx_topo(), intentionally does not need ice_init_dev_hw()
-during its reinit, it only needs the core HW reinitialization. This
-breaks the recursion cleanly without adding flags or guards.
-
-The deinit ordering changes from commit 8a37f9e2ff40 ("ice: move
-ice_deinit_dev() to the end of deinit paths") which fixed slow rmmod
-are preserved, only the init-side placement of ice_init_dev_hw() is
-reverted.
-
-Fixes: 8a37f9e2ff40 ("ice: move ice_deinit_dev() to the end of deinit paths")
+Fixes: 2dd5d03c77e2 ("ice: redesign dpll sma/u.fl pins control")
 Signed-off-by: Petr Oros <poros@redhat.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Ivan Vecera <ivecera@redhat.com>
+Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 Tested-by: Alexander Nowlin <alexander.nowlin@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/intel/ice/devlink/devlink.c | 2 ++
- drivers/net/ethernet/intel/ice/ice_common.c      | 2 --
- drivers/net/ethernet/intel/ice/ice_main.c        | 2 ++
- 3 files changed, 4 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_dpll.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-index 6144cee8034d..641d6e289d5c 100644
---- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-@@ -1245,6 +1245,8 @@ static int ice_devlink_reinit_up(struct ice_pf *pf)
- 		return err;
+diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
+index 62f75701d652..498ec2c045f3 100644
+--- a/drivers/net/ethernet/intel/ice/ice_dpll.c
++++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
+@@ -4014,6 +4014,7 @@ static int ice_dpll_init_info_sw_pins(struct ice_pf *pf)
+ 	struct ice_dpll_pin *pin;
+ 	u32 phase_adj_max, caps;
+ 	int i, ret;
++	u8 data;
+ 
+ 	if (pf->hw.device_id == ICE_DEV_ID_E810C_QSFP)
+ 		input_idx_offset = ICE_E810_RCLK_PINS_NUM;
+@@ -4073,6 +4074,22 @@ static int ice_dpll_init_info_sw_pins(struct ice_pf *pf)
+ 		}
+ 		ice_dpll_phase_range_set(&pin->prop.phase_range, phase_adj_max);
  	}
- 
-+	ice_init_dev_hw(pf);
 +
- 	/* load MSI-X values */
- 	ice_set_min_max_msix(pf);
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index ce11fea122d0..b617a6bff891 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -1126,8 +1126,6 @@ int ice_init_hw(struct ice_hw *hw)
- 	if (status)
- 		goto err_unroll_fltr_mgmt_struct;
- 
--	ice_init_dev_hw(hw->back);
--
- 	mutex_init(&hw->tnl_lock);
- 	ice_init_chk_recipe_reuse_support(hw);
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 5f92377d4dfc..1d1947a7fe11 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -5245,6 +5245,8 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
- 		return err;
- 	}
- 
-+	ice_init_dev_hw(pf);
++	/* Initialize the SMA control register to a known-good default state.
++	 * Without this write the PCA9575 GPIO expander retains its power-on
++	 * default (all outputs high) which makes all SW pins appear inactive.
++	 * Set SMA1 and SMA2 as active inputs, disable U.FL1 output and
++	 * U.FL2 input.
++	 */
++	ret = ice_read_sma_ctrl(&pf->hw, &data);
++	if (ret)
++		return ret;
++	data &= ~ICE_ALL_SMA_MASK;
++	data |= ICE_SMA1_TX_EN | ICE_SMA2_TX_EN | ICE_SMA2_UFL2_RX_DIS;
++	ret = ice_write_sma_ctrl(&pf->hw, data);
++	if (ret)
++		return ret;
 +
- 	adapter = ice_adapter_get(pdev);
- 	if (IS_ERR(adapter)) {
- 		err = PTR_ERR(adapter);
+ 	ret = ice_dpll_pin_state_update(pf, pin, ICE_DPLL_PIN_TYPE_SOFTWARE,
+ 					NULL);
+ 	if (ret)
 
 -- 
 2.54.0.rc2.531.gaf818d63126a
