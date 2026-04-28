@@ -1,200 +1,151 @@
-Return-Path: <netdev+bounces-282120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282121-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MO+RHGw48Wm/egEAu9opvQ
-	(envelope-from <netdev+bounces-282120-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 00:45:00 +0200
+	id MHhsIt458WkmewEAu9opvQ
+	(envelope-from <netdev+bounces-282121-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 00:51:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF25548CBF6
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 00:44:59 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6BF748CD85
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 00:51:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 248443021B25
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 22:44:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6F2A930562AE
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 22:49:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0D0384239;
-	Tue, 28 Apr 2026 22:44:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KtUy9M9+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9510D3806B3;
+	Tue, 28 Apr 2026 22:49:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f201.google.com (mail-dy1-f201.google.com [74.125.82.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069D83815F0
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 22:44:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 229B4364E92;
+	Tue, 28 Apr 2026 22:49:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777416297; cv=none; b=ahI65ByTDi2sfXDula5Me312MbEpfnzfIpKnyEoeakVPLeD0vhFGVgvl0pq1BBe0jrYBUOR9HxLjP3O/RZZVBa1bl4u3xYet5aQ1J74s4kv2xDMMLxpMYCavXrE3k1tElXKYbXwJ/a1sUBBpOjNlKA7+Pmu3QptHW8riRmxYQZ0=
+	t=1777416551; cv=none; b=PB+2qA/vhByvgpY+SRcKwnhCKbNRc6JPS6yrVtiG/Zl/g3XxSCKbg0sYsQyBycvTEW3NJk1njKYz5C2GWGvvopv4kb0qIrObyf5ZHYhrfx7IkuXHQHunc01QKvGxe68ARGWaRoFbf3FwtxjNSUgJ9/21ant6Ux1V7BkGk82YZH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777416297; c=relaxed/simple;
-	bh=ai8QUQpe+eGBNcBYzX5wgc4QtQufT5uTE6GhpsaCC0Y=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ghit+WOszhVUGAqNfELp8CNKHU2d98/OQWQmfuW4Hd9OPuE+LJw4Pkr6jD4VoANif0V0uQHFVsWttP0UBZJDlsHjAWIizDaH/fU8ifkHFo9hXknC102ni2/S8sOX1UCoAKpoMuX/lbbH01ncmWJas1eWlvi7obqc5eGizwtafq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KtUy9M9+; arc=none smtp.client-ip=74.125.82.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com
-Received: by mail-dy1-f201.google.com with SMTP id 5a478bee46e88-2bdf6fe90a9so19318728eec.1
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 15:44:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777416295; x=1778021095; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4TUkxWmkceVVg+Z+lQyOtJ2XfCE43FvOGg/yLxop1NU=;
-        b=KtUy9M9+B3xni5dI9gUq6zNtsKaHFeC6cQ/4AOe6tKCbZa1OrIMPu/TORV23hCT73O
-         t4N34CU8YoLuUwuv5sG8UKGA1gkGqr4wMUfN8T9fiY5ZJfZrQ918UJCzKCjeEJdfW/0A
-         Ab/LCF0AMzU1xQ01TKSmz9xhXTxyik2JZxC+CE7dvsucEb5eS13nXKHPzVXEsegOBwwM
-         HShdGQqJxsKEAinIqalGUFQZpnt/9cz489ZMZVsVRNKAyLYVEa0+hYGi1TqbS8ake+2Z
-         nEKdkJ2CDyFicx8Qkt9pxA4awa2QZTBoP4OB0FrpFTPIyNHZ3vfsPmlZErR6aXq9N03A
-         ZVBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777416295; x=1778021095;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4TUkxWmkceVVg+Z+lQyOtJ2XfCE43FvOGg/yLxop1NU=;
-        b=A99VwAfySgkake0K998HPObm1zCJCu3M5z3I4GjXqnj36Y6sTNTnsQrUdwXWHZ4nhT
-         0NpzuaxVxBXwgIeY6YYHCWWk+59V1QKO94/UMLqXod8VhfxPniqKV7ZMx78tBEmj8JoM
-         58GJH1rQVX5Mig9nGGKxzTLJJSfAT2sMM76DeZwqnAI0MNLAqtNg7CD52CJUZEmvfVnt
-         y1Hq63rwqGqAQkF9tVpazYi6SAmT7npqL7CIweA9a+Zut8VJoYsTI5xNnnCXqPMyB+Yx
-         WxqDGP0uTAnDszk/D830+1AvQqvuBZUxPQtk+eTJo47zyu7TUmG/aDnGLpR+trkLl1KU
-         ellg==
-X-Gm-Message-State: AOJu0Ywx4hdCBaR5MBSMq9uyuBVxWN11Vxd9L5vkrcAagKQSfMgt8l/H
-	1yxrs+AkpBMIrn/badL+PRGDx/SRojOrVM2cpd1cvjun5rK7mSINsrIrXEbMGcSyyiXQGqWuH1l
-	/+tt0hfjrZTVwVxAG91O3mg==
-X-Received: from dycoh5.prod.google.com ([2002:a05:7301:da05:b0:2d8:4599:1d20])
- (user=marcharvey job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:7301:d8f:b0:2d8:b814:29af with SMTP id 5a478bee46e88-2ed19716925mr687253eec.3.1777416294853;
- Tue, 28 Apr 2026 15:44:54 -0700 (PDT)
-Date: Tue, 28 Apr 2026 22:44:34 +0000
+	s=arc-20240116; t=1777416551; c=relaxed/simple;
+	bh=nLEfbRIRvnlwTITh/nE8m/FFx0nDjwrbG1AUcQ7QqoY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QcYfyPoZYa/3q6pdmJSYbjUKzaHY50SKo/fBdb+WdQEjINEbil+6NpCpXVRNeKtGyWVdVww9nrc6dq81kdVgPsBrcYPrWvB+49Jc3VXIZAWF0Ky7dGzK5vfUuOJjBfbPKnTeG0t9UOf70pC30xSvNGWKxzfQWojcV2Tr3UdBOok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; arc=none smtp.client-ip=160.80.4.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
+Received: from localhost.localdomain ([160.80.103.126])
+	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 63SMmTio003354;
+	Wed, 29 Apr 2026 00:48:34 +0200
+From: Andrea Mayer <andrea.mayer@uniroma2.it>
+To: "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: Alexander Aring <alex.aring@gmail.com>,
+        Justin Iurman <justin.iurman@gmail.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        stefano.salsano@uniroma2.it, Andrea Mayer <andrea.mayer@uniroma2.it>
+Subject: [PATCH net] ipv6: rpl: add NULL check for idev in ipv6_rpl_srh_rcv()
+Date: Wed, 29 Apr 2026 00:48:16 +0200
+Message-Id: <20260428224816.11223-1-andrea.mayer@uniroma2.it>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAFI48WkC/x3MTQqAIBBA4avErBNKsr+rRITWVAM1hUoI4d2Tl
- t/ivRccWkIHffaCxYccXZxQ5hnMu+YNBS3JIAtZF5VsxHkENT3h0CyaUtVdZ1pjUEMKbosrhX8 2AKMXjMHDGOMHGgZed2YAAAA=
-X-Change-Id: 20260427-mlx5_vxlan-715699b8bbea
-X-Developer-Key: i=marcharvey@google.com; a=ed25519; pk=OzOeciadbfF5Bug/4/hyEAwfrruSY4tn0Q0LocyYUL0=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1777416293; l=3018;
- i=marcharvey@google.com; s=20260401; h=from:subject:message-id;
- bh=ai8QUQpe+eGBNcBYzX5wgc4QtQufT5uTE6GhpsaCC0Y=; b=vg5g7vP2EM46YpgEoKVKKpCPrEdNIlWCVg6lGbsIIfELTu4gk8o+Fa/nww2xQIL96DpvPEsWc
- eoaHiL67gr0DIzm5DhBIKIZ4TR7fBMGOajPs2Xar5rRs+twXcU0iEgS
-X-Mailer: b4 0.14.3
-Message-ID: <20260428-mlx5_vxlan-v1-1-cf666d042618@google.com>
-Subject: [PATCH net-next] net/mlx5: Add MLX5_VXLAN config option
-From: Marc Harvey <marcharvey@google.com>
-To: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
-	Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Marc Harvey <marcharvey@google.com>
-Content-Type: text/plain; charset="utf-8"
-X-Rspamd-Queue-Id: AF25548CBF6
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
+X-Virus-Status: Clean
+X-Rspamd-Queue-Id: E6BF748CD85
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.64 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[uniroma2.it : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282120-lists,netdev=lfdr.de];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282121-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marcharvey@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrea.mayer@uniroma2.it,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,uniroma2.it];
+	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	NEURAL_SPAM(0.00)[0.946];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,uniroma2.it:mid,uniroma2.it:email]
 
-Currently, there is no way to disable mlx5 vxlan offloading if vxlan
-is enabled. We've (possibly) seen some minor udp rr and udp stream
-regressions when enabling vxlan, and want a way to disable this
-offloading. Also coupling vxlan offloading with vxlan enablement
-generally limits the flexability of vxlan setups.
+ipv6_rpl_srh_rcv() dereferences idev from __in6_dev_get() without
+a NULL check when reading idev->cnf.rpl_seg_enabled.
+When the device's MTU drops below IPV6_MIN_MTU, addrconf_ifdown()
+clears dev->ip6_ptr through RCU_INIT_POINTER(), which is immediately
+visible to concurrent readers. A packet that already passed the idev
+check in ip6_rcv_core() can race with this and hit a NULL pointer
+dereference.
 
-Add a new config option for mlx5 vxlan offloading specifically, so
-that users can use vxlan without automatically opting in to the
-offloading.
+Reproduced by flooding traffic through a route with RPL source routing
+while rapidly flapping the receiving interface's MTU between 1500 and
+1200:
 
-To keep the same behavior as before, the new config option is enabled
-by default if vxlan is enabled.
+ BUG: KASAN: null-ptr-deref in ipv6_rpl_srh_rcv+0xae/0x1050
+ Read of size 4 at addr 00000000000006b4 by task ping6/318
 
-Signed-off-by: Marc Harvey <marcharvey@google.com>
+ CPU: 0 UID: 0 PID: 318 Comm: ping6 Not tainted 7.1.0-rc1-micro-vm-dev-g46f74a3f7d57 #82 PREEMPT(full)
+ Call Trace:
+  <IRQ>
+  kasan_report+0xc6/0x100
+  ipv6_rpl_srh_rcv+0xae/0x1050
+  ip6_protocol_deliver_rcu+0x717/0x960
+  ip6_input_finish+0xa3/0x1b0
+  ip6_input+0xdc/0x490
+  ipv6_rcv+0x338/0x460
+  __netif_receive_skb_one_core+0xd1/0x130
+  process_backlog+0x2c7/0x9f0
+  __napi_poll.constprop.0+0x51/0x270
+  net_rx_action+0x322/0x730
+  handle_softirqs+0x119/0x640
+  do_softirq+0xae/0xe0
+  </IRQ>
+
+Add a NULL check for idev after __in6_dev_get() and drop the skb if
+idev is NULL, consistent with the SRv6 fix in commit 064137935262
+("ipv6: add NULL checks for idev in SRv6 paths").
+
+Fixes: 8610c7c6e3bd ("net: ipv6: add support for rpl sr exthdr")
+Cc: stable@vger.kernel.org
+Signed-off-by: Andrea Mayer <andrea.mayer@uniroma2.it>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/Kconfig     | 11 +++++++++++
- drivers/net/ethernet/mellanox/mlx5/core/Makefile    |  2 +-
- drivers/net/ethernet/mellanox/mlx5/core/lib/vxlan.h |  2 +-
- 3 files changed, 13 insertions(+), 2 deletions(-)
+ net/ipv6/exthdrs.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Kconfig b/drivers/net/ethernet/mellanox/mlx5/core/Kconfig
-index 3c3e84100d5a..d2e091bdbafc 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/Kconfig
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/Kconfig
-@@ -218,3 +218,14 @@ config MLX5_EN_PSP
- 	  interfaces to PSP Stack which supports PSP crypto offload.
+diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
+index 03cbce842c1a..e398a8851031 100644
+--- a/net/ipv6/exthdrs.c
++++ b/net/ipv6/exthdrs.c
+@@ -499,6 +499,10 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
+ 	u32 r;
  
- 	  If unsure, say Y.
-+
-+config MLX5_VXLAN
-+	bool "Mellanox Technologies vxlan offloading"
-+	depends on VXLAN
-+	depends on MLX5_CORE_EN
-+	default y
-+	help
-+	  mlx5 device offload support for vxlan. Makes the mlx5 driver always
-+	  attempt to initialize device handling of vxlan packets.
-+
-+	  If unsure, say Y.
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Makefile b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-index d39fe9c4a87c..6f2cc5414d07 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-@@ -86,7 +86,7 @@ mlx5_core-$(CONFIG_MLX5_BRIDGE)    += esw/bridge.o esw/bridge_mcast.o esw/bridge
+ 	idev = __in6_dev_get(skb->dev);
++	if (!idev) {
++		kfree_skb(skb);
++		return -1;
++	}
  
- mlx5_core-$(CONFIG_HWMON)          += hwmon.o
- mlx5_core-$(CONFIG_MLX5_MPFS)      += lib/mpfs.o
--ifneq ($(CONFIG_VXLAN),)
-+ifneq ($(CONFIG_MLX5_VXLAN),)
- 	mlx5_core-y		   += lib/vxlan.o
- endif
- mlx5_core-$(CONFIG_PTP_1588_CLOCK) += lib/clock.o
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/vxlan.h b/drivers/net/ethernet/mellanox/mlx5/core/lib/vxlan.h
-index 34ef662da35e..67d0c126c2ae 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/vxlan.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/vxlan.h
-@@ -50,7 +50,7 @@ static inline bool mlx5_vxlan_allowed(struct mlx5_vxlan *vxlan)
- 	return !IS_ERR_OR_NULL(vxlan);
- }
- 
--#if IS_ENABLED(CONFIG_VXLAN)
-+#if IS_ENABLED(CONFIG_MLX5_VXLAN)
- struct mlx5_vxlan *mlx5_vxlan_create(struct mlx5_core_dev *mdev);
- void mlx5_vxlan_destroy(struct mlx5_vxlan *vxlan);
- int mlx5_vxlan_add_port(struct mlx5_vxlan *vxlan, u16 port);
-
----
-base-commit: 790ead9394860e7d70c5e0e50a35b243e909a618
-change-id: 20260427-mlx5_vxlan-715699b8bbea
-
-Best regards,
+ 	accept_rpl_seg = min(READ_ONCE(net->ipv6.devconf_all->rpl_seg_enabled),
+ 			     READ_ONCE(idev->cnf.rpl_seg_enabled));
 -- 
-Marc Harvey <marcharvey@google.com>
+2.20.1
 
 
