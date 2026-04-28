@@ -1,190 +1,187 @@
-Return-Path: <netdev+bounces-281754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281755-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mDbsOleI8GnuUQEAu9opvQ
-	(envelope-from <netdev+bounces-281754-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 12:13:43 +0200
+	id aPd9NvuC8GlwUQEAu9opvQ
+	(envelope-from <netdev+bounces-281755-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:50:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7C134825E9
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 12:13:42 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6361E481DC2
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 11:50:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8B57A315A441
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 09:39:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BD9F13034A34
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 09:45:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C957C3D47BC;
-	Tue, 28 Apr 2026 09:39:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fQZ+sdHr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A28D3D9DB8;
+	Tue, 28 Apr 2026 09:45:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29E12EF653;
-	Tue, 28 Apr 2026 09:39:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A24F82C08DC
+	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 09:45:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777369171; cv=none; b=tk2jMhMJMFLzMi83k6fp/ispo4oxQm1JGrHVtTfd86W9gpCeR2DIwPb9DtVN1c0P4SpJO154l3tQqkfo8hoHD7z3vcSPUJlG3WeuITJu8ukgN15QchClWYEFwY33J7rJkL2okSmkSMN+LejqnyQ5XNu0IS97nY8gwzMke7e6rck=
+	t=1777369527; cv=none; b=XQlfnErLMAzMK3ndjAuCvmw1+ljWVBxHD2aDzg+qfci95pSs1JeakvHAl7q8bdwvGpH3KWB23gVAQCRKZHe9Lw3D7OF4gcCuXxq40WM8sXkEqcVX1cFyVSt8KrFRPiMreErAK9rLolN+28yxSylxmb9QMpZq6g0ChRiD1M9pgZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777369171; c=relaxed/simple;
-	bh=p7IdvtVE/evm+N22/Y2mzoWyYve0mGB/apLJBPbltXs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hcg319DMARvWXMsSU6quW2AYj7pmOZZ47JDfWy8+1ZFMInM7qaLU/YCXXPtKmyEiL/izP6k26XzNq9vQLBVzL9DHvqJaoFJBm3H24Yh1buAmQQb9ge9zqV1sXxRlhiXKDq9IqnI5d5X3mnzT7e8s2ht1PCusW6VX8sYXYWldCBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=fQZ+sdHr; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=PSRhFVtT2RWFdp856Xk+KYQvTFkIYWnEyy7wWGqEW4M=; b=fQZ+sdHr/DxtXPOoTa0/PXsoq7
-	akesGkU6rpfZ8ktRkjQ7tb4j3wfiY2oC0JpAxpcj5J6QSH+4/QdbiyWoNvPOhdc3ymvaX15Tlsf6U
-	+jDrDT9XWlUxaHuLTcM6FRz60Ez8QHwalzwaPVTo1RDVxgD8UnM9wteHViwqyt1dw0Y0Z82bUVQ5G
-	LHZC0upELm//PQd4zJFQwM7yY1xBvPQOp7Z6Qxt3H5FLYzMbwmnUx+DgPPNFKttx2uYW4nflxpdsh
-	ftGz7lpw550Tda7nMjz+4g78gSeB0NfhUtv97VPsSjZsAhQvGEgVhgTCmMoVY8FxA/dRDpdIVYyGQ
-	1O7O0eKQ==;
-Received: from 2001-1c00-8d85-4b00-266e-96ff-fe07-7dcc.cable.dynamic.v6.ziggo.nl ([2001:1c00:8d85:4b00:266e:96ff:fe07:7dcc] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1wHeuJ-00000002bvc-0jGo;
-	Tue, 28 Apr 2026 09:39:07 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id A1C1C30330B; Tue, 28 Apr 2026 11:39:05 +0200 (CEST)
-Date: Tue, 28 Apr 2026 11:39:05 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Yury Norov <ynorov@nvidia.com>
-Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
-	Jonathan Cameron <jic23@kernel.org>,
-	David Lechner <dlechner@baylibre.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	David Laight <david.laight.linux@gmail.com>,
-	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
-	Andy Shevchenko <andy@kernel.org>,
-	Ping-Ke Shih <pkshih@realtek.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Hans de Goede <hansg@kernel.org>, Linus Walleij <linusw@kernel.org>,
-	Sakari Ailus <sakari.ailus@linux.intel.com>,
-	Salah Triki <salah.triki@gmail.com>,
-	Achim Gratz <Achim.Gratz@stromeko.de>,
-	Ben Collins <bcollins@watter.com>, x86@kernel.org,
-	linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	linux-rtc@vger.kernel.org
-Subject: Re: [PATCH v2 2/9] x86/extable: switch to using FIELD_GET_SIGNED()
-Message-ID: <20260428093905.GA1026330@noisy.programming.kicks-ass.net>
-References: <20260427214127.406067-1-ynorov@nvidia.com>
- <20260427214127.406067-3-ynorov@nvidia.com>
+	s=arc-20240116; t=1777369527; c=relaxed/simple;
+	bh=+SczXxPMicIegRdCfLiY2TJdrXgCKfIYJ4G3kiIco7E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PiiNVb2AkxjmBRTK4KYaUxLtzTMP5ruCxNkU7pyb11ubuNndSTtwKQFaUXic9pQUZc7oaQjf6QbWxjdoU4axRe2U1Tf5QQwxE0s57S9GLc2NhrkwzUi0ABr/IMIHbqCK9Zhya9k9IgUh19p40CMgfRYla/FPHrz6mRrRq4zaSm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 0A9F34C288718F;
+	Tue, 28 Apr 2026 11:44:51 +0200 (CEST)
+Message-ID: <f9fbc8c3-3b1d-456c-a389-4f95bf07822a@molgen.mpg.de>
+Date: Tue, 28 Apr 2026 11:44:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260427214127.406067-3-ynorov@nvidia.com>
-X-Rspamd-Queue-Id: E7C134825E9
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [RFC PATCH] ice: allow creating VFs when
+ !CONFIG_ICE_SWITCHDEV
+To: Vincent Chen <vincent.chen@sifive.com>
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org
+References: <20260427031158.2665916-1-vincent.chen@sifive.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20260427031158.2665916-1-vincent.chen@sifive.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 6361E481DC2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=desiato.20200630];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-281754-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,redhat.com,alien8.de,linux.intel.com,zytor.com,baylibre.com,sipsolutions.net,gmail.com,analog.com,realtek.com,lunn.ch,davemloft.net,google.com,bootlin.com,rasmusvillemoes.dk,stromeko.de,watter.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-281755-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[35];
+	RCVD_COUNT_THREE(0.00)[4];
+	SUBJECT_HAS_EXCLAIM(0.00)[];
+	DMARC_NA(0.00)[mpg.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[infradead.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[peterz@infradead.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.995];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	R_DKIM_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,nvidia.com:email,infradead.org:dkim,infradead.org:email,noisy.programming.kicks-ass.net:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sifive.com:email]
 
-On Mon, Apr 27, 2026 at 05:41:19PM -0400, Yury Norov wrote:
-> The EX_DATA register is laid out such that EX_DATA_IMM occupied MSB.
-> It's done to make sure that FIELD_GET() will sign-extend the IMM
-> field during extraction.
-> 
-> To enforce that, all EX_DATA masks are made signed integers. This
-> works, but relies on the particular implementation of FIELD_GET(),
-> i.e. masking then shifting, not vice versa; and the particular
-> placement of the fields in the register.
-> 
-> Switch to using the dedicated FIELD_GET_SIGNED(), and relax those
-> limitations.
-> 
-> Signed-off-by: Yury Norov <ynorov@nvidia.com>
+Dear Vincent,
 
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 
+Thank you for your patch.
+
+Am 27.04.26 um 05:11 schrieb Vincent Chen via Intel-wired-lan:
+> Currently ice_eswitch_attach_vf() is called unconditionally in
+> ice_start_vfs() and ice_reset_all_vfs(), which causes VF creation
+> to fail when CONFIG_ICE_SWITCHDEV is not defined or switchdev mode
+> is not enabled at runtime.
+
+I’d add a blank line between paragraphs.
+
+> Fix this by adding switchdev mode checks at the call sites before
+> calling ice_eswitch_attach_vf(), consistent with how
+> ice_eswitch_attach_sf() is already handled in ice_devlink_port_new().
+> Also remove the redundant check inside ice_eswitch_attach_vf() itself.
+
+*Also* is a good indicator to make it a separate patch. I’d favor this 
+in this case.
+
+> This is similar to commit aacca7a83b97 ("ice: allow creating VFs for
+> !CONFIG_NET_SWITCHDEV") which fixed the same issue for the previous
+> ice_eswitch_configure() API.
+> 
+> Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
 > ---
->  arch/x86/include/asm/extable_fixup_types.h | 13 ++++---------
->  arch/x86/mm/extable.c                      |  2 +-
->  2 files changed, 5 insertions(+), 10 deletions(-)
+>   drivers/net/ethernet/intel/ice/ice_eswitch.c |  3 ---
+>   drivers/net/ethernet/intel/ice/ice_sriov.c   | 14 ++++++++------
+>   drivers/net/ethernet/intel/ice/ice_vf_lib.c  |  3 ++-
+>   3 files changed, 10 insertions(+), 10 deletions(-)
 > 
-> diff --git a/arch/x86/include/asm/extable_fixup_types.h b/arch/x86/include/asm/extable_fixup_types.h
-> index 906b0d5541e8..fd0cfb472103 100644
-> --- a/arch/x86/include/asm/extable_fixup_types.h
-> +++ b/arch/x86/include/asm/extable_fixup_types.h
-> @@ -2,15 +2,10 @@
->  #ifndef _ASM_X86_EXTABLE_FIXUP_TYPES_H
->  #define _ASM_X86_EXTABLE_FIXUP_TYPES_H
->  
-> -/*
-> - * Our IMM is signed, as such it must live at the top end of the word. Also,
-> - * since C99 hex constants are of ambiguous type, force cast the mask to 'int'
-> - * so that FIELD_GET() will DTRT and sign extend the value when it extracts it.
-> - */
-> -#define EX_DATA_TYPE_MASK		((int)0x000000FF)
-> -#define EX_DATA_REG_MASK		((int)0x00000F00)
-> -#define EX_DATA_FLAG_MASK		((int)0x0000F000)
-> -#define EX_DATA_IMM_MASK		((int)0xFFFF0000)
-> +#define EX_DATA_TYPE_MASK		(0x000000FF)
-> +#define EX_DATA_REG_MASK		(0x00000F00)
-> +#define EX_DATA_FLAG_MASK		(0x0000F000)
-> +#define EX_DATA_IMM_MASK		(0xFFFF0000)
->  
->  #define EX_DATA_REG_SHIFT		8
->  #define EX_DATA_FLAG_SHIFT		12
-> diff --git a/arch/x86/mm/extable.c b/arch/x86/mm/extable.c
-> index 6b9ff1c6cafa..ceb8d03191ab 100644
-> --- a/arch/x86/mm/extable.c
-> +++ b/arch/x86/mm/extable.c
-> @@ -322,7 +322,7 @@ int fixup_exception(struct pt_regs *regs, int trapnr, unsigned long error_code,
->  
->  	type = FIELD_GET(EX_DATA_TYPE_MASK, e->data);
->  	reg  = FIELD_GET(EX_DATA_REG_MASK,  e->data);
-> -	imm  = FIELD_GET(EX_DATA_IMM_MASK,  e->data);
-> +	imm  = FIELD_GET_SIGNED(EX_DATA_IMM_MASK, e->data);
->  
->  	switch (type) {
->  	case EX_TYPE_DEFAULT:
-> -- 
-> 2.51.0
-> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+> index 2e4f0969035f..c709decb26d5 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+> @@ -512,9 +512,6 @@ int ice_eswitch_attach_vf(struct ice_pf *pf, struct ice_vf *vf)
+>   	struct ice_repr *repr;
+>   	int err;
+>   
+> -	if (!ice_is_eswitch_mode_switchdev(pf))
+> -		return 0;
+> -
+>   	repr = ice_repr_create_vf(vf);
+>   	if (IS_ERR(repr))
+>   		return PTR_ERR(repr);
+> diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
+> index 843e82fd3bf9..6a0b724e46f9 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_sriov.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
+> @@ -484,12 +484,14 @@ static int ice_start_vfs(struct ice_pf *pf)
+>   			goto teardown;
+>   		}
+>   
+> -		retval = ice_eswitch_attach_vf(pf, vf);
+> -		if (retval) {
+> -			dev_err(ice_pf_to_dev(pf), "Failed to attach VF %d to eswitch, error %d",
+> -				vf->vf_id, retval);
+> -			ice_vf_vsi_release(vf);
+> -			goto teardown;
+> +		if (ice_is_eswitch_mode_switchdev(pf)) {
+> +			retval = ice_eswitch_attach_vf(pf, vf);
+> +			if (retval) {
+> +				dev_err(ice_pf_to_dev(pf), "Failed to attach VF %d to eswitch, error %d",
+> +					vf->vf_id, retval);
+> +				ice_vf_vsi_release(vf);
+> +				goto teardown;
+> +			}
+>   		}
+>   
+>   		set_bit(ICE_VF_STATE_INIT, vf->vf_states);
+> diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+> index de9e81ccee66..71595410174c 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+> @@ -807,7 +807,8 @@ void ice_reset_all_vfs(struct ice_pf *pf)
+>   		ice_vf_rebuild_vsi(vf);
+>   		ice_vf_post_vsi_rebuild(vf);
+>   
+> -		ice_eswitch_attach_vf(pf, vf);
+> +		if (ice_is_eswitch_mode_switchdev(pf))
+> +			ice_eswitch_attach_vf(pf, vf);
+>   
+>   		mutex_unlock(&vf->cfg_lock);
+>   	}
+
+The diff looks good.
+
+
+Kind regards,
+
+Paul
 
