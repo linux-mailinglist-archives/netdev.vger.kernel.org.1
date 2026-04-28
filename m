@@ -1,149 +1,148 @@
-Return-Path: <netdev+bounces-281967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-281968-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KI2JAqTj8GmoagEAu9opvQ
-	(envelope-from <netdev+bounces-281967-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:43:16 +0200
+	id oDroKGTn8Gn2awEAu9opvQ
+	(envelope-from <netdev+bounces-281968-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:59:16 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E005B489327
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:43:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A7CE44897C9
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 18:59:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 91A643082124
-	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:14:15 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7019437D7E52
+	for <lists+netdev@lfdr.de>; Tue, 28 Apr 2026 16:21:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E1643E498;
-	Tue, 28 Apr 2026 16:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4486344D01E;
+	Tue, 28 Apr 2026 16:14:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="qPSztoZg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JbkEQnl8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24CE643CEFB
-	for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 16:08:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 214F73C2799;
+	Tue, 28 Apr 2026 16:14:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777392487; cv=none; b=EynXdkMr4D7vxaYl475AUmu5PxI99SDJ2Y8oH3nntnQ+dAZYHcOD2AZeAeLjdosp0bymZp7lne+gqxvm8GinEe8lkSK8i+aBk/QHV5VvWWQ98y6NoQXP02XI57ZLoLa0enFxq/UU19309sZq7OhxbtkMQJmeEPqG8T3vg7zddZs=
+	t=1777392894; cv=none; b=i8emZsj9igoDsIFulhlSY+JYZ5tPGV5M4bHn182it0UMx4O+M6rTzjWUy9hmJcUxxdHk2bFKtnRrIBPQioIgVRH9prwlZh+NQLMbXlONX71KjCW11dU0zJXpMwlGKdhnoSXPWBWIRf3b2Hf/jIrPXwKtyURVDHMW5qmBkXUXdF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777392487; c=relaxed/simple;
-	bh=DOvjwCqRSTMuph9VfUSOH3Bnxl1XAy9dSaasLTePhRU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YzgWWL+IECsi0QMTw+cRg2mRG+G9MYBH3ure0kgV5S93yJW9MU9VLaxRXzf90ZXuYNspZXGZcrC58Zfg7kCehv6klnLgfUcNJngmHI90NHjQvru1CsK9X5ZyncbKraunZnC/V91KADFLbZOYRlNEp5El13jiH4a7Hbjjp9f+IBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=qPSztoZg; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 863014E42B54;
-	Tue, 28 Apr 2026 16:08:03 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 4CA35601D0;
-	Tue, 28 Apr 2026 16:08:03 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9ED3E10728E5D;
-	Tue, 28 Apr 2026 18:07:54 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1777392481; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=R7YnNrHkXr0z6CcnblvtQUE03jaxaAjhHUqCoIZWK3k=;
-	b=qPSztoZgXx+kxLNzJum1hgHv4NAJeJDfINkViE9otpRTWo1Tif78POYWdHN2F/Bdfhfrzm
-	1ntwbF2ByJFgJmMVOSpK+czfI/tBWKMWfLQQzsy1OOYWSOAeBim5wKn1itEZ6A6pZSlMAw
-	0qGzC47poRHNgQr/8zCUGsyO2UiuEHgt3ZANU8gru1lBWXvi3Y7BFJ0ZRYX5Sao8QnnJSC
-	nYqi7zKWGJK87MVruHV/yncpE/W5C6dQzAv9wHnT8irsBW6UpZwbvvkvmd8zM8tekHjfxZ
-	OPmd39vhByGsk27HRvI3iFrkfgj/BHqOi0x/hkagWLqlx8QRqr/IKDV4o8O49g==
-Date: Tue, 28 Apr 2026 18:07:52 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Daniel Machon <daniel.machon@microchip.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur
- <horatiu.vultur@microchip.com>, Steen Hegelund
- <steen.hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>, "Alexei
- Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- "Jesper Dangaard Brouer" <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, Arnd
- Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Mohsin Bashir <mohsin.bashr@gmail.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 00/13] net: lan966x: add support for PCIe
- FDMA
-Message-ID: <20260428180752.4e68fea8@bootlin.com>
-In-Reply-To: <20260428-lan966x-pci-fdma-v2-0-d3ec66e06202@microchip.com>
-References: <20260428-lan966x-pci-fdma-v2-0-d3ec66e06202@microchip.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.4.0 (GTK 3.24.52; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1777392894; c=relaxed/simple;
+	bh=KL2ZfNVqrWQLqUll24996ElMsbWWCAGfVvy2a3Aa0Vs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bgEckSmhRTQvW3fkFsnbuPFaNmId5fpQRfs9ixIHq/aHlpZz+rYj33eGKQV5b5fJ7JaglQ6+BxjVqICZ05HU+rlH2s67ne97ne6IqJcEfD3u54i2ezReD0nR5B5Ts/jg6Uq0jg8KsDSzMZ+Du1Na7CFVKD/Uvlc6qKIkCFXEHmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JbkEQnl8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE790C2BCAF;
+	Tue, 28 Apr 2026 16:14:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777392893;
+	bh=KL2ZfNVqrWQLqUll24996ElMsbWWCAGfVvy2a3Aa0Vs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JbkEQnl8PbvoONjjfnDexc6ygPB3xUpJM0n/RKwzjtMG6dF/c1uB/5aZas06b+Fh5
+	 TsVKWoJO19sgPwMKC5x0jd0KG6sRIDv7A9jSFKJlDM6oKrKgZt6bwuLhh607MaSpdP
+	 QrXG3P/HHmrkG5WJl2Rqx7OGXUqGYvrXq8XcPc8gj0Wyyujt8wBi2V2ABjnqdi+/KW
+	 6HfOQtzQcv5SUMCMQzNMlf2bpWSYRHmBSORhRDed6lHF3e8MzD94ILuZ+IgYw4YDqr
+	 sfdKFqBho4fDCwzo2YegESounFOdnfM58bd3VPkqk+iFGTMpOiaO6AcxtudeyLB7X7
+	 5Xy5b9UePUzPg==
+Date: Tue, 28 Apr 2026 17:14:44 +0100
+From: Simon Horman <horms@kernel.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Loic Poulain <loic.poulain@oss.qualcomm.com>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	=Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH] net: Unify user-visible "Qualcomm" name
+Message-ID: <20260428161444.GU900403@horms.kernel.org>
+References: <20260427070127.18471-2-krzysztof.kozlowski@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: E005B489327
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260427070127.18471-2-krzysztof.kozlowski@oss.qualcomm.com>
+X-Rspamd-Queue-Id: A7CE44897C9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,iogearbox.net,gmail.com,fomichev.me,arndb.de,linuxfoundation.org,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-281967-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	TAGGED_FROM(0.00)[bounces-281968-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,oss.qualcomm.com,gmail.com,sipsolutions.net,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[herve.codina@bootlin.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,bootlin.com:email,bootlin.com:dkim,bootlin.com:mid,microchip.com:email]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,horms.kernel.org:mid,qualcomm.com:email]
 
-Hi Daniel, all,
-
-On Tue, 28 Apr 2026 15:06:49 +0200
-Daniel Machon <daniel.machon@microchip.com> wrote:
-
-> When lan966x operates as a PCIe endpoint, the driver currently uses
-> register-based I/O for frame injection and extraction. This approach is
-> functional but slow, topping out at around 33 Mbps on an Intel x86 host
-> with a lan966x PCIe card.
+On Mon, Apr 27, 2026 at 09:01:27AM +0200, Krzysztof Kozlowski wrote:
+> Various names for Qualcomm as a company are used in user-visible config
+> options: QCOM, Qualcomm and Qualcomm Technologies.  Switch to unified
+> "Qualcomm" so it will be easier for users to identify the options when
+> for example running menuconfig.
 > 
-> This series adds FDMA (Frame DMA) support for the PCIe path. When
-> operating as a PCIe endpoint, the internal FDMA engine on lan966x cannot
-> directly access host memory, so DMA buffers are allocated as contiguous
-> coherent memory and mapped through the PCIe Address Translation Unit
-> (ATU). The ATU provides outbound windows that translate internal FDMA
-> addresses to PCIe bus addresses, allowing the FDMA engine to read and
-> write host memory. Because the ATU requires contiguous address regions,
-> page_pool and normal per-page DMA mappings cannot be used. Instead,
-> frames are transferred using memcpy between the ATU-mapped buffers and
-> the network stack. With this, throughput increases from ~33 Mbps to
-> ~620 Mbps for default MTU.
-> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
 
-I have applied the whole series and performed some tests.
+...
 
-Issues observed in v1 are no more present.
+> diff --git a/drivers/net/wwan/Kconfig b/drivers/net/wwan/Kconfig
+> index 88df55d78d90..958dbc7347fa 100644
+> --- a/drivers/net/wwan/Kconfig
+> +++ b/drivers/net/wwan/Kconfig
+> @@ -38,7 +38,7 @@ config WWAN_HWSIM
+>  	  called wwan_hwsim.  If unsure, say N.
+>  
+>  config MHI_WWAN_CTRL
+> -	tristate "MHI WWAN control driver for QCOM-based PCIe modems"
+> +	tristate "MHI WWAN control driver for Qualcomm-based PCIe modems"
+>  	depends on MHI_BUS
+>  	help
+>  	  MHI WWAN CTRL allows QCOM-based PCIe modems to expose different modem
 
-Tested-by: Herve Codina <herve.codina@bootlin.com>
+Hi Krzysztof,
 
-Best regards,
-Hervé
+Sashiko points out that QCOM is still used on the line above.
+
+> @@ -51,7 +51,7 @@ config MHI_WWAN_CTRL
+>  	  called mhi_wwan_ctrl.
+>  
+>  config MHI_WWAN_MBIM
+> -        tristate "MHI WWAN MBIM network driver for QCOM-based PCIe modems"
+> +        tristate "MHI WWAN MBIM network driver for Qualcomm-based PCIe modems"
+>          depends on MHI_BUS
+>          help
+>            MHI WWAN MBIM is a WWAN network driver for QCOM-based PCIe modems.
+
+And here too.
+
+-- 
+pw-bot: changes-requested
 
