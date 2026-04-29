@@ -1,95 +1,91 @@
-Return-Path: <netdev+bounces-282418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282419-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yJeYEWQd8mm/oAEAu9opvQ
-	(envelope-from <netdev+bounces-282418-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 17:01:56 +0200
+	id 4BE8F4sf8mkboQEAu9opvQ
+	(envelope-from <netdev+bounces-282419-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 17:11:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 020EF496738
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 17:01:51 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DD0A4969C3
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 17:11:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8EF013011441
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 15:01:17 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 543BB3009CDC
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 15:08:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B17D136605D;
-	Wed, 29 Apr 2026 15:01:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE7BD3002B3;
+	Wed, 29 Apr 2026 15:08:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s+nv7TZ4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bw63088U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2144537646A
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 15:01:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E88832ED3A
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 15:08:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777474864; cv=none; b=m7xpu6KYaG3za7QIPCU/dsOWlmUgAkJlTAHhf0fu8Pvtc2Fy+mMkj3cOWVmX3MesS/tqRV6AfLcSAwv/O51/cY8AhZ9gt+Sok1ZnIoRI+Y4gq5WLXH5teSBg8ip/DS6EE3c6L7UNjcH6ZdvvCw/tgYwOGKt9u8xVh5KWXvHSmhI=
+	t=1777475317; cv=none; b=o8OQNjk5DvDBueOJ0FAkCAhtbfkGhCsacHmRF+n49S+uYsOn1UBzvYFw2nTIbZtF1kgpPGjmwJXiDam5hmUjGr6VO/YQnY0KoSO4QfAGIFGtGdRaB5wZDQ3QOYOkmWECiH0r51Sav7jAN/pWp2QBS0HvNOHZhC8pjxYD4UOEfdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777474864; c=relaxed/simple;
-	bh=FZkPLyz4iy8JIkfq5sjfg8+HsGK+VmVs0AAYqDsVXqw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MAFS0mnhCdID6M/dmeJRg1+IRYafFzhwWX8b+CP7Reshx+Y1YvayB59mgNcgNq0PMGdntNSjcQ+DvhDZWR1jKiMEa+DxcmamhwTVyC02aP8YaPuQkK1GW5gIZK+zEr7210c+UN7paLAw2A93dAkOfVdVojvcopbSi3yT8/XvmNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=s+nv7TZ4; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-8ef45a6d9dfso953826385a.0
-        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 08:01:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777474860; x=1778079660; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=W2cPAm1wDcQ/uIsNTaahkJXXGkH27N19gjb7Z1QCBIs=;
-        b=s+nv7TZ4YxAKM+6KPfBAubVKH2bpnbEmNMu3GPydk+hhcamWYB02sC6L2LGjlnvSDB
-         Fddw99SHZWDledbhQI094lK8dZ+E6niNZs8eGHwh+nr27ROMPtFXLq/U0vu5+gJ8yWJI
-         gKFhmB9yZGrrQ8b5sm3N+CnabquLm7UotaAD5VrzfHvyhJPc8KWRjZAT2frJQ3jUZ0bZ
-         LGgjZJc8fWUEqinUHNFewIlGXy2CvjuQlc3HvNRFARh2dysNSEGNL89hWIdwaX5+FjsN
-         gkUy3v1xT/oom0/hHRyeAG2REzgVwKGiLZLVq2MI/ekkXQlc/tDnW+CrZQE8P0+rYv3S
-         uJgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777474860; x=1778079660;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W2cPAm1wDcQ/uIsNTaahkJXXGkH27N19gjb7Z1QCBIs=;
-        b=haBtR/bs78nmEvKjEXGzedOU3eRO8hZ6JJiXEjS1XERMKiKPM5EmCSZRdQA01SZpwY
-         Ud3BWwGUD8/iFwepLHTIYvYQAUl8Z3tyU4WO3tJGyxBi7CSE7tpAQFvzLWxe8VT7GWmV
-         E3FHCkohooyKm7lALzfW6iqvsledFZJ9RNmkBhvw7q3GlheOY2DVFFnqdBNdBW7WIrYT
-         TwQEIj7mhloYKJiIdwkHPna2W36D8DJqFBB9+3h4VplhYMt9oIjqnlcSZidH3HDBqV+Y
-         12RvzUcZcJBbcYZf5XmC2mSiwuFagCtO/67+j0kiW8MwhTP3KwhCr5hll15viN5h6MGc
-         MPoA==
-X-Forwarded-Encrypted: i=1; AFNElJ80VdwLJcuCGqsp9ZYyol6bm2fMZBHBxRGQrBlwA23uEwWZgH74KNnwFi1bYE2kdur2jwhhmes=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyeor59PBAr/I2/WQs3P2LlEeBUmg3elvQA+f3d0qOotb5z77tU
-	bURjM/ktQIus/u2AjSUQqOPUAM05Xu/z/imyKwzxrLKBWbPmvVn/Rvlx
-X-Gm-Gg: AeBDiesML9shYTmACO9umaHt1ems8rWhAwhq1oPIcqtWbpyUr3WrvnVaV04EgzBgYiP
-	wmHp8ftfWBNp0/5Q1UW2mTVumaYNhfiZIhslmoVtBp18STX85/ZYiOUpdcj0vZvDCNGJE9ZXODP
-	vizv492r5Otv7A8ctmvUPMhKDSquLkwpJwoQSkJR1s1aUYJ+K006nrqSafMVV9UuwuAcBm+Ka5u
-	LQrwLPermOwOTejU0aGtfJ3P3y/KmKPOS5aPrDCVoNRcLC17Y+QX/Do9mOfjZidDxjpeo/Y8z30
-	G4zpP6eWHfg3sXXKl1P4SzFlBqNeWAw5wHCk+rJk0PPCWKQ+6A/BB+s+O/Vzgr6hROoJRciIsPl
-	+axJ3xAzeEHSPQanNFhG2wzTQ73dLpV0yeBmQm2epRGOR5/9JgXBGHBZiGhDN0SAJJDevaBxIfR
-	b3ss7+qPa/k8Spq0SGBi5bZUfN8TSUJuvy6kynn3VkT9Ve0lC1Ny7PIAbNy/2G2H0t5IU=
-X-Received: by 2002:a05:620a:258d:b0:8cf:f215:24c6 with SMTP id af79cd13be357-8f7d7833fa5mr1022963885a.21.1777474852384;
-        Wed, 29 Apr 2026 08:00:52 -0700 (PDT)
-Received: from PF5YBGDS.localdomain ([163.114.130.7])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8f93f5826f7sm216892285a.30.2026.04.29.08.00.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Apr 2026 08:00:51 -0700 (PDT)
-From: mike.marciniszyn@gmail.com
-To: Alexander Duyck <alexanderduyck@fb.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	kernel-team@meta.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1777475317; c=relaxed/simple;
+	bh=kQGgil5UtMbQLmT0vDByEJyWHWYRQNQUc/bdOI23AVc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gvRU7EraRCfGq9XiJijcOhT8036R9UEO2VCnprJy13ZVYsjmj/c4kbgxrex6RO5yrRs8LjCYJexESf/FaGjMD6bsOKn98oEx+L4ZAsbSPamBrod3E914op18nBgIlUN2KsYHhD6TI+8d3iF/mXS33Anca5M9wnIperWkvOkyzsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bw63088U; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777475315;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=jmgVAR52adSNZivpuFC5mZuvwbrYOguZpZ/j6Z7n8jU=;
+	b=bw63088UgzOZAJ3MZ4eaBIoMci3z9L1h1Evz5fLjH6YmYuqIGFjjqlz+djuXvyFJ6jWR+k
+	v78tXmUlHhoniSs6bMHsUOzPU8AyshwyhlyYibGGt5SBeAqcmAOE3Zt3PuNZJ4EQAiW4/S
+	SFNgOkyWOIxazZxOWcRKGhbuGfQrQjI=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-302-6tO-l2hcN0OUXDVHlhOFqQ-1; Wed,
+ 29 Apr 2026 11:08:32 -0400
+X-MC-Unique: 6tO-l2hcN0OUXDVHlhOFqQ-1
+X-Mimecast-MFC-AGG-ID: 6tO-l2hcN0OUXDVHlhOFqQ_1777475307
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 047E71955F0B;
+	Wed, 29 Apr 2026 15:08:26 +0000 (UTC)
+Received: from p16v.redhat.com (unknown [10.44.49.234])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 01D8319560B6;
+	Wed, 29 Apr 2026 15:08:18 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
 	"David S. Miller" <davem@davemloft.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: mike.marciniszyn@gmail.com,
-	netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Leon Romanovsky <leon@kernel.org>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pasi Vaananen <pvaanane@redhat.com>,
+	Petr Oros <poros@redhat.com>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Simon Horman <horms@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net] net: eth: fbnic: Fix addr validation in pcs write
-Date: Wed, 29 Apr 2026 11:00:49 -0400
-Message-ID: <20260429150049.1643-1-mike.marciniszyn@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	linux-rdma@vger.kernel.org
+Subject: [PATCH net-next 0/2] dpll: rework fractional frequency offset reporting
+Date: Wed, 29 Apr 2026 17:08:15 +0200
+Message-ID: <20260429150817.3059763-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,65 +93,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 020EF496738
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Rspamd-Queue-Id: 1DD0A4969C3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282418-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,intel.com,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,lwn.net,nvidia.com,redhat.com,microchip.com,linuxfoundation.org,linux.dev,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-282419-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mikemarciniszyn@gmail.com,netdev@vger.kernel.org];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.995];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-From: "Mike Marciniszyn (Meta)" <mike.marciniszyn@gmail.com>
+Rework how the fractional frequency offset (FFO) is reported in
+the DPLL subsystem.
 
-This patch contains a fix for addr validation in fbnic_mdio_write_pcs().
+The fractional-frequency-offset-ppt attribute is moved from the
+top-level pin attributes into the pin-parent-device nested attribute
+set. This makes it consistent with phase-offset (which is already
+per-parent) and clarifies that FFO PPT represents the frequency
+difference between a pin and its parent DPLL device.
 
-Cc: stable@vger.kernel.org
-Fixes: d0ce9fd7eae0 ("fbnic: Add SW shim for MDIO interface to PMD and PCS")
-Signed-off-by: Mike Marciniszyn (Meta) <mike.marciniszyn@gmail.com>
----
- drivers/net/ethernet/meta/fbnic/fbnic_mdio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The two FFO contexts are distinguished in the ffo_get callback:
+dpll=NULL for the top-level RX vs TX symbol rate offset and a valid
+dpll pointer for the nested pin vs DPLL offset.
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c b/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c
-index 709041f7fc43..d6a124889f52 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c
-@@ -125,7 +125,7 @@ fbnic_mdio_write_pcs(struct fbnic_dev *fbd, int addr, int regnum, u16 val)
- 		addr, regnum, val);
- 
- 	/* Allow access to both halves of PCS for 50R2 config */
--	if (addr > 2)
-+	if (addr >= 2)
- 		return;
- 
- 	/* Skip write for reserved registers */
+Patch 1 restructures the DPLL subsystem netlink handling, updates
+the YAML spec and driver-api documentation, and adds NULL guards
+to mlx5 and zl3073x drivers.
+
+Patch 2 implements the nested FFO for zl3073x using the
+dpll_df_offset_x register with ref_ofst=1, providing 2^-48
+resolution. The old per-reference frequency measurement is removed
+as it was redundant with measured-frequency.
+
+Ivan Vecera (2):
+  dpll: move fractional-frequency-offset-ppt under pin-parent-device
+  dpll: zl3073x: report FFO as DPLL vs input reference offset
+
+ Documentation/driver-api/dpll.rst             | 16 +++++++
+ Documentation/netlink/specs/dpll.yaml         | 11 +++--
+ drivers/dpll/dpll_netlink.c                   | 34 ++++++++++----
+ drivers/dpll/dpll_nl.c                        |  1 +
+ drivers/dpll/zl3073x/chan.c                   | 31 ++++++++++++-
+ drivers/dpll/zl3073x/chan.h                   | 14 ++++++
+ drivers/dpll/zl3073x/core.c                   | 45 -------------------
+ drivers/dpll/zl3073x/dpll.c                   | 34 +++++++-------
+ drivers/dpll/zl3073x/ref.h                    | 14 ------
+ drivers/dpll/zl3073x/regs.h                   | 15 +++++++
+ .../net/ethernet/mellanox/mlx5/core/dpll.c    |  4 ++
+ 11 files changed, 126 insertions(+), 93 deletions(-)
+
+
 -- 
-2.43.0
+2.53.0
 
 
