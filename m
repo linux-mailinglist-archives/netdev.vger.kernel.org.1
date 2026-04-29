@@ -1,185 +1,160 @@
-Return-Path: <netdev+bounces-282150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282151-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eAP5A4FN8WlRfwEAu9opvQ
-	(envelope-from <netdev+bounces-282150-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 02:14:57 +0200
+	id YDzJDZVN8WlRfwEAu9opvQ
+	(envelope-from <netdev+bounces-282151-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 02:15:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A1AC48DB8F
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 02:14:55 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EC6348DB96
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 02:15:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D29EA307E061
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 00:14:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B9C59300D46C
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 00:15:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8297C28E0F;
-	Wed, 29 Apr 2026 00:14:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 248CD1632E7;
+	Wed, 29 Apr 2026 00:15:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U4JHBp1l"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XouY6cdB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3698D199D8
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 00:14:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777421651; cv=none; b=J1zF+gxzy6CmTxCzxxkANVAWka1Ls1dz7pw7jW+h5gNrAa+REQMUglVIDS/Ub/T7ghzPMpfdPR3I+GDw7QpNYjv7/U5z8UVGiYBUs6fD5ap2XeCbbK4AZCU29sI+FHriBDvQWob8gEygHSjyvMYB7g37a+Y7a7/EjKdzoCc5Slg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777421651; c=relaxed/simple;
-	bh=9fzFgwV3aBoRbhtgsfEan8Kws0jWx89MBtlw4TMZIPU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WnnV5y+rsdsO4cxgj8hMBXXQK1BMk0RXyFdLoSsNoDVtM7EsCdEjhh/3iTcGdd3b/r1icPDitpLJdAEW+ZZTjHo30mhev009kmodxtQRIpunRBzYSdNZ0IRR48nqo+pheJqJFOMK2S31Me+kMqeAlL0SpZytNiw9NuVlXhbHQzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U4JHBp1l; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFED87E792
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 00:15:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777421703; cv=pass; b=HZfNbCxpcM8m+Hx3ghgE37HWjvUSz9E50xXW5ILHoO32dS030jCvLVho1HPrtKehrmthxuBNa5oIngf6aT1BRxSYRyFv81WENmprzrFxkzhdZ3G27WX3Ftu9bog1r5zhZ8lvOqFy7Y93kKyi65gG8ZcNRUBv2qFX5IjwTBMuRZM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777421703; c=relaxed/simple;
+	bh=69RqotLGaHA+82ydaZexv7veZoHxIQWTY3fS43Pw+Fs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=F8lIVYIIK0TW83mwPUTmMrL66OBOlW9J7PRKqwJY/hBlMUVxALeRGEAlIhXTF0L2Kmw3uznqzbQmf8S7XznrJvSxjNqbUWwev4aXlAafZfr7EiutSwSTqwGBUs5ayi1fpAOtYOG/xrFfA3amr6V94d+LVD8oHUIfEsd26TJmM+s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XouY6cdB; arc=pass smtp.client-ip=209.85.160.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c7973e22399so4743657a12.0
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 17:14:09 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-50d75bfb259so86797491cf.1
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 17:15:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777421701; cv=none;
+        d=google.com; s=arc-20240605;
+        b=aljYf9NNZ4aEM0RfgYoNBiPQzDTyulwn/9k+jxWOG9CTWPzGzlvriOfi3uj6l/i2Ze
+         V4KRyKHEEGp2cm8bNg0cacZsO5u+xQ5k3ZHoB2+ZToAJ2svhdkszfWiQdxxYFRZlMK/w
+         9h5/qcIVr4LcUn0CMSTB5vD55bmYhS+fPiGifM4aIpqYrBehfxE0qI9etkhot3t439Df
+         Ii8Ge93JjL/W5HKsLAFemd6zHGG1AnRgFb9zIYdY3IoH8WLbEOShdArmT/hwibPeClCx
+         S4eM9kurGj/G4b4+1+fLiI7JDZeys8FfOr5WkL7r8cVL2/uxcZk+vXbkV8M0RSyRkSZd
+         QpHA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=69RqotLGaHA+82ydaZexv7veZoHxIQWTY3fS43Pw+Fs=;
+        fh=g3y0LYhlJTM/JgpyNPYqBqJnbn1zvDSXWgCwSfhIlxg=;
+        b=GRxbeMZ1BoG2uJ4A18njTQocNF77yCvs2QxQ1NieM1+71i2is4N68gDIwfVwe5BO/7
+         1mAdqowignJG88RpF6eb7UBymVKpgh6QTDLhE689ReT8hJtjODY+tzRYvDYg7d78hp5y
+         o1th+5cBBywcGsdKp7B1xHmrretjcokfueAQQsfl9Z1ta7RHjyWAfHdAnAn+lNDDqzt5
+         TOFD78iXEaIaNgXSGwEhIP8cfDaGWye+1O1Vw9S0wKXPrcf0uySckE8KgoFEFlvZ9Nud
+         rkpoE6RK49dWU4mOrBteRt8Uvfl7h1xK9fX/JM8oxHfdr3evwY9qbmTaSo3Wtv09Wn1R
+         gapw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777421649; x=1778026449; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WBrlzsQ3SPS9MDqc3/b/n/nv8z/Nq6uXbkMYi4POkNg=;
-        b=U4JHBp1lnSrqZHhiI29KdxPPX/M5y8xI85JMEBEH+iGJRhC5LSo5sLW2f/mydxiVE1
-         GkC5bbpIDXDlbfzxGKrryKGmM/4m9KCVYziQHJLIeIJr3N5G849zflUJcKSv7W/Pm0t/
-         LYYGfrbAohf9onpXWxANnDV4e/ph/VSldj9A1Qld4qQ5mfjuS2f6FTJfHY/w319TT99L
-         lrnR4CGLv0r/uAFV3Ywkf+0VlR5Je5ziHIPypYIa5nzXW5Tv9i4bjY35TYHf30VUdCjl
-         0CBi8wUb3zCTSajWcxVf3hhvv3SveZ7Xwl/kK9+nGOmEHDc0xw/GR5BRvoO/wYEa/hei
-         IVmA==
+        d=google.com; s=20251104; t=1777421701; x=1778026501; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=69RqotLGaHA+82ydaZexv7veZoHxIQWTY3fS43Pw+Fs=;
+        b=XouY6cdBmyNIh0dlBiLkTAwnB5uxagHx5woiz+8aJlmB1rm7KhOOzoKCSnQrjxjums
+         8HGgzOc/qe/D6JkkUc3HdPBxD0+DsWaTG3SFUgemCeJM632VVI86J3l7kjvMbhh7AsqT
+         vcQMag2FXlveSI4ATrf9gMeH70WTCc7FIqcpNIZ7MQtCst9RE7AfsX9+NpwfLCf97OWv
+         p/nkjZ+chLrSe2F/0y0H/Hdyl6bRVyQ39kt8S1wkjZw1NBXGYnmMi/4GNdLm59FdJ0qi
+         V4jJ/xKzDFdywe16R3eKSYNm5Igdanh3VXjy3D9mu5zJDCY6epFWhrkf5/DNvaahBevt
+         upvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777421649; x=1778026449;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WBrlzsQ3SPS9MDqc3/b/n/nv8z/Nq6uXbkMYi4POkNg=;
-        b=Ujy+lS8ibnePXEonkKQEx0hsJEPikfscgaG28Lt8/9vD3EBvzpy7hSyqoMev+KTWBt
-         rtImHrIPsTeQceHbdnPdA+ebPn2IuQMvtLm9DroFtYCPV18KWiR+Jry09o+zDLOrtYep
-         66471DBKSqSDqyZnIUiZyjqKB2rdeJZx9t9g31gMs6Gcc6U27wn7aSKQjd7+lG1k8o6x
-         rG+YbQgMqX1VTLcIbGyzKfwMuZMVSHnrC3tsH/pEBSSQZCLy4PNucN1kGDuYGlhjSsi7
-         RFulB2zzTGvP1kL+S+PwlEkY+rcxm5sX3Oa/wWe4Wlw02gNfhkRr5C6cRVrBh6y5USMf
-         BqKQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8UEXaWzVacXRXwNmh9L/MOGGF0tWymwZ7jjtByyDtEls4WiLJ5JQmTVRIVRPOrBoufX0JzpmI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWmnD7lrFs3EoxJmIOqs2zo9ujc+HZqqVBqsq8o6VEYCI9bo/4
-	+I+9HrT1hbOPptkptuykWBTA1RkulSn5PKwb3OfYkvbObxRxDdBil1pmmlcqiH2aYfyqqWva1x9
-	ddsi3jA==
-X-Received: from pgbcp13.prod.google.com ([2002:a05:6a02:400d:b0:c76:9b3f:5a8e])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:431e:b0:3a2:bd1d:d68d
- with SMTP id adf61e73a8af0-3a39c255a99mr6163350637.32.1777421649042; Tue, 28
- Apr 2026 17:14:09 -0700 (PDT)
-Date: Wed, 29 Apr 2026 00:13:22 +0000
-In-Reply-To: <20260428160445.1336649-2-horms@kernel.org>
+        d=1e100.net; s=20251104; t=1777421701; x=1778026501;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=69RqotLGaHA+82ydaZexv7veZoHxIQWTY3fS43Pw+Fs=;
+        b=ErvGPMyjsObWItQppYl8M8CMSej3sqGasPSlLjMrjaTFJCVjk0Pw96g97n23YGoxb7
+         cHUxg111VBrtkzcfs7+o2OQoBa6pjNVkj5kR8tfaYG4mF2ZBCeAF7IHwwAwhuMaeJdev
+         mXSh2XvyBPpfmHtsmHSTJATT9Hd+td9UoaImcLdxm26VyhNb4NsTxa3G7E/tWiJ1HlMj
+         7IPqDEGPFdFMc/aSXV1dFUh/AA4zovPTEza5pXBO4vfmgw9BViBmaTz6hioZQkmB2b5T
+         3iAVeAtauGRrTo0/JCDSLSvqGea0qW1vjNEN5+TsCT/VpQmN5xcEcoezfw3HmC8eCEeE
+         bFew==
+X-Forwarded-Encrypted: i=1; AFNElJ/DLp6Sc8/F4ZsgDT6Yq0IxPp732g9oPCV086BKfADaedFxZ4sju27tZSqZh4uuhOaKZ1fnX6U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxizBi2EE+e8Y/DKCoZyrmt3lrXloslFFoh7l217vsuU1QGfL9R
+	BGyqbzHLnn+lSq9pvqHcM7RB9wvo6a9ZIv4DKaWG3wJvJwzxQQmamsd/47VZu/r4mV88qXWbOZi
+	miA4JqInQdYqvpD1c2SVlrj2jPB6iGiW5wgooHxjd
+X-Gm-Gg: AeBDiesUa0Mua92Tq3e/O9GYYJRgMfJ8XoLYhzWJU95mqCjsX09IathWk/x0GDkfmDv
+	cK1IVLoGWjmzd47mx96bI0kYrh22FIVhvLWxRnYDqE8cOC2Q8IZaUD4248uR7g0MJN7dT+ScuAR
+	S/75BHNU8zg3DVp/ezIewpf7jAUD8eb4EyW/HrwCZlSahZr3yLvLF3GSfX3KqSLMgKiPxiovvnK
+	5OykS478p8pg/N/ZU5qwHypU30m92NBOFGKcVkV4rcwAH0lFlnNRmujm3H/HIeuDP89Cvxqcg1R
+	HbWmkI+kv+Ob5IBPzSSdj5Gnwo1jLNcPvLOypqvoYn22QhjEWfF4gE+k8JfdSw2v1bSIVMUv+hu
+	DaHQKcUMyIA==
+X-Received: by 2002:a05:622a:a6cb:b0:50e:63b4:9b9f with SMTP id
+ d75a77b69052e-51018ac63e2mr24179351cf.55.1777421700238; Tue, 28 Apr 2026
+ 17:15:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260428160445.1336649-2-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260429001407.3358732-1-kuniyu@google.com>
-Subject: Re: [PATCH net] bareudp: fix NULL pointer dereference in bareudp_fill_metadata_dst()
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: horms@kernel.org
-Cc: andrew+netdev@lunn.ch, bestswngs@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, martin.varghese@nokia.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, willemb@google.com, xmei5@asu.edu
+MIME-Version: 1.0
+References: <20260428205352.1247325-1-kuba@kernel.org> <20260428205352.1247325-4-kuba@kernel.org>
+In-Reply-To: <20260428205352.1247325-4-kuba@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 28 Apr 2026 17:14:48 -0700
+X-Gm-Features: AVHnY4K28zIg_UV6cHdwcToXBqQwlhcqWbSAK4hYHGI2mLzgbnbXEvUfK7AC-jE
+Message-ID: <CANn89iJFK1=RtREbXpiY8q7gudqVSJXFSqiwOyUOW9vTOaTNMA@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/3] psp: validate IPv4 header fields in psp_dev_rcv()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
+	andrew+netdev@lunn.ch, horms@kernel.org, willemdebruijn.kernel@gmail.com, 
+	daniel.zahka@gmail.com
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 5A1AC48DB8F
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 7EC6348DB96
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,nokia.com,vger.kernel.org,redhat.com,asu.edu];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	TAGGED_FROM(0.00)[bounces-282150-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282151-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.958];
-	TAGGED_RCPT(0.00)[netdev];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,redhat.com,lunn.ch,kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
 
-From: Simon Horman <horms@kernel.org>
-Date: Tue, 28 Apr 2026 17:04:46 +0100
-> From: 'Simon Horman' <horms@kernel.org>
-> 
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> Full review at: https://sashiko.dev
-> ---
-> bareudp: fix NULL pointer dereference in bareudp_fill_metadata_dst()
-> 
-> This commit fixes a NULL pointer dereference in bareudp_fill_metadata_dst()
-> by adding a check for the socket in the IPv6 path. If the device is down
-> and the socket is NULL, it now returns -ESHUTDOWN.
-> 
-> > Add a NULL check returning -ESHUTDOWN, consistent with the xmit paths
-> > in the same driver.
-> 
-> Does the IPv4 path also need to be updated to remain consistent?
+On Tue, Apr 28, 2026 at 1:53=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> psp_dev_rcv() is called from the NIC driver's RX completion path
+> before the frame reaches ip_rcv_core(), so the IP header has not
+> been validated in SW, yet. We expect that the device has done
+> all this validation, but let's also add the SW checks, to avoid
+> surprises.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-No, because udp_tunnel_dst_lookup() does not take struct
-sock while udp_tunnel6_dst_lookup() does.
-
-And all the other fast paths (bareudp_xmit_skb() and
-bareudp6_xmit_skb()) have NULL checks properly.
-
-
-> 
-> While the IPv4 path lookup doesn't use the socket pointer directly, if the
-> socket is NULL (meaning the device is down), shouldn't the IPv4 path also
-> return -ESHUTDOWN instead of successfully performing a route lookup?
-> 
-> > diff --git a/drivers/net/bareudp.c b/drivers/net/bareudp.c
-> > index 0df3208783ad..da5866ba0699 100644
-> > --- a/drivers/net/bareudp.c
-> > +++ b/drivers/net/bareudp.c
-> > @@ -529,6 +529,9 @@ static int bareudp_fill_metadata_dst(struct net_device *dev,
-> 
-> Is it possible for an IPv6 tunnel key to be incorrectly processed as IPv4
-> earlier in this function?
-
-I think this is orthogonal to this patch and can be a follow-up.
-
-I have a series to remove all synchronize_rcu() from all UDP tunnel
-users and udp_tunnel_sock_release(), but it conflict with this patch,
-so I hope this land net-next this Thursday :)
-
-
-> 
-> Looking at the preceding condition in this function:
-> 
->     if (!ipv6_mod_enabled() || ip_tunnel_info_af(info) == AF_INET) {
->         struct rtable *rt;
->         ...
->         info->key.u.ipv4.src = saddr;
->     }
-> 
-> If the IPv6 module is disabled at runtime, but an IPv6 tunnel key is provided
-> (e.g., via OVS or TC), the code falls back to the IPv4 branch.
-> 
-> Since key->u.ipv4.dst aliases exactly with bytes 4-7 of key->u.ipv6.src due
-> to the union layout in struct ip_tunnel_key, could this result in an invalid
-> IPv4 route lookup using portions of the IPv6 source address?
-> 
-> Would it be safer to explicitly reject IPv6 tunnel keys when the IPv6 module
-> is disabled?
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
