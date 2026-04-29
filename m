@@ -1,128 +1,143 @@
-Return-Path: <netdev+bounces-282185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282186-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cPzcENdh8WnhgQEAu9opvQ
-	(envelope-from <netdev+bounces-282185-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:41:43 +0200
+	id iN68Hfhh8WnhgQEAu9opvQ
+	(envelope-from <netdev+bounces-282186-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:42:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id F18BF48E0AF
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:41:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E718148E0CB
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:42:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 57B583003992
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 01:41:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8CA73301FFBE
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 01:42:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5839D258CE5;
-	Wed, 29 Apr 2026 01:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E051F27EFE9;
+	Wed, 29 Apr 2026 01:42:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ulrLN2sY"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kp+edf72"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1812571C7;
-	Wed, 29 Apr 2026 01:41:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C2F271A6D;
+	Wed, 29 Apr 2026 01:42:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777426869; cv=none; b=HZMgV20Ulwfdogbb+urGsOstoRDfDehUyBW/OP+YBo0zRPLvJVGbCs08JnjkJ0Mk5+OeOxzAnKbrenzFXMuBvXvftVI4McKzY+exIYHD2OQDeuyTc/V3o0au1aKdH7MhtzTcJ/uUot65N6NBlSsNzCzV84m/6NnS7FLqHEicr3s=
+	t=1777426928; cv=none; b=ZSDVHDQgLp72TA7EEUJaKiItI59WUAIw/YZ7DLjywfWx1Kt8cm3fbeJIGRcs254623loA4VXJ3/SemYoBR/JqAl0bfqJJPA2Wpx5UzFhGvm2OCnAsTWty9ZA3EmrRXe8r8pddnXJSyx7lgr0Ov/QSRxqPg5tJYjpFVmo51AK8e4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777426869; c=relaxed/simple;
-	bh=ZufN4XiT3cEF3/MnkweTt+1XxyC1FpruRMf/3bTu5sY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DiAvjZlyaCCYNFc7DeAgQbkLfbEC5jT/ddgjfZJEaCRsH5QEypi85x8fvG6Os75Os3Ie2eMyCuX391i7/t0ib2iAAORXgEAwtBSH5Co+1b8JrzrrVGdtZOQ4R9gPdrdbHFr6morSLMGmXA9N3H+BYapLlrlzYOhpFAni2Vc5R1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ulrLN2sY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCA75C2BCB9;
-	Wed, 29 Apr 2026 01:41:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777426868;
-	bh=ZufN4XiT3cEF3/MnkweTt+1XxyC1FpruRMf/3bTu5sY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ulrLN2sYRdRw10f88Xd+A0bNorZTVDpY9x4g6DQAONVa/Hf71NRuvJ8ZsRrZI/RU1
-	 Vw2TFc2UFO7kKnfqJuOyXC5VQYm3OOo8baS2E12jKin7fjf56BeiM7HTaizAnUjD0E
-	 JH47Pjftu5I6fVpUImlOmII/KsTuFs/iTAocACknzCc7pFkH8/4P7RYU5o4GVyMr3G
-	 bMX0ceF85/F+o7EGq1nPwVtT32OSaRBPPv86DbylBl8mgTtQOzGaGW7rs5735r10y+
-	 +jQN/tXzsrAnjYr+u8D+T1LJeU7vVaBLLm3607wuhgZkEbgY02EOoFeu+fnFh3gyAy
-	 keG7QSteAMEGQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FDC539302C2;
-	Wed, 29 Apr 2026 01:40:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1777426928; c=relaxed/simple;
+	bh=v67v7KT5BIZDe+T4/abHvDx4Y87f8RhD9dCoqpqCDHk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YeZdT4b9B79ZvTYTGsK72QhXOLMuKGQNMmMwAlS4I4V53AdSKE+t/cA3MYnbkUGF+QLyLzIKL6UxPu2Jg+P7atboTZd63CVmJF9YRl3tuaArFvs4h/B890jzE5Q6KUBglalzqb5YXiVcpxEghGwQii/rILEfYj7e4nJjxNzxrjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kp+edf72; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=xr++0uW3/aWfxubO3cxQcvyMCVatN4XOXUV5OwG2V2w=; b=kp+edf72edokyxU3mtqEnZKTr3
+	IdsBZ36KjZkY+e6Mq+wkNkDnqeAGDWrgyJ93hMP+ALlz9+l3ZutV6C30c3TTf1iuG0U5PLgIzieVn
+	XNbOI/kNLVqt5Yk26Maej/3KG2oCWZjyZb6Uwktr5gIfLqnUtIv8x4BMfVTQ1yt+/QTY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wHtw1-000Rgl-Lj; Wed, 29 Apr 2026 03:41:53 +0200
+Date: Wed, 29 Apr 2026 03:41:53 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: lizhi2@eswincomputing.com
+Cc: devicetree@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk,
+	pjw@kernel.org, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+	alex@ghiti.fr, linux-riscv@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	maxime.chevallier@bootlin.com, ningyu@eswincomputing.com,
+	linmin@eswincomputing.com, pinkesh.vaghela@einfochips.com,
+	pritesh.patel@einfochips.com, weishangjuan@eswincomputing.com,
+	horms@kernel.org
+Subject: Re: [PATCH net-next v7 4/4] riscv: dts: eswin:
+ eic7700-hifive-premier-p550: enable Ethernet controller
+Message-ID: <d662fa07-cd0f-48c4-a6e4-03c5fd390e92@lunn.ch>
+References: <20260427072353.1114-1-lizhi2@eswincomputing.com>
+ <20260427072603.1191-1-lizhi2@eswincomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] ppp: add PPPOX symbol
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177742682479.1291511.12607684897778641027.git-patchwork-notify@kernel.org>
-Date: Wed, 29 Apr 2026 01:40:24 +0000
-References: <20260428012830.3069-1-qingfang.deng@linux.dev>
-In-Reply-To: <20260428012830.3069-1-qingfang.deng@linux.dev>
-To: Qingfang Deng <qingfang.deng@linux.dev>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, julianbraha@gmail.com,
- ebiggers@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-ppp@vger.kernel.org
-X-Rspamd-Queue-Id: F18BF48E0AF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260427072603.1191-1-lizhi2@eswincomputing.com>
+X-Rspamd-Queue-Id: E718148E0CB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,dabbelt.com,eecs.berkeley.edu,ghiti.fr,lists.infradead.org,st-md-mailman.stormreply.com,bootlin.com,eswincomputing.com,einfochips.com];
+	TAGGED_FROM(0.00)[bounces-282186-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-282185-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:email]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Hello:
+> +&gmac1 {
+> +	phy-handle = <&gmac1_phy0>;
+> +	/*
+> +	 * For the TX path of gmac1, there is a skew between the TX clock
+> +	 * and data on the MAC controller inside the silicon. This skew happens
+> +	 * to be approximately 2 ns. Therefore, it can be considered that the
+> +	 * 2 ns delay of TX is provided by the MAC.
+> +	 * No delay configuration for tx is needed in software via PHY driver.
+> +	 */
+> +	phy-mode = "rgmii-rxid";
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This is wrong. Take a read of
 
-On Tue, 28 Apr 2026 09:28:26 +0800 you wrote:
-> Add a dedicated CONFIG_PPPOX symbol to handle the PPPoX generic module,
-> avoiding redundant pppox.o definitions in the Makefile.
-> 
-> Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
-> ---
->  drivers/net/ppp/Kconfig  | 6 ++++++
->  drivers/net/ppp/Makefile | 6 +++---
->  2 files changed, 9 insertions(+), 3 deletions(-)
+https://elixir.bootlin.com/linux/v6.15/source/Documentation/devicetree/bindings/net/ethernet-controller.yaml#L287
 
-Here is the summary with links:
-  - [net-next] ppp: add PPPOX symbol
-    https://git.kernel.org/netdev/net-next/c/09942ddedcb9
+phy-mode describes the board. If the board provides the 2ns delay, you
+use rgmii. If the MAC/PHY pair needs to provide the delay, you using
+rgmii-id.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+If rgmii-id is used, it is up to the MAC/PHY to decide which will add
+the delay. If the MAC adds the delay, it needs to mask the value of
+phy-mode it passes to the PHY so it does not also add the delay.
 
+Your broken hardware means you cannot support 'rgmii' or 'rgmii-rx',
+since you cannot turn off this 2ns delay, so you end up with double
+delays if anybody designs a board with 2ns TX delay on the board
+itself. So please validate the PHY modes and return -EINVAL if these
+modes are used.
 
+    Andrew
+
+---
+pw-bot: cr
 
