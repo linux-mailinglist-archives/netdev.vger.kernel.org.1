@@ -1,159 +1,228 @@
-Return-Path: <netdev+bounces-282540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282541-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ABsiBCCS8mlhsgEAu9opvQ
-	(envelope-from <netdev+bounces-282540-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:20:00 +0200
+	id 8NgcEEGS8mlhsgEAu9opvQ
+	(envelope-from <netdev+bounces-282541-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:20:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C6F149B52A
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:19:58 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95B6549B531
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:20:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 825E6301153C
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:19:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 23F03301F300
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE92639B951;
-	Wed, 29 Apr 2026 23:19:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3A5639A07B;
+	Wed, 29 Apr 2026 23:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hnc4IVGS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NuYiimmp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4752E39B94C
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 23:19:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80EED39A058
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 23:20:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777504755; cv=none; b=j3cdtOA10XuIEszOU0vJGzq7GqMPodYlwOlkjn6Mq6c/5nlMZWBZs9vsF56w5jxO+X4cDzClc0szHOsJhV3NLjCGlp9jCSXxBKglPdZRSJcUzoR7fDu+oEa9sul9fFiHrv9P7kA54Fkmc46xfo+tZilFAMEF4g1Wl9pZMacGjrg=
+	t=1777504830; cv=none; b=jU2KxzMnrmTu7WxGiPHkYBtWzm6efCksNTrO3FvNEhSX/4eHW+uaKb/KCClFcWiktHG6yOqJ4f8QuFZrvqtYocMOeyVkZ5cpQllHw55OP9CvfHjhc5vZeqehDMBKQSLglw6dSBq+EOVeOBiDhFMQ2PTFVdj0vNCTFY+2c6zSTJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777504755; c=relaxed/simple;
-	bh=vnf9u5bZr2Jh4vHEhpzns0hJLI6h1CacL4VAyx/kSbw=;
+	s=arc-20240116; t=1777504830; c=relaxed/simple;
+	bh=8yUalhQiacb6ndI3FJHIMCDZWuNxlI1ZYXfnxLFHdEs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=J/mXdQQGk+EP4Ll7ZWGke1TVdZr3VJLUyd/5BjZLMgywbWhMx9yJN7xY6rnXvXfe1k+6jY2OznJD5nXatpXYB514EIbNcMDqzeBeO471arq+8yD+nkOFWMLnPqA8Sdkmc/RuIrhjLyZkMDBf7sAxaJj/cIyOrF5tTrxUG6kMipg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hnc4IVGS; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-43eb012ac4fso179999f8f.0
-        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 16:19:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777504753; x=1778109553; darn=vger.kernel.org;
-        h=mime-version:content-transfer-encoding:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Xg4uL55KM0rpFJAt2ymSaCICrZWf1oCpfyBNCgcrMb4=;
-        b=Hnc4IVGS5eyTt3dBGI3jm2Yi6bpyGq2/IUGR094lMMJWJAtbIgU/AOcylkkxkIsEvz
-         Dfss/BJgqLchl9JUobzRcrZ/hzevpBuKHvo5Qtt5BL6Ha9wZgK6iZh7huH5HQ4QizekW
-         6wfl2WkpR6hreV1/2kHsZxbrwaQpi3TphNw/dgR716Vz06x0TF0VfHIlMWs/DGvGw61G
-         UVLQu2Ahx/yphAhkflW72+qQdlyef0tjbrqq7B1RqzWv7rd67inn/DiHm6cEy/oKnvQ4
-         iq1GElBXS9UIav1DK2Cj5W0W71i6HVJEfPDJDJbt1OgXhDcI+GaXZdwJf7DKa1WHB27R
-         TtrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777504753; x=1778109553;
-        h=mime-version:content-transfer-encoding:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Xg4uL55KM0rpFJAt2ymSaCICrZWf1oCpfyBNCgcrMb4=;
-        b=iejeEi7t1hc5CKvTNEKl8ilwtluPQPtVkgFZx/Y8Kgs3iUpSPZ0A8pCK+1t+EoL8gn
-         OU/cH/26z3Z2BtIKWa0bbxEmOWdaFGhSiG5wPcWVMQ63qExkFB4NeVoNw/sDbiV5W4bj
-         zGZ769w2Os5nrO7VZmnvmpiWk6h7Z8lJtS2fB6BHrdGGHdIgQMeCIm3CyU3u1Y0KQvy1
-         iHwr0bigaqtRb2Qb3TAsp92r1DSXzv0J+FfUGmjqRtkk2OpKaOWo0qmd1qHjC1R+Hin5
-         D/Rcxq2a6y6AMOgViv5Bq/+QaEX6a1+Mu3EW8dd6RajW2eaaLnPcvx3x8he8CpvLSHOG
-         kLFg==
-X-Forwarded-Encrypted: i=1; AFNElJ8stJZB6JBrkUa8H+Ome4Hz/d7c36YgjqXXcrfY/UNs+vCsZtjskYwDOy+FQTR7CO9R3ygySIE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3wwth4W5MtKnzPFUgmY3OuX7WSMhnqtmPRxJJoGDQMo0zb9K7
-	bUm86z+rTJloR/F9sS5YZn3cIg1xBaNvz/iRkWBX0HpkcAr2Yvi9a5c=
-X-Gm-Gg: AeBDiesKF/crfC/nC4A+wDAZR1/ugk3k3EeIlN++FHR+IfABrHr8Qas1jqkBeQYvBev
-	Rvx+nZ4ac86FwnhlGSJAFreZ8JnXGDJyTrnWap7Tm+Qo1sOBApp9+uNO+6E6jOSVK/iSi2P2I7Z
-	rQ3S97RTIjF+nMtz3J5weH+QfpuepEmzbVK0PAUGpCPkYuqAZELMADbt4H9hRYlWGHXQBCByMGQ
-	nh9JC3mWi8HexqHhtfNjb4/8CvJDQjIKqfV62BtHCUjCBTAhkzYLU1rLJJBbzDKi+QgToM/1uWv
-	CP1o7lDzRESqaMdT8xz38Rmuj2W4aAP7jzYniohHsgb9cRU9vvUfW8GCZzicl7xijxsq+hA+Hj/
-	EKBBK3bnYTxI9GmQ763uSptegm8wbAAsymqeey6ocWGkt6GdJvw8aWa83weu+eKJKqI9KhZboOC
-	HZwv5NbfTFWAjMLQ==
-X-Received: by 2002:a05:6000:611:b0:43e:a81d:c475 with SMTP id ffacd0b85a97d-4493cf2d583mr611329f8f.6.1777504752636;
-        Wed, 29 Apr 2026 16:19:12 -0700 (PDT)
-Received: from debian ([2001:41d0:303:db6b::])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-447b3d48517sm7502180f8f.5.2026.04.29.16.19.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Apr 2026 16:19:12 -0700 (PDT)
-From: Tristan Madani <tristmd@gmail.com>
-X-Google-Original-From: Tristan Madani <tristan@talencesecurity.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Phil Sutter <phil@nwl.cc>, Florian Westphal <fw@strlen.de>,
- netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
- stable@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/2] netfilter: ip6_tables: guard
- ip6t_unregister_table_pre_exit against NULL ops
-Date: Wed, 29 Apr 2026 23:19:11 -0000
-Message-ID: <177750475157.3021974.6858117535916205046@talencesecurity.com>
-In-Reply-To: <177750472539.3004201.15967003942391945312@talencesecurity.com>
-References: <20260429175613.1459342-1-tristmd@gmail.com>
- <177750472539.3004201.15967003942391945312@talencesecurity.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	 MIME-Version; b=kfqco4v6VMJQQzfonCg8IIq4MWHR8tcp+5dGvEouLJhek+YRTB1ZWc9PBGICejIhhJKxLGYHv5xAmvzx8q0CL7SG1qee/3yT3O6iIQDR3d2X9v9dGzRqa67I0XhQdrXBKMUQUjHZTTyl6dlw21FzV8zWBOkuEIQPprJ98ToAk+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NuYiimmp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4807C19425;
+	Wed, 29 Apr 2026 23:20:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777504830;
+	bh=8yUalhQiacb6ndI3FJHIMCDZWuNxlI1ZYXfnxLFHdEs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=NuYiimmpZAW/bW+COVr4zz51Aw8lz+TFGbnYQrh+DxCPkFqbG1V41pKwthn6+8KrU
+	 I2RUlTcZhJvkqrMIa9AwVDZofaxQy1HzGdeePiejFscdPVZJN0w84Jlq+6hC2pxYYv
+	 HmybF03YUbVyoNUVHTjZWixFXbqeop+uoL5Wn1ncoKEnwrwOmL0zVnOFBMFPt5vTJr
+	 E/rg08Wkr94vIsdc4P++VO4YXAigXd7bfWGy3pnWXh8+kW3ew/OrliJcsITQVgWzSi
+	 ZkclP2ptEBoH4oD/cL37LIVmOMWiXKrtXcpsjiDaBGB0S4pPVtbJ/+j8q6X7s+zfCm
+	 Dbcj8jMbnb8nA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: justin.chen@broadcom.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	bcm-kernel-feedback-list@broadcom.com,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	davem@davemloft.net,
+	andrew+netdev@lunn.ch,
+	florian.fainelli@broadcom.com
+Subject: Re: [PATCH net-next 1/2] net: bcmasp: Divide init to allow partial bring up
+Date: Wed, 29 Apr 2026 16:20:22 -0700
+Message-ID: <20260429232021.2186988-2-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260428220858.2076469-2-justin.chen@broadcom.com>
+References: <20260428220858.2076469-2-justin.chen@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: 1C6F149B52A
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 95B6549B531
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-282540-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282541-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tristmd@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[talencesecurity.com:mid,talencesecurity.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Same race as the ipv4 counterpart: ip6t_register_table() adds the
-table to the per-netns list before assigning new_table->ops.
-cleanup_net can find the table with a NULL ops pointer and crash in
-nf_unregister_net_hooks().
-
-Guard against this by checking table->ops before the call.
-
-Fixes: ee177a54413a ("netfilter: ip6_tables: Use xt_register_table()")
-Cc: stable@vger.kernel.org
-Signed-off-by: Tristan Madani <tristan@talencesecurity.com>
+This is an AI-generated review of your patch. The human sending this
+email says "Blindly sending out since there will be a repost,
+anyway."
 ---
- net/ipv6/netfilter/ip6_tables.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+net: bcmasp: Divide init to allow partial bring up
 
-diff --git a/net/ipv6/netfilter/ip6_tables.c b/net/ipv6/netfilter/ip6_tables.c
-index XXXXXXX..XXXXXXX 100644
---- a/net/ipv6/netfilter/ip6_tables.c
-+++ b/net/ipv6/netfilter/ip6_tables.c
-@@ -1804,7 +1804,7 @@ void ip6t_unregister_table_pre_exit(struct net *net, co=
-nst char *name)
- {
- 	struct xt_table *table =3D xt_find_table(net, NFPROTO_IPV6, name);
+To prepare for a partial bring up of the interface during resume,
+we break apart the bcmasp_netif_init() function into smaller chunks
+that can be called as necessary.
 
--	if (table)
-+	if (table && table->ops)
- 		nf_unregister_net_hooks(net, table->ops, hweight32(table->valid_hooks));
- }
+> diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
+> index ec63f50a849e..aff0a6d84126 100644
+> --- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
+> +++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
+[ ... ]
+> -static void umac_reset(struct bcmasp_intf *intf)
+> +static void umac_reset_and_init(struct bcmasp_intf *intf,
+> +				const unsigned char *addr)
+>  {
+> +	struct phy_device *phydev = intf->ndev->phydev;
+> +	u32 mac0, mac1;
+>  
+>  	umac_wl(intf, 0x0, UMC_CMD);
+>  	umac_wl(intf, UMC_CMD_SW_RESET, UMC_CMD);
+>  	usleep_range(10, 100);
+>  	/* We hold the umac in reset and bring it out of
+>  	 * reset when phy link is up.
+>  	 */
+> -}
+>  
+> -static void umac_set_hw_addr(struct bcmasp_intf *intf,
+> -			     const unsigned char *addr)
+> -{
+> -	u32 mac0 = (addr[0] << 24) | (addr[1] << 16) | (addr[2] << 8) |
+> -		    addr[3];
+> -	u32 mac1 = (addr[4] << 8) | addr[5];
+> +	umac_wl(intf, 0x800, UMC_FRM_LEN);
+> +	umac_wl(intf, 0xffff, UMC_PAUSE_CNTRL);
+> +	umac_wl(intf, 0x800, UMC_RX_MAX_PKT_SZ);
+> +
+> +	mac0 = (addr[0] << 24) | (addr[1] << 16) | (addr[2] << 8) |
+> +		addr[3];
+> +	mac1 = (addr[4] << 8) | addr[5];
+>  
+>  	umac_wl(intf, mac0, UMC_MAC0);
+>  	umac_wl(intf, mac1, UMC_MAC1);
+> +
+> +	/* Reset shadow values since we reset the umac */
+> +	intf->old_duplex = -1;
+> +	intf->old_link = -1;
+> +	intf->old_pause = -1;
+> +	phydev->eee_cfg.tx_lpi_timer = umac_rl(intf, UMC_EEE_LPI_TIMER);
+>  }
 
+Since UMC_CMD_SW_RESET was just asserted above, won't reading
+UMC_EEE_LPI_TIMER here return 0 or a hardware default value, effectively
+overwriting the bootloader-configured EEE TX LPI timer?
+
+Also, since umac_reset_and_init() is now called unconditionally during
+bcmasp_interface_resume(), does this dangerously overwrite
+phydev->eee_cfg.tx_lpi_timer without holding mutex_lock(&phydev->lock)?
+This seems like it could create a data race with concurrent accesses, for
+example from ethtool.
+
+[ ... ]
+> +static void bcmasp_netif_init(struct net_device *dev)
+> +{
+> +	struct bcmasp_intf *intf = netdev_priv(dev);
+>  
+>  	bcmasp_init_tx(intf);
+>  	netif_napi_add_tx(intf->ndev, &intf->tx_napi, bcmasp_tx_poll);
+
+This existed prior to this patch, but since bcmasp_netif_init() and
+bcmasp_netif_deinit() are called directly from bcmasp_interface_resume()
+and bcmasp_interface_suspend() (which execute asynchronously without
+rtnl_lock), can modifying the global dev->napi_list via netif_napi_add_tx()
+and netif_napi_del() cause a race condition with concurrent list readers?
+
+Suspend and resume paths typically rely on napi_enable() and napi_disable()
+rather than adding and deleting the NAPI structures entirely.
+
+[ ... ]
+> @@ -1454,17 +1436,19 @@ int bcmasp_interface_resume(struct bcmasp_intf *intf)
+>  	if (ret)
+>  		return ret;
+>  
+> -	ret = bcmasp_netif_init(dev, false);
+> -	if (ret)
+> -		goto out;
+> +	bcmasp_core_clock_set_intf(intf, true);
+>  
+>  	bcmasp_resume_from_wol(intf);
+>  
+> +	bcmasp_phy_hw_prepare(intf);
+> +
+> +	umac_reset_and_init(intf, dev->dev_addr);
+> +
+
+If Wake-on-LAN is disabled, bcmasp_interface_suspend() un-prepares the PHY
+by asserting reset and disabling clocks. By calling bcmasp_resume_from_wol()
+before bcmasp_phy_hw_prepare(), if EEE is enabled and invokes eee_fixup(),
+won't the MDIO access timeout or cause a bus error because the PHY hardware
+isn't prepared yet?
+
+Additionally, won't any WOL state changes (like clearing
+UMC_MPD_CTRL_MPD_EN) be immediately wiped out by the MAC software reset
+inside the subsequent umac_reset_and_init() call?
+
+I noticed this is fixed later in the series by commit 6994d859a69dd
+(net: bcmasp: Keep PHY link during WoL sleep cycle), but does leaving it
+like this here break bisection?
+
+> +	bcmasp_netif_init(dev);
+> +
+> +	phy_start(dev->phydev);
+> +
+>  	netif_device_attach(dev);
+>  
+>  	return 0;
+> -
+> -out:
+> -	clk_disable_unprepare(intf->parent->clk);
+> -	return ret;
+>  }
+-- 
+pw-bot: cr
 
