@@ -1,62 +1,80 @@
-Return-Path: <netdev+bounces-282503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282504-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KC/ZGmB48mnDrgEAu9opvQ
-	(envelope-from <netdev+bounces-282503-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:30:08 +0200
+	id iLXqEw958mnjrgEAu9opvQ
+	(envelope-from <netdev+bounces-282504-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:33:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA48249A980
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:30:07 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7CD949A9A0
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:33:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 471DD30166EB
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 21:30:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 76DA1301B4CF
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 21:33:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 527123A9015;
-	Wed, 29 Apr 2026 21:30:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4FF43ACF02;
+	Wed, 29 Apr 2026 21:32:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b1uXaWBk"
+	dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b="jJ63qV6s"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szelinsky.de (szelinsky.de [85.214.127.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 302F93AF654
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 21:30:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60A92FE58C;
+	Wed, 29 Apr 2026 21:32:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.127.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777498205; cv=none; b=dEj+Yd5anaBbwj1rj7bkWtXqKMFEKersFWiDJLz9UQ9RDs1/VdNvdAFtrBrhgSuYR2a7Tch1QTpsxKJS28NDro/5KJWMrv91ZSjSR29FCBDNZCb4rAghrsuR/fblv2xbSHMCrS2O10/FZj02PIV7rsRuk53+0qjQ9gJRdeubqfE=
+	t=1777498378; cv=none; b=TwCQP1z16NiVF+lBcFXo7OeMf/ATVGrGKaspp7g2CDZ5nSvDZvbXH56kjJn4yYkY+O5aMYGVEet3F+ZumZtRlREnOEl9s8o+Rs+kL1XlRzCakMUXXm740V3ZT+R1BOM9plthUwvteydXNu+krPbR4vccexnBt5FJrt/m0uz4w6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777498205; c=relaxed/simple;
-	bh=4Cxb47gcz+vaLUIRcKU20fRqNd9jdvyMRqSuKHHidD8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iYCcSX+S2g74U4MxJKIgJw+f/kHUy9G6kR1apuz337SC2Rx+9V5fXBQe4QiEFvmY2VOqabjU5NxEW/R3c7lVeazkxRk4BMy5PMOZfoiO/dZ1cHiqV/syJEPUXGVrgguysJwi0gTYAJjFMa7qjq6V3GmHMwbmwfjoetHssrzMDLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b1uXaWBk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 665B8C19425;
-	Wed, 29 Apr 2026 21:30:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777498204;
-	bh=4Cxb47gcz+vaLUIRcKU20fRqNd9jdvyMRqSuKHHidD8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=b1uXaWBkeLA/MSyWPj+WlXOcY8eLXBX/IAmgx0o1v2ejfuMJm1xJCVCrSmWVSox/f
-	 R2jU5yZ8YBAMX9ih+J0As3zRKdH6qx2sPqwaIrzj6TsDT3LhlrpqVV0o6zpWQ26RhD
-	 Pxis6PUN6oPu/1k2fXiyfjU3vYsQrClitwUHczue7ZahgwjsRMDrmcKijAPq9vbrpu
-	 0NV7gTpGNUj+UQtrO8z3rPIQqB9VEO5WUzm17eG92XZVahi1tFYzMkgmWjOx3TvbWq
-	 cmnoD2605QS5R3FUUCY/WTjrRUIuJUXRp1JM3Oq/EkbOwRwo9hqraskZenOerww/1e
-	 NB27zdaydSPiA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
+	s=arc-20240116; t=1777498378; c=relaxed/simple;
+	bh=Npd0+htLe+9yXPZp9F6EG9yvAgnKAETbR0NBN6Jn3jQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Mm54MwkTV5A0d6Ua6SE4u7+GmNT2fXIQUCw6+t+qbi80ZcNiwJQG1DJSWexNFWPXWt4A8jAm3cOZ5iroMmRxfXwBUwWbqYq30R6r9B78xuAa7bB7UfaOsNjGsCKZO9x5QEjQ9hEb/X/Vhs9Wd61f1evjRIiBhl6ST9fLk5lVbkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de; spf=pass smtp.mailfrom=szelinsky.de; dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b=jJ63qV6s; arc=none smtp.client-ip=85.214.127.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szelinsky.de
+Received: from localhost (localhost [127.0.0.1])
+	by szelinsky.de (Postfix) with ESMTP id AE579E83563;
+	Wed, 29 Apr 2026 23:32:48 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=szelinsky.de;
+	s=mail; t=1777498368;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zVlNOCW3KnH24Ji0t/GVr8tDWyG6du2U70C/+3G4mfU=;
+	b=jJ63qV6sYxtObB6jkhSIIAzk42WLwKmLbXqG3qPB4YQsXmu66RSE6JutENX3r43zJn55ft
+	IpKlW5r2YsjAe8jk0rmmISS4Y2Drl6PAuNFr7RmIB5HeX5Z1wJjlGai2xoM/LCsbmrvmzf
+	OYKZBnL66OclBBjYcRgF4DLizXMD9wmaVWFM7Fl5XcaYYFahduz8cFNhWrmb59Qxghe8EB
+	8nbIC3l9SRQ0wsEteZdcLNwWkNsePtsKIhE8XD1W0XqA5vioqagthd3R8eXkno6uWqjr1t
+	9Ohqu1vZqU+kS2TX/VFySnqhEccM1zi5U61Mwy5qftO7xytFDsEE0FXiIs2gnA==
+X-Virus-Scanned: Debian amavis at szelinsky.de
+Received: from szelinsky.de ([127.0.0.1])
+ by localhost (szelinsky.de [127.0.0.1]) (amavis, port 10025) with ESMTP
+ id etyT_gkzeYdT; Wed, 29 Apr 2026 23:32:48 +0200 (CEST)
+Received: from p14sgen5.fritz.box (dslb-002-205-089-102.002.205.pools.vodafone-ip.de [2.205.89.102])
+	by szelinsky.de (Postfix) with ESMTPSA;
+	Wed, 29 Apr 2026 23:32:48 +0200 (CEST)
+From: Carlo Szelinsky <github@szelinsky.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	john.fastabend@gmail.com,
-	sd@queasysnail.net
-Subject: [PATCH net-next] net: tls: reshuffle the device ops check
-Date: Wed, 29 Apr 2026 14:30:01 -0700
-Message-ID: <20260429213001.1908235-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
+	Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-leds@vger.kernel.org,
+	Carlo Szelinsky <github@szelinsky.de>
+Subject: [PATCH net-next v5 0/2] net: pse-pd: add poll path and LED trigger support
+Date: Wed, 29 Apr 2026 23:32:22 +0200
+Message-ID: <20260429213224.1747410-1-github@szelinsky.de>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260410124428.809943-1-github@szelinsky.de>
+References: <20260410124428.809943-1-github@szelinsky.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,7 +82,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: BA48249A980
+X-Rspamd-Queue-Id: B7CD949A9A0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
@@ -72,76 +90,147 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[szelinsky.de,quarantine];
+	R_DKIM_ALLOW(-0.20)[szelinsky.de:s=mail];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-282504-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,queasysnail.net];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-282503-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.982];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[github@szelinsky.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[szelinsky.de:+];
+	NEURAL_HAM(-0.00)[-0.998];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FROM_HAS_DN(0.00)[]
 
-We try to validate during registration that the netdev
-has ops if it has features. This is currently somewhat sillily
-written because we have a dereference before a NULL check
-on the ops struct. Straighten this out.
+Thanks to Kory, Oleksij, Krzysztof, Andrew and Jakub for all the
+helpful feedback on earlier versions:-) I really appreciate the time
+you put into reviewing this. I hope this is now the last round ;-)
 
-No functional change intended other than saving ourselves
-the very theoretical crash with a bad driver.
+This series adds poll-based event detection and LED trigger support
+to the PSE core subsystem.
 
-Note that we check earlier in the function that either ops
-or TLS features are set for the device in question.
+Patch 1 introduces the poll path independently of LED support,
+so it can be tested in isolation on boards with and without IRQ
+configured.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: john.fastabend@gmail.com
-CC: sd@queasysnail.net
----
- net/tls/tls_device.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+Patch 2 adds LED triggers that hook into the shared event handling
+path introduced by patch 1.
 
-diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
-index 99c8eff9783e..741aef09bfd3 100644
---- a/net/tls/tls_device.c
-+++ b/net/tls/tls_device.c
-@@ -1387,16 +1387,15 @@ static int tls_dev_event(struct notifier_block *this, unsigned long event,
- 	case NETDEV_FEAT_CHANGE:
- 		if (netif_is_bond_master(dev))
- 			return NOTIFY_DONE;
-+		if  (!dev->tlsdev_ops ||
-+		     !dev->tlsdev_ops->tls_dev_add ||
-+		     !dev->tlsdev_ops->tls_dev_del)
-+			return NOTIFY_BAD;
- 		if ((dev->features & NETIF_F_HW_TLS_RX) &&
- 		    !dev->tlsdev_ops->tls_dev_resync)
- 			return NOTIFY_BAD;
- 
--		if  (dev->tlsdev_ops &&
--		     dev->tlsdev_ops->tls_dev_add &&
--		     dev->tlsdev_ops->tls_dev_del)
--			return NOTIFY_DONE;
--		else
--			return NOTIFY_BAD;
-+		return NOTIFY_DONE;
- 	case NETDEV_DOWN:
- 		return tls_device_down(dev);
- 	}
--- 
-2.54.0
+Note: while reworking the poll teardown for v5, I noticed
+pse_release_pis() (which kfree()s the pi[] array) runs before
+disable_irq() / cancel_delayed_work_sync() in
+pse_controller_unregister(). A concurrent IRQ or poll worker that
+fires in that window would read through a freed pi[]. This is
+pre-existing for the IRQ path (since fc0e6db30941, "Add support for
+reporting events"); the v5 poll cancel inherits the same placement
+for symmetry. Does it make sense that I send a separate fix that disables
+both async sources before pse_release_pis() or am I wrong here?
+
+Changes since v4:
+- Rebased on top of "net: pse-pd: fix out-of-bounds bitmap access in
+  pse_isr() on 32-bit" (5099807f335c, merged via net). Extended the
+  same bitmap-pointer pattern to the new pse_handle_events() and
+  pse_poll_worker() code paths so for_each_set_bit() does not read
+  past a single unsigned long when nr_lines > BITS_PER_LONG (Jakub,
+  Kory)
+- Cancel the poll work explicitly in pse_controller_unregister(),
+  next to the existing disable_irq() for the IRQ path, instead of
+  relying on devm_add_action_or_reset() LIFO ordering. Makes the
+  helper safe even when a driver registers it in the standard order
+  (helper before devm_pse_controller_register()) (Jakub)
+- struct pse_pi_led_triggers no longer wrapped in
+  #if IS_ENABLED(CONFIG_LEDS_TRIGGERS); only the function bodies
+  remain ifdef'd, so reference sites no longer need their own
+  ifdefs (Jakub)
+- Added .activate callbacks for both LED triggers. Without these,
+  an LED bound to a trigger after pse_controller_register() (e.g.
+  via sysfs) would stay dark until the next hardware event toggled
+  state (Jakub)
+- Run the post-registration initial-state pass under pcdev->lock,
+  matching pse_led_update()'s documented locking contract and
+  avoiding races with concurrent regulator_enable() that share
+  last_delivering / last_enabled and the hardware ops (Jakub)
+- On partial pse_led_triggers_register() failure, NULL out
+  pcdev->pi_led_trigs so the existing early-return guard in
+  pse_led_update() short-circuits any later calls onto
+  partially-registered triggers (Jakub)
+
+Changes since v3:
+- Dropped the dt-bindings poll-interval-ms patch: the poll interval
+  is a driver decision, not a hardware property (Krzysztof)
+- Removed of_property_read_u32() for poll-interval-ms from
+  devm_pse_poll_helper(); the 500ms default is now hardcoded but
+  drivers can override pcdev->poll_interval_ms before calling the
+  helper
+- Rebased on net-next/main
+
+Changes since v2:
+- Based on net-next/main, added net-next subject prefix
+- Added --base tree information
+- Added CC for devicetree list and DT maintainers
+- Collected Reviewed-by from Kory Maincent on patch 1/3
+- Fixed build error when CONFIG_LEDS_TRIGGERS is disabled:
+  moved LED registration before list_add(), removing the
+  pcdev->pi_led_trigs = NULL assignment on conditionally
+  compiled struct member (reported by kernel test robot)
+- Fixed use-after-free on device unbind: poll work is now
+  cancelled via devm_add_action_or_reset() to ensure correct
+  devres teardown ordering (poll_work cancelled before
+  poll_notifs is freed)
+- Used system_freezable_wq for poll worker to prevent hardware
+  access during system suspend
+- Added PoDL power status and admin state checks to LED triggers
+  so they work for both C33 and PoDL controller types
+- Used dev_name(dev) for LED trigger names to ensure uniqueness
+  across multiple PSE controllers (of_node->name can be generic)
+- Added initial LED state query at registration so already-active
+  ports are reflected immediately
+- Added pse_led_update() calls in regulator enable/disable paths
+  so ethtool admin state changes are reflected in LEDs
+- Moved LED trigger registration before list_add() to prevent
+  race where IRQ/poll could invoke pse_led_update() on partially
+  initialized triggers
+
+Changes since v1:
+- Split single patch into 3 separate patches
+- Extracted pse_handle_events() and devm_pse_poll_helper() as a
+  standalone poll path (patches 1-2), testable without LED code
+- Added DT binding for poll-interval-ms as a separate patch
+- Renamed led-poll-interval-ms to poll-interval-ms for generic use
+- Fire LED triggers from the notification path rather than a
+  separate poll loop
+
+Tested on Realtek RTL9303 with HS104 PoE chip, poll path only
+(without IRQ configured). Verified PD connect/disconnect notifications
+and LED trigger state changes.
+
+Link: https://lore.kernel.org/all/20260410124428.809943-1-github@szelinsky.de/
+Link: https://lore.kernel.org/all/20260329153124.2823980-1-github@szelinsky.de/
+Link: https://lore.kernel.org/all/20260323201225.1836561-1-github@szelinsky.de/
+
+Carlo Szelinsky (2):
+  net: pse-pd: add devm_pse_poll_helper()
+  net: pse-pd: add LED trigger support via notification path
+
+ drivers/net/pse-pd/pse_core.c | 355 +++++++++++++++++++++++++++++++---
+ include/linux/pse-pd/pse.h    |  32 +++
+ 2 files changed, 356 insertions(+), 31 deletions(-)
+
+
+base-commit: 09942ddedcb960f9e78fd817ec33f501d1040c5b
+--
+2.43.0
 
 
