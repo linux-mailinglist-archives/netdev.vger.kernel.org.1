@@ -1,200 +1,243 @@
-Return-Path: <netdev+bounces-282474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282475-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yOxvEr1f8mnqqQEAu9opvQ
-	(envelope-from <netdev+bounces-282474-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 21:45:01 +0200
+	id ULkGImpm8mkBqwEAu9opvQ
+	(envelope-from <netdev+bounces-282475-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 22:13:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1F2B499DC9
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 21:45:00 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8979B49A023
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 22:13:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3D9B830087E8
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 19:45:00 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8B0A93010752
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 20:13:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3993835836B;
-	Wed, 29 Apr 2026 19:44:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90ED8383C95;
+	Wed, 29 Apr 2026 20:13:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p7gkKnUt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uIwsJXG5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16ECD346A08;
-	Wed, 29 Apr 2026 19:44:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777491899; cv=none; b=BC01vI0b3TQxgty38GzTsQxMtd31VU1Ftwa6HvzdQHt/YOnY3ZXXFpHSD9j2/rQ4W+Q1cFlfOfQR7quf715Xt1a8XpmvqwrMKunZkddBm2SHUFji8Qbf96b4qr9TxDq/zX25OSW6Sv0towwmxAX0mYRJKnwTRseO9Hhg5srNGSE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777491899; c=relaxed/simple;
-	bh=s0/dTaIxNL0KrxhwLFFoQn+/ebIRYDw7l8AENrCVRw0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aJdFMSrXXoFodTP0LPZMMH+43EybQx/xLPd4q+qDVbG9WOcefhD+FY0KSYBWwfoHec/7KzmDFtMi4ssz/s2vNAbVkSjibOy1FsjhNzyLVwVUc+S4B3sGzTXixOV1WTeXltXPgbxAahDMOp8GVjkCvUp+47Ob+qUX0iyL3HZfN9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p7gkKnUt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1390DC19425;
-	Wed, 29 Apr 2026 19:44:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777491898;
-	bh=s0/dTaIxNL0KrxhwLFFoQn+/ebIRYDw7l8AENrCVRw0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=p7gkKnUt3nxUjeHiJZAJs3IGsXePs+A8+VpGXMgx8GnHDX6FzWaefgDdM6W3Nbszk
-	 hUo9nfkqfRdp8g5J/OX4RNRcyF32T4ktIflJ00gUDyWVA6CPEHKm+lFtHm9OGG9Wp3
-	 auTF24QEgGX4dR2zZ7IIFZ7vMNnchCyI511ybCDwBVygM1x0v+eJKugtjGiV4pizJi
-	 CLeR2ry8K3DCfQTSrWEU57CdhHPnFhYk1XLRR+OlZZlVqHHAhlGWNU/PoQnpt2TAwB
-	 T56bJrR6Cdk/f2dJ9YVrxO7fMzTW7n1ulW1XwUv8ZGI9F6tjIlrc3EgzPSGOZuZUxL
-	 muBh/zjQ/MLeg==
-Date: Wed, 29 Apr 2026 19:44:56 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, edumazet@google.com,
-	ncardwell@google.com, kuniyu@google.com, davem@davemloft.net,
-	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	ardb@kernel.org, Jason@zx2c4.com, herbert@gondor.apana.org.au,
-	0x7f454c46@gmail.com
-Subject: Re: [PATCH net-next v2 1/5] net/tcp-ao: Drop support for most
- non-RFC-specified algorithms
-Message-ID: <20260429194456.GA621449@google.com>
-References: <20260427172727.9310-2-ebiggers@kernel.org>
- <20260429185828.1539480-2-horms@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B2E43806D6
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 20:13:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777493603; cv=pass; b=rpzYP/TykVzS3+QdhMKZGXbQaYLBHgZcMTpVr3/SQB/yJHz7drbmyo+/kHoA+5criA2orVwyfL7Bg5/sAE4ysDTkMVIfv0M/n463pJWaz8Sm5YpXcojz2c4OzJwID976jY1Ld8KQ6xuoHbRUbX/sLLhnmbxJr3Kbs99hLJoeWZQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777493603; c=relaxed/simple;
+	bh=DgWmlhFDeoYKsDHkxPltw/rRajokF52EOWSxWdgpKOU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kLM18stQLvAkkQw2wDECDFhMQBYZtKU06gqJrphWn95vEcca0qRYTsjdKV9TwDTnC2m2Fvk3bKPrAR6iuaYj4/cP9ezl5DouccFWKd1nlZB9eOlN5WgU/K+dIBaN6sRUnoqqAhD3o5OAYv1HeYwfHjHwKbBYutzmEMW0CqgKuaI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uIwsJXG5; arc=pass smtp.client-ip=74.125.224.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-64eaf8aa893so118706d50.3
+        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 13:13:21 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777493601; cv=none;
+        d=google.com; s=arc-20240605;
+        b=eOhCBQERrvLNdv8Vb0FpcWihtv1yQY3X74RF9JjhLSapD8iDxxtIX3mSm3ch2wNwib
+         bPxlwX/ubQW61YofCKqxB3jZtzo5UfX2gfOsmJtmj/S35vHKhBLQGBeXxviAB0e5W7qz
+         oyLTH3YmF1Zem/T1dhaSp6qIUckL2BnCBXVkNVr772RJx5mrVPqtaA+qD3Rc0bHV/Jjf
+         dB5WcWEN5sNErh9Q0UJqylso4RPrIAVfELxaIA7OjyEXzFJJaClDxYGahxn9i5iYKVIf
+         i/vpDbORHt2h50rskklAykCG3HIYMVKmrqv3EUKMRqcJujK9yn0IFE9s8fzu2sk6h4Ge
+         /kyA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=9jvyc7f7PRAOiwTjwKhbnQrjsI3mybG0X85iNl/kJTM=;
+        fh=oiTxyG6i/nSjWV7gChOLBdavsrs4WwbZ8nhGbxICSQM=;
+        b=OhOjXcw+VzKs2UJoobMGoxPA5rYeqPKiNp2cumG/4DH0FZdlx4d9AMh9hDU3X17Kc1
+         TWtg2ac99Xd0Tys6AMlLwsIw2mfpCmacLZNiVXTmQOU/5GeKD4ubnyRR29Uszvb4y4Iz
+         4ExF3yfruuYlzaPxplOjD0nZTLRy6g1nhOwYFd35yxQatIeX6kKZ9udD++gAcKvPzeky
+         CnCbNb+oMiuf5Uggo3MsiKbyb2xCP3K67+8VbTiGHNfeiSywvWTCXxKqdTSbQAyZCBSS
+         3vSYQPFXqwfUtsmirIkOIdp1t3NIc6g7AAjNw/xZkV405Bsxd2TnhjW9gJuEc2Y5t8O8
+         ZpFQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777493601; x=1778098401; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9jvyc7f7PRAOiwTjwKhbnQrjsI3mybG0X85iNl/kJTM=;
+        b=uIwsJXG5lDbK7VSrssez5pjA468gkZjWuB59Ic1sC1A/UXBGw7dsnYcIDB1NgM4n7N
+         mIlcfsCjZFjja/be9r2vO5V/ObbwXTnCHmmVdRZMvFHQkvRlt5wrC4PX3u2BDSggu7VA
+         KMT23Q7uV9+QPslqS6W2J9337N1SqhUod/5/JJQCa99aDqWoYu0xd4ksK9SJAlcAjEOe
+         YevVcW68Fqv/to4tIriBovUcyP2zMXZW5QNE8N/siigjpVWmXswzfWJutrypXKJ3nk4k
+         ZvftJtaPYCYRuWQOasARXS391JaeWWbKxp1hZnT9MEyQQMwR/hZqltReODpVOu+O6KKT
+         x+uA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777493601; x=1778098401;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=9jvyc7f7PRAOiwTjwKhbnQrjsI3mybG0X85iNl/kJTM=;
+        b=JvkkjN7Wr57Y/SMtMJXbYn6r4mCOgKffEuLUfxFCmx3p0fVaeW6HhF7QH8OrUMK79+
+         WGk8ZIRlklk9z0l++BDbN+NNgn78W71V0acYYgrc6fQXyc6zg01x8mCeUTCUVjm8gvyv
+         5Ao8Ddmc/qNalGt0AUcJxSTk89CU452V0DArr33rpb697wgaXjQ/XubfYx6ulvqikENB
+         vG9vlVQazB5u3WHP0K2fynCHslRebPGxlkU1vNTX6qfPQf7itJAz5LPX74H91hexz6Or
+         L9nL9ysl2tnUK9vd7K5SVOyzJ/gUGZN0K1+/M/X/C/rLnTHJ/2uS4vCnzImbpEUDZKCD
+         h4qA==
+X-Forwarded-Encrypted: i=1; AFNElJ9bXUy6PzMqxP3ykxZ9fs7rCpUm+Em/WnUFeVe1WG8gWqF/pXvdOKfh4m6IKcs/bI3lMHtPo44=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDW7hpguTf3NnRd8O+7sxq7onIwc9yeqddqRPNTTXv4E+VCBDA
+	58i5il2p2i/jNpTUy8h9D62esAxg5Sl6JUDhJruSP5bINb6gDwKwtz7Pz7IsS8m+6X1pLtVIbpQ
+	4QK3LQPFFl5JgvqEty0JggMOb90jeLpb5JNgoY1EV
+X-Gm-Gg: AeBDiet7uZnDux5Bnynk0W2kxxKaUJt527CSSNgQbMyuBrp83pjCTxjXAuTWPFgOK9c
+	n6ofL11FWMcqPMnTWw8ZgtKYa72vHag7S0g3/RKm81HLLznK9faepchgEUESskERi3VFSU3VoRx
+	hzGpRTcvY/Y+EaLizCz/48f4XDS6Df0RF5iHFbke3dhfewIA6adlyQz1YiQs0DPGs5wsFh+gvRY
+	78h+IsVQk0V71BUrT0BzbvxftLDVao8WWPjkSu5+NRkc7j2f7dgRI1RKSFGieKZDy374KUJVsug
+	kUNgw5SZEQvF96bgfGBMYmJGrPu1mrTsrcAT0CHPtNzLi6moBxr8sB0txFA=
+X-Received: by 2002:a05:690e:1916:b0:656:30a1:70f3 with SMTP id
+ 956f58d0204a3-65beed92f14mr8048708d50.14.1777493600534; Wed, 29 Apr 2026
+ 13:13:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260429185828.1539480-2-horms@kernel.org>
-X-Rspamd-Queue-Id: E1F2B499DC9
+References: <20260425014842.1036981-1-boolli@google.com> <IA3PR11MB8986566C5F04D57DEC8DE45AE5362@IA3PR11MB8986.namprd11.prod.outlook.com>
+In-Reply-To: <IA3PR11MB8986566C5F04D57DEC8DE45AE5362@IA3PR11MB8986.namprd11.prod.outlook.com>
+From: Li Li <boolli@google.com>
+Date: Wed, 29 Apr 2026 13:13:07 -0700
+X-Gm-Features: AVHnY4KRKw4LoyS3xC6Qv4GwmQjPl1AbHgwZ3PdkQOrkri_GO4mhq3Yme5RvCb8
+Message-ID: <CAODvEq5WZNP7sp+Kym9-pmUQrpsJv_sW=zz82f8EARZh1ceYsg@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] libie: log more info when
+ virtchnl fails
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+Cc: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, 
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, David Decotigny <decot@google.com>, 
+	"Singhai, Anjali" <anjali.singhai@intel.com>, 
+	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Brian Vazquez <brianvv@google.com>, 
+	"Tantilov, Emil S" <emil.s.tantilov@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 8979B49A023
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282474-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282475-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,davemloft.net,kernel.org,redhat.com,zx2c4.com,gondor.apana.org.au,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ebiggers@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[boolli@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TO_DN_SOME(0.00)[]
 
-On Wed, Apr 29, 2026 at 07:58:29PM +0100, Simon Horman wrote:
-> Is this a uAPI regression for existing users of TCP_AO_ADD_KEY?
-> 
-> Before this change, tcp_ao_add::alg_name accepted any crypto_ahash
-> algorithm name.  The commit message itself notes "arbitrary HMAC algorithms
-> probably do work", and the selftest prior to this patch exercised
-> hmac(sha512), hmac(sha384), hmac(sha224), hmac(sha3-512), hmac(rmd160) and
-> hmac(md5), which demonstrates those configurations were functional in
-> practice.
-> 
-> A setsockopt call that previously succeeded with e.g. alg_name =
-> "hmac(sha512)" now returns -ENOENT after a kernel upgrade, with no
-> deprecation window, no Kconfig opt-in, and no runtime toggle.  HMAC-SHA512
-> in particular seems like a plausible choice that a deployment may already
-> rely on.
-> 
-> Would it make sense to keep hmac(sha512) (and possibly hmac(sha384)) in the
-> accepted list, or to gate the removal behind a Kconfig/sysctl while warning
-> for a few releases?
+On Mon, Apr 27, 2026 at 2:06=E2=80=AFAM Loktionov, Aleksandr
+<aleksandr.loktionov@intel.com> wrote:
+>
+>
+>
+> > -----Original Message-----
+> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> > Of Li Li via Intel-wired-lan
+> > Sent: Saturday, April 25, 2026 3:49 AM
+> > To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
+> > Przemyslaw <przemyslaw.kitszel@intel.com>; David S. Miller
+> > <davem@davemloft.net>; Jakub Kicinski <kuba@kernel.org>; Eric Dumazet
+> > <edumazet@google.com>; intel-wired-lan@lists.osuosl.org
+> > Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org; David
+> > Decotigny <decot@google.com>; Singhai, Anjali
+> > <anjali.singhai@intel.com>; Samudrala, Sridhar
+> > <sridhar.samudrala@intel.com>; Brian Vazquez <brianvv@google.com>; Li
+> > Li <boolli@google.com>; Tantilov, Emil S <emil.s.tantilov@intel.com>
+> > Subject: [Intel-wired-lan] [PATCH iwl-next v2] libie: log more info
+> > when virtchnl fails
+> >
+> > Virtchnl failures can be hard to debug without logs. Logging the
+> > details of virtchnl transactions can be useful for debugging virtchnl-
+> > related issues.
+> >
+> > Tested: Built and booted on a test machine.
+> >
+> > Signed-off-by: Li Li <boolli@google.com>
+> > ---
+> > v2:
+> >  - Use dev_warn_ratelimited instead of dev_notice_ratelimited based on
+> >    reviewer feedback.
+> >
+> >  drivers/net/ethernet/intel/libie/controlq.c | 15 +++++++++++++++
+> >  1 file changed, 15 insertions(+)
+> >
+> > diff --git a/drivers/net/ethernet/intel/libie/controlq.c
+> > b/drivers/net/ethernet/intel/libie/controlq.c
+> > index ebc05355e39d..bf200fea1e12 100644
+> > --- a/drivers/net/ethernet/intel/libie/controlq.c
+> > +++ b/drivers/net/ethernet/intel/libie/controlq.c
+> > @@ -762,6 +762,16 @@ libie_ctlq_xn_process_recv(struct
+> > libie_ctlq_xn_recv_params *params,
+> >       status =3D ctlq_msg->chnl_retval ? -EFAULT : 0;
+> >
+> >       xn =3D &xnm->ring[xn_index];
+> > +
+> > +     if (ctlq_msg->chnl_retval) {
+> > +             dev_err_ratelimited(
+> > +                     params->ctlq->dev,
+> > +                     "Non-zero virtchnl ret val (msg op: %u, ret val:
+> > %u, msg_cookie: %u, data_len: %u); xn op: %u, id: %u, cookie: %u\n",
+> > +                     ctlq_msg->chnl_opcode, ctlq_msg->chnl_retval,
+> > +                     msg_cookie, ctlq_msg->data_len, xn-
+> > >virtchnl_opcode,
+> > +                     xn->index, xn->cookie);
+> Dangerous! You add xn logging before it's fields validation.
 
-This is intentional and has already been explained and discussed
-extensively.
+I intentionally added the log before the field validation because I
+wanted to surface corrupted or timed out virtchnl replies. If we log
+it only after the field validation, we won't have the visibility into
+the corrupted / timed-out virtchnl replies.
 
-> Also, -ENOENT is the same error returned when the crypto module for an
-> otherwise-accepted algorithm is simply not built in.  Should a distinct
-> errno (for example -EOPNOTSUPP) be used here so userspace can tell
-> "algorithm rejected by policy" apart from "algorithm module missing"?
+But so far the bugs we have seen in our internal OOT driver all
+appeared after the field validation, so I'm fine with moving the log
+to after the validation as well. I will do it in the v3 patch.
 
-This review seems a bit inconsistent, as now it's advocating *for* a
-UAPI change.  I suggest we just stay with ENOENT, as this patch does.
-
-> > diff --git a/tools/testing/selftests/net/tcp_ao/config b/tools/testing/selftests/net/tcp_ao/config
-> > index f22148512365..47228a7d0b90 100644
-> > --- a/tools/testing/selftests/net/tcp_ao/config
-> > +++ b/tools/testing/selftests/net/tcp_ao/config
-> > @@ -1,6 +1,5 @@
-> >  CONFIG_CRYPTO_CMAC=y
-> >  CONFIG_CRYPTO_HMAC=y
-> > -CONFIG_CRYPTO_RMD160=y
-> >  CONFIG_CRYPTO_SHA1=y
-> >  CONFIG_IPV6=y
-> >  CONFIG_IPV6_MULTIPLE_TABLES=y
-> 
-> Should CONFIG_CRYPTO_SHA256=y (and possibly CONFIG_CRYPTO_AES=y) be added
-> here?
-
-This is an existing bug, which patch 2 fixes by making CONFIG_TCP_AO
-select the algorithms it uses.
-
-> > diff --git a/tools/testing/selftests/net/tcp_ao/key-management.c b/tools/testing/selftests/net/tcp_ao/key-management.c
-> > index 69d9a7a05d5c..d86bb380b79f 100644
-> > --- a/tools/testing/selftests/net/tcp_ao/key-management.c
-> > +++ b/tools/testing/selftests/net/tcp_ao/key-management.c
-> 
-> [ ... ]
-> 
-> > -const char *test_algos[] = {
-> > -	"cmac(aes128)",
-> > -	"hmac(sha1)", "hmac(sha512)", "hmac(sha384)", "hmac(sha256)",
-> > -	"hmac(sha224)", "hmac(sha3-512)",
-> > -	/* only if !CONFIG_FIPS */
-> > -#define TEST_NON_FIPS_ALGOS	2
-> > -	"hmac(rmd160)", "hmac(md5)"
-> > -};
-> > +const char *test_algos[] = { "cmac(aes128)", "hmac(sha1)", "hmac(sha256)" };
-> 
-> With the FIPS/algorithm-probing logic removed and roughly one third of
-> generated keys now using hmac(sha256), and with the kernel side now
-> returning -ENOENT for non-whitelisted algorithms, tcp_sigpool_alloc_ahash()
-> will fail for every hmac(sha256) key on a kernel built from this config
-> unless CRYPTO_SHA256 is selected.
-> 
-> CRYPTO_SHA256 is not implied by CRYPTO_HMAC or TCP_AO, so on a kernel built
-> strictly from tools/testing/selftests/net/tcp_ao/config the tests would
-> appear to fail rather than be skipped.  Can the config fragment be updated
-> to match the new required algorithm set?
-
-Again, this is an existing bug, which patch 2 fixes by making
-CONFIG_TCP_AO select the algorithms it uses.
-
-> One more question, on the commit message and documentation rather than the
-> diff: Documentation/networking/tcp_ao.rst still describes TCP-AO as "May
-> support any hashing algorithm"
-
-That "May support any hashing algorithm" statement has always been
-incorrect, so I wouldn't pay much attention to it.  It also appears in a
-table describing TCP-AO as a protocol, not the kernel's implementation.
-
-> and does not mention the newly enforced
-> whitelist or the -ENOENT failure mode.  Should tcp_ao.rst be updated in
-> this patch to list the accepted algorithm strings and the rationale (e.g.
-> the 20-byte TCP option MAC cap), so userspace has a documented contract?
-
-As stated in the commit message, the list of MAC algorithms supported by
-the kernel's implementation of TCP-AO has always been undocumented.  It
-should be documented, but I would suggest documentation improvements
-belong in a separate patch.
-
-- Eric
+>
+>
+> > +     }
+> > +
+> >       if (ctlq_msg->chnl_opcode !=3D xn->virtchnl_opcode ||
+> >           msg_cookie !=3D xn->cookie)
+> >               return false;
+> > @@ -1011,6 +1021,11 @@ int libie_ctlq_xn_send(struct
+> > libie_ctlq_xn_send_params *params)
+> >               params->recv_mem =3D xn->recv_mem;
+> >               break;
+> >       default:
+> > +             dev_warn_ratelimited(
+> > +                     params->ctlq->dev,
+> > +                     "Transaction failed (op %u, xn state: %d, id: %u,
+> > cookie: %u, size: %zu)\n",
+> > +                     params->chnl_opcode, xn->state, xn->index, xn-
+> > >cookie,
+> > +                     xn->recv_mem.iov_len);
+> >               ret =3D -EBADMSG;
+> >               break;
+> >       }
+> > --
+> > 2.54.0.rc2.544.gc7ae2d5bb8-goog
+>
 
