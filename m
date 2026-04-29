@@ -1,131 +1,175 @@
-Return-Path: <netdev+bounces-282484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282485-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sDB9FWlr8mkMrAEAu9opvQ
-	(envelope-from <netdev+bounces-282484-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 22:34:49 +0200
+	id WBDfKwFt8mkMrAEAu9opvQ
+	(envelope-from <netdev+bounces-282485-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 22:41:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F7FA49A2D5
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 22:34:48 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BA3849A38F
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 22:41:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E0A3230B9E88
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 20:32:48 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B63E0300B469
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 20:41:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A5D539BFFA;
-	Wed, 29 Apr 2026 20:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0957639FCC5;
+	Wed, 29 Apr 2026 20:41:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BfK55Za6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
+Received: from mail-dy1-f202.google.com (mail-dy1-f202.google.com [74.125.82.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94033346A1C
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 20:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E173932DE
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 20:41:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777494760; cv=none; b=JW/DP4b2Pjl/XduES0+gAmtZSx7DbpoYpGn1r4h/a1ZKks929YWG/ymtlSeQNv/pz2GvixgjAPCrPfghVRNQPzFKdKG0DeqwRCqmhcSA+SV6BGXARE8Gn4mB7K8PjzA0Oub0SIk0YpjPWh2ALjO+NyFzgDkwalEXDwBQuCSpbUY=
+	t=1777495293; cv=none; b=WwJmihSnFZUvuP+zwdoaxT8k6T/1Q/57Tr4LTbkYZctEfegY/BMH9fay1Lt5951p03yCIcCiYsU0jgXf0Jtkv/f1J/T2aaXjaWquZ3G82DNTBiyFndljBV9mSqrcMFC3K/IZK6ebSlJTNze8orshH/xiY2xUTjvU83KnditJjwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777494760; c=relaxed/simple;
-	bh=xiRXsiO3W/9uU8aPNFezc3qHFbf+yUCJnyeh4Fk9QcQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=igmp10ZNNE4BgTGl4zmDhyIj7oqTyHZQyeyG3bnzaQFfMkIir6O+/eg0wY4iPOVfLSmhDXbxn7AiYwF/jZm8QPRkyam58lPNziyZj7NXA6SP46pdWV48VGDeXeF0Fd0F2Dz90EdztywKRQCLTigo3A83aqT4sGMKUTx9Pgn6B90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-696307c7ee0so371489eaf.0
-        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 13:32:38 -0700 (PDT)
+	s=arc-20240116; t=1777495293; c=relaxed/simple;
+	bh=kN+EfbkIP3h0uxp77sIOlxAwH9iR+jNzSBYddzfWMzo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=uEjOPPSJO/PVrdjKm7wCsO+QBjC9glLkaWXChVVtEIxMOLTshWvIuwZ05ogVoGln5RTrsM4LJIXz3NgAQv34FdK2Q0+ZumL5aJhZe9UwHHAhYVgjtVt4Qyszug4r0ZMxZt9KTvNi/+5h7TaHcSo7wFYqbBYIiF9+9Z+c8gsumQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--boolli.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BfK55Za6; arc=none smtp.client-ip=74.125.82.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--boolli.bounces.google.com
+Received: by mail-dy1-f202.google.com with SMTP id 5a478bee46e88-2e60238adb1so914956eec.0
+        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 13:41:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777495292; x=1778100092; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Dombmj9ny0RyT7dLXRXjIRy7HfDUGhjx5FcWbglB77o=;
+        b=BfK55Za6h80Vtd6j/DUeqv3jH0yxktcqbSHT4u8EIR31/3zXfrlywukmZZyZHq8CtQ
+         UUjyybegVgQI/mEDAUKA6PPMCY0TeO8P76N49j+C6KeCPAQ9iHfItF8So7rgUBxZ4WYI
+         WarqPhjCAss1dJa80y5yZtdgNRUNSuQKCVrTobQiMsYOoPCu9vwmo7kbcXB63cM8cNDw
+         5SA5YczQgO6Bp2HCt/z+17+Y3yN5hKxO+/LHqDoMrumLWP8mKLD6eGaVOwvMQUMyEBi/
+         fF1Lm97bydlM9BNE8J32kbV8b2ck0av8muuVewfhQQ/Fr0YDM8V3qGlL3fqDtZuyT3Yo
+         T4VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777494757; x=1778099557;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20251104; t=1777495292; x=1778100092;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=fJOViW9ZqXgJfTCarUw22NKpcmj3qAVWjjSA+y5d1Jw=;
-        b=XMcIrsHiRg2h29E3/dCpsJ+7Vfjzy8sfq9/fDLBs3UGTJkJRO/coWVWRW9s098a6zA
-         Cyq83gL54Y9FHr6iP2rOLH/EZ04EXpvqdjkICrF7DBMpJTBpzlXROylVl+wE+pjETA6b
-         VG8h+VlPNv95qmwiEU9qdqZBfl+zpRtQFeQ1K7l7K1FyznGVrE0HHRAbEcO+ZlF7Fh7f
-         FSsxagDfnYBzZ793N3uIao3NdPttVlYz9UhB3FJdAjJOkJ+zSwipJ3caXJdDy5uNL5O9
-         6jcrY4VMSI1Jp+jxUsg55sLnIuyTDNYELUVH9hCnfkAJfhV2E5BUhb6ttKgrJTmDbMNX
-         +L5w==
-X-Forwarded-Encrypted: i=1; AFNElJ+ThlxMa9zlZEVioHCEQx4MAzAYVGbA9ySVzN7rmzwdeDHumIXqJ4IJeP2O610xFlYSzKwb2ws=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJWTuZhnxujVx1h0plB7/qvZsamGBSwHVhSHR5gEk/3A/NzLpf
-	3YdTZd8H9LO38NwQ8kQ9V4HjdvhwbtbM7pUFzHWx80Fsw1YXmbaFbY55QRuqnSb4Ngi4FCqxtjV
-	LBWn6gHxUloD0Gx6M+K7tPAfgMa9a3VmP0WQZXTYGHJwAPxWtvcZso2qTEes=
+        bh=Dombmj9ny0RyT7dLXRXjIRy7HfDUGhjx5FcWbglB77o=;
+        b=WpvPCmH4iIuzuraDmjGR9YoTn95mi7a+gAv4ZRLz9Z6A9lGMNElG2bJCbAUh4h7oEJ
+         5VKBDxRw8lOnBaMp8lj/FrisHoihKfw2Siv0+zP0sfIIsib/sOAOTkiQ/6S4BZ+Wumjl
+         0XzGQeGEmxIuSAMBG9xTzlrLJFymY3BH0I98SiphoENeukmbc6nEaCvHjdY/kdqgoF/Y
+         5mfP1UTOxLx535L61o8IJEM9e8m5sspSlM9rdRDmJDdhVJmd2zbg1M4LNt5mul0DMNif
+         qiBu/2Wdd+YtkoEG/6+c5YJ090rFVeIEqPPA3fSkhPrNsKl0xN7f9dFlDgZxK1XXNlg4
+         LnEg==
+X-Gm-Message-State: AOJu0YxXHuH7ihzHB4DN6FtmB3bHXMl2hae1sRtqIrvoX4Gu0CkTa4td
+	G7eMzBV66OWZYur+9L4ImViwiVnRheVykSpQI2W/gITAkm0c7y3SHb8PyF0hGyR3nSHg7CeHFSj
+	ZFFiRKg==
+X-Received: from dycmd10.prod.google.com ([2002:a05:693c:23ca:b0:2dd:7012:2d3b])
+ (user=boolli job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7300:dc93:b0:2cb:8d2f:e247
+ with SMTP id 5a478bee46e88-2ed0a099154mr4072247eec.13.1777495291613; Wed, 29
+ Apr 2026 13:41:31 -0700 (PDT)
+Date: Wed, 29 Apr 2026 20:41:28 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6820:16a8:b0:694:8683:3860 with SMTP id
- 006d021491bc7-6967a625551mr83622eaf.48.1777494757575; Wed, 29 Apr 2026
- 13:32:37 -0700 (PDT)
-Date: Wed, 29 Apr 2026 13:32:37 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69f26ae5.170a0220.3c4978.000b.GAE@google.com>
-Subject: [syzbot] Monthly wpan report (Apr 2026)
-From: syzbot <syzbot+list6f39c4e3ba0bb706b158@syzkaller.appspotmail.com>
-To: alex.aring@gmail.com, linux-kernel@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
-	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
+Message-ID: <20260429204128.2865817-1-boolli@google.com>
+Subject: [PATCH iwl-next v3] libie: log more info when virtchnl fails
+From: Li Li <boolli@google.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	David Decotigny <decot@google.com>, Anjali Singhai <anjali.singhai@intel.com>, 
+	Sridhar Samudrala <sridhar.samudrala@intel.com>, Brian Vazquez <brianvv@google.com>, 
+	Li Li <boolli@google.com>, emil.s.tantilov@intel.com
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 9F7FA49A2D5
+X-Rspamd-Queue-Id: 5BA3849A38F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org,bootlin.com,datenfreihafen.org,googlegroups.com];
+	TAGGED_FROM(0.00)[bounces-282485-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-282484-lists,netdev=lfdr.de,list6f39c4e3ba0bb706b158];
-	FROM_HAS_DN(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.625];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	R_DKIM_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[boolli@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-Hello wpan maintainers/developers,
+Virtchnl failures can be hard to debug without logs. Logging the details
+of virtchnl transactions can be useful for debugging virtchnl-related
+issues.
 
-This is a 31-day syzbot report for the wpan subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/wpan
+Tested: Built & booted on a test machine and synthetically produced a
+virtual failure to produce the following log:
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 5 issues are still open and 26 have already been fixed.
+idpf 0000:01:00.0: Non-zero virtchnl ret val (msg op: 1, ret val: 6,
+data_len: 8); xn id: 0, cookie: 0
+idpf 0000:01:00.0: Transaction failed (op 1, xn state:
+3, id: 0, cookie: 0, size: 8)
 
-Some of the still happening issues:
-
-Ref Crashes Repro Title
-<1> 460     Yes   KMSAN: uninit-value in ieee802154_hdr_push (2)
-                  https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
-<2> 366     Yes   WARNING in lowpan_xmit (2)
-                  https://syzkaller.appspot.com/bug?extid=5b74e0e96f12e3728ec8
-<3> 55      Yes   WARNING in __dev_change_net_namespace (3)
-                  https://syzkaller.appspot.com/bug?extid=3344d668bbbc12996d46
-
+Signed-off-by: Li Li <boolli@google.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+v3:
+ - Use dev_err_ratelimited in both logs.
+ - Move log placement to after virtchnl field validation.
+ - Remove redundant op/cookie fields since they were validated.
+v2:
+ - Use dev_warn_ratelimited instead of dev_notice_ratelimited based on
+   reviewer feedback.
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+ drivers/net/ethernet/intel/libie/controlq.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+diff --git a/drivers/net/ethernet/intel/libie/controlq.c b/drivers/net/ethernet/intel/libie/controlq.c
+index ebc05355e39d..ceca8a076d79 100644
+--- a/drivers/net/ethernet/intel/libie/controlq.c
++++ b/drivers/net/ethernet/intel/libie/controlq.c
+@@ -766,6 +766,14 @@ libie_ctlq_xn_process_recv(struct libie_ctlq_xn_recv_params *params,
+ 	    msg_cookie != xn->cookie)
+ 		return false;
+ 
++	if (ctlq_msg->chnl_retval) {
++		dev_err_ratelimited(
++			params->ctlq->dev,
++			"Non-zero virtchnl ret val (msg op: %u, ret val: %u, data_len: %u); xn id: %u, cookie: %u\n",
++			ctlq_msg->chnl_opcode, ctlq_msg->chnl_retval,
++			ctlq_msg->data_len, xn->index, xn->cookie);
++	}
++
+ 	spin_lock(&xn->xn_lock);
+ 	if (xn->state != LIBIE_CTLQ_XN_ASYNC &&
+ 	    xn->state != LIBIE_CTLQ_XN_WAITING) {
+@@ -1011,6 +1019,11 @@ int libie_ctlq_xn_send(struct libie_ctlq_xn_send_params *params)
+ 		params->recv_mem = xn->recv_mem;
+ 		break;
+ 	default:
++		dev_err_ratelimited(
++			params->ctlq->dev,
++			"Transaction failed (op %u, xn state: %d, id: %u, cookie: %u, size: %zu)\n",
++			params->chnl_opcode, xn->state, xn->index, xn->cookie,
++			xn->recv_mem.iov_len);
+ 		ret = -EBADMSG;
+ 		break;
+ 	}
+-- 
+2.54.0.545.g6539524ca2-goog
 
-You may send multiple commands in a single email message.
 
