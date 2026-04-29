@@ -1,143 +1,121 @@
-Return-Path: <netdev+bounces-282186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282187-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iN68Hfhh8WnhgQEAu9opvQ
-	(envelope-from <netdev+bounces-282186-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:42:16 +0200
+	id GLf1Dehi8WnhgQEAu9opvQ
+	(envelope-from <netdev+bounces-282187-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:46:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E718148E0CB
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:42:11 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB6FC48E12F
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:46:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8CA73301FFBE
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 01:42:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 59FD2306B11D
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 01:43:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E051F27EFE9;
-	Wed, 29 Apr 2026 01:42:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 964F827E05E;
+	Wed, 29 Apr 2026 01:43:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kp+edf72"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GUigyiPF"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C2F271A6D;
-	Wed, 29 Apr 2026 01:42:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 742762749EA
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 01:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777426928; cv=none; b=ZSDVHDQgLp72TA7EEUJaKiItI59WUAIw/YZ7DLjywfWx1Kt8cm3fbeJIGRcs254623loA4VXJ3/SemYoBR/JqAl0bfqJJPA2Wpx5UzFhGvm2OCnAsTWty9ZA3EmrRXe8r8pddnXJSyx7lgr0Ov/QSRxqPg5tJYjpFVmo51AK8e4=
+	t=1777427018; cv=none; b=eOMTS0sFdGRDleE5LM619RMoa57+5PFwaobiR+6IzEXcz4ZFRkxDd5tYOPGB0xaBr5JgZ6w0YwHjAilTws8hD2c3cgazuiIBvosa/zYzm8LfS/SX9Orn4deawnSS03iQtX6KtGXxolfaeBnkfpSZ9xtZoMju6zTFMmhOa0G9cNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777426928; c=relaxed/simple;
-	bh=v67v7KT5BIZDe+T4/abHvDx4Y87f8RhD9dCoqpqCDHk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YeZdT4b9B79ZvTYTGsK72QhXOLMuKGQNMmMwAlS4I4V53AdSKE+t/cA3MYnbkUGF+QLyLzIKL6UxPu2Jg+P7atboTZd63CVmJF9YRl3tuaArFvs4h/B890jzE5Q6KUBglalzqb5YXiVcpxEghGwQii/rILEfYj7e4nJjxNzxrjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kp+edf72; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xr++0uW3/aWfxubO3cxQcvyMCVatN4XOXUV5OwG2V2w=; b=kp+edf72edokyxU3mtqEnZKTr3
-	IdsBZ36KjZkY+e6Mq+wkNkDnqeAGDWrgyJ93hMP+ALlz9+l3ZutV6C30c3TTf1iuG0U5PLgIzieVn
-	XNbOI/kNLVqt5Yk26Maej/3KG2oCWZjyZb6Uwktr5gIfLqnUtIv8x4BMfVTQ1yt+/QTY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wHtw1-000Rgl-Lj; Wed, 29 Apr 2026 03:41:53 +0200
-Date: Wed, 29 Apr 2026 03:41:53 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: lizhi2@eswincomputing.com
-Cc: devicetree@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk,
-	pjw@kernel.org, palmer@dabbelt.com, aou@eecs.berkeley.edu,
-	alex@ghiti.fr, linux-riscv@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	maxime.chevallier@bootlin.com, ningyu@eswincomputing.com,
-	linmin@eswincomputing.com, pinkesh.vaghela@einfochips.com,
-	pritesh.patel@einfochips.com, weishangjuan@eswincomputing.com,
-	horms@kernel.org
-Subject: Re: [PATCH net-next v7 4/4] riscv: dts: eswin:
- eic7700-hifive-premier-p550: enable Ethernet controller
-Message-ID: <d662fa07-cd0f-48c4-a6e4-03c5fd390e92@lunn.ch>
-References: <20260427072353.1114-1-lizhi2@eswincomputing.com>
- <20260427072603.1191-1-lizhi2@eswincomputing.com>
+	s=arc-20240116; t=1777427018; c=relaxed/simple;
+	bh=Yb9zc5Unqbm55Kqcwq5GJE34VTgUMnFyUDUbA+hjqY8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nX3HnBJhA2/I9dXGFwkWBH6jBDpsRzoCuB4xT4BIgEej+6Ne/rJVID/qdebQYhwrqudkXjvT4Vt7c96Ye3z3+A7qMh08B1EFJ/BsdqXytO1b9W7AZOjb7fiDFSUGfAF9CsAg8qGbWmWTBuUIYG/bofc0D5DD+PNgG1HlaSih9m0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GUigyiPF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5516C2BCB7;
+	Wed, 29 Apr 2026 01:43:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777427018;
+	bh=Yb9zc5Unqbm55Kqcwq5GJE34VTgUMnFyUDUbA+hjqY8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GUigyiPFHwGr8sWDKONW22d34HdjsUYCDEGfyFYFpIqJO6wiXnQYdMOhfuf68vbDl
+	 JHXO/O1fKar7wE1BIvWHlAmCHSWHP4GZ8pgAxPlDICd1ue4VEhLvypmO0Jpzfw0bGm
+	 0iTjRByjX+tqpvMmPp0M5B9JSPQobTpqS6zroOA0K72bbiqwlvtCLsaQH6rLaULCUL
+	 bEuPIOmYrCBRGgQ3THNpRcMGhlV43kFnHK6s2weORHJEs0aHWl8S80Wo2/9R0e2rh7
+	 Pmy3QdoGE9xXBwaz97ui7fqNY5It2BlTi4UNSI6GAUTMqYc2f/j3UV4wHcMILtSA7B
+	 5XF4kNEO6v2vw==
+Date: Tue, 28 Apr 2026 18:43:36 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ daniel.zahka@gmail.com
+Subject: Re: [PATCH net-next 3/3] psp: validate IPv4 header fields in
+ psp_dev_rcv()
+Message-ID: <20260428184336.2244b6a1@kernel.org>
+In-Reply-To: <willemdebruijn.kernel.223eebd28b57a@gmail.com>
+References: <20260428205352.1247325-1-kuba@kernel.org>
+	<20260428205352.1247325-4-kuba@kernel.org>
+	<willemdebruijn.kernel.223eebd28b57a@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260427072603.1191-1-lizhi2@eswincomputing.com>
-X-Rspamd-Queue-Id: E718148E0CB
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: CB6FC48E12F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,dabbelt.com,eecs.berkeley.edu,ghiti.fr,lists.infradead.org,st-md-mailman.stormreply.com,bootlin.com,eswincomputing.com,einfochips.com];
-	TAGGED_FROM(0.00)[bounces-282186-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-282187-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	TO_DN_NONE(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-> +&gmac1 {
-> +	phy-handle = <&gmac1_phy0>;
-> +	/*
-> +	 * For the TX path of gmac1, there is a skew between the TX clock
-> +	 * and data on the MAC controller inside the silicon. This skew happens
-> +	 * to be approximately 2 ns. Therefore, it can be considered that the
-> +	 * 2 ns delay of TX is provided by the MAC.
-> +	 * No delay configuration for tx is needed in software via PHY driver.
-> +	 */
-> +	phy-mode = "rgmii-rxid";
+On Tue, 28 Apr 2026 20:22:34 -0400 Willem de Bruijn wrote:
+> Jakub Kicinski wrote:
+> > psp_dev_rcv() is called from the NIC driver's RX completion path
+> > before the frame reaches ip_rcv_core(), so the IP header has not
+> > been validated in SW, yet. We expect that the device has done
+> > all this validation, but let's also add the SW checks, to avoid
+> > surprises.  
+> 
+> If devices are expected to have verified this, should these be more
+> noisy checks, similar to netdev_rx_csum_fault?
 
-This is wrong. Take a read of
+Maybe "expect" is a bit of a strong word, I meant "anticipate" /
+"suspect". Dropping invalid packet in SW doesn't seem like a huge
+problem, other paths in this function already do. For rx csum the
+problem is that we got a incorrectly math'ed out value for what is
+likely a valid packet.
 
-https://elixir.bootlin.com/linux/v6.15/source/Documentation/devicetree/bindings/net/ethernet-controller.yaml#L287
-
-phy-mode describes the board. If the board provides the 2ns delay, you
-use rgmii. If the MAC/PHY pair needs to provide the delay, you using
-rgmii-id.
-
-If rgmii-id is used, it is up to the MAC/PHY to decide which will add
-the delay. If the MAC adds the delay, it needs to mask the value of
-phy-mode it passes to the PHY so it does not also add the delay.
-
-Your broken hardware means you cannot support 'rgmii' or 'rgmii-rx',
-since you cannot turn off this 2ns delay, so you end up with double
-delays if anybody designs a board with 2ns TX delay on the board
-itself. So please validate the PHY modes and return -EINVAL if these
-modes are used.
-
-    Andrew
-
----
-pw-bot: cr
+That's just to explain my thinking, if you prefer we warn / dump skb
+I can respin.
 
