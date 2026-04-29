@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-282184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282185-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SM0THWti8WnhgQEAu9opvQ
-	(envelope-from <netdev+bounces-282184-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:44:11 +0200
+	id cPzcENdh8WnhgQEAu9opvQ
+	(envelope-from <netdev+bounces-282185-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:41:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15DCC48E100
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:44:07 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id F18BF48E0AF
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:41:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2E7413080436
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 01:41:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 57B583003992
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 01:41:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB69F25F994;
-	Wed, 29 Apr 2026 01:41:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5839D258CE5;
+	Wed, 29 Apr 2026 01:41:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dYsu5qfx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ulrLN2sY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A1025CC79;
-	Wed, 29 Apr 2026 01:41:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1812571C7;
+	Wed, 29 Apr 2026 01:41:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777426864; cv=none; b=QK1dhnbCkNenZRSPhAsG7buqNe8NJmuWabZC464tTQOXkYCs0SX/grWPWO1htNo7EqpaeJvQuMAmKoBr9kMTMe1NmSFB8YoTGqXWbZCbRuG4QUG6PHhfWxhX33yQMkdL7q36UIo2YfQpsZxvHbYjRD1TDlFHb0K+B4RcxEcOFps=
+	t=1777426869; cv=none; b=HZMgV20Ulwfdogbb+urGsOstoRDfDehUyBW/OP+YBo0zRPLvJVGbCs08JnjkJ0Mk5+OeOxzAnKbrenzFXMuBvXvftVI4McKzY+exIYHD2OQDeuyTc/V3o0au1aKdH7MhtzTcJ/uUot65N6NBlSsNzCzV84m/6NnS7FLqHEicr3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777426864; c=relaxed/simple;
-	bh=b11SGdH0FsTnTNE4pNU/h3ZTWlCwDvtiUgKtozYLqAQ=;
+	s=arc-20240116; t=1777426869; c=relaxed/simple;
+	bh=ZufN4XiT3cEF3/MnkweTt+1XxyC1FpruRMf/3bTu5sY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lOZD8adcw1iSfuheTz4k7va2Ypk9oGiTuFoXg2qqVshvPaekVsIhSdAWnbshcbfzG07vI1slMgGgUn60zt7QcGSP7cQUGk9HVKfOO8CSQrG1kUbEhduoOdhGHOyg/iQpYExCE2Wv6E0nfUBfkX8XMDi22rrXwbBpktQYLAmbofE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dYsu5qfx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82805C2BCB7;
-	Wed, 29 Apr 2026 01:41:04 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=DiAvjZlyaCCYNFc7DeAgQbkLfbEC5jT/ddgjfZJEaCRsH5QEypi85x8fvG6Os75Os3Ie2eMyCuX391i7/t0ib2iAAORXgEAwtBSH5Co+1b8JrzrrVGdtZOQ4R9gPdrdbHFr6morSLMGmXA9N3H+BYapLlrlzYOhpFAni2Vc5R1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ulrLN2sY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCA75C2BCB9;
+	Wed, 29 Apr 2026 01:41:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777426864;
-	bh=b11SGdH0FsTnTNE4pNU/h3ZTWlCwDvtiUgKtozYLqAQ=;
+	s=k20201202; t=1777426868;
+	bh=ZufN4XiT3cEF3/MnkweTt+1XxyC1FpruRMf/3bTu5sY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dYsu5qfxlbNVzNlvJnWw4lDlFj8hwTFRaV0FUlqhDJrvnkOhXpZ9rEEf0MgWfusn3
-	 4LF4Zn43srcD7iHMJOY+fZAaYWZeHW+9A5Gxy26/SQg7cOaDqgX4qEu5FKSY39B+a4
-	 IB9WtQ577pIiItpJCL6X5R3Pb+DC24n3Ox13FBRWvyW414nQpQboByEfyF2+4kYVoK
-	 dCM4vsSUzfZoKfYcdPoO448aeztqwaJwSDis9+5QyzrHTSsJIHh8ZES1ppmuvDjgVj
-	 WhgkATC4NfmZzb8twEDD59PgiR8zhwconLD7KThyZFdKBTNeCYxvzzMPP48KXyQEUm
-	 31TOBN4aBqmPw==
+	b=ulrLN2sYRdRw10f88Xd+A0bNorZTVDpY9x4g6DQAONVa/Hf71NRuvJ8ZsRrZI/RU1
+	 Vw2TFc2UFO7kKnfqJuOyXC5VQYm3OOo8baS2E12jKin7fjf56BeiM7HTaizAnUjD0E
+	 JH47Pjftu5I6fVpUImlOmII/KsTuFs/iTAocACknzCc7pFkH8/4P7RYU5o4GVyMr3G
+	 bMX0ceF85/F+o7EGq1nPwVtT32OSaRBPPv86DbylBl8mgTtQOzGaGW7rs5735r10y+
+	 +jQN/tXzsrAnjYr+u8D+T1LJeU7vVaBLLm3607wuhgZkEbgY02EOoFeu+fnFh3gyAy
+	 keG7QSteAMEGQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02E0139302C2;
-	Wed, 29 Apr 2026 01:40:22 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FDC539302C2;
+	Wed, 29 Apr 2026 01:40:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,77 +55,69 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 0/4] netconsole: configfs store callback fixes
+Subject: Re: [PATCH net-next] ppp: add PPPOX symbol
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177742682054.1291511.6093516123446754481.git-patchwork-notify@kernel.org>
-Date: Wed, 29 Apr 2026 01:40:20 +0000
-References: <20260427-netconsole_ai_fixes-v2-0-59965f29d9cc@debian.org>
-In-Reply-To: <20260427-netconsole_ai_fixes-v2-0-59965f29d9cc@debian.org>
-To: Breno Leitao <leitao@debian.org>
+ <177742682479.1291511.12607684897778641027.git-patchwork-notify@kernel.org>
+Date: Wed, 29 Apr 2026 01:40:24 +0000
+References: <20260428012830.3069-1-qingfang.deng@linux.dev>
+In-Reply-To: <20260428012830.3069-1-qingfang.deng@linux.dev>
+To: Qingfang Deng <qingfang.deng@linux.dev>
 Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, k-keiichi@bx.jp.nec.com,
- satyam@infradead.org, akpm@linux-foundation.org, thepacketgeek@gmail.com,
- asantostc@gmail.com, gustavold@gmail.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-team@meta.com, horms@kernel.org
-X-Rspamd-Queue-Id: 15DCC48E100
+ kuba@kernel.org, pabeni@redhat.com, julianbraha@gmail.com,
+ ebiggers@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-ppp@vger.kernel.org
+X-Rspamd-Queue-Id: F18BF48E0AF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282184-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bx.jp.nec.com,infradead.org,linux-foundation.org,gmail.com,vger.kernel.org,meta.com];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-282185-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FROM_NO_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:email]
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 27 Apr 2026 07:30:34 -0700 you wrote:
-> V2 for issues in netconsole's configfs store callbacks.
+On Tue, 28 Apr 2026 09:28:26 +0800 you wrote:
+> Add a dedicated CONFIG_PPPOX symbol to handle the PPPoX generic module,
+> avoiding redundant pppox.o definitions in the Makefile.
 > 
-> There are still some changes I want to make, such as, having the dynamic
-> lock when reading from configfs (_show() callbacks), wich will solve
-> other issues, but I will keep it for later.
-> 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> 
-> [...]
+> Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
+> ---
+>  drivers/net/ppp/Kconfig  | 6 ++++++
+>  drivers/net/ppp/Makefile | 6 +++---
+>  2 files changed, 9 insertions(+), 3 deletions(-)
 
 Here is the summary with links:
-  - [net,v2,1/4] netconsole: return count instead of strnlen(buf, count) from store callbacks
-    https://git.kernel.org/netdev/net/c/d62c6f2df5c0
-  - [net,v2,2/4] netconsole: avoid clobbering userdatum value on truncated write
-    https://git.kernel.org/netdev/net/c/e6dd94252b0f
-  - [net,v2,3/4] netconsole: propagate device name truncation in dev_name_store()
-    https://git.kernel.org/netdev/net/c/92ceb7bff62c
-  - [net,v2,4/4] netconsole: restore userdatum value on update_userdata() failure
-    https://git.kernel.org/netdev/net/c/869cd6490faf
+  - [net-next] ppp: add PPPOX symbol
+    https://git.kernel.org/netdev/net-next/c/09942ddedcb9
 
 You are awesome, thank you!
 -- 
