@@ -1,203 +1,329 @@
-Return-Path: <netdev+bounces-282299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282300-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CIhiA3TB8WkbkQEAu9opvQ
-	(envelope-from <netdev+bounces-282299-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 10:29:40 +0200
+	id QMtANiXC8WkbkQEAu9opvQ
+	(envelope-from <netdev+bounces-282300-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 10:32:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC2584912F3
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 10:29:39 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75BB849137C
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 10:32:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C744A30164F1
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 08:29:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DB7683057C72
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 08:29:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95EDB3B3BE6;
-	Wed, 29 Apr 2026 08:29:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBDC63B27FA;
+	Wed, 29 Apr 2026 08:29:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="UNIzo59C";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="jnws1Hw1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eJI/M43M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B323B27DE
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 08:29:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777451347; cv=none; b=ciXgq8jyBYAeyj04IxNHJ/TLl3KybeRf2fNzFsLJIsFZ+gkt01mIIGEU2uLQIQQSj2Y1mfs7Thd65Inf2x4aE+01tpKa1ttdczcKGXRa4p9Sky9Js1kxfiPK5qe+Xv/fF1BGH1dugcoxGv07axsspAGgkoT7U2TQLKrngA0m4sI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777451347; c=relaxed/simple;
-	bh=NMbmUa/Z/P8s1i+9J9SWnpDqu/ZnM5WIaLzDgULOUOg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=en8WpjZCp6pG96/yjGnzV1VjfmofSAHq2P5BtX3fBgwhAor6m8M+ynlg5dhUhYj3EIKwyvrTQzFmeH5xTV7uHfzRUgeAZYlcQCvstAFWI1Ydu/j4rtPeo8S9pcLJZghtKGKwq/yIr4gsbr5gxJn/poRa9LQttCjhktSIYOaLdqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=UNIzo59C; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=jnws1Hw1; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63T6ExqY1281962
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 08:29:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	VlD6Drlg3A7sUzQoyWrCGwHxyeMtG1KLVPsv3qmuRxM=; b=UNIzo59COmbRk+I9
-	lRVW/wcxw3B09B/UKEnF9Q308iJ4di+UEodyA1hKRVHhgwy/+6u1DRV9Vt8G69C+
-	5pIihZNK3rxgQULbf2c+tHe12pBtggH2fsDodFV2WehImHMVhmsj0arfsaA+1lNj
-	nNAc1CysprUxHX0NOHzcdmM7EwYIT5CSSOsujNAy5GiK0hikOJyDoKgfwEP5LgVI
-	9R+xbsQE1tsQ2gbbI+PlKM+1sq7l8+YOZ0O0C67HPt4e+Qr8oBWL+1bwkLdCfqXX
-	OQRMsetxeopojSy3DWBGltTstPtmEnsM3TSOP9bEKvp3m71KR/smngx394wx38Tp
-	qvOuww==
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com [209.85.216.72])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ducj80jy0-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 08:29:03 +0000 (GMT)
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-3594620fe97so27575691a91.1
-        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 01:29:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5032D3B19D7
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 08:29:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777451365; cv=pass; b=YmIhlc2syaqnbHjjMvRl5cJIVAr5gHTjNwjlKEef/Dze0ucbjMzPc3xWG451KiTnYqbL4gKd/SJ5pvE35oDDi5zDRswo+YYob8ffQZea9bF/+KJ+Of6l+/M9Lyil4qJHqmAduxgvoaAwMclI/QNV0f49eDJQU/SLYXWdxmZjTAE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777451365; c=relaxed/simple;
+	bh=/Gwm6v/TijAsffL2OxDtjOUdBTDbHCA9DZqpqs3v1rY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=loMqUtsIM399uz67A0pgsoNaoYX6wRnw8bvKzNO0IeZtMN0CwkluRgOg4tfrHGDCMCtjou5NGHtdRNzAMIQ2RQg0letpps2M+0efta+cvMNopXFlE3dWz+KDAgotF+sS6KbCOeQNG2CJYfYiuzceXx+wwUT0lXkPaBQRrQZ/86c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eJI/M43M; arc=pass smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-66ba9dfe83bso15335875a12.3
+        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 01:29:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777451362; cv=none;
+        d=google.com; s=arc-20240605;
+        b=M5vvNSPIaoi4HYh2Y6jORqX2Ia4vpsJgonf8arBfrq0lz9O568fITgZbDjX+LCMbE2
+         imy0kguEv75y1YFJ7CXrCVaZoyIk9c5ic0CuwqbpIhWmb/JJ7HMhBEjNKnpHk6IL9czb
+         MbyhbsI3WDpBxDA3gIzlmENGiOKt1KFJrYDe3YFKdwQnY1M2Zd3xi9oDIoUJWfTY+nI4
+         tpe7itxQt7hLIq/Yah72hkVTzIEY4d2lmnRRKRu9Mxnorhn0lsVd0ihhr1dAzfcopjjm
+         cfxvhj/4sYPp49CQZxyXPA4lGVue9A/+gnnP11qcxjxo4/0veMVpI1M8wSXSZN1Sf/Jp
+         v/Hg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=zG15aGf0OE+kY43cX7iltj+gfDWHix1TD45tz4xvz3g=;
+        fh=YM51lkGkELBPHe2P7CjRCMKDnkQ8LerNEGmeN/AJaS4=;
+        b=SUnrgj6IzobY09uhtAdNLvfCIWB2zzZYkG2o7+UzDxmvd2bVAcuub5z2dVDuXVyHYK
+         zCBJyAOhOVDXfxYeVq0sYcujEAKYTO0jXOo7GTlMxfxaRF5c780aDGhfoyS6YS0YILg2
+         2CNxe39qRo7p947303svZmG5yEzCcQXxS0j7u1LjbwSDtz5hbRP+xSgdgHhyDvlTJXcd
+         DK42MFNfzTFOQzr3i08ZbgrZ3vFMzZ0CMI1Rw+lk28eKZFpmb4ILndSNA1NyINtEzXqr
+         p3AeUCHlFIKWIwfqyRtozAZV3BmsixEdKA6nAamAA+pOq0JaXPWGqxUztlwybtVNUdoF
+         Sliw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1777451343; x=1778056143; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VlD6Drlg3A7sUzQoyWrCGwHxyeMtG1KLVPsv3qmuRxM=;
-        b=jnws1Hw1G/SVrladfDA2BjGw/1Oy0iZm0pihCeTVNN2tM/EAmPcniX3Il/Jj59M080
-         clIOhtvao6/FjLvHGEUdrwdmKbBE6Q6+km77an4x66P+A8rz6aCey425k7jWaMQrEgKu
-         4kFDdJHn6EjnqiAyKMc92GmF9W7OFGD9/QBz61xqTQJlQdRohnNt0nAa49zU1r1lgPPp
-         ed/CiclzzcQyBW2+gzVreJ4g9/ZLLbPIh6hF2uuYrjC+MJqnjOO5Iy/UzkMAxG1ATQHz
-         vJT1iSPw4bapmn+FWdIGUwOYWqFOx3em2JKhUQWRCRz+l6oI2YhKoJk0FvvyKamva4OB
-         UJSQ==
+        d=gmail.com; s=20251104; t=1777451362; x=1778056162; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zG15aGf0OE+kY43cX7iltj+gfDWHix1TD45tz4xvz3g=;
+        b=eJI/M43MdSFA42iBw3LhW0gYxnPQYtaplpVyvffn8tOIZK0BGz1ijtv4tjStAM6E0A
+         Iq7ceW9MSidfXv8sH/CnzQf4tPVmOcwYRoXtXEbWpamU9ehUk9lMsqtC+bKQymck1lEf
+         Ng/Zh1ccvZ7U3hThAi1hKJ3sL3WNk8YdhHT54UTbcsihXcZi1ae7WZsa8k8hiDXe4dyN
+         bW9oKv/gflJsi6eD32DUtWwTiuA1E3rDERXWNMqx2k3CsOfLV0jRT+lEbUJg6uTYJVax
+         vxnUuyfwPKT3iitOEXXgeJo9e+2sz4d+dySsQnBH/3P5VhqegQHHpF6xItzjOSHaKwS0
+         x8Yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777451343; x=1778056143;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VlD6Drlg3A7sUzQoyWrCGwHxyeMtG1KLVPsv3qmuRxM=;
-        b=q+J5coQR+z6pCawtICVJsZTfttA5ymfhC6C7q01Cmc15h+TDxbiRkmaXRroot25Xze
-         MTJXyHBtYd02YxECh6oCuF7nOOw5czPrcfw2nPWGlSonv/Mo8//1f1f25vx4am6Pks8T
-         CsJQPufhU+Oxx8QWx9/oKk252n0DrR6XhtQypXWEbCD4hrFjJorC+/RSnUIva4rkCYUn
-         DFittywj0/roElC7E0JNHQx7QiMF9RHEqlod3JmuqeHq7Wrc0CGqoHEjsyOs1zG8+nYk
-         Q/IjgO923SJBrqd4fjLNSIRUz65Q2pxmp7L6F0F6ZNpUkpfBPMemkmLHyrAR0eHo/gVl
-         Fz+Q==
-X-Forwarded-Encrypted: i=1; AFNElJ8rRKEIKW5obNUSLd2kRNKRXHhZ90oyy+5J0Mq5geIs2lMUuTC8olzkRk14G5uMl/MPZDHNNSU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfcvncxR+yiNHWzEfceihMk7NqyUm3kxp5zkQglZvbnFzbDfp4
-	iNsKV9aj3c9HRqrfH9zoiQn1xS8cOYRki2i0zIlEBR3F/aZVZIIKlvMa3KHpajz4EIj4IuqZ3KR
-	8/G6YM2hNkv3q7HzpLv90qv0E8rqb44e24JrIx0QrQgWKYZPWNtgw4KWB0Bo=
-X-Gm-Gg: AeBDietx+e+uMhuWhwD0U4bp0cM6sX2JdAQKLQzQhkPcmlCHkopmvl1AusbXulem94+
-	fsA/S54k7ErT3axc4NCqq4vt91/zPNFxAYfZLTMwxBkVTOcA6/XctDxyj8rPrEnpHRcs9XfzzI9
-	GwTXJQ5wlyp0j8fKHH1t9sq9c527wWAJu/2VWbWBTdewYfX13LAD5aoWlHxMjoZAXdR3+DQje5Q
-	MNNonXWuTPMBhZ34HQ/0U5oa2Haa43IeZmB/tz/8hpqv1HfPLyO/m1sG4iIdQxx6n/lhoFbHmMy
-	DbYIQ4/uyepB6gMMSMeugZDG09/K9aL9sJpcb5RS1uDKYyOPUZCBT55UC0G+TQd/xCL49QYJv93
-	FNnKxDc/6fdSAntTYmh4eLNJRsrT6JR4QpgdTIWLLSBmBKfWFLQliBcVHiwUN7slFb602gj9u2T
-	rsiK0JiMOu9Q8BOkuLRyILYvMBTF7acn1MlKuSnC8CB/+gscgHl1A=
-X-Received: by 2002:a17:90b:4b8f:b0:359:8de8:1229 with SMTP id 98e67ed59e1d1-364921bfab3mr7376155a91.21.1777451342805;
-        Wed, 29 Apr 2026 01:29:02 -0700 (PDT)
-X-Received: by 2002:a17:90b:4b8f:b0:359:8de8:1229 with SMTP id 98e67ed59e1d1-364921bfab3mr7376128a91.21.1777451342309;
-        Wed, 29 Apr 2026 01:29:02 -0700 (PDT)
-Received: from [10.190.200.117] (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com. [103.229.18.19])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-364a41520dbsm1396271a91.3.2026.04.29.01.28.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Apr 2026 01:29:02 -0700 (PDT)
-Message-ID: <cc4380d0-d9b3-47d3-bc80-1c970ee7a5ea@oss.qualcomm.com>
-Date: Wed, 29 Apr 2026 13:58:56 +0530
+        d=1e100.net; s=20251104; t=1777451362; x=1778056162;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=zG15aGf0OE+kY43cX7iltj+gfDWHix1TD45tz4xvz3g=;
+        b=Zylsv9nDs6akIu3xKABH1zLG7t3tlTdfCsDAkTSrSNp3qidbMbjYNG73ULRYitMFTg
+         QQrs4by1mlez803xENbK/9jEr6EGXWbgtzEesCJT0zVdcLFRccLwqcws+vIOzrNz/60x
+         uz8o9IoyWwnYYAjtaCW2q6wVOKsl+irPYm9W7kTsGG7mcueaJzK0ge2E1OxgpYnAnc/o
+         tZvfMb2hM49aJT0i4AX7vfZjjDV7P8WVsgLJLxlT6vDY8vEwmjESxOIox+Se+buIi+sY
+         QxlEZLCtPsJLjA1w2/HKhOPZzXPtQk8xN/y7UV6RbcS2pxV0uGO21wJVhdClCGxFViJ7
+         glfg==
+X-Forwarded-Encrypted: i=1; AFNElJ+/O7MvHcnVRe7tLRb4EI2xAfqzFkxMbimB5/bQ7uRiO0BNV7OVpFPjG8e9SyUPqQVMTgUkGck=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAnlfnwPoAY+K4B9490MtdFJ/fQrbexXE+fRZ82d9vlfFZeLqV
+	KvSotoeHBWaF/KYNQpLWeMszqA3SHmNllQ6w3vbKFv9mYcvd8xLRVG9FgH5Xo883FawnDtv36BX
+	7tctgx8W1Ipa7jc2O5f+1IZwFDY9KDVA=
+X-Gm-Gg: AeBDietBu1ct8AsaQpdvqlgbMCxOxZJluyDQHlPFoFzIHj+/AwfabLMhkrZbBbzN4X1
+	u5zAV7yJUSa08FvIv0cnv65yr8QJ/9jsIcnkZp3T3RPzPc65alk7JzYwz6EOuZ5BytX10p9WQBS
+	utx+yB8x1b696JgJx22WF3Jl6rHLFuh9hO+O7v/zbaJ+qfFsZVkN1PmxqAhomVYbQGOiP3566Rp
+	ZW6xpevjvwAvKmfA3SgSzL3/7frPbJNxhY14nO9Ow8owS76ahLt+LY83R7G/UzGr6U9wGJQtRDG
+	6qa/C71gMrBewVI/UMHZiA+SRb1/Um3XPcRI+/ogXWK0sVei8w==
+X-Received: by 2002:a17:906:ef0c:b0:ba7:62f:9fa6 with SMTP id
+ a640c23a62f3a-bb8018de3eemr369720766b.2.1777451361410; Wed, 29 Apr 2026
+ 01:29:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/2] pinctrl: qcom: add the TLMM driver for the Nord
- platforms
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Linus Walleij <linusw@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Bartosz Golaszewski <brgl@kernel.org>,
-        Shawn Guo <shengchao.guo@oss.qualcomm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Cc: linux-arm-msm@vger.kernel.org, linux-gpio@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-References: <20260428-nord-tlmm-v3-0-f16f08d084cc@oss.qualcomm.com>
- <20260428-nord-tlmm-v3-2-f16f08d084cc@oss.qualcomm.com>
-Content-Language: en-US
-From: Pankaj Patil <pankaj.patil@oss.qualcomm.com>
-In-Reply-To: <20260428-nord-tlmm-v3-2-f16f08d084cc@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: 68OBSpnhsusOMrP1BIaDVLIF5AZEd6Z6
-X-Authority-Analysis: v=2.4 cv=RI6D2Yi+ c=1 sm=1 tr=0 ts=69f1c14f cx=c_pps
- a=RP+M6JBNLl+fLTcSJhASfg==:117 a=Ou0eQOY4+eZoSc0qltEV5Q==:17
- a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yx91gb_oNiZeI1HMLzn7:22
- a=EUspDBNiAAAA:8 a=HC_c-dvtGznJx1dPDJUA:9 a=QEXdDO2ut3YA:10
- a=iS9zxrgQBfv6-_F4QbHw:22
-X-Proofpoint-GUID: 68OBSpnhsusOMrP1BIaDVLIF5AZEd6Z6
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI5MDA4MyBTYWx0ZWRfX2KCwRy+uv21U
- hBoYBfIbnY/9wWgNp5Qg+Ed6sCdPCu/z9KFdEsuZl7NzNrLnU5oeyIV0tGxpJ/QtDxCGB9gV7R4
- v7RGpErCzZ5/y4/rTPIicH8t5vPP8LOmSBlXZta1zIWL9pP1yYZJ6Ll4nTsCVoYKIyq7cKbalD8
- SkwhfCC2BAQ17ssgCGlTNfSmZODxzF81Up+Y0rqueJ2IN51F6lZ5vn6ifDXuBFORpLFVjqMu3Zz
- GYfmTnwTFRHYck6Uzea0ENtLRdIxNmz1PjLVJ9yPcMRmE8lDkH/9TapX0MEtrXQ/7XQS888guBe
- FwUZlG8cd99vPU77zhlYCo5OUXGbg64Pyk0tPL+779tsBJoVuMVYBfqCpGFlHr6iYWDhg8AN2Wv
- Hox4EfutEZ+1AKnDl/vUz1um6mReEP3kq/iN/02vUexeLgvdZgcv2KIkHPMSZxtg63Y3sj8Aw9U
- 6G9gG3qlzaBpEWB+/JA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-28_05,2026-04-28_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 priorityscore=1501 malwarescore=0 suspectscore=0
- lowpriorityscore=0 adultscore=0 clxscore=1015 impostorscore=0 bulkscore=0
- spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2604200000
- definitions=main-2604290083
-X-Rspamd-Queue-Id: AC2584912F3
+References: <CAFRy_Hg8O9smcwzWTdBn6j6NLwv+8vBXKtm2KTsOoG1CjxC2Dg@mail.gmail.com>
+ <afGug2nzdfjEGHxO@secunet.com>
+In-Reply-To: <afGug2nzdfjEGHxO@secunet.com>
+From: Michal Kosiorek <mkosiorek121@gmail.com>
+Date: Wed, 29 Apr 2026 10:29:10 +0200
+X-Gm-Features: AVHnY4LqoTY5DkMiKXlxQ8n9WkREu7CVtiTGqR0WHoa-ov-VwakT5YntKk-n-_w
+Message-ID: <CAFRy_HgkpfzxtJEJWRa=wfJ+m_++FbGsaezywRXQWt7uhkKoTQ@mail.gmail.com>
+Subject: Re: [PATCH] xfrm: protect __xfrm_state_delete against double-unhash
+ of byseq/byspi
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Greg KH <gregkh@linuxfoundation.org>, sd@queasysnail.net, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 75BB849137C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282299-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
-	FREEMAIL_TO(0.00)[oss.qualcomm.com,kernel.org,gmail.com,arndb.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pankaj.patil@oss.qualcomm.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-282300-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mkosiorek121@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,secunet.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-On 4/28/2026 7:18 PM, Bartosz Golaszewski wrote:
-> Add support for the TLMM controller on the Qualcomm Nord platform.
-> 
-> Co-developed-by: Shawn Guo <shengchao.guo@oss.qualcomm.com>
-> Signed-off-by: Shawn Guo <shengchao.guo@oss.qualcomm.com>
-> Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-> ---
->  drivers/pinctrl/qcom/Kconfig.msm    |    8 +
->  drivers/pinctrl/qcom/Makefile       |    1 +
->  drivers/pinctrl/qcom/pinctrl-nord.c | 1771 +++++++++++++++++++++++++++++++++++
->  3 files changed, 1780 insertions(+)
-> 
-Reviewed-by: Pankaj Patil <pankaj.patil@oss.qualcomm.com>
+v2 addresses your two points:
+  - Added Fixes: tags (fe9f1d8779cb for byseq, 7b4dc3600e48 for byspi).
+  - Rebased on ipsec.git master (HEAD fa90a3145c03), `git apply --check`
+    clean. Same hunk applies to torvalds/master without changes.
+
+Also added `Cc: stable@vger.kernel.org` per stable-kernel-rules.html
+Option 1, since the Fixes: tags otherwise leave AUTOSEL doing the
+disambiguation work alone.
+
+Patch follows.
+
+---
+
+KASAN reproduces a slab-use-after-free in __xfrm_state_delete()'s
+hlist_del_rcu calls under syzkaller load on linux-6.12.y stable
+(reproduced on 6.12.47, also reachable via the same code path on
+torvalds/master and on the ipsec tree). Nine unique signatures cluster
+in the xfrm_state lifecycle, the load-bearing one being:
+
+  BUG: KASAN: slab-use-after-free in __hlist_del
+include/linux/list.h:990 [inline]
+  BUG: KASAN: slab-use-after-free in hlist_del_rcu
+include/linux/rculist.h:516 [inline]
+  BUG: KASAN: slab-use-after-free in __xfrm_state_delete net/xfrm/xfrm_stat=
+e.c
+  Write of size 8 at addr ffff8881198bcb70 by task kworker/u8:9/435
+
+  Workqueue: netns cleanup_net
+  Call Trace:
+   __hlist_del / hlist_del_rcu
+   __xfrm_state_delete
+   xfrm_state_delete
+   xfrm_state_flush
+   xfrm_state_fini
+   ops_exit_list
+   cleanup_net
+
+The other observed signatures hit the same slab object from
+__xfrm_state_lookup, xfrm_alloc_spi, __xfrm_state_insert and an OOB
+write variant of __xfrm_state_delete, all on the byseq/byspi
+hash chains.
+
+__xfrm_state_delete() guards its byseq and byspi unhashes with
+value-based predicates:
+
+if (x->km.seq)
+hlist_del_rcu(&x->byseq);
+if (x->id.spi)
+hlist_del_rcu(&x->byspi);
+
+while everywhere else in the file (e.g. state_cache, state_cache_input)
+the safer hlist_unhashed() check is used. xfrm_alloc_spi() sets
+x->id.spi =3D newspi inside xfrm_state_lock and then immediately inserts
+into byspi, but a path that observes x->id.spi !=3D 0 outside of
+xfrm_state_lock can still skip-or-hit the byspi unhash inconsistently
+with whether x is actually on the list. The same holds for x->km.seq
+versus byseq, and the bydst/bysrc unhashes have no predicate at all,
+so a second __xfrm_state_delete() on the same object writes through
+LIST_POISON pprev.
+
+The defensive change here:
+
+  - Use hlist_del_init_rcu() instead of hlist_del_rcu() on bydst,
+    bysrc, byseq and byspi so a second deletion is a no-op rather
+    than a write through LIST_POISON pprev. The byseq/byspi nodes
+    are already initialised in xfrm_state_alloc().
+  - Test hlist_unhashed() rather than the value predicate for
+    byseq/byspi, so the unhash decision tracks list state rather than
+    mutable scalar fields.
+
+Empirical verification: applied this patch on top of v6.12.47, rebuilt,
+and re-ran the same syzkaller harness for 1h16m on a previously-crashy
+configuration that produced ~100 hits each of slab-use-after-free
+Read in xfrm_alloc_spi / Read in __xfrm_state_lookup / Write in
+__xfrm_state_delete. After the patch, 7.1M execs across 32 VMs at
+~1550 exec/sec produced zero xfrm_state UAF/OOB hits. /proc/slabinfo
+confirms the xfrm_state slab is actively allocated and freed during
+the run (~143 KiB resident), so the fuzzer is still exercising those
+code paths -- they just no longer crash.
+
+Reproduction:
+
+  - Linux 6.12.47 x86_64 + KASAN_GENERIC + KASAN_INLINE + KCOV
+  - syzkaller @ 746545b8b1e4c3a128db8652b340d3df90ce61db
+  - 32 QEMU/KVM VMs x 2 vCPU on AWS c5.metal bare metal
+  - 9 unique signatures collected in ~9h, all within xfrm_state
+    lifecycle
+
+Fixes: fe9f1d8779cb ("xfrm: add state hashtable keyed by seq")
+Fixes: 7b4dc3600e48 ("[XFRM]: Do not add a state whose SPI is zero to
+the SPI hash.")
+Reported-by: Michal Kosiorek <mkosiorek121@gmail.com>
+Tested-by: Michal Kosiorek <mkosiorek121@gmail.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Michal Kosiorek <mkosiorek121@gmail.com>
+---
+ net/xfrm/xfrm_state.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index 1748d374abca..686014d39429 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -818,17 +818,17 @@ int __xfrm_state_delete(struct xfrm_state *x)
+
+  spin_lock(&net->xfrm.xfrm_state_lock);
+  list_del(&x->km.all);
+- hlist_del_rcu(&x->bydst);
+- hlist_del_rcu(&x->bysrc);
+- if (x->km.seq)
+- hlist_del_rcu(&x->byseq);
++ hlist_del_init_rcu(&x->bydst);
++ hlist_del_init_rcu(&x->bysrc);
++ if (!hlist_unhashed(&x->byseq))
++ hlist_del_init_rcu(&x->byseq);
+  if (!hlist_unhashed(&x->state_cache))
+  hlist_del_rcu(&x->state_cache);
+  if (!hlist_unhashed(&x->state_cache_input))
+  hlist_del_rcu(&x->state_cache_input);
+
+- if (x->id.spi)
+- hlist_del_rcu(&x->byspi);
++ if (!hlist_unhashed(&x->byspi))
++ hlist_del_init_rcu(&x->byspi);
+  net->xfrm.state_num--;
+  xfrm_nat_keepalive_state_updated(x);
+  spin_unlock(&net->xfrm.xfrm_state_lock);
+--=20
+2.54.0
+
+
+=C5=9Br., 29 kwi 2026 o 09:08 Steffen Klassert
+<steffen.klassert@secunet.com> napisa=C5=82(a):
+>
+> On Tue, Apr 28, 2026 at 09:53:45AM +0200, Michal Kosiorek wrote:
+> ...
+> >
+> > Reported-by: Michal Kosiorek <mkosiorek121@gmail.com>
+> > Tested-by: Michal Kosiorek <mkosiorek121@gmail.com>
+> > Signed-off-by: Michal Kosiorek <mkosiorek121@gmail.com>
+>
+> Please add a 'Fixes:' tag so the patch can be backported
+> to the stable trees.
+>
+> > ---
+> >  net/xfrm/xfrm_state.c | 12 ++++++------
+> >  1 file changed, 6 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> > --- a/net/xfrm/xfrm_state.c
+> > +++ b/net/xfrm/xfrm_state.c
+> > @@ -758,16 +758,16 @@ int __xfrm_state_delete(struct xfrm_state *x)
+> >
+> >   spin_lock(&net->xfrm.xfrm_state_lock);
+> >   list_del(&x->km.all);
+> > - hlist_del_rcu(&x->bydst);
+> > - hlist_del_rcu(&x->bysrc);
+> > - if (x->km.seq)
+> > - hlist_del_rcu(&x->byseq);
+> > + hlist_del_init_rcu(&x->bydst);
+> > + hlist_del_init_rcu(&x->bysrc);
+> > + if (!hlist_unhashed(&x->byseq))
+> > + hlist_del_init_rcu(&x->byseq);
+> >   if (!hlist_unhashed(&x->state_cache))
+> >   hlist_del_rcu(&x->state_cache);
+> >   if (!hlist_unhashed(&x->state_cache_input))
+> >   hlist_del_rcu(&x->state_cache_input);
+> >
+> > - if (x->id.spi)
+> > - hlist_del_rcu(&x->byspi);
+> > + if (!hlist_unhashed(&x->byspi))
+> > + hlist_del_init_rcu(&x->byspi);
+> >   net->xfrm.state_num--;
+> >   xfrm_nat_keepalive_state_updated(x);
+> >   spin_unlock(&net->xfrm.xfrm_state_lock);
+>
+> This does not allpy to the ipsec tree. Please
+> rebase on the ipsec tree and resend.
+>
+> Thanks!
 
