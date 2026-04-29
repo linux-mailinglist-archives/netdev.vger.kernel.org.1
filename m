@@ -1,161 +1,100 @@
-Return-Path: <netdev+bounces-282495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282496-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MJdqHuhy8mnVrQEAu9opvQ
-	(envelope-from <netdev+bounces-282495-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:06:48 +0200
+	id QGidCmxy8mnSrQEAu9opvQ
+	(envelope-from <netdev+bounces-282496-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:04:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8918C49A643
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:06:47 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83A8849A5B0
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:04:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 11FE53031833
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 21:03:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9E26A3002F6B
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 21:04:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28BBD388E46;
-	Wed, 29 Apr 2026 21:03:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MVLDABHH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B81138C2A7;
+	Wed, 29 Apr 2026 21:04:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B104024EAB1
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 21:03:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92FA839658A;
+	Wed, 29 Apr 2026 21:04:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777496630; cv=none; b=J1KJmtcJeKFqpoxubToE718bl3kHbODYT7kbK17Ptfrje7QYm2s9LjeRtAhcyowxg82f4lH0CAAUy1AMRZMozk//fmVRSzk14MqP0ffj3XHTUGhuYZZ5O/A3D3Ro4kecl+sedTXIhnqyqf/jcFzjTiES8ZoRbuGVECkTPKLUBlc=
+	t=1777496679; cv=none; b=ddeagO12xlCVmJ0yFUPjjE4Pk1Cq7CMzdwQ7vpPtfannw6viExUJBYNjHpoZ6vvM+UEfKd9NjOBUD/JUCXMGB2U/Gs9S2o8oqprWW7L+7zaMUXfC30GfotNuq+4XzPGcv9AxmrqXu/WhhVNG8wxJ/IaNv8JcZl5Of0WrIfPzonw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777496630; c=relaxed/simple;
-	bh=2aA3uWTswagHEVLFA8v5skfAX/JT54EYEV9OQ+OofHQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Pnt6MLVfD2vMz3LpusH8QxHABv1j+5084Q0PuIpZrkD4H/XVzo2T0dKPMgP+5JockAebQ25hpf9xY1aLAGKo0oxN0yUOWPLOStDQALLpoUlwzBHf61sFwZRzjaq3xRAQY0vi0nj/DIsEpauGCb2JSgVIuLNnELfPM+jnxYTctnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MVLDABHH; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-488ad135063so1669185e9.0
-        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 14:03:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777496627; x=1778101427; darn=vger.kernel.org;
-        h=mime-version:content-transfer-encoding:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9eaYTnlxpHCY09/j5CrSkFztBrg3e6wlR9rFliILkCQ=;
-        b=MVLDABHH2s+wca68H4L+y5daBBNCnTUMhWl6HRklW6MSdEAY4a6yOrY5kF9H2KYkxy
-         nMNeIbT2Bp9W649poDIzsnnBlgtFphG1BsOmUM7RBiqNYf9eo7Z6bYShIjfKQgNufM2J
-         1Tg61FURYlgeIfbFgNo8oKo1nzyRdmOqwVd2Ipzp4KKbZUVS+vR9elLc79ExJ/79Ijp2
-         YDyL72gafLeamh7GrT0yuUYsnCdFACHI2ENscvafXVJsfrbQitd3Xgq5bME2LnQ1yAoh
-         ob1NstAwBzNdtWtfzA09d5ECVRx+U5gXGcbSukpebnoPW1y8rFHisrwQ2v+LDiJ6g25D
-         sqbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777496627; x=1778101427;
-        h=mime-version:content-transfer-encoding:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=9eaYTnlxpHCY09/j5CrSkFztBrg3e6wlR9rFliILkCQ=;
-        b=VvtzGvtN2PF7C+jbXtH4sujQaL/USuUqQ+6AieYJzAe5xyGD9Pca0SnO80a9SlmN7N
-         E6XwAX0zFOIOR11JYsb8KSLz3bOhj1Nf6X5+H9aqEXCUYS7DXA3b1VXLwpTeRyYVRsPi
-         GFTIT9KdW+YebmJ9zpMSypEiwdCboRJt48H9hofrEB1mPx0CwVvJiOQctxv12twxZRG2
-         eoYtxfSPnSYkm6hGDbWv2D9Rd3g+f8+FgNY93rV75HzoRycsl/WyxiMVzD/hud4twJC3
-         hg7nQ2deNMEibnuSwlBOLGmV30wsLlLHO9aAGAP+u2WIe8XZuJ12uGC/TEYFBoaDMFF8
-         /v9w==
-X-Forwarded-Encrypted: i=1; AFNElJ+fAjiLK96oHb2W86XuUwA22bYMM/dQxeCNWFtAIVA41Nl4ORRwf2P0ZD1+Sinmz0dqDdNmWY0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxI8tYWFmE7+cCvb4/beft7yol9V8/nPynPeoKzixGkgL2mtrOt
-	CZNC4bFXidnZizQndFw4hNtDfgadaKFTkLcahmS+/3BMtbD8gPk/sSGw2JH5
-X-Gm-Gg: AeBDieuECpzt9+36GnR5WFTKfYvN+VPzr/3Nh13EX6jTlCiR1HbAGdNKcAcdsPvr6QQ
-	upsb15Lq3OP63L6D5dt8f32qc9Wzze5SDpICRyxGJh0PjiE1gJxF0IH0mohyeKFTKFOX/8N1Wgt
-	JQYMhtqsMRE5fjtpL+6dGLkfvoxEUF4LCxNCBFtt4ZrqPeh0EjVtf+ka9hudo5RABDhIv23mxZe
-	BG0IXoTE8CIOVIiIPMF7F/ErqksUrf/FFP0PKICAEuJpUFo17BGhYrGE0REWO925IgW2ZOgT6Ln
-	TzFD4JJc8mI1MfjRZvDEUbXcXyhWeJwmPVrPT18rTS3XNyAe7Y/qRFerxb9afdhn74h7P/SPhuA
-	Qf3AEvi+7V8iOb8CIe4aRyB1arr6gIGPYzykwvXXoUUCIiT94RbFXzToTtzHhZerL/2OvsJC2tD
-	hY0c+O6iCbxf/ZIA==
-X-Received: by 2002:a05:600c:350d:b0:48a:57e1:d8cc with SMTP id 5b1f17b1804b1-48a83e7055bmr3924695e9.9.1777496627067;
-        Wed, 29 Apr 2026 14:03:47 -0700 (PDT)
-Received: from debian ([2001:41d0:303:db6b::])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a822c832fsm29134635e9.10.2026.04.29.14.03.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Apr 2026 14:03:45 -0700 (PDT)
-From: Tristan Madani <tristmd@gmail.com>
-X-Google-Original-From: Tristan Madani <tristan@talencesecurity.com>
-To: Phil Sutter <phil@nwl.cc>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>,
- netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
- stable@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] netfilter: fix NULL ops race in iptable lazy init
-Date: Wed, 29 Apr 2026 21:03:44 -0000
-Message-ID: <177749662469.1430165.8044688741351868980@talencesecurity.com>
-In-Reply-To: <20260429175613.1459342-1-tristmd@gmail.com>
-References: <20260429175613.1459342-1-tristmd@gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+	s=arc-20240116; t=1777496679; c=relaxed/simple;
+	bh=hRuy7WgCIVRD583lA+MEcUg/0SPThFP+5pL8HoRtRho=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=F5v0JcFt1oRl6RCQOGuHU/zdws1C+fb0A9e6AYdURykdrWoLcZCy1+3RZvliZx2u+GjyBFPpYFIIro4WhcYKbR+ePmu6pHV8OJuToht2JCBQvkP9qKTqrVXf/EDDn37n39aWUQmY9Are1hfuoYKsYmHMQuT3sLggM6kVi5Dh4nA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [192.168.178.127] (pd9eaad8c.dip0.t-ipconnect.de [217.234.173.140])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.2/8.18.2) with ESMTPSA id 63TL4OA3019919
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 29 Apr 2026 23:04:24 +0200 (CEST)
+Message-ID: <5232eae3-e924-42c2-bab4-6f2023aa629b@tu-dortmund.de>
+Date: Wed, 29 Apr 2026 23:04:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: 8918C49A643
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 0/4] tun/tap & vhost-net: apply qdisc
+ backpressure on full ptr_ring to reduce TX drops
+To: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, mst@redhat.com,
+        eperezma@redhat.com, leiyang@redhat.com, stephen@networkplumber.org,
+        jon@nutanix.com, tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+References: <20260428123859.19578-1-simon.schippers@tu-dortmund.de>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <20260428123859.19578-1-simon.schippers@tu-dortmund.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 83A8849A5B0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[tu-dortmund.de : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-282495-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tristmd@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	TAGGED_FROM(0.00)[bounces-282496-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,talencesecurity.com:mid]
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.299];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-On Wed, 30 Apr 2026 Phil Sutter wrote:
-> Is this true? Your patch moves the ops allocation, but new_table->ops is
-> still assigned after xt_register_table() has returned. AIUI, the race
-> window is just reduced, not eliminated.
+I just saw that the Sashiko AI review found some valid regressions.
 
-You are right -- I missed that new_table->ops is assigned after
-xt_register_table() returns. The table becomes visible via list_add()
-inside xt_register_table(), but the ops pointer is still NULL at that
-point. Moving the allocation alone does not close the window.
+I will update and test the patch set accordingly and send a new
+version...
 
-We cannot assign ops before xt_register_table() because we need the
-returned new_table pointer to set ops[i].priv.
-
-Would a V2 that guards the pre_exit path instead be acceptable?
-Something like:
-
-  void ipt_unregister_table_pre_exit(struct net *net, const char *name)
-  {
-  	struct xt_table *table = xt_find_table(net, NFPROTO_IPV4, name);
-
-  	if (table && table->ops)
-  		nf_unregister_net_hooks(net, table->ops,
-  				        hweight32(table->valid_hooks));
-  }
-
-This way cleanup_net simply skips the table if ops has not been assigned
-yet. The register path will either complete and call
-nf_register_net_hooks() normally, or fail and clean up via
-__ipt_unregister_table().
-
-Thanks,
-Tristan
 
