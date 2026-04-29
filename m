@@ -1,68 +1,69 @@
-Return-Path: <netdev+bounces-282432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282434-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aAQOMNQq8mlvogEAu9opvQ
-	(envelope-from <netdev+bounces-282432-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 17:59:16 +0200
+	id SAvBNqYu8mlvogEAu9opvQ
+	(envelope-from <netdev+bounces-282434-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 18:15:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51CF44975ED
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 17:59:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57B7A497937
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 18:15:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 788D530704E0
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 15:58:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8A9A3313ABCD
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 16:08:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC4E7382379;
-	Wed, 29 Apr 2026 15:58:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="NZdxhF0/";
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="XXroV8/z"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 337953FE379;
+	Wed, 29 Apr 2026 16:08:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f66.google.com (mail-ot1-f66.google.com [209.85.210.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D80B37EFF4;
-	Wed, 29 Apr 2026 15:58:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9543FB06F
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 16:08:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777478286; cv=none; b=jrYhaHmdWwWddCdG+29/CPgWPud1t298RHmFpdNye5lR0A5QlEf6pZu5ZPOfenKmjfgyn9Xgq6K325UcTFJJwwjrzaz2lWElz8DXXJvJmcdq4b8HFxQkMKpDC37zvMFo+l80e0ec2AXZB2CuqdSLFyKbqinKGoO7NuqvKu956js=
+	t=1777478893; cv=none; b=TGKwosmNY1juvSHaamz5aoW2cgrBALDsKGDdB9JzXm8yAnuCkz0cxCS4puRStUaZ3dEBdBNI+/j7KKxJdYA1TeDTNx5rhYwfLoF7f+d2f7fjuvtRn7fj3PHnl3fvVRIO5BGstCuy1NNzqwg+OtdCz1rKiAh9Ynd+0nF0HH+nNsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777478286; c=relaxed/simple;
-	bh=PfNXmVfGxA90BsbyUVfnu94ZdIsgKvjsCofoE+mFm9g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FyOdqTrOdPXbHfVo2Rnr48/mFdbtfin1RBCaC5aCinWHe8KxWP91Il/uWqJLRZWBkjDdDDXsIklXwGsmJ8z6q8griWAsQVbHM5pfd9lniM/wfIbzwK7QejHHzbexZVBlFkByg4Sv8V3pAjuU1XOy8GNSKrbgHTOTMjVJjXl/qZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=NZdxhF0/; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=XXroV8/z; arc=none smtp.client-ip=23.88.97.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1777478283;
-	bh=PfNXmVfGxA90BsbyUVfnu94ZdIsgKvjsCofoE+mFm9g=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=NZdxhF0/l3bT8CSLK8k7fRcIuzoqGTrRbKdu9sj/+Glz3X04NT+DuYq/eAWzY7s8G
-	 RDit3Gp5wYqwNIYLZvC8SBaO1GIBrJoxLnJiO3A+Gi05taDREvf4Ujst7K4RI1akrj
-	 +cMCTy9cD0n361BvrYkYLs2ae9Sh+j5In83riQcFdvRU8OFu8GwJLKzGvNVtkX0XTg
-	 6FqRORLGmgYJ64X14uHMh/C1yDoD3Bq+zWlvculd2zWEZij3XKdAQ6gYpzcWk1yTrv
-	 A6M/u8xFTfZZFWzPe/0wIbHylgvZxnHSZd6uU3J7RToA+jzH6ErSs//u/YywQv0MuW
-	 l96w3LSfuBXQw==
-Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
-	id 1936048196; Wed, 29 Apr 2026 15:58:03 +0000 (UTC)
-X-Spam-Level: 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1777478282;
-	bh=PfNXmVfGxA90BsbyUVfnu94ZdIsgKvjsCofoE+mFm9g=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=XXroV8/zZZ5arbMn2W0U7wGTt8DvPNqTEib1xJcMqDbidxAsGvtKsJJeX9t+1/UsG
-	 dbQNECnG+s3fBaBQIHpvKdqcZIh7qW8Wt4K1g6Q6kX6DxuIDj3n0GEjr24qt6xd2Yi
-	 wWnuNr9uLfEfdhp0QfpIvZMfmFFtxDtO9QbxDEmTGFZ0+PGUK4N89ISp2CQYDf3iDe
-	 0kFxMju6zI35QipDWAHiyPebaml/nRLM8DlwKSnkMefFiux8/7WHIN9e4oJKezPD2w
-	 arWKT/vCJMVc3NCeUwTgFF4pCVdVfOTLUDUlNRFJwykECxM9mA+lGFMj6huUckY0/E
-	 h3V37WTvZwUGw==
-Received: from [IPV6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb] (unknown [IPv6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb])
-	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 2802947E37;
-	Wed, 29 Apr 2026 15:58:02 +0000 (UTC)
-Message-ID: <e1c4bffd-47dd-4097-9ff3-f181d21c6999@birger-koblitz.de>
-Date: Wed, 29 Apr 2026 17:58:00 +0200
+	s=arc-20240116; t=1777478893; c=relaxed/simple;
+	bh=CkV3UIcJhdoUQamAo7wSXIPkMsnfCDQLRf9Rws7yZ5o=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=fOHT84HcSr7SHxKTNA/kIpBzegmMb4+f59ltooo+I9s+mslPl0f+plUaawZiABSFmdNor/2k5b6nBA4d0AscaHRlJPNUsn/RHF5euTxMkTM/ieEPVeBSpvLPdGf/ApFpSInjijNYy0oc1ebKKDq3wYjc1ig0iptNVaEnBO/Psvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f66.google.com with SMTP id 46e09a7af769-7dcd9061b1aso7719523a34.2
+        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 09:08:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777478885; x=1778083685;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:cc:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uW0sQP+sekma1N2hzMiGd7HMv+vP1und5+yCAqWbZsE=;
+        b=QD9i8Mhzzn+qonuIqjCK1ssY9bLOV1YmmwY8P6sORsZMVJgVU+MeCDF/1T+3YbSS8u
+         hi2RIW3kE+aS53ENd5vPLU0KuLVo1JEiHk77QzU8RB5Nvp+7i5aE9dKnOWVKpM9SnjKE
+         OIrPkVZz9axbjDy99fgHDZ73nq3D0NIvxFPXQEI5NVGaxvZw8ymc4f4l7z55M1A2OUw3
+         CBWI7X4k7HqifXa67F/QLrPxiD8HXYcbfrH4x/PVMukYQCNHOyrLBL4e6a5NMLEcDblt
+         TjAvUMLEwJh08GUKRsllzu02bSfSxHYATji9G4UuHMdcyIzMTTJF2EMyGPZWgkEqtFCo
+         SCkw==
+X-Gm-Message-State: AOJu0YzN4HecrT3tLZURn8o2L8d/83EMsYPqqs4YpYPjjA2fVjPeweXf
+	5+5MHjmJy2MztkWNkeCSD76p5m0PptIrE6dftGCVfvsYauTEbygOVqPJcaWUBXAxd9Q=
+X-Gm-Gg: AeBDies1MmucKkdgKeQ6j08aL8bTsxO8+942G0qj1DZNtFphEu8xLGcySMzabYQh0NK
+	FGNiuRZqYN4KSXcTMNaXitV4CzrwaHXKj6Q67rEvobVeAd8p9qLKBXGxVa/9IO7xICaSPhdmhKR
+	4sFlB7EeN0IkBr+6sCRlZzOuAfYObwV5il/moU6Q5TcdIZdNP0DmT4OMPIg9ZKu5JJ7I3W+d648
+	B7nvMEZlmpLUmENCQKBNLBvl2Bva5UyaQLE7bhH2N6I1BBpiQ+XxOLuxBQ0LBzzidO1ofAlJrIX
+	cZHNW3obf6fHrKP9nXI+sIryz3WYQlHKrkDKwIsgtXZtjeKrY+LO5ekz8FfdryYV9sE/rzxwugO
+	6wRxcWQeylrTg2jKvyFmQZJjyUS/resAAWV4dltpzVbsDGCuGecd8KofFA8fVr1ZAl9sZq1GvUp
+	Cn47Iv9Z0QA2gL3VxDm7PymiGdhGawy557jGqAs5GIVnRxkZw6CUizArWjHtQUogrPpw==
+X-Received: by 2002:a05:6830:67cc:b0:7d7:e045:b489 with SMTP id 46e09a7af769-7dea66700f1mr2896745a34.12.1777478885133;
+        Wed, 29 Apr 2026 09:08:05 -0700 (PDT)
+Received: from [192.168.88.241] (89-24-32-159.nat.epc.tmcz.cz. [89.24.32.159])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b3ef6faf6asm27819856d6.5.2026.04.29.09.08.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Apr 2026 09:08:04 -0700 (PDT)
+Message-ID: <9e8f5742-d607-4c48-a280-7fc0e425a521@ovn.org>
+Date: Wed, 29 Apr 2026 18:08:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,77 +71,114 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 4/4] r8152: Add firmware upload capability for
- RTL8157/RTL8159
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+Cc: i.maximets@ovn.org, Aaron Conole <aconole@redhat.com>,
+ Eelco Chaudron <echaudro@redhat.com>, "David S. Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-usb@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Chih Kai Hsu <hsu.chih.kai@realtek.com>
-References: <20260428-rtl8159_net_next-v1-0-52d03927b46f@birger-koblitz.de>
- <20260428-rtl8159_net_next-v1-4-52d03927b46f@birger-koblitz.de>
- <d9d69a5a-be6e-4566-9ec3-e742f745a530@lunn.ch>
- <877f67bd-6bd8-4d61-8f7b-d206b9125eda@birger-koblitz.de>
- <376f2907-55c0-416b-8904-e61888feb3cd@lunn.ch>
-From: Birger Koblitz <mail@birger-koblitz.de>
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ Yuan Tan <tanyuan98@outlook.com>, Yang Yang <n05ec@lzu.edu.cn>,
+ dev@openvswitch.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net 2/2] selftests: openvswitch: add tests for tunnel
+ vport refcounting
+To: netdev@vger.kernel.org
+References: <20260429151756.4157670-1-i.maximets@ovn.org>
+ <20260429151756.4157670-3-i.maximets@ovn.org>
 Content-Language: en-US
-In-Reply-To: <376f2907-55c0-416b-8904-e61888feb3cd@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <20260429151756.4157670-3-i.maximets@ovn.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 51CF44975ED
+X-Rspamd-Queue-Id: 57B7A497937
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[birger-koblitz.de:+];
-	TAGGED_FROM(0.00)[bounces-282432-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[birger-koblitz.de];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[ovn.org,redhat.com,davemloft.net,google.com,kernel.org,outlook.com,lzu.edu.cn,openvswitch.org,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-282434-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[ovn.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.753];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,birger-koblitz.de:dkim,birger-koblitz.de:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ovn.org:mid]
 
-On 29/04/2026 3:01 pm, Andrew Lunn wrote:
-> On Wed, Apr 29, 2026 at 06:21:58AM +0200, Birger Koblitz wrote:
->> On 29/04/2026 3:57 am, Andrew Lunn wrote:
->>> On Tue, Apr 28, 2026 at 05:47:24AM +0200, Birger Koblitz wrote:
->>>> The RTL8159 requires firmware for its PHY in order to work at
->>>> connection speeds > 5GBit. Add support for uploading firmware for
->>>> the PHYs using the existing rtl8152_apply_firmware() function
->>>> in r8157_hw_phy_cfg() and set up the correct names for the firmware
->>>> files.
+On 4/29/26 5:16 PM, Ilya Maximets wrote:
+> There were a few issues found with the tunnel vport types around the
+> vport destruction code.  Add some basic tests, so at least we know that
+> they can be properly added and removed without obvious issues.
 > 
->> No, since the RTL8157 (RTL_VER_16) also works in my experiments as expected
->> without this change, i.e. without any updated firmware, or better the
->> possibility to update the firmware. It is only for the RTL8159 where the
->> firmware is necessary to even get 10GBit performance, at least for the
->> link-partners I use for testing. My understanding of the Realtek "firmware"
->> is that it mainly provides updated calibration constants, possibly better
->> calibration routines for interoperability. Unlike for many other drivers,
->> the firmware is not necessary to make the driver work at all.
+> The test creates OVS datapath, adds a non-LWT tunnel port, makes sure
+> they are created, and then removes the datapath and waits for all the
+> ports to be gone.
 > 
-> O.K. Please could you expand the commit message. Explain why you are
-> adding code for RTL_VER_16 as well as RTL_VER_17.
->I will update the commit message accordingly.
+> The dpctl script had a few bugs in the none-lwt tunnel creation code,
+> so fixing them as well to make the testing possible:
+> - The type of the --lwt option changed in order to properly disable it.
+> - Removed byte order conversion for the port numbers, as the value
+>   supposed to be in the host order.
 
-Birger
+Hrm, forgot to remove the import for socket library that is now unused.
+Can send a v2 with that once I get some reviews on the set.
+
+Best regards, Ilya Maximets.
 
