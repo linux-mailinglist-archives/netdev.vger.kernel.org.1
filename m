@@ -1,176 +1,167 @@
-Return-Path: <netdev+bounces-282546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282547-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iGWjKOSV8mkNswEAu9opvQ
-	(envelope-from <netdev+bounces-282546-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:36:04 +0200
+	id SOR8OFCY8ml1swEAu9opvQ
+	(envelope-from <netdev+bounces-282547-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:46:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0A1949B622
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:36:03 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5460049B676
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:46:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 32DF6303B71B
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:36:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3D31D301A2A1
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 929BF3A382B;
-	Wed, 29 Apr 2026 23:36:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73953282F3F;
+	Wed, 29 Apr 2026 23:46:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G5yeLmvP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D0PEiJXT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A1B72253EE
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 23:36:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED821FBC8E;
+	Wed, 29 Apr 2026 23:46:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777505761; cv=none; b=M+gUHDJpHIzAb9y+rvcW5aE0UtRpBBYGgZMsPqDh4PfjCR6kBMB6umuUVc6gHtAYNT8zTrTrgnM7tak+rCH9J3POAkzAD1hy1JBtuj6BqqzxnW3mUTXte5pFpCusxfSYFHvHX7bLpWZB+3dNAyr59fBHTmeDBmeecZg2inX7WYg=
+	t=1777506380; cv=none; b=o2rl+yVEC2NtuqhZZ6+HsvysDQOtv2jAPcjwBwBQ3wv96cuwypWE6IHADf4CS0NEbdHBekowEtj7x2NUw5uBdJd+anbdIZbl1guClXrRijAQ/PCRgC5fcAPMmJaZmAyTDGwbDG/oeHygPKAYVI22106Y7bbiULDiaHZXsOKz3lk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777505761; c=relaxed/simple;
-	bh=6p2wF/KAGBxnYjm9WujwA9uUvhFUL23UjYg0EjS0VbU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=bS6L/9nNODIZZi8bke79D6tMBFNJ4btQSub2Cpo1kWUA2wZiIz4NJcjWo+KziMPX72DW+iFgbpDVpPjK2+JpPk161R2IbLQUckYd5JCwfCETxKnUxtkWcsTRoEdvXgDRNwzJf2usNXVAuPF/x8xVjflhoPsFVlmCxZBlyEXoSUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G5yeLmvP; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-364c5317d67so25867a91.2
-        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 16:36:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777505760; x=1778110560; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ijVyuUROF7AQHIY8lacIUeZaqX8lgHCdNnE9tX/cb9U=;
-        b=G5yeLmvP13Ex+0qipNhWSre54NNl5ME37rO+RtGdUX5fq7SnH8GFRU8xym3qJipK/S
-         4RxeStjglL/br5nCI03EyX78CE76s4PxFHWRZlfDWrpiipN/p1UupnXFp7Z6Mg3wQOvn
-         aob2rBlN2KS6kqSVGryWT5GtVAHVq1wCSbysZRPXW/jYcsI46jNpDMkFpvIurnYO98WZ
-         P709rcdCIvIE6jR0IMw/W7zOmdxxPQjT669z2NoEM0glLYtwexsqxJkZitQed1xIbI1r
-         d7AhgneoBZIFQOuLsx9lHojm3OCwGcneQp9Rgzgs3FK+Oi4ByYE6eC24p4SxjEA8WukU
-         yuLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777505760; x=1778110560;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ijVyuUROF7AQHIY8lacIUeZaqX8lgHCdNnE9tX/cb9U=;
-        b=BiAB/bUMkyrhPmb1AAq5Rgb4NO7zu6THiWyfFBEd4jDIG1U9Zw+aJc+DEyiRLa59Y0
-         WL3vbIF7W+NU8nVpqnvK2bTLKZ5C90xSYqAsRfAOVrWl2M7ZVWz8xAnLG++IQi0QLQlz
-         b9p2daY9UvEYGHa498m7aNvg8poOdnaTNKUXEy5Cp2gHJURQDmmyBpc+a2zyxLhHOMZI
-         MYgdGJEl5VuUAOEcqMeGw7+WeSSb9C5WBPIUy78ZSwKKSEJW8WCEzEm6ur9zjrnaN8vu
-         xVNFiUJ/jcLFHFxXa5b+P+qpZ7so4TnRBxmUhcpGMh41Yl4P8xo3IWKCJ9MiVtd+ALDO
-         OY3w==
-X-Forwarded-Encrypted: i=1; AFNElJ8zOlf1ZD5J5saPkGC70IBoiRT2/YemJdT3e4iQbqSPwJyyKGaWvjWeXvtOz96TMMjmPB88Jm0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsguusulOrMw/ybs9CFeslGJLBSapRn8eJV4iSAHI+gNAGYtIK
-	JtvESZTytfHnhzBBVYJM65Aj31QT3UibGaYbia4rtVb8z/5Utpk7oHCX
-X-Gm-Gg: AeBDieu83hPKTSORofk4F/RrAz7XsUSJjT+FQRTpbK5ymfLGAAjVokbREH1DSfZE9Ss
-	u/ToKIJrXTD34gAlRQsXiyWZb3b6iJjI3jzMJjMMjl5Iy8ymPN49JVD9aonTxt4RAX/yKJnJyU0
-	9wiqgqz/iKN3CmHUGKastaBe7oSmqt/aIFiqc4OYwiJNSSCFaH6nyQOOE+ZYOf/a1g3tqICfUvo
-	BXo0BG2arIRfIIvbjVEkGQ9aB9EtJIwsMDiA4bEMrUp+rPkJDCrFqHjurk58smw01Knut2I2f8y
-	QetS9efdaFm0nJq3cvIdUBdzy0B7Np3K3lNxCDatXIGSqGxKqZuhH9zWo7InZXZd8JjfzI1m8Di
-	oODrYYc/wGHexyl2UeOTE5Ka+FCfbUvmIqnySE5V9p5Fmp4dJkKnbaxTN+pDM6S/MWhrVxf27TG
-	PDuqEDg8aouxBdbEB+L4phhyIyVBLs+hxJOtK9GkILnOSByrFk4wgeag==
-X-Received: by 2002:a17:90b:52cf:b0:35f:ccf6:69a5 with SMTP id 98e67ed59e1d1-364c31a6b14mr389899a91.20.1777505759731;
-        Wed, 29 Apr 2026 16:35:59 -0700 (PDT)
-Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-364bdf50bc3sm793425a91.8.2026.04.29.16.35.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Apr 2026 16:35:59 -0700 (PDT)
-Date: Thu, 30 Apr 2026 08:35:55 +0900
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: dhowells@redhat.com, marc.dionne@auristor.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, linux-afs@lists.infradead.org,
-	netdev@vger.kernel.org
-Cc: imv4bel@gmail.com
-Subject: [PATCH net] rxrpc: Also unshare DATA/RESPONSE packets when paged
- frags are present
-Message-ID: <afKV2zGR6rrelPC7@v4bel>
+	s=arc-20240116; t=1777506380; c=relaxed/simple;
+	bh=AKOnTbZ/fLlnqhqvD803u8VOuwIHV1SefABXb7khWUg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=IAUWimDK/VUG7heFPdt0pQKu+dlVi5l1QhZV1gd6qK/ZswL1iNcv0/hpmsVnASZG5ddVxSmHOCIen3y75SQ9rhFUvTwNK1cXkuabNC4IWxE4Ve9MayDArWqwkvJbVy0XpzmgFLpx4EI4clx5xItg0xvQNISfA+ECDeM3lHH4M7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D0PEiJXT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 550CFC19425;
+	Wed, 29 Apr 2026 23:46:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777506380;
+	bh=AKOnTbZ/fLlnqhqvD803u8VOuwIHV1SefABXb7khWUg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=D0PEiJXTVUTImHN8honj78SrualSm/j5yLbUEUOXiOK1OjBSPZsl52CI0BNJzqCYG
+	 nt2llUvANFTSpjicOlBbOtmpJfwNjyRRbIAsS+IzZncuzvNGPoutdzaTDaxUI1W+iT
+	 2p41QuGxnTg2hpBIwpZNliUtdP1y2NEsUcZlA6WOdb7GCeT6jjUw8g/OMrh86E6wYj
+	 vA6u+4X20/AGINeIj4OdFJltsygijPsdieLFqgJjgiwi3KXa1EHC18RW3II6S1VKYf
+	 OwP2OdCALu6nMSsjEnJSCvbM/79J1OqA1CP4x06eERkhIzdREJQ8chZxK7tYEhFwxX
+	 QZIrvewMVCEPw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: daniel@makrotopia.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	chester.a.unal@arinc9.com,
+	andrew@lunn.ch,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com,
+	linux@armlinux.org.uk,
+	ansuelsmth@gmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net v4] net: dsa: mt7530: fix .get_stats64 sleeping in atomic context
+Date: Wed, 29 Apr 2026 16:46:13 -0700
+Message-ID: <20260429234612.2240476-2-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <16efd278e4f17776ccfbf8491e5be71a4689c137.1777385305.git.daniel@makrotopia.org>
+References: <16efd278e4f17776ccfbf8491e5be71a4689c137.1777385305.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Rspamd-Queue-Id: A0A1949B622
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 5460049B676
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FREEMAIL_CC(0.00)[kernel.org,arinc9.com,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,collabora.com,armlinux.org.uk,vger.kernel.org,lists.infradead.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-282547-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282546-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.991];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-The DATA-packet handler in rxrpc_input_call_event() and the RESPONSE
-handler in rxrpc_verify_response() copy the skb to a linear one before
-calling into the security ops only when skb_cloned() is true.  An skb
-that is not cloned but still carries paged fragments (skb->data_len != 0)
-falls through to the in-place decryption path, which binds the frag
-pages directly into the AEAD/skcipher SGL via skb_to_sgvec().
-
-Extend the gate so that any skb with non-linear data is also copied,
-ensuring the security handler always operates on a fully linear skb.
-The OOM/trace handling already in place is reused.
-
-Fixes: d0d5c0cd1e71 ("rxrpc: Use skb_unshare() rather than skb_cow_data()")
-Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 ---
- net/rxrpc/call_event.c | 2 +-
- net/rxrpc/conn_event.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+net: dsa: mt7530: fix .get_stats64 sleeping in atomic context
 
-diff --git a/net/rxrpc/call_event.c b/net/rxrpc/call_event.c
-index fdd683261226..6c924ef55208 100644
---- a/net/rxrpc/call_event.c
-+++ b/net/rxrpc/call_event.c
-@@ -334,7 +334,7 @@ bool rxrpc_input_call_event(struct rxrpc_call *call)
- 
- 			if (sp->hdr.type == RXRPC_PACKET_TYPE_DATA &&
- 			    sp->hdr.securityIndex != 0 &&
--			    skb_cloned(skb)) {
-+			    (skb_cloned(skb) || skb->data_len)) {
- 				/* Unshare the packet so that it can be
- 				 * modified by in-place decryption.
- 				 */
-diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
-index a2130d25aaa9..eab7c5f2517a 100644
---- a/net/rxrpc/conn_event.c
-+++ b/net/rxrpc/conn_event.c
-@@ -245,7 +245,7 @@ static int rxrpc_verify_response(struct rxrpc_connection *conn,
- {
- 	int ret;
- 
--	if (skb_cloned(skb)) {
-+	if (skb_cloned(skb) || skb->data_len) {
- 		/* Copy the packet if shared so that we can do in-place
- 		 * decryption.
- 		 */
+This commit introduces a delayed workqueue to asynchronously poll MIB counters
+for MDIO-connected switches. This caches the results so they can be returned
+safely without sleeping in the atomic .get_stats64 callback.
+
+> diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+> index b9423389c2ef..66bff861a921 100644
+> --- a/drivers/net/dsa/mt7530.c
+> +++ b/drivers/net/dsa/mt7530.c
+
+[ ... ]
+
+> @@ -3137,9 +3187,25 @@ mt753x_setup(struct dsa_switch *ds)
+>  	if (ret && priv->irq_domain)
+>  		mt7530_free_mdio_irq(priv);
+>  
+> +	if (!ret && priv->bus) {
+> +		spin_lock_init(&priv->stats_lock);
+> +		INIT_DELAYED_WORK(&priv->stats_work, mt7530_stats_poll);
+> +		mt7530_stats_refresh(priv);
+> +		schedule_delayed_work(&priv->stats_work,
+> +				      MT7530_STATS_POLL_INTERVAL);
+> +	}
+> +
+>  	return ret;
+>  }
+
+[ ... ]
+
+> @@ -3409,6 +3476,9 @@ mt7530_remove_common(struct mt7530_priv *priv)
+>  
+>  	dsa_unregister_switch(priv->ds);
+>  
+> +	if (priv->bus)
+> +		cancel_delayed_work_sync(&priv->stats_work);
+
+Could this call cancel_delayed_work_sync() on an uninitialized work struct
+if the driver is unbound before the DSA switch tree completes?
+
+The priv->bus pointer is initialized during probe. However,
+INIT_DELAYED_WORK() is only called in mt753x_setup(), which might never
+execute if the DSA tree remains incomplete.
+
+If the driver is unbound in this state, mt7530_remove_common() will evaluate
+priv->bus as true and pass a zero-initialized work struct to
+cancel_delayed_work_sync(). This usually triggers lockdep ("trying to
+register non-static key") and debugobjects ("assert_init not available")
+warnings.
+
+Would it be better to move the INIT_DELAYED_WORK() call into the probe
+path or track whether the setup function was actually completed?
 -- 
-2.43.0
-
+pw-bot: cr
 
