@@ -1,215 +1,185 @@
-Return-Path: <netdev+bounces-282486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282487-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yE2jLWpu8mnbrAEAu9opvQ
-	(envelope-from <netdev+bounces-282486-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 22:47:38 +0200
+	id cIHiCPdx8mmJrQEAu9opvQ
+	(envelope-from <netdev+bounces-282487-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:02:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 375FF49A3DD
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 22:47:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 983CB49A537
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:02:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2AB8C3017065
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 20:47:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A8AB03018BD0
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 21:00:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B7FD3A5E98;
-	Wed, 29 Apr 2026 20:47:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70F34274FDF;
+	Wed, 29 Apr 2026 21:00:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AvwZPjvm"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="JJ2MEQvN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011048.outbound.protection.outlook.com [40.107.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 943D838550A
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 20:47:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05BA26ED5D
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 21:00:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777495654; cv=pass; b=j5tSbMlOdxZv8ApXeDDZT51Ql2SD0rZsjVaeWyvrmxWp6JcUfxs6kAnGy1AkG0UTaBWzXmsBNl0LGBcfxu1jWJqPG0uhaoVmoa0YQW2JCUNilGrFKXNQBn5MYSMdHWBIZ7B5FzxQ1cxiCkBrffk7FcNZMJaZKc4HnCC5Ot+fSq4=
+	t=1777496452; cv=fail; b=R/NgQhwLcmABGHtNyyhcb6VJV1/vb0jd7skUn5Bbab9waOhCvcR+I8E0DZD2inpadXd2SFnyOVxSqirLWI8ZRquzLsuCnK/P6VzHwP8gDXWNiJVVJJb+SuIUY2ti0NgqMtF6QuHVMT9+E9WonSmbI0anNz8DdbjQ0Uqoj5W6eBY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777495654; c=relaxed/simple;
-	bh=xxpVo9VADcJWZ5Rw/BcfOodgHejdClQG1LcA2vjR+9o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uflLxWe7qV9Ae8x6Oq0Jvurr4kdvERIGAVv3bMIFSnz+YwySHrP5f/nFRhJcjIQoSyM6EJXMUL4zBtstUI0p+6sIDBlsCMddKiOqu8tVK2vUDdGLDmReXxe+P5kET6YtwFwhonENSgNquiA7JA1QmmB2YtkimMj2cYzUyY2hIi4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AvwZPjvm; arc=pass smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-50d864c23bdso61161cf.1
-        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 13:47:33 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777495652; cv=none;
-        d=google.com; s=arc-20240605;
-        b=K0rwdNXVp1LDKyJ/183ZoSGu8fOmlOKgFCbQsyBaow69OI1gzPyqIf1KgHvL7+T91X
-         YtJlqwnCFYSbtr/dAYlBKGHurYtk5Hwgxzl8u+kRdweR8ZG5+qAvmNzNJb2r60rJVnIq
-         D7gy06zGkXGgqnGOruNk8+LM5mJEdpeuzM0INjplNuvZUVMbNW7HA66NVkzOjxTrgvXz
-         EBKfuuconhLuNPgbW0FKT1Q5QGJT9ULlk/zplCkvyrVRbW7iSVmmK/w//CQjblxjZTkj
-         mRvBg5tBRmqJzM/otAYHjxeKrM6cEGajHsKe339MCyVciLM+QHQyxIGoNNyQ/iz2FmY4
-         9eXw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ecRuB/6i+9UMzvvn/8bl8OOBs0mGsTmgmv3uTcJUmxE=;
-        fh=cH00qHlPL/yYAeItXk4BK+0GatxFg0OfJQnfbxHzcN8=;
-        b=B7HavOI0zvKA9mxsVKlUTGFVs7F2Ks2hBq24Iifa4J9CUic2ZBviiKhH/ZhEENuTYL
-         UFkJ4SbDazhsc55WZhKU2O/3bC1xOVBY2Rgjld7sz7G9jqXsyyW+wwXrC274ApI4CH2V
-         HSg8x4yY97/vPJqQIfJcn6gH8uZ9Dqvr7GW2dQhfOLPDr3BeoNdkNvIeKwWvf5B/Jmdc
-         DqrTotUVkRCE6yV7S58UuhIX57A6qNPhb1iMOwAstAl7U+8VNda5fe2EYEchVIfWucNf
-         +2YaUdc78MnZareH/i6b02SKVxzzejbzWOSg55af8C4CYrnUdSYpT328dlOwC5FGK81D
-         Rbrg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777495652; x=1778100452; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ecRuB/6i+9UMzvvn/8bl8OOBs0mGsTmgmv3uTcJUmxE=;
-        b=AvwZPjvmTNMPGzhnkdyNWRobnbt/Uq78IpdsxcHL6is7MrLHOScCXkykJuwOMEPJcT
-         rNgqIg7Jzy0arQJCwCbsSzow/Y1MIWbVYRGtLvFIoGcBV/Dv+5VrRHOrvXpKj8Tw16nh
-         TlIWX0ye864YWDD5U+eBB/ePccuk0Fq4wLRGbKJ/pM4U7Giw8Dohhy38Lr5DYrct+VBu
-         Lxwl+sUNz0zKe8xPopqjgWVLpunJwIrnt8AO94uQo/7mLcaWj37Oc+u5kbfnRv8BwsUT
-         Eo0ULZ9fVQHXOjsqy7OQbVglUXAxQGspppDRxoJlbYRK9gIAcAkB08NCv54OvmZA1GpL
-         BWNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777495652; x=1778100452;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ecRuB/6i+9UMzvvn/8bl8OOBs0mGsTmgmv3uTcJUmxE=;
-        b=UksFxsQyM27JGaTeNfH3TxNdZYwlo6UIatQe1uYAfrdooSdcgxyT9gg+CYn6oNKGpN
-         UdksCyWuqRVAP+sKMsTLJYQ0aAEko9I2SRBiKCggYWiYvjKwUZ1jmdivpByKiNzd+1oo
-         iPeosUHQF4BV+58p8WH3JolT4fPtlJRA0bdlAr9E+WDfGHWpsfwJMtzEnaayWy87klnW
-         yIW0SV3nZLInF2qKaZU+Gk2ihhIADIJCK44wfVGJu5t2rqrzXzaneKRGiJlIsmRzPbYU
-         O/1Pf1YAcOlnjaxNZKBOxNmwegz5g/SZNiWKbkuPZWh4EocMCnWIvmsNnGZBLUQtIQPv
-         d4PA==
-X-Forwarded-Encrypted: i=1; AFNElJ9032hMlJvsrn2KrFLxbHUgcyH58ymdgIMWFbvbm3k5CoM7yo6ECl99euaI9yrF6QDyltOZI+o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzI4PkExTOhqvhDjAu+YnzM/P+tfWcYeXyK7J+5kUa7ON6yuEnI
-	poPvqSXozktjwRTXGhwD8L/nXddhhlCvW+wXniAOHjfIa+yyES5MaLZctsgizaE9I/FDOMP/uMp
-	AZ5QByVLk2sQuYKDDJJsyq5UivmDd76Lo5i2SfoD6
-X-Gm-Gg: AeBDieu97QENnKiFSDGHyQVMcibWZfW3UUY/79YTiJYu36My7pKuxJjW67pTXTCI/sl
-	CWOsqDZX6UI9T0ulXxiefeNolrZqBPEPXokpNoJs6X0F1kuedU02gVGH6aNy0yMgPHo1Vsr7+Ok
-	mSP2l4exlg9dKJ9flg+DHaVOxDCU41lEsHUxQNt11wHE2UM32HWSbDvuan3mV/aX1IUCr2M6Gzo
-	06ZXQ7LarUi5zIifrkQLasCAhFCHjdB2hcEgRFG/zHtZ16ZFvqyq23uXPJxZ1cnN7QzGsIUh8AM
-	H54upYMt0NlSh9vZ8WV8vaxZgSIBWLHYuqNHPMecb/8JdWetbH6cAVgpwVCooH9lAsodoq0lma9
-	KFBzIhc26RLTYPEW+UQ==
-X-Received: by 2002:a05:622a:1f94:b0:50e:38f8:9885 with SMTP id
- d75a77b69052e-510286340d1mr3553681cf.12.1777495652017; Wed, 29 Apr 2026
- 13:47:32 -0700 (PDT)
+	s=arc-20240116; t=1777496452; c=relaxed/simple;
+	bh=KKvccr7G1Hx+F/+4Tz2OgebWewx1BQkmwHwEmOtfjyA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mJOFSyQpFt9jh3M+s3u6ipJuHqTPDhjw3Ir9HZ1kINbCIZC7bFzBBkH14y/7FLxADeExumX9iktJeqE9ZuxXHnSt5BFyJcbGZ3pP4K3p4Wxe16WlLs9z3YU7CKD570tnk4YRMWc2tRUT5/dP5RFsgTmGL/zJM6ZZhxoXaFCyQmM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=JJ2MEQvN; arc=fail smtp.client-ip=40.107.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qd1c330+c2bh8DajK8UGTUBTG03C+aBxwB9P9GyVM33IoEmWWUVLh9/KtKs8x87oHAykS+hZzI5eq/yH406Ofsfr1LZEdnRRR2eS1wfpacjb6Im9RXUN6wOARCb5PLA9kX8V2wxJM9beM+Z9xHp3KJeo538MegaJiP78qRcWAVQEtUXbMr6A4JjzZCRGgoEZ6sdy8c5dSobfRSL9VRqPoF6WVP+71AuptYt0t/htJvrIivJ2ilxFI3XC7A6uubgnjUPnDmzHOpYr59V49tFqO1qjxObuKKaAL0xUmZ02WuP9oTiUCOOch2H/Fh9YwQTyBj48bs5VhVaN5P4GN4Gy8Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GgwGA1ETiwPmmvNORs1DM8Bsn8J9vzL2l5xCmBh7Cog=;
+ b=y4a3QGlN2pFnv2TRn3zkL/LgV/19/K4XKJueiWxbpniPojjv64uwLaIQD9g+Q1Q411jXrBkovL43hxbwWnOWI/rvDq7ZueQAV9MnGEZxFr07juLQ5aPawvSQTmfHb8nnqObezJNEYzPNEAV4PuMiojduMqx9nsZYy+W5YGHBKVIY2eS/DB0K7CyzZ+tOHaaGHrHQSO09sb4yf6q2FmkD2l/y+hOalulQePZXHfvZi2kJ5WiRya6fkRcRhA/Et5uW9uEk4fn1Ij3vFMGKgKA9bzFVlHMp6JU1HLDxobGZYU3c7A4I6xXYhACM5OHjvWFy/JPaLxAVkZ3yWAPFlhdlgg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GgwGA1ETiwPmmvNORs1DM8Bsn8J9vzL2l5xCmBh7Cog=;
+ b=JJ2MEQvN11eDIdJbLJ2eD+3rrx+CKJZRJZH9GhlhDSUhwyH7wUMup+1C7P5B1xS3L8wlvuNsz4hzPHtQ44IgxrMTQ6CvOnLmCSMGfAn9suCXW3J/XoYCKAAfXbNEybGORMQXb7E6bkiNpFox5s9/cECyDq06pEKlPkNkj5VSheA=
+Received: from SJ0PR03CA0044.namprd03.prod.outlook.com (2603:10b6:a03:33e::19)
+ by DM6PR12MB4201.namprd12.prod.outlook.com (2603:10b6:5:216::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.18; Wed, 29 Apr
+ 2026 21:00:45 +0000
+Received: from SJ1PEPF00002310.namprd03.prod.outlook.com
+ (2603:10b6:a03:33e:cafe::20) by SJ0PR03CA0044.outlook.office365.com
+ (2603:10b6:a03:33e::19) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9846.30 via Frontend Transport; Wed,
+ 29 Apr 2026 21:00:44 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ SJ1PEPF00002310.mail.protection.outlook.com (10.167.242.164) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9846.18 via Frontend Transport; Wed, 29 Apr 2026 21:00:44 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 29 Apr
+ 2026 16:00:43 -0500
+From: Eric Joyner <eric.joyner@amd.com>
+To: <netdev@vger.kernel.org>
+CC: Brett Creeley <brett.creeley@amd.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Eric Joyner <eric.joyner@amd.com>
+Subject: [PATCH net 0/7] ionic: Various bugfixes
+Date: Wed, 29 Apr 2026 14:00:00 -0700
+Message-ID: <20260429210007.40015-1-eric.joyner@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260429080036.1528533-1-edumazet@google.com> <20260429094805.1aa6bf3c@kernel.org>
- <CANn89i+KuSf8PhAsf7a=h+tR1c8aLNdiM6NzaBU8tjpoLAfcQA@mail.gmail.com> <CANn89iJrvSvw2XKvB7LfXc2egeaqC+seiCiKN2USMw9gicqM1w@mail.gmail.com>
-In-Reply-To: <CANn89iJrvSvw2XKvB7LfXc2egeaqC+seiCiKN2USMw9gicqM1w@mail.gmail.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Wed, 29 Apr 2026 16:47:14 -0400
-X-Gm-Features: AVHnY4Jwb9FMxPT6sFCf7y7njQjHa2dIODiRifvFUF1cQqVk_n3xvMyvcUMDKsE
-Message-ID: <CADVnQyn-U-QgyT-HqeqZVX3FJi-UCgwfGJk2VaBBhjajKoih6g@mail.gmail.com>
-Subject: Re: [PATCH net-next] selftests/net: packetdrill: add tcp_syncookies_ip6_9k
-To: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 375FF49A3DD
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00002310:EE_|DM6PR12MB4201:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1a6d40da-6ded-4047-a1f0-08dea6326177
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|36860700016|82310400026|1800799024|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	VsEc8TE7m9zyFY6ArE6TiYtcmtWDRxzdOSCE/LS8cNsM3GUGdeXtECUSryTYPIYocskwyPvdIIYy7gl806HGmnnxbQ6kn+2vuK5RVNbHG/xeSIKRvdpMrekB8wL3cgrF2WjqjwoW0MhQMvBvg9OP7jQlb2uI69gfTf3GVoZxu6ItpLaitGnnv/ruUuOFbTULI7spfRZvbvZvQIjzBag+dbWlEuKbla64ebNvu8zjJlAKEQgEP9uhvZeAezZaBqgUBsUE7dUwWDkYg0tiOhrblVnwHrFcw2drpLDAn5UBLuURFj4lZmTpKbQBZh9PArX+7sH6ShcdJH0bPpICYV0YXp+IWElIyhXGdwQx7t8HkynF5BeP7L9GnbZnyrSqPByRYk+0DSfgRafvW2t2kDm+1eTH0EiMsNX1RRsPLNOfsXCPN9lR6ltmjkWVGSa3BAtLNUOf7nYPiBBYx++fXoOsZDkmJC+H1WzLDNKJIYEFazhMomyPD4Fwv0IjfcPOATE8zxn0m6JQYbyJWeSFVkU0k8BmnYZgyH2ezifBI8V3POs+PpFjk6Rmhx+/Nv9ZcmDnjK476uKcF6d59hedRoBzYWLh0GOzFAwUiJGE6oazw1Qtr/giC4xg4OE30JAUFtPHl3bt5xN5CerbZEDhOWlmJ6wZ9dTT7CxrB50T/jU/9EZ9i3xIKIbz6KvvVfidPn74tGKud36ETYorv5NJ6rhicq6kbawhE9yeKOTdoAhSJKIStV8/RoVQjEjJcfuy3CGCEBMidHyo0glBklYVKT09AQ==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700016)(82310400026)(1800799024)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	iAOxpwbs1PTf534lRQNmqr1o+N+L3XHfZjmDowewBLLclDZDixA02VUMSyLaBuLX+uaT/sTjvp9EyiXuj+XcpnMBGwGOo2TOs/jJe2xfVf3WSgfn9EAStW7dlUtfMKn+M+zXX/yeBVQkaRWFFU8f1oCRCfCfvBaSNzLMgO3s0SFunZo0iqiWZ7IONgUjPLdeKMzdXihzZrpO+C6GDaeOut8nAwesxOO80W7yEJxp3nY6+xGk9kcEkFwKVQ997oq+IWcslQWDI5kmivRE4SbQ6GfM7p9iTOh1LjymRIvRKqbbo9Xr8bZMPD7dL6hFLNZYqUEYZwCj/OHdpYsF+ca4kC9YTasBXA0F+wDjGvHsyKQBNa8uS9e7ksx2F1xvj0xLm6yiW0d5gEbJaI6BXAUtnjWFZSC7D+Jv0j+tBiBfwVH3DDQU00Qi1jr4ILhNq0bz
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2026 21:00:44.6052
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1a6d40da-6ded-4047-a1f0-08dea6326177
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00002310.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4201
+X-Rspamd-Queue-Id: 983CB49A537
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,redhat.com,google.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-282486-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282487-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amd.com:dkim,amd.com:mid];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ncardwell@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[eric.joyner@amd.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[amd.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	RCVD_COUNT_SEVEN(0.00)[7]
 
-On Wed, Apr 29, 2026 at 1:15=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Wed, Apr 29, 2026 at 10:09=E2=80=AFAM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> >
-> > On Wed, Apr 29, 2026 at 9:48=E2=80=AFAM Jakub Kicinski <kuba@kernel.org=
-> wrote:
-> > >
-> > > On Wed, 29 Apr 2026 08:00:36 +0000 Eric Dumazet wrote:
-> > > > This test checks syncookie mode is able to reconstruct some
-> > > > client options when TCP TS are used:
-> > > >
-> > > > - wscale option.
-> > > > - sackOK.
-> > > > - MSS (in a limited way).
-> > > > - ECN (not tested, because of limited value).
-> > >
-> > > We're getting:
-> > >
-> > > # TAP version 13
-> > > # 1..1
-> > > #   File "/tmp/code_oyWax9", line 223
-> > > #     assert tcpi_snd_wscale =3D 10, tcpi_snd_wscale
-> > > #                            ^
-> > > # SyntaxError: invalid syntax
-> > > # tcp_syncookies_ip6_9k.pkt: error executing code: 'python3' returned=
- non-zero status 1
-> > >
-> > > do we need to update packetdrill ?
-> >
-> > No, this should have been
-> >
-> >  assert tcpi_snd_wscale =3D=3D 10, tcpi_snd_wscale
-> >
-> > I initially had a value of 8, and decided going to 10 just to make it
-> > different than the output wscale value.
-> >
-> > Sorry for the confusion.
->
-> Neal, can you take care of adding TCPI_OPT_SACK to packetdrill ?
->
-> Thanks!
->
-> diff --git a/gtests/net/packetdrill/code.c b/gtests/net/packetdrill/code.=
-c
-> index d90bffabcfe6..6d8d20e64d8c 100644
-> --- a/gtests/net/packetdrill/code.c
-> +++ b/gtests/net/packetdrill/code.c
-> @@ -129,6 +129,7 @@ static void write_symbols(struct code_state *code)
->         emit_var(code, "TCPI_OPT_WSCALE",       TCPI_OPT_WSCALE);
->         emit_var(code, "TCPI_OPT_ECN",          TCPI_OPT_ECN);
->         emit_var(code, "TCPI_OPT_SYN_DATA",     TCPI_OPT_SYN_DATA);
-> +       emit_var(code, "TCPI_OPT_SACK", TCPI_OPT_SACK);
->  #endif  /* linux */
->  }
+Brett's patches mostly fix issues around communication and configuration
+between the firmware and the driver; the last two are related and were
+found after an incorrectly operating firmware caused Admin Queue
+commands to time out. This issue and the rest are fixes to issues that
+we've observed internally.
 
-Sure! Done. I added all the missing bit values in the following commit:
+Prabu's patch is critical for enabling PTP/HW timestamping to work
+correctly when the completion queue entries are double-sized; the offset
+into the descriptor to read the HW timestamp is incorrect when in that
+mode.
 
-https://github.com/google/packetdrill/commit/faa0dfb54065118625e169d3111ce0=
-9c65b20229
+Brett Creeley (6):
+  ionic: Allow the first devcmd to trigger deferred probe
+  ionic: Handle failures from ionic_reset() when relevant
+  ionic: Fix unexpected dev_cmd failures
+  ionic: Fix check in ionic_get_link_ext_stats
+  ionic: fix adminq use-after-free on command timeout
+  ionic: service adminq CQ before cancelling to avoid false timeouts
 
-This can be picked up with the following, or similar:
+Prabu Thayalan (1):
+  ionic: fix completion descriptor access with 2x desc size
 
-  git clone https://github.com/google/packetdrill.git
+ .../ethernet/pensando/ionic/ionic_bus_pci.c   |  8 +-
+ .../ethernet/pensando/ionic/ionic_ethtool.c   |  6 +-
+ .../net/ethernet/pensando/ionic/ionic_lif.c   |  4 +-
+ .../net/ethernet/pensando/ionic/ionic_main.c  | 74 +++++++++++++++++--
+ .../net/ethernet/pensando/ionic/ionic_txrx.c  | 27 +++----
+ 5 files changed, 96 insertions(+), 23 deletions(-)
 
-neal
+
+base-commit: e728258debd553c95d2e70f9cd97c9fde27c7130
+-- 
+2.17.1
+
 
