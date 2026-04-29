@@ -1,193 +1,211 @@
-Return-Path: <netdev+bounces-282327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282328-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yHThLPLO8WmQkgEAu9opvQ
-	(envelope-from <netdev+bounces-282327-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 11:27:14 +0200
+	id EKfjI+DQ8WlrkgEAu9opvQ
+	(envelope-from <netdev+bounces-282328-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 11:35:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B25AE491E19
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 11:27:13 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E962492022
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 11:35:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 642733004405
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 09:27:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4741A3098BBC
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 09:31:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CFE02D876A;
-	Wed, 29 Apr 2026 09:27:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E393D392828;
+	Wed, 29 Apr 2026 09:30:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="1nArF057"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="W9VWA6S3";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="V4Wf0eoQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D86B37D137;
-	Wed, 29 Apr 2026 09:27:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1708B38A72C
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 09:30:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777454827; cv=none; b=JScX3syGl3TVjs5u3vQfgrH7k0RoMRqA7VBiTTQDWxA9Szg9zx4zwdU9E04RlXlQHRuz5JBkqshBGXoKQK5V40KYDcjhPxJcbNkiRpy3f1e/zFHuosU+FEnVAi+gXcU+DwR41wq/bID56AyZJ9kcespdUUqd+QXR2ZRcuuIJH5k=
+	t=1777455051; cv=none; b=mZqA/NcJI5Jxuss3Jj1EZL0pLPFaNxg4S83wcJDaWMtcuB+iH+ON/pOl3/tkgVfD5sfQ5FV1E/yAZzQ7ihGvycp/qgaFSWCeabL5jsPY05Lkj7/TKzf5XOZIV5MIHmca1EHbr2fxgR0QEvy8m/0cblZp/3dNtLIYdTRtnY/1up4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777454827; c=relaxed/simple;
-	bh=e9kpVznoXWPmdDZYzo5h7YVmLm1mINreekjC/IMMlhU=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Subject:Cc:To:
-	 References:In-Reply-To; b=QlQnMt31rsk7tw91AcRWQzRpZTDnvlTdKrwjq5zhhrqZajghNKx9d5I3LZ3FnM7JNv0NnG+IU1TI3+MvpAn1jlVu+jKpj8FHJSpnhSonbbZPhb2L3u6rx/fO8SHy5lT/Whu1GaF+5fn+Nfr4s8CJl0PpLvBimwX3yPtwIDeer5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=1nArF057; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 14CCC4E42B3E;
-	Wed, 29 Apr 2026 09:27:03 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id CCBA9601DF;
-	Wed, 29 Apr 2026 09:27:02 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B918D10729379;
-	Wed, 29 Apr 2026 11:26:48 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1777454821; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=xZ8VMjmAuXE7bj1xiXzUWvyTTPxElhI0qs5AYciLeQ8=;
-	b=1nArF057MsMdZUgpYhN6s2KAv0T+92sKVtzrc9vC4QAfR0RXrUhkbBhxtmA9h1DCjxoujY
-	QVnIjPjFlbwJud/AmAcnGvuzmaW9fNl+GOe/afSDYnBUDnQOsdmCsbUSVr07HAWddXsSj6
-	IaJksiqOzEQDbMp/0m5HTQvuorwLatoJIiupolrhAKmWuSoHdq+e/nz2zG+3ZoZdJ3NoaR
-	4IcS4+0df/byy5pe321xxmEhjDt40kcvH7xHhQeSRjvf3VI3HkbxyISGfetNNkseaCEuuH
-	piAruBTpPYZ/tTLULngBtcnjj1Br7ipcaommegW5qt2UElS4/W4X+FyrPFgq1A==
+	s=arc-20240116; t=1777455051; c=relaxed/simple;
+	bh=wC9jrPQBmpCZbW2mnXn6p/4PAelbyjfeh2Yka1RlPpM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GBzGLZhSnJ6e9LYY6Y89xXPMNc3pccWv8LhHL8klIS9bQht5xiMw7YN8vjYXzIQzhVrJmoVJFQ9ka2hPhb6ZKcYIovQnJ5if7aJBE72Fwm33oevn6usbKK1CflYYLMXsKdi8/PvABsa/aIYwKbjXhzDd66anryY/1IAbs4ph6ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=W9VWA6S3; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=V4Wf0eoQ; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63T8pxOZ963223
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 09:30:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	gTbNCeRSUqu4zDmkAqRY6ARTuww7wMu5rx1tnXDAf20=; b=W9VWA6S3iqRyvA7f
+	IQsLcQMaUAo6MrX9KGt2ltCHppKvhII5yVDzVpDzHK2kuP0AaZslI8qh0v3tmdex
+	IHtPapbJQePeiqdCjlTAhAHyEtwfT+4h6Zf8mY9rL59hDCZTT0mB7QUXD6jK/LEX
+	YPlvGlHt/g2oCFgtmk6x9RRZqHkzt+idAJZfRqmiEEqUOF9drtciI0/PpY5w+sH2
+	wGojjqWxaAsCUJXiE3JP1jCqQkACKt3T6EDFIM1KBOrrB9G53FbimPaNVhoSbKrh
+	h3vOEeWBL3aHeQUyDP5coXfAtAd1BplIgxkVknbEbhHroHuyOjpgWPgJcKcqpcyx
+	cjXoQg==
+Received: from mail-vk1-f200.google.com (mail-vk1-f200.google.com [209.85.221.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4du2m4tqqe-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 09:30:49 +0000 (GMT)
+Received: by mail-vk1-f200.google.com with SMTP id 71dfb90a1353d-56f71af9dddso903394e0c.1
+        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 02:30:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1777455048; x=1778059848; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gTbNCeRSUqu4zDmkAqRY6ARTuww7wMu5rx1tnXDAf20=;
+        b=V4Wf0eoQAMEva3tDdlrX9/Zl9AZ1bYSngQg/oYmbri4DFawPnSwKNq3piwSd9kYUpE
+         wJMOp9YezrpOeC69LdgSX/znAt2WaolwaiJKh1MceLb025yYmwEvSmSta/Jcq35nK+WP
+         wBjGkelpYxRvdJkqEWpA+vLyGKMxCRc06xoyTg6Erw8FT1e+87RjsjHtDXshS6VNG2Kt
+         Vfw6sTmLtrIWtP/Jrl+IbgfcTIJU+GcNoDXYWEx8Bj3C7x33mRyb6OzLQHgUhwZUN3ui
+         dNa9CIjrWBJ9N0vDukQG8M/ieGF6fxPlbBSG3TD1Wc1A6l9DWi40S3VcUuWjfYoECdMb
+         W28g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777455048; x=1778059848;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gTbNCeRSUqu4zDmkAqRY6ARTuww7wMu5rx1tnXDAf20=;
+        b=c+G4WUtDWIL+KDA2OJ1bs98m2M8TyIQVTAmisUV4s8bwo/gtRSQ5fp0/NXAVC4zdWk
+         k84q6J7I0uBCsCeINsFjI5bd4J51jvpQzbcTEsR2dr/vbenEUAPWKIiZJ61wLSjGLR7h
+         ZRx3oZi8DsruotvSodV8hQPTQo3Uonx/xNpxOseP3uaUe2D/ekK6i5pWbVO3LxKIFzvn
+         ysNEFEWMYbbci8Kj92wUrWN9Cl5OTNMZAaD7tX1my/TUofP0T1lkKcUytTvWoYsNYgtM
+         2f51sqjVcJMhoAtkPe18BDDWDjEugSD9JER6Q+LNLUtjDlqkoYvewLLdk80gld1blpxv
+         5RrA==
+X-Forwarded-Encrypted: i=1; AFNElJ8IuJNgMWqcZx+cAwLJTP5sYR51CUzFLhhvuN5/WU1Pppegsl+O34aoiT0bqMK3ytD7v1KOUos=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9tzcMygLKGxFuUqKDBnmD5Cf7ZNPAjtIiD+fuYqVMZDs/uvtf
+	xJEUIyn7/te81NzzzRukBx+p46y2sCYeaF9YvHE3AMmJrDfeMN77vLd8vWFByPIvQpxiqtImc0s
+	IyswzfX2aoD66ZSooTx5sXDRyoM4aBHhzIP4RHWgle64ihyHxetdMd/GE4jk=
+X-Gm-Gg: AeBDies92v8GqRgtZdGkJTBsXAkxf0Tb91n2iLqm3n6+2rWTVh7MxlAjmqhRK+tMz3w
+	KxuYjZggpJzMwIu9yiVQvVEYh/E0028ERhpXlaSWTit7k9FM7/vlSZDKChNUPhznVcyXW+NaHUL
+	Y/GbVYBmYcUJvtOQxe5nsOnvWyezfB/2Ql7Ery5B0lDFHxDdYNZCP+SFRqvHh47rnY036cu38XG
+	DPjsn0C1gC36bo/8mzncPQJEy7qm9o46PUNOOFHy35nh/e8t6+31il+m2XaumSRFAUl3+P3jZ3h
+	S9W463IYHklbQewwkApxOh/jHlGsmVq0fBVMzIgtxUJ1TffOcdD/k8NmxCMqys8lqJq/MifENBP
+	SgQelF2dPRvSWj3jiPeD/iaeHVl/FJhSICeaw0J1Oma/PVxqW5zUm238RMSpTlLMPK0x5EVWx/G
+	8XCd837/YGZIZa7A==
+X-Received: by 2002:ac5:c894:0:b0:56f:6edd:77ae with SMTP id 71dfb90a1353d-573a293d531mr1234277e0c.0.1777455048475;
+        Wed, 29 Apr 2026 02:30:48 -0700 (PDT)
+X-Received: by 2002:ac5:c894:0:b0:56f:6edd:77ae with SMTP id 71dfb90a1353d-573a293d531mr1234254e0c.0.1777455048034;
+        Wed, 29 Apr 2026 02:30:48 -0700 (PDT)
+Received: from [192.168.119.254] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bb985e1b108sm65753866b.50.2026.04.29.02.30.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Apr 2026 02:30:47 -0700 (PDT)
+Message-ID: <aadfa862-a99e-4214-b19f-6854672dc8d4@oss.qualcomm.com>
+Date: Wed, 29 Apr 2026 11:30:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/9] arm64: dts: qcom: arduino-imola: Get WiFi MAC from
+ NVMEM
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>,
+        Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jeff Johnson
+ <jjohnson@kernel.org>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+        ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, daniel@makrotopia.org
+References: <20260428-block-as-nvmem-v1-0-6ad23e75190a@oss.qualcomm.com>
+ <20260428-block-as-nvmem-v1-5-6ad23e75190a@oss.qualcomm.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20260428-block-as-nvmem-v1-5-6ad23e75190a@oss.qualcomm.com>
 Content-Type: text/plain; charset=UTF-8
-Date: Wed, 29 Apr 2026 11:26:47 +0200
-Message-Id: <DI5J5659IHRK.2VDGEBK93OQJP@bootlin.com>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Subject: Re: [PATCH net v2 2/4] net: macb: drop in-flight Tx SKBs on close
-Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
- <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Haavard Skinnemoen" <hskinnemoen@atmel.com>, "Jeff Garzik"
- <jeff@garzik.org>, "Paolo Valerio" <pvalerio@redhat.com>, "Conor Dooley"
- <conor@kernel.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, "Vladimir Kondratiev"
- <vladimir.kondratiev@mobileye.com>, "Gregory CLEMENT"
- <gregory.clement@bootlin.com>, =?utf-8?q?Beno=C3=AEt_Monin?=
- <benoit.monin@bootlin.com>, "Tawfik Bayouk" <tawfik.bayouk@mobileye.com>,
- "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>, "Maxime Chevallier"
- <maxime.chevallier@bootlin.com>, <stable@vger.kernel.org>
-To: "Nicolai Buchwitz" <nb@tipi-net.de>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260428-macb-drop-tx-v2-0-647f5199d8df@bootlin.com>
- <20260428-macb-drop-tx-v2-2-647f5199d8df@bootlin.com>
- <75229fab491465e06a98ee580a51f0b4@tipi-net.de>
-In-Reply-To: <75229fab491465e06a98ee580a51f0b4@tipi-net.de>
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: B25AE491E19
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI5MDA5NSBTYWx0ZWRfX/kG5HZbhm5tu
+ H+Olj3wvlxHmMqHD9C6SCCg0AJKTQvWXorgcWnAWX6ky99beqww/n0485YOpGfYhciaZllQEO15
+ lFaHoNH0hJn5RJBI3R4g0xNmqnTio77Ipq3rzPGKFQnm7M40vXe63zpdGW/cmy82sh9tkv5VJPR
+ OdYL2W/mkWbLbym84eiN7EOISMvMPIbdm+RL8SWOpSGF4r8Rf2iMy8vSQVg06FIe88yA91W6lbp
+ YbY/7rzW6HUelNUGn/2Us80ei2ZGUoxfNznuwgRoPe9lg7vMKji4pbdI+LCe2PqjRS/vcpbbIwA
+ KT7PqxzerqBtFN21ZbZm5DbkLsrJ1BGmwaQJXhL/vKGZXMO6ofwQKCNa0wd1owO0blzgnfvZTw/
+ qncLgMagCGox2cx99JHLlUzY0AVzkhS4F8i+2CpTpUqhWR5NgoKXU3QUBVHfnCT52d3Ou+4S3va
+ BcQYbP/8Izz9pzxkt2Q==
+X-Proofpoint-GUID: NVUfGqn3Tr3MaHvgxFhg4-KLU7Aa6z3w
+X-Authority-Analysis: v=2.4 cv=MuFiLWae c=1 sm=1 tr=0 ts=69f1cfc9 cx=c_pps
+ a=wuOIiItHwq1biOnFUQQHKA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22
+ a=EUspDBNiAAAA:8 a=vtxEUVkT7waMBiOsAPUA:9 a=QEXdDO2ut3YA:10
+ a=XD7yVLdPMpWraOa8Un9W:22
+X-Proofpoint-ORIG-GUID: NVUfGqn3Tr3MaHvgxFhg4-KLU7Aa6z3w
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-28_05,2026-04-28_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 clxscore=1015 phishscore=0 impostorscore=0 adultscore=0
+ priorityscore=1501 malwarescore=0 suspectscore=0 lowpriorityscore=0
+ spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2604200000
+ definitions=main-2604290095
+X-Rspamd-Queue-Id: 1E962492022
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-282328-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,qualcomm.com:dkim,qualcomm.com:email,oss.qualcomm.com:dkim,oss.qualcomm.com:mid];
+	FREEMAIL_TO(0.00)[oss.qualcomm.com,kernel.org,kernel.dk,sipsolutions.net,holtmann.org,gmail.com,quicinc.com,davemloft.net,google.com,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282327-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[30];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[konrad.dybcio@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,bootlin.com:mid,bootlin.com:email,bootlin.com:dkim,bootlin.com:url,tipi-net.de:email]
+	RCVD_COUNT_SEVEN(0.00)[7]
 
-Hello Nicolai,
+On 4/28/26 4:23 PM, Loic Poulain wrote:
+> On Arduino Uno-Q, the WiFi MAC address is stored in the eMMC
+> boot1 partition. Point to the appropriate NVMEM cell to
+> retrieve it.
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> ---
 
-On Tue Apr 28, 2026 at 11:30 PM CEST, Nicolai Buchwitz wrote:
-> On 28.4.2026 18:32, Th=C3=A9o Lebrun wrote:
->> The MACB driver has since forever leaked the outgoing SKBs that
->> have not yet been marked as completed. They live in queue->tx_skb
->> which gets freed without remorse nor checking.
->>=20
->> macb_free_consistent() gets called in a few codepaths, but only
->> close will trigger the added expressions. In macb_open() and
->> macb_alloc_consistent() failure cases, tx_skb just got allocated
->> and is empty.
->>=20
->> Use the new macb_tx_unmap() prototype to report our error as
->> SKB_DROP_REASON_NOT_SPECIFIED rather than SKB_CONSUMED which makes it
->> sound like no error occurred. Equivalent to dev_kfree_skb_any().
->>=20
->> Fixes: 89e5785fc8a6 ("[PATCH] Atmel MACB ethernet driver")
->> Cc: stable@vger.kernel.org
->> Signed-off-by: Th=C3=A9o Lebrun <theo.lebrun@bootlin.com>
->> ---
->>  drivers/net/ethernet/cadence/macb_main.c | 22 ++++++++++++++++++++--
->>  1 file changed, 20 insertions(+), 2 deletions(-)
->>=20
->> diff --git a/drivers/net/ethernet/cadence/macb_main.c=20
->> b/drivers/net/ethernet/cadence/macb_main.c
->> index 9caae1ef52b1..5a2500bd59a6 100644
->> --- a/drivers/net/ethernet/cadence/macb_main.c
->> +++ b/drivers/net/ethernet/cadence/macb_main.c
->> @@ -2678,8 +2678,26 @@ static void macb_free_consistent(struct macb=20
->> *bp)
->>  	dma_free_coherent(dev, size, bp->queues[0].rx_ring,=20
->> bp->queues[0].rx_ring_dma);
->>=20
->>  	for (q =3D 0, queue =3D bp->queues; q < bp->num_queues; ++q, ++queue) =
-{
->> -		kfree(queue->tx_skb);
->> -		queue->tx_skb =3D NULL;
->> +		if (queue->tx_skb) {
->> +			unsigned int dropped =3D 0, tail;
->> +
->> +			for (tail =3D queue->tx_tail; tail !=3D queue->tx_head;
->> +			     tail++) {
->> +				if (macb_tx_skb(queue, tail)->skb)
->> +					dropped++;
->> +				macb_tx_unmap(bp, macb_tx_skb(queue, tail), 0,
->> +					      SKB_DROP_REASON_NOT_SPECIFIED);
->> +			}
->
-> Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
+Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 
-Thanks for the review!
-We are quite a few caring about MACB which is nice.
-
-> Side note, not blocking: macb_close() doesn't cancel tx_error_task,
-> so the workqueue handler can race with this loop on tx_skb[]. The
-> exposure is pre-existing, but maybe worth a follow-up adding
-> cancel_work_sync() between napi_disable() and macb_free_consistent().
-
-Yes, noticed that while working on the context swapping series [0].
-The goal here is to improve MACB piecewise, so I won't take that on in
-the current series.
-
-[0]: https://lore.kernel.org/all/90f843aa3940bdbabadddce27314c1f1@tipi-net.=
-de/t/#mda18f759c27a4d833084b23605463994632d97e3
-     (and the two replies)
-
-Thanks,
-
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+Konrad
 
