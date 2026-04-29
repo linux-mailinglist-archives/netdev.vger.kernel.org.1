@@ -1,249 +1,142 @@
-Return-Path: <netdev+bounces-282252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282257-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CKi7FtKu8WmwjgEAu9opvQ
-	(envelope-from <netdev+bounces-282252-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 09:10:10 +0200
+	id gCZuGLmu8WmwjgEAu9opvQ
+	(envelope-from <netdev+bounces-282257-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 09:09:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D23F4903F0
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 09:10:09 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9FAB4903DB
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 09:09:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EB4F9307734B
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 07:05:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 556283046533
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 07:08:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B683A380E;
-	Wed, 29 Apr 2026 07:05:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C93933A3E94;
+	Wed, 29 Apr 2026 07:08:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TM6xzoa2"
+	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="CbTZKcTD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5B893A3836;
-	Wed, 29 Apr 2026 07:05:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF533A2550;
+	Wed, 29 Apr 2026 07:08:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777446340; cv=none; b=AVZjrCcK6POkbEhqOLWOXThj1dzObGFw348R4KN5WbdcLJzWcqrFZdTaL9ZitZ6b3TfcV1NTjPZVbDhQDK7Hd8FMuBd3W605PBsTy9f/tBt1VpaGgjkA3fqQUFs/KOzG0WNQGYTjkOM91ZLD65XXfkuLprAqh9OdKmCvJFoyld0=
+	t=1777446505; cv=none; b=uwjpbfoR0ah5KLb00Fimv1OQSeE+H+IxVsMWYJgvUPB2M174t8JTn+fYaSc2L28el8yiSKy9xpOqPL0mlZVd032JeCaBVw87Wm62Va43WmtMS/ltceShMdmpa7kzT6fbUoTAeeQOYVFbrNERbMgDy3TFooju6wlnLIQ84SMnk20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777446340; c=relaxed/simple;
-	bh=tuQZoweB37YIPb0s2Ws/3CvfgIEiBhy5mpLdxPSjUsA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tI6cIqnGj5UaokYgDU4oPIyX9EeAbPr2161GRQIr/l4ZQwTSBpLpUgbES9pdRAAe3iWc4c31BvAFr8+5NPF1mRhAEx2vV8B4wiAUZEioej4kvdsArUmKufbQUA32G06Wif0AOoN2B/FCIE4Dkjo2JjPoR5SdxLelNsXwzOgWb8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TM6xzoa2; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777446336; x=1808982336;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tuQZoweB37YIPb0s2Ws/3CvfgIEiBhy5mpLdxPSjUsA=;
-  b=TM6xzoa2VTfKyWQLt2P44pcmc4ACB/6auiNRjw9edetE2y66vnyAbEeb
-   ZpgC0Af/2AMQBhS1Xr5UWVHthVkJgpauOh0+M+4yicTqwLbDjNaMpz4h+
-   Qs+A3TmXK/DqT+mxyUswdgRwkuG2VoFfSW+WSR0BJ1gow3mb7r1Z2/Nt3
-   oDysAETWwic94G+uLnS4xB+2u8rWa7xsvQMshLw3WvNzHaT9rqjvWnXyc
-   wDTbL3aJX96tgPIsocbcSCRkuaAtG5aBZudlkFMXwJ3QbBFfW0LuZxC0D
-   xf24I/Yia10TwmVseYVocG3vP3ZL/Tke6TcPpRWGbNpMF496lDmWJICO/
-   g==;
-X-CSE-ConnectionGUID: ENfbi42HT+CmVm/I0evAnw==
-X-CSE-MsgGUID: imJ8wYTfTsSPUA4z8NKirQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11770"; a="88676975"
-X-IronPort-AV: E=Sophos;i="6.23,205,1770624000"; 
-   d="scan'208";a="88676975"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2026 00:05:32 -0700
-X-CSE-ConnectionGUID: J7/m8SfER6qabd4UD/5sNQ==
-X-CSE-MsgGUID: aZ5CuJd7RQKnC30tSH+iPQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,205,1770624000"; 
-   d="scan'208";a="234049647"
-Received: from black.igk.intel.com ([10.91.253.5])
-  by orviesa008.jf.intel.com with ESMTP; 29 Apr 2026 00:05:30 -0700
-Received: by black.igk.intel.com (Postfix, from userid 1001)
-	id 663E895; Wed, 29 Apr 2026 09:05:28 +0200 (CEST)
-Date: Wed, 29 Apr 2026 09:05:28 +0200
-From: Mika Westerberg <mika.westerberg@linux.intel.com>
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: linux-usb@vger.kernel.org, Yehezkel Bernat <YehezkelShB@gmail.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	Andreas Noever <andreas.noever@gmail.com>,
-	Alan Borzeszkowski <alan.borzeszkowski@linux.intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 9/9] thunderbolt: Add support for USB4STREAM
-Message-ID: <20260429070528.GB557136@black.igk.intel.com>
-References: <20260428072209.3084930-1-mika.westerberg@linux.intel.com>
- <20260428072209.3084930-10-mika.westerberg@linux.intel.com>
- <2026042848-cubical-penalize-807c@gregkh>
- <20260428120314.GR557136@black.igk.intel.com>
- <2026042802-bobsled-envy-8e56@gregkh>
- <20260428141148.GS557136@black.igk.intel.com>
- <2026042854-reburial-extinct-e16d@gregkh>
+	s=arc-20240116; t=1777446505; c=relaxed/simple;
+	bh=LHvHk9wT9cQmy7E7onyCKxFJGKzrJmyu2ITLVPN9HNs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uEMzYHHqvODUmAcawvTJrXbTwFBadTc5FT/EZiLdL6vPO2nD36aOtwlxXXPJMeBRrg3Y/AuPN+dYxJlveHH/BFtajQSAdFam1kdB3RbvuLFqFES/6wkXP1RNiTOAJTV8DGW8VFRxoeVXpVRQo9tDX4Kq8hBD/GLKAr5Lwp17x5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=CbTZKcTD; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 63T77qvaE1069969, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
+	s=dkim; t=1777446473;
+	bh=2SqM0TNUN/1Wx/hGComi5YDdmUSn1Iu0mpWOi8sIdfQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=CbTZKcTDCZs/FFp3AGJ62uZSXziZsXHueqvN95bLWPdLUl9zzNjQg1CPsga2YozUa
+	 dQ8JxfULlJo79mo32eoDCI2AKGKdDW29+uyLlrM9QAA0/PXsOfPsHyPpjihtROdbbC
+	 /Pqimy0OPPeNdkiAq3fbjKftfIMehue5+s71HxlG2ujFx5+vdJ0JtKPeXE4ka4dZZY
+	 27Mq58q/brUZ+hszOwWdQGOxviFVZ/WYj91jEEjJ6RHrpoPe72NlOD8TIdcmisUzlU
+	 F8OHCjQelOetIXgbrVGemkvNZNQuvnupWrfg7WNm8cEQjFAZGcphleAhBGsiPgSvfv
+	 Vf7NywpOEFigA==
+Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
+	by rtits2.realtek.com.tw (8.15.2/3.27/5.94) with ESMTPS id 63T77qvaE1069969
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 29 Apr 2026 15:07:52 +0800
+Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
+ RS-EX-MBS2.realsil.com.cn (172.29.17.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Wed, 29 Apr 2026 15:07:53 +0800
+Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS1.realsil.com.cn
+ (172.29.17.101) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
+ Transport; Wed, 29 Apr 2026 15:07:53 +0800
+From: javen <javen_xu@realsil.com.cn>
+To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <horms@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Javen Xu
+	<javen_xu@realsil.com.cn>
+Subject: [RFC Patch net-next v2 0/8] r8169: add RSS (Receive Side Scaling) support for RTL8127
+Date: Wed, 29 Apr 2026 15:07:42 +0800
+Message-ID: <20260429070750.1477-1-javen_xu@realsil.com.cn>
+X-Mailer: git-send-email 2.50.1.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2026042854-reburial-extinct-e16d@gregkh>
-X-Rspamd-Queue-Id: 9D23F4903F0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Rspamd-Queue-Id: A9FAB4903DB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
+	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,wunner.de,linux.intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-282252-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-282257-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[realsil.com.cn:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mika.westerberg@linux.intel.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[realsil.com.cn:email,realsil.com.cn:dkim,realsil.com.cn:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Tue, Apr 28, 2026 at 12:10:08PM -0600, Greg KH wrote:
-> On Tue, Apr 28, 2026 at 04:11:48PM +0200, Mika Westerberg wrote:
-> > On Tue, Apr 28, 2026 at 07:54:51AM -0600, Greg KH wrote:
-> > > On Tue, Apr 28, 2026 at 02:03:14PM +0200, Mika Westerberg wrote:
-> > > > On Tue, Apr 28, 2026 at 05:57:37AM -0600, Greg KH wrote:
-> > > > > On Tue, Apr 28, 2026 at 09:22:09AM +0200, Mika Westerberg wrote:
-> > > > > > Introduce USB4STREAM protocol and Linux implementation. This allows two
-> > > > > > (or more) hosts to transfer data directly over Thunderbolt/USB4 cable
-> > > > > > through a character device without need to go through the network stack.
-> > > > > > 
-> > > > > > Any application that supports read(2) and write(2) in some form should
-> > > > > > be able to use the device without changes. The data is sent out to the
-> > > > > > other side over a tunnel inside Thunderbolt/USB4 fabric. The character
-> > > > > > device is called /dev/tbstreamX where X is the minor number starting
-> > > > > > from 0.
-> > > > > > 
-> > > > > > All stream devices need to be configured first. This is done through
-> > > > > > ConfigFS interface. There can be multiple streams at the same time (this
-> > > > > > depends on number of DMA rings and available HopIDs) and a single stream
-> > > > > > supports traffic in both directions. For example there could be an
-> > > > > > application that uses one stream as control channel and another one as
-> > > > > > bi-directional data channel.
-> > > > > > 
-> > > > > > A real use-case for this is to take a backup as a part of recovery
-> > > > > > initramfs tooling (no need to setup networking or have ssh or similar
-> > > > > > tooling as part of the initramfs). Say we want to backup the disk of
-> > > > > > host1 to host2. First Thunderbolt/USB4 cable is connected between the
-> > > > > > hosts (there can be devices in the middle too) then the receiving side
-> > > > > > configures the stream:
-> > > > > > 
-> > > > > >   host2 # mkdir /sys/kernel/config/thunderbolt/stream/0-1.0
-> > > > > >   host2 # mkdir /sys/kernel/config/thunderbolt/stream/0-1.0/backup
-> > > > > >   host2 # echo -1 > /sys/kernel/config/thunderbolt/stream/0-1.0/backup/in_hopid
-> > > > > >   host2 # echo -1 > /sys/kernel/config/thunderbolt/stream/0-1.0/backup/out_hopid
-> > > > > > 
-> > > > > > We use automatic HopID allocation (writing -1 to HopIDs) for simplicity.
-> > > > > > >From this point forward the /dev/tbstream0 can be used pretty much as
-> > > > > > regular file:
-> > > > > > 
-> > > > > >   host2 # dd if=/dev/tbstream0 of=/tmp/host1.nvme0n1.backup-$(date +%F) bs=256k
-> > > > > > 
-> > > > > > The host that is being backed up then configures the stream accordingly:
-> > > > > > 
-> > > > > >   host1 # mkdir /sys/kernel/config/thunderbolt/stream/0-503.0
-> > > > > >   host1 # mkdir /sys/kernel/config/thunderbolt/stream/0-503.0/backup
-> > > > > > 
-> > > > > > Here we take advantage of the fact that host2 also announces the active
-> > > > > > streams through XDomain properties so the name "backup" gives us the
-> > > > > > HopIDs. It is also possible to configure them manually in the same way
-> > > > > > we did for host2.
-> > > > > > 
-> > > > > > Then it is just a matter of copying the data over:
-> > > > > > 
-> > > > > >   host1 # dd if=/dev/nvme0n1 of=/dev/tbstream0 bs=256k
-> > > > > > 
-> > > > > > Similarly it is possible to transfer parts of the filesystem. For
-> > > > > > example copy contents of mydir over to the host2:
-> > > > > > 
-> > > > > >   host2 # gunzip < /dev/tbstream0 | tar xf -
-> > > > > >   host1 # tar cf - mydir | gzip > /dev/tbstream0
-> > > > > > 
-> > > > > > Other end of the spectrum use-case is "borrowing" laptop (host1) camera
-> > > > > > to desktop (host2):
-> > > > > > 
-> > > > > >   host2 # gst-launch-1.0 filesrc location=/dev/tbstream0 ! jpegdec ! videoconvert ! \
-> > > > > >                          autovideosink
-> > > > > > 
-> > > > > >   host1 # gst-launch-1.0 v4l2src device=/dev/video0 ! video/x-raw,width=1920,height=1080 ! \
-> > > > > >                          jpegenc quality=90 ! filesink location=/dev/tbstream0
-> > > > > > 
-> > > > > > Once the streams are no longer needed they can be removed:
-> > > > > > 
-> > > > > >   host1 # cd /sys/kernel/config/thunderbolt/stream/
-> > > > > >   host1 # rmdir -p 0-503.0/backup
-> > > > > > 
-> > > > > >   host2 # cd /sys/kernel/config/thunderbolt/stream
-> > > > > >   host2 # rmdir -p 0-1.0/backup
-> > > > > 
-> > > > > Very cool, but shouldn't the above be in some documentation somewhere so
-> > > > > that people know how to use it?
-> > > > 
-> > > > Sure, I can add it part of the Documentation/admin-guide/thunderbolt.rs for
-> > > > example.
-> > > > 
-> > > > > And why do you need a whole major for this, why not just use a misc
-> > > > > device that it dynamically created for every new dev?
-> > > > 
-> > > > We do use this:
-> > > > 
-> > > >        ret = alloc_chrdev_region(&tbstream_devt, 0, TBSTREAM_DEV_MINORS,
-> > > >                                   "tbstream");
-> > > > 
-> > > > that should be dynamically allocated, no?
-> > > 
-> > > Yes, but you are using up a whole major number for this, and in reality
-> > > there's only going to be 1-2, maybe 4, different devices needed at once,
-> > > right?  So just use the miscdev interface instead?
-> > 
-> > There could be 11 per host controller in Intel hardware (we have 12 DMA
-> > rings, one of which is reserved for control traffic), and we have 2 host
-> > conrollers in recent systems. Due to the dedicated flow control we use now
-> > that's not possible but we are planning to make it to use shared flow
-> > control instead which allows more.
-> > 
-> > Not sure if anybody ever will create that many, though.
-> 
-> Yeah, that's not many, and a bit of a waste of a full major number.
-> 
-> > Second thing is that we use cdev_device_add() to manage the char device and
-> > the stream device as they are part of the same structure. I don't think
-> > that can be done with miscdevice.
-> 
-> Not yet, but see the patches on the list for how to do that properly.
-> You will have issues with disconnect/open/close that you need to handle
-> very carefully, especially as you are a dynamic device.  See this
-> thread:
-> 	https://lore.kernel.org/r/20260427134659.95181-1-tzungbi@kernel.org
-> 
+From: Javen Xu <javen_xu@realsil.com.cn>
 
-Thanks for the pointer. I'll look at how we could use miscdevice with
-stream.
+This patch series adds RSS (Receive Side Scaling) support for the r8169
+ethernet driver, specifically for RTL8127 (RTL_GIGA_MAC_VER_80).
+
+RSS enables packet distribution across multiple receive queues, which can
+significantly improve network throughput on multi-core systems by allowing
+parallel processing of incoming packets.
+
+Key features:
+- Multi-queue RX support (up to 8 queues)
+- MSI-X interrupt with vector mapping
+- Dynamic queue configuration via ethtool (-L)
+- RSS hash computation for flow classification
+- NETIF_F_RXHASH feature support
+
+Javen Xu (8):
+  r8169: add some register definitions
+  r8169: add support for multi irqs
+  r8169: add support for multi rx queues
+  r8169: add support for new interrupt mapping
+  r8169: enable new interrupt mapping
+  r8169: add support and enable rss
+  r8169: move struct ethtool_ops
+  r8169: add support for ethtool
+
+ drivers/net/ethernet/realtek/r8169_main.c | 1217 ++++++++++++++++++---
+ 1 file changed, 1095 insertions(+), 122 deletions(-)
+
+-- 
+2.43.0
+
 
