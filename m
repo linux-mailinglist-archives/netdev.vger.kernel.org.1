@@ -1,125 +1,125 @@
-Return-Path: <netdev+bounces-282390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282391-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QIMpJ08H8mkimwEAu9opvQ
-	(envelope-from <netdev+bounces-282390-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 15:27:43 +0200
+	id SMQLKVUI8mnhmwEAu9opvQ
+	(envelope-from <netdev+bounces-282391-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 15:32:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E9DD494CB8
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 15:27:38 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E852494DEF
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 15:32:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A0630301DBB2
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 13:22:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2844C305BF30
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 13:25:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DADCE3FCB27;
-	Wed, 29 Apr 2026 13:22:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D6A3F7AB7;
+	Wed, 29 Apr 2026 13:25:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GIoD06gR"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DeHXCnCr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B859C3F23AB;
-	Wed, 29 Apr 2026 13:22:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD89039099B;
+	Wed, 29 Apr 2026 13:25:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777468949; cv=none; b=h1YREqD/q1IZEF+4tEcVuiIxHLdj07xSeaOigS2d6DN3Buw8OnODx6TcX7hqtNumNFPcVpVvKLX9/sTZ9oVMksDF6/QualY72J8aDqUmWqWYg0z1q8t4KC4VaYCMBXL0YtJgjY2SjLOUqhzgvi6YSxFf8nfgjiXR+aamDQs5IQI=
+	t=1777469102; cv=none; b=pCC4Pq6Xs+9MoqP1+jKl0HcEK8W2QFXcBAaDa8kHikEf+EhZ/7rvUINK0GU+oECaR+KYmMAJmALRRnD5hyrDFeqWc2oCUSg8PuIrkNS/OB2DRRItGKocY29f9Y74p0gUXZ3jGf4gij3a0KRl3xFdZqUNGovKrbhNgUdhwqNENHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777468949; c=relaxed/simple;
-	bh=0q4Kb+0MtHIIchjg9qK9s2IuUDQ6rf+FF6oXl0WBVmY=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=t9e02iGA57dJOa99Owp1jLNWqv1dWFMyi2w++q6yzTQad+Z6iPoLodXij4baskonbvE1XzrG+I64NvMWJJ6zMQh0OKlsj6cAGmLZtdxgLXJnyt0ae3e93R/JtIYK4q7yljUh0W+K182ZkCIDprDiD/BMe25uhtIiqLmSoXbTuFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GIoD06gR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB103C19425;
-	Wed, 29 Apr 2026 13:22:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777468949;
-	bh=0q4Kb+0MtHIIchjg9qK9s2IuUDQ6rf+FF6oXl0WBVmY=;
-	h=From:To:Subject:Date:From;
-	b=GIoD06gRdm6t/17QcjvIQ1PqvZOIfpf1Sh8/UIkzYtRzmgYHoIYe+PETjvlFoMekA
-	 nAiT1SUMXdL+ITGT2ym2wDSgo00EgabvZmuEW2qK/a1GLvqgpsXU0y028PJ62cqZtj
-	 v0nuz1tYmh5Ud294f8eNXJ7VU8/5bWNnddF0FDz7nF+PuVr3EKa156US+bO5Pv+QwA
-	 06My+oMY2kVXjUBenZ/6I23uIwaCW34H3DTkE7P8GcgsSBHSFsMuGgdYUGgkpY460y
-	 aobYYVFRsuOBTNZuxwBO5Ugz5IVN3JzXLnGczofCUpsgTjK9DL1Uy7k+CKi5QyzkD8
-	 IZcliNk3Fs28Q==
-From: Lee Jones <lee@kernel.org>
-To: lee@kernel.org,
+	s=arc-20240116; t=1777469102; c=relaxed/simple;
+	bh=oKMamG83QOLrWSxnhitkkjPtleCNuHOyDK7t0dLY+8w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tscyY+uEPYPaoLl2P4DDFQMowBcflld8bnJ5eNW1K3aalJiiYari2weZF9bxM5sUO9KOonad1JHAcdp011yXfyKSIO7HTP6wNCRoYwFgP3jf3SwuMm8/U2UHllklBbtb3qBdPqwimNhwObCsknOPWaRE/++o2E5fuqFxjbq5gBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DeHXCnCr; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=QSOgMQl0K1POqlJK6mzVSLOEWmD2vZiKst0hjhUeTdI=; b=DeHXCnCrlOcl7xy8sGWJgNWbVV
+	C+NF4TfBFHbekMVdBDUQ7SOE215XeHu/QrzKhApgtgj/3uByR1MpX7b8Q8MABZQ7sXwqIEJ6TYW5m
+	dU3Qdchehn/q9gyYCkhEZhQX8woEn+AiWF6e3SZ/E6mNYR2afi4KSVQP72GFXf3TqCaA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wI4uK-000XKa-At; Wed, 29 Apr 2026 15:24:52 +0200
+Date: Wed, 29 Apr 2026 15:24:52 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/1] nfc: llcp: fix use-after-free in llcp_sock_release()
-Date: Wed, 29 Apr 2026 13:22:11 +0000
-Message-ID: <20260429132218.3548644-1-lee@kernel.org>
-X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: gianfar: use alloc_ethdev_mqs
+Message-ID: <72c3a071-ae9e-416a-8800-6b136c2758ab@lunn.ch>
+References: <20260428223058.113013-1-rosenp@gmail.com>
+ <0f704ce2-e936-4bc1-8ab2-144de9e74af8@lunn.ch>
+ <CAKxU2N8yb9-M9zELSxdEjLz02GKFZ2mOmgHhc7NbW+oJsvtGXg@mail.gmail.com>
+ <d807e204-0052-4a33-b711-e372c7695023@lunn.ch>
+ <CAKxU2N_uQaGvsT5zri53Bcr9veCFWzV=_VnddJRdOXBYgoqWQw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 2E9DD494CB8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKxU2N_uQaGvsT5zri53Bcr9veCFWzV=_VnddJRdOXBYgoqWQw@mail.gmail.com>
+X-Rspamd-Queue-Id: 3E852494DEF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282390-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282391-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[lee@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[]
 
-llcp_sock_release() unconditionally unlinks the socket from the local
-sockets list.  However, if the socket is still in connecting state, it
-is on the connecting list.
+> I see what you mean. Will respin this.
 
-Fix this by checking the socket state and unlinking from the correct list.
+This is why the netdev FAQ says:
 
-Signed-off-by: Lee Jones <lee@kernel.org>
----
- net/nfc/llcp_sock.c | 2 ++
- 1 file changed, 2 insertions(+)
+  Netdev discourages patches which perform simple clean-ups, which are
+  not in the context of other work.
 
-diff --git a/net/nfc/llcp_sock.c b/net/nfc/llcp_sock.c
-index f1be1e84f6653..feab29fc62f44 100644
---- a/net/nfc/llcp_sock.c
-+++ b/net/nfc/llcp_sock.c
-@@ -633,6 +633,8 @@ static int llcp_sock_release(struct socket *sock)
- 
- 	if (sock->type == SOCK_RAW)
- 		nfc_llcp_sock_unlink(&local->raw_sockets, sk);
-+	else if (sk->sk_state == LLCP_CONNECTING)
-+		nfc_llcp_sock_unlink(&local->connecting_sockets, sk);
- 	else
- 		nfc_llcp_sock_unlink(&local->sockets, sk);
- 
--- 
-2.54.0.545.g6539524ca2-goog
+  ...
 
+  This is because it is felt that the churn that such changes produce
+  comes at a greater cost than the value of such clean-ups.
+
+Does changing alloc_netdev_mq() to alloc_netdev_mqs() bring enough
+gain to offset the work needed to find the new bugs added at the same
+time?
+
+I know i would prefer looking at patches adding new drivers, new
+infrastructure, new features, than broken cleanups for very old
+drivers with very few users.
+
+	Andrew
 
