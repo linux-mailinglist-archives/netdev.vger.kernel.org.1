@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-282493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282494-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QCwKObhx8mmJrQEAu9opvQ
-	(envelope-from <netdev+bounces-282493-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:01:44 +0200
+	id yNzhN3By8mnVrQEAu9opvQ
+	(envelope-from <netdev+bounces-282494-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:04:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0B0B49A511
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:01:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 498E349A5BE
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:04:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DB7D6300349A
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 21:01:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2C71830BBE30
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 21:01:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED74D377EDB;
-	Wed, 29 Apr 2026 21:01:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EDF737648D;
+	Wed, 29 Apr 2026 21:01:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="CF5VrnJ+"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="lmJyjUAz"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012049.outbound.protection.outlook.com [40.93.195.49])
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013040.outbound.protection.outlook.com [40.107.201.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A38343D66
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 21:01:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5967388E46
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 21:01:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.40
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777496499; cv=fail; b=oNZcG/KMsGqBMOkzOnGwEqW/RPQvq1CsVX3hMWUMGLRFdW2A8HF8bCtC59GIjg/wIs1xtJ7HH33xKk21w7lR/sETyfcFkQX8DkLnScM7r8XSbsaWvsszpEfM6F6SM3EOPhxhVbYy/PuoW3djXstb/P+syocxwjTdkGKR/RHrf40=
+	t=1777496505; cv=fail; b=Zq6ZRu3X7luZotB8ned7aD4cdyXebuAQSj2dBLTVvKYOVfZe8G28T046Ts6qge292EpB4SUJG2xc8ZfRJ+Mm2sbyruh5k3VJGg+wj4yylEJvRbRBwncppTPeHdIJh20ykZyZAtO4SliviuBZG70K8biXAaEBEXUvCaA5KXJjTTw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777496499; c=relaxed/simple;
-	bh=2PowJRFIV7NW2Y7WfpLoTup5hxAOevo07h6RMwieaIM=;
+	s=arc-20240116; t=1777496505; c=relaxed/simple;
+	bh=40M5f+pYvdyVnpHFmmVc1bTijoEqcSuITTzlLi3oz7c=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HepMAFKjMHmiV87K9WdZEyVkJrdsOi7/XzbDRU5tiYRFFMKwQQprw/9s2QILZHD9FOiyNDJJiAj3xNC72JfqIu/8LG1JkJ7gQ767+onHFoRMnHpjf5vDcSvurCNrmD99VS2dOqa6wopBD8dhar2XfvuTjaQ+CfjSX75RWtH8UUA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=CF5VrnJ+; arc=fail smtp.client-ip=40.93.195.49
+	 MIME-Version:Content-Type; b=VaPN+L7TCP1T/F+OY6+nrHpUb6QYQIH3w+tty6+To/AdD+DfNRNs0hew6jLV0zynbzXOUib+TZcWacJ4oBT9NJf4DZvfEIXpsX4aGVezimUQJ4J4MG0DRTXsjCFsUy8HpEX+GMK4jgboEIcgtwqlUPrQnI+FeqKnbAqFqO2I9JM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=lmJyjUAz; arc=fail smtp.client-ip=40.107.201.40
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EtIAksSVWx5DZb+mvdNH8nqxkgDiKI214cmO1W4SYtYTJQVF2mbi2grPD/iVW8I3w7+x/nsHKdlh+PBqLt7tL/srCKkno8sCir5CLBsv9fOiXBMBTQ4t8TH19dMinD7YVwH9Rk7U/7yXH2ahfDJE3bXPsogD124W0vmuzdJM22Ya7wzTd5oqPeIXvrgxyIp+a6qrUO0+4/dzOX4SPSrW22nGYXkQ5NYW2lzjEU7WSRU9zaz/wTPQRM+KPeN7+UexsQtwcPfFd/zkgvs8V3EuNzkqE2iDvn5OsAaAwNd49K6UnHgVrbSsBFgCykbRuajSTUD7iTlm+xBgufzhBcsw5Q==
+ b=XK5kqjvBCNirF4imCL1D5LCj4PBBD51+SfNQqm+lrESk7fpgyTa/qTXhTCWBYCRle4ESmg1XbDS5sxFwyythCdDMqZXZjrAvUb20EDVRr01/VKT0t4SFt31KWJMa4fFLzfsahKrU8/RPnG55iYMpucvBCChZ+vY6UvbfZHj1Gr2bgIOQZvEV0553ZK8N5T1doNOlPKZUvHPx3RCqwExxx7/sTFhXJ0gdgWd7YaE/UYtUxxQajy9nQcixPIM7HqLHbWl1/3stJzRubQ6ZxgaOZr6R7woMiNC/JgtU1vl7kSOK9MfsBDUqlie7iKVJRboECruWP2QdQowZOI9lXo5gyw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7YL25DHNK3JK91ec7rMU2IxPuJw8P5J9YmtadlrvjOw=;
- b=gdGk6HjfaNFJ8DI13f4thwn/4ia3cboL2nW3f2JJrBklhLIJ3Yl5pEof+lHAZ2kccPcJqRu5i50Z0b0ZQAxo2wn/oJxgYCuLsNJuRo4c06LfwRwtV2WHFodV9+Hofms2cC7wXTwgay6gK+Kt03ywxdq8lyeXfjhBKqGJyOh4K4Q6hgpYZ7cIxFQgeQeMBgCuoSdOWrnOkwlcBXRINrdyAKyfswM1PtnQj4ogIkhVm4QzHfgMqR1aI4rvWG4O+v99/ABbITefW8CKOJQBN6EWR/AO7DyR7L178XI711C12JuOC66ACeOYLfKn2N4oQIBU8DbZHZIaFMSUMay3nWbMRA==
+ bh=Mn5/XHmx90NyvvBmLk4io2ev3sCT3Q6F1tyq735g0iA=;
+ b=b7Q7GH9S5Aw8eAhxTiE4GuanTdRbI+qL5doUi6vsO365cMgWnAcNcfTZH37Ui7/H0VUT7MFgR5m85MjMOsU4NAu7zHuvv5rFpMPrCDxsftt4Tr1gE31ZZJaTXc7xcpLZV0TEVFSqhm4+n4THUVBoNgdit1gsBexaim1rhPBoUfMMANKqHERGyydaotsGhx9jFNxFQHq+Cj7dccS5GZ2ZELspr2yu393d5xjOWwK5eLu0YFjMPAJ0yNMg3ifc1SMLt+BYzCITUyzY8wY06mMKvwconodm9HWPCqWSxtX0eWOuHPfAkAT97uqCJWB7wnMrr3e7+16OFTmEN+tUGWprgg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7YL25DHNK3JK91ec7rMU2IxPuJw8P5J9YmtadlrvjOw=;
- b=CF5VrnJ+ajHByCvVlQuyoAdukzh4roR3jj1MiBKWTEQa3sP4a8cjgiumCpAqo3Yc7ayBr5FIpj1s9f+Gq32LMql2lIfpw7OZ7wpNyzdPx/3ZuAoYOLJg0spXBnxBaJXxh/2R60MSwLd5ScYwqO6wtQvLtLv0tOsWgn5LyDGK2Ec=
-Received: from SJ0PR03CA0096.namprd03.prod.outlook.com (2603:10b6:a03:333::11)
- by SA1PR12MB8917.namprd12.prod.outlook.com (2603:10b6:806:386::20) with
+ bh=Mn5/XHmx90NyvvBmLk4io2ev3sCT3Q6F1tyq735g0iA=;
+ b=lmJyjUAzGfqC3rWvNgn6bfm7CmaEzHO2QE1LHDB/X0w/jDValvgCEUOcdkYrtusKEftPYOQl55bUek7jR7CmWtMaXqxKyK8JPyhkU93fnj90OhhOPvyfL+Oh+6usDroD/y0XnPI9gvjClCgspg8GySLBgeVYz+oaIeo3W37//bk=
+Received: from BYAPR02CA0052.namprd02.prod.outlook.com (2603:10b6:a03:54::29)
+ by CYYPR12MB8963.namprd12.prod.outlook.com (2603:10b6:930:c3::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.15; Wed, 29 Apr
- 2026 21:01:29 +0000
-Received: from SJ1PEPF00002312.namprd03.prod.outlook.com
- (2603:10b6:a03:333:cafe::2f) by SJ0PR03CA0096.outlook.office365.com
- (2603:10b6:a03:333::11) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9846.28 via Frontend Transport; Wed,
- 29 Apr 2026 21:01:29 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.16; Wed, 29 Apr
+ 2026 21:01:36 +0000
+Received: from SJ1PEPF00002317.namprd03.prod.outlook.com
+ (2603:10b6:a03:54:cafe::af) by BYAPR02CA0052.outlook.office365.com
+ (2603:10b6:a03:54::29) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9846.30 via Frontend Transport; Wed,
+ 29 Apr 2026 21:01:36 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -66,22 +66,23 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- SJ1PEPF00002312.mail.protection.outlook.com (10.167.242.166) with Microsoft
+ SJ1PEPF00002317.mail.protection.outlook.com (10.167.242.171) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9846.18 via Frontend Transport; Wed, 29 Apr 2026 21:01:29 +0000
+ 15.20.9846.18 via Frontend Transport; Wed, 29 Apr 2026 21:01:35 +0000
 Received: from driver-dev1.pensando.io (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 29 Apr
- 2026 16:01:27 -0500
+ 2026 16:01:34 -0500
 From: Eric Joyner <eric.joyner@amd.com>
 To: <netdev@vger.kernel.org>
 CC: Brett Creeley <brett.creeley@amd.com>, Andrew Lunn
 	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
  Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Eric Joyner <eric.joyner@amd.com>
-Subject: [PATCH net 6/7] ionic: service adminq CQ before cancelling to avoid false timeouts
-Date: Wed, 29 Apr 2026 14:00:06 -0700
-Message-ID: <20260429210007.40015-7-eric.joyner@amd.com>
+	<pabeni@redhat.com>, Eric Joyner <eric.joyner@amd.com>, Prabu Thayalan
+	<prabu.ponrajthayalan@amd.com>
+Subject: [PATCH net 7/7] ionic: fix completion descriptor access with 2x desc size
+Date: Wed, 29 Apr 2026 14:00:07 -0700
+Message-ID: <20260429210007.40015-8-eric.joyner@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20260429210007.40015-1-eric.joyner@amd.com>
 References: <20260429210007.40015-1-eric.joyner@amd.com>
@@ -96,31 +97,31 @@ X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00002312:EE_|SA1PR12MB8917:EE_
-X-MS-Office365-Filtering-Correlation-Id: bb9fbb7d-0790-4d9d-d6f7-08dea6327bfb
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00002317:EE_|CYYPR12MB8963:EE_
+X-MS-Office365-Filtering-Correlation-Id: 972bcf58-d270-4021-3aea-08dea6327fcd
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|82310400026|1800799024|376014|22082099003|18002099003|56012099003;
+	BCL:0;ARA:13230040|82310400026|36860700016|1800799024|376014|22082099003|56012099003|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	XBbIOGhj9Z/Z7KlUZmQ37Kfgi1WXW24A7UpEkN35Wy57SaCZcEbSTx4s2YrevTrTcI5gRMaX4CSUUou5KLDSV9rfeQR2Yh4980TyKJ4kzXzreVA82BMNCjXIIr7aLEmbEUx32iTpU6kPNZeUcIeQdUFhuaAWL7wAhDIrPcL6gXM5rMdEBydxyeIZCP5bc7It7TVexhhUfczAQUSkC+WTNVwEOn8FWQDSvwDguKq+87yFTlmq5QElUdicAErF/IlxdzySwjTi0OKYs+FqHnVqzgLRV0iiZ8bYLjqDqSiybl7+UqXFtBcU5uH1Oq3TJlUIpb/dcxl3z7J4nFOSBNbWoUZeI4B/B/F+0ur10rZq5d2+TI3ETzFVowHrCmMnw7nus5ySXQFptnFr5TIuqlDpyKOwzFVit0TZio5HDkqufCaakQsTFbI/GCrr6YhfDBDmyHJvn/vy108N6kajYWCh0Yx/CNhdBIFkPUu04xEnziJHRg5ekL3gL3/aezMWY1OQlGYB8M4LLhbI2ixylx8bPClkRBw0mxTvfq1uvCHl6ksKMnAwR2bxr1SJAIOZEivms284QXW5rlayx3JgQA34QSkvSIl1E678KNHy1R9BSjpAWy3ww//XnZAPIJyx0Kpki3EFhTWkuugbMbDLLdAzV95aAbCvwbz2PPukgTWtTOLqcxSK9G2J8WDJTwgJxzGceIL7T59CYKufYBtY2d40ogKmtl+YbBD1wM8ER9eGQ1IIk/rvbwZ49+9aHQmMaWlq9ixCCjJICFGPx79ZCy24zA==
+	sSsHlhz5VKdzm7C5wjKUz71ZXY9tuiDwpz6OcJNOKW/aGf/AKiZSwg9ihlzAWlfAUxif2DlIG0TuKqwvCTLpvZhPtHKOAwXB0PPZoAcI+9JKjWdGxLz+2cVS/axErywyCDLwyEcCD/EUb8j0JWRfwwSgeFGJPBvIVe108k0IpzV7d/NhQzdtsSUN+o37zEYFIJxSqWCHZcFc91wdaKQ6mYwN4pab7NiLnH4KTj7F3TJ9h2nyq9hcLCSi5MY2TOuOjjTc0DDN6iIVkMPS8TF/JymLeRcvFtm0jXsyVNXGAh+IWsOMPI0fJxDymgMy8BN9OUfxi0C7eD10CILcgPqP5j3kiMM+K35rj7VLvdTEdGClYq2d/yjqsAyf4GK4fxL1tsmgPFB4NkYq5yNK4+IMdhSOeAYzjnhhHAmHZC0G/7bNQ5YhW6KFV3mKm6iuIWZiQaD5oy/cjfYTU7rbbNBftTuUJl3hdghnLjLvgM0d5LE7LT7diSSpMhHZdjbYJeTJqaYn+Wdjd8V/LHbeBVuBpDRas45RLb7QBjSf+Qc8GYE5ie8pnCyXcsL+OW8k3I/E4/XRsGhK3W3+uJq93IvWI1iI48Nxoy/iW7ZHz3yJIdK4B0rX9gWfOdY/clcUaDOX6NwmYtOBYS55c4MYH7bOE1X2WfJ+Zv9ySHQbnRPrl+l86Yx2ZKRFe82Vfu3Uc9FXaZtgPHafRFGlPzJJ/GqbQ/MayqVPArik1pkgPagngKVi8qkD8OmWwcXtOF6E2sPTxGhYoaVD2zerpWFjMldi4Q==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(82310400026)(1800799024)(376014)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(1800799024)(376014)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	Mvbo/6pd06tPmWTfNAqFPgV9h6mq3c0yUlL7tiET5Rli9C5Bz/Pml4ihzkevrDClNh8eXgBFINyiDfiGoroSaMCojDKr+MOBQIjTY5IJoDSZVHyhixSqXipGUIrBiPDxjxrz+897kDIQYtIRAgqpqckJABhJmppcRbDq+1UWEjZfHSbsYEBclezBMq9OtZlOl0mfCBqg4qTuu1SKZwmfSJ6FkW0ULuY4WkuFpoB3KWY21OmFCvnQQrs5Yx9k5qrbUg3Za2IOTj0EqJjkwTDXm1juCCZY7CDZj9EeNn7wD727eXjC3Wbq3ttwkEyM1IVjYWT8jpscXQpVpxQDWCUasU76HLeySiwvI/NF48wKS6HJyV6tA595cbfXKpqsjEusxtJ8aebxyuxwkJ2m6/Q9oLVMg2Mpjv5XDUxqilG798My8WMCwbtjpGmd8Ov4Sszt
+	iV+4MDtu3jJiYLsTIEjfN92NaqIo9PzgcFn8Rwr8DIVCqEjeJSmP6RYWzdRem4BEAGW6tmUxyyX/PIeIwSwbsgxQc4A8dKI8iz2G7ZkxlABzqiyJFAqVeSksAjMA513Td+Ursy2wCtBBv0KCf+ogzG0BQSXrm7J/53PKx+KsLxQY3dXFOhMsPfsAcGt68N69AX0Xzg3qh0rCDpSqEm66FAyg7XW/yFt5QdMhj4aoTBrg/ElvgVILQlNd6OwGn1jiOmQdcHLPTjwFneMJXaRIANhzlsSRKFPhDCAEcqubLYzzHMk2O/ez5cPVSEf5gHX2hLGie3kggQGqqVj5FMdx/oJKc71qMb+juZvIs0Uz/zyLeAjX0361OgoR3+78hObZyp67SCAUZX6IhVOlDQU42JnHeI6pzIs19tXLgIPQF0y2L/LSkE5OWXaxoqovoP4Y
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2026 21:01:29.0521
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2026 21:01:35.4837
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bb9fbb7d-0790-4d9d-d6f7-08dea6327bfb
+X-MS-Exchange-CrossTenant-Network-Message-Id: 972bcf58-d270-4021-3aea-08dea6327fcd
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00002312.namprd03.prod.outlook.com
+	SJ1PEPF00002317.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8917
-X-Rspamd-Queue-Id: D0B0B49A511
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8963
+X-Rspamd-Queue-Id: 498E349A5BE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [2.84 / 15.00];
@@ -129,7 +130,7 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -137,9 +138,9 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282493-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,amd.com:dkim,amd.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-282494-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amd.com:email,amd.com:dkim,amd.com:mid];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[eric.joyner@amd.com,netdev@vger.kernel.org];
@@ -147,133 +148,108 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	DKIM_TRACE(0.00)[amd.com:+];
 	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[7]
 
-From: Brett Creeley <brett.creeley@amd.com>
+From: Prabu Thayalan <prabu.ponrajthayalan@amd.com>
 
-When ionic_adminq_wait() hits its timeout, it's possible the
-firmware has already written the completion to the CQ but
-ionic_adminq_service() was never scheduled via NAPI to process it.
-In this case the command is falsely reported as timed out even
-though it completed successfully.
+The old ionic_rx_service() and ionic_tx_service() used array
+indexing to access completion descriptors:
 
-Fix this by renaming ionic_adminq_cancel() to
-ionic_adminq_service_or_cancel() and having it call
-ionic_cq_service() under the adminq_lock before checking whether
-the context needs to be cancelled.  ionic_cq_service() invokes
-ionic_adminq_service() which will process any pending CQ entries,
-copy the completion data, call complete_all(), and clear
-desc_info->ctx for completed commands.
+    comp = &((struct ionic_rxq_comp *)cq->base)[cq->tail_idx];
 
-After servicing, check completion_done() on the ctx.  If the
-completion was found and processed, return false (not cancelled)
-so ionic_adminq_wait() can use the actual firmware result instead
-of reporting a false timeout.  If the completion was not found,
-fall through to the existing cancel path that NULLs desc_info->ctx
-and return true (cancelled).
+This assumes the stride is sizeof(struct ionic_rxq_comp) = 16 bytes.
+However, when the IONIC_Q_F_2X_CQ_DESC flag is set, the actual
+completion descriptor size is 32 bytes (2 * sizeof(comp)), and the
+completion itself is located at the end of that 32-byte slot. Array
+indexing with a 16-byte stride would access the wrong offset.
 
-Fixes: 938962d55229 ("ionic: Add adminq action")
-Assisted-by: Claude:claude-opus-4.6
-Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+Use pointer arithmetic that accounts for the actual descriptor size
+from cq->desc_size:
+
+    comp = cq->base +
+           cq->desc_size * cq->tail_idx +
+           cq->desc_size - sizeof(*comp);
+
+This correctly calculates the completion location regardless of
+descriptor size. For the common case where desc_size equals
+sizeof(*comp), use array indexing in a likely() fast path to avoid
+performance regression.
+
+Fixes: 0ec9f6669a7d ("ionic: add handling of larger descriptors")
+Signed-off-by: Prabu Thayalan <prabu.ponrajthayalan@amd.com>
 Signed-off-by: Eric Joyner <eric.joyner@amd.com>
 ---
- .../net/ethernet/pensando/ionic/ionic_main.c  | 42 +++++++++++++++----
- 1 file changed, 34 insertions(+), 8 deletions(-)
+ .../net/ethernet/pensando/ionic/ionic_txrx.c  | 27 ++++++++++---------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_main.c b/drivers/net/ethernet/pensando/ionic/ionic_main.c
-index 0971ca4d6650..708c7e4c578b 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_main.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_main.c
-@@ -190,8 +190,8 @@ static const char *ionic_opcode_to_str(enum ionic_cmd_opcode opcode)
- 	}
- }
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
+index 301ebee2fdc5..27a113d63d28 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
++++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
+@@ -701,11 +701,7 @@ static void ionic_rx_clean(struct ionic_queue *q,
+ 		__le64 *cq_desc_hwstamp;
+ 		u64 hwstamp;
  
--static void ionic_adminq_cancel(struct ionic_lif *lif,
--				struct ionic_admin_ctx *ctx)
-+static bool ionic_adminq_service_or_cancel(struct ionic_lif *lif,
-+					   struct ionic_admin_ctx *ctx)
+-		cq_desc_hwstamp =
+-			(void *)comp +
+-			qcq->cq.desc_size -
+-			sizeof(struct ionic_rxq_comp) -
+-			IONIC_HWSTAMP_CQ_NEGOFFSET;
++		cq_desc_hwstamp = (void *)comp - IONIC_HWSTAMP_CQ_NEGOFFSET;
+ 
+ 		hwstamp = le64_to_cpu(*cq_desc_hwstamp);
+ 
+@@ -729,7 +725,12 @@ static bool __ionic_rx_service(struct ionic_cq *cq, struct bpf_prog *xdp_prog)
+ 	struct ionic_queue *q = cq->bound_q;
+ 	struct ionic_rxq_comp *comp;
+ 
+-	comp = &((struct ionic_rxq_comp *)cq->base)[cq->tail_idx];
++	if (likely(cq->desc_size == sizeof(*comp)))
++		comp = &((struct ionic_rxq_comp *)cq->base)[cq->tail_idx];
++	else
++		comp = cq->base +
++		       cq->desc_size * cq->tail_idx +
++		       cq->desc_size - sizeof(*comp);
+ 
+ 	if (!color_match(comp->pkt_type_color, cq->done_color))
+ 		return false;
+@@ -1180,7 +1181,6 @@ static void ionic_tx_clean(struct ionic_queue *q,
+ 			   bool in_napi)
  {
- 	struct ionic_admin_desc_info *desc_info;
- 	unsigned long irqflags;
-@@ -201,9 +201,29 @@ static void ionic_adminq_cancel(struct ionic_lif *lif,
- 	spin_lock_irqsave(&lif->adminq_lock, irqflags);
- 	if (!lif->adminqcq) {
- 		spin_unlock_irqrestore(&lif->adminq_lock, irqflags);
--		return;
-+		return true;
-+	}
-+
-+	/* Service the CQ to pick up any completions that the FW has
-+	 * sent but NAPI hasn't processed yet.  This will call
-+	 * complete_all() on any matching contexts, including ours.
-+	 */
-+	ionic_cq_service(&lif->adminqcq->cq, lif->adminqcq->cq.num_descs,
-+			 ionic_adminq_service, NULL, NULL);
-+
-+	/* If the completion was serviced above, the ctx will have been
-+	 * completed and its desc_info->ctx cleared by
-+	 * ionic_adminq_service().  Check and return not-cancelled.
-+	 */
-+	if (completion_done(&ctx->work)) {
-+		spin_unlock_irqrestore(&lif->adminq_lock, irqflags);
-+		return false;
- 	}
+ 	struct ionic_tx_stats *stats = q_to_tx_stats(q);
+-	struct ionic_qcq *qcq = q_to_qcq(q);
+ 	struct sk_buff *skb;
  
-+	/* The command is still pending, cancel it by clearing
-+	 * desc_info->ctx so ionic_adminq_service() won't touch
-+	 * the caller's ctx after we return.
-+	 */
- 	q = &lif->adminqcq->q;
+ 	if (desc_info->xdpf) {
+@@ -1205,11 +1205,7 @@ static void ionic_tx_clean(struct ionic_queue *q,
+ 			__le64 *cq_desc_hwstamp;
+ 			u64 hwstamp;
  
- 	for (i = 0; i < q->num_descs; i++) {
-@@ -214,6 +234,8 @@ static void ionic_adminq_cancel(struct ionic_lif *lif,
- 		}
- 	}
- 	spin_unlock_irqrestore(&lif->adminq_lock, irqflags);
-+
-+	return true;
- }
+-			cq_desc_hwstamp =
+-				(void *)comp +
+-				qcq->cq.desc_size -
+-				sizeof(struct ionic_txq_comp) -
+-				IONIC_HWSTAMP_CQ_NEGOFFSET;
++			cq_desc_hwstamp = (void *)comp - IONIC_HWSTAMP_CQ_NEGOFFSET;
  
- static void ionic_adminq_flush(struct ionic_lif *lif)
-@@ -444,6 +466,7 @@ int ionic_adminq_wait(struct ionic_lif *lif, struct ionic_admin_ctx *ctx,
- 	unsigned long time_start;
- 	unsigned long time_done;
- 	unsigned long remaining;
-+	bool timed_out = false;
- 	const char *name;
+ 			hwstamp = le64_to_cpu(*cq_desc_hwstamp);
  
- 	name = ionic_opcode_to_str(ctx->cmd.cmd.opcode);
-@@ -474,7 +497,7 @@ int ionic_adminq_wait(struct ionic_lif *lif, struct ionic_admin_ctx *ctx,
- 			if (do_msg)
- 				netdev_warn(netdev, "%s (%d) interrupted, FW in reset\n",
- 					    name, ctx->cmd.cmd.opcode);
--			ionic_adminq_cancel(lif, ctx);
-+			ionic_adminq_service_or_cancel(lif, ctx);
- 			ctx->comp.comp.status = IONIC_RC_ERROR;
- 			return -ENXIO;
- 		}
-@@ -485,12 +508,15 @@ int ionic_adminq_wait(struct ionic_lif *lif, struct ionic_admin_ctx *ctx,
- 	dev_dbg(lif->ionic->dev, "%s: elapsed %d msecs\n",
- 		__func__, jiffies_to_msecs(time_done - time_start));
+@@ -1244,7 +1240,12 @@ static bool ionic_tx_service(struct ionic_cq *cq,
+ 	unsigned int pkts = 0;
+ 	u16 index;
  
-+	/* If the wait timed out, attempt to service the CQ and cancel
-+	 * the ctx.  If ionic_adminq_service() completed the ctx between
-+	 * timeout detection and taking the lock, cancel returns false
-+	 * and we avoid a false timeout.
-+	 */
- 	if (time_after_eq(time_done, time_limit))
--		ionic_adminq_cancel(lif, ctx);
-+		timed_out = ionic_adminq_service_or_cancel(lif, ctx);
+-	comp = &((struct ionic_txq_comp *)cq->base)[cq->tail_idx];
++	if (likely(cq->desc_size == sizeof(*comp)))
++		comp = &((struct ionic_txq_comp *)cq->base)[cq->tail_idx];
++	else
++		comp = cq->base +
++		       cq->desc_size * cq->tail_idx +
++		       cq->desc_size - sizeof(*comp);
  
--	return ionic_adminq_check_err(lif, ctx,
--				      time_after_eq(time_done, time_limit),
--				      do_msg);
-+	return ionic_adminq_check_err(lif, ctx, timed_out, do_msg);
- }
- 
- static int __ionic_adminq_post_wait(struct ionic_lif *lif,
+ 	if (!color_match(comp->color, cq->done_color))
+ 		return false;
 -- 
 2.17.1
 
