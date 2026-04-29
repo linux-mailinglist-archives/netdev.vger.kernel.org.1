@@ -1,183 +1,185 @@
-Return-Path: <netdev+bounces-282263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282264-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wJUwLmKw8WmwjgEAu9opvQ
-	(envelope-from <netdev+bounces-282263-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 09:16:50 +0200
+	id EFLYAdCv8WmwjgEAu9opvQ
+	(envelope-from <netdev+bounces-282264-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 09:14:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17A3749052F
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 09:16:50 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CDBE4904A6
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 09:14:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2C5D6302F5B8
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 07:13:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DE87D300614B
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 07:14:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879DE390993;
-	Wed, 29 Apr 2026 07:13:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71E043A380A;
+	Wed, 29 Apr 2026 07:14:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fmKbZUVH";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="XURZciUE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GXXiujZA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 085BE35A387
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 07:13:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E155C3596F8
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 07:14:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777446799; cv=none; b=irCq/pfKYq2MJb9vuLonGGkfo2iWUuZ8smAvPHDsRnSzILJHnj3MSeN/AH2OJxmZ5UMyWf/Ee2WKNi6CFktsQmQYSAtMIui1LoTPE8O1vEUGQ1vYpmluQTD76dPc3EZrL5DVW/VRjT+ldDn2v1aMDNjd+uCgf/93avxPworZC6Y=
+	t=1777446861; cv=none; b=mqigZtPrwowF9udk5Ft0meI8l7vc0kjh1aT1Eby+58a3kQ4kMmzdx9JypFxkQfhrTH0Te6X48fDdKD5zyKZip8yg4zZn35j1GGJdLfYVyn1IVzuB6BPbygnR/aBg8xJHCYCzXjIlhbRAR//etmTRuw60UzFgJXzXp+rLQpoTa0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777446799; c=relaxed/simple;
-	bh=wNILQUDbLMcTKSkCvUyt/Iw0CCFz9V3YODdTXrt+qzo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uwHQkEKb7a38uifRyGCeyfGCnW1jGXG3QXd8+pf3o9mmr7RSXvpCbH5pbn787Oq60/3MA4wJosU7B4yDsBSW7J/CLScy5yccPjM0Oc/pcBb7ZF4FJDDRq4TGSATA4YM1cfd2dsMLcwwebxKmXBY50/WVcReAPXGwFWjrZODZt0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fmKbZUVH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=XURZciUE; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777446797;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Pctx3U8jzLN+ebOHZ/syUkW1in+jvQwG0EPyRgEuVFc=;
-	b=fmKbZUVHBxr2mTHK7WKzDFfnFxdW4wWj6eX7TI4P1PQ1WFGmPFhVVYd+AjnadnSjWC7vCW
-	wt/NN5A5GnTLwTm0Dxayoj0gGts5wwAHFtCGutRrcIZY+9CuvekPthJuiQW+fwPhhfemXL
-	kb/ei51Zrrcg3W0OT4K5WeWyYCEAxk4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-102-IKr-VccZNLq6TjLyMnSuvQ-1; Wed, 29 Apr 2026 03:13:15 -0400
-X-MC-Unique: IKr-VccZNLq6TjLyMnSuvQ-1
-X-Mimecast-MFC-AGG-ID: IKr-VccZNLq6TjLyMnSuvQ_1777446794
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-43d03065782so7858554f8f.0
-        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 00:13:15 -0700 (PDT)
+	s=arc-20240116; t=1777446861; c=relaxed/simple;
+	bh=Ms3QAY077lghlESoMz4cmu/HHhwxOm5OtQ9Q3cVsBZA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=prHLnUqMb22WJCHO59z211qklQB18D8314Dj/3ljbAJzu9HmH+rWbKlHi4Hu34pN9TD8XlIC9VbsRIcyBDNx38pDYZ2fMyfsX4JHH12B5UaCnAv8U3NgoqtSNrTCPjF/7NsH5Gs2sQN+ZYpYtXa0S74g4pqLkCYFk2aHWT415Dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GXXiujZA; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-38ccde812ecso6389261fa.0
+        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 00:14:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1777446794; x=1778051594; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Pctx3U8jzLN+ebOHZ/syUkW1in+jvQwG0EPyRgEuVFc=;
-        b=XURZciUEpJDyUCUcZCIcYNmfnUM9P/6BaqdqC7SKfiyfgW2JIKgOsRJqhh1UtmQKA8
-         FHXtfYG1p3l9AjCdwcOS9m6tUj1wdu59iDu18fVebICzANrbLubroDYAc776LLF8rfnv
-         yfKADCCGXqDF2o9m3lZC6igFodACMEeRNUAVViQRxOp96Cez5xb4KDF8eVkFWMg5FA2T
-         ufEfiqPSO/Tbfeht85GjJvcB76yIrUQsVbvkfAyVXLNcTdABa21QqZiYwd2nlS/44YWA
-         LtiDNFE+BUpI0jggMTpDokzoBtoMI6nwpYizMasr/Y2jghNFQe/yiqcyIfjCTdgsEPk7
-         cfjw==
+        d=gmail.com; s=20251104; t=1777446858; x=1778051658; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=z19nRFaT8/kYHTBgQjxsWY7McT0fpcEner+6VJ01bbE=;
+        b=GXXiujZA6sgGAOLk3UWVkFJ2FnYBhBH88SLArKYKVtErv6uQJxdTJ1jCkNt7e70I1P
+         +yaWVROSYDgAqLFhz2GDxZqjsssFaAL5Sg1LMb3mBXgg6s1ycRDYuEV1ipPmBCybR0Vu
+         LiCakfldgTJdPN+4u4yEnCN+3HvYnh8L7G+tWi+iBiwW9ZVSG36KeVCnAzrs2OzFAcjV
+         dg+blocFeBf57Q91zLCRcJ2p0fBvL4RX0Dc4SxnyNgnV0Lmzu0PBEWHnVPmk7XVehEV6
+         39YLqCkFO1AS3E6swjT0+XGer/dzRmuhN7bxLcHnK3KOcDGpCLux/Fb1/CxMB84bO6Nq
+         SOWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777446794; x=1778051594;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Pctx3U8jzLN+ebOHZ/syUkW1in+jvQwG0EPyRgEuVFc=;
-        b=YmEJDC/zgW8MWFErvKNVu/EauLtxpPe+gex9sQ91pKFBBxcOg+5CMXAHAMaysnJjCJ
-         VgqZ8lQ5DNPscy17XrwvFDbHf2bBWNLPoqDmSHvNHg+qvp87eoJ9eB5BaF6pO8q13iqB
-         8pe2sWCEg3S6jXCVICU/An8eW+FbdxHy7jwZ/IQb8XJSBQulekZhVxUwZtg3QKIzHjxl
-         jyGxB1jAbqtM0yGBBg9EJVnFPD7zPySTvKqiS9+XepNH0MWote2ISieRoj6rMPpoMKTf
-         ovw3GG2jBFkivftfE7q6NFteNHC5bXF4Rqe64u9/exmX5OafMLEFQ1VBT3ovcfiolZFq
-         Piyg==
-X-Forwarded-Encrypted: i=1; AFNElJ+rBc+9cCQCUXv9wekl/LAybBb7mRLhhCAdRu0e3y+hPTIDgFYokFd+2SKAewvUj+WZfzVDCjs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZd0q1Ya+DGb6qZzld62UYGqnSDnMU4BooE+T2G3/dXlihcNKg
-	gd2z7cY29ZecDUXhLClMmuBhl0kq1jlZH0GzWj3/VACRN3uMnoCa3DB45JN2aAS3vOa8ORWl2IE
-	VqKi0fwRDwU0c/ZgSlDwQ2zqxiCKFTFrT64HlbESKdFytoIHNuKZTvtdFuA==
-X-Gm-Gg: AeBDiet9HSHFWJFklq6cB84NPmHgQ0OCuuWYFWKhOzfbZsDPWCTy8Z8umWVSy7rdlaO
-	11A3SIZoAkwOWgoYmWralcgV/r1oJ2IxoFxhsn7obWLTMQCYScfLF7MUL+1FrapcGOYo6B6i5Z/
-	HHM4ka+cyA4LwiZmhnlda8KCRwmqxPBIqfIQEavQLt/haNbzuetb41dsHoOfGohkEdFCYQQzVyk
-	Xkl5f4ajozlEznHiidHoAREto2tv/7nuaIAbmX2L7+hk9DuVTJY9IN38+OBvvW1b3u//Mbc5VEV
-	3ZPsbso9Cu4phOOx6QLks0l1iGJOtgYjdZTmjRu5s1Xwrg83M9W4BAvO39zi6shX8cfWHpYkD7n
-	ILfeHwu3m0si5FDpqwQE/Y84A/Dj+LYpQ9go5uFsJHweLcSf5nOg6exhC33S+jvJlaA==
-X-Received: by 2002:a05:600c:3d90:b0:488:b239:77ec with SMTP id 5b1f17b1804b1-48a77b1781cmr102522365e9.17.1777446793876;
-        Wed, 29 Apr 2026 00:13:13 -0700 (PDT)
-X-Received: by 2002:a05:600c:3d90:b0:488:b239:77ec with SMTP id 5b1f17b1804b1-48a77b1781cmr102521825e9.17.1777446793321;
-        Wed, 29 Apr 2026 00:13:13 -0700 (PDT)
-Received: from [192.168.88.32] ([216.128.9.114])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a7b912ee3sm21514565e9.2.2026.04.29.00.13.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Apr 2026 00:13:12 -0700 (PDT)
-Message-ID: <4b4bb983-45ec-4e0c-911e-466c784f2211@redhat.com>
-Date: Wed, 29 Apr 2026 09:13:11 +0200
+        d=1e100.net; s=20251104; t=1777446858; x=1778051658;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z19nRFaT8/kYHTBgQjxsWY7McT0fpcEner+6VJ01bbE=;
+        b=JcgT3nPMUjipYg3CCJ9iwSug1uTWB9Oldpdp0FEncP3I2MjJGWv/3RBcZne8rf5We6
+         qDFY81uxu5Lc6MyDNHGaekKsueQyZk1TxVIQcmsK+54chsaRnFRMjQBn4N+kR8ontQ6C
+         FjVLHHuGsGbEJli0k2sduEONC7oNICr4pmoRTD3Q0QDVPO3QtdtQima/K0JjPuYKnw6J
+         +GudH07odDq+NDfDvYmzS0AzSoNNBYS4qnVKSDvKuiUtn9PwBMijMzbWjdouMValdgsN
+         tQQouRmbknJe+YP5X3Shc8pyUC4dmTs6j3xguNoP/ov5QVQu2jLTSOate1TU8HO2Gdnc
+         kuFw==
+X-Forwarded-Encrypted: i=1; AFNElJ/H5qOh4W6PiPOgh1AVOOGaSGqgjOXR7qbC1ZUoiy8Q/3TVftrb2jUacNAHCPPOWYX/Ukh1jsk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywzp56TUp8LywzLJwRYb15YL1EcNRSJrQLuJeTm2CkFtxY09oH5
+	MZqCfhFOqUU8fFveYFXpaQQOesDo9HhY2wkB+A03aFNQQiTcwb4fYy+X
+X-Gm-Gg: AeBDiev1z9FsTQetAEkYloBJAP/p8+gP+71Z3g/WaIzyroJQCjvT6v/DzQRuGo49ifl
+	o9b0YN4w56pg/leAs/iMxebT4sOOmbVBJAOgIktkZSLfjgvu3WXvRsPlk6nHOolPOOW0WJBmJ1U
+	oCtPQCSGULXGUnmiSuAO8sCR3j9q0iafIJCbeGni+c7mRi6GhX6ViIKIXA7lkG3I/fCG0oRb0JJ
+	3YZDAL94RF9nmwNDa1lnbveRj+Xop+rnkTQz+3p8NvC0NdDXQCOM17tKgK5KMlnn6ZqWGBDol9T
+	TZpopM2fbKYoThy1eDU8t+w6TbCROkZmph7xRIZMikb/53lsWs3pb3HoH2+YFZwbjhaekf+g5b/
+	2mkEFBgj28H5WGpfH612TBBASKSKSWxXLXfJMEMJzpb6AmMR19VO9ow9cBWFReQaA0ZKsCtjco8
+	sAuVbEjE+DzE7qoB1iYjZi+0+MMPQF2/o=
+X-Received: by 2002:a2e:9896:0:b0:389:e6e4:3c7d with SMTP id 38308e7fff4ca-3924d716d8amr5232581fa.19.1777446857723;
+        Wed, 29 Apr 2026 00:14:17 -0700 (PDT)
+Received: from thinkpad ([188.225.109.225])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-3924fa7c93bsm2861151fa.23.2026.04.29.00.14.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Apr 2026 00:14:17 -0700 (PDT)
+From: Matthew Bystrin <dev.mbstr@gmail.com>
+To: Lee Jones <lee@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Min Li <min.li.xe@renesas.com>
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v2 0/2] mfd: rsmu: fixes and new IC support
+Date: Wed, 29 Apr 2026 10:20:45 +0300
+Message-ID: <20260429072047.1111427-1-dev.mbstr@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] net: mctp i2c: check length before marking flow
- active
-To: Jeremy Kerr <jk@codeconstruct.com.au>,
- "William A.Kennington III" <william@wkennington.com>
-Cc: matt@codeconstruct.com.au, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, wsa@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260423074741.201460-1-william@wkennington.com>
- <177737520480.421689.2467854297040801595.git-patchwork-notify@kernel.org>
- <bd8704fe0bd53e278add5cde4873256656623e2e.camel@codeconstruct.com.au>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <bd8704fe0bd53e278add5cde4873256656623e2e.camel@codeconstruct.com.au>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 17A3749052F
+X-Rspamd-Queue-Id: 8CDBE4904A6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[kernel.org,gmail.com,renesas.com];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282263-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-282264-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devmbstr@gmail.com,netdev@vger.kernel.org];
 	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-On 4/29/26 3:23 AM, Jeremy Kerr wrote:
-> Hi Pablo,
-> 
->> Here is the summary with links:
->>   - [net,v2] net: mctp i2c: check length before marking flow active
->>     https://git.kernel.org/netdev/net/c/4ca07b9239bd
->>
->> You are awesome, thank you!
-> 
-> 4ca07b9239bd seems to have acquired an unrelated change:
-> 
->    $ git show 4ca07b9239bd | diffstat
->     drivers/net/mctp/mctp-i2c.c |    4 ++--
->     net/sched/cls_flower.c      |    4 +++-
->     2 files changed, 5 insertions(+), 3 deletions(-)
-> 
-> While the commit structure is probably not intentional, are the Flower
-> changes acceptable for the net tree?
+Hi!
 
-Thanks for checking!
+First patch fixes Renesas 8A34002 SPI driver.
 
-That is a serious error on my side, I had an unclean working tree when I
-applied the patch that ended-up including random staff. Absolutely not
-intended for the net tree. I'll send a fixup patch.
+In my setup 8A34002 is connected to VisionFive2 (via SPI or I2C). I've
+discovered that upstream driver does not work:
 
-Thank you again for the head-up!
+[    4.728771] 8a3400x-phc 8a3400x-phc.0.auto: 4.8.7, Id: 0x4002  HW Rev: 5  OTP Config Select: 0
+[    4.737389] 8a3400x-phc 8a3400x-phc.0.auto: requesting firmware 'idtcm.bin'
+[    4.744462] 8a3400x-phc 8a3400x-phc.0.auto: Direct firmware load for idtcm.bin failed with error -2
+[    4.753547] 8a3400x-phc 8a3400x-phc.0.auto: Failed at line 1273 in idtcm_load_firmware!
+[    4.761576] 8a3400x-phc 8a3400x-phc.0.auto: loading firmware failed with -2
+[    4.769411] 8a3400x-phc 8a3400x-phc.0.auto: No wait state: DPLL_SYS_STATE 0
+[    4.776374] 8a3400x-phc 8a3400x-phc.0.auto: Continuing while SYS APLL/DPLL is not locked
+[    4.785206] 8a3400x-phc 8a3400x-phc.0.auto: Unsupported MANUAL_REFERENCE: 0x00
+[    4.796930] 8a3400x-phc 8a3400x-phc.0.auto: PLL2 registered as ptp0
 
-Paolo
+This being caused by a piece of code in rsmu_write_page_register() function:
+
+if (reg < RSMU_CM_SCSR_BASE)
+	return 0;
+
+All addresses in include/linux/mfd/idt8a340_reg.h are less than
+RSMU_CM_SCSR_BASE so functions was returning early, before any modifications to
+the page register. Valid read of versions - is just a coincidence, because
+default value of the page register is zero.
+
+There were 2 separate patch series which had to be merged in one time: mfd and
+ptp. The latter have been merged, the former [1] have not. As result we've got a
+broken driver.
+
+This patch can be reverted later when the second part will be ready (of course
+if it is planned to do so). Any comments, Min? I could support with testing.
+
+Second patch just adds support for 8A34002, which is compatible with 8A34001. As
+I can see there is no need to update bindings, everything is already being done.
+
+Link [2] to v1.
+
+Changes in v2:
+- Fix page register issue in rsmu_i2c
+- Add support for 8a34002 in rsmu_i2c
+
+Link [1]: https://lore.kernel.org/netdev/LV3P220MB1202F8E2FCCFBA2519B4966EA0192@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM/
+Link [2]: https://lore.kernel.org/netdev/20260421090710.395591-1-dev.mbstr@gmail.com/
+Signed-off-by: Matthew Bystrin <dev.mbstr@gmail.com>
+
+Matthew Bystrin (2):
+  mfd: rsmu: fix page register setup
+  mfd: rsmu: add 8a34002 support
+
+ drivers/mfd/rsmu_i2c.c | 8 +++-----
+ drivers/mfd/rsmu_spi.c | 7 +++----
+ 2 files changed, 6 insertions(+), 9 deletions(-)
+
+-- 
+2.53.0
 
 
