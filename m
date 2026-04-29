@@ -1,281 +1,214 @@
-Return-Path: <netdev+bounces-282228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282229-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8N2aKAZ+8WkOhQEAu9opvQ
-	(envelope-from <netdev+bounces-282228-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 05:41:58 +0200
+	id IESmMeuA8WlYhQEAu9opvQ
+	(envelope-from <netdev+bounces-282229-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 05:54:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2A3948EB52
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 05:41:53 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 714B448EDD1
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 05:54:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EED26301150A
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:41:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6AA213058136
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:49:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D32CB2C0260;
-	Wed, 29 Apr 2026 03:41:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF253128D4;
+	Wed, 29 Apr 2026 03:49:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QyUYd35E"
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="dxokGYNW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D6024A067
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 03:41:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777434107; cv=pass; b=Lofe4GVed7OOwHu5C3mfzU30LElIntBGYqd1uPfXVptFgbPe4wX49suUF3Lw1fv3c5x/8vZbK8Rbcq3KG9WCcZDd8KzsrskYWyzoP3im+VQHW9YY4ho01MXDBu7QC9Lj9t6VBgPqaYSgt4O7ASxmum8M4tmFbaONYB69dh9C73g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777434107; c=relaxed/simple;
-	bh=1AgJ/iZ+yxVyTBccrjIytFwrSGBWeASY4/uRssTvWak=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZzYuJTJPEA1NAbq9tHNhrlqrtA8BTz4wNwDS0tCq7m+FEqmNLY6FS9N547XBKOgKQYfs7HbYxEW/Eo+eIkUyD8qBI1T9q2CM+JP3ZN1Gw0XvI3w6/7Rp/aNYJ2Fz0+C87jRSFf5EJYOM+qXtej3UZFQauFI9l7TvUNbresetl2w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QyUYd35E; arc=pass smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-3922b35e69cso30814851fa.0
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 20:41:44 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777434103; cv=none;
-        d=google.com; s=arc-20240605;
-        b=C1aMa70zXI0d+xEok/WLYtquuk1aNpb/ewTDzRTN51gxiZmZLMwDwU4LkSIwyOxh80
-         AJmSFX7vP8cGnbk5X5d3iI1oue7DHeRFOWyiinuwVKWSdQWzk4ujECj7WXwCJ5xkDz/O
-         /8hKtO+ZqYfxvuk+VrTVgR4plZAx1gAVrb/i0ULPvtk69PcWZ8araMhgpuWV8dh2XHOD
-         sv8k46cnuDYtrjXkdaHE5JzEJVZiAZZEQMFmsXGVX4LcWcz8NxltCh8OmuC5e+ff+GDp
-         IPON1b6sS30rzSJig8e+cCUVA8uSPKmM1+4mwadvQ7SOULChhYMadP7fy/eTqQfBKXNt
-         na1w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=4Ruk6MIfAq6RGeIbwYOky+24mFcxVrwW7kYRMU64s0I=;
-        fh=tITMrJseNmhU/QD449NY7pxyireIbt0ufltgzqg/b5E=;
-        b=iAHf0Xs/+NTf5nuN5tHeRwnFsTG5sW2+QukH4XVjpCCbpSQmKYkaMrmqsxqLsjpkTr
-         0esskSKhqX44d9Ys7jefRYrkInTZE8pceyS86sMylBqi8t4LwsMGTgrq8Cmbw/avax6f
-         jEU3weBqS1AoV8/aWWBrMR2XZd2T5rZoAKr15tDTyGJsY39SKnWhYmMI2oo9X7kDkM1B
-         ABmF80SF95wgHdkCQntyBqrHrKffLnAnjVdH+ksFnOEhySUZ+HKcqldlM2UMGGp5qeMp
-         c/wHJDwclXMjvdJUvwh3RyrJfeNhTgD+qCME/WXUzjYw6SbugQl3RHEXTafyBWmTsxEf
-         CfNQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777434103; x=1778038903; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4Ruk6MIfAq6RGeIbwYOky+24mFcxVrwW7kYRMU64s0I=;
-        b=QyUYd35ETYIrBF9kk0eq2RX5Q6bvETdL1xZ4UW+aC8xpNA9HGy4D3/Fta62a18Cbuk
-         CM9W6CmEXaHF6R19a4oTk0EUy/ANSe1zsOJoRRWwOpryLenvYYd/jvbgZXiLqfAvPs2Q
-         svAv+5PWyz8UA54cp9qLTkLjhsPKb41SGaT3coPvlULLuYHZu+f9h8Y6tO1IGlrdPXmp
-         zCjpBQK9x7IgKEAtE8LQ4Elu9hbhHNGaDQymKQ9TQM8StG8TUsZl8dTP03sWNaSXluj7
-         YGSzgagUnZIk19YQ6erjySVH0mqdn1OhscY9gUQV45J/ED0CjzwN4K/U4lg51MtDFtRd
-         um4A==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F36D31E85C
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 03:49:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777434547; cv=none; b=G49nWjhLghv7PPkOfoU9zMC6rBiAxuVBeKVQJ0DLDm3YIR0n3E411EHCz9lUkT+SnG0fpiDeiJdbDQIyFFqurGM0/dWgqBbpZSWenAL80f6QJAaRhhWW8T6XGiILQhVScXCEIzsCjWt+6b18TItykSLxLQ5v6R/aVm54boBGQZ4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777434547; c=relaxed/simple;
+	bh=0v25Za+7o8YkYnq2Rk8ediQfsgs4jUxwmLfDUCjvKws=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Cd4Z/gdvOi+eDRg620FX/i1eTX7hJyJt+RZ5Rk1Xu9qa0L2yWcLYXaK9AY5q11Uy+ZDtlnaMv8Jy2j57Zw/glWNphI+jzy9Ci5xRwZhwVNt6W1ldBWoqwT9tyRdKoVezCLtLxgk9sVQmuvEhmG/HyIG/5IOqDLj9jCyw/cZSnR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=dxokGYNW; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id E44A53F7DD
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 03:49:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20251003; t=1777434542;
+	bh=9Poun78EQtztiC583t+elgVeEgGqZI6iTcp9LxQ5+sk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
+	b=dxokGYNWBfVHMu4VcaLtOE5TgrIb8LulDvUkmSMqLPereGehZOjvuPB40Bn3R5m2+
+	 JopZXuzvqJJ/jvp4diXLdF5bPvZSfWOiAID3U24FlxG2mJXjSnYNMYtUXHqI5yhllq
+	 GIWtsdCZDsQad1K1Owm2weyofo77tHfiGjU+YhY8FAf6w7hZoAyrGfXVLo3EmLwslm
+	 gJMJbMBmJ6ivkV2kmkf8j/HJ9tz6vpShp0r/+VPMlqV88/3gcYzJqHJExjigtWU1r3
+	 a/HNCwkSp9vga0xce/uZ4+NQBQeDBByVWya913VU6LVNBcWnzFjpCO9/gJYoMlQ+mZ
+	 WGSz728QKCvwDGg3bNGiT+ybTaHFz2j27zy+A7NtGiNeQtHn92pO/eJmMNjLcSv5Tp
+	 BOlsEOqVg77IG9Oh3zQaOcUdl7N+P5hykn4PmxMSVDMtHQwpJBrTJk9sQtg0XisSyu
+	 DepeIEbRjYq7A6gQlIoFyGrqKjbk3m0Fw8eaMThVLNEhJzBh51BoBNAlqpKlotVzdN
+	 nELuhNo5X0mxv4Mrz9ILKXVzC8oLxB5/nOhyF7byA5F9H+Db1Qe7fBwXgpdPM5q/C1
+	 EUexKjPcWTSfqllQJxv5HDGCfz3TaifK4oknlJ8copvJ5wzVIoAKupCjqsEZ+hshiW
+	 klVsXpoZeQdExNNiPZ5gZ880=
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2b2d83e7461so210755435ad.3
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 20:49:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777434103; x=1778038903;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=4Ruk6MIfAq6RGeIbwYOky+24mFcxVrwW7kYRMU64s0I=;
-        b=byRrRXbxlAh+l3ywSzwiO+uVKycvP3Wq8URvIbFf+p7jDeEyGHS38pkPrzZkaJcQcI
-         CmEBWuN6xjXqJGs+b/LmLF6PwNNmo9aTF+RARSHnzCYBoFMf0v5CVzJifis0rKt1eoYS
-         jhJ+D9M37XHy+Qm9XcrZUnvuhKl7vBLYvKVwNGKn6NTXBwDWcqtTaFvkzw494eWale34
-         iIxxLbCEeaxQ5BCpGVhSLnRaWv0qDF8ehjbUiAvCJUFaIxp1xkYQdmgrNXCxMUCeTqq0
-         1BmMwngRK36NtMjNvEYtavl7GygxetO94Nibc5FkSNP4WXvC5PbE59pq0qQMpj0yv2GC
-         M6UQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/Nre1M/oP/6uSSiRQCO46mrjODMCcwZii8m2VjQiA1dDMlPSlyx9cd1zZUPmjwC/9nv7I5cp0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbuGV8eSUMrBHO7MxS+l2wbi72VpqvpzpDvTER8nnnhrjyusFE
-	RSY6tTJJ8ca+SwmE1qlPsqOPX48hEBjG50L0w4cyDUU9+5G503RW284owV4PE/7nmGQhdHrU9OP
-	yZM4ML2mxkeE9RXa4s5TShxM/k8ri1Fs=
-X-Gm-Gg: AeBDiesg5mnUZZwQMsCmNlLWmxsliUzJ9UBYThw74W3C+Hc9R4olDj8KOSHouj6rb0A
-	zurV6ZVA+ckZWktLbfpXaaXdxM/mfbgnbCkqC0r0WFgEbDW9H6+MEI/nh2SnPw62RKbqv57JkP7
-	V2Rd2Eg+RvC7Urm5NfNBe/9PMEK97CW2edLb1+2l97Q8eDPkFdHygmhzg9WhZ0Gic/qh7FWBL2Y
-	n+NjQXqiLBUYVTYvXR24usoIaf62dfad+RQgHxbqPHHio1W0wa5gRnxBCNoaA9t0qc5LXeVZXBh
-	1aVLVMi7E2m/BYvqxPdrUktYZQxRAfCesq+xqJpDybkObd0=
-X-Received: by 2002:a05:6512:114c:b0:5a3:ccae:c650 with SMTP id
- 2adb3069b0e04-5a74660ed58mr2159980e87.26.1777434102764; Tue, 28 Apr 2026
- 20:41:42 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1777434541; x=1778039341;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9Poun78EQtztiC583t+elgVeEgGqZI6iTcp9LxQ5+sk=;
+        b=eLZgp8O+1FHYNzKal033LYzxRjfbnWPIsHzPLoNI0/1FNmG7LJD6BsNwrHB0OqLXUy
+         Q7eWWgFGJx7vDPwFt5S32XFKHc2lByvOY7ZN2nwQoVNV+2CHA301AF4nKqroVrL/fnH9
+         PhuKA7T6g+xju4/c6raMmdfoTK/DI8YuT87FA6Zkd1qD4/cAyJ+jFVI+GpLY9hrsbqqK
+         6kbkVTCAzIycc1hzyH/tVdW9TSf8KgiwA5lY9tW/oSniC78Nnqq+jYz0Luo5JdN0bjdx
+         L0uEYn6BH7YvBfXRERr1ibNg9UCQERvE9PRoLbF3hmn2yabxCR14MQ+q35gPATj6mErX
+         aC/w==
+X-Forwarded-Encrypted: i=1; AFNElJ/97pH80V6TXySdLW20kME0eLKLbWGxvz+pvjWN/DlM4GNYjtm3WKOq6Rrgn+7SWBvMtWFy+o4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwI/dGdonUBAbMxMcEQsgNl0EgVybtjASYWhCNP9opMUKAXjXrL
+	Ih+DThccVJFOqMncsl10EaWXzrcjYLNANTBuYVvZFCsqu0MlrW8huW/rAr1zcrlS8woVWmQbf2x
+	SCZQAR8ZvWHJgpjaOms0M0XAGsMTJz4DKLmrt03/onPFmwdDo119PoAvHG0dIQT3GVg/VRfK4Zw
+	==
+X-Gm-Gg: AeBDietQSyZCDpLqkh6d0YyCl75s8KwbTpGmIDHXrjsVn4edmdAImjjZ+hFyIVGYioC
+	U2eAYEN4M8GsivARzG/WmzizcJjBHNgpuOBKXEeKy24Leh0NI1EUZP0nPkDF6XEKq1uHiy7qzhI
+	OP0o3B5RMqxERtx6wug2fdGpR38Yqs4KwZU7R/4L54LgK7Y6UiSWkRfuKUvHyjmN1x/9VgrJbNN
+	gBjnHebWwYSjkRSGYBn+Z0PCmCwK+GGdFV7I9eeWKuPVkI7Skdx+f5eL1yOezXg5P5nc7pQPyMF
+	+lMEk7MZeWv6s1KeWO0lqLahutESlziqizuPpw5ltp4MpDGw7z8u3t0vCMC7EOtF8BInZFWzc6I
+	tQsX4BQ7Klqop2+vHSyKk7smUHz9Wul02StwnZX87MtdFe2B8ioi3VFTxzMrnN8IK2J8LCp/mxS
+	NiQ5U3eUbxfUqiHHPbIrzhmc4km7kV
+X-Received: by 2002:a17:902:b7c9:b0:2ae:c529:a13f with SMTP id d9443c01a7336-2b97c4373camr40318375ad.14.1777434541572;
+        Tue, 28 Apr 2026 20:49:01 -0700 (PDT)
+X-Received: by 2002:a17:902:b7c9:b0:2ae:c529:a13f with SMTP id d9443c01a7336-2b97c4373camr40318195ad.14.1777434541160;
+        Tue, 28 Apr 2026 20:49:01 -0700 (PDT)
+Received: from localhost.localdomain ([103.155.100.7])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b98893f1d1sm6615585ad.48.2026.04.28.20.48.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Apr 2026 20:49:00 -0700 (PDT)
+From: Aaron Ma <aaron.ma@canonical.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Akeem G Abodunrin <akeem.g.abodunrin@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	intel-wired-lan@lists.osuosl.org,
+	aleksandr.loktionov@intel.com,
+	kohei@enjuk.jp,
+	Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: [PATCH v4] ice: wait for reset completion in ice_resume()
+Date: Wed, 29 Apr 2026 11:48:49 +0800
+Message-ID: <20260429034849.1686650-1-aaron.ma@canonical.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260424053816.27965-1-kerneljasonxing@gmail.com>
- <20260424053816.27965-9-kerneljasonxing@gmail.com> <afE7EFYdrNg1u_g2@devvm7509.cco0.facebook.com>
-In-Reply-To: <afE7EFYdrNg1u_g2@devvm7509.cco0.facebook.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 29 Apr 2026 06:41:05 +0300
-X-Gm-Features: AVHnY4KK9bx9x3EL_qgNLT4hjlw0wtoxviJnnLnGHp1l0EefBQZ5qSnKZ_YCOio
-Message-ID: <CAL+tcoA0j+tHOPr-DLyW26_EF1JhwqV+no0Lcx335FtKRbwUAw@mail.gmail.com>
-Subject: Re: [PATCH net v4 8/8] xsk: fix u64 descriptor address truncation on
- 32-bit architectures
-To: Stanislav Fomichev <sdf.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, aleksander.lobakin@intel.com, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: D2A3948EB52
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 714B448EDD1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[canonical.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[canonical.com:s=20251003];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282228-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_FROM(0.00)[bounces-282229-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[canonical.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,fomichev.me,iogearbox.net,vger.kernel.org,tencent.com];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[aaron.ma@canonical.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid,tencent.com:email]
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[enjuk.jp:email,intel.com:email,canonical.com:email,canonical.com:dkim,canonical.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-On Wed, Apr 29, 2026 at 2:11=E2=80=AFAM Stanislav Fomichev <sdf.kernel@gmai=
-l.com> wrote:
->
-> On 04/24, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > In copy mode TX, xsk_skb_destructor_set_addr() stores the 64-bit
-> > descriptor address into skb_shinfo(skb)->destructor_arg (void *) via a
-> > uintptr_t cast:
-> >
-> >     skb_shinfo(skb)->destructor_arg =3D (void *)((uintptr_t)addr | 0x1U=
-L);
-> >
-> > On 32-bit architectures uintptr_t is 32 bits, so the upper 32 bits of
-> > the descriptor address are silently dropped. In unaligned mode the chun=
-k
-> > offset is encoded in bits 48-63 of the descriptor address
-> > (XSK_UNALIGNED_BUF_OFFSET_SHIFT =3D 48), meaning the offset is lost
-> > entirely. The completion queue then returns a truncated address to
-> > userspace, making buffer recycling impossible.
-> >
-> > Fix this by handling the 32-bit case in the destructor_arg helpers:
-> >
-> > - xsk_skb_destructor_set_addr(): on !CONFIG_64BIT, allocate an
-> >   xsk_addrs struct via kmem_cache_zalloc() to store the full u64
-> >   address. Leave num_descs as 0 (zalloc) so that the subsequent
-> >   xsk_inc_num_desc() brings it to the correct count of 1.
-> >
-> > - xsk_skb_destructor_is_addr(): on !CONFIG_64BIT, return true only
-> >   when destructor_arg is NULL (not yet set), false when it points to
-> >   an xsk_addrs struct.
-> >
-> > - xsk_skb_init_misc(): call xsk_skb_destructor_set_addr() first
-> >   before touching any other skb fields; on failure return early so
-> >   the skb destructor is never changed from sock_wfree.
-> >
-> > The existing xsk_consume_skb() already handles 32-bit correctly after
-> > these changes: xsk_skb_destructor_is_addr() returns false for any
-> > allocated xsk_addrs, so the kmem_cache_free path is always taken.
-> >
-> > The overhead is one extra kmem_cache_zalloc per first descriptor on
-> > 32-bit only; 64-bit builds are completely unchanged.
-> >
-> > Closes: https://lore.kernel.org/all/20260419045824.D9E5EC2BCAF@smtp.ker=
-nel.org/
-> > Fixes: 0ebc27a4c67d ("xsk: avoid data corruption on cq descriptor numbe=
-r")
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >  net/xdp/xsk.c | 38 +++++++++++++++++++++++++++++++-------
-> >  1 file changed, 31 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> > index ed96f6ec8ff2..fe88f47741b5 100644
-> > --- a/net/xdp/xsk.c
-> > +++ b/net/xdp/xsk.c
-> > @@ -558,7 +558,10 @@ static int xsk_cq_reserve_locked(struct xsk_buff_p=
-ool *pool)
-> >
-> >  static bool xsk_skb_destructor_is_addr(struct sk_buff *skb)
-> >  {
-> > -     return (uintptr_t)skb_shinfo(skb)->destructor_arg & 0x1UL;
-> > +     if (IS_ENABLED(CONFIG_64BIT))
-> > +             return (uintptr_t)skb_shinfo(skb)->destructor_arg & 0x1UL=
-;
-> > +     else
-> > +             return !skb_shinfo(skb)->destructor_arg;
->
-> Don't understand why we need to special case CONFIG_64BIT here?
-> Shouldn't the same existing condition work on 32bit?
+ice_resume() schedules an asynchronous PF reset and returns
+immediately. The reset runs later in ice_service_task(). If
+userspace tries to bring up the net device before the reset
+finishes, ice_open() fails with -EBUSY:
 
-Because 0x1UL is the particular semantic applied on a 64-bit arch.
-xsk_skb_destructor_set_addr() sets it while
-xsk_skb_destructor_is_addr() recognizes it. They are a pair.
+  ice_resume()
+    ice_schedule_reset()          # sets ICE_PFR_REQ, returns
+  ...
+  ice_open()
+    ice_is_reset_in_progress()    # ICE_PFR_REQ still set, -EBUSY
+  ...
+  ice_service_task()
+    ice_do_reset()
+      ice_rebuild()               # clears ICE_PFR_REQ, too late
 
-As you noticed, one liner works but is not that appropriate: on a
-32-bit arch, this member should be either a NULL point or a valid
-pointer pointing to a memory region. Testing if it's NULL can be
-helpful as to the long term maintenance because of its readability and
-robustness/safety.
+Reproduced on E800 series NICs during suspend/resume with irdma
+enabled, where the aux device probe widens the race window.
 
-The error path in allocation of skb is really complex, which is why
-I'm so cautious to take care of it :)
+  ice 0000:81:00.0: can't open net device while reset is in progress
 
-I've noticed the status has been changed to 'changes requested'. Does
-that mean one way or another I have to post a new version?
+Add a best-effort wait (10s timeout, matching ice_devlink_info_get())
+for the reset to complete before returning from ice_resume(). In
+practice the reset completes in ~300ms.
 
-Thanks,
-Jason
+Fixes: 769c500dcc1e ("ice: Add advanced power mgmt for WoL")
+Cc: stable@vger.kernel.org
+Reviewed-by: Kohei Enju <kohei@enjuk.jp>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Aaron Ma <aaron.ma@canonical.com>
+---
+v4: use secs_to_jiffies() instead of 10 * HZ (Przemek Kitszel)
+v3: add error message to commit message for searchability, mention
+    timeout in dev_err (Paul Menzel)
+v2: reword comment to clarify best-effort semantics (Kohei Enju)
+v1: https://lore.kernel.org/intel-wired-lan/20260402024220.210466-1-aaron.ma@canonical.com/
 
+ drivers/net/ethernet/intel/ice/ice_main.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
->
-> >  }
-> >
-> >  static u64 xsk_skb_destructor_get_addr(struct sk_buff *skb)
-> > @@ -566,9 +569,21 @@ static u64 xsk_skb_destructor_get_addr(struct sk_b=
-uff *skb)
-> >       return (u64)((uintptr_t)skb_shinfo(skb)->destructor_arg & ~0x1UL)=
-;
-> >  }
-> >
-> > -static void xsk_skb_destructor_set_addr(struct sk_buff *skb, u64 addr)
-> > +static int xsk_skb_destructor_set_addr(struct sk_buff *skb, u64 addr)
-> >  {
->
-> [..]
->
-> > +     if (!IS_ENABLED(CONFIG_64BIT)) {
-> > +             struct xsk_addrs *xsk_addr;
-> > +
-> > +             xsk_addr =3D kmem_cache_zalloc(xsk_tx_generic_cache, GFP_=
-KERNEL);
-> > +             if (!xsk_addr)
-> > +                     return -ENOMEM;
-> > +             xsk_addr->addrs[0] =3D addr;
-> > +             skb_shinfo(skb)->destructor_arg =3D (void *)xsk_addr;
-> > +             return 0;
-> > +     }
-> > +
-> >       skb_shinfo(skb)->destructor_arg =3D (void *)((uintptr_t)addr | 0x=
-1UL);
-> > +     return 0;
->
-> I think this is gonna be a 3rd copy paste of the same logic? Let's
-> move to a new helper and replace existing kmem_cache_zalloc places?
->
-> xsk_skb_destructor_alloc_list(prev_addr) ?
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 5f92377d4dfc2..5fce644dc658e 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -5635,6 +5635,16 @@ static int ice_resume(struct device *dev)
+ 	/* Restart the service task */
+ 	mod_timer(&pf->serv_tmr, round_jiffies(jiffies + pf->serv_tmr_period));
+ 
++	/* Best-effort wait for the scheduled reset to finish so that the
++	 * device is operational before returning. Without this, userspace
++	 * (e.g. NetworkManager) may try to open the net device while the
++	 * asynchronous reset is still in progress, hitting -EBUSY.
++	 */
++	ret = ice_wait_for_reset(pf, secs_to_jiffies(10));
++	if (ret)
++		dev_err(dev, "Wait for reset timed out (10s) during resume: %d\n",
++			ret);
++
+ 	return 0;
+ }
+ 
+-- 
+2.43.0
+
 
