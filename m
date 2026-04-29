@@ -1,173 +1,213 @@
-Return-Path: <netdev+bounces-282371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282372-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cEzVHUz78WmElwEAu9opvQ
-	(envelope-from <netdev+bounces-282371-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 14:36:28 +0200
+	id MAuMOIf78WmElwEAu9opvQ
+	(envelope-from <netdev+bounces-282372-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 14:37:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F067C49423F
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 14:36:23 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1427C494268
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 14:37:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1565C30330A9
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 12:32:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 381FB300BEB1
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 12:37:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4678F3F2101;
-	Wed, 29 Apr 2026 12:32:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A9DF3BED1E;
+	Wed, 29 Apr 2026 12:37:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rkcrr/JK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dr/g0T/i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6BDD3EF663
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 12:32:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.181
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777465929; cv=pass; b=ZMoMYV91cujLrXxyj7DdZrcHwpflvZumV4GrbN8OHltH0pQ6ufQjo5jeVP4IBJHNcAsW7yKBHzl5JzxuBxYXhQdeR1q4srwQ42KhzyxlzY+hsuoTzKhrW3rz6Cf/6Y04c68xErBz6i4ykYjrw+eRJLfB/db4PLUNInQdEF0pW50=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777465929; c=relaxed/simple;
-	bh=KGv+d56Pg7QWyBPbrJ4qHztALT+NJSTOOru5rKlWGoo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X2lW60c5ZDFIiZ5SUJqEarmLfEzwJGW3pP0Jl5jPz0qmTDmzGpMd2qb37c8kRs7SxG+ygxsCeh34ms7dTekcaTKJRHHUgGXDZDZtX0su9+KyPm6mMSKEgKHcqWAV4/5JOo3quTxvhS8uiFrES9JALezTR+0BDzaEp8aCbzUT7R0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rkcrr/JK; arc=pass smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-506aa68065eso90715561cf.1
-        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 05:32:07 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777465927; cv=none;
-        d=google.com; s=arc-20240605;
-        b=aI6z7rQnL/os4uTq2L0JXc6X+nZUoYEcxuA/FI2zQpdsvOu49mhy6IuA63FMboA74R
-         x0lzQgRjvVQBkIBXTH0Q7aTC6IA8PaHShBNVx4YJBpdNhXVm3V9ePxd/QBAHbs7f3w3H
-         74TKKjWg/s87dDAi4wd3Uv22R/tXgymkGO8F21/rVX8lmzlJFr5Bjz702CdUaNh8mohi
-         PanbhS7yyLbp/wOPxQqsFTACE/T6QhXpu4rIzVx7lyGUXTwlUO5RzcMLfE6peSc/v5UV
-         YSOuz7FWLz+4TUXEfFJnXgMqUjRUue4dE0p19tTkvjvAktpqYBhA3mtZbKo9HullSBNw
-         /vHQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=9DHs+YzocsqeU+mv/fyZTv7O47rCb6IRdrHqru+bKqw=;
-        fh=vuEPLyGSwB+7RzNTOI7nlc8Tp08bner6A1cmXtHNWEE=;
-        b=JzIsCusnd/i51CfUahFARv0Rvz6dBV4VzGOCbfSqhPwkURw2XB8Y/5A/F5Xe+R6I+v
-         JgAx3H2+3e8xXg/MxKH3lH7fo7jxmMJbw3v4m6m5llY6WKAQOoZgMX2gtdK/1H3F0FOi
-         s2FSsijDCo7Dvql/rjFl8yp4cR9zj0+e0AxcwwEeWkPqqqI1kIIgH7Cp8SGBbHYY3OsY
-         I41PAAHZeeIfo2cNHe3XKkVUsaRLgnWtoFZMwkCoZ8Z2u5zTmDmPVwKvljNnE1MR6Bkg
-         0werErdxJgjlaSVfQ3VOn2GSkrTRQXUwTsdemLQLAvRO7j0hlwqeHY+rt/+zkKYVic9U
-         Gb0Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777465927; x=1778070727; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9DHs+YzocsqeU+mv/fyZTv7O47rCb6IRdrHqru+bKqw=;
-        b=rkcrr/JKz6zRqdQofqPNeiMk0oGTL4Qd+UJNzzKhAIOq4o57iDSTq6tITLs1iA1Osd
-         A3HqyNky/erxG1Vhypr319cZCjuCgGbsjDx4VewdcRyexPouDtFP6SAACxOrlBHrE+kb
-         6A+20fy12nCoOaNuHtcftiyVM3kM8QUJ+jbZvBMnttCvSg0zrWpVc8jpYXFVKHPZP9al
-         VvUjlSMMkoASk1Lys2/QaExJZ4IJj7y+fb+OR3EDgC/DWRwqHvhQM5Q6KfiQjhyjA+wd
-         tFjZS/jr9buzio9LTQYMDKCudAdPVuXaBBed6FBlp3TWJNowGwcRExlHG5qrLQhEf50p
-         PCEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777465927; x=1778070727;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=9DHs+YzocsqeU+mv/fyZTv7O47rCb6IRdrHqru+bKqw=;
-        b=Yig27lp5vcNpLVfRZEJob9pOnqi5E4Uo3NktrXLHqsGaHvuOEDPiOuTvbTlI39kk9r
-         4R1zKXc1kg6y7Fr5uWZKXI+uRkW49IGBXJUGaOS1YqFn1oGmseTmzVWdKjhsm5NUmAER
-         yHaKqm1FzunOavwYwuPZLHx3roEmpJW13QAw0RshpX449389MJPpghrOL5ZXTlJtcRTy
-         8TBhmNV+HD98/bWPdfQAlOdVNO0QQ3v+0xKoO5xOhhzfRdemeIUkyS3mhYnRTHoJnj2V
-         59PxMzkK+5tm4q9CuEwOl4EqxVq3a2s9eR3Ru2EjnM302Rl9UtVJ7taWEOVNA5zWmOGx
-         nbvA==
-X-Forwarded-Encrypted: i=1; AFNElJ9CywWmKueVNghVkxui4iAyuKoTuKOOKqekbQYdfwSh2ui0kUcLeBfI6TNT/W2i1ibmADjntZc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzH5LCM5jTOd3V2RX06H0HMd5F5GlWFb7Ad5qmvSOc9k1JGsprm
-	mAIekGFN848m6jIYFW9FcNelaYWVNlwEf/6dkHRoLLZaUbcK9mfEjgLv2tqhMG1yS/MEBEzupy4
-	qB93xQWDNlPJw+V+HWTJCvwrAkr6L7oB8EdBV5fTf
-X-Gm-Gg: AeBDievALb21InPLdRZwMYzCGUY1hyPZvqz1pQXnezEWGnioRruP+W4BKeMtl8IrJyh
-	yuu9yotdcL1SST8Gi3VTMo0dF6e2X1Wnlv+5oIdgujBXOodFXHgXlyWSGvdZWVMTZZ2xP9Z1/e9
-	yeFNs8e6Hu0eT2eDfN5PdFbSUarmIW9QcstwVWYfT9N0fjHuqZJF5PYuhfkmJ9QIWZKmT8xH49a
-	VSY1JOwKfJDoGVGi8kTNDWDkjejplWe+Iuvh2NBugKJwXjFp3D0k+UjeQEZn/mhP7shSnxgVuzP
-	UbWPzboIVKrpf30ER6Yel+RH8lHBe2HRr7QAijYehTST+NUp+EomkLw1quDa1XQiNO9oGdHuqzx
-	65W5Qy2cE
-X-Received: by 2002:a05:622a:480e:b0:50d:60a4:47a7 with SMTP id
- d75a77b69052e-510189363a2mr51069921cf.4.1777465926253; Wed, 29 Apr 2026
- 05:32:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38521397E85;
+	Wed, 29 Apr 2026 12:37:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777466238; cv=none; b=BFwpgHIHE4RUxzAy3o1+MTBtmGh/X9ee7Nt1Ft1Oy054uaN+U/sal5hEkZvT//jp9cPz+dGFN5zB3Jbc0/Mo8a0/3QxVeMsZSRi0Hn7BLoO/LLR4WYGA9nGua053sThNBf1y1nuctAgGxM3UjEjMUc9GK4EbYtNVPGPXzs4S+iI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777466238; c=relaxed/simple;
+	bh=hvuUMdThIwKFwbEJULtky1d689I530Q1mu8Oq7VyBwI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=DjeZWKrRvHwiO4n1tZwT4QwND971JjA3x2Tk6sq69+fXIndhj7g2rZRzJvaKl9j1MEX1TG4K2UF74PzNJGtwO4cOGx6uvpG6zhtd7Ns53qhxfK2gvknaol13jRBzg6pnXlakMvxO7dDaAlDDr54RJyEV5r6z7KtnGsi3v2vrVCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dr/g0T/i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F67BC19425;
+	Wed, 29 Apr 2026 12:37:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777466237;
+	bh=hvuUMdThIwKFwbEJULtky1d689I530Q1mu8Oq7VyBwI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=dr/g0T/iHE3ynvq2KAdwl+wj9HFSUBzaKaIywu611UnOIRGzFM005oxs4QzepEGaM
+	 kvqsxSuWSVF6F3GRnPwE4WtKMywXp2e6VYu/l+VnktkF7ZGOQXRGT2bmqjmQSQKCOU
+	 c5PSeKutrmI+DRiK1bz0Tb4gWnkzXG9rb3Cft24DdhhO4BZHwwWczIXJEnlkUxcKuE
+	 qgS1O50M1alQ7hCOGeqe3NHuXblCQrfE1gtiKPwlkOE1aOwWchSK5ZaTuQLnG7UGth
+	 F30mV9wi49ZgqtWSfdKqocG1kGFuYm0z8vWcgRAUqANoEghgANb1MlJ1puykH3gKSG
+	 PQ2VE/Pv0BRcw==
+From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+To: Dragos Tatulea <dtatulea@nvidia.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>
+Cc: Martin Karsten <mkarsten@uwaterloo.ca>, dtatulea@nvidia.com, Gal
+ Pressman <gal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Joe Damato
+ <joe@dama.to>, Frederik Deweerdt <fdeweerdt@fastly.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH net-next 2/2] net: napi: Skip poll when arming GRO
+ timer in busy poll
+In-Reply-To: <20260428175134.1197036-4-dtatulea@nvidia.com>
+References: <20260428175134.1197036-2-dtatulea@nvidia.com>
+ <20260428175134.1197036-4-dtatulea@nvidia.com>
+Date: Wed, 29 Apr 2026 14:37:14 +0200
+Message-ID: <87ik9ahrid.fsf@all.your.base.are.belong.to.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260429123741.3777677-1-yuehaibing@huawei.com>
-In-Reply-To: <20260429123741.3777677-1-yuehaibing@huawei.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 29 Apr 2026 05:31:55 -0700
-X-Gm-Features: AVHnY4LqdOcLvpMRs8mkOJGdSd5JEyHBiKDCrR6RiidZ6hVrPe9macOE23BDm98
-Message-ID: <CANn89i+BCcSMCPTzrXPrJ2Zevtrjj6RYu+cadT6qXErMLmLNRA@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: core: Call netif_get_rxqueue() in get_rps_cpu()
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: F067C49423F
+X-Rspamd-Queue-Id: 1427C494268
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282371-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282372-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[bjorn@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,huawei.com:email]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,nvidia.com:email,uwaterloo.ca:email]
 
-On Wed, Apr 29, 2026 at 5:15=E2=80=AFAM Yue Haibing <yuehaibing@huawei.com>=
- wrote:
+Dragos Tatulea <dtatulea@nvidia.com> writes:
+
+> From: Martin Karsten <mkarsten@uwaterloo.ca>
 >
-> Refactor netif_get_rxqueue() return NULL when rxq index checking failed
-> instead of falling back to first queue, then use it to avoid code
-> duplication.
->
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> As referenced in the previous patch, having the GRO timer scheduled
+> while poll is running can lead to issues.
+
+Outline the issues here as well, so we don't need to cross-reference the
+kernel logs.
+
+> Skip the extra call to napi->poll() when the GRO timer is armed. This
+> removes the need for having a separate __busy_poll_stop routine and its
+> code is moved directly into the relevant places in busy_poll_stop.
+
+Nice!
+
+> Signed-off-by: Martin Karsten <mkarsten@uwaterloo.ca>
+> Co-developed-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
 > ---
->  net/core/dev.c | 24 +++++++++---------------
->  1 file changed, 9 insertions(+), 15 deletions(-)
+>  net/core/dev.c | 61 +++++++++++++++++++++++++-------------------------
+>  1 file changed, 30 insertions(+), 31 deletions(-)
 >
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 1487d4946dcf..d4829c2484f5 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -6869,26 +6869,6 @@ static void skb_defer_free_flush(void)
+>=20=20
+>  #if defined(CONFIG_NET_RX_BUSY_POLL)
+>=20=20
+> -static void __busy_poll_stop(struct napi_struct *napi, unsigned long tim=
+eout)
+> -{
+> -	unsigned long flags;
+> -
+> -	if (!timeout) {
+> -		gro_normal_list(&napi->gro);
+> -		__napi_schedule(napi);
+> -		return;
+> -	}
+> -
+> -	/* Flush too old packets. If HZ < 1000, flush all packets */
+> -	gro_flush_normal(&napi->gro, HZ >=3D 1000);
+> -
+> -	local_irq_save(flags);
+> -	hrtimer_start(&napi->timer, ns_to_ktime(timeout),
+> -		      HRTIMER_MODE_REL_PINNED);
+> -	clear_bit(NAPI_STATE_SCHED, &napi->state);
+> -	local_irq_restore(flags);
+> -}
+> -
+>  enum {
+>  	NAPI_F_PREFER_BUSY_POLL	=3D 1,
+>  	NAPI_F_END_ON_RESCHED	=3D 2,
+> @@ -6898,14 +6878,14 @@ static void busy_poll_stop(struct napi_struct *na=
+pi, void *have_poll_lock,
+>  			   unsigned flags, u16 budget)
+>  {
+>  	struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
+> -	unsigned long timeout =3D 0;
+> +	unsigned long timeout;
+>  	int rc;
+>=20=20
+>  	/* Busy polling means there is a high chance device driver hard irq
+>  	 * could not grab NAPI_STATE_SCHED, and that NAPI_STATE_MISSED was
+>  	 * set in napi_schedule_prep().
+> -	 * Since we are about to call napi->poll() once more, we can safely
+> -	 * clear NAPI_STATE_MISSED.
+> +	 * Since we either call napi->poll() once more or start the timer,
+> +	 * we can safely clear NAPI_STATE_MISSED.
+>  	 *
+>  	 * Note: x86 could use a single "lock and ..." instruction
+>  	 * to perform these two clear_bit()
+> @@ -6918,13 +6898,28 @@ static void busy_poll_stop(struct napi_struct *na=
+pi, void *have_poll_lock,
+>=20=20
+>  	if (flags & NAPI_F_PREFER_BUSY_POLL) {
+>  		napi->defer_hard_irqs_count =3D napi_get_defer_hard_irqs(napi);
+> -		if (napi->defer_hard_irqs_count) {
+> -			/* Timer will be scheduled after napi poll to avoid
+> -			 * firing during a slow poll which could cause the
+> -			 * queue to get stuck with interrupts disabled and no
+> -			 * scheduled timer.
+> +		timeout =3D napi_get_gro_flush_timeout(napi);
+> +		if (napi->defer_hard_irqs_count && timeout) {
+> +			unsigned long flags;
+> +
+> +			/* Drop prefer-busy state as in napi_complete_done(). */
+> +			clear_bit(NAPI_STATE_PREFER_BUSY_POLL, &napi->state);
+> +			netpoll_poll_unlock(have_poll_lock);
+> +
+> +			/* Flush too old packets. If HZ < 1000, flush all
+> +			 * packets.
+> +			 */
+> +			gro_flush_normal(&napi->gro, HZ >=3D 1000);
+> +			local_irq_save(flags);
+> +			hrtimer_start(&napi->timer, ns_to_ktime(timeout),
+> +				      HRTIMER_MODE_REL_PINNED);
+> +			clear_bit(NAPI_STATE_SCHED, &napi->state);
+> +			local_irq_restore(flags);
 
-This code (get_rps_cpu()) is super hot for some of us.
+(Same swap arm timer/clear as patch 1.)
 
-Are you sure netif_get_rxqueue() is kept inline?
+> +
+> +			/* Timer started, so need for another call to
+                                            ^
+                                       "so *NO* need for another..."
 
-I do not think gcc is smart enough:
 
-scripts/bloat-o-meter -t net/core/dev.o.before net/core/dev.o.after
-add/remove: 1/0 grow/shrink: 2/2 up/down: 116/-132 (-16)
-Function                                     old     new   delta
-netif_get_rxqueue.isra                         -      84     +84
-dev_getbyhwaddr_rcu                          133     149     +16
-__netif_set_xps_queue                       2837    2853     +16
-bpf_prog_run_generic_xdp                     899     846     -53
-get_rps_cpu                                  835     756     -79
-      // This is bad,
-Total: Before=3D90848, After=3D90832, chg -0.02%
+
+Bj=C3=B6rn
 
