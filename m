@@ -1,89 +1,93 @@
-Return-Path: <netdev+bounces-282264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282265-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EFLYAdCv8WmwjgEAu9opvQ
-	(envelope-from <netdev+bounces-282264-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 09:14:24 +0200
+	id GHo9HOKw8WmwjgEAu9opvQ
+	(envelope-from <netdev+bounces-282265-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 09:18:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CDBE4904A6
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 09:14:23 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1631F490575
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 09:18:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DE87D300614B
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 07:14:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 76D0F3076179
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 07:14:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71E043A380A;
-	Wed, 29 Apr 2026 07:14:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD783A3E80;
+	Wed, 29 Apr 2026 07:14:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GXXiujZA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f4xIbUUh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E155C3596F8
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 07:14:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D67539C65E
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 07:14:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777446861; cv=none; b=mqigZtPrwowF9udk5Ft0meI8l7vc0kjh1aT1Eby+58a3kQ4kMmzdx9JypFxkQfhrTH0Te6X48fDdKD5zyKZip8yg4zZn35j1GGJdLfYVyn1IVzuB6BPbygnR/aBg8xJHCYCzXjIlhbRAR//etmTRuw60UzFgJXzXp+rLQpoTa0Q=
+	t=1777446862; cv=none; b=uiEHVFJkyx0CqUVDpVpTIqtCkNn5fULsPODAMTwm8lqlWaaBR9B/cUh9dph+bA8AccQtR9B1pjrIZhgRsmfg2jrBUlCGbbkIpAI+XMpoDvyFPT86EWA7nktE0zZBFhsCRE4IXLAXvEa/ZU3WIE5rakF/lc8er/VjhjVMbB+pbME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777446861; c=relaxed/simple;
-	bh=Ms3QAY077lghlESoMz4cmu/HHhwxOm5OtQ9Q3cVsBZA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=prHLnUqMb22WJCHO59z211qklQB18D8314Dj/3ljbAJzu9HmH+rWbKlHi4Hu34pN9TD8XlIC9VbsRIcyBDNx38pDYZ2fMyfsX4JHH12B5UaCnAv8U3NgoqtSNrTCPjF/7NsH5Gs2sQN+ZYpYtXa0S74g4pqLkCYFk2aHWT415Dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GXXiujZA; arc=none smtp.client-ip=209.85.208.172
+	s=arc-20240116; t=1777446862; c=relaxed/simple;
+	bh=BzL2dzaDkxeqGllHqj3NV6tg03FX4+dG8gU9GpWFTqc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XGlbdCWH6X/rt0AeEImsgQ2Ws82ovsazieo1OT+XZFL6y1sregAAZApNoVCVuaCAJsLknyEa9ZMolFYtPnaZIAnFf8oaWR8FbPPPQCLquujZRpxqKVoxo/b23lneQXzzw6nl2P/AnDKi6L7ro3o/p/RnHr9PFKX3rLUkAoLNlOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f4xIbUUh; arc=none smtp.client-ip=209.85.208.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-38ccde812ecso6389261fa.0
-        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 00:14:19 -0700 (PDT)
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-38dfb789d7fso94443401fa.2
+        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 00:14:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777446858; x=1778051658; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=z19nRFaT8/kYHTBgQjxsWY7McT0fpcEner+6VJ01bbE=;
-        b=GXXiujZA6sgGAOLk3UWVkFJ2FnYBhBH88SLArKYKVtErv6uQJxdTJ1jCkNt7e70I1P
-         +yaWVROSYDgAqLFhz2GDxZqjsssFaAL5Sg1LMb3mBXgg6s1ycRDYuEV1ipPmBCybR0Vu
-         LiCakfldgTJdPN+4u4yEnCN+3HvYnh8L7G+tWi+iBiwW9ZVSG36KeVCnAzrs2OzFAcjV
-         dg+blocFeBf57Q91zLCRcJ2p0fBvL4RX0Dc4SxnyNgnV0Lmzu0PBEWHnVPmk7XVehEV6
-         39YLqCkFO1AS3E6swjT0+XGer/dzRmuhN7bxLcHnK3KOcDGpCLux/Fb1/CxMB84bO6Nq
-         SOWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777446858; x=1778051658;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1777446859; x=1778051659; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=z19nRFaT8/kYHTBgQjxsWY7McT0fpcEner+6VJ01bbE=;
-        b=JcgT3nPMUjipYg3CCJ9iwSug1uTWB9Oldpdp0FEncP3I2MjJGWv/3RBcZne8rf5We6
-         qDFY81uxu5Lc6MyDNHGaekKsueQyZk1TxVIQcmsK+54chsaRnFRMjQBn4N+kR8ontQ6C
-         FjVLHHuGsGbEJli0k2sduEONC7oNICr4pmoRTD3Q0QDVPO3QtdtQima/K0JjPuYKnw6J
-         +GudH07odDq+NDfDvYmzS0AzSoNNBYS4qnVKSDvKuiUtn9PwBMijMzbWjdouMValdgsN
-         tQQouRmbknJe+YP5X3Shc8pyUC4dmTs6j3xguNoP/ov5QVQu2jLTSOate1TU8HO2Gdnc
-         kuFw==
-X-Forwarded-Encrypted: i=1; AFNElJ/H5qOh4W6PiPOgh1AVOOGaSGqgjOXR7qbC1ZUoiy8Q/3TVftrb2jUacNAHCPPOWYX/Ukh1jsk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywzp56TUp8LywzLJwRYb15YL1EcNRSJrQLuJeTm2CkFtxY09oH5
-	MZqCfhFOqUU8fFveYFXpaQQOesDo9HhY2wkB+A03aFNQQiTcwb4fYy+X
-X-Gm-Gg: AeBDiev1z9FsTQetAEkYloBJAP/p8+gP+71Z3g/WaIzyroJQCjvT6v/DzQRuGo49ifl
-	o9b0YN4w56pg/leAs/iMxebT4sOOmbVBJAOgIktkZSLfjgvu3WXvRsPlk6nHOolPOOW0WJBmJ1U
-	oCtPQCSGULXGUnmiSuAO8sCR3j9q0iafIJCbeGni+c7mRi6GhX6ViIKIXA7lkG3I/fCG0oRb0JJ
-	3YZDAL94RF9nmwNDa1lnbveRj+Xop+rnkTQz+3p8NvC0NdDXQCOM17tKgK5KMlnn6ZqWGBDol9T
-	TZpopM2fbKYoThy1eDU8t+w6TbCROkZmph7xRIZMikb/53lsWs3pb3HoH2+YFZwbjhaekf+g5b/
-	2mkEFBgj28H5WGpfH612TBBASKSKSWxXLXfJMEMJzpb6AmMR19VO9ow9cBWFReQaA0ZKsCtjco8
-	sAuVbEjE+DzE7qoB1iYjZi+0+MMPQF2/o=
-X-Received: by 2002:a2e:9896:0:b0:389:e6e4:3c7d with SMTP id 38308e7fff4ca-3924d716d8amr5232581fa.19.1777446857723;
-        Wed, 29 Apr 2026 00:14:17 -0700 (PDT)
+        bh=YEfFwVoPkTu57X++6jUaIy2CgDN8Kgokv8XI4v/O6v8=;
+        b=f4xIbUUhbaKClwpI7QDtMYfSpbLGolNibAaasNUoHuJv5HrL30gbSVR9bPRlOG2dCA
+         GsI5s8mI7nXxnWZZVXr4YS9eET+3o8OkwVhNkScVdax0FBVCaJ1FM+Ko2CCCB0Nhg1cE
+         3SO7/sxkJKC8RxT7AEiUpvh2xdW90j59ZsgGRYt5hyRADqkBRzRmPvXGCzRh5ZTlzBA8
+         JVW3N5z8GxsoeF/7+FzxzojgbdncshthlmW967ZoXYkClth9Z6G/A3Gy/Ru5j4MSr1g2
+         HsSRk3vxysbNAkAyM7FOBqXjzrq7plCyfUw5TEJuuy0TsoFlKrxr0x+lEtgEP0CPKvIl
+         Ignw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777446859; x=1778051659;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=YEfFwVoPkTu57X++6jUaIy2CgDN8Kgokv8XI4v/O6v8=;
+        b=nYDQTukiVTkmflC4SsELWrG6RWkW5gHz42ONZDQsF1oYmIPctQ6h1FYoF3TZruYodt
+         2j8RWTH/uxvoTFTavcLw8ujU3t38YPFcj7bgwCxKTDEI7dS/g9dtLuHo45d/dUjJybMj
+         jT4+Olok/WeHsLqt6DFPJWGM/dhvHIWNtHYE+j2zOwuXq5ZO6VIvWiVgdIc2QWa89jGe
+         s5cBfumA2UeHaypho+I2jM8AKLPpJYNmFp7Ilqn8hTyZz7Dm3S7bBl0at4Q6MTZyC3Rz
+         9bzTdZ4BgE0TT4zHkP6NgoY2CoVjkY1NtA28ve3HRJODSBM9i6/mSuhNFtPXWdkScIuo
+         8Rwg==
+X-Forwarded-Encrypted: i=1; AFNElJ/LiAoP3WqUbDpuPkQ2DrfeHVuVAHtQdmPIISdEKca89uqNINuNq9XKi5pLv9O58N6cNeYMECQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpwVfKewLoh13lyk344jpBT0e3G7adooXFPMY4L5d8whN5Fz7B
+	FHq/99wrnfQdB+xzQEKJbJVoTczmxhxfOBZKdRoxUw2DFDzzDuU99A2g
+X-Gm-Gg: AeBDiettk4WgrHXt3w0A3TfxexkZPiPniAugSxOiRVx2ZnSnSx+7z+sHBc/paXTk5zJ
+	9IPzUuaGa/tCfwA6r487d2HISwtwtkx/uYeR3F/y14kKcV8mFCC9qDghrw7/SBeqvIbX2jIJW4a
+	UR8YBI7sNSrjH4N1rTeXTWJuGc48+e4KyVHEr27jRocGBC71f/FvtYtxxTh+q8NsTFr4cUjgYzt
+	Cq5387Y+klLZPoX+CGc6RuaIh1mV3R9KSwiVwC+Hf40iMsnw+n5KbaEj7hekokWbY3Lj3du1pE4
+	bA9AQwqEaXdSQ4pM28u+0ux975gctNQHpuaUUvO5ywM6jGkJW9YWvbV46J/3zt2g6l2uvUGnwHq
+	aFkqaCAOlOskupUVau7KpJ/yuVnXRyGgxDKUkrF/RZc89WZS7GLFsomMh8p0SiGG7bVGgfVJFQJ
+	9euG6nsqlB1hPo9XodW26VJSQwv4nAIBY=
+X-Received: by 2002:a2e:a994:0:b0:38c:c253:2999 with SMTP id 38308e7fff4ca-3924100a4d7mr21713741fa.31.1777446858332;
+        Wed, 29 Apr 2026 00:14:18 -0700 (PDT)
 Received: from thinkpad ([188.225.109.225])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-3924fa7c93bsm2861151fa.23.2026.04.29.00.14.16
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-3924fa7c93bsm2861151fa.23.2026.04.29.00.14.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Apr 2026 00:14:17 -0700 (PDT)
+        Wed, 29 Apr 2026 00:14:18 -0700 (PDT)
 From: Matthew Bystrin <dev.mbstr@gmail.com>
 To: Lee Jones <lee@kernel.org>,
 	Richard Cochran <richardcochran@gmail.com>,
 	Min Li <min.li.xe@renesas.com>
 Cc: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH v2 0/2] mfd: rsmu: fixes and new IC support
-Date: Wed, 29 Apr 2026 10:20:45 +0300
-Message-ID: <20260429072047.1111427-1-dev.mbstr@gmail.com>
+Subject: [PATCH v2 1/2] mfd: rsmu: fix page register setup
+Date: Wed, 29 Apr 2026 10:20:46 +0300
+Message-ID: <20260429072047.1111427-2-dev.mbstr@gmail.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260429072047.1111427-1-dev.mbstr@gmail.com>
+References: <20260429072047.1111427-1-dev.mbstr@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,14 +95,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 8CDBE4904A6
+X-Rspamd-Queue-Id: 1631F490575
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -107,7 +111,7 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-282264-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-282265-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
@@ -121,64 +125,63 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_FIVE(0.00)[5];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Hi!
+Fix writes to page register in 8A3400x family (Clock Matrix).
 
-First patch fixes Renesas 8A34002 SPI driver.
+All calls to rsmu_write_page_register() (both in i2c and spi) have
+resulted in early return, becase all addresses in
+include/linux/mfd/idt8a340_reg.h are less than RSMU_CM_SCSR_BASE.
 
-In my setup 8A34002 is connected to VisionFive2 (via SPI or I2C). I've
-discovered that upstream driver does not work:
+There were 2 separate patch series which have to be merged in one time:
+mfd and ptp. The latter have been merged, the former[1] have not.
 
-[    4.728771] 8a3400x-phc 8a3400x-phc.0.auto: 4.8.7, Id: 0x4002  HW Rev: 5  OTP Config Select: 0
-[    4.737389] 8a3400x-phc 8a3400x-phc.0.auto: requesting firmware 'idtcm.bin'
-[    4.744462] 8a3400x-phc 8a3400x-phc.0.auto: Direct firmware load for idtcm.bin failed with error -2
-[    4.753547] 8a3400x-phc 8a3400x-phc.0.auto: Failed at line 1273 in idtcm_load_firmware!
-[    4.761576] 8a3400x-phc 8a3400x-phc.0.auto: loading firmware failed with -2
-[    4.769411] 8a3400x-phc 8a3400x-phc.0.auto: No wait state: DPLL_SYS_STATE 0
-[    4.776374] 8a3400x-phc 8a3400x-phc.0.auto: Continuing while SYS APLL/DPLL is not locked
-[    4.785206] 8a3400x-phc 8a3400x-phc.0.auto: Unsupported MANUAL_REFERENCE: 0x00
-[    4.796930] 8a3400x-phc 8a3400x-phc.0.auto: PLL2 registered as ptp0
-
-This being caused by a piece of code in rsmu_write_page_register() function:
-
-if (reg < RSMU_CM_SCSR_BASE)
-	return 0;
-
-All addresses in include/linux/mfd/idt8a340_reg.h are less than
-RSMU_CM_SCSR_BASE so functions was returning early, before any modifications to
-the page register. Valid read of versions - is just a coincidence, because
-default value of the page register is zero.
-
-There were 2 separate patch series which had to be merged in one time: mfd and
-ptp. The latter have been merged, the former [1] have not. As result we've got a
-broken driver.
-
-This patch can be reverted later when the second part will be ready (of course
-if it is planned to do so). Any comments, Min? I could support with testing.
-
-Second patch just adds support for 8A34002, which is compatible with 8A34001. As
-I can see there is no need to update bindings, everything is already being done.
-
-Link [2] to v1.
-
-Changes in v2:
-- Fix page register issue in rsmu_i2c
-- Add support for 8a34002 in rsmu_i2c
-
-Link [1]: https://lore.kernel.org/netdev/LV3P220MB1202F8E2FCCFBA2519B4966EA0192@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM/
-Link [2]: https://lore.kernel.org/netdev/20260421090710.395591-1-dev.mbstr@gmail.com/
+Link: https://lore.kernel.org/netdev/LV3P220MB1202F8E2FCCFBA2519B4966EA0192@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM/
+Fixes: 67d6c76fc815 ("mfd: rsmu: Support 32-bit address space")
 Signed-off-by: Matthew Bystrin <dev.mbstr@gmail.com>
+---
+ drivers/mfd/rsmu_i2c.c | 6 +-----
+ drivers/mfd/rsmu_spi.c | 5 +----
+ 2 files changed, 2 insertions(+), 9 deletions(-)
 
-Matthew Bystrin (2):
-  mfd: rsmu: fix page register setup
-  mfd: rsmu: add 8a34002 support
-
- drivers/mfd/rsmu_i2c.c | 8 +++-----
- drivers/mfd/rsmu_spi.c | 7 +++----
- 2 files changed, 6 insertions(+), 9 deletions(-)
-
+diff --git a/drivers/mfd/rsmu_i2c.c b/drivers/mfd/rsmu_i2c.c
+index cba64f107a2f..9e5fc8259eec 100644
+--- a/drivers/mfd/rsmu_i2c.c
++++ b/drivers/mfd/rsmu_i2c.c
+@@ -134,14 +134,10 @@ static int rsmu_i2c_write_device(struct rsmu_ddata *rsmu, u8 reg, u8 *buf, u8 by
+ static int rsmu_write_page_register(struct rsmu_ddata *rsmu, u32 reg,
+ 				    rsmu_rw_device rsmu_write_device)
+ {
+-	u32 page = reg & RSMU_CM_PAGE_MASK;
++	u32 page = (reg | RSMU_CM_SCSR_BASE) & RSMU_CM_PAGE_MASK;
+ 	u8 buf[4];
+ 	int err;
+ 
+-	/* Do not modify offset register for none-scsr registers */
+-	if (reg < RSMU_CM_SCSR_BASE)
+-		return 0;
+-
+ 	/* Simply return if we are on the same page */
+ 	if (rsmu->page == page)
+ 		return 0;
+diff --git a/drivers/mfd/rsmu_spi.c b/drivers/mfd/rsmu_spi.c
+index 39d9be1e141f..c931d8cea0a1 100644
+--- a/drivers/mfd/rsmu_spi.c
++++ b/drivers/mfd/rsmu_spi.c
+@@ -101,11 +101,8 @@ static int rsmu_write_page_register(struct rsmu_ddata *rsmu, u32 reg)
+ 
+ 	switch (rsmu->type) {
+ 	case RSMU_CM:
+-		/* Do not modify page register for none-scsr registers */
+-		if (reg < RSMU_CM_SCSR_BASE)
+-			return 0;
+ 		page_reg = RSMU_CM_PAGE_ADDR;
+-		page = reg & RSMU_PAGE_MASK;
++		page = (reg | RSMU_CM_SCSR_BASE) & RSMU_PAGE_MASK;
+ 		buf[0] = (u8)(page & 0xFF);
+ 		buf[1] = (u8)((page >> 8) & 0xFF);
+ 		buf[2] = (u8)((page >> 16) & 0xFF);
 -- 
 2.53.0
 
