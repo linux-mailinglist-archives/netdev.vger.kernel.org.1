@@ -1,136 +1,160 @@
-Return-Path: <netdev+bounces-282290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282291-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wKoIAAfB8WkbkQEAu9opvQ
-	(envelope-from <netdev+bounces-282290-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 10:27:51 +0200
+	id SFH5CDzB8WkbkQEAu9opvQ
+	(envelope-from <netdev+bounces-282291-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 10:28:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 680304912A2
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 10:27:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B5EA4912CE
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 10:28:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EE3063025A4F
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 08:27:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B5F173024103
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 08:28:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 193713B0AF1;
-	Wed, 29 Apr 2026 08:27:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE1D83B27C2;
+	Wed, 29 Apr 2026 08:28:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="bVEJDhQT"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="uteRq7Qf"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6DE3AEF2D
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 08:27:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 436E03B27CD;
+	Wed, 29 Apr 2026 08:28:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777451268; cv=none; b=gO0fbbMELrcSl9uPZ3rlBUwg8dnFhmIcJvItW4HsklA8EGyqPvKWixySKcltVTLt+Fwks50Um8l47d859EKUUmQCl/gmci7gVug9HxvMbEecHerAOU/pepa1kQPcte5gkorhnemiHrqsSFr/CLboREjlXp3R+yJcGvUq0zQ83EA=
+	t=1777451301; cv=none; b=tsxgyM3DOfnWqQ1g9AJ4Fdp1HDqmPCMrNJY9XaSUVyBTAndZB7A4HtcWLtK5+jkwBzX0TBmp2zXke/uUrjcDXUvv7k3yLxsPPBp7ytVKOdcFvfOeiQfnRsKGzXJ7eCKqDBKy91c9eFmYW5JCKhtgWrb4lrp35Yt3ilTxdWvw+14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777451268; c=relaxed/simple;
-	bh=UeMbgQyKW4ov6RfuOD74SYC2gPv8C8XNhZJlOULT9L0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=YC2m1V08UbtD+hlnJ7t40WJ0kFbHj5uBsdJO3YzXwlTKpU+kosFkSsrYxRNvVtXbcfg7jZYWynsyv2pH/nfWXqqOEFy9G4/G9IThKvnzRWOcPwODuo2ZDmGkjKN0xXtTwZdp+zKodrCrMHKnuTLbWl0Yg2yeh2SfftVaUdjlYko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=bVEJDhQT; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1777451264;
-	bh=WgrZsvJRYeCZws+T6fsE9IMjwZvCyab/9cFomg6EY6I=;
-	h=From:Date:Subject:To:Cc;
-	b=bVEJDhQTonpj01syqHICznvyz1l4AYgDV0VYVsv04N87zK7lU6BsZXNbLNmzRKDEM
-	 ew7m7cOdVDhRSLZpjGaqYqpO6T13InhyPrJrN2q3ssUvu96XSbjVTNp2nuQmliRPZL
-	 s4/Ce8CdPOQIDS/8Ntj+guf2b0VcnSmCDCe23+e7j4f1X4LtJZO0VZHabuGYiSazqp
-	 qar19dTnKUFhRb3cFY0921TWaogkzXSGbzJxPkuEaPBlRZrjb/C6KjPTO9NhcveXBY
-	 JLlEuiSSEf2JWSoY98e9AYcgKbC2FH0IplAlCg126hVmCJWTfwQupFsfm1OEW0C3Ow
-	 g7zOggCcGwLMg==
-Received: by codeconstruct.com.au (Postfix, from userid 10000)
-	id A94C160263; Wed, 29 Apr 2026 16:27:44 +0800 (AWST)
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-Date: Wed, 29 Apr 2026 16:27:31 +0800
-Subject: [PATCH net-next] net: mctp: test: remove skb dumps from test
- output
+	s=arc-20240116; t=1777451301; c=relaxed/simple;
+	bh=gp0X0IKX1nlk1W58F7GG9Yrg2G+Bl/rYge1cXsrGT8I=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=aozj8NLdALuNSh66tub1bNEtbfMeQ7clfvJI1HWc2DGki0Gs2cCMXJsbflylMlIO0d9RI/HLvzUHyQXdpOPL02bYINVunJRlEhUiQI2B4xfsZ6Unx5z8d1q2ikG7MjYACCIOuwmxNj2b1T2UgGpaS83bpk+07mcpI14ev2IxrNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=uteRq7Qf; arc=none smtp.client-ip=115.124.30.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1777451296; h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type;
+	bh=xSa86XxQYWXAtuebcZ/sZ7wICcG6K5woqk8TDtWkg3Y=;
+	b=uteRq7Qf/W6QY8e/YDZTTWmrR6/pZTyf78FVO9u/+ou93bgp9jVzWhPRT6m5BhHSP8evCo12gKmV5ErIEbtq3lhOhbXVf0J3ygmm3886lcqR17f1eLOCxj03KoFYD7qv/LePksM9bBCAaS9yR/nPgG+9rMiK3fQypN92kedX9UA=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R321e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037009110;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=34;SR=0;TI=SMTPD_---0X1wyHwL_1777451283;
+Received: from 30.221.129.232(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0X1wyHwL_1777451283 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 29 Apr 2026 16:28:14 +0800
+Message-ID: <6117ac34-cf26-40b1-a522-3bbfbd7024ea@linux.alibaba.com>
+Date: Wed, 29 Apr 2026 16:28:03 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260429-dev-mctp-test-skb-dump-v1-1-13fd5789ef71@codeconstruct.com.au>
-X-B4-Tracking: v=1; b=H4sIAPLA8WkC/yWMwQ6CMBAFf4Xs2U2wAQP+ivFA24cWQ226CyEh/
- LtVj5PJzE6CHCB0rXbKWIOEdyxwPlXknkN8gIMvTKY2l7oxPXusPDtNrBBleVn2y5zYudb27dj
- BDJ5KnDLGsP3GN4pQjtiU7n8ji53g9Pul4/gA2As9mIQAAAA=
-X-Change-ID: 20260429-dev-mctp-test-skb-dump-cc5b95f8e2ad
-To: Matt Johnston <matt@codeconstruct.com.au>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org
-X-Mailer: b4 0.16-dev
-X-Rspamd-Queue-Id: 680304912A2
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/2] MAINTAINERS: update PTP maintainer entries after
+ directory split
+From: Wen Gu <guwen@linux.alibaba.com>
+To: Jakub Kicinski <kuba@kernel.org>, David Woodhouse <dwmw2@infradead.org>
+Cc: tglx@kernel.org, richardcochran@gmail.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, jstultz@google.com,
+ anna-maria@linutronix.de, frederic@kernel.org, daniel.lezcano@kernel.org,
+ sboyd@kernel.org, vladimir.oltean@nxp.com, wei.fang@nxp.com,
+ xiaoning.wang@nxp.com, jonathan.lemon@gmail.com, vadim.fedorenko@linux.dev,
+ yangbo.lu@nxp.com, svens@linux.ibm.com, nick.shi@broadcom.com,
+ ajay.kaher@broadcom.com, alexey.makhalov@broadcom.com,
+ bcm-kernel-feedback-list@broadcom.com, linux-fpga@vger.kernel.org,
+ imx@lists.linux.dev, linux-s390@vger.kernel.org, dust.li@linux.alibaba.com,
+ xuanzhuo@linux.alibaba.com, mani@kernel.org, imran.shaik@oss.qualcomm.com,
+ taniya.das@oss.qualcomm.com
+References: <20260407104802.34429-1-guwen@linux.alibaba.com>
+ <20260407104802.34429-3-guwen@linux.alibaba.com>
+ <20260412084704.743482ad@kernel.org>
+ <4B889ED5-D1F6-401D-B753-89AE2037F316@infradead.org>
+ <20260412095301.4fe1fe65@kernel.org>
+ <ebf19246-91af-4887-b2aa-d9007921f7b2@linux.alibaba.com>
+In-Reply-To: <ebf19246-91af-4887-b2aa-d9007921f7b2@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 9B5EA4912CE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-7.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282290-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-282291-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[codeconstruct.com.au:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,linutronix.de,nxp.com,linux.dev,linux.ibm.com,broadcom.com,lists.linux.dev,linux.alibaba.com,oss.qualcomm.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[guwen@linux.alibaba.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,codeconstruct.com.au:email,codeconstruct.com.au:dkim,codeconstruct.com.au:mid]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:url,infradead.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.alibaba.com:dkim,linux.alibaba.com:mid]
 
-We're currently dumping skb info in our fragment input test, which makes
-interpreting the TAP test output a bit awkward.
 
-Remove the skb dumps.
 
-Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
----
- net/mctp/test/route-test.c | 6 ------
- 1 file changed, 6 deletions(-)
+On 2026/4/13 17:00, Wen Gu wrote:
+> 
+> 
+> On 2026/4/13 00:53, Jakub Kicinski wrote:
+>> On Sun, 12 Apr 2026 17:32:22 +0100 David Woodhouse wrote:
+>>> On 12 April 2026 16:47:04 BST, Jakub Kicinski <kuba@kernel.org> wrote:
+>>>> On Tue,  7 Apr 2026 18:48:02 +0800 Wen Gu wrote:
+>>>>> +PTP EMULATED CLOCK SUPPORT
+>>>>> +M:    David Woodhouse <dwmw2@infradead.org>
+>>>>> +M:    Wen Gu <guwen@linux.alibaba.com>
+>>>>> +M:    Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+>>>>> +L:    linux-kernel@vger.kernel.org
+>>>>> +S:    Maintained
+>>>>> +T:    git git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git timers/core
+>>>>
+>>>> Hi David,
+>>>>
+>>>> Do you have a tree to route the patches thru? Or do you really have
+>>>> access to the tip tree?
+>>>
+>>> I do not have access to the tip tree. I can make a shared tree on
+>>> git.infradead.org if the other two maintainers would like to send me
+>>> a SSH pubkey and preferred username...
+>>
+>> Honestly I'd love for you to be the only M here, and the other two
+>> to be reviewers. Xuan Zhuo is currently at v40 trying to upstream
+>> an Ethernet driver. Some growth needed there to become a subsystem
+>> maintainer IMO.
+> 
+> Hi Jakub, David,
+> 
+> That works for us. We can act as reviewers.
+> 
+> If David sets up a new tree, I will update the MAINTAINERS entry
+> accordingly in v3.
 
-diff --git a/net/mctp/test/route-test.c b/net/mctp/test/route-test.c
-index e1033643fab0..fbd6d4e08aef 100644
---- a/net/mctp/test/route-test.c
-+++ b/net/mctp/test/route-test.c
-@@ -859,12 +859,6 @@ static void mctp_test_route_input_cloned_frag(struct kunit *test)
- 	skb[0]->data[4] = 0;
- 	skb[3]->data[4] = 0;
- 
--	skb_dump("pkt1 ", skb[0], false);
--	skb_dump("pkt2 ", skb[1], false);
--	skb_dump("pkt3 ", skb[2], false);
--	skb_dump("pkt4 ", skb[3], false);
--	skb_dump("pkt5 ", skb[4], false);
--
- 	for (int i = 0; i < 5; i++) {
- 		KUNIT_EXPECT_EQ(test, refcount_read(&skb[i]->users), 1);
- 		/* Take a reference so we can check refcounts at the end */
+Hi David,
 
----
-base-commit: dca922e019dd758b4c1b4bec8f1d509efddeaab4
-change-id: 20260429-dev-mctp-test-skb-dump-cc5b95f8e2ad
+Just checking if there is any update on the maintainer tree
+for the emulated PTP drivers.
 
-Best regards,
---  
-Jeremy Kerr <jk@codeconstruct.com.au>
+Thanks.
+
+> 
+> Thanks.
 
 
