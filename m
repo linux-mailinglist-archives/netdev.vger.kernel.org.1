@@ -1,136 +1,163 @@
-Return-Path: <netdev+bounces-282190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282191-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gKoFEQZk8WnhgQEAu9opvQ
-	(envelope-from <netdev+bounces-282190-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:51:02 +0200
+	id sHIZD4tk8Wk8ggEAu9opvQ
+	(envelope-from <netdev+bounces-282191-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:53:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3699548E191
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:51:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA0D048E20B
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:53:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D72BD301069D
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 01:50:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 74682301E584
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 01:53:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D3834AB06;
-	Wed, 29 Apr 2026 01:50:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23E75359A68;
+	Wed, 29 Apr 2026 01:53:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pe1MPdgp"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tmUixQaj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31F4E33CEB0;
-	Wed, 29 Apr 2026 01:50:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6735234AB06;
+	Wed, 29 Apr 2026 01:53:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777427455; cv=none; b=ToL0FdQcW3CZTowzJ/jk/1Cmlj0FqOYhTycWMMpZKUaRbjvXfzZh1kJKXQ6OUGI5KVOhPY/u+OWFlXbp7feSlmvgy2yXwriuAuSEtS+PEggWQQkftwH3GMW61gVEe/odDDgpVLhVNSsbQfhYUfTysfI14OnMvnKOxgDA3gmlQ38=
+	t=1777427587; cv=none; b=H5YfkxCRIdTxZ4SoGK8E5jsp/B02aknkznT1oopYBTN+uo6Kw6WQOloVqCikZtcp3G0k6ip5YFjggW93WWA9wz/I1+PCDHwwABWbRXum9IDec9rWUKvYOExRImRgLzsaRQuINZ+4oPbjSKOE79K0vq/AJAE/XuygUGSsyH1nXPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777427455; c=relaxed/simple;
-	bh=INbXNf2q6MmeJIX0oGNkmmY+3fO27A1j0CNgV9qd/tk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=HP1DlxqXGj4WHmtPKvyOf4UwFfjrEIdk2PVdubTT9KBq72JKmVrrOK6DmmSUvMXIEoAapg4H0HgCDo7bQ8j+IF8d1tqz7wC0RU1wJIanyltRz613iM4nnr3cTcV4gJW95mL3KCXCFpILun562dJgKfDMAf00HpPtcw2ks+sPqsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pe1MPdgp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5F16C2BCB7;
-	Wed, 29 Apr 2026 01:50:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777427454;
-	bh=INbXNf2q6MmeJIX0oGNkmmY+3fO27A1j0CNgV9qd/tk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pe1MPdgpgiLhcCA6RhSfk4qrj9/fC69pI1oywMecUUdf1ru+Q2O5G52/id3L/QqmV
-	 2DNGvAbqU8JWlsmwOhJinUk+usYV4rGhOuhnYa1vqcIebAhnSBpsb7a5oCmL9xa3RS
-	 mlSU6/WK8dQ/LOoCutl7J50EJVWWLmF2zAkvDlv1yIjBR2c2ETzk06FwRL69Ig17jf
-	 UP2/IYg3sLDeoAtmz1pEBA3fzk/992PjmF0+oP+ulsO3FlH4M3fKQmaQyjorPc2wJW
-	 GghelHFi8n1dmkuFn7zCueUHBxLEps1VrHHX3zBfjm8QHknXgnV+/NsEP4ayxql5SM
-	 tOpIG4nYeucQQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FD8639302C7;
-	Wed, 29 Apr 2026 01:50:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1777427587; c=relaxed/simple;
+	bh=5aXFuNsbs4JbrpQO6xbeh6efmIxB4/L1r+seliHUaIY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N17RiFX3i+5HJzMdrAtFhwAmY1xNK+4+vEnZLrNh9rjK3h9CJwe1a5pqLZFYwpTTRFUldbgkTsnw2ivVPNE7Nb6h0WA35fsKSVM84KthLrY2TwhMfpStKYWmM6qSqRVG8yP8luiLJ24ZxWl8C1z6C0Ig5/fIYocxJeq+X7vNH1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tmUixQaj; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Z0cX/ojT+0Guv16ohll90IHcdqreDWnQJf999+c3H6c=; b=tmUixQajy0qwThmRHc7SRL0MB6
+	WXvKZdhrXjwVhNceBPzWJofTEY8YWESJvWo3wUtezUM0AgFDhyCMCn9bn8mfuOwJI1XZwIUob95Yg
+	KYN7ZvJ6xfY5/sD4HOhGnlQ6Xm5162g9lpHTdWHJGX7u7jTxrz++qbsQuSsZdCp2TFbE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wHu6k-000Rn6-1B; Wed, 29 Apr 2026 03:52:58 +0200
+Date: Wed, 29 Apr 2026 03:52:58 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Birger Koblitz <mail@birger-koblitz.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Chih Kai Hsu <hsu.chih.kai@realtek.com>
+Subject: Re: [PATCH net-next 2/4] r8152: Add support for the RTL8159 chip
+Message-ID: <3e04d913-693c-44a9-a685-df9d0c9bd95f@lunn.ch>
+References: <20260428-rtl8159_net_next-v1-0-52d03927b46f@birger-koblitz.de>
+ <20260428-rtl8159_net_next-v1-2-52d03927b46f@birger-koblitz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/4] mptcp: misc fixes for v7.1-rc2
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177742741105.1295091.8893336213893309310.git-patchwork-notify@kernel.org>
-Date: Wed, 29 Apr 2026 01:50:11 +0000
-References: 
- <20260427-net-mptcp-misc-fixes-7-1-rc2-v1-0-7432b7f279fa@kernel.org>
-In-Reply-To: 
- <20260427-net-mptcp-misc-fixes-7-1-rc2-v1-0-7432b7f279fa@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: martineau@kernel.org, geliang@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- fw@strlen.de, netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kernel@vger.kernel.org, yangang@kylinos.cn, stable@vger.kernel.org,
- sashiko-bot@kernel.org, lance@lance0.com
-X-Rspamd-Queue-Id: 3699548E191
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260428-rtl8159_net_next-v1-2-52d03927b46f@birger-koblitz.de>
+X-Rspamd-Queue-Id: BA0D048E20B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282190-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-282191-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Hello:
+> @@ -3431,6 +3432,7 @@ static void rtl8152_nic_reset(struct r8152 *tp)
+>  		ocp_word_clr_bits(tp, MCU_TYPE_USB, USB_USB_CTRL, CDC_ECM_EN);
+>  		break;
+>  
+> +	case RTL_VER_17:
+>  	case RTL_VER_16:
+>  		ocp_byte_clr_bits(tp, MCU_TYPE_PLA, PLA_CR, CR_RE | CR_TE);
 
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+nitpick. The other switch statements seem to be sorted. So 17 should
+be after 16.
 
-On Mon, 27 Apr 2026 21:54:32 +0200 you wrote:
-> Here are various unrelated fixes:
-> 
-> - Patches 1-2: set timestamp flags on 'ssk', not 'sk' (typo); Plus do
->   that with sleepable lock_sock/release_sock. A fix for v5.14.
-> 
-> - Patch 3: respect SO_LINGER(1, 0) by sending MP_FASTCLOSE at close time
->   as expected. A fix for v6.1.
-> 
-> [...]
+> +		/* Power level tuning */
+> +		// test mode power level
+> +		sram_write_w0w1(tp, 0x8415, 0xff00, 0x9300);
+> +		// normal link power level 10G, 5G, 2.5G
+> +		sram_write_w0w1(tp, 0x81a3, 0xff00, 0x0f00);
+> +		sram_write_w0w1(tp, 0x81ae, 0xff00, 0x0f00);
+> +		sram_write_w0w1(tp, 0x81b9, 0xff00, 0xb900);
+> +		//nomal link TX filter
 
-Here is the summary with links:
-  - [net,1/4] mptcp: sockopt: set timestamp flags on subflow socket, not msk
-    https://git.kernel.org/netdev/net/c/5f95c21fc23a
-  - [net,2/4] mptcp: fix scheduling with atomic in timestamp sockopt
-    https://git.kernel.org/netdev/net/c/b5c52908d52c
-  - [net,3/4] mptcp: fastclose msk when linger time is 0
-    https://git.kernel.org/netdev/net/c/f14d6e9c3678
-  - [net,4/4] mptcp: pm: kernel: reset fullmesh counter after flush
-    https://git.kernel.org/netdev/net/c/1774d3cf3cf1
+normal? Please also add a space after the //. netdev also prefers /*
+*/.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> +		/* XG INRX parameters */
+> +		// RC coefficients
+> +		sram2_write(tp, 0x84ac, 0x0000);
+> +		sram2_write(tp, 0x84ae, 0x0000);
+> +		sram2_write(tp, 0x84b0, 0xf818);
+> +		sram2_write_w0w1(tp, 0x84b2, 0xff00, 0x6000);
+> +		//Training AAGC PAR (with uc2 patch)
 
+space
 
+> +static int r8159_wait_backup_restore(struct r8152 *tp)
+> +{
+> +	u32 ocp_data;
+> +
+> +	ocp_data = ocp_read_word(tp, MCU_TYPE_USB, USB_MISC_0);
+> +	if (!(ocp_data & PCUT_STATUS))
+> +		return 0;
+> +
+> +	return poll_timeout_us(ocp_data = ocp_read_word(tp, MCU_TYPE_USB, USB_GPHY_CTRL),
+> +			       ocp_data & BACKUP_RESTRORE, 200, 2000, false);
+> +}
+> +
+>  static void r8156_init(struct r8152 *tp)
+> @@ -8221,6 +8421,9 @@ static void r8156_init(struct r8152 *tp)
+>  			return;
+>  	}
+>  
+> +	if (tp->version == RTL_VER_17 && r8159_wait_backup_restore(tp))
+> +		return;
+
+You should probably do something with the return value from
+r8159_wait_backup_restore(). At minimum a dev_err().
+
+    Andrew
+
+---
+pw-bot: cr
+	
 
