@@ -1,457 +1,218 @@
-Return-Path: <netdev+bounces-282506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282507-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id INPgEkl58mnjrgEAu9opvQ
-	(envelope-from <netdev+bounces-282506-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:34:01 +0200
+	id AJNhC/t58mnjrgEAu9opvQ
+	(envelope-from <netdev+bounces-282507-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:36:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B32D549A9D3
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:34:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C366549AA22
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:36:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1AA63303B4DF
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 21:33:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 59C7F3036EF2
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 21:36:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A663B38A6;
-	Wed, 29 Apr 2026 21:33:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7714F3B27C1;
+	Wed, 29 Apr 2026 21:36:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b="SMTVCpcM"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="Jr+R6Qpk";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="lH+dIeKq"
 X-Original-To: netdev@vger.kernel.org
-Received: from szelinsky.de (szelinsky.de [85.214.127.56])
+Received: from flow-b5-smtp.messagingengine.com (flow-b5-smtp.messagingengine.com [202.12.124.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 017363B2FE1;
-	Wed, 29 Apr 2026 21:33:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.127.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B746277C9D;
+	Wed, 29 Apr 2026 21:36:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777498386; cv=none; b=GfZWT+LgQg42w44XvENEeWwwRi8bOskCTuR/XBrv6Qr5D/KzcZhCAIKaAj+ByI6Z3vuqHWHy0c5oHZUmK+J1onxmLwIasqtrxh0ywr0p3EFG3rKH5OT4+IkCtUuM4NUce6phmXOmmCeWqCKE4xFrn7UsJV1HWQdOB5Nfb3dDkZ8=
+	t=1777498590; cv=none; b=OOmxWLN2QsHTwQeo6p6f8k+teshnh73wZAWfbNLzCibQrlMdr1OfyqtWgIeB7k/P3cxr/gXadkc627BRxD8jJ/nNCl9gNQo6JcSz3yvyFrGdLHB5RES7DPikQt3eE9MUkChTgcsLZwQt3LA9vjeqFoFrZkKppu0oGfcCVQIUti4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777498386; c=relaxed/simple;
-	bh=naMgGoPobYy3+Z53SE87atkPF93pxALNkBgCzwvHJRI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=s/HxOfLQ0xRCaLw1sragzLSZvi9ZeoJkrvC1fAo0OcvAEaOyrDspHQK9uQrOmnV3AnBfVUFk+pXRDpWQVNUGEp8Ys71Q++MsV58XUaVbj7BtVnr31RAWZs2QiKFAUC/W4fiu9U+Auxjj+jD72yOi/EFeDSyidW1CwXseqAcOujQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de; spf=pass smtp.mailfrom=szelinsky.de; dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b=SMTVCpcM; arc=none smtp.client-ip=85.214.127.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szelinsky.de
-Received: from localhost (localhost [127.0.0.1])
-	by szelinsky.de (Postfix) with ESMTP id 3B107E83563;
-	Wed, 29 Apr 2026 23:33:03 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=szelinsky.de;
-	s=mail; t=1777498383;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CmPrjGiR21Cu6k9gRrkx6D5ePgbYzoL1rr4mVdnIeGg=;
-	b=SMTVCpcMbdPV4aXOEgkzZ02ufnoMTtq0V5N2ADqyPxagaYEsqiSaLqM9IUDTuQEcTWAds9
-	xxbY3QtAcQwPbBb+eEv7cZgY/Tcrqio8JrQuyf00ejdiQhGoaJnvt2WckMl+mtBt8M38hz
-	P9v3bBhW73KtuliRhAoIl6akv7JZIp0Jsttkfifq9ttC1yyHx06sjBfsF1jyv3gjsqmOmZ
-	8tu95+XD7267ysopLgXu3ofV18pB0HRvbSWtJ8HpmlyZgZOni9xt9wjqUD7o8Tc9hK+hvw
-	XfkufW9R3HNvzG42vxRSErGdpRD6OpOujGauvwmcYQ7Jj7VVXyGCX/8tcwriMw==
-X-Virus-Scanned: Debian amavis at szelinsky.de
-Received: from szelinsky.de ([127.0.0.1])
- by localhost (szelinsky.de [127.0.0.1]) (amavis, port 10025) with ESMTP
- id ltVUqJReRUGy; Wed, 29 Apr 2026 23:33:03 +0200 (CEST)
-Received: from p14sgen5.fritz.box (dslb-002-205-089-102.002.205.pools.vodafone-ip.de [2.205.89.102])
-	by szelinsky.de (Postfix) with ESMTPSA;
-	Wed, 29 Apr 2026 23:33:01 +0200 (CEST)
-From: Carlo Szelinsky <github@szelinsky.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>,
-	Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-leds@vger.kernel.org,
-	Carlo Szelinsky <github@szelinsky.de>
-Subject: [PATCH net-next v5 2/2] net: pse-pd: add LED trigger support via notification path
-Date: Wed, 29 Apr 2026 23:32:24 +0200
-Message-ID: <20260429213224.1747410-3-github@szelinsky.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260429213224.1747410-1-github@szelinsky.de>
-References: <20260410124428.809943-1-github@szelinsky.de>
- <20260429213224.1747410-1-github@szelinsky.de>
+	s=arc-20240116; t=1777498590; c=relaxed/simple;
+	bh=klf0tstlaQQRwsbPlrG8dRk7UxgfXScT7I6Ug1NVWqo=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=ggtG+0VCwswovEzdH5WmOOnreU2mKXBGD+b8toIa4Fwu+ItbduLrHAgfN1t6eofq3ZQMxViySTbikThdUGYWvitAPL9XmQGNadm1IUxvE8gkIWkUIVY3mGqymUovYCUXYT/S1pfukX8LmxgGkHKsQFbuDMyjzfFGc4a2wYp6Npg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=Jr+R6Qpk; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=lH+dIeKq; arc=none smtp.client-ip=202.12.124.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailflow.stl.internal (Postfix) with ESMTP id BF9B4130036A;
+	Wed, 29 Apr 2026 17:36:26 -0400 (EDT)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-04.internal (MEProxy); Wed, 29 Apr 2026 17:36:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1777498586;
+	 x=1777505786; bh=5c6EKeRaeRgw2IP6/aj0vwG5gMU6SBqRhc9H6l67RiQ=; b=
+	Jr+R6QpkxIywS/7WcSX44vaN9mfpxh7lBC2ezZrvdvuA/yI+NBgPqA9p1STNkGxv
+	+d48HacyNpKlIYgICiGd2MaHDc9qZjiR7fn+eFjIL70w+t2NjuHnAaHPu+W5YBJg
+	ANsGVbscLAui2TZcyw/0j58ke/CfVlQCeQhDi4ZcbrBNt6Z9hu1LCHdKLJbIy//W
+	9Wl16IcsT1sYF8P8bBxmIhuWzinkqAP0KyxuCpZY2eipNp6hADnDn89bKQlXLXPU
+	+twHMtrBu3HzhxOv21mgHo069Hz4yZynJw3+ds/cBumeITKX3FxdSb/JRljN7qKL
+	LrN53qX0XMZKZuAwWviCSA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1777498586; x=
+	1777505786; bh=5c6EKeRaeRgw2IP6/aj0vwG5gMU6SBqRhc9H6l67RiQ=; b=l
+	H+dIeKqoYkoZhzjlRFOgPwh6Y2FWWcE8/DB5spvkDaBfxAULdmlBIkLHMmkvMZwT
+	gViu6vzN/tIYlHs2lUsOq1RZY94Lpo8XT9gxDpc8lM1EU49KKT1787DaKatfnIfu
+	C8w3KTJqxEU2iZZlk86pBDCo6g3y6v3cyki8SnkAU7IQWMkpiXS37XAjhOxMHkNl
+	iF8td4IVsEJ2gpictINOm+8jDDgXLno5xEX7JlFPNdIa0Y1PFdTDe6qO7r9/HsKE
+	JygEHebypLDS5V2Nf3FvK2DixXjhRspCzvu6BeKxrIcMBU8Uvnj88RiMdn06lnwF
+	pV8f4LNsk6g8tuO6FqGLw==
+X-ME-Sender: <xms:2nnyae4igw8uVEMMztjiAbf_zsCdn6yhDMpsb1lqcNZA7PPowcjEuA>
+    <xme:2nnyaSuHLt8KUulleeBoxX1S6dP-b1Gw_xoLfgASRLEQVlyK_4tx17HEAp0NdPaua
+    94grnG3ddm8JJnAA229mKBXPmqyzQgMsMDH9RNU79Qj1PXshC7ztg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdekheehgecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdetrhhnugcu
+    uegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtthgvrh
+    hnpefhtdfhvddtfeehudekteeggffghfejgeegteefgffgvedugeduveelvdekhfdvieen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnug
+    esrghrnhgusgdruggvpdhnsggprhgtphhtthhopedvjedpmhhouggvpehsmhhtphhouhht
+    pdhrtghpthhtohepthhonhihsegrthhomhhiuggvrdgtohhmpdhrtghpthhtohepsggtoh
+    hushhsohhnsegsrgihlhhisghrvgdrtghomhdprhgtphhtthhopehkhhhilhhmrghnsegs
+    rgihlhhisghrvgdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrd
+    hnvghtpdhrtghpthhtoheptghhuhhnkhgvvgihsehgmhgrihhlrdgtohhmpdhrtghpthht
+    ohepughmihhtrhihrdhtohhrohhkhhhovhesghhmrghilhdrtghomhdprhgtphhtthhope
+    gvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoheprggrrhhordhkohhs
+    khhinhgvnhesihhkihdrfhhipdhrtghpthhtoheprghnughrvggrsheskhgvmhhnrgguvg
+    drihhnfhho
+X-ME-Proxy: <xmx:2nnyaQVgbuPYwQ5PhORdbzIQH5UhjHsL72TZyvElKtkH1aaRbv438Q>
+    <xmx:2nnyadxpkCobOu3ZukawY3SpbfPzxsOghsEgMP3SNhGL8Vb0cspQDQ>
+    <xmx:2nnyaeibFjsc08s8EhBQwOqVh2QaA3ndmeaPDON86htoMSYXBjMHIA>
+    <xmx:2nnyaQMltp_xmQ2nS6jRq7wyIVO4JwQcWZDKNPUXxJb4EIrvy47p3A>
+    <xmx:2nnyaXavduEMWLUdY2sB7yCKpzJ24ICtTtce4Ut1i37Vrhc5Zf-xsmEA>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id EA351700065; Wed, 29 Apr 2026 17:36:25 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: B32D549A9D3
+X-ThreadId: A9F4XwaMmS3c
+Date: Wed, 29 Apr 2026 23:35:44 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Krzysztof Kozlowski" <krzk@kernel.org>, "Arnd Bergmann" <arnd@kernel.org>
+Cc: "Aaro Koskinen" <aaro.koskinen@iki.fi>,
+ "Andreas Kemnade" <andreas@kemnade.info>,
+ "Bartosz Golaszewski" <brgl@kernel.org>,
+ =?UTF-8?Q?Beno=C3=AEt_Cousson?= <bcousson@baylibre.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Dmitry Torokhov" <dmitry.torokhov@gmail.com>,
+ "Eric Dumazet" <edumazet@google.com>, "Felipe Balbi" <balbi@kernel.org>,
+ "Jakub Kicinski" <kuba@kernel.org>,
+ "Johannes Berg" <johannes@sipsolutions.net>,
+ "Kevin Hilman" <khilman@baylibre.com>,
+ "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
+ "Linus Walleij" <linusw@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Rob Herring" <robh+dt@kernel.org>, "Roger Quadros" <rogerq@kernel.org>,
+ "Tony Lindgren" <tony@atomide.com>, linux-wireless@vger.kernel.org,
+ Netdev <netdev@vger.kernel.org>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+ Linux-OMAP <linux-omap@vger.kernel.org>,
+ "Christian Lamparter" <chunkeey@gmail.com>
+Message-Id: <556b64c4-febb-4dc6-8d51-1b1c2d2c6aa6@app.fastmail.com>
+In-Reply-To: <e4a7e9d8-7091-4520-a634-ff0a44eb5139@kernel.org>
+References: <20260427142355.2532714-1-arnd@kernel.org>
+ <20260427142355.2532714-4-arnd@kernel.org>
+ <e4a7e9d8-7091-4520-a634-ff0a44eb5139@kernel.org>
+Subject: Re: [PATCH v3 3/3] p54spi: convert to devicetree
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: C366549AA22
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.65 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[szelinsky.de,quarantine];
-	R_DKIM_ALLOW(-0.20)[szelinsky.de:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[arndb.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[arndb.de:s=fm2,messagingengine.com:s=fm2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-282506-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[iki.fi,kemnade.info,kernel.org,baylibre.com,davemloft.net,gmail.com,google.com,sipsolutions.net,redhat.com,atomide.com,vger.kernel.org,lists.infradead.org];
+	TAGGED_FROM(0.00)[bounces-282507-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_TWELVE(0.00)[27];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[github@szelinsky.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[szelinsky.de:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FROM_HAS_DN(0.00)[]
+	FROM_NEQ_ENVFROM(0.00)[arnd@arndb.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[arndb.de:+,messagingengine.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[]
 
-Add per-PI "delivering" and "enabled" LED triggers to the PSE core
-subsystem. LED state is updated from the shared pse_handle_events()
-function whenever the IRQ or poll path detects a state change, as well
-as from the regulator enable/disable paths so that host-initiated
-admin state changes via ethtool are immediately reflected.
+On Wed, Apr 29, 2026, at 10:07, Krzysztof Kozlowski wrote:
+> On 27/04/2026 16:23, Arnd Bergmann wrote:
+>>  
+>> -	ret = gpio_request(p54spi_gpio_power, "p54spi power");
+>> -	if (ret < 0) {
+>> -		dev_err(&priv->spi->dev, "power GPIO request failed: %d", ret);
+>> +	priv->gpio_powerdown = gpiod_get(&spi->dev, "powerdown", GPIOD_OUT_HIGH);
+>> +	if (IS_ERR(priv->gpio_powerdown)) {
+>> +		ret = PTR_ERR(priv->gpio_powerdown);
+>> +		dev_err(&priv->spi->dev, "powerdown GPIO request failed: %d", ret);
+>
+> Binding said it is optional, so this cannot be a failure.
+>
+> Also, please use ret = dev_err_probe syntax.
 
-Each trigger registers an .activate callback that syncs a freshly-bound
-LED to the cached state, so an LED bound after pse_controller_register()
-(e.g. via sysfs) does not stay dark until the next hardware event.
+Ok, fixed both.
 
-The post-registration initial-state pass is run under pcdev->lock,
-matching pse_led_update()'s documented locking contract and avoiding
-races with concurrent regulator_enable() paths that share last_delivering
-/ last_enabled and the hardware ops.
+>> @@ -686,10 +659,19 @@ static void p54spi_remove(struct spi_device *spi)
+>>  	p54_free_common(priv->hw);
+>>  }
+>>  
+>> +struct of_device_id p54spi_of_ids[] = {
+>
+> static const
 
-If pse_led_triggers_register() fails partway through, the partially-
-registered triggers are detached by clearing pcdev->pi_led_trigs, so the
-existing early-return guard in pse_led_update() is the single point of
-truth and a stale led_trigger.name cannot fool the dereference path
-into touching an unregistered trigger.
+I would have expected that to trigger a compile-time warning for a
+missing declaration, not sure what happened here. Fixed now.
 
-The per-PI trigger struct lives outside the CONFIG_LEDS_TRIGGERS ifdef
-to avoid forcing every reference site to be wrapped; the LED-specific
-code paths remain ifdef'd.
+>> +	{ .compatible = "cnxt,3110x", },
+>> +	{ .compatible = "isil,p54spi", },
+>> +	{ .compatible = "st,stlc4550", },
+>> +	{ .compatible = "st,stlc4560", },
+>
+> At least last two devices are then compatible, so this should be
+> expressed in the binding with fallback and drop stlc4560 here. Maybe all
+> of them are compatible.
 
-Link: https://lore.kernel.org/oe-kbuild-all/202603251254.o5PqMBRU-lkp@intel.com/
-Link: https://lore.kernel.org/oe-kbuild-all/202603251250.cuMCk5Yv-lkp@intel.com/
-Signed-off-by: Carlo Szelinsky <github@szelinsky.de>
----
- drivers/net/pse-pd/pse_core.c | 200 +++++++++++++++++++++++++++++++++-
- include/linux/pse-pd/pse.h    |  18 +++
- 2 files changed, 217 insertions(+), 1 deletion(-)
+The driver doesn't know the difference, so I assume they are
+either all compatible, or the other ones don't actually work.
+I've dropped everything except  "st,stlc4550" now, as that is the
+one I used in the dts file. I kept the other identifiers
+in the binding as:
 
-diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
-index b7ffec0c942c..bff97211ae22 100644
---- a/drivers/net/pse-pd/pse_core.c
-+++ b/drivers/net/pse-pd/pse_core.c
-@@ -8,6 +8,7 @@
- #include <linux/device.h>
- #include <linux/ethtool.h>
- #include <linux/ethtool_netlink.h>
-+#include <linux/leds.h>
- #include <linux/of.h>
- #include <linux/phy.h>
- #include <linux/pse-pd/pse.h>
-@@ -669,6 +670,168 @@ static int _pse_pi_delivery_power_sw_pw_ctrl(struct pse_controller_dev *pcdev,
- 	return 0;
- }
- 
-+#if IS_ENABLED(CONFIG_LEDS_TRIGGERS)
-+/**
-+ * pse_pi_get_states - Fetch current delivering/enabled state for a PI
-+ * @pcdev: PSE controller device
-+ * @id: PI index
-+ * @delivering: out, set to true if PI is currently delivering power
-+ * @enabled: out, set to true if PI is administratively enabled
-+ *
-+ * Queries hardware via the controller ops. Caller must hold pcdev->lock.
-+ *
-+ * Return: 0 on success, negative errno on failure.
-+ */
-+static int pse_pi_get_states(struct pse_controller_dev *pcdev, int id,
-+			     bool *delivering, bool *enabled)
-+{
-+	struct pse_pw_status pw_status = {};
-+	struct pse_admin_state admin_state = {};
-+	int ret;
-+
-+	ret = pcdev->ops->pi_get_pw_status(pcdev, id, &pw_status);
-+	if (ret)
-+		return ret;
-+	ret = pcdev->ops->pi_get_admin_state(pcdev, id, &admin_state);
-+	if (ret)
-+		return ret;
-+
-+	*delivering = pw_status.c33_pw_status ==
-+		ETHTOOL_C33_PSE_PW_D_STATUS_DELIVERING ||
-+		pw_status.podl_pw_status ==
-+		ETHTOOL_PODL_PSE_PW_D_STATUS_DELIVERING;
-+	*enabled = admin_state.c33_admin_state ==
-+		ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED ||
-+		admin_state.podl_admin_state ==
-+		ETHTOOL_PODL_PSE_ADMIN_STATE_ENABLED;
-+
-+	return 0;
-+}
-+
-+/**
-+ * pse_led_update - Update LED triggers for a PI based on current state
-+ * @pcdev: PSE controller device
-+ * @id: PI index
-+ *
-+ * Queries the current power status and admin state of the PI and
-+ * fires LED trigger events on state changes. Called from the
-+ * notification path and the regulator enable/disable paths.
-+ *
-+ * Must be called with pcdev->lock held.
-+ */
-+static void pse_led_update(struct pse_controller_dev *pcdev, int id)
-+{
-+	struct pse_pi_led_triggers *trigs;
-+	bool delivering, enabled;
-+
-+	if (!pcdev->pi_led_trigs)
-+		return;
-+
-+	trigs = &pcdev->pi_led_trigs[id];
-+	if (!trigs->delivering.name)
-+		return;
-+
-+	if (pse_pi_get_states(pcdev, id, &delivering, &enabled))
-+		return;
-+
-+	if (trigs->last_delivering != delivering) {
-+		trigs->last_delivering = delivering;
-+		led_trigger_event(&trigs->delivering,
-+				  delivering ? LED_FULL : LED_OFF);
-+	}
-+
-+	if (trigs->last_enabled != enabled) {
-+		trigs->last_enabled = enabled;
-+		led_trigger_event(&trigs->enabled,
-+				  enabled ? LED_FULL : LED_OFF);
-+	}
-+}
-+
-+/* Sync a freshly-bound LED to the cached trigger state. Without these
-+ * .activate callbacks, an LED bound to the trigger after
-+ * pse_controller_register() (e.g. via sysfs) would stay dark until the
-+ * next hardware event toggles state.
-+ */
-+static int pse_led_delivering_activate(struct led_classdev *led_cdev)
-+{
-+	struct pse_pi_led_triggers *trigs =
-+		container_of(led_cdev->trigger, struct pse_pi_led_triggers,
-+			     delivering);
-+
-+	led_set_brightness(led_cdev,
-+			   trigs->last_delivering ? LED_FULL : LED_OFF);
-+	return 0;
-+}
-+
-+static int pse_led_enabled_activate(struct led_classdev *led_cdev)
-+{
-+	struct pse_pi_led_triggers *trigs =
-+		container_of(led_cdev->trigger, struct pse_pi_led_triggers,
-+			     enabled);
-+
-+	led_set_brightness(led_cdev,
-+			   trigs->last_enabled ? LED_FULL : LED_OFF);
-+	return 0;
-+}
-+
-+static int pse_led_triggers_register(struct pse_controller_dev *pcdev)
-+{
-+	struct device *dev = pcdev->dev;
-+	const char *dev_id;
-+	int i, ret;
-+
-+	dev_id = dev_name(dev);
-+
-+	pcdev->pi_led_trigs = devm_kcalloc(dev, pcdev->nr_lines,
-+					   sizeof(*pcdev->pi_led_trigs),
-+					   GFP_KERNEL);
-+	if (!pcdev->pi_led_trigs)
-+		return -ENOMEM;
-+
-+	for (i = 0; i < pcdev->nr_lines; i++) {
-+		struct pse_pi_led_triggers *trigs = &pcdev->pi_led_trigs[i];
-+
-+		/* Skip PIs not described in device tree */
-+		if (!pcdev->no_of_pse_pi && !pcdev->pi[i].np)
-+			continue;
-+
-+		trigs->delivering.name = devm_kasprintf(dev, GFP_KERNEL,
-+							"pse-%s:port%d:delivering",
-+							dev_id, i);
-+		if (!trigs->delivering.name)
-+			return -ENOMEM;
-+		trigs->delivering.activate = pse_led_delivering_activate;
-+
-+		ret = devm_led_trigger_register(dev, &trigs->delivering);
-+		if (ret) {
-+			trigs->delivering.name = NULL;
-+			return ret;
-+		}
-+
-+		trigs->enabled.name = devm_kasprintf(dev, GFP_KERNEL,
-+						     "pse-%s:port%d:enabled",
-+						     dev_id, i);
-+		if (!trigs->enabled.name)
-+			return -ENOMEM;
-+		trigs->enabled.activate = pse_led_enabled_activate;
-+
-+		ret = devm_led_trigger_register(dev, &trigs->enabled);
-+		if (ret) {
-+			trigs->enabled.name = NULL;
-+			return ret;
-+		}
-+	}
-+
-+	return 0;
-+}
-+#else
-+static inline void pse_led_update(struct pse_controller_dev *pcdev, int id) {}
-+static int pse_led_triggers_register(struct pse_controller_dev *pcdev)
-+{
-+	return 0;
-+}
-+#endif /* CONFIG_LEDS_TRIGGERS */
-+
- static int pse_pi_enable(struct regulator_dev *rdev)
- {
- 	struct pse_controller_dev *pcdev = rdev_get_drvdata(rdev);
-@@ -694,6 +857,7 @@ static int pse_pi_enable(struct regulator_dev *rdev)
- 			pcdev->pi[id].admin_state_enabled = 1;
- 			ret = 0;
- 		}
-+		pse_led_update(pcdev, id);
- 		mutex_unlock(&pcdev->lock);
- 		return ret;
- 	}
-@@ -701,6 +865,7 @@ static int pse_pi_enable(struct regulator_dev *rdev)
- 	ret = ops->pi_enable(pcdev, id);
- 	if (!ret)
- 		pcdev->pi[id].admin_state_enabled = 1;
-+	pse_led_update(pcdev, id);
- 	mutex_unlock(&pcdev->lock);
- 
- 	return ret;
-@@ -718,6 +883,7 @@ static int pse_pi_disable(struct regulator_dev *rdev)
- 	ret = _pse_pi_disable(pcdev, id);
- 	if (!ret)
- 		pi->admin_state_enabled = 0;
-+	pse_led_update(pcdev, id);
- 
- 	mutex_unlock(&pcdev->lock);
- 	return 0;
-@@ -1107,6 +1273,31 @@ int pse_controller_register(struct pse_controller_dev *pcdev)
- 	if (ret)
- 		return ret;
- 
-+	ret = pse_led_triggers_register(pcdev);
-+	if (ret) {
-+		/* LED triggers are non-essential for power delivery; warn
-+		 * and continue. NULL out the array so pse_led_update()'s
-+		 * early-return guard short-circuits any later calls onto
-+		 * partially-registered triggers.
-+		 */
-+		dev_warn(pcdev->dev, "Failed to register LED triggers: %d\n",
-+			 ret);
-+		pcdev->pi_led_trigs = NULL;
-+	}
-+
-+	/* Query initial LED state for all PIs so already-active ports
-+	 * are reflected immediately without waiting for a hardware event.
-+	 * Hold pcdev->lock: regulators are already exposed and a
-+	 * concurrent regulator_enable() would race on the hw callbacks
-+	 * and on last_delivering / last_enabled.
-+	 */
-+	mutex_lock(&pcdev->lock);
-+	for (i = 0; i < pcdev->nr_lines; i++) {
-+		if (pcdev->no_of_pse_pi || pcdev->pi[i].np)
-+			pse_led_update(pcdev, i);
-+	}
-+	mutex_unlock(&pcdev->lock);
-+
- 	mutex_lock(&pse_list_mutex);
- 	list_add(&pcdev->list, &pse_controller_list);
- 	mutex_unlock(&pse_list_mutex);
-@@ -1267,7 +1458,14 @@ static void pse_handle_events(struct pse_controller_dev *pcdev,
- 		struct pse_ntf ntf = {};
- 		int ret;
- 
--		/* Do nothing PI not described */
-+		/* Update LEDs for described PIs regardless of consumer state.
-+		 * LED triggers are registered at controller init, before any
-+		 * PHY claims a PSE control, so rdev may still be NULL here.
-+		 */
-+		if (pcdev->no_of_pse_pi || pcdev->pi[i].np)
-+			pse_led_update(pcdev, i);
-+
-+		/* Skip regulator/netlink path for PIs without consumers */
- 		if (!pcdev->pi[i].rdev)
- 			continue;
- 
-diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
-index 4b5d5b11a084..ba321e669642 100644
---- a/include/linux/pse-pd/pse.h
-+++ b/include/linux/pse-pd/pse.h
-@@ -10,6 +10,7 @@
- #include <linux/kfifo.h>
- #include <uapi/linux/ethtool.h>
- #include <uapi/linux/ethtool_netlink_generated.h>
-+#include <linux/leds.h>
- #include <linux/regulator/driver.h>
- 
- /* Maximum current in uA according to IEEE 802.3-2022 Table 145-1 */
-@@ -266,6 +267,21 @@ struct pse_pi {
- 	int pw_allocated_mW;
- };
- 
-+/**
-+ * struct pse_pi_led_triggers - LED trigger state for a PSE PI
-+ *
-+ * @delivering: LED trigger for power delivering state
-+ * @enabled: LED trigger for admin enabled state
-+ * @last_delivering: cached delivering state for change detection
-+ * @last_enabled: cached enabled state for change detection
-+ */
-+struct pse_pi_led_triggers {
-+	struct led_trigger delivering;
-+	struct led_trigger enabled;
-+	bool last_delivering;
-+	bool last_enabled;
-+};
-+
- /**
-  * struct pse_ntf - PSE notification element
-  *
-@@ -304,6 +320,7 @@ struct pse_ntf {
-  * @ntf_work: workqueue for PSE notification management
-  * @ntf_fifo: PSE notifications FIFO
-  * @ntf_fifo_lock: protect @ntf_fifo writer
-+ * @pi_led_trigs: per-PI LED trigger state array
-  */
- struct pse_controller_dev {
- 	const struct pse_controller_ops *ops;
-@@ -329,6 +346,7 @@ struct pse_controller_dev {
- 	struct work_struct ntf_work;
- 	DECLARE_KFIFO_PTR(ntf_fifo, struct pse_ntf);
- 	spinlock_t ntf_fifo_lock; /* Protect @ntf_fifo writer */
-+	struct pse_pi_led_triggers *pi_led_trigs;
- };
- 
- /**
--- 
-2.43.0
+  compatible:
+    oneOf:
+      - const: st,stlc4560
+      - items:
+          - enum:
+              - cnxt,3110x
+              - st,stlc4550
+              - isil,p54spi
+          - const: st,stlc4560
 
+Not sure if that's the best way to express this.
+
+       Arnd
 
