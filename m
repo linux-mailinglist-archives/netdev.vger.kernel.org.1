@@ -1,203 +1,289 @@
-Return-Path: <netdev+bounces-282321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282322-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EMOkCvjN8WlrkgEAu9opvQ
-	(envelope-from <netdev+bounces-282321-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 11:23:04 +0200
+	id 8H16MHPN8WlrkgEAu9opvQ
+	(envelope-from <netdev+bounces-282322-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 11:20:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B766E491CEE
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 11:23:03 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA130491C47
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 11:20:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 120EF30B74D9
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 09:17:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 553F3300EB78
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 09:18:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 111F73C1400;
-	Wed, 29 Apr 2026 09:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 261D63BC69D;
+	Wed, 29 Apr 2026 09:18:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="rQEhSziT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IzuNOyuc"
 X-Original-To: netdev@vger.kernel.org
-Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C1B3C0607
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 09:16:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777454211; cv=none; b=TqE0OVL+24vZ/C/+pDixwLf62h90UIMcmu8YnFGENBBMi3+UeBwEu8PYFfNGogn8hC1ldPbI7gUKlpGpaXffCjsLgiGvPB+p3ce6XkDm1ykNf7V6LIRrbbAQZvsaOzQUd5R7+GVi1Lgri0dYurYOpuJPArYOpw3PBeIHAMxBPbI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777454211; c=relaxed/simple;
-	bh=jooEF0Q2ODBHr+EeWZk3cn58gUgpPnmfj/zlBZ4xAes=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GCT+pwDVGN0l/hc1RfL902MMSLE5wJY+Avt1oqkh20wlC6IOxslwC0WJsFaVAlzhmvB9NRke8CePN1v6HZVSpoi81TpH7KjcTAMayUDurZU27rge1aQ00gC0U/NJJP5gEEtCo6xE5DRjav0BuxUR1t8VMSKhPr/mtXFBwGLyb8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=rQEhSziT; arc=none smtp.client-ip=49.212.198.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
-Received: from ms-a2 (197.87.13.160.dy.iij4u.or.jp [160.13.87.197])
-	(authenticated bits=0)
-	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 63T9Gl79043858
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 29 Apr 2026 18:16:47 +0900 (JST)
-	(envelope-from kohei@enjuk.jp)
-DKIM-Signature: a=rsa-sha256; bh=VNsqaO4VKM8duP7X8u8FBpIkMOKyeVk0AVzZrcnvqQk=;
-        c=relaxed/relaxed; d=enjuk.jp;
-        h=From:Message-ID:To:Subject:Date;
-        s=rs20251215; t=1777454208; v=1;
-        b=rQEhSziTaV0FBpgEarw4ucX8bjV0NzKD6QXkBZ5aqUTVRatvlFm0OtMQc44rgxUJ
-         0qPPxlKIL+tX1tAbZHE0CyWNZeijJUmKb1/4PGO01THNbf7tSzRn8dnE29JjzbEE
-         J8KOn0wM4y8IDRxwCvrYoyNB61hwQ6+XgV+MaRfLTqltIPfqSF3SgfIXeLdKOkBw
-         hMxHM45BCjQ4QHIQ2gB6BHsQPIG9ah5a4XP6j1PW6rs58UMGp1ZvmpfAR8noozkT
-         jHHNHh7HfEhsdgjNG/p8z054cAMN0CzvpdGWCVNnDwDgZ3C+XTLweTmQT1NTrg0v
-         kgU2YZZPMvtWSmLryHzKVA==
-From: Kohei Enju <kohei@enjuk.jp>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Kuniyuki Iwashima <kuniyu@google.com>,
-        Willem de Bruijn <willemb@google.com>,
-        David Ahern <dsahern@kernel.org>, Neal Cardwell <ncardwell@google.com>,
-        Gerhard Engleder <gerhard@engleder-embedded.com>,
-        Jonathan Lemon <jonathan.lemon@gmail.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Kohei Enju <kohei@enjuk.jp>
-Subject: [PATCH net v1 3/3] tcp: use skb_get_hwtstamp() for hardware timestamps
-Date: Wed, 29 Apr 2026 09:16:19 +0000
-Message-ID: <20260429091632.26509-4-kohei@enjuk.jp>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260429091632.26509-1-kohei@enjuk.jp>
-References: <20260429091632.26509-1-kohei@enjuk.jp>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C05E39479E
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 09:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777454286; cv=fail; b=AOows7d/XvcFNfrUHvb5+kWPFmgwV92Yd7adFgQnhkhciNoS5R3mzqUnPAlFNbrl1u75xpTmy/QhJTrEAjH2IbOFpCyrBqP+mkQny/1x/iJBEEHZCFwiCHJvl7Edep30i6onxmXNWpYqlXPTfglraUO8s69aKsXEiayJE3YnGII=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777454286; c=relaxed/simple;
+	bh=LAS43hwMF7Lr7q2fMl50f8qcXme/MO7AC01jhSYnUyw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=m20tZAm3y8tQiV2+NIk3XIpg40McKT8FATq587J/dGM4srnEwIrpywgtnyPY4NRO32JJ29C0jynLzG02kv8jDNshmkfcuwVhBiYVnpPGhxu+0S/BieWpJIt63HXX2kL1g+19rjd+bJGSNMMJUi5G3u8JypRy7Z+nHJ6ZHc3KpgQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IzuNOyuc; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777454284; x=1808990284;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=LAS43hwMF7Lr7q2fMl50f8qcXme/MO7AC01jhSYnUyw=;
+  b=IzuNOyucYW6m8079OgosOWJqGa23fTQNin2CCv2qW/OemGIig5Aaq+4G
+   nBaj0EG5lNo3k3j1wwumUPfYmzbD3jIoBKgJTNy1d+c15CvqhdhPrO8iG
+   NzpRQpz7StoCklVWVhuppTxrlI1kwzScRoYbbbtI8PG+fLNC+MYdA7v8M
+   o90Rv3CmyomwhFPTOpupRluptdF5xrXlDh9JgBdDfAAnprCQpVT6PGOrF
+   E9tWjTA4jsvbZJYxw2jmT3hJWyaL0XMmXYRaVkk2/Ie7UBEi1jUwuxIoQ
+   ocI/EKUt+qZOgVxqL4svdlLQ1Iz/X535HKwLnBs32UCHClIHwQfz542Jj
+   g==;
+X-CSE-ConnectionGUID: MB4PkctcS4agBa2qX4kpaw==
+X-CSE-MsgGUID: vRNl8fgxRJyp45/749sYyg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11770"; a="89756392"
+X-IronPort-AV: E=Sophos;i="6.23,205,1770624000"; 
+   d="scan'208";a="89756392"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2026 02:17:54 -0700
+X-CSE-ConnectionGUID: M4Wfo5YmTvaiDaHou39bgg==
+X-CSE-MsgGUID: wsx52v6LTa615rKj0+GNIg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,205,1770624000"; 
+   d="scan'208";a="257771173"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2026 02:17:38 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 29 Apr 2026 02:17:37 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Wed, 29 Apr 2026 02:17:37 -0700
+Received: from CH1PR05CU001.outbound.protection.outlook.com (52.101.193.43) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 29 Apr 2026 02:17:37 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BrVaYR/S+JxfGg3FXjYi2j5rkXK3kgRdjNj6exy5jCN0tK8qWr9+TkDR+3kMBWLNCWOJJVYNu9pV5pi+skt1EC8mfiBx6Qrn8JsOvmF+sLNw5AgK2vTdTbDmm0YNEx73BtjMQx4fpL4KKbklxqgwKCxsPb0NbNTWbZ6Nn6RtFMEe8tluGP2MIIFw5Uc3nul+pT8mjdfRYcan14RDVnATPGT0lpR0lW68yOeWoCr1aNM8fqXqUdwi4ZyPzLAKEa5C9I5EqZCiJ/Qg0yPw7St9wbDMZpadNd7YbxuvwByeCZ7R3cDKsYcEumZCCwEbOom4JtPpha1OJ4taNWZrYU7ZZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=blJrQI2x27A5EJfGNXzCB/todmqxiNkBJpTO31I4cX0=;
+ b=aKcxUf2DHD1zgmA4CLsI72te5yTdg2W5x7MSqC4PT9yqc1ND20DJmxOBlAuh0bMZFxWhgPyu7pnOrZPZ4drBane4r4ehWaknt5EXFEo3S4Q8RTDZJ3N6YUwjR1CSAdTR0ga/O3hGPZZFiLCR0pgm2mpZtQdgEoxFZS+5gU8XtPToRuiRKOj39bdkgvZBWvegz7V2VbGTW3S1JLbTVNpKs8nioyB6PNgbEPujGPNreYKo0coLEwcbLioVtnARZ1GtcwCVe3oRdXbueh/KGr7HDDTOrBPZZYgEJGLK5mrNQwYxOIfnJUH4eFmHx9+80ehHAdCjR0rEcs0Lekx6K68zRg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by BL1PR11MB5303.namprd11.prod.outlook.com (2603:10b6:208:31b::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.20; Wed, 29 Apr
+ 2026 09:17:34 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c%5]) with mapi id 15.20.9870.013; Wed, 29 Apr 2026
+ 09:17:34 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: Vincent Chen <vincent.chen@sifive.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>
+CC: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: [Intel-wired-lan] [PATCH 1/2] ice: allow creating VFs when
+ !CONFIG_ICE_SWITCHDEV
+Thread-Topic: [Intel-wired-lan] [PATCH 1/2] ice: allow creating VFs when
+ !CONFIG_ICE_SWITCHDEV
+Thread-Index: AQHc16S4Y7rLNF2F9k+v9Q/tHUIGlrX1wqwg
+Date: Wed, 29 Apr 2026 09:17:34 +0000
+Message-ID: <IA3PR11MB8986CF64FC3168AFD28231C3E5342@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20260429065127.423949-1-vincent.chen@sifive.com>
+ <20260429065127.423949-2-vincent.chen@sifive.com>
+In-Reply-To: <20260429065127.423949-2-vincent.chen@sifive.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|BL1PR11MB5303:EE_
+x-ms-office365-filtering-correlation-id: 8ac0b655-be7d-487c-3fb4-08dea5d02603
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|18002099003|22082099003|56012099003|38070700021;
+x-microsoft-antispam-message-info: 2ACS/OPoni1lSAaVOQ1egAf+gxg6d83FlEn/GJq/Qj9OvApsGjrOEJBt9Ds86HiLJPZsP7PwU3RMKk/Bztw+aQbhGq2Bz43FiK7aYSjo1Su/0p0B2qBxtV8DPVTe+IuhahqglPlcCTIHcnU2zA5UrSPckx50EgjE1zTPKUUC+naRW79z6GifBhXbUU13x/AeL6tfB7LiUXerP2L9vzYXjGUgm6niz4EEVs0Lm6/VLx0aTOnmtkNMFMJXwkl5zJ+enwX7vsTXr53XxvMqPE3Molna2RgiNp8D+us7ibjt50+EaKRIW3Np0HlFvWsRjVtMw/3vxa8L0jdLeRN+tdXccpM9MAF2H3+1lFkT+DzEfwFyPQKymbp6MYmfh9C60XUK+slL2emqgBNV3aH4XHTo3uzwfqbAAOuTz1AgAqjGap8InrAosPBVAOrzQW9qcuG+dzqPbZaWmLJbiYE12HGfAupqIKU60xsm97kTxIdtEiUqX/z6NGB6o1hhYWenTulDQP/ML9wB6H538e1Z4j5ZOT3Emav9m6tyx0AnKDtZorc9/7hGzYY2K7fZYDCQ8/b5cdez8kn9AIlPrwX6wfjCxaKU9AqmjKjgjtZ36zUbDP7BKP9Kt3bIdFg/6xLocnxE24q2w496HhszIOltgKAqjhCtWvI1XbU//gWH/u2efRZedi7EsjOatcE8Mq25W8HXzcyLwq+wcjckxk3HGJvSY872l3gWz6siYSl/hZ5h/psxjPaI9toIGvzzlie7l8nOwoTCwZo++bP9F1SkE7RrDndax2ELfLp9kOTUoIQqGK4=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(18002099003)(22082099003)(56012099003)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?lkC+vUSCCrGg7daKMhOeoC2nVruV+U++99w+Ply2kfzcmvfPqexWN2SBElPS?=
+ =?us-ascii?Q?i6/64Gwxj9fEFwEkq4MyeJRePjvrXDOT4/BWdVkOGnwZFXmaPO3F9i+z4yd0?=
+ =?us-ascii?Q?KnqLpe0uHyx2CVXNIX3U/1gEsQIBB7XvF8MzJJLjiZ2MaBg0jAKlTFkYyfm9?=
+ =?us-ascii?Q?osdMRN2sEx35OTZCyFXtCZdS4Afr0PfJI6UP3uwfojoSwLar+gpEDIPZiHVJ?=
+ =?us-ascii?Q?tpqCtPIfVHjo00YKvXSwhIVfvMG4U01JEnblg5sgsWkLlGjmXR4YKSZGp6mM?=
+ =?us-ascii?Q?aFvjP2Kr1mYVDa4dDhEckT1Weny9YXy0eVZStAIcSnfje733pFlS7rt8egFF?=
+ =?us-ascii?Q?opSGQO1EuJV+WAGoOgF7LNY4pMc3N7pd4oFyChCJctmZkbMerf362CpCvShP?=
+ =?us-ascii?Q?7H0RMgEWPwauYpXEpCYfE8h99FGs8rbUkQ9FhYpxWnnTiXcp21gmkLmFNsAD?=
+ =?us-ascii?Q?6Dc3sSBeE/rI4rVvzDDQnL+mpDaXcB15TczeTtqcAuaJmGJofjvLg+Hik5XS?=
+ =?us-ascii?Q?kLgXUn6s6//aCzltzbm2LQ2tkjZs+GKEDAfM3INV6szqwB8OabOc+V0F0KIC?=
+ =?us-ascii?Q?Y8U09kuzUilTKxJLRpseZFpSfNzuPxChi/fFjVbCclxmIP7KgcazEHGsgaB0?=
+ =?us-ascii?Q?/HAudAk9JqMtdaWw8TUaRtK6u5ZgJj3CLI3TVrPYXGXuCevIEYs66XyVm8Yt?=
+ =?us-ascii?Q?IdT/Rn5OYvcsVfHpeInwc7dEIaLjbnk4tVnFgES7kki6i3gpke3fcgdX7PzA?=
+ =?us-ascii?Q?OQ7oT8NuXVcvDoo3WOL8xOR4PUdATCGiYNbl4A27L+2K0ca4JivjuPCUNNXL?=
+ =?us-ascii?Q?NG3USE7WjCHHfwvCAtLumeCVaE7G4LmCvtU+XxWFdbCMsed2XVNSNWxpcgIP?=
+ =?us-ascii?Q?af7TyFOjeRM/0jPrq6HhuDwgIZff6PXiuffQlE2hYDy84haGKVVsBRkowfTJ?=
+ =?us-ascii?Q?mfT7KXrub8/20umuO5cIRFbjv9uHdSJ9Saxvtwx8P+fr3lGjdPnQHsdFJ+3j?=
+ =?us-ascii?Q?r5yH0uHxhH0zYJQ9fFa0sCdR6zJbV1wMHiZ7JmxXUBALZWDw3kq0N1vwzXLC?=
+ =?us-ascii?Q?7BnU3gtdd4lNHz4R1kYZZ0JdC186wDBLE8jOQ/2P+Rsmgq80eYjFwUsN0GHH?=
+ =?us-ascii?Q?FNTxRyyQIApbNtoVoRBLElRxCdShcarN1BL7mKYsoVovq1qliwRD5Z3DFJVD?=
+ =?us-ascii?Q?Zm/iLxZoNjJFNy90x6tNXfWCR5ThOXX69BerloUQbW6z8pnzRLzJ4kFwArhz?=
+ =?us-ascii?Q?yCj61D3JHGqSS96o4q91tP1GadKpTnp8nVfOdMx/r7h9MnabylG3E5lBbKEH?=
+ =?us-ascii?Q?qs33/CIs9MrQVAMe/DH1z+kh8V+G+RIBBXYGF7vyAXE0fJHu+PF1l3zVN3Ej?=
+ =?us-ascii?Q?5pcVVxkEs6vrOZNW/ZPxw6qS8CDSjLq0cJIYFpZJhvcU+IZd8yJd0Vb/UJs/?=
+ =?us-ascii?Q?VyWDa8ZM64X5B6iX04BMZzknrRwAk2BWAVYl8A3JXMKcDcRmeZ538c3Noxg+?=
+ =?us-ascii?Q?Kb601P7v+KPxQ0cee6C2/j2A7rboewh3PTjCsZpLfWZHXQpH1oiK3vlYZfcg?=
+ =?us-ascii?Q?60IIkaWnPW4JrsXbdaczo5ZPsfVdDDQ8mQFDTZoGIP3usADGhD0un656qVjQ?=
+ =?us-ascii?Q?KVHwvTtHuugeEs28lbEEm8R0pvyBXJt0uvvqmWZimHgvhjYPAg8hnebzyzGt?=
+ =?us-ascii?Q?bKrVn6WPdak7UUzGBIfAx2517ei5LIvE6Fbh73APOv7tUDR+lPm0zrNrKRRO?=
+ =?us-ascii?Q?x/Lxo7zoS/UNmipyIDUKyZMvHGWDmI4=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: B766E491CEE
+X-Exchange-RoutingPolicyChecked: PmpTrgVwbOBqxCdVV4SaUTubnrVizYihwzYxHs3H7Wcsldq7Z974fNiYwndkFWrdq3HiHfi9JkZIDotx3XXaN6HXiMtKmHrWtgxx32EzKOjLCgAzdgeV6+Yir3BrnLkLQmJGBVaNauR0NE47KRC0rnU+3bQWqYCkonxLBnYPvfO5QBaJ5YQYW8GIC/8ByoUsaRR1+PYSs1qmXFOMfxmYJHaJjbEr0M3AEB5ni4O4f3SrgBfR2IVQYTdKH0N6qBIwn9UxVBAXBO8+9nXFdmD5jf0zrDy91Hhtpr1q1mVfMpGT/frnL2vCt2Noi+IEqtMCjDV+rfgT+nM0y1nszDgTvw==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8ac0b655-be7d-487c-3fb4-08dea5d02603
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Apr 2026 09:17:34.2542
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: jcmNKIoeYSkfPPUpdCETem8oaNdWXHnoV2mgq41bc4BBqmgG4gg8AtnOkfMX/5p7jY0orytLk4pIt8yLeKRFe2uZ5RGEGTKvArvzFAIg4zw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB5303
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: CA130491C47
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,engleder-embedded.com,gmail.com,enjuk.jp];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-282321-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282322-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	SUBJECT_HAS_EXCLAIM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[enjuk.jp:+];
-	NEURAL_HAM(-0.00)[-0.996];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[enjuk.jp:email,enjuk.jp:dkim,enjuk.jp:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 
-Since commit 97dc7cd92ac6 ("ptp: Support late timestamp determination"),
-skb_shared_hwtstamps may contain netdev_data instead of hwtstamp. TCP
-receive timestamping can then interpret the stored value as a ktime_t
-and report bogus hardware timestamps to userspace.
 
-Use skb_get_hwtstamp() instead of reading hwtstamp directly, so TCP
-sockets follow the same hardware timestamp resolution path as the socket
-layer. When coalescing SKBs, resolve late timestamps before copying them
-to the merged skb. Additionally, recognize SKBTX_HW_TSTAMP_NETDEV as
-indicating a receive timestamp is present.
 
-Note that skb_get_hwtstamp() is called with cycles == false, since TCP
-hasn't honored SOF_TIMESTAMPING_BIND_PHC so far, and this patch doesn't
-change that behavior.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Vincent Chen via Intel-wired-lan
+> Sent: Wednesday, April 29, 2026 8:51 AM
+> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
+> Przemyslaw <przemyslaw.kitszel@intel.com>
+> Cc: andrew+netdev@lunn.ch; davem@davemloft.net; edumazet@google.com;
+> kuba@kernel.org; pabeni@redhat.com; intel-wired-lan@lists.osuosl.org;
+> netdev@vger.kernel.org; vincent.chen@sifive.com
+> Subject: [Intel-wired-lan] [PATCH 1/2] ice: allow creating VFs when
+> !CONFIG_ICE_SWITCHDEV
+>=20
+> Currently ice_eswitch_attach_vf() is called unconditionally in
+> ice_start_vfs(), which causes VF creation to fail when
+> CONFIG_ICE_SWITCHDEV is not defined.
+>=20
+> Fix this by adding switchdev mode checks at the call sites before
+> calling ice_eswitch_attach_vf(), consistent with how
+> ice_eswitch_attach_sf() is already handled in ice_devlink_port_new().
+> This is similar to commit aacca7a83b97 ("ice: allow creating VFs for
+> !CONFIG_NET_SWITCHDEV") which fixed the same issue for the previous
+> ice_eswitch_configure() API.
+>=20
+> Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_sriov.c  | 14 ++++++++------
+> drivers/net/ethernet/intel/ice/ice_vf_lib.c |  3 ++-
+>  2 files changed, 10 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c
+> b/drivers/net/ethernet/intel/ice/ice_sriov.c
+> index 843e82fd3bf9..6a0b724e46f9 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_sriov.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
+> @@ -484,12 +484,14 @@ static int ice_start_vfs(struct ice_pf *pf)
+>  			goto teardown;
+>  		}
+>=20
+> -		retval =3D ice_eswitch_attach_vf(pf, vf);
+> -		if (retval) {
+> -			dev_err(ice_pf_to_dev(pf), "Failed to attach VF
+> %d to eswitch, error %d",
+> -				vf->vf_id, retval);
+> -			ice_vf_vsi_release(vf);
+> -			goto teardown;
+> +		if (ice_is_eswitch_mode_switchdev(pf)) {
+> +			retval =3D ice_eswitch_attach_vf(pf, vf);
+> +			if (retval) {
+> +				dev_err(ice_pf_to_dev(pf), "Failed to
+> attach VF %d to eswitch, error %d",
+> +					vf->vf_id, retval);
+> +				ice_vf_vsi_release(vf);
+> +				goto teardown;
+> +			}
+>  		}
+>=20
+>  		set_bit(ICE_VF_STATE_INIT, vf->vf_states); diff --git
+> a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+> b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+> index de9e81ccee66..71595410174c 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+> @@ -807,7 +807,8 @@ void ice_reset_all_vfs(struct ice_pf *pf)
+>  		ice_vf_rebuild_vsi(vf);
+>  		ice_vf_post_vsi_rebuild(vf);
+>=20
+> -		ice_eswitch_attach_vf(pf, vf);
+> +		if (ice_is_eswitch_mode_switchdev(pf))
+> +			ice_eswitch_attach_vf(pf, vf);
+>=20
+>  		mutex_unlock(&vf->cfg_lock);
+>  	}
+> --
+> 2.34.1
 
-Fixes: 97dc7cd92ac6 ("ptp: Support late timestamp determination")
-Signed-off-by: Kohei Enju <kohei@enjuk.jp>
----
- include/net/tcp.h    | 2 +-
- net/ipv4/tcp_input.c | 3 ++-
- net/ipv4/tcp_ipv4.c  | 6 ++++--
- net/ipv6/tcp_ipv6.c  | 3 ++-
- 4 files changed, 9 insertions(+), 5 deletions(-)
-
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index ecbadcb3a744..7b5fcee97079 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -524,7 +524,7 @@ tcp_update_recv_tstamps(struct sk_buff *skb,
- 			struct scm_timestamping_internal *tss)
- {
- 	tss->ts[0] = skb->tstamp;
--	tss->ts[2] = skb_hwtstamps(skb)->hwtstamp;
-+	tss->ts[2] = skb_get_hwtstamp(skb, false, NULL);
- }
- 
- void tcp_recv_timestamp(struct msghdr *msg, const struct sock *sk,
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index d5c9e65d9760..9fd473559b58 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -5237,7 +5237,8 @@ static bool tcp_try_coalesce(struct sock *sk,
- 	if (TCP_SKB_CB(from)->has_rxtstamp) {
- 		TCP_SKB_CB(to)->has_rxtstamp = true;
- 		to->tstamp = from->tstamp;
--		skb_hwtstamps(to)->hwtstamp = skb_hwtstamps(from)->hwtstamp;
-+		skb_hwtstamps(to)->hwtstamp = skb_get_hwtstamp(from, false, NULL);
-+		skb_shinfo(to)->tx_flags &= ~SKBTX_HW_TSTAMP_NETDEV;
- 	}
- 
- 	return true;
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 8fc24c3743c5..c35d82317764 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -1993,7 +1993,8 @@ enum skb_drop_reason tcp_add_backlog(struct sock *sk, struct sk_buff *skb)
- 		if (TCP_SKB_CB(skb)->has_rxtstamp) {
- 			TCP_SKB_CB(tail)->has_rxtstamp = true;
- 			tail->tstamp = skb->tstamp;
--			skb_hwtstamps(tail)->hwtstamp = skb_hwtstamps(skb)->hwtstamp;
-+			skb_hwtstamps(tail)->hwtstamp = skb_get_hwtstamp(skb, false, NULL);
-+			skb_shinfo(tail)->tx_flags &= ~SKBTX_HW_TSTAMP_NETDEV;
- 		}
- 
- 		/* Not as strict as GRO. We only need to carry mss max value */
-@@ -2062,7 +2063,8 @@ static void tcp_v4_fill_cb(struct sk_buff *skb, const struct iphdr *iph,
- 	TCP_SKB_CB(skb)->ip_dsfield = ipv4_get_dsfield(iph);
- 	TCP_SKB_CB(skb)->sacked	 = 0;
- 	TCP_SKB_CB(skb)->has_rxtstamp =
--			skb->tstamp || skb_hwtstamps(skb)->hwtstamp;
-+			skb->tstamp || skb_hwtstamps(skb)->hwtstamp ||
-+			(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP_NETDEV);
- }
- 
- /*
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 2c3f7a739709..3361ed7f94de 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1704,7 +1704,8 @@ static void tcp_v6_fill_cb(struct sk_buff *skb, const struct ipv6hdr *hdr,
- 	TCP_SKB_CB(skb)->ip_dsfield = ipv6_get_dsfield(hdr);
- 	TCP_SKB_CB(skb)->sacked = 0;
- 	TCP_SKB_CB(skb)->has_rxtstamp =
--			skb->tstamp || skb_hwtstamps(skb)->hwtstamp;
-+			skb->tstamp || skb_hwtstamps(skb)->hwtstamp ||
-+			(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP_NETDEV);
- }
- 
- INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
--- 
-2.53.0
-
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
