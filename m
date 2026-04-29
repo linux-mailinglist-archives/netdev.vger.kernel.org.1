@@ -1,99 +1,65 @@
-Return-Path: <netdev+bounces-282468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282469-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2ISmMx5S8mlGpgEAu9opvQ
-	(envelope-from <netdev+bounces-282468-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 20:46:54 +0200
+	id CKyhNsNU8mnGpgEAu9opvQ
+	(envelope-from <netdev+bounces-282469-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 20:58:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69E3A4994B1
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 20:46:53 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 677E3499663
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 20:58:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5284D30022E2
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 18:46:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 919073016031
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 18:58:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D060633031C;
-	Wed, 29 Apr 2026 18:46:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB6A421EFE;
+	Wed, 29 Apr 2026 18:57:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KEZD1QBx"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="G4Z9xDaW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50237C14A
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 18:46:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31A2D37F001;
+	Wed, 29 Apr 2026 18:57:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777488410; cv=none; b=hDE/2f9DgODrBWintyQ+wVqfiC+QGYuzCQZ+CoJFaZ8erDBcpKX8ZEtJGXb/IXDLwWEcvDtsUJt6b719qK9GdOnaQ/eK6HgelOvgPe9WMlfG8EJz/qFQ7pNvFXPNYg/Eq2bdWeY+LurvMGBaiAHsEfoNJ39YfTqOhwXvM1YGNvs=
+	t=1777489076; cv=none; b=YhIjsTajywTRG9mUZVt2jAGm/PMKAIQ31YGiTWoYJ/cavLtj85WOinUB5X1lOBqKmA3nlXUgR4u1dcjjGud7cHGqx6nqndaoEwuBjmMmBYRnSLtrcy+5HY/8lIwwPTZI0eRzq4XqPKT96Vv9j6Rqu7q2pe0DtAXR0jLa6hCPtOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777488410; c=relaxed/simple;
-	bh=YxaC4w6FTlCKs2WmcLJn5H0MVoMr9sL61ly2AepPPlQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZmMU0hD2XlGnIH6JRMcC30cOs/bBWMrS5V6Zz6kfNBug4A8tWf0Yx71I540ILgLM/M8tb7iwPdLKsksCaA604uFhZ0LBhhzNq0sY4QwyvVs/Gy2RxlzZlB+MeQwFcQYvLAJucr5kCjfSoSRxW336QkP94KrwW8aSRjcSlNP76Lg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KEZD1QBx; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-35dac556bb2so50555a91.1
-        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 11:46:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777488409; x=1778093209; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gbFC/WpUxSc+aDwFY31WGqtvojwgOPL4vm/ZT+3jh1U=;
-        b=KEZD1QBxpcbMaUA4JOFIuuXSr/I+yovlPJEjmVMfuKWdCBzUkc2lbInHgu9XJ4azan
-         eaMDpkgBoaY0JP1k4njBiEUkPcFQO9kXpbMgbC8loiMBicY7+6ArOWmsoiXSzrLEncts
-         nhXo29mzHMwYA2rhqr8NrosWM29Uxhc7QQ9P5gAtkfZZ/lzJY1R/f7KjGH2nPi/GGCk6
-         hVONL+RGdqVOKBZvMywWIqSZVwQ+wlOA5dsqU16lHYkASvnNP3A0vhk+rFgVp33u4SYM
-         qs8igXmNnD27cQEt+SWrKcp7ZAdK9Oc5h7+BejPs9HN8m/x5ua4jRrYY0Uhpjch8iPpg
-         nQ4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777488409; x=1778093209;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gbFC/WpUxSc+aDwFY31WGqtvojwgOPL4vm/ZT+3jh1U=;
-        b=BT6xLBbotlwiahGToSbyD6TcNgsunM2aZbjKxsiF1w0S/Rxj7tofmAgY0S9unCZRSA
-         q+o5iOxVUnVlqbw24AmSDhrL2FPNlBdjeQWY//lsyv1W0SeHpeCSzDvcxd5euIz6EGLl
-         COU9OnIsYTcFzmaHeE9161qhhQWAkXkB84OnYFnAOEZEbgvu7TxmHTjTtUKQXukbfCVq
-         zsx8FeJB7ClR/lOrhv0ADCJ1ReSbr5RuDUSPgDkpXprhx/A8LnZTrtF+DBg1iKRm4nT/
-         Tkf7JpEkQ/x4qO3nimkdq1e7PWelensUtnIpGfQgRgc+jUQM9xBoHUM4nE8P/AWS5LhU
-         65bw==
-X-Forwarded-Encrypted: i=1; AFNElJ8HKwkLfGo/MKhgJDG1vdVQgeEYX+QJQHK2MR4rzPXiuEZgoeekcH+rvGkX6nxihozR7WrfSF0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzr7fV9kA3NrV8Do2wsMnQituFirBmE57apdfueHj9SpbRnTZy0
-	l3kj+SMuJRNYrVzjCVG7v/rfYenxy6jVOxBaKN7yJFrjToCI4z9kuuKJ
-X-Gm-Gg: AeBDievHyqMmuAhKtmDexzY+C4R2UyI3ToVdqEx5W999CTKfAkIrd4anqwWMfenGGu7
-	B+bTEQzkTkmQNYNOx+ekbxJX5Tw/QFQ4o/dlIVbUWDiNWtYUxXlUW6srMR+kwkgfOhlrghyBYL8
-	P5Z0MQ00UIl4sjpwMJTyplMbxZfDvjB1T0FBQUUtN3RQBb2wRMZ0j/R6iOaHAy01+mC2qeYHCPH
-	gn/2JgV0uZVM29OIFR1RB9AzqT9u9NsLcS/lpaMdzZzOWWuEd6D/pPJagA3bNAc3AzK5JTiEJUb
-	iy+2PmZu2p//GdvWA4+JoVQallTy3sF2W6O73EWrpLhbDWwVmgfIqmfcU/DsvudYuj3jGs5Kc8o
-	lKs0EXTKmYdp2Mae7QXHvFR2AV7VyTI9rfsXn6i9f8ugks/+iONi/mTDDR/8fO5VxoCyfv3piAR
-	RHLzivRvFHDkWT+gu1TCBx09MwFs1v+Z6fAY+al5KEtDOSR8eN9VtrHw==
-X-Received: by 2002:a17:903:b83:b0:2b7:ab8e:53b7 with SMTP id d9443c01a7336-2b9874078a2mr48952485ad.20.1777488408483;
-        Wed, 29 Apr 2026 11:46:48 -0700 (PDT)
-Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b988963ed0sm29612165ad.65.2026.04.29.11.46.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Apr 2026 11:46:47 -0700 (PDT)
-Date: Thu, 30 Apr 2026 03:46:44 +0900
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, Julia.Lawall@inria.fr,
-	linux@treblig.org, nate.karstens@garmin.com, netdev@vger.kernel.org,
-	imv4bel@gmail.com
-Subject: Re: [PATCH net v2] strparser: Fix race condition in strp_done()
-Message-ID: <afJSFEU0SSlYCPxJ@v4bel>
-References: <aZyMejqTbkI7o_VM@krikkit>
- <aaDATohaW62X_pxk@v4bel>
- <aaYY6UiXSppOig9Q@krikkit>
- <aaY-TbPsNxo6toSr@v4bel>
- <aaoTVMhnY5FKMrem@krikkit>
- <aaobmK6d_xd9ZXGj@v4bel>
- <aaqovyrmd5pJtZKq@krikkit>
- <aaq9TgFpsjn9XWAC@v4bel>
- <abDr-fSP9EtP7uEQ@v4bel>
- <ab2bA-g2qnwhdWbq@v4bel>
+	s=arc-20240116; t=1777489076; c=relaxed/simple;
+	bh=0Lf1JAZcn5OKtEUrE2xilAaeXrgja2/wjH7CaZRdCDw=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=SqyUUFl8+rF+oTo4F23LjOmDr2clM6wxWS5NFPaIw9y0FQVhG3b5GTQ0hZW9woBu66k5cn9iqinkR7HIM6QhVTK/rvKoJcTsqeTMt7r1B7y+9rZn3xum0YQT5LBLjdvPcKcXgAoLgLQZmUvEuqAgd2wbwUo9sxk5SW6E+Tt3iKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=G4Z9xDaW; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 6525520B716C; Wed, 29 Apr 2026 11:57:55 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6525520B716C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1777489075;
+	bh=9vI85T3v4VJVXTP0rhG0xF0Bxxz7sGEbD9Trgq1IZew=;
+	h=Date:From:To:Subject:From;
+	b=G4Z9xDaWHRuPja0iDJkXlJOvWGj3HtC7P0ocPfNJ6pCrw+wj6LHvS+9636iUZsTkW
+	 cmtJpOUlngE5/xOggC+i6NfA3fCcJi0v0vpCoeq3qM3qqDaJZ3AjB8hN9PDyxdwwL1
+	 xx7MAiEWd6GBh/lGlBuv9Ure3KgJYJe9Qahh+OTE=
+Date: Wed, 29 Apr 2026 11:57:55 -0700
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	leon@kernel.org, longli@microsoft.com, kotaranov@microsoft.com,
+	horms@kernel.org, shradhagupta@linux.microsoft.com,
+	ssengar@linux.microsoft.com, ernis@linux.microsoft.com,
+	shirazsaleem@microsoft.com, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, stephen@networkplumber.org,
+	jacob.e.keller@intel.com, dipayanroy@microsoft.com,
+	leitao@debian.org, kees@kernel.org, john.fastabend@gmail.com,
+	hawk@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net,
+	ast@kernel.org, sdf@fomichev.me, yury.norov@gmail.com
+Subject: [PATCH net, v2] net: mana: Fix crash from unvalidated SHM offset
+ read from BAR0 during FLR
+Message-ID: <afJUszROT+yKjth0@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,238 +68,275 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ab2bA-g2qnwhdWbq@v4bel>
-X-Rspamd-Queue-Id: 69E3A4994B1
+X-Rspamd-Queue-Id: 677E3499663
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282468-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,inria.fr,treblig.org,garmin.com,vger.kernel.org,gmail.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282469-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	RCPT_COUNT_TWELVE(0.00)[33];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid]
 
-On Sat, Mar 21, 2026 at 04:07:47AM +0900, Hyunwoo Kim wrote:
-> On Wed, Mar 11, 2026 at 01:13:45PM +0900, Hyunwoo Kim wrote:
-> > On Fri, Mar 06, 2026 at 08:41:02PM +0900, Hyunwoo Kim wrote:
-> > > On Fri, Mar 06, 2026 at 11:13:19AM +0100, Sabrina Dubroca wrote:
-> > > > 2026-03-06, 09:11:04 +0900, Hyunwoo Kim wrote:
-> > > > > On Fri, Mar 06, 2026 at 12:35:48AM +0100, Sabrina Dubroca wrote:
-> > > > > > Sorry for the delay, I wanted to think about the race condition a bit
-> > > > > > more.
-> > > > > > 
-> > > > > > 2026-03-03, 10:50:05 +0900, Hyunwoo Kim wrote:
-> > > > > > > On Tue, Mar 03, 2026 at 12:10:33AM +0100, Sabrina Dubroca wrote:
-> > > > > > > > 2026-02-27, 06:51:10 +0900, Hyunwoo Kim wrote:
-> > > > > > > > > On Mon, Feb 23, 2026 at 06:20:58PM +0100, Sabrina Dubroca wrote:
-> > > > > > > > > > 2026-02-20, 18:29:55 +0900, Hyunwoo Kim wrote:
-> > > > > > > > > > "strp stopped" is not really enough, I think we'd also need to reset
-> > > > > > > > > > the CBs, and then grab bh_lock_sock to make sure a previously-running
-> > > > > > > > > > ->sk_data_ready has completed. This is what kcm does, at least.
-> > > > > > > > > 
-> > > > > > > > > It seems that this is not something that should be handled inside strp itself, 
-> > > > > > > > > but rather something that each caller of strp_stop() is expected to take care 
-> > > > > > > > > of individually. Would that be the right direction?
-> > > > > > > > 
-> > > > > > > > Agree.
-> > > > > > > > 
-> > > > > > > > > It also appears that ovpn and kcm handle this by implementing their own callback 
-> > > > > > > > > restoration logic.
-> > > > > > > > 
-> > > > > > > > Right. I tried to look at skmsg/psock (the other user of strp), but
-> > > > > > > > didn't get far enough to verify if it's handling this correctly.
-> > > > > > > > 
-> > > > > > > > > > Without that, if strp_recv runs in parallel (not from strp->work) with
-> > > > > > > > > > strp_done, cleaning up skb_head in strp_done seems problematic.
-> > > > > > > > > 
-> > > > > > > > > From the espintcp perspective, how about applying a patch along the following lines?
-> > > > > > > > 
-> > > > > > > > This is what I was thinking about, yes.
-> > > > > > > 
-> > > > > > > In my opinion, it might be cleaner to split the espintcp callback restoration work into 
-> > > > > > > a separate patch, rather than merging it into the strparser v3 patch. What do you think?
-> > > > > > 
-> > > > > > Sure. But once espintcp is fixed in that way, can the original race
-> > > > > > condition with strparser still occur? release_sock() will wait for any
-> > > > > 
-> > > > > If the espintcp callback restoration patch is applied, the strparser
-> > > > > race should no longer occur in espintcp.
-> > > > > 
-> > > > > > espintcp_data_ready()/strp_data_ready() that's already running, and a
-> > > > > > sk_data_ready that starts after we've changed the callbacks will not
-> > > > > > end up in strp_data_ready() at all so it won't restart the works that
-> > > > > > are being stopped by strp_done()?
-> > > > > > 
-> > > > > > It's quite reasonable to use disable*_work_sync in strp_done, but I'm
-> > > > > > not sure there's a bug other than espintcp not terminating itself
-> > > > > > correctly on the socket.
-> > > > > 
-> > > > > That said, the _cancel APIs in strparser still appear to carry some
-> > > > > structural risk, so it might still make sense to switch to the _disable
-> > > > > APIs for the benefit of other strp users or potential future callers.
-> > > > 
-> > > > Not really. Every user of strp that is open to the strp_recv vs
-> > > > cancel_* race is also open to the strp_recv vs free race, so switching
-> > > > from cancel_* to disable_* is only a partial fix.
-> > > > 
-> > > > But if we took and released the socket lock in strp_done, we would
-> > > > solve the issue for all users even without resetting the callbacks?
-> > > 
-> > > Looks good to me. With this change, it seems the issue can be resolved
-> > > not only for espintcp but for all strp users.
-> > > 
-> > > When strp_stop() runs first:
-> > > ```
-> > >                  cpu0                                cpu1
-> > > 
-> > > espintcp_close()
-> > >   strp_stop()
-> > >     strp->stopped = 1;
-> > >                                          espintcp_data_ready()
-> > >                                            strp_data_ready()
-> > >                                              if (unlikely(strp->stopped)) return;
-> > >   strp_done()
-> > >     lock_sock();
-> > >     release_sock();
-> > >     cancel_delayed_work_sync(&strp->msg_timer_work);
-> > >     kfree_skb(strp->skb_head);
-> > > ```
-> > > 
-> > > When strp_data_ready() runs first:
-> > > ```
-> > >                  cpu0                                cpu1
-> > > 
-> > >                                          espintcp_data_ready()
-> > >                                            strp_data_ready()
-> > >                                              if (unlikely(strp->stopped)) return;
-> > > espintcp_close()
-> > >   strp_stop()
-> > >     strp->stopped = 1;
-> > >   strp_done()
-> > >     lock_sock();
-> > >                                              strp_read_sock()
-> > >                                                tcp_read_sock()
-> > >                                                  __tcp_read_sock()
-> > >                                                    strp_recv()
-> > >                                                      __strp_recv()
-> > >                                                        head = strp->skb_head;
-> > >                                                        strp_start_timer()
-> > >                                                          mod_delayed_work(&strp->msg_timer_work);
-> > >                                                        ...
-> > >     release_sock();
-> > >     cancel_delayed_work_sync(&strp->msg_timer_work);
-> > >     kfree_skb(strp->skb_head);
-> > > ```
-> > > In both cases, the race does not appear to cause any problem.
-> > > 
-> > > > 
-> > > > @@ -503,6 +503,10 @@ void strp_done(struct strparser *strp)
-> > > >  {
-> > > >  	WARN_ON(!strp->stopped);
-> > > >  
-> > > > +	lock_sock(strp->sk);
-> > > > +	/* sync with other code */
-> > > > +	release_sock(strp->sk);
-> > > > +
-> > > >  	cancel_delayed_work_sync(&strp->msg_timer_work);
-> > > >  	cancel_work_sync(&strp->work);
-> > > >  
-> > > > 
-> > > > 
-> > > >  - strp->stopped so any new call into strp_data_ready will not do anything
-> > > > 
-> > > >  - lock/release need to take bh_lock_sock so any existing call to
-> > > >    strp_data_ready will have to complete before we move on to cancel*_work
-> > > > 
-> > > > 
-> > > > 
-> > > > Or maybe the requirement should be that strp_stop has to be called
-> > > 
-> > > From my perspective, adding lock_sock() inside strp_done(), as in the
-> > > patch above, looks cleaner.
-> > > 
-> > > > under lock_sock() (or even just bh_lock_sock), but again I can't
-> > > > figure out if that's ok for sockmap.
-> > > 
-> > > sockmap/psock has a more complex call stack compared to other strp
-> > > users, so I'm also not entirely certain about that part.
-> > 
-> > I looked into the sockmap/psock side. sk_psock_strp_data_ready() is protected 
-> > by read_lock_bh(&sk->sk_callback_lock), and during teardown sk_psock_drop() 
-> > performs callback restoration and strp_stop() under 
-> > write_lock_bh(&sk->sk_callback_lock), so sockmap/psock doesn't have this race 
-> > to begin with.
-> > 
-> > As for introducing this patch, in sockmap/psock strp_done() is only called 
-> > from sk_psock_destroy(), which is scheduled via queue_rcu_work() and runs 
-> > on system_percpu_wq after an RCU GP, so no locks including lock_sock are held 
-> > at that point. And since lock_sock is released before cancel_work_sync, 
-> > there's no circular dependency with do_strp_work/strp_msg_timeout either. 
-> > So this patch shouldn't introduce any new issues for sockmap/psock.
-> 
-> Hi Sabrina,
-> 
-> Could you please provide an update on the status of this patch?
-> 
-> 
-> Best regards,
-> Hyunwoo Kim
+During Function Level Reset recovery, the MANA driver reads
+hardware BAR0 registers that may temporarily contain garbage values.
+The SHM (Shared Memory) offset read from GDMA_REG_SHM_OFFSET is used
+to compute gc->shm_base, which is later dereferenced via readl() in
+mana_smc_poll_register(). If the hardware returns an unaligned or
+out-of-range value, the driver must not blindly use it, as this would
+propagate the hardware error into a kernel crash.
 
-Dear Sabrina,
+The following crash was observed on an arm64 Hyper-V guest running
+kernel 6.17.0-3013-azure during VF reset recovery triggered by HWC
+timeout.
 
-This issue has been public for some time and seems to be gradually 
-fading from attention.
+[13291.785274] Unable to handle kernel paging request at virtual address ffff8000a200001b
+[13291.785311] Mem abort info:
+[13291.785332]   ESR = 0x0000000096000021
+[13291.785343]   EC = 0x25: DABT (current EL), IL = 32 bits
+[13291.785355]   SET = 0, FnV = 0
+[13291.785363]   EA = 0, S1PTW = 0
+[13291.785372]   FSC = 0x21: alignment fault
+[13291.785382] Data abort info:
+[13291.785391]   ISV = 0, ISS = 0x00000021, ISS2 = 0x00000000
+[13291.785404]   CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+[13291.785412]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+[13291.785421] swapper pgtable: 4k pages, 48-bit VAs, pgdp=00000014df3a1000
+[13291.785432] [ffff8000a200001b] pgd=1000000100438403, p4d=1000000100438403, pud=1000000100439403, pmd=0068000fc2000711
+[13291.785703] Internal error: Oops: 0000000096000021 [#1]  SMP
+[13291.830975] Modules linked in: tls qrtr mana_ib ib_uverbs ib_core xt_owner xt_tcpudp xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nft_compat nf_tables cfg80211 8021q garp mrp stp llc binfmt_misc joydev serio_raw nls_iso8859_1 hid_generic aes_ce_blk aes_ce_cipher polyval_ce ghash_ce sm4_ce_gcm sm4_ce_ccm sm4_ce sm4_ce_cipher hid_hyperv sm4 sm3_ce sha3_ce hv_netvsc hid vmgenid hyperv_keyboard hyperv_drm sch_fq_codel nvme_fabrics efi_pstore dm_multipath nfnetlink vsock_loopback vmw_vsock_virtio_transport_common hv_sock vmw_vsock_vmci_transport vmw_vmci vsock dmi_sysfs ip_tables x_tables autofs4
+[13291.862630] CPU: 122 UID: 0 PID: 61796 Comm: kworker/122:2 Tainted: G        W           6.17.0-3013-azure #13-Ubuntu VOLUNTARY
+[13291.869902] Tainted: [W]=WARN
+[13291.871901] Hardware name: Microsoft Corporation Virtual Machine/Virtual Machine, BIOS Hyper-V UEFI Release v4.1 01/08/2026
+[13291.878086] Workqueue: events mana_serv_func
+[13291.880718] pstate: 62400005 (nZCv daif +PAN -UAO +TCO -DIT -SSBS BTYPE=--)
+[13291.884835] pc : mana_smc_poll_register+0x48/0xb0
+[13291.887902] lr : mana_smc_setup_hwc+0x70/0x1c0
+[13291.890493] sp : ffff8000ab79bbb0
+[13291.892364] x29: ffff8000ab79bbb0 x28: ffff00410c8b5900 x27: ffff00410d630680
+[13291.896252] x26: ffff004171f9fd80 x25: 000000016ed55000 x24: 000000017f37e000
+[13291.899990] x23: 0000000000000000 x22: 000000016ed55000 x21: 0000000000000000
+[13291.904497] x20: ffff8000a200001b x19: 0000000000004e20 x18: ffff8000a6183050
+[13291.908308] x17: 0000000000000000 x16: 0000000000000000 x15: 000000000000000a
+[13291.912542] x14: 0000000000000004 x13: 0000000000000000 x12: 0000000000000000
+[13291.916298] x11: 0000000000000000 x10: 0000000000000001 x9 : ffffc45006af1bd8
+[13291.920945] x8 : ffff000151129000 x7 : 0000000000000000 x6 : 0000000000000000
+[13291.925293] x5 : 000000015f214000 x4 : 000000017217a000 x3 : 000000016ed50000
+[13291.930436] x2 : 000000016ed55000 x1 : 0000000000000000 x0 : ffff8000a1ffffff
+[13291.934342] Call trace:
+[13291.935736]  mana_smc_poll_register+0x48/0xb0 (P)
+[13291.938611]  mana_smc_setup_hwc+0x70/0x1c0
+[13291.941113]  mana_hwc_create_channel+0x1a0/0x3a0
+[13291.944283]  mana_gd_setup+0x16c/0x398
+[13291.946584]  mana_gd_resume+0x24/0x70
+[13291.948917]  mana_do_service+0x13c/0x1d0
+[13291.951583]  mana_serv_func+0x34/0x68
+[13291.953732]  process_one_work+0x168/0x3d0
+[13291.956745]  worker_thread+0x2ac/0x480
+[13291.959104]  kthread+0xf8/0x110
+[13291.961026]  ret_from_fork+0x10/0x20
+[13291.963560] Code: d2807d00 9417c551 71000673 54000220 (b9400281)
+[13291.967299] ---[ end trace 0000000000000000 ]---
 
-Could you please let me know the current status of the work on this?
+Disassembly of mana_smc_poll_register() around the crash site:
 
+Disassembly of section .text:
 
-Best regards,
-Hyunwoo Kim
+00000000000047c8 <mana_smc_poll_register>:
+    47c8: d503201f        nop
+    47cc: d503201f        nop
+    47d0: d503233f        paciasp
+    47d4: f800865e        str     x30, [x18], #8
+    47d8: a9bd7bfd        stp     x29, x30, [sp, #-48]!
+    47dc: 910003fd        mov     x29, sp
+    47e0: a90153f3        stp     x19, x20, [sp, #16]
+    47e4: 91007014        add     x20, x0, #0x1c
+    47e8: 5289c413        mov     w19, #0x4e20
+    47ec: f90013f5        str     x21, [sp, #32]
+    47f0: 12001c35        and     w21, w1, #0xff
+    47f4: 14000008        b       4814 <mana_smc_poll_register+0x4c>
+    47f8: 36f801e1  tbz  w1, #31, 4834 <mana_smc_poll_register+0x6c>
+    47fc: 52800042        mov     w2, #0x2
+    4800: d280fa01        mov     x1, #0x7d0
+    4804: d2807d00        mov     x0, #0x3e8
+    4808: 94000000        bl      0 <usleep_range_state>
+    480c: 71000673        subs    w19, w19, #0x1
+    4810: 54000200        b.eq    4850 <mana_smc_poll_register+0x88>
+    4814: b9400281      ldr   w1, [x20] <-- **** CRASHED HERE *****
+    4818: d50331bf        dmb     oshld
+    481c: 2a0103e2        mov     w2, w1
+    ...
 
-> 
-> > 
-> > > 
-> > > > 
-> > > > 
-> > > > > With that in mind, perhaps the direct fix for this race could be handled
-> > > > > in the espintcp callback restoration patch. For the strparser patch, I
-> > > > > could instead adjust the commit message to reflect that it removes a
-> > > > > potential hazard by replacing the _cancel APIs with the _disable
-> > > > > variants, and resubmit it in that form.
-> > > > 
-> > > > I'm not going to nack a patch doing s/cancel_/disable_/ in strp_done,
-> > > > but it doesn't fully solve the race condition if the caller isn't
-> > > > doing the right thing, and it doesn't do anything if the strp user is
-> > > > handling the teardown correctly.
-> > > 
-> > > I agree with your point there. Still, after the core patches addressing
-> > > this race are applied, I plan to resubmit the _disable patch with an
-> > > updated commit message. I think applying that change is still beneficial.
-> > > 
-> > > 
-> > > Best regards,
-> > > Hyunwoo Kim
+From the crash signature x20 = ffff8000a200001b, this address
+ends in 0x1b which is not 4-byte aligned, so the 'ldr w1, [x20]'
+instruction (readl) triggers the arm64 alignment fault (FSC = 0x21).
+
+The root cause is in mana_gd_init_vf_regs(), which computes:
+
+  gc->shm_base = gc->bar0_va + mana_gd_r64(gc, GDMA_REG_SHM_OFFSET);
+
+The offset is used without any validation.  The same problem exists
+in mana_gd_init_pf_regs() for sriov_base_off and sriov_shm_off.
+
+Fix this by validating all offsets before use:
+
+- VF: check shm_off is within BAR0, properly aligned to 4 bytes
+  (readl requirement), and leaves room for the full 256-bit
+  (32-byte) SMC aperture.
+
+- PF: check sriov_base_off is within BAR0, aligned to 8 bytes
+  (readq requirement), and leaves room to safely read the
+  sriov_shm_off register at sriov_base_off + GDMA_PF_REG_SHM_OFF.
+  Then check sriov_shm_off leaves room for the full SMC aperture.
+  All arithmetic uses subtraction rather than addition to avoid
+  integer overflow on garbage firmware values.
+
+without validating the offset read from hardware. If the register
+returns a garbage value that is neither within bar 0 bounds nor aligned
+to the 4-byte granularity, thus causing the alignment fault.
+
+Define SMC_APERTURE_SIZE (32 bytes, derived from the 256-bit aperture
+width)
+
+Return -EPROTO on invalid values.  The existing recovery path in
+mana_serv_reset() already handles -EPROTO by falling through to PCI
+device rescan, giving the hardware another chance to present valid
+register values after reset.
+
+Fixes: 9bf66036d686 ("net: mana: Handle hardware recovery events when probing the device")
+Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+
+---
+Changes in v2:
+- Fix sriov_base_off alignment check: sizeof(u32) to sizeof(u64), since
+  mana_gd_r64() (readq) requires 8-byte alignment on arm64.
+- Fix sriov_base_off bounds: also verify enough space remains in BAR0
+  to safely read sriov_shm_off at offset GDMA_PF_REG_SHM_OFF + 8 bytes.
+- Fix integer overflow: rewrite bounds checks using subtraction
+  (remaining = bar0_size - base) instead of addition.
+- Fix SMC aperture size: add gc->bar0_size - shm_off < SMC_APERTURE_SIZE
+  checks in both VF and PF paths; previously only the start address was
+  validated, but mana_smc_poll_register() accesses up to shm_base + 0x1c
+  (28 bytes from base, 32 bytes total).
+- Export SMC_APERTURE_SIZE to shm_channel.h.
+---
+ .../net/ethernet/microsoft/mana/gdma_main.c   | 40 ++++++++++++++++---
+ include/net/mana/shm_channel.h                |  6 +++
+ 2 files changed, 41 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index 098fbda0d128..d8e816882f02 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -43,8 +43,9 @@ static u64 mana_gd_r64(struct gdma_context *g, u64 offset)
+ static int mana_gd_init_pf_regs(struct pci_dev *pdev)
+ {
+ 	struct gdma_context *gc = pci_get_drvdata(pdev);
+-	void __iomem *sriov_base_va;
++	u64 remaining_barsize;
+ 	u64 sriov_base_off;
++	u64 sriov_shm_off;
+ 
+ 	gc->db_page_size = mana_gd_r32(gc, GDMA_PF_REG_DB_PAGE_SIZE) & 0xFFFF;
+ 
+@@ -73,10 +74,28 @@ static int mana_gd_init_pf_regs(struct pci_dev *pdev)
+ 	gc->phys_db_page_base = gc->bar0_pa + gc->db_page_off;
+ 
+ 	sriov_base_off = mana_gd_r64(gc, GDMA_SRIOV_REG_CFG_BASE_OFF);
++	if (sriov_base_off >= gc->bar0_size ||
++	    gc->bar0_size - sriov_base_off <
++		GDMA_PF_REG_SHM_OFF + sizeof(u64) ||
++	    !IS_ALIGNED(sriov_base_off, sizeof(u64))) {
++		dev_err(gc->dev,
++			"SRIOV base offset 0x%llx out of range or unaligned (BAR0 size 0x%llx)\n",
++			sriov_base_off, (u64)gc->bar0_size);
++		return -EPROTO;
++	}
+ 
+-	sriov_base_va = gc->bar0_va + sriov_base_off;
+-	gc->shm_base = sriov_base_va +
+-			mana_gd_r64(gc, sriov_base_off + GDMA_PF_REG_SHM_OFF);
++	remaining_barsize = gc->bar0_size - sriov_base_off;
++	sriov_shm_off = mana_gd_r64(gc, sriov_base_off + GDMA_PF_REG_SHM_OFF);
++	if (sriov_shm_off >= remaining_barsize ||
++	    remaining_barsize - sriov_shm_off < SMC_APERTURE_SIZE ||
++	    !IS_ALIGNED(sriov_shm_off, sizeof(u32))) {
++		dev_err(gc->dev,
++			"SRIOV SHM offset 0x%llx out of range or unaligned (BAR0 size 0x%llx)\n",
++			sriov_shm_off, (u64)gc->bar0_size);
++		return -EPROTO;
++	}
++
++	gc->shm_base = gc->bar0_va + sriov_base_off + sriov_shm_off;
+ 
+ 	return 0;
+ }
+@@ -84,6 +103,7 @@ static int mana_gd_init_pf_regs(struct pci_dev *pdev)
+ static int mana_gd_init_vf_regs(struct pci_dev *pdev)
+ {
+ 	struct gdma_context *gc = pci_get_drvdata(pdev);
++	u64 shm_off;
+ 
+ 	gc->db_page_size = mana_gd_r32(gc, GDMA_REG_DB_PAGE_SIZE) & 0xFFFF;
+ 
+@@ -111,7 +131,17 @@ static int mana_gd_init_vf_regs(struct pci_dev *pdev)
+ 	gc->db_page_base = gc->bar0_va + gc->db_page_off;
+ 	gc->phys_db_page_base = gc->bar0_pa + gc->db_page_off;
+ 
+-	gc->shm_base = gc->bar0_va + mana_gd_r64(gc, GDMA_REG_SHM_OFFSET);
++	shm_off = mana_gd_r64(gc, GDMA_REG_SHM_OFFSET);
++	if (shm_off >= gc->bar0_size ||
++	    gc->bar0_size - shm_off < SMC_APERTURE_SIZE ||
++	    !IS_ALIGNED(shm_off, sizeof(u32))) {
++		dev_err(gc->dev,
++			"SHM offset 0x%llx out of range or unaligned (BAR0 size 0x%llx)\n",
++			shm_off, (u64)gc->bar0_size);
++		return -EPROTO;
++	}
++
++	gc->shm_base = gc->bar0_va + shm_off;
+ 
+ 	return 0;
+ }
+diff --git a/include/net/mana/shm_channel.h b/include/net/mana/shm_channel.h
+index 5199b41497ff..dbabcfb95daf 100644
+--- a/include/net/mana/shm_channel.h
++++ b/include/net/mana/shm_channel.h
+@@ -4,6 +4,12 @@
+ #ifndef _SHM_CHANNEL_H
+ #define _SHM_CHANNEL_H
+ 
++#define SMC_APERTURE_BITS 256
++#define SMC_BASIC_UNIT (sizeof(u32))
++#define SMC_APERTURE_DWORDS (SMC_APERTURE_BITS / (SMC_BASIC_UNIT * 8))
++#define SMC_LAST_DWORD (SMC_APERTURE_DWORDS - 1)
++#define SMC_APERTURE_SIZE  (SMC_APERTURE_BITS / 8)
++
+ struct shm_channel {
+ 	struct device *dev;
+ 	void __iomem *base;
+-- 
+2.43.0
+
 
