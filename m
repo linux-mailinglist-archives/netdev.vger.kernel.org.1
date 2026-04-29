@@ -1,211 +1,158 @@
-Return-Path: <netdev+bounces-282154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282155-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qIjXJN1P8WmGfwEAu9opvQ
-	(envelope-from <netdev+bounces-282154-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 02:25:01 +0200
+	id Vv/uBIBR8Wm7fwEAu9opvQ
+	(envelope-from <netdev+bounces-282155-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 02:32:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9F6F48DBE3
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 02:25:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 49FB448DC2D
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 02:31:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BF7C530A2DC2
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 00:24:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 768953024A48
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 00:31:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60E561DD9AC;
-	Wed, 29 Apr 2026 00:24:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9BA338DF9;
+	Wed, 29 Apr 2026 00:31:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m95jD2En"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QZTLccq1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C4C318A6A8
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 00:24:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777422261; cv=pass; b=PrPYBCPMnnnWxMhf5GqGLSfbpTbMws0+T2ouboTYjb7PZyIqIf/8M132gnC4YGf5lQVr90ZeA4hpTy0ElxJINxfWPAghEHjJkfMJWWJtF3n0dB8M0nJF9pD7An0x1nbUbQGFtYCLnMChTRp7KRuaD/icKfdK7geD6KJqpNYESr0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777422261; c=relaxed/simple;
-	bh=UJXPcwA89OjMeIoeEEHrLC4GWyoAx5SCk8QvmlDPxwI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mDYG0O/zoXZEaLZazPxK5zCXQ2gH+oP+GxyiZX1/fj72IMwTbG3bB+1FA9m86ychISUOi5l9GKUDU3QXdVFLwnSCJHJ8ayBXL0+XDMGSKww4TxiyhVEs+X3x1EgIKAmB77qv9uyEPjTUzMRwj3QM+JZej6wd2i+qLIs6+KX0ap4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m95jD2En; arc=pass smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-506a747448dso86353001cf.0
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 17:24:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777422257; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Qr9NKo1iPnN1gLmoiQB51ugNWUTd9EjGHTkfiAvYZO+ZhMe5bo3oaiqakJbgA/noDM
-         GajTuLB8kkY3A+jU6in/8Aw/t3oKSwuu0KbHqtxJgsc03BI2K+VnI3SI/UyS90UFg5rz
-         iNVZ+jyxeKNo44umR8XXpdISG0q0IudPMxMv+KoJgDbj/0rABuSoygh8X5j/xtKGk+5y
-         6aQnFqt60Zjy3UnUG2GFPJcAB6EeVvUxnEtTMtnAeHUi8WmgNjnnAIL+8w6OQYgODKk5
-         KRtD4Ykf8EKo3H2zCdUPBCT/fbyy3/mp3G37N0LF45DpdaQFRc3Siiy3415LK6OVdkEn
-         FHgA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=5EekIEEAn9zcWSyRffp42SDp9Ty9BQf71SkpBOEt/1k=;
-        fh=pFmB8AQxtTuwqmvy5pBHZt8wAG/rofCm8CEXdJQlLLc=;
-        b=LaqurieLRfOQjIWDSjOa/8IBGeXBV+jtgu0WzkhvTgzdI02dPaNckNVyevad3E/OeI
-         nlXQQq90K47uYdsOxEJhlU0jHB2E0vQXqcsorvbXBEKWVLfg7TQMILNTPpdDgjkdi9dp
-         lk5+4r7uFcOs17Xdq4qRHO35j1J8ZokzJglBgMUk576PM9YqsZYPXob3h8cA9I4brccp
-         J8UkytW4E57XZ3CxH2cnd5Rj6KYTsHwsNXzJyKuX28QVVpvoyo7ZWdkI2pKwTIL1Kui8
-         03D0Mh+98Pwbs7hfDl7Lg0fM7vq8LaKKBhsMKFMUwgdomtUSiX9kXopeyJegFVYMpiiS
-         ir8w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777422257; x=1778027057; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5EekIEEAn9zcWSyRffp42SDp9Ty9BQf71SkpBOEt/1k=;
-        b=m95jD2EnKtKcSXmhejLDIhMzOrmHv6giH1hUWQT84l5ILnJ+8pEI0I/0rkjESwx6Fm
-         5aJwcVXbPBs6GybIKBp/Py12uF3y9zl61KqiZhi5eokNb1Alg9y7kOXfjfTLxbC4tzkt
-         QtXbUEc31G6bKjJwaN/As1HP8F6I7nWN+DdiNHB69dG2awdDFmRARzpAGzMeLCuM6S2k
-         5ffwgtKNsDLZS4K2SSCz65nQIvwTrVR/76xAPVd8OEzzCqVz5l3vFRTjwmLNhgih9lrM
-         s9GmaqRP3ktkb63Y4raqsh9HC8DI6KvcOgPeM7NKENB52Zij8CHi3UZio1NI+FUsGS4L
-         8m/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777422257; x=1778027057;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=5EekIEEAn9zcWSyRffp42SDp9Ty9BQf71SkpBOEt/1k=;
-        b=q4dJhRwB/4CJnxpvIrYHUVPzVcGMp2OGBXiwSaUEMaabJ+Rw3wOb8O13sXzNQkSDq9
-         tD2pXR5krLnKykIr0Cpd1sssVOpEjy5F1O20kKd8GFN55Q3Cnp2QuDr9/I39VlACGHG9
-         Eb0rQD6XkbTEqQO1ZPMm5sbq8UEklu7Py3hBB4k0vP9XeZZq5OnIrx7EcLvoTpw8a5ft
-         vaTYVUiE0Rr7ugFcSPkpBhDOnyoQh4neu7LIssGz1JZZirqT52FWuaJKnO+mc8N3/bwV
-         wIXYrBWrzmLmWFBtsHezbvccNZ8w0tVW0EC41KOGXzSeauqZVkv/NUtcAO9MlFHniy0q
-         J97Q==
-X-Forwarded-Encrypted: i=1; AFNElJ8Cn68mg/VAR+SDKfEWR/49ssVgzMHVyOqzDMjVrTtnctTglEZ2OFVcHASVend3oY26Xa6bJb0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzesY30Izy7rnJCWxPiLGScguUdNlK+RvYwukzaaDemb0CMn9sk
-	kYl/CQZZigVRqY4ehUqYmIT7WPzBzQ2ULE8940sH+daZla1AvARvxHXWnbxMUL+NgjNhsV0pj58
-	JBcpWwoqcvmxyjYPusTwr+kvDWYefdlys2rj29u68
-X-Gm-Gg: AeBDieszyCfJDeEqhT38hG5Te51NU1MpDfdkSugrpXy7mo7ykHJ8QPlMdxQrTjHH90Y
-	jUbmaEu0jJrmxK1suKQ2t5ZX0v3oO4zdKylGRsCT8oalFvSD5UPL8UCrtfwfyeitEZtJCon64hY
-	nlf9kU6cHRBL5i2mS2asnCZhTrAeUZww2h+g8o3Xx8pwhyTeyimj6KM/vGM+7WFmAJMr/Kpilte
-	wjLHOTZY7Z9gHpmD3GR5kLMwyxufupB0BHPhTLNYK9Pl0IqnHZb+iryBLXRbat0DWn5sDmq6+lL
-	eUNi9jg5vvtz9TolPtMQyVC5QTG7tM2W4fQXDVwThLuqMcs3hWczIOsuqh7JhMHN8r2HJ0+4nuo
-	LnRY1bWXHeprI1S7iJ9ll
-X-Received: by 2002:ac8:5d90:0:b0:50d:7384:a660 with SMTP id
- d75a77b69052e-5100e0f4cb1mr71639201cf.6.1777422256877; Tue, 28 Apr 2026
- 17:24:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8721640DFDE;
+	Wed, 29 Apr 2026 00:31:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777422716; cv=none; b=BK0kDpxfAk0juQObb4pZTcXKApiSBgvLhX4EsebnkwQK9PFf4HflMXuJr/lEvdoljrjMppOYjtGmCJSg/hbYZUmP6/BHezNH8vmApBGSXbv6yAYipEBceOIMLn0Nu/jGxMU2/CjGz69hDPga8ARolsqJ6lc0JSTzLt2pmsb5yuc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777422716; c=relaxed/simple;
+	bh=5cwocb0fy34F3UPSlPfYA0SYAJqzs7LuAxA+luBHnQw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=o8Mgiyvis6JE/hI6wNuCcenMnjVBJT1kx3DqHFp4wEgar+OZBr0A4xT5HcjWNArAiUDuzhz1dAtp2SNAP7/LpVpLXo2akuwWu6g87DUn0j8IIbcFDhN+rOWgL4Df2hyIgAyzbhpFOQ14W5h4Ui99SLibU48fWVDmNuz4wyZ8JFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QZTLccq1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 849F9C2BCAF;
+	Wed, 29 Apr 2026 00:31:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777422716;
+	bh=5cwocb0fy34F3UPSlPfYA0SYAJqzs7LuAxA+luBHnQw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QZTLccq1EIFjtt/9EnlBB/Rv9e3F6p8wMW2b3fcAxmZQgqKAEYCeFal+fAw2K+XiS
+	 K1TBfmva7moM0YVgEx3SUPwiU0Hb91rALuu6EK4qBYLLNgkepjyqCOjPcYINrTgD3Z
+	 AboLSgw/wqQYQU+CdZnP539cMBFq5aEHu1H1opbw4usqYjUJOtkZ3zQHIWXmSfP90X
+	 6vCqWf+OtmYbLBixf3sMRsb6KUM99ysJpEa/xr1KKNL+pD1WkA+sNX9hvYVV+zyBfK
+	 21DWi02IwMY9iIIf8WeYLevNWs0TvvA9FMUULDGcbSFlPhCWptKUt03mOfQQwNa6pA
+	 SOtBnegi+r7zw==
+Date: Tue, 28 Apr 2026 17:31:54 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Martin Karsten <mkarsten@uwaterloo.ca>
+Cc: Dragos Tatulea <dtatulea@nvidia.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
+ <bjorn@kernel.org>, Gal Pressman <gal@nvidia.com>, Tariq Toukan
+ <tariqt@nvidia.com>, Joe Damato <joe@dama.to>, Frederik Deweerdt
+ <fdeweerdt@fastly.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH net-next 1/2] net: napi: Fix interrupts permanently
+ disabled during busy poll
+Message-ID: <20260428173154.7b6864ef@kernel.org>
+In-Reply-To: <4c45f423-ea41-4ae8-9cb0-7aca9157d8a4@uwaterloo.ca>
+References: <20260428175134.1197036-2-dtatulea@nvidia.com>
+	<20260428175134.1197036-3-dtatulea@nvidia.com>
+	<20260428164004.1f6902ac@kernel.org>
+	<4c45f423-ea41-4ae8-9cb0-7aca9157d8a4@uwaterloo.ca>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260428224816.11223-1-andrea.mayer@uniroma2.it>
-In-Reply-To: <20260428224816.11223-1-andrea.mayer@uniroma2.it>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 28 Apr 2026 17:24:05 -0700
-X-Gm-Features: AVHnY4Lxx2_566jaJobQy5M9DdHNmCDtFn90_njALOpDxBSMh5sD-BAbouWm3xg
-Message-ID: <CANn89i+dSEkqgbvsonrC5V=e-vnMPVNdVnD+0KdkkAxM_kxEQw@mail.gmail.com>
-Subject: Re: [PATCH net] ipv6: rpl: add NULL check for idev in ipv6_rpl_srh_rcv()
-To: Andrea Mayer <andrea.mayer@uniroma2.it>
-Cc: "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Alexander Aring <alex.aring@gmail.com>, Justin Iurman <justin.iurman@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
-	stefano.salsano@uniroma2.it
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: E9F6F48DBE3
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 49FB448DC2D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282154-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-282155-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,gmail.com,vger.kernel.org,uniroma2.it];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,uniroma2.it:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Tue, Apr 28, 2026 at 3:48=E2=80=AFPM Andrea Mayer <andrea.mayer@uniroma2=
-.it> wrote:
->
-> ipv6_rpl_srh_rcv() dereferences idev from __in6_dev_get() without
-> a NULL check when reading idev->cnf.rpl_seg_enabled.
-> When the device's MTU drops below IPV6_MIN_MTU, addrconf_ifdown()
-> clears dev->ip6_ptr through RCU_INIT_POINTER(), which is immediately
-> visible to concurrent readers. A packet that already passed the idev
-> check in ip6_rcv_core() can race with this and hit a NULL pointer
-> dereference.
->
-> Reproduced by flooding traffic through a route with RPL source routing
-> while rapidly flapping the receiving interface's MTU between 1500 and
-> 1200:
->
->  BUG: KASAN: null-ptr-deref in ipv6_rpl_srh_rcv+0xae/0x1050
->  Read of size 4 at addr 00000000000006b4 by task ping6/318
->
->  CPU: 0 UID: 0 PID: 318 Comm: ping6 Not tainted 7.1.0-rc1-micro-vm-dev-g4=
-6f74a3f7d57 #82 PREEMPT(full)
->  Call Trace:
->   <IRQ>
->   kasan_report+0xc6/0x100
->   ipv6_rpl_srh_rcv+0xae/0x1050
->   ip6_protocol_deliver_rcu+0x717/0x960
->   ip6_input_finish+0xa3/0x1b0
->   ip6_input+0xdc/0x490
->   ipv6_rcv+0x338/0x460
->   __netif_receive_skb_one_core+0xd1/0x130
->   process_backlog+0x2c7/0x9f0
->   __napi_poll.constprop.0+0x51/0x270
->   net_rx_action+0x322/0x730
->   handle_softirqs+0x119/0x640
->   do_softirq+0xae/0xe0
->   </IRQ>
->
-> Add a NULL check for idev after __in6_dev_get() and drop the skb if
-> idev is NULL, consistent with the SRv6 fix in commit 064137935262
-> ("ipv6: add NULL checks for idev in SRv6 paths").
->
-> Fixes: 8610c7c6e3bd ("net: ipv6: add support for rpl sr exthdr")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Andrea Mayer <andrea.mayer@uniroma2.it>
-> ---
->  net/ipv6/exthdrs.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
-> index 03cbce842c1a..e398a8851031 100644
-> --- a/net/ipv6/exthdrs.c
-> +++ b/net/ipv6/exthdrs.c
-> @@ -499,6 +499,10 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
->         u32 r;
->
->         idev =3D __in6_dev_get(skb->dev);
-> +       if (!idev) {
-> +               kfree_skb(skb);
+On Tue, 28 Apr 2026 20:04:13 -0400 Martin Karsten wrote:
+> On 2026-04-28 19:40, Jakub Kicinski wrote:
+> > On Tue, 28 Apr 2026 17:51:30 +0000 Dragos Tatulea wrote:  
+> >> Under certain conditions a queue can be left out with interrupts
+> >> disabled and with the napi re-scheduling timer permanently stopped.
+> >> This behaviour is triggered by the napi busy poll path when
+> >> gro-flush-timeout and defer-hard-irq are set. Here's a sequence of
+> >> operations:
+> >>
+> >> 1. Busy poll starts, NAPI_STATE_SCHED is set to avoid rescheduling napi
+> >> from the timer.
+> >>
+> >> 2. During napi poll, driver disables interrupts due to being in poll
+> >> mode (napi_complete_done() returns false because napi->state has
+> >> NAPIF_STATE_IN_BUSY_POLL set).  
+> > 
+> > Why does the driver have IRQs disabled in busy poll?  
+> 
+> The problems occurs in irq deferral mode when both gro-flush-timeout and 
+> defer-hard-irqs are nonzero and NIC interrupts are disabled.
 
-I suggest:
+Okay.
 
-kfree_skb_reason(skb, SKB_DROP_REASON_IPV6DISABLED)
+> >> 3. At the end of the busy poll (busy_poll_stop()):
+> >>    3.1 napi timer is scheduled and skip_schedule is set (due to config)
+> >>    3.2 napi->poll() is called:
+> >>      - driver poll() processes exactly budget packets
+> >>        and exits early => napi not scheduled.
+> >>        (interrupts are still disabled at this point)
+> >>    3.3 Since napi poll processed budget packets, __busy_poll_stop()
+> >>      is called with skip_schedule set => napi is not scheduled here
+> >>      either.  
+> > 
+> > with skip_schedule it calls:
+> > 
+> > 	clear_bit(NAPI_STATE_SCHED, &napi->state);
+> >   
+> >> 4. If the napi timer from 3.1 gets to be triggered due to slow napi poll
+> >> or some other reason, the timer will run with no effect (due to
+> >> NAPI_STATE_SCHED being set).  
+> > 
+> > And here you claim STATE_SCHED is still set?  
+> 
+> Labelling this with number 4. might be misleading, sorry! The concern is 
+> that a short enough timer (compared to the duration of the driver poll) 
+> can be triggered before the NAPI_STATE_SCHED bit is cleared at the end 
+> of Step 3.3.
+
+Ah. Just say that :D Two pages of buggy text, y'all would have been
+better off using this one paragraph as the commit message.
+Please don't use AI for generating commit messages if that's the cause.
+It really is spectacularly shit at it.
 
