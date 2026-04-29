@@ -1,191 +1,217 @@
-Return-Path: <netdev+bounces-282459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282460-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wEMOL8ZH8mmTpQEAu9opvQ
-	(envelope-from <netdev+bounces-282459-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 20:02:46 +0200
+	id 0PgJHpFK8mnNpQEAu9opvQ
+	(envelope-from <netdev+bounces-282460-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 20:14:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A7BA498819
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 20:02:46 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DF41498DDE
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 20:14:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1459A301A931
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 18:02:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9B2B13007ACE
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 18:11:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F87338BF8D;
-	Wed, 29 Apr 2026 18:02:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2CB137E2FD;
+	Wed, 29 Apr 2026 18:11:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s0Bsz5fe"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="by5BOO7E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16A5F38D688
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 18:02:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 031C32580CF
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 18:11:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777485743; cv=none; b=I0ePBLIuSMDo1qwqIe5zGJ0UZVv8frWeaocDb0IT6kNUp3e+5MYZQ2VsM/fGHs9xq90fv7I+OExLx3EQYtIPONpZeYtt61ikkPKbBCoaZVTnB7ABUY1Bqbn+yPg00eGjhayBl5yyPn4WhB3O62m8JoZXOhxauE6Epm4X/61aaHs=
+	t=1777486279; cv=none; b=eTI1NVf4nZA3v9Vw2CgaB6paxlVRYtIhvOOD1pOysqpH1AEePq0uUxgcFQ1uG7n+PjQg4CJvhb379b00EA3WBt1mjs7rboEncsFIlNgaNsqmsux5OfwU1N7uCRXNo3Mh+MniWQDHrXh3JrsZNnGP8jQBe8brnoJjuzdyQpiSOYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777485743; c=relaxed/simple;
-	bh=ZYDm6LQjx6z8qEP8enhW6C4tZcrjPsHDjbFGVaexpiQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NqyvofqeIp6kJ4MZ6PtSKQi5KOIPN/NFnUDBhawDourc75xb1A4C4/zaddM0Z0mDNJGu2P8sij1LhPi/qFqrJMvQYssA4Xe8rkf0CNBtrR6qU07HJh4C7V1uNNN6jyNvlVJVVNJk6D6PRsVV/HCSSoZ8QlRElgzglXkUKkv5HzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=s0Bsz5fe; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5a2c500750dso29541e87.1
-        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 11:02:21 -0700 (PDT)
+	s=arc-20240116; t=1777486279; c=relaxed/simple;
+	bh=Z0bIVU6SS+S6MdJBsTyOe/UplqWn50S40CXuK52m2hE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XaLjr3cvN1XnRZD89hGqfgqvj+7MeVGRIJNiVpzzLJs8w8BOMCPOML5Dj4w0J/o9X5OTtpybfKWNOqf1cEsmO5hpwxZvzT6vdOHDOiGAuNDiFFlLbNp/xggvB8grx4OFZrqyOR6bUnhTH/8XI6BSKBThOwZ+YfeCQDVrJQoJXUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=by5BOO7E; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4891cd41959so346745e9.3
+        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 11:11:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777485740; x=1778090540; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OxhOyUtiJJnwjvooR0tpgz13ADxv2UwdgT9k4qtUzLg=;
-        b=s0Bsz5fe6dZgzzw5hk9TYVrgCyD33/5e07jskNoWgSTYXo4LQu32VKvYKCVSm4k5YZ
-         Sog7syc/qZKJf2qSrcPuyrzWf6gxgC5nqBBBERKmJFaGRsmYUJ7rH4Bkx/rvyr3H+5wh
-         MEaWegpsNwGW/z48eDQXmmuixAQnyq0crK/eKNUl9tHNZE+tNYuVHlH4JrQ2Mo33EFKG
-         nEqmmQzUul4R4iKl2B6eMV4bT0qkn18uk4rc3eIOIhCv5bsOa9rOtRVtZuYuXsJr5ZcH
-         Sglj+roz0JFuHkgSHC+dDW7B+37AM6mzlRLuwZPd7dRWHhVTEXSgvbzc6HDiGOyeqeuj
-         6Q3g==
+        d=purestorage.com; s=google2022; t=1777486276; x=1778091076; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ezL0pR0AX9nqfNlvpg+fDKk8//SgRDedoro1/h3Zecs=;
+        b=by5BOO7E2XTkfh9DpFaqu2FgidwNIgxF9ywkQ1x78bG1aNwiWIIha76zEehvqj/zw8
+         djW6DnR6sUBtlh5KxesZHV4WVP+q6q8ppBHkCbpnZhgFv8WZtRuXH/CCjKg0btcjz8qk
+         wNrvOwRDO8dUV09UxzT1U2lENydw7tOdrpD9j2SNDZVbtu2omp6qndGE+om6ysYmpTUF
+         XFj6wqd4K2M27L7Itb6l/ndAddd+5nIcELnTAw/9UoCZ/s80ucI0eO9YhzV33ENJDSiS
+         xiitJw+KfUyfy1vg5k1W3UeVyZieFuAy2gVtFyRfZJwUPgThgT1QfvB2DeH1H0DlBq/J
+         aNhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777485740; x=1778090540;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OxhOyUtiJJnwjvooR0tpgz13ADxv2UwdgT9k4qtUzLg=;
-        b=nbaL8eLQ54ClSHWqs7SUttncsiPqLgCGdSd/IoDsTNGZG21HKmwguCPXxrt6YvMHKt
-         /6Rmcp8jmIkrXykrhW9czqLepVuU1ECS/eGE+GV5kYA9ecw4pr3zYW4rucmwbRwT3ZfK
-         EsS3OgspV1VPXWB524LpUuOB+yrOjXPvH+3FGE8ZhZUuhB71a+GZZtucMz6hUZ1dlXxM
-         MIekRdyJeC3BQVOENuMQ2eWv202ypxktU1ngWWOZY0qJX0A77LHK0K2iWvomMHceIga0
-         B/r7qVRfNJAjDY0DOyTM90f/QbD4UGTW4Uet9Y8mBhlIRw+Opm5Dr/k5fmb5NZ9QvwL8
-         cf9A==
-X-Forwarded-Encrypted: i=1; AFNElJ8Q40fN4StF+GIi3JEEzTjzGOZ2j6R0XTCbkluST6kqA/VyK+V4+Aqnza0U2IwVEPkg+rcapZ4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyK6kFrxAWzFgv5jwBXnyDDtbh01P8BtVBGQMxeQPvSefoh5mG
-	cfSFWu1nDR5etS0THjl/S3lwGxRIoNUnztw9/FQvc3II3b5txGc2iQMl
-X-Gm-Gg: AeBDieuMRppGYZp2LV1f8zePFZq+fRXHqTz2EnI4PKZFtNgS2z801WGuWxbyId28oZc
-	9tGLcFVryikOKgiczLxMpfXqaRkqQwPW/P9GYae0STWWVzgspaIIAc5mrKiQvQbbohBN5k3TUiG
-	M7iUej0msQMPcI7FvmowHrwFDe3z3+nEaf3m0Zo66yTQAV4QrVXfGLhnItzjHrzqTdVhPWB6HYs
-	sP7pHox0hlnVMXi8rzySQSXJZXGEOIQBZ7RfI+3qY/yoSjV/rYkD9TPx9ZMD99nGxkYr8nAp1in
-	uWM35bT9b683yJ1asxsetY6CYtafHQeAklBozVK4YM4O5KFW9BEfBCiYvS4dMflPLoHlTQil+Uy
-	E42g0hIgQR3B93O7O4Zfh7HxrvOwgSmzf6Qqk0KSt21UCtaHRYpNySlp3RFSJzjfpajNIal2pxf
-	LM989ZiqUzg6SSaPE8y7lI6SRqcSJvqfpZ+Xnp9X76/QQa90QgcftxFA==
-X-Received: by 2002:a05:6512:1394:b0:5a3:ecf7:71c0 with SMTP id 2adb3069b0e04-5a746409f38mr2777358e87.5.1777485739988;
-        Wed, 29 Apr 2026 11:02:19 -0700 (PDT)
-Received: from foxbook (bfh75.neoplus.adsl.tpnet.pl. [83.28.45.75])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a74a756c8fsm729425e87.38.2026.04.29.11.02.17
-        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
-        Wed, 29 Apr 2026 11:02:19 -0700 (PDT)
-Date: Wed, 29 Apr 2026 20:02:14 +0200
-From: Michal Pecio <michal.pecio@gmail.com>
-To: Birger Koblitz <mail@birger-koblitz.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, linux-usb@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Chih Kai Hsu <hsu.chih.kai@realtek.com>
-Subject: Re: [PATCH net-next 3/4] r8152: Add irq mitigation for RTL8157/9
-Message-ID: <20260429200214.3e8dee67.michal.pecio@gmail.com>
-In-Reply-To: <9feb0bc1-b817-46f8-9092-e2beff30ec9d@birger-koblitz.de>
-References: <20260428-rtl8159_net_next-v1-0-52d03927b46f@birger-koblitz.de>
-	<20260428-rtl8159_net_next-v1-3-52d03927b46f@birger-koblitz.de>
-	<06a42ba1-b714-45b1-be30-4a793752e495@lunn.ch>
-	<9feb0bc1-b817-46f8-9092-e2beff30ec9d@birger-koblitz.de>
+        d=1e100.net; s=20251104; t=1777486276; x=1778091076;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ezL0pR0AX9nqfNlvpg+fDKk8//SgRDedoro1/h3Zecs=;
+        b=dzBjJF/xCM9UC+VlnWOpY4a+VeuTWaSnFOl73SYW1TQv5Jua7xZDP/yaVhYTvmobSR
+         AMvRq6n1VSEmm6+JujQXKKB0gnc2q4YLOjNqNqeXZSJdwk/mAmVnSaB9Lh8I1JPSz7c/
+         gKjVLEJ9xfsjZdmDUJZ07/K3QonrGgqRlywxiQug97GPF9YtoxrGBRXwJqvkI3+P78Ur
+         eScrvAsRzwVdfo7oI3waizo9a68kwYrBis1H1w06V5Li/ziDnY/XE5SOGGEFih3p7IKM
+         cB0PAMtHweexI++60TUW8wmUdEOG/F6tXNcYsIxdY4D8pA+SPkCuR51Mq94ajTBsrAQV
+         lOLg==
+X-Gm-Message-State: AOJu0YyXTOIWgmDZg3TikFE2dRkJ+zlvjHnDXxUveRKEnbHUKjjbVmdr
+	pqIjUfwihG69QjnSRHz5IxuCM4a7JUZuLT677NHtVd489maFLCgqfugqDavHtURSHikJD4HRUc5
+	aUJlrhOZCgPonL6BfCeehRDSdc6vuABdETO76Y+Wi23qJ9uLutbwbuK6Y/jqtzjUN0elK/JDepa
+	EpBdQlokt6FmNcVhR+caUoVhbPrSWYkrw+AxtM4hlUSB3WBwA=
+X-Gm-Gg: AeBDietmDaT7FKx+COH+2lwDEREuGEJjCO+XgvxSgfIFo/wlB9b7gdMok/mSHJbZDBo
+	4QWt0gKGaZ6YyK80pXYAxQkmYlVNqZJjRys4TsNW8L32wlfgn4rhRDu0GpUZqUdRlU82y+4QaHE
+	DvMviffkSNz+qyeahcZNaGNlbHBrINraY0oKBbdYIJE0XDU+9fKl+PjCO2UEjVtBLOW2MOob9yw
+	r8AhckhsOlcxFbyc7k4+tmFEBYLaBPg/DNHvKTGg6LsOXh410/CnR/g7Gxqos0Q66li2EClvEPL
+	wrsYK3Q0V1eeZ4QlhxeizBPbuInflQxAZt33hVO5BQqjMH17CRVSq/QyWcPInnImlW2WGz/DQL3
+	0FOHWCdoxbSlqHjVKlrHJU1Z2WX3g83XnYlkxIO5Sblmo+VwgwzQof3EI71fOcNN2btB0n4X8R2
+	JbMyxfVX8ikWCo34T0HzGr+sl7CJhS6dqg/b1NxXwZwB0DI9aPLpr8IktcoJKX8z87/YI=
+X-Received: by 2002:a05:600c:a315:b0:488:9e54:94c0 with SMTP id 5b1f17b1804b1-48a77adc73dmr99301725e9.8.1777486276010;
+        Wed, 29 Apr 2026 11:11:16 -0700 (PDT)
+Received: from dev-rjethwani.dev.purestorage.com ([208.88.159.129])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-48a82308d77sm7525285e9.14.2026.04.29.11.11.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Apr 2026 11:11:15 -0700 (PDT)
+From: Rishikesh Jethwani <rjethwani@purestorage.com>
+To: netdev@vger.kernel.org
+Cc: saeedm@nvidia.com,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
+	borisp@nvidia.com,
+	john.fastabend@gmail.com,
+	kuba@kernel.org,
+	sd@queasysnail.net,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	leon@kernel.org,
+	Rishikesh Jethwani <rjethwani@purestorage.com>
+Subject: [PATCH net-next v13 0/6] tls: Add TLS 1.3 hardware offload support
+Date: Wed, 29 Apr 2026 12:10:10 -0600
+Message-Id: <20260429181016.3164935-1-rjethwani@purestorage.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 2A7BA498819
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 7DF41498DDE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[purestorage.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[purestorage.com:s=google2022];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[nvidia.com,gmail.com,kernel.org,queasysnail.net,davemloft.net,redhat.com,google.com,purestorage.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_FROM(0.00)[bounces-282460-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282459-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michalpecio@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rjethwani@purestorage.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[purestorage.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,birger-koblitz.de:email]
+	NEURAL_HAM(-0.00)[-0.980];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[purestorage.com:dkim,purestorage.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-On Wed, 29 Apr 2026 06:06:30 +0200, Birger Koblitz wrote:
-> On 29/04/2026 3:56 am, Andrew Lunn wrote:
-> > On Tue, Apr 28, 2026 at 05:47:23AM +0200, Birger Koblitz wrote:  
-> >> Add interrupt mitigation code for both RTL8157 and RTL8159 that prevents
-> >> USB interrupt callbacks with urb->status ESHUTDOWN being triggered. While the
-> >> issue is rarely seen on the RTL8157, without the mitigation, it is
-> >> common on the RTL8159:
-> >> [273.561863] r8152 7-1:1.0 enx88c9b3b5xxxx: Stop submitting intr, status -108
-> >>
-> >> Signed-off-by: Birger Koblitz <mail@birger-koblitz.de>
-> >> ---
-> >>   drivers/net/usb/r8152.c | 6 ++++++
-> >>   1 file changed, 6 insertions(+)
-> >>
-> >> diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-> >> index 8255261d73148a7b4dabe0188faf07cb1f356437..08cc3c1dae0facb2400890ba4d093c97ed56d40b 100644
-> >> --- a/drivers/net/usb/r8152.c
-> >> +++ b/drivers/net/usb/r8152.c
-> >> @@ -8444,6 +8444,12 @@ static void r8156_init(struct r8152 *tp)
-> >>   	else
-> >>   		r8153_u2p3en(tp, false);
-> >>   
-> >> +	if (tp->version >= RTL_VER_16) {
-> >> +		/* Disable Interrupt Mitigation */
-> >> +		ocp_byte_clr_bits(tp, MCU_TYPE_USB, 0xcf04,
-> >> +				  BIT(0) | BIT(1) | BIT(2) | BIT(7));
-> >> +	}  
-> > 
-> > What does interrupt mitigation do?
-> > 
-> > Is this a different name for interrupt coalescence, where the MAC
-> > delays interrupts for a period of time so more packets are in the
-> > receive ring when it does interrupt, so reducing the number of
-> > interrupts, and bigger bursts of packets are processed at once?
-> >   
-> 
-> I do not understand what the mechanism behind this is, there is no
-> more documentation in the original driver. I experimented with this
-> for some time and the effect that I see is that it prevents
-> interrupts after shutdown.
+Hi all,
 
-What do you mean by "after shutdown", driver unbind? You shouldn't be
-seeing URB completions then if the disconnect() method unlinks them.
-And if it doesn't, completions may be using driver data after free.
+This series adds TLS 1.3 hardware offload support including KeyUpdate
+(rekey) and a selftest for validation.
 
-Or maybe you have pending URBs while calling set_configuration() or
-set_interface(), which is dodgy too but at least not asking for panic.
+Patch 1: Reject TLS 1.3 offload in chcr_ktls and nfp drivers
+  These drivers only support TLS 1.2; add explicit version check.
 
-Other cause of ESHUTDOWN might be serious host controller failure, but
-you would likely get other log noise with that, at least with xhci.
+Patch 2: mlx5e TLS 1.3 hardware offload
+  Add TLS 1.3 TX/RX offload on ConnectX-6 Dx and newer.
+  Handle 12-byte IV format and TLS_1_3 context type.
 
-What shows up if you repro with this enabled?
-echo 'module usbcore +p' >/proc/dynamic_debug/control
+Patch 3: Core TLS 1.3 hardware offload support
+  Extend tls_device.c for TLS 1.3 record format (content type
+  appended before tag). Handle TLS 1.3 IV construction in fallback.
 
-Regards,
-Michal
+Patch 4: Split tls_set_sw_offload into init/finalize
+  Allows HW RX path to init SW context, attempt HW setup, then
+  finalize. Required for proper rekey error handling.
+
+Patch 5: Hardware offload key update (rekey) support
+  TX: delete old HW context and add new one with updated key. Track
+  TCP ACKs to flush old-key records before the HW switch; SW path
+  carries records crossing the rekey boundary.
+  RX: on peer KeyUpdate, retire the NIC key; queued records that the
+  NIC already processed under the old key are XOR-undone in software
+  before AEAD with the new key. NIC re-arming is deferred until the
+  old-key region has fully drained from the user's recv queue.
+
+Patch 6: Selftest for hardware offload
+  Python wrapper + C binary using NetDrvEpEnv framework.
+  Tests TLS 1.2/1.3, AES-GCM-128/256, rekey, various buffer sizes.
+
+Tested on Mellanox ConnectX-6 Dx (Crypto Enabled) with TLS 1.3 AES-GCM-128/256
+and multiple rekey cycles.
+
+Rishikesh
+
+Changes in v13:
+- RX: on peer KeyUpdate, retire the NIC key; queued records that the
+  NIC already processed under the old key are XOR-undone in software
+  before AEAD with the new key. NIC re-arming is deferred until the
+  old-key region has fully drained from the user's recv queue.
+- TX: cancel rekey_sw delayed work in complete_rekey,
+  EOR-fence the last old-key skb.
+- Selftest: new test_tls_offload_burst (TX/RX, RX-ZC) under sustained
+  rekey.
+
+Rishikesh Jethwani (6):
+  net: tls: reject TLS 1.3 offload in chcr_ktls and nfp drivers
+  net/mlx5e: add TLS 1.3 hardware offload support
+  tls: add TLS 1.3 hardware offload support
+  tls: split tls_set_sw_offload into init and finalize stages
+  tls: add hardware offload key update support
+  selftests: net: add TLS hardware offload test
+
+ MAINTAINERS                                   |   2 +
+ .../chelsio/inline_crypto/ch_ktls/chcr_ktls.c |   3 +
+ .../mellanox/mlx5/core/en_accel/ktls.h        |   8 +-
+ .../mellanox/mlx5/core/en_accel/ktls_txrx.c   |  14 +-
+ .../net/ethernet/netronome/nfp/crypto/tls.c   |   3 +
+ include/net/tls.h                             |  84 +-
+ include/uapi/linux/snmp.h                     |   2 +
+ net/tls/tls.h                                 |  33 +-
+ net/tls/tls_device.c                          | 815 ++++++++++++++--
+ net/tls/tls_device_fallback.c                 |  82 +-
+ net/tls/tls_main.c                            |  33 +-
+ net/tls/tls_proc.c                            |   2 +
+ net/tls/tls_sw.c                              | 153 ++-
+ net/tls/trace.h                               |  79 ++
+ .../selftests/drivers/net/hw/.gitignore       |   1 +
+ .../testing/selftests/drivers/net/hw/Makefile |   2 +
+ .../selftests/drivers/net/hw/tls_hw_offload.c | 887 ++++++++++++++++++
+ .../drivers/net/hw/tls_hw_offload.py          | 256 +++++
+ 18 files changed, 2271 insertions(+), 188 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/hw/tls_hw_offload.c
+ create mode 100755 tools/testing/selftests/drivers/net/hw/tls_hw_offload.py
+
+-- 
+2.25.1
+
 
