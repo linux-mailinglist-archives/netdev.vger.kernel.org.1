@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-282240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282241-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YEmyDUak8WnxjAEAu9opvQ
-	(envelope-from <netdev+bounces-282240-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 08:25:10 +0200
+	id uBQ9AI6k8WnxjAEAu9opvQ
+	(envelope-from <netdev+bounces-282241-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 08:26:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id F269E48FBB9
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 08:25:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C54748FBDE
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 08:26:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D9672300B58B
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 06:25:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 07E67303101F
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 06:25:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A9CF3822BE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC3138BF96;
 	Wed, 29 Apr 2026 06:25:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="t8CjGuwM"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="atO/V2r4"
 X-Original-To: netdev@vger.kernel.org
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011043.outbound.protection.outlook.com [52.101.52.43])
+Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012061.outbound.protection.outlook.com [40.107.209.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD46388E63;
-	Wed, 29 Apr 2026 06:25:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA85C37999D;
+	Wed, 29 Apr 2026 06:25:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.61
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777443905; cv=fail; b=apTGxvxPvFxIvCbnC0/zQartkQrIPzzVxa3KSHGBrFTgHYA220nJfrYtDeFCYM6ans9R179Gy8/tvdUvv+bIG7WpZkhXIyOFYgExcBBkNqDfHxnq/tammP6hC2a1q5lsO0wPB0EQ13NtNP2hHKCTK5CV+k+WywTROCsmN21XJEg=
+	t=1777443905; cv=fail; b=BrQScYcOWN5dj2b3yQMA8xlrC9KPQs0DTmR82NT4VudNy2oFFTlYNsivwdzDF+iP/PzTdL0UgUUx2jNizaHQvuGmDNYkjNJphghM5gzea8lfnq2bqc3xUp/Swwa48YjwL3FWs2DrNP3Er9ffJYtKkkcwvw1pZmuTxnR3Ecg9IWg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1777443905; c=relaxed/simple;
-	bh=uBBNjm/uXqoh3BYyQFRZNM+9GzRpWFtycr51w0f5Knw=;
+	bh=trkMJtlvFx/Na/tZUSCceot+wR8HIBcVZ/V6mC4rz8Q=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JJG4gf3uyNVW0mL2mUXVTGb2hTz0CNOj04ymf/somBmzQU/aDl5mnFMft05Gv3ahfONWsGCKL3elziMCbXecnPKd3HK6nfEbhB5JI1hACrGLo2KtJg/nCR4Q/prblr0O/6b1eV6ce5e15yt7/iGZNItRyeVNpm8DkqRtg3AKvrE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=t8CjGuwM; arc=fail smtp.client-ip=52.101.52.43
+	 MIME-Version:Content-Type; b=DsGlZAVev+XJnskPg3rvdX2Jq67kjVLHsIdEsBJZiSqln9zdQ/hkao61I6hmdaQ2vxvKpZm1Qn5Xzw8EdS/8HHO263b1tzgWcag5SZi5BtP/cZYBa5ZZRHeYpCSmUKBW7mnKJQsBXzYgm9B51zlvVmjOPOa2oxvtH3nOKAO7oDk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=atO/V2r4; arc=fail smtp.client-ip=40.107.209.61
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hjgfHrMd0SrmhD5kKKYXcCPG3pczJA/7CJLHBvk2xII45S3kl9KAHvgUrOcLTyByqiMFiRrcJUUigXUFmWTJS7ra7Z9U6TTMCs5rjG8Cly76UYU4po9oNp83lQbdKrqFnYCaFR4V/nTDWiJPVssJWAM43uCd4UyI4hWeMutVa+skjMCBNvxSCZc/1su/RhrK5jj4FF1fZF8USm12WD9RIVG0HpGDcaaBqv9tBhHgnWgUEC52G5CZiGSwlkbANnq0t1VEEZDnpBPo5vTwnWbN/jw3HooXlfkBw5y+P2p6/2Tecj6Uy/b0hNMhyAhzZ2HTqfJ1XX9WLVA0AM/ThBYLrw==
+ b=lzvojfJM/StfDs4vrcCTELrr2wZ4mnhlYWwOp17wEtiCDO0czwT/g0wgv1vWGrLYBM0jFOU70RrY0G/GUwjlzi9xpWH2X12p+c5Wf4f6o0B5nRXSgButQo6/fSHo23Bq/JXpb6CKCtDX5vD53rKKQJ7FOYNut4lBJhsuOYtryIszO94JKtNv+f52T725EagueUgE+nWvYrCFr6JgOlDrA+f739BUavf/H2VYa3QXGfrZ58Fof6yQ+OG87yo9SnPrSNOrBGQ2du6OOHEH7EHl+D58RrZwfxnlpE+AQS/IVWCelbx4KleIcpLCACHUi+A36W5qI2s79UUn41rlFEhE7g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VCRkgxWBcA+Bm4a1kg1jwe90f9Qdbgv4ZpVfg+PNiEo=;
- b=K8RueG4jNZRB/8egdLynLA1+69qtcA0jASYuNZwvE/7U2RvcO0ZsrAiW3yGG0u4IMbWFjUEZQsQtS7Hq3Cs/et1sc3Z86DlyynODkI382WFdk0NEZdNZA67dABLWAz03V1HYXG+v06W5fk4GTQFlgTbbC/fZp9pe/ba1ntgfLnH6wg0m7ayeVXCi776FdwmQZiIcc+cDZFJBZIcl/QS2umtdNx/HvK+O5CM71TR7bDjGxtI6SzFDx4DSa2lQ1CkrgUXYx5IVj0i5WWgoJm5dqu6VGfiwhbrbMPl+R2jGDzGtDZMel/0CM7mMMvh0hDQCUj0lTa1ZROt1MM9qhB0+Gg==
+ bh=fvIgL0kCtcPlgXfQClPHlYdaacIvlKPgTGUVTAxePio=;
+ b=l4npPiLnSorf5cTiVTCNl3zsvYuAk5zIKtVQSoVnj2Z/ZXswyqHMfyyf8z0xR12mfbiGdYC3pslgUkfi5yByqjUmj6VaQLu/RFJEiBpjhYFnYylxMq24tArPoSx+wKeU0q/+vvTFUnzcCNfdGbMm5X/w20sJwRRZJAyLPJ04h9MgjSk2DIaTyUSvc4x7c0dZt5Gwp8CwUMePBccVVEWL6eMSlirmvLxZ4meflJYu6oXMHnquepoTSjgZ8uA6UuhMPPEPV3x3fw96wNjM2gjYu18XlLShwF1r6cAks4Vtx4WChRQYZO8psNWBSBMBkO/xFSYW1YQTK6N7B7K3FhmDhg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -48,18 +48,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VCRkgxWBcA+Bm4a1kg1jwe90f9Qdbgv4ZpVfg+PNiEo=;
- b=t8CjGuwMERbG5bYZlcqQMEtxaZL/+BK711+SsMYC6lbofzc5Q6EEnf5NzCtDDs3usqwu2I5fF76uCkd8WiXlmqavvD9w4TheLmwd2tbMoc64fP0jBf3ADSIaY7t8P7n30Ud0FBsZbfkhDEt/GDnupEivUIDjlLAQxCv+sM7NVz23NCn6WvjjdZnG5zZJhOQ5WTQxOT9kXmFion13er6k26AOJ+m5xHw1XHW7wT6rEEBOR/M1CgR67aQJkFF2yt5eWdBLGtTMUyUCZ80X7r/ZvrlUFuyVpDqsHC1JNqYgfdcByX4ahTXyp9c7or9kH2Stmdd4Cpc7lBjbir14b5oyNw==
-Received: from PH7PR17CA0008.namprd17.prod.outlook.com (2603:10b6:510:324::8)
- by CH3PR12MB8188.namprd12.prod.outlook.com (2603:10b6:610:120::8) with
+ bh=fvIgL0kCtcPlgXfQClPHlYdaacIvlKPgTGUVTAxePio=;
+ b=atO/V2r4LAyTZ378xO1PdTkLZjDHeJNby8Ni43jaHboqXg+w0NvBzwvNyYo0wEehQEQGjR9C+35XmMed9dPI3crJ+zUXEf/qGVNw77azGyQHoKwq3SS6+YSEiAqRUT5N0IJVDKY5Vx8sfcsOEqm+rbY9kKSCHU8OoLuwPk91G+HYFqEH8Rj5EP6ermg6wVgAijC01m4+xCS437FubVkFMYSDPuovXveL5Y0rUK+Wx6W7iTxoiRLF3QXdutEj3Xh0bv8w+pgGLw9CdgMDacq4IYERoc4HAvdK0cb2tucYifHKPzWmg2PmjV+9QG4GojXJb9avG2MrbBlko1eqhIEPIA==
+Received: from DM6PR11CA0056.namprd11.prod.outlook.com (2603:10b6:5:14c::33)
+ by DS7PR12MB6335.namprd12.prod.outlook.com (2603:10b6:8:94::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.16; Wed, 29 Apr
- 2026 06:24:52 +0000
-Received: from CY4PEPF0000EE31.namprd05.prod.outlook.com
- (2603:10b6:510:324:cafe::b8) by PH7PR17CA0008.outlook.office365.com
- (2603:10b6:510:324::8) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.17; Wed, 29 Apr
+ 2026 06:24:55 +0000
+Received: from CY4PEPF0000EE36.namprd05.prod.outlook.com
+ (2603:10b6:5:14c:cafe::47) by DM6PR11CA0056.outlook.office365.com
+ (2603:10b6:5:14c::33) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9846.30 via Frontend Transport; Wed,
- 29 Apr 2026 06:24:52 +0000
+ 29 Apr 2026 06:24:55 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -67,17 +67,17 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- CY4PEPF0000EE31.mail.protection.outlook.com (10.167.242.37) with Microsoft
+ CY4PEPF0000EE36.mail.protection.outlook.com (10.167.242.42) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9846.18 via Frontend Transport; Wed, 29 Apr 2026 06:24:52 +0000
+ 15.20.9846.18 via Frontend Transport; Wed, 29 Apr 2026 06:24:55 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 28 Apr
- 2026 23:24:29 -0700
+ 2026 23:24:33 -0700
 Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.231.37) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Tue, 28 Apr 2026 23:24:25 -0700
+ 15.2.2562.20; Tue, 28 Apr 2026 23:24:29 -0700
 From: Danielle Ratson <danieller@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <razor@blackwall.org>, <idosch@nvidia.com>, <davem@davemloft.net>,
@@ -85,9 +85,9 @@ CC: <razor@blackwall.org>, <idosch@nvidia.com>, <davem@davemloft.net>,
 	<horms@kernel.org>, <shuah@kernel.org>, <bridge@lists.linux.dev>,
 	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>, "Danielle
  Ratson" <danieller@nvidia.com>
-Subject: [PATCH net-next 1/2] bridge: Do not suppress ARP probes and DAD NS unconditionally
-Date: Wed, 29 Apr 2026 09:24:04 +0300
-Message-ID: <20260429062405.1386417-2-danieller@nvidia.com>
+Subject: [PATCH net-next 2/2] selftests: net: Add tests for ARP probe and DAD NS handling
+Date: Wed, 29 Apr 2026 09:24:05 +0300
+Message-ID: <20260429062405.1386417-3-danieller@nvidia.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260429062405.1386417-1-danieller@nvidia.com>
 References: <20260429062405.1386417-1-danieller@nvidia.com>
@@ -103,31 +103,31 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE31:EE_|CH3PR12MB8188:EE_
-X-MS-Office365-Filtering-Correlation-Id: 58eca8fd-9670-4a1f-f040-08dea5b805c1
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE36:EE_|DS7PR12MB6335:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1a3b9dd3-cf08-4164-2fba-08dea5b807ca
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|7416014|82310400026|1800799024|376014|18002099003|56012099003|22082099003;
+	BCL:0;ARA:13230040|7416014|376014|36860700016|1800799024|82310400026|22082099003|18002099003|56012099003;
 X-Microsoft-Antispam-Message-Info:
-	VR0P+bpqUCdQzN3F2wcYECYALvElIUiUvgdWdTeaFg5i+qN/3mcZfZ7toKLTbyX9+gR+WDGQorh0leMgf+/E9wy0l287jukxxGK7eHl4RNHQqFAJdw8DjuEfuvEIMQZLzgLVewKShxH4Dh8tK4XTYewsVholBcFl1RoZzoqrRFJJUcCqS+CUkWGekxUrkgSERE7vmGbbXw7oFm1RGIloziS68SwFDTVmmix+lVc+BaiEpB+ZV1prWGOBj43LPvwO7Fmnp5kkcefNXtVAycck8NkPWoNwuSnBqkQzB0CKYUrvbf7UVD1QWaYJtuVCTNjpEBYCPBo4h+MPR7agrLyymWyF431iv7aYZfxGSQ4FhTU8aaWWrEyB6q1KpwLxltzfLiswu6mjxl2k00+OCTt+WSr0YCG5R0qKkjJEA7w98j7tMxpQ9zwZcdCm0XGIJW2JRNQhFD0R9eI/yKGsN2ljUeJvys3l9WXTP9/x5tFFxVwRZz/ezfxhRO3FqE52UWCM03A+tzMWTQaJ5Sh97436iZhWz2ZvfIc5pL6k5c11HIokUlH2beANNqvAjvk24LJ54Om22yBVEYqx8Ube9PvUl5L6/xG3wKLChx+EUH02hUahsTBVZ4Oot9x30XCEmz8r7iM8MN0K9QSSK2CvAMu5S+2sE+GaoNJ380yL91yF7mpi7o4+OlEZdHcqgKsbeSDOMN7HhZItt7OaH+gRvWeq5cUzhJ70di8VU6j6AyyWhm4Ovt8az8BoqZGN5DbeHKwyiNfsZs13DniffD5CIzZnbw==
+	dso11fgnQVl8ufeZUFmSqeM3Hi6TnYyYBpV+aOTU4aEfOT4WZ7/5hN+8AubsU88oJLjD+gVkts0tboxAM/tc7LtA6DByYAKrhgPrdZunV1r6KUlxjQ7aE0S8CMY7Wnf9aX3RiriEkaka94QE2OtcXoaYZIAss48dP3PUjKAcfIZrgmaSMEMHJVzvYbdATSQSu0GIrmKiHivNfL6iiMRLMQaoagA4Tub0//keDyXMbc39wqRKxdTbtnuGSsMGvNnLwt7UcFMjaCt+DAMBXJhmZnI+yHBt1zjF6w5NwPcdGh4GNLfsJ5ZsUQar2z+hbhdNsQsOMuZU8yMjjI353HPAUBWefmwrWyvwnhfKwp8cXlsoKQlUdqwz2xstoeXzLBFMBkqH6Ud+Hi6HCy8Y7SuSSrBkENc4BRnF+9L9W2vj18PbB5o+sNAN4tCiYn+xq6iwgaVn3qHBH/1s/mMMLyjpEosVGB9nrevGFfGHXTixMl/4xIynzYRYbpFaXil1iR3W8jUEA0Jt7nQS5cuwweNR0VzQLKripv3fxpNCXwfy+mb7oXU2grbQpZT6/jX6KShYaGqW5VDE+5Bm5enSDAMZA1i22Kct7EWYOh98Vyc5gkd78gdB5O43BVdUoUT01KrlA9kMCKNEu5ar8eqpdZbKyd9pO0FVsXiYA8KHWcIhHr6M1CKso0wdajoxGxzdCdxWnZyvU5gC3aIz4gMRSVVPbliF3Lh3cY2+cxRlfk/bPvPVoheeLtafG1ShyCUYnKmanX/795oTjuRoY4ys4ifOTg==
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(7416014)(82310400026)(1800799024)(376014)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(36860700016)(1800799024)(82310400026)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	p6ss/QRtwi0XFlig5vuLrSB4cXLtsdy8I0nGtUSUC2fEi0jBO5+B8b7bjQZwHud0xyX2q15rkqs2XfMI5M1z4qHi3wCZXw48EZ6FbOKTd5L+MFTNgKvQdygP07sZO/9Sj23cedkj6VbrNI0m7PMwX1hRvIFzLZCu2go0XCH9qUgNu57YDrainkCupzrN4vjyzMJ5r2O0W+NDy1I2ZgOHBixXK56N77d7daA55IDKTHzsVxaRCMb2jFwt6txxKKJwxVBdmhqQhct3bzSooiDBc0kUl1RDlxxOVwoW2e5YWWKA/2yfhPvMwuNcJQqRaACstPjodRNjqIAh27WcpFSbRjDsbRHx2WpO+6WdH93zpcbmVDti3vp4yf/cqnutX0jfVyaK+M8LwXOXeZ0k32Dnjp3uIPkr3yXmjl5nxPs58QrweGUwr1ZYX2bHYaXtTMY+
+	J62fT8jfe5CNLzdfh2bTccdluVwh986oEveDl9kh7DQR78Bw0F1PwMZb7JwZtOKBw8aPu/wiXB7TdQIj3AGcyCMrk/eONERo5gPsHNCsAelU9GKwiWTNO/JrCOim/m03DEX4cYbaAXjD7dppu4qBvgz1F2GmiZR3DB9A7N/xBxDlMw3ulzuB8ReU1DX86wL/BxynaW8+w0rVp6XVTzVumNo7bda04/KEWYTOStNMzTAN4lw8qAbOsYeAP+QN1gULmx7QR1b+62GOFrdb1yCHHyksFP4HNSv1Y/RE2++ONiTUjSXMGYpksHeURs1EH9niA8DLi83w8gL4Z/CS6ncB9etT/nBtdtz1D7wuY/geOO7Ui3CZ99wqBHjswMr1/js7jtaBUEBs7VOJ14wFQDpio7AJi5aisoLxy0s0AWtKs49KcbD36A8koxdp05oSGTht
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2026 06:24:52.0927
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2026 06:24:55.5116
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 58eca8fd-9670-4a1f-f040-08dea5b805c1
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1a3b9dd3-cf08-4164-2fba-08dea5b807ca
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE31.namprd05.prod.outlook.com
+	CY4PEPF0000EE36.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8188
-X-Rspamd-Queue-Id: F269E48FBB9
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6335
+X-Rspamd-Queue-Id: 4C54748FBDE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.34 / 15.00];
@@ -136,14 +136,14 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
 	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282240-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-282241-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -151,111 +151,247 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[danieller@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[Nvidia.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,nvidia.com:email,Nvidia.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:mid,nvidia.com:email];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[8]
 
-When neighbor suppression is enabled on a VXLAN port, the bridge is
-expected to reply to ARP/NS messages on behalf of remote hosts when both
-FDB and neighbor entries exist. This allows the bridge to suppress
-flooding of these messages to the VXLAN overlay.
+Add test cases to verify that ARP probes and DAD Neighbor Solicitations
+are handled correctly by the bridge neighbor suppression feature.
 
-According to RFC 9161 ("Operational Aspects of Proxy ARP/ND in Ethernet
-Virtual Private Networks"):
-"A PE SHOULD reply to broadcast/multicast address resolution messages,
-i.e., ARP Requests, ARP probes, NS messages, as well as DAD NS messages.
-An ARP probe is an ARP Request constructed with an all-zero sender IP
-address that may be used by hosts for IPv4 Address Conflict Detection as
-specified in [RFC5227]".
+When neighbor suppression is enabled on a bridge VXLAN port, the bridge
+should reply to ARP/NS messages on behalf of remote hosts when both FDB
+and neighbor entries exist, and the answer is known. However, when
+either the FDB or the neighbor exists, ARP probes / DAD NS should be
+treated like regular ARP requests / NS and flood to VXLAN.
 
-However, the current implementation unconditionally suppresses ARP probes
-and DAD Neighbor Solicitations, which breaks Duplicate Address Detection
-(DAD) over EVPN.
+Add two new test functions:
 
-For DAD to work correctly over the VXLAN fabric:
-- When the bridge does not know the answer:
-  flood the probe/DAD packet to allow remote VTEPs to respond.
-- When the bridge knows the answer:
-  reply to indicate the address is in use.
+neigh_suppress_arp_probe(): Tests ARP probe handling by triggering
+duplicate address detection using arping -D. Verifies that probes are
+flooded when the bridge doesn't know the answer, and suppressed when FDB
+and neighbor entries exist.
 
-Fix by adjusting the early suppression checks to exclude ARP probes and
-DAD NS from unconditional suppression.
+neigh_suppress_dad_ns(): Tests DAD NS handling by constructing DAD NS
+packets using mausezahn and verifies correct flooding/suppression
+behavior.
 
-When replying to a DAD NS, br_nd_send() is adjusted to set the NA
-destination to the all-nodes multicast address (ff02::1) and clear the
-Solicited flag, in accordance with RFC 4861 section 7.2.4.
+Before the previous patch:
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+$ ./test_bridge_neigh_suppress.sh -t "neigh_suppress_arp_probe neigh_suppress_dad_ns"
+
+Per-port ARP probe suppression
+------------------------------
+TEST: ARP probe suppression                                         [ OK ]
+TEST: "neigh_suppress" is on                                        [ OK ]
+TEST: ARP probe suppression                                         [FAIL]
+TEST: FDB and neighbor entry installation                           [ OK ]
+TEST: arping                                                        [FAIL]
+TEST: ARP probe suppression                                         [FAIL]
+TEST: neighbor removal                                              [ OK ]
+TEST: ARP probe suppression                                         [FAIL]
+TEST: "neigh_suppress" is off                                       [ OK ]
+TEST: ARP probe suppression                                         [FAIL]
+
+Per-port DAD NS suppression
+---------------------------
+TEST: DAD NS suppression                                            [ OK ]
+TEST: "neigh_suppress" is on                                        [ OK ]
+TEST: DAD NS suppression                                            [FAIL]
+TEST: FDB and neighbor entry installation                           [ OK ]
+TEST: DAD NS suppression                                            [FAIL]
+TEST: neighbor removal                                              [ OK ]
+TEST: DAD NS suppression                                            [FAIL]
+TEST: DAD NS proxy NA reply                                         [FAIL]
+TEST: "neigh_suppress" is off                                       [ OK ]
+TEST: DAD NS suppression                                            [FAIL]
+
+Tests passed:   10
+Tests failed:   10
+
+After the previous patch:
+
+$ ./test_bridge_neigh_suppress.sh -t "neigh_suppress_arp_probe neigh_suppress_dad_ns"
+
+Per-port ARP probe suppression
+------------------------------
+TEST: ARP probe suppression                                         [ OK ]
+TEST: "neigh_suppress" is on                                        [ OK ]
+TEST: ARP probe suppression                                         [ OK ]
+TEST: FDB and neighbor entry installation                           [ OK ]
+TEST: arping                                                        [ OK ]
+TEST: ARP probe suppression                                         [ OK ]
+TEST: neighbor removal                                              [ OK ]
+TEST: ARP probe suppression                                         [ OK ]
+TEST: "neigh_suppress" is off                                       [ OK ]
+TEST: ARP probe suppression                                         [ OK ]
+
+Per-port DAD NS suppression
+---------------------------
+TEST: DAD NS suppression                                            [ OK ]
+TEST: "neigh_suppress" is on                                        [ OK ]
+TEST: DAD NS suppression                                            [ OK ]
+TEST: FDB and neighbor entry installation                           [ OK ]
+TEST: DAD NS suppression                                            [ OK ]
+TEST: neighbor removal                                              [ OK ]
+TEST: DAD NS suppression                                            [ OK ]
+TEST: DAD NS proxy NA reply                                         [ OK ]
+TEST: "neigh_suppress" is off                                       [ OK ]
+TEST: DAD NS suppression                                            [ OK ]
+
+Tests passed:  20
+Tests failed:   0
+
 Signed-off-by: Danielle Ratson <danieller@nvidia.com>
 ---
- net/bridge/br_arp_nd_proxy.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ .../net/test_bridge_neigh_suppress.sh         | 126 ++++++++++++++++++
+ 1 file changed, 126 insertions(+)
 
-diff --git a/net/bridge/br_arp_nd_proxy.c b/net/bridge/br_arp_nd_proxy.c
-index deb1ab1f24b0..3205346f298c 100644
---- a/net/bridge/br_arp_nd_proxy.c
-+++ b/net/bridge/br_arp_nd_proxy.c
-@@ -164,7 +164,7 @@ void br_do_proxy_suppress_arp(struct sk_buff *skb, struct net_bridge *br,
- 			return;
- 		if (parp->ar_op != htons(ARPOP_RREQUEST) &&
- 		    parp->ar_op != htons(ARPOP_RREPLY) &&
--		    (ipv4_is_zeronet(sip) || sip == tip)) {
-+		    sip == tip) {
- 			/* prevent flooding to neigh suppress ports */
- 			BR_INPUT_SKB_CB(skb)->proxyarp_replied = 1;
- 			return;
-@@ -262,6 +262,7 @@ static void br_nd_send(struct net_bridge *br, struct net_bridge_port *p,
- 	int ns_olen;
- 	int i, len;
- 	u8 *daddr;
-+	bool dad;
- 	u16 pvid;
+diff --git a/tools/testing/selftests/net/test_bridge_neigh_suppress.sh b/tools/testing/selftests/net/test_bridge_neigh_suppress.sh
+index 9067197c9055..4bc92078e173 100755
+--- a/tools/testing/selftests/net/test_bridge_neigh_suppress.sh
++++ b/tools/testing/selftests/net/test_bridge_neigh_suppress.sh
+@@ -56,6 +56,8 @@ TESTS="
+ 	neigh_suppress_uc_ns
+ 	neigh_vlan_suppress_arp
+ 	neigh_vlan_suppress_ns
++	neigh_suppress_arp_probe
++	neigh_suppress_dad_ns
+ "
+ VERBOSE=0
+ PAUSE_ON_FAIL=no
+@@ -875,6 +877,130 @@ neigh_vlan_suppress_ns()
+ 	log_test $? 0 "NS suppression (VLAN $vid2)"
+ }
  
- 	if (!dev || skb_linearize(request))
-@@ -300,8 +301,13 @@ static void br_nd_send(struct net_bridge *br, struct net_bridge_port *p,
- 		}
- 	}
- 
-+	dad = ipv6_addr_any(&ipv6_hdr(request)->saddr);
++neigh_suppress_arp_probe()
++{
++	local vid=10
++	local tip=192.0.2.2
++	local h2_mac
 +
- 	/* Ethernet header */
--	ether_addr_copy(eth_hdr(reply)->h_dest, daddr);
-+	if (dad)
-+		ipv6_eth_mc_map(&in6addr_linklocal_allnodes, eth_hdr(reply)->h_dest);
-+	else
-+		ether_addr_copy(eth_hdr(reply)->h_dest, daddr);
- 	ether_addr_copy(eth_hdr(reply)->h_source, n->ha);
- 	eth_hdr(reply)->h_proto = htons(ETH_P_IPV6);
- 	reply->protocol = htons(ETH_P_IPV6);
-@@ -317,7 +323,7 @@ static void br_nd_send(struct net_bridge *br, struct net_bridge_port *p,
- 	pip6->priority = ipv6_hdr(request)->priority;
- 	pip6->nexthdr = IPPROTO_ICMPV6;
- 	pip6->hop_limit = 255;
--	pip6->daddr = ipv6_hdr(request)->saddr;
-+	pip6->daddr = dad ? in6addr_linklocal_allnodes : ipv6_hdr(request)->saddr;
- 	pip6->saddr = *(struct in6_addr *)n->primary_key;
++	echo
++	echo "Per-port ARP probe suppression"
++	echo "------------------------------"
++
++	run_cmd "tc -n $sw1 qdisc replace dev vx0 clsact"
++	run_cmd "tc -n $sw1 filter replace dev vx0 egress pref 1 handle 101 proto 0x0806 flower indev swp1 arp_tip $tip arp_sip 0.0.0.0 arp_op request action pass"
++
++	# Initial state - check that ARP probes are not suppressed.
++	run_cmd "ip netns exec $h1 arping -D -q -c 1 -w 5 -I eth0.$vid $tip"
++	tc_check_packets "$sw1" "dev vx0 egress" 101 1
++	log_test $? 0 "ARP probe suppression"
++
++	# Enable neighbor suppression and check that nothing changes.
++	run_cmd "bridge -n $sw1 link set dev vx0 neigh_suppress on"
++	run_cmd "bridge -n $sw1 -d link show dev vx0 | grep \"neigh_suppress on\""
++	log_test $? 0 "\"neigh_suppress\" is on"
++
++	run_cmd "ip netns exec $h1 arping -D -q -c 1 -w 5 -I eth0.$vid $tip"
++	tc_check_packets "$sw1" "dev vx0 egress" 101 2
++	log_test $? 0 "ARP probe suppression"
++
++	# Install FDB and a neighbor and check that ARP probes are suppressed.
++	h2_mac=$(ip -n "$h2" -j -p link show eth0."$vid" | jq -r '.[]["address"]')
++	run_cmd "bridge -n $sw1 fdb replace $h2_mac dev vx0 master static vlan $vid"
++	run_cmd "ip -n $sw1 neigh replace $tip lladdr $h2_mac nud permanent dev br0.$vid"
++	log_test $? 0 "FDB and neighbor entry installation"
++
++	run_cmd "ip netns exec $h1 arping -D -q -c 1 -w 5 -I eth0.$vid $tip"
++	log_test $? 1 "arping"
++	tc_check_packets "$sw1" "dev vx0 egress" 101 2
++	log_test $? 0 "ARP probe suppression"
++
++	# Remove the neighbor entry and check that ARP probes are not suppressed.
++	run_cmd "ip -n $sw1 neigh del $tip dev br0.$vid"
++	log_test $? 0 "neighbor removal"
++
++	run_cmd "ip netns exec $h1 arping -D -q -c 1 -w 5 -I eth0.$vid $tip"
++	tc_check_packets "$sw1" "dev vx0 egress" 101 3
++	log_test $? 0 "ARP probe suppression"
++
++	# Disable neighbor suppression.
++	run_cmd "bridge -n $sw1 link set dev vx0 neigh_suppress off"
++	run_cmd "bridge -n $sw1 -d link show dev vx0 | grep \"neigh_suppress off\""
++	log_test $? 0 "\"neigh_suppress\" is off"
++
++	run_cmd "ip netns exec $h1 arping -D -q -c 1 -w 5 -I eth0.$vid $tip"
++	tc_check_packets "$sw1" "dev vx0 egress" 101 4
++	log_test $? 0 "ARP probe suppression"
++}
++
++neigh_suppress_dad_ns()
++{
++	local vid=10
++	local tip=2001:db8:1::99
++	local mcast=ff02::1:ff00:99
++	local dmac=33:33:ff:00:00:99
++	local full_tip=20:01:0d:b8:00:01:00:00:00:00:00:00:00:00:00:99
++	local csum="4b:bc"
++	local smac
++	local tmac
++
++	echo
++	echo "Per-port DAD NS suppression"
++	echo "---------------------------"
++
++	smac=$(ip -n "$h1" -j -p link show eth0."$vid" | jq -r '.[]["address"]')
++
++	run_cmd "tc -n $sw1 qdisc replace dev vx0 clsact"
++	run_cmd "tc -n $sw1 filter replace dev vx0 egress pref 1 handle 101 proto ipv6 flower indev swp1 ip_proto icmpv6 dst_ip $mcast src_ip :: type 135 code 0 action pass"
++
++	# Initial state - check that DAD NS are not suppressed.
++	run_cmd "ip netns exec $h1 mausezahn -6 eth0.$vid -c 1 -a $smac -b $dmac -A :: -B $mcast -t ip hop=255,next=58,payload=$(icmpv6_header_get "$csum" "$full_tip") -q"
++	tc_check_packets "$sw1" "dev vx0 egress" 101 1
++	log_test $? 0 "DAD NS suppression"
++
++	# Enable neighbor suppression and check that nothing changes.
++	run_cmd "bridge -n $sw1 link set dev vx0 neigh_suppress on"
++	run_cmd "bridge -n $sw1 -d link show dev vx0 | grep \"neigh_suppress on\""
++	log_test $? 0 "\"neigh_suppress\" is on"
++
++	run_cmd "ip netns exec $h1 mausezahn -6 eth0.$vid -c 1 -a $smac -b $dmac -A :: -B $mcast -t ip hop=255,next=58,payload=$(icmpv6_header_get "$csum" "$full_tip") -q"
++	tc_check_packets "$sw1" "dev vx0 egress" 101 2
++	log_test $? 0 "DAD NS suppression"
++
++	# Install FDB and a neighbor and check that DAD NS are suppressed
++	# and that a proxy NA is sent back to h1.
++	tmac=$(ip -n "$h2" -j -p link show eth0."$vid" | jq -r '.[]["address"]')
++	run_cmd "bridge -n $sw1 fdb replace $tmac dev vx0 master static vlan $vid"
++	run_cmd "ip -n $sw1 -6 neigh replace $tip lladdr $tmac nud permanent dev br0.$vid"
++	log_test $? 0 "FDB and neighbor entry installation"
++
++	run_cmd "tc -n $h1 qdisc replace dev eth0.$vid clsact"
++	run_cmd "tc -n $h1 filter replace dev eth0.$vid ingress pref 1 handle 101 proto ipv6 flower ip_proto icmpv6 dst_ip ff02::1 src_ip $tip type 136 code 0 action pass"
++
++	run_cmd "ip netns exec $h1 mausezahn -6 eth0.$vid -c 1 -a $smac -b $dmac -A :: -B $mcast -t ip hop=255,next=58,payload=$(icmpv6_header_get "$csum" "$full_tip") -q"
++	tc_check_packets "$sw1" "dev vx0 egress" 101 2
++	log_test $? 0 "DAD NS suppression"
++	tc_check_packets "$h1" "dev eth0.$vid ingress" 101 1
++	log_test $? 0 "DAD NS proxy NA reply"
++
++	# Remove the neighbor entry and check that DAD NS are not suppressed.
++	run_cmd "ip -n $sw1 -6 neigh del $tip dev br0.$vid"
++	log_test $? 0 "neighbor removal"
++
++	run_cmd "ip netns exec $h1 mausezahn -6 eth0.$vid -c 1 -a $smac -b $dmac -A :: -B $mcast -t ip hop=255,next=58,payload=$(icmpv6_header_get "$csum" "$full_tip") -q"
++	tc_check_packets "$sw1" "dev vx0 egress" 101 3
++	log_test $? 0 "DAD NS suppression"
++
++	# Disable neighbor suppression.
++	run_cmd "bridge -n $sw1 link set dev vx0 neigh_suppress off"
++	run_cmd "bridge -n $sw1 -d link show dev vx0 | grep \"neigh_suppress off\""
++	log_test $? 0 "\"neigh_suppress\" is off"
++
++	run_cmd "ip netns exec $h1 mausezahn -6 eth0.$vid -c 1 -a $smac -b $dmac -A :: -B $mcast -t ip hop=255,next=58,payload=$(icmpv6_header_get "$csum" "$full_tip") -q"
++	tc_check_packets "$sw1" "dev vx0 egress" 101 4
++	log_test $? 0 "DAD NS suppression"
++}
++
+ ################################################################################
+ # Usage
  
- 	skb_pull(reply, sizeof(struct ipv6hdr));
-@@ -330,7 +336,7 @@ static void br_nd_send(struct net_bridge *br, struct net_bridge_port *p,
- 	na->icmph.icmp6_type = NDISC_NEIGHBOUR_ADVERTISEMENT;
- 	na->icmph.icmp6_router = (n->flags & NTF_ROUTER) ? 1 : 0;
- 	na->icmph.icmp6_override = 1;
--	na->icmph.icmp6_solicited = 1;
-+	na->icmph.icmp6_solicited = dad ? 0 : 1;
- 	na->target = ns->target;
- 	ether_addr_copy(&na->opt[2], n->ha);
- 	na->opt[0] = ND_OPT_TARGET_LL_ADDR;
-@@ -435,7 +441,7 @@ void br_do_suppress_nd(struct sk_buff *skb, struct net_bridge *br,
- 	saddr = &iphdr->saddr;
- 	daddr = &iphdr->daddr;
- 
--	if (ipv6_addr_any(saddr) || !ipv6_addr_cmp(saddr, daddr)) {
-+	if (!ipv6_addr_cmp(saddr, daddr)) {
- 		/* prevent flooding to neigh suppress ports */
- 		BR_INPUT_SKB_CB(skb)->proxyarp_replied = 1;
- 		return;
 -- 
 2.51.0
 
