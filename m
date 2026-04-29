@@ -1,175 +1,192 @@
-Return-Path: <netdev+bounces-282514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282515-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EEYxMgx+8mmmrwEAu9opvQ
-	(envelope-from <netdev+bounces-282514-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:54:20 +0200
+	id uM4QLFx/8mnarwEAu9opvQ
+	(envelope-from <netdev+bounces-282515-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:59:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A34949ABD3
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:54:20 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D67149AC19
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:59:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2C303301C90A
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 21:54:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 40ED4300A514
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 21:59:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 871D1379EEC;
-	Wed, 29 Apr 2026 21:54:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC18A396D06;
+	Wed, 29 Apr 2026 21:59:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P67qq8Cr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D50oExMl";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="aHxS8Rcc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6356E2749D6;
-	Wed, 29 Apr 2026 21:54:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777499656; cv=none; b=Mn9uyrii4e3KYQCmXdKcWeuO0toSPXvzA8aiPA2ZpOHqR2LUYUk3CM7gTyB48dZ9Yv4XIsLcTSxONPP0tjJYjUz9PLZtCJNLfA4OvEgWQYlo2/wrHOL2VIxaluU4sA33M+9y91Ku1T124/ASPRuDSV1pZc9iH27ayGID2DLf/C4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777499656; c=relaxed/simple;
-	bh=bsaeh1g7HsSHpY8faUX1qXJdUYghqfwLHKYIHWf7EhA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=EbLTCUi/6opObFDyh6mfxGYQdm4QJq4AZi3/Qfe0r9eIenBDZsSxgVdiQe/il6wSSA7a8MEad9/94e+FHESqp1+XVXgthCl+wyNFC4FOn7u/atGRmnUOVsVEIV8WftJyLkXV6UYwcgFbsQOfTQWpOYrx5tlJgr1RGBRTuNp/fh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P67qq8Cr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 09690C19425;
-	Wed, 29 Apr 2026 21:54:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777499656;
-	bh=bsaeh1g7HsSHpY8faUX1qXJdUYghqfwLHKYIHWf7EhA=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=P67qq8CrNASOVlJ/IGZeYFRD7MfpmPmUHDvighV+JwPHW4rWMvinatqhvKAxE3cIy
-	 fJa2aL2a8xRM1dHyDecb5AHOKX5RD3s/9zkl5o1xCY++1Y/J2icOw42ZlfmMVOjP4j
-	 3nwRXv+nd1osYWRey5EdFDSZstGJVUUW2Zg0Mpfgox7Jx2o8Lvk/pRRMPYdZ2SKw7I
-	 noiqzd/ODc3mAaMrueClHL1eVepnz5K8cxmX9yWE49qfCLdr4KkCrEnNy8DEtKH9N6
-	 lUyX84yPEfQeVL5L99Ix3xC7tGKg1yTsVdxzDvbcf2H7bnktKVmvLrxbks1o2OG9hx
-	 60GRrNI/tMrcw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA6CFFF887E;
-	Wed, 29 Apr 2026 21:54:15 +0000 (UTC)
-From: Gregory Fuchedgi via B4 Relay <devnull+gfuchedgi.gmail.com@kernel.org>
-Date: Wed, 29 Apr 2026 14:54:14 -0700
-Subject: [PATCH] amd-xgbe: fix PTP addend overflow causing frozen clock
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73BD5387375
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 21:59:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777499990; cv=pass; b=VQ89TEaRmLn5lduoiU722p4S/RvEUtw2RP9YCwxOwTDYZVLzKcgMxMxOl1fec4GIm2e9xWHou8G41UDpuN8W/bqUR/31T6JRTgYs5dVuHubaYfQ1CxWnvOS7c54PPP30uqyC5E2EZnnNt2F32mQRR6e4Aqe9zpyj3/X366TXGIw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777499990; c=relaxed/simple;
+	bh=ckU6BlywLCQn1zkVJ+Ykqm5HURqPnfgSidoz4ywj2cE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=j7f6BisxrXNFnnGPIjmFmLVQPv6m95kwqTFqYoB3yb9E3U/jFi8aIecHztIGgDT4Tr62L4M+6NuHxw8BFlZjl23/CEsaqRLJGk9ljYupDmV55Jz6fFXUq6ZH2l2UAzlB3u5zQDu4km0M1qEpAA0K7fsaHevEAbQgpUE0kRWi8zs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D50oExMl; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=aHxS8Rcc; arc=pass smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777499988;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ckU6BlywLCQn1zkVJ+Ykqm5HURqPnfgSidoz4ywj2cE=;
+	b=D50oExMlXNjD8PfiiUiER9KwcqFoEs88kmbvwTgAGSLN95kk1uwwOEQmoW6O4kHPTW7dhi
+	HFIYfSYFvnwec7V8uUmrVXeyacwbfWytuMT1CNASgLJ0WV9VaZp3SEJwE17kk71EYPl6DS
+	H1g2txp5+2DSZfHqRxQaGNqE8lnjc1g=
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
+ [209.85.167.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-151-R6GMHDNANMaP-qFA3_ACUw-1; Wed, 29 Apr 2026 17:59:47 -0400
+X-MC-Unique: R6GMHDNANMaP-qFA3_ACUw-1
+X-Mimecast-MFC-AGG-ID: R6GMHDNANMaP-qFA3_ACUw_1777499986
+Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-4728b95f695so76163b6e.0
+        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 14:59:47 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777499986; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Uz23tg8s6l2j5OqejnzwwC7U/cHYvWes0Lezni3l2S97PJ8QrBxEMkA8xf8Fkxiyfk
+         jjiMcbgOAg/ggjlEP2yWVFyJG7d7QI4ZP/bhXhpmiZA1c+3iO62HfmgcuLUlCFpPCCVk
+         0FKgicpQ37YzE6aeG1CQfN9UJbkXuhuJDw3DT5KT0NBfmQXhvoUm3QqSTRCSHhyCQYat
+         JI9bjw05vm6J+2xFgAWIvGETDxtxfdMQwo4Bfxj+hFbLQELS9atLHFFr4IKYNWa0bh4u
+         cBXtUXsoPnPQcGtZdq1jbKtNh3VnjInL0+IOdA2qGIX64bBTxSUzGHPnKG2lV/TzCszN
+         XBXg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ckU6BlywLCQn1zkVJ+Ykqm5HURqPnfgSidoz4ywj2cE=;
+        fh=hNHI46qM68lLxOuNpM7iE9QJX6tCK8rhx6y4+WNDFVk=;
+        b=NJdgrwTR7kEJWpodXiwsFo8Jw4zWFW96u29VAXNFRbr3hsSlKz8dhQoiLofCDWLGak
+         11QK3PUwbOfndZzgSC3jxAL7CrgjiydwmyAv6SZcARJfbaJg+ocdWOGUw2/SgxXMfxki
+         uc+FdCNVldsHXVZyU2dTac18WKR+MGXSzOyqw04KLt2pPsaL0Vcj89G9CLuD0L/Pydep
+         DLtL2vh2Th78LkZMJVADGTSLmM4fsK77RCigNKuA/SxTR2S1nCMlAoJGGvuvk0JB6apj
+         F418j+KXTvcciCNckiB1vITyExag9Fmnm4B8ItIm9KUxpRiF2368hIjlqeuow6N7whMo
+         Bw7Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1777499986; x=1778104786; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ckU6BlywLCQn1zkVJ+Ykqm5HURqPnfgSidoz4ywj2cE=;
+        b=aHxS8RccDr40zDLBHIAIedRtmmustF5d0uRSUdWCzlLhZeT8B3izI+d8TB6vmisNVJ
+         9CoB44zF/jddyFHlUnA2WK7qMQsGAPf/n/8797tr/q+2mjcURyXRT4rirPLS0b2NDSpr
+         HGrX2iGfoNX1snbd3gF8klhdbP2hDq1QL+evcG+Lw0ZpWzhBOl1Eb3ESuwlgGW+k28Ds
+         gj3ZZmFS6xMlFEHPx2R42t2cX1W/S7ZZWtZqvQKFtlX+v/amGMkhzWk76ReTOzRkiSuO
+         aIzKMMfRkT+cXvDKaSYPFM8Q6dVeAAGPWUovYTQlliugkLuuRDzKD0bvShoHW7FDS5uK
+         8AQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777499986; x=1778104786;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ckU6BlywLCQn1zkVJ+Ykqm5HURqPnfgSidoz4ywj2cE=;
+        b=UZBQWgJaNbjhLelCox0A5OBuIZUlFgNvAQuhZmz4aBCsNOK5yIGwl0PguJRLWkdXXm
+         3FPYX2jV5KF3+YGag30x97brSkoCpfJQryqmJbCiXcEVs0DbXHCfnBwAu+A9BiMgTpHX
+         Yvtt7QFh/r9/hVDqJJzX8Q2l872cSJHdLSam9u9dhDxG9en0t8eJbN22ulZg3r4z70XB
+         JKue1SrvJEbb0jW/CM7V9O7M1gEwA9kMsmrTIbIzKa4tZk13Q4DYvIcrC1zHJC1SDXNm
+         bbZkBXUDZGP6XQ8Q+7+npWCOWnzxqWm6iWdv1kgi7ryd2qGksjQCcClKYOG3DIkpg0W2
+         ZFPg==
+X-Forwarded-Encrypted: i=1; AFNElJ83wmWUEeTphEilt4CaQXf2BZFVQ5cdiWHr0sUP/aXGU13qanjx7o/bCe+3ntOxzXS6F1Dgtjw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpMCcuBB+s5yhzZCvIjHcApIakSUG2tkyT/6gitokZ2eNBnBmF
+	q6r23TIKKh2AVmHrk3Xz7BF0fFF6KPVNuVtRp7yO0LVss1Tr8KBKDozSyv5mm39uRCxqo7a9u/d
+	xgQMeSs8U8fER+UN+EWR4eZ+RkVoaMbqcz3DYTsdTlqTGkV4sLqDqmcOLo+/eBQ5DsqvYuG2eM2
+	nXb/Hby1T7nJpQDhvxL7rEv/o8uNfzOPlH
+X-Gm-Gg: AeBDietRKZUk7SrHd/OkmIpEnMj2lYUt582+byTaBcFI4uFlwZWQ5i54VgcOc9xhbgU
+	M4eR2YY3aS0twUzG9nIKa5F3k1l8J5XwfRsjTJ0lkqTuHwJfAuon2+2VRICfGUOsW7GMVo/AJH9
+	P5KbVu9GumeQx/+dcISoAeGeonTetowf18G8DoKucq59nlPKJJ9KssT0iCAUT+nbMPohro7E9k4
+	VAwdWwO9qqFrkWC
+X-Received: by 2002:a05:6870:312a:b0:41c:9f58:baa4 with SMTP id 586e51a60fabf-43433778db8mr193024fac.1.1777499986247;
+        Wed, 29 Apr 2026 14:59:46 -0700 (PDT)
+X-Received: by 2002:a05:6870:312a:b0:41c:9f58:baa4 with SMTP id
+ 586e51a60fabf-43433778db8mr193014fac.1.1777499985793; Wed, 29 Apr 2026
+ 14:59:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260429-fix-xgbe-ptp-addend-v1-1-fca5b0ca5e62@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAAV+8mkC/x2MQQqAMAzAviI9W9AiU/yKeHBrnb3MsYkIsr87P
- AaSvJAlqWSYmxeS3Jr1DBX6tgF3bMELKlcG6sh0A02464OPt4LxirgxS2B0zva8GxoNEdQyJqn
- af13WUj5Pv04MZQAAAA==
-To: Raju Rangoju <Raju.Rangoju@amd.com>, 
- Prashanth Kumar K R <PrashanthKumar.K.R@amd.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Richard Cochran <richardcochran@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Gregory Fuchedgi <gfuchedgi@gmail.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1777499655; l=2038;
- i=gfuchedgi@gmail.com; s=20250811; h=from:subject:message-id;
- bh=Cw28xQLOHUHtos1dic3d/FADE55TTbWnyZfMkX9S3cY=;
- b=2iJIHjvr4n+p0miuEdP5oBsAcJJ7E1suy1Np1mk0fMWu8OgBrHPkKGWiIbuPZbGQyBsxafxs9
- RedEe1CdjBlDAaLlrHQs+QG5qNwfNuHHt6DidbU9v0WFAbmQFq80VQF
-X-Developer-Key: i=gfuchedgi@gmail.com; a=ed25519;
- pk=J3o48+1a2mUIebH8K4S3SPuR5bmamUvjlsf8onoIccA=
-X-Endpoint-Received: by B4 Relay for gfuchedgi@gmail.com/20250811 with
- auth_id=484
-X-Original-From: Gregory Fuchedgi <gfuchedgi@gmail.com>
-Reply-To: gfuchedgi@gmail.com
-X-Rspamd-Queue-Id: 4A34949ABD3
+References: <20260427151827.43342-1-mschmidt@redhat.com> <2106884f-6914-437f-84eb-262581b9fef7@intel.com>
+In-Reply-To: <2106884f-6914-437f-84eb-262581b9fef7@intel.com>
+From: Michal Schmidt <mschmidt@redhat.com>
+Date: Wed, 29 Apr 2026 23:59:33 +0200
+X-Gm-Features: AVHnY4K7QDn2acJZ0UOfycvXxeY_tNPK4c07I89nHPRJ7kapJLnnMkA3FK5a2Bs
+Message-ID: <CADEbmW0BsQsu1pPX=kk58tTz_5EArjCKgmp_MKxRFcuvb3TDGg@mail.gmail.com>
+Subject: Re: [PATCH net] ice: fix stats array overflow when VF requests more queues
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jacob Keller <jacob.e.keller@intel.com>, Petr Oros <poros@redhat.com>, 
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 1D67149AC19
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	FREEMAIL_REPLYTO_NEQ_FROM(2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282514-lists,netdev=lfdr.de,gfuchedgi.gmail.com];
+	TAGGED_FROM(0.00)[bounces-282515-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[amd.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_REPLYTO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	HAS_REPLYTO(0.00)[gfuchedgi@gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-0.982];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mschmidt@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid]
 
-From: Gregory Fuchedgi <gfuchedgi@gmail.com>
+On Tue, Apr 28, 2026 at 4:00=E2=80=AFPM Przemek Kitszel
+<przemyslaw.kitszel@intel.com> wrote:
+> On 4/27/26 17:18, Michal Schmidt wrote:
+> > When a VF increases its queue count via VIRTCHNL_OP_REQUEST_QUEUES,
+> > ice_vc_request_qs_msg() sets vf->num_req_qs and triggers a VF reset.
+> > The reset calls ice_vf_reconfig_vsi(), which does ice_vsi_decfg()
+> > followed by ice_vsi_cfg(). ice_vsi_decfg() does not free the per-ring
+> > stats arrays. Inside ice_vsi_cfg_def(), ice_vsi_set_num_qs() updates
+> > alloc_txq/alloc_rxq to the new larger value, but
+> > ice_vsi_alloc_stat_arrays() returns early because the stats already
+> > exist. ice_vsi_alloc_ring_stats() then iterates using the new larger
+> > alloc_txq and writes beyond the bounds of the old, smaller
+> > tx_ring_stats/rx_ring_stats pointer arrays, corrupting adjacent SLUB
+> > metadata.
+> >
+>
+> thank you for reproducing the bug, it is exactly the situation that
+> I was facing
+> have you tried with my proposed (unfortunately not public yet) fix
+> to just combine ice_vsi_alloc_stat_arrays() and
+> ice_vsi_realloc_stat_arrays() into one function?
 
-XGBE_PTP_ACT_CLK_FREQ and XGBE_V2_PTP_ACT_CLK_FREQ were 10x too
-large (500MHz/1GHz instead of 50MHz/100MHz), causing the computed
-addend to overflow the 32-bit tstamp_addend. In the general case
-this would result in the clock advancing at the wrong rate. For v2
-(PCI), ptpclk_rate is hardcoded to 125MHz, so the addend formula
-(ACT_CLK_FREQ << 32) / ptpclk_rate yields exactly 8 * 2^32, and
-when stored to the 32-bit tstamp_addend the value is zero. With
-addend = 0 the hardware accumulator never overflows and the PTP
-clock is fully stopped. For v1 (platform), ptpclk_rate is read from
-ACPI/DT so the exact overflow behavior depends on the
-firmware-reported frequency.
-
-Define the constants as NSEC_PER_SEC / SSINC so the relationship is
-explicit and cannot drift out of sync.
-
-Fixes: fbd47be098b5 ("amd-xgbe: add hardware PTP timestamping support")
-Tested-by: Gregory Fuchedgi <gfuchedgi@gmail.com>
-Signed-off-by: Gregory Fuchedgi <gfuchedgi@gmail.com>
----
-Tested by running ptp4l and verifying successful clock synchronization on v2
-(PCI) hardware.
----
- drivers/net/ethernet/amd/xgbe/xgbe.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe.h b/drivers/net/ethernet/amd/xgbe/xgbe.h
-index 60b7e53206d1..3d3b09010d48 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe.h
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
-@@ -135,11 +135,11 @@
-  */
- #define XGBE_TSTAMP_SSINC	20
- #define XGBE_TSTAMP_SNSINC	0
--#define XGBE_PTP_ACT_CLK_FREQ	500000000
-+#define XGBE_PTP_ACT_CLK_FREQ	(NSEC_PER_SEC / XGBE_TSTAMP_SSINC)
- 
- #define XGBE_V2_TSTAMP_SSINC	0xA
- #define XGBE_V2_TSTAMP_SNSINC	0
--#define XGBE_V2_PTP_ACT_CLK_FREQ	1000000000
-+#define XGBE_V2_PTP_ACT_CLK_FREQ	(NSEC_PER_SEC / XGBE_V2_TSTAMP_SSINC)
- 
- /* Define maximum supported values */
- #define XGBE_MAX_PPS_OUT	4
-
----
-base-commit: 0c7a5ba011d336df4fcd1f667fcc16ea5549be12
-change-id: 20260428-fix-xgbe-ptp-addend-ccb1df627622
-
-Best regards,
--- 
-Gregory Fuchedgi <gfuchedgi@gmail.com>
-
+I tried that now and the result is: yes, your patch fixes the bug too.
+Michal
 
 
