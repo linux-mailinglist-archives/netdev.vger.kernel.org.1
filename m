@@ -1,215 +1,196 @@
-Return-Path: <netdev+bounces-282200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282202-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id E8PMGzBs8WkIgwEAu9opvQ
-	(envelope-from <netdev+bounces-282200-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 04:25:52 +0200
+	id ABDMI71s8WkIgwEAu9opvQ
+	(envelope-from <netdev+bounces-282202-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 04:28:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB6BF48E498
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 04:25:47 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B2B148E4D7
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 04:28:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 43E713034DC0
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 02:25:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6364F30197C7
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 02:28:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6090937F740;
-	Wed, 29 Apr 2026 02:25:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0F143815F7;
+	Wed, 29 Apr 2026 02:27:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="iIj0NxBI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB3AA257849
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 02:25:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C0137FF62;
+	Wed, 29 Apr 2026 02:27:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777429545; cv=none; b=ImdR8uz0CmHmk1/KokFekHRTMxrIV3+K62xaMvJnbpTR9zDNVqL82ou/h68UMEsVinToA9kQ+r8/LnkWM/ncCEmHwQJh3KmdBooPd1EZUN5p6dFiEzcAFXsVXAJC0te3qV803IMPL2Q+BlhEsexy9AcRias+CTPZ9I5puU5O33U=
+	t=1777429678; cv=none; b=Y1giu2CssorqNWtIensrfFPN3wXjx0Pib+qWOViJJPdGK/lP21JDVelVofFEE9L6UUsAc7SuU14Ky7DOMll5dQl8Z52yhh9IcW0L1a743S7ActoiJrvKKXv7SRulVXN56olISZS99xhJevYTz6fXQ7L9XIPsbMg5FUuMxI7i6yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777429545; c=relaxed/simple;
-	bh=vgFToGvV8ikwg1TNP69hmHJFjdbf1VCoMhZ4s0Aj8Dw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Q28agNeS5WdFohPZN9FLYovS8iDVKL4NB3Q9KynjIp/GxNR2XNnYqEmjm5lZ70qZwO3b0mQwLqmZs8u/DPWEkk7582+U9/tp7JnstCjZyEiSzbrigU3Jq7NdCS/wqt6lCddeVxUvlwO4tcufGLOOORwPr4UH49voTB8/896zPiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-695aebf3cc7so7935097eaf.0
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 19:25:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777429543; x=1778034343;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6Wuf1uPr6EJz090SBkio4UZycSnIJX01CYea+KO7Xg8=;
-        b=foEBFYluV9S1AVTn0wRMr30gaUo3+z1yKLtETYvAaF/fd1nOBuspgKmxrO4b7OFJvq
-         YdJsQVwiOThb3TbfEpdXZK9AD6MxygbfzNbhxXhLi44EY1+e1EPW4kCQwFsQT75JQLyl
-         4MCfRx6yxPa7I7l9e/8TmroduQPTI9kB3QFLoUDPlY/oF5F64hSSp+dLfC085WYQlQsp
-         UHykZ6hRiCOsKRqk58oZGcTH+5DgTs6KapLWf1sfPjEOvUTBBcpZHXtNXWp4rLCjA+Hr
-         TJ0/MTjd8Ybsyh4rkZo1QvAGFH+wpWBSwyfA6wvnHhiYEHzVrlQbtIXSQ5j0TqQT7+l5
-         mUbg==
-X-Forwarded-Encrypted: i=1; AFNElJ+se7/jP4FhKFUEtw+BnUhhV7CyYU9326g38Zjt9fdSCUKef54mdm6cAy7eKzHPR6uCmLHU2r0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7QLFKu6ISOrcOrwmJjF/cQPyLKpamn8tWAijhvm9NFIfOd7aC
-	45lBRaZVFkIfwpaOpVT5KzqEJjoKZV7WiWMtG4oEp0WebDl82O8MoYT31yO6l8ukGxD0I+ztQXK
-	Qa41m+8AAbygKDQ17EwfBFoksekxzTOwC7rQZaOuJZmK+lslBGBziMobvAc0=
+	s=arc-20240116; t=1777429678; c=relaxed/simple;
+	bh=AkPFceWU+ZYyM8uHmBYL7YveuTRchdbB0aJkUSwH6Zs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OPfElmBPY6RlZ27vrOb2+ePbV+0FSUE34T9OQxASTl4zoR7m4g1XFjCZEeM79EdIxQxVdBDiEwOU/Q3mBQ5nA0Fa/TiozjHVcjsJ/L9+Zd5jJttkC4d/9pwtwm2PegaigtzIVBIoHNxz3XCbotorYU0O6JC+2CVEGM4BYLusb0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=iIj0NxBI; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63SNc0hB4076530;
+	Tue, 28 Apr 2026 19:27:35 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=JwkDD1pRTTj21vRR/bYOG9G
+	WVcIr8sIGS5W8I7hiDCY=; b=iIj0NxBItn5J6J/77kGyq0wKni1lGKbvJrq5KoZ
+	QDPpUff6ALHewfGRO8+yD+L3J3MwGTkXXZvEIARRVf5Io6qZBZfjWdY3TbKp7dny
+	vANPZj+WxQUoM9FBMPtPsEhuepHJtMzOTIz+j3Mcl5FuP9yoG0+H0Ylk3zb4c7it
+	AsvZ4MN3pXkeqLycrD5rOiyRrEiWtWwFGtUXDDEZtIlM0rvWpO1Mc6ELzqdQXuGc
+	E4VnoeXkjqsvgSECAae2i8Dn2IiILReXXeQn3yJx7frXkKY0RqP1Z6qXvkCPe2mh
+	C1a//F5m3dS962I5IMRyraLmiuHVm1TqDQIGaAB29FVim0A==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4du6r38c08-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 28 Apr 2026 19:27:34 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 28 Apr 2026 19:27:33 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Tue, 28 Apr 2026 19:27:33 -0700
+Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id E14E83F70E6;
+	Tue, 28 Apr 2026 19:27:30 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+        "Ratheesh
+ Kannoth" <rkannoth@marvell.com>
+Subject: [PATCH v5 net 00/10] octeontx2-af: npc: cn20k: MCAM fixes
+Date: Wed, 29 Apr 2026 07:57:12 +0530
+Message-ID: <20260429022722.1110289-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a4a:ee85:0:b0:694:9bdb:596b with SMTP id
- 006d021491bc7-6965ca7da67mr3267644eaf.17.1777429542704; Tue, 28 Apr 2026
- 19:25:42 -0700 (PDT)
-Date: Tue, 28 Apr 2026 19:25:42 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69f16c26.170a0220.34e5b8.0013.GAE@google.com>
-Subject: [syzbot] [net?] WARNING: ODEBUG bug in lane_ioctl (3)
-From: syzbot <syzbot+ca9d5686d06994c6547c@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: CB6BF48E498
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: CtfD-D1zh_1vY-WPDVwTxCCQ8XL8_RyY
+X-Proofpoint-ORIG-GUID: CtfD-D1zh_1vY-WPDVwTxCCQ8XL8_RyY
+X-Authority-Analysis: v=2.4 cv=RKWD2Yi+ c=1 sm=1 tr=0 ts=69f16c96 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
+ a=qit2iCtTFQkLgVSMPQTB:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
+ a=ALkQAJV8toBbO7D8Nj8A:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI5MDAyMSBTYWx0ZWRfX3nrvN/inMSYy
+ GX9lATlv63RC7+512qDbvIshhCTxs0HIK/RLlwRddR5Vrf6VBCD9gRFm55Wts4bWaFOKozH9eBQ
+ pI4PJiQHJIRpV6UYWNvZjz95RGoccHueYARrxS9yOH4iqfD8FrEgklL+Zqo2TbPTi4xnzB0Yzht
+ gaV13GYBvTKA5I6JQCONjeeE6rtikOBmfVB9jVNn0vZSRc3a20mT2WOmZd70tf8danhoAj/Gy4h
+ q9Qz0u5MAAVzp9cakBhGg9MJojq7/hQGKl6mqktswrPJzjInK6nMJU0q07XZ3+T+rKgYvQJtjIA
+ 09r/ER+OidQ/h8HnAYPKHHNnCoCfTDjdiLry7t0sADqrxgzIRgZf1eboCHEmec4cEXPo70X6ZI/
+ dT9Hmo4xNsvzA70/kG9XKVPTGSsoTm2F+nt9DhkHzpa7X7TdLb2oGTML22g93NEJhFwyLGjxXA3
+ +W+ol+0fg/GRzMYFPMQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-28_05,2026-04-28_01,2025-10-01_01
+X-Rspamd-Queue-Id: 4B2B148E4D7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=ca77bfc4078c8193];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-282200-lists,netdev=lfdr.de,ca9d5686d06994c6547c];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282202-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.992];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCVD_TLS_LAST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.999];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,marvell.com:email,marvell.com:dkim,marvell.com:mid];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
 
-Hello,
+This series tightens Marvell OcteonTX2 AF NPC support for CN20K silicon
+around MCAM key typing, optional debugfs setup, defrag allocation rollback,
+defrag entry relocation bookkeeping, logical MCAM clear and programming,
+default-rule index handling with explicit teardown, and NIXLF reserved-slot
+lookup when default rules are missing.
 
-syzbot found the following issue on:
+Patches 1 through 3 focus on AF error handling: propagate
+npc_mcam_idx_2_key_type() failures through cn20k MCAM enable, config, copy,
+and read paths; treat cn20k NPC debugfs nodes as optional so probe does not
+fail when debugfs is unavailable; and fix defrag MCAM allocation rollback
+so allocation errno is not overwritten during subbank index resolution.
 
-HEAD commit:    e728258debd5 Merge tag 'net-7.1-rc1' of git://git.kernel.o..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1752f702580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ca77bfc4078c8193
-dashboard link: https://syzkaller.appspot.com/bug?extid=ca9d5686d06994c6547c
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16811c36580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=128c52d2580000
+Patch 4 fixes npc_defrag_move_vdx_to_free(): when an MCAM line is moved to
+a new physical index, move entry2target_pffunc[] association to the new
+slot, clear the old slot, and retarget the matching mcam_rules entry so
+software state matches hardware after defrag.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/24195bde5d1d/disk-e728258d.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/78131d1b0e14/vmlinux-e728258d.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/836d0dd78c10/bzImage-e728258d.xz
+Patches 5 through 7 refine cn20k MCAM programming: clear entries using the
+logical MCAM index and resolved key width, fix bank/CFG sequencing in
+npc_cn20k_config_mcam_entry(), and read action metadata from the correct
+bank in npc_cn20k_read_mcam_entry().
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+ca9d5686d06994c6547c@syzkaller.appspotmail.com
+Patches 8 through 10 complete default-rule lifecycle handling: initialize
+default-rule index outputs eagerly, tear down reserved default MCAM rules
+explicitly (coordinated with npc_mcam_free_all_entries()), and reject
+USHRT_MAX sentinel indices from npc_get_nixlf_mcam_index() on cn20k.
 
-------------[ cut here ]------------
-ODEBUG: init active (active state 0) object: ffff888077a60f78 object type: timer_list hint: lec_arp_check_expire+0x0/0xc90 net/atm/lec.c:-1
-WARNING: lib/debugobjects.c:632 at debug_print_object lib/debugobjects.c:629 [inline], CPU#0: syz-executor253/5933
-WARNING: lib/debugobjects.c:632 at __debug_object_init+0x2b1/0x4e0 lib/debugobjects.c:780, CPU#0: syz-executor253/5933
-Modules linked in:
-CPU: 0 UID: 0 PID: 5933 Comm: syz-executor253 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
-RIP: 0010:debug_print_object lib/debugobjects.c:629 [inline]
-RIP: 0010:__debug_object_init+0x30f/0x4e0 lib/debugobjects.c:780
-Code: 3c 38 00 74 08 4c 89 ef e8 0e df 74 fd 4d 8b 4d 00 4c 89 f7 48 c7 c6 20 a7 28 8c 4c 89 e2 8b 4c 24 08 4c 8b 04 24 ff 74 24 10 <67> 48 0f b9 3a 48 83 c4 08 ff 05 8e 8c 77 0b 83 fd 03 75 3f 4c 8b
-RSP: 0018:ffffc90003e278f8 EFLAGS: 00010246
-RAX: 1ffffffff179e734 RBX: ffff888077a60f78 RCX: 0000000000000000
-RDX: ffffffff8c28ab20 RSI: ffffffff8c28a720 RDI: ffffffff903e69a0
-RBP: 0000000000000003 R08: ffff888077a60f78 R09: ffffffff8bcf4d00
-R10: dffffc0000000000 R11: ffffffff81b236d0 R12: ffffffff8c28ab20
-R13: ffffffff8bcf39a0 R14: ffffffff903e69a0 R15: dffffc0000000000
-FS:  00007f3e1e8976c0(0000) GS:ffff888125213000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055a602110fd8 CR3: 00000000753ea000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- debug_timer_init kernel/time/timer.c:788 [inline]
- debug_init kernel/time/timer.c:836 [inline]
- timer_init_key+0x41/0x2c0 kernel/time/timer.c:880
- lec_arp_init net/atm/lec.c:1274 [inline]
- lecd_attach net/atm/lec.c:781 [inline]
- lane_ioctl+0x1579/0x2220 net/atm/lec.c:1037
- do_vcc_ioctl+0x36d/0x9d0 net/atm/ioctl.c:159
- svc_ioctl+0x1f6/0x7d0 net/atm/svc.c:611
- sock_do_ioctl+0x101/0x320 net/socket.c:1313
- sock_ioctl+0x5c6/0x7f0 net/socket.c:1434
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f3e1e8bf0d9
-Code: c0 79 93 eb d5 48 8d 7c 1d 00 eb 99 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 d0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f3e1e897158 EFLAGS: 00000246
- ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f3e1e96fb48 RCX: 00007f3e1e8bf0d9
-RDX: 0000000000000000 RSI: 00000000000061d0 RDI: 0000000000000005
-RBP: 00007f3e1e96fb40 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f3e1e9413b0
-R13: 0000000000000000 R14: 0000200000000040 R15: b635773f07ebbeef
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	3c 38                	cmp    $0x38,%al
-   2:	00 74 08 4c          	add    %dh,0x4c(%rax,%rcx,1)
-   6:	89 ef                	mov    %ebp,%edi
-   8:	e8 0e df 74 fd       	call   0xfd74df1b
-   d:	4d 8b 4d 00          	mov    0x0(%r13),%r9
-  11:	4c 89 f7             	mov    %r14,%rdi
-  14:	48 c7 c6 20 a7 28 8c 	mov    $0xffffffff8c28a720,%rsi
-  1b:	4c 89 e2             	mov    %r12,%rdx
-  1e:	8b 4c 24 08          	mov    0x8(%rsp),%ecx
-  22:	4c 8b 04 24          	mov    (%rsp),%r8
-  26:	ff 74 24 10          	push   0x10(%rsp)
-* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
-  2f:	48 83 c4 08          	add    $0x8,%rsp
-  33:	ff 05 8e 8c 77 0b    	incl   0xb778c8e(%rip)        # 0xb778cc7
-  39:	83 fd 03             	cmp    $0x3,%ebp
-  3c:	75 3f                	jne    0x7d
-  3e:	4c                   	rex.WR
-  3f:	8b                   	.byte 0x8b
+Ratheesh Kannoth (10):
+  octeontx2-af: npc: cn20k: Propagate MCAM key-type errors on cn20k
+  octeontx2-af: npc: cn20k: Drop debugfs_create_file() error checks in init
+  octeontx2-af: npc: cn20k: Propagate errors in defrag MCAM alloc rollback
+  octeontx2-af: npc: cn20k: Fix target map and rule
+  octeontx2-af: npc: cn20k: Clear MCAM entries by index and key width
+  octeontx2-af: npc: cn20k: Fix bank value
+  octeontx2-af: npc: cn20k: Fix MCAM actions read
+  octeontx2-af: npc: cn20k: Initialize default-rule index outputs up front
+  octeontx2-af: npc: cn20k: Tear down default MCAM rules explicitly on free
+  octeontx2-af: npc: cn20k: Reject missing default-rule MCAM indices
 
+Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+v4 -> v5:
+	https://lore.kernel.org/all/20260427063213.3937451-11-rkannoth@marvell.com/
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+v3 -> v4:
+  - Add patch fixing entry2target_pffunc[] and mcam_rules when defrag
+    relocates an MCAM entry (npc_defrag_move_vdx_to_free()).
+  - Drop the standalone default-entry x4 preference and x2-profile flow-
+    install rejection patches from this series (10 patches total).
+  Link:
+  https://lore.kernel.org/netdev/
+  20260420023442.3295891-1-rkannoth@marvell.com/
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+v2 -> v3:
+  Addresses Simon and Paolo comments.
+  Link:
+  https://lore.kernel.org/netdev/
+  20260420023442.3295891-1-rkannoth@marvell.com/
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+v1 -> v2:
+  Address Simon comments and add further cn20k NPC correctness fixes.
+  Link:
+  https://lore.kernel.org/netdev/
+  20260418162013.GG280379@horms.kernel.org/
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+2.43.0
 
