@@ -1,190 +1,147 @@
-Return-Path: <netdev+bounces-282429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282430-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sA+eBnch8mm/oAEAu9opvQ
-	(envelope-from <netdev+bounces-282429-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 17:19:19 +0200
+	id sI9pLg8l8mlmoQEAu9opvQ
+	(envelope-from <netdev+bounces-282430-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 17:34:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBFB4496B4E
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 17:19:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BC1F497025
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 17:34:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 82053300B9E0
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 15:18:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6325131577E0
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 15:28:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25B7937AA8E;
-	Wed, 29 Apr 2026 15:18:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F4603ACEFF;
+	Wed, 29 Apr 2026 15:27:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b7iJCGba"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hcbpjvF1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C28378813
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 15:18:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C9933B0ACD
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 15:27:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777475916; cv=none; b=DETmDD1qBvAwzq4L36xBhfhFKvbxHLkGhOX7/46gt3q4l4ysdgLIEDZyfdcPvXfXq/Qmspxxwx5wvE885dtQscIYMEQZ23gzI3HUp6YKzpQtqZrAFv04UORb8lJg5kKF5TUgE4yJG6B1iUy2g79AtCVX5AOd7QYDxulo497zod0=
+	t=1777476434; cv=none; b=i32WFjpiZtRT7nPsVz+N02+xTsCf5Jc6Sum17cgn1jLueLpScZW1k6lWrvlr+PDYHf+a+lzKtqfOAAxQrLvvTR9NWPT9/7LGJb9v058sdWjkj2hcExFdoHRsnf1zPK8Tq3YhFtaiB0bRhCkgLNgLuk/gnw2CUts/tXWMV3weTz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777475916; c=relaxed/simple;
-	bh=/BimwSCUsuashVXwD+dzxd+4t5G8fzzhA6oBT4Cnlr0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fo5iaWcoTesBvzHuiMNDQjPCJd/qgw5YHjxHi9easbt9hkMSdCTLjHaLLnx/iLVydPcdqggO+zPCqAWzuBhKoQDR8dXJmp/ia+mI35FJt7c5n66uHk9dCTgQm+2YRZsPE1kvuecWlnK8Iv23XC/EqUNl+xeNjgha/rzOTsQKq0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b7iJCGba; arc=none smtp.client-ip=209.85.210.53
+	s=arc-20240116; t=1777476434; c=relaxed/simple;
+	bh=yH3lOS+okcN9lX37K1yKCibq1O8XsuGDUh7KdJIH8tU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DnMek042P5N9hrWIml6KyxE42svqr9JObMI/sdfrkI8wq7BRyuETUwaTLAj9ytS/kRS+Y/PsxykAfvNivDvNCqQCizl7gzF+UbPKWgAzsyWJlo3dTRYNNPCrM3v6AWrBdzS4cvqTgS+vT3BrWkkaoHvUFuhBY1Lm+qNv0zbyf78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hcbpjvF1; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-7dbd23bc684so7133168a34.2
-        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 08:18:34 -0700 (PDT)
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4891e5b9c1fso112013835e9.2
+        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 08:27:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777475913; x=1778080713; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7hCAZnYdZvdp+ak79vsUFUwhsK90OGnLnVC3WYq76N8=;
-        b=b7iJCGbaNlXtp4X0g6/WayFeLAL1bJl7AXsejxs7Gg1yd3+tXxfLCqVRJ6zgl+87Ty
-         AzkjBbmGxQXA5dPHLvzunpTs8WxAQ7r7BYtmSYzNn8xmKooUmrYgvDByEfrGR9oMNHST
-         6CYlQCxvgSVqcxF4KUQH1q7M9m7OjIWYp2+HxRh/LoRPURMvrEgXRK9WNLNlB7BsykRX
-         Pmu2UsOH9F8ek8o5h+A7RETSgO/zEg5diwBo2XSltxub7IYnetVfLLiar8QOKiuubRSR
-         mVR2pcvukrXZxLDMZLKOgq8uo+utneT0SkFkFgAMAA8W5wNs+4wTTLLdIaYkjcrXUpMc
-         ExWA==
+        d=gmail.com; s=20251104; t=1777476429; x=1778081229; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=y561SdX4ufl2HV+PYvdTDx/yIZUsaqz/jgiYxdaXm/o=;
+        b=hcbpjvF1LXMrEmHY7DtpTG/UDFIuRn3vIJS6pKYwLFqRaoQFM+NczeJvj9E3oKg10Q
+         hn8UWwqknWgirRpoT9KibsSdFGimSLdFboMKNAd+emW3d1zim41oi5XRyHFbGIvoO7RZ
+         SwkkO0tWhUxjabe47kzMaWXXlCJlqJiLwSfsiMKjiswMZkNazhL6do3B+vNReAyrhbAT
+         fv+NkKS0fcEl47q0lCp2OZgT7H1wB4E3Ynf+b/kSr+JE17PZRZasOl6uaGdkMciRO01X
+         52qAxecgBJf/qk5mHNixc1f9oylt4pH9Idhdzq8houX7EQYzCBrY8uUOdYr6uDGOmnZ2
+         cNYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777475913; x=1778080713;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7hCAZnYdZvdp+ak79vsUFUwhsK90OGnLnVC3WYq76N8=;
-        b=dyIUoE8gjdaMLV79iO3u7Ssz70FkVsnOIBicDjTMlrU6mwZZTGXVpmAfcysGtkoRr9
-         vaAgXU7ZaVXs6FlrUHXvJZEIsYS/I9j1YroDM99OSVZjUin/YoIObEuDLVcBqSbUwxyb
-         CGCLWhg3WSIASlrs86f/GNBrZ2QHTA7wnDiyiO4GzyevgFM/qjw2JOKFQj0BMvYhAxmP
-         iPkre5wAor5tJfP/9VniCEAKgXASnRQDDOKGKtOvF2t3EHjhANP+QrJFd3zq41B+IB/4
-         u0/JObbY8aruuj7bTdTnaQ7LqbzV7TsWngGonIlMfNeVqKVY7TAR4+Ob0BtOakhy4p3j
-         WR1Q==
-X-Forwarded-Encrypted: i=1; AFNElJ8gxbtuFFJj41I1yJp6Zt24cvJ/NA5lV9BE00xkGxRWV4mT2AuO4LPylSwPjAkIXAgs9n1RL0c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfLSmxzQbuvNCvvdwAK3wexB2+yBKkWCAw/6/P62A0UVdU8hue
-	Va7K29d069XaNO5r1VHtM9LPHk6yXcG1dJfiZWWPgsc2Bw1+5dvY9nxq
-X-Gm-Gg: AeBDieuoIiLL1ACYzjaXNO4I63YXD9yOVky3rhAEJOD6zBS5gpaOb4tIfwaAo2krbUV
-	Hl/zPVgJtj1y6gbz2nKe8A2eEl1odCq9wFEgDujL91oMlhGESUio+pQDpuo1gvhH2pTusQi7TFn
-	Pt32i8dIUoprE4zzZcOiDTeFybMUCQybFhupW+RbziD++lFzhESvWCREvi2sgvy0qrrDHzDUBnb
-	ZS6rnlSbNm4kM+99TojbK1gjnCT9SLPGZZM+vIeAHdLxBshZjjQufFy6/WqGKyXGH64v0RsApcL
-	tSIQprwBxdKlLiFBxlAsEO+Flxi/Ph1n07LBTmTXOOei3s2ymkMLMh2Jwg7FT5dc3LUIgNWw5OI
-	0TCuEKDP4D0jB2PD9AJ74JsjZtDMBURsRkQMr9mC7hU5M04Tbl5uU9Be+dL24NTkfO6a1FDKuIT
-	d8ojHuKMKpOhdgfHrzDPpZISyR7S3iyn2GTEIHhl3nbljui91zZvHWF2/PtA==
-X-Received: by 2002:a05:6830:25d1:b0:7dc:da80:42b4 with SMTP id 46e09a7af769-7de9a1002c7mr4284996a34.24.1777475913099;
-        Wed, 29 Apr 2026 08:18:33 -0700 (PDT)
-Received: from devvm29614.prn0.facebook.com ([2a03:2880:f812:6a::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7deab99036asm1469135a34.17.2026.04.29.08.18.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Apr 2026 08:18:32 -0700 (PDT)
-Date: Wed, 29 Apr 2026 08:18:23 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>, Alex Shi <alexs@kernel.org>,
-	Yanteng Si <si.yanteng@linux.dev>, Dongliang Mu <dzm91@hust.edu.cn>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Joshua Washington <joshwash@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Shuah Khan <shuah@kernel.org>, David Wei <dw@davidwei.uk>,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Mina Almasry <almasrymina@google.com>,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next 00/11] net: devmem: support devmem with netkit
- devices
-Message-ID: <afIhP5dtlzCtzn1T@devvm29614.prn0.facebook.com>
-References: <20260428-tcp-dm-netkit-v1-0-719280eba4d2@meta.com>
- <f954a636-4d21-47c0-8afa-cc4b24adb0fb@iogearbox.net>
+        d=1e100.net; s=20251104; t=1777476429; x=1778081229;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=y561SdX4ufl2HV+PYvdTDx/yIZUsaqz/jgiYxdaXm/o=;
+        b=LEVE4Zo77cjdNFI/l7zip9Gw45rrtHqTKNB5fDjSmVEnmNT/+OnHTDQFEGtIBsaK0v
+         mkP/mukKG3mrycboLrEWxLlzKFaPNuwsV6IZ/mQPdr2y1/zWimjqQi+J9M4AdmHUpTam
+         qS1KEJInp7wG4toP3p1l+tY+QL9z5wkaGwiYpS7TMS9HeNgNiChVmpNrzhG/7vI5awAv
+         6ds4X6ELw4uXfbR1YhpD9COTnCrZ77qNLTBy4IKKSKnva/XDdhHefr20pHv3YNbALNqF
+         sITcuMaKjDlSdNKhiHB7aOp55TkxGSNXRt1+bXJWtOjwgA8fnT1VUAzulT1bBiJSz03Y
+         nYfg==
+X-Forwarded-Encrypted: i=1; AFNElJ9D9J57AxOQ+8l/lJaUctOBGvlxqQXsBuMbTXYJQY0GXWkmkwc2WAa20wULTuHjdIp9+ZX205I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcPD3/AnT3+jpjQQ6/wgogtC6Hx4AtKHVjOjrjJxVA9ivYAe/T
+	CtogThQOyglsrACzFQbsq/ZsZyEdBVT0PcL8aMcxowg2krlb5OmMOFad
+X-Gm-Gg: AeBDievOL0n01Iy0ck7FS7PMErvVmPsYjcx87yYxiP+jkxAXZSv+IRN4dEG42XlGuO7
+	XXhdEjLlJyeoWyLHBOpFuQiKqOe043hGT9Bb1/PsV2TVTF0WtPJAuORIByRh7E/1ElevieWn0Lz
+	1DArxYD3f125Sq2FJuJk06XMBc/cKelfijpgV+Uwx+xXgoctk4N4HGpSyycSyLxNe1lQyOsdZ+c
+	aK90+HJMXHt6loYunD78SzQF26r3TdoPXZy0hyZ6Zku/IZz6THG+choztWO5xB3z+VLlVB/pGws
+	h93TQqTXlrDrNL8GmJ3yfUQtcaD+aR+tXpZMSoHINhAp1F8UaZvU3hFXRX+WqksKnk4HEhCCKR+
+	+MMP3pv5o/F1Nl2wirG6EYgePJZyXWtRPaUzZJGzPlldnleX1Aseu+9RFAOkRT3xWXyonFl7LTe
+	sKQ7Ld59BRogJ8ND8ojlX8uIBhBNTesVAdk+klQ9x70/Sy7T7S8epZkiXgyDWob2HbZ2d+cDlHq
+	yUnqsuPjS/IWUqWwX+lWgM6
+X-Received: by 2002:a05:600c:4713:b0:488:ffb1:494c with SMTP id 5b1f17b1804b1-48a77aed429mr128781245e9.12.1777476429200;
+        Wed, 29 Apr 2026 08:27:09 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a7c584607sm60074975e9.8.2026.04.29.08.27.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Apr 2026 08:27:08 -0700 (PDT)
+Message-ID: <b99eac30-ec61-4b33-9517-3cc2af0cb12b@gmail.com>
+Date: Wed, 29 Apr 2026 16:27:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f954a636-4d21-47c0-8afa-cc4b24adb0fb@iogearbox.net>
-X-Rspamd-Queue-Id: DBFB4496B4E
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net] sfc: fix error code in
+ efx_devlink_info_running_versions()
+To: Dan Carpenter <error27@gmail.com>,
+ Alejandro Lucero <alejandro.lucero-palau@amd.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Martin Habets <habetsm.xilinx@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ netdev@vger.kernel.org, linux-net-drivers@amd.com,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+References: <afGpsbLRHL4_H0KS@stanley.mountain>
+Content-Language: en-GB
+From: Edward Cree <ecree.xilinx@gmail.com>
+In-Reply-To: <afGpsbLRHL4_H0KS@stanley.mountain>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 4BC1F497025
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282429-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-282430-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,amd.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,resnulli.us,vger.kernel.org,amd.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ecreexilinx@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,devvm29614.prn0.facebook.com:mid]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Wed, Apr 29, 2026 at 02:08:31PM +0200, Daniel Borkmann wrote:
-> Hi Bobby,
+On 29/04/2026 07:48, Dan Carpenter wrote:
+> Return -EIO if efx_mcdi_rpc() doesn't return enough space.
 > 
-> On 4/29/26 12:41 AM, Bobby Eshleman wrote:
-> > This series enables TCP devmem TX through netkit devices.
-> > 
-> > Netkit now supports queue leasing. A physical NIC's RX queue can be
-> > leased to a netkit guest interface inside a container namespace. This
-> > gives the container a devmem-capable data path on the RX side (bind-rx,
-> > etc...). On the TX side, the container process binds to its netkit guest
-> > interface and sends traffic that netkit redirects (via BPF or ip
-> > forwarding) to the physical NIC for DMA.
-> [...]
-> Thanks for working on this, after the RX queue leasing got merged, I've
-> been looking into the same actually. :)
-> 
-> I think the NETMEM_TX_* enum approach seems reasonable.
-> 
-> What I have a PoC on is to build out TX queue leasing as first-class
-> symmetric infrastructure to complement the RX queue leasing - basically
-> I implemented an equivalent to the latter in netdev_nl_queue_create_doit
-> et al, so you can have independent RX and TX leases and per-queue
-> accountability, such that ynl queue-get op shows the full picture, and
-> lastly we could also enable AF_XDP TX-only support through this infra.
-> 
-> Would you be open to collab on integrating both and migrating the devmem
-> code to work off an TX queue object? Next week is LSF/MM/BPF, are you
-> there by any chance to catch up in person?
-> 
+> Fixes: 14743ddd2495 ("sfc: add devlink info support for ef100")
+> Signed-off-by: Dan Carpenter <error27@gmail.com>
 
-Hey Daniel,
-
-Definitely am open to that. I will unfortunately not be at LSF/MM/BPF,
-but maybe we can schedule a meeting offline to sync up?
-
-On the approach, explicit TX queue leasing sounds like a better way to
-permit devmem's tx binding than implicitly via RX lease.
-
-Best,
-Bobby
+Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
 
