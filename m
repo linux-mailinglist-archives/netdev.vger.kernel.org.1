@@ -1,227 +1,128 @@
-Return-Path: <netdev+bounces-282524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282525-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gF0nCh2E8mnLsAEAu9opvQ
-	(envelope-from <netdev+bounces-282524-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 00:20:13 +0200
+	id WEIgBG+G8mkcsQEAu9opvQ
+	(envelope-from <netdev+bounces-282525-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 00:30:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89F1249AE2A
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 00:20:12 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B97249B069
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 00:30:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3EDB73059321
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 22:17:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 680083019CA5
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 22:30:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44C1843CEE9;
-	Wed, 29 Apr 2026 22:16:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1099E3AE19C;
+	Wed, 29 Apr 2026 22:30:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ezbBlo6b"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 401DA4219F2;
-	Wed, 29 Apr 2026 22:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E148639EF2C;
+	Wed, 29 Apr 2026 22:30:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777501011; cv=none; b=dQGC2OxOpYao/Neoiv1ej9oLDpRoM7kouk26CypFEWve1otTVuF5bS3EHbxobkkxd869CU7QHkxrhA+FJpfIqV062HeX0n7dSz2HYQjwgijM9A7WOHKxOd3P71rH3hVQQs/UK2kyzEDkeUKbY4CTkhHlLchp+iOu/g8Ms2xwzds=
+	t=1777501803; cv=none; b=UvH7pHGhba260WeWV3EJnkaUCZXNjUYnniJGMsL4ZvHUmKh2ix0DGC4uzGxTJhGvi0KQNPmIZkA/V1aWMKpmJj8FKYyjCPJXnGDIQrJjzwtoZCYP8Gi2L9/GZ04d4sh1B3xva7tCoiep0/VXLFInOsv9kDsTqqGB9FhzPglDpgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777501011; c=relaxed/simple;
-	bh=rncdyI/b3cHbZ+JPqj7zU7jEbw0V0lTd6KTb/GTUC7Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mILdFdTpvuiwLh9iri7MYrFllFWlcnVlnfkPbM4e8WTxyLCGDZKt2MGYoLymybxS2ve+YOlQEnfadRkQIMoq9IzMrg2aKLcsutvmdMvpn/GsoIcbAw0JX91em34O17wMyI4thgBqk2cHAFGe/IXD4C9OXHpIqhxXXh5zpZ+7T04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1202)
-	id 9582E20B717B; Wed, 29 Apr 2026 15:16:39 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 9582E20B717B
-From: Long Li <longli@microsoft.com>
-To: Long Li <longli@microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K . Y . Srinivasan" <kys@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>
-Cc: Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v6 6/6] RDMA/mana_ib: Allocate interrupt contexts on EQs
-Date: Wed, 29 Apr 2026 15:16:25 -0700
-Message-ID: <20260429221625.1841150-7-longli@microsoft.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20260429221625.1841150-1-longli@microsoft.com>
-References: <20260429221625.1841150-1-longli@microsoft.com>
+	s=arc-20240116; t=1777501803; c=relaxed/simple;
+	bh=3DcQIt3OyWfZwNDlD3KnBgTDz3Y2yFzJGzIKKpu3KJE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SxqOwJP8Wox75AlMX9l2M6Rz8CnkVPFWuG1/RGh9FdMk6uKFADUYhb8TxcSQrNR+K8X5bATzzlZWX7e9Tky8XVcelNoIuwCDHs+UHSLk+LCx0+oDJE+H9c8nDu1mwbeGaoQ04LeooAQhUTuzhztprq2qWpNBYuCB4fiUKwYtvmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ezbBlo6b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29F79C2BCB4;
+	Wed, 29 Apr 2026 22:30:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777501802;
+	bh=3DcQIt3OyWfZwNDlD3KnBgTDz3Y2yFzJGzIKKpu3KJE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ezbBlo6bgBKEEKdAHzTGXWDdwYzD5N6UUyoP1u93bdUv0+YudqOgkJnif7BF5L0O7
+	 MtynkNmY5uSnSuBPrL1eZc/z1IdTM+lrYqFuvVMNB2k1D1YbwUfId0L8hFrKyJXJnx
+	 NxjCnv5DIR0gatVqUsx0bvC378J9Ru/FNMiGKXcwis2LOkT6CnbkZIqI3oospHcehR
+	 9QGEkp7yrg4XLz6bWrtwrea+RqEdYPr6Q7RsVSZAVNOHpwCjTaws94/loKvFN18Kbb
+	 vsQ7Y66n1XXjopQIGQGuhK+rb/fcN3GR1vnczzgT8iGqifJvItagtSatmZOF+3lDVp
+	 qXgTLddaMfG+A==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	bpf@vger.kernel.org,
+	john.fastabend@gmail.com,
+	sd@queasysnail.net,
+	linux-kselftest@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net 0/7] net: tls: fix a few random bugs
+Date: Wed, 29 Apr 2026 15:29:37 -0700
+Message-ID: <20260429222944.2139041-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 89F1249AE2A
+X-Rspamd-Queue-Id: 7B97249B069
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [3.54 / 15.00];
-	DMARC_POLICY_REJECT(2.00)[microsoft.com : SPF not aligned (relaxed), No valid DKIM,reject];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	TAGGED_FROM(0.00)[bounces-282524-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,queasysnail.net];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-282525-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_SPAM(0.00)[0.623];
-	FROM_NEQ_ENVFROM(0.00)[longli@microsoft.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-Use the GIC functions to allocate interrupt contexts for RDMA EQs. These
-interrupt contexts may be shared with Ethernet EQs when MSI-X vectors
-are limited.
+Fix a few random bugs, from external reports and my local scan
+with various AI tools. Mostly corner cases in code which I don't
+think TLS maintainers would consider "battle tested".
 
-The driver now supports allocating dedicated MSI-X for each EQ. Indicate
-this capability through driver capability bits.
+Jakub Kicinski (7):
+  net: tls: fix silent data drop under pipe back-pressure
+  selftests: tls: add test for data loss on small pipe
+  net: tls: fix page pin leak on sendpage_ok() failure
+  net: tls: fix off-by-one in sg_chain entry count for wrapped sk_msg
+    ring
+  selftests: bpf: cover wrapped sk_msg ring chaining in ktls TX path
+  net: tls: fix use-after-free in tls_sw_sendmsg_locked after bpf
+    verdict
+  selftests: bpf: cover tls_sw_sendmsg UAF after bpf_exec_tx_verdict
+    split
 
-Signed-off-by: Long Li <longli@microsoft.com>
----
- drivers/infiniband/hw/mana/main.c | 33 ++++++++++++++++++++++++++-----
- include/net/mana/gdma.h           |  7 +++++--
- 2 files changed, 33 insertions(+), 7 deletions(-)
+ net/tls/tls_device.c                          |   2 +
+ net/tls/tls_sw.c                              |  17 ++-
+ .../selftests/bpf/prog_tests/sockmap_ktls.c   | 139 ++++++++++++++++++
+ .../selftests/bpf/progs/test_sockmap_ktls.c   |  10 ++
+ tools/testing/selftests/net/tls.c             |  43 ++++++
+ 5 files changed, 207 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/infiniband/hw/mana/main.c b/drivers/infiniband/hw/mana/main.c
-index 60cc02e4ad10..2267a73f0d6e 100644
---- a/drivers/infiniband/hw/mana/main.c
-+++ b/drivers/infiniband/hw/mana/main.c
-@@ -748,6 +748,7 @@ int mana_ib_create_eqs(struct mana_ib_dev *mdev)
- {
- 	struct gdma_context *gc = mdev_to_gc(mdev);
- 	struct gdma_queue_spec spec = {};
-+	struct gdma_irq_context *gic;
- 	int err, i;
- 
- 	spec.type = GDMA_EQ;
-@@ -758,9 +759,15 @@ int mana_ib_create_eqs(struct mana_ib_dev *mdev)
- 	spec.eq.log2_throttle_limit = LOG2_EQ_THROTTLE;
- 	spec.eq.msix_index = 0;
- 
-+	gic = mana_gd_get_gic(gc, false, &spec.eq.msix_index);
-+	if (!gic)
-+		return -ENOMEM;
-+
- 	err = mana_gd_create_mana_eq(mdev->gdma_dev, &spec, &mdev->fatal_err_eq);
--	if (err)
-+	if (err) {
-+		mana_gd_put_gic(gc, false, 0);
- 		return err;
-+	}
- 
- 	mdev->eqs = kzalloc_objs(struct gdma_queue *,
- 				 mdev->ib_dev.num_comp_vectors);
-@@ -771,31 +778,47 @@ int mana_ib_create_eqs(struct mana_ib_dev *mdev)
- 	spec.eq.callback = NULL;
- 	for (i = 0; i < mdev->ib_dev.num_comp_vectors; i++) {
- 		spec.eq.msix_index = (i + 1) % gc->num_msix_usable;
-+
-+		gic = mana_gd_get_gic(gc, false, &spec.eq.msix_index);
-+		if (!gic) {
-+			err = -ENOMEM;
-+			goto destroy_eqs;
-+		}
-+
- 		err = mana_gd_create_mana_eq(mdev->gdma_dev, &spec, &mdev->eqs[i]);
--		if (err)
-+		if (err) {
-+			mana_gd_put_gic(gc, false, spec.eq.msix_index);
- 			goto destroy_eqs;
-+		}
- 	}
- 
- 	return 0;
- 
- destroy_eqs:
--	while (i-- > 0)
-+	while (i-- > 0) {
- 		mana_gd_destroy_queue(gc, mdev->eqs[i]);
-+		mana_gd_put_gic(gc, false, (i + 1) % gc->num_msix_usable);
-+	}
- 	kfree(mdev->eqs);
- destroy_fatal_eq:
- 	mana_gd_destroy_queue(gc, mdev->fatal_err_eq);
-+	mana_gd_put_gic(gc, false, 0);
- 	return err;
- }
- 
- void mana_ib_destroy_eqs(struct mana_ib_dev *mdev)
- {
- 	struct gdma_context *gc = mdev_to_gc(mdev);
--	int i;
-+	int i, msi;
- 
- 	mana_gd_destroy_queue(gc, mdev->fatal_err_eq);
-+	mana_gd_put_gic(gc, false, 0);
- 
--	for (i = 0; i < mdev->ib_dev.num_comp_vectors; i++)
-+	for (i = 0; i < mdev->ib_dev.num_comp_vectors; i++) {
- 		mana_gd_destroy_queue(gc, mdev->eqs[i]);
-+		msi = (i + 1) % gc->num_msix_usable;
-+		mana_gd_put_gic(gc, false, msi);
-+	}
- 
- 	kfree(mdev->eqs);
- }
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index 240d7f1c0733..12502b1b7be1 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -615,6 +615,7 @@ enum {
- #define GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG BIT(3)
- #define GDMA_DRV_CAP_FLAG_1_GDMA_PAGES_4MB_1GB_2GB BIT(4)
- #define GDMA_DRV_CAP_FLAG_1_VARIABLE_INDIRECTION_TABLE_SUPPORT BIT(5)
-+#define GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE BIT(6)
- 
- /* Driver can handle holes (zeros) in the device list */
- #define GDMA_DRV_CAP_FLAG_1_DEV_LIST_HOLES_SUP BIT(11)
-@@ -631,7 +632,8 @@ enum {
- /* Driver detects stalled send queues and recovers them */
- #define GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY BIT(18)
- 
--#define GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE BIT(6)
-+/* Driver supports separate EQ/MSIs for each vPort */
-+#define GDMA_DRV_CAP_FLAG_1_EQ_MSI_UNSHARE_MULTI_VPORT BIT(19)
- 
- /* Driver supports linearizing the skb when num_sge exceeds hardware limit */
- #define GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE BIT(20)
-@@ -659,7 +661,8 @@ enum {
- 	 GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE | \
- 	 GDMA_DRV_CAP_FLAG_1_PROBE_RECOVERY | \
- 	 GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY | \
--	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECOVERY)
-+	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECOVERY | \
-+	 GDMA_DRV_CAP_FLAG_1_EQ_MSI_UNSHARE_MULTI_VPORT)
- 
- #define GDMA_DRV_CAP_FLAGS2 0
- 
 -- 
-2.43.0
+2.54.0
 
 
