@@ -1,141 +1,421 @@
-Return-Path: <netdev+bounces-282358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282359-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OC63BRXr8WmalQEAu9opvQ
-	(envelope-from <netdev+bounces-282358-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 13:27:17 +0200
+	id wBeYNWvr8WmalQEAu9opvQ
+	(envelope-from <netdev+bounces-282359-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 13:28:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A68CB493894
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 13:27:16 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FDC44938E7
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 13:28:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 19EEF30659C7
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 11:26:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 90C5A300614A
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 11:28:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23EEB3F1669;
-	Wed, 29 Apr 2026 11:26:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A13C3F0760;
+	Wed, 29 Apr 2026 11:28:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ejvHWE1z"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aTLGKTwc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA70302750;
-	Wed, 29 Apr 2026 11:26:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777462002; cv=none; b=T4w88c8pfdui+uKTZ/A75N54vv5+ygt6XtOs+c3C834wo0jn3RKHbz8ymm034YMsyjybqeQRh4/Pkv4+hdKrXyhNd6+FeEmf1vc8g4TePtP2zeSpc7qPPwVv/agvMsclMeZvSkFsu2dIiPIE3NOV7HwPXDkT9IpDdJth3Fb3HrQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777462002; c=relaxed/simple;
-	bh=HgV0q/+gZ9n2giWTxhUD6P3yQ6wEmY66ZwCWQHhgQ2g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kKGPImIqofHhHWkrh4obt4PWgAsqITzuUZVnGNDkfXyNLSZcsDoFgpxWWpSmbc5g0edrzTytstBlWuiMROxKCSnCuFDN5vsyWoqKkpkiSdJCcn9sghnNkWFaAx9gXkuVuHeVxtZuU4tcBqXoQ9JIGTcKIDXLTkfHvbQdDMgSy0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ejvHWE1z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 158D1C19425;
-	Wed, 29 Apr 2026 11:26:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777462002;
-	bh=HgV0q/+gZ9n2giWTxhUD6P3yQ6wEmY66ZwCWQHhgQ2g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ejvHWE1zJ0tb1KwQu/gVCMj0KcNhlMqCOjLI4kQmWC01EPIO4HFDTFQg5PpNyMx2F
-	 7OMWgwbyfp16yd5ZKGLwfDDMuBlWK8CK9qcSIqUHZRxyhnWE4iAN+OK+xmr5WBtr4T
-	 BgqmCB7r/rsFvwFu/mT2z67QkDE/mDzOf7GDi68KHsQjYM3r7svy7TXqJDW5kWsfNa
-	 xYHmkznhflijvwvOUJkH6AcM42ZHWo8kZp7k26fwbFC82N/jHC8/F/rL8GlM8z6Ksh
-	 UMOZ5KVH94exo80oAIrmoHKOK/k/qke5mU8V2uOXUW3Mlxuf7JynBO/Edq8wMcfI5M
-	 twwrBSWDcoLLw==
-Date: Wed, 29 Apr 2026 12:26:30 +0100
-From: Will Deacon <will@kernel.org>
-To: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-Cc: Yury Norov <ynorov@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	David Laight <david.laight.linux@gmail.com>,
-	Thomas Gleixner <tglx@linutronix.de>, linux-alpha@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-snps-arc@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-	dmaengine@vger.kernel.org, linux-efi@vger.kernel.org,
-	linux-fsi@lists.ozlabs.org, amd-gfx@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-	linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-spi@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-staging@lists.linux.dev,
-	linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
-	xen-devel@lists.xenproject.org, linux-fsdevel@vger.kernel.org,
-	ocfs2-devel@lists.linux.dev, bpf@vger.kernel.org,
-	kasan-dev@googlegroups.com, linux-mm@kvack.org,
-	linux-x25@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	linux-sound@vger.kernel.org, sound-open-firmware@alsa-project.org,
-	linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
-	linux-openrisc@vger.kernel.org, linux-parisc@vger.kernel.org,
-	linux-sh@vger.kernel.org, linux-arch@vger.kernel.org,
-	catalin.marinas@arm.com
-Subject: Re: [RFC PATCH v1 8/9] arm64: Add unsafe_copy_from_user()
-Message-ID: <afHq5vyNUJzxVwDV@willie-the-truck>
-References: <cover.1777306795.git.chleroy@kernel.org>
- <5b09e58a84c9edcfe5724db5cd57e45d96a96bfa.1777306795.git.chleroy@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44F952550D5;
+	Wed, 29 Apr 2026 11:28:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777462117; cv=fail; b=hMqa7m1kWTfCht4nHqwZyZ7hRtZ4P1+suZXRpjrdeRS85q21Zkr+4uQwoi3SYgt/8RGg6qJFMckywPi9NdU4F5g/dPNA+Dcl5t98vZf3LMSVOLdPTARRWb4wY1wvTkYbuv5ZwnPAa43z1jaXllKqa7Whvq8XciCplyJmZRlD7k8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777462117; c=relaxed/simple;
+	bh=UBb8fQJvK1Esj7KPS5QG4RcOApniJlymwXtFr32JV7k=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=G1hEd0bbAKBBEDJ4BpBluTuFnY5ePO3egyX83y8QqLVVQFLpVLBFIXXPeDLies3l4hyHCSjuV6JapEm2HmgQ1QZnXL4NuKNC4rkP48hztbI/xMjnwB6XOe2r+LKC/S/E3jvIn9q3CNUs2K1RshyqVvQH8uFIdbKlTYpzYWcGJ28=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aTLGKTwc; arc=fail smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777462115; x=1808998115;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=UBb8fQJvK1Esj7KPS5QG4RcOApniJlymwXtFr32JV7k=;
+  b=aTLGKTwck2NsIWLyXnf6r+odOFR/nhuFU5pikRwUwZFwLpfX1V6RUtJi
+   /pB6Mxi1RPlbJMIBaJXaDohbW8HVxTByo+dlY4a8PikNHCliuh2FqTjIU
+   iFTjnWlCA/wLSGsCLIlfasbOqUyHW+fmHQsYMKtMMc3jNEiINoU0rM2NV
+   iOq4hQROEesyxw04MMw/74emXGAJn0AjvDPdbqRaMEn4yn1joI/ARV9EU
+   0OdXgOvyDwLdTI+8U4eqQCNH3uGoTrpTjPpWOn6vzPAmGZSptbEzxdbim
+   vNhOj+4Q/v6gYEBdaBiHBiBGDBvU8SjGHE51UZnSu3ribP74q+ItxhJKx
+   Q==;
+X-CSE-ConnectionGUID: iuS9uvLSSkyqvOUGYSU3/A==
+X-CSE-MsgGUID: BfQuRok5QqORJDaFNe9IOQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11770"; a="78444225"
+X-IronPort-AV: E=Sophos;i="6.23,206,1770624000"; 
+   d="scan'208";a="78444225"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2026 04:28:34 -0700
+X-CSE-ConnectionGUID: zyo6koVcS5u4GiOB8znU/g==
+X-CSE-MsgGUID: FVj0GeWmSa6jAZ16svdhlA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,206,1770624000"; 
+   d="scan'208";a="231101609"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2026 04:28:34 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 29 Apr 2026 04:28:33 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Wed, 29 Apr 2026 04:28:33 -0700
+Received: from DM5PR21CU001.outbound.protection.outlook.com (52.101.62.2) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 29 Apr 2026 04:28:31 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BKr/UHFUYWqaLBaSVLelyATKOmIELFLq6cjrA3KohQTkNGji7bfOct6vZFNZz7fIBNn5uM7KQnMI2HLDbCNs3x1iY0w4l2muCjYCg6i90ncgfYJgxDqriKOiJ6CbMQutIPU8QK0YbDuy003eEibUrrUuUQgkpzWGMXgb7dAGFul5DbMikQ8Z5u15PFGqewscsIy9/aAIEX4gk6Zniref4/hwkLQMDOX0kR3B/GcYibLVzJYD0ZV/Bz7fiKxgfSfBLpO8SsKruhG/8Y5tBfB0eCvVJhgEaYCmppNYoW3Vancvo/xD20AfzFYOf9XtY+w71oIwQ0veaMNjEhua8Yzpog==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ovdDN0kfVgsr+o1j0KoC+sts4YkO+2sTyhj5T2VeSQ4=;
+ b=Wd+bfthFNiDp3NY7r0hOxZrYsWsj3SF/Mx8qHIMgib0PbqD618Ua57gOBQdTZuPGYHjd0f+eXvR9a8AdHzExOVcWgv30ZgnlVGuPM25pWI8VhaY8+E2fMDZzuPTPoxU1gJ3isI4TYvW1g9gf4R6vCg+RnwJnvkMLW9JrfUKhZMFA7WsD0Ugn/s0harHf/gMJ0r1xZJmdcO1W8H5jCfm7LvB1idHpuwAXeLLoP06RDdceIzTITvUpeR20O5w/pxLAwaRhdKrXbpCZ6wea09AxD4Z24W/5k5vlukC4s3420tvyvBl6mOPw71d44xibnTOPOuqsDYv2auOXpQBDQbovfg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by PH0PR11MB7564.namprd11.prod.outlook.com (2603:10b6:510:288::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.20; Wed, 29 Apr
+ 2026 11:28:25 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c%5]) with mapi id 15.20.9870.013; Wed, 29 Apr 2026
+ 11:28:25 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "Keller, Jacob E"
+	<jacob.e.keller@intel.com>, "horms@kernel.org" <horms@kernel.org>,
+	"jesse.brandeburg@intel.com" <jesse.brandeburg@intel.com>, "Nguyen, Anthony
+ L" <anthony.l.nguyen@intel.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: RE: [PATCH net v5 3/4] iavf: send MAC change request synchronously
+Thread-Topic: [PATCH net v5 3/4] iavf: send MAC change request synchronously
+Thread-Index: AQHc18KBJc7otQTA8kazvt8l9ITW+bX15rcA
+Date: Wed, 29 Apr 2026 11:28:25 +0000
+Message-ID: <IA3PR11MB89861527E138BBA14FA907DCE5342@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20260429102426.210750-1-jtornosm@redhat.com>
+ <20260429102426.210750-4-jtornosm@redhat.com>
+In-Reply-To: <20260429102426.210750-4-jtornosm@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|PH0PR11MB7564:EE_
+x-ms-office365-filtering-correlation-id: 1707bde3-4ea8-4410-0713-08dea5e26dbf
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|18002099003|22082099003|56012099003|38070700021;
+x-microsoft-antispam-message-info: POGgE84KI0fp1md1lDnKuycLSpoCZ5PQK1Hjrw3z/91vrgK2d4jesyN+mi6InxuXvjj6MchLV2NtP1W0UTZJUwDi+QBFYDT3CXBhv9AhjvGvBPXs9rsK3Bl8WH7pKXMDlm2yC+h0ciMdGmuvH9x8ZLIPzQ/tdh/ZAZG3jU1uUXgdpeXyJw/JJJHzKsnraDTqf+dZDZ+s8Mwe34HkkjqUN9BTe/8JOVYhMTj9bcXan6R2HuXabeQiCkKFs8AqSXJqxgHNmWFyEvfZlSBHqIpN19CICGgDNdPfn0kgoffrbs6j3ELKMLI1JhYFyUS2xOW8IEG0Et+uDSrXP4bMg9dg0/piOro+xMd9xafeAqCfdladl+dXHtapWdXIsGNzw1JkHcPV1jHDDZG/7pwBz97xIaMPwxDSclNAzssztACHVNnYTspmoJRkanjaY94TjfXT7Smk+1qRXXDPkljlwAqdORgbywBo2mc6k/O0eVXSRv1VnVDeHImNO/RcORFAqT0rZhjpsBVgJYG5RYG4xgdgCmlg7EnhRaOPxH+cqn9u9gShPQJOYYAVUv/SLnVDo+cloHokc2gmP/Odx8JMIEdkrahszBHY2FvaV42CuHmuXwv6svamzJz8b02TWq5B2zYVyLWvVZwSioKX1T/uXZpEt6pdgLvcQI/NBrKU0mHvGylV8KTIJI3vNruAcdR8FluWeCOXXFMnMurLdkvCAI8mtN/sPuQ8cY8gsH+UllCXn9rLPTu54iZCnXrbJbzgCnM6CgL2f0swfzdxZuZglFr0YsWfA2eB/xvs2Z9CujQIxcg=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(18002099003)(22082099003)(56012099003)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?mky64SMyjcYAtVvr/wA+zpY848vuMt2Wj8QNN21WxxDHicviZDos43ikBJfC?=
+ =?us-ascii?Q?M7eAupTrWeQUoG6y04Ev1zKFHNvela3tsqUXLrY0dvEFtahGgkVDgb0Af3Tl?=
+ =?us-ascii?Q?tf4LXjvS2dm86pTrm0J3yxUy9sS7CqBCJJqvw2lGwbZcVJqZfEjWTZ4vT0h1?=
+ =?us-ascii?Q?N6B7eP5vPlRKlJ+M3+xPnjq35TgTtKThw5nZu7QGe+Ui4P7G4SCZazV1SU9L?=
+ =?us-ascii?Q?D3ektdMXChpqUiYntDL1thIrHq1nwc3ynpup0ErxhPzw92PmbMNjpX8qodC4?=
+ =?us-ascii?Q?oV8xOXN1QDQBKu4r000iy1eorra3nztneh9m7kS6taKX7F4XFsggZ2sYYVCh?=
+ =?us-ascii?Q?l5k7wsYaJL4TTEGmyASJsIIufvMTIsbxWL8pE4mgzuv5oxYIG/jSHBdOo8+D?=
+ =?us-ascii?Q?UQwnHjeSqpaEvwIEOfWe0v4hWOerCcg7LYbEroURDKyVA6ddYOAYlisyf4iV?=
+ =?us-ascii?Q?oInG3yleDwS2YzIJWG8pGZ6lRmptu0nIMsUhFsuv7OMO7Hdg5YQlJAoLxVTF?=
+ =?us-ascii?Q?mRFF15SXtS6MtHUCVAohqV0wNn1PEB4MSc6S/UJDalXNvnszm5REMwsiF4VC?=
+ =?us-ascii?Q?jcXMz2BYifd36UQqJl3dd5sqnsgiooLVamWYSjqgY+ihgwp01eJkGNcbptGt?=
+ =?us-ascii?Q?DBY4bNaqYgSvh2eMKw+lFiWuVofEO1vnyCVmC4HnPv/u84XNlT1A8gYfHeee?=
+ =?us-ascii?Q?zq8v2BtJqSuvXBzMJpq6Xh9x0uX2hN2F11VJlo3G7kXh6LKggU3SPGKEYdpQ?=
+ =?us-ascii?Q?ajfxr5a4u+Rn/OxKhwLsB5FQ7j+luTm4mpnSPB6lel2qJUFLSrythKlktrYp?=
+ =?us-ascii?Q?0HF0Gk/2fVBUahWhGVJ2aWpE7ioZZBfitwtr0dXFKbaamKdKS4FlbpN6ebPn?=
+ =?us-ascii?Q?jjQkJteJQiHba/ksZTrmBpfotjgbPjhvxkqpYXHt6LEauZZo9bSVz5nG43WW?=
+ =?us-ascii?Q?7Md5z2OGq8xSHlRGUcZc0u/dvL43mNlUWI8vkhR+FalMlX0dcqFWQxmj2fEm?=
+ =?us-ascii?Q?QYSw+JzQRFTUS89a15UwAr65VEwSd8EknUxA5YJN1Mh1nae60hAw0dwR1rEO?=
+ =?us-ascii?Q?JaN2rfpONu2LZAnhd4kJSxK4IPPdDBuCUY5yitDK4Z/kx+5nWxTulJ1ZKgWG?=
+ =?us-ascii?Q?FwdT1353nBBlXn6eEmEbTJHn3vENh8FIBgptGircYmH6qAeYUx2u8vIhYml6?=
+ =?us-ascii?Q?j94EXMvP1CXtzUu0N2BtauERVfimvdcZ8xQD4QCHK4JDJtdtQ4/YIkGt+vQq?=
+ =?us-ascii?Q?renS3IsciDwCZce+T5shl9Mob4ge4CBcT4F7S6LBQ/Ta7X0/Vmw99SRQ/SNE?=
+ =?us-ascii?Q?yLhzddjOf2e/11Cur7rJVCSqgdax9m01/Xy4SzZD+eqW69lxIosKydrAMK0C?=
+ =?us-ascii?Q?I5WKBMJ0Ga9ClEgx8JByu4XfWowEerTSKCgKeTEIIlpL5XcdmT2t3Tk6V6WM?=
+ =?us-ascii?Q?EJwgYHkeeChYhNJOImMFfOjRQ3qFu4vcofuY5xLSETRcgJDUzURyVdJt356B?=
+ =?us-ascii?Q?eLOwZR1Zg2qcI8O5dd/k892Yi6PoGo2cHl9xBzs0uwM1AO5HQo8E5bmLNCUT?=
+ =?us-ascii?Q?4ZX8B9nyWR8osz9DHfKRZcFq5koHxZSJeRUl+oKVw+gwje4PrJBxJz3Os+2v?=
+ =?us-ascii?Q?Ghus5EAdNPbjO3bOUT5oG2RHh5OQhApjvCA7QdIzALfJp45o8rNbThonFly3?=
+ =?us-ascii?Q?fzYATQDFMouHlctG/gCvBAlxW0xKXu8Jn78HJiBDWOe/BDnQAMOmv41tCOGb?=
+ =?us-ascii?Q?/++KqzX2WjFRdI6dGpg7ukv0XIE/imM=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5b09e58a84c9edcfe5724db5cd57e45d96a96bfa.1777306795.git.chleroy@kernel.org>
-X-Rspamd-Queue-Id: A68CB493894
+X-Exchange-RoutingPolicyChecked: ld0iQGMXLvI/bd6mFBLJINcJ+W9SwfJWuXkq6UH2QzA5tzkhdzYtZ1CEl3j6O2hFRej39sJbJ0uMw8AUo7WirO13YAskt6MGPXso6X3rr27daOlX41jRDf1GMHYyv5fRR+9DRhx0wYFCBP8xY4hnw/aGH9dhILsRN2PFkt0LLZUuY3Stzf7Bhh5xFgdJnNFZ612rgHaEDnqTHb+ssSbmubnKCqDjJWlhIMT1r86Sj25oBSDXoIZz+whOxC0mtUxOvVNOs+Q+pzzLyyLJMs7T5CHSdwYnMFwjfVxDyQclCV2HyCtr/5GXOMemYtGKRJ4yufuSeHOP3gTtWIoerCrFcQ==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1707bde3-4ea8-4410-0713-08dea5e26dbf
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Apr 2026 11:28:25.4631
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: XqrpJweKEL3Fh6n0ZsC0w+eUSKU+qb0HGijD+UbCatG+W1kmLSGz6jEnP07WyMtuIyEliAthcJFwOt9IOu00cdoB0bOKZFAe7NhHCaZzqaU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7564
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: 9FDC44938E7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282358-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282359-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[nvidia.com,linux-foundation.org,gmail.com,linutronix.de,vger.kernel.org,lists.infradead.org,lists.ozlabs.org,lists.freedesktop.org,lists.linux.dev,lists.xenproject.org,googlegroups.com,kvack.org,alsa-project.org,lists.linux-m68k.org,arm.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[50];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[will@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 
-[+Catalin]
 
-On Mon, Apr 27, 2026 at 07:13:49PM +0200, Christophe Leroy (CS GROUP) wrote:
-> At the time being, x86 and arm64 are missing unsafe_copy_from_user().
-> 
-> Add it.
-> 
-> Signed-off-by: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
+
+> -----Original Message-----
+> From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+> Sent: Wednesday, April 29, 2026 12:24 PM
+> To: netdev@vger.kernel.org
+> Cc: intel-wired-lan@lists.osuosl.org; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; Loktionov, Aleksandr
+> <aleksandr.loktionov@intel.com>; Keller, Jacob E
+> <jacob.e.keller@intel.com>; horms@kernel.org;
+> jesse.brandeburg@intel.com; Nguyen, Anthony L
+> <anthony.l.nguyen@intel.com>; davem@davemloft.net;
+> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com; Jose Ignacio
+> Tornos Martinez <jtornosm@redhat.com>; stable@vger.kernel.org
+> Subject: [PATCH net v5 3/4] iavf: send MAC change request
+> synchronously
+>=20
+> After commit ad7c7b2172c3 ("net: hold netdev instance lock during
+> sysfs operations"), iavf_set_mac() is called with the netdev instance
+> lock already held.
+>=20
+> The function queues a MAC address change request via
+> iavf_replace_primary_mac() and then waits for completion. However, in
+> the current flow, the actual virtchnl message is sent by the watchdog
+> task, which also needs to acquire the netdev lock to run.
+> Additionally, the adminq_task which processes virtchnl responses also
+> needs the netdev lock.
+>=20
+> This creates a deadlock scenario:
+> 1. iavf_set_mac() holds netdev lock and waits for MAC change 2.
+> Watchdog needs netdev lock to send the request -> blocked 3. Even if
+> request is sent, adminq_task needs netdev lock to process
+>    PF response -> blocked
+> 4. MAC change times out after 2.5 seconds 5. iavf_set_mac() returns -
+> EAGAIN
+>=20
+> This particularly affects VFs during bonding setup when multiple VFs
+> are enslaved in quick succession.
+>=20
+> Fix by implementing a synchronous MAC change operation similar to the
+> approach used in commit fdadbf6e84c4 ("iavf: fix incorrect reset
+> handling in callbacks").
+>=20
+> The solution:
+> 1. Send the virtchnl ADD_ETH_ADDR message directly (not via watchdog)
+> 2. Poll the admin queue hardware directly for responses 3. Process all
+> received messages (including non-MAC messages) 4. Return when MAC
+> change completes or times out
+>=20
+> A new generic function iavf_poll_virtchnl_response() is introduced
+> that can be reused for any future synchronous virtchnl operations. It
+> takes a callback to check completion, allowing flexible condition
+> checking.
+>=20
+> This allows the operation to complete synchronously while holding
+> netdev_lock, without relying on watchdog or adminq_task. The function
+> can sleep for up to 2.5 seconds polling hardware, but this is
+> acceptable since netdev_lock is per-device and only serializes
+> operations on the same interface.
+>=20
+> To support this, change iavf_add_ether_addrs() to return an error code
+> instead of void, allowing callers to detect failures. Additionally,
+> export iavf_mac_add_reject() to enable proper rollback on local
+> failures (timeouts, send errors) - PF rejections are already handled
+> automatically by iavf_virtchnl_completion().
+>=20
+> Remove vc_waitqueue entirely because iavf_set_mac was the only waiter
+> on this waitqueue and after the changes it is not needed.
+>=20
+> Fixes: ad7c7b2172c3 ("net: hold netdev instance lock during sysfs
+> operations")
+> cc: stable@vger.kernel.org
+> Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
 > ---
->  arch/arm64/include/asm/uaccess.h | 29 ++++++++++++++++++++++++-----
->  1 file changed, 24 insertions(+), 5 deletions(-)
+> v5: Address the comments from Przemek Kitszel:
+>     - Add note in commit message about vc_waitqueue removal.
+>     - Change kdoc to use "Return:" instead of "Returns"
+>     - kdoc should end with '*/' not '**/' (new functions or with
+> changes in the
+>     prototypes)
+>     - Sort lines from longest to shortest
+> (iavf_poll_virtchnl_response)
+>     - Avoid "sleep then check time" (iavf_poll_virtchnl_response)
+>     Address AI review (sashiko.dev) from Simon Horman:
+>     - Restore adapter->hw.mac.addr on local failure (complete rollback
+>       in iavf_set_mac)
+>     - Remove timeout current_op clearing to prevent overlapping
+> command
+>       race, the status can be controlled from outside and better to
+> not
+>       corrupt it (iavf_poll_virtchnl_response) (as in v3).
+> v4: https://lore.kernel.org/all/20260423130405.139568-4-
+> jtornosm@redhat.com/
+>=20
+>  drivers/net/ethernet/intel/iavf/iavf.h        |  10 +-
+>  drivers/net/ethernet/intel/iavf/iavf_main.c   |  71 +++++++++----
+>  .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 100 ++++++++++++++++-
+> -
+>  3 files changed, 151 insertions(+), 30 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf.h
+> b/drivers/net/ethernet/intel/iavf/iavf.h
+> index e9fb0a0919e3..78fa3df06e11 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf.h
+> +++ b/drivers/net/ethernet/intel/iavf/iavf.h
+> @@ -260,7 +260,6 @@ struct iavf_adapter {
+>  	struct work_struct adminq_task;
+>  	struct work_struct finish_config;
+>  	wait_queue_head_t down_waitqueue;
+> -	wait_queue_head_t vc_waitqueue;
+>  	struct iavf_q_vector *q_vectors;
+>  	struct list_head vlan_filter_list;
+>  	int num_vlan_filters;
+> @@ -589,8 +588,9 @@ void iavf_configure_queues(struct iavf_adapter
+> *adapter);  void iavf_enable_queues(struct iavf_adapter *adapter);
+> void iavf_disable_queues(struct iavf_adapter *adapter);  void
+> iavf_map_queues(struct iavf_adapter *adapter); -void
+> iavf_add_ether_addrs(struct iavf_adapter *adapter);
 
-Why?
+...
 
-And please cc the arm64 maintainers on arm64 patches next time. You've
-managed to cc most of the world apart from us.
+> +/**
+> + * iavf_poll_virtchnl_response - Poll admin queue for virtchnl
+> response
+> + * @adapter: adapter structure
+> + * @condition: callback to check if desired response received
+> + * @cond_data: context data passed to condition callback
+> + * @timeout_ms: maximum time to wait in milliseconds
+> + *
+> + * Polls the admin queue and processes all incoming virtchnl
+> messages.
+> + * After processing each valid message, calls the condition callback
+> to
+> +check
+> + * if the expected response has been received. The callback receives
+> +the opcode
+> + * of the processed message to identify which response was received.
+> +Continues
+> + * polling until the callback returns true or timeout expires.
+> + * Caller must hold netdev_lock. This can sleep for up to timeout_ms
+> +while
+> + * polling hardware.
+> + *
+> + * Return: 0 on success (condition met), -EAGAIN on timeout, or error
+> +code  */ int iavf_poll_virtchnl_response(struct iavf_adapter
+> *adapter,
+> +				bool (*condition)(struct iavf_adapter
+> *adapter,
+> +						  const void *data,
+> +						  enum virtchnl_ops v_op),
+> +				const void *cond_data,
+> +				unsigned int timeout_ms)
+> +{
+> +	struct iavf_hw *hw =3D &adapter->hw;
+> +	struct iavf_arq_event_info event;
+> +	enum virtchnl_ops received_op;
+> +	unsigned long timeout;
+> +	int ret =3D -EAGAIN;
+> +	u16 pending =3D 0;
+> +	u32 v_retval;
+> +
+> +	netdev_assert_locked(adapter->netdev);
+> +
+> +	event.buf_len =3D IAVF_MAX_AQ_BUF_SIZE;
+> +	event.msg_buf =3D kzalloc(event.buf_len, GFP_KERNEL);
+> +	if (!event.msg_buf)
+> +		return -ENOMEM;
+> +
+> +	timeout =3D jiffies + msecs_to_jiffies(timeout_ms);
+> +	do {
+> +		if (!pending)
+> +			usleep_range(50, 75);
+> +
+> +		if (iavf_clean_arq_element(hw, &event, &pending) =3D=3D
+> IAVF_SUCCESS) {
+> +			received_op =3D (enum
+> virtchnl_ops)le32_to_cpu(event.desc.cookie_high);
+> +			if (received_op !=3D VIRTCHNL_OP_UNKNOWN) {
+> +				v_retval =3D
+> le32_to_cpu(event.desc.cookie_low);
+> +
+> +				iavf_virtchnl_completion(adapter,
+> received_op,
+> +							 (enum
+> iavf_status)v_retval,
+> +							 event.msg_buf,
+> event.msg_len);
+> +
+> +				if (condition(adapter, cond_data,
+> received_op)) {
+> +					ret =3D 0;
+> +					break;
+> +				}
+> +			}
+> +
+> +			memset(event.msg_buf, 0, IAVF_MAX_AQ_BUF_SIZE);
+> +
+> +			if (pending)
+> +				continue;
+I think continue at the end of the cycle is redundant.
 
-Will
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+
+> +		}
+> +	} while (time_before(jiffies, timeout));
+> +
+> +	kfree(event.msg_buf);
+> +	return ret;
+> +}
+> --
+> 2.53.0
+
 
