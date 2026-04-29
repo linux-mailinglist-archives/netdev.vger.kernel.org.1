@@ -1,235 +1,133 @@
-Return-Path: <netdev+bounces-282341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282342-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GHknOMjd8Wn3kwEAu9opvQ
-	(envelope-from <netdev+bounces-282341-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 12:30:32 +0200
+	id 8PjtDzne8Wn3kwEAu9opvQ
+	(envelope-from <netdev+bounces-282342-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 12:32:25 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91E3A492F47
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 12:30:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C745E492F97
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 12:32:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 57A6E3029609
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 10:30:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BD61A3013EDE
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 10:32:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 161083D9DDB;
-	Wed, 29 Apr 2026 10:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF2553DE427;
+	Wed, 29 Apr 2026 10:32:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20251104.gappssmtp.com header.i=@baylibre-com.20251104.gappssmtp.com header.b="bjgsjhgb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BDSdjthw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1127B3D5640
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 10:30:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC09A3D091F;
+	Wed, 29 Apr 2026 10:32:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777458626; cv=none; b=VWw5+O0n/DYjfXOkedpZAnyiDiPhF2/gX/bsZV+BoXbR26bokiTqfpifItTP4mafOTlq3LLL8/FkT7LcuTygtFLO3Pu1I8fD+LdYmT/NjAT+aBJztLfRgSAV+uB8YqM0LynqJUlU4GxFqHvkwfh8ikfD/GvhwE3BIf29kcWLkmk=
+	t=1777458740; cv=none; b=SRxrObPtvPM2roFmX4sbRG71V27e+yUy2jeatWiSK5JTxi7KFKqmTa3D9Fw7hD8psY8g4Y0bmAKvN8NiwOQyBfe2Bp6e+yDRfnyrrYISUjPqGA7uUfC7v0AOawAyX37SCiUlJ+2cYW6tTJ1BsDP5EKBK+d6zzGWpwWNLRb9lgKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777458626; c=relaxed/simple;
-	bh=8k+/eJ+oplAKwa6y8hgdOMX1aMdC7hSdvQ+WDtJexew=;
+	s=arc-20240116; t=1777458740; c=relaxed/simple;
+	bh=duAsDJqmbqNJ9PlYMKXHs5Ry2vjSnimCTEf03ja5FRg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uPt++Lgyzh7dqRAN3GlzrrqbBYdn1UeAAOAkB9c3n0kOirMtX1qaeLQAeMUCYWiZR6VfXMajzMzFzmEDV829iFjuI10P83ANDWov5oUuBLYrSvHUeYAkH3EzZfySvN0mhYDasSEsNU3j22yMLrwYOiRY2BtSHURdeLjzwuEF8L0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20251104.gappssmtp.com header.i=@baylibre-com.20251104.gappssmtp.com header.b=bjgsjhgb; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-488d2079582so144955175e9.2
-        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 03:30:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20251104.gappssmtp.com; s=20251104; t=1777458622; x=1778063422; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4K3CX6fQVp3G5LFrOMSsx2n8N4FljSdUREsN/3Z40rY=;
-        b=bjgsjhgb4OsQIhvq0fHIIxH0cSCfCKFi1n04zU6r75eqdWhQPXahMcQUfQFXi6x1c5
-         f1EyEG4/TtvYx4j+IWrkk3EN2bJqSqqYEfCaZUZFwPZbs6rIfdATuqntg9fG5HiVNba2
-         r0lTsBgGML1akn11CEmCoZCHkaIgPiOsDNuZ7gj5RHLeFHOwxfhfzcaUeB2AWvElJsry
-         5fj6nLHhewUeWD8JULg4yJMi+laRDU89fHvNln0y1E5h1oGbHnWhypceJ0UD/0TGuDQd
-         k7p9RoPpJxxncom3FjG4LGEQ/eLJEriLw8incVpA5TwDHKQ331+s6B09FQXSkdLw9DXs
-         LVIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777458622; x=1778063422;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4K3CX6fQVp3G5LFrOMSsx2n8N4FljSdUREsN/3Z40rY=;
-        b=tVm2uPdgEPzHfunJzxMdPqoG6IdJA3SX9SEFWEn4/U856gOQkUodXigklKAsUOCUfo
-         oWse/1W6QDC555+/C0hYTE9vQy4wQS3GKmOb41VjcJq4MmeFSL0bnstRedZKpISajgDD
-         M+PDfHIQVEevQZz+E+MqxoWgzuryWYYBA5iKc0aYD0jSBMAI1TGiQQV71ty1+rrbmLNd
-         SS9MbeWjCRkVtMah42q95kdfd0hsaD26BA1ppcA3IZboVhdAHAO0rC435ob+7Wo7PU2F
-         /YrNK6fFjEAforILU2PSh/1d90be4Gto0L2r5DAPh3Vy2T1vJpcVVBItWmM/2FlAwaMB
-         Vb4w==
-X-Forwarded-Encrypted: i=1; AFNElJ+31yoIYlMG1QToqzyjQPCiTewgf/V6DlAZsznwFoKRYzXGXX8dxuZOKpRkFteVMtlSU3LeLIE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzq/gPZ+kFB+j8BFjR8KzeANycx+VaCFDshtX3eHd71BS7RzMmy
-	qcoHVdIwu7s2P7FD0soHv+2QDvtmHS+0SYtyBW5YwTi8ly14zCkz6KeAAI1vycZNh8g=
-X-Gm-Gg: AeBDieuwC6fC9bBgucmwclVPqJYLhFbQGtB6AN4/QhUmst3NRNhFQ3bBBHjTDZS9sKF
-	1e25eG1zNueNxa0gFm5qx/SJTk5ik5MrE6srXwecfeL4BvXkLBr56BE/loHcArYZPgvVaTIozDS
-	Ic0rPyfvSCjkWn7oxzFfsRNEPBQXijcA/2IZNS2TEFJZClbbwIFjM/WfbCpFnI2ORVcHXqCnJIu
-	reHZQarX+lt+kTYi2GQKJhWAeX0OJ55F/81HBohdVNFMv1il8b3X/9ly5HdO7xbWuhvnq8VIRFC
-	KtehEHDzZ7I76VrazBxtkmn6jlwRIAhqD8IKW8iVaY0ZVYbP8Cnkspn+/zO/h3+zvJOuMg65H/p
-	IcHY6r1sIKlVlCFm+YrIuJKq4IkMchb+d0oSB8NV3V4Q8JYL+KPD/9mKSzFlXrUzoBN+Dnqk/81
-	jZbLIwxc/EO7qV5H0DiQMYAuEQrDBUX5StIsQxE6CBviKv8L9HkbdiwCtSYYYFrKid+Po3Ojmzb
-	DsByeCHx1iu7OEhjyMr41sUaQ==
-X-Received: by 2002:a05:600c:a4f:b0:485:3a03:ceca with SMTP id 5b1f17b1804b1-48a7b543796mr66187605e9.23.1777458621928;
-        Wed, 29 Apr 2026 03:30:21 -0700 (PDT)
-Received: from localhost (p200300f65f114e08936c55da887fa426.dip0.t-ipconnect.de. [2003:f6:5f11:4e08:936c:55da:887f:a426])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-48a7c57b641sm47160965e9.6.2026.04.29.03.30.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Apr 2026 03:30:21 -0700 (PDT)
-Date: Wed, 29 Apr 2026 12:30:20 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Michael Grzeschik <m.grzeschik@pengutronix.de>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Vincent Mailhol <mailhol@kernel.org>, 
-	Krzysztof Halasa <khc@pm.waw.pl>, Johannes Berg <johannes@sipsolutions.net>, 
-	Markus Schneider-Pargmann <msp@baylibre.com>, Steffen Klassert <klassert@kernel.org>, 
-	David Dillow <dave@thedillows.org>, Ion Badulescu <ionut@badula.org>, 
-	Mark Einon <mark.einon@gmail.com>, Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com, 
-	Manish Chopra <manishc@marvell.com>, Potnuri Bharat Teja <bharat@chelsio.com>, 
-	Denis Kirjanov <kirjanov@gmail.com>, Jijie Shao <shaojijie@huawei.com>, 
-	Jian Shen <shenjian15@huawei.com>, Cai Huoqing <cai.huoqing@linux.dev>, 
-	Fan Gong <gongfan1@huawei.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Tariq Toukan <tariqt@nvidia.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Mark Bloch <mbloch@nvidia.com>, Ido Schimmel <idosch@nvidia.com>, 
-	Petr Machata <petrm@nvidia.com>, Yibo Dong <dong100@mucse.com>, Simon Horman <horms@kernel.org>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com, Jiri Pirko <jiri@resnulli.us>, 
-	Francois Romieu <romieu@fr.zoreil.com>, Daniele Venzano <venza@brownhat.org>, 
-	Samuel Chessman <chessman@tux.org>, Jiawen Wu <jiawenwu@trustnetic.com>, 
-	Mengyuan Lou <mengyuanlou@net-swift.com>, Kevin Curtis <kevin.curtis@farsite.co.uk>, 
-	Arend van Spriel <arend.vanspriel@broadcom.com>, Stanislav Yakovlev <stas.yakovlev@gmail.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Kees Cook <kees@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Thomas Fourier <fourier.thomas@gmail.com>, Ingo Molnar <mingo@kernel.org>, 
-	Kory Maincent <kory.maincent@bootlin.com>, Zilin Guan <zilin@seu.edu.cn>, 
-	Marco Crivellari <marco.crivellari@suse.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Jacob Keller <jacob.e.keller@intel.com>, Philipp Stanner <phasta@kernel.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Yeounsu Moon <yyyynoom@gmail.com>, 
-	Denis Benato <benato.denis96@gmail.com>, Yonglong Liu <liuyonglong@huawei.com>, 
-	Andy Shevchenko <andriy.shevchenko@intel.com>, Yicong Hui <yiconghui@gmail.com>, 
-	Randy Dunlap <rdunlap@infradead.org>, MD Danish Anwar <danishanwar@ti.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Sai Krishna <saikrishnag@marvell.com>, 
-	Ethan Nelson-Moore <enelsonmoore@gmail.com>, Larysa Zaremba <larysa.zaremba@intel.com>, 
-	Joe Damato <joe@dama.to>, Double Lo <double.lo@cypress.com>, 
-	Colin Ian King <colin.i.king@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-can@vger.kernel.org, linux-parisc@vger.kernel.org, intel-wired-lan@lists.osuosl.org, 
-	linux-rdma@vger.kernel.org, oss-drivers@corigine.com, linux-wireless@vger.kernel.org, 
-	brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com
-Subject: Re: [PATCH net-next] net: Consistently define pci_device_ids using
- named initializers
-Message-ID: <afHdAUpvfYa7A3AE@monoceros>
-References: <20260428171845.2288395-2-u.kleine-koenig@baylibre.com>
- <20260429-responsible-clever-coyote-6b79f1-mkl@pengutronix.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pTKfUXvaNJ6rghLH0OKCyd3Y69+sOP5em7hrRuIf3D44uUVFb6bOsWdTGnky/JHex60076HeKCeDtGEXFaMvtLlkkBqIOBj579owqaIeC6+hMr9h6KQXywKcgt6fCJ6Vn2U457ZKMsyuVtd/FS8lRYChGYziAaCc9dB8YOQf4Jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BDSdjthw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0034AC19425;
+	Wed, 29 Apr 2026 10:32:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777458740;
+	bh=duAsDJqmbqNJ9PlYMKXHs5Ry2vjSnimCTEf03ja5FRg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BDSdjthwmycI1JuMkY+YoDIMxrV1zeGppZFXcAlagvK0BOvUCw0EICd1Da+IjHAqL
+	 Nl/cHxSqotsKTTxJZnMV5zmmfot+IhZebTQ2sZqZyVmgzwTnCBs7HiknXhpIJI6M6J
+	 O14UMbwWo68lWQHPX24mFeirz8BK84v6OwGSU1IbHzNmiZGH/WH+cagv0FxNZqqY5k
+	 Rr9MKZwVGMF89IjlZPsjFmV7I/JLRAmqLteA2SpIh/vtDMJDwHhCtw1UMaPvac1XKY
+	 miLFtDFJHCPTjxdY/u3kh1A76JTASCGaYN1kzv0CUD2cwTrZ4qV6ZaSUs5eZJNDsWM
+	 3j3wBk9RUb/BA==
+Date: Wed, 29 Apr 2026 11:32:15 +0100
+From: Simon Horman <horms@kernel.org>
+To: Michal Schmidt <mschmidt@redhat.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Petr Oros <poros@redhat.com>, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] ice: fix stats array overflow when VF requests more
+ queues
+Message-ID: <20260429103215.GY900403@horms.kernel.org>
+References: <20260427151827.43342-1-mschmidt@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="3grpbpcumi4i3vj3"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260429-responsible-clever-coyote-6b79f1-mkl@pengutronix.de>
-X-Rspamd-Queue-Id: 91E3A492F47
+In-Reply-To: <20260427151827.43342-1-mschmidt@redhat.com>
+X-Rspamd-Queue-Id: C745E492F97
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[baylibre-com.20251104.gappssmtp.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282341-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[baylibre.com];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	TAGGED_FROM(0.00)[bounces-282342-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[pengutronix.de,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,pm.waw.pl,sipsolutions.net,baylibre.com,thedillows.org,badula.org,gmail.com,marvell.com,chelsio.com,huawei.com,linux.dev,intel.com,nvidia.com,mucse.com,realtek.com,resnulli.us,fr.zoreil.com,brownhat.org,tux.org,trustnetic.com,net-swift.com,farsite.co.uk,broadcom.com,bootlin.com,seu.edu.cn,suse.com,infradead.org,ti.com,dama.to,cypress.com,vger.kernel.org,lists.osuosl.org,corigine.com,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[u.kleine-koenig@baylibre.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[baylibre-com.20251104.gappssmtp.com:+];
-	RCPT_COUNT_GT_50(0.00)[81];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,baylibre-com.20251104.gappssmtp.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,horms.kernel.org:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,atlassian.net:url]
+
+On Mon, Apr 27, 2026 at 05:18:26PM +0200, Michal Schmidt wrote:
+> When a VF increases its queue count via VIRTCHNL_OP_REQUEST_QUEUES,
+> ice_vc_request_qs_msg() sets vf->num_req_qs and triggers a VF reset.
+> The reset calls ice_vf_reconfig_vsi(), which does ice_vsi_decfg()
+> followed by ice_vsi_cfg(). ice_vsi_decfg() does not free the per-ring
+> stats arrays. Inside ice_vsi_cfg_def(), ice_vsi_set_num_qs() updates
+> alloc_txq/alloc_rxq to the new larger value, but
+> ice_vsi_alloc_stat_arrays() returns early because the stats already
+> exist. ice_vsi_alloc_ring_stats() then iterates using the new larger
+> alloc_txq and writes beyond the bounds of the old, smaller
+> tx_ring_stats/rx_ring_stats pointer arrays, corrupting adjacent SLUB
+> metadata.
+
+...
+
+> See the linked RHEL Jira item for a reproducer.
+> 
+> Fixes: 2a2cb4c6c181 ("ice: replace ice_vf_recreate_vsi() with ice_vf_reconfig_vsi()")
+> Closes: https://redhat.atlassian.net/browse/RHEL-164321
+> Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+> Assisted-by: Claude:claude-opus-4-6 semcode
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
---3grpbpcumi4i3vj3
-Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net-next] net: Consistently define pci_device_ids using
- named initializers
-MIME-Version: 1.0
-
-Hello Marc,
-
-On Wed, Apr 29, 2026 at 11:10:21AM +0200, Marc Kleine-Budde wrote:
-> On 28.04.2026 19:18:44, Uwe Kleine-K=F6nig (The Capable Hub) wrote:
-> >  	},
-> > -	{ 0,}
-> > +	{ }
->=20
-> Nitpick: can you convert the terminating entry to follow the same style
-> as the rest of the driver:
->=20
-> diff --git a/drivers/net/can/sja1000/plx_pci.c b/drivers/net/can/sja1000/=
-plx_pci.c
-> index a03553b80a5d..d69ff0ccfd94 100644
-> --- a/drivers/net/can/sja1000/plx_pci.c
-> +++ b/drivers/net/can/sja1000/plx_pci.c
-> @@ -353,8 +353,8 @@ static const struct pci_device_id plx_pci_tbl[] =3D {
->                  PCI_DEVICE_SUB(ASEM_RAW_CAN_VENDOR_ID, ASEM_RAW_CAN_DEVI=
-CE_ID,
->                                 ASEM_RAW_CAN_SUB_VENDOR_ID, ASEM_RAW_CAN_=
-SUB_DEVICE_ID_BIS),
->                  .driver_data =3D (kernel_ulong_t)&plx_pci_card_info_asem=
-_dual_can,
-> -        },
-> -        { }
-> +        }, {
-> +        }
->  };
->  MODULE_DEVICE_TABLE(pci, plx_pci_tbl);
-
-That might be subjective. I also see some value to have the terminating
-entry stand out a bit in the formatting and so I usually kept the entry
-as it was.
-
-If you prefer I can rework the can drivers at least to match your taste.
-
-As you didn't object to have the can drivers converted as part of the
-drivers/net patch, I assume that part is OK for you?!
-
-Best regards
-Uwe
-
---3grpbpcumi4i3vj3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmnx3bkACgkQj4D7WH0S
-/k6JpggAqaPu+dVWg39EGo869zm4GExkyk9Cfi0y4X05WE8coeYG2q3U4oD1x05e
-mbEJVHdpAHnBcB/vafRjFDSueFN1LbdYKyqmCOoSEVZm6FUryg3uez5LBTQ1H2M+
-HSSsw95R2MJqtNxxGphk2Cr4lR3yVrG+oJpIot8CPMMed7xddK4yn7AdrudrcYAv
-fhOuS+7KEB4g6yajDT95eF2Jj+hN7rzcU0+g6TBO5Gd3GnLwIhG6FG4iZnwnaU8Z
-FqH+sC+KN85L/JYWezdPXgx5DnHkrmX1530hPFowO9u5SBLf6zBmbuKUgF8CdU4H
-gSp6StxoogXj+z4H3WJRpNSbxjHwNQ==
-=BqTG
------END PGP SIGNATURE-----
-
---3grpbpcumi4i3vj3--
+FTR: There is an AI generated review of this patch available on sashiko.dev.
+I believe the issues flagged there pre-date this patch and do not impact
+this patch. So while I do not think they should block progress of this
+patch I suggest looking over them to see if any follow-up is warranted.
 
