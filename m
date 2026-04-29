@@ -1,175 +1,195 @@
-Return-Path: <netdev+bounces-282225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282226-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oEKyFXx48WkxhAEAu9opvQ
-	(envelope-from <netdev+bounces-282225-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 05:18:20 +0200
+	id 9t4SLmt88WnohAEAu9opvQ
+	(envelope-from <netdev+bounces-282226-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 05:35:07 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B716E48EA7C
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 05:18:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E4B148EADE
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 05:35:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7010E30180A5
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:18:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B9802303BB08
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:34:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60AE7388E42;
-	Wed, 29 Apr 2026 03:18:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD2753890F0;
+	Wed, 29 Apr 2026 03:34:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RWW19ZAy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d25M/Qx9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 287F730E0E9
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 03:18:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777432684; cv=pass; b=buCrqWFC45LHMh8sb1Bfx14KrlTK6Ztu6nTzYV0dz1OB+b7yMspOKxuGau7FAyeqAsvrxahqX66DP9dBBdOBJXKVcMDuZONumaFGEFJlg/8ZQ3Fii/2maU02NYVfplydOP1+aKa+Oh93IuqZSCCv7QftWM/ygCMCQGbn8o1V2Ws=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777432684; c=relaxed/simple;
-	bh=+9I6BZpYH4ZA17HgMEUnD97sbyGC7ok3QfK96UOaQy8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jVM7iYjjelLVuq3tAlUfCRRjLJaJjS6gctA6ZftQXMJDqG6MRmLzF2XGKQFWRomjbldZJeFBPgPw6m3gLk1ewu6AglymVTfGcvttU5sQ5hBo6VapojL3NLN7xcUOdSxraRzCD9A0HpnLvWEfZWItT2Z3TOVPtPgNmZfjPbYVN84=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RWW19ZAy; arc=pass smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 871A5388E6F
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 03:34:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777433695; cv=none; b=XODfcGLp5IVisJ6Kt+dFOjE/FUdeAOvn/gi9Iw15m0/foechgXBNK1fM67ASWC6lJfAKCVXvgLsXVMi7oPRtTzJKWhMzgtdHkwKmXU3aQUbG4e1vfS4ZUeilxP0iM+zLkUos2ex510jasZEl0+sp4+hSMLUS1EpMxKl/tTlMsxo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777433695; c=relaxed/simple;
+	bh=JIwkDKUEYsWpb/54OV85fk68Ds+wXKQ4rnbe2Q7eY2A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p2K5WyyCs/6ZlkYyrwKUFCfTBKk6vnVkxx849bD8hAnRTrPlfANQx2dWd78H6YCmr4hgdn0JDDtN5HrrA7CtMBA+pcUYz/ARKrvgZjj94BugpPbguTNirR1gqthAMh9oopLHCvVMDxzlA79Fv/j8AQVib+AsIAYPocaE/0RiDPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d25M/Qx9; arc=none smtp.client-ip=209.85.216.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-ba8472c1613so1756725166b.0
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 20:18:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777432680; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Ilh5JSjTTYwYkxjF8AOR3W6nr6bwFrxWhNLeEqsK2z5QkSJmjQ9e0RxQB0hC7DasE7
-         wapCZ44lUTbaa++bOc6rQVZ7LQqyAEci5+dZL91Z8+IxUpCSCQ8WSRYL7KSPoSiiHHCe
-         7wf4qHp3iDBhCZmkCzBFDCQmSthjc0gYIC8XI9kwjJWGinEEHrrUVdYv5gn8SnBBA4bC
-         0yW3Fpdkcs0mIG4EKzbWmmB6F+y2Fx5CZkdr5IdB7kRCODpsyp4d0ccM9FkrNcbz+nDj
-         umTazXy7lqfWbWwmf+MLzNCNg0nK3CV+8zqnb45lk8r1V5PhviX0EsmJlY/x811b9RMM
-         sUsg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=QxUgM2+HSvGtmsANZ7nKaXzcaQ2hVwBZw7XEi+CfGNA=;
-        fh=xYqZzbZo7gkXGIXbZUWrdlEbdtmvlA4A3HGwRevES9Q=;
-        b=ZZ66p96AxpLAFhYrPwdvpSrO6I5t++HQoKQgjIWiMeQwMcWCCw6I3uO0GCG+4TdZ50
-         Es/LCzUWAycPYAvVZJnCqaTzWMlGvD4EqveRx/VmcZnVfW1YwP8nDWx5nOer+s7TcTEo
-         RX+IC03VEmbVUjTHoU73sw+5LkAZ9qMP4SJssUVEF7L+pX9LOL7shkQEHyJVHhgrvpal
-         lITmE305Hoh4z1aGDdwS1WsLEFl3441YhhXImO1/769yqqGM4jGD3MXL0f7QC4e2avS8
-         qTyeBQchq4ZcSRbgFyPoRjPk+rmIgSgt2BMytow3ycqoGHQpzc4Qz1cbYiKMEV1/oZJw
-         6vIQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-35da01fc0baso7632266a91.2
+        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 20:34:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777432680; x=1778037480; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QxUgM2+HSvGtmsANZ7nKaXzcaQ2hVwBZw7XEi+CfGNA=;
-        b=RWW19ZAywl7ed+B6NQbrb6jMh3Hf5Hfzl2FxRUCqD7VomOof1PmUnTRypx7iF7J28z
-         qHi4f2xFyfv0lxSn5cEa6DCBqDKxSipCUPnQbndZ6SkEO5Qf4VaOhVTThTc31ZXZ4Gz0
-         gKQlT6L6KUBru9HU8J6iJAawvaipZVfJOYYQ2TWLzEMJs8tYAU6teTx20skz8fM1C47P
-         x7Ec6YoBAJ2zsOSCS/OcdxJwFDnFU97kSDMpL3ygjs6de/W0tVn8reu8bxRFiUdZMl8g
-         3BMpYN/pubBhgWoFJiyi5/kNaeZ9SvI6U8F/oyHRS/xfYiHKcHK76uAgQP+FByoR3JwQ
-         bi7Q==
+        d=gmail.com; s=20251104; t=1777433692; x=1778038492; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3g9FrMLlGHRvfkrznYnVah7AN8jAhSnFp4GMEptSQDo=;
+        b=d25M/Qx9Xk21rAr4eAyp/IZNtADrLCUTXWoSZuS1T0BgrHG/mthb8nfz0NlImiq6eo
+         6rdybEfhGnkObm/a/Z39yGDUe9L8Dh5u1qW38bwWjjRXy2zHBUG0luA/YY5KvDVeZIRA
+         vfZaPTT/zEMs2mm8TZ0LLZh/jW6nsD4hb2e1149FMe5+07W/XklpZi9gwRkwPQVbWNU2
+         fQhhYT+MDkThLh9PnxMj9lAtVzPvi3Uxos51DC4f8htIoKMOGHJUKhIOl7+y7HnMKVYn
+         uGr0KWqv5wUvCPJYJlsTH8yVe+73eHr2p16s1QlSqMef7k4/WYB7jJFOvFk5gZwe2txG
+         0jyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777432680; x=1778037480;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=QxUgM2+HSvGtmsANZ7nKaXzcaQ2hVwBZw7XEi+CfGNA=;
-        b=abQKDjYfRMIgkXxwRNl730Dfi4WXISApE1yvdTvevxBOzVS9wd83ogv5bjMsQZpijB
-         huXzC18fOVvmnXorUNFzRAs3mPYNdSvstRvaWuLcehm5rvyJAQy5W8KM65zl9tNnUXMg
-         x/SVIsDSul+NqykMNWHCTHz1ze7OcjbS4JlnsKigj01Tlgtz7fYeUn7Jrg3cHKV/okJM
-         kewPQihCP9gqbWsr5xt6+ur3CkSjmul5vvwN7Z5VG6xFSk/XzxEUK8d237H1kOzfz3Bm
-         ImlF9bIe0yGoNlIwzF8nRniTXzA4Ls+B9mbnNBX3PxkW2ci1q8p7nV54hRzZUWlu3Jux
-         QPVw==
-X-Gm-Message-State: AOJu0Yye39+Bdmpea/hPBeIIx6rrNS+nDxDzCA9cF2nGnmk3i8NDQ8R7
-	T0go3cdAwMZs5E5J2VeeNBs5wzCIVCI4+zKthj2uhV0HL2LKUGnSiCBuTTpuIxF/Ww8351uThC7
-	c5eJdk34OjTjOgYjndtpz4fTW93mDDGs=
-X-Gm-Gg: AeBDiev/OjpHhvfzcSGyBsnAM9/1/JaTA3fk87nTv9uQEmisRgmbG05tjc4CQhsnY7i
-	amdljxinBFJxXy5Cnbh5rcgxFjNEcxRI1OdnnjTglEIObtgzMCDB8FILLrndu6aSdwwny8KmHrP
-	I5njrRjPrne66/J6nvATx0buKWU7zbVwxL476XLsypwbb53f9/0WxaFk9/38fuho/DFEj1ScfJb
-	WKgX8byAJ26AU0rxmqQIw0Jj2NCNQFgisI1Fudar+Gaipk0UnT2vyGaC1mJwCCiUES5iPRrjVrs
-	xlkNtD7rJ9OZCXOr5K5x4wYYwAVT3iiKvOoa3lCNkERcX6V3DirTOXX+F4Dp/05j1TxpB058hph
-	h8vRDcdgTopI2l5094brA2mdA0VnH9jLVBCFenZD9s5iue7UH
-X-Received: by 2002:a17:906:5189:20b0:ba5:8976:552a with SMTP id
- a640c23a62f3a-bb801bcdb32mr259607366b.15.1777432680066; Tue, 28 Apr 2026
- 20:18:00 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1777433692; x=1778038492;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3g9FrMLlGHRvfkrznYnVah7AN8jAhSnFp4GMEptSQDo=;
+        b=jktFWJkH7UbFZDbtndF0fmwbRPK+6lRfhLZ5FLSRyi+3ecUjWMdkYUoWn0YyxRmA0N
+         aTy2Tg7JIh0nKk/NBDbROz/VzMX9iLtdYvpgyZGCIC+WIiyaxYzH7XErEjGk2pxiYVan
+         wwBRxJOw4d+/2NxggBF3eTmEZdrMNkabGQy0YswbhXlG+RJ5omhQt317BR84YaTHkq1s
+         em2c6gvlTCfo6Y31B45Qx25cQghGIVoGa3zgFQXwYfRCZfrBMAcaFdqmmof2GKDY4gvr
+         CJpLWsuQ4uFNzMDkuMTOALiwLptTBoXpBbpj/U6OEzYtPKDuO9a31Hdfc52YsUZkqsXo
+         pz8Q==
+X-Gm-Message-State: AOJu0YyO8I17fpu1Z+LSeAH5qk9oSM0Rl8I7Be48VdxyFqqZUf9zWbq5
+	LT+DCc6wQF2swIAzGzgaFdhS9U0uFPLNfBx7Zjw9BNVoBlnoieCbNz2e0n52eL+p
+X-Gm-Gg: AeBDiesMvGYHRVc1Wj9VXsHvDg5/iFDyX4nhW+CydIXyF/IoEJxM+vff2OcLu+BD+MQ
+	EKU2FF6fEt5fI84+WjtDk6JuRImP3mBk26Yjnb00FDWwGvyx2ypNBJRREvatIXYG1h4Ewwx50ME
+	5KoyhlSwsvHv1uIsr4gyyJB1OJRPOaONYPKqTNn7d1l0TT5yWkR881hIF+qZx/UsBsv+hZ6o/RF
+	H0qdabOGN5DN8C6gtAriIeVfHY7PcVHhrCPTXUUIf5r+tODmI6cfRNbUe2uYAFS7p5b+ioFOEos
+	uD36HIVZsXe5tX9Gvgi2299K1BRwzOr3hVrIlLenvEP83xns1sEOaII8eIgtkw61dS92hla/N95
+	egTwwX3NgV9RM6GedRXGjHHMF8Ftm5B4jdn9fVrpZg/NenjK9UF7qTAZWFquQ6p4KzEbLA/9Y9M
+	1iqGjAcGbFLQmFmEY4WvDi7D3Qa+UfEvPr8Fno6QFdC6gI/ew6pabF8hFt9T5nFwbc4PhLqFz4j
+	13YISOTK2SVKNAKAsqc1l1byg==
+X-Received: by 2002:a17:90b:39cb:b0:364:6f27:43ea with SMTP id 98e67ed59e1d1-3649205a569mr6457195a91.21.1777433692320;
+        Tue, 28 Apr 2026 20:34:52 -0700 (PDT)
+Received: from ryzen ([2601:644:8000:5b5d::8bd])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c7fd65065e1sm524839a12.22.2026.04.28.20.34.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Apr 2026 20:34:51 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Justin Chen <justin.chen@broadcom.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	bcm-kernel-feedback-list@broadcom.com (open list:BROADCOM ASP 2.0 ETHERNET DRIVER),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCHv2 net-next] net: bcmasp: handle EPROBE_DEFER for MAC retrieval
+Date: Tue, 28 Apr 2026 20:34:34 -0700
+Message-ID: <20260429033434.367366-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260428223058.113013-1-rosenp@gmail.com> <0f704ce2-e936-4bc1-8ab2-144de9e74af8@lunn.ch>
- <CAKxU2N8yb9-M9zELSxdEjLz02GKFZ2mOmgHhc7NbW+oJsvtGXg@mail.gmail.com> <d807e204-0052-4a33-b711-e372c7695023@lunn.ch>
-In-Reply-To: <d807e204-0052-4a33-b711-e372c7695023@lunn.ch>
-From: Rosen Penev <rosenp@gmail.com>
-Date: Tue, 28 Apr 2026 20:17:46 -0700
-X-Gm-Features: AVHnY4LvjhRn4RiVI-oALQDpmkPGHnzTYaHvuRa7haCpJwBNgJ0mrIKK1m71FWk
-Message-ID: <CAKxU2N_uQaGvsT5zri53Bcr9veCFWzV=_VnddJRdOXBYgoqWQw@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: gianfar: use alloc_ethdev_mqs
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Claudiu Manoil <claudiu.manoil@nxp.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: B716E48EA7C
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 0E4B148EADE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282225-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282226-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Tue, Apr 28, 2026 at 5:41=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> > > > +     *pdev =3D alloc_etherdev_mqs(sizeof(*priv), num_tx_qs, num_rx=
-_qs);
-> > > >       dev =3D *pdev;
-> > > >       if (NULL =3D=3D dev)
-> > > >               return -ENOMEM;
-> > > > @@ -679,10 +679,6 @@ static int gfar_of_init(struct platform_device=
- *ofdev, struct net_device **pdev)
-> > > >
-> > > >       priv->mode =3D mode;
-> > > >
-> > > > -     priv->num_tx_queues =3D num_tx_qs;
-> > > > -     netif_set_real_num_rx_queues(dev, num_rx_qs);
-> > > > -     priv->num_rx_queues =3D num_rx_qs;
-> > >
-> > > Please add to the commit message an explanation of why these two
-> > > assignments can be removed, because it is not obvious.
-> > I didn't explain that _mqs sets them?
->
-> How can alloc_etherdev_mqs() set them? priv is opaque to the core. All
-> the core knows is the size of struct gfar_private, but nothing about
-> its layout, where num_tx_queues and num_rx_queues are within priv.
-I see what you mean. Will respin this.
->
->         Andrew
+of_get_ethdev_address can return EPROBE_DEFER when using nvmem. To
+handle this, encode the error with ERR_PTR for minimal changes. Adjust
+the only place using bcmasp_interface_create.
+
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ v2: use goto after of_get_mac_address probe deferral
+ drivers/net/ethernet/broadcom/asp2/bcmasp.c      | 6 +++---
+ drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c | 6 ++++--
+ 2 files changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
+index 972474893a6b..e9b11b956344 100644
+--- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
++++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
+@@ -1333,10 +1333,10 @@ static int bcmasp_probe(struct platform_device *pdev)
+ 	i = 0;
+ 	for_each_available_child_of_node_scoped(ports_node, intf_node) {
+ 		intf = bcmasp_interface_create(priv, intf_node, i);
+-		if (!intf) {
+-			dev_err(dev, "Cannot create eth interface %d\n", i);
++		if (IS_ERR(intf)) {
+ 			of_node_put(ports_node);
+-			ret = -EINVAL;
++			ret = dev_err_probe(dev, PTR_ERR(intf), "Cannot create eth interface %d\n",
++					    i);
+ 			goto err_cleanup;
+ 		}
+ 		list_add_tail(&intf->list, &priv->intfs);
+diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
+index ec63f50a849e..4c34bf16bb76 100644
+--- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
++++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
+@@ -1254,7 +1254,7 @@ struct bcmasp_intf *bcmasp_interface_create(struct bcmasp_priv *priv,
+ 	struct device *dev = &priv->pdev->dev;
+ 	struct bcmasp_intf *intf;
+ 	struct net_device *ndev;
+-	int ch, port, ret;
++	int ch, port, ret = -EINVAL;
+
+ 	if (of_property_read_u32(ndev_dn, "reg", &port)) {
+ 		dev_warn(dev, "%s: invalid port number\n", ndev_dn->name);
+@@ -1314,6 +1314,8 @@ struct bcmasp_intf *bcmasp_interface_create(struct bcmasp_priv *priv,
+ 	}
+
+ 	ret = of_get_ethdev_address(ndev_dn, ndev);
++	if (ret == -EPROBE_DEFER)
++		goto err_deregister_fixed_link;
+ 	if (ret) {
+ 		netdev_warn(ndev, "using random Ethernet MAC\n");
+ 		eth_hw_addr_random(ndev);
+@@ -1340,7 +1342,7 @@ struct bcmasp_intf *bcmasp_interface_create(struct bcmasp_priv *priv,
+ err_free_netdev:
+ 	free_netdev(ndev);
+ err:
+-	return NULL;
++	return ERR_PTR(ret);
+ }
+
+ void bcmasp_interface_destroy(struct bcmasp_intf *intf)
+--
+2.54.0
+
 
