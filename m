@@ -1,139 +1,169 @@
-Return-Path: <netdev+bounces-282517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282518-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id dymyCOqC8mnLsAEAu9opvQ
-	(envelope-from <netdev+bounces-282517-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 00:15:06 +0200
+	id WNWdNFuD8mnLsAEAu9opvQ
+	(envelope-from <netdev+bounces-282518-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 00:16:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E39349AD03
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 00:15:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 824CD49AD89
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 00:16:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 97C4030158A6
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 22:15:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 736D0302EEAD
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 22:16:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E71944266B1;
-	Wed, 29 Apr 2026 22:15:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="hj/9APhO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FAE63AA1B8;
+	Wed, 29 Apr 2026 22:16:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F471A6819;
-	Wed, 29 Apr 2026 22:14:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D258437757A;
+	Wed, 29 Apr 2026 22:16:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777500902; cv=none; b=LmTQffq/PYG5/9VFh1f5G67XuoM6FQXh0cODBDTKqml4hGILE9ppW0MY5/PM3U46c66eqcMXa4fZTpQVCMB1CfBF71taxgyydFIQU8tSGy78I5xQ+aDHL6AkBWSyxQIyOP1w5AF6OXO3bUlEhqEU7vYG4p+8h/+hHJTFP/dHyYI=
+	t=1777500989; cv=none; b=aUq0IdAK8XAM5W2l8oJHtqgOWgmnZNb1LQGWQej678FH4Ir4x8RiijktRKpa+dD0tLtg2D/Ew47A2IIieXHz7iRZ2hnNw7LcQUQwnYewMtmtXQVXtPoH66ocW0HMKGXSCu/expe3WHlJQ8y8DWpconRJfiXqfkYvnTm+q9tGjo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777500902; c=relaxed/simple;
-	bh=HT26rCSHP7clF/Q6nvPHVhG4+FSjhFhTgoNSTML3fLc=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=RwDQgLF5eJka9lY5tJPg/LuJ3Emf9uDTkBBboLi9r+7PwE6Uiwm3LOVhnZuGzsWgjRdLX8ydzol/TO4n4f0G5WHzPfJg5xNDR9F4n4hGkRGkLSI/fWmmfmeaU8ALmupy8/lthjFUv4X/CuNbTv4t0DvBO6d7m9h2zPePk/xGoZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=hj/9APhO; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3F538A3C20;
-	Thu, 30 Apr 2026 00:14:46 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1777500889; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=7BzH4qdeDi13MyxTGrEycFeytt8YAjgTx/LRGdh9EU4=;
-	b=hj/9APhOG7xv9bwIo0S5OI+KMe2TJPUcRp/fSesPsu+tjUb08UvR9h79VYmk7yRKcYQAzF
-	4NwDMYQXEuXV/0dAMur/0sGJD9yn94rl4PT3qxxNpnmkpG7q9+SzzlkJC9rjoHoZWvjCov
-	50TKGyQf0zNn2SJ3RtHeMBUsRBnTg39+2JiicHcl8RWFjMiM4g8T53jrKksXTpiqG5jyZC
-	B9gF27oqA2VPHL0QcfTKCgn1P7WnxZVpFgbWTRqRNaLtJoSh2mJ1P6TzEvDOlGag0z8GkB
-	ZFYk9cAK78sScCM/UBWeBqLkpJY6joAb10kyP5jvgkGu55a4nzJ1fqCqPxQhMg==
+	s=arc-20240116; t=1777500989; c=relaxed/simple;
+	bh=g2elQ2LNyV4dm3QMU4usylgpVfyTYrLxwAIIqZy16tg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tQ1jJa967dwJS7NxfEoJwHGV5w4s9hqvqNWQpabXAmCnCq1JpfTZ1yBEbZ4A8GlDmVIrJ7DapdEmqfGEDIIJKqPoOZi5TESHqIknTN89nYZ/x/G/JaXcmD3m4SUR8tG2TuBDduLcfureP6CZj0htZs9fxUKdg0ouzsn2uDn3zrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1202)
+	id 2FF1420B716C; Wed, 29 Apr 2026 15:16:28 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 2FF1420B716C
+From: Long Li <longli@microsoft.com>
+To: Long Li <longli@microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K . Y . Srinivasan" <kys@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>
+Cc: Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v6 0/6] net: mana: Per-vPort EQ and MSI-X interrupt management
+Date: Wed, 29 Apr 2026 15:16:19 -0700
+Message-ID: <20260429221625.1841150-1-longli@microsoft.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 30 Apr 2026 00:14:46 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea
- <claudiu.beznea@tuxon.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Haavard
- Skinnemoen <hskinnemoen@atmel.com>, Jeff Garzik <jeff@garzik.org>, Paolo
- Valerio <pvalerio@redhat.com>, Conor Dooley <conor@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Vladimir Kondratiev
- <vladimir.kondratiev@mobileye.com>, Gregory CLEMENT
- <gregory.clement@bootlin.com>, =?UTF-8?Q?Beno=C3=AEt_Monin?=
- <benoit.monin@bootlin.com>, Tawfik Bayouk <tawfik.bayouk@mobileye.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, stable@vger.kernel.org
-Subject: Re: [PATCH net v2 2/4] net: macb: drop in-flight Tx SKBs on close
-In-Reply-To: <DI5J5659IHRK.2VDGEBK93OQJP@bootlin.com>
-References: <20260428-macb-drop-tx-v2-0-647f5199d8df@bootlin.com>
- <20260428-macb-drop-tx-v2-2-647f5199d8df@bootlin.com>
- <75229fab491465e06a98ee580a51f0b4@tipi-net.de>
- <DI5J5659IHRK.2VDGEBK93OQJP@bootlin.com>
-Message-ID: <a1fa54317d5a534bd7e6746754a754e8@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
 Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: 6E39349AD03
+X-Rspamd-Queue-Id: 824CD49AD89
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [3.54 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[microsoft.com : SPF not aligned (relaxed), No valid DKIM,reject];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282517-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-282518-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_SPAM(0.00)[0.899];
+	FROM_NEQ_ENVFROM(0.00)[longli@microsoft.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[]
+	R_DKIM_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Hi Théo
+This series adds per-vPort Event Queue (EQ) allocation and MSI-X interrupt
+management for the MANA driver. Previously, all vPorts shared a single set
+of EQs. This change enables dedicated EQs per vPort with support for both
+dedicated and shared MSI-X vector allocation modes.
 
-On 29.4.2026 11:26, Théo Lebrun wrote:
-> [...]
+Patch 1 moves EQ ownership from mana_context to per-vPort mana_port_context
+and exports create/destroy functions for the RDMA driver. Also adds EQ
+create/destroy calls to mana_ib_cfg_vport/uncfg_vport so RDMA vPorts get
+their own EQs.
 
->> Side note, not blocking: macb_close() doesn't cancel tx_error_task,
->> so the workqueue handler can race with this loop on tx_skb[]. The
->> exposure is pre-existing, but maybe worth a follow-up adding
->> cancel_work_sync() between napi_disable() and macb_free_consistent().
-> 
-> Yes, noticed that while working on the context swapping series [0].
-> The goal here is to improve MACB piecewise, so I won't take that on in
-> the current series.
-> 
-> [0]: 
-> https://lore.kernel.org/all/90f843aa3940bdbabadddce27314c1f1@tipi-net.de/t/#mda18f759c27a4d833084b23605463994632d97e3
->      (and the two replies)
+Patch 2 adds device capability queries to determine whether MSI-X vectors
+should be dedicated per-vPort or shared. When the number of available MSI-X
+vectors is insufficient for dedicated allocation, the driver enables sharing
+mode with bitmap-based vector assignment.
 
-Yes, flagged it on that series too. Wasn't my intention to fold it
-into this one either, just wanted to make sure it doesn't get lost
-with so much in flight on macb right now, which I really appreciate!
+Patch 3 introduces the GIC (GDMA IRQ Context) abstraction with reference
+counting, allowing multiple EQs to safely share a single MSI-X vector.
 
-> [...]
+Patch 4 converts the global EQ allocation in probe/resume to use the new
+GIC functions.
 
-Cheers,
-Nicolai
+Patch 5 adds per-vPort GIC lifecycle management, calling get/put on each
+EQ creation and destruction during vPort open/close.
+
+Patch 6 extends the same GIC lifecycle management to the RDMA driver's EQ
+allocation path.
+
+Changes in v6:
+- Rebased on net-next/main (v7.1-rc1)
+
+Changes in v5:
+- Rebased on net-next/main
+
+Changes in v4:
+- Rebased on net-next/main 7.0-rc4
+- Patch 2: Use MANA_DEF_NUM_QUEUES instead of hardcoded 16 for
+  max_num_queues clamping
+- Patch 3: Track dyn_msix in GIC context instead of re-checking
+  pci_msix_can_alloc_dyn() on each call; improved remove_irqs iteration
+  to skip unallocated entries
+
+Changes in v3:
+- Rebased on net-next/main
+- Patch 1: Added NULL check for mpc->eqs in mana_ib_create_qp_rss() to
+  prevent NULL pointer dereference when RSS QP is created before a raw QP
+  has configured the vport and allocated EQs
+
+Changes in v2:
+- Rebased on net-next/main (adapted to kzalloc_objs/kzalloc_obj macros,
+  new GDMA_DRV_CAP_FLAG definitions)
+- Patch 2: Fixed misleading comment for max_num_queues vs
+  max_num_queues_vport in gdma.h
+- Patch 3: Fixed spelling typo in gdma_main.c ("difference" -> "different")
+
+Long Li (6):
+  net: mana: Create separate EQs for each vPort
+  net: mana: Query device capabilities and configure MSI-X sharing for
+    EQs
+  net: mana: Introduce GIC context with refcounting for interrupt
+    management
+  net: mana: Use GIC functions to allocate global EQs
+  net: mana: Allocate interrupt context for each EQ when creating vPort
+  RDMA/mana_ib: Allocate interrupt contexts on EQs
+
+ drivers/infiniband/hw/mana/main.c             |  47 ++-
+ drivers/infiniband/hw/mana/qp.c               |  16 +-
+ .../net/ethernet/microsoft/mana/gdma_main.c   | 307 +++++++++++++-----
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 163 ++++++----
+ include/net/mana/gdma.h                       |  32 +-
+ include/net/mana/mana.h                       |   7 +-
+ 6 files changed, 416 insertions(+), 156 deletions(-)
+
+-- 
+2.43.0
 
