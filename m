@@ -1,202 +1,152 @@
-Return-Path: <netdev+bounces-282230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282231-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GDM/L89/8WlYhQEAu9opvQ
-	(envelope-from <netdev+bounces-282230-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 05:49:35 +0200
+	id ULBpMaKB8WlYhQEAu9opvQ
+	(envelope-from <netdev+bounces-282231-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 05:57:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2684E48EC9E
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 05:49:35 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB46C48EE7C
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 05:57:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BF1463044B84
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:49:33 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7B318301A98F
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 03:53:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24DB93112BC;
-	Wed, 29 Apr 2026 03:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E468E329E47;
+	Wed, 29 Apr 2026 03:52:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="BBI1JU8O"
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="oZxOoajT";
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="kWgGRYDo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F2A129BDAA
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 03:49:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.125.188.122
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777434573; cv=pass; b=nu1P0In2F+fUf5KQxjH3r0RNosl1byLBWoAq1u+ZcDQl58UB3jXqawTUGPZKuO+QO/2/q1G1zh7kUWM3BZ78wj6+MXBRy7N9QwXxJDgQ2cS8GYpxdWc3gtTjUHphVw3/zU+3B6Ac1ZdjRmC7239xQJE1fiZ439mmPEIBqKp8k80=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777434573; c=relaxed/simple;
-	bh=EqBNC2MSK4VwxObvb6iFCvTEIai6wWSpY/G3xu8ebB4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=odtqSfQCWTo9g0E5bNrzbdU4IPn9colovO0BWG00Oy+dw2azA0oEgvouNrTmSEvBy9hQxQ3vKudYFh3FcXudhpXOlTEIlqg7rzw42BgoLJTJ9nVmT3UpsdpwlnSnInr6mbvJ65YPXtq9Iz4Jisf1dNATDv74hInsoz+R/AoSoTc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=BBI1JU8O; arc=pass smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-dy1-f200.google.com (mail-dy1-f200.google.com [74.125.82.200])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id E91743F7DD
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 03:49:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1777434569;
-	bh=OieD6dy4kgRnLfBJqkyKmCw15BeoKWXt1QJY2qpfM9o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=BBI1JU8ORGYZts91Ul630iEY3cPWX2I3uLWKGX2ohmkz/eSJx2h8AKXfbTqcvTOaQ
-	 Ie2t+2ULmTQBxnfaOkwRPwXBSXNNPvpRCctR8I/IhxwMYMWsD2Dbkf1SSy5jSqT1AF
-	 ZHzDVmWgP3nxzd3A3qSDLQ8VEqS+GeFoos1VrOVqaOUtmsx16Imr9TvvFXqt8d2H9d
-	 wEvrjGhTxfvyRt9t1wvOZpQpPX2BTT4ftjCpF26++vaKgS5+isZGApfmmUqAQ6Vt6n
-	 XwHx9sNtoCgfUGzlYCcSJTBp3j/bVmEQWmjzUSJgLlmv2px0oUnv+KXyPj5ysFDeek
-	 sRE8NhcEgV0qKhykQ57iFv/h1uUQ/HgM6ubQ2+Sgd4rQxxqttfdc5LFOCEPsrwYygd
-	 JoeUnF6Hi/rhDVrCein8JU25oRfAeU6/oodjGBmZ0cqRzPlzmgflkcFQJhrYPHy4L9
-	 bK9UQJHJIQglltdy1OyxrRvwbkcbEAWHCvczwCq/Obhu/P+AfX8hHV8s7opW008pPd
-	 SXAP7PEiaCdmiL2cQPXTUJVac3beWmFfLBANLc21cVDOxJBHd2eeeyr3L+yA4AjsxW
-	 FOTLAXmLgpIKSGZzNHb4xv5b63zfNNU6PCZMHpsBOQVMyWxSlmZcEZGFIb+27wiJhA
-	 zg7iIbhBruGsTkKmBtbHNNIo=
-Received: by mail-dy1-f200.google.com with SMTP id 5a478bee46e88-2bda35eab74so536822eec.0
-        for <netdev@vger.kernel.org>; Tue, 28 Apr 2026 20:49:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777434568; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Pde0DNf5MZJpdHy1BFjWZIJMWJlaQ4n8sB6Bj3f2mpB2mjkQeS57u8ACPrQ80eUq7f
-         ywtZasi34+G5/D4438dKhDD9++OQNWGSqFv7+JYNc9spt9xcCZLgXgbc73H07k/RZtkt
-         pIcbCkjV7bedsZEp69kJ+sKBvjgqjytaMiAdg7cNUK+tnXzeobiPmqg18V3P4U1zjQ+r
-         7lz/vsSjB7zz5r8kqnF6IjB6DbKZJYD7fTrTc0IXeD/iKdx6QayzWSHCrc7PpUdDPE6s
-         ecDPcs+lvARoQl2ktYlb5fy7RqzJ42jULvQKJPG0ob6+url0WVPXFnsquSH6UNhZ0B3e
-         8Law==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version;
-        bh=OieD6dy4kgRnLfBJqkyKmCw15BeoKWXt1QJY2qpfM9o=;
-        fh=NQuuU9lwP0K2LMXazWSb+3U/PVFZtBWpgZLcm3Z7Oz0=;
-        b=Ey9M+0l72wg7vGaDWummB0+mRNtS88FL3DG6xOcdPmtKr0c2gwhCzBpN8BcHnPxdN5
-         CvYcCbiniyUZ1Z1Le7Et+aSa3DEou0Ar+wqkFIGp3IPng9Yus//4qWBU4HxGmMsjRX23
-         49Uay1HruIrMLKG3k3gIelLYgTvaelorhSt4Joa3MVYvix5vRbJ+Udzs10hkGQCykCrL
-         TBjRk5nc3LB+V06wmtuIDE+aFwP3+oQtR5fw+hdmQ2FtE9w+xqjF065RXKzSIQ8lSj4d
-         ForadMlAleJtLp2eAZR+Gdvu+1bMSI1P5zK1LKJZbFne+ygmxAkr3G1jHfN91s6Il/WA
-         kRrw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777434568; x=1778039368;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OieD6dy4kgRnLfBJqkyKmCw15BeoKWXt1QJY2qpfM9o=;
-        b=jo5fhnfd3fUphec3OJSbmXVXzDHoTWQpujZmzkhopsnMKdp2VYICn81mh72jQDdZ+n
-         Vn6nVXsoLNZH64J3aJXWceKaW+O2r5taXjn+AwfNZJNYeSTJZyV+B9QnMjlqfwcDoMR7
-         CmOzrX132RcF8twwreePRR76LUQ+uqLBxdsnUPYViCFWlyUIV4HAYJiiNyRqMvt1Zhj3
-         b9YZFWMwW33Yb+rzhXUYt4qFZnPoXI3pQOBjB5IJq9uzYzOw4Ijs2IPeM+SjZqNMCAQP
-         xmXHPxCFg3nVz28M59rXJDEFnsoMmyVDbwPDyFVLpRwhIM/6wTx4EUqHXX8L2cUkT4uv
-         QMzA==
-X-Forwarded-Encrypted: i=1; AFNElJ/27r2wvNtBOK0Xr2xZbkzIUxICV/hisYVw8Wr2934MNncHWk10aC/7Q0euFm0maJeSvC/KPSM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMwZry+jKk5PQhtCWZB989kyIA/C+2UznN36aceS6gfs2EnEKu
-	23RoS2b2U3Drs5oIpKYfT46fYp8y5vlbdb6xXd8WyUR2w/rPVSlOW5rAkIPbmQbiE7t+/vL2Rax
-	8go1C/brKjJJIwWqfYe0wpToFVBW4Mvise6D2rEemp19Ink+Hz2Gzen5+thUBby5rKtLIOsxDNw
-	wm8rxNMua+Jsbl9Ir3Jq2ZcGls5VhJ/NeiVD5+Q+j3i1GFrCPq
-X-Gm-Gg: AeBDiesTj16gxkK7oeoGO+6FlpXmzlcyNYH4/NTC024bZnuv+nOW0ksvsbVk+ng/RF+
-	X/XqI9s1zn/HNxKVddz7jXaHdBY6stxC8v6tSPVpSmVL/Ir1i4AA5QWbNFWlprSJ/sok0D+oL4+
-	zSEaf6rE07k5ujXAral/iSsCpXF4Y41hQpXv0rQhKq7oc3ERU4hSVPzb+so1pmXKHwT17RXVGX1
-	Ddj5gOF3qghMnWCJ78rsd7uTSg7a01vxtYPJiSr8hGl3WohI5RnlGua+n1PrO/1K3FQkMb/
-X-Received: by 2002:a05:7022:eca:b0:12d:b1a6:7387 with SMTP id a92af1059eb24-12de2c5cf51mr566293c88.0.1777434568482;
-        Tue, 28 Apr 2026 20:49:28 -0700 (PDT)
-X-Received: by 2002:a05:7022:eca:b0:12d:b1a6:7387 with SMTP id
- a92af1059eb24-12de2c5cf51mr566272c88.0.1777434568099; Tue, 28 Apr 2026
- 20:49:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BA3F304BDF;
+	Wed, 29 Apr 2026 03:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777434777; cv=none; b=Z8GNA9EN6VrCciOsph6SLs7Sapk7X5UyZQPSbVjLgYRKkjBLgnJQ1Kzjmtsf9nEC66b8rdN8jvnAjXYgz94yYXQcC/BBSyZYihGv7JVoH68WGf1TyvuIawS84cXzxhJ8FI3exeZIeeRGkMTvinnLtAM4k5YyJl09yClClqbAv8k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777434777; c=relaxed/simple;
+	bh=B2HX1PM5n3v6UGf6lGhJXaxG5YbV920BqkBbCmtAv4o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=F7F7lhP+1k2TM4wAu5xTuGz7NwNzqmdDyTaleDxgzgOs9yvGraaZjiH5mD85IvwW6g8b0Zylm3N44vriXNFkvSxcsn0Hpah1z+B+I3xXsUjrTog6g/fnYEVSk+5XX+DH6pkhqJZ5fQJ1iTJEwirWwxDGMh5sdfVf/nZyhxv/yy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=oZxOoajT; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=kWgGRYDo; arc=none smtp.client-ip=23.88.97.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1777434769;
+	bh=B2HX1PM5n3v6UGf6lGhJXaxG5YbV920BqkBbCmtAv4o=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=oZxOoajT+YOjhYwgFm/dXcpF4GKMHC0dJ7VhdNRwkCfqZ4EaFn+OOGZv3nG6gISma
+	 SZZP51glOz5DbZVc5Y4S9iZxAkaVzmTPpjrL64KB5i32jcyLnb+GHhxpNB9TA8TCQZ
+	 v0QsNyH8Xk3qRdWFpnOibTTY+tcnLFowhG4F359nM9EZO6NemyDQ88Gw6nIU9n+Gva
+	 JfQrnHt6G4Beaf2sBNH/7ycKX6i5Nu805jARpni7bTl19RGzplZSchhT1kvH/DQxBX
+	 MmxBv0nnfsE9u/TU0gY/LW+SsyoaF9Rm5AMAswgcyYsXF0K7pSy5RncWf4yQNZz7m5
+	 b4xJ0OkaDWeMw==
+Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
+	id 41F9047DF8; Wed, 29 Apr 2026 03:52:49 +0000 (UTC)
+X-Spam-Level: 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1777434768;
+	bh=B2HX1PM5n3v6UGf6lGhJXaxG5YbV920BqkBbCmtAv4o=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=kWgGRYDoO7Ge7fBRUGfGegL6TO2Y4W7UcT/wVTyd2U2J4XjJJWuNvoJQb2RA/CVZf
+	 SG5n0IiEEkLO8ZzEOiIP8V0QA0StsZpzC3T0LqEjc++fkZ7AVIadQiD2gy/9TMC0vM
+	 WwKctpjby1qSSCFuOGTCCjZ2Jteb4GXY29xqzJ5g74wM7rpde+Os2aW0+kSJxADo4c
+	 TYEHTq7C5JKSmz/0xCYQIE51sR2y0ZsGyyvzHEUtJpV+yaeeF9RcMYof73nlQJhsib
+	 sd4ODOVjApooJVGolS44ZIN2r/T6YiVaeQuhis6mcbNzCC8lS+yO3dqEA5AGBVHmfL
+	 /87/8WAqQx9aQ==
+Received: from [IPV6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb] (unknown [IPv6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb])
+	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 5A06646FB3;
+	Wed, 29 Apr 2026 03:52:48 +0000 (UTC)
+Message-ID: <54e5e249-d947-4b0f-915c-e13bc4f6e345@birger-koblitz.de>
+Date: Wed, 29 Apr 2026 05:52:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260424030345.1140665-1-aaron.ma@canonical.com>
- <0d1ef57c-7ab6-4ed1-bc11-323aeeb12eac@molgen.mpg.de> <CAJ6xRxUEcbadApMg0i7ngcqYMUacrGNvCrUZ96sqkW22TsC7iA@mail.gmail.com>
- <091fa6fa-0f1d-40b3-9c32-8401306f0e66@molgen.mpg.de> <9fd9877a-99d5-4710-a063-ca9a62d425c5@intel.com>
-In-Reply-To: <9fd9877a-99d5-4710-a063-ca9a62d425c5@intel.com>
-From: Aaron Ma <aaron.ma@canonical.com>
-Date: Wed, 29 Apr 2026 11:49:13 +0800
-X-Gm-Features: AVHnY4InM7OkWN2CPJ-1cMrO41cVOXWpX9YAPstQlqDm7rE2TqD4F005hpwpvK8
-Message-ID: <CAJ6xRxVc=q-7cJOVFt4GV=NJ8h2tZ7+EYFG86oM3i_H8PjH89g@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] [PATCH v2] ice: wait for reset completion in ice_resume()
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Paul Menzel <pmenzel@molgen.mpg.de>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Akeem G Abodunrin <akeem.g.abodunrin@intel.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>, 
-	intel-wired-lan@lists.osuosl.org, Kohei Enju <kohei@enjuk.jp>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 2684E48EC9E
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/4] r8152: Add support for the RTL8159 chip
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Chih Kai Hsu <hsu.chih.kai@realtek.com>
+References: <20260428-rtl8159_net_next-v1-0-52d03927b46f@birger-koblitz.de>
+ <20260428-rtl8159_net_next-v1-2-52d03927b46f@birger-koblitz.de>
+ <3e04d913-693c-44a9-a685-df9d0c9bd95f@lunn.ch>
+From: Birger Koblitz <mail@birger-koblitz.de>
+Content-Language: en-US
+In-Reply-To: <3e04d913-693c-44a9-a685-df9d0c9bd95f@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: CB46C48EE7C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[canonical.com,reject];
-	R_DKIM_ALLOW(-0.20)[canonical.com:s=20251003];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282230-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[birger-koblitz.de:+];
+	TAGGED_FROM(0.00)[bounces-282231-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[birger-koblitz.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[canonical.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aaron.ma@canonical.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,birger-koblitz.de:dkim,birger-koblitz.de:mid]
 
-On Tue, Apr 28, 2026 at 9:08=E2=80=AFPM Przemek Kitszel
-<przemyslaw.kitszel@intel.com> wrote:
->
->
-> >>>> +     ret =3D ice_wait_for_reset(pf, 10 * HZ);
-> >>>
-> >>> Why not pass a delay in micro/milliseconds?
-> >>
-> >> ice_wait_for_reset() takes jiffies =E2=80=94 that's the existing API.
-> >
-> > It=E2=80=99s recommended to use `msecs_to_jiffies()` to make it HZ inva=
-riant.
->
-> there is also secs_to_jiffies()
+Hi Andrew,
+thanks for reviewing!
+On 29/04/2026 3:52 am, Andrew Lunn wrote:
+>> +	case RTL_VER_17:
+>>   	case RTL_VER_16:
+>>   		ocp_byte_clr_bits(tp, MCU_TYPE_PLA, PLA_CR, CR_RE | CR_TE);
+> 
+> nitpick. The other switch statements seem to be sorted. So 17 should
+> be after 16.
+Will fix in the next version.
 
-Thank you very much.
+>> +		sram_write_w0w1(tp, 0x81b9, 0xff00, 0xb900);
+>> +		//nomal link TX filter
+> 
+> normal? Please also add a space after the //. netdev also prefers /*
+> */.
+Will fix.
 
-V4 is sent.
+>> +		sram2_write_w0w1(tp, 0x84b2, 0xff00, 0x6000);
+>> +		//Training AAGC PAR (with uc2 patch)
+> 
+> space
+Will fix.
 
-Aaron
+>> +	if (tp->version == RTL_VER_17 && r8159_wait_backup_restore(tp))
+>> +		return;
+> 
+> You should probably do something with the return value from
+> r8159_wait_backup_restore(). At minimum a dev_err().
+> 
+I will add a dev_err() message.
 
->
-> >
-> >>>> +     if (ret)
-> >>>> +             dev_err(dev, "Wait for reset failed during resume:
-> >>>> %d\n", ret);
-> >>>
-> >>> Mention the delay?
-> >>
-> >> Good point. I'll include the timeout in the error message in v3.
-> >
-> > Awesome.
-> >
-> > [=E2=80=A6]
-> >
-> >
-> > Thanks,
-> >
-> > Paul
->
+Birger
 
