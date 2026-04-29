@@ -1,195 +1,205 @@
-Return-Path: <netdev+bounces-282355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282356-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IM4fGprl8WlZlAEAu9opvQ
-	(envelope-from <netdev+bounces-282355-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 13:03:54 +0200
+	id kM9LNgbo8WlZlAEAu9opvQ
+	(envelope-from <netdev+bounces-282356-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 13:14:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB21049350B
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 13:03:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85DEE493626
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 13:14:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A327E3012301
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 11:03:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1A593302C5F5
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 11:14:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A4C3815F0;
-	Wed, 29 Apr 2026 11:03:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49D543E867A;
+	Wed, 29 Apr 2026 11:14:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="fovEaSBg";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="szoRSUeP"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="L4ci4D7b";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="M5ZRz5vS"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0BF37B41E;
-	Wed, 29 Apr 2026 11:03:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5B6E37E2F2
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 11:14:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777460631; cv=none; b=Jr1qmR64pqKRrZblTGBGJXUDH11MSQJpzMPXD+W8pQaHa6VUrSOIsss1duk9rQ9wSUCQBGeoD2w3yc4r8gNegpaseNdrFRSzWCANkOpYLd/VdCaMsqGcoYnJeijH27olgEzXoXizBdcA04Ux0x62pJ8qaobvBbM77S8FPvR1xow=
+	t=1777461247; cv=none; b=eN0dq/3ytUX7hZxDQeobiVyGd9VU8oCQPBBx1HswIfKyVIg4ald3C1h5F866HrTL5w/CYxGF8am0MAqalQKCpNBMaL3YIR+3r4TJDIVSt8och9uvkYjl+Tmo3hmPAkZfh6Av1XDuZXQFa1HH6rL3sHRdaMll/C8ov5QibSbe2I0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777460631; c=relaxed/simple;
-	bh=cZm9nR+23JyzHvmYbF8V/WFjTR5KWk6Lw1WGUxgsGiE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Bz/8GIvjyvQYLVzjM4KY2YRG8AIDTz1DCyJl0JT/ac+b5Muye3NUUjvy7Jedhs1U89sJ7jTaWidvOB78xIABXxSaf+7FLoeA7LgG5gFFVtKLTE7fgqOWcrff6A/aWrxO9xUMCuTCH2LI2Ff7vSlKPKPFH0wk+CxQdRot0uKlQ2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=fovEaSBg; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=szoRSUeP; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Wed, 29 Apr 2026 13:03:41 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1777460623;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/UriPQL6XaAfr9C928OrjNsarnff/ygNYveY3BfmJUU=;
-	b=fovEaSBgw8CLKbrAl+inoruy1DmI0GtoxZZT07CGZS8c6l+X3UuNBxBofjtAEDabweP2/y
-	KjQjdR89BDFFPytegFrnuzVtF8Lxq8SPgiMVikEGlDpqE0g79C2/aW58pVx8vzh7wMr10/
-	8kcsJNOGbnTyujniIES4YF+YyxPCHHib/01nYXrSPaD4HEWuR5kCAPvuYFI/dsi4PWuMTr
-	mUup+Y+N1YrK/biA199fVQy61WYVwQAjzjvZMGnz5zYH0tZ1VYl2/uoB32IpXsPiciPeh4
-	fVt+P/Xx76wUH7EPvMu9nXUSbiziF3yKLISFb+b8PhukfTiw7ghvuNrUsJF59w==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1777460623;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/UriPQL6XaAfr9C928OrjNsarnff/ygNYveY3BfmJUU=;
-	b=szoRSUeP3wad7j4LOuG6BB4KMNAoF9FUlCkFLnljETLfmh8pQbGxYTXkWzSXvmiUNdqLQW
-	uEm+jE0JqhPLOtCQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Andrea Mayer <andrea.mayer@uniroma2.it>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	clrkwllms@kernel.org, rostedt@goodmis.org,
-	david.lebrun@uclouvain.be, alex.aring@gmail.com,
-	Justin Iurman <justin.iurman@gmail.com>,
-	stefano.salsano@uniroma2.it, netdev@vger.kernel.org,
-	linux-rt-devel@lists.linux.dev, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] net: ipv6: fix NOREF dst use in seg6 and rpl
- lwtunnels
-Message-ID: <20260429110341.ipXGaamM@linutronix.de>
-References: <20260421094735.20997-1-andrea.mayer@uniroma2.it>
- <20260423080056.KgHlh9Oa@linutronix.de>
- <20260425160856.8cebade5eae1dcaec7af8bfe@uniroma2.it>
+	s=arc-20240116; t=1777461247; c=relaxed/simple;
+	bh=NwdKNv9Hu+IWNEVQY+p5RpQP4NJdLi/dq8xnqnYaRwQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VojH+d9uRyUPHgBY5rZnCaDlhcZ5vfaI9BSBg8GQTMabGlIXkjti1YlxGRyl3CNOcPX/2VcmMpZ5x/tRG46yW7AXBO7N2hd6+GtVqZRzF6UjbcpUj3EVisBvOCeDG6pHxBnhovoBblZEelbflxQJxIn7Ud6l2eE/odcKCiokKNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=L4ci4D7b; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=M5ZRz5vS; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63T8pvBl2094252
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 11:14:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	j992D0crgViSah9SzynZETMed764JJO3ToIXrer4z6w=; b=L4ci4D7b7m9Y0Lvd
+	OU5xI4yGxG/tQDYOuW0NfXMpXASZf4an0LV8mRIkadB9P+TOzZVFMQlhRWmBEqPw
+	YUz9AOFe0Kde4xtFhJewM26paqu6gOy+ixNU6jRpv9yPlxKtexrnkpTmdrNKuoRM
+	kyc70AJeIqdpx5w0Xy26kt5Dk4/QnUU0GeKHqMXcqLx2PeJ1QsAoNpFMni9asUPI
+	sECI7bfDWssTt50K6ohMoY0t+po/ivuA+DBDynvjgjWHcqKqeb36UNqwmhNJnZhm
+	88SW8ZjsoUIwxETWSlio4GWy3BxsJTydMh7Is4Ju+PXPinn+NOWfyE2/3Ujk7as2
+	AtxefA==
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com [209.85.215.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dudh3s0yu-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 11:14:04 +0000 (GMT)
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-c79907d4c57so4456392a12.0
+        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 04:14:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1777461244; x=1778066044; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=j992D0crgViSah9SzynZETMed764JJO3ToIXrer4z6w=;
+        b=M5ZRz5vSxR//HSfcvO1iCIWg72UNeSjClyaCGHhwZkDHGploemhrZPD1HzrpgPEibQ
+         owimUM0gWRRaxWizjdFRL441dhyJr6EDSL32YmVtFJD0PWH0A+ePaEWzmPQKNn5Q/Ilm
+         jJmwmZuxJHTkavqcQ8tYhfXcFTWk/caFmXSIlpW8h6S3gFpWuzLJxb5QVqysSiU3WqA2
+         f0t6ZmiVkAnL9B7ubkRCYhyUdjqqlJuhmPs94kMySI+lGzdYNJ7duAFuV70k9kQYnKuT
+         1ajN8PCbNkoWAjD6xI7mxCTLFO5FZgPEsPeWrrGOzJNY/3Y9yUrs3uIq3A1JxcobpvF2
+         kfqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777461244; x=1778066044;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=j992D0crgViSah9SzynZETMed764JJO3ToIXrer4z6w=;
+        b=IFqhPC03KFNGDuHbiLSrLdiEvyZWKgEpddJYFo5lGqJIeT3mDdjFnDRzwYw4ZzkLLs
+         gp4hzwJydEia+5vzhOuVNQbeUP0nnq6IEyX0PmeBr84o0y0po46KJ5LPA0qiP1fKZuBe
+         qcM6w91PkVAddrFnm4W+68VMNTakSJb2jtuPWpiHdfrtuJGCgIx/0i5+F1TFisbdAFBz
+         563sNoaEo51CtJ3y1/iW4vUwYAnMeyqr5qt/hFm4ySmG2CBy3DsDhbN+nK9H7RZfTpio
+         ZRLkvQbdt27Bhv1gpB2fl5fG6yq+9smad3rAN1FP6UUjZ32huWkcVmdQ2+SuurTSynAG
+         D+fw==
+X-Forwarded-Encrypted: i=1; AFNElJ/so0pxRlaCoqn+lT+Iv0g5B2zkRRCvRZV5u+jbtfOIpLxGNXxX8QjchPXAHcJHjt88S0UH1JE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0DCvfbukblMoXWdPvM7CnHnKmn4L/iax+0FVrt9WyvOEh6GTr
+	L8JQg9rodb5W67QylAG93hUOhd0FxmgTk0ZaI1ehenLIsns3Sfqd990Ma310KO2FhInufTTgYyw
+	JxPbrPt0AEIgiji9f4NzCeLgZiTMfvCGhh5qkXNqh41zWQk7Y9Dt2xVEg7Xs=
+X-Gm-Gg: AeBDiespMGpFhcqsQg4NZx8uOxumqaqzmip36eXOXaHt8objnBYDKsBRJ8P7Zz24U3d
+	DOQaLS1nPegAz75+9zTKI+lGAYcNgW2sbjoNUIPdGFlxTczasXtbYGBNY3ESMKKFxlYzgYJwXMS
+	GIRI2j/LDcS9leypcHK/Ua4EK84RgSolXhJHPmUSrwJPR6zzH52tN2nzORydf4IbyjNhoIkFNr5
+	TyUip+KMnjHpepre/KTVppHjr/JzP+KczMMyvh04wzLcFs1qraUsitlaHBkz1Ygi7G4cdAZiEQ9
+	ftJXx+1m6q78rixQ3PXvU2e5LAl1xmfgq8QvtT2mX/WbZBcmV2fP/J9LjDxC/XNvjTAk52EQrmu
+	8H5WVrY0sigkEtGfGWBTlBCundGQVOKgDBl8hb231quesTwE+0HkNHnB8Cf2x
+X-Received: by 2002:a05:6a21:6da7:b0:39f:2b9e:e489 with SMTP id adf61e73a8af0-3a39c05b9femr8322390637.13.1777461243977;
+        Wed, 29 Apr 2026 04:14:03 -0700 (PDT)
+X-Received: by 2002:a05:6a21:6da7:b0:39f:2b9e:e489 with SMTP id adf61e73a8af0-3a39c05b9femr8322361637.13.1777461243538;
+        Wed, 29 Apr 2026 04:14:03 -0700 (PDT)
+Received: from [10.217.216.225] ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c7fd6067403sm1735002a12.10.2026.04.29.04.13.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Apr 2026 04:14:03 -0700 (PDT)
+Message-ID: <be36fe69-e7e4-41c1-9dc7-dc2c3d9af563@oss.qualcomm.com>
+Date: Wed, 29 Apr 2026 16:43:57 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260425160856.8cebade5eae1dcaec7af8bfe@uniroma2.it>
-X-Rspamd-Queue-Id: BB21049350B
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/5] clk: qcom: smd-rpm: Add support for RPM clocks on
+ Qualcomm Shikra SoC
+To: Imran Shaik <imran.shaik@oss.qualcomm.com>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd
+ <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>
+Cc: Ajit Pandey <ajit.pandey@oss.qualcomm.com>,
+        Jagadeesh Kona <jagadeesh.kona@oss.qualcomm.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>, linux-arm-msm@vger.kernel.org,
+        linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20260429-shikra-gcc-rpmcc-clks-v1-0-c3cd77558b7a@oss.qualcomm.com>
+ <20260429-shikra-gcc-rpmcc-clks-v1-3-c3cd77558b7a@oss.qualcomm.com>
+Content-Language: en-US
+From: Taniya Das <taniya.das@oss.qualcomm.com>
+In-Reply-To: <20260429-shikra-gcc-rpmcc-clks-v1-3-c3cd77558b7a@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: u6rT3vo3MPKWnGcYoUsUVKcEoDq48DvH
+X-Authority-Analysis: v=2.4 cv=A4dc+aWG c=1 sm=1 tr=0 ts=69f1e7fc cx=c_pps
+ a=Oh5Dbbf/trHjhBongsHeRQ==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=ZpdpYltYx_vBUK5n70dp:22
+ a=EUspDBNiAAAA:8 a=G-4fGFNKO6kq0i09DNwA:9 a=QEXdDO2ut3YA:10
+ a=_Vgx9l1VpLgwpw_dHYaR:22
+X-Proofpoint-ORIG-GUID: u6rT3vo3MPKWnGcYoUsUVKcEoDq48DvH
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI5MDExMyBTYWx0ZWRfXxOzuTv6k0ikr
+ VToiobpQfPxSmHqnPpNThYR10uTzPZURzvjlT49ZDGmbtfW2ESt4gV78LxWHbKMGYl0sYTqPlOh
+ scatE0w7flWo8YZVYfUCBBJDgLAmBiZkWu3YsJpX5obJcaLtckPKXg5CUjdTOi+yRxCa2NBWFNm
+ E2lFv7FrKuw+wM60DTmZfF7kj/sn7l8ANYuYrWCyCX+aQORYw1VlhVKkru3q0Za5LeBrgWCXWla
+ PGV2q8KQEQwkU3KIUYG2o4a1K/Al6wXnvhqbzjBl67rhb1bI5U1cQ69JB0y1jN4D+yhhzyIXO9l
+ EjHbXJqlFhMP37Sn25+Oi6dVNESd4f6kNNeF+90moVn8dyEjnNVfaFbj/6A1G7ZvRPOpFLd2yWl
+ psoJRamtC5vNAR6pzn6p/PKgl8rjB8SBAcgdjCbGj8Xe0ci8+LxhB0/yAU73dRnfikyct7rtjk5
+ HquBwYPIqKwYHxSKgiQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-28_05,2026-04-28_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 spamscore=0 suspectscore=0 malwarescore=0 lowpriorityscore=0
+ priorityscore=1501 phishscore=0 bulkscore=0 impostorscore=0 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2604290113
+X-Rspamd-Queue-Id: 85DEE493626
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282355-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-282356-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.qualcomm.com:dkim,oss.qualcomm.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,qualcomm.com:dkim,qualcomm.com:email];
+	FREEMAIL_TO(0.00)[oss.qualcomm.com,kernel.org,baylibre.com,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,goodmis.org,uclouvain.be,gmail.com,uniroma2.it,vger.kernel.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[taniya.das@oss.qualcomm.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
 
-On 2026-04-25 16:08:56 [+0200], Andrea Mayer wrote:
-> On Thu, 23 Apr 2026 10:00:56 +0200
-> Sebastian Andrzej Siewior <bigeasy@linutronix.de> wrote:
+
+
+On 4/29/2026 4:21 PM, Imran Shaik wrote:
+> Add support for RPM-managed clocks on Qualcomm Shikra SoC. The icc_clks
+> list is same as QCM2290, hence reuse the same for Shikra.
 > 
-> Hi Sebastian,
+> Signed-off-by: Imran Shaik <imran.shaik@oss.qualcomm.com>
+> ---
+>  drivers/clk/qcom/clk-smd-rpm.c | 39 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 39 insertions(+)
 
-Hi Andrea,
+Reviewed-by: Taniya Das <taniya.das@oss.qualcomm.com>
 
-> > Doesn't this make ip6_route_input() on RT fragile in general due to the
-> > RT6_LOOKUP_F_DST_NOREF usage or here something special about the two
-> > files that are patched?
-> > Based on your explanation it all makes sense, I am just not sure if this
-> > race is limited to those two are if there is more to it.
-> 
-> seg6_input_core() and rpl_input() cache the dst via dst_cache_set_ip6(), which
-> invokes dst_hold(). The dst_hold() calls rcuref_get(), failing on a zero
-> refcount and triggering a WARN, but the pointer is still stored in the cache.
-> After the RCU grace period completes the dst is freed, and a subsequent
-> dst_cache_get() returns a dangling pointer.
->  
-> The other callers of ip6_route_input() (e.g., ipv6_srh_rcv, ipv6_rpl_srh_rcv,
-> ip6_rcv_finish_core) consume the NOREF dst without caching it. Even if the
-> pcpu_rt's refcount is concurrently dropped to zero, the dst memory remains
-> valid because dst_release() defers the actual free via call_rcu_hurry() and the
-> caller is still inside the RCU read-side critical section.
+-- 
+Thanks,
+Taniya Das
 
-Ah, okay. Thank you for clearing that up.
-
-> > > [snip]
-> > >
-> > > Fixes: af4a2209b134 ("ipv6: sr: use dst_cache in seg6_input")
-> > > Fixes: a7a29f9c361f ("net: ipv6: add rpl sr tunnel")
-> > 
-> > If having PREEMPT_RT_NEEDS_BH_LOCK unset is the requirement then the
-> > right fixes: would be
-> > Fixes: 3253cb49cbad4 ("softirq: Allow to drop the softirq-BKL lock on PREEMPT_RT")
-> > 
-> > as prior this commit the race is not possible, right?
-> 
-> I built and tested kernels at 3253cb49cbad and its parent fd4e876f59b7 (both
-> CONFIG_PREEMPT_RT=y, without the fix): no issues at fd4e876f59b7.
-> At 3253cb49cbad, a pcpu_rt cmpxchg contention in rt6_make_pcpu_route() shows
-> up, which was addressed in 1adaea51c61b. I also tested at 1adaea51c61b, and at
-> that point the dst_hold() race described in this patch appears.
->  
-> The seg6/rpl code obtains a NOREF dst from ip6_route_input(), does not promote
-> it via skb_dst_force(), and passes it to dst_cache_set_ip6() which calls
-> dst_hold(). This pattern has been present since af4a2209b134 and a7a29f9c361f,
-> and the current Fixes: tags point to the commits where it was introduced.
-> Does that seem reasonable?
-
-Yes. So based on that the regression was introduced in 3253cb49cbad.
-Before that, the lock guarded everything. That means also that
-rpl_input() and seg6_input_core() is invoked a BH disabled section which
-is what makes it for !RT work.
-
-> > Does this mean that rpl_input() does a local_bh_disable() while
-> > obtaining the dst but it never runs outside of bh-disabled section?
-> > Because if it can run in preemptible context then it would not be to
-> > PREEMPT_RT at which point the Fixes: tags from above would make sense
-> > again.
-> > 
-> 
-> rpl_input() and seg6_input_core() run in softirq context via lwtunnel_input().
-> They do local_bh_disable() around dst_cache_get() and dst_cache_set_ip6(), but
-> not around ip6_route_input(). The race window is between ip6_route_input()
-> returning and dst_cache_set_ip6().
-
-My point was that the Fixes: tag could be updated to 3253cb49cbad
-instead. Since everything runs in softirq context, the
-local_bh_disable() within that functions is not needed. Otherwise, if
-this would not be invoked softirq then preemption would also be possible
-on !RT.
-Anyway, now it has been merged.
-
-> 
-> Ciao,
-> Andrea
-
-Sebastian
 
