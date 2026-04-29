@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-282541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282542-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8NgcEEGS8mlhsgEAu9opvQ
-	(envelope-from <netdev+bounces-282541-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:20:33 +0200
+	id UCYjAlCS8mlhsgEAu9opvQ
+	(envelope-from <netdev+bounces-282542-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:20:48 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95B6549B531
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:20:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 172BF49B543
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:20:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 23F03301F300
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:20:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B2C463023361
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 23:20:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3A5639A07B;
-	Wed, 29 Apr 2026 23:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B6537EFE8;
+	Wed, 29 Apr 2026 23:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NuYiimmp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MBcmS0ix"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80EED39A058
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 23:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DC183242B8
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 23:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777504830; cv=none; b=jU2KxzMnrmTu7WxGiPHkYBtWzm6efCksNTrO3FvNEhSX/4eHW+uaKb/KCClFcWiktHG6yOqJ4f8QuFZrvqtYocMOeyVkZ5cpQllHw55OP9CvfHjhc5vZeqehDMBKQSLglw6dSBq+EOVeOBiDhFMQ2PTFVdj0vNCTFY+2c6zSTJk=
+	t=1777504832; cv=none; b=BuvIsqmcrjm1dP3RROqAb7L+d/olK69gdrs+ATcUF0RcPNLx1v0b6k+wJbKjg3lK82ZuSvUszLA719nYC/HwnF/zWDzvb8nujS2EuCjx/bT/mIQIU5dML/3UxCArM2R8IaXr6djKTC26xs2lG3tCeCexyYMZXILlfXruuV7s6U0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777504830; c=relaxed/simple;
-	bh=8yUalhQiacb6ndI3FJHIMCDZWuNxlI1ZYXfnxLFHdEs=;
+	s=arc-20240116; t=1777504832; c=relaxed/simple;
+	bh=PmrBehyeFmpkVRCjvpx3z0u+kGD8cpUpKFIPLgBS2s8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kfqco4v6VMJQQzfonCg8IIq4MWHR8tcp+5dGvEouLJhek+YRTB1ZWc9PBGICejIhhJKxLGYHv5xAmvzx8q0CL7SG1qee/3yT3O6iIQDR3d2X9v9dGzRqa67I0XhQdrXBKMUQUjHZTTyl6dlw21FzV8zWBOkuEIQPprJ98ToAk+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NuYiimmp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4807C19425;
-	Wed, 29 Apr 2026 23:20:29 +0000 (UTC)
+	 MIME-Version; b=X/gVDQXrCkRqgC4RwBRx3wfIG7+/pFlPfNNnx6rcSrVdvQJT6MD44hl+tO4byFYW4XhySJESUH19vqcodtA7G7Cb6eq66LDKxdiQkXVhZtKFMrijPS93JmLN+NCxVxfJ7Eg67Kxu5dpTnrLvpCj11lmTwBlxnbjsj4L1NI9fvog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MBcmS0ix; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EEBDC19425;
+	Wed, 29 Apr 2026 23:20:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777504830;
-	bh=8yUalhQiacb6ndI3FJHIMCDZWuNxlI1ZYXfnxLFHdEs=;
+	s=k20201202; t=1777504831;
+	bh=PmrBehyeFmpkVRCjvpx3z0u+kGD8cpUpKFIPLgBS2s8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NuYiimmpZAW/bW+COVr4zz51Aw8lz+TFGbnYQrh+DxCPkFqbG1V41pKwthn6+8KrU
-	 I2RUlTcZhJvkqrMIa9AwVDZofaxQy1HzGdeePiejFscdPVZJN0w84Jlq+6hC2pxYYv
-	 HmybF03YUbVyoNUVHTjZWixFXbqeop+uoL5Wn1ncoKEnwrwOmL0zVnOFBMFPt5vTJr
-	 E/rg08Wkr94vIsdc4P++VO4YXAigXd7bfWGy3pnWXh8+kW3ew/OrliJcsITQVgWzSi
-	 ZkclP2ptEBoH4oD/cL37LIVmOMWiXKrtXcpsjiDaBGB0S4pPVtbJ/+j8q6X7s+zfCm
-	 Dbcj8jMbnb8nA==
+	b=MBcmS0ix9EWRUXlf6xlu6eqUkGhypD3e+CkNeVUrkQqmrQSIKVbk+uVjzn2J5hIqc
+	 waGttYg1Txp4xJR0YXCGcBahm7Q9z8cZwthPrbIWIuf7r+GtOcrtdhuUjKmNJr4azm
+	 VpN8JeNSK7qn0dPJUTOofcJb0OpfHIVIjC8lWVoEjRPIsgJKVKnoEBQ+Y5dTjCjjgn
+	 1r6yP3fihhUt2u7zqaNCFq+Y4WeWzHSSwHCTfu4OCB/cGirszpwNEk04CysY8tRLUQ
+	 4oCuZZhZyk8veCO0qb/QnP1i+41D/dezTW1CSoMIVsi3jvoFtXll/fyc4uks1IbMYn
+	 XoDbxsv0WtEwQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: justin.chen@broadcom.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -54,12 +54,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	davem@davemloft.net,
 	andrew+netdev@lunn.ch,
 	florian.fainelli@broadcom.com
-Subject: Re: [PATCH net-next 1/2] net: bcmasp: Divide init to allow partial bring up
-Date: Wed, 29 Apr 2026 16:20:22 -0700
-Message-ID: <20260429232021.2186988-2-kuba@kernel.org>
+Subject: Re: [PATCH net-next 2/2] net: bcmasp: Keep PHY link during WoL sleep cycle
+Date: Wed, 29 Apr 2026 16:20:30 -0700
+Message-ID: <20260429232030.2187222-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260428220858.2076469-2-justin.chen@broadcom.com>
-References: <20260428220858.2076469-2-justin.chen@broadcom.com>
+In-Reply-To: <20260428220858.2076469-3-justin.chen@broadcom.com>
+References: <20260428220858.2076469-3-justin.chen@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,7 +67,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 95B6549B531
+X-Rspamd-Queue-Id: 172BF49B543
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
@@ -85,7 +85,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282541-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-282542-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
@@ -93,7 +93,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
+	NEURAL_HAM(-0.00)[-0.988];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
@@ -103,126 +103,117 @@ This is an AI-generated review of your patch. The human sending this
 email says "Blindly sending out since there will be a repost,
 anyway."
 ---
-net: bcmasp: Divide init to allow partial bring up
+net: bcmasp: Keep PHY link during WoL sleep cycle
 
-To prepare for a partial bring up of the interface during resume,
-we break apart the bcmasp_netif_init() function into smaller chunks
-that can be called as necessary.
+We currently more or less restart all the HW on resume. Since we also
+stop the PHY, it takes a while for the PHY link to be re-negotiated on
+resume. Instead of doing a full restart, we keep the HW state and the
+PHY link, that way we can resume network traffic with a much smaller
+delay.
 
 > diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-> index ec63f50a849e..aff0a6d84126 100644
+> index aff0a6d84126..bab2a4f82e4e 100644
 > --- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
 > +++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
 [ ... ]
-> -static void umac_reset(struct bcmasp_intf *intf)
-> +static void umac_reset_and_init(struct bcmasp_intf *intf,
-> +				const unsigned char *addr)
+> @@ -1383,15 +1384,20 @@ int bcmasp_interface_suspend(struct bcmasp_intf *intf)
 >  {
-> +	struct phy_device *phydev = intf->ndev->phydev;
-> +	u32 mac0, mac1;
+>  	struct device *kdev = &intf->parent->pdev->dev;
+>  	struct net_device *dev = intf->ndev;
+> +	bool wake;
 >  
->  	umac_wl(intf, 0x0, UMC_CMD);
->  	umac_wl(intf, UMC_CMD_SW_RESET, UMC_CMD);
->  	usleep_range(10, 100);
->  	/* We hold the umac in reset and bring it out of
->  	 * reset when phy link is up.
->  	 */
-> -}
+>  	if (!netif_running(dev))
+>  		return 0;
 >  
-> -static void umac_set_hw_addr(struct bcmasp_intf *intf,
-> -			     const unsigned char *addr)
-> -{
-> -	u32 mac0 = (addr[0] << 24) | (addr[1] << 16) | (addr[2] << 8) |
-> -		    addr[3];
-> -	u32 mac1 = (addr[4] << 8) | addr[5];
-> +	umac_wl(intf, 0x800, UMC_FRM_LEN);
-> +	umac_wl(intf, 0xffff, UMC_PAUSE_CNTRL);
-> +	umac_wl(intf, 0x800, UMC_RX_MAX_PKT_SZ);
+>  	netif_device_detach(dev);
+>  
+> -	bcmasp_netif_deinit(dev);
+> +	wake = device_may_wakeup(kdev) && intf->wolopts;
+>  
+> -	if (!intf->wolopts) {
+> +	bcmasp_netif_deinit(dev, !wake);
 > +
-> +	mac0 = (addr[0] << 24) | (addr[1] << 16) | (addr[2] << 8) |
-> +		addr[3];
-> +	mac1 = (addr[4] << 8) | addr[5];
+> +	if (wake) {
+> +		bcmasp_suspend_to_wol(intf);
+> +	} else {
+>  		bcmasp_phy_hw_unprepare(intf);
 >  
->  	umac_wl(intf, mac0, UMC_MAC0);
->  	umac_wl(intf, mac1, UMC_MAC1);
-> +
-> +	/* Reset shadow values since we reset the umac */
-> +	intf->old_duplex = -1;
-> +	intf->old_link = -1;
-> +	intf->old_pause = -1;
-> +	phydev->eee_cfg.tx_lpi_timer = umac_rl(intf, UMC_EEE_LPI_TIMER);
->  }
-
-Since UMC_CMD_SW_RESET was just asserted above, won't reading
-UMC_EEE_LPI_TIMER here return 0 or a hardware default value, effectively
-overwriting the bootloader-configured EEE TX LPI timer?
-
-Also, since umac_reset_and_init() is now called unconditionally during
-bcmasp_interface_resume(), does this dangerously overwrite
-phydev->eee_cfg.tx_lpi_timer without holding mutex_lock(&phydev->lock)?
-This seems like it could create a data race with concurrent accesses, for
-example from ethtool.
-
-[ ... ]
-> +static void bcmasp_netif_init(struct net_device *dev)
-> +{
-> +	struct bcmasp_intf *intf = netdev_priv(dev);
+>  		/* If Wake-on-LAN is disabled, we can safely
+> @@ -1400,9 +1406,6 @@ int bcmasp_interface_suspend(struct bcmasp_intf *intf)
+>  		bcmasp_core_clock_set_intf(intf, false);
+>  	}
 >  
->  	bcmasp_init_tx(intf);
->  	netif_napi_add_tx(intf->ndev, &intf->tx_napi, bcmasp_tx_poll);
-
-This existed prior to this patch, but since bcmasp_netif_init() and
-bcmasp_netif_deinit() are called directly from bcmasp_interface_resume()
-and bcmasp_interface_suspend() (which execute asynchronously without
-rtnl_lock), can modifying the global dev->napi_list via netif_napi_add_tx()
-and netif_napi_del() cause a race condition with concurrent list readers?
-
-Suspend and resume paths typically rely on napi_enable() and napi_disable()
-rather than adding and deleting the NAPI structures entirely.
-
-[ ... ]
-> @@ -1454,17 +1436,19 @@ int bcmasp_interface_resume(struct bcmasp_intf *intf)
->  	if (ret)
->  		return ret;
->  
-> -	ret = bcmasp_netif_init(dev, false);
-> -	if (ret)
-> -		goto out;
-> +	bcmasp_core_clock_set_intf(intf, true);
->  
->  	bcmasp_resume_from_wol(intf);
->  
-> +	bcmasp_phy_hw_prepare(intf);
-> +
-> +	umac_reset_and_init(intf, dev->dev_addr);
-> +
-
-If Wake-on-LAN is disabled, bcmasp_interface_suspend() un-prepares the PHY
-by asserting reset and disabling clocks. By calling bcmasp_resume_from_wol()
-before bcmasp_phy_hw_prepare(), if EEE is enabled and invokes eee_fixup(),
-won't the MDIO access timeout or cause a bus error because the PHY hardware
-isn't prepared yet?
-
-Additionally, won't any WOL state changes (like clearing
-UMC_MPD_CTRL_MPD_EN) be immediately wiped out by the MAC software reset
-inside the subsequent umac_reset_and_init() call?
-
-I noticed this is fixed later in the series by commit 6994d859a69dd
-(net: bcmasp: Keep PHY link during WoL sleep cycle), but does leaving it
-like this here break bisection?
-
-> +	bcmasp_netif_init(dev);
-> +
-> +	phy_start(dev->phydev);
-> +
->  	netif_device_attach(dev);
->  
->  	return 0;
+> -	if (device_may_wakeup(kdev) && intf->wolopts)
+> -		bcmasp_suspend_to_wol(intf);
 > -
-> -out:
-> -	clk_disable_unprepare(intf->parent->clk);
-> -	return ret;
+>  	clk_disable_unprepare(intf->parent->clk);
+
+If wake is true, phy_stop() is skipped during bcmasp_netif_deinit().
+This leaves the phylib state machine active and polling on its delayed
+workqueue.
+
+At the end of bcmasp_interface_suspend(), the main MAC clock is
+unconditionally disabled via clk_disable_unprepare(intf->parent->clk).
+
+If the PHY state machine executes while this clock is disabled, will it
+attempt to access PHY registers over the MDIO bus, resulting in a
+synchronous external abort (bus fault) or kernel panic?
+
+Could the active state machine also concurrently invoke the MAC's
+adjust_link callback while bcmasp_interface_resume() is executing,
+causing a data race on MAC registers?
+
+>  	return 0;
 >  }
--- 
-pw-bot: cr
+> @@ -1426,8 +1429,11 @@ static void bcmasp_resume_from_wol(struct bcmasp_intf *intf)
+>  
+>  int bcmasp_interface_resume(struct bcmasp_intf *intf)
+>  {
+[ ... ]
+> +	/* The interface might be HW reset in some suspend modes, so we may
+> +	 * need to restore the UNIMAC/PHY if that is the case.
+> +	 */
+> +	reg = umac_rl(intf, UMC_CMD);
+> +	if (wake && (reg & UMC_CMD_RX_EN)) {
+> +		umac_enable_set(intf, UMC_CMD_TX_EN, 1);
+> +		bcmasp_resume_from_wol(intf);
+> +	} else {
+> +		bcmasp_phy_hw_prepare(intf);
+> +		umac_reset_and_init(intf, dev->dev_addr);
+> +	}
+
+If wake is true but the MAC hardware was reset (reg & UMC_CMD_RX_EN
+is false), the code branches to the else block and skips calling
+bcmasp_resume_from_wol().
+
+Since bcmasp_resume_from_wol() is responsible for reversing the WoL
+configuration applied during suspend (like restoring the EEE fixup state
+and masking the wakeup interrupt), does skipping this teardown leave the
+wakeup interrupt unmasked during normal operation and risk an interrupt
+storm?
+
+>  	bcmasp_netif_init(dev);
+>  
+> -	phy_start(dev->phydev);
+> +	/* If HW was reset, we need to force a link re-negotiation */
+> +	if (wake && !(reg & UMC_CMD_RX_EN)) {
+> +		phy_restart_aneg(dev->phydev);
+
+If the user has explicitly configured forced speed and duplex with
+autonegotiation disabled, will this unconditional call to
+phy_restart_aneg() override the user's configuration? It appears to
+enable autonegotiation without checking if phydev->autoneg ==
+AUTONEG_ENABLE.
+
+Also, because phy_stop() was skipped during suspend, the PHY state
+machine is still actively running in the background. Does calling
+phy_restart_aneg() without holding phydev->lock create a data race
+with the concurrent PHY state machine?
+
+> +		phy_trigger_machine(dev->phydev);
+> +	} else if (!wake) {
+> +		phy_start(dev->phydev);
+> +	}
+>  
+>  	netif_device_attach(dev);
 
