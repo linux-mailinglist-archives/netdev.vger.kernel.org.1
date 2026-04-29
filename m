@@ -1,257 +1,157 @@
-Return-Path: <netdev+bounces-282308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282309-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cFotCH3H8WnnkQEAu9opvQ
-	(envelope-from <netdev+bounces-282308-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 10:55:25 +0200
+	id uHSFG4vH8WnnkQEAu9opvQ
+	(envelope-from <netdev+bounces-282309-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 10:55:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A3F9491656
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 10:55:24 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C038949165E
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 10:55:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AF7BB3038C5E
-	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 08:54:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9C9E7300D710
+	for <lists+netdev@lfdr.de>; Wed, 29 Apr 2026 08:55:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53ABF3A9015;
-	Wed, 29 Apr 2026 08:54:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 849983B0ADD;
+	Wed, 29 Apr 2026 08:55:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J3UECdS2"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b="lpLF3T7i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B87DB29CB57
-	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 08:54:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 090E339DBCC
+	for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 08:55:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777452897; cv=none; b=Ypw/S8oGlnS5wnbaR10lzcIHIuIxVVOsBZtX0ztgGHnDhBfLS99Xz/ITdgZlprYj21uL/x/4JL3af0XrzGWKQ3UalMf2otEK3oOk7kgE8JvOunKZhSCnmWv9KtZZVOuJiaCm0itYZS7KtUBT904mHmzr9F6O9GED4UwfQdZ5v0E=
+	t=1777452936; cv=none; b=lx7H/i9CO2ZUVth1zinBblw2SHdfqMkmGd/QXsMCgX0RC/TGGvk0ufsAkoM7dOqFmbMpT7CS2weOV/YAItQoLMwV2CPtaWX2NGdXMkD4sV7PZHEotlP/w+PohqQ0t2CMsGcHaJTt9e0GbvCPP7cMcQmOJ+GpSQq6WXdpi4CC1Jc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777452897; c=relaxed/simple;
-	bh=OGC7+IcZNZIL6sd3hOLyJPDWEm22FuB1Y+vAmXpI6EU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WF2CrFEq7hmySWcPkKTmPRBLOpd+VZxMMBnoZV/2Cwgeuy7lqb9K0OdFHHZxpKWWPcR9DqHFjPmfiBtl+BAttvYMvzWvTfZ6kbT6RpWsQct4X8N76WV9BLddQr64O0tTE9rkdLXHDmYjTTIjzQV4U0jvyJVaIlryMSa7xo/WsRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J3UECdS2; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ba6b39871a3so118734666b.0
-        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 01:54:55 -0700 (PDT)
+	s=arc-20240116; t=1777452936; c=relaxed/simple;
+	bh=zloadYk+FRxuCKY1pGkNPmHK8KQ4PABu8yyLAufBvZA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N91jwDYhTXwv/9jYGe3ZT2/8tX7Vy3uhkuJzPeMCGUHZ+cXU9KD4EQocXxDdkrni3uU1mguiT01sHa4plJzz/bTcRsHB65dt5YIXptc+IkzU+T4/7oy9H/OVYhPSHesnH75FCpUKBxZnEoaKauDZ88ydtczQFOg3+IAnqkgJOx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=lpLF3T7i; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-43cfd832155so9006090f8f.1
+        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 01:55:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777452894; x=1778057694; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wxxbbPZ8q2XWtUlU/73YnAMHWldZI5Lyz7JAu6k9IoU=;
-        b=J3UECdS2on/eRgMU+Q7mwA4hNRZEujruIEbgMXyVWehdXFwkAakK2Z0g7K+YQpByfJ
-         FRaE6tzIDJWOIjIINzOabdtg61LqIJGdCaUz4HDwKbCSAnNil4/SZtNJEX4aAvPap6Zf
-         W7MrM3nIJzaJSFetObHeK4+L8TJaP1+6vXv4BUmVyL4T6no22hZAIsStWsxZ3qWpMPUz
-         m9vVkMjKv78DgsHlAAZF3JWJs1qIaSpmMg5HnGCgZVlk/yD35hkKJkSlFqSJOVgMAM5X
-         sDxGB1Tj+WVQCXkOCUdLAfbvVXOB2nHJUd8F88F2S6fRGrFJXHwb3bvwnjf2mSg2S/RV
-         Gztw==
+        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1777452931; x=1778057731; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nt4otsNZP+qM1RAgOCDcWAVXVHOwNcuga4GcWRLPXg4=;
+        b=lpLF3T7i9Y/ZHbWCAqHJ+CGOhS9l6q/j5ghgUJQbOHiwie31KWrOUMLpFxkqPE1xUv
+         97tZ0lndsgCxAflKz+tsV4PYoEG1a/Ru0g48wScK2vAgvghUzHgyWmR9wHbpYRgXne4W
+         XKw6GyNFQRJUn7AZvMHJQmnUg7lW7YIN1F54YKMOWyV9HfinnwvkWyeiLYntrFEdcYR2
+         atIrgFuumMTxRSxBcaN42QkiOE8SJidAwBJCWSrwJzpofAAYxEDUG4kKhmP9x2BgML97
+         7ncCjHEBOGbfYsuagML107m0gAXY1Ge5OlCRBOqVlxy7RWWxTUvKBwiDqUjqiTCptuXs
+         10Lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777452894; x=1778057694;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wxxbbPZ8q2XWtUlU/73YnAMHWldZI5Lyz7JAu6k9IoU=;
-        b=DoJKnWJa8xKGBz1QZPV8ZmFINOT5QwYRTMOy+jjdMJzyIGjhqIA5XsyiX2IoBp13Uc
-         pUgduMxwEZkSa52WrfZ0jRRphWcHbauKIhSRWAILHgirU5pLWSoHJZWDRVDIOC7WdFE4
-         dUMgxbQ8EsE/Pc7xGc/+GdJqnf6MdaJXei50cDLvH5fmz8HGFC0WbNrLj2E3awmLN5nn
-         U7rzMXF46TLCDR86CJe3oVi75/p9ndCe322KQvAjBeTzhhBL4po2aBq5fNGZumuMymhW
-         2Pk6OjH23stbRgNnlr5NAxV/NBBJGHCjqLiow2wdbGqNFlmmET7B5FmFBHPcvvrTkC1b
-         faxw==
-X-Forwarded-Encrypted: i=1; AFNElJ/vfVmGFgr8SjpwIUiiJPZKpxRaOLx4KhZZxNoTh7TqkP4ZDHPKFwj/l8+j6IhodyIPrS1Di9c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpT+jCZxRTgggxUaRNdY/oFtQnzBE5CDz3DO3bjl6LugNBRySC
-	95GGtWRMd14MCkM6A3Hq4SLUHIJMLQzAiSsMpgWJipr/VVHJg2+SbZfs
-X-Gm-Gg: AeBDievt8EtWBrRPYKNi5t+WIhLmo0G/dzoTEfHPUHGV76PCh2CzCNlDyGch4Qj/Ljk
-	ovzXduLR5C4+2ZQMqGhx5JrAyZTdpCJNSaPU4tbxLdPNeYnXW9Mij7ZUUzB/yijush6tr1SccBR
-	2sPBAdz4J+V2siftm3wWOVtp3UJFz9pbCvwLy+RPJLBxdN6P9Q56RO9bSo0IR2tgpXmZYJPuoi2
-	0WTfsdSOYZ+VeiFz+Tui9lt7lxzzb/n4SHvgVI/q+BsgDs9lEy75oBVev8gQhkZYiJmAKEc0QHw
-	1pm55M0ubKE0W6UclROHe+m2MxxVANIbmBCINRu3mTdGEbfJ56gOb2I2fYDf8eY7JffvHCMm2TZ
-	8KDFDLJjzfJKzcq7JpSvWwnzVR+BW/56TvQFIrOxP1p2rNeqAq11VzLtfLzxIog4dirx3yUyqjG
-	FV0u0Wpncl3PHrN1Vt36P/ns5hShqJw/Xvvumh1+BR0BysVOu7CamIoxjye5lkGn/p19aPnITeF
-	+AYrvb7kiEXJ4OaSr01l1CGerJ7lU4tBL14RAS4QGdNmiKuEAQ=
-X-Received: by 2002:a17:907:3e0f:b0:ba7:41d0:5efd with SMTP id a640c23a62f3a-bb96bb7eba4mr103744066b.28.1777452893856;
-        Wed, 29 Apr 2026 01:54:53 -0700 (PDT)
-Received: from localhost.localdomain (pqu18.internetdsl.tpnet.pl. [213.76.110.18])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bb980a70168sm62682466b.2.2026.04.29.01.54.52
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 29 Apr 2026 01:54:53 -0700 (PDT)
-From: Michal Kosiorek <mkosiorek121@gmail.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH ipsec v2] xfrm: defensively unhash xfrm_state lists in __xfrm_state_delete
-Date: Wed, 29 Apr 2026 10:54:51 +0200
-Message-ID: <20260429085451.93944-1-mkosiorek121@gmail.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <afHEWqYEiA07An7W@secunet.com>
-References: <afHEWqYEiA07An7W@secunet.com>
+        d=1e100.net; s=20251104; t=1777452931; x=1778057731;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Nt4otsNZP+qM1RAgOCDcWAVXVHOwNcuga4GcWRLPXg4=;
+        b=IGmEiKK5N8DzguqdOxld89Jz0uGgnBk7yAr1MeD7x3+57BsRxrx+F4Dt2SxXfwgV76
+         8Xvzh6cIiji2K+FB8PzO65zR2inHAGrpOU1HO0jvG3I6J76xSmzu7mzLnj0YMg2VRHiX
+         Mjb/C6vP/Ru8r25E7xw1WftOEDV111dRLVpDJiV1Pz7nUZa7MSw2/OrxSSeWmddfOGgw
+         AbqjyNgPfqANipPpyR45SwOgC+q5D2jsSrKUDJL5k1kn8MWI/0ISlew+89hIoTxG0Wmc
+         V8pJImN7CEAcvOooaq7JuPqHyXada79iCi2LT9J2DaBMUEBGgGWeH8pj/a0tkx7Qr/mr
+         9uFg==
+X-Gm-Message-State: AOJu0YxMN1Es9uXHtcxgSMUIXzbdCOyNXaRP94T37TrDzUTur0EoG3NC
+	EIO82rKnrtCfZVCZYF1fumEIETbSzJOynmi/lnwGrfuq75WZN/s0cPePrfD0rTaE+PE=
+X-Gm-Gg: AeBDieuH1JcArcGyAv1+XSKDrQd99enhNPi+NPIXM9fiOBrnwNfP1XPXMm041sG94gt
+	2HVVcsHNLmpAdzRCy4OUWaXTdrjZwcjRejEoYLVlKuLsY8hvvwQ3L5JkJVlFqIkeUQNeeDUI1d1
+	hz9inqqwAyE1KTVv9O0TmPIoi37pdmZW6OEqydKUk8ZJix6GCvf/nK74h4h88T37I8Lt1FkERiW
+	54Ot/9S7GKdZYT2IJ8p3/+WU+WQ8ABpp09a4OqtjCgzROLl00M3KmDQf6oG17wlen7Z6WbV/c2Z
+	RxkF2XiL83fvOyOGS9gA0MGQRAROU9fQSGj5Jhtyh8pHw5aLIOEg9YYboSHvam66xhlj7uCxcis
+	oDU46CclZooUnesCRo09H4r5b290REB7vrOPGghvkl0EgFh2UaMIOyccIsSK3zZWKUjZBWM8lkJ
+	wm8qz/7Xdo0UOWI7d0U2sczrAxtxBrkmgJbW/0jD5OTA==
+X-Received: by 2002:a5d:5d11:0:b0:43e:b0f7:9ce9 with SMTP id ffacd0b85a97d-44647dd17c1mr11721926f8f.14.1777452931178;
+        Wed, 29 Apr 2026 01:55:31 -0700 (PDT)
+Received: from FV6GYCPJ69 ([85.163.81.98])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-447b7218622sm4257094f8f.21.2026.04.29.01.55.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Apr 2026 01:55:30 -0700 (PDT)
+Date: Wed, 29 Apr 2026 10:55:27 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, 
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, "David S. Miller" <davem@davemloft.net>, 
+	Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Michal Schmidt <mschmidt@redhat.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Pasi Vaananen <pvaanane@redhat.com>, Petr Oros <poros@redhat.com>, 
+	Prathosh Satish <Prathosh.Satish@microchip.com>, Shuah Khan <skhan@linuxfoundation.org>, 
+	Simon Horman <horms@kernel.org>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] dpll: add pin operational state
+Message-ID: <afHHb6UmK73yRXs-@FV6GYCPJ69>
+References: <20260428154907.2820654-1-ivecera@redhat.com>
+ <20260428154907.2820654-2-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 7A3F9491656
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260428154907.2820654-2-ivecera@redhat.com>
+X-Rspamd-Queue-Id: C038949165E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-282308-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282309-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[resnulli.us];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mkosiorek121@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,davemloft.net,gmail.com,google.com,kernel.org,lwn.net,redhat.com,microchip.com,linuxfoundation.org,linux.dev];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email]
 
-KASAN reproduces a slab-use-after-free in __xfrm_state_delete()'s
-hlist_del_rcu calls under syzkaller load on linux-6.12.y stable
-(reproduced on 6.12.47, also reachable via the same code path on
-torvalds/master and on the ipsec tree). Nine unique signatures cluster
-in the xfrm_state lifecycle, the load-bearing one being:
+Tue, Apr 28, 2026 at 05:49:06PM +0200, ivecera@redhat.com wrote:
+>Add pin-operstate enum and operstate_on_dpll_get callback to report
+>the actual hardware status of a pin with respect to its parent DPLL
+>device. Unlike pin-state (which reflects administrative intent set
+>by the user), operstate reflects what the hardware is actually doing.
+>
+>Defined operational states:
+>  - active: pin is qualified and actively used by the DPLL
+>  - standby: pin is qualified but not actively used by the DPLL
+>  - no-signal: pin does not have a valid signal
+>  - qual-failed: pin signal failed qualification
+>
+>The operstate is reported inside the pin-parent-device nested
+>attribute alongside the existing state and phase-offset attributes.
+>
+>Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 
-  BUG: KASAN: slab-use-after-free in __hlist_del include/linux/list.h:990 [inline]
-  BUG: KASAN: slab-use-after-free in hlist_del_rcu include/linux/rculist.h:516 [inline]
-  BUG: KASAN: slab-use-after-free in __xfrm_state_delete net/xfrm/xfrm_state.c
-  Write of size 8 at addr ffff8881198bcb70 by task kworker/u8:9/435
+Looks great.
 
-  Workqueue: netns cleanup_net
-  Call Trace:
-   __hlist_del / hlist_del_rcu
-   __xfrm_state_delete
-   xfrm_state_delete
-   xfrm_state_flush
-   xfrm_state_fini
-   ops_exit_list
-   cleanup_net
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
-The other observed signatures hit the same slab object from
-__xfrm_state_lookup, xfrm_alloc_spi, __xfrm_state_insert and an OOB
-write variant of __xfrm_state_delete, all on the byseq/byspi
-hash chains.
-
-__xfrm_state_delete() guards its byseq and byspi unhashes with
-value-based predicates:
-
-	if (x->km.seq)
-		hlist_del_rcu(&x->byseq);
-	if (x->id.spi)
-		hlist_del_rcu(&x->byspi);
-
-while everywhere else in the file (e.g. state_cache, state_cache_input)
-the safer hlist_unhashed() check is used. xfrm_alloc_spi() sets
-x->id.spi = newspi inside xfrm_state_lock and then immediately inserts
-into byspi, but a path that observes x->id.spi != 0 outside of
-xfrm_state_lock can still skip-or-hit the byspi unhash inconsistently
-with whether x is actually on the list. The same holds for x->km.seq
-versus byseq, and the bydst/bysrc unhashes have no predicate at all,
-so a second __xfrm_state_delete() on the same object writes through
-LIST_POISON pprev.
-
-The defensive change here:
-
-  - Use hlist_del_init_rcu() instead of hlist_del_rcu() on bydst,
-    bysrc, byseq and byspi so a second deletion is a no-op rather
-    than a write through LIST_POISON pprev. The byseq/byspi nodes
-    are already initialised in xfrm_state_alloc().
-  - Test hlist_unhashed() rather than the value predicate for
-    byseq/byspi, so the unhash decision tracks list state rather than
-    mutable scalar fields.
-
-Empirical verification: applied this patch on top of v6.12.47, rebuilt,
-and re-ran the same syzkaller harness for 1h16m on a previously-crashy
-configuration that produced ~100 hits each of slab-use-after-free
-Read in xfrm_alloc_spi / Read in __xfrm_state_lookup / Write in
-__xfrm_state_delete. After the patch, 7.1M execs across 32 VMs at
-~1550 exec/sec produced zero xfrm_state UAF/OOB hits. /proc/slabinfo
-confirms the xfrm_state slab is actively allocated and freed during
-the run (~143 KiB resident), so the fuzzer is still exercising those
-code paths -- they just no longer crash.
-
-Reproduction:
-
-  - Linux 6.12.47 x86_64 + KASAN_GENERIC + KASAN_INLINE + KCOV
-  - syzkaller @ 746545b8b1e4c3a128db8652b340d3df90ce61db
-  - 32 QEMU/KVM VMs x 2 vCPU on AWS c5.metal bare metal
-  - 9 unique signatures collected in ~9h, all within xfrm_state
-    lifecycle
-
-Fixes: fe9f1d8779cb ("xfrm: add state hashtable keyed by seq")
-Fixes: 7b4dc3600e48 ("[XFRM]: Do not add a state whose SPI is zero to the SPI hash.")
-Reported-by: Michal Kosiorek <mkosiorek121@gmail.com>
-Tested-by: Michal Kosiorek <mkosiorek121@gmail.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Michal Kosiorek <mkosiorek121@gmail.com>
----
-
-Resending v2 via git send-email -- the previous post had been sent
-through Gmail's web client which stripped all tabs from the diff
-hunk and made the patch un-applyable. Apologies for the noise. No
-other changes versus the prior v2 send.
-
- net/xfrm/xfrm_state.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 1748d374abca..686014d39429 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -818,17 +818,17 @@ int __xfrm_state_delete(struct xfrm_state *x)
- 
- 		spin_lock(&net->xfrm.xfrm_state_lock);
- 		list_del(&x->km.all);
--		hlist_del_rcu(&x->bydst);
--		hlist_del_rcu(&x->bysrc);
--		if (x->km.seq)
--			hlist_del_rcu(&x->byseq);
-+		hlist_del_init_rcu(&x->bydst);
-+		hlist_del_init_rcu(&x->bysrc);
-+		if (!hlist_unhashed(&x->byseq))
-+			hlist_del_init_rcu(&x->byseq);
- 		if (!hlist_unhashed(&x->state_cache))
- 			hlist_del_rcu(&x->state_cache);
- 		if (!hlist_unhashed(&x->state_cache_input))
- 			hlist_del_rcu(&x->state_cache_input);
- 
--		if (x->id.spi)
--			hlist_del_rcu(&x->byspi);
-+		if (!hlist_unhashed(&x->byspi))
-+			hlist_del_init_rcu(&x->byspi);
- 		net->xfrm.state_num--;
- 		xfrm_nat_keepalive_state_updated(x);
- 		spin_unlock(&net->xfrm.xfrm_state_lock);
--- 
-2.54.0
-
+Thanks!
 
