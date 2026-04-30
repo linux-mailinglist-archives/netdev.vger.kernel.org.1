@@ -1,209 +1,200 @@
-Return-Path: <netdev+bounces-282900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282901-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IKvIJRh282mt4AEAu9opvQ
-	(envelope-from <netdev+bounces-282900-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:32:40 +0200
+	id iMWkOpl282ng4AEAu9opvQ
+	(envelope-from <netdev+bounces-282901-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:34:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E88384A4D42
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:32:39 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50AC14A4DCB
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:34:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EE23E30864DC
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:25:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6FE6030ABE12
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:26:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 700D42DFA5B;
-	Thu, 30 Apr 2026 15:25:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98A72D97B9;
+	Thu, 30 Apr 2026 15:26:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oAHGY0ZM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f77.google.com (mail-oa1-f77.google.com [209.85.160.77])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A81D32E7657
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 15:25:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 530A02DFA5B
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 15:26:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777562748; cv=none; b=YFOjLoyhaW8PqhV7ddK8FUKaCLCDFrugn/IKUfdUtr25dc5cnTp5Po2uzkkGrrxVVppQFMHDzMfrKjKI2CYxfETcmKqig6ZqOSif/tV1cC84ZqFCZuUoiNAKI2sBTr0Rse5k+2tdkRZHQB18RLJMdssT+0a6V6nGR5A4LObsCUc=
+	t=1777562815; cv=none; b=ci61aXumGaVOIPEGIVFcw/wEWSHieKcTHQ7+3J9+4aUSjVGq9uI3nai67zgrgVBcABcPDorzuIA2rumHql1wt2eLZSHCiX//GePStrdl/w8UyJU9No2hlqbuNyYgymT5cKVViGP7GuEDiVqgdWMEjrtJybHM0lHx2jYC67gFs+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777562748; c=relaxed/simple;
-	bh=Jb+W/c8q5pIXe64yihqmRs2snXid3xrVWxzGQEqzGso=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=CfUN/v1zwi/ZD9/350S+2RhcyNVedHW9eWsLPgBmvP6vbvuc/61C5CV45Yjri9HsCw98980h9qx2KxJF7x7qcGe1STxKqMJ17YYUAjkaatR56Mcb+YAk4WjLTw6QMT2+IDZN9p5zNfKGtQkFdvhHBMDa5jV4YfbKRphN/sO/qa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oa1-f77.google.com with SMTP id 586e51a60fabf-415583a6862so1878953fac.1
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 08:25:46 -0700 (PDT)
+	s=arc-20240116; t=1777562815; c=relaxed/simple;
+	bh=z0DYBvb+LZUpxretZCjDv+k9yn01sF1apvq6+r/SDyc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=P7DLlQ6Sg3R2ixPwLicRmpS6z/7lyhrBNCyqqXfbrjdAr0W35QnBtt+DKZjjPF1nlEwQOLILqGRgu+Mexc8A9rETTu5lKO7gXjHHral/y3hezp2wTsICAUVWeQwylN7tpbdikF+KXXm/JkNunOITDv4p6OT/s2ZbKoHFJvpv97I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oAHGY0ZM; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-488d2079582so11229165e9.2
+        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 08:26:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777562812; x=1778167612; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/1jOo4LrB4QdOIsyappS3L/Lh2AU+Kgh3i+w/0anQdk=;
+        b=oAHGY0ZMUcPi/iwy915tcI2O60jUooipymzZNyQ1WS+f5D6udHxif9elFZhpd/pP64
+         kYbsbjD9mde6LUYomaTn/kx4k5LP26s4x2/mgEalWGXtVaQNZRv3SERQcL38TtcGwdG3
+         Kt8jS9sOh3bB1jyeSfmSvWupssjJhTaEr1m2plnW0JaCx8Mj/Jo+uuMF4nJatUE3IRCl
+         F6L+ne2+M97Yu7XdaSkQ7i7vtdSkOO4CzP0vxWg9e97d1stUmGSXAJ8syq6Bk/H9Ki9z
+         knpFUrv70+Bf6HwnuNardnq4TVzJZbG0sc0WGhua8Ic16GOYokNw8puGMpDoXDAvcDPn
+         VAEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777562745; x=1778167545;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rq2+BnD3PgSUbQ80h6yebk3lUMErj3s/YmUC1cmrT1w=;
-        b=LaAAz3yelgJGfJW3xky0iiThtxHEHC1PL8ygOeMYCCQ9/Y6IC4KbPruKRrq/ZT3r1s
-         phwFGKaNkOMNaLbW2dyKHqgKMkL/KBBneM01STRXaJIZpe9QrKSVkE/WhI4fGM4R8z5s
-         1wsibmWdC534RE6gQFHQD3Elw76/CgjqDQPReWACb0Tq5mNDYsjmCgd5V6fZQ6xLfCsR
-         CbR2QzGDjFAkUdwnni3ZL7Rh2UJpR1kt96EUgrEB1JONmFEqxxDMNGRMkuT5haiWg67u
-         XfFzNujtL5hGecgz5G641keofjNeB6mYUTNCG0ozNcQvhJXEixUL5ySo/syhpUCUZj0u
-         GBaA==
-X-Forwarded-Encrypted: i=1; AFNElJ81bZ08dGYCvRgMwTFR3F0+pUgR5TZSWZjg93fxmfgcEORNDsWXugHBT4cWFOmdLAyS2EY8bPA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzf0r03CD3i4+3gGSbNubLLPlwFhytc0GNrgaCUQqVXwMYbhJUQ
-	I8PPAIOnmSRXkAWjMhUCsK3utQiH2b033JTAVsBE/E33QAdJU8M4uYpyqkJH0n/G3TItbNKMNqL
-	0A8KMlaYJU8orYaxYFM52cBbeRwoo3UA8fC6iw2L1thZB0DaXuyriv1K5jq4=
+        d=1e100.net; s=20251104; t=1777562812; x=1778167612;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=/1jOo4LrB4QdOIsyappS3L/Lh2AU+Kgh3i+w/0anQdk=;
+        b=MflByeiWNFlMjgl6nYozxRRYuW7aw/DvG9h5ywmvWW0cQblGZKA5psC55mcxUv0fA4
+         WumTjjQT1OnIoABLTlUx6FMeZ6SrAj4TKNiHWFiUHnMh8HlZXt5d9NpTWo09hbV334j7
+         Mp7I3zHLqGUEyDod+5byhyvM0YG/hxieKMb5Jmf6qSj8zCtwou8fX2AL1QIBtHxP1Rvc
+         nzvlevLlB01PbkqE+g0MB9OFOtWp1r9ihueVKiiYdUKg8QfGPwNh/i2xNkx+uo4YQQpa
+         u6rYSyYMwE2AEFh+4mBQL7rFYZ1AZ46tX+RY+5FHir0oL9e16zviggpjGRe11C1tR87z
+         xBYQ==
+X-Gm-Message-State: AOJu0YymDQoTk1pdvnGedXPR50EucAdnAYUTkcyZMmuLW0uxio3As1rV
+	2YVQ1G6KmgJshzywImO9qAGa/0Orc0IDrRCmrkqnuiXDZbC8pgsD7/zJzvF7clbg13VgEg==
+X-Gm-Gg: AeBDieurNrtkAMJo2JOCWwglh01PfEI0UYppkC7jhSRqbCrt0RTMAMQ47xNckZkOmc3
+	Hs4LM6yctrxoPEoscz7Wcpaq16TCmxLKsSHnspynqVLNq2bARWxo1fCOp0xYg4DNDPfJcgl649i
+	SZD39IHXLYzFnIcqR987927FBu9qOuphGJfpB6imhJ7E1P5kkyuiKL6M82BMCDwGkbu10AC6oF4
+	Z37m64VI1Ao3Ft6WkTV7VLbXR1iOa8ze7AJdg3NZ4XaOnq0Wy3fZjItruxJDimVcbqBQ+HX1QBO
+	p6kxpEEEaWic0fSzh8DZ6xnJtIA6B7SYXwrfrZvMJsQA9Nt0wrsRhy9TkVWFOvepewzePe0svfM
+	7CJyM8bgPRyIO/f+JO4/zXv/lSDiA7OYjp0kRop1bBY8gU+iMw1d0698fJ5Ibdg1uWF5vmzQphW
+	+ope7dTwkWZzDWccL128h7KPLd37HoAzF3fUnNF++Xr1sY/7c2OagnzVDu0u54iIGbcKQBdCQHt
+	7GAnL8M4GmG199tiO+qptMr/o6jvyiUUTDJfg==
+X-Received: by 2002:a05:600c:a408:b0:48a:58ae:992f with SMTP id 5b1f17b1804b1-48a84446302mr43617965e9.16.1777562811753;
+        Thu, 30 Apr 2026 08:26:51 -0700 (PDT)
+Received: from localhost.localdomain ([2a00:a041:e04f:2600:f9d2:9c9e:9a42:5d91])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a82301ad1sm119212485e9.9.2026.04.30.08.26.50
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 30 Apr 2026 08:26:51 -0700 (PDT)
+From: Kai Zen <kai.aizen.dev@gmail.com>
+To: netdev@vger.kernel.org
+Cc: stable@vger.kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	gregkh@linuxfoundation.org
+Subject: [PATCH net v3] net: rtnetlink: zero ifla_vf_broadcast to avoid stack infoleak in rtnl_fill_vfinfo
+Date: Thu, 30 Apr 2026 18:26:48 +0300
+Message-ID: <3c506e8f936e52b57620269b55c348af05d413a2.1777557228.git.kai.aizen.dev@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <CALynFi54eQj7SOmF6QNG0eqhLw7AuURzo6tSYQavvM3ZP74ikw@mail.gmail.com>
+References: <CALynFi54eQj7SOmF6QNG0eqhLw7AuURzo6tSYQavvM3ZP74ikw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:2f08:b0:696:2b58:4ac0 with SMTP id
- 006d021491bc7-6967bdc8fe6mr913952eaf.35.1777562745581; Thu, 30 Apr 2026
- 08:25:45 -0700 (PDT)
-Date: Thu, 30 Apr 2026 08:25:45 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69f37479.170a0220.5f1b.0003.GAE@google.com>
-Subject: [syzbot] [net?] WARNING in hci_sock_sendmsg
-From: syzbot <syzbot+8fe47b0d0d2830a8d3be@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, kuniyu@google.com, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	willemb@google.com
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: E88384A4D42
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 50AC14A4DCB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=fff2b12da07ad];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_NEQ_ENVFROM(0.00)[kaiaizendev@gmail.com,netdev@vger.kernel.org];
+	TO_DN_NONE(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282901-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-282900-lists,netdev=lfdr.de,8fe47b0d0d2830a8d3be];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,goo.gl:url,googlegroups.com:email,appspotmail.com:email,storage.googleapis.com:url]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Hello,
+rtnl_fill_vfinfo() declares struct ifla_vf_broadcast on the stack
+without initialisation:
 
-syzbot found the following issue on:
+	struct ifla_vf_broadcast vf_broadcast;
 
-HEAD commit:    9974969c1403 Add linux-next specific files for 20260428
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=16056b6c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fff2b12da07ad
-dashboard link: https://syzkaller.appspot.com/bug?extid=8fe47b0d0d2830a8d3be
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+The struct contains a single fixed 32-byte field:
 
-Unfortunately, I don't have any reproducer for this issue yet.
+	/* include/uapi/linux/if_link.h */
+	struct ifla_vf_broadcast {
+		__u8 broadcast[32];
+	};
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/755177aac4cc/disk-9974969c.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/fe2f57d4e79e/vmlinux-9974969c.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/15b13a4a7518/bzImage-9974969c.xz
+The function then copies dev->broadcast into it using dev->addr_len
+as the length:
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+8fe47b0d0d2830a8d3be@syzkaller.appspotmail.com
+	memcpy(vf_broadcast.broadcast, dev->broadcast, dev->addr_len);
 
-------------[ cut here ]------------
-workqueue: cannot queue hci_tx_work on wq hci0
-WARNING: kernel/workqueue.c:2298 at __queue_work+0xd67/0x1010 kernel/workqueue.c:2296, CPU#1: syz.0.23/5836
-Modules linked in:
-CPU: 1 UID: 0 PID: 5836 Comm: syz.0.23 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
-RIP: 0010:__queue_work+0xd87/0x1010 kernel/workqueue.c:2296
-Code: 01 00 00 4c 8d 35 49 c5 21 0e 4c 89 e8 48 c1 e8 03 42 80 3c 20 00 74 08 4c 89 ef e8 b3 f6 a0 00 49 8b 75 00 4c 89 f7 4c 89 fa <67> 48 0f b9 3a 48 83 c4 58 5b 41 5c 41 5d 41 5e 41 5f 5d e9 11 48
-RSP: 0018:ffffc90005817958 EFLAGS: 00010046
-RAX: 1ffff11004a2198f RBX: 0000000000000008 RCX: 0000000000080000
-RDX: ffff888037302968 RSI: ffffffff8a252410 RDI: ffffffff8faf47a0
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: dffffc0000000000 R11: ffffed1004a2198d R12: dffffc0000000000
-R13: ffff88802510cc78 R14: ffffffff8faf47a0 R15: ffff888037302968
-FS:  00007f2b3bbfe6c0(0000) GS:ffff888125dd8000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000110c459547 CR3: 000000004410a000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- queue_work_on+0x106/0x1d0 kernel/workqueue.c:2432
- queue_work include/linux/workqueue.h:696 [inline]
- hci_sock_sendmsg+0xb3d/0xf40 net/bluetooth/hci_sock.c:-1
- sock_sendmsg_nosec+0x112/0x150 net/socket.c:797
- __sock_sendmsg net/socket.c:812 [inline]
- sock_write_iter+0x308/0x410 net/socket.c:1269
- new_sync_write fs/read_write.c:595 [inline]
- vfs_write+0x629/0xba0 fs/read_write.c:688
- ksys_write+0x156/0x270 fs/read_write.c:740
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f2b3d9acdd9
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f2b3bbfe028 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007f2b3dc25fa0 RCX: 00007f2b3d9acdd9
-RDX: 0000000000000006 RSI: 0000200000000240 RDI: 0000000000000006
-RBP: 00007f2b3da42d69 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f2b3dc26038 R14: 00007f2b3dc25fa0 R15: 00007fffb59042a8
- </TASK>
-----------------
-Code disassembly (best guess), 1 bytes skipped:
-   0:	00 00                	add    %al,(%rax)
-   2:	4c 8d 35 49 c5 21 0e 	lea    0xe21c549(%rip),%r14        # 0xe21c552
-   9:	4c 89 e8             	mov    %r13,%rax
-   c:	48 c1 e8 03          	shr    $0x3,%rax
-  10:	42 80 3c 20 00       	cmpb   $0x0,(%rax,%r12,1)
-  15:	74 08                	je     0x1f
-  17:	4c 89 ef             	mov    %r13,%rdi
-  1a:	e8 b3 f6 a0 00       	call   0xa0f6d2
-  1f:	49 8b 75 00          	mov    0x0(%r13),%rsi
-  23:	4c 89 f7             	mov    %r14,%rdi
-  26:	4c 89 fa             	mov    %r15,%rdx
-* 29:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
-  2e:	48 83 c4 58          	add    $0x58,%rsp
-  32:	5b                   	pop    %rbx
-  33:	41 5c                	pop    %r12
-  35:	41 5d                	pop    %r13
-  37:	41 5e                	pop    %r14
-  39:	41 5f                	pop    %r15
-  3b:	5d                   	pop    %rbp
-  3c:	e9                   	.byte 0xe9
-  3d:	11                   	.byte 0x11
-  3e:	48                   	rex.W
+On Ethernet devices (the overwhelming majority of SR-IOV NICs)
+dev->addr_len is 6, so only the first 6 bytes of broadcast[] are
+written. The remaining 26 bytes retain whatever was previously on
+the kernel stack. The full struct is then handed to userspace via:
 
+	nla_put(skb, IFLA_VF_BROADCAST,
+		sizeof(vf_broadcast), &vf_broadcast)
 
+leaking up to 26 bytes of uninitialised kernel stack per VF per
+RTM_GETLINK request, repeatable.
+
+The other vf_* structs in the same function are explicitly zeroed
+for exactly this reason - see the memset() calls for ivi,
+vf_vlan_info, node_guid and port_guid a few lines above.
+vf_broadcast was simply missed when it was added.
+
+Reachability: any unprivileged local process can open AF_NETLINK /
+NETLINK_ROUTE without capabilities and send RTM_GETLINK with an
+IFLA_EXT_MASK attribute carrying RTEXT_FILTER_VF. The kernel walks
+each VF and emits IFLA_VF_BROADCAST, leaking 26 bytes of stack per
+VF per request. Stack residue at this call site can include return
+addresses and transient sensitive data; KASAN with stack
+instrumentation, or KMSAN, will flag the nla_put() when reproduced.
+
+Zero the on-stack struct before the partial memcpy, matching the
+existing pattern used for the other vf_* structs in the same
+function.
+
+Fixes: 75345f888f70 ("ipoib: show VF broadcast address")
+Cc: stable@vger.kernel.org
+Signed-off-by: Kai Zen <kai.aizen.dev@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/core/rtnetlink.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index b613bb6e0..df042da42 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -1572,6 +1572,7 @@ static noinline_for_stack int rtnl_fill_vfinfo(struct sk_buff *skb,
+ 		port_guid.vf = ivi.vf;
+ 
+ 	memcpy(vf_mac.mac, ivi.mac, sizeof(ivi.mac));
++	memset(&vf_broadcast, 0, sizeof(vf_broadcast));
+ 	memcpy(vf_broadcast.broadcast, dev->broadcast, dev->addr_len);
+ 	vf_vlan.vlan = ivi.vlan;
+ 	vf_vlan.qos = ivi.qos;
+-- 
+2.43.0
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
