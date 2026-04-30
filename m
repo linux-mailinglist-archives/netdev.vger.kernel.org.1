@@ -1,144 +1,120 @@
-Return-Path: <netdev+bounces-282576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282577-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id Dj0eMuyv8mk+tgEAu9opvQ
-	(envelope-from <netdev+bounces-282576-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:27:08 +0200
+	id HSW4M3aw8mlItgEAu9opvQ
+	(envelope-from <netdev+bounces-282577-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:29:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2025849BFE3
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:27:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F65149BFF3
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:29:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C55F2300BDAB
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:27:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7BBB330180AA
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:29:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C993A25B30D;
-	Thu, 30 Apr 2026 01:27:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E92B7265CA2;
+	Thu, 30 Apr 2026 01:29:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YNJFKg0V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F+thYEcL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6CD1227B94;
-	Thu, 30 Apr 2026 01:27:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A91D26ED46;
+	Thu, 30 Apr 2026 01:29:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777512423; cv=none; b=QCZzWZMkuSu2Ypz8CeZ/6glHG5/6fhG71OMWdrDD7ko7CrRLCO5/mudjKcfpp51FFC+TKwZL88WgmksdUsojnQScZb0XNfu052U9xnSMuUBuM0AtGjNNWljUhXbJh2dpqveyCxcKmZ3VwP0+kH6jSgwFKrEszgC3w84PVXOlzW0=
+	t=1777512559; cv=none; b=h2KuEg39B7omS2QksCFWHlT9FxdGiYKEqhxMkk395+l8koABEGcmL+Nh37R//SYt6n4b0zcgb90CsZfXO52n6r2Qpb2utM40gabDu+u3B0gIkKOzRzhXFQP1RTnVqXNJiwomjtLsx6LayjUTkZJu9/vbMRThqJo4ISzNtzVgJS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777512423; c=relaxed/simple;
-	bh=OQClfIllpvjb88x1YwOMzh+Yc6xI81J2AsvPmhkrUcg=;
+	s=arc-20240116; t=1777512559; c=relaxed/simple;
+	bh=7AMc2xtDJZHbbx6E8fFOl3b0dTV0r3JCWZmEz2YDezw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eB9INLgO8kgewcX3nOPk/LBGxbxwVEah1Y0Fl+Sh5f+UNuLLk1SEPRdEXaWw02Ntj/IM3/572kdM/Ubz2QR1d9oai1tmPvmgO/LvmUIB9uNyYjfNH0BqUcuhtPqlrsfNPyhFp60f/+WxHzOIbYrA6hJ3T5kJ+3UKlWhAZZtxjDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YNJFKg0V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB002C19425;
-	Thu, 30 Apr 2026 01:27:02 +0000 (UTC)
+	 MIME-Version:Content-Type; b=hExookHPk2VucWIdCtyaRlV/rIggmqIXK2HDCdamEC2hztWBf5zNmyyU0KOxUc2YKsGvi7m732U9xolq6YOHD/66F2vuK+CjULSMHMUfv02GPAUx6P3vZzWhSooczE5gQnmQexfKFGBswyF0jXvrf5442vsOSWiyk6nzwiGhD3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F+thYEcL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68C96C19425;
+	Thu, 30 Apr 2026 01:29:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777512423;
-	bh=OQClfIllpvjb88x1YwOMzh+Yc6xI81J2AsvPmhkrUcg=;
+	s=k20201202; t=1777512559;
+	bh=7AMc2xtDJZHbbx6E8fFOl3b0dTV0r3JCWZmEz2YDezw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YNJFKg0Vhcrr3OWAB0rM2asrt9S92vjKJONZ1VMNrfo2gE/ZZ0+cprJpMwW3XFbOv
-	 fJBs9reV25ahLQW4DMS8+fxy/PmVXi3/DNBIJJlv2XDx7tDEdIoJ7QuJCE4JGy+hG4
-	 MDTsQB6UE4HBuKwinyWmDKs2Pan2kUAEbcgl4xvv+scHEziVwnI6ThrMLcnBA9wy1s
-	 JakrRwV+WCjCCWIWkbTSTdGtoQHIURyPJ1Xzn1oT6lNlHxaJ2XVTQHgr5+CWsCMkfk
-	 skpeLwM4sgjfKeNISI5XmO0xlM7Ux54TvxH3L/Wy8w8DE3TghciRLcYhK8GDqXXAjE
-	 yt84HDeDuyWPA==
-Date: Wed, 29 Apr 2026 18:27:01 -0700
+	b=F+thYEcL7OQllfsHv+cY0yB8u4ltpP5XuVjLsny8ZVjwN8/Irz//7rBQvixZSDRiQ
+	 C13Ap4OyGAT9ar7euxeciGUxZf1hUWfBdakhQpTChm6f6cm3RIHv0FxKoIY+u/wIsI
+	 yaRFD92HSOjHkHGs+PVfKMQTrQLrOGOu/nXg6buZOfhqwDzhvWLaSIav7EAZUZx1jF
+	 95dpfFFf6HrYx2kw+vtofa71zP+so3E2AuWEfeZXCFVppogPeBW6wHTJ/RVR1qTj4M
+	 d5d+h9FMf+9OKsV7JKhAknvI1uqPrJ43OqMm0GOD+uu1vJKG+XnhHr7LZ2V87Rq0aq
+	 A4nH1ZFISwR/g==
+Date: Wed, 29 Apr 2026 18:29:17 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org, Yibo Dong
- <dong100@mucse.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, MD Danish Anwar <danishanwar@ti.com>, Vadim Fedorenko
- <vadim.fedorenko@linux.dev>
-Subject: Re: [PATCH v2] net: ethernet: rnpgbe: mark nonfunctional incomplete
- driver as BROKEN
-Message-ID: <20260429182701.28edde72@kernel.org>
-In-Reply-To: <CADkSEUiRwto-14zkER30WJdiQa2b+OGOZ+2S50pq4doJ37X70Q@mail.gmail.com>
-References: <20260428030826.47509-1-enelsonmoore@gmail.com>
-	<20260429175421.014bb28f@kernel.org>
-	<CADkSEUiRwto-14zkER30WJdiQa2b+OGOZ+2S50pq4doJ37X70Q@mail.gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Daniel Golle <daniel@makrotopia.org>, chester.a.unal@arinc9.com,
+ olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, linux@armlinux.org.uk,
+ ansuelsmth@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net v4] net: dsa: mt7530: fix .get_stats64 sleeping in
+ atomic context
+Message-ID: <20260429182917.20f96df5@kernel.org>
+In-Reply-To: <52d69a5d-a951-4a65-a947-7aaf41bc3daf@lunn.ch>
+References: <16efd278e4f17776ccfbf8491e5be71a4689c137.1777385305.git.daniel@makrotopia.org>
+	<20260429234612.2240476-2-kuba@kernel.org>
+	<afKaVQ27GUQiWZTb@makrotopia.org>
+	<52d69a5d-a951-4a65-a947-7aaf41bc3daf@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 2025849BFE3
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 1F65149BFF3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282576-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-282577-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_CC(0.00)[makrotopia.org,arinc9.com,gmail.com,davemloft.net,google.com,redhat.com,collabora.com,armlinux.org.uk,vger.kernel.org,lists.infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Wed, 29 Apr 2026 18:13:46 -0700 Ethan Nelson-Moore wrote:
-> On Wed, Apr 29, 2026 at 5:54=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
-wrote:
-> > I'm having second thoughts about this. I'm worried users will come to
-> > expect that drivers are marked as BROKEN until such time that they
-> > can be considered a sufficiently complete replacement for an OOT /
-> > vendor driver. This will be highly subjective. =20
->=20
-> I understand your concern, but there is precedent for doing this when
-> the driver doesn't work at all.
->=20
-> The ntsync driver was marked as broken in commit f5b335dc025c ("misc:
-> ntsync: mark driver as "broken" to prevent from building") until it
-> was fully merged. The BROKEN dependency was then removed in commit
-> c301e1fefc2d ("ntsync: No longer depend on BROKEN.")
+On Thu, 30 Apr 2026 02:12:47 +0200 Andrew Lunn wrote:
+> > > The priv->bus pointer is initialized during probe. However,
+> > > INIT_DELAYED_WORK() is only called in mt753x_setup(), which might never
+> > > execute if the DSA tree remains incomplete.  
+> 
+> The opposite of .setup() is .teardown(). So if the delayed work is
+> setup is setup() it should be cancelled in .teardown, to keeps things
+> symmetric.
 
-ntsync is mere 1.2kLoC, that's 10x smaller than typical networking
-driver these days, and even (slightly) smaller than rnpgbe(!)
+The code does that, but also cancels again in remove.
+IDK if that's just "for good measure", or motivated by a previous AI
+complaint :(
 
-Most in-tree networking drivers play constant catch-up with the OOT
-version so they are never "fully merged".
-
-> If it were my decision, I would remove BROKEN from this driver once it
-> supports a stable network connection, and perhaps also once it
-> survives suspends and resumes, since that is expected in modern
-> desktop use cases. I think that is a fairly objective reading of the
-> word BROKEN.
-
-That'd require us to know if the device is going to be used on
-desktop because for datacenter NICs suspend/resume does not matter.
-
-> It might also be a good idea to agree on expected uses of
-> CONFIG_BROKEN and document them in init/Kconfig.
-> Currently it says:
->   This option allows you to choose whether you want to try to
->   compile (and fix) old drivers that haven't been updated to
->   new infrastructure.
-> which does not fully encompass what it is used for.
-
-Maybe it was written in simpler times, maybe the help message was
-aspirational to begin with..
+But I think your point stands, as is the driver is not symmetric,
+if we want to cancel in .remove it has to init in .probe.
 
