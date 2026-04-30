@@ -1,68 +1,53 @@
-Return-Path: <netdev+bounces-282566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282567-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 5dSDEXip8mmstQEAu9opvQ
-	(envelope-from <netdev+bounces-282566-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:59:36 +0200
+	id sJfVAN6p8mm8tQEAu9opvQ
+	(envelope-from <netdev+bounces-282567-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:01:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9230349BDDA
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:59:35 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25AAC49BE27
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:01:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 36198300F51B
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 00:59:32 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1EBBB300BEAF
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:01:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FE1621A459;
-	Thu, 30 Apr 2026 00:59:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE2F821C16A;
+	Thu, 30 Apr 2026 01:00:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cJs40i6b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FG/RnQ+4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B1BD5474F;
-	Thu, 30 Apr 2026 00:59:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB40D1C28E;
+	Thu, 30 Apr 2026 01:00:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777510770; cv=none; b=gLIzF1cauqNTZWomv0DO63SXNhH9jO4AbQyOUIOcoK9TGUd1VdS1zKC6HeWdH6yNGVfnApaQAYIWzHOdBNDApecBrP1nofFdawtb1Zmlvm6EdW5D9a1hwHmoB5TNceTL0ffJIxvhRv0RDIcPox/V8G3WRDZL3Z4GKccPbI8rbpQ=
+	t=1777510858; cv=none; b=mp4B5wVUTNhBF+6Ff7l1HJlM9Zf+ZDqPVx5t6bzSqq6vYwNwKoGp3TTdMGSH0FQQ4ybP+v0N6mgs66IaiiN9YBfvza5iUXenVwYsMGCGUCO+zyHeAJXRz5/RzMijXRV7FZMcPokox9HNWdpoNf1Zi3jTz7HTaUP7Zm47k04Gu5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777510770; c=relaxed/simple;
-	bh=kOruFAilq7Jtl1UPd7biykndLNJldYpzfBtFWIdBIWk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LdT55mL/AFfFnAp1eOa+dOJ/9hjNA5iMr/rdIFEUC9EwMB7Pg7rfgNgncwsM5shNDRTwyCDm5OUZJ/9qrAOV52UipKyy/TjHOtBFi7j/yJQrtsPMoI4i20bCsc/qvwi8EMnR7VXCWOYf/lPPG3SVUsE2uHDhxPXfwEypJVwOFbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cJs40i6b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59414C19425;
-	Thu, 30 Apr 2026 00:59:29 +0000 (UTC)
+	s=arc-20240116; t=1777510858; c=relaxed/simple;
+	bh=mecOdSgVKPkbWXaWPf66CrtxpWFpJtUvn40eTyEgAQE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=lCTm6nLwk/OZ5Nupwdr/lVhzEyHhJwSY4z38/OY2un9bIIUHJ1UKnBE56ckzAQS2LVApZdmGFkReT24/1efhtf+D5jjlvcOyxiubz7FubcPkYgKp5lNzBvi8aVfbJBjHysPq+KBpnLy0iD/M+m3ZzEOz0dnqYe7/hj9B/9gIspA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FG/RnQ+4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 522D5C19425;
+	Thu, 30 Apr 2026 01:00:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777510769;
-	bh=kOruFAilq7Jtl1UPd7biykndLNJldYpzfBtFWIdBIWk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cJs40i6blewAusDoiLM8gOuK6cvIqQxqsa+U5FWJflaTG8nQueeTV+CTapOVCLtqh
-	 G/XNs3pL+UiBsip+cwdi0yG90U2QRaqEOdtrge56C+JWFxKMLIF+NmoNAWSKwhtybg
-	 8XP+IjnYlIi5350RBCIQ3LdEFdqxo0GdbrDzLqpq/7TWBRm1Hi4E26gInFCLIud4Sa
-	 SrvujoRUEuOsHzCM7s8bgCbFMjZc0ftwyV+vaVPL8j7XLzYFh+48dhruLjjKM7riS4
-	 pXgXQPRauG6ODLn80av/F0fntw6798xL9vg/3sxN0z2IbAEc3lcR9zLoeuxGI5uz2c
-	 wgR6r4VRbROfw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: wei.fang@nxp.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev
-Subject: Re: [PATCH v2 net] net: enetc: fix VSI mailbox timeout handling and DMA lifecycle
-Date: Wed, 29 Apr 2026 17:59:20 -0700
-Message-ID: <20260430005919.2320380-2-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260428063111.2869408-1-wei.fang@nxp.com>
-References: <20260428063111.2869408-1-wei.fang@nxp.com>
+	s=k20201202; t=1777510858;
+	bh=mecOdSgVKPkbWXaWPf66CrtxpWFpJtUvn40eTyEgAQE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=FG/RnQ+49fB+v8h8056qWGA9/qQ02KyUh0+KVkmH/VUWchR5sxdhn1dx80OgD0ffA
+	 r2Y0yY9C0I3ZExJxpV7beh7IaPYS5etpLpVvWXvb2tc/HGNkHqC4fYhvuX3av9X5Vp
+	 mFsxwLw0HSwWKFMXC4jGbNE+69GY1/uuvRsBP/gsqM/KbN0mu86AaB9ogRqbGJCflp
+	 bOkusARUPpeE01C/7/n94xtbqa09jR1+Yjlqa1Oz51UHNytsYGjOnJVYnQx0S/USN7
+	 niFvp3WOwp1tPYfw64lIOLAX8RVxMjy4yBnyq07Bwhc2qY/ADBmPyqvlRs6M8Ufcjf
+	 t9dDVwm/3O4CQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9F1E3809A33;
+	Thu, 30 Apr 2026 01:00:14 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,102 +55,80 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 9230349BDDA
+Subject: Re: [PATCH net-next V2 0/3] net/mlx5: Fix E-Switch work queue
+ deadlock
+ with devlink lock
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177751081355.2244169.9369329388278811671.git-patchwork-notify@kernel.org>
+Date: Thu, 30 Apr 2026 01:00:13 +0000
+References: <20260428051018.219093-1-tariqt@nvidia.com>
+In-Reply-To: <20260428051018.219093-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
+ dtatulea@nvidia.com
+X-Rspamd-Queue-Id: 25AAC49BE27
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-282566-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-282567-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.998];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FROM_HAS_DN(0.00)[]
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-net: enetc: fix VSI mailbox timeout handling and DMA lifecycle
+Hello:
 
-This patch preserves the VSI mailbox DMA buffer in si->msg so it can
-be freed on the next send (once the mailbox is no longer busy), and
-adds a final free in enetc_vf_remove(). It also bails out early if
-the mailbox is still busy when a new message is submitted.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> diff --git a/drivers/net/ethernet/freescale/enetc/enetc_vf.c b/drivers/net/ethernet/freescale/enetc/enetc_vf.c
-> index 6c4b374bcb0e..e8c5adee9743 100644
-> --- a/drivers/net/ethernet/freescale/enetc/enetc_vf.c
-> +++ b/drivers/net/ethernet/freescale/enetc/enetc_vf.c
+On Tue, 28 Apr 2026 08:10:14 +0300 you wrote:
+> Hi,
+> 
+> See detailed description by Mark below [1].
+> 
+> Regards,
+> Tariq
+> 
+> [...]
 
-[ ... ]
+Here is the summary with links:
+  - [net-next,V2,1/3] net/mlx5: E-Switch, move work queue generation counter
+    https://git.kernel.org/netdev/net-next/c/f950ddb57ce4
+  - [net-next,V2,2/3] net/mlx5: E-Switch, introduce generic work queue dispatch helper
+    https://git.kernel.org/netdev/net-next/c/2a110ee54e89
+  - [net-next,V2,3/3] net/mlx5: E-Switch, fix deadlock between devlink lock and esw->wq
+    https://git.kernel.org/netdev/net-next/c/6a92fe1956d2
 
-> @@ -258,6 +281,7 @@ static int enetc_vf_probe(struct pci_dev *pdev,
->  static void enetc_vf_remove(struct pci_dev *pdev)
->  {
->  	struct enetc_si *si = pci_get_drvdata(pdev);
-> +	struct enetc_msg_swbd msg = si->msg;
->  	struct enetc_ndev_priv *priv;
->  
->  	priv = netdev_priv(si->ndev);
->  	unregister_netdev(si->ndev);
-
-Is there a race between this local copy of si->msg and a concurrent
-ndo callback?
-
-The local 'msg' is captured at function entry, before unregister_netdev()
-has run, and .remove() does not hold RTNL. During that window, userspace
-(for example 'ip link set dev ethX address ...') can acquire RTNL and
-invoke enetc_vf_set_mac_addr() -> enetc_msg_vsi_set_primary_mac_addr()
--> enetc_msg_vsi_send() on the same si.
-
-Inside enetc_msg_vsi_send(), on the non-busy path:
-
-	/* Free the DMA buffer of the last message */
-	enetc_msg_dma_free(dev, &si->msg);
-	si->msg = *msg;
-
-the buffer whose (vaddr, dma, size) our local 'msg' still holds a copy
-of gets freed, and si->msg is replaced with a new allocation.
-
->  
->  	enetc_free_msix(priv);
->  
->  	enetc_free_si_resources(priv);
->  	enetc_teardown_cbdr(&si->cbd_ring);
->  
->  	free_netdev(si->ndev);
->  
->  	enetc_pci_remove(pdev);
-> +	enetc_msg_dma_free(&pdev->dev, &msg);
->  }
-
-When this trailing enetc_msg_dma_free(&pdev->dev, &msg) runs, can it
-call dma_free_coherent() on a buffer that enetc_msg_vsi_send() already
-freed, and also leak the newer buffer now sitting in si->msg (which is
-no longer referenced by anything)?
-
-Would capturing msg = si->msg after unregister_netdev() returns (i.e.
-once no further ndo callbacks can race) avoid both the double free
-and the leak?
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
