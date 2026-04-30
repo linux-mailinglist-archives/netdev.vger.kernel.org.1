@@ -1,71 +1,73 @@
-Return-Path: <netdev+bounces-282593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282594-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IJCPEKi38mnLtgEAu9opvQ
-	(envelope-from <netdev+bounces-282593-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:00:08 +0200
+	id yO5uIBq48mnltgEAu9opvQ
+	(envelope-from <netdev+bounces-282594-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:02:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE1BD49C2B9
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:00:07 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E30B49C2E0
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:02:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6F9B130276B9
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:00:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5E88E300AD6C
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:01:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1327224466C;
-	Thu, 30 Apr 2026 02:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26C8228466C;
+	Thu, 30 Apr 2026 02:01:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AvTO2+mC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mlkw7phV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF550B672
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 02:00:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03DE1270545;
+	Thu, 30 Apr 2026 02:01:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777514405; cv=none; b=mVca7U5ViNczCgNlC2l0I5QCHln0ND+Il+QSVcDi3rDOWE5ThR3JbNhgTLKi0yIp6fyY+y6fQKodrBTW8tiCo1vjoxPgZOr7PaYkVpYoSdxD+Tv5M6uvR9MbRF26rd4YNx8EmvKMHzJzRAoXbKgqLuOUFPzD/J+pMYB0BZaVvoM=
+	t=1777514512; cv=none; b=A+eWDa7sBw/jnA7PY2Cih+HdPRjAzuaVigrLkLbsGA1XLNmmkmdr7aqNvnz3vx8AuyVmDAK4vaUDo5wHZ/QQZCz/LpHG02ZAae3V7TFr9N9ru8+OW73Bn2ArjZW1VuGujzeUbkmMPDLChVBDNEg0F0z03ws0fheUZwkJFduaQIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777514405; c=relaxed/simple;
-	bh=B6FsFeB3KyWWTfncPSh42chuXWXna92iSyPvit3Meuk=;
+	s=arc-20240116; t=1777514512; c=relaxed/simple;
+	bh=YX2d4wcuN1GU1u0POqjHNgHYHZGTaml01xeVLvOYBms=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iJHV/vAijM7XZv21BC99mlkA1yOxnqDJekX9KJMlUH/U+rdMwFylHn/T3l4fJIrfc3kU2amqVbqa0yUvmqj8kto+smMbsCsHB1FtpRTylf7w5/KQUTnZloNLlkciOfi4m7XC3oJZYEM2EsywU0P0jRFSIWzBMx4K+VG9EkUlCow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AvTO2+mC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34C58C19425;
-	Thu, 30 Apr 2026 02:00:05 +0000 (UTC)
+	 MIME-Version:Content-Type; b=e1u+QxQg8CQ76FQqWZhyN/tJxULfe9PUtD8KigCB+SRa93Lptk4biMAg+I28Xyj/KbnQkOeO3kSZqV6u6ZiNXymSVoYLBKs28SrVdTbbPYeIYp/Iws2Zaj7FQXdMVok2HO98LJv284EpizwqTG+mKXBIhC99/h2/Kz8lfOjV51Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mlkw7phV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A9A4C19425;
+	Thu, 30 Apr 2026 02:01:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777514405;
-	bh=B6FsFeB3KyWWTfncPSh42chuXWXna92iSyPvit3Meuk=;
+	s=k20201202; t=1777514511;
+	bh=YX2d4wcuN1GU1u0POqjHNgHYHZGTaml01xeVLvOYBms=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AvTO2+mCZgHNeKQnM073vj9syWAhE3ncwhmGNe4DF0av1pucviT/JTNoyrSXY9aAd
-	 nv+EdTZ4GOGnwYWUVw2feBhAhczsbLc1wuKkO20NgnbGjDo8CzEObeWDKLbnPRNra4
-	 to1SRhEXBhxOwLCh03ecwH3oofV6lUvCqKj/Xj6Umuvd2Mb2tzMtnSmJqvEd05c7/K
-	 m8ht9O1X7cPESi2gJteezHBtJUEUOwU2ePAEAMIfKimrtEqV4hLiUrnn+GG6iUKyFI
-	 SPd08+SVK8JLhdxt4nRW3anmVw9Tj28dAaFmZacfvfMPzDGWrNhOCmjgd95GreWhm0
-	 1j9887D0Bnf4Q==
-Date: Wed, 29 Apr 2026 19:00:04 -0700
+	b=Mlkw7phVtuwbS2L0giugbl0rR5f3TxbREQbL5P8f4ivpCEoTV0UeOfIpLzGqR2kZC
+	 RAjFN9kzXsapHJ9CjY48iWp4xeVTR7Id0vWq3CJz2OO3Hf7Xghi0W5YaCo06o4zEmC
+	 mjde64FpEsqd/HrY/NSog+sNpz0Yun0j8YvXa7YqgKVP2Jwd/WMQ4Mcxz5M29UpU7x
+	 04qPkeLURvkZF6tQ+nPM/K59OjIGMHvGoOKNpMfLxTNwL7WHw7Cwz8B6Vdc7Refwg0
+	 RzlGf0n1xirYskv4dfyhX6VX6+QAmWhuqiMpsSEC+Y8G/EqaNS00KHLOtgl8A0Zg8A
+	 +o2ywYX6ekspA==
+Date: Wed, 29 Apr 2026 19:01:50 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jamal Hadi Salim
- <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com
-Subject: Re: [PATCH v2 net-next 3/4] net/sched: switch tc_dump_qdisc() to
- for_each_netdev_dump()
-Message-ID: <20260429190004.2bb674d4@kernel.org>
-In-Reply-To: <20260428170414.250566-4-edumazet@google.com>
-References: <20260428170414.250566-1-edumazet@google.com>
-	<20260428170414.250566-4-edumazet@google.com>
+To: Marc Harvey <marcharvey@google.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Kuniyuki Iwashima <kuniyu@google.com>
+Subject: Re: [PATCH net-next] net/mlx5: Add MLX5_VXLAN config option
+Message-ID: <20260429190150.417b0302@kernel.org>
+In-Reply-To: <CANkEMgkBnuRfurKcFEUAZcJcX1XYSnHbBozZGP8DpnKq--tWbw@mail.gmail.com>
+References: <20260428-mlx5_vxlan-v1-1-cf666d042618@google.com>
+	<20260428184631.40f1f1b7@kernel.org>
+	<CANkEMgkBnuRfurKcFEUAZcJcX1XYSnHbBozZGP8DpnKq--tWbw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: CE1BD49C2B9
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 7E30B49C2E0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -73,63 +75,57 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,kernel.org,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-282593-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-282594-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-On Tue, 28 Apr 2026 17:04:13 +0000 Eric Dumazet wrote:
->  static int tc_dump_qdisc(struct sk_buff *skb, struct netlink_callback *cb)
->  {
+On Wed, 29 Apr 2026 17:46:36 -0700 Marc Harvey wrote:
+> On Tue, Apr 28, 2026 at 6:46=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> >
+> > On Tue, 28 Apr 2026 22:44:34 +0000 Marc Harvey wrote: =20
+> > > Currently, there is no way to disable mlx5 vxlan offloading if vxlan
+> > > is enabled. We've (possibly) seen some minor udp rr and udp stream
+> > > regressions when enabling vxlan, and want a way to disable this
+> > > offloading. Also coupling vxlan offloading with vxlan enablement
+> > > generally limits the flexability of vxlan setups.
+> > >
+> > > Add a new config option for mlx5 vxlan offloading specifically, so
+> > > that users can use vxlan without automatically opting in to the
+> > > offloading.
+> > >
+> > > To keep the same behavior as before, the new config option is enabled
+> > > by default if vxlan is enabled. =20
+> >
+> > Can we delay init of whatever makes the device slow down until the
+> > first vxlan port is registered? A kconfig level optimization of this
+> > sort will have rather limited applicability. =20
+>=20
+> There would still be the problem of wanting to use vxlan without vxlan
+> offload. Agree that a kconfig might not be ideal, but it is currently
+> guarded by a kconfig that offers no choice to opt out.
 
-> +	struct {
-> +		unsigned long ifindex;
-> +		int q_idx;
-> +	} *ctx = (void *)cb->ctx;
-> +	unsigned long s_ifindex;
-> +	struct net_device *dev;
-> +	int s_q_idx, q_idx;
->  	int err;
->  
-> -	s_idx = cb->args[0];
-> -	s_q_idx = q_idx = cb->args[1];
-> -
-> -	idx = 0;
->  	ASSERT_RTNL();
->  
->  	err = nlmsg_parse_deprecated(nlh, sizeof(struct tcmsg), tca, TCA_MAX,
-> @@ -1896,42 +1896,40 @@ static int tc_dump_qdisc(struct sk_buff *skb, struct netlink_callback *cb)
->  	if (err < 0)
->  		return err;
->  
-> -	for_each_netdev(net, dev) {
-> +	s_ifindex = ctx->ifindex;
-> +	s_q_idx = ctx->q_idx;
-> +
-> +	for_each_netdev_dump(net, dev, ctx->ifindex) {
-
-compilers point out that s_ifindex is set but not used since we iterate
-directly on ctx->ifindex
--- 
-pw-bot: cr
+Are you aware of NETIF_F_RX_UDP_TUNNEL_PORT ?
+I haven't checked it does exactly what we need, but I recall there was=20
+a ethtool feature for this..
 
