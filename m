@@ -1,191 +1,162 @@
-Return-Path: <netdev+bounces-282838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282839-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8IzOLJtL82kTzQEAu9opvQ
-	(envelope-from <netdev+bounces-282838-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 14:31:23 +0200
+	id 6A2pKcBL82kTzQEAu9opvQ
+	(envelope-from <netdev+bounces-282839-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 14:32:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C610C4A2C57
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 14:31:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D1CB4A2C5F
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 14:31:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 648AD300D171
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 12:31:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B53B1300D172
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 12:31:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E16B51E4AF;
-	Thu, 30 Apr 2026 12:31:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BFEF3E639B;
+	Thu, 30 Apr 2026 12:31:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pgLyMkTi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dkZvQ6Id"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF18313DDAE
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 12:31:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D50335081
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 12:31:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777552268; cv=none; b=cEi1MMuKTVFTaiFv/mpGOiQsZngyLRJfdBk1xN/RkcwXRkgrEW4EMK5O0v0kxRRFKczkjo8YxJjOUiC5NB+e4YFFNznYq9NXRcu+Uih/dwrOYebCYYHHDkqMjUy1j+iXh/9kcKczRS7XmUlecaAdfJT7ptSPJ9UBZc36w67ErMU=
+	t=1777552318; cv=none; b=cU1I6jrn/kAMi9CN2ac9uQGdLoppCL0FtLODwDaUkWMGZSkL67jXaZZxWpPr+C9kdUJjNaXEedWggKGkwg33oHY7EvNAfgBlmh3uOek/pZoCnvGo2CLlauaO/dKaabE8W9z8XAytaR8iRQL7NZNe44iC56UTA99djwL7Jq4Tw8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777552268; c=relaxed/simple;
-	bh=Fp6nDvrdJ0an0Bdrc/rA4+2C/js0byI0WoX7NJWs4vA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SPqApafgJBdPDJEw3Ia25rIlgUzEbNV+hs7MNPcXAm4jal105TfYcAfNpClKRlFi87wEE5cPk3SwwfDipp4MR2PbhnYd9JHcVYVrm0tmK0tRQmZIHvppq9OxKPc7wVEKj1jgZtkv8chAMksD0TlASFDcihhJyZBX3TP7vmooBIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pgLyMkTi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F14BC2BCB3;
-	Thu, 30 Apr 2026 12:31:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777552268;
-	bh=Fp6nDvrdJ0an0Bdrc/rA4+2C/js0byI0WoX7NJWs4vA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=pgLyMkTiyi8SFM/bzhidlofi3hmOnpPZ3WgG6HpkNTBPvXBHcHxTy+xC5M9K7GCl4
-	 C/Ak/Cwh885KmWBQoE8irULblICMT0ZhE1BV7RIH4yc6X4mihwtjms5GUG6oz+H49d
-	 tOd30USNmI+S5VL06FfucLQxsBofO0UTl2t6zZxNy/xdne0CVusfq0+GSWuSmEB11i
-	 Bsqt5Mf1YbrX05D883ueN7q8gEoQSBjV7bnEv7Aeev1OpUSiz1be7LGkjWWvNG7E9R
-	 4B+0E3g+TjCDWitUoCjwlPqKvrBAP00KYsDBgGWPq0SPM8+dO/NkNhgwl3pjgBHN3m
-	 CFIUu9smaMfcQ==
-Message-ID: <e599e4e9-3440-4a20-9911-c75edad7850e@kernel.org>
-Date: Thu, 30 Apr 2026 14:31:03 +0200
+	s=arc-20240116; t=1777552318; c=relaxed/simple;
+	bh=wZ/elesy/7o01ujF9sto27cSfGzsZbuvXwSSNlM4CXE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K3yO8HzlEgBZfdOw0h5R9X824HJauKhoq7pEkO1XGVaC1/toSNkW4obOmibQeqPDZnRSLTpDvNb7sRqS7JO1yRwhwdgTIpG99yNrZmJF2u7D5wH4Y3m8uM2/5EQm/yxzPcw07TA/T7Sa4tyke1QNSL6qQLLu2P20aqXphSQlQf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dkZvQ6Id; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777552317; x=1809088317;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=wZ/elesy/7o01ujF9sto27cSfGzsZbuvXwSSNlM4CXE=;
+  b=dkZvQ6IdJFx93pPxOlh0sSa2DzFrYyy4X70zQFbwM2KM3B3OIt3/9YSz
+   kzFIvf+DPiL+MTjtTq66Ca7lpg4ZTWvXGjqShXO3Tag3H/nDFj0ZOqAfF
+   WlITjEGf11cQTqsmb8QQbXj62P/bB0LcPaZ4zrpBNQSIDSnO3aKtQsioj
+   3cQOWwt146lhUbut6myK+pvsmOjUK/KPPne72MdIFb4QlwHIrqJxju/eh
+   JjmTh6F3aW3cebZSBECHDCsQPJl/25EQ2qG9vb1WkcRhmlDAGtfIMtBqN
+   2rvpVW0i694oUD2s/eC/Jscj+s7yWiGkGqiIAClCBRBrUN1arZa/VBWWU
+   Q==;
+X-CSE-ConnectionGUID: BRSAqk86TayvLdr3MaJPJw==
+X-CSE-MsgGUID: r0Nqd2ctQquTm5Lvpw+HVg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11771"; a="78487641"
+X-IronPort-AV: E=Sophos;i="6.23,208,1770624000"; 
+   d="scan'208";a="78487641"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2026 05:31:56 -0700
+X-CSE-ConnectionGUID: HoLNcZzvQ6icQ3rD2c9NCA==
+X-CSE-MsgGUID: OtfPuoPHRcKyXdb1fTk7Dg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,208,1770624000"; 
+   d="scan'208";a="236353093"
+Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
+  by fmviesa004.fm.intel.com with ESMTP; 30 Apr 2026 05:31:55 -0700
+From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	aleksandr.loktionov@intel.com
+Cc: netdev@vger.kernel.org
+Subject: [PATCH net] ixgbe: fix X550 AQ PHY identification returning ixgbe_phy_unknown
+Date: Thu, 30 Apr 2026 14:31:53 +0200
+Message-ID: <20260430123154.132072-1-aleksandr.loktionov@intel.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 5/5] selftests: net: add veth BQL stress test
-To: Simon Schippers <simon.schippers@tu-dortmund.de>,
- =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- horms@kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
- kernel-team@cloudflare.com, kuba@kernel.org, netdev@vger.kernel.org,
- pabeni@redhat.com
-References: <20260324174719.1224337-7-hawk@kernel.org>
- <02a713ac-f794-416f-9d69-95ea98d515b6@tu-dortmund.de>
- <1c435d90-8d08-4ac1-8b84-cc72c0b4e30f@tu-berlin.de>
- <7bc8edc9-1b46-471a-9a6e-cd2c27aebcfc@tu-dortmund.de>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <7bc8edc9-1b46-471a-9a6e-cd2c27aebcfc@tu-dortmund.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: C610C4A2C57
+X-Rspamd-Queue-Id: 0D1CB4A2C5F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282838-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-282839-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
 
+ixgbe_get_phy_id() reads the two MII_PHYSID registers and combines them
+into hw->phy.id with the lower 4 revision bits masked out by
+IXGBE_PHY_REVISION_MASK (0xFFFFFFF0).
 
+Commit 5f1c3589b0f0 ("ixgbe: Correct X550 phy ID") replaced
+X550_PHY_ID (0x01540220) with X550_PHY_ID2 (0x01540223) and
+X550_PHY_ID3 (0x01540221).  These are the raw values read directly off
+hardware, but after revision-bit masking both reduce to 0x01540220.
+The switch cases in ixgbe_get_phy_type_from_id() therefore never match,
+and X550 AQ PHY devices always fall through to ixgbe_phy_unknown.  A
+wrong PHY type means the wrong ops vector is selected, resulting in
+failed PHY initialization and no link.
 
-On 30/04/2026 11.45, Simon Schippers wrote:
-> On 4/30/26 11:17, Jonas Köppeler wrote:
->> On 3/28/26 4:19 PM, Simon Schippers wrote:
->>> Hi, thanks for your work! I am really interested in this patchset.
->>>
->>> I am planning to submit a similar patch set (see [1]) for the tun/tap
->>> driver, where I am currently implementing qdisc backpressure similar
->>> to that used in veth.
->>>
->>> Can you run pktgen [2] to see if there is a regression?
->>> I think that there might be a slowdown due to BQL not choosing a big
->>> enough queue size.
->> I ran some tests using pktgen by replacing the trafficgen from the
->> selftest with samples/pktgen/pktgen_sample01_simple.sh (Patch v3)
->> and used --nrules 0. In general the throughput is quite similar:
->>
->> BQL disabled (using --bql-disable):
->>    2378694pps 1141Mb/sec (1141773120bps) errors: 0
->>    2400898pps 1152Mb/sec (1152431040bps) errors: 0
->>    2358125pps 1131Mb/sec (1131900000bps) errors: 0
->>    2402034pps 1152Mb/sec (1152976320bps) errors: 0
->>    2362061pps 1133Mb/sec (1133789280bps) errors: 0
->>    2416301pps 1159Mb/sec (1159824480bps) errors: 0
->>    2398496pps 1151Mb/sec (1151278080bps) errors: 0
->>    2415200pps 1159Mb/sec (1159296000bps) errors: 0
->>    2375921pps 1140Mb/sec (1140442080bps) errors: 0
->>    2427419pps 1165Mb/sec (1165161120bps) errors: 0
->>    2382461pps 1143Mb/sec (1143581280bps) errors: 0
->>
->>    mean: 2392510pps
->>
->> BQL enabled:
->>    2159545pps 1036Mb/sec (1036581600bps) errors: 0
->>    2321899pps 1114Mb/sec (1114511520bps) errors: 0
->>    2477853pps 1189Mb/sec (1189369440bps) errors: 0
->>    2447857pps 1174Mb/sec (1174971360bps) errors: 0
->>    2400284pps 1152Mb/sec (1152136320bps) errors: 0
->>    2442841pps 1172Mb/sec (1172563680bps) errors: 0
->>    2442540pps 1172Mb/sec (1172419200bps) errors: 0
->>    2410585pps 1157Mb/sec (1157080800bps) errors: 0
->>    2395902pps 1150Mb/sec (1150032960bps) errors: 0
->>    2393260pps 1148Mb/sec (1148764800bps) errors: 0
->>    2401959pps 1152Mb/sec (1152940320bps) errors: 0
->>
->>    mean: 2390411pps
->>
->> BQL enabled is ~2099pps (~0.09%) lower than BQL disabled.
-> 
-> Sounds great!
-> 
-> One more thing:
-> Could you check what BQL limit settles during the test run using
-> something like:
-> 
-> watch -n 0.1 'cat /sys/class/net/XXXXX/queues/tx-0/byte_queue_limits/limit'
+Restore X550_PHY_ID (0x01540220) as the match value -- the
+revision-stripped ID that the driver actually stores.  Keep X550_PHY_ID2
+and X550_PHY_ID3 as documentation of the hardware-reported values.
 
-FYI: The selftest already tracks BQL "limit" and "inflight".
-- Jonas can just report those BQL inflight logs
+Fixes: 5f1c3589b0f0 ("ixgbe: Correct X550 phy ID")
+Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c  | 3 +--
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type.h | 1 +
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-+print_periodic_stats() {
-+    local elapsed="$1"
-+
-+    # BQL stats and watchdog counter
-+    WD_CNT=$(cat /sys/class/net/${VETH_A}/queues/tx-0/tx_timeout \
-+        2>/dev/null) || WD_CNT="?"
-+    if [ -n "$BQL_DIR" ] && [ -d "$BQL_DIR" ]; then
-+        INFLIGHT=$(cat "$BQL_DIR/inflight" 2>/dev/null || echo "?")
-+        LIMIT=$(cat "$BQL_DIR/limit" 2>/dev/null || echo "?")
-+        echo "  [${elapsed}s] BQL inflight=${INFLIGHT} limit=${LIMIT}" \
-+            "watchdog=${WD_CNT}"
-+    else
-+        echo "  [${elapsed}s] watchdog=${WD_CNT} (no BQL sysfs)"
-+    fi
-
-
-> I guess it will just choose the ptr_ring size as limit in this case,
-> but it would be nice if you could briefly verify this :)
-> 
-> Thanks!
-> 
->>
->>> Thanks!
->>>
->>> [1] Link:https://lore.kernel.org/all/20260312130639.138988-1-simon.schippers@tu-dortmund.de/
->>> [2] Link:https://www.kernel.org/doc/html/latest/networking/pktgen.html
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
+index ab733e7..ca98dad 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
+@@ -364,8 +364,7 @@ static enum ixgbe_phy_type ixgbe_get_phy_type_from_id(u32 phy_id)
+ 	case TN1010_PHY_ID:
+ 		phy_type = ixgbe_phy_tn;
+ 		break;
+-	case X550_PHY_ID2:
+-	case X550_PHY_ID3:
++	case X550_PHY_ID:
+ 	case X540_PHY_ID:
+ 		phy_type = ixgbe_phy_aq;
+ 		break;
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+index 61f2ef6..0d47622 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+@@ -1412,6 +1412,7 @@ struct ixgbe_nvm_version {
+ #define TN1010_PHY_ID    0x00A19410
+ #define TNX_FW_REV       0xB
+ #define X540_PHY_ID      0x01540200
++#define X550_PHY_ID      0x01540220
+ #define X550_PHY_ID2	0x01540223
+ #define X550_PHY_ID3	0x01540221
+ #define X557_PHY_ID      0x01540240
+-- 
+2.52.0
 
 
