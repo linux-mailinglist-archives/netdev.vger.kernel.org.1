@@ -1,175 +1,165 @@
-Return-Path: <netdev+bounces-282676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282677-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SN8uGIYB82lswgEAu9opvQ
-	(envelope-from <netdev+bounces-282676-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:15:18 +0200
+	id UJvRAWcB82lswgEAu9opvQ
+	(envelope-from <netdev+bounces-282677-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:14:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7CC449E7CD
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:15:17 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BD7649E7A3
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:14:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 20E0C3029E73
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 07:11:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 28745300BEA1
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 07:14:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71A0039A07B;
-	Thu, 30 Apr 2026 07:11:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B981139BFE4;
+	Thu, 30 Apr 2026 07:14:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YnWnp9RC"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="oVgLBWoK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 230C529CE1
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 07:11:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A18377EBC;
+	Thu, 30 Apr 2026 07:14:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777533118; cv=none; b=uSb2Vt9FUqWeSpS9Zx1qiGgvzoysW9XS2egx7HpTWjmZAjTS86PyKK/ZbLBntwwzKpJTtfA/PfrqpuJJyhPEJhoIzavDlsIgntDpneXOWqG5mBHQoHHnW1TSmg+uxAJtqIp/cRZsesGpq8hjpcfq07v7YkSilQVdSghyi8Jvh3g=
+	t=1777533280; cv=none; b=shNTCCbk57idlN7+8TXw5wm7cud0vlcb0HWI8r4jCu/neYcrjCFO072O8PupE7snXkXiUXWKZl5LG0honk+gTTr2Ze1iP2A94DdUOldH8ikW/awsfdg1yyOajQ/B1rGToa+gmMJn2Fmom8s8kYefpcLxm3A7Tq7915q/2+3txbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777533118; c=relaxed/simple;
-	bh=WHf7SDMWeGDMepkYHsY68ydsCu4X3ZfH1ZKR959neqg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TXAdj3CRyssGwe4bHF7o0Q18cRtsWLIrGjuIwUl3QfrAGm7zSmV8PBIq9EbzfBSecn4e+oRVVYSU7tm3vvSc1EN3foB3Fx6pfXrfUFdQkEVexycRq4G3M8Bt1QkQk+2+vwc6PFiTuqeNKpPYjOvDwRxqVBZ1f7lMbEZetfjlyIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YnWnp9RC; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-8244105fa96so21424b3a.3
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 00:11:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777533116; x=1778137916; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=CFvNVNkRh7BzI+OzIKJ5kBHa8BAxHSA7m55h3BL2rQs=;
-        b=YnWnp9RCggRjEd1Tp728h4tXn6aq+rDoBV3L0sPx/93PFdq6nNMYNoit4r+v9vlozK
-         /UuY+Qlys+AU3QwKYKeV/33VUEM48+oIKEQ0iOvXDfJi4U0Gl/L5i5WRw8D8FfW6Jk2p
-         SXMuQGVVnHT8zYiWDi27xH5VSlhNZJ3hpUIjhcgo6a22wYELgkGJmpR8XZ7iTWleYwOQ
-         aIOpIqjqP8JDvcyOdjkAzxrgazxgOQmHWWC1cC0hhxNGEL7HvcR9xFBCOfuUKIOrFTTG
-         1a1He56B5Qeu6h/CWxXzbod3s3GLvUv7mvBmGByw5LqCDzG8th5UxpYT/d4Usx3K8w++
-         1v2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777533116; x=1778137916;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CFvNVNkRh7BzI+OzIKJ5kBHa8BAxHSA7m55h3BL2rQs=;
-        b=XtHwjMQhNlOPjL3XZu4UXn+aZBNmpsSuuwqE22evCPvJWLxYZNaHVLNHBd2SvcGeaR
-         7BTIPPNFm8uzMzkwtInBwaoe8umUWTxdSTf7xnMfTQN7qzGcCkaYyOWzcsuUbHn7kKLq
-         8V7/Jb0g2uK4KwZC2QyZJCf0E9ya5qYfVc04BJThmqqyulUEYmTchx3IjBgBMmlkz/7i
-         /TRw/7yXw4GSDyfz86iSf/NfXMQ6XqBJ4B+2xiiezYgzL8hDHSM/+eoWUeUIBahRcXO5
-         nxlhoejatAipZXt+Zs4IxfVPwnfssSjnDUe2NeHsSjJE8xIPhAmtnYDsfevV6gn8EAsR
-         OsoA==
-X-Gm-Message-State: AOJu0YwujtP+RBHqtNq4km6RMuNX6mJsFuke6pwmtSf0OrjX+HM+qqC2
-	vvVgSlXo3MrtcYuHCxoinzSJN0XgyR9K5HqSexaFYDgdflScNM5jWfyG
-X-Gm-Gg: AeBDievj6dhjiMH8cuPAlbwEd8ILirr3uGRHOdnn8jqXihAxsTWBf9k8yV+fRfMskUA
-	PHQtSCq4MG7hqMpVJ0t0juSgP1od1F99wDID3llM9Lp78+YEuKs+uyXWLV8hC9f6nLVkdKkJtQp
-	N98OuRIrJ4oZ/ZiXyx4o0wAouk/r2C/IJ83kYOxl+nivjpZj811bbgv94zNRnwFWUUbmnW0khgk
-	Dk7ITFEgjzWm0mRyxekd/K5y8f056YqQk034edlHoR/7IWroR9v5DcIfC4FJmKSXGW7h58IJg0Z
-	0F0MSlk6Fy8NMhYJE2mirqYp//dOc5Hp3roY/he5AxyMUrh/tDJd5WC/FPT4cb97aSQz81dB6iC
-	hXOZZFZEVhtj1xsRa19uCGCBuTW6khFSWXEPFHWxOSAg6q5h6JnRNoJUX/GZasMiUqsGmrwKNQh
-	EJsE2+FQAYX41FFS0FIa+oRTrNiiGFxIWJ5cKDAeT73NE=
-X-Received: by 2002:a05:6300:2208:b0:3a3:18d4:2590 with SMTP id adf61e73a8af0-3a3cf70d02dmr1041632637.3.1777533116186;
-        Thu, 30 Apr 2026 00:11:56 -0700 (PDT)
-Received: from localhost.localdomain ([189.1.242.96])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-834ed7ecf57sm4049605b3a.50.2026.04.30.00.11.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Apr 2026 00:11:55 -0700 (PDT)
-From: Yiqi Sun <sunyiqixm@gmail.com>
-To: kvm@vger.kernel.org,
-	virtualization@lists.linux.dev
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stefanha@redhat.com,
-	sgarzare@redhat.com,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	Yiqi Sun <sunyiqixm@gmail.com>
-Subject: [PATCH] vsock/virtio: fix vsockmon info leak in non-linear tap copy
-Date: Thu, 30 Apr 2026 15:11:10 +0800
-Message-Id: <20260430071110.380509-1-sunyiqixm@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1777533280; c=relaxed/simple;
+	bh=9p6qcbnC9W8Op8ZW63/wJ/shZ8IDJFL5eDzsJbCfzjE=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=pXnLaE5q/HjZkJdxRJ4ZlqI1bkvFLpcW2JiJfVDYEvZkG4LNIxjhpBP3LGLwRRboD7s9AWW9HtVkz60Kdu4HDVJL573+EXSItRquX6gRbJc8t2dfteOs2b+A1loIirFXVWkJDrYwBA2DEUA1LcIwl5fA2LB3ni6TAytOSKdtdQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=oVgLBWoK; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D5E9FA5338;
+	Thu, 30 Apr 2026 09:14:26 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1777533273; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=ofsbHe1+Vc16B+sH0Di155irlQlERmPTioiiPYeTY1U=;
+	b=oVgLBWoK1rhtvx9PiPWRC2g0SEkdmrUkxMbW5NjqEiEC1t7iqgqM9f9IvzYazP57a0qzs9
+	Do/ceK3rgdkeA+V+yyU9c+MQrKPoawLG1wUXL6rTmIhYmYf4bIeVRxcXZFBprsS3DaULGn
+	KHTXJnJrcL35ReG9UaRAb/XjYQMJmmoSgRJ6C+iGfY4bWX8gxvSHgfbvsamRERzQclLuz0
+	o/WFnwqd90ymjKeweI2bFh7lg705xtwVTk0QbfjsmD1LSGe4YIi4xVURPQMFGimxOXSL8i
+	Iy6FM8TEP6rGXr5FoKYP79QmrubtJ5s+lAc5P+SNBdwpxN/ZSyOztgfCWXKaxA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Date: Thu, 30 Apr 2026 09:14:26 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Haavard Skinnemoen <hskinnemoen@atmel.com>, Jeff Garzik
+ <jeff@garzik.org>, Paolo Valerio <pvalerio@redhat.com>, Conor Dooley
+ <conor@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, Gregory CLEMENT
+ <gregory.clement@bootlin.com>, =?UTF-8?Q?Beno=C3=AEt_Monin?=
+ <benoit.monin@bootlin.com>, Tawfik Bayouk <tawfik.bayouk@mobileye.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, stable@vger.kernel.org
+Subject: Re: [PATCH net v2 2/4] net: macb: drop in-flight Tx SKBs on close
+In-Reply-To: <20260429193446.5985abea@kernel.org>
+References: <20260428-macb-drop-tx-v2-0-647f5199d8df@bootlin.com>
+ <20260428-macb-drop-tx-v2-2-647f5199d8df@bootlin.com>
+ <20260429193446.5985abea@kernel.org>
+Message-ID: <08335d886fb578f18b13f82deafe2995@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: B7CC449E7CD
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: 0BD7649E7A3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,linux.alibaba.com,davemloft.net,google.com,kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-282676-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sunyiqixm@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-282677-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-vsockmon mirrors packets through virtio_transport_build_skb(), which
-builds a new skb and copies the payload into it. For non-linear skbs,
-this goes through virtio_transport_copy_nonlinear_skb().
+Hi Théo and Jacub
 
-Helper manually initializes a iov_iter, but leaves iov_iter.count unset.
-As a result, skb_copy_datagram_iter() sees zero writable bytes
-in the destination iterator and copies no payload data.
+On 30.4.2026 04:34, Jakub Kicinski wrote:
+> On Tue, 28 Apr 2026 18:32:58 +0200 Théo Lebrun wrote:
+>>  	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
+>> -		kfree(queue->tx_skb);
+>> -		queue->tx_skb = NULL;
+>> +		if (queue->tx_skb) {
+>> +			unsigned int dropped = 0, tail;
+>> +
+>> +			for (tail = queue->tx_tail; tail != queue->tx_head;
+>> +			     tail++) {
+>> +				if (macb_tx_skb(queue, tail)->skb)
+>> +					dropped++;
+>> +				macb_tx_unmap(bp, macb_tx_skb(queue, tail), 0,
+>> +					      SKB_DROP_REASON_NOT_SPECIFIED);
+>> +			}
+>> +
+>> +			queue->stats.tx_dropped += dropped;
+>> +			bp->dev->stats.tx_dropped += dropped;
+> 
+> I'm slightly baffled by the stats in this driver.
+> 
+> Incrementing of both device and queue stats is highly unusual.
+> The driver seems to already have the values for the per-queue drops
+> but currently never increments it (did I miss it?) It does for Rx
+> stats but not for Tx stats.
+> 
+> As sashiko correctly points out incrementing dev stats will lead
+> to races and lass of increments for multi-queue devices.
+> 
+> Since there are no increments for tx_dropped stat today - could you
+> please delete it from ethtool -S, migrate the only existing
+> dev->stats.tx_dropped++; to increment the per-queue stat and make
+> macb_get_stats() collect the tx_dropped from all queues, instead
+> of relying on the device-level stat?
 
-This becomes an info leak because virtio_transport_build_skb() has
-already reserved payload_len bytes in the new skb with skb_put(). The
-skb is then returned to the tap path with that payload area still
-uninitialized, so userspace reading from a vsockmon device can observe
-heap contents and potentially kernel address.
+Would make sense, yes. While we're already cleaning this up, two
+more things possibly worth touching:
 
-Fix it by initializing iov_iter.count to the number of bytes to copy.
+1. macb_start_xmit() drops the skb on macb_clear_csum() and
+    macb_pad_and_fcs() failures without counting it. Both could
+    use a tx_dropped++.
 
-Fixes: 4b0bf10eb077 ("vsock/virtio: non-linear skb handling for tap")
-Signed-off-by: Yiqi Sun <sunyiqixm@gmail.com>
----
- net/vmw_vsock/virtio_transport_common.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+2. tx_packets / tx_bytes already increment per-queue but never
+    rach nstat (rx side too). Could just pick them up in the same
+    loop.
 
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 416d533f493d..6b26ee57ccab 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -152,7 +152,7 @@ static void virtio_transport_copy_nonlinear_skb(const struct sk_buff *skb,
- 	iov_iter.nr_segs = 1;
- 
- 	to_copy = min_t(size_t, len, skb->len);
--
-+	iov_iter.count = to_copy;
- 	skb_copy_datagram_iter(skb, VIRTIO_VSOCK_SKB_CB(skb)->offset,
- 			       &iov_iter, to_copy);
- }
--- 
-2.34.1
+> [...]
 
+Thanks,
+Nicolai
 
