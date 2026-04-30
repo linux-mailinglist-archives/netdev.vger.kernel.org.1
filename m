@@ -1,201 +1,342 @@
-Return-Path: <netdev+bounces-282803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282804-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6LDZGcg982kGywEAu9opvQ
-	(envelope-from <netdev+bounces-282803-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 13:32:24 +0200
+	id aLYsLZI982kGywEAu9opvQ
+	(envelope-from <netdev+bounces-282804-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 13:31:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C049F4A22E9
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 13:32:23 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FA024A22C5
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 13:31:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 038263001CDF
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 11:27:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6E5B73030D0B
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 11:29:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E2C23D903E;
-	Thu, 30 Apr 2026 11:27:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A23843D810B;
+	Thu, 30 Apr 2026 11:29:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QimBV/Y6";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ODNclXgI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TR5syLaW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2860D3D7D97
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 11:27:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777548446; cv=none; b=aykVqGa48YYdm8mBLEF3AHILGPw/8VY85qRPikisfgmEGvpznDkSzFXPdNCFOR7rdmnIDYZfYE5NzYZ5l5LpJr36czZ7zjkEPmOXT/3r/KrebSeKuxhwAFSI0T3u9v80fUBE3SEKLEOKH2mGmPH1eVa/36Tlb2v3SccNsp77PyY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777548446; c=relaxed/simple;
-	bh=2T++ZgnqanVb7btL16I7116C/GmLc7NafiInXl+HwAg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=EBRHWj7Mtoejdg9L+mSJVP9BFpjDhgkwJg1aHcgJraH6f55mkIxXDEYq3blxixbZ0NSMJCdzhOXtsaaUOkt67+MxvvGlTaUDiZrUX7Z02XBR7nFeon10Ocpdqo4eKsjFiAb3csJRGsT85qMVc386A6DiCJQ5tgpi/mBdnPiZ6wI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QimBV/Y6; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ODNclXgI; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777548444;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CIMy9S5iWlyc40JZ79p231oXUkP2gHnlruiMtNy2qdM=;
-	b=QimBV/Y6IlW8KXhRLpIRQmuf/sU8V6i4BCNEvOBVkzmHXkl7ufXyMtDKGovzq3WqQc0j8l
-	rIr537z8yLGZ7yDB9rM1jyLRx8+yWdZHxUeC7WEW1YF78rkVpMZ6BmD8kNMWJF63kgF8rI
-	xO+bLaBP/0rc/To23nYtCXUAIBUjykQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-593-260oxfxhOJmGNYhc0a_Cpw-1; Thu, 30 Apr 2026 07:27:22 -0400
-X-MC-Unique: 260oxfxhOJmGNYhc0a_Cpw-1
-X-Mimecast-MFC-AGG-ID: 260oxfxhOJmGNYhc0a_Cpw_1777548442
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-43cfedb10a8so527078f8f.1
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 04:27:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1777548441; x=1778153241; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=CIMy9S5iWlyc40JZ79p231oXUkP2gHnlruiMtNy2qdM=;
-        b=ODNclXgI/vVOyfw+vWdQkOsi4g1BaoPK55kphih59OqU4cnm21p06pmgvfJzG2zBgI
-         gBcNluAdw4lYpNSeIKh6r/MP2pn6jCAeZ0MsuMhVi1olyzRO1ssCH1oTAunkGxzHvbdr
-         Vg/V+BRKlXEIQ2DBrhAOIQzy2UNrJmBWrd/IiozmrD0n79r77nzxUwdHyBp54D7TG360
-         rvOICVmlGTI3ZqTR1w1s8MAno3RWB7Lby7VqKO3zGdjYf+x9Riss5QLVSIsn6Tj5bYbO
-         BlyzK5sRSKBcxOR6VOGIxr9VpdjC16XDCYMGQloMdc2wCgB4XyOLLSeH3Db4tuT13NSd
-         YItw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777548441; x=1778153241;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CIMy9S5iWlyc40JZ79p231oXUkP2gHnlruiMtNy2qdM=;
-        b=EgZJzUk9MVDl3D/NRuw7W7pt2WSglAs+UvOIGdu6VD6TRfXE3N/rDnlBUyABpXe7YB
-         aubGcthJSC2+VCXpK2ejUFMeakKlW757CvomEMJRDC4DdmDuKjLitRtZoKhYngIe2XQC
-         Ax4tUqd11B2XEKtm+IMzDrgW1wZcP1Rw4+cxBH7WiCugwildE+HuN8IeVZsmsq0gYReY
-         IlFA1Eiyyj9CHiVt++lFJ+BA3JCrM/6+RWwepK8fYC9jNxhGeT2J+2GYUU+sE0hsBlPH
-         o9ZGxUVpoOL15kKLn6nlBnc5kQO3pMaXpmig8HOGx5aJSCSYPASWPGWpglEZ+5dQFqr8
-         gblg==
-X-Forwarded-Encrypted: i=1; AFNElJ82L3RQF3JEwuhcv98L+vL0gpPe4ZinuOt05RMtOsbD8J5x5ujyjoHp8+/a9455M+FFLK6/hpY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjAq1WNnlYEagRER0hW4XFA7RRWcPhFfNnMuVoNSDCE0Z92AAe
-	qYb4fW+qmU+hCRclKzNthO2KlAgCJh+6joEtwJ4lrFfZBt+i5m0IVkd9D1IC9MYUOJRtfzBpxKg
-	qERAzyL4iNhaLfYDC1qxzVSDlRz5oza110Ae/IByS9KiIJKq6znuKZ/6LaA==
-X-Gm-Gg: AeBDiesE9eCG0u+Y7oQE9fL8LfPd/njIvxK2/CHsuutlj0ScxPEO8iHSv5FXEAHtfAC
-	GJZvt0Pku5Niows4+/NRAuzCE42hhOaVzmDdWYvJIn91hGCEH6o36+YZgpKHY/IQLfs5yvZR2um
-	FwMaqd1AHmQ/u9z8GFwTGJsv2j9jLvpEwMKsLCrv9RR1AeHq1hZd/zYuGEgnVx/fK0vrS5CxS8S
-	6S8HBQOGY1cq7Ds7lx5pw8lnHCgxDlnt72EKV62Y2iwVHfqxtP5VgDVN/AC8sgkC75JYq706EaW
-	t34CnASGGBzV8XZzUJHZ3Z2IHeq6pzm2Hipe3leqK403yJYEUkSZkYZJleTJZEvPafIPAf33+ZA
-	mCVQLldTz5Qw4QN5eU50G88kvQ/1O4THF5lWHTAHXjjNyiJ6/jJSFJtL7GCuhH2qOAg==
-X-Received: by 2002:a05:6000:3105:b0:43c:fe0e:5bbc with SMTP id ffacd0b85a97d-4493d21f546mr4136250f8f.19.1777548441443;
-        Thu, 30 Apr 2026 04:27:21 -0700 (PDT)
-X-Received: by 2002:a05:6000:3105:b0:43c:fe0e:5bbc with SMTP id ffacd0b85a97d-4493d21f546mr4136180f8f.19.1777548440919;
-        Thu, 30 Apr 2026 04:27:20 -0700 (PDT)
-Received: from [192.168.88.32] ([150.228.93.27])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-447b3d48517sm10934692f8f.5.2026.04.30.04.27.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Apr 2026 04:27:20 -0700 (PDT)
-Message-ID: <0060104c-bb38-45d5-8f8e-14708702feac@redhat.com>
-Date: Thu, 30 Apr 2026 13:27:19 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 924C13D7D96;
+	Thu, 30 Apr 2026 11:29:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777548588; cv=fail; b=KUQiWtxEdGxe75lHkrtZITsdQLqNTEoH7v8tCqA82F9ERZDumnxtN1tNHWYv0g+PsPhwkr/b7GdFHESofmelGHg2e1/pVnGtirSkh2m7XFinpM0RVPRIh4OJZTIyqjaTIC4pwMKGRevwk2hzyJSk/O9CXmLJnoJlAfGakha/I8g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777548588; c=relaxed/simple;
+	bh=BOXIWWufkr6BjIrK3I6H8c3UioWK5u5HUvIs+eZfcWw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=nxBoEw72R/AEfP4MbhleCzHBTVQ0khSEcFGeACUaP9xw5anHij3c0IixFk9CWhiGgMsfcIFHQwGDd4yjEgGniBmo/pL81SytjnaXaQJ5KD7MpuVXDT+qeRLD++azKIl+kV2sWsMA3Wnp04V12lbncFkivNmmlCVin2QIWKBOHFU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TR5syLaW; arc=fail smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777548586; x=1809084586;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=BOXIWWufkr6BjIrK3I6H8c3UioWK5u5HUvIs+eZfcWw=;
+  b=TR5syLaWWfaUzJWS1hxryw0F/sXZ0i5FdtDHCIzVk6DCbLDQnR0GJfic
+   jIl1xTtjHccGhEoFqMKSEe+23Jjkthh8vfpPUBEcD3acwI0+oo6vCLX9i
+   1K/+oPae+Dp37uOyz9v+kC+zQre2gvOSGhPjX209FAefwcVCmfBA84PoA
+   A8LCFMOtaWoK+TEjO/vmfr4dOfeJDUtya8eZHpSYg9mRXiv8sCb8xmoMz
+   A3zraiigIqhQEbH9Y49y0ZyZhKu+Wd8hOHwp9B7qwHqrLKjYFryR4/cjq
+   oCVCvaW1r5Yke+2xH6pHKDzgRvty9Tk/tsptC3bSNmZiUZGMgxPwgIkPw
+   g==;
+X-CSE-ConnectionGUID: 2smvJ7nfQWughqvHy/fGRA==
+X-CSE-MsgGUID: E5Vywup8R6mhXFDcpsqRPQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11771"; a="78204862"
+X-IronPort-AV: E=Sophos;i="6.23,208,1770624000"; 
+   d="scan'208";a="78204862"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2026 04:29:45 -0700
+X-CSE-ConnectionGUID: lXRWFe7bQf22P2CiZqrWYA==
+X-CSE-MsgGUID: 7McejbgXSzm1I0BX9LTPYg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,208,1770624000"; 
+   d="scan'208";a="229949671"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2026 04:29:44 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Thu, 30 Apr 2026 04:29:43 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Thu, 30 Apr 2026 04:29:43 -0700
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (52.101.43.26) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Thu, 30 Apr 2026 04:29:43 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cVzX3m7EBMoGmtGIgDO1Ql0f8L0iKdzgeAdbOfnldRq11bE+A/wjh7u2CJHcG86jVgh1SalSyLalPK1/0gsB2W3PSmIxEUfXo49fdngRoo62hbbarLl8oRLWEC/M38X6Kx5braGaK8gouUU1m/Si1NAV8q0d+x8iE3mCKZ2xwgUh3RivHRCOPDlnrIMPF0fxglUYawu+5XGZEvzN/M91BdirHppgBWf4GnpcR2seOuzyIZM2N566ni+Q1Dbeq0yG+iCR781SUKdzpVB8xmhXaaOdIrjKsuFB8iadTS5r5cagHSeBM4MVQtg5o3Ba9Xz7cxl6mkqyGsHBlvV1jCFkug==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=slKOeRLRMEZss+rLU95xhdBSHOH8RIAJE2KkbPzCPwM=;
+ b=cH9CjS+TRMdvnPhStzrt13x5BEEAvWwIq2KmV626Y9Y1lBj3W0BXYFKKGx4PKOLO6PWQEiJ2m7Tpf0TJ3nNVDdzIK1XNxXQxeiW4yYLjQOTRDVkDEkZcZrPphIrkrAVic40KwEqQWdg9v3vSfQlIZSvf39GEFtYUwrApSUuKSH9ABZWhkaUdweqXtnntEVCsk/Jd2tRDiu24GU5pCWFH/1rafUh8Y+5FthBTgFvORZvBI+C7Baa4zPPT9DYLnYYFJcrroPcSTZnxmjjlK9rSVacUSD2Asi7agh/9JG7Y61MGflNEMGt5fjr9kLEZCMMN4DmFAB7trXa60jWPwKoc+g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by CH0PR11MB8085.namprd11.prod.outlook.com (2603:10b6:610:183::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.20; Thu, 30 Apr
+ 2026 11:29:39 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c%5]) with mapi id 15.20.9870.020; Thu, 30 Apr 2026
+ 11:29:39 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "Vecera, Ivan" <ivecera@redhat.com>, "vadim.fedorenko@linux.dev"
+	<vadim.fedorenko@linux.dev>, "kuba@kernel.org" <kuba@kernel.org>,
+	"jiri@resnulli.us" <jiri@resnulli.us>, "edumazet@google.com"
+	<edumazet@google.com>, "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>,
+	"donald.hunter@gmail.com" <donald.hunter@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Kubalewski,
+ Arkadiusz" <arkadiusz.kubalewski@intel.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "horms@kernel.org" <horms@kernel.org>,
+	"Prathosh.Satish@microchip.com" <Prathosh.Satish@microchip.com>, "Nguyen,
+ Anthony L" <anthony.l.nguyen@intel.com>, "pabeni@redhat.com"
+	<pabeni@redhat.com>, "davem@davemloft.net" <davem@davemloft.net>
+Subject: RE: [Intel-wired-lan] [PATCH v7 net-next 7/8] ice: add Tx reference
+ clock index handling to AN restart command
+Thread-Topic: [Intel-wired-lan] [PATCH v7 net-next 7/8] ice: add Tx reference
+ clock index handling to AN restart command
+Thread-Index: AQHc2IZqDPnP6xhm00ikOcbl8yu+FLX3eCLg
+Date: Thu, 30 Apr 2026 11:29:39 +0000
+Message-ID: <IA3PR11MB898655C6C1197A45FE33099EE5352@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20260430094238.987976-1-grzegorz.nitka@intel.com>
+ <20260430094238.987976-8-grzegorz.nitka@intel.com>
+In-Reply-To: <20260430094238.987976-8-grzegorz.nitka@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|CH0PR11MB8085:EE_
+x-ms-office365-filtering-correlation-id: e9dbd8a9-6051-46de-31ab-08dea6abc43a
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014|38070700021|18002099003|22082099003|56012099003;
+x-microsoft-antispam-message-info: wi6iTPVgPxgCbNQhsbhQkK2l6075PGJUmXEjTluCSs0aJcmG5DUDueDn9zgTWULnhIBVItxeZJSjgjLt7Ume0Zitkmhg1ieIW5RVRzOpjCw7vKFcKbXf++14fZ3AAbfWBU8Cg2fdn3WGjz7b1M41M+8CF/2dxHIlYvqUBQsFUPMV8vW99d9gvdVDxe1vChfN4syBMWOiGegMRLTS5ADuuwQgLTQjFm5pntnDN+UOt4HHKeoehrsgswdKcr63afrC+ofTZHSzsBtTWrcf/Xm0kn/XGIp1GZfIdfBMq6ieOl0dKW2XCInDZCAttXzLA3vJmNSfQJ57FcVIS7XgoIIMLuMV4PwBYYIVbMl/lnStIbUiUK6ldv5Ox0twh67390aFteDIa9VZvXXAR5/U7IOOnrf5FitHKOujOyZIjrRcr7HG1K/3VoeswHU5mO75xLCL+Qnhq6niENVesmUt9Ecc/hUriNK3+8ZV30a5zOdhNGMzMuu+MWRQCQX18zJp9L259ttcj+FE1eGP48qX7ZOljroCnAhCBROd7GBpVQxEvgVSbasGS5VSa5nkSjaUEC2/fv+SSUuO5ex3oaMXxQ0J7ugT1GZmch1EaHPgbEZwt8+gHXkPy0+5TUUtwgJsrc4fAfLCFlOF+NGj1vqkASN1nT+FoYDKGWAXtXPMi1EBhjZu5vs3+elQoQrDeOV1NaSD1RLpiZLZRFkLHi9WrgIPwvsN4orz8ZNX6r4FKoxX4lu3whKTC5/VLcLu5mVxT8s5aOisWDWbSuHDakh0VWNv0L41J6lixs3UjxpLp/JGMKk=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(38070700021)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?LuvPiE65hvXk1uV6JRajEZrcxAQ2jRU0Zp5HuiXHKvR6lAPfGhrOuUznxHDw?=
+ =?us-ascii?Q?E0aWZTE0i1uSFiNiXHxDKLrHcTaQKh9y7y+hWw/A5F6wcBNQ2PhUZC6jWHcy?=
+ =?us-ascii?Q?qFdHXUiUqOWdey0ZbPrqqxd1Gya/GPOHRTE9EMB4xnvhXj/PYlDCHf48Ys+N?=
+ =?us-ascii?Q?tfrl5j/Il34YPTXkxiyinBL5NGdMid22KPQeHv0P1xG/Ok6pkSfIw6McOcr3?=
+ =?us-ascii?Q?Z2FjbAba/4FEQrPP/s+2f3t7UKf7hv9LUt/ZVvkRbjzJRBk+/TjBiCnjc9ir?=
+ =?us-ascii?Q?tmGSSG8BbaKiTuSYvH0WaTJvOoncMBu35Ia3QtIpYaXKCTyhK72gaWHux0cE?=
+ =?us-ascii?Q?BDwsLJvQ4HiMIC3pwco/xyEO65lxdA4B1tKR9LqYb328yAxTjaYCgwbfRhMb?=
+ =?us-ascii?Q?5cyyA2lop/1w9TT14jouQlGihrFGZPjDEMhRGq705YdIZs2Xt1idMkr2Lxdk?=
+ =?us-ascii?Q?CmCG9xHeuKbtpbmPL1BgUBMB1N3P+/TihwMbfK1U6KpQNxVxkgy/0xjroGDD?=
+ =?us-ascii?Q?jkgvaZ96UXJDObXlsrncyuMeXY7Cg761MKFP5hzh8WnvTrObVK+WbI7GIQSt?=
+ =?us-ascii?Q?Nug2pD3KKijg/6OdOa4e1Rsv5jPATtV4dxj3nidfvHEyGvs7vF84MZnZbT38?=
+ =?us-ascii?Q?zE9PrY4YXNpJLOAiaPmFPO+0z5/R7NyBj054MQnyPKcNAnr6Ph+AZpTdB0AC?=
+ =?us-ascii?Q?M/e5Bd6BZOwLphdH/O+B0wiNnMJWrk0ii6OyGwS88MbLAqEM8jx71UBfwWC0?=
+ =?us-ascii?Q?1dArzz0g1A+LJp89Izt7mJ9ZaXgjhw0U0DAzP9+NT8E/nM2ST14j0z12NnqN?=
+ =?us-ascii?Q?ZY0g9AS+9Eo+g7LQ4AOpOY7TM8iESY8/Ib8TeG/0llb7uCeprGCLBpsTcScG?=
+ =?us-ascii?Q?zUXD9Og8M11avnZu8oqFNk6RutdOrIGOFZkMQnUv6stVeE/agDEStA7g+hT8?=
+ =?us-ascii?Q?Lm4Z7l1ft1HPPyNB1jlFidecvheQQooZOq6BVLIE7svY/aqC8KiCX0cbCHI1?=
+ =?us-ascii?Q?Hdps/8/om5hZQZy2/x5lF2xnLQxC7LsQLVnCKUK4gGIJiBaV2Au/Tq/tY1nh?=
+ =?us-ascii?Q?MkIHxcc4hddDdnWig4UxL2Zn9HOqG0IpfI8XFyMvTEriCo7YJCCoDvhZLC1b?=
+ =?us-ascii?Q?/bIsEcReLZXCAICMCP0uS0MPYwOZnU3RxzvbVDo1GapwX7wih7UIjzpQYhwn?=
+ =?us-ascii?Q?Hx89zJMle9JIZ9PymkpqvxjuZ5fAItsW4Qdzsgu1BT+5+7x/xVuDkarX4hBC?=
+ =?us-ascii?Q?IhDBsTuKhXpdKahClW6c1Y1BJVEukaUFezpRn6zb/u8LjPJlrcXmXQslTBz6?=
+ =?us-ascii?Q?r9oQKxtEHJ5rcXBlcgG6XHRmhvStKudsyNfTFh6L7zshbhJx3Hvb456ZsRzd?=
+ =?us-ascii?Q?hKhM+xUqdjmQyqo18NuYDFwwhPw2FnDgIuUeMBdQBu+bRnQ064YWBmBYXcoQ?=
+ =?us-ascii?Q?kAfRleI8U6Kej/cstHGaqzFiy9eCispSa41rwoAbWyC/jp3K04FBg1g19lQQ?=
+ =?us-ascii?Q?sAD/W/Cq2V2ynW3QGu4R/vcw6U/TEOeyj7eczFQZHLemSI7fyh0auLPQR1Bx?=
+ =?us-ascii?Q?kPkG4WZ0eqIM3khpKT1S3GmQR0xjT5UOsaiP6GvMwhlt5fvehQDdFklwz+Ao?=
+ =?us-ascii?Q?c1kU0g2ILOtSXUDnR4gZQ8+QEdNjd4h+vq6mnNCcS3mvw0kWAeKjPAczrN+Z?=
+ =?us-ascii?Q?z76+MCTT/qSC0UQoB30TLjIxe17DMwLASWot0xBUQvnNraSB7qKhpuHeyu8B?=
+ =?us-ascii?Q?pQ00+64KSRXfoMBxrb/IkP4mx3IEBDA=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: phy: micrel: fix LAN8814 QSGMII soft reset
-To: Robert Marko <robert.marko@sartura.hr>, andrew@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, Divya.Koppera@microchip.com,
- horatiu.vultur@microchip.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260428134138.1741253-1-robert.marko@sartura.hr>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260428134138.1741253-1-robert.marko@sartura.hr>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: C049F4A22E9
+X-Exchange-RoutingPolicyChecked: ALgJbPeYsjB6wYYsd9KCpCn1eSEmjvh108/xrgo4k9YRZiTrX4arbc5bFmKzU1VI3j7RKAyJ9JBqrCMrGw43o/YdRVpgztFQhbUG9fBIk+LuZM6UVqudB4UAo/ls6XK7XFOOaFs5rX6no76uEO/+gEaUgOhhVB6rocb35UuTI4qfOepo4heLLnztI8ElQzmxHUD2iMYsgVlomLTsiqNLS6w+h4/sEU56rhWYhee6HMz8mXKPPLpvNwsJvFLXBgzDtX1w/hXPoB2ZrkWAIcwO0YhWrVd2hbc/mzvq9cmdny1X5t2zhOR2S4IA48ezv4prFYBo3dXei338/9JBUNWosg==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e9dbd8a9-6051-46de-31ab-08dea6abc43a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Apr 2026 11:29:39.4453
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Rid2DVgbY4Z9Wp4MvlbbCzg2e82r+khegK/NkAoXzRB4iSry4SEEk+83goplu70RwpWi7p/QtesaOaseM0/4RU69dFb2YQu1VrYiVSLHZ4Y=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB8085
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: 1FA024A22C5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TAGGED_FROM(0.00)[bounces-282803-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[sartura.hr,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,microchip.com,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282804-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[redhat.com,linux.dev,kernel.org,resnulli.us,google.com,intel.com,gmail.com,vger.kernel.org,lunn.ch,lists.osuosl.org,microchip.com,davemloft.net];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sartura.hr:email]
+	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 
-On 4/28/26 3:41 PM, Robert Marko wrote:
-> LAN8814 QSGMII soft reset was moved into the probe function to avoid
-> triggering it for each of 4 PHY-s in the package.
-> 
-> However, that broke QSGMII link between the MAC and PHY on most LAN8814
-> PHY-s, specificaly for us on the Microchip LAN969x switch.
-> Reading the QSGMII status registers it was visible that lanes were only
-> partially synced.
-> 
-> It looks like the reset timing is crucial, so lets move the reset back
-> into the .config_init function but guard it with phy_package_init_once()
-> to avoid it being triggered on each of 4 PHY-s in the package.
-> Change the probe function to use phy_package_probe_once() for coma and PtP
-> setup.
-> 
-> Fixes: 96a9178a29a6 ("net: phy: micrel: lan8814 fix reset of the QSGMII interface")
-> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+
+
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Grzegorz Nitka
+> Sent: Thursday, April 30, 2026 11:43 AM
+> To: netdev@vger.kernel.org
+> Cc: Vecera, Ivan <ivecera@redhat.com>; vadim.fedorenko@linux.dev;
+> kuba@kernel.org; jiri@resnulli.us; edumazet@google.com; Kitszel,
+> Przemyslaw <przemyslaw.kitszel@intel.com>; richardcochran@gmail.com;
+> donald.hunter@gmail.com; linux-kernel@vger.kernel.org; Kubalewski,
+> Arkadiusz <arkadiusz.kubalewski@intel.com>; andrew+netdev@lunn.ch;
+> intel-wired-lan@lists.osuosl.org; horms@kernel.org;
+> Prathosh.Satish@microchip.com; Nguyen, Anthony L
+> <anthony.l.nguyen@intel.com>; pabeni@redhat.com; davem@davemloft.net
+> Subject: [Intel-wired-lan] [PATCH v7 net-next 7/8] ice: add Tx
+> reference clock index handling to AN restart command
+>=20
+> Extend the Restart Auto-Negotiation (AN) AdminQ command with a new
+> parameter allowing software to specify the Tx reference clock index to
+> be used during link restart.
+>=20
+> This patch:
+>  - adds REFCLK field definitions to ice_aqc_restart_an
+>  - updates ice_aq_set_link_restart_an() to take a new refclk parameter
+>    and properly encode it into the command
+>  - keeps legacy behavior by passing REFCLK_NOCHANGE where appropriate
+>=20
+> This prepares the driver for configurations requiring dynamic
+> selection of the Tx reference clock as part of the AN flow.
+>=20
+> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
 > ---
->  drivers/net/phy/micrel.c | 15 ++++++++-------
->  1 file changed, 8 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-> index 2aa1dedd21b8..e211a523c258 100644
-> --- a/drivers/net/phy/micrel.c
-> +++ b/drivers/net/phy/micrel.c
-> @@ -4548,6 +4548,13 @@ static int lan8814_config_init(struct phy_device *phydev)
->  	struct kszphy_priv *lan8814 = phydev->priv;
->  	int ret;
->  
-> +	if (phy_package_init_once(phydev))
-> +		/* Reset the PHY */
-> +		lanphy_modify_page_reg(phydev, LAN8814_PAGE_COMMON_REGS,
-> +				       LAN8814_QSGMII_SOFT_RESET,
-> +				       LAN8814_QSGMII_SOFT_RESET_BIT,
-> +				       LAN8814_QSGMII_SOFT_RESET_BIT)
+>  drivers/net/ethernet/intel/ice/ice_adminq_cmd.h | 2 ++
+>  drivers/net/ethernet/intel/ice/ice_common.c     | 5 ++++-
+>  drivers/net/ethernet/intel/ice/ice_common.h     | 2 +-
+>  drivers/net/ethernet/intel/ice/ice_lib.c        | 3 ++-
+>  4 files changed, 9 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> index 3cbb1b0582e3..42878abac9eb 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> @@ -1169,6 +1169,8 @@ struct ice_aqc_restart_an {
+>  	u8 cmd_flags;
+>  #define ICE_AQC_RESTART_AN_LINK_RESTART	BIT(1)
+>  #define ICE_AQC_RESTART_AN_LINK_ENABLE	BIT(2)
+> +#define ICE_AQC_RESTART_AN_REFCLK_M	GENMASK(4, 3)
+> +#define ICE_AQC_RESTART_AN_REFCLK_NOCHANGE 0
+>  	u8 reserved2[13];
+>  };
+>=20
+> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c
+> b/drivers/net/ethernet/intel/ice/ice_common.c
+> index ce11fea122d0..de88aec9137c 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_common.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
+> @@ -4126,12 +4126,13 @@ int ice_get_link_status(struct ice_port_info
+> *pi, bool *link_up)
+>   * @pi: pointer to the port information structure
+>   * @ena_link: if true: enable link, if false: disable link
+>   * @cd: pointer to command details structure or NULL
+> + * @refclk: the new TX reference clock, 0 if no change
+>   *
+>   * Sets up the link and restarts the Auto-Negotiation over the link.
+>   */
+>  int
+>  ice_aq_set_link_restart_an(struct ice_port_info *pi, bool ena_link,
+> -			   struct ice_sq_cd *cd)
+> +			   struct ice_sq_cd *cd,  u8 refclk)
+>  {
+>  	struct ice_aqc_restart_an *cmd;
+>  	struct libie_aq_desc desc;
+> @@ -4147,6 +4148,8 @@ ice_aq_set_link_restart_an(struct ice_port_info
+> *pi, bool ena_link,
+>  	else
+>  		cmd->cmd_flags &=3D ~ICE_AQC_RESTART_AN_LINK_ENABLE;
+>=20
+> +	cmd->cmd_flags |=3D FIELD_PREP(ICE_AQC_RESTART_AN_REFCLK_M,
+> refclk);
+> +
+>  	return ice_aq_send_cmd(pi->hw, &desc, NULL, 0, cd);  }
+>=20
+> diff --git a/drivers/net/ethernet/intel/ice/ice_common.h
+> b/drivers/net/ethernet/intel/ice/ice_common.h
+> index e700ac0dc347..9f5344212195 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_common.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_common.h
+> @@ -215,7 +215,7 @@ ice_cfg_phy_fec(struct ice_port_info *pi, struct
+> ice_aqc_set_phy_cfg_data *cfg,
+>  		enum ice_fec_mode fec);
+>  int
+>  ice_aq_set_link_restart_an(struct ice_port_info *pi, bool ena_link,
+> -			   struct ice_sq_cd *cd);
+> +			   struct ice_sq_cd *cd, u8 refclk);
+>  int
+>  ice_aq_set_mac_cfg(struct ice_hw *hw, u16 max_frame_size, struct
+> ice_sq_cd *cd);  int diff --git
+> a/drivers/net/ethernet/intel/ice/ice_lib.c
+> b/drivers/net/ethernet/intel/ice/ice_lib.c
+> index 837b71b7b2b7..8cdc4fda89e9 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_lib.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+> @@ -3769,7 +3769,8 @@ int ice_set_link(struct ice_vsi *vsi, bool ena)
+>  	if (vsi->type !=3D ICE_VSI_PF)
+>  		return -EINVAL;
+>=20
+> -	status =3D ice_aq_set_link_restart_an(pi, ena, NULL);
+> +	status =3D ice_aq_set_link_restart_an(pi, ena, NULL,
+> +
+> ICE_AQC_RESTART_AN_REFCLK_NOCHANGE);
+>=20
+>  	/* if link is owned by manageability, FW will return
+> LIBIE_AQ_RC_EMODE.
+>  	 * this is not a fatal error, so print a warning message and
+> return
+> --
+> 2.39.3
 
-Sashiko says:
 
----
-Could this introduce a race condition if multiple ports are brought up
-concurrently?
-Because phy_package_init_once() does not provide a synchronization
-barrier for followers, they might proceed immediately to configure their
-registers while the leader is still performing the reset.
----
-
-on top of my head IDK if such race is possible at all.
-
-/P
-
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
