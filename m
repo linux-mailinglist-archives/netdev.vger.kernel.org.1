@@ -1,162 +1,144 @@
-Return-Path: <netdev+bounces-282580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282576-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gDERAR2x8mlItgEAu9opvQ
-	(envelope-from <netdev+bounces-282580-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:32:13 +0200
+	id Dj0eMuyv8mk+tgEAu9opvQ
+	(envelope-from <netdev+bounces-282576-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:27:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9530B49C042
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:32:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2025849BFE3
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:27:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DE2D53007B9B
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:32:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C55F2300BDAB
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:27:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE042246762;
-	Thu, 30 Apr 2026 01:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C993A25B30D;
+	Thu, 30 Apr 2026 01:27:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FGh9/0l8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YNJFKg0V"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B31B1DE2D3;
-	Thu, 30 Apr 2026 01:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6CD1227B94;
+	Thu, 30 Apr 2026 01:27:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777512730; cv=none; b=agvw4btLSELFLyKccMM3aIsMYfCMQ8skT4PO3PM8TxnMCLErc2VEd9+NQGjwDX5zaIXudmAtRclEWCyEJ060nrltfhddqi7PFJKfCqozrgS8A3PyH/49sFRyvh6Sncx3NgOB/xoy+ZyU9PaA+nJJtVbkDCV5YrA5Ki0/DHbTx1A=
+	t=1777512423; cv=none; b=QCZzWZMkuSu2Ypz8CeZ/6glHG5/6fhG71OMWdrDD7ko7CrRLCO5/mudjKcfpp51FFC+TKwZL88WgmksdUsojnQScZb0XNfu052U9xnSMuUBuM0AtGjNNWljUhXbJh2dpqveyCxcKmZ3VwP0+kH6jSgwFKrEszgC3w84PVXOlzW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777512730; c=relaxed/simple;
-	bh=GPfPSzp1YJCpnaNQiH/G8TJL9kVKVDTd3wQ5tcMnVn0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dvOgUdoqiiQ2OI/mq+NIoLIdw5XVgr9wFmifFu8iD1fISRF0qdBMSTV1RLU4bCWxj2p9etYNKTNU9AQ7hSYitpvSSM3Ar6Q3ACEWyPx2RwzydLxtRDSBjcfpDMuU5mgz0VQsdlFtzeQEMmheiwjbZO+4W2Lpv/SmT8PpjfdKi+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FGh9/0l8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4B8BC19425;
-	Thu, 30 Apr 2026 01:32:09 +0000 (UTC)
+	s=arc-20240116; t=1777512423; c=relaxed/simple;
+	bh=OQClfIllpvjb88x1YwOMzh+Yc6xI81J2AsvPmhkrUcg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eB9INLgO8kgewcX3nOPk/LBGxbxwVEah1Y0Fl+Sh5f+UNuLLk1SEPRdEXaWw02Ntj/IM3/572kdM/Ubz2QR1d9oai1tmPvmgO/LvmUIB9uNyYjfNH0BqUcuhtPqlrsfNPyhFp60f/+WxHzOIbYrA6hJ3T5kJ+3UKlWhAZZtxjDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YNJFKg0V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB002C19425;
+	Thu, 30 Apr 2026 01:27:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777512730;
-	bh=GPfPSzp1YJCpnaNQiH/G8TJL9kVKVDTd3wQ5tcMnVn0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FGh9/0l87EM/HnNW6kz0veKsHsG0TAEaY0jUX2sepU9JVMHGtdsDww30zHaXwm5LC
-	 xy2/u396oUNUY1oPDvGoS9W+S+EibC40TRD6QLxj3TCQCig9ztsAfiea6ecPP8LwFZ
-	 1/Aj6izP87bik7ZrRIa7/cLTlZqPSpnGWTnc2lIPvEBFoxSuuosuqCIuWJGkMeOowD
-	 bZzCtLNvTdCtfmSk2AG2X55An+X26qN+J8hJGQ7yKqrDVLjCBqTzAsjSNeiMGUlIV3
-	 LfsPyyqJsXSZ897WAYZTyt1WysASQKl1fWANEW6CZlExrl3papNfqCw/A+l+6nKFuX
-	 ti5C9elTQzOtQ==
+	s=k20201202; t=1777512423;
+	bh=OQClfIllpvjb88x1YwOMzh+Yc6xI81J2AsvPmhkrUcg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YNJFKg0Vhcrr3OWAB0rM2asrt9S92vjKJONZ1VMNrfo2gE/ZZ0+cprJpMwW3XFbOv
+	 fJBs9reV25ahLQW4DMS8+fxy/PmVXi3/DNBIJJlv2XDx7tDEdIoJ7QuJCE4JGy+hG4
+	 MDTsQB6UE4HBuKwinyWmDKs2Pan2kUAEbcgl4xvv+scHEziVwnI6ThrMLcnBA9wy1s
+	 JakrRwV+WCjCCWIWkbTSTdGtoQHIURyPJ1Xzn1oT6lNlHxaJ2XVTQHgr5+CWsCMkfk
+	 skpeLwM4sgjfKeNISI5XmO0xlM7Ux54TvxH3L/Wy8w8DE3TghciRLcYhK8GDqXXAjE
+	 yt84HDeDuyWPA==
+Date: Wed, 29 Apr 2026 18:27:01 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: maoyixie.tju@gmail.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	kuniyu@google.com,
-	shaw.leon@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	kuznet@ms2.inr.ac.ru,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	security@kernel.org
-Subject: Re: [PATCH net 2/2] ip6_gre: Use cached t->net in ip6erspan_changelink().
-Date: Wed, 29 Apr 2026 18:18:48 -0700
-Message-ID: <20260430011849.2345207-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260428110713.2550315-3-maoyixie.tju@gmail.com>
-References: <20260428110713.2550315-3-maoyixie.tju@gmail.com>
+To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org, Yibo Dong
+ <dong100@mucse.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, MD Danish Anwar <danishanwar@ti.com>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH v2] net: ethernet: rnpgbe: mark nonfunctional incomplete
+ driver as BROKEN
+Message-ID: <20260429182701.28edde72@kernel.org>
+In-Reply-To: <CADkSEUiRwto-14zkER30WJdiQa2b+OGOZ+2S50pq4doJ37X70Q@mail.gmail.com>
+References: <20260428030826.47509-1-enelsonmoore@gmail.com>
+	<20260429175421.014bb28f@kernel.org>
+	<CADkSEUiRwto-14zkER30WJdiQa2b+OGOZ+2S50pq4doJ37X70Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 9530B49C042
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 2025849BFE3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282580-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282576-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,google.com,gmail.com,davemloft.net,redhat.com,ms2.inr.ac.ru];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.972];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-ip6_gre: Use cached t->net in ip6erspan_changelink().
+On Wed, 29 Apr 2026 18:13:46 -0700 Ethan Nelson-Moore wrote:
+> On Wed, Apr 29, 2026 at 5:54=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> > I'm having second thoughts about this. I'm worried users will come to
+> > expect that drivers are marked as BROKEN until such time that they
+> > can be considered a sufficiently complete replacement for an OOT /
+> > vendor driver. This will be highly subjective. =20
+>=20
+> I understand your concern, but there is precedent for doing this when
+> the driver doesn't work at all.
+>=20
+> The ntsync driver was marked as broken in commit f5b335dc025c ("misc:
+> ntsync: mark driver as "broken" to prevent from building") until it
+> was fully merged. The BROKEN dependency was then removed in commit
+> c301e1fefc2d ("ntsync: No longer depend on BROKEN.")
 
-This commit fixes an issue where ip6erspan_changelink() uses the device
-creation netns instead of the per-netns ip6gre hash. This ensures the tunnel
-is inserted into the correct hash, avoiding a stale entry and subsequent
-use-after-free during netns destruction.
+ntsync is mere 1.2kLoC, that's 10x smaller than typical networking
+driver these days, and even (slightly) smaller than rnpgbe(!)
 
-> diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
-> index 63fc8556b475..c5978e0bdfe3 100644
-> --- a/net/ipv6/ip6_gre.c
-> +++ b/net/ipv6/ip6_gre.c
-> @@ -2262,7 +2262,8 @@ static int ip6erspan_changelink(struct net_device *dev, struct nlattr *tb[],
->  				struct nlattr *data[],
->  				struct netlink_ext_ack *extack)
->  {
-> -	struct ip6gre_net *ign = net_generic(dev_net(dev), ip6gre_net_id);
-> +	struct ip6_tnl *nt = netdev_priv(dev);
-> +	struct ip6gre_net *ign = net_generic(nt->net, ip6gre_net_id);
->  	struct __ip6_tnl_parm p;
->  	struct ip6_tnl *t;
+Most in-tree networking drivers play constant catch-up with the OOT
+version so they are never "fully merged".
 
-While reviewing this area, I noticed a regression further down in
-ip6erspan_changelink() regarding the metadata tunnel unlinking.
+> If it were my decision, I would remove BROKEN from this driver once it
+> supports a stable network connection, and perhaps also once it
+> survives suspends and resumes, since that is expected in modern
+> desktop use cases. I think that is a fairly objective reading of the
+> word BROKEN.
 
-If an existing ERSPAN tunnel with metadata collection enabled is modified via
-a netlink changelink request to disable metadata collection, does the unlink
-sequence clear the correct pointer?
+That'd require us to know if the device is going to be used on
+desktop because for datacenter NICs suspend/resume does not matter.
 
-Looking at the rest of ip6erspan_changelink():
+> It might also be a good idea to agree on expected uses of
+> CONFIG_BROKEN and document them in init/Kconfig.
+> Currently it says:
+>   This option allows you to choose whether you want to try to
+>   compile (and fix) old drivers that haven't been updated to
+>   new infrastructure.
+> which does not fully encompass what it is used for.
 
-    ip6gre_tunnel_unlink_md(ign, t);
-    ip6gre_tunnel_unlink(ign, t);
-    ip6erspan_tnl_change(t, &p, !tb[IFLA_MTU]);
-    ip6erspan_tunnel_link_md(ign, t);
-
-Because ip6gre_tunnel_unlink_md() is called instead of
-ip6erspan_tunnel_unlink_md(), it evaluates the old collect_md state but
-clears ign->collect_md_tun instead of ign->collect_md_tun_erspan.
-
-This seems to leave ign->collect_md_tun_erspan pointing to the tunnel.
-
-Since ip6erspan_tnl_change() updates the parameters to disable collect_md,
-the subsequent call to ip6erspan_tunnel_link_md() will skip updating the
-pointer.
-
-When the tunnel is eventually deleted, ip6erspan_tunnel_unlink_md() would
-be bypassed entirely because collect_md is now false.
-
-Could this leave ign->collect_md_tun_erspan as a dangling pointer,
-causing a use-after-free when an incoming ERSPAN packet triggers
-ip6gre_tunnel_lookup() and dereferences it?
+Maybe it was written in simpler times, maybe the help message was
+aspirational to begin with..
 
