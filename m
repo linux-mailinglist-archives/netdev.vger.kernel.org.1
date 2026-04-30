@@ -1,74 +1,77 @@
-Return-Path: <netdev+bounces-282830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282831-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wDs7BWJK82ngzAEAu9opvQ
-	(envelope-from <netdev+bounces-282830-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 14:26:10 +0200
+	id yL8sFHJK82ngzAEAu9opvQ
+	(envelope-from <netdev+bounces-282831-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 14:26:26 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 631D54A2BC2
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 14:26:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 96E184A2BF4
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 14:26:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 90B3F300A39C
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 12:26:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A9E72301573E
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 12:26:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BF5F402B96;
-	Thu, 30 Apr 2026 12:26:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8601A402BB0;
+	Thu, 30 Apr 2026 12:26:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jfe67wvQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nayGQg+B"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605083A7F79
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 12:26:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94FC3402435
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 12:26:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777551967; cv=none; b=aUCo5DA1TpIt3IwJD4LYfIP1Bg9mqVzHoAQIsCsCTcdxLsoMvAT5/QiGM31bSBk3zaSZVYoM4W3pPVRha61DnhqJPCIgiigF5mtBvd4jAuAxHmM4Qaf3QAH83oPd6yZL2jEj1U+Bi4DAJyYDqsXPRA0rqaA7b/z0/P1cUOHXxaU=
+	t=1777551968; cv=none; b=HJ1gY+max9JurD3NMczkJCekSFseNhJVzBCjFXZ1WMAGrkrRmy9m19sVt5kOmDaDZYukTJTwr4uGpT7wlQMpv5MIg8cICWI9aCkMQTsUmaLKE3Ro7fBr553A9GvHTvs57UotgwajLeNLroEt6bqw6GbGOvYtxgzJ0Y4e2DvM3uM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777551967; c=relaxed/simple;
-	bh=WoSZTJZgD5sk1nHAskzI2NqSbzu34TMeqUl/m7B6ltc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=vB+ACHDdkbZUqBRmtEJhoqoy458H4PTrQqfqRYBObVmM2WkKxk4/R3sFT1m1sh+1MDDWy5nn6sv9jgxieu7t06CJIW/wZIRwWfPV1zpTBwr7eMu+sS/OU4rq0Dm2s9izJhs+ae38vc62Vl6D0tYFE/ARx5TMAxzi6+wxxWEYCJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jfe67wvQ; arc=none smtp.client-ip=198.175.65.16
+	s=arc-20240116; t=1777551968; c=relaxed/simple;
+	bh=Y1C501JONhNNAVfQFgCHZpYKC+oUFWqSXemVKft+MIg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AbXwlCM0IPoPSjdoA4BIKWEMICRttcOau7XsIKmaV9LlTkp0A3RDkcJEhmq+dwHqnTNd7dJToLjDNf/FGifCuXngrioE6S7NlvBDnZZzuFaz5uzrSzDhjIdToqTtIeV7byFwccAdzdp+WSlDRRwnEQEBqAAcgunuzq3ivIlgjWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nayGQg+B; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777551965; x=1809087965;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=WoSZTJZgD5sk1nHAskzI2NqSbzu34TMeqUl/m7B6ltc=;
-  b=jfe67wvQZfv3/qV3DzwE1Qf7K+YmBK1A5M2lloFkmMN6oDLYjNB9nnhi
-   eysw9DsLd9lJ1NAj5O7u/psxTVKxDFR+IWmCNUCR/Hwnj0EmOJLoNkaWK
-   Rg8O/qIDGHdBVag6D04udGI1i7SZJWpPb3Za8umGuzPkW1xJ8bBXjtaPI
-   ynu6gc9jWd70ln7YZS1NLYsiRwNboFv1IJBxC+inOqX2WreHmhe0kq1p+
-   H9hLLYKnlyXaMDrr3H+alhDdIlD8O1K5dHD7KSLtwzqa22Yaa7tOUpnM6
-   pp9/grHoOSRWtn/EJk//Xu2Ry8Bzx3neLvDZaMGfxrkKWdspazmw95Ezu
+  t=1777551966; x=1809087966;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Y1C501JONhNNAVfQFgCHZpYKC+oUFWqSXemVKft+MIg=;
+  b=nayGQg+B7Gc3uO0EQzfKR2gd4XkSwxZtx96EgQCioFfJp16MBZv+LZOo
+   r+m/PQbFpz/MSPForFF6Ns7tVckUDn/zRFkoBQPGG8GEhXr52zzM+lS/N
+   z1Vj6d6vaYjBDJI2kVsvA7cTPYsDk7ELMOgjUmxcjvBkvit8OrrBx0Xgn
+   Nsdo4ul5eWsyKabbr5lsrhk/pMpbqZH+McdC/UkbARZqWDuU4pVaINW6J
+   uuQkHPab9CSY8oxp4mHtd+F5wl//0s2/bDFvdmcL4zTp/iBICKqCZvCMz
+   iKtjyKcmN2Z2TzV3CBZuI/06R0a6/JkKRuL6k1HM/kTOkX5luyvE1Ze2X
    A==;
-X-CSE-ConnectionGUID: gTHu1dlwSq2KFtm13xDTjQ==
-X-CSE-MsgGUID: fmSbAfnIQSOK3F2S1K9lMQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11771"; a="78689179"
+X-CSE-ConnectionGUID: qaEu5ugXRm6fduOMYdSWUg==
+X-CSE-MsgGUID: 0HooY1FVSOu+bXV9bTx2iA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11771"; a="78689181"
 X-IronPort-AV: E=Sophos;i="6.23,208,1770624000"; 
-   d="scan'208";a="78689179"
+   d="scan'208";a="78689181"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2026 05:26:05 -0700
-X-CSE-ConnectionGUID: cSnv3J4PTpO/KHFmOGTMGw==
-X-CSE-MsgGUID: duS/1KRASjuFWY8mlw9i9A==
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2026 05:26:06 -0700
+X-CSE-ConnectionGUID: iGpTe9cgTJqrJcYaeqGlxw==
+X-CSE-MsgGUID: Mfr2tqbKTTGcHSYViPM7Jg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,208,1770624000"; 
-   d="scan'208";a="233538420"
+   d="scan'208";a="233538423"
 Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
-  by orviesa006.jf.intel.com with ESMTP; 30 Apr 2026 05:26:04 -0700
+  by orviesa006.jf.intel.com with ESMTP; 30 Apr 2026 05:26:05 -0700
 From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 To: intel-wired-lan@lists.osuosl.org,
 	anthony.l.nguyen@intel.com,
 	aleksandr.loktionov@intel.com
 Cc: netdev@vger.kernel.org
-Subject: [PATCH 0/5] ice: five small fixes and cleanups
-Date: Thu, 30 Apr 2026 14:25:57 +0200
-Message-ID: <20260430122602.126722-1-aleksandr.loktionov@intel.com>
+Subject: [PATCH 1/5] ice: fix ETH56G Rx offset type description in kernel-doc comment
+Date: Thu, 30 Apr 2026 14:25:58 +0200
+Message-ID: <20260430122602.126722-2-aleksandr.loktionov@intel.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260430122602.126722-1-aleksandr.loktionov@intel.com>
+References: <20260430122602.126722-1-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,7 +79,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 631D54A2BC2
+X-Rspamd-Queue-Id: 96E184A2BF4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -89,7 +92,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282830-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-282831-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_HAS_DN(0.00)[];
@@ -104,53 +107,37 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Three correctness fixes and two cleanups for the ice driver.
+From: Karol Kolacinski <karol.kolacinski@intel.com>
 
-Patch 1 corrects a kernel-doc comment in ice_ptp_hw.h that described the
-ETH56G MAC Rx offset field as unsigned when it is signed (trivial doc fix,
-no functional change).
+The ETH56G MAC register configuration Rx offset field stores a signed
+integer, not an unsigned one. Correct the struct comment that incorrectly
+described it as '11 bit unsigned int'. Also update 'unsigned ints' to
+'unsigned integers' for consistency.
 
-Patch 2 removes the PF_SB_REM_DEV_CTL sideband register write from
-ice_ptp_init_phc_e82x().  PHY access is enabled by default on E82X and
-the register write was a leftover from an earlier SWITCH_MODE workaround
-that is no longer needed.
+Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Patch 3 renames ICE_SMA2_UFL2_RX_DIS to ICE_SMA2_UFL2_RX_EN to match
-the actual active-high hardware semantics and inverts the three use sites
-in ice_dpll.c so that the logic remains correct.
-
-Patch 4 replaces the static per-type frequency tables for CGU pins with a
-single DPLL_PIN_FREQUENCY_RANGE(1, 25 MHz) entry.  The firmware defines
-an any_freq capability for configurable CGU inputs, but the old tables
-restricted users to 1 PPS or 10 MHz.  GNSS pins retain a 1 PPS-only
-entry since they are physically constrained.
-
-Patch 5 exports ice_dcb_need_recfg() and calls it in the four SW LLDP
-netlink setters instead of memcmp() on a non-packed struct, which is
-undefined behaviour due to uninitialised padding bytes.  The redundant
-memcmp in ice_pf_dcb_cfg() is removed since callers now guard it.
-
-Aleksandr Loktionov (2):
-  ice: add correct handling of SMA/u.FL states
-  ice: use element-by-element comparison for DCB config changes
-
-Arkadiusz Kubalewski (1):
-  ice: fix DPLL pin frequency range in CGU pin descriptors
-
-Karol Kolacinski (2):
-  ice: fix ETH56G Rx offset type description in kernel-doc comment
-  ice: remove unnecessary PF_SB_REM_DEV_CTL write for E82X
-
- drivers/net/ethernet/intel/ice/ice_dcb_lib.c |  13 +-
- drivers/net/ethernet/intel/ice/ice_dcb_lib.h |   2 +
- drivers/net/ethernet/intel/ice/ice_dcb_nl.c  |  30 +++-
- drivers/net/ethernet/intel/ice/ice_dpll.c    |   6 +-
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c  | 141 ++++++++++---------
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h  |   8 +-
- 6 files changed, 113 insertions(+), 87 deletions(-)
-
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+index 9bfd3e7..c1aa408 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+@@ -144,9 +144,9 @@ struct ice_vernier_info_e82x {
+  * @tx_offset: total Tx offset, fixed point
+  * @rx_offset: total Rx offset, contains value for bitslip/deskew, fixed point
+  *
+- * All fixed point registers except Rx offset are 23 bit unsigned ints with
++ * All fixed point registers except Rx offset are 23 bit unsigned integers with
+  * a 9 bit fractional.
+- * Rx offset is 11 bit unsigned int with a 9 bit fractional.
++ * Rx offset is 11 bit signed integer with a 9 bit fractional.
+  */
+ struct ice_eth56g_mac_reg_cfg {
+ 	struct {
 -- 
 2.52.0
 
