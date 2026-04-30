@@ -1,137 +1,146 @@
-Return-Path: <netdev+bounces-282930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282931-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GF6cBlN782nH4QEAu9opvQ
-	(envelope-from <netdev+bounces-282930-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:54:59 +0200
+	id uPFUODZ982nH4QEAu9opvQ
+	(envelope-from <netdev+bounces-282931-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:03:02 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CDF44A5328
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:54:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A19A4A544F
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:02:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6B636305B59D
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:51:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C4C4530125F5
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:57:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A536844BC88;
-	Thu, 30 Apr 2026 15:51:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4D2141B375;
+	Thu, 30 Apr 2026 15:57:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="Y1/klBNo"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="DDwGkzxI"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0827F44BC93;
-	Thu, 30 Apr 2026 15:51:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A9C13382E5;
+	Thu, 30 Apr 2026 15:57:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777564281; cv=none; b=FcTG7890dRWdV1/x4f0lXOxjgklA/wccb8ufEtOGY/u+e7zmTODm3kLqrll0hMT+laYehGDd90Dq2HZAUaVUtHRspDBw6M9oH/FONd/pV2FTcdOLp5bDMgInEaBC8MGSViqxBs+grE2AaRYoCbkb+DEvyiil+99WzClnYMX8yjQ=
+	t=1777564676; cv=none; b=Gy3U1qWtEKLwtRAa8BDlob0q82dgMhyJB46bQQZdaFrGWoIrr9mypE6o+ekt8LZ9GQrU/jX83nWj4qyhObXkTQmaOUKzdFTjJ4e/AvyHUBvu1vpOxfz7+Yvtu7iSEUWoKYH7bctjaICMAbn8M0Ms6syjm1pBmCwXnjD7uSG96P4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777564281; c=relaxed/simple;
-	bh=Z4QaB5zoZbMfWKiPjof9bKBHvnmTLTNxpgUmaJ49tFQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=PA8mt2ZzTkcbLXEDnN9B3FNv04kOmvX7rr5EkiazeRkXDlIpnqnIZ20wD1CK9bwfE2VDim9sd9eQzyidZr7Xk+4l63BE2vxW49I0Cje/8tCyFfEf2EMdDsKdeM6A3wO0uf+aoANZiQZuXHI0Y5ApjcxPtgdHraQmQjtbGj892MU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net; spf=none smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=Y1/klBNo; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=nmPqSIyOsYk7X61mHEchbXrVS9D6WK3wP2smAwfltuk=;
-	t=1777564280; x=1778773880; b=Y1/klBNoEYrWeVpGEhPXDGVdSZFRkWU6ssIti030AZjMRMK
-	u8OTTx1ndjAVg7Zkv/gGQR7ClD3AqCYPf279Z3xvQBN7v35frYaIWBcbZWoi1tuPJPv/WzQ2UxWIn
-	zRxwQDajtN/gNsV2meWkhbodRNHTPcwwXbfbjVkv0WdMwzZlc/FRGoJiXyOKjJLv01obZ3b2r2kTu
-	klmYe0pZidSxaKDp27EjOi8Q8c2DDpfdqZHPfPuq0n7ds8ro8zI5M2pbf7hpGmOE/Ic/Ho9LVIWor
-	2BMPFlHiez4A0gyyqPObRpldqaEIxYIhClyohbGmN6c2VwWMAj/iPep1TJtAE+WQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1wITfY-00000005Yof-3e2k;
-	Thu, 30 Apr 2026 17:51:17 +0200
-Message-ID: <027691e6472079e06f816462a8049308a1bea908.camel@sipsolutions.net>
-Subject: Re: [GIT PULL] wireless-2026-04-30
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
-Date: Thu, 30 Apr 2026 17:51:15 +0200
-In-Reply-To: <20260430071239.36b0e5f0@kernel.org>
-References: <20260430111831.219242-6-johannes@sipsolutions.net>
-	 <20260430071239.36b0e5f0@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	s=arc-20240116; t=1777564676; c=relaxed/simple;
+	bh=NBbW+I5HblCuhQGuDtTWvOWuXyeopGFsbAAGTugsplE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sprz7xuuvRLlpqOElVcLSXWOXGL42w9uyDWljJeCOVtOrwp8Obs6NbdE64coUZrubSEUnT6BFqJIGbDWExOYrZ7IEEOta3hx8pxGc8LxY6B7o6wIqhrVs0GkUsA0QE22nLHb5mN5yqRtlJ1LKyFNBX+2PwptZUOE4L1LlALMs9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=DDwGkzxI; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 2294F60263;
+	Thu, 30 Apr 2026 17:57:53 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1777564673;
+	bh=x8RLS4IOBlLKzzcEugB33op1GEA4JAgsxvw3AAn9dd4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DDwGkzxIgHG8UjM/zW6YYAp+v/nB8UFgFJAEXQMHudNeizLwQ4b8LOT9gU1p+vhNP
+	 huy/AvrirTwKOZ+C3PSzhsccETYGbNrqXB/dfGzOawIDZu0o3X0loIMGR+U6Ad6k/+
+	 5YyzFaljafsuRgYHrUj+j2W7+N6t8F3KgumfePcJMa0e+fmcLf/8JtlVU5Bd1E07/G
+	 jZKt0PipirBeUlyzYtAPgWJ4EHRkvW2cPtMlNimIDBikzLMaAwl4Xn97KzjL32s30e
+	 dyYNQ7bnst6Bw6CfU0JJNANHNaZ6XCPQKcu0XM0hTyO2D1YIB8TpYqheeg9tU6VLTH
+	 KPFUXFX5SjZBA==
+Date: Thu, 30 Apr 2026 17:57:50 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Qingfang Deng <dqfext@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Felix Fietkau <nbd@nbd.name>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-ppp@vger.kernel.org
+Subject: Re: [RFC PATCH net-next v6 1/2] net: pppoe: implement GRO/GSO support
+Message-ID: <afN7_oBICMZ_45Zh@chamomile>
+References: <20260326081127.61229-1-dqfext@gmail.com>
+ <9d7f1bbc-155d-4c18-bcf7-732ebe4cbf67@redhat.com>
+ <CALW65jYB1jWS5LnSxRCrEeCpPfhA8saqbYYfU-LkPh_25gWfsw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
-X-Rspamd-Queue-Id: 8CDF44A5328
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALW65jYB1jWS5LnSxRCrEeCpPfhA8saqbYYfU-LkPh_25gWfsw@mail.gmail.com>
+X-Rspamd-Queue-Id: 8A19A4A544F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282930-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[sipsolutions.net: no valid DMARC record];
-	DKIM_TRACE(0.00)[sipsolutions.net:+];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[netfilter.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-282931-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[netfilter.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sipsolutions.net:dkim,sipsolutions.net:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RSPAMD_EMAILBL_FAIL(0.00)[pabeni.redhat.com:query timed out];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,netfilter.org:dkim]
 
-On Thu, 2026-04-30 at 07:12 -0700, Jakub Kicinski wrote:
-> On Thu, 30 Apr 2026 13:17:52 +0200 Johannes Berg wrote:
-> > So the LLM floodgates are starting to open ;-) But I'm somewhat
-> > happy that so far we haven't gotten any really critical reports.
-> > Here's a couple of first fixes though.
-> >=20
-> > Please pull and let us know if there's any problem.
->=20
-> Looks like this breaks kunit:
->=20
-> ok 70 mac80211-tpe
->     KTAP version 1
->     # Subtest: mac80211-mlme-chan-mode
->     # module: mac80211_tests
->     1..1
->         KTAP version 1
->         # Subtest: test_determine_chan_mode
->         ok 1 Normal case, EHT is working
->         ok 2 Requiring EHT support is fine
->         ok 3 Lowering the mode limits us
-> kunit: required basic rate or BSS membership selectors not supported or d=
-isabled, rejecting connection
->         ok 4 Requesting a basic rate/selector that we do not support
->         ok 5 As before, but userspace says it is taking care of it
->     # test_determine_chan_mode: ASSERTION FAILED at net/mac80211/tests/ch=
-an-mode.c:258
->     Expected conn.mode =3D=3D params->expected_mode, but
->         conn.mode =3D=3D 5 (0x5)
->         params->expected_mode =3D=3D 1 (0x1)
->         not ok 6 Masking out a supported rate in HT capabilities
->=20
+Hi Paolo,
 
-D'oh. Yeah, that's the AP workaround, we'll need to adjust the test. I'm
-on my way out right now, so I guess that'll have to wait for next week.
+On Thu, Apr 30, 2026 at 11:47:57PM +0800, Qingfang Deng wrote:
+> On Thu, Apr 30, 2026 at 5:34 PM Paolo Abeni <pabeni@redhat.com> wrote:
+> >
+> > AFAICS, when the computed len is >= 64K, and the above min() will
+> > truncate it, later pppoe_rcv() will drop the packet.
+> 
+> pppoe_rcv() does _not_ drop such packets.
+> The drop condition is "skb->len < ntohs(ph->length)", not the other way around.
+> 
+> > > +     skb = segs;
+> > > +     do {
+> > > +             phdr = (struct pppoe_hdr *)(skb_mac_header(skb) + nhoff);
+> > > +             len = skb->len - (nhoff + sizeof(*phdr));
+> > > +             phdr->length = cpu_to_be16(len);
+> > > +             skb->network_header = (u8 *)phdr - skb->head;
+> >
+> > I understand is quite late for the following question, but...
+> > The network headers points to the pppoe hdr. Should it point to the
+> > actual IP hdr?
 
-johannes
+This is the same with double-tagged-vlan, the network header also
+points to the inner vlan in the skb payload. Changing this would
+require to revisit all users in the tree that are already assuming
+this.
+
+> > Why not? A comment in the code or in the commit message would be
+> > appreciated.
+> 
+> I'm not sure about the GSO stuff. This code is carried over from
+> Felix's v3 patch unmodified and I haven't noticed any issues. Maybe he
+> has the answer.
+> 
+> FYI, Pablo Neira Ayuso is adding the "inline PPPoE GSO" to Netfilter
+> flowtable: https://lore.kernel.org/netfilter-devel/20260430055836.223494-2-pablo@netfilter.org/
+> to work around missing GSO support in PPPoE driver, prior to this
+> patch.
 
