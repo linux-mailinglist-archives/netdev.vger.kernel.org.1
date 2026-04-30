@@ -1,210 +1,210 @@
-Return-Path: <netdev+bounces-282988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282989-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UA7TD4rC82mw6gEAu9opvQ
-	(envelope-from <netdev+bounces-282988-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 22:58:50 +0200
+	id 0KQvGp/C82mw6gEAu9opvQ
+	(envelope-from <netdev+bounces-282989-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 22:59:11 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B6354A7F6F
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 22:58:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C9E734A7F8C
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 22:59:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0E8BF301DAEC
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 20:58:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 82B623020AA0
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 20:58:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 670503AE712;
-	Thu, 30 Apr 2026 20:58:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B83DB3A63F8;
+	Thu, 30 Apr 2026 20:58:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HRi5Ngjq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f67.google.com (mail-qv1-f67.google.com [209.85.219.67])
+Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E70E235A3B1
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 20:58:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.67
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777582727; cv=none; b=EfzbAJB4Xx7Vb9h7ucgpMD/dT8wQkLQMjtuQhDHtGaEpPYAEepXCUnXGjVUxYA1t1PTMFDuSx3co6PHaQ5fY9gxpvUxZNvRb0uFVxd6Ew7A5Pli9mwdo1UGYFItYFoSRj1rUOCS6jRMg5vy+Eq7F8+oUq+fAxaS+N8xXvyzzfXg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777582727; c=relaxed/simple;
-	bh=bLcJu71G7WPZXPFwGj3wOrf2aAWHV9CNC4610TMQDno=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Nejlbk8aRD9ZVyOTNDy+OKqYQl+dkgL0pUPb0oTGuSAKNONLW28sNqcYRFJ0C5jchBeNQ6otkSEaYycj35HMNCY6Y8BV/yL/ToEPmj+2V+lrrDuuevsyKgtgWPDZPn3gj96tE62XxbypP6N5HYY4f20XHRj4jG6sRAyTDju7BEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.219.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f67.google.com with SMTP id 6a1803df08f44-8acb3daf2aaso19310346d6.0
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 13:58:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777582723; x=1778187523;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551FA3783B2
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 20:58:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777582733; cv=pass; b=kPrRWjCAMAI04D/syh6ey2c9MtsNvKmwrREvJLUA4jtb1xBPF11Gx0JKJi1tlgpWMdyjU4M7s4hocFMG0tHETPX33VYDYTlU3t65RU8WHi1NFRf2nE1N34fp4uwafe/lBwNHRk6vJMGmBf8FGUc62zJp3x8CdoQQkd6xPQ8R6vY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777582733; c=relaxed/simple;
+	bh=DZm88FmcH8LX12G8Lj00Yhlmj5kB1D8w1Kmsk4vwxIc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rHkDD5uCIjmZHpIUx2Lw40lafxdrTI/t+5w27AFZwQj1y6S/AnihefU3aYAkSt2l8P+3jbMJzoSwYozvT7zqkDftmZMRwZOTp9FoM/43FvIXiR9GhyJYhKd1D3vIluB0dfBBFGEz1KBccjO91EUE4DmBt5uC7xmRjONJcOqfCfU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HRi5Ngjq; arc=pass smtp.client-ip=74.125.224.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-65890a6ca20so1432140d50.0
+        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 13:58:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777582731; cv=none;
+        d=google.com; s=arc-20240605;
+        b=MgeTWHnsamYQ/Z9uTm9B3dwzjKknlZAKp9EtyfEh2faecq5eBcpS6+GQo+6DE6JJBq
+         s9kAg44w3Q0VCzLXhRn1zIbmjWW3yqtd2y1/sF0jWhJ7sadweOyMySU2kWyyb+WKHOoK
+         EQXGQLtuJFUIclswr3EAERM6lY+0J2Ps8TLo7lbcoc/cYwN/U8r1SliB14aJ5f9YzZpN
+         rA+Cr02jc7hPwdW6RIgElv7cBwl9k3hEFXAJkhdtcnWRY9R92iQaDgxsnm7pTog7GcQI
+         /QVeszafzS7h0UAYuuR2TM6GDPNmTA/tS8bUFvJgxMnOiYle/dHw5C18MgR4NVUvyy5L
+         fqBQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=hEnpSpB3eFO8NuC3B8ExUkCQEnerNqs6qb5XedqR3wE=;
+        fh=GpV+c7upuF4kmO/xoVtWsew5MoC0pqLi6S/Or0wUf08=;
+        b=Ept06KcU3LhrRHFH+78oSf99w0f6Y83GyqO31VTtbvDFS8q2L0tE07xFoAVGPN+W1b
+         mefK3t9dMXcO7cmNz64jjaafUPTZlRkdWWx4H1dX90qN0ZXFOabKgOsR6jIoubXWCP44
+         y+cGqm1rf9VK7h/dyoVZkfjveNlEbVgSL5o/TYW1O3vevc8CmOTtQACjLGTy092gaa/z
+         82WRmk99XBaz+aw0DbXYwoB6TRH52b98Je52kGJClRhEH6xmk8hoZHw/L704CzagZu3b
+         BU9+6ohLyEWBpQqbmbToxxHQTU4SHXYp8qiElgGOk3mkpOHcV0utSaiJcQNenPpHqHdy
+         CYow==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777582731; x=1778187531; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SvyvGmLX7fIENRT2IT+DRsK2ttBx2k3lafk3GdB3p2E=;
-        b=TDSEQ/hGoBPHH5Mu3Z7kAob2r4YS+k+duH3whnaY0gChLGTLRYiaisehYQck/c8Gwx
-         DkUnCkjdd2FGHExCXeotgE7ljgWjq3aZIzsbbagauIhHNf/yCC6Kz+HsOi5YuTlDsCWs
-         WRRE6ZfrIOcqSvPKeZcpAICzDR8oNeR9TW9/uw5euFbpTu9Fgt6gQW0r4SrxRWtHB66N
-         bGxi/1D3Hx0llaNPwcCsIx3JYDweylma+BIT40ebOomZ5aABf1CGWzbAp9W2WO5NxZ0X
-         TGMwgHUDD/JZoT4DdErrXTU1M1tDuHhhqX38eGhmLDYlS3joePdXRhKvdW05EOowdist
-         Kk2g==
-X-Forwarded-Encrypted: i=1; AFNElJ8oHDyr4BF0vrRiZFdmTO3pO2fqKN+hiTh4vXCknNReWrFgdn3fGPMPUMrH3HbF+Cf98VEX6fw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPE5m8MoJmt4whk6zaiKorpaSrv7+5UPywYQfiHf/+VzucT26B
-	1XFRfSKVpjBGhky0y1OVaPuiHOybHsIkseGVc6/JPcrf3a4VxN7zT9FH
-X-Gm-Gg: AeBDievMnOB/I4VIICUSLEwbW774dKTRrhLFbTTAiQRjM056JcA9kBMD3tPKUG6V3f7
-	3nWMHgDRq2pFKBDb/Bo976urRF8Rb6q5qC7Q1tITwZpmTtPX7IaYopJc8gSi2ijZ67XnxqPjSTm
-	dSGDgV/l6hDl/rLzV/n+0L+RKVGrRu7ccwIiNWsT3IWA9g7eFwrjVrk4a70uxgxwIzyOZHIq+d8
-	yjT3tNOAnqYucd1+8G+uvzM0oniFYHFFZNt0UHoAe8sxCPzJKZAeM+b60uE6mmXxECb1kEmybQE
-	JFG5iXb2eo+cm7KHr/yVO+KA27MKUMjAFt07Ejv7KmOhViA32kjXtHeufowWcurqD7HAMejmQF5
-	B6cxlCx3ThrCka5yqPrnG/CAMttnglf+gA0GrjYDcPgLs1cnAgJ63DpyGGoP0fFO6RJiqBiwKA2
-	M7q4mnLgWbL0S2x51SkKVUzkskeVkOLSZGhcCkbioOc0yMUco36yTsKM9a5Hs1l+j0uw==
-X-Received: by 2002:a05:6214:5f04:b0:8b3:e7b3:99ec with SMTP id 6a1803df08f44-8b3fe77dc0emr70398276d6.4.1777582723342;
-        Thu, 30 Apr 2026 13:58:43 -0700 (PDT)
-Received: from [192.168.88.241] (89-24-32-159.nat.epc.tmcz.cz. [89.24.32.159])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b53c0e7ebdsm2231936d6.29.2026.04.30.13.58.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Apr 2026 13:58:42 -0700 (PDT)
-Message-ID: <8fd5d3a3-d1d7-4542-a0db-1678989940d4@ovn.org>
-Date: Thu, 30 Apr 2026 22:58:38 +0200
+        bh=hEnpSpB3eFO8NuC3B8ExUkCQEnerNqs6qb5XedqR3wE=;
+        b=HRi5Ngjqb56ijwc2YXXzEZlot5RNqjlczTMFHwWzl7s67CTkXm2IGAySetX/i/lCST
+         z8HjGsPM7yCW36u3X49H0yf+Nf4hW5Ph/6YiwUb3ke5mTk/2IMaxS3DaXlxJE3tM/TM1
+         M1kR/n9XMCzKEhs2CW0cAYcOmGuDaXRI2TE/KCpBH4+Q/0i8VAIoQxjos3dHLzqwNxUj
+         BlE2IoTloLNGlwBhwNhcByC2hTuX8ub6jkdcid1cQDVnO0hPbRlkETeqrZ8PnNXEgkhv
+         r+sZh2DnXS6UEf5lnNbcEQR8ZOB+h+R6IxYT4cewRLZW7uPPPSmWDQtr+M81GEDObUe+
+         mXbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777582731; x=1778187531;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=hEnpSpB3eFO8NuC3B8ExUkCQEnerNqs6qb5XedqR3wE=;
+        b=VkjyFKP9okUFV7hLspUrgfLQ6TQv6FRXPuYqcbppVmdGJ6khLOWjRPIirgELtBlnJR
+         4l4BT4ZUFSSRgUkMlsKKJ19hDgjXGlw3Zev6rF/CI049ndK0B1l+toaKLytqmSZw+w/5
+         +dQYIkbv/kTkgTngRT0lN7CdQRQ+n+Xs0X4CRkSBA0CRvxNYp5m5ei47C2odRkY6XR8X
+         BD9oRa54/2hGWELaed1/Yh7b7Xi3X8bef88g161+tw4QF+Kw7Vfv7gTJ6Y2ERkzN7bgp
+         I/GFn/dA6GGnHLI/Y92kGlg5Hs/MRIndfHTe7CGWO5ZGSUmu8MyxwuYBtPD97E/XGHRJ
+         hihw==
+X-Forwarded-Encrypted: i=1; AFNElJ8BkSRO6hSh6aPgh77X2fJdz1Ncz3NAtGm2t5qpfWPepOd+KCn9lEZHGfDMBuxVHvFiq2rnw+c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzuebi7TYwSM/RimRRY+Wc1WDeP7EfZV2IS9A2ft9fYmFaD3Deb
+	BqANon76h/D50iLfmPC3J62GFMMNe2UnlG7TNaUdPPVuNeRHlvJNjV1yK4y9MMJwTEz8B08yzxo
+	3rfSJEHh3D/UeQtv+ecAmPO3WAVNqpdpzJ1sImaxD
+X-Gm-Gg: AeBDieslB8nwB0oVjNf2kNSdbD37HGfDLavSg/VJoYdxr0Hal4p7hIeIo9ypgu3w4ct
+	nd1GhfKZifUFD5aSLpXJDRST1i+ITL870t8/15jI4imVpMChtBhm41QZ0WDifHHuW89UxBYls+F
+	a+HLDyETgXcDlJtUEIMBQUD++H42S01sOP49jCuYfQSopznT5bpVG7RIj7s+xyz0PqaGo8NSIfb
+	CJ5aquW6/j3ZLAxsnPnLsxqDRS80fpEo402NRLMkIdXJ5HGaYYiAj+GzObMeJE+duQ7B+/GeBjV
+	djU88Vvr0X6Af0KlEuy6K+fPpWlJ1X8n+/D6eeX3rSglCT5ebxwR5u7F1ZU=
+X-Received: by 2002:a53:ac83:0:b0:65c:2ac8:ec3a with SMTP id
+ 956f58d0204a3-65c2ac8ed74mr1612608d50.21.1777582730691; Thu, 30 Apr 2026
+ 13:58:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 06/12] netfilter: nf_conntrack_expect: honor
- expectation helper field
-To: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org,
- fw@strlen.de
-Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, horms@kernel.org,
- i.maximets@ovn.org, Eelco Chaudron <echaudro@redhat.com>,
- Aaron Conole <aconole@redhat.com>
-References: <20260326125153.685915-1-pablo@netfilter.org>
- <20260326125153.685915-7-pablo@netfilter.org>
-Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- xsFNBF77bOMBEADVZQ4iajIECGfH3hpQMQjhIQlyKX4hIB3OccKl5XvB/JqVPJWuZQRuqNQG
- /B70MP6km95KnWLZ4H1/5YOJK2l7VN7nO+tyF+I+srcKq8Ai6S3vyiP9zPCrZkYvhqChNOCF
- pNqdWBEmTvLZeVPmfdrjmzCLXVLi5De9HpIZQFg/Ztgj1AZENNQjYjtDdObMHuJQNJ6ubPIW
- cvOOn4WBr8NsP4a2OuHSTdVyAJwcDhu+WrS/Bj3KlQXIdPv3Zm5x9u/56NmCn1tSkLrEgi0i
- /nJNeH5QhPdYGtNzPixKgPmCKz54/LDxU61AmBvyRve+U80ukS+5vWk8zvnCGvL0ms7kx5sA
- tETpbKEV3d7CB3sQEym8B8gl0Ux9KzGp5lbhxxO995KWzZWWokVUcevGBKsAx4a/C0wTVOpP
- FbQsq6xEpTKBZwlCpxyJi3/PbZQJ95T8Uw6tlJkPmNx8CasiqNy2872gD1nN/WOP8m+cIQNu
- o6NOiz6VzNcowhEihE8Nkw9V+zfCxC8SzSBuYCiVX6FpgKzY/Tx+v2uO4f/8FoZj2trzXdLk
- BaIiyqnE0mtmTQE8jRa29qdh+s5DNArYAchJdeKuLQYnxy+9U1SMMzJoNUX5uRy6/3KrMoC/
- 7zhn44x77gSoe7XVM6mr/mK+ViVB7v9JfqlZuiHDkJnS3yxKPwARAQABzSJJbHlhIE1heGlt
- ZXRzIDxpLm1heGltZXRzQG92bi5vcmc+wsGUBBMBCAA+AhsDBQsJCAcCBhUKCQgLAgQWAgMB
- Ah4BAheAFiEEh+ma1RKWrHCY821auffsd8gpv5YFAmfB9JAFCQyI7q0ACgkQuffsd8gpv5YQ
- og/8DXt1UOznvjdXRHVydbU6Ws+1iUrxlwnFH4WckoFgH4jAabt25yTa1Z4YX8Vz0mbRhTPX
- M/j1uORyObLem3of4YCd4ymh7nSu++KdKnNsZVHxMcoiic9ILPIaWYa8kTvyIDT2AEVfn9M+
- vskM0yDbKa6TAHgr/0jCxbS+mvN0ZzDuR/LHTgy3e58097SWJohj0h3Dpu+XfuNiZCLCZ1/G
- AbBCPMw+r7baH/0evkX33RCBZwvh6tKu+rCatVGk72qRYNLCwF0YcGuNBsJiN9Aa/7ipkrA7
- Xp7YvY3Y1OrKnQfdjp3mSXmknqPtwqnWzXvdfkWkZKShu0xSk+AjdFWCV3NOzQaH3CJ67NXm
- aPjJCIykoTOoQ7eEP6+m3WcgpRVkn9bGK9ng03MLSymTPmdINhC5pjOqBP7hLqYi89GN0MIT
- Ly2zD4m/8T8wPV9yo7GRk4kkwD0yN05PV2IzJECdOXSSStsf5JWObTwzhKyXJxQE+Kb67Wwa
- LYJgltFjpByF5GEO4Xe7iYTjwEoSSOfaR0kokUVM9pxIkZlzG1mwiytPadBt+VcmPQWcO5pi
- WxUI7biRYt4aLriuKeRpk94ai9+52KAk7Lz3KUWoyRwdZINqkI/aDZL6meWmcrOJWCUMW73e
- 4cMqK5XFnGqolhK4RQu+8IHkSXtmWui7LUeEvO/OwU0EXvts4wEQANCXyDOic0j2QKeyj/ga
- OD1oKl44JQfOgcyLVDZGYyEnyl6b/tV1mNb57y/YQYr33fwMS1hMj9eqY6tlMTNz+ciGZZWV
- YkPNHA+aFuPTzCLrapLiz829M5LctB2448bsgxFq0TPrr5KYx6AkuWzOVq/X5wYEM6djbWLc
- VWgJ3o0QBOI4/uB89xTf7mgcIcbwEf6yb/86Cs+jaHcUtJcLsVuzW5RVMVf9F+Sf/b98Lzrr
- 2/mIB7clOXZJSgtV79Alxym4H0cEZabwiXnigjjsLsp4ojhGgakgCwftLkhAnQT3oBLH/6ix
- 87ahawG3qlyIB8ZZKHsvTxbWte6c6xE5dmmLIDN44SajAdmjt1i7SbAwFIFjuFJGpsnfdQv1
- OiIVzJ44kdRJG8kQWPPua/k+AtwJt/gjCxv5p8sKVXTNtIP/sd3EMs2xwbF8McebLE9JCDQ1
- RXVHceAmPWVCq3WrFuX9dSlgf3RWTqNiWZC0a8Hn6fNDp26TzLbdo9mnxbU4I/3BbcAJZI9p
- 9ELaE9rw3LU8esKqRIfaZqPtrdm1C+e5gZa2gkmEzG+WEsS0MKtJyOFnuglGl1ZBxR1uFvbU
- VXhewCNoviXxkkPk/DanIgYB1nUtkPC+BHkJJYCyf9Kfl33s/bai34aaxkGXqpKv+CInARg3
- fCikcHzYYWKaXS6HABEBAAHCwXwEGAEIACYCGwwWIQSH6ZrVEpascJjzbVq59+x3yCm/lgUC
- Z8H0qQUJDIjuxgAKCRC59+x3yCm/loAdD/wJCOhPp9711J18B9c4f+eNAk5vrC9Cj3RyOusH
- Hebb9HtSFm155Zz3xiizw70MSyOVikjbTocFAJo5VhkyuN0QJIP678SWzriwym+EG0B5P97h
- FSLBlRsTi4KD8f1Ll3OT03lD3o/5Qt37zFgD4mCD6OxAShPxhI3gkVHBuA0GxF01MadJEjMu
- jWgZoj75rCLG9sC6L4r28GEGqUFlTKjseYehLw0s3iR53LxS7HfJVHcFBX3rUcKFJBhuO6Ha
- /GggRvTbn3PXxR5UIgiBMjUlqxzYH4fe7pYR7z1m4nQcaFWW+JhY/BYHJyMGLfnqTn1FsIwP
- dbhEjYbFnJE9Vzvf+RJcRQVyLDn/TfWbETf0bLGHeF2GUPvNXYEu7oKddvnUvJK5U/BuwQXy
- TRFbae4Ie96QMcPBL9ZLX8M2K4XUydZBeHw+9lP1J6NJrQiX7MzexpkKNy4ukDzPrRE/ruui
- yWOKeCw9bCZX4a/uFw77TZMEq3upjeq21oi6NMTwvvWWMYuEKNi0340yZRrBdcDhbXkl9x/o
- skB2IbnvSB8iikbPng1ihCTXpA2yxioUQ96Akb+WEGopPWzlxTTK+T03G2ljOtspjZXKuywV
- Wu/eHyqHMyTu8UVcMRR44ki8wam0LMs+fH4dRxw5ck69AkV+JsYQVfI7tdOu7+r465LUfg==
-In-Reply-To: <20260326125153.685915-7-pablo@netfilter.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 8B6354A7F6F
+References: <20260421051641.370436-1-boolli@google.com> <20260423163307.989421-3-horms@kernel.org>
+ <25163a38-53b5-445c-936c-0cba94cb731f@intel.com>
+In-Reply-To: <25163a38-53b5-445c-936c-0cba94cb731f@intel.com>
+From: Li Li <boolli@google.com>
+Date: Thu, 30 Apr 2026 13:58:38 -0700
+X-Gm-Features: AVHnY4I8U8-NSsj-bnIoiUgXgoUy_jiPXyvaEaAv_OuN_FcN8_8wmmTGL0lyL7M
+Message-ID: <CAODvEq4R_7SXfo5QJ0z=fM5npz1ZFFcCQTTKkdoLKtXyoDnjRA@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v2] idpf: do not perform flow
+ ops when netdev is detached
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Simon Horman <horms@kernel.org>, anthony.l.nguyen@intel.com, 
+	przemyslaw.kitszel@intel.com, davem@davemloft.net, kuba@kernel.org, 
+	edumazet@google.com, intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, decot@google.com, anjali.singhai@intel.com, 
+	sridhar.samudrala@intel.com, brianvv@google.com, emil.s.tantilov@intel.com, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: C9E734A7F8C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282988-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[ovn.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282989-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[boolli@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,netfilter.org:email]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email]
 
-On 3/26/26 1:51 PM, Pablo Neira Ayuso wrote:
-> The expectation helper field is mostly unused. As a result, the
-> netfilter codebase relies on accessing the helper through exp->master.
-> 
-> Always set on the expectation helper field so it can be used to reach
-> the helper.
-> 
-> nf_ct_expect_init() is called from packet path where the skb owns
-> the ct object, therefore accessing exp->master for the newly created
-> expectation is safe. This saves a lot of updates in all callsites
-> to pass the ct object as parameter to nf_ct_expect_init().
-> 
-> This is a preparation patches for follow up fixes.
-> 
-> Signed-off-by: Florian Westphal <fw@strlen.de>
-> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-> ---
+On Thu, Apr 23, 2026 at 11:40=E2=80=AFAM Jacob Keller <jacob.e.keller@intel=
+.com> wrote:
+>
+> On 4/23/2026 9:33 AM, Simon Horman wrote:
+> > From: 'Simon Horman' <horms@kernel.org>
+> >
+> > This is an AI-generated review of your patch. The human sending this
+> > email has considered the AI review valid, or at least plausible.
+> > Full review at: https://sashiko.dev
+> > ---
+> > idpf: do not perform flow ops when netdev is detached
+> >
+> > This commit adds checks to prevent crashes when out-of-tree modules byp=
+ass
+> > ethtool core locks and call flow operations on detached netdevs during =
+a
+> > hardware reset. It introduces netdev and netif_device_present checks in
+> > idpf_get_rxnfc and idpf_set_rxnfc.
+> >
+> >> Even though commit 2e281e1155fc ("idpf: detach and close netdevs while
+> >> handling a reset") prevents ethtool -N/-n operations to operate on
+> >> detached netdevs, we found that out-of-tree workflows like OpenOnload
+> >> can bypass ethtool core locks and call idpf_set_rxnfc directly during
+> >> an idpf HW reset.
+> >
+> > Is it acceptable to add defensive checks upstream solely to accommodate
+> > out-of-tree modules that bypass core kernel locking?
+> >
+> > The core ethtool infrastructure manages locks like rtnl_lock for in-tre=
+e
+> > callers to guarantee safety. Modifying the upstream driver to paper ove=
+r
+> > locking violations in out-of-tree modules might contradict upstream pol=
+icies.
+> >
+> > Simon says: If this is to address OOT module behaviour then I am concer=
+ned.
+> >             And I would suggest that the correct approach is to fix
+> >           the OOT kernel module.
+> >
+>
+> The commit message says: "OpenOnload can bypass ethtool core locks and
+> call idpf_set_rxnfc directly". But if it somehow calls
+> idpf_set_rxnfc_directly without holding the appropriate locks, then no
+> amount of changes to the idpf driver will fix that issue. It is simply
+> unsafe for that to be occurring, and this feels like it just patches one
+> specific problem without addressing the root cause that something is
+> calling the drivers ethtool function without correctly holding the
+> expected locks.
+>
+>
+> @Li Li, could you please explain more details about the workflow that
+> triggers these behaviors? If it can't be reproduced with in-tree modules
+> then I don't think we can accept this fix.
 
-Hi, Pablo and Florian.
+Yes, OpenOnload calls idpf_set_rxnfc directly without checking if the
+netdev is detached first. I've discussed this with the team
+internally, and we decided to fix OpenOnload directly, rather than
+adding the check in idpf.
 
-I was investigating FTP test failures in OVS with 7.0 kernel and bisected
-the issue down to this commit.  AFAIU, with this change all the related
-connections over time gain their parents' helpers,.  This is causing a change
-visible to the userspace, because FTP data connections are now reported to
-have helpers in the conntrack dump:
-
-# conntrack -L
-tcp      6 119 TIME_WAIT src=10.1.1.1 dst=10.1.1.2 sport=59534 dport=21 \
-                         src=10.1.1.2 dst=10.1.1.1 sport=21    dport=59534 \
-           [ASSURED] mark=0 helper=ftp use=2
-tcp      6 119 TIME_WAIT src=10.1.1.2 dst=10.1.1.1 sport=52709 dport=52381 \
-                         src=10.1.1.1 dst=10.1.1.2 sport=52381 dport=52709 \
-           [ASSURED] mark=0 helper=ftp use=1
-
-Before this commit only the control connection had helper=ftp reported in
-the dump.  The traffic seems to work fine, but our tests fail because we
-do not expect the helper attached.
-
-AFAIU, it's generally not something that should be happening, as helpers
-on data connections do not really make much sense.  But I'm just trying to
-figure out if you would consider this as a regression and fix in the kernel
-or if we should adjust our userspace components for this new dump content,
-which would not be very straightforward to do if we want to be able to run
-tests on both old and the new versions.
-
-What do you think?
-
-Best regards, Ilya Maximets.
+Please feel free to drop this patch, thank you!
 
