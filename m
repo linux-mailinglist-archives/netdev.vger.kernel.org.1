@@ -1,367 +1,180 @@
-Return-Path: <netdev+bounces-282915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282916-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CDwTNdl482mt4AEAu9opvQ
-	(envelope-from <netdev+bounces-282915-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:44:25 +0200
+	id cFiYEj9482mt4AEAu9opvQ
+	(envelope-from <netdev+bounces-282916-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:41:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FD264A5098
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:44:25 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A77A74A4FF6
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:41:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AB2483044810
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:41:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 443B7302736A
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:41:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20AEF30FC34;
-	Thu, 30 Apr 2026 15:41:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C122DAFD7;
+	Thu, 30 Apr 2026 15:41:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZtH0Wmgu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lsvd0/PE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A98F1A304A
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 15:41:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777563663; cv=none; b=omZaDhnqf6K9Gm69d4oDRyA4Ngo0TR6F848WflsYO6XkMvEQ/tsGKHIDwSpN+AOiP0j/R9G4W8sIRrBodUkL51cRYqTw324DhApXktdkdn9fvvQYxFIn32czadWudP9uca5XHLVgewe+Ksis58Gq6aZrdQNmw1ERuUPbzk3NEy4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777563663; c=relaxed/simple;
-	bh=6F4FIqvRlAxLMiyzjB1a0Loef1xYOuziOaEvpkQ9tjE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X+3CwB7OYkOunWFwUd//D89IAWFvJ5OD2OfOx2/LnzyD+PQsOiWuonqlR9mZnHz9KhnKF7U+aQfiuUSzgz51vXdH7ah1wuKNPTDW0htILrbyx2qaJaatpeks5r/df/fidYwxzzsbf6l6vTP5aA+G/3C7nLg8BQtfv/82H/Aysv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZtH0Wmgu; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4891e86fabeso13795135e9.1
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 08:41:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99EA52FF672
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 15:41:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777563706; cv=pass; b=Ve+6EEVgsOtdW2OmUGegE4P6+vIu6CIAnIHg33cKPCZ6aUESxuRoKvEBp3JovU0/uJWfIysGSoAUkR4TWt16C8SBObJZPtPRCJA4iRwXpkzXxKXATp68yGRxBF95h59I78409afOJflkExX5iEmhd+2rY+dmmQL+/u7K6n7tUU8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777563706; c=relaxed/simple;
+	bh=CTnm8jbixxkr+n0+syoF6WFncIQ1WX2G9KR4zzj6vcc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=g+gg04YY9s/l+qX2Jiu8dWv9zGsSHVcAuyAm+HTwjhkifAmjpfMUZvr+uOlYx9l5PcLwEqX6MSAVBTatqDRnV+WdJO7op8v6mJL/tSlNkzR2U3TQ+jUEeTkjs6CIdeDUr6SRT4xr6UaEqQ/eLrKk7ZDT2PECp9jzk08DZ9ANiFQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lsvd0/PE; arc=pass smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-50e5c7eb565so9425301cf.3
+        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 08:41:45 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777563704; cv=none;
+        d=google.com; s=arc-20240605;
+        b=M7hsMO6YY2kVH3mJ1rCalbOQWzPtOd5gslogpr2qnk6f6Uim+fq3TAxdVaFg57tDXe
+         C9fFz29SsFXNqdY2K4K+BVbMhyvHPo4GuHM84wTr5kahG/SNGh3gXzhN0wwKcfrxU0BV
+         EQS1q1IceiLuSz3bdUq3P3NUuRqYy5YL+w0nE4rb9P9h8AEwEem675GyAvFnCbElk0nD
+         fvNggSqsfonVaNMG/HQWSHvc/iWoz9dwXLBJ93WdFa92/+TZNFbkawyR27M518T6ANUF
+         GcTIeBlz8ZBLH2qyCqv+S/aBzUPWB+5YdwcQmTJciUWZmQNWOYkAU1aMF/cp+ds1Bdnk
+         bCDA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=4fWKCvUcYkO7KnC4xGz/XeA+D7NpQomx4e1roT5OH94=;
+        fh=Iy2XQJamSMJoeWqwxtepJZ+MKGh8QDUjPwyraS3u70o=;
+        b=IKLV9PkB5aNKbgGIUOV87IIz02x/8J6EBCfkZIrEL/z1013rUHW/x3BDiaGvlZihMV
+         5Zx4c8TAgZ3APGU/Ry66Nv0z4TcmDNQauMxOljQvkWtk4DHTjDe7bSeqrCE8AMJO1+Jm
+         bhU8vrrM48+dEA4NVZd+LzOY0hfYhypYPGmit3F5R3ge928tdOVxp+Wgd745OadWqHon
+         T5ooc848rXipsmZfsgbgudXJoYcekmPfuKcXgtEpPjq1qxGlg7joE32v/1Dil+lBBnS4
+         G1cRnj0uqbXwb8BCp5PfuJqMtUbHqmFU4X5hhJVMM3GTdat+Irpf7JvsYrPpUADyfw9y
+         KZpw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777563659; x=1778168459; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20251104; t=1777563704; x=1778168504; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/MHpRBHdNTVeiHYde/smY3bJSKHcAn6/QCWkGp6rSLM=;
-        b=ZtH0WmgunrKWVUj0Q8nQMr3rEmPCKD6GJQEbkTsG2ZiMNyLLEZC3qoGMOJsgdEth8q
-         UBftmcRwqrNUbxFZbC1SXgKY/aehJZ3KnvCATTyu4FziaHseEgppU8f7pgcWZ+ssLbex
-         zDV4HZ0uwrrjiR/1eII34Gt6UGVw2ldigi/Q+vyCGEMbcDWzQKbILY/LDjdQGh9w9QPB
-         Uke7MSLzbGpQCreaxjbmaJEkHKk1ceVnW21raM47PuSC3PPG5eaYxM4pRq1WYa4nYczh
-         D/nA7c/qf2TS6wotBvaKAHx4FoITLrs/Mdei0N9eCePLbkYHMYYRw757OsMs3ocsLbG9
-         AeFA==
+        bh=4fWKCvUcYkO7KnC4xGz/XeA+D7NpQomx4e1roT5OH94=;
+        b=Lsvd0/PE5JuOV3gxqXCkHTg0Ao5QCACI0TuHMZaA0HQ7MGXFrsgStXef1tivxh6C0C
+         e79NLqnKsm1b9FpCSp6/2ml0zePphn/iax84jTNIWzZneRlCoIrL5/Kjyaqu+gZIhFOD
+         yoGOwVjqcmYhxxrPnCDuslqC2Xp8VzrHkr4weaEpND7wKVhZXQKkflGf2iHVh25dXRUO
+         2hXbftVebChGb3ISm/ax8oTNkgDLSLSSetDYlMBTWIoyhqYvvwVhIi/UlUup1UHoN2rK
+         69jMlmtqNGmWiYrsVbl7BoU/lJnBWVwf4zGRM3E3FZrIO+ulhBxpQ9rfBwIT0544gmk0
+         Tqkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777563659; x=1778168459;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1777563704; x=1778168504;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=/MHpRBHdNTVeiHYde/smY3bJSKHcAn6/QCWkGp6rSLM=;
-        b=TkJkOWJhbNb6LCXSM8eGb7s2LlCwSJTv9KYTAtJ0aQuAQcOeeo4wMn7kBg3J/j5/Rw
-         sRVgrJhesWMGALrrpGr3lvsMLYLtwumvpaMrrv9dN0dnymQRNJUCnBrJLpe7P/mxoyeS
-         tDdAomfqwiwvMrmJ80TQ4wT31AFD9npMEUAZsfPx/nG1q1TMMxe2ypMtVyuoxEjwm9No
-         FTJO/V9s7a5RIfMLOkaGstceZSkHt83dnX2yTxngkc3PmnpCtgOsZ29W20mFN3yJgcQd
-         sKhxGd7FODQndsJnzW6xoi0adsRIopcDirY2h2YSeIxQtAPeI6D73M37LMmA4CWQ59J+
-         39yg==
-X-Gm-Message-State: AOJu0YyaICf5pbcW+uzUIkQnNgxvR3L5VffN62Qen9HRkm38iZzWjFXb
-	SCtRxop5tOpBHRqLkKwWLh4DdEsdwHpoSgHhIeZD8KplgXLOWgDQbJqL/WUJvJ4ByhdCWA==
-X-Gm-Gg: AeBDietdjCWsS7621jcOoPi4psqidH7ome+L3XY/JSDhrL9wiiQCrf15FyUJr8VJxEQ
-	Qn3DabFFXrI0rokv5eGuoYmIzZEIa06eJlKJtsgb2605ca48Y/Q5nARc/phNzFcyCfHpf6QYvFX
-	nLw5ST4f+lNAuwH0ytkmqX1e9KCXatsSu0o7EzbXIX5n6IrbxNW+9V63DkYjrZEtBNCbn0uiXeQ
-	giBhH+aX2AeArhSKCrxIixnHTZ0NXe9N0qQEKz1khh4qDvOIZFh2045wrQX2QkyKmlDhh1Mb8bW
-	3TPpe/1XWCD0Us6Hm6AlM+cmfbHqhsZXZ1Gs5tLnK7Q/TvkfRtWkMDLCaG4I13FvAIVxpkEv8wt
-	HTOADVWEi2j8Nm1/HWdkGQJOwdpYiDkP9l+P0kv9XlXFUO4V/dGhiovjNE3+ySUDQd21mKAs714
-	QAmcoXF7wZKvtQDP+oLYaWKoJdAF+uWdvM4Fn5uAjT16DVF6VAEPWsWMFtm6evycVsd0i4+uuxa
-	zLZ3J/2PsEuVwulpYNhfslUtAJr2bsjMbzOEw==
-X-Received: by 2002:a05:600c:c10b:b0:488:8840:e5ae with SMTP id 5b1f17b1804b1-48a8445876dmr49276425e9.24.1777563659236;
-        Thu, 30 Apr 2026 08:40:59 -0700 (PDT)
-Received: from localhost.localdomain ([2a00:a041:e04f:2600:f9d2:9c9e:9a42:5d91])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a7c31fb8asm43928545e9.30.2026.04.30.08.40.57
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 30 Apr 2026 08:40:58 -0700 (PDT)
-From: "SnailSploit | Kai Aizen" <kai.aizen.dev@gmail.com>
-X-Google-Original-From: SnailSploit | Kai Aizen <95986478+SnailSploit@users.noreply.github.com>
-To: netdev@vger.kernel.org
-Cc: stable@vger.kernel.org,
-	jmaloy@redhat.com,
-	ying.xue@windriver.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	tipc-discussion@lists.sourceforge.net,
-	tung.q.nguyen@dektech.com.au,
-	lkp@intel.com,
-	oe-kbuild-all@lists.linux.dev,
-	syzkaller-bugs@googlegroups.com,
-	"SnailSploit | Kai Aizen" <95986478+SnailSploit@users.noreply.github.com>,
-	syzbot ci <syzbot+ci779e8ed86620f383@syzkaller.appspotmail.com>
-Subject: [PATCH net v3] tipc: fix UAF race in tipc_mon_peer_up/down/remove_peer vs bearer teardown
-Date: Thu, 30 Apr 2026 18:40:55 +0300
-Message-ID: <80ae67e96de2f702028e5bacc89db4575e1531ca.1777559945.git.kai.aizen.dev@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <CALynFi5d0DuGW50xq7xQnsDPdEuN5jBGTqh8bcsUwxk6L-FAdA@mail.gmail.com>
-References: <CALynFi5d0DuGW50xq7xQnsDPdEuN5jBGTqh8bcsUwxk6L-FAdA@mail.gmail.com>
+        bh=4fWKCvUcYkO7KnC4xGz/XeA+D7NpQomx4e1roT5OH94=;
+        b=BkGKQWuepGZi2cfFuUsR6bnotTXdtFuVgFUXYV0LbltFVeMzIOeX30pp4KpUSmIgtD
+         KBjRSnASNwPe3U3Z6ypqdMqlrI/Kzr3g94Ixc7Gd5P5ozTX17R8392LkbPWZ17HySox3
+         IkHjrNObqTyBJ/LMsfr7NEOKxMlRbPCWlFXwzscrJicIlC3mvknE9ywUFMIQ/vtKnLA+
+         wEZ0lzYRee5shUqxF5JM/7l6Dyr/4NuJIM1JH1WM7ynt70I9pAX6bJRECDvLHYVxmd3Z
+         1mkkgulDfdqlrp9NLUgUKlnFBZSU/q/77ojqky43tosB2a+zZpljV7PBBuTUgQJChuPQ
+         LNrQ==
+X-Gm-Message-State: AOJu0Yx264U3a9dlVKh2CTM1/gP/3ZzOZ2lTmk/KzsqFzaHJGhNSVqu/
+	nW6ahdQOHknA66RofosLhhwHd1UwctGWC15d9iUiXAxyyfXZ/kIUpNqM8QobVEr5gBT3DhjNUKp
+	6NuEE5kSe+QxvFXXq2DbVMgYu8HfV0Lm4W8BpgOjJ
+X-Gm-Gg: AeBDietPQbekeIGKgF0mQd/SoJ1getoOCkFtpyd+93M2OaHS0qbbMb1qeyb2+IWWBxb
+	Ug+Y1N0RH0/CZK+8ijFE68BzJvUu/DlyshdvEYwtxnQwEyT7APT7PuCfEg90rM8AuhUvSs/WTLe
+	mb2ijwSgv1MzQxPpCP9yBNmWOwjqv4f4DOgZJLwX4wFl61m1VrIZLsS7YOCjz8ZNdNW7KpcsLVR
+	uEDgKiS+R/VL9GNXTa/cN0POsLAXqsAdEL6Rd8PNMCak1BVUFVVciVi179AlH/I/Wwz66exmBAw
+	xvuhUS2Q6Onfojs03X6nb6Vp2H+HW/H9ZJ07DVWI6p6fOeJ9sRgsEe4Ibva50moWCGC7Q/5hE4b
+	tFDfZEd9NrPNAMBQbBE8MxWUV/q/RWzUbzHBilf9Q
+X-Received: by 2002:a05:622a:1186:b0:50e:5cc7:97c9 with SMTP id
+ d75a77b69052e-5102ae07329mr45719901cf.34.1777563703768; Thu, 30 Apr 2026
+ 08:41:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 7FD264A5098
+References: <20260430152957.194015-1-jhs@mojatatu.com> <20260430152957.194015-2-jhs@mojatatu.com>
+In-Reply-To: <20260430152957.194015-2-jhs@mojatatu.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 30 Apr 2026 08:41:32 -0700
+X-Gm-Features: AVHnY4L0ZMuYpEJ5g14e4qii1WBLn7wy0aw6djcbYX75S6c6yexgXJfpiaMN06o
+Message-ID: <CANn89iLkdvOhBHnL37dWGPCHj9_j6aaXR+cgm0mTXHFPfxTywA@mail.gmail.com>
+Subject: Re: [PATCH net 1/3] net/sched: sch_red: Replace direct dequeue call
+ with peek and qdisc_dequeue_peeked
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us, victor@mojatatu.com, 
+	pctammela@mojatatu.com, ghandatmanas@gmail.com, rakshitawasthi17@gmail.com, 
+	security@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: A77A74A4FF6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_FROM(0.00)[bounces-282915-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-282916-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,redhat.com,resnulli.us,mojatatu.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FROM_NEQ_ENVFROM(0.00)[kaiaizendev@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev,SnailSploit,ci779e8ed86620f383];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,syzbot.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,mojatatu.com:email]
 
-From: "SnailSploit | Kai Aizen" <95986478+SnailSploit@users.noreply.github.com>
+On Thu, Apr 30, 2026 at 8:30=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
+>
+> When red qdisc has children (eg qfq qdisc) whose peek() callback is
+> qdisc_peek_dequeued(), we could get a kernel panic. When the parent of su=
+ch
+> qdiscs (eg illustrated in patch #3 as tbf) wants to retrieve an skb from
+> its child (red in this case), it will do the following:
+>  1a. do a peek() - and when sensing there's an skb the child can offer, t=
+hen
+>      - the child in this case(red) calls its child's (qfq) peek.
+>         qfq does the right thing and will return the gso_skb queue packet=
+.
+>         Note: if there wasnt a gso_skb entry then qfq will store it there=
+.
+>  1b. invoke a dequeue() on the child (red). And herein lies the problem.
+>      - red will call the child's dequeue() which will essentially just
+>        try to grab something of qfq's queue.
+>
+>
+> The right thing to do in #1b is to grab the skb off gso_skb queue.
+> This patchset fixes that issue by changing #1b to use qdisc_dequeue_peeke=
+d()
+> method instead.
+>
+>
+> Fixes: 77be155cba4e ("pkt_sched: Add peek emulation for non-work-conservi=
+ng qdiscs.")
+> Reported-by: Manas <ghandatmanas@gmail.com>
+> Reported-by: Rakshit Awasthi <rakshitawasthi17@gmail.com>
+> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
-CVE-2025-40280 fixed tipc_mon_reinit_self() accessing monitors[] from a
-workqueue without RTNL.  That patch closed the workqueue path by adding
-rtnl_lock() around the call.
-
-However, three additional functions in the same subsystem access
-tipc_net->monitors[] from softirq context with no RCU protection at all:
-
-  tipc_mon_peer_up()     - called from tipc_node_write_unlock()
-  tipc_mon_peer_down()   - called from tipc_node_write_unlock()
-  tipc_mon_remove_peer() - called from tipc_node_link_down()
-
-These are invoked from the packet receive path (tipc_rcv ->
-tipc_node_write_unlock / tipc_node_link_down) and hold only the per-node
-rwlock, not RTNL.
-
-Concurrently, bearer_disable() -- which always holds RTNL -- calls
-tipc_mon_delete(), which sets tn->monitors[bearer_id] = NULL and then
-kfree(mon) without an RCU grace period. A softirq reader can observe
-the non-NULL slot, take a reference, get preempted, and resume after
-kfree(mon) on another CPU, dereferencing freed memory.
-
-Convert monitors[] to __rcu, use rcu_assign_pointer() on creation,
-RCU_INIT_POINTER() + synchronize_rcu() on deletion before kfree(), and
-the appropriate dereference variant at each read site:
-
-  - tipc_monitor() returns rcu_dereference_bh(...) for softirq callers
-    (tipc_mon_peer_up/down/remove_peer/rcv/prep/get_state).
-  - tipc_monitor_rtnl() returns rtnl_dereference(...) for RTNL-held
-    callers (tipc_mon_delete via bearer_disable, tipc_mon_reinit_self
-    via tipc_net_finalize_work which wraps in rtnl_lock(), and the
-    netlink dump handlers tipc_nl_add_monitor_peer /
-    __tipc_nl_add_monitor).
-
-Also, get_self() was a thin wrapper over tipc_monitor() + ->self deref,
-duplicating the RCU-checked load that callers already perform on entry.
-With monitors[] becoming __rcu, get_self()'s use of tipc_monitor()
-generates a lockdep splat in tipc_mon_delete() (RTNL context) because
-the inner load is rcu_dereference_bh().  syzbot CI reported this on
-v1/v2 of this patch:
-
-  WARNING: suspicious RCU usage in tipc_mon_delete
-  net/tipc/monitor.c:108 suspicious rcu_dereference_check() usage!
-  ...
-  tipc_monitor_rcu_bh+0xf5/0x110  net/tipc/monitor.c:108
-  get_self                        net/tipc/monitor.c:209
-  tipc_mon_delete+0x10b/0x4d0     net/tipc/monitor.c:704
-
-Drop get_self() entirely.  Each existing caller already has a valid
-mon pointer from its initial RCU-correct load, and mon->self is the
-result get_self() was returning.  Replace each "self = get_self(...)"
-with "self = mon->self;".  This both removes the duplicate dereference
-and fixes the lockdep splat.
-
-synchronize_rcu() in tipc_mon_delete() is placed after
-write_unlock_bh() and before timer_shutdown_sync() + kfree() so all
-softirq readers that already observed the old pointer have completed
-before the memory is freed.
-
-Fixes: 35c55c9877f8 ("tipc: add neighbor monitoring framework")
-Cc: stable@vger.kernel.org
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202604301148.jfXKC9HF-lkp@intel.com/
-Reported-by: syzbot ci <syzbot+ci779e8ed86620f383@syzkaller.appspotmail.com>
-Closes: https://ci.syzbot.org/series/6267bc07-4172-4821-b3e5-dac381479d9d
-Signed-off-by: SnailSploit | Kai Aizen <95986478+SnailSploit@users.noreply.github.com>
----
- net/tipc/core.h    |  2 +-
- net/tipc/monitor.c | 42 +++++++++++++++++++++++-------------------
- 2 files changed, 24 insertions(+), 20 deletions(-)
-
-diff --git a/net/tipc/core.h b/net/tipc/core.h
-index 9ce5f9ff6..cd582f7a2 100644
---- a/net/tipc/core.h
-+++ b/net/tipc/core.h
-@@ -109,7 +109,7 @@ struct tipc_net {
- 	u32 num_links;
- 
- 	/* Neighbor monitoring list */
--	struct tipc_monitor *monitors[MAX_BEARERS];
-+	struct tipc_monitor __rcu *monitors[MAX_BEARERS];
- 	int mon_threshold;
- 
- 	/* Bearer list */
-diff --git a/net/tipc/monitor.c b/net/tipc/monitor.c
-index a94b9b36a..0095a62ae 100644
---- a/net/tipc/monitor.c
-+++ b/net/tipc/monitor.c
-@@ -99,7 +99,14 @@ struct tipc_monitor {
- 
- static struct tipc_monitor *tipc_monitor(struct net *net, int bearer_id)
- {
--	return tipc_net(net)->monitors[bearer_id];
-+	return rcu_dereference_bh(tipc_net(net)->monitors[bearer_id]);
-+}
-+
-+/* tipc_monitor_rtnl - dereference monitors[] from RTNL-held control path. */
-+static struct tipc_monitor * __maybe_unused
-+tipc_monitor_rtnl(struct net *net, int bearer_id)
-+{
-+	return rtnl_dereference(tipc_net(net)->monitors[bearer_id]);
- }
- 
- const int tipc_max_domain_size = sizeof(struct tipc_mon_domain);
-@@ -192,13 +199,6 @@ static struct tipc_peer *get_peer(struct tipc_monitor *mon, u32 addr)
- 	return NULL;
- }
- 
--static struct tipc_peer *get_self(struct net *net, int bearer_id)
--{
--	struct tipc_monitor *mon = tipc_monitor(net, bearer_id);
--
--	return mon->self;
--}
--
- static inline bool tipc_mon_is_active(struct net *net, struct tipc_monitor *mon)
- {
- 	struct tipc_net *tn = tipc_net(net);
-@@ -358,7 +358,7 @@ void tipc_mon_remove_peer(struct net *net, u32 addr, int bearer_id)
- 	if (!mon)
- 		return;
- 
--	self = get_self(net, bearer_id);
-+	self = mon->self;
- 	write_lock_bh(&mon->lock);
- 	peer = get_peer(mon, addr);
- 	if (!peer)
-@@ -422,9 +422,12 @@ static bool tipc_mon_add_peer(struct tipc_monitor *mon, u32 addr,
- void tipc_mon_peer_up(struct net *net, u32 addr, int bearer_id)
- {
- 	struct tipc_monitor *mon = tipc_monitor(net, bearer_id);
--	struct tipc_peer *self = get_self(net, bearer_id);
-+	struct tipc_peer *self;
- 	struct tipc_peer *peer, *head;
- 
-+	if (!mon)
-+		return;
-+	self = mon->self;
- 	write_lock_bh(&mon->lock);
- 	peer = get_peer(mon, addr);
- 	if (!peer && !tipc_mon_add_peer(mon, addr, &peer))
-@@ -449,7 +452,7 @@ void tipc_mon_peer_down(struct net *net, u32 addr, int bearer_id)
- 	if (!mon)
- 		return;
- 
--	self = get_self(net, bearer_id);
-+	self = mon->self;
- 	write_lock_bh(&mon->lock);
- 	peer = get_peer(mon, addr);
- 	if (!peer) {
-@@ -651,7 +654,7 @@ int tipc_mon_create(struct net *net, int bearer_id)
- 	struct tipc_peer *self;
- 	struct tipc_mon_domain *dom;
- 
--	if (tn->monitors[bearer_id])
-+	if (rtnl_dereference(tn->monitors[bearer_id]))
- 		return 0;
- 
- 	mon = kzalloc_obj(*mon, GFP_ATOMIC);
-@@ -663,7 +666,7 @@ int tipc_mon_create(struct net *net, int bearer_id)
- 		kfree(dom);
- 		return -ENOMEM;
- 	}
--	tn->monitors[bearer_id] = mon;
-+	rcu_assign_pointer(tn->monitors[bearer_id], mon);
- 	rwlock_init(&mon->lock);
- 	mon->net = net;
- 	mon->peer_cnt = 1;
-@@ -682,16 +685,16 @@ int tipc_mon_create(struct net *net, int bearer_id)
- void tipc_mon_delete(struct net *net, int bearer_id)
- {
- 	struct tipc_net *tn = tipc_net(net);
--	struct tipc_monitor *mon = tipc_monitor(net, bearer_id);
-+	struct tipc_monitor *mon = tipc_monitor_rtnl(net, bearer_id);
- 	struct tipc_peer *self;
- 	struct tipc_peer *peer, *tmp;
- 
- 	if (!mon)
- 		return;
- 
--	self = get_self(net, bearer_id);
-+	self = mon->self;
-+	RCU_INIT_POINTER(tn->monitors[bearer_id], NULL);
- 	write_lock_bh(&mon->lock);
--	tn->monitors[bearer_id] = NULL;
- 	list_for_each_entry_safe(peer, tmp, &self->list, list) {
- 		list_del(&peer->list);
- 		hlist_del(&peer->hash);
-@@ -700,6 +703,7 @@ void tipc_mon_delete(struct net *net, int bearer_id)
- 	}
- 	mon->self = NULL;
- 	write_unlock_bh(&mon->lock);
-+	synchronize_rcu();
- 	timer_shutdown_sync(&mon->timer);
- 	kfree(self->domain);
- 	kfree(self);
-@@ -712,7 +716,7 @@ void tipc_mon_reinit_self(struct net *net)
- 	int bearer_id;
- 
- 	for (bearer_id = 0; bearer_id < MAX_BEARERS; bearer_id++) {
--		mon = tipc_monitor(net, bearer_id);
-+		mon = tipc_monitor_rtnl(net, bearer_id);
- 		if (!mon)
- 			continue;
- 		write_lock_bh(&mon->lock);
-@@ -798,7 +802,7 @@ static int __tipc_nl_add_monitor_peer(struct tipc_peer *peer,
- int tipc_nl_add_monitor_peer(struct net *net, struct tipc_nl_msg *msg,
- 			     u32 bearer_id, u32 *prev_node)
- {
--	struct tipc_monitor *mon = tipc_monitor(net, bearer_id);
-+	struct tipc_monitor *mon = tipc_monitor_rtnl(net, bearer_id);
- 	struct tipc_peer *peer;
- 
- 	if (!mon)
-@@ -827,7 +831,7 @@ int tipc_nl_add_monitor_peer(struct net *net, struct tipc_nl_msg *msg,
- int __tipc_nl_add_monitor(struct net *net, struct tipc_nl_msg *msg,
- 			  u32 bearer_id)
- {
--	struct tipc_monitor *mon = tipc_monitor(net, bearer_id);
-+	struct tipc_monitor *mon = tipc_monitor_rtnl(net, bearer_id);
- 	char bearer_name[TIPC_MAX_BEARER_NAME];
- 	struct nlattr *attrs;
- 	void *hdr;
--- 
-2.43.0
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
