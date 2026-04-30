@@ -1,195 +1,175 @@
-Return-Path: <netdev+bounces-282680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282681-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gP2+HRME82nawgEAu9opvQ
-	(envelope-from <netdev+bounces-282680-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:26:11 +0200
+	id +HSgBvwG82lHwwEAu9opvQ
+	(envelope-from <netdev+bounces-282681-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:38:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 220B049E97D
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:26:11 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F85749EBAA
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:38:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ADE703037682
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 07:22:32 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0A57930055F3
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 07:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 670CC3A16A2;
-	Thu, 30 Apr 2026 07:22:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4FEB3E5594;
+	Thu, 30 Apr 2026 07:38:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="lIRYhsmR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E99322768
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 07:22:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C14C93D9033;
+	Thu, 30 Apr 2026 07:38:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777533752; cv=none; b=OKMaA/qHUEWJP0S7ktc68XsR9D3bHsukYtWtutVLWcJ8G70COSiRBeQC7/lUTPLQkBGZoZOMlcJenoEA3crKjm0EWUZvXJQKSQxoHqo+W+3aCpIjKRBMsLuVM4d6/fHmgjvKSvlJTloYi9LpLhN6XjgCi5voBo8RhBZB31hOwkA=
+	t=1777534707; cv=none; b=iTmxNfxrUHrf+FnH3IFoZunZjt1dG1gn6JcTfxPY/r2lMVL/au33croMQLW44E3UVEqVquQ21HnPjAKUzvGm+Wr1Lxxvq9p6aqo5IphtVt70khr9awrfj36WXtmNd6uuORhnFVkTFYJ6qbLSqSlyM+VaSr2bZAU91aRPl++ZONw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777533752; c=relaxed/simple;
-	bh=sC5MVFkAnZyx3mcfwly5Dgffg29w2p4oxdEcKWACiJM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BVm6x22kIOXjGPblsGoEgo9viATlRPZyEZ6WFsMVnGCfrtpya+28rOjWuJlStelkAlf90GJD4qvjEYfHg9smDJWxYriP0KqVscs7P2DbYm1VE/7aD7DOrNfYvFsCMdacnH9Ri2AZgxWBY6IeqxqgZU9RvA/llO1RVwmfvFXdX1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.217.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-60579e72ff9so438259137.1
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 00:22:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777533750; x=1778138550;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Bp0BgOGCYFNvjRA6ZumN87R8na6iqe2i6++f2ynASA0=;
-        b=otlgiQoSPtWOQ5KSEbxgO7cUuFnaPU41uGNM+jA8W3h10AD6fomZiRf6MAH7nsQEcG
-         dVLK36ur9A0PYtV25wlb3muxK5aw7ze54KnQzaq8GDuj9uiI1sDA/Jbz4Qq3FkaZ7FLq
-         cHRIv7eeoG4Z67yyJquYlazphc2QNPo+aun1UBeYkJMQH418m1SeSwGDgvad00oiXq4E
-         KQxpbNALceZDMEUG3N3eSmbJGQFvIfS/KUs9qoIXa3EIKL9cIa3oHpiVLsgPxXGR+Rw4
-         gc6dqLeD6fY39wOpt3C1xiNlEEbX9mHG8LaSaCB8wZlS8G/oYETZt+UX+ED6VIeBfOW6
-         osTQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8Su8sTsYGR7qomApOUC2VrSWI845vWmd9p3p4swawAj61KHDRwx8YBJNhIFt9JZc/CGJgxbCc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQbEPSVd1RlVOdWKpXsGig9WBwYkLnqxKBdGME6Md7IVexvzrm
-	/FOHCMqPAV8Q8fnqKh7VBUTVr+FpEhS24+uKjBW555LI7+PdvjRfkSZx175AVJ0RP7I=
-X-Gm-Gg: AeBDiesTUoqfvTZmcWFz2LXPu6ySVihcLuWu4ym6xBbAXvzoqA4jfrin9QUHl9RgYcU
-	jo8wBCQZb2+i1KbyNavYE3w/UCMGYAWnjgBhHrs2umW3tBmD2BtBmprctIrqFjXjxvHHfX/El5f
-	BjwWPhHectB4l7gHQoUPPqEx984tFenkRWno5rKla/IQxIjwzspE2hF4y+GeHsNEDC8JD9tkoq0
-	yL7wSf5vfV6N6GgkE7nc18cnq4KsRsPHBWVUNFzYSi9fjEd0u0rR8gCMAD2+IuJEcLNB3YXVn9n
-	ECIMFPL+bQVrC7vv1KgQzlKjyKU0uOLdeuo9Mb7sZkCQ4ZierBpQp4RUJ+9Ie5YMbowi3YVjgxY
-	zEhiuG6wbupHusivyQRR0eTCeFU8KKwJMV0tNMMmWJwnTtPzCoxZt76CziQvTyLFQuaW5QGL8ny
-	zLnc5zADsWaRHAgNbRgeOH9XrPl1SLfqxIf4VAKOq7lzwamATNEa7+OEaKxlOotIgDHXUPNhw=
-X-Received: by 2002:a05:6102:8494:20b0:605:6468:bc86 with SMTP id ada2fe7eead31-62af93e22c6mr237092137.0.1777533749902;
-        Thu, 30 Apr 2026 00:22:29 -0700 (PDT)
-Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com. [209.85.222.44])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-62984335909sm2531425137.8.2026.04.30.00.22.29
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Apr 2026 00:22:29 -0700 (PDT)
-Received: by mail-ua1-f44.google.com with SMTP id a1e0cc1a2514c-94ab69af6c8so1069835241.0
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 00:22:29 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ9635QrlPN+RTw/qOM5q8cL6xASpvWPDjEtRAyLwI8g4CS33ek2YgInGnsCsTIUVkt21ZB8EKU=@vger.kernel.org
-X-Received: by 2002:a05:6102:5489:b0:607:4fe2:d33f with SMTP id
- ada2fe7eead31-62afe60dacdmr375755137.12.1777533748960; Thu, 30 Apr 2026
- 00:22:28 -0700 (PDT)
+	s=arc-20240116; t=1777534707; c=relaxed/simple;
+	bh=eksxvsbDdZZrboXO7N34nKTHzByTtlomhkQCFHWIglU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=p8FHoSTlDKmQCj6hHf3dt381wBJKcIBs0wxPT3Fxm9gfmRRWd803PbZt9bJsB4o0U3ZVgvQsnLkMTHAeUfLzDwCBDVKBNtq5Lb/9l+nsfGQt6E3J8JdZ342op061u7GPNOcit01n8WFk/XrfQPpsiy6oOF7aCJf3NRq6hR0N+JQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=lIRYhsmR; arc=none smtp.client-ip=213.160.73.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
+Received: by dvalin.narfation.org (Postfix) id 8D1E21FF8D;
+	Thu, 30 Apr 2026 07:38:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
+	s=20121; t=1777534689;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lrWkfmosicCb3bXJFi7fcRxV+xZwfl91sGSlkgUQsYQ=;
+	b=lIRYhsmRno4XToAYKY2FN2Yf2DHcu3M89tJ61RllITajpDHavnbrB9y/rvnvS4DO552Wd4
+	uenZSsUW14sY/31l0lDlw+Qil/Gyx3SXQ31nHgZ1Abu7UiInN0kpvkOJ2X12xvEhugmWjy
+	GQ5lU0m7EOMjfYFqSj9+poDsf0nd+tg=
+From: Sven Eckelmann <sven@narfation.org>
+To: stable@vger.kernel.org, Haoze Xie <royenheart@gmail.com>,
+ Robert Garcia <rob_garcia@163.com>
+Cc: Simon Wunderlich <sw@simonwunderlich.de>,
+ Robert Garcia <rob_garcia@163.com>, Yifan Wu <yifanwucs@gmail.com>,
+ Juefei Pu <tomapufckgml@gmail.com>, Yuan Tan <yuantan098@gmail.com>,
+ Xin Liu <bird@lzu.edu.cn>, Ao Zhou <n05ec@lzu.edu.cn>,
+ Marek Lindner <mareklindner@neomailbox.ch>,
+ Antonio Quartulli <a@unstable.cc>, "David S . Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ b.a.t.m.a.n@lists.open-mesh.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Sasha Levin <sashal@kernel.org>
+Subject:
+ Re: [PATCH 5.15.y] batman-adv: hold claim backbone gateways by reference
+Date: Thu, 30 Apr 2026 09:38:05 +0200
+Message-ID: <1857579.VLH7GnMWUR@ripper>
+In-Reply-To: <20260430071645.3030702-1-rob_garcia@163.com>
+References: <20260430071645.3030702-1-rob_garcia@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260429145624.2948432-1-arnd@kernel.org> <20260429145624.2948432-2-arnd@kernel.org>
-In-Reply-To: <20260429145624.2948432-2-arnd@kernel.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 30 Apr 2026 09:22:17 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdUTafaCe+M5GEi-35=92eTJ++U+TfUShw-aV6uifnkgTw@mail.gmail.com>
-X-Gm-Features: AVHnY4KVIcY2rUp9jOsemm_MlRAb0mCVWFgMZJUFzGZGfCliMz66tg3ZVORjG4o
-Message-ID: <CAMuHMdUTafaCe+M5GEi-35=92eTJ++U+TfUShw-aV6uifnkgTw@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] ne2k: fold drivers/net/Space.c into ne.c
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Simon Horman <horms@kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, "Borislav Petkov (AMD)" <bp@alien8.de>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 220B049E97D
+Content-Type: multipart/signed; boundary="nextPart8717455.NyiUUSuA9g";
+ micalg="pgp-sha512"; protocol="application/pgp-signature"
+X-Rspamd-Queue-Id: 0F85749EBAA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-3.76 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[narfation.org,none];
+	R_DKIM_ALLOW(-0.20)[narfation.org:s=20121];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-282680-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[linux-m68k.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com,163.com];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-282681-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[narfation.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.612];
+	FROM_NEQ_ENVFROM(0.00)[sven@narfation.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[simonwunderlich.de,163.com,gmail.com,lzu.edu.cn,neomailbox.ch,unstable.cc,davemloft.net,kernel.org,lunn.ch,lists.open-mesh.org,vger.kernel.org];
 	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux-m68k.org:email,arndb.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[simonwunderlich.de:email,narfation.org:dkim,narfation.org:email,lzu.edu.cn:email]
 
-On Wed, 29 Apr 2026 at 16:58, Arnd Bergmann <arnd@kernel.org> wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> drivers/net/Space.c is the last remnant of the linux-2.4.x driver model
-> that required each subsystem and device driver init function to be called
-> from init/main.c explicitly, before the introduction of initcall levels.
->
-> In linux-7.0, this was only used for a handful of ISA network drivers,
-> with the ne2000 driver being the last one.
->
-> Fold the code into ne.c directly, with minimal changes to preserve
-> the existing command line parsing.
->
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+--nextPart8717455.NyiUUSuA9g
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
+From: Sven Eckelmann <sven@narfation.org>
+Date: Thu, 30 Apr 2026 09:38:05 +0200
+Message-ID: <1857579.VLH7GnMWUR@ripper>
+In-Reply-To: <20260430071645.3030702-1-rob_garcia@163.com>
+References: <20260430071645.3030702-1-rob_garcia@163.com>
+MIME-Version: 1.0
 
->  Documentation/arch/m68k/kernel-options.rst    |  24 +-
+On Thursday, 30 April 2026 09:16:45 CEST Robert Garcia wrote:
+> From: Haoze Xie <royenheart@gmail.com>
+> 
+> [ Upstream commit 82d8701b2c930d0e96b0dbc9115a218d791cb0d2 ]
+> 
+> batadv_bla_add_claim() can replace claim->backbone_gw and drop the old
+> gateway's last reference while readers still follow the pointer.
+> 
+> The netlink claim dump path dereferences claim->backbone_gw->orig and
+> takes claim->backbone_gw->crc_lock without pinning the underlying
+> backbone gateway. batadv_bla_check_claim() still has the same naked
+> pointer access pattern.
+> 
+> Reuse batadv_bla_claim_get_backbone_gw() in both readers so they operate
+> on a stable gateway reference until the read-side work is complete.
+> This keeps the dump and claim-check paths aligned with the lifetime
+> rules introduced for the other BLA claim readers.
+> 
+> Fixes: 23721387c409 ("batman-adv: add basic bridge loop avoidance code")
+> Fixes: 04f3f5bf1883 ("batman-adv: add B.A.T.M.A.N. Dump BLA claims via netlink")
+> Cc: stable@vger.kernel.org
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+> Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+> Suggested-by: Xin Liu <bird@lzu.edu.cn>
+> Signed-off-by: Haoze Xie <royenheart@gmail.com>
+> Signed-off-by: Ao Zhou <n05ec@lzu.edu.cn>
+> Signed-off-by: Sven Eckelmann <sven@narfation.org>
+> Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
+> Signed-off-by: Robert Garcia <rob_garcia@163.com>
 
-Acked-by: Geert Uytterhoeven <geert@linux-m68k.org> # m68k
+See https://lore.kernel.org/r/20260413125407.85603-1-sven@narfation.org for 
+the original backport. Can you explain further why you send a new version?
 
-> --- a/Documentation/arch/m68k/kernel-options.rst
-> +++ b/Documentation/arch/m68k/kernel-options.rst
-> @@ -244,23 +244,7 @@ drive (with "root=").
->  3) General Device Options (Amiga and Atari)
->  ===========================================
->
-> -3.1) ether=
-> ------------
-> -
-> -:Syntax: ether=[<irq>[,<base_addr>[,<mem_start>[,<mem_end>]]]],<dev-name>
-> -
-> -<dev-name> is the name of a net driver, as specified in
-> -drivers/net/Space.c in the Linux source. Most prominent are eth0, ...
-> -eth3, sl0, ... sl3, ppp0, ..., ppp3, dummy, and lo.
-> -
-> -The non-ethernet drivers (sl, ppp, dummy, lo) obviously ignore the
-> -settings by this options. Also, the existing ethernet drivers for
-> -Linux/m68k (ariadne, a2065, hydra) don't use them because Zorro boards
-> -are really Plug-'n-Play, so the "ether=" option is useless altogether
-> -for Linux/m68k.
-> -
-> -
-> -3.2) hd=
-> +3.1) hd=
+Sasha Levin <sashal@kernel.org> picked it up for 5.15.y (on Sun, 19 Apr 2026 
+21:13:58 -0400, MsgId 20260419195610.batman-adv-5.15@kernel.org). 
+Yes, it was not yet published or 5.15 - so maybe fell through the cracks.
 
-[...]
+Regards,
+	Sven
+--nextPart8717455.NyiUUSuA9g
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
 
-> -3.3) max_scsi_luns=
-> +3.2) max_scsi_luns=
+-----BEGIN PGP SIGNATURE-----
 
-[...]
+iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCafMG3QAKCRBND3cr0xT1
+y41NAQDcrtNDGgWALEYpUXSE0WJzqoMrzlHp9SPLAwNG0wQnAgD+KXx7wBA9AmQ5
+m9xfCxUXBRwKccOO0RwYSOtd4QP3igY=
+=5+3O
+-----END PGP SIGNATURE-----
 
-> -3.4) st=
-> +3.3) st=
+--nextPart8717455.NyiUUSuA9g--
 
-[...]
 
-> -3.5) dmasound=
-> +3.4) dmasound=
 
-So that's why you should leave numbering to the tooling ;-)
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
 
