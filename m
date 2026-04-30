@@ -1,92 +1,92 @@
-Return-Path: <netdev+bounces-282798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282799-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uLmII3g+82kGywEAu9opvQ
-	(envelope-from <netdev+bounces-282798-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 13:35:20 +0200
+	id SEV+CCw882mFygEAu9opvQ
+	(envelope-from <netdev+bounces-282799-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 13:25:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 897554A2371
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 13:35:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 976314A20AD
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 13:25:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4185E3025E0C
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 11:20:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D5A0630131D4
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 11:20:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 280DA3DD52D;
-	Thu, 30 Apr 2026 11:17:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6621D3F0A8C;
+	Thu, 30 Apr 2026 11:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ojUat8+/"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="BWYg6a3j"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010008.outbound.protection.outlook.com [52.101.201.8])
+Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012063.outbound.protection.outlook.com [40.107.209.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31F8D23EA89;
-	Thu, 30 Apr 2026 11:17:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF983E717F;
+	Thu, 30 Apr 2026 11:17:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.63
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777547859; cv=fail; b=CMk0aR5VI7fo4y+Y7M8gc+a1fQIAWhdplqR+3hyF4+1hz7gx3bBHLZM7mcSj+s94Et1O39j9dG/Okb/UArq7rRdGOShHPfCy14nVBfVYnm5ozFW6ZNpKMw6AHW/BqDiYpkuIEomh6axcbDKhkB250IJTefl5BOLXCCXqVnkh6BM=
+	t=1777547863; cv=fail; b=TPTqdQaY7OP6J65HwgE6oORuyG9Now5OpmdOjq3OC7U4ocLmpN3o97LqDDBJoz9EUtdTm2FM6XdeVIPj0ygmiiMdiBct8oJWnWIwgq2Pgx6eHNPCeFM+G2DQkeSUdNKmIRs5rXftRFDToC9Evx9lrM4GpzDcK83nau2MR6F4C2c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777547859; c=relaxed/simple;
-	bh=41Tk0gUeuWPvAJyRQa+pWjoOSa13hAmf/+Yk5qnL/wQ=;
+	s=arc-20240116; t=1777547863; c=relaxed/simple;
+	bh=LM5BVsDAqtfujOtXZ3OT1UDjgSlh4yPBZpj0mX/BHMM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RErEOIJg/3tUXVGkWjRCKbm79gKfaTmmKGCLI6KFAJiEfqfrELLOgTQHyzAg3zYn3M40BI7OATXFMQB1/I8wxfDnS2HQs/BomG5Qx2KqzL3Ou7cKNwavWCKmZSEkEVZjyMlDKs7syZfMZhd5CVYwGRczsVF9+83hXaFu8nKl70c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ojUat8+/; arc=fail smtp.client-ip=52.101.201.8
+	 MIME-Version:Content-Type; b=WM8VqzkAHDVa+49EQpoFC/LM5futHES1iPcZyYXjIpioG0oodmgt7CzKo+IyUUeSSupo4Yz9V+NxeGLnO6mV8RZvnI9Vq4x+IjYSy+YE3VNHXdvc0MpJMLum+f80wEk3lcZFO/sCpNGiz1fhSIbUBJGBGFNu5Qc8bfZV4EEXWSE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=BWYg6a3j; arc=fail smtp.client-ip=40.107.209.63
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Mai1xaPqjBL+yFgjOpu5vtxEjdZHuOmbQz9X3wQqfqmQas+PdT2IsUn1psBSMc+ytnGKSSd5fa2DLlbchQG93LKobQQqe9kELUAwi2yd9Qi5MKtCvCiJpbdFvvGB5ebLfTptan+cmOX+r9ouONT1oJJVt6mJW1ww2/PBL2XvOXA4NbYTBwWd4PBmjzy1poPkt2q3WI9Qfir5NKzmTVlSZi9xNDU1uJNZehY+V1aAq+VD7mxAvrm6kAhX8S3UknxMPenrhwaguQWUP8DUqr6qlxkS/TMBsbGUBs5OP1qXqUUQg1qssY0P/3yf8bH27wZwxG3nPw+QdrBiMElROLBy5Q==
+ b=iyndqoW9ngIu7ZX0V2KveEpqfI5AjTB9JAQc2z8E+BZqnyu4MjuGsdDew6NvyHSRXuwapeQEU70Wvonq6l3f0bRjAScHzEZ8rvrb/wTcd68KT0fG/gJ/7wSDMqqXPo1s/PMnbIBUj11DsBt8p6nyjEPm1eMw0OXdbBOCAwERavUUZpWHWQtM/jnsncBiT2wyLLlg4QlP9V4NLWbIshOpVdNKGtE0Hq03AbBqiDfUN5Ka2IG3wJkDZbCD/2gap5devcZ6DkYIwh1o3LXLgPeLP1TR1A/Tzi/jCJOh7dfk2dX0oTsTlVZrJj+e9/VNemtVxYsTwUcKlSoPOB0hqu/Hhw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=a+UBH12pjfNxwqS0RoBvyUFQwL6rKVWN5GA14EfBt6A=;
- b=GOWwzl5Ok5zcAjbadKi7dKS55tWhhCjvnAPFQZeAMh86cHApReaRMrEFgJUo6l7CvFOb2xVWHRpzOCcqotEDlddPt7bUV7lJhCYZimEO5lkzg5uuWlPizIOg61iY8fJeX7g8vSi0+lX6mG/2ZZVM6DI0U9xlakYqw1jkHlGZL2JfOlJ6YZzchQeVCbSzEoa/1tpEJtLqhxXjV2bJavLVq2oP7jl2kYwsOS32oMBOT3jnw913e+noNm11DwiCapxli40N0WN2ZsEymqXUu7FKCv3y8zjUNws5IxQfxG/NY1HCyiRLs/mDv1HCsks602v4oeIGablnDhQ8VKWxc/uw5g==
+ bh=nRgxgyv5nll+HnAKrl7rA6TjK1HbJdnxpOZOlYaG/eo=;
+ b=FRQHNOI7BbSXuGOC3aVf9vtalwE30YhPTxiYpEWyfAE5G7fjEQLaJBm0VWZOo5PChkUgEJBpL57BefVnT1ohU2MTfra1lz6yOcDgwZHT3QET908z9hsVn2nPwAjOR4Pdehs2Q68Lr6oxap41pTpq2RE0vX5QKTvmqhLMbqxmfEnlGzizRmdaL2dpaUXUQiyDiJUdWJhdu5+1bUJwjNlbAEP4bVdtC7/RwzhyTKq+V7w3NEd2CPRFZB9V8q4+drxXcCuEaiJR4YO/pJuo1FKZJDP1XQM9Irmkv9OsByfvYFxtKDsd/esqOPdCDPi8+1fI0HLWvtg+W4pACW5lISpkfg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.23.195) smtp.rcpttodomain=linux.dev smtp.mailfrom=ti.com; dmarc=pass
+ 198.47.23.194) smtp.rcpttodomain=linux.dev smtp.mailfrom=ti.com; dmarc=pass
  (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
  (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=a+UBH12pjfNxwqS0RoBvyUFQwL6rKVWN5GA14EfBt6A=;
- b=ojUat8+/ZCYrvbUYc9NuHQqWPs37Yr9/SYGoBByCXJ0ZZKfhdNMRRfElPnW0ozJSvhrGCzY7GiPOnmk+z6MYhRlYoLvdXa7tG6IMzFYPfVezU1nOOouBm8oBdsW1ymQFKkqcLj8B+k/4Diazxr5b1aI1YRL6GJvqF7P0lqgyeoo=
-Received: from BL1PR13CA0371.namprd13.prod.outlook.com (2603:10b6:208:2c0::16)
- by IA3PR10MB8185.namprd10.prod.outlook.com (2603:10b6:208:509::14) with
+ bh=nRgxgyv5nll+HnAKrl7rA6TjK1HbJdnxpOZOlYaG/eo=;
+ b=BWYg6a3jpsfpnwb70GvuOgvfY64Nb4lXqgrI91FyQNL2HCiYCcQq/TV+s0tGjU2mYkCoiArlK2Ecze2td3Q+DzoDZH6a9GsPeIomtv7eP8xH62shVF/XPHZZQn644YigxI1TwgfjW1587rpe0hmkwLM9wVZ/7BJcSMZ2dBOD9iU=
+Received: from BYAPR08CA0069.namprd08.prod.outlook.com (2603:10b6:a03:117::46)
+ by MN6PR10MB7542.namprd10.prod.outlook.com (2603:10b6:208:46d::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.26; Thu, 30 Apr
- 2026 11:17:33 +0000
-Received: from BL02EPF0001A108.namprd05.prod.outlook.com
- (2603:10b6:208:2c0:cafe::3f) by BL1PR13CA0371.outlook.office365.com
- (2603:10b6:208:2c0::16) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9846.26 via Frontend Transport; Thu,
- 30 Apr 2026 11:17:33 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.195)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.20; Thu, 30 Apr
+ 2026 11:17:38 +0000
+Received: from SJ1PEPF00001CE3.namprd05.prod.outlook.com
+ (2603:10b6:a03:117:cafe::bf) by BYAPR08CA0069.outlook.office365.com
+ (2603:10b6:a03:117::46) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9846.30 via Frontend Transport; Thu,
+ 30 Apr 2026 11:17:37 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.194)
  smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
  action=none header.from=ti.com;
 Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.23.195 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.23.195; helo=lewvzet201.ext.ti.com; pr=C
-Received: from lewvzet201.ext.ti.com (198.47.23.195) by
- BL02EPF0001A108.mail.protection.outlook.com (10.167.241.138) with Microsoft
+ 198.47.23.194 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.23.194; helo=lewvzet200.ext.ti.com; pr=C
+Received: from lewvzet200.ext.ti.com (198.47.23.194) by
+ SJ1PEPF00001CE3.mail.protection.outlook.com (10.167.242.11) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9870.22 via Frontend Transport; Thu, 30 Apr 2026 11:17:33 +0000
-Received: from DLEE202.ent.ti.com (157.170.170.77) by lewvzet201.ext.ti.com
- (10.4.14.104) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.9846.18 via Frontend Transport; Thu, 30 Apr 2026 11:17:37 +0000
+Received: from DLEE205.ent.ti.com (157.170.170.85) by lewvzet200.ext.ti.com
+ (10.4.14.103) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 30 Apr
- 2026 06:17:32 -0500
-Received: from DLEE209.ent.ti.com (157.170.170.98) by DLEE202.ent.ti.com
- (157.170.170.77) with Microsoft SMTP Server (version=TLS1_2,
+ 2026 06:17:35 -0500
+Received: from DLEE207.ent.ti.com (157.170.170.95) by DLEE205.ent.ti.com
+ (157.170.170.85) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 30 Apr
- 2026 06:17:32 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE209.ent.ti.com
- (157.170.170.98) with Microsoft SMTP Server (version=TLS1_2,
+ 2026 06:17:35 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE207.ent.ti.com
+ (157.170.170.95) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Thu, 30 Apr 2026 06:17:32 -0500
+ Transport; Thu, 30 Apr 2026 06:17:35 -0500
 Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 63UBHWRr1243123;
-	Thu, 30 Apr 2026 06:17:32 -0500
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 63UBHZTu1000506;
+	Thu, 30 Apr 2026 06:17:35 -0500
 Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 63UBHVPK031193;
-	Thu, 30 Apr 2026 06:17:31 -0500
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 63UBHYIk031199;
+	Thu, 30 Apr 2026 06:17:35 -0500
 From: Meghana Malladi <m-malladi@ti.com>
 To: <vadim.fedorenko@linux.dev>, <haokexin@gmail.com>,
 	<jacob.e.keller@intel.com>, <horms@kernel.org>, <m-malladi@ti.com>,
@@ -97,9 +97,9 @@ To: <vadim.fedorenko@linux.dev>, <haokexin@gmail.com>,
 CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <srk@ti.com>, Vignesh Raghavendra
 	<vigneshr@ti.com>
-Subject: [PATCH net-next v5 1/2] net: ti: icssg-prueth: Add Frame Preemption MAC Merge support
-Date: Thu, 30 Apr 2026 16:47:22 +0530
-Message-ID: <20260430111723.497113-2-m-malladi@ti.com>
+Subject: [PATCH net-next v5 2/2] net: ti: icssg-prueth: Add ethtool ops for Frame Preemption MAC Merge
+Date: Thu, 30 Apr 2026 16:47:23 +0530
+Message-ID: <20260430111723.497113-3-m-malladi@ti.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260430111723.497113-1-m-malladi@ti.com>
 References: <20260430111723.497113-1-m-malladi@ti.com>
@@ -114,32 +114,32 @@ Content-Type: text/plain
 X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0001A108:EE_|IA3PR10MB8185:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7b5b3230-d09a-48f8-60c6-08dea6aa1353
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE3:EE_|MN6PR10MB7542:EE_
+X-MS-Office365-Filtering-Correlation-Id: b2c03c0f-6666-4b7b-da4d-08dea6aa15bc
 X-LD-Processed: e5b49634-450b-4709-8abb-1e2b19b982b7,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|82310400026|1800799024|36860700016|921020|13003099007|22082099003|18002099003|56012099003;
+	BCL:0;ARA:13230040|82310400026|7416014|376014|1800799024|36860700016|921020|56012099003|22082099003|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	puNJpbrgKqPfjtfO11K2q0t5U34jh0ZM2PAPIyljHmAiN1oXBSPwSK5xp03hadN3kb37ch09JcjOvGdGoyVaPv2oCHW5dBSyiZusOVUa5LPAa8072IHpd5gO1+eHoi65KuhKCxpF0fxkSugoo875qxifBf9WZzGX1hP56GTEkpEExWs9H9mAZem15Zw6M14LYnF3eQFTwrx4LD3L4bbhAW9UQH8kQXbDDrpv15wlvNiJtII+gcPKkFfA4sw1w1lmRqvimHrvLDUgfs5p1YARPA6pOnZ/LMW5BTEl4zGNaSk1S+vs/4TxTSpEZEfBmmVLsUUaZvxyZN15geic1hY6iIgiquZDpx7ks/sb7f9a0YJJD0EauSX1YVjrK7KpvuXe0a4QQT06I+9UPnbtXs0JOX9eiAAeH4YnZfNuew76Gc8nUlkJtHUa4NSaWt5CEd72CeCIj1sAoAsi1qNlgHbM4KabJJCxjfkT/A46qjBWFe40ljpQ4QoZmkYvL6JFMCNWIqAosQum+9qBChUg7YoTrZeVxEpoJVR3Adj4qUHsyI2YHs19igVWlKxKEj+dMzw7LqJqFmiDH8QriK0xHbEFIXauD/LNqXcGVK1Y3mwPwl48M0bADBs5HG+atN9DNXv1M625kG2l2weDdOH6cqn/AyhWDjiPySp8w0+LuBsThCBB4TAdVNDHk4yKnAUwfubJJZfokOXWVPNSuLUKqUE5BYRQoUJMMErnhDf4xtL17WkouDB+flFJPmfHrvhWvaFomLvNlkn3gdOKvjlXJ2sYvQ==
+	wpji/iw8ZbKNZ8XzjETsXoenby5XkRQbozU/cJ8mW+lGg2anIJp1ss2xn59/HVEnGT6PiunG/3aV7eKmlGsWWQl/5lWz47msR3+Cy2G69iIBjps6QrGIrxl3sh1uEv64cxtvBazijwLcqjXVkch6O1u5vn997PMdUBDrHkhQPsiWJbvztE3tKLgWNiC+U1opb1myM1CGJ3+MyQ/Ul0mlxJ5zwrXHAkTI9yfPQpZ3D4dBtkObGQGuIacbQx6xlfeO4a3TK0dzcJwfWC2oHawgxudLs6pLY6dktbV6Kfk4G6fhfcBOquq70c0yErgk7WauLKTtLGQqkLrFouP03h2NX3l3uwF58zP1JjhE6innvOnqqKAzwVKVT0WHF98C0wrHOkDEw1EmZ6ocRV+uCGVw/u+T8+QeRJbfG0zX89O7yS/qICaxuQdphklKFGm0lbafbKMGVTD/I/1GbB6dZr8pi6VvR7sgdd6vRSC2BebXphPYqhUSWusJbSp3flI5H2RjKr5zH95fPizXzp/zeau/p171DC6h1GGxReqPBiSmUdDo2UivRHv2gk937wq2z8f9YxjXnDft3agYhgrklh11OQbxyYf+wMBewmlzvmvkxZ65E5U0Dc3W0jxZrwIPVqbPEZ76sZTFsm34iEYJGYyNWU411XdbCPdfNAnPNQ/niHJa9Kr25yFI64j9heyuZ3f5hQA4FqewvhlHFo2QMjZQvwr8iW458EOcxGltdjDy369ss/0wkQuESkAaOoWTazpV0bt39o143brJEFo6wMZQ6uwy8JeqQo7N1D8TwhqFKPq3uQ/2vV0nsB9B7mgt+HWv
 X-Forefront-Antispam-Report:
-	CIP:198.47.23.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet201.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(82310400026)(1800799024)(36860700016)(921020)(13003099007)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+	CIP:198.47.23.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet200.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(7416014)(376014)(1800799024)(36860700016)(921020)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	Cq/ehRqEudpsYr0vomHSuTxJ3eWk+Ueg3g/D6Dz9lVXp/qGgjv5JwJp08HXml0W20YUXSEFBBWsE2mRkvs7+LtB782pfZOhoI2U0vjOGJnWNU2ReGi3TcRiu2VmlvDKn/aNEHpJ9MNTZLeTDeAW8qmhWXrhVUIUkDcg75AeKjj5qWW4yGXkTGweEGLsoqyQ4EfJnLG+io40lGvnGXHtabVsVsNrKL3IfRueWBLtpieYNMYdml9PTaUQp2Np9sNKahY8nU9NMPMsdMi0RCFGIQm3fhDvcMrKTpCbLgooHd97SPGoLjdXK76kVnIYflnwsm0jVnOoP7XRpexebDaH15aXye0Hz1YeZjErAnF8Pkm9YESD/WvUN3hxWlqgDsUjjy0FMM2bRIWw14a/3N7Hhn68TkkHjbqUXOev8N6VmPiJFaRiQ7UgAMS5E+l93I7oC
+	ZkpmaQ7YgdobTRiY8ls3pokbSebXp9vfuniWA4AP8hr+SKB29UBos4MK+YTDCIOrK1PvbXuWQZ3IwRnTpPId33OFiGRJej6cwtzWdDp0TuZTxTuzSziw51cJ/s6+2ehOgFhdc4hQ8+sIp1mrnRCOoK3DaZVz4kndRZnRsTx6b0xdEqHj1c6fVPvITRCPStAgO89+3Gapk7J6EFxc+F+9Y2GvvpybEN9LMrTeMUR0nnXySdkZ99o5+5i5LA4u5YHvBVg0LZt6e5HKPfZTG9stSNj1wdp0OV2rFhKYe5+EAWZdDmxqxCSnpTLYsmcjCxzj6rLI5ulQhmn9zsgEn53Nv3R+z1U4MagyJVdZdUEpCqd2LLX8S+Vfats0Z3IQEs0X3gA5KEfAfjbD985XWn1r+7u7+ZsauavPwWWsKAFjU+FtcOmTs2N98KFwFRkO/kdG
 X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2026 11:17:33.0916
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2026 11:17:37.1220
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7b5b3230-d09a-48f8-60c6-08dea6aa1353
+X-MS-Exchange-CrossTenant-Network-Message-Id: b2c03c0f-6666-4b7b-da4d-08dea6aa15bc
 X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.195];Helo=[lewvzet201.ext.ti.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.194];Helo=[lewvzet200.ext.ti.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF0001A108.namprd05.prod.outlook.com
+	SJ1PEPF00001CE3.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR10MB8185
-X-Rspamd-Queue-Id: 897554A2371
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR10MB7542
+X-Rspamd-Queue-Id: 976314A20AD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [2.84 / 15.00];
@@ -148,7 +148,7 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -158,7 +158,7 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282798-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-282799-lists,netdev=lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	DKIM_TRACE(0.00)[ti.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -166,466 +166,322 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[m-malladi@ti.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,ti.com:mid,ti.com:email,ti.com:dkim,ti.com:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,ti.com:email,ti.com:dkim,ti.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.995];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[11]
 
 From: MD Danish Anwar <danishanwar@ti.com>
 
-Introduce QoS infrastructure for Frame Preemption (FPE) support in
-the ICSSG Ethernet driver.
+Add driver support for viewing and changing the MAC Merge sublayer
+parameters via ethtool ops: .set_mm(), .get_mm() and .get_mm_stats().
 
-prueth_qos_iet tracks FPE enable/active state and verify state machine
-status via firmware-reported enum icssg_ietfpe_verify_states.
-icssg_config_ietfpe() configures IET FPE in firmware, triggers
-verify state machine based on ethtool MAC Merge parameters.
-Polls firmware verify status up to 3 times with verify_time_ms intervals
-and driver handles timeout by logging error and returning.
+The minimum size of non-final mPacket fragments supported by the firmware
+without leading errors is 64 Bytes (including FCS). Verify time bounded to
+1-128 ms per 802.3-2018 clause 30.14.1.6. Add a check to ensure
+user passed tx_min_frag_size argument via ethtool, honors this.
+Add pa stats registers to check statistics for preemption, which can be
+dumped using ethtool ops.
 
-For MQPRIO qdisc support all queues are express by default later
-gets override by user-provided preemptible_tcs bitmask via tc qdisc mask
-Preempt mask configuration: Maps traffic classes to queue express/preemptible
-state and applied only when FPE is active (Tx enabled)
-
-Verify state machine re-triggers on link up/down events based on
-fpe_enabled and fpe_active flags, and for memory protection, fpe_lock
-serializes all FPE state mutations, preventing races between ethtool
-config, qdisc setup, and link events
+Fix emac_get_stat_by_name() to return u64 instead of int and return 0 on
+error instead of -EINVAL. This prevents invalid stat lookups from corrupting
+output stats with signed error codes cast to u64. Error conditions are still
+logged via netdev_err().
 
 Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
 Signed-off-by: Meghana Malladi <m-malladi@ti.com>
 ---
 
-changes from v4(v5-v4):
-- preemptible TCs are committed to hardware only when FPE is active
-- Removed workqueue implementation with direct call to configure FPE
-- Changed MAC verification logic to poll at verify_time_ms intervals
-  instead of 5 seconds.
-- Used mutex_lock whenever necessary to ensure proper synchronization
+Changes from v4(v5-v4):
+- Fix the naming conventiion for icssg_qos_frag_size_min_to_add()
+- Change the logic to include FCS while validating and accepting
+  values from the userspace
 All the above changes are addressed as part of Vladimir Oltean <vladimir.oltean@nxp.com>
 comments for this patch
+- Handle all verify_status values in emac_get_mm() based on what
+  all states are supported by the firmware.
+This change is addressed based on AI-generated review and highlighted by
+Simon Horman <horms@kernel.org>
 
- drivers/net/ethernet/ti/Makefile             |   3 +-
- drivers/net/ethernet/ti/icssg/icssg_config.h |   9 -
- drivers/net/ethernet/ti/icssg/icssg_prueth.c |   7 +
- drivers/net/ethernet/ti/icssg/icssg_prueth.h |   2 +
- drivers/net/ethernet/ti/icssg/icssg_qos.c    | 232 +++++++++++++++++++
- drivers/net/ethernet/ti/icssg/icssg_qos.h    |  68 ++++++
- 6 files changed, 311 insertions(+), 10 deletions(-)
- create mode 100644 drivers/net/ethernet/ti/icssg/icssg_qos.c
- create mode 100644 drivers/net/ethernet/ti/icssg/icssg_qos.h
+ drivers/net/ethernet/ti/icssg/icssg_ethtool.c | 107 +++++++++++++++++-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h  |   7 +-
+ drivers/net/ethernet/ti/icssg/icssg_qos.h     |  38 +++++++
+ drivers/net/ethernet/ti/icssg/icssg_stats.c   |   5 +-
+ drivers/net/ethernet/ti/icssg/icssg_stats.h   |   5 +
+ .../net/ethernet/ti/icssg/icssg_switch_map.h  |   5 +
+ 6 files changed, 160 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/ti/Makefile b/drivers/net/ethernet/ti/Makefile
-index f4276c9a77620..d19bcd25c9d07 100644
---- a/drivers/net/ethernet/ti/Makefile
-+++ b/drivers/net/ethernet/ti/Makefile
-@@ -46,6 +46,7 @@ icssg-y := icssg/icssg_common.o \
- 	   icssg/icssg_config.o \
- 	   icssg/icssg_mii_cfg.o \
- 	   icssg/icssg_stats.o \
--	   icssg/icssg_ethtool.o
-+	   icssg/icssg_ethtool.o \
-+	   icssg/icssg_qos.o
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_ethtool.c b/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
+index b715af21d23ac..6a08c40adde54 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
+@@ -6,7 +6,6 @@
+  */
  
- obj-$(CONFIG_TI_ICSS_IEP) += icssg/icss_iep.o
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.h b/drivers/net/ethernet/ti/icssg/icssg_config.h
-index 60d69744ffae2..1ac202f855ed4 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_config.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_config.h
-@@ -323,13 +323,4 @@ struct prueth_fdb_slot {
- 	u8 fid;
- 	u8 fid_c2;
- } __packed;
--
--enum icssg_ietfpe_verify_states {
--	ICSSG_IETFPE_STATE_UNKNOWN = 0,
--	ICSSG_IETFPE_STATE_INITIAL,
--	ICSSG_IETFPE_STATE_VERIFYING,
--	ICSSG_IETFPE_STATE_SUCCEEDED,
--	ICSSG_IETFPE_STATE_FAILED,
--	ICSSG_IETFPE_STATE_DISABLED
--};
- #endif /* __NET_TI_ICSSG_CONFIG_H */
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 591be5c8056b4..7657dc1015f0a 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -392,6 +392,8 @@ static void emac_adjust_link(struct net_device *ndev)
- 		} else {
- 			icssg_set_port_state(emac, ICSSG_EMAC_PORT_DISABLE);
- 		}
-+
-+		icssg_qos_link_state_update(ndev);
- 	}
+ #include "icssg_prueth.h"
+-#include "icssg_stats.h"
  
- 	if (emac->link) {
-@@ -1652,6 +1654,7 @@ static const struct net_device_ops emac_netdev_ops = {
- 	.ndo_hwtstamp_get = icssg_ndo_get_ts_config,
- 	.ndo_hwtstamp_set = icssg_ndo_set_ts_config,
- 	.ndo_xsk_wakeup = prueth_xsk_wakeup,
-+	.ndo_setup_tc = icssg_qos_ndo_setup_tc,
- };
+ static void emac_get_drvinfo(struct net_device *ndev,
+ 			     struct ethtool_drvinfo *info)
+@@ -294,6 +293,109 @@ static int emac_set_per_queue_coalesce(struct net_device *ndev, u32 queue,
+ 	return 0;
+ }
  
- static int prueth_netdev_init(struct prueth *prueth,
-@@ -1686,6 +1689,8 @@ static int prueth_netdev_init(struct prueth *prueth,
- 
- 	INIT_DELAYED_WORK(&emac->stats_work, icssg_stats_work_handler);
- 
-+	icssg_qos_init(ndev);
-+
- 	ret = pruss_request_mem_region(prueth->pruss,
- 				       port == PRUETH_PORT_MII0 ?
- 				       PRUSS_MEM_DRAM0 : PRUSS_MEM_DRAM1,
-@@ -2461,6 +2466,7 @@ static int prueth_probe(struct platform_device *pdev)
- 		}
- 		unregister_netdev(prueth->registered_netdevs[i]);
- 		disable_work_sync(&prueth->emac[i]->rx_mode_work);
-+		mutex_destroy(&prueth->emac[i]->qos.iet.fpe_lock);
- 	}
- 
- netdev_exit:
-@@ -2521,6 +2527,7 @@ static void prueth_remove(struct platform_device *pdev)
- 		prueth->emac[i]->ndev->phydev = NULL;
- 		unregister_netdev(prueth->registered_netdevs[i]);
- 		disable_work_sync(&prueth->emac[i]->rx_mode_work);
-+		mutex_destroy(&prueth->emac[i]->qos.iet.fpe_lock);
- 	}
- 
- 	for (i = 0; i < PRUETH_NUM_MACS; i++) {
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index df93d15c5b786..85f7017d2c8e7 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -44,6 +44,7 @@
- #include "icssg_config.h"
- #include "icss_iep.h"
- #include "icssg_switch_map.h"
-+#include "icssg_qos.h"
- 
- #define PRUETH_MAX_MTU          (2000 - ETH_HLEN - ETH_FCS_LEN)
- #define PRUETH_MIN_PKT_SIZE     (VLAN_ETH_ZLEN)
-@@ -254,6 +255,7 @@ struct prueth_emac {
- 	struct bpf_prog *xdp_prog;
- 	struct xdp_attachment_info xdpi;
- 	int xsk_qid;
-+	struct prueth_qos qos;
- };
- 
- /* The buf includes headroom compatible with both skb and xdpf */
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_qos.c b/drivers/net/ethernet/ti/icssg/icssg_qos.c
-new file mode 100644
-index 0000000000000..fc4b0ebc7d683
---- /dev/null
-+++ b/drivers/net/ethernet/ti/icssg/icssg_qos.c
-@@ -0,0 +1,232 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Texas Instruments ICSSG PRUETH QoS submodule
-+ * Copyright (C) 2023 Texas Instruments Incorporated - http://www.ti.com/
-+ */
-+
-+#include "icssg_prueth.h"
-+#include "icssg_switch_map.h"
-+
-+static void icssg_iet_set_preempt_mask(struct prueth_emac *emac)
-+{
-+	void __iomem *config = emac->dram.va + ICSSG_CONFIG_OFFSET;
-+	struct prueth_qos_mqprio *p_mqprio = &emac->qos.mqprio;
-+	struct tc_mqprio_qopt *qopt = &p_mqprio->mqprio.qopt;
-+	u8 preemptible_tcs = p_mqprio->preemptible_tcs;
-+	struct prueth_qos_iet *iet = &emac->qos.iet;
-+	int prempt_mask = 0, i;
-+	u8 tc;
-+
-+	/* The preemptible traffic classes should only be committed to hardware
-+	 * once TX is active.
-+	 */
-+	if (!iet->fpe_active) {
-+		netdev_dbg(emac->ndev, "FPE not active, skipping preempt mask config\n");
-+		return;
-+	}
-+
-+	/* Configure the queues based on the preemptible tc map set by the user */
-+	for (tc = 0; tc < p_mqprio->mqprio.qopt.num_tc; tc++) {
-+		/* check if the tc is preemptive or not */
-+		if (preemptible_tcs & BIT(tc)) {
-+			for (i = qopt->offset[tc]; i < qopt->offset[tc] + qopt->count[tc]; i++) {
-+				/* Set all the queues in this tc as preemptive queues */
-+				writeb(BIT(4), config + EXPRESS_PRE_EMPTIVE_Q_MAP + i);
-+				prempt_mask &= ~BIT(i);
-+			}
-+		} else {
-+			/* Set all the queues in this tc as express queues */
-+			for (i = qopt->offset[tc]; i < qopt->offset[tc] + qopt->count[tc]; i++) {
-+				writeb(0, config + EXPRESS_PRE_EMPTIVE_Q_MAP + i);
-+				prempt_mask |= BIT(i);
-+			}
-+		}
-+		netdev_set_tc_queue(emac->ndev, tc, qopt->count[tc], qopt->offset[tc]);
-+	}
-+	writeb(prempt_mask, config + EXPRESS_PRE_EMPTIVE_Q_MASK);
-+}
-+
-+static int icssg_iet_verify_wait(struct prueth_emac *emac)
-+{
-+	void __iomem *config = emac->dram.va + ICSSG_CONFIG_OFFSET;
-+	struct prueth_qos_iet *iet = &emac->qos.iet;
-+	int try = 3;
-+
-+	do {
-+		msleep(iet->verify_time_ms);
-+		iet->verify_status = readb(config + PRE_EMPTION_VERIFY_STATUS);
-+		if (iet->verify_status == ICSSG_IETFPE_STATE_SUCCEEDED)
-+			return 0;
-+	} while (--try > 0);
-+
-+	netdev_err(emac->ndev, "MAC Verify timeout\n");
-+	return -ETIMEDOUT;
-+}
-+
-+/* Direct synchronous configuration of IET FPE.
-+ * Caller must hold iet->fpe_lock.
-+ */
-+void icssg_config_ietfpe(struct prueth_emac *emac, bool enable)
-+{
-+	void __iomem *config = emac->dram.va + ICSSG_CONFIG_OFFSET;
-+	struct prueth_qos_iet *iet = &emac->qos.iet;
-+	int ret;
-+	u8 val;
-+
-+	/* return early if FPE is not active and need not be enabled */
-+	if (!iet->fpe_enabled && !iet->fpe_active)
-+		return;
-+
-+	if (!netif_running(emac->ndev)) {
-+		netdev_dbg(emac->ndev, "cannot change IET/FPE state when interface is down\n");
-+		return;
-+	}
-+
-+	/* Update FPE Tx enable bit (PRE_EMPTION_ENABLE_TX) if
-+	 * fpe_enabled is set to enable MM in Tx direction
-+	 */
-+	writeb(enable ? 1 : 0, config + PRE_EMPTION_ENABLE_TX);
-+
-+	/* If FPE is to be enabled, first configure MAC Verify state
-+	 * machine in firmware as firmware kicks the Verify process
-+	 * as soon as ICSSG_EMAC_PORT_PREMPT_TX_ENABLE command is
-+	 * received.
-+	 */
-+	if (enable && iet->mac_verify_configure) {
-+		writeb(1, config + PRE_EMPTION_ENABLE_VERIFY);
-+		writew(iet->tx_min_frag_size, config + PRE_EMPTION_ADD_FRAG_SIZE_LOCAL);
-+		writel(iet->verify_time_ms, config + PRE_EMPTION_VERIFY_TIME);
-+	} else {
-+		iet->verify_status = ICSSG_IETFPE_STATE_DISABLED;
-+	}
-+
-+	/* Send command to enable FPE Tx side. Rx is always enabled */
-+	ret = icssg_set_port_state(emac,
-+				   enable ? ICSSG_EMAC_PORT_PREMPT_TX_ENABLE :
-+					    ICSSG_EMAC_PORT_PREMPT_TX_DISABLE);
-+	if (ret) {
-+		netdev_err(emac->ndev, "TX preempt %s command failed\n",
-+			   str_enable_disable(enable));
-+		writeb(0, config + PRE_EMPTION_ENABLE_VERIFY);
-+		iet->verify_status = ICSSG_IETFPE_STATE_DISABLED;
-+		return;
-+	}
-+
-+	if (enable && iet->mac_verify_configure) {
-+		ret = icssg_iet_verify_wait(emac);
-+		if (ret) {
-+			netdev_err(emac->ndev, "MAC Verification failed with timeout\n");
-+			return;
-+		}
-+	} else if (enable) {
-+		/* Give firmware some time to update PRE_EMPTION_ACTIVE_TX state */
-+		usleep_range(100, 200);
-+	}
-+
-+	if (enable) {
-+		val = readb(config + PRE_EMPTION_ACTIVE_TX);
-+		if (val != 1) {
-+			netdev_err(emac->ndev,
-+				   "Firmware fails to activate IET/FPE\n");
-+			return;
-+		}
-+		iet->fpe_active = true;
-+	} else {
-+		iet->fpe_active = false;
-+	}
-+
-+	icssg_iet_set_preempt_mask(emac);
-+	netdev_err(emac->ndev, "IET FPE %s successfully\n",
-+		  str_enable_disable(iet->fpe_active));
-+}
-+EXPORT_SYMBOL_GPL(icssg_config_ietfpe);
-+
-+void icssg_qos_init(struct net_device *ndev)
++static int emac_get_mm(struct net_device *ndev, struct ethtool_mm_state *state)
 +{
 +	struct prueth_emac *emac = netdev_priv(ndev);
 +	struct prueth_qos_iet *iet = &emac->qos.iet;
++	enum icssg_ietfpe_verify_states verify_status;
 +
-+	iet->emac = emac;
-+	mutex_init(&iet->fpe_lock);
-+}
-+
-+static void icssg_iet_change_preemptible_tcs(struct prueth_emac *emac)
-+{
-+	struct prueth_qos_iet *iet = &emac->qos.iet;
++	if (emac->is_sr1)
++		return -EOPNOTSUPP;
 +
 +	mutex_lock(&iet->fpe_lock);
-+	icssg_config_ietfpe(emac, iet->fpe_enabled);
++	state->tx_enabled = iet->fpe_enabled;
++	state->tx_min_frag_size = iet->tx_min_frag_size - ETH_FCS_LEN;
++	state->tx_active = iet->fpe_active;
++	state->verify_enabled = iet->mac_verify_configure;
++	state->verify_time = iet->verify_time_ms;
++	verify_status = iet->verify_status;
 +	mutex_unlock(&iet->fpe_lock);
-+}
 +
-+static int emac_tc_query_caps(struct net_device *ndev, void *type_data)
-+{
-+	struct tc_query_caps_base *base = type_data;
++	state->pmac_enabled = true;
++	/* 64Bytes is the minimum fragment size supported
++	 * by the firmware. <64B leads to min frame errors
++	 */
++	state->rx_min_frag_size = 64;
 +
-+	switch (base->type) {
-+	case TC_SETUP_QDISC_MQPRIO: {
-+		struct tc_mqprio_caps *caps = base->caps;
-+
-+		caps->validate_queue_counts = true;
-+		return 0;
-+	}
++	switch (verify_status) {
++	case ICSSG_IETFPE_STATE_DISABLED:
++		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
++		break;
++	case ICSSG_IETFPE_STATE_INITIAL:
++		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_INITIAL;
++		break;
++	case ICSSG_IETFPE_STATE_VERIFYING:
++		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_VERIFYING;
++		break;
++	case ICSSG_IETFPE_STATE_SUCCEEDED:
++		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED;
++		break;
++	case ICSSG_IETFPE_STATE_FAILED:
++		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_FAILED;
++		break;
 +	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
-+static int emac_tc_setup_mqprio(struct net_device *ndev, void *type_data)
-+{
-+	struct tc_mqprio_qopt_offload *mqprio = type_data;
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+	struct tc_mqprio_qopt *qopt = &mqprio->qopt;
-+	struct prueth_qos_mqprio *p_mqprio;
-+	u8 num_tc = mqprio->qopt.num_tc;
-+	int tc, offset, count;
-+
-+	p_mqprio = &emac->qos.mqprio;
-+
-+	if (!num_tc) {
-+		netdev_reset_tc(ndev);
-+		p_mqprio->preemptible_tcs = 0;
-+		p_mqprio->mqprio.qopt.num_tc = 0;
-+		goto reset_tcs;
++		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_UNKNOWN;
++		break;
 +	}
 +
-+	memcpy(&p_mqprio->mqprio, mqprio, sizeof(*mqprio));
-+	p_mqprio->preemptible_tcs = mqprio->preemptible_tcs;
-+	netdev_set_num_tc(ndev, mqprio->qopt.num_tc);
-+
-+	for (tc = 0; tc < num_tc; tc++) {
-+		count = qopt->count[tc];
-+		offset = qopt->offset[tc];
-+		netdev_set_tc_queue(ndev, tc, count, offset);
-+	}
-+
-+reset_tcs:
-+	icssg_iet_change_preemptible_tcs(emac);
++	/* 802.3-2018 clause 30.14.1.6, says that the aMACMergeVerifyTime
++	 * variable has a range between 1 and 128 ms inclusive. Limit to that.
++	 */
++	state->max_verify_time = ETHTOOL_MM_MAX_VERIFY_TIME_MS;
 +
 +	return 0;
 +}
-+EXPORT_SYMBOL_GPL(icssg_qos_init);
 +
-+int icssg_qos_ndo_setup_tc(struct net_device *ndev, enum tc_setup_type type,
-+			   void *type_data)
++static int emac_set_mm(struct net_device *ndev, struct ethtool_mm_cfg *cfg,
++		       struct netlink_ext_ack *extack)
 +{
-+	switch (type) {
-+	case TC_QUERY_CAPS:
-+		return emac_tc_query_caps(ndev, type_data);
-+	case TC_SETUP_QDISC_MQPRIO:
-+		return emac_tc_setup_mqprio(ndev, type_data);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+EXPORT_SYMBOL_GPL(icssg_qos_ndo_setup_tc);
++	struct prueth_emac *emac = netdev_priv(ndev);
++	struct prueth_qos_iet *iet = &emac->qos.iet;
++	int err;
 +
-+void icssg_qos_link_state_update(struct net_device *ndev)
++	if (emac->is_sr1)
++		return -EOPNOTSUPP;
++
++	if (!cfg->pmac_enabled)
++		NL_SET_ERR_MSG_MOD(extack, "preemptible MAC is always enabled");
++
++	err = icssg_qos_validate_tx_min_frag_size(cfg->tx_min_frag_size, extack);
++	if (err)
++		return err;
++
++	err = icssg_qos_validate_verify_time(cfg->verify_time, extack);
++	if (err)
++		return err;
++
++	mutex_lock(&iet->fpe_lock);
++	iet->verify_time_ms = cfg->verify_time;
++	iet->tx_min_frag_size = cfg->tx_min_frag_size + ETH_FCS_LEN;
++	iet->fpe_enabled = cfg->tx_enabled;
++	iet->mac_verify_configure = cfg->verify_enabled;
++	icssg_config_ietfpe(emac, cfg->tx_enabled);
++	mutex_unlock(&iet->fpe_lock);
++
++	return err;
++}
++
++static void emac_get_mm_stats(struct net_device *ndev,
++			      struct ethtool_mm_stats *s)
 +{
 +	struct prueth_emac *emac = netdev_priv(ndev);
 +
-+	icssg_iet_change_preemptible_tcs(emac);
++	if (emac->is_sr1)
++		return;
++
++	if (!emac->prueth->pa_stats)
++		return;
++
++	s->MACMergeFrameAssOkCount = emac_get_stat_by_name(emac, "FW_PREEMPT_ASSEMBLY_OK");
++	s->MACMergeFrameAssErrorCount = emac_get_stat_by_name(emac, "FW_PREEMPT_ASSEMBLY_ERR");
++	s->MACMergeFragCountRx = emac_get_stat_by_name(emac, "FW_PREEMPT_FRAG_CNT_RX");
++	s->MACMergeFragCountTx = emac_get_stat_by_name(emac, "FW_PREEMPT_FRAG_CNT_TX");
++	s->MACMergeFrameSmdErrorCount = emac_get_stat_by_name(emac, "FW_PREEMPT_BAD_FRAG");
 +}
-+EXPORT_SYMBOL_GPL(icssg_qos_link_state_update);
++
+ const struct ethtool_ops icssg_ethtool_ops = {
+ 	.get_drvinfo = emac_get_drvinfo,
+ 	.get_msglevel = emac_get_msglevel,
+@@ -317,5 +419,8 @@ const struct ethtool_ops icssg_ethtool_ops = {
+ 	.set_eee = emac_set_eee,
+ 	.nway_reset = emac_nway_reset,
+ 	.get_rmon_stats = emac_get_rmon_stats,
++	.get_mm = emac_get_mm,
++	.set_mm = emac_set_mm,
++	.get_mm_stats = emac_get_mm_stats,
+ };
+ EXPORT_SYMBOL_GPL(icssg_ethtool_ops);
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+index 85f7017d2c8e7..61320c252bec2 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+@@ -45,6 +45,7 @@
+ #include "icss_iep.h"
+ #include "icssg_switch_map.h"
+ #include "icssg_qos.h"
++#include "icssg_stats.h"
+ 
+ #define PRUETH_MAX_MTU          (2000 - ETH_HLEN - ETH_FCS_LEN)
+ #define PRUETH_MIN_PKT_SIZE     (VLAN_ETH_ZLEN)
+@@ -58,8 +59,8 @@
+ 
+ #define ICSSG_MAX_RFLOWS	8	/* per slice */
+ 
+-#define ICSSG_NUM_PA_STATS	32
+-#define ICSSG_NUM_MIIG_STATS	60
++#define ICSSG_NUM_PA_STATS	ARRAY_SIZE(icssg_all_pa_stats)
++#define ICSSG_NUM_MIIG_STATS	ARRAY_SIZE(icssg_all_miig_stats)
+ /* Number of ICSSG related stats */
+ #define ICSSG_NUM_STATS (ICSSG_NUM_MIIG_STATS + ICSSG_NUM_PA_STATS)
+ #define ICSSG_NUM_STANDARD_STATS 31
+@@ -460,7 +461,7 @@ int emac_fdb_flow_id_updated(struct prueth_emac *emac);
+ 
+ void icssg_stats_work_handler(struct work_struct *work);
+ void emac_update_hardware_stats(struct prueth_emac *emac);
+-int emac_get_stat_by_name(struct prueth_emac *emac, char *stat_name);
++u64 emac_get_stat_by_name(struct prueth_emac *emac, char *stat_name);
+ 
+ /* Common functions */
+ void prueth_cleanup_rx_chns(struct prueth_emac *emac,
 diff --git a/drivers/net/ethernet/ti/icssg/icssg_qos.h b/drivers/net/ethernet/ti/icssg/icssg_qos.h
-new file mode 100644
-index 0000000000000..083f248c557de
---- /dev/null
+index 083f248c557de..104910516d966 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_qos.h
 +++ b/drivers/net/ethernet/ti/icssg/icssg_qos.h
-@@ -0,0 +1,68 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (C) 2023 Texas Instruments Incorporated - http://www.ti.com/
-+ */
+@@ -65,4 +65,42 @@ void icssg_qos_link_state_update(struct net_device *ndev);
+ int icssg_qos_ndo_setup_tc(struct net_device *ndev, enum tc_setup_type type,
+ 			   void *type_data);
+ void icssg_config_ietfpe(struct prueth_emac *emac, bool enable);
++static inline int icssg_qos_validate_tx_min_frag_size(u32 min_frag_size,
++						      struct netlink_ext_ack *extack)
++{
++	/* Firmware takes min_frag_size including FCS length */
++	min_frag_size += ETH_FCS_LEN;
 +
-+#ifndef __NET_TI_ICSSG_QOS_H
-+#define __NET_TI_ICSSG_QOS_H
++	/* The minimum size of the non-final mPacket supported
++	 * by the firmware is 64B and multiples of 64B.
++	 */
++	if (min_frag_size < 64) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "tx_min_frag_size must be at least 64 bytes");
++		return -EINVAL;
++	}
 +
-+#include <linux/atomic.h>
-+#include <linux/netdevice.h>
-+#include <net/pkt_sched.h>
++	if (min_frag_size % (ETH_ZLEN + ETH_FCS_LEN)) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "tx_min_frag_size must be a multiple of 64 bytes");
++		return -EINVAL;
++	}
 +
-+/**
-+ * enum icssg_ietfpe_verify_states - status of MAC Merge Verify returned by firmware
-+ * @ICSSG_IETFPE_STATE_UNKNOWN:
-+ *	verification status is unknown
-+ * @ICSSG_IETFPE_STATE_INITIAL:
-+ *	Firmware returns this if verify state diagram is idle
-+ * @ICSSG_IETFPE_STATE_VERIFYING:
-+ *	Firmware returns this if verification is ongoing
-+ * @ICSSG_IETFPE_STATE_SUCCEEDED:
-+ *	Firmware returns this if verify state diagram completes verification
-+ * @ICSSG_IETFPE_STATE_FAILED:
-+ *	Firmware returns this if verify state diagram fails during verification
-+ * @ICSSG_IETFPE_STATE_DISABLED:
-+ *	verification is disabled by the driver
-+ */
-+enum icssg_ietfpe_verify_states {
-+	ICSSG_IETFPE_STATE_UNKNOWN = 0,
-+	ICSSG_IETFPE_STATE_INITIAL,
-+	ICSSG_IETFPE_STATE_VERIFYING,
-+	ICSSG_IETFPE_STATE_SUCCEEDED,
-+	ICSSG_IETFPE_STATE_FAILED,
-+	ICSSG_IETFPE_STATE_DISABLED
-+};
++	return 0;
++}
 +
-+struct prueth_qos_mqprio {
-+	struct tc_mqprio_qopt_offload mqprio;
-+	u8 preemptible_tcs;
-+};
++static inline int icssg_qos_validate_verify_time(u32 verify_time_ms,
++						 struct netlink_ext_ack *extack)
++{
++	/* 802.3-2018 clause 30.14.1.6: aMACMergeVerifyTime must be
++	 * between 1 and 128 ms inclusive
++	 */
++	if (verify_time_ms < 1 || verify_time_ms > 128) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "verify_time must be between 1 and 128 ms");
++		return -EINVAL;
++	}
 +
-+struct prueth_qos_iet {
-+	struct prueth_emac *emac;
-+
-+	/* Configuration state - protected by fpe_lock */
-+	bool fpe_enabled;
-+	bool mac_verify_configure;
-+	u32 tx_min_frag_size;
-+	u32 verify_time_ms;
-+
-+	/* Runtime state - protected by fpe_lock */
-+	bool fpe_active;
-+	enum icssg_ietfpe_verify_states verify_status;
-+
-+	/* Synchronization: single mutex protects all FPE operations */
-+	struct mutex fpe_lock;
-+};
-+
-+struct prueth_qos {
-+	struct prueth_qos_iet iet;
-+	struct prueth_qos_mqprio mqprio;
-+};
-+
-+void icssg_qos_init(struct net_device *ndev);
-+void icssg_qos_link_state_update(struct net_device *ndev);
-+int icssg_qos_ndo_setup_tc(struct net_device *ndev, enum tc_setup_type type,
-+			   void *type_data);
-+void icssg_config_ietfpe(struct prueth_emac *emac, bool enable);
-+#endif /* __NET_TI_ICSSG_QOS_H */
++	return 0;
++}
+ #endif /* __NET_TI_ICSSG_QOS_H */
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_stats.c b/drivers/net/ethernet/ti/icssg/icssg_stats.c
+index 7159baa0155cf..950d58d8183eb 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_stats.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_stats.c
+@@ -6,7 +6,6 @@
+  */
+ 
+ #include "icssg_prueth.h"
+-#include "icssg_stats.h"
+ #include <linux/regmap.h>
+ 
+ #define ICSSG_TX_PACKET_OFFSET	0xA0
+@@ -74,7 +73,7 @@ void icssg_stats_work_handler(struct work_struct *work)
+ }
+ EXPORT_SYMBOL_GPL(icssg_stats_work_handler);
+ 
+-int emac_get_stat_by_name(struct prueth_emac *emac, char *stat_name)
++u64 emac_get_stat_by_name(struct prueth_emac *emac, char *stat_name)
+ {
+ 	int i;
+ 
+@@ -91,5 +90,5 @@ int emac_get_stat_by_name(struct prueth_emac *emac, char *stat_name)
+ 	}
+ 
+ 	netdev_err(emac->ndev, "Invalid stats %s\n", stat_name);
+-	return -EINVAL;
++	return 0;
+ }
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_stats.h b/drivers/net/ethernet/ti/icssg/icssg_stats.h
+index 5ec0b38e0c67d..f35ae1b4f8460 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_stats.h
++++ b/drivers/net/ethernet/ti/icssg/icssg_stats.h
+@@ -189,6 +189,11 @@ static const struct icssg_pa_stats icssg_all_pa_stats[] = {
+ 	ICSSG_PA_STATS(FW_INF_DROP_PRIOTAGGED),
+ 	ICSSG_PA_STATS(FW_INF_DROP_NOTAG),
+ 	ICSSG_PA_STATS(FW_INF_DROP_NOTMEMBER),
++	ICSSG_PA_STATS(FW_PREEMPT_BAD_FRAG),
++	ICSSG_PA_STATS(FW_PREEMPT_ASSEMBLY_ERR),
++	ICSSG_PA_STATS(FW_PREEMPT_FRAG_CNT_TX),
++	ICSSG_PA_STATS(FW_PREEMPT_ASSEMBLY_OK),
++	ICSSG_PA_STATS(FW_PREEMPT_FRAG_CNT_RX),
+ 	ICSSG_PA_STATS(FW_RX_EOF_SHORT_FRMERR),
+ 	ICSSG_PA_STATS(FW_RX_B0_DROP_EARLY_EOF),
+ 	ICSSG_PA_STATS(FW_TX_JUMBO_FRM_CUTOFF),
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_switch_map.h b/drivers/net/ethernet/ti/icssg/icssg_switch_map.h
+index 7e053b8af3ece..855fd4ed0b3f6 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_switch_map.h
++++ b/drivers/net/ethernet/ti/icssg/icssg_switch_map.h
+@@ -256,6 +256,11 @@
+ #define FW_INF_DROP_PRIOTAGGED		0x0148
+ #define FW_INF_DROP_NOTAG		0x0150
+ #define FW_INF_DROP_NOTMEMBER		0x0158
++#define FW_PREEMPT_BAD_FRAG		0x0160
++#define FW_PREEMPT_ASSEMBLY_ERR		0x0168
++#define FW_PREEMPT_FRAG_CNT_TX		0x0170
++#define FW_PREEMPT_ASSEMBLY_OK		0x0178
++#define FW_PREEMPT_FRAG_CNT_RX		0x0180
+ #define FW_RX_EOF_SHORT_FRMERR		0x0188
+ #define FW_RX_B0_DROP_EARLY_EOF		0x0190
+ #define FW_TX_JUMBO_FRM_CUTOFF		0x0198
 -- 
 2.43.0
 
