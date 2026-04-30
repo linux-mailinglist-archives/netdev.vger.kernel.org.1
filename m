@@ -1,172 +1,175 @@
-Return-Path: <netdev+bounces-282675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282676-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kC9EC4H/8mkvwgEAu9opvQ
-	(envelope-from <netdev+bounces-282675-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:06:41 +0200
+	id SN8uGIYB82lswgEAu9opvQ
+	(envelope-from <netdev+bounces-282676-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:15:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BAA449E63A
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:06:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7CC449E7CD
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:15:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A2AA63015D0B
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 07:06:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 20E0C3029E73
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 07:11:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3273396B7F;
-	Thu, 30 Apr 2026 07:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71A0039A07B;
+	Thu, 30 Apr 2026 07:11:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="erR5acDQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YnWnp9RC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72163396593
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 07:06:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 230C529CE1
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 07:11:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777532775; cv=none; b=iODduSAl/tPDv6J7O78/8vMoZ0el5QoVSM6t6DOEyLzddt42guZQk2mue9riSiB+DIFt6SSMGJRDFMeBtJDNO7AKaCSZ5pM4iwF54ce0pExxIVHtwJBvifmpWCmNV1UchCcfdzrBROMu/7VpDlre/4TOxPlNQOiewCQ3mghpTzQ=
+	t=1777533118; cv=none; b=uSb2Vt9FUqWeSpS9Zx1qiGgvzoysW9XS2egx7HpTWjmZAjTS86PyKK/ZbLBntwwzKpJTtfA/PfrqpuJJyhPEJhoIzavDlsIgntDpneXOWqG5mBHQoHHnW1TSmg+uxAJtqIp/cRZsesGpq8hjpcfq07v7YkSilQVdSghyi8Jvh3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777532775; c=relaxed/simple;
-	bh=MlWBYtPRt6aJZyTinMGdRY0mwjEGCsSDIfB+4snf3iM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Y7tr359sr2RaBNvPdvY0pO1ABFMk+eeeZcmIGVJ4J2vV5FfUKnzHXN9ic4CdfxI8w0T2PIcYtS4brC6HaT7b3gea1PcrKRjot0XKwp9Hueg36lXXvte3aeBYskwYO+bHMQm6nr/M58pl7ZOavP5fqYo1Afhd1j9EgHAYzBRXlWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=erR5acDQ; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-50fba8d8c40so12219691cf.3
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 00:06:14 -0700 (PDT)
+	s=arc-20240116; t=1777533118; c=relaxed/simple;
+	bh=WHf7SDMWeGDMepkYHsY68ydsCu4X3ZfH1ZKR959neqg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TXAdj3CRyssGwe4bHF7o0Q18cRtsWLIrGjuIwUl3QfrAGm7zSmV8PBIq9EbzfBSecn4e+oRVVYSU7tm3vvSc1EN3foB3Fx6pfXrfUFdQkEVexycRq4G3M8Bt1QkQk+2+vwc6PFiTuqeNKpPYjOvDwRxqVBZ1f7lMbEZetfjlyIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YnWnp9RC; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-8244105fa96so21424b3a.3
+        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 00:11:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777532773; x=1778137573; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0ZrJASGNRErK/O4ZE+4RJN+zI0UpB/rpLurWI28Q2Bc=;
-        b=erR5acDQu8dfZMqVoKRyRXSc/HeR91n6vC8vbV19U+Xy7pU91XvpUV2KaZ+/pWDTLh
-         xmWKxOJxTz1DI4cO4SLd9vV5rflug2jJ4noiETIWXjt4aMs0ay4tBAmPEoAmf/CHorhK
-         mwInrGqzG0KD9rBp684rAktWBWMh7kpk9P14iLonskE8Ttsu9JK09qKagG0+mHt8thDq
-         GLTnXAdjhws7nIzmJMLUJv3uKWPmoDYo/xgH7lIGY6MWkJWTGA2u91a3deO3+VrnXuWL
-         Gg7QAyCv0pmkBohOFiy96hIFoYiX1kU6CPRX2LmWldBQVihBt5sT/YbO4cJgsMDzUK+o
-         UJjA==
+        d=gmail.com; s=20251104; t=1777533116; x=1778137916; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CFvNVNkRh7BzI+OzIKJ5kBHa8BAxHSA7m55h3BL2rQs=;
+        b=YnWnp9RCggRjEd1Tp728h4tXn6aq+rDoBV3L0sPx/93PFdq6nNMYNoit4r+v9vlozK
+         /UuY+Qlys+AU3QwKYKeV/33VUEM48+oIKEQ0iOvXDfJi4U0Gl/L5i5WRw8D8FfW6Jk2p
+         SXMuQGVVnHT8zYiWDi27xH5VSlhNZJ3hpUIjhcgo6a22wYELgkGJmpR8XZ7iTWleYwOQ
+         aIOpIqjqP8JDvcyOdjkAzxrgazxgOQmHWWC1cC0hhxNGEL7HvcR9xFBCOfuUKIOrFTTG
+         1a1He56B5Qeu6h/CWxXzbod3s3GLvUv7mvBmGByw5LqCDzG8th5UxpYT/d4Usx3K8w++
+         1v2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777532773; x=1778137573;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0ZrJASGNRErK/O4ZE+4RJN+zI0UpB/rpLurWI28Q2Bc=;
-        b=jYPUa/v3GYFMQL5LMPSGGKMDb2UlVyZYsV0x49nwIe3ZLepB8WJmsieWT3OhmxfDro
-         rM+WKETWpGXsIUKPR/KW1EiDX9z3i84Gztv/yomjsvgCrzLxpq/oI9HlFcMrwfIjSy8J
-         9JBKxZgWTpg3FiRtm/bsU3JmVdFVs1nz+DBoBHcR52azzNgFpV/LA4XoRPXmOn3JSN16
-         +lnBpEDqhDku0ZQg8wBLVfeH+gfxB17UeEKADqNuoWFJusqx5cxZM/GJXh5f2IC2iKuH
-         0itpmRhb5PZOxJh1CDAvyp5sIwSWk6s1WpCNXAvfx8gDPKXTakr/fkIUQeOUDv8KGiUQ
-         mvBQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/q01dwjVlNS7TZDFQ6DkdMGxBKsoMdrduXt3Tc4gFw56syIDw02gyuQmcShdVSukBqLbOse68=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpDIvSeu1svoCZbQeXzivkYPY4jVqFhTMtWNBf0OkhQURj6ROl
-	tITRmsO+/YiF/bUWPBtHbMPTKCa9kRrPVAhQskdvpmTGSfDJgPf422U5qYsn9vRuV7OsxusmSM0
-	R0PlBc1JhnV3jLg==
-X-Received: from qtpr16.prod.google.com ([2002:ac8:67d0:0:b0:50f:9c36:1323])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:5a0c:0:b0:50d:d1ea:65dd with SMTP id d75a77b69052e-5102ab5ce91mr25442661cf.14.1777532773093;
- Thu, 30 Apr 2026 00:06:13 -0700 (PDT)
-Date: Thu, 30 Apr 2026 07:06:11 +0000
+        d=1e100.net; s=20251104; t=1777533116; x=1778137916;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CFvNVNkRh7BzI+OzIKJ5kBHa8BAxHSA7m55h3BL2rQs=;
+        b=XtHwjMQhNlOPjL3XZu4UXn+aZBNmpsSuuwqE22evCPvJWLxYZNaHVLNHBd2SvcGeaR
+         7BTIPPNFm8uzMzkwtInBwaoe8umUWTxdSTf7xnMfTQN7qzGcCkaYyOWzcsuUbHn7kKLq
+         8V7/Jb0g2uK4KwZC2QyZJCf0E9ya5qYfVc04BJThmqqyulUEYmTchx3IjBgBMmlkz/7i
+         /TRw/7yXw4GSDyfz86iSf/NfXMQ6XqBJ4B+2xiiezYgzL8hDHSM/+eoWUeUIBahRcXO5
+         nxlhoejatAipZXt+Zs4IxfVPwnfssSjnDUe2NeHsSjJE8xIPhAmtnYDsfevV6gn8EAsR
+         OsoA==
+X-Gm-Message-State: AOJu0YwujtP+RBHqtNq4km6RMuNX6mJsFuke6pwmtSf0OrjX+HM+qqC2
+	vvVgSlXo3MrtcYuHCxoinzSJN0XgyR9K5HqSexaFYDgdflScNM5jWfyG
+X-Gm-Gg: AeBDievj6dhjiMH8cuPAlbwEd8ILirr3uGRHOdnn8jqXihAxsTWBf9k8yV+fRfMskUA
+	PHQtSCq4MG7hqMpVJ0t0juSgP1od1F99wDID3llM9Lp78+YEuKs+uyXWLV8hC9f6nLVkdKkJtQp
+	N98OuRIrJ4oZ/ZiXyx4o0wAouk/r2C/IJ83kYOxl+nivjpZj811bbgv94zNRnwFWUUbmnW0khgk
+	Dk7ITFEgjzWm0mRyxekd/K5y8f056YqQk034edlHoR/7IWroR9v5DcIfC4FJmKSXGW7h58IJg0Z
+	0F0MSlk6Fy8NMhYJE2mirqYp//dOc5Hp3roY/he5AxyMUrh/tDJd5WC/FPT4cb97aSQz81dB6iC
+	hXOZZFZEVhtj1xsRa19uCGCBuTW6khFSWXEPFHWxOSAg6q5h6JnRNoJUX/GZasMiUqsGmrwKNQh
+	EJsE2+FQAYX41FFS0FIa+oRTrNiiGFxIWJ5cKDAeT73NE=
+X-Received: by 2002:a05:6300:2208:b0:3a3:18d4:2590 with SMTP id adf61e73a8af0-3a3cf70d02dmr1041632637.3.1777533116186;
+        Thu, 30 Apr 2026 00:11:56 -0700 (PDT)
+Received: from localhost.localdomain ([189.1.242.96])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-834ed7ecf57sm4049605b3a.50.2026.04.30.00.11.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Apr 2026 00:11:55 -0700 (PDT)
+From: Yiqi Sun <sunyiqixm@gmail.com>
+To: kvm@vger.kernel.org,
+	virtualization@lists.linux.dev
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stefanha@redhat.com,
+	sgarzare@redhat.com,
+	mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	Yiqi Sun <sunyiqixm@gmail.com>
+Subject: [PATCH] vsock/virtio: fix vsockmon info leak in non-linear tap copy
+Date: Thu, 30 Apr 2026 15:11:10 +0800
+Message-Id: <20260430071110.380509-1-sunyiqixm@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260430070611.4004529-1-edumazet@google.com>
-Subject: [PATCH net] ipmr: prevent info-leak in pmr_cache_report()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Ido Schimmel <idosch@nvidia.com>, David Ahern <dsahern@kernel.org>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Yiming Qian <yimingqian591@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 7BAA449E63A
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: B7CC449E7CD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[nvidia.com,kernel.org,vger.kernel.org,gmail.com,google.com];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,linux.alibaba.com,davemloft.net,google.com,kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-282676-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282675-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.992];
+	FROM_NEQ_ENVFROM(0.00)[sunyiqixm@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Yiming Qian reported:
+vsockmon mirrors packets through virtio_transport_build_skb(), which
+builds a new skb and copies the payload into it. For non-linear skbs,
+this goes through virtio_transport_copy_nonlinear_skb().
 
-<quote>
- ipmr_cache_report()` allocates a report skb with `alloc_skb(128,
- GFP_ATOMIC)` and appends a `struct igmphdr` using `skb_put()`. In the
- non-`IGMPMSG_WHOLEPKT` path it initializes only:
+Helper manually initializes a iov_iter, but leaves iov_iter.count unset.
+As a result, skb_copy_datagram_iter() sees zero writable bytes
+in the destination iterator and copies no payload data.
 
- - `igmp->type`
- - `igmp->code`
+This becomes an info leak because virtio_transport_build_skb() has
+already reserved payload_len bytes in the new skb with skb_put(). The
+skb is then returned to the tap path with that payload area still
+uninitialized, so userspace reading from a vsockmon device can observe
+heap contents and potentially kernel address.
 
- but does not initialize:
+Fix it by initializing iov_iter.count to the number of bytes to copy.
 
- - `igmp->csum`
- - `igmp->group`
-
- Later, `igmpmsg_netlink_event()` copies the bytes after `sizeof(struct
- igmpmsg)` into the `IPMRA_CREPORT_PKT` netlink attribute and emits
- `RTM_NEWCACHEREPORT` on `RTNLGRP_IPV4_MROUTE_R`.
-
- As a result, 6 bytes of stale heap data from the skb head are
- disclosed to userspace.
-</quote>
-
-Let's use skb_put_zero() instead of skb_put() to fix this bug.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: Yiming Qian <yimingqian591@gmail.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+Fixes: 4b0bf10eb077 ("vsock/virtio: non-linear skb handling for tap")
+Signed-off-by: Yiqi Sun <sunyiqixm@gmail.com>
 ---
- net/ipv4/ipmr.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ net/vmw_vsock/virtio_transport_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-index 2058ca860294b01385063555d0354b7a9a736118..05fb6eefe0beb3c45c7ec485692460b84cb332c4 100644
---- a/net/ipv4/ipmr.c
-+++ b/net/ipv4/ipmr.c
-@@ -1112,11 +1112,12 @@ static int ipmr_cache_report(const struct mr_table *mrt,
- 		msg->im_vif_hi = vifi >> 8;
- 		ipv4_pktinfo_prepare(mroute_sk, pkt, false);
- 		memcpy(skb->cb, pkt->cb, sizeof(skb->cb));
--		/* Add our header */
--		igmp = skb_put(skb, sizeof(struct igmphdr));
-+		/* Add our header.
-+		 * Note that code, csum and group fields are cleared.
-+		 */
-+		igmp = skb_put_zero(skb, sizeof(struct igmphdr));
- 		igmp->type = assert;
- 		msg->im_msgtype = assert;
--		igmp->code = 0;
- 		ip_hdr(skb)->tot_len = htons(skb->len);	/* Fix the length */
- 		skb->transport_header = skb->network_header;
- 	}
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index 416d533f493d..6b26ee57ccab 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -152,7 +152,7 @@ static void virtio_transport_copy_nonlinear_skb(const struct sk_buff *skb,
+ 	iov_iter.nr_segs = 1;
+ 
+ 	to_copy = min_t(size_t, len, skb->len);
+-
++	iov_iter.count = to_copy;
+ 	skb_copy_datagram_iter(skb, VIRTIO_VSOCK_SKB_CB(skb)->offset,
+ 			       &iov_iter, to_copy);
+ }
 -- 
-2.54.0.545.g6539524ca2-goog
+2.34.1
 
 
