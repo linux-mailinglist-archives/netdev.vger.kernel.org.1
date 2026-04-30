@@ -1,184 +1,230 @@
-Return-Path: <netdev+bounces-282678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282679-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AKIrHt8C82lswgEAu9opvQ
-	(envelope-from <netdev+bounces-282678-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:21:03 +0200
+	id KKCsDRgD82lswgEAu9opvQ
+	(envelope-from <netdev+bounces-282679-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:22:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D531649E8F0
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:21:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C14949E916
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:21:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C1768303E2E6
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 07:16:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7CA7C3033D37
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 07:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D99AA39E6E4;
-	Thu, 30 Apr 2026 07:16:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 063B639FCA2;
+	Thu, 30 Apr 2026 07:18:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NI3CIeXF"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="bhfNzI/w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A44AB39EF10
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 07:16:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA9E39FCA5;
+	Thu, 30 Apr 2026 07:18:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777533381; cv=none; b=mMPXJo+Oe+OCRX5WlGn/jwZQufmqx5yALzjEcYcQcB4qM1w0i6vnZNrzGunZjCN7jzei1PQcgMwGY8KT8y2o+R+4H1ZCrgBSKsqlEBRhp/ASxD6XsSAiYUd0m5loSDNbQMPgNnBQ9Az6T+sQfkThNH04k+GEOY2ODqBnUpMzCq0=
+	t=1777533500; cv=none; b=uWBCN6aQkCYkPJ431viEsedWI98fxzBzp+wo1m6wx5pers6mtqdVKC5Vz6wAAS1niaZoplkmf4/oIMf8toJeI98bSayWuLMmN+YXuw3Z6Xq7GtQXRjQEwtiTcK/2k+Oz/7lhT+d9S2S4RA+4YTxlcMbqlNzhOB4KjGqQaqwK0QU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777533381; c=relaxed/simple;
-	bh=g099dLdjyRhmrxecWGAVmHcsSqfPyYdB7TQu+yaVEyc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pbrEawtgKjJ5WieNRh5vnawYJXQbHbq+WXLmnr3+2QfA2Oin8xfNRhgJ2P1XIxux+smTizA18holAM76Afy0SGh5SLQWQIcbSqR+jfcRwbPXwdou2zuvOT/uosBqmEj7mPDvOyxZVaz0CpY8dLE9RVt5ksbz/O4laUlTSp1Pi9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NI3CIeXF; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-82f8892d4d6so277555b3a.0
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 00:16:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777533380; x=1778138180; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KdME8RIbkjektnVQG1CaOvBK5+Ca3v4sNxeone+8L1Y=;
-        b=NI3CIeXFFJdWblZtK8FYKJVC4YBaG6g1MlbyrTNIiQY0Jnk6d9lQEeya/NOtzTzY5v
-         TeT2ChqQaS1J16Lizf9H85yxyUnW48HsNIBKaYlZxUiWH8xPvHLIZBh7m5svN5ZTiF22
-         NKcP9bZ+aObBnZJPrcsXNWEcgyGuIHd8dLWhpEZeCexjKV7HlZsKky5WryHHcH8AZUIg
-         hVZ8Xl4+mgjSDrr1FfOdJG72iHTJzqOVg2XhR4mJjK6bXyOGUvAmM/9wemeZYwLcptmR
-         sMISYlxchqpDX4BfAzAZygpId5FQA1639HRhu6YLOaFP5lgsaxoH9twqLOkI04FJlZtS
-         k0Ww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777533380; x=1778138180;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KdME8RIbkjektnVQG1CaOvBK5+Ca3v4sNxeone+8L1Y=;
-        b=j8yKS8nId9bSYb+3SFrSqdNNI6xQutMYZA1r9bTaYyin6SPf4yEEdfgCbMsI55NLT6
-         I0xDlcH/jGtC2rVwwA3IF1tRIGS8hhFSF2cbnHO8hm9nVFbhJeO5FIhrLDgHBEtgkk1t
-         Av+BzmEdcnfcCE54xyZLg/Dxvc6AoBa6nH3oA/MS0Vceg4BLZaYyQftB7N+lZ5Nlf1Yn
-         bKXygtxHlUWv9jt9LAI2/NzFdAcZafTbJDosR3550zFzsm6yFiQqt7W/Fmelbjz48Cfq
-         c0eniZUUgEOHhyIvwgD0HY7V17ohuObXmXiX5zofL2ICFImHUTaz58+X/2KHI3u1N3bZ
-         pJKw==
-X-Forwarded-Encrypted: i=1; AFNElJ+leM5mUK4oGDMhKBL2Cz8UK/mWBcuNWcG+5Eye+mGJHlSNQvq8OQkP4GHlf08HnhqggWb7jrI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3SUx5rBMLI+kv75kr9+6+P7CVKW5mXPDq0nV6IyhvyOEHcN22
-	ndc9Nkyqh1ijLD5/yrIGl16/E32VpFRPwoxeamZkcwS+ZD38qEzp1h+O
-X-Gm-Gg: AeBDiety+UTggnR0pnmbka5BPoX7VX3H31EAUZ0lrLcfQwhwFV74d+whR2J36MzaWw3
-	oLAPadDKwTZJHDXButtySnEBiOmKOVn9E02CzN+/KUW62vF5o65Z4mI6DIlgBIAkVKemkumBCZb
-	PXcXKmu7TnhI3GXZFtZ8YfCRuKGnqKp7IVbefLYWXD1t2EZ5qYJZsUTZwdAJIire08uyY9pyAVs
-	2lHBlnlK2K+wBkA33G2CGfzDd9IxaVLL5SnmDfLX4yFPHFBHueBOpIFLDzh+oIz61FbWvp5q/bS
-	W8i+hpH7K1oyHS+kH+y1VGcrHX5HI4pisroXFNw4EVLeLQC9rY9Cvd2uu/D9Daoip/Z1HT25mYm
-	KOP2yUcN2cMUMGfqWOZPvW0lnwmpZuGYIuvHIGaLBx3qxHXEaShmZqRbmw3QvWqWJgdpHbQvCN4
-	UoWjXNkRDU24bZiTvIB5SxN5FsHgm7KBvfO7o5CmIbGo/XO1/ent9Yud4h/NPI5bnQ
-X-Received: by 2002:a05:6a00:3cce:b0:82c:24d5:63e6 with SMTP id d2e1a72fcca58-834fdb5ff74mr2040979b3a.15.1777533379766;
-        Thu, 30 Apr 2026 00:16:19 -0700 (PDT)
-Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-834ed7eb783sm4233150b3a.42.2026.04.30.00.16.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Apr 2026 00:16:19 -0700 (PDT)
-Date: Thu, 30 Apr 2026 16:16:15 +0900
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: steffen.klassert@secunet.com, davem@davemloft.net, dsahern@kernel.org,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, ilant@mellanox.com, sowmini.varadhan@oracle.com,
-	netdev@vger.kernel.org, imv4bel@gmail.com
-Subject: Re: [PATCH ipsec] esp: Force skb_cow_data() on RX when the skb is
- non-linear
-Message-ID: <afMBv4M-iyd8Z-g2@v4bel>
-References: <afLDKSvAvMwGh7Fy@v4bel>
- <afLZ6Fl6b2ChTnus@gondor.apana.org.au>
+	s=arc-20240116; t=1777533500; c=relaxed/simple;
+	bh=Q7foYfp8ARoIBQqg1d2+D9rs0xQ21+cNmUKlyxxvTFE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=I1lt+zsczI3HvXIHEjrDMij8ONKcFOR5anwf5jl2UBrzVRDxPpb550pko9mpgsIoqV+HOuCeAxDEoYsaFcNlL6FClu6sXdmsqOU8OzBju8rK7HIUwUFPUo5YHk3H7hZ+pFtxRDRNdICBBq6vpSktOBm0cKnfw3EEIqSVMBU7PS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=bhfNzI/w; arc=none smtp.client-ip=220.197.31.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=ek
+	Cy/GX+5k72OAkBDR9bmLdXrX1HQq/QVHZD/S3Dr/A=; b=bhfNzI/wZX/r+rr2g9
+	yF4Im+Qn4RJ5dYPadk8tB2CeBvw6vzCYOdVaUsHhinRYH4rgwkliidJQcVVkSADF
+	3uZaKO/n3T9h44YgnllO7IEoone5uVvI4SeJyLEMzRtGt9BS4LibpXdiZEe6dry3
+	juSS9f4gL9JOW2wtvHTMU6Fqw=
+Received: from pek-lpg-core5.wrs.com (unknown [])
+	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wAX4WzdAfNpXUOSCg--.61089S2;
+	Thu, 30 Apr 2026 15:16:46 +0800 (CST)
+From: Robert Garcia <rob_garcia@163.com>
+To: stable@vger.kernel.org,
+	Haoze Xie <royenheart@gmail.com>
+Cc: Simon Wunderlich <sw@simonwunderlich.de>,
+	Robert Garcia <rob_garcia@163.com>,
+	Yifan Wu <yifanwucs@gmail.com>,
+	Juefei Pu <tomapufckgml@gmail.com>,
+	Yuan Tan <yuantan098@gmail.com>,
+	Xin Liu <bird@lzu.edu.cn>,
+	Ao Zhou <n05ec@lzu.edu.cn>,
+	Sven Eckelmann <sven@narfation.org>,
+	Marek Lindner <mareklindner@neomailbox.ch>,
+	Antonio Quartulli <a@unstable.cc>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	b.a.t.m.a.n@lists.open-mesh.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 5.15.y] batman-adv: hold claim backbone gateways by reference
+Date: Thu, 30 Apr 2026 15:16:45 +0800
+Message-Id: <20260430071645.3030702-1-rob_garcia@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <afLZ6Fl6b2ChTnus@gondor.apana.org.au>
-X-Rspamd-Queue-Id: D531649E8F0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wAX4WzdAfNpXUOSCg--.61089S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxXryxGFykCrWrWr13GF1ftFb_yoWrCr15pF
+	17Kw1rKrs7Xws7X342yry2gF1UXrs3GrW7WryUGF1Iyw1jyr18K345KF1IvF4YyFyqkrs8
+	Zr1Ykr17urs8CrUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zR4SoJUUUUU=
+X-CM-SenderInfo: 5uresw5dufxti6rwjhhfrp/xtbC5h7OOmnzAd4ToQAA37
+X-Rspamd-Queue-Id: 8C14949E916
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282678-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[secunet.com,davemloft.net,kernel.org,google.com,redhat.com,mellanox.com,oracle.com,vger.kernel.org,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[163.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-282679-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[163.com:+];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rob_garcia@163.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[simonwunderlich.de,163.com,gmail.com,lzu.edu.cn,narfation.org,neomailbox.ch,unstable.cc,davemloft.net,kernel.org,lunn.ch,lists.open-mesh.org,vger.kernel.org];
+	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,apana.org.au:url,apana.org.au:email]
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[simonwunderlich.de:email,lzu.edu.cn:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,narfation.org:email]
 
-On Thu, Apr 30, 2026 at 12:26:16PM +0800, Herbert Xu wrote:
-> On Thu, Apr 30, 2026 at 11:49:13AM +0900, Hyunwoo Kim wrote:
-> > esp_input() and esp6_input() skip skb_cow_data() on uncloned skbs
-> > through two arms: one for fully linear skbs (nfrags = 1) and one for
-> > skbs carrying paged fragments without a frag_list, which sets
-> > nfrags = skb_shinfo(skb)->nr_frags + 1.  In both arms the skb is mapped
-> > into a scatterlist via skb_to_sgvec() and passed as both src and dst of
-> > aead_request_set_crypt(), so the AEAD operates in place over the
-> > existing frag pages.
-> > 
-> > Drop the paged-fragment arm so any non-linear inbound skb falls through
-> > to skb_cow_data().  The fully linear fast path is unchanged and the
-> > existing skb_cow_data() error handling that follows the gate is reused.
-> > 
-> > Fixes: cac2661c53f3 ("esp4: Avoid skb_cow_data whenever possible")
-> > Fixes: 03e2a30f6a27 ("esp6: Avoid skb_cow_data whenever possible")
-> > Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
-> > ---
-> >  net/ipv4/esp4.c | 13 +++----------
-> >  net/ipv6/esp6.c | 13 +++----------
-> >  2 files changed, 6 insertions(+), 20 deletions(-)
-> 
-> Good catch!
-> 
-> When a packet comes from a device driver, it's usually safe to
-> write to the fragments since they would have been allocated by
-> the driver.
-> 
-> But when a packet originates from our own stack, then it's not
-> safe to write to the fragments.
-> 
-> Unfortunately the two paths cross with the loopback driver (and
-> probably other means of creating loopback).
-> 
-> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+From: Haoze Xie <royenheart@gmail.com>
 
-Thank you for the review.
+[ Upstream commit 82d8701b2c930d0e96b0dbc9115a218d791cb0d2 ]
 
-If it's not too much trouble, I would be grateful if you could also 
-take a look at this rxrpc patch, which addresses a similar bug: 
-https://lore.kernel.org/all/afKV2zGR6rrelPC7@v4bel/
+batadv_bla_add_claim() can replace claim->backbone_gw and drop the old
+gateway's last reference while readers still follow the pointer.
 
+The netlink claim dump path dereferences claim->backbone_gw->orig and
+takes claim->backbone_gw->crc_lock without pinning the underlying
+backbone gateway. batadv_bla_check_claim() still has the same naked
+pointer access pattern.
 
-Best regards,
-Hyunwoo Kim
+Reuse batadv_bla_claim_get_backbone_gw() in both readers so they operate
+on a stable gateway reference until the read-side work is complete.
+This keeps the dump and claim-check paths aligned with the lifetime
+rules introduced for the other BLA claim readers.
 
-> 
-> Thanks,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Fixes: 23721387c409 ("batman-adv: add basic bridge loop avoidance code")
+Fixes: 04f3f5bf1883 ("batman-adv: add B.A.T.M.A.N. Dump BLA claims via netlink")
+Cc: stable@vger.kernel.org
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+Suggested-by: Xin Liu <bird@lzu.edu.cn>
+Signed-off-by: Haoze Xie <royenheart@gmail.com>
+Signed-off-by: Ao Zhou <n05ec@lzu.edu.cn>
+Signed-off-by: Sven Eckelmann <sven@narfation.org>
+Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
+Signed-off-by: Robert Garcia <rob_garcia@163.com>
+---
+ net/batman-adv/bridge_loop_avoidance.c | 27 +++++++++++++++++---------
+ 1 file changed, 18 insertions(+), 9 deletions(-)
+
+diff --git a/net/batman-adv/bridge_loop_avoidance.c b/net/batman-adv/bridge_loop_avoidance.c
+index 17687848daec..fb9aaf82f713 100644
+--- a/net/batman-adv/bridge_loop_avoidance.c
++++ b/net/batman-adv/bridge_loop_avoidance.c
+@@ -2131,6 +2131,7 @@ batadv_bla_claim_dump_entry(struct sk_buff *msg, u32 portid,
+ 			    struct batadv_bla_claim *claim)
+ {
+ 	u8 *primary_addr = primary_if->net_dev->dev_addr;
++	struct batadv_bla_backbone_gw *backbone_gw;
+ 	u16 backbone_crc;
+ 	bool is_own;
+ 	void *hdr;
+@@ -2146,32 +2147,35 @@ batadv_bla_claim_dump_entry(struct sk_buff *msg, u32 portid,
+ 
+ 	genl_dump_check_consistent(cb, hdr);
+ 
+-	is_own = batadv_compare_eth(claim->backbone_gw->orig,
+-				    primary_addr);
++	backbone_gw = batadv_bla_claim_get_backbone_gw(claim);
++
++	is_own = batadv_compare_eth(backbone_gw->orig, primary_addr);
+ 
+-	spin_lock_bh(&claim->backbone_gw->crc_lock);
+-	backbone_crc = claim->backbone_gw->crc;
+-	spin_unlock_bh(&claim->backbone_gw->crc_lock);
++	spin_lock_bh(&backbone_gw->crc_lock);
++	backbone_crc = backbone_gw->crc;
++	spin_unlock_bh(&backbone_gw->crc_lock);
+ 
+ 	if (is_own)
+ 		if (nla_put_flag(msg, BATADV_ATTR_BLA_OWN)) {
+ 			genlmsg_cancel(msg, hdr);
+-			goto out;
++			goto put_backbone_gw;
+ 		}
+ 
+ 	if (nla_put(msg, BATADV_ATTR_BLA_ADDRESS, ETH_ALEN, claim->addr) ||
+ 	    nla_put_u16(msg, BATADV_ATTR_BLA_VID, claim->vid) ||
+ 	    nla_put(msg, BATADV_ATTR_BLA_BACKBONE, ETH_ALEN,
+-		    claim->backbone_gw->orig) ||
++		    backbone_gw->orig) ||
+ 	    nla_put_u16(msg, BATADV_ATTR_BLA_CRC,
+ 			backbone_crc)) {
+ 		genlmsg_cancel(msg, hdr);
+-		goto out;
++		goto put_backbone_gw;
+ 	}
+ 
+ 	genlmsg_end(msg, hdr);
+ 	ret = 0;
+ 
++put_backbone_gw:
++	batadv_backbone_gw_put(backbone_gw);
+ out:
+ 	return ret;
+ }
+@@ -2467,6 +2471,7 @@ int batadv_bla_backbone_dump(struct sk_buff *msg, struct netlink_callback *cb)
+ bool batadv_bla_check_claim(struct batadv_priv *bat_priv,
+ 			    u8 *addr, unsigned short vid)
+ {
++	struct batadv_bla_backbone_gw *backbone_gw;
+ 	struct batadv_bla_claim search_claim;
+ 	struct batadv_bla_claim *claim = NULL;
+ 	struct batadv_hard_iface *primary_if = NULL;
+@@ -2489,9 +2494,13 @@ bool batadv_bla_check_claim(struct batadv_priv *bat_priv,
+ 	 * return false.
+ 	 */
+ 	if (claim) {
+-		if (!batadv_compare_eth(claim->backbone_gw->orig,
++		backbone_gw = batadv_bla_claim_get_backbone_gw(claim);
++
++		if (!batadv_compare_eth(backbone_gw->orig,
+ 					primary_if->net_dev->dev_addr))
+ 			ret = false;
++
++		batadv_backbone_gw_put(backbone_gw);
+ 		batadv_claim_put(claim);
+ 	}
+ 
+-- 
+2.34.1
+
 
