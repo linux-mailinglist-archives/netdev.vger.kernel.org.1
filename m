@@ -1,111 +1,210 @@
-Return-Path: <netdev+bounces-282987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282988-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mMDLEq/B82mw6gEAu9opvQ
-	(envelope-from <netdev+bounces-282987-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 22:55:11 +0200
+	id UA7TD4rC82mw6gEAu9opvQ
+	(envelope-from <netdev+bounces-282988-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 22:58:50 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A632B4A7F44
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 22:55:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B6354A7F6F
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 22:58:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 54C053008A6F
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 20:53:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0E8BF301DAEC
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 20:58:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D50E377031;
-	Thu, 30 Apr 2026 20:53:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="42bawgt5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 670503AE712;
+	Thu, 30 Apr 2026 20:58:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f67.google.com (mail-qv1-f67.google.com [209.85.219.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 946892FE066;
-	Thu, 30 Apr 2026 20:53:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E70E235A3B1
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 20:58:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777582420; cv=none; b=gDXPttUJFa1B0VAJZu+62mhsHqivawAvsbuHIvTQe4nDFdgWnE54lx/rwE8Y2k66AktqhDGBDSsS3UnpodONgCG0aMu+rNgg2xB1ax6N0GXLKIsGL+s7tq8bmTwcZPPbrvtkYDNqbZPgN6Ca0M7IS3LJ1bWhzW6Ix38xZFUhIRI=
+	t=1777582727; cv=none; b=EfzbAJB4Xx7Vb9h7ucgpMD/dT8wQkLQMjtuQhDHtGaEpPYAEepXCUnXGjVUxYA1t1PTMFDuSx3co6PHaQ5fY9gxpvUxZNvRb0uFVxd6Ew7A5Pli9mwdo1UGYFItYFoSRj1rUOCS6jRMg5vy+Eq7F8+oUq+fAxaS+N8xXvyzzfXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777582420; c=relaxed/simple;
-	bh=2xY6QXp+xDjIPzfjgM937u3DZS3jvm7IWfWklxvvSHY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=US+3PhKeNpP305bADAnCDTFTPOSjPVEnJp48tUTpixt5P2z8WVorLW1GQ4aahUWUpNSHEYfmS4v0owpbqJxswlK0E1N4qXA237w+tLsaVx/SbwlSvy9/IT7N8OFR0Zt3jCU7QpuCBHOa6/WG+lCU2dXMosZKNrysdfM68TyXxkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=42bawgt5; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Fb7QkoGw9cRrxb4sMM2/4Lv4eMeLn4V7CADnhUhruZU=; b=42bawgt5bNFy+BAbLlXOuXzuW2
-	OHzrG/E9Cnhq2J1+gK4RdnllV16yyqL1y/W3N0Q9c1sKPRKtWNEKEOv5sv70Q7mcRAc+GpS+gDij+
-	+98WwpaiTVrw8OsG5zbZRZgZ6dGPiH+jh67tquBNaQyzlrl/kDe4UD29O51dEntht0yA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wIYO0-000kCZ-RV; Thu, 30 Apr 2026 22:53:28 +0200
-Date: Thu, 30 Apr 2026 22:53:28 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: muhammad.nazim.amirul.nazle.asmade@altera.com
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, andrew+netdev@lunn.ch,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: stmmac: Add support for TX/RX channel interrupt
-Message-ID: <42b173da-5c0b-4d72-9247-49ebec5e95e5@lunn.ch>
-References: <20260429072728.13638-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
+	s=arc-20240116; t=1777582727; c=relaxed/simple;
+	bh=bLcJu71G7WPZXPFwGj3wOrf2aAWHV9CNC4610TMQDno=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Nejlbk8aRD9ZVyOTNDy+OKqYQl+dkgL0pUPb0oTGuSAKNONLW28sNqcYRFJ0C5jchBeNQ6otkSEaYycj35HMNCY6Y8BV/yL/ToEPmj+2V+lrrDuuevsyKgtgWPDZPn3gj96tE62XxbypP6N5HYY4f20XHRj4jG6sRAyTDju7BEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.219.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f67.google.com with SMTP id 6a1803df08f44-8acb3daf2aaso19310346d6.0
+        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 13:58:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777582723; x=1778187523;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SvyvGmLX7fIENRT2IT+DRsK2ttBx2k3lafk3GdB3p2E=;
+        b=TDSEQ/hGoBPHH5Mu3Z7kAob2r4YS+k+duH3whnaY0gChLGTLRYiaisehYQck/c8Gwx
+         DkUnCkjdd2FGHExCXeotgE7ljgWjq3aZIzsbbagauIhHNf/yCC6Kz+HsOi5YuTlDsCWs
+         WRRE6ZfrIOcqSvPKeZcpAICzDR8oNeR9TW9/uw5euFbpTu9Fgt6gQW0r4SrxRWtHB66N
+         bGxi/1D3Hx0llaNPwcCsIx3JYDweylma+BIT40ebOomZ5aABf1CGWzbAp9W2WO5NxZ0X
+         TGMwgHUDD/JZoT4DdErrXTU1M1tDuHhhqX38eGhmLDYlS3joePdXRhKvdW05EOowdist
+         Kk2g==
+X-Forwarded-Encrypted: i=1; AFNElJ8oHDyr4BF0vrRiZFdmTO3pO2fqKN+hiTh4vXCknNReWrFgdn3fGPMPUMrH3HbF+Cf98VEX6fw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPE5m8MoJmt4whk6zaiKorpaSrv7+5UPywYQfiHf/+VzucT26B
+	1XFRfSKVpjBGhky0y1OVaPuiHOybHsIkseGVc6/JPcrf3a4VxN7zT9FH
+X-Gm-Gg: AeBDievMnOB/I4VIICUSLEwbW774dKTRrhLFbTTAiQRjM056JcA9kBMD3tPKUG6V3f7
+	3nWMHgDRq2pFKBDb/Bo976urRF8Rb6q5qC7Q1tITwZpmTtPX7IaYopJc8gSi2ijZ67XnxqPjSTm
+	dSGDgV/l6hDl/rLzV/n+0L+RKVGrRu7ccwIiNWsT3IWA9g7eFwrjVrk4a70uxgxwIzyOZHIq+d8
+	yjT3tNOAnqYucd1+8G+uvzM0oniFYHFFZNt0UHoAe8sxCPzJKZAeM+b60uE6mmXxECb1kEmybQE
+	JFG5iXb2eo+cm7KHr/yVO+KA27MKUMjAFt07Ejv7KmOhViA32kjXtHeufowWcurqD7HAMejmQF5
+	B6cxlCx3ThrCka5yqPrnG/CAMttnglf+gA0GrjYDcPgLs1cnAgJ63DpyGGoP0fFO6RJiqBiwKA2
+	M7q4mnLgWbL0S2x51SkKVUzkskeVkOLSZGhcCkbioOc0yMUco36yTsKM9a5Hs1l+j0uw==
+X-Received: by 2002:a05:6214:5f04:b0:8b3:e7b3:99ec with SMTP id 6a1803df08f44-8b3fe77dc0emr70398276d6.4.1777582723342;
+        Thu, 30 Apr 2026 13:58:43 -0700 (PDT)
+Received: from [192.168.88.241] (89-24-32-159.nat.epc.tmcz.cz. [89.24.32.159])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b53c0e7ebdsm2231936d6.29.2026.04.30.13.58.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Apr 2026 13:58:42 -0700 (PDT)
+Message-ID: <8fd5d3a3-d1d7-4542-a0db-1678989940d4@ovn.org>
+Date: Thu, 30 Apr 2026 22:58:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260429072728.13638-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
-X-Rspamd-Queue-Id: A632B4A7F44
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 06/12] netfilter: nf_conntrack_expect: honor
+ expectation helper field
+To: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org,
+ fw@strlen.de
+Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, horms@kernel.org,
+ i.maximets@ovn.org, Eelco Chaudron <echaudro@redhat.com>,
+ Aaron Conole <aconole@redhat.com>
+References: <20260326125153.685915-1-pablo@netfilter.org>
+ <20260326125153.685915-7-pablo@netfilter.org>
+Content-Language: en-US
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <20260326125153.685915-7-pablo@netfilter.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 8B6354A7F6F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282987-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-282988-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[ovn.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,netfilter.org:email]
 
-> +	/* For RX Channel */
-> +	for (i = 0; i < MTL_MAX_RX_QUEUES; i++) {
-> +		snprintf(irq_name, sizeof(irq_name), "dma_rx%i", i);
-> +		irq = platform_get_irq_byname_optional(pdev, irq_name);
-> +		if (irq == -EPROBE_DEFER)
-> +			return irq;
-> +		else if (irq < 0)
-> +			break;
+On 3/26/26 1:51 PM, Pablo Neira Ayuso wrote:
+> The expectation helper field is mostly unused. As a result, the
+> netfilter codebase relies on accessing the helper through exp->master.
+> 
+> Always set on the expectation helper field so it can be used to reach
+> the helper.
+> 
+> nf_ct_expect_init() is called from packet path where the skb owns
+> the ct object, therefore accessing exp->master for the newly created
+> expectation is safe. This saves a lot of updates in all callsites
+> to pass the ct object as parameter to nf_ct_expect_init().
+> 
+> This is a preparation patches for follow up fixes.
+> 
+> Signed-off-by: Florian Westphal <fw@strlen.de>
+> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+> ---
 
-It would be good to differentiate between real errors, and it not
-being available. I think -ENOXIO is returned when it does not
-exist. Anything else is a real error?
+Hi, Pablo and Florian.
 
-	Andrew
+I was investigating FTP test failures in OVS with 7.0 kernel and bisected
+the issue down to this commit.  AFAIU, with this change all the related
+connections over time gain their parents' helpers,.  This is causing a change
+visible to the userspace, because FTP data connections are now reported to
+have helpers in the conntrack dump:
+
+# conntrack -L
+tcp      6 119 TIME_WAIT src=10.1.1.1 dst=10.1.1.2 sport=59534 dport=21 \
+                         src=10.1.1.2 dst=10.1.1.1 sport=21    dport=59534 \
+           [ASSURED] mark=0 helper=ftp use=2
+tcp      6 119 TIME_WAIT src=10.1.1.2 dst=10.1.1.1 sport=52709 dport=52381 \
+                         src=10.1.1.1 dst=10.1.1.2 sport=52381 dport=52709 \
+           [ASSURED] mark=0 helper=ftp use=1
+
+Before this commit only the control connection had helper=ftp reported in
+the dump.  The traffic seems to work fine, but our tests fail because we
+do not expect the helper attached.
+
+AFAIU, it's generally not something that should be happening, as helpers
+on data connections do not really make much sense.  But I'm just trying to
+figure out if you would consider this as a regression and fix in the kernel
+or if we should adjust our userspace components for this new dump content,
+which would not be very straightforward to do if we want to be able to run
+tests on both old and the new versions.
+
+What do you think?
+
+Best regards, Ilya Maximets.
 
