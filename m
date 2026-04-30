@@ -1,53 +1,106 @@
-Return-Path: <netdev+bounces-282713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282714-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4J4uESYY82llxAEAu9opvQ
-	(envelope-from <netdev+bounces-282713-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 10:51:50 +0200
+	id EB0eHsoY82llxAEAu9opvQ
+	(envelope-from <netdev+bounces-282714-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 10:54:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CF9249F736
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 10:51:48 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3B1A49F7C6
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 10:54:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1303430013A1
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 08:49:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 53CC830128C9
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 08:54:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819ED3FE65D;
-	Thu, 30 Apr 2026 08:49:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B7803EF678;
+	Thu, 30 Apr 2026 08:54:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l1TkQH5D"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="DI4RWOBJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9A03FD15C;
-	Thu, 30 Apr 2026 08:49:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A253164C3
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 08:54:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777538994; cv=none; b=WTghPVbHkYndyqYjNBsTLaRfr57a9TvvMNrgVM8tqPoOZFL4Gkjhm1HTtkSHx8Wl4R8p1WCx4x1o7H92F6ev9jKY6OdO21wKoKz/7KsSLPCKOiSct8Wkfq48lOEw5QcSj8M6Kh21rQCmyWwARILEnF40mrKTJtjfB4k2UaGCcXg=
+	t=1777539270; cv=none; b=VEACJAXkrLEdnRCi8EkVQrmieHbv2V1N6t3iOldRt7ajr3g5XlUqPQeSowADwoIhc82u1bMqlN2K6zbaXMeVKPOKP6vyxxujWa+S6YXGYB0W885nCpD9O3qVyFJUkDoP0KiZ3NdKdsLpYlxhz1+9UKy8VauoJ0yTkDpFvcAJVQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777538994; c=relaxed/simple;
-	bh=Ig2KLrSxctNzfv91/Ob0md9MNjcSl3mUxpCXDK4oFKo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Nc6SoYGhuCytQVWzphtZSN2+NSZnPt8288m/+mKU2O+ETcLM3bgFo7Fx0WsUf34SeaIUCtyTsOcebGPFFSoLCGo/C6pjsZF7/+fWRs3ToLPa/ciQBgVRXBClGLGqtdaqb5ziZaWFB8HuAPyU7miSZg0wNSbJyxtrodrH3SMvyH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l1TkQH5D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBDD4C2BCB3;
-	Thu, 30 Apr 2026 08:49:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777538994;
-	bh=Ig2KLrSxctNzfv91/Ob0md9MNjcSl3mUxpCXDK4oFKo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=l1TkQH5Dn+sUZ3til3wuTYPRDB+JaNiKkdXyEkx0f6Hh6E1yu5YdhowBr0/KzN7Ma
-	 wQhxWNlRXB3zuGY8wsxlKj46yayeWaKAWRGSEnioEwjzfGYXbqYzdmjCnPI8Aulc7R
-	 TYRT1Ojwpx5QEUy4kZu9xjnyn5Jhfx/HsDENJ1o4zh2IPTJtQnif/8+Gk+MFJoEkGi
-	 DPAnWRnDuWGOk7dFK1khzNA0TnU+eDrwWnMQIRrPo/vjLEO23FKCOnGqhWQP8mos0i
-	 tb0PRSYeYiCAtufnBPi4eMA5i+h1h9E2u26Rbs25sS1u7iN3igzkbGi9SoZDWZ4Jow
-	 XbeyHY5usCwVQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02FFF380A95A;
-	Thu, 30 Apr 2026 08:49:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1777539270; c=relaxed/simple;
+	bh=s/mRY8DfMR8DIXpcHgLYEU8aDoZ9DdH5IyZrbIZM1HQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K9NeaGywqUT7NPb6lBmE1UHYHnj6ZRs28x0k0P9ILF7uEwqyhICkPRVcIu9I2WRuYTmCqFfwoNpjSFs9Lc4XCKiX+5BOCKHbhQaTox0b+7DomTrbnqDNVsfeBayjEhQQZIeoXASO5nA0Gd5WOfYx6v4pORdAbARAKln1zHJqMt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=DI4RWOBJ; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-488b3f8fa2bso17213445e9.1
+        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 01:54:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1777539267; x=1778144067; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6A9BkChX+85bq148XRWnuRUsG5zQnCEzyenyeEOtadE=;
+        b=DI4RWOBJuahh4eB++rrQhTMoTwFKxoIeuMBZUE3nCyMwGRCqkmfmL4KcxvsryNCjIM
+         +oUt7drtBWksNHP3zw7RVWp+lTs7QVw7wYfTuHwWnbz1As4nzb2RRm8+FNODv5x28awH
+         BQvJWIhe3+KDRXHYu9/IE/DUO1zB88gJJqLY+e/GqfwZPZKefybgwm5s+lIG7u7NgzbX
+         cJHyp7SAEFAXMcLVSV4AM+NP2wa8JgRQDLT848SKE0ngQPWvUbgM+Kwl5Zy0SLCj0IbR
+         077gAgIYnhC3W9nudNTA021ai1SqqJowK06JObCWkPfVOv/yZNOn5KUH85QGnyYt8BEF
+         ixdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777539267; x=1778144067;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6A9BkChX+85bq148XRWnuRUsG5zQnCEzyenyeEOtadE=;
+        b=DrAOQejyCeOBgU5LRHHQMcm3HfmW9qa5XD/yVhrG2MWbxaxql7Ll+L76ZQFYJS4UWu
+         MQyBjqi33irBDkqdJUDtEA1TYwvP+yy3dTLbqqji6cX01t58V0gAYDl+kT0pBwchcjpI
+         0h4BMewFLN358LhVpAXympZQ7v8k4+s2o4mRijBT5PAxGIZAN2S3+/2epqBVMu40tiGk
+         CZfw5tXzD7doivJWikNdzk/Gwe1y8GZocgpA0SBye7wDKRAlDFAmjoIs118I79dxBxjH
+         mpvGV1enmy6bREM2OhLEqwpCrmOqDH9D1UAaFogyLGw3RB273ZGdyyFfZg8DaQ9tUWlc
+         /pZw==
+X-Forwarded-Encrypted: i=1; AFNElJ+l7RljiByMDxUV61dXzuMi+QMf8Wdf2jnpCfE1OsvHWn9GXJm5NbVxGdIxiazKgX2lWrCi8II=@vger.kernel.org
+X-Gm-Message-State: AOJu0YybjgO3D1O8enw+c8y2iPKkmpnZraOzaZkLpXADcXFz+gVr9xn8
+	A58isT4K6zlPBm8HSwznMUw9WBACw1T/RGAYt6b3kLEwolwkDK4SiQ6OVJ/jSv3G9+4=
+X-Gm-Gg: AeBDiesY7HUiExEyBaBvEMzwxVbkj7TCNPrYKFC5CVFuyC7U/vZF9p6Ncr840YFygys
+	chMSjCRFftqMEbBm8sLyNxstlaI1jznlaEJIlT4wInSiEbSNXneLu40QG/ma7fxGjVm4d2zypJt
+	pJZbC79VkLmCVeWfWwSmEOMAn/O4SDw4B72TVGrPnzZk90O074HVnmqFC85JolRPLxkY0X1F5h6
+	fyfAFEA/zXQe5E7UyMD1540BtjQYgCvQKJgplQXhYYZU7og51kJ5vz+3LUHnVSQeGentHWL5Cxo
+	4mULYal/WeY4suF7MV9W8obDGHBnumIJA1pFx/CFHEGXZ8KKorxAgl48S+b7itH+u/Zhg+cpbiF
+	Lk8suQ8OBXzi0VHZ22/DvTHg09GMWibTJFSP0PvPObQJ5cyRJ2UPCRInqpPEqCTkzYJBTfv6csc
+	3BkPGcCMkQaAW4+knPuKyWAeEK3UDxKj1Tc1oYo/OjERMu35POCsOJCLdndZl8ET5Vt/92
+X-Received: by 2002:a05:600c:6291:b0:48a:79d8:a8d6 with SMTP id 5b1f17b1804b1-48a85e75173mr26204975e9.7.1777539266753;
+        Thu, 30 Apr 2026 01:54:26 -0700 (PDT)
+Received: from localhost.localdomain ([2a00:6d43:105:c401:e307:1a37:2e76:ce91])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a7c2fb5c7sm52906795e9.5.2026.04.30.01.54.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Apr 2026 01:54:26 -0700 (PDT)
+From: Marco Crivellari <marco.crivellari@suse.com>
+To: linux-kernel@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Tejun Heo <tj@kernel.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	NeilBrown <neil@brown.name>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [RFC PATCH] xprtrdma: Move long delayed work on system_dfl_long_wq
+Date: Thu, 30 Apr 2026 10:54:12 +0200
+Message-ID: <20260430085412.96961-1-marco.crivellari@suse.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,86 +108,102 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/5] Reimplement TCP-AO using crypto library
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177753894880.2417501.17222225356856785813.git-patchwork-notify@kernel.org>
-Date: Thu, 30 Apr 2026 08:49:08 +0000
-References: <20260427172727.9310-1-ebiggers@kernel.org>
-In-Reply-To: <20260427172727.9310-1-ebiggers@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, edumazet@google.com, ncardwell@google.com,
- kuniyu@google.com, davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, ardb@kernel.org, Jason@zx2c4.com,
- herbert@gondor.apana.org.au, 0x7f454c46@gmail.com
-X-Rspamd-Queue-Id: 3CF9249F736
+X-Rspamd-Queue-Id: E3B1A49F7C6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,davemloft.net,kernel.org,redhat.com,zx2c4.com,gondor.apana.org.au,gmail.com];
-	TAGGED_FROM(0.00)[bounces-282713-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linutronix.de,suse.com,oracle.com,brown.name,redhat.com,talpey.com,davemloft.net,google.com];
+	TAGGED_FROM(0.00)[bounces-282714-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[suse.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marco.crivellari@suse.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,suse.com:email,suse.com:dkim,suse.com:mid]
 
-Hello:
+Currently the code enqueue work items using {queue|mod}_delayed_work(),
+using system_long_wq. This workqueue should be used when long works are
+expected, but it is a per-cpu workqueue.
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+This is important because queue_delayed_work() queue the work using:
 
-On Mon, 27 Apr 2026 10:27:22 -0700 you wrote:
-> This series can also be retrieved from:
-> 
->     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tcp-ao-v2
-> 
-> This series is targeting net-next for 7.2.  To make this series
-> self-contained in the networking code, I dropped the patches that remove
-> support for transformation cloning from the crypto API, which is a
-> further negative 275-line cleanup and optimization this series enables.
-> That will be done as a follow-up, either through the crypto tree for
-> 7.3, or still through net-next for 7.2 at maintainer preference.
-> 
-> [...]
+   queue_delayed_work_on(WORK_CPU_UNBOUND, ...);
 
-Here is the summary with links:
-  - [net-next,v2,1/5] net/tcp-ao: Drop support for most non-RFC-specified algorithms
-    https://git.kernel.org/netdev/net-next/c/5eb0cfedb258
-  - [net-next,v2,2/5] net/tcp-ao: Use crypto library API instead of crypto_ahash
-    https://git.kernel.org/netdev/net-next/c/068f5a009556
-  - [net-next,v2,3/5] net/tcp-ao: Use stack-allocated MAC and traffic_key buffers
-    https://git.kernel.org/netdev/net-next/c/48168799896c
-  - [net-next,v2,4/5] net/tcp-ao: Return void from functions that can no longer fail
-    https://git.kernel.org/netdev/net-next/c/8e4f61e43163
-  - [net-next,v2,5/5] net/tcp: Remove tcp_sigpool
-    https://git.kernel.org/netdev/net-next/c/4baf2415992e
+Note that WORK_CPU_UNBOUND = NR_CPUS.
 
-You are awesome, thank you!
+This would end up calling __queue_delayed_work() that does:
+
+    if (housekeeping_enabled(HK_TYPE_TIMER)) {
+    //      [....]
+    } else {
+            if (likely(cpu == WORK_CPU_UNBOUND))
+                    add_timer_global(timer);
+            else
+                    add_timer_on(timer, cpu);
+    }
+
+So when cpu == WORK_CPU_UNBOUND the timer is global and is
+not using a specific CPU. Later, when __queue_work() is called:
+
+    if (req_cpu == WORK_CPU_UNBOUND) {
+            if (wq->flags & WQ_UNBOUND)
+                    cpu = wq_select_unbound_cpu(raw_smp_processor_id());
+            else
+                    cpu = raw_smp_processor_id();
+    }
+
+Because the wq is not unbound, it takes the CPU where the timer
+fired and enqueue the work on that CPU.
+The consequence of all of this is that the work can run anywhere,
+depending on where the timer fired.
+
+Recently, a new unbound workqueue specific for long running work has
+been added:
+
+   c116737e972e ("workqueue: Add system_dfl_long_wq for long unbound works")
+
+So change system_long_wq with system_dfl_long_wq so that the work may
+benefit from scheduler task placement.
+
+Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
+---
+ net/sunrpc/xprtrdma/transport.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/sunrpc/xprtrdma/transport.c b/net/sunrpc/xprtrdma/transport.c
+index 61706df5e485..1a54993f7ffb 100644
+--- a/net/sunrpc/xprtrdma/transport.c
++++ b/net/sunrpc/xprtrdma/transport.c
+@@ -484,7 +484,8 @@ xprt_rdma_connect(struct rpc_xprt *xprt, struct rpc_task *task)
+ 		xprt_reconnect_backoff(xprt, RPCRDMA_INIT_REEST_TO);
+ 	}
+ 	trace_xprtrdma_op_connect(r_xprt, delay);
+-	queue_delayed_work(system_long_wq, &r_xprt->rx_connect_worker, delay);
++	queue_delayed_work(system_dfl_long_wq, &r_xprt->rx_connect_worker,
++			   delay);
+ }
+ 
+ /**
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.53.0
 
 
