@@ -1,146 +1,190 @@
-Return-Path: <netdev+bounces-282611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282612-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OHrmAt3B8mnktwEAu9opvQ
-	(envelope-from <netdev+bounces-282611-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:43:41 +0200
+	id kEgTD5vC8mkjuAEAu9opvQ
+	(envelope-from <netdev+bounces-282612-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:46:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6557549C6FB
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:43:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96E0949C714
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:46:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 623423044B99
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:42:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0E6C030151E7
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:46:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1CAC2FF164;
-	Thu, 30 Apr 2026 02:42:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E34332D0EE;
+	Thu, 30 Apr 2026 02:46:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s3IG+Az7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d4MUZKEu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D5332EBBA4;
-	Thu, 30 Apr 2026 02:42:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777516929; cv=none; b=HuuqK9JU5IUCEdBpos6sfPBwXMIrkURSdz/EAb1/S3dYAf4lJFXPVL/8TLNoBS9jFWUD3lgi64amxaYeYetQnXZKoKmhoyTjXayUyGJ41034QXSyCAhVuJI/2WFcDXWnzLYJ6iIf0E8dw66CrEcddfRZqouJTWeFbxjHNrzGNxc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777516929; c=relaxed/simple;
-	bh=L6+iCDsBkfClSuv3Tvg8xW4/AS6rgmHIIAwwRVLPNp8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tLYwCb6D3wHlW1pofvxotcKMTTpKDjfGRn/6lmZOgALYuPpS6G1JQ3U8viqfsZlSosnOybMnD9OZCEoXhnIGiIfNDQ+vI/7flWFOxNvAm+iUvFO+gobB+RK0/QlpsyMp2rUX+KcxttRItlzoZc+N66+wpBEWLlp9BrlhbeL2Z/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s3IG+Az7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D194FC2BCC4;
-	Thu, 30 Apr 2026 02:42:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777516929;
-	bh=L6+iCDsBkfClSuv3Tvg8xW4/AS6rgmHIIAwwRVLPNp8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=s3IG+Az7jgHhvBT8q82HCq0jdzh7m/C6bFlF04Z3Dug2rMYogX1H42KAX160OGubr
-	 ha/VRRb6tD3uRhr3ehlBnkpA9vJIiheog8FODIfNantWZAKJIxhL2/j9chJ06G1QUa
-	 ZRPQ9ehaCy/3A7YjLPDedwUiS9Z5ei4Asm1tvoWpSYqG0g+2D16Yjr4vN6nTeCRM/p
-	 vhQ0cnlLJkL7wa2bPsMgN1WOM2pvOd+/72/rWWJ5ATj0oVbUmsawfcVLMgOjfgMp6k
-	 inP78ZeLbngxzgclUv8LVFFM9Lmof6xJ9ehULThsZon8OPW8EEiuKqy9zmEsIP88TU
-	 liGKxxxPoKNiQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: achender@kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	horms@kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	shuah@kernel.org
-Subject: Re: [PATCH net-next v2 6/7] selftests: rds: Collect pcaps on timeout
-Date: Wed, 29 Apr 2026 19:42:07 -0700
-Message-ID: <20260430024207.2452372-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260428222716.2960871-7-achender@kernel.org>
-References: <20260428222716.2960871-7-achender@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96A9F3002A0
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 02:46:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.175
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777517199; cv=pass; b=F9If2D/IgsnoQgpIh5gDXEx8QGHrT5fl9o/OkrLJIDA1/G9Qh5e5lhdaOE95TxTyPPkNKB3DBO75C63vE+9/biJPR+3m9hzXRCtjBtqnUAElLH6LvtiBZc9cf9G39Wt1u7+DbdpRtEFiZJy94H6oFWjYtSw8oomczY+741qpXmY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777517199; c=relaxed/simple;
+	bh=aT11hkKef07wVt5TZXMpjctyPu05lHXAD49tSMD9BFY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nu6Fq8ZKg18HEp2bTFV3Zfye4tH7AvcBK/O5ZhaTuQphoaeHGuRWPwuFHyjqjBazJFCcHx66Mpj2m92fNbyxrxk304JLUIzTDo3AzO5v9iaeITEFGVMGn+88LNpWnyn1GM/m7zkYrOv0Mhs7MV7KSOy9mrWe0ZXHJCxV2RmDges=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d4MUZKEu; arc=pass smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-8ee7ffd738dso147625585a.1
+        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 19:46:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777517195; cv=none;
+        d=google.com; s=arc-20240605;
+        b=CMH7kuhnCuyS/9S9qL2x9dtGQR9UKqX2ejaItV3/DWfsQUhNC6ruQP2G31LqNngGIG
+         UUVcJuiB+dliXOC6pylHlxB+AVqo1770ctVyvJTge0mJERq+kqxFvbKaA6FDQXxEpd6y
+         vtCwtwfvV6RQY0dpLN5TBlMGvRNJwa+khsfzn6rYZrQIryl5xVnjvGMjX6zjbn0thXHr
+         Pt9zjayDNqVh1b/D8M+mBBBeRaQavlR2yegMPmyb/iNoMXu4UCFcSI8TNmN8gkYl+8Uj
+         AYXP6M6m/JzTOl86sZIJI+RnGanrBwXwMl4KP/PPpsWmTgPY9GefdbUWq+ElpYa2LPwK
+         ASEQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=eSsA+Kw8J1H0AN7uzgMjjhL2cMAl5C4DIDhT6f092dg=;
+        fh=g1WZQvXdr6C6NhCXS5xCN7jDF/l7Ye+0nF9MI3SMpF4=;
+        b=RghWKC8GRapuhtPBph3KLJrUZt17EkauRgWJxVmMbHScBrwFqfGm86zRktF+hB7P4n
+         KGhVwfac06zl6sODUPGtEdCVLp+ke4VZwhcq/QRI7z9t30uslZaQd38XyfmLVe4nhkiO
+         DX0ZfDouN1+Pg7X3Evff7SB+TkrYlov2J2SAHoAhT/C6iKZG4mIU3llxFLif+x9mk3zc
+         6xlTkgH6d0zJg+AvvYdr5NLtxFQQJecnQezo/Pp9fwZQPj3DbBwwigmOvE7ppMhwRipu
+         k7/9QnkjOLpT6hd8F8VPY9XIALtnDIUDfnqriw1XOgSPAmBcU6F+hIGiICSHf+tEq6WW
+         X5Ew==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777517195; x=1778121995; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eSsA+Kw8J1H0AN7uzgMjjhL2cMAl5C4DIDhT6f092dg=;
+        b=d4MUZKEuWVjYak/nY3toeGapT3AruxjY+iP/uu7qUs1RkzF1bv2Rt27gf9zam/UL1g
+         ayUO85u1QcT6WuMn0QNzLuuJyEhBbJbaxOYdrdnKmyyjVeDl/hiL87N3NKnb/nlcp2H6
+         9b2nGgcOlQGz/UFblbuq28mOZBPWPIwtWfj8t3D5kdZB1I3S7h8seCERZzkOwzyTVptc
+         exkj6A2Neeew4DQ36/UBO+Ore0tYRvpiIhYSgca+Wfwgv/OYXzBZzj8vvJiNxoNYuWf5
+         OmPbl0zO9hh6gHpRyUjtIKJwtYLpbUHcnvl3NdrhhaHns/9dc06BaIADqJ5vvoZSIF2n
+         iaFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777517195; x=1778121995;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=eSsA+Kw8J1H0AN7uzgMjjhL2cMAl5C4DIDhT6f092dg=;
+        b=Wlq5PH3n6QEpCPWg45XYAsPc68oXY3yLNYctqjWUzdCX5+FDtWrk+0KLdYsEkeHTyn
+         Nmcx/WEvTzkB0uQzWCzWW8MLLx/r5gG23rrvFGZd45aNQeViITvuW2ZZI1ydBKVCYbXg
+         lXJ/DgGy4TSvEjf422yV7Vlr2rQTlQaEETp5IT2MUT3ku72pG4ysBUgjkZh3dfeLxGUX
+         q0KGlrTlF3PUY1eHCHtBCMETzLB0U8d2h8N8psabRpQLFgc5OWFrUMbbKaGlJUIyKnLM
+         Z4y8h0754FTfCrSzX7peGXOlcb6I29MZASRSlDZj4m6EQ/4SnSUIMmdl1OEs1p1mFwTr
+         oxoQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8JGPtbIbRVUDSsrOlELyDhVgYVlu/mykBR8+EtnAT+EaIGk7AsIj7GcPTpmqIg7C/Hg6aQmd8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmpydoVUpxOwntlZs+fjIX2jqTbp19V/EtkXC8HVCqJg+Mn8sD
+	DhkvwGvqevswTEkO9fueu9ptw9glJKscnOxgXROJOzM4qdWZUuTfx2n9m4OVHn9tLwAEjBBzEXn
+	wZsAU5hN8zq2Ph19jfRTcV2uzM+wHEgE52qD+HEqS
+X-Gm-Gg: AeBDietr1G7lqODmWZpf61jMoWTCaLaud4bf52gjCBiNctN3Ai4VXOZUYFlZABlccXh
+	YJlgEqvEq+osZg7HE5cbSdPgi8ELK1c89byMNVM5z7iWIyfYubfPoFr+NJqxjPAtHb7BDmV627z
+	FXc7335IyQHZ9PSOK/1bqL0wR+5Kx2JARADjGRYv9IYrWABfqnf9dm55uDJeKZjZr2moybdT8Vu
+	L0l652/Wa8H23uWdHch0kgpCeMAIL6SrHL7O+L0e+2XUBiH4uopmXZ3rY0qEktSuxgcRQiVbm0t
+	++oqesC6R90I1yu0OgnQO8FWc0Hdq/Fh4aTDlObpacw965y1kECJWyfJFYbCVk5FIA+Z2v0a7qu
+	K0oAiigY=
+X-Received: by 2002:a05:622a:514:b0:50d:3efd:bd93 with SMTP id
+ d75a77b69052e-5102d0d3e87mr7791921cf.11.1777517195076; Wed, 29 Apr 2026
+ 19:46:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 6557549C6FB
+References: <TY7PR01MB172057C053E8D550485A29A08E0352@TY7PR01MB17205.jpnprd01.prod.outlook.com>
+In-Reply-To: <TY7PR01MB172057C053E8D550485A29A08E0352@TY7PR01MB17205.jpnprd01.prod.outlook.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 29 Apr 2026 19:46:23 -0700
+X-Gm-Features: AVHnY4Lwl01Xyj2g07tpoheIVw1AqnWlO4eliacZgKmPEOyIUAmGUIaTS9ZoNBs
+Message-ID: <CANn89iJHUEio=hZPkKuh7MZLxQuU1h4RLyB4c6nkWGNifevexg@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next 0/3] netns: optionally inherit IPv4 TCP
+ sysctls from old net
+To: nmreadelf <kong414@outlook.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net, 
+	dsahern@kernel.org, horms@kernel.org, chia-yu.chang@nokia-bell-labs.com, 
+	idosch@nvidia.com, ij@kernel.org, brauner@kernel.org, jack@suse.cz, 
+	kuniyu@google.com, jlayton@kernel.org, netdev@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, lance.yang@linux.dev, 
+	leon.hwang@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 96E0949C714
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282611-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[outlook.com];
+	TAGGED_FROM(0.00)[bounces-282612-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_TWELVE(0.00)[19];
+	TO_DN_SOME(0.00)[]
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-selftests: rds: Collect pcaps on timeout
+On Wed, Apr 29, 2026 at 6:30=E2=80=AFPM nmreadelf <kong414@outlook.com> wro=
+te:
+>
+> a new network namespace starts with built-in TCP defaults.
+> In container-heavy setups, operators often tune TCP sysctls in init_net a=
+nd then
+> need to re-apply the same values for each new netns.
+>
 
-This commit updates the RDS selftest to collect network packet captures
-when a timeout occurs. It moves the packet capture cleanup logic into a
-new helper function and calls it from the signal handler before exiting.
+There is a mistake here.  init_net is not the same as parent_net (or
+old_net in your patches)
 
-> diff --git a/tools/testing/selftests/net/rds/test.py b/tools/testing/selftests/net/rds/test.py
-> --- a/tools/testing/selftests/net/rds/test.py
-> +++ b/tools/testing/selftests/net/rds/test.py
-[ ... ]
-> @@ -70,11 +70,21 @@ def netns_socket(netns, *sock_args):
->      u1.close()
->      return socket.fromfd(fds[0], *sock_args)
->  
-> +def collect_pcaps():
-> +    """Stop tcpdump processes and move their pcaps into the log dir."""
-> +    print("Stopping network packet captures")
-> +    for proc, tmp_path, dest_path, fno in tcpdump_procs:
-> +        proc.terminate()
-> +        proc.wait()
+unshare -n  # Parent netns might be init_net
+unshare -n  # Parent netns is not init_net
+...
 
-Could this proc.wait() block indefinitely and defeat the test timeout?
 
-If a child process is unresponsive, the timeout signal handler will get
-stuck waiting for it. Using proc.wait(timeout=...) might ensure the
-timeout path remains robust and doesn't hang the test infrastructure.
-
-> +        os.close(fno)
-> +        shutil.move(tmp_path, dest_path)
-
-Can this cause unhandled exceptions if the timeout triggers during or
-after the normal script cleanup phase?
-
-Because collect_pcaps() is called from both the normal execution path and
-the timeout signal handler, it might be executed twice. Since it loops
-over the global tcpdump_procs list without clearing processed items, a
-second run will attempt to close already closed file descriptors and move
-already moved files.
-
-In Python, this raises OSError (EBADF) and FileNotFoundError, which would
-abort the signal handler with a traceback instead of executing the clean
-sys.exit(1).
+> This series adds an opt-in mechanism to initialize per-netns IPv4 TCP sys=
+ctl
+> settings from init_net at netns creation time.
+>
+> Behavior:
+>
+> Default is unchanged.
+> When net.ipv4.netns_inherit_tcp_sysctls=3D1, new netns inherit
+> TCP sysctl from old_net.
+>
+> nmreadelf (3):
+>   ipv4: netns: group copyable TCP sysctls in netns_ipv4
+>   net: ipv4: add netns_inherit_tcp_sysctls sysctl
+>   tcp: netns: optionally inherit IPv4 TCP sysctls from parent netns
+>
+>  .../net_cachelines/netns_ipv4_sysctl.rst      | 25 +++----
+>  include/net/netns/ipv4.h                      | 33 +++++----
+>  net/core/net_namespace.c                      | 72 +++++++++++++++++++
+>  net/ipv4/sysctl_net_ipv4.c                    |  9 +++
+>  4 files changed, 114 insertions(+), 25 deletions(-)
+>
+> --
+> 2.47.3
+>
 
