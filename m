@@ -1,145 +1,126 @@
-Return-Path: <netdev+bounces-282927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282928-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 7qq7AiZ682mt4QEAu9opvQ
-	(envelope-from <netdev+bounces-282927-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:49:58 +0200
+	id aOTAGvl682nH4QEAu9opvQ
+	(envelope-from <netdev+bounces-282928-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:53:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 914CA4A51E1
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:49:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCB234A52D2
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:53:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A76203008C0A
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:49:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 14C3B3031CC6
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:50:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C7CF44CF39;
-	Thu, 30 Apr 2026 15:49:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A557F44BC88;
+	Thu, 30 Apr 2026 15:50:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="YDPegXpS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OMvDqa/s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA0F44CAE2
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 15:49:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838892E7F20
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 15:50:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777564187; cv=none; b=JeCy50nM+0ULg2DZkZS/p+mWZNJSSkehiQiuFnNzScUWzGQXtJYLkuRlqF8uJGp1RZA/jhgEb5cr/syFH0jIYlNQs55qWt2VIhZ9fs/nm4zLS3CAwgXJAhnhS3DnM90R2oAHnmCCyQjzaN8olL9EoSrjZbtSH5UhIomZmGzbP+o=
+	t=1777564252; cv=none; b=AY2iCgg7Z81GCYjOoPp2/7GM25nCBTkKHepqM4uDuiKWPXP+1y+2XErQs3hs/OGHiDYSruppI4IkwlJENEzTDYoyoojngIoH8ykm38cKsbm0K6i5UW6upJ6uAntsuyTifvr0Ce7R+DtcB6PMbjm48BXsZ/ejXypHuLTtd3Eb844=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777564187; c=relaxed/simple;
-	bh=Pd8sYVFV1kR0uSimC6jrCcGJEkwAziThLBOjGnujbaw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=a8xTtbN2uNMHULG8OFSZ7JLY+ltUzQ5Bg0HHuj075nWa9gVvJSvaXMB4uKJjSA40yrFkqnsq2CnJLEfgdX17uCskIs7uw1s8lYWHCnPAyg6OErmod0cm11gW1e7ds4mGgrU+OLo0FuNshRemByUVJ+1Dj/iccDnDVrTZaLZvbHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=YDPegXpS; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20260430154943euoutp01aa4ecc9fcaac5bca7cedc8429f3ee74e~rLTTzpenl2250222502euoutp01T
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 15:49:43 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20260430154943euoutp01aa4ecc9fcaac5bca7cedc8429f3ee74e~rLTTzpenl2250222502euoutp01T
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1777564183;
-	bh=iCKWbPC+I/tUrQZJo+RFleYMY1viaZ7b8su8ZQeFbG8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YDPegXpShtz3+ydmnC4zWjutNW66ZiSt2HRTHYrXgjRx8ghZ9tTFZzomldrOLO+Kj
-	 ydUF+T+w0EUOOBrXecEOjWZKHMm2cN31en3SOjqAfIMKIDLGhEBq8TQn2NKKQjQARy
-	 f0Uxp+ilwFYC7W77ZgwLjlm2BKwn7gnQd8gz+vQ8=
-Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20260430154943eucas1p1bceacf3abe2f9fa802912566f1876217~rLTTrGz3v0489904899eucas1p1s;
-	Thu, 30 Apr 2026 15:49:43 +0000 (GMT)
-Received: from AMDC4622.eu.corp.samsungelectronics.net (unknown
-	[106.120.77.34]) by eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20260430154942eusmtip233cda62c92a14610cd4e27508e05f97c~rLTTNpc3N1125511255eusmtip2i;
-	Thu, 30 Apr 2026 15:49:42 +0000 (GMT)
-Date: Thu, 30 Apr 2026 17:49:39 +0200
-From: Jakub Raczynski <j.raczynski@samsung.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH RESEND net-next] net/sun: Fix multiple typos in comments
-Message-ID: <afN6CpRoH6g2RdoB@AMDC4622.eu.corp.samsungelectronics.net>
+	s=arc-20240116; t=1777564252; c=relaxed/simple;
+	bh=i17bkRA9ZM8Zb6B2YOoJQwthaj4FCYcd/reu6I/vOBU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Gph5aW3xaFPblS8XbPlXSGoP3XtNPtspjGFB+3NLWLzfn8dy6P6ryOEsz7Gzs+OO6u7va6GPonFm0enQZrf2FTn6UrqPml1jK+I11S8cyAljmPom45dLYo0zorJ4mVk9G4bOySRO3gkjAYbePKPr9OKBch7moqOtZU2dAAxGfb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OMvDqa/s; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34D0AC2BCB3;
+	Thu, 30 Apr 2026 15:50:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777564252;
+	bh=i17bkRA9ZM8Zb6B2YOoJQwthaj4FCYcd/reu6I/vOBU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=OMvDqa/sM5SgC+9LKZFGdYZ2QdHGtqtmuCKr16CO+HAI5pU2ZJzmqSWge1LbbeWtl
+	 /1pNdolFtKh39Sk0LSImJ4fsdd7B3owqorFQ2GCS7hu0Bv0uBJcH238AgoHmg/FOKD
+	 s+L2Ra7w6VlhRMf77Lmj2+bi5SjHL2L427oeL3djyL4KY3U1Y+5MlAdI4K9vcJALqw
+	 zVMjuXEcicOW/CTvQQjT/4krhOJpF2cbLD18f93ATG0eHhe2FupshkrQWE1dUUcXKA
+	 8erLmmovW0gxsK/e13V7EUse4a1kC0GgFuJyWTKNumFeMFL3C46cO4LdtwzCBPOEyW
+	 yfxyNHIdb51mg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02CC2380AA5D;
+	Thu, 30 Apr 2026 15:50:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20260430010322.2326574-1-kuba@kernel.org>
-X-CMS-MailID: 20260430154943eucas1p1bceacf3abe2f9fa802912566f1876217
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----EbkeEIwBiIKV-5_.nU08j0UNUa-otTO645nIPTj5A2-x7-zv=_3474b_"
-X-RootMTR: 20260430010331eucas1p1e5a85246a4a475b4b70b883f4f241c26
-X-EPHeader: CA
-X-CMS-RootMailID: 20260430010331eucas1p1e5a85246a4a475b4b70b883f4f241c26
-References: <20260428101728.3537456-1-j.raczynski@samsung.com>
-	<CGME20260430010331eucas1p1e5a85246a4a475b4b70b883f4f241c26@eucas1p1.samsung.com>
-	<20260430010322.2326574-1-kuba@kernel.org>
-X-Rspamd-Queue-Id: 914CA4A51E1
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute2-next] man: remove libnetlink man page
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177756420680.3067548.17200337241738648432.git-patchwork-notify@kernel.org>
+Date: Thu, 30 Apr 2026 15:50:06 +0000
+References: <20260427172827.300214-1-stephen@networkplumber.org>
+In-Reply-To: <20260427172827.300214-1-stephen@networkplumber.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org
+X-Rspamd-Queue-Id: CCB234A52D2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	CTYPE_MIXED_BOGUS(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[samsung.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282928-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWO(0.00)[2];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282927-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+,1:+,2:+];
-	RCPT_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[j.raczynski@samsung.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NO_DN(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,samsung.com:dkim,AMDC4622.eu.corp.samsungelectronics.net:mid]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,networkplumber.org:email]
 
-------EbkeEIwBiIKV-5_.nU08j0UNUa-otTO645nIPTj5A2-x7-zv=_3474b_
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
+Hello:
 
-On Wed, Apr 29, 2026 at 06:03:22PM -0700, Jakub Kicinski wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
+This patch was applied to iproute2/iproute2-next.git (main)
+by David Ahern <dsahern@kernel.org>:
 
-I should also implement any basic tools or AI to verify my writing skills.
-This patch was basically prepared with help of 'typos' script and yet has
-errors.
-> The "autonogotiation" to "autonegotiation" change looks correct, but
-> the neighbouring "in enabled" in the same sentence appears to be a
-> leftover grammar slip (should it read "is enabled"?).  Since this
-> sentence is already being touched as part of the typo cleanup, would
-> it make sense to fix that at the same time?
-Probably, no reason to not do that. Might be good to also change double spaces
+On Mon, 27 Apr 2026 10:28:27 -0700 you wrote:
+> The iproute2 libnetlink is not a public and stable API.
+> Having a man page encourages users to think it is available.
+> 
+> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+> ---
+>  man/Makefile          |   2 +-
+>  man/man3/Makefile     |  18 ----
+>  man/man3/libnetlink.3 | 200 ------------------------------------------
+>  3 files changed, 1 insertion(+), 219 deletions(-)
+>  delete mode 100644 man/man3/Makefile
+>  delete mode 100644 man/man3/libnetlink.3
 
-> Neither "imperical" nor "emperical" is a correct English word; the
-> intended word is "empirical".  Was the replacement here meant to be
-> "empirical"?
-Writing fail. Funny enough, I had someone read/check this before sending and
-it slipped.
+Here is the summary with links:
+  - [iproute2-next] man: remove libnetlink man page
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=fa2309a9e91e
 
-Will resend whole patch soon.
-
-Regards
-Jakub Raczynski
-
-------EbkeEIwBiIKV-5_.nU08j0UNUa-otTO645nIPTj5A2-x7-zv=_3474b_
-Content-Type: text/plain; charset="utf-8"
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-------EbkeEIwBiIKV-5_.nU08j0UNUa-otTO645nIPTj5A2-x7-zv=_3474b_--
 
