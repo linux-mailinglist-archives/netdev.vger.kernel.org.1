@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-282905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282903-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AKOMNMB182nJ4AEAu9opvQ
-	(envelope-from <netdev+bounces-282905-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:31:12 +0200
+	id uK7xOCB382mt4AEAu9opvQ
+	(envelope-from <netdev+bounces-282903-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:37:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 552D24A4D0D
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:31:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A3B44A4E71
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:37:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 582543030758
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:30:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2DFBD303465A
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5743030F533;
-	Thu, 30 Apr 2026 15:30:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEF2329BDBF;
+	Thu, 30 Apr 2026 15:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="Gz3tE79F"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="fsMUFG1q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9A3831327D
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 15:30:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 324E227A123
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 15:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777563038; cv=none; b=tLrBe1F8MSqflEjFElyGHb6vjGEc4Hl2ijy//oSfZ5cyr9npmbn6Fu2tPXhHHCO0avYBbNHzk6nmKmz8N8y/6mr1NhA6qcWw+jB+pGLwUK77oAAMDiC8gUZNBVPm3AZrTYNeHou/k70neH2A+pzjqwVermrL7SNGre34DT42qM0=
+	t=1777563034; cv=none; b=mc2hPwYv7G5CRTax0AB5BmkqgJadQXcWlH9lJSguZ0TfdqZqV+1M8lTlSuYF23nulxz8u+9DwfAi1GqgrDXyqtAZPIwwTp4AKgb/Pur8u9I3eTJqo8iaNBTB+GmooeO5tDKjFQ/BDXidaHHvCeOxwTES7lPq91ZASfaevSjsxwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777563038; c=relaxed/simple;
-	bh=xXnQsjtqGxKOM8NZxDlpP6YJlvkaUbX9991pUA+OdbM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kxT6IyhB/tt+A/yjAMX7O6Jl8pTvQphqmzuQYAhdAFZO8vfqW8d85RcFzPcAPWhBDWliXw4rLBLJ9lM73ool3kIjTT9BgQnh9nNJm/iY9g7OHe5edHWpFIXhvOFSZBepN9dHRvQu5NZrBKbYeo7PgU1P5pqRhXoA1z0U+wBxtuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=Gz3tE79F; arc=none smtp.client-ip=209.85.222.178
+	s=arc-20240116; t=1777563034; c=relaxed/simple;
+	bh=AQod7Z3vBXi7GLgv7aJ9RS4Ri6kONs3+lhD2VSQ0iBY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Xh6Y+CWjqP0cdfvXsS4fIYw/8SM4Xfh4Zor4Z4ZEQjcwPMgeQNRqmEGpIklo+Iz/68KM2PtHm6qCS/yNSLxBz44DhWYPBc6f2+FpqqhChBR7B6eeSO0DEO3pSEpQT9mzik4ZRyOXqs59uDZ3Iqc1L8Wiq1GPrcVKB20uZvY+FQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=fsMUFG1q; arc=none smtp.client-ip=209.85.160.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-8d933da14f0so110109085a.2
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 08:30:36 -0700 (PDT)
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-50e5bea4045so7754231cf.3
+        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 08:30:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1777563035; x=1778167835; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lXTJvAOfvRa7NNwLaGmrCktIbRSgY5DJNwPRo6G8z14=;
-        b=Gz3tE79FZAnMGac2Ijn/V12fIBvovLbaPmbZ0ot70v7Zm+fGD3yejkOZNFJdi8cL6/
-         orRzXjJKh9EY8gsWaw0lVARDk/FXXS6NnWypL6Ca7P6rEuvrdKuAcS+cdr3yEKM43vG+
-         ZZmiGeTfc6xW0lphCLXztvnG7kzWk3ZWOZFC7r9VKh9hxAEiAbw684Xmz4NG63CLccCv
-         8wHRNixg4zozW96b6lgc9CDdRsCtRLN8wEbdIVRNXrOoKDXuAYmH8n4xZ8hIWV2tU+X7
-         YqCo+3dQofkgxmeOILA26BSaYuM19XghoTU2bc81BfcrZQSGxVtqnozlTXUpnoW4UEtB
-         QywQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777563035; x=1778167835;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1777563031; x=1778167831; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lXTJvAOfvRa7NNwLaGmrCktIbRSgY5DJNwPRo6G8z14=;
-        b=QW7SmshYbNul0CbqUG8Z+nfHz52ogi3QbhSEaFeP93kQYoQwhZWxwiKfPUfpKPNyhp
-         KaFUKwwzZaRnGjsHela251wf5rFrtWYn/aMgJ8XEXCZ3F0ss4U8aFVQ6WMTWlIwGGUrg
-         +9VCIagZq4zpxcWl8j9bRrV2VWdIelJxgXZGwIOTJL1fgeVhoagkoYCdbp96oqOEmlp+
-         cNfoQagp4H65Tan21QA+43m5qjNvdkjMcK2mRE1fSAnQzA7mNxpp9g7Mkhd7oV5cTNL1
-         bzHopPyDLhml9DhrxnvFAOYfd/veIJvigVQXclXIZGfb+WcEmtvWTUMXjrIaiDdiGB36
-         qomg==
-X-Gm-Message-State: AOJu0YyQ9pV3wyP/lpru7w8QbuDH4ONXoVqenkj26l5ek63pt0b7Y0IC
-	58hGu5EeTAYEMNlkS33fbJzKHGW17YIuIL4wQOhlWa4TglkuDDN+BlWeRuJdh0YrqyI5S14Erpt
-	VYNc=
-X-Gm-Gg: AeBDievxFe57n9Yn1a8jOp4QTdhwhge7PQ1pYkrm1uoNxU59hSqORyw/QlbGHMbPDM3
-	F8VeOLS02mwaWxAMJ5sBngeq4i7584KwJxZl4lyGunkchIcWUfjV0tueEVpOOAVcPnIKxJeGtfM
-	VSJNFOZzlJsc6YOMafevg3JH9q2/darsaZVGjycM96qvj+EtqTd0PuAZjVyJrBrMpVSb6zYboHd
-	z/vnsMAhP1U43u17wy4+OGw3tMQr2JP6J24ZUbgcMovJzrV9gUR+lanakKRfEpN5QOwD7SFkz8S
-	w3kj2cVNkt+MQu9wgngN1DmkK1d1g6AJv5Buph1aYWRr7zUuqk52Z90EzV3rMn52nhjIqSkc538
-	X6L2zC0d8w5CsGj+fGWFWDQ/Gm7gdOTXQFAwt/B9Bm4fe0TyWsUXIQNozb9DpTva8KVbk8UGsye
-	FGP7RpEZxb16Vr1076jfPLsCrf2FZySmGapL4mqQ==
-X-Received: by 2002:ac8:7f42:0:b0:50b:4a84:aa94 with SMTP id d75a77b69052e-5102aaebfb4mr48264681cf.7.1777563029617;
-        Thu, 30 Apr 2026 08:30:29 -0700 (PDT)
+        bh=4lvJAuBtx6u7Jt9OXcsd2Lp87vUF1cpUlCvS747GXao=;
+        b=fsMUFG1qtn/qY2ASNYT4fCDvuYCNUbohd8pJppz0cfmT6j32WI8DI9YcjSHOQjVBuc
+         gW5BO9Cagnn2MvlinRE2hF5ione/bp8T9uq+sVfPKOhhzvz84dzuXbU/2rlLOAWMYi7P
+         zmzjTpNJEQDEiSb1hpLt5AUEZpIpSCMWxHkN6HiNCAtk/WU1jl7LgwR7C1Cl1MemgJHn
+         O7b47w/wPBiyg++0vbbS1ml3SkFWRER/GXqkSb8n1TtMuBD90KfKDvsiYF/53JxwUFe0
+         oCXMJyENMbxpQFai2VA2TNqNz9k8LKjtd65+2VqnB7UNrw+roccwDGFOZ0/R2vRw/1o/
+         wrEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777563031; x=1778167831;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=4lvJAuBtx6u7Jt9OXcsd2Lp87vUF1cpUlCvS747GXao=;
+        b=lx5iz4xwC3w9IL55hmNjWpfw/3dHIrM72gcey6WC0aMFR9Z5Sn300TqsIpULMQQ3D+
+         QsRXZIZ4WEw0FBAavCvk9jmpGe/8fj2jg9HaV0yJN9Z7MDwSsgbZuY7Z8KHwHHp8QKGQ
+         MTQXuhOxteS8xDq3DgH1m3yRATLFz3CBDoYccujBaESUMlvsTP2YnmSH3XPAZLzB4Nv2
+         KG8TvZHrs7/nj7OU4Lg1HmhcU429W4ThUUXymKiDAzGbWzckJAGtVo6sJH8KwX0PBE7L
+         5XRykW0RZjmRQ6Dl23tbvxs1/XHlpWA0jOINj8E+Hs1/6TzltUj7lRfHQxTF+1bAf2MQ
+         Ut8Q==
+X-Gm-Message-State: AOJu0YzdEaKm7uIbY8et62k7FkJqIsTg4qIpT68EbQ0LuQcR168duc17
+	0UyrvXcnKpuJdY0s0aFnNq+/1IFZVBZTXglhAfZgaHDD5iw75zZIXJxzinkGNUacR0tQ1aWuf0a
+	2efg=
+X-Gm-Gg: AeBDietaUKL3HQykA3MmbmmnxCyJCRWe26Te01apNxTe7YAmM/Ns1xzHOnN6gwKo5Nn
+	RLD3eNU4821O9DinLSSsz7ZU6laX417ksVyF+uIdNRatYHOPcuAo/1c65QCmyeJyNgQn6dXkKTa
+	y17hfGYMhEIzcKx1bxKopCpnHqw5GuBcyir8fLPwowceQ5x0ykgNbMVBo3F070HqEwVF2Bs/zYo
+	9NLZ24nBKfppdp9j9d7lz8z9hpVY9DPlIcmP5zM33uO+bIC6kHXNdc3RLmWfbqbXkut89q43nxP
+	WU6DPOaJKOjb9vogkt44TVss+PBjqwPkEWX7sQN5y5BAuVs7552h6hhNuIFRuN2LYzxrwzgQQtd
+	uVWxtq/yeg/XSa1UdbmBESSQyGc73MJzSkOeQQy2PQPEi+8PQDt0pbuTLi4zbgsLFtWSh0GLwDm
+	Aj1nQ9o6y4lagMjjxAiSFSASP6oL1DhuhGhRklFQ==
+X-Received: by 2002:a05:622a:993:b0:50d:8792:b6d1 with SMTP id d75a77b69052e-5102adba99emr49041571cf.38.1777563030989;
+        Thu, 30 Apr 2026 08:30:30 -0700 (PDT)
 Received: from majuu.waya ([184.144.29.222])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5103b398312sm876591cf.10.2026.04.30.08.30.27
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5103b398312sm876591cf.10.2026.04.30.08.30.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Apr 2026 08:30:28 -0700 (PDT)
+        Thu, 30 Apr 2026 08:30:30 -0700 (PDT)
 From: Jamal Hadi Salim <jhs@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
@@ -88,10 +90,12 @@ Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
 	ghandatmanas@gmail.com,
 	rakshitawasthi17@gmail.com,
 	security@kernel.org
-Subject: [PATCH net 0/3] Replace direct dequeue call with qdisc_dequeue_peeked
-Date: Thu, 30 Apr 2026 11:29:54 -0400
-Message-Id: <20260430152957.194015-1-jhs@mojatatu.com>
+Subject: [PATCH net 1/3] net/sched: sch_red: Replace direct dequeue call with peek and qdisc_dequeue_peeked
+Date: Thu, 30 Apr 2026 11:29:55 -0400
+Message-Id: <20260430152957.194015-2-jhs@mojatatu.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260430152957.194015-1-jhs@mojatatu.com>
+References: <20260430152957.194015-1-jhs@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,7 +103,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 552D24A4D0D
+X-Rspamd-Queue-Id: 4A3B44A4E71
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
@@ -107,11 +111,11 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282905-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-282903-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[mojatatu.com,davemloft.net,kernel.org,google.com,redhat.com,resnulli.us,gmail.com];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
@@ -119,7 +123,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	DMARC_NA(0.00)[mojatatu.com];
 	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
@@ -129,43 +133,74 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mojatatu.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mojatatu.com:mid,mojatatu.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mojatatu-com.20251104.gappssmtp.com:dkim]
 
-
-When sfb and red qdiscs have children (eg qfq qdisc) whose peek() callback is
+When red qdisc has children (eg qfq qdisc) whose peek() callback is
 qdisc_peek_dequeued(), we could get a kernel panic. When the parent of such
 qdiscs (eg illustrated in patch #3 as tbf) wants to retrieve an skb from
-its child (red/sfb in this case), it will do the following:
+its child (red in this case), it will do the following:
  1a. do a peek() - and when sensing there's an skb the child can offer, then
-     - the child in this case(red/sfb) calls its child's (qfq) peek.
+     - the child in this case(red) calls its child's (qfq) peek.
         qfq does the right thing and will return the gso_skb queue packet.
         Note: if there wasnt a gso_skb entry then qfq will store it there.
- 1b. invoke a dequeue() on the child (red/sfb). And herein lies the problem.
-     - red/sfb will call the child's dequeue() which will essentially just
+ 1b. invoke a dequeue() on the child (red). And herein lies the problem.
+     - red will call the child's dequeue() which will essentially just
        try to grab something of qfq's queue.
+
+[   78.667668][  T363] KASAN: null-ptr-deref in range [0x0000000000000048-0x000000000000004f]
+[   78.667927][  T363] CPU: 1 UID: 0 PID: 363 Comm: ping Not tainted 7.1.0-rc1-00033-g46f74a3f7d57-dirty #790 PREEMPT(full)
+[   78.668263][  T363] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+[   78.668486][  T363] RIP: 0010:qfq_dequeue+0x446/0xc90 [sch_qfq]
+[   78.668718][  T363] Code: 54 c0 e8 dd 90 00 f1 48 c7 c7 e0 03 54 c0 48 89 de e8 ce 90 00 f1 48 8d 7b 48 b8 ff ff 37 00 48 89 fa 48 c1 e0 2a 48 c1 ea 03 <80> 3c 02 00 74 05 e8 ef a1 e1 f1 48 8b 7b 48 48 8d 54 24 58 48 8d
+[   78.669312][  T363] RSP: 0018:ffff88810de573e0 EFLAGS: 00010216
+[   78.669533][  T363] RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
+[   78.669790][  T363] RDX: 0000000000000009 RSI: 0000000000000004 RDI: 0000000000000048
+[   78.670044][  T363] RBP: ffff888110dc4000 R08: ffffffffb1b0885a R09: fffffbfff6ba9078
+[   78.670297][  T363] R10: 0000000000000003 R11: ffff888110e31c80 R12: 0000001880000000
+[   78.670560][  T363] R13: ffff888110dc4150 R14: ffff888110dc42b8 R15: 0000000000000200
+[   78.670814][  T363] FS:  00007f66a8f09c40(0000) GS:ffff888163428000(0000) knlGS:0000000000000000
+[   78.671110][  T363] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   78.671324][  T363] CR2: 000055db4c6a30a8 CR3: 000000010da67000 CR4: 0000000000750ef0
+[   78.671585][  T363] PKRU: 55555554
+[   78.671713][  T363] Call Trace:
+[   78.671843][  T363]  <TASK>
+[   78.671936][  T363]  ? __pfx_qfq_dequeue+0x10/0x10 [sch_qfq]
+[   78.672148][  T363]  ? __pfx__printk+0x10/0x10
+[   78.672322][  T363]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   78.672496][  T363]  ? lockdep_hardirqs_on_prepare+0xa8/0x1a0
+[   78.672706][  T363]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   78.672875][  T363]  ? trace_hardirqs_on+0x19/0x1a0
+[   78.673047][  T363]  red_dequeue+0x65/0x270 [sch_red]
+[   78.673217][  T363]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   78.673385][  T363]  tbf_dequeue.cold+0xb0/0x70c [sch_tbf]
+[   78.673566][  T363]  __qdisc_run+0x169/0x1900
 
 The right thing to do in #1b is to grab the skb off gso_skb queue.
 This patchset fixes that issue by changing #1b to use qdisc_dequeue_peeked()
 method instead.
 
-Patch 1 fixes the issue for red qdisc. Patch 2 fixes it for sfb.
-Patch 3 adds testcases for the two setups.
 
-Jamal Hadi Salim (2):
-  net/sched: sch_red: Replace direct dequeue call with peek and
-    qdisc_dequeue_peeked
-  net/sched: sch_sfb: Replace direct dequeue call with peek and
-    qdisc_dequeue_peeked
+Fixes: 77be155cba4e ("pkt_sched: Add peek emulation for non-work-conserving qdiscs.")
+Reported-by: Manas <ghandatmanas@gmail.com>
+Reported-by: Rakshit Awasthi <rakshitawasthi17@gmail.com>
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+---
+ net/sched/sch_red.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Victor Nogueira (1):
-  selftests/tc-testing: Add tests that force red and sfb to dequeue from
-    child's gso_skb
-
- net/sched/sch_red.c                           |   2 +-
- net/sched/sch_sfb.c                           |   2 +-
- .../tc-testing/tc-tests/infra/qdiscs.json     | 148 ++++++++++++++++++
- 3 files changed, 150 insertions(+), 2 deletions(-)
-
+diff --git a/net/sched/sch_red.c b/net/sched/sch_red.c
+index 432b8a3000a5..4d0e44a2e7c6 100644
+--- a/net/sched/sch_red.c
++++ b/net/sched/sch_red.c
+@@ -162,7 +162,7 @@ static struct sk_buff *red_dequeue(struct Qdisc *sch)
+ 	struct red_sched_data *q = qdisc_priv(sch);
+ 	struct Qdisc *child = q->qdisc;
+ 
+-	skb = child->dequeue(child);
++	skb = qdisc_dequeue_peeked(child);
+ 	if (skb) {
+ 		qdisc_bstats_update(sch, skb);
+ 		qdisc_qstats_backlog_dec(sch, skb);
 -- 
 2.34.1
 
