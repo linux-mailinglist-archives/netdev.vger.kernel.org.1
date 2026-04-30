@@ -1,497 +1,277 @@
-Return-Path: <netdev+bounces-282630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282631-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EDbDKLfD8mkjuAEAu9opvQ
-	(envelope-from <netdev+bounces-282630-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:51:35 +0200
+	id 8PjEAerG8mmnuAEAu9opvQ
+	(envelope-from <netdev+bounces-282631-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 05:05:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5300649C8D0
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:51:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 601E249CAB9
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 05:05:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 89FF43031A3A
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:49:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6BB4F301A706
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:04:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2E6733B97A;
-	Thu, 30 Apr 2026 02:49:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7D6C331222;
+	Thu, 30 Apr 2026 03:04:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="EvXjKQT5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hVw263LQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013002.outbound.protection.outlook.com [40.107.162.2])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A809733F8D6;
-	Thu, 30 Apr 2026 02:49:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.2
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777517361; cv=fail; b=g961Yd87YSoKi9l7DQy8LyVJ/A72G2i2LMXphZhItFs5P24FVIQJD6zcLtMfH7ld4oFi/u5JtBRGkxHWVNBpaczIAVXVkytncqUzqQ9yXByX6CiGp+8v3y9dsmf5AUGKVOJOdPad7Yd7r+0raboFjFVvaCoPwjyQiA+bvOgNGjM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777517361; c=relaxed/simple;
-	bh=0V33JuQZ0Fov2wpKeB6RulXK1kkdUhq2n/TH1n3FJD0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=iNlEku/g3saS+S4qNcEbezaJU/WVPD8LAHAVcq0GQsAENhqEfJWoCjQBroxrvMPbS7ukFRAHlkvkIc6raru4x0+neT45VqaGYymsJS+XV0A7Vv9vN+u64+FSJtTU3fjdCO/fpnbCxYe84Uit0P6kCQzlbvlxuj2V5U8k3SOAPd8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=EvXjKQT5; arc=fail smtp.client-ip=40.107.162.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cuj43wRpCeIZmUELR+JnoBGIFtlEfDP3n8HR5BX9x+scOWR+9cSBwa2/ltDdn5yu1j8oOLUwkZy3Tgm60/uvJ894uudPtQhdf80cbUnu9Y269MBXgbYZr/T2YnVhovQUe4hWg2Bs6erR3oQmQWQ7GhiOX628VcFp1el/obsD06GXl0cQC/fyOWANpYjZo+2LQqjWUTjONcX9bZjLPol0KKMewR8/LrIbiB0WAgUv78yFrtm/awV7Ulck7u+f930RD4PdXrSgAuR0UQbWlXYYCpV7WKcVEUrmOAsLnUhcZAfwZ3C3+M9Get0UBTuB7lFDO601q4fr24nTRArmhVYdZA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vpFP/5ZCJ+bg+eA8fAjzxurulz/xwiGFfOFB8EZy15M=;
- b=iE3jwqdHG95wOf/jU1H2cJby+0lOt39l9dLWAyWAUwhKTIvlwH5HBtjXHilBnvzW5jwXv30vXDkpnbThfjYeV0hLDp2fpfpjBfQZ0FsuYkb7GHYLXX0sfPni4jNDbY4OSD4g8egBuDFx4td/5/sQi3L0xCgtwytlShZk5qyimFVOkeVSMCEtbtuzcad7i+r0ilUAe8jXAoIX3H+a5/kmvW6GuODGT29CDcIJPkFOsCvehqWoYAjdMClQU/LcDnIifCCvDQJzgN3MsHb9mXg4xbYFp8yZ6Pmh0prudmy5dwX2isbuNiF519EwU77ldcYAIXSsWE9xrqLBruy5ymnpTA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vpFP/5ZCJ+bg+eA8fAjzxurulz/xwiGFfOFB8EZy15M=;
- b=EvXjKQT5p2zCiDg8Yl75PMssrIwkePgjzkv4NwNQ2Ya9qDMuT771lWPf/+IRnHFWw962QuIcq+dL2GFs5G4a8qRkB+NnNdBypLXausmI1SCJDuec9XpfO2nyZPBkC9f2vOCpV0FtVA9Ov23vWoh89Wah6fZ02+WosUZzsvenPyGLyGTDeXx1p1aw++mukUYHfkhI4rxuEEBlWu0TQ8aZDtJq9Z1M8u3cfNll6/OX5PI9atGK8AToSi2uM2JVGs4Jg9NUlh9z77GrwETXKxHQFQVvJTG5bnaNjWmMSw9d9/l/nbwyR/L2DrR7lJgnQkUEM+83bZkea5iaBsANjxTBWw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
- by PAXPR04MB8608.eurprd04.prod.outlook.com (2603:10a6:102:21b::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.18; Thu, 30 Apr
- 2026 02:49:17 +0000
-Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
- ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
- ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.20.9870.020; Thu, 30 Apr 2026
- 02:49:16 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	f.fainelli@gmail.com,
-	frank.li@nxp.com,
-	chleroy@kernel.org,
-	horms@kernel.org,
-	linux@armlinux.org.uk
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-arm-kernel@lists.infradead.org,
-	imx@lists.linux.dev
-Subject: [PATCH v5 net-next 15/15] net: dsa: netc: add support for ethtool private statistics
-Date: Thu, 30 Apr 2026 10:49:45 +0800
-Message-Id: <20260430024945.3413973-16-wei.fang@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260430024945.3413973-1-wei.fang@nxp.com>
-References: <20260430024945.3413973-1-wei.fang@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SG2PR01CA0133.apcprd01.prod.exchangelabs.com
- (2603:1096:4:8f::13) To DBBPR04MB7500.eurprd04.prod.outlook.com
- (2603:10a6:10:1f4::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DCE6301471
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 03:04:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777518278; cv=none; b=n40cUCRoDAgn5UuiIzRfYGIQsvipwXyvpy3JD/7WXko7VG8Euy+Y0SYRWNlKw1J0Xt4FLiL6rPRQjTzOajWJNCmc2RSVNBPgzPHI440UanTWGE2g+gAP9nAU06pKr82aIdFJv+HTVL7DnejHbEPp9MfLSU3Wt1KMCmdvjB1xNuc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777518278; c=relaxed/simple;
+	bh=mxAeFa0zucritB95EEF1sgq4ftLNUflodECe6CLmwnE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O5BKHxyCtQobhCWe0j/intG5dnfjSEwGenSU+gmAqTwrI49DfyHvzGTVr4TyB1ERliX3VnXmrrId1ajbK2Rw4coOoJrV54Fn9Qj8NnsVu0eU4tFLlhCBSlAcpPDgiQaeIfbmGmWA2kpRZg3SBHxNu2+s9zvgWgVCUvTuRFFfOnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hVw263LQ; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777518277; x=1809054277;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=mxAeFa0zucritB95EEF1sgq4ftLNUflodECe6CLmwnE=;
+  b=hVw263LQcp/BCvS4f3r1GPxaBnxFjdNhEmn/QElfbhgRYdGjpBexctob
+   pynKACKiGYBaybbPFJYS1Ms8Tqjy59eTbRUITlCHFpprdW9BYsWlOwEp+
+   hAPLsiMM/0/VOmuHimek9xBzN0hp94yAOjlNhym3cuyO+jBTK9YQz5fyN
+   BGxR74G8GB7VlK/KG7Vf1XkU+8kJdofcsBsihvzCIrT/BxW9FMG3NcC5l
+   RMTCZNBSclIGF797bnK+ELWIPlGk5hLAjiOukjwlFgoVIlU3rNpifgX1j
+   plyR5izCx+fX0+0TDfuaTUZQ/JguMrwus+VKS6KEtS8I8AQ6Qjhbf2zDB
+   g==;
+X-CSE-ConnectionGUID: 4JfhTuwwRLyMuq3VhjSMMg==
+X-CSE-MsgGUID: Us497ZZsRau4brAslbKcgQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11771"; a="65991967"
+X-IronPort-AV: E=Sophos;i="6.23,207,1770624000"; 
+   d="scan'208";a="65991967"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2026 20:04:36 -0700
+X-CSE-ConnectionGUID: bk16eBbRQOy1LcpnzG9kqg==
+X-CSE-MsgGUID: 0A6sJFtkRC61WCvn12Vhew==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,207,1770624000"; 
+   d="scan'208";a="234480184"
+Received: from lkp-server01.sh.intel.com (HELO aa799cca880d) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 29 Apr 2026 20:04:34 -0700
+Received: from kbuild by aa799cca880d with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wIHhX-00000000Brc-0OVn;
+	Thu, 30 Apr 2026 03:04:31 +0000
+Date: Thu, 30 Apr 2026 11:03:46 +0800
+From: kernel test robot <lkp@intel.com>
+To: Dudu Lu <phx0fer@gmail.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, Dudu Lu <phx0fer@gmail.com>
+Subject: Re: [PATCH] nfc: nci: Add skb length validation in
+ nci_core_init_rsp_packet
+Message-ID: <202604301024.q9hVP893-lkp@intel.com>
+References: <20260413090102.77980-1-phx0fer@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DBBPR04MB7500:EE_|PAXPR04MB8608:EE_
-X-MS-Office365-Filtering-Correlation-Id: 863931bb-7cda-4160-efcb-08dea66311ef
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|19092799006|7416014|52116014|376014|38350700014|921020|56012099003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	omkXyNqJzMUGvrDATze0xn9OEWc4fUSp1dYH+xQUKQU2bVai8fbNN2mpEIu4MuOS8/76Wh8QWxrymBPS9msNapZoAdYzkrL1le+ZnAhfUlM+3q8uSWTStc84WKdML/yQhjmqai2ZntxDVBwx/M2Tl3iQBlM3x35dRKl2pmwco2bFsy70DzF8mgvNmBgY9C87FuPY4vBIMGKnJqAlOzEEWPll6mSkjuf+8uvDRHfSmuzzqciH72k2CE1QTpCb/K2kWRuu4v5z82pKTQjDEJaz9c7DNoq3wyn/YN5Md8Ttt71q1WR2lmNkgExIUpkCrIwdZWFZVYjWlhiQbehMS7fbOdn3JxDc9TwL9ENWxB9tC0o+NltP+n9iLJ+l8czjAjrLNPXhk7WFd3YBKoVRzma1gaNaJ673SL/3CUtXU1/nMq476uXJSJ4R/kTpUOGlZL41JX69Ui4w53kr6WpEdvctlO7mkXEq2iQOubJQ0v8h2/jfBp4jzO1wiGBXOwcGimaSDrgIhEFBF0FIV81rFzB5YqS+u1sFPY1jnamoU9xykd9u2xl7++DiRBSaASKSZ9Cvij2+uL+cqPia1qxC93/seQh01lzvxFctgIA35LmE5bN6ZXRzJyhU6fnc6X62zJbQ6rCKiI6J96SZqNVBwnLMs8hf5BnGILDJ7/1GPguwT13a52Pwu35HxgWOs0dL59nwzQaBz2R2ecSKVE33daaRH9u2E3hBSb+OXBKFeW/DOuKdXo+o1Fo+vSZ8UZxAqvddwFx4/EXsmPG0maH+q5gKaWhm4UNnJu6KW5h5mtJ7A0oYx8EDEtr8KqLfNP0RcxEd
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(19092799006)(7416014)(52116014)(376014)(38350700014)(921020)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?JBpH7BX7f7Gq3dpgp2ycQ3ARnmRZoCB+cM2H38SjeO7i3E0knbUJrvC+brS9?=
- =?us-ascii?Q?OIOozH6JFM4E5SAsXUsuxbL94IJ8xAuvkMACcE5zgQqYSy+tFXPplvfUtWsL?=
- =?us-ascii?Q?AJwA5OqBpFn0NSTFhWX5D13mOlyVJSVu+gCiV2JniaY0lr8GBclwk/iF4M2H?=
- =?us-ascii?Q?p8ulSqPB6ft27kCn2Vv6BOGEou7ZxuU01ERG0+uml7jvz5+A+lRptYdyZE1D?=
- =?us-ascii?Q?XDxmWrxKG1S/aajDm5erFKHrL4ThrRKrah5HFCLu56IqC26xgSBbmVPRvP36?=
- =?us-ascii?Q?CUv7JnYIA2kQPNVbfCjnSAcfpTNLnXOQOPKpjEW70B+9dEUPDl4/iCYB3rUD?=
- =?us-ascii?Q?dobGyduwZDRV+N3+zN6hTawO89OPtHVSJpVDwWbDGVZt++8ZofLcKi3Ai16D?=
- =?us-ascii?Q?Pdp2jUre+k/q4/yUwaVO/X2+bM8sAvWZbub1LdaP2E0Gy0TA8QQ92db1gyND?=
- =?us-ascii?Q?buo1phbkveCE9o6zmirFPYZVofDA72ZbN11dhUNFJwNAVXO7YU/CcvYGpReO?=
- =?us-ascii?Q?vH49CDqvpCnQp78xZWID9+V9TBK5jPRtIvAEI8eStBXoGJVVdqO2gOg+XPqi?=
- =?us-ascii?Q?lO5ZtEWIOrfK3FNpWp/ZqoRBBj2tfV3jOJohIem5cfH32LZDPbV649UzoiBG?=
- =?us-ascii?Q?rqSAH+9NieJFQH86VAUU9GB8yFEAIq2NyUMsIuvB/c2GFM1KF/ai4bjQyQHH?=
- =?us-ascii?Q?veyaNnfrZ+kuA9e5vPBCFN3EIYytk8NTRlBOjXa9TQSovMEFis/GogIuq+0x?=
- =?us-ascii?Q?pVdDbsixE8PJQnORP1pFBu62wue4o1Ja99OJ+3LACIN40wIs4V7dpEskQVq3?=
- =?us-ascii?Q?pnwHggfUK9IG0SevegjLNaWUi/ok099Bksfw9CfgSTYgOMLCA8WZAP6Qx9UA?=
- =?us-ascii?Q?sUkFp7OamZ8mw5t4mi0p4DrImFCxAquLCLArTBNEvVdYs8GnaGFevw0MB2+B?=
- =?us-ascii?Q?Y0k/1crRI0OLUMhEPspdA1afHWKn9MDhwE/lzrWYq6VZzHi6E92NJGkPBG+s?=
- =?us-ascii?Q?AOkmQV71gkq0bMah22rTSRiltKClIue9DVbzlctjBEmYMSrkhTOW0zKxNTic?=
- =?us-ascii?Q?kPUDAwDM+fiKLJOcErf5kxFM3y+SFqAl+/gUhZs4OzsUUGSFHTVrvdq90O7b?=
- =?us-ascii?Q?cQ5iLnpC31DOho6TuLMh8bA6VV92opyj9JXuOiW7ffZkCF5weymwKSdE0wrZ?=
- =?us-ascii?Q?JR9BOfFgDTobyWpiBSNU6mKyPmAFp5jsjQjC6hwL3YYRqokcId76yJZatZ/4?=
- =?us-ascii?Q?HvBu5L2/t0J/KV5UT78miF0B94ZCeQEnnjwLhLpq2BRircNTMuUvTSwKav2Z?=
- =?us-ascii?Q?p674U/opKk/gvFmtlbjZ4rSJuWXVReObUFkf2hiobtU2dtavuAYlguEE1kUD?=
- =?us-ascii?Q?9aNQ+WQHE6vxoKNXDgraW1uecMkaz/QkUaX5GoW9r9HjvMV6h2wHQFiUhDq4?=
- =?us-ascii?Q?gfBXbQ4ag9awia6TooB9ZpuG8Q/abxW4dD5rwvWGUxsGFEn2v2Q2LuyOrpir?=
- =?us-ascii?Q?YvKa4fXcmrWk7cmfcKjeVtyiSQb+xCrl6ON1aj3Zy2NGvU41ikpPJePLWvA9?=
- =?us-ascii?Q?RrWyYMLteVvpAJYWGV+aXgl0Q9SBu7LYCPGeEFYeNmDLxJsHdsaBWUQErh3r?=
- =?us-ascii?Q?Jpn0fO78EEA+vnliG8Wfkmtk/OFRuSzf15Gy6qW9oh3JwQQjzX7Wlv9tMlUn?=
- =?us-ascii?Q?bDAn//eDZv2Qmn/3zm8Sy9QFCGCGCTITl9PKFRkxYXdI4s0z?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 863931bb-7cda-4160-efcb-08dea66311ef
-X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2026 02:49:16.7887
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dJvxUT4lYrDZnenDWCA7PU9Lz0/FgxVz0efCUqFi+NeaLUvEHZL4HltcUQ35qe63V0zRojy0QNAkVeDlbsnSkQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8608
-X-Rspamd-Queue-Id: 5300649C8D0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260413090102.77980-1-phx0fer@gmail.com>
+X-Rspamd-Queue-Id: 601E249CAB9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[lists.linux.dev,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-282631-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
-	TAGGED_FROM(0.00)[bounces-282630-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[]
 
-Implement the ethtool private statistics interface to expose additional
-port-level and MAC-level counters that are not covered by the standard
-IEEE 802.3 statistics. The pMAC counters are only reported when the port
-supports Frame Preemption (802.1Qbu/802.3br).
+Hi Dudu,
 
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
----
- drivers/net/dsa/netc/netc_ethtool.c   | 107 ++++++++++++++++++++++++++
- drivers/net/dsa/netc/netc_main.c      |   3 +
- drivers/net/dsa/netc/netc_switch.h    |   9 +++
- drivers/net/dsa/netc/netc_switch_hw.h |  58 ++++++++++++++
- 4 files changed, 177 insertions(+)
+kernel test robot noticed the following build errors:
 
-diff --git a/drivers/net/dsa/netc/netc_ethtool.c b/drivers/net/dsa/netc/netc_ethtool.c
-index ac8940b5a85c..8d04db534347 100644
---- a/drivers/net/dsa/netc/netc_ethtool.c
-+++ b/drivers/net/dsa/netc/netc_ethtool.c
-@@ -19,6 +19,56 @@ static const struct ethtool_rmon_hist_range netc_rmon_ranges[] = {
- 	{ }
- };
- 
-+static const struct netc_port_stat netc_port_counters[] = {
-+	{ NETC_PTGSLACR,	"port gate late arrival frames" },
-+	{ NETC_PSDFTCR,	"port SDF transmit frames" },
-+	{ NETC_PSDFDDCR,	"port SDF drop duplicate frames" },
-+	{ NETC_PRXDCR,		"port rx discard frames" },
-+	{ NETC_PRXDCRRR,	"port rx discard read-reset" },
-+	{ NETC_PRXDCRR0,	"port rx discard reason 0" },
-+	{ NETC_PRXDCRR1,	"port rx discard reason 1" },
-+	{ NETC_PTXDCR,		"port tx discard frames" },
-+	{ NETC_PTXDCRRR,	"port tx discard read-reset" },
-+	{ NETC_PTXDCRR0,	"port tx discard reason 0" },
-+	{ NETC_PTXDCRR1,	"port tx discard reason 1" },
-+	{ NETC_BPDCR,		"bridge port discard frames" },
-+	{ NETC_BPDCRRR,	"bridge port discard read-reset" },
-+	{ NETC_BPDCRR0,	"bridge port discard reason 0" },
-+	{ NETC_BPDCRR1,	"bridge port discard reason 1" },
-+};
-+
-+static const struct netc_port_stat netc_emac_counters[] = {
-+	{ NETC_PM_ROCT(0),	"eMAC rx octets" },
-+	{ NETC_PM_RVLAN(0),	"eMAC rx VLAN frames" },
-+	{ NETC_PM_RERR(0),	"eMAC rx frame errors" },
-+	{ NETC_PM_RUCA(0),	"eMAC rx unicast frames" },
-+	{ NETC_PM_RDRP(0),	"eMAC rx dropped packets" },
-+	{ NETC_PM_RPKT(0),	"eMAC rx packets" },
-+	{ NETC_PM_TOCT(0),	"eMAC tx octets" },
-+	{ NETC_PM_TVLAN(0),	"eMAC tx VLAN frames" },
-+	{ NETC_PM_TFCS(0),	"eMAC tx FCS errors" },
-+	{ NETC_PM_TUCA(0),	"eMAC tx unicast frames" },
-+	{ NETC_PM_TPKT(0),	"eMAC tx packets" },
-+	{ NETC_PM_TUND(0),	"eMAC tx undersized packets" },
-+	{ NETC_PM_TIOCT(0),	"eMAC tx invalid octets" },
-+};
-+
-+static const struct netc_port_stat netc_pmac_counters[] = {
-+	{ NETC_PM_ROCT(1),	"pMAC rx octets" },
-+	{ NETC_PM_RVLAN(1),	"pMAC rx VLAN frames" },
-+	{ NETC_PM_RERR(1),	"pMAC rx frame errors" },
-+	{ NETC_PM_RUCA(1),	"pMAC rx unicast frames" },
-+	{ NETC_PM_RDRP(1),	"pMAC rx dropped packets" },
-+	{ NETC_PM_RPKT(1),	"pMAC rx packets" },
-+	{ NETC_PM_TOCT(1),	"pMAC tx octets" },
-+	{ NETC_PM_TVLAN(1),	"pMAC tx VLAN frames" },
-+	{ NETC_PM_TFCS(1),	"pMAC tx FCS errors" },
-+	{ NETC_PM_TUCA(1),	"pMAC tx unicast frames" },
-+	{ NETC_PM_TPKT(1),	"pMAC tx packets" },
-+	{ NETC_PM_TUND(1),	"pMAC tx undersized packets" },
-+	{ NETC_PM_TIOCT(1),	"pMAC tx invalid octets" },
-+};
-+
- static void netc_port_pause_stats(struct netc_port *np, int mac,
- 				  struct ethtool_pause_stats *stats)
- {
-@@ -188,3 +238,60 @@ void netc_port_get_eth_mac_stats(struct dsa_switch *ds, int port,
- 		break;
- 	}
- }
-+
-+int netc_port_get_sset_count(struct dsa_switch *ds, int port, int sset)
-+{
-+	struct netc_port *np = NETC_PORT(ds, port);
-+	int size;
-+
-+	if (sset != ETH_SS_STATS)
-+		return -EOPNOTSUPP;
-+
-+	size = ARRAY_SIZE(netc_port_counters) +
-+	       ARRAY_SIZE(netc_emac_counters);
-+
-+	if (np->caps.pmac)
-+		size += ARRAY_SIZE(netc_pmac_counters);
-+
-+	return size;
-+}
-+
-+void netc_port_get_strings(struct dsa_switch *ds, int port,
-+			   u32 sset, u8 *data)
-+{
-+	struct netc_port *np = NETC_PORT(ds, port);
-+	int i;
-+
-+	if (sset != ETH_SS_STATS)
-+		return;
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_port_counters); i++)
-+		ethtool_cpy(&data, netc_port_counters[i].name);
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_emac_counters); i++)
-+		ethtool_cpy(&data, netc_emac_counters[i].name);
-+
-+	if (!np->caps.pmac)
-+		return;
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_pmac_counters); i++)
-+		ethtool_cpy(&data, netc_pmac_counters[i].name);
-+}
-+
-+void netc_port_get_ethtool_stats(struct dsa_switch *ds, int port, u64 *data)
-+{
-+	struct netc_port *np = NETC_PORT(ds, port);
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_port_counters); i++)
-+		*data++ = netc_port_rd(np, netc_port_counters[i].reg);
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_emac_counters); i++)
-+		*data++ = netc_port_rd64(np, netc_emac_counters[i].reg);
-+
-+	if (!np->caps.pmac)
-+		return;
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_pmac_counters); i++)
-+		*data++ = netc_port_rd64(np, netc_pmac_counters[i].reg);
-+}
-diff --git a/drivers/net/dsa/netc/netc_main.c b/drivers/net/dsa/netc/netc_main.c
-index ae8f28b82b72..803582d939b0 100644
---- a/drivers/net/dsa/netc/netc_main.c
-+++ b/drivers/net/dsa/netc/netc_main.c
-@@ -1472,6 +1472,9 @@ static const struct dsa_switch_ops netc_switch_ops = {
- 	.get_rmon_stats			= netc_port_get_rmon_stats,
- 	.get_eth_ctrl_stats		= netc_port_get_eth_ctrl_stats,
- 	.get_eth_mac_stats		= netc_port_get_eth_mac_stats,
-+	.get_sset_count			= netc_port_get_sset_count,
-+	.get_strings			= netc_port_get_strings,
-+	.get_ethtool_stats		= netc_port_get_ethtool_stats,
- };
- 
- static int netc_switch_probe(struct pci_dev *pdev,
-diff --git a/drivers/net/dsa/netc/netc_switch.h b/drivers/net/dsa/netc/netc_switch.h
-index d477b0cd2157..90d750331fb9 100644
---- a/drivers/net/dsa/netc/netc_switch.h
-+++ b/drivers/net/dsa/netc/netc_switch.h
-@@ -93,6 +93,11 @@ struct netc_fdb_entry {
- 	struct hlist_node node;
- };
- 
-+struct netc_port_stat {
-+	int reg;
-+	char name[ETH_GSTRING_LEN] __nonstring;
-+};
-+
- struct netc_switch {
- 	struct pci_dev *pdev;
- 	struct device *dev;
-@@ -159,5 +164,9 @@ void netc_port_get_eth_ctrl_stats(struct dsa_switch *ds, int port,
- 				  struct ethtool_eth_ctrl_stats *ctrl_stats);
- void netc_port_get_eth_mac_stats(struct dsa_switch *ds, int port,
- 				 struct ethtool_eth_mac_stats *mac_stats);
-+int netc_port_get_sset_count(struct dsa_switch *ds, int port, int sset);
-+void netc_port_get_strings(struct dsa_switch *ds, int port,
-+			   u32 sset, u8 *data);
-+void netc_port_get_ethtool_stats(struct dsa_switch *ds, int port, u64 *data);
- 
- #endif
-diff --git a/drivers/net/dsa/netc/netc_switch_hw.h b/drivers/net/dsa/netc/netc_switch_hw.h
-index f8d436ad9623..1b016e7dd03e 100644
---- a/drivers/net/dsa/netc/netc_switch_hw.h
-+++ b/drivers/net/dsa/netc/netc_switch_hw.h
-@@ -87,6 +87,17 @@
- #define  PSR_TX_BUSY			BIT(0)
- #define  PSR_RX_BUSY			BIT(1)
- 
-+#define NETC_PTGSLACR			0x130
-+
-+#define NETC_PRXDCR			0x1c0
-+#define NETC_PRXDCRRR			0x1c4
-+#define NETC_PRXDCRR0			0x1c8
-+#define NETC_PRXDCRR1			0x1cc
-+#define NETC_PTXDCR			0x1e0
-+#define NETC_PTXDCRRR			0x1e4
-+#define NETC_PTXDCRR0			0x1e8
-+#define NETC_PTXDCRR1			0x1ec
-+
- #define NETC_PTCTMSDUR(a)		(0x208 + (a) * 0x20)
- #define  PTCTMSDUR_MAXSDU		GENMASK(15, 0)
- #define  PTCTMSDUR_SDU_TYPE		GENMASK(17, 16)
-@@ -94,6 +105,9 @@
- #define   SDU_TYPE_MPDU			1
- #define   SDU_TYPE_MSDU			2
- 
-+#define NETC_PSDFTCR			0x4c4
-+#define NETC_PSDFDDCR			0x4c8
-+
- #define NETC_BPCR			0x500
- #define  BPCR_DYN_LIMIT			GENMASK(15, 0)
- #define  BPCR_MLO			GENMASK(22, 20)
-@@ -142,6 +156,11 @@ enum netc_stg_stage {
- 	NETC_STG_STATE_FORWARDING,
- };
- 
-+#define NETC_BPDCR			0x580
-+#define NETC_BPDCRRR			0x584
-+#define NETC_BPDCRR0			0x588
-+#define NETC_BPDCRR1			0x58c
-+
- /* Definition of Switch ethernet MAC port registers */
- #define NETC_PMAC_OFFSET		0x400
- #define NETC_PM_CMD_CFG(a)		(0x1008 + (a) * 0x400)
-@@ -176,6 +195,9 @@ enum netc_stg_stage {
- /* Port MAC 0/1 Receive Ethernet Octets Counter */
- #define NETC_PM_REOCT(a)		(0x1100 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Receive Octets Counter */
-+#define NETC_PM_ROCT(a)			(0x1108 + (a) * 0x400)
-+
- /* Port MAC 0/1 Receive Alignment Error Counter Register */
- #define NETC_PM_RALN(a)			(0x1110 + (a) * 0x400)
- 
-@@ -188,12 +210,27 @@ enum netc_stg_stage {
- /* Port MAC 0/1 Receive Frame Check Sequence Error Counter */
- #define NETC_PM_RFCS(a)			(0x1128 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Receive VLAN Frame Counter */
-+#define NETC_PM_RVLAN(a)		(0x1130 + (a) * 0x400)
-+
-+/* Port MAC 0/1 Receive Frame Error Counter */
-+#define NETC_PM_RERR(a)			(0x1138 + (a) * 0x400)
-+
-+/* Port MAC 0/1 Receive Unicast Frame Counter */
-+#define NETC_PM_RUCA(a)			(0x1140 + (a) * 0x400)
-+
- /* Port MAC 0/1 Receive Multicast Frame Counter */
- #define NETC_PM_RMCA(a)			(0x1148 + (a) * 0x400)
- 
- /* Port MAC 0/1 Receive Broadcast Frame Counter */
- #define NETC_PM_RBCA(a)			(0x1150 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Receive Dropped Packets Counter */
-+#define NETC_PM_RDRP(a)			(0x1158 + (a) * 0x400)
-+
-+/* Port MAC 0/1 Receive Packets Counter */
-+#define NETC_PM_RPKT(a)			(0x1160 + (a) * 0x400)
-+
- /* Port MAC 0/1 Receive Undersized Packet Counter */
- #define NETC_PM_RUND(a)			(0x1168 + (a) * 0x400)
- 
-@@ -236,6 +273,9 @@ enum netc_stg_stage {
- /* Port MAC 0/1 Transmit Ethernet Octets Counter */
- #define NETC_PM_TEOCT(a)		(0x1200 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Transmit Octets Counter */
-+#define NETC_PM_TOCT(a)			(0x1208 + (a) * 0x400)
-+
- /* Port MAC 0/1 Transmit Excessive Deferral Packet Counter */
- #define NETC_PM_TEDFR(a)		(0x1210 + (a) * 0x400)
- 
-@@ -245,15 +285,30 @@ enum netc_stg_stage {
- /* Port MAC 0/1 Transmit Frame Counter */
- #define NETC_PM_TFRM(a)			(0x1220 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Transmit Frame Check Sequence Error Counter */
-+#define NETC_PM_TFCS(a)			(0x1228 + (a) * 0x400)
-+
-+/* Port MAC 0/1 Transmit VLAN Frame Counter */
-+#define NETC_PM_TVLAN(a)		(0x1230 + (a) * 0x400)
-+
- /* Port MAC 0/1 Transmit Frame Error Counter */
- #define NETC_PM_TERR(a)			(0x1238 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Transmit Unicast Frame Counter */
-+#define NETC_PM_TUCA(a)			(0x1240 + (a) * 0x400)
-+
- /* Port MAC 0/1 Transmit Multicast Frame Counter */
- #define NETC_PM_TMCA(a)			(0x1248 + (a) * 0x400)
- 
- /* Port MAC 0/1 Transmit Broadcast Frame Counter */
- #define NETC_PM_TBCA(a)			(0x1250 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Transmit Packets Counter */
-+#define NETC_PM_TPKT(a)			(0x1260 + (a) * 0x400)
-+
-+/* Port MAC 0/1 Transmit Undersized Packet Counter */
-+#define NETC_PM_TUND(a)			(0x1268 + (a) * 0x400)
-+
- /* Port MAC 0/1 Transmit 64-Octet Packet Counter */
- #define NETC_PM_T64(a)			(0x1270 + (a) * 0x400)
- 
-@@ -293,6 +348,9 @@ enum netc_stg_stage {
- /* Port MAC 0/1 Transmit Excessive Collisions Counter */
- #define NETC_PM_TECOL(a)		(0x12f0 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Transmit Invalid Octets Counter */
-+#define NETC_PM_TIOCT(a)		(0x12f8 + (a) * 0x400)
-+
- #define NETC_PEMDIOCR			0x1c00
- #define NETC_EMDIO_BASE			NETC_PEMDIOCR
- 
+[auto build test ERROR on net/main]
+[also build test ERROR on net-next/main linus/master horms-ipvs/master v7.1-rc1 next-20260429]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Dudu-Lu/nfc-nci-Add-skb-length-validation-in-nci_core_init_rsp_packet/20260423-210923
+base:   net/main
+patch link:    https://lore.kernel.org/r/20260413090102.77980-1-phx0fer%40gmail.com
+patch subject: [PATCH] nfc: nci: Add skb length validation in nci_core_init_rsp_packet
+config: arm64-randconfig-004-20260430 (https://download.01.org/0day-ci/archive/20260430/202604301024.q9hVP893-lkp@intel.com/config)
+compiler: clang version 23.0.0git (https://github.com/llvm/llvm-project 5bac06718f502014fade905512f1d26d578a18f3)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260430/202604301024.q9hVP893-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202604301024.q9hVP893-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> net/nfc/nci/rsp.c:1:2: error: expected identifier or '('
+       1 |         if (skb->len < sizeof(*rsp)) {
+         |         ^
+   net/nfc/nci/rsp.c:5:2: error: expected identifier or '('
+       5 |         if (skb->len < 6 + rsp_1->num_supported_rf_interfaces +
+         |         ^
+   net/nfc/nci/rsp.c:10:2: error: expected identifier or '('
+      10 |         if (skb->len < sizeof(*rsp_1))
+         |         ^
+   In file included from net/nfc/nci/rsp.c:29:
+   In file included from include/linux/interrupt.h:11:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/arm64/include/asm/hardirq.h:17:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:588:
+   In file included from include/linux/irqdesc.h:5:
+   In file included from include/linux/irq_work.h:6:
+   In file included from include/linux/rcuwait.h:6:
+   In file included from include/linux/sched/signal.h:6:
+   include/linux/signal.h:98:11: warning: array index 3 is past the end of the array (that has type 'unsigned long[1]') [-Warray-bounds]
+      98 |                 return (set->sig[3] | set->sig[2] |
+         |                         ^        ~
+   include/uapi/asm-generic/signal.h:62:2: note: array 'sig' declared here
+      62 |         unsigned long sig[_NSIG_WORDS];
+         |         ^
+   In file included from net/nfc/nci/rsp.c:29:
+   In file included from include/linux/interrupt.h:11:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/arm64/include/asm/hardirq.h:17:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:588:
+   In file included from include/linux/irqdesc.h:5:
+   In file included from include/linux/irq_work.h:6:
+   In file included from include/linux/rcuwait.h:6:
+   In file included from include/linux/sched/signal.h:6:
+   include/linux/signal.h:98:25: warning: array index 2 is past the end of the array (that has type 'unsigned long[1]') [-Warray-bounds]
+      98 |                 return (set->sig[3] | set->sig[2] |
+         |                                       ^        ~
+   include/uapi/asm-generic/signal.h:62:2: note: array 'sig' declared here
+      62 |         unsigned long sig[_NSIG_WORDS];
+         |         ^
+   In file included from net/nfc/nci/rsp.c:29:
+   In file included from include/linux/interrupt.h:11:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/arm64/include/asm/hardirq.h:17:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:588:
+   In file included from include/linux/irqdesc.h:5:
+   In file included from include/linux/irq_work.h:6:
+   In file included from include/linux/rcuwait.h:6:
+   In file included from include/linux/sched/signal.h:6:
+   include/linux/signal.h:99:4: warning: array index 1 is past the end of the array (that has type 'unsigned long[1]') [-Warray-bounds]
+      99 |                         set->sig[1] | set->sig[0]) == 0;
+         |                         ^        ~
+   include/uapi/asm-generic/signal.h:62:2: note: array 'sig' declared here
+      62 |         unsigned long sig[_NSIG_WORDS];
+         |         ^
+   In file included from net/nfc/nci/rsp.c:29:
+   In file included from include/linux/interrupt.h:11:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/arm64/include/asm/hardirq.h:17:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:588:
+   In file included from include/linux/irqdesc.h:5:
+   In file included from include/linux/irq_work.h:6:
+   In file included from include/linux/rcuwait.h:6:
+   In file included from include/linux/sched/signal.h:6:
+   include/linux/signal.h:101:11: warning: array index 1 is past the end of the array (that has type 'unsigned long[1]') [-Warray-bounds]
+     101 |                 return (set->sig[1] | set->sig[0]) == 0;
+         |                         ^        ~
+   include/uapi/asm-generic/signal.h:62:2: note: array 'sig' declared here
+      62 |         unsigned long sig[_NSIG_WORDS];
+         |         ^
+   In file included from net/nfc/nci/rsp.c:29:
+   In file included from include/linux/interrupt.h:11:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/arm64/include/asm/hardirq.h:17:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:588:
+   In file included from include/linux/irqdesc.h:5:
+   In file included from include/linux/irq_work.h:6:
+   In file included from include/linux/rcuwait.h:6:
+   In file included from include/linux/sched/signal.h:6:
+   include/linux/signal.h:114:11: warning: array index 3 is past the end of the array (that has type 'const unsigned long[1]') [-Warray-bounds]
+     114 |                 return  (set1->sig[3] == set2->sig[3]) &&
+         |                          ^         ~
+   include/uapi/asm-generic/signal.h:62:2: note: array 'sig' declared here
+      62 |         unsigned long sig[_NSIG_WORDS];
+         |         ^
+   In file included from net/nfc/nci/rsp.c:29:
+   In file included from include/linux/interrupt.h:11:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/arm64/include/asm/hardirq.h:17:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:588:
+   In file included from include/linux/irqdesc.h:5:
+   In file included from include/linux/irq_work.h:6:
+   In file included from include/linux/rcuwait.h:6:
+   In file included from include/linux/sched/signal.h:6:
+   include/linux/signal.h:114:27: warning: array index 3 is past the end of the array (that has type 'const unsigned long[1]') [-Warray-bounds]
+     114 |                 return  (set1->sig[3] == set2->sig[3]) &&
+
+
+vim +1 net/nfc/nci/rsp.c
+
+   > 1		if (skb->len < sizeof(*rsp)) {
+     2			pr_err("short NCI_CORE_INIT_RSP v2 packet\n");
+     3			return NCI_STATUS_SYNTAX_ERROR;
+     4		}
+     5		if (skb->len < 6 + rsp_1->num_supported_rf_interfaces +
+     6				sizeof(*rsp_2)) {
+     7			pr_err("short NCI_CORE_INIT_RSP v1 packet\n");
+     8			return NCI_STATUS_SYNTAX_ERROR;
+     9		}
+    10		if (skb->len < sizeof(*rsp_1))
+    11			return NCI_STATUS_SYNTAX_ERROR;
+    12	// SPDX-License-Identifier: GPL-2.0-only
+    13	/*
+    14	 *  The NFC Controller Interface is the communication protocol between an
+    15	 *  NFC Controller (NFCC) and a Device Host (DH).
+    16	 *
+    17	 *  Copyright (C) 2011 Texas Instruments, Inc.
+    18	 *
+    19	 *  Written by Ilan Elias <ilane@ti.com>
+    20	 *
+    21	 *  Acknowledgements:
+    22	 *  This file is based on hci_event.c, which was written
+    23	 *  by Maxim Krasnyansky.
+    24	 */
+    25	
+
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
