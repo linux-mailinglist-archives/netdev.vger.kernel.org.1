@@ -1,260 +1,229 @@
-Return-Path: <netdev+bounces-282992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282993-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +u3INYHF82ni6wEAu9opvQ
-	(envelope-from <netdev+bounces-282992-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 23:11:29 +0200
+	id QF81Jh/G82ni6wEAu9opvQ
+	(envelope-from <netdev+bounces-282993-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 23:14:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 279474A8053
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 23:11:28 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0313E4A8075
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 23:14:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3ECD2300DE29
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 21:11:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AEC4B30254A2
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 21:14:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 562403B0ADF;
-	Thu, 30 Apr 2026 21:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F073B52FC;
+	Thu, 30 Apr 2026 21:14:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="UtR4CiY/"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="fqQ5PfYo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f97.google.com (mail-oa1-f97.google.com [209.85.160.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010005.outbound.protection.outlook.com [40.93.198.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE50C3AE6F4
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 21:11:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.97
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777583486; cv=none; b=HOO4ZaACw9PhAv/scPUBwjekc4FYRXhjuzG+PS1N3fmK6PhGnOIiDA6h8U34F5EQF34kf/R0PfP/4SDXsO6dZSEILjWZSadsHAKOXpDPCXLrTF4HWH26G31ZG6btcmkSFyAFg+J+49PYb7NRHdjaEihJUODsw/FHXiNcLQ+kPW0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777583486; c=relaxed/simple;
-	bh=Tvs2Y6dEfG7JIoa6I/MdzMhiXBMCXIecvVgvnHMGwec=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qO/23c2U5wK2qF58ENDU+2NmfUJwzrKbmjViMBZzeaX4a0FFAI2D6bweyweC5zJwtFup9qVTf9X5EYG3b3P4/Ckc8NmkfTKZYu0rACJfnjK5JyYMvn4Au8xFcceTPwt7x1wrHf6vCyZDA04RmV66h5A/GpPtR07pWxMf2+OA35Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=UtR4CiY/; arc=none smtp.client-ip=209.85.160.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oa1-f97.google.com with SMTP id 586e51a60fabf-40efc77933fso891611fac.3
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 14:11:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777583484; x=1778188284;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vGuDNrM9cC9CuvljB5nsRFoixf3FmlIx1za+l5upQs4=;
-        b=kwpo4QYOr/FgQfL+ldepZBMbUJdLH8qnfFmX3B1QxWpJ5FkDqykjvkLGmcm2WDBQ/d
-         QJgqrcDMAVIHvadl4FPedj9eKrp9p4AVN8MZKbUDh9P/XU2Cqm2DI8djazIVB098NYzC
-         zTITSVjdfwEq3INzfAc1o9FiV8+mv+vKWRX7gTJVcU6F83K9AAXkefdjM7rPyigWJi9B
-         bivBOxJaujtNVc+XMoKKLhTBF25AQ/MjUI73Nv/0TS0TyKvkKFFRmzceMYKpiLy6zJds
-         28yQRgmHX8fFVdTRMDJROoVHAoxmhG8c6Neo5TDMUSjP18bt6+T/dcjOvFmsLOngXehB
-         gl8Q==
-X-Gm-Message-State: AOJu0Yz2Jb1NRsUfNyUND/5huHuZpf4LZ4922glw97BADQsesunXLWMF
-	U3mTpmVMaHu/Zm6AwGVeukzJxav6IEXelOguowJByAf01GSD80TR8UBd8cJ3Auy+G9zroq787Nq
-	ChUmlbrdJfpVIAk+GxfD7M5xw2V5zPZrwXCirCOPZeIsEBQquoF1Al6zFwxaL9MWIq21slw1Uky
-	5jaRsXoZ7z1WIjlo4xbz9j3fpiLwzRC7G11beFJA9fCDAjXbkWNzLscCsJFWEJ+JZFdOeB7AHUn
-	vb06hcu1w==
-X-Gm-Gg: AeBDietYYVE5Rh9UvOs80ugUBMLg7QhRZE8mgstDsLs0wUn28mGhL9UJXfyXotkV3g1
-	sdArOeLOhwUEXZ+sBFfGI3vPKNtlsSWBy5pzy2L+QIbkiNu9GRpoeQPKxuKYbtEqu9403WN7rXG
-	yi8MuhYcuO5RA42EmczPYzIge0+JMjGHXEG+dcRcRTG86Yjgogme/+6+6oSTPY0Aq5U5TOqJiqE
-	dJPTaxnEHTms1pW0ot1qYS4FJTiIBlfM3c+VJ0MUbxRCeAhrthKT++f5t8nw75KLsB4Q6vk1LBF
-	oXqednr8076ZQQ2shTsag7/e+TroerRTdP0DcQsP4S002wNTxbjpL/84nE3DPfSP3tBV6QDwm6H
-	UqLJ4MZbeh1wV2WR0nB6slaAFHdnN+0YDGLIfknCoOutouCVWszKDBTRqkvZJ6LayZRZJLF94OI
-	Ck2G3xryBsbk5qNw==
-X-Received: by 2002:a05:6870:b295:b0:417:3421:13ff with SMTP id 586e51a60fabf-43434040a4bmr2757347fac.29.1777583483706;
-        Thu, 30 Apr 2026 14:11:23 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com ([144.49.247.127])
-        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-43454d7ea1bsm72005fac.13.2026.04.30.14.11.23
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 30 Apr 2026 14:11:23 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-50fb6d713ddso24255791cf.1
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 14:11:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1777583482; x=1778188282; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vGuDNrM9cC9CuvljB5nsRFoixf3FmlIx1za+l5upQs4=;
-        b=UtR4CiY/seFIeHslXXQ5ptBf6w15vsv+j1ZLqCBGA9qJ/7dgKpPTI4KTUOsb7EsEcS
-         Gzfntm4XMSEyE0oWsb/en/uHwERv89/2impVsSpLuOIAw93MhZcUdq4t26cZxR0lLKJi
-         afQ9NNxZQ7xDfcLLpVck6hU8pPyMNTipkViBA=
-X-Received: by 2002:a05:622a:242:b0:50d:7d8a:5d45 with SMTP id d75a77b69052e-5102ae08973mr66384921cf.36.1777583482284;
-        Thu, 30 Apr 2026 14:11:22 -0700 (PDT)
-X-Received: by 2002:a05:622a:242:b0:50d:7d8a:5d45 with SMTP id d75a77b69052e-5102ae08973mr66384111cf.36.1777583481527;
-        Thu, 30 Apr 2026 14:11:21 -0700 (PDT)
-Received: from stbsdo-bld-1.sdg.broadcom.net ([192.19.161.248])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5103e595bd4sm1707441cf.24.2026.04.30.14.11.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Apr 2026 14:11:21 -0700 (PDT)
-From: Justin Chen <justin.chen@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	linux@armlinux.org.uk,
-	hkallweit1@gmail.com,
-	andrew@lunn.ch,
-	bcm-kernel-feedback-list@broadcom.com,
-	florian.fainelli@broadcom.com,
-	Justin Chen <justin.chen@broadcom.com>
-Subject: [PATCH net-next v2] net: phy: broadcom: Save PHY counters during suspend
-Date: Thu, 30 Apr 2026 14:11:17 -0700
-Message-Id: <20260430211117.2348478-1-justin.chen@broadcom.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED6E972622;
+	Thu, 30 Apr 2026 21:14:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.5
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777583643; cv=fail; b=q7EXEb/+ZFuV8g1/qKQ/Jr7dNZa9ixGcTIkFm4/hpg8EaaeWCJcshkXijhSB4s18AwU9ywWggc8PgQq7fKeMnvMdkecPNYZdw67RPzUcKoL4bzTkPa/CCcQH6GYitjDiFPHaW7aNzHb13Bc9+9xaDIQeBZVczbdhsHYLt3kz+Tg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777583643; c=relaxed/simple;
+	bh=bYytc2ztmJUdgRh+g5MPsWIzUGdVFPary3ts7H0w5sM=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=gXHDBTy11rhVhWmqxKDOjILbhV0PmmrEmMx97rA2tPJB2qwXzeO9D58gnHEH+KeUIFQWK+H5gL+iabr/xZZ+pVF7TlIklJkF52H4A9bW/QXPBZ8sgNdbuupalYlsUU59NAnyrOM0Me5DuE7GgLQj/i4s19obYOjjbpZqpjFt+X4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=fqQ5PfYo; arc=fail smtp.client-ip=40.93.198.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=v0OK9GV2gEMr4/zxIjHHQjJ1xTbBT8NzNKmFHebrU0ZbMr8sap521GP65aHOqK9oS/P9Amh0vvMS8PCUQFKuBi/FxfQS1EvLi4F6AFqqgRKvIn0ladlvy6RFFYfh+Gc25wIlZsIXCXssVvjvkXo0t5sQXeBUCpyEtrBCzpVsgt50jUmynyC8a+BOEnYZP+R5aKkUKobUpJ1xcOZqLVSsaDVqDYRM06gqcdAsmntL9deso5XXNXict66F2Knb+gURWys/OS0Am8awreCw5CJ4DZ51YQZsYxsxPDo8Yi8kT5bpqRLtCJ5FKucAjDsc2xXZBE7FQBae3nU8rRtFDVuBIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QRn+Atoo0Tub/MJUyqcXAlIGpLkykDYDrGB2uE2CuG8=;
+ b=y+AffW7TQejzbBWffnFQh6KaaZo0S2vja3QM1tswe/37ply9NHLgtBXuUqpgs0skJQp/dBGGzfkbowrEPuTj0aELSQgccQPz5dNfyztup7IAgJ6BkfS953QBbEx9HrAH8ZQNsFyfnOX7JYBFRC8FhTOFwGtoUJtKTSzYV+C7/82U7VTWS/M7X9/KPf8iDFZdTVut+tNF4etBRtPC61Cd/uFgCwMafZIN9uJ52blIzb7UkbinopvtyuTTsnilCITm6CtN1HGmGKurToD5kmvUJh8tBaj6BZXsDQEnAkai/BLHC9RyFoWz+IgZ3Y8dOkoSxgotRKDGYLDI7CJ7snwfhg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QRn+Atoo0Tub/MJUyqcXAlIGpLkykDYDrGB2uE2CuG8=;
+ b=fqQ5PfYoa9WTYukJ0+QAmzoFfq+DlrIMjjf2fx4fcg9OZc3xc9Dq28px7m/Vf/wRPiIzMYE+g91LCbgQinFeOoJRhDxbmOeg5X6s5eOZyhNE2J0o/X3tWT78jgdilsQ/o/XH9JESfKpLMXQaSRbJSeYiL90rS3nIvtMpz60t6yn60587cV0uPhtLbPqjn0KcdfTqRvM/fIFcUViNfFK0Mwol6Pp2zODEwirmgvwe4vEGnwm+u3yjbTnbZ9NBksRsLAgWBsu+Ma0n5ygs4OC8oZfOFZYqroTNQoeJXUDIebaNnebRA6gk8OfYnZ/6BmDJK+59fyhUfzE0GqObBkUSQQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY8PR12MB8300.namprd12.prod.outlook.com (2603:10b6:930:7d::16)
+ by DM4PR12MB6256.namprd12.prod.outlook.com (2603:10b6:8:a3::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9870.20; Thu, 30 Apr 2026 21:13:56 +0000
+Received: from CY8PR12MB8300.namprd12.prod.outlook.com
+ ([fe80::ce75:8187:3ac3:c5de]) by CY8PR12MB8300.namprd12.prod.outlook.com
+ ([fe80::ce75:8187:3ac3:c5de%3]) with mapi id 15.20.9870.020; Thu, 30 Apr 2026
+ 21:13:55 +0000
+From: Yury Norov <ynorov@nvidia.com>
+To: Paul Walmsley <pjw@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Jinjie Ruan <ruanjinjie@huawei.com>,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	linux-arch@vger.kernel.org,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: Yury Norov <ynorov@nvidia.com>
+Subject: [PATCH 0/6] lib: rework bitreverse
+Date: Thu, 30 Apr 2026 17:13:44 -0400
+Message-ID: <20260430211351.658193-1-ynorov@nvidia.com>
+X-Mailer: git-send-email 2.51.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR03CA0274.namprd03.prod.outlook.com
+ (2603:10b6:a03:39e::9) To CY8PR12MB8300.namprd12.prod.outlook.com
+ (2603:10b6:930:7d::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-X-Rspamd-Queue-Id: 279474A8053
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY8PR12MB8300:EE_|DM4PR12MB6256:EE_
+X-MS-Office365-Filtering-Correlation-Id: 919cf35c-e24a-48af-ea8f-08dea6fd6302
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|1800799024|10070799003|366016|18002099003|56012099003|921020;
+X-Microsoft-Antispam-Message-Info:
+	SPwn79hu4mpZbmd0li5fYtGc34idG9EvU/wMDfiHGkiKvF/Qb6QCMqBTHdyfNg5LwcuBiFuC56G7XJFwsI7ARiOoyRAiU2OXqRXfOUXjy7BTx3addb5lov9Vs/SAtXfEWhmQUMzTYR50Ll3ZO3NAXke9oTcuCrpwq+vsxAI2KAY0AXf2W950j4n7RBErzlIKGKLNGnTHU7++Yu674SLGtSnO9FXotFb5MBq1vO9iETdl84KGNLp3Y2JJ2AsSLchBw/bDXD7BFKDDJM9CVcmadTQ5S2ItWv02oWWvjzh+oRJG6aUy2/z6Tb4+61AIcxTz+Kv+n4KsCzzH83ISgn2vKAJGnC7B0xc1AFxpH9FCo2YLnWpYwxsXPxrKk0OJi6hSRkle95zLePQsOcfm23X59RaP9GVHodxy/q0GaHFqWzSNIP0+itUTw93vjB0S279GNZeBajkIW/7c9SbbHNuZebBwjY+7B/N4uO+xjhJNvYBxQmXbMPqrM88+u/BCau7jH4QqVXSB/EeZSh5F9o0vg6GpZEUl7WrB0LUcZ3ucv1ShrRg+PI5dcezPJTEvBkPtXzHGS3skVO9gpDjqEtVcbIqqAAnJu0VV9OZBmKECqQE2YBESa6es24tl8+lVWTym3sH2qvH/3rJQISyrky+GHUKkRkIuOw3rZsqmrLZCOzzn8wVBN4ZqjJXqj2cbGkRL/+9lfrhgyEEePAJUFvSIkLIio1EDX9Q0vz21ROltgPc=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB8300.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(10070799003)(366016)(18002099003)(56012099003)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?g95T87zbdJ000amw3EymqQ0gAPj8Dj0n2NO0Y5EYGjIyti3MynWX3s42+cRk?=
+ =?us-ascii?Q?KiaeyytztVnc97z3eEcf/1YtjpdFNIUKIDM28DUJ5NjvhabpDDHkIMAcXuI7?=
+ =?us-ascii?Q?UvCAwf7kcE4dOZQx2yzHx27becHw7y1x/y3QS5BTDJqHXTFzjiACSzKMrCR9?=
+ =?us-ascii?Q?dwjZQfnRk6F87vFsA9ZmM2g3Oi+JLX87vjg0n/SWyiJANpgnq3qmFXwe3e0M?=
+ =?us-ascii?Q?HSwSIBDXOf+64qny3xNmAQie2/lk6wc/P9yV1jK7WmMmkAPXatm+DDpfb+OQ?=
+ =?us-ascii?Q?rWVhJnsyn7OMtQBLWO28ib5jZoD9EyuewGteDkxJLcLy6hQX06S+bME1iWtA?=
+ =?us-ascii?Q?gkaf4UuMSnOll/tcHMPlB/A1ymBit59iPooNIlaA5CKyRlMitvtzoKpRNPyt?=
+ =?us-ascii?Q?jHXfNmltrnj2N14C0LuC0avLdhUK4nfYS0DoVRj/XF9uQsNOzdT0vWYX25Mz?=
+ =?us-ascii?Q?lnU56W2phvhtw0hVE3MBDE5MQMLX2qXpBVgHC+tg8jhH/qYN9uYDyrgUBFdW?=
+ =?us-ascii?Q?KVaj49rD9e8su8sKWF0nNA7KUm5IaSRdFSDV2Xq/i2ltbbUYKcvk31lY09vq?=
+ =?us-ascii?Q?qh8lMrpzcgAiw25sVLQ52EBe+AKjdLjeL+Y320pnpm5FbC9wMUDzEto5jSKn?=
+ =?us-ascii?Q?CMCeWiLMLpbW7rapc1ebYRLrQGsGVn55vl8s51RKz0/s2/jVLgOWSeek41HJ?=
+ =?us-ascii?Q?qKaXPmP0pX8eHQUNpgb6svFMhKBum8qgM4HSs7zpuDH/pPMd+i1DGcHhYsfh?=
+ =?us-ascii?Q?K+o3FwEJww5NAoXN0gKMVrW/vRC+uALEn+3SysaC1v4RqU0zcqJyfv5SQ0w4?=
+ =?us-ascii?Q?6ZfQqMwR1NBsLpeGqpppZABtMardRSqw2iiDYNELPD83kWhPHnIUGNHVAeMZ?=
+ =?us-ascii?Q?RGNetU35JnTZ3APGJBIfECyLsW3cQm7QcrQ7H+edk5KxQ444dyyEdyrzbfzP?=
+ =?us-ascii?Q?Q/SvFcsuem9nY3BVUJLDr3JdBNWTeKbBol3dVl0N71AvSiFTsiEhlzson1zY?=
+ =?us-ascii?Q?w32iC948kn9AhMrGZVDtA8P+dnkr2/f9XaQog/LeBINgJSqULjXQBoEuLQz+?=
+ =?us-ascii?Q?IhsBx18CFadrGtHojYGJTz+1F/hGtAO0mo5z00N/GuXssHBPOWOH+IZV8TAr?=
+ =?us-ascii?Q?2iEcWcw9TVYhnjd6Bo7ahDXG4yRycCwOMT4ShK1tQxwZThozC+fekjDuYl1o?=
+ =?us-ascii?Q?7vqk68HkIh4+4jH6+trY+SOGFaWMtHBOh+9N6sO1TLys+T7QVmqEWr+bBhAT?=
+ =?us-ascii?Q?OVwYeLKSjbGTMZweIb63rSe4qGIl5F6xAxEzH6OFuUnR0sT9VmgijZ0l//i2?=
+ =?us-ascii?Q?u1ThAcuR0y+E4U0WQv2o6MNN1K0itrScbro8fEZjwjqBN7vSCw3qcydfF0r3?=
+ =?us-ascii?Q?Y68y3x+lXC/7MiGtIAnuH2Pkn0n8y2UR+8+4GRAL8jIg9PfdgnuPB/yFd3C8?=
+ =?us-ascii?Q?cVrRXz1SO4N6N2MjaqzqpTEiU363VGavCqELzIDRZDLQyuHWLB9xUvFsTXoF?=
+ =?us-ascii?Q?5aYPlJr/uNUDDJJI6CT8OwbAm+PUfJdmY8aUnzG051hDTSYgHvoK9A2wCJVv?=
+ =?us-ascii?Q?BSPxPm954H/d+HzcoP8k7DccU3BMbLehUHmIwvRBDqL5ACmyYPspxB1Lh4Ct?=
+ =?us-ascii?Q?1orVC6RrrvB5qegCZF2HaIqcDqpDplwlnsyhZ3ay/aSB5NuvpBW1nSNucs7P?=
+ =?us-ascii?Q?i+dSA0VIjWp8O1rYTDw8P9ErBlNblgFeiypmnwIALVxJb+z+BhYhOneJOXRq?=
+ =?us-ascii?Q?hUjFTFd6oC5EuCJl3c5hEkNMypY7AG7eVxjQdb1CgL+MdAacJwDQ?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 919cf35c-e24a-48af-ea8f-08dea6fd6302
+X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB8300.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2026 21:13:55.3471
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: B25ZgCAYu78XhGs25DylfUSSlNvvS1eOzDxAYibijJORYq7ZXSgN/xppiv0eplmrBCZuGmqcZ9Cjrsc2v9x1Ag==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6256
+X-Rspamd-Queue-Id: 0313E4A8075
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [2.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_TO(0.00)[kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr,gmail.com,rasmusvillemoes.dk,arndb.de,lunn.ch,davemloft.net,google.com,redhat.com,linux-foundation.org,iogearbox.net,fomichev.me,huawei.com,vger.kernel.org,lists.infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[25];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282992-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[redhat.com,kernel.org,google.com,davemloft.net,armlinux.org.uk,gmail.com,lunn.ch,broadcom.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[justin.chen@broadcom.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282993-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[ynorov@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.994];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-The PHY counters can be lost if the PHY is reset during suspend. We
-need to save the values into the shadow counters or the accounting
-will be incorrect over multiple suspend and resume cycles.
+This series is a resend for Jinjie Ruan's "arch/riscv: Add bitrev.h file
+to support rev8 and brev8" [1], my follow-up "lib: compile generic
+bitrev based on GENERIC_BITREVERSE" [2], and the fix for a build error
+reported by Nathan Chancellor [3].
 
-Signed-off-by: Justin Chen <justin.chen@broadcom.com>
----
-v2
-- Removed hook into bcm7xxx_suspend(). We dont have phy stats for 40NM phys
-  nor shadow stats.
+No changes, except for combining pieces together and rebasing on top of
+the tree.
 
- drivers/net/phy/bcm-phy-lib.c |  9 +++++++++
- drivers/net/phy/bcm-phy-lib.h |  1 +
- drivers/net/phy/bcm7xxx.c     | 14 ++++++++++++++
- drivers/net/phy/broadcom.c    |  5 +++++
- 4 files changed, 29 insertions(+)
+[1] https://lore.kernel.org/all/20260421130752.607500-1-ruanjinjie@huawei.com/
+[2] https://lore.kernel.org/all/20260427205210.397471-1-ynorov@nvidia.com/
+[3] https://lore.kernel.org/all/20260429202922.GA3575295@ax162/
 
-diff --git a/drivers/net/phy/bcm-phy-lib.c b/drivers/net/phy/bcm-phy-lib.c
-index 5198d66dbbc0..b64beade8dd9 100644
---- a/drivers/net/phy/bcm-phy-lib.c
-+++ b/drivers/net/phy/bcm-phy-lib.c
-@@ -563,6 +563,15 @@ void bcm_phy_get_stats(struct phy_device *phydev, u64 *shadow,
- }
- EXPORT_SYMBOL_GPL(bcm_phy_get_stats);
- 
-+void bcm_phy_update_stats_shadow(struct phy_device *phydev, u64 *shadow)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(bcm_phy_hw_stats); i++)
-+		bcm_phy_get_stat(phydev, shadow, i);
-+}
-+EXPORT_SYMBOL_GPL(bcm_phy_update_stats_shadow);
-+
- void bcm_phy_r_rc_cal_reset(struct phy_device *phydev)
- {
- 	/* Reset R_CAL/RC_CAL Engine */
-diff --git a/drivers/net/phy/bcm-phy-lib.h b/drivers/net/phy/bcm-phy-lib.h
-index bceddbc860eb..bba94ce96195 100644
---- a/drivers/net/phy/bcm-phy-lib.h
-+++ b/drivers/net/phy/bcm-phy-lib.h
-@@ -85,6 +85,7 @@ int bcm_phy_get_sset_count(struct phy_device *phydev);
- void bcm_phy_get_strings(struct phy_device *phydev, u8 *data);
- void bcm_phy_get_stats(struct phy_device *phydev, u64 *shadow,
- 		       struct ethtool_stats *stats, u64 *data);
-+void bcm_phy_update_stats_shadow(struct phy_device *phydev, u64 *shadow);
- void bcm_phy_r_rc_cal_reset(struct phy_device *phydev);
- int bcm_phy_28nm_a0b0_afe_config_init(struct phy_device *phydev);
- int bcm_phy_enable_jumbo(struct phy_device *phydev);
-diff --git a/drivers/net/phy/bcm7xxx.c b/drivers/net/phy/bcm7xxx.c
-index 00e8fa14aa77..71a163f62c0e 100644
---- a/drivers/net/phy/bcm7xxx.c
-+++ b/drivers/net/phy/bcm7xxx.c
-@@ -807,6 +807,17 @@ static void bcm7xxx_28nm_get_phy_stats(struct phy_device *phydev,
- 	bcm_phy_get_stats(phydev, priv->stats, stats, data);
- }
- 
-+static int bcm7xxx_28nm_suspend(struct phy_device *phydev)
-+{
-+	struct bcm7xxx_phy_priv *priv = phydev->priv;
-+
-+	mutex_lock(&phydev->lock);
-+	bcm_phy_update_stats_shadow(phydev, priv->stats);
-+	mutex_unlock(&phydev->lock);
-+
-+	return genphy_suspend(phydev);
-+}
-+
- static int bcm7xxx_28nm_probe(struct phy_device *phydev)
- {
- 	struct bcm7xxx_phy_priv *priv;
-@@ -849,6 +860,7 @@ static int bcm7xxx_28nm_probe(struct phy_device *phydev)
- 	.flags		= PHY_IS_INTERNAL,				\
- 	.config_init	= bcm7xxx_28nm_config_init,			\
- 	.resume		= bcm7xxx_28nm_resume,				\
-+	.suspend	= bcm7xxx_28nm_suspend,				\
- 	.get_tunable	= bcm7xxx_28nm_get_tunable,			\
- 	.set_tunable	= bcm7xxx_28nm_set_tunable,			\
- 	.get_sset_count	= bcm_phy_get_sset_count,			\
-@@ -866,6 +878,7 @@ static int bcm7xxx_28nm_probe(struct phy_device *phydev)
- 	.flags		= PHY_IS_INTERNAL,				\
- 	.config_init	= bcm7xxx_28nm_ephy_config_init,		\
- 	.resume		= bcm7xxx_28nm_ephy_resume,			\
-+	.suspend	= bcm7xxx_28nm_suspend,				\
- 	.get_sset_count	= bcm_phy_get_sset_count,			\
- 	.get_strings	= bcm_phy_get_strings,				\
- 	.get_stats	= bcm7xxx_28nm_get_phy_stats,			\
-@@ -902,6 +915,7 @@ static int bcm7xxx_28nm_probe(struct phy_device *phydev)
- 	.config_aneg	= genphy_config_aneg,				\
- 	.read_status	= genphy_read_status,				\
- 	.resume		= bcm7xxx_16nm_ephy_resume,			\
-+	.suspend	= bcm7xxx_28nm_suspend,				\
- }
- 
- static struct phy_driver bcm7xxx_driver[] = {
-diff --git a/drivers/net/phy/broadcom.c b/drivers/net/phy/broadcom.c
-index bf0c6a04481e..d1a4edb34ad2 100644
---- a/drivers/net/phy/broadcom.c
-+++ b/drivers/net/phy/broadcom.c
-@@ -592,8 +592,13 @@ static int bcm54xx_set_wakeup_irq(struct phy_device *phydev, bool state)
- 
- static int bcm54xx_suspend(struct phy_device *phydev)
- {
-+	struct bcm54xx_phy_priv *priv = phydev->priv;
- 	int ret = 0;
- 
-+	mutex_lock(&phydev->lock);
-+	bcm_phy_update_stats_shadow(phydev, priv->stats);
-+	mutex_unlock(&phydev->lock);
-+
- 	bcm54xx_ptp_stop(phydev);
- 
- 	/* Acknowledge any Wake-on-LAN interrupt prior to suspend */
+Build-tested against x86 tinyconfig and defconfig, having disabled and
+enabiled CRC32 and BITREVERSE, correspondingly.
+
+Jinjie Ruan (3):
+  lib/bitrev: Introduce GENERIC_BITREVERSE and cleanup Kconfig
+  bitops: Define generic __bitrev8/16/32 for reuse
+  arch/riscv: Add bitrev.h file to support rev8 and brev8
+
+Yury Norov (3):
+  lib: include crc32.h conditionally on CONFIG_CRC32
+  lib: compile generic bitrev.c conditionally on GENERIC_BITREVERSE
+  MAINTAINERS: BITOPS: include bitrev.[ch]
+
+ MAINTAINERS                           |  2 ++
+ arch/riscv/Kconfig                    |  2 ++
+ arch/riscv/include/asm/bitrev.h       | 51 +++++++++++++++++++++++++++
+ include/asm-generic/bitops/__bitrev.h | 25 +++++++++++++
+ include/linux/bitrev.h                | 20 +++--------
+ include/linux/etherdevice.h           |  4 +++
+ lib/Kconfig                           | 18 ++++++++++
+ lib/Makefile                          |  2 +-
+ lib/bitrev.c                          |  3 --
+ 9 files changed, 107 insertions(+), 20 deletions(-)
+ create mode 100644 arch/riscv/include/asm/bitrev.h
+ create mode 100644 include/asm-generic/bitops/__bitrev.h
+
 -- 
-2.34.1
+2.51.0
 
 
