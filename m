@@ -1,146 +1,137 @@
-Return-Path: <netdev+bounces-282603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282604-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UDQDAMy/8mlbtwEAu9opvQ
-	(envelope-from <netdev+bounces-282603-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:34:52 +0200
+	id aPTJH6vA8mnktwEAu9opvQ
+	(envelope-from <netdev+bounces-282604-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:38:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73F5849C62E
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:34:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E73D749C682
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:38:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 620A0300B873
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:34:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EC248301ECE3
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:36:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7936928468E;
-	Thu, 30 Apr 2026 02:34:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 792B02BE656;
+	Thu, 30 Apr 2026 02:36:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="etwG8gnx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LKWRDhVb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D4E175A5;
-	Thu, 30 Apr 2026 02:34:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29A862853F3
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 02:36:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777516489; cv=none; b=RmUZSNIKwg4Zk+25wv+lZJ1mrS06/4Ey0z934zQgXo054b2CTi8WjQ0p8B2E23vjv4T5kcd0LqG1m6tJLtAGhCApEPAhHmeLu9/xyEXjKaogel3FDWG9bVHMrwhsyW7bU3hJNJfY7ZXPCkJoXz9IMOn28F2Bfco0VmAokkDsB4w=
+	t=1777516592; cv=none; b=f4R1yBawzkSSA8XYzK8FDqk47XXjwupRYAoay1HSVFPJ5RkBP9fAG1E2DEOSJ1LWBahyN34lQ6z2RUx6KZIBLVaMmxkY3N2W+qSCAV57o2FGcWJx+puYzNoLW3Ox4lpcpZvD9T2DJF38vdCDsMWEnyDUbAs8FUpQ3E57ARcMDw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777516489; c=relaxed/simple;
-	bh=Akn6BBdD9VzfdZuUDM8cGWmjnSwFKo+fMd1NMemYleY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DXyzsgkKhjckghHCduN8IIZMDMinlZNkwbNf8GbPvD21jcG1qiYcSi/PvCE7vrGp2QzLwM180Bj2GEI6izFAxTMvOcou7w46JAVPaBx+HdrYJYhtYwMOu/mU531giU2wm0tpmIdLMuwAyVmJtCN6Yl8zzcHlw916MdQKoKx6gBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=etwG8gnx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDABBC19425;
-	Thu, 30 Apr 2026 02:34:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777516488;
-	bh=Akn6BBdD9VzfdZuUDM8cGWmjnSwFKo+fMd1NMemYleY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=etwG8gnxcw1f0mIkPJ4N1NlXamuy+3oKr+++bRrqZJOlX7OluoFD9kx6zdyiah44Y
-	 Pgxae1oCn2+qLYw/kLEHMR/zvwKd1QZLl4CSxm/oXuS9V0WLVs8bEcWa4bu6KqJ0Tg
-	 4sXYZmSTDFni3kXtEOFy2CvFet8i6Uzd4RdtvRsTuNwtermhmUNfTK/TIYo9q5LCTU
-	 R7iiP/c1/dTesatYATC80BnVfyUrDvYl0P4OflSaWzXu60mrNsKp6X3rQxfD1twGZ0
-	 ZMRUKTv5TIfLBce05avRvwVnz3Ynk4C8GyhZ9d1Adu6IsPKed/SyO+GNKzrLpAAHR7
-	 HhVYAXggn3BBw==
-Date: Wed, 29 Apr 2026 19:34:46 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?VGjDqW8=?= Lebrun <theo.lebrun@bootlin.com>
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea
- <claudiu.beznea@tuxon.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Haavard Skinnemoen <hskinnemoen@atmel.com>, Jeff
- Garzik <jeff@garzik.org>, Paolo Valerio <pvalerio@redhat.com>, Conor Dooley
- <conor@kernel.org>, Nicolai Buchwitz <nb@tipi-net.de>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Vladimir Kondratiev
- <vladimir.kondratiev@mobileye.com>, Gregory CLEMENT
- <gregory.clement@bootlin.com>, =?UTF-8?B?QmVub8OudA==?= Monin
- <benoit.monin@bootlin.com>, Tawfik Bayouk <tawfik.bayouk@mobileye.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, stable@vger.kernel.org
-Subject: Re: [PATCH net v2 2/4] net: macb: drop in-flight Tx SKBs on close
-Message-ID: <20260429193446.5985abea@kernel.org>
-In-Reply-To: <20260428-macb-drop-tx-v2-2-647f5199d8df@bootlin.com>
-References: <20260428-macb-drop-tx-v2-0-647f5199d8df@bootlin.com>
-	<20260428-macb-drop-tx-v2-2-647f5199d8df@bootlin.com>
+	s=arc-20240116; t=1777516592; c=relaxed/simple;
+	bh=z3UFk9DXs9/npEsMInOp5FxYmpvj18QiiM9uzHepGmw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=rlL0becFwqAxmcFcQlRg0NeQEmIu34sToKrYx5wPZJvqT25SpAvqrw9vZzgPxyydzBNOgd/2no3FcT7+itAql94SO3VDue6S9hxo7VCeZkB33+vErARxat20i+VL+XaYVSh0cBCKmlhJYbFrxs29m5DL5WXR++6nYyw9MBWo9vU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LKWRDhVb; arc=none smtp.client-ip=209.85.219.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-8aca4660827so13448846d6.3
+        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 19:36:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777516590; x=1778121390; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=oCWVLnOfJ6oLkzlLj6HLhBZ5ZOfcOhnTya7EkvSjzy0=;
+        b=LKWRDhVbE+pfXtACPIuJUnGSon35Wc44N1R/HngY5g/ZkiwsgCJ95JtQcqyDDuJna/
+         LpHkabu78KuKGTWNTlRe4src603cMBmygxJIWUUV86Zr2hujIDdY4Rt9HVl7Uy/FaF22
+         /9EM0DVFac8ztuPz6Aj3teffQlrKV7l50H/YY79/IMqiPz24YxElDpcuzXcCJjaQZs3G
+         JxSZ24RjqneVL6UyOggJHbcQAlNZ5RhJli10i+/HZYfHiHZ3kvjc5tztz9UOsNPjUG5Y
+         Y6eSpzGIHLYOt/gruX2Q38nyMdOYzfUOlk6lAimpBt96IQqgX0WudEvI2pWEeVJ03kg7
+         1/pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777516590; x=1778121390;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oCWVLnOfJ6oLkzlLj6HLhBZ5ZOfcOhnTya7EkvSjzy0=;
+        b=gX750dZ4uozfojZKjziK7hj39fZAHhfBBPCQnprJjZI5reerpzIrR1tfDt3qpLFBx2
+         25mtgtfcuYXVKa+U153sv/5BGTfiCGxXrg2ylkAG3pPs0z3S1FBr95jYKLR9uuoKussR
+         4bTAof8kQHN2ZEhi1fMCJtPIY4vJxxadZNm3qOzjgCKHuygZ1bAwLMuBcWyDAh8s4nup
+         hQkh4ezJhdmvlh4ZTM6JhufKYu7MQayNxVJ00UDKr1skK7MOzbg3dCXtifj+B5QagBpg
+         gbJJjKUxMlrKOJwWa8UMr/ItLq1uMlusXcZS1Yhi+EiBSCg1AXlSyX+I2dFrwkMGJgiy
+         FCZw==
+X-Forwarded-Encrypted: i=1; AFNElJ/i2mjiTFGVtJPEPo1zZCWtn/iRWNo+eGBy9O8YWqrFAHBnnBRSVMJgAAxtRk5lpJOv5JbAQ/c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpVJ6yglNmdrAuMegrsE+a2C1F1Pkw5ZZg8ebzd4KsyTiv9Yaa
+	dbxWdpcsUvR9ggGcgNgWiX5YSRM2MqF1H4/R81hjMALiNWsNIryLJgzbFWDEie7CmpB9Av6G2DJ
+	5CbTJtUufQcJR2Q==
+X-Received: from qvab10.prod.google.com ([2002:a05:6214:610a:b0:8ae:5fcc:a3ef])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6214:3d9e:b0:89c:e7d5:4b20 with SMTP id 6a1803df08f44-8b3fe765fddmr17789536d6.15.1777516589895;
+ Wed, 29 Apr 2026 19:36:29 -0700 (PDT)
+Date: Thu, 30 Apr 2026 02:36:24 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 73F5849C62E
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
+Message-ID: <20260430023628.3216283-1-edumazet@google.com>
+Subject: [PATCH v3 net-next 0/4] net/sched: tc_dump_qdisc() optimizations
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
+	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: E73D749C682
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282603-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com,google.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282604-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.984];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Tue, 28 Apr 2026 18:32:58 +0200 Th=C3=A9o Lebrun wrote:
->  	for (q =3D 0, queue =3D bp->queues; q < bp->num_queues; ++q, ++queue) {
-> -		kfree(queue->tx_skb);
-> -		queue->tx_skb =3D NULL;
-> +		if (queue->tx_skb) {
-> +			unsigned int dropped =3D 0, tail;
-> +
-> +			for (tail =3D queue->tx_tail; tail !=3D queue->tx_head;
-> +			     tail++) {
-> +				if (macb_tx_skb(queue, tail)->skb)
-> +					dropped++;
-> +				macb_tx_unmap(bp, macb_tx_skb(queue, tail), 0,
-> +					      SKB_DROP_REASON_NOT_SPECIFIED);
-> +			}
-> +
-> +			queue->stats.tx_dropped +=3D dropped;
-> +			bp->dev->stats.tx_dropped +=3D dropped;
+Before converting tc_dump_qdisc() to RCU, we make the following changes:
 
-I'm slightly baffled by the stats in this driver.
+- Use for_each_netdev_dump() instead of for_each_netdev()
 
-Incrementing of both device and queue stats is highly unusual.
-The driver seems to already have the values for the per-queue drops
-but currently never increments it (did I miss it?) It does for Rx
-stats but not for Tx stats.
+- Only dump qdiscs of a single device at user space request.
 
-As sashiko correctly points out incrementing dev stats will lead
-to races and lass of increments for multi-queue devices.
+v2 and v3: addressed Jakub feedback (thanks!)
 
-Since there are no increments for tx_dropped stat today - could you
-please delete it from ethtool -S, migrate the only existing
-dev->stats.tx_dropped++; to increment the per-queue stat and make=20
-macb_get_stats() collect the tx_dropped from all queues, instead
-of relying on the device-level stat?
+Eric Dumazet (4):
+  net/sched: propagate tc_fill_tclass() error
+  net/sched: tc_dump_qdisc_root() refactor
+  net/sched: switch tc_dump_qdisc() to for_each_netdev_dump()
+  net/sched: speedup tc_dump_qdisc() when tcm_ifindex is provided
 
-This should be patch 2 in this series, and then subsequent patches
-don't have to do this double-counting dance.
+ net/sched/sch_api.c | 127 +++++++++++++++++++++++---------------------
+ 1 file changed, 67 insertions(+), 60 deletions(-)
 
-I suppose you may want to migrate the byte and packet counters
-while at it, and add a u64 sync...
+-- 
+2.54.0.545.g6539524ca2-goog
+
 
