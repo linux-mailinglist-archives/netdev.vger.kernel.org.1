@@ -1,176 +1,152 @@
-Return-Path: <netdev+bounces-282752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282755-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SArRIqwq82mwxgEAu9opvQ
-	(envelope-from <netdev+bounces-282752-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 12:10:52 +0200
+	id 3+b/Bdcq82nMxwEAu9opvQ
+	(envelope-from <netdev+bounces-282755-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 12:11:35 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF3BB4A08C2
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 12:10:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6313C4A08ED
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 12:11:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 728AB303FACA
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 10:00:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 00B8A3052A29
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 10:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46C483FAE1C;
-	Thu, 30 Apr 2026 10:00:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D1FC3A6B99;
+	Thu, 30 Apr 2026 10:01:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p1eDn6ld"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lUbGELC0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F19127EFE9
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 10:00:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B23D377ECA
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 10:01:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777543235; cv=none; b=EPzOGn6tpYfqFdCvmz9oV+LusZrrM4WLfn4JhKyLElkiMGXIax4O2v8R8S1utLaX99GFQbwNRNHx0sPW7xciZP37bu3fq3CVbugL8agl65NBKhaE1EeJ9zSU620IJPpLMUYW5T1VVXdvANPAJHb2w5wLdEudy+nxlGwJts3hfBw=
+	t=1777543266; cv=none; b=ssQzObgDJ6WqddYyTJbqgCT9/dZL7EE8IwqF3fVVaHTqyIgBxuKKtA4/upTAPHKQezEH2xKdHXuSRCI2BdmtCSIuosvK9Z/VZ+gqp1atkFDHiC5HmRpeODfwTOzLKWZZxo0OI7josxl74CkU/Y39z2/ov3uMZlHzDwoQAbjMcEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777543235; c=relaxed/simple;
-	bh=qdT9YwEie/9T8UyoPg+BQ4ocYv3D/xC3k7NJfx9UFw0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Sv1TFkn+AGYlZZBhCI4vzsTbOp2dGjb+1mw9RMFKHezEUwilnf7Cpz3XqtbeOibM9hUWIKiTQhIn4d1joK/RY+ZTUsjP9C5LqmKkl/IYP1GZMMvwJ+0uuxbXE/Twcgbs1tXuXO8f+J0tAaF1vV7H1Lfsy7fdhj1ecp3RsifuJHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p1eDn6ld; arc=none smtp.client-ip=209.85.219.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-8aca3b7b536so21275646d6.3
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 03:00:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777543229; x=1778148029; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J4eOJh1op/uPGObl4DOQiu/FPWjkacquyPxjppNVQIA=;
-        b=p1eDn6ld4b2KmFPNB3b5w1sYuPEeHlpYfIA6URRTsbvK2rhdw7A3cQl7l2DFaO1EmG
-         8xU5AqY8hSEFtI6D7JYO5joKxmlWQ1Adq4+z9GvmwuaYcaJbs038RekDoDZF8emZlZZZ
-         hkyO04E4iuwEhBH6mws3Yb9BxmxpQYsiJQfJ9l+Hu/JkFJaBzNy/c9ad97hpPLLCFAAK
-         j+wjOvjVLZM5DkoyQ8stdpHXXmX+neRFMi1hO6xj6etpL7ksrp59G1HcweeO33PZ1WEc
-         RoxKd2WhRGlMlUe4+bMtsNw7w1qjY+H1iEX3XV3ZN/GOCLh4mJwC79FJ7HLbeAZn/sDU
-         zhzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777543229; x=1778148029;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J4eOJh1op/uPGObl4DOQiu/FPWjkacquyPxjppNVQIA=;
-        b=hdiJ94d++sUgGQVghw5Y/aHhh96EMiyA4fIseFlB7vwYPEJB6ACwZMSbFISpWnEVYm
-         9PYXWKVJ7c8yOZxj2KjGRmQA6+iJ9O/evynByo5K4G4p7yGDGNuUILdbTfGCwPdq4Bp4
-         38QBp/KyUjGP4E3S5yTNzaUZP0oWCreIolVWaEZZbOREESkbDhzOdBkoiJwAZht9SoYy
-         /64ei1/Ccv1t+Y57065FXrrVPSlJqpVL+7F1twhwkT59DyR/8sWG9k1UxTWaciWJ1Wla
-         NdSXN7sQkbNnlstdB062FQoELUIeEZfk3msnR50rqoEykCkvNoBR945Ne7p2rwpGPK13
-         OuSQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9VUPhD8vf9/boS5k1CddmHnqJclU8kIkj9bkYTFw12rCAyvvro8JYG9WjY4lJpu+zXUfXsqYg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfNHsaMoDrycJ4zKQXduwt/q1EfhvgL0ScQxU4t9Ao3ZalJSQL
-	BiRJboVGeM3UvEmL4aYlcuzZVpHDcBPbdksmOAenfJF87iT1lEcoyuwlSymCUAVx+nxdHCdH+YF
-	jy5zgW6DjxDi/rg==
-X-Received: from qvblh1.prod.google.com ([2002:a05:6214:54c1:b0:8a3:a172:4323])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:3d12:b0:8ac:9fc3:b9fb with SMTP id 6a1803df08f44-8b3feef85edmr28811336d6.45.1777543228572;
- Thu, 30 Apr 2026 03:00:28 -0700 (PDT)
-Date: Thu, 30 Apr 2026 10:00:19 +0000
-In-Reply-To: <20260430100021.211139-1-edumazet@google.com>
+	s=arc-20240116; t=1777543266; c=relaxed/simple;
+	bh=4uNn5VjlMIxviBM8I2EAC/V5geQPmRJJ5m8IuNt0Bi0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=FkxYv2z4zV9yiDHB7n+zlEVlB6UzkQr9j9ZCdqRpFsZB1vqwAGKhPYgQfFaQsVhJtH1hC2Mn9aGwVwp2sSTMXBSyrgh3NqS6ErRDtFjv2TpOJB8+mDDhUjvL2XNh3iJXNODY/xYTDrTguhsmLFdaCWaREhlgt6NX3kO5MdgvRKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lUbGELC0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B15B2C2BCB3;
+	Thu, 30 Apr 2026 10:01:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777543265;
+	bh=4uNn5VjlMIxviBM8I2EAC/V5geQPmRJJ5m8IuNt0Bi0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=lUbGELC0pfLQ+kxFkajY+Xn1bZUl/Af1m/GldBcX8VN6spiicOj1321B1595Vii1r
+	 16mC/Km8J7Phv+FY/rCUga6MJXBdz3bpF3Si3PUeEYiLy9deVJELbaRTa9003Ta5yn
+	 Mz+HBn3J0xpjtvlwPfBSgSfbFQH/CYxGrzEpWY2g7Zy0m77FVa67IhB/fWDdnBDVEp
+	 0P/pbG5OkP++6RyYWGeWoGT0yFpSS/uQXnZ2nfmkKaWoUh2mY7cFzphLZMELcPGNed
+	 P/28ZdLyt6HbeVdfehAN4wthejrWMkUDzfiHAcpn9Mz2tkBLgnf4NuTjt6E0HjobK+
+	 cPEDI/+5UdFfA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9F34380A965;
+	Thu, 30 Apr 2026 10:00:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260430100021.211139-1-edumazet@google.com>
-X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260430100021.211139-4-edumazet@google.com>
-Subject: [PATCH net-next 3/5] tcp: move tp->first_tx_mstamp and
- tp->delivered_mstamp to tcp_sock_write_tx
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: EF3BB4A08C2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 00/11] Intel Wired LAN Update 2026-04-27 (ice, iavf)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177754322054.2492956.9695571168501500899.git-patchwork-notify@kernel.org>
+Date: Thu, 30 Apr 2026 10:00:20 +0000
+References: <20260427-jk-iwl-net-petr-oros-fixes-v1-0-cdcb48303fd8@intel.com>
+In-Reply-To: <20260427-jk-iwl-net-petr-oros-fixes-v1-0-cdcb48303fd8@intel.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, aleksandr.loktionov@intel.com,
+ horms@kernel.org, jiri@resnulli.us, netdev@vger.kernel.org, poros@redhat.com,
+ rafal.romanowski@intel.com, pmenzel@molgen.mpg.de,
+ alexander.nowlin@intel.com, ivecera@redhat.com,
+ arkadiusz.kubalewski@intel.com, vadim.fedorenko@linux.dev
+X-Rspamd-Queue-Id: 6313C4A08ED
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-282755-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282752-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.996];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-These fields are touched in when payload is sent.
+Hello:
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/linux/tcp.h | 4 ++--
- net/ipv4/tcp.c      | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-index 89013be1519abd1713d42f93e1864fb1d61d303a..e9adc88b73b43c39c734361da149ad29ef48e922 100644
---- a/include/linux/tcp.h
-+++ b/include/linux/tcp.h
-@@ -258,6 +258,8 @@ struct tcp_sock {
- 	u64	bytes_sent;	/* RFC4898 tcpEStatsPerfHCDataOctetsOut
- 				 * total number of data bytes sent.
- 				 */
-+	u64	first_tx_mstamp;  /* start of window send phase */
-+	u64	delivered_mstamp; /* time we reached "delivered" */
- 	u32	data_segs_out;	/* RFC4898 tcpEStatsPerfDataSegsOut
- 				 * total number of data segments sent.
- 				 */
-@@ -347,8 +349,6 @@ struct tcp_sock {
- 	u32	rcv_rtt_last_tsecr;
- 	u32	delivered_ecn_bytes[3];
- 	u16	pkts_acked_ewma;/* Pkts acked EWMA for AccECN cep heuristic */
--	u64	first_tx_mstamp;  /* start of window send phase */
--	u64	delivered_mstamp; /* time we reached "delivered" */
- 	u64	bytes_acked;	/* RFC4898 tcpEStatsAppHCThruOctetsAcked
- 				 * sum(delta(snd_una)), or how many bytes
- 				 * were acked.
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 135a5db6c3fcc1e33227403fd9376642c9826412..d25698a0e6819cb4d3563461bb1ae89d5104669f 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -5234,6 +5234,8 @@ static void __init tcp_struct_check(void)
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, delivered);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, delivered_ce);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, bytes_sent);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, first_tx_mstamp);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, delivered_mstamp);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, snd_sml);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, chrono_start);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, chrono_stat);
-@@ -5280,8 +5282,6 @@ static void __init tcp_struct_check(void)
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rcv_rtt_last_tsecr);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, delivered_ecn_bytes);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, pkts_acked_ewma);
--	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, first_tx_mstamp);
--	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, delivered_mstamp);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, bytes_acked);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rcv_rtt_est);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rcvq_space);
+On Mon, 27 Apr 2026 22:22:12 -0700 you wrote:
+> Petr Oros from RedHat has accumulated a number of fixes for the Intel ice
+> and iavf drivers, bundled together in this series.
+> 
+> First, a series of 4 fixes to resolve issues with the iavf driver logic for
+> handling VLAN filters. This includes keeping VLAN filters while the
+> interface is brought down, waiting for confirmation on filter deletion
+> before deleting filters from the driver tracking structures, and handling
+> the VIRTCHNL_OP_ADD_VLAN for the old v1 VLAN_ADD command.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,01/11] iavf: rename IAVF_VLAN_IS_NEW to IAVF_VLAN_ADDING
+    https://git.kernel.org/netdev/net/c/70d62b669f1f
+  - [net,02/11] iavf: stop removing VLAN filters from PF on interface down
+    https://git.kernel.org/netdev/net/c/f2ce65b9b917
+  - [net,03/11] iavf: wait for PF confirmation before removing VLAN filters
+    https://git.kernel.org/netdev/net/c/bbcbe4ed70de
+  - [net,04/11] iavf: add VIRTCHNL_OP_ADD_VLAN to success completion handler
+    https://git.kernel.org/netdev/net/c/34d33313b52e
+  - [net,05/11] ice: fix NULL pointer dereference in ice_reset_all_vfs()
+    https://git.kernel.org/netdev/net/c/54ef02487914
+  - [net,06/11] ice: fix infinite recursion in ice_cfg_tx_topo via ice_init_dev_hw
+    https://git.kernel.org/netdev/net/c/70ad216411e0
+  - [net,07/11] ice: fix missing SMA pin initialization in DPLL subsystem
+    https://git.kernel.org/netdev/net/c/56a643aed0f0
+  - [net,08/11] ice: fix SMA and U.FL pin state changes affecting paired pin
+    https://git.kernel.org/netdev/net/c/6f9d8393c9f5
+  - [net,09/11] dpll: export __dpll_pin_change_ntf() for use under dpll_lock
+    (no matching commit)
+  - [net,10/11] ice: fix missing dpll notifications for SW pins
+    https://git.kernel.org/netdev/net/c/1a41b58fd4dc
+  - [net,11/11] ice: add dpll peer notification for paired SMA and U.FL pins
+    https://git.kernel.org/netdev/net/c/9e5dead140af
+
+You are awesome, thank you!
 -- 
-2.54.0.545.g6539524ca2-goog
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
