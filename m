@@ -1,228 +1,272 @@
-Return-Path: <netdev+bounces-282715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282716-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iJu4I+4Y82nNxAEAu9opvQ
-	(envelope-from <netdev+bounces-282715-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 10:55:10 +0200
+	id 8IYqCYUZ82nNxAEAu9opvQ
+	(envelope-from <netdev+bounces-282716-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 10:57:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0974249F814
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 10:55:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8445949F893
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 10:57:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C0196301BA7D
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 08:54:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4543F300A763
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 08:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A74203FD15E;
-	Thu, 30 Apr 2026 08:54:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C5713FF8A6;
+	Thu, 30 Apr 2026 08:55:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gOy8SjMe";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="NGLikinj"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20251104.gappssmtp.com header.i=@baylibre-com.20251104.gappssmtp.com header.b="sG9T6KPC"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A3403DBD71
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 08:54:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32713FD15E
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 08:55:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777539287; cv=none; b=Xqddmn5Es9qvWZIxHyST/9ogg3mDRABNZtXmzcFd8LhXNDZ8HKUaQA27/Iv8jT2jIGbquvAmi0xlaxPQr82qur8ayGmNyEHRrAsL2zp7UVW5gkOuA2ipgdSypo1D0vK0l4fSACvXF9ecHQ0e61Ov0T2w1CeUwIOnQJwlt9SYCV4=
+	t=1777539327; cv=none; b=DQbBCyC5fsA0Xj7l3l3zb+88EfMiRyfbCjuSpAzyJ9LP39fZ39ckNfD2MJ5NxT0xQjt7ESg+PjkY50xTHuqBB7shlwRA70IFgSuEsmonQFJILOBw1YKkOVxk9apczhAkyuN19PyjPGPIQzCQive7hNXprJ9GwsHXMZljTvQUlxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777539287; c=relaxed/simple;
-	bh=BXkjAEQH1pEX97etVeo1QwQJ+MmukyjYyoW3FfIXJsg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=nFM+GNJetO0woYeNAlPy1d/o6phPGQxfNoDi34b/sKEs+FXnXMUY13NB1ozlgbCPpFm3SUWksd4DRBp+J1p8ud/7qbjUNZgkkXZFR6rXSvZDfo9DfRMekePx2gyTS9fv7MrKXmcU2GhPyngCsbdwZC8e6MdvfiKlFW4Dxax8dqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gOy8SjMe; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=NGLikinj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777539285;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GQwFPqdunk7GL7ROCqWeVKcEMJAeoTNuS9bxiITd8QA=;
-	b=gOy8SjMe1Kcb0SYDpwdo6FWKLTL1IjoBOx+wAIc3NRGO6PUk1X98Wa7U/+v77P5DeUDeH6
-	dd1hNV4q2EPpbx/gQqzSKoJiFtt50VzUARDcBfmb7US3VYG6gcLeLfQKFGZu4lCb8bedKo
-	fDo2tvBYQFEwlQ9CVI8MdPRxL98Dn4g=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-517-fINvrsy1PYu4qgfXrSRYZw-1; Thu, 30 Apr 2026 04:54:43 -0400
-X-MC-Unique: fINvrsy1PYu4qgfXrSRYZw-1
-X-Mimecast-MFC-AGG-ID: fINvrsy1PYu4qgfXrSRYZw_1777539282
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-488d56f87e8so5673585e9.0
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 01:54:43 -0700 (PDT)
+	s=arc-20240116; t=1777539327; c=relaxed/simple;
+	bh=Pqq8zSAcOFFR5+YaBlC+lfkekk7615G+YO4hKhKWJCU=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=f/C0L0WMwlL3ho7YC6lHLcjBdhU20blx9p92Jns2okucARxl8USdLBoO+RJ4NlSKEINl8VNVHzvzhse1apN3+/maY/DTeKP7c9QnB56atKHRKSfgRimo+/xuTZYYQ51A1tlVkEjL+AVbAfGU5RHwywHV2/NGotHGhJPhrhA4Ke4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20251104.gappssmtp.com header.i=@baylibre-com.20251104.gappssmtp.com header.b=sG9T6KPC; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-4486b5fcf3cso598709f8f.2
+        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 01:55:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1777539282; x=1778144082; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=GQwFPqdunk7GL7ROCqWeVKcEMJAeoTNuS9bxiITd8QA=;
-        b=NGLikinjC2Ru21sFkWbWpAXh91MY5LBogholgkzzArgA7YZBQM/1xAV1Jwq+NssUEr
-         X2FJaL8lfa88sxlKjiyzIqwlcMBEnXHo620WJJ9RVQKKnrdXfqzSTA7qF3GxGZStlSpo
-         oIXPjgRMV+lIGuteP5g2LW90Nyy+Hzz9C3vXB0GEUKZovjCJQ/Dh2NJIJOF7oGzPn+/B
-         8KmYEHrqLK/yDlj3noe3r9w5iINCjxgcpnsVblc/p/Otvc9MulKWD9yT8tQ9+7sKKlfA
-         gJ+hHDqASRpAGBuTkH+Rmf4d7piIqBv4/DBteqfPkJjgHaySwE6JczJ9/HpMiTOp3Otw
-         D6xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777539282; x=1778144082;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=baylibre-com.20251104.gappssmtp.com; s=20251104; t=1777539323; x=1778144123; darn=vger.kernel.org;
+        h=in-reply-to:references:content-transfer-encoding:to:from:subject:cc
+         :message-id:date:mime-version:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=GQwFPqdunk7GL7ROCqWeVKcEMJAeoTNuS9bxiITd8QA=;
-        b=e6BZWFqw7BJ/pF8nnMwq0Na7mLpvWXmdvRN/aPHTPJ7y62UjBKknp5oAOFk1cee1W+
-         do1KSEDD1cjVtNVUzdNWJmbAM4YCHPIw7veapR7v706mLBb9FtFauulUeh7/QudV/twK
-         pRfZEfXCjCUMpWdcXEfXM5OQNMLtpuqM8MtxAxyp4ECMJ/52hp233f+M4MuTCjmIxksw
-         yuneMhOxkKKWsDYpAn0eE07pnnB/mTmbaQWDmdR9gp/M63jWZqvipUp6Ii9YtjJiteeY
-         IH8gUHLEqYE5RC5tOl3R4GeE6UZhSh4vVRaI5iSuQtB25jpfqgJO1W+2RFjGgpb/Mk+6
-         MWUw==
-X-Forwarded-Encrypted: i=1; AFNElJ8eIsUquDUenL/MCAniSqR8XJ/1OGbm9JqRT/x7YSqlFGesc+/TKr+ke/uOpABN7PlqVttNCf8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxvczv2oUjLyMNpd8F7UYcdk472rucWnAf2LhJCSt/xGqAiZFbZ
-	/eQX4SNwzsZAgXsf0l2dLE6vd11BDkW6EDjRJRRJVUpe4IPOPKRDv1ro/S9deWTmnPGu/HtSpbz
-	s3fEwaKHv7Fkgfv2TckHtPzkt7POODH/ooSL/itAb+n/kXLBwFTJ7CPbLQg==
-X-Gm-Gg: AeBDies79MNFJVle+A10xGryfnRrZYfL/FSztn8Sji38aM+2uFGeMK7WuV+pVckICJS
-	p3lAQp+hPOyqSCN0KONey3dML7esrTAtAqUZOzQH0s3xZ6XUyEd8sOhKhFiawPgh550wZftfTWp
-	sOsYOueuIV0OK+8bUoJEPHPcs/QCBOQn04J1wOhMx8OhlCzCtLSeg6Yq9ECIFyJ00OV5w0Xkag6
-	XOujWqWyVZT1SnckvyyUmITfIa1Z0mIOEqjCgrGZgImiV4Bb0n+7d37grQcqa5REjkL2IlmHLm9
-	gGm4on1+wZuoQ1vLe4s5Ehfa7kcX0x+7q9VWC3SGktqKq43UDjkyV+eyHYR5YSCl+yFrBiiQPts
-	uo1jUma9rgDJKpn/y/+lntUhxuxV/OgrxJpNhw3HQ70vA+uH08htmnH6ZdcaMSetgOw==
-X-Received: by 2002:a05:600c:a00e:b0:489:1b0c:8b43 with SMTP id 5b1f17b1804b1-48a83f6c8ddmr34258935e9.1.1777539282165;
-        Thu, 30 Apr 2026 01:54:42 -0700 (PDT)
-X-Received: by 2002:a05:600c:a00e:b0:489:1b0c:8b43 with SMTP id 5b1f17b1804b1-48a83f6c8ddmr34258295e9.1.1777539281465;
-        Thu, 30 Apr 2026 01:54:41 -0700 (PDT)
-Received: from [192.168.88.32] ([150.228.93.27])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a81ed6bafsm83284215e9.2.2026.04.30.01.54.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Apr 2026 01:54:41 -0700 (PDT)
-Message-ID: <410c814a-399a-4eb9-a39a-d1e5fecd6b33@redhat.com>
-Date: Thu, 30 Apr 2026 10:54:39 +0200
+        bh=oTklDTNdxgMiOr8HV0Z6gDUQcK4MMB7dBQkYfU4NXYc=;
+        b=sG9T6KPC866Z2GUGB8sKaxyruk7UrFIkcWncaHwiNWzI3GPtrpX2vLWbABrn1zff0C
+         FBCLzqJU+iA18ZKv+bdPJq5sw4Dn6MoQc/5+JUngXqaw0KW4k/wR0EMQdYt1aYIVOurC
+         v+45ReIUit/MbA+ap2CMIyYNoCqEHfO3eohN4LpbRwZTr8NmHUgERO4cbvrB1He995ip
+         oiFRc9o7uAl4CPBh+toq6+zBVycPnPi1kGp+o/HKHsWIy0yMWRB1XekrXSoTl2uUuvm/
+         KRHaaZVUHY7ijfFLaceAQh+Z54wAB1fT5XCgGkLmCWKvO4dpHRS6+zYGagcFmu4JCwTw
+         R09A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777539323; x=1778144123;
+        h=in-reply-to:references:content-transfer-encoding:to:from:subject:cc
+         :message-id:date:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oTklDTNdxgMiOr8HV0Z6gDUQcK4MMB7dBQkYfU4NXYc=;
+        b=JmUlpRh4J+Dv/r2Ky23ZhvZM6wH3JJOZgmpkxcXuB3CfIc66iQ7GFECOq5Qslhcx1H
+         J0HMGQl0E+KVw35Ct3hDjVDl0HupTw3K8rQ/XbiXHubwj3K6xSPq5Q3qhPbhVeEoRjbb
+         B8ao5LuvnXUJRT4VFHhgqGatIZxEq8YJBq67VPP9hFfsNtH2qYSIkPf+1UbCPDOfnv09
+         mkwrotVOMIDIzG0k+MYIst8BkeR7uPSdFnC6fApq8nBfvgxOWOn6/+GBqO89KdccNPXx
+         XgK2lsFX23cdSfEQ0kad5ztGsWztVq1l0KtHS/2bCVxSknWAlXx1WrPd8bfWy8xSzfP3
+         Z7pQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8IUdYKzTfDOTsV5QcefJx5MU3Wn9ujt6unx+N08JELNFp8pe3ay6KtXP4JPKOtvYzqP6FNNOk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/yaQX04P+m+3F0QsuFfAKxDLI4KHvPY3KMI1KmXa8xSHgouyL
+	3N3OvIqkXtVNt4sT4GAs5OdSTeW74SPxL1SJ+U/lzYZxUt5a8x34W5hyQP2FJ02W02k=
+X-Gm-Gg: AeBDietCANYXu/tEHUAH67CCL7GILUJrAoFLSqtaGDjjL9nXv973vbTVu+uXHspCliI
+	6ACpnDgj67FdIxHpcerQflzhdmVWAWCHDgajKU5VvpkosXzdBkHyu7m8QvztBytkC+0HzRasQxv
+	2araT/qWLjer52AN5MY0xVWnaNJAFGFqinUvRxaqsEodlX4SSA3yFGivEcTynu8lWhJU8YJ777G
+	0zTH/3ubtKUzKE0S+YgdS1tSc/LG4RPGKsnGAP9YWMd84IQHiR0w6/BsF3tXpKK8PCuNG/bwaKc
+	vCt41c8RHGUUZNGMxUlMp6VQj3mMezWp3/Utjtrt/FTo5Rp6yieUdXrPKNMSqGyeD3OVF3cFWEG
+	IzJCFNLImePZ1zitCggbBtW66jHX36riAU+vQQkwOLbx1G/XVAAVm9DELR5XRnjQI5+g+HnNhO3
+	Bd1BN+FCD+LtzrxZUhlodPIMqLNHk=
+X-Received: by 2002:a05:6000:26d1:b0:43e:a703:3665 with SMTP id ffacd0b85a97d-4493f42ced4mr3244142f8f.25.1777539322750;
+        Thu, 30 Apr 2026 01:55:22 -0700 (PDT)
+Received: from localhost ([2001:4090:a246:83ca:298c:ceb1:1a:f428])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-447b7ca5fe6sm11988989f8f.32.2026.04.30.01.55.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Apr 2026 01:55:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] ppp: consolidate RX skb queueing
-To: Qingfang Deng <qingfang.deng@linux.dev>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Guillaume Nault <gnault@redhat.com>,
- Breno Leitao <leitao@debian.org>, Taegu Ha <hataegu0826@gmail.com>,
- Kees Cook <kees@kernel.org>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- linux-ppp@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260428024426.48605-1-qingfang.deng@linux.dev>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260428024426.48605-1-qingfang.deng@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 0974249F814
+Mime-Version: 1.0
+Content-Type: multipart/signed;
+ boundary=49f7733329a22fff4b83a1680bdebfd7a9830dc80234132c7fb08fa112fd;
+ micalg=pgp-sha512; protocol="application/pgp-signature"
+Date: Thu, 30 Apr 2026 10:55:14 +0200
+Message-Id: <DI6D3JVJ6JG6.8V4XUVGJA2D4@baylibre.com>
+Cc: "Markus Schneider-Pargmann" <msp@baylibre.com>, "Steffen Klassert"
+ <klassert@kernel.org>, "David Dillow" <dave@thedillows.org>, "Ion
+ Badulescu" <ionut@badula.org>, "Mark Einon" <mark.einon@gmail.com>, "Rasesh
+ Mody" <rmody@marvell.com>, <GR-Linux-NIC-Dev@marvell.com>, "Sudarsana
+ Kalluru" <skalluru@marvell.com>, "Manish Chopra" <manishc@marvell.com>,
+ "Potnuri Bharat Teja" <bharat@chelsio.com>, "Denis Kirjanov"
+ <kirjanov@gmail.com>, "Jijie Shao" <shaojijie@huawei.com>, "Jian Shen"
+ <shenjian15@huawei.com>, "Cai Huoqing" <cai.huoqing@linux.dev>, "Fan Gong"
+ <gongfan1@huawei.com>, "Tony Nguyen" <anthony.l.nguyen@intel.com>, "Przemek
+ Kitszel" <przemyslaw.kitszel@intel.com>, "Tariq Toukan"
+ <tariqt@nvidia.com>, "Saeed Mahameed" <saeedm@nvidia.com>, "Leon
+ Romanovsky" <leon@kernel.org>, "Mark Bloch" <mbloch@nvidia.com>, "Ido
+ Schimmel" <idosch@nvidia.com>, "Petr Machata" <petrm@nvidia.com>, "Yibo
+ Dong" <dong100@mucse.com>, "Simon Horman" <horms@kernel.org>, "Heiner
+ Kallweit" <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, "Jiri Pirko"
+ <jiri@resnulli.us>, "Francois Romieu" <romieu@fr.zoreil.com>, "Daniele
+ Venzano" <venza@brownhat.org>, "Samuel Chessman" <chessman@tux.org>,
+ "Jiawen Wu" <jiawenwu@trustnetic.com>, "Mengyuan Lou"
+ <mengyuanlou@net-swift.com>, "Kevin Curtis" <kevin.curtis@farsite.co.uk>,
+ "Arend van Spriel" <arend.vanspriel@broadcom.com>, "Stanislav Yakovlev"
+ <stas.yakovlev@gmail.com>, "Richard Cochran" <richardcochran@gmail.com>,
+ "Kees Cook" <kees@kernel.org>, "Thomas Gleixner" <tglx@kernel.org>, "Thomas
+ Fourier" <fourier.thomas@gmail.com>, "Ingo Molnar" <mingo@kernel.org>,
+ "Kory Maincent" <kory.maincent@bootlin.com>, "Zilin Guan"
+ <zilin@seu.edu.cn>, "Marco Crivellari" <marco.crivellari@suse.com>, "Vadim
+ Fedorenko" <vadim.fedorenko@linux.dev>, "Jacob Keller"
+ <jacob.e.keller@intel.com>, "Philipp Stanner" <phasta@kernel.org>, "Bjorn
+ Helgaas" <bhelgaas@google.com>, "Yeounsu Moon" <yyyynoom@gmail.com>, "Denis
+ Benato" <benato.denis96@gmail.com>, "Peiyang Wang"
+ <wangpeiyang1@huawei.com>, "Yonglong Liu" <liuyonglong@huawei.com>, "Andy
+ Shevchenko" <andriy.shevchenko@intel.com>, "Yicong Hui"
+ <yiconghui@gmail.com>, "Randy Dunlap" <rdunlap@infradead.org>, "MD Danish
+ Anwar" <danishanwar@ti.com>, "Nathan Chancellor" <nathan@kernel.org>, "Sai
+ Krishna" <saikrishnag@marvell.com>, "Ethan Nelson-Moore"
+ <enelsonmoore@gmail.com>, "Larysa Zaremba" <larysa.zaremba@intel.com>, "Joe
+ Damato" <joe@dama.to>, "Double Lo" <double.lo@cypress.com>, "Chi-hsien Lin"
+ <chi-hsien.lin@cypress.com>, "Colin Ian King" <colin.i.king@gmail.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-can@vger.kernel.org>, <linux-parisc@vger.kernel.org>,
+ <intel-wired-lan@lists.osuosl.org>, <linux-rdma@vger.kernel.org>,
+ <oss-drivers@corigine.com>, <linux-wireless@vger.kernel.org>,
+ <brcm80211@lists.linux.dev>, <brcm80211-dev-list.pdl@broadcom.com>
+Subject: Re: [PATCH net-next] net: Consistently define pci_device_ids using
+ named initializers
+From: "Markus Schneider-Pargmann" <msp@baylibre.com>
+To: =?utf-8?b?VXdlIEtsZWluZS1Lw7ZuaWcgKFRoZSBDYXBhYmxlIEh1Yik=?=
+ <u.kleine-koenig@baylibre.com>, "Michael Grzeschik"
+ <m.grzeschik@pengutronix.de>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Marc Kleine-Budde" <mkl@pengutronix.de>, "Vincent Mailhol"
+ <mailhol@kernel.org>, "Krzysztof Halasa" <khc@pm.waw.pl>, "Johannes Berg"
+ <johannes@sipsolutions.net>
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: aerc 0.21.0-126-g9e77103592fe
+References: <20260428171845.2288395-2-u.kleine-koenig@baylibre.com>
+In-Reply-To: <20260428171845.2288395-2-u.kleine-koenig@baylibre.com>
+X-Rspamd-Queue-Id: 8445949F893
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.76 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MV_CASE(0.50)[];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[baylibre-com.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282715-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[linux.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,debian.org,gmail.com,linutronix.de,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282716-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FREEMAIL_CC(0.00)[baylibre.com,kernel.org,thedillows.org,badula.org,gmail.com,marvell.com,chelsio.com,huawei.com,linux.dev,intel.com,nvidia.com,mucse.com,realtek.com,resnulli.us,fr.zoreil.com,brownhat.org,tux.org,trustnetic.com,net-swift.com,farsite.co.uk,broadcom.com,bootlin.com,seu.edu.cn,suse.com,google.com,infradead.org,ti.com,dama.to,cypress.com,vger.kernel.org,lists.osuosl.org,corigine.com,lists.linux.dev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[baylibre.com];
+	DKIM_TRACE(0.00)[baylibre-com.20251104.gappssmtp.com:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:email]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[msp@baylibre.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[85];
+	NEURAL_HAM(-0.00)[-0.989];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[baylibre-com.20251104.gappssmtp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,baylibre.com:mid,baylibre.com:email]
 
+--49f7733329a22fff4b83a1680bdebfd7a9830dc80234132c7fb08fa112fd
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
 
+Hi Uwe,
 
-On 4/28/26 4:44 AM, Qingfang Deng wrote:
-> In ppp_input() and ppp_receive_nonmp_frame(), received skbs are queued
-> for userspace delivery using the same open-coded pattern:
-> 
-> 	skb_queue_tail(&pf->rq, skb);
-> 	while (pf->rq.qlen > PPP_MAX_RQLEN &&
-> 	       (skb = skb_dequeue(&pf->rq)))
-> 		kfree_skb(skb);
-> 	wake_up_interruptible(&pf->rwait);
-> 
-> This has a potential race: skb_queue_tail() releases the queue lock,
-> then qlen is read locklessly before skb_dequeue() re-acquires it.
-> Another CPU enqueueing concurrently could cause the length check to see
-> stale data. This race is benign, as it only causes extra skbs to be
-> freed in the worst case.
-> 
-> Introduce ppp_file_queue_rx_skb() to perform the enqueue, length check,
-> and trim atomically under a single pf->rq.lock critical section. As both
-> callers have softirq disabled, plain spin_lock() can be used instead of
-> _bh()/_irqsave() variants. Since only one skb is enqueued at a time, the
-> queue can exceed PPP_MAX_RQLEN by at most one frame, so replace the
-> while-loop with an if-statement. While at it, use skb_queue_len()
-> instead of open-coding the qlen access.
-> 
-> Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
+On Tue Apr 28, 2026 at 7:18 PM CEST, Uwe Kleine-K=C3=B6nig (The Capable Hub=
+) wrote:
+> ... and PCI device helpers.
+>
+> The various struct pci_device_id arrays were initialized mostly by one
+> the PCI_DEVICE macros and then list expressions. The latter isn't easily
+> readable if you're not into PCI. Using named initializers is more
+> explicit and thus easier to parse.
+>
+> Also use PCI_DEVICE* helper macros to assign .vendor, .device,
+> .subvendor and .subdevice where appropriate and skip explicit
+> assignments of 0 (which the compiler takes care of).
+>
+> The secret plan is to make struct pci_device_id::driver_data an
+> anonymous union (similar to
+> https://lore.kernel.org/all/cover.1776579304.git.u.kleine-koenig@baylibre=
+.com/)
+> and that requires named initializers. But it's also a nice cleanup on
+> its own.
+>
+> This change doesn't introduce changes to the compiled pci_device_id
+> arrays. Tested on x86 and arm64.
+>
+> Signed-off-by: Uwe Kleine-K=C3=B6nig (The Capable Hub) <u.kleine-koenig@b=
+aylibre.com>
 > ---
->  drivers/net/ppp/ppp_generic.c | 37 ++++++++++++++++++++++-------------
->  1 file changed, 23 insertions(+), 14 deletions(-)
-> 
-> diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
-> index 57c68efa5ff8..6ab5011540a0 100644
-> --- a/drivers/net/ppp/ppp_generic.c
-> +++ b/drivers/net/ppp/ppp_generic.c
-> @@ -2307,6 +2307,27 @@ static bool ppp_channel_bridge_input(struct channel *pch, struct sk_buff *skb)
->  	return !!pchb;
->  }
->  
-> +/* Queue up and deliver a received skb to userspace.
-> + * Must be called in softirq.
-> + */
-> +static void ppp_file_queue_rx_skb(struct ppp_file *pf, struct sk_buff *skb)
-> +{
-> +	spin_lock(&pf->rq.lock);
-> +	__skb_queue_tail(&pf->rq, skb);
-> +	/* limit queue length by dropping old frames */
-> +	if (unlikely(skb_queue_len(&pf->rq) > PPP_MAX_RQLEN)) {
-> +		struct sk_buff *old = __skb_peek(&pf->rq);
-> +
-> +		__skb_unlink(old, &pf->rq);
-> +		spin_unlock(&pf->rq.lock);
-> +		kfree_skb(old);
-> +	} else {
-> +		spin_unlock(&pf->rq.lock);
+> Hello,
+>
+> the mentioned follow-up quest allows to do
+>
+> 			PCI_DEVICE(0x1571, 0xa203),
+> 	+		.driver_data =3D (kernel_ulong_t)&card_info_10mbit,
+> 	-		.driver_data_ptr =3D &card_info_10mbit,
+>
+> which gets rid of a bunch of casts and so brings a little bit more type
+> safety. This patch is a preparation for that.
+>
+> I handled all of drivers/net/ in a single patch, please tell me if I
+> should split by subsystem.
+>
+> Best regards
+> Uwe
+> ---
 
-Note that after __skb_queue_tail(), skb_queue_len(&pf->rq) could be ==
-PPP_MAX_RQLEN + 2, due to the slightly different check in
-ppp_prepare_tx_skb().
+[...]
 
-I think the above it could/should be simplified to:
-	while (unlikely(skb_queue_len(&pf->rq) > PPP_MAX_RQLEN))
-		kfree_skb(__skb_dequeue(&pf->rq));
-	spin_unlock(&pf->rq.lock);
+> diff --git a/drivers/net/can/m_can/m_can_pci.c b/drivers/net/can/m_can/m_=
+can_pci.c
+> index eb31ed1f9644..cb9335c1d3ea 100644
+> --- a/drivers/net/can/m_can/m_can_pci.c
+> +++ b/drivers/net/can/m_can/m_can_pci.c
+> @@ -183,9 +183,9 @@ static SIMPLE_DEV_PM_OPS(m_can_pci_pm_ops,
+>  			 m_can_pci_suspend, m_can_pci_resume);
+> =20
+>  static const struct pci_device_id m_can_pci_id_table[] =3D {
+> -	{ PCI_VDEVICE(INTEL, 0x4bc1), M_CAN_CLOCK_FREQ_EHL, },
+> -	{ PCI_VDEVICE(INTEL, 0x4bc2), M_CAN_CLOCK_FREQ_EHL, },
+> -	{  }	/* Terminating Entry */
+> +	{ PCI_VDEVICE(INTEL, 0x4bc1), .driver_data =3D M_CAN_CLOCK_FREQ_EHL, },
+> +	{ PCI_VDEVICE(INTEL, 0x4bc2), .driver_data =3D M_CAN_CLOCK_FREQ_EHL, },
+> +	{ }	/* terminating entry */
 
-And possibly it would make sense to consolidate the test in
-ppp_prepare_tx_skb(), too for consistency - in that case an `if`
-statement should become enough.
+M_CAN_CLOCK_FREQ_EHL is basically hardcoded for all PCI devices since
+2020. I don't think we need this driver data at all and can just drop it
+and use M_CAN_CLOCK_FREQ_EHL directly in the code for the frequency.
+Once a real new PCI device gets added we can see if and what driver_data
+is needed.
 
-/P
+Best
+Markus
 
+--49f7733329a22fff4b83a1680bdebfd7a9830dc80234132c7fb08fa112fd
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iKMEABYKAEsWIQSJYVVm/x+5xmOiprOFwVZpkBVKUwUCafMY8hsUgAAAAAAEAA5t
+YW51MiwyLjUrMS4xMiwyLDIRHG1zcEBiYXlsaWJyZS5jb20ACgkQhcFWaZAVSlPG
+LAD/fzJVNBHtKblmZr7CitXNgE0iUthbQCQShJJb37V4mMgA/2HCptgFXjEqdTdF
+h7pcmno1RbnSKnZ/TDh+JQ7CnAwN
+=RRmw
+-----END PGP SIGNATURE-----
+
+--49f7733329a22fff4b83a1680bdebfd7a9830dc80234132c7fb08fa112fd--
 
