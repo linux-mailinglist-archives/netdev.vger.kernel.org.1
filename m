@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-282975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282976-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CO0uNumj82kQ5gEAu9opvQ
-	(envelope-from <netdev+bounces-282975-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 20:48:09 +0200
+	id aPhLJguj82ly5QEAu9opvQ
+	(envelope-from <netdev+bounces-282976-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 20:44:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 485B14A724D
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 20:48:09 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DAF54A71A6
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 20:44:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6D17030A3F2B
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:44:17 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 225C1300D769
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E688147D95D;
-	Thu, 30 Apr 2026 18:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA07247D94D;
+	Thu, 30 Apr 2026 18:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MiIvaBQr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tsicAHzB"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 374A747D93A
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 18:44:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13E4147D950
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 18:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777574654; cv=none; b=ijMkVpaMIawqueEJL9GBtoBuNkfNqAQ/Do3kS0deVkRwvgqyiIvDjqGnxmVp780ceQskZFzmGKc0362XWjIXK03HD9PYbRpp5bXP2dsmMleJfYBkn/gmnMCFYLpKKv7qAVd1c9pRCXssIFrD2LsuQUnZr2Z6DcD9M1f2hqKtOKk=
+	t=1777574655; cv=none; b=iZC1u9bGpx9QjVH4pgSHHlrE+1iIDArWEgloonCrspffSVZNvWQPp4c0pC5kIiJm0eaFtZupk5gH7GUhZT+vdwI9jQ+RU1+g6U/4DWikXzFm75fF/szL+aVjcnzVvSxhDPudIYw/bDhcKk1PCWt7dVdpZlhSdMb3JZ5p5Uc7mys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777574654; c=relaxed/simple;
-	bh=5cfjlg3GQ6sMGcsFREj82Hbpq0DXadM7BwJqf7Dy09Y=;
+	s=arc-20240116; t=1777574655; c=relaxed/simple;
+	bh=/HEsPTBP2Z/J3XuWMk0gaH/F8ujsApOQLRx2eiOFc3c=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Yp61s6TJwzb/Tbr36Cru27j6I9iB+fTMm4cJ93DlDIWJeDc9ndEpozw3/8iaKhs+DnXq+uJEDuFTgIzzDorka9wD/nYkCrAzfaqRDjdy9ffbZstP83huDsSIABIzzpKEy25r399ihvG2EfiORROGuEHJzl7gaUrneGPdokrV2u8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MiIvaBQr; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=uPbd7jXlceTzoRQd9/8HJ2Hwd4p7HjuuJQTGa9N1jv8gHmA3+Psi0or8uOQVqICmFpXNIcu2g/0ZGTacHH0Opr/TBfdSWMAsNh5njhdf4qUcapTpVLafRIQMACB7ECbHlJAWlggzeQYQfA2o2TuPTEh2eignn4ziqo3H+gSeKIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tsicAHzB; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-82f70ae35c0so735565b3a.2
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 11:44:11 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-82f504f6b75so723332b3a.1
+        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 11:44:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777574650; x=1778179450; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1777574652; x=1778179452; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=x8OenfZCy+qWu1Qhs0vDlZYR6b4P/Y7vHqJjLORFF7s=;
-        b=MiIvaBQrLzQjIpuU0GRioKi1QceZY2ut0QurdSc8V8FrF2E7ZNVdcXGo1qiL58XT57
-         RuJWyVsvTovbbT5OAmUdLa1Aj+RhLFmol6fVue/qLiTV7x7WZmpEn21FGHRDeEx1V/QU
-         snad2RBESDl9ggAZdwCGCtH/8jiOickhfKXiPu8sJnXssIQhiQDOeaYOId0Y8fRYZqTn
-         qm4VfyhMrZ0dWpC51TzyK+i9sU++1KDsgCzouoLbfRuniqF3uJfnZWR4Es9hBl4OcW3u
-         vvKvK7UA1+dpwMn8ECcPEwpKy+X4kqvwHuLAMOiDJvuJd8JaT261EsmgUo58HIeDAMcW
-         iiww==
+        bh=8B+EV+dAZPjMHacRoI0PFkSCDi+v0zDQ1718UXTo0aI=;
+        b=tsicAHzBnDU/zQai9tEdrPbtBfZxHKL9iACY6xY4FCLp6R1G8+XWdcHvtpAjcFx6IG
+         S6GUHaMkQJ6eswhc5JEXCzOSXzUgiQRBA3ZFeigB3qHNned7Eg3KI9u/fLoUkRZeJMTa
+         8wNdkg5y6LFLsAglWjS+8YuK+X5QuG2FunEGo15keOB7Eo2qStrJiEAD5vGrMgNMjjJa
+         ZypxWBf+ks7EzOvNwLkbL4jNkFoXHyv9fpNSdVNdFWpeZkDReLjlpJ9aCTn+5vsVEPae
+         ddum1atanFQI5+RqeeaEqjhuuXsdMKdWXM1Una0FY07nA6m+Q1/Sj+FXJLnhT6NGwEX0
+         TRCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777574650; x=1778179450;
+        d=1e100.net; s=20251104; t=1777574652; x=1778179452;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=x8OenfZCy+qWu1Qhs0vDlZYR6b4P/Y7vHqJjLORFF7s=;
-        b=eC8bZK9x8Co4XSHM4sFnIGLxDgJWSzkaN/f3soi9q6HIqixCAMSwJwuTtiwCgo/Jzk
-         6TCRlSwgS0/LKNmgAHAO8LnDufp4LvyFXzD99eizY6O4RcQro1hStIp/OqhtDHON97FV
-         hIc0n5cRvN1sS0Y9XxL+me+ddIrtSnwlahiLT3/AjDhQiflkvBsZVFLEebyMWnCbTT65
-         rpVLQLPQd02c9cuaZmGbOZSDbhntEORm4PL4eCyFp+7m8Q9k8s88rRrUSiObiXqv6v6d
-         Arfb2BpWJ8mkIr9VQm5acwNt5xIAgLhdZuVjuE4N7uipnS66ItXZTSmEAswb9EaHveuf
-         +fOQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9tAog5LHgCZQx/T9u1+mIYBJsLDa/ZU3AhltIOVmq1idmla85ivoYSp8wKuPV8qo0fRMH9dJc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHYsAL8imbp5mUMAzcRrLG5nu7CTGzaSoIW3LLRTpRZ0eHPgQ7
-	lxc4cyW1LWr9CgxuiEL+O4iybaNr6sXiqwPdkXLnyTREpsPQ7xIjETXTQw5Q2nh1eROOyskeMj3
-	Nu2bEag==
-X-Received: from pfr21.prod.google.com ([2002:a05:6a00:94d5:b0:82f:b8b3:900f])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:4005:b0:82a:ea3:c172
- with SMTP id d2e1a72fcca58-834fdc92504mr4452770b3a.46.1777574650172; Thu, 30
- Apr 2026 11:44:10 -0700 (PDT)
-Date: Thu, 30 Apr 2026 18:43:51 +0000
+        bh=8B+EV+dAZPjMHacRoI0PFkSCDi+v0zDQ1718UXTo0aI=;
+        b=fycNIk95BxZ2JGaCuODKHpe+so6Cw5T4Nh5mL/IuwrvbeaS77+RaMY9Ywnc97Zn8yw
+         n124DljdS6XEwbXIc4AVqgoYfGQ6Mv5O4rO5nU9vTM1JT6CPc5zHye+66GCcE++ncqnT
+         aG7g9zAkcTRPRkAg2IipDAYREJY0TWVtirdUor27FmfuECz4tf3nzksdwTs4s9WeoofE
+         uAMqIxzHUgKvKzz0xukjbBEsXKMI83bw0lvLgAPRr6XdG0WvYhHSq98z2QE6TANy8EHP
+         k32uz7aJ/YQ0Y/SwFsZpNNdrbxmbhPTKWSTtM8dpWAiUfmakqouZhVt6BMpwsPgHT7m2
+         9/rw==
+X-Forwarded-Encrypted: i=1; AFNElJ+LaimtiX7aLnnCRDrN4/TP2OBV+07plNgv0bA2QpS4XgFlPSFDMbUUIYOF8Q234Q1sNzyrieo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxilLnBICIwRAM6DAFSkxkcoYvAlU3dD47QfjoHsidMrDCa0R7c
+	JN8FmovpkfxQu6BJVhU92x3cfjQuv5xZIhQ3MfKCYH82FlGH5wQIXbRB9bxfQcmhz9J/XdOg43g
+	ls1xIeA==
+X-Received: from pfva20.prod.google.com ([2002:a05:6a00:c94:b0:82f:8afc:f74a])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:b46:b0:82f:390a:69df
+ with SMTP id d2e1a72fcca58-834fdcb6501mr4991165b3a.35.1777574652100; Thu, 30
+ Apr 2026 11:44:12 -0700 (PDT)
+Date: Thu, 30 Apr 2026 18:43:52 +0000
 In-Reply-To: <20260430184405.1227386-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260430184405.1227386-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260430184405.1227386-2-kuniyu@google.com>
-Subject: [PATCH v1 bpf 1/2] bpf: tcp: Fix type confusion in bpf_tcp_sock().
+Message-ID: <20260430184405.1227386-3-kuniyu@google.com>
+Subject: [PATCH v1 bpf 2/2] selftest: bpf: Add test for bpf_tcp_sock() and RAW socket.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: Martin KaFai Lau <martin.lau@linux.dev>, Daniel Borkmann <daniel@iogearbox.net>, 
 	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
@@ -85,10 +85,9 @@ To: Martin KaFai Lau <martin.lau@linux.dev>, Daniel Borkmann <daniel@iogearbox.n
 Cc: John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
 	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
 	Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Damiano Melotti <melotti@google.com>
+	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 485B14A724D
+X-Rspamd-Queue-Id: 5DAF54A71A6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
@@ -98,7 +97,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -106,8 +105,8 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[linux.dev,iogearbox.net,kernel.org,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282975-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-282976-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[google.com:+];
@@ -116,77 +115,103 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[gmail.com,fomichev.me,kernel.org,linux.dev,google.com,vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-bpf_tcp_sock() only check if sk->sk_protocol is IPPROTO_TCP,
-but RAW socket can bypass it:
+Let's extend sockopt_sk.c to cover bpf_tcp_sock() for the
+wrong socket type.
 
-  socket(AF_INET, SOCK_RAW, IPPROTO_TCP)
+Before:
+  # ./test_progs -t sockopt_sk
+  [  151.948613] ==================================================================
+  [  151.951376] BUG: KASAN: slab-out-of-bounds in sol_tcp_sockopt+0xc7/0x8e0
+  [  151.954159] Read of size 8 at addr ffff88801083d760 by task test_progs/1259
+  ...
+  run_test:FAIL:getsetsockopt unexpected error: -1 (errno 22)
+  #427     sockopt_sk:FAIL
 
-Calling bpf_setsockopt() in SOCKOPT prog triggers out-of-bounds
-access to another slab object. [0]
+After:
+  #427     sockopt_sk:OK
 
-Let's use sk_is_tcp().
+While at it, missing free() is fixed up.
 
-[0]:
-BUG: KASAN: slab-out-of-bounds in sol_tcp_sockopt (net/core/filter.c:5519)
-Read of size 8 at addr ffff88801083d760 by task test_progs/1259
-
-CPU: 1 UID: 0 PID: 1259 Comm: test_progs Tainted: G           OE       7.0.0-11175-gb5c111f4967b #1 PREEMPT(full)
-Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-debian-1.17.0-1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl (lib/dump_stack.c:94 lib/dump_stack.c:120)
- print_report (mm/kasan/report.c:378 mm/kasan/report.c:482)
- kasan_report (mm/kasan/report.c:595)
- sol_tcp_sockopt (net/core/filter.c:5519)
- __bpf_getsockopt (net/core/filter.c:5633)
- bpf_sk_getsockopt (net/core/filter.c:5654)
- bpf_prog_629ba00a1601e9f2__setsockopt+0x86/0x22c
- __cgroup_bpf_run_filter_setsockopt (./include/linux/bpf.h:1402 ./include/linux/filter.h:722 ./include/linux/filter.h:729 kernel/bpf/cgroup.c:81 kernel/bpf/cgroup.c:2026)
- do_sock_setsockopt (net/socket.c:2363)
- __x64_sys_setsockopt (net/socket.c:2406)
- do_syscall_64 (arch/x86/entry/syscall_64.c:63)
- entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
-RIP: 0033:0x7f85f82fe7de
-Code: 55 48 63 c9 48 63 ff 45 89 c9 48 89 e5 48 83 ec 08 6a 2c e8 34 69 f7 ff c9 c3 66 90 f3 0f 1e fa 49 89 ca b8 36 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 0a c3 66 0f 1f 84 00 00 00 00 00 48 8b 15 e1
-RSP: 002b:00007ffe59dcecd8 EFLAGS: 00000202 ORIG_RAX: 0000000000000036
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f85f82fe7de
-RDX: 000000000000001c RSI: 0000000000000006 RDI: 000000000000000d
-RBP: 00007ffe59dcef20 R08: 000000000000003c R09: 0000000000000000
-R10: 00007ffe59dcef00 R11: 0000000000000202 R12: 00007ffe59dcf268
-R13: 0000000000000003 R14: 00007f85f9da5000 R15: 000055b2f3201400
- </TASK>
-
-The buggy address belongs to the object at ffff88801083d280
- which belongs to the cache RAW of size 1792
-The buggy address is located 1248 bytes inside of
- allocated 1792-byte region [ffff88801083d280, ffff88801083d980)
-
-Fixes: 655a51e536c0 ("bpf: Add struct bpf_tcp_sock and BPF_FUNC_tcp_sock")
-Reported-by: Damiano Melotti <melotti@google.com>
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- net/core/filter.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../selftests/bpf/prog_tests/sockopt_sk.c       | 17 ++++++++++++++++-
+ tools/testing/selftests/bpf/progs/sockopt_sk.c  | 16 ++++++++++++++++
+ 2 files changed, 32 insertions(+), 1 deletion(-)
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index bc96c18df4e0..cd88633f8dc1 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -7475,7 +7475,7 @@ u32 bpf_tcp_sock_convert_ctx_access(enum bpf_access_type type,
+diff --git a/tools/testing/selftests/bpf/prog_tests/sockopt_sk.c b/tools/testing/selftests/bpf/prog_tests/sockopt_sk.c
+index 53637431ec5d..87e771c8991f 100644
+--- a/tools/testing/selftests/bpf/prog_tests/sockopt_sk.c
++++ b/tools/testing/selftests/bpf/prog_tests/sockopt_sk.c
+@@ -190,7 +190,7 @@ static int getsetsockopt(void)
+ 	fd = socket(AF_NETLINK, SOCK_RAW, 0);
+ 	if (fd < 0) {
+ 		log_err("Failed to create AF_NETLINK socket");
+-		return -1;
++		goto err;
+ 	}
  
- BPF_CALL_1(bpf_tcp_sock, struct sock *, sk)
- {
--	if (sk_fullsock(sk) && sk->sk_protocol == IPPROTO_TCP)
-+	if (sk_fullsock(sk) && sk_is_tcp(sk))
- 		return (unsigned long)sk;
+ 	buf.u32 = 1;
+@@ -211,6 +211,21 @@ static int getsetsockopt(void)
+ 	}
+ 	ASSERT_EQ(optlen, 8, "Unexpected NETLINK_LIST_MEMBERSHIPS value");
  
- 	return (unsigned long)NULL;
++	/* Trick bpf_tcp_sock() with IPPROTO_TCP */
++	close(fd);
++	fd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP);
++	if (fd < 0) {
++		log_err("Failed to create RAW socket");
++		goto err;
++	}
++
++	optlen = 60;
++	err = setsockopt(fd, SOL_TCP, TCP_SAVED_SYN, &buf, optlen);
++	if (err) {
++		log_err("Unexpected setsockopt(TCP_SAVED_SYN)");
++		goto err;
++	}
++
+ 	free(big_buf);
+ 	close(fd);
+ 	return 0;
+diff --git a/tools/testing/selftests/bpf/progs/sockopt_sk.c b/tools/testing/selftests/bpf/progs/sockopt_sk.c
+index cb990a7d3d45..5e0b27e7855c 100644
+--- a/tools/testing/selftests/bpf/progs/sockopt_sk.c
++++ b/tools/testing/selftests/bpf/progs/sockopt_sk.c
+@@ -149,6 +149,20 @@ int _setsockopt(struct bpf_sockopt *ctx)
+ 	if (sk && sk->family == AF_NETLINK)
+ 		goto out;
+ 
++	if (sk && sk->family == AF_INET && sk->type == SOCK_RAW) {
++		struct bpf_tcp_sock *tp = bpf_tcp_sock(sk);
++
++		if (tp) {
++			char saved_syn[60];
++
++			bpf_getsockopt(sk, SOL_TCP, TCP_SAVED_SYN,
++				       &saved_syn, sizeof(saved_syn));
++			goto consumed;
++		}
++
++		goto out;
++	}
++
+ 	/* Make sure bpf_get_netns_cookie is callable.
+ 	 */
+ 	if (bpf_get_netns_cookie(NULL) == 0)
+@@ -224,6 +238,8 @@ int _setsockopt(struct bpf_sockopt *ctx)
+ 		return 0; /* couldn't get sk storage */
+ 
+ 	storage->val = optval[0];
++
++consumed:
+ 	ctx->optlen = -1; /* BPF has consumed this option, don't call kernel
+ 			   * setsockopt handler.
+ 			   */
 -- 
 2.54.0.545.g6539524ca2-goog
 
