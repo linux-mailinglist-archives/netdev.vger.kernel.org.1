@@ -1,170 +1,242 @@
-Return-Path: <netdev+bounces-282948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282949-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0NSkGqCI82mS4wEAu9opvQ
-	(envelope-from <netdev+bounces-282948-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:51:44 +0200
+	id KLFGIaqJ82m74wEAu9opvQ
+	(envelope-from <netdev+bounces-282949-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:56:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD1404A605A
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:51:43 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 914624A6188
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:56:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 01172300A7D3
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 16:47:54 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 688953004D90
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 16:48:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB11B33EB10;
-	Thu, 30 Apr 2026 16:47:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A0BF36405A;
+	Thu, 30 Apr 2026 16:48:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Bz7WoQgz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZRYN6usF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC69329C66
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 16:47:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777567671; cv=pass; b=VkgI/vSxP9lBGffx9PcSqGIDIcRnHp3ov/76zXenAjag6O2QZOSlwBWhzeB4/LepZlAeUycfxBY1l7LaxuWE/5GQkuWYQfjEjQlGGtsVZEM1L3ki4iWFuzguM2IvCl/h6hpU+pCcdpzkmLB/kpcw72/0DiTJ7Pmpl60lVRoh99U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777567671; c=relaxed/simple;
-	bh=s3Q1zrVX/VDLpIIL3aJ8TT2PIigww+xEiCWav7Oc06s=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=pZM+sAF7YPW+gwsKpkg7AWP7vW30x3hGkN7NXXX7BSY2zpCoNOVkD9KVUr6rZh2N2QJvxtwgAHeok/NBfcEiquskuKLZxC1WZgTIdHK8GKW9wnW5oHqwx1AoTh9w1yqDuecxb99jGT4OCsdTYYI0/1StvO4KYOWjOJfLaL+qE7M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Bz7WoQgz; arc=pass smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C727349B0A
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 16:48:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777567721; cv=none; b=s6dSoEMmjdv4JhInfr5plFpCdlnGb0cvq4MR5fRY3IPIvyVqfoHlJfomiEk4wXAdj2qX7lea+Kf27qYYTmoXS1yi5bYNYbzY6M2lJQTIppHSVC7CaXGkA1lbBxxBaV3ied1vyBjb3kDLM5cUceAbsUq68Tf7btAL6rxMyriL64I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777567721; c=relaxed/simple;
+	bh=GkpKU4XozAnfRNUYdiLmU+0WwjazJSknrwv6sd6JmSI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Iu8878knjv38+qlRAYXKZIbWs6fugoYFoWcK4TDvhmIOvDpccMX00oVWIF+p2l6Zu8ZIjFiX1bCtNlvT6TxvWF63LtfNUOazUZeMdjxw4/2JqN4/FajCDpIfwiqkoeNRTMPDx3V4P3gA5+C6Sflk0BGQICN+A7/dmOURQu9PL6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZRYN6usF; arc=none smtp.client-ip=209.85.222.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-67148a70f8aso114a12.1
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 09:47:50 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777567669; cv=none;
-        d=google.com; s=arc-20240605;
-        b=D4Y6xGGulv8990rysjOsIL8WtJ7R31cNrNpZq4YJpu0Vy2A8EmvqwEgKZIUkDVKfHy
-         rpP0zUAE6MnvBopynfXQdMl30bKpcb7NDOU0pHozV3l/7Bpl5hCZWqXNkya14nLedGE3
-         9xhx5uUe/VvN2oCaoWqGAmaFHf8SuhfjKNjOpknTOVswgrOXOOP5FK8g4e9Qk0pwx+t7
-         QQr0ru81ZuoLiLLSptjQ/F3M4rpjqVFVA/iL6c3SJFFzXX2U6ODjWpRFcP+kWm9QPkj8
-         gieRTWxBADJ0ECmxq40yH5f3aD/xWdZH1OZhyz1QM5hu7Q1czAOhPi9APjTRyFUv+49E
-         9VlQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=35BOGIcH1p4dwQ5HuRv3TZ7eqiagtXX5VFCur+zr67U=;
-        fh=lcRP/JuPI2Spal4BmJvxgAwMGUrJv8zlG+SD2pE6xAs=;
-        b=BpHdiIVvlvDTswfjcihPo/qUrvM7aSyS6so6mlqEujBTbv26BeBofjAMnehHhs1XnY
-         XfLgISUiJwg0q0RCCNRDan29JEUa3My4fIJPm5mzlsU6k+jNLz0nWXq/hrT4DGORZxES
-         VcKHqdUt7YUSi+G56pQRWvS/J9uqjr1Mk0uXe+EwflaZZv2A78TiywOaIszOp4zjvihb
-         1r9bPTqijVK5Le6ybDS1Tzsc8WXGdfMRMBPhSbEHf7+j20DJEf7696gV3GtlKYPh6BZX
-         i/S+t9V+zkvXRUrj/RKCGcR7N+Nuu19U4zQ1zO0ahWALtw85s8kLKue7WF/51BtIryXx
-         u1qQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8eabf08affaso285869785a.1
+        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 09:48:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777567669; x=1778172469; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+        d=google.com; s=20251104; t=1777567719; x=1778172519; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=35BOGIcH1p4dwQ5HuRv3TZ7eqiagtXX5VFCur+zr67U=;
-        b=Bz7WoQgzDd+nfWMklgOLBjaChHrou7f8kejh2HF1GUTZZOqQnhfro6oRPb34+QcALk
-         Hi5kMoA/74+sDdm1OpY21gUhlE32cL7wN2fW4nP4H7S/SsIQAGFR17USFgib2oqy/+UI
-         1owckaM2LHZZ5n6Qf23z7yEIX0YtiXCAmw2VYt+1tG8z+7t7gib23vJ5jkPk1DnncdWy
-         cGn471zA2h0IW15horCWO3Gutq8yaURrim3D2AedDBMMGbJmWJnRABg8OpbxtSR7O5NH
-         XW1MKl7omJSoQqnFhzDZY3pSzCX4saKqXoqmh9152CXR3BipjVgI0iA8KKSEepTUdz7w
-         kp7A==
+        bh=1FzJ5xY5z4LHiTKkrELilBbSkxF0ncX3ngziNIJZYdw=;
+        b=ZRYN6usFSKzVLBKMnqVGysxmvXlYeLrmWT+M8PikWPJiXy+xxXqrNBvKJSOjlEqS79
+         cLaeQZZF8rQIFpo2CxpaLHzxr19w/KYLIeaAuIxCX2Kl3xfZI7s/9RMnWR/nM2pxR5fO
+         w4M/WrqRsPeTrZA7VGPaDhwW8Po4baAMKBgqVLID0urRpU0O3DnPZDtYyjF5eTHlUOBw
+         ECTWwkj6aQo/YLZ1PSEIaDAuRNVY5YKINWH3OQoXzX1mEiollIqaN49ujfTETvAKvPmY
+         3O6cM+IhlaZJlWEP2f9cFx7RFsH9/TpmjlxpaNY5A56s1AcUB+lQiwnZFCUf8jQO/0j4
+         v+dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777567669; x=1778172469;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=35BOGIcH1p4dwQ5HuRv3TZ7eqiagtXX5VFCur+zr67U=;
-        b=ddoQw7mTgXq6mOh5ORdZdgYqXduFLm4O0MjSMnDY4XeoOJ0+Jwy1PLDlTNC5U+BmeJ
-         RelH/X+PP0gQta23E8tyT66ALUDVqbFdB5si+o3K8soR38g5ASIt9RTJ8L7uP8WEVoDO
-         OL8OduuRJbgk/9+6G8m65Hy6k9cZzyNblCiYaiiMaOd1FFEnkaRi0JrFXZpb0wtg4N78
-         jpoNRK2A0HTAf3rmscpOO4R/llQHTN1lQA9cH7MVxv41SUuS74KvsQSpAB/Y9YGg3E2e
-         JoXmk/o31RNekHNoOA/vJE6bSOwIUZTfDQBzCXToh6tzmjKJkyuLxlx5A5zzxvULC09P
-         97VQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+enRlwMHkO5lKl5+qTyiE3TJGyaszeT7gZHx0xKf0qTc1ms5xEbMcYfuAxDHpLgH+qJGhLwi0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8UptUH8/NrckUPX+A/I1fbsNdrGksC6RYIq6pcmBnkVx3cS5n
-	0xMiwgqKt0iu15/UXIxZ76L0d7IhwYSMBdUAJK8PRcJs2g+EEY4IRO5myEOwgqBGxBVksH82Szb
-	kIvRfmLHcf0EL2gBhCkGoEcNO8dCL86Kkarcte+gj
-X-Gm-Gg: AeBDietK/NumNWA9YA20aDqger5CQgW6TAEs+RMN1t+vS2xMmbldpdzItf7KqWI4gJc
-	f/d6hQ0iu1u6XkAfwrDmntjHMH1NfFS2NrHSS7PM8FYIKYTpNUvfCGxUxh60w7v+B9TXa6gLhbn
-	nDpliclYgm/L2QHKjzIxgLUKRdsUtoMEreJiO8avvJxc+3kfY+fgQGpwgDWuGJ1J3a3MlWXfxx5
-	EyMuz1ioTZSFnKpBbf5oaREzomn+qpwyl/8vG8QCoRAEYGy/jF0Lb5lVr2sQGolVX1ZyIunnZPk
-	gIh33dlkJ7UgII6Vfb6Svnm0l5SrstZNpwGqQFDWcsZFLVu22FRQlpE0Kw==
-X-Received: by 2002:aa7:ca4c:0:b0:670:d5f0:2595 with SMTP id
- 4fb4d7f45d1cf-67b8f250163mr2117a12.11.1777567668262; Thu, 30 Apr 2026
- 09:47:48 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1777567719; x=1778172519;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1FzJ5xY5z4LHiTKkrELilBbSkxF0ncX3ngziNIJZYdw=;
+        b=fRPdev6EtZN052Q/vntZxZYTmSss2NCUYHsjf+msLN4Ds3cLONVcR6pJqrsP794I3u
+         Ch/TYJRzDSWWh7HGxGBbA882ysLHCCkyi97P1HTuqv0sqnR3/Vm1tgyUJ98U9XauLgU1
+         0rDYmuJ+regeWr07/ltKWuGAHwuL8ph9Flzp4M2Nmk7zjMvBXy47D3BxZ/ev8elMqJhL
+         nwP0kkDVlxAEMQgjUCgFWEvHFuQ5/6MyMm31klkzgPWfm9aB6lJoc50KlZR4dajKoQAq
+         8BNfPCDC47VKfse7BhPj6H27Q0cEgN9DX5bm/YQQD3oEHO3BuOvyK4uQth4kSvR2HBAa
+         O+6w==
+X-Forwarded-Encrypted: i=1; AFNElJ8mpWE8c2vjWfhV4bP9AFVCytgl5bu3KpoRGuVu5G2CfSnm1vpAxGApkuXE7KqI1ga+DMaxt6A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJAOyWISpUvCT2C45rj9sr3P2lu5o6mo4TUNQd4SGuSc1786eF
+	pIjvIxKmeBdmgDjsDFl0RoC1+/uIbhbX4Yu2MGxIq2iwhlKv+l8J4OFYUlGFXDfJlRsK2qguHEf
+	HQfvJBpKCRVxbSw==
+X-Received: from qkpc14.prod.google.com ([2002:a05:620a:268e:b0:8de:d98c:d163])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:40c1:b0:8eb:73f6:b5a5 with SMTP id af79cd13be357-8fa89223971mr571142885a.44.1777567718592;
+ Thu, 30 Apr 2026 09:48:38 -0700 (PDT)
+Date: Thu, 30 Apr 2026 16:48:36 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: Jann Horn <jannh@google.com>
-Date: Thu, 30 Apr 2026 18:47:12 +0200
-X-Gm-Features: AVHnY4JtB2QrcIoj5b2LdRvNFl6PvvqV-cmLqetEfIthcxa1hOmyqbxeD9zj4A8
-Message-ID: <CAG48ez2=SSQfGUXTPs9jQw_2Tw0JdzRHcLDdCgC7wTGkK0GOTA@mail.gmail.com>
-Subject: [BUG?] bluetooth LE ISO sockets never get freed because of SOCK_DEAD confusion?
-To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	linux-bluetooth@vger.kernel.org
-Cc: kernel list <linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Network Development <netdev@vger.kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
+Message-ID: <20260430164836.872079-1-edumazet@google.com>
+Subject: [PATCH net] ipv4: igmp: annotate data-races in igmp_heard_query()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot+ae9a171f239b14485310@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: BD1404A605A
+X-Rspamd-Queue-Id: 914624A6188
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	SUBJECT_ENDS_QUESTION(1.00)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282948-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,vger.kernel.org,gmail.com,google.com,syzkaller.appspotmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[holtmann.org,gmail.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282949-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jannh@google.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,ae9a171f239b14485310];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,appspotmail.com:email]
 
-I can't figure out how to release a bluetooth LE ISO socket such that
-it gets freed.
+Multiple cpus can run igmp_heard_query() concurrently.
 
-ISO sockets are placed on the iso_sk_list, which holds references to
-its entries. The only place in which an ISO socket can be removed from
-this list is iso_sock_kill(), which calls bt_sock_unlink(&iso_sk_list,
-sk).
+Add missing READ_ONCE()/WRITE_ONCE() over following in_dev fields.
 
-But iso_sock_kill() bails out immediately if either sk->sk_socket is
-still set, or SOCK_DEAD is set. This means that if anything other than
-iso_sock_kill() sets SOCK_DEAD, the socket can never be freed.
+- mr_qrv
+- mr_qi
+- mr_qri
+- mr_v1_seen
+- mr_v2_seen
 
-When I call close() on an ISO socket returned by accept(), the
-behavior I observe is:
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: syzbot+ae9a171f239b14485310@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/69f38675.050a0220.3cbe47.0002.GAE@google.com
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/ipv4/igmp.c | 58 ++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 36 insertions(+), 22 deletions(-)
 
-sock_close
-  __sock_release
-    iso_sock_release
-      iso_sock_close
-        iso_sock_kill
-          [bails out because sk->sk_socket is still non-NULL]
-      sock_orphan
-        sk_set_flag(sk, SOCK_DEAD)
-        sk_set_socket(sk, NULL)
-      iso_sock_kill
-        [bails out because SOCK_DEAD is now set]
+diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+index a674fb44ec25baf963dbaf9e72ccc45980b858b6..a9ad39064f3bb7fcfaace52448473f0425b2fa07 100644
+--- a/net/ipv4/igmp.c
++++ b/net/ipv4/igmp.c
+@@ -122,16 +122,29 @@
+  * contradict to specs provided this delay is small enough.
+  */
+ 
+-#define IGMP_V1_SEEN(in_dev) \
+-	(IPV4_DEVCONF_ALL_RO(dev_net(in_dev->dev), FORCE_IGMP_VERSION) == 1 || \
+-	 IN_DEV_CONF_GET((in_dev), FORCE_IGMP_VERSION) == 1 || \
+-	 ((in_dev)->mr_v1_seen && \
+-	  time_before(jiffies, (in_dev)->mr_v1_seen)))
+-#define IGMP_V2_SEEN(in_dev) \
+-	(IPV4_DEVCONF_ALL_RO(dev_net(in_dev->dev), FORCE_IGMP_VERSION) == 2 || \
+-	 IN_DEV_CONF_GET((in_dev), FORCE_IGMP_VERSION) == 2 || \
+-	 ((in_dev)->mr_v2_seen && \
+-	  time_before(jiffies, (in_dev)->mr_v2_seen)))
++static bool IGMP_V1_SEEN(const struct in_device *in_dev)
++{
++	unsigned long seen;
++
++	if (IPV4_DEVCONF_ALL_RO(dev_net(in_dev->dev), FORCE_IGMP_VERSION) == 1)
++		return true;
++	if (IN_DEV_CONF_GET((in_dev), FORCE_IGMP_VERSION) == 1)
++		return true;
++	seen = READ_ONCE(in_dev->mr_v1_seen);
++	return seen && time_before(jiffies, seen);
++}
++
++static bool IGMP_V2_SEEN(const struct in_device *in_dev)
++{
++	unsigned long seen;
++
++	if (IPV4_DEVCONF_ALL_RO(dev_net(in_dev->dev), FORCE_IGMP_VERSION) == 2)
++		return true;
++	if (IN_DEV_CONF_GET((in_dev), FORCE_IGMP_VERSION) == 2)
++		return true;
++	seen = READ_ONCE(in_dev->mr_v2_seen);
++	return seen && time_before(jiffies, seen);
++}
+ 
+ static int unsolicited_report_interval(struct in_device *in_dev)
+ {
+@@ -954,23 +967,21 @@ static bool igmp_heard_query(struct in_device *in_dev, struct sk_buff *skb,
+ 	int			max_delay;
+ 	int			mark = 0;
+ 	struct net		*net = dev_net(in_dev->dev);
+-
++	unsigned long seen;
+ 
+ 	if (len == 8) {
++		seen = jiffies + READ_ONCE(in_dev->mr_qrv) * READ_ONCE(in_dev->mr_qi) +
++		       READ_ONCE(in_dev->mr_qri);
+ 		if (ih->code == 0) {
+ 			/* Alas, old v1 router presents here. */
+ 
+ 			max_delay = IGMP_QUERY_RESPONSE_INTERVAL;
+-			in_dev->mr_v1_seen = jiffies +
+-				(in_dev->mr_qrv * in_dev->mr_qi) +
+-				in_dev->mr_qri;
++			WRITE_ONCE(in_dev->mr_v1_seen, seen);
+ 			group = 0;
+ 		} else {
+ 			/* v2 router present */
+ 			max_delay = ih->code*(HZ/IGMP_TIMER_SCALE);
+-			in_dev->mr_v2_seen = jiffies +
+-				(in_dev->mr_qrv * in_dev->mr_qi) +
+-				in_dev->mr_qri;
++			WRITE_ONCE(in_dev->mr_v2_seen, seen);
+ 		}
+ 		/* cancel the interface change timer */
+ 		WRITE_ONCE(in_dev->mr_ifc_count, 0);
+@@ -995,6 +1006,8 @@ static bool igmp_heard_query(struct in_device *in_dev, struct sk_buff *skb,
+ 		if (!max_delay)
+ 			max_delay = 1;	/* can't mod w/ 0 */
+ 	} else { /* v3 */
++		unsigned long mr_qi;
++
+ 		if (!pskb_may_pull(skb, sizeof(struct igmpv3_query)))
+ 			return true;
+ 
+@@ -1015,15 +1028,16 @@ static bool igmp_heard_query(struct in_device *in_dev, struct sk_buff *skb,
+ 		 * received value was zero, use the default or statically
+ 		 * configured value.
+ 		 */
+-		in_dev->mr_qrv = ih3->qrv ?: READ_ONCE(net->ipv4.sysctl_igmp_qrv);
+-		in_dev->mr_qi = IGMPV3_QQIC(ih3->qqic)*HZ ?: IGMP_QUERY_INTERVAL;
+-
++		WRITE_ONCE(in_dev->mr_qrv,
++			   ih3->qrv ?: READ_ONCE(net->ipv4.sysctl_igmp_qrv));
++		mr_qi = IGMPV3_QQIC(ih3->qqic)*HZ ?: IGMP_QUERY_INTERVAL;
++		WRITE_ONCE(in_dev->mr_qi, mr_qi);
+ 		/* RFC3376, 8.3. Query Response Interval:
+ 		 * The number of seconds represented by the [Query Response
+ 		 * Interval] must be less than the [Query Interval].
+ 		 */
+-		if (in_dev->mr_qri >= in_dev->mr_qi)
+-			in_dev->mr_qri = (in_dev->mr_qi/HZ - 1)*HZ;
++		if (READ_ONCE(in_dev->mr_qri) >= mr_qi)
++			WRITE_ONCE(in_dev->mr_qri, (mr_qi/HZ - 1) * HZ);
+ 
+ 		if (!group) { /* general query */
+ 			if (ih3->nsrcs)
+-- 
+2.54.0.545.g6539524ca2-goog
 
-Am I missing something, or can ISO sockets (once they have been
-accepted) never be freed?
 
