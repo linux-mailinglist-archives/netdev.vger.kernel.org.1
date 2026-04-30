@@ -1,245 +1,303 @@
-Return-Path: <netdev+bounces-282696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282697-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mI4VD9wP82kDxAEAu9opvQ
-	(envelope-from <netdev+bounces-282696-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 10:16:28 +0200
+	id GGBUC8ER82k7xAEAu9opvQ
+	(envelope-from <netdev+bounces-282697-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 10:24:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE1C949F262
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 10:16:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 852CF49F352
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 10:24:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 86D4A3012CCE
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 08:16:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B64F430125E6
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 08:24:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302CF3FBEB0;
-	Thu, 30 Apr 2026 08:16:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50EF12C2349;
+	Thu, 30 Apr 2026 08:24:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JWjeV+Hc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KXn3uHf9";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="b9KqPhnX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FA13FBEB1
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 08:16:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC23925A2A4
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 08:24:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777536976; cv=none; b=mU77TlE5t3WAvvqHsxLNxThbbpmQ0bEzadQJBJv80fv+3+S900ezUlNpoSQ8UPZhZyZMWl14TX/fbF8vPS+kFzvlZdv+Vu4mNAC/OYRjgQl7gbt+klHPwd88jYVcsa4zsSVf56kK6iW2wjbC/zFS749vTCkeMiBf6CCqWsUAcTI=
+	t=1777537470; cv=none; b=FKdUqDpuAKeQPQ3lTnvIDtlbjARzhGLG6yjAixtWzRAQUkSdQtPeIZvXFHj/mS8xQWA1OudqGkD8SLFSIE2vDdKMpvYhXVfn38Vi/5GUFC1tGisDrOM/YZ8lk3EasgdHK9KwU9ZWxC2yLtZe5b/wUf9J9+Gxd/rnsMEzHXgESqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777536976; c=relaxed/simple;
-	bh=kXDNzh3W0EHULfn4PPnSPjEYkLJFsmJz53EYF9EyLIE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FuYncaBwJuGk9DzW54qh4BPiwaKHkPpteGfA4WLvK+pE429wy4Jcb8vWh53zTDByXEaESX/TUKZmJ6nApue3LfIYdgrHXnCx1Dpd+v/2vXptKcU9T0OaIGy7N7JchXueZ84TQz0wkvQe9GSnPlaV7njR/dnGLqFuFf3dLhcsOeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JWjeV+Hc; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-35d95017a68so423637a91.3
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 01:16:14 -0700 (PDT)
+	s=arc-20240116; t=1777537470; c=relaxed/simple;
+	bh=jjidWdW0YWSV+wkMhkXcGYqkGoHqXZyXLu+qBjBHHD4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZkUXoYnw+4jMEjV1qg4O006dueFyt7EDfbCTQUkavZvcuR0IUL/T6MJ2onhlqHGWb745Zt3WMNJlWBzaf3wU8JYynN82Dz6lKkoRimHIL+UJ0sjp6nLJb7ezSb7JoLFQkEQiKlcVVot6RALKsGwG7OjvHxp4/b6Ty3+SdqCma1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KXn3uHf9; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=b9KqPhnX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777537467;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UVCaEm6muV7wKha/pOtJeifcwpGgdooKYnz79e+lKwk=;
+	b=KXn3uHf9qKXPB3FsqmAjeEzy4KoIXxhjzJ52GMI9pI26RRLuqYdMX9PKOfk7VrF1P5y3nk
+	jPXtPkQevJVkaOVz+AW1dn9KktAEIESUMM77LOhtqO13E1qTB7PEqv5LLADX+wA65qxUB+
+	Pz2bXDNuTjx2DXve7UOElto8O2grs1Q=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-112-sjpqXU67Nqit46IPhV65HQ-1; Thu, 30 Apr 2026 04:24:26 -0400
+X-MC-Unique: sjpqXU67Nqit46IPhV65HQ-1
+X-Mimecast-MFC-AGG-ID: sjpqXU67Nqit46IPhV65HQ_1777537465
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-48a5adc12ffso3918685e9.0
+        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 01:24:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777536974; x=1778141774; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pzPzUpwdLlRLvZLzGbauoBQzCR22bCmWR4lR+Wns/aM=;
-        b=JWjeV+HcG3bXmpE2aT5bpH2mPJKn9S0+7Me8zUthfUcA7yoiLO1Li8tc0KDcr+lmtG
-         NC5qknuo2HZKjaVOhoQM8S3mHkYP4FfA9wIDrWSzFKqyJfI9f9MRrcwkX/uBvCW2/plA
-         vW0hJnDaRN/rJat2wMji0M6UkHvz8T4x6zbSLSKqjorLbR8YVvR+n5+3Tfy6nQzO4ETV
-         R28F3Mw1h7YJDLBW8HBvE+LTgmnoKpj4trcVw8qR9W1sgipGX4axvlWD3YYlsZnpc0zj
-         mZHiwPWmslm0XVVVD6Zb1Y/xdHH9sUctULoRSBu1eRmFCZZLPlTdJyCplMTF3JBhWcvN
-         rxEA==
+        d=redhat.com; s=google; t=1777537465; x=1778142265; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UVCaEm6muV7wKha/pOtJeifcwpGgdooKYnz79e+lKwk=;
+        b=b9KqPhnXVs2mQqicBgUilVfhNDDD5YFF1t3PRx10h0ScAGCRTRSwcE9+jh1r2gqRTw
+         P/9bDz4P9Kxgc2F9fp7A6ZvTbbzUKQ03p/UU1c5eFi/ebwkJhiWuzT+JdX747sQzkoHe
+         NkEyApNFg1yuAqdvo7PFVCTnWu/FBYh2LQPKP44uryerJU+iWoBwr/lJcvF11cQoXS44
+         g08Sy/lLV+dIQwQqSUjUmKJ1Oa8OYzChrbI75/Zq5EAXtGtiNe4hg4Yp8JyOvFj7lP0c
+         3YFXIyzG9MgovknLY1WZYm/m3GIeJsiIzGtxraObMVA5OxvTIHgkyBqF6uyPr9tjCboP
+         InDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777536974; x=1778141774;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pzPzUpwdLlRLvZLzGbauoBQzCR22bCmWR4lR+Wns/aM=;
-        b=o0cqJTAwlpQachwl1+jMA2iMIIersV93kFEvyYrZmiLSe7XFut+gzIH63xyiiXMt8F
-         DFnE0sLOa51Fxpymurnnagm6SudbCTKLbahrPCJohJCIEWW5+AFzpXiEyrPCqyXH2ocV
-         mp7KxqT+LJ9c2OEcOEYn4Tz7p3bvm9NTsmhscSSrXRHnjJd7hGGan2H+6v8oc+IIhYqL
-         Zg3jNcG3ijuF3NwT/43XXITnybxGHYeVgPOMmq0/lVQaUICo99GRm5G/8ecs3h7RHv6u
-         Wqka4ZLS3CoP4mQ5U5uWAZH9fRtUdZw91S+mNGLwrQuBrYEKvCmHfREW3hkbHyO5ebIr
-         vk0A==
-X-Gm-Message-State: AOJu0YzVNMYilEptZWnv15mXKrdu/JGYFgzOHmLgKEhli6REUEIauO/E
-	T/X0RxSy34P1C0k31KSAGmoIvIQMF+8wFDYAtF4TnPIscL94pd7ZX9Vo0QOXfw==
-X-Gm-Gg: AeBDiess4Ey7pnZCxLV7NwFvnw9XyeB1V+3EUCTx8B5NkGGmKmf930Z0ZqWs1+tqjVE
-	Y75Pc4sO+c1h0V9QkRcQ+Ohl0FJwKsFihUL7TZyOJYiAGNNzLMa5pOMFD2c0s5WlWAMEif3zmcg
-	yODHeUJz9p0V+wfyg7QiYdRaoLgw5m+viZ7jxjYL6UjS3SC2aE+vv/eV3csawsEH+742C4Nx/gS
-	VsmF6brz3p2CY5fMJVHRVinoexTMuiWAHWOusZWaRKWo3i21mCN3HMakAA/Enqp8kLgffHunJkb
-	rTgpkSyDJXAoRbU/TkC/WJAyWm4kfdGsyyU9F7b0njCT1gR0MMhIkQ5hgkeVcHXLwj+hheBrLPY
-	ffafikSjtq92cxJSwAwzyH9igCPu0GBTVKrEoIK8iMkJxWuUw6WeJWk6/rmbVVUO+mXVF2An54P
-	PhVY+zfrBKSpFiBjf/6xH+9iNv4bOmROfi0TRUlsMWWaWzanVoG+DEd8rJFFI=
-X-Received: by 2002:a17:90b:38c4:b0:33b:b078:d6d3 with SMTP id 98e67ed59e1d1-364c30feb2dmr2009777a91.23.1777536973687;
-        Thu, 30 Apr 2026 01:16:13 -0700 (PDT)
-Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b98879f22esm44208345ad.31.2026.04.30.01.16.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Apr 2026 01:16:13 -0700 (PDT)
-From: Maoyi Xie <maoyixie.tju@gmail.com>
-To: netdev@vger.kernel.org
-Cc: willemb@google.com,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuznet@ms2.inr.ac.ru,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	security@kernel.org
-Subject: [PATCH net v3] ipv6: flowlabel: enforce per-netns limit for unprivileged callers
-Date: Thu, 30 Apr 2026 16:16:08 +0800
-Message-Id: <20260430081608.3137365-1-maoyixie.tju@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20251104; t=1777537465; x=1778142265;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UVCaEm6muV7wKha/pOtJeifcwpGgdooKYnz79e+lKwk=;
+        b=nT1Zsho6Ni4Ppt21dKFOz41zFAmFLbahMtExfGpev8y9AMCcfRHiTP76SO7mSacHee
+         owCYbxUEuw8gOz4A10T722SYUGmI5xdkNzJwCe7P9bASrzKIeftwvizaMlGo4gBYR9XO
+         OSWO7Kyi404tEG8skam25QYIEYwErhqOtl311jGDNxgvR6lbLZ0QQZt3zoZhSSG8I9W9
+         NcYAgqHwX4Xca4qEZKGsDvCwcun89ixAR1azwA1RBTTw4tFxeWMEtHxxsRgN1KHVO9fI
+         zuzo+GhuKyyzUNYl2roXdpXk3/7JxZNUEkcmq3vze8qTCK6Se+Eyp3QfyqOL8aljd2vv
+         8+UQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/C1jRB0AE9T+6R483GsrQiedX5j2myrq3S43Dkn9NLn49JjKT3xrb4rKktLwZH/Cj25GDwpNI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yztf58cfJ+bs7VTKnXXwmnQ1qvOfpbhd4l9ne6grNKggaze7hvP
+	VaBtCp9SEAryEj0yQuqw7CmLuXX0Q9w9BdwFnnd7tGBGV+I/fkEGb50j2bycIb5u3zRYMTyeW7b
+	/x3R6a4C+x/HDLd5QAcDL2cDLdgmefEArnOgHbk/uUa2LuVtAR9RRYK4dxA==
+X-Gm-Gg: AeBDiev+EiP+M12Yr0yh6eyKDBR4SJMGl0edhIcFtW1m5O+o1q5PYfv+/yVkRAZ5uJp
+	XaprPFOcT3e7vAjqjW+2K77mND95ejeZ3voaQtIDAVwP83yTV5QJxGc6JyZjCMAiMSj07vECSV6
+	hywy8d0yORXnzWbA1U9usxDaXzQ33ZMqaTdznKmmDevihNzH4L6D3B0WNnKGKyaHsboPgFGNthc
+	moj8GFvlGopUOp6uwgZ4f2nfERCcGuA5y6gKLNb6dhDyIZzNvJPUw0Ungs+Afte6ZYD2oWVpS4V
+	gTc/VYUCWv9C0W1GLYTjD71wClXIjTFvRCpFJ0kXp1SnPewE7Djx9f7BQzwNWcoBdvYzthenTrD
+	+Azf+JH18CJgEJr+3iFpEol/A9tCibi2VkVUJhGunfKnhuy1SPFoRxwH7hgMUMksCcA==
+X-Received: by 2002:a05:600c:8b0d:b0:489:e696:8362 with SMTP id 5b1f17b1804b1-48a8451d095mr30957275e9.13.1777537464856;
+        Thu, 30 Apr 2026 01:24:24 -0700 (PDT)
+X-Received: by 2002:a05:600c:8b0d:b0:489:e696:8362 with SMTP id 5b1f17b1804b1-48a8451d095mr30956725e9.13.1777537464289;
+        Thu, 30 Apr 2026 01:24:24 -0700 (PDT)
+Received: from [192.168.88.32] ([150.228.93.27])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a820c71f2sm72738455e9.5.2026.04.30.01.24.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Apr 2026 01:24:23 -0700 (PDT)
+Message-ID: <fb036ffe-b2da-4e9a-a3f4-0f0e467b9e25@redhat.com>
+Date: Thu, 30 Apr 2026 10:24:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: DE1C949F262
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1 2/5] net: wangxun: add Tx timeout process
+To: Jiawen Wu <jiawenwu@trustnetic.com>, netdev@vger.kernel.org
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Richard Cochran
+ <richardcochran@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ Simon Horman <horms@kernel.org>, Kees Cook <kees@kernel.org>,
+ Larysa Zaremba <larysa.zaremba@intel.com>, Breno Leitao <leitao@debian.org>,
+ Joe Damato <joe@dama.to>, Jacob Keller <jacob.e.keller@intel.com>,
+ Fabio Baltieri <fabio.baltieri@gmail.com>
+References: <20260428021156.13564-1-jiawenwu@trustnetic.com>
+ <20260428021156.13564-3-jiawenwu@trustnetic.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260428021156.13564-3-jiawenwu@trustnetic.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 852CF49F352
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
-	TO_DN_NONE(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282696-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FREEMAIL_CC(0.00)[net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,gmail.com,armlinux.org.uk,intel.com,debian.org,dama.to];
+	TAGGED_FROM(0.00)[bounces-282697-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-From: Maoyi Xie <maoyi.xie@ntu.edu.sg>
+On 4/28/26 4:11 AM, Jiawen Wu wrote:
+> +static void wx_reset_subtask(struct wx *wx)
+> +{
+> +	if (!test_bit(WX_FLAG_NEED_PF_RESET, wx->flags))
+> +		return;
+> +
+> +	rtnl_lock();
+> +
+> +	if (!netif_running(wx->netdev) ||
+> +	    test_bit(WX_STATE_RESETTING, wx->state))
+> +		return;
 
-fl_size, fl_ht and ip6_fl_lock in net/ipv6/ip6_flowlabel.c are file
-scope and shared across netns. mem_check() reads fl_size to decide
-whether to deny non-CAP_NET_ADMIN callers; capable() runs against
-init_user_ns, so an unprivileged user in any non-init userns can
-push fl_size past FL_MAX_SIZE - FL_MAX_SIZE/4 and starve every
-other unprivileged userns on the host.
+Sashiko says:
 
-Add struct netns_ipv6::flowlabel_count, bumped and decremented next
-to fl_size in fl_intern, ip6_fl_gc and ip6_fl_purge. Place it near
-ipmr_seq rather than next to flowlabel_has_excl: flowlabel_has_excl
-is read on every flowlabel lookup, and a counter written on every
-alloc would dirty its cacheline.
+Does this early return path leak the rtnl_lock?
+If the interface is brought down concurrently while a reset is scheduled,
+it appears this would return without calling rtnl_unlock(). Since all
+network
+configuration operations require the RTNL lock, could this lead to a
+system-wide deadlock in the networking subsystem?
 
-mem_check() folds an extra FL_MAX_SIZE/8 ceiling into the existing
-non-CAP_NET_ADMIN conditional.
+> +
+> +	wx_warn(wx, "Reset adapter.\n");
+> +
+> +	if (test_and_clear_bit(WX_FLAG_NEED_PF_RESET, wx->flags)) {
+> +		if (wx->do_reset)
+> +			wx->do_reset(wx->netdev);
+> +	}
+> +
+> +	rtnl_unlock();
+> +}
+> +
+> +/*
+> + * wx_check_tx_hang_subtask - check for hung queues and dropped interrupts
+> + * @wx - pointer to the device wx structure
+> + *
+> + * This function serves two purposes.  First it strobes the interrupt lines
+> + * in order to make certain interrupts are occurring.  Secondly it sets the
+> + * bits needed to check for TX hangs.  As a result we should immediately
+> + * determine if a hang has occurred.
+> + */
+> +static void wx_check_tx_hang_subtask(struct wx *wx)
+> +{
+> +	int i;
+> +
+> +	/* If we're down or resetting, just bail */
+> +	if (!netif_running(wx->netdev) ||
+> +	    test_bit(WX_STATE_RESETTING, wx->state))
+> +		return;
+> +
+> +	/* Force detection of hung controller */
+> +	if (netif_carrier_ok(wx->netdev)) {
+> +		for (i = 0; i < wx->num_tx_queues; i++)
+> +			set_bit(WX_TX_DETECT_HANG, wx->tx_ring[i]->state);
+> +	}
+> +}
+> +
+> +void wx_handle_errors_subtask(struct wx *wx)
+> +{
+> +	wx_reset_subtask(wx);
+> +	wx_check_tx_hang_subtask(wx);
+> +}
+> +EXPORT_SYMBOL(wx_handle_errors_subtask);
+> +
+> +static void wx_tx_timeout_reset(struct wx *wx)
+> +{
+> +	if (!netif_running(wx->netdev))
+> +		return;
+> +
+> +	set_bit(WX_FLAG_NEED_PF_RESET, wx->flags);
+> +	wx_warn(wx, "initiating reset due to tx timeout\n");
+> +	wx_service_event_schedule(wx);
+> +}
+> +
+> +void wx_tx_timeout(struct net_device *netdev, unsigned int txqueue)
+> +{
+> +	struct wx *wx = netdev_priv(netdev);
+> +	u32 head, tail;
+> +	int i;
+> +
+> +	for (i = 0; i < wx->num_tx_queues; i++) {
+> +		struct wx_ring *tx_ring = wx->tx_ring[i];
+> +
+> +		if (test_bit(WX_TX_DETECT_HANG, tx_ring->state) &&
+> +		    wx_check_tx_hang(tx_ring))
+> +			wx_warn(wx, "Real tx hang detected on queue %d\n", i);
+> +
+> +		head = rd32(wx, WX_PX_TR_RP(tx_ring->reg_idx));
+> +		tail = rd32(wx, WX_PX_TR_WP(tx_ring->reg_idx));
+> +		wx_warn(wx,
+> +			"tx ring %d next_to_use is %d, next_to_clean is %d\n",
+> +			i, tx_ring->next_to_use,
+> +			tx_ring->next_to_clean);
+> +		wx_warn(wx, "tx ring %d hw rp is 0x%x, wp is 0x%x\n",
+> +			i, head, tail);
+> +	}
+> +
+> +	wx_tx_timeout_reset(wx);
+> +}
+> +EXPORT_SYMBOL(wx_tx_timeout);
+> +
+> +void wx_handle_tx_hang(struct wx_ring *tx_ring, unsigned int next)
+> +{
+> +	struct wx *wx = netdev_priv(tx_ring->netdev);
+> +
+> +	wx_warn(wx, "Detected Tx Unit Hang\n"
+> +		"  Tx Queue             <%d>\n"
+> +		"  TDH, TDT             <%x>, <%x>\n"
+> +		"  next_to_use          <%x>\n"
+> +		"  next_to_clean        <%x>\n"
+> +		"tx_buffer_info[next_to_clean]\n"
+> +		"  time_stamp           <%lx>\n"
+> +		"  jiffies              <%lx>\n",
 
-Bump FL_MAX_SIZE from 4096 to 8192. It has been 4096 since the file
-was added; machines and connection counts have grown. The new
-per-netns ceiling is then 1024 flowlabels, half of FL_MAX_SIZE/4.
+It's better to use a single string for the whole message, even if it
+would exceed the 80 chars limit
 
-CAP_NET_ADMIN against init_user_ns still bypasses both caps.
+> +		tx_ring->queue_index,
+> +		rd32(wx, WX_PX_TR_RP(tx_ring->reg_idx)),
+> +		rd32(wx, WX_PX_TR_WP(tx_ring->reg_idx)),
+> +		tx_ring->next_to_use, next,
+> +		tx_ring->tx_buffer_info[next].time_stamp, jiffies);
+> +
+> +	netif_stop_subqueue(tx_ring->netdev, tx_ring->queue_index);
+> +
+> +	wx_warn(wx, "tx hang detected on queue %d, resetting adapter\n",
+> +		tx_ring->queue_index);
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Suggested-by: Willem de Bruijn <willemb@google.com>
-Cc: stable@vger.kernel.org # v5.15+
-Signed-off-by: Maoyi Xie <maoyi.xie@ntu.edu.sg>
----
-v3 (this submission, netdev): addressed Willem's review on the
-    private security@ thread:
-    - merged the FL_MAX_SIZE doubling into this patch
-    - dropped the test data block from the commit body
-    - moved flowlabel_count to a 4-byte hole next to ipmr_seq, off
-      the flowlabel_has_excl cacheline
-    - inlined fl->fl_net in ip6_fl_gc (no local var)
-v2: per-netns counter + cap, sent to security@ as a 2-patch series
-v1: fix-shape sketch in original disclosure
+Possibly two warn messages for the same cause is a bit too verbose (same
+in wx_tx_timeout()).
 
- include/net/netns/ipv6.h |  1 +
- net/ipv6/ip6_flowlabel.c | 10 ++++++++--
- 2 files changed, 9 insertions(+), 2 deletions(-)
+> +bool wx_check_tx_hang(struct wx_ring *ring)
+> +{
+> +	u32 tx_done_old = ring->tx_stats.tx_done_old;
+> +	u32 tx_pending = wx_get_tx_pending(ring);
+> +	u32 tx_done = ring->stats.packets;
+> +
+> +	clear_bit(WX_TX_DETECT_HANG, ring->state);
 
-diff --git a/include/net/netns/ipv6.h b/include/net/netns/ipv6.h
-index 34bdb1308..329482373 100644
---- a/include/net/netns/ipv6.h
-+++ b/include/net/netns/ipv6.h
-@@ -119,6 +119,7 @@ struct netns_ipv6 {
- 	struct fib_notifier_ops	*notifier_ops;
- 	struct fib_notifier_ops	*ip6mr_notifier_ops;
- 	unsigned int ipmr_seq; /* protected by rtnl_mutex */
-+	atomic_t		flowlabel_count;
- 	struct {
- 		struct hlist_head head;
- 		spinlock_t	lock;
-diff --git a/net/ipv6/ip6_flowlabel.c b/net/ipv6/ip6_flowlabel.c
-index c92f98c6f..4a5219356 100644
---- a/net/ipv6/ip6_flowlabel.c
-+++ b/net/ipv6/ip6_flowlabel.c
-@@ -36,7 +36,7 @@
- /* FL hash table */
- 
- #define FL_MAX_PER_SOCK	32
--#define FL_MAX_SIZE	4096
-+#define FL_MAX_SIZE	8192
- #define FL_HASH_MASK	255
- #define FL_HASH(l)	(ntohl(l)&FL_HASH_MASK)
- 
-@@ -162,6 +162,7 @@ static void ip6_fl_gc(struct timer_list *unused)
- 				ttd = fl->expires;
- 				if (time_after_eq(now, ttd)) {
- 					*flp = fl->next;
-+					atomic_dec(&fl->fl_net->ipv6.flowlabel_count);
- 					fl_free(fl);
- 					atomic_dec(&fl_size);
- 					continue;
-@@ -195,6 +196,7 @@ static void __net_exit ip6_fl_purge(struct net *net)
- 			if (net_eq(fl->fl_net, net) &&
- 			    atomic_read(&fl->users) == 0) {
- 				*flp = fl->next;
-+				atomic_dec(&net->ipv6.flowlabel_count);
- 				fl_free(fl);
- 				atomic_dec(&fl_size);
- 				continue;
-@@ -245,6 +247,7 @@ static struct ip6_flowlabel *fl_intern(struct net *net,
- 	fl->next = fl_ht[FL_HASH(fl->label)];
- 	rcu_assign_pointer(fl_ht[FL_HASH(fl->label)], fl);
- 	atomic_inc(&fl_size);
-+	atomic_inc(&net->ipv6.flowlabel_count);
- 	spin_unlock_bh(&ip6_fl_lock);
- 	rcu_read_unlock();
- 	return NULL;
-@@ -464,6 +467,7 @@ fl_create(struct net *net, struct sock *sk, struct in6_flowlabel_req *freq,
- 
- static int mem_check(struct sock *sk)
- {
-+	struct net *net = sock_net(sk);
- 	int room = FL_MAX_SIZE - atomic_read(&fl_size);
- 	struct ipv6_fl_socklist *sfl;
- 	int count = 0;
-@@ -478,7 +482,9 @@ static int mem_check(struct sock *sk)
- 
- 	if (room <= 0 ||
- 	    ((count >= FL_MAX_PER_SOCK ||
--	      (count > 0 && room < FL_MAX_SIZE/2) || room < FL_MAX_SIZE/4) &&
-+	      (count > 0 && room < FL_MAX_SIZE/2) ||
-+	      room < FL_MAX_SIZE/4 ||
-+	      atomic_read(&net->ipv6.flowlabel_count) >= FL_MAX_SIZE/8) &&
- 	     !capable(CAP_NET_ADMIN)))
- 		return -ENOBUFS;
- 
--- 
-2.34.1
+It looks like every caller checks WX_TX_DETECT_HANG, it would be
+probably better to use test_and_clear_bit() here, and drop the test from
+the caller.
+
+/P
 
 
