@@ -1,140 +1,231 @@
-Return-Path: <netdev+bounces-282599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282600-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ONQFJXe68mkYtwEAu9opvQ:T2
-	(envelope-from <netdev+bounces-282599-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:12:07 +0200
+	id aIZ1Nx678mlAtwEAu9opvQ
+	(envelope-from <netdev+bounces-282600-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:14:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4013149C38B
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:12:07 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9881E49C3C2
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:14:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 68D6E302A06D
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:12:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3606C3016D1C
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:14:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97FE02857FA;
-	Thu, 30 Apr 2026 02:12:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B08286415;
+	Thu, 30 Apr 2026 02:14:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k5kPcn1Q"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j0qJdnN+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F09927281E;
-	Thu, 30 Apr 2026 02:12:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3105474F
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 02:14:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777515121; cv=none; b=LPCIQeHyAov4mOEdRAh9AiW68G+tBHJNpaFxxcHniPDMejdiYPsxf4i/i+VAbbtQ8udBzdEutQ6uLh8/IumRsQGyk4jlE3/5SDzq22+Ecf7nPpF046Gow68qH81ZfeAguF4sTNdAOQkzNbSoLaQmgflRIh9MNLZtGRdnCku9Y+A=
+	t=1777515292; cv=none; b=hly2cUtqBkkX8G7iZbEOcEmE0RJyX9mUkdjSSIViA29lAQscQ8yQBjVetVJDMpFsKsw06qQohVWvwRpIfBfLOGaIKXZp072s9q3poQjvAqNuq89i6ggKZtrQMQKnZUv//pDZvAfJ4hWbGBx6CIDQXScAx9XdPcW0xiXGCOVmYCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777515121; c=relaxed/simple;
-	bh=Iynk1THCP/qxdLQKKSMR/8OAJf7uHsox6KYhOKpSMU0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CinLlP1p6KdqF0nBTrYiloh2E+KZ1q98ZFUWRZgIddFDCz8L2xGip2+rHfyepSVGjzyprYBUFotq1wKPhu+feGujq94O32P5YRdYjrLI5Cf/RNrVGVqwKat0CthrbMIOpG/n67OxRvmmgN7qklgBdJvc44rpJvS9oZ0wTPJ7Lh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k5kPcn1Q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73F8FC19425;
-	Thu, 30 Apr 2026 02:12:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777515120;
-	bh=Iynk1THCP/qxdLQKKSMR/8OAJf7uHsox6KYhOKpSMU0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=k5kPcn1Q1fUhwjrw0jUQbfbBGvNFQcLWfY70N66e6NxJsAlJ72hGJFLJdO/PzWgpo
-	 MLxCvYfGQpDkBNr3pnw/MT9mkIJiDXWGypfO85vxMM3hJOreGIN7mRc9e8N4nezFk3
-	 UnF1NLTth1FY0KExLwJkQdwIojJO9kunMAGn/+w7p3neh1GrcKY3asz+9VnOgCajqI
-	 8dyfrmHbUbPnvzcBdriDV3bJR7qoNLLsGLSfZGF6nRQrOwfelo6PUH9PVx8LEH4is4
-	 tHc4jTR5t8aPrg4fvnYgWHkL2YMnM48nyrNzslD6/WfgwL8/AWpdwqREf2/k4JQIJn
-	 3HN/JRZClm+lA==
-Date: Wed, 29 Apr 2026 19:10:42 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-api@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
-Message-ID: <20260430021042.GA51782@sol>
-References: <20260430011544.31823-1-ebiggers@kernel.org>
- <afK4zC-Mgo6LBfUh@gondor.apana.org.au>
+	s=arc-20240116; t=1777515292; c=relaxed/simple;
+	bh=KLiqAyUkqXHnKS9RafYaBOcAmJV4oLZYMbTc8uZLjEk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mhM3i06XGwdi0KSLyy4lIABdPpzHTRAvf4UYvcs+DljF/Ao6WnnRmcIhtn+7eXQlKgNPnAFxcGeeUnlGRZaXPXccV+5q4KnEahrQ3J58qEZuLLaxHEkA9oy7lpwM3DTIBo2BqcHOaDFZdT6nO6V5rel800hkwERz//LW9ZXOiiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j0qJdnN+; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8ebe2c596c6so80103285a.1
+        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 19:14:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777515290; x=1778120090; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Ud/hFbpxUGS8OGEJg6KdSgybhV6VvHwTJnM2I3fPKjY=;
+        b=j0qJdnN+oJms6qMnnDdagXIebSZQepOPBN7yRbLgNoS75GqHWlJRwXBEshnnQbJfSI
+         hhGn6E7w3oG2p201mHykY5s9yL/h6PkdLu+81NDH9K9bWz43OZ/7aUvFZQkVTBrqn9eC
+         7YJGN3cPbMkeVNFIG+eZQ81OAfhiTRThO2TDrGnhb7kYCTQwTzaxWpm0ksLAyl9/NPHv
+         LSc8iHIGxeyQ6zs0Yszgk2JCo99PoEz2Zea0icb7L7CCh6qwtaIqB52I/bVmP8A6Udvy
+         Lms2B1cTliGp2y1cDIM3r4lPlLfEccM9jg63KheMQBAcdgJBebdr31LnQWwcPckhGfjr
+         qlsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777515290; x=1778120090;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ud/hFbpxUGS8OGEJg6KdSgybhV6VvHwTJnM2I3fPKjY=;
+        b=fS/Y3bBb7zlfkacggmop4nymHXBPLQfkHVdQ33UoHkpEkt7JEq/c83fwmKGdQ4sv49
+         8zPaq9pZ0/C8KWGuNWaxBX4WvLIfn8o5ioQ/InBOf0cZvnkJh03xyy0LOIlHLYyonPKx
+         F1ivaoA0qlPHUH7X3oG3I3TliJuoZxkEhhPiHedwUral5j7GfqgmcR5Sc39bVVc9+q2M
+         EtjuZRvIw1r70pZ7WY/rjfqWwmUp3fJOBExjTDYpBMEWQfn6PnoTKnanCQ3XZB0WR1m5
+         jPkxfBd6irh73T0Ts+ubQhIsW6vbttrVpcAmS1q+82tyNEzjjPq/J6my/Nsxc5JKeOzp
+         yQIA==
+X-Forwarded-Encrypted: i=1; AFNElJ+pxjua4KovchF9qcsO17ep/HPA5uj8nOdUUAjw7JhWQsMEAwQHfKCyPG0eU92dUxbf4eSeVD0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTdQ1IYVt6PUOizCC5Xdo9ADQXOs18gRvdnKnMsFRxB01AyJV6
+	dg5H0Ag6wDgcLCzqhP33l7iq9Q8ac0ZU5efi8JWAowDHazUYvGtKs1cWeRueFFrK9EfDpN9V4hm
+	WwumRSFP470FeSw==
+X-Received: from qkgj25.prod.google.com ([2002:ae9:c219:0:b0:8ec:27fc:b227])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:1722:b0:8ed:11b9:1ecb with SMTP id af79cd13be357-8fa86db7224mr214937485a.20.1777515289840;
+ Wed, 29 Apr 2026 19:14:49 -0700 (PDT)
+Date: Thu, 30 Apr 2026 02:14:44 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <afK4zC-Mgo6LBfUh@gondor.apana.org.au>
-X-Rspamd-Queue-Id: 4013149C38B
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
+Message-ID: <20260430021444.2929534-1-edumazet@google.com>
+Subject: [PATCH v2 net-next] selftests/net: packetdrill: add tcp_syncookies_ip[46]_9k
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 9881E49C3C2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282599-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ebiggers@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282600-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[copy.fail:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.984];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-On Thu, Apr 30, 2026 at 10:05:00AM +0800, Herbert Xu wrote:
-> On Wed, Apr 29, 2026 at 06:15:44PM -0700, Eric Biggers wrote:
-> > AF_ALG is almost completely unnecessary, and it exposes a massive attack
-> > surface that hasn't been standing up to modern vulnerability discovery
-> > tools.  The latest one even has its own website, providing a small
-> > Python script that reliably roots most Linux distros: https://copy.fail/
-> > 
-> > This isn't sustainable, especially as LLMs have accelerated the rate the
-> > vulnerabilities are coming in.  The effort that is being put into this
-> > thing is vastly disproportional to the few programs that actually use
-> > it, and those programs would be better served by userspace code anyway.
-> > 
-> > These issues have been noted in many mailing list discussions already.
-> > But until now they haven't been reflected in the documentation or
-> > kconfig menu itself, and the vulnerabilities are still coming in.
-> > 
-> > Let's go ahead and document the deprecation.
-> > 
-> > This isn't intended to change anything overnight.  After all, most Linux
-> > distros won't be able to disable the kconfig options quite yet, mainly
-> > because of iwd.  But this should create a bit more impetus for these
-> > userspace programs to be fixed, and the documentation update should also
-> > help prevent more users from appearing.
-> > 
-> > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> 
-> What about the exposure of akcipher through security/keys/keyctl_pkey.c?
-> 
-> There isn't even a Kconfig option to disable that user-space API.
-> If module signatures are enabled then this automatically gets added
-> to the kernel:
-> 
-> MODULE_SIG -> MODULE_SIG_FORMAT -> SYSTEM_DATA_VERIFICATION ->
-> KEYS + ASYMMETRIC_KEY_TYPE
+These tests check syncookie mode is able to reconstruct some
+client options when TCP TS are used:
 
-Yes, that would be a different patch, but KEYCTL_PKEY_* have a very
-similar issue.  That should have a kconfig option added too.
+- wscale option.
+- sackOK.
+- MSS (in a limited way, especially for IPv4).
+- ECN : not enabled.
 
-I believe iwd is the main (or even only?) user there, as well.
+Note that IPv4 and IPv6 have different msstab[] values:
 
-- Eric
+IPv4 msstab[4] = { 536, 1300, 1440, 1460 }
+IPv6 msstab[4] = { 1280 - 60, 1480 - 60, 1500 - 60, 9000 - 60 }
+
+IPv4 is currently capping SND_MSS to 1460, even on a 9K MTU network.
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+v2: Fixed typos (Jakub, Neal)
+    Added ipv4 version.
+
+ .../net/packetdrill/tcp_syncookies_ip4_9k.pkt | 37 +++++++++++++++++++
+ .../net/packetdrill/tcp_syncookies_ip6_9k.pkt | 36 ++++++++++++++++++
+ 2 files changed, 73 insertions(+)
+ create mode 100644 tools/testing/selftests/net/packetdrill/tcp_syncookies_ip4_9k.pkt
+ create mode 100644 tools/testing/selftests/net/packetdrill/tcp_syncookies_ip6_9k.pkt
+
+diff --git a/tools/testing/selftests/net/packetdrill/tcp_syncookies_ip4_9k.pkt b/tools/testing/selftests/net/packetdrill/tcp_syncookies_ip4_9k.pkt
+new file mode 100644
+index 0000000000000000000000000000000000000000..60910069b3d7a4c01d989e48ffb16f12bd56ca25
+--- /dev/null
++++ b/tools/testing/selftests/net/packetdrill/tcp_syncookies_ip4_9k.pkt
+@@ -0,0 +1,37 @@
++// SPDX-License-Identifier: GPL-2.0
++//
++// Check syncookies.
++//
++// Check we are able to rebuild client sack, wscale, ecn and mss options.
++// IPv4 msstab[4] = { 536, 1300, 1440, 1460 }
++
++--ip_version=ipv4
++
++`./defaults.sh
++sysctl -q net.ipv4.tcp_syncookies=2
++ip link set dev tun0 mtu 9000
++`
++
++    0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
++   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
++   +0 bind(3, ..., ...) = 0
++   +0 listen(3, 10) = 0
++
++   +0 < S 0:0(0) win 32792 <mss 8960,sackOK,TS val 100 ecr 0,nop,wscale 10>
++   +0 > S. 0:0(0) ack 1 <mss 8960,sackOK,TS val 4000 ecr 100,nop,wscale 8>
++ +.01 < . 1:1(0) ack 1 win 1024 <nop,nop,TS val 110 ecr 4000>
++
++   +0 accept(3, ..., ...) = 4
++
++// Check we properly infer from the final packet the other peer wanted mss >= 1460, wscale 10, sackOK and no ECN.
++// Note that mss is limited to 1460 - 12 because of IPv4 msstab[]
++// This is only possible because TCP TS option was used.
++// Linux uses the SYNACK TS.val 6 low order bits to encode the options.
++
++   +0 %{ assert tcpi_snd_mss == 1460 - 12, tcpi_snd_mss; \
++         assert tcpi_snd_wscale == 10, tcpi_snd_wscale; \
++         assert (tcpi_options & TCPI_OPT_SACK) != 0, tcpi_options; \
++         assert (tcpi_options & TCPI_OPT_TIMESTAMPS) != 0, tcpi_options; \
++         assert (tcpi_options & TCPI_OPT_WSCALE) != 0, tcpi_options; \
++         assert (tcpi_options & TCPI_OPT_ECN) == 0, tcpi_options
++}%
+diff --git a/tools/testing/selftests/net/packetdrill/tcp_syncookies_ip6_9k.pkt b/tools/testing/selftests/net/packetdrill/tcp_syncookies_ip6_9k.pkt
+new file mode 100644
+index 0000000000000000000000000000000000000000..f333c61044bc6d94a2309b88c9fd83bc608cc28c
+--- /dev/null
++++ b/tools/testing/selftests/net/packetdrill/tcp_syncookies_ip6_9k.pkt
+@@ -0,0 +1,36 @@
++// SPDX-License-Identifier: GPL-2.0
++//
++// Check syncookies.
++//
++// Check we are able to rebuild client sack, wscale, ecn and mss options.
++// IPv6 msstab[4] = { 1280 - 60, 1480 - 60, 1500 - 60, 9000 - 60 }
++
++--ip_version=ipv6
++
++`./defaults.sh
++sysctl -q net.ipv4.tcp_syncookies=2
++ip link set dev tun0 mtu 9000
++`
++
++    0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
++   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
++   +0 bind(3, ..., ...) = 0
++   +0 listen(3, 10) = 0
++
++   +0 < S 0:0(0) win 32792 <mss 8940,sackOK,TS val 100 ecr 0,nop,wscale 10>
++   +0 > S. 0:0(0) ack 1 <mss 8940,sackOK,TS val 4000 ecr 100,nop,wscale 8>
++ +.01 < . 1:1(0) ack 1 win 1024 <nop,nop,TS val 110 ecr 4000>
++
++   +0 accept(3, ..., ...) = 4
++
++// Check we properly infer from the final packet the other peer wanted mss >= 8940, wscale 10, sackOK and no ECN.
++// This is only possible because TCP TS option was used.
++// Linux uses the SYNACK TS.val 6 low order bits to encode the options.
++
++   +0 %{ assert tcpi_snd_mss == 8940 - 12, tcpi_snd_mss; \
++         assert tcpi_snd_wscale == 10, tcpi_snd_wscale; \
++         assert (tcpi_options & TCPI_OPT_SACK) != 0, tcpi_options; \
++         assert (tcpi_options & TCPI_OPT_TIMESTAMPS) != 0, tcpi_options; \
++         assert (tcpi_options & TCPI_OPT_WSCALE) != 0, tcpi_options; \
++         assert (tcpi_options & TCPI_OPT_ECN) == 0, tcpi_options
++}%
+-- 
+2.54.0.545.g6539524ca2-goog
+
 
