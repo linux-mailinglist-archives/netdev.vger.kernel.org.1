@@ -1,209 +1,165 @@
-Return-Path: <netdev+bounces-282937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282938-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0Jd2EqmB82kY4wEAu9opvQ
-	(envelope-from <netdev+bounces-282937-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:22:01 +0200
+	id YB+lOvGB82kY4wEAu9opvQ
+	(envelope-from <netdev+bounces-282938-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:23:13 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADC564A599F
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:22:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7343C4A59FA
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:23:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ABE4E3059CF9
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 16:20:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C9678300B767
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 16:21:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55A124657D0;
-	Thu, 30 Apr 2026 16:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6051642EEDB;
+	Thu, 30 Apr 2026 16:21:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="R6dIxE6U"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="Dhc0qfwc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A8545BD57;
-	Thu, 30 Apr 2026 16:20:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B20834D4CC;
+	Thu, 30 Apr 2026 16:21:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777566020; cv=none; b=uqF2xrb7ssRMqzc8hHl23UEggipd4ypvYcXm0oZliCs+NTK5iKB0afbpeTh7/dSFtU1By82APYr0VFPOL1lAwJOnmm0KgXrifcgn26ysOg1FPjzvZnd1/0+/O4Pxo4kk1siLZvW2zIxjqhvXAL0t3A51SfKpnZMB5HYIwfMtYEw=
+	t=1777566090; cv=none; b=QaflLQO9SMTvwR6EdXskiqT+e7WI8vzGPsyFa7d1gR0LAm2F/2J9txHMIRZt8bYc6josEu8Py9nLBen+77fuq9ePqL1AcQqhJ39yH6FvoyS9TPFiOZoLxh5TpvyoeDC/GScTQvgx4jXJJcX8dumUx5rua/oTcKOj5+AKU2/V2XE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777566020; c=relaxed/simple;
-	bh=E2SKPUsUqU+3vPOonTNGjXVFFdcFDlAnxiNBfRQyCts=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:To:From:Subject:
-	 References:In-Reply-To; b=jjdXHOEOPJcR4Xahdp1oBMK2uZBVqMkFv+syT2uzYPe3nsgQQlxU4efJnr4+YP+zixIeYvpU9Lrl44yGDwlMqrz5o4LAhFZ1lXKOLgWJnsdujlHYmFV/ymHyvLNMCoSQlX+0yKrpeAadxwumQojx+qhCFg2NqMkR7dAjtUpuHXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=R6dIxE6U; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 96DDD1A3489;
-	Thu, 30 Apr 2026 16:20:15 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 67062601DF;
-	Thu, 30 Apr 2026 16:20:15 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E2EFE11AC9346;
-	Thu, 30 Apr 2026 18:20:01 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1777566014; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=3Bi+4lUG6gSEZp6P+IQVg5hHVjrg/DNa8f+Q/OrWakE=;
-	b=R6dIxE6UeJHb3IJWoP5AjOqIMP5hS8HjvAxpqCFwoGDsIUyEc3UC+CufNMrVteeX5COYLa
-	n5vuxJaWZUZCjNdkbxFHDgDOzGzLEMH9CMwbZPmarpJjnum8IJqP7B4EZ1s7RaOW2L7HGU
-	BBoeZsHOROojOw13UHbyM8qZgA5Q7wURC937eIcEnxJ0mKBUTpZMWeal6lM3kgVQxGvc2p
-	xea0gpF21AgpU9FxRG4O6JLvcFilPkvAoDC9oiY2x9ozIEhMb5jwvM03WDPLT0siT/7Q0x
-	0GxtL5cNowkDpIO3bQIihdWpA4PbX5peGjlOpQHAkx1VP8gqs6lOEdhaCGU9mg==
+	s=arc-20240116; t=1777566090; c=relaxed/simple;
+	bh=ai6+QVjyr+hlKt887iNpLWeIMLjufD7i076g2yHFK6o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TP/Lu5J1aD/0/pJZPs+TnEORvt24Y6ZB5Wwz3xBDxMdfat+2ykFo1xBIQotU+RteZg/Dpqdh4vU+PYiUiTHqhiPWorABxq1ceJHVXBkW2cO+4Ip5Fnv/2NqO0NBPGh1SjoSDRVgrp1QVdHeHQKr/tNy8bs4poiXbdNqL4YQoHuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=Dhc0qfwc; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 24C1460265;
+	Thu, 30 Apr 2026 18:21:27 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1777566087;
+	bh=Mfb7idhAW77GRVWo14Dge1zqfEz94ADSCClG6QGYrks=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Dhc0qfwc9o+8SlyGPFA59cNGDTXu1D+rO/uLDn+KBFAKIZbB7yho60O6ELKIabmtA
+	 zMfNXyRxtMtKsvOI7cWYtDhVkqMUnnn0VLOF0mGr9SB5MR2gMWR1/fiBr+4nFyn6tA
+	 al65FDDAQqZhSKMSfl3YSCC3kd9mXahZD0CUcRXr5kLi9q6Jo8yDORheVNUjwE+nNM
+	 q+Y1YbVOUDTh98dkuHhzet+2KrKnpUW6Qm1CnEwODVkfgF+O3bpmGm9dsFjSvgBzQF
+	 V+IQyTb2nIJtCvYtCvoc93Rak0xVzZ/0WzVdY+gwtTyl9fShvAF9fKT0PEfdmQ66ye
+	 GE7nmIxSBSvfQ==
+Date: Thu, 30 Apr 2026 18:21:24 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: HACKE-RC <rc@rexion.ai>
+Cc: Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/2] netfilter: nf_conntrack_amanda: reject port
+ values above 65535
+Message-ID: <afOBhH9Ef7z-QqxL@chamomile>
+References: <20260430161515.3449513-3-rc@rexion.ai>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 30 Apr 2026 18:20:01 +0200
-Message-Id: <DI6MK3PFX8EE.1R1567RYTUVNL@bootlin.com>
-Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
- <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Paolo Abeni" <pabeni@redhat.com>, "Haavard Skinnemoen"
- <hskinnemoen@atmel.com>, "Jeff Garzik" <jeff@garzik.org>, "Paolo Valerio"
- <pvalerio@redhat.com>, "Conor Dooley" <conor@kernel.org>, "Nicolai
- Buchwitz" <nb@tipi-net.de>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, "Vladimir Kondratiev"
- <vladimir.kondratiev@mobileye.com>, "Gregory CLEMENT"
- <gregory.clement@bootlin.com>, =?utf-8?q?Beno=C3=AEt_Monin?=
- <benoit.monin@bootlin.com>, "Tawfik Bayouk" <tawfik.bayouk@mobileye.com>,
- "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>, "Maxime Chevallier"
- <maxime.chevallier@bootlin.com>, <stable@vger.kernel.org>
-To: "Jakub Kicinski" <kuba@kernel.org>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Subject: Re: [PATCH net v2 2/4] net: macb: drop in-flight Tx SKBs on close
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260428-macb-drop-tx-v2-0-647f5199d8df@bootlin.com>
- <20260428-macb-drop-tx-v2-2-647f5199d8df@bootlin.com>
- <20260429193446.5985abea@kernel.org>
-In-Reply-To: <20260429193446.5985abea@kernel.org>
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: ADC564A599F
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260430161515.3449513-3-rc@rexion.ai>
+X-Rspamd-Queue-Id: 7343C4A59FA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MV_CASE(0.50)[];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282937-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[netfilter.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-282938-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:url,bootlin.com:dkim,bootlin.com:mid]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,rexion.ai:email]
 
-Hello Jakub,
+Hi,
 
-On Thu Apr 30, 2026 at 4:34 AM CEST, Jakub Kicinski wrote:
-> On Tue, 28 Apr 2026 18:32:58 +0200 Th=C3=A9o Lebrun wrote:
->>  	for (q =3D 0, queue =3D bp->queues; q < bp->num_queues; ++q, ++queue) =
-{
->> -		kfree(queue->tx_skb);
->> -		queue->tx_skb =3D NULL;
->> +		if (queue->tx_skb) {
->> +			unsigned int dropped =3D 0, tail;
->> +
->> +			for (tail =3D queue->tx_tail; tail !=3D queue->tx_head;
->> +			     tail++) {
->> +				if (macb_tx_skb(queue, tail)->skb)
->> +					dropped++;
->> +				macb_tx_unmap(bp, macb_tx_skb(queue, tail), 0,
->> +					      SKB_DROP_REASON_NOT_SPECIFIED);
->> +			}
->> +
->> +			queue->stats.tx_dropped +=3D dropped;
->> +			bp->dev->stats.tx_dropped +=3D dropped;
->
-> I'm slightly baffled by the stats in this driver.
->
-> Incrementing of both device and queue stats is highly unusual.
-> The driver seems to already have the values for the per-queue drops
-> but currently never increments it (did I miss it?) It does for Rx
-> stats but not for Tx stats.
->
-> As sashiko correctly points out incrementing dev stats will lead
-> to races and lass of increments for multi-queue devices.
->
-> Since there are no increments for tx_dropped stat today - could you
-> please delete it from ethtool -S, migrate the only existing
-> dev->stats.tx_dropped++; to increment the per-queue stat and make=20
-> macb_get_stats() collect the tx_dropped from all queues, instead
-> of relying on the device-level stat?
->
-> This should be patch 2 in this series, and then subsequent patches
-> don't have to do this double-counting dance.
->
-> I suppose you may want to migrate the byte and packet counters
-> while at it, and add a u64 sync...
+On Thu, Apr 30, 2026 at 09:45:15PM +0530, HACKE-RC wrote:
+> amanda_help() converts the result of simple_strtoul() to __be16 via
+> htons() without checking the parsed value fits in 16 bits. The
+> existing len > 5 guard limits strings to five digits, capping the
+> parseable range at 99999, but values 65536-99999 still silently
+> truncate on the htons() conversion.
+> 
+> Use an intermediate unsigned long and reject out-of-range values
+> before converting to network byte order.
+> 
+> Fixes: 16958900578b ("[NETFILTER]: nf_conntrack/nf_nat: add amanda helper port")
+> Signed-off-by: HACKE-RC <rc@rexion.ai>
+> ---
+>  net/netfilter/nf_conntrack_amanda.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/netfilter/nf_conntrack_amanda.c b/net/netfilter/nf_conntrack_amanda.c
+> index d2c09e8dd..58d6c9f29 100644
+> --- a/net/netfilter/nf_conntrack_amanda.c
+> +++ b/net/netfilter/nf_conntrack_amanda.c
+> @@ -88,11 +88,12 @@ static int amanda_help(struct sk_buff *skb,
+>  	struct nf_conntrack_expect *exp;
+>  	struct nf_conntrack_tuple *tuple;
+>  	unsigned int dataoff, start, stop, off, i;
+> +	nf_nat_amanda_hook_fn *nf_nat_amanda;
+>  	char pbuf[sizeof("65535")], *tmp;
+> +	unsigned long parsed_port;
+> +	int ret = NF_ACCEPT;
+>  	u_int16_t len;
+>  	__be16 port;
+> -	int ret = NF_ACCEPT;
+> -	nf_nat_amanda_hook_fn *nf_nat_amanda;
+>  
+>  	/* Only look at packets from the Amanda server */
+>  	if (CTINFO2DIR(ctinfo) == IP_CT_DIR_ORIGINAL)
+> @@ -132,10 +133,11 @@ static int amanda_help(struct sk_buff *skb,
+>  			break;
+>  		pbuf[len] = '\0';
+>  
+> -		port = htons(simple_strtoul(pbuf, &tmp, 10));
+> +		parsed_port = simple_strtoul(pbuf, &tmp, 10);
 
-Agreed. Here is the plan for next revision. It goes further than your
-proposal on some aspects and less so on others.
+While being here, I would replace this simple_strtoul by a parser
+which does not rely on nul-terminated strings.
 
- - Stop using `netdev->stats`. Not even on MACB (single queue) or from
-   at91 code (single queue, custom functions for a lot of things). This
-   will drop all the double-counting; I added some in this series but
-   there is lot in the driver to drop.
+A similar patch went in for the sip helper recently, maybe you can
+just take such function to parse ports, move it to the
+nf_conntrack_helper core so it can be shared by helpers.
 
-   sed 's/netdev->stats/queue->stats/' **/macb_main.c  # -ish
-
- - All stats that used to land in netdev->stats will instead land in
-   queue->stats. For that we need to add two fields:
-    - multicast, incremented by at91ether_rx()
-    - tx_errors, incremented by at91ether_interrupt()
-
- - Make queue->stats u64 values (getting inspiration from nstat).
-
- - In macb_get_stats(), replace:
-
-      netdev_stats_to_stats64(nstat, &bp->dev->stats);
-
-   by:
-
-      for (q =3D 0, queue =3D bp->queues; q < bp->num_queues; ++q, ++queue)=
- {
-         u64_stats_fetch_begin(...);
-         nstat->rx_packets +=3D queue->stats.rx_packets;
-         nstat->tx_packets +=3D queue->stats.tx_packets;
-         // ... same for all stats ...
-      }
-
- - Also the struct name (struct queue_stats) deserves a driver prefix.
-
-Notice we don't drop tx_dropped from `ethtool -S`. It might be useful to
-get per-queue stats and it doesn't cost much. We need per-queue
-counters anyway, let's keep exposing them.
-
-I don't have time to test enough, next revision will wait next week.
-
-Thanks,
-
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+>  		len = tmp - pbuf;
+> -		if (port == 0 || len > 5)
+> +		if (parsed_port == 0 || parsed_port > 65535 || len > 5)
+>  			break;
+> +		port = htons(parsed_port);
+>  
+>  		exp = nf_ct_expect_alloc(ct);
+>  		if (exp == NULL) {
+> -- 
+> 2.54.0
+> 
 
