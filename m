@@ -1,182 +1,130 @@
-Return-Path: <netdev+bounces-282597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282598-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id zmnkLOm58mkYtwEAu9opvQ
-	(envelope-from <netdev+bounces-282597-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:09:45 +0200
+	id gCHuKS668mkYtwEAu9opvQ
+	(envelope-from <netdev+bounces-282598-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:10:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE09649C371
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:09:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03B5549C379
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:10:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 161E43013AAC
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:09:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5E6683013D7A
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:10:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73722220F2D;
-	Thu, 30 Apr 2026 02:09:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 163BD2765FF;
+	Thu, 30 Apr 2026 02:10:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bWPkW7w8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xn05qJ7v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F7913777E
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 02:09:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777514982; cv=pass; b=uBMuGCSP6l2hJw+1tadJ9IkCoKTLtBsYHp0Ebakyp+HTe6bKtLVsv7ePH9pVlG31Yp9vW6KtySessO1427dzEFnM2N0Gq+QG/mMPwozr9nqA2m0XSSUFbC3VS+TJp9Ebsy+yUSf0tDd23BiS13OOVPPbPXU8FYcORkfpHZhP9+g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777514982; c=relaxed/simple;
-	bh=z/L5FEasjEfUVBGnzkABUuoAiflIqv6vkBJWNwdvMjg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MsZWjPugpRSGrnpP8OgSTr4QcW7mtmthTW8o7jptKk9dKbEb0238FxWefuuYx208AJz9IVXb3uQ07HqXqGEgfmBiHhO7NP7hblsflszCyuvkFI0kUABsKqa/PHqIKDoseu/ydUT2atdP2qr8lHcoXwEr2mABwrr7JqxflIVBx/g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bWPkW7w8; arc=pass smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-506a747448dso2477891cf.0
-        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 19:09:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777514980; cv=none;
-        d=google.com; s=arc-20240605;
-        b=fbiB9v0vm5UiklniE7ZIER/0JTZTmqKvMLTn7hJqImbPImL8HP0CWLToM8It5pF9VP
-         wf8349zfi2dpBETT0NAoSSJbbEQKjy8T6/bLbFYdT3XtCHagfH9dpDR5Nd7UTGyeMVUY
-         qXopPdSdJMomQWU2NveoPp8+I62WtZeXPJhqQT+yopLiNm8u2VGfKe6RjrWiGHMiIGve
-         6Z0ZELCMc0u/pYrh/cMpzyL6w62c4xy+MwvBogDJt8KCPK2jomeMBcv6Td+OnwqQZEm+
-         2BnDQjV2hTm1oMVK6CNHNhz1gB3WkgR93y/8Qgol3Q7LbbuE3Tpoj5tWJ207rmg7dZep
-         L+Jg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=SvE0I/JhiLpuwT8tMag71J64hdVM5U416QBSdoJER2s=;
-        fh=8EyDL+osoDMWVJE7JQm53vzWK3EATTXPRFA/qRcJHf0=;
-        b=Lvnjee1pI0U21BYP4KA3JP4TRiyRwMQYrfRxC7//Hbf8g2s48urSgnWODzazPod9jP
-         46EMLcdIp9SQeBkaPYa3sS3chbXDoqZNz0426ZALUiNx48lnEsqZik4Du8/8vrg9VEqu
-         W5HuONiTgxWZ6TcsXPZ3d7Pt7ngc32+gTLFTHsQ6wgZPO5VVdQ2XTwwTWM8zvO4FtjOH
-         zY5n4k+gcB02LYd7Q7oFOrm1eaYKkQm31iqMTsXd78RaxFv24DX2GLYsug0TRvO1yKOQ
-         sPN9UylygxJ97NPlGQ2xBBQ1db40Tcl9ledVVX8uB0Kb6SQYwdrjmIrBUtBwyBYyxAGM
-         Kb1A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777514980; x=1778119780; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SvE0I/JhiLpuwT8tMag71J64hdVM5U416QBSdoJER2s=;
-        b=bWPkW7w8gj1OPGy5c4biovbjLgGE5A4zm80AKOsoFBrc0SgbnCvKdykz6sDfKEZdm9
-         cgUXJeMwM3b6/gtcbAB3oZEZr+kLmQQh1ZFz7V0sl5799FPMIJq4TQOfdcVjBYfjzGK6
-         8kRiqZm115H4FMM4eaqulAunicXW2ctBdFbhm+4+oRdmRST/Mm4nOQXMtM//O9dp/quV
-         M8qJ5s9h3Dwk0fzJ9reWVH8eHCFf3IvGqSOFJ7aiiPUch8tsKrMUvLkZ9puHJ6VIZYSC
-         jiD6Dsz8Bz9UFnkzNMBrk3241qzJ2KVQGoQFMaYRM8db+akSfTUdPCZE8jOgfkZGUS1X
-         C9yA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777514980; x=1778119780;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=SvE0I/JhiLpuwT8tMag71J64hdVM5U416QBSdoJER2s=;
-        b=B+ac69TSY9ipMUq4vgIT7TODEi+4QSp8La0il49EhXEsdFELuiXcNH6FLjec0r4fyr
-         YfAo1QxpzhfJdm7auNZohfWEvbsuEM/NWA9ncfrW30VipDhvHnDYO0PBd8uvOLArsJvA
-         qs2pcsMK28QvZhMQbrjbsw0qOTXaD+1umnBPBcDWKrxi/cwqmmdHdgMaRiKRAwlLwXP1
-         y/6rly61MHHRtvxBiBdYeax7PY7K8a5TaQF8fk1TqWntIfEN16zP+5OFNKgY8wlTySrF
-         jHiI8r6t3rze08sWVWQkRet2TxGaem6S33XhsuC3O8nIYU8ZOduq3Zr85TzffnJdkkYL
-         Bv7g==
-X-Forwarded-Encrypted: i=1; AFNElJ+R3tJYqzKXCQbQ3OtEMlFFvfW/PTK+oo3e7KS5cZ10WKwYRNcmuddqVlgIGBLY5WtCgUrCG9Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtclcvueuGoZvvOGlcAGHM+j8Ys2KYkjlCQRqEforwaXEXKWrr
-	ZaCw8UOC/5gLs6pEFynlULA81GUcSj8HkqAhhP1QZsBRDmtSVAOzK5bU/3glGy7yxUtc+e53MnS
-	3dd02AX2QyIW3o5Qx/O8p9HgIu1XgJFy75iLNm1Ey
-X-Gm-Gg: AeBDieuZ2++MjDf76lZjqwJjw9ExxqSZ9ZEwrTAndMkWxOBo5X1TZxESFpOItL+Pr4l
-	3kmWmLOBJVDedsdHHUU5UpvUkvC7mA1kJM4i1AFnYjX7C8CvlJ0fmmQdGyJZFYN84bLlsyvDziZ
-	q7mv3oF0IkGya1ESUTBifHTf0JUmxYQTca1De0aFBnBwNZvbtpNbKsDt5VXcKERbWIgzFRgKtxt
-	Llwckc+ymr0i1bdEZsQyhbF9cgUOToZUMu45EX9Jwn21OGnwAeHVfScfLjZNVhFxNCMWYJQyyv0
-	mvx77qIAaYgFnFNgrQKfrE46h954RQ0pmbMB08AHsPbBW1cltoszqBkuSKmbwr9Cxsgr0wrgQDh
-	Jv/g2IPrCCfJYomtkDg==
-X-Received: by 2002:a05:622a:5805:b0:50d:8e6b:96ac with SMTP id
- d75a77b69052e-5102afa5dc0mr14709791cf.58.1777514979481; Wed, 29 Apr 2026
- 19:09:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E78D125FA29
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 02:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777515051; cv=none; b=auWDx7I5BkjJL7POb2YqFexH3XreDS7eKIwIviJ7JR3XlBM06TyVRUEtFhFSz6ZD8tqvO+IGoWBhu1t7gwx/zmvT8jQariaB5NP0Z/VWUAtZjEYHVaL8i+Y6vLP8YU7MjDiKLCCOQVbRzgR4a3OkJYDe+65zHlFw7luRYhWTSY8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777515051; c=relaxed/simple;
+	bh=a1UzXaYYxk8eew7tH6jlILm+q1oKKsetaZ6dGSzp9sg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bTyTn4km2NpPMQWsy6woNtV/DiGOygj62LKE3t2fH9wh/p0aH4clYjUZ04nEd54qOn7dE8/XsTU3JlquNiWd/h6JRdyuzU9T/PnzddtUpP9mDlHmUIO1KGHSR1ndN1Z6CJs+qf95iXe9nsg/xXphS9HpWP1XlpUTMWvf1LyBquQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xn05qJ7v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9962BC19425;
+	Thu, 30 Apr 2026 02:10:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777515050;
+	bh=a1UzXaYYxk8eew7tH6jlILm+q1oKKsetaZ6dGSzp9sg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Xn05qJ7vAcgYPxLznWRllP4Mhyq1kDF7Bwq76iNCRnIwTxEhhorKD9zeprKj70fAD
+	 paCo8UCJ0Oo8pMqwjsDOjLMXqag/ybQLExsJndAhtwpZMUk1oycntHwFgqnhF3wGuR
+	 s5qatD6bdK5c6IgOBI+Q/vknFVJD2umKpBA2oXoZ8XIQ/SczibDddB8kc49GyMI7Wv
+	 DKvWvkd+IkS1F+spu3rGFeXqXUdJXYj7Tnele9vvNbrFrgVi70vWSSn/zM8SXLLiJO
+	 RbT3EYSLmPWG25VtpgvmgFDpE7LGxENmZ+t1uf7LABZ6+NR5lh8tblNDCdJw5qTby1
+	 4H4/G7Q0HPjTQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02E6B3809A33;
+	Thu, 30 Apr 2026 02:10:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260429080036.1528533-1-edumazet@google.com> <20260429094805.1aa6bf3c@kernel.org>
- <CANn89i+KuSf8PhAsf7a=h+tR1c8aLNdiM6NzaBU8tjpoLAfcQA@mail.gmail.com>
- <CANn89iJrvSvw2XKvB7LfXc2egeaqC+seiCiKN2USMw9gicqM1w@mail.gmail.com>
- <CADVnQyn-U-QgyT-HqeqZVX3FJi-UCgwfGJk2VaBBhjajKoih6g@mail.gmail.com> <20260429163338.423c75ee@kernel.org>
-In-Reply-To: <20260429163338.423c75ee@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 29 Apr 2026 19:09:27 -0700
-X-Gm-Features: AVHnY4IRKhJMPUlXE0pCq9f6lXQs2ElNzDA8giRancGW1vzSw-POqxhj8HQhraM
-Message-ID: <CANn89iJcxnh8nH9-Md-R6ZCNkVTSuc76NozkFf_dKBp1bBBesA@mail.gmail.com>
-Subject: Re: [PATCH net-next] selftests/net: packetdrill: add tcp_syncookies_ip6_9k
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Neal Cardwell <ncardwell@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: EE09649C371
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] bonding: 3ad: implement proper RCU rules for
+ port->aggregator
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177751500580.2264184.2818208802204710307.git-patchwork-notify@kernel.org>
+Date: Thu, 30 Apr 2026 02:10:05 +0000
+References: <20260428123207.3809211-1-edumazet@google.com>
+In-Reply-To: <20260428123207.3809211-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ syzbot+9bb2ff2a4ab9e17307e1@syzkaller.appspotmail.com, jv@jvosburgh.net,
+ andrew+netdev@lunn.ch
+X-Rspamd-Queue-Id: 03B5549C379
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,syzkaller.appspotmail.com,jvosburgh.net,lunn.ch];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-282598-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[google.com,davemloft.net,redhat.com,kernel.org,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-282597-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,9bb2ff2a4ab9e17307e1];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Wed, Apr 29, 2026 at 4:33=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Wed, 29 Apr 2026 16:47:14 -0400 Neal Cardwell wrote:
-> > > diff --git a/gtests/net/packetdrill/code.c b/gtests/net/packetdrill/c=
-ode.c
-> > > index d90bffabcfe6..6d8d20e64d8c 100644
-> > > --- a/gtests/net/packetdrill/code.c
-> > > +++ b/gtests/net/packetdrill/code.c
-> > > @@ -129,6 +129,7 @@ static void write_symbols(struct code_state *code=
-)
-> > >         emit_var(code, "TCPI_OPT_WSCALE",       TCPI_OPT_WSCALE);
-> > >         emit_var(code, "TCPI_OPT_ECN",          TCPI_OPT_ECN);
-> > >         emit_var(code, "TCPI_OPT_SYN_DATA",     TCPI_OPT_SYN_DATA);
-> > > +       emit_var(code, "TCPI_OPT_SACK", TCPI_OPT_SACK);
-> > >  #endif  /* linux */
-> > >  }
-> >
-> > Sure! Done. I added all the missing bit values in the following commit:
-> >
-> > https://github.com/google/packetdrill/commit/faa0dfb54065118625e169d311=
-1ce09c65b20229
-> >
-> > This can be picked up with the following, or similar:
-> >
-> >   git clone https://github.com/google/packetdrill.git
->
-> Updated in netdev CI.
+Hello:
 
-Excellent, thanks Neal and Jakub.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-I am sending a V2 right now, because I am OOO for the rest of the week.
+On Tue, 28 Apr 2026 12:32:07 +0000 you wrote:
+> syzbot found a data-race in bond_3ad_get_active_agg_info /
+> bond_3ad_state_machine_handler [1] which hints at lack of proper
+> RCU implementation.
+> 
+> Add __rcu qualifier to port->aggregator, and add proper RCU API.
+> 
+> [1]
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] bonding: 3ad: implement proper RCU rules for port->aggregator
+    https://git.kernel.org/netdev/net/c/c4f050ce06c5
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
