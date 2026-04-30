@@ -1,285 +1,335 @@
-Return-Path: <netdev+bounces-283008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283009-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eHepG3bf82kC8QEAu9opvQ
-	(envelope-from <netdev+bounces-283008-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 01:02:14 +0200
+	id iNjoAUri82mG8QEAu9opvQ
+	(envelope-from <netdev+bounces-283009-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 01:14:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C87DE4A8B0E
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 01:02:13 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03D974A8B8E
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 01:14:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2F4733005D22
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 23:02:12 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A91453006095
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 23:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4922389473;
-	Thu, 30 Apr 2026 23:02:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="MOnNKTW1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB7FE3A4F50;
+	Thu, 30 Apr 2026 23:14:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f225.google.com (mail-dy1-f225.google.com [74.125.82.225])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BB2A37F8C6
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 23:02:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFBFC3A3E94;
+	Thu, 30 Apr 2026 23:14:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777590131; cv=none; b=X1Pbzzn4DEu4YPptuZlXuW9GJUPhzIQVxKqJdL//Q75wo0Hn4qsWJvXcs30avoK83nW5CxIR+waKPl8jyn+bbQgU6hizATIw5NIcHLFomqO2mMVPQ5ldUGGYba366AmIUIfFIQDY2qJ3IsyiJpmH/eaOqnXkEqdFjKi08qwmRLw=
+	t=1777590852; cv=none; b=JnR3fz6Ncof52sOyTYdfjTwgLA1Yh/vnzONhb+7EB7uGj8qZz53RfAlBPxws3/bGbw86zSdaSSep1LC/TVP3SjQvCZLuN1EoCmIa48fbgCHTw2xR/+NIifF+eiQ1tsaH3gWgT9ncuePg9cbYSvtT+S2/3Q1SfIIw4rHyhl6oQ2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777590131; c=relaxed/simple;
-	bh=4/8lnxUTYpYRP6cjn7kFqKxNNGXeu+aLqyxkxxChz4k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=krUzFLD+ngRhpZDEd0XsX42idrX/vdImqSo15cA/++/d5zQ/Z9wWMCrlV6ibr1O2ViI0WMA5iXoKBl4+PQ60HgeXCdsgr9tBFAVtgh97/jyHnCh2kdcJ/6Zye4gQNck0TGNL74ZLDzySB5RL2MsXa+m3vQP1qomcqXxoG5PUG0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=MOnNKTW1; arc=none smtp.client-ip=74.125.82.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-dy1-f225.google.com with SMTP id 5a478bee46e88-2ba9c484e5eso1721807eec.1
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 16:02:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777590129; x=1778194929;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GJ81Pef+B3Dc5BnrdQj2nwCfvwT9t1jIFAWHa4CEN/k=;
-        b=rFKr5df0lbH9jnwke0YxnxAHHq2aAT7E1DfoZqm+Y49+r8y35gp60VK3l2OKlhIjPF
-         cYw12dh50400oL6AZIOMEkEsJ18aE1uJFUft04122ZQ4dyZY06zvNJSw3NxMJ0uSvX+y
-         4+bmeRZH5fqIaUfaOfmg9diXQIUnpjrJ2V29HEPLfj+fCaWxqOostE/id+drcv70X4jW
-         Tb1Fe3Jtry40+txgUF0mPZJKnwyZNsVcvsj2hhtJxzu9L4F+w8UnK2Kq90FuKRkv720O
-         VYPvfW4OD7b/y27IyOqZqJiRW6XBmR7pgxyz2NR+3V3Y6Xqfb9CfAykA1Q4BbVOPDU/6
-         7fLA==
-X-Gm-Message-State: AOJu0Yzu9OmTl2ZlQDg3EsDE2iNCqQunw91vDyay9pRfLiEsD1nVlJ2R
-	b9y8GSfwfu9IQAWRA1UK2PxsQDAbhPWsnB8Nn8SO9HYkRSf5Q09hMRFoZssXJicjzXUCa4j4jJE
-	Lwd2ZNvXaO6qZ68pC9Os0Xy2tlb4MGRYcjCXED8CqK0UY6DBW3RSKGolugaNwC43TxfdG3iGVJD
-	CAKujK0Oz5TdZu1Hyo8ldPZKtx2H7ytPeJFGm1OABDWq6B7aW+c1b324TZP6UfrvEOdwc52f0aO
-	nZ7ZzcpPA==
-X-Gm-Gg: AeBDiesi0/kQJAa0aihVfG7tIPANLCobgEb/twAfciGqVQ00QrW0S5wF55Md/i8dqO8
-	1owNz5sh3TZ+MpFHi//oOqmM/Qbmy7vNrZIYU3j2tw/P4rW2nAkiI/S4l3Ql5VblJZpidbIOvuP
-	3iG8dcWTd2MEcP2T3fADUwjlM9jD6gapjabHYaMz57EFwGr6C6XEx6EHcZUXdVLgvkugWRdI+94
-	si8ig9un7A2/HURVsTWHxr9LrIHMxWJS+uiYzTLWtwCbbcBbIMtH0HVjfVg/Xxo4LlfigjGv5ef
-	VKfrnUDf7+13bSpSw7MQ9VtFuuodqFzLUrBQnVuJ+tKBaUOxVTLAhKv6kNyxsbCHdweCXXWiVcs
-	5v7GkAYbbqIp1h+Zerb/4tvaZ/iVWy1uJCrLAC6EUVByZuSRRPYfakhWln5z9M2+fL3jcCjLJvH
-	G3I2ZjF6MH83ws9p6xjhFCGpsDT5G0qHxPkVaVQd5VH2jbe+8UD2fMWAeW65CE1X3Pog==
-X-Received: by 2002:a05:7300:220e:b0:2c9:ee15:a0d6 with SMTP id 5a478bee46e88-2ed3fd62fabmr2671506eec.29.1777590128778;
-        Thu, 30 Apr 2026 16:02:08 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-21.dlp.protect.broadcom.com. [144.49.247.21])
-        by smtp-relay.gmail.com with ESMTPS id 5a478bee46e88-2ee39fec315sm110403eec.9.2026.04.30.16.02.08
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 30 Apr 2026 16:02:08 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dy1-f197.google.com with SMTP id 5a478bee46e88-2ee34588671so729784eec.0
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 16:02:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1777590127; x=1778194927; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GJ81Pef+B3Dc5BnrdQj2nwCfvwT9t1jIFAWHa4CEN/k=;
-        b=MOnNKTW1ePouS4yF2GbL5R6kxqkIiFZzjwWPm3oBF3DwsMhx4JCy+6lrlZvr9xtlOw
-         XnW+WjZSg2/GNZD81Oahd9W53dvZhv2bWaxB5eliMfgTk4Y9YwYiCQEOyNxRi4k7Ku09
-         DYoPV6d7mWIWp2iPub9d+3UVim6laOfaawkPo=
-X-Received: by 2002:a05:7301:6009:b0:2ed:e14:42e5 with SMTP id 5a478bee46e88-2ed3fd663c9mr2066845eec.30.1777590126728;
-        Thu, 30 Apr 2026 16:02:06 -0700 (PDT)
-X-Received: by 2002:a05:7301:6009:b0:2ed:e14:42e5 with SMTP id 5a478bee46e88-2ed3fd663c9mr2066819eec.30.1777590125615;
-        Thu, 30 Apr 2026 16:02:05 -0700 (PDT)
-Received: from [10.14.6.173] ([192.19.161.248])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ee3bb60811sm2004491eec.24.2026.04.30.16.02.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Apr 2026 16:02:04 -0700 (PDT)
-Message-ID: <e13eb2f3-ed6e-4e2d-8f01-f108afa4f4df@broadcom.com>
-Date: Thu, 30 Apr 2026 16:02:03 -0700
+	s=arc-20240116; t=1777590852; c=relaxed/simple;
+	bh=mXgJkxdYWuWcTEBIxA69SPNWmjAuQ/JVaW1SrK+sZKM=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=iDT0FLqeBaba7sumCJ/ahEHkf5cxMXf/R7AW5Er/jZbOATzZvR+Fl/YpMCVpXKO10NYuBHu4Q33hW6IqSVE4voWfpR9q9H1GUTdg6bnDutJxPc9BtNLDtPa3mJcNLPI6yXXW3i7pAt3KSq0Nh468zn4SLB1pbz5xyzaVHG15S7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1wIaZo-000000000SO-2uXZ;
+	Thu, 30 Apr 2026 23:13:48 +0000
+Date: Fri, 1 May 2026 00:13:45 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: "Chester A. Unal" <chester.a.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Christian Marangi <ansuelsmth@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH net v5] net: dsa: mt7530: fix .get_stats64 sleeping in atomic
+ context
+Message-ID: <4086098f5333d48221f83fa775607330836336d7.1777590741.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net: bcmasp: Keep PHY link during WoL sleep
- cycle
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, bcm-kernel-feedback-list@broadcom.com,
- pabeni@redhat.com, edumazet@google.com, davem@davemloft.net,
- andrew+netdev@lunn.ch, florian.fainelli@broadcom.com
-References: <20260428220858.2076469-3-justin.chen@broadcom.com>
- <20260429232030.2187222-1-kuba@kernel.org>
-Content-Language: en-US
-From: Justin Chen <justin.chen@broadcom.com>
-In-Reply-To: <20260429232030.2187222-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-X-Rspamd-Queue-Id: C87DE4A8B0E
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Rspamd-Queue-Id: 03D974A8B8E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	TAGGED_FROM(0.00)[bounces-283009-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[makrotopia.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[arinc9.com,makrotopia.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,collabora.com,armlinux.org.uk,vger.kernel.org,lists.infradead.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283008-lists,netdev=lfdr.de];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justin.chen@broadcom.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[makrotopia.org:mid,makrotopia.org:email,arinc9.com:email,lunn.ch:email]
 
+The .get_stats64 callback runs in atomic context, but on
+MDIO-connected switches every register read acquires the MDIO bus
+mutex, which can sleep:
+[   12.645973] BUG: sleeping function called from invalid context at kernel/locking/mutex.c:609
+[   12.654442] in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 759, name: grep
+[   12.663377] preempt_count: 0, expected: 0
+[   12.667410] RCU nest depth: 1, expected: 0
+[   12.671511] INFO: lockdep is turned off.
+[   12.675441] CPU: 0 UID: 0 PID: 759 Comm: grep Tainted: G S      W           7.0.0+ #0 PREEMPT
+[   12.675453] Tainted: [S]=CPU_OUT_OF_SPEC, [W]=WARN
+[   12.675456] Hardware name: Bananapi BPI-R64 (DT)
+[   12.675459] Call trace:
+[   12.675462]  show_stack+0x14/0x1c (C)
+[   12.675477]  dump_stack_lvl+0x68/0x8c
+[   12.675487]  dump_stack+0x14/0x1c
+[   12.675495]  __might_resched+0x14c/0x220
+[   12.675504]  __might_sleep+0x44/0x80
+[   12.675511]  __mutex_lock+0x50/0xb10
+[   12.675523]  mutex_lock_nested+0x20/0x30
+[   12.675532]  mt7530_get_stats64+0x40/0x2ac
+[   12.675542]  dsa_user_get_stats64+0x2c/0x40
+[   12.675553]  dev_get_stats+0x44/0x1e0
+[   12.675564]  dev_seq_printf_stats+0x24/0xe0
+[   12.675575]  dev_seq_show+0x14/0x3c
+[   12.675583]  seq_read_iter+0x37c/0x480
+[   12.675595]  seq_read+0xd0/0xec
+[   12.675605]  proc_reg_read+0x94/0xe4
+[   12.675615]  vfs_read+0x98/0x29c
+[   12.675625]  ksys_read+0x54/0xdc
+[   12.675633]  __arm64_sys_read+0x18/0x20
+[   12.675642]  invoke_syscall.constprop.0+0x54/0xec
+[   12.675653]  do_el0_svc+0x3c/0xb4
+[   12.675662]  el0_svc+0x38/0x200
+[   12.675670]  el0t_64_sync_handler+0x98/0xdc
+[   12.675679]  el0t_64_sync+0x158/0x15c
 
+For MDIO-connected switches, poll MIB counters asynchronously using a
+delayed workqueue every second and let .get_stats64 return the cached
+values under a spinlock. A mod_delayed_work() call on each read
+triggers an immediate refresh so counters stay responsive when queried
+more frequently.
 
-On 4/29/26 4:20 PM, Jakub Kicinski wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email says "Blindly sending out since there will be a repost,
-> anyway."
-> ---
-> net: bcmasp: Keep PHY link during WoL sleep cycle
-> 
-> We currently more or less restart all the HW on resume. Since we also
-> stop the PHY, it takes a while for the PHY link to be re-negotiated on
-> resume. Instead of doing a full restart, we keep the HW state and the
-> PHY link, that way we can resume network traffic with a much smaller
-> delay.
-> 
->> diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
->> index aff0a6d84126..bab2a4f82e4e 100644
->> --- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
->> +++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-> [ ... ]
->> @@ -1383,15 +1384,20 @@ int bcmasp_interface_suspend(struct bcmasp_intf *intf)
->>   {
->>   	struct device *kdev = &intf->parent->pdev->dev;
->>   	struct net_device *dev = intf->ndev;
->> +	bool wake;
->>   
->>   	if (!netif_running(dev))
->>   		return 0;
->>   
->>   	netif_device_detach(dev);
->>   
->> -	bcmasp_netif_deinit(dev);
->> +	wake = device_may_wakeup(kdev) && intf->wolopts;
->>   
->> -	if (!intf->wolopts) {
->> +	bcmasp_netif_deinit(dev, !wake);
->> +
->> +	if (wake) {
->> +		bcmasp_suspend_to_wol(intf);
->> +	} else {
->>   		bcmasp_phy_hw_unprepare(intf);
->>   
->>   		/* If Wake-on-LAN is disabled, we can safely
->> @@ -1400,9 +1406,6 @@ int bcmasp_interface_suspend(struct bcmasp_intf *intf)
->>   		bcmasp_core_clock_set_intf(intf, false);
->>   	}
->>   
->> -	if (device_may_wakeup(kdev) && intf->wolopts)
->> -		bcmasp_suspend_to_wol(intf);
->> -
->>   	clk_disable_unprepare(intf->parent->clk);
-> 
-> If wake is true, phy_stop() is skipped during bcmasp_netif_deinit().
-> This leaves the phylib state machine active and polling on its delayed
-> workqueue.
-> 
-> At the end of bcmasp_interface_suspend(), the main MAC clock is
-> unconditionally disabled via clk_disable_unprepare(intf->parent->clk).
-> 
-> If the PHY state machine executes while this clock is disabled, will it
-> attempt to access PHY registers over the MDIO bus, resulting in a
-> synchronous external abort (bus fault) or kernel panic?
-> 
-> Could the active state machine also concurrently invoke the MAC's
-> adjust_link callback while bcmasp_interface_resume() is executing,
-> causing a data race on MAC registers?
-> 
+MMIO-connected switches (MT7988, EN7581, AN7583) are not affected
+because their regmap does not sleep, so they continue to read MIB
+counters directly in .get_stats64.
 
-Just tested this. Added an infinite loop after we call 
-clk_disable_unprepare() and don't see the state machine running, so I 
-think we are good here.
+Fixes: 88c810f35ed5 ("net: dsa: mt7530: implement .get_stats64")
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Acked-by: Chester A. Unal <chester.a.unal@arinc9.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+---
+v5:
+ * spin_lock_init() and INIT_DELAYED_WORK() in probe()
+ * drop teardown as cancel_delayed_work_sync() in remove() is
+   sufficient and now symmetric with init happening in probe()
 
->>   	return 0;
->>   }
->> @@ -1426,8 +1429,11 @@ static void bcmasp_resume_from_wol(struct bcmasp_intf *intf)
->>   
->>   int bcmasp_interface_resume(struct bcmasp_intf *intf)
->>   {
-> [ ... ]
->> +	/* The interface might be HW reset in some suspend modes, so we may
->> +	 * need to restore the UNIMAC/PHY if that is the case.
->> +	 */
->> +	reg = umac_rl(intf, UMC_CMD);
->> +	if (wake && (reg & UMC_CMD_RX_EN)) {
->> +		umac_enable_set(intf, UMC_CMD_TX_EN, 1);
->> +		bcmasp_resume_from_wol(intf);
->> +	} else {
->> +		bcmasp_phy_hw_prepare(intf);
->> +		umac_reset_and_init(intf, dev->dev_addr);
->> +	}
-> 
-> If wake is true but the MAC hardware was reset (reg & UMC_CMD_RX_EN
-> is false), the code branches to the else block and skips calling
-> bcmasp_resume_from_wol().
-> 
-> Since bcmasp_resume_from_wol() is responsible for reversing the WoL
-> configuration applied during suspend (like restoring the EEE fixup state
-> and masking the wakeup interrupt), does skipping this teardown leave the
-> wakeup interrupt unmasked during normal operation and risk an interrupt
-> storm?
-> 
+v4:
+ * extract mt7530_stats_refresh() helper from mt7530_stats_poll()
+   -> mt7530_stats_poll() now just refreshes and re-arms
+ * call helper synchronously in mt753x_setup() to seed the cache
+ * avoid zeroed counters during the first poll interval
+ * avoid INITIAL_JIFFIES vs stats_last==0 wraparound on 32-bit
+ * swap deprecated system_wq for system_percpu_wq in get_stats64
+ * keeps on-demand refresh on the same queue as schedule_*_work
 
-In the case that the MAC hardware is reset, there is no WoL 
-configuration to reverse since it was HW reset. Interrupts are also 
-reset, so the HW default of everything being masked means this isn't an 
-issue.
+v3:
+ * move `stats_last` access under the spinlock to avoid potential race
 
->>   	bcmasp_netif_init(dev);
->>   
->> -	phy_start(dev->phydev);
->> +	/* If HW was reset, we need to force a link re-negotiation */
->> +	if (wake && !(reg & UMC_CMD_RX_EN)) {
->> +		phy_restart_aneg(dev->phydev);
-> 
-> If the user has explicitly configured forced speed and duplex with
-> autonegotiation disabled, will this unconditional call to
-> phy_restart_aneg() override the user's configuration? It appears to
-> enable autonegotiation without checking if phydev->autoneg ==
-> AUTONEG_ENABLE.
-> 
-> Also, because phy_stop() was skipped during suspend, the PHY state
-> machine is still actively running in the background. Does calling
-> phy_restart_aneg() without holding phydev->lock create a data race
-> with the concurrent PHY state machine?
-> 
+v2:
+ * use spin_lock_bh()/spin_unlock_bh() to prevent potential deadlock
+ * rate-limit mod_delayed_work() refresh to at most once per 100ms
+ * move cancel_delayed_work_sync() after dsa_unregister_switch()
+ * add mt753x_teardown() callback to cancel the stats work
+ * fix commit message
+---
+ drivers/net/dsa/mt7530.c | 68 ++++++++++++++++++++++++++++++++++++++--
+ drivers/net/dsa/mt7530.h |  8 +++++
+ 2 files changed, 73 insertions(+), 3 deletions(-)
 
-Will fix. I think need to just put the phy state back to PHY_UP state 
-and have the state machine take care of relinking whatever the 
-configuration is set at.
-
-Justin
-
->> +		phy_trigger_machine(dev->phydev);
->> +	} else if (!wake) {
->> +		phy_start(dev->phydev);
->> +	}
->>   
->>   	netif_device_attach(dev);
-
+diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+index b9423389c2ef..e769914d726c 100644
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -25,6 +25,9 @@
+ 
+ #include "mt7530.h"
+ 
++#define MT7530_STATS_POLL_INTERVAL	(1 * HZ)
++#define MT7530_STATS_RATE_LIMIT		(HZ / 10)
++
+ static struct mt753x_pcs *pcs_to_mt753x_pcs(struct phylink_pcs *pcs)
+ {
+ 	return container_of(pcs, struct mt753x_pcs, pcs);
+@@ -906,10 +909,9 @@ static void mt7530_get_rmon_stats(struct dsa_switch *ds, int port,
+ 	*ranges = mt7530_rmon_ranges;
+ }
+ 
+-static void mt7530_get_stats64(struct dsa_switch *ds, int port,
+-			       struct rtnl_link_stats64 *storage)
++static void mt7530_read_port_stats64(struct mt7530_priv *priv, int port,
++				     struct rtnl_link_stats64 *storage)
+ {
+-	struct mt7530_priv *priv = ds->priv;
+ 	uint64_t data;
+ 
+ 	/* MIB counter doesn't provide a FramesTransmittedOK but instead
+@@ -951,6 +953,54 @@ static void mt7530_get_stats64(struct dsa_switch *ds, int port,
+ 			       &storage->rx_crc_errors);
+ }
+ 
++static void mt7530_stats_refresh(struct mt7530_priv *priv)
++{
++	struct rtnl_link_stats64 stats = {};
++	struct dsa_port *dp;
++	int port;
++
++	dsa_switch_for_each_user_port(dp, priv->ds) {
++		port = dp->index;
++
++		mt7530_read_port_stats64(priv, port, &stats);
++
++		spin_lock_bh(&priv->stats_lock);
++		priv->ports[port].stats = stats;
++		priv->stats_last = jiffies;
++		spin_unlock_bh(&priv->stats_lock);
++	}
++}
++
++static void mt7530_stats_poll(struct work_struct *work)
++{
++	struct mt7530_priv *priv = container_of(work, struct mt7530_priv,
++						stats_work.work);
++
++	mt7530_stats_refresh(priv);
++	schedule_delayed_work(&priv->stats_work,
++			      MT7530_STATS_POLL_INTERVAL);
++}
++
++static void mt7530_get_stats64(struct dsa_switch *ds, int port,
++			       struct rtnl_link_stats64 *storage)
++{
++	struct mt7530_priv *priv = ds->priv;
++	bool refresh;
++
++	if (priv->bus) {
++		spin_lock_bh(&priv->stats_lock);
++		*storage = priv->ports[port].stats;
++		refresh = time_after(jiffies, priv->stats_last +
++					      MT7530_STATS_RATE_LIMIT);
++		spin_unlock_bh(&priv->stats_lock);
++		if (refresh)
++			mod_delayed_work(system_percpu_wq,
++					 &priv->stats_work, 0);
++	} else {
++		mt7530_read_port_stats64(priv, port, storage);
++	}
++}
++
+ static void mt7530_get_eth_ctrl_stats(struct dsa_switch *ds, int port,
+ 				      struct ethtool_eth_ctrl_stats *ctrl_stats)
+ {
+@@ -3137,6 +3187,12 @@ mt753x_setup(struct dsa_switch *ds)
+ 	if (ret && priv->irq_domain)
+ 		mt7530_free_mdio_irq(priv);
+ 
++	if (!ret && priv->bus) {
++		mt7530_stats_refresh(priv);
++		schedule_delayed_work(&priv->stats_work,
++				      MT7530_STATS_POLL_INTERVAL);
++	}
++
+ 	return ret;
+ }
+ 
+@@ -3395,6 +3451,9 @@ mt7530_probe_common(struct mt7530_priv *priv)
+ 	priv->ds->ops = &mt7530_switch_ops;
+ 	priv->ds->phylink_mac_ops = &mt753x_phylink_mac_ops;
+ 	mutex_init(&priv->reg_mutex);
++	spin_lock_init(&priv->stats_lock);
++	INIT_DELAYED_WORK(&priv->stats_work, mt7530_stats_poll);
++
+ 	dev_set_drvdata(dev, priv);
+ 
+ 	return 0;
+@@ -3409,6 +3468,9 @@ mt7530_remove_common(struct mt7530_priv *priv)
+ 
+ 	dsa_unregister_switch(priv->ds);
+ 
++	if (priv->bus)
++		cancel_delayed_work_sync(&priv->stats_work);
++
+ 	mutex_destroy(&priv->reg_mutex);
+ }
+ EXPORT_SYMBOL_GPL(mt7530_remove_common);
+diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
+index 3e0090bed298..dd33b0df3419 100644
+--- a/drivers/net/dsa/mt7530.h
++++ b/drivers/net/dsa/mt7530.h
+@@ -796,6 +796,7 @@ struct mt7530_fdb {
+  * @pvid:	The VLAN specified is to be considered a PVID at ingress.  Any
+  *		untagged frames will be assigned to the related VLAN.
+  * @sgmii_pcs:	Pointer to PCS instance for SerDes ports
++ * @stats:	Cached port statistics for MDIO-connected switches
+  */
+ struct mt7530_port {
+ 	bool enable;
+@@ -803,6 +804,7 @@ struct mt7530_port {
+ 	u32 pm;
+ 	u16 pvid;
+ 	struct phylink_pcs *sgmii_pcs;
++	struct rtnl_link_stats64 stats;
+ };
+ 
+ /* Port 5 mode definitions of the MT7530 switch */
+@@ -875,6 +877,9 @@ struct mt753x_info {
+  * @create_sgmii:	Pointer to function creating SGMII PCS instance(s)
+  * @active_cpu_ports:	Holding the active CPU ports
+  * @mdiodev:		The pointer to the MDIO device structure
++ * @stats_lock:		Protects cached per-port stats from concurrent access
++ * @stats_work:		Delayed work for polling MIB counters on MDIO switches
++ * @stats_last:		Jiffies timestamp of last MIB counter poll
+  */
+ struct mt7530_priv {
+ 	struct device		*dev;
+@@ -900,6 +905,9 @@ struct mt7530_priv {
+ 	int (*create_sgmii)(struct mt7530_priv *priv);
+ 	u8 active_cpu_ports;
+ 	struct mdio_device *mdiodev;
++	spinlock_t stats_lock; /* protects cached stats counters */
++	struct delayed_work stats_work;
++	unsigned long stats_last;
+ };
+ 
+ struct mt7530_hw_vlan_entry {
+-- 
+2.54.0
 
