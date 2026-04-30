@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-282641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282642-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oOA9MpLN8mnOuQEAu9opvQ
-	(envelope-from <netdev+bounces-282641-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 05:33:38 +0200
+	id CGGnAy3N8mmWuQEAu9opvQ
+	(envelope-from <netdev+bounces-282642-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 05:31:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B71A49CF5D
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 05:33:38 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FA8449CEC4
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 05:31:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 105F030AC8D6
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:28:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0CA39303FA7C
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:29:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7A4837FF5F;
-	Thu, 30 Apr 2026 03:26:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A0FF35C1AE;
+	Thu, 30 Apr 2026 03:26:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="maB0P+UK"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="ADVhxAvA"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com [34.218.115.239])
+Received: from pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com [50.112.246.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8A33537EE;
-	Thu, 30 Apr 2026 03:26:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.218.115.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6FFE384236;
+	Thu, 30 Apr 2026 03:26:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=50.112.246.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777519577; cv=none; b=Y+Z5H3lgL877jcFGKq7hBbOA4FIk3XxBdMOADhJcpxqphbQHLU2kW0YXf1ePPKEnDCfNQ4azyCWGRsTyN0l//pufLZjbfx9ILTjXclPreEJZQFTYfbpuD3DVjN6dfYEZWT/jE6Q8m9O7z3CmVdOD8LqERVLmDkzk3D8RNZjQNp0=
+	t=1777519587; cv=none; b=u5aibOqx8Th1AMH5w2sNm4F7OTnFALY0AzOlpZ/L08WIhlbIdQnYyjY5P+Brlh4zKULOiBaQa0XOU9Xc4dnrs3ReutXeJlVy/hTeS/S8YJHasNui/+HbySmrRYIijRdS5JQgNJ8CwlD9DU0Tz5Loa0BW4oRrzW5NJk9zc3K63kQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777519577; c=relaxed/simple;
-	bh=40+iOzLXD3tWyS1IPfiti2phBhJXYA6klN23tZGxVcs=;
+	s=arc-20240116; t=1777519587; c=relaxed/simple;
+	bh=3TGtOzPn0RxyO/+/FxJXgX91uECyg93GeYIjrF2UsQs=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SR4drMx1c9fkJ2i5+Xob2g5PP4L79HLMuE5/HNhjxR6JiXbR6TBweB1S5SJt54d9xTPzTFaCUdcMl9xH+LDso+QPEsqOTX1bg5tB030lE8gEPC/PdQ4xlJngGoq5C33noxYXiskrTpDexkem69fyZjCnniS7qnQEGZ5aSccksFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=maB0P+UK; arc=none smtp.client-ip=34.218.115.239
+	 MIME-Version:Content-Type; b=LZt2HolmeEfmUzi+2/C+xc8gri7UJs76GTG+iodExKTWpsUFLl1SibzPqqeLqdsTYvosJbhvC2TKeaJmofjTYWS+spggDGY+ODTHevxYcG4ZL4MwJ8Txrxs1tNBai5JkIwSEylInEvJmE2y+7xSgSlQu+Emk8zS/1lhu0qx0l5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=ADVhxAvA; arc=none smtp.client-ip=50.112.246.219
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1777519576; x=1809055576;
+  t=1777519586; x=1809055586;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=OdQObmpWdMS62HawkPR43Dq1LTkIjudiZH+uNt0BEZ4=;
-  b=maB0P+UKvKNz7470FZ/yqtLEo+ZA+OoIfRQiZg73ohQyKzW/sA34W4vH
-   fZndhG2IXykBfde40skqmd7QB51p3+94oo/dq1XkHM73EWWqOCb8hKS+A
-   IFUQonDr5SLy2V5pJBzyxD4W+pqBeiMrjANd2yW9/9pVBgi/PvoRSKfbK
-   XXPjnyHe6dZXYZuPS/9db0mLKDOPuPTKwKmWmKcFJ1Hb4DOdmy4V7Om6p
-   8+07eXFt2KgJ7uhJhxYKtMWlpvq/1Ib8py8KpYiQiuEiR1mEZkaGRrzzN
-   VqA4eTZ3qGdCrGUJQj/nLERB7SC5GUuXDtgK/dEzpealCvtcrE99OLkh2
-   Q==;
-X-CSE-ConnectionGUID: VhRLu7vkRd2lwJnMLvZHiA==
-X-CSE-MsgGUID: E97I0dVBSRyqr+2NuotVNA==
+  bh=QxX1R+bJTeGdHHpMlgT86lyJMRpGzOjKsh3iX3iumeM=;
+  b=ADVhxAvASkD9FNKLXwh8MrgkFZB1rbCNXPlbBXqPanY3m5znMOUjcxx8
+   YowWFJa92XG28Rdh3rkBbapeRviN7rfR/7hWHBfQujHmWGqzCUG83iP6w
+   NbqowRLSWrkSgUhMG8Wm4rXsc9EDVv+Vx1vidVIrSjUbRlKOyXOwcySD6
+   45pClqmB7opNBDiZPBPUBfvVecoyN6IvygZzsKc/zEsiEn3e7B5C8QjMI
+   GvTxz7hq5pTGNwgFDyVED90VjvM3Ss1T68sIW6tbKJ1+yR8fRaKAhiX/Y
+   8JszTigjaoR7dlePwl0IVZ84W4sXw1DpvJQEuZniONCBi7xs3wUmge4EX
+   A==;
+X-CSE-ConnectionGUID: yFmCUc1HTY+Eqn4RI3zs+g==
+X-CSE-MsgGUID: xT9VL42uTw+xyniHY3Lk8Q==
 X-IronPort-AV: E=Sophos;i="6.23,207,1770595200"; 
-   d="scan'208";a="18324232"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2026 03:26:12 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [205.251.233.236:22372]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.50.165:2525] with esmtp (Farcaster)
- id af88eeab-5b82-4eda-ba23-69b8a9d94cff; Thu, 30 Apr 2026 03:26:12 +0000 (UTC)
-X-Farcaster-Flow-ID: af88eeab-5b82-4eda-ba23-69b8a9d94cff
+   d="scan'208";a="18347843"
+Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
+  by internal-pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2026 03:26:23 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [205.251.233.105:26826]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.4.227:2525] with esmtp (Farcaster)
+ id 26dea6bb-e7d0-4d1d-aa44-5e464c24cba3; Thu, 30 Apr 2026 03:26:23 +0000 (UTC)
+X-Farcaster-Flow-ID: 26dea6bb-e7d0-4d1d-aa44-5e464c24cba3
 Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Thu, 30 Apr 2026 03:26:08 +0000
+ Thu, 30 Apr 2026 03:26:23 +0000
 Received: from dev-dsk-akiyano-1c-2138b29d.eu-west-1.amazon.com (172.19.83.6)
  by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Thu, 30 Apr 2026 03:26:03 +0000
+ Thu, 30 Apr 2026 03:26:18 +0000
 From: Arthur Kiyanovski <akiyano@amazon.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	<netdev@vger.kernel.org>
@@ -84,9 +84,9 @@ CC: Arthur Kiyanovski <akiyano@amazon.com>, Richard Cochran
 	<ofirt@amazon.com>, Amit Bernstein <amitbern@amazon.com>,
 	<linux-kselftest@vger.kernel.org>, <shuah@kernel.org>,
 	<vadim.fedorenko@linux.dev>
-Subject: [PATCH v2 net-next 7/8] net: ena: Add error bound to PHC communication layer
-Date: Thu, 30 Apr 2026 03:25:04 +0000
-Message-ID: <20260430032507.11586-8-akiyano@amazon.com>
+Subject: [PATCH v2 net-next 8/8] net: ena: Implement gettimexattrs64 callback for PTP attributes
+Date: Thu, 30 Apr 2026 03:25:05 +0000
+Message-ID: <20260430032507.11586-9-akiyano@amazon.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260430032507.11586-1-akiyano@amazon.com>
 References: <20260430032507.11586-1-akiyano@amazon.com>
@@ -98,9 +98,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWC003.ant.amazon.com (10.13.139.252) To
+X-ClientProxiedBy: EX19D040UWB002.ant.amazon.com (10.13.138.89) To
  EX19D001UWA001.ant.amazon.com (10.13.138.214)
-X-Rspamd-Queue-Id: 7B71A49CF5D
+X-Rspamd-Queue-Id: 9FA8449CEC4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-6.16 / 15.00];
@@ -110,218 +110,121 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[amazon.com,gmail.com,google.com,redhat.com,infradead.org,linutronix.de,lunn.ch,linux.alibaba.com,vger.kernel.org,kernel.org,linux.dev];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282641-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-282642-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[33];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[akiyano@amazon.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[amazon.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
+	NEURAL_HAM(-0.00)[-0.998];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[7]
 
-Extend the ENA PHC communication layer to retrieve error bound from
-the device.
+Implement the gettimexattrs64 callback in the ENA driver to support
+the PTP_SYS_OFFSET_EXTENDED_ATTRS ioctl.
 
-Update ena_com_phc_get_timestamp() to retrieve error_bound alongside
-timestamps.
-Add error handling and statistics for error_bound retrieval failures.
+This enables applications to retrieve PHC timestamps with quality
+attributes through the standard PTP ioctl interface.
+
+The ENA device currently reports only error_bound.
+clock_status and timescale attributes are set to default values.
 
 Signed-off-by: Amit Bernstein <amitbern@amazon.com>
 Signed-off-by: Arthur Kiyanovski <akiyano@amazon.com>
 ---
- .../device_drivers/ethernet/amazon/ena.rst    |  2 ++
- drivers/net/ethernet/amazon/ena/ena_com.c     | 36 ++++++++++++-------
- drivers/net/ethernet/amazon/ena/ena_com.h     |  5 ++-
- drivers/net/ethernet/amazon/ena/ena_debugfs.c |  3 ++
- drivers/net/ethernet/amazon/ena/ena_phc.c     |  3 +-
- 5 files changed, 34 insertions(+), 15 deletions(-)
+ drivers/net/ethernet/amazon/ena/ena_phc.c | 59 +++++++++++++++++++----
+ 1 file changed, 49 insertions(+), 10 deletions(-)
 
-diff --git a/Documentation/networking/device_drivers/ethernet/amazon/ena.rst b/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
-index 14784a0..ce9ba84 100644
---- a/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
-+++ b/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
-@@ -306,6 +306,8 @@ PHC errors must remain below 1% of all PHC requests to maintain the desired leve
- **phc_err_dv**      | Number of failed get time attempts due to device errors (entering into block state).
- **phc_err_ts**      | Number of failed get time attempts due to timestamp errors (entering into block state),
-                     | This occurs if driver exceeded the request limit or device received an invalid timestamp.
-+**phc_err_eb**      | Number of failed get time attempts due to error bound errors (entering into block state),
-+                    | This occurs if device received an excessively high or invalid error bound.
- =================   ======================================================
- 
- PHC timeouts:
-diff --git a/drivers/net/ethernet/amazon/ena/ena_com.c b/drivers/net/ethernet/amazon/ena/ena_com.c
-index 1549d6e..981e8e4 100644
---- a/drivers/net/ethernet/amazon/ena/ena_com.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_com.c
-@@ -45,7 +45,8 @@
- #define ENA_PHC_DEFAULT_EXPIRE_TIMEOUT_USEC 10
- #define ENA_PHC_DEFAULT_BLOCK_TIMEOUT_USEC 1000
- #define ENA_PHC_REQ_ID_OFFSET 0xDEAD
--#define ENA_PHC_ERROR_FLAGS (ENA_ADMIN_PHC_ERROR_FLAG_TIMESTAMP)
-+#define ENA_PHC_ERROR_FLAGS (ENA_ADMIN_PHC_ERROR_FLAG_TIMESTAMP | \
-+			     ENA_ADMIN_PHC_ERROR_FLAG_ERROR_BOUND)
- 
- /*****************************************************************************/
- /*****************************************************************************/
-@@ -1726,7 +1727,7 @@ int ena_com_phc_config(struct ena_com_dev *ena_dev)
- 	if (phc->expire_timeout_usec > phc->block_timeout_usec)
- 		phc->expire_timeout_usec = phc->block_timeout_usec;
- 
--	/* Prepare PHC feature command */
-+	/* Prepare PHC config feature command */
- 	memset(&set_feat_cmd, 0x0, sizeof(set_feat_cmd));
- 	set_feat_cmd.aq_common_descriptor.opcode = ENA_ADMIN_SET_FEATURE;
- 	set_feat_cmd.feat_common.feature_id = ENA_ADMIN_PHC_CONFIG;
-@@ -1781,7 +1782,8 @@ void ena_com_phc_destroy(struct ena_com_dev *ena_dev)
- 	phc->virt_addr = NULL;
- }
- 
--int ena_com_phc_get_timestamp(struct ena_com_dev *ena_dev, u64 *timestamp)
-+int ena_com_phc_get_timestamp(struct ena_com_dev *ena_dev, u64 *timestamp,
-+			      u32 *error_bound)
- {
- 	volatile struct ena_admin_phc_resp *resp = ena_dev->phc.virt_addr;
- 	const ktime_t zero_system_time = ktime_set(0, 0);
-@@ -1825,6 +1827,8 @@ int ena_com_phc_get_timestamp(struct ena_com_dev *ena_dev, u64 *timestamp)
- 			 * a PHC error, this occurs if device:
- 			 * - exceeded the get time request limit
- 			 * - received an invalid timestamp
-+			 * - received an excessively high error bound
-+			 * - received an invalid error bound
- 			 */
- 			netdev_err(ena_dev->net_device,
- 				   "PHC get time request 0x%x failed (error 0x%x)\n",
-@@ -1832,9 +1836,11 @@ int ena_com_phc_get_timestamp(struct ena_com_dev *ena_dev, u64 *timestamp)
- 				   resp->error_flags);
- 			phc->stats.phc_err_ts += !!(resp->error_flags &
- 				ENA_ADMIN_PHC_ERROR_FLAG_TIMESTAMP);
-+			phc->stats.phc_err_eb += !!(resp->error_flags &
-+				ENA_ADMIN_PHC_ERROR_FLAG_ERROR_BOUND);
- 		} else {
- 			/* Device updated req_id during blocking time
--			 * with valid timestamp
-+			 * with valid timestamp and error bound
- 			 */
- 			phc->stats.phc_exp++;
- 		}
-@@ -1861,9 +1867,9 @@ int ena_com_phc_get_timestamp(struct ena_com_dev *ena_dev, u64 *timestamp)
- 	/* Stalling until the device updates req_id */
- 	while (1) {
- 		if (unlikely(ktime_after(ktime_get(), expire_time))) {
--			/* Gave up waiting for updated req_id, PHC enters into
--			 * blocked state until passing blocking time,
--			 * during this time any get PHC timestamp will fail with
-+			/* Gave up waiting for updated req_id,
-+			 * PHC enters into blocked state until passing blocking
-+			 * time, during this time, any request will fail with
- 			 * device busy error
- 			 */
- 			ret = -EBUSY;
-@@ -1879,14 +1885,15 @@ int ena_com_phc_get_timestamp(struct ena_com_dev *ena_dev, u64 *timestamp)
- 		}
- 
- 		/* req_id was updated by the device which indicates that
--		 * PHC timestamp and error_flags are updated too,
--		 * checking errors before retrieving timestamp
-+		 * PHC timestamp, error_bound and error_flags are updated too,
-+		 * checking error flags before retrieving timestamp and
-+		 * error_bound values
- 		 */
- 		if (unlikely(resp->error_flags & ENA_PHC_ERROR_FLAGS)) {
--			/* Retrieved invalid PHC timestamp, PHC enters into
--			 * blocked state until passing blocking time,
--			 * during this time any get PHC timestamp requests
--			 * will fail with device busy error
-+			/* Retrieved timestamp or error bound errors,
-+			 * PHC enters into blocked state until passing blocking
-+			 * time, during this time, any request will fail with
-+			 * device busy error
- 			 */
- 			ret = -EBUSY;
- 			break;
-@@ -1894,12 +1901,15 @@ int ena_com_phc_get_timestamp(struct ena_com_dev *ena_dev, u64 *timestamp)
- 
- 		/* PHC timestamp value is returned to the caller */
- 		*timestamp = resp->timestamp;
-+		if (error_bound)
-+			*error_bound = resp->error_bound;
- 
- 		/* Update statistic on valid PHC timestamp retrieval */
- 		phc->stats.phc_cnt++;
- 
- 		/* This indicates PHC state is active */
- 		phc->system_time = zero_system_time;
-+
- 		break;
- 	}
- 
-diff --git a/drivers/net/ethernet/amazon/ena/ena_com.h b/drivers/net/ethernet/amazon/ena/ena_com.h
-index 64df2c4..fcbff1a 100644
---- a/drivers/net/ethernet/amazon/ena/ena_com.h
-+++ b/drivers/net/ethernet/amazon/ena/ena_com.h
-@@ -216,6 +216,7 @@ struct ena_com_stats_phc {
- 	u64 phc_skp;
- 	u64 phc_err_dv;
- 	u64 phc_err_ts;
-+	u64 phc_err_eb;
- };
- 
- struct ena_com_admin_queue {
-@@ -462,9 +463,11 @@ void ena_com_phc_destroy(struct ena_com_dev *ena_dev);
- /* ena_com_phc_get_timestamp - Retrieve PHC timestamp
-  * @ena_dev: ENA communication layer struct
-  * @timestamp: Retrieved PHC timestamp
-+ * @error_bound: maximum possible deviation of the timestamp (nanosecond)
-  * @return - 0 on success, negative value on failure
-  */
--int ena_com_phc_get_timestamp(struct ena_com_dev *ena_dev, u64 *timestamp);
-+int ena_com_phc_get_timestamp(struct ena_com_dev *ena_dev, u64 *timestamp,
-+			      u32 *error_bound);
- 
- /* ena_com_set_mmio_read_mode - Enable/disable the indirect mmio reg read mechanism
-  * @ena_dev: ENA communication layer struct
-diff --git a/drivers/net/ethernet/amazon/ena/ena_debugfs.c b/drivers/net/ethernet/amazon/ena/ena_debugfs.c
-index 46ed809..db9d184 100644
---- a/drivers/net/ethernet/amazon/ena/ena_debugfs.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_debugfs.c
-@@ -32,6 +32,9 @@ static int phc_stats_show(struct seq_file *file, void *priv)
- 	seq_printf(file,
- 		   "phc_err_ts: %llu\n",
- 		   adapter->ena_dev->phc.stats.phc_err_ts);
-+	seq_printf(file,
-+		   "phc_err_eb: %llu\n",
-+		   adapter->ena_dev->phc.stats.phc_err_eb);
- 
- 	return 0;
- }
 diff --git a/drivers/net/ethernet/amazon/ena/ena_phc.c b/drivers/net/ethernet/amazon/ena/ena_phc.c
-index c2a3ff1..2bcb5af 100644
+index 2bcb5af..2ce5d45 100644
 --- a/drivers/net/ethernet/amazon/ena/ena_phc.c
 +++ b/drivers/net/ethernet/amazon/ena/ena_phc.c
-@@ -40,7 +40,8 @@ static int ena_phc_gettimex64(struct ptp_clock_info *clock_info,
- 	ptp_read_system_prets(sts);
+@@ -25,6 +25,44 @@ static int ena_phc_feature_enable(struct ptp_clock_info *clock_info,
+ 	return -EOPNOTSUPP;
+ }
  
- 	rc = ena_com_phc_get_timestamp(phc_info->adapter->ena_dev,
--				       &timestamp_nsec);
++static int ena_phc_gettimexattrs64(struct ptp_clock_info *clock_info,
++				   struct timespec64 *ts,
++				   struct ptp_system_timestamp *sts,
++				   struct ptp_clock_attributes *att)
++{
++	struct ena_phc_info *phc_info =
++		container_of(clock_info, struct ena_phc_info, clock_info);
++	u32 error_bound_nsec;
++	unsigned long flags;
++	u64 timestamp_nsec;
++	int rc;
++
++	spin_lock_irqsave(&phc_info->lock, flags);
++
++	ptp_read_system_prets(sts);
++
++	rc = ena_com_phc_get_timestamp(phc_info->adapter->ena_dev,
 +				       &timestamp_nsec,
-+				       NULL);
++				       &error_bound_nsec);
++
++	ptp_read_system_postts(sts);
++
++	spin_unlock_irqrestore(&phc_info->lock, flags);
++
++	if (rc)
++		return rc;
++
++	*ts = ns_to_timespec64(timestamp_nsec);
++
++	if (att) {
++		att->error_bound = error_bound_nsec;
++		att->status = PTP_CLOCK_STATUS_UNKNOWN;
++		att->timescale = PTP_TIMESCALE_UNKNOWN;
++	}
++
++	return 0;
++}
++
+ static int ena_phc_gettimex64(struct ptp_clock_info *clock_info,
+ 			      struct timespec64 *ts,
+ 			      struct ptp_system_timestamp *sts)
+@@ -62,16 +100,17 @@ static int ena_phc_settime64(struct ptp_clock_info *clock_info,
+ }
  
- 	ptp_read_system_postts(sts);
+ static struct ptp_clock_info ena_ptp_clock_info = {
+-	.owner		= THIS_MODULE,
+-	.n_alarm	= 0,
+-	.n_ext_ts	= 0,
+-	.n_per_out	= 0,
+-	.pps		= 0,
+-	.adjtime	= ena_phc_adjtime,
+-	.adjfine	= ena_phc_adjfine,
+-	.gettimex64	= ena_phc_gettimex64,
+-	.settime64	= ena_phc_settime64,
+-	.enable		= ena_phc_feature_enable,
++	.owner		   = THIS_MODULE,
++	.n_alarm	   = 0,
++	.n_ext_ts	   = 0,
++	.n_per_out	   = 0,
++	.pps		   = 0,
++	.adjtime	   = ena_phc_adjtime,
++	.adjfine	   = ena_phc_adjfine,
++	.gettimexattrs64   = ena_phc_gettimexattrs64,
++	.gettimex64	   = ena_phc_gettimex64,
++	.settime64	   = ena_phc_settime64,
++	.enable		   = ena_phc_feature_enable,
+ };
  
+ /* Enable/Disable PHC by the kernel, affects on the next init flow */
 -- 
 2.47.3
 
