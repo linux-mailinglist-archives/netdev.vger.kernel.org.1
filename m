@@ -1,261 +1,225 @@
-Return-Path: <netdev+bounces-282871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282872-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KAUbJgRe82lT1wEAu9opvQ
-	(envelope-from <netdev+bounces-282871-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:49:56 +0200
+	id sICqLmRe82lT1wEAu9opvQ
+	(envelope-from <netdev+bounces-282872-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:51:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 032C64A3A98
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:49:55 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 372BD4A3AC4
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:51:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C74083018280
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 13:44:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3D2A1301AAA7
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 13:51:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1508B40FDA1;
-	Thu, 30 Apr 2026 13:44:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C85972580D7;
+	Thu, 30 Apr 2026 13:51:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wf+pVWnI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="abCfbkoz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995D0428462
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 13:44:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777556653; cv=pass; b=XmC5XgToZSZF/O/7ULLAHL1P+C/2lNC1G6SepzfWx7Oiai/p3bpcIbs/6rxq1rfGqBw5tjycWfuGKMWX6Wv8jPsBLE9PYC2sd6s4ZYOLcIlPVfeP0Z81ltfA25IIRUwxuSnBCv7ZHrVwS5JTElYrGMhnqg3EOJJbiPR+BcKS30g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777556653; c=relaxed/simple;
-	bh=TnP9jw3J/tQZ8VNVBpmJIIoxKPuBGjgeD5iQCa5ZU6M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P86JEYB8z60pfxfNbc/EGL1CaMIyyQ+sIzm25cH3or5BbrN8/rsiKQ1OquFTCSABVb86IEpiZZyGmVGvzLVcG8MFO9wGUSJ11KONxTxy35CQu1UJMnQ4inFWRvOPMaMss2aINfTOotP4vKOfyQyOO6kvT7VjjK//ceX3N1nUNPY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wf+pVWnI; arc=pass smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-50fb1932b62so6113771cf.2
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 06:44:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777556650; cv=none;
-        d=google.com; s=arc-20240605;
-        b=UU0FliuH4Jz1Omi3mmLFTxQzUIcP2O6RALB5qLmmcIXPG7IPzoEnYly1xpc1g1XFvx
-         HxVAUAuSvAQa1swxG6ZduxJZWofHMOlQaHxuzs3OAvEP/RRoCwnlG7wxP4jzZZRrxq9K
-         7N4sergML0PKXLVHyeON7kMY52tCVxQ+nF+KWR9AltKFkxyHgfJ9brL7T/rMWwFhylaw
-         W77gsvwd9O2b3qm+Ryl3i9TqyoVt8IgWQzbqxmhn9hSRKWEjkKFKRwrSQFktCADxpUZk
-         6Zo5B+QIBrzztjjTMeCIzVdG0Uan0Whh67D3p/RDbwScVRIsarbwimmRc9ry0KbBli+D
-         Yrzg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=3d3puXtDUADrN9NAWln8DOLDJZhYjr55R03Q795zRcw=;
-        fh=XAP/NFhdQKj5EV/4sRjo2gudU1EN2dVwOItQVbby6O0=;
-        b=MCSsxGbvCar8jQ+F1Oox9FpM4HRsPEFmMDDDqRtdc99Krk80jgkAV42pPqA2DFLL2R
-         /CwynUQKcrxWPbxu/ldsKN1Vw+5we3AlvM1Hb7FEHh5RgyWW8SelrIkUP1ZIZjX+YZ6z
-         sFrjKyMaEk5frAgAEHbLzB1coLgNOwIHk5g3TtgbYIIagKdpr73rNfhIOqCCjEhuTQ6h
-         ttXzXBGS+CC654VYnqAIwYQbtOKdqhVPHteiUgyOQH2J9A76Ckt3MjzCTUl4Ch8zN0U3
-         bnEEitfWuGxojzwGqDHjq6adw2yxNNzZCvajeMQR0d2WCNjWUMcOmUycm+9TsLl+VhcJ
-         K4cw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777556650; x=1778161450; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3d3puXtDUADrN9NAWln8DOLDJZhYjr55R03Q795zRcw=;
-        b=wf+pVWnIuDgevLTi3ancMey0ky+CTP0f7mMBkXBG4AE0HuWe/A6MbKTvAN1ElwqmCj
-         2d1y04oqI3neErE28qqDh0p0rX+ljWXAyiak/FveOR+IjofZLDGlaS9q4KbA60RasoMs
-         J+XS5LM5IYrdBP4DpS3CADZ1ulLjdb4EEZQdFdQRpQQbaU41OufUuUD29EZm+eMTukJu
-         QA+fHtKRK71r5mIlFYwOAG5dXB7EVmQ1AXQAO9Xl4MFCiU/PyNpJ7jytx6Vt8uslH2u9
-         H3j7Gy8cplOe2qb59bWg5pYkOg2zyci+xoZXEOXvYmzdpnrNICJiSXmGfeMAP9rpsK2A
-         mFOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777556650; x=1778161450;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3d3puXtDUADrN9NAWln8DOLDJZhYjr55R03Q795zRcw=;
-        b=UwV45sDFVUlTRg6uXtxiuYMRHfoOyXwdMh7hgfM6m+NmyIpkZqE33KqZR8Ok4m4qgw
-         bb0qkAMkqvNVfcgM+wrbeqZetn1aa2FK+d5PO74lb5Wj6NrmViWlTZgH5iyODd3ws9vg
-         SJCpYZkZworZ4PIknuOgpaga0+mc7ksOYYjAwG2qSRELLuE/shdXkJhQc89Dktbhxoa9
-         Ldg/ZnMJUsadd9R8YjjaQaDOX6u8K6FPIq8DUHraiDM36xClk2dxY3sJV47pIXo4B/Oc
-         ou1kq3yu3fYaGRhceAM/Pfc/VXN9mcS3VBk8kqkjGlvI1SplssnwYFvyiTHedvWSKbXH
-         X0ZQ==
-X-Gm-Message-State: AOJu0YxqVpgSWRISk4noQ05corQAju2RLRaTc1nhZ9kKIDRaK9SerV60
-	czWHPASdylcGkuTNxiIb265BiA/GtPQjmGUuk2Lujvh8MQwaNmKNrBq617aedLcm7WeMe0on33D
-	D0tIabcsJvzmgh+iwEJoGJuMh1kOiEAq/DViIGVRi
-X-Gm-Gg: AeBDiesupxDMi72Gu1SQ4r69SeEkdsLM6Nz7WKjZ5PPEEXAE5Go0H/ZI1NZOVtPzcHp
-	v8ituJ90A35haE0Wj+JASnT3Q2tH2YieYdJAGD2SaV5NsF8Yc/y54aFPionMmQxRlWyTHuxuD8C
-	4bVmWiBvod669ivEgNOHhKuY/jBvZb3axZFnCteTcc7JSE4IL5+Ez//PnZNAZvhThmE3HQ5qJBk
-	5e6UI5AiS01nITEKEYH7cLMEX5gnugCO+71S16SCMrHZVNvj1s3dwifn+HIqdZcjZyNrPkzw4vE
-	/1oWSm8UhX0hNYTYYY5994OQulw4GpPRfZ1dveAUNxhQIanmaHx3BfusOYKoOWDD8n81R50aRfT
-	+1xh+TgcvYaTnNfZQoxIOEZwDVTKylkYkUwe6QyYG
-X-Received: by 2002:a05:622a:82:b0:50d:a6a0:8f09 with SMTP id
- d75a77b69052e-5102ae4fd6emr37741691cf.39.1777556649898; Thu, 30 Apr 2026
- 06:44:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A549F35958;
+	Thu, 30 Apr 2026 13:51:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777557086; cv=none; b=CenrEIt5CU1OBATXayEMfjy8aCx/onmRuLxicJ+UgcR+4OTcU3ytl4stNSwjUxMNxV3FWG1yzWBvOp9fnxviynzqmxVm0vTpA5MA56WmtIBm1OwB69WgukFrfos9+/B+Y7ReH49bvqawAd+F5x45d/SGi9ln3KsNwLXGgmbY0kg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777557086; c=relaxed/simple;
+	bh=sGKecohrPFm0s7IoeAxyxJmKcE8tQ35JCJLbT5iR9m8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=jxptVzgDq0W7auao0v00tH1JDtjUh/d5+PfDNY0z137ZHgxsjDnKVlN8Fyp05lB71nSzL1D0mR/YCAsK8CMaXPm25jX3RQflpxpJtVU+XEoom0Ri84GSlHnWbSzchpKpZ7vYAJZIHBfZAtc21F7v/EYDnZGLlhefaYPzHXfaDFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=abCfbkoz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC959C2BCB3;
+	Thu, 30 Apr 2026 13:51:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777557085;
+	bh=sGKecohrPFm0s7IoeAxyxJmKcE8tQ35JCJLbT5iR9m8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=abCfbkozqqeclATf5iyy8Ha/AMdrHQ3m0RD8bvbJIyrPqg+uVcr4sO2JtNVvAcXQ2
+	 FPitsgA0/L+mbeCgryRresXrbPEC1qRrBGA/ldr5+8LT7j0nr9WYTD4O6e93rsn4Ia
+	 gTi5g0IXuljAIKwHuhwKn7Sw+Wp2pBdb44W6JpA7p4C/V3aeW0baSLoK9qFj4pMi0k
+	 YGTgV7UpUCNw/N31Nd8XjyFY9llWLwEHHSaijxwH+Fe4ft/j/3iRRdvFet4qqm5QK/
+	 AR8x/a1MXEQ4hVkqCAwy00DypdxgIsE6AYT5mn60s5UUfs7yCwUfUqp/TUCucbI/DZ
+	 T/Wep7zefQqvQ==
+From: Simon Horman <horms@kernel.org>
+To: khai.wen.tan@linux.intel.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	anthony.l.nguyen@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	faizal.abdul.rahim@intel.com,
+	hong.aun.looi@intel.com,
+	khai.wen.tan@intel.com,
+	faizal.abdul.rahim@linux.intel.com
+Subject: Re: [PATCH iwl-next v4 3/3] igc: add support for forcing link speed without autonegotiation
+Date: Thu, 30 Apr 2026 14:50:57 +0100
+Message-ID: <20260430135057.1653330-1-horms@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260428060009.311393-4-khai.wen.tan@linux.intel.com>
+References: <20260428060009.311393-4-khai.wen.tan@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260429120120.514491-1-antonio@openvpn.net> <20260429120120.514491-3-antonio@openvpn.net>
- <5b281966-c278-46d5-ade0-9dc24175de6e@openvpn.net> <CANn89i+kGAXWEmgSwrUyRhh7kk6r3FjEza9mjDXq4AjwbC5DZA@mail.gmail.com>
- <4930aa65-6d0e-4ff8-8e7b-91feee1ce646@openvpn.net>
-In-Reply-To: <4930aa65-6d0e-4ff8-8e7b-91feee1ce646@openvpn.net>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 30 Apr 2026 06:43:57 -0700
-X-Gm-Features: AVHnY4JCUK6121wLzGPyIXP07d-igAqYP1lRcIrIUyh29nqRNsgJArzNCdJ30Cg
-Message-ID: <CANn89i+5q8D50sEKUwk1OzGt8tZD2ddSK-kHGq6dFm5QRRpaDQ@mail.gmail.com>
-Subject: Re: [PATCH net 2/2] ovpn: ensure gro_cells_receive() is invoked with
- BH disabled
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, ralf@mandelbit.com, 
-	Sabrina Dubroca <sd@queasysnail.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 032C64A3A98
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 372BD4A3AC4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282871-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-282872-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,openvpn.net:email]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url]
 
-On Thu, Apr 30, 2026 at 6:40=E2=80=AFAM Antonio Quartulli <antonio@openvpn.=
-net> wrote:
->
-> Hi Eric,
->
-> On 30/04/2026 15:37, Eric Dumazet wrote:
-> > On Thu, Apr 30, 2026 at 6:28=E2=80=AFAM Antonio Quartulli <antonio@open=
-vpn.net> wrote:
-> >>
-> >> Hi Jakub,
-> >>
-> >> sashiko came back with an interesting review of the per-cpu stats upda=
-te
-> >> in the surrounding code.
-> >>
-> >> As far as I can tell its explanation makes sense, but I am no per-cpu
-> >> expert.
-> >>
-> >> IIUC it basically says that if gro_cells_receive() is invoked with
-> >> bottom halves disabled, the following dev_dstats_rx_add() should be to=
-o
-> >> to avoid deadlocks and corruptions.
-> >>
-> >> See below:
-> >>
-> >> On 29/04/2026 14:01, Antonio Quartulli wrote:
-> >>> diff --git a/drivers/net/ovpn/io.c b/drivers/net/ovpn/io.c
-> >>> index d92bb87be2b2..c0fdb9504241 100644
-> >>> --- a/drivers/net/ovpn/io.c
-> >>> +++ b/drivers/net/ovpn/io.c
-> >>> @@ -91,7 +91,13 @@ static void ovpn_netdev_write(struct ovpn_peer *pe=
-er, struct sk_buff *skb)
-> >>>
-> >>>        /* cause packet to be "received" by the interface */
-> >>>        pkt_len =3D skb->len;
-> >>> +     /* we may get here in process context in case of TCP connection=
-s,
-> >>> +      * therefore we have to disable BHs to ensure gro_cells_receive=
-()
-> >>> +      * doesn't enter deadlock
-> >>> +      */
-> >>> +     local_bh_disable();
-> >>>        ret =3D gro_cells_receive(&peer->ovpn->gro_cells, skb);
-> >>> +     local_bh_enable();
-> >>>        if (likely(ret =3D=3D NET_RX_SUCCESS)) {
-> >>>                /* update RX stats with the size of decrypted packet *=
-/
-> >>>                ovpn_peer_stats_increment_rx(&peer->vpn_stats, pkt_len=
-);
-> >>   >>             dev_dstats_rx_add(peer->ovpn->dev...) << not visible =
-in the diff,
-> >> but it's here
-> >>
-> >> from sashiko:
-> >>
-> >> Can this lead to seqcount deadlocks and stat corruption since
-> >> dev_dstats_rx_add() is executed with preemption and bottom-halves enab=
-led?
-> >> dev_dstats_rx_add() operates on per-CPU statistics and protects 64-bit
-> >> updates with a sequence counter (u64_stats_update_begin()). When calle=
-d
-> >> from process context with BH enabled, on 64-bit systems, this_cpu_ptr(=
-)
-> >> is evaluated with preemption enabled. If the task is migrated mid-upda=
-te,
-> >> it risks cross-CPU stat corruption.
-> >> On 32-bit systems, u64_stats_update_begin() disables preemption but no=
-t
-> >> bottom-halves. If a softirq (e.g., a concurrent UDP packet reception)
-> >> interrupts the process context and calls dev_dstats_rx_add() for the s=
-ame
-> >> interface, it will re-enter the seqcount writer lock on the exact same=
- CPU.
-> >> This corrupts the sequence counter, causing readers to see an unlocked
-> >> sequence during active writes, leading to torn reads and corrupted sta=
-ts.
-> >> Should local_bh_enable() be moved after the statistics updates to ensu=
-re
-> >> the entire per-CPU update is atomic with respect to softirqs?
-> >>
-> >>
-> >> Do you have an opinion?
-> >
-> > Sashiko suggestion seems good to me.
->
-> But am I right saying that this bug existed before and it is not
-> introduced by this patch?
->
-> A concurrent softirq (UDP RX pkt) could already trigger this problem
-> before we introduced the local_bh_disable/enable() calls, right?
+From: 'Simon Horman' <horms@kernel.org>
 
-I think we are saying the same thing.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
+---
+igc: add support for forcing link speed without autonegotiation
 
-Let me rephrase: The bug was introduced in:
+This commit allows users to force 10/100 Mb/s link speed and duplex via
+ethtool when autonegotiation is disabled. Previously, the driver rejected
+these requests.
 
-Fixes: ab66abbc769b ("ovpn: implement basic RX path (UDP)")
+> diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+> index cfcbf2fdad6e..9997ebbdf778 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
+> +++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+[ ... ]
+> @@ -2000,6 +2013,41 @@ static int igc_ethtool_get_link_ksettings(struct net_device *netdev,
+>  	return 0;
+>  }
+>  
+> +/**
+> + * igc_handle_autoneg_disabled - Configure forced speed/duplex settings
+> + * @adapter: private driver structure
+> + * @speed: requested speed (must be SPEED_10 or SPEED_100)
+> + * @duplex: requested duplex
+> + *
+> + * Records forced speed/duplex when autoneg is disabled.
+> + * Caller must validate speed before calling this function.
+> + */
+> +static void igc_handle_autoneg_disabled(struct igc_adapter *adapter, u32 speed,
+> +					u8 duplex)
+> +{
+> +	struct igc_mac_info *mac = &adapter->hw.mac;
+> +
+> +	switch (speed) {
+> +	case SPEED_10:
+> +		mac->forced_speed_duplex = (duplex == DUPLEX_FULL) ?
+> +			IGC_FORCED_10F : IGC_FORCED_10H;
+> +		break;
+> +	case SPEED_100:
+> +		mac->forced_speed_duplex = (duplex == DUPLEX_FULL) ?
+> +			IGC_FORCED_100F : IGC_FORCED_100H;
+> +		break;
+> +	default:
+> +		WARN_ONCE(1, "Unsupported speed %u\n", speed);
+> +		return;
+> +	}
+> +
+> +	mac->autoneg_enabled = false;
+> +
+> +	/* Half-duplex cannot support flow control per IEEE 802.3 */
+> +	if (duplex != DUPLEX_FULL)
+> +		adapter->hw.fc.requested_mode = igc_fc_none;
 
-Please respin a V2.
+Does this permanently overwrite the user's flow control preference?
 
->
->
-> Regards,
->
->
-> >
-> > Proper Fixes: tag would be:
-> >
-> > Fixes: ab66abbc769b ("ovpn: implement basic RX path (UDP)")
->
-> --
-> Antonio Quartulli
-> OpenVPN Inc.
->
+If half-duplex is requested, requested_mode is set to igc_fc_none. Because
+requested_mode represents the persistent state for the user's flow control
+preference, the user might permanently lose their configuration. If they later
+switch back to full-duplex, requested_mode remains igc_fc_none, and flow
+control stays disabled.
+
+Would it be better to dynamically override hw->fc.current_mode to
+igc_fc_none during link configuration instead of mutating requested_mode?
+
+> +}
+[ ... ]
+> @@ -2071,14 +2126,20 @@ igc_ethtool_set_link_ksettings(struct net_device *netdev,
+>  		}
+>  	}
+>  
+> +	if (cmd->base.autoneg == AUTONEG_DISABLE &&
+> +	    cmd->base.speed != SPEED_10 && cmd->base.speed != SPEED_100) {
+> +		netdev_info(dev, "Unsupported speed for forced link\n");
+> +		return -EINVAL;
+> +	}
+> +
+
+Should we also validate cmd->base.duplex here to prevent a fallback to
+half-duplex?
+
+If a user runs a command like "ethtool -s eth0 speed 100 autoneg off" while
+the link is down, ethtool queries and preserves the current duplex value,
+which is DUPLEX_UNKNOWN (0xff).
+
+In igc_handle_autoneg_disabled(), the code checks if duplex == DUPLEX_FULL,
+which evaluates to false, and forces the interface to 100 Mbps half-duplex.
+
+Could we explicitly check that cmd->base.duplex is either DUPLEX_HALF or
+DUPLEX_FULL and return -EINVAL otherwise?
+
+>  	while (test_and_set_bit(__IGC_RESETTING, &adapter->state))
+>  		usleep_range(1000, 2000);
+
+This isn't a bug introduced by this patch, but does this ad-hoc
+synchronization loop reimplement locking without fairness or lockdep support?
+
+According to the Networking Subsystem Guidelines, using bit operations as a
+substitute for real locks violates core kernel locking rules and introduces
+potential races.
+
+Could this be replaced with a proper concurrency mechanism such as a mutex?
+
+>  
+> -	if (cmd->base.autoneg == AUTONEG_ENABLE) {
+> +	if (cmd->base.autoneg == AUTONEG_ENABLE)
+>  		igc_handle_autoneg_enabled(adapter, cmd);
+> -	} else {
+> -		netdev_info(dev, "Force mode currently not supported\n");
+> -	}
+> +	else
+> +		igc_handle_autoneg_disabled(adapter, cmd->base.speed,
+> +					    cmd->base.duplex);
+>  
+>  	/* MDI-X => 2; MDI => 1; Auto => 3 */
+>  	if (cmd->base.eth_tp_mdix_ctrl) {
 
