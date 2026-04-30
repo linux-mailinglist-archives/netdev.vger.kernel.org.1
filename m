@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-282551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282552-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oCdUG56e8mlQtAEAu9opvQ
-	(envelope-from <netdev+bounces-282551-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:13:18 +0200
+	id 4cNzEAWf8mlutAEAu9opvQ
+	(envelope-from <netdev+bounces-282552-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:15:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A177449B944
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:13:17 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 329FE49B95D
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:15:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 55707300E59C
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 00:13:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C23BC30232B6
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 00:13:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0756834CDD;
-	Thu, 30 Apr 2026 00:13:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CF5634CDD;
+	Thu, 30 Apr 2026 00:13:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KJWUAyPA"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5PyDpKwy"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89FE518C2C;
-	Thu, 30 Apr 2026 00:13:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FFD18C2C;
+	Thu, 30 Apr 2026 00:13:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777507990; cv=none; b=o4iRA7f8Pu1A/7NnindjEfUag99rQ065w/9qCkNorrlRTogtZaOgwVnxFhWWTIi19zaGYz3cQPFk8f7tpJOyFTD4ffwrnY11UPPrSW07Eon8bE5m0v1SDeaCnBmSeGuvSkLdikL2/riAgGdyHSTcJwmMukN5gNNMvRTUYJW4fbY=
+	t=1777508029; cv=none; b=GpIkUQvbT08P3Czhy2v7Q9D1pydvfwr1/stDFJXa6iQXFYnX1+IdtlPlbXARm23FoehhxSyJ96PjZ4GLVwh4e07wIkDcjokcGZoF4fWLIPPoNUh5UH6KozRp93FoPJoROcs0BejxyoenbFFjLyk/3ZLpQlwOu/BSE/d+FM6VLiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777507990; c=relaxed/simple;
-	bh=BItvzQkmDs3qE/bIqrWLinaBdsIIA6iXl/Sl1zB6KG8=;
+	s=arc-20240116; t=1777508029; c=relaxed/simple;
+	bh=fQhlf4FVXz8jqrxUfUCR7CcIhP9nCMAq8KesLC6HqCM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L+phCArRpvzx3mi1/YSSslVZ+bD2iPPZ/olRmWvVz40Ec5hIxv0jAGovWJuZ++RqXLtqnaTy7YSPosQ+pvzfQLNlL4eP+KDPgOjVquudSvKClW1xpHZFXXD4+mx0RXSDEIpLtwLAZ/xo7XHuqvDO336rCQUwD9w11obW4UbFKLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KJWUAyPA; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=PzGslI9wUXKLVoQzvRBfHWm2Bl+3e7a4nh3hxHrwJrgWg7FauVtdq2Gtaolp1BQS7OOdNgg0b1pojQQ3n/Lq5wJDeQ+Qimifyu35lJoKdFK+56glJXaqPussWxjOQJwLo+GvSV16JsWGVRA4hDAcXQjtHFInRroxdJEHZDHgPOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5PyDpKwy; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -39,16 +39,16 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=J2ry0U935a8I3q3XfQjQUSSNMEI0AxgGrv07wg6nKVY=; b=KJWUAyPAQWZB0kky33B6zNGF0S
-	k37urVAle+ZHmV+kFU9r768+7cpcdanW2GHOptBCiw5++7XNvs5iwYeRjB0CiUk47ZZDYlVSkhAK1
-	ED4HFLTpgI1/4ymFQmnirTXu5YTTxq7AgDmoHuA2Y5wPrXOj1XwcLFuAI9blhprja54k=;
+	bh=icHsd1TlftPaJ6j5j1qmW4lXPQP4Ynfc2dJNOWPkDRc=; b=5PyDpKwyDJg0/Vcl2JJqPdv68b
+	7mCT6ojdSToaLxVm1u96oyCfiHQVEkFS0Q3Tb6nZwGt/7FZWb8dPNrtLV4IpmU6woZsx6DxFiJ810
+	erRRmoksoZl+QP+eY6C3aQwEnfyHtgA9fLV2fOUhW6vACPeZzQ2dY+itCnQWAMs7Nseg=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1wIF1L-000bDY-T5; Thu, 30 Apr 2026 02:12:47 +0200
-Date: Thu, 30 Apr 2026 02:12:47 +0200
+	id 1wIF28-000bEJ-Uj; Thu, 30 Apr 2026 02:13:36 +0200
+Date: Thu, 30 Apr 2026 02:13:36 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, chester.a.unal@arinc9.com,
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Daniel Golle <daniel@makrotopia.org>, chester.a.unal@arinc9.com,
 	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
 	pabeni@redhat.com, matthias.bgg@gmail.com,
 	angelogioacchino.delregno@collabora.com, linux@armlinux.org.uk,
@@ -57,10 +57,11 @@ Cc: Jakub Kicinski <kuba@kernel.org>, chester.a.unal@arinc9.com,
 	linux-mediatek@lists.infradead.org
 Subject: Re: [PATCH net v4] net: dsa: mt7530: fix .get_stats64 sleeping in
  atomic context
-Message-ID: <52d69a5d-a951-4a65-a947-7aaf41bc3daf@lunn.ch>
+Message-ID: <e06bee51-561e-4405-b3b2-a5d672d8e8b0@lunn.ch>
 References: <16efd278e4f17776ccfbf8491e5be71a4689c137.1777385305.git.daniel@makrotopia.org>
  <20260429234612.2240476-2-kuba@kernel.org>
  <afKaVQ27GUQiWZTb@makrotopia.org>
+ <20260429171124.07787599@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,8 +70,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <afKaVQ27GUQiWZTb@makrotopia.org>
-X-Rspamd-Queue-Id: A177449B944
+In-Reply-To: <20260429171124.07787599@kernel.org>
+X-Rspamd-Queue-Id: 329FE49B95D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -78,15 +79,15 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282551-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-282552-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,arinc9.com,gmail.com,davemloft.net,google.com,redhat.com,collabora.com,armlinux.org.uk,vger.kernel.org,lists.infradead.org];
+	FREEMAIL_CC(0.00)[makrotopia.org,arinc9.com,gmail.com,davemloft.net,google.com,redhat.com,collabora.com,armlinux.org.uk,vger.kernel.org,lists.infradead.org];
 	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
@@ -97,18 +98,15 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
 
-> > The priv->bus pointer is initialized during probe. However,
-> > INIT_DELAYED_WORK() is only called in mt753x_setup(), which might never
-> > execute if the DSA tree remains incomplete.
+> Not sure how much of the D in DSA is actually implemented but in terms
+> of fix why not do what the bot suggests?
 
-The opposite of .setup() is .teardown(). So if the delayed work is
-setup is setup() it should be cancelled in .teardown, to keeps things
-symmetric.
+As far as i know, this device is not D in DSA capable.
 
-	Andrew
+   Andrew
 
