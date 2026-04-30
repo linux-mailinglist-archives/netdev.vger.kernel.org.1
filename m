@@ -1,120 +1,133 @@
-Return-Path: <netdev+bounces-282932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282936-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cMauLth/82ni4gEAu9opvQ
-	(envelope-from <netdev+bounces-282932-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:14:16 +0200
+	id mFX2NBiD82kY4wEAu9opvQ
+	(envelope-from <netdev+bounces-282936-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:28:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B1BD4A57F6
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:14:15 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC4234A5AEF
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:28:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 50CA3306DC8C
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 16:06:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 02BB130187B5
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 16:20:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A01B845BD4E;
-	Thu, 30 Apr 2026 16:06:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C988F47276D;
+	Thu, 30 Apr 2026 16:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="spBhA6pg"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rexion.ai header.i=@rexion.ai header.b="XuWIc38a"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from out-13.smtp.spacemail.com (out-13.smtp.spacemail.com [63.250.43.96])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D73444E03B;
-	Thu, 30 Apr 2026 16:06:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00C733382FC;
+	Thu, 30 Apr 2026 16:20:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.250.43.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777565208; cv=none; b=KilwcehBh5rpmghIXUaYvOZkpyRDPpamN9D4n+caZPYEJlg+Z+4uxrktwVyGM5NegpaUe+qWqCk5Mo0Stie6BaVv2pSK0BYYpyitYS0ixEpqdSvMEDfZquAd9iQtfBLbEQbNcK/L6/QajpYVVw0Bo1J5JQj7XVOuml1tAzHwD3I=
+	t=1777566003; cv=none; b=p4YASj4Ed3HFrZ1mOhB+7ll5ygsS9eBbZ8cUtVnIgvmbewjxKK9DOgFru8nwk2eMgONp4Qnzn0r6zR0Xjr8Mq0yUihWhr7i+YSvr6qAVzOTc/MXWjZBa27xNvH3ykD42+h8GTgDkqEskeUXhHdaJoLWDXXdtOgm5Dcp3mp7rQVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777565208; c=relaxed/simple;
-	bh=GIRvz4CtKMyqM6AnssrDgYhg/bBnQXEUYJr0j3ySicw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EkpgAbjey+CBsJTgG15OQHbRgWkwmsuDwL9d/duH/gWZjzE9jdbM3M7cbJx7nfOwG0FURRXKP8TTKk/UCIhDt+olKvjXqBBfe2X5QIgRACerXY0Xkbc7yXmU0viB09syJeD2uqluRi4begCbF981XXbMAnD3CaxnUPdhC6TQndA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=spBhA6pg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13CC9C2BCB3;
-	Thu, 30 Apr 2026 16:06:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777565208;
-	bh=GIRvz4CtKMyqM6AnssrDgYhg/bBnQXEUYJr0j3ySicw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=spBhA6pgH1M04QfVKtWLIJhaKkIYr5fgTXb55CJZpBl2AGjfsqRBQTc7wE+I5olPW
-	 8FhMFBvWPnlcCngSSSD7CQewg1vaSO0b4lPF6xIl4lFOi1mskaMs4cLwMYGcytVGfY
-	 X+XLsiiUpNCtsB+c1pb/XTao60QTiI7Cyj8ETEq5wXplUFbthgAusqe3oBHiZcSdJI
-	 SjL3rOX7cTC6pzfuA+cxJPKmPEmdTqPz3zFm992coPg9ToO+Obxyf5+kVgz32oQ6HX
-	 11oEMFkTP7NopbjhgY1JHm2hgN0tKjXPbJPDthxfvUjEixUw6ObktqTG09/QP1eTDq
-	 LsGzBgE9WA0QQ==
-Date: Thu, 30 Apr 2026 17:06:43 +0100
-From: Simon Horman <horms@kernel.org>
-To: Robert Marko <robert.marko@sartura.hr>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, Divya.Koppera@microchip.com,
-	horatiu.vultur@microchip.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: phy: micrel: fix LAN8814 QSGMII soft reset
-Message-ID: <20260430160643.GA900403@horms.kernel.org>
-References: <20260428134138.1741253-1-robert.marko@sartura.hr>
+	s=arc-20240116; t=1777566003; c=relaxed/simple;
+	bh=qcWpcofcD5xQONZRCZG2JVsf06Gg8/Szb89ksk12cPc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EOfdTe/nCzb38XWdJL28Vb/zKCPar62jUw/0LtdN+sxkgYCj28yoskoIpY82JLoCRTcdu88M3lk8NLJiIHIdJVL0utq/cnNHDdiDwWVV0SKKY/BunZb38t5t9sqpq3X2IC00tOFeFVJadg5SflfmlkDmnUgfC07Qbo+7s8eiXWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rexion.ai; spf=pass smtp.mailfrom=rexion.ai; dkim=fail (0-bit key) header.d=rexion.ai header.i=@rexion.ai header.b=XuWIc38a reason="key not found in DNS"; arc=none smtp.client-ip=63.250.43.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rexion.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rexion.ai
+Received: from Kyren (unknown [49.207.224.37])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.spacemail.com (Postfix) with ESMTPSA id 4g5zhy2N22z2x9M;
+	Thu, 30 Apr 2026 16:12:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rexion.ai;
+	s=spacemail; t=1777565558;
+	bh=6pgjt9PVUYpaS1esvDnc3/NQF+deIy8NLJHpEbltOuU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=XuWIc38aDBqengf1KoqK6026kkWGm61ataZV36C7HzK24FQkNQQwbp9t8G5urljI7
+	 pc05NVEyrXCk/ZbMm9+ztAn8+xgdxqBdDLA+53dsf5yw6YrhmDeUILe7Q11T1d2unN
+	 2oN3kiFrewLAibblDAabMffJ+9Crep6ThLZ8vMCB7Se3jUDrUK8bJhEg+LISg6PO6K
+	 xOz7Swy5AqMqu12/Ba5tqe0F1ZtRYImpUKViuH0pelA0/6Clh6EUJLEb1Ig/RnwnB9
+	 +FCgZWfFI6ocpC3IHoTjsje9Xs2E/VfYokxQDF9ZIQjxmXpWc/fkF+ni1j90sGaxdz
+	 tAYnufDxflWGg==
+From: HACKE-RC <rc@rexion.ai>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>
+Cc: Phil Sutter <phil@nwl.cc>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	HACKE-RC <rc@rexion.ai>
+Subject: [PATCH net-next 0/2] netfilter: conntrack: validate parsed port values in IRC and Amanda helpers
+Date: Thu, 30 Apr 2026 21:42:28 +0530
+Message-ID: <20260430161230.3438973-1-rc@rexion.ai>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260428134138.1741253-1-robert.marko@sartura.hr>
-X-Rspamd-Queue-Id: 3B1BD4A57F6
+Content-Transfer-Encoding: 8bit
+X-Envelope-From: rc@rexion.ai
+X-Rspamd-Queue-Id: CC4234A5AEF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-282932-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-282936-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	DMARC_NA(0.00)[rexion.ai];
+	RCVD_COUNT_THREE(0.00)[4];
+	R_DKIM_PERMFAIL(0.00)[rexion.ai:s=spacemail];
+	DKIM_TRACE(0.00)[rexion.ai:~];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	NEURAL_SPAM(0.00)[0.005];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[rc@rexion.ai,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid,sartura.hr:email,sashiko.dev:url]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[rexion.ai:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-On Tue, Apr 28, 2026 at 03:41:01PM +0200, Robert Marko wrote:
-> LAN8814 QSGMII soft reset was moved into the probe function to avoid
-> triggering it for each of 4 PHY-s in the package.
-> 
-> However, that broke QSGMII link between the MAC and PHY on most LAN8814
-> PHY-s, specificaly for us on the Microchip LAN969x switch.
-> Reading the QSGMII status registers it was visible that lanes were only
-> partially synced.
-> 
-> It looks like the reset timing is crucial, so lets move the reset back
-> into the .config_init function but guard it with phy_package_init_once()
-> to avoid it being triggered on each of 4 PHY-s in the package.
-> Change the probe function to use phy_package_probe_once() for coma and PtP
-> setup.
-> 
-> Fixes: 96a9178a29a6 ("net: phy: micrel: lan8814 fix reset of the QSGMII interface")
-> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+Both nf_conntrack_irc and nf_conntrack_amanda parse port numbers from
+application-layer protocol data using simple_strtoul(), which returns
+unsigned long. The results are stored in u16 variables without range
+checks, silently truncating values above 65535.
 
-FTR: an AI generated review of this patch is available at sashiko.dev.
-     I believe that both issues flagged there pre-date this patch
-     and should not block progress of it.
+This series adds explicit upper-bound validation in both helpers.
+
+Note: checkpatch warns about simple_strtoul being obsolete. Both
+call sites use the endptr output parameter to advance the parse
+position, which kstrtoul does not provide. Converting to kstrtoul
+would require restructuring the parsers, which is out of scope for
+this fix.
+
+HACKE-RC (2):
+  netfilter: nf_conntrack_irc: reject DCC port values above 65535
+  netfilter: nf_conntrack_amanda: reject port values above 65535
+
+ net/netfilter/nf_conntrack_amanda.c | 10 ++++++----
+ net/netfilter/nf_conntrack_irc.c    |  7 ++++++-
+ 2 files changed, 12 insertions(+), 5 deletions(-)
+
+-- 
+2.54.0
+
 
