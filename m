@@ -1,333 +1,225 @@
-Return-Path: <netdev+bounces-282844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282845-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GHiRFfJN82lnzQEAu9opvQ
-	(envelope-from <netdev+bounces-282844-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 14:41:22 +0200
+	id sDmuF95O82lnzQEAu9opvQ
+	(envelope-from <netdev+bounces-282845-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 14:45:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B94C34A2D61
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 14:41:21 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB7384A2DD1
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 14:45:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3F8243041D4A
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 12:40:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 656533006788
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 12:40:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEE6440628F;
-	Thu, 30 Apr 2026 12:40:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DED2D40628E;
+	Thu, 30 Apr 2026 12:40:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="OiaKLycd"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="SBYoAxgC"
 X-Original-To: netdev@vger.kernel.org
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012070.outbound.protection.outlook.com [52.101.43.70])
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010041.outbound.protection.outlook.com [52.101.56.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61D3E407561;
-	Thu, 30 Apr 2026 12:40:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CB13D6465
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 12:40:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.41
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777552816; cv=fail; b=gc/nZsbhi1IEfUVZrfKyC0mkAOubdKrBdVPRT/wiMuKyML/zyPuSYZAH4yN6JCfijIB+DJ5jckPp8rCelWK///IiKcVMbVpNNxSfhAl1PtzclO+Ubw/YkxfOLgIEtlMqVTOfmBuTn8P8YggleZN1aYljmQy1UIsQDbh2l0fdGug=
+	t=1777552846; cv=fail; b=bPaO3wAY+lGwspzohR+L434lT8xLVSyzHCUoIqX3fgFOnPk+39Nuke/WoMB7H3rUL6JcqY5dC5dIkqrkeAa83GMJo5rNpCT1yJ54d0l/pPlkN7otnpKLztaztKvFM4Dl0vw5j4ibzoM3Oj4G4WX8n7LDmih9WoXAA99yxl4n+SI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777552816; c=relaxed/simple;
-	bh=NMq+YOxwFCO0bFM7YU7wsqJdn6xGxmn8xIyozC5t8RE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hDRiAVxFDDoFDaZNFghDN7FJ2ojTlYoFYBgI/M2+p/jy+8Zqk6zdhj8Wt2uTOXAyfFARhDuXILzjvH/hyfRGyhcUmETZg5MnM4eBlbz1K5YH4n9qNhBqLvA9o8+Shc1gMzZ2jHK3q3uIetn0Y9VaX5JJu2eZbCkI0nMljOsrTw4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=OiaKLycd; arc=fail smtp.client-ip=52.101.43.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1777552846; c=relaxed/simple;
+	bh=uNPb+7vchJXX5JC9D0vHG3/AITNEGHGBRoIDUVc6uKA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=q0k8NImt0NuSR5OnGvRzqL+aevDvkhmo866r3ADlP5nG3WweSPMZrsfIC/4JUg6FCIbihQ3wxdqil29f0EeJG6G3FkFpVNCC0fX4KK1zcacGeAEGOXmuONPpxc541H1hx1g5qbegJChzsbA8U5odE2CmdqDlABNtzzkz5ZBbVbA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=SBYoAxgC; arc=fail smtp.client-ip=52.101.56.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NELMLC4SqIh4O5PT4NaqJawBJaAQmeklHeZwk9WmUoJ2renITkvit+9jCeUykUWO5NmGPBLrC/MIGqAgeIXelNidrSL+e6YpXOgL72fVUlSZPzshyH5W9bqAP4uF18evGiWfvPctBYeZ2hx+QbcD7jJbAqESGucUN1S1ETQsie2RLNETs1CRh/xItaeswkCIz43Zeefzirs2Q+Aj5/w99JunOGkTO3f9ltwHO3ZMP59dXyXmDkDClIvt0Lo7RIWWlmgjsYNlhIST/FlA1QqlxXYIb/CpBlQK+tlq/8ZusPxjLfEo9WGd1e42MJ43pqA3te9IyOrYGjYR0TycnSJSEw==
+ b=zTOUyi0hr2TRaz+1eyMr7YtBYA1ZOqck9pk+7HRzafbg2nZzSwbVHQZZey6FJ0uxWs1whfEmx7flr10lchsbkbDzIKYTfRNniYG5uXGcakG11A0kVjC1Okz5CeRL0+oWl80Ew/z4PEzoQLrPMTf6Iae+7KYv8wM0eq/5RQ9ryc2jVk3zhNZKpB6R+le54z48GM3/gYbMOOe+YgEpfq7aVTcavDHutIT6IuJihZbKvYzI+RSPEMJ/DBgmWHl1PQZ35SflCFcNZfSmDgFRQnPonEqEVgP3YLqFvepYhCRlXiXBtZxAcXco5FZ6n42xCKrQOECZX+Bkzm52UYIWcp0DKg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3TbUUoZjvSR0gATb+Bq3mHH+f2rvmZUePtmEa3yRhS4=;
- b=huY3sLIdSPiLdvklmFtr3ngCQx4rnme/52c0O6K8I1kMsXEo7Tmfx3yxOsnUS61kUTBOkktD9hQnoMHoiOoilpIwuzOcRlm5h5OwLZxOLh3OxaLIciujviuHxOhhP2Z26Qe2xUpjtnOer8r7ruR8eiYJ8/Avsc2OMOaYJuoo07JO0UwLrFb96dEr1pY3sbZpoGRR1yFlAL4GEwBI5vUCDAk4gct7an5z3OYQEBMKvEnAkii1w1kHJpqwIisGjQ+G78pxES4wV+SzAS/H5KYiWypk8NfPDmWOVcFdfzLHUcAlHROnfksZM5Psro1wJTxTNSxxlLpOkNma0eDt3eaY2Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=ziepe.ca smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ bh=8NjaGumnVINVypa13ehsMedFnSUpRyxM1T6u4FrlHYU=;
+ b=elu2SU3LVEQZQMUEwe80kWUF5uDMObaoGQAibBJfjBP46qsjEcCCtizZTuK0M75BcCm9g0io9UEum1sw+ComQU81eOCqjr2JwaVBmPhAgm/8kgu97AnU/HGVs76TmtZCoM6+YqWr5w/Azw/jUFigLnujhpYPuQgNYeU7j1z6z1tyKDWS0Iw249roHyxcv0GzYuPYHYkxsL2AVnWFfoLXoO42wv4PDx9lBLUihKnLBG54xCl0XwcoD1FZ7lMLRw6vKt0EeMbDISSBBtylLcp1+FrbH9j2EMmzx1Wl9ljcdEzGfdO2LXmUk6i6CNlJAMWdOjNtoStrEJX7V2L/YNBPcg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3TbUUoZjvSR0gATb+Bq3mHH+f2rvmZUePtmEa3yRhS4=;
- b=OiaKLycdhB+YORokN8QIc1ZB2LV4WEpNObhMbVzhppxiVCTDkqzXO3I9wUAif7vDpftIwsddGNpK5NIdK+9goKHDhyIHX2UGgpnvBGemmgwSLBZPvF8Zo/FOpddUnvnBGu6PAfHQRrJ/WrccCCAWAcbWqbrU8G4Cnx8J5MOyBh4=
-Received: from PH8PR21CA0015.namprd21.prod.outlook.com (2603:10b6:510:2ce::12)
- by CY8PR12MB7267.namprd12.prod.outlook.com (2603:10b6:930:55::17) with
+ bh=8NjaGumnVINVypa13ehsMedFnSUpRyxM1T6u4FrlHYU=;
+ b=SBYoAxgCrv6gC9qGNxM0x5Q4QBYsXce+D0/dBtOvVQk3qlzWueqHAARO7Vsbf2ELp3ekxnjk/APDoqeexOWek1DEp+3k7Zka3mvxmu8BBtytEtpDL7DLLpZVJukQ/kmeuY1+hbjXn24qphIdJ1CpRGMbOQTTwCXto1tbObECjnT4AbtJKc86LFVndVypwogXBK/kxhNZZV24zvHWg5Mf0u6+B4v0x1Tdd+d0Y33vB2E+DEavGAREmathyK2bdbMqcp23YzivI7yg/5eE8pa+RRJ7XUadW3KHEuI93dWY9v/eN0sYDX3XPtwClY9CAJJrx3RdkMCD88A/qBRbhJ7UYA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by DS0PR12MB7606.namprd12.prod.outlook.com (2603:10b6:8:13c::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.20; Thu, 30 Apr
- 2026 12:40:02 +0000
-Received: from SN1PEPF000397B4.namprd05.prod.outlook.com
- (2603:10b6:510:2ce:cafe::7b) by PH8PR21CA0015.outlook.office365.com
- (2603:10b6:510:2ce::12) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9891.7 via Frontend Transport; Thu,
- 30 Apr 2026 12:40:02 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- SN1PEPF000397B4.mail.protection.outlook.com (10.167.248.58) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9846.18 via Frontend Transport; Thu, 30 Apr 2026 12:40:01 +0000
-Received: from SATLEXMB04.amd.com (10.181.40.145) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.2562.17; Thu, 30 Apr
- 2026 07:40:00 -0500
-Received: from satlexmb08.amd.com (10.181.42.217) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 30 Apr
- 2026 07:39:59 -0500
-Received: from xhdipdslab46.xilinx.com (10.180.168.240) by satlexmb08.amd.com
- (10.181.42.217) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Thu, 30 Apr 2026 07:39:56 -0500
-From: Abhijit Gangurde <abhijit.gangurde@amd.com>
-To: <jgg@ziepe.ca>, <leon@kernel.org>, <brett.creeley@amd.com>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <allen.hubbe@amd.com>, <nikhil.agarwal@amd.com>,
-	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Abhijit Gangurde <abhijit.gangurde@amd.com>
-Subject: [PATCH 3/3] RDMA/ionic: Support QP transport mode selection in create and modify
-Date: Thu, 30 Apr 2026 18:09:31 +0530
-Message-ID: <20260430123931.3256130-4-abhijit.gangurde@amd.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260430123931.3256130-1-abhijit.gangurde@amd.com>
-References: <20260430123931.3256130-1-abhijit.gangurde@amd.com>
+ 2026 12:40:39 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.20.9870.020; Thu, 30 Apr 2026
+ 12:40:39 +0000
+Date: Thu, 30 Apr 2026 15:40:25 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: kuba@kernel.org, edumazet@google.com, dsahern@kernel.org,
+	tom@herbertland.com, willemdebruijn.kernel@gmail.com,
+	pabeni@redhat.com, justin.iurman@gmail.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net v5] ipv6: Implement limits on extension header parsing
+Message-ID: <20260430124025.GA971154@shredder>
+References: <20260429154648.809751-1-daniel@iogearbox.net>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260429154648.809751-1-daniel@iogearbox.net>
+X-ClientProxiedBy: TL0P290CA0006.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:5::9)
+ To SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-Received-SPF: None (SATLEXMB04.amd.com: abhijit.gangurde@amd.com does not
- designate permitted sender hosts)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF000397B4:EE_|CY8PR12MB7267:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2a1aaaf1-5e1b-45a9-0bae-08dea6b5989d
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|DS0PR12MB7606:EE_
+X-MS-Office365-Filtering-Correlation-Id: 80eb9019-40f3-4477-a9ea-08dea6b5af51
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|7416014|376014|82310400026|1800799024|22082099003|56012099003|18002099003;
+	BCL:0;ARA:13230040|366016|376014|1800799024|22082099003|56012099003|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	+uyQ7Ae/5QTSdm3zwf/YcTKcWnHCRt/Z5KWD4QKLZT+HBfIw1yz+5FVJfbougt4eJdgD9knYB57wFqGPvGfRq5tXZuI5T2pppVzTf27xqNEcZtpaKryjYcd224DA4j08UlvcqLRd183ACCq/BzUS4LBwe9vvhV+BxJyNLUatFCdlCxYEWeEF1HZrCuQnVwgLwHUksKhlUzGglAU0+0d8kL63lfLxRrx4LoZxpZalh/vG+iGNTwWMDZNIn+F5kzBNjHZjkzgJXSEH+prEMCOSxWWKdAL/7r0SaXs/8fUl6rQ00gQ2MGN7sVrwHndvylJtDb0y5Edx6LAU4dd88/3hfb1RHnLubcH+6sroi1rMz2VZ8rEkqIOiXTFZapFhyi7J73dLHXOP3UCi4mqMjjIr2gLJh2gcQgczwX2xodG58HUP+lX+FTfXQq8GK/wCZxSTXWi8wRRWLlqWrPqBdGHYJ1ct+Vf+VnJOfd59FYlAJUS/24xph4zC0YfYhkLh6PddJLSTi2Otloe0ZQDQuqBJnH9/7viwlrSoOChFn0+2m2+WEKpfaggr9Y1U8w8Lcy1/RRz3+gjPOp9BqGF6FkB2ppTkZMDAIVzAHa55UNwbLKhxkUIJbxbYbbko9NN8T+/0/R3y6+j9BxqOzJBfGb5yWiJWVIOOt8p0c7XaYBJi60L6a6OY3HmNps7ertfsauF+5UbsmLfyOKqpY6aNSf8H/9YXk5+BDnCWQ0CAqZACJQuhoJbFyBCUImaNF8T8h+58+MR2aIwqOR8VhSavEq2HXw==
+	P2DRySv0xm2AMRMgDcylkuXsRA0tCQ0ThqFXNbDUjbBPfea6Hd07JD6Ji+F+8KCNRgdZeGiytBnqLRwBDHZ441mcDQ6FHRb9ctSibLfj9vTvu53nLqvR/7YQdXGxSlZIukCAZeSWUHDqsh2h9p+ahWaP0DE424IQmvahn4yibyMxbtZYLzf+kwYPLIosBx1hE0zWrP/njzeIPU3b3iy0Vu9ofCoAT3iVx8EN3IjSXO2gyBgfdhcL5CNX/zsRt7uK5nO57+v4YLXwfL6rb/f2HsSNZBD0hd4cqB1vkaRsT8OObKJbY1mkmDnPkGWnVY98tbsnPaAJqTBOCCXJtVXvIpt+0U2mfkslQlX5/XbGCJz1yd2QCIUIgklktndrBla9D90TBkIC3E6ZwflcKbZBJzbFZDptC5G4t1e2s1vYUaRyBeqLz+uDLnEUpoxwHyxTO9ZAgVmIKUbYLr+BHGlWR2W2m2iHI1fEPh/1/lbKXnBRQ1mvDaGNeSoMuM4xnqLVP0KAmtn04nQfqzCtiKx/ED+wsBMhlz1pBwlMt2tRR6/sUlqRNMx5ptLVj/2TGjJK+sgEBTNrGNHdKYpku+O5VRzOXMNZbdB78hfDN0KBSnBTURpjnJiApvh1UdN57Q9ou39tqm/4MPM+Z7+jHjlVeioVvumKmlGDd2wxPRTR8rPExagRic2Md0qDUxBk1K2CsgSOwnm6ZR74JPypAnir/5ruEhpsJcXkySrbDbkGIg4=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(7416014)(376014)(82310400026)(1800799024)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	eSCkrXLAv3zctPD34AHl/mEgqvnF+LZgHrG3cqTqYOQU2r4e7CTvY3qK9fuaXpBhnREGsS06VuiNL/6aqhQb0Z/faq+gMmVv2pdKrrCzN2JirDHSmOcnAySXBKV/iO//kZzGtDvqJ37cJkmH/42Y4zFvHr5ZR3iXirZoRtZ/wdSF3btsahp6RR06QxVPvbB0FSlG0351tm9bI30vSeeIkKh+1XPmtaULDkwVDWEaJu9WbghSJ5hXAVwxYMKsriCJjZoVijOIPxYWaTSBk7ZjuWYcdpDQCTpwQMJv16smfTcI9B+wGomJQKm9GyXuPv154WCA+rT26QtBerSFYW/HPP/J7FkI5glh/Q5PcDpTw8zNQoxZ1GDLpad52ZF87+I6qzHT04nROdZhmcHr6Y/nuL8G3hE078zrPw1e79GxfBxBChoXpfsADU2dYLI6Nzkz
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2026 12:40:01.2287
+	=?us-ascii?Q?SxrxLxxUPLcWKZD3ZqM4pmPqIkTtU1muaSZa7b0Z25oYeGMnDPjZTkk65Rvk?=
+ =?us-ascii?Q?Jq9xsevAMbuBSVpoA0MNH3YuG4Y776ZKaayQEM0bnXq8RrxZ3zkiaf2q0xlp?=
+ =?us-ascii?Q?NN7+zZ2rWq4KVlOP+hikk+ixMOMevwwiR1UpO8v6DeY6qmpSJQLexrMoHF4X?=
+ =?us-ascii?Q?BIqElijKhR06LTMDaHldL7r6UBLe9Iq7xo0M7yCKzbbsa803HQBwdVzrO34J?=
+ =?us-ascii?Q?frAAzYSUxWV6SGdj1cN9z9Wk2vnvN4scsILZIEYHN3a5uwfxNxZjrGLT2Gwz?=
+ =?us-ascii?Q?S50z5oqVU40nQGDzCT/ZJ0LPdr6J5FguXQzaovybxjWmRlZbKFW3ki2h0kXf?=
+ =?us-ascii?Q?g+2Nq223siY8Jy12FxaZaNsxQEP3bRgpVMQ9sE6oC9YDxs6qsDgOGhWN081y?=
+ =?us-ascii?Q?HD9N1VSLL7fQ8lL5i9ceVK+DIzmV+hoU+sNJ0A0fCgFBEqcjtB4XeEmqsECo?=
+ =?us-ascii?Q?ifcJFD6iaU0yFpYKNzy1fPlyjRbjWifLEZYxoOiRi7pAUgFehiR4cs9CO82g?=
+ =?us-ascii?Q?gLNWYhTiZLXuEvkv3oM7x0KZ+4fgd7hUbC4RQl4egtQsGQoJS8c7ZcSKDSkl?=
+ =?us-ascii?Q?ztZehxuDg+f7pI09R2xE8gtBbbCIKs+bU3tlhtOqBWDaNg+FTbADohuEtS5G?=
+ =?us-ascii?Q?UVSzwkMfG1ueBo0AXviA0WlkaHbszG9tc/dE9xrE/5Q5mYZOjjrp5jG9g70t?=
+ =?us-ascii?Q?ghXCOeXKJYPPw7ISc2Np/VT3+IO/TOzWW6ndk4pfgYRzDTK+eLryIVISc8kL?=
+ =?us-ascii?Q?C1ck8vdpohvXcaW6yhQf34C8Fo8lrTrGeD/G5/5X7KfFLvd2rn5vu0SB88dl?=
+ =?us-ascii?Q?sJOQ4QBjwi/maSKQ7yOPNCFmDfwRoKwQORLGjKfSyoEnD4znBjqGPMU3S7eG?=
+ =?us-ascii?Q?9GH5beqdTC+6o6Ca9RZSlXn0QSKv12jMDc0Q5gnFab7FPQe6kM4rfJSE+vc7?=
+ =?us-ascii?Q?8taH5jEVDYm8MMyAgAr5CAPzYOIoSnkodqqkXK1ezDtQWCKCqAidZ1PENkvS?=
+ =?us-ascii?Q?E3HKQE0K+/LqSASiQN4IkAyl7qFkMsX8eniwcieCSIDQy5e5P2WRro4Pylz0?=
+ =?us-ascii?Q?NxlZrZPF5FHckyCY6H2drNSLLRvV4dfMXnJGIeuQ2SHfLuT/DrRiz8G3NoVB?=
+ =?us-ascii?Q?kFHrpsobIcb/BtHSLpEDDsj0+rXqzbp3aD+rT1FIR92BdhRAgt0T5iUcax1l?=
+ =?us-ascii?Q?ApDJBByZszbBWq3bEo04Ub2KmlM1oiZPx8q2bMdGMOIni10bdJSw2n4jHf3P?=
+ =?us-ascii?Q?n9v/NT9fIFdOJSpIptC4nQcaN8x07sCVXIIeuXa/hMs+/RHWCQoqtCwEQXqr?=
+ =?us-ascii?Q?vaYLn2i7EXeFZKC5jXXEhzLxpy0wDYj0PPwfOAsbO3pA91K/+NfzX6W69rqL?=
+ =?us-ascii?Q?M2q3EsfYH71ATKNVCNA8BD/MPKvB9QloOUppdgiyh0N9WwMd/37irs6+miQ1?=
+ =?us-ascii?Q?7TqWmzV1lRCUBlTWQWx6tKA/UcpuJBu7v7ReGmombbzmH9M1+/P2tgUJJ29I?=
+ =?us-ascii?Q?HvHHMqx2995CPsV0P4WZHc/ObrcMbhamjEUnrfbU5RCqBFAzUATYnisQ6K5Y?=
+ =?us-ascii?Q?uK5tK4eugOw/OT0wapwetcokF5DTbsx+HuLsBon3igMKs/SbN4qoWPLVD3Xm?=
+ =?us-ascii?Q?RmTa75E+uUJDzrlh6f/ShHQyRjv/YVQjhOOj3ICR0ZeiBjQEM3VgUq+MMVBu?=
+ =?us-ascii?Q?yPB0WtkUsRtrXq8tLj2UtizNouljXhegEFgfSh3ipsalLdgM?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 80eb9019-40f3-4477-a9ea-08dea6b5af51
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2026 12:40:39.6851
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2a1aaaf1-5e1b-45a9-0bae-08dea6b5989d
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF000397B4.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7267
-X-Rspamd-Queue-Id: B94C34A2D61
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5pRuDQSeXuGKXPjxNDL5KoCV4tuWf/2YzkX0aNu31KUF5r7XzDHk1wxoWVvTuwUkSPYeXB8WLl0uBD2bBw5Eow==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7606
+X-Rspamd-Queue-Id: CB7384A2DD1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [1.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-282844-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-282845-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,herbertland.com,gmail.com,redhat.com,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[abhijit.gangurde@amd.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,amd.com:dkim,amd.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.993];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[9]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email,Nvidia.com:dkim]
 
-Allow userspace to specify the QP transport mode and number of
-reorder completion queue paths during QP creation and modification.
+On Wed, Apr 29, 2026 at 05:46:48PM +0200, Daniel Borkmann wrote:
+> ipv6_{skip_exthdr,find_hdr}() and ip6_{tnl_parse_tlv_enc_lim,
+> protocol_deliver_rcu}() iterate over IPv6 extension headers until they
+> find a non-extension-header protocol or run out of packet data. The
+> loops have no iteration counter, relying solely on the packet length
+> to bound them. For a crafted packet with 8-byte extension headers
+> filling a 64KB jumbogram, this means a worst case of up to ~8k
+> iterations with a skb_header_pointer call each. ipv6_skip_exthdr(),
+> for example, is used where it parses the inner quoted packet inside
+> an incoming ICMPv6 error:
+> 
+>   - icmpv6_rcv
+>     - checksum validation
+>     - case ICMPV6_DEST_UNREACH
+>       - icmpv6_notify
+>         - pskb_may_pull()       <- pull inner IPv6 header
+>         - ipv6_skip_exthdr()    <- iterates here
+>         - pskb_may_pull()
+>         - ipprot->err_handler() <- sk lookup
+> 
+> The per-iteration cost of ipv6_skip_exthdr itself is generally
+> light, but skb_header_pointer becomes more costly on reassembled
+> packets: the first ~1232 bytes of the inner packet are in the skb's
+> linear area, but the remaining ~63KB are in the frag_list where
+> skb_copy_bits is needed to read data.
+> 
+> Initially, the idea was to add a configurable limit via a new
+> sysctl knob with default 8, in line with knobs from commit
+> 47d3d7ac656a ("ipv6: Implement limits on Hop-by-Hop and Destination
+> options"), but two reasons eventually argued against it:
+> 
+> - It adds to UAPI that needs to be maintained forever, and
+>   upcoming work is restricting extension header ordering anyway,
+>   leaving little reason for another sysctl knob
+> - exthdrs_core.c is always built-in even when CONFIG_IPV6=n,
+>   where struct net has no .ipv6 member, so the read site would
+>   need an ifdef'd fallback to a constant anyway
+> 
+> Therefore, just use a constant (IP6_MAX_EXT_HDRS_CNT). All four
+> extension header walking functions are now bound by this limit.
+> 
+> Note that the check in ip6_protocol_deliver_rcu() happens right
+> before the goto resubmit, such that we don't have to have a test
+> for ipv6_ext_hdr() in the fast-path.
+> 
+> There's an ongoing IETF draft-iurman-6man-eh-occurrences to enforce
+> IPv6 extension headers ordering and occurrence. The latter also
+> discusses security implications. As per RFC8200 section 4.1, the
+> occurrence rules for extension headers provide a practical upper
+> bound which is 8. In order to be conservative, let's define
+> IP6_MAX_EXT_HDRS_CNT as 12 to leave enough room for quirky setups.
+> In the unlikely event that this is still not enough, then we might
+> need to reconsider a sysctl.
+> 
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
 
-Extend ionic_qp_req with transport_mode, num_rcq_paths, and
-ionic_flags fields. The transport mode selects the firmware QP type,
-ionic_flags are forwarded in the upper bits of priv_flags during
-QP creation, and num_rcq_paths is passed to firmware during QP
-modify.
-
-Co-developed-by: Allen Hubbe <allen.hubbe@amd.com>
-Signed-off-by: Allen Hubbe <allen.hubbe@amd.com>
-Signed-off-by: Abhijit Gangurde <abhijit.gangurde@amd.com>
----
- .../infiniband/hw/ionic/ionic_controlpath.c    | 16 +++++++++++-----
- drivers/infiniband/hw/ionic/ionic_fw.h         | 18 +++++++++++++++---
- drivers/infiniband/hw/ionic/ionic_ibdev.h      |  1 +
- include/uapi/rdma/ionic-abi.h                  |  5 ++++-
- 4 files changed, 31 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/infiniband/hw/ionic/ionic_controlpath.c b/drivers/infiniband/hw/ionic/ionic_controlpath.c
-index 6bb645713d6b..5a6d4036ea98 100644
---- a/drivers/infiniband/hw/ionic/ionic_controlpath.c
-+++ b/drivers/infiniband/hw/ionic/ionic_controlpath.c
-@@ -1326,7 +1326,9 @@ static int ionic_create_qp_cmd(struct ionic_ibdev *dev,
- 			       struct ionic_qp *qp,
- 			       struct ionic_tbl_buf *sq_buf,
- 			       struct ionic_tbl_buf *rq_buf,
--			       struct ib_qp_init_attr *attr)
-+			       struct ib_qp_init_attr *attr,
-+			       u32 ionic_flags,
-+			       enum ionic_qp_transport_mode transport_mode)
- {
- 	const u16 dbid = ionic_obj_dbid(dev, pd->ibpd.uobject);
- 	const u32 flags = to_ionic_qp_flags(0, 0,
-@@ -1342,8 +1344,9 @@ static int ionic_create_qp_cmd(struct ionic_ibdev *dev,
- 			.len = cpu_to_le16(IONIC_ADMIN_CREATE_QP_IN_V1_LEN),
- 			.cmd.create_qp = {
- 				.pd_id = cpu_to_le32(pd->pdid),
--				.priv_flags = cpu_to_be32(flags),
--				.type_state = to_ionic_qp_type(attr->qp_type),
-+				.priv_flags = cpu_to_be32(flags |
-+						(ionic_flags & IONIC_QP_USER_FLAGS_MASK)),
-+				.type_state = to_ionic_qp_type(attr->qp_type, transport_mode),
- 				.dbid_flags = cpu_to_le16(dbid),
- 				.id_ver = cpu_to_le32(qp->qpid),
- 			}
-@@ -1412,6 +1415,7 @@ static int ionic_modify_qp_cmd(struct ionic_ibdev *dev,
- 					  (attr->rnr_retry << 4)),
- 				.rnr_timer = attr->min_rnr_timer,
- 				.retry_timeout = attr->timeout,
-+				.mrc_num_paths = qp->num_rcq_paths,
- 				.type_state = state,
- 				.id_ver = cpu_to_le32(qp->qpid),
- 			}
-@@ -2156,7 +2160,7 @@ int ionic_create_qp(struct ib_qp *ibqp, struct ib_qp_init_attr *attr,
- 	int rc;
- 
- 	if (udata) {
--		rc = ib_copy_validate_udata_in(udata, req, rsvd);
-+		rc = ib_copy_validate_udata_in(udata, req, ionic_flags);
- 		if (rc)
- 			return rc;
- 	} else {
-@@ -2203,6 +2207,7 @@ int ionic_create_qp(struct ib_qp *ibqp, struct ib_qp_init_attr *attr,
- 
- 	qp->sig_all = attr->sq_sig_type == IB_SIGNAL_ALL_WR;
- 	qp->has_ah = attr->qp_type == IB_QPT_RC;
-+	qp->num_rcq_paths = req.num_rcq_paths;
- 
- 	if (qp->has_ah) {
- 		qp->hdr = kzalloc_obj(*qp->hdr);
-@@ -2239,7 +2244,8 @@ int ionic_create_qp(struct ib_qp *ibqp, struct ib_qp_init_attr *attr,
- 	rc = ionic_create_qp_cmd(dev, pd,
- 				 to_ionic_vcq_cq(attr->send_cq, qp->udma_idx),
- 				 to_ionic_vcq_cq(attr->recv_cq, qp->udma_idx),
--				 qp, &sq_buf, &rq_buf, attr);
-+				 qp, &sq_buf, &rq_buf, attr, req.ionic_flags,
-+				 req.transport_mode);
- 	if (rc)
- 		goto err_cmd;
- 
-diff --git a/drivers/infiniband/hw/ionic/ionic_fw.h b/drivers/infiniband/hw/ionic/ionic_fw.h
-index adfbb89d856c..3a31cd9073ca 100644
---- a/drivers/infiniband/hw/ionic/ionic_fw.h
-+++ b/drivers/infiniband/hw/ionic/ionic_fw.h
-@@ -105,6 +105,8 @@ enum ionic_qp_flags {
- 	IONIC_QPF_SQ_CMB		= BIT(13),
- 	IONIC_QPF_RQ_CMB		= BIT(14),
- 	IONIC_QPF_PRIVILEGED		= BIT(15),
-+
-+	IONIC_QP_USER_FLAGS_MASK	= GENMASK(31, 16),
- };
- 
- static inline int from_ionic_qp_flags(int flags)
-@@ -218,6 +220,11 @@ static inline int ionic_to_ib_status(int sts)
- 	}
- }
- 
-+enum ionic_qp_transport_mode {
-+	IONIC_QPT_TRANSPORT_ROCE_V2 = BIT(0),
-+	IONIC_QPT_TRANSPORT_MRC = BIT(1),
-+};
-+
- /* admin queue qp type */
- enum ionic_qp_type {
- 	IONIC_QPT_RC,
-@@ -228,16 +235,21 @@ enum ionic_qp_type {
- 	IONIC_QPT_XRC_INI,
- 	IONIC_QPT_XRC_TGT,
- 	IONIC_QPT_XRC_SRQ,
-+	IONIC_QPT_MRC,
- };
- 
--static inline int to_ionic_qp_type(enum ib_qp_type type)
-+static inline int to_ionic_qp_type(enum ib_qp_type type,
-+				   enum ionic_qp_transport_mode tm)
- {
- 	switch (type) {
- 	case IB_QPT_GSI:
- 	case IB_QPT_UD:
- 		return IONIC_QPT_UD;
- 	case IB_QPT_RC:
--		return IONIC_QPT_RC;
-+		if (tm == IONIC_QPT_TRANSPORT_MRC)
-+			return IONIC_QPT_MRC;
-+		else
-+			return IONIC_QPT_RC;
- 	case IB_QPT_UC:
- 		return IONIC_QPT_UC;
- 	case IB_QPT_XRC_INI:
-@@ -808,7 +820,7 @@ struct ionic_admin_mod_qp {
- 	__le32		ah_id_len;
- 	__u8		en_pcp;
- 	__u8		ip_dscp;
--	__u8		rsvd2;
-+	__u8		mrc_num_paths;
- 	__u8		type_state;
- 	union {
- 		struct {
-diff --git a/drivers/infiniband/hw/ionic/ionic_ibdev.h b/drivers/infiniband/hw/ionic/ionic_ibdev.h
-index 63828240d659..24a7f93e1f00 100644
---- a/drivers/infiniband/hw/ionic/ionic_ibdev.h
-+++ b/drivers/infiniband/hw/ionic/ionic_ibdev.h
-@@ -253,6 +253,7 @@ struct ionic_qp {
- 	u8			has_sq:1;
- 	u8			has_rq:1;
- 	u8			sig_all:1;
-+	u8			num_rcq_paths;
- 
- 	struct list_head	qp_list_counter;
- 
-diff --git a/include/uapi/rdma/ionic-abi.h b/include/uapi/rdma/ionic-abi.h
-index fb0d13094c12..bd02e4541d85 100644
---- a/include/uapi/rdma/ionic-abi.h
-+++ b/include/uapi/rdma/ionic-abi.h
-@@ -85,7 +85,10 @@ struct ionic_qp_req {
- 	__u8 sq_cmb;
- 	__u8 rq_cmb;
- 	__u8 udma_mask;
--	__u8 rsvd[3];
-+	__u8 num_rcq_paths;
-+	__u8 transport_mode;
-+	__u8 rsvd;
-+	__u32 ionic_flags;
- };
- 
- struct ionic_qp_resp {
--- 
-2.43.0
-
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
