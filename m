@@ -1,238 +1,169 @@
-Return-Path: <netdev+bounces-282893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282894-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mMw1AV9w82m42gEAu9opvQ
-	(envelope-from <netdev+bounces-282893-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:08:15 +0200
+	id oHcFHwRx82m42gEAu9opvQ
+	(envelope-from <netdev+bounces-282894-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:11:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C8564A471D
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:08:14 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 429E94A47A4
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:10:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C3C79301C3ED
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:04:08 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 86B5A30193EC
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:09:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1817D254B1F;
-	Thu, 30 Apr 2026 15:04:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 796F131F9AD;
+	Thu, 30 Apr 2026 15:08:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TJizXtey"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SRuHsT6d"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8DC319D074;
-	Thu, 30 Apr 2026 15:04:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C322DC783
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 15:08:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777561448; cv=none; b=avdcm7AVGHMqOKENJVhKH2+xf6ZfgcyHSjZazPRtksc9Q2ATsFvPsiGQOXlgVPzqNwezrhg0B2xTmZjbYR7fta4XNdvG9S47nGOakFxaVECBjv8qgN8TD1jOhaKRAMEHmtA9Oz6rQFr/Cp0oHBsSao97RCg1dRmueC0for3T07s=
+	t=1777561689; cv=none; b=hKuLbCdpAYcM9x7n5BmxE8q2UgPGEUOWnRCriBNPVjQbj2/UVt0+ujmR7AXqiZ3IEtN2nzF945KI/Na/DsJi5MI0pqPIRmVRVn5wzYWon9MI2w6sPWB4ZaTNfKkCBRrV8ldHmeeUpeHaBY57bhgTzmS+aemXPpwvkOGiIZA6l+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777561448; c=relaxed/simple;
-	bh=/O0CpJRysWYZda1keHG+1ZMsSYW/5zb6IS+USuBxsQQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h6YkyIRHuB1Jmnqr7zh+IAOlmwkEmBpALocrd6mmF2yN2Ppx0cRzh/rjvidk55gvY2/6bFCZYzswXRSiT1+c03kTJK5enxfrSWWAk7n9ETOexVJUJB1C9z4+GiRKbdonhnc3DdsIxW3+rDg4TYQHbYatScAGyezzHOB9NzMKRKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TJizXtey; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25258C2BCB3;
-	Thu, 30 Apr 2026 15:04:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777561447;
-	bh=/O0CpJRysWYZda1keHG+1ZMsSYW/5zb6IS+USuBxsQQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TJizXteyODbb9obnaqnQjl7EuJy3CBoHg2bqOqcQ7YLBmtumqv06iGQkemV/Uclmr
-	 eORvvsqhL0WBnnq5Omgc1F8wg+iUKPk4VqXUNZl6/SU7ET/z280dx8t60hOZlk59jX
-	 nTyMvMs/iHh85O8Dk3aHq/byW64eEcIPNBX59SB5I9JT0DQzdOIeolpj6JngtZFmdc
-	 58H9gy/wBt7B3R56XkUONZUpsmy2jfiQb7PTFM5RKu3qt75W/fTCb5ELkmriRj9R8L
-	 0ip34/6YHRu7KAZ6amRcW0OzllheWRhxIdXVkPNE9cdTUkx7j+ctz8k9ZWZE9keGWG
-	 aMtI3wfM8aLdg==
-Date: Thu, 30 Apr 2026 17:04:04 +0200
-From: Frederic Weisbecker <frederic@kernel.org>
-To: Chuck Lever <cel@kernel.org>
-Cc: Marco Crivellari <marco.crivellari@suse.com>,
-	linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org, Tejun Heo <tj@kernel.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Michal Hocko <mhocko@suse.com>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
-	"David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1777561689; c=relaxed/simple;
+	bh=TvP7ZTDOMHBu/ZdHZdb2POMtxrpsyT8ynEDaZnjecUI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Uix8RFyGVf/ZyAwaFbCUBVNyTKWSiFhqk0h9frQ2sekKd3qj2dRfhjGPTNRiJ80y4V3G+xHQMVp9WvECSH3rXX8kAvJg9DI35a4ZBGLCa8Y2LuLS5K6Ef9qLQX+IboeWAF7mBEnESyDKdRiuqVzLzKrtwfUfCwJ+lrHs90eowYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SRuHsT6d; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-506362ac5f7so7161141cf.1
+        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 08:08:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777561685; x=1778166485; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ILCkE3O6mXbfWtPYor9kKdKDv0oBBMcO4rocHA3WptM=;
+        b=SRuHsT6dRhpEzAH+dsfisF9dHtvRKZNi4sZ4MEkUSqYYOZfc6Icq4WOhMTVuKnL6o/
+         fzpaV4KtEg2IYpfeXQxFT+RbCtBQ80wttSZ9cIvShlJS4o+DFymnJ1CBYpkSxOxu66N1
+         v7PNWm3wWQP2phWonAzJnUJrhtZYXSMRtp14DyPorwqUIrCQFfXjAD+sVHDtctzlrLtv
+         AaEs/jXem2cZX8vNAyNnV+6w+9KcYlZwwGqs00RTzhu+oKulhKiOSxlPiq3zMJUQgdZ3
+         jEJVlq4jAZ/eu8jPnffI53VeYkrWMP5QexBClQZX7dI2vMc+QZfaBYgTO31zTtUixgC3
+         GUYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777561685; x=1778166485;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ILCkE3O6mXbfWtPYor9kKdKDv0oBBMcO4rocHA3WptM=;
+        b=P9DsH89pPD39LPZWIb4LFIW01vNdHDGTeAB5+HMNETQMXluqHjwZLjz1e8YP7pRukq
+         AE7T+y5n+SSAaIpbp2YbcV1wlRPcgqplUO85KEhYxhPC5CjOk/N6xBCK4GUllOWPx64q
+         jt8qvH3Ek/B9VhCwj+ycYbq7wjWYK/5tAhsJTPbWoLuKqGMJTt5DxXhB9uy3zVKlPP/y
+         ZKJDsRk3kY2LIJLJpjgHfmHo+9vd45pxohCtz3VLLYxhQ/m3A7M5pJndthhRhTrVEW2S
+         9MQkBq6cYiMazuGzIzdtECy02KRjinrOI/Z2TEQN3cZV6ycvOQzgup7nZewKHoaQ2m/V
+         F67Q==
+X-Forwarded-Encrypted: i=1; AFNElJ/aJ/dEq3j26lFF0anHY4VRIekRX5EyRA9FfwhXfZuwHmnl5SUBbjS4gOJqDrtuVp5iRVHr2YM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyg3QjlV3vZcOQUaL1DOX/hfXKedn6JY483TLLzjRkKMcyebtuN
+	mEkfCUtfO3KIhucVFbkYvpLMaFvLANw618XcFMZCfDiffFZCAoVY5hYY
+X-Gm-Gg: AeBDies1h47Mog7skxCM5hEH4eLT5YmtUsLq2fgHSU2URYsBdhoHQIzSo7yKLCr8ItA
+	YbkwguSdF+tqnHc4QdZHvug51socagTj15GUi2y8XS4FKFaZaUj5EoN+ZjyS8nsObIClEG3dueu
+	TQ9BwxoBNzD99UCVkt+7dl7ICrBdDwdo+w3gnzIipIu5VAUQd9FGWgbx2gZKMrnM/Ii4RtVk0+i
+	ba87ApAy4xsqiCM6l72nqpSRlrq3hvnbIKjjdUcFGhcYkZEKY60iUvp8XAXFXkCrVM+dYQRCdX9
+	ebvErZgMG3mVk4NvDLkZT/Mf9CXr5y01d7VCXBnDdJ+EEtMhZIXZk4mZvGSPfXIMrWmNti/gQDb
+	a6zWPxjPKdHCudmU+rH+RbpapJhY1z6ORqUTf0srgitVU4sejgcbN0OmZcxl9ijilQVtW8ZlvS+
+	gqgxJBx35JAsaug/DPmvBCB15up9ZzHcC1vN1Ia+nGdEguXMmtMm8DRztYNXrOJWmKjp8=
+X-Received: by 2002:ac8:5f47:0:b0:50d:ab9d:33bc with SMTP id d75a77b69052e-5102ab34ee4mr47569101cf.8.1777561684734;
+        Thu, 30 Apr 2026 08:08:04 -0700 (PDT)
+Received: from PF5YBGDS.localdomain ([163.114.130.4])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5103b397c38sm450731cf.7.2026.04.30.08.08.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Apr 2026 08:08:04 -0700 (PDT)
+From: mike.marciniszyn@gmail.com
+To: Alexander Duyck <alexanderduyck@fb.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	kernel-team@meta.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [RFC PATCH] xprtrdma: Move long delayed work on
- system_dfl_long_wq
-Message-ID: <afNvZKtiQPLbi-3F@localhost.localdomain>
-References: <20260430085412.96961-1-marco.crivellari@suse.com>
- <8d1eff7b-3712-4039-87d6-028a4118e210@app.fastmail.com>
- <afNguCraI6AvmZrR@localhost.localdomain>
- <1e220a70-4318-49de-aaac-332c0a1cfab4@app.fastmail.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Mohsin Bashir <mohsin.bashr@gmail.com>,
+	Lee Trager <lee@trager.us>,
+	Andrew Lunn <andrew@lunn.ch>
+Cc: mike.marciniszyn@gmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2 0/3] first series for xpcs based rsfec configuration
+Date: Thu, 30 Apr 2026 11:07:59 -0400
+Message-ID: <20260430150802.3521-1-mike.marciniszyn@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <1e220a70-4318-49de-aaac-332c0a1cfab4@app.fastmail.com>
-X-Rspamd-Queue-Id: 5C8564A471D
+X-Rspamd-Queue-Id: 429E94A47A4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282893-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[suse.com,vger.kernel.org,kernel.org,gmail.com,linutronix.de,oracle.com,brown.name,redhat.com,talpey.com,davemloft.net,google.com];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	TAGGED_FROM(0.00)[bounces-282894-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[fb.com,kernel.org,meta.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,armlinux.org.uk,intel.com,trager.us];
+	FROM_NO_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.997];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[frederic@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[mikemarciniszyn@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[localhost.localdomain:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-Le Thu, Apr 30, 2026 at 10:05:52AM -0400, Chuck Lever a écrit :
-> 
-> 
-> On Thu, Apr 30, 2026, at 10:01 AM, Frederic Weisbecker wrote:
-> > Le Thu, Apr 30, 2026 at 09:35:20AM -0400, Chuck Lever a écrit :
-> >> 
-> >> On Thu, Apr 30, 2026, at 4:54 AM, Marco Crivellari wrote:
-> >> > Currently the code enqueue work items using {queue|mod}_delayed_work(),
-> >> > using system_long_wq. This workqueue should be used when long works are
-> >> > expected, but it is a per-cpu workqueue.
-> >> >
-> >> > This is important because queue_delayed_work() queue the work using:
-> >> >
-> >> >    queue_delayed_work_on(WORK_CPU_UNBOUND, ...);
-> >> >
-> >> > Note that WORK_CPU_UNBOUND = NR_CPUS.
-> >> >
-> >> > This would end up calling __queue_delayed_work() that does:
-> >> >
-> >> >     if (housekeeping_enabled(HK_TYPE_TIMER)) {
-> >> >     //      [....]
-> >> >     } else {
-> >> >             if (likely(cpu == WORK_CPU_UNBOUND))
-> >> >                     add_timer_global(timer);
-> >> >             else
-> >> >                     add_timer_on(timer, cpu);
-> >> >     }
-> >> >
-> >> > So when cpu == WORK_CPU_UNBOUND the timer is global and is
-> >> > not using a specific CPU. Later, when __queue_work() is called:
-> >> >
-> >> >     if (req_cpu == WORK_CPU_UNBOUND) {
-> >> >             if (wq->flags & WQ_UNBOUND)
-> >> >                     cpu = wq_select_unbound_cpu(raw_smp_processor_id());
-> >> >             else
-> >> >                     cpu = raw_smp_processor_id();
-> >> >     }
-> >> >
-> >> > Because the wq is not unbound, it takes the CPU where the timer
-> >> > fired and enqueue the work on that CPU.
-> >> > The consequence of all of this is that the work can run anywhere,
-> >> > depending on where the timer fired.
-> >> >
-> >> > Recently, a new unbound workqueue specific for long running work has
-> >> > been added:
-> >> >
-> >> >    c116737e972e ("workqueue: Add system_dfl_long_wq for long unbound works")
-> >> >
-> >> > So change system_long_wq with system_dfl_long_wq so that the work may
-> >> > benefit from scheduler task placement.
-> >> 
-> >> The patch description confuses me.
-> >> 
-> >> The message ends with "the work can run anywhere, depending on where
-> >> the timer fired." Read literally, "can run anywhere" sounds like a
-> >> feature, not a bug
-> >
-> > A feature, but incomplete :)
-> >
-> >> — and the proposed fix (WQ_UNBOUND) also lets it
-> >> run anywhere, just via a different selection path. Without a sentence
-> >> saying "and that anywhere includes isolated CPUs, which we don't want,"
-> >> the reader is left to fill in the gap.
-> >
-> > Not quite, global timers don't fire on isolated CPUs. And since it gets enqueued
-> > on the CPU where it fired, it won't be enqueued on an isolated CPU.
-> >
-> >> 
-> >> So, could the commit message lead with the motivation? My guess is that
-> >> this is about respecting HK_TYPE_TIMER housekeeping on isolated systems,
-> >> which system_long_wq cannot do because its per-CPU pool ignores the
-> >> housekeeping mask once the global timer fires. If that is the case,
-> >> please say so directly and the mechanism trace becomes a supporting
-> >> argument rather than the whole argument.
-> >
-> > The purpose is explained on the last line:
-> >
-> > """
-> > So change system_long_wq with system_dfl_long_wq so that the work may
-> >  benefit from scheduler task placement.
-> > """
-> >
-> > Arguably this could be elaborated. For example we can change that:
-> >
-> > """
-> > The consequence of all of this is that the work can run anywhere,
-> > depending on where the timer fired.
-> > """
-> >
-> > into that:
-> >
-> > """
-> > The consequence of all of this is that the work can run on any
-> > housekeeping CPU, irrespective of the scheduler that knows better
-> > about the best task placement, which would apply if the work were
-> > to be queued on an unbound workqueue.
-> > """
-> >
-> > Would that help?
-> 
-> It's still not clearing it up for me.
-> 
-> Does the patch address a bug (work isn't getting rescheduled at
-> all) or is it merely a minor optimization for certain platforms?
-> 
-> What's the user-visible issue that will be improved with this
-> change?
+From: "Mike Marciniszyn (Meta)" <mike.marciniszyn@gmail.com>
 
-It's not a bug, it's an optimization power-wise and performance-wise
-and also part of a bigger sanity change:
+The series:
+- Fixes an addr validation error
+- Adds MDIO defines associated with RS-FEC
+- consolidates the handling of the boilerplat ID registers
+  into a routine to report id'ish registers and reduces the lines
+  of code across the entire set of c45 routines.
+- adds PMA read/write routines
 
-- Long works have no reason to stick to a single CPU. If they are converted to
-  be unbound, the scheduler can move them to relevant targets to optimize
-  performances and power consumption. Hence the new system_unbound_long_wq.
-  The goal is to remove system_long_wq if none of its users rely on locality.
+https://lore.kernel.org/all/20260428172810.175077-2-mike.marciniszyn@gmail.com/
+has been removed from the series and submitted to net as
+https://lore.kernel.org/all/20260429150049.1643-1-mike.marciniszyn@gmail.com/
 
-- Using queue_delayed_work() with a bound workqueue doesn't make any sense
-  since the target is completely random.
+pcs reads for DEVS1 and DEVS2 cleaned up 2/3
 
-Thanks.
+Mike Marciniszyn (Meta) (3):
+  net: mdio: Add support for RSFEC Control register for PMA
+  net: eth: fbnic: Consolidate register reads for ids and devs
+  net: eth: fbnic: Add pma read and write access
 
--- 
-Frederic Weisbecker
-SUSE Labs
+ drivers/net/ethernet/meta/fbnic/fbnic_csr.h  |   1 +
+ drivers/net/ethernet/meta/fbnic/fbnic_mdio.c | 135 +++++++++++++++----
+ include/uapi/linux/mdio.h                    |  10 ++
+ 3 files changed, 122 insertions(+), 24 deletions(-)
+
+--
+2.43.0
+
 
