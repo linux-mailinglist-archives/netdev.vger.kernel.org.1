@@ -1,180 +1,200 @@
-Return-Path: <netdev+bounces-282916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282917-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cFiYEj9482mt4AEAu9opvQ
-	(envelope-from <netdev+bounces-282916-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:41:51 +0200
+	id wBqPLD1782nc4QEAu9opvQ
+	(envelope-from <netdev+bounces-282917-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:54:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A77A74A4FF6
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:41:50 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D52B54A5318
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:54:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 443B7302736A
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:41:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9BE9F3039DFD
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:41:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C122DAFD7;
-	Thu, 30 Apr 2026 15:41:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 994CE331A76;
+	Thu, 30 Apr 2026 15:41:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lsvd0/PE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TkmxXSXu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99EA52FF672
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 15:41:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777563706; cv=pass; b=Ve+6EEVgsOtdW2OmUGegE4P6+vIu6CIAnIHg33cKPCZ6aUESxuRoKvEBp3JovU0/uJWfIysGSoAUkR4TWt16C8SBObJZPtPRCJA4iRwXpkzXxKXATp68yGRxBF95h59I78409afOJflkExX5iEmhd+2rY+dmmQL+/u7K6n7tUU8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777563706; c=relaxed/simple;
-	bh=CTnm8jbixxkr+n0+syoF6WFncIQ1WX2G9KR4zzj6vcc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g+gg04YY9s/l+qX2Jiu8dWv9zGsSHVcAuyAm+HTwjhkifAmjpfMUZvr+uOlYx9l5PcLwEqX6MSAVBTatqDRnV+WdJO7op8v6mJL/tSlNkzR2U3TQ+jUEeTkjs6CIdeDUr6SRT4xr6UaEqQ/eLrKk7ZDT2PECp9jzk08DZ9ANiFQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lsvd0/PE; arc=pass smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-50e5c7eb565so9425301cf.3
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 08:41:45 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777563704; cv=none;
-        d=google.com; s=arc-20240605;
-        b=M7hsMO6YY2kVH3mJ1rCalbOQWzPtOd5gslogpr2qnk6f6Uim+fq3TAxdVaFg57tDXe
-         C9fFz29SsFXNqdY2K4K+BVbMhyvHPo4GuHM84wTr5kahG/SNGh3gXzhN0wwKcfrxU0BV
-         EQS1q1IceiLuSz3bdUq3P3NUuRqYy5YL+w0nE4rb9P9h8AEwEem675GyAvFnCbElk0nD
-         fvNggSqsfonVaNMG/HQWSHvc/iWoz9dwXLBJ93WdFa92/+TZNFbkawyR27M518T6ANUF
-         GcTIeBlz8ZBLH2qyCqv+S/aBzUPWB+5YdwcQmTJciUWZmQNWOYkAU1aMF/cp+ds1Bdnk
-         bCDA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=4fWKCvUcYkO7KnC4xGz/XeA+D7NpQomx4e1roT5OH94=;
-        fh=Iy2XQJamSMJoeWqwxtepJZ+MKGh8QDUjPwyraS3u70o=;
-        b=IKLV9PkB5aNKbgGIUOV87IIz02x/8J6EBCfkZIrEL/z1013rUHW/x3BDiaGvlZihMV
-         5Zx4c8TAgZ3APGU/Ry66Nv0z4TcmDNQauMxOljQvkWtk4DHTjDe7bSeqrCE8AMJO1+Jm
-         bhU8vrrM48+dEA4NVZd+LzOY0hfYhypYPGmit3F5R3ge928tdOVxp+Wgd745OadWqHon
-         T5ooc848rXipsmZfsgbgudXJoYcekmPfuKcXgtEpPjq1qxGlg7joE32v/1Dil+lBBnS4
-         G1cRnj0uqbXwb8BCp5PfuJqMtUbHqmFU4X5hhJVMM3GTdat+Irpf7JvsYrPpUADyfw9y
-         KZpw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006A533D4E9
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 15:41:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777563711; cv=none; b=Mi4lI+1G3b+jopAWeKdm3HDfu+zeakxzdwcHHBhCtdntI9gnySqjoM2lrlEGqNaKQIJ+vUNthosCW4/H+O9v/HkQ7pe/vy5CkdpY2Bqz5kx4kLISMnTlA9r7fH4ybn9Fo01FyLAFTtko91oLn2NB15f1lJ8iWHzSsocPUoCx/cQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777563711; c=relaxed/simple;
+	bh=z0DYBvb+LZUpxretZCjDv+k9yn01sF1apvq6+r/SDyc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=lZwsxbp59DeBRXRmgdPfrpbG88ClZg3B/QrChcKoxakU7vAzoOQBrhq7cQzIqy8MLr6zEo6RVohIQvvs7t5O3ycU1SLZ+JWaNySpIiEvXfxyJKItfTz8PgcRM1EHHpHQoyz8sk91ElGbxf+k+0VDsCF6cdaxAsnU6yrAWhsKh5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TkmxXSXu; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-43d77f60944so769151f8f.3
+        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 08:41:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777563704; x=1778168504; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1777563708; x=1778168508; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4fWKCvUcYkO7KnC4xGz/XeA+D7NpQomx4e1roT5OH94=;
-        b=Lsvd0/PE5JuOV3gxqXCkHTg0Ao5QCACI0TuHMZaA0HQ7MGXFrsgStXef1tivxh6C0C
-         e79NLqnKsm1b9FpCSp6/2ml0zePphn/iax84jTNIWzZneRlCoIrL5/Kjyaqu+gZIhFOD
-         yoGOwVjqcmYhxxrPnCDuslqC2Xp8VzrHkr4weaEpND7wKVhZXQKkflGf2iHVh25dXRUO
-         2hXbftVebChGb3ISm/ax8oTNkgDLSLSSetDYlMBTWIoyhqYvvwVhIi/UlUup1UHoN2rK
-         69jMlmtqNGmWiYrsVbl7BoU/lJnBWVwf4zGRM3E3FZrIO+ulhBxpQ9rfBwIT0544gmk0
-         Tqkg==
+        bh=/1jOo4LrB4QdOIsyappS3L/Lh2AU+Kgh3i+w/0anQdk=;
+        b=TkmxXSXu+XYTyV11z+SNTS4rOiC4ZBzszwaHLhyZoTCWBlZXex94X8gXqiQImNqbWp
+         UQ1yCdi4Nxf0PZS2YOFhu/mnH9bs3IjkKHzhOCMeXkMqKlq3Ekuhl+l/QRZWRpf1IMGK
+         baUYLi4FwlrQ48MF943hGL5w+B1SWsmrILJtfVMp94y/UFNbFjgETcDwvDex+D19qR4i
+         Cdc7CfguGOtgvg7D8STowTlJsfRo26wnq5R4q7B5cS4LeJ0gBZSznd3Giz3rweZBp2hM
+         FYoJahpMvPI0aIazx1127YRN733Z0ZIGvoXtpt+XGJp2y0NaCmrhlj+VxY60Vte/4ygg
+         fNpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777563704; x=1778168504;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1777563708; x=1778168508;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=4fWKCvUcYkO7KnC4xGz/XeA+D7NpQomx4e1roT5OH94=;
-        b=BkGKQWuepGZi2cfFuUsR6bnotTXdtFuVgFUXYV0LbltFVeMzIOeX30pp4KpUSmIgtD
-         KBjRSnASNwPe3U3Z6ypqdMqlrI/Kzr3g94Ixc7Gd5P5ozTX17R8392LkbPWZ17HySox3
-         IkHjrNObqTyBJ/LMsfr7NEOKxMlRbPCWlFXwzscrJicIlC3mvknE9ywUFMIQ/vtKnLA+
-         wEZ0lzYRee5shUqxF5JM/7l6Dyr/4NuJIM1JH1WM7ynt70I9pAX6bJRECDvLHYVxmd3Z
-         1mkkgulDfdqlrp9NLUgUKlnFBZSU/q/77ojqky43tosB2a+zZpljV7PBBuTUgQJChuPQ
-         LNrQ==
-X-Gm-Message-State: AOJu0Yx264U3a9dlVKh2CTM1/gP/3ZzOZ2lTmk/KzsqFzaHJGhNSVqu/
-	nW6ahdQOHknA66RofosLhhwHd1UwctGWC15d9iUiXAxyyfXZ/kIUpNqM8QobVEr5gBT3DhjNUKp
-	6NuEE5kSe+QxvFXXq2DbVMgYu8HfV0Lm4W8BpgOjJ
-X-Gm-Gg: AeBDietPQbekeIGKgF0mQd/SoJ1getoOCkFtpyd+93M2OaHS0qbbMb1qeyb2+IWWBxb
-	Ug+Y1N0RH0/CZK+8ijFE68BzJvUu/DlyshdvEYwtxnQwEyT7APT7PuCfEg90rM8AuhUvSs/WTLe
-	mb2ijwSgv1MzQxPpCP9yBNmWOwjqv4f4DOgZJLwX4wFl61m1VrIZLsS7YOCjz8ZNdNW7KpcsLVR
-	uEDgKiS+R/VL9GNXTa/cN0POsLAXqsAdEL6Rd8PNMCak1BVUFVVciVi179AlH/I/Wwz66exmBAw
-	xvuhUS2Q6Onfojs03X6nb6Vp2H+HW/H9ZJ07DVWI6p6fOeJ9sRgsEe4Ibva50moWCGC7Q/5hE4b
-	tFDfZEd9NrPNAMBQbBE8MxWUV/q/RWzUbzHBilf9Q
-X-Received: by 2002:a05:622a:1186:b0:50e:5cc7:97c9 with SMTP id
- d75a77b69052e-5102ae07329mr45719901cf.34.1777563703768; Thu, 30 Apr 2026
- 08:41:43 -0700 (PDT)
+        bh=/1jOo4LrB4QdOIsyappS3L/Lh2AU+Kgh3i+w/0anQdk=;
+        b=p/KmVHoqqKS0mYK5dTo6SU6evAv2AEwbrrlcr+xl43R1X5m/OEwUstguF2/c3gSFHQ
+         KDaWgm5wZYlw8K6kR8cftglR1MJM1bS8hhvZuJxVPQ0dTjmtg6y8up1XzQgmOL4QWS1o
+         dXNwYf4H9DP+WOrKG6njhdOmmGH4gHZIXN0A1JslHFOwIeC8vazz6wHzX+rvY15Y3DIr
+         XgATdoS7IrC4fB43rb99Ac2rTYtwnvu/bjPIp7y2tTePGcpd58QK/2QoT1iuPFwdokxa
+         lsPHtANe0kQuT5j/nWllRo8TbHDZCiPXDSszYFIpRUZNkdNmpbJGLGtxXl8VOZUkoiEV
+         jHjA==
+X-Gm-Message-State: AOJu0YzQMgX5ocFTpp19vD1A8PLdeQcHHLOygcnQpsl8LE06g/Itbvus
+	AqRa1o7lPUmp7ng2r6EYcN9oS3ToImoEdokdKz1qjQitBhAUWCj0yA2o2OikIDC3p2gXSw==
+X-Gm-Gg: AeBDiesj85Q3xjbSKealsgWh1tAo+BZDHpf6K8jrEksxY4CqRleqs+QaDzFXhhewZTd
+	0PtO+4RHchMvoIWEa6/aouDAMOeqSgqPzSTWA1BPH6LIg2yvgW+Pka2ivmqWuV/DzOTmhIZ51ry
+	jl0M91K4m+edcYgFWq4U/Y5StG26j8yEL9Aw4i9NoTThA1nEBn+k/rIsSlegIJH9UewEDePjXiW
+	097SK7P6OlirzsntAaNlaQgaEoenGJkxjqInXFjwjRW6d5bDNzmvfwhTVUGCoj/7bxhdkEwSnlF
+	AL/e+Vi/F5bpMwNXkYHFmjcH22rXzh9Y+kaoUOVbg0cxfMsrUZgo5iN/DRgPqeCywlIp/LJ4R5/
+	FyNrVKEESzpa3Mtzmz2adQhlJEpuTK1sy/1U1kVscMpjpdKyKIIz0EOrmawKlJlBSWL5Y+2qABe
+	1CeY16MNM6FMuD01hXc2pcYV++Yb2WOz1++loRWWK7Z6jN/p27witF+oAr/CbdUQja6ZKmw81A2
+	b1EEx/38lXV68HeuhsU/cJjj3A9/Ok+dvXfyg==
+X-Received: by 2002:a05:6000:184e:b0:43d:7d24:b510 with SMTP id ffacd0b85a97d-4493e5a7a64mr6025860f8f.22.1777563707827;
+        Thu, 30 Apr 2026 08:41:47 -0700 (PDT)
+Received: from localhost.localdomain ([2a00:a041:e04f:2600:a0c9:1d35:8283:f96b])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-449c576d0a2sm3596521f8f.31.2026.04.30.08.41.46
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 30 Apr 2026 08:41:47 -0700 (PDT)
+From: Kai Zen <kai.aizen.dev@gmail.com>
+To: netdev@vger.kernel.org
+Cc: stable@vger.kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	gregkh@linuxfoundation.org
+Subject: [PATCH net v3] net: rtnetlink: zero ifla_vf_broadcast to avoid stack infoleak in rtnl_fill_vfinfo
+Date: Thu, 30 Apr 2026 18:41:35 +0300
+Message-ID: <3c506e8f936e52b57620269b55c348af05d413a2.1777557228.git.kai.aizen.dev@gmail.com>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <CALynFi54eQj7SOmF6QNG0eqhLw7AuURzo6tSYQavvM3ZP74ikw@mail.gmail.com>
+References: <CALynFi54eQj7SOmF6QNG0eqhLw7AuURzo6tSYQavvM3ZP74ikw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260430152957.194015-1-jhs@mojatatu.com> <20260430152957.194015-2-jhs@mojatatu.com>
-In-Reply-To: <20260430152957.194015-2-jhs@mojatatu.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 30 Apr 2026 08:41:32 -0700
-X-Gm-Features: AVHnY4L0ZMuYpEJ5g14e4qii1WBLn7wy0aw6djcbYX75S6c6yexgXJfpiaMN06o
-Message-ID: <CANn89iLkdvOhBHnL37dWGPCHj9_j6aaXR+cgm0mTXHFPfxTywA@mail.gmail.com>
-Subject: Re: [PATCH net 1/3] net/sched: sch_red: Replace direct dequeue call
- with peek and qdisc_dequeue_peeked
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us, victor@mojatatu.com, 
-	pctammela@mojatatu.com, ghandatmanas@gmail.com, rakshitawasthi17@gmail.com, 
-	security@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: A77A74A4FF6
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: D52B54A5318
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282916-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[kaiaizendev@gmail.com,netdev@vger.kernel.org];
+	TO_DN_NONE(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282917-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,redhat.com,resnulli.us,mojatatu.com,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,mojatatu.com:email]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-On Thu, Apr 30, 2026 at 8:30=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com>=
- wrote:
->
-> When red qdisc has children (eg qfq qdisc) whose peek() callback is
-> qdisc_peek_dequeued(), we could get a kernel panic. When the parent of su=
-ch
-> qdiscs (eg illustrated in patch #3 as tbf) wants to retrieve an skb from
-> its child (red in this case), it will do the following:
->  1a. do a peek() - and when sensing there's an skb the child can offer, t=
-hen
->      - the child in this case(red) calls its child's (qfq) peek.
->         qfq does the right thing and will return the gso_skb queue packet=
-.
->         Note: if there wasnt a gso_skb entry then qfq will store it there=
-.
->  1b. invoke a dequeue() on the child (red). And herein lies the problem.
->      - red will call the child's dequeue() which will essentially just
->        try to grab something of qfq's queue.
->
->
-> The right thing to do in #1b is to grab the skb off gso_skb queue.
-> This patchset fixes that issue by changing #1b to use qdisc_dequeue_peeke=
-d()
-> method instead.
->
->
-> Fixes: 77be155cba4e ("pkt_sched: Add peek emulation for non-work-conservi=
-ng qdiscs.")
-> Reported-by: Manas <ghandatmanas@gmail.com>
-> Reported-by: Rakshit Awasthi <rakshitawasthi17@gmail.com>
-> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+rtnl_fill_vfinfo() declares struct ifla_vf_broadcast on the stack
+without initialisation:
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+	struct ifla_vf_broadcast vf_broadcast;
+
+The struct contains a single fixed 32-byte field:
+
+	/* include/uapi/linux/if_link.h */
+	struct ifla_vf_broadcast {
+		__u8 broadcast[32];
+	};
+
+The function then copies dev->broadcast into it using dev->addr_len
+as the length:
+
+	memcpy(vf_broadcast.broadcast, dev->broadcast, dev->addr_len);
+
+On Ethernet devices (the overwhelming majority of SR-IOV NICs)
+dev->addr_len is 6, so only the first 6 bytes of broadcast[] are
+written. The remaining 26 bytes retain whatever was previously on
+the kernel stack. The full struct is then handed to userspace via:
+
+	nla_put(skb, IFLA_VF_BROADCAST,
+		sizeof(vf_broadcast), &vf_broadcast)
+
+leaking up to 26 bytes of uninitialised kernel stack per VF per
+RTM_GETLINK request, repeatable.
+
+The other vf_* structs in the same function are explicitly zeroed
+for exactly this reason - see the memset() calls for ivi,
+vf_vlan_info, node_guid and port_guid a few lines above.
+vf_broadcast was simply missed when it was added.
+
+Reachability: any unprivileged local process can open AF_NETLINK /
+NETLINK_ROUTE without capabilities and send RTM_GETLINK with an
+IFLA_EXT_MASK attribute carrying RTEXT_FILTER_VF. The kernel walks
+each VF and emits IFLA_VF_BROADCAST, leaking 26 bytes of stack per
+VF per request. Stack residue at this call site can include return
+addresses and transient sensitive data; KASAN with stack
+instrumentation, or KMSAN, will flag the nla_put() when reproduced.
+
+Zero the on-stack struct before the partial memcpy, matching the
+existing pattern used for the other vf_* structs in the same
+function.
+
+Fixes: 75345f888f70 ("ipoib: show VF broadcast address")
+Cc: stable@vger.kernel.org
+Signed-off-by: Kai Zen <kai.aizen.dev@gmail.com>
+---
+ net/core/rtnetlink.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index b613bb6e0..df042da42 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -1572,6 +1572,7 @@ static noinline_for_stack int rtnl_fill_vfinfo(struct sk_buff *skb,
+ 		port_guid.vf = ivi.vf;
+ 
+ 	memcpy(vf_mac.mac, ivi.mac, sizeof(ivi.mac));
++	memset(&vf_broadcast, 0, sizeof(vf_broadcast));
+ 	memcpy(vf_broadcast.broadcast, dev->broadcast, dev->addr_len);
+ 	vf_vlan.vlan = ivi.vlan;
+ 	vf_vlan.qos = ivi.qos;
+-- 
+2.43.0
+
 
