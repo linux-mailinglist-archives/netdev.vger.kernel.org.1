@@ -1,68 +1,65 @@
-Return-Path: <netdev+bounces-282717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282718-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sMtlLdgZ82nNxAEAu9opvQ
-	(envelope-from <netdev+bounces-282717-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 10:59:04 +0200
+	id 0DSVGnwb82kLxQEAu9opvQ
+	(envelope-from <netdev+bounces-282718-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 11:06:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0D3D49F8DF
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 10:59:03 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07F1C49F9A1
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 11:06:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C38993006B20
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 08:56:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C7D0E300680D
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:06:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2D1B3FF8AA;
-	Thu, 30 Apr 2026 08:56:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD85525D1E9;
+	Thu, 30 Apr 2026 09:06:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="qeiMzR8Q"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="G8qTBwo5"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB85B3FE362;
-	Thu, 30 Apr 2026 08:56:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E95A15853B
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 09:06:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777539408; cv=none; b=tFm+AVlXC/QShxmI5/huGAzWhPlOqthgMBXwTJsW9wWRvh2CNK18i1BPjFhqURWR+roa+h3AX4vuQJkelOOKwhRWpp8wniYxgD9jXCMJsphImo7WMk6sSdZAWVqC7raYtzgT3VhGLO0XB1fxz5k3WB/K/oTPJI9n8RdANPABsn4=
+	t=1777539961; cv=none; b=VuXicy5bTQuDB8BE70v9TmdrU7+GVJgfu+p2UcnvifW2+0Ud0wvQnWbVaZ0rCFt6iG8Rip6/2bs3DXjVGKQVOFEmc5fK+iMkKHawJk06SlPec1ynmSS3y5L4xxe3bVNSrvHr9ZifaFDESuTZhgLS+yiBcAoHkUEI4VXVsNlrUZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777539408; c=relaxed/simple;
-	bh=1sPYt3HYXlR9uuUgoaurUYFLplw2XmTOjZbCd7KtAL0=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=nBoYJ1I11q/ihkUUKbrSiH9/TU5QNZ8+y43ph1RPElBXZc50HabU3VX/jxikIDiUlG4OpT0GaRAqBXKcv5Vzjq8xfu/2kTNSWUza27FZ5rEpw3nUNnNts4NMYFR+urwBxLPXN718wyRjnNsdTN0tCzD2CVkpG942OcKZQ4+yBUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=qeiMzR8Q; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id 18F0120B7175; Thu, 30 Apr 2026 01:56:47 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 18F0120B7175
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1777539407;
-	bh=AI7/huEcShjMtyvFXEkAKvAjjr5VrRcIU1qEYzuphIA=;
-	h=From:To:Subject:Date:From;
-	b=qeiMzR8QqZgNkiwvj3Q5m6i9J9uGzoMhwkoUZiNMcNpK2ogBoBpWJT5gnedGQfL0M
-	 IZjSmLt9Opud+Sjajerqc8ZqdSSCGLMRSJz/qphRRpMtCWbBsEXEZXnHeks1BfbHmf
-	 HYA02dWXfYOLt0csOtO/tJDrLXzmg5ziqUqZoa7o=
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	longli@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ernis@linux.microsoft.com,
-	dipayanroy@linux.microsoft.com,
-	shirazsaleem@microsoft.com,
-	kees@kernel.org,
-	linux-hyperv@vger.kernel.org,
+	s=arc-20240116; t=1777539961; c=relaxed/simple;
+	bh=ot8RZ1mBjO7hyMpwt4w1JlEgoj5gEdRJBQoWICe8ZzU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=nakDfGHKZhsAm0dJy/q0DQzFhXAoXcGxRRI+qdVc0hSKk9Bk6vSL8XcKnXaCh192rCpzf8q0rq15gqj0McLTzgK6r1mnSBzscUmIC4qZA+6ywqlvuEklTLf7H60p0ReMYvRV37fYCgyAsgrpdfoHlweb0eoGN0T6DiJPossftjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=G8qTBwo5; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1777539948;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hCANES//Zba6NT24A7SxC6UwfIqx4fR+aEhtC8a7AAk=;
+	b=G8qTBwo5Jp0so5tpGpRmq62SARaYQvkSOFHNe0CyFfVBjMLJUWw6dHPlXena3mM7nvAq6F
+	eKV/ocG0Oir2b9i+B6/yUEX0CHX4WE8yTTTNsKX3BoFWNgAVMykOFuIa80y7CgtW+7NZHH
+	UspMfphfRdRG+7q7EzJ1lrICsjycfa8=
+From: Qingfang Deng <qingfang.deng@linux.dev>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Qingfang Deng <qingfang.deng@linux.dev>,
+	Simon Horman <horms@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	Taegu Ha <hataegu0826@gmail.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	linux-ppp@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2] net: mana: hardening: Reject zero max_num_queues from MANA_QUERY_VPORT_CONFIG
-Date: Thu, 30 Apr 2026 01:56:31 -0700
-Message-ID: <20260430085638.1875400-1-ernis@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.7
+Subject: [PATCH net-next 1/3] ppp: use file.dead to check channel unregistration
+Date: Thu, 30 Apr 2026 17:05:21 +0800
+Message-ID: <20260430090532.244758-1-qingfang.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,71 +67,116 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: F0D3D49F8DF
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 07F1C49F9A1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-282718-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.dev,gmail.com,linutronix.de,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282717-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-0.998];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.microsoft.com:dkim,linux.microsoft.com:mid]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,linux.dev:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-As a part of MANA hardening for CVM, validate that max_num_sq and
-max_num_rq returned by MANA_QUERY_VPORT_CONFIG are not zero. These
-values flow into apc->num_queues, which is used as an allocation count
-and loop bound. A zero value would result in zero-size allocations and
-incorrect driver behavior.
+Currently, ppp_generic checks if pch->chan is NULL to determine if a
+channel is being unregistered. However, struct ppp_file already has a
+'dead' flag for this purpose, which is used by ppp units and other
+parts of the driver.
 
-Return -EPROTO if either value is zero.
+Switch all pch->chan NULL checks to pch->file.dead checks. In
+ppp_unregister_channel, move the setting of pch->file.dead inside the
+locked section to ensure atomicity and remove the now redundant
+pch->chan = NULL assignment.
 
-Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+This is a preparation to eventually unify 'struct ppp_channel' and
+'struct channel' into a single struct.
+
+Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
 ---
-Changes in v2:
-* Rebase to latest main.
----
- drivers/net/ethernet/microsoft/mana/mana_en.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/net/ppp/ppp_generic.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index a654b3699c4c..7c83e010a1e6 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -1262,6 +1262,12 @@ static int mana_query_vport_cfg(struct mana_port_context *apc, u32 vport_index,
+diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
+index 57c68efa5ff8..aef42a69b63c 100644
+--- a/drivers/net/ppp/ppp_generic.c
++++ b/drivers/net/ppp/ppp_generic.c
+@@ -790,7 +790,7 @@ static long ppp_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+ 			down_read(&pch->chan_sem);
+ 			chan = pch->chan;
+ 			err = -ENOTTY;
+-			if (chan && chan->ops->ioctl)
++			if (!pch->file.dead && chan->ops->ioctl)
+ 				err = chan->ops->ioctl(chan, cmd, arg);
+ 			up_read(&pch->chan_sem);
+ 		}
+@@ -2167,7 +2167,7 @@ static void __ppp_channel_push(struct channel *pch, struct ppp *ppp)
+ 	struct sk_buff *skb;
  
- 	*max_sq = resp.max_num_sq;
- 	*max_rq = resp.max_num_rq;
-+
-+	if (*max_sq == 0 || *max_rq == 0) {
-+		netdev_err(apc->ndev, "Invalid max queues from vPort config\n");
-+		return -EPROTO;
-+	}
-+
- 	if (resp.num_indirection_ent > 0 &&
- 	    resp.num_indirection_ent <= MANA_INDIRECT_TABLE_MAX_SIZE &&
- 	    is_power_of_2(resp.num_indirection_ent)) {
+ 	spin_lock(&pch->downl);
+-	if (pch->chan) {
++	if (!pch->file.dead) {
+ 		while (!skb_queue_empty(&pch->file.xq)) {
+ 			skb = skb_dequeue(&pch->file.xq);
+ 			if (!pch->chan->ops->start_xmit(pch->chan, skb)) {
+@@ -2288,7 +2288,7 @@ static bool ppp_channel_bridge_input(struct channel *pch, struct sk_buff *skb)
+ 		goto out_rcu;
+ 
+ 	spin_lock_bh(&pchb->downl);
+-	if (!pchb->chan) {
++	if (pchb->file.dead) {
+ 		/* channel got unregistered */
+ 		kfree_skb(skb);
+ 		goto outl;
+@@ -3002,7 +3002,7 @@ ppp_unregister_channel(struct ppp_channel *chan)
+ 	ppp_disconnect_channel(pch);
+ 	down_write(&pch->chan_sem);
+ 	spin_lock_bh(&pch->downl);
+-	pch->chan = NULL;
++	pch->file.dead = 1;
+ 	spin_unlock_bh(&pch->downl);
+ 	up_write(&pch->chan_sem);
+ 
+@@ -3013,7 +3013,6 @@ ppp_unregister_channel(struct ppp_channel *chan)
+ 
+ 	ppp_unbridge_channels(pch);
+ 
+-	pch->file.dead = 1;
+ 	wake_up_interruptible(&pch->file.rwait);
+ 
+ 	ppp_release_channel(pch);
+@@ -3505,7 +3504,7 @@ ppp_connect_channel(struct channel *pch, int unit)
+ 
+ 	ppp_lock(ppp);
+ 	spin_lock_bh(&pch->downl);
+-	if (!pch->chan) {
++	if (pch->file.dead) {
+ 		/* Don't connect unregistered channels */
+ 		spin_unlock_bh(&pch->downl);
+ 		ppp_unlock(ppp);
 -- 
-2.34.1
+2.43.0
 
 
