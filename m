@@ -1,166 +1,155 @@
-Return-Path: <netdev+bounces-282608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282610-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id umKoJEPA8mnktwEAu9opvQ
-	(envelope-from <netdev+bounces-282608-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:36:51 +0200
+	id MCbUDMjB8mnktwEAu9opvQ
+	(envelope-from <netdev+bounces-282610-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:43:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA34549C64E
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:36:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A1FF49C6EB
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:43:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E13F9300C26D
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:36:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 188FA300EABC
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:42:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C01CE2C029D;
-	Thu, 30 Apr 2026 02:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 385D32F6591;
+	Thu, 30 Apr 2026 02:42:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PRZ7pHPf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gw70+f8M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C9F29B8D3
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 02:36:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13BC92F361E;
+	Thu, 30 Apr 2026 02:42:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777516601; cv=none; b=J1nZZ1kd0MKvQN+P7ozX5GSlF2FrI/170JhJJoryVx0Bmuqiu4tZoO+h9G8kocdRYCUwbLgJwcY85IsgP7q9S2dHnVqxP/+8ia1xJZEDLx7ysv17K9gwIh94UY/DelU50RqTFn6eaetL/X2lBSZbdHFGQPMwqx1PUnhRTFUSXhY=
+	t=1777516928; cv=none; b=jMlKwWET7tBgEGEixYih+mvI5ynKTYl6lkQHBBGz08bAmv5BVcEMcYSOkB2Obkbo7S38FQlYS582yKEMr6zEh7tjrGza3lPLRbVQ20hp/f2n8X+rXZcrlZlLqzuvmVg1avb1xxsm7jE+46F3stkBwvLtHCqIi2DzkBF206ryo6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777516601; c=relaxed/simple;
-	bh=rqIfcvFJMU4U4AVHcj0LU7UoHNsl+kuvgRjGup0eiwc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=M6/SJmwL67T81oUBsHZ0L+fGW64XZ2qJkpMGRcKeQT4AaahqL09iPZiJIqorwxiP7vcU+0Hu5IgJfNSEbfYMMOlsYN7DfQGVuhCQ0yu4DTrJhQHCKo4erOf9Qu8PPUnh2xYw4AU0CxR+lCN6rhK23Jn/AFaUSAt6Se4JA/BT4g4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PRZ7pHPf; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8ead5ab474bso89714985a.1
-        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 19:36:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777516599; x=1778121399; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/bMNpW3c4F75ct2ys7AkCXK7g/wrITynXJXwYUZMSu4=;
-        b=PRZ7pHPfCF28S8dBQNsNtyq74NAf/pXQcLQ7UM6WE8bM9L1Hwr98jgjFZLQsqBbnJa
-         boelsPZIXCkiVTRAU6fSY+XVQdPQQxqnbbzkbw/9+9N7gZ2i/Xt3kGZDPj0lfnvVL8Uo
-         LYzbRCGeLHlCsoPr33PsVlkaRoXFDtu+2UODqXUe6K04R0G9bapAdUtcweXXJz46gxx4
-         wxDYuRKUVcXWXWIppkMBpnD0VzTLC3XieFLJAQGu8PtliOv4YZlgBzz0AwfPfLoyHH7O
-         t67VUz2LyX2IrdaSgHSPS8V2hQ0kQzIoAmRz6TUBFiBg/kdUuBvbajwiSy/czKLeKR5r
-         JU/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777516599; x=1778121399;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/bMNpW3c4F75ct2ys7AkCXK7g/wrITynXJXwYUZMSu4=;
-        b=l0PJkKY1r+7rSohB23c/SC3fip9g9V//7H8Y48maNFHD1VEVebOOlolUU4Los+NJ8p
-         p8fa6fnIH+43sB5R81ser6lp8Sdg9J7WzcNDvI4gwyHF2ysG5AV0jm+KjtNugby6hwYs
-         NHUZfD6JEyVGUvXdJgeNVIXmgXUCHGML1U01y8GCYMnyDF8lyPy3HIPYnVBAJbBHsGee
-         82eTSOKE6K4pwgbr/kFGYOW7hLLfJJBsEq01XrS0UpFRpmmrfPn/HOR8HWzMC2bZIwLq
-         aFTrnG8S+qjLBKXHqXORelqhlFIYQppoyU2K2vfzFPLSi5+OUMgYDzTQMlF+hRQEblLh
-         xlLg==
-X-Forwarded-Encrypted: i=1; AFNElJ8JI4seMllW+ECqGMQyeId8RVGbKPLLOsQi07wIOJsbHzfCSVRK/7Auqkuacs8hd8CWh9p+V8s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzB7riQvufiNyIzlqsoEBNh5K19Oa5yyYOhjSXT3mH9bjj9BKtx
-	vRgYNLCf5CPMq+SOuJCDMMWZoh081EfTj9XdcKg7yKsLbLrUgXR2tHZVxn1uim63jY5XpI2flOI
-	Im6N+ENk46/CuIg==
-X-Received: from qkntp5.prod.google.com ([2002:a05:620a:3c85:b0:8d4:abda:a95])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:c4d:b0:8ef:1157:6a05 with SMTP id af79cd13be357-8fa86fa7612mr206005285a.19.1777516599205;
- Wed, 29 Apr 2026 19:36:39 -0700 (PDT)
-Date: Thu, 30 Apr 2026 02:36:28 +0000
-In-Reply-To: <20260430023628.3216283-1-edumazet@google.com>
+	s=arc-20240116; t=1777516928; c=relaxed/simple;
+	bh=hCKPMhlDk5ib397JtkQYKg8iIdJBJanlckgHAuazbGI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=jRHLP1K1rxATS8Q26+3OCRm27EsgpZusshoO6r/dzw727xl6R7bJ41RlA4DRYqoeFlROZhSOXSXqzUY+XK7srYJBKJxTLQaIUBHCRmCDOxN9O+SnfexdFiMtzCM03KRyhfI0GZf7EkReSsAEEdECv+TylUp42yMAPVyK1Xqel4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gw70+f8M; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4420FC19425;
+	Thu, 30 Apr 2026 02:42:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777516927;
+	bh=hCKPMhlDk5ib397JtkQYKg8iIdJBJanlckgHAuazbGI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Gw70+f8M8Pv/BOEKzcE5BlqNT/lnCEdKAYyIbDdALz8U0Y+08Opvwx9np3V1eOEQP
+	 DIzvZlUw0yJ7mYbEKnMUz+JZD8JmaB5ZjgMKF/3LBH1YSwpOf2S+4NptajbtEBDy5W
+	 i7IPC4xacR2sCTV2hwgiuicoke3/OJE5BR59noPs/4yUV6w7Yjv9gMXjBOQ/6umGdu
+	 UD57/3ckSjdMC3JzP0bqGguZ6buLycevyTYNlJOn5LBtc8qg/nornwH+B0LT46ATSZ
+	 pWnZnyIYwBbmEanTQI/RHXJ9kdXTQ/B1odC3iWsPBg84CfFHcMYPnibCWn3jd2mols
+	 H3udaHXPATGfA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: achender@kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	horms@kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	shuah@kernel.org
+Subject: Re: [PATCH net-next v2 5/7] selftests: rds: Fix gcov and pcap collection
+Date: Wed, 29 Apr 2026 19:42:06 -0700
+Message-ID: <20260430024206.2452353-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260428222716.2960871-6-achender@kernel.org>
+References: <20260428222716.2960871-6-achender@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260430023628.3216283-1-edumazet@google.com>
-X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260430023628.3216283-5-edumazet@google.com>
-Subject: [PATCH v3 net-next 4/4] net/sched: speedup tc_dump_qdisc() when
- tcm_ifindex is provided
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
-	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: EA34549C64E
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 8A1FF49C6EB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com,google.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282608-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-282610-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.982];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-There is no point dumping qdiscs for all devices when user space
-wants them for a single device:
-
-tc -s -d qdisc show dev eth1
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 ---
- net/sched/sch_api.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+selftests: rds: Fix gcov and pcap collection
 
-diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index cf3d01dd6b268741a6e4674954940e09dff139a4..dd0edc9bd4610ec865fc97a81f801a7da020667b 100644
---- a/net/sched/sch_api.c
-+++ b/net/sched/sch_api.c
-@@ -1884,6 +1884,7 @@ static int tc_dump_qdisc(struct sk_buff *skb, struct netlink_callback *cb)
- 		unsigned long ifindex;
- 		int q_idx;
- 	} *ctx = (void *)cb->ctx;
-+	const struct tcmsg *tcm;
- 	struct net_device *dev;
- 	int s_q_idx, q_idx;
- 	int err;
-@@ -1894,6 +1895,9 @@ static int tc_dump_qdisc(struct sk_buff *skb, struct netlink_callback *cb)
- 				     rtm_tca_policy, cb->extack);
- 	if (err < 0)
- 		return err;
-+	tcm = nlmsg_data(nlh);
-+	if (tcm->tcm_ifindex && !ctx->ifindex)
-+		ctx->ifindex = tcm->tcm_ifindex;
- 
- 	s_q_idx = ctx->q_idx;
- 
-@@ -1901,6 +1905,9 @@ static int tc_dump_qdisc(struct sk_buff *skb, struct netlink_callback *cb)
- 		struct netdev_queue *dev_queue;
- 		struct Qdisc *q;
- 
-+		if (tcm->tcm_ifindex && ctx->ifindex != tcm->tcm_ifindex)
-+			break;
-+
- 		q_idx = 0;
- 
- 		netdev_lock_ops(dev);
+This commit addresses dependencies on host systemd configurations in the vng
+guest. It adds mounts for tmpfs on /tmp and debugfs to ensure pcap and gcov
+data collection work, and updates the gcovr root path.
+
+> diff --git a/tools/testing/selftests/net/rds/run.sh b/tools/testing/selftests/net/rds/run.sh
+> index bc2e53126aab..3fc116d23410 100755
+> --- a/tools/testing/selftests/net/rds/run.sh
+> +++ b/tools/testing/selftests/net/rds/run.sh
+> @@ -197,6 +197,13 @@ COVR_DIR="${LOG_DIR}/coverage/"
+>  mkdir -p  "$LOG_DIR"
+>  mkdir -p "$COVR_DIR"
+>  
+> +# tcpdump saves pcaps to /tmp because it requires chown to save the
+> +# pcap but chown is not supported by 9p.  Mount tmpfs on /tmp if it is
+> +# not already a separate filesystem
+> +if ! mountpoint -q /tmp 2>/dev/null; then
+> +	mount -t tmpfs tmpfs /tmp
+> +fi
+> +
+
+Could this introduce a regression when the test is run directly on a host
+workstation rather than inside an isolated VM?
+
+If /tmp is a regular directory on the root filesystem, mounting tmpfs over it
+will instantly hide all existing files and UNIX domain sockets in /tmp.
+
+Since there is no cleanup trap to unmount it on exit or failure, does this
+leave the host system in a degraded state?
+
+[ ... ]
+
+>  if [ "$GENERATE_GCOV_REPORT" -eq 1 ]; then
+>         echo saving coverage data...
+> +
+> +       # Ensure debugfs is mounted
+> +       if ! test -d /sys/kernel/debug/gcov; then
+> +               mount -t debugfs debugfs /sys/kernel/debug 2>/dev/null || true
+> +       fi
+> +
+
+If the test is run against a kernel that does not have CONFIG_GCOV_KERNEL
+enabled, the gcov directory will not exist even when debugfs is correctly
+mounted.
+
+Will this condition cause a regression where the script repeatedly mounts
+debugfs on every run, stacking redundant shadow mounts over
+/sys/kernel/debug since they are never unmounted?
 -- 
-2.54.0.545.g6539524ca2-goog
-
+pw-bot: cr
 
