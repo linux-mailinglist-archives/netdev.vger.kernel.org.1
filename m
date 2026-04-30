@@ -1,173 +1,165 @@
-Return-Path: <netdev+bounces-282884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282885-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2BFeHINl82le2AEAu9opvQ
-	(envelope-from <netdev+bounces-282884-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 16:21:55 +0200
+	id WNevKoll82le2AEAu9opvQ
+	(envelope-from <netdev+bounces-282885-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 16:22:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C6EE4A3F86
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 16:21:54 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B4084A3F95
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 16:22:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id AED3E3007B14
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 14:21:51 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4419C30041D7
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 14:22:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D447440629C;
-	Thu, 30 Apr 2026 14:21:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD73940628F;
+	Thu, 30 Apr 2026 14:21:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vbdIDG4p"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GTv8jjJx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A6E740B6DE
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 14:21:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777558909; cv=pass; b=s54YuTPQUJlAyF6SG+WfVtnVYK5xf28CX2kDceQZHSzCe5LaFi/MgJkKJaI7bybzxNp4QXJ7AM5PNgHINrHoSvKKO7wzWuIkKBwIe45wwAhVgI5kZ761vw+mA5IEhCVZ09Ihb/VpJL6WxEv+Ev1FJ2pFLprnXxxOrbPkmcioSMM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777558909; c=relaxed/simple;
-	bh=ibVh3c5305iUKdF/FHfUnvLzIUREZVrpImUBHgzD1XY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mAWb9aYHTTiyoti1r7rGgHNPQphaCEr2aVpuG4J9lNkKmroz7Ku3e6Hvx421DJkDB66XG1TlAvCIi/xUuoQ2wRUc60jdihOXLibTwYUMwWFR9yCDcTHxo57a4L7cAq/s7Y6H+FxRiJsWp8KkP0sUaheIHHg+pRc9/kzZ+GgCXJU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vbdIDG4p; arc=pass smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-50d836552daso596651cf.0
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 07:21:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777558907; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Kty2obHUJTcb+CTBBdzKWcsBORKgvQIDzkk+y+07yZgb3gY8BXAkvQuAxAf09Skfxj
-         3YJ2tDwXQI9N4tjGdmr3nHcItCDAtTMxvlGUZ+pk4yAoGr/gg1pbKLQC+QkRgozbUEik
-         ut52Y0EsSy/8N1MqIwnQ5rGySNE9kJrUvc47+IWqCFv7XhinoSh7SD0M8C+1F1olI4Qu
-         CNQnWyrCw4qESiXGyaMEX4RTeZrgQI6GzoFXGPKsC5LMt86oI6aYW/nb1K1fvbciPWpV
-         kR5sXZoqwRa4U1NDz17k2cPcZpZUH1LysxNDbemicWqpo2iVsc3HicAmObqYp7r0VYBl
-         NmCQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ibVh3c5305iUKdF/FHfUnvLzIUREZVrpImUBHgzD1XY=;
-        fh=rerTHHIhCDoVeuGyCirwSDU3IA8cQo2gkqQZRhU2Jps=;
-        b=NG1p6bTZ/6yWtmnVDXyllCmIAPIS2mlRrpL17BSgLI4Z3+CoKRvcVlwJwv12UkuV4J
-         5d/g12ooZONVtF3jAYXd+SrLMq1oF4Flcz9yyQcJLgTkvLusG+Lvz3Y3A9HJuGJADDZr
-         45NehAX92MfX8YQPd+zeKPdgxkcZbslsurfOhBY+fo9oIqZ20QY3dUXmLWsK2CCPWiOl
-         g2f3Ir3mutA6QfM98PxJBZp0Epuri52IlJTBAl2Ww61NaRRpTDoYpZ1UFgAH+d30rMcC
-         Xd0HY9su370is85hqpyXidsiXxgAc9KI/Em5/sJ93AwgD5hvPUNkKSix6KY5AmYsTQi5
-         3C6Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777558907; x=1778163707; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ibVh3c5305iUKdF/FHfUnvLzIUREZVrpImUBHgzD1XY=;
-        b=vbdIDG4pZrYh7HDzW9Y3Zkn6lquGJ59yWGR1TuB+btNdEv/MLNK7JTa3uTs3d5Ji1A
-         FUenDcD4hs45D/Hk0lr1ArT0o0+8u7mqddyfw/kTZIqcfCE7dzl9kaTHxhnW8q0q8E+D
-         7ZO4UPHWQd2H9AkhZGii/xrdffKc4rd044FdDM1Ajr8MBbpU9cPYJrFRL6Q39mnJtZEx
-         ybczTtKqpRi6uEAdfI6cnULkMYUybiR96QfoB/0VyYG3EGnO21Auv49L82prsvW45qQq
-         QwKNldizlo7BdS+gGofR7hB2CW4lcm4TL+A8FAY3oMVSHVwTF0UuY473Xssej+GQVGMA
-         iDlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777558907; x=1778163707;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ibVh3c5305iUKdF/FHfUnvLzIUREZVrpImUBHgzD1XY=;
-        b=PdI/MCILCzD+/+gfcOXyfkGDj1GksF9yfziboPwxqI7wNQeQzoSowcoFpKIZvuGNPU
-         C0ItU2SWd0vhAL1AzWJpNh/5OgBxfhmxjuTPPwiemmm1FtkZxYjY6O8AYvWsuCdvfH4/
-         ABTb/u03LIsBt8Up7EEslwOlw101w/VKNcze2pDK3iYqi9yJ5alNPy94+PWX44Vho+Za
-         MSxmwzRdSjvVCpoKN6uN1KMxMyA4/quo3jlVVRBbJ85Y4c+SDlEfavIT+PBhReUc9oh3
-         mL3bU+xx1gQco0YZUbGMT7R654IzpU7FN7ituXAk6A8iiCRP9DYIVzG+VtHaJ3a0/Sq+
-         T0lg==
-X-Forwarded-Encrypted: i=1; AFNElJ8nxw4XPQUyeHVk3VC+yXGWbSC6QPweiKS4Yy7QBY/VSnKVR1xoQor5hnNAVqZhxm+AYLlaVDc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGCOvg6g8J0ZtUerbqEFu0o+jtf7R0g9dBwm18Lwb8oU1UKWlu
-	ok2PCu0DOZeFYTuH5BbdDmCSrX6M4KujQ04V+kdeCqbd3EM105TzFG8fqGd8n/hH2TLqZJ5n/Cr
-	WJMuzIRtneiiUhU2rjtKLvGS3bo0QFrJTezpmBup6
-X-Gm-Gg: AeBDieuZZAGZ9i/L1jKlqJNd4wmsNCTp2RhnwPbbXQhEofzGDmySvR3KrCK+1Hbj/U+
-	UBzfzLjlKWd+GLceeleRbl61BngpfVfjbZ4/u0PfNc7vTbsMZ+rC03gQCZWxynhdZAEWAj7dScr
-	8WKdSN7ZvT7GyYp/+5uZjL1JcTar6NbwnO0KB5EahnxKUngdTgV7UvHjrrFcm+8S5hfF/jJxLZ8
-	YUIUwQcd78/N3+AxWw/MM/MnWNShYq3+sYuZRZT/DIgixF+fLIpKUuvVsAIQkGt/ck0iP6W15y3
-	yYbVCinYAczG6rAp6SwOWFAizgff9em6B+N/z+a9wOLggCAwBzSIs5Cn/JDmD2zim4sbB6Vsdpy
-	d1FBT4rBH8zvUQqXPaQ==
-X-Received: by 2002:ac8:59ca:0:b0:50e:5e19:587a with SMTP id
- d75a77b69052e-5102a3d3061mr12409231cf.3.1777558906644; Thu, 30 Apr 2026
- 07:21:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E12212D7C
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 14:21:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777558917; cv=none; b=UDfodRR9qi750oo4qzM6D1jIP1PJ0yJRY1fuPlG+HhL0sOCPnKKfwnJSwKBiEH9FR7/T4xCccing7627WFPxDgKMgCVUyzWaev+Fcd3S5gA8G4a2KMzAEeM1cG2Xv11i2QHdbt1Hi97G0HIsYBTxejrZne6adpnjilY7BMB5OU8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777558917; c=relaxed/simple;
+	bh=DCJwLVpYE8Oxc/iSi+wYoHkqwCDP0eV6aMqtwc865HA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=swkm0xagTOFpkoSoREL/+WodgQULg5POEBFREmsK9tLslS+D6iwZjsi2+rDmefUTEKp+3fEM2rEhsRl33GjMF1Tq1QMFe659TfDafn2e/QvQGCPloDWgc1E+J3pNpGFFJ51BXiwtarfkye2q7rWJee1jF5lDxsEVb+tR/kjqdKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GTv8jjJx; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777558916; x=1809094916;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=DCJwLVpYE8Oxc/iSi+wYoHkqwCDP0eV6aMqtwc865HA=;
+  b=GTv8jjJxZs7ktVsUyoDvGWxG4oNH8y6e5OnVcmir/thGsW00yGuwvjx7
+   yQm+AGuK/jm5b7FnAQvZtB/gNoQ/CIkI3unx+mYKEHfgdV6YukRzIQC2g
+   nS+BmixW2xn53k615hoQ1R36ACJXfSvu2ETJ/sBv3KvmIs8WjdJdcZawK
+   0FEiBr3kZjXzdkHrV5mtXYdfUBNEcGTwb3lGH8UgMjiMsJ3w1c79ygEVw
+   wmT6y/kiepX7npkhnpszlzzcC/NxdG0jdGPelgRcp9cqRxj0PaMoG6jaG
+   L2eU/oJnyWjfNGlB+yfdNg1YCtxTCkgkDdtmh5q5UpPKgKjxJHTEUNnU7
+   w==;
+X-CSE-ConnectionGUID: nze+QQ2lQuezFX+7lS5EQg==
+X-CSE-MsgGUID: GpTJIqRKSd2UDpbWSyzEFg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11772"; a="89105265"
+X-IronPort-AV: E=Sophos;i="6.23,208,1770624000"; 
+   d="scan'208";a="89105265"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2026 07:21:55 -0700
+X-CSE-ConnectionGUID: wa+JDUS8Qh25A3rGOjwIWA==
+X-CSE-MsgGUID: +6CKxlaFR/W8YI6VBDFvRA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,208,1770624000"; 
+   d="scan'208";a="236382905"
+Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
+  by fmviesa004.fm.intel.com with ESMTP; 30 Apr 2026 07:21:54 -0700
+From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	aleksandr.loktionov@intel.com
+Cc: netdev@vger.kernel.org
+Subject: [PATCH iwl-net] ice: reject out-of-range ptype in ice_parser_profile_init
+Date: Thu, 30 Apr 2026 16:21:53 +0200
+Message-ID: <20260430142153.249062-1-aleksandr.loktionov@intel.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260430021444.2929534-1-edumazet@google.com>
-In-Reply-To: <20260430021444.2929534-1-edumazet@google.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Thu, 30 Apr 2026 10:21:23 -0400
-X-Gm-Features: AVHnY4LJpsTpu_KyhbVHFFrPFWxvhOjifWTFbSVd8nPlQ846loyh3E2yU6R3vCw
-Message-ID: <CADVnQy=aaa7OBd6hjxjwR=9RfYSoJGVeX9ixbCfdkrd7px0HLQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next] selftests/net: packetdrill: add tcp_syncookies_ip[46]_9k
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 9C6EE4A3F86
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 4B4084A3F95
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-282884-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282885-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ncardwell@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-On Wed, Apr 29, 2026 at 10:14=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> These tests check syncookie mode is able to reconstruct some
-> client options when TCP TS are used:
->
-> - wscale option.
-> - sackOK.
-> - MSS (in a limited way, especially for IPv4).
-> - ECN : not enabled.
->
-> Note that IPv4 and IPv6 have different msstab[] values:
->
-> IPv4 msstab[4] =3D { 536, 1300, 1440, 1460 }
-> IPv6 msstab[4] =3D { 1280 - 60, 1480 - 60, 1500 - 60, 9000 - 60 }
->
-> IPv4 is currently capping SND_MSS to 1460, even on a 9K MTU network.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
+set_bit(rslt->ptype, prof->ptypes) operates on a DECLARE_BITMAP of
+ICE_FLOW_PTYPE_MAX (1024) bits. Nothing prevents a malicious VF from
+providing ptype >= 1024 through VIRTCHNL, resulting in a write past
+the end of the bitmap and a kernel page fault.
 
-Reviewed-by: Neal Cardwell <ncardwell@google.com>
+Reproduced with a custom kernel module injecting a crafted
+VIRTCHNL_OP_ADD_RSS_CFG on E810-C QSFP (8086:1592),
+FW 4.91 0x800214af 1.3909.0, ICE COMMS DDP 1.3.53.0,
+kernel 7.1.0-rc1.
 
-Very nice. Thanks, Eric!
+crash_parser: ice_parser_profile_init @ ffffffffc0d61b60
+crash_parser: setting ptype=0xffff (max valid=1023)
+crash_parser: calling ice_parser_profile_init -- expect OOB crash!
+BUG: kernel NULL pointer dereference, address: 0000000000000000
+#PF: supervisor write access in kernel mode
+#PF: error_code(0x0002) - not-present page
+Oops: Oops: 0002 [#1] SMP NOPTI
+CPU: 56 UID: 0 PID: 165011 Comm: insmod Kdump: loaded Tainted: G S U OE 7.1.0-rc1 #1
+Hardware name: Intel Corporation S2600BPB/S2600BPB
+RIP: 0010:ice_parser_profile_init+0x2d/0x1d0 [ice]
+Call Trace:
+ <TASK>
+ ? __pfx_ice_parser_profile_init+0x10/0x10 [ice]
+ crash_init+0x127/0xff0 [crash_parser]
+ do_one_initcall+0x45/0x310
+ do_init_module+0x64/0x270
+ init_module_from_file+0xcc/0xf0
+ idempotent_init_module+0x17b/0x280
+ __x64_sys_finit_module+0x6e/0xe0
 
-neal
+Bail out early with -EINVAL when ptype is out of range.
+
+Fixes: e312b3a1e209 ("ice: add API for parser profile initialization")
+Cc: stable@vger.kernel.org
+Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_parser.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_parser.c b/drivers/net/ethernet/intel/ice/ice_parser.c
+index f8e6963..3ede4c1 100644
+--- a/drivers/net/ethernet/intel/ice/ice_parser.c
++++ b/drivers/net/ethernet/intel/ice/ice_parser.c
+@@ -2368,6 +2368,9 @@ int ice_parser_profile_init(struct ice_parser_result *rslt,
+ 	u16 proto_off = 0;
+ 	u16 off;
+ 
++	if (rslt->ptype >= ICE_FLOW_PTYPE_MAX)
++		return -EINVAL;
++
+ 	memset(prof, 0, sizeof(*prof));
+ 	set_bit(rslt->ptype, prof->ptypes);
+ 	if (blk == ICE_BLK_SW) {
+-- 
+2.52.0
+
 
