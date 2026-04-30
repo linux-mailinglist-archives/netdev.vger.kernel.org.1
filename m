@@ -1,80 +1,88 @@
-Return-Path: <netdev+bounces-282631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282632-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8PjEAerG8mmnuAEAu9opvQ
-	(envelope-from <netdev+bounces-282631-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 05:05:14 +0200
+	id aKV7CF3J8mntuAEAu9opvQ
+	(envelope-from <netdev+bounces-282632-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 05:15:41 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 601E249CAB9
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 05:05:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 74E1B49CBE8
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 05:15:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6BB4F301A706
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:04:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CD410301A3B8
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:15:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7D6C331222;
-	Thu, 30 Apr 2026 03:04:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A56313A3ED;
+	Thu, 30 Apr 2026 03:15:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hVw263LQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NgUjVS9n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DCE6301471
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 03:04:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE68E7E0FF;
+	Thu, 30 Apr 2026 03:15:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777518278; cv=none; b=n40cUCRoDAgn5UuiIzRfYGIQsvipwXyvpy3JD/7WXko7VG8Euy+Y0SYRWNlKw1J0Xt4FLiL6rPRQjTzOajWJNCmc2RSVNBPgzPHI440UanTWGE2g+gAP9nAU06pKr82aIdFJv+HTVL7DnejHbEPp9MfLSU3Wt1KMCmdvjB1xNuc=
+	t=1777518936; cv=none; b=FMuBsBTbmBFX3vXzd30FlzujZjbaKhHnzofxe36OXUwgyUNojxS+Ty6zroNhkOTFtsinApxS63TmevZbJN+dTOpwNqO0UvvuJYm2E2D+yUwOS+fM9xGkajs0vKTPHQF87bBAjyGH+DsYXuqw2jyY4C5MmG9r6dAAmhHGcByb0fo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777518278; c=relaxed/simple;
-	bh=mxAeFa0zucritB95EEF1sgq4ftLNUflodECe6CLmwnE=;
+	s=arc-20240116; t=1777518936; c=relaxed/simple;
+	bh=mvpSvKMWoCG60xuK5G87ZW0h44g1nMj9onmCjCXuN08=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O5BKHxyCtQobhCWe0j/intG5dnfjSEwGenSU+gmAqTwrI49DfyHvzGTVr4TyB1ERliX3VnXmrrId1ajbK2Rw4coOoJrV54Fn9Qj8NnsVu0eU4tFLlhCBSlAcpPDgiQaeIfbmGmWA2kpRZg3SBHxNu2+s9zvgWgVCUvTuRFFfOnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hVw263LQ; arc=none smtp.client-ip=192.198.163.16
+	 Content-Type:Content-Disposition:In-Reply-To; b=Oamtd/YwzcVlbdEO00kimNOobpMbq/V9OknNzTVayWNUKDhe9E8qHR6kSbnnn9MlMfu1J+k419SMJaWEoSbVUfxvqjM9sJ37/ic4vc9Xr/0+vNOjqHf2ZDW1NkxTSaZAoO6blV9KAaWhk5SYQzKtgjp48C1pL5SiB8pPa4p1lpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NgUjVS9n; arc=none smtp.client-ip=192.198.163.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777518277; x=1809054277;
+  t=1777518934; x=1809054934;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=mxAeFa0zucritB95EEF1sgq4ftLNUflodECe6CLmwnE=;
-  b=hVw263LQcp/BCvS4f3r1GPxaBnxFjdNhEmn/QElfbhgRYdGjpBexctob
-   pynKACKiGYBaybbPFJYS1Ms8Tqjy59eTbRUITlCHFpprdW9BYsWlOwEp+
-   hAPLsiMM/0/VOmuHimek9xBzN0hp94yAOjlNhym3cuyO+jBTK9YQz5fyN
-   BGxR74G8GB7VlK/KG7Vf1XkU+8kJdofcsBsihvzCIrT/BxW9FMG3NcC5l
-   RMTCZNBSclIGF797bnK+ELWIPlGk5hLAjiOukjwlFgoVIlU3rNpifgX1j
-   plyR5izCx+fX0+0TDfuaTUZQ/JguMrwus+VKS6KEtS8I8AQ6Qjhbf2zDB
-   g==;
-X-CSE-ConnectionGUID: 4JfhTuwwRLyMuq3VhjSMMg==
-X-CSE-MsgGUID: Us497ZZsRau4brAslbKcgQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11771"; a="65991967"
+  bh=mvpSvKMWoCG60xuK5G87ZW0h44g1nMj9onmCjCXuN08=;
+  b=NgUjVS9noiAejoNlcXg77wEKnFOLTsP7aVXEUZ5yHSWTOT+zxVc3Ipnv
+   qxNRFAG1hMjJiMCy03PKuv6E4YMDNRJe0sKr7vkwK2pF1K/ckO1efAEKT
+   Bal4BSjr236d3Az/5Suo2klhhVxzJCiGvHPiJ27wYztFKa7ZfD+XGORWA
+   3WjaklX+Ajql3DV4GvDXbKcDk4E6nj5MRQq/A7a1Q+36CZAnlAQv69rfF
+   GDF2hEdQ+L3LtxVykwO3EsrLAIzk5FBHAxuRYoLWmINj0zhRmsiv71+Rh
+   FVEqNPHxvV1Sa6M0zo9AHSANJaBd3BfWDOh9mB2x+5Brm34yNBm4EFmo1
+   w==;
+X-CSE-ConnectionGUID: DNrwS0rHS0CZSdRgiHbMzg==
+X-CSE-MsgGUID: eyNRQpmnSwqcwdFFlyWwtw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11771"; a="78513783"
 X-IronPort-AV: E=Sophos;i="6.23,207,1770624000"; 
-   d="scan'208";a="65991967"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2026 20:04:36 -0700
-X-CSE-ConnectionGUID: bk16eBbRQOy1LcpnzG9kqg==
-X-CSE-MsgGUID: 0A6sJFtkRC61WCvn12Vhew==
+   d="scan'208";a="78513783"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2026 20:15:34 -0700
+X-CSE-ConnectionGUID: P8oxglENSn2K+pg7WmkCCw==
+X-CSE-MsgGUID: eN54ZgMfQFO9dEZk/h/kFA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,207,1770624000"; 
-   d="scan'208";a="234480184"
-Received: from lkp-server01.sh.intel.com (HELO aa799cca880d) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 29 Apr 2026 20:04:34 -0700
-Received: from kbuild by aa799cca880d with local (Exim 4.98.2)
+   d="scan'208";a="231312463"
+Received: from igk-lkp-server01.igk.intel.com (HELO bdf09bfdbd5f) ([10.211.93.152])
+  by fmviesa007.fm.intel.com with ESMTP; 29 Apr 2026 20:15:31 -0700
+Received: from kbuild by bdf09bfdbd5f with local (Exim 4.98.2)
 	(envelope-from <lkp@intel.com>)
-	id 1wIHhX-00000000Brc-0OVn;
-	Thu, 30 Apr 2026 03:04:31 +0000
-Date: Thu, 30 Apr 2026 11:03:46 +0800
+	id 1wIHs8-000000004in-2vm8;
+	Thu, 30 Apr 2026 03:15:28 +0000
+Date: Thu, 30 Apr 2026 05:14:58 +0200
 From: kernel test robot <lkp@intel.com>
-To: Dudu Lu <phx0fer@gmail.com>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, Dudu Lu <phx0fer@gmail.com>
-Subject: Re: [PATCH] nfc: nci: Add skb length validation in
- nci_core_init_rsp_packet
-Message-ID: <202604301024.q9hVP893-lkp@intel.com>
-References: <20260413090102.77980-1-phx0fer@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Michael Fritscher <michael@fritscher.net>,
+	Byron Stanoszek <gandalf@winds.org>,
+	Daniel Palmer <daniel@0x0f.com>, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH net v2 15/15] drivers: net: 8390: wd80x3: Remove this
+ driver
+Message-ID: <202604300512.3KcfhJGd-lkp@intel.com>
+References: <20260422-v7-0-0-net-next-driver-removal-v1-v2-15-08a5b59784d5@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,11 +91,12 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260413090102.77980-1-phx0fer@gmail.com>
-X-Rspamd-Queue-Id: 601E249CAB9
+In-Reply-To: <20260422-v7-0-0-net-next-driver-removal-v1-v2-15-08a5b59784d5@lunn.ch>
+X-Rspamd-Queue-Id: 74E1B49CBE8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
@@ -96,180 +105,57 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-282632-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-282631-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Hi Dudu,
+Hi Andrew,
 
-kernel test robot noticed the following build errors:
+kernel test robot noticed the following build warnings:
 
-[auto build test ERROR on net/main]
-[also build test ERROR on net-next/main linus/master horms-ipvs/master v7.1-rc1 next-20260429]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+[auto build test WARNING on 1f5ffc672165ff851063a5fd044b727ab2517ae3]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Dudu-Lu/nfc-nci-Add-skb-length-validation-in-nci_core_init_rsp_packet/20260423-210923
-base:   net/main
-patch link:    https://lore.kernel.org/r/20260413090102.77980-1-phx0fer%40gmail.com
-patch subject: [PATCH] nfc: nci: Add skb length validation in nci_core_init_rsp_packet
-config: arm64-randconfig-004-20260430 (https://download.01.org/0day-ci/archive/20260430/202604301024.q9hVP893-lkp@intel.com/config)
-compiler: clang version 23.0.0git (https://github.com/llvm/llvm-project 5bac06718f502014fade905512f1d26d578a18f3)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260430/202604301024.q9hVP893-lkp@intel.com/reproduce)
+url:    https://github.com/intel-lab-lkp/linux/commits/Andrew-Lunn/drivers-net-3com-3c509-Remove-this-driver/20260424-104110
+base:   1f5ffc672165ff851063a5fd044b727ab2517ae3
+patch link:    https://lore.kernel.org/r/20260422-v7-0-0-net-next-driver-removal-v1-v2-15-08a5b59784d5%40lunn.ch
+patch subject: [PATCH net v2 15/15] drivers: net: 8390: wd80x3: Remove this driver
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+docutils: docutils (Docutils 0.21.2, Python 3.13.5, on linux)
+reproduce: (https://download.01.org/0day-ci/archive/20260430/202604300512.3KcfhJGd-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202604301024.q9hVP893-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202604300512.3KcfhJGd-lkp@intel.com/
 
-All errors (new ones prefixed by >>):
+All warnings (new ones prefixed by >>):
 
->> net/nfc/nci/rsp.c:1:2: error: expected identifier or '('
-       1 |         if (skb->len < sizeof(*rsp)) {
-         |         ^
-   net/nfc/nci/rsp.c:5:2: error: expected identifier or '('
-       5 |         if (skb->len < 6 + rsp_1->num_supported_rf_interfaces +
-         |         ^
-   net/nfc/nci/rsp.c:10:2: error: expected identifier or '('
-      10 |         if (skb->len < sizeof(*rsp_1))
-         |         ^
-   In file included from net/nfc/nci/rsp.c:29:
-   In file included from include/linux/interrupt.h:11:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/arm64/include/asm/hardirq.h:17:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:588:
-   In file included from include/linux/irqdesc.h:5:
-   In file included from include/linux/irq_work.h:6:
-   In file included from include/linux/rcuwait.h:6:
-   In file included from include/linux/sched/signal.h:6:
-   include/linux/signal.h:98:11: warning: array index 3 is past the end of the array (that has type 'unsigned long[1]') [-Warray-bounds]
-      98 |                 return (set->sig[3] | set->sig[2] |
-         |                         ^        ~
-   include/uapi/asm-generic/signal.h:62:2: note: array 'sig' declared here
-      62 |         unsigned long sig[_NSIG_WORDS];
-         |         ^
-   In file included from net/nfc/nci/rsp.c:29:
-   In file included from include/linux/interrupt.h:11:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/arm64/include/asm/hardirq.h:17:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:588:
-   In file included from include/linux/irqdesc.h:5:
-   In file included from include/linux/irq_work.h:6:
-   In file included from include/linux/rcuwait.h:6:
-   In file included from include/linux/sched/signal.h:6:
-   include/linux/signal.h:98:25: warning: array index 2 is past the end of the array (that has type 'unsigned long[1]') [-Warray-bounds]
-      98 |                 return (set->sig[3] | set->sig[2] |
-         |                                       ^        ~
-   include/uapi/asm-generic/signal.h:62:2: note: array 'sig' declared here
-      62 |         unsigned long sig[_NSIG_WORDS];
-         |         ^
-   In file included from net/nfc/nci/rsp.c:29:
-   In file included from include/linux/interrupt.h:11:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/arm64/include/asm/hardirq.h:17:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:588:
-   In file included from include/linux/irqdesc.h:5:
-   In file included from include/linux/irq_work.h:6:
-   In file included from include/linux/rcuwait.h:6:
-   In file included from include/linux/sched/signal.h:6:
-   include/linux/signal.h:99:4: warning: array index 1 is past the end of the array (that has type 'unsigned long[1]') [-Warray-bounds]
-      99 |                         set->sig[1] | set->sig[0]) == 0;
-         |                         ^        ~
-   include/uapi/asm-generic/signal.h:62:2: note: array 'sig' declared here
-      62 |         unsigned long sig[_NSIG_WORDS];
-         |         ^
-   In file included from net/nfc/nci/rsp.c:29:
-   In file included from include/linux/interrupt.h:11:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/arm64/include/asm/hardirq.h:17:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:588:
-   In file included from include/linux/irqdesc.h:5:
-   In file included from include/linux/irq_work.h:6:
-   In file included from include/linux/rcuwait.h:6:
-   In file included from include/linux/sched/signal.h:6:
-   include/linux/signal.h:101:11: warning: array index 1 is past the end of the array (that has type 'unsigned long[1]') [-Warray-bounds]
-     101 |                 return (set->sig[1] | set->sig[0]) == 0;
-         |                         ^        ~
-   include/uapi/asm-generic/signal.h:62:2: note: array 'sig' declared here
-      62 |         unsigned long sig[_NSIG_WORDS];
-         |         ^
-   In file included from net/nfc/nci/rsp.c:29:
-   In file included from include/linux/interrupt.h:11:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/arm64/include/asm/hardirq.h:17:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:588:
-   In file included from include/linux/irqdesc.h:5:
-   In file included from include/linux/irq_work.h:6:
-   In file included from include/linux/rcuwait.h:6:
-   In file included from include/linux/sched/signal.h:6:
-   include/linux/signal.h:114:11: warning: array index 3 is past the end of the array (that has type 'const unsigned long[1]') [-Warray-bounds]
-     114 |                 return  (set1->sig[3] == set2->sig[3]) &&
-         |                          ^         ~
-   include/uapi/asm-generic/signal.h:62:2: note: array 'sig' declared here
-      62 |         unsigned long sig[_NSIG_WORDS];
-         |         ^
-   In file included from net/nfc/nci/rsp.c:29:
-   In file included from include/linux/interrupt.h:11:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/arm64/include/asm/hardirq.h:17:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:588:
-   In file included from include/linux/irqdesc.h:5:
-   In file included from include/linux/irq_work.h:6:
-   In file included from include/linux/rcuwait.h:6:
-   In file included from include/linux/sched/signal.h:6:
-   include/linux/signal.h:114:27: warning: array index 3 is past the end of the array (that has type 'const unsigned long[1]') [-Warray-bounds]
-     114 |                 return  (set1->sig[3] == set2->sig[3]) &&
+   Non-Preserved Properties
+   ======================== [docutils]
+>> Documentation/networking/device_drivers/ethernet/index.rst:10: WARNING: toctree contains reference to nonexisting document 'networking/device_drivers/ethernet/3com/3c509' [toc.not_readable]
+   Documentation/networking/skbuff:36: ./include/linux/skbuff.h:48: ERROR: Unexpected section title.
 
 
-vim +1 net/nfc/nci/rsp.c
+vim +10 Documentation/networking/device_drivers/ethernet/index.rst
 
-   > 1		if (skb->len < sizeof(*rsp)) {
-     2			pr_err("short NCI_CORE_INIT_RSP v2 packet\n");
-     3			return NCI_STATUS_SYNTAX_ERROR;
-     4		}
-     5		if (skb->len < 6 + rsp_1->num_supported_rf_interfaces +
-     6				sizeof(*rsp_2)) {
-     7			pr_err("short NCI_CORE_INIT_RSP v1 packet\n");
-     8			return NCI_STATUS_SYNTAX_ERROR;
-     9		}
-    10		if (skb->len < sizeof(*rsp_1))
-    11			return NCI_STATUS_SYNTAX_ERROR;
-    12	// SPDX-License-Identifier: GPL-2.0-only
-    13	/*
-    14	 *  The NFC Controller Interface is the communication protocol between an
-    15	 *  NFC Controller (NFCC) and a Device Host (DH).
-    16	 *
-    17	 *  Copyright (C) 2011 Texas Instruments, Inc.
-    18	 *
-    19	 *  Written by Ilan Elias <ilane@ti.com>
-    20	 *
-    21	 *  Acknowledgements:
-    22	 *  This file is based on hci_event.c, which was written
-    23	 *  by Maxim Krasnyansky.
-    24	 */
-    25	
+132db93572821e Jakub Kicinski 2020-06-26   7  
+132db93572821e Jakub Kicinski 2020-06-26   8  Contents:
+132db93572821e Jakub Kicinski 2020-06-26   9  
+132db93572821e Jakub Kicinski 2020-06-26 @10  .. toctree::
 
 -- 
 0-DAY CI Kernel Test Service
