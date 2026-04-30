@@ -1,61 +1,69 @@
-Return-Path: <netdev+bounces-282575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282574-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UA6QLw+u8mkatgEAu9opvQ
-	(envelope-from <netdev+bounces-282575-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:19:11 +0200
+	id Z4+7Nvyt8mkatgEAu9opvQ
+	(envelope-from <netdev+bounces-282574-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:18:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3567B49BF91
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:19:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3871149BF7C
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:18:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 262F7301C96A
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:19:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 501113016CBC
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:18:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2848825CC57;
-	Thu, 30 Apr 2026 01:19:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B17F12459C5;
+	Thu, 30 Apr 2026 01:18:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZQV3aXAl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CEdr9kD2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018E123EA8A;
-	Thu, 30 Apr 2026 01:19:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F364194A6C;
+	Thu, 30 Apr 2026 01:18:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777511948; cv=none; b=cy4wgf0UZSwTrkwd3PJ20yM7QGPjfxJPUxGs4jLOlTyx+QmAwnRU4dJJ9E15QUU6l7yyOt5EFJWZqRnGIq+liEPBFtxCtvIPrM+EuA82WRlA9YCb5T9wNZHfP5kdzXtrqsYhh6DXi6KSdhbJGVmSTQbYjnf2Fbf/93V2DjgAk6E=
+	t=1777511929; cv=none; b=rS/G3a9aFvdQmVFbcuSoCoT2rYEN535HW06nIRGPoL3PEFGxmW/qnNewelWn5JJZMSFLJP4vPR/i6gATDq7vL9cPc8LFJV08F6FGYilP5Q3N+Mv1UWXCuKJq7UYM3Z3bKG1+x1IH0NW1EiUgn8mrrTKDc5BsQtjhE4JhbQ7zu3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777511948; c=relaxed/simple;
-	bh=6czsOlNriyalap6EeFnkX5tgFtke+HknraCqL0WxuNI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ROeIXqnQTLY1k7PEabB0fhvABV1FjhsC3FTz09Tfhjm8WTSU8phtiGttQMjYhE9SQB7esq3fo9zOFvLc1N+VlQgN6C+tBoixDrk4gzHZJ/rNWqyBbDak/k01kROkD6pXVa+ga0pJLNeyLxEugn4bOR3BJuk2fp84CQRQL0vtOTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZQV3aXAl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FCCCC19425;
-	Thu, 30 Apr 2026 01:19:07 +0000 (UTC)
+	s=arc-20240116; t=1777511929; c=relaxed/simple;
+	bh=8I/TGIeJpKZJ99tALKbqpZFfrLAguMqYMRot9pDDjFA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=nm5Zax7NBDsFx9GbB3yho0kl6jcV0UQwwby8Sz6BcTM7MeDNlV0eZW4KL0NH6E1Mi/VOIAHcuo+Euvn6aGBZqfRWJ7m0bhkYhQANwws7b+BmMbaIueqa5HsF86vdmaKXu3IqrbztdWGIdKskF6MLWAyxsPrUSZ+DWhRK6LADzKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CEdr9kD2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 432F0C19425;
+	Thu, 30 Apr 2026 01:18:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777511947;
-	bh=6czsOlNriyalap6EeFnkX5tgFtke+HknraCqL0WxuNI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ZQV3aXAlpikEuzoE2QSEIEEH7BanzAKa27C4vM6on6FOu/quvXe9632AMzF9wycOH
-	 oMKrBt9Fnz05dqtS0DBK5fMbiMiPZA0k4JIeFtjUhxB09W6h0Qqvrbw76k/5rJSOMU
-	 0GqSbldRfCnKjm8QCoBXEVf6MUegQFoAYtv8+assh9Y9GBZhNJDrBH24krekphJ4i5
-	 RopZpz7kAv/WKEX+7vbAs2jJPVEQnT2UQFmK7s4U+92GJMsuj7thb13GdxGq4awKvw
-	 1Wa0Via3K/6vG5gRxINYsAo9cNq/CDJBg+wxD5pMnNspYIeRldp6oFD75NdNb00Md5
-	 HRGylGPtLzX9w==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-doc@vger.kernel.org,
-	linux-api@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+	s=k20201202; t=1777511928;
+	bh=8I/TGIeJpKZJ99tALKbqpZFfrLAguMqYMRot9pDDjFA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=CEdr9kD2r1ZVsI0g0c7GJRNC+Pq09jt6y+7cDDBpYMJV/41JimIDZMSiNyXoQZ2Us
+	 iimqk9jWtUXNca7Ne9Gu5y8BpvEmXd1V5r+jNM/Lmwt+8ZWz14yFq4elltN2VJq7Co
+	 NKi45Q8L8SFdopY/EYrAqunqvI5qXIFRpHYsVIaUdkKjgrnl8SsnnZ8e4vMfuzeiqK
+	 Qs0cXPCi7GXPgKNpD+wLoVKxvD8gPPKNM/1fBsydCt9FTDYfkaBvYGGel3//uYg2GE
+	 3Cq7Au9wcuVc9IGPDaNzL02+h7BmRU7lJC2ESobGzAwBcCT12rTLTFL/525SDiejCz
+	 JLNd6LSa3MUdA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: maoyixie.tju@gmail.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
 	netdev@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
-Date: Wed, 29 Apr 2026 18:15:44 -0700
-Message-ID: <20260430011544.31823-1-ebiggers@kernel.org>
+	kuniyu@google.com,
+	shaw.leon@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	kuznet@ms2.inr.ac.ru,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	security@kernel.org
+Subject: Re: [PATCH net 1/2] ip6: vti: Use ip6_tnl.net in vti6_changelink().
+Date: Wed, 29 Apr 2026 18:18:47 -0700
+Message-ID: <20260430011847.2344915-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260428110713.2550315-2-maoyixie.tju@gmail.com>
+References: <20260428110713.2550315-2-maoyixie.tju@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,293 +71,107 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 3567B49BF91
+X-Rspamd-Queue-Id: 3871149BF7C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-282574-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282575-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[ebiggers@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,google.com,gmail.com,davemloft.net,redhat.com,ms2.inr.ac.ru];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.911];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,copy.fail:url,chronox.de:url]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-AF_ALG is almost completely unnecessary, and it exposes a massive attack
-surface that hasn't been standing up to modern vulnerability discovery
-tools.  The latest one even has its own website, providing a small
-Python script that reliably roots most Linux distros: https://copy.fail/
-
-This isn't sustainable, especially as LLMs have accelerated the rate the
-vulnerabilities are coming in.  The effort that is being put into this
-thing is vastly disproportional to the few programs that actually use
-it, and those programs would be better served by userspace code anyway.
-
-These issues have been noted in many mailing list discussions already.
-But until now they haven't been reflected in the documentation or
-kconfig menu itself, and the vulnerabilities are still coming in.
-
-Let's go ahead and document the deprecation.
-
-This isn't intended to change anything overnight.  After all, most Linux
-distros won't be able to disable the kconfig options quite yet, mainly
-because of iwd.  But this should create a bit more impetus for these
-userspace programs to be fixed, and the documentation update should also
-help prevent more users from appearing.
-
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 ---
+ip6: vti: Use ip6_tnl.net in vti6_changelink().
 
-This patch is targeting crypto/master
+After commit 5e72ce3e3980 ("net: ipv6: Use link netns in newlink() of
+rtnl_link_ops"), vti6_newlink() correctly resolves the per-netns vti6
+hash via link_net. vti6_changelink() and vti6_update() were not
+converted in that series and still read dev_net(dev) /
+dev_net(t->dev), which diverge from the device's creation netns
+after IFLA_NET_NS_FD migration. The result is a stale per-netns hash
+entry; cleanup_net() of the original netns then walks freed memory.
 
- Documentation/crypto/userspace-if.rst | 82 ++++++++++++++++++++-------
- crypto/Kconfig                        | 69 ++++++++++++++++------
- 2 files changed, 113 insertions(+), 38 deletions(-)
+> diff --git a/net/ipv6/ip6_vti.c b/net/ipv6/ip6_vti.c
+> index ad5290be4dd6..dcb257411d6e 100644
+> --- a/net/ipv6/ip6_vti.c
+> +++ b/net/ipv6/ip6_vti.c
+> @@ -722,10 +722,11 @@ vti6_tnl_change(struct ip6_tnl *t, const struct __ip6_tnl_parm *p,
+>  static int vti6_update(struct ip6_tnl *t, struct __ip6_tnl_parm *p,
+>  		       bool keep_mtu)
+>  {
+> -	struct net *net = dev_net(t->dev);
+> -	struct vti6_net *ip6n = net_generic(net, vti6_net_id);
+> +	struct net *net = t->net;
+> +	struct vti6_net *ip6n;
+>  	int err;
 
-diff --git a/Documentation/crypto/userspace-if.rst b/Documentation/crypto/userspace-if.rst
-index 021759198fe7..c39f5c79a5b7 100644
---- a/Documentation/crypto/userspace-if.rst
-+++ b/Documentation/crypto/userspace-if.rst
-@@ -2,30 +2,72 @@ User Space Interface
- ====================
- 
- Introduction
- ------------
- 
--The concepts of the kernel crypto API visible to kernel space is fully
--applicable to the user space interface as well. Therefore, the kernel
--crypto API high level discussion for the in-kernel use cases applies
--here as well.
--
--The major difference, however, is that user space can only act as a
--consumer and never as a provider of a transformation or cipher
--algorithm.
--
--The following covers the user space interface exported by the kernel
--crypto API. A working example of this description is libkcapi that can
--be obtained from [1]. That library can be used by user space
--applications that require cryptographic services from the kernel.
--
--Some details of the in-kernel kernel crypto API aspects do not apply to
--user space, however. This includes the difference between synchronous
--and asynchronous invocations. The user space API call is fully
--synchronous.
--
--[1] https://www.chronox.de/libkcapi/index.html
-+AF_ALG provides unprivileged userspace programs access to arbitrary hash,
-+symmetric cipher, AEAD, and RNG algorithms that are implemented in kernel-mode
-+code.
-+
-+AF_ALG is insecure and is deprecated. Originally added to the kernel in 2010,
-+most kernel developers now consider it to be a mistake.
-+
-+AF_ALG continues to be supported only for backwards compatibility. On systems
-+where no programs using AF_ALG remain, the support for it should be disabled by
-+disabling ``CONFIG_CRYPTO_USER_API_*``.
-+
-+Deprecation
-+-----------
-+
-+AF_ALG was originally intended to provide userspace programs access to crypto
-+accelerators that they wouldn't otherwise have access to.
-+
-+However, that capability turned out to not be useful on very many systems. More
-+significantly, the actual implementation exposes a vastly greater amount of
-+functionality than that. It actually provides access to all software algorithms.
-+
-+This includes arbitrary compositions of different algorithms created via a
-+complex template system, as well as algorithms that only make sense as internal
-+implementation details of other algorithms. It also includes full zero-copy
-+support, which is difficult for the kernel to implement securely.
-+
-+Ultimately, these algorithms are just math computations. They use the same
-+instructions that userspace programs already have access to, just accessed in a
-+much more convoluted and less efficient way.
-+
-+Indeed, userspace code is nearly always what is being used anyway. These same
-+algorithms are widely implemented in userspace crypto libraries.
-+
-+Meanwhile, AF_ALG hasn't been withstanding modern vulnerability discovery tools
-+such as syzbot and large language models. It receives a steady stream of CVEs.
-+Some of the examples include:
-+
-+- CVE-2026-31677
-+- CVE-2026-31431 (https://copy.fail)
-+- CVE-2025-38079
-+- CVE-2025-37808
-+- CVE-2024-26824
-+- CVE-2022-48781
-+- CVE-2019-8912
-+- CVE-2018-14619
-+- CVE-2017-18075
-+- CVE-2017-17806
-+- CVE-2017-17805
-+- CVE-2016-10147
-+- CVE-2015-8970
-+- CVE-2015-3331
-+- CVE-2014-9644
-+- CVE-2013-7421
-+- CVE-2011-4081
-+
-+It is recommended that, whenever possible, userspace programs be migrated to
-+userspace crypto code (which again, is what is normally used anyway) and
-+``CONFIG_CRYPTO_USER_API_*`` be disabled.  On systems that use SELinux, SELinux
-+can also be used to restrict the use of AF_ALG to trusted programs.
-+
-+The remainder of this documentation provides the historical documentation for
-+the deprecated AF_ALG interface.
- 
- User Space API General Remarks
- ------------------------------
- 
- The kernel crypto API is accessible from user space. Currently, the
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 103d1f58cb7c..6cd1c478d4be 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1278,48 +1278,72 @@ config CRYPTO_DF80090A
- 	tristate
- 	select CRYPTO_AES
- 	select CRYPTO_CTR
- 
- endmenu
--menu "Userspace interface"
-+menu "Userspace interface (deprecated)"
- 
- config CRYPTO_USER_API
- 	tristate
- 
- config CRYPTO_USER_API_HASH
--	tristate "Hash algorithms"
-+	tristate "Hash algorithms (deprecated)"
- 	depends on NET
- 	select CRYPTO_HASH
- 	select CRYPTO_USER_API
- 	help
--	  Enable the userspace interface for hash algorithms.
-+	  Enable the AF_ALG userspace interface for hash algorithms.  This
-+	  provides unprivileged userspace programs access to arbitrary hash
-+	  algorithms implemented in the kernel's privileged execution context.
- 
--	  See Documentation/crypto/userspace-if.rst and
--	  https://www.chronox.de/libkcapi/html/index.html
-+	  This interface is deprecated and is supported only for backwards
-+	  compatibility.  It regularly has vulnerabilities, and the capabilities
-+	  it provides are redundant with userspace crypto libraries.
-+
-+	  Enable this only if needed for support for a program that hasn't yet
-+	  been converted to userspace crypto, for example iwd.
-+
-+	  See also Documentation/crypto/userspace-if.rst
- 
- config CRYPTO_USER_API_SKCIPHER
--	tristate "Symmetric key cipher algorithms"
-+	tristate "Symmetric key cipher algorithms (deprecated)"
- 	depends on NET
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_USER_API
- 	help
--	  Enable the userspace interface for symmetric key cipher algorithms.
-+	  Enable the AF_ALG userspace interface for symmetric key algorithms.
-+	  This provides unprivileged userspace programs access to arbitrary
-+	  symmetric key algorithms implemented in the kernel's privileged
-+	  execution context.
-+
-+	  This interface is deprecated and is supported only for backwards
-+	  compatibility.  It regularly has vulnerabilities, and the capabilities
-+	  it provides are redundant with userspace crypto libraries.
-+
-+	  Enable this only if needed for support for a program that hasn't yet
-+	  been converted to userspace crypto, for example iwd, or cryptsetup
-+	  with certain algorithms.
- 
--	  See Documentation/crypto/userspace-if.rst and
--	  https://www.chronox.de/libkcapi/html/index.html
-+	  See also Documentation/crypto/userspace-if.rst
- 
- config CRYPTO_USER_API_RNG
--	tristate "RNG (random number generator) algorithms"
-+	tristate "Random number generation algorithms (deprecated)"
- 	depends on NET
- 	select CRYPTO_RNG
- 	select CRYPTO_USER_API
- 	help
--	  Enable the userspace interface for RNG (random number generator)
--	  algorithms.
-+	  Enable the AF_ALG userspace interface for random number generation
-+	  (RNG) algorithms.  This provides unprivileged userspace programs
-+	  access to arbitrary RNG algorithms implemented in the kernel's
-+	  privileged execution context.
- 
--	  See Documentation/crypto/userspace-if.rst and
--	  https://www.chronox.de/libkcapi/html/index.html
-+	  This interface is deprecated and is supported only for backwards
-+	  compatibility.  It regularly has vulnerabilities, and the capabilities
-+	  it provides are redundant with userspace crypto libraries as well as
-+	  the normal kernel RNG (e.g., /dev/urandom and getrandom(2)).
-+
-+	  See also Documentation/crypto/userspace-if.rst
- 
- config CRYPTO_USER_API_RNG_CAVP
- 	bool "Enable CAVP testing of DRBG"
- 	depends on CRYPTO_USER_API_RNG && CRYPTO_DRBG
- 	help
-@@ -1330,20 +1354,29 @@ config CRYPTO_USER_API_RNG_CAVP
- 
- 	  This should only be enabled for CAVP testing. You should say
- 	  no unless you know what this is.
- 
- config CRYPTO_USER_API_AEAD
--	tristate "AEAD cipher algorithms"
-+	tristate "AEAD cipher algorithms (deprecated)"
- 	depends on NET
- 	select CRYPTO_AEAD
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_USER_API
- 	help
--	  Enable the userspace interface for AEAD cipher algorithms.
-+	  Enable the AF_ALG userspace interface for authenticated encryption
-+	  with associated data (AEAD) algorithms.  This provides unprivileged
-+	  userspace programs access to arbitrary AEAD algorithms implemented in
-+	  the kernel's privileged execution context.
-+
-+	  This interface is deprecated and is supported only for backwards
-+	  compatibility.  It regularly has vulnerabilities, and the capabilities
-+	  it provides are redundant with userspace crypto libraries.
-+
-+	  Enable this only if needed for support for a program that hasn't yet
-+	  been converted to userspace crypto, for example iwd.
- 
--	  See Documentation/crypto/userspace-if.rst and
--	  https://www.chronox.de/libkcapi/html/index.html
-+	  See also Documentation/crypto/userspace-if.rst
- 
- config CRYPTO_USER_API_ENABLE_OBSOLETE
- 	bool "Obsolete cryptographic algorithms"
- 	depends on CRYPTO_USER_API
- 	default y
+Does this fix introduce a regression by leaving a loophole in
+vti6_siocdevprivate()?
 
-base-commit: 57b8e2d666a31fa201432d58f5fe3469a0dd83ba
+While vti6_changelink() and vti6_update() now correctly use t->net,
+vti6_siocdevprivate() still uses dev_net(dev) to locate the tunnel during
+a tunnel modification ioctl:
+
+net/ipv6/ip6_vti.c:vti6_siocdevprivate() {
+	...
+	struct net *net = dev_net(dev);
+	...
+	case SIOCCHGTUNNEL:
+		...
+		t = vti6_locate(net, &p1, cmd == SIOCADDTUNNEL);
+		if (dev != ip6n->fb_tnl_dev && cmd == SIOCCHGTUNNEL) {
+			if (t) {
+				if (t->dev != dev) {
+					err = -EEXIST;
+					break;
+				}
+			} else
+				t = netdev_priv(dev);
+
+			err = vti6_update(t, &p1, false);
+		}
+	...
+}
+
+Because the collision check occurs in the new namespace (dev_net(dev)), but
+vti6_update() now modifies the original namespace's hash table (t->net),
+could an attacker in the new namespace configure their tunnel to perfectly
+match the parameters of an existing victim tunnel in the original namespace?
+
+Since the check in the new namespace finds no collision, it seems it bypasses
+the error check. Then vti6_update() prepends the attacker's tunnel
+into the original namespace's hash table, which might allow intercepting or
+hijacking traffic destined for the victim tunnel.
+
+Should vti6_siocdevprivate() also be updated to use t->net for collision
+checks to prevent cross-namespace traffic hijacking?
 -- 
-2.54.0
-
+pw-bot: cr
 
