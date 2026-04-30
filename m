@@ -1,179 +1,168 @@
-Return-Path: <netdev+bounces-282720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282721-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iI2FHuAb82kvxQEAu9opvQ
-	(envelope-from <netdev+bounces-282720-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 11:07:44 +0200
+	id sGNMOxAg82lsxQEAu9opvQ
+	(envelope-from <netdev+bounces-282721-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 11:25:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9ADF49FA1C
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 11:07:43 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EAF049FD49
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 11:25:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9F9F730238C1
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:06:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 30A873006930
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:25:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FE41377EC6;
-	Thu, 30 Apr 2026 09:06:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B20723A0E8D;
+	Thu, 30 Apr 2026 09:25:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FpOLyU0m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iot/Czbj"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160D737D12F
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 09:06:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A46A39F160;
+	Thu, 30 Apr 2026 09:25:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777539976; cv=none; b=gRcREkcOQlr7MWBLxwEtxQAeecvsFe7fWgF3VnxhmCcIUqC1bsmMoHYTNqN5GbvRi2wV5jZIOd76UztKFTc+PZ997CVND8fcJ+V0YADwq1tYw5uTeGciqjspDGW3S3HAEsV1YgstuOToBNV8syeD9sJbXJGo3mpbu3PbH7gKbYs=
+	t=1777541129; cv=none; b=D5hMj1nxEpOETapXT0FoUcSQkrSkRioqQgDF90qKuHZPp9LrXx4U+bBGIZqoAU2ajYUaOJtc1EN+mrii8Uv1PYWrQaHQjI0yqPyGnedN0oc1bRYZI3Al6qqryjHew85osbwExpxeDf9RymHwn3osIPq/7qN4kIZpV4NZDxtuxYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777539976; c=relaxed/simple;
-	bh=O0kNZNME6liz/PDiFhx17G1oocdPgEZotIhQ2QvF/Sw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=H0jGabQOBTYES9s96MpI/XN3gN3+G5exAKIKePqQuNbA5CEft3Yu6mozlODpCL1O9eUQkqjC3b1QjvxSlwRUJoLvTFzl8UvjOClKTi4hxker6B+n9D8WoZV7AB4eUaccH6U8yigbHsUPDQZey7eGj8eNCkrc+ISpZurfL/e0pgA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FpOLyU0m; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1777539972;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=psV3t89J4TYPxkXy1/CDffDJ8IP5u3Jv6+y4DGwPsJ4=;
-	b=FpOLyU0mpZPwFkcF6k1NUo3Uc6UvCelLgc/8buJxDcA/i8iclap2bvE7G1lROhJ+qO3ItZ
-	hM5eIImbNKg5EpmZMVix/ZWABNMyvD8d2/gnrUQWT/8tl1+kuRlb8yvNyrB/9nLpwD0s1U
-	PfE1S+m/zlP1wtYgB9mYVE6+4ZuVWCQ=
-From: Qingfang Deng <qingfang.deng@linux.dev>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: linux-ppp@vger.kernel.org,
-	Qingfang Deng <qingfang.deng@linux.dev>
-Subject: [PATCH net-next 3/3] docs: update ppp_generic.rst for API changes
-Date: Thu, 30 Apr 2026 17:05:23 +0800
-Message-ID: <20260430090532.244758-3-qingfang.deng@linux.dev>
-In-Reply-To: <20260430090532.244758-1-qingfang.deng@linux.dev>
-References: <20260430090532.244758-1-qingfang.deng@linux.dev>
+	s=arc-20240116; t=1777541129; c=relaxed/simple;
+	bh=B853Eh9uk565MxVVpob3pa08VA0fsq5RODboe/BkwDg=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=Fs9Qj9uAzNV9xGK6MexXhqUIWgV+GRItq+yDB6BBdVRDB9TMOxqyDnAkI6yVJ+8IN55iGUiWzg6yjlNNd9wvxw/JAFoPnuPXTvDeSUI2Ui8fOLUwM2AcqG2c/M6C4i/L4TeBlGCg377xEJ57/7LPWwvHHrY0RidE7Mx3PElnUnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iot/Czbj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E38C5C2BCB4;
+	Thu, 30 Apr 2026 09:25:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777541129;
+	bh=B853Eh9uk565MxVVpob3pa08VA0fsq5RODboe/BkwDg=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=iot/Czbj1UTXZtIKbuakUOJPEZf2jgEJsXUobkf3fTE6pxHY1WoYVSUKSdjGjweU2
+	 uJCII7hbjhIouQ7z+4khXHPcxKRfaQKW5M8Ob7Ff/2xSIiteOAtptRQ6PRVkaTUlXR
+	 m5hnmHC34YoQvr6bwwzWq2O9IDz3/7o6w2Ux/d7uBQOzrHFiHHPE6x5MGEwTHosl5Y
+	 FtyWqlDWOsE2uTUmk93O2vMxDZkoZBQ9EeRqJitySRYcWBAmbfCmXMjl7Y98+WSE2j
+	 s23YYEIaJkoJReZgcK3bIv8Gfrr3USg/F7iytFGSPEmXH9vDS7tcs9sL21B1DUkETF
+	 aW/y9woiMNIXw==
+Date: Thu, 30 Apr 2026 04:25:27 -0500
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: C9ADF49FA1C
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Christian Lamparter <chunkeey@gmail.com>, 
+ Andreas Kemnade <andreas@kemnade.info>, 
+ =?utf-8?q?Beno=C3=AEt_Cousson?= <bcousson@baylibre.com>, 
+ Eric Dumazet <edumazet@google.com>, Bartosz Golaszewski <brgl@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Johannes Berg <johannes@sipsolutions.net>, Jakub Kicinski <kuba@kernel.org>, 
+ Kevin Hilman <khilman@baylibre.com>, Arnd Bergmann <arnd@arndb.de>, 
+ linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+ linux-omap@vger.kernel.org, Felipe Balbi <balbi@kernel.org>, 
+ Rob Herring <robh+dt@kernel.org>, linux-gpio@vger.kernel.org, 
+ Paolo Abeni <pabeni@redhat.com>, devicetree@vger.kernel.org, 
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+ Roger Quadros <rogerq@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
+ Aaro Koskinen <aaro.koskinen@iki.fi>, Tony Lindgren <tony@atomide.com>, 
+ Linus Walleij <linusw@kernel.org>
+To: Arnd Bergmann <arnd@kernel.org>
+In-Reply-To: <20260430081242.3686993-2-arnd@kernel.org>
+References: <20260430081242.3686993-1-arnd@kernel.org>
+ <20260430081242.3686993-2-arnd@kernel.org>
+Message-Id: <177754112702.3678889.4847926893667561974.robh@kernel.org>
+Subject: Re: [PATCH v4 1/3 net-next] dt-bindings: net: add
+ st,stlc4560/p54spi binding
+X-Rspamd-Queue-Id: 1EAF049FD49
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[27];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282720-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,kemnade.info,baylibre.com,google.com,kernel.org,sipsolutions.net,arndb.de,vger.kernel.org,redhat.com,davemloft.net,lists.infradead.org,iki.fi,atomide.com];
+	TAGGED_FROM(0.00)[bounces-282721-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_COUNT_THREE(0.00)[3];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email,linux.dev:dkim,linux.dev:mid]
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[arndb.de:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-Document the new ppp_channel_conf struct and ppp_channel lifecycle
-management changes.
 
-Assisted-by: Gemini:gemini-3-flash
-Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
----
- Documentation/networking/ppp_generic.rst | 33 ++++++++++--------------
- 1 file changed, 13 insertions(+), 20 deletions(-)
+On Thu, 30 Apr 2026 10:12:40 +0200, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> The SPI version of Prism54 was sold under a couple of different
+> names and supported by the Linux p54spi driver, but there was
+> never a DT binding for it.
+> 
+> Document the four known names of this device and the properties
+> that are sufficient for its use on the Nokia N8x0 tablet.
+> 
+> As I don't have this hardware or documentation for it, this is
+> purely based on existing usage in the driver.
+> 
+> Link: https://lore.kernel.org/all/e8dc9acb-6f85-e0a9-a145-d101ca6da201@gmail.com/
+> Acked-by: Christian Lamparter <chunkeey@gmail.com>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+> v4: renamed file to st,stlc4560, matching the primary compatible string
+>     require st,stlc4560 string
+> ---
+>  .../bindings/net/wireless/st,stlc4560.yaml    | 61 +++++++++++++++++++
+>  MAINTAINERS                                   |  1 +
+>  2 files changed, 62 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/wireless/st,stlc4560.yaml
+> 
 
-diff --git a/Documentation/networking/ppp_generic.rst b/Documentation/networking/ppp_generic.rst
-index 5a10abce5964..8d63f997fb3f 100644
---- a/Documentation/networking/ppp_generic.rst
-+++ b/Documentation/networking/ppp_generic.rst
-@@ -124,18 +124,19 @@ presented to the start_xmit() function contain only the 2-byte
- protocol number and the data, and the skbuffs presented to ppp_input()
- must be in the same format.
- 
--The channel must provide an instance of a ppp_channel struct to
--represent the channel.  The channel is free to use the ``private`` field
--however it wishes.  The channel should initialize the ``mtu`` and
--``hdrlen`` fields before calling ppp_register_channel() and not change
--them until after ppp_unregister_channel() returns.  The ``mtu`` field
--represents the maximum size of the data part of the PPP frames, that
--is, it does not include the 2-byte protocol number.
-+The channel must provide an instance of a ppp_channel_conf struct to
-+describe the channel during registration.  The generic layer will
-+allocate a ppp_channel struct and return a pointer to it.  The
-+ppp_channel struct is opaque to the channel driver.  The ``mtu`` field
-+(if multilink is enabled) represents the maximum size of the data part
-+of the PPP frames, that is, it does not include the 2-byte protocol
-+number.  ppp_channel_update_mtu() can be called by the channel driver
-+to update the ``mtu`` field once LCP MRU negotiation is complete.
- 
- If the channel needs some headroom in the skbuffs presented to it for
- transmission (i.e., some space free in the skbuff data area before the
- start of the PPP frame), it should set the ``hdrlen`` field of the
--ppp_channel struct to the amount of headroom required.  The generic
-+ppp_channel_conf struct to the amount of headroom required.  The generic
- PPP layer will attempt to provide that much headroom but the channel
- should still check if there is sufficient headroom and copy the skbuff
- if there isn't.
-@@ -199,20 +200,12 @@ The PPP generic layer has been designed to be SMP-safe.  Locks are
- used around accesses to the internal data structures where necessary
- to ensure their integrity.  As part of this, the generic layer
- requires that the channels adhere to certain requirements and in turn
--provides certain guarantees to the channels.  Essentially the channels
--are required to provide the appropriate locking on the ppp_channel
--structures that form the basis of the communication between the
--channel and the generic layer.  This is because the channel provides
--the storage for the ppp_channel structure, and so the channel is
--required to provide the guarantee that this storage exists and is
--valid at the appropriate times.
-+provides certain guarantees to the channels.  The generic layer manages
-+the ppp_channel object, ensuring it exists and is valid while the
-+channel is registered.
- 
- The generic layer requires these guarantees from the channel:
- 
--* The ppp_channel object must exist from the time that
--  ppp_register_channel() is called until after the call to
--  ppp_unregister_channel() returns.
--
- * No thread may be in a call to any of ppp_input(), ppp_input_error(),
-   ppp_output_wakeup(), ppp_channel_index() or ppp_unit_number() for a
-   channel at the time that ppp_unregister_channel() is called for that
-@@ -453,4 +446,4 @@ an interface unit are:
-   fragments is disabled.  This ioctl is only available if the
-   CONFIG_PPP_MULTILINK option is selected.
- 
--Last modified: 7-feb-2002
-+Last modified: 16-apr-2026
--- 
-2.43.0
+My bot found errors running 'make dt_binding_check' on your patch:
+
+yamllint warnings/errors:
+
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/wireless/st,stlc4560.yaml: $id: Cannot determine base path from $id, relative path/filename doesn't match actual path or filename
+ 	 $id: http://devicetree.org/schemas/net/wireless/st,stlc45xx.yaml
+ 	file: /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/wireless/st,stlc4560.yaml
+
+doc reference errors (make refcheckdocs):
+Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/net/wireless/st,stlc45xx.yaml
+MAINTAINERS: Documentation/devicetree/bindings/net/wireless/st,stlc45xx.yaml
+
+See https://patchwork.kernel.org/project/devicetree/patch/20260430081242.3686993-2-arnd@kernel.org
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
 
 
