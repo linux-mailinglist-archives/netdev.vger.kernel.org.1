@@ -1,387 +1,217 @@
-Return-Path: <netdev+bounces-282984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282985-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0LPzLUi382mW6QEAu9opvQ
-	(envelope-from <netdev+bounces-282984-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 22:10:48 +0200
+	id wBAJEhLA82mw6gEAu9opvQ
+	(envelope-from <netdev+bounces-282985-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 22:48:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 423854A7971
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 22:10:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AC294A7E7E
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 22:48:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 82BA9302E414
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 20:10:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 38F413061DC4
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 20:32:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC8B3379979;
-	Thu, 30 Apr 2026 20:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57684376BD6;
+	Thu, 30 Apr 2026 20:32:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WcRmo7jU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="icZoEP0e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D38F38CFE1
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 20:10:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777579804; cv=none; b=McIp7hb+xKyuY3o1/Nuk0a3CTypBKqgr29cJCa8PKwdKSHIcz1ZSAP+/Vg4uHr6DAXD8Nyii6G/G/Q04VP2QMDEa6AALiBx2y8iPFucmGykefjx65FwYpmaxwi/f6U8gO+SiJul2hbjDYrm/wb+/AfrG9hLv84A5pn2g5gE/uBk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777579804; c=relaxed/simple;
-	bh=25uK8l6zeHyNQEvdYXtFvnvOLgVvwguj9Xp1gd9LSF8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=S9OVjesT50un6LI/hvWPxPy0GK69s4a6WWnbSJj1IK/DO1XriCsP5wylzyYvwpejA2DoLTU9rFY1HzSK5HRxshN2m2KvAfHjHvpwENWnTDoUqdjFWWRanJp7m+1+OP2AGMjXKrsNwSmzUdMnuKWiOE8y1vwzofA/S3ZU5g6WAkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sharmasagarika.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WcRmo7jU; arc=none smtp.client-ip=209.85.219.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5A83A3830
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 20:32:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777581178; cv=pass; b=K5kTSs2HZo/ICVZ1JuCJbx9pJev+Svy5WkYhs+KxqMPMa3VUF5joj+XPDDBJJyQaO5JbRwwikoJqUP0hdARaflX4Sn4n+uis1qDTGsjMpjk61AI8ia5+efvGg+rH1XpGiS5pU6HqtmeB/whllBZoXQ8KOtyAEtB3rwqG8SYzqkQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777581178; c=relaxed/simple;
+	bh=U2eH8NGTZAa0spz3Gpw8B0ZcuVJWHa8CNLda7oex5Hc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ekq0vSw2bdpByOsqytXOp1pE9yBhi1Ocr3hOi55RjKwOC+qdNJM6IKKHrsS99RAgg9sgUfj/+URWU9Td0R6B+rMMp1iXMLq8dpybkJdkNFKwixcorilpNAH6qkTkV8C/+bsZy4n1lmZZIasxJJAQzHcJT0hNOkUW/kLZU1Gd3gI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=icZoEP0e; arc=pass smtp.client-ip=74.125.82.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sharmasagarika.bounces.google.com
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-8b459fa5f76so14990536d6.1
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 13:10:01 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-12dca45ca21so1831526c88.1
+        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 13:32:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777581176; cv=none;
+        d=google.com; s=arc-20240605;
+        b=XOY879g3cX9faEravujy1m3VSl0xKdsiYxD13VGyrXgEMWQuAslaSZRhUsyALK37Rb
+         VRPx9dCm5E3Y95Wh+106guovJ3Z6Qy4MBDsSVhzG3yERF3NH0X4OWcs16tCIjCmafdvk
+         BxRtvR0OXCg6uh+6eXJLXIpo3ejYzo7dSz82SPQ8IHZR9b3NkMOGgY7jXTAGd5SedUdG
+         qPB7yQxQXOMJrMM3p4824O+ZrKoYFrLnFkotOFpWs9Ljd7+oasKNKVPvNb7ptR+sYdQN
+         Lztu5HfUAFPx8qqp3HtyFLJDQCZ/o1gbVpFU9bobBXt08r5OjyOo4mG/zgQd7iv1F80Z
+         NY2w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=TMxaUy4qZ0yhVhil4Cjh0E5+hmuhmKfd+HYIaVWBDiE=;
+        fh=AGVKekq6vkSql6ETFDc+MFhi7eEQLmZOyjHq94+f1EU=;
+        b=PG8r5fNLQhBI2r1mTtXJkg69mQQplCrFRmkoYa+AlVirj8lWi346RbI849KRiCvLx+
+         0sfyEwWBjtGQobDu6wucMPdNkrWjGG8EFC30nnQ0hsRBG8UlEFABXlnDyVxH6Vmmgdlz
+         PQgTx/XCGvZ9x4JumDy+2bKAifVVBYNyPuybZiCy0ToTB71AV3PfZDEiL3ZYSQNqE3Mq
+         5fNzC+2mF2j+MCpNVw7A15w/vgRfU1qJ6SmV9zRWePv95DMITFpYXb+9/XcOHe6e/+lr
+         96duCnJ8/Yyao2eAAoNtLgaB5FQwAphhugEsbaGZMzEBwKNSKURITq//18vxNUV3rcjp
+         QZGw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777579801; x=1778184601; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VITGrWKqa7uuy6OpvcFGCq4ihxeDvtVatwX3FxDEXv0=;
-        b=WcRmo7jUPuVw7yrKSVKa+J9d+7WWMX2AQJIkrlXQCwNvITtTOzJXj16YOtRnVtpCXY
-         QMFOAWDgic4lYbeoN3ydBM0ovG5BH5YcaPzW1Ug5c+nBj2hqO1jYhS6qodmgDCclZPf4
-         EcLv3PYcsIcRhOcESEJcmwsfXLGCJGZg6JjSuRfb48Hd1SDy23X/JxSg6IczGWkQhliN
-         2IJ4rZLV5DQs4V4T4IW3+8Iozu1husK03JPeTOG7fdZEQF206KbBsY8TqNa9qd2EH+JQ
-         wvPh216Hx99yF6+H3H5VS+5GflydDNLc75gP1w9vnKLRH8uTG4oG6cunrT8PINtcJw7l
-         /oaw==
+        d=google.com; s=20251104; t=1777581176; x=1778185976; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TMxaUy4qZ0yhVhil4Cjh0E5+hmuhmKfd+HYIaVWBDiE=;
+        b=icZoEP0etWqUV5+RIHho1Peu9vOEoiezTz+D8YB0T/YQL1PAim0nF54pPOm2jNqGbI
+         9kCvMDq2hJOB85t+TjOTzw4zzHKcXIlB3ZsWlKZfalJ/hyA9UFHWX1Q0+Et4aA+rXNOZ
+         RqIQHv273qs1xSxTpn+uX4idOUHuouj8apeYXtLIYVYDnKdKUXvtKuMZkcskhDKil0+3
+         vzH/dqedaxvlTX4knBKaP/12HmGA4XdLWIwiIPBAvrUv1XISk+jgazuMIeRlgvNp/Pno
+         hNGkQpi/7ej157c7NX97ImsWviAdFjXG6MtW2A0N7XvEYUYgZyvxdy/a1tPsM26W6sf9
+         3jNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777579801; x=1778184601;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VITGrWKqa7uuy6OpvcFGCq4ihxeDvtVatwX3FxDEXv0=;
-        b=sRNY693Hu9vXLcDVQGLPPwec1mD20vyJejOiDr8IGxf5G9RXRiR2OOHr3uRIBcW9e4
-         TUr8b/qLLfhJTXZqRLq7iOfBseZfwGSqfO+kcBwYvNT/av9p1ui1/UX0CkfSBoPSDPd7
-         xv0fhruHx4KOpcbYypWIOtXSCPfwt9AfdCH6EMS3yOwPW5+5SuHAM6MUy0lGPpE9YHqb
-         ll17KwYDy0MUpl3o6Tr2Zk6a8utdw3gWh3vT67Gd5TqGzE1si1WQCsQssudmN3n5qHat
-         vqMMIwDU9CKKBwg860G7XEXEd2GrLplURJrdDbnJrFBhNUBqoRvev5/Hi9SoBFprIS5C
-         qYUQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9OYOj2ecimiypmGxZzO/ChIT0/UqXetzf7BHEz75lW4dDVhdML4yTJP0kkZv6YhA8r2CIpseE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIzyuE9JXXpd3xClirPNOaPEerEINmfUvliNJoTJaxKI9pJJI4
-	M6VfqYTJ2s5e6ox5e4DOzReADxuPdTcap2WZZEdnbxS+WcyVECtX+eO5GZ3C4LVRaubIIosGwpI
-	ICRDDslgDuJNgZOvcs2bsh1/D37enAmS6oBcYQg==
-X-Received: from qvbmf3.prod.google.com ([2002:a05:6214:5d83:b0:89c:8686:b1a9])
- (user=sharmasagarika job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:6103:b0:8a0:6d76:325a with SMTP id 6a1803df08f44-8b3fe73808dmr60695186d6.20.1777579800785;
- Thu, 30 Apr 2026 13:10:00 -0700 (PDT)
-Date: Thu, 30 Apr 2026 20:09:01 +0000
-In-Reply-To: <20260430200909.527827-1-sharmasagarika@google.com>
+        d=1e100.net; s=20251104; t=1777581176; x=1778185976;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=TMxaUy4qZ0yhVhil4Cjh0E5+hmuhmKfd+HYIaVWBDiE=;
+        b=a1tbVO5MevziGKJqsIiFOTcYYFr/0XA9bY0+uHMMbG2GKlclrNLB/br/5YCIoH+qo4
+         WzjC8dUGKviHA73gvPa9JDEpF5QNd+1VLzGXkdXtqub58/IQJa2O5spoagUbAzeyJfl6
+         obZMVqRmReIA+QLNn1xQWmCOGvLIfEBHGMLBUq/W3WBLYhKJ3P0dq+Xs0f1zqTzVU5gr
+         ddDpDDfMgWxpHuFedbdE04G8b9opmWAPxJkKTPmfR58/ZdHjXeRd+FuAxc4P7aeUPSyW
+         bi0DvL5yY22UnV/fVfViJNIUXG7eSdUmDXIk2xtTs3aE5J7GPuld+vdHbIAJeAr/IYlA
+         4PYw==
+X-Forwarded-Encrypted: i=1; AFNElJ9oTbAYISSoKMeHyp1liOpSSBaPdoAqN8b6/VVwJOPeQe0kGpQv3B9U0HoKF+szyTAAswt6hrE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMZaWOMlp30L9ZlYCUElU1rua3fail5fvbDnQe0yB4F21Ur6/c
+	FeSEGZ8Agu+ErSkQUNIEe5izTU6MLsv7dVL+WjDj6DtbSj3Y5/rWBOxk3o6vNZ1g69o7bdRqd9I
+	i1nIRctz8BRrE3ZZmzVt6/EMnBWNtvuzvmqyHl8Rp
+X-Gm-Gg: AeBDieuBqNbIhkzsAYsp5CNj86bKHCGeHO6LLmwORUc2ShH53I5pD41kSZ62XmZWikB
+	eJO2/J4DbnEG4wrrEnS+od04F5fCyVTcxW3OjVT1xenPNFvdQ7XgR0M5ueaDvZuGVIngexqZ6gg
+	t7NGwB0UUR3q+qhCSc2czv6B1HfUwm7puRofrOmHuE54VOYZK5u2TSO08H5OGjAM0la/fEDuMmQ
+	hDjPs4KX+JwpwwS+WUYZbuixmZt8LM+8C8KTgYVCVRpoX5Z3A3+d43HlWcl1zSZl3/pD0+g2v0N
+	ziCFHTfbkzeXIltLF8dtjW7n0GWxBJTSSPsBMHaiMOBwOK40FwfKu6UuWEw91K4KiZsLNKs+7tL
+	RMU9rZcgMSfosOHUiN0hcHiWnxXSdqBbaa+2PC24yDOc2QeTou2fOokTPvp5iwbEephQg1SsHDN
+	OoImPRaEcn
+X-Received: by 2002:a05:7022:427:b0:12c:8e7f:1b30 with SMTP id
+ a92af1059eb24-12deac42292mr2220710c88.2.1777581175300; Thu, 30 Apr 2026
+ 13:32:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260430200909.527827-1-sharmasagarika@google.com>
-X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260430200909.527827-3-sharmasagarika@google.com>
-Subject: [PATCH net v2 2/2] selftest: net: Add test for TCP flow failover with
- ECMP routes.
-From: Sagarika Sharma <sharmasagarika@google.com>
-To: "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Sagarika Sharma <sharmasagarika@google.com>
+MIME-Version: 1.0
+References: <20260430184405.1227386-1-kuniyu@google.com> <20260430184405.1227386-3-kuniyu@google.com>
+In-Reply-To: <20260430184405.1227386-3-kuniyu@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Thu, 30 Apr 2026 13:32:44 -0700
+X-Gm-Features: AVHnY4Ls7u6p0o5JMcAnAHJzpiAZfoiB3CE6dVbmTrXjuY0KiwPbdq7_p-En4PA
+Message-ID: <CAAVpQUC83MxhfV-sreAPvfPJoqW=G20CPCPdRaQ6hvMt_khFtw@mail.gmail.com>
+Subject: Re: [PATCH v1 bpf 2/2] selftest: bpf: Add test for bpf_tcp_sock() and
+ RAW socket.
+To: Martin KaFai Lau <martin.lau@linux.dev>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Cc: John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 423854A7971
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 9AC294A7E7E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	MV_CASE(0.50)[];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282984-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-282985-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[linux.dev,iogearbox.net,kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sharmasagarika@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,fomichev.me,kernel.org,linux.dev,google.com,vger.kernel.org];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-From: Kuniyuki Iwashima <kuniyu@google.com>
+On Thu, Apr 30, 2026 at 11:44=E2=80=AFAM Kuniyuki Iwashima <kuniyu@google.c=
+om> wrote:
+>
+> Let's extend sockopt_sk.c to cover bpf_tcp_sock() for the
+> wrong socket type.
+>
+> Before:
+>   # ./test_progs -t sockopt_sk
+>   [  151.948613] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>   [  151.951376] BUG: KASAN: slab-out-of-bounds in sol_tcp_sockopt+0xc7/0=
+x8e0
+>   [  151.954159] Read of size 8 at addr ffff88801083d760 by task test_pro=
+gs/1259
+>   ...
+>   run_test:FAIL:getsetsockopt unexpected error: -1 (errno 22)
+>   #427     sockopt_sk:FAIL
+>
+> After:
+>   #427     sockopt_sk:OK
+>
+> While at it, missing free() is fixed up.
+>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> ---
+>  .../selftests/bpf/prog_tests/sockopt_sk.c       | 17 ++++++++++++++++-
+>  tools/testing/selftests/bpf/progs/sockopt_sk.c  | 16 ++++++++++++++++
+>  2 files changed, 32 insertions(+), 1 deletion(-)
+>
+> diff --git a/tools/testing/selftests/bpf/prog_tests/sockopt_sk.c b/tools/=
+testing/selftests/bpf/prog_tests/sockopt_sk.c
+> index 53637431ec5d..87e771c8991f 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/sockopt_sk.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/sockopt_sk.c
+> @@ -190,7 +190,7 @@ static int getsetsockopt(void)
+>         fd =3D socket(AF_NETLINK, SOCK_RAW, 0);
+>         if (fd < 0) {
+>                 log_err("Failed to create AF_NETLINK socket");
+> -               return -1;
+> +               goto err;
+>         }
+>
+>         buf.u32 =3D 1;
+> @@ -211,6 +211,21 @@ static int getsetsockopt(void)
+>         }
+>         ASSERT_EQ(optlen, 8, "Unexpected NETLINK_LIST_MEMBERSHIPS value")=
+;
+>
+> +       /* Trick bpf_tcp_sock() with IPPROTO_TCP */
+> +       close(fd);
+> +       fd =3D socket(AF_INET, SOCK_RAW, IPPROTO_TCP);
+> +       if (fd < 0) {
+> +               log_err("Failed to create RAW socket");
+> +               goto err;
+> +       }
+> +
+> +       optlen =3D 60;
+> +       err =3D setsockopt(fd, SOL_TCP, TCP_SAVED_SYN, &buf, optlen);
+> +       if (err) {
 
-Without the previous commit, TCP failed to switch to alternative
-IPv6 routes immediately upon carrier loss.
+Ugh, I forgot to commit s/err/!err/ change.. :/
 
-It would persist with the dead route until reaching the threshold
-net.ipv4.tcp_retries1, leading to unnecessary delays in failover.
-
-Let's add a selftest for this scenario to ensure TCP fails over
-immediately upon a carrier loss event.
-
-Before:
-  TEST: TCP IPv4 failover                                             [ OK ]
-  TEST: TCP IPv6 failover                                             [FAIL]
-
-After:
-  TEST: TCP IPv4 failover                                             [ OK ]
-  TEST: TCP IPv6 failover                                             [ OK ]
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-Signed-off-by: Sagarika Sharma <sharmasagarika@google.com>
----
-v2: Add require_command, fix exit code and shellcheck warnings
-    except for SC2154 (netns allocation confuses shellcheck),
-    lower threshold of packets captured for success.
----
- tools/testing/selftests/net/Makefile          |   1 +
- .../selftests/net/tcp_ecmp_failover.sh        | 216 ++++++++++++++++++
- 2 files changed, 217 insertions(+)
- create mode 100755 tools/testing/selftests/net/tcp_ecmp_failover.sh
-
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index a275ed584026..f3da38c54d27 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -96,6 +96,7 @@ TEST_PROGS := \
- 	srv6_hl2encap_red_l2vpn_test.sh \
- 	srv6_iptunnel_cache.sh \
- 	stress_reuseport_listen.sh \
-+	tcp_ecmp_failover.sh \
- 	tcp_fastopen_backup_key.sh \
- 	test_bpf.sh \
- 	test_bridge_backup_port.sh \
-diff --git a/tools/testing/selftests/net/tcp_ecmp_failover.sh b/tools/testing/selftests/net/tcp_ecmp_failover.sh
-new file mode 100755
-index 000000000000..5768aa8bff6a
---- /dev/null
-+++ b/tools/testing/selftests/net/tcp_ecmp_failover.sh
-@@ -0,0 +1,216 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Copyright 2026 Google LLC.
-+#
-+# This test verifies TCP flow failover between ECMP routes
-+# upon carrier loss on the active device.
-+#
-+#   socat  ----------------------------->  socat
-+#                        |
-+#           .-- veth-c1 -|- veth-s1 --.
-+#   dummy0 -|            |            |-- dummy0
-+#           '-- veth-c2 -|- veth-s2 --'
-+#                        |
-+#
-+
-+REQUIRE_JQ=no
-+REQUIRE_MZ=no
-+NUM_NETIFS=0
-+
-+source forwarding/lib.sh
-+
-+CLIENT_IP="10.0.59.1"
-+SERVER_IP="10.0.92.1"
-+CLIENT_IP6="2001:db8:5a9a::1"
-+SERVER_IP6="2001:db8:9292::1"
-+
-+setup_server()
-+{
-+	IP="ip -n $server"
-+	NS_EXEC="ip netns exec $server"
-+
-+	$IP link add dummy0 type dummy
-+	$IP link set dummy0 up
-+
-+	$IP -4 addr add $SERVER_IP/32 dev dummy0
-+	$IP -6 addr add $SERVER_IP6/128 dev dummy0 nodad
-+
-+	$IP link set veth-s1 up
-+	$IP link set veth-s2 up
-+
-+	$IP -4 addr add 192.168.1.2/24 dev veth-s1
-+	$IP -4 addr add 192.168.2.2/24 dev veth-s2
-+
-+	$IP -4 route add $CLIENT_IP/32 \
-+		nexthop via 192.168.1.1 dev veth-s1 weight 1 \
-+		nexthop via 192.168.2.1 dev veth-s2 weight 1
-+
-+	$IP -6 addr add 2001:db8:1::2/64 dev veth-s1 nodad
-+	$IP -6 addr add 2001:db8:2::2/64 dev veth-s2 nodad
-+
-+	$IP -6 route add $CLIENT_IP6/128 \
-+		nexthop via 2001:db8:1::1 dev veth-s1 weight 1 \
-+		nexthop via 2001:db8:2::1 dev veth-s2 weight 1
-+}
-+
-+setup_client()
-+{
-+	IP="ip -n $client"
-+	NS_EXEC="ip netns exec $client"
-+
-+	$IP link add dummy0 type dummy
-+	$IP link set dummy0 up
-+
-+	$IP -4 addr add $CLIENT_IP/32 dev dummy0
-+	$IP -6 addr add $CLIENT_IP6/128 dev dummy0 nodad
-+
-+	$IP link set veth-c1 up
-+	$IP link set veth-c2 up
-+
-+	$IP -4 addr add 192.168.1.1/24 dev veth-c1
-+	$IP -4 addr add 192.168.2.1/24 dev veth-c2
-+
-+	$IP -4 route add $SERVER_IP/32 \
-+		nexthop via 192.168.1.2 dev veth-c1 weight 1 \
-+		nexthop via 192.168.2.2 dev veth-c2 weight 1
-+
-+	$IP -6 addr add 2001:db8:1::1/64 dev veth-c1 nodad
-+	$IP -6 addr add 2001:db8:2::1/64 dev veth-c2 nodad
-+
-+	$IP -6 route add $SERVER_IP6/128 \
-+		nexthop via 2001:db8:1::2 dev veth-c1 weight 1 \
-+		nexthop via 2001:db8:2::2 dev veth-c2 weight 1
-+
-+	# By default, tcp_retries1=3 triggers a route refresh
-+	# after 3 retransmits (~5s).  Ensure this never occurs
-+	# for test stability.
-+	$NS_EXEC sysctl -qw net.ipv4.tcp_retries1=100
-+
-+	# When NETDEV_CHANGE is issued for a dev tied to an ECMP
-+	# route, RTNH_F_LINKDOWN is flagged and the sernum is
-+	# bumped to invalidate the route via sk_dst_check().
-+	#
-+	# Without ignore_routes_with_linkdown=1, subsequent
-+	# lookups may still select the same RTNH_F_LINKDOWN route.
-+	$NS_EXEC sysctl -qw net.ipv4.conf.veth-c1.ignore_routes_with_linkdown=1
-+	$NS_EXEC sysctl -qw net.ipv4.conf.veth-c2.ignore_routes_with_linkdown=1
-+
-+	$NS_EXEC sysctl -qw net.ipv6.conf.veth-c1.ignore_routes_with_linkdown=1
-+	$NS_EXEC sysctl -qw net.ipv6.conf.veth-c2.ignore_routes_with_linkdown=1
-+}
-+
-+setup()
-+{
-+	setup_ns client server
-+
-+	ip -n "$client" link add veth-c1 type veth peer veth-s1 netns "$server"
-+	ip -n "$client" link add veth-c2 type veth peer veth-s2 netns "$server"
-+
-+	setup_server
-+	setup_client
-+}
-+
-+cleanup()
-+{
-+	cleanup_all_ns > /dev/null 2>&1
-+}
-+
-+tcp_ecmp_failover()
-+{
-+	local pf=$1; shift
-+	local server_ip=$1; shift
-+	local client_ip=$1; shift
-+
-+	RET=0
-+
-+	tcpdump_start veth-s1 "$server"
-+	tcpdump_start veth-s2 "$server"
-+
-+	ip netns exec "$server" \
-+		socat -u TCP-LISTEN:8080,pf="$pf",bind="$server_ip",reuseaddr /dev/null &
-+	server_pid=$!
-+
-+	# Wait for server to start listening.
-+	# Sometimes client fails without this sleep.
-+	sleep 1
-+
-+	ip netns exec "$client" \
-+		socat -u /dev/zero TCP:"$server_ip":8080,pf="$pf",bind="$client_ip" &
-+	client_pid=$!
-+
-+	# To capture enough packets.
-+	sleep 3
-+
-+	tcpdump_stop veth-s1
-+	tcpdump_stop veth-s2
-+
-+	pkts_s1=$(tcpdump_show veth-s1 | wc -l)
-+	pkts_s2=$(tcpdump_show veth-s2 | wc -l)
-+
-+	tcpdump_cleanup veth-s1
-+	tcpdump_cleanup veth-s2
-+
-+	# Detect the device chosen by the client
-+	if [ "$pkts_s1" -gt "$pkts_s2" ]; then
-+		veth_down=veth-s1
-+		veth_up=veth-s2
-+	else
-+		veth_down=veth-s2
-+		veth_up=veth-s1
-+	fi
-+
-+	# Taking down $veth_down causes its peer to lose carrier,
-+	# triggering NETDEV_CHANGE.  This flags RTNH_F_LINKDOWN
-+	# and bumps the sernum for the route associated with that
-+	# peer, invalidating the cached dst in the TCP socket.
-+	#
-+	# Consequently, sk_dst_check() fails, forcing the subsequent
-+	# lookup to select the remaining healthy route via $veth_up.
-+	ip -n "$server" link set "$veth_down" down
-+
-+	tcpdump_start "$veth_up" "$server"
-+
-+	# To capture enough packets.
-+	sleep  3
-+
-+	tcpdump_stop "$veth_up"
-+
-+	kill -9 "$client_pid" > /dev/null 2>&1
-+	kill -9 "$server_pid" > /dev/null 2>&1
-+	wait 2> /dev/null
-+
-+	pkts=$(tcpdump_show $veth_up | wc -l)
-+
-+	tcpdump_cleanup "$veth_up"
-+
-+	if [ "$pkts" -lt 1000 ]; then
-+		RET=$ksft_fail
-+	fi
-+}
-+
-+test_ipv4()
-+{
-+	setup
-+	tcp_ecmp_failover IPv4 $SERVER_IP $CLIENT_IP
-+	log_test "TCP IPv4 failover"
-+	cleanup
-+}
-+
-+test_ipv6()
-+{
-+	setup
-+	tcp_ecmp_failover IPv6 "[$SERVER_IP6]" "[$CLIENT_IP6]"
-+	log_test "TCP IPv6 failover"
-+	cleanup
-+}
-+
-+require_command socat
-+require_command tcpdump
-+
-+trap cleanup EXIT
-+
-+test_ipv4
-+test_ipv6
-+
-+exit "$EXIT_STATUS"
--- 
-2.54.0.545.g6539524ca2-goog
-
+pw-bot: cr
 
