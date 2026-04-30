@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-282739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282740-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aPSJANMm82mwxgEAu9opvQ
-	(envelope-from <netdev+bounces-282739-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 11:54:27 +0200
+	id OHXpE+8m82mwxgEAu9opvQ
+	(envelope-from <netdev+bounces-282740-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 11:54:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94CB34A0457
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 11:54:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5F394A0488
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 11:54:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 62892306264F
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:47:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EB3E330210C4
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:48:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29DF03FE652;
-	Thu, 30 Apr 2026 09:46:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D89713D2FF7;
+	Thu, 30 Apr 2026 09:47:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D/NggZxY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BCzt6Kgp"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ABA43FE65D;
-	Thu, 30 Apr 2026 09:46:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0C53AD53B;
+	Thu, 30 Apr 2026 09:46:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777542414; cv=none; b=jwtd0xbA8UHdZt/YDvFvTJN3bwkGBPgFCuy71dvcX3I2WyneTXASn5nepkFldYFONNG2SMGjN7YnWZsPjTTlb8tSsrC7TtKprEgcWQc8kjnOIMBUYPkMzrQIrrPLryB+FD2QN7e9+ZnLDVexw9l0KGRofGBwbexFkkmjY4AVgoE=
+	t=1777542420; cv=none; b=SXr85p72yJOTxPC3iSBFD/IxSnzeB4Qu6dJkA3hk+7aIUCvbOWinNkB39CvaH5YDslSyrMfdT2bSE8LR5kTMuX7SMB/rjFIRb7BY2iedaboPonQoulbV1gnwZPd+tbmW5TGKFEd3JJRVbDlo5AAAQ8bU0QgLc0Ezqge2Bdd9BYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777542414; c=relaxed/simple;
-	bh=/HBM1v6M04Z+Jc0mYsEibM5D9jaupGjKj8gDCUGJ9xY=;
+	s=arc-20240116; t=1777542420; c=relaxed/simple;
+	bh=EOgihlParWdvZQu0pqNNQEy4sT2tgqQbBXWYV2xn2Lg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cvxhTDiPxt5K7psXcjwkLZLDRqy1VEawHhwt9BGrTn0NVe2UPNScLFTnDxQTbeeSM8+auhbsMsfQMoC/6gKe0rrPRN9v+0VCgg1W6aFz95WwSvzQfUJPcjDb+lozVZ5x6m2mXRKuF5Byh3N/vfVz/4J5ozS5tEPXWOxgtb1vu9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D/NggZxY; arc=none smtp.client-ip=192.198.163.12
+	 MIME-Version; b=pQf8sBpnYAtrkZlmlS2k4dweu+oQYCajVauL+bDdysO7uf6gvBDshNW+D1rewhBthePdO8/Okv/lFtFRZtxvGGp07IyYtz07ho2xyg/zkeryF2x5YFSHwJQazXyO9lKKVIoZPhkK/Huep74QoR6xHDfgM6rPpqKNUFwtZpef5FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BCzt6Kgp; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777542413; x=1809078413;
+  t=1777542419; x=1809078419;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=/HBM1v6M04Z+Jc0mYsEibM5D9jaupGjKj8gDCUGJ9xY=;
-  b=D/NggZxYybTb8cT3ktSaM93AEBCuHDT+ShglguWKK4+WfhSE2fR+uNKy
-   08VAgvCH1QG8pTMnQ8rcfiTyqHklpLo5itFdEugpFlFoIHfJqplFI+LLi
-   JpmUbPzhHSACSZTDUY1VWAioGnFM+kG88Y+0iiqneEi/idB1+oXHm/NtN
-   qj+QVHW7ScqLVCekZtinlwhwAZlFAcS6pWcYo9X89UDO5gfMRQ1/1NPby
-   UufH2+Z9NdLkUmfoYpaSJ8LJ0G0WIKpuf83Ie9dwmb4vkBfl6yq8VTpx/
-   VqwhWJaKCsRMt/WslXCPwxS9oCNrEqajFXf6nuz0tTNPD4eBWHJ2FDR7F
+  bh=EOgihlParWdvZQu0pqNNQEy4sT2tgqQbBXWYV2xn2Lg=;
+  b=BCzt6KgpZAa0PJ3iz+9RD1J5rInijeErLVAONqsJ1Ib6T/xqMCaLlK1G
+   qYxSey5YtgjcRePdq47V5du5JsjNNFrgpNWuhxzQGHKpIp0I5zJ3mGjx2
+   CO4ca1WsCRAAcQM8aglz2TsPj2wgawsfO8JC+7DXb84rcxlYAiqdCpe3a
+   +qfvTdva5tV9STVFlP19AzPupd7NXFw74g4RGv//wbVNdGBncq6+anT3k
+   8O3MXkZ24nm4KlafQAxib3yLXHzPZdeSAsVER/kTSDeCey2zSQFcNH5ir
+   2qoEu92xn3Qj669RMCmxwLaFSX9zS4h4vySXvZg0XviFK1+iBiOylLr9j
    g==;
-X-CSE-ConnectionGUID: f3nB1acRQDKfmNxtMdhuFA==
-X-CSE-MsgGUID: xtwRB0NETV+kkyOE0EabUA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11771"; a="82342583"
+X-CSE-ConnectionGUID: VDMN2S/cQ3ivBU1PMQOp5A==
+X-CSE-MsgGUID: QJKiLK0mQXC4WhezDdhOIg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11771"; a="82342607"
 X-IronPort-AV: E=Sophos;i="6.23,207,1770624000"; 
-   d="scan'208";a="82342583"
+   d="scan'208";a="82342607"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2026 02:46:52 -0700
-X-CSE-ConnectionGUID: 59Py9SOzQTWl3mG6rX/Zlg==
-X-CSE-MsgGUID: N9nGTysXSpSRPoxcZo0z1w==
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2026 02:46:59 -0700
+X-CSE-ConnectionGUID: uRdSpdM6SOiiNRft5sKYZw==
+X-CSE-MsgGUID: e1p1h0mySzqIfXyOIQu5hA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,207,1770624000"; 
-   d="scan'208";a="272649754"
+   d="scan'208";a="272649775"
 Received: from gklab-003-001.igk.intel.com ([10.91.173.48])
-  by orviesa001.jf.intel.com with ESMTP; 30 Apr 2026 02:46:47 -0700
+  by orviesa001.jf.intel.com with ESMTP; 30 Apr 2026 02:46:54 -0700
 From: Grzegorz Nitka <grzegorz.nitka@intel.com>
 To: netdev@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -82,11 +82,10 @@ Cc: linux-kernel@vger.kernel.org,
 	davem@davemloft.net,
 	edumazet@google.com,
 	Grzegorz Nitka <grzegorz.nitka@intel.com>,
-	Jiri Pirko <jiri@nvidia.com>,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH v7 net-next 2/8] dpll: allow registering FW-identified pin with a different DPLL
-Date: Thu, 30 Apr 2026 11:42:32 +0200
-Message-Id: <20260430094238.987976-3-grzegorz.nitka@intel.com>
+Subject: [PATCH v7 net-next 3/8] dpll: extend pin notifier and netlink events with notification source ID
+Date: Thu, 30 Apr 2026 11:42:33 +0200
+Message-Id: <20260430094238.987976-4-grzegorz.nitka@intel.com>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20260430094238.987976-1-grzegorz.nitka@intel.com>
 References: <20260430094238.987976-1-grzegorz.nitka@intel.com>
@@ -97,7 +96,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 94CB34A0457
+X-Rspamd-Queue-Id: C5F394A0488
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
@@ -106,15 +105,15 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net,google.com,nvidia.com];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net,google.com];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-282739-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-282740-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -126,53 +125,185 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-0.996];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Relax the (module, clock_id) equality requirement when registering a
-pin identified by firmware (pin->fwnode). Some platforms associate a
-FW-described pin with a DPLL instance that differs from the pin's
-(module, clock_id) tuple. For such pins, permit registration without
-requiring the strict match. Non-FW pins still require equality.
+Extend the DPLL pin notification API to include a source identifier
+indicating where the notification originates. This allows notifier
+consumers and netlink listeners to distinguish between notifications
+coming from an associated DPLL instance, a parent pin, or the pin
+itself.
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+A new field, src_id, is added to struct dpll_pin_notifier_info and is
+passed through all pin-related notification paths. Callers of
+dpll_pin_notify() are updated to provide a meaningful source identifier
+based on their context:
+  - pin registration/unregistration uses the DPLL's clock_id,
+  - pin-on-pin operations use the parent pin's clock_id,
+  - pin changes use the pin's own clock_id.
+
+As introduced in the commit ("dpll: allow registering FW-identified pin
+with a different DPLL"), it is possible to share the same physical pin
+via firmware description (fwnode) with DPLL objects from different
+kernel modules. This means that a given pin can be registered multiple
+times.
+
+Driver such as ICE (E825 devices) rely on this mechanism when listening
+for the event where a shared-fwnode pin appears, while avoiding reacting
+to events triggered by their own registration logic.
+
+This change only extends the notification metadata and does not alter
+existing semantics for drivers that do not use the new field.
+
 Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
 ---
- drivers/dpll/dpll_core.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ drivers/dpll/dpll_core.c    | 14 ++++++++------
+ drivers/dpll/dpll_core.h    |  3 ++-
+ drivers/dpll/dpll_netlink.c | 10 +++++-----
+ drivers/dpll/dpll_netlink.h |  4 ++--
+ include/linux/dpll.h        |  1 +
+ 5 files changed, 18 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
-index cbb635db4321..afe4552bdcd4 100644
+index afe4552bdcd4..857bd02da7ba 100644
 --- a/drivers/dpll/dpll_core.c
 +++ b/drivers/dpll/dpll_core.c
-@@ -883,11 +883,21 @@ dpll_pin_register(struct dpll_device *dpll, struct dpll_pin *pin,
- 		return -EINVAL;
+@@ -71,7 +71,8 @@ void dpll_device_notify(struct dpll_device *dpll, unsigned long action)
+ 	call_dpll_notifiers(action, &info);
+ }
  
- 	mutex_lock(&dpll_lock);
--	if (WARN_ON(!(dpll->module == pin->module &&
--		      dpll->clock_id == pin->clock_id)))
-+
-+	/*
-+	 * For pins identified via firmware (pin->fwnode), allow registration
-+	 * even if the pin's (module, clock_id) differs from the target DPLL.
-+	 * For non-fwnode pins, require a strict (module, clock_id) match.
-+	 */
-+	if (!pin->fwnode &&
-+	    WARN_ON_ONCE(dpll->module != pin->module ||
-+			 dpll->clock_id != pin->clock_id)) {
- 		ret = -EINVAL;
--	else
--		ret = __dpll_pin_register(dpll, pin, ops, priv, NULL);
-+		goto out_unlock;
-+	}
-+
-+	ret = __dpll_pin_register(dpll, pin, ops, priv, NULL);
-+out_unlock:
- 	mutex_unlock(&dpll_lock);
+-void dpll_pin_notify(struct dpll_pin *pin, unsigned long action)
++void dpll_pin_notify(struct dpll_pin *pin, u64 src_clock_id,
++		     unsigned long action)
+ {
+ 	struct dpll_pin_notifier_info info = {
+ 		.pin = pin,
+@@ -80,6 +81,7 @@ void dpll_pin_notify(struct dpll_pin *pin, unsigned long action)
+ 		.clock_id = pin->clock_id,
+ 		.fwnode = pin->fwnode,
+ 		.prop = &pin->prop,
++		.src_clock_id = src_clock_id,
+ 	};
+ 
+ 	call_dpll_notifiers(action, &info);
+@@ -847,7 +849,7 @@ __dpll_pin_register(struct dpll_device *dpll, struct dpll_pin *pin,
+ 	if (ret)
+ 		goto ref_pin_del;
+ 	xa_set_mark(&dpll_pin_xa, pin->id, DPLL_REGISTERED);
+-	dpll_pin_create_ntf(pin);
++	dpll_pin_create_ntf(pin, dpll->clock_id);
  
  	return ret;
+ 
+@@ -949,7 +951,7 @@ void dpll_pin_unregister(struct dpll_device *dpll, struct dpll_pin *pin,
+ 		return;
+ 
+ 	mutex_lock(&dpll_lock);
+-	dpll_pin_delete_ntf(pin);
++	dpll_pin_delete_ntf(pin, dpll->clock_id);
+ 	__dpll_pin_unregister(dpll, pin, ops, priv, NULL);
+ 	mutex_unlock(&dpll_lock);
+ }
+@@ -995,7 +997,7 @@ int dpll_pin_on_pin_register(struct dpll_pin *parent, struct dpll_pin *pin,
+ 			stop = i;
+ 			goto dpll_unregister;
+ 		}
+-		dpll_pin_create_ntf(pin);
++		dpll_pin_create_ntf(pin, parent->clock_id);
+ 	}
+ 	mutex_unlock(&dpll_lock);
+ 
+@@ -1006,7 +1008,7 @@ int dpll_pin_on_pin_register(struct dpll_pin *parent, struct dpll_pin *pin,
+ 		if (i < stop) {
+ 			__dpll_pin_unregister(ref->dpll, pin, ops, priv,
+ 					      parent);
+-			dpll_pin_delete_ntf(pin);
++			dpll_pin_delete_ntf(pin, parent->clock_id);
+ 		}
+ 	dpll_xa_ref_pin_del(&pin->parent_refs, parent, ops, priv, pin);
+ unlock:
+@@ -1032,7 +1034,7 @@ void dpll_pin_on_pin_unregister(struct dpll_pin *parent, struct dpll_pin *pin,
+ 	unsigned long i;
+ 
+ 	mutex_lock(&dpll_lock);
+-	dpll_pin_delete_ntf(pin);
++	dpll_pin_delete_ntf(pin, parent->clock_id);
+ 	dpll_xa_ref_pin_del(&pin->parent_refs, parent, ops, priv, pin);
+ 	xa_for_each(&pin->dpll_refs, i, ref)
+ 		__dpll_pin_unregister(ref->dpll, pin, ops, priv, parent);
+diff --git a/drivers/dpll/dpll_core.h b/drivers/dpll/dpll_core.h
+index 71ac88ef2017..92cb919317eb 100644
+--- a/drivers/dpll/dpll_core.h
++++ b/drivers/dpll/dpll_core.h
+@@ -98,6 +98,7 @@ extern struct xarray dpll_pin_xa;
+ extern struct mutex dpll_lock;
+ 
+ void dpll_device_notify(struct dpll_device *dpll, unsigned long action);
+-void dpll_pin_notify(struct dpll_pin *pin, unsigned long action);
++void dpll_pin_notify(struct dpll_pin *pin, u64 src_clock_id,
++		     unsigned long action);
+ 
+ #endif
+diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
+index af7ce62ec55c..aeae5afe71c8 100644
+--- a/drivers/dpll/dpll_netlink.c
++++ b/drivers/dpll/dpll_netlink.c
+@@ -888,21 +888,21 @@ dpll_pin_event_send(enum dpll_cmd event, struct dpll_pin *pin)
+ 	return ret;
+ }
+ 
+-int dpll_pin_create_ntf(struct dpll_pin *pin)
++int dpll_pin_create_ntf(struct dpll_pin *pin, u64 src_clock_id)
+ {
+-	dpll_pin_notify(pin, DPLL_PIN_CREATED);
++	dpll_pin_notify(pin, src_clock_id, DPLL_PIN_CREATED);
+ 	return dpll_pin_event_send(DPLL_CMD_PIN_CREATE_NTF, pin);
+ }
+ 
+-int dpll_pin_delete_ntf(struct dpll_pin *pin)
++int dpll_pin_delete_ntf(struct dpll_pin *pin,  u64 src_clock_id)
+ {
+-	dpll_pin_notify(pin, DPLL_PIN_DELETED);
++	dpll_pin_notify(pin, src_clock_id, DPLL_PIN_DELETED);
+ 	return dpll_pin_event_send(DPLL_CMD_PIN_DELETE_NTF, pin);
+ }
+ 
+ int __dpll_pin_change_ntf(struct dpll_pin *pin)
+ {
+-	dpll_pin_notify(pin, DPLL_PIN_CHANGED);
++	dpll_pin_notify(pin, pin->clock_id, DPLL_PIN_CHANGED);
+ 	return dpll_pin_event_send(DPLL_CMD_PIN_CHANGE_NTF, pin);
+ }
+ 
+diff --git a/drivers/dpll/dpll_netlink.h b/drivers/dpll/dpll_netlink.h
+index dd28b56d27c5..89fef266392f 100644
+--- a/drivers/dpll/dpll_netlink.h
++++ b/drivers/dpll/dpll_netlink.h
+@@ -8,8 +8,8 @@ int dpll_device_create_ntf(struct dpll_device *dpll);
+ 
+ int dpll_device_delete_ntf(struct dpll_device *dpll);
+ 
+-int dpll_pin_create_ntf(struct dpll_pin *pin);
++int dpll_pin_create_ntf(struct dpll_pin *pin, u64 src_clock_id);
+ 
+-int dpll_pin_delete_ntf(struct dpll_pin *pin);
++int dpll_pin_delete_ntf(struct dpll_pin *pin, u64 src_clock_id);
+ 
+ int __dpll_pin_change_ntf(struct dpll_pin *pin);
+diff --git a/include/linux/dpll.h b/include/linux/dpll.h
+index b7277a8b484d..299cef38b657 100644
+--- a/include/linux/dpll.h
++++ b/include/linux/dpll.h
+@@ -212,6 +212,7 @@ struct dpll_pin_notifier_info {
+ 	u64 clock_id;
+ 	const struct fwnode_handle *fwnode;
+ 	const struct dpll_pin_properties *prop;
++	u64 src_clock_id;
+ };
+ 
+ #if IS_ENABLED(CONFIG_DPLL)
 -- 
 2.39.3
 
