@@ -1,146 +1,120 @@
-Return-Path: <netdev+bounces-282931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282932-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uPFUODZ982nH4QEAu9opvQ
-	(envelope-from <netdev+bounces-282931-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:03:02 +0200
+	id cMauLth/82ni4gEAu9opvQ
+	(envelope-from <netdev+bounces-282932-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:14:16 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A19A4A544F
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:02:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B1BD4A57F6
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:14:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C4C4530125F5
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:57:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 50CA3306DC8C
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 16:06:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4D2141B375;
-	Thu, 30 Apr 2026 15:57:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A01B845BD4E;
+	Thu, 30 Apr 2026 16:06:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="DDwGkzxI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="spBhA6pg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A9C13382E5;
-	Thu, 30 Apr 2026 15:57:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D73444E03B;
+	Thu, 30 Apr 2026 16:06:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777564676; cv=none; b=Gy3U1qWtEKLwtRAa8BDlob0q82dgMhyJB46bQQZdaFrGWoIrr9mypE6o+ekt8LZ9GQrU/jX83nWj4qyhObXkTQmaOUKzdFTjJ4e/AvyHUBvu1vpOxfz7+Yvtu7iSEUWoKYH7bctjaICMAbn8M0Ms6syjm1pBmCwXnjD7uSG96P4=
+	t=1777565208; cv=none; b=KilwcehBh5rpmghIXUaYvOZkpyRDPpamN9D4n+caZPYEJlg+Z+4uxrktwVyGM5NegpaUe+qWqCk5Mo0Stie6BaVv2pSK0BYYpyitYS0ixEpqdSvMEDfZquAd9iQtfBLbEQbNcK/L6/QajpYVVw0Bo1J5JQj7XVOuml1tAzHwD3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777564676; c=relaxed/simple;
-	bh=NBbW+I5HblCuhQGuDtTWvOWuXyeopGFsbAAGTugsplE=;
+	s=arc-20240116; t=1777565208; c=relaxed/simple;
+	bh=GIRvz4CtKMyqM6AnssrDgYhg/bBnQXEUYJr0j3ySicw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sprz7xuuvRLlpqOElVcLSXWOXGL42w9uyDWljJeCOVtOrwp8Obs6NbdE64coUZrubSEUnT6BFqJIGbDWExOYrZ7IEEOta3hx8pxGc8LxY6B7o6wIqhrVs0GkUsA0QE22nLHb5mN5yqRtlJ1LKyFNBX+2PwptZUOE4L1LlALMs9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=DDwGkzxI; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 2294F60263;
-	Thu, 30 Apr 2026 17:57:53 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1777564673;
-	bh=x8RLS4IOBlLKzzcEugB33op1GEA4JAgsxvw3AAn9dd4=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=EkpgAbjey+CBsJTgG15OQHbRgWkwmsuDwL9d/duH/gWZjzE9jdbM3M7cbJx7nfOwG0FURRXKP8TTKk/UCIhDt+olKvjXqBBfe2X5QIgRACerXY0Xkbc7yXmU0viB09syJeD2uqluRi4begCbF981XXbMAnD3CaxnUPdhC6TQndA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=spBhA6pg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13CC9C2BCB3;
+	Thu, 30 Apr 2026 16:06:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777565208;
+	bh=GIRvz4CtKMyqM6AnssrDgYhg/bBnQXEUYJr0j3ySicw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DDwGkzxIgHG8UjM/zW6YYAp+v/nB8UFgFJAEXQMHudNeizLwQ4b8LOT9gU1p+vhNP
-	 huy/AvrirTwKOZ+C3PSzhsccETYGbNrqXB/dfGzOawIDZu0o3X0loIMGR+U6Ad6k/+
-	 5YyzFaljafsuRgYHrUj+j2W7+N6t8F3KgumfePcJMa0e+fmcLf/8JtlVU5Bd1E07/G
-	 jZKt0PipirBeUlyzYtAPgWJ4EHRkvW2cPtMlNimIDBikzLMaAwl4Xn97KzjL32s30e
-	 dyYNQ7bnst6Bw6CfU0JJNANHNaZ6XCPQKcu0XM0hTyO2D1YIB8TpYqheeg9tU6VLTH
-	 KPFUXFX5SjZBA==
-Date: Thu, 30 Apr 2026 17:57:50 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Felix Fietkau <nbd@nbd.name>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-ppp@vger.kernel.org
-Subject: Re: [RFC PATCH net-next v6 1/2] net: pppoe: implement GRO/GSO support
-Message-ID: <afN7_oBICMZ_45Zh@chamomile>
-References: <20260326081127.61229-1-dqfext@gmail.com>
- <9d7f1bbc-155d-4c18-bcf7-732ebe4cbf67@redhat.com>
- <CALW65jYB1jWS5LnSxRCrEeCpPfhA8saqbYYfU-LkPh_25gWfsw@mail.gmail.com>
+	b=spBhA6pgH1M04QfVKtWLIJhaKkIYr5fgTXb55CJZpBl2AGjfsqRBQTc7wE+I5olPW
+	 8FhMFBvWPnlcCngSSSD7CQewg1vaSO0b4lPF6xIl4lFOi1mskaMs4cLwMYGcytVGfY
+	 X+XLsiiUpNCtsB+c1pb/XTao60QTiI7Cyj8ETEq5wXplUFbthgAusqe3oBHiZcSdJI
+	 SjL3rOX7cTC6pzfuA+cxJPKmPEmdTqPz3zFm992coPg9ToO+Obxyf5+kVgz32oQ6HX
+	 11oEMFkTP7NopbjhgY1JHm2hgN0tKjXPbJPDthxfvUjEixUw6ObktqTG09/QP1eTDq
+	 LsGzBgE9WA0QQ==
+Date: Thu, 30 Apr 2026 17:06:43 +0100
+From: Simon Horman <horms@kernel.org>
+To: Robert Marko <robert.marko@sartura.hr>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, Divya.Koppera@microchip.com,
+	horatiu.vultur@microchip.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: phy: micrel: fix LAN8814 QSGMII soft reset
+Message-ID: <20260430160643.GA900403@horms.kernel.org>
+References: <20260428134138.1741253-1-robert.marko@sartura.hr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALW65jYB1jWS5LnSxRCrEeCpPfhA8saqbYYfU-LkPh_25gWfsw@mail.gmail.com>
-X-Rspamd-Queue-Id: 8A19A4A544F
+In-Reply-To: <20260428134138.1741253-1-robert.marko@sartura.hr>
+X-Rspamd-Queue-Id: 3B1BD4A57F6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-282932-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[netfilter.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-282931-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[netfilter.org:+];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RSPAMD_EMAILBL_FAIL(0.00)[pabeni.redhat.com:query timed out];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,netfilter.org:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid,sartura.hr:email,sashiko.dev:url]
 
-Hi Paolo,
+On Tue, Apr 28, 2026 at 03:41:01PM +0200, Robert Marko wrote:
+> LAN8814 QSGMII soft reset was moved into the probe function to avoid
+> triggering it for each of 4 PHY-s in the package.
+> 
+> However, that broke QSGMII link between the MAC and PHY on most LAN8814
+> PHY-s, specificaly for us on the Microchip LAN969x switch.
+> Reading the QSGMII status registers it was visible that lanes were only
+> partially synced.
+> 
+> It looks like the reset timing is crucial, so lets move the reset back
+> into the .config_init function but guard it with phy_package_init_once()
+> to avoid it being triggered on each of 4 PHY-s in the package.
+> Change the probe function to use phy_package_probe_once() for coma and PtP
+> setup.
+> 
+> Fixes: 96a9178a29a6 ("net: phy: micrel: lan8814 fix reset of the QSGMII interface")
+> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
 
-On Thu, Apr 30, 2026 at 11:47:57PM +0800, Qingfang Deng wrote:
-> On Thu, Apr 30, 2026 at 5:34 PM Paolo Abeni <pabeni@redhat.com> wrote:
-> >
-> > AFAICS, when the computed len is >= 64K, and the above min() will
-> > truncate it, later pppoe_rcv() will drop the packet.
-> 
-> pppoe_rcv() does _not_ drop such packets.
-> The drop condition is "skb->len < ntohs(ph->length)", not the other way around.
-> 
-> > > +     skb = segs;
-> > > +     do {
-> > > +             phdr = (struct pppoe_hdr *)(skb_mac_header(skb) + nhoff);
-> > > +             len = skb->len - (nhoff + sizeof(*phdr));
-> > > +             phdr->length = cpu_to_be16(len);
-> > > +             skb->network_header = (u8 *)phdr - skb->head;
-> >
-> > I understand is quite late for the following question, but...
-> > The network headers points to the pppoe hdr. Should it point to the
-> > actual IP hdr?
-
-This is the same with double-tagged-vlan, the network header also
-points to the inner vlan in the skb payload. Changing this would
-require to revisit all users in the tree that are already assuming
-this.
-
-> > Why not? A comment in the code or in the commit message would be
-> > appreciated.
-> 
-> I'm not sure about the GSO stuff. This code is carried over from
-> Felix's v3 patch unmodified and I haven't noticed any issues. Maybe he
-> has the answer.
-> 
-> FYI, Pablo Neira Ayuso is adding the "inline PPPoE GSO" to Netfilter
-> flowtable: https://lore.kernel.org/netfilter-devel/20260430055836.223494-2-pablo@netfilter.org/
-> to work around missing GSO support in PPPoE driver, prior to this
-> patch.
+FTR: an AI generated review of this patch is available at sashiko.dev.
+     I believe that both issues flagged there pre-date this patch
+     and should not block progress of it.
 
