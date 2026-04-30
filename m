@@ -1,164 +1,140 @@
-Return-Path: <netdev+bounces-282971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282974-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aCapMZGf82ly5QEAu9opvQ
-	(envelope-from <netdev+bounces-282971-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 20:29:37 +0200
+	id mOI3BwGj82ly5QEAu9opvQ
+	(envelope-from <netdev+bounces-282974-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 20:44:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64C684A6F88
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 20:29:37 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id F00384A7187
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 20:44:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 13FEA303AF2C
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:26:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E73D33003353
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 18:44:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47FA947CC69;
-	Thu, 30 Apr 2026 18:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A590E47B401;
+	Thu, 30 Apr 2026 18:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rexion.ai header.i=@rexion.ai header.b="btA5f6cx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U92MX/DK"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-13.smtp.spacemail.com (out-13.smtp.spacemail.com [63.250.43.96])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C67A39D6DE;
-	Thu, 30 Apr 2026 18:26:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.250.43.96
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 354AF45BD45
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 18:44:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777573592; cv=none; b=JdG1STQ0ayTxbbACqBf4QAB51W5RXhMtJpcs9cLNXPAX+H5Mj2XgxktOnRlz5cg/PL3IHoO2CTj9Bdp7nQO4mvDThPBZArm0B5f36MgFn8/mgwYioSUw0fNTMtBX9Oo4Xp04Q9rJaC4BxjRnZEBPGgVonHuaQAphxJT8qFhpMQM=
+	t=1777574652; cv=none; b=dc1HDlI08roXiN+0lACB1qqCxGI+w2FiMRQNH5ZiV8GydECJifJR4zpzv9H6MmSL65JY9/YOiJRf4JM4IVNG4uhs6PbgHkmd2zhWJTvTna8dLZYAOGATIUBEDwVxJAVFqxHgLNdTrc5HmxP+f0kV5CcKiuAJt5FRkN8m3juAgSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777573592; c=relaxed/simple;
-	bh=9yyUUs2BXIToAhIyi6W6MlHL2Q0Rkg+H4tfy95uVAzs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EKyGWPpV8weTkrLA+s91U+UA3cPNhJ9Ou2D+h5nhVUePNpI4ufAhPW5prLHh6UH92mLvQHbHNY+C92Ooyo9mlZJXDsf3lQXWnzHddBu4gmrXDpc0O8bTci+EY7+ZD/9RsgCDdD15ysCuk+cgR54rywfIHFczERH92Nus1VERMM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rexion.ai; spf=pass smtp.mailfrom=rexion.ai; dkim=fail (0-bit key) header.d=rexion.ai header.i=@rexion.ai header.b=btA5f6cx reason="key not found in DNS"; arc=none smtp.client-ip=63.250.43.96
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rexion.ai
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rexion.ai
-Received: from Kyren (unknown [49.207.224.37])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.spacemail.com (Postfix) with ESMTPSA id 4g62gP5PlPz8sXN;
-	Thu, 30 Apr 2026 18:26:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rexion.ai;
-	s=spacemail; t=1777573590;
-	bh=aCT15It8ZbWGI5T3TU+l8UKx6cl6pDrHxcHnymDFNhk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=btA5f6cxO7/UPYYBJdlAzt3hu6DUQPvM9rOl5iAYVEx8HxzCuhlg7Qk9UJpEiqPCG
-	 NFpr8Vk7c0XWoyCNjKyr1E3CiNdxrI3Rz0L/jCQ/gUnAX11EnK0FZC/9X39hDwB3QW
-	 m4v76vaB5R6QM5CvNtgbPWgXnivKNadp03fGqZmjbWnkDJHfP4mB5aNKbo/9UBVNSt
-	 vg3i0BmfkKKkkc0YwSD66d56j/fmMCXLQD+XYDLcpbJmLkGLUPEdsS9oSWJpGHbu1F
-	 QKEB2dXqS77/UE4EsdRkmtMcy5evWNAC+1hOlTyF9F+MaL43OGNP+7BxOtJc72xTLE
-	 ggd6NV0uulXnA==
-From: HACKE-RC <rc@rexion.ai>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>
-Cc: Phil Sutter <phil@nwl.cc>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	HACKE-RC <rc@rexion.ai>
-Subject: [PATCH net-next v2 3/3] netfilter: nf_conntrack_amanda: use nf_ct_helper_parse_port()
-Date: Thu, 30 Apr 2026 23:55:43 +0530
-Message-ID: <20260430182543.3931718-4-rc@rexion.ai>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260430182543.3931718-1-rc@rexion.ai>
-References: <20260430182543.3931718-1-rc@rexion.ai>
+	s=arc-20240116; t=1777574652; c=relaxed/simple;
+	bh=/PRIKgLfKPj4zMKorNmQ1wB3iJTK0C/w2vdDIs7PKVk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=OCQql1Nar8IXWkqIp0ail2Y6HI65K/UCTdK4OwMnifZthmx3RXq4A+oflxPnXr/AzVFAkhwF9QD9e65WJqVXaTsj8GITnaKVMb0FOqhLzafD3fHDoQcNRpCgUscoBBAlrzBXSstFzQUm8SjBAGhQAWO7c6j7ZPmgBns2O2sGn+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U92MX/DK; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-354c44bf176so1529033a91.0
+        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 11:44:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777574648; x=1778179448; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YSFg1U9KtAY77SgXkcle8/Z1smWtplMzJzd6qV/sqH0=;
+        b=U92MX/DKFZjA2U0RpyT4OPLiMTkZnNo6UpEezgKpey9pTj0Q6ivtJLxfqhduwFs3Ny
+         zdlynOq/yrfN3Slp7bs7J9F3057oey3DXssKn7IGNYBKC0mH+esBQkJo0O2hSsmc0xcV
+         31Q3zlAaNFrpDNzBH7KXlWIx4SmbIQ5FUBAF/1RckuG0AH5Y3XHINvc+243mCQTwerki
+         /C6O+U642gbXOj/zjmFQPGQitgIhajw+S79pyTo4xJR3ZB2WZYa/PqvuzDCUt9RwqBYr
+         Zt39kVRAmq+72WC2phGfNeAanb6UpAXDxBGBD2jo67as8eyiLnmeGVD5A7QBoz09OsrG
+         0tcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777574648; x=1778179448;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YSFg1U9KtAY77SgXkcle8/Z1smWtplMzJzd6qV/sqH0=;
+        b=gu5t8ovJDUIB3p6EolWl4m8XcV4apfva9V/PUuNA5JQS5lIyh4T+M499HsKHGGjayW
+         cgC+rDDpRXIWLnVzYDZDVBJznCzFqA6IXT1iC1/NpkYuhzr3hQkn4ikGtHeybuPkbMGl
+         ZlBsGHo2UDPuool2jqEANgB+px7YWM2XIv8PgVL/LUI1yJ125GE3NMlnKlpDbiUlluvH
+         r1vurv2ZWVsCKVfkAJJSR7ka1s5/dAQDDAnAyDM0BEQI/HxjufrjnK4Hc7XtjXDcYOJK
+         98s7pLV4e+QdnsP67qjZnBML+SNtdHdMhJFbO4+IzNCE/D7WGDGJ6b10IalNmIBUQaf9
+         zh9Q==
+X-Forwarded-Encrypted: i=1; AFNElJ+P2AwgkA9zcHFFJ4vtZWoSAKb+bLbwPvpVBW3d49cGWjeqU3Ndi66XrzHjJ6ZTAvcl6Z/Fa7Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJhkrCcuJqNVGVCuGvRpA0CvbTnrqYnMGESQxhvaclIKCwzFjR
+	Y6ZufV6ya82/Hor53qWKN6RbwWsMa7zhMIP9fTg4k4nASwH5r9dneMTJf1TmLnvbOaA49HWW5eG
+	E19MWXw==
+X-Received: from pgbq1.prod.google.com ([2002:a63:5c01:0:b0:c74:664d:4080])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:6a0a:b0:39f:aa3:5e56
+ with SMTP id adf61e73a8af0-3a3cf5e8cd2mr5001483637.14.1777574648207; Thu, 30
+ Apr 2026 11:44:08 -0700 (PDT)
+Date: Thu, 30 Apr 2026 18:43:50 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Envelope-From: rc@rexion.ai
-X-Rspamd-Queue-Id: 64C684A6F88
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
+Message-ID: <20260430184405.1227386-1-kuniyu@google.com>
+Subject: [PATCH v1 bpf 0/2] bpf: tcp: Fix type confusion in bpf_tcp_sock().
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Cc: John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: F00384A7187
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-282971-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[rexion.ai];
 	RCVD_COUNT_THREE(0.00)[4];
-	R_DKIM_PERMFAIL(0.00)[rexion.ai:s=spacemail];
-	DKIM_TRACE(0.00)[rexion.ai:~];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_SPAM(0.00)[0.011];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rc@rexion.ai,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[linux.dev,iogearbox.net,kernel.org,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-282974-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[rexion.ai:mid,rexion.ai:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,fomichev.me,kernel.org,linux.dev,google.com,vger.kernel.org];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-Replace the bare simple_strtoul() call with the shared
-nf_ct_helper_parse_port(). This removes reliance on the
-nul-terminated pbuf string for parsing and validates the port
-range in a single call.
+bpf_tcp_sock() only check if sk->sk_protocol is IPPROTO_TCP,
+but RAW socket can bypass it:
 
-The len > 5 guard and port == 0 check are now handled by the
-shared parser, which rejects zero and values above 65535.
+  socket(AF_INET, SOCK_RAW, IPPROTO_TCP)
 
-Reorder local variable declarations to reverse christmas tree.
+Patch 1 fixes it and Patch 2 adds a test.
 
-Fixes: 16958900578b ("[NETFILTER]: nf_conntrack/nf_nat: add amanda helper port")
-Signed-off-by: HACKE-RC <rc@rexion.ai>
----
- net/netfilter/nf_conntrack_amanda.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/net/netfilter/nf_conntrack_amanda.c b/net/netfilter/nf_conntrack_amanda.c
-index d2c09e8dd..30b5c4b84 100644
---- a/net/netfilter/nf_conntrack_amanda.c
-+++ b/net/netfilter/nf_conntrack_amanda.c
-@@ -88,11 +88,12 @@ static int amanda_help(struct sk_buff *skb,
- 	struct nf_conntrack_expect *exp;
- 	struct nf_conntrack_tuple *tuple;
- 	unsigned int dataoff, start, stop, off, i;
-+	nf_nat_amanda_hook_fn *nf_nat_amanda;
- 	char pbuf[sizeof("65535")], *tmp;
-+	int ret = NF_ACCEPT;
- 	u_int16_t len;
-+	u16 parsed_port;
- 	__be16 port;
--	int ret = NF_ACCEPT;
--	nf_nat_amanda_hook_fn *nf_nat_amanda;
- 
- 	/* Only look at packets from the Amanda server */
- 	if (CTINFO2DIR(ctinfo) == IP_CT_DIR_ORIGINAL)
-@@ -132,10 +133,10 @@ static int amanda_help(struct sk_buff *skb,
- 			break;
- 		pbuf[len] = '\0';
- 
--		port = htons(simple_strtoul(pbuf, &tmp, 10));
--		len = tmp - pbuf;
--		if (port == 0 || len > 5)
-+		if (nf_ct_helper_parse_port(pbuf, len, &parsed_port, &tmp))
- 			break;
-+		port = htons(parsed_port);
-+		len = tmp - pbuf;
- 
- 		exp = nf_ct_expect_alloc(ct);
- 		if (exp == NULL) {
+Kuniyuki Iwashima (2):
+  bpf: tcp: Fix type confusion in bpf_tcp_sock().
+  selftest: bpf: Add test for bpf_tcp_sock() and RAW socket.
+
+ net/core/filter.c                               |  2 +-
+ .../selftests/bpf/prog_tests/sockopt_sk.c       | 17 ++++++++++++++++-
+ tools/testing/selftests/bpf/progs/sockopt_sk.c  | 16 ++++++++++++++++
+ 3 files changed, 33 insertions(+), 2 deletions(-)
+
 -- 
-2.54.0
+2.54.0.545.g6539524ca2-goog
 
 
