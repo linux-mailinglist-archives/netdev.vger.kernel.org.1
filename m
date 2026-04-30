@@ -1,127 +1,111 @@
-Return-Path: <netdev+bounces-282986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282987-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6O2DN3HB82mw6gEAu9opvQ
-	(envelope-from <netdev+bounces-282986-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 22:54:09 +0200
+	id mMDLEq/B82mw6gEAu9opvQ
+	(envelope-from <netdev+bounces-282987-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 22:55:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 410ED4A7F35
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 22:54:09 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A632B4A7F44
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 22:55:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5F48F3002A06
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 20:50:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 54C053008A6F
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 20:53:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 030EA377031;
-	Thu, 30 Apr 2026 20:50:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D50E377031;
+	Thu, 30 Apr 2026 20:53:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kzuADWQn"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="42bawgt5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C6B35C1A0
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 20:50:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 946892FE066;
+	Thu, 30 Apr 2026 20:53:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777582252; cv=none; b=IWT65UgtCfBPyhNi5KA/KPMj9fpqdFwaXzJVjNwl2EPzO3iFN7ECq+iIBkDQkIM3lliHL1b4MVhikK++/MutnA3qgYe2EfUcL8MC4AYtDRAwW05cUEv0cF6rgN3lJYlmko9G7xtVim9/EnZqv7b60/yMMuzNaH0Gsr4dnAyBpP4=
+	t=1777582420; cv=none; b=gDXPttUJFa1B0VAJZu+62mhsHqivawAvsbuHIvTQe4nDFdgWnE54lx/rwE8Y2k66AktqhDGBDSsS3UnpodONgCG0aMu+rNgg2xB1ax6N0GXLKIsGL+s7tq8bmTwcZPPbrvtkYDNqbZPgN6Ca0M7IS3LJ1bWhzW6Ix38xZFUhIRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777582252; c=relaxed/simple;
-	bh=CFgfpR9D5FEp93q+wOjAvPsmxavUw22WMhsnYPtT4Ms=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nh2vFmbU2SvzLgJqsVJHeyE9Bb4GPEos3gDG78yOTpDsAmfPRahQxZrFVNYP0lvXykWJfEq3CMoHH5dW5C94GrRv+mO1KTPJv2cAOk2fN4/Ug3kdmfnEAQxv7i0tOWqTQM3Jcpm9rCNqBw1qlnvlOaTmRE1ly1cxa0H5cPtAdCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kzuADWQn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 737C1C2BCB3;
-	Thu, 30 Apr 2026 20:50:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777582252;
-	bh=CFgfpR9D5FEp93q+wOjAvPsmxavUw22WMhsnYPtT4Ms=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kzuADWQn3zoGqhLxtMCV8Q8Xe87zzXTF+/PbXUqa+Q4v3AGW+dNqRKgiBvSFjABQ8
-	 kpCpBjh3AbPNHi4gYHb3GI2LPbGubIH/FBeAF3KYKJz7l9mK+JVghiFI/y82l9iuPj
-	 4Xl0SOYfRtXHzU15kxKg/gmJ2L2Z+ckcId1vE2ci/+ZCrbONkZCIP3Ma/fv5ApafZH
-	 XmoICNshS6D/NGb0tBPuOBv99Uf4uoQbvWYFwfbPm9nqe1wESJ53PLv7XApBHGTBwz
-	 S+6dy41vGY6YRNC7fm+W+pfcL35TdBjpJAKBjPtqATd/bPxd5Uh50M1bdwKVF+O2yZ
-	 m4aAclclpyfzQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0317A380AA7D;
-	Thu, 30 Apr 2026 20:50:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1777582420; c=relaxed/simple;
+	bh=2xY6QXp+xDjIPzfjgM937u3DZS3jvm7IWfWklxvvSHY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=US+3PhKeNpP305bADAnCDTFTPOSjPVEnJp48tUTpixt5P2z8WVorLW1GQ4aahUWUpNSHEYfmS4v0owpbqJxswlK0E1N4qXA237w+tLsaVx/SbwlSvy9/IT7N8OFR0Zt3jCU7QpuCBHOa6/WG+lCU2dXMosZKNrysdfM68TyXxkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=42bawgt5; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Fb7QkoGw9cRrxb4sMM2/4Lv4eMeLn4V7CADnhUhruZU=; b=42bawgt5bNFy+BAbLlXOuXzuW2
+	OHzrG/E9Cnhq2J1+gK4RdnllV16yyqL1y/W3N0Q9c1sKPRKtWNEKEOv5sv70Q7mcRAc+GpS+gDij+
+	+98WwpaiTVrw8OsG5zbZRZgZ6dGPiH+jh67tquBNaQyzlrl/kDe4UD29O51dEntht0yA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wIYO0-000kCZ-RV; Thu, 30 Apr 2026 22:53:28 +0200
+Date: Thu, 30 Apr 2026 22:53:28 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: muhammad.nazim.amirul.nazle.asmade@altera.com
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, andrew+netdev@lunn.ch,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: stmmac: Add support for TX/RX channel interrupt
+Message-ID: <42b173da-5c0b-4d72-9247-49ebec5e95e5@lunn.ch>
+References: <20260429072728.13638-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: mctp: test: remove skb dumps from test
- output
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177758220580.3198946.7586606245510104457.git-patchwork-notify@kernel.org>
-Date: Thu, 30 Apr 2026 20:50:05 +0000
-References: 
- <20260429-dev-mctp-test-skb-dump-v1-1-13fd5789ef71@codeconstruct.com.au>
-In-Reply-To: 
- <20260429-dev-mctp-test-skb-dump-v1-1-13fd5789ef71@codeconstruct.com.au>
-To: Jeremy Kerr <jk@codeconstruct.com.au>
-Cc: matt@codeconstruct.com.au, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org
-X-Rspamd-Queue-Id: 410ED4A7F35
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260429072728.13638-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
+X-Rspamd-Queue-Id: A632B4A7F44
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282986-lists,netdev=lfdr.de,netdevbpf];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282987-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,codeconstruct.com.au:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
 
-Hello:
+> +	/* For RX Channel */
+> +	for (i = 0; i < MTL_MAX_RX_QUEUES; i++) {
+> +		snprintf(irq_name, sizeof(irq_name), "dma_rx%i", i);
+> +		irq = platform_get_irq_byname_optional(pdev, irq_name);
+> +		if (irq == -EPROBE_DEFER)
+> +			return irq;
+> +		else if (irq < 0)
+> +			break;
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+It would be good to differentiate between real errors, and it not
+being available. I think -ENOXIO is returned when it does not
+exist. Anything else is a real error?
 
-On Wed, 29 Apr 2026 16:27:31 +0800 you wrote:
-> We're currently dumping skb info in our fragment input test, which makes
-> interpreting the TAP test output a bit awkward.
-> 
-> Remove the skb dumps.
-> 
-> Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] net: mctp: test: remove skb dumps from test output
-    https://git.kernel.org/netdev/net-next/c/8ca4bff2ff3e
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+	Andrew
 
