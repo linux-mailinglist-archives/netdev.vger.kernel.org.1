@@ -1,216 +1,196 @@
-Return-Path: <netdev+bounces-282762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282763-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MKgkAw4w82m0yAEAu9opvQ
-	(envelope-from <netdev+bounces-282762-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 12:33:50 +0200
+	id IP52H0ww82m0yAEAu9opvQ
+	(envelope-from <netdev+bounces-282763-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 12:34:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA5DE4A0E0A
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 12:33:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28AC84A0E3E
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 12:34:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1F7523019F16
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 10:32:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C73E6300FC76
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 10:33:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EED4337FF5B;
-	Thu, 30 Apr 2026 10:32:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B7C389473;
+	Thu, 30 Apr 2026 10:33:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z888PKGK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CwfosyMi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5560A3822A4
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 10:32:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2713793C3
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 10:33:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777545145; cv=none; b=lHgkvrfyIs0DSlOfCDNv2ZiQFc9HQIQvt6uEAYnMXw9qtuLnqeWwq05eiSTYnKowiMVvO+DCGD6df09ZHfaNyy+DVZ1vYTXqB7IoymsKjmkMveD5kRtXdscfgaJCcx8vM63dWREef0w5BsNpfKV6elr6QRfK9aUw56+UFWdYg6M=
+	t=1777545205; cv=none; b=D2KRPr1d3y9J07s4wfO6VVCMW0iwEYHK1PIblgxqViZVT6zvJw+K9FIUZMOqkpLoDVedXM+A1+lmHfgpmBR52ABvFchTSXvxV/mOyZghBfH6IFYtPGqDHYCPFZ1UqoxkMAJh0biWY2qofaKB3Hlm9DugHPkBoRa7Cn/T276R7XQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777545145; c=relaxed/simple;
-	bh=7GIoZQpII0CyFeLA/DgpC+EXxwGcnlMsXtlB+pHIe4s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bUGkPuhZbMY2+s+e5CQ6Yk8wPr/Z13IToGvJmoBig3JCK3nQtuueLOdEjEWsc3Bbms/9J+k/fIM6Us/MU/k66rQHom9AfZkfo/WqzBzp61Pjkdl2m9DotiN0prb1Z+HuWwhpSoXERzirlRiTsD1+F1dL3wMiTYtNYRG8KIbnHw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z888PKGK; arc=none smtp.client-ip=209.85.219.45
+	s=arc-20240116; t=1777545205; c=relaxed/simple;
+	bh=HmJDuI15pv/V4UFD9ngUIjPrqHL42c/sRO/HoYWBlO0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=S+tMPrCmP1CVa5tfdcYt1iIBtnl/SbpLmj85qtQjd7QfJ2NVkhoWHZFJ6UEY8a8MNQLSyQ+v6oNvERCM3PTbCJjdJ9KpvOOJxzuBFcZ4dJUhDhhcsCrWiTTwBuJMp81Jo1lM91tDNmJ/McWu8GKtocqkaOIMFhD/6t7yDhYRpuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CwfosyMi; arc=none smtp.client-ip=209.85.216.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-8b4aeddfacaso92946d6.0
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 03:32:23 -0700 (PDT)
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-35d99bae2ebso715489a91.3
+        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 03:33:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777545142; x=1778149942; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=riHCeEKv9JBqgVZavmNjnLcf0Ylg7fMRVgWiYHUs0oE=;
-        b=Z888PKGKodCwuVCaPXL9Z0UvbQF3kUYKBo0Xvlu0y2nPBdH3YTUMuEzTUy4Lhre7Ef
-         V6fafZsAosIYkSCXpoXx3CDdePyUny/swyZw4g4B1c3m0fz2XVtulOYGvteE8vYldTm+
-         X01iyNo8ykR0/H6yx8OXDlFjOyBku0YROeGZk9v37ZsXehLYyUFw/By4hA0JDkjtA+Q+
-         B2eqH6IKDveBTICMYWtsX1PqHRq6lVCwDkBexAdZas0l94X/rJYVSmPe53UKGTzG0uvI
-         9tmd7wuIeTqgiJJ7ljzH/UgWEBiA5WaFt6yygvhKn82B8eAjO9PzTsU5zioPdCXhWM1M
-         RwEg==
+        d=gmail.com; s=20251104; t=1777545204; x=1778150004; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zlQdc9ZGGOy1nWwQGOqT37EUu8/n7T3oBCrdhsUWNlU=;
+        b=CwfosyMiQX58roqtRTYo8NNy1EBVH+rybYqrkB1n+FpN/maTjzJnD9l3UEh8P6AYTX
+         QCulFfig+79Yu+dt92WKu33J7WJ88dwKrO1yrl0QSTVAxOhdMr+QtA0Ob3KAU5WMGhSE
+         gYULiU5RJLnO8oFjCdgMbS1vacGGuEqFT2VZjhLCvT5nXHBwnoRwG+42/2ksGlYv2s2W
+         ZWZrRE6Ag0dxoR+vdaDfgpbiJG9KMO30dGrmBURSZQakBtn96RVTLyNCLnpnnD6SCypX
+         C9yAMIFWjgOaamfSYVGYgjqIHoDvXSWQ3aw90GxxPu9RjWvkvecxTPJb8hD0hnIwbIwv
+         rU6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777545142; x=1778149942;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=riHCeEKv9JBqgVZavmNjnLcf0Ylg7fMRVgWiYHUs0oE=;
-        b=g69BOfEproDvbHq0uFphkkxjGNcZrcWXYQvkgPK28Jp0dhkM8cNnMe1EWrHbSiguaf
-         F1akJntmYrdVpVUU0YaKSpq/T4N6AGTFNk3dE7HC6EGPgr11Y3bQBt4ghred1JkSEX1e
-         aUwyzqdPhoYCrLxz4bhGk4exqrIIG3fdcGLFdDIZNlwdmaFYN6vP8WFNdgDjTrSwXFic
-         trghV9TR5Gk51aX3wEb2mZ47uM2IEafm0Ruvti6HETS2/GoN3+VGdow6RWOJCC5nmgHN
-         +AQqbukkvvmTtq9nFFVW0jUERWp6KOfp4TF6Lc8TYMYrN0TzcOFA0xrntV3N6e0dZ1ZC
-         kiPw==
-X-Forwarded-Encrypted: i=1; AFNElJ+QNgyq+ygrEMKWWDJnwwKZuZbVEltGCqGjrijL/0/X1PE/J8YFPuaH8Dey1PiLnqjcUEcMSxA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyD1+EdwMkcTilXDoGa9Tv6VRsXSmYMcdWhj9ykmqcL8p3GSOt6
-	6kOnqtb3Y5RgfSJoEbBa27wX90X/UfFO6Pzdv40yjM3dzT5PB2Lm5t2P
-X-Gm-Gg: AeBDieuIDTBWjOES4cKgoDf7NvDi71+Ldaik50MjjYMfQLarcI2/AIJuzejfhXhsQDG
-	HL0G+ybZTUyHnQGio3xFRGz7b1U1M4FoUXoRnkNWxAgT+qLhadcFQ7e4hI4Zl1SOFvag2WxNl8M
-	1yidXuas5o7b/DmjIIRlnjOrqliNhrfcZCu9Z5X4WFUFDLpF1UiJO0h0Qcv72Rt/4YruoHb/Mcz
-	8WPPtnyD8AFahIpM0lvi9e1gRH7dvHqkksGT0UEPyQKquCv88I0kK2anHEI26U8LV28zBNgDOcT
-	Yh6z8BBc99TMF6iFov7RR2q3HmKomDkbiGN8gqNzaGKdj2Qj5Sv6lYN4gzQIESwofsO1mUFdjG1
-	SYWH5rI4NvkFbx229HUxpN5X9stHGJgXBttnDGorz4RxEdavVGzzAw/HYKi13xTHMUyvL7EvPHY
-	5rsXeW5MijRlp3VsH/KcUrDChrxiPpJplQgan1Ngdon842GI6c5Aj6ohThn/8f1ElBQuPtnB9eU
-	W/FZCFmDQB0yx17NksKVCNPo/j5ysmO/MLceGqpDf/qzyct
-X-Received: by 2002:a05:6214:f66:b0:8ac:800f:10da with SMTP id 6a1803df08f44-8b3fe70fef3mr36555836d6.4.1777545142241;
-        Thu, 30 Apr 2026 03:32:22 -0700 (PDT)
-Received: from ?IPV6:2600:4040:93b4:e600:a22c:878f:7c1a:1976? ([2600:4040:93b4:e600:a22c:878f:7c1a:1976])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b3ff321bf9sm14521296d6.13.2026.04.30.03.32.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Apr 2026 03:32:21 -0700 (PDT)
-Message-ID: <700329b9-e4b5-434e-9678-5a7f067a535a@gmail.com>
-Date: Thu, 30 Apr 2026 06:32:20 -0400
+        d=1e100.net; s=20251104; t=1777545204; x=1778150004;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zlQdc9ZGGOy1nWwQGOqT37EUu8/n7T3oBCrdhsUWNlU=;
+        b=ot3T1VN2EgBov7J7k//T+Tbx6Kn4zurENGcALri1fYjymb5/sy2rG6GqDjGonZDY+l
+         rUzpaWHHK6CWPQU2+BKPC2e/yNwVRiqzapRDXDQPhzoayz3zcB/DZoRuDe7JXlEAzpcb
+         NNDuRWdBbbjDa2KTyHZKRCeYG1VjC4bH8avEMOanCxTzsVBSMdtfEJ7vNXavqi7QLXxB
+         /mo8BZeRRwy0NCiMO8B2DiOzS9HhUjoYmb2lYPPmlCnJNQGsCCdhNbHIDcWWWFPf191O
+         X+uLgakGRZntiiRqGndfaNGTuceZAocuQetKaId4Ia2kkCoNDEe84kp+nSevnqeHDyb+
+         JyQA==
+X-Gm-Message-State: AOJu0Yxbx10LUBskVADOswJu05uSIPqeUCBjck809ECjztG128T7L+29
+	RUPPq8D20IGnEDlF8G8LWeE6vT6ol+nI0yTPaFSl3fg3cIvbf0e4VYDZ+AuRjg==
+X-Gm-Gg: AeBDievR+4dYRbCSP9f6b549ZgsS77eRcYSGMRHmWvhn/22UwX5v+2+/C2n759aOCSR
+	GISVYa/qB7cogj/4wFSZiFhSyOgzsSrhXLpWaz13vQg8UgLQymuslK48DzsH01Fog9D4Em8dYzN
+	He1wpXSGzPdiCZhUketEibKp38oJApY/rq35p1JsVeo/ImYIRupev0EJDcu8yhbx/W84IyMBdPN
+	nMNEY2Ji/eE4bgLjxhPigLY6N988ydVM1zcoF65cELmQ/dsY5qVjijGfAyud2dkVs7IsZZ/EfQk
+	BVS7m+h101ImHoNMoWQtFH88Kiq9itWXvIVLRPACE+uVKRXl+zqJU+tH7+0Ese8iC8b+EfKLCjU
+	AehbhfeEVLf3uYBBxP5FVAXkwx/FhOi2yp7gr3MLMdeZuEHtkO72N1GS/CXeE0WZJrVi/ELQ7xY
+	THRrSwDvZVRxnxc8nDVf+HjMBmux0iugJlLUo3UU5JzC0lBAhmSfGMQ4+k
+X-Received: by 2002:a17:90b:57d0:b0:362:eaa6:a3a2 with SMTP id 98e67ed59e1d1-364c309b029mr2403183a91.19.1777545203681;
+        Thu, 30 Apr 2026 03:33:23 -0700 (PDT)
+Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-364bdf5312fsm2486218a91.6.2026.04.30.03.33.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Apr 2026 03:33:23 -0700 (PDT)
+From: Maoyi Xie <maoyixie.tju@gmail.com>
+X-Google-Original-From: Maoyi Xie <maoyi.xie@ntu.edu.sg>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	dsahern@kernel.org,
+	horms@kernel.org,
+	willemb@google.com,
+	kuniyu@google.com,
+	shaw.leon@gmail.com,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net v2] ip6_gre: Use cached t->net in ip6erspan_changelink().
+Date: Thu, 30 Apr 2026 18:33:18 +0800
+Message-Id: <20260430103318.3206018-1-maoyi.xie@ntu.edu.sg>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] psp: reject packets carrying unsupported PSP optional
- fields
-To: David Carlier <devnexen@gmail.com>, kuba@kernel.org
-Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org, raeds@nvidia.com,
- kees@kernel.org, cratiu@nvidia.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20260430062033.20428-1-devnexen@gmail.com>
-Content-Language: en-US
-From: Daniel Zahka <daniel.zahka@gmail.com>
-In-Reply-To: <20260430062033.20428-1-devnexen@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: AA5DE4A0E0A
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 28AC84A0E3E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282762-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,kernel.org,nvidia.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-282763-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,gmail.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[danielzahka@gmail.com,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.995];
+	TO_DN_NONE(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ntu.edu.sg:mid,ntu.edu.sg:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
+After commit 5e72ce3e3980 ("net: ipv6: Use link netns in newlink() of
+rtnl_link_ops"), ip6erspan_newlink() correctly resolves the per-netns
+ip6gre hash via link_net. ip6erspan_changelink() was not converted in
+that series and still uses dev_net(dev), which diverges from the
+device's creation netns after IFLA_NET_NS_FD migration.
 
-On 4/30/26 2:20 AM, David Carlier wrote:
-> psp_dev_rcv() documents that it does not support optional PSP fields
-> but never enforces it. The helper unconditionally strips a fixed
-> PSP_ENCAP_HLEN, so a frame whose PSP header carries options is
-> silently mis-decapsulated: option bytes spill into the inner packet
-> head and parsing fails downstream on a corrupted skb instead of being
-> rejected early.
->
-> Validate hdrlen, crypt_offset and PSPHDR_VERFL_VIRT, and hoist the
-> psph read above skb_ext_add() so rejected packets do not pick up an
-> SKB_EXT_PSP extension only to drop it. Both in-tree callers gate on
-> hardware-validated, opt-less PSP, so this is hardening rather than a
-> reachable corruption path.
->
-> Fixes: 0eddb8023cee ("psp: provide decapsulation and receive helper for drivers")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: David Carlier <devnexen@gmail.com>
-> ---
->   net/psp/psp_main.c | 12 ++++++++++--
->   1 file changed, 10 insertions(+), 2 deletions(-)
->
-> diff --git a/net/psp/psp_main.c b/net/psp/psp_main.c
-> index 524978dfb8fd..53d7e14c054a 100644
-> --- a/net/psp/psp_main.c
-> +++ b/net/psp/psp_main.c
-> @@ -321,12 +321,20 @@ int psp_dev_rcv(struct sk_buff *skb, u16 dev_id, u8 generation, bool strip_icv)
->   	if (unlikely(uh->dest != htons(PSP_DEFAULT_UDP_PORT)))
->   		return -EINVAL;
->   
-> +	psph = (struct psphdr *)(skb->data + l2_hlen + l3_hlen +
-> +				 sizeof(struct udphdr));
-> +
-> +	/* Fixed-length decap; reject optional fields rather than mis-decapsulate. */
-> +
-> +	if (unlikely(psph->hdrlen != PSP_HDRLEN_NOOPT ||
-> +		     psph->crypt_offset ||
-> +		     (psph->verfl & PSPHDR_VERFL_VIRT)))
-> +		return -EINVAL;
-> +
->   	pse = skb_ext_add(skb, SKB_EXT_PSP);
->   	if (!pse)
->   		return -EINVAL;
->   
-> -	psph = (struct psphdr *)(skb->data + l2_hlen + l3_hlen +
-> -				 sizeof(struct udphdr));
->   	pse->spi = psph->spi;
->   	pse->dev_id = dev_id;
->   	pse->generation = generation;
+This re-inserts the tunnel into the wrong per-netns hash. The
+original netns keeps a stale entry. When that netns is later
+destroyed, ip6gre_exit_rtnl_net() walks the stale entry, producing a
+slab-use-after-free reported by KASAN, followed by a kernel BUG at
+net/core/dev.c (LIST_POISON1) in unregister_netdevice_many_notify().
 
+Reachable from an unprivileged user namespace (unshare --user
+--map-root-user --net).
 
-Thanks. There is a bit of a gray area in regards to how much we need to 
-validate here, because callers ought to use this only downstream of a 
-real PSP device, and only when that device has emitted some metadata 
-that the skb was at least parsed as PSP and decrypted correctly. That 
-being said, the handling of psp hdrlen is definitely a bug, because even 
-valid values can cause corruption during decap as you noted. I think we 
-should fix it by validating that it is less than the remaining bytes 
-after the psp-udp header, and then stripping the correct header length 
-accordingly.
+ip6gre_changelink() earlier in the same file already uses the cached
+t->net; only ip6erspan_changelink() has the wrong shape.
 
+Fixes: 2d665034f239 ("net: ip6_gre: Fix ip6erspan hlen calculation")
+Cc: stable@vger.kernel.org # v5.15+
+Signed-off-by: Maoyi Xie <maoyi.xie@ntu.edu.sg>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+v2 (this submission, addressing v1 review):
+    - Fixes: changed to 2d665034f239 ("net: ip6_gre: Fix ip6erspan
+      hlen calculation"), the commit that introduced the divergent
+      ip6erspan_changelink() shape (per Xiao Liang).
+    - dropped Reported-by since the SOB is the same person
+      (per Kuniyuki Iwashima).
+    - reverse xmas tree local variable order; reused *t instead of
+      shadowing it (per Kuniyuki Iwashima).
+    - added Reviewed-by Eric Dumazet, Reviewed-by Kuniyuki Iwashima.
+v1: originally posted as [PATCH net 2/2] of the
+    "ipv6: tunnel changelink: use cached netns pointer" series.
+    The sibling patch ([PATCH net 1/2] vti6_changelink) is being
+    handled in its own thread.
 
-For the other two, I'm not sure they are really necessary. Mandating 
-that crypt off is 0 is too restrictive as this function should work just 
-fine with non-zero values. We could validate that it isn't too long or 
-misaligned with the payload, but it may be better to have callers know 
-their NICs PSP implementation and decide if that is necessary. Similar 
-story with the VC present bit.
+ net/ipv6/ip6_gre.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-
-In any case, I think this function will also need a comment update 
-giving some more context for caller, and we can mention that the whole 
-psp header will be stripped away according the psp hdrlen, and that any 
-vc or options will be ignored and discarded.
-
-
-For a fix, you'll need to target the net tree with this patch, (i.e. 
-"PATCH net").
+diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
+index dafcc0dcd..0097d4784 100644
+--- a/net/ipv6/ip6_gre.c
++++ b/net/ipv6/ip6_gre.c
+@@ -2261,10 +2261,11 @@ static int ip6erspan_changelink(struct net_device *dev, struct nlattr *tb[],
+ 				struct nlattr *data[],
+ 				struct netlink_ext_ack *extack)
+ {
+-	struct ip6gre_net *ign = net_generic(dev_net(dev), ip6gre_net_id);
++	struct ip6_tnl *t = netdev_priv(dev);
+ 	struct __ip6_tnl_parm p;
+-	struct ip6_tnl *t;
++	struct ip6gre_net *ign;
+ 
++	ign = net_generic(t->net, ip6gre_net_id);
+ 	t = ip6gre_changelink_common(dev, tb, data, &p, extack);
+ 	if (IS_ERR(t))
+ 		return PTR_ERR(t);
+-- 
+2.34.1
 
 
