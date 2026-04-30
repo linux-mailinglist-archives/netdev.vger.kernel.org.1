@@ -1,159 +1,172 @@
-Return-Path: <netdev+bounces-282960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282961-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KBkNDJiP82ky5AEAu9opvQ
-	(envelope-from <netdev+bounces-282960-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 19:21:28 +0200
+	id SCRPMCyT82mL5AEAu9opvQ
+	(envelope-from <netdev+bounces-282961-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 19:36:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C09354A6497
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 19:21:27 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 437924A67E2
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 19:36:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E3891300130C
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:21:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 652C6301C6D6
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:36:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4931C47277D;
-	Thu, 30 Apr 2026 17:21:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0FC547A0AE;
+	Thu, 30 Apr 2026 17:36:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UrT4YYij"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B80833F59E
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 17:21:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C40C646AEF1
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 17:36:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777569676; cv=none; b=JLGehyFdsRh+14wICkjVrw8tVTFoeIOLna2iBj9LsCWvrbEOz1w5P6AkJLCwm79QEULdB0511hMtQDkeePfItVrH8Jz5zQco1auzLW9ePZ8Ab8mqq22FQ9fEl+ljg9pnmPagydRV7rE6SCungK/C5g5MZUWbiQ+XxhCwGAu1wis=
+	t=1777570597; cv=none; b=DjCBDeEHTdz0tXYFsMJccZJHXrQt0KbBmIW4bjxGSULiZWk/acMZ+NHM7l0lx+Q0CaG7eZ3DMZS29SuTpJQ/ZAG6XX2NasgVjRJn+V+6PJb+iF/SYwn5wUXfMl97Rhw4+ZWUgL+7WpaD5K8IzlaUTGvnNE76VRa4LVzT8IqiKqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777569676; c=relaxed/simple;
-	bh=dDk/opa2+T2emR/G8A+f4v+AuEOKkTGYYeN87SteDLs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VUf3GS8rWezrngrbsCZCot9pNiPXrqy8sU8Y7W+STHJMMs9fcNaJushVn7b2pJ5tbFvVFdmo+6IsGjTLbhz1i7yTr1eKxQS3lIxjsogF/7uo6XRYufO09LMbv0ZQGj+fUuSaABY9g9XeiZ0wk2ZgpTWoDEHc1W0fIO3bmPuktt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.44.251] (unknown [185.238.219.95])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	s=arc-20240116; t=1777570597; c=relaxed/simple;
+	bh=DKpm77o7C+wmP2zqZP5HxdRKhRGoLrYB4dvKBgkzBM8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=isM5sIhYaMLVkI7ef7F//4L45jJRdgR3hkfrLj8/FvDjqYd8xfbIWrahBpEMJG8vPSYqeWTdseHHtE7L61XIa1w31U/SYy6B2Y58smEGJ1q6jFn/mgP18XXxiZVw9mDNlKpztKWdujkT0PyduQUoIgz6y5dxnxDL/NDAQ84c7ws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UrT4YYij; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777570587;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9TxaOgZk77bW6UP/5RC087WlAvfwLVRhA/dLxiGUyNA=;
+	b=UrT4YYijiARh0wH8nEfK/HDhXBylCFUh3zGnnwajmhCdj7OIM2w1kBV7LylM+mB7RvJz3g
+	Bp/jQcX2G6wGxxkgGD6csyYRRZ7lpUbmyapd3XYhd9zJDrWXE820fMNHW6nIsZ+FTn9ZTE
+	9r6psij7NAPn0tP3XoZdbP8bdGOt+pM=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-380-ZfV2gvCTObWTNv2BXneHqw-1; Thu,
+ 30 Apr 2026 13:36:22 -0400
+X-MC-Unique: ZfV2gvCTObWTNv2BXneHqw-1
+X-Mimecast-MFC-AGG-ID: ZfV2gvCTObWTNv2BXneHqw_1777570580
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 611884C2C37F04;
-	Thu, 30 Apr 2026 19:20:58 +0200 (CEST)
-Message-ID: <1737f22d-1eca-4dee-95cc-6bd397e655dc@molgen.mpg.de>
-Date: Thu, 30 Apr 2026 19:20:55 +0200
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8B81618005A9;
+	Thu, 30 Apr 2026 17:36:19 +0000 (UTC)
+Received: from p16v.redhat.com (unknown [10.44.49.13])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E7D02180045E;
+	Thu, 30 Apr 2026 17:36:12 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Leon Romanovsky <leon@kernel.org>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pasi Vaananen <pvaanane@redhat.com>,
+	Petr Oros <poros@redhat.com>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Simon Horman <horms@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH net-next v2 0/2] dpll: rework fractional frequency offset reporting
+Date: Thu, 30 Apr 2026 19:36:09 +0200
+Message-ID: <20260430173611.3312596-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net] ice: reject out-of-range ptype
- in ice_parser_profile_init
-To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
- netdev@vger.kernel.org
-References: <20260430142153.249062-1-aleksandr.loktionov@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260430142153.249062-1-aleksandr.loktionov@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: C09354A6497
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Rspamd-Queue-Id: 437924A67E2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-282960-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[mpg.de];
+	FREEMAIL_CC(0.00)[lunn.ch,intel.com,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,lwn.net,nvidia.com,redhat.com,microchip.com,linuxfoundation.org,linux.dev,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-282961-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,molgen.mpg.de:mid,intel.com:email]
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-Dear Aleksandr,
+Rework how the fractional frequency offset (FFO) is reported in
+the DPLL subsystem.
 
+The fractional-frequency-offset-ppt attribute is moved from the
+top-level pin attributes into the pin-parent-device nested attribute
+set. This makes it consistent with phase-offset (which is already
+per-parent) and clarifies that FFO PPT represents the frequency
+difference between a pin and its parent DPLL device.
 
-Thank you for your patch.
+The two FFO contexts are distinguished in the ffo_get callback:
+dpll=NULL for the top-level RX vs TX symbol rate offset and a valid
+dpll pointer for the nested pin vs DPLL offset.
 
-Am 30.04.26 um 16:21 schrieb Aleksandr Loktionov:
-> set_bit(rslt->ptype, prof->ptypes) operates on a DECLARE_BITMAP of
-> ICE_FLOW_PTYPE_MAX (1024) bits. Nothing prevents a malicious VF from
-> providing ptype >= 1024 through VIRTCHNL, resulting in a write past
-> the end of the bitmap and a kernel page fault.
-> 
-> Reproduced with a custom kernel module injecting a crafted
-> VIRTCHNL_OP_ADD_RSS_CFG on E810-C QSFP (8086:1592),
-> FW 4.91 0x800214af 1.3909.0, ICE COMMS DDP 1.3.53.0,
-> kernel 7.1.0-rc1.
+Patch 1 restructures the DPLL subsystem netlink handling, updates
+the YAML spec and driver-api documentation, and adds NULL guards
+to mlx5 and zl3073x drivers.
 
-7.1-rc1 (no need to resend)
+Patch 2 implements the nested FFO for zl3073x using the
+dpll_df_offset_x register with ref_ofst=1, providing 2^-48
+resolution. The old per-reference frequency measurement is removed
+as it was redundant with measured-frequency.
 
-> crash_parser: ice_parser_profile_init @ ffffffffc0d61b60
-> crash_parser: setting ptype=0xffff (max valid=1023)
-> crash_parser: calling ice_parser_profile_init -- expect OOB crash!
-> BUG: kernel NULL pointer dereference, address: 0000000000000000
-> #PF: supervisor write access in kernel mode
-> #PF: error_code(0x0002) - not-present page
-> Oops: Oops: 0002 [#1] SMP NOPTI
-> CPU: 56 UID: 0 PID: 165011 Comm: insmod Kdump: loaded Tainted: G S U OE 7.1.0-rc1 #1
-> Hardware name: Intel Corporation S2600BPB/S2600BPB
-> RIP: 0010:ice_parser_profile_init+0x2d/0x1d0 [ice]
-> Call Trace:
->   <TASK>
->   ? __pfx_ice_parser_profile_init+0x10/0x10 [ice]
->   crash_init+0x127/0xff0 [crash_parser]
->   do_one_initcall+0x45/0x310
->   do_init_module+0x64/0x270
->   init_module_from_file+0xcc/0xf0
->   idempotent_init_module+0x17b/0x280
->   __x64_sys_finit_module+0x6e/0xe0
-> 
-> Bail out early with -EINVAL when ptype is out of range.
+Ivan Vecera (2):
+  dpll: move fractional-frequency-offset-ppt under pin-parent-device
+  dpll: zl3073x: report FFO as DPLL vs input reference offset
 
-Is a warning logged now?
+ Documentation/driver-api/dpll.rst             | 16 +++++++
+ Documentation/netlink/specs/dpll.yaml         | 11 +++--
+ drivers/dpll/dpll_netlink.c                   | 34 ++++++++++----
+ drivers/dpll/dpll_nl.c                        |  1 +
+ drivers/dpll/zl3073x/chan.c                   | 31 ++++++++++++-
+ drivers/dpll/zl3073x/chan.h                   | 14 ++++++
+ drivers/dpll/zl3073x/core.c                   | 45 -------------------
+ drivers/dpll/zl3073x/dpll.c                   | 34 +++++++-------
+ drivers/dpll/zl3073x/ref.h                    | 14 ------
+ drivers/dpll/zl3073x/regs.h                   | 15 +++++++
+ .../net/ethernet/mellanox/mlx5/core/dpll.c    |  4 ++
+ 11 files changed, 126 insertions(+), 93 deletions(-)
 
-> Fixes: e312b3a1e209 ("ice: add API for parser profile initialization")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> ---
->   drivers/net/ethernet/intel/ice/ice_parser.c | 3 +++
->   1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_parser.c b/drivers/net/ethernet/intel/ice/ice_parser.c
-> index f8e6963..3ede4c1 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_parser.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_parser.c
-> @@ -2368,6 +2368,9 @@ int ice_parser_profile_init(struct ice_parser_result *rslt,
->   	u16 proto_off = 0;
->   	u16 off;
->   
-> +	if (rslt->ptype >= ICE_FLOW_PTYPE_MAX)
-> +		return -EINVAL;
-> +
->   	memset(prof, 0, sizeof(*prof));
->   	set_bit(rslt->ptype, prof->ptypes);
->   	if (blk == ICE_BLK_SW) {
+-- 
+2.53.0
 
-
-Kind regards,
-
-Paul
 
