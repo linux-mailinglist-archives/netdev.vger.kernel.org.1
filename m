@@ -1,189 +1,206 @@
-Return-Path: <netdev+bounces-282669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282671-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OBmaAMT08mnNvwEAu9opvQ
-	(envelope-from <netdev+bounces-282669-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 08:20:52 +0200
+	id UCAQL0v68mnxwAEAu9opvQ
+	(envelope-from <netdev+bounces-282671-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 08:44:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B55C49E02B
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 08:20:51 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 637DE49E30F
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 08:44:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8AA803017077
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 06:20:42 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 878F9300C01C
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 06:44:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5643A376BD7;
-	Thu, 30 Apr 2026 06:20:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HmBHV95e"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D899377563;
+	Thu, 30 Apr 2026 06:44:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1321376BE8
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 06:20:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.75.44.102])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C5149443;
+	Thu, 30 Apr 2026 06:44:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.75.44.102
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777530041; cv=none; b=ZkdQJoei3bRDnsvjjxWp1jpGpyG1At9dQo35qvzb9ujCrd4vzMIK1KRuEH/umgZcniupI91oEvs7vw6FXeTaEtEixd7CzA/jzcfQ4PxB3XGtakMbQZB3c/V9uctH5aWPNCCqF7J1guIH67ExYkM7fIyV3i/lkSGquwt1ZRVLCME=
+	t=1777531465; cv=none; b=dEWwRuuB4JR/xne+CN66zWbIXdHuUb5MEcpPt1la36M6pSge+YmkbQ5ied15F5zmq4e/Ra1H4HncA7pPMSsRdVRx8l0ZF1ELS9b4ukyUEQjmmYiq2vUfo/odhpwL1JFs7BphCDAgAffnJnR5SGq0BpPynYtH4juWkxNDR635Vac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777530041; c=relaxed/simple;
-	bh=WoVUCUrfo2gwpqQRWaT4c9mJLRFmqHWrpaoGhQn80Hk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GMTKVzWMxIrmQlzTvjF17xhj2h/mnM1Z2ZFDGyFchfS1o9uiQD2l5rB3Sf0X1D2UL53ZdpgGuy0F+nDIu/HyvD7z/rwVtAVefFKQjWhkYp0SmvQhtJDA1gP01S2jMsEVU7YCu01pkeMG3eTrL+jwPKBTZMIqlOP2PYxuvwpxFdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HmBHV95e; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-43cfde3c3f3so476243f8f.3
-        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 23:20:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777530037; x=1778134837; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sV2UBVZcC8+xJMcWfLN7GQdGIuXPa9HMH6HdwJRVHxY=;
-        b=HmBHV95ecCWCsvBZTkzngwPftEEvTs3QGvRVnwaDoTXDr3TJqbJ51mVZR/2HpKaN/u
-         LGiGIPQQod5JIwTkW2WaXVMfCyjoBxIF6Bwi3YiSJknp8YyIBPTWyThJYLE5NPp859EF
-         7aivl48KiyPS0sxwHbfbHOdOgtz6SWC5zOyW8I1XhPsYvxnfkL+VhPecmhkaIEZE7Wzm
-         TwJMCTiJxlKX/OrhXE2qo39WAaZ5KAwp+S7o8E8KZvsWvBj3SlP1P8rddDuifLZNpO/O
-         LK048H7sybWEOvjxJpUUx58mOgDHAsZgjkjajrTwegZEQnLpdXpec/u7Gl5cy9plM82x
-         ljWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777530037; x=1778134837;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sV2UBVZcC8+xJMcWfLN7GQdGIuXPa9HMH6HdwJRVHxY=;
-        b=RTr4nVHcXHcxD8v/+JSeeRPtP3dLrp/i9r2sUy+59HufeNPY16awN2ambpsCdDs/VG
-         +KvPurMU5fuaexxzTOmtWp9q44fAu+J92rkdBq1UNf3C7gIEzRd/oco64O7SrQy1aXnr
-         OrK+qzt0HW6USETqxLEgCNGcmwZ/sMzZz2FjtqvMKpeqHfQ0HXmGN94wRFAAy8BJNWKz
-         QCnFixmjaTXXGSKDVQKneV0CKtRbATswTLSZ2sl/nkYssX8umjPvpKm24mcSeq05Tn3X
-         9IGAh5nzkW5E9l6RB8WjRJsxhCcOHAHbc6EsO+yyqwjdq25Xx6WyRje2Xle7XG/a8J7v
-         n31Q==
-X-Forwarded-Encrypted: i=1; AFNElJ9mYPuISsYChN98rPuOumoIDfrSGw8o+nfSceGa7Kvz96clOuSTeee7dsTK0X+01RelIZtK9Zs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzWbicGBi1BnJ4bjeUbJuX6ZS4mWVFQmpOnPN3yXD5NNGjnkZv
-	uUd7d8HZ7ho269fVvHkffC8JHukzSapAZzuHXPwcqSXpub7oVteejwmc
-X-Gm-Gg: AeBDies5zX8+JWVJC/nkLnf+7P5Hy5AsirX1LYry7HAnKsmClfSyeJ7hUOkosT9qfK2
-	GuEclg5kSJZP16UePYQ8lxSNhgb9AROyJxQ1wgiKuae7+YDFnkrS1n4KRoeUyAVtvsfWYizez8F
-	w5CMeTcNQ7O/ZPVvHswZOOBwS85ltr/WQEmm1Vn8NdPLyKwWgjWJNSGzkUu5Xe9cfYKx4S8pCLW
-	XGO//9eiWwGYZeDVlp2QQ3rwcF6w+PTvMZJRj961mq1YCO6c/2MHXu6FxQEzSMqlju07zOQ6GZ+
-	1Zv2y1y7rf06fCBepYvtg/L4JR7d/TEeoIDxZYWuvzSa7jd+ywj/RekTyfIfSihOyINWYiMROO+
-	SpV17o7Gq018v/szJmKoefRIr7enHB+4Qnbn6KfQvgdvbqKrOX29dPYAFp3i1DDTUJXhUoZ4oaA
-	g/j5QR8xIPKGfOKkm2zvBipNd/vmwUkQhslhYXj+RsLinQnLR3HTFiEvSv3wnk5UOCRIw/+L42e
-	i5M/ZC4UTyw12KMIuuO+nAceZ20dtjB
-X-Received: by 2002:a05:6000:288d:b0:43c:fde7:f1 with SMTP id ffacd0b85a97d-4493e0c3deemr2155856f8f.18.1777530036849;
-        Wed, 29 Apr 2026 23:20:36 -0700 (PDT)
-Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-447b3d481fdsm11373101f8f.8.2026.04.29.23.20.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Apr 2026 23:20:36 -0700 (PDT)
-From: David Carlier <devnexen@gmail.com>
-To: daniel.zahka@gmail.com,
-	kuba@kernel.org
-Cc: willemdebruijn.kernel@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	raeds@nvidia.com,
-	kees@kernel.org,
-	cratiu@nvidia.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	David Carlier <devnexen@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] psp: reject packets carrying unsupported PSP optional fields
-Date: Thu, 30 Apr 2026 07:20:33 +0100
-Message-ID: <20260430062033.20428-1-devnexen@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1777531465; c=relaxed/simple;
+	bh=fgl1GEPklDOhWXvF7Mi2fECDUwjtNtSl9niLN5UtMT0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=tmKwkOjVdCz5cQgD8/+cG7Dr2Bi4TzuE+AYOuGa4FYyBSwAC9yVUEYufil+I7/3iKXfoEEssSl/fUojMca/hpU+bMzvJGJEHxSOgbLPcHGFPR5auo6xw7dawxyFT8Q5zY8w5afu1Ap327DpTSVIxSyMPHVxCA/+W35PYtfQ9wqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=13.75.44.102
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
+Received: from lizhi2$eswincomputing.com ( [10.11.96.26] ) by
+ ajax-webmail-app1 (Coremail) ; Thu, 30 Apr 2026 14:43:50 +0800 (GMT+08:00)
+Date: Thu, 30 Apr 2026 14:43:50 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: =?UTF-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>
+To: "Jakub Kicinski" <kuba@kernel.org>, andrew+netdev@lunn.ch
+Cc: devicetree@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk,
+	pjw@kernel.org, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+	alex@ghiti.fr, linux-riscv@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	maxime.chevallier@bootlin.com, ningyu@eswincomputing.com,
+	linmin@eswincomputing.com, pinkesh.vaghela@einfochips.com,
+	pritesh.patel@einfochips.com, weishangjuan@eswincomputing.com,
+	horms@kernel.org
+Subject: Re: Re: [PATCH net-next v7 2/4] net: stmmac: eic7700: enable clocks
+ before syscon access and correct RX sampling timing
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2024.2-cmXT6 build
+ 20241203(6b039d88) Copyright (c) 2002-2026 www.mailtech.cn
+ mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
+In-Reply-To: <20260428180625.738223cf@kernel.org>
+References: <20260427072353.1114-1-lizhi2@eswincomputing.com>
+ <20260427072508.1151-1-lizhi2@eswincomputing.com>
+ <20260428180625.738223cf@kernel.org>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 7B55C49E02B
+Message-ID: <2117464.7991.19ddd2125d1.Coremail.lizhi2@eswincomputing.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:TAJkCgDHaXMm+vJp1e8VAA--.6484W
+X-CM-SenderInfo: xol2xx2s6h245lqf0zpsxwx03jof0z/1tbiAQENDGnyMpsSHgAAs-
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWkCw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
+X-Rspamd-Queue-Id: 637DE49E30F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,kernel.org,nvidia.com,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-282669-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282671-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[eswincomputing.com];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	HAS_X_PRIO_THREE(0.00)[3];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.996];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.436];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lizhi2@eswincomputing.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,dabbelt.com,eecs.berkeley.edu,ghiti.fr,lists.infradead.org,st-md-mailman.stormreply.com,bootlin.com,eswincomputing.com,einfochips.com];
+	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-psp_dev_rcv() documents that it does not support optional PSP fields
-but never enforces it. The helper unconditionally strips a fixed
-PSP_ENCAP_HLEN, so a frame whose PSP header carries options is
-silently mis-decapsulated: option bytes spill into the inner packet
-head and parsing fails downstream on a corrupted skb instead of being
-rejected early.
-
-Validate hdrlen, crypt_offset and PSPHDR_VERFL_VIRT, and hoist the
-psph read above skb_ext_add() so rejected packets do not pick up an
-SKB_EXT_PSP extension only to drop it. Both in-tree callers gate on
-hardware-validated, opt-less PSP, so this is hardening rather than a
-reachable corruption path.
-
-Fixes: 0eddb8023cee ("psp: provide decapsulation and receive helper for drivers")
-Cc: stable@vger.kernel.org
-Signed-off-by: David Carlier <devnexen@gmail.com>
----
- net/psp/psp_main.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/net/psp/psp_main.c b/net/psp/psp_main.c
-index 524978dfb8fd..53d7e14c054a 100644
---- a/net/psp/psp_main.c
-+++ b/net/psp/psp_main.c
-@@ -321,12 +321,20 @@ int psp_dev_rcv(struct sk_buff *skb, u16 dev_id, u8 generation, bool strip_icv)
- 	if (unlikely(uh->dest != htons(PSP_DEFAULT_UDP_PORT)))
- 		return -EINVAL;
- 
-+	psph = (struct psphdr *)(skb->data + l2_hlen + l3_hlen +
-+				 sizeof(struct udphdr));
-+
-+	/* Fixed-length decap; reject optional fields rather than mis-decapsulate. */
-+
-+	if (unlikely(psph->hdrlen != PSP_HDRLEN_NOOPT ||
-+		     psph->crypt_offset ||
-+		     (psph->verfl & PSPHDR_VERFL_VIRT)))
-+		return -EINVAL;
-+
- 	pse = skb_ext_add(skb, SKB_EXT_PSP);
- 	if (!pse)
- 		return -EINVAL;
- 
--	psph = (struct psphdr *)(skb->data + l2_hlen + l3_hlen +
--				 sizeof(struct udphdr));
- 	pse->spi = psph->spi;
- 	pse->dev_id = dev_id;
- 	pse->generation = generation;
--- 
-2.53.0
-
+CgoKPiAtLS0tLeWOn+Wni+mCruS7ti0tLS0tCj4g5Y+R5Lu25Lq6OiAiSmFrdWIgS2ljaW5za2ki
+IDxrdWJhQGtlcm5lbC5vcmc+Cj4g5Y+R6YCB5pe26Ze0OjIwMjYtMDQtMjkgMDk6MDY6MjUgKOaY
+n+acn+S4iSkKPiDmlLbku7bkuro6IGxpemhpMkBlc3dpbmNvbXB1dGluZy5jb20KPiDmioTpgIE6
+IGRldmljZXRyZWVAdmdlci5rZXJuZWwub3JnLCBhbmRyZXcrbmV0ZGV2QGx1bm4uY2gsIGRhdmVt
+QGRhdmVtbG9mdC5uZXQsIGVkdW1hemV0QGdvb2dsZS5jb20sIHJvYmhAa2VybmVsLm9yZywga3J6
+aytkdEBrZXJuZWwub3JnLCBjb25vcitkdEBrZXJuZWwub3JnLCBuZXRkZXZAdmdlci5rZXJuZWwu
+b3JnLCBwYWJlbmlAcmVkaGF0LmNvbSwgbWNvcXVlbGluLnN0bTMyQGdtYWlsLmNvbSwgYWxleGFu
+ZHJlLnRvcmd1ZUBmb3NzLnN0LmNvbSwgcm1rK2tlcm5lbEBhcm1saW51eC5vcmcudWssIHBqd0Br
+ZXJuZWwub3JnLCBwYWxtZXJAZGFiYmVsdC5jb20sIGFvdUBlZWNzLmJlcmtlbGV5LmVkdSwgYWxl
+eEBnaGl0aS5mciwgbGludXgtcmlzY3ZAbGlzdHMuaW5mcmFkZWFkLm9yZywgbGludXgtc3RtMzJA
+c3QtbWQtbWFpbG1hbi5zdG9ybXJlcGx5LmNvbSwgbGludXgtYXJtLWtlcm5lbEBsaXN0cy5pbmZy
+YWRlYWQub3JnLCBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnLCBtYXhpbWUuY2hldmFsbGll
+ckBib290bGluLmNvbSwgbmluZ3l1QGVzd2luY29tcHV0aW5nLmNvbSwgbGlubWluQGVzd2luY29t
+cHV0aW5nLmNvbSwgcGlua2VzaC52YWdoZWxhQGVpbmZvY2hpcHMuY29tLCBwcml0ZXNoLnBhdGVs
+QGVpbmZvY2hpcHMuY29tLCB3ZWlzaGFuZ2p1YW5AZXN3aW5jb21wdXRpbmcuY29tLCBob3Jtc0Br
+ZXJuZWwub3JnCj4g5Li76aKYOiBSZTogW1BBVENIIG5ldC1uZXh0IHY3IDIvNF0gbmV0OiBzdG1t
+YWM6IGVpYzc3MDA6IGVuYWJsZSBjbG9ja3MgYmVmb3JlIHN5c2NvbiBhY2Nlc3MgYW5kIGNvcnJl
+Y3QgUlggc2FtcGxpbmcgdGltaW5nCj4gCj4gCj4gV2h5IEZpeGVzPyBJZiBldGgxIG5ldmVyIHdv
+cmtlZCB0aGlzIGlzIG5vdCBhIGZpeCBidXQgbmV3IGZ1bmN0aW9uYWxpdHkKPiBJZiB5b3Ugd2Fu
+dCB0byBtYWtlIHRoaXMgYSBmaXggdG8gcHJldmVudCBpbmNvbXBhdGliaWxpdHkgLSBjdXQgaXQg
+ZG93bgo+IGp1c3QgdG8gdGhlIGV0aDAgY2hhbmdlcy4KPiAKVGhhbmsgeW91IGZvciB0aGUgc3Vn
+Z2VzdGlvbi4KCllvdSdyZSByaWdodCB0aGF0IGV0aDEgbmV2ZXIgd29ya2VkIGF0IEdpZ2FiaXQg
+c3BlZWQsIHNvIHRoaXMgc2hvdWxkCm5vdCBiZSB0cmVhdGVkIGFzIGEgZml4LgoKSW4gdjgsIEkg
+d2lsbCBzcGxpdCB0aGUgY2hhbmdlcyBpbnRvIHR3byBwYXRjaGVzIHdpdGhpbiB0aGUgc2FtZSBz
+ZXJpZXM6Ci0gUGF0Y2ggMSB3aWxsIGNvbnRhaW4gb25seSB0aGUgZml4ZXMgYWZmZWN0aW5nIHRo
+ZSBleGlzdGluZyBldGgwCmZ1bmN0aW9uYWxpdHksIGFuZCB3aWxsIGtlZXAgdGhlIEZpeGVzIHRh
+Zy4KLSBQYXRjaCAyIHdpbGwgYWRkIHRoZSBldGgxIHN1cHBvcnQgKFJYIGNsb2NrIGludmVyc2lv
+biB3b3JrYXJvdW5kKQphcyBuZXcgZnVuY3Rpb25hbGl0eSwgd2l0aG91dCBhIEZpeGVzIHRhZy4K
+ClBsZWFzZSBsZXQgbWUga25vdyBpZiB5b3Ugd291bGQgcHJlZmVyIGEgZGlmZmVyZW50IHNwbGl0
+IG9yIG9yZGVyaW5nLgoKPiAKPiBBSSBzYXlzOgo+IAo+ICAgVGhlIHN0ZXAgdW5pdCBpcyBiZWlu
+ZyBzaWxlbnRseSBjaGFuZ2VkIGZyb20gMC4xIG5zIChkZWxheV9wcyAvIDEwMCkKPiAgIHRvIDAu
+MDIgbnMgKGRlbGF5X3BzIC8gMjApLiAgVGhlIHNhbWUgRFQgdmFsdWUgbm93IHByb2dyYW1zIDV4
+IHRoZSBudW1iZXIKPiAgIG9mIGRlbGF5IHN0ZXBzIGludG8gdGhlIGhhcmR3YXJlLgo+IAoKVGhp
+cyBjaGFuZ2UgaXMgaW50ZW50aW9uYWwuIFRoZSBwcmV2aW91cyBkcml2ZXIgdXNlZCBhbiBpbmNv
+cnJlY3QKY29udmVyc2lvbiAoMTAwcHMgcGVyIHN0ZXApLCB3aGlsZSB0aGUgYWN0dWFsIGhhcmR3
+YXJlIHN0ZXAgaXMgMjBwcy4KClRoaXMgcGF0Y2ggY29ycmVjdHMgdGhlIGRlbGF5IGNhbGN1bGF0
+aW9uIHRvIG1hdGNoIHRoZSBoYXJkd2FyZS4KClRoZSBEVCBiaW5kaW5nIGlzIHVwZGF0ZWQgYWNj
+b3JkaW5nbHkgdG8gcmVmbGVjdCB0aGUgY29ycmVjdAoyMHBzIGdyYW51bGFyaXR5IGFuZCBlbmZv
+cmNlIHZhbGlkIHZhbHVlcy4KClRoaXMgYmluZGluZyBoYXMgbm90IHlldCBiZWVuIHVzZWQgaW4g
+YW55IHVwc3RyZWFtIERUUywgc28gdGhlcmUKYXJlIG5vIGluLXRyZWUgdXNlcnMgcmVseWluZyBv
+biB0aGUgcHJldmlvdXMgYmVoYXZpb3IuCgpJIHdpbGwgY2xhcmlmeSB0aGlzIGV4cGxpY2l0bHkg
+aW4gdGhlIHY4IGNvbW1pdCBtZXNzYWdlLgoKPiAKPiBBSSBzYXlzCj4gCj4gICBJbiB0aGUgZGVm
+YXVsdCBjYXNlIHRoaXMgbG9ncyAiaW52YWxpZCBzcGVlZCAldSIgYnV0IHRoZW4gZmFsbHMKPiAg
+IHRocm91Z2ggYW5kIHN0aWxsIGV4ZWN1dGVzIHRoZSByZWdtYXBfd3JpdGUoKSB3aXRoIHRoZSBi
+YXNlIGRseV9wYXJhbS4gIEFuCj4gICB1bnN1cHBvcnRlZCBzcGVlZCByZXBvcnRzIGFuIGVycm9y
+IGFuZCByZXByb2dyYW1zIHRoZSBoYXJkd2FyZSBhbnl3YXkuCj4gCj4gICBTaG91bGQgdGhlIGRl
+ZmF1bHQgcGF0aCByZXR1cm4gd2l0aG91dCB3cml0aW5nLCBvciBzaG91bGQgdGhlIHdyaXRlIGJl
+Cj4gICBtb3ZlZCBpbnRvIHRoZSB2YWxpZCBjYXNlcyBvbmx5Pwo+IAoKVGhlIGRlZmF1bHQgY2Fz
+ZSBzaG91bGQgbm90IHJlcHJvZ3JhbSBhbnkgaGFyZHdhcmUgcmVnaXN0ZXJzLgoKSSB3aWxsIGNo
+YW5nZSB0aGUgaW1wbGVtZW50YXRpb24gc28gdGhhdCByZWdpc3RlciB3cml0ZXMgYXJlIG9ubHkK
+cGVyZm9ybWVkIGZvciB2YWxpZCBzcGVlZHMgKFNQRUVEXzEwLzEwMC8xMDAwKS4gRm9yIHVuc3Vw
+cG9ydGVkCnNwZWVkcywgdGhlIGZ1bmN0aW9uIHdpbGwgb25seSBsb2cgdGhlIGVycm9yIGFuZCBy
+ZXR1cm4gd2l0aG91dAphbnkgc2lkZSBlZmZlY3RzLgoKPiAKPiBBSSBzYXlzOgo+IAo+ICAgRmly
+c3QsIHJ4LWludGVybmFsLWRlbGF5LXBzIGFuZCB0eC1pbnRlcm5hbC1kZWxheS1wcyBhcmUgc2ls
+ZW50bHkKPiAgIGRlbW90ZWQgZnJvbSByZXF1aXJlZCB0byBvcHRpb25hbC4gIFRoZSBwcmV2aW91
+cyBkcml2ZXIgcmV0dXJuZWQKPiAgIC1FSU5WQUwgd2l0aCAibWlzc2luZyByZXF1aXJlZCBwcm9w
+ZXJ0eSAuLi4iIHdoZW4gZWl0aGVyIHdhcyBhYnNlbnQ7Cj4gICB0aGUgZWxzZSBicmFuY2hlcyBo
+YXZlIGJlZW4gcmVtb3ZlZCwgc28gbWlzc2luZyBwcm9wZXJ0aWVzIG5vdyBsZWF2ZQo+ICAgZXRo
+X2Nsa19kbHlfcGFyYW0gYXQgemVybyBhbmQgZml4X21hY19zcGVlZCgpIHByb2dyYW1zIHplcm8g
+ZGVsYXkKPiAgIHdpdGhvdXQgZGlhZ25vc3RpYy4gIElzIHRoaXMgaW50ZW50aW9uYWwsIGFuZCBp
+ZiBzbyBzaG91bGQgdGhlIGNvbW1pdAo+ICAgbWVzc2FnZSBhbmQgdGhlIERUIGJpbmRpbmcgcmVm
+bGVjdCBpdD8KPiAgCj4gICBTZWNvbmQsIHRoZSBwcmV2aW91cyBjb2RlIHNpbGVudGx5IGNsYW1w
+ZWQgb3V0LW9mLXJhbmdlIHZhbHVlcyB2aWEKPiAgIG1pbigpIGFuZCBvbmx5IHJlcXVpcmVkIG5v
+bi16ZXJvIHN0ZXAgdW5pdHMgYnkgaW50ZWdlciB0cnVuY2F0aW9uLgo+ICAgVGhlIG5ldyBjb2Rl
+IHJlamVjdHMgbm9uLW11bHRpcGxlcyBvZiAyMCBhbmQgdmFsdWVzIGdyZWF0ZXIgdGhhbiAyNTQw
+Cj4gICBwcyB3aXRoIC1FSU5WQUwgYXQgcHJvYmUgdGltZS4gIERUQnMgdGhhdCBwcmV2aW91c2x5
+IHByb2JlZCB3aXRoCj4gICBjbGFtcGVkIGRlbGF5cyB3aWxsIG5vdyBmYWlsIHByb2JlLiAgU2hv
+dWxkIHRoaXMgc3RyaWN0ZXIgdmFsaWRhdGlvbgo+ICAgYWxzbyBiZSBjYWxsZWQgb3V0IGluIHRo
+ZSBjb21taXQgbWVzc2FnZT8KPiAKClllcywgdGhpcyBjaGFuZ2UgaXMgaW50ZW50aW9uYWwuCgpU
+aGUgcHJldmlvdXMgaW1wbGVtZW50YXRpb24gdXNlZCBpbmNvcnJlY3QgZGVsYXkgc2VtYW50aWNz
+CigxMDBwcyBzdGVwIGFuZCBpbXBsaWNpdCBjbGFtcGluZyksIHdoaWNoIGRvZXMgbm90IG1hdGNo
+IHRoZQphY3R1YWwgaGFyZHdhcmUgYmVoYXZpb3IuCgpUaGUgbmV3IGltcGxlbWVudGF0aW9uIGNv
+cnJlY3RzIHRoZSBoYXJkd2FyZSBwcm9ncmFtbWluZyB0byB1c2UKdGhlIHJlYWwgMjBwcyBzdGVw
+IGdyYW51bGFyaXR5IGFuZCBlbmZvcmNlcyB2YWxpZCByYW5nZXMuCgpSZWdhcmRpbmcgdGhlIERU
+IGJpbmRpbmcgY2hhbmdlIChyZXF1aXJlZCDihpIgb3B0aW9uYWwpIGFuZCB0aGUKc3RyaWN0ZXIg
+dmFsaWRhdGlvbiwgdGhpcyBpcyBhbHNvIGludGVudGlvbmFsLiBaZXJvIGRlbGF5IGlzIGEKdmFs
+aWQgaGFyZHdhcmUgY29uZmlndXJhdGlvbiwgYW5kIHRoZSBzdHJpY3RlciBjaGVja3MgYXJlIGFk
+ZGVkCnRvIGF2b2lkIHNpbGVudGx5IG1hc2tpbmcgaW52YWxpZCB2YWx1ZXMuCgpJbXBvcnRhbnRs
+eSwgdGhpcyBiaW5kaW5nIGhhcyBub3QgYmVlbiB1c2VkIGJ5IGFueSB1cHN0cmVhbSBEVFMKeWV0
+LCBzbyB0aGVyZSBhcmUgbm8gaW4tdHJlZSB1c2VycyBhZmZlY3RlZCBieSB0aGlzIGNoYW5nZS4K
+Ckkgd2lsbCBleHBsaWNpdGx5IGRvY3VtZW50IGJvdGggdGhlIHNlbWFudGljIGNoYW5nZSBhbmQg
+dGhlCmNvbXBhdGliaWxpdHkgbm90ZXMgaW4gdGhlIHY4IGNvbW1pdCBtZXNzYWdlIGFuZCB1cGRh
+dGUgdGhlCmJpbmRpbmcgZGVzY3JpcHRpb24gYWNjb3JkaW5nbHkuCgo+IAo+IEFJIHNheXM6Cj4g
+Cj4gICBUaGUgZXN3aW4saHNwLXNwLWNzciBwaGFuZGxlLWFyZ3MgbGF5b3V0IGlzIGV4cGFuZGVk
+IGZyb20gNCBjZWxscwo+ICAgKHBoYW5kbGUgKyAzIG9mZnNldHMpIHRvIDYgY2VsbHMgKHBoYW5k
+bGUgKyA1IG9mZnNldHMpLCB3aXRoIG5ldwo+ICAgaW5kaWNlcyAzLzQvNSBub3cgcmVxdWlyZWQu
+ICBBbnkgRFRCIHByb2R1Y2VkIGFnYWluc3QgdGhlIG9yaWdpbmFsCj4gICBlYTc3ZGJiZGJjNGUg
+YmluZGluZyB3aWxsIGZhaWwgcHJvYmUgaGVyZSB3aXRoIC1FSU5WQUwuCgpUaGUgcHJldmlvdXMg
+cGhhbmRsZS1hcmdzIGxheW91dCAoNCBjZWxscykgd2FzIGJhc2VkIG9uIGFuCmluY29tcGxldGUg
+aW5pdGlhbCBkZXNpZ24gYW5kIGRpZCBub3QgZnVsbHkgZGVzY3JpYmUgYWxsIHJlcXVpcmVkCmhh
+cmR3YXJlIHJlZ2lzdGVyIG9mZnNldHMuCgpUaGUgdXBkYXRlZCA2LWNlbGwgZm9ybWF0IHJlZmxl
+Y3RzIHRoZSBjb21wbGV0ZSBoYXJkd2FyZSBDU1IgbGF5b3V0CmFuZCBhbGxvd3MgZXhwbGljaXQg
+Y29uZmlndXJhdGlvbiBvZiBhZGRpdGlvbmFsIGNvbnRyb2wgcmVnaXN0ZXJzLgoKSW1wb3J0YW50
+bHksIHRoaXMgYmluZGluZyBoYXMgbm90IGJlZW4gdXNlZCBieSBhbnkgdXBzdHJlYW0gRFRTLApz
+byB0aGVyZSBhcmUgbm8gaW4tdHJlZSB1c2VycyBhZmZlY3RlZCBieSB0aGlzIGNoYW5nZS4KCkkg
+YWdyZWUgdGhhdCB0aGlzIGlzIGEgRFQgQUJJIGNoYW5nZSwgYW5kIEkgd2lsbCBleHBsaWNpdGx5
+IGRvY3VtZW50CnRoZSBjb21wYXRpYmlsaXR5IGltcGFjdCBhbmQgdXBkYXRlZCBiaW5kaW5nIGRl
+c2NyaXB0aW9uIGluIHRoZSB2OApzZXJpZXMgdG8gbWFrZSB0aGlzIGNsZWFyLgo=
 
