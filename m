@@ -1,122 +1,200 @@
-Return-Path: <netdev+bounces-282619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282629-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KPqVOL/D8mkjuAEAu9opvQ
-	(envelope-from <netdev+bounces-282619-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:51:43 +0200
+	id YKTILXrE8mkjuAEAu9opvQ
+	(envelope-from <netdev+bounces-282629-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:54:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E81249C8F4
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:51:43 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC82449C99B
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:54:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8D33E30A2BEB
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:48:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 343AA301FF63
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 02:49:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 311B032FA2E;
-	Thu, 30 Apr 2026 02:48:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F41433F8B1;
+	Thu, 30 Apr 2026 02:49:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WeiRhIJ8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S+EibLJw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D39532E73E;
-	Thu, 30 Apr 2026 02:48:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C920E331A66
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 02:49:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777517288; cv=none; b=OGWEG2q0ZkKnMTl1OmGuMBj4lNt4kFGF3IgpBrzWxXl1OHw9stCVV3Okso6c6+gQwehEuzjll7EULUYdCRVsqASnokM7687COdsK8ZW1GZMSrN3Xpd8r8cch6HxxWfmZZx3qjrajUr7fDRDCBoHOaQ2LJL9GpemsyRMf1zJXLJI=
+	t=1777517359; cv=none; b=kzhHVP/foPOAxyak1goZsVrpnaOOjnUGVBlcy+3CWGFjzlGxvK+19k857aFvrmUAf6XSHLLBAnlXSrUGNlOB91YLy4ijdHHGz23OnSNnhu6SIUJ6Yafdq8FZ2P/MmsJIUyrq0miEh/fDykPva+0CrwDdbE7tCFlDFf1sy/zg+Qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777517288; c=relaxed/simple;
-	bh=9EWgWOwUQP4dy4iHDSI1Tz91C4RbKMQbBcNeW+9fQk4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dtKGLWzFkPSCLo3tOFjh1wrYcL8GBb6lDLHLC+haIBaxdyY91KAuplTfmyrUlpaRCAgV+e4VelmcrW1Ig2eB5PpuLkQB5t+OQCdjDwZzf6xpwc13IWec60MZ0ZZsdqrwXTHmx3ixu/mIrD5ZadocQ7jytT7222u9TFG/K+x3gb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WeiRhIJ8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67D05C19425;
-	Thu, 30 Apr 2026 02:48:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777517287;
-	bh=9EWgWOwUQP4dy4iHDSI1Tz91C4RbKMQbBcNeW+9fQk4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WeiRhIJ8nX8FC7OsaCYYzUXUbH/kV1iLJgfOglrFHDgcvRBNomqsi4bLU0Vlw9wU+
-	 Af9Bkxt7FLXS1SlYfHUCNBlkuLSdFWv3SYzRIMIxK8frCRJK/NWSBbxboj2gUXzXWP
-	 xP/KuIc9aHkz1FLeK+gPCiXmV2Rdql59ynChdT0H1lt6FldXUZuwsgWnk2aJ6SZ0Vz
-	 BcxVdZi6t5uzzT2RL2565XW4Jrv8tXlTtLnAEpl7HrOODxoEoZ2fIHO8O97UZPRsJz
-	 EPxrI6Xf3xcPTNexPrvFH2Ee7pqDMoU4cpJrkuzsqNeMiZGW9n9T0MIsmlvWhNzApv
-	 r5m0rMkSIQZYQ==
-Date: Wed, 29 Apr 2026 19:48:06 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: achender@kernel.org
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
- horms@kernel.org, linux-rdma@vger.kernel.org,
- linux-kselftest@vger.kernel.org, shuah@kernel.org
-Subject: Re: [PATCH net-next v2 5/7] selftests: rds: Fix gcov and pcap
- collection
-Message-ID: <20260429194806.6ae176a9@kernel.org>
-In-Reply-To: <20260430024206.2452353-1-kuba@kernel.org>
-References: <20260428222716.2960871-6-achender@kernel.org>
-	<20260430024206.2452353-1-kuba@kernel.org>
+	s=arc-20240116; t=1777517359; c=relaxed/simple;
+	bh=Jzgtlfa0XPZihBMBAayfdTGA4qfZ/66+CFb4fTrbr1I=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=lQ0pdLOt47uIQOSM6Hu45zHoM6peyp9G0eGVFyMO7DSyReIK4tgNfII+V4N60aLZdn6uuFJSGAWzYXb6DjmOhnTLKJtp2/PhAiEjLWJ9szAREgInVwyHnxZmBiQaK9Wbu5lV7Cv9RvAF/PXgZAGjU+DOS82ClHRl5Jls6LrnC5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S+EibLJw; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2b2d3a9e149so7106325ad.1
+        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 19:49:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777517357; x=1778122157; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IFqSQggU6wMZ3sBcEBzUN/eFk5956xtC2nEBI87o+d8=;
+        b=S+EibLJwmE2dTvXZvzrJ3NDUFadRQwEwaCedn0MlO+Ys8RRVCUcxZR36hRKdMZlpMa
+         wC7aCZ4oxX6pRCC++ArI/QOL0Cb26QbpOTYkEMMiY3fnA445tshDvL7dHQX4BvXLo2+a
+         HlyYILSEHmAIm8P8UgOaWsR75G5WYjwtr5axPWHJ0jIWQud0NLvEUJweTz8yX+LcCgnx
+         3+2DInJICqYacGcADgxDUWmgnyaauXTVG2JXjI+9xvCXxqb7C7kdb1dEP8J+E+MS7XA3
+         9+yUYEN/gGxlHy7M9ijCIKIdOG+rCOvOxTTNkW/oS84bHyRA/puTQwzlxNlJvDVUyOwL
+         T3lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777517357; x=1778122157;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IFqSQggU6wMZ3sBcEBzUN/eFk5956xtC2nEBI87o+d8=;
+        b=HrYwD70mHmQMu9fP1+KULHp4iwDUl/PaFMNzX28ttlCPBqThzv4T6zxVrukNBObSzw
+         CJ6rrgLU32vXOygcA9v/1Edq7EiMV3XrbnG5Qtpt/vuruOdeRrPDA3eNaVCNw0zQyeSU
+         2sxveUKWvZoo2ATjs0/GFOT/er7JxMbHFLZXE7WTX1SzMxWaYsxVZbg8FELTcpRL3voB
+         5GYeZgFJAGFzBKwP6owRY5ZUDg+krw9/oZd9RkJJEGRL+Z3z+2dxAhya/p89CsAFeKAI
+         +m2IdpHnB1Oflt+X8pVo7dgGFNE7kkMr9i05MXGo8H/zeLubFlLiO9r9ep36RqzMd3jG
+         OilA==
+X-Gm-Message-State: AOJu0YzlRygHGDV5MozSzbr3WNXxYJIjIP2YdCfddmnxLN0wy5c4i+iA
+	vVOYIt3fLK+J/pheWQjOsJruL6vU9i+gGhAJNgqGkwFDuzl1kC2tQXiekWROau76
+X-Gm-Gg: AeBDiesJ8b4ndwfI26LnTO/sm8JwJ32yJ5etei8fGe8RDVE144GBLcqrzcjFz3Zok9l
+	pWsCDfsjQyA4rQioZVtR3X0yfUtcvtCMCCwrJKk7yCC7UEA/VAjLTGYcSqptkYfpnSDM3VgmwOW
+	XoDXCq47LWFPisi7UAbNDafpUQG0G0eBf8AVKUGwJfVayT7hxhY3gG+877TwdqsF/1fusXyUo0M
+	QnYnnHfcCHccbVrmok41PaMaJxGq52u5ZQowFEexnFRiBzMPGWLTYrSiS5rfek148VCgciyGaoJ
+	Tg32ZNfcX51sud1zTDCgnNYTvfSgbiNNGnLYyl1REnM/habtdWbUK4z4qMXiAkln0eJfDsPhdQA
+	HGgIU5F68SrkDj/awBwbiknUOLczfKMtdlmJ9nJuwd+iPkUMQIlMqcGam6wqtuIZshCbZye2xDP
+	V6JfMp4iTHrJT8Y1aVritv1+nObNFxbT56tZMubKg34kdAJ8293/Fk3w==
+X-Received: by 2002:a17:903:1a86:b0:2b2:eba4:2149 with SMTP id d9443c01a7336-2b9a47711b9mr5385535ad.30.1777517357156;
+        Wed, 29 Apr 2026 19:49:17 -0700 (PDT)
+Received: from v4bel ([58.123.110.97])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b988989d67sm36559455ad.76.2026.04.29.19.49.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Apr 2026 19:49:16 -0700 (PDT)
+Date: Thu, 30 Apr 2026 11:49:13 +0900
+From: Hyunwoo Kim <imv4bel@gmail.com>
+To: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	ilant@mellanox.com, sowmini.varadhan@oracle.com
+Cc: netdev@vger.kernel.org, imv4bel@gmail.com
+Subject: [PATCH ipsec] esp: Force skb_cow_data() on RX when the skb is
+ non-linear
+Message-ID: <afLDKSvAvMwGh7Fy@v4bel>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 8E81249C8F4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Rspamd-Queue-Id: AC82449C99B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-282629-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282619-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MIME_TRACE(0.00)[0:+]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com]
 
-On Wed, 29 Apr 2026 19:42:06 -0700 Jakub Kicinski wrote:
-> > +# tcpdump saves pcaps to /tmp because it requires chown to save the
-> > +# pcap but chown is not supported by 9p.  Mount tmpfs on /tmp if it is
-> > +# not already a separate filesystem
-> > +if ! mountpoint -q /tmp 2>/dev/null; then
-> > +	mount -t tmpfs tmpfs /tmp
-> > +fi
-> > +  
-> 
-> Could this introduce a regression when the test is run directly on a host
-> workstation rather than inside an isolated VM?
-> 
-> If /tmp is a regular directory on the root filesystem, mounting tmpfs over it
-> will instantly hide all existing files and UNIX domain sockets in /tmp.
-> 
-> Since there is no cleanup trap to unmount it on exit or failure, does this
-> leave the host system in a degraded state?
+esp_input() and esp6_input() skip skb_cow_data() on uncloned skbs
+through two arms: one for fully linear skbs (nfrags = 1) and one for
+skbs carrying paged fragments without a frag_list, which sets
+nfrags = skb_shinfo(skb)->nr_frags + 1.  In both arms the skb is mapped
+into a scatterlist via skb_to_sgvec() and passed as both src and dst of
+aead_request_set_crypt(), so the AEAD operates in place over the
+existing frag pages.
 
-I share Sashiko's mixed feelings here. Do other tests mount /tmp ?
-Seems like something that belongs in the "CI setup", external
-to ksft itself.
+Drop the paged-fragment arm so any non-linear inbound skb falls through
+to skb_cow_data().  The fully linear fast path is unchanged and the
+existing skb_cow_data() error handling that follows the gate is reused.
 
-point #2 my vng does have an overlayfs mounted over /tmp so the
-mountpoint check doesn't trigger IDK if this is what you meant 
-or I have a different version.
+Fixes: cac2661c53f3 ("esp4: Avoid skb_cow_data whenever possible")
+Fixes: 03e2a30f6a27 ("esp6: Avoid skb_cow_data whenever possible")
+Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+---
+ net/ipv4/esp4.c | 13 +++----------
+ net/ipv6/esp6.c | 13 +++----------
+ 2 files changed, 6 insertions(+), 20 deletions(-)
+
+diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+index 6dfc0bcdef65..a6fbdec139dc 100644
+--- a/net/ipv4/esp4.c
++++ b/net/ipv4/esp4.c
+@@ -868,17 +868,10 @@ static int esp_input(struct xfrm_state *x, struct sk_buff *skb)
+ 		assoclen += seqhilen;
+ 	}
+ 
+-	if (!skb_cloned(skb)) {
+-		if (!skb_is_nonlinear(skb)) {
+-			nfrags = 1;
+-
+-			goto skip_cow;
+-		} else if (!skb_has_frag_list(skb)) {
+-			nfrags = skb_shinfo(skb)->nr_frags;
+-			nfrags++;
++	if (!skb_cloned(skb) && !skb_is_nonlinear(skb)) {
++		nfrags = 1;
+ 
+-			goto skip_cow;
+-		}
++		goto skip_cow;
+ 	}
+ 
+ 	err = skb_cow_data(skb, 0, &trailer);
+diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
+index 9f75313734f8..e5504cc0ecf9 100644
+--- a/net/ipv6/esp6.c
++++ b/net/ipv6/esp6.c
+@@ -910,17 +910,10 @@ static int esp6_input(struct xfrm_state *x, struct sk_buff *skb)
+ 		assoclen += seqhilen;
+ 	}
+ 
+-	if (!skb_cloned(skb)) {
+-		if (!skb_is_nonlinear(skb)) {
+-			nfrags = 1;
+-
+-			goto skip_cow;
+-		} else if (!skb_has_frag_list(skb)) {
+-			nfrags = skb_shinfo(skb)->nr_frags;
+-			nfrags++;
++	if (!skb_cloned(skb) && !skb_is_nonlinear(skb)) {
++		nfrags = 1;
+ 
+-			goto skip_cow;
+-		}
++		goto skip_cow;
+ 	}
+ 
+ 	nfrags = skb_cow_data(skb, 0, &trailer);
+-- 
+2.43.0
+
 
