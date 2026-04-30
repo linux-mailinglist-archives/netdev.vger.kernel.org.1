@@ -1,185 +1,178 @@
-Return-Path: <netdev+bounces-282589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282590-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sP0/K8Oz8ml8tgEAu9opvQ
-	(envelope-from <netdev+bounces-282589-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:43:31 +0200
+	id ED67Nxy18mmUtgEAu9opvQ
+	(envelope-from <netdev+bounces-282590-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:49:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDB5B49C143
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:43:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 391CB49C184
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 03:49:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8501D3016028
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:43:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 253D23008D11
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 01:48:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01751274B3B;
-	Thu, 30 Apr 2026 01:43:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74DEB274FE8;
+	Thu, 30 Apr 2026 01:48:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G0m5RvEc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rDUnci1J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f68.google.com (mail-qv1-f68.google.com [209.85.219.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B2626FDBF
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 01:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777513407; cv=none; b=I3lCpS9y1zVdz5v4Aqgl5zB20Hfqjg+V4mXKnYIgJptrCBSmAtRwww9netyGMnR53x5agt/KWwsU+0wIjOihfS3uIgits0K3/B7hqFqEvgwcjs4r1YdxPt90p95O9FLFo+vpqT9tNKtikOnA4lB/NPYSIkn3s1tIQ0Cb2m1ztB8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777513407; c=relaxed/simple;
-	bh=DMMwX71W5njtCV48hCp4HWCaEVTrnwbN6m7AsCKkf+w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a/D+IEo2zlZBaIQeabls00pwLSWj/LgyJ1V2uneZJw7vJjMpj/jSgocsVeL+2zyOzYB9Xrqd45m+lM/MeSxbMzPY7CbH7hReFounhk6urzTdgGzFisXZpCmjuor+QVl8X6UUKLNq2+bUBsdH04FeY6MSLj7ovTDN/QmxhqZnBEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G0m5RvEc; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777513404; x=1809049404;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=DMMwX71W5njtCV48hCp4HWCaEVTrnwbN6m7AsCKkf+w=;
-  b=G0m5RvEcU+jq/aMfVEIZ6vabozMrML4SYO80UmjVdjHzBnzaPhS3q03Q
-   eofoVaVVqYklg7M3FEehz9ugmJ+VJF2U0BDQHLtUWpUaKlXrLAiwwbkcx
-   d5uHRSlodqaNsC8CtIftaXPCOX9ZSPwxyyUMjkmoEsVXtK+yExlnTJFFd
-   xUrm2iumfBvC90p2GNDC0Pp0dsQ4K+pQWcyWK44pmwSVCEdyOazJmPqgk
-   tusei2iKGwdlFl7hlwiCTxjR7hpCjmeqa7QzEHicYD49uBpsyQOSedD7r
-   2tFVcLzF9tUI6eG7dDLQDEXW4d1raRyg1o7oD6ah9Vp41COZ42o4XUuVT
-   g==;
-X-CSE-ConnectionGUID: 5XSy9EESRmKMPTuaQgAkrA==
-X-CSE-MsgGUID: uN0Mut6pRwyb6pJ6s9vHDQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11771"; a="78373814"
-X-IronPort-AV: E=Sophos;i="6.23,207,1770624000"; 
-   d="scan'208";a="78373814"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2026 18:43:24 -0700
-X-CSE-ConnectionGUID: 0FIBQk2mQP6lXkExHSsfRg==
-X-CSE-MsgGUID: Tuci5ImdTOiccES9KrEnwA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,207,1770624000"; 
-   d="scan'208";a="239460115"
-Received: from lkp-server01.sh.intel.com (HELO aa799cca880d) ([10.239.97.150])
-  by orviesa005.jf.intel.com with ESMTP; 29 Apr 2026 18:43:23 -0700
-Received: from kbuild by aa799cca880d with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wIGQx-00000000Bma-3dVk;
-	Thu, 30 Apr 2026 01:43:19 +0000
-Date: Thu, 30 Apr 2026 09:43:02 +0800
-From: kernel test robot <lkp@intel.com>
-To: Dudu Lu <phx0fer@gmail.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, Dudu Lu <phx0fer@gmail.com>
-Subject: Re: [PATCH] nfc: nci: Add skb length validation in
- nci_core_init_rsp_packet
-Message-ID: <202604300902.FjrlfrkQ-lkp@intel.com>
-References: <20260413090102.77980-1-phx0fer@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A738261B9B
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 01:48:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.68
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777513736; cv=pass; b=VxGIxLt9H9kZLitpj5cfKXXRkIxr33SH2KUulzokrWWASzuEmjR1yE6Ven+GDeXQWgqHV0U9ksLWup76odykZiZnjFpxVDb+qk1G/QXR+5+Kk0pKdJ49Om2b+zU+vRFqXRXy31SF/Vh7LiumlY5Ed0waqSAvqvE+xSKGBP8zLBM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777513736; c=relaxed/simple;
+	bh=Cpy4HtVc4TDj/lkwt4Oo2cs+X4zrx+JeYqCu8ESQ9f0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rddMeSQEDOCvwcXs9Tijvvf5rhvrMq9Smge/L9TEP3jCVPvCMrAZOcfmZDjpkDo0hKes8iAcGqbHEHZDvp5SHFsFQtQcdibhLdVBLJ+e7b43ADANyI1VxNc0g6UjYrCOqFWAVod1/1xKxojB+HoNW1N3aLjGoPp6AX8nXelxhMc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rDUnci1J; arc=pass smtp.client-ip=209.85.219.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f68.google.com with SMTP id 6a1803df08f44-8aca2726f61so6278466d6.0
+        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 18:48:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777513734; cv=none;
+        d=google.com; s=arc-20240605;
+        b=duZTsqNepNP/Vpph/7COR0HR0t6JbI2av5+6MGFZHrzloPVJdJl78YPG2LROVJCb9Z
+         ja+PfQMKBsEln0fC5Y+FU5OHrHVxnLaXHRr1i9Y07HyCnO2C3BSQgYKnMbgDKezd7H2M
+         j90jNQ0xfa/JKkD8fmAZVSCiefOby39HpeIT93nWNTsSxyn5c6Pjnhb8olDmqlL6dzjM
+         7Ve7kvUiLN+5PMUcuPFO/mos+cDx6lFz2SKAopl+jaOR/8hCbQ9Ck6DN3hKZHvW8KiP3
+         ZhOjpfwTvt+amrhmg044FY5hZcv8PQI55pb7xbxQayv767w1Ywkmf+gsLKW/ZuLmwPti
+         NJyQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Cpy4HtVc4TDj/lkwt4Oo2cs+X4zrx+JeYqCu8ESQ9f0=;
+        fh=vAlDPZgThCC6etRTHHhmGYq1pRJwYWxyKtIdxCdY4B8=;
+        b=JlrnHM8+HW7lz0+rAyDVfFPZPWxayQMS0Pwm/S7h29r7+DVD/QzZz1J/p7bULdq/Dk
+         fSH7MefyKIxVFIOEpRmHFUaTFcdtQU72d7gLLADt4Inp5tFoh7mGEzthba1UOeiejmop
+         IQ0fPSTnESRkrVrGCOfdfjXfBIFBNVrXp4JLEUoCc/JETryFGv+PZqjBUhymERT+vu0Q
+         qTDBNjNgy78GyDpk5C4BIaY4mpFg9XYN7Dkm8AvcJvjZFnamrpN2k/X5jUuM80zrj2mn
+         2yAJzsq4IDdBLf0/me/yP7rkNQawWUcvVwsgdGMt4QF3URV4ACX4tPbxgZblmg9d25Rx
+         /m8g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777513734; x=1778118534; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Cpy4HtVc4TDj/lkwt4Oo2cs+X4zrx+JeYqCu8ESQ9f0=;
+        b=rDUnci1JgHxQSDhZfk9wGYqdUKCeE41E1Z6ulxH+PRJE+u3zPlkL5255OKnQp89giO
+         9wp3twjquQqjFmycL207huBV0z4+tE0A5CpC956c9Nz+y4c/P+pwlAQD6qUH7zuUMBkR
+         5UhzGa6Kba9EsDvjZHQSmgS9tbsFnssMuIgHgaJX/gUmBOv76Cpu4sl8upP7edZDLwN1
+         TlmOEOtbuSyEofB/gL7T8lb2LB/DNeKj8TRPcFz0jJK8P8mS2QKeWC7HchKSYS/3vHqO
+         +96svf2s9bjHL+s+HhGzb22YsmmwNOV5d7Zgi4a4LPyUVANo/k6ISxl45aJ8weKl9L1Z
+         eoxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777513734; x=1778118534;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Cpy4HtVc4TDj/lkwt4Oo2cs+X4zrx+JeYqCu8ESQ9f0=;
+        b=oWuZ9qvbQd3FjDyCIniYorMh7ry47nR4IVyTKPaH7IXTS+UwNZZOD3zLewjFy/U3Sa
+         Ma9+IaLH8YQhd4QURkrOHvhzlCJu1nVxuGToieiyCYkfLjtF6MTROEL9lAaBJjxvg+aO
+         k/2VVM28+9fGUPKi31OwWmus0TMTIvkv+CtVPcXDzxoYZ1Iq9eCwP4splw5u2p96g4u/
+         K4Q53uYI0xfTbfvoI18Hs0PhEPr5MAEs6cyhYYTiD55HN5kTOuuYTIpEXCRe1SiM/JrA
+         knXwFxI41Las07nlXSRb52eqN9KycrG75U4dQcimm3DEdI52Hghnm/zFzUWlWv3/TPwi
+         aw4A==
+X-Gm-Message-State: AOJu0YyAjmpIW18vb2F/dbFXvDX7yRLxn8nw5xLZd7ubZCiZVxG9ghRY
+	ludk8/ABrlMDRtOCf50wOw2kXG0u2IM1A9pmbm1JVpCpCH4CHLZGMjv4Wm3mPLTPCjcitXzaSz4
+	6o6sb1hE5NFEeM5vVRws/eo6ZTo0QAFc=
+X-Gm-Gg: AeBDievrgpiS/HqeZ8LJ4Wei5USVMG/h4vtnzI4EdoA5+L/4k3vPBL9xCBTmPrfayA4
+	NfBBX6lBucOVi9p+jtuvICtn+RwAfICBbiu62gcaMzE/FNuZdjisxwWF9BT9xxeAmzvg/07sL3f
+	IOuIibM/gbdlMRxAd3r7eFwqpBYxvPTFOqVZHkeZg8mC5szc9dacXtR+XzSuroWTjszEKIBTj7n
+	hpT0YCjFyEnIeqVt5TJ3H7d/M9ADRjz7wF+x6Bi1Cn+nD9tXV841GpVS6RzVIPEp/E2N9as7+lL
+	XhTHwFp/mOBadU95LjUnBglcaGGcW7qkYo8Fla6/fjzq0T6egZk1Q9+icjEpw5bCza+0dT4pZeF
+	+iaM=
+X-Received: by 2002:ac8:5dcf:0:b0:50d:4601:e335 with SMTP id
+ d75a77b69052e-5102ae5de21mr13700191cf.54.1777513733882; Wed, 29 Apr 2026
+ 18:48:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260413090102.77980-1-phx0fer@gmail.com>
-X-Rspamd-Queue-Id: EDB5B49C143
+References: <20260428030826.47509-1-enelsonmoore@gmail.com>
+ <20260429175421.014bb28f@kernel.org> <CADkSEUiRwto-14zkER30WJdiQa2b+OGOZ+2S50pq4doJ37X70Q@mail.gmail.com>
+ <20260429182701.28edde72@kernel.org>
+In-Reply-To: <20260429182701.28edde72@kernel.org>
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Date: Wed, 29 Apr 2026 18:48:43 -0700
+X-Gm-Features: AVHnY4JzAmcEdxPyItkj_q8Wxw9A4aKJfDhdvIkOsOY2k8ahbWf25THMCYHvnm0
+Message-ID: <CADkSEUgYtyoGNAyVJQNUPvpaGZdn-L6OzE9qP+T-rDt8AVmgQA@mail.gmail.com>
+Subject: Re: [PATCH v2] net: ethernet: rnpgbe: mark nonfunctional incomplete
+ driver as BROKEN
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org, 
+	Yibo Dong <dong100@mucse.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, MD Danish Anwar <danishanwar@ti.com>, 
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 391CB49C184
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-282589-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-282590-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid,01.org:url]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
 
-Hi Dudu,
+Hi, Jakub,
 
-kernel test robot noticed the following build errors:
+On Wed, Apr 29, 2026 at 6:27=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+> That'd require us to know if the device is going to be used on
+> desktop because for datacenter NICs suspend/resume does not matter.
 
-[auto build test ERROR on net/main]
-[also build test ERROR on net-next/main linus/master horms-ipvs/master v7.1-rc1 next-20260429]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Good point - I was thinking about that myself. I would be fine with
+only marking it as broken until it can actually transmit and receive
+packets. What do you think about that? Of course, as a maintainer, the
+decision is up to you in the end.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Dudu-Lu/nfc-nci-Add-skb-length-validation-in-nci_core_init_rsp_packet/20260423-210923
-base:   net/main
-patch link:    https://lore.kernel.org/r/20260413090102.77980-1-phx0fer%40gmail.com
-patch subject: [PATCH] nfc: nci: Add skb length validation in nci_core_init_rsp_packet
-config: arm64-randconfig-001-20260430 (https://download.01.org/0day-ci/archive/20260430/202604300902.FjrlfrkQ-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 8.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260430/202604300902.FjrlfrkQ-lkp@intel.com/reproduce)
+> Maybe it was written in simpler times, maybe the help message was
+> aspirational to begin with..
+Probably both. On a related note, I think something needs to be done
+about some drivers staying in staging indefinitely without being moved
+out of it or removed. The most obvious example is rtl8723bs. Eager new
+contributors have spent an inordinate amount of time cleaning it up,
+yet it is nowhere near ready to be taken out of staging. One major
+blocker is that it doesn't use mac80211, but changing it to do so
+would be nearly impossible in its current state. I think it makes the
+most sense now to either remove the driver entirely if no one is using
+it or add SDIO support to rtl8xxxu (some work has already done on this
+out-of-tree).
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202604300902.FjrlfrkQ-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> net/nfc/nci/rsp.c:1:2: error: expected identifier or '(' before 'if'
-     if (skb->len < sizeof(*rsp)) {
-     ^~
-   net/nfc/nci/rsp.c:5:2: error: expected identifier or '(' before 'if'
-     if (skb->len < 6 + rsp_1->num_supported_rf_interfaces +
-     ^~
-   net/nfc/nci/rsp.c:10:2: error: expected identifier or '(' before 'if'
-     if (skb->len < sizeof(*rsp_1))
-     ^~
-
-
-vim +1 net/nfc/nci/rsp.c
-
-   > 1		if (skb->len < sizeof(*rsp)) {
-     2			pr_err("short NCI_CORE_INIT_RSP v2 packet\n");
-     3			return NCI_STATUS_SYNTAX_ERROR;
-     4		}
-     5		if (skb->len < 6 + rsp_1->num_supported_rf_interfaces +
-     6				sizeof(*rsp_2)) {
-     7			pr_err("short NCI_CORE_INIT_RSP v1 packet\n");
-     8			return NCI_STATUS_SYNTAX_ERROR;
-     9		}
-    10		if (skb->len < sizeof(*rsp_1))
-    11			return NCI_STATUS_SYNTAX_ERROR;
-    12	// SPDX-License-Identifier: GPL-2.0-only
-    13	/*
-    14	 *  The NFC Controller Interface is the communication protocol between an
-    15	 *  NFC Controller (NFCC) and a Device Host (DH).
-    16	 *
-    17	 *  Copyright (C) 2011 Texas Instruments, Inc.
-    18	 *
-    19	 *  Written by Ilan Elias <ilane@ti.com>
-    20	 *
-    21	 *  Acknowledgements:
-    22	 *  This file is based on hci_event.c, which was written
-    23	 *  by Maxim Krasnyansky.
-    24	 */
-    25	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Ethan
 
