@@ -1,177 +1,169 @@
-Return-Path: <netdev+bounces-282735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282736-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ECUKLyEq82mwxgEAu9opvQ
-	(envelope-from <netdev+bounces-282735-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 12:08:33 +0200
+	id QAsCHEIm82mZxgEAu9opvQ
+	(envelope-from <netdev+bounces-282736-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 11:52:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EB724A0850
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 12:08:33 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35D094A0369
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 11:52:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 69CA5303A3C8
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:44:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 91F2830078BD
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 09:46:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC73F3ACA5B;
-	Thu, 30 Apr 2026 09:44:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEF353FFAA0;
+	Thu, 30 Apr 2026 09:45:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bplODJU/"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="aH0YYmPC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D4183A5E81;
-	Thu, 30 Apr 2026 09:44:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7823F3AE19C
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 09:45:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777542241; cv=none; b=CQQJNRzQ9svU4Dvm5jbkyuZAFwrbzfsNVU/fSMzYc9oYukMcXb/lusnz5RcxDM6ymPK5EQtNQXNr5YltnJPN3rp0E/R6ZUmhHq185q8W3Nee5vzUYpVmN9I5EqIsXbVh0LbjmuhWXtapMdt8C7aTsXCuOoCoJXnsjIdE6umtmH4=
+	t=1777542349; cv=none; b=eaiwQUVVVG0zeLWqBV3RJb/7aw6BPYw7ynLL7R2FnyABz7xEMF+dqCAc0r7yfvzxSJJ9AZ0ePTvs3BX7dvrLmY7ZQlrQmequ02cSERUGWpU7pPF6jWqFn5EwimkswpHK0YoF04M60P/ydi1P6jgjPiv4pIagvtdwHDnkA3VeYrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777542241; c=relaxed/simple;
-	bh=pjD4a8rJ5wy6WIWFMXc/dMRwPE2lWwOkl+wfhS2cIxg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A6jLjC0mAFIS8/tGx5TlxlOnPGlb7yNv15qXboiAs9kMiuBWR5Lm1gZ4ohD1mAh52Es+k8/ZknJ42TECzDMrEphGTOrC6okF6qmbCYfGTJcoNBMpHKjCKr6XPehmyAoPEi795qjCFxE/je4A57IAZycbXgTVbqLpTfSFZpXE5yE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bplODJU/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92F83C2BCB3;
-	Thu, 30 Apr 2026 09:44:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777542241;
-	bh=pjD4a8rJ5wy6WIWFMXc/dMRwPE2lWwOkl+wfhS2cIxg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bplODJU/7ooHDNPIO3jofxmXUudXii8FNNlM4cLlKsg2xa1rzkJtzGIaCQEE5PtlT
-	 k2X2s+mFd8BHQrw+yditg9/oAb2mOFnydZHwRjIeFD0D5um8JnTMBeGiyY0lIqzu8A
-	 1dkEpe7x9CySs76qPyfav4wXZJZ33CEYe0VOX2WxMb4kdeR5izyJ4N7QuOfKzD+DYH
-	 OdTB2zDSzpq/JKsvbnZADUyziLCEVZsv4jiGSpL+Rn0Cub486PPITbtdu63OuNPubA
-	 cOL0/bXqyVZSeTcBqQGrpC11wIezKJWt6LrGGRX7T3O57Xmkl/hs+yrorqRVZFkcrf
-	 jmBwyEe1LL1xQ==
-Date: Thu, 30 Apr 2026 11:43:58 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
-	Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	daniel@makrotopia.org
-Subject: Re: [PATCH 2/9] arm64: dts: qcom: arduino-imola: Describe boot1
- NVMEM layout
-Message-ID: <20260430-famous-meek-dinosaur-edacc6@quoll>
-References: <20260428-block-as-nvmem-v1-0-6ad23e75190a@oss.qualcomm.com>
- <20260428-block-as-nvmem-v1-2-6ad23e75190a@oss.qualcomm.com>
+	s=arc-20240116; t=1777542349; c=relaxed/simple;
+	bh=QDslXe+wxXz5Sle2ZLJzuC1bnySYRgtXv3okkVLqu5g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=U+hMABiYcOFt6IWXMQ4EoOHYlcVxqY2Kvkdfvps/Ssd1wjAhoqC4tCeYy4SEYpybk90WCFZbMsNzjEg+ZxK+bHntDrqA+37h8UiaRZEmPaFuh/UanGEv7ZSuFLaQBWOOSq9Igo7obqckdoxSkPXBJf0xRJng8Kowp8wy2aBg38E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=aH0YYmPC; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1777542327;
+	bh=QDslXe+wxXz5Sle2ZLJzuC1bnySYRgtXv3okkVLqu5g=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=aH0YYmPCsnknvGmIaOKTwAjqO0F8P7l7dCNyLzCUAqStulfZVer3U3XddZnaItI7h
+	 ZUqkhDpQkZ60eyKO1LfKRseletXxRX3PJcEF3BwM4ao6wwn1aXlplcpH9qBnuXcnEm
+	 0KqX+FT7s5siIV3fu3zCpVnO1gy8qgieNw9abaw4=
+Received: from [129.217.186.229] ([129.217.186.229])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.2/8.18.2) with ESMTPSA id 63U9jEZE021677
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Thu, 30 Apr 2026 11:45:15 +0200 (CEST)
+Message-ID: <7bc8edc9-1b46-471a-9a6e-cd2c27aebcfc@tu-dortmund.de>
+Date: Thu, 30 Apr 2026 11:45:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260428-block-as-nvmem-v1-2-6ad23e75190a@oss.qualcomm.com>
-X-Rspamd-Queue-Id: 3EB724A0850
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 5/5] selftests: net: add veth BQL stress test
+To: =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>,
+        hawk@kernel.org
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        horms@kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
+        kernel-team@cloudflare.com, kuba@kernel.org, netdev@vger.kernel.org,
+        pabeni@redhat.com
+References: <20260324174719.1224337-7-hawk@kernel.org>
+ <02a713ac-f794-416f-9d69-95ea98d515b6@tu-dortmund.de>
+ <1c435d90-8d08-4ac1-8b84-cc72c0b4e30f@tu-berlin.de>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <1c435d90-8d08-4ac1-8b84-cc72c0b4e30f@tu-berlin.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 35D094A0369
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [5.34 / 15.00];
-	SEM_URIBL(3.50)[0.0.0.0:email];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_RHS_NOT_FQDN(0.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
+	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282735-lists,netdev=lfdr.de];
-	R_DKIM_ALLOW(0.00)[kernel.org:s=k20201202];
-	FROM_HAS_DN(0.00)[];
-	GREYLIST(0.00)[pass,body];
-	RCPT_COUNT_TWELVE(0.00)[30];
+	TAGGED_FROM(0.00)[bounces-282736-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,kernel.dk,sipsolutions.net,holtmann.org,gmail.com,quicinc.com,davemloft.net,google.com,redhat.com,vger.kernel.org,lists.infradead.org,makrotopia.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	R_SPF_ALLOW(0.00)[+ip4:172.105.105.114:c];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	NEURAL_SPAM(0.00)[0.591];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[0.0.21.24:email,qualcomm.com:email,0.0.17.48:email,0.0.0.0:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tu-dortmund.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,tu-dortmund.de:dkim,tu-dortmund.de:mid]
 
-On Tue, Apr 28, 2026 at 04:23:07PM +0200, Loic Poulain wrote:
-> On Arduino Uno-Q, the eMMC boot1 partition is factory provisioned
-> with device-specific information such as the WiFi MAC address
-> and the Bluetooth BD address. This partition can serve as an
-> alternative to additional non-volatile memory, such as a
-> dedicated EEPROM.
+On 4/30/26 11:17, Jonas Köppeler wrote:
+> On 3/28/26 4:19 PM, Simon Schippers wrote:
+>> Hi, thanks for your work! I am really interested in this patchset.
+>>
+>> I am planning to submit a similar patch set (see [1]) for the tun/tap
+>> driver, where I am currently implementing qdisc backpressure similar
+>> to that used in veth.
+>>
+>> Can you run pktgen [2] to see if there is a regression?
+>> I think that there might be a slowdown due to BQL not choosing a big
+>> enough queue size.
+> I ran some tests using pktgen by replacing the trafficgen from the
+> selftest with samples/pktgen/pktgen_sample01_simple.sh (Patch v3)
+> and used --nrules 0. In general the throughput is quite similar:
 > 
-> The eMMC boot partitions are typically good candidates, as they
-> are realively small, read-only by default (and can be enforced
-> as hardware read-only), and are not affected by board reflashing
-> procedures, which generally target the eMMC user or GP partitions.
+> BQL disabled (using --bql-disable):
+>   2378694pps 1141Mb/sec (1141773120bps) errors: 0
+>   2400898pps 1152Mb/sec (1152431040bps) errors: 0
+>   2358125pps 1131Mb/sec (1131900000bps) errors: 0
+>   2402034pps 1152Mb/sec (1152976320bps) errors: 0
+>   2362061pps 1133Mb/sec (1133789280bps) errors: 0
+>   2416301pps 1159Mb/sec (1159824480bps) errors: 0
+>   2398496pps 1151Mb/sec (1151278080bps) errors: 0
+>   2415200pps 1159Mb/sec (1159296000bps) errors: 0
+>   2375921pps 1140Mb/sec (1140442080bps) errors: 0
+>   2427419pps 1165Mb/sec (1165161120bps) errors: 0
+>   2382461pps 1143Mb/sec (1143581280bps) errors: 0
 > 
-> Describe the corresponding nvmem-layout for the WiFi and
-> Bluetooth addresses.
+>   mean: 2392510pps
 > 
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> ---
->  arch/arm64/boot/dts/qcom/qrb2210-arduino-imola.dts | 24 ++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
+> BQL enabled:
+>   2159545pps 1036Mb/sec (1036581600bps) errors: 0
+>   2321899pps 1114Mb/sec (1114511520bps) errors: 0
+>   2477853pps 1189Mb/sec (1189369440bps) errors: 0
+>   2447857pps 1174Mb/sec (1174971360bps) errors: 0
+>   2400284pps 1152Mb/sec (1152136320bps) errors: 0
+>   2442841pps 1172Mb/sec (1172563680bps) errors: 0
+>   2442540pps 1172Mb/sec (1172419200bps) errors: 0
+>   2410585pps 1157Mb/sec (1157080800bps) errors: 0
+>   2395902pps 1150Mb/sec (1150032960bps) errors: 0
+>   2393260pps 1148Mb/sec (1148764800bps) errors: 0
+>   2401959pps 1152Mb/sec (1152940320bps) errors: 0
 > 
-> diff --git a/arch/arm64/boot/dts/qcom/qrb2210-arduino-imola.dts b/arch/arm64/boot/dts/qcom/qrb2210-arduino-imola.dts
-> index bf088fa9807f040f0c8f405f9111b01790b09377..dc85cf94f71cac8666cab30ccf37cc2d2f8fd941 100644
-> --- a/arch/arm64/boot/dts/qcom/qrb2210-arduino-imola.dts
-> +++ b/arch/arm64/boot/dts/qcom/qrb2210-arduino-imola.dts
-> @@ -409,7 +409,31 @@ &sdhc_1 {
->  	no-sdio;
->  	no-sd;
->  
-> +	#address-cells = <1>;
-> +	#size-cells = <0>;
-> +
->  	status = "okay";
-> +
-> +	card@0 {
-> +		compatible = "mmc-card";
-> +		reg = <0>;
+>   mean: 2390411pps
+> 
+> BQL enabled is ~2099pps (~0.09%) lower than BQL disabled.
 
-> +
-> +		partitions-boot1 {
-> +			nvmem-layout {
+Sounds great!
 
-This should not be a separate patch. You add the layout AND you use it.
+One more thing:
+Could you check what BQL limit settles during the test run using
+something like:
 
-> +				compatible = "fixed-layout";
-> +				#address-cells = <1>;
-> +				#size-cells = <1>;
-> +
-> +				wifi_mac_addr: mac-addr@4400 {
-> +					reg = <0x4400 0x6>;
-> +				};
-> +
-> +				bd_addr: bd-addr@5400 {
-> +					reg = <0x5400 0x6>;
-> +				};
-> +			};
-> +		};
-> +	};
->  };
->  
->  &spi5 {
+watch -n 0.1 'cat /sys/class/net/XXXXX/queues/tx-0/byte_queue_limits/limit'
+
+I guess it will just choose the ptr_ring size as limit in this case,
+but it would be nice if you could briefly verify this :)
+
+Thanks!
+
 > 
-> -- 
-> 2.34.1
-> 
+>> Thanks!
+>>
+>> [1] Link:https://lore.kernel.org/all/20260312130639.138988-1-simon.schippers@tu-dortmund.de/
+>> [2] Link:https://www.kernel.org/doc/html/latest/networking/pktgen.html
 
