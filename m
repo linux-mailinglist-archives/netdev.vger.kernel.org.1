@@ -1,227 +1,276 @@
-Return-Path: <netdev+bounces-282658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282659-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id jXfNNbXe8mmHvAEAu9opvQ
-	(envelope-from <netdev+bounces-282658-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 06:46:45 +0200
+	id qIXhGLjf8mmtvAEAu9opvQ
+	(envelope-from <netdev+bounces-282659-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 06:51:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2185349D58A
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 06:46:44 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3FAA49D602
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 06:51:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0D6AA300A8D6
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:46:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C8F76301BA48
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 04:51:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F37636607F;
-	Thu, 30 Apr 2026 04:46:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27C111A6807;
+	Thu, 30 Apr 2026 04:51:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="pauSl8Ye";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="YMG2rh5d"
+	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="CWJPrFDl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DFD12C3255
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 04:46:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FDC23D76
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 04:50:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777524402; cv=none; b=W2fz0ij6U6S6vDS6YXYppf3YYhbswwY+rpr3sBGqJYG1T9mVHHu8WmIElpxFv3PHMElP1KCB8DBVHpFEExL3JKf5HnwlJEN0GK3X2Rw3UpDUGhpZeRE5Bl1oLBI9Y2a7yrQ3RLyZKIxRarWeXyZSyFkFAMPEcEPQwF3QKnf39jg=
+	t=1777524662; cv=none; b=CCRzm6KwK/NCrZQw1Zn3bhEi3cCOsHbZgRH1wgb923BZNLDqVqoIfn4P49gAgRpdsJI2MigU/bKTdzVjZTi5DFWle+U4rB2IjS+4YirRRgF24wLkhJjbn3I5zG0hNysaATI+GldSIY/N0xMn2uhbzHQtHHvZ8N1jOkrsh92eYs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777524402; c=relaxed/simple;
-	bh=ERhZOvBPJGPRGOnygQd9Z24lOzXG4tJMtlhFjmEopLY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LD8ZGWxWHMAptJf2SNv9VHm/6xTOkkBpKTon+BUGuyavacJjRPtDYlHJ4rcTuZZfGD7GVb5cXiaJQn4kwD5NW+XfzI7YLPtqEXPtpDwA9S4HTNqM9KWwgB1UPj9wuaN2j7mAH/88jRU5/ozkn8rvFzU1BkTw2WdbY0eMcPKOKjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=pauSl8Ye; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=YMG2rh5d; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63TKbUMo1809656
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 04:46:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	UHHyy1jhBLSCQLkczwQR9iTY7y+sVIfuoEj3zUQPDRo=; b=pauSl8YeBI7B11Tk
-	8T2OP/Hl1HpR7rcTTzMTrL1rTlJe9v8o7NIHtPxoea5QcSJKKdnlXICKsB+Qv8DZ
-	aH+7M/YUFBQV5bs4rIvJW1CjtXdPdt5rV02NAxCIeFY3FqBI+pzjCkYlzmVnUzba
-	0Xw1o76B1sF5pQqXv4RpKTQSKKo6N+Bdho7VKA4A4kGFWxlX5HRaTaC6icD2zova
-	4/UO99JL5/xl/QtaiS4of+V90FgMNuHNWrHMRJHymUvWD6pcN1xtI1KJCFZHwM+S
-	ubSH4GxZejEzCzGk3fZG4EAxBgCFuLG2JDnGcBqUstmp+7nc5/Q1qJhPKlnDi7zV
-	YMB5AQ==
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4duj6tb4n7-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 04:46:40 +0000 (GMT)
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-35da97f6a6dso506168a91.0
-        for <netdev@vger.kernel.org>; Wed, 29 Apr 2026 21:46:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1777524400; x=1778129200; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UHHyy1jhBLSCQLkczwQR9iTY7y+sVIfuoEj3zUQPDRo=;
-        b=YMG2rh5dHnf4LkrK2VObCBcugfclPfBmIO6klmm7fDOAIQjPNvxX2NzflnYitMQMJU
-         HFm+meHBGSxtmNfTc6eTfSKBD7HWqqbBj6wahVIH5TmtrAlG5vfru+HEaIeIR/4tRuZ4
-         MLr7Xt01i2Svlnjbx1QC+lI5Lqs0QOv8bcHjQFagRqXBw5cdorfTFp2cKr0HQqXPm8Wk
-         WmRx2LpOCgVV1Kl22znFphTjcjZ3YypAgkdE3XrWTovOsaItyzcSqcdX6CdKK7JfqIH2
-         YeiXZjxGzyPIcY/dR3+CekZLKfPKeHIavI2lNeRA4xmskBFC96CdEYN92/PDwN4YADvb
-         8JZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777524400; x=1778129200;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UHHyy1jhBLSCQLkczwQR9iTY7y+sVIfuoEj3zUQPDRo=;
-        b=SpevS3BmlLc8/Bh4ImRUGHsDKKS68ZrpFGWfvqifnr+CKxo8u2TovIYBzcfgjnOZDO
-         hqAEA1HPy1bCkrONvVroWOn/F8fsSpcg4t5HDqW0OVmlUNZF5bGzeVQ7jtr1V9RC32AN
-         Ck+ZAnTD98s7cPBgmlNjmcJJd+1AF0LE3GGd059zTp8ybPEaCZnyletxcYyiVY8fd31C
-         +2jhU1OdPZY5MdF+xGnGnBRuJbXW7N75HSKSFRqqiEScAlZDeAed1mLK0+3wpjusuHZX
-         fRqdc4VnZkfvpMvS+z9uctmvL7RxmeP8kEyPl4gnKgGdEBFRmgqz/P1uqrUVIAd7Uv3B
-         l4cA==
-X-Forwarded-Encrypted: i=1; AFNElJ/wV56QpQKk7uwe9L4mAKT9NLQHF6gsjsaCWVN6GjtIrscmsQfjdx3F6WWT7ykw4lsNVAw7WfI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyl4PcMRsvt0FDq6kVnfwFVBzVAjKeDuB1h98cGuUyyai082eNn
-	85ogEuTll65knmiGgUVrJip1hWx7vZP5nKuXWEN/FlnpJX7xS/FCryazk0v/y7sO+x8AsUNXjSt
-	Zy8wxVw67QJ1b2Lltf0Ji3nht8rUs+OIwWodmoPfpHBV0HEmBlgXFblh8aPk=
-X-Gm-Gg: AeBDieu9tGQ3VVwJcnrkXyueAn1S4CBdEimMtcbnZkGB8+MkAhTSNsDK9teVm9f79Hw
-	ad3EYH1Lg1IAJrSn/me+B2Ib2+xEbrQFxN1I1/xtEYYi7ytYUXW1UTVgpy1PIrHkJw5mjfD3C4e
-	eyfN4hebqmJNdTM14mEaJpWTZr2ZvVZDYvTnWyLO7Q2t0QGeRUm/LosQ3vZZvwodjk81fCJUrXm
-	nkQy8WRMbCCchvpwRUYyPstqFjv2Z9AsJTEtsGLi64LOZJl0Bssxl5zb6qFlDIQkcVgzkCZvEcJ
-	uj+ywntNYuuvLDqy1QR8wrf0CpmQQXcWxQB/y6XaIOydbpPjqRSPlrIdVxdly93ZCKGmrrXTLPF
-	MsUO8UV61P4EzAPCi2vmDlzfYNZ6IKuJICGhOcAtuU09N93KhjmA4rNBxLny9hQ==
-X-Received: by 2002:a17:90b:4b8f:b0:35f:c729:de9f with SMTP id 98e67ed59e1d1-364c32cdbcdmr1280469a91.27.1777524399744;
-        Wed, 29 Apr 2026 21:46:39 -0700 (PDT)
-X-Received: by 2002:a17:90b:4b8f:b0:35f:c729:de9f with SMTP id 98e67ed59e1d1-364c32cdbcdmr1280434a91.27.1777524399270;
-        Wed, 29 Apr 2026 21:46:39 -0700 (PDT)
-Received: from [10.217.198.242] ([202.46.22.19])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-364be044f23sm1211837a91.17.2026.04.29.21.46.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Apr 2026 21:46:38 -0700 (PDT)
-Message-ID: <c058b0ce-08b7-44c6-8558-959711a6ddbb@oss.qualcomm.com>
-Date: Thu, 30 Apr 2026 10:16:33 +0530
+	s=arc-20240116; t=1777524662; c=relaxed/simple;
+	bh=iq6CSZYTiKKqbyc8F5UbD3NSGiJAmFaOf4CJvl+NaNg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mnd+MczpZN+WnzqrNSuCEA4Gx35Fxyydfmt4UJ8CzIDSUR6ihJPsRu+q8DfiLmQNRxANM+mjY5rcvEZteonSZNMBst9jBe7dvx4iSWESxj2sw3AqkMnlH1yMmMbv9jzp7jiTsSFLbwvwWk1acDRtBFS02umGaF09jZvRMug33Go=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=CWJPrFDl; arc=none smtp.client-ip=49.212.198.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
+Received: from x1 (197.87.13.160.dy.iij4u.or.jp [160.13.87.197])
+	(authenticated bits=0)
+	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 63U4ot9J035305
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Thu, 30 Apr 2026 13:50:57 +0900 (JST)
+	(envelope-from kohei@enjuk.jp)
+DKIM-Signature: a=rsa-sha256; bh=H81XK4QYpi/JwTadWLTFz0nHm7i6ontMKrB10Pxtklo=;
+        c=relaxed/relaxed; d=enjuk.jp;
+        h=From:Message-ID:To:Subject:Date;
+        s=rs20251215; t=1777524658; v=1;
+        b=CWJPrFDlr16BnRc6sh2HSIbssH4gQ1kWc2Nv7AHS6NLWs031Vmafu91oPwNFkIMS
+         HONvnXXx+En7erQ/o4mhT4VWHlWt/WB7+5Qi0DcIlQfxWMbhHeW/RkGs66aGwScD
+         JWN78Q80FvkqSxM8+VbLIpANdFESeHsJcUdkO6taCQXdw4Wibwf7h7JmvNKYeMCy
+         RTwyiOpKbS/PWgJUMqB2Ti2YJ4KX9T3oV63KX/PGWZCDFcbyOYl1OsGAyDCsTQ70
+         l9ZweV07QpCwHXmkBMGdcCrv4R0o9D/Zk8TADb6wUEXOEEL2b5lGq9GNkOjQC/NX
+         xnIra8Vm39Y9s5POF5WbAw==
+Date: Thu, 30 Apr 2026 13:50:55 +0900
+From: Kohei Enju <kohei@enjuk.jp>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Kuniyuki Iwashima <kuniyu@google.com>,
+        Willem de Bruijn <willemb@google.com>,
+        David Ahern <dsahern@kernel.org>, Neal Cardwell <ncardwell@google.com>,
+        Gerhard Engleder <gerhard@engleder-embedded.com>,
+        Jonathan Lemon <jonathan.lemon@gmail.com>,
+        Richard Cochran <richardcochran@gmail.com>
+Subject: Re: [PATCH net v1 1/3] net: introduce helper to resolve hardware
+ timestamps from skb
+Message-ID: <afLew3MP3j_lIOxS@x1>
+References: <20260429091632.26509-1-kohei@enjuk.jp>
+ <20260429091632.26509-2-kohei@enjuk.jp>
+ <willemdebruijn.kernel.2d041a6261a02@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/2] pinctrl: qcom: add the TLMM driver for the Nord
- platforms
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Linus Walleij <linusw@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Bartosz Golaszewski <brgl@kernel.org>,
-        Shawn Guo <shengchao.guo@oss.qualcomm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Cc: linux-arm-msm@vger.kernel.org, linux-gpio@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-References: <20260428-nord-tlmm-v3-0-f16f08d084cc@oss.qualcomm.com>
- <20260428-nord-tlmm-v3-2-f16f08d084cc@oss.qualcomm.com>
-Content-Language: en-US
-From: "Maulik Shah (mkshah)" <maulik.shah@oss.qualcomm.com>
-In-Reply-To: <20260428-nord-tlmm-v3-2-f16f08d084cc@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: -ynw7sNNn9vD1QHaBXreQSiKCo2hPW1J
-X-Authority-Analysis: v=2.4 cv=KcHidwYD c=1 sm=1 tr=0 ts=69f2deb0 cx=c_pps
- a=0uOsjrqzRL749jD1oC5vDA==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
- a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=YMgV9FUhrdKAYTUUvYB2:22
- a=EUspDBNiAAAA:8 a=d8IIXGk-wedfOAHOyJQA:9 a=QEXdDO2ut3YA:10
- a=mQ_c8vxmzFEMiUWkPHU9:22
-X-Proofpoint-ORIG-GUID: -ynw7sNNn9vD1QHaBXreQSiKCo2hPW1J
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDMwMDA0NSBTYWx0ZWRfX8VAp1L2i4Fp+
- CG8Ya5KeK+4LF1sG783r/FNW7eaBMdxLp0RnAZ07H6tC0Hahx0XwNlzfwX27Z/KbQgz4n3hi7Y8
- MQV+jCJBbpFk0K2YaugMu1CuXrSwrRjDGUuzYffn4T97zNWAkFqJfQWDMc3BaUHqNCXda318E1I
- 0PCy6vy6RQFU8miQMtK4oQaJQYvqi1RYCO6y1nIqNfb9WwkIJKb7TW2GBX7IM1NVsY8aCCRigba
- ZHkDottz/DrSFyRdcF37/5JhvUro2wSCSdXbstIGANOEmhpxH07EiMxp8FR1z4xbhmH7ktb9yHH
- y4VrrzS0z1jtUSYqvGs4eSGE23mh2OHtwyks+/p3mEg9sKQBaiAoCapzyiGpoASmGbCVXyXvPUd
- /s20KpTwo5I5d7qYAShBunAi5gQpkDwaB7FmJpPEbh4v+W7dRwJ/NUv1frxoLdkQy7SpKKSUoNo
- gQ4NNO2vqLixXfULfFQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-30_01,2026-04-28_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 spamscore=0 phishscore=0 bulkscore=0 suspectscore=0
- malwarescore=0 lowpriorityscore=0 clxscore=1015 adultscore=0
- priorityscore=1501 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2604200000
- definitions=main-2604300045
-X-Rspamd-Queue-Id: 2185349D58A
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <willemdebruijn.kernel.2d041a6261a02@gmail.com>
+X-Rspamd-Queue-Id: D3FAA49D602
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282658-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.qualcomm.com:dkim,oss.qualcomm.com:mid,qualcomm.com:dkim,qualcomm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	FREEMAIL_TO(0.00)[oss.qualcomm.com,kernel.org,gmail.com,arndb.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-282659-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maulik.shah@oss.qualcomm.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[enjuk.jp:+];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,engleder-embedded.com,gmail.com];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
+On 04/29 17:04, Willem de Bruijn wrote:
+> Kohei Enju wrote:
+> > Move the logic that resolves a hardware timestamp from an skb, including
+> > late timestamp resolution via netdev_get_tstamp(), from net/socket.c to
+> > a common helper.
+> > 
+> > Let's allow other networking code to reuse the same resolution path.
+> > 
+> > Signed-off-by: Kohei Enju <kohei@enjuk.jp>
+> 
+> Thanks for the fix series.
+> 
+> Fixes require a Fixes tag. See also https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html.
+> 
+> I suggest merging this and the second patch, as this is not a
+> standalone fix, and the other is a one-line change.
 
+Thank you for the suggestion, and it looks good to me.
+I'll do so in v2.
 
-On 4/28/2026 7:18 PM, Bartosz Golaszewski wrote:
-> Add support for the TLMM controller on the Qualcomm Nord platform.
+> 
+> > ---
+> >  include/linux/skbuff.h | 11 +++++++++++
+> >  net/core/skbuff.c      | 27 +++++++++++++++++++++++++++
+> >  net/socket.c           | 27 +++------------------------
+> >  3 files changed, 41 insertions(+), 24 deletions(-)
+> > 
+> > diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> > index 2bcf78a4de7b..651a5ae8b11c 100644
+> > --- a/include/linux/skbuff.h
+> > +++ b/include/linux/skbuff.h
+> > @@ -4731,6 +4731,17 @@ void __skb_tstamp_tx(struct sk_buff *orig_skb, const struct sk_buff *ack_skb,
+> >  void skb_tstamp_tx(struct sk_buff *orig_skb,
+> >  		   struct skb_shared_hwtstamps *hwtstamps);
+> >  
+> > +/**
+> > + * skb_get_hwtstamp - resolve a hardware timestamp from an skb
+> > + * @skb:	skb carrying the timestamp
+> > + * @cycles:	true to request the free-running cycle-based timestamp
+> > + * @if_index:	optional return pointer for the originating netdev ifindex
+> > + *
+> > + * Return: resolved hardware timestamp, or the stored skb hwtstamp when no
+> > + * device-specific late timestamp resolution is needed.
+> > + */
+> > +ktime_t skb_get_hwtstamp(struct sk_buff *skb, bool cycles, int *if_index);
+> > +
+> >  /**
+> >   * skb_tx_timestamp() - Driver hook for transmit timestamping
+> >   *
+> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > index 7dad68e3b518..d11f4e2e9391 100644
+> > --- a/net/core/skbuff.c
+> > +++ b/net/core/skbuff.c
+> > @@ -5729,6 +5729,33 @@ void skb_tstamp_tx(struct sk_buff *orig_skb,
+> >  }
+> >  EXPORT_SYMBOL_GPL(skb_tstamp_tx);
+> >  
+> > +ktime_t skb_get_hwtstamp(struct sk_buff *skb, bool cycles, int *if_index)
+> > +{
+> > +	struct skb_shared_hwtstamps *shhwtstamps = skb_hwtstamps(skb);
+> > +	struct net_device *orig_dev;
+> > +	ktime_t hwtstamp;
+> > +
+> > +	if (if_index)
+> > +		*if_index = 0;
+> > +
+> > +	if (!(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP_NETDEV))
+> > +		return shhwtstamps->hwtstamp;
+> > +
+> > +	rcu_read_lock();
+> > +	orig_dev = dev_get_by_napi_id(skb_napi_id(skb));
+> > +	if (orig_dev) {
+> > +		if (if_index)
+> > +			*if_index = orig_dev->ifindex;
+> > +		hwtstamp = netdev_get_tstamp(orig_dev, shhwtstamps, cycles);
+> > +	} else {
+> > +		hwtstamp = shhwtstamps->hwtstamp;
+> > +	}
+> > +	rcu_read_unlock();
+> > +
+> > +	return hwtstamp;
+> > +}
+> > +EXPORT_SYMBOL_GPL(skb_get_hwtstamp);
+> > +
+> >  #ifdef CONFIG_WIRELESS
+> >  void skb_complete_wifi_ack(struct sk_buff *skb, bool acked)
+> >  {
+> > diff --git a/net/socket.c b/net/socket.c
+> > index 22a412fdec07..95b21b16a0fc 100644
+> > --- a/net/socket.c
+> > +++ b/net/socket.c
+> > @@ -876,21 +876,7 @@ static bool skb_is_swtx_tstamp(const struct sk_buff *skb, int false_tstamp)
+> >  static ktime_t get_timestamp(struct sock *sk, struct sk_buff *skb, int *if_index)
+> >  {
+> >  	bool cycles = READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_BIND_PHC;
+> > -	struct skb_shared_hwtstamps *shhwtstamps = skb_hwtstamps(skb);
+> > -	struct net_device *orig_dev;
+> > -	ktime_t hwtstamp;
+> > -
+> > -	rcu_read_lock();
+> > -	orig_dev = dev_get_by_napi_id(skb_napi_id(skb));
+> > -	if (orig_dev) {
+> > -		*if_index = orig_dev->ifindex;
+> > -		hwtstamp = netdev_get_tstamp(orig_dev, shhwtstamps, cycles);
+> > -	} else {
+> > -		hwtstamp = shhwtstamps->hwtstamp;
+> > -	}
+> > -	rcu_read_unlock();
+> > -
+> > -	return hwtstamp;
+> > +	return skb_get_hwtstamp(skb, cycles, if_index);
+> >  }
+> 
+> At this point simpler to remove get_timestamp entirely. It's an
+> unnecessary layer of indirection.
+> 
+> Perhaps pass sk_tsflags rather than bool to skb_get_hwtstamp.
 
-> +
-> +static const struct of_device_id nord_tlmm_of_match[] = {
-> +	{ .compatible = "qcom,nord-tlmm", .data = &nord_tlmm },
-> +	{},
-> +};
-> +MODULE_DEVICE_TABLE(of, nord_tlmm_of_match);
-
-[...]
-
-MODULE_DEVICE_TABLE() seems to be kept as the last line in other pinctrl-<target> files.
-if you are sending a new revision, better to keep at the end for uniformity.
-
-> +
-
-[...]
-
-> +
-> +MODULE_DESCRIPTION("Qualcomm Technologies Inc. Nordschleife TLMM driver");
-
-Is Nordschleife expected name here or should it be just called Nord?
-
-Also since all other pinctrl-<target> files have this description using "QTI <SoC> TLMM driver"
-Do you need to replace Qualcomm Technologies Inc. with QTI to have uniformity across all SoCs?
-
-Otherwise looks good to me,
-
-Reviewed-by: Maulik Shah <maulik.shah@oss.qualcomm.com>
+Good points. I'll rework this in v2.
 
 Thanks,
-Maulik
+Kohei
 
-> +MODULE_LICENSE("GPL");
+>   
+> >  static void put_ts_pktinfo(struct msghdr *msg, struct sk_buff *skb,
+> > @@ -940,7 +926,6 @@ int skb_get_tx_timestamp(struct sk_buff *skb, struct sock *sk,
+> >  {
+> >  	u32 tsflags = READ_ONCE(sk->sk_tsflags);
+> >  	ktime_t hwtstamp;
+> > -	int if_index = 0;
+> >  
+> >  	if ((tsflags & SOF_TIMESTAMPING_SOFTWARE) &&
+> >  	    ktime_to_timespec64_cond(skb->tstamp, ts))
+> > @@ -950,10 +935,7 @@ int skb_get_tx_timestamp(struct sk_buff *skb, struct sock *sk,
+> >  	    skb_is_swtx_tstamp(skb, false))
+> >  		return -ENOENT;
+> >  
+> > -	if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP_NETDEV)
+> > -		hwtstamp = get_timestamp(sk, skb, &if_index);
+> > -	else
+> > -		hwtstamp = skb_hwtstamps(skb)->hwtstamp;
+> > +	hwtstamp = get_timestamp(sk, skb, NULL);
+> >  
+> >  	if (tsflags & SOF_TIMESTAMPING_BIND_PHC)
+> >  		hwtstamp = ptp_convert_timestamp(&hwtstamp,
+> > @@ -1033,10 +1015,7 @@ void __sock_recv_timestamp(struct msghdr *msg, struct sock *sk,
+> >  	      !(tsflags & SOF_TIMESTAMPING_OPT_RX_FILTER))) &&
+> >  	    !skb_is_swtx_tstamp(skb, false_tstamp)) {
+> >  		if_index = 0;
+> > -		if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP_NETDEV)
+> > -			hwtstamp = get_timestamp(sk, skb, &if_index);
+> > -		else
+> > -			hwtstamp = shhwtstamps->hwtstamp;
+> > +		hwtstamp = get_timestamp(sk, skb, &if_index);
+> >  
+> >  		if (tsflags & SOF_TIMESTAMPING_BIND_PHC)
+> >  			hwtstamp = ptp_convert_timestamp(&hwtstamp,
+> > -- 
+> > 2.53.0
+> > 
 > 
-
+> 
 
