@@ -1,178 +1,169 @@
-Return-Path: <netdev+bounces-282920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282924-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OH1lDZx582mt4AEAu9opvQ
-	(envelope-from <netdev+bounces-282920-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:47:40 +0200
+	id 6C3xKgt582mt4AEAu9opvQ
+	(envelope-from <netdev+bounces-282924-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:45:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB6CA4A5179
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:47:39 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67C8F4A50CF
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:45:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 66A49309F923
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:42:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 33E1F30312CB
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:45:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2B4E40759D;
-	Thu, 30 Apr 2026 15:42:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84A6143901B;
+	Thu, 30 Apr 2026 15:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pvWITKMm"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="kIVovgty"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88742401498
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 15:42:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777563769; cv=pass; b=q3iirG27Ubt+LjcyzS0qJN6l1FpViEsyszQ6fuQC5rz/vSqaBQptflaOuLOIY6RyMdpadsXCckqg9vYXX1OmjC2Dhs7pg85WKhZ/2N3Fs4e9UvYM8OeJkFlrXH/pZeQjJrB/YTkEtZLtQD+dvLrMZoKnst0Bn6mkO9qYbzLDkf4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777563769; c=relaxed/simple;
-	bh=/tI3nemy+5o5rhw9EKFifIfBFcxIAV5VrVbT9R0+NDo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gMthmaTAu0TNewNkVOaF2sMmUA/56ix5MUN1bXXoxQkJDDfltF4pedGS3+JgB9XuMHOplowmQnM2NzA2Po7CSAyCf84XsH3eNcD0ws2/hwC1yJcCLXwwhGCtqau1cTOirWfJa9dJzPx5Gu8Jh7PKFDRHbF6loATV6I4/INQzsvs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pvWITKMm; arc=pass smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-50e5ad864a6so10149001cf.0
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 08:42:45 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777563764; cv=none;
-        d=google.com; s=arc-20240605;
-        b=baL3hVm9POA+SpDAG+1dHUrGuVQ1dD1pDaqkgYoLADopUvYQcs32X49tjyUbE1EfVF
-         /C52/9ItcwPQL9U+vXqj2pK3lWhF8uZKZEje6EK+M0P4uqvHkT+AiIVEzFASZHMn+m/x
-         p4o0uUfa2JWf3DuXYsPGJg/24biacN5eRq1Kb6g837YmE8GJWVaOgjbBy34e7eBEGKCm
-         p6iTn89di0GegPCWpE8X/56EwGwhlaLJ3WzOziads9dErknsHDKRx8M6KU9hDGPRvZI6
-         74K7p2z0CDeHLbwLtx0shfjcqS4Ij8nb1BuPD8SAm9pBy6V4W1sOIwkrcNdM3L2LViLE
-         xQeg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=YS7pav7IZfZN0Z4brsPr4DcNsJFXH3CeO65Vi6O53oQ=;
-        fh=R2COx0uBBaEQQdqDBAsdWXjsp35rvgMASrLLLw0YWs4=;
-        b=Drl/0E+tuY/esh2cxfbk4iG0yDG8bJHq1d9deFy9u/g7kZpSQsB5Ry7B6cO97SdsAp
-         FrVIlgOEYu5NlULe0s9x7mQd7I2TGMnJ0Hyz8wlsrm3NJjR/hJj1gc5TF1jwXphDaDOo
-         L3t10z6HVeOK27sxhfAO0XvtkSOwLqISM8iL8BMF/V9bVrUEM9z18mYlqg53dzlTbpq8
-         XuONSTzrRfcpv94vF9rNBumdSxzkgBDmrxEYEdP9SfEjwSHpoaNSz6q5bIaElDHiy/Wv
-         dBV+BFDA+Pe0mOqxtU+VLS0jT9aNvCyMlZTDfX07b7r0eE+k1dFj7iJpnzzWoS+0ksnB
-         61hg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5D9438FFA
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 15:44:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777563900; cv=none; b=ht5SwvyuJ9b5zctYZHSy+a9vPyejbAEPzbQqaMW3BHs+2HwBFjpH9qPdaP2uK9SnYiBKTI/QlWBWiaVNhqmlALlnwtS+B3dTXFE5rTpEELughCDfT5PBjbuBcOPNgIEQp2JvH5K+ur5sNY/1aSXoRz1pS9YbVtrDPVo9rhA1Yno=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777563900; c=relaxed/simple;
+	bh=RUE0wRnDSulogZaSv/Phdq6tG4EVlY/e2/sK/FRA2lg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=K+5ko7KOjT7X2k7b7BmMnAefHsnqfUVVTNVvJRCqh9A8Mh5x/VWhZU/B4I4e9HJ2CG1ID5OHBls68IGNNG5oKNge3Gzs50EcQu9Nl0y4OTm/0a/v4EBp86TjS+0Tc+BmXuN797u1Wrd7sFEk5KzdwiQLcbXvVqCbRf/IE1u59v4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=kIVovgty; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-43d7828221bso53082f8f.3
+        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 08:44:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777563764; x=1778168564; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YS7pav7IZfZN0Z4brsPr4DcNsJFXH3CeO65Vi6O53oQ=;
-        b=pvWITKMmiadqzo3snuRE/OBQt56lnsLKBmFSVmOC7rZXwSf3aMEnOOPQ/KNRaxNHKr
-         Xfd5sejKkYu5xT/6FejBoXkZUiZgZQjOFGvV02W03Tp1dkWE5k6tSn+UroD3F74epE8e
-         iF9r7mPVl5ShMpy5Yde97oXf/wt6/X0LN0ZOC+MnASUoYYv7FGmgb+S9Ro8BGpOJk46I
-         d1+IOEuUhv9lb8qKzXGLJy1aMWJAuZPsqcoNs0f4NdqzPezEFbYbBvG4H/+Mqhh4Pazh
-         Qc2/BzffWeD4QVMKE5g8pfVD0cjOiYmNoECnHTwhiExoBdgh774cdKHmccXgejuFbqA1
-         xhdw==
+        d=6wind.com; s=google; t=1777563895; x=1778168695; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=nVdkXGvjipVBSYbCT/dFGYanP9qbDtxjNRTDheTpI08=;
+        b=kIVovgty868XFtEfPeoHV5DB5ZZXqPyEvjft08k376aiPD3ETBi0iiahiRcDAmGjQE
+         07nsaK+WoWWxpfYJgOUZ2BPC+VlYMk3DLAyrfqeVAqFVWbAKcFadIEDqNTjq8iAO3kl7
+         6Wb/uKRGSvGzwnTigQRGQ69RO3oeJavhGaTN/wSrW0ic7t8Dd+W+cqVM28+KDqtOTMez
+         Qj1r39hVVgI1wqPz3Gc4a8Ldq8zkUcsx+6fcfg2nZSC0vTWli3r2tD3amDLZ/pUVEczp
+         /qD/5BLRwNAV/dYiec+0oWCNVfnXmGSMQ7V6tM1yIF7mjvBfFWnbJI3MzZ5/AjC4Mp2G
+         duuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777563764; x=1778168564;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=YS7pav7IZfZN0Z4brsPr4DcNsJFXH3CeO65Vi6O53oQ=;
-        b=Y3vAdXguY4nrWhCdlRCjYvypPO2BUknrK/UfWtbCIXEvWtkwl7o7Q2B9qEAUTf5zGB
-         6mG/H8wUxWCWvu1XeAOmezaY9+DStnq7VM3BHWninsyBXFEir67CTL1TwJ6L0YK7TVyY
-         lJViXpLYG+TBtgeIpotg6wrY2RFtECRNGGipGGJRvMSc8VTiCiuh1K2jxFYx51QYqaUA
-         fuzpw/cc/JVOkW7Vf60qnTlJWcXGgiFYRqzTYTg+kdaf1jGFmVa1I2H3UJFQFM+Xa82J
-         sr1BeHkmjh42KWebwKyCUdjRU2rYW9rVxjozj4JkK+9SD9OsbkyMJ9OBjy6wGiJRSJ0s
-         EGyA==
-X-Gm-Message-State: AOJu0Yy1PfEsUT2wxOfdrb0IZEcHeQHs3COMXUkrxosQztdzFvD3iVW0
-	00imyE10oip6RcevLPnaofe37hqQMS3GdO7PKPwOi4s51sMve3AZnXFhtOcODFCuvwZ5mwqCMXI
-	JhGpJmMN9lLsKzEkUgVJiBnem84nbpIKs0QV5tueJ
-X-Gm-Gg: AeBDieu2DVcyvPmScDJn6q+sXU1vM8T54lerWbZ5x3GRn/2FXKSxDg9BcpjAqBybSjk
-	cw6O7Mquoy2y8gQsgLhO1xYSL+PIb8VZiWgoSPBexM9yQoQgnhrmmn02mdZCd+yrPj9geUmQt2c
-	1jOCoK0hrtjD7cL4Y62AEIKQIX32Nji/yxRn5uCxk5ZuKCx9Lury64XM/EtXANt0HAC6NKKcFc5
-	gg8N9zd+3DfXP1eYd1TR9oYIt80H6Q8SSX3usgBTwtBAM829pb0pms+2uPW2M/TlCOuCawFcJYX
-	OgihkuanE80tKddpxo2AaK3fBLJ9T8m4zM9B1/18pJgXcofGFYkhkoUgiU0LZcW1Qraupthyrtd
-	XqmvzqqxdOg1SZRVwVpM2VMAtKMjtTZ91aq7EIoiAmzSF+eCzpuQ=
-X-Received: by 2002:ac8:5915:0:b0:50d:81c4:4c79 with SMTP id
- d75a77b69052e-5102ada8998mr45823981cf.35.1777563763230; Thu, 30 Apr 2026
- 08:42:43 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1777563895; x=1778168695;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nVdkXGvjipVBSYbCT/dFGYanP9qbDtxjNRTDheTpI08=;
+        b=lm3yQNQf9+Qmfi6a4RDX+2PW5IluJ9mwnc3d+HL+dquKIMumaN85yn2o+DELuIqzwc
+         msEK5d+TXId5lIOXqZwTtwd1JHZQGdt4qNFfX3AA+ijgOD2tDBU9go8SOGOYwpN3Auet
+         XfYkDtTmoOOBbB5dJrgnl/kkTpWitjQGIua5/CZVGvGUFmz0+OxH/Xack6GrtJzJKJ7S
+         EQDModbPd9cetXpxDQs3FQEoLd4IlwIp9aSdg6oIWbS3D3ogC6VWsxbek/wX3jjVlcUc
+         6wzZ5xcJ04VxRHgBK7096P2d/2/87EwicbnluYN0+5NdIcAgCDj+yv8t/gWkqWxIFz0L
+         ZEVA==
+X-Forwarded-Encrypted: i=1; AFNElJ+xwTDT1uT9j1aVcVVpvWJJeKXPVhdc66m9kJ4RavCVmFglc+vaIAElDTVFV8cS0XJz5cXuWDc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXoLed3x13D3xqXRco65B7EK9CNWkDz/1kH8/oCXZxLOWfTznU
+	5oZuTGOFED7jFQbXa+FhAfwEzpVzzALP9XVgO3AodPIP9UnpSEURK8q34bcqY+wE+Bc=
+X-Gm-Gg: AeBDieuKv7FF9GHFzIvyxFCVS8r2VvO24OxLTzeWcND0QnNoeGwXaeg205IrUkTkx0H
+	V5tAYeJNd33SRgu0k1K710nUOsmSp5iGaATZs2rvcd78ys4rICoc+wOfBfpFrzz6YB8o1qWUsw1
+	Qa4xjLTfkALYIjmabWbcSjjHS0y+vRMBhlrRt3xv5wkJ1sCGOS6q4iTWbPzJyjDrl/g/P9rsRt6
+	zw1Fi7wR+WOyBp9mSNCxDF0w9UmXdmhFQ+ilPxL9ml66ApmUFqvTXAIbJ1XkHVAR60wGQJKTWht
+	Y0YtA/yDuWvXBRdHwDxjk2erfCqYARV4sjakgqvBMUY6hsjjqYE5EVZT+tHS/nJWsmXxMXEyplg
+	7TMVCpja8DzEZdCyTSR+bzqvzuZXcYPdnBJxw+grrpu0br2CXn54VYGNxksYRTF+mTavWap/o8i
+	FaRgzvJcneslRq5AbVch0TQAXtsIUrb1GIzQdK2OS6BfJIhWqVzGEvdawWbrjo9z89RhKisFZRl
+	iCFfG48VzAlNFc=
+X-Received: by 2002:a05:6000:2995:20b0:43d:1d3a:b60a with SMTP id ffacd0b85a97d-449403aa04bmr1985624f8f.7.1777563894613;
+        Thu, 30 Apr 2026 08:44:54 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:6a1d:efff:fe52:1959? ([2a01:e0a:b41:c160:6a1d:efff:fe52:1959])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-449c576d0a2sm3615047f8f.31.2026.04.30.08.44.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Apr 2026 08:44:54 -0700 (PDT)
+Message-ID: <3f8d63a3-e39e-48f9-a0d0-517be7c05498@6wind.com>
+Date: Thu, 30 Apr 2026 17:44:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260430152957.194015-1-jhs@mojatatu.com> <20260430152957.194015-3-jhs@mojatatu.com>
-In-Reply-To: <20260430152957.194015-3-jhs@mojatatu.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 30 Apr 2026 08:42:31 -0700
-X-Gm-Features: AVHnY4KP2NlXdbXHzcxnYeCvdy_BmqdXq3xr0rIRVXYtQ61GDJPVTRlE7iYayis
-Message-ID: <CANn89iJxyiuwXOTX2yvKZMwdmKndNABd-4dbMha=TbJqE6WKVQ@mail.gmail.com>
-Subject: Re: [PATCH net 2/3] net/sched: sch_sfb: Replace direct dequeue call
- with peek and qdisc_dequeue_peeked
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, Victor Nogueria <victor@mojatatu.com>, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us, 
-	pctammela@mojatatu.com, ghandatmanas@gmail.com, rakshitawasthi17@gmail.com, 
-	security@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: AB6CA4A5179
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [RFC PATCH net-next 0/3] netns: optionally inherit IPv4 TCP
+ sysctls from old net
+To: nmreadelf <kong414@outlook.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
+ dsahern@kernel.org
+Cc: horms@kernel.org, chia-yu.chang@nokia-bell-labs.com, idosch@nvidia.com,
+ ij@kernel.org, brauner@kernel.org, jack@suse.cz, kuniyu@google.com,
+ jlayton@kernel.org, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lance.yang@linux.dev, leon.hwang@linux.dev
+References: <TY7PR01MB172057C053E8D550485A29A08E0352@TY7PR01MB17205.jpnprd01.prod.outlook.com>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Content-Language: en-US
+Organization: 6WIND
+In-Reply-To: <TY7PR01MB172057C053E8D550485A29A08E0352@TY7PR01MB17205.jpnprd01.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 67C8F4A50CF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282920-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,mojatatu.com,davemloft.net,kernel.org,redhat.com,resnulli.us,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	DKIM_TRACE(0.00)[6wind.com:+];
 	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282924-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	HAS_ORG_HEADER(0.00)[];
+	FREEMAIL_TO(0.00)[outlook.com,davemloft.net,google.com,kernel.org,redhat.com,lwn.net];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	HAS_REPLYTO(0.00)[nicolas.dichtel@6wind.com];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[nicolas.dichtel@6wind.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,mojatatu.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-On Thu, Apr 30, 2026 at 8:30=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com>=
- wrote:
->
-> From: Victor Nogueria <victor@mojatatu.com>
->
-> When sfb has children (eg qfq qdisc) whose peek() callback is
-> qdisc_peek_dequeued(), we could get a kernel panic. When the parent of su=
-ch
-> qdiscs (eg illustrated in patch #3 as tbf) wants to retrieve an skb from
-> its child (sfb in this case), it will do the following:
->  1a. do a peek() - and when sensing there's an skb the child can offer, t=
-hen
->      - the child in this case(sfb) calls its child's (qfq) peek.
->         qfq does the right thing and will return the gso_skb queue packet=
-.
->         Note: if there wasnt a gso_skb entry then qfq will store it there=
-.
->  1b. invoke a dequeue() on the child (sfb). And herein lies the problem.
->      - sfb will call the child's dequeue() which will essentially just
->        try to grab something of qfq's queue.
->
+Le 30/04/2026 à 03:30, nmreadelf a écrit :
+> a new network namespace starts with built-in TCP defaults.
+> In container-heavy setups, operators often tune TCP sysctls in init_net and then
+> need to re-apply the same values for each new netns.
+> 
+> This series adds an opt-in mechanism to initialize per-netns IPv4 TCP sysctl
+> settings from init_net at netns creation time.
+> 
+> Behavior:
+> 
+> Default is unchanged.
+> When net.ipv4.netns_inherit_tcp_sysctls=1, new netns inherit
+> TCP sysctl from old_net.
 
-> The right thing to do in #1b is to grab the skb off gso_skb queue.
-> This patchset fixes that issue by changing #1b to use qdisc_dequeue_peeke=
-d()
-> method instead.
->
-> Fixes: e13e02a3c68d ("net_sched: SFB flow scheduler")
-> Signed-off-by: Victor Nogueria <victor@mojatatu.com>
+There is the same kind of sysctl for net.{ipv4,ipv6}.conf.{all,default}.*:
+net.core.devconf_inherit_init_net.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/admin-guide/sysctl/net.rst#n401
+
+I'm not sure if it's acceptable to use this existing entry to control the TCP
+sysctl.
+At least, putting the new one in the same place + using the same template for
+the name + the same values would be nice. Something like
+net.core.tcp_inherit_init_net.
+
+Regards,
+Nicolas
 
