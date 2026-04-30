@@ -1,138 +1,172 @@
-Return-Path: <netdev+bounces-283004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283005-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QKhoGNDL82mL7AEAu9opvQ
-	(envelope-from <netdev+bounces-283004-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 23:38:24 +0200
+	id 0GXuMIzO82nq7AEAu9opvQ
+	(envelope-from <netdev+bounces-283005-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 23:50:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA9724A84A4
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 23:38:23 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 336B04A8625
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 23:50:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 629A63015E09
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 21:34:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E58D73014533
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 21:50:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F28D38F643;
-	Thu, 30 Apr 2026 21:34:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7519339C65D;
+	Thu, 30 Apr 2026 21:50:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="gY6nMyBy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CIeUjj3n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E512D0617
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 21:34:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FCC039B972
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 21:49:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777584885; cv=none; b=ZQsGtYJV6FpcgLsuOjWKTUvY2tYjj90d1iWUmJlcNWZ9hN9pWgCkQNuy/nNH4I2jB++TeYNHEDg/x/13zEfdhePpwr7KcoljvnoPoC/engpjsZb3kX9CnfGA/PhhAU8c0qYzyC2y8Yokz/fjD8mSHzH8RiUGcX6uGDb4FiKEzZ4=
+	t=1777585800; cv=none; b=CTkUjadUF2mIlCFcSSJSCHzsAfIQG4GWz7FPkacEyDoGe6XdELx/MStOxuwOt1Qco6PO1OF1AhPVGNxNM8CYLLwb2re/iiqsGUhdJfv97AY7LxTWVWuq8NSUpCCOz0eSt5SPAFWZIlsk6wSt5XNl5bbSq9k20qbBdtgyRVsFzoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777584885; c=relaxed/simple;
-	bh=FDX4lEd6jhJ5khd+SbAHvHCyvm8Jz9Gum+WIoJqM/D0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RBqE/0pG9CpOuMbw9gMP61J+RxKhV+Ud71FaJAqE3zHAjDeQijSMj9cW5ybwMDnqGvTeLaRJATZQLcdIpBHT1iFVYPW2soHS3Si21btvejZBL5FBRFZFmbZVfg1v75HPlTtRmKCdDBwjn0nGqC8HRr8kiIr9iMxIGlHLpuTpTZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=gY6nMyBy; arc=none smtp.client-ip=212.77.101.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
-Received: (wp-smtpd smtp.wp.pl 20061 invoked from network); 30 Apr 2026 23:34:40 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1777584880; bh=KOlCJwPpuqnNC5OKwD++DIMZZIis5KRKRMlUvG+zZ1M=;
-          h=From:To:Cc:Subject;
-          b=gY6nMyBypIayXBT7ryfc2auwkxqpyHA2a5h0y93Tw86hRNFaNEyzju78pwWb2s54J
-           ehIBIfC2RnIIqiFm8OWMrtfBeZRV7QPF70tlVIAukmgfo7K7O7k9yq7SJ5ZQe8qFWy
-           d1sAtpfr1W9KKacT/qzjMVSfdVa6zinckFacOTlsw8UGgn5sLzMmqCGOdrFDO7qPyG
-           +YBfpbw3R81RAROilQH8fBuVml0r5LI0Y8R3PtVbswCGDn3E/mNjVKXKGaSIkhyHKJ
-           KlsJb0s4TIdn1tw0JJhQUEdXEKJks3mcXd1UjpGO4wSMjtDDR8MJsICQFL0QR97NQQ
-           5lBJo/lvckViA==
-Received: from 83.24.138.167.ipv4.supernova.orange.pl (HELO abajkowski.lan) (olek2@wp.pl@[83.24.138.167])
-          (envelope-sender <olek2@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with TLS_AES_256_GCM_SHA384 encrypted SMTP
-          for <andrew+netdev@lunn.ch>; 30 Apr 2026 23:34:40 +0200
-From: Aleksander Jan Bajkowski <olek2@wp.pl>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	hayeswang@realtek.com,
-	hsu.chih.kai@realtek.com,
-	kees@kernel.org,
-	mail@birger-koblitz.de,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Aleksander Jan Bajkowski <olek2@wp.pl>,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: [PATCH net-next] net: usb: r8152: add TRENDnet TUC-ET2G v2.0
-Date: Thu, 30 Apr 2026 23:34:33 +0200
-Message-ID: <20260430213435.21821-1-olek2@wp.pl>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1777585800; c=relaxed/simple;
+	bh=85tk5QsJ9uyjCVoVZBAl1BfLHBLBZIfxn5vihRLucTM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=X58TphrFxwykMjdq81hIy5L28Cf6aNiFqX3nV3EEDCM2oUiS2lISGqOjspZR54EpHA/ceBVUYadSB8u/d1EpfK7NzQrshV2BQFKlpg9GIqG4xghg4UZPtoxK77q37Jw/FNf1x6vMW+E3FM8bigmyAjECc/lO4iRQECLdiBdGSHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CIeUjj3n; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4890d945eb4so15215945e9.0
+        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 14:49:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777585795; x=1778190595; darn=vger.kernel.org;
+        h=mime-version:content-transfer-encoding:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=co7aAOg5SysfklO7pgS2h74n35b039IvIzPWl7cCjfc=;
+        b=CIeUjj3nCpEgA/zFx6LaFJLEDQpAnDz5HROpJ/A6b4WxragTW/tGTfNLNIyRyGgRxt
+         2Qp3CJoLJAFXdqJedBoYx1t5v+EfFe1Y/PdJC4Gv56G9wCMETQp9EsaWw7ki5rKvMlbc
+         xHQimS+0hEkPYJM3rQtWc53rHnb81PgBdKKzGle66RwccEHPx1miyurWzvABKJiOBnsc
+         hqfWz/3W/dkJGaB3jT2jGfUudUrLb/RADufOudsSKi5PvnbXxArwptVZisb32Ys5YiWB
+         219U4MIOjyRpgXyouIIFqZftPLOGDA5Ezkc/22SPFQh0xAo5xU6I/PlGm2cAJVoeoVgB
+         TXtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777585795; x=1778190595;
+        h=mime-version:content-transfer-encoding:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=co7aAOg5SysfklO7pgS2h74n35b039IvIzPWl7cCjfc=;
+        b=A7IIW52auBsJn1D8cW58nidTwdc2a9euN1hBq74KotoHnL8mqhSXiLEnWwpNRexar0
+         VKJKnIF9F4+5G/JMGIoLuf2gs80WrwJ6M3jjnaHxsRGf2/A18AaJcCwQX9fTuoUEwAKw
+         oh4qnYkzW06H3ukMFsp1rADvMRjda+uvl1r0dMaASmMxZXY2z0CT1qnuDFvmYlaPQKUn
+         PnxZpUP56cZyHsOd3LT2NmjWUfbFg3Def8uWt78a2UL3QC9e1stRz2jiH/2Vo5Mns25V
+         lMCvmkChDByYQ119gDHG+Z9zCIkOpEpif/bBbL1BJm9psQIWzM4TBPjpdkTOXtpDSNqG
+         HarA==
+X-Forwarded-Encrypted: i=1; AFNElJ+50Y8aAdOUS0gB65V0LZZUWbt1kCxiG3Zxb2l/XvJvZxH5f8NQr8KW3a2bvVefYREJdqGp848=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxhew5E8k/6CbaKmI8C+PJXmJ/3Zm1fla5tXjr9rrKzxpSXxpgk
+	8w1iGxho3ZwVs70tkLC4UQhtHDcwBh76u2cRW7eqWzo0lhpUJt6Kv5E=
+X-Gm-Gg: AeBDiesoDtS6rIJRsTCskh4llaSuYDdOqYxAO0JIK25ckrMFI2EOxS3hzv5ECBocWV7
+	WqnIr+Q9FYYkuDpm+N+LThND37/EbGjcQHeN9OgJKPKtabQZ9DXnAr9T+F7ldnJdI+Jsc/G8w7p
+	4HP5mgqB4vEXu4ZbzmGst2K+uC+uHU2Ea92JXH6uuAY3ozgIlfPontsI0c9qxtFgQKvCJ5S8jek
+	P8xRh+pU4dMaMdlY0KMuUTsC17p0xoaZMkrlD4+oN0AHgzh/xQ0nQHJAJnYmtLdvAE9KbsCUxV6
+	NmzvMguJPRb0o+evyJu15tvvQG6HhScCslZOC/F6g+kl5wTP8v+feg9k16BBaN8BblHSJ8tERnI
+	K1eH5cxP1vh2FN4tIg27lefgFYWTFl1n1gjxqagejq5AmvaHh41z3zr3F1iLzQ8teHzmFw3epaD
+	NhxcIxNMBmQGYxA+ExhC30aUFJh7zX6vzoYtsTWMHZCnE=
+X-Received: by 2002:a05:600c:4f52:b0:489:32b:ac0b with SMTP id 5b1f17b1804b1-48a85e684a8mr63270095e9.6.1777585795291;
+        Thu, 30 Apr 2026 14:49:55 -0700 (PDT)
+Received: from kali (88-173-4-42.subs.proxad.net. [88.173.4.42])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a8eb55be7sm2654625e9.19.2026.04.30.14.49.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Apr 2026 14:49:54 -0700 (PDT)
+From: Tristan Madani <tristmd@gmail.com>
+To: fw@strlen.de
+Cc: pablo@netfilter.org, phil@nwl.cc, netfilter-devel@vger.kernel.org,
+ netdev@vger.kernel.org, stable@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] netfilter: ip_tables: guard
+ ipt_unregister_table_pre_exit against NULL ops
+Date: Thu, 30 Apr 2026 21:49:49 -0000
+Message-ID: <177758578919.118018.11758358602621428742@gmail.com>
+In-Reply-To: <afNYqx41pBCyDnjR@strlen.de>
+References: <20260429175613.1459342-1-tristmd@gmail.com>
+ <177750472539.3004201.15967003942391945312@talencesecurity.com>
+ <177750474339.3016150.13196470704394042910@talencesecurity.com>
+ <afNYqx41pBCyDnjR@strlen.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-WP-MailID: 14b2f4eff858d4c91fa7923b8791bc5b
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0100001 [saKd]                               
-X-Rspamd-Queue-Id: BA9724A84A4
+X-Rspamd-Queue-Id: 336B04A8625
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[wp.pl,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[wp.pl:s=20241105];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283004-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[wp.pl];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[wp.pl:+];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[olek2@wp.pl,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[wp.pl,lunn.ch];
-	NEURAL_HAM(-0.00)[-0.986];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[wp.pl:email,wp.pl:dkim,wp.pl:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:email]
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283005-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tristmd@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-The TRENDnet TUC-ET2G V2.0 is an RTL8156B based 2.5G Ethernet controller.
+Florian Westphal <fw@strlen.de> wrote:
+> Is there a reproducer for this bug?
 
-Add the vendor and product ID values to the driver. This makes Ethernet
-work with the adapter.
+Syzkaller hit it under failslab. The race is between the lazy
+init path in ipt_register_table() and cleanup_net(). The table
+becomes visible via xt_register_table() before ops is assigned,
+so pre_exit can find it with NULL ops.
 
-Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
- drivers/net/usb/r8152.c | 1 +
- 1 file changed, 1 insertion(+)
+Cleaned crash log:
 
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index 7337bf1b7d6a..1ace1d2398c9 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -10138,6 +10138,7 @@ static const struct usb_device_id rtl8152_table[] = {
- 	{ USB_DEVICE(VENDOR_ID_DELL,    0xb097) },
- 	{ USB_DEVICE(VENDOR_ID_ASUS,    0x1976) },
- 	{ USB_DEVICE(VENDOR_ID_TRENDNET, 0xe02b) },
-+	{ USB_DEVICE(VENDOR_ID_TRENDNET, 0xe02c) },
- 	{}
- };
- 
--- 
-2.53.0
+  Oops: general protection fault, probably for non-canonical address 0xdffffc=
+0000000003: 0000 [#1] PREEMPT SMP KASAN NOPTI
+  KASAN: null-ptr-deref in range [0x0000000000000018-0x000000000000001f]
+  CPU: 1 UID: 0 PID: 604 Comm: kworker/u8:19 Tainted: G            E      6.1=
+4.11 #1
+  Workqueue: netns cleanup_net
+  RIP: 0010:nf_unregister_net_hook net/netfilter/core.c:531 [inline]
+  RIP: 0010:nf_unregister_net_hooks+0xbc/0x150 net/netfilter/core.c:613
+  Call Trace:
+   <TASK>
+   ipt_unregister_table_pre_exit+0x8a/0xc0 net/ipv4/netfilter/ip_tables.c:1814
+   iptable_mangle_net_pre_exit+0x21/0x30 net/ipv4/netfilter/iptable_mangle.c:=
+99
+   ops_pre_exit_list net/core/net_namespace.c:162 [inline]
+   cleanup_net+0x4b9/0xbe0 net/core/net_namespace.c:632
+   process_one_work+0x98f/0x1750 kernel/workqueue.c:3238
+   worker_thread+0x679/0xf50 kernel/workqueue.c:3402
+   kthread+0x3f0/0x7e0 kernel/kthread.c:464
+   ret_from_fork+0x60/0x90 arch/x86/kernel/process.c:153
+   </TASK>
 
+> I'm working on a new unreg scheme to avoid rmmod racing with
+> concurrent calls into iptables set/getsockopts.
+
+That sounds like a different issue (rmmod vs sockopt). This one
+is init vs cleanup_net -- the NULL ops window exists regardless
+of the unreg scheme. V2 is a minimal guard for that.
+
+Thanks,
+Tristan
 
