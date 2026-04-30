@@ -1,488 +1,322 @@
-Return-Path: <netdev+bounces-282799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282800-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SEV+CCw882mFygEAu9opvQ
-	(envelope-from <netdev+bounces-282799-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 13:25:32 +0200
+	id kCxvOBA982kGywEAu9opvQ
+	(envelope-from <netdev+bounces-282800-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 13:29:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 976314A20AD
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 13:25:31 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 653904A2245
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 13:29:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D5A0630131D4
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 11:20:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 17A463087C45
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 11:20:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6621D3F0A8C;
-	Thu, 30 Apr 2026 11:17:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 900C73FFAA5;
+	Thu, 30 Apr 2026 11:17:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="BWYg6a3j"
+	dkim=pass (2048-bit key) header.d=solid-run.com header.i=@solid-run.com header.b="Dr40klQI";
+	dkim=pass (2048-bit key) header.d=solid-run.com header.i=@solid-run.com header.b="Dr40klQI"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012063.outbound.protection.outlook.com [40.107.209.63])
+Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11023103.outbound.protection.outlook.com [52.101.72.103])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF983E717F;
-	Thu, 30 Apr 2026 11:17:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.63
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777547863; cv=fail; b=TPTqdQaY7OP6J65HwgE6oORuyG9Now5OpmdOjq3OC7U4ocLmpN3o97LqDDBJoz9EUtdTm2FM6XdeVIPj0ygmiiMdiBct8oJWnWIwgq2Pgx6eHNPCeFM+G2DQkeSUdNKmIRs5rXftRFDToC9Evx9lrM4GpzDcK83nau2MR6F4C2c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777547863; c=relaxed/simple;
-	bh=LM5BVsDAqtfujOtXZ3OT1UDjgSlh4yPBZpj0mX/BHMM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WM8VqzkAHDVa+49EQpoFC/LM5futHES1iPcZyYXjIpioG0oodmgt7CzKo+IyUUeSSupo4Yz9V+NxeGLnO6mV8RZvnI9Vq4x+IjYSy+YE3VNHXdvc0MpJMLum+f80wEk3lcZFO/sCpNGiz1fhSIbUBJGBGFNu5Qc8bfZV4EEXWSE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=BWYg6a3j; arc=fail smtp.client-ip=40.107.209.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EEEC3FE640;
+	Thu, 30 Apr 2026 11:17:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.103
+ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777547876; cv=fail; b=C9SrSF8NyraQr2SqkF1vzBPjxmWcKRoIzA1ph+/Jm+Bt3pquV6gevl98/y3Z+DaL7AdRXqMEkbUhZ3mEodNcgVDc4aQh4t1YpwLwNzSZw8cH0USuAU669ik04MGvqbckkyXSnIOwYs8dFIf9yb9XspebGEmDZ6ntmHUEzkfCgxI=
+ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777547876; c=relaxed/simple;
+	bh=eqtTyZi7axFq4BRkihtrQdjuk6Ocf90arkERygX30AY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=QOS3OQM+kXxcR5EU/Y+33hp2fpR9x2AsiljEGZJnKXk4BBdUYoYNyLHiwLGHQs/3hZimwzb4wd+m69z22xWrhYyzvX31iEsqok6zy1C3zQ56BhCTFYE0bxI7u5PoNjMxie2ZjVVQPqFWuyeaCQvoxgeON6RgOxZiqrhpYT2sdXk=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=solid-run.com; spf=pass smtp.mailfrom=solid-run.com; dkim=pass (2048-bit key) header.d=solid-run.com header.i=@solid-run.com header.b=Dr40klQI; dkim=pass (2048-bit key) header.d=solid-run.com header.i=@solid-run.com header.b=Dr40klQI; arc=fail smtp.client-ip=52.101.72.103
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=solid-run.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=solid-run.com
+ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
+ b=OG56vtALCmQYPbVesvrpdGgcq9+Jb8T1g+hWC/EcID6c78uSZCME12iI5HMCgWYmMA8WHXETsCa/nk1oFE4K4kG3qa7MBGG7zr7OfZsO69mwygdWREZVj6WlDODxBnWH4fmMGJSGSJDBkb3YWyOSqdZcGGDzizQCra+b9ep3gaGaGTv4BGRLArj/k7Bj5tDsGclSNivg0+hoxNW0WZgM1r0IAnEMRBX1k7qq+FXYRAE1kwg2OIVGbTPDDlr9NfcqUoYTIyRB4zMKF/uSSAXFeEkGEyt4iSudjrhXbOVtY/5zmYZOhuBNWYeQdL+HsqWEE8afshL+1eFS1ugr2bnxQA==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eqtTyZi7axFq4BRkihtrQdjuk6Ocf90arkERygX30AY=;
+ b=xeDEH0V0fwRIsqkXtaquh52T709VqR5/yF/KtmGd+HfPDNT6yK2c659dSFM2/KglfzXPHENCa1r9ViWSdXSa2j/V1L/M+6kdJIFCfNjEalgR+fcZ1kjIQVWeLP6j2I+LSmprsyPNK7GrjZCo1+ZWibXXEpX1o02HsqIQa5Zj7D6kJbtLWUr94VD/zmupToJi3MgIeamrlaaT/c2uhSXpzDbMziiwQDlFWXZLb9epmEr6ng71JPRB4L4x2sZNCFWkOvcFcJebJ6iUy5QxQ8BB3lYuaUOka7UKNxLZvwWQrp0hjANyUOdmlXASvmKQmZ+aG9UdhigPtPUddv8pLvFxyg==
+ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=fail (sender ip is
+ 52.17.62.50) smtp.rcpttodomain=davemloft.net smtp.mailfrom=solid-run.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none
+ header.from=solid-run.com; dkim=pass (signature was verified)
+ header.d=solid-run.com; arc=pass (0 oda=1 ltdi=1
+ spf=[1,1,smtp.mailfrom=solid-run.com] dkim=[1,1,header.d=solid-run.com]
+ dmarc=[1,1,header.from=solid-run.com])
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=solid-run.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eqtTyZi7axFq4BRkihtrQdjuk6Ocf90arkERygX30AY=;
+ b=Dr40klQIJyX5QZ6p5/H1q+HyYBc1cCDvV5TMctKOlU/qSTB2GYnCEm/gM3s0qKyamXvWC7+w40a7oJQ2I4Yn3AtpOSITUp2476LAsW7xJr0tIbuJ2Vy1BpvqPql0yDOgK3/bIhgRgL7zO/EdlfHqSNaHTU612eVVY9E6MtfgLI6S2V6kzhkOR0/LQW9vJhumRemeR/tfXeIXvh5YNGCyGFE+69MegOW9fbMPTKa3u/8+tQMPy56yHjvCFESGvpULzTvxsiYgv9NhB6f6OQpi5z5Ua7NB+qnEUhgQpmw354YjYxarVHgsLTXD20NQw6+W/YLN8phh/gTx7BGCbkdAWQ==
+Received: from AS4P190CA0043.EURP190.PROD.OUTLOOK.COM (2603:10a6:20b:5d1::14)
+ by DB8PR04MB6793.eurprd04.prod.outlook.com (2603:10a6:10:11a::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.20; Thu, 30 Apr
+ 2026 11:17:47 +0000
+Received: from AMS0EPF000001AA.eurprd05.prod.outlook.com
+ (2603:10a6:20b:5d1:cafe::34) by AS4P190CA0043.outlook.office365.com
+ (2603:10a6:20b:5d1::14) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9846.30 via Frontend Transport; Thu,
+ 30 Apr 2026 11:17:47 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 52.17.62.50)
+ smtp.mailfrom=solid-run.com; dkim=pass (signature was verified)
+ header.d=solid-run.com;dmarc=pass action=none header.from=solid-run.com;
+Received-SPF: Fail (protection.outlook.com: domain of solid-run.com does not
+ designate 52.17.62.50 as permitted sender) receiver=protection.outlook.com;
+ client-ip=52.17.62.50; helo=eu-dlp.cloud-sec-av.com;
+Received: from eu-dlp.cloud-sec-av.com (52.17.62.50) by
+ AMS0EPF000001AA.mail.protection.outlook.com (10.167.16.150) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9846.18
+ via Frontend Transport; Thu, 30 Apr 2026 11:17:45 +0000
+Received: from emails-9989122-12-mt-prod-cp-eu-2.checkpointcloudsec.com (ip-10-20-5-243.eu-west-1.compute.internal [10.20.5.243])
+	by mta-outgoing-dlp-291-mt-prod-cp-eu-2.checkpointcloudsec.com (Postfix) with ESMTPS id 508D0806FA;
+	Thu, 30 Apr 2026 11:17:45 +0000 (UTC)
+X-Mailbox-Line: From b'josua@solid-run.com' Thu Apr 30 11:17:38 2026
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=iyndqoW9ngIu7ZX0V2KveEpqfI5AjTB9JAQc2z8E+BZqnyu4MjuGsdDew6NvyHSRXuwapeQEU70Wvonq6l3f0bRjAScHzEZ8rvrb/wTcd68KT0fG/gJ/7wSDMqqXPo1s/PMnbIBUj11DsBt8p6nyjEPm1eMw0OXdbBOCAwERavUUZpWHWQtM/jnsncBiT2wyLLlg4QlP9V4NLWbIshOpVdNKGtE0Hq03AbBqiDfUN5Ka2IG3wJkDZbCD/2gap5devcZ6DkYIwh1o3LXLgPeLP1TR1A/Tzi/jCJOh7dfk2dX0oTsTlVZrJj+e9/VNemtVxYsTwUcKlSoPOB0hqu/Hhw==
+ b=rF/W3cgFLRIQZIILM7w8lhEg3X217mWutxeJZcU74XUcQb6WR2GCAPen0oRDPIJ/pSbCQKChTCoJiO7pKSHrAh8sMS4yZr6tBhQyI8KchZzObBNXeB8vznqDuualR2e/ffgGRCBEPytA5EDCJVBegs1SUgJtTMFLGkhy4FvzJUTeb+gDg0c3I5UfizKtLJwN05muyj5m3PhWkrM8PuOttZkR7bLiEJdj8nEhLL5kFnDY4NBFgHvsj/tuTCC3WogLdlwrt32OiQQT/zVWKfGwLwBWYtmqZARCQT403H/FK6INYUsAwS+CiL3j86JLJuAmsU8H4J1Tj5UldzjsddAHcA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nRgxgyv5nll+HnAKrl7rA6TjK1HbJdnxpOZOlYaG/eo=;
- b=FRQHNOI7BbSXuGOC3aVf9vtalwE30YhPTxiYpEWyfAE5G7fjEQLaJBm0VWZOo5PChkUgEJBpL57BefVnT1ohU2MTfra1lz6yOcDgwZHT3QET908z9hsVn2nPwAjOR4Pdehs2Q68Lr6oxap41pTpq2RE0vX5QKTvmqhLMbqxmfEnlGzizRmdaL2dpaUXUQiyDiJUdWJhdu5+1bUJwjNlbAEP4bVdtC7/RwzhyTKq+V7w3NEd2CPRFZB9V8q4+drxXcCuEaiJR4YO/pJuo1FKZJDP1XQM9Irmkv9OsByfvYFxtKDsd/esqOPdCDPi8+1fI0HLWvtg+W4pACW5lISpkfg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.23.194) smtp.rcpttodomain=linux.dev smtp.mailfrom=ti.com; dmarc=pass
- (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
- (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ bh=eqtTyZi7axFq4BRkihtrQdjuk6Ocf90arkERygX30AY=;
+ b=PEEgRy1p3TFok7ccQbaqe/iWa+zID8GmztdgpUDjuPauaKIx2NAd5mZGOQrd/cmzI8hkgxDt1eBw1fSvOqI8euGvzmwFGqkkaO3phSImDKQL7pbGRuCdOFXV3CLsq//e9gLQH4qdy0WbT08Q1u0McOpsGzO54J+XlCCVHyLwRAfBQnpNWsh6Xe1EW4uRG4o/fFK6xj6cPc2gLmdPepOhREHYu6z2KsoLZfc9ZcwGTS1Wj7yLa61057QHwGpovLnIM61PV7XOokXJDJPWWpui9tA2kYwkQHBaV31FggkUouDQcrgJizsM5+15JLXaXWR0sx1G8mggPwNnTh9W4SEecw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=solid-run.com; dmarc=pass action=none
+ header.from=solid-run.com; dkim=pass header.d=solid-run.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=solid-run.com;
+ s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nRgxgyv5nll+HnAKrl7rA6TjK1HbJdnxpOZOlYaG/eo=;
- b=BWYg6a3jpsfpnwb70GvuOgvfY64Nb4lXqgrI91FyQNL2HCiYCcQq/TV+s0tGjU2mYkCoiArlK2Ecze2td3Q+DzoDZH6a9GsPeIomtv7eP8xH62shVF/XPHZZQn644YigxI1TwgfjW1587rpe0hmkwLM9wVZ/7BJcSMZ2dBOD9iU=
-Received: from BYAPR08CA0069.namprd08.prod.outlook.com (2603:10b6:a03:117::46)
- by MN6PR10MB7542.namprd10.prod.outlook.com (2603:10b6:208:46d::15) with
- Microsoft SMTP Server (version=TLS1_2,
+ bh=eqtTyZi7axFq4BRkihtrQdjuk6Ocf90arkERygX30AY=;
+ b=Dr40klQIJyX5QZ6p5/H1q+HyYBc1cCDvV5TMctKOlU/qSTB2GYnCEm/gM3s0qKyamXvWC7+w40a7oJQ2I4Yn3AtpOSITUp2476LAsW7xJr0tIbuJ2Vy1BpvqPql0yDOgK3/bIhgRgL7zO/EdlfHqSNaHTU612eVVY9E6MtfgLI6S2V6kzhkOR0/LQW9vJhumRemeR/tfXeIXvh5YNGCyGFE+69MegOW9fbMPTKa3u/8+tQMPy56yHjvCFESGvpULzTvxsiYgv9NhB6f6OQpi5z5Ua7NB+qnEUhgQpmw354YjYxarVHgsLTXD20NQw6+W/YLN8phh/gTx7BGCbkdAWQ==
+Received: from GVXPR04MB12057.eurprd04.prod.outlook.com
+ (2603:10a6:150:313::24) by PA4PR04MB9391.eurprd04.prod.outlook.com
+ (2603:10a6:102:2aa::17) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.20; Thu, 30 Apr
- 2026 11:17:38 +0000
-Received: from SJ1PEPF00001CE3.namprd05.prod.outlook.com
- (2603:10b6:a03:117:cafe::bf) by BYAPR08CA0069.outlook.office365.com
- (2603:10b6:a03:117::46) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9846.30 via Frontend Transport; Thu,
- 30 Apr 2026 11:17:37 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.194)
- smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
- action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.23.194 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.23.194; helo=lewvzet200.ext.ti.com; pr=C
-Received: from lewvzet200.ext.ti.com (198.47.23.194) by
- SJ1PEPF00001CE3.mail.protection.outlook.com (10.167.242.11) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9846.18 via Frontend Transport; Thu, 30 Apr 2026 11:17:37 +0000
-Received: from DLEE205.ent.ti.com (157.170.170.85) by lewvzet200.ext.ti.com
- (10.4.14.103) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 30 Apr
- 2026 06:17:35 -0500
-Received: from DLEE207.ent.ti.com (157.170.170.95) by DLEE205.ent.ti.com
- (157.170.170.85) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 30 Apr
- 2026 06:17:35 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE207.ent.ti.com
- (157.170.170.95) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Thu, 30 Apr 2026 06:17:35 -0500
-Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 63UBHZTu1000506;
-	Thu, 30 Apr 2026 06:17:35 -0500
-Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 63UBHYIk031199;
-	Thu, 30 Apr 2026 06:17:35 -0500
-From: Meghana Malladi <m-malladi@ti.com>
-To: <vadim.fedorenko@linux.dev>, <haokexin@gmail.com>,
-	<jacob.e.keller@intel.com>, <horms@kernel.org>, <m-malladi@ti.com>,
-	<arnd@arndb.de>, <parvathi@couthit.com>, <afd@ti.com>,
-	<basharath@couthit.com>, <vladimir.oltean@nxp.com>, <rogerq@kernel.org>,
-	<danishanwar@ti.com>, <pabeni@redhat.com>, <kuba@kernel.org>,
-	<edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>
-CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <srk@ti.com>, Vignesh Raghavendra
-	<vigneshr@ti.com>
-Subject: [PATCH net-next v5 2/2] net: ti: icssg-prueth: Add ethtool ops for Frame Preemption MAC Merge
-Date: Thu, 30 Apr 2026 16:47:23 +0530
-Message-ID: <20260430111723.497113-3-m-malladi@ti.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260430111723.497113-1-m-malladi@ti.com>
-References: <20260430111723.497113-1-m-malladi@ti.com>
+ 2026 11:17:36 +0000
+Received: from GVXPR04MB12057.eurprd04.prod.outlook.com
+ ([fe80::14f1:a127:2988:de5b]) by GVXPR04MB12057.eurprd04.prod.outlook.com
+ ([fe80::14f1:a127:2988:de5b%2]) with mapi id 15.20.9870.020; Thu, 30 Apr 2026
+ 11:17:36 +0000
+From: Josua Mayer <josua@solid-run.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Frank Li
+	<Frank.Li@nxp.com>, Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel
+ Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>, Vladimir
+ Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Yazan Shhady <yazan.shhady@solid-run.com>, Mikhail
+ Anikin <mikhail.anikin@solid-run.com>, Alexander Dahl <ada@thorsis.com>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, Vladimir Oltean
+	<vladimir.oltean@nxp.com>, Conor Dooley <conor.dooley@microchip.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 3/3] arm64: dts: imx8dxl: Add SolidRun SoM and
+ HummingBoard
+Thread-Topic: [PATCH v2 3/3] arm64: dts: imx8dxl: Add SolidRun SoM and
+ HummingBoard
+Thread-Index: AQHcyB1El0M7TqUrrEi06prfauJkr7XWrZoAgCDoD4A=
+Date: Thu, 30 Apr 2026 11:17:36 +0000
+Message-ID: <bd2e73c5-2e61-4ea1-ab3b-42a6573b31f8@solid-run.com>
+References: <20260409-imx8dxl-sr-som-v2-0-83ff20629ba0@solid-run.com>
+ <20260409-imx8dxl-sr-som-v2-3-83ff20629ba0@solid-run.com>
+ <8efbafe3-0a8a-4005-960c-e8fe62cee719@lunn.ch>
+In-Reply-To: <8efbafe3-0a8a-4005-960c-e8fe62cee719@lunn.ch>
+Accept-Language: de-DE, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=solid-run.com;
+x-ms-traffictypediagnostic:
+	GVXPR04MB12057:EE_|PA4PR04MB9391:EE_|AMS0EPF000001AA:EE_|DB8PR04MB6793:EE_
+X-MS-Office365-Filtering-Correlation-Id: b49b4027-27b2-478c-77b0-08dea6aa1ad0
+x-cloud-sec-av-info: solidrun,office365_emails,sent,inline
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted:
+ BCL:0;ARA:13230040|366016|7416014|1800799024|376014|22082099003|56012099003|18002099003|38070700021;
+X-Microsoft-Antispam-Message-Info-Original:
+ kwOHh2ES9/r4vvtEP1l97NDXz76VZZCjeFucTH4dMuALzn/wwwVSBvzAmBn0WOlXKTuwz5eXjfYZty18xd6Kg8soi4M7nbSwGaRiD3bF32gnm+W8fkkz5u+zzkL4PYW7Xfs2yIxJ09oCOTp47WoO4DUuCGNhcDOlfiRDEQTC++rC7iNPJCETpAM46c3LvGl5+PmrtaWYtbvGsMbYPxS1feSnbdWwma7vWlIc3K9l3h/PCn/W81meliVQJNs/nHm8acTVORPzPEa/4ueaseYo6ql2AdCttY3yRkKQRHmjLwYiibL+0A4cyMGuhXYfsAJznVYmTIi8wMh1UHDEFZXvx53lJvWfqvKjPFDm/vRg/zn6nYWyiua+6phAtRs1Kh5kvgOPkdDo1hl++eIABEjY2JMuvJZ6DzNv1ViAW4MboaAIwNZl+U9/eDLRm3F/syNTfL+TcG3+wh1nWrwtIXxArPVOiT5ErDQyDQj4HJQxNMtn5vrM4wX59puN0Vom1y8JO93oT0DDuKUsA96kaLTtIEUEa8nzwCCw3vFge5Ltql8NAY6QUjyRfmF0g7EWMtzZ0Xzy0DopSNdrj5Y/Ks2aXZSX/aGR8Z+71ndTSIVDRpGe+RM6UzQNrrVafP1QgCmNhcB1HGbWE0DKU4oKYWnPczTMyWFK1uB27NO+L95HbLXTMKwr9HVaGaNx8GC5coNb6/5/Wxa/gYN9I1hp2X/Gkp4ZG+SOHoMpx33p1fAcZZhnJiAO73tZrp9fNTgpgg6LtwXqEv359jQznfGoEy/aTSCJrSZxrL19BBJx4vP2Slw=
+X-Forefront-Antispam-Report-Untrusted:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GVXPR04MB12057.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014)(22082099003)(56012099003)(18002099003)(38070700021);DIR:OUT;SFP:1102;
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A9146AD6B2CF9D4B9A4002F390EEB222@eurprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-Exchange-RoutingPolicyChecked:
+ PuLsGFZ9reHz5eyVa1PUJSSrNjpaoC/q8pV++uhGhrE/CLMJ3FFMUj9LkrkToFNfehQdOG3RBtyUG9jDbmoPLcGspar7ivMfQvXh6i/6arhzY5kHymjY4UMdP8jqauX0/pVY4sfWDG35wJ0yAf5t79rmN2X0iXTb4YR+dFNSOEPMFLrNjqBd11rjAu83BzUOmCgKDWJA1oDyTw4ZN8irauNVwwOZ8zXYphpDJxCNgGFKAfTNXfzHKUT/ppqd7v1b75o27ZjiR3z+5FHgYtMRvNx0kxHd+tFuuugYcyLO45aa3xWyA1yMMMsX0vT24y+Ay2MDXjuoICVrMR+Ex7AiPA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB9391
+X-CLOUD-SEC-AV-INT-Relay: sent<mta-outgoing-dlp-mt-prod-cp-eu-2-6.checkpointcloudsec.com>
+X-CLOUD-SEC-AV-UUID: da73c6a5a8674d58b33638a1fafcbbb4:solidrun,office365_emails,sent,inline:799b5ba2f54d29e9ffdb0c663810b71a
 X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ AMS0EPF000001AA.eurprd05.prod.outlook.com
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE3:EE_|MN6PR10MB7542:EE_
-X-MS-Office365-Filtering-Correlation-Id: b2c03c0f-6666-4b7b-da4d-08dea6aa15bc
-X-LD-Processed: e5b49634-450b-4709-8abb-1e2b19b982b7,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+	51c5e303-ecac-49d9-c6d9-08dea6aa152d
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|7416014|376014|1800799024|36860700016|921020|56012099003|22082099003|18002099003;
+	BCL:0;ARA:13230040|35042699022|1800799024|36860700016|82310400026|14060799003|376014|7416014|18002099003|56012099003|22082099003;
 X-Microsoft-Antispam-Message-Info:
-	wpji/iw8ZbKNZ8XzjETsXoenby5XkRQbozU/cJ8mW+lGg2anIJp1ss2xn59/HVEnGT6PiunG/3aV7eKmlGsWWQl/5lWz47msR3+Cy2G69iIBjps6QrGIrxl3sh1uEv64cxtvBazijwLcqjXVkch6O1u5vn997PMdUBDrHkhQPsiWJbvztE3tKLgWNiC+U1opb1myM1CGJ3+MyQ/Ul0mlxJ5zwrXHAkTI9yfPQpZ3D4dBtkObGQGuIacbQx6xlfeO4a3TK0dzcJwfWC2oHawgxudLs6pLY6dktbV6Kfk4G6fhfcBOquq70c0yErgk7WauLKTtLGQqkLrFouP03h2NX3l3uwF58zP1JjhE6innvOnqqKAzwVKVT0WHF98C0wrHOkDEw1EmZ6ocRV+uCGVw/u+T8+QeRJbfG0zX89O7yS/qICaxuQdphklKFGm0lbafbKMGVTD/I/1GbB6dZr8pi6VvR7sgdd6vRSC2BebXphPYqhUSWusJbSp3flI5H2RjKr5zH95fPizXzp/zeau/p171DC6h1GGxReqPBiSmUdDo2UivRHv2gk937wq2z8f9YxjXnDft3agYhgrklh11OQbxyYf+wMBewmlzvmvkxZ65E5U0Dc3W0jxZrwIPVqbPEZ76sZTFsm34iEYJGYyNWU411XdbCPdfNAnPNQ/niHJa9Kr25yFI64j9heyuZ3f5hQA4FqewvhlHFo2QMjZQvwr8iW458EOcxGltdjDy369ss/0wkQuESkAaOoWTazpV0bt39o143brJEFo6wMZQ6uwy8JeqQo7N1D8TwhqFKPq3uQ/2vV0nsB9B7mgt+HWv
+	COxV99e3F7mZjm23M/IuVrnRPaaOmNGirrRXRbCNOIHw0N5V5CX13jAIDsMTkwiTM/NOlW9sw0naAa07tycEdR+3K4oAN6GKuEE9ybKetwOav2JZTtcPQpE+qD9Mn1AlA5gFaLiYW+qhnMBbv6w0Pap89tPex80WZ2IL7lP/jUrqZWVq0tAtXnH0ww4c9AjMd7gd0P1qPqdHUCgTFS7QKI9mOP1viqjGmVgrcACYBm81W6oGczWFwhtRbmMIuwefhnzR7Iu4zGAlFclUsvSlUNp10CVvAaSmvXNZxNToyLPTRaIhFwd/SLRm+6k13AUyYqvYU6ic9XL4XDVhW/i/sadBKfVpVASmoDGRjJLuAZt5tw0r50K4ZvDz2nUDBQapCQJJl7/ofxs+UJfU6qQ6chkqTLXUTG3xraQkUHpQ52r0juT6WqVwCAKsSlrGySWswSscmP/M7Vt+80OL7IgcjGXhAjyxmAKuSqWHvzCMOrlQ2+jvOFXoZPNJw250HXSAUZsfCI/AIIC+fVOCZhtUpe0s37coRQJ2qsiS0DMp9oKLTYYOULHU4ey356qD1xGDJGLv/jOykWmsLF5UgwdRCEH7H2bnnnLybbrCnW0e3oStAFEbSOBNISj3lzYnEbAQWrLcm25cMlhd7+gWhvodoT5PWqbdeFCeSgxY4caGqyw4DmOD9GLC2ixzuVUN6l+xtT16ORaTSy4n8dgA/UMCSO+nRzJClkAIKPMydh80fxYQWSOk9TFE6bYO0K+2wanF3FKjxGTEFzrsFWBx4CwTsA==
 X-Forefront-Antispam-Report:
-	CIP:198.47.23.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet200.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(7416014)(376014)(1800799024)(36860700016)(921020)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+	CIP:52.17.62.50;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:eu-dlp.cloud-sec-av.com;PTR:eu-dlp.cloud-sec-av.com;CAT:NONE;SFS:(13230040)(35042699022)(1800799024)(36860700016)(82310400026)(14060799003)(376014)(7416014)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	ZkpmaQ7YgdobTRiY8ls3pokbSebXp9vfuniWA4AP8hr+SKB29UBos4MK+YTDCIOrK1PvbXuWQZ3IwRnTpPId33OFiGRJej6cwtzWdDp0TuZTxTuzSziw51cJ/s6+2ehOgFhdc4hQ8+sIp1mrnRCOoK3DaZVz4kndRZnRsTx6b0xdEqHj1c6fVPvITRCPStAgO89+3Gapk7J6EFxc+F+9Y2GvvpybEN9LMrTeMUR0nnXySdkZ99o5+5i5LA4u5YHvBVg0LZt6e5HKPfZTG9stSNj1wdp0OV2rFhKYe5+EAWZdDmxqxCSnpTLYsmcjCxzj6rLI5ulQhmn9zsgEn53Nv3R+z1U4MagyJVdZdUEpCqd2LLX8S+Vfats0Z3IQEs0X3gA5KEfAfjbD985XWn1r+7u7+ZsauavPwWWsKAFjU+FtcOmTs2N98KFwFRkO/kdG
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2026 11:17:37.1220
+	0VbpNxDJEE3U/cUInpADJ6Fmh+LdqrPRzW0tHR95j2QcDnTGk8IJsvUVYUxq4OMjqfxRlC8Ku7HcoSe/MlD6U3u46jynEeZU1knIk3j3ZDMTLzRGfKKFKQrwgi3Quf5twskOF3bL52aex6T2dXLJBGGJ5tJjzdwdQtfP9Fdv416ECUAeowRjGNgb9INqE3Vp4sZguyWUo9UPsEyqvjogODoLR+wGHWGPEx8nz/h/Oz3G1z/mALNaV4iQI/YKB/Mb/Tve+vvsqtu9fpGzfgPWK2RXmZEuRdeJL5NgwZ0UJ/Esjt8Gql3pRLNPRqFEEmlGtgqCcmucYEyXWpLX4ZDZaRye6CKhO5cDXNDg0oejo59Vt8xTM2Y67kG4hkljLpHtCVzGgza+JIJrn7WVPrGRFtmiykogbcIybrsw/Zg9yiDU4k5KV5H3a1MG1ASm+QdG
+X-OriginatorOrg: solid-run.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2026 11:17:45.6791
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b2c03c0f-6666-4b7b-da4d-08dea6aa15bc
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.194];Helo=[lewvzet200.ext.ti.com]
+X-MS-Exchange-CrossTenant-Network-Message-Id: b49b4027-27b2-478c-77b0-08dea6aa1ad0
+X-MS-Exchange-CrossTenant-Id: a4a8aaf3-fd27-4e27-add2-604707ce5b82
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=a4a8aaf3-fd27-4e27-add2-604707ce5b82;Ip=[52.17.62.50];Helo=[eu-dlp.cloud-sec-av.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CE3.namprd05.prod.outlook.com
+	AMS0EPF000001AA.eurprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR10MB7542
-X-Rspamd-Queue-Id: 976314A20AD
-X-Rspamd-Action: no action
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR04MB6793
+X-Rspamd-Queue-Id: 653904A2245
+X-Rspamd-Action: add header
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [6.94 / 15.00];
+	SEM_URIBL(3.50)[0.0.0.0:email];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	BAD_REP_POLICIES(0.10)[];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[linux.dev,gmail.com,intel.com,kernel.org,ti.com,arndb.de,couthit.com,nxp.com,redhat.com,google.com,davemloft.net,lunn.ch];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-282800-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282799-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DKIM_TRACE(0.00)[ti.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[m-malladi@ti.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
+	GREYLIST(0.00)[pass,meta];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	R_DKIM_ALLOW(0.00)[solid-run.com:s=selector1];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,nxp.com,pengutronix.de,gmail.com,davemloft.net,google.com,redhat.com,solid-run.com,thorsis.com,vger.kernel.org,lists.linux.dev,lists.infradead.org,microchip.com];
+	DKIM_TRACE(0.00)[solid-run.com:+];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,ti.com:email,ti.com:dkim,ti.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.995];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[11]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.509];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[josua@solid-run.com,netdev@vger.kernel.org];
+	DMARC_POLICY_ALLOW(0.00)[solid-run.com,reject];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_SPF_ALLOW(0.00)[+ip6:2600:3c09:e001:a7::/64:c];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Spam: Yes
 
-From: MD Danish Anwar <danishanwar@ti.com>
-
-Add driver support for viewing and changing the MAC Merge sublayer
-parameters via ethtool ops: .set_mm(), .get_mm() and .get_mm_stats().
-
-The minimum size of non-final mPacket fragments supported by the firmware
-without leading errors is 64 Bytes (including FCS). Verify time bounded to
-1-128 ms per 802.3-2018 clause 30.14.1.6. Add a check to ensure
-user passed tx_min_frag_size argument via ethtool, honors this.
-Add pa stats registers to check statistics for preemption, which can be
-dumped using ethtool ops.
-
-Fix emac_get_stat_by_name() to return u64 instead of int and return 0 on
-error instead of -EINVAL. This prevents invalid stat lookups from corrupting
-output stats with signed error codes cast to u64. Error conditions are still
-logged via netdev_err().
-
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
-Signed-off-by: Meghana Malladi <m-malladi@ti.com>
----
-
-Changes from v4(v5-v4):
-- Fix the naming conventiion for icssg_qos_frag_size_min_to_add()
-- Change the logic to include FCS while validating and accepting
-  values from the userspace
-All the above changes are addressed as part of Vladimir Oltean <vladimir.oltean@nxp.com>
-comments for this patch
-- Handle all verify_status values in emac_get_mm() based on what
-  all states are supported by the firmware.
-This change is addressed based on AI-generated review and highlighted by
-Simon Horman <horms@kernel.org>
-
- drivers/net/ethernet/ti/icssg/icssg_ethtool.c | 107 +++++++++++++++++-
- drivers/net/ethernet/ti/icssg/icssg_prueth.h  |   7 +-
- drivers/net/ethernet/ti/icssg/icssg_qos.h     |  38 +++++++
- drivers/net/ethernet/ti/icssg/icssg_stats.c   |   5 +-
- drivers/net/ethernet/ti/icssg/icssg_stats.h   |   5 +
- .../net/ethernet/ti/icssg/icssg_switch_map.h  |   5 +
- 6 files changed, 160 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_ethtool.c b/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
-index b715af21d23ac..6a08c40adde54 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
-@@ -6,7 +6,6 @@
-  */
- 
- #include "icssg_prueth.h"
--#include "icssg_stats.h"
- 
- static void emac_get_drvinfo(struct net_device *ndev,
- 			     struct ethtool_drvinfo *info)
-@@ -294,6 +293,109 @@ static int emac_set_per_queue_coalesce(struct net_device *ndev, u32 queue,
- 	return 0;
- }
- 
-+static int emac_get_mm(struct net_device *ndev, struct ethtool_mm_state *state)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+	struct prueth_qos_iet *iet = &emac->qos.iet;
-+	enum icssg_ietfpe_verify_states verify_status;
-+
-+	if (emac->is_sr1)
-+		return -EOPNOTSUPP;
-+
-+	mutex_lock(&iet->fpe_lock);
-+	state->tx_enabled = iet->fpe_enabled;
-+	state->tx_min_frag_size = iet->tx_min_frag_size - ETH_FCS_LEN;
-+	state->tx_active = iet->fpe_active;
-+	state->verify_enabled = iet->mac_verify_configure;
-+	state->verify_time = iet->verify_time_ms;
-+	verify_status = iet->verify_status;
-+	mutex_unlock(&iet->fpe_lock);
-+
-+	state->pmac_enabled = true;
-+	/* 64Bytes is the minimum fragment size supported
-+	 * by the firmware. <64B leads to min frame errors
-+	 */
-+	state->rx_min_frag_size = 64;
-+
-+	switch (verify_status) {
-+	case ICSSG_IETFPE_STATE_DISABLED:
-+		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
-+		break;
-+	case ICSSG_IETFPE_STATE_INITIAL:
-+		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_INITIAL;
-+		break;
-+	case ICSSG_IETFPE_STATE_VERIFYING:
-+		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_VERIFYING;
-+		break;
-+	case ICSSG_IETFPE_STATE_SUCCEEDED:
-+		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED;
-+		break;
-+	case ICSSG_IETFPE_STATE_FAILED:
-+		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_FAILED;
-+		break;
-+	default:
-+		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_UNKNOWN;
-+		break;
-+	}
-+
-+	/* 802.3-2018 clause 30.14.1.6, says that the aMACMergeVerifyTime
-+	 * variable has a range between 1 and 128 ms inclusive. Limit to that.
-+	 */
-+	state->max_verify_time = ETHTOOL_MM_MAX_VERIFY_TIME_MS;
-+
-+	return 0;
-+}
-+
-+static int emac_set_mm(struct net_device *ndev, struct ethtool_mm_cfg *cfg,
-+		       struct netlink_ext_ack *extack)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+	struct prueth_qos_iet *iet = &emac->qos.iet;
-+	int err;
-+
-+	if (emac->is_sr1)
-+		return -EOPNOTSUPP;
-+
-+	if (!cfg->pmac_enabled)
-+		NL_SET_ERR_MSG_MOD(extack, "preemptible MAC is always enabled");
-+
-+	err = icssg_qos_validate_tx_min_frag_size(cfg->tx_min_frag_size, extack);
-+	if (err)
-+		return err;
-+
-+	err = icssg_qos_validate_verify_time(cfg->verify_time, extack);
-+	if (err)
-+		return err;
-+
-+	mutex_lock(&iet->fpe_lock);
-+	iet->verify_time_ms = cfg->verify_time;
-+	iet->tx_min_frag_size = cfg->tx_min_frag_size + ETH_FCS_LEN;
-+	iet->fpe_enabled = cfg->tx_enabled;
-+	iet->mac_verify_configure = cfg->verify_enabled;
-+	icssg_config_ietfpe(emac, cfg->tx_enabled);
-+	mutex_unlock(&iet->fpe_lock);
-+
-+	return err;
-+}
-+
-+static void emac_get_mm_stats(struct net_device *ndev,
-+			      struct ethtool_mm_stats *s)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+
-+	if (emac->is_sr1)
-+		return;
-+
-+	if (!emac->prueth->pa_stats)
-+		return;
-+
-+	s->MACMergeFrameAssOkCount = emac_get_stat_by_name(emac, "FW_PREEMPT_ASSEMBLY_OK");
-+	s->MACMergeFrameAssErrorCount = emac_get_stat_by_name(emac, "FW_PREEMPT_ASSEMBLY_ERR");
-+	s->MACMergeFragCountRx = emac_get_stat_by_name(emac, "FW_PREEMPT_FRAG_CNT_RX");
-+	s->MACMergeFragCountTx = emac_get_stat_by_name(emac, "FW_PREEMPT_FRAG_CNT_TX");
-+	s->MACMergeFrameSmdErrorCount = emac_get_stat_by_name(emac, "FW_PREEMPT_BAD_FRAG");
-+}
-+
- const struct ethtool_ops icssg_ethtool_ops = {
- 	.get_drvinfo = emac_get_drvinfo,
- 	.get_msglevel = emac_get_msglevel,
-@@ -317,5 +419,8 @@ const struct ethtool_ops icssg_ethtool_ops = {
- 	.set_eee = emac_set_eee,
- 	.nway_reset = emac_nway_reset,
- 	.get_rmon_stats = emac_get_rmon_stats,
-+	.get_mm = emac_get_mm,
-+	.set_mm = emac_set_mm,
-+	.get_mm_stats = emac_get_mm_stats,
- };
- EXPORT_SYMBOL_GPL(icssg_ethtool_ops);
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index 85f7017d2c8e7..61320c252bec2 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -45,6 +45,7 @@
- #include "icss_iep.h"
- #include "icssg_switch_map.h"
- #include "icssg_qos.h"
-+#include "icssg_stats.h"
- 
- #define PRUETH_MAX_MTU          (2000 - ETH_HLEN - ETH_FCS_LEN)
- #define PRUETH_MIN_PKT_SIZE     (VLAN_ETH_ZLEN)
-@@ -58,8 +59,8 @@
- 
- #define ICSSG_MAX_RFLOWS	8	/* per slice */
- 
--#define ICSSG_NUM_PA_STATS	32
--#define ICSSG_NUM_MIIG_STATS	60
-+#define ICSSG_NUM_PA_STATS	ARRAY_SIZE(icssg_all_pa_stats)
-+#define ICSSG_NUM_MIIG_STATS	ARRAY_SIZE(icssg_all_miig_stats)
- /* Number of ICSSG related stats */
- #define ICSSG_NUM_STATS (ICSSG_NUM_MIIG_STATS + ICSSG_NUM_PA_STATS)
- #define ICSSG_NUM_STANDARD_STATS 31
-@@ -460,7 +461,7 @@ int emac_fdb_flow_id_updated(struct prueth_emac *emac);
- 
- void icssg_stats_work_handler(struct work_struct *work);
- void emac_update_hardware_stats(struct prueth_emac *emac);
--int emac_get_stat_by_name(struct prueth_emac *emac, char *stat_name);
-+u64 emac_get_stat_by_name(struct prueth_emac *emac, char *stat_name);
- 
- /* Common functions */
- void prueth_cleanup_rx_chns(struct prueth_emac *emac,
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_qos.h b/drivers/net/ethernet/ti/icssg/icssg_qos.h
-index 083f248c557de..104910516d966 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_qos.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_qos.h
-@@ -65,4 +65,42 @@ void icssg_qos_link_state_update(struct net_device *ndev);
- int icssg_qos_ndo_setup_tc(struct net_device *ndev, enum tc_setup_type type,
- 			   void *type_data);
- void icssg_config_ietfpe(struct prueth_emac *emac, bool enable);
-+static inline int icssg_qos_validate_tx_min_frag_size(u32 min_frag_size,
-+						      struct netlink_ext_ack *extack)
-+{
-+	/* Firmware takes min_frag_size including FCS length */
-+	min_frag_size += ETH_FCS_LEN;
-+
-+	/* The minimum size of the non-final mPacket supported
-+	 * by the firmware is 64B and multiples of 64B.
-+	 */
-+	if (min_frag_size < 64) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "tx_min_frag_size must be at least 64 bytes");
-+		return -EINVAL;
-+	}
-+
-+	if (min_frag_size % (ETH_ZLEN + ETH_FCS_LEN)) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "tx_min_frag_size must be a multiple of 64 bytes");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static inline int icssg_qos_validate_verify_time(u32 verify_time_ms,
-+						 struct netlink_ext_ack *extack)
-+{
-+	/* 802.3-2018 clause 30.14.1.6: aMACMergeVerifyTime must be
-+	 * between 1 and 128 ms inclusive
-+	 */
-+	if (verify_time_ms < 1 || verify_time_ms > 128) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "verify_time must be between 1 and 128 ms");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
- #endif /* __NET_TI_ICSSG_QOS_H */
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_stats.c b/drivers/net/ethernet/ti/icssg/icssg_stats.c
-index 7159baa0155cf..950d58d8183eb 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_stats.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_stats.c
-@@ -6,7 +6,6 @@
-  */
- 
- #include "icssg_prueth.h"
--#include "icssg_stats.h"
- #include <linux/regmap.h>
- 
- #define ICSSG_TX_PACKET_OFFSET	0xA0
-@@ -74,7 +73,7 @@ void icssg_stats_work_handler(struct work_struct *work)
- }
- EXPORT_SYMBOL_GPL(icssg_stats_work_handler);
- 
--int emac_get_stat_by_name(struct prueth_emac *emac, char *stat_name)
-+u64 emac_get_stat_by_name(struct prueth_emac *emac, char *stat_name)
- {
- 	int i;
- 
-@@ -91,5 +90,5 @@ int emac_get_stat_by_name(struct prueth_emac *emac, char *stat_name)
- 	}
- 
- 	netdev_err(emac->ndev, "Invalid stats %s\n", stat_name);
--	return -EINVAL;
-+	return 0;
- }
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_stats.h b/drivers/net/ethernet/ti/icssg/icssg_stats.h
-index 5ec0b38e0c67d..f35ae1b4f8460 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_stats.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_stats.h
-@@ -189,6 +189,11 @@ static const struct icssg_pa_stats icssg_all_pa_stats[] = {
- 	ICSSG_PA_STATS(FW_INF_DROP_PRIOTAGGED),
- 	ICSSG_PA_STATS(FW_INF_DROP_NOTAG),
- 	ICSSG_PA_STATS(FW_INF_DROP_NOTMEMBER),
-+	ICSSG_PA_STATS(FW_PREEMPT_BAD_FRAG),
-+	ICSSG_PA_STATS(FW_PREEMPT_ASSEMBLY_ERR),
-+	ICSSG_PA_STATS(FW_PREEMPT_FRAG_CNT_TX),
-+	ICSSG_PA_STATS(FW_PREEMPT_ASSEMBLY_OK),
-+	ICSSG_PA_STATS(FW_PREEMPT_FRAG_CNT_RX),
- 	ICSSG_PA_STATS(FW_RX_EOF_SHORT_FRMERR),
- 	ICSSG_PA_STATS(FW_RX_B0_DROP_EARLY_EOF),
- 	ICSSG_PA_STATS(FW_TX_JUMBO_FRM_CUTOFF),
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_switch_map.h b/drivers/net/ethernet/ti/icssg/icssg_switch_map.h
-index 7e053b8af3ece..855fd4ed0b3f6 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_switch_map.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_switch_map.h
-@@ -256,6 +256,11 @@
- #define FW_INF_DROP_PRIOTAGGED		0x0148
- #define FW_INF_DROP_NOTAG		0x0150
- #define FW_INF_DROP_NOTMEMBER		0x0158
-+#define FW_PREEMPT_BAD_FRAG		0x0160
-+#define FW_PREEMPT_ASSEMBLY_ERR		0x0168
-+#define FW_PREEMPT_FRAG_CNT_TX		0x0170
-+#define FW_PREEMPT_ASSEMBLY_OK		0x0178
-+#define FW_PREEMPT_FRAG_CNT_RX		0x0180
- #define FW_RX_EOF_SHORT_FRMERR		0x0188
- #define FW_RX_B0_DROP_EARLY_EOF		0x0190
- #define FW_TX_JUMBO_FRM_CUTOFF		0x0198
--- 
-2.43.0
-
+QW0gMDkuMDQuMjYgdW0gMTQ6NDYgc2NocmllYiBBbmRyZXcgTHVubjoNCj4+ICsmZXFvcyB7DQo+
+PiArCS8qIGRlbGF5cyBhcmUgYWRkZWQgYnkgY29ubmVjdGVkIGV0aGVybmV0LXN3aXRjaCBjcHUg
+cG9ydCAqLw0KPj4gKwlwaHktbW9kZSA9ICJyZ21paSI7DQo+PiArCXBpbmN0cmwtMCA9IDwmZXFv
+c19waW5zPjsNCj4+ICsJcGluY3RybC1uYW1lcyA9ICJkZWZhdWx0IjsNCj4+ICsJc3RhdHVzID0g
+Im9rYXkiOw0KPj4gKw0KPj4gKwlmaXhlZC1saW5rIHsNCj4+ICsJCWZ1bGwtZHVwbGV4Ow0KPj4g
+KwkJc3BlZWQgPSA8MTAwMD47DQo+PiArCX07DQo+PiArfTsNCj4NCj4+ICsJZXRoZXJuZXQtc3dp
+dGNoQDAgew0KPj4gKwkJY29tcGF0aWJsZSA9ICJueHAsc2phMTExMGEiOw0KPj4gKwkJcmVnID0g
+PDA+Ow0KPj4gKwkJcmVzZXQtZ3Bpb3MgPSA8JmxzaW9fZ3BpbzQgMyBHUElPX0FDVElWRV9MT1c+
+Ow0KPj4gKwkJc3BpLW1heC1mcmVxdWVuY3kgPSA8NDAwMDAwMD47DQo+PiArDQo+PiArCQlldGhl
+cm5ldC1wb3J0cyB7DQo+PiArCQkJI2FkZHJlc3MtY2VsbHMgPSA8MT47DQo+PiArCQkJI3NpemUt
+Y2VsbHMgPSA8MD47DQo+PiArDQo+PiArCQkJLyogMTAwQmFzZS1UWCBvbiBjb25uZWN0b3IgSjI2
+ICovDQo+PiArCQkJcG9ydEAxIHsNCj4+ICsJCQkJcmVnID0gPDB4MT47DQo+PiArCQkJCWxhYmVs
+ID0gImxhbjEiOw0KPj4gKwkJCQlwaHktaGFuZGxlID0gPCZzd2l0Y2hfcG9ydDFfYmFzZV90eF9w
+aHk+Ow0KPj4gKwkJCQlwaHktbW9kZSA9ICJpbnRlcm5hbCI7DQo+PiArCQkJCXN0YXR1cyA9ICJv
+a2F5IjsNCmRyb3BwaW5nIHVubmVjZXNzYXJ5IHN0YXR1cyBva2F5IGZvciB2Mw0KPj4gKwkJCX07
+DQo+PiArDQo+PiArCQkJLyogQ1BVICovDQo+PiArCQkJcG9ydEAyIHsNCj4+ICsJCQkJcmVnID0g
+PDB4Mj47DQo+PiArCQkJCWV0aGVybmV0ID0gPCZlcW9zPjsNCj4+ICsJCQkJbGFiZWwgPSAiY3B1
+IjsNCj4+ICsJCQkJcGh5LW1vZGUgPSAicmdtaWktaWQiOw0KPj4gKwkJCQlyeC1pbnRlcm5hbC1k
+ZWxheS1wcyA9IDwyMDAwPjsNCj4+ICsJCQkJdHgtaW50ZXJuYWwtZGVsYXktcHMgPSA8MjAwMD47
+DQo+PiArCQkJCXN0YXR1cyA9ICJva2F5IjsNCmRyb3BwaW5nIHVubmVjZXNzYXJ5IHN0YXR1cyBv
+a2F5IGZvciB2Mw0KPj4gKw0KPj4gKwkJCQlmaXhlZC1saW5rIHsNCj4+ICsJCQkJCWZ1bGwtZHVw
+bGV4Ow0KPj4gKwkJCQkJc3BlZWQgPSA8MTAwMD47DQo+PiArCQkJCX07DQo+PiArCQkJfTsNCj4+
+ICsNCj4+ICsJCQkvKiBzZ21paSBvbiBhZGRvbiBib2FyZCBjb25uZWN0b3IgSjIxICovDQo+PiAr
+CQkJcG9ydEAzIHsNCj4+ICsJCQkJcmVnID0gPDB4Mz47DQo+PiArCQkJCWxhYmVsID0gImxhbjMi
+Ow0KPj4gKwkJCQlzdGF0dXMgPSAiZGlzYWJsZWQiOw0KPj4gKwkJCX07DQo+PiArDQo+PiArCQkJ
+Lyogc2dtaWkgb24gYWRkb24gYm9hcmQgY29ubmVjdG9yIEoyMSAqLw0KPj4gKwkJCXBvcnRANCB7
+DQo+PiArCQkJCXJlZyA9IDwweDQ+Ow0KPj4gKwkJCQlsYWJlbCA9ICJsYW40IjsNCj4+ICsJCQkJ
+c3RhdHVzID0gImRpc2FibGVkIjsNCj4+ICsJCQl9Ow0KPj4gKw0KPj4gKwkJCS8qIDEwMGJhc2Ut
+dDEgb24gYWRkb24gYm9hcmQgY29ubmVjdG9yIEoyMSAqLw0KPj4gKwkJCXBvcnRANSB7DQo+PiAr
+CQkJCXJlZyA9IDwweDU+Ow0KPj4gKwkJCQlsYWJlbCA9ICJ0cngxIjsNCj4+ICsJCQkJcGh5LWhh
+bmRsZSA9IDwmc3dpdGNoX3BvcnQ1X2Jhc2VfdDFfcGh5PjsNCj4+ICsJCQkJcGh5LW1vZGUgPSAi
+aW50ZXJuYWwiOw0KPj4gKwkJCQlzdGF0dXMgPSAiZGlzYWJsZWQiOw0KPj4gKwkJCX07DQo+PiAr
+DQo+PiArCQkJLyogMTAwYmFzZS10MSBvbiBhZGRvbiBib2FyZCBjb25uZWN0b3IgSjIxICovDQo+
+PiArCQkJcG9ydEA2IHsNCj4+ICsJCQkJcmVnID0gPDB4Nj47DQo+PiArCQkJCWxhYmVsID0gInRy
+eDIiOw0KPj4gKwkJCQlwaHktaGFuZGxlID0gPCZzd2l0Y2hfcG9ydDZfYmFzZV90MV9waHk+Ow0K
+Pj4gKwkJCQlwaHktbW9kZSA9ICJpbnRlcm5hbCI7DQo+PiArCQkJCXN0YXR1cyA9ICJkaXNhYmxl
+ZCI7DQo+PiArCQkJfTsNCj4+ICsNCj4+ICsJCQkvKiAxMDBiYXNlLXQxIG9uIGFkZG9uIGJvYXJk
+IGNvbm5lY3RvciBKMjEgKi8NCj4+ICsJCQlwb3J0QDcgew0KPj4gKwkJCQlyZWcgPSA8MHg3PjsN
+Cj4+ICsJCQkJbGFiZWwgPSAidHJ4MyI7DQo+PiArCQkJCXBoeS1oYW5kbGUgPSA8JnN3aXRjaF9w
+b3J0N19iYXNlX3QxX3BoeT47DQo+PiArCQkJCXBoeS1tb2RlID0gImludGVybmFsIjsNCj4+ICsJ
+CQkJc3RhdHVzID0gImRpc2FibGVkIjsNCj4+ICsJCQl9Ow0KPj4gKw0KPj4gKwkJCS8qIDEwMGJh
+c2UtdDEgb24gYWRkb24gYm9hcmQgY29ubmVjdG9yIEoyMSAqLw0KPj4gKwkJCXBvcnRAOCB7DQo+
+PiArCQkJCXJlZyA9IDwweDg+Ow0KPj4gKwkJCQlsYWJlbCA9ICJ0cng0IjsNCj4+ICsJCQkJcGh5
+LWhhbmRsZSA9IDwmc3dpdGNoX3BvcnQ4X2Jhc2VfdDFfcGh5PjsNCj4+ICsJCQkJcGh5LW1vZGUg
+PSAiaW50ZXJuYWwiOw0KPj4gKwkJCQlzdGF0dXMgPSAiZGlzYWJsZWQiOw0KPj4gKwkJCX07DQo+
+PiArDQo+PiArCQkJLyogMTAwYmFzZS10MSBvbiBhZGRvbiBib2FyZCBjb25uZWN0b3IgSjIxICov
+DQo+PiArCQkJcG9ydEA5IHsNCj4+ICsJCQkJcmVnID0gPDB4OT47DQo+PiArCQkJCWxhYmVsID0g
+InRyeDUiOw0KPj4gKwkJCQlwaHktaGFuZGxlID0gPCZzd2l0Y2hfcG9ydDlfYmFzZV90MV9waHk+
+Ow0KPj4gKwkJCQlwaHktbW9kZSA9ICJpbnRlcm5hbCI7DQo+PiArCQkJCXN0YXR1cyA9ICJkaXNh
+YmxlZCI7DQo+PiArCQkJfTsNCj4+ICsNCj4+ICsJCQkvKiAxMDBCYXNlLVQxIG9uIGNvbm5lY3Rv
+ciBKMjYgKi8NCj4+ICsJCQlwb3J0QGEgew0KPj4gKwkJCQlyZWcgPSA8MHhhPjsNCj4+ICsJCQkJ
+bGFiZWwgPSAidHJ4NiI7DQo+PiArCQkJCXBoeS1oYW5kbGUgPSA8JnN3aXRjaF9wb3J0MTBfYmFz
+ZV90MV9waHk+Ow0KPj4gKwkJCQlwaHktbW9kZSA9ICJpbnRlcm5hbCI7DQo+PiArCQkJCXN0YXR1
+cyA9ICJva2F5IjsNCmRyb3BwaW5nIHVubmVjZXNzYXJ5IHN0YXR1cyBva2F5IGZvciB2Mw0KPj4g
+KwkJCX07DQo+PiArCQl9Ow0KPj4gKw0KPj4gKwkJbWRpb3Mgew0KPj4gKwkJCSNhZGRyZXNzLWNl
+bGxzID0gPDE+Ow0KPj4gKwkJCSNzaXplLWNlbGxzID0gPDA+Ow0KPj4gKw0KPj4gKwkJCW1kaW9A
+MCB7DQo+PiArCQkJCWNvbXBhdGlibGUgPSAibnhwLHNqYTExMTAtYmFzZS10MS1tZGlvIjsNCj4+
+ICsJCQkJcmVnID0gPDA+Ow0KPj4gKwkJCQkjYWRkcmVzcy1jZWxscyA9IDwxPjsNCj4+ICsJCQkJ
+I3NpemUtY2VsbHMgPSA8MD47DQo+PiArDQo+PiArCQkJCS8qIDEwMGJhc2UtdDEgb24gYWRkb24g
+Ym9hcmQgY29ubmVjdG9yIEoyMSAqLw0KPj4gKwkJCQlzd2l0Y2hfcG9ydDVfYmFzZV90MV9waHk6
+IGV0aGVybmV0LXBoeUAxIHsNCj4+ICsJCQkJCWNvbXBhdGlibGUgPSAiZXRoZXJuZXQtcGh5LWll
+ZWU4MDIuMy1jNDUiOw0KPj4gKwkJCQkJcmVnID0gPDB4MT47DQo+PiArCQkJCQlzdGF0dXMgPSAi
+ZGlzYWJsZWQiOw0KPj4gKwkJCQl9Ow0KPj4gKw0KPj4gKwkJCQkvKiAxMDBiYXNlLXQxIG9uIGFk
+ZG9uIGJvYXJkIGNvbm5lY3RvciBKMjEgKi8NCj4+ICsJCQkJc3dpdGNoX3BvcnQ2X2Jhc2VfdDFf
+cGh5OiBldGhlcm5ldC1waHlAMiB7DQo+PiArCQkJCQljb21wYXRpYmxlID0gImV0aGVybmV0LXBo
+eS1pZWVlODAyLjMtYzQ1IjsNCj4+ICsJCQkJCXJlZyA9IDwweDI+Ow0KPj4gKwkJCQkJc3RhdHVz
+ID0gImRpc2FibGVkIjsNCj4+ICsJCQkJfTsNCj4+ICsNCj4+ICsJCQkJLyogMTAwYmFzZS10MSBv
+biBhZGRvbiBib2FyZCBjb25uZWN0b3IgSjIxICovDQo+PiArCQkJCXN3aXRjaF9wb3J0N19iYXNl
+X3QxX3BoeTogZXRoZXJuZXQtcGh5QDMgew0KPj4gKwkJCQkJY29tcGF0aWJsZSA9ICJldGhlcm5l
+dC1waHktaWVlZTgwMi4zLWM0NSI7DQo+PiArCQkJCQlyZWcgPSA8MHgzPjsNCj4+ICsJCQkJCXN0
+YXR1cyA9ICJkaXNhYmxlZCI7DQo+PiArCQkJCX07DQo+PiArDQo+PiArCQkJCS8qIDEwMGJhc2Ut
+dDEgb24gYWRkb24gYm9hcmQgY29ubmVjdG9yIEoyMSAqLw0KPj4gKwkJCQlzd2l0Y2hfcG9ydDhf
+YmFzZV90MV9waHk6IGV0aGVybmV0LXBoeUA0IHsNCj4+ICsJCQkJCWNvbXBhdGlibGUgPSAiZXRo
+ZXJuZXQtcGh5LWllZWU4MDIuMy1jNDUiOw0KPj4gKwkJCQkJcmVnID0gPDB4ND47DQo+PiArCQkJ
+CQlzdGF0dXMgPSAiZGlzYWJsZWQiOw0KPj4gKwkJCQl9Ow0KPj4gKw0KPj4gKwkJCQkvKiAxMDBi
+YXNlLXQxIG9uIGFkZG9uIGJvYXJkIGNvbm5lY3RvciBKMjEgKi8NCj4+ICsJCQkJc3dpdGNoX3Bv
+cnQ5X2Jhc2VfdDFfcGh5OiBldGhlcm5ldC1waHlANSB7DQo+PiArCQkJCQljb21wYXRpYmxlID0g
+ImV0aGVybmV0LXBoeS1pZWVlODAyLjMtYzQ1IjsNCj4+ICsJCQkJCXJlZyA9IDwweDU+Ow0KPj4g
+KwkJCQkJc3RhdHVzID0gImRpc2FibGVkIjsNCj4+ICsJCQkJfTsNCj4+ICsNCj4+ICsJCQkJLyog
+MTAwQmFzZS1UMSBvbiBjb25uZWN0b3IgSjI2ICovDQo+PiArCQkJCXN3aXRjaF9wb3J0MTBfYmFz
+ZV90MV9waHk6IGV0aGVybmV0LXBoeUA2IHsNCj4+ICsJCQkJCWNvbXBhdGlibGUgPSAiZXRoZXJu
+ZXQtcGh5LWllZWU4MDIuMy1jNDUiOw0KPj4gKwkJCQkJcmVnID0gPDB4Nj47DQo+PiArCQkJCX07
+DQo+PiArCQkJfTsNCj4+ICsNCj4+ICsJCQltZGlvQDEgew0KPj4gKwkJCQljb21wYXRpYmxlID0g
+Im54cCxzamExMTEwLWJhc2UtdHgtbWRpbyI7DQo+PiArCQkJCXJlZyA9IDwxPjsNCj4+ICsJCQkJ
+I2FkZHJlc3MtY2VsbHMgPSA8MT47DQo+PiArCQkJCSNzaXplLWNlbGxzID0gPDA+Ow0KPj4gKw0K
+Pj4gKwkJCQkvKiAxMDBCYXNlLVRYIG9uIGNvbm5lY3RvciBKMjYgKi8NCj4+ICsJCQkJc3dpdGNo
+X3BvcnQxX2Jhc2VfdHhfcGh5OiBldGhlcm5ldC1waHlAMSB7DQo+PiArCQkJCQlyZWcgPSA8MHgx
+PjsNCj4+ICsJCQkJfTsNCj4+ICsJCQl9Ow0KPiBGb3IgdGhlc2Ugbm9kZXMgb25seToNCj4NCj4g
+UmV2aWV3ZWQtYnk6IEFuZHJldyBMdW5uIDxhbmRyZXdAbHVubi5jaD4NCj4NCj4gICAgIEFuZHJl
+dw0KDQpUaGFua3MhDQoNCkkgZG9uJ3Qga25vdyBob3cgdG8ga2VlcCB0aGlzIHBhcnRpYWwgcmV2
+aWV3IGZvciB2Mywgc28gSSB3aWxsIHNlbmQgaXQgd2l0aG91dC4=
 
