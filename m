@@ -1,260 +1,152 @@
-Return-Path: <netdev+bounces-282876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282877-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8D2ME9th82le2AEAu9opvQ
-	(envelope-from <netdev+bounces-282876-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 16:06:19 +0200
+	id GIGRNAhi82le2AEAu9opvQ
+	(envelope-from <netdev+bounces-282877-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 16:07:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E63784A3D7C
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 16:06:18 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7346D4A3D9A
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 16:07:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id ED230300A331
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 14:06:17 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B2044300AB33
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 14:07:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3CA441325C;
-	Thu, 30 Apr 2026 14:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71BDA42668E;
+	Thu, 30 Apr 2026 14:07:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QrtZRd3w"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XRqQ7vFu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA0140B6DE;
-	Thu, 30 Apr 2026 14:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F6AB40B6DE;
+	Thu, 30 Apr 2026 14:06:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777557975; cv=none; b=My3Vr8wbt+5SKxeWj9swhKEaV0kFTy8BWE1nJmMBcbl6jLiyzEu7UNvubxYJYa53oU5FBmewPEQ/PIZTDKFJ60X0GPaIPmquxhYbrdPwgPOxOSTOTtUInn4EW45PJegOF5nlKV3fBXJ5m4ceBJ0qN817gELx7TRGHQ812mF7l64=
+	t=1777558022; cv=none; b=WGpuXwADjws1jn3Ei5zkcELXESzpDd6/sTNr9XOn4yQ8FjFrasXubtSFZ/eYZO1cdhmyyDD9yhePK0C2n8xY4ErtyIudw8iJW7s54bW0gnHqLFUEr5IPO/IwlQXl6cOqfgv5HpxSs6ktaTEer7jzKF/UXKkKAKMVNqFCP6XI94A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777557975; c=relaxed/simple;
-	bh=XWEsNmRSdX9WgGb2UIXr7POsHjtPCiMQMtr3RMrDXq4=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=kH/Dwl9+mhxuw/nzxjMd+k3ozs4lXD5qeifiPvQyEUDmRa8ifL0M6YleqLbNXyBfdoX4Y34C/mZ+i3mEVi0JIzhMAgB/CzZ+e78j0vr7K7WztPsYwuh/Cz3uFgUSzCFqC7Ad037XHRLaFm0UMbejD58iZs7WRQde/V6m5CfFWzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QrtZRd3w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C7A3C4AF0B;
-	Thu, 30 Apr 2026 14:06:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777557975;
-	bh=XWEsNmRSdX9WgGb2UIXr7POsHjtPCiMQMtr3RMrDXq4=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=QrtZRd3wwgksGExz22wW7QleFHv32WWInSgz0SivBKsSzr7Y8n9oqQ3PnBjVpFAYe
-	 9KDbj5L1INyrRjjpc24ihzw0WQfSXMVvYeiQpchLeQLYiNGfSSeDTknaYZBK/ZXh3U
-	 hgctSEcPjDuh33a1ODhJqsao0JybJc5MMHws8lUPxl4bLbC6a7f1CyiO4/yE2UELYg
-	 hMQ2IICEmGHrAiYchVEhdlEkVgy2ZUZ4uew5v/IWbvicBkkH3GBarbPdbEVtD4bMr4
-	 t10N0wOtKKNX+r65KBv+s/xfQk7Yb/2kdLGGPwctUp6xqVwv7feqnfbebx++2Y/h3e
-	 sVUlJgl2T01Sg==
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 75802F40075;
-	Thu, 30 Apr 2026 10:06:13 -0400 (EDT)
-Received: from phl-imap-15 ([10.202.2.104])
-  by phl-compute-10.internal (MEProxy); Thu, 30 Apr 2026 10:06:13 -0400
-X-ME-Sender: <xms:1WHzaeUt0L1el-qeqEQsKWzDwHLWbbja6ThrdMhome6XwrLzEjyfyA>
-    <xme:1WHzaVYcipu8zCcrGCd-9svv8gIf-wGCDyMoRxBmbyJKbnH_jYJcyQ19gAEbclNVx
-    eeNY7XQgvpM-n2txWo11eOnm3gI4n4p3vX_b7-KffdXdiq9ndFTtwQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdekjeehudcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefoggffhffvvefkjghfufgtgfesthhqredtredtjeenucfhrhhomhepfdevhhhutghk
-    ucfnvghvvghrfdcuoegtvghlsehkvghrnhgvlhdrohhrgheqnecuggftrfgrthhtvghrnh
-    epgffhgeeutdeiieevuefgvedtjeefudekvefggefguefgtefgledtteeuleelleetnecu
-    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheptghhuhgtkh
-    hlvghvvghrodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieefgeelleel
-    heelqdefvdelkeeggedvfedqtggvlheppehkvghrnhgvlhdrohhrghesfhgrshhtmhgrih
-    hlrdgtohhmpdhnsggprhgtphhtthhopedvvddpmhhouggvpehsmhhtphhouhhtpdhrtghp
-    thhtohepnhgvihhlsegsrhhofihnrdhnrghmvgdprhgtphhtthhopegurghvvghmsegurg
-    hvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepjhhirghnghhshhgrnhhlrghisehgmhgr
-    ihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprh
-    gtphhtthhopegrnhhnrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepfhhrvgguvghr
-    ihgtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdroh
-    hrghdprhgtphhtthhopehjlhgrhihtohhnsehkvghrnhgvlhdrohhrghdprhgtphhtthho
-    pehkuhgsrgeskhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:1WHzaVHw46XBLyJmpi7AXeNAra7Yt58uCIoEhNxjP154LP2Ja1wScA>
-    <xmx:1WHzaazfDlDIun2DNyTQsOcXEcvWBbhUyT5eUfZR6mmphi1lkuUvSg>
-    <xmx:1WHzackHmKK6p-PtjuxV2p_IvdKrZTpYatOUAIHoSQPLKPvGkYNgag>
-    <xmx:1WHzaZA9PmPUklF2zRWQ4gcmWxAUO5DiAf20jQfpPCtmFXnzKjq0tA>
-    <xmx:1WHzafIOR8V2GBv0OB-XtkgDUnde7FeBRHJAbFWhdepSO-UXGYISD-Ac>
-Feedback-ID: ifa6e4810:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 4C62078006C; Thu, 30 Apr 2026 10:06:13 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1777558022; c=relaxed/simple;
+	bh=tU+0UxDytiVL+yVVVe0/BtP3SVKh0FV94j6KFD2OP/0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nk8KlQ4cPRgdV4ZXZkzrIdGlS0gvl86JHxLutoYHsSXrpLYNpkHSV7CwyTh71Q4tfl2Sq5mpiKtmXozPnYWIDYqvZE3tUqjLqCdoLznu4Jz/p5Qg0X9kEyxasYRYAcH04Vy4bho+armN1SaOqTFHR81JQeHC27UXFY5hUHrvx88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XRqQ7vFu; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=odfisOKLb+4yvBy7AJ37qHBwXC8cw5zHJIG7y4mEJ/0=; b=XR
+	qQ7vFu0LANTE4mm9ix8Cgztidd9/ZquCyUK52yVFPuQkm5lA+iProb2QG98KcUuj8BRdUyali4w+T
+	zG9zkQXaIC2wUnl+2rx33fzfb3xFiypXO6j5ybYInFDr+7zSh6p2Ise5RUbF307L3xY6+bXOi7Sma
+	TbT+nrZPd4U9qIU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wIS2J-000gvp-5P; Thu, 30 Apr 2026 16:06:39 +0200
+Date: Thu, 30 Apr 2026 16:06:39 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Josua Mayer <josua@solid-run.com>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+	Frank Li <Frank.Li@nxp.com>, Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yazan Shhady <yazan.shhady@solid-run.com>,
+	Mikhail Anikin <mikhail.anikin@solid-run.com>,
+	Alexander Dahl <ada@thorsis.com>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 3/3] arm64: dts: imx8dxl: Add SolidRun SoM and
+ HummingBoard
+Message-ID: <d0c9d2c9-3743-4ee6-a2d7-692118903141@lunn.ch>
+References: <20260409-imx8dxl-sr-som-v2-0-83ff20629ba0@solid-run.com>
+ <20260409-imx8dxl-sr-som-v2-3-83ff20629ba0@solid-run.com>
+ <8efbafe3-0a8a-4005-960c-e8fe62cee719@lunn.ch>
+ <bd2e73c5-2e61-4ea1-ab3b-42a6573b31f8@solid-run.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: Ak4FKvzB_QgF
-Date: Thu, 30 Apr 2026 10:05:52 -0400
-From: "Chuck Lever" <cel@kernel.org>
-To: "Frederic Weisbecker" <frederic@kernel.org>
-Cc: "Marco Crivellari" <marco.crivellari@suse.com>,
- linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org,
- netdev@vger.kernel.org, "Tejun Heo" <tj@kernel.org>,
- "Lai Jiangshan" <jiangshanlai@gmail.com>,
- "Sebastian Andrzej Siewior" <bigeasy@linutronix.de>,
- "Michal Hocko" <mhocko@suse.com>, "Trond Myklebust" <trondmy@kernel.org>,
- "Anna Schumaker" <anna@kernel.org>, "Chuck Lever" <chuck.lever@oracle.com>,
- "Jeff Layton" <jlayton@kernel.org>, NeilBrown <neil@brown.name>,
- "Olga Kornievskaia" <okorniev@redhat.com>, "Dai Ngo" <Dai.Ngo@oracle.com>,
- "Tom Talpey" <tom@talpey.com>, "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>
-Message-Id: <1e220a70-4318-49de-aaac-332c0a1cfab4@app.fastmail.com>
-In-Reply-To: <afNguCraI6AvmZrR@localhost.localdomain>
-References: <20260430085412.96961-1-marco.crivellari@suse.com>
- <8d1eff7b-3712-4039-87d6-028a4118e210@app.fastmail.com>
- <afNguCraI6AvmZrR@localhost.localdomain>
-Subject: Re: [RFC PATCH] xprtrdma: Move long delayed work on system_dfl_long_wq
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: E63784A3D7C
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <bd2e73c5-2e61-4ea1-ab3b-42a6573b31f8@solid-run.com>
+X-Rspamd-Queue-Id: 7346D4A3D9A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.15 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	XM_UA_NO_VERSION(0.01)[];
-	TAGGED_FROM(0.00)[bounces-282876-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	TAGGED_FROM(0.00)[bounces-282877-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,nxp.com,pengutronix.de,gmail.com,davemloft.net,google.com,redhat.com,solid-run.com,thorsis.com,vger.kernel.org,lists.linux.dev,lists.infradead.org,microchip.com];
+	RCPT_COUNT_TWELVE(0.00)[25];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[suse.com,vger.kernel.org,kernel.org,gmail.com,linutronix.de,oracle.com,brown.name,redhat.com,talpey.com,davemloft.net,google.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[app.fastmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
+> > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> >
+> >     Andrew
+> 
+> Thanks!
+> 
+> I don't know how to keep this partial review for v3, so I will send it without.
 
+You can add my Reviewed-by. It is on record in the archive that it
+only applies to a subset.
 
-On Thu, Apr 30, 2026, at 10:01 AM, Frederic Weisbecker wrote:
-> Le Thu, Apr 30, 2026 at 09:35:20AM -0400, Chuck Lever a =C3=A9crit :
->>=20
->> On Thu, Apr 30, 2026, at 4:54 AM, Marco Crivellari wrote:
->> > Currently the code enqueue work items using {queue|mod}_delayed_wor=
-k(),
->> > using system_long_wq. This workqueue should be used when long works=
- are
->> > expected, but it is a per-cpu workqueue.
->> >
->> > This is important because queue_delayed_work() queue the work using:
->> >
->> >    queue_delayed_work_on(WORK_CPU_UNBOUND, ...);
->> >
->> > Note that WORK_CPU_UNBOUND =3D NR_CPUS.
->> >
->> > This would end up calling __queue_delayed_work() that does:
->> >
->> >     if (housekeeping_enabled(HK_TYPE_TIMER)) {
->> >     //      [....]
->> >     } else {
->> >             if (likely(cpu =3D=3D WORK_CPU_UNBOUND))
->> >                     add_timer_global(timer);
->> >             else
->> >                     add_timer_on(timer, cpu);
->> >     }
->> >
->> > So when cpu =3D=3D WORK_CPU_UNBOUND the timer is global and is
->> > not using a specific CPU. Later, when __queue_work() is called:
->> >
->> >     if (req_cpu =3D=3D WORK_CPU_UNBOUND) {
->> >             if (wq->flags & WQ_UNBOUND)
->> >                     cpu =3D wq_select_unbound_cpu(raw_smp_processor=
-_id());
->> >             else
->> >                     cpu =3D raw_smp_processor_id();
->> >     }
->> >
->> > Because the wq is not unbound, it takes the CPU where the timer
->> > fired and enqueue the work on that CPU.
->> > The consequence of all of this is that the work can run anywhere,
->> > depending on where the timer fired.
->> >
->> > Recently, a new unbound workqueue specific for long running work has
->> > been added:
->> >
->> >    c116737e972e ("workqueue: Add system_dfl_long_wq for long unboun=
-d works")
->> >
->> > So change system_long_wq with system_dfl_long_wq so that the work m=
-ay
->> > benefit from scheduler task placement.
->>=20
->> The patch description confuses me.
->>=20
->> The message ends with "the work can run anywhere, depending on where
->> the timer fired." Read literally, "can run anywhere" sounds like a
->> feature, not a bug
->
-> A feature, but incomplete :)
->
->> =E2=80=94 and the proposed fix (WQ_UNBOUND) also lets it
->> run anywhere, just via a different selection path. Without a sentence
->> saying "and that anywhere includes isolated CPUs, which we don't want=
-,"
->> the reader is left to fill in the gap.
->
-> Not quite, global timers don't fire on isolated CPUs. And since it get=
-s enqueued
-> on the CPU where it fired, it won't be enqueued on an isolated CPU.
->
->>=20
->> So, could the commit message lead with the motivation? My guess is th=
-at
->> this is about respecting HK_TYPE_TIMER housekeeping on isolated syste=
-ms,
->> which system_long_wq cannot do because its per-CPU pool ignores the
->> housekeeping mask once the global timer fires. If that is the case,
->> please say so directly and the mechanism trace becomes a supporting
->> argument rather than the whole argument.
->
-> The purpose is explained on the last line:
->
-> """
-> So change system_long_wq with system_dfl_long_wq so that the work may
->  benefit from scheduler task placement.
-> """
->
-> Arguably this could be elaborated. For example we can change that:
->
-> """
-> The consequence of all of this is that the work can run anywhere,
-> depending on where the timer fired.
-> """
->
-> into that:
->
-> """
-> The consequence of all of this is that the work can run on any
-> housekeeping CPU, irrespective of the scheduler that knows better
-> about the best task placement, which would apply if the work were
-> to be queued on an unbound workqueue.
-> """
->
-> Would that help?
+And in general, nobody can know the whole kernel, all the different
+subsystems, and the details for all the DT bindings. So i would allow
+some fuzziness for Reviewed-by: for a DT patch.
 
-It's still not clearing it up for me.
+Interesting, an Acked-by: might actually be more appropriate.
 
-Does the patch address a bug (work isn't getting rescheduled at
-all) or is it merely a minor optimization for certain platforms?
+    Acked-by: does not necessarily indicate acknowledgement of the
+    entire patch. For example, if a patch affects multiple subsystems
+    and has an Acked-by: from one subsystem maintainer then this
+    usually indicates acknowledgement of just the part which affects
+    that maintainer’s code. Judgement should be used here.
 
-What's the user-visible issue that will be improved with this
-change?
+So how about:
 
---=20
-Chuck Lever
+Acked-by: Andrew Lunn <andrew@lunn.ch>
+
+and you can take your pick :-)
+
+    Andrew
 
