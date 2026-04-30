@@ -1,169 +1,357 @@
-Return-Path: <netdev+bounces-282924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282925-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6C3xKgt582mt4AEAu9opvQ
-	(envelope-from <netdev+bounces-282924-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:45:15 +0200
+	id 2DPOOYF682mt4AEAu9opvQ
+	(envelope-from <netdev+bounces-282925-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:51:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67C8F4A50CF
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:45:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C4734A5244
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 17:51:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 33E1F30312CB
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:45:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 34717305FFF2
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:46:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84A6143901B;
-	Thu, 30 Apr 2026 15:45:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E50AD359A6C;
+	Thu, 30 Apr 2026 15:46:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="kIVovgty"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="QGEpwya3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5D9438FFA
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 15:44:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777563900; cv=none; b=ht5SwvyuJ9b5zctYZHSy+a9vPyejbAEPzbQqaMW3BHs+2HwBFjpH9qPdaP2uK9SnYiBKTI/QlWBWiaVNhqmlALlnwtS+B3dTXFE5rTpEELughCDfT5PBjbuBcOPNgIEQp2JvH5K+ur5sNY/1aSXoRz1pS9YbVtrDPVo9rhA1Yno=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777563900; c=relaxed/simple;
-	bh=RUE0wRnDSulogZaSv/Phdq6tG4EVlY/e2/sK/FRA2lg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K+5ko7KOjT7X2k7b7BmMnAefHsnqfUVVTNVvJRCqh9A8Mh5x/VWhZU/B4I4e9HJ2CG1ID5OHBls68IGNNG5oKNge3Gzs50EcQu9Nl0y4OTm/0a/v4EBp86TjS+0Tc+BmXuN797u1Wrd7sFEk5KzdwiQLcbXvVqCbRf/IE1u59v4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=kIVovgty; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-43d7828221bso53082f8f.3
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 08:44:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD537351C07
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 15:46:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777563971; cv=pass; b=LvuSjHLlx+IT5e+rAAK8iGm95rfMx9gqWph5kUnWyRoytfhD35vEbadL9Ah2cJBtlliZ7DDR9vdx1SZGj4WbGsrABO6MGzoeObx3VjbYi6ikhUKNXQSWP9TxGV06UMBWa3N0KSeeGHiprBvgpDGd0VZXOay3VgqiT9gqJlqTphw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777563971; c=relaxed/simple;
+	bh=7haGA0Cmpz3rciaomjCQyZGKxFid6gvKmvDHOSIWR00=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KCXS8Pps+ktJBbQTYRtaRLW+Ct94f25EVcK2Rkk1iMTfwPU8IEKkGm0buPsisOmj24gwGHuk1SfS7z7D4WH0pjjDD8FgczOA3eeblZQ+lljbXNLayW9Xp42JUaXYQDzTT4ICRdJkkQ8m6MOd61FA8cY64ABRq2Y6q6AOxJ6bLo0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=QGEpwya3; arc=pass smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-7bd5c582c6cso5444397b3.1
+        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 08:46:07 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777563966; cv=none;
+        d=google.com; s=arc-20240605;
+        b=a0qAjhRRcosWcQQIWvPcOhj9/G7RvStFK/m1RYZHBJJ+uvXX5R5jkgs3QfAdENnpkF
+         sxCIRaxvcFT7LHDAShf152tLPyFdqgFaHElvHypywRWTlRmrZIbGk76ckc0mGVSpkWmC
+         3YCfDojnBd3Ml82HAUQggI28OCsmFgbp3nm91pb1OF0zJH/LidTUIgT2ZIDwPvFUp89g
+         x9dFmBafR635D4Y7GMwmXwRWhn0eR8JhF0yicoR1+V/j/u1ISNx7krq6D3woNCv81PIO
+         xv00xgnGzWvAGq/GrdIASSrohjdAudectOzYwzpHD6BMpX+UzUeChgsisO3hllBBi8MT
+         4NIA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=HrvAokJscQ8nUXAYywqyvUiBsVl9BDqi6SeIaa6RaNc=;
+        fh=KqAMUBre+gbEPG3eo2pT5r3MhL3kFfXxaNCMx3oAjJg=;
+        b=lZNG8kNvejLEXcbEpiBRYHLeu7d4dfZTSvTZqQB930Kdexnc494jom8W7Fx/51WTxD
+         D4esp7B8YDWGlCbukh0gqCAUZuTQ3nc8GARCBYPoYEdeUCgNlc19VAmYqPlHe4ty4qdo
+         dnMxbwf5LpUzRJ3nnbuYWWHb8T+ESA9vJdeokODcwA6oUrufBn6NkS+y2kokOshhgi6w
+         h1/awznvWjbMlHW27KHJM26qITUwiLqyD6DMvuAxtJUQhdOaYTRE1l7PpYblAlfgREUP
+         GYsq6zGTCNNNrmV7OiJBgPDVy/bZJTTbqrd5W2zymmlGsgdtcTih3G1TaHmvmG3CoNZf
+         MF5A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1777563895; x=1778168695; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=nVdkXGvjipVBSYbCT/dFGYanP9qbDtxjNRTDheTpI08=;
-        b=kIVovgty868XFtEfPeoHV5DB5ZZXqPyEvjft08k376aiPD3ETBi0iiahiRcDAmGjQE
-         07nsaK+WoWWxpfYJgOUZ2BPC+VlYMk3DLAyrfqeVAqFVWbAKcFadIEDqNTjq8iAO3kl7
-         6Wb/uKRGSvGzwnTigQRGQ69RO3oeJavhGaTN/wSrW0ic7t8Dd+W+cqVM28+KDqtOTMez
-         Qj1r39hVVgI1wqPz3Gc4a8Ldq8zkUcsx+6fcfg2nZSC0vTWli3r2tD3amDLZ/pUVEczp
-         /qD/5BLRwNAV/dYiec+0oWCNVfnXmGSMQ7V6tM1yIF7mjvBfFWnbJI3MzZ5/AjC4Mp2G
-         duuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777563895; x=1778168695;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1777563966; x=1778168766; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nVdkXGvjipVBSYbCT/dFGYanP9qbDtxjNRTDheTpI08=;
-        b=lm3yQNQf9+Qmfi6a4RDX+2PW5IluJ9mwnc3d+HL+dquKIMumaN85yn2o+DELuIqzwc
-         msEK5d+TXId5lIOXqZwTtwd1JHZQGdt4qNFfX3AA+ijgOD2tDBU9go8SOGOYwpN3Auet
-         XfYkDtTmoOOBbB5dJrgnl/kkTpWitjQGIua5/CZVGvGUFmz0+OxH/Xack6GrtJzJKJ7S
-         EQDModbPd9cetXpxDQs3FQEoLd4IlwIp9aSdg6oIWbS3D3ogC6VWsxbek/wX3jjVlcUc
-         6wzZ5xcJ04VxRHgBK7096P2d/2/87EwicbnluYN0+5NdIcAgCDj+yv8t/gWkqWxIFz0L
-         ZEVA==
-X-Forwarded-Encrypted: i=1; AFNElJ+xwTDT1uT9j1aVcVVpvWJJeKXPVhdc66m9kJ4RavCVmFglc+vaIAElDTVFV8cS0XJz5cXuWDc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXoLed3x13D3xqXRco65B7EK9CNWkDz/1kH8/oCXZxLOWfTznU
-	5oZuTGOFED7jFQbXa+FhAfwEzpVzzALP9XVgO3AodPIP9UnpSEURK8q34bcqY+wE+Bc=
-X-Gm-Gg: AeBDieuKv7FF9GHFzIvyxFCVS8r2VvO24OxLTzeWcND0QnNoeGwXaeg205IrUkTkx0H
-	V5tAYeJNd33SRgu0k1K710nUOsmSp5iGaATZs2rvcd78ys4rICoc+wOfBfpFrzz6YB8o1qWUsw1
-	Qa4xjLTfkALYIjmabWbcSjjHS0y+vRMBhlrRt3xv5wkJ1sCGOS6q4iTWbPzJyjDrl/g/P9rsRt6
-	zw1Fi7wR+WOyBp9mSNCxDF0w9UmXdmhFQ+ilPxL9ml66ApmUFqvTXAIbJ1XkHVAR60wGQJKTWht
-	Y0YtA/yDuWvXBRdHwDxjk2erfCqYARV4sjakgqvBMUY6hsjjqYE5EVZT+tHS/nJWsmXxMXEyplg
-	7TMVCpja8DzEZdCyTSR+bzqvzuZXcYPdnBJxw+grrpu0br2CXn54VYGNxksYRTF+mTavWap/o8i
-	FaRgzvJcneslRq5AbVch0TQAXtsIUrb1GIzQdK2OS6BfJIhWqVzGEvdawWbrjo9z89RhKisFZRl
-	iCFfG48VzAlNFc=
-X-Received: by 2002:a05:6000:2995:20b0:43d:1d3a:b60a with SMTP id ffacd0b85a97d-449403aa04bmr1985624f8f.7.1777563894613;
-        Thu, 30 Apr 2026 08:44:54 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:6a1d:efff:fe52:1959? ([2a01:e0a:b41:c160:6a1d:efff:fe52:1959])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-449c576d0a2sm3615047f8f.31.2026.04.30.08.44.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Apr 2026 08:44:54 -0700 (PDT)
-Message-ID: <3f8d63a3-e39e-48f9-a0d0-517be7c05498@6wind.com>
-Date: Thu, 30 Apr 2026 17:44:53 +0200
+        bh=HrvAokJscQ8nUXAYywqyvUiBsVl9BDqi6SeIaa6RaNc=;
+        b=QGEpwya3OP0OFtDOS8YGPs6vbaZ8BpNRqVA85lIKjyPp3SGhLWo8OYZ51m9/v+LSVU
+         5W6dgOyc7YcOukLAoUyJxJfF3Sh5u7s1Rflcz7kuiW7cPjkq7RLrJW8RL/j9s7gkU+l1
+         74mOT2173ifGAO/3IMhIz2NV0arCaCaHpl+vEq3MTowvR3MqlCC5erNoOve4lQxgFMSC
+         RNsLJ9tD7ABhxQnroXDO+5y6GpC/scfxhAwAOUIAMaOcsCw18YGG9hkKIp4jRSNj00Ty
+         9kOab7axwwxv2i5VmEVL8rQdgJh8UhJrfz2tBi+8XzRmDvQJ3vgTjo2ouK30Iy2sWng3
+         r6Pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777563966; x=1778168766;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=HrvAokJscQ8nUXAYywqyvUiBsVl9BDqi6SeIaa6RaNc=;
+        b=l3Y4GYplJknHK+rriNgajLWskaBu6jSi2MRYxy/yPwB2gpHDRvMhRfRWtvS/i5lf4C
+         VwaynHbLGeux1i5iAoU4F79MInc5yVDVP0EDvsExwd8/RwRoWN0on1MaMSb7lKU7s6r5
+         AAsCMnjZLGAPPfjttGq3oYUc+LyaxbKwEBVtUT04g6c4kwEU2dps0SHawnP5Gb2KzoUz
+         ilCMPGD2SsWLBCJEGvnV/BCY3Uq7v4tik6hFN/2jKbIOqxMSE8AvG2A+e9ubbHo47nZT
+         +8vLa7m+BHb6gDzmlm2DUZparYWJyK7a0BMzG5NM6B58pqB4yYxlQSS5avjV6dOrhtJu
+         etGw==
+X-Forwarded-Encrypted: i=1; AFNElJ+5Vi2rDHFX2XQgmVcu8HEwHFNPfmv9kfciXbP+/TczUhnEXZ0DJTKMv9SapWTAr0KF8z/EUlY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyerRKWAt3eYEkLXQyUeKUNvu2MGmaEnDMu5KIjdMEJFk0xkKGb
+	QKbcsEjjAjaD7Lllw5HMZizKq18tZlRBHWJuPSDb5+nAKcX2M7SFawvwZrzpxZIpKacO2CGVzJR
+	eGEMLbg+4O8KAWZlLq2DfxJ2qz3MHPPS3HHZ+oRP+
+X-Gm-Gg: AeBDietjHcnj4q911J3UHbzV49V6dWMFJ7jHQws+48xBJlE7urDZYuQa4xIlvmDitD7
+	+EuLNvmKVVyouQk02Y/E1Qr+5zX9081XaqwZBuLD7xGa/fT5gJB1h9jcgTrwyiabK0KDXoYDVQe
+	WUtlePq6jntGppvywLOemsdOKOChKsFgueMvNcmhmd2KNcX7FkR16SVs0cEfjNEWFxK39gs1azw
+	I7pY6BEsMfY4EBIOl8REBhQSOOw/1zAbTYTxsVdpdn5T20mZG3oyTZFmdU9Ni5MR7P0oSKjTQSZ
+	CKrLhQ1r51Sk04Sn8niRBor2Be5xdA==
+X-Received: by 2002:a05:690c:c664:b0:79f:cadb:d0ba with SMTP id
+ 00721157ae682-7bd52846f4emr29165927b3.20.1777563965824; Thu, 30 Apr 2026
+ 08:46:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [RFC PATCH net-next 0/3] netns: optionally inherit IPv4 TCP
- sysctls from old net
-To: nmreadelf <kong414@outlook.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
- dsahern@kernel.org
-Cc: horms@kernel.org, chia-yu.chang@nokia-bell-labs.com, idosch@nvidia.com,
- ij@kernel.org, brauner@kernel.org, jack@suse.cz, kuniyu@google.com,
- jlayton@kernel.org, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, lance.yang@linux.dev, leon.hwang@linux.dev
-References: <TY7PR01MB172057C053E8D550485A29A08E0352@TY7PR01MB17205.jpnprd01.prod.outlook.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <TY7PR01MB172057C053E8D550485A29A08E0352@TY7PR01MB17205.jpnprd01.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 67C8F4A50CF
+References: <20260428082851.3240821-1-edumazet@google.com> <18134b6e-8944-49f4-9bb0-2903aa00d28a@kernel.org>
+In-Reply-To: <18134b6e-8944-49f4-9bb0-2903aa00d28a@kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 30 Apr 2026 11:45:54 -0400
+X-Gm-Features: AVHnY4L4jTo3f8CHVtGASzPYwZL3Xx4K0XNUOEPiJ-oX2IvhZPB0YD6m6JcRKb4
+Message-ID: <CAM0EoMn4_MKeSRTM=g4i8nFPJVAFNW3WcRxzuQQRu5WMtGBKTg@mail.gmail.com>
+Subject: Re: [PATCH iproute2-next] tc: use ll_init_map() only when needed
+To: David Ahern <dsahern@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, Stephen Hemminger <stephen@networkplumber.org>, 
+	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 4C4734A5244
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	DKIM_TRACE(0.00)[6wind.com:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282924-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
-	FREEMAIL_TO(0.00)[outlook.com,davemloft.net,google.com,kernel.org,redhat.com,lwn.net];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	HAS_REPLYTO(0.00)[nicolas.dichtel@6wind.com];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[nicolas.dichtel@6wind.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-282925-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[mojatatu.com];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[google.com,networkplumber.org,davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,mojatatu-com.20251104.gappssmtp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Le 30/04/2026 à 03:30, nmreadelf a écrit :
-> a new network namespace starts with built-in TCP defaults.
-> In container-heavy setups, operators often tune TCP sysctls in init_net and then
-> need to re-apply the same values for each new netns.
-> 
-> This series adds an opt-in mechanism to initialize per-netns IPv4 TCP sysctl
-> settings from init_net at netns creation time.
-> 
-> Behavior:
-> 
-> Default is unchanged.
-> When net.ipv4.netns_inherit_tcp_sysctls=1, new netns inherit
-> TCP sysctl from old_net.
+On Thu, Apr 30, 2026 at 11:36=E2=80=AFAM David Ahern <dsahern@kernel.org> w=
+rote:
+>
+> Jamal: waiting for your review ...
+>
 
-There is the same kind of sysctl for net.{ipv4,ipv6}.conf.{all,default}.*:
-net.core.devconf_inherit_init_net.
+Looks good - running tdc on it to make sure nothing breaks...
 
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/admin-guide/sysctl/net.rst#n401
-
-I'm not sure if it's acceptable to use this existing entry to control the TCP
-sysctl.
-At least, putting the new one in the same place + using the same template for
-the name + the same values would be nice. Something like
-net.core.tcp_inherit_init_net.
-
-Regards,
-Nicolas
+cheers,
+jamal
+> On 4/28/26 2:28 AM, Eric Dumazet wrote:
+> > Some setups can have thousands of devices.
+> >
+> > ll_init_map() is rather expensive for them.
+> >
+> > Only call ll_init_map() in the following cases:
+> >
+> > 1) tc runs in batch mode.
+> > 2) tc runs in monitor mode.
+> > 3) tc dumps qdiscs/classes/filters for all netdev.
+> >
+> > This greatly reduces RTNL pressure on common operations.
+> >
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > ---
+> >  tc/f_route.c   |  1 -
+> >  tc/m_mirred.c  |  2 --
+> >  tc/tc.c        |  1 +
+> >  tc/tc_class.c  |  6 ++----
+> >  tc/tc_filter.c | 32 ++++++++++++++++----------------
+> >  tc/tc_qdisc.c  |  5 ++---
+> >  6 files changed, 21 insertions(+), 26 deletions(-)
+> >
+> > diff --git a/tc/f_route.c b/tc/f_route.c
+> > index 96b99b06be179c90dfb0d24d9577b5206dd98ef1..c234ddf0cb9309556844c85=
+047d0f9ef53a2fd7b 100644
+> > --- a/tc/f_route.c
+> > +++ b/tc/f_route.c
+> > @@ -76,7 +76,6 @@ static int route_parse_opt(const struct filter_util *=
+qu, char *handle, int argc,
+> >                       __u32 id;
+> >
+> >                       NEXT_ARG();
+> > -                     ll_init_map(&rth);
+> >                       if ((id =3D ll_name_to_index(*argv)) <=3D 0) {
+> >                               fprintf(stderr, "Illegal \"fromif\"\n");
+> >                               return -1;
+> > diff --git a/tc/m_mirred.c b/tc/m_mirred.c
+> > index f4da3c76284460d7f4bb73c7c3c172732f054632..e9ae5199432e828026f15ce=
+226c5f5f84998c660 100644
+> > --- a/tc/m_mirred.c
+> > +++ b/tc/m_mirred.c
+> > @@ -213,8 +213,6 @@ parse_direction(const struct action_util *a, int *a=
+rgc_p, char ***argv_p,
+> >       if (d[0])  {
+> >               int idx;
+> >
+> > -             ll_init_map(&rth);
+> > -
+> >               idx =3D ll_name_to_index(d);
+> >               if (!idx)
+> >                       return nodev(d);
+> > diff --git a/tc/tc.c b/tc/tc.c
+> > index 0fc658c881f0f553f1f1f8d87b46943d4d0eed8f..7d69e4d533a98b9c071cb95=
+4443a049a52252f2c 100644
+> > --- a/tc/tc.c
+> > +++ b/tc/tc.c
+> > @@ -243,6 +243,7 @@ static int batch(const char *name)
+> >               return -1;
+> >       }
+> >
+> > +     ll_init_map(&rth);
+> >       ret =3D do_batch(name, force, tc_batch_cmd, NULL);
+> >
+> >       rtnl_close(&rth);
+> > diff --git a/tc/tc_class.c b/tc/tc_class.c
+> > index 6d707d8c924f4b5e90201d4de8e9779f82ce17f3..9aace019e6c8b96fb51edb4=
+fe89bea5b7469beed 100644
+> > --- a/tc/tc_class.c
+> > +++ b/tc/tc_class.c
+> > @@ -136,11 +136,11 @@ static int tc_class_modify(int cmd, unsigned int =
+flags, int argc, char **argv)
+> >       }
+> >
+> >       if (d[0])  {
+> > -             ll_init_map(&rth);
+> > -
+> >               req.t.tcm_ifindex =3D ll_name_to_index(d);
+> >               if (!req.t.tcm_ifindex)
+> >                       return -nodev(d);
+> > +     } else {
+> > +             ll_init_map(&rth);
+> >       }
+> >
+> >       if (rtnl_talk(&rth, &req.n, NULL) < 0)
+> > @@ -437,8 +437,6 @@ static int tc_class_list(int argc, char **argv)
+> >               argc--; argv++;
+> >       }
+> >
+> > -     ll_init_map(&rth);
+> > -
+> >       if (d[0]) {
+> >               t.tcm_ifindex =3D ll_name_to_index(d);
+> >               if (!t.tcm_ifindex)
+> > diff --git a/tc/tc_filter.c b/tc/tc_filter.c
+> > index 7db850bda11a3408ec66b457c9fc590f3a734f65..be70e360849e5058192640d=
+a0f061810a99e2ea8 100644
+> > --- a/tc/tc_filter.c
+> > +++ b/tc/tc_filter.c
+> > @@ -188,16 +188,17 @@ static int tc_filter_modify(int cmd, unsigned int=
+ flags, int argc, char **argv)
+> >               addattr_l(&req.n, sizeof(req), TCA_KIND, k, strlen(k)+1);
+> >
+> >       if (d[0])  {
+> > -             ll_init_map(&rth);
+> > -
+> >               req.t.tcm_ifindex =3D ll_name_to_index(d);
+> >               if (req.t.tcm_ifindex =3D=3D 0) {
+> >                       fprintf(stderr, "Cannot find device \"%s\"\n", d)=
+;
+> >                       return 1;
+> >               }
+> > -     } else if (block_index) {
+> > -             req.t.tcm_ifindex =3D TCM_IFINDEX_MAGIC_BLOCK;
+> > -             req.t.tcm_block_index =3D block_index;
+> > +     } else {
+> > +             ll_init_map(&rth);
+> > +             if (block_index) {
+> > +                     req.t.tcm_ifindex =3D TCM_IFINDEX_MAGIC_BLOCK;
+> > +                     req.t.tcm_block_index =3D block_index;
+> > +             }
+> >       }
+> >
+> >       if (q) {
+> > @@ -539,8 +540,6 @@ static int tc_filter_get(int cmd, unsigned int flag=
+s, int argc, char **argv)
+> >       }
+> >
+> >       if (d[0])  {
+> > -             ll_init_map(&rth);
+> > -
+> >               req.t.tcm_ifindex =3D ll_name_to_index(d);
+> >               if (!req.t.tcm_ifindex)
+> >                       return -nodev(d);
+> > @@ -704,21 +703,22 @@ static int tc_filter_list(int cmd, int argc, char=
+ **argv)
+> >
+> >       req.t.tcm_info =3D TC_H_MAKE(prio<<16, protocol);
+> >
+> > -     ll_init_map(&rth);
+> > -
+> >       if (d[0]) {
+> >               req.t.tcm_ifindex =3D ll_name_to_index(d);
+> >               if (!req.t.tcm_ifindex)
+> >                       return -nodev(d);
+> >               filter_ifindex =3D req.t.tcm_ifindex;
+> > -     } else if (block_index) {
+> > -             if (!tc_qdisc_block_exists(block_index)) {
+> > -                     fprintf(stderr, "Cannot find block \"%u\"\n", blo=
+ck_index);
+> > -                     return 1;
+> > +     } else {
+> > +             ll_init_map(&rth);
+> > +             if (block_index) {
+> > +                     if (!tc_qdisc_block_exists(block_index)) {
+> > +                             fprintf(stderr, "Cannot find block \"%u\"=
+\n", block_index);
+> > +                             return 1;
+> > +                     }
+> > +                     req.t.tcm_ifindex =3D TCM_IFINDEX_MAGIC_BLOCK;
+> > +                     req.t.tcm_block_index =3D block_index;
+> > +                     filter_block_index =3D block_index;
+> >               }
+> > -             req.t.tcm_ifindex =3D TCM_IFINDEX_MAGIC_BLOCK;
+> > -             req.t.tcm_block_index =3D block_index;
+> > -             filter_block_index =3D block_index;
+> >       }
+> >
+> >       if (filter_chain_index_set)
+> > diff --git a/tc/tc_qdisc.c b/tc/tc_qdisc.c
+> > index 7eb9a31baa31fb91a8141c9eca1135e76a52fa8b..252ea861f249a5a71cf7823=
+89776e68c3e48c6cc 100644
+> > --- a/tc/tc_qdisc.c
+> > +++ b/tc/tc_qdisc.c
+> > @@ -193,8 +193,6 @@ static int tc_qdisc_modify(int cmd, unsigned int fl=
+ags, int argc, char **argv)
+> >       if (d[0])  {
+> >               int idx;
+> >
+> > -             ll_init_map(&rth);
+> > -
+> >               idx =3D ll_name_to_index(d);
+> >               if (!idx)
+> >                       return -nodev(d);
+> > @@ -411,13 +409,14 @@ static int tc_qdisc_list(int argc, char **argv)
+> >               argc--; argv++;
+> >       }
+> >
+> > -     ll_init_map(&rth);
+> >
+> >       if (d[0]) {
+> >               req.t.tcm_ifindex =3D ll_name_to_index(d);
+> >               if (!req.t.tcm_ifindex)
+> >                       return -nodev(d);
+> >               filter_ifindex =3D req.t.tcm_ifindex;
+> > +     } else {
+> > +             ll_init_map(&rth);
+> >       }
+> >
+> >       if (dump_invisible) {
+>
 
