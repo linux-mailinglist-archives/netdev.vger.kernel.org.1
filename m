@@ -1,121 +1,208 @@
-Return-Path: <netdev+bounces-282865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282866-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kM6LGtlZ82lfzwEAu9opvQ
-	(envelope-from <netdev+bounces-282865-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:32:09 +0200
+	id OBpCIHBb82lfzwEAu9opvQ
+	(envelope-from <netdev+bounces-282866-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:38:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E27A4A37F0
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:32:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF8614A392B
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:38:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6CF8330066A2
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 13:32:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 00DEF304F2F5
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 13:35:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47B3B4279F4;
-	Thu, 30 Apr 2026 13:32:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AD74428484;
+	Thu, 30 Apr 2026 13:35:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MLfLT3gY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aUJtDcp2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E9E4266B3;
-	Thu, 30 Apr 2026 13:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D759D428480;
+	Thu, 30 Apr 2026 13:35:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777555925; cv=none; b=gkMEzD7EqAIMgEMbaNFayOon1ITdccYMWtqaTnQYVc8F8ONCES7gH5XwC9u0CGczJf2t34h9GDgiGMn6c1eHrpDQLd+VOim5P/vYZ+MiUxgnabWrgb5ysf602WiS9j/Pr0hOQPoj1ahAwAm43aRssWVw+0tPAMph86IGmpPj+oI=
+	t=1777556142; cv=none; b=Rif5ZzBX8/Fj2XTn5hVGaUA6usaRVOlclI5tNFmNtKT/PZLuaXHpvJjXdsiY+yaO0/sxS4g0FwaDSyUhywf7WncgzlcGs7mRdss2l+3NSV5hmSUwgNRQmvkA9FjuOSQA8hn1MrCd/MMlCj2VripkUzFgsZwbdgpP73/yx6GH534=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777555925; c=relaxed/simple;
-	bh=iN8DKEJJ1MqxD8Atz5WqGwwGI8zukpbk6ZFINC7U+H0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LbCRzcruTYcGBYmXEKWe01oeDnfElO5H0eR8YjHSzrdkBbniojTU2i0qvG4Xt5u0EHJGE5Ug8jxqeUsnaJuCKSMq77KzusFYlgll32HkIEz7HI99Nnfvz9GdU5GVsApRSn1AJ5kci1Q8sgTJdSTsiclfN063OyuzwQmEYKhsL7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MLfLT3gY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90388C2BCB3;
-	Thu, 30 Apr 2026 13:32:04 +0000 (UTC)
+	s=arc-20240116; t=1777556142; c=relaxed/simple;
+	bh=Jts2CoDuG9f7IQGE0LXf+uYfhKHe9oYIDMc2uUAcUOc=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=Dm3frb2eOHCy7LnNbJla8v3pmTHm8ND5dW58D2VB7yeEGDQJrKCtk86S6LLtUx1u+epZitqI86tsHOqushcWa6LnxIyFt2YXPeD/PLWQqU4DFrjdliplDqOH+vITBpZnYexm0hnXGkqn0Fa8m6oxCkXVx51f2lm6kiupeVqsm7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aUJtDcp2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC119C2BCB3;
+	Thu, 30 Apr 2026 13:35:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777555924;
-	bh=iN8DKEJJ1MqxD8Atz5WqGwwGI8zukpbk6ZFINC7U+H0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MLfLT3gYJYUrNlUUkxWDvsFI0GEOKhIELDpU30KfET7gp5dTZ9EY4yyMRczN4jZYE
-	 kqXh+s5ibDaz4iOJHmi/9a3t5PdwUCMVIPhSyv19a35G0YWrCuHRJ68M2QfyfU6FzX
-	 vbrFtrqv2nfcDGMpLeznkZGIaOVkMBBYgUR8RK+me3NEajH4Fm8l691ni6A/iw9Bzm
-	 evViPymfOmZlY003vEz7sliSgQKwulQt5UV8/tFcpCN0UoX+Q7TUlnqDc9ttQ8+a5w
-	 33Hchtzclp1IGnms+afkLKQSx0mG3M58jh1HGFCYfgOkMPwwuoI9aqhWUOf6Ic5shv
-	 occY/ASH6fFqQ==
-Date: Thu, 30 Apr 2026 09:32:03 -0400
-From: Sasha Levin <sashal@kernel.org>
-To: Sven Eckelmann <sven@narfation.org>
-Cc: stable@vger.kernel.org, Haoze Xie <royenheart@gmail.com>,
-	Robert Garcia <rob_garcia@163.com>, b.a.t.m.a.n@lists.open-mesh.org,
-	Simon Wunderlich <sw@simonwunderlich.de>,
-	Yifan Wu <yifanwucs@gmail.com>, Juefei Pu <tomapufckgml@gmail.com>,
-	Yuan Tan <yuantan098@gmail.com>, Xin Liu <bird@lzu.edu.cn>,
-	Ao Zhou <n05ec@lzu.edu.cn>,
-	Marek Lindner <mareklindner@neomailbox.ch>,
-	Antonio Quartulli <a@unstable.cc>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 5.15.y] batman-adv: hold claim backbone gateways by
- reference
-Message-ID: <afNZ0zVdXkgj5hvA@laps>
-References: <20260430071645.3030702-1-rob_garcia@163.com>
- <1857579.VLH7GnMWUR@ripper>
- <3609597.QJadu78ljV@ripper>
+	s=k20201202; t=1777556142;
+	bh=Jts2CoDuG9f7IQGE0LXf+uYfhKHe9oYIDMc2uUAcUOc=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=aUJtDcp2ib2UzLUlQhYlq4hIhCPnq0JUJKFUobXZoK7Gp7dnmxfJcsGSdW20aY7ca
+	 Sf40/QoY4edaJ6DRu4Q3p9+1K2xeGvJZFdHAElXgPa7BsUOjMjdVTOk2RRNIjOwoF1
+	 sAuXsUhVg0g9sEAIrtBxDDqWz97NBhHSc2mKCAsGUKLRoynKqIY0VxwD6WpcYzBjBU
+	 +I1icaMH7hJ550KyV2riIdZAG7Pz/IsUEGObKq2EGP9gjVgfIoppYQ1zf6LF2utnzj
+	 IsiWYN2ZZxV3Ejb27Yb7+V0jXQmUjvx3o5G4Ynadgc/hjwmrn5Isna1MVNkZM+8/Es
+	 cqU0cgU0ik2DA==
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id CD2EDF40074;
+	Thu, 30 Apr 2026 09:35:40 -0400 (EDT)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-10.internal (MEProxy); Thu, 30 Apr 2026 09:35:40 -0400
+X-ME-Sender: <xms:rFrzaQbOgQeEQ8jYDth3sjPs8rE3idLCK4_olg4iq-bX6u7vN7FUgw>
+    <xme:rFrzaWPwdM4JRT4tjbdFzG2DRUl-SvglcB1JgxA8t6HetQjZsS2Ep8OmQXFPOXrIM
+    AyH5ziF2VOfmynid6WFEUT-trkJlIrGx2cV27HvNSJQ3jLfiyhZ3iw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdekjeeghecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefoggffhffvvefkjghfufgtgfesthhqredtredtjeenucfhrhhomhepfdevhhhutghk
+    ucfnvghvvghrfdcuoegtvghlsehkvghrnhgvlhdrohhrgheqnecuggftrfgrthhtvghrnh
+    epgffhgeeutdeiieevuefgvedtjeefudekvefggefguefgtefgledtteeuleelleetnecu
+    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheptghhuhgtkh
+    hlvghvvghrodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieefgeelleel
+    heelqdefvdelkeeggedvfedqtggvlheppehkvghrnhgvlhdrohhrghesfhgrshhtmhgrih
+    hlrdgtohhmpdhnsggprhgtphhtthhopedvvddpmhhouggvpehsmhhtphhouhhtpdhrtghp
+    thhtohepnhgvihhlsegsrhhofihnrdhnrghmvgdprhgtphhtthhopegurghvvghmsegurg
+    hvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepjhhirghnghhshhgrnhhlrghisehgmhgr
+    ihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprh
+    gtphhtthhopegrnhhnrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepfhhrvgguvghr
+    ihgtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdroh
+    hrghdprhgtphhtthhopehjlhgrhihtohhnsehkvghrnhgvlhdrohhrghdprhgtphhtthho
+    pehkuhgsrgeskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:rFrzaaLYYZlejZSY3UT_lYlTXdpkyX5-3FCOC_izeZk2Mc3T-Avfug>
+    <xmx:rFrzaSmQD4S2xu0YZFtxHn9UOHjUKx3yoFHykmmMiMbe5P1Qu1yOEQ>
+    <xmx:rFrzaQJ7r35KiCA0Zw05fw0WccNlHSUBI3RQMJKhboafLtZZrV3Deg>
+    <xmx:rFrzadWCS9H9PaBc75joe4daInB_rdyM2fkmz5qHh3gjhOiSv1fwbg>
+    <xmx:rFrzaVOLxT6YcZh_segc0ADP3Emvyy8KbHubXeZAmKmvjdJtgQV9o70n>
+Feedback-ID: ifa6e4810:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id A2456780070; Thu, 30 Apr 2026 09:35:40 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <3609597.QJadu78ljV@ripper>
-X-Rspamd-Queue-Id: 6E27A4A37F0
+X-ThreadId: Ak4FKvzB_QgF
+Date: Thu, 30 Apr 2026 09:35:20 -0400
+From: "Chuck Lever" <cel@kernel.org>
+To: "Marco Crivellari" <marco.crivellari@suse.com>,
+ linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: "Tejun Heo" <tj@kernel.org>, "Lai Jiangshan" <jiangshanlai@gmail.com>,
+ "Frederic Weisbecker" <frederic@kernel.org>,
+ "Sebastian Andrzej Siewior" <bigeasy@linutronix.de>,
+ "Michal Hocko" <mhocko@suse.com>, "Trond Myklebust" <trondmy@kernel.org>,
+ "Anna Schumaker" <anna@kernel.org>, "Chuck Lever" <chuck.lever@oracle.com>,
+ "Jeff Layton" <jlayton@kernel.org>, NeilBrown <neil@brown.name>,
+ "Olga Kornievskaia" <okorniev@redhat.com>, "Dai Ngo" <Dai.Ngo@oracle.com>,
+ "Tom Talpey" <tom@talpey.com>, "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>
+Message-Id: <8d1eff7b-3712-4039-87d6-028a4118e210@app.fastmail.com>
+In-Reply-To: <20260430085412.96961-1-marco.crivellari@suse.com>
+References: <20260430085412.96961-1-marco.crivellari@suse.com>
+Subject: Re: [RFC PATCH] xprtrdma: Move long delayed work on system_dfl_long_wq
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: DF8614A392B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.15 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	XM_UA_NO_VERSION(0.01)[];
+	TAGGED_FROM(0.00)[bounces-282866-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282865-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,163.com,lists.open-mesh.org,simonwunderlich.de,lzu.edu.cn,neomailbox.ch,unstable.cc,davemloft.net,kernel.org,lunn.ch];
-	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linutronix.de,suse.com,oracle.com,brown.name,redhat.com,talpey.com,davemloft.net,google.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,app.fastmail.com:mid];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
 
-On Thu, Apr 30, 2026 at 09:40:34AM +0200, Sven Eckelmann wrote:
->On Thursday, 30 April 2026 09:38:05 CEST Sven Eckelmann wrote:
->> Sasha Levin <sashal@kernel.org> picked it up for 5.15.y (on Sun, 19 Apr 2026
->> 21:13:58 -0400, MsgId 20260419195610.batman-adv-5.15@kernel.org).
->> Yes, it was not yet published or 5.15 - so maybe fell through the cracks.
+
+On Thu, Apr 30, 2026, at 4:54 AM, Marco Crivellari wrote:
+> Currently the code enqueue work items using {queue|mod}_delayed_work(),
+> using system_long_wq. This workqueue should be used when long works are
+> expected, but it is a per-cpu workqueue.
 >
->https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git/commit/?h=queue/5.15&id=6fd37208adf6771125b59e1ae0452561024be4e2
+> This is important because queue_delayed_work() queue the work using:
+>
+>    queue_delayed_work_on(WORK_CPU_UNBOUND, ...);
+>
+> Note that WORK_CPU_UNBOUND =3D NR_CPUS.
+>
+> This would end up calling __queue_delayed_work() that does:
+>
+>     if (housekeeping_enabled(HK_TYPE_TIMER)) {
+>     //      [....]
+>     } else {
+>             if (likely(cpu =3D=3D WORK_CPU_UNBOUND))
+>                     add_timer_global(timer);
+>             else
+>                     add_timer_on(timer, cpu);
+>     }
+>
+> So when cpu =3D=3D WORK_CPU_UNBOUND the timer is global and is
+> not using a specific CPU. Later, when __queue_work() is called:
+>
+>     if (req_cpu =3D=3D WORK_CPU_UNBOUND) {
+>             if (wq->flags & WQ_UNBOUND)
+>                     cpu =3D wq_select_unbound_cpu(raw_smp_processor_id=
+());
+>             else
+>                     cpu =3D raw_smp_processor_id();
+>     }
+>
+> Because the wq is not unbound, it takes the CPU where the timer
+> fired and enqueue the work on that CPU.
+> The consequence of all of this is that the work can run anywhere,
+> depending on where the timer fired.
+>
+> Recently, a new unbound workqueue specific for long running work has
+> been added:
+>
+>    c116737e972e ("workqueue: Add system_dfl_long_wq for long unbound w=
+orks")
+>
+> So change system_long_wq with system_dfl_long_wq so that the work may
+> benefit from scheduler task placement.
 
-Yup, it's still in the queue.
+The patch description confuses me.
 
--- 
-Thanks,
-Sasha
+The message ends with "the work can run anywhere, depending on where
+the timer fired." Read literally, "can run anywhere" sounds like a
+feature, not a bug =E2=80=94 and the proposed fix (WQ_UNBOUND) also lets=
+ it
+run anywhere, just via a different selection path. Without a sentence
+saying "and that anywhere includes isolated CPUs, which we don't want,"
+the reader is left to fill in the gap.                               =20
+
+So, could the commit message lead with the motivation? My guess is that
+this is about respecting HK_TYPE_TIMER housekeeping on isolated systems,
+which system_long_wq cannot do because its per-CPU pool ignores the
+housekeeping mask once the global timer fires. If that is the case,
+please say so directly and the mechanism trace becomes a supporting
+argument rather than the whole argument.
+
+
+--=20
+Chuck Lever
 
