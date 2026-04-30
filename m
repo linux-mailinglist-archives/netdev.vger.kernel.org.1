@@ -1,192 +1,206 @@
-Return-Path: <netdev+bounces-282852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282853-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cBoYMFNV82mLzgEAu9opvQ
-	(envelope-from <netdev+bounces-282852-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:12:51 +0200
+	id UAuDEndV82mLzgEAu9opvQ
+	(envelope-from <netdev+bounces-282853-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:13:27 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 642A24A3389
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:12:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A0C484A33BF
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 15:13:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CD8D330459EF
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 13:10:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C12613011589
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 13:11:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA386413247;
-	Thu, 30 Apr 2026 13:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C180B41B35D;
+	Thu, 30 Apr 2026 13:11:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="JW8j6XN/"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="DY3cItEk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010031.outbound.protection.outlook.com [52.101.61.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEBBF3A4F32;
-	Thu, 30 Apr 2026 13:10:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777554629; cv=none; b=J2J3koKzFegNJGOB8Dyt27Un4KwYidenMn4FK/IGVD9hdCtoTg7Hce2aG3ulWo3b7gYQkI6TTe7uRlkbQvf3J5LAGvmp8MOhb7E8+EQdUIeOfb6ZQycNNurRGaMdqucTyrkeH9nBIJuj3sPY3woVi70TV55+okAK62ynVzgddqY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777554629; c=relaxed/simple;
-	bh=KZPypeK+VvHN7tyvMnyAUYzimRriKTvsTR9yLNw6TwY=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=MgzgbxTQ8Mxs9ZQqd/MoqnTyBv9HrGwkGTetb8vMjpC3j29yicCyyQwwO0rTpfuRVa5BivbtE+A1wQEtMpYNtw2Imw0UUy8yYcEeT3eUAubNt0X9P07oS9H+1P4Fa7sRq3BBbYKLWij0I2MiwNTuLrBa8w6MtCJG5o4Pw6GyPtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=JW8j6XN/; arc=none smtp.client-ip=193.238.174.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mx.ssi.bg (localhost [127.0.0.1])
-	by mx.ssi.bg (Potsfix) with ESMTP id 487772292F;
-	Thu, 30 Apr 2026 16:10:20 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
-	:content-type:content-type:date:from:from:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
-	 bh=6eOycCEcSlmpqyMHk/j1cnGYIXhhIxDgKIaphAvfliY=; b=JW8j6XN/CKVg
-	X6N6SdA3Y+3snjIQYwid2OKIULVpcgrObZebAQm2wodcsdZDpXvDaOoXd7sQzssx
-	DIhjUHRiMk03UoJ4wRUNyGeGwACn8vNtrHkg/P6fgy/zZ88UyFvx8FgUOlGE3228
-	rdEc83Y6hUb5QQQYu+wzEHyjQI3c0qIzJUe7Wse7ROWjzAhAqSX9K7HbEJpF2iD7
-	dug0v/6zfT6j620MpUsUVEJxlQgpqGvdvMXSEAk27I1OjI3WM449dRSfb60b3ZzR
-	ebbNria9iZHv2i+IJY8JoPJtrpyn/+waqXhzWEg4QVCYBcr0csnEaaI9iEHrC1HD
-	ivUSg2tcImf+Xt680DosojUMURY/W41qzWuliuRarFFi3ydpW0szGaF7ZqJ6OAWz
-	Ej5/aweE5fbuNgBks5/hRxUFytp2lL7ap8hXi5px4xpvEAiAI2k5MfNc6MWXfkOO
-	6E8neZy+LuIh3LYkfNZ+cEp01lEAnoIkQtEstxYY2q6PoF2bfiBBhz61GkRxFvMK
-	jWNL9beFaAhJv4AEOona5QHgh+637xQzoWuSMoW6lTUFsyADf8WaMP/u6MxITfFq
-	2W2NbweKnamW+mTL9BwownE3mflRLLZ830Ofmk8t8R/VPvDZvgK5k8/ElwwZZltw
-	ciJfd9lrOPwZejpE0NUzWjDnBdq8/Rw=
-Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
-	by mx.ssi.bg (Potsfix) with ESMTPS;
-	Thu, 30 Apr 2026 16:10:19 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by box.ssi.bg (Potsfix) with ESMTPSA id C365A61C02;
-	Thu, 30 Apr 2026 16:10:17 +0300 (EEST)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.1/8.18.1) with ESMTP id 63UDAGec055756;
-	Thu, 30 Apr 2026 16:10:16 +0300
-Date: Thu, 30 Apr 2026 16:10:16 +0300 (EEST)
-From: Julian Anastasov <ja@ssi.bg>
-To: Simon Horman <horms@kernel.org>
-cc: horms@verge.net.au, pablo@netfilter.org, fw@strlen.de,
-        lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH net] ipvs: fix shift-out-of-bounds in
- ip_vs_rht_desired_size
-In-Reply-To: <20260430123917.1628871-2-horms@kernel.org>
-Message-ID: <fec8dc99-9611-7311-5ec0-0d5d3895b1cc@ssi.bg>
-References: <20260427234014.86256-1-ja@ssi.bg> <20260430123917.1628871-2-horms@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD91041B355
+	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 13:11:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.31
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777554674; cv=fail; b=mGSgjr0QBokaX9EQv6oSFjzzU3bbN6M9MidxZ4vqBGW8gOzryWJ9m9o56Bhql5x/AmV/Dc0k+cblhF4QscZE009RtexnSEwTGYdCRPZlI5tucvKdeSLe9tmdo1BKb3z7IEu70vfblmukYUcjyqdiz9661GaHtY4gpDFCbh4zvBM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777554674; c=relaxed/simple;
+	bh=wqRpZIDh7htWupA6cJCzViOKgdYExLMR7+uN+XdpOcQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=XQ/0MPYX6EVtGHDKiFJVn27YvDhA1Wog+4rj7t49XKps7ddvIAv+Nu6lnPYEtOxQKPTbQNh36w97Xe9ErmDlEYKnRNgKO7u46H+HkrmmXz4YRky4lT7QSn1nAnh8ik8NkG8E3oXczMQ55r3EYU4vap4JEZS5gps76NKMnnvJvXI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=DY3cItEk; arc=fail smtp.client-ip=52.101.61.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gzn2jluriB7A/f6EvEmY+NrqBqjhZCkn5DdkyoDEEf9xr7bKjfA9xv1wsVuVf/rqaScs7NxnqtMhDIQ/E9aA7c4IFLGxXTh99lcRrmlCGl1R+l9m0qFa5HX0S4OLGcdb6AhON9dxlnDyiUHUI9r0W5Ph7bmCzl0nd08P31VUnMFY1+b5SUup9q3nZl1Aj/8pdwtgAXkI5461D7JpW3sYMF2HnBTp06C0FE62ddSzFqIk0guhe+FZYfKfwkyudX4i201DUwKbmpYFteU15oMoBs41yUnsANg88FD9QRJPRGFIzs5EKJ+4r1kHvyKaekzU4rIjGg78ZssiYFnQiilctw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HyXlbhUYJNXU4gjycixYc/zmQGD+mN7P6/zz9M81aF4=;
+ b=adAJGlH2ow3q/RTQ+wXArePvsLBREIS8awRiinXA9QZGlJxV6gihOKhKVrSFNroA1BS76aOK2Jd/xiiMzhDhFL46o6QSwi2hGQ7WE63nqjTYM2ekyeCyc3SJ6mqFBuXAkKz7A078+Xhv/nE+7ri2dklQ3GbIv11IafR6lngAgFl/E1hK6HTqkIiNqq/A7mrB+X2lmLpvwght5qA3jv3AnHxQZj5G13Wo3hEBZUvG05tmZxEIKtGcLxvitKA3rjnrqFRszmZi8m5wlrvYHhynMZYS5fklDH59KeaoZ0lMI0aBTKj7/IPHkRcGByOQitdGmYDlCDC+ivDh1lz89pHzEg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HyXlbhUYJNXU4gjycixYc/zmQGD+mN7P6/zz9M81aF4=;
+ b=DY3cItEkaBEzPfRyOKja1dB3F2R+oL197/PrEr/OThrQEnmG3GmS0bU3XxFMmk2szPhrDGcmPtgDNnLypsPaAX19hb16dQDtTdn2KG0qCrH35FGVOCpzcoBE3EI/UwFF8mR3bZ7gnXznXqKG1tX+EsdV8VMKVpRY4dgXYv2gDw7+FPFDAyK8Cw52B1o+6s8hxvbGUuXo9pHbtedufkpKlDYchLE2qXC+Jvs7eOLSGQuJCcXzEmcfU0MEeTfYlFEGDuXPraDoWT0zqtOa4YLgie0HwbvDqqV6Gha5BsDTLo/DkHK+NG0vENu34EI5SwWepAuku/tJs8bItxhqJiWm4A==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by CH2PR12MB9541.namprd12.prod.outlook.com (2603:10b6:610:27e::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.21; Thu, 30 Apr
+ 2026 13:11:05 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.20.9870.020; Thu, 30 Apr 2026
+ 13:11:05 +0000
+Date: Thu, 30 Apr 2026 16:10:55 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com,
+	Yiming Qian <yimingqian591@gmail.com>
+Subject: Re: [PATCH net] ipmr: prevent info-leak in pmr_cache_report()
+Message-ID: <20260430131055.GA976630@shredder>
+References: <20260430070611.4004529-1-edumazet@google.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260430070611.4004529-1-edumazet@google.com>
+X-ClientProxiedBy: TL2P290CA0012.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:2::16) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Rspamd-Queue-Id: 642A24A3389
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|CH2PR12MB9541:EE_
+X-MS-Office365-Filtering-Correlation-Id: bf8cea31-918f-4dce-4bea-08dea6b9ef70
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|376014|22082099003|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	FuOUjMglCfUrkNWTd8OaCAa2W8AP1UR0AiHWkNOXSpLHIzjVinTUrYFQcQGCOOml74gK8sn/JGa4PA0vyGDAbB815sVpn0YGnvoczKO6NYoQZpWMsnUAI5ewLtOBSvHNJM6hKOqddoYoQXnXhE4CoP0418daf6DFmdW5Atv5T8HwFzygJ97ieIC2NO6SYj+gVM0FUekzhYnHZaDZ2SNwsyfO6VOAuRRYyj51ciY1Qk5ax5LBf4wFwJvwUWEBn5nig5tor0ZN0YoKZ27vNZhzwzbaCkNwe14+UF4zArAgeNYQ13gwoXVBEIJ6fjQyWdrmoAtWvOU1Gg0MPCi7hKU40rVtOHBi+r3RMeBjKJEfrutaimpIu9BbzLLDLWSNGvvog+5y2y3dD6FkHpk99FaHos3rj0G+nvAhqy3xmXM4hwkuMmp6vOp6SlzuKykf7Hj4DUUYebi35ipPuThIlb4IfDLHm3pUtw7GsU4s9GZ4w44Wut9dAXi+Jl4bSpvIb/MFGXLpIGWyVTD/Ff//KOte88Qoyk85NG/LWJdb4uBmMkO/QIbtSo5/7L4UkvEkzU5OpDRMg0BXrsk5i8SBa2YYeWWGMy92ccO2bBzXsKgk/M6TkdnyRdDmLN4Vkci9nlRWWhvpvoWWMoVl+UJToJ3rHY4Exf8dtoBrGw7gLm7RT5l5okExMrGgF0cbip6NC2+76spxyLdi59sOOImcTlKcW+1SlieAQvQoNMj37+o+Qb4=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?ofLwf9Ce20eTlWlFl4a7674krz0bU3O95y2/Xlr35ym2E/0S8/2R7zJOP7Og?=
+ =?us-ascii?Q?8ipl31fcYAYKvWibYlHg+GCYr82oJlHVAMnVXbL0yMp6vHO+SVCTlXNGGFMP?=
+ =?us-ascii?Q?YPFpAbBWT0yUiygym7Um0AUL6Y5SsBYgiQ5omRki7tgxIi0n3gx6s9xiGhsH?=
+ =?us-ascii?Q?qKjVobQJ9DIN/jJovWe36zPdtr7bhn5sBM2hBHvMuPlKvLaZnjxgMsUfJk2D?=
+ =?us-ascii?Q?BRe6d9T/0DNw8IM7/5wNHcMzdWpO3eXEbytRuBMiSyga5lRxSEBjLnl/wXnv?=
+ =?us-ascii?Q?Qo2QBzLEt8oAjNSc5t0VWUnpu/CnivEf9k2HpUB5g5j3kvaLSmiGEY1/+hrg?=
+ =?us-ascii?Q?nUZYtko9xL6WmTXphPblOgrNNWYwlpcZTreUQSi+j3a8KgZM/8N46izXyp5M?=
+ =?us-ascii?Q?gTs34X3ng1yXeZn8ectFTIunxXcYapq0pFPFaI/TpaHD9cqEVrjAiw+FbsYM?=
+ =?us-ascii?Q?fqKo59GQTwrPm+ji40L1g/vHfHiNcwtlWR4eWgeFU13OzPZqrECL16lCABGS?=
+ =?us-ascii?Q?7yGii+Wi9DO3uQljlcW4xdGTKhjuBbtMDIxbBS6wcLO0A1WAs2+I56vFrqvn?=
+ =?us-ascii?Q?i0FGzf/baeuaYYCa+gORyOapV4uX1e9shckGWibItMGS5jh6x0vhxq2lYtKX?=
+ =?us-ascii?Q?B4uFvcLuWuFgMCMbgwKArzcPB/rd8sNg+GRRq+2pgv0CcQZmd5+D8DAT3PPi?=
+ =?us-ascii?Q?HVgrzEHFjDwI9xI2ZZ24Bhnz1pSFER7adnbeI5ZXa2JmmBGRWoNXg6JMYxYb?=
+ =?us-ascii?Q?ghE9jYZxmhNSYaQjizuddkUHYyHfjTvZdcFpawD4spF0ESEjsuTqfMCr4En7?=
+ =?us-ascii?Q?E6RPOKB8ghJzaFMhictxHYbeyoLqSlz9/RvVt0Yh8ISeVXz505q6+TWsxzqi?=
+ =?us-ascii?Q?xD/6ECs5fmNu7oug/XfCDfeHoRn1jO7a/p7C6ebULK4g9riXRkGwfkD6QQS1?=
+ =?us-ascii?Q?2tMa8v0Vjvi/Y6pUx1oBxvH0YBXJnPm7Xo2IoN4tIno3uIKDaLrSNjAzyF6W?=
+ =?us-ascii?Q?7dg1+QRt2AMGMlm3f5Dd+aihMzIBXApThtalTiavd9QaxjcndrR01eBwqwvd?=
+ =?us-ascii?Q?92hdbwkLknDCpey7mqzUQ5mrITykQY3IOwOwREpCAGxAnb9yLUqBGoHY1Gli?=
+ =?us-ascii?Q?Cerns5I2iabCCiHgmL7AmyGYkZxEJMtCDqxajSta8LQ1M0ugaoREC5Cn+o3f?=
+ =?us-ascii?Q?fWswqHBvzeTkwnh6nXBV3ke2YUEY2BAZuUbpnpsfWjvcFK1sbLkNieWZyZqY?=
+ =?us-ascii?Q?7V5v5Qazsfge56zA3LVtFxEAwd+59drUuDscCxB0yiG90KYZsYkj2ZiBBIkw?=
+ =?us-ascii?Q?rz6SAmoo6BOQhKfa7eHoyNYz2NL4jys5NsbQINnojEoB7VlHa+i+oIPgrC5u?=
+ =?us-ascii?Q?TDDecEVch5k1i4V0cZUos6Y/xJrzlse5Mxhvld6/Xdtbjah2pNMx/imWjn5n?=
+ =?us-ascii?Q?0hRSZU9XYP7OdHZJhAP+hE2J1Y1pnKPvfVq6UO8ZRokI+XFbgWrBhiIJXm+N?=
+ =?us-ascii?Q?TWgpF8qEZ2eF0EpzY9ft3xui5ZWmk0fOEFCOSUdB1vQe+D7Tkkd6wikOjoWV?=
+ =?us-ascii?Q?R09doEJgxc7ZCKbz/njqfk+E9HN1rtxbH2t70kiJ49jJt7eYJGrNbkpw392w?=
+ =?us-ascii?Q?20e9SrSL4noE/9jIVQY3Tk1uQuq7DslkLzsTanmADSEiTeFsqWFS41D3M/aW?=
+ =?us-ascii?Q?rIFcjhsGoPFMre7obS8XJMp7bGTV/6AluXvK/RR/JOoxuWeG?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bf8cea31-918f-4dce-4bea-08dea6b9ef70
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2026 13:11:05.3581
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Bc6UFEiH6+VCsQe9tX/ltWuGH43oHwkL3IZSs3h6u2DFwQDbO51FgAsOQaul2ol6NjwyGDF9XXtw8bJ9Ez+Lyw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB9541
+X-Rspamd-Queue-Id: A0C484A33BF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
-	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
+X-Spamd-Result: default: False [1.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[ssi.bg:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ssi.bg:email,ssi.bg:dkim,ssi.bg:mid,sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-282852-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-282853-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,Nvidia.com:dkim]
 
+Nit: s/pmr_cache_report/ipmr_cache_report/ in subject
 
-	Hello,
+On Thu, Apr 30, 2026 at 07:06:11AM +0000, Eric Dumazet wrote:
+> Yiming Qian reported:
+> 
+> <quote>
+>  ipmr_cache_report()` allocates a report skb with `alloc_skb(128,
+>  GFP_ATOMIC)` and appends a `struct igmphdr` using `skb_put()`. In the
+>  non-`IGMPMSG_WHOLEPKT` path it initializes only:
+> 
+>  - `igmp->type`
+>  - `igmp->code`
+> 
+>  but does not initialize:
+> 
+>  - `igmp->csum`
+>  - `igmp->group`
+> 
+>  Later, `igmpmsg_netlink_event()` copies the bytes after `sizeof(struct
+>  igmpmsg)` into the `IPMRA_CREPORT_PKT` netlink attribute and emits
+>  `RTM_NEWCACHEREPORT` on `RTNLGRP_IPV4_MROUTE_R`.
+> 
+>  As a result, 6 bytes of stale heap data from the skb head are
+>  disclosed to userspace.
+> </quote>
+> 
+> Let's use skb_put_zero() instead of skb_put() to fix this bug.
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Reported-by: Yiming Qian <yimingqian591@gmail.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-On Thu, 30 Apr 2026, Simon Horman wrote:
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
-> From: 'Simon Horman' <horms@kernel.org>
-> 
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> Full review at: https://sashiko.dev
-> ---
-> ipvs: fix shift-out-of-bounds in ip_vs_rht_desired_size
-> 
-> This commit addresses a shift-out-of-bounds issue when roundup_pow_of_two()
-> is called with 0 in ip_vs_rht_desired_size. It updates the assignment to fall
-> back to 1 if n is 0.
-> 
-> > diff --git a/net/netfilter/ipvs/ip_vs_core.c b/net/netfilter/ipvs/ip_vs_core.c
-> > index f5b7a2047291..ea450944465f 100644
-> > --- a/net/netfilter/ipvs/ip_vs_core.c
-> > +++ b/net/netfilter/ipvs/ip_vs_core.c
-> > @@ -237,7 +237,7 @@ int ip_vs_rht_desired_size(struct netns_ipvs *ipvs, struct ip_vs_rht *t, int n,
-> >  {
-> >  	if (!t)
-> >  		return 1 << min_bits;
-> > -	n = roundup_pow_of_two(n);
-> > +	n = n ? roundup_pow_of_two(n) : 1;
-
-	To overflow it on 64-bit we need 600GB+ memory, the
-conns are ~300 bytes.
-
-	In v2 I changed it to n > 0. To solve it completely
-we may need to introduce some kind of "conn_max" sysctl,
-now per-netns. It can help to limit the conns which are
-created GFP_ATOMIC while for other structures we will switch
-to GFP_KERNEL_ACCOUNT.
-
-> The parameter n is a signed int. If n happens to be negative, it will evaluate
-> to true and be passed to roundup_pow_of_two().
-> 
-> Because roundup_pow_of_two() casts the input to unsigned long, a negative
-> value like -1 becomes ULONG_MAX. This results in a shift exponent of 64,
-> triggering a shift-out-of-bounds regression. Would it be safer to check
-> for n <= 0 instead?
-> 
-> Additionally, if n exceeds 1.07 billion (1 << 30) on systems with large
-> amounts of RAM, roundup_pow_of_two(n) evaluates to 1UL << 31. Since n is
-> a 32-bit signed int, assigning 1UL << 31 back to n overflows and results
-> in a negative number.
-> 
-> Since subsequent bounds checks use signed comparisons:
-> 
-> >  	if (lfactor < 0) {
-> >  		int factor = min(-lfactor, max_bits);
-> >  
-> >  		n = min(n, 1 << (max_bits - factor));
-> 
-> These checks will fail to constrain the size correctly.
-> 
-> [ ... ]
-> 
-> >  	/* Shrink but keep it n * 2 to prevent frequent resizing */
-> >  	return clamp(n << 1, 1 << min_bits, 1 << max_bits);
-> >  }
-> 
-> Eventually, the function returns clamp(n << 1, 1 << min_bits, 1 << max_bits).
-> Shifting a negative number causes undefined behavior, and the clamp operation
-> will force the hash table to its absolute minimum size.
-> 
-> Could this cause millions of connections to be placed into a minimally sized
-> hash table, causing severe collisions during RCU hash lookups?
-
-	All that is valid without conn/mem limits.
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
-
+FYI, I checked and ip6mr_cache_report() seems OK.
 
