@@ -1,286 +1,268 @@
-Return-Path: <netdev+bounces-282756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-282758-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SH+GDPIq82mwxgEAu9opvQ
-	(envelope-from <netdev+bounces-282756-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 12:12:02 +0200
+	id UDqaOlQs82kByAEAu9opvQ
+	(envelope-from <netdev+bounces-282758-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 12:17:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 906AF4A08FE
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 12:12:01 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id E697C4A0ABB
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 12:17:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B124230595A0
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 10:01:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E209F3048D29
+	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 10:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 303923FB06D;
-	Thu, 30 Apr 2026 10:01:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9AB03FF8B4;
+	Thu, 30 Apr 2026 10:05:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g9f7+PZu";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="jmMCyuwa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ewglzuO2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADD833AA4F1
-	for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 10:01:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 038F83FE373;
+	Thu, 30 Apr 2026 10:05:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777543300; cv=none; b=hB9E5GAaCpilS3OVx1Qg4dUwAx4D9cViFEZxBGTFRO8vFY/RgJeeocQFtI92wHYrBTKWYJXtOr/DUuI5x6cechSdeACSrCkrB+CDUQ7kAY1QufeRIuzude9P4kBHmmqtg9c3szbwmdNtkyuNKjO7vZz7mFZTv8PCZdNKwIgo++c=
+	t=1777543519; cv=none; b=lFzAkgO40xCPKkt5g85OZB+Vh7QP5emIbqzEVorFvtizg6epCSawQWEf4+4Sl7HZSNNglY3oR6LJk3MgUQpYayVe/6pNNG7cGznHgUCPTEyjQxZTd2v8m3WKzkEu8JGmHykd2q5LIxOmJMhu7hM5qwM8hL5Ia9DRSdxThGhG6To=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777543300; c=relaxed/simple;
-	bh=XuzriXIH4ZVyXTd2Jo14EGNEA6R0lhMFbzpoWHiIR+M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sZuqsZDzakweMNjqSbdBNuT+6PEQmTS+zPYtdZ7ntRHaf1AkVPDdmpP8IoDR0E7gaBiH2ZskIZa2953D4cVkiSFoI/2+zzXH+TKICjoSAYQ8OlsQFU6xo3hTcq34mfOqYJWxSNdK0BswU0LH3R/sBfdv9YR1Kvxb2m5IRfojxzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g9f7+PZu; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=jmMCyuwa; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777543297;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N07/Ak0OajH65jWxaz0uv/NFa2E5T7TXDwVpUO3pEZk=;
-	b=g9f7+PZupYB7Oi6A2H5qLAn7CgQm9HPYijfUqg68UxjA+M72NBhuHqHKt5IeZghLegtq2H
-	dIx/zJ9JxN1M9pU+Ofgc9fGkKDLxbcRN9jJoXlz5a1inooGg4z2PYqoO0V2eydTsV2tNGf
-	7srAbc1jFvrSNTH+lVtfPEkYE3eAMeA=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-630-f5OSvDlcOVC1B2xhjKrZLA-1; Thu, 30 Apr 2026 06:01:36 -0400
-X-MC-Unique: f5OSvDlcOVC1B2xhjKrZLA-1
-X-Mimecast-MFC-AGG-ID: f5OSvDlcOVC1B2xhjKrZLA_1777543295
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-48a5523fd53so3186435e9.3
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 03:01:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1777543295; x=1778148095; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=N07/Ak0OajH65jWxaz0uv/NFa2E5T7TXDwVpUO3pEZk=;
-        b=jmMCyuwasQ5/1y03YvKEICo6UrfVQLV4AjessP0jKUdzOCFMmC6Ovwzpk6a+cB7Tt7
-         Uh+5iTS+OCPdOTDM//K3t5U8Y1j/kG+31lPeRTwoNgtWnBFcmiJjcN5vPwH/mgPH5Qll
-         /ebzCn6+AS7jM5XSke1Gc3znYx+OLB78R4iRwVP3i0FGR1lOTiwakvHPpahaXDUCjxny
-         sSQwNCi0F8Yj9LEsHhE1EqMBPz7T1MYjrhomjuzuWVZwBKRYxVhZZVdJDcbvMCOTxVK3
-         6e+57hC3Y8Jw3/LHho3G5UyVYENjIvg+YTdL568+2bl6b5hrcW1g6aKmXBnEinZ9+yjR
-         bg8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777543295; x=1778148095;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=N07/Ak0OajH65jWxaz0uv/NFa2E5T7TXDwVpUO3pEZk=;
-        b=mL9ZDTaBl+lxaw2RGDlNc31T8vhV51NY9iFWUOOujJaxirtOGNzcJf/fYMhvjYFqoG
-         Y/D0Q4csvm/8H9oSRRzsL6mjCSfFEl2dEmnM9z+A4VKlK6KtR3K5w20HPpO8XzDwf1nW
-         RX+6P2H0gvNYk3MGJZ1U7Qe6JDrzfzryNFnbx2kbcC9XRZyTf9DNqil/kUIPAR1qq8kF
-         XTihNJ9xtX0sFX9c+81JxlYcmB95wEFWAC8mK0vX6lyNWtfhhRw4tfDYpUyaPHUxUv4X
-         vVnl7w+tMolfqGf+HSKK+g7gTlAp02e06t8ZPFV30usK51YOXRk7Fv8MFzyUlkn2A512
-         5PvA==
-X-Forwarded-Encrypted: i=1; AFNElJ8gptqVw3Vse+CCoOWwebCH9sSZkoqTu0oRCQz8anCN499kKr+HmbVDmG6mLrFAOJwIjuIFVbA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjZosE6QNiLpKCATusvwv8Dqg20+qM/Xn+vzCv6qyPWZ2P7ZKN
-	BlMEtY3/ODB6XGWW1XnE4eOiiv5bRtWYh+TpO+Dmi6cC+80LOxIJ+OIBzuUjVm7pnJGKBeTpfuX
-	b9cVhXS9vD+UGrHpzA4vGaPMzrNsmPrrMKP0E35Kwb1ZiDOgFl6Ay+3VY1g==
-X-Gm-Gg: AeBDieumjXHLCNwFdVSDrt9oCAJWwMYvz/jblWOyZEVqNLUgXRRHBTvm1BM51XD5tD3
-	lBa7dzIKQq/eVK43ivzj29+rwp1sIHhFvYR5IusJ7H3c3dUS/Qvj2Hnhcsf3iaSbxRnq4Wb5RC6
-	mnlCdOjdIGe1QjLccm/TnNa+GVUFtuOndjalnSYom8M8Vxs2FLO0QW8E6VmzZKGZbNnlJHwAwPO
-	/LCeeHZjn/aaFDXWYQvoHlUgAHglX4ibtM2os9NqeuI2Xk3zQTlJNkXX25K5q5I8zYQvaGBWa0W
-	OaXfhLmkhRrLSG0qmkz7fQ0MpT0+ihODdquABMmTcDi4UloG8iJMIxyZR3VknBFV9ueGuAXkmMd
-	bX7DFoqxMG2wrwosyWc4Ki7BViu9FUDY2LC0/G02JIuZ40uBH1x607z5vOiAY9ZCXOQ==
-X-Received: by 2002:a05:600c:4fc5:b0:488:9e43:9690 with SMTP id 5b1f17b1804b1-48a83e7206emr39045455e9.10.1777543293605;
-        Thu, 30 Apr 2026 03:01:33 -0700 (PDT)
-X-Received: by 2002:a05:600c:4fc5:b0:488:9e43:9690 with SMTP id 5b1f17b1804b1-48a83e7206emr39044565e9.10.1777543292809;
-        Thu, 30 Apr 2026 03:01:32 -0700 (PDT)
-Received: from [192.168.88.32] ([150.228.93.27])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a81ed6b65sm89540355e9.3.2026.04.30.03.01.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Apr 2026 03:01:32 -0700 (PDT)
-Message-ID: <5fb1048c-1b3d-4136-9f10-0525ef063e58@redhat.com>
-Date: Thu, 30 Apr 2026 12:01:30 +0200
+	s=arc-20240116; t=1777543519; c=relaxed/simple;
+	bh=43/PYTKoM5Si0NIj9BiQpEm3hIxxN21kEzjN//oZk2c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gcI+MQlmlavDB5k7IJWmZdMkTJ+Jrl+SLLmsTzm1qs/h3LTXtN8/WdbzS2OWZ4sgE5W/+ZhWgoJmLFJyM84mvRYilrNEVPf5X4GvTpvokvkwdOEhK1ObcH3WXKgs7/edvvJDo9eAggolWduGogfBw06StZ/xh7u8JB5Qa28DR3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ewglzuO2; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777543518; x=1809079518;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=43/PYTKoM5Si0NIj9BiQpEm3hIxxN21kEzjN//oZk2c=;
+  b=ewglzuO2k9LLXrjSWyS6OI/3iKUv3aOls09XNTVsMyU8240RTcoGkiaP
+   AhRhwGcTHuOTqaAnEKhS4KqgZuAAmEX6wAqBNdAdbfVZc4PAmwIQzguZW
+   5MdAaYGtcV4KnReYgW42OubmihYuvuFzxW4EWMma86mZ2DqWxsDl1XJhO
+   4r/vZnLbSHiDvw8N4eymDc8zYmrGlQ8O+Eve2XJtAyOgA14OQiVBqH+2E
+   L/xiePGpHfQmQ9U/jUi0KIpgzWYNgcDkn3unvtw3rwYVqzz5RZhDXMmPw
+   +EmSXn5bsBBtqzFTiUPIwXQW9V84Q2NYOBwr9SfMnvJ2Bq2MhI9pmgdAI
+   A==;
+X-CSE-ConnectionGUID: Zk4ekQd6QvK43BtVJahSrQ==
+X-CSE-MsgGUID: dHSWaFI4Rx2Pq2gNtjCuDQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11771"; a="101153184"
+X-IronPort-AV: E=Sophos;i="6.23,207,1770624000"; 
+   d="scan'208";a="101153184"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2026 03:05:17 -0700
+X-CSE-ConnectionGUID: 4eINE8sUQdOCWlG9SAe+Vg==
+X-CSE-MsgGUID: eLSDstEeSa6KHP0wrJRw4w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,207,1770624000"; 
+   d="scan'208";a="229932585"
+Received: from lkp-server01.sh.intel.com (HELO aa799cca880d) ([10.239.97.150])
+  by fmviesa006.fm.intel.com with ESMTP; 30 Apr 2026 03:05:14 -0700
+Received: from kbuild by aa799cca880d with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wIOGc-00000000CGW-3J3K;
+	Thu, 30 Apr 2026 10:05:10 +0000
+Date: Thu, 30 Apr 2026 18:04:13 +0800
+From: kernel test robot <lkp@intel.com>
+To: wit_yuan <yuanzhaoming901030@126.com>, jk@codeconstruct.com.au
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	yuanzhaoming901030@126.com, yuanzm2@lenovo.com,
+	matt@codeconstruct.com.au, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net:mctp: split mctp hdr version to ver and rsvd
+Message-ID: <202604301714.OQSuNMur-lkp@intel.com>
+References: <20260409125129.9210-1-yuanzhaoming901030@126.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 1/2] net: pppoe: implement GRO/GSO support
-To: Qingfang Deng <qingfang.deng@linux.dev>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
- Simon Horman <horms@kernel.org>, Kees Cook <kees@kernel.org>,
- Guillaume Nault <gnault@redhat.com>, Eric Woudstra <ericwouds@gmail.com>,
- Felix Fietkau <nbd@nbd.name>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: linux-ppp@vger.kernel.org, Pablo Neira Ayuso <pablo@netfilter.org>
-References: <20260428064717.74794-1-qingfang.deng@linux.dev>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260428064717.74794-1-qingfang.deng@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 906AF4A08FE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260409125129.9210-1-yuanzhaoming901030@126.com>
+X-Rspamd-Queue-Id: E697C4A0ABB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-282756-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[linux.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,nbd.name,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-282758-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lists.linux.dev,126.com,lenovo.com,codeconstruct.com.au,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_TO(0.00)[126.com,codeconstruct.com.au];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,git-scm.com:url,01.org:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-On 4/28/26 8:47 AM, Qingfang Deng wrote:
-> diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
-> index bdd61c504a1c..363204e0c49a 100644
-> --- a/drivers/net/ppp/pppoe.c
-> +++ b/drivers/net/ppp/pppoe.c
-> @@ -77,6 +77,7 @@
->  #include <net/net_namespace.h>
->  #include <net/netns/generic.h>
->  #include <net/sock.h>
-> +#include <net/gro.h>
->  
->  #include <linux/uaccess.h>
->  
-> @@ -409,7 +410,7 @@ static int pppoe_rcv(struct sk_buff *skb, struct net_device *dev,
->  	if (ppp_skb_is_compressed_proto(skb))
->  		goto drop;
->  
-> -	if (pskb_trim_rcsum(skb, len))
-> +	if (!skb_is_gso(skb) && pskb_trim_rcsum(skb, len))
->  		goto drop;
->  
->  	ph = pppoe_hdr(skb);
-> @@ -1103,6 +1104,164 @@ static struct pernet_operations pppoe_net_ops = {
->  	.size = sizeof(struct pppoe_net),
->  };
->  
-> +static u16
-> +compare_pppoe_header(const struct pppoe_hdr *phdr,
-> +		     const struct pppoe_hdr *phdr2)
-> +{
-> +	__be16 proto = *(const __be16 *)(phdr + 1);
-> +	__be16 proto2 = *(const __be16 *)(phdr2 + 1);
-> +
-> +	return (__force u16)((phdr->sid ^ phdr2->sid) | (proto ^ proto2));
-> +}
-> +
-> +static __be16 pppoe_hdr_proto(const struct pppoe_hdr *phdr)
-> +{
-> +	__be16 proto = *(const __be16 *)(phdr + 1);
-> +
-> +	switch (proto) {
-> +	case cpu_to_be16(PPP_IP):
-> +		return cpu_to_be16(ETH_P_IP);
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +	case cpu_to_be16(PPP_IPV6):
-> +		return cpu_to_be16(ETH_P_IPV6);
-> +#endif
-> +	default:
-> +		return 0;
-> +	}
-> +}
-> +
-> +static struct sk_buff *pppoe_gro_receive(struct list_head *head,
-> +					 struct sk_buff *skb)
-> +{
-> +	const struct packet_offload *ptype;
-> +	unsigned int hlen, off_pppoe;
-> +	const struct pppoe_hdr *phdr;
-> +	struct sk_buff *pp = NULL;
-> +	struct sk_buff *p;
-> +	int flush = 1;
-> +	__be16 type;
-> +
-> +	off_pppoe = skb_gro_offset(skb);
-> +	hlen = off_pppoe + PPPOE_SES_HLEN;
-> +	phdr = skb_gro_header(skb, hlen, off_pppoe);
-> +	if (unlikely(!phdr))
-> +		goto out;
-> +
-> +	/* filter for session packets (type:1, ver:1, code:0) */
-> +	if (*(const __be16 *)phdr != cpu_to_be16(0x1100))
-> +		goto out;
-> +
-> +	/* ignore packets with padding or invalid length */
-> +	if (skb_gro_len(skb) != be16_to_cpu(phdr->length) + sizeof(*phdr))
-> +		goto out;
-> +
-> +	type = pppoe_hdr_proto(phdr);
-> +	ptype = gro_find_receive_by_type(type);
-> +	if (!ptype)
-> +		goto out;
-> +
-> +	flush = 0;
-> +
-> +	list_for_each_entry(p, head, list) {
-> +		const struct pppoe_hdr *phdr2;
-> +
-> +		if (!NAPI_GRO_CB(p)->same_flow)
-> +			continue;
-> +
-> +		phdr2 = (const struct pppoe_hdr *)(p->data + off_pppoe);
-> +		if (compare_pppoe_header(phdr, phdr2))
-> +			NAPI_GRO_CB(p)->same_flow = 0;
-> +	}
-> +
-> +	skb_gro_pull(skb, PPPOE_SES_HLEN);
-> +	skb_gro_postpull_rcsum(skb, phdr, PPPOE_SES_HLEN);
-> +
-> +	pp = indirect_call_gro_receive_inet(ptype->callbacks.gro_receive,
-> +					    ipv6_gro_receive, inet_gro_receive,
-> +					    head, skb);
-> +
-> +out:
-> +	skb_gro_flush_final(skb, pp, flush);
-> +
-> +	return pp;
-> +}
-> +
-> +static int pppoe_gro_complete(struct sk_buff *skb, int nhoff)
-> +{
-> +	struct pppoe_hdr *phdr = (struct pppoe_hdr *)(skb->data + nhoff);
-> +	__be16 type = pppoe_hdr_proto(phdr);
-> +	struct packet_offload *ptype;
-> +	unsigned int len;
-> +
-> +	ptype = gro_find_complete_by_type(type);
-> +	if (!ptype)
-> +		return -ENOENT;
-> +
-> +	len = skb->len - (nhoff + sizeof(*phdr));
-> +	len = min(len, 0xFFFFU);
-> +	phdr->length = cpu_to_be16(len);
+Hi wit_yuan,
 
-Whoops, I wrongly replied to v6, but comments still apply here:
+kernel test robot noticed the following build errors:
 
-https://lore.kernel.org/netdev/9d7f1bbc-155d-4c18-bcf7-732ebe4cbf67@redhat.com/T/#m6c92ba4367355abf1bdb001f102c4847853ac4f3
+[auto build test ERROR on linus/master]
+[also build test ERROR on v7.1-rc1 next-20260429]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/wit_yuan/net-mctp-split-mctp-hdr-version-to-ver-and-rsvd/20260414-044431
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20260409125129.9210-1-yuanzhaoming901030%40126.com
+patch subject: [PATCH] net:mctp: split mctp hdr version to ver and rsvd
+config: riscv-allyesconfig (https://download.01.org/0day-ci/archive/20260430/202604301714.OQSuNMur-lkp@intel.com/config)
+compiler: clang version 16.0.6 (https://github.com/llvm/llvm-project 7cbf1a2591520c2491aa35339f227775f4d3adf6)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260430/202604301714.OQSuNMur-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202604301714.OQSuNMur-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from net/mctp/route.c:1793:
+>> net/mctp/test/route-test.c:70:3: error: invalid application of 'typeof' to bit-field
+                   KUNIT_EXPECT_EQ(test, hdr2->ver, hdr.ver);
+                   ^
+   include/kunit/test.h:1033:2: note: expanded from macro 'KUNIT_EXPECT_EQ'
+           KUNIT_EXPECT_EQ_MSG(test, left, right, NULL)
+           ^
+   include/kunit/test.h:1036:2: note: expanded from macro 'KUNIT_EXPECT_EQ_MSG'
+           KUNIT_BINARY_INT_ASSERTION(test,                                       \
+           ^
+   include/kunit/test.h:869:2: note: expanded from macro 'KUNIT_BINARY_INT_ASSERTION'
+           KUNIT_BASE_BINARY_ASSERTION(test,                                      \
+           ^
+   include/kunit/test.h:839:14: note: expanded from macro 'KUNIT_BASE_BINARY_ASSERTION'
+           const typeof(left) __left = (left);                                    \
+                       ^
+   In file included from net/mctp/route.c:1793:
+>> net/mctp/test/route-test.c:70:3: error: invalid application of 'typeof' to bit-field
+   include/kunit/test.h:1033:2: note: expanded from macro 'KUNIT_EXPECT_EQ'
+           KUNIT_EXPECT_EQ_MSG(test, left, right, NULL)
+           ^
+   include/kunit/test.h:1036:2: note: expanded from macro 'KUNIT_EXPECT_EQ_MSG'
+           KUNIT_BINARY_INT_ASSERTION(test,                                       \
+           ^
+   include/kunit/test.h:869:2: note: expanded from macro 'KUNIT_BINARY_INT_ASSERTION'
+           KUNIT_BASE_BINARY_ASSERTION(test,                                      \
+           ^
+   include/kunit/test.h:840:14: note: expanded from macro 'KUNIT_BASE_BINARY_ASSERTION'
+           const typeof(right) __right = (right);                                 \
+                       ^
+   2 errors generated.
 
 
-/P
+vim +/typeof +70 net/mctp/test/route-test.c
 
+161eba50e183ed4 Jeremy Kerr 2021-10-03   19  
+161eba50e183ed4 Jeremy Kerr 2021-10-03   20  static void mctp_test_fragment(struct kunit *test)
+161eba50e183ed4 Jeremy Kerr 2021-10-03   21  {
+161eba50e183ed4 Jeremy Kerr 2021-10-03   22  	const struct mctp_frag_test *params;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   23  	int rc, i, n, mtu, msgsize;
+269936db5eb3962 Jeremy Kerr 2025-07-02   24  	struct mctp_test_dev *dev;
+269936db5eb3962 Jeremy Kerr 2025-07-02   25  	struct mctp_dst dst;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   26  	struct sk_buff *skb;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   27  	struct mctp_hdr hdr;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   28  	u8 seq;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   29  
+161eba50e183ed4 Jeremy Kerr 2021-10-03   30  	params = test->param_value;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   31  	mtu = params->mtu;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   32  	msgsize = params->msgsize;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   33  
+161eba50e183ed4 Jeremy Kerr 2021-10-03   34  	hdr.ver = 1;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   35  	hdr.src = 8;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   36  	hdr.dest = 10;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   37  	hdr.flags_seq_tag = MCTP_HDR_FLAG_TO;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   38  
+161eba50e183ed4 Jeremy Kerr 2021-10-03   39  	skb = mctp_test_create_skb(&hdr, msgsize);
+161eba50e183ed4 Jeremy Kerr 2021-10-03   40  	KUNIT_ASSERT_TRUE(test, skb);
+161eba50e183ed4 Jeremy Kerr 2021-10-03   41  
+269936db5eb3962 Jeremy Kerr 2025-07-02   42  	dev = mctp_test_create_dev();
+269936db5eb3962 Jeremy Kerr 2025-07-02   43  	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, dev);
+269936db5eb3962 Jeremy Kerr 2025-07-02   44  
+6ab578739a4c1f5 Jeremy Kerr 2025-11-26   45  	mctp_test_dst_setup(test, &dst, dev, mtu);
+161eba50e183ed4 Jeremy Kerr 2021-10-03   46  
+269936db5eb3962 Jeremy Kerr 2025-07-02   47  	rc = mctp_do_fragment_route(&dst, skb, mtu, MCTP_TAG_OWNER);
+161eba50e183ed4 Jeremy Kerr 2021-10-03   48  	KUNIT_EXPECT_FALSE(test, rc);
+161eba50e183ed4 Jeremy Kerr 2021-10-03   49  
+6ab578739a4c1f5 Jeremy Kerr 2025-11-26   50  	n = dev->pkts.qlen;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   51  	KUNIT_EXPECT_EQ(test, n, params->n_frags);
+161eba50e183ed4 Jeremy Kerr 2021-10-03   52  
+161eba50e183ed4 Jeremy Kerr 2021-10-03   53  	for (i = 0;; i++) {
+161eba50e183ed4 Jeremy Kerr 2021-10-03   54  		struct mctp_hdr *hdr2;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   55  		struct sk_buff *skb2;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   56  		u8 tag_mask, seq2;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   57  		bool first, last;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   58  
+161eba50e183ed4 Jeremy Kerr 2021-10-03   59  		first = i == 0;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   60  		last = i == (n - 1);
+161eba50e183ed4 Jeremy Kerr 2021-10-03   61  
+6ab578739a4c1f5 Jeremy Kerr 2025-11-26   62  		skb2 = skb_dequeue(&dev->pkts);
+161eba50e183ed4 Jeremy Kerr 2021-10-03   63  		if (!skb2)
+161eba50e183ed4 Jeremy Kerr 2021-10-03   64  			break;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   65  
+161eba50e183ed4 Jeremy Kerr 2021-10-03   66  		hdr2 = mctp_hdr(skb2);
+161eba50e183ed4 Jeremy Kerr 2021-10-03   67  
+161eba50e183ed4 Jeremy Kerr 2021-10-03   68  		tag_mask = MCTP_HDR_TAG_MASK | MCTP_HDR_FLAG_TO;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   69  
+161eba50e183ed4 Jeremy Kerr 2021-10-03  @70  		KUNIT_EXPECT_EQ(test, hdr2->ver, hdr.ver);
+161eba50e183ed4 Jeremy Kerr 2021-10-03   71  		KUNIT_EXPECT_EQ(test, hdr2->src, hdr.src);
+161eba50e183ed4 Jeremy Kerr 2021-10-03   72  		KUNIT_EXPECT_EQ(test, hdr2->dest, hdr.dest);
+161eba50e183ed4 Jeremy Kerr 2021-10-03   73  		KUNIT_EXPECT_EQ(test, hdr2->flags_seq_tag & tag_mask,
+161eba50e183ed4 Jeremy Kerr 2021-10-03   74  				hdr.flags_seq_tag & tag_mask);
+161eba50e183ed4 Jeremy Kerr 2021-10-03   75  
+161eba50e183ed4 Jeremy Kerr 2021-10-03   76  		KUNIT_EXPECT_EQ(test,
+161eba50e183ed4 Jeremy Kerr 2021-10-03   77  				!!(hdr2->flags_seq_tag & MCTP_HDR_FLAG_SOM), first);
+161eba50e183ed4 Jeremy Kerr 2021-10-03   78  		KUNIT_EXPECT_EQ(test,
+161eba50e183ed4 Jeremy Kerr 2021-10-03   79  				!!(hdr2->flags_seq_tag & MCTP_HDR_FLAG_EOM), last);
+161eba50e183ed4 Jeremy Kerr 2021-10-03   80  
+161eba50e183ed4 Jeremy Kerr 2021-10-03   81  		seq2 = (hdr2->flags_seq_tag >> MCTP_HDR_SEQ_SHIFT) &
+161eba50e183ed4 Jeremy Kerr 2021-10-03   82  			MCTP_HDR_SEQ_MASK;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   83  
+161eba50e183ed4 Jeremy Kerr 2021-10-03   84  		if (first) {
+161eba50e183ed4 Jeremy Kerr 2021-10-03   85  			seq = seq2;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   86  		} else {
+161eba50e183ed4 Jeremy Kerr 2021-10-03   87  			seq++;
+161eba50e183ed4 Jeremy Kerr 2021-10-03   88  			KUNIT_EXPECT_EQ(test, seq2, seq & MCTP_HDR_SEQ_MASK);
+161eba50e183ed4 Jeremy Kerr 2021-10-03   89  		}
+161eba50e183ed4 Jeremy Kerr 2021-10-03   90  
+161eba50e183ed4 Jeremy Kerr 2021-10-03   91  		if (!last)
+161eba50e183ed4 Jeremy Kerr 2021-10-03   92  			KUNIT_EXPECT_EQ(test, skb2->len, mtu);
+161eba50e183ed4 Jeremy Kerr 2021-10-03   93  		else
+161eba50e183ed4 Jeremy Kerr 2021-10-03   94  			KUNIT_EXPECT_LE(test, skb2->len, mtu);
+161eba50e183ed4 Jeremy Kerr 2021-10-03   95  
+161eba50e183ed4 Jeremy Kerr 2021-10-03   96  		kfree_skb(skb2);
+161eba50e183ed4 Jeremy Kerr 2021-10-03   97  	}
+161eba50e183ed4 Jeremy Kerr 2021-10-03   98  
+6ab578739a4c1f5 Jeremy Kerr 2025-11-26   99  	mctp_dst_release(&dst);
+269936db5eb3962 Jeremy Kerr 2025-07-02  100  	mctp_test_destroy_dev(dev);
+161eba50e183ed4 Jeremy Kerr 2021-10-03  101  }
+161eba50e183ed4 Jeremy Kerr 2021-10-03  102  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
