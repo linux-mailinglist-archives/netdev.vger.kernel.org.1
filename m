@@ -1,178 +1,182 @@
-Return-Path: <netdev+bounces-283240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283238-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +GsxONzZ9GmfFQIAu9opvQ
-	(envelope-from <netdev+bounces-283240-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 18:50:36 +0200
+	id +P6xKZLX9GmfFQIAu9opvQ
+	(envelope-from <netdev+bounces-283238-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 18:40:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41D804AE2FD
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 18:50:36 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC0BD4AE1FF
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 18:40:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7E9BA3010382
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 16:50:22 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BD01B3004CBA
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 16:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7668F413244;
-	Fri,  1 May 2026 16:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A29E640B6C1;
+	Fri,  1 May 2026 16:40:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=soslab.tu-darmstadt.de header.i=@soslab.tu-darmstadt.de header.b="Qzc8N4Qc"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="bDC7G1JY";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="P4E3P4Bt"
 X-Original-To: netdev@vger.kernel.org
-Received: from c2682.mx.srv.dfn.de (c2682.mx.srv.dfn.de [194.95.239.80])
+Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD753FBEA4;
-	Fri,  1 May 2026 16:50:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.95.239.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8CA83D5225;
+	Fri,  1 May 2026 16:40:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777654218; cv=none; b=YwwDjVbaQDzbGauRVF6xPNcAsBBPdjIplXOpMuQetv+AMuTLaN/Fn3sJWxyyzGoFWJET4iIJZUZsMcc8H4z/AsKP8NVRG461jlSsO2j1yG3kmZivczgHBUGTgUPqvETD5VKIsOoVSwdtKBB6kmGtXUw6/vdxMvP9EgnVR69w10A=
+	t=1777653639; cv=none; b=nJTN+FEmNG+ofs5V205X1h1JHo3Ml8njx1v3MsexVv9iaLPdfaxQHE1NTfE3gmNWZZ4vwLruVplXFh+vMYFLY9gxYoWkmAUIkR5ETnaTOGL8zCyfH354SVoWfmJ3D7icpLrO1Dru0wYBH0hLxi0d5y3/KG8PRXXEAPmbykWZYIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777654218; c=relaxed/simple;
-	bh=7GvWlYJ66GEsKXxb5c+BB1NizN+kBkLoRH4YlKVEf9M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bDEpT08/ipQvontHj/FL6N/SpdQsEUfl6L6E2IIJJnLXho68QPQaYAG8S/aSa4ZypB9BycK1YtegGGlBla5Q6tKJTHkNqOIjmy8pPwqOtsd/Zqi3TUlvi6WYs1f09v9KdbAhJJdol2jn1oMKut3pq654gOEDmd6pSYXQqUkBozM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=soslab.tu-darmstadt.de; spf=pass smtp.mailfrom=soslab.tu-darmstadt.de; dkim=pass (1024-bit key) header.d=soslab.tu-darmstadt.de header.i=@soslab.tu-darmstadt.de header.b=Qzc8N4Qc; arc=none smtp.client-ip=194.95.239.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=soslab.tu-darmstadt.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soslab.tu-darmstadt.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-	soslab.tu-darmstadt.de; h=content-transfer-encoding:mime-version
-	:message-id:date:date:subject:subject:from:from:received; s=s1;
-	 t=1777653596; x=1779467997; bh=7GvWlYJ66GEsKXxb5c+BB1NizN+kBkLo
-	RH4YlKVEf9M=; b=Qzc8N4Qc0Xxdm5YkvPaWLZ7jvevJXkG0bONxEbqblwRjn0MU
-	wPXiJo8xPYOSXT0w6OJvjAgGaNo/jSWclBtzZEPldi/6LmkkA4yhU9apk7VCajya
-	G3MoALID5y0KsBbVrG2HTNHAyRsSYzu6c8PZdzaek0CaRfue+38nP6GZlKM=
-Received: from mail-relay150.hrz.tu-darmstadt.de (mailout.hrz.tu-darmstadt.de [130.83.252.150])
-	by c2682.mx.srv.dfn.de (Postfix) with ESMTPS id 4D511438;
-	Fri,  1 May 2026 18:39:54 +0200 (CEST)
-Received: from smtp.tu-darmstadt.de (mail-relay158.hrz.tu-darmstadt.de [IPv6:2001:41b8:83f:1611::158])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits)
-	 client-signature RSA-PSS (4096 bits))
-	(Client CN "mail-relay158.hrz.tu-darmstadt.de", Issuer "GEANT TLS RSA 1" (not verified))
-	by mail-relay150.hrz.tu-darmstadt.de (Postfix) with ESMTPS id 4g6cG04RMVz43Vv;
-	Fri,  1 May 2026 18:39:52 +0200 (CEST)
-From: Markus Baier <Markus.Baier@soslab.tu-darmstadt.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-	Miaoqian Lin <linmq006@gmail.com>,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Markus Baier <Markus.Baier@soslab.tu-darmstadt.de>
-Subject: [PATCH net] net: usb: asix: ax88772: re-add usbnet_link_change() in phylink callbacks
-Date: Fri,  1 May 2026 18:39:41 +0200
-Message-ID: <20260501163941.107668-1-Markus.Baier@soslab.tu-darmstadt.de>
+	s=arc-20240116; t=1777653639; c=relaxed/simple;
+	bh=oPTsl+/496bFh76vbS1ubzBHeDSAPNRi0MlcpI2817E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U+ZVv/+EzOCx4UY+E75zoYg85vOTPU6AkJsaqIKoStxLbQDZ5jAeEpQz64cUNYzTQ7bmFwz6QDrAEfhmz2JTdZSrhDa5hltdDXkwyOTUKYQuCGbYO6Ysc04ybD4EId8NLkKg4QPOadl0GMINdPvFk6kuW0RE9OOalDdq9j9N49g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=bDC7G1JY; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=P4E3P4Bt; arc=none smtp.client-ip=103.168.172.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfout.phl.internal (Postfix) with ESMTP id 51EB1EC00AD;
+	Fri,  1 May 2026 12:40:31 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-05.internal (MEProxy); Fri, 01 May 2026 12:40:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1777653631; x=
+	1777740031; bh=EDzZJrBF0h84N+Gtj5o0fJbwTeT70yzNk/Y8SM68IW0=; b=b
+	DC7G1JY1tzExZduEO995/ESD+VNnu/KrSx7JhYOSmTVsEOMKkqzxuGMpicbQ80em
+	Wqx13fCwm+tThfzk0+pzWF75hfxJDHc3pi8uiNb3u8gyju5447qCPxMIY4d5LQ0g
+	kII9wLOHvwgw5kdumYNCJyA3NWmdK6YAYn7QfK+o7rl3/1HgMEc1zQDfL9cDhNyo
+	Y++upjGdsDIMJCEUiWqbvRZrsIFmoYbbuqH1xwL90aw3M8Vf5yXJVtYITVRN0vyz
+	C/kG5M5PxVRfBD98yiVqbihsqbqNGf28kXWde6UwnDGaC+KP7L5fHcU9CBQoiKgi
+	QVg6vxfx8upmTQggx2psQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1777653631; x=1777740031; bh=EDzZJrBF0h84N+Gtj5o0fJbwTeT70yzNk/Y
+	8SM68IW0=; b=P4E3P4BtuuHNMN79XJ2aVUD3zx3/BVjKaJtogChu7l/G8HTeQRT
+	Nyuu2kBFiTZKQXKo6B/UeG5dMIRSKJBH5fRuai+rsyz9wd1IkZGM2LiKRm7PH3RJ
+	WEOtjMkzpXH8fp240O0hAG6aA3+zOB6vyF3gdGodZ8ed3q8nc6viZ3q9q7CX7asM
+	HzVKDvGrr8w2BmzTX5+anRxk47A+rgGJjITPhj5qztp0PzX0GTeYYN4KfAfxqGIt
+	S9Dbn+wrse9tSZ/pvS4Zi66NamosmEDshQSfTd3RPPS+2FwLnknhdEgdqSep8Eks
+	lQ0oeN13EaxmpvJT2gH+AGYkg6x/BdXBnlA==
+X-ME-Sender: <xms:ftf0adt4OR1Pl7ZxS8dVFC9df0y3_juzHJ9YUmMWAM_hUCCPpXBW4A>
+    <xme:ftf0aTKDm3VeLQsp6ES5u7b-u4i7d8yRI_XGpUAMAjS_G2zKzCHHHFmxL1mN_MiC7
+    J3oUePw_impsgUw_zsV5pxQqlWwwSPztH3ZA3f-bYVfAvKjYXG0GlY>
+X-ME-Received: <xmr:ftf0aUqrG5MGzwGTEYSWqo_7k6CXx8UhykqdxhqZ13fi9n6Aw0Ug0ukOVxAH>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdeltdejtdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecunecujfgurhepfffhvfevuffkfhggtggujgesthdtredttd
+    dtjeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshih
+    shhnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtd
+    efhfekgeetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptden
+    ucfrrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpd
+    hnsggprhgtphhtthhopedufedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepkhhu
+    sggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofh
+    htrdhnvghtpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+    pdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhope
+    hprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvght
+    uggvvheslhhunhhnrdgthhdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrgh
+    dprhgtphhtthhopegsphhfsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
+    jhhohhhnrdhfrghsthgrsggvnhgusehgmhgrihhlrdgtohhm
+X-ME-Proxy: <xmx:ftf0aeVdqjBR69tUD6d6GY1ZWvntYS09CBO8xud9CgBsnt76kB--jQ>
+    <xmx:ftf0aR0GebU2wwF71G8yEE5JJ715hteOvKgvE1RR9zT_FlZV1OdhoQ>
+    <xmx:ftf0adTvQflkmo4ENF5Dpbkxpf2Ne-yCE6TzV_g7QsSKJ6SWSdcMFA>
+    <xmx:ftf0aVQdZm18VXqJpC580VHl7Q-N_iNyf58KxOZ5qC7LhsHUr__vpQ>
+    <xmx:f9f0absOJcs2rNO4ZceBOqI6mRlu5h6eJzW2650Fn0T0AgnW0BuI4x0b>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 1 May 2026 12:40:30 -0400 (EDT)
+Date: Fri, 1 May 2026 18:40:27 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	bpf@vger.kernel.org, john.fastabend@gmail.com,
+	linux-kselftest@vger.kernel.org,
+	=?utf-8?B?6ZKx5LiA6ZOt?= <yimingqian591@gmail.com>,
+	daniel@iogearbox.net, jonathan.lemon@gmail.com
+Subject: Re: [PATCH net 4/7] net: tls: fix off-by-one in sg_chain entry count
+ for wrapped sk_msg ring
+Message-ID: <afTXe_kAumf2vjvE@krikkit>
+References: <20260429222944.2139041-1-kuba@kernel.org>
+ <20260429222944.2139041-5-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Header-TUDa: <oLVU8RZcsZEyAQfzRmgEF3b1uXjKJR8xr9rjOseZUALhHMCE0j7fB4s3GsGmqsRPyzo3qQyFCncAZxJRB4qZR58VDy64pXzojSOaT.1777653593>
-X-TUDa-Umlauf: 1
-X-Rspamd-Queue-Id: 41D804AE2FD
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260429222944.2139041-5-kuba@kernel.org>
+X-Rspamd-Queue-Id: AC0BD4AE1FF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[tu-darmstadt.de,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[soslab.tu-darmstadt.de:s=s1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,soslab.tu-darmstadt.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-283240-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283238-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,iogearbox.net];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Markus.Baier@soslab.tu-darmstadt.de,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[soslab.tu-darmstadt.de:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[queasysnail.net:dkim]
 
-Commit e0bffe3e6894 ("net: asix: ax88772: migrate to phylink") replaced
-the asix_adjust_link() PHY callback with phylink's mac_link_up() and
-mac_link_down() handlers, but did not carry over the usbnet_link_change()
-notification that commit 805206e66fab ("net: asix: fix "can't send until
-first packet is send" issue") had added.
+[I'm slowly trying to catch up with the chunk of ktls patches that
+were posted in the past 3 days]
 
-As a result, the original symptom returns: when the link comes up,
-usbnet is never notified, so the RX URB submission stays dormant until
-some other event (e.g. a transmitted packet triggering the status
-endpoint interrupt) wakes it up.
+2026-04-29, 15:29:41 -0700, Jakub Kicinski wrote:
+[...]
+> Every other wrapped-ring arithmetic operation in the sk_msg subsystem
+> (sk_msg_iter_dist, sk_msg_iter_var_next, sk_msg_iter_var_prev,
+> bpf_msg_pull_data) correctly uses NR_MSG_FRAG_IDS as the ring modulus.
+> This sg_chain call is the sole remaining use of MAX_SKB_FRAGS for
+> ring-modulus arithmetic and was introduced after the ring expansion.
 
-This is reproducible with the Apple A1277 USB Ethernet Adapter
-(05ac:1402, AX88772A based) on a Banana Pro using a static IPv4
-configuration. After bringing the interface up, no incoming packets are
-received until the first outgoing frame triggers usbnet's RX path.
+[...]
+> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+> index 906a1998c630..600e13effaab 100644
+> --- a/net/tls/tls_sw.c
+> +++ b/net/tls/tls_sw.c
+> @@ -802,7 +802,7 @@ static int tls_push_record(struct sock *sk, int flags,
+>  
+>  	if (msg_pl->sg.end < msg_pl->sg.start) {
+>  		sg_chain(&msg_pl->sg.data[msg_pl->sg.start],
+> -			 MAX_SKB_FRAGS - msg_pl->sg.start + 1,
+> +			 NR_MSG_FRAG_IDS - msg_pl->sg.start + 1,
+>  			 msg_pl->sg.data);
 
-Restore the link change notification, gated on a carrier transition so
-the call remains idempotent if the status endpoint also reports the
-change later.
+And get rid of the [start] / NR - start dance to make this code a bit
+clearer?
 
-Fixes: e0bffe3e6894 ("net: asix: ax88772: migrate to phylink")
-Assisted-by: Claude:claude-opus-4-7
-Signed-off-by: Markus Baier <Markus.Baier@soslab.tu-darmstadt.de>
----
+This should maybe even be an skmsg helper to avoid "random" code
+making assumptions on the size of the sg.data array. The last
+paragraph in your commit message also tends to suggest that.
 
-Transparency notice: The English formulation of this bug report was
-prepared with AI assistance. The actual system testing and verification
-of the issue were performed manually without AI involvement.
-The bug was originally located via git bisect between v5.13 (good)
-and v5.14 (first bad), pointing to commit e532a096be0e ("net: usb: asix:
-ax88772: add phylib support"). Commit 805206e66fab later fixed this in
-v5.19, but commit e0bffe3e6894 (phylink migration in v6.x) re-introduced
-the same symptom by replacing the asix_adjust_link() callback path
-without porting the usbnet_link_change() call to the new phylink
-mac_link_up/down handlers.
-
-First Tested on Linux 6.18.18-gentoo with Apple A1277 USB Ethernet Adapter
-(05ac:1402, AX88772A based) on a Banana Pro (Allwinner A20).
-Later on Linux 7.1.0-rc1 with identical hardware setup.
-
- drivers/net/usb/asix_devices.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
-index df0bcfedddbc..293ef80c4e30 100644
---- a/drivers/net/usb/asix_devices.c
-+++ b/drivers/net/usb/asix_devices.c
-@@ -756,6 +756,7 @@ static void ax88772_mac_link_down(struct phylink_config *config,
- 	struct usbnet *dev = netdev_priv(to_net_dev(config->dev));
- 
- 	asix_write_medium_mode(dev, 0, 0);
-+	usbnet_link_change(dev, false, false);
- }
- 
- static void ax88772_mac_link_up(struct phylink_config *config,
-@@ -786,6 +787,7 @@ static void ax88772_mac_link_up(struct phylink_config *config,
- 		m |= AX_MEDIUM_RFC;
- 
- 	asix_write_medium_mode(dev, m, 0);
-+	usbnet_link_change(dev, true, false);
- }
- 
- static const struct phylink_mac_ops ax88772_phylink_mac_ops = {
 -- 
-2.52.0
-
+Sabrina
 
