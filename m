@@ -1,385 +1,216 @@
-Return-Path: <netdev+bounces-283062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283060-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GO8CLar/82n99QEAu9opvQ
-	(envelope-from <netdev+bounces-283062-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 03:19:38 +0200
+	id sO/LG3f/82n99QEAu9opvQ
+	(envelope-from <netdev+bounces-283060-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 03:18:47 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 390624A98E5
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 03:19:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 00A614A98C8
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 03:18:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AB57130538C8
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 01:16:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 68CEB30727FC
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 01:16:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F364E2D77E9;
-	Fri,  1 May 2026 01:16:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2D842DEA89;
+	Fri,  1 May 2026 01:16:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dIBbIBo3"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="KPij8ARO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010057.outbound.protection.outlook.com [52.101.84.57])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319D9225A38
-	for <netdev@vger.kernel.org>; Fri,  1 May 2026 01:16:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777598192; cv=none; b=V3qf1xmnwdSJZLzcrxtzYM237t3fvKoljTmoCvVeQL3inMbSO3iJ4Zat52gVhJb5TDYqhBgjJhNSCTlc8rS6ND60oA2XNUR+1KdLNJbWQWNqG8RWwYxWuljZr1STr2/S0lUtTw0pVh1wozQj8NMcwZHkYAN3kFW3sC8Wfb/m8B4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777598192; c=relaxed/simple;
-	bh=YO606FGCvTmL8As/8r2us37/1EmLMwGYIVE5kokr4ps=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=csCQFR6QJyzqiXlp5NTkYEYsLqcmA9tAR6yIn2hYXOxrHvqK8worKON8+auzRhW5aQ8J86G+CqJe9j7iGAUD50SfwGcGdMa0rWKWzojZqijjxq6vsaNRUrJQIZNE5PC7kVfeQ3nQ00ygGTvQmrYIJh8AgVUsk2oE9HnV4/jrRHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dIBbIBo3; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-43d77f6092eso946016f8f.2
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 18:16:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777598189; x=1778202989; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/c8Wu+9VhDvSXUBcr83Y/i5yPiGwRnxgWsCNpKzYXf8=;
-        b=dIBbIBo3gTS0CJOIs9leecVBpdYImZS8eyp3V30GcrB8XLJNXEXUYMLF+R5JMQRmwu
-         Z0efvbXUXZdmiwY8+ekMZgYWQdR2lX2PSt8IV0NcNUGJlXH4THHbVw0Y+KMRlSM+U9R6
-         FELPJfrKgHbGFQNanHaCFEW0Qc+sLvKIJrhYb5Ma/Hadse/2s5AweJ0XE3id6dOsaa4t
-         WQRph9uogBqSWvL3j8gLx+kRV1TQgzji/VSZlr3ii8kM38xQI08WVpl2Ycllkmzy6ViF
-         CwupuovZeXMZXICDy7yzq4SdgohtTvOaZf5z8ZlAFlqmcJy34QRn12jx5vyIlzNmYLfn
-         bZ+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777598189; x=1778202989;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=/c8Wu+9VhDvSXUBcr83Y/i5yPiGwRnxgWsCNpKzYXf8=;
-        b=JGQhGCq+3GKcVjKvRmrYBxyJmgKAq1/Dhc9GynjG4OPvHGfR5BqhxHzMmOwdn5feXc
-         eamVr+RF90Wn9wHdF7Fr8uC5l+RZk5Y5Lmmxle2QFPn5NZ5RwZLUlCpO+xDYvb5aHFFe
-         zBlJUieqAcRTJYwlcdDR96MWn9r7/+klMyRSX2tTt9gIFgNL3ZiAbU2/Z89k7GPTrFK3
-         fM7pmCiAjTzJPs0YXhdYqnhcxEitQPKXwPcDPxJ1CmtQ4qxXAvj+MW4ZDN9ZvFVKYPoP
-         GvtHHTXXcYip0E1YYBdggK2Bs8yHMvAGijv7E2RKaqTv7PUwx7YZoLwELkvgw52BK/St
-         IETg==
-X-Gm-Message-State: AOJu0YxPmWvpy4RtnIhl1bUvcmPWpec+qitSNNvgam5h5ZQndoSzfA1h
-	r5QpXWD084gOx5nYhMfQI2ywANYz/nrbdWMh6m5C3YlJDIu8fBCBwyW6bfPlw1La
-X-Gm-Gg: AeBDiev2YcuFCXpc9RRKxr22bb7s+9R3BPbpKPwakH0Q/Y+pUP0Xmt0WLFmJfUYaxtp
-	yCoUD/6rjuQbqfPu2Qx3TNhFF+HstWduCO6iKud0n0mcJQIDEY8ZLM4DeN29Pp2JbMc5x6l1qq0
-	2FpmzfaCY3OZbYcUU6bjALRRc1sKnjtLgW+uWue6hiMw028lVUw/3W1R61wTmvT9FZelOWo529d
-	VeNwGGexoXW+ZagX1zj/DJdxzqGVrpnhQBobRkHVhM/DujinZ0Yv5+4y+vZQedc6PQa39SVcQCF
-	QiveBxNSd2uoARErmIzf++NprG5D3bPx/88GTfU9utOlEwuHNji53mu+ZTRyKI/9nJtaVk0mW/W
-	3+4BEmncqzmdKhIAB5WE8hbsEJvxhgo8FaOtHmD2/zc7oDdy5OUanpP5zpJsal9+J7fVljSe0k6
-	01MjpB0zs0DZAsIhcNnliKu1Vy9HEiWw==
-X-Received: by 2002:a05:6000:1ac8:b0:43d:75ec:26f7 with SMTP id ffacd0b85a97d-4493fa01814mr8600782f8f.29.1777598189199;
-        Thu, 30 Apr 2026 18:16:29 -0700 (PDT)
-Received: from localhost ([2a03:2880:31ff:1::])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-44a8ef52854sm1571036f8f.12.2026.04.30.18.16.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Apr 2026 18:16:28 -0700 (PDT)
-From: Mohsin Bashir <mohsin.bashr@gmail.com>
-To: netdev@vger.kernel.org
-Cc: dsahern@kernel.org,
-	stephen@networkplumber.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	ernis@linux.microsoft.com,
-	mohsin.bashr@gmail.com
-Subject: [PATCH iproute2-next 5/5] netshaper: Add group command for creating scheduling hierarchies
-Date: Thu, 30 Apr 2026 18:16:11 -0700
-Message-ID: <20260501011611.3533573-6-mohsin.bashr@gmail.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260501011611.3533573-1-mohsin.bashr@gmail.com>
-References: <20260501011611.3533573-1-mohsin.bashr@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E80392DB798;
+	Fri,  1 May 2026 01:16:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777598186; cv=fail; b=heXQojtzdlx/fLse5FV2NSCaRuZ8ofeXIqIJ0gH5u3N2hNryM2Vej/fU4lzTCSpgv3+JILtZPFlC7q7r46CsDtZWqo8NB5zx96I/nctm5KqvgqcKoeQrTP31OyWFNbFGLY8xEwTgXrxAx+DZtjDAYJpf3PnwXQDQXg72CGnHdUw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777598186; c=relaxed/simple;
+	bh=61gScocZPUo9b67w59nQD7HckavXtffCAlXEfjMHJL4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=oUlWcfzlgK4ONRdXAK28CUixpZeRv5sORQ7LedpTnKkZ/9CUWMt3qcrLa2MobnWTnwl/FqYiwOxRUX5Vjcx5r72Q6XZA8oYB/3FWpacJs+voDmrL+L0k4AFsDieZxa5Bjzzdp4KPL2yGT1dnuoHwOHTfqEgEXmQs0Ej8wUj6q9M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=KPij8ARO; arc=fail smtp.client-ip=52.101.84.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=X/py2EXaltjscaqQGEf0kc0PDKnGqiXosoBasXd3QJvu09beuRi1kfrZ0Rbx9BYW+uYd33WqQjLaQ6wuhh+JLNLzbwSh4XtxFsFk8isOajm4X0juFwERihliTdwVzV9dXpiMphBbiQBzOeKzsnapad7j2UX8pUs1Q6Sjvnl1K5t/g7uhwESo+Zc72h4ppvvAOaPZ7CSaOnDYUw0RfbfI4jVGOj/HkFoadEDHucwU85rR4rg1M/7Z4dcOG8t/Ry8cFWQSToIE7fHSqVAreNx2N9ThaEajiEJh4244vxPmesiwi0D8cG8g0gBOMYgT6zejLW8VFr6BnjlVboO+zX4SFw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hAd3BehVcy4Py0TS/4q35/P4IWy+4uJA2w0e9WU2hz8=;
+ b=hx0+a+xqG0m/TFlZNmd6cZ8WWUz89L3KfT31TXVz2cgFDKAuMGlKa8HKg0bJRz2EtOBF5tGgGvdkbkiCti3rykS0Y67RiCYaWjN+tzTxldRZKwBfOauZ4IlEsjHe4uBOt/3aEA+vMDALHMzUE6UyvRsIK0OZaG5ajz+wj0zTlx4OrdkXyoRNOEmB7Rqe2tSNyk09GBGxFkkkeRbmGrOfVRaz7Q/uOOAEYnq1EO+6W2GEaFtETlVtKqd0n1n/SEZYEB30RfdCkcbXRW8Ql6HM8gE98qeVkjA+tk0CQ1p5nhyS4xYEq5h2FXAdPtZdXZ4CgocJX0h8uip4zO17Fd4mvw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hAd3BehVcy4Py0TS/4q35/P4IWy+4uJA2w0e9WU2hz8=;
+ b=KPij8AROFUcbDYp1SuOQWzri31KshrKDyVNa+C2jJ0KbWwES1b3IpvLvdYmnS92wsr2TKkG8mcMVopwmrsWbp24tJ3T5un316cdaB5yIF/A/4z8wWVCpNoo0sD6g/+lr9R1k6Vg2yVmEP25yrc2N09hd7QgpRzGifxncFpCU07irqNxIRC1l7YkwsCbtS//r3JsYy76VorzB0ujHn71JXNW8wxsZpLbd/lskApqYqs24yqLVGpCqXYUaH+yLH5HJ1ORpx7i0auovIonup6Fbvk66aKVzDQl1H7NVSbgpkmpWbmBzWh0VuQls39P7ps2VrJ8NC+GeIm+Z+0GEPvD9Kw==
+Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
+ by GV1PR04MB10557.eurprd04.prod.outlook.com (2603:10a6:150:209::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.19; Fri, 1 May
+ 2026 01:16:19 +0000
+Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
+ ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
+ ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.20.9870.020; Fri, 1 May 2026
+ 01:16:19 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Simon Horman <horms@kernel.org>
+CC: Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean
+	<vladimir.oltean@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>
+Subject: RE: [PATCH v3 net] net: enetc: fix VSI mailbox timeout handling and
+ DMA lifecycle
+Thread-Topic: [PATCH v3 net] net: enetc: fix VSI mailbox timeout handling and
+ DMA lifecycle
+Thread-Index: AQHc17CRGSmZt98tIEKQV5KOjIkWQ7X32MwAgACHMuA=
+Date: Fri, 1 May 2026 01:16:19 +0000
+Message-ID:
+ <DBBPR04MB7500C307D75153F1BF27406B88322@DBBPR04MB7500.eurprd04.prod.outlook.com>
+References: <20260429081930.3259824-1-wei.fang@nxp.com>
+ <20260430170922.1729686-1-horms@kernel.org>
+In-Reply-To: <20260430170922.1729686-1-horms@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DBBPR04MB7500:EE_|GV1PR04MB10557:EE_
+x-ms-office365-filtering-correlation-id: 195ea9c2-0c2e-4a01-259b-08dea71f404f
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|376014|19092799006|1800799024|38070700021|18002099003|22082099003|56012099003;
+x-microsoft-antispam-message-info:
+ /uM+pt+QgKbSvYariiE+jFXu4UarKDtca8vDJ+u586ENE0C7kRVgi7uSi1di2T+fO9GmpCLCejME6P+szGO3XYHC+tHQ4B5hPBetzAIqQVUDcMjUniAsRDbtWy/eXc+JanhaY0T9LslMBJ3trSWqSYc+c08J7tPth5P3ZjTU91P9SkbbTxBvwhBdXeJSVuGzIpc7pZkXhLprCkc4bIwtcI6/gEKrRQfkjwy63V8XG7TiuJQgheQd3rlkRyc+4Q4WW3HQSIUrwE07qx1/U6mUa5RVtSN5ox5SJUcRQSPFn5U2ua/Kww6e6RwggTgXj9Rode6zCS1zXqD90JVwWW/H1N6SBMhmMNT2zDuuqmIMPIYGfN8FUgACjhc9g55LxRgUTlRiCP5zmcAgtuF1qX4mg/IetFyIcE287TWzH/f/sXAjHOA0rTvKRb1qirsGXDRjPlRK6i7ffcawqiApNfBqWudQSQ3WkwqzGUQfIfB+d1655XutFf2Kw7CrkYRcKvp2MGu94wee3GRZYUaYsX/qjpXaH3g7w9pYOlnJmy4zgOloa+25xa0bq8UBvnlYS9XnOIM6LLfd8vLf3YN7usU2oH8tsvHETph5ctJe438sSD95FpI3wRXxdYuBsSa4ubZBpYRjpl7z4kNyM6pQC8wSC02N6A4FRTvbNSAYLFx1Lzu4un80Tu7Aki0tMZ3Tto9RzkQwW0FE3QGS5cbxc2GPhz5JchGofsfgL04ZLdD1JKniemi762YSUJ/1NW9qedWi
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(19092799006)(1800799024)(38070700021)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?r/hr4bOHWeL8fv7X/9cMUr66SqW5NiGrfK5zgxTefZhq50ZebMiisKs+eE0A?=
+ =?us-ascii?Q?dp91aZKHfEz16W6E7tIVIY/Xjc0xHbZT/kOD2rTnQEsCrLHURWx0Hmc50WXU?=
+ =?us-ascii?Q?dxusEboLnCSO3JeozNxyHSz8zgqfqeeRSmvp7IIHFbn6nQ5SXQ89JRhi6maG?=
+ =?us-ascii?Q?giMtFEzA8GgKCf0A3f9JWkjaYpgOX/VxcJaK8QmKzjxLVopyPXav3hzO2QM5?=
+ =?us-ascii?Q?Y59leylhoHUCr/QEu7pyH+qafoucAm45s6UkWiNZ64YeDpdjBePqsfIS6dWC?=
+ =?us-ascii?Q?cjeSPTK4iUJtyK2VruQdd6v5M1xVPzHvMqzm1G3uoSh77srKnW49ioLN5CUl?=
+ =?us-ascii?Q?shcrzBgItKlTR3vaZf/tAv1OXmwyfvCh4uwHtSZvnJc1PgTcEbYPrIi9fTEm?=
+ =?us-ascii?Q?NSBEIK/JEzuaK85h6YnCPq+HZNWL+qIU9YrGYyRZJXrRBqo7LBS8rOEZPACf?=
+ =?us-ascii?Q?EbG99mggy1zMYtFyMr/DE0eMI08g7PX6BcBdLqQjCgxndpN9tq+8SqPRnjhE?=
+ =?us-ascii?Q?U9cj9FuN1zwLxanURmuuY7BTisNnot25taupdVy/F/vv5dcGrEpczCdX51W4?=
+ =?us-ascii?Q?iaemTuIBEIxTYC+Ut8N6OWHITysc03zfaeZDiQr6xREmwZWC59AHJTlOLv2u?=
+ =?us-ascii?Q?IGTktXisX5gJQaqh3Fqt32TDDQ1VQrAgDDGq5EO9HfZlbrd3GFe7noPHGwe5?=
+ =?us-ascii?Q?KprUXCE9cbaQLMkFgCjEMO/PpGOMnOizaUZ5eprIuNbjV98jhZpisse3vL8c?=
+ =?us-ascii?Q?w4Ky5ynA4PDe3MzWReb2vbqfGX1IihfPQQxjWtNoZG6Thzjqr3uaLqHd6avS?=
+ =?us-ascii?Q?ZRWVktbONlyJwiIENBc36JKE8EQOy3vVdKEh3PfnT2eaXDlzNcDs3M6/z2s9?=
+ =?us-ascii?Q?fcFlIURT3zu9N7SQBkwD2/xztL8ZzzOHQyLgjkVONeFUeXXuIRLdeEZHic/7?=
+ =?us-ascii?Q?eQcsK+Y8nDXi/ipli4DmxAcaegWZNPr3b/QAqDRsu4z1pizYisgyo06Fx79C?=
+ =?us-ascii?Q?MnbseJ5ZvphuHrQ3EowOsJDYU9DOX3MHOhIUzWgkPDuKVB7Ed9xBAJUpL09D?=
+ =?us-ascii?Q?SP+mCHKhMTuIhqpQ0sycqSjEy4mPJw3U8hPmw2Qi9AmuZfHfMQyRzCnyY28Y?=
+ =?us-ascii?Q?ILj9a11JyXBkcMj2TInKMgmYBnx1J6NOzy8JBcmIqGl8M9MUJSSWiqJd+VlV?=
+ =?us-ascii?Q?r1uWEPnwns5XT27S0q0WwKxeKRxKMmVZ/45T1W6CFV5cxDF6RdedrtnS2CMD?=
+ =?us-ascii?Q?kMox/Du4AW5EqpETsYr2bE7IpPcYOdDgfgV23Ca3EaxNU0hzwIGB1yy78bPZ?=
+ =?us-ascii?Q?WtN5hIYjsQaeD2nDJ0byek2Xkv4OBSZZfUe5a+FJWwWtQehFo7NJR8M9a7EN?=
+ =?us-ascii?Q?AW7wwWBsZ72VXGERoIWanZcg470fD0Z6Qt2q5CafUE5tT8/vdi8S/kbS923V?=
+ =?us-ascii?Q?fLlSqIiXyt2jXEf3N/cLYoJjByquCg/ngbvYgb97qUHRFTVM3GBlC164RmxR?=
+ =?us-ascii?Q?MWkVkq2WvSzzgxsTYR31a87kdgEcF2+MtGNBZvrSjnf5YfHjPkuHxWKhYnQI?=
+ =?us-ascii?Q?QrnwWxF5vAq9MnZ+v/a3x839v77CoYw+g1zaNZq69VtJfYuDRkYCotCDP0Rx?=
+ =?us-ascii?Q?hJ+zqCD7ufIkISv+qwvnQgCBuuV2mAj6huv44Oi4LPyf6j/r2PhRvz/XaoYa?=
+ =?us-ascii?Q?9/+SUy1Bz1eCdfQKz+cNJiClh0rsRRow3fi6UzGkEepacjje?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 390624A98E5
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 195ea9c2-0c2e-4a01-259b-08dea71f404f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 May 2026 01:16:19.7876
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Rr0zdUdxK/jyMdMvYR4MYqDn0tbW4Rz2qni1YNwZthke1QljlX+LvC7Jzy0r6PXmDlLPkIy2IbsRm3H5CWT3kg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR04MB10557
+X-Rspamd-Queue-Id: 00A614A98C8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-283060-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,networkplumber.org,redhat.com,linux.microsoft.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-283062-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[mohsinbashr@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.992];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,DBBPR04MB7500.eurprd04.prod.outlook.com:mid,nxp.com:dkim]
 
-Add the group command to create and update scheduling groups via the
-NET_SHAPER_CMD_GROUP netlink operation. This enables building shaper
-hierarchies by specifying a node handle, parent scope, rate parameters,
-and a set of leaf shapers (queues or nodes) to attach.
+> > @@ -259,6 +282,7 @@ static void enetc_vf_remove(struct pci_dev *pdev)
+> > {
+> >  	struct enetc_si *si =3D pci_get_drvdata(pdev);
+> >  	struct enetc_ndev_priv *priv;
+> > +	struct enetc_msg_swbd msg;
+> >
+> >  	priv =3D netdev_priv(si->ndev);
+> >  	unregister_netdev(si->ndev);
+> > @@ -270,7 +294,9 @@ static void enetc_vf_remove(struct pci_dev *pdev)
+> >
+> >  	free_netdev(si->ndev);
+> >
+> > +	msg =3D si->msg;
+> >  	enetc_pci_remove(pdev);
+> > +	enetc_msg_dma_free(&pdev->dev, &msg);
+>=20
+> Is it possible for the mailbox to still be busy here?
+>=20
+> The commit addresses the use-after-free in the send path by checking the
+> mailbox busy status before freeing the previous buffer. However, during d=
+river
+> teardown, enetc_msg_dma_free() is called unconditionally.
+>=20
+> If a prior message sent via enetc_msg_vsi_send() times out and the hardwa=
+re is
+> still accessing the buffer, and then the driver is unbound, could this ca=
+use the
+> hardware to read from freed DMA memory?
+>=20
+> Should the teardown path wait for the mailbox to become idle or ensure th=
+e
+> hardware is safely reset before freeing the buffer?
+>=20
 
-Example usage:
-  netshaper group dev eth0 handle scope node parent scope netdev \
-      bw-max 1gbit leaves scope queue id 0 scope queue id 1
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
----
- netshaper/netshaper.c | 206 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 205 insertions(+), 1 deletion(-)
-
-diff --git a/netshaper/netshaper.c b/netshaper/netshaper.c
-index fc68e735..7ec8220c 100644
---- a/netshaper/netshaper.c
-+++ b/netshaper/netshaper.c
-@@ -31,9 +31,15 @@ static void usage(void)
- 	fprintf(stderr,
- 		"Usage: netshaper [ OPTIONS ] { COMMAND | help }\n"
- 		"OPTIONS := { -V[ersion] | -c[olor] | -help }\n"
--		"COMMAND := { set | get | delete } dev DEVNAME\n"
-+		"COMMAND := { set | get | delete | group } dev DEVNAME\n"
- 		"	    handle scope HANDLE_SCOPE [id HANDLE_ID]\n"
- 		"	    [bw-max BW_MAX] [bw-min BW_MIN] [weight WEIGHT]\n"
-+		"\n"
-+		"netshaper group dev DEVNAME handle scope SCOPE [ id ID ]\n"
-+		"          parent scope SCOPE [ id ID ]\n"
-+		"          [ bw-max BW ] [ bw-min BW ] [ weight WEIGHT ]\n"
-+		"          leaves { scope SCOPE id ID } [ ... ]\n"
-+		"\n"
- 		"Where: DEVNAME         := STRING\n"
- 		"       HANDLE_SCOPE    := { netdev | queue | node }\n"
- 		"       HANDLE_ID       := UINT (required for queue/node, optional for netdev)\n"
-@@ -264,6 +270,202 @@ static int do_cmd(int argc, char **argv, int cmd)
- 	return err;
- }
- 
-+static int do_group(int argc, char **argv)
-+{
-+	GENL_REQUEST(req, 4096, genl_family, 0, NET_SHAPER_FAMILY_VERSION,
-+		     NET_SHAPER_CMD_GROUP, NLM_F_REQUEST | NLM_F_ACK);
-+
-+	bool has_bw_max = false, has_bw_min = false, has_weight = false;
-+	bool parsing_leaves = false, has_hid = false, has_pid = false;
-+	int parent_scope = -1, ifindex = -1, num_leaves = 0;
-+	int err, handle_scope = NET_SHAPER_SCOPE_UNSPEC;
-+	__u32 handle_id = 0, parent_id = 0, weight = 0;
-+	__u64 bw_max_bps = 0, bw_min_bps = 0;
-+	struct nlmsghdr *answer;
-+
-+	struct {
-+		int scope;
-+		__u32 id;
-+	} leaves[128];
-+
-+	while (argc > 0) {
-+		if (parsing_leaves) {
-+			if (strcmp(*argv, "scope") == 0) {
-+				int lscope;
-+
-+				NEXT_ARG();
-+				lscope = parse_scope(*argv);
-+				if (lscope < 0) {
-+					fprintf(stderr, "Invalid leaf scope \"%s\"\n",
-+						*argv);
-+					return -1;
-+				}
-+
-+				NEXT_ARG();
-+				if (strcmp(*argv, "id") != 0) {
-+					fprintf(stderr, "Expected \"id\" after leaf scope\n");
-+					return -1;
-+				}
-+
-+				NEXT_ARG();
-+				leaves[num_leaves].scope = lscope;
-+				if (get_unsigned(&leaves[num_leaves].id, *argv, 10)) {
-+					fprintf(stderr, "Invalid leaf id\n");
-+					return -1;
-+				}
-+				num_leaves++;
-+				argc--;
-+				argv++;
-+				continue;
-+			}
-+			parsing_leaves = false;
-+		}
-+
-+		if (strcmp(*argv, "dev") == 0) {
-+			NEXT_ARG();
-+			ifindex = ll_name_to_index(*argv);
-+			if (ifindex == 0) {
-+				fprintf(stderr, "Device \"%s\" not found\n", *argv);
-+				return -1;
-+			}
-+		} else if (strcmp(*argv, "bw-max") == 0) {
-+			NEXT_ARG();
-+			if (parse_rate(*argv, &bw_max_bps))
-+				return -1;
-+			has_bw_max = true;
-+		} else if (strcmp(*argv, "bw-min") == 0) {
-+			NEXT_ARG();
-+			if (parse_rate(*argv, &bw_min_bps))
-+				return -1;
-+			has_bw_min = true;
-+		} else if (strcmp(*argv, "weight") == 0) {
-+			NEXT_ARG();
-+			if (get_unsigned(&weight, *argv, 10)) {
-+				fprintf(stderr, "Invalid weight value\n");
-+				return -1;
-+			}
-+			has_weight = true;
-+		} else if (strcmp(*argv, "handle") == 0) {
-+			NEXT_ARG();
-+			if (strcmp(*argv, "scope") != 0) {
-+				fprintf(stderr, "Expected \"scope\" after \"handle\"\n");
-+				return -1;
-+			}
-+			NEXT_ARG();
-+			handle_scope = parse_scope(*argv);
-+			if (handle_scope < 0) {
-+				fprintf(stderr, "Invalid handle scope \"%s\"\n",
-+					*argv);
-+				return -1;
-+			}
-+
-+			if (argc > 1 && strcmp(argv[1], "id") == 0) {
-+				NEXT_ARG();
-+				NEXT_ARG();
-+				if (get_unsigned(&handle_id, *argv, 10)) {
-+					fprintf(stderr, "Invalid handle id\n");
-+					return -1;
-+				}
-+				has_hid = true;
-+			}
-+		} else if (strcmp(*argv, "parent") == 0) {
-+			NEXT_ARG();
-+			if (strcmp(*argv, "scope") != 0) {
-+				fprintf(stderr, "Expected \"scope\" after \"parent\"\n");
-+				return -1;
-+			}
-+			NEXT_ARG();
-+			parent_scope = parse_scope(*argv);
-+			if (parent_scope < 0) {
-+				fprintf(stderr, "Invalid parent scope \"%s\"\n",
-+					*argv);
-+				return -1;
-+			}
-+
-+			if (argc > 1 && strcmp(argv[1], "id") == 0) {
-+				NEXT_ARG();
-+				NEXT_ARG();
-+				if (get_unsigned(&parent_id, *argv, 10)) {
-+					fprintf(stderr, "Invalid parent id\n");
-+					return -1;
-+				}
-+				has_pid = true;
-+			}
-+		} else if (strcmp(*argv, "leaves") == 0) {
-+			parsing_leaves = true;
-+			argc--;
-+			argv++;
-+			continue;
-+		} else {
-+			fprintf(stderr, "What is \"%s\"\n", *argv);
-+			usage();
-+			return -1;
-+		}
-+		argc--;
-+		argv++;
-+	}
-+
-+	if (ifindex == -1)
-+		missarg("dev");
-+	if (handle_scope == NET_SHAPER_SCOPE_UNSPEC)
-+		missarg("handle");
-+	if (parent_scope < 0)
-+		missarg("parent");
-+	if (num_leaves == 0)
-+		missarg("leaves");
-+
-+	addattr32(&req.n, sizeof(req), NET_SHAPER_A_IFINDEX, ifindex);
-+
-+	struct rtattr *parent = addattr_nest(&req.n, sizeof(req),
-+					     NET_SHAPER_A_PARENT | NLA_F_NESTED);
-+	addattr32(&req.n, sizeof(req), NET_SHAPER_A_HANDLE_SCOPE, parent_scope);
-+	if (has_pid)
-+		addattr32(&req.n, sizeof(req), NET_SHAPER_A_HANDLE_ID, parent_id);
-+	addattr_nest_end(&req.n, parent);
-+
-+	struct rtattr *handle = addattr_nest(&req.n, sizeof(req),
-+					     NET_SHAPER_A_HANDLE | NLA_F_NESTED);
-+	addattr32(&req.n, sizeof(req), NET_SHAPER_A_HANDLE_SCOPE, handle_scope);
-+	if (has_hid)
-+		addattr32(&req.n, sizeof(req), NET_SHAPER_A_HANDLE_ID, handle_id);
-+	addattr_nest_end(&req.n, handle);
-+
-+	if (has_bw_max)
-+		addattr64(&req.n, sizeof(req), NET_SHAPER_A_BW_MAX, bw_max_bps);
-+	if (has_bw_min)
-+		addattr64(&req.n, sizeof(req), NET_SHAPER_A_BW_MIN, bw_min_bps);
-+	if (has_weight)
-+		addattr32(&req.n, sizeof(req), NET_SHAPER_A_WEIGHT, weight);
-+
-+	if (has_bw_max || has_bw_min)
-+		addattr32(&req.n, sizeof(req), NET_SHAPER_A_METRIC,
-+			  NET_SHAPER_METRIC_BPS);
-+
-+	for (int i = 0; i < num_leaves; i++) {
-+		struct rtattr *leaf, *leaf_handle;
-+
-+		leaf = addattr_nest(&req.n, sizeof(req),
-+				    NET_SHAPER_A_LEAVES | NLA_F_NESTED);
-+		leaf_handle = addattr_nest(&req.n, sizeof(req),
-+					   NET_SHAPER_A_HANDLE | NLA_F_NESTED);
-+		addattr32(&req.n, sizeof(req), NET_SHAPER_A_HANDLE_SCOPE,
-+			  leaves[i].scope);
-+		addattr32(&req.n, sizeof(req), NET_SHAPER_A_HANDLE_ID,
-+			  leaves[i].id);
-+		addattr_nest_end(&req.n, leaf_handle);
-+		addattr_nest_end(&req.n, leaf);
-+	}
-+
-+	err = rtnl_talk(&gen_rth, &req.n, &answer);
-+	if (err < 0) {
-+		fprintf(stderr, "Kernel command failed: %d\n", err);
-+		return err;
-+	}
-+
-+	print_netshaper_attrs(answer);
-+	return 0;
-+}
-+
- int main(int argc, char **argv)
- {
- 	int color = default_color_opt();
-@@ -308,6 +510,8 @@ int main(int argc, char **argv)
- 			return do_cmd(argc - 1, argv + 1, NET_SHAPER_CMD_DELETE);
- 		if (strcmp(*argv, "show") == 0)
- 			return do_cmd(argc - 1, argv + 1, NET_SHAPER_CMD_GET);
-+		if (strcmp(*argv, "group") == 0)
-+			return do_group(argc - 1, argv + 1);
- 		if (strcmp(*argv, "help") == 0) {
- 			usage();
- 			return 0;
--- 
-2.52.0
+enetc_msg_dma_free() is called after enetc_pci_remove(), enetc_pci_remove()
+will disable the device, so it is safe to free the buffer.
 
 
