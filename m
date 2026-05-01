@@ -1,153 +1,126 @@
-Return-Path: <netdev+bounces-283311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283312-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id T78gGnE89Wn1JgIAu9opvQ
-	(envelope-from <netdev+bounces-283311-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 01:51:13 +0200
+	id OKbXJoY89WnzJgIAu9opvQ
+	(envelope-from <netdev+bounces-283312-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 01:51:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B70904B0629
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 01:51:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id F261C4B0636
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 01:51:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 10A41300DA51
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 23:51:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CA560301AD3B
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 23:51:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39BD734E771;
-	Fri,  1 May 2026 23:51:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22DA2372ED0;
+	Fri,  1 May 2026 23:51:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ridUYzzb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yua6v27P"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1680E2EC0A1;
-	Fri,  1 May 2026 23:51:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3FBB34E771;
+	Fri,  1 May 2026 23:51:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777679470; cv=none; b=Mb4j+x9C7SDbMgsyZoI2xtu0lhYvJFSKi79o4c3+lPlDIBBmmtgAb/7wH3ed4WbLpf/OBqOsC6K2s3SDk2HVfUTCTEY4YGyuxipLYRF5uM0kXjyRlKkJI3mozvtMWTOGgBBY8fQ7eXGUohASNjiiw2e35NJZVAoHz+XCmQlboHQ=
+	t=1777679481; cv=none; b=QpktfH8V0GmNng7Ju4p8SEIWMI5YT7E3+ptTqm5g/bel678wVZzFEX5SEGsatJR6LlmG+q+Irxyjz3iJWoqFDD9RhHP1fIlNLGZTbn1er5FIjK6XbcqvSkmOQgvyKSh/ug4uEQN7qGcsmSbE2dXe6CTSuOKXUdxehpS81iC50CQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777679470; c=relaxed/simple;
-	bh=blhZiMz/SgM1lwXzxNwOF/MqFMiwiS0W4iq5pX26ISo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YLTiNXUBjtFKoE7sUj0Td3phC7x4Jsbr7W6J280UbhdpKI3jxWVA0hfJCzvpkl4UUzCTzaqBLRN1jLORrLAWjh7YfDAcOGXyTjvM2+TY+okGFDMDdjeG0DRIjM0E3wD/DqM3+XtXcsIRujBmVpDPaNF3p9uXRNWxQsOzZ5sXGrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ridUYzzb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A41DBC2BCB4;
-	Fri,  1 May 2026 23:51:09 +0000 (UTC)
+	s=arc-20240116; t=1777679481; c=relaxed/simple;
+	bh=z/o5SPBeNCnj8W+pPRlVdKVV1Xv4sidmA4w2XL86RwQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bPhZwYFL74UroFq9RQLPip9Ziq/t7buxGXqPLZ8FnmA+b9oA4qViQj+BPLOiq/sAJg9C/3djVn+gY6PzSQ0XbsrbLb1Nws2DWK9e3WNWCD0sdRNFwXGA1gIPsTfBJs6VwTsIKrvD+iic0L6sZj7tnL0R/8y2CIN8FvVACRb+y5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yua6v27P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27C0BC2BCB4;
+	Fri,  1 May 2026 23:51:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777679469;
-	bh=blhZiMz/SgM1lwXzxNwOF/MqFMiwiS0W4iq5pX26ISo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ridUYzzbW5d9KyRTmy9Bv6NTF+Gjw9gTRy5yF0PtQVzQhxnkhBUu/iPKTEP62Cwvp
-	 RgOI5LbCokT4ta2HuLNyHbuQWh8/cE48NXkm86tnXsEjVyglB2TQ9AzVwsb9ix2jqm
-	 J33bmzLmcz4BEvUk6iT8Jm7rtG9tK5SY7zjaNjlmykJTE/Mi42OpalzU2mCBrBEYlz
-	 UiOsw5f+Tb3fsYD0fmBaRuFzKKw3wHHIjo6WsfogsuqXSamoXk18JsxBdeIJYg1Ted
-	 PMTNkonPQaa0FSlfBjcT026aY8gkrLXsUAfkpXimfClIxY3j+CwQBN9r3jPhBKrQZB
-	 iHSeFbU5//TQQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02DD7380CEF5;
-	Fri,  1 May 2026 23:50:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1777679480;
+	bh=z/o5SPBeNCnj8W+pPRlVdKVV1Xv4sidmA4w2XL86RwQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Yua6v27P4/7STHTO03XBcavxCGjeau3wgy33Z/JJ6LsqRXIsNb/MMfvYjVB7NdiNq
+	 btIDV+qOedNbMiw2/Bei1DD+HnlrDZmonNdmVfCq7yaTAvH0b7WAOhYK5Fi6OefHTE
+	 dojSCwTbau4+uZ6aGISeFNGmbKJ2wrivQLr/D/QXY4Ok+oPKgSrEnHhHOYrXPjraM0
+	 dDezoLXc0/v868MyLnzXGqG/gV70H/LFyfXkM0DmSxFA8L78S61xh4oOmLjslYz/Ay
+	 CkVLC1Twp5/8S5AnHGD1uALCCU5ZtVLWpRNC9pH+A4HHQ+7yq1HD2QvAzj3CAnlrm+
+	 jhn/N6czKN7gA==
+Date: Fri, 1 May 2026 16:51:19 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Birger Koblitz <mail@birger-koblitz.de>
+Cc: Aleksander Jan Bajkowski <olek2@wp.pl>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ hayeswang@realtek.com, hsu.chih.kai@realtek.com, kees@kernel.org,
+ linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH net-next] net: usb: r8152: add TRENDnet TUC-ET2G v2.0
+Message-ID: <20260501165119.2622a2af@kernel.org>
+In-Reply-To: <7b3d3fc6-bbed-4a75-ac19-33fa910359c9@birger-koblitz.de>
+References: <20260430213435.21821-1-olek2@wp.pl>
+	<7b3d3fc6-bbed-4a75-ac19-33fa910359c9@birger-koblitz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 01/14] netfilter: replace skb_try_make_writable() by
- skb_ensure_writable()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177767942280.3662469.15016765867771829872.git-patchwork-notify@kernel.org>
-Date: Fri, 01 May 2026 23:50:22 +0000
-References: <20260501122237.296262-2-pablo@netfilter.org>
-In-Reply-To: <20260501122237.296262-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de, horms@kernel.org
-X-Rspamd-Queue-Id: B70904B0629
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: F261C4B0636
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-283312-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283311-lists,netdev=lfdr.de,netdevbpf];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[wp.pl,lunn.ch,davemloft.net,google.com,redhat.com,realtek.com,kernel.org,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,netfilter.org:email]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[birger-koblitz.de:email,wp.pl:email,lunn.ch:email]
 
-Hello:
+On Fri, 1 May 2026 06:03:05 +0200 Birger Koblitz wrote:
+> On 30/04/2026 11:34 pm, Aleksander Jan Bajkowski wrote:
+> > The TRENDnet TUC-ET2G V2.0 is an RTL8156B based 2.5G Ethernet controller.
+> > 
+> > Add the vendor and product ID values to the driver. This makes Ethernet
+> > work with the adapter.
+> > 
+> > Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+> > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> > ---
+> >   drivers/net/usb/r8152.c | 1 +
+> >   1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+> > index 7337bf1b7d6a..1ace1d2398c9 100644
+> > --- a/drivers/net/usb/r8152.c
+> > +++ b/drivers/net/usb/r8152.c
+> > @@ -10138,6 +10138,7 @@ static const struct usb_device_id rtl8152_table[] = {
+> >   	{ USB_DEVICE(VENDOR_ID_TRENDNET, 0xe02b) },
+> > +	{ USB_DEVICE(VENDOR_ID_TRENDNET, 0xe02c) },
+> >     
+> You may also add my Reviewed-by: Birger Koblitz <mail@birger-koblitz.de>
 
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
-
-On Fri,  1 May 2026 14:22:24 +0200 you wrote:
-> skb_try_make_writable() only works on clones and uncloned packets might
-> have their network header in paged fragments.
-> 
-> nft_fwd needs to work for the ingress and egress hooks, but the egress
-> hook where skb->data points to the mac header, use skb_network_offset()
-> to include the mac header. The flowtable is fine since it already uses
-> the transport offset.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,01/14] netfilter: replace skb_try_make_writable() by skb_ensure_writable()
-    https://git.kernel.org/netdev/net/c/1049970d7583
-  - [net,02/14] netfilter: nft_fwd_netdev: add device and headroom validate with neigh forwarding
-    https://git.kernel.org/netdev/net/c/0a0b35f0bf10
-  - [net,03/14] netfilter: nft_fwd_netdev: use recursion counter in neigh egress path
-    https://git.kernel.org/netdev/net/c/1d47b55b36d2
-  - [net,04/14] netfilter: x_tables: add .check_hooks to matches and targets
-    https://git.kernel.org/netdev/net/c/6813985ca456
-  - [net,05/14] netfilter: nft_compat: run xt_check_hooks_{match,target}() from .validate
-    https://git.kernel.org/netdev/net/c/2f768d638d97
-  - [net,06/14] netfilter: xt_CT: fix usersize for v1 and v2 revision
-    https://git.kernel.org/netdev/net/c/8bedb6c46945
-  - [net,07/14] netfilter: nf_tables: fix netdev hook allocation memleak with dormant tables
-    https://git.kernel.org/netdev/net/c/63bac0278603
-  - [net,08/14] netfilter: nf_socket: skip socket lookup for non-first fragments
-    https://git.kernel.org/netdev/net/c/0bf00859d7a5
-  - [net,09/14] netfilter: nf_tables: skip L4 header parsing for non-first fragments
-    https://git.kernel.org/netdev/net/c/009d203e56db
-  - [net,10/14] netfilter: xtables: fix L4 header parsing for non-first fragments
-    https://git.kernel.org/netdev/net/c/952e121c9613
-  - [net,11/14] netfilter: flowtable: ensure sufficient headroom in xmit path
-    https://git.kernel.org/netdev/net/c/ef4f741e8627
-  - [net,12/14] netfilter: flowtable: fix inline vlan encapsulation in xmit path
-    https://git.kernel.org/netdev/net/c/a177ae30f786
-  - [net,13/14] netfilter: flowtable: fix inline pppoe encapsulation in xmit path
-    https://git.kernel.org/netdev/net/c/69c54f80f4a7
-  - [net,14/14] netfilter: flowtable: use skb_pull_rcsum() to pop vlan/pppoe header
-    https://git.kernel.org/netdev/net/c/baa3c65435fb
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks! In the future please make sure you send the Review tags on a
+separate line, otherwise our scripts don't pick them up
 
