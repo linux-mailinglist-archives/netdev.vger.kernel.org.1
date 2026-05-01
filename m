@@ -1,156 +1,142 @@
-Return-Path: <netdev+bounces-283291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283293-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AITpFPQP9WnIHwIAu9opvQ
-	(envelope-from <netdev+bounces-283291-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 22:41:24 +0200
+	id 6BPSIn0T9WnpIAIAu9opvQ
+	(envelope-from <netdev+bounces-283293-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 22:56:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3DE64AF8D8
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 22:41:23 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A9484AF970
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 22:56:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D6FCD3019F16
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 20:41:11 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9B798300682C
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 20:56:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D8C042315B;
-	Fri,  1 May 2026 20:41:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EA3E3FD126;
+	Fri,  1 May 2026 20:56:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qEi8ltVY"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="G3dAtTYj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 094FF4219E7
-	for <netdev@vger.kernel.org>; Fri,  1 May 2026 20:41:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B11B03491C4;
+	Fri,  1 May 2026 20:56:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777668070; cv=none; b=NwK07zIHLFMyQtwP5rWbnYa4WPVZKmqbCC2UqLVREa+IksxblOYDDezAcDyJZVjWvzbQWBBVwOij6oz21TIU3WbywKSQnawyZoKN1h4HpIB43HhLyRkTIWoFzP9ntXcuzMRq5uGFb7liqEtAw2YwcoLimKAlbJSDRPG217Z0i/Y=
+	t=1777668986; cv=none; b=fpsUf+yhDtUJJbriSusYk4QgHFg7p7QRECnQwovYyFM4qAtbn0CKWJrf6aFSlU3fZryf8+/1XjK/QYQ1R/qeqwhYZ9cOV6lOrKiYzN+dJdLIXgnyB70+mqDqWSbZRF1GxizNcfDlHC6bRFgyz1zIkKPLA9ZY9iHkYkFM0lTh80Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777668070; c=relaxed/simple;
-	bh=VAGwlkfOhO8vq5+QQLvGj7XDBS7ATS4VX2eI2mgwUus=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=sfAGsgMSGnyS+Ag2BL84B2MX2c6y80Sz1StDi+4ns9potvBkIPXEsoqJ1BOgDcErckcw4ezXClmPYP/ugaTgUI69uYoQeM0EJvB3qFNaUp5ktUUzlRkLM9+qWZmEltErtgoIO4quWsbjA23/DpOf62R6+CTlLHBGzi6yUue8ZAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qEi8ltVY; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-488ad135063so18446385e9.0
-        for <netdev@vger.kernel.org>; Fri, 01 May 2026 13:41:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777668067; x=1778272867; darn=vger.kernel.org;
-        h=mime-version:content-transfer-encoding:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VAGwlkfOhO8vq5+QQLvGj7XDBS7ATS4VX2eI2mgwUus=;
-        b=qEi8ltVY5FPEkzaV0Cs9mYwRsvjaa8SVo60MZY0QFhFnG6FzppCD07Ig8oFLUFCBbH
-         puGD2nsRT7C5GnHb//5Az6G1obFAXi/gAlcuPX8h9ntj0DNsW1CZeuKAALjO/Hhvac9t
-         FmBk6RXdOlM0X+r/1iwngpC8pEKFe3FcIgyaoOwCO1ZGBj1EEZ9zl+Hz4AKfVdVllvM5
-         qpXddun6F14obLU40djU92xYXpovRtbDpeaj2SYRk/FcztH1pkcPdosmgEDdi+YQ5mWx
-         hHx/qpD1IQIGBBInApPHgk5mPsFY6kuiyqmAWxbbfBETeq3dCSihVsbftqa28pXx+Y1/
-         a6KQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777668067; x=1778272867;
-        h=mime-version:content-transfer-encoding:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=VAGwlkfOhO8vq5+QQLvGj7XDBS7ATS4VX2eI2mgwUus=;
-        b=W9Uw5QLYHo+LfEd8NPXmXPupbjXlu/tBckyniLPZaK03UswMhQq/xhuhE2ylTHnmrW
-         rFnF6vmTGeBKtxkCugeEJ6f7xo5bRSUUqVd93Ht4g/VVEJy4X/PiwkLFgZPtSDyoc+QU
-         lzv3qeUBchJ0FUvngzEjhu8jspE5MHgXv/vT3IBuPIICITEM1j1cAr+P6R/XoH1/5Gdg
-         Z4ShrKqU3WMOJw7VzPxWbqMJoY3bnfdEqoPaIHEsfbTf0Kz5SDcozBSi+wsh8ra66s/e
-         1vIhwIODgbuOAakftpF0IbXZtfJn5BWP+Hh4rVSsL5xqNeoX6FicO6k09UYm/OmVxjO3
-         i5Tg==
-X-Forwarded-Encrypted: i=1; AFNElJ8XqQO3SXyUnKnW9RsCPzPtWV/+dtkb/lM9BZyuhIAoAQ8Y0QY3lFF9ftLmFx3BDmDh/15udAo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKJM8HyoByMK4NzMjcO4QDUpenbqezjAMd29Tc2qbD1fNF2651
-	UYBihTsGfZoRU8cTC4oW8q3zoIr/9Yd2xwHqlIThOJQrx9zCn2fwv2M=
-X-Gm-Gg: AeBDies6Df4vp7ZXc9ar/anehqmrdstqTmv2r5lpTFUyUOKMAoG+YI+JUNrUha4CPNF
-	LOmaWKRC8R/DpZBpsn3m6R0TTfAjzt98bxR21d7QbUv9ZWPJBj3+kDwJuuF5eRqCaTLc+nmk99e
-	trIzxG3wYK7tDraHR0x0CYBz2vDDI0zubzW6NmskSQ6V0U2D7sidgElBU5RPGM4cbI0C67swxzD
-	Cjt6MMRNT2aUTu64EJEC277IAfB+SGzyiKKRkHH7LNuUn6ubbGllKF+rhFkAjPORnt7fo1lEWnm
-	1BmCsaRlJ6NDAZ3H3B+jLb7Dop6q+4MrZE14afRnCyFtbc7G0sBekbM9VvXEE1wPUmclQodTaUF
-	qXn0r5vXwvMrpG3vJbxBLplS6+e77Y2gYZZyseAnZiRKH79JpV0wMOjsR1Jt7+9V9i99Efpvcmz
-	0wRzXxDy6Y4RU=
-X-Received: by 2002:a05:6000:2383:b0:43d:c95c:4259 with SMTP id ffacd0b85a97d-44bb5b4e054mr1421092f8f.30.1777668067195;
-        Fri, 01 May 2026 13:41:07 -0700 (PDT)
-Received: from debian ([2001:41d0:303:db6b::])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-44a986aa3a5sm7882383f8f.26.2026.05.01.13.41.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 May 2026 13:41:06 -0700 (PDT)
-From: Tristan Madani <tristmd@gmail.com>
-To: Florian Westphal <fw@strlen.de>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>,
- netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
- stable@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] netfilter: ip_tables: guard
- ipt_unregister_table_pre_exit against NULL ops
-Date: Fri, 01 May 2026 20:41:05 -0000
-Message-ID: <177766806589.1898033.5646188235412407059@gmail.com>
-In-Reply-To: <afPUr2oksLlaMcOj@strlen.de>
-References: <20260429175613.1459342-1-tristmd@gmail.com>
- <177750472539.3004201.15967003942391945312@talencesecurity.com>
- <177750474339.3016150.13196470704394042910@talencesecurity.com>
- <afNYqx41pBCyDnjR@strlen.de>
- <177758578919.118018.11758358602621428742@gmail.com>
- <afPUr2oksLlaMcOj@strlen.de>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+	s=arc-20240116; t=1777668986; c=relaxed/simple;
+	bh=xrA5pvPy1cRCoop4m79kAzLeDUdXCIENeq4TEMsPG5M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eCBGqdRN/PQ1DntE3iXtTOaGfkVgy9fFx/VS1MeFtyqhcpLI3LyXFS+RQ+6wiI77TqOQwhl+/9RGh2LmbuT/s4p3vlYnrzdkzAtXis0P0o3R9CZEJtaX2/c0ew0crA55cUzyjDklkVtCf/cQQ9CSOR1ca+Ych9sFDNW3zjfsc4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=G3dAtTYj; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=3Tcbg9/ugxpQr7TMEC6mX5fl4hcvqIRPYh248BBUiSY=; b=G3dAtTYjFbHZBVFYI5xNUl+35H
+	KRyZcgox694pudSxsak7WqvEaSJg6i8zmsRlzvrlJA0nRmjkBO6Ki8ttOeZGIjBBz33HVTKQwHVEa
+	OMKtIGMqPN3Ly370NqGZwL6N2Xu0utn81eXt57J1kyFdGXLZLZHNAY4GisuufoMlJTZk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wIuth-000shL-GJ; Fri, 01 May 2026 22:55:41 +0200
+Date: Fri, 1 May 2026 22:55:41 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alex Elder <elder@riscstar.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, maxime.chevallier@bootlin.com,
+	rmk+kernel@armlinux.org.uk, andersson@kernel.org,
+	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, linusw@kernel.org, brgl@kernel.org,
+	arnd@arndb.de, gregkh@linuxfoundation.org, daniel@riscstar.com,
+	mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com,
+	alexandre.torgue@foss.st.com, ast@kernel.org,
+	boon.khai.ng@altera.com, chenchuangyu@xiaomi.com,
+	chenhuacai@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	hkallweit1@gmail.com, inochiama@gmail.com, john.fastabend@gmail.com,
+	julianbraha@gmail.com, livelycarpet87@gmail.com,
+	matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc,
+	prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
+	rohan.g.thomas@altera.com, sdf@fomichev.me,
+	siyanteng@cqsoftware.com.cn, weishangjuan@eswincomputing.com,
+	wens@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 04/12] net: stmmac: dma: create a separate
+ dma_device pointer
+Message-ID: <4cbe1a04-4a49-4e4d-95f4-ed4df1afa24f@lunn.ch>
+References: <20260501155421.3329862-1-elder@riscstar.com>
+ <20260501155421.3329862-5-elder@riscstar.com>
+ <9203d8dd-8ec0-415e-9c2e-5b06b1b8dc11@lunn.ch>
+ <539b9de3-4a78-44cf-9085-06cd0cab2d17@riscstar.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: A3DE64AF8D8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <539b9de3-4a78-44cf-9085-06cd0cab2d17@riscstar.com>
+X-Rspamd-Queue-Id: 2A9484AF970
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-283291-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,riscstar.com,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-283293-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[50];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tristmd@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	TAGGED_RCPT(0.00)[netdev,kernel,dt];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[]
 
-On Thu, 1 May 2026 Florian Westphal wrote:
-> If we have races between a thread calling ipt_register_table
-> and the netns cleanup path there is nothing we could ever do to
-> fix it: we are tearing down a live network namespace.
-> Something else must be going on.
+On Fri, May 01, 2026 at 01:06:23PM -0500, Alex Elder wrote:
+> On 5/1/26 12:13 PM, Andrew Lunn wrote:
+> > >   	if (priv->dma_cap.host_dma_width) {
+> > > -		ret = dma_set_mask_and_coherent(device,
+> > > -				DMA_BIT_MASK(priv->dma_cap.host_dma_width));
+> > > +		u64 mask = DMA_BIT_MASK(priv->dma_cap.host_dma_width);
+> > > +
+> > > +		ret = dma_set_mask_and_coherent(priv->dma_device, mask);
+> > 
+> > I'm nitpicking, but i don't think you need to introduce mask.
+> > DMA_BIT_MASK... is already on a line of its own, and is within the 80
+> > limit. Nothing changes here with s/device/priv->dma_device/
+> > 
+> > 	Andrew
+> 
+> I did this.  It was simply to silence a checkpatch.pl warning
+> about a long line.
+> 
+> I don't care either way, I'll gladly put it back the way it was.
 
-I agree, this one is unusual. I tried multiple PoC approaches
-without success -- all I have is the syzkaller crash I shared,
-no reliable reproducer. Syzkaller itself could not minimize it
-either.
+Please pull checkpatch fixes out into a patch of their own.
 
-That said, the crash is real -- KASAN shows ops=NULL in
-pre_exit during cleanup_net -- so something is reaching that
-path. The V2 guard handles it regardless of the root cause:
-if ops is NULL in pre_exit, we should not pass it to
-nf_unregister_net_hooks.
-
-I will share any PoC/repro if I get one.
-
-Thanks,
-Tristan
+       Andrew
 
