@@ -1,96 +1,79 @@
-Return-Path: <netdev+bounces-283254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283256-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6LPmNtHj9Gl1FgIAu9opvQ
-	(envelope-from <netdev+bounces-283254-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 19:33:05 +0200
+	id UETPI6jm9Gm5FgIAu9opvQ
+	(envelope-from <netdev+bounces-283256-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 19:45:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A63D4AE8B0
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 19:33:05 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E8D94AEA0F
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 19:45:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0AC433013A77
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 17:33:01 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B8FED300808B
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 17:39:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07D52313E0D;
-	Fri,  1 May 2026 17:32:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC253164AA;
+	Fri,  1 May 2026 17:38:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="efxVWf89"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1RUdOWDp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 263AA25F984
-	for <netdev@vger.kernel.org>; Fri,  1 May 2026 17:32:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3F93148B5;
+	Fri,  1 May 2026 17:38:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777656777; cv=none; b=hwTwyX59hp+d14aqGD6u6XcC2gFaRGcohukC2Uf9jtm34Wp8Iab+Bb5KCQJ3yPv7NMegMtxtK01W2CGPuKZ8Ptk2K0jUxj4tyeWWr2FRnpa2LV2fubmxT2SXQPcDhRKZpNVV5ozkhPQtfMu70fPa+Q/gfw2GDgWyB8i4nXXQ/ak=
+	t=1777657138; cv=none; b=V6rK4Fh9tSA9lAq8lwOb5pg4qPA3jcCKUU2S1CSh9UmDFgQsVuwOBVKcRvJk81U6hGQ2ov0u4GeGHm6LL6lS1S17C6cJMvLWT6/aW/2Nbu/3o0NIff4EHKgkGj7abCnTckeuvuxFudq+YK+SbEDl1UGYgwz2tqmEfO/ysV2lMcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777656777; c=relaxed/simple;
-	bh=NaBbNXwWIH1VnZaIKy4sMwMBtFjUTNWJd1g7S4np/Z4=;
+	s=arc-20240116; t=1777657138; c=relaxed/simple;
+	bh=FkLvuBwHLW9KIU/MWqsTCq6sClXi+dyujMF+dGFavFk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pwUNr0e8fzVTe4EXTigReQUEkET71KftFDOzFgUtOs43Uj8QW/fViw8rI+rAVhfZbKvboc29+22FaoPVnUjAkKEdVOJKdMIWlLJ3OpzWD8BH737J9stSLG+O4+74tUADx0oyhkIkk72L/7Hr+Tdo0E2g3Lj7lI+cAFxuFJF1f4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=efxVWf89; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-79ea87af213so51171897b3.0
-        for <netdev@vger.kernel.org>; Fri, 01 May 2026 10:32:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777656774; x=1778261574; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AryNV0l+jgUF7izPhm+UoZG1NwQ31VUz12XuoxZ/bAc=;
-        b=efxVWf89qiF/V/OzGoKXB8Uevv7jlCkk4CbS2SAJ5HU/JhmNsDwmue6U7l9s1KVxVA
-         PHYAsbfhDEty5RRsDr8mgCdgJRzYXy6WjxW0pACtsi9aIAcsSk8p6VHsmSNZCWOZxDt/
-         uVzPB9Z0/IX+mFx52HIsIUVelkJJc+5YOW+ZTMLoHL37Hta/sz2qXq/Hz9Oog/alu2C7
-         3FTnQCaB5DLc19uOmBXs9b9LwUvtmwNUOuMLGW1RG2P/RpwBKUPwQFfpANCmPDCPsEta
-         RACS6MiRRb0KMR+6Bs2UmN23KCWS8YLuyHnqQ49qOEbgItkrtac9ceB0xoX11BMlBwUG
-         X3/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777656774; x=1778261574;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AryNV0l+jgUF7izPhm+UoZG1NwQ31VUz12XuoxZ/bAc=;
-        b=QQpgtdip10cGnOPlunpCsDNHUp6F159sOkW/yWhXelCJsRD8k2XHviaqaDQtsdC4W/
-         0ImZmGuvW+aRUzi1ankjFSr9Bcw8D1vlotjCD+TPwA5HKRVdP8s/02/TQ5f4ZA71uGYH
-         vkDvVFzqHTT/kxiQ7epNdG8ZmPYcE8AQwAJIBkpIlqvi8p0D/LVdHrIjngmD634db1uO
-         qXW9X21qD9/R4tFGX0SMLqyXMgTy7nXwZMWC8EMq9pJGlElKi/tkj8KQ4VVS8NakNnNv
-         5xwg7kHf6Gtd7kXsp9RkwkFIjx4E+EYUN5/CHugHQTZActVsyXJBeg8crrkdHoIvS90S
-         T9rQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8qMTTx9YRMd4OhSaOQ+HXh69kfNUSlKGLrb19+WztJFZNGXy6A/mYxma5XCNFMvn4ZUVVxJ+w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8xG48kiaRKmagAbQ6TRURMbfz4PCIo8tqAIwS3yVrQWW2gb2O
-	HP21Xh2+4F5gcix3n49WZ/zxtOmFaKK40x5/N8x/cXtWmwRVJampKmhE
-X-Gm-Gg: AeBDieudnHp2onUrglJqp7xXo0gAxXq94fDoHgirmVzaR22q/pZRBDk5Tss9ALjH9lA
-	DqEV3bq5zrMAcnam3OuWqUCYWiHiIXa8YfuH8cl2XMZOq8uOIhX740T0NjP9jD7zDf01SykXUXr
-	WaD9MetJhodewYHmt/JPtZ59u35DersId10/grBbU4ZaIgA4yf1VFR9/s4hTi6QHdx8m5IGoY1B
-	CfcYQCSo4TS5Z3mzTzzWSydNfaALVtmc1uZ/q+22ueCf8SlSZ/oyTfGTyQq/HziRKn5xP7Y70vF
-	m5Y/2189ifXRBwphuD5zEaux9PkW/1WCx2M+YQyOSOoIwIpKDSZ3hdlpfbDUEpN18OFoev5p4a2
-	MrTW0JRvySUCs/224/xFGWjQEAcb0947aJwBHdg0PWqd4BdRRSC63hQw6fotztQ1Ij11FY0n/9P
-	6gDr6oYDJ7AO00Cygo6u6Nlf3llAOS0KBNK4D4RP3hfxmmCzLvclCXPfw=
-X-Received: by 2002:a05:690c:1d:b0:7b4:6f40:654 with SMTP id 00721157ae682-7bd768772a4mr4403587b3.4.1777656774212;
-        Fri, 01 May 2026 10:32:54 -0700 (PDT)
-Received: from devvm29614.prn0.facebook.com ([2a03:2880:ff:70::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7bd665694b8sm13710007b3.21.2026.05.01.10.32.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 May 2026 10:32:53 -0700 (PDT)
-Date: Fri, 1 May 2026 10:32:44 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, sdf.kernel@gmail.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org,
-	kernel-team@meta.com
-Subject: Re: [PATCH net-next 2/3] vsock: convert to getsockopt_iter
-Message-ID: <afTjvM1P4gjPSvW8@devvm29614.prn0.facebook.com>
-References: <20260501-getsock_one-v1-0-810ce23ea70e@debian.org>
- <20260501-getsock_one-v1-2-810ce23ea70e@debian.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rEyfZ97z01lv+9o7s1tsyZnStvEVYu1SkYo+L5c/CDfm7co33GWk5EolOTHBQ7Q+Hhsvb4Uwgha6RqKLYoJV7qGsl/36nallS7fa9vUzZ8wrKePrKxKaFbwbho48VfuqBWexaIlvT0ZKN3JQ+Omoy5iFKz0NC4r2Al8NWcugXR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1RUdOWDp; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=v1G+n5y3YaiJOCPRo9ZSXyCutKw19S+mOiIPygXvWbA=; b=1RUdOWDpRr1oCft025cSv8R4JM
+	7JEFjRj+B2aOR33WNSyqJ0LUTLOPlRXuB27RxpQuiHsoK2UxvcHt/feQeARPBKKRd75vpeMJBL+VA
+	QutEOfQtlovqoFmxTw5pLgvxcNj79Ys9Gxw2YAyJbf0T6TYLP527f884yruR48HgiUwQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wIrok-000qnU-W4; Fri, 01 May 2026 19:38:22 +0200
+Date: Fri, 1 May 2026 19:38:22 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alex Elder <elder@riscstar.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, maxime.chevallier@bootlin.com,
+	rmk+kernel@armlinux.org.uk, andersson@kernel.org,
+	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, linusw@kernel.org, brgl@kernel.org,
+	arnd@arndb.de, gregkh@linuxfoundation.org,
+	Daniel Thompson <daniel@riscstar.com>, mohd.anwar@oss.qualcomm.com,
+	a0987203069@gmail.com, alexandre.torgue@foss.st.com, ast@kernel.org,
+	boon.khai.ng@altera.com, chenchuangyu@xiaomi.com,
+	chenhuacai@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	hkallweit1@gmail.com, inochiama@gmail.com, john.fastabend@gmail.com,
+	julianbraha@gmail.com, livelycarpet87@gmail.com,
+	matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc,
+	prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
+	rohan.g.thomas@altera.com, sdf@fomichev.me,
+	siyanteng@cqsoftware.com.cn, weishangjuan@eswincomputing.com,
+	wens@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 08/12] dt-bindings: net: toshiba,tc965x-dwmac:
+ add TC956x Ethernet bridge
+Message-ID: <1f34cbce-e2dd-4e80-b136-55d0efa50002@lunn.ch>
+References: <20260501155421.3329862-1-elder@riscstar.com>
+ <20260501155421.3329862-9-elder@riscstar.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,125 +82,97 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260501-getsock_one-v1-2-810ce23ea70e@debian.org>
-X-Rspamd-Queue-Id: 9A63D4AE8B0
+In-Reply-To: <20260501155421.3329862-9-elder@riscstar.com>
+X-Rspamd-Queue-Id: 8E8D94AEA0F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [4.84 / 15.00];
+	SEM_URIBL(3.50)[0.0.0.0:email];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283254-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,riscstar.com,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	TAGGED_FROM(0.00)[bounces-283256-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_POLICY_ALLOW(0.00)[lunn.ch,none];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org,lists.linux.dev,meta.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	R_DKIM_ALLOW(0.00)[lunn.ch:s=20171124];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	GREYLIST(0.00)[pass,body];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,meta.com:email,devvm29614.prn0.facebook.com:mid]
+	RCPT_COUNT_GT_50(0.00)[50];
+	NEURAL_HAM(-0.00)[-0.743];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_SPF_ALLOW(0.00)[+ip4:104.64.211.4:c];
+	MISSING_XM_UA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel,dt];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[0.0.0.0:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid,1c:email]
 
-On Fri, May 01, 2026 at 08:52:52AM -0700, Breno Leitao wrote:
-> Convert AF_VSOCK's getsockopt implementation to use the new
-> getsockopt_iter callback with sockopt_t. The single
-> vsock_connectible_getsockopt() callback is shared by both
-> vsock_stream_ops and vsock_seqpacket_ops, so both proto_ops are
-> updated to use .getsockopt_iter.
-> 
-> Key changes:
-> - Replace (char __user *optval, int __user *optlen) with sockopt_t *opt
-> - Use opt->optlen for buffer length (input) and returned size (output)
-> - Use copy_to_iter() instead of put_user()/copy_to_user()
-> 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
->  net/vmw_vsock/af_vsock.c | 16 +++++++---------
->  1 file changed, 7 insertions(+), 9 deletions(-)
-> 
-> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> index 44037b066a5ff..d4a97eeb596e6 100644
-> --- a/net/vmw_vsock/af_vsock.c
-> +++ b/net/vmw_vsock/af_vsock.c
-> @@ -155,6 +155,7 @@
->  #include <linux/random.h>
->  #include <linux/skbuff.h>
->  #include <linux/smp.h>
-> +#include <linux/uio.h>
->  #include <linux/socket.h>
->  #include <linux/stddef.h>
->  #include <linux/sysctl.h>
-> @@ -2091,8 +2092,7 @@ static int vsock_connectible_setsockopt(struct socket *sock,
->  
->  static int vsock_connectible_getsockopt(struct socket *sock,
->  					int level, int optname,
-> -					char __user *optval,
-> -					int __user *optlen)
-> +					sockopt_t *opt)
->  {
->  	struct sock *sk = sock->sk;
->  	struct vsock_sock *vsk = vsock_sk(sk);
-> @@ -2110,8 +2110,7 @@ static int vsock_connectible_getsockopt(struct socket *sock,
->  	if (level != AF_VSOCK)
->  		return -ENOPROTOOPT;
->  
-> -	if (get_user(len, optlen))
-> -		return -EFAULT;
-> +	len = opt->optlen;
->  
->  	memset(&v, 0, sizeof(v));
->  
-> @@ -2142,11 +2141,10 @@ static int vsock_connectible_getsockopt(struct socket *sock,
->  		return -EINVAL;
->  	if (len > lv)
->  		len = lv;
-> -	if (copy_to_user(optval, &v, len))
-> +	if (copy_to_iter(&v, len, &opt->iter_out) != len)
->  		return -EFAULT;
->  
-> -	if (put_user(len, optlen))
-> -		return -EFAULT;
-> +	opt->optlen = len;
->  
->  	return 0;
->  }
-> @@ -2631,7 +2629,7 @@ static const struct proto_ops vsock_stream_ops = {
->  	.listen = vsock_listen,
->  	.shutdown = vsock_shutdown,
->  	.setsockopt = vsock_connectible_setsockopt,
-> -	.getsockopt = vsock_connectible_getsockopt,
-> +	.getsockopt_iter = vsock_connectible_getsockopt,
->  	.sendmsg = vsock_connectible_sendmsg,
->  	.recvmsg = vsock_connectible_recvmsg,
->  	.mmap = sock_no_mmap,
-> @@ -2653,7 +2651,7 @@ static const struct proto_ops vsock_seqpacket_ops = {
->  	.listen = vsock_listen,
->  	.shutdown = vsock_shutdown,
->  	.setsockopt = vsock_connectible_setsockopt,
-> -	.getsockopt = vsock_connectible_getsockopt,
-> +	.getsockopt_iter = vsock_connectible_getsockopt,
->  	.sendmsg = vsock_connectible_sendmsg,
->  	.recvmsg = vsock_connectible_recvmsg,
->  	.mmap = sock_no_mmap,
-> 
-> -- 
-> 2.52.0
-> 
+Your ASCII art of the chip might be useful here as documentation.
 
-Reviewed-by: Bobby Eshleman <bobbyeshleman@meta.com>
+> +  # We can't allOf reference Ethernet-controller.yaml because we end up with
+> +  # contradictory $nodename rules (`ethernet@` versus `pci@`). Happily only a
+> +  # small number of the properties are useful on TC956x so we can just reference
+> +  # what we need.
+
+Why not add an subnodes for the ethernet interfaces?
+
+> +examples:
+> +  - |
+> +    pcie {
+> +      #address-cells = <3>;
+> +      #size-cells = <2>;
+> +
+> +      tc956x_emac0: pci@0,0 {
+> +        compatible = "pci1179,0220";
+> +        reg = <0x50000 0x0 0x0 0x0 0x0>;
+> +        #address-cells = <3>;
+> +        #size-cells = <2>;
+> +        device_type = "pci";
+> +        ranges;
+> +
+> +        gpio-controller;
+> +        #gpio-cells = <2>;
+
+I've not got to the GPIO driver patch yet...
+
+Is the GPIO part of the ethernet device, or part of the chip? The
+hierarchy here should match the hierarchy of the hardware.
+
+> +        phy-mode = "10gbase-r";
+> +        phy-handle = <&tc956x_emac0_phy>;
+> +
+> +        mdio {
+> +          compatible = "snps,dwmac-mdio";
+> +          #address-cells = <1>;
+> +          #size-cells = <0>;
+> +
+> +          tc956x_emac0_phy: ethernet-phy@1c {
+> +            compatible = "ethernet-phy-id311c.1c12";
+> +            reg = <0x1c>;
+> +          };
+> +        };
+> +      };
+> +      pci@0,1 {
+> +        compatible = "pci1179,0220";
+> +        reg = <0x50100 0x0 0x0 0x0 0x0>;
+> +        #address-cells = <3>;
+> +        #size-cells = <2>;
+> +        device_type = "pci";
+> +        ranges;
+> +
+
+You second ethernet does not have a gpio controller?
+
+	Andrew
 
