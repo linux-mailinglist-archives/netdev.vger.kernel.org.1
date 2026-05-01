@@ -1,177 +1,287 @@
-Return-Path: <netdev+bounces-283066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283067-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id s11rDfwA9Gkw9gEAu9opvQ
-	(envelope-from <netdev+bounces-283066-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 03:25:16 +0200
+	id uE8cMV0E9GnR9gEAu9opvQ
+	(envelope-from <netdev+bounces-283067-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 03:39:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 711414A99D1
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 03:25:15 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C31414A9A73
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 03:39:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 048A1301B728
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 01:25:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 44ED9300A640
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 01:39:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 229BB2BDC32;
-	Fri,  1 May 2026 01:25:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0D992D7398;
+	Fri,  1 May 2026 01:39:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fD6ToFG8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LLTjKOK3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f201.google.com (mail-dy1-f201.google.com [74.125.82.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4421287263
-	for <netdev@vger.kernel.org>; Fri,  1 May 2026 01:25:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE9B23C39A;
+	Fri,  1 May 2026 01:39:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777598713; cv=none; b=QLB7BvLqQPjDA975D6co6aEkzRXNO6kZheS/gGfRs6fpvOIiTOz3QENF7sYbauX2SV7NBN91CJ/vZM1YyQt7U5H9ezTPUeqwVf/WKjNnSlzmoU7lKhqRC+cRU9jf9E/lkz6dSL18ToHT9Jr8QZRztsacqItmfwEN+WCJivVyCGo=
+	t=1777599575; cv=none; b=esh4oUIeh0c+MxswyL/FqrfSfrbxdmcvDfFGY7WaDSzCkVDhFPLhDA/SEcrrVONNeFVXl1RVIXGEba7O9Q0P1DCVfTeYC32BhNqrMEuutTgylFdP8iMyc6bjoraGn8kqurBqosJr/dqwiGQh8FXEpAXr6t/z0aOW+VIq69Ba+YI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777598713; c=relaxed/simple;
-	bh=sw9s8UjpZFd8zI7MGxTn46oINIzT/Z36l7Cymb5QNnM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=lH71xzj2jOTceuu1FIjBULdIJ5F8V9QbCVEjdLkaZaRh3eDP304M3yGhCluNDniolj81byrMMaE4Q70teRTZbSBaNxquSeX0OEzuJPBV/538dwsK+tIu/H+6OhJILBmjOa6niOOFOVUvjXHDRpzoEkMpAEgW47ghIXCKtSc6Olc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--boolli.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fD6ToFG8; arc=none smtp.client-ip=74.125.82.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--boolli.bounces.google.com
-Received: by mail-dy1-f201.google.com with SMTP id 5a478bee46e88-2bdf6fe90a9so3256395eec.1
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 18:25:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777598711; x=1778203511; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=oVNJyuWqlMR4ml4qJTrmF4Dl7mhOJUtG2QO1Cc6843I=;
-        b=fD6ToFG8Pm8thJ2+P8ahPLCI6qotrYzWny8A1jQhlXUEQYP+hZ4g/tO617M2HKc5yD
-         jaJA+mm807kCn/GVWe3apHcyn0Wlu3WqK0JR9R9Ro0ywuECeAkmQg4ThvAeyPY3yYz5P
-         jKlSTkW2b0lcrYfrO2uO44H3IZBh4LApY5PrIbx9Rn8z/r5IXddcSjgQ6tlqUcFrJ0Aa
-         1iLV/Oa6Npjz37mysgC0le+r3ZjCxH5bhj9WZ4OddZPzG5Ns3JRpiMvnH3IpmtU3Ov6g
-         wCCEOX86bfS/l+U3OZCG9HV1RITAEmp2hiKcYG67QgUPXLFb2gKAS/8GEw8slj+/bCrC
-         OLWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777598711; x=1778203511;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oVNJyuWqlMR4ml4qJTrmF4Dl7mhOJUtG2QO1Cc6843I=;
-        b=d2kKjnNjLSF721rzTeSVuW8MRXd3CjuajhwRKV9DjhPxv1K7X0NmiGQL6inbvjMW+F
-         EGiOdHQFJMjT8fG+VldXCej/oQLT2vxV6GnPX4KKpDLKrVFjdaYzUsgzIISrAxNry+gT
-         lcZSwDmjRJrW/Xx8cehSDahZ8NfWmXBj7NEUZqs3h+ZxgiRswbOuwgcxGm/OB4PWh0H0
-         bspORlfID0OA/F6GySQD8yIlBD7utlRLJhPLbAOBxv9tVxD7rbPlRdPXschcnTGMCIx7
-         VzPa91gJuNjR0felQoPe2EZqpAE2j+Srpk3WA30LhH0IcS4yTfRsQk9bFlpL8BulADVa
-         LrrQ==
-X-Gm-Message-State: AOJu0YxiPm6F0g2boAeVlnYcdqFla75ujTr+GuMh2M87Vs6Zu0vaMPEJ
-	jjPeHJgNN0nGdrzk/X5ss4mOwxhTdhTclmy5mi6t4YS1rshx47ffmyFT2WgARxM9erve3I/wsYd
-	JTnpuXQ==
-X-Received: from dybvi26.prod.google.com ([2002:a05:7301:531a:b0:2d8:dd18:baee])
- (user=boolli job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7301:6743:b0:2d9:bc8d:f62a
- with SMTP id 5a478bee46e88-2ed3e486c61mr2586087eec.16.1777598710661; Thu, 30
- Apr 2026 18:25:10 -0700 (PDT)
-Date: Fri,  1 May 2026 01:25:07 +0000
+	s=arc-20240116; t=1777599575; c=relaxed/simple;
+	bh=QVVmfKBuYjK1KtBzZ+SBGhTexOP7jIj1vRGIDd19OrU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=GH0BOrBdXLPXajhcu+z11EmZJWN+f1Y70SL/kJGKWmxE69rlVxk46eXg2DsTlb6Mxw3G1Y+CT3IHaVPscFojxueAsmdPVN+g3wWnNNLddwdIFDsrPdX2zm4mQN3pI39waeXxEgrwqDg6j7KwyWqVwUhu9ac56MN9DvcBiMlu2Z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LLTjKOK3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5536C2BCB3;
+	Fri,  1 May 2026 01:39:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777599575;
+	bh=QVVmfKBuYjK1KtBzZ+SBGhTexOP7jIj1vRGIDd19OrU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=LLTjKOK3/Wo09wGrdAJ7Dc1wUl3ssr3LQ0j0Ab4GKyxj/xMm8kzsOyfDPk4Az8QNG
+	 Tl/WCx32St1mPloNKLHCg0t8Y0nTzeDpAbe/1o4uQWexRlZXXIsqp0Z9XzGQKFsABW
+	 8T4N5b8YLIVweYm9MJPzNo6BYoyMTSjhOusr621u66W33L70nsqshq/kbrA3+jamnA
+	 d6KZs9UlDgbB+JPza8CoVLa8MjLvXYtzWD9F7UX4+JgBmPI9J9MADVIjxdTeYoR1TN
+	 v+BJkHWEJOgvuX8hX2TWNvCT2voSStxsjH5osGIDaineaXZbhFL94MHT1B+sIXLcny
+	 rLT9s/A2vYEww==
+From: Jakub Kicinski <kuba@kernel.org>
+To: nb@tipi-net.de
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	justin.chen@broadcom.com,
+	horms@kernel.org,
+	mohsin.bashr@gmail.com,
+	opendmb@gmail.com,
+	florian.fainelli@broadcom.com,
+	bcm-kernel-feedback-list@broadcom.com,
+	andrew+netdev@lunn.ch,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	rajashekar.hudumula@broadcom.com,
+	vikas.gupta@broadcom.com,
+	bhargava.marreddy@broadcom.com,
+	sashal@kernel.org,
+	ebiggers@google.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v8 1/7] net: bcmgenet: convert RX path to page_pool
+Date: Thu, 30 Apr 2026 18:37:25 -0700
+Message-ID: <20260501013724.3164844-2-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260428205846.2625550-2-nb@tipi-net.de>
+References: <20260428205846.2625550-2-nb@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260501012507.461044-1-boolli@google.com>
-Subject: [PATCH iwl-next v4] libie: log more info when virtchnl fails
-From: Li Li <boolli@google.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	David Decotigny <decot@google.com>, Anjali Singhai <anjali.singhai@intel.com>, 
-	Sridhar Samudrala <sridhar.samudrala@intel.com>, Brian Vazquez <brianvv@google.com>, 
-	Li Li <boolli@google.com>, emil.s.tantilov@intel.com
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 711414A99D1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: C31414A9A73
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283066-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,broadcom.com,gmail.com,lunn.ch,google.com,redhat.com,davemloft.net];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-283067-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[boolli@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.996];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-Virtchnl failures can be hard to debug without logs. Logging the details
-of virtchnl transactions can be useful for debugging virtchnl-related
-issues.
-
-Tested: Built & booted on a test machine and synthetically produced a
-virtual failure to produce the following log:
-
-idpf 0000:01:00.0: Non-zero virtchnl ret val 6 (msg op: 1, data_len: 8);
-xn id: 0, cookie: 0
-idpf 0000:01:00.0: Transaction failed (op 1, xn state:
-3, id: 0, cookie: 0, size: 8)
-
-Signed-off-by: Li Li <boolli@google.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 ---
-v4:
- - Simplify logging to reduce redundant "ret val"s.
- - Use %u for xn->state.
-v3:
- - Use dev_err_ratelimited in both logs.
- - Move log placement to after virtchnl field validation.
- - Remove redundant op/cookie fields since they were validated.
-v2:
- - Use dev_warn_ratelimited instead of dev_notice_ratelimited based on
-   reviewer feedback.
- drivers/net/ethernet/intel/libie/controlq.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+net: bcmgenet: convert RX path to page_pool
 
-diff --git a/drivers/net/ethernet/intel/libie/controlq.c b/drivers/net/ethernet/intel/libie/controlq.c
-index ebc05355e39d..e1bc19d6cdbf 100644
---- a/drivers/net/ethernet/intel/libie/controlq.c
-+++ b/drivers/net/ethernet/intel/libie/controlq.c
-@@ -766,6 +766,14 @@ libie_ctlq_xn_process_recv(struct libie_ctlq_xn_recv_params *params,
- 	    msg_cookie != xn->cookie)
- 		return false;
- 
-+	if (ctlq_msg->chnl_retval) {
-+		dev_err_ratelimited(
-+			params->ctlq->dev,
-+			"Non-zero virtchnl ret val %u (msg op: %u, data_len: %u); xn id: %u, cookie: %u\n",
-+			ctlq_msg->chnl_retval, ctlq_msg->chnl_opcode,
-+			ctlq_msg->data_len, xn->index, xn->cookie);
-+	}
-+
- 	spin_lock(&xn->xn_lock);
- 	if (xn->state != LIBIE_CTLQ_XN_ASYNC &&
- 	    xn->state != LIBIE_CTLQ_XN_WAITING) {
-@@ -1011,6 +1019,11 @@ int libie_ctlq_xn_send(struct libie_ctlq_xn_send_params *params)
- 		params->recv_mem = xn->recv_mem;
- 		break;
- 	default:
-+		dev_err_ratelimited(
-+			params->ctlq->dev,
-+			"Transaction failed (op %u, xn state: %u, id: %u, cookie: %u, size: %zu)\n",
-+			params->chnl_opcode, xn->state, xn->index, xn->cookie,
-+			xn->recv_mem.iov_len);
- 		ret = -EBADMSG;
- 		break;
- 	}
+This patch replaces the per-packet __netdev_alloc_skb() + dma_map_single()
+in the bcmgenet RX path with page_pool, adding a page_pool per RX ring and
+building SKBs from pages via napi_build_skb() with skb_mark_for_recycle().
+A few questions on the changes below.
+
+> diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+> index 54f71b1e85fc..d013a3df9048 100644
+> --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+> +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+> @@ -52,6 +52,13 @@
+>  #define RX_BUF_LENGTH		2048
+>  #define SKB_ALIGNMENT		32
+>  
+> +/* Page pool RX buffer layout:
+> + * XDP_PACKET_HEADROOM | RSB(64) + pad(2) | frame data | skb_shared_info
+> + * The HW writes the 64B RSB + 2B alignment padding before the frame.
+> + */
+> +#define GENET_RSB_PAD		(sizeof(struct status_64) + 2)
+> +#define GENET_RX_HEADROOM	(XDP_PACKET_HEADROOM + GENET_RSB_PAD)
+
+Is GENET_RX_HEADROOM used anywhere?  A grep of the tree after this patch
+shows no references to it; all call sites use XDP_PACKET_HEADROOM and
+GENET_RSB_PAD separately.  Can this macro be dropped?
+
+Jakub: false positive
+
+Also, XDP_PACKET_HEADROOM is referenced here and in three other places in
+bcmgenet.c (bcmgenet_rx_refill, bcmgenet_desc_rx, and
+bcmgenet_rx_ring_create_pool), but the only new include added by the
+patch is <net/page_pool/helpers.h> in bcmgenet.h.  XDP_PACKET_HEADROOM is
+defined in include/uapi/linux/bpf.h, and the helpers.h/types.h chain does
+not include it.  Would it be worth adding an explicit #include
+<linux/bpf.h> to bcmgenet.c so this does not rely on transitive inclusion
+(other drivers using this macro, e.g. bnxt, include it explicitly)?
+
+> @@ -2250,46 +2249,30 @@ static netdev_tx_t bcmgenet_xmit(struct sk_buff *skb, struct net_device *dev)
+> -static struct sk_buff *bcmgenet_rx_refill(struct bcmgenet_priv *priv,
+> -					  struct enet_cb *cb)
+> +static int bcmgenet_rx_refill(struct bcmgenet_rx_ring *ring,
+> +			      struct enet_cb *cb)
+>  {
+[ ... ]
+> -	/* Allocate a new Rx skb */
+> -	skb = __netdev_alloc_skb(priv->dev, priv->rx_buf_len + SKB_ALIGNMENT,
+> -				 GFP_ATOMIC | __GFP_NOWARN);
+
+After this conversion, priv->rx_buf_len no longer has any readers; the
+old dma_map_single/dma_unmap paths that consumed it are gone, and the new
+code uses RX_BUF_LENGTH directly in pp_params.max_len and
+page_pool_dma_sync_for_cpu().  bcmgenet_init() still writes the field.
+Should priv->rx_buf_len be removed as part of this cleanup?
+
+[ ... ]
+
+> @@ -2341,25 +2324,28 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
+>  	while ((rxpktprocessed < rxpkttoprocess) &&
+>  	       (rxpktprocessed < budget)) {
+>  		struct status_64 *status;
+> +		struct page *rx_page;
+> +		unsigned int rx_off;
+>  		__be16 rx_csum;
+> +		void *hard_start;
+>  
+>  		cb = &priv->rx_cbs[ring->read_ptr];
+[ ... ]
+> +		page_pool_dma_sync_for_cpu(ring->page_pool, rx_page, 0,
+> +					   RX_BUF_LENGTH);
+
+page_pool_dma_sync_for_cpu() is called unconditionally with a fixed size
+of RX_BUF_LENGTH (2048) even when the actual received frame is much
+smaller.  The received length is available in the descriptor status word
+once it is read.  On the non-cache-coherent SoCs this driver targets
+(for example BCM2711), is there a reason not to sync only the number of
+bytes that were actually received?
+
+[ ... ]
+
+> @@ -2375,7 +2361,8 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
+>  		if (unlikely(len > RX_BUF_LENGTH)) {
+>  			netif_err(priv, rx_status, dev, "oversized packet\n");
+>  			BCMGENET_STATS64_INC(stats, length_errors);
+[ ... ]
+
+> @@ -2411,24 +2399,47 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
+[ ... ]
+> -		skb_put(skb, len);
+> +		/* Build SKB from the page - data starts at hard_start,
+> +		 * frame begins after RSB(64) + pad(2) = 66 bytes.
+> +		 */
+> +		skb = napi_build_skb(hard_start, PAGE_SIZE - XDP_PACKET_HEADROOM);
+> +		if (unlikely(!skb)) {
+> +			BCMGENET_STATS64_INC(stats, dropped);
+> +			page_pool_put_full_page(ring->page_pool, rx_page,
+> +						true);
+> +			goto next;
+> +		}
+>  
+> -		/* remove RSB and hardware 2bytes added for IP alignment */
+> -		skb_pull(skb, 66);
+> -		len -= 66;
+> +		skb_mark_for_recycle(skb);
+> +
+> +		/* Reserve the RSB + pad, then set the data length */
+> +		skb_reserve(skb, GENET_RSB_PAD);
+> +		__skb_put(skb, len - GENET_RSB_PAD);
+
+Can len here be smaller than GENET_RSB_PAD (66)?  len is taken from
+status->length_status >> DMA_BUFLENGTH_SHIFT and the only bound checked
+above is the upper bound against RX_BUF_LENGTH:
+
+    if (unlikely(len > RX_BUF_LENGTH)) {
+        ...
+    }
+
+If HW ever reports a runt length below 66 (for example after a reset or
+due to an errata path), len - GENET_RSB_PAD underflows as an unsigned
+value.  __skb_put() is the unchecked variant:
+
+    static inline void *__skb_put(struct sk_buff *skb, unsigned int len)
+    {
+        void *tmp = skb_tail_pointer(skb);
+        SKB_LINEAR_ASSERT(skb);
+        skb->tail += len;
+        skb->len  += len;
+        return tmp;
+    }
+
+so it will not trip skb_over_panic(); instead skb->tail/skb->len advance
+past skb->end into the page.  Since napi_build_skb() was given
+frag_size = PAGE_SIZE - XDP_PACKET_HEADROOM, skb->end sits inside the
+same page_pool-backed page and the SKB would then expose recycled
+page_pool memory up the stack via napi_gro_receive().
+
+The previous code used skb_put(skb, len) followed by skb_pull(skb, 66),
+both of which are bounds-checked.  Would it make sense to add an
+explicit guard such as:
+
+    if (unlikely(len < GENET_RSB_PAD)) {
+        BCMGENET_STATS64_INC(stats, length_errors);
+        page_pool_put_full_page(ring->page_pool, rx_page, true);
+        goto next;
+    }
+
+before the __skb_put() call?
+
+Jakub: I suppose.. IDK if protecting against bad HW is required, up to you
+
+>  		if (priv->crc_fwd_en) {
+> -			skb_trim(skb, len - ETH_FCS_LEN);
+> -			len -= ETH_FCS_LEN;
+> +			skb_trim(skb, skb->len - ETH_FCS_LEN);
+>  		}
+
+The same underflow concern applies here: if skb->len is less than
+ETH_FCS_LEN, skb->len - ETH_FCS_LEN wraps to a very large unsigned
+value, and skb_trim() does:
+
+    void skb_trim(struct sk_buff *skb, unsigned int len)
+    {
+        if (skb->len > len)
+            __skb_trim(skb, len);
+    }
+
+so the trim is silently skipped and the FCS stays attached.  Should this
+path also validate skb->len before subtracting ETH_FCS_LEN?
+
+[ ... ]
 -- 
-2.54.0.545.g6539524ca2-goog
-
+pw-bot: cr
 
