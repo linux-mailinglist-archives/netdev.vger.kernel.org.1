@@ -1,59 +1,58 @@
-Return-Path: <netdev+bounces-283217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283218-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EDqrHnHM9GkDFAIAu9opvQ
-	(envelope-from <netdev+bounces-283217-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 17:53:21 +0200
+	id qPGqM3XM9GkDFAIAu9opvQ
+	(envelope-from <netdev+bounces-283218-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 17:53:25 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2C114ADBBF
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 17:53:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 902E74ADBD5
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 17:53:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D014D301230B
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 15:53:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 192B03016D1E
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 15:53:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEF643CB2E5;
-	Fri,  1 May 2026 15:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0978D3D0925;
+	Fri,  1 May 2026 15:53:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="a/OaqmS2"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="LwvONb9C"
 X-Original-To: netdev@vger.kernel.org
 Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ACA4308F1D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC30255F2D;
 	Fri,  1 May 2026 15:53:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777650796; cv=none; b=Xjb3f/0B/XPwvGQE3zm4ragImX1HurSYbOVOF0PjHb/ySSjendsVspNswI7EosjzPHz3o5knA1S49vNiKPwbSQLD+/5JiLeLH4Xck5XdeS0p4gM5+4d1nMNBn3jn5oSMp4DAK9liucjDdgKYB02Ycz5jShzvE5C/s3+yWBkfZXo=
+	t=1777650796; cv=none; b=EOQ9Q03sGNAtD38Dvph0rzwc8d5QkeQ+OMN9eKHpH9TLcoX0fiAfDx3GqJVG2CrclvQ/1rTvv7IJD5I86F+bkvJiYkEpe7HOr3KgrNuMWBAZzdUwY1McYpzn94NDi5iEOGs4LO/rNVhgu9g6v0QSrToyJmDsx3UsdCQm7vjcRBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1777650796; c=relaxed/simple;
-	bh=gduIzX2COqKi3echiOqVyeGo3D7A5nRe5hkExoahJTs=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=pciEr/1B1HDhp/S8rtW7mOFxZdP1dt8DL5ojtSCg+JIJrsjlUJJEeNvkkpKLKqm7CZoKbEr6tHzyrkOJvvrKNCECKQ0Pm0jnyALOibP+DT6iCjBcP44/okE1XgS4rSeXydrR+KU9Zk9DBBO9/9e2Ks9mEHAfcA1aMWY008tPq/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=a/OaqmS2; arc=none smtp.client-ip=82.195.75.108
+	bh=2RzQAc1xCBTOApgSCT3b/XDOkjZpHj50sn+KhiO7Kv0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=ue3NJqBBP8NTk9bw+83senZIqBydC36c9tCjjq6gZByW7661xp1X9BKX3i59O25wsNGvtroYuWpt3KMCCCX9qJzDLplQudsUIFW0DhRUqwtcabg3iorfDKgfJxkbriozwKmb6B5BBaMREccZ8P5WrtWRmWlUxKhA3Y0Es0NsbKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=LwvONb9C; arc=none smtp.client-ip=82.195.75.108
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:Message-Id:Date:Subject:From:Reply-To:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=BM9TRss7pseX+5KsnKhBOYrrt8MuhcUMHzPX/Gdxhl8=; b=a/OaqmS29DgdUZ+aj09+krWGZx
-	1HPWQJKqJ8e5e0XH/Kk3NN5InLgYmcRGRDVtEnKQZEk2jtezUctodg6txSNpA8jMEW5LADC+yl1rG
-	TymrkAdJCAvTz4HbGczLkcu91r3VLnC0aKaqJ9s8/KYnRtoZzAWfsh1JzCC09DVQnYFr6jUZ5rThU
-	h1yaF30qVChT2nFx4aU0QBJsBIjkhfUpo5dMh+a+KibRFll9UaXsCuCw9sR860N0cT4zgp8VG2DTN
-	bURcwiPIvmQgjfDeFUrPIV+Y/ER+/HpVZw15Dbhh6G007oS4yMm47ZKMOacgJrNd/1LJ+UBovdLnp
-	L4hGsMxw==;
+	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:In-Reply-To:References:
+	Message-Id:Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:
+	From:Reply-To:Content-ID:Content-Description;
+	bh=wk6HrIetaG5h57CrSbWNYYlAjHlopMNgZIksPE136dQ=; b=LwvONb9CPQQlR7vWdEvRkY4wws
+	7gGbHNYxpdvSMLWAZvjhKMXIfbnSFfcPeCDSoMaWKrw8TdqTMwI+bX/22HyKGfX/HsUszFgJfgjbK
+	NdAn5I2ZnY3NVzlIlDHR1458jglJX4p0950pwcDMSHPeDgWCb7LIPrl23yK6B+TJgBIkOOiveFc1S
+	BMrdr9q2HuOndbFAxIpsL1Oiri8vT3NBWqYeexsRNIyZ7Qf2O0dMNPJfdlkawlKMGR0q73eoZ39XD
+	cGemnjslRL7J00b+wLL2Ht3jUYExo1MRmEaiRIyu2E5NY4YeKxrAhwMud62gEDuhsBDmM7Ov/VV/K
+	EikDVXtw==;
 Received: from authenticated user
 	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.96)
 	(envelope-from <leitao@debian.org>)
-	id 1wIqAt-008gXm-2X;
-	Fri, 01 May 2026 15:53:08 +0000
+	id 1wIqAy-008gXq-1b;
+	Fri, 01 May 2026 15:53:12 +0000
 From: Breno Leitao <leitao@debian.org>
-Subject: [PATCH net-next 0/3] net: Convert AF_NETLINK and AF_VSOCK to
- getsockopt_iter API
-Date: Fri, 01 May 2026 08:52:50 -0700
-Message-Id: <20260501-getsock_one-v1-0-810ce23ea70e@debian.org>
+Date: Fri, 01 May 2026 08:52:51 -0700
+Subject: [PATCH net-next 1/3] netlink: convert to getsockopt_iter
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,11 +61,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAFLM9GkC/2WNywqDMBBFfyXM2kAMvppfKSIxHe20ENvMKIL47
- 6WtdNP1PfecDRgTIYNTGyRciGmK4FSeKQhXH0fUdAGnwBpbmdLkekThKdy7KaL2la3Lxp96b0v
- IFDwSDrR+bGeIKDriKtB+F577GwZ5yw424XMmJjkOv55TfzUSTN1AiUU39VD5ugi2QOOWHNp9f
- wFx1vt+xgAAAA==
-X-Change-ID: 20260501-getsock_one-a62758a9ba25
+Message-Id: <20260501-getsock_one-v1-1-810ce23ea70e@debian.org>
+References: <20260501-getsock_one-v1-0-810ce23ea70e@debian.org>
+In-Reply-To: <20260501-getsock_one-v1-0-810ce23ea70e@debian.org>
 To: "David S. Miller" <davem@davemloft.net>, 
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
  Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
@@ -76,24 +73,24 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
  Breno Leitao <leitao@debian.org>, kernel-team@meta.com
 X-Mailer: b4 0.16-dev-453a6
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1362; i=leitao@debian.org;
- h=from:subject:message-id; bh=gduIzX2COqKi3echiOqVyeGo3D7A5nRe5hkExoahJTs=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBp9MxeFq/D7jFqIv11BP6BM9zPkXhUVb4scptVj
- 6kq7ZILtcuJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCafTMXgAKCRA1o5Of/Hh3
- bT8mEACrZTYte2TN8LU1uRVgKVKEPcHdCbkK2gAHbwefeNmAv9ubMeaeb4YzPlRlf5Lj2TR5iCn
- D8VeM9NzxdRnUoQt3RbEjA+JcFxek8N6VCCiq6ih0pDcmp+xaxaECNJxUPGX1wb6QD22d65x9Ty
- hkaB83VIa3lTLflpSd55xhuCmQLCh1/rua34UdxKrJc5fcHAj03xjS/wsT5VAPyJoWvRGh03Iqx
- z4n1RiKNnnlVcOPzZC21GnOtIgvZGR7jPeVoUZPrrTlePdGHkp0KzmLiO9hxGtkn8A4GQWDCuZ2
- 24bQjl9HfR+qcKs2b/DoFeNAT7aPEzW3qMaL4yN7ohnOsYLAcMPgj0ZIHTWasKYlFze2RuEMeIk
- +ytbjV1MSJaTEJlN1v3rvWMrtnmE8jvfpImfhC54ZksEjBl7JdBcJvIjZw3A5qZqZW+hrDSUf/G
- B1d5BfuDYK5xkWOsP0XfvbSBzYBNFaVUosd21BSoe6rczygT2XvLCEYO8sAjisBAsTZho10PRvw
- vtlKQr5N5BKSBplDmaiS9bZAVIw9XS3Qg0oOapz7rlCg4LyGMPt7vho0rO7g/q4GkyCojotZNf2
- S3z10H6L5dFFGp+Fie1z9TOUy+iRQfk/BfcUqD+8I5aePo0OUBLqlIEOszeiW4+M4Ee9Lbo+CyL
- GvkA3kX0gRlmllw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3187; i=leitao@debian.org;
+ h=from:subject:message-id; bh=2RzQAc1xCBTOApgSCT3b/XDOkjZpHj50sn+KhiO7Kv0=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBp9MxeOV3EhrpJhtSFkKpq6NyBuuzMgfbR2eN4m
+ MnyhjsFZrOJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCafTMXgAKCRA1o5Of/Hh3
+ bXDrD/kBVcq49jX6TQWTuCp94RKqjrrsPW2Bi5tVQQQaG35DyS+Nmp1yeVXXCsoys6m88H5hdro
+ RQelY2vgG/k4qIdc+SIClvFua6QYgOtUDvnVJR6ciWqC9bvt4uzG1pBz7cTPWTnF1ly5uJTok3H
+ KgoGcLIYlmprQdtPy3fWYplo/zdLw6DCNzMchb91EPT4eieDF3zdFPSqLHGgMh0Jy9gtMgvi2Pm
+ 7T97f82k9ltLbtbaFyZV5dMfNKhypYOHGZPs4GTKb5QsNtMZv0jCPDFnYcHI2SzE8eBD9E2YxpW
+ 9c9+U9SdqKZi38tDDKWC0qUpCFoep/MGqbnCFniGT5ZBVjl39xxqxBthYGCdv6hBvLZrrD9jla4
+ iTzNmNrIJAeynw2/k6/D+aIyXB9cJSzHBYDITeNcjwPPbwW5hht/YgLtVJN3y1d7mtzt39sg4eM
+ rdjluoC3Cf6peF5hEobI7P/30NnR45Y1OpVDZfXMvzkjO9IkKuravOob4W9Zf1Kg0tzWF91Vvt3
+ JdxP6TS0RQi8Md2BpYXtzfaaGUcpNbPQ7hwU1mI4tgNMHXQ/4tzlSOmzy1jcl7aNDVwcnW89lA1
+ OAu9UQsgNLdlbqM4P5oVflIac51Oukbkj35EdmgMThkCimRiCG3fy4N5RxcjoZKiYhUrln0sHsr
+ YfV3d5IlP7mbfwA==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 X-Debian-User: leitao
-X-Rspamd-Queue-Id: E2C114ADBBF
+X-Rspamd-Queue-Id: 902E74ADBD5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -106,7 +103,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283217-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283218-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -124,38 +121,100 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-Continue the work to convert protocols to the new getsockopt_iter API.
+Convert AF_NETLINK's getsockopt implementation to use the new
+getsockopt_iter callback with sockopt_t.
 
-Convert AF_NETLINK and AF_VSOCK getsockopt implementations to the new
-sockopt_t/getsockopt_iter API, and add kselftests that verify the size
-and errno semantics are preserved across the conversion.
-
-I chose these two socket families because they are probably one of the
-most used  protocols,, ensuring that any potential bugs will be
-discovered and reported quickly.
-
-The selftest was added as suggested by Stanislav Fomichev in [1].
-Link: https://lore.kernel.org/all/adkSnyihmD1Atfcf@devvm17672.vll0.facebook.com/ [1]
+Key changes:
+- Replace (char __user *optval, int __user *optlen) with sockopt_t *opt
+- Use opt->optlen for buffer length (input) and returned size (output)
+- Use copy_to_iter() instead of put_user()/copy_to_user()
+- For NETLINK_LIST_MEMBERSHIPS: walk the groups bitmap and emit each
+  u32 sequentially via copy_to_iter(), then set opt->optlen to the
+  total size required (ALIGN(BITS_TO_BYTES(ngroups), sizeof(u32))).
+  The wrapper writes opt->optlen back to userspace even on partial
+  failure, preserving the existing API that lets userspace discover
+  the needed allocation size.
 
 Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
-Breno Leitao (3):
-      netlink: convert to getsockopt_iter
-      vsock: convert to getsockopt_iter
-      net: selftests: add getsockopt_iter regression tests
+ net/netlink/af_netlink.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
- net/netlink/af_netlink.c                      |  21 +--
- net/vmw_vsock/af_vsock.c                      |  16 +-
- tools/testing/selftests/net/Makefile          |   1 +
- tools/testing/selftests/net/getsockopt_iter.c | 213 ++++++++++++++++++++++++++
- 4 files changed, 232 insertions(+), 19 deletions(-)
----
-base-commit: edf4bee4215a173c0534d1851d7523d827149f9e
-change-id: 20260501-getsock_one-a62758a9ba25
-prerequisite-change-id: 20260501-getsock_iter_first-87f6a74c24e0:v1
+diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+index 2aeb0680807d6..db3be485b4804 100644
+--- a/net/netlink/af_netlink.c
++++ b/net/netlink/af_netlink.c
+@@ -39,6 +39,7 @@
+ #include <linux/fs.h>
+ #include <linux/slab.h>
+ #include <linux/uaccess.h>
++#include <linux/uio.h>
+ #include <linux/skbuff.h>
+ #include <linux/netdevice.h>
+ #include <linux/rtnetlink.h>
+@@ -1716,18 +1717,18 @@ static int netlink_setsockopt(struct socket *sock, int level, int optname,
+ }
+ 
+ static int netlink_getsockopt(struct socket *sock, int level, int optname,
+-			      char __user *optval, int __user *optlen)
++			      sockopt_t *opt)
+ {
+ 	struct sock *sk = sock->sk;
+ 	struct netlink_sock *nlk = nlk_sk(sk);
+ 	unsigned int flag;
+ 	int len, val;
++	u32 group;
+ 
+ 	if (level != SOL_NETLINK)
+ 		return -ENOPROTOOPT;
+ 
+-	if (get_user(len, optlen))
+-		return -EFAULT;
++	len = opt->optlen;
+ 	if (len < 0)
+ 		return -EINVAL;
+ 
+@@ -1751,14 +1752,14 @@ static int netlink_getsockopt(struct socket *sock, int level, int optname,
+ 
+ 			idx = pos / sizeof(unsigned long);
+ 			shift = (pos % sizeof(unsigned long)) * 8;
+-			if (put_user((u32)(nlk->groups[idx] >> shift),
+-				     (u32 __user *)(optval + pos))) {
++			group = (u32)(nlk->groups[idx] >> shift);
++			if (copy_to_iter(&group, sizeof(u32),
++					 &opt->iter_out) != sizeof(u32)) {
+ 				err = -EFAULT;
+ 				break;
+ 			}
+ 		}
+-		if (put_user(ALIGN(BITS_TO_BYTES(nlk->ngroups), sizeof(u32)), optlen))
+-			err = -EFAULT;
++		opt->optlen = ALIGN(BITS_TO_BYTES(nlk->ngroups), sizeof(u32));
+ 		netlink_unlock_table();
+ 		return err;
+ 	}
+@@ -1784,8 +1785,8 @@ static int netlink_getsockopt(struct socket *sock, int level, int optname,
+ 	len = sizeof(int);
+ 	val = test_bit(flag, &nlk->flags);
+ 
+-	if (put_user(len, optlen) ||
+-	    copy_to_user(optval, &val, len))
++	opt->optlen = len;
++	if (copy_to_iter(&val, len, &opt->iter_out) != len)
+ 		return -EFAULT;
+ 
+ 	return 0;
+@@ -2813,7 +2814,7 @@ static const struct proto_ops netlink_ops = {
+ 	.listen =	sock_no_listen,
+ 	.shutdown =	sock_no_shutdown,
+ 	.setsockopt =	netlink_setsockopt,
+-	.getsockopt =	netlink_getsockopt,
++	.getsockopt_iter = netlink_getsockopt,
+ 	.sendmsg =	netlink_sendmsg,
+ 	.recvmsg =	netlink_recvmsg,
+ 	.mmap =		sock_no_mmap,
 
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
+-- 
+2.52.0
 
 
