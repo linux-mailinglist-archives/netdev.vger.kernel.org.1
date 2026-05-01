@@ -1,248 +1,217 @@
-Return-Path: <netdev+bounces-283052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283053-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2MJhIZD+82n99QEAu9opvQ
-	(envelope-from <netdev+bounces-283052-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 03:14:56 +0200
+	id 2AC3H9L+82n99QEAu9opvQ
+	(envelope-from <netdev+bounces-283053-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 03:16:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 079FA4A9816
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 03:14:55 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28D804A9833
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 03:16:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BDE5C30387E0
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 01:14:42 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 34EED300988D
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 01:16:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB46B2D47F1;
-	Fri,  1 May 2026 01:14:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4B6A18FDDE;
+	Fri,  1 May 2026 01:15:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t1igKKZ6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tPQp3cCL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB542C21F2
-	for <netdev@vger.kernel.org>; Fri,  1 May 2026 01:14:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.179
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777598076; cv=pass; b=thEFLYkU8WJuGhrv3h/YZ/Wzw0baTTYsheOodBgO66SMLaRu8Gy1qlwIgx2CRBEvsTMFNXD+iQt/8ut743u3pdAtp75CSKtx+OesfHwx4wILtGdYY3EleSBYk8w9pfey9QAJfmOVbu90ooSVQMQlhBCKCa6+Zdac0ymh+iDYhtE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777598076; c=relaxed/simple;
-	bh=PxA4O5b3HlPuK6DlNhQIIiB7d9oEdMoi/b6jA358CFE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WX7j0ifyv2lfZE1S4yVGB841AQU+tAvEUeuP+4/8o+poQ3IQP4gbnEMN0IFSEmALM6OzLPIc5E3FgL5LRYXnVAZ4rLWWjsfwad+I9AEiL6PayO/X+14qcQoUPnGjm2wqF/lvpWD8MKFMMX4iw3TbjYwPSjXtGB7rmEARLu2YM1M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t1igKKZ6; arc=pass smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-38dd9f11a09so12715761fa.2
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 18:14:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777598073; cv=none;
-        d=google.com; s=arc-20240605;
-        b=fe5vl3ommeUbnrpKsyvCO5dyDl7q23zEHrWKcqvljO3RhfWwh7M0Op7MJWfI1/slyr
-         2J4zSm6Z0CaFv1rhYaQ9Sh3qfrcDYeLFtwjiVHzwg9i2PuqeED46gCKiwVmX2VNZlo4j
-         SMBzKvFmKzOZDtivhStyiZYtr3MxVwTXShyXYo7DE6YQPnaxoxEPqdpSr62DEdcFhMnA
-         bg/qHEPyLe0w6HhlAA/CEaZguRT0Qftc5d9x+F5zzla2h42ufjLxXj5jI1nffGHeQdZP
-         /k/Ej4wT3xkck4W+nJlB7TcX88NOkRj3b/wYgGw/iWqtPPPJf5Il+3I2aem3ptJ042o4
-         rnmA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=nSQkpXPvbzNQeoub82VoqlOWrgCeyn6/Q35lCNTDSoo=;
-        fh=lsijaURVwGctBikN4FnjDFOO46SkWKavLG73BiAQAhA=;
-        b=KCSQB6zF8wXTjEZlOaSdrlKhOAT0blFUKWRCQFdGnmHQ5PBDpBYWn8uWjxbgoFieGJ
-         ZjTTxA4wWENYPhdKiwljO8lDuvzW6rWlOnWXmvvpH4sof46+xyoL5WR/avQ5HO/5Qttw
-         D4mQF3jU+1eFmG2werCKKHiSp+WQljpKAk3dzXIFEYg9BxsOLK3AT7am1uH572MyJKqf
-         vQyKimfLUxdW2UuQ84KiEaWTywF90DNafm5nBMbm6yCDl1MGqqUsg+z9tsKxTD9CH2QJ
-         CxyZbUINTf3B9rDyrbInosxP/8VAr+Tk/kBKdkA1A0j8m2LA8dxm2Ju6N/tJYqM3/amd
-         512w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777598073; x=1778202873; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nSQkpXPvbzNQeoub82VoqlOWrgCeyn6/Q35lCNTDSoo=;
-        b=t1igKKZ64GH3V6YHO8UNCwHdh8bkrzDmfwz9KIT/G2/I4wAvnHenwLcc9dxIOVeFhm
-         5YAirzBCe6/zYbnEJEqUBooHg//ZtDZny4gKOKivCpQ8+AweXg0vHkPzqbxCvPNiazLq
-         CmOtUliSQ85Gh62eXhZquPhtOeMY5CxZFq17G5qe4sIOVJUIY7Pc+Ok+QyDpJX6Lp/6i
-         5Eyy83kjiEIF5Bvb5gI0+GYlWqm8iQqW5KkTJ4pNWF3nNKZg3sNpEAYLjty9awh6Ro9U
-         L6C2JCl7d0Dr2rGf/gsW4mBCMaX9ZdN6Jxk3eiYyAJDSILy5Hy66Q9xxWL31mv3XIWon
-         MclA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777598073; x=1778202873;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=nSQkpXPvbzNQeoub82VoqlOWrgCeyn6/Q35lCNTDSoo=;
-        b=cFioTZj8eF8xB2JbkkSzl2zzxA0vHiTXQV/bQ9DVPE3yRIdgUhmXdLtPz33Lu3YAQG
-         tben5+jV0SrBm8oCp8i2HxGiaNFbsc1q2ogntFuCjZTvKIq7Jo60QXImsHnkkWbbZCPc
-         ONtWpEnMRPQ+0+hnVNGQMGNKMz9p3/FmkD9DwkEYLS3javBAnIcDsRB5CObP7l0+vLz8
-         cPDqAtbDzDhGN1SxaX0/1Q853CizMoaYWWgpNCQelRLsaRJMDjMzdJhBwAvqQ02zmiog
-         BXbrBCkOdV5QCA2rIIYRg70y1WTAoqSQOyutVTQlCs994vxL720VtgAe6CzuOIQ79czg
-         M4Jw==
-X-Forwarded-Encrypted: i=1; AFNElJ9PKELfCe8Z4JEi45uP01dJwGR+XdhC6bWPqS8rHNuakoRHU+KYaDL2rVnwVAgfrsxyGruIHm8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzP6OyRYIC6iiMr/QpCbuSmcKWDFxLfgDPa7kL1Uo++GEm3Tc+H
-	FuOGGT46KAPkFeHk6aUU3COTMP1AihZjYAklbXohr85IQBRsWvqFuSi3wNS+PLD4sy4C406LAKh
-	CjAV7KjhRsnqYWJEivJ1Uuosx09Bmx2owQmJw9Rdj
-X-Gm-Gg: AeBDietBt2buJ1T9HyjXNtc1JAirNRAUxgfY9iJKuouzFLRFTEdyl+Nh8oWXPubXsqt
-	9u4P9VcIGpEaQmoEcDjceGJyjp+8pK0HAqUkgPEghdbQemAaOYSBDA0wwLMhzxQMojY+lIb+5wJ
-	z6jI1FDQJYkGxB+AdDIJicRswCbrVabEwcD/x9J50LnsbgNYZeGyt3+izTex+zn6q9eQ84bFRAb
-	sCz3OBLmKmipEnQEVuFiNJpBD39LcFwbsU8oke9jKLvwYKBpNg0BGIoHBv27gxK3ewHbxtLTGwr
-	BRFbZ6Q3PanBOORr9n4EvKe259N5SpZuYEuGi/qy4I2vMQXRZNfGZTFwU98=
-X-Received: by 2002:a05:651c:502:b0:38a:902:dcd with SMTP id
- 38308e7fff4ca-3934e204d45mr18166231fa.20.1777598072804; Thu, 30 Apr 2026
- 18:14:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91D4340DFBB;
+	Fri,  1 May 2026 01:15:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777598158; cv=none; b=EdpvsHD4Z+mUQb+XiEZQ1qQPiSjz5ljyv3IWf2cNdJ+CLWLKJQR6zbsnicvdMwB2nt0ig5b0FSnRppkG/t9OFLPqAPd1m2YewSNGKbhkBn5wnLt6AlKPpOMKxQk3Vbe6ceC9FyJXNd0bmXJPbTAiE25tIJWAMmLyPoE3rCMB3kc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777598158; c=relaxed/simple;
+	bh=qPYC6I4jdwxetpCzBkZHKnFeFY+d8UGLLlB7ID60jFs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=YnCA/63HgBoDbrwUgk65sJPVG5y2QMOyxOtvFR1eUL/F9yKu18GK/1ZUQ+ny7DzTqqS2+6TvTJsdRAbCIsCa1iQH93Qm0lUCPgen6vbD2+6U6MZ5DshkZm65DOt9eFZpfpqSIzEE6D3EcLrOWRw90w3QgMJZoe+3lqKN3xN3KJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tPQp3cCL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBFF6C2BCB3;
+	Fri,  1 May 2026 01:15:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777598158;
+	bh=qPYC6I4jdwxetpCzBkZHKnFeFY+d8UGLLlB7ID60jFs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=tPQp3cCLR4LEkj41hd0e5IrG8grOiTBZ3AbtUoyTOpwFa6QwGMPv71njCzwBz8C8S
+	 6CHolbVmOKtVJajRUceV8enNUyiHBuOGx2+FlRfQww5IrRWhKhdR9kGQWRULsAS2wf
+	 iUQ9f3fJ/nRhOgxIznCzA55tws/nKVy6yQ2WRJS1/GI0dd5qgCVvLZICIM4JSMt6Da
+	 tR4kTGRW8PRS7t3YMnuAtdhcflzy45ibjIT6P1r9vQ24iq+6TS3dxTCARrArs1EZm8
+	 QxuF/eBu1DhOzsmbW4duSgWzhmPLtNoqxBlAxE4bxicFcLMpDT9D9KpQQQB1IauGYc
+	 y8pNmjjgMXipA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: mail@birger-koblitz.de
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	hsu.chih.kai@realtek.com
+Subject: Re: [PATCH net-next v2 1/4] r8152: Add support for 10Gbit Link Speeds and EEE
+Date: Thu, 30 Apr 2026 18:15:56 -0700
+Message-ID: <20260501011556.3154166-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260429-rtl8159_net_next-v2-1-bab3cd4e4c66@birger-koblitz.de>
+References: <20260429-rtl8159_net_next-v2-1-bab3cd4e4c66@birger-koblitz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260429204128.2865817-1-boolli@google.com> <IA3PR11MB8986449FB3714E23C389F6D1E5352@IA3PR11MB8986.namprd11.prod.outlook.com>
-In-Reply-To: <IA3PR11MB8986449FB3714E23C389F6D1E5352@IA3PR11MB8986.namprd11.prod.outlook.com>
-From: Li Li <boolli@google.com>
-Date: Thu, 30 Apr 2026 18:14:18 -0700
-X-Gm-Features: AVHnY4J_plv41lTEdTL-vvxKy5_2KloHTpmwjewmh1NkxAdrXpoon5Ni15mn_Pw
-Message-ID: <CAODvEq4bfK70wx4TX+6ZoYpj=3FBY6fR6LJFpPdR-u3H6kJn1w@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3] libie: log more info when
- virtchnl fails
-To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-Cc: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, 
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, David Decotigny <decot@google.com>, 
-	"Singhai, Anjali" <anjali.singhai@intel.com>, 
-	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Brian Vazquez <brianvv@google.com>, 
-	"Tantilov, Emil S" <emil.s.tantilov@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 079FA4A9816
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 28D804A9833
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283052-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[google.com:+];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283053-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[boolli@google.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,davemloft.net:email,osuosl.org:email,intel.com:email]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-On Thu, Apr 30, 2026 at 1:36=E2=80=AFAM Loktionov, Aleksandr
-<aleksandr.loktionov@intel.com> wrote:
->
->
->
-> > -----Original Message-----
-> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> > Of Li Li via Intel-wired-lan
-> > Sent: Wednesday, April 29, 2026 10:41 PM
-> > To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
-> > Przemyslaw <przemyslaw.kitszel@intel.com>; David S. Miller
-> > <davem@davemloft.net>; Jakub Kicinski <kuba@kernel.org>; Eric Dumazet
-> > <edumazet@google.com>; intel-wired-lan@lists.osuosl.org
-> > Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org; David
-> > Decotigny <decot@google.com>; Singhai, Anjali
-> > <anjali.singhai@intel.com>; Samudrala, Sridhar
-> > <sridhar.samudrala@intel.com>; Brian Vazquez <brianvv@google.com>; Li
-> > Li <boolli@google.com>; Tantilov, Emil S <emil.s.tantilov@intel.com>
-> > Subject: [Intel-wired-lan] [PATCH iwl-next v3] libie: log more info
-> > when virtchnl fails
-> >
-> > Virtchnl failures can be hard to debug without logs. Logging the
-> > details of virtchnl transactions can be useful for debugging virtchnl-
-> > related issues.
-> >
-> > Tested: Built & booted on a test machine and synthetically produced a
-> > virtual failure to produce the following log:
-> >
-> > idpf 0000:01:00.0: Non-zero virtchnl ret val (msg op: 1, ret val: 6,
-> > data_len: 8); xn id: 0, cookie: 0
-> > idpf 0000:01:00.0: Transaction failed (op 1, xn state:
-> > 3, id: 0, cookie: 0, size: 8)
-> >
-> > Signed-off-by: Li Li <boolli@google.com>
-> > ---
-> > v3:
-> >  - Use dev_err_ratelimited in both logs.
-> >  - Move log placement to after virtchnl field validation.
-> >  - Remove redundant op/cookie fields since they were validated.
-> > v2:
-> >  - Use dev_warn_ratelimited instead of dev_notice_ratelimited based on
-> >    reviewer feedback.
-> >
-> >  drivers/net/ethernet/intel/libie/controlq.c | 13 +++++++++++++
-> >  1 file changed, 13 insertions(+)
-> >
-> > diff --git a/drivers/net/ethernet/intel/libie/controlq.c
-> > b/drivers/net/ethernet/intel/libie/controlq.c
-> > index ebc05355e39d..ceca8a076d79 100644
-> > --- a/drivers/net/ethernet/intel/libie/controlq.c
-> > +++ b/drivers/net/ethernet/intel/libie/controlq.c
-> > @@ -766,6 +766,14 @@ libie_ctlq_xn_process_recv(struct
-> > libie_ctlq_xn_recv_params *params,
-> >           msg_cookie !=3D xn->cookie)
-> >               return false;
-> >
-> > +     if (ctlq_msg->chnl_retval) {
-> > +             dev_err_ratelimited(
-> > +                     params->ctlq->dev,
-> > +                     "Non-zero virtchnl ret val (msg op: %u, ret val:
-> > %u, data_len: %u); xn id: %u, cookie: %u\n",
-> > +                     ctlq_msg->chnl_opcode, ctlq_msg->chnl_retval,
-> > +                     ctlq_msg->data_len, xn->index, xn->cookie);
-> 'virtchnl ret val' 'ret val:' looks like a duplication in dmesg.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+---
+r8152: Add support for 10Gbit Link Speeds and EEE
 
-Let me send out v4 to simplify it.
+This change adds support for 10 Gbit link speeds on RTL8159 via the
+ethtool link_ksettings interface and adds 10 Gbit EEE advertisement
+handling alongside the existing 2.5G/5G paths.
 
->
->
-> > +     }
-> > +
-> >       spin_lock(&xn->xn_lock);
-> >       if (xn->state !=3D LIBIE_CTLQ_XN_ASYNC &&
-> >           xn->state !=3D LIBIE_CTLQ_XN_WAITING) { @@ -1011,6 +1019,11
-> > @@ int libie_ctlq_xn_send(struct libie_ctlq_xn_send_params *params)
-> >               params->recv_mem =3D xn->recv_mem;
-> >               break;
-> >       default:
-> > +             dev_err_ratelimited(
-> > +                     params->ctlq->dev,
-> > +                     "Transaction failed (op %u, xn state: %d, id: %u,
-> > cookie: %u, size: %zu)\n",
-> > +                     params->chnl_opcode, xn->state, xn->index, xn-
-> > >cookie,
-> > +                     xn->recv_mem.iov_len);
-> Probably %u fits better for enums than %d, what do you think?
+> diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+> index 7337bf1b7d6a..01e65d845f87 100644
+> --- a/drivers/net/usb/r8152.c
+> +++ b/drivers/net/usb/r8152.c
 
-Sure, let me use %u in v4.
+[ ... ]
 
->
-> >               ret =3D -EBADMSG;
-> >               break;
-> >       }
-> > --
-> > 2.54.0.545.g6539524ca2-goog
->
+> @@ -5773,6 +5779,11 @@ static void r8156_eee_en(struct r8152 *tp, bool enable)
+>  	else
+>  		config &= ~MDIO_EEE_5GT;
+>  
+> +	if (enable && (tp->eee_adv2 & MDIO_EEE_10GT))
+> +		config |= MDIO_EEE_10GT;
+> +	else
+> +		config &= ~MDIO_EEE_10GT;
+> +
+>  	ocp_reg_write(tp, OCP_EEE_ADV2, config);
+>  }
+
+Is MDIO_EEE_10GT actually a bit of the EEE advertisement 2 register
+(7.62, cap2 / OCP_EEE_ADV2)?
+
+MDIO_EEE_10GT is defined by IEEE 802.3 as a bit of the EEE advertisement
+register 7.60 (cap1 / OCP_EEE_ADV), not of register 7.62. The existing
+10G EEE advertisement already flows through tp->eee_adv (populated by
+linkmode_to_mii_eee_cap1_t() in r8152_set_eee()) and is written to
+OCP_EEE_ADV by rtl_eee_enable().
+
+tp->eee_adv2 is populated only by linkmode_to_mii_eee_cap2_t() in
+r8152_set_eee(), which covers 2500baseT and 5000baseT and cannot set
+MDIO_EEE_10GT, plus the chip-init assignments in rtl_ops_init() which
+also do not set this bit.
+
+With that in mind, is the enable && (tp->eee_adv2 & MDIO_EEE_10GT)
+condition ever true?  The else branch will then unconditionally clear
+bit 3 of OCP_EEE_ADV2 on every call, which is a cap1 bit being written
+into the cap2 register.
+
+[ ... ]
+
+> @@ -8968,6 +9008,13 @@ static int r8153_get_eee(struct r8152 *tp, struct ethtool_keee *eee)
+>  			linkmode_set_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT, common);
+>  	}
+>  
+> +	if (tp->support_10000full) {
+> +		linkmode_set_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT, eee->supported);
+> +
+> +		if (speed & _10000bps)
+> +			linkmode_set_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT, common);
+> +	}
+> +
+>  	eee->eee_enabled = tp->eee_en;
+
+Should this hunk also extend the earlier gating inside r8153_get_eee()?
+
+A few lines above, the cap2 register reads are still gated on:
+
+	if (tp->support_2500full || tp->support_5000full) {
+		val = ocp_reg_read(tp, OCP_EEE_ADV2);
+		mii_eee_cap2_mod_linkmode_adv_t(eee->advertised, val);
+
+		val = ocp_reg_read(tp, OCP_EEE_LPABLE2);
+		mii_eee_cap2_mod_linkmode_adv_t(eee->lp_advertised, val);
+	}
+
+The equivalent disjunction in rtl8152_set_speed() and
+rtl8152_get_link_ksettings() was updated to include support_10000full,
+but r8153_get_eee() (and r8152_set_eee() at the analogous spot) still
+only checks support_2500full || support_5000full.
+
+A hypothetical chip that sets only support_10000full would bypass the
+OCP_EEE_ADV2 / OCP_EEE_LPABLE2 reads and never reflect 10G EEE into
+eee->advertised.  Should the condition be made consistent with the
+other sites?
+
+> @@ -9982,6 +10029,11 @@ static int rtl8152_probe_once(struct usb_interface *intf,
+>  			tp->speed = SPEED_5000;
+>  			tp->advertising |= RTL_ADVERTISED_5000_FULL;
+>  		}
+> +		if (tp->support_10000full &&
+> +		    tp->udev->speed >= USB_SPEED_SUPER) {
+> +			tp->speed = SPEED_10000;
+> +			tp->advertising |= RTL_ADVERTISED_10000_FULL;
+> +		}
+>  		tp->advertising |= RTL_ADVERTISED_1000_FULL;
+>  	}
+>  	tp->duplex = DUPLEX_FULL;
+
+Is USB_SPEED_SUPER the correct gate for defaulting to a 10 Gbit link?
+
+USB_SPEED_SUPER is USB 3.0 SuperSpeed at 5 Gbit/s signaling, which
+cannot carry a 10 Gbit Ethernet link.  The minimum bus rate that can
+sustain 10GBASE-T is USB_SPEED_SUPER_PLUS (USB 3.1 Gen 2, 10 Gbit/s).
+
+With this check, a 10G-capable RTL8159 plugged into a USB 3.0 host
+will still default to tp->speed = SPEED_10000 and advertise
+RTL_ADVERTISED_10000_FULL, so the Ethernet link may negotiate at 10G
+while the USB bus is bottlenecked well below that, leading to
+misleading ethtool speed reporting and back-pressure on the bus.
+
+The same >= USB_SPEED_SUPER gate is reused from the 2.5G and 5G
+defaults, which fit inside the USB 3.0 envelope; should the 10G
+default instead use >= USB_SPEED_SUPER_PLUS?
+-- 
+pw-bot: cr
 
