@@ -1,132 +1,226 @@
-Return-Path: <netdev+bounces-283214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283215-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WGupLtLH9GmPEgIAu9opvQ
-	(envelope-from <netdev+bounces-283214-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 17:33:38 +0200
+	id 6EJKJlvI9GmPEgIAu9opvQ
+	(envelope-from <netdev+bounces-283215-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 17:35:55 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C9584AD9C1
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 17:33:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E86F94AD9E8
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 17:35:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 243C73036742
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 15:33:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7309A3024100
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 15:35:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FB703D16F8;
-	Fri,  1 May 2026 15:32:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2FA23CD8C2;
+	Fri,  1 May 2026 15:35:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HIV8lO8o"
+	dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b="jnTpLX1R"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBEE23D16F1;
-	Fri,  1 May 2026 15:32:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 771833A1A3B
+	for <netdev@vger.kernel.org>; Fri,  1 May 2026 15:35:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777649579; cv=none; b=ZMqoVk0miq3SWHu1k98wVO9NgFZeIbEAtb5zY/F7oS7GNhq/v8j2p3jtGuic3xIe8kxdGwqp1PPzyLa3MX7kIyl85xm+8WHA2tV5pD64KXQYI3IwcXAoJcUOO3e6YtPoSxgDDCLUrktV0upUbU7FQ+7eT2PqPA8+kxnLAOA++V0=
+	t=1777649752; cv=none; b=YZf3eWU99r0N/A0FqwP+4C/Hr8VzKfO2dvMvTGDs4NQnuaLcxytlD2EadV9S37QAESRhTkWU+sz+OrvueVZd0znhJ/sAs9+PMqSFFIRxuXSJgaYolkJmf0KwpZQwNUsKX4AVbYG4MENC6MbipRSUxQ+dNS35LOk57uJwyJBhHfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777649579; c=relaxed/simple;
-	bh=6PRsjuPArP4S1iH3EgrUV5/FjiwTHGBLaee3iEDRAqo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZFmDMkb+nHpuy88Qd7G5HG4IM7bpgjdpODK18+uAT9n3IjJyddAoPE4jfCFkXfh3ZRCps9HTmdfUtIDOhtMTfk7t3Ea5atxMKx6y0fH5amPessQW6CX3rxRhkkRSXxYeE1n/s0blOM7+b2qeuUDZRdOEmEaTukyp8uV/+iZUDvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HIV8lO8o; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56B3DC2BCB4;
-	Fri,  1 May 2026 15:32:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777649578;
-	bh=6PRsjuPArP4S1iH3EgrUV5/FjiwTHGBLaee3iEDRAqo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HIV8lO8oD/bm1+JoakBDKYOexpgkai6wMeiePzDLLKW6bGQrScOkr9PJohEK/B/H6
-	 eTmWRma/AiujOOMMjEDh1S+0Z+AE5TNAF2l4k6UFSTD9v1Ek6ICjoh8apcs3M/oegC
-	 iMB42UOv77bBHt80Cm1KQEiH3z88IgS8ce2KcF42rjffSljtmKPHyyx+v4raFR53nc
-	 JdSg0BWHXw9yfrz9aq2K5u3tmsRqwDy6IHZe/KIPxNYsYUkmoymRrEsLqI906PJdvG
-	 Z1I3Lg47dFLs19rQ2eJr1MR3HBDn7k1QcojPjIvxO4ewyTxJmSK+iCH/a/00A4p6zn
-	 YoB1ETcRuFUbg==
-Date: Fri, 1 May 2026 16:32:53 +0100
-From: Simon Horman <horms@kernel.org>
-To: gfuchedgi@gmail.com
-Cc: Raju Rangoju <Raju.Rangoju@amd.com>,
-	Prashanth Kumar K R <PrashanthKumar.K.R@amd.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] amd-xgbe: fix PTP addend overflow causing frozen clock
-Message-ID: <20260501153253.GJ15617@horms.kernel.org>
-References: <20260429-fix-xgbe-ptp-addend-v1-1-fca5b0ca5e62@gmail.com>
+	s=arc-20240116; t=1777649752; c=relaxed/simple;
+	bh=27HBlAxg0ZM6N2nrQoLYUcVV7TnAlR8/aIP3GxzSa9s=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=LZ+DelxzA09fFAgVG/8lEW3EN/P0I0+Zkn60tJmHaM1mv4aXeYBA1+m45iQ3XX/CDgTCUbP1nNQsTeexaM419ydQFwuEwJeSuEsmLJ+44xlDovLeKnGhBeQFBCvVyYXismBaq/+CZfoRRNT2uZvCuhmnUY6emuWo262WY0NSX+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=jnTpLX1R; arc=none smtp.client-ip=195.121.94.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xs4all.nl
+X-KPN-MessageId: 451195f7-4573-11f1-afe2-005056994fde
+Received: from mta.kpnmail.nl (unknown [10.31.161.189])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id 451195f7-4573-11f1-afe2-005056994fde;
+	Fri, 01 May 2026 17:34:40 +0200 (CEST)
+Received: from mtaoutbound.kpnmail.nl (unknown [10.128.135.189])
+	by mta.kpnmail.nl (Halon) with ESMTP
+	id 45107614-4573-11f1-b5d1-0050569981f5;
+	Fri, 01 May 2026 17:34:40 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=xs4all.nl; s=xs4all01;
+	h=content-type:mime-version:subject:message-id:to:from:date;
+	bh=yWlYvHDKJLboPw9xhm3CMUezHzmqhjNa6HKZQkEvPVQ=;
+	b=jnTpLX1Ri3JA4mDO10E7pg44QFiChMj5lRgY4JAZEiVY2yZCGnTQc8cRaBhaVjpt7ZltUgK2RMZ3E
+	 M78CQ86x2rRoZxcMJdnbES5oddauFOdW2vX3n1GQfnsXzQ+mGrYuh5mCGjVHMdnmc5zzpmxU4t5KrO
+	 9QJ/0D5hdkS6X1sHYi+yZnJNitTfhvUK1i+0YwJN/qp39Kri9r51h+5x7+FDFKWJmmnw3nuKisftzZ
+	 UblDWpvZqwkotbs3kYhIIfmqIgl5iCzkD+Sh6losmwQFndSax7Cqo+Fwe3Upj8en/AUcIetXgdHg19
+	 Eq31JTRYRp73sO//MsNbYLe10mApeFw==
+X-KPN-MID: 33|+wst0lK91gmxlExsuJLOoikJCsA0QLTVmXpcK9nSTwrmv8tILalQp4kUKabb/fl
+ 23gsYBj7cofRS+4WVOGphlVqzjqy98YIhFTStYjYCvDY=
+X-CMASSUN: 33|pyE9OPP/7F9Ad8pTvxO8IbpJEd1c575BI62ZUn6pjmt4BfrO94fDDv6nxUOe1PV
+ AfWwg25InOqgBieh3R8hXPg==
+X-KPN-VerifiedSender: Yes
+Received: from cpxoxapps-mh01 (cpxoxapps-mh01.personalcloud.so.kpn.org [10.128.135.207])
+	by mtaoutbound.kpnmail.nl (Halon) with ESMTPSA
+	id 4503de11-4573-11f1-94b1-00505699eff2;
+	Fri, 01 May 2026 17:34:40 +0200 (CEST)
+Date: Fri, 1 May 2026 17:34:40 +0200 (CEST)
+From: Jori Koolstra <jkoolstra@xs4all.nl>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Kees Cook <kees@kernel.org>, Simon Horman <horms@kernel.org>,
+	Andy Lutomirski <luto@amacapital.net>,
+	Will Drewry <wad@chromium.org>, Jeff Layton <jlayton@kernel.org>,
+	Oleg Nesterov <oleg@redhat.com>, Andrei Vagin <avagin@gmail.com>,
+	Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
+	Mateusz Guzik <mjguzik@gmail.com>,
+	Joel Granados <joel.granados@kernel.org>,
+	Charlie Mirabile <cmirabil@redhat.com>,
+	Aleksa Sarai <cyphar@cyphar.com>, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	io-uring@vger.kernel.org
+Message-ID: <89346381.2074764.1777649680664@kpc.webmail.kpnmail.nl>
+In-Reply-To: <CAAVpQUBKeN2KtRkRAFr8sYJM1_-rbkdjsujau5fAyaiP_dO6FA@mail.gmail.com>
+References: <20260428175125.2705296-1-jkoolstra@xs4all.nl>
+ <20260428175125.2705296-2-jkoolstra@xs4all.nl>
+ <CAAVpQUBKeN2KtRkRAFr8sYJM1_-rbkdjsujau5fAyaiP_dO6FA@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/2] net: af_unix: Useful handling of LSM denials on
+ SCM_RIGHTS
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260429-fix-xgbe-ptp-addend-v1-1-fca5b0ca5e62@gmail.com>
-X-Rspamd-Queue-Id: 1C9584AD9C1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Priority: 3
+Importance: Normal
+X-Rspamd-Queue-Id: E86F94AD9E8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[xs4all.nl,reject];
+	R_DKIM_ALLOW(-0.20)[xs4all.nl:s=xs4all01];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[amd.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-283214-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283215-lists,netdev=lfdr.de];
+	HAS_X_PRIO_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[zeniv.linux.org.uk,kernel.org,suse.cz,google.com,redhat.com,davemloft.net,kernel.dk,amacapital.net,chromium.org,gmail.com,virtuozzo.com,cyphar.com,vger.kernel.org];
+	FREEMAIL_FROM(0.00)[xs4all.nl];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jkoolstra@xs4all.nl,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[xs4all.nl:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Wed, Apr 29, 2026 at 02:54:14PM -0700, Gregory Fuchedgi via B4 Relay wrote:
-> From: Gregory Fuchedgi <gfuchedgi@gmail.com>
-> 
-> XGBE_PTP_ACT_CLK_FREQ and XGBE_V2_PTP_ACT_CLK_FREQ were 10x too
-> large (500MHz/1GHz instead of 50MHz/100MHz), causing the computed
-> addend to overflow the 32-bit tstamp_addend. In the general case
-> this would result in the clock advancing at the wrong rate. For v2
-> (PCI), ptpclk_rate is hardcoded to 125MHz, so the addend formula
-> (ACT_CLK_FREQ << 32) / ptpclk_rate yields exactly 8 * 2^32, and
-> when stored to the 32-bit tstamp_addend the value is zero. With
-> addend = 0 the hardware accumulator never overflows and the PTP
-> clock is fully stopped. For v1 (platform), ptpclk_rate is read from
-> ACPI/DT so the exact overflow behavior depends on the
-> firmware-reported frequency.
-> 
-> Define the constants as NSEC_PER_SEC / SSINC so the relationship is
-> explicit and cannot drift out of sync.
-> 
-> Fixes: fbd47be098b5 ("amd-xgbe: add hardware PTP timestamping support")
-> Tested-by: Gregory Fuchedgi <gfuchedgi@gmail.com>
-> Signed-off-by: Gregory Fuchedgi <gfuchedgi@gmail.com>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+> Op 30-04-2026 04:04 CEST schreef Kuniyuki Iwashima <kuniyu@google.com>:
+>=20
+> =20
+> On Tue, Apr 28, 2026 at 10:51=E2=80=AFAM Jori Koolstra <jkoolstra@xs4all.=
+nl> wrote:
+> >
+> > Right now if some LSM such as Smack denies an AF_UNIX socket peer to
+> > receive an SCM_RIGHTS fd the SCM_RIGHTS fd array will be cut short at
+> > that point, and MSG_CTRUNC is set on return of recvmsg(). This is
+> > highly problematic behaviour, because it leaves the receiver
+> > wondering what happened. As per man page MSG_CTRUNC is supposed to
+> > indicate that the control buffer was sized too short, but suddenly
+> > a permission error might result in the exact same flag being set.
+> > Moreover, the receiver has no chance to determine how many fds got
+> > originally sent and how many were suppressed.[1]
+> >
+> > Add two MSG_* flags:
+>=20
+> Since we only have 5 bits remaining for future extension,
+> we need to consider the use case a bit more carefully.
+>=20
 
-There is an AI generated review of this patch available on sashiko.dev.
-While I do believe the issues flagged there warrant investigation
-as possible follow-up, I do not think they should delay progress
-of this patch.
+Right. Since it wasn't a lot of work I implemented it exactly as the reques=
+t
+was made from userspace, and then discuss it from there. By the way, I supp=
+ose
+nothing can be done about that small flag space?
+
+>=20
+> >  - MSG_RIGHTS_DENIAL is set whenever any file is rejected by the LSM
+> >    during recvmsg() of SCM_RIGHTS fds.
+>=20
+> Is this really needed ?
+>=20
+> Even if the fd array is truncated, the application will traverse
+> the array anyway since it has some fds already installed (to
+> clean up in case of MSG_CTRUNC ?).
+>=20
+> Then, it will find the -EPERM entry.
+>=20
+> I assume no one uses MSG_RIGHTS_DENIAL without
+> MSG_RIGHTS_FILTER.
+>=20
+
+I guess that is a fair assumption to make. We can certainly do without
+MSG_RIGHTS_DENIAL if saving flags is important. I also suggested that
+we may see whether we can make MSG_RIGHTS_FILTER the default behavior.
+In the mean time I've found grep.app, and it turns out the answer is no.
+Apparently almost no one checks even for the truncation flag (mostly 1 fd
+is passed and then it is check the cmsg lenght). But cpython has this for
+instance:
+
+    /* Close all descriptors coming from SCM_RIGHTS, so they don't leak. */
+    for (cmsgh =3D ((msg.msg_controllen > 0) ? CMSG_FIRSTHDR(&msg) : NULL);
+         cmsgh !=3D NULL; cmsgh =3D CMSG_NXTHDR(&msg, cmsgh)) {
+        cmsg_status =3D get_cmsg_data_len(&msg, cmsgh, &cmsgdatalen);
+        if (cmsg_status < 0)
+            break;
+        if (cmsgh->cmsg_level =3D=3D SOL_SOCKET &&
+            cmsgh->cmsg_type =3D=3D SCM_RIGHTS) {
+            size_t numfds;
+            int *fdp;
+            numfds =3D cmsgdatalen / sizeof(int);
+            fdp =3D (int *)CMSG_DATA(cmsgh);
+            while (numfds-- > 0)
+                close(*fdp++);
+        }
+        if (cmsg_status !=3D 0)
+            break;
+    }
+
+>=20
+> >  - If MSG_RIGHTS_FILTER is passed as a flag to recvmsg(), the SCM_RIGHT=
+S
+>=20
+> Does this flag need per-recvmsg() granularity ?
+>=20
+
+Perhaps not. What would be the alternative? A fcntl option for the socket f=
+d?
+
+> If the application does not welcome the truncated fd array,
+> it would have passed MSG_RIGHTS_FILTER to every
+> recvmsg(), no ?
+>=20
+
+Correct.
+
+
+Thanks,
+Jori.
 
