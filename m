@@ -1,145 +1,233 @@
-Return-Path: <netdev+bounces-283154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283155-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oDT1Jsaa9GloCwIAu9opvQ
-	(envelope-from <netdev+bounces-283154-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 14:21:26 +0200
+	id DfPmKBqb9Gl1CwIAu9opvQ
+	(envelope-from <netdev+bounces-283155-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 14:22:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E21424AC4FF
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 14:21:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEAE54AC527
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 14:22:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 42F2730089A2
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 12:21:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5529130158AE
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 12:22:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43E8F39BFFE;
-	Fri,  1 May 2026 12:21:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEA8D39E18C;
+	Fri,  1 May 2026 12:22:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VBNUx1lF"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="UWr9/9b9"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A48C727A476;
-	Fri,  1 May 2026 12:21:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FA772C0299;
+	Fri,  1 May 2026 12:22:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777638082; cv=none; b=lgjxg1GHEUBqsrq2jhUxRq2fcFe5r7flAQyXOJnskuaNEOWZhGKpTuAdrULVECzGKLgh86hpzuxae+VKoFnorKw6+aFADstgoQx5xOFBE2Xk4cuwyrk3mCXdDOlyDjxE825ULV4YLGQTSQLYXzY8MuYGUCJpw+pE+Y3eoyPwD40=
+	t=1777638166; cv=none; b=cqWe1b9FNv2C5HjDr56C57GCLcdAqtjYWMtc93wG7lbC48l2kXOIHzf5Zswtifws2rLNNqNpRsykxar0nQvfn7lyzdxbX4g1VvrXiFZXKy52nuEZNzhGZpIKSqmYUlp4s05QhyosFtVt7hp905Oh5d8E9kqckLf01kjan+ssJBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777638082; c=relaxed/simple;
-	bh=TNzDR1TZBAM85v+1er1cq8xj4+1oEevMKUhGnxk3ru8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J7zW0/cbuC0YA5El/DfmOXlFZBQbrNP9q/HPacngkSY6+GCGHenlrtIk46TJsVIl6uZSHtCWNQDafiSlpIbsK6QDTtz6UJIPv54mW94OISqux0/wxkl4QYets1m8iQCTkr1WSlElOUHausDFhlw7KQm1AL/XFU/lGNtxQYDkd4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=VBNUx1lF; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=MsrW9P+18F84Qy89FNTzjz238B+2WoEoX3uJ89Kl6oU=; b=VBNUx1lFE3UuUK5wfhNEymEvQL
-	3FgOUfwExbmAdD/bnOXkAoh+L2C0xOeXB0hsEeI37FXr5G/52UzprljFbbSSH2/EDlZ5JOEsfmskS
-	/D38J4PwGEh/q2JIQZtf54zjTkU4N8m1NXLRggizZEh07YNnLZEsQvM6/ZwCMMzGSGiU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wImrk-000oXt-RZ; Fri, 01 May 2026 14:21:08 +0200
-Date: Fri, 1 May 2026 14:21:08 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Birger Koblitz <mail@birger-koblitz.de>
-Cc: Michal Pecio <michal.pecio@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Chih Kai Hsu <hsu.chih.kai@realtek.com>
-Subject: Re: [PATCH net-next 3/4] r8152: Add irq mitigation for RTL8157/9
-Message-ID: <0fd2b263-bbe0-483d-b2e7-92d76d895b11@lunn.ch>
-References: <20260428-rtl8159_net_next-v1-0-52d03927b46f@birger-koblitz.de>
- <20260428-rtl8159_net_next-v1-3-52d03927b46f@birger-koblitz.de>
- <06a42ba1-b714-45b1-be30-4a793752e495@lunn.ch>
- <9feb0bc1-b817-46f8-9092-e2beff30ec9d@birger-koblitz.de>
- <20260429200214.3e8dee67.michal.pecio@gmail.com>
- <4446ad8c-0f5f-4f5a-8166-557ce9cc91b7@birger-koblitz.de>
- <fac7da10-a2d3-4c14-9208-8762f38564cd@lunn.ch>
- <62fb1f24-b0cb-4310-a155-1f5cce14d83a@birger-koblitz.de>
+	s=arc-20240116; t=1777638166; c=relaxed/simple;
+	bh=x+jo6M4gpez/T9wNfinw4JPM0YFJ/ocRTT+SsiIfYSw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HGr8AtyUa/g5PhGlMzpFGR4nCCLcKA8nzoOSYpbykf2e+UplIdSsrekAr0vC3W91a9RhHNxZNplpdNlldPkFHn6kjIA0j58agTWTsvI3GMQXo/9oRLnMdhw0tollfEG6Am9kbiEYmaMD0pfppwrsFcfr240sIkneWEl55pX+vBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=UWr9/9b9; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from localhost.localdomain (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id AA401600B9;
+	Fri,  1 May 2026 14:22:41 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1777638162;
+	bh=jZZJvItWoQZw+BJX7xl0B7sj/2R/wM6H+07bOlYl3so=;
+	h=From:To:Cc:Subject:Date:From;
+	b=UWr9/9b9ZaJOUWILXVpebhrcF0wK4r8BwFT9LyL/8j7e9NrwDhtzbnjkyKToKx50y
+	 3nKsRxKzkNDt145CXfpNPjJ1VKmqsnxTTsLuhepllCilqAkA6OoB8AaxCNAbbOL7hv
+	 Gi385L6SqHzsXW/s19vtWbmHbzKV3RfOicERLrydHeNg1goXyp6BX9OoXZ/ef6hIMo
+	 x6xbt8NTSu2/SUOG1HfI2TqGOos8OTXEc1X9DgaV80uI9XD12f1r/FJQR5mFMDoKTl
+	 FGmpOlAog4AQqdDsDqcPtk9inOqT4daanHdLXwa8FiyK6xZnckb3L6z1YkEWpUv71G
+	 LY6YU/jTuVNow==
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de,
+	horms@kernel.org
+Subject: [PATCH net 00/14] Netfilter fixes for net
+Date: Fri,  1 May 2026 14:22:23 +0200
+Message-ID: <20260501122237.296262-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <62fb1f24-b0cb-4310-a155-1f5cce14d83a@birger-koblitz.de>
-X-Rspamd-Queue-Id: E21424AC4FF
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: DEAE54AC527
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,realtek.com];
-	TAGGED_FROM(0.00)[bounces-283154-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	DMARC_NA(0.00)[netfilter.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283155-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-> However, there is a big difference in CPU-load when running iperf3,
-> especially with multiple threads:
-> 
-> WITH the CODE saying it disables IRQ mitigation:
-> $ iperf3 -c 192.168.3.1
-> [  5] 0.00-10.00  sec  10.3 GBytes  8.83 Gbits/sec
-> CPU: iperf3 22.5% ksoftirqd 16.6%
-> 
-> $ iperf3 -c 192.168.3.1 -P4
-> [SUM]   0.00-10.00  sec  9.36 GBytes  8.04 Gbits/sec
-> perf3: 19.3% ksoftirqd 96.7%
-> 
-> 
-> WITHOUT the CODE saying it disabled IRQ mitigation:
-> [  5]   0.00-10.00  sec  10.3 GBytes  8.87 Gbits/sec
-> CPU: perf3 19.7% ksoftirqd 12.5%
-> 
-> $ iperf3 -c 192.168.3.1 -P4
-> [SUM]   0.00-10.00  sec  10.3 GBytes  8.81 Gbits/sec
-> CPU: iperf3 22.0% ksoftirqd 46.5%
+Hi,
 
-Thanks for doing this performance testing.
+The following batch contains Netfilter fixes for net:
 
+1) Replace skb_try_make_writable() by skb_ensure_writable() in
+   nft_fwd_netdev and the flowtable to deal with uncloned packets
+   having their network header in paged fragments.
 
-> My undestanding from the first email by Michal is that the behavior with the
-> ESHUTOWN is actually harmless and has been seen in the driver already for
-> the RTL8153.
-> 
-> So, my suggestion is I drop this part of the patch-series and remove the
-> IRQ-mitigation code that says it disables the IRQ mitigation as performance
-> is higher without that code.
+2) Drop packet if output device does not exist and ensure sufficient
+   headroom in nft_fwd_netdev before transmitting the skb.
 
-Agreed.
+3) Use the existing dup recursion counter in nft_fwd_netdev for the
+   neigh_xmit variant, from Weiming Shi.
 
-	Andrew
+4) Add .check_hooks interface to x_tables to detach the control plane
+   hook check based on the match/target configuration. Then, update
+   nft_compat to use .check_hooks from .validate path, this fixes a
+   lack of hook validation for several match/targets.
+
+5) Fix incorrect .usersize in xt_CT, from Florian Westphal.
+
+6) Fix a memleak with netdev tables in dormant state,
+   from Florian Westphal.
+
+7) Several patches to check if the packet is a fragment, then skip
+   layer 4 inspection, for x_tables and nf_tables; as well as common
+   nf_socket infrastructure. The xt_hashlimit match drops fragments
+   to stay consistent with the existing approach when failing to parse
+   the layer 4 protocol header.
+
+8) Ensure sufficient headroom in the flowtable before transmitting
+   the skb.
+
+9) Fix the flowtable inline vlan approach for double-tagged vlan:
+   Reverse the iteration over .encap[] since it represents the
+   encapsulation as seen from the ingress path. Postpone pushing
+   layer 2 header so output device is available to calculate needed
+   headroom. Finally, add and use nf_flow_vlan_push() to fix it.
+
+10) Fix flowtable inline pppoe with GSO packets. Moreover, use
+    FLOW_OFFLOAD_XMIT_DIRECT to fill up destination hardware
+    address since neighbour cache does not exist in pppoe.
+
+11) Use skb_pull_rcsum() to decapsulate vlan and pppoe headers, for
+    double-tagged vlan in particular this should provide some benefits
+    in certain scenarios.
+
+More notes regarding 9-11):
+
+- sashiko is also signalling to use it for IPIP headers, but that needs
+  more adjustments such setting skb->protocol after removing the IPIP
+  header, will follow up in a separated patch.
+- I plan to submit selftests to cover double-tagged-vlan. As for pppoe,
+  it should be possible but that would mandate a few userspace dependencies.
+  This has been semi-automatically  tested by me and reporters describing
+  broken double-vlan-tagged and pppoe currently in the flowtable.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-26-05-01
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit 0c7a5ba011d336df4fcd1f667fcc16ea5549be12:
+
+  Merge branch 'mptcp-misc-fixes-for-v7-1-rc2' (2026-04-28 18:36:29 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-26-05-01
+
+for you to fetch changes up to baa3c65435fb3f450b262672bc06db887a92d397:
+
+  netfilter: flowtable: use skb_pull_rcsum() to pop vlan/pppoe header (2026-05-01 12:39:23 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 26-05-01
+
+----------------------------------------------------------------
+Fernando Fernandez Mancera (3):
+      netfilter: nf_socket: skip socket lookup for non-first fragments
+      netfilter: nf_tables: skip L4 header parsing for non-first fragments
+      netfilter: xtables: fix L4 header parsing for non-first fragments
+
+Florian Westphal (2):
+      netfilter: xt_CT: fix usersize for v1 and v2 revision
+      netfilter: nf_tables: fix netdev hook allocation memleak with dormant tables
+
+Pablo Neira Ayuso (8):
+      netfilter: replace skb_try_make_writable() by skb_ensure_writable()
+      netfilter: nft_fwd_netdev: add device and headroom validate with neigh forwarding
+      netfilter: x_tables: add .check_hooks to matches and targets
+      netfilter: nft_compat: run xt_check_hooks_{match,target}() from .validate
+      netfilter: flowtable: ensure sufficient headroom in xmit path
+      netfilter: flowtable: fix inline vlan encapsulation in xmit path
+      netfilter: flowtable: fix inline pppoe encapsulation in xmit path
+      netfilter: flowtable: use skb_pull_rcsum() to pop vlan/pppoe header
+
+Weiming Shi (1):
+      netfilter: nft_fwd_netdev: use recursion counter in neigh egress path
+
+ include/linux/netfilter/x_tables.h    |   8 ++
+ include/net/netfilter/nf_dup_netdev.h |  13 +++
+ include/net/netfilter/nf_flow_table.h |   4 +-
+ net/ipv4/netfilter/nf_socket_ipv4.c   |   3 +
+ net/ipv6/netfilter/nf_socket_ipv6.c   |   5 +-
+ net/netfilter/nf_dup_netdev.c         |  16 ----
+ net/netfilter/nf_flow_table_core.c    |   1 +
+ net/netfilter/nf_flow_table_ip.c      | 151 ++++++++++++++++++++++++++--------
+ net/netfilter/nf_flow_table_path.c    |   7 +-
+ net/netfilter/nf_tables_api.c         |  35 ++++----
+ net/netfilter/nf_tables_core.c        |   2 +-
+ net/netfilter/nft_compat.c            |  45 +++++++---
+ net/netfilter/nft_exthdr.c            |   2 +-
+ net/netfilter/nft_fwd_netdev.c        |  29 ++++++-
+ net/netfilter/nft_osf.c               |   2 +-
+ net/netfilter/nft_tproxy.c            |   8 +-
+ net/netfilter/x_tables.c              |  79 ++++++++++++++++--
+ net/netfilter/xt_CT.c                 |   8 +-
+ net/netfilter/xt_TCPMSS.c             |  33 ++++----
+ net/netfilter/xt_TPROXY.c             |  11 ++-
+ net/netfilter/xt_addrtype.c           |  25 ++++--
+ net/netfilter/xt_devgroup.c           |  18 ++--
+ net/netfilter/xt_ecn.c                |   4 +
+ net/netfilter/xt_hashlimit.c          |   4 +-
+ net/netfilter/xt_osf.c                |   3 +
+ net/netfilter/xt_physdev.c            |  20 +++--
+ net/netfilter/xt_policy.c             |  24 ++++--
+ net/netfilter/xt_set.c                |  39 +++++----
+ net/netfilter/xt_tcpmss.c             |   4 +
+ 29 files changed, 447 insertions(+), 156 deletions(-)
 
