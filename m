@@ -1,78 +1,80 @@
-Return-Path: <netdev+bounces-283056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283057-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6LWqOTz/82n99QEAu9opvQ
-	(envelope-from <netdev+bounces-283056-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 03:17:48 +0200
+	id 2LLmLkj/82n99QEAu9opvQ
+	(envelope-from <netdev+bounces-283057-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 03:18:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 658294A9886
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 03:17:48 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 569764A9894
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 03:18:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BEB6A3066297
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 01:16:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E250330488EA
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 01:16:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA5D629BD87;
-	Fri,  1 May 2026 01:16:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 311651E1E04;
+	Fri,  1 May 2026 01:16:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RT8A8Nkb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NvN/xE2O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FF1518FDDE
-	for <netdev@vger.kernel.org>; Fri,  1 May 2026 01:16:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B27B82D5436
+	for <netdev@vger.kernel.org>; Fri,  1 May 2026 01:16:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777598178; cv=none; b=CbFw93DNe17MndQwitc4Q2y4zDFhbzhscPMUqB6aBKcPqXtPG2eL5aqQ5xh/2MEJZiNNxH1zL/dWDzyFrjceiTwejRCgWbqqZnBDdvWy2m/lEpxMUukbi9u6jbAab/V5Z/8PLBqP68r4ART2TwIrPu4KGaKloPaQPqvWYf6ulWg=
+	t=1777598181; cv=none; b=ern2gCjg6zc/kjw5OlcoeGVC9dSSUpc73q0Ew07UyVlxJwYC8HlVxOwag8y1CMuKaFrczWbOXZLLlyBZXDNGwbnjItwVeCXs/P2F0Je97i9956/f+QVSbwzgKh/Q1dsZwFtnahsr1/WU0dt9MDJm0mG02pAcAo/WB/gfdA/6YBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777598178; c=relaxed/simple;
-	bh=JO6PXjlfHfBnLGzUji8BB/JYESf8hMrMH8npw/5dtY0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q1x8z7sKD4qQabZ18zjcH+TO+cnKHusFWosU5N701Cx3Sqc8fJNhkVhjJ+0ViIKWFEUz58LafxH00ywaVKYBBmixIfXVAEZr5cn9D2nosQ35CM56a0iuPW9Ubx8hBeH0ZqSBOHHsaDxrM3RLcmYTVWrR2fLXWiG418q+QIPWA/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RT8A8Nkb; arc=none smtp.client-ip=209.85.128.43
+	s=arc-20240116; t=1777598181; c=relaxed/simple;
+	bh=07TjzL2oVJExjVmJrVmA1U/ABU7FDg0bndC+c14Yj9c=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qi5Sb3Qlw+56wobGhojFh3FXLNQROlD4bvse53IyEDit6g66k2NbUPZ0oxkRhieVRNJBBv+Wk2K8UwwH9xX1Cq7WRW+0HiH7r2YeKdHJ0NFznjLoDPFtKp0AUci66R6vALeHeKLOv8f17LY1tXcsOPBx859KEPe3JVi32ABa7Iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NvN/xE2O; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4891f625344so16406785e9.0
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 18:16:17 -0700 (PDT)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-48984d29fe3so21645085e9.0
+        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 18:16:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777598175; x=1778202975; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZueHIPSPNTV1ZqBjmU63LlwYCH0Ig995X9Tl5eH7gHs=;
-        b=RT8A8NkbP8Jgr474lOUqUCBHTxzS430vc+vI2zhCNYAMxU7D86CUJ23tW+fo1qYNOP
-         iLGejOf7jWV/mOOaIHnkHvkfxSaqzAG1EA3LvmnxnKAutGtoMzJ+trrh3Yg8mKmQv1H0
-         cL6DCf6c1KF1U6D6CM3HKyMUPW6MDT4HzGZiwFsoyCOccSMStjb9F9Y9qbW3/ovcMhbO
-         tiNEG8730fSRI02uVloWc6/xLgIeXvL4VJWar/sLQQ+Sh+XiRRK3zN8NdjRVnBX2ZN6E
-         VAGymZsRZF7BW7tp7NgfDr/BK+PCSlq0wEezMcJpWRMwng0L6WUxlfPvQfER7jMBh+ve
-         HwVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777598175; x=1778202975;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1777598178; x=1778202978; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZueHIPSPNTV1ZqBjmU63LlwYCH0Ig995X9Tl5eH7gHs=;
-        b=jHKLaSonCgHeQ1HfJAuQmQ5Xb06uIJS85BwTCsO+wUSZEOI9c72C4gG4t7euQET3Qu
-         bqgiIodjQmiYqgZA0lxHnm6JH8iVJILAqjugi8VhLtE6DdEOf9qz0DkgtSd+3xG92GvD
-         685pM5Ma9w5r9cmA8ePqGYIeglJi2uwsL+FyDzGH9RqmYY9A39E8R3+5XEf5kEHGXWL7
-         +udH0locFsT1veQV+oqcrhw1SoQ6zp+2njhSyT9qoVgLEC7yTWqvtlNoardI8WVppY88
-         NJFiSbyAHc4XDgbx64QVgDa/LYAjguMGKtEOEcyLuoo5HM2ccGHMqSR8iBA4kaTvMZvS
-         da7w==
-X-Gm-Message-State: AOJu0YxPSckTz4pm9Ssc4MtnG2iSxl4xWaP/ldupcPu235xT4+j2ilth
-	vuBl7HWP8sLOJ88is9q7emCRg2VrdYZaMIivU3Vvb7XUSiRv8H0sawM7LISDj4oM
-X-Gm-Gg: AeBDies3cUn+7ICU80/ktuCazqBz+E4rLU6/isdL7JaE/tEvuwio46MXozc0M8s421P
-	WtkF3V7DT4/IVdzHaQl/PfVEEvQpBWOh1vszr30ic5yeuwLhfXmcsV7m/TqErhE+eT2SwoiYuW7
-	bXcoUUdOKA25DHDk6nio558DPFjVcqsSi2xOdxpdpWteBEE/UxIznpLtN4DUeX4l6Ckz+vzhHhS
-	c1+HuGipvlcOwSa9aTaUPOXWmfelJbE3+2dzTMjKLGPQFHbuCYoMJMMTMG/+1W7MlBGePvwgZl4
-	GAO6ehmLLH5K42S5NItnMKW7jfz9jtdjMJkiUrKbsDR9Mu+3Wy6G8Bz7qe6fgmootPP0cEWyuIl
-	QZCP5Gd+4oZxvmh1fqrNu4DqpnszknKMvLgAu9tO+tpug4zZwIWMBfH8lyWJ16urkUCWfluBYTj
-	YrxDp+FxaM1oDjbjjnF8ERYs8f6tWmDw==
-X-Received: by 2002:a05:600c:4b1a:b0:488:aa33:dc8f with SMTP id 5b1f17b1804b1-48a85dc37c2mr43435225e9.0.1777598175294;
-        Thu, 30 Apr 2026 18:16:15 -0700 (PDT)
-Received: from localhost ([2a03:2880:31ff:b::])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a8feb8595sm2694385e9.2.2026.04.30.18.16.13
+        bh=4P3mwB5zn6zCWdiX+lH7lZlwJPcN0c53T4YUn73J7gI=;
+        b=NvN/xE2OUBRPAyzhY/cPABy14EMI5AX++tyS01Ou+HGY/P4zOqlKXVnv2c2sc3aWG2
+         nv1H+gqwiC4+TagcNb+f+mVAzHjjIVyDtbjeOqkahxJiTcilqVOSgBP4XXeFHwi75DLo
+         7r45S56W0/OZHP4p6xVy3pSNtNdDGb9F3GwapSkPIn15VOxJHAG4pRj0e9NjPhwjT2s3
+         a930ga7QjrYZhq8a6tOsUt2PTAul1WhJjnliWARhFENxeTS8p8DMmkquvpgW4CAHyM6J
+         ZEhhjIiWJiGryoynWqfru2kGuGHo5Ykyvy/BTNtImxeU51+lIodZU9wwg+zSvnYwKwn2
+         BJPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777598178; x=1778202978;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=4P3mwB5zn6zCWdiX+lH7lZlwJPcN0c53T4YUn73J7gI=;
+        b=pjur72zOkpve5on3u4FOeRAfeY5k7USVZxWEt8FNGXUpwR1h8k15s/kGg263XSYyN4
+         W+D5aJpNQe9D+ho5ePgLn+Z09fjbEXqtOIfTX6UifhXYTRMGbFDLC4TkOfdjdfhK3HYC
+         KqBrQwFEVjUd+qmVIlde4O8mBSgPH6XfYorRbrQ3bSjcuSGG1NNKdAEw88FDHTDmE0HB
+         sCANellHck5+MMJMucZDyg7r8/OHlyvLzDo2u61+UloFv8v2NzeBXtnBLxW5ZIxCkCwF
+         5utlyU9YwAY1BGsMjmvKBNR3vAj23BxNZFoz7STB1teBaVAtvCuh/OjEipMqxG8fNG+N
+         y/tw==
+X-Gm-Message-State: AOJu0Yxjr9/LwErMVjONa/D3AbYNG44AE8zUlJrJnHWlIvYoKOQo6qpt
+	Oe4yvV7ssVuEtAEP4k8tXB6Inm2dxkzwKap9nvLrq/q0X0Pqo0D+Om7w4mFYb4w0
+X-Gm-Gg: AeBDieusCpYbkVJRdiXB0M332xBknYcNilK6fCNKkqZ/Rl6W5B6NjqhszsMay38KrPt
+	1ygPz4nLIaFqtYBKahf06Hm6KYfWEOP48kcshbMmVjJlaaO/DbxLApZfQaGGbFHJ9AnO7alavX8
+	Pl2X70YgXYP2tv0ZDUygt/wO61AvtgQKfDy1mt+Da70J6qX2z3417jGkHtP9xP5q0d6H9OVMPnj
+	5tGlnhxMhiQQ6cXPpDn4+76Jbx3rE7gNoFnjaMBhgSclj8zCfYCAMjACSQltk7MgewPq+CiV7xx
+	29wFvbtIqf0mmCloXBuBvi/B9G0keBTkARLFoJ67cdDVKH+JAJualHN58BQK2xFh0qGt5o2x50E
+	qDuWH1xDiMIrQI+MRJGIZpPlSSL5eVxG4DntnbN1k/z1491+wBaND5lRti5C5c27S2ueGymtzAd
+	v0PzzDo9S6d/XJtSjrS2+WFfbraQxUH+M=
+X-Received: by 2002:a05:600c:26d2:b0:48a:89d9:a419 with SMTP id 5b1f17b1804b1-48a89d9a46emr34894615e9.11.1777598177801;
+        Thu, 30 Apr 2026 18:16:17 -0700 (PDT)
+Received: from localhost ([2a03:2880:31ff:35::])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a82307f28sm165629135e9.13.2026.04.30.18.16.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Apr 2026 18:16:13 -0700 (PDT)
+        Thu, 30 Apr 2026 18:16:17 -0700 (PDT)
 From: Mohsin Bashir <mohsin.bashr@gmail.com>
 To: netdev@vger.kernel.org
 Cc: dsahern@kernel.org,
@@ -81,10 +83,12 @@ Cc: dsahern@kernel.org,
 	kuba@kernel.org,
 	ernis@linux.microsoft.com,
 	mohsin.bashr@gmail.com
-Subject: [PATCH iproute2-next 0/5] netshaper: Extend netshaper support
-Date: Thu, 30 Apr 2026 18:16:06 -0700
-Message-ID: <20260501011611.3533573-1-mohsin.bashr@gmail.com>
+Subject: [PATCH iproute2-next 1/5] netshaper: Extract parse_scope() and parse_rate() helpers
+Date: Thu, 30 Apr 2026 18:16:07 -0700
+Message-ID: <20260501011611.3533573-2-mohsin.bashr@gmail.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260501011611.3533573-1-mohsin.bashr@gmail.com>
+References: <20260501011611.3533573-1-mohsin.bashr@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,7 +96,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 658294A9886
+X-Rspamd-Queue-Id: 569764A9894
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
@@ -101,7 +105,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -109,7 +113,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_CC(0.00)[kernel.org,networkplumber.org,redhat.com,linux.microsoft.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-283056-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283057-lists,netdev=lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -119,35 +123,133 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_NEQ_ENVFROM(0.00)[mohsinbashr@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_NONE(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.991];
+	NEURAL_HAM(-0.00)[-0.992];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,meta.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-From: Mohsin Bashir <hmohsin@meta.com>
+Add parse_scope() and parse_rate() helpers in preparation for
+adding the group command which will need scope and rate parsing
+at various places in the code. This patch will help to avoid
+code duplication.
 
-This series extends the netshaper CLI with missing parameter support
-and adds the group command for building scheduling hierarchies.
+Verify that the tool works as before:
+./netshaper set dev eth2 handle scope queue id 0 bw-max 100kbit
+./netshaper delete dev eth2 handle scope queue id 0 bw-max 100kbit
 
-The existing netshaper tool only supports setting bw-max on individual
-shapers. This series adds the remaining shaper attributes (bw-min,
-weight, priority) needed for TX scheduling, and introduces the
-group command which ties leaf shapers to a parent node in a single
-operation.
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+---
+ netshaper/netshaper.c | 65 +++++++++++++++++++++++--------------------
+ 1 file changed, 35 insertions(+), 30 deletions(-)
 
-Mohsin Bashir (5):
-  netshaper: Extract parse_scope() and parse_rate() helpers
-  netshaper: Add bw-min and weight parameter support
-  netshaper: Extend show output with parent, bw-min and weight
-  netshaper: Make handle id optional for node scope
-  netshaper: Add group command for creating scheduling hierarchies
-
- netshaper/netshaper.c | 398 ++++++++++++++++++++++++++++++++++--------
- 1 file changed, 324 insertions(+), 74 deletions(-)
-
+diff --git a/netshaper/netshaper.c b/netshaper/netshaper.c
+index 47fb805e..1603e6e5 100644
+--- a/netshaper/netshaper.c
++++ b/netshaper/netshaper.c
+@@ -47,6 +47,28 @@ static const char *net_shaper_scope_names[NET_SHAPER_SCOPE_MAX + 1] = {
+ 	"node"
+ };
+ 
++static int parse_scope(const char *str)
++{
++	if (strcmp(str, "netdev") == 0)
++		return NET_SHAPER_SCOPE_NETDEV;
++	if (strcmp(str, "queue") == 0)
++		return NET_SHAPER_SCOPE_QUEUE;
++	if (strcmp(str, "node") == 0)
++		return NET_SHAPER_SCOPE_NODE;
++	return -1;
++}
++
++static int parse_rate(const char *str, __u64 *rate_bps)
++{
++	if (get_rate64(rate_bps, str)) {
++		fprintf(stderr, "Invalid rate value \"%s\"\n", str);
++		return -1;
++	}
++	/* get_rate64 returns bytes/sec, convert to bits/sec */
++	*rate_bps *= 8;
++	return 0;
++}
++
+ static void print_netshaper_attrs(struct nlmsghdr *answer)
+ {
+ 	struct genlmsghdr *ghdr = NLMSG_DATA(answer);
+@@ -117,12 +139,8 @@ static int do_cmd(int argc, char **argv, int cmd)
+ 			ifindex = ll_name_to_index(*argv);
+ 		} else if (strcmp(*argv, "bw-max") == 0) {
+ 			NEXT_ARG();
+-			if (get_rate64(&bw_max_bps, *argv)) {
+-				fprintf(stderr, "Invalid bw-max value\n");
++			if (parse_rate(*argv, &bw_max_bps))
+ 				return -1;
+-			}
+-			/* Convert Bps to bps */
+-			bw_max_bps *= 8;
+ 		} else if (strcmp(*argv, "handle") == 0) {
+ 			handle_present = true;
+ 			NEXT_ARG();
+@@ -134,34 +152,24 @@ static int do_cmd(int argc, char **argv, int cmd)
+ 			}
+ 			NEXT_ARG();
+ 
+-			if (strcmp(*argv, "netdev") == 0) {
+-				handle_scope = NET_SHAPER_SCOPE_NETDEV;
+-				/* For netdev scope, id is optional - check if next arg is "id" */
++			handle_scope = parse_scope(*argv);
++			if (handle_scope < 0) {
++				fprintf(stderr, "Invalid scope \"%s\"\n", *argv);
++				return -1;
++			}
++
++			if (handle_scope == NET_SHAPER_SCOPE_NETDEV) {
++				/* For netdev scope, id is optional */
+ 				if (argc > 1 && strcmp(argv[1], "id") == 0) {
+-					NEXT_ARG(); /* move to "id" */
+-					NEXT_ARG(); /* move to id value */
++					NEXT_ARG();
++					NEXT_ARG();
+ 					if (get_unsigned(&handle_id, *argv, 10)) {
+ 						fprintf(stderr, "Invalid handle id\n");
+ 						return -1;
+ 					}
+ 				}
+-			} else if (strcmp(*argv, "queue") == 0) {
+-				handle_scope = NET_SHAPER_SCOPE_QUEUE;
+-				/* For queue scope, id is required */
+-				NEXT_ARG();
+-				if (strcmp(*argv, "id") != 0) {
+-					fprintf(stderr, "What is \"%s\"\n", *argv);
+-					usage();
+-					return -1;
+-				}
+-				NEXT_ARG();
+-				if (get_unsigned(&handle_id, *argv, 10)) {
+-					fprintf(stderr, "Invalid handle id\n");
+-					return -1;
+-				}
+-			} else if (strcmp(*argv, "node") == 0) {
+-				handle_scope = NET_SHAPER_SCOPE_NODE;
+-				/* For node scope, id is required */
++			} else {
++				/* For queue/node scope, id is required */
+ 				NEXT_ARG();
+ 				if (strcmp(*argv, "id") != 0) {
+ 					fprintf(stderr, "What is \"%s\"\n", *argv);
+@@ -173,9 +181,6 @@ static int do_cmd(int argc, char **argv, int cmd)
+ 					fprintf(stderr, "Invalid handle id\n");
+ 					return -1;
+ 				}
+-			} else {
+-				fprintf(stderr, "Invalid scope\n");
+-				return -1;
+ 			}
+ 		} else {
+ 			fprintf(stderr, "What is \"%s\"\n", *argv);
 -- 
 2.52.0
 
