@@ -1,131 +1,143 @@
-Return-Path: <netdev+bounces-283042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283043-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MHOUGHn582lo9QEAu9opvQ
-	(envelope-from <netdev+bounces-283042-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 02:53:13 +0200
+	id kK/DFZj682mY9QEAu9opvQ
+	(envelope-from <netdev+bounces-283043-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 02:58:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDB784A9626
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 02:53:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0019D4A969F
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 02:57:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F19B5301A42D
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 00:53:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0A4B93024CAD
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 00:57:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D2D3264A9D;
-	Fri,  1 May 2026 00:53:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC30282F1C;
+	Fri,  1 May 2026 00:57:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OvErAkrR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oL9KNxZS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F89267B07;
-	Fri,  1 May 2026 00:53:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03238267B07;
+	Fri,  1 May 2026 00:57:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777596788; cv=none; b=XIjmREvc5PLP9J2ORPeXKuPibElDKLEK1scy1K7koGue0D/dN4/7l+JtbuDPT5XrDIIGD7JkgLOGHDzxu3TCA6rAW6W0adNozqLGkFQ7s7Zdjn0z6an7LZtezbnQrPV+Zzh4dLyOJjUf3QUiIhLTg8M+Vy5kxezOVUS3GacftUQ=
+	t=1777597047; cv=none; b=JD4c2rLDfWlXOcZWPdJkHcZu4jkl5w4HdRaNj1qZ18HiMmtWs8Svaxq7g/Sbnmt2a6LImacj5AgR6oKbI4AOJwoy7Sapo6yuKoEhDAU6LH2V2f+B0RxshBxG7+dSnvsWA92wAoslc9GB7XM1yKjxmDJzuB4MGFqTN/O68vlRXH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777596788; c=relaxed/simple;
-	bh=d0XT4/t91RskoEJQxzzKgFJMNLW9IouAU7J8aDIYAmw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=It2HLOkSCuL71ubSJ02ibBPLWro+z7KIYNBm1ZWDTPR8LzX+Ho81raU42+MDDqh6m7moptUz7qvPixSwf/beJgooZ8020alvuphNGounm7EmOS32iwDAXYBUnmOPWHLS5Mcigjvj8zqQyGhYpt0FBmWT0Abs4JLgE+XgO0egjB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OvErAkrR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4F26C2BCB3;
-	Fri,  1 May 2026 00:53:06 +0000 (UTC)
+	s=arc-20240116; t=1777597047; c=relaxed/simple;
+	bh=bs05aRDwfyaoPAgx838AnsLYLubyaA3dlIOPWod+1Y8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NLmm3ir5XRclqCfupRLzDEd4cnzhBVPA2Y2KpCxHHus4AeLFa/5VvNuPP6Xd3h7Q8sObOursrlz/so4w+A1Il4sBmb9MgxxUI0KRH4oCxQlSjak2muob9TMmKm5FKNZ+fGv80VA7L5JrG1/PFzXpnzNI6JHrOowNX02eOf1sRsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oL9KNxZS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8953EC2BCB3;
+	Fri,  1 May 2026 00:57:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777596787;
-	bh=d0XT4/t91RskoEJQxzzKgFJMNLW9IouAU7J8aDIYAmw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OvErAkrReBqj9eyP4ir2aJOVzvOro/O1nq6Kgsz4yExaOJxK5Llu+zOelrVvOwbHN
-	 c7L3hx7EPsZ8NAYdqaJu2IzaNdf1diLw+GXrJGe2nQfrF9XqUTBsZiKcRx51Y5L8Ge
-	 r1DLtt67IZYqxTrX42O626oImVgWzpafNz0zfnCze2uRFaNcFZ8NKS6tHTKYyJ491T
-	 r4MZPaT+bkFpoT78G56dG7B0rdumxAzbCwFDAH9m8/s5H+9fTAcxuMyCWFU5kHjclR
-	 75DHavrk4gF8/7PMyalAEHEcrZZRh8cwzDw7uv8jxfhQBjgQO8skWa99+jAcfJmaVj
-	 8qQXNQapYWNVg==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org,
-	Tung Nguyen <tung.q.nguyen@dektech.com.au>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Jon Maloy <jmaloy@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Robert Garcia <rob_garcia@163.com>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 5.15.y] tipc: fix kernel warning when sending SYN message
-Date: Thu, 30 Apr 2026 20:53:05 -0400
-Message-ID: <20260430160000.item003-5.15@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260429075033.234885-1-rob_garcia@163.com>
-References: <20260429075033.234885-1-rob_garcia@163.com>
+	s=k20201202; t=1777597046;
+	bh=bs05aRDwfyaoPAgx838AnsLYLubyaA3dlIOPWod+1Y8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=oL9KNxZS0ZtiRkjef9sVKNyf4iisFfLGGPVRLgjI3Ykn73Pdz6xvS6dfrqE2ygcPv
+	 bLIhEmQlxG6faHCYchb2dVOEEbX2LVpLbw830jUWwcs4x7X4HK1YlF/UNau/t7Kiq9
+	 HTVWjnsq/e4P8gbPCMVmLn2jIV+uA3swtV3M614QO67pxQOA+D6i53AmjBBQva4p0u
+	 QIt/71GKKjQHAlr+KuHvT8UMZ+GA2GLOXPFJIqK/Fsb9ZqGmOzZPlOvvWvb5i6EUFk
+	 l4FNG9tyPtC9zWfX3R0lBpW5ppy26FZTo/1ANIyvRCoosEh2jitBofEiME7/UEziyj
+	 U0yKPeDSEfB4A==
+Date: Thu, 30 Apr 2026 17:57:24 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, Alex Shi
+ <alexs@kernel.org>, Yanteng Si <si.yanteng@linux.dev>, Dongliang Mu
+ <dzm91@hust.edu.cn>, Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi
+ <pavan.chebbi@broadcom.com>, Joshua Washington <joshwash@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch
+ <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Alexander Duyck
+ <alexanderduyck@fb.com>, kernel-team@meta.com, Daniel Borkmann
+ <daniel@iogearbox.net>, Nikolay Aleksandrov <razor@blackwall.org>, Shuah
+ Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, Stanislav Fomichev
+ <sdf@fomichev.me>, Mina Almasry <almasrymina@google.com>, Bobby Eshleman
+ <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next 07/11] net: devmem: support TX over
+ NETMEM_TX_NO_DMA devices
+Message-ID: <20260430175724.0c134a0d@kernel.org>
+In-Reply-To: <20260428-tcp-dm-netkit-v1-7-719280eba4d2@meta.com>
+References: <20260428-tcp-dm-netkit-v1-0-719280eba4d2@meta.com>
+	<20260428-tcp-dm-netkit-v1-7-719280eba4d2@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: CDB784A9626
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 0019D4A969F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283042-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,redhat.com,davemloft.net,163.com,zeniv.linux.org.uk,vger.kernel.org,lists.sourceforge.net];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TAGGED_FROM(0.00)[bounces-283043-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Wed, Apr 29, 2026 at 03:50:33PM +0800, Robert Garcia wrote:
-> From: Tung Nguyen <tung.q.nguyen@dektech.com.au>
->
-> [ Upstream commit 11a4d6f67cf55883dc78e31c247d1903ed7feccc ]
->
-> When sending a SYN message, this kernel stack trace is observed:
-[...]
-> It is because commit a41dad905e5a ("iov_iter: saner checks for attempt
-> to copy to/from iterator") has introduced sanity check for copying
-> from/to iov iterator. Lacking of copy direction from the iterator
-> viewpoint would lead to kernel stack trace like above.
+On Tue, 28 Apr 2026 15:42:04 -0700 Bobby Eshleman wrote:
+>  	shinfo = skb_shinfo(skb);
+> +	if (shinfo->nr_frags == 0)
+> +		goto out;
 
-Thanks for the submission, but I don't think we need this in 5.15.y.
+Feels tempting to cover the NETMEM_TX_NO_DMA / NETMEM_TX_NONE
+cases here before we even look at the frags?
 
-The WARN this fix silences was added by a41dad905e5a ("iov_iter: saner
-checks for attempt to copy to/from iterator"), which landed in v6.1 and
-has never been backported to 5.15.y. Without that prerequisite the WARN
-isn't reachable in 5.15 — the SYN/ACK sends call copy_from_iter_full()
-with dsz=0 on a zero-initialized msghdr, and 5.15's _copy_from_iter()
-only WARNs for ITER_PIPE iters, not on data_source.
-
-Your ITER_SOURCE -> WRITE adaptation is correct, but since the bug is
-absent in 5.15 the patch isn't needed there.
-
---
-Thanks,
-Sasha
+> -	if (shinfo->nr_frags > 0) {
+> -		niov = netmem_to_net_iov(skb_frag_netmem(&shinfo->frags[0]));
+> -		if (net_is_devmem_iov(niov) &&
+> -		    READ_ONCE(net_devmem_iov_binding(niov)->dev) != dev)
+> +	niov = netmem_to_net_iov(skb_frag_netmem(&shinfo->frags[0]));
+> +	if (!net_is_devmem_iov(niov))
+> +		goto out;
+> +
+> +	binding = net_devmem_iov_binding(niov);
+> +
+> +	switch (dev->netmem_tx) {
+> +	case NETMEM_TX_DMA:
+> +		if (READ_ONCE(binding->dev) != dev)
+>  			goto out_free;
+> +		break;
+> +	case NETMEM_TX_NO_DMA:
+> +		break;
+> +	default: /* NETMEM_TX_NONE */
+> +		goto out_free;
+>  	}
 
