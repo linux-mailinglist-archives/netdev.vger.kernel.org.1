@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-283113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283115-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gImoFu9K9GlSAQIAu9opvQ
-	(envelope-from <netdev+bounces-283113-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 08:40:47 +0200
+	id WJMJEEVL9GkUAQIAu9opvQ
+	(envelope-from <netdev+bounces-283115-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 08:42:13 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A67D64AAB19
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 08:40:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B97054AAB42
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 08:42:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 821CA303454A
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 06:38:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3877D3051BCF
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 06:38:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26545365A0F;
-	Fri,  1 May 2026 06:38:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5AC236BCF0;
+	Fri,  1 May 2026 06:38:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C8GuMXUL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IsrcBL9L"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7768736167B;
-	Fri,  1 May 2026 06:38:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F05C364045;
+	Fri,  1 May 2026 06:38:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777617516; cv=none; b=jfK6TMTxPaYTnzoGNdPbsGgv/ygxEVCpZ3HIxTsSfuLoFXj+SSeabM5SnHJnffD4KO3+xCyeaNbc/8n/ayl2s4yme7s6pLnUkWmN+NUHXeKDBQU+VlZwDuojqgLG89FwoEICcn0Q5xQUi0QFlp+eiKSdCamWZOPMCbqW8rxZq2g=
+	t=1777617517; cv=none; b=IT07kVAM1uc/Kfj/EQpFNSYc1d/BFcAhdu+/bKTth3GTBO1za58JfggujDv9tdOI9VYev59VpZLj/3tpy/hgLC93phLz8PsKnVElYDAH4KzXaKWLCF4Qa5EhyXekoUikom6Er/uZXLUIH6HEgwoEbvnHmZprb6rYVLjzCV9sK50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777617516; c=relaxed/simple;
-	bh=MQeFejbbiidxI9MeU5AD6rTFEXrZY96L6m7vWdpFxLI=;
+	s=arc-20240116; t=1777617517; c=relaxed/simple;
+	bh=bZ2vP+E4nRubcr8z05aW0zLO08M66BVyDXcFD80rasQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=nSJhbd9u9ojASEkPWjR50bFAgjKXxdgQbd9JGHnM8z47imBQhkmB0SHutAXsV65Jc1VH92Zjxd3XfhwM0cbZGrr9emeaICsrw1CHRAq8vr9hMw4SOSlpBVRSes/Rj/1s5Z+93Rvdh5yMFyBZq88nN4+iK66QOy+uNYs6e53fCp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C8GuMXUL; arc=none smtp.client-ip=192.198.163.9
+	 In-Reply-To:To:Cc; b=sipofeX/39TAlMsA/CKA6dOvTGgYbwMOic3vNYWtNWmTcOf0o63h6e/hH676/JBLd52dFhLYn/kJFtG8xuF9YPiFeaBLwqyFtBA6urUU3cpaSS+ZYwwfXjpyEnn5Hon4gIUhIqvaMiS1I2X9FJeS7N0ewPSO9QWJ4o314ZNo45w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IsrcBL9L; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777617515; x=1809153515;
+  t=1777617516; x=1809153516;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=MQeFejbbiidxI9MeU5AD6rTFEXrZY96L6m7vWdpFxLI=;
-  b=C8GuMXUL9bdbnqoRt+sNM5rnzzMiPHicAYsscRymOQHsLRmLaVMtvBBY
-   c83UrdGo/EhWiMPGv5Z/a0yf1yvB+/GqMdtT+e8G2FRsCP3llzDb4i1Ue
-   UMOnqTG2Jj1CkDXgo8SSoOqzZhjEJmR6UnVDtoVWNS1cgOcSWi9vVohLC
-   RnHkFC+a0YS7Ojcw7wV2PYRtOK3mTjQj5Ab7mtW+6MGZZg5vxSsUS/jKe
-   lEnSsV/L9dT0QUMuZBYDtuKtK3Lcmz+WGi4sAIxaWGwAuHlWlyd0DYZEx
-   x3j21br7nqRtN10bmK6+duLU1M/8OZ/W6Cw/A3UCJSyYjpZj6GtqoWK0j
+  bh=bZ2vP+E4nRubcr8z05aW0zLO08M66BVyDXcFD80rasQ=;
+  b=IsrcBL9LnqXrU+2sHpYBD8hZWYbdqmGzs8cXlAVGbSYO/8c8d1hbCCvL
+   BAvxVVQInWUHEKsMxqlef8FnMqyF4wZsHganMbCEsa2OQuXEAD5byi2C3
+   UzSRg3GIFeM3C2f5hSVTQN+tmBhwvZYwOWYKAay6GONq1arO4tacjKEjs
+   6iG3ZnR2fDaaERUGvN1A+Ds10MEQfYnJEjAL4/RgwBqseT3Js2Ae5rmY6
+   Oizc5TFCv09GbS2zUzQZ/D7PBrItu4tATqHG8RV5YFrDQr03tAu8D+xUc
+   HcSrgtT+mxiIU/7w60xZ0hg+PC8G4fSKcwBvVAGvsgkkzSQLWPAULXl9f
    Q==;
-X-CSE-ConnectionGUID: XaxF/Ta/QwqAtDHeRLxNBg==
-X-CSE-MsgGUID: 7RusvAUvTq+SmwtOuV0Zzg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11772"; a="89271880"
+X-CSE-ConnectionGUID: wi2QN2fwQJOr1aYl1wMebA==
+X-CSE-MsgGUID: aEti7ZgtTP2z33uDIjuXbQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11772"; a="89271887"
 X-IronPort-AV: E=Sophos;i="6.23,209,1770624000"; 
-   d="scan'208";a="89271880"
+   d="scan'208";a="89271887"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
   by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2026 23:38:32 -0700
-X-CSE-ConnectionGUID: qvAXxiR2RaG1gA1zNFcW6g==
-X-CSE-MsgGUID: SO51vtIGR+efTcW0+vsFZg==
+X-CSE-ConnectionGUID: /NXGYkg1Ti6YL3hiPKVfFg==
+X-CSE-MsgGUID: CvQazrnjT8qQa1nTL2EHGA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,209,1770624000"; 
-   d="scan'208";a="233752848"
+   d="scan'208";a="233752852"
 Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.109]) ([10.166.28.109])
   by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2026 23:38:31 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Thu, 30 Apr 2026 23:37:15 -0700
-Subject: [PATCH net-next 04/15] ixgbe: E610: update ACI command structs
- with EEE fields
+Date: Thu, 30 Apr 2026 23:37:16 -0700
+Subject: [PATCH net-next 05/15] ixgbe: move EEE config validation out of
+ ixgbe_set_eee()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,7 +73,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260430-jk-iwl-net-next-2026-04-30-v1-4-6f27ae1cd073@intel.com>
+Message-Id: <20260430-jk-iwl-net-next-2026-04-30-v1-5-6f27ae1cd073@intel.com>
 References: <20260430-jk-iwl-net-next-2026-04-30-v1-0-6f27ae1cd073@intel.com>
 In-Reply-To: <20260430-jk-iwl-net-next-2026-04-30-v1-0-6f27ae1cd073@intel.com>
 To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
@@ -93,16 +93,16 @@ Cc: Piotr Kwapulinski <piotr.kwapulinski@intel.com>, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
  Rinitha S <sx.rinitha@intel.com>
 X-Mailer: b4 0.16-dev-ea14f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3625;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4123;
  i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=xlP/+hUtsf9ohCh8KeWrPSIgij8iWN/pG/B9r5XKl08=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhswvXskSO/qaBWuUCphDCqbuuVCZv9Y7ufNG4Hq7dt1vv
- yYv97TvKGVhEONikBVTZFFwCFl53XhCmNYbZzmYOaxMIEMYuDgFYCKihxj+GQlXzmw8aXXf79O8
- g0zW/X3V91OiA57Kf/6X73fsf57xNob/vlbz4g5vjbRgnBMkK3fvxYHv7/3mzDy8eX2C3O7vsf2
- y/AA=
+ bh=+UYOBw1om1HhT8Rq1KbBklwfxBv/e5K+mQfxVIFcl9I=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhswvXikS/8Ty7+6smcPo57puc5liS5LSDhshlQ2LnqdsF
+ uwy0ebpKGVhEONikBVTZFFwCFl53XhCmNYbZzmYOaxMIEMYuDgFYCJvLzH8j0lovn+XSe+qWstU
+ w+obu6P25TUEs0y8NkWin42jKXx9PyND+z2Z+GJuLfn4zY5nK+WTmgwnWiXfYmR47yBYv+askiA
+ LAA==
 X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
  fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
-X-Rspamd-Queue-Id: A67D64AAB19
+X-Rspamd-Queue-Id: B97054AAB42
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -114,7 +114,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283113-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283115-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -134,90 +134,139 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 
 From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
 
-There were recent changes in some of the ACI commands,
-which have been extended with EEE related fields.
-Set PHY Config, Get PHY Caps and Get Link Info have been
-affected.
-
-Align SW structs to the recent FW changes.
+To make this part of the code mode reusable move all
+EEE input checks out of ixgbe_set_eee().
 
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
 Tested-by: Rinitha S <sx.rinitha@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h | 16 +++++++++-------
- drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c      |  2 ++
- 2 files changed, 11 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c | 98 ++++++++++++++----------
+ 1 file changed, 57 insertions(+), 41 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-index cfaaf2fcf7ae..959cacecae49 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-@@ -323,10 +323,8 @@ struct ixgbe_aci_cmd_get_phy_caps_data {
- #define IXGBE_ACI_PHY_EEE_EN_100BASE_TX			BIT(0)
- #define IXGBE_ACI_PHY_EEE_EN_1000BASE_T			BIT(1)
- #define IXGBE_ACI_PHY_EEE_EN_10GBASE_T			BIT(2)
--#define IXGBE_ACI_PHY_EEE_EN_1000BASE_KX		BIT(3)
--#define IXGBE_ACI_PHY_EEE_EN_10GBASE_KR			BIT(4)
--#define IXGBE_ACI_PHY_EEE_EN_25GBASE_KR			BIT(5)
--#define IXGBE_ACI_PHY_EEE_EN_10BASE_T			BIT(11)
-+#define IXGBE_ACI_PHY_EEE_EN_5GBASE_T			BIT(11)
-+#define IXGBE_ACI_PHY_EEE_EN_2_5GBASE_T			BIT(12)
- 	__le16 eeer_value;
- 	u8 phy_id_oui[4]; /* PHY/Module ID connected on the port */
- 	u8 phy_fw_ver[8];
-@@ -356,7 +354,9 @@ struct ixgbe_aci_cmd_get_phy_caps_data {
- #define IXGBE_ACI_MOD_TYPE_BYTE2_SFP_PLUS		0xA0
- #define IXGBE_ACI_MOD_TYPE_BYTE2_QSFP_PLUS		0x86
- 	u8 qualified_module_count;
--	u8 rsvd2[7];	/* Bytes 47:41 reserved */
-+	u8 rsvd2;
-+	__le16 eee_entry_delay;
-+	u8 rsvd3[4];
- #define IXGBE_ACI_QUAL_MOD_COUNT_MAX			16
- 	struct {
- 		u8 v_oui[3];
-@@ -512,8 +512,9 @@ struct ixgbe_aci_cmd_get_link_status_data {
- #define IXGBE_ACI_LINK_SPEED_200GB		BIT(11)
- #define IXGBE_ACI_LINK_SPEED_UNKNOWN		BIT(15)
- 	__le16 reserved3;
--	u8 ext_fec_status;
--#define IXGBE_ACI_LINK_RS_272_FEC_EN	BIT(0) /* RS 272 FEC enabled */
-+	u8 eee_status;
-+#define IXGBE_ACI_LINK_EEE_ENABLED		BIT(2)
-+#define IXGBE_ACI_LINK_EEE_ACTIVE		BIT(3)
- 	u8 reserved4;
- 	__le64 phy_type_low; /* Use values from ICE_PHY_TYPE_LOW_* */
- 	__le64 phy_type_high; /* Use values from ICE_PHY_TYPE_HIGH_* */
-@@ -815,6 +816,7 @@ struct ixgbe_link_status {
- 	 * of ixgbe_aci_get_phy_caps structure
- 	 */
- 	u8 module_type[IXGBE_ACI_MODULE_TYPE_TOTAL_BYTE];
-+	u8 eee_status;
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+index 8450094a028a..186345933f3f 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+@@ -3557,6 +3557,47 @@ static const struct {
+ 	{ FW_PHY_ACT_UD_2_10G_KR_EEE, ETHTOOL_LINK_MODE_10000baseKR_Full_BIT},
  };
  
- /* Common HW capabilities for SW use */
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-index 2703207a9efa..a01d991ee2e0 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-@@ -1076,6 +1076,7 @@ void ixgbe_copy_phy_caps_to_cfg(struct ixgbe_aci_cmd_get_phy_caps_data *caps,
- 	cfg->link_fec_opt = caps->link_fec_options;
- 	cfg->module_compliance_enforcement =
- 		caps->module_compliance_enforcement;
-+	cfg->eee_entry_delay = caps->eee_entry_delay;
++static int ixgbe_validate_keee(struct net_device *netdev,
++			       struct ethtool_keee *keee_requested)
++{
++	struct ixgbe_adapter *adapter = ixgbe_from_netdev(netdev);
++	struct ethtool_keee keee_stored = {};
++	int err;
++
++	if (!(adapter->flags2 & IXGBE_FLAG2_EEE_CAPABLE))
++		return -EOPNOTSUPP;
++
++	err = netdev->ethtool_ops->get_eee(netdev, &keee_stored);
++	if (err)
++		return err;
++
++	if (keee_stored.tx_lpi_enabled != keee_requested->tx_lpi_enabled) {
++		e_err(drv, "Setting EEE tx-lpi is not supported\n");
++		return -EINVAL;
++	}
++
++	if (keee_stored.tx_lpi_timer != keee_requested->tx_lpi_timer) {
++		e_err(drv,
++		      "Setting EEE Tx LPI timer is not supported\n");
++		return -EINVAL;
++	}
++
++	if (!linkmode_equal(keee_stored.advertised,
++			    keee_requested->advertised)) {
++		e_err(drv,
++		      "Setting EEE advertised speeds is not supported\n");
++		return -EINVAL;
++	}
++
++	/* -EALREADY here is for internal use only, must be converted into
++	 * early bail out with 0 by caller
++	 */
++	if (keee_stored.eee_enabled == keee_requested->eee_enabled)
++		return -EALREADY;
++
++	return 0;
++}
++
+ static int
+ ixgbe_get_eee_fw(struct ixgbe_adapter *adapter, struct ethtool_keee *edata)
+ {
+@@ -3615,53 +3656,28 @@ static int ixgbe_set_eee(struct net_device *netdev, struct ethtool_keee *edata)
+ {
+ 	struct ixgbe_adapter *adapter = ixgbe_from_netdev(netdev);
+ 	struct ixgbe_hw *hw = &adapter->hw;
+-	struct ethtool_keee eee_data;
+ 	int ret_val;
+ 
+-	if (!(adapter->flags2 & IXGBE_FLAG2_EEE_CAPABLE))
+-		return -EOPNOTSUPP;
+-
+-	memset(&eee_data, 0, sizeof(struct ethtool_keee));
+-
+-	ret_val = ixgbe_get_eee(netdev, &eee_data);
+-	if (ret_val)
++	ret_val = ixgbe_validate_keee(netdev, edata);
++	if (ret_val == -EALREADY)
++		return 0;
++	else if (ret_val)
+ 		return ret_val;
+ 
+-	if (eee_data.eee_enabled && !edata->eee_enabled) {
+-		if (eee_data.tx_lpi_enabled != edata->tx_lpi_enabled) {
+-			e_err(drv, "Setting EEE tx-lpi is not supported\n");
+-			return -EINVAL;
+-		}
+-
+-		if (eee_data.tx_lpi_timer != edata->tx_lpi_timer) {
+-			e_err(drv,
+-			      "Setting EEE Tx LPI timer is not supported\n");
+-			return -EINVAL;
+-		}
+-
+-		if (!linkmode_equal(eee_data.advertised, edata->advertised)) {
+-			e_err(drv,
+-			      "Setting EEE advertised speeds is not supported\n");
+-			return -EINVAL;
+-		}
++	if (edata->eee_enabled) {
++		adapter->flags2 |= IXGBE_FLAG2_EEE_ENABLED;
++		hw->phy.eee_speeds_advertised =
++					   hw->phy.eee_speeds_supported;
++	} else {
++		adapter->flags2 &= ~IXGBE_FLAG2_EEE_ENABLED;
++		hw->phy.eee_speeds_advertised = 0;
+ 	}
+ 
+-	if (eee_data.eee_enabled != edata->eee_enabled) {
+-		if (edata->eee_enabled) {
+-			adapter->flags2 |= IXGBE_FLAG2_EEE_ENABLED;
+-			hw->phy.eee_speeds_advertised =
+-						   hw->phy.eee_speeds_supported;
+-		} else {
+-			adapter->flags2 &= ~IXGBE_FLAG2_EEE_ENABLED;
+-			hw->phy.eee_speeds_advertised = 0;
+-		}
+-
+-		/* reset link */
+-		if (netif_running(netdev))
+-			ixgbe_reinit_locked(adapter);
+-		else
+-			ixgbe_reset(adapter);
+-	}
++	/* reset link */
++	if (netif_running(netdev))
++		ixgbe_reinit_locked(adapter);
++	else
++		ixgbe_reset(adapter);
+ 
+ 	return 0;
  }
- 
- /**
-@@ -1404,6 +1405,7 @@ int ixgbe_aci_get_link_info(struct ixgbe_hw *hw, bool ena_lse,
- 	li->topo_media_conflict = link_data.topo_media_conflict;
- 	li->pacing = link_data.cfg & (IXGBE_ACI_CFG_PACING_M |
- 				      IXGBE_ACI_CFG_PACING_TYPE_M);
-+	li->eee_status = link_data.eee_status;
- 
- 	/* Update fc info. */
- 	tx_pause = !!(link_data.an_info & IXGBE_ACI_LINK_PAUSE_TX);
 
 -- 
 2.54.0.rc2.531.gaf818d63126a
