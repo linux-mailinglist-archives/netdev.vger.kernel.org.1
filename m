@@ -1,403 +1,141 @@
-Return-Path: <netdev+bounces-283087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283088-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QKC3Eo8j9Gmo+gEAu9opvQ
-	(envelope-from <netdev+bounces-283087-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 05:52:47 +0200
+	id 0JHPLQwm9Gnb+gEAu9opvQ
+	(envelope-from <netdev+bounces-283088-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 06:03:24 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A10E54A9FD5
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 05:52:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 17F104AA036
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 06:03:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CB651301F9EB
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 03:51:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C4FA63012E8F
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 04:03:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 678042E7F39;
-	Fri,  1 May 2026 03:51:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E030125393B;
+	Fri,  1 May 2026 04:03:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rTTdpjt5"
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="ixYVRtGg";
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="N0b6FK6+"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47CE92E22BD
-	for <netdev@vger.kernel.org>; Fri,  1 May 2026 03:51:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BAE91CEAC2;
+	Fri,  1 May 2026 04:03:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777607499; cv=none; b=P+LFgCQoLNzETTvVIe2fuSc1TpyzgQcTAu2+7WvD8/V5JFAGC/j/f+WyqBOrxHlqb6jROahP75t7tU5QWGwutMJednrZ+sOhplED7RmO9JKg393fSLqJpxxKk3xrbk7GzQwJpaQf6lClSG671Cg5zLMLNUoeAD5MQjpccAA5kVM=
+	t=1777608201; cv=none; b=sD2s/pz2Ve8NnV0qkHtR/YyxSFd+p6UcCadfVDiuGPlkgE7y58h7ZFsFc4nDO4ABona3eUGonhugrwVcTwb9d8LrPknAwaW861o5Ovw1LaTiXKQgVeTq1z/fzROrC0OX1rexEcqv2GJU4W6rr3NL8QlIule6H4ns1AvGRkxm4EM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777607499; c=relaxed/simple;
-	bh=8aVuGX6C1CY75DjKusdT6vsJr3lkhtZ1wE8vP1R+BHc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RQr83aKMi1dhZ2bbF3eo7Kg+Oa65VKmcdN6E/Yz38/vDZgWLCYb3nFvBz88MQbsOHL9oCueN3UNPCixT0/huhPd51LEAVHKoFLSdxHi8R1CakkIb6X4UA5wzHmpbb/0FkzAr6mvOf3hNQiOIIrj8MSF3RZ6PIa+9G/IcaVnibjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rTTdpjt5; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1777607495;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HUnI0n9J7drud7PwkLtSQ5IrHkcJ+FbC8XgD0dZ1e9Q=;
-	b=rTTdpjt5a3oKMZb+fZM5agLMpPlXW0MtMxZ2aw3wdSKME6m4chh6hhVctgx4XUhuf0plA4
-	olsmaNTaJzOubsrNSrK3V10sK/HpGvdC5U1UuRJFFdsT0lBcWPAk83KL92dGMjMrcEpnJO
-	2LF6QKnM5ZwhKZvUU7J3b+7aS/jDUIo=
-From: Qingfang Deng <qingfang.deng@linux.dev>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	Petr Machata <petrm@nvidia.com>,
-	Anubhav Singh <anubhavsinggh@google.com>,
-	Richard Gobert <richardbgobert@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: linux-ppp@vger.kernel.org,
-	Qingfang Deng <qingfang.deng@linux.dev>
-Subject: [PATCH net-next v8 2/2] selftests: net: test PPPoE packets in gro.sh
-Date: Fri,  1 May 2026 11:50:51 +0800
-Message-ID: <20260501035102.293031-2-qingfang.deng@linux.dev>
-In-Reply-To: <20260501035102.293031-1-qingfang.deng@linux.dev>
-References: <20260501035102.293031-1-qingfang.deng@linux.dev>
+	s=arc-20240116; t=1777608201; c=relaxed/simple;
+	bh=FkIxgPZlZNy64mEA07cC2VpF4xRbXLaoWWOeyCQgk1U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RsckGrt8lBk3YiVGy9GL/Q3ePI01e0xDGoDeewe+8USYxmDVVfH0axck9jUMlWaDkP+oOiUeDj6RInW6bp6+G4jBHcPOrSDWR86AAZoWLkZeZI3nzFirenLH24Hu3OtYrZCbbPRtmoF05XJhh9v5CGAtmpsxgZvzxdQzsDGFRVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=ixYVRtGg; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=N0b6FK6+; arc=none smtp.client-ip=23.88.97.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1777608191;
+	bh=FkIxgPZlZNy64mEA07cC2VpF4xRbXLaoWWOeyCQgk1U=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ixYVRtGgkBET00Q4AbEsrUJk9AOdaklU904nO4naDnLvq4HEGt48ZgSY9gLcxYpE8
+	 qCn5Z8EMBRIu4lzcMLBb6GAs5UGLBVNLiaKvD4BISWKil09GyKyY+nxwROAqtVAjn8
+	 gyKwcEXnGkbuQ5oDsad34HovW1DszAemz5e6r5HX4y73NpibOHV/AbkCqPidbju/5c
+	 YNT70hOJ+eBlJZz2JudQoyPSvXZKo6Z1zMk/2AdrBwU/L+MxyMMIyVKpJxnRHbXKCV
+	 8mVODifCq0mITCLiAvxOISerwyvmO7egq+9jhRiXK9GgSEFh3W5JFjvXZDCxIrkl8l
+	 dl1U+1ibk3N5w==
+Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
+	id C24EB4820C; Fri,  1 May 2026 04:03:11 +0000 (UTC)
+X-Spam-Level: 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1777608186;
+	bh=FkIxgPZlZNy64mEA07cC2VpF4xRbXLaoWWOeyCQgk1U=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=N0b6FK6+2HOT6vbT0CJcphYs3A3x/ed1irb9MFPYdl5mrF1Ux7r8nUfqgudWHahUA
+	 ula31Ro25Ht52XBGTyepJVSxM6rdIvAMs7GbjhFikwNq4BXTVXW7/WUm8Qh1HAR6rf
+	 6XcQk0onWv5EYyiXMA1oXnIDSQA//vJh8laksMq3I48zXGycTr0UX+krD7D5/v+zDz
+	 ZOFH9dKbuuIXqvyaJ7wA23fZmkz7C4EB+kzs5Ce2V+DsSldLB+HmQxMDdmh9BFKmuo
+	 Vf6z8ZkoWrgj7hGYqu+zvHFmQHE9HOlc9QJ7IHmnDUDKRC55Pay9TWcQxtwrdTLkgt
+	 FU6SNPqj0hq3w==
+Received: from [IPV6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb] (unknown [IPv6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb])
+	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 1A7294120B;
+	Fri,  1 May 2026 04:03:06 +0000 (UTC)
+Message-ID: <7b3d3fc6-bbed-4a75-ac19-33fa910359c9@birger-koblitz.de>
+Date: Fri, 1 May 2026 06:03:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: A10E54A9FD5
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: usb: r8152: add TRENDnet TUC-ET2G v2.0
+To: Aleksander Jan Bajkowski <olek2@wp.pl>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, hayeswang@realtek.com, hsu.chih.kai@realtek.com,
+ kees@kernel.org, linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>
+References: <20260430213435.21821-1-olek2@wp.pl>
+From: Birger Koblitz <mail@birger-koblitz.de>
+Content-Language: en-US
+In-Reply-To: <20260430213435.21821-1-olek2@wp.pl>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 17F104AA036
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283087-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-283088-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,nvidia.com,gmail.com,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FREEMAIL_TO(0.00)[wp.pl,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,realtek.com,vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[birger-koblitz.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[birger-koblitz.de:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email,linux.dev:dkim,linux.dev:mid]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:email,wp.pl:email]
 
-Add PPPoE test-cases to the GRO selftest. Only run a subset of
-common_tests to avoid changing the hardcoded L3 offsets everywhere.
-Add a new "pppoe_sid" test case to verify that packets with different
-PPPoE session IDs are correctly identified as separate flows and not
-coalesced.
+On 30/04/2026 11:34 pm, Aleksander Jan Bajkowski wrote:
+> The TRENDnet TUC-ET2G V2.0 is an RTL8156B based 2.5G Ethernet controller.
+> 
+> Add the vendor and product ID values to the driver. This makes Ethernet
+> work with the adapter.
+> 
+> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> ---
+>   drivers/net/usb/r8152.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+> index 7337bf1b7d6a..1ace1d2398c9 100644
+> --- a/drivers/net/usb/r8152.c
+> +++ b/drivers/net/usb/r8152.c
+> @@ -10138,6 +10138,7 @@ static const struct usb_device_id rtl8152_table[] = {
+>   	{ USB_DEVICE(VENDOR_ID_TRENDNET, 0xe02b) },
+> +	{ USB_DEVICE(VENDOR_ID_TRENDNET, 0xe02c) },
+>   
+You may also add my Reviewed-by: Birger Koblitz <mail@birger-koblitz.de>
 
-Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
----
-v8:
- - add a new macro L2_HLEN_MAX for PPPoE
-v7: https://lore.kernel.org/netdev/20260428064717.74794-2-qingfang.deng@linux.dev
- - Do not run all the tests for PPPoE
- - Add a new test for PPPoE
-v6: https://lore.kernel.org/netdev/20260326081127.61229-2-dqfext@gmail.com
-
- tools/testing/selftests/drivers/net/config |   2 +
- tools/testing/selftests/drivers/net/gro.py |  11 +++
- tools/testing/selftests/net/lib/gro.c      | 100 +++++++++++++++++----
- 3 files changed, 97 insertions(+), 16 deletions(-)
-
-diff --git a/tools/testing/selftests/drivers/net/config b/tools/testing/selftests/drivers/net/config
-index fd16994366f4..07e386895b94 100644
---- a/tools/testing/selftests/drivers/net/config
-+++ b/tools/testing/selftests/drivers/net/config
-@@ -8,5 +8,7 @@ CONFIG_NETCONSOLE=m
- CONFIG_NETCONSOLE_DYNAMIC=y
- CONFIG_NETCONSOLE_EXTENDED_LOG=y
- CONFIG_NETDEVSIM=m
-+CONFIG_PPP=y
-+CONFIG_PPPOE=y
- CONFIG_VLAN_8021Q=m
- CONFIG_XDP_SOCKETS=y
-diff --git a/tools/testing/selftests/drivers/net/gro.py b/tools/testing/selftests/drivers/net/gro.py
-index 221f27e57147..ad7c80f7ba96 100755
---- a/tools/testing/selftests/drivers/net/gro.py
-+++ b/tools/testing/selftests/drivers/net/gro.py
-@@ -313,6 +313,12 @@ def _gro_variants():
-         "ip_frag6", "ip_v6ext_same", "ip_v6ext_diff",
-     ]
- 
-+    # Tests specific to PPPoE
-+    pppoe_tests = [
-+        "data_same", "data_lrg_sml", "data_sml_lrg", "data_lrg_1byte",
-+        "data_burst", "pppoe_sid",
-+    ]
-+
-     for mode in ["sw", "hw", "lro"]:
-         for protocol in ["ipv4", "ipv6", "ipip", "ip6ip6"]:
-             for test_name in common_tests:
-@@ -325,6 +331,11 @@ def _gro_variants():
-                 for test_name in ipv6_tests:
-                     yield mode, protocol, test_name
- 
-+    for mode in ["sw"]:
-+        for protocol in ["pppoev4", "pppoev6"]:
-+            for test_name in pppoe_tests:
-+                yield mode, protocol, test_name
-+
- 
- @ksft_variants(_gro_variants())
- def test(cfg, mode, protocol, test_name):
-diff --git a/tools/testing/selftests/net/lib/gro.c b/tools/testing/selftests/net/lib/gro.c
-index 11b16ae5f0e8..4ffb0491c0da 100644
---- a/tools/testing/selftests/net/lib/gro.c
-+++ b/tools/testing/selftests/net/lib/gro.c
-@@ -67,12 +67,14 @@
- #include <errno.h>
- #include <error.h>
- #include <getopt.h>
-+#include <net/ethernet.h>
-+#include <net/if.h>
- #include <linux/filter.h>
- #include <linux/if_packet.h>
-+#include <linux/if_pppox.h>
- #include <linux/ipv6.h>
- #include <linux/net_tstamp.h>
--#include <net/ethernet.h>
--#include <net/if.h>
-+#include <linux/ppp_defs.h>
- #include <netinet/in.h>
- #include <netinet/ip.h>
- #include <netinet/ip6.h>
-@@ -102,6 +104,7 @@
- #define MAX_LARGE_PKT_CNT ((IP_MAXPACKET - (MAX_HDR_LEN - ETH_HLEN)) /	\
- 			   (ASSUMED_MTU - (MAX_HDR_LEN - ETH_HLEN)))
- #define MIN_EXTHDR_SIZE 8
-+#define L2_HLEN_MAX	(ETH_HLEN + PPPOE_SES_HLEN)
- #define EXT_PAYLOAD_1 "\x00\x00\x00\x00\x00\x00"
- #define EXT_PAYLOAD_2 "\x11\x11\x11\x11\x11\x11"
- 
-@@ -134,6 +137,7 @@ static int total_hdr_len = -1;
- static int ethhdr_proto = -1;
- static bool ipip;
- static bool ip6ip6;
-+static bool pppoe;
- static uint64_t txtime_ns;
- static int num_flows = 4;
- static bool order_check;
-@@ -171,6 +175,22 @@ static void vlog(const char *fmt, ...)
- 	}
- }
- 
-+static void fill_pppoelayer(void *buf, int payload_len, uint16_t sid)
-+{
-+	struct pppoe_ppp_hdr {
-+		struct pppoe_hdr eh;
-+		__be16 proto;
-+	} *ph = buf;
-+
-+	payload_len += sizeof(struct tcphdr);
-+	ph->eh.type = 1;
-+	ph->eh.ver = 1;
-+	ph->eh.code = 0;
-+	ph->eh.sid = htons(sid);
-+	ph->eh.length = htons(payload_len + sizeof(ph->proto));
-+	ph->proto = htons(proto == PF_INET ? PPP_IP : PPP_IPV6);
-+}
-+
- static void setup_sock_filter(int fd)
- {
- 	const int dport_off = tcp_offset + offsetof(struct tcphdr, dest);
-@@ -412,11 +432,15 @@ static void create_packet(void *buf, int seq_offset, int ack_offset,
- 
- 	fill_networklayer(buf + inner_ip_off, payload_len, IPPROTO_TCP);
- 	if (inner_ip_off > ETH_HLEN) {
--		int encap_proto = (proto == PF_INET) ?
--				  IPPROTO_IPIP : IPPROTO_IPV6;
-+		if (pppoe) {
-+			fill_pppoelayer(buf + ETH_HLEN, payload_len + ip_hdr_len, 0x1234);
-+		} else {
-+			int encap_proto = (proto == PF_INET) ?
-+					  IPPROTO_IPIP : IPPROTO_IPV6;
- 
--		fill_networklayer(buf + ETH_HLEN,
--				  payload_len + ip_hdr_len, encap_proto);
-+			fill_networklayer(buf + ETH_HLEN,
-+					  payload_len + ip_hdr_len, encap_proto);
-+		}
- 	}
- 
- 	fill_datalinklayer(buf);
-@@ -526,7 +550,7 @@ static void send_flags(int fd, struct sockaddr_ll *daddr, int psh, int syn,
- static void send_data_pkts(int fd, struct sockaddr_ll *daddr,
- 			   int payload_len1, int payload_len2)
- {
--	static char buf[ETH_HLEN + IP_MAXPACKET];
-+	static char buf[L2_HLEN_MAX + IP_MAXPACKET];
- 
- 	create_packet(buf, 0, 0, payload_len1, 0);
- 	write_packet(fd, buf, total_hdr_len + payload_len1, daddr);
-@@ -1071,6 +1095,20 @@ static void send_fragment6(int fd, struct sockaddr_ll *daddr)
- 	write_packet(fd, buf, bufpkt_len, daddr);
- }
- 
-+static void send_changed_pppoe_sid(int fd, struct sockaddr_ll *daddr)
-+{
-+	static char buf[L2_HLEN_MAX + PAYLOAD_LEN];
-+	int pkt_size = total_hdr_len + PAYLOAD_LEN;
-+	struct pppoe_hdr *hdr = (struct pppoe_hdr *)(buf + ETH_HLEN);
-+
-+	create_packet(buf, 0, 0, PAYLOAD_LEN, 0);
-+	write_packet(fd, buf, pkt_size, daddr);
-+
-+	create_packet(buf, PAYLOAD_LEN, 0, PAYLOAD_LEN, 0);
-+	hdr->sid = htons(0x4321);
-+	write_packet(fd, buf, pkt_size, daddr);
-+}
-+
- static void bind_packetsocket(int fd)
- {
- 	struct sockaddr_ll daddr = {};
-@@ -1121,9 +1159,10 @@ static void recv_error(int fd, int rcv_errno)
- static void check_recv_pkts(int fd, int *correct_payload,
- 			    int correct_num_pkts)
- {
--	static char buffer[IP_MAXPACKET + ETH_HLEN + 1];
--	struct iphdr *iph = (struct iphdr *)(buffer + ETH_HLEN);
--	struct ipv6hdr *ip6h = (struct ipv6hdr *)(buffer + ETH_HLEN);
-+	static char buffer[IP_MAXPACKET + L2_HLEN_MAX + 1];
-+	int nhoff = ETH_HLEN + (pppoe ? PPPOE_SES_HLEN : 0);
-+	struct iphdr *iph = (struct iphdr *)(buffer + nhoff);
-+	struct ipv6hdr *ip6h = (struct ipv6hdr *)(buffer + nhoff);
- 	struct tcphdr *tcph;
- 	bool bad_packet = false;
- 	int tcp_ext_len = 0;
-@@ -1140,7 +1179,7 @@ static void check_recv_pkts(int fd, int *correct_payload,
- 
- 	while (1) {
- 		ip_ext_len = 0;
--		pkt_size = recv(fd, buffer, IP_MAXPACKET + ETH_HLEN + 1, 0);
-+		pkt_size = recv(fd, buffer, sizeof(buffer), 0);
- 		if (pkt_size < 0)
- 			recv_error(fd, errno);
- 
-@@ -1183,9 +1222,10 @@ static void check_recv_pkts(int fd, int *correct_payload,
- 
- static void check_capacity_pkts(int fd)
- {
--	static char buffer[IP_MAXPACKET + ETH_HLEN + 1];
--	struct iphdr *iph = (struct iphdr *)(buffer + ETH_HLEN);
--	struct ipv6hdr *ip6h = (struct ipv6hdr *)(buffer + ETH_HLEN);
-+	static char buffer[IP_MAXPACKET + L2_HLEN_MAX + 1];
-+	int nhoff = ETH_HLEN + (pppoe ? PPPOE_SES_HLEN : 0);
-+	struct iphdr *iph = (struct iphdr *)(buffer + nhoff);
-+	struct ipv6hdr *ip6h = (struct ipv6hdr *)(buffer + nhoff);
- 	int num_pkt = 0, num_coal = 0, pkt_idx;
- 	const char *fail_reason = NULL;
- 	int flow_order[num_flows * 2];
-@@ -1203,7 +1243,7 @@ static void check_capacity_pkts(int fd)
- 
- 	while (1) {
- 		ip_ext_len = 0;
--		pkt_size = recv(fd, buffer, IP_MAXPACKET + ETH_HLEN + 1, 0);
-+		pkt_size = recv(fd, buffer, sizeof(buffer), 0);
- 		if (pkt_size < 0)
- 			recv_error(fd, errno);
- 
-@@ -1499,6 +1539,12 @@ static void gro_sender(void)
- 		usleep(fin_delay_us);
- 		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
- 
-+	/* PPPoE sub-tests */
-+	} else if (strcmp(testname, "pppoe_sid") == 0) {
-+		send_changed_pppoe_sid(txfd, &daddr);
-+		usleep(fin_delay_us);
-+		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
-+
- 	} else {
- 		error(1, 0, "Unknown testcase: %s", testname);
- 	}
-@@ -1716,6 +1762,12 @@ static void gro_receiver(void)
- 	} else if (strcmp(testname, "capacity") == 0) {
- 		check_capacity_pkts(rxfd);
- 
-+	} else if (strcmp(testname, "pppoe_sid") == 0) {
-+		correct_payload[0] = PAYLOAD_LEN;
-+		correct_payload[1] = PAYLOAD_LEN;
-+		printf("different PPPoE session ID doesn't coalesce: ");
-+		check_recv_pkts(rxfd, correct_payload, 2);
-+
- 	} else {
- 		error(1, 0, "Test case error: unknown testname %s", testname);
- 	}
-@@ -1734,6 +1786,8 @@ static void parse_args(int argc, char **argv)
- 		{ "ipv6", no_argument, NULL, '6' },
- 		{ "ipip", no_argument, NULL, 'e' },
- 		{ "ip6ip6", no_argument, NULL, 'E' },
-+		{ "pppoev4", no_argument, NULL, 'p' },
-+		{ "pppoev6", no_argument, NULL, 'P' },
- 		{ "num-flows", required_argument, NULL, 'n' },
- 		{ "rx", no_argument, NULL, 'r' },
- 		{ "saddr", required_argument, NULL, 's' },
-@@ -1745,7 +1799,7 @@ static void parse_args(int argc, char **argv)
- 	};
- 	int c;
- 
--	while ((c = getopt_long(argc, argv, "46d:D:eEi:n:rs:S:t:ov", opts, NULL)) != -1) {
-+	while ((c = getopt_long(argc, argv, "46d:D:eEi:n:pPrs:S:t:ov", opts, NULL)) != -1) {
- 		switch (c) {
- 		case '4':
- 			proto = PF_INET;
-@@ -1765,6 +1819,16 @@ static void parse_args(int argc, char **argv)
- 			proto = PF_INET6;
- 			ethhdr_proto = htons(ETH_P_IPV6);
- 			break;
-+		case 'p':
-+			pppoe = true;
-+			proto = PF_INET;
-+			ethhdr_proto = htons(ETH_P_PPP_SES);
-+			break;
-+		case 'P':
-+			pppoe = true;
-+			proto = PF_INET6;
-+			ethhdr_proto = htons(ETH_P_PPP_SES);
-+			break;
- 		case 'd':
- 			addr4_dst = addr6_dst = optarg;
- 			break;
-@@ -1812,6 +1876,10 @@ int main(int argc, char **argv)
- 	} else if (ip6ip6) {
- 		tcp_offset = ETH_HLEN + sizeof(struct ipv6hdr) * 2;
- 		total_hdr_len = tcp_offset + sizeof(struct tcphdr);
-+	} else if (pppoe) {
-+		tcp_offset = ETH_HLEN + PPPOE_SES_HLEN +
-+			(proto == PF_INET ? sizeof(struct iphdr) : sizeof(struct ipv6hdr));
-+		total_hdr_len = tcp_offset + sizeof(struct tcphdr);
- 	} else if (proto == PF_INET) {
- 		tcp_offset = ETH_HLEN + sizeof(struct iphdr);
- 		total_hdr_len = tcp_offset + sizeof(struct tcphdr);
--- 
-2.43.0
-
+Birger
 
