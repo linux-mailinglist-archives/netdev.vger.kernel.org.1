@@ -1,242 +1,534 @@
-Return-Path: <netdev+bounces-283273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283274-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SJKuK/D79GnFGwIAu9opvQ
-	(envelope-from <netdev+bounces-283273-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 21:16:00 +0200
+	id QCvaBen79GnFGwIAu9opvQ
+	(envelope-from <netdev+bounces-283274-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 21:15:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D3AE4AF17C
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 21:15:59 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15F8D4AF16E
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 21:15:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 02967301ECF4
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 19:15:31 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E187C3007ACF
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 19:15:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 003DC413225;
-	Fri,  1 May 2026 19:15:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1753B4218A6;
+	Fri,  1 May 2026 19:15:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b="Rp7q4TfE"
+	dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b="DDBknHiv"
 X-Original-To: netdev@vger.kernel.org
 Received: from usb-smtp-delivery-120.mimecast.com (usb-smtp-delivery-120.mimecast.com [170.10.153.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DF3D313E03
-	for <netdev@vger.kernel.org>; Fri,  1 May 2026 19:15:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26FE23019A9
+	for <netdev@vger.kernel.org>; Fri,  1 May 2026 19:15:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.153.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777662929; cv=none; b=Foo5e6ZWBKPLPAVUBZZxJoYgtjYAUU/zPCRtKVJAfiL5V8gwWme80vDxda6M2jIaF42txDfD0Mhi9Dv4h3rTFMi9lSrV9Z01A2gXSvFQY9UsOBXScXIZzgVFZ5onL8lOlLTM9BqaQ8OTxOgA1xS3oDj6GsW71yYZbUJUKQ4RW6k=
+	t=1777662940; cv=none; b=MsdyxRIc6ES7zNOg8H60N23xze4rJzHmeRnu/hLVjxnRlLVP2g9c+4SQvh2kFNMmr4lWak6YSNj1wjcLzFe2PR90E1iwVaOrvS1FK10Yzeb0p/+4Ti+Q1XnSR8nKXviCB6G5c4NrewIsEfHaZj374v2KE/unz/ljPQbzb/bWxQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777662929; c=relaxed/simple;
-	bh=qHSNIJ9cYlXbzAMXZ5mTRowu6vXbMWvdA8ZRuYcwsT4=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LqjTysOjkG2ymia3FW/F+aPy0lCfvwhbCH/y9vveWTLLJf+3P1qQjKs6JgsXpDZJKCQwMy14eWyKwpCHatmNgdZxbI7TmFlc6YxQRLQ5j0a8FvjOpAl9sfHVFQ0awiSnWzJICRCMTHgK/j+sIRmU2dDWQTrDoiN77vMqZDiulSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com; spf=pass smtp.mailfrom=onsemi.com; dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b=Rp7q4TfE; arc=none smtp.client-ip=170.10.153.120
+	s=arc-20240116; t=1777662940; c=relaxed/simple;
+	bh=UfK5msXccGuPPkTH0STK3T1T8QdGXytYs3gUrSgiPDc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fiZcFqelzOcdJNWrLFw5i4iKOaq70Ejh21+MW8ev/WQE1+ercXJZ6Z4J5kY1tPKd2hN17o5J9cOT3jJlz/atn10S7GM7D5auKIhE3cTGDV74sXtxJEknDaNOvOoaGvSyhYjKtZ6D+Brh+vX0H1PvopiGb9wckEqlMaMk+VYZSZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com; spf=pass smtp.mailfrom=onsemi.com; dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b=DDBknHiv; arc=none smtp.client-ip=170.10.153.120
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=onsemi.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=onsemi.com;
-	s=mimecast20250127; t=1777662928;
+	s=mimecast20250127; t=1777662937;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=qHSNIJ9cYlXbzAMXZ5mTRowu6vXbMWvdA8ZRuYcwsT4=;
-	b=Rp7q4TfEE8iSAAJAz4trllf1YLenDJT5tKwdhOL+f9Rx6g0pI/4skdOa2SFzN2eg5gCTW4
-	md9eUXPozsg82hm8Qpv4+mrUyayDP/4wXPnNGNPJyONUgfhvYsIb0N00FXd1dEZCS6S2eE
-	bEMjNZAL9e5LNKy678ouhrvozYhs25hMJLUKv/lvsHj7q0mE4bDeFDRL6Ilz4PXF7nV1H5
-	qpdZtv+RigrpIf99CP/6HbUAXbzI7YCgSkLAjhsLJMQCEc24x13zqnxfdAtN+m5BvGLaVJ
-	kZw7OP3TlXCwMB/yZ9z7n/YB/e3vKooXd/KgcBmZBugSdvKAk2wma2RdUOFoPQ==
+	bh=5rJyb4QbUWbqUCKO7924AFEEg8JVSImtO8ou8DVDX/I=;
+	b=DDBknHiv2loxmM/re3Cm/nYkX6Zhnns7NYZRxV8q005/BeMg9yb+5K+IR4GMdaX/32na1P
+	cUjHpxBUXE7ZtjLJe0kUQjEx+bsbIjSaAmclore38ntkPyWuKaNIlZI9xwFewqEVp+z8ZX
+	szajBZSP1VHSJEQGUq8m62Vv2Yr1bOuHJ/sW2lwBk/gyRAxkdl0vU9Dq4Nm+YKXXmbrk42
+	vWRtLJUh+R2ddpwzAHJTshDxIrRkM2jpEQA8tscZtvKt1yP+vu33asdBRF+dq8mJ5+IATO
+	hxQlNhI75fPqCYe9NflPKSg9s2ieoVG9+oNXVWwA4HO6h58bTkTH2yM7bvtTeg==
 Received: from CH1PR05CU001.outbound.protection.outlook.com
- (mail-northcentralusazon11010024.outbound.protection.outlook.com
- [52.101.193.24]) by relay.mimecast.com with ESMTP with STARTTLS
+ (mail-northcentralusazon11010049.outbound.protection.outlook.com
+ [52.101.193.49]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- usb-mta-70-KhvN51g4M32ZRNWY5lzbYw-1; Fri, 01 May 2026 12:15:21 -0700
-X-MC-Unique: KhvN51g4M32ZRNWY5lzbYw-1
-X-Mimecast-MFC-AGG-ID: KhvN51g4M32ZRNWY5lzbYw_1777662919
+ usb-mta-20-xUPSIRRKMVayZSQN_RaP5Q-1; Fri, 01 May 2026 12:15:28 -0700
+X-MC-Unique: xUPSIRRKMVayZSQN_RaP5Q-1
+X-Mimecast-MFC-AGG-ID: xUPSIRRKMVayZSQN_RaP5Q_1777662927
 Received: from CY8PR02MB9249.namprd02.prod.outlook.com (2603:10b6:930:9c::17)
  by SJ0PR02MB8595.namprd02.prod.outlook.com (2603:10b6:a03:3fc::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.23; Fri, 1 May
- 2026 19:15:18 +0000
+ 2026 19:15:25 +0000
 Received: from CY8PR02MB9249.namprd02.prod.outlook.com
  ([fe80::e437:4ba8:6506:4cda]) by CY8PR02MB9249.namprd02.prod.outlook.com
  ([fe80::e437:4ba8:6506:4cda%3]) with mapi id 15.20.9870.022; Fri, 1 May 2026
- 19:15:17 +0000
+ 19:15:25 +0000
 From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-To: Piergiorgio Beruto <Pier.Beruto@onsemi.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "robh@kernel.org"
-	<robh@kernel.org>, "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next 1/5] dt-bindings: net: add onsemi's TS2500/NCN26010
- 10BASE-T1S MACPHY
-Thread-Topic: [PATCH net-next 1/5] dt-bindings: net: add onsemi's
- TS2500/NCN26010 10BASE-T1S MACPHY
-Thread-Index: AdzZlV5WH2ywWnNEREiWlMiVKhqFig==
-Date: Fri, 1 May 2026 19:15:17 +0000
-Message-ID: <CY8PR02MB9249D083B637477C254F9B0583322@CY8PR02MB9249.namprd02.prod.outlook.com>
+To: Piergiorgio Beruto <Pier.Beruto@onsemi.com>, "andrew@lunn.ch"
+	<andrew@lunn.ch>, "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next 2/5] net: phy: ncn26000: add support for TS2500
+ internal PHY
+Thread-Topic: [PATCH net-next 2/5] net: phy: ncn26000: add support for TS2500
+ internal PHY
+Thread-Index: AdzZlYUfyizcr/htRFmk61PXzoS0bg==
+Date: Fri, 1 May 2026 19:15:25 +0000
+Message-ID: <CY8PR02MB924929303200D28EDEB66F4783322@CY8PR02MB9249.namprd02.prod.outlook.com>
 Accept-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_1dcb4cab-3db0-412f-be97-4e57888824a6_Enabled=True;MSIP_Label_1dcb4cab-3db0-412f-be97-4e57888824a6_SiteId=04e1674b-7af5-4d13-a082-64fc6e42384c;MSIP_Label_1dcb4cab-3db0-412f-be97-4e57888824a6_SetDate=2026-05-01T18:44:27.0000000Z;MSIP_Label_1dcb4cab-3db0-412f-be97-4e57888824a6_Name=Public
+msip_labels: MSIP_Label_1dcb4cab-3db0-412f-be97-4e57888824a6_Enabled=True;MSIP_Label_1dcb4cab-3db0-412f-be97-4e57888824a6_SiteId=04e1674b-7af5-4d13-a082-64fc6e42384c;MSIP_Label_1dcb4cab-3db0-412f-be97-4e57888824a6_SetDate=2026-05-01T18:44:31.0000000Z;MSIP_Label_1dcb4cab-3db0-412f-be97-4e57888824a6_Name=Public
  Information;MSIP_Label_1dcb4cab-3db0-412f-be97-4e57888824a6_ContentBits=3;MSIP_Label_1dcb4cab-3db0-412f-be97-4e57888824a6_Method=Privileged
 x-ms-publictraffictype: Email
 x-ms-traffictypediagnostic: CY8PR02MB9249:EE_|SJ0PR02MB8595:EE_
-x-ms-office365-filtering-correlation-id: bd2c65c3-4c77-47c3-a804-08dea7b5fb04
+x-ms-office365-filtering-correlation-id: 5d4d05e8-0e1a-4592-09e3-08dea7b5ff7f
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024|38070700021|921020|56012099003|18002099003
-x-microsoft-antispam-message-info: qefDpnvc5A//BiKTNe/yYpduA9DZTaXR2nKlKShDObyDM1BEBs4dfZwfrDO99H8yMV1xwA1kMAgczY0txPm/NdaTvBVWP5N28Q11xqE+HXLqjKFRF1bC0Y0nKzpM5ml0wPA/hvYh4JyULk+juZ++e/ATsDWcwGt3+vjCRWP99g24bjAsyr9L5GKCjIKmqYAyU8oO4uvYLLJ2VOaZl66HH98Fsp8dY9RVI8OHPnBvU0vBYe3mCcfg+Asvh30a7+ft+4jb1UYe5k4y5Xyqm4hm5147yaE6GghGC5iFWVwDb/dzCGIMBVo7mN5XPJNJWkCCihsm66b44CflTdZ7orLfNnMpfl2sO242kVY2QcEHXe9vzkVCPvTULHlzh6zCe6msSY05W1VMAYd4MmC0/iCAPXn+w3lVrAZUf/HdzXIc72inIS8EjTdZ1nEUDyqv/mVP+IiOQZ6mimNkQ2SRkpvuUMy7KGyDvOdfig16q2cD0LhU0WI1VLiYKa9jNIGUAUNiuO9Wex/yFDRLQqalOy+aNQ1xWxdaGTOrmJBx0ta3rzP1kVXbzhaHkw3bzh44VdEzA7+WMP5OeKtFcuvD7kpFWgMt3roj5+qyNEgcT1feaqaoa5Kie4IukvRTvSehvZ5buZuVTWmb1EG51Cqun185NPgVFTSzdArekv6Wa4cp58Qjxokf+uLtIqamGiQeuVePWPSLzOefOfuag3oLQHTFqA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR02MB9249.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(38070700021)(921020)(56012099003)(18002099003);DIR:OUT;SFP:1101
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700021|921020|56012099003|18002099003
+x-microsoft-antispam-message-info: ejw4VPZHoBAZsf+o6vc4zNejedaCWlvrz6sPcbD+MXrodMOXGcennSgFqKB/DkFMrI7pmDJIrKu6GLdq5/ugU/fUWY16N/skfQDjLzif1+aVr9sziGBFMYczwOVMkR1euwHO31ySw92APKMoRyo5rmMAvaB8dts9hO1xWC95H3cCL7iuMjXI8IbaWkwAqy/1bmQwB1MOu7M5QlHnH9tLAbMekOZuOgGUJX060MuJ2q34tNNG/60SSrizZmOcIdopLuOdmTq1m1fgcs6DWajjOmwW9A3WGgQ2Jxhv/pUv9pxui4xo4B69AldoVfm++gA72zuLRrDYShveYpypsYwHLkL7QEpdE5FyOUKjnZGdHIJ5//0nk+uI1dbrAwAIoEl+qbY4tnQCKnjoj4/owLHopPyaefZrwfkSfGQdZSo23UzAEP7dH85cHSbD/g+gT04kY766Ml2Q3ORBprRB04C1rjMHy9GPaB9WDyadNXBaS52hGAYKipEfhCjnNcFkcZhW2ibIhvFYuLQA5rN9AXjPxM4+v7U6aAoUgMHSPK5tV1vjZhFEkZumMRbUvF2Ne7Na1MFBdtHeINf5kwXds1fP0skl6sU281MgcC7s1AqhyIN5hr/AR9OhHx8vGa9+uWBS5jbxGNJUxJa2AowxTE3XtMrUnGrv3lCbNKRgRTNECKpDyRRJ8iidw6x8UeXeubC/AeQQz2mEISKZzWP2FpcVOg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR02MB9249.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700021)(921020)(56012099003)(18002099003);DIR:OUT;SFP:1101
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?bnljL3FyOXllUG1jT3kvWWVXMk5vcFZRY1cyWk50RnNXWisvaDBHclI1Si8v?=
- =?utf-8?B?aVp6VUg1VEVMSUROdW1Dc0JDUy81eUQ3YkhFWnd0eHZ2MHRSd2tCeEJPMHVC?=
- =?utf-8?B?am16MVp2eFYyRU1yeThYZWhUcjc2ZEZ2TkRPQkhiUnJMZlNIVG9mYWpQeUVl?=
- =?utf-8?B?RVV2b2N3U09qUWw5ckJGeWNqaVV0d0NVMlN2UFk0cFcydkdBTjc0K05aVkZQ?=
- =?utf-8?B?M3IzaGxMK2MvVGN0TUVwNDkwdmVoT1B3VE1pL0Z5Qm8xSnN6VFE1T0s5djh6?=
- =?utf-8?B?SHdKVkF3REdWcTJvcmthRHpiQ2dzdURPWk5kcU9QNXBSTEpwbFNxdW1BL2dF?=
- =?utf-8?B?cm1xeXpYalF6cGJnK1hRU3lBeDYrQkJtZnR4WnZDZ3pnd21ocTh0NU1MUGt5?=
- =?utf-8?B?cVloQkFJMjQ1QkRGQndEVllkdmhTOExhNklPK0Q2Zk1QZjltY2RlUVc3VUxt?=
- =?utf-8?B?QmphMUE2WEZhbmU0RmdZdTZBWnlXaStnTG5sbTRVaVZ1cHN5cVQrV2l0bTBr?=
- =?utf-8?B?LzIrVmRPVlRkVjJFWVpmOHBjSzdHU1NQVEppMm5HREs1MzFRY1BJV3QxYzdH?=
- =?utf-8?B?cWU3VlJZSG1acGdYQTZDOGRjdG02N1g5eTUzdFN3NjBWUk9RRks0MUtHWDZ0?=
- =?utf-8?B?NGJlNU1kYnF1aytxZWEyZStxV3N1Zkt5UmMwL0UwV0ppaW5YTExON3BWOEI0?=
- =?utf-8?B?L0Y5SVhOUE4wWTlMZjllbUlVMmJHZmFleWkyMXZzZi9JbWNtSFRUNFFvQTBu?=
- =?utf-8?B?aFVJQWFMclRkQ1phSVBNM2JvRmhBNC9pUWJ5eGVEK0dJK05sQjF2YTh2RFIw?=
- =?utf-8?B?cGhvUUlTZ0dzcmZydVdiTjgwL2xFaDVQOEF3dmtEUGIxK0dtM2w5d2hlZEZH?=
- =?utf-8?B?ZjdYTXFRb2YxNlZVSmQ4MWxXN2tGOEJJV2k1Tm5nN2hLek1FR1Y2eGFuTEc3?=
- =?utf-8?B?QmtKYU5ZcEcvSm9aSWtzTU5HZjBsWTNKamFqWERUSlVPbmRUMjlZNlllUmJ6?=
- =?utf-8?B?VHc3R29MTjRPbzJHVGFvR3VMYkVJYXN6NlBXdTBnaDRoTkp4WkZCUzRPQnpF?=
- =?utf-8?B?QkVIM0liSVVNZTBrQ2RHRHR5RG9HQUtTaFA4YTVPa3dQOXo4QWlrK1JqNFBP?=
- =?utf-8?B?VGVQWHRWQ09TWDZvWVBmV0xuMmZaV0dJbUwyWW0wRkR2ZHR2QzdGdVBBUnNy?=
- =?utf-8?B?S21QV21iS1JmZUoxZGwvd2k3TmMxOEpjRHNZMnBtcmp5a3JGOUJRM2hQb0g2?=
- =?utf-8?B?MkZ2TE01V1VUU3hSdFZuVXlQZEpNTFNzMTZUYVJMUy9FMmVwWkRWRjZhck1O?=
- =?utf-8?B?dHFaMUwwdmhMb0ZNK0g3cDA4WDRSeEI3dW5PT0ZPVXFYRzBnaE9lWDlvNnBS?=
- =?utf-8?B?V1MrUmpvdVpHVVpRTGFCQVIrQ1ZGY2x1b2tEUDhhNzB6OW1JUDVNS293UzZM?=
- =?utf-8?B?dXVwbkRqUkZuSGVWbGZQMzZJaERBM0lXVHgrc2h4Y21SWFJMY0NpelRhakZQ?=
- =?utf-8?B?TzMyOFRaYUJ5c25yUG04YXcrTlZqc3JKd0VmYVorcVAzN2g1eHd2RTVSb3N5?=
- =?utf-8?B?bUJNdkpjWnR1UDNyQVE5MHJwbjgvMVdsbWVtU25Bcm1IaUkzbm5OZ2VhbFZT?=
- =?utf-8?B?Qm5hTGZGVmI2aFBFd0FGTVJPT0p0aXIrc3hYOTN3MzloakdUL09FUlBuQlZC?=
- =?utf-8?B?YWExNm14SWtuZzVmR2p4ek82TmFFcVBiNmZHTW15d05FU1hINGV0R1ZKOW95?=
- =?utf-8?B?ZlZCSEtBZHZOMDBZY2Q4dzFaVHhHZmhURGRuQjRHUmdiN0h2M2xjNFI3OVR3?=
- =?utf-8?B?VGNpR2M5ZGJHRjJKR1I0STRUWGhXTTN0RE40NHA4dlkyTUdEMmlCSUJpa0Fy?=
- =?utf-8?B?N0o5Q3drbjRtcGJFSnBHUXFab1JMMlZhMWlOL09GbVB4bDlVciswc2srcFpz?=
- =?utf-8?B?OXBuZyt0QTl3cm1mVXBxdHUxYllyWlU2dXpzRUxab3gvbEhIdUxKdVFlTW5w?=
- =?utf-8?B?enJnMmc5RUdFU1B5b09tbnJxd1lDQ1prY0REb2Q5Z1dWVWRuNEkyY1djbnhW?=
- =?utf-8?B?RWw1dm5WY3hhMjNIU2lxNlFEaU1SRk5RSEE0WGMzNm1VT2RZNkRGQUhweHFm?=
- =?utf-8?B?SXVlVkFabHY4TmhTMnNWaVRXeFVjOTY2VlNrNFBYTUFhWXl3bnZCMVJMYlM5?=
- =?utf-8?B?RHdVNWo1aVFIZGRKUGo4aDNzUWRQd2gwMjlwL1AvTGo3aVVYbTFSeUNRWGx0?=
- =?utf-8?B?VEw3alYzTkdSWDNNRU0zZVM5ODJkcjJHVXFYVVpMRUZ0MCtVRXRKUjFYbkN2?=
- =?utf-8?B?QnQxRVBJN2ZSek9qd29lWFM4ajVkRnRvQ05UWlk0c2I2Rm9vQ1ZLZz09?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?xW1aj1kgOIkew6HwPPF2m+1KLwAxenjKo5YZI5XU9vZaRl0B8TEA1KS0r2OX?=
+ =?us-ascii?Q?TPrjl31BXijXjVO0TyYJTE/x17DKQ2wtkPz+bPGQ27ST3IbWhH9TFZWlTWOo?=
+ =?us-ascii?Q?eRoid3Y8kQ2Jv25YdGUsuitOqj+S4R8pGeDINcJxnXdZWRyrlW2OkT9cmkHX?=
+ =?us-ascii?Q?x2OY79qlFG4wxyffM8QlaHJuJ2Slfg0oIxBbTcqmyWmLaFEmsWR6DfA6exZ+?=
+ =?us-ascii?Q?vA2sJ7Rx8oK1/15aFB0PcHe/KRpIb4TY7Ib5t0LoJroRvKCUzudZORR6DJFP?=
+ =?us-ascii?Q?H6oFm3E52dJaHggk/vpTdmp1Xy5m8R+vWZS5gNBVsCiu4GrFiEz0Y9OZbzeY?=
+ =?us-ascii?Q?tBMqnAh46rGeNklUZfIy9Ybl0ARuu+Ni5SF9lLoOHn5N3j4vy+UldMtNhVBU?=
+ =?us-ascii?Q?77ZcDCoOZ9XPhR6EZuB0gm1ysU/DgJUPJEg1hBT2yPxS0+JC1+yLfm03AVau?=
+ =?us-ascii?Q?qH4lo7TwnSXQTLgEiZWB0koAP1fSJ5730K7TElbDRF4TffvMFmsNAg83bFkP?=
+ =?us-ascii?Q?NM5SUKHSKagq4CGjUewiNTbZXr1v+34ybLUjsez6kLtAbceh5jWjI1uxFXIo?=
+ =?us-ascii?Q?V0yB/Mlkw9AoYXMgoW0uWq4EpcT4y38R4IdebQm9BR1nE/DYucavGvxvMepa?=
+ =?us-ascii?Q?WCSa6N0iVEaB+tv0pFv4HKY0ezs/CXScvZJOLb6k30vHHemRNA2NUGgqUkV6?=
+ =?us-ascii?Q?DhTyK+1IBbsN1KzW1/BWgW5pNzj3R82vrU5cTWm/6Ep2GUL1MVf9X8tXLurK?=
+ =?us-ascii?Q?eODl+AxxKtwvKyVcd+zRbYwSEuvi7glT5e4ZJ0MIwbOt7OvnBaK2Qls0Zf6q?=
+ =?us-ascii?Q?gcKnpXu5+c6oRZ63ydkaZeGJHd5Ix4G2kNlXgYmAJxgVn+9DsPIXjuHa7bx2?=
+ =?us-ascii?Q?2PY3VhkVIxb9YwBb7i8AvI2+E+bpQ6T5/BsN63MIuxHfy8/c5eVMb3zi/5+F?=
+ =?us-ascii?Q?Va5/yqmzYlLBpwuYYEoE0DenpjrHDoGF+NdrH4kDI+7YOqEYxnGiuxLbsVrR?=
+ =?us-ascii?Q?kFk7NSw993OitXMYKiFkSkJ5xWbiMk09ptmy9cVemcwvKm7/EAZP7pF/PXcA?=
+ =?us-ascii?Q?LmudrEuwK+HYVCkbHLvuAXwJRYraUBCM3vg5Ykxzj6tX/QiVhKKEZD+OY06b?=
+ =?us-ascii?Q?jVVSdKK290wyebQX0M1iaFzmxaYTwXXDN5emRRDDdg/r3ZIGMu9VkSvMIMj8?=
+ =?us-ascii?Q?rYLr59gmdXyX2Y14EXMdSLdRhS9a0sit2UHvZSqZLX9Ca89K0RIw5eMcM3aX?=
+ =?us-ascii?Q?QroR70qWJFgsjT1BPquz9x2PcvJO4PqFrKMPWadR6hedAhHuE/rpQQSgYw0n?=
+ =?us-ascii?Q?sd7+aq/puOXVqvlS4j5IyHAo9F38qndSy3P+qa0Brby0Ao//yQhjVSewsd3U?=
+ =?us-ascii?Q?ML5FT2ACfrnI4Y73/mbjSej7nCmg3UCggbbtZwXB/1ox12cgaGGwqZxQYj7x?=
+ =?us-ascii?Q?LZQCPl93AcRqxZolyQ92/j7rizqVPPIDZdDvIuOsmBttqzm0kOUuQDCnUACa?=
+ =?us-ascii?Q?GsJBoWOUdaRF9fl4IJ8EEvmbDubKO1/Sf/sgoDbZ8PDHb5bpiFxSaYasSE6D?=
+ =?us-ascii?Q?H+mOiM3wVh5+KNQ9DQ6H4ZYTrUwUdts6tr/AFX4U1u3a3EQiVrwcWkaB3dte?=
+ =?us-ascii?Q?SRh+8NK1fz+qJWkOpZCeGlT0neBO7oIy5y1p3peBLMTriZRxZV4S88Swchgo?=
+ =?us-ascii?Q?JhYRCmL8a1t+aMDj2QVwA9yezxMuCaoTUmcpuF7qtpQKuytVK+tC0NojbnYV?=
+ =?us-ascii?Q?3lK70x5Xew=3D=3D?=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: GiwF83o0V7yVCOwdEYDQ+xVcCiHQiqloP2pVgfTUeTCtg2Jy3Jg+GeZfCCi6d9F2eAx2jYxxenj05zXjxAw3OeOuJFW/xXarf800EUJMrRA0P+EYUMYZXmKfuvXgnnv0pvMtbpkfxrbvtzLZvxJox59rjoU6v+Rr6rmeMxCuQtmJc6GwRxfDut8L+xM967F2UDcbKU1teogPwdjZC5IxNqayP7cXC0NWnfjpxsiApi2ximCPj47fwBZ2mSy5tX6ljHJ2ksW7LqzDui9dC4ixpHRuZyY149LtLZcTBjYqPlojZP5KpZ1CdrpqDMk7m9u+7yVUVm4iPbtXrN+hD6GAGg==
+X-Exchange-RoutingPolicyChecked: Zk+1yZ+ZjTuhmIkMrXOvuDL2WfpZlSi04RH12YFCTbx7TT3eyUwn3jD3dXO00G/3B0jXyh41MFnb3VheOyc8U4IBJ6EJrh3jnqn7jiEPvxg+QN9zun+JJNdqdxWPi94kGLy5IO4P9wDKoRpENih3P81zwH/0scvfv7JcjG5/s8X+PjFunbfT0ml7AisZKfsGsQk/stxD/+3IE2hsCeGzMlGjOHKxC3qD2qU5wO0g2JSKL4tN6SaSW3SVfdC7N/JfE18w1BZFGMIcq8K0ojceB19uZyG8t0plMHfBCYQWfqJlKwC0HGO27tLF18+wGGZwOgvqpCKayfsbQUxy2VONLg==
 X-OriginatorOrg: onsemi.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: CY8PR02MB9249.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bd2c65c3-4c77-47c3-a804-08dea7b5fb04
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 May 2026 19:15:17.4852
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5d4d05e8-0e1a-4592-09e3-08dea7b5ff7f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 May 2026 19:15:25.0454
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 04e1674b-7af5-4d13-a082-64fc6e42384c
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 9loZm9gC/v6kiKgUDAZFaoI+aHNXgIJQZlO9cvEHu+ALlSwnHtEsia3Sz655fmSv3YU6aCaEs2nhna7puT00NcaiT0d1WjVosBdo09QOc5o=
+X-MS-Exchange-CrossTenant-userprincipalname: TIM9ZgkN44DnOA5kNZxbGJEgK8Ke126sp9PqBBQ6nwDN63UdDJo9zahWQ6cR0tmVtmF5I3xtmtIy7fmv9pscyP/NHXitg5WzE0SAQ0+AQok=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR02MB8595
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: 6hXzptmsq2Yov1kIsGpV6rBC7PoXeCCLgIluTDMSfN8_1777662919
+X-Mimecast-MFC-PROC-ID: tiBeDhn1BD0E3EzED1hkfkXi8WvZ188lQLcGmd_jzqQ_1777662927
 X-Mimecast-Originator: onsemi.com
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-X-Rspamd-Queue-Id: 0D3AE4AF17C
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 15F8D4AF16E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [4.94 / 15.00];
-	SEM_URIBL(3.50)[0.0.0.0:email];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[onsemi.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[onsemi.com:s=mimecast20250127];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	BAD_REP_POLICIES(0.10)[];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283273-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	R_DKIM_ALLOW(0.00)[onsemi.com:s=mimecast20250127];
-	DMARC_POLICY_ALLOW(0.00)[onsemi.com,reject];
-	MIME_TRACE(0.00)[0:+];
-	GREYLIST(0.00)[pass,meta];
-	DKIM_TRACE(0.00)[onsemi.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FROM_NEQ_ENVFROM(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.455];
-	R_SPF_ALLOW(0.00)[+ip4:172.234.253.10:c];
+	TAGGED_FROM(0.00)[bounces-283274-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[onsemi.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[onsemi.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[CY8PR02MB9249.namprd02.prod.outlook.com:mid,onsemi.com:email,onsemi.com:dkim,onsemi.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,0.0.0.0:email,devicetree.org:url]
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,onsemi.com:email,onsemi.com:dkim,onsemi.com:url,linaro.org:email,CY8PR02MB9249.namprd02.prod.outlook.com:mid]
 
-QWRkIFlBTUwgZGV2aWNlIHRyZWUgYmluZGluZyBmb3IgdGhlIG9uc2VtaSBOQ04yNjAxMCBhbmQg
-VFMyNTAwDQpJRUVFIDgwMi4zY2cgY29tcGxpYW50IEV0aGVybmV0IHRyYW5zY2VpdmVyIGRldmlj
-ZXMuDQoNClNpZ25lZC1vZmYtYnk6IFNlbHZhbWFuaSBSYWphZ29wYWwgPFNlbHZhbWFuaS5SYWph
-Z29wYWxAb25zZW1pLmNvbT4NCi0tLQ0KIC4uLi9iaW5kaW5ncy9uZXQvb25ubixuY24yNjB4eC55
-YW1sICAgICAgICAgICB8IDcxICsrKysrKysrKysrKysrKysrKysNCiAxIGZpbGUgY2hhbmdlZCwg
-NzEgaW5zZXJ0aW9ucygrKQ0KIGNyZWF0ZSBtb2RlIDEwMDY0NCBEb2N1bWVudGF0aW9uL2Rldmlj
-ZXRyZWUvYmluZGluZ3MvbmV0L29ubm4sbmNuMjYweHgueWFtbA0KDQpkaWZmIC0tZ2l0IGEvRG9j
-dW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL25ldC9vbm5uLG5jbjI2MHh4LnlhbWwgYi9E
-b2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmluZGluZ3MvbmV0L29ubm4sbmNuMjYweHgueWFtbA0K
-bmV3IGZpbGUgbW9kZSAxMDA2NDQNCmluZGV4IDAwMDAwMDAwMC4uMTk4Y2Q3ZTlkDQotLS0gL2Rl
-di9udWxsDQorKysgYi9Eb2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmluZGluZ3MvbmV0L29ubm4s
-bmNuMjYweHgueWFtbA0KQEAgLTAsMCArMSw3MSBAQA0KKyMgU1BEWC1MaWNlbnNlLUlkZW50aWZp
-ZXI6IChHUEwtMi4wLW9ubHkgT1IgQlNELTItQ2xhdXNlKQ0KKyVZQU1MIDEuMg0KKy0tLQ0KKyRp
-ZDogaHR0cDovL2RldmljZXRyZWUub3JnL3NjaGVtYXMvbmV0L29ubm4sbmNuMjYweHgueWFtbCMN
-Ciskc2NoZW1hOiBodHRwOi8vZGV2aWNldHJlZS5vcmcvbWV0YS1zY2hlbWFzL2NvcmUueWFtbCMN
-CisNCit0aXRsZTogb25zZW1pIE5DTjI2MDEwL1RTMjUwMCAxMEJBU0UtVDFTIE1BQ1BIWSBFdGhl
-cm5ldCBDb250cm9sbGVycw0KKw0KK21haW50YWluZXJzOg0KKyAgLSBQaWVyZ2lvcmdpbyBCZXJ1
-dG8gPFBpZXIuQmVydXRvQG9uc2VtaS5jb20+DQorICAtIFNlbHZhIFJhamFnb3BhbCA8U2VsdmFt
-YW5pLlJhamFnb3BhbEBvbnNlbWkuY29tPg0KKw0KK2Rlc2NyaXB0aW9uOiB8DQorICBUaGUgTkNO
-MjYwMTAgYW5kIFRTMjUwMCBjb21iaW5lIGEgTWVkaWEgQWNjZXNzIENvbnRyb2xsZXIgKE1BQykg
-YW5kIGFuDQorICBFdGhlcm5ldCBQSFkgdG8gZW5hYmxlIDEwQkFTReKAkVQxUyBuZXR3b3Jrcy4g
-VGhlIEV0aGVybmV0IE1lZGlhIEFjY2Vzcw0KKyAgQ29udHJvbGxlciAoTUFDKSBtb2R1bGUgaW1w
-bGVtZW50cyBhIDEwIE1icHMgaGFsZiBkdXBsZXggRXRoZXJuZXQgTUFDLA0KKyAgY29tcGF0aWJs
-ZSB3aXRoIHRoZSBJRUVFIDgwMi4zIHN0YW5kYXJkIGFuZCBhIDEwQkFTRS1UMVMgcGh5c2ljYWwg
-bGF5ZXINCisgIHRyYW5zY2VpdmVyIGludGVncmF0ZWQgaW50byB0aGUgTkNOMjYwMTAuIFRoZSBj
-b21tdW5pY2F0aW9uIGJldHdlZW4NCisgIHRoZSBob3N0IGFuZCB0aGUgTUFDLVBIWSBpcyBzcGVj
-aWZpZWQgaW4gdGhlIE9QRU4gQWxsaWFuY2UgMTBCQVNFLVQxeA0KKyAgTUFDUEhZIFNlcmlhbCBJ
-bnRlcmZhY2UgKFRDNikuDQorDQorICBTcGVjaWZpY2F0aW9ucyBhYm91dCB0aGUgTkNOMjYwMTAg
-Y2FuIGJlIGZvdW5kIGF0Og0KKyAgICBodHRwczovL3d3dy5vbnNlbWkuY29tL2Rvd25sb2FkL2Rh
-dGEtc2hlZXQvcGRmL25jbjI2MDEwLWQucGRmDQorICAgIGh0dHBzOi8vd3d3Lm9uc2VtaS5jb20v
-cHJvZHVjdHMvaW50ZXJmYWNlcy9ldGhlcm5ldC1jb250cm9sbGVycy90MzBobTF0czI1MDANCisN
-CithbGxPZjoNCisgIC0gJHJlZjogL3NjaGVtYXMvbmV0L2V0aGVybmV0LWNvbnRyb2xsZXIueWFt
-bCMNCisgIC0gJHJlZjogL3NjaGVtYXMvc3BpL3NwaS1wZXJpcGhlcmFsLXByb3BzLnlhbWwjDQor
-DQorcHJvcGVydGllczoNCisgIGNvbXBhdGlibGU6DQorICAgIGNvbnN0OiBvbm5uLG5jbjI2MHh4
-DQorDQorICByZWc6DQorICAgIG1heEl0ZW1zOiAxDQorDQorICBpbnRlcnJ1cHRzOg0KKyAgICBk
-ZXNjcmlwdGlvbjogfA0KKyAgICAgIEludGVycnVwdCBmcm9tIE1BQy1QSFkgYXNzZXJ0ZWQgaW4g
-dGhlIGV2ZW50IG9mIFJlY2VpdmUgQ2h1bmtzDQorICAgICAgQXZhaWxhYmxlLCBUcmFuc21pdCBD
-aHVuayBDcmVkaXRzIEF2YWlsYWJsZSBhbmQgRXh0ZW5kZWQgU3RhdHVzDQorICAgICAgRXZlbnQu
-DQorICAgIG1heEl0ZW1zOiAxDQorDQorICBzcGktbWF4LWZyZXF1ZW5jeToNCisgICAgbWluaW11
-bTogMTUwMDAwMDANCisgICAgbWF4aW11bTogMjUwMDAwMDANCisNCityZXF1aXJlZDoNCisgIC0g
-Y29tcGF0aWJsZQ0KKyAgLSByZWcNCisgIC0gaW50ZXJydXB0cw0KKyAgLSBzcGktbWF4LWZyZXF1
-ZW5jeQ0KKw0KK2FkZGl0aW9uYWxQcm9wZXJ0aWVzOiBmYWxzZQ0KKw0KK2V4YW1wbGVzOg0KKyAg
-LSB8DQorICAgIHNwaSB7DQorICAgICAgI2FkZHJlc3MtY2VsbHMgPSA8MT47DQorICAgICAgI3Np
-emUtY2VsbHMgPSA8MD47DQorDQorICAgICAgZXRoZXJuZXRAMCB7DQorICAgICAgICBjb21wYXRp
-YmxlID0gIm9ubm4sbmNuMjYweHgiOw0KKyAgICAgICAgcmVnID0gPDA+Ow0KKyAgICAgICAgcGlu
-Y3RybC1uYW1lcyA9ICJkZWZhdWx0IjsNCisgICAgICAgIGludGVycnVwdC1wYXJlbnQgPSA8Jmdw
-aW8+Ow0KKyAgICAgICAgaW50ZXJydXB0cyA9IDwyNSAyPjsNCisgICAgICAgIHN0YXR1cyA9ICJv
-a2F5IjsNCisgICAgICAgIHNwaS1tYXgtZnJlcXVlbmN5ID0gPDI1MDAwMDAwPjsNCisgICAgICB9
-Ow0KKyAgICB9Ow0KLS0NCjIuNDMuMA0KDQoNClB1YmxpYyBJbmZvcm1hdGlvbg0K
+Support for onsemi's IEEE 802.3cg compliant Ethernet Transceiver
+with integrated Media Access Controller (MACPHY). NCN26010 and
+TS2500 are supported.
+
+Updated MAINTAINERS file
+
+Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+---
+ MAINTAINERS                |  11 ++-
+ drivers/net/phy/ncn26000.c | 193 +++++++++++++++++++++++++------------
+ 2 files changed, 144 insertions(+), 60 deletions(-)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 27a073f53..36c1b2f02 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -19934,12 +19934,21 @@ S:    Maintained
+ F:     arch/mips/boot/dts/ralink/omega2p.dts
+
+ ONSEMI ETHERNET PHY DRIVERS
+-M:     Piergiorgio Beruto <piergiorgio.beruto@gmail.com>
++M:     Piergiorgio Beruto <pier.beruto@onsemi.com>
++M:     Selva Rajagopal <selvamani.rajagopal@onsemi.com>
+ L:     netdev@vger.kernel.org
+ S:     Supported
+ W:     http://www.onsemi.com
+ F:     drivers/net/phy/ncn*
+
++ONSEMI NCN260xx/TS2500 10BASE-T1S MACPHY ETHERNET DRIVER
++M:     Piergiorgio Beruto <pier.beruto@onsemi.com>
++M:     Selva Rajagopal <selvamani.rajagopal@onsemi.com>
++L:     netdev@vger.kernel.org
++S:     Maintained
++F:     Documentation/devicetree/bindings/net/onnn,ncn260xx.yaml
++F:     drivers/net/ethernet/onsemi/ncn260xx/ncn*
++
+ OP-TEE DRIVER
+ M:     Jens Wiklander <jens.wiklander@linaro.org>
+ L:     op-tee@lists.trustedfirmware.org (moderated for non-subscribers)
+diff --git a/drivers/net/phy/ncn26000.c b/drivers/net/phy/ncn26000.c
+index cabdd83c6..d4bb4b230 100644
+--- a/drivers/net/phy/ncn26000.c
++++ b/drivers/net/phy/ncn26000.c
+@@ -2,7 +2,7 @@
+ /*
+  *  Driver for the onsemi 10BASE-T1S NCN26000 PHYs family.
+  *
+- * Copyright 2022 onsemi
++ * Copyright 2026 onsemi
+  */
+ #include <linux/kernel.h>
+ #include <linux/bitfield.h>
+@@ -11,39 +11,43 @@
+ #include <linux/module.h>
+ #include <linux/mii.h>
+ #include <linux/phy.h>
++#include <linux/ethtool.h>
++#include <linux/ethtool_netlink.h>
++#include <linux/slab.h>
++#include <linux/delay.h>
+
+ #include "mdio-open-alliance.h"
+
+ #define PHY_ID_NCN26000                        0x180FF5A1
++#define PHY_ID_TS2500                  0x180FF411
+
+-#define NCN26000_REG_IRQ_CTL            16
+-#define NCN26000_REG_IRQ_STATUS         17
++#define TO_TMR_DEFAULT                 32
+
+-// the NCN26000 maps link_ctrl to BMCR_ANENABLE
+-#define NCN26000_BCMR_LINK_CTRL_BIT    BMCR_ANENABLE
++#define NCN26000_REG_IRQ_CTL           16
++#define NCN26000_REG_IRQ_STATUS                17
+
+-// the NCN26000 maps link_status to BMSR_ANEGCOMPLETE
+-#define NCN26000_BMSR_LINK_STATUS_BIT  BMSR_ANEGCOMPLETE
++/* clause 45 vendor specific registers */
++#define NCN26000_REG_PHYCFG1_MMD       MDIO_MMD_VEND2
++#define NCN26000_REG_PHYCFG1           0x8001
+
+ #define NCN26000_IRQ_LINKST_BIT                BIT(0)
+-#define NCN26000_IRQ_PLCAST_BIT                BIT(1)
+-#define NCN26000_IRQ_LJABBER_BIT       BIT(2)
+-#define NCN26000_IRQ_RJABBER_BIT       BIT(3)
+-#define NCN26000_IRQ_PLCAREC_BIT       BIT(4)
+-#define NCN26000_IRQ_PHYSCOL_BIT       BIT(5)
+-#define NCN26000_IRQ_RESET_BIT         BIT(15)
+
+-#define TO_TMR_DEFAULT                 32
++#define NCN26000_PHYCFG1_ENI           BIT(7)
++#define NCN26000_PHYCFG1_ENI_MASK      BIT(7)
+
++/* Default value of the PLCA TO_TIMER should be 32. NCN26000 reports
++ * as 24. This is fixed in next version, in TS2500.
++ */
+ static int ncn26000_config_init(struct phy_device *phydev)
+ {
+-       /* HW bug workaround: the default value of the PLCA TO_TIMER should=
+ be
+-        * 32, where the current version of NCN26000 reports 24. This will =
+be
+-        * fixed in future PHY versions. For the time being, we force the
+-        * correct default here.
+-        */
+-       return phy_write_mmd(phydev, MDIO_MMD_VEND2, MDIO_OATC14_PLCA_TOTMR=
+,
+-                            TO_TMR_DEFAULT);
++       const struct phy_driver *pdrv =3D phydev->drv;
++       int ret =3D 0;
++
++       if (pdrv && pdrv->phy_id =3D=3D PHY_ID_NCN26000)
++               ret =3D phy_modify_mmd(phydev, MDIO_MMD_VEND2,
++                                    MDIO_OATC14_PLCA_TOTMR,
++                                    0xFFFF, TO_TMR_DEFAULT);
++       return ret;
+ }
+
+ static int ncn26000_config_aneg(struct phy_device *phydev)
+@@ -55,17 +59,20 @@ static int ncn26000_config_aneg(struct phy_device *phyd=
+ev)
+        phydev->mdix_ctrl =3D ETH_TP_MDI_AUTO;
+        phydev->mdix =3D ETH_TP_MDI;
+
+-       // bring up the link
+-       return phy_write(phydev, MII_BMCR, NCN26000_BCMR_LINK_CTRL_BIT);
++       /* NCN2600x maps link_ctrl to BMCR_ANENABLE */
++       return phy_write(phydev, MII_BMCR, BMCR_ANENABLE);
+ }
+
++/* Link status mapped to BMSR_ANEGCOMPLETE. */
+ static int ncn26000_read_status(struct phy_device *phydev)
+ {
+-       /* The NCN26000 reports NCN26000_LINK_STATUS_BIT if the link status=
+ of
+-        * the PHY is up. It further reports the logical AND of the link st=
+atus
+-        * and the PLCA status in the BMSR_LSTATUS bit.
+-        */
+-       int ret;
++       u16 status_check =3D BMSR_ANEGCOMPLETE;
++       int ret =3D 0;
++
++       phydev->duplex =3D DUPLEX_HALF;
++       phydev->speed =3D SPEED_10;
++       phydev->autoneg =3D AUTONEG_DISABLE;
++       phydev->pause =3D 0;
+
+        /* The link state is latched low so that momentary link
+         * drops can be detected. Do not double-read the status
+@@ -76,7 +83,7 @@ static int ncn26000_read_status(struct phy_device *phydev=
+)
+                ret =3D phy_read(phydev, MII_BMSR);
+                if (ret < 0)
+                        return ret;
+-               else if (ret & NCN26000_BMSR_LINK_STATUS_BIT)
++               if (ret & status_check)
+                        goto upd_link;
+        }
+
+@@ -85,30 +92,54 @@ static int ncn26000_read_status(struct phy_device *phyd=
+ev)
+                return ret;
+
+ upd_link:
+-       // update link status
+-       if (ret & NCN26000_BMSR_LINK_STATUS_BIT) {
++       /* Update link status */
++       if (ret & status_check)
+                phydev->link =3D 1;
+-               phydev->pause =3D 0;
+-               phydev->duplex =3D DUPLEX_HALF;
+-               phydev->speed =3D SPEED_10;
+-       } else {
++       else
+                phydev->link =3D 0;
+-               phydev->duplex =3D DUPLEX_UNKNOWN;
+-               phydev->speed =3D SPEED_UNKNOWN;
+-       }
+
+        return 0;
+ }
+
++/* We capture calls to PLCA set config to intercept PLCA enable/disable
++ * requests and set the proprietary ENI mode accordingly
++ */
++static int ncn26000_plca_set_cfg(struct phy_device *phydev,
++                                const struct phy_plca_cfg *plca_cfg)
++{
++       int ret =3D genphy_c45_plca_set_cfg(phydev, plca_cfg);
++       u16 cfg_enabled =3D 0;
++       int ctl0 =3D 0;
++
++       if (ret || plca_cfg->enabled < 0)
++               return ret;
++
++       ret =3D phy_read_mmd(phydev, MDIO_MMD_VEND2, MDIO_OATC14_PLCA_CTRL1=
+);
++       if (ret >=3D 0) {
++               ctl0 =3D phy_read_mmd(phydev, MDIO_MMD_VEND2,
++                                   MDIO_OATC14_PLCA_CTRL0);
++               if (ctl0 >=3D 0)
++                       dev_info(&phydev->mdio.dev, "PLCA %s: node id=3D%d,=
+ count=3D%d",
++                                (ctl0 & MDIO_OATC14_PLCA_EN) ? "ON" : "OFF=
+",
++                                ret & MDIO_OATC14_PLCA_ID,
++                                (ret & MDIO_OATC14_PLCA_NCNT) >> 8);
++       }
++
++       cfg_enabled =3D (plca_cfg->enabled) ? NCN26000_PHYCFG1_ENI : 0;
++       return phy_modify_mmd(phydev, NCN26000_REG_PHYCFG1_MMD,
++                             NCN26000_REG_PHYCFG1,
++                             NCN26000_PHYCFG1_ENI_MASK, cfg_enabled);
++}
++
+ static irqreturn_t ncn26000_handle_interrupt(struct phy_device *phydev)
+ {
+        int ret;
+
+-       // read and aknowledge the IRQ status register
++       /* Read and acknowledge the IRQ status register */
+        ret =3D phy_read(phydev, NCN26000_REG_IRQ_STATUS);
+
+-       // check only link status changes
+-       if (ret < 0 || (ret & NCN26000_REG_IRQ_STATUS) =3D=3D 0)
++       /* Check only link status changes */
++       if (ret < 0 || ((ret & NCN26000_IRQ_LINKST_BIT) =3D=3D 0))
+                return IRQ_NONE;
+
+        phy_trigger_machine(phydev);
+@@ -117,20 +148,17 @@ static irqreturn_t ncn26000_handle_interrupt(struct p=
+hy_device *phydev)
+
+ static int ncn26000_config_intr(struct phy_device *phydev)
+ {
++       u16 irqe =3D 0;
+        int ret;
+-       u16 irqe;
+
+        if (phydev->interrupts =3D=3D PHY_INTERRUPT_ENABLED) {
+-               // acknowledge IRQs
++               /* Acknowledge IRQs */
+                ret =3D phy_read(phydev, NCN26000_REG_IRQ_STATUS);
+                if (ret < 0)
+                        return ret;
+
+-               // get link status notifications
++               /* Get link status notifications */
+                irqe =3D NCN26000_IRQ_LINKST_BIT;
+-       } else {
+-               // disable all IRQs
+-               irqe =3D 0;
+        }
+
+        ret =3D phy_write(phydev, NCN26000_REG_IRQ_CTL, irqe);
+@@ -140,20 +168,66 @@ static int ncn26000_config_intr(struct phy_device *ph=
+ydev)
+        return 0;
+ }
+
++static void ncn26000_remove(struct phy_device *phydev)
++{
++       phydev->priv =3D NULL;
++}
++
++static int ncn26000_read_mmd(struct phy_device *phydev, int dev, u16 reg)
++{
++       struct mii_bus *bus =3D phydev->mdio.bus;
++       int addr =3D phydev->mdio.addr;
++
++       return __mdiobus_c45_read(bus, addr, dev, reg);
++}
++
++static int ncn26000_write_mmd(struct phy_device *phydev, int dev,
++                             u16 reg, u16 val)
++{
++       struct mii_bus *bus =3D phydev->mdio.bus;
++       int addr =3D phydev->mdio.addr;
++
++       return __mdiobus_c45_write(bus, addr, dev, reg, val);
++}
++
+ static struct phy_driver ncn26000_driver[] =3D {
++       {
++               PHY_ID_MATCH_MODEL(PHY_ID_TS2500),
++               .name                  =3D "TS2500",
++               .features              =3D PHY_BASIC_T1S_P2MP_FEATURES,
++               .remove                =3D ncn26000_remove,
++               .config_init           =3D ncn26000_config_init,
++               .config_intr           =3D ncn26000_config_intr,
++               .config_aneg           =3D ncn26000_config_aneg,
++               .read_status           =3D ncn26000_read_status,
++               .handle_interrupt      =3D ncn26000_handle_interrupt,
++               .set_plca_cfg          =3D ncn26000_plca_set_cfg,
++               .get_plca_cfg          =3D genphy_c45_plca_get_cfg,
++               .get_plca_status       =3D genphy_c45_plca_get_status,
++               .soft_reset            =3D genphy_soft_reset,
++               .get_sqi               =3D genphy_c45_oatc14_get_sqi,
++               .get_sqi_max           =3D genphy_c45_oatc14_get_sqi_max,
++               .read_mmd              =3D ncn26000_read_mmd,
++               .write_mmd             =3D ncn26000_write_mmd,
++               .cable_test_get_status =3D genphy_c45_oatc14_cable_test_get=
+_status,
++               .cable_test_start      =3D genphy_c45_oatc14_cable_test_sta=
+rt,
++       },
+        {
+                PHY_ID_MATCH_MODEL(PHY_ID_NCN26000),
+-               .name                   =3D "NCN26000",
+-               .features               =3D PHY_BASIC_T1S_P2MP_FEATURES,
+-               .config_init            =3D ncn26000_config_init,
+-               .config_intr            =3D ncn26000_config_intr,
+-               .config_aneg            =3D ncn26000_config_aneg,
+-               .read_status            =3D ncn26000_read_status,
+-               .handle_interrupt       =3D ncn26000_handle_interrupt,
+-               .get_plca_cfg           =3D genphy_c45_plca_get_cfg,
+-               .set_plca_cfg           =3D genphy_c45_plca_set_cfg,
+-               .get_plca_status        =3D genphy_c45_plca_get_status,
+-               .soft_reset             =3D genphy_soft_reset,
++               .name                  =3D "NCN26000",
++               .features              =3D PHY_BASIC_T1S_P2MP_FEATURES,
++               .remove                =3D ncn26000_remove,
++               .config_init           =3D ncn26000_config_init,
++               .config_intr           =3D ncn26000_config_intr,
++               .config_aneg           =3D ncn26000_config_aneg,
++               .read_status           =3D ncn26000_read_status,
++               .handle_interrupt      =3D ncn26000_handle_interrupt,
++               .set_plca_cfg          =3D ncn26000_plca_set_cfg,
++               .get_plca_cfg          =3D genphy_c45_plca_get_cfg,
++               .get_plca_status       =3D genphy_c45_plca_get_status,
++               .soft_reset            =3D genphy_soft_reset,
++               .read_mmd              =3D ncn26000_read_mmd,
++               .write_mmd             =3D ncn26000_write_mmd,
+        },
+ };
+
+@@ -161,11 +235,12 @@ module_phy_driver(ncn26000_driver);
+
+ static const struct mdio_device_id __maybe_unused ncn26000_tbl[] =3D {
+        { PHY_ID_MATCH_MODEL(PHY_ID_NCN26000) },
++       { PHY_ID_MATCH_MODEL(PHY_ID_TS2500) },
+        { }
+ };
+
+ MODULE_DEVICE_TABLE(mdio, ncn26000_tbl);
+
+-MODULE_AUTHOR("Piergiorgio Beruto");
++MODULE_AUTHOR("Piergiorgio Beruto <Pier.Beruto@onsemi.com>");
+ MODULE_DESCRIPTION("onsemi 10BASE-T1S PHY driver");
+ MODULE_LICENSE("Dual BSD/GPL");
+--
+2.43.0
+
+
+Public Information
 
 
