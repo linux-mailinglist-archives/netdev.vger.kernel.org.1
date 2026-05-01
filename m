@@ -1,187 +1,140 @@
-Return-Path: <netdev+bounces-283104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283105-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id dIV2DAtF9GmNAAIAu9opvQ
-	(envelope-from <netdev+bounces-283104-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 08:15:39 +0200
+	id +NrQEO9I9GkGAQIAu9opvQ
+	(envelope-from <netdev+bounces-283105-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 08:32:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CCA24AA99D
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 08:15:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96C3D4AA9E5
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 08:32:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B16B03007346
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 06:15:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6D1DD300D965
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 06:32:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5155332470A;
-	Fri,  1 May 2026 06:15:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9633335AC34;
+	Fri,  1 May 2026 06:32:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rexion.ai header.i=@rexion.ai header.b="c/zswwmj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f80.google.com (mail-oo1-f80.google.com [209.85.161.80])
+Received: from out-06.smtp.spacemail.com (out-06.smtp.spacemail.com [66.29.159.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86CC23EA8B
-	for <netdev@vger.kernel.org>; Fri,  1 May 2026 06:15:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4341C231835;
+	Fri,  1 May 2026 06:32:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.29.159.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777616136; cv=none; b=YokKCzdIe+DIIsnPSd2i2LyFjUO1unMPU1hgW9hc0/AisDw1YZwssYw23/jHL9BVNpq0oIyOaVpPtF0oEB3SMXxbeiWX9dxlpfst5FM/6g9u9GpLWWyALtkLCxDki6LaVjbih8lwiWQpcBkF0djB/Hiw0yx9mnhVTYt9sETY3Fg=
+	t=1777617131; cv=none; b=siORq22G5DX/Ms6lfhTBvgejiKm+e4whz99Mnd+1ZcBwbSywKnvCQ3okWH/RiEKc5ucAW3YCq3ck9TBL3FnubHCtlF/jA2yQMtt6aPBH6H2snjPMzfO1e0iw8l5l8vI9kP3iBA75t0xaf4VHD4HUDRTV1OQwFlkpPM2iVPmIipU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777616136; c=relaxed/simple;
-	bh=qZ4WU2pBlLmoGsXwq3Ezn4egfYWE9pBO/xwux0q5+PY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=beqC/HxUaNPXZHve0+LDXRqxmAWm+b6e4mhspqAlT5y97qBowIF2gp6OfYlOndbB0EL+9eMyZVdf7tpNZkWfZzSdWLoQ3Uk5CmRz7FkMqZHz4XjoipWf2dqODrKLDHcD+EDfvEmndtT5hohiiLCXd5cTHNpM/I90v2aWJBfEOt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f80.google.com with SMTP id 006d021491bc7-6966db8db2aso2973019eaf.0
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 23:15:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777616134; x=1778220934;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vnYtTOTH4t5DEazx+JuK0nr+p0ULTXMDrk/Z6Bp4+xc=;
-        b=Y5cssZi3Epxp7O/nlKP/8RVo1n3XCfKBvYGvX2KW/3I2uUlSxNUqkXaamIGZQAOhQg
-         h+kv2j9WpDy9Q0gIZpEyBTrDbCBwf8JvBFLO7GVKSozzVsbn+CnsZR5pcK0bEuP2RUot
-         8RqaI6y3eS2EVKW77SpXTsg5riWGIOLrkODdrMIIyPMYLuCD10Tq3jG8Bgh0k3FXncKX
-         UzPkKLl5xkSWRFDSZ6buUk6m/jxAyy7/CJ3eykZJSOknytiZJtko+T07PJmTsUfvXppj
-         OmPH6SrHp1xdycKUB0mWN/LVIJ5sqvR8LG/L0e0fuMu+GMqoUyi1ISfL5kugOvU23bKk
-         dzvQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/s8YirUiLTCHlVtoZ70iEm775D1dKZXzg/zeAvaDTlw9/B0Sbpu7ijHS7IWHPcqL37PCzDzvI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxlb9ekelSi1upyKZJYqhFDQy88drJqG0z25cvHpNTTIWWoLPbu
-	yk95qre/91Xv8ImbcCh5XvmFEFFGclbmTQKtNsQXTRYvlcZkQGAaeLhN5tQOfrrlxZuWMvOar25
-	rjEtwhJt3InztTLmkieoPJ/0ajq8NZD5BK7xq3ANrgFrZwEX+q+tRC3XaHBc=
+	s=arc-20240116; t=1777617131; c=relaxed/simple;
+	bh=swLMH6pLURjgirL9xBadXFGC5E5pIa70YvFJGr2fQdE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X65XMWRvEGK2TmW3VT28tN8DCiSoi4z+u8Y1XyYoy0N/ImILic4m8Zom3fXAKZYkQGo2BbNT1MWIig15vb0Ufi5oV1TJxuV98b/XcTK5JlSmYdBGH2xaSF6qjP+272YNZB8nPYaiV8pmKC2W+XFd0yzxxs78fwVI25SYBQUvbqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rexion.ai; spf=pass smtp.mailfrom=rexion.ai; dkim=fail (0-bit key) header.d=rexion.ai header.i=@rexion.ai header.b=c/zswwmj reason="key not found in DNS"; arc=none smtp.client-ip=66.29.159.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rexion.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rexion.ai
+Received: from Kyren (unknown [49.207.224.37])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.spacemail.com (Postfix) with ESMTPSA id 4g6Lmh6s8nz8sX2;
+	Fri, 01 May 2026 06:32:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rexion.ai;
+	s=spacemail; t=1777617129;
+	bh=Ug20lDJ3azlJTOlx8qs0QKzdbTa2xWSAosLLSGBJEeE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=c/zswwmjIVlWn3FqubHmqqLDSTG6nntUulrx5tVCtAQmztwShYrJwB1nG5yzOFq1l
+	 5zyZGdfFB9yKUb/OgWq0r70u6dnMem22uX5DWpBA3WZsvnHsoPwZ89NLWp3ZqC7Kjl
+	 obcROkbree1s4BSZcsZaW9E8M0zqollaZj2yqKQtC/u0C9ttDNrntnTDn+2EsII4tI
+	 /7/F0rOwfkRrCgsJ/80kfGvpejZkRwEqF/8rV3CJtWWONJtEWSeQ+Dc9OMpyUi9l5s
+	 pHM8a0hb46ZsapslaCLMEk1vHPHqttB5dI8GpJjkDE7rA3lrRU/TPkL6mHx0X+0c+P
+	 z4vDFa53gPtww==
+From: HACKE-RC <rc@rexion.ai>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>
+Cc: Phil Sutter <phil@nwl.cc>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	HACKE-RC <rc@rexion.ai>
+Subject: [PATCH net-next v2 0/3] netfilter: conntrack: add shared port parser and use it in IRC and Amanda helpers
+Date: Fri,  1 May 2026 12:01:53 +0530
+Message-ID: <20260501063156.2520780-1-rc@rexion.ai>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:160a:b0:694:95ae:c546 with SMTP id
- 006d021491bc7-6967bcc8597mr2734595eaf.2.1777616133780; Thu, 30 Apr 2026
- 23:15:33 -0700 (PDT)
-Date: Thu, 30 Apr 2026 23:15:33 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69f44505.050a0220.3cbe47.0008.GAE@google.com>
-Subject: [syzbot] [mptcp?] KMSAN: uninit-value in mptcp_established_options
-From: syzbot <syzbot+ff020673c5e3d94d9478@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, geliang@kernel.org, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	martineau@kernel.org, matttbe@kernel.org, mptcp@lists.linux.dev, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 7CCA24AA99D
+Content-Transfer-Encoding: 8bit
+X-Envelope-From: rc@rexion.ai
+X-Rspamd-Queue-Id: 96C3D4AA9E5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=1c3f61154f3bb7e5];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-283104-lists,netdev=lfdr.de,ff020673c5e3d94d9478];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-283105-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[rexion.ai];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
+	R_DKIM_PERMFAIL(0.00)[rexion.ai:s=spacemail];
+	DKIM_TRACE(0.00)[rexion.ai:~];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_SPAM(0.00)[0.113];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[rc@rexion.ai,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,storage.googleapis.com:url,googlegroups.com:email,syzkaller.appspot.com:url]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,rexion.ai:mid]
 
-Hello,
+Both nf_conntrack_irc and nf_conntrack_amanda parse port numbers
+from application-layer protocol data using simple_strtoul(), which
+relies on nul-terminated strings and returns unsigned long without
+range checking. Port values above 65535 silently truncate when
+stored in u16.
 
-syzbot found the following issue on:
+This v2 adds a shared nf_ct_helper_parse_port() function to the
+conntrack helper core, modeled after the approach in 8cf6809cddcb
+("netfilter: nf_conntrack_sip: don't use simple_strtoul"), then
+converts both helpers to use it.
 
-HEAD commit:    08d0d3466664 Merge tag 'net-7.1-rc2' of git://git.kernel.o..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15f6976c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1c3f61154f3bb7e5
-dashboard link: https://syzkaller.appspot.com/bug?extid=ff020673c5e3d94d9478
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-userspace arch: i386
+Changes since v1:
+  - Added shared nf_ct_helper_parse_port() in the helper core
+    instead of open-coding range checks in each helper (Pablo)
+  - Parser does not rely on nul-terminated strings
+  - Dropped simple_strtoul usage entirely for port parsing
 
-Unfortunately, I don't have any reproducer for this issue yet.
+HACKE-RC (3):
+  netfilter: conntrack: add shared port parser for helpers
+  netfilter: nf_conntrack_irc: use nf_ct_helper_parse_port()
+  netfilter: nf_conntrack_amanda: use nf_ct_helper_parse_port()
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/8688db3eb9ae/disk-08d0d346.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/72c570681077/vmlinux-08d0d346.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/21669c9bddcd/bzImage-08d0d346.xz
+ include/net/netfilter/nf_conntrack_helper.h |  3 +++
+ net/netfilter/nf_conntrack_amanda.c         | 11 ++++----
+ net/netfilter/nf_conntrack_helper.c         | 28 +++++++++++++++++++++
+ net/netfilter/nf_conntrack_irc.c            |  4 ++-
+ 4 files changed, 40 insertions(+), 6 deletions(-)
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+ff020673c5e3d94d9478@syzkaller.appspotmail.com
+-- 
+2.54.0
 
-=====================================================
-BUG: KMSAN: uninit-value in mptcp_write_data_fin net/mptcp/options.c:542 [inline]
-BUG: KMSAN: uninit-value in mptcp_established_options_dss net/mptcp/options.c:590 [inline]
-BUG: KMSAN: uninit-value in mptcp_established_options+0x112f/0x3530 net/mptcp/options.c:874
- mptcp_write_data_fin net/mptcp/options.c:542 [inline]
- mptcp_established_options_dss net/mptcp/options.c:590 [inline]
- mptcp_established_options+0x112f/0x3530 net/mptcp/options.c:874
- tcp_established_options+0x312/0xcc0 net/ipv4/tcp_output.c:1192
- __tcp_transmit_skb+0x5dc/0x5fe0 net/ipv4/tcp_output.c:1575
- __tcp_send_ack+0x967/0xad0 net/ipv4/tcp_output.c:4499
- tcp_send_ack+0x3d/0x60 net/ipv4/tcp_output.c:4505
- mptcp_subflow_shutdown+0x164/0x690 net/mptcp/protocol.c:3137
- mptcp_check_send_data_fin+0x31b/0x3d0 net/mptcp/protocol.c:3218
- __mptcp_wr_shutdown net/mptcp/protocol.c:3234 [inline]
- __mptcp_close+0x860/0x1360 net/mptcp/protocol.c:3313
- mptcp_close+0x42/0x260 net/mptcp/protocol.c:3367
- inet_release+0x1ee/0x2a0 net/ipv4/af_inet.c:442
- __sock_release net/socket.c:722 [inline]
- sock_close+0xd6/0x2f0 net/socket.c:1514
- __fput+0x60e/0x1010 fs/file_table.c:510
- ____fput+0x25/0x30 fs/file_table.c:538
- task_work_run+0x208/0x2b0 kernel/task_work.c:233
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- __exit_to_user_mode_loop kernel/entry/common.c:67 [inline]
- exit_to_user_mode_loop+0x306/0x1b60 kernel/entry/common.c:98
- __exit_to_user_mode_prepare include/linux/irq-entry-common.h:207 [inline]
- syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:238 [inline]
- syscall_exit_to_user_mode include/linux/entry-common.h:318 [inline]
- __do_fast_syscall_32+0x2c7/0x460 arch/x86/entry/syscall_32.c:310
- do_fast_syscall_32+0x37/0x80 arch/x86/entry/syscall_32.c:332
- do_SYSENTER_32+0x1f/0x30 arch/x86/entry/syscall_32.c:370
- entry_SYSENTER_compat_after_hwframe+0x84/0x8e
-
-Local variable opts created at:
- __tcp_transmit_skb+0x4d/0x5fe0 net/ipv4/tcp_output.c:1536
- __tcp_send_ack+0x967/0xad0 net/ipv4/tcp_output.c:4499
-
-CPU: 0 UID: 0 PID: 24584 Comm: syz.4.6812 Tainted: G        W           syzkaller #0 PREEMPT(full) 
-Tainted: [W]=WARN
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
-=====================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
