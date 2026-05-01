@@ -1,405 +1,270 @@
-Return-Path: <netdev+bounces-283023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283031-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4MZjDqzs82kV8wEAu9opvQ
-	(envelope-from <netdev+bounces-283023-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 01:58:36 +0200
+	id MHMoKivv82n38wEAu9opvQ
+	(envelope-from <netdev+bounces-283031-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 02:09:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C33D04A90CD
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 01:58:35 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6477C4A91C9
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 02:09:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8101A302F248
-	for <lists+netdev@lfdr.de>; Thu, 30 Apr 2026 23:56:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1638B3014A0D
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 00:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97C9B3DBD63;
-	Thu, 30 Apr 2026 23:56:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6389913E02A;
+	Fri,  1 May 2026 00:08:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HTHYrutO"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Z1SwNDOr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010026.outbound.protection.outlook.com [52.101.61.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7487C3D9DB3;
-	Thu, 30 Apr 2026 23:56:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777593387; cv=none; b=j8Q+bTMT1YhA/V8MldkIqyLnBOln0cCIC8Q/qnnUSQW+HafFPNV/z0E5otVfsKfDj9Kwhaie6A/oGXvbItoUWvgaYSFtCbetK191q5PemlKOtRQBP0gk7HAB7/jiqLxMbLU0w+BC4vsgGOVH88sF2t1Ho/1sVu2SUPeXQfyWj9Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777593387; c=relaxed/simple;
-	bh=Xjt9d8An4SheLcIFTQP4r2cQFtRU13RlK74dYzrR/08=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HsehJ75Dt519NVQS9dQMKHEm66Idds6bBlGAf9HZaSJrkVpcaXkwYudr9nX0wZ/sqS1lYUTUwx5ig4SRQQeVLgDYUUFasT8l2EyNr2ssTb7+cRisvEuURLQmJISIuMPfHZe4xsCaAB0s6AXzaFZcKf8DvgWBTMwip4xktmowUW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HTHYrutO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52447C2BCB3;
-	Thu, 30 Apr 2026 23:56:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777593386;
-	bh=Xjt9d8An4SheLcIFTQP4r2cQFtRU13RlK74dYzrR/08=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HTHYrutO3wEsiOdD/ieZwOG2d1+2Bpy+B5r+5Yan3tUfspfQxFQPo6eOiss3Icsfl
-	 xfJ4YlI2DTKxAjqcNnTkFIApm2yhkGtTHKngkT0rYaTVkjk12Fc0B2JYJvOO+j9r/K
-	 9QDzqCtzOVHHOg8RHsN4Nr1doF6dck5t73cMLjq3FhaYbpsa7n/r7UocVLr2H3kFwT
-	 VDaZXX6FT5s4vDuGf2j5RLQA4DiXc7vuSf8J6o/SyT1nRxiUYEu7CveyRz5NGo68ks
-	 byUduPkOM+7h+uPQfOXWYgXau0cqCSF02bvUVU83cjexXYprjpi2tZpN99qhQmw116
-	 3WNVRnWgUhozQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: joey@tinyisr.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C46335975;
+	Fri,  1 May 2026 00:08:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.26
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777594139; cv=fail; b=etRV23Js/yDEZ6P7+1H+ZMGx1DdE+6m91hSXIWr0vkEzzgP2YumygOg0/GCMBGQtfZHBDQZXIdSL+QDE23FWOqUzxK/A5bghZPidFkLZCDhT/DpsLXJk3lKzC+G5vNneU+CYF3fWipG6BRqht2QSTEM5eBeEUtKUCpb2S8CYLLw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777594139; c=relaxed/simple;
+	bh=ND7sKTofEY0sDte7OfNZDhZr2X/goVZR/Mqh+hWroh8=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=qZaruup6TlI4Rr18iZsnA85L1xt5qUXgZ18scW6mxLF4ojqo7btRohYEKS9oNfR3eNyCjVy7at3NidrDcLzqj/37+R8ZdlsLaFWKjdGT7KkOiz3e3w3yp6ocDoxy2rmdGQNmkBoynZiWXCwJ+QGb7yozTmToIlBi0fcEMyia14E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Z1SwNDOr; arc=fail smtp.client-ip=52.101.61.26
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Lm3PFygP+Zu1EcPfuq3cf0vAocrh7ZmbEF4E5hcUpnbo65m3Jr+V+bMIA2EeZFy/g7s0LOK4tIBS5UVVBS529tD5Aydrw//pZ4L3KXevyy2wBGqXQcdlRRoIwjibMY/nyuqExMSvxcmiRh2uxTfq3wV/UoFNpXAjb1FUT7OSGPSb68ys8ldUOZxrIOlo6clayZ1JH9RiFW6+2NhN/HjU34W5hBWKfGQsioI3EcCUbQFGaaZUfPHQ6XicQetimGTXGX6BhQlzQv/e52RycT3Dn8uYWF0834mKKX2ZS48RGaLuZgevpNkamPvrd7wYrJ+R+Sf+eOcw6mZwGaqPDjwvYg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=b4rx+HwIlN4DXQsISJIiNaNKocWNbLy0KAHbQUoM+CE=;
+ b=nj5rfzJmBvGeNqGL4Zg2CH7GusKsuNDeD3vexyFlIrr/Bwb0uTNI852pq1aUGCvtL5rc8dDGNTst3Wbl/mNFpaKOhwDBZ8/NPD8PuMKyZeqX9mh/E8mNi1ld/HGkfEyGmCoUcEpKgIULxpaTX1+CvOeqjRhCzMXkHCXNsu2nBPnDAofRI2cpumQiRIQm+T5WgV6RKSjPWgRy1sIlOqH3A/YuTiZ4+p1FPKcJWB6vMsXNdXJIRK7/QbHunwJNVZNey1407r1VfmdDlVAdYfSvJMhcbGF0nwpBQqPp9h30PYeYQtU6qgksjG7NbajJp/HmSHvpp5EumqsWQe2wMLL6eA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=b4rx+HwIlN4DXQsISJIiNaNKocWNbLy0KAHbQUoM+CE=;
+ b=Z1SwNDOr7G6ZUWcW3uXoYpHKLSK+fRnYOkP6X4aa9m4HbsuGqozG/z1nTnfgKB7SF4mFIarvg9RYH12sYkluYexBtui3EVBOmTayWio8W/XzKIc7s3DhhRhBSD+Ce/8VE+flGzqhselZxShqFa63uHuH0MKWfRvRC2Q0cHhhBKNpbWres4PAw8e870pWNNoKIb3Kxf3/+7Q9t6U9yHtsWLRS/Mu+JxrhGr2XkYDaP9lSUodaAy3E1aZpwUVEWqUnknwkX0k0kNtzN9V6LyT78RT1nXZt0sjLjirz1Uqw0qrx84cwi9kmu4TOhCs1/7CrjtDgqEfdaulkvch+ewXohA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV8PR12MB9620.namprd12.prod.outlook.com (2603:10b6:408:2a1::19)
+ by SAVPR12MB999167.namprd12.prod.outlook.com (2603:10b6:806:4e5::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.19; Fri, 1 May
+ 2026 00:08:39 +0000
+Received: from LV8PR12MB9620.namprd12.prod.outlook.com
+ ([fe80::299d:f5e0:3550:1528]) by LV8PR12MB9620.namprd12.prod.outlook.com
+ ([fe80::299d:f5e0:3550:1528%5]) with mapi id 15.20.9870.013; Fri, 1 May 2026
+ 00:08:39 +0000
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Alex Williamson <alex@shazbot.org>,
+	David Matlack <dmatlack@google.com>,
+	kvm@vger.kernel.org,
+	Leon Romanovsky <leon@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	Mark Bloch <mbloch@nvidia.com>,
 	netdev@vger.kernel.org,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	davem@davemloft.net,
-	olteanv@gmail.com,
-	andrew@lunn.ch,
-	devicetree@vger.kernel.org,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org
-Subject: Re: [PATCH net-next v3 4/4] net: dsa: initial support for MT7628 embedded switch
-Date: Thu, 30 Apr 2026 16:56:23 -0700
-Message-ID: <20260430235623.3080104-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260428185510.261521-5-joey@tinyisr.com>
-References: <20260428185510.261521-5-joey@tinyisr.com>
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>
+Cc: patches@lists.linux.dev
+Subject: [PATCH 00/11] mlx5 support for VFIO self test
+Date: Thu, 30 Apr 2026 21:08:26 -0300
+Message-ID: <0-v1-dc5fa250ca1d+3213-mlx5st_jgg@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BL1PR13CA0152.namprd13.prod.outlook.com
+ (2603:10b6:208:2bd::7) To LV8PR12MB9620.namprd12.prod.outlook.com
+ (2603:10b6:408:2a1::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: C33D04A90CD
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV8PR12MB9620:EE_|SAVPR12MB999167:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7b886a4d-5a52-4f21-22c4-08dea715cbb7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|366016|921020|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	ow4iWnjDiPC7DGKGCoogC1/0QUibBkny19bRTL8dtKtAVG4ZUrnOfiv48xyPubLXim9agKQse++siq7uaTtb/ykWTTymJO1MHLPQ9rtnzU7tNLzlXlL1+Vn7v7dCtri0gHl5J+kWcwZ2X/Ba12nEOclFK5f1fH83kEC+F6toUzyQUDLVqRIPZ3Ji8WKeUc/uNTeXqji28brSdu+JFpq/4MkgM0TI8yRAema81QiadSgP3upB84OH1l4JS79o0ADWrWG7xvce+5Znt75bbDHhQOEl8OQPEgIG3NuoBun1dNT/pl6kHxsuOCsVkj1yVw4h4oG+h9iH08dxV0wiwaxS7WngbKGsjh0NvSuNWKpbMLQHm6cbDHdnM/fPQLONwyKWttjODnPxX2jNZco0w7c68PGMn5XmRi+Nr4QkmrY3vqj8bPwwjlpfFlYQ1e6NT983FIf+giGHzLb6D/Lp73kpTX6BO9m7pwygWtu8i7GumRHbZIkFv1+9pvLfMDcIKqiw70L9vW1XsM57kaIidoSkoSW0qyXQNdJ67fjVECFfZB8m822IBYw7VhZ0Lx4C0WCV9go9jES18dvTrLd3rZxlgw5BAatI9HR65D5dQi1+LlM/6GI/C6h9MyZPo/nFInFYw+YNWF4W+MAF/0eAJ1gRs2/iF2nJJBX8Y4r+Hnn4lOS/TjCKPAr09aYj77z9cuXnGR4C8075yUcIALxiYI0QfJm94edgRPXmW6E2LUow7DU=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR12MB9620.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(921020)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Ih1kvpQ6RgmfjkDzgbZkGWvQMpXJp4tXtpC5dtU321OMTwYLMt3deDkX1jM1?=
+ =?us-ascii?Q?QrAaw87vmsAMACEZpm4A5tx08+mp/eUfWWFBqCivQbQ1EeszceNST3F9qwlX?=
+ =?us-ascii?Q?Gas/tS0JRVa12bmOGy3ea8AJAXpZLJkC0EwpDLVsGvN1XrpeH87xGGm7YtOX?=
+ =?us-ascii?Q?jbwo+bi62jaArrBYPGcz+xAv0gKKv1QJAMydyDgsiAGV5lrFxi1GxWb6gxc3?=
+ =?us-ascii?Q?IystCYsvDJiutVSLM2q+l+xQNfriAtTDHfhMBNG+pSOETlGjIDO3hMPAf7Q9?=
+ =?us-ascii?Q?oFAdV7ZdjqRyhAJ6eLowLjwAHk0AM/1sKzKjPnOEc5SWwXHrXIlz9P39boZk?=
+ =?us-ascii?Q?oPiCNWmGdkTVxmnMfG6G/mQJWw59OTBVmmL6RbxS5OnmFMzh+vhXsr23wKMa?=
+ =?us-ascii?Q?psTySzQWZKq/NqbWGmA1dJTa+L7hYb64XjbXw0t9IMr/uL6wf23bAyKJ58Qa?=
+ =?us-ascii?Q?hcZux/PCrR3kkA4ubdpMXcCq4dvWNWmX/cwa2oPhVKnl2Qq9AvVXCmP2TQjx?=
+ =?us-ascii?Q?p9XbZu5iFlOEE4d8fFcDjFo1TP3MN8AXdPUY8UGJ2TInA8igDsgJ1IFchPva?=
+ =?us-ascii?Q?JDHRDc7bPBusMeebyOVluvxZ7TM1v0QPwATAhQD7PvzQm4zYNa+viAV+4/xY?=
+ =?us-ascii?Q?A9EXJQzXxfA4/MeduRpWLnsPbLissHeAUmU6kcdqn8UgRWk1ClzLfLx+vYHF?=
+ =?us-ascii?Q?54sQqXmkRNdFmCu8rdlFDObuKFzN0VP+nMQvJD/GYHYkpAH97jtj7Qi6GAnp?=
+ =?us-ascii?Q?LAYSfDQ4VMKvRmAo3mkklA0OSUAYkvW6zhz6Y/DnLSFBvf1CgdnxC6C0IcCk?=
+ =?us-ascii?Q?7JdoAqS+pDlMSdWpUedG0+8rpAfz6gVKFF+EaxKMmC0paybEBNST2qXP8oBh?=
+ =?us-ascii?Q?rE8Bq3n5o+lp/wfE102RxaUuKVLn6GpcRfCxr1gPlBvfbXtlciORH7yqmGHu?=
+ =?us-ascii?Q?1FPPD5Zxuyc3cyeFWIqp9NHZ0godfJlkrVR4Pl4Bt1AgL105qIK54NzNkaXr?=
+ =?us-ascii?Q?ooO5JKjlKYb5SB2TcmFGMIlbO7muuMyBTLN6a0h8rr7oj6QOtcWNllkp3IT8?=
+ =?us-ascii?Q?5uedh7geXMnbvGptZtq6g7BBo6j+3KIBwo0g048fn5TfEWHEZcMb25T2PCSc?=
+ =?us-ascii?Q?c77QkcRqpiuO/KEnMvK6cxlnj/1QJArdCeZsSIK0x8HXCKbW37LYf3xziQ8e?=
+ =?us-ascii?Q?gF7qfvrBZBvSTBL90Yrq2/AkhYEUP5UzXlnpjFIdeHB4tDABifKxvpFOnCVG?=
+ =?us-ascii?Q?0uxgmqLWU4TDYDjI/Vtf40t5AdYBaknGk+WBXyLluelJl0kD6KNIT7+l/r9e?=
+ =?us-ascii?Q?m7XYL4+UvmVC9M/AzIYX+ARkUQ5nqQS7NLVQekVvGAuOFKkxeXKGtaQ75uOo?=
+ =?us-ascii?Q?YsW6nHPt8bjdOpULuOKWzkX+daZ7sSg5vsZKMg7BcGKlJU1EDpXlt1Fjth7H?=
+ =?us-ascii?Q?I6kpcMQKXlgPrLmx6PQot57frM5ouqi0Jyv/02CtjbU/VJw8E5qCywAIoA8h?=
+ =?us-ascii?Q?M0XpIOsRqIt9fLSPoMJ3IK2T4FTpQkdb6p5VFQkVhRz+QIMiqbHjeVAUub0M?=
+ =?us-ascii?Q?10w0VW1uj8U3TV8nH/guvbXCPLscfTTy/soQHZav/jVXlEgYhjj/LOBNmqWp?=
+ =?us-ascii?Q?4ivFJVAn5DyYcvpKed+VOuHWxsSMoI+bjkfViR8HmqLVh0DYf+UYHwiv20dV?=
+ =?us-ascii?Q?oT9WOO18xrNF0rB4Jj40oSn9hgfWUbtODmvkeQKWMFU5z0vf?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b886a4d-5a52-4f21-22c4-08dea715cbb7
+X-MS-Exchange-CrossTenant-AuthSource: LV8PR12MB9620.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 May 2026 00:08:38.8251
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QetU0dTsnK4H06TNItrjZdVirR9QlSNlxv99/Op0kfIx41NnNELO+xRhNexkiIUo
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SAVPR12MB999167
+X-Rspamd-Queue-Id: 6477C4A91C9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,redhat.com,google.com,davemloft.net,gmail.com,lunn.ch];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-283023-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283031-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[jgg@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	DBL_PROHIBIT(0.00)[0.0.0.5:email];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	NEURAL_HAM(-0.00)[-0.995];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nvidia.com:mid,Nvidia.com:dkim]
 
-This is an AI-generated review of your patch. The human sending this
-email says "Since Andrew requested some changes already here is the
-AI review to look thru as well (could be false positives)."
----
-net: dsa: initial support for MT7628 embedded switch
+Add an mlx5 driver to VFIO self test. This is largely a remix of the
+existing VFIO mlx5 driver in rdma-core. It uses an RDMA loopback QP
+to issue RDMA WRITE operations which effectively perform memory
+copies using DMA. Since mlx5 has a stable programming ABI this
+should work on devices from CX5 to current HW. The device FW must
+support the QP loopback configuration.
 
-This patch adds a new DSA driver for the MT7628 embedded switch, with
-five 100Mbps user ports, a 1Gbps CPU port, and a 16-entry VLAN table
-that is used via tag_8021q for port isolation.
+Also support send_msi by arming completion events of the RDMA WRITE
+to trigger MSI delivery.
 
-> diff --git a/drivers/net/dsa/mt7628.c b/drivers/net/dsa/mt7628.c
-> new file mode 100644
-> index 000000000000..1ed99706e41d
-> --- /dev/null
-> +++ b/drivers/net/dsa/mt7628.c
+mlx5 device startup is very complex and most of this code is just
+booting the device, with a smaller amount for operating the QP.
 
-[ ... ]
+This entire series was coded by Claude Code in about 4 days. It
+used about 4.5M output tokens, 30 individual sessions and 5600 lines
+of AI-generated .md files. I spent an annoying amount of time
+de-slopping and cleaning its work product to make it presentable.
+However, previous VFIO drivers have taken on the order of 1-2
+months to write, so getting one in a week is pretty remarkable.
 
-> +static int mt7628_mii_read(struct mii_bus *bus, int port, int regnum)
-> +{
-> +	struct mt7628_esw *esw = bus->priv;
-> +	int ret;
-> +	u32 val;
-> +
-> +	ret = regmap_read_poll_timeout(esw->regmap, MT7628_ESW_REG_PCR1, val,
-> +				       !(val & MT7628_ESW_PCR1_RD_DONE), 10,
-> +				       5000);
-> +	if (ret)
-> +		goto out;
-> +
-> +	ret = regmap_write(esw->regmap, MT7628_ESW_REG_PCR0,
-> +			   FIELD_PREP(MT7628_ESW_PCR0_CPU_PHY_REG,
-> +				      regnum) |
-> +			   FIELD_PREP(MT7628_ESW_PCR0_CPU_PHY_ADDR,
-> +				      port) | MT7628_ESW_PCR0_RD_PHY_CMD);
-> +	if (ret)
-> +		goto out;
-> +
-> +	ret = regmap_read_poll_timeout(esw->regmap, MT7628_ESW_REG_PCR1, val,
-> +				       (val & MT7628_ESW_PCR1_RD_DONE), 10,
-> +				       5000);
-> +out:
+For those interested, the flow I used was broadly a prompt sequence
+sort of like:
 
-Can these MDIO routines work after the first transaction?
+ - Hey Claude, go look at the falcon series, VFIO self test, the
+   mlx5 driver, rdma-core and some PDF documentation and make a
+   plan to put mlx5 under the selftest.
+ - Write an rdma-core application using the built-in VFIO provider
+   that can do the required memcpy operations that vfio selftests
+   wants.
+   (This resulted in a 1k loc C file that compiled and ran the
+    first time but had a few bugs related to device programming
+    that the AI resolved.)
+ - Replace the rdma-core components with open-coded versions to
+   create a fully stand-alone program that does the DMA memcpy.
+ - Review and audit the thing.
+ [Pause and de-slop it]
+ - Make it work on a PF too (this is surprisingly hard!).
+ [Move to a kernel tree and copy all the .md files and .c program
+  it made]
+ - Hey Claude, look at all this stuff and make a broad plan to
+   actually build a VFIO self test.
+ - Here is my 1 sentence advice on what each patch should look
+   like, make a detailed plan to make a patch for every one.
+ [Pause and polish the patch plans]
+ - Execute plan X then commit it [pause and de-slop each patch,
+   repeat].
+ [Review and final polish]
 
-Both mt7628_mii_read() and mt7628_mii_write() first poll for
-MT7628_ESW_PCR1_RD_DONE / WT_DONE to be clear, then issue the PCR0
-command, then poll for the done bit to become set.  Nothing in the driver
-writes-to-clear these done bits.
+It is based on a tree with the falcon series applied.
 
-After a successful read, MT7628_ESW_PCR1_RD_DONE is 1 (that is the loop's
-exit condition).  On the next mt7628_mii_read() call the first poll waits
-for it to become 0, which only happens if the hardware auto-clears the
-done bit on a new PCR0 command write.
+Jason Gunthorpe (11):
+  net/mlx5: Add IFC structures for CQE and WQE
+  net/mlx5: Move HW constant groups from device.h/cq.h to mlx5_ifc.h
+  net/mlx5: Extract MLX5_SET/GET macros into mlx5_ifc_macros.h
+  net/mlx5: Add ONCE and MMIO accessor variants to mlx5_ifc_macros.h
+  selftests: Add additional kernel functions to tools/include/
+  selftests: Fix arm64 IO barriers to match kernel
+  vfio: selftests: Allow drivers to specify required region size
+  vfio: selftests: Add dev_dbg
+  vfio: selftests: Add mlx5 driver - HW init and command interface
+  vfio: selftests: Add mlx5 driver - data path and memcpy ops
+  vfio: selftests: mlx5 driver - add send_msi support
 
-Is that hardware behavior documented?  Similar MediaTek DSA drivers
-(mt7530/mt7531) do not precede the command with a wait-for-not-done poll.
-If the bit does not self-clear on command issue, every MDIO transaction
-after the first would spin for ~5ms and return -ETIMEDOUT.
+ include/linux/mlx5/cq.h                       |   10 -
+ include/linux/mlx5/device.h                   |  231 +-
+ include/linux/mlx5/mlx5_ifc.h                 |  178 ++
+ include/linux/mlx5/mlx5_ifc_macros.h          |  185 ++
+ tools/arch/arm64/include/asm/barrier.h        |   18 +
+ tools/arch/x86/include/asm/barrier.h          |    5 +
+ tools/include/asm-generic/io.h                |   28 +
+ tools/include/asm/barrier.h                   |    8 +
+ tools/include/linux/stddef.h                  |   10 +
+ .../selftests/vfio/lib/drivers/mlx5/mlx5.c    | 1920 +++++++++++++++++
+ .../selftests/vfio/lib/drivers/mlx5/mlx5_hw.h |  114 +
+ .../vfio/lib/drivers/mlx5/mlx5_ifc.h          |    1 +
+ .../vfio/lib/drivers/mlx5/mlx5_ifc_fpga.h     |    1 +
+ .../vfio/lib/drivers/mlx5/mlx5_ifc_macros.h   |    1 +
+ .../lib/include/libvfio/vfio_pci_device.h     |    6 +
+ .../lib/include/libvfio/vfio_pci_driver.h     |    3 +
+ tools/testing/selftests/vfio/lib/libvfio.mk   |    1 +
+ .../selftests/vfio/lib/vfio_pci_driver.c      |    2 +
+ .../selftests/vfio/vfio_pci_driver_test.c     |    3 +-
+ 19 files changed, 2485 insertions(+), 240 deletions(-)
+ create mode 100644 include/linux/mlx5/mlx5_ifc_macros.h
+ create mode 100644 tools/include/linux/stddef.h
+ create mode 100644 tools/testing/selftests/vfio/lib/drivers/mlx5/mlx5.c
+ create mode 100644 tools/testing/selftests/vfio/lib/drivers/mlx5/mlx5_hw.h
+ create mode 120000 tools/testing/selftests/vfio/lib/drivers/mlx5/mlx5_ifc.h
+ create mode 120000 tools/testing/selftests/vfio/lib/drivers/mlx5/mlx5_ifc_fpga.h
+ create mode 120000 tools/testing/selftests/vfio/lib/drivers/mlx5/mlx5_ifc_macros.h
 
-> +	if (ret) {
-> +		dev_err(&bus->dev, "read failed. MDIO timeout?\n");
-> +		return ret;
-> +	}
-> +	return FIELD_GET(MT7628_ESW_PCR1_RD_DATA, val);
-> +}
 
-[ ... ]
+base-commit: 75b2e40c376951e2174f08c871389955253d3f5e
+-- 
+2.43.0
 
-> +static void mt7628_switch_init(struct dsa_switch *ds)
-> +{
-> +	struct mt7628_esw *esw = ds->priv;
-> +
-> +	regmap_write(esw->regmap, MT7628_ESW_REG_FCT0,
-
-[ ... ]
-
-> +	regmap_update_bits(esw->regmap, MT7628_ESW_REG_PFC1,
-> +			   MT7628_ESW_PFC1_EN_VLAN,
-> +			   FIELD_PREP(MT7628_ESW_PFC1_EN_VLAN,
-> +				      MT7628_ESW_PORTS_ALL));
-> +}
-
-Should mt7628_switch_init() also initialize MT7628_ESW_REG_POC0's
-PORT_DISABLE field to a known state?
-
-DSA only invokes .port_enable / .port_disable for ports described in the
-DT and brought up by the stack.  The CPU port and the non-existent port 5
-are never touched, so they stay at the hardware reset default.  If the
-default is enabled, traffic may be forwarded on ports the driver believes
-are inactive; if disabled, the CPU port may never come up because
-mt7628_port_enable() is only called for user ports.
-
-Other DSA drivers (for example b53_common.c) explicitly set all port
-enable bits to a known state in .setup() before letting per-port callbacks
-modify them.  Is a similar initialization needed here?
-
-[ ... ]
-
-> +static void mt7628_vlan_sync(struct dsa_switch *ds)
-> +{
-
-[ ... ]
-
-> +}
-> +
-> +static int mt7628_setup(struct dsa_switch *ds)
-> +{
-> +	struct mt7628_esw *esw = ds->priv;
-> +	int ret;
-> +
-> +	reset_control_reset(esw->rst_esw);
-> +	usleep_range(1000, 2000);
-> +	reset_control_reset(esw->rst_ephy);
-> +	usleep_range(1000, 2000);
-> +	/*
-> +	 * all MMIO reads hang if esw is not out of reset
-> +	 * ephy needs extra time to get out of reset or it ends up misconfigured
-> +	 */
-> +	mt7628_switch_init(ds);
-
-Should the return values from reset_control_reset() be checked?
-
-The comment in this function says "all MMIO reads hang if esw is not out
-of reset".  reset_control_reset() can fail with -EBUSY, -ENOTSUPP and
-similar (see drivers/reset/core.c), and on failure mt7628_switch_init()
-proceeds to issue regmap writes/reads against a block still held in
-reset, which by this comment hangs the CPU.
-
-Can these return values be propagated from mt7628_setup()?
-
-[ ... ]
-
-> +static void mt7628_phylink_get_caps(struct dsa_switch *ds, int port,
-> +				    struct phylink_config *config)
-> +{
-> +	switch (port) {
-> +	case 6:
-> +		config->mac_capabilities |= MAC_1000;
-> +		fallthrough;
-> +	case 0 ... 4:
-> +		config->mac_capabilities |= MAC_100 | MAC_10;
-> +		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
-> +			  config->supported_interfaces);
-> +		break;
-> +	default:
-> +		break;		/* port 5 does not exist on MT7628 */
-> +	}
-> +}
-
-How is port 5 meant to be handled?
-
-ds->num_ports is set to MT7628_ESW_NUM_PORTS (7), but this function
-comments that port 5 does not exist on MT7628 and leaves its capabilities
-empty.  DSA iterates 0..num_ports-1 in several generic paths (for
-example the tag_8021q setup loop), and phylink setup on a port with
-empty mac_capabilities and no supported_interfaces will warn.
-
-The driver appears to rely on the DT never declaring a port@5 node.  Is
-that implicit contract intentional, and should it be documented or
-enforced (for example by rejecting a port@5 in probe)?
-
-> +
-> +static int mt7628_dsa_8021q_vlan_add(struct dsa_switch *ds, int port,
-> +				     u16 vid, u16 flags)
-> +{
-> +	struct mt7628_esw *esw = ds->priv;
-> +	struct mt7628_vlan *vlan = NULL;
-> +	int i;
-> +
-> +	for (i = 0; i < MT7628_NUM_VLANS; i++) {
-> +		struct mt7628_vlan *check_vlan = &esw->vlans[i];
-> +
-> +		if (!check_vlan->active && !vlan) {
-> +			vlan = check_vlan;
-> +		} else if (check_vlan->vid == vid) {
-> +			vlan = check_vlan;
-> +			break;
-> +		}
-> +	}
-
-Is the else-if branch here intentional for inactive slots?
-
-mt7628_dsa_8021q_vlan_del() clears members, untag and active, but leaves
-vlan->vid untouched:
-
-	vlan->members &= ~BIT(port);
-	vlan->untag &= ~BIT(port);
-
-	if (!vlan->members)
-		vlan->active = false;
-
-An inactive slot that previously held the same VID will therefore match
-via check_vlan->vid == vid and be reused.  For vid == 0 every pristine
-zero-initialized slot also matches, making slot selection
-non-deterministic.
-
-tag_8021q currently composes non-zero VIDs (see DSA_8021Q_RSV in
-net/dsa/tag_8021q.c), so vid == 0 is not reachable via tag_8021q today,
-but the .tag_8021q_vlan_add API itself accepts any u16.  Would guarding
-the match with check_vlan->active (or clearing vid on delete) make the
-allocator more robust?
-
-> +
-> +	if (!vlan)
-> +		return -ENOSPC;
-> +
-> +	vlan->vid = vid;
-> +	vlan->active = true;
-> +	vlan->members |= BIT(port);
-> +
-> +	if (flags & BRIDGE_VLAN_INFO_PVID)
-> +		esw->tag_8021q_pvid[port] = vid;
-> +
-> +	if (flags & BRIDGE_VLAN_INFO_UNTAGGED)
-> +		vlan->untag |= BIT(port);
-> +
-> +	mt7628_vlan_sync(ds);
-> +	return 0;
-> +}
-> +
-> +static int mt7628_dsa_8021q_vlan_del(struct dsa_switch *ds, int port, u16 vid)
-> +{
-> +	struct mt7628_esw *esw = ds->priv;
-> +	struct mt7628_vlan *vlan = NULL;
-> +	int i;
-> +
-> +	for (i = 0; i < MT7628_NUM_VLANS; i++) {
-> +		struct mt7628_vlan *check_vlan = &esw->vlans[i];
-> +
-> +		if (!check_vlan->active || check_vlan->vid != vid)
-> +			continue;
-> +		vlan = check_vlan;
-> +		break;
-> +	}
-> +	if (!vlan)
-> +		return -ENOENT;
-> +
-> +	vlan->members &= ~BIT(port);
-> +	vlan->untag &= ~BIT(port);
-> +
-> +	if (!vlan->members)
-> +		vlan->active = false;
-> +
-> +	mt7628_vlan_sync(ds);
-> +	return 0;
-> +}
-
-Should vlan_del also clear esw->tag_8021q_pvid[port] when the VID being
-deleted is the port's current PVID?
-
-mt7628_vlan_sync() unconditionally programs esw->tag_8021q_pvid[port]
-into MT7628_ESW_REG_PVIDC for every port:
-
-	for (i = 0; i < ds->num_ports; i++)
-		mt7628_esw_set_pvid(esw, i, esw->tag_8021q_pvid[i]);
-
-If the VLAN being deleted becomes inactive (members == 0), the hardware
-PVID for the port still references that VLAN slot, which will be
-reprogrammed with empty members/untag.  Untagged ingress on that port
-would then be tagged with a VID whose VLAN table entry has no members.
-
-In the normal bridge_join/bridge_leave flow
-(dsa_tag_8021q_bridge_join/leave in net/dsa/tag_8021q.c) the replacement
-VID is added (with BRIDGE_VLAN_INFO_PVID) before the old one is deleted,
-which masks the issue.  On teardown/unbind
-(dsa_tag_8021q_port_teardown() deletes without a preceding add) the
-stale pvid can linger and be re-applied by any later vlan_sync.
-
-> +
-> +static void mt7628_teardown(struct dsa_switch *ds)
-> +{
-> +	rtnl_lock();
-> +	dsa_tag_8021q_unregister(ds);
-> +	rtnl_unlock();
-> +}
-> +
-> +static struct dsa_switch_ops mt7628_switch_ops = {
-       ^^^^^^
-
-This isn't a bug, but should mt7628_switch_ops be const?  struct
-dsa_switch holds a const struct dsa_switch_ops *ops, and other DSA
-drivers (mt7530, sja1105, felix, ...) declare their ops tables const so
-the vtable lives in .rodata.
-
-> +	.get_tag_protocol = mt7628_get_tag_proto,
-> +	.setup = mt7628_setup,
-> +	.teardown = mt7628_teardown,
-> +	.port_enable = mt7628_port_enable,
-> +	.port_disable = mt7628_port_disable,
-> +	.phylink_get_caps = mt7628_phylink_get_caps,
-> +	.tag_8021q_vlan_add = mt7628_dsa_8021q_vlan_add,
-> +	.tag_8021q_vlan_del = mt7628_dsa_8021q_vlan_del,
-> +};
-
-[ ... ]
 
