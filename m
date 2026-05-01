@@ -1,134 +1,131 @@
-Return-Path: <netdev+bounces-283041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283042-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wN14IM/282kC9QEAu9opvQ
-	(envelope-from <netdev+bounces-283041-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 02:41:51 +0200
+	id MHOUGHn582lo9QEAu9opvQ
+	(envelope-from <netdev+bounces-283042-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 02:53:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC9144A93FA
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 02:41:50 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDB784A9626
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 02:53:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B91533019BBB
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 00:40:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F19B5301A42D
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 00:53:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2009F2475F7;
-	Fri,  1 May 2026 00:40:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D2D3264A9D;
+	Fri,  1 May 2026 00:53:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HHV/X1fL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OvErAkrR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EED951A6831;
-	Fri,  1 May 2026 00:40:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F89267B07;
+	Fri,  1 May 2026 00:53:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777596059; cv=none; b=quycAsEk8KbntXJeeBaCWRU4QRADrFmLGOcUlZgL37TDdi4CQDuYwS7xe1DykbYZbLhXu3X3n/Lk4iPo4/xKuNzebGTTxZQ9e5CKvQN5uZE5LOH+kJTMufJ7E8GS/HZ9+xMsbYtvsEIqFKF3FsoADV9gWOdhcHrK1Sd1H/twnDc=
+	t=1777596788; cv=none; b=XIjmREvc5PLP9J2ORPeXKuPibElDKLEK1scy1K7koGue0D/dN4/7l+JtbuDPT5XrDIIGD7JkgLOGHDzxu3TCA6rAW6W0adNozqLGkFQ7s7Zdjn0z6an7LZtezbnQrPV+Zzh4dLyOJjUf3QUiIhLTg8M+Vy5kxezOVUS3GacftUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777596059; c=relaxed/simple;
-	bh=PtLrFph3lbPc8YZ5Wtnug2wfYQTeFOm+zgR85PMU9o8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Qy5gNkr7nC54sibSYEsjz3vwKIq/QmXIJwND0QdhP2OQEyILPzc1+nEcc0ruDVkT6emUZKGv9Wi+52DdZr4rZCDLIWVSLTDe2K99kIvz7xYDcbNyIzCUu7a+QPh7PiKnHJgjwdjobxMg1E4H7tnmqcvhIYI0KQUA4Scyoe0e5p8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HHV/X1fL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96054C2BCB3;
-	Fri,  1 May 2026 00:40:58 +0000 (UTC)
+	s=arc-20240116; t=1777596788; c=relaxed/simple;
+	bh=d0XT4/t91RskoEJQxzzKgFJMNLW9IouAU7J8aDIYAmw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=It2HLOkSCuL71ubSJ02ibBPLWro+z7KIYNBm1ZWDTPR8LzX+Ho81raU42+MDDqh6m7moptUz7qvPixSwf/beJgooZ8020alvuphNGounm7EmOS32iwDAXYBUnmOPWHLS5Mcigjvj8zqQyGhYpt0FBmWT0Abs4JLgE+XgO0egjB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OvErAkrR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4F26C2BCB3;
+	Fri,  1 May 2026 00:53:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777596058;
-	bh=PtLrFph3lbPc8YZ5Wtnug2wfYQTeFOm+zgR85PMU9o8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HHV/X1fL7ldck/K9s6hXOe92t/h8W0JZ5mNaSTTGebMlhVCCgi+/cPQ7LGU57gmt0
-	 Y6HR1EAkGrNT/DDBgeUI2bwkDKHZMbqFYmLJjfV3DaWaXwKtPb4j0BirU2TSubxhND
-	 mznGy+8x6+fsCRIXt9EGLXTxj4f5okvfLhBHCez1WaPFZ3I5oN41ZW0BTEs/w9Uup+
-	 q5oBqXjH54Nj3zmx5kBACPxazYV+BIrviec4Rj7w7NWGJQDW7wsTZ54/qJPfVUEB2u
-	 jgzb/pRBPZM04vrRxtSdwuo/44u/+UGtjEt5OLLIn0NL74ahCi+8F+r3lHIbpLS+Ww
-	 GTxM03khH/5/A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02BFD380CEC4;
-	Fri,  1 May 2026 00:40:14 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1777596787;
+	bh=d0XT4/t91RskoEJQxzzKgFJMNLW9IouAU7J8aDIYAmw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=OvErAkrReBqj9eyP4ir2aJOVzvOro/O1nq6Kgsz4yExaOJxK5Llu+zOelrVvOwbHN
+	 c7L3hx7EPsZ8NAYdqaJu2IzaNdf1diLw+GXrJGe2nQfrF9XqUTBsZiKcRx51Y5L8Ge
+	 r1DLtt67IZYqxTrX42O626oImVgWzpafNz0zfnCze2uRFaNcFZ8NKS6tHTKYyJ491T
+	 r4MZPaT+bkFpoT78G56dG7B0rdumxAzbCwFDAH9m8/s5H+9fTAcxuMyCWFU5kHjclR
+	 75DHavrk4gF8/7PMyalAEHEcrZZRh8cwzDw7uv8jxfhQBjgQO8skWa99+jAcfJmaVj
+	 8qQXNQapYWNVg==
+From: Sasha Levin <sashal@kernel.org>
+To: stable@vger.kernel.org,
+	Tung Nguyen <tung.q.nguyen@dektech.com.au>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Jon Maloy <jmaloy@redhat.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Robert Garcia <rob_garcia@163.com>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 5.15.y] tipc: fix kernel warning when sending SYN message
+Date: Thu, 30 Apr 2026 20:53:05 -0400
+Message-ID: <20260430160000.item003-5.15@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260429075033.234885-1-rob_garcia@163.com>
+References: <20260429075033.234885-1-rob_garcia@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3] net/smc: cap allocation order for SMC-R
- physically contiguous buffers
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177759601254.3265014.6576952498122987091.git-patchwork-notify@kernel.org>
-Date: Fri, 01 May 2026 00:40:12 +0000
-References: <20260429021637.21815-1-alibuda@linux.alibaba.com>
-In-Reply-To: <20260429021637.21815-1-alibuda@linux.alibaba.com>
-To: D. Wythe <alibuda@linux.alibaba.com>
-Cc: davem@davemloft.net, dust.li@linux.alibaba.com, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, sidraya@linux.ibm.com,
- wenjia@linux.ibm.com, mjambigi@linux.ibm.com, horms@kernel.org,
- tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- oliver.yang@linux.alibaba.com, pasic@linux.ibm.com
-X-Rspamd-Queue-Id: DC9144A93FA
+X-Rspamd-Queue-Id: CDB784A9626
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283041-lists,netdev=lfdr.de,netdevbpf];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-283042-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,davemloft.net,163.com,zeniv.linux.org.uk,vger.kernel.org,lists.sourceforge.net];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-Hello:
+On Wed, Apr 29, 2026 at 03:50:33PM +0800, Robert Garcia wrote:
+> From: Tung Nguyen <tung.q.nguyen@dektech.com.au>
+>
+> [ Upstream commit 11a4d6f67cf55883dc78e31c247d1903ed7feccc ]
+>
+> When sending a SYN message, this kernel stack trace is observed:
+[...]
+> It is because commit a41dad905e5a ("iov_iter: saner checks for attempt
+> to copy to/from iterator") has introduced sanity check for copying
+> from/to iov iterator. Lacking of copy direction from the iterator
+> viewpoint would lead to kernel stack trace like above.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Thanks for the submission, but I don't think we need this in 5.15.y.
 
-On Wed, 29 Apr 2026 10:16:37 +0800 you wrote:
-> The alloc_pages() cannot satisfy requests exceeding MAX_PAGE_ORDER,
-> and attempting such allocations will lead to guaranteed failures
-> and potential kernel warnings.
-> 
-> For SMCR_PHYS_CONT_BUFS, cap the allocation order to MAX_PAGE_ORDER.
-> This ensures the attempts to allocate the largest possible physically
-> contiguous chunk succeed, instead of failing with an invalid order.
-> This also avoids redundant "try-fail-degrade" cycles in
-> __smc_buf_create().
-> 
-> [...]
+The WARN this fix silences was added by a41dad905e5a ("iov_iter: saner
+checks for attempt to copy to/from iterator"), which landed in v6.1 and
+has never been backported to 5.15.y. Without that prerequisite the WARN
+isn't reachable in 5.15 — the SYN/ACK sends call copy_from_iter_full()
+with dsz=0 on a zero-initialized msghdr, and 5.15's _copy_from_iter()
+only WARNs for ITER_PIPE iters, not on data_source.
 
-Here is the summary with links:
-  - [net-next,v3] net/smc: cap allocation order for SMC-R physically contiguous buffers
-    https://git.kernel.org/netdev/net-next/c/4cc5130ee84a
+Your ITER_SOURCE -> WRITE adaptation is correct, but since the bug is
+absent in 5.15 the patch isn't needed there.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+--
+Thanks,
+Sasha
 
