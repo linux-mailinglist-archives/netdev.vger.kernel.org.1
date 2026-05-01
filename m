@@ -1,251 +1,314 @@
-Return-Path: <netdev+bounces-283145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283147-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iN1OHn159GliBgIAu9opvQ
-	(envelope-from <netdev+bounces-283145-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 11:59:25 +0200
+	id F21UBj599GlDBwIAu9opvQ
+	(envelope-from <netdev+bounces-283147-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 12:15:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68DB34AB774
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 11:59:24 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 213894AB863
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 12:15:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 581B93006918
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 09:59:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D1E4F300821C
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 10:15:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05D6A37E2E4;
-	Fri,  1 May 2026 09:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="kn+SB0JY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E21837EFFE;
+	Fri,  1 May 2026 10:15:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from mail-m155101.qiye.163.com (mail-m155101.qiye.163.com [101.71.155.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D992239E76;
-	Fri,  1 May 2026 09:59:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D081DE2D8;
+	Fri,  1 May 2026 10:15:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.71.155.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777629559; cv=none; b=bnSQRxGv3febnw3OWHtHQI8t7SaY9fAWhNlsR36ioeO7JlZ5loE06wlzq1gbBkOy8NxAvq5TJ69wEvjUwQIwIszXg7Ekd34xb85AqUqN3lT3glzzxzG7j9QIOmY0wUITIYUMPTbKxmjWPho2JHsMG3VtiLodKBuX3Pr22svsKV0=
+	t=1777630523; cv=none; b=osRTJ+UmjZfOF601JqFarHsW1Kveyh1nfrClcCSqQwrdmU/cEGssbrWo9F1ELATrkIlz86sKGyZbNO9zS9JbhqDQH773l1K4QqFVqwW+DBzp7Za0YLqLZ3ma7oXQkDRdg2AwwWrDfSfp0SdoPRczAWO7CjAPxEtoYNT0WhOCCNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777629559; c=relaxed/simple;
-	bh=Ht1Z3AXesOuPDUPc68E58Er9GLEBiH8LQ/rtm1UWLW4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Ws3oy4aBFSYQbItlpk6yaosyLkwnrDGnuy7VNnGSfJ8t+HlNv9rUO+LumRLEH8NAJ/2nU9S6ks6u6b4kn16yc+B4wEiVQPhp+Ss3GuRG8GW8a0StTDzVUV9BEbVQ2kc0joIZh8msNG5iLv+avH3x+b9qRfwYc55bj/UucgAyoPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=kn+SB0JY; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:
-	Reply-To:Content-ID:Content-Description:In-Reply-To:References;
-	bh=Do0+DvOjHI9jdfhPM/JNVzuWC0QX+D3vjQ5ws8ibw3o=; b=kn+SB0JYTGW5ig/0BzSnWAExxU
-	tgn9aDH8Ze5e7S91XqUqBY3FdSzc9LN2SXPC89LSD6hCVheGn+ft7XDjbGt3XBvy/NZffgO+iDjLW
-	3DGmK6yt7Fcww3LNv4gECuDdI1tho/mZKGyoUXCOBa2I9CxVHAAzB6DZYZ32gNY6gWXjInPDre3Im
-	nizrjQ5IAFA7TsvoC5TgkDCnH1arMlaQBPSCoB8CsjoSw7Bav74/SFiA91Ha+OmTQjUvbxarqgdEb
-	I/mUBgoBAAqQNqMoAeWPmWo3ktf24MY4fk1RAlR0Kk0a/r8SmcZ7tmNaSbphP8Quds8RzG80RFZG8
-	B1kI3sVg==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wIkeH-008UfD-2G;
-	Fri, 01 May 2026 09:59:06 +0000
-From: Breno Leitao <leitao@debian.org>
-Date: Fri, 01 May 2026 02:58:41 -0700
-Subject: [PATCH net] netpoll: pass buffer size to egress_dev() to avoid MAC
- truncation
+	s=arc-20240116; t=1777630523; c=relaxed/simple;
+	bh=dl+25Eus40M68Ieerpnxepbae0fwQlJmCdnGm4sytp8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Vt1CvxdxXAa2Doy2FFO6SL9/qIHYNC/F2PqwV96eM2u7vT8BQi9Es/NcibajsruQqzfj2JNO1WF+x1cmV16tTFUlY79Pe8uT3RrDz6sHK20Cgl3Al6RswJa2W0pPpsJm74zAmyaJXmQMhIqmQO962argvcQrDKPycmz5g1v/a50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jmu.edu.cn; spf=pass smtp.mailfrom=jmu.edu.cn; arc=none smtp.client-ip=101.71.155.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jmu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jmu.edu.cn
+Received: from Vostro-3710.. (unknown [119.122.215.211])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 3cdf2484d;
+	Fri, 1 May 2026 18:10:02 +0800 (GMT+08:00)
+From: Chukun Pan <amadeus@jmu.edu.cn>
+To: "David S . Miller" <davem@davemloft.net>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Chukun Pan <amadeus@jmu.edu.cn>
+Subject: [PATCH v3 1/1] net: phy: realtek: Add support for PHY LEDs on RTL8221B
+Date: Fri,  1 May 2026 18:00:02 +0800
+Message-Id: <20260501100002.755672-1-amadeus@jmu.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260501-netpoll_snprintf_fix-v1-1-84b0566e6597@debian.org>
-X-B4-Tracking: v=1; b=H4sIAFF59GkC/yXMTQqDMBAG0KsM39pAIlpsrlKK+DNpp8gYkrQI4
- t2l7fYt3o7MSTjD047EH8myKjy5ijA9B32wkRmeUNv6YlvrjHKJ67L0WWMSLaEPsplrOzZ2tk0
- XXIeKEBMH2X7tDcoF9z/m9/jiqXxDHMcJT8sSwH0AAAA=
-X-Change-ID: 20260501-netpoll_snprintf_fix-95b40d048f18
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Uday Shankar <ushankar@purestorage.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, clm@meta.com, 
- kernel-team@meta.com, stable@vger.kernel.org, 
- Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.16-dev-453a6
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4419; i=leitao@debian.org;
- h=from:subject:message-id; bh=Ht1Z3AXesOuPDUPc68E58Er9GLEBiH8LQ/rtm1UWLW4=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBp9HllnQja2imHnx+OEwGtxaShqQxoe5+dI4pzo
- 4yjvV+OXPeJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCafR5ZQAKCRA1o5Of/Hh3
- bcU6D/9PkQStRQorMuIfbwxmVw77MUB2MeRx2IiDRqaGA+jZgQySh+4YJE77+uPgDT2d7+SF0f7
- TrZQgOfmYd+tfR/xtwN9vpPMxo0FwZp6vi13NHYcYuH+WkE9AUU8Wm9M8q60syxImWr10saGiQb
- mfPZYhoI7es9BX6WNFux7ry4JldbduM7wneL5vW5B4ta6pV+s4h7FS2zywVr0FMoExQVoPvw+Ns
- MR46guVAPvSo+OChOFDSJGVrt/cm6rOUbPHByOzLwBJWpiRzTW3yjpAxmRVOM2nrN1xr9wvLV24
- jra3fTbMuOXsF/49oiShYXTKBdDlfBV6g+wKuHa1hPjqzRG715Sj4T7flTYjDmrcTpCIecDuHXo
- gBcAM/Kf9t2JEoOvDWfMgjnO/iYfShX+7Cn8mZCqBW/pCEYVW8yPF3nFZupU/WLVyC2GJw3fBW2
- TlRaI1nTGA/HtWqw24Vj1yx8uPx9UaEVPuua7Ybr7XpGYJ2HlCSwdr3CJHkUhhSmqrH40Bbj1o2
- VDXvGxQtVNlQaDt0+pMoltMvYUT1LnzpAgMKFVAO2SpMpFjnq9nZcU55czVDW0NCPIk6aRSoNEy
- kALji9hVEg+JPEltJzLXz6uiTY+XoqCg8XhZMujPMbYwS3MGZThW+M1yYoEKkUbdkaN9mRYdB/S
- dCXVMSEnIdMn7cQ==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
-X-Debian-User: leitao
-X-Rspamd-Queue-Id: 68DB34AB774
+Content-Transfer-Encoding: 8bit
+X-HM-Tid: 0a9de3044b0303a2kunm9d72a4a436bf6
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVlCQxlCVkJNSUNITBhLSUIaSVYeHw
+	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlKSkJVSklJVUlKTlVJSkpZV1kWGg8SFR0UWUFZT0tIVUpLSE
+	pOTE5VSktLVUpCS0tZBg++
+X-Rspamd-Queue-Id: 213894AB863
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+X-Spamd-Result: default: False [4.94 / 15.00];
+	SEM_URIBL(3.50)[jmu.edu.cn:email];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[jmu.edu.cn : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
+	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283145-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,redhat.com,kernel.org,google.com,armlinux.org.uk,makrotopia.org,gmail.com,vger.kernel.org,jmu.edu.cn];
+	TAGGED_FROM(0.00)[bounces-283147-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	GREYLIST(0.00)[pass,meta];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[debian.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[amadeus@jmu.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.992];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	R_DKIM_NA(0.00)[];
+	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,jmu.edu.cn:mid,jmu.edu.cn:email]
 
-egress_dev() formats np->dev_mac via snprintf() but receives buf as
-a bare char *, so it cannot derive the buffer size from the pointer. The
-size argument was hardcoded to MAC_ADDR_STR_LEN (3 * ETH_ALEN - 1 = 17),
-which is silly wrong in two ways:
+Realtek RTL8221B Ethernet PHY supports three LED pins which are used to
+indicate link status and activity. Add netdev trigger support for them.
 
- 1) misleading kernel log output on the MAC-selected target path
-    (np->dev_name[0] == '\0'); for example "aa:bb:cc:dd:ee:ff doesn't
-    exist, aborting" was logged as "aa:bb:cc:dd:ee:f doesn't exist,
-    aborting".
-
- 2) the second argument of snprintf is the size of the buffer, not the
-    size of what you want to write.
-
-Add a bufsz parameter to egress_dev() and pass sizeof(buf) from each
-caller, matching the standard snprintf() idiom and removing the
-hardcoded size from the helper.
-
-Every caller already declares "char buf[MAC_ADDR_STR_LEN + 1]" so the
-formatted MAC continues to fit.
-
-Tested by booting with
-  netconsole=6665@/aa:bb:cc:dd:ee:ff,6666@10.0.0.1/00:11:22:33:44:55
-on a kernel without a matching device. Pre-fix dmesg shows
-"aa:bb:cc:dd:ee:f doesn't exist, aborting"; post-fix shows the full
-"aa:bb:cc:dd:ee:ff doesn't exist, aborting".
-
-Fixes: f8a10bed32f5 ("netconsole: allow selection of egress interface via MAC address")
-Cc: stable@vger.kernel.org
-Signed-off-by: Breno Leitao <leitao@debian.org>
+Signed-off-by: Chukun Pan <amadeus@jmu.edu.cn>
 ---
- net/core/netpoll.c | 23 +++++++++++++----------
- 1 file changed, 13 insertions(+), 10 deletions(-)
+Changes in v3:
+- In led_hw_control_set, reset the LED polarity to default.
+- Link to v2: https://lore.kernel.org/all/20260420100800.2435204-1-amadeus@jmu.edu.cn/
+Changes in v2:
+- Invert the LED polarity in led_brightness_set to achieve LED_ON.
+- Link to v1: https://lore.kernel.org/all/20260401100010.3079700-1-amadeus@jmu.edu.cn/
+---
+ drivers/net/phy/realtek/realtek_main.c | 165 +++++++++++++++++++++++++
+ 1 file changed, 165 insertions(+)
 
-diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-index 4381e0fc25bf4..84faace50ac28 100644
---- a/net/core/netpoll.c
-+++ b/net/core/netpoll.c
-@@ -608,14 +608,16 @@ EXPORT_SYMBOL_GPL(__netpoll_setup);
- /*
-  * Returns a pointer to a string representation of the identifier used
-  * to select the egress interface for the given netpoll instance. buf
-- * must be a buffer of length at least MAC_ADDR_STR_LEN + 1.
-+ * is used to format np->dev_mac when np->dev_name is empty; bufsz must
-+ * be at least MAC_ADDR_STR_LEN + 1 to fit the formatted MAC address
-+ * and its NUL terminator.
-  */
--static char *egress_dev(struct netpoll *np, char *buf)
-+static char *egress_dev(struct netpoll *np, char *buf, size_t bufsz)
- {
- 	if (np->dev_name[0])
- 		return np->dev_name;
+diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
+index 79c867ef64da..e0b37e8d3410 100644
+--- a/drivers/net/phy/realtek/realtek_main.c
++++ b/drivers/net/phy/realtek/realtek_main.c
+@@ -165,6 +165,18 @@
  
--	snprintf(buf, MAC_ADDR_STR_LEN, "%pM", np->dev_mac);
-+	snprintf(buf, bufsz, "%pM", np->dev_mac);
- 	return buf;
+ #define RTL8221B_VND2_INSR			0xa4d4
+ 
++#define RTL822X_VND2_LED(x)			(0xd032 + ((x) * 2))
++#define RTL822X_VND2_LCR_LINK_10		BIT(0)
++#define RTL822X_VND2_LCR_LINK_100		BIT(1)
++#define RTL822X_VND2_LCR_LINK_1000		BIT(2)
++#define RTL822X_VND2_LCR_LINK_2500		BIT(5)
++
++#define RTL822X_VND2_LCR6			0xd040
++#define RTL822X_VND2_LED_ACT(x)			BIT(x)
++
++#define RTL822X_VND2_LCR7			0xd044
++#define RTL822X_VND2_LED_POLAR(x)		BIT(x)
++
+ #define RTL8224_MII_RTCT			0x11
+ #define RTL8224_MII_RTCT_ENABLE			BIT(0)
+ #define RTL8224_MII_RTCT_PAIR_A			BIT(4)
+@@ -1797,6 +1809,151 @@ static int rtl822xb_c45_read_status(struct phy_device *phydev)
+ 	return 0;
  }
  
-@@ -645,7 +647,7 @@ static int netpoll_take_ipv6(struct netpoll *np, struct net_device *ndev)
- 
- 	if (!IS_ENABLED(CONFIG_IPV6)) {
- 		np_err(np, "IPv6 is not supported %s, aborting\n",
--		       egress_dev(np, buf));
-+		       egress_dev(np, buf, sizeof(buf)));
- 		return -EINVAL;
- 	}
- 
-@@ -667,7 +669,7 @@ static int netpoll_take_ipv6(struct netpoll *np, struct net_device *ndev)
- 	}
- 	if (err) {
- 		np_err(np, "no IPv6 address for %s, aborting\n",
--		       egress_dev(np, buf));
-+		       egress_dev(np, buf, sizeof(buf)));
- 		return err;
- 	}
- 
-@@ -687,14 +689,14 @@ static int netpoll_take_ipv4(struct netpoll *np, struct net_device *ndev)
- 	in_dev = __in_dev_get_rtnl(ndev);
- 	if (!in_dev) {
- 		np_err(np, "no IP address for %s, aborting\n",
--		       egress_dev(np, buf));
-+		       egress_dev(np, buf, sizeof(buf)));
- 		return -EDESTADDRREQ;
- 	}
- 
- 	ifa = rtnl_dereference(in_dev->ifa_list);
- 	if (!ifa) {
- 		np_err(np, "no IP address for %s, aborting\n",
--		       egress_dev(np, buf));
-+		       egress_dev(np, buf, sizeof(buf)));
- 		return -EDESTADDRREQ;
- 	}
- 
-@@ -736,7 +738,8 @@ int netpoll_setup(struct netpoll *np)
- 		ndev = dev_getbyhwaddr(net, ARPHRD_ETHER, np->dev_mac);
- 
- 	if (!ndev) {
--		np_err(np, "%s doesn't exist, aborting\n", egress_dev(np, buf));
-+		np_err(np, "%s doesn't exist, aborting\n",
-+		       egress_dev(np, buf, sizeof(buf)));
- 		err = -ENODEV;
- 		goto unlock;
- 	}
-@@ -744,14 +747,14 @@ int netpoll_setup(struct netpoll *np)
- 
- 	if (netdev_master_upper_dev_get(ndev)) {
- 		np_err(np, "%s is a slave device, aborting\n",
--		       egress_dev(np, buf));
-+		       egress_dev(np, buf, sizeof(buf)));
- 		err = -EBUSY;
- 		goto put;
- 	}
- 
- 	if (!netif_running(ndev)) {
- 		np_info(np, "device %s not up yet, forcing it\n",
--			egress_dev(np, buf));
-+			egress_dev(np, buf, sizeof(buf)));
- 
- 		err = dev_open(ndev, NULL);
- 		if (err) {
-
----
-base-commit: edf4bee4215a173c0534d1851d7523d827149f9e
-change-id: 20260501-netpoll_snprintf_fix-95b40d048f18
-
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
++static int rtl822xb_led_brightness_set(struct phy_device *phydev, u8 index,
++				       enum led_brightness value)
++{
++	int ret;
++
++	if (index >= RTL8211x_LED_COUNT)
++		return -EINVAL;
++
++	/* clear HW LED setup */
++	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2,
++			    RTL822X_VND2_LED(index), 0);
++	if (ret < 0)
++		return ret;
++
++	/* clear HW LED blink */
++	ret = phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2, RTL822X_VND2_LCR6,
++				 RTL822X_VND2_LED_ACT(index));
++	if (ret < 0)
++		return ret;
++
++	if (value != LED_OFF)
++		return phy_set_bits_mmd(phydev, MDIO_MMD_VEND2,
++					RTL822X_VND2_LCR7,
++					RTL822X_VND2_LED_POLAR(index));
++	else
++		return phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2,
++					  RTL822X_VND2_LCR7,
++					  RTL822X_VND2_LED_POLAR(index));
++}
++
++static int rtl822xb_led_hw_is_supported(struct phy_device *phydev, u8 index,
++					unsigned long rules)
++{
++	const unsigned long  act_mask = BIT(TRIGGER_NETDEV_RX) |
++					BIT(TRIGGER_NETDEV_TX);
++
++	const unsigned long link_mask = BIT(TRIGGER_NETDEV_LINK) |
++					BIT(TRIGGER_NETDEV_LINK_10) |
++					BIT(TRIGGER_NETDEV_LINK_100) |
++					BIT(TRIGGER_NETDEV_LINK_1000) |
++					BIT(TRIGGER_NETDEV_LINK_2500);
++
++	if (index >= RTL8211x_LED_COUNT)
++		return -EINVAL;
++
++	/* Filter out any other unsupported triggers. */
++	if (rules & ~(link_mask | act_mask))
++		return -EOPNOTSUPP;
++
++	/* RX and TX are not differentiated, they are not possible
++	 * without combination with a link trigger.
++	 */
++	if ((rules & act_mask) && !(rules & link_mask))
++		return -EOPNOTSUPP;
++
++	return 0;
++}
++
++static int rtl822xb_led_hw_control_get(struct phy_device *phydev, u8 index,
++				       unsigned long *rules)
++{
++	int val;
++
++	if (index >= RTL8211x_LED_COUNT)
++		return -EINVAL;
++
++	val = phy_read_mmd(phydev, MDIO_MMD_VEND2, RTL822X_VND2_LED(index));
++	if (val < 0)
++		return val;
++
++	if (val & RTL822X_VND2_LCR_LINK_10)
++		__set_bit(TRIGGER_NETDEV_LINK_10, rules);
++
++	if (val & RTL822X_VND2_LCR_LINK_100)
++		__set_bit(TRIGGER_NETDEV_LINK_100, rules);
++
++	if (val & RTL822X_VND2_LCR_LINK_1000)
++		__set_bit(TRIGGER_NETDEV_LINK_1000, rules);
++
++	if (val & RTL822X_VND2_LCR_LINK_2500)
++		__set_bit(TRIGGER_NETDEV_LINK_2500, rules);
++
++	if ((val & RTL822X_VND2_LCR_LINK_10) &&
++	    (val & RTL822X_VND2_LCR_LINK_100) &&
++	    (val & RTL822X_VND2_LCR_LINK_1000) &&
++	    (val & RTL822X_VND2_LCR_LINK_2500))
++		__set_bit(TRIGGER_NETDEV_LINK, rules);
++
++	val = phy_read_mmd(phydev, MDIO_MMD_VEND2, RTL822X_VND2_LCR6);
++	if (val < 0)
++		return val;
++
++	if (val & RTL822X_VND2_LED_ACT(index)) {
++		__set_bit(TRIGGER_NETDEV_RX, rules);
++		__set_bit(TRIGGER_NETDEV_TX, rules);
++	}
++
++	return 0;
++}
++
++static int rtl822xb_led_hw_control_set(struct phy_device *phydev, u8 index,
++				       unsigned long rules)
++{
++	u16 val = 0;
++	bool act;
++	int ret;
++
++	if (index >= RTL8211x_LED_COUNT)
++		return -EINVAL;
++
++	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
++	    test_bit(TRIGGER_NETDEV_LINK_10, &rules))
++		val |= RTL822X_VND2_LCR_LINK_10;
++
++	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
++	    test_bit(TRIGGER_NETDEV_LINK_100, &rules))
++		val |= RTL822X_VND2_LCR_LINK_100;
++
++	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
++	    test_bit(TRIGGER_NETDEV_LINK_1000, &rules))
++		val |= RTL822X_VND2_LCR_LINK_1000;
++
++	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
++	    test_bit(TRIGGER_NETDEV_LINK_2500, &rules))
++		val |= RTL822X_VND2_LCR_LINK_2500;
++
++	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2,
++			    RTL822X_VND2_LED(index), val);
++	if (ret < 0)
++		return ret;
++
++	act = test_bit(TRIGGER_NETDEV_RX, &rules) ||
++	      test_bit(TRIGGER_NETDEV_TX, &rules);
++
++	ret = phy_modify_mmd(phydev, MDIO_MMD_VEND2, RTL822X_VND2_LCR6,
++			     RTL822X_VND2_LED_ACT(index), act ?
++			     RTL822X_VND2_LED_ACT(index) : 0);
++	if (ret < 0)
++		return ret;
++
++	/* Reset polarity to default */
++	return phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2, RTL822X_VND2_LCR7,
++				  RTL822X_VND2_LED_POLAR(index));
++}
++
+ static int rtl8224_cable_test_start(struct phy_device *phydev)
+ {
+ 	u32 val;
+@@ -2565,6 +2722,10 @@ static struct phy_driver realtek_drvs[] = {
+ 		.write_page	= rtl821x_write_page,
+ 		.read_mmd	= rtl822xb_read_mmd,
+ 		.write_mmd	= rtl822xb_write_mmd,
++		.led_brightness_set = rtl822xb_led_brightness_set,
++		.led_hw_is_supported = rtl822xb_led_hw_is_supported,
++		.led_hw_control_get = rtl822xb_led_hw_control_get,
++		.led_hw_control_set = rtl822xb_led_hw_control_set,
+ 	}, {
+ 		.match_phy_device = rtl8221b_vm_cg_match_phy_device,
+ 		.name		= "RTL8221B-VM-CG 2.5Gbps PHY",
+@@ -2584,6 +2745,10 @@ static struct phy_driver realtek_drvs[] = {
+ 		.write_page	= rtl821x_write_page,
+ 		.read_mmd	= rtl822xb_read_mmd,
+ 		.write_mmd	= rtl822xb_write_mmd,
++		.led_brightness_set = rtl822xb_led_brightness_set,
++		.led_hw_is_supported = rtl822xb_led_hw_is_supported,
++		.led_hw_control_get = rtl822xb_led_hw_control_get,
++		.led_hw_control_set = rtl822xb_led_hw_control_set,
+ 	}, {
+ 		.match_phy_device = rtl8251b_c45_match_phy_device,
+ 		.name		= "RTL8251B 5Gbps PHY",
+-- 
+2.34.1
 
 
