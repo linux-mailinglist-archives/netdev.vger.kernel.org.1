@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-283068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283069-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IKmBI6UE9GnR9gEAu9opvQ
-	(envelope-from <netdev+bounces-283068-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 03:40:53 +0200
+	id 2D5DAA0F9GnR9gEAu9opvQ
+	(envelope-from <netdev+bounces-283069-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 03:42:37 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAEA54A9A8C
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 03:40:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C05C4A9AC3
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 03:42:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 33EC03003E9B
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 01:40:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ACEDC3003EF8
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 01:42:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F066F2D7398;
-	Fri,  1 May 2026 01:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3148329A9E9;
+	Fri,  1 May 2026 01:42:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GSGYgkWO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sp3Naciw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD732296BCC;
-	Fri,  1 May 2026 01:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E57219D065;
+	Fri,  1 May 2026 01:42:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777599601; cv=none; b=Mfc4WQTNR5/tJedrp+kpFq63qA9picPlc7aPZ8qnRzieIqQ0g5JmnmTfhyckJLMb2J0gBiSGdSXvW65zNNiTGX/ETZ82Svr81uwzQugvWdSjXfGtR7kVMSlcJ4IAIUXK26GPDPqp20LdLRPDOAFy2ZQ51Hl1tulHJigU+r6cm/A=
+	t=1777599754; cv=none; b=NefQOWnuss8EP1X8b8BjyFYdlA4ocEpAlwSzB3tyG1DMNHU6dumO2fm8wIaoFY2ybykLOGvxfk/DM/GjdEWR+ByGNjnIXavpGr1KEparenXqjKABT4voOexzpC5ac5qAhjD3BDQetR8QNqXuB3U5s5QBpdl5h0Abo8g+n5ZbIBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777599601; c=relaxed/simple;
-	bh=GOsfo1wRbu74Tcp5qyZ5uUS0nXD/Uj24m8TIY2AwNo4=;
+	s=arc-20240116; t=1777599754; c=relaxed/simple;
+	bh=ZdITBZENdOr+jdgX2h9Hp07AHixOH3K6o/nDArx9E8M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HoCfg2qHgKYKjlTQOwRSM1PHJ8LMPGUfzgwBn195mYmI4wZHAhSI46onlxIn7IEPd5G7wNcoHSkna+PAZakUCjjH4o/BzTevEeoMT2oyvxzJAe+wr50IBVngcqIZxig5GKWI6kAGUb8IpfQnHihhNysNzoJ6nnsS44CTvJlVlHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GSGYgkWO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 955CBC2BCB3;
-	Fri,  1 May 2026 01:40:00 +0000 (UTC)
+	 MIME-Version:Content-Type; b=outsubApZi1yRUQl0feWLgDuW5NzPy8ljtR80+3NOwuD1l+q3eXX6as75WbXHwJRidX3EaQrGpc6KcCbVbaqe0GB5jlcVE0S8ZfRmjT+HTuREgIQ89e/WXbqwGeNy+8MxYz5knurCajlWtyoH8AohGfKWAwsF2Sc1y/PgTJSUWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sp3Naciw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4654C2BCB8;
+	Fri,  1 May 2026 01:42:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777599601;
-	bh=GOsfo1wRbu74Tcp5qyZ5uUS0nXD/Uj24m8TIY2AwNo4=;
+	s=k20201202; t=1777599753;
+	bh=ZdITBZENdOr+jdgX2h9Hp07AHixOH3K6o/nDArx9E8M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GSGYgkWOX8HEUsdKJEhA7Xkk6YEpUkLDJN5R0msHCWTDHNzTSI9RHZCxQ85BhnDt7
-	 uYuNunHcXy1Va40054bPtit6AoGuRGhkrik+HnaHE5iHt/xuJ3OJ2Hdy4DpBAK3Enx
-	 /SZv7gU72ti1ZmGC/rV0klCHpyEL+T1gSVQjIR1DK219Nu1a/Fd89evw1pyt+AgyEt
-	 wW4cLCyhvjcF691I7P1yesd/ezq1ZfLmgtDfdefa1z6CauONPaDYiANu33AC0hjfdn
-	 kBKM9HVA51TJbAkX3S1WjRqI+lRXRGxBUNVW81V+oiMtzQh5/VQ34ZRQF+L/MVxcYj
-	 kRnsN1h3d+VZw==
+	b=Sp3Naciw8kXhqIxT/jWZpHQhn3KsrHcbaKofLw1R6zy4qxQCiV1XwfApTH9vpiQXe
+	 nA99huSzA6F2onnYfNsrvdL9JcyZxK0F8vMakROj56LI9J6fCZUNv3E2Hg4mYa8gVl
+	 UKQIAnM2O57sqBkrV43Bn+GQrIeSNXJOVULCgdPRw+NQWCK8vsngIWLnVsANDLvGWe
+	 QArizcDDSLxTEf4W+e9+lPWFd0KmZeyMmrOLaRrQXLmDevXgbe3zZwE3MF07XPTWIB
+	 7Vx9FG9Bw5U3PPHj3B0QeG8/9WraIdeTCF0Ch6RS+hcB6ZnXy/jkCxsgAyTz20emzx
+	 yh8xAddQqhv+Q==
 From: Jakub Kicinski <kuba@kernel.org>
 To: nb@tipi-net.de
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -64,47 +64,47 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	sashal@kernel.org,
 	ebiggers@google.com,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v8 4/7] net: bcmgenet: add XDP_TX support
-Date: Thu, 30 Apr 2026 18:39:36 -0700
-Message-ID: <20260501013935.3169102-2-kuba@kernel.org>
+Subject: Re: [PATCH net-next v8 5/7] net: bcmgenet: add XDP_REDIRECT and ndo_xdp_xmit support
+Date: Thu, 30 Apr 2026 18:40:02 -0700
+Message-ID: <20260501014007.3169322-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260428205846.2625550-5-nb@tipi-net.de>
-References: <20260428205846.2625550-5-nb@tipi-net.de>
+In-Reply-To: <20260428205846.2625550-6-nb@tipi-net.de>
+References: <20260428205846.2625550-6-nb@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: DAEA54A9A8C
+X-Rspamd-Queue-Id: 5C05C4A9AC3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,broadcom.com,gmail.com,lunn.ch,google.com,redhat.com,davemloft.net];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283069-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[19];
-	TAGGED_FROM(0.00)[bounces-283068-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,broadcom.com,gmail.com,lunn.ch,google.com,redhat.com,davemloft.net];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.996];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
@@ -113,145 +113,160 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-net: bcmgenet: add XDP_TX support
+net: bcmgenet: add XDP_REDIRECT and ndo_xdp_xmit support
 
-This patch adds XDP_TX support to bcmgenet by dedicating ring 16
-(DESC_INDEX) to XDP TX, carving 32 BDs from ring 0's allocation and
-piggybacking TX completion on the RX NAPI poll.  The page_pool DMA
-direction is switched from DMA_FROM_DEVICE to DMA_BIDIRECTIONAL.
+This patch adds XDP_REDIRECT support in the RX path and implements
+ndo_xdp_xmit for receiving redirected frames from other devices, batching
+frames into ring 16 under a single spinlock. It also advertises
+NETDEV_XDP_ACT_REDIRECT and NETDEV_XDP_ACT_NDO_XMIT in xdp_features.
 
 > diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> index 1b60571446e1..3c3b0c44ea8a 100644
+> index 3c3b0c44ea8a..9dd258567824 100644
 > --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
 > +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
 
 [ ... ]
 
-> @@ -1940,8 +1956,15 @@ static unsigned int __bcmgenet_tx_reclaim(struct net_device *dev,
->  
->  	/* Reclaim transmitted buffers */
->  	while (txbds_processed < txbds_ready) {
-> -		skb = bcmgenet_free_tx_cb(&priv->pdev->dev,
-> -					  &priv->tx_cbs[ring->clean_ptr]);
-> +		tx_cb = &priv->tx_cbs[ring->clean_ptr];
-> +		if (tx_cb->xdpf) {
-> +			pkts_compl++;
-> +			bytes_compl += tx_cb->xdp_dma_map
-> +				? tx_cb->xdpf->len
-> +				: tx_cb->xdpf->len -
-> +				  sizeof(struct status_64);
-> +		}
-> +		skb = bcmgenet_free_tx_cb(&priv->pdev->dev, tx_cb);
->  		if (skb) {
->  			pkts_compl++;
->  			bytes_compl += GENET_CB(skb)->bytes_sent;
-> @@ -1963,8 +1986,11 @@ static unsigned int __bcmgenet_tx_reclaim(struct net_device *dev,
->  	u64_stats_add(&stats->bytes, bytes_compl);
->  	u64_stats_update_end(&stats->syncp);
->  
-> -	netdev_tx_completed_queue(netdev_get_tx_queue(dev, ring->index),
-> -				  pkts_compl, bytes_compl);
-> +	/* Ring DESC_INDEX (XDP TX) has no netdev TX queue; skip BQL */
-> +	if (ring->index != DESC_INDEX)
-> +		netdev_tx_completed_queue(netdev_get_tx_queue(dev,
-> +							      ring->index),
-> +					  pkts_compl, bytes_compl);
->  
->  	return txbds_processed;
->  }
-
-The guard here skips netdev_get_tx_queue() for the XDP TX ring, but the
-outer wrapper bcmgenet_tx_reclaim() still calls:
-
-    netdev_tx_reset_queue(netdev_get_tx_queue(dev, ring->index));
-    ...
-    bcmgenet_tdma_ring_writel(priv, ring->index, ring->prod_index, ...);
-
-unconditionally when invoked with all=true.
-
-For the XDP TX ring, ring->index == DESC_INDEX == 16, but bcmgenet_probe()
-allocates the netdev via alloc_etherdev_mqs(..., GENET_MAX_MQ_CNT + 1,
-GENET_MAX_MQ_CNT + 1), which is only 5 TX queues.  So netdev_get_tx_queue(dev,
-16) returns &dev->_tx[16], well past the end of the allocated _tx[] array.
-
-On CONFIG_BQL=y (the default), netdev_tx_reset_queue() then writes into that
-memory through dql_reset() and clear_bit(__QUEUE_STATE_STACK_XOFF, &q->state).
-
-Can this path corrupt memory past dev->_tx[] whenever bcmgenet_tx_reclaim_all()
-runs on the XDP TX ring?  See the new call added below:
-
-[ ... ]
-
-> @@ -2043,6 +2069,9 @@ static void bcmgenet_tx_reclaim_all(struct net_device *dev)
->  	do {
->  		bcmgenet_tx_reclaim(dev, &priv->tx_rings[i++], true);
->  	} while (i <= priv->hw_params->tx_queues && netif_is_multiqueue(dev));
-> +
-> +	/* Also reclaim XDP TX ring */
-> +	bcmgenet_tx_reclaim(dev, &priv->xdp_tx_ring, true);
->  }
-
-bcmgenet_tx_reclaim_all() is reached from bcmgenet_netif_stop() (ifconfig
-down), the WoL/suspend reconfigure path, and open/reset-failure cleanup, so
-this is triggerable from userspace on every interface-down.
-
-Should the netdev_tx_reset_queue() in bcmgenet_tx_reclaim()'s all-branch be
-guarded with the same ring->index != DESC_INDEX check that was added to
-__bcmgenet_tx_reclaim()?
-
-[ ... ]
-
-> @@ -3008,14 +3161,18 @@ static int bcmgenet_rdma_disable(struct bcmgenet_priv *priv)
-
-[ ... ]
-
->  static void bcmgenet_init_tx_queues(struct net_device *dev)
->  {
-> @@ -3028,7 +3185,8 @@ static void bcmgenet_init_tx_queues(struct net_device *dev)
->  
->  	/* Initialize Tx priority queues */
->  	for (i = 0; i <= priv->hw_params->tx_queues; i++) {
-> -		bcmgenet_init_tx_ring(priv, i, end - start, start, end);
-> +		bcmgenet_init_tx_ring(priv, &priv->tx_rings[i],
-> +				      i, end - start, start, end);
->  		start = end;
->  		end += priv->hw_params->tx_bds_per_q;
->  		dma_priority[DMA_PRIO_REG_INDEX(i)] |=
-> @@ -3036,13 +3194,19 @@ static void bcmgenet_init_tx_queues(struct net_device *dev)
->  			<< DMA_PRIO_REG_SHIFT(i);
+> @@ -3996,10 +4017,16 @@ static int bcmgenet_xdp_setup(struct net_device *dev,
+>  		return -EOPNOTSUPP;
 >  	}
 >  
-> +	/* Initialize ring 16 (descriptor ring) for XDP TX */
-> +	bcmgenet_init_tx_ring(priv, &priv->xdp_tx_ring,
-> +			      DESC_INDEX, GENET_Q16_TX_BD_CNT,
-> +			      TOTAL_DESC - GENET_Q16_TX_BD_CNT, TOTAL_DESC);
+> +	if (!prog)
+> +		xdp_features_clear_redirect_target(dev);
 > +
->  	/* Set Tx queue priorities */
->  	bcmgenet_tdma_writel(priv, dma_priority[0], DMA_PRIORITY_0);
->  	bcmgenet_tdma_writel(priv, dma_priority[1], DMA_PRIORITY_1);
->  	bcmgenet_tdma_writel(priv, dma_priority[2], DMA_PRIORITY_2);
+>  	old_prog = xchg(&priv->xdp_prog, prog);
+>  	if (old_prog)
+>  		bpf_prog_put(old_prog);
+>  
+> +	if (prog)
+> +		xdp_features_set_redirect_target(dev, false);
+> +
 
-What priority does ring 16 end up with under strict-priority arbitration?
+Does this leave NETDEV_XDP_ACT_NDO_XMIT permanently cleared after a
+single attach+detach cycle?
 
-dma_priority[] is declared as:
+bcmgenet_probe() unconditionally sets:
 
-    u32 dma_priority[3] = {0, 0, 0};
+    dev->xdp_features = NETDEV_XDP_ACT_BASIC | NETDEV_XDP_ACT_REDIRECT |
+                        NETDEV_XDP_ACT_NDO_XMIT;
 
-and only rings 0..tx_queues populate it.  Ring 16's priority field lives in
-DMA_PRIORITY_2, bits [20..24] (DMA_PRIO_REG_INDEX(16) == 2,
-DMA_PRIO_REG_SHIFT(16) == 20), and is left as zero.
+but on any call to bcmgenet_xdp_setup() with prog == NULL this code
+runs xdp_features_clear_redirect_target(dev), which clears both
+NETDEV_XDP_ACT_NDO_XMIT and NETDEV_XDP_ACT_NDO_XMIT_SG in
+xdp_features_clear_redirect_target_locked() (net/core/xdp.c).
 
-In this driver priority 0 is the highest:
+bcmgenet_xdp_xmit() does not depend on priv->xdp_prog — it only needs
+netif_running() and priv->xdp_tx_ring, which is initialized
+unconditionally in bcmgenet_init_tx_queues(). So after attach+detach,
+is_valid_dst() in kernel/bpf/devmap.c:__xdp_enqueue() will see
+NETDEV_XDP_ACT_NDO_XMIT cleared and reject every redirected frame with
+-EOPNOTSUPP until another program is attached.
 
-    #define GENET_Q1_PRIORITY   0   /* Default highest priority queue */
-    #define GENET_Q0_PRIORITY   1
+The paired xdp_features_set_redirect_target(dev, false) call only fires
+for prog != NULL, so it does not restore the bit after a no-op detach,
+and it is redundant with the probe-time advertisement when prog is
+non-NULL.
 
-A few lines above, arbitration is set to strict priority:
+>  	return 0;
+>  }
+>  
+> @@ -4013,6 +4040,36 @@ static int bcmgenet_xdp(struct net_device *dev, struct netdev_bpf *xdp)
+>  	}
+>  }
+>  
+> +static int bcmgenet_xdp_xmit(struct net_device *dev, int num_frames,
+> +			     struct xdp_frame **frames, u32 flags)
+> +{
+> +	struct bcmgenet_priv *priv = netdev_priv(dev);
+> +	struct bcmgenet_tx_ring *ring = &priv->xdp_tx_ring;
+> +	int sent = 0;
+> +	int i;
+> +
+> +	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
+> +		return -EINVAL;
+> +
+> +	if (unlikely(!netif_running(dev)))
+> +		return -ENETDOWN;
 
-    bcmgenet_tdma_writel(priv, DMA_ARBITER_SP, DMA_ARB_CTRL);
+Is there a use-after-free window between this check and a concurrent
+bcmgenet_close()?
 
-So ring 16 ends up at priority 0, outranking Q0 (priority 1) and equal to
-the user-configured high-priority queues Q1..Q4.  Should ring 16 be given
-an explicit priority (for example the same as Q0, or lower) so XDP_TX does
-not preempt normal SKB TX under strict-priority arbitration?
+netif_running() is an unlocked test_bit on __LINK_STATE_START.
+__dev_close_many() clears that bit and then calls ndo_stop, which
+reaches bcmgenet_close() -> bcmgenet_netif_stop() -> bcmgenet_fini_dma(),
+where kfree(priv->tx_cbs) frees the backing array that ring->cbs points
+into.
+
+The synchronize_net() inside dev_deactivate_many() only waits for
+outstanding qdisc enqueuers, not for a remote device's NAPI loop that
+is inside xdp_do_flush() -> __dev_flush() -> bq_xmit_all() ->
+bcmgenet_xdp_xmit() on another CPU.
+
+A caller that passed the netif_running() test just before
+__LINK_STATE_START was cleared can then execute bcmgenet_get_txcb() and
+dmadesc_set() against freed tx_cbs memory after bcmgenet_fini_dma() has
+run.
+
+Would an RCU-protected "xmit enabled" flag cleared on close followed by
+synchronize_rcu() before freeing the ring be needed here?
+
+Jakub: I think this is worried that sync_net will be skipped if the device
+has no qdiscs on down(). I don't think we care.
+
+> +
+> +	spin_lock(&ring->lock);
+> +
+> +	for (i = 0; i < num_frames; i++) {
+> +		if (!bcmgenet_xdp_xmit_frame(priv, ring, frames[i], true))
+> +			break;
+> +		sent++;
+> +	}
+> +
+> +	if (sent)
+> +		bcmgenet_xdp_ring_doorbell(priv, ring);
+> +
+> +	spin_unlock(&ring->lock);
+> +
+> +	return sent;
+> +}
+
+How are completions reclaimed on priv->xdp_tx_ring (ring 16) when the
+device has no local RX traffic?
+
+The existing ring 16 has no TX interrupt and is reclaimed only from
+bcmgenet_rx_poll(); the driver comment states:
+
+    /* ring 16 has no interrupt */
+
+bcmgenet_xdp_xmit() itself has no completion path. When this device is
+used purely as a redirect target (receiving frames via ndo_xdp_xmit
+from other NICs) with little or no local RX traffic, bcmgenet_rx_poll()
+is not scheduled, completed descriptors are never reclaimed,
+ring->free_bds stays at 0 after the first burst, and
+bcmgenet_xdp_xmit_frame() returns false for every subsequent frame.
+bcmgenet_xdp_xmit() then returns 0 (all frames dropped) until unrelated
+RX traffic happens to arrive.
+
+The XDP_TX path does not hit this because it runs from inside
+bcmgenet_rx_poll(), which drains the ring on each call.
+
+Would scheduling tx reclaim from ndo_xdp_xmit, or installing a
+completion interrupt or timer for ring 16, be appropriate here?
+
+> +
+>  static const struct net_device_ops bcmgenet_netdev_ops = {
+>  	.ndo_open		= bcmgenet_open,
+>  	.ndo_stop		= bcmgenet_close,
+
+[ ... ]
+
+> @@ -4327,7 +4385,8 @@ static int bcmgenet_probe(struct platform_device *pdev)
+>  			 NETIF_F_RXCSUM;
+>  	dev->hw_features |= dev->features;
+>  	dev->vlan_features |= dev->features;
+> -	dev->xdp_features = NETDEV_XDP_ACT_BASIC;
+> +	dev->xdp_features = NETDEV_XDP_ACT_BASIC | NETDEV_XDP_ACT_REDIRECT |
+> +			    NETDEV_XDP_ACT_NDO_XMIT;
+>  
+>  	netdev_sw_irq_coalesce_default_on(dev);
 
