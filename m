@@ -1,258 +1,316 @@
-Return-Path: <netdev+bounces-283176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283178-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iMuSKBWk9GlKDAIAu9opvQ
-	(envelope-from <netdev+bounces-283176-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 15:01:09 +0200
+	id yEoZEDKq9GmBDQIAu9opvQ
+	(envelope-from <netdev+bounces-283178-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 15:27:14 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A63A4AC871
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 15:01:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D51514ACB63
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 15:27:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DDFE1301DE37
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 13:00:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A2856301AA6C
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 13:27:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BC9E248880;
-	Fri,  1 May 2026 13:00:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E48039EF0B;
+	Fri,  1 May 2026 13:27:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UZ1AB4fb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ks9s1mZI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E74EF1A0728
-	for <netdev@vger.kernel.org>; Fri,  1 May 2026 13:00:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71DCF33EF;
+	Fri,  1 May 2026 13:27:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777640454; cv=none; b=DO/DjKIeoyWx4/zFoNUHZdGgh+v3MwL46jaThtZHG43xyMgKVkT2hvWhxEBgAVZ56BaBU+2sM31CKQJEKalEd049xo5P+zt7DpKgJi8iQ0smzGSVLpGCGz3rLtCXEwXj/LXPXygk2V71cCm5dBhcElWiNz5486qr7l8fN5SaGoo=
+	t=1777642028; cv=none; b=BREC5jtlhomovGqd9l6K9zD5H9kDE8Hdt1HQSp99qobhGwleY/7zvacF8m8jbvA0VwUc0UO6Oz4imarLa5HOx+dwvSTl96V+aBuxAJkrsWvdfV3fNizlhNKJXij2oZ3a6BQV6tLqvCdGqVKKx76YV/xKmD2lsJG8wOwD4vv328w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777640454; c=relaxed/simple;
-	bh=qyIkRHi6oV5U2SmgdqpjVI5pwMUbK8zwy66lyVzRAGs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=O4PQv1F5AldDna/UNoMSRK2RFRmBhog2DXJuJsUQM+QoAlROHtFcnySGpYM3VJ0EukEp2lIIZn0FkvJPJZJ43GueGuWI9VLoqJSQSmtN+oFSrOt8Ptdt5/CusD8d3nv3XubsCAkkQK+nViVDixTZ55ExO3FBzksqkQB2GEaOyMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UZ1AB4fb; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-488e1a8ac40so18416585e9.2
-        for <netdev@vger.kernel.org>; Fri, 01 May 2026 06:00:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777640450; x=1778245250; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pqhRiAzIyiH2+fYeG1xj4sXrzPXGhw3STHTuHrGU/qY=;
-        b=UZ1AB4fbwLpo6HsO5504KHdSFb29QYDc7E9RPsNsQXNwn1llm38Mm00ylSnEkk3kFs
-         //0wgOBBzxVAKP8E1WFS4qczuW7LIAyTxG3czvlhOPIxqQPVr6TFBWap9n9RdzzzYa9D
-         O4trE/rFYCUfMIRbulzv8as9ze6FDTqcs9Cgk40an/HrUlb8B2CT5+pOAECM7mTzLl3w
-         a7GJmHiVS297Ig0fQ0p5LboCPAQV7lcvMRGWp/PMUrKwN6qD5Wf2NxoAEE6V/8+9UrcK
-         DxSBEHyAolyaUdq04mSsbqyoPMNw7wafaDMf8o3ZmJHEQqIQsUJmEsD+9L4kyStiQC3C
-         wxXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777640450; x=1778245250;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=pqhRiAzIyiH2+fYeG1xj4sXrzPXGhw3STHTuHrGU/qY=;
-        b=i547blHO6P40cAydsTyMv4oUt33fwfeqLz40gQ62TtIBVH42WnKofShl55KLTkbc7X
-         /GW9Qy2dxUiHWBTRfR32nTe6bofXbo+nKTq2oNw035KdLw4S6FtJ5MgpjLmY+owIROnv
-         Pam/BHNLDriqPp7GkRV5uA8a9lzmYfn4TSGjLmzukg3FDxH2wWjJHISFC8t0d2Sbvq8w
-         pC/wZlYHDNzJ2Lx7TheAFIbWcOpJFNBxjffWj6Li77tzofs5JeKrsJESl51zMtV5q+M8
-         aMEJe0IvboQLUBlKXHljHnRaFGG0FwZUCrPYNIgoe/vpKX6NHtoqygFEaf6aUa0/SjiL
-         b4Vw==
-X-Forwarded-Encrypted: i=1; AFNElJ/GXwhkHYO65hY2UxZbu8hGBqphxm44rVVtWj8EfD0sbvPaLCOD7IRZciH++GD47u/4NY1fGqw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywc8jIPyJ+D8lvqWy2+uXvX1tdwWu6eMw72zo28RT9uoNVoyXCs
-	SCgeajZXVsYzpg5huUjRHjvQBuHdC1JFSVWrwb8Xa4bjFY3pCSyuZmN6
-X-Gm-Gg: AeBDievnxXKRpEwh4FQ7PjRc4Pc5OBkHDSlVHb+ZPXaP+kNOf0y92LmFG3F/wisaI0e
-	Dr34GmtuGul14obAJRJ1FVNda8/9KC8uU+cZYghpluzWN4l9bRoj83nPMx2vt9bwLghMdaDrmp9
-	uPwst1bO1kr7KiQeWQ6k45Hvl4SGXPzvXXPIX6tedYcVUTwOmVe1jHx40kHCKrC4ulvDXJtAXs4
-	Y4NIcxAcPfGWBoazQCVo6YpMzW4bf/GNw2gMspoSEDX71DtGPoK9au9l4fJvuCEsq8O5Jw2yBLe
-	oh29+k9ABQnUze8ZnSWPNUNVtoTDBzc+Mw5h87bdSAotn/7QwTJ2K7tkaFviJvNGmrw6d9QsOYf
-	ZSUgfdjlQA9pqQltpdcIn57Kze3uCIy2O2rYS5KYuwKTVQw4ss6vPJBSYLAUCRvV+34k18Fm9kA
-	KxC0hIN0M7oSG5aFHnV2Wbpey8S9qQsv9gO7JwAmwawPv+1F4ZBvCIVGtD7vwSER4Az7hQNuj8z
-	ROkT0xxl5abX5NDTtihRg==
-X-Received: by 2002:a05:600c:1f10:b0:487:1fb4:7e1 with SMTP id 5b1f17b1804b1-48a8445b91cmr118213405e9.22.1777640449917;
-        Fri, 01 May 2026 06:00:49 -0700 (PDT)
-Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a82301b7bsm151465915e9.11.2026.05.01.06.00.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 May 2026 06:00:49 -0700 (PDT)
-From: David Carlier <devnexen@gmail.com>
-To: daniel.zahka@gmail.com,
-	kuba@kernel.org
-Cc: willemdebruijn.kernel@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	raeds@nvidia.com,
-	kees@kernel.org,
-	cratiu@nvidia.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	David Carlier <devnexen@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net v2] psp: strip variable-length PSP header in psp_dev_rcv()
-Date: Fri,  1 May 2026 14:00:46 +0100
-Message-ID: <20260501130046.16008-1-devnexen@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260430062033.20428-1-devnexen@gmail.com>
-References: <20260430062033.20428-1-devnexen@gmail.com>
+	s=arc-20240116; t=1777642028; c=relaxed/simple;
+	bh=cecY22npZ8O09cZUaB8M0VENwxo6jF899E2WK/sGM8U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=THfRSWzYKQdnMnc5FNa7S+Vjzn1hQfl2fslwufIumWFF2b8SqKWCrSk0pf6CV9zHgD/+fdIA3L9QTBDHs9AciGMztiIXF52bisv2RzpbuD7huiwASTMsT+rFaARq3uT2jfueX4ZUSxJhKWiLEbqM0kVdzghArdLPyoYBlO1skWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ks9s1mZI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A09DDC2BCB4;
+	Fri,  1 May 2026 13:26:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777642028;
+	bh=cecY22npZ8O09cZUaB8M0VENwxo6jF899E2WK/sGM8U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ks9s1mZIkV8HxwO4Mq2+M0rNhz33rtPZ+PEpQg8O0T7agTQM/ie+qo1rwFzMc+b+A
+	 VqDH4/+JcAgC//FSDTXVNeTLY3ZnVf6ao0PPeE2eDyKLB70fqAtG1BZGKK4J4NwVYM
+	 OfaQriqJVci3Be7SKDrYFRY61OXwF0wXPYEyzsVt5ayiFhEFxMW1q5daFboq3L7XMO
+	 64Cx2hTxZcYCLazmmG5vv2hGIZnAcTrMTjhtB+7TrKmtFgXcpfm7HFnitN26O/Gx8U
+	 JOUfHUQd9G+45ryjeV+BQBCvFltUxfgmsGCNc+KFS0VD58QfpBufJUzuhvutKP50DW
+	 4FZ/nGOcO+OnA==
+Date: Fri, 1 May 2026 18:56:50 +0530
+From: Sumit Garg <sumit.garg@kernel.org>
+To: Mukesh Ojha <mukesh.ojha@oss.qualcomm.com>
+Cc: andersson@kernel.org, konradybcio@kernel.org,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+	linux-media@vger.kernel.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
+	linux-remoteproc@vger.kernel.org, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org,
+	robin.clark@oss.qualcomm.com, sean@poorly.run,
+	akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
+	jesszhan0024@gmail.com, marijn.suijten@somainline.org,
+	airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
+	dikshita.agarwal@oss.qualcomm.com, bod@kernel.org,
+	mchehab@kernel.org, elder@kernel.org, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, jjohnson@kernel.org, mathieu.poirier@linaro.org,
+	trilokkumar.soni@oss.qualcomm.com, pavan.kondeti@oss.qualcomm.com,
+	jorge.ramirez@oss.qualcomm.com, tonyh@qti.qualcomm.com,
+	vignesh.viswanathan@oss.qualcomm.com,
+	srinivas.kandagatla@oss.qualcomm.com,
+	amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
+	op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
+	skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
+	Sumit Garg <sumit.garg@oss.qualcomm.com>
+Subject: Re: [PATCH v4 11/15] media: qcom: Switch to generic PAS TZ APIs
+Message-ID: <afSqGp-yzZip7q-j@sumit-xelite>
+References: <20260427095603.1157963-1-sumit.garg@kernel.org>
+ <20260427095603.1157963-12-sumit.garg@kernel.org>
+ <20260428193714.sg5n3tntww2nuquu@hu-mojha-hyd.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 3A63A4AC871
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260428193714.sg5n3tntww2nuquu@hu-mojha-hyd.qualcomm.com>
+X-Rspamd-Queue-Id: D51514ACB63
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,kernel.org,nvidia.com,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-283176-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283178-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[49];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.991];
+	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,qualcomm.com:email]
 
-psp_dev_rcv() unconditionally removes a fixed PSP_ENCAP_HLEN, even
-when psph->hdrlen indicates that the PSP header carries optional
-fields. A frame whose PSP header advertises a non-zero VC or any
-extension would therefore be silently mis-decapsulated: option bytes
-would spill into the inner packet head and downstream parsing would
-fail on a corrupted skb.
+On Wed, Apr 29, 2026 at 01:07:14AM +0530, Mukesh Ojha wrote:
+> On Mon, Apr 27, 2026 at 03:25:59PM +0530, Sumit Garg wrote:
+> > From: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> > 
+> > Switch qcom media client drivers over to generic PAS TZ APIs. Generic PAS
+> > TZ service allows to support multiple TZ implementation backends like QTEE
+> > based SCM PAS service, OP-TEE based PAS service and any further future TZ
+> > backend service.
+> > 
+> > Along with that pass proper PAS ID to set_remote_state API. As per testing
+> > the SCM backend just ignores it while OP-TEE makes use of it to for proper
+> > book keeping purpose.
+> 
+> When we use 'Along with' or 'while at it', patch is doing two things and
+> not one.
 
-Compute the full PSP header length from psph->hdrlen, pull the
-optional bytes into the linear region, and strip the whole header
-when decapsulating. Optional fields (VC, ...) are still ignored,
-just discarded with the rest of the header instead of leaking.
-crypt_offset and the VIRT flag are intentionally not validated here
-- callers know their device's PSP implementation and can decide.
+Okay, I will split this into 2.
 
-Both in-tree callers gate on hardware-validated PSP, so this is a
-correctness fix rather than a reachable corruption path under
-current configurations.
+> 
+> > 
+> > Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> > ---
+> >  drivers/media/platform/qcom/iris/Kconfig      | 25 ++++++++++---------
+> >  .../media/platform/qcom/iris/iris_firmware.c  |  9 ++++---
+> >  drivers/media/platform/qcom/venus/Kconfig     |  1 +
+> >  drivers/media/platform/qcom/venus/firmware.c  | 11 ++++----
+> >  4 files changed, 25 insertions(+), 21 deletions(-)
+> > 
+> > diff --git a/drivers/media/platform/qcom/iris/Kconfig b/drivers/media/platform/qcom/iris/Kconfig
+> > index 3c803a05305a..f54b759c18aa 100644
+> > --- a/drivers/media/platform/qcom/iris/Kconfig
+> > +++ b/drivers/media/platform/qcom/iris/Kconfig
+> > @@ -1,13 +1,14 @@
+> >  config VIDEO_QCOM_IRIS
+> > -        tristate "Qualcomm iris V4L2 decoder driver"
+> > -        depends on VIDEO_DEV
+> > -        depends on ARCH_QCOM || COMPILE_TEST
+> > -        select V4L2_MEM2MEM_DEV
+> > -        select QCOM_MDT_LOADER if ARCH_QCOM
+> > -        select QCOM_SCM
+> > -        select VIDEOBUF2_DMA_CONTIG
+> > -        help
+> > -          This is a V4L2 driver for Qualcomm iris video accelerator
+> > -          hardware. It accelerates decoding operations on various
+> > -          Qualcomm SoCs.
+> > -          To compile this driver as a module choose m here.
+> > +	tristate "Qualcomm iris V4L2 decoder driver"
+> > +	depends on VIDEO_DEV
+> > +	depends on ARCH_QCOM || COMPILE_TEST
+> > +	select V4L2_MEM2MEM_DEV
+> > +	select QCOM_MDT_LOADER if ARCH_QCOM
+> > +	select QCOM_SCM
+> > +	select QCOM_PAS
+> > +	select VIDEOBUF2_DMA_CONTIG
+> > +	help
+> > +	  This is a V4L2 driver for Qualcomm iris video accelerator
+> > +	  hardware. It accelerates decoding operations on various
+> > +	  Qualcomm SoCs.
+> > +	  To compile this driver as a module choose m here.
+> 
+> Here, Space replaced by Tabs just for one line.., should be fine.
 
-Fixes: 0eddb8023cee ("psp: provide decapsulation and receive helper for drivers")
-Suggested-by: Daniel Zahka <daniel.zahka@gmail.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: David Carlier <devnexen@gmail.com>
----
-v1 -> v2 (per Daniel Zahka):
-  - strip the variable-length PSP header (psph->hdrlen) instead of
-    rejecting opt-bearing frames; VC/options are ignored, not refused
-  - drop the crypt_offset and PSPHDR_VERFL_VIRT checks
-  - refresh kerneldoc above psp_dev_rcv()
-  - retarget at net (was net-next)
+Yeah, spaces aren't meant here.
 
- net/psp/psp_main.c | 41 +++++++++++++++++++++++++++++++----------
- 1 file changed, 31 insertions(+), 10 deletions(-)
+> 
+> 
+> > diff --git a/drivers/media/platform/qcom/iris/iris_firmware.c b/drivers/media/platform/qcom/iris/iris_firmware.c
+> > index 5f408024e967..856fa6a79064 100644
+> > --- a/drivers/media/platform/qcom/iris/iris_firmware.c
+> > +++ b/drivers/media/platform/qcom/iris/iris_firmware.c
+> > @@ -4,6 +4,7 @@
+> >   */
+> >  
+> >  #include <linux/firmware.h>
+> > +#include <linux/firmware/qcom/qcom_pas.h>
+> >  #include <linux/firmware/qcom/qcom_scm.h>
+> >  #include <linux/of_address.h>
+> >  #include <linux/of_reserved_mem.h>
+> > @@ -79,7 +80,7 @@ int iris_fw_load(struct iris_core *core)
+> >  		return -ENOMEM;
+> >  	}
+> >  
+> > -	ret = qcom_scm_pas_auth_and_reset(core->iris_platform_data->pas_id);
+> > +	ret = qcom_pas_auth_and_reset(core->iris_platform_data->pas_id);
+> >  	if (ret)  {
+> >  		dev_err(core->dev, "auth and reset failed: %d\n", ret);
+> >  		return ret;
+> > @@ -93,7 +94,7 @@ int iris_fw_load(struct iris_core *core)
+> >  						     cp_config->cp_nonpixel_size);
+> >  		if (ret) {
+> >  			dev_err(core->dev, "qcom_scm_mem_protect_video_var failed: %d\n", ret);
+> > -			qcom_scm_pas_shutdown(core->iris_platform_data->pas_id);
+> > +			qcom_pas_shutdown(core->iris_platform_data->pas_id);
+> >  			return ret;
+> >  		}
+> >  	}
+> > @@ -103,10 +104,10 @@ int iris_fw_load(struct iris_core *core)
+> >  
+> >  int iris_fw_unload(struct iris_core *core)
+> >  {
+> > -	return qcom_scm_pas_shutdown(core->iris_platform_data->pas_id);
+> > +	return qcom_pas_shutdown(core->iris_platform_data->pas_id);
+> >  }
+> >  
+> >  int iris_set_hw_state(struct iris_core *core, bool resume)
+> >  {
+> > -	return qcom_scm_set_remote_state(resume, 0);
+> > +	return qcom_pas_set_remote_state(resume, core->irisi_platform_data->pas_id);
+> 
+> 
+> Should be a separate change for qcom_pas_set_remote_state()
+> 
+> >  }
+> > diff --git a/drivers/media/platform/qcom/venus/Kconfig b/drivers/media/platform/qcom/venus/Kconfig
+> > index ffb731ecd48c..574172724e8f 100644
+> > --- a/drivers/media/platform/qcom/venus/Kconfig
+> > +++ b/drivers/media/platform/qcom/venus/Kconfig
+> > @@ -6,6 +6,7 @@ config VIDEO_QCOM_VENUS
+> >  	select OF_DYNAMIC if ARCH_QCOM
+> >  	select QCOM_MDT_LOADER if ARCH_QCOM
+> >  	select QCOM_SCM
+> > +	select QCOM_PAS
+> >  	select VIDEOBUF2_DMA_CONTIG
+> >  	select V4L2_MEM2MEM_DEV
+> >  	help
+> > diff --git a/drivers/media/platform/qcom/venus/firmware.c b/drivers/media/platform/qcom/venus/firmware.c
+> > index 1de7436713ed..3c0727ea137d 100644
+> > --- a/drivers/media/platform/qcom/venus/firmware.c
+> > +++ b/drivers/media/platform/qcom/venus/firmware.c
+> > @@ -12,6 +12,7 @@
+> >  #include <linux/of_reserved_mem.h>
+> >  #include <linux/platform_device.h>
+> >  #include <linux/of_device.h>
+> > +#include <linux/firmware/qcom/qcom_pas.h>
+> >  #include <linux/firmware/qcom/qcom_scm.h>
+> >  #include <linux/sizes.h>
+> >  #include <linux/soc/qcom/mdt_loader.h>
+> > @@ -58,7 +59,7 @@ int venus_set_hw_state(struct venus_core *core, bool resume)
+> >  	int ret;
+> >  
+> >  	if (core->use_tz) {
+> > -		ret = qcom_scm_set_remote_state(resume, 0);
+> > +		ret = qcom_pas_set_remote_state(resume, VENUS_PAS_ID);
+> 
+> This too..
+> 
+> >  		if (resume && ret == -EINVAL)
+> >  			ret = 0;
+> >  		return ret;
+> > @@ -218,7 +219,7 @@ int venus_boot(struct venus_core *core)
+> >  	int ret;
+> >  
+> >  	if (!IS_ENABLED(CONFIG_QCOM_MDT_LOADER) ||
+> > -	    (core->use_tz && !qcom_scm_is_available()))
+> > +	    (core->use_tz && !qcom_pas_is_available()))
+> >  		return -EPROBE_DEFER;
+> >  
+> >  	ret = of_property_read_string_index(dev->of_node, "firmware-name", 0,
+> > @@ -236,7 +237,7 @@ int venus_boot(struct venus_core *core)
+> >  	core->fw.mem_phys = mem_phys;
+> >  
+> >  	if (core->use_tz)
+> > -		ret = qcom_scm_pas_auth_and_reset(VENUS_PAS_ID);
+> > +		ret = qcom_pas_auth_and_reset(VENUS_PAS_ID);
+> >  	else
+> >  		ret = venus_boot_no_tz(core, mem_phys, mem_size);
+> >  
+> > @@ -259,7 +260,7 @@ int venus_boot(struct venus_core *core)
+> >  						     res->cp_nonpixel_start,
+> >  						     res->cp_nonpixel_size);
+> >  		if (ret) {
+> > -			qcom_scm_pas_shutdown(VENUS_PAS_ID);
+> > +			qcom_pas_shutdown(VENUS_PAS_ID);
+> >  			dev_err(dev, "set virtual address ranges fail (%d)\n",
+> >  				ret);
+> >  			return ret;
+> > @@ -274,7 +275,7 @@ int venus_shutdown(struct venus_core *core)
+> >  	int ret;
+> >  
+> >  	if (core->use_tz)
+> > -		ret = qcom_scm_pas_shutdown(VENUS_PAS_ID);
+> > +		ret = qcom_pas_shutdown(VENUS_PAS_ID);
+> >  	else
+> >  		ret = venus_shutdown_no_tz(core);
+> >  
+> > -- 
+> > 2.51.0
+> 
+> with above change
+> 
+> Reviewed-by: Mukesh Ojha <mukesh.ojha@oss.qualcomm.com>
+> 
 
-diff --git a/net/psp/psp_main.c b/net/psp/psp_main.c
-index 9508b6c38003..b040345d7273 100644
---- a/net/psp/psp_main.c
-+++ b/net/psp/psp_main.c
-@@ -263,15 +263,17 @@ EXPORT_SYMBOL(psp_dev_encapsulate);
- 
- /* Receive handler for PSP packets.
-  *
-- * Presently it accepts only already-authenticated packets and does not
-- * support optional fields, such as virtualization cookies. The caller should
-- * ensure that skb->data is pointing to the mac header, and that skb->mac_len
-- * is set. This function does not currently adjust skb->csum (CHECKSUM_COMPLETE
-- * is not supported).
-+ * Accepts only already-authenticated packets. The full PSP header is
-+ * stripped according to psph->hdrlen; any optional fields it advertises
-+ * (virtualization cookies, etc.) are ignored and discarded along with the
-+ * rest of the header. The caller should ensure that skb->data is pointing
-+ * to the mac header, and that skb->mac_len is set. This function does not
-+ * currently adjust skb->csum (CHECKSUM_COMPLETE is not supported).
-  */
- int psp_dev_rcv(struct sk_buff *skb, u16 dev_id, u8 generation, bool strip_icv)
- {
- 	int l2_hlen = 0, l3_hlen, encap;
-+	u32 psp_hdr_len;
- 	struct psp_skb_ext *pse;
- 	struct psphdr *psph;
- 	struct ethhdr *eth;
-@@ -312,18 +314,36 @@ int psp_dev_rcv(struct sk_buff *skb, u16 dev_id, u8 generation, bool strip_icv)
- 	if (unlikely(uh->dest != htons(PSP_DEFAULT_UDP_PORT)))
- 		return -EINVAL;
- 
--	pse = skb_ext_add(skb, SKB_EXT_PSP);
--	if (!pse)
-+	psph = (struct psphdr *)(skb->data + l2_hlen + l3_hlen +
-+				 sizeof(struct udphdr));
-+
-+	/* Strip the full PSP header per psph->hdrlen; VC/options are pulled
-+	 * into the linear region only so they can be discarded with the
-+	 * rest of the header.
-+	 */
-+	psp_hdr_len = ((u32)psph->hdrlen + 1) * 8;
-+
-+	if (unlikely(psp_hdr_len < sizeof(struct psphdr)))
-+		return -EINVAL;
-+
-+	if (psp_hdr_len > sizeof(struct psphdr) &&
-+	    !pskb_may_pull(skb, l2_hlen + l3_hlen +
-+				sizeof(struct udphdr) + psp_hdr_len))
- 		return -EINVAL;
- 
- 	psph = (struct psphdr *)(skb->data + l2_hlen + l3_hlen +
- 				 sizeof(struct udphdr));
-+
-+	pse = skb_ext_add(skb, SKB_EXT_PSP);
-+	if (!pse)
-+		return -EINVAL;
-+
- 	pse->spi = psph->spi;
- 	pse->dev_id = dev_id;
- 	pse->generation = generation;
- 	pse->version = FIELD_GET(PSPHDR_VERFL_VERSION, psph->verfl);
- 
--	encap = PSP_ENCAP_HLEN;
-+	encap = sizeof(struct udphdr) + psp_hdr_len;
- 	encap += strip_icv ? PSP_TRL_SIZE : 0;
- 
- 	if (proto == htons(ETH_P_IP)) {
-@@ -340,8 +360,9 @@ int psp_dev_rcv(struct sk_buff *skb, u16 dev_id, u8 generation, bool strip_icv)
- 		ipv6h->payload_len = htons(ntohs(ipv6h->payload_len) - encap);
- 	}
- 
--	memmove(skb->data + PSP_ENCAP_HLEN, skb->data, l2_hlen + l3_hlen);
--	skb_pull(skb, PSP_ENCAP_HLEN);
-+	memmove(skb->data + sizeof(struct udphdr) + psp_hdr_len,
-+		skb->data, l2_hlen + l3_hlen);
-+	skb_pull(skb, sizeof(struct udphdr) + psp_hdr_len);
- 
- 	if (strip_icv)
- 		pskb_trim(skb, skb->len - PSP_TRL_SIZE);
--- 
-2.53.0
+Thanks.
 
+-Sumit
 
