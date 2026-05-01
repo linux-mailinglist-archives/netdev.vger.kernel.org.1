@@ -1,69 +1,103 @@
-Return-Path: <netdev+bounces-283177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283176-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qHc3Eh6k9GlKDAIAu9opvQ
-	(envelope-from <netdev+bounces-283177-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 15:01:18 +0200
+	id iMuSKBWk9GlKDAIAu9opvQ
+	(envelope-from <netdev+bounces-283176-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 15:01:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 274DF4AC878
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 15:01:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A63A4AC871
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 15:01:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 818903006013
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 13:01:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DDFE1301DE37
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 13:00:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C1621C9EA;
-	Fri,  1 May 2026 13:01:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BC9E248880;
+	Fri,  1 May 2026 13:00:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WakF7gha"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UZ1AB4fb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234AC1A0728;
-	Fri,  1 May 2026 13:01:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E74EF1A0728
+	for <netdev@vger.kernel.org>; Fri,  1 May 2026 13:00:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777640471; cv=none; b=HRSixqqGWqDlR70liAlpy4DobS+cEWq1CjCl7svvUeFPFIBAHk0MnLd69LmDBUcWPzmhxzwgGXTP2+Nb1lC/QaJLXaxV8Kre+RfIf3GF0lxWy0iQfX/tEw+HEliAXScsoB8OSluJkWR4Z4HJDj54eHLUDZ8MMny9pxQHHKw1+qo=
+	t=1777640454; cv=none; b=DO/DjKIeoyWx4/zFoNUHZdGgh+v3MwL46jaThtZHG43xyMgKVkT2hvWhxEBgAVZ56BaBU+2sM31CKQJEKalEd049xo5P+zt7DpKgJi8iQ0smzGSVLpGCGz3rLtCXEwXj/LXPXygk2V71cCm5dBhcElWiNz5486qr7l8fN5SaGoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777640471; c=relaxed/simple;
-	bh=anHGGlP7eUobci4qOJNwgNRVYwi3Jyjr5+UH1j30138=;
+	s=arc-20240116; t=1777640454; c=relaxed/simple;
+	bh=qyIkRHi6oV5U2SmgdqpjVI5pwMUbK8zwy66lyVzRAGs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LcBDp+FCYsVApNTXIuOG9b1i8nWauQNk8Z3AZyy1LyCjVsK0SCNBp3tDlCQsoEwkFUmaRSrPiQ3CxbwfCESAA8mzX5jmp0wWvc+peQXB7u8a2EoZZvDKPWPfd9m/KyicTyvc4TGXgoOiLxgFtavUt7urOiuiRqTiwZHIGW+31+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WakF7gha; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CFB0C2BCB4;
-	Fri,  1 May 2026 13:01:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777640470;
-	bh=anHGGlP7eUobci4qOJNwgNRVYwi3Jyjr5+UH1j30138=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WakF7gha4S92pyCJb0f2WGU9T08DKi5BS9vG6CjgEqz8zJdrDX6IhemtqYYH1SbTm
-	 BvwHtCyKKaH+6xJDmkqQB7RYt+d4xqcEJNPvZahvKmGcRAS7fBi/5RbY+tCYVJzdUl
-	 9EF2torHoRz7xjqo8DqUt3WoxCOntgjfBdO7xL00fe6cGjjTTfRRIVu7o3JMob7206
-	 8NO8bhdjbcirxd9okt68OD6bhGEd0HwtUPfE4j40sW8TXQKRIRTPsTXFxVBcvYIl0w
-	 RkaLDQh/+8UbjXqA9BOTzULreQzy3WFGzt1ZhMy3qG7ojRgjM6kCEgQKswcMJuNtzy
-	 LJ9J+4MlT7tTA==
-From: Simon Horman <horms@kernel.org>
-To: lee@kernel.org
-Cc: 'Simon Horman' <horms@kernel.org>,
+	 MIME-Version; b=O4PQv1F5AldDna/UNoMSRK2RFRmBhog2DXJuJsUQM+QoAlROHtFcnySGpYM3VJ0EukEp2lIIZn0FkvJPJZJ43GueGuWI9VLoqJSQSmtN+oFSrOt8Ptdt5/CusD8d3nv3XubsCAkkQK+nViVDixTZ55ExO3FBzksqkQB2GEaOyMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UZ1AB4fb; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-488e1a8ac40so18416585e9.2
+        for <netdev@vger.kernel.org>; Fri, 01 May 2026 06:00:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777640450; x=1778245250; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pqhRiAzIyiH2+fYeG1xj4sXrzPXGhw3STHTuHrGU/qY=;
+        b=UZ1AB4fbwLpo6HsO5504KHdSFb29QYDc7E9RPsNsQXNwn1llm38Mm00ylSnEkk3kFs
+         //0wgOBBzxVAKP8E1WFS4qczuW7LIAyTxG3czvlhOPIxqQPVr6TFBWap9n9RdzzzYa9D
+         O4trE/rFYCUfMIRbulzv8as9ze6FDTqcs9Cgk40an/HrUlb8B2CT5+pOAECM7mTzLl3w
+         a7GJmHiVS297Ig0fQ0p5LboCPAQV7lcvMRGWp/PMUrKwN6qD5Wf2NxoAEE6V/8+9UrcK
+         DxSBEHyAolyaUdq04mSsbqyoPMNw7wafaDMf8o3ZmJHEQqIQsUJmEsD+9L4kyStiQC3C
+         wxXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777640450; x=1778245250;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=pqhRiAzIyiH2+fYeG1xj4sXrzPXGhw3STHTuHrGU/qY=;
+        b=i547blHO6P40cAydsTyMv4oUt33fwfeqLz40gQ62TtIBVH42WnKofShl55KLTkbc7X
+         /GW9Qy2dxUiHWBTRfR32nTe6bofXbo+nKTq2oNw035KdLw4S6FtJ5MgpjLmY+owIROnv
+         Pam/BHNLDriqPp7GkRV5uA8a9lzmYfn4TSGjLmzukg3FDxH2wWjJHISFC8t0d2Sbvq8w
+         pC/wZlYHDNzJ2Lx7TheAFIbWcOpJFNBxjffWj6Li77tzofs5JeKrsJESl51zMtV5q+M8
+         aMEJe0IvboQLUBlKXHljHnRaFGG0FwZUCrPYNIgoe/vpKX6NHtoqygFEaf6aUa0/SjiL
+         b4Vw==
+X-Forwarded-Encrypted: i=1; AFNElJ/GXwhkHYO65hY2UxZbu8hGBqphxm44rVVtWj8EfD0sbvPaLCOD7IRZciH++GD47u/4NY1fGqw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywc8jIPyJ+D8lvqWy2+uXvX1tdwWu6eMw72zo28RT9uoNVoyXCs
+	SCgeajZXVsYzpg5huUjRHjvQBuHdC1JFSVWrwb8Xa4bjFY3pCSyuZmN6
+X-Gm-Gg: AeBDievnxXKRpEwh4FQ7PjRc4Pc5OBkHDSlVHb+ZPXaP+kNOf0y92LmFG3F/wisaI0e
+	Dr34GmtuGul14obAJRJ1FVNda8/9KC8uU+cZYghpluzWN4l9bRoj83nPMx2vt9bwLghMdaDrmp9
+	uPwst1bO1kr7KiQeWQ6k45Hvl4SGXPzvXXPIX6tedYcVUTwOmVe1jHx40kHCKrC4ulvDXJtAXs4
+	Y4NIcxAcPfGWBoazQCVo6YpMzW4bf/GNw2gMspoSEDX71DtGPoK9au9l4fJvuCEsq8O5Jw2yBLe
+	oh29+k9ABQnUze8ZnSWPNUNVtoTDBzc+Mw5h87bdSAotn/7QwTJ2K7tkaFviJvNGmrw6d9QsOYf
+	ZSUgfdjlQA9pqQltpdcIn57Kze3uCIy2O2rYS5KYuwKTVQw4ss6vPJBSYLAUCRvV+34k18Fm9kA
+	KxC0hIN0M7oSG5aFHnV2Wbpey8S9qQsv9gO7JwAmwawPv+1F4ZBvCIVGtD7vwSER4Az7hQNuj8z
+	ROkT0xxl5abX5NDTtihRg==
+X-Received: by 2002:a05:600c:1f10:b0:487:1fb4:7e1 with SMTP id 5b1f17b1804b1-48a8445b91cmr118213405e9.22.1777640449917;
+        Fri, 01 May 2026 06:00:49 -0700 (PDT)
+Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a82301b7bsm151465915e9.11.2026.05.01.06.00.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 May 2026 06:00:49 -0700 (PDT)
+From: David Carlier <devnexen@gmail.com>
+To: daniel.zahka@gmail.com,
+	kuba@kernel.org
+Cc: willemdebruijn.kernel@gmail.com,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	kuniyu@google.com,
-	mingo@kernel.org,
+	horms@kernel.org,
+	raeds@nvidia.com,
 	kees@kernel.org,
-	qjx1298677004@gmail.com,
-	sameo@linux.intel.com,
+	cratiu@nvidia.com,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] nfc: llcp: Fix use-after-free in llcp_sock_release()
-Date: Fri,  1 May 2026 13:58:28 +0100
-Message-ID: <20260501125826.102679-3-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260429134115.3558604-1-lee@kernel.org>
-References: <20260429134115.3558604-1-lee@kernel.org>
+	linux-kernel@vger.kernel.org,
+	David Carlier <devnexen@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net v2] psp: strip variable-length PSP header in psp_dev_rcv()
+Date: Fri,  1 May 2026 14:00:46 +0100
+Message-ID: <20260501130046.16008-1-devnexen@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260430062033.20428-1-devnexen@gmail.com>
+References: <20260430062033.20428-1-devnexen@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,101 +105,154 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 274DF4AC878
+X-Rspamd-Queue-Id: 3A63A4AC871
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,gmail.com,linux.intel.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-283177-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,kernel.org,nvidia.com,vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-283176-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-0.991];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-From: 'Simon Horman' <horms@kernel.org>
+psp_dev_rcv() unconditionally removes a fixed PSP_ENCAP_HLEN, even
+when psph->hdrlen indicates that the PSP header carries optional
+fields. A frame whose PSP header advertises a non-zero VC or any
+extension would therefore be silently mis-decapsulated: option bytes
+would spill into the inner packet head and downstream parsing would
+fail on a corrupted skb.
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
+Compute the full PSP header length from psph->hdrlen, pull the
+optional bytes into the linear region, and strip the whole header
+when decapsulating. Optional fields (VC, ...) are still ignored,
+just discarded with the rest of the header instead of leaking.
+crypt_offset and the VIRT flag are intentionally not validated here
+- callers know their device's PSP implementation and can decide.
+
+Both in-tree callers gate on hardware-validated PSP, so this is a
+correctness fix rather than a reachable corruption path under
+current configurations.
+
+Fixes: 0eddb8023cee ("psp: provide decapsulation and receive helper for drivers")
+Suggested-by: Daniel Zahka <daniel.zahka@gmail.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: David Carlier <devnexen@gmail.com>
 ---
-nfc: llcp: Fix use-after-free in llcp_sock_release()
+v1 -> v2 (per Daniel Zahka):
+  - strip the variable-length PSP header (psph->hdrlen) instead of
+    rejecting opt-bearing frames; VC/options are ignored, not refused
+  - drop the crypt_offset and PSPHDR_VERFL_VIRT checks
+  - refresh kerneldoc above psp_dev_rcv()
+  - retarget at net (was net-next)
 
-This commit addresses a use-after-free issue in llcp_sock_release(). It
-attempts to fix the problem by checking if the socket is in the connecting
-state, and if so, unlinks it from the connecting_sockets list instead of the
-default sockets list.
+ net/psp/psp_main.c | 41 +++++++++++++++++++++++++++++++----------
+ 1 file changed, 31 insertions(+), 10 deletions(-)
 
-> diff --git a/net/nfc/llcp_sock.c b/net/nfc/llcp_sock.c
-> index f1be1e84f665..feab29fc62f4 100644
-> --- a/net/nfc/llcp_sock.c
-> +++ b/net/nfc/llcp_sock.c
-[ ... ]
-> @@ -633,6 +633,8 @@ static int llcp_sock_release(struct socket *sock)
->  
->  	if (sock->type == SOCK_RAW)
->  		nfc_llcp_sock_unlink(&local->raw_sockets, sk);
-> +	else if (sk->sk_state == LLCP_CONNECTING)
-> +		nfc_llcp_sock_unlink(&local->connecting_sockets, sk);
+diff --git a/net/psp/psp_main.c b/net/psp/psp_main.c
+index 9508b6c38003..b040345d7273 100644
+--- a/net/psp/psp_main.c
++++ b/net/psp/psp_main.c
+@@ -263,15 +263,17 @@ EXPORT_SYMBOL(psp_dev_encapsulate);
+ 
+ /* Receive handler for PSP packets.
+  *
+- * Presently it accepts only already-authenticated packets and does not
+- * support optional fields, such as virtualization cookies. The caller should
+- * ensure that skb->data is pointing to the mac header, and that skb->mac_len
+- * is set. This function does not currently adjust skb->csum (CHECKSUM_COMPLETE
+- * is not supported).
++ * Accepts only already-authenticated packets. The full PSP header is
++ * stripped according to psph->hdrlen; any optional fields it advertises
++ * (virtualization cookies, etc.) are ignored and discarded along with the
++ * rest of the header. The caller should ensure that skb->data is pointing
++ * to the mac header, and that skb->mac_len is set. This function does not
++ * currently adjust skb->csum (CHECKSUM_COMPLETE is not supported).
+  */
+ int psp_dev_rcv(struct sk_buff *skb, u16 dev_id, u8 generation, bool strip_icv)
+ {
+ 	int l2_hlen = 0, l3_hlen, encap;
++	u32 psp_hdr_len;
+ 	struct psp_skb_ext *pse;
+ 	struct psphdr *psph;
+ 	struct ethhdr *eth;
+@@ -312,18 +314,36 @@ int psp_dev_rcv(struct sk_buff *skb, u16 dev_id, u8 generation, bool strip_icv)
+ 	if (unlikely(uh->dest != htons(PSP_DEFAULT_UDP_PORT)))
+ 		return -EINVAL;
+ 
+-	pse = skb_ext_add(skb, SKB_EXT_PSP);
+-	if (!pse)
++	psph = (struct psphdr *)(skb->data + l2_hlen + l3_hlen +
++				 sizeof(struct udphdr));
++
++	/* Strip the full PSP header per psph->hdrlen; VC/options are pulled
++	 * into the linear region only so they can be discarded with the
++	 * rest of the header.
++	 */
++	psp_hdr_len = ((u32)psph->hdrlen + 1) * 8;
++
++	if (unlikely(psp_hdr_len < sizeof(struct psphdr)))
++		return -EINVAL;
++
++	if (psp_hdr_len > sizeof(struct psphdr) &&
++	    !pskb_may_pull(skb, l2_hlen + l3_hlen +
++				sizeof(struct udphdr) + psp_hdr_len))
+ 		return -EINVAL;
+ 
+ 	psph = (struct psphdr *)(skb->data + l2_hlen + l3_hlen +
+ 				 sizeof(struct udphdr));
++
++	pse = skb_ext_add(skb, SKB_EXT_PSP);
++	if (!pse)
++		return -EINVAL;
++
+ 	pse->spi = psph->spi;
+ 	pse->dev_id = dev_id;
+ 	pse->generation = generation;
+ 	pse->version = FIELD_GET(PSPHDR_VERFL_VERSION, psph->verfl);
+ 
+-	encap = PSP_ENCAP_HLEN;
++	encap = sizeof(struct udphdr) + psp_hdr_len;
+ 	encap += strip_icv ? PSP_TRL_SIZE : 0;
+ 
+ 	if (proto == htons(ETH_P_IP)) {
+@@ -340,8 +360,9 @@ int psp_dev_rcv(struct sk_buff *skb, u16 dev_id, u8 generation, bool strip_icv)
+ 		ipv6h->payload_len = htons(ntohs(ipv6h->payload_len) - encap);
+ 	}
+ 
+-	memmove(skb->data + PSP_ENCAP_HLEN, skb->data, l2_hlen + l3_hlen);
+-	skb_pull(skb, PSP_ENCAP_HLEN);
++	memmove(skb->data + sizeof(struct udphdr) + psp_hdr_len,
++		skb->data, l2_hlen + l3_hlen);
++	skb_pull(skb, sizeof(struct udphdr) + psp_hdr_len);
+ 
+ 	if (strip_icv)
+ 		pskb_trim(skb, skb->len - PSP_TRL_SIZE);
+-- 
+2.53.0
 
-Does this cover the case where a remote peer rejects a non-blocking
-connection with a DM frame?
-
-If a non-blocking connection is initiated, the socket is placed on
-local->connecting_sockets with the state LLCP_CONNECTING. If the remote
-peer then rejects the connection via a Disconnect Mode (DM) frame,
-nfc_llcp_recv_dm() sets sk->sk_state = LLCP_CLOSED but leaves the socket
-in the connecting_sockets list.
-
-When llcp_sock_release() later checks the state, it will be LLCP_CLOSED,
-causing the new LLCP_CONNECTING check to fail. The code will then fall
-through to the else branch:
-
->  	else
->  		nfc_llcp_sock_unlink(&local->sockets, sk);
-
-Could this corrupt the list? The nfc_llcp_sock_unlink() call for
-local->sockets acquires local->sockets.lock and executes sk_del_node_init().
-Since the socket is physically still on the local->connecting_sockets hlist,
-this would mutate the connecting_sockets list pointers concurrently without
-holding the correct local->connecting_sockets.lock.
-
-Simon says: while I think the problem above warrants looking into in
-            the context of this patch, I think the problem below pre-dates
-	    this patch and does not need to block progress of it.
-
-Is there also a race condition here with nfc_llcp_recv_cc()?
-
-In nfc_llcp_recv_cc(), a connecting socket is unlinked from
-connecting_sockets and linked to sockets without acquiring lock_sock(sk).
-
-If llcp_sock_release() executes concurrently (since it holds lock_sock(sk)
-while recv_cc does not), could it fully unlink the socket and drop its
-references while nfc_llcp_recv_cc() resumes, blindly linking the now
-released socket into local->sockets?
-
-This would leave a dangling pointer in the local->sockets list. I noticed
-this specific race appears to be addressed later in the series by commit
-e4b0d26ffad8cf0db2a59991b8b7098890b74187 ("nfc: llcp: Fix use-after-free
-race in nfc_llcp_recv_cc()").
 
