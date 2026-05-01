@@ -1,170 +1,201 @@
-Return-Path: <netdev+bounces-283235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283236-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QNO8L0fQ9GkYFQIAu9opvQ
-	(envelope-from <netdev+bounces-283235-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 18:09:43 +0200
+	id 8AT2N0LR9GkYFQIAu9opvQ
+	(envelope-from <netdev+bounces-283236-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 18:13:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2629B4ADF27
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 18:09:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23B164ADFD6
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 18:13:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C3CE5300276E
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 16:09:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BFF2F3043515
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 16:11:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3F943F54C4;
-	Fri,  1 May 2026 16:09:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D0AF3F7AA0;
+	Fri,  1 May 2026 16:11:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bppzZu+A"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iuDKym33"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CA7F1FE471
-	for <netdev@vger.kernel.org>; Fri,  1 May 2026 16:09:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777651761; cv=none; b=KqIljdrpIbXynjS7EQfFJ6tx0H0XsS5bVQ8jtueS4jZX9Axcw6r+CtXkm9a34EvLt52ZoVYt9Cc/rBHaJhhDSGFdkWtTeiLynUWB2YxpIt+JecoItDElWwtvp1py/7fqzw+m61W7iBU+4PhjyXf90aR5N9lw5L1oG1Bu+s3kbAU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777651761; c=relaxed/simple;
-	bh=H9vy1cQC/HXlqztXuZ9OEMMIXA5/uAtvI5lbbPAhQiI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sBEVG1/dsV2rU4sRFJeI3UGMeseVNbM5gIduWa+X+svG0ImcuR613oRQzZXnIrnKb1JTWI7Y0+7tfUFame8ZU2OaI3iByrBC6AWOLF31rX51i2z/zaBV5NYh+7Bzac7JiR41+yXtaorRTbu9r0htTGgg+ROuOVY50Y0bFZfrQ/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bppzZu+A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BA82C2BCB4;
-	Fri,  1 May 2026 16:09:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777651757;
-	bh=H9vy1cQC/HXlqztXuZ9OEMMIXA5/uAtvI5lbbPAhQiI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bppzZu+Ak1L388bnWMHsRyi0iyGLlinM4hLe4WPouxBNPlRTgyX4J9R57m2YeRXA6
-	 F4vqBZI8Vxuqu+8Ukl9iDU9THq53ofGKNfSy3X/Zqa5rlM5ISqRSR8nIQ92xi3rbu0
-	 AwxQeLgOmO6ZF51I4ardQ6lOASZZXTH8zzNsT+dwlVAeviuOY/bQNDiMko5KwNw7N9
-	 3PiYbtYYuyRk7b0vFp/Xzeo0M17fZ8kZfgOpxR9sn1EtiDkGYO4+92BnVsCn+7k/ib
-	 MtXflYbm6R7T5jCGjc8GnwSpTYCYdFdxhhb289BzDQIaVw6AoJdfAZ2kTCdUnVl7Ma
-	 sztwadvzZinog==
-From: Simon Horman <horms@kernel.org>
-To: imv4bel@gmail.com
-Cc: 'Simon Horman' <horms@kernel.org>,
-	steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ilant@mellanox.com,
-	sowmini.varadhan@oracle.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH ipsec] esp: Force skb_cow_data() on RX when the skb is non-linear
-Date: Fri,  1 May 2026 17:09:10 +0100
-Message-ID: <20260501160910.234735-1-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <afLDKSvAvMwGh7Fy@v4bel>
-References: <afLDKSvAvMwGh7Fy@v4bel>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EC903DEFFF
+	for <netdev@vger.kernel.org>; Fri,  1 May 2026 16:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777651909; cv=pass; b=BHlJbvnEaxf9Kc6u8d9dLGIMqJqWUdmPPtA5XegAyEvyjM5PI0uFQL1JBdIcrF8tcqPKwL9SVALr4bTSfEOzXtpIBkBpANgHaBVFwRKAKEhnXfihDiOh9kA6Mcx+pyKTLQwEKzjkWuTxDMImCxCeOfaQNPB6+aUwBbjCmBMvEs0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777651909; c=relaxed/simple;
+	bh=Lg3I4a5CVSLmEfFpzSrc+IJ6RbdpOOFMUy6frdtkKdg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=H0kh15yOw2iodu+90qgNV7V9PddBs5NYxkbuhZ43j5uhbc1VSG/G37p9Orx/S3TipczuCyZhJBu7riqr3avU2FUbgM2o9Ye++TnS2ow//oG9S2NrbsQgGGxH38RdEVHR6uA6+cZYypjPoZGr9nso23bjx+sxD3YmtE1jOQSVGig=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iuDKym33; arc=pass smtp.client-ip=74.125.82.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-12c565dd3a7so2914433c88.1
+        for <netdev@vger.kernel.org>; Fri, 01 May 2026 09:11:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777651899; cv=none;
+        d=google.com; s=arc-20240605;
+        b=RwnqWr9xV/ceFNiAKQwENYTwnVus90HjEZo4UxukGtoTzZZSYMBEgZvkcyCOKbFaR+
+         4q6lKuhB/I2/7BGaAJj9KaFuUfTAhubq2GsL7ZGSGGJyw9SL0H963ozINsVHEMbDblSu
+         I9/Trfx5NKvPDDrssytDOIWvfVZ1FjShJuezdSQDmPxlE2wYWWv0ekPJt40erujBqB5J
+         cDFo+eTDRkGK55/uXiRTHZbBAXzKxfdFbORDuuTgabEjF9876twpfADzaVe5pGY6fCuR
+         wtjC6A6lXaekb4hDZgMn0gd7sH3YC9z0AD8w9vyXpcGO53NKeFYhLnmD6HveA3gAfTAR
+         lUnA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=qUtLnk45BiKrXHINpVcyMQeBwCn16A0KrBFa2QFTWtI=;
+        fh=xfrZAEFk+gwESRlweNHdT400HdgrQxt/8Pgxxcq3pvM=;
+        b=aYUnSkPnCWahXWG/h2SP6630vn0BGe9flLCb5W4Jd0CUJthA6aptMtRjlQw9CcxJIi
+         pwBrg6pK2x928Tnl28I204d2nuurplck0pxq2Z0knNT2VULugWf3wQJjyuKWXGmGNS2l
+         2aKhw+wroyo2dnZn3+E+2/jefMTbV8K9Y8DOgWVoYr2/vvGliLg9Z2vIKi9Jp+EGYZfV
+         wPRY/f70ubLvSsEPm6/o7Yc2NGyvQti9OD98xbEEioMMTVEo4oyvDEq+Wv8R+UB23gr+
+         sr+5vnoMD/uC0qYfCqN7w8/kuCqUqDFTr4XuLAZiuAk9JjwUhPG3JEBOVnokKjY6aDxw
+         wZ9w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777651899; x=1778256699; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qUtLnk45BiKrXHINpVcyMQeBwCn16A0KrBFa2QFTWtI=;
+        b=iuDKym332S3y8j2Dh8gx5+R6x5q9ow83jxo2eSebtwLzoL7A08OmajBfhFzWCdKifv
+         tSC2/qCqb0EUCeKQDXArWwsFbvxZshdj6+YxZkOwWJCHAlm9NTkqeDbUD5DhrBf+uT8b
+         7OVSxiC+3KhCsYvtennSRH1IZs6NYrEzCC0WKMmPy12hYAmghoqQEMvJSKgRc/MER5jp
+         SdoEm9F7/eDVT3mm6gVwb+36REfhqT1KtcCZSynk5T8jlVrrv2iHBADepDV4W4Fny6Ce
+         VqcOd4HzKiBmsbe9OdD/EaQKN8No8kqjD+EfMrTpOxVlFahLEr+8c0miMiEYERdd7FJz
+         H1Pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777651899; x=1778256699;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=qUtLnk45BiKrXHINpVcyMQeBwCn16A0KrBFa2QFTWtI=;
+        b=ZZ/jarpZUuB30/gtvuUakiGYoYZ0iqGOQSnQE2O/uIjeGB32dfbsJ6oBB6DW4BkCj4
+         h295LWek8FirJmCThjpccASWdr75Cb11Gw5/8FAJPqwrO+2LHEtXld8Mxas73BSxOqcl
+         wS27XhWtJmiBoWlJT2RQwnsBarLO4cfbU4eZmLiXFWH9ODhLbklsr5CRQuyIQduUScMN
+         FjcOut+lHUVhQ/a0adcwrI+ZIdPE2Jl+cnNl27NXKrDdPqAXn3h6LLjmtLv4Y3qXOplC
+         yrN4nur63zspRJOyzVj+wXO5Or8PewbsMAkYPZQpcjgC0fEorAkU0yWZLBAQmthQvYEj
+         qhbQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9rjRoOwXEjgzKwl/PKObQob8CwSJsL5EaNrPvl7E6UvqJ5vcDYaiVoRP0y0/xWEnBjPZvpmCc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEeOUE1AbXlLsTG05Xy/BrWSekkGoTCVEPi0kAuRYjY8/e5CaP
+	IiQvlXeSi+Hddsc7EvDILym4lxTGPWNlsxV2Fzyh4/pgDyfZSDdjWtUbyew2hqadvkuoOe/OQEw
+	XB8Rrz0w7mt970CDzGXkt7t69H41y8K5dpHM3Ge7I
+X-Gm-Gg: AeBDiesBCFPuAuGZdRZGP6C2LBZ3WCTQmy8yU1JhxeHXivRyGdQrzIv0aTKU/k3rS5m
+	+H1cuqg8XeQrrjzO8hCsIEF30eaOyKdMSmAANHXmKHD+DExa1zhXMhl2Huxco9XfweSWxqBYcFw
+	yZfrr0k6UrcZC4uSRhfBRF9qV4Pvr9wjOFqQQcF8r5BIcQoOTRnaUHgpIIy04iMh7xtlonjtso/
+	DeP8wdYWcl6KQqeritna2/7RaiBkJyz/Lnn98qwFCZaphX3sIKNN6mSm79537hptx7c00XUPHES
+	pB+dhZ64MB/b1iQSyycpWe8S2DV4EUI6FkOhfFgV
+X-Received: by 2002:a05:7022:423:b0:12d:e126:b7c8 with SMTP id
+ a92af1059eb24-12deac411demr3607716c88.13.1777651898369; Fri, 01 May 2026
+ 09:11:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 2629B4ADF27
+References: <0-v1-dc5fa250ca1d+3213-mlx5st_jgg@nvidia.com>
+In-Reply-To: <0-v1-dc5fa250ca1d+3213-mlx5st_jgg@nvidia.com>
+From: David Matlack <dmatlack@google.com>
+Date: Fri, 1 May 2026 09:11:11 -0700
+X-Gm-Features: AVHnY4IcOZBEwRDeFauz0p7wo2ItTFGZpUDr4nDVbee6fBs6NBQ1Q0W5r-m7yp8
+Message-ID: <CALzav=ci8bi3=sY+F3HJTB5sOQ_pJ8Lm+kz0CDBBWVXry5P98w@mail.gmail.com>
+Subject: Re: [PATCH 00/11] mlx5 support for VFIO self test
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Alex Williamson <alex@shazbot.org>, kvm@vger.kernel.org, 
+	Leon Romanovsky <leon@kernel.org>, linux-kselftest@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org, 
+	Saeed Mahameed <saeedm@nvidia.com>, Shuah Khan <shuah@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
+	patches@lists.linux.dev, Josh Hilke <jrhilke@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 23B164ADFD6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283235-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283236-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dmatlack@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,qemu.org:url,nvidia.com:email]
 
-From: 'Simon Horman' <horms@kernel.org>
+On Thu, Apr 30, 2026 at 5:08=E2=80=AFPM Jason Gunthorpe <jgg@nvidia.com> wr=
+ote:
+>
+> Add an mlx5 driver to VFIO self test. This is largely a remix of the
+> existing VFIO mlx5 driver in rdma-core. It uses an RDMA loopback QP
+> to issue RDMA WRITE operations which effectively perform memory
+> copies using DMA. Since mlx5 has a stable programming ABI this
+> should work on devices from CX5 to current HW. The device FW must
+> support the QP loopback configuration.
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-esp: Force skb_cow_data() on RX when the skb is non-linear
+> This entire series was coded by Claude Code in about 4 days.
 
-This commit modifies esp_input() and esp6_input() to unconditionally call
-skb_cow_data() for all non-linear skbs. This removes the fast path that
-previously allowed in-place AEAD decryption for skbs carrying paged
-fragments without a frag_list.
+Very exciting. Josh Hilke from Google is also working on using AI to
+create a selftest driver for Intel IGB NICs so VFIO selftests can run
+in QEMU [1]. So it's encouraging to see you were able to do it with
+mlx5.
 
-> diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-> index 6dfc0bcdef65..a6fbdec139dc 100644
-> --- a/net/ipv4/esp4.c
-> +++ b/net/ipv4/esp4.c
-> @@ -868,17 +868,10 @@ static int esp_input(struct xfrm_state *x, struct sk_buff *skb)
->  		assoclen += seqhilen;
->  	}
->  
-> -	if (!skb_cloned(skb)) {
-> -		if (!skb_is_nonlinear(skb)) {
-> -			nfrags = 1;
-> -
-> -			goto skip_cow;
-> -		} else if (!skb_has_frag_list(skb)) {
-> -			nfrags = skb_shinfo(skb)->nr_frags;
-> -			nfrags++;
-> +	if (!skb_cloned(skb) && !skb_is_nonlinear(skb)) {
-> +		nfrags = 1;
->  
-> -			goto skip_cow;
-> -		}
-> +		goto skip_cow;
->  	}
+[1] https://www.qemu.org/docs/master/system/devices/igb.html
 
-By removing this fast path and forcing all non-linear skbs to fall through
-to skb_cow_data(), does this break the IPsec GRO/GSO fast path?
+> For those interested, the flow I used was broadly a prompt sequence
+> sort of like:
+>
+>  - Hey Claude, go look at the falcon series, VFIO self test, the
+>    mlx5 driver, rdma-core and some PDF documentation and make a
+>    plan to put mlx5 under the selftest.
+>  - Write an rdma-core application using the built-in VFIO provider
+>    that can do the required memcpy operations that vfio selftests
+>    wants.
+>    (This resulted in a 1k loc C file that compiled and ran the
+>     first time but had a few bugs related to device programming
+>     that the AI resolved.)
+>  - Replace the rdma-core components with open-coded versions to
+>    create a fully stand-alone program that does the DMA memcpy.
+>  - Review and audit the thing.
+>  [Pause and de-slop it]
+>  - Make it work on a PF too (this is surprisingly hard!).
 
-Looking at skb_cow_data() in net/core/skbuff.c:
+Can it work on CX VFs? We're interested in continuously performing
+memory copies across a Live Update using a VF via selftests to
+demonstrate SR-IOV preservation (when we eventually get there).
 
-int skb_cow_data(struct sk_buff *skb, int tailbits, struct sk_buff **trailer)
-{
-	...
-	if ((skb_cloned(skb) || skb_shinfo(skb)->nr_frags) &&
-	    !__pskb_pull_tail(skb, __skb_pagelen(skb)))
-		return -ENOMEM;
-	...
+>  [Move to a kernel tree and copy all the .md files and .c program
+>   it made]
+>  - Hey Claude, look at all this stuff and make a broad plan to
+>    actually build a VFIO self test.
+>  - Here is my 1 sentence advice on what each patch should look
+>    like, make a detailed plan to make a patch for every one.
+>  [Pause and polish the patch plans]
+>  - Execute plan X then commit it [pause and de-slop each patch,
+>    repeat].
+>  [Review and final polish]
+>
+> It is based on a tree with the falcon series applied.
 
-For a large GRO or GSO packet (which can be up to 64KB) with paged fragments,
-this attempts to pull the entire paged payload into the linear data area
-via __pskb_pull_tail().
-
-Since this runs in the RX softirq path, pulling the entire payload requires
-a high-order contiguous memory allocation using GFP_ATOMIC. 
-
-Could this lead to widespread packet drops when memory is fragmented and
-these high-order atomic allocations fail?
-
-Additionally, even when the allocations succeed, does unconditionally copying
-up to 64KB of data per packet introduce a severe performance regression by
-entirely negating the software crypto fast path?
-
-[ ... ]
+Thanks for sending, I look forward to reviewing!
 
