@@ -1,61 +1,60 @@
-Return-Path: <netdev+bounces-283308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283309-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8AxDJAk69Wl8JgIAu9opvQ
-	(envelope-from <netdev+bounces-283308-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 01:40:57 +0200
+	id sEZPIzs69Wl8JgIAu9opvQ
+	(envelope-from <netdev+bounces-283309-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 01:41:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18BA64B0570
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 01:40:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 373F44B0586
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 01:41:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C196130166DC
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 23:40:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E0346301690E
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 23:41:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62F5A36CDF3;
-	Fri,  1 May 2026 23:40:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C1C37E2FA;
+	Fri,  1 May 2026 23:41:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FwDgQio7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RCRg68/u"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41019366079
-	for <netdev@vger.kernel.org>; Fri,  1 May 2026 23:40:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A64876FC5
+	for <netdev@vger.kernel.org>; Fri,  1 May 2026 23:41:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777678855; cv=none; b=GDn0xNVt5W+ou1ZFe3BhIYEEBlkcvy5fg0GKPV4fZm4bv4PuD1gv05TaIq8lZv6eAkTefw74KTuMBA2CQ+M29jhh69BR+lQDpsF5iWSadx/Yz8HWtVeZjlK0flBMPouz73Fxl2mmlXnw583mvVDrjk1zpT7koCIeo+yupzWya70=
+	t=1777678903; cv=none; b=BVTgvXgJ5iVSF2CWtnm3MP5ZQN1EvHKJ1C4bo8xJeeCMALMjni7q1uiIRtB6mkAmDCoUI2JcLcGuraCCOD9s9I4zFVunWmIaay5Fg8vHkSFZDZK1RHtBXx8acmN8ONjsPV32ekT1cTFLWtVICS+kPqEkC43yaXB5GHzG7zlmxPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777678855; c=relaxed/simple;
-	bh=WExdvJ9e3UJXKudyOxvJ7IX9xdwi3Wg7H+r/lMC8Pm4=;
+	s=arc-20240116; t=1777678903; c=relaxed/simple;
+	bh=lhpeol+0ulG+Ef1czwz3jozMm0LyTrPVVBHkFeQSGrg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e29tFVXV2mSCoZHMqQOtRhvLJQbIidY6kaMyGC7ZD6ip51tMEgc9d+mgwtBJjVYKirr7I0LKFUHrqnLZGkWANm0c9hMPyXXHMNy6Y8VXVaf+4L7D3oGtskva4u1+lXzxjTw6WfadDJAWbvHkEVX+WvN6UuwapCrddR1rt5iiAUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FwDgQio7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90255C2BCB4;
-	Fri,  1 May 2026 23:40:54 +0000 (UTC)
+	 MIME-Version:Content-Type; b=KlSuM4ewWGifW6CU0LF8QWbom2lDramFL/c71ZC+kQRPxWKticPgXaG/o9g4L9n0H4V524V2uHolG48Sp8S7f8BQC5X4JwILHIhtTQWtN4ZVa87fzU56MecNYhxNpWUldg6x5K7RZxxlIcLeNpfTRtjo9lMDCkPFTFF+mZkAZ5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RCRg68/u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B892C2BCB8;
+	Fri,  1 May 2026 23:41:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777678854;
-	bh=WExdvJ9e3UJXKudyOxvJ7IX9xdwi3Wg7H+r/lMC8Pm4=;
+	s=k20201202; t=1777678903;
+	bh=lhpeol+0ulG+Ef1czwz3jozMm0LyTrPVVBHkFeQSGrg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FwDgQio7/Xp0q7WgJeIVCEXEjOy/bgXXTxqFrbZHAY9fzlbIA+1hBVhroVeCcHPJA
-	 W/2blfo4mTfQY2+WDhh1Xl1cUOMbiPmt4yLbui/jK5LpIuwNXjWOczjPOX0EiMptbE
-	 O5vhvOwYLLZqQz/EXeNKPwJR/3jLEr/SZSKTbSG5ThH4xEjjhIfS8RVW8StRhJ9XsY
-	 FYMxRB9TM0yg4mMDIvw1AE21xR0vdUygdZIs3nTzYckXoXA9wlFPfgMbHleKY9g6Yk
-	 t3SBhenvmV5PcKZ/3bmviFiU+vSci+hodC3zgZynykKnHsQ0bmmWyr7yHAo/VI9sBa
-	 izulWEyP+18kQ==
-Date: Fri, 1 May 2026 16:40:53 -0700
+	b=RCRg68/upk468E2gh5yQVI1nCflGF0F/fV9fTB+yCKPZaF20fXKzxhnO7aTc7JIh3
+	 jKxUOmZNIRD+xc3F6XjUtL7PkTLpMAdqqgLNS7ZnwgqqSweEemttaUiwPP7fx8SONL
+	 2sRUqy/DpFo+0CzG1Cv5J+N3qdlCjz5dv5vl9d5+JtIZUNuddgiE5cpqtVRSnFmMQZ
+	 4vpweih0Ow8nswPbWK13gQWecBTi7ry7gY2OMeosY2Zj7rhKYQ91J3XAbtuVczwCtD
+	 6+CQ4An6ah1WiJTJWEva+SYzbApVGmxE4pyldJcs+J+s3yUAUdWlOEoyFde2/zobIa
+	 ebJRpIkTEWmOw==
+Date: Fri, 1 May 2026 16:41:42 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Eric Joyner <eric.joyner@amd.com>
 Cc: <netdev@vger.kernel.org>, Brett Creeley <brett.creeley@amd.com>, Andrew
  Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
  "Eric Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 3/5] ionic: Update ionic_if.h with new extra
- port stats structure
-Message-ID: <20260501164053.23312056@kernel.org>
-In-Reply-To: <20260501031555.43259-4-eric.joyner@amd.com>
+Subject: Re: [PATCH net-next 5/5] ionic: Add .get_fec_stats ethtool handler
+Message-ID: <20260501164142.77cb73e7@kernel.org>
+In-Reply-To: <20260501031555.43259-6-eric.joyner@amd.com>
 References: <20260501031555.43259-1-eric.joyner@amd.com>
-	<20260501031555.43259-4-eric.joyner@amd.com>
+	<20260501031555.43259-6-eric.joyner@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,7 +63,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 18BA64B0570
+X-Rspamd-Queue-Id: 373F44B0586
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -72,11 +71,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283308-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283309-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
@@ -84,7 +83,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
@@ -96,25 +95,15 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Thu, 30 Apr 2026 20:15:53 -0700 Eric Joyner wrote:
-> @@ -2951,6 +2959,7 @@ union ionic_port_identity {
->   * @sprom_page17:    Extended Transceiver sprom, page 17
->   * @rsvd:            reserved byte(s)
->   * @pb_stats:        uplink pb drop stats
+On Thu, 30 Apr 2026 20:15:55 -0700 Eric Joyner wrote:
+> Several FEC error statistics being collected can be reported in a
+> dedicated ethtool callback for FEC errors, so implement the handler that
+> does so. This includes 802.3ck FEC histogram data that some newer
+> hardware collects.
 
-Looks like the removed field is left behind in the doc?
+sparse says:
 
-> + * @extra_stats:     Extra port statistics data
->   */
->  struct ionic_port_info {
->  	union ionic_port_config config;
-> @@ -2968,9 +2977,7 @@ struct ionic_port_info {
->  		};
->  	};
->  	u8     rsvd[376];
-> -
-> -	/* pb_stats must start at 2k offset */
-> -	struct ionic_port_pb_stats  pb_stats;
-> +	struct ionic_port_extra_stats extra_stats;
->  };
+drivers/net/ethernet/pensando/ionic/ionic_ethtool.c:449:37: warning: incorrect type in assignment (different base types)
+drivers/net/ethernet/pensando/ionic/ionic_ethtool.c:449:37:    expected unsigned long long [usertype] sum
+drivers/net/ethernet/pensando/ionic/ionic_ethtool.c:449:37:    got restricted __le64 const
 
