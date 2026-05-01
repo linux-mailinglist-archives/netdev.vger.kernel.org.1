@@ -1,313 +1,276 @@
-Return-Path: <netdev+bounces-283084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283085-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0JhPFSoe9Gks+gEAu9opvQ
-	(envelope-from <netdev+bounces-283084-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 05:29:46 +0200
+	id sH4XD6ce9Gks+gEAu9opvQ
+	(envelope-from <netdev+bounces-283085-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 05:31:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F023C4A9ECB
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 05:29:45 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B6F14A9EED
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 05:31:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 87D45301A91C
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 03:29:39 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 296FC300A581
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 03:31:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 171DA309F1D;
-	Fri,  1 May 2026 03:29:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3358B2DA749;
+	Fri,  1 May 2026 03:31:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AxbkzECo"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="3OAyOEGs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011059.outbound.protection.outlook.com [40.107.208.59])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 138951A0712
-	for <netdev@vger.kernel.org>; Fri,  1 May 2026 03:29:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777606179; cv=none; b=lUpkLoL9GonDeZqfplUqj6Ae2k3Bx3POjKNRL6kQJQ1jDEA5xJC30gIeRC0gg/ntxz5vYaE49xNtP9hFihNLBb424daEtL5fqj2yjcNuxp/c08U3BWSasRCxRmPYNFfO0xoao8Smj2Y1ug3wHAYjuOargFymIB2ca3BeVo9J4y0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777606179; c=relaxed/simple;
-	bh=cZfTMIMKNTtYHRa010I665NFQ7IXtH/nYQmAfdK3zls=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ipJd6UvbRBw1FvEBpH4KeLM7nAxN0Cl6gBKCusKojn/Pj4OcOVrb2834gzu4TM9FkjN9Z0PHyycQOoF7uRC3vC6vP7jcpQYgKJsefqRKqLxHwT14yiVsyMYAkYnawIUPgbNP8kgRmPE8sm0eRmQWraXdUULPGo7EdrV4lhrj3rY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AxbkzECo; arc=none smtp.client-ip=209.85.214.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-2b4583f0a1aso10123705ad.3
-        for <netdev@vger.kernel.org>; Thu, 30 Apr 2026 20:29:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777606176; x=1778210976; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=y5pMq+0ztTJey3vt9ZG8NcMewBWSWt2n8Zyo2B0ipWk=;
-        b=AxbkzECovBsRtT+F4Ka9KfuDYyw///lwX3k+k5SJfDwSeY5ZY/40+AitWG0OAsbFRG
-         TsWvemnNmbl1ZWbgKcOg33kn1c7n9vkIjcliB0TyXzAgbYJHZsY7yxrohix0qhiO/1v+
-         hB/OeH1Deu0MQKow1/1C5eptpAPz2tIAvDI8wqjHNz/312y88YQkDrDaGTuSTi0ux2iJ
-         lbEz6lpI9WlMay3GsgVc80WE8hP31my5CRUdRmxqC7+sWIJ738RbGm2gCC8qCzZO9/oP
-         OrMjqpAkrpzK+tA15Crl/A6uLp2UiFai7LSvuLZbMnNsFnQ7d64yg0KboWlUcbWVT909
-         4L3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777606176; x=1778210976;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y5pMq+0ztTJey3vt9ZG8NcMewBWSWt2n8Zyo2B0ipWk=;
-        b=di7coyKDNOxJb29yCfN+8M06jqldT0edpEkpZgyhsdaaEmX+vTBiT3Zal4EgNDT3e4
-         wKsVhRe2t+u3zN0G7B3pZJLut35PQFWel2TsxyOrIZtzsuNpnR3IVDsjc3t83M8MpsS1
-         YbfolUQPo1aJS8s/U9Yom/PVMCwHYNoQib/qb6p6SnFuPISZukL4nSmu10y4hQcZwIjY
-         DuHbM7t+LF5JC9tFxyi2/VRtz05lKdRQZoA+0NyrMTLT2SfBFnnbva6Yn6ObLkcJ9BWH
-         5hEyGKFuzCn8i4PXLVkces281ybWIPU/UaGYe/MgwUp3XIgffcd6h8o+l6BGXsk9CyBu
-         z+5g==
-X-Forwarded-Encrypted: i=1; AFNElJ+WMXUgLV0KSEIPbjlG/qNUHBzRWmzNq7unZsZBnDeI8s3toC1UlfsXSgeKI2hmzfGMgzQ8i7Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5KztAAnMPU6MWju4f7ze/XVQ/40NVU2DsoalWReRmKxW870Pj
-	swjNGzNrBxt1kU19bXibCak9ZkiAVcJx8M96nFrJWoZyS8IQ2Guh2Nea
-X-Gm-Gg: AeBDietDkOSEFLw0ZqDNwymsz7rVpHQ5Q++pB07SOtrEDQsiX+yI+vf4EJDzClK1ffY
-	8WZAbZihPmw20phVI+SzvjVEk8lA/H+VvhdOtfFFCQdIdJDf3AEYYXsjNiGV/OtTqq0GMcm0sP9
-	WTHDr+6LnI3d4Twkl0UbbC3/7ATtOy98cf0b93a+tdCuixjPZwMcS9/9zuIFS1LJS87T5Sm+MO+
-	Ug/Ojkm9UaGWBJMO+j/uH5pAQ/4oh1oYnJ2sxWcjeVasKWa7tEXKPcHPkUc8Ebw7VtpdydBY8An
-	CmKsu+VtbmxeoMFbkzAGLg5MAFydsA/O3rCgMa6QccA3lV7kbDM6XDbbDq1DFMkSUj65G9V2TYk
-	HNWgrfddS11zadfYerrv2t2lpn16DufyvTYK+pQU0oxJqJCjBQ3n2w+Qkd/D2RzB5DVnLmFTHXg
-	kFuQofLncwB4lAtMPm8bmJgV182lM=
-X-Received: by 2002:a17:902:9a81:b0:2b2:a267:784a with SMTP id d9443c01a7336-2b9d442a93bmr7345535ad.24.1777606176324;
-        Thu, 30 Apr 2026 20:29:36 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:46::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b9caa7ee38sm9906495ad.16.2026.04.30.20.29.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Apr 2026 20:29:35 -0700 (PDT)
-Date: Thu, 30 Apr 2026 20:29:35 -0700
-From: Stanislav Fomichev <sdf.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
-	aleksander.lobakin@intel.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net v4 8/8] xsk: fix u64 descriptor address truncation on
- 32-bit architectures
-Message-ID: <afQdzWlMzjgpAUq7@devvm7509.cco0.facebook.com>
-References: <20260424053816.27965-1-kerneljasonxing@gmail.com>
- <20260424053816.27965-9-kerneljasonxing@gmail.com>
- <afE7EFYdrNg1u_g2@devvm7509.cco0.facebook.com>
- <CAL+tcoA0j+tHOPr-DLyW26_EF1JhwqV+no0Lcx335FtKRbwUAw@mail.gmail.com>
- <afIeuwJNfwVmk9Pn@devvm7509.cco0.facebook.com>
- <CAL+tcoBTO9QGM220EO=m1TdiXwod7QzG59j7vQL3qoVSrb2QEw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4979196C7C
+	for <netdev@vger.kernel.org>; Fri,  1 May 2026 03:31:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777606305; cv=fail; b=BLVrqWTTICx6VmWqBnp/qvlCluPANN0KSlHAmSUZmzLo3fEBc/twm4nodE77J6vb0P6DaKKC3VMfZvUJ6m9N+axmqltTTeRoymScTcsrnuqvcjVTSB4cOgRVFPacOhQ8K++SwJA2kLeziZjqnjrVHPnxLpsvU1ncZCUT8GYkcaI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777606305; c=relaxed/simple;
+	bh=NUipQuyx7U8WoIA5vLM3WNXIgZEjzgzLdRX2Oc9aiK8=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=BHd6/+SbEEeeyx9i43QpjJ4ZELYuWtb1DdHVbp1MRE4wnMCMFUwWOv7g99A0usG6h/lMT2Gi5WfBAv4lDMi88JTlVz5zb1kiBSb9ZcKy5vVo21kjDTCVN7ydx2/CxrspbOrX+I3Qp08164gaYVpAwgbWH/49CXoIulc9+MWAYSE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=3OAyOEGs; arc=fail smtp.client-ip=40.107.208.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=mmz9fvxkD3WNT9mSRJOfdqM4sc2JcweGWeJLWBOhwsLQwKoFEEk12YKvBUtdO+2Xbum1ewguUtzGvEynYW0bNEVpix2FIwuTItsJU5RyHrWP5YOlxVdukQD99IjrRPctyQVzyn2dDoLMnVZ/t9JPehO6crbCNby7DLZQVJKm7Rlb0nSxbLRsHshBudefr13JEt3+H0gpN9Y95JHAbyfvJ74Og9TTaZxx/iY3TjNTva0bipOrmY179Yc9W92HF0RuVmQ8TrjkbJlFtGA4XOr6DvSeSdBV21qwc5MorWuulVP+DHPg8d2Q8ud8FDTrpxtOchBq5vwuT6bOQAPwGNMh6w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EkqjSTZVNH//rscXkRIAZqnwNKW3rCRXshkQM44aPkU=;
+ b=dFcB1fAjg0zmIaVZrJ0uScAXrIjOj0HuCyTBC1qtTVXcucfRR08SyCYsWYFMHgASPN7F8QreqG2a1rsQtQKrU0aQ3HK5k2iOzWfTZgqxRBO1c4jYLJthMAT/5S4qOlFcenK9tZD3qGFOXAM7lgRRSoZzHlDjX2bVj2foCRQ/0EKlJozvJTNxP7xZRFSHqB0qWEObm1mtSsnjD+8HZOWMWgLAC0dVDh7epoit92rmXlCeQmPprJ+bz4a3TNk8k6w81I55s1/tbXJ62q5SvtYDDoe4i99zSV6/pHyYP7UFg4u8mO311/cne28CAbuD9j1unKhMH24jBWAkNK2pCsqXKg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EkqjSTZVNH//rscXkRIAZqnwNKW3rCRXshkQM44aPkU=;
+ b=3OAyOEGsfVcdzSEG7L4cJo6V4jxyjGHCs+4tyO9fJ3mO6wBQnFmPxOs7lhmXCBTNukYFdTG4z++6ER//TPAx9TswedOuc3Dqy1qvfVRsd+ufYhme5DJCRr9VeSZX3YZLgMngk0cgyqrmEZ5ccPe2V7fx6b4OOrC/DmzAgreCsbw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS4PR12MB9708.namprd12.prod.outlook.com (2603:10b6:8:278::7) by
+ IA0PR12MB7508.namprd12.prod.outlook.com (2603:10b6:208:440::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9870.22; Fri, 1 May 2026 03:31:39 +0000
+Received: from DS4PR12MB9708.namprd12.prod.outlook.com
+ ([fe80::8570:d817:2f81:c62a]) by DS4PR12MB9708.namprd12.prod.outlook.com
+ ([fe80::8570:d817:2f81:c62a%6]) with mapi id 15.20.9870.016; Fri, 1 May 2026
+ 03:31:39 +0000
+Message-ID: <e11587b5-2012-449b-b108-7483f5943327@amd.com>
+Date: Thu, 30 Apr 2026 20:31:36 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 5/7] ionic: fix adminq use-after-free on command
+ timeout
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: "Creeley, Brett" <Brett.Creeley@amd.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20260429210007.40015-1-eric.joyner@amd.com>
+ <20260429210007.40015-6-eric.joyner@amd.com>
+Content-Language: en-US
+From: Eric Joyner <eric.joyner@amd.com>
+In-Reply-To: <20260429210007.40015-6-eric.joyner@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR13CA0193.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c3::18) To DS4PR12MB9708.namprd12.prod.outlook.com
+ (2603:10b6:8:278::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL+tcoBTO9QGM220EO=m1TdiXwod7QzG59j7vQL3qoVSrb2QEw@mail.gmail.com>
-X-Rspamd-Queue-Id: F023C4A9ECB
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS4PR12MB9708:EE_|IA0PR12MB7508:EE_
+X-MS-Office365-Filtering-Correlation-Id: 54b3132e-774b-4a7f-b1da-08dea732279e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|366016|18002099003|22082099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	CbL/K9tIDhjJeFJtT0C/xsrvPQ1jEUw5//FxXyLgtcUiB692fnh8yJQZDHNzX6K024tV4b+bjtxsk0vNkVkRTokVbKdHPUso8Iz2pqxFH4Bv8VzX6sQhYFLD/BuDO98IG31qMaHdCHywvT1n/QL1UY1LYK+VJsofqJLv7UyftV3ENPyXvvVuWSGg36RLC9qP36KiOHzkXKC38LlZifXrRukzBxnWh1kqiOi4pruOyBRM7dvxt+v9U/cgc6k/nPdl+56LGftktJwW4eLfLXaN+2hFW4tHF1tCKVO9BYdpSsj8MZgghCAGt9Mu9daaHhNQHeA381tgKgXoUEKgUOAVcYdFEIyBtMRB9t8g9+s6wFmZQPMj0G+sY7+VCr6TWd5tj5U4PkgyeOoys2SPeKjwW4XgRdU++LNAE56hV5S+p3VWGtD8atHOmwWpytbBQQ5d2AhP82n4P8IUDHVUolSi2k69qxv17icLHkUQ+anrNwfPqCAHeA7ZsktpXKUbLBlmJ6IQ1TrEOGiDuY4pvCAUizKER39GwoAimTNuicqPVlUCdnhL7UrRa4kxUDO4Xno3cnu0Xzm53LxiMuoSvOTXD0gOflTUz2pAPUzJqSjpnXsUoZZLf/FLejgjJea0QNiGG1e5LViT73/IwIptKpcGRg==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS4PR12MB9708.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VHZ3THh6NnpxVWJIRVF6QXYrVnZ5eUhoSjBMZVI5WFV2OW5OZm9UUDZJU0Yz?=
+ =?utf-8?B?bTJNNW4rdWttcG9NWmswVnVHRWJ5Rll3VDU3V2lmbGhNTnBhenYwSGFDRnV3?=
+ =?utf-8?B?b24rVXFESzVtQmxZQkpObThHM2lLWHM3ZCt4NEN3WVpaVVZTZ0pPdUxYZ2k3?=
+ =?utf-8?B?U0ZLYXhyeElNRDZMYXBGVFBUN1d2SVh4NklGMEhPUFNsVG4rZndLYWtlQ2Fj?=
+ =?utf-8?B?aEFCRldkbVRwT3NYNVM2WmYrcWducWJvMUprMnV0TlNzSWYyN3dKR25DU2J3?=
+ =?utf-8?B?dWhYOWhMMklTNFUwdHltRjh1dXZYYTMwb2xGby85NEtXYmdKNHZGeUhOZDRH?=
+ =?utf-8?B?c2tldCtMWTU5ZkJ1YlgyY0JkZERtNklwenljOWxudDlZN1FuMzJ4ZTEwSW54?=
+ =?utf-8?B?MlVPY0FoVFNxWmM0Rmp1SGNKc0hObFJCQ3MzY0lpR0d1MHBXTS82WDFxUVBj?=
+ =?utf-8?B?V1E2eno3MTJpQ1RpYjB5UkdaV21tWVpvTmdWRWxoRUsxV0ZXUnQ4RytweEtO?=
+ =?utf-8?B?VEIwa0h0WHJISXVTVkpQNitOeXhvaVNyeXJpU1dqeHhCNHdLNm9oQ2RJemtJ?=
+ =?utf-8?B?eXU4b0hyY0t4NC9ucWxBT0s0aHZQWVFZcDVZSFJvOUdLMG10bVNCUktGaXk4?=
+ =?utf-8?B?MlM5Zm1pdE9SWW93RkFCOUZSb0VFZEU4VUhDUlJ6L1h3aGhDelpzS1BUTUZx?=
+ =?utf-8?B?TzVNclMzbWVvcTgvT0swWFZOa2JtN3c1Y200L2dpSnJ2ZDFhb3lNTXFXbEpF?=
+ =?utf-8?B?dVEraUR6S21GQkVEeXNjNDVGdVJyWmJTbVNZSHBteFVJbzk2dWQ4WG1DdTM0?=
+ =?utf-8?B?cHp0aHQ1M1c2b2RaRldRcDJGTW8rTUl5eXk2TW1uWENIeFFrdzJjZFZuMmVU?=
+ =?utf-8?B?bHdzQmlFMFdqa29IOUZKVkhuaHhWdDFheUpsUlo0V0lUNUlrazBCRkt2Q3Z1?=
+ =?utf-8?B?ZTRwV3RFOTFwWFVTWWwvTGppRC9DRmhvQzNLRklUR2V6dXhoY3I4Tm91STFN?=
+ =?utf-8?B?UHF5MWEvaGErbXJXU2NoVFpFY2ZZUWdhYlEvcS9ZTlJjMHNYMUlnVW54OTJJ?=
+ =?utf-8?B?QkgrNjVRNWpzb3p2TlRjT21wakg0SEhVK0lwOGlwSXpTV2x6YVJxVGpyM05C?=
+ =?utf-8?B?MHlicDlSY0VMMkF3dmF4MWM3UmFJemdQL3JWL01BNllJYXVUNXJIeWRwcDRD?=
+ =?utf-8?B?eUdBN1NHdGQxd3duTVlEREtqeSs4TnZ2cEtMYUxlelZ0dkMweVVHYktRSkZJ?=
+ =?utf-8?B?Y2psMitRUTlJVEQyaVh5Q1lwRjdPdGJnMXkzYlFJWHRFbjllRnRoV3VDbUkx?=
+ =?utf-8?B?NXhWamhMWDRITTB0RjlyeXV2VVpnanhQM3lQSmc4NUtHUk1mcXgrbmhVb2JS?=
+ =?utf-8?B?alJhOUJJdTdQb0oyVkpiYkJGa0QxRTBERnBPZ3ZaMlVVZWVDam5lYU4yYmtV?=
+ =?utf-8?B?djl0NFk1Mys2SVQvQjNSWmtxcEJSRWoveTdXVTk1eG5SZ2E5ZFpNSmpTejdE?=
+ =?utf-8?B?WjNhNU93T2RjZTJuSXY0a0ZvZXdxNWlacHorelFZUzlKZS92RmttNElSTXdV?=
+ =?utf-8?B?bTlJeFJFc3Q4dm5nN2dEYkE5dzZtL0FIQ0h5ZEl6QVQ5TUlDOEFJTXFkNDIz?=
+ =?utf-8?B?OFZjbWVKSnR0ZUYwbEpRMy9RN3Z0Z0lObkJOOTBUck1FMHREckhScllPNmxZ?=
+ =?utf-8?B?VmkwY0toYndyK0VjekZvNkZRTEdsMkpFOGozQWJ0T3d3K1JOSVl2eXhucXZB?=
+ =?utf-8?B?OHAzcHREbDFsbDZuMFNySEZNY0g4VU9rL1dteHlEMmRweEYzaDNvZko0VUMy?=
+ =?utf-8?B?ZGp4S1RtaGZkRGd0YjZTK0M5a0dGUUNQY0MyN2Q4YitYOExSN21PZnV6YkNu?=
+ =?utf-8?B?c0VpVmhiaHhSdmlhR1Q4Tm9XN3VSaTFKTE5pSGRjSFd2SXJHRWdWQ2hsR2Iv?=
+ =?utf-8?B?cUx0SkMzQXB4aU5tSHJUaG8vL0pnSWZvNGxmWGRuR0pnVGR6VmplZ2dkY0dP?=
+ =?utf-8?B?MXRwRGJ1OXVPSnZnZU56QzZEeGE5TEcyb3pnY1JMM0gwemppdVJxQlo5RnAw?=
+ =?utf-8?B?Y0R6NVhGbHhBNHV2R1FwRFF4V1A3c05pY1ByVHBlaEdKUnVDWCttcklpYnpB?=
+ =?utf-8?B?bHcvUEtadmt1TmhQZzU0SVpTQ2w3VG9hbFZSRk5xUlFWRFVGRUtBWHFUY2RI?=
+ =?utf-8?B?ZC9oNlVxeE5YRkVZZE1XeGt1cDhxVXNPNzJULzhpRzYvVko1U2h6dFdlMWh2?=
+ =?utf-8?B?TmRnU1RtQ0tydkZRRFZ6ZngwWWF0ZFRMd0FJQmkrL1dpVlRLbUp1bkRUNXBD?=
+ =?utf-8?B?VmRmb25pb1F6cFhCOGRiZ012cWhEcGExLzFkVG1pVTV6Z3lMS0kwUT09?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 54b3132e-774b-4a7f-b1da-08dea732279e
+X-MS-Exchange-CrossTenant-AuthSource: DS4PR12MB9708.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 May 2026 03:31:39.0456
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZEXJYRWMwYrnKiqYF4ahVxtnargzOPuO3SXY3xDfOjM0Q6yizAv6E5CQONOHmrU9
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7508
+X-Rspamd-Queue-Id: 2B6F14A9EED
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283084-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283085-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,fomichev.me,iogearbox.net,vger.kernel.org,tencent.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[amd.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[eric.joyner@amd.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,amd.com:dkim,amd.com:mid,sashiko.dev:url]
 
-On 04/29, Jason Xing wrote:
-> On Wed, Apr 29, 2026 at 6:14 PM Stanislav Fomichev <sdf.kernel@gmail.com> wrote:
-> >
-> > On 04/29, Jason Xing wrote:
-> > > On Wed, Apr 29, 2026 at 2:11 AM Stanislav Fomichev <sdf.kernel@gmail.com> wrote:
-> > > >
-> > > > On 04/24, Jason Xing wrote:
-> > > > > From: Jason Xing <kernelxing@tencent.com>
-> > > > >
-> > > > > In copy mode TX, xsk_skb_destructor_set_addr() stores the 64-bit
-> > > > > descriptor address into skb_shinfo(skb)->destructor_arg (void *) via a
-> > > > > uintptr_t cast:
-> > > > >
-> > > > >     skb_shinfo(skb)->destructor_arg = (void *)((uintptr_t)addr | 0x1UL);
-> > > > >
-> > > > > On 32-bit architectures uintptr_t is 32 bits, so the upper 32 bits of
-> > > > > the descriptor address are silently dropped. In unaligned mode the chunk
-> > > > > offset is encoded in bits 48-63 of the descriptor address
-> > > > > (XSK_UNALIGNED_BUF_OFFSET_SHIFT = 48), meaning the offset is lost
-> > > > > entirely. The completion queue then returns a truncated address to
-> > > > > userspace, making buffer recycling impossible.
-> > > > >
-> > > > > Fix this by handling the 32-bit case in the destructor_arg helpers:
-> > > > >
-> > > > > - xsk_skb_destructor_set_addr(): on !CONFIG_64BIT, allocate an
-> > > > >   xsk_addrs struct via kmem_cache_zalloc() to store the full u64
-> > > > >   address. Leave num_descs as 0 (zalloc) so that the subsequent
-> > > > >   xsk_inc_num_desc() brings it to the correct count of 1.
-> > > > >
-> > > > > - xsk_skb_destructor_is_addr(): on !CONFIG_64BIT, return true only
-> > > > >   when destructor_arg is NULL (not yet set), false when it points to
-> > > > >   an xsk_addrs struct.
-> > > > >
-> > > > > - xsk_skb_init_misc(): call xsk_skb_destructor_set_addr() first
-> > > > >   before touching any other skb fields; on failure return early so
-> > > > >   the skb destructor is never changed from sock_wfree.
-> > > > >
-> > > > > The existing xsk_consume_skb() already handles 32-bit correctly after
-> > > > > these changes: xsk_skb_destructor_is_addr() returns false for any
-> > > > > allocated xsk_addrs, so the kmem_cache_free path is always taken.
-> > > > >
-> > > > > The overhead is one extra kmem_cache_zalloc per first descriptor on
-> > > > > 32-bit only; 64-bit builds are completely unchanged.
-> > > > >
-> > > > > Closes: https://lore.kernel.org/all/20260419045824.D9E5EC2BCAF@smtp.kernel.org/
-> > > > > Fixes: 0ebc27a4c67d ("xsk: avoid data corruption on cq descriptor number")
-> > > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > > > ---
-> > > > >  net/xdp/xsk.c | 38 +++++++++++++++++++++++++++++++-------
-> > > > >  1 file changed, 31 insertions(+), 7 deletions(-)
-> > > > >
-> > > > > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> > > > > index ed96f6ec8ff2..fe88f47741b5 100644
-> > > > > --- a/net/xdp/xsk.c
-> > > > > +++ b/net/xdp/xsk.c
-> > > > > @@ -558,7 +558,10 @@ static int xsk_cq_reserve_locked(struct xsk_buff_pool *pool)
-> > > > >
-> > > > >  static bool xsk_skb_destructor_is_addr(struct sk_buff *skb)
-> > > > >  {
-> > > > > -     return (uintptr_t)skb_shinfo(skb)->destructor_arg & 0x1UL;
-> > > > > +     if (IS_ENABLED(CONFIG_64BIT))
-> > > > > +             return (uintptr_t)skb_shinfo(skb)->destructor_arg & 0x1UL;
-> > > > > +     else
-> > > > > +             return !skb_shinfo(skb)->destructor_arg;
-> > > >
-> > > > Don't understand why we need to special case CONFIG_64BIT here?
-> > > > Shouldn't the same existing condition work on 32bit?
-> > >
-> > > Because 0x1UL is the particular semantic applied on a 64-bit arch.
-> > > xsk_skb_destructor_set_addr() sets it while
-> > > xsk_skb_destructor_is_addr() recognizes it. They are a pair.
-> > >
-> > > As you noticed, one liner works but is not that appropriate: on a
-> > > 32-bit arch, this member should be either a NULL point or a valid
-> > > pointer pointing to a memory region. Testing if it's NULL can be
-> > > helpful as to the long term maintenance because of its readability and
-> > > robustness/safety.
-> > >
-> > > The error path in allocation of skb is really complex, which is why
-> > > I'm so cautious to take care of it :)
-> >
-> > Let's cleanup the error path instead of adding more complexity? Similar to what
-> > you do with your "xsk: fix xsk_addrs slab leak on multi-buffer error path",
-> > but maybe add a few NULL checks?
+On 4/29/2026 2:00 PM, Joyner, Eric wrote:
+> From: Brett Creeley <brett.creeley@amd.com>
 > 
-> Good suggestion. I think I can cook a follow up patch to do such a
-> thing targetting net-next tree. This patch 8 belongs to net material
-> which means it will be backported to the older stable kernel as soon
-> as it gets merged. IIUC, the better way is to make it as simple as
-> possible?
+> When ionic_adminq_wait() times out or detects FW reset, it
+> returns an error to the caller, whose ionic_admin_ctx is typically
+> on the stack. However, desc_info->ctx in the adminq still points
+> to that ctx. If ionic_adminq_service() later runs in NAPI context,
+> it dereferences the stale pointer to copy the completion and call
+> complete_all(), causing a use-after-free.
 > 
-> >
-> > Instead of 32 vs 64, I'd like to reason about whether destructor_arg
-> > is an address or an allocated array (not whether we have 1 or >1
-> > descriptors). And we special case 32 bit by always allocating it.
-> >
-> > Haven't checked, but maybe this is all you need (besides your _set_addr
-> > changes)?
-> >
-> > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> > index 6149f6a79897..03f217e85d31 100644
-> > --- a/net/xdp/xsk.c
-> > +++ b/net/xdp/xsk.c
-> > @@ -589,6 +589,8 @@ static u32 xsk_get_num_desc(struct sk_buff *skb)
-> >                 return 1;
-> >
-> >         xsk_addr = (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
-> > +       if (!xsk_addr)
-> > +               return 0;
-> >
-> >         return xsk_addr->num_descs;
-> >  }
+> The timeout path partially addressed this via ionic_adminq_flush()
+> in ionic_adminq_check_err(), which NULLs all pending desc_info->ctx
+> entries. But there is a race window between the timeout detection
+> and the flush where NAPI could fire and access the stale ctx. The
+> FW reset path had no protection at all and returned directly
+> without clearing desc_info->ctx.
 > 
-> Right, as I mentioned, how about posting a new cleanup patch with your
-> suggested-by tag?
+> Add ionic_adminq_cancel() which takes adminq_lock and NULLs
+> desc_info->ctx for the specific context being cancelled. This
+> coordinates with ionic_adminq_service() which also runs under the
+> same lock. Call it from both error paths in ionic_adminq_wait()
+> before returning.
 > 
-> >
-> > > I've noticed the status has been changed to 'changes requested'. Does
-> > > that mean one way or another I have to post a new version?
-> >
-> > That wasn't me :-) From my POW, patches 1-7 are good to go..
+> Fixes: 938962d55229 ("ionic: Add adminq action")
+> Assisted-by: Claude:claude-opus-4.6
+> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+> Signed-off-by: Eric Joyner <eric.joyner@amd.com>
+> ---
+>  .../net/ethernet/pensando/ionic/ionic_main.c  | 30 +++++++++++++++++++
+>  1 file changed, 30 insertions(+)
 > 
-> Great! Thanks for the review. My hope is to get this series merged
-> soon in the net tree.
-> 
-> >
-> > > >
-> > > > >  }
-> > > > >
-> > > > >  static u64 xsk_skb_destructor_get_addr(struct sk_buff *skb)
-> > > > > @@ -566,9 +569,21 @@ static u64 xsk_skb_destructor_get_addr(struct sk_buff *skb)
-> > > > >       return (u64)((uintptr_t)skb_shinfo(skb)->destructor_arg & ~0x1UL);
-> > > > >  }
-> > > > >
-> > > > > -static void xsk_skb_destructor_set_addr(struct sk_buff *skb, u64 addr)
-> > > > > +static int xsk_skb_destructor_set_addr(struct sk_buff *skb, u64 addr)
-> > > > >  {
-> > > >
-> > > > [..]
-> > > >
-> > > > > +     if (!IS_ENABLED(CONFIG_64BIT)) {
-> > > > > +             struct xsk_addrs *xsk_addr;
-> > > > > +
-> > > > > +             xsk_addr = kmem_cache_zalloc(xsk_tx_generic_cache, GFP_KERNEL);
-> > > > > +             if (!xsk_addr)
-> > > > > +                     return -ENOMEM;
-> > > > > +             xsk_addr->addrs[0] = addr;
-> > > > > +             skb_shinfo(skb)->destructor_arg = (void *)xsk_addr;
-> > > > > +             return 0;
-> > > > > +     }
-> > > > > +
-> > > > >       skb_shinfo(skb)->destructor_arg = (void *)((uintptr_t)addr | 0x1UL);
-> > > > > +     return 0;
-> > > >
-> > > > I think this is gonna be a 3rd copy paste of the same logic? Let's
-> > > > move to a new helper and replace existing kmem_cache_zalloc places?
-> > > >
-> > > > xsk_skb_destructor_alloc_list(prev_addr) ?
-> >
-> > Any comments on this?
-> 
-> I didn't comment on this because I thought I was not that sure if we
-> needed to wrap it up in the stable kernels :)
-> 
-> Of course, it would be easier for me to work on the net-next tree to
-> make the code look
-> more neat and elegant.
+> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_main.c b/drivers/net/ethernet/pensando/ionic/ionic_main.c
+> index 810cef0fec93..0971ca4d6650 100644
+> --- a/drivers/net/ethernet/pensando/ionic/ionic_main.c
+> +++ b/drivers/net/ethernet/pensando/ionic/ionic_main.c
+> @@ -190,6 +190,32 @@ static const char *ionic_opcode_to_str(enum ionic_cmd_opcode opcode)
+>  	}
+>  }
+>  
+> +static void ionic_adminq_cancel(struct ionic_lif *lif,
+> +				struct ionic_admin_ctx *ctx)
+> +{
+> +	struct ionic_admin_desc_info *desc_info;
+> +	unsigned long irqflags;
+> +	struct ionic_queue *q;
+> +	int i;
+> +
+> +	spin_lock_irqsave(&lif->adminq_lock, irqflags);
+> +	if (!lif->adminqcq) {
+> +		spin_unlock_irqrestore(&lif->adminq_lock, irqflags);
+> +		return;
+> +	}
+> +
+> +	q = &lif->adminqcq->q;
+> +
+> +	for (i = 0; i < q->num_descs; i++) {
+> +		desc_info = &q->admin_info[i];
+> +		if (desc_info->ctx == ctx) {
+> +			desc_info->ctx = NULL;
+> +			break;
+> +		}
+> +	}
+> +	spin_unlock_irqrestore(&lif->adminq_lock, irqflags);
+> +}
+> +
+>  static void ionic_adminq_flush(struct ionic_lif *lif)
+>  {
+>  	struct ionic_admin_desc_info *desc_info;
+> @@ -448,6 +474,7 @@ int ionic_adminq_wait(struct ionic_lif *lif, struct ionic_admin_ctx *ctx,
+>  			if (do_msg)
+>  				netdev_warn(netdev, "%s (%d) interrupted, FW in reset\n",
+>  					    name, ctx->cmd.cmd.opcode);
+> +			ionic_adminq_cancel(lif, ctx);
+>  			ctx->comp.comp.status = IONIC_RC_ERROR;
+>  			return -ENXIO;
+>  		}
+> @@ -458,6 +485,9 @@ int ionic_adminq_wait(struct ionic_lif *lif, struct ionic_admin_ctx *ctx,
+>  	dev_dbg(lif->ionic->dev, "%s: elapsed %d msecs\n",
+>  		__func__, jiffies_to_msecs(time_done - time_start));
+>  
+> +	if (time_after_eq(time_done, time_limit))
+> +		ionic_adminq_cancel(lif, ctx);
+> +
+>  	return ionic_adminq_check_err(lif, ctx,
+>  				      time_after_eq(time_done, time_limit),
+>  				      do_msg);
 
-Are you concerned that you're gonna break something in the net tree? Why not
-do it properly from the start? If you want, you can post 1-7 patches
-separately and we follow up with this one but still into net?
+I took a look at the Sashiko output for patches 5 and 6, and it echoed concerns that we found
+internally around ionic_adminq_cancel() and ionic_adminq_flush(). We might need to rework at
+least those two.
+
+https://sashiko.dev/#/message/20260429210007.40015-7-eric.joyner%40amd.com
+
+- Eric
+
 
