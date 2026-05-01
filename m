@@ -1,294 +1,209 @@
-Return-Path: <netdev+bounces-283200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283201-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GBHsIUC79Gm3EAIAu9opvQ
-	(envelope-from <netdev+bounces-283200-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 16:40:00 +0200
+	id uPG6J/q99GkDEQIAu9opvQ
+	(envelope-from <netdev+bounces-283201-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 16:51:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 418004AD523
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 16:40:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D27664AD623
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 16:51:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A8BD93007537
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 14:39:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 35DD3300CC3D
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 14:51:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0D093B6BFD;
-	Fri,  1 May 2026 14:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8534C3CCFB0;
+	Fri,  1 May 2026 14:51:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kq4+umvl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ewa+g0MK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 049153B19AE
-	for <netdev@vger.kernel.org>; Fri,  1 May 2026 14:39:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.178
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777646398; cv=pass; b=UAZYgfZTU8xHvEDJsjw8vjwhp/1lyAInjTT2VsWtYB2DRczsn2Xt6Pzc1J1GQiXqTtz6+3BR47uPOo580DOMwQGHqKkBcm2WjzW3PwF8bq59VSNeUDB1tz+KrLy4e29kN9EK2O/AQdsL8UmIfpn4zFL9Q77DZ4M27ph0rvQgNPY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777646398; c=relaxed/simple;
-	bh=S8fve2HFcCTBx3SnwVrIBbes1OGaEfXXe9hynclioBQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bQvwTwI5i4yqlGSCfxsD876XK2JZDAcUMImc0EQeyCmtp+90OpZNsDkVZkfwh/djZdrdaqZV12wOVhj8DGj+t1QW1LILekilPZbEXUPsQI4RexD1OzGEL0x6uGNsLzmwtt9bwLLnlWfgpcWB87zjzVijYiETp8fVfeJAEyiYcKQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kq4+umvl; arc=pass smtp.client-ip=209.85.167.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-479d4df9035so1844961b6e.0
-        for <netdev@vger.kernel.org>; Fri, 01 May 2026 07:39:56 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777646396; cv=none;
-        d=google.com; s=arc-20240605;
-        b=B3LmOAMn022I0KVmG/RZbeUc7dwIqaZCN1NssTvaIIr74BGzfvRJ9SlmHL7Kcqgu7s
-         5dMqw+qXJ/ExRu5wVpc/qWxSADO53wyWYNXhA5xmwePs+PNXrkqMa3UMe8TJvbVqT/O3
-         /MUPUsHwzPWFbul/OVqYFSdSsMRhMJ5xIE4KGuIFeRcLCoskj+RIkT8jvgBB2O9phl2Q
-         R6cyGBcM/Z5V8DIrk27FYxoD51vSntH0aNspi4jtfZgab82LBdKHqR9et4pK0ahIiVV/
-         Da2kvddyeWmFx4FSU4m24r4eqrA0CFF3Hbzuo5OeLEHfDuZ1vBwrY0m0at2/0q1carDX
-         FhQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=NftTzy9Ln5DqXKSRJIZ/qHTlNehEhTWv0Pbo/cmQRj0=;
-        fh=Wlvsxrn8BiFrGQcgQBearBQd6wC9bAcwZO7x212+4lI=;
-        b=iXoOXWryoHvK8UlxzwJ988Q4STlWjl8XIY2iM7RGpUVl/qKYaLSKMMBjbPs5i3LZDg
-         i7siI90AgoIVqPnc5m7HuUHPWKFNnrtLD5Mtl5s3cre4y9iFqcxyG4Tt/GcX6LgxFXmm
-         CTSRhmX60NBqJQXn7kcmSGEOe5SQTQB5bE1IE2sSxTIFeJ+N7qX3VDBGTEo0yIFoKjy5
-         tze3stQSpwIe9oUFCdk9ez+yD1PTtfWp5H6zUUAVLm448buGN8gyoL5e5vQ0CvWHfblm
-         owKyvZAUeaU27HIphE4oi0E1W7t1eQtSMdov4JpVSWzpft05CpJZYBVSSWnJB4/5kEY8
-         9vXQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777646396; x=1778251196; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=NftTzy9Ln5DqXKSRJIZ/qHTlNehEhTWv0Pbo/cmQRj0=;
-        b=Kq4+umvl9GaLHNKjf1HxbtCWRRaH6sJvZ7EDfMgE9MwBKACTwog7ES+0lFKVWN4pZ1
-         AIxn4Oh6qOGwju7RmNi9ggNAf/M3TOCGPgh6AMyS+PmdZVtuMfLyuU5CseSyzsZzTn+g
-         RrC9ax+acJDtTmZiqIVFJwiBJWI2CQiuJMZT4lXclKZkjlt60hw/+Vgc3tYe6NQuioSr
-         JlnvezqT921g83jgSGf2ZCF9Fm71T9bN4q7o+xQkBuVzqzh8FWhzFLXuelHCP6HBqS4F
-         4GGNvoZ3ce0d0C6MCH8eVkHlcE8WPIr2naFAiYiT/RGZDoF3eGib7oM7NSuEsaBwtnGg
-         OahQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777646396; x=1778251196;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NftTzy9Ln5DqXKSRJIZ/qHTlNehEhTWv0Pbo/cmQRj0=;
-        b=fXJlX0kU6k9wC2Apd/iOmyncoi/vND7O5vj/R5IWK06/gF5TtU+IXxgOd1mIpNjp0f
-         oYmZDdLhSLnwQQ4wHabM8r+pBR1pghE/YAWTs09zhaDE7/OqIXcS/PFtVRFs4J82HY+X
-         Gb00riw6qt/1vbzdOhD2MuwrbVNNz+0EGYZjHYTt8WjoF6D/348/2Y4RC/lQ1GikhvAv
-         EeOkfomRXCOTG3/WDipOct0Fj6nKvex/D2NFF13YNVtCcRVGUVcPDrwoRdWfNykrk+Wa
-         Mzr7poBTnAoflff5TSluAzdQEFyCR/lJlWagczeQIoIoqtbGUDMmqhz8tT0rrxjf5u0J
-         Y90A==
-X-Forwarded-Encrypted: i=1; AFNElJ/BiFD52YqtZXyA92oLwnUpOlfVdpReXCxyijN1YIheGY/MkwLOPjbBsdkM3gh4p4U2RRowREM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/VHrAm5ifzpF0s8pdM/SOhkkpiPIW5kwUEdbyKJBTemTPvtGw
-	puFqQTAF+wjmAb834KiQLildj0dDw/ZkYabbDPQIlnBkM35wGyTVOoO2x28+pob4C/dM/JyYe+p
-	L4e+lZxYJcOE2wTrYLUJijxnH660Gjzw=
-X-Gm-Gg: AeBDieuwV9McSJ29xHS11k3IcOpduRMFAWnRqT1TCSGwbQyDJtFy3Bl8WH8LfwlNP75
-	RzT2vzc6Q/P5kENCmxIUf72BewojOXCm59NvKCwz7amQKKdCxxtvrabogQM8kqOR7F4BnHzTsyA
-	okgWdH34WmQvyvboRG9Rz/Mqb8G3MR5bjFtHstDrg4HyyKuCt4kRNEp34jE0tJaSZ/1RDC0rwD/
-	7ihCPNGBwKNRuuzJNn4pOZCE7aU+D8xRpcDcJOLIKBhHtMRkVnIknAzee0F35lg1yojXryEec8A
-	Q61WUYcwWo/ud3uW+L8d5Zogp6IKDV/DiQ5eNze0b/4GK8h0
-X-Received: by 2002:a05:6808:bc3:b0:47c:34fd:d3be with SMTP id
- 5614622812f47-47c62120f95mr2972379b6e.25.1777646395848; Fri, 01 May 2026
- 07:39:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6179C282F06;
+	Fri,  1 May 2026 14:51:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777647090; cv=none; b=cS5oQ8Lyta3CieRCjYHPcdq2DOOAMh4F7lU6mpJZKHy8bq5Fh8NN4RkuN6NIsVAsouc0ncZM75QlfQk5ukHPRdUdk3w/lkcnUz2+Xj4dIZMPon4BJEx/VkeT5Wz9kfPNiCknLixFlVn9//60Zc1SachK5KSM1IpFJKMsgHZNsjQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777647090; c=relaxed/simple;
+	bh=SNs+jOeLk7gIMEEAJYWCC2bIpE4D7lFY/byWgaXHaio=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=lK6yvWuE1Iyvi17hbya2ZnhdL6f6X7SC0ER6dAAheygqFurIGJHhdrLvFYVi0a2RLTfRuJL6LcE6Thh3BjLrmO2TxW/dsmcC7bAhMavQGwHgMtfabgOyFSRAkLYRoCaitRRSHXzqFVmLiUvV34DkT2/aFCBskfb1SjESVEU6xSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ewa+g0MK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEF56C2BCB4;
+	Fri,  1 May 2026 14:51:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777647090;
+	bh=SNs+jOeLk7gIMEEAJYWCC2bIpE4D7lFY/byWgaXHaio=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Ewa+g0MKEpW9ixH4w+q/KbTgY8IDFIl5YcW7fat4l4TfDvh+irGlObX1LCOoCRXhK
+	 5XVd2Zf6P62kvptz77Fi8sM9kv9uhLdjCUYm61o5lkah0gZqj4E/pkeJ7sC20y0Nhi
+	 JiVUSVS1uwYYLq8EKrVMwXYWOmQLFr7V7D9/DzUhAZzu3yDMUQ/pgLwZ/r3GQoTvSt
+	 8rRitnPP48BUWSXk2jEuBWMy3BHQqSpESABJgHRKeT4ugLpk89rYZBLOZzxTv8NFMv
+	 bwpHWFdV5vkU/4BTw6qr7c/1wpsUs3cjlY0M2f7WEfflKBAGXwasNMooq1oWO1jVsl
+	 IoYct0R9amKTQ==
+From: Chuck Lever <cel@kernel.org>
+Subject: [PATCH 0/6] SUNRPC: Address remaining cache_check_rcu() UAF in
+ cache content files
+Date: Fri, 01 May 2026 10:51:06 -0400
+Message-Id: <20260501-cache-uaf-fix-v1-0-a49928bf4817@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260430062033.20428-1-devnexen@gmail.com> <20260501130046.16008-1-devnexen@gmail.com>
- <ba78786c-881e-4cf4-91d1-7e9d21194454@gmail.com>
-In-Reply-To: <ba78786c-881e-4cf4-91d1-7e9d21194454@gmail.com>
-From: David CARLIER <devnexen@gmail.com>
-Date: Fri, 1 May 2026 15:39:43 +0100
-X-Gm-Features: AVHnY4JZoZ6HEd13u2rB4qAfp7JhHIIU5be_x8vaILgtsy2LYp44cmL4Y3uE-e4
-Message-ID: <CA+XhMqxJoSVkoOOqM8idGJD1TFxb7ksQesQZ8R27BTU7Kg6DdQ@mail.gmail.com>
-Subject: Re: [PATCH net v2] psp: strip variable-length PSP header in psp_dev_rcv()
-To: Daniel Zahka <daniel.zahka@gmail.com>
-Cc: kuba@kernel.org, willemdebruijn.kernel@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, horms@kernel.org, raeds@nvidia.com, 
-	kees@kernel.org, cratiu@nvidia.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 418004AD523
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIANq99GkC/yWMQQrDMAwEvxJ0rkCJSwL9SulBVuTYPbjFSkIh5
+ O+12+MMu3OAaUlqcOsOKLonS69cob90IJHzopjmyjDQMNLVEQpLVNw4YEgf5N4RURgncRPUz7t
+ o1b/e/fFn2/xTZW2RtvBsir5wlthUDjbjqramvMB5fgFCxxI0kAAAAA==
+X-Change-ID: 20260430-cache-uaf-fix-a13000f67c37
+To: Misbah Anjum N <misanjum@linux.ibm.com>, 
+ Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>, 
+ Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+ Tom Talpey <tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, 
+ Anna Schumaker <anna@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Yang Erkun <yangerkun@huawei.com>
+Cc: linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, Chuck Lever <chuck.lever@oracle.com>
+X-Mailer: b4 0.16-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3764;
+ i=chuck.lever@oracle.com; h=from:subject:message-id;
+ bh=SNs+jOeLk7gIMEEAJYWCC2bIpE4D7lFY/byWgaXHaio=;
+ b=owEBbQKS/ZANAwAKATNqszNvZn+XAcsmYgBp9L3gdmsF0fj1gXJLUgau6PlHPtwmaZVGhZVJr
+ 7RaeL40ssGJAjMEAAEKAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCafS94AAKCRAzarMzb2Z/
+ l0AVD/9VTfN8bZ8SF+VFYMTuSYe37Tm6Li3xK6dbsZF7cICO03jNy++pMQ64Gk0MBCMpnGrr6oi
+ TuEP72N4wTgLO18bN6mQoaNJcxkC+n4loA6Bf/b9w1y37VYXomz//Hya1g9d0A1GWcnu6Ozm8ev
+ 1cLWL9vSefM0cZmn7LcD0hmWZmM+V7Y/NT6bv4e5+KeVpPvsM+CJn762KuaOrSrW6ASxmMzeRnQ
+ l1NPkOG9CgziJIeBevu7rACfdCdACcKeSDBi4HbJTo9FMk3ZgxovJBfgOD1K4hXmY1FEjZwwrNu
+ vnazdCyxhViTpExMdfRWC59fJ8jyzCbwYCGlO/Czz9dCLFre94XNd3fBC95kPxUJIqjZy+69LQC
+ 9eeHs/imu8qluVimate7KCSVV/VYDSz5QHoYd8xqqrnkkAbhdMyGaUDBEiXf/y+NPNtP0rUml5g
+ mzqHalsTX0dM/8SU/YXrJo0RgWoaZxZTC0eEIroPZgvuFvRy/SCNeARrBkIvf/MwwZZIkUtQJax
+ m6LfTFkplE0+zM8aQgWDDoKrTOZFwyKCFDFi+VkDxt/jQq6kWigJgUoPdgXbdLytNcsN+YtJkRQ
+ X68XtkEr3Sx9tf1xQ2mWUlZnDVsyIhwHzLUEBpxFIuMS4DxBNMJVnYZJJnvQLUuCgjKv4Fi9Ib3
+ XRJ3zimqzRMxS3Q==
+X-Developer-Key: i=chuck.lever@oracle.com; a=openpgp;
+ fpr=28B2E5B01286DF243CF23EFE336AB3336F667F97
+X-Rspamd-Queue-Id: D27664AD623
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283200-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-283201-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,davemloft.net,google.com,redhat.com,nvidia.com,vger.kernel.org];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Fri, 1 May 2026 at 15:13, Daniel Zahka <daniel.zahka@gmail.com> wrote:
->
->
-> On 5/1/26 9:00 AM, David Carlier wrote:
-> > psp_dev_rcv() unconditionally removes a fixed PSP_ENCAP_HLEN, even
-> > when psph->hdrlen indicates that the PSP header carries optional
-> > fields. A frame whose PSP header advertises a non-zero VC or any
-> > extension would therefore be silently mis-decapsulated: option bytes
-> > would spill into the inner packet head and downstream parsing would
-> > fail on a corrupted skb.
-> >
-> > Compute the full PSP header length from psph->hdrlen, pull the
-> > optional bytes into the linear region, and strip the whole header
-> > when decapsulating. Optional fields (VC, ...) are still ignored,
-> > just discarded with the rest of the header instead of leaking.
-> > crypt_offset and the VIRT flag are intentionally not validated here
-> > - callers know their device's PSP implementation and can decide.
-> >
-> > Both in-tree callers gate on hardware-validated PSP, so this is a
-> > correctness fix rather than a reachable corruption path under
-> > current configurations.
-> >
-> > Fixes: 0eddb8023cee ("psp: provide decapsulation and receive helper for drivers")
-> > Suggested-by: Daniel Zahka <daniel.zahka@gmail.com>
->
->
-> No need for the suggested tag here.
->
->
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: David Carlier <devnexen@gmail.com>
-> > ---
-> > v1 -> v2 (per Daniel Zahka):
-> >    - strip the variable-length PSP header (psph->hdrlen) instead of
-> >      rejecting opt-bearing frames; VC/options are ignored, not refused
-> >    - drop the crypt_offset and PSPHDR_VERFL_VIRT checks
-> >    - refresh kerneldoc above psp_dev_rcv()
-> >    - retarget at net (was net-next)
-> >
-> >   net/psp/psp_main.c | 41 +++++++++++++++++++++++++++++++----------
-> >   1 file changed, 31 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/net/psp/psp_main.c b/net/psp/psp_main.c
-> > index 9508b6c38003..b040345d7273 100644
-> > --- a/net/psp/psp_main.c
-> > +++ b/net/psp/psp_main.c
-> > @@ -263,15 +263,17 @@ EXPORT_SYMBOL(psp_dev_encapsulate);
-> >
-> >   /* Receive handler for PSP packets.
-> >    *
-> > - * Presently it accepts only already-authenticated packets and does not
-> > - * support optional fields, such as virtualization cookies. The caller should
-> > - * ensure that skb->data is pointing to the mac header, and that skb->mac_len
-> > - * is set. This function does not currently adjust skb->csum (CHECKSUM_COMPLETE
-> > - * is not supported).
-> > + * Accepts only already-authenticated packets. The full PSP header is
-> > + * stripped according to psph->hdrlen; any optional fields it advertises
-> > + * (virtualization cookies, etc.) are ignored and discarded along with the
-> > + * rest of the header. The caller should ensure that skb->data is pointing
-> > + * to the mac header, and that skb->mac_len is set. This function does not
-> > + * currently adjust skb->csum (CHECKSUM_COMPLETE is not supported).
-> >    */
-> >   int psp_dev_rcv(struct sk_buff *skb, u16 dev_id, u8 generation, bool strip_icv)
-> >   {
-> >       int l2_hlen = 0, l3_hlen, encap;
-> > +     u32 psp_hdr_len;
->
->
-> There is a style convention in the networking subsystem that
-> declarations are sorted longest to shortest from top to bottom. Let's
-> maintain that here.
->
-> nit: int psp_hlen might be more consistent with the types/names of the
-> other local vars.
->
->
-> >       struct psp_skb_ext *pse;
-> >       struct psphdr *psph;
-> >       struct ethhdr *eth;
-> > @@ -312,18 +314,36 @@ int psp_dev_rcv(struct sk_buff *skb, u16 dev_id, u8 generation, bool strip_icv)
-> >       if (unlikely(uh->dest != htons(PSP_DEFAULT_UDP_PORT)))
-> >               return -EINVAL;
-> >
-> > -     pse = skb_ext_add(skb, SKB_EXT_PSP);
-> > -     if (!pse)
-> > +     psph = (struct psphdr *)(skb->data + l2_hlen + l3_hlen +
-> > +                              sizeof(struct udphdr));
-> > +
-> > +     /* Strip the full PSP header per psph->hdrlen; VC/options are pulled
-> > +      * into the linear region only so they can be discarded with the
-> > +      * rest of the header.
-> > +      */
-> > +     psp_hdr_len = ((u32)psph->hdrlen + 1) * 8;
->
->
-> I don't believe casting psph->hdrlen to u32 is necessary for correctness
-> here.
->
->
-> > +
-> > +     if (unlikely(psp_hdr_len < sizeof(struct psphdr)))
-> > +             return -EINVAL;
-> > +
-> > +     if (psp_hdr_len > sizeof(struct psphdr) &&
-> > +         !pskb_may_pull(skb, l2_hlen + l3_hlen +
-> > +                             sizeof(struct udphdr) + psp_hdr_len))
-> >               return -EINVAL;
-> >
-> >       psph = (struct psphdr *)(skb->data + l2_hlen + l3_hlen +
-> >                                sizeof(struct udphdr));
-> > +
-> > +     pse = skb_ext_add(skb, SKB_EXT_PSP);
-> > +     if (!pse)
-> > +             return -EINVAL;
-> > +
-> >       pse->spi = psph->spi;
-> >       pse->dev_id = dev_id;
-> >       pse->generation = generation;
-> >       pse->version = FIELD_GET(PSPHDR_VERFL_VERSION, psph->verfl);
-> >
-> > -     encap = PSP_ENCAP_HLEN;
-> > +     encap = sizeof(struct udphdr) + psp_hdr_len;
-> >       encap += strip_icv ? PSP_TRL_SIZE : 0;
-> >
-> >       if (proto == htons(ETH_P_IP)) {
-> > @@ -340,8 +360,9 @@ int psp_dev_rcv(struct sk_buff *skb, u16 dev_id, u8 generation, bool strip_icv)
-> >               ipv6h->payload_len = htons(ntohs(ipv6h->payload_len) - encap);
-> >       }
-> >
-> > -     memmove(skb->data + PSP_ENCAP_HLEN, skb->data, l2_hlen + l3_hlen);
-> > -     skb_pull(skb, PSP_ENCAP_HLEN);
-> > +     memmove(skb->data + sizeof(struct udphdr) + psp_hdr_len,
-> > +             skb->data, l2_hlen + l3_hlen);
-> > +     skb_pull(skb, sizeof(struct udphdr) + psp_hdr_len);
-> >
-> >       if (strip_icv)
-> >               pskb_trim(skb, skb->len - PSP_TRL_SIZE);
->
->
-> Minor comments, but otherwise lgtm.
->
-> Reviewed-by: Daniel Zahka <daniel.zahka@gmail.com>
->
+Misbah Anjum reported a use-after-free in cache_check_rcu()
+reached through e_show() while sosreport was reading
+/proc/fs/nfsd/exports on ppc64le.  Two fixes for that report
+landed in v7.0:
 
-ACK, will resend tomorrow, Cheers !
+  48db892356d6 ("NFSD: Defer sub-object cleanup in export put callbacks")
+  e7fcf179b82d ("NFSD: Hold net reference for the lifetime of /proc/fs/nfs/exports fd")
+
+The original e_show() repro is now fixed.  However, the same
+sosreport workload still reproduces a closely related fault on
+post-v7.0 mainline (Misbah, ppc64le) and on master.20260424
+(internal report, aarch64).  In both cases the fault is in
+cache_check_rcu() reached through c_show() rather than e_show(),
+and the cache_head pointer is plain garbage:
+
+  pc : cache_check_rcu+0x40 [sunrpc]
+  lr : c_show+0x60 [sunrpc]
+  ...faulting on h->flags off h = 0x0000000200000000
+
+c_show() is the generic show callback used by
+/proc/net/rpc/<cd>/content for every per-net cache_detail
+(auth.unix.ip, auth.unix.gid, nfsd.fh, nfsd.export).  Two
+bugs combine in that path:
+
+1. cache_unregister_net() / cache_destroy_net() free cd and
+   cd->hash_table synchronously when the namespace exits.  The
+   /proc/net/rpc/.../content open path takes only a module
+   reference, so a fd kept open across a netns exit walks a
+   freed hash_table and returns garbage cache_head pointers.
+   This is the same hazard that e7fcf179b82d closed for the
+   /proc/fs/nfs/exports file alone.
+
+2. ip_map_put() drops auth_domain_put() before kfree_rcu(), so
+   sub-objects can be freed before the RCU grace period -- the
+   same hazard that 48db892356d6 fixed for svc_export_put() and
+   expkey_put().  unix_gid_put() does not have this bug
+   structurally (its put_group_info() runs inside the call_rcu()
+   callback) but it uses a separate idiom from the other three
+   caches.
+
+This series replaces the v1 narrow fixes with shared
+infrastructure that covers all four cache_detail .put paths
+and all three per-cache file types:
+
+Patch 1 hoists nfsd_export_wq up to the sunrpc layer as
+sunrpc_cache_wq, exposed through sunrpc_cache_queue_release()
+and sunrpc_cache_drain() so all four put callbacks share one
+workqueue and one drain primitive.
+
+Patch 2 converts ip_map_put() to the queue_rcu_work() pattern,
+moving auth_domain_put() into a deferred ip_map_release() that
+runs after the RCU grace period.
+
+Patch 3 unifies unix_gid_put() onto the same pattern for
+consistency (not a bug fix on its own).
+
+Patch 4 takes a get_net(cd->net) in content_open(), cache_open(),
+and open_flush() and drops it in the matching release helpers,
+so cache_destroy_net() cannot run while a sunrpc cache fd is
+open.
+
+Series has been compile-tested only.
+
+---
+Chuck Lever (6):
+      SUNRPC: Move cache_initialize() declaration to sunrpc-private header
+      SUNRPC: Provide a shared workqueue for cache release callbacks
+      SUNRPC: Defer ip_map sub-object cleanup past RCU grace period
+      SUNRPC: Use shared release pattern for the unix_gid cache
+      SUNRPC: Hold cd->net for the lifetime of cache files
+      NFSD: Convert nfsd_export_shutdown() to sunrpc_cache_destroy_net()
+
+ fs/nfsd/export.c             | 45 ++--------------------
+ fs/nfsd/export.h             |  2 -
+ fs/nfsd/nfsctl.c             |  8 +---
+ include/linux/sunrpc/cache.h |  3 +-
+ net/sunrpc/cache.c           | 90 ++++++++++++++++++++++++++++++++++++++++++--
+ net/sunrpc/sunrpc.h          |  2 +
+ net/sunrpc/sunrpc_syms.c     | 23 ++++++-----
+ net/sunrpc/svcauth_unix.c    | 46 ++++++++++++----------
+ 8 files changed, 135 insertions(+), 84 deletions(-)
+---
+base-commit: f3a313ecd1fdab1f5da119db355363b13af6fcac
+change-id: 20260430-cache-uaf-fix-a13000f67c37
+
+Best regards,
+--  
+Chuck Lever
+
 
