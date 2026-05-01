@@ -1,144 +1,191 @@
-Return-Path: <netdev+bounces-283282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283283-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WOxzKXEB9WmYHAIAu9opvQ
-	(envelope-from <netdev+bounces-283282-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 21:39:29 +0200
+	id QNpNKSkC9WnAHAIAu9opvQ
+	(envelope-from <netdev+bounces-283283-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 21:42:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C08A4AF349
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 21:39:29 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AE684AF428
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 21:42:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 605DA3051CB3
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 19:36:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 644F030498D0
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 19:40:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97CEE421EE5;
-	Fri,  1 May 2026 19:36:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4FC7426EC3;
+	Fri,  1 May 2026 19:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BvGlhk2A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GFrNpdHz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 726F24219EB;
-	Fri,  1 May 2026 19:36:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F04421A14;
+	Fri,  1 May 2026 19:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777664182; cv=none; b=ovII98ODTMG8sdX+367YzuCrWx8St1EFOBONLnFqHEkxr2VUK3tdltcKRKPFn1hWX08LswLihVfMor/8vf6eej4AzFuNSseHrU1SosMyA+P7uvcaGMn7YTPo/h2pDAqZmw4OvK2FOo8vo+8D6rAhnLwEcPy+/FauUYiWi6SFvJE=
+	t=1777664430; cv=none; b=P8GmWMv/Ussw2xWW0VTNy2HObZWQwel6MLpnpS2eRfeORudamhdEu5HzASREa7J22oDjUyj3nHCiDWjWorkY8UjLFluIOji/DSagigkAAzXBaYoXWnmAJWz4aMOFnhPnEtzp4JpVKc4Ne0+L+bZ3HximHbWocAnNai2oO1egKg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777664182; c=relaxed/simple;
-	bh=YH7r1TqDwBvSYseUZJ6Hz6O11d1VtypwRVryXcDfqxA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=JPvptolaVCZHmSYqXXkrSvrnRykBgTnkuF42ICQh1iyDDQx8ktI6axkE089Y4fFXcdskmWU+aAdShUAYKjG9k5hOb6eI8gIeYkViIKukhLIvcWOjrLXMT7G2ew+KVo2LdWFCTWBXEu6piP8MchjyEcllf6TBmwSwoPF6Oal56Wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BvGlhk2A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10BA7C2BCC6;
-	Fri,  1 May 2026 19:36:19 +0000 (UTC)
+	s=arc-20240116; t=1777664430; c=relaxed/simple;
+	bh=DVernVjlwHkGRUemq83InMZZTHnAT+4erTkc0LGEwrU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=NmNmmjk0FliSV5lnKLg2WbGryglKB2ZhpfyjFvWkeeAezd1zlfpwrK5oE7iq8wbUm6REFdAlBFmvsI6qJH1g8ShqCl7QTXp1lrh8JWypQ7l1zag98tb0GF7IR6KXhfLbz8CpSu/NKrSjHPObgHRUjzThXixdBXLI/lvvbAJ7EIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GFrNpdHz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF150C2BCB8;
+	Fri,  1 May 2026 19:40:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777664182;
-	bh=YH7r1TqDwBvSYseUZJ6Hz6O11d1VtypwRVryXcDfqxA=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=BvGlhk2A7v1NrdA/ly4N2ArUC26zOsrnF9oD8LZv7QIG85CQjFKPbJfbgJAtTdctG
-	 wkL1E2q5zvmmvCGzoh9OOuK1+zcTIylDkVQCXLLvMdbNURtpfI4xsPSc0NesAcD/n4
-	 J1bgV9HFHVauSGIv6YzURK1/Mo1PvJE1UqKMw/rEMxpT6aBezVa2bF9/hw7Dkwfwke
-	 PvbKnxUCsI5nRkFUOphwKeg4SVsnCvuSmgLSB4QoGQ35Z7aqUWqqG34OcHDoT2CnVR
-	 6XGxj//6LbiUMj036RRxpYcLuoX9JEWXMqQQgFcxwYBMuQS/T4D1ADYZG3FMxVqaM4
-	 LY0auJIwhBZQQ==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 01 May 2026 21:35:37 +0200
-Subject: [PATCH net 4/4] mptcp: sockopt: increase seq in
- mptcp_setsockopt_all_sf
+	s=k20201202; t=1777664428;
+	bh=DVernVjlwHkGRUemq83InMZZTHnAT+4erTkc0LGEwrU=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=GFrNpdHz44rlcoSQzge3VQPoSOfqLpLse6we5jgwG4isV0aywD+0ZrACAZyaQfVpV
+	 JvUeEG+d0McDQ8CduL4vAgtUwLyHZyqlIRRsiAK720i5/G9IMrgtYoIgUrDZVlNzM/
+	 HUlzIVc6j1BUjgRS9zcz7oB1RTHSoblLzKi/7kDHdyDoO5R3AiN0RUDPOBXUUg6mRz
+	 +SduDz6v8dLz7O/tKbSJQd6UEtFWVXPqvDft/EdqQ3waAn6hXeaF/lxfFLQyMEfiGz
+	 wpjk19uBU0smVbVqLdhq6N3V4B1xSTJiXe6vftAZySNL5LSlNa2287gBlSF2awBJhH
+	 z5pBMT0vSJhLQ==
+Message-ID: <87f79bc7483aa1a7b3a44718b62a5cd5bd016f8c.camel@kernel.org>
+Subject: Re: [PATCH net 1/1] net/rds: handle zerocopy send cleanup before
+ the message is queued
+From: Allison Henderson <achender@kernel.org>
+To: Ren Wei <n05ec@lzu.edu.cn>, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com,  horms@kernel.org, santosh.shilimkar@oracle.com,
+ sowmini.varadhan@oracle.com,  willemb@google.com, yuantan098@gmail.com,
+ yifanwucs@gmail.com,  tomapufckgml@gmail.com, bird@lzu.edu.cn,
+ lx24@stu.ynu.edu.cn, tonanli66@gmail.com
+Date: Fri, 01 May 2026 12:40:26 -0700
+In-Reply-To: <d2ea98a6313d5467bac00f7c9fef8c7acddb9258.1777550074.git.tonanli66@gmail.com>
+References: <cover.1777550074.git.tonanli66@gmail.com>
+	 <d2ea98a6313d5467bac00f7c9fef8c7acddb9258.1777550074.git.tonanli66@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260501-net-mptcp-misc-fixes-7-1-rc3-v1-4-b70118df778e@kernel.org>
-References: <20260501-net-mptcp-misc-fixes-7-1-rc3-v1-0-b70118df778e@kernel.org>
-In-Reply-To: <20260501-net-mptcp-misc-fixes-7-1-rc3-v1-0-b70118df778e@kernel.org>
-To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>, 
- Gang Yan <yangang@kylinos.cn>, Dmytro Shytyi <dmytro@shytyi.net>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
- linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- stable@vger.kernel.org
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=982; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=YH7r1TqDwBvSYseUZJ6Hz6O11d1VtypwRVryXcDfqxA=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDK/Mqw47dMt4V6VUuPmEBG+ZdencNcmabattx98Xqnqc
- Lz59tvFHaUsDGJcDLJiiizSbZH5M59X8ZZ4+VnAzGFlAhnCwMUpABNRV2X4n/uFMd34zorfzUe0
- +E98q+JQ0BB/LPxe+hP35e3m6ayCRxj+l6ROs/myLsgoL+3qzi0VFnwiC1fr1f9bs2xm3dO+V/H
- 9vAA=
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
-X-Rspamd-Queue-Id: 1C08A4AF349
+X-Rspamd-Queue-Id: 1AE684AF428
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+X-Spamd-Result: default: False [3.34 / 15.00];
+	SEM_URIBL(3.50)[ynu.edu.cn:email];
 	MAILLIST(-0.15)[generic];
+	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283282-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283283-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,oracle.com,gmail.com,lzu.edu.cn,stu.ynu.edu.cn];
+	R_DKIM_ALLOW(0.00)[kernel.org:s=k20201202];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.993];
 	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	R_SPF_ALLOW(0.00)[+ip6:2600:3c04:e001:36c::/64:c];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lzu.edu.cn:email]
 
-mptcp_setsockopt_all_sf() was missing a call to sockopt_seq_inc(). This
-is required not to cause missing synchronization for newer subflows
-created later on.
+On Fri, 2026-05-01 at 09:08 +0800, Ren Wei wrote:
+> From: Nan Li <tonanli66@gmail.com>
+>=20
+> A zerocopy send can fail after user pages have been pinned but before
+> the message is attached to the sending socket.
+>=20
+> The purge path currently infers zerocopy state from rm->m_rs, so an
+> unqueued message can be cleaned up as if it owned normal payload pages.
+> However, zerocopy ownership is really determined by the presence of
+> op_mmp_znotifier, regardless of whether the message has reached the
+> socket queue.
+>=20
+> Capture op_mmp_znotifier up front in rds_message_purge() and use it as
+> the cleanup discriminator. If the message is already associated with a
+> socket, keep the existing completion path. Otherwise, drop the pinned
+> page accounting directly and release the notifier before putting the
+> payload pages.
+>=20
+> This keeps early send failure cleanup consistent with the zerocopy
+> lifetime rules without changing the normal queued completion path.
+>=20
+> Fixes: 0cebaccef3ac ("rds: zerocopy Tx support.")
+> Cc: stable@kernel.org
+> Reported-by: Yuan Tan <yuantan098@gmail.com>
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Reported-by: Xin Liu <bird@lzu.edu.cn>
+> Co-developed-by: Xiao Liu <lx24@stu.ynu.edu.cn>
+> Signed-off-by: Xiao Liu <lx24@stu.ynu.edu.cn>
+> Signed-off-by: Nan Li <tonanli66@gmail.com>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 
-This helper is called each time a socket option is set on subflows, and
-future ones will need to inherit this option after their creation.
+This fix looks fine to me.  Thanks Ren Wei!
+Reviewed-by: Allison Henderson <achender@kernel.org>
 
-Fixes: 51c5fd09e1b4 ("mptcp: add TCP_MAXSEG sockopt support")
-Cc: stable@vger.kernel.org
-Suggested-by: Paolo Abeni <pabeni@redhat.com>
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- net/mptcp/sockopt.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Allison
 
-diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
-index 0efe40be2fde..1cf608e7357b 100644
---- a/net/mptcp/sockopt.c
-+++ b/net/mptcp/sockopt.c
-@@ -812,6 +812,10 @@ static int mptcp_setsockopt_all_sf(struct mptcp_sock *msk, int level,
- 		if (ret)
- 			break;
- 	}
-+
-+	if (!ret)
-+		sockopt_seq_inc(msk);
-+
- 	return ret;
- }
- 
-
--- 
-2.53.0
+> ---
+>  net/rds/message.c | 20 +++++++++++++++-----
+>  1 file changed, 15 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/net/rds/message.c b/net/rds/message.c
+> index eaa6f22601a4..25fedcb3cd00 100644
+> --- a/net/rds/message.c
+> +++ b/net/rds/message.c
+> @@ -131,24 +131,34 @@ static void rds_rm_zerocopy_callback(struct rds_soc=
+k *rs,
+>   */
+>  static void rds_message_purge(struct rds_message *rm)
+>  {
+> +	struct rds_znotifier *znotifier;
+>  	unsigned long i, flags;
+> -	bool zcopy =3D false;
+> +	bool zcopy;
+> =20
+>  	if (unlikely(test_bit(RDS_MSG_PAGEVEC, &rm->m_flags)))
+>  		return;
+> =20
+>  	spin_lock_irqsave(&rm->m_rs_lock, flags);
+> +	znotifier =3D rm->data.op_mmp_znotifier;
+> +	rm->data.op_mmp_znotifier =3D NULL;
+> +	zcopy =3D !!znotifier;
+> +
+>  	if (rm->m_rs) {
+>  		struct rds_sock *rs =3D rm->m_rs;
+> =20
+> -		if (rm->data.op_mmp_znotifier) {
+> -			zcopy =3D true;
+> -			rds_rm_zerocopy_callback(rs, rm->data.op_mmp_znotifier);
+> +		if (znotifier) {
+> +			rds_rm_zerocopy_callback(rs, znotifier);
+>  			rds_wake_sk_sleep(rs);
+> -			rm->data.op_mmp_znotifier =3D NULL;
+>  		}
+>  		sock_put(rds_rs_to_sk(rs));
+>  		rm->m_rs =3D NULL;
+> +	} else if (znotifier) {
+> +		/*
+> +		 * Zerocopy can fail before the message is queued on the
+> +		 * socket, so there is no rs to carry the notification.
+> +		 */
+> +		mm_unaccount_pinned_pages(&znotifier->z_mmp);
+> +		kfree(rds_info_from_znotifier(znotifier));
+>  	}
+>  	spin_unlock_irqrestore(&rm->m_rs_lock, flags);
+> =20
 
 
