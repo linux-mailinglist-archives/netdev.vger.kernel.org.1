@@ -1,178 +1,135 @@
-Return-Path: <netdev+bounces-283256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283257-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UETPI6jm9Gm5FgIAu9opvQ
-	(envelope-from <netdev+bounces-283256-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 19:45:12 +0200
+	id m3uVAkHn9Gm9FgIAu9opvQ
+	(envelope-from <netdev+bounces-283257-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 19:47:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E8D94AEA0F
-	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 19:45:11 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82A514AEA20
+	for <lists+netdev@lfdr.de>; Fri, 01 May 2026 19:47:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B8FED300808B
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 17:39:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 51B9F30066B1
+	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 17:47:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC253164AA;
-	Fri,  1 May 2026 17:38:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB784258EC2;
+	Fri,  1 May 2026 17:47:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1RUdOWDp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="epC2OfdX"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3F93148B5;
-	Fri,  1 May 2026 17:38:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B929221ADC7
+	for <netdev@vger.kernel.org>; Fri,  1 May 2026 17:47:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777657138; cv=none; b=V6rK4Fh9tSA9lAq8lwOb5pg4qPA3jcCKUU2S1CSh9UmDFgQsVuwOBVKcRvJk81U6hGQ2ov0u4GeGHm6LL6lS1S17C6cJMvLWT6/aW/2Nbu/3o0NIff4EHKgkGj7abCnTckeuvuxFudq+YK+SbEDl1UGYgwz2tqmEfO/ysV2lMcg=
+	t=1777657661; cv=none; b=uB6CPY57S7icftBy76VBNlXHAWx+6nT0lFF6rLseP6jETXKH56UaSgJoLWczxmgWDeQsgCUyHh0yPe3sZeM5yZnL1hBhhDOAAE58SFfk4rOsR169GB98NuiQ0W+h84RLnN2g8F6t+rnJ5HuuWi8XS+HCRCDTnxUNjPGj7e7aoFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777657138; c=relaxed/simple;
-	bh=FkLvuBwHLW9KIU/MWqsTCq6sClXi+dyujMF+dGFavFk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rEyfZ97z01lv+9o7s1tsyZnStvEVYu1SkYo+L5c/CDfm7co33GWk5EolOTHBQ7Q+Hhsvb4Uwgha6RqKLYoJV7qGsl/36nallS7fa9vUzZ8wrKePrKxKaFbwbho48VfuqBWexaIlvT0ZKN3JQ+Omoy5iFKz0NC4r2Al8NWcugXR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1RUdOWDp; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=v1G+n5y3YaiJOCPRo9ZSXyCutKw19S+mOiIPygXvWbA=; b=1RUdOWDpRr1oCft025cSv8R4JM
-	7JEFjRj+B2aOR33WNSyqJ0LUTLOPlRXuB27RxpQuiHsoK2UxvcHt/feQeARPBKKRd75vpeMJBL+VA
-	QutEOfQtlovqoFmxTw5pLgvxcNj79Ys9Gxw2YAyJbf0T6TYLP527f884yruR48HgiUwQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wIrok-000qnU-W4; Fri, 01 May 2026 19:38:22 +0200
-Date: Fri, 1 May 2026 19:38:22 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alex Elder <elder@riscstar.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, maxime.chevallier@bootlin.com,
-	rmk+kernel@armlinux.org.uk, andersson@kernel.org,
-	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, linusw@kernel.org, brgl@kernel.org,
-	arnd@arndb.de, gregkh@linuxfoundation.org,
-	Daniel Thompson <daniel@riscstar.com>, mohd.anwar@oss.qualcomm.com,
-	a0987203069@gmail.com, alexandre.torgue@foss.st.com, ast@kernel.org,
-	boon.khai.ng@altera.com, chenchuangyu@xiaomi.com,
-	chenhuacai@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	hkallweit1@gmail.com, inochiama@gmail.com, john.fastabend@gmail.com,
-	julianbraha@gmail.com, livelycarpet87@gmail.com,
-	matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc,
-	prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
-	rohan.g.thomas@altera.com, sdf@fomichev.me,
-	siyanteng@cqsoftware.com.cn, weishangjuan@eswincomputing.com,
-	wens@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 08/12] dt-bindings: net: toshiba,tc965x-dwmac:
- add TC956x Ethernet bridge
-Message-ID: <1f34cbce-e2dd-4e80-b136-55d0efa50002@lunn.ch>
-References: <20260501155421.3329862-1-elder@riscstar.com>
- <20260501155421.3329862-9-elder@riscstar.com>
+	s=arc-20240116; t=1777657661; c=relaxed/simple;
+	bh=bhJldRImlh0oNHY8ZrSWdYN+3XaJAItl0r7oPTpjHeE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CG6Tm4aaGCSdi1g6stOQWemnLvsbg+30ffGMQUEOxDZ+guFwBc318UDMEpESkZe5VeNPvEoosl+yPMljZlqpHff47QFL6VMriWJhT6bqO7p6DCT5J853VdiQSVRE5mnKnON+A3933T+GAyr4bUN/N11AZBHhaJS0LCnFCAnHwng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=epC2OfdX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18BFBC2BCB4;
+	Fri,  1 May 2026 17:47:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777657661;
+	bh=bhJldRImlh0oNHY8ZrSWdYN+3XaJAItl0r7oPTpjHeE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=epC2OfdXe9IgrtyoAYoYf1JvwrJGbXa0QpgVJgeSp/Kc4HP2T4yuIZrSz6E52lqLH
+	 Qd8yoyyeqFYKkDmf67Xy6PfmZUcmas4aGzv7ga/jSAbFbL/f+bVT8Q4KEibmNDLMlp
+	 +tiX1pV+AM44YvNjWxLyTRr+x0Q3IeIPGkDIo/kGPG/BbZ6A9NGS6w16An4NkFcPSr
+	 bTHdBx/w+W9O7tsUqZqWBpiXh+7VrXdD8FvCU8TXm3T+KCpAh4S2ffJgTwDraplivN
+	 FwtM5kKuEWc5EfA8VfON6aoIwIfdQMNmmGqfO+84a/QrMBwXqrVN3MGoqUY5IlisQY
+	 AuKSo9DvX90aw==
+Message-ID: <1c2fb5a2-6756-4a76-91b3-f1ef578ba8a3@kernel.org>
+Date: Fri, 1 May 2026 11:47:40 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260501155421.3329862-9-elder@riscstar.com>
-X-Rspamd-Queue-Id: 8E8D94AEA0F
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2-next 1/5] netshaper: Extract parse_scope() and
+ parse_rate() helpers
+Content-Language: en-US
+To: Mohsin Bashir <mohsin.bashr@gmail.com>, netdev@vger.kernel.org
+Cc: stephen@networkplumber.org, pabeni@redhat.com, kuba@kernel.org,
+ ernis@linux.microsoft.com
+References: <20260501011611.3533573-1-mohsin.bashr@gmail.com>
+ <20260501011611.3533573-2-mohsin.bashr@gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20260501011611.3533573-2-mohsin.bashr@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 82A514AEA20
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [4.84 / 15.00];
-	SEM_URIBL(3.50)[0.0.0.0:email];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,riscstar.com,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	TAGGED_FROM(0.00)[bounces-283256-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_POLICY_ALLOW(0.00)[lunn.ch,none];
-	MIME_TRACE(0.00)[0:+];
-	R_DKIM_ALLOW(0.00)[lunn.ch:s=20171124];
+	TAGGED_FROM(0.00)[bounces-283257-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	GREYLIST(0.00)[pass,body];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[50];
-	NEURAL_HAM(-0.00)[-0.743];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	R_SPF_ALLOW(0.00)[+ip4:104.64.211.4:c];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel,dt];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[0.0.0.0:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid,1c:email]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-Your ASCII art of the chip might be useful here as documentation.
+On 4/30/26 7:16 PM, Mohsin Bashir wrote:
+> diff --git a/netshaper/netshaper.c b/netshaper/netshaper.c
+> index 47fb805e..1603e6e5 100644
+> --- a/netshaper/netshaper.c
+> +++ b/netshaper/netshaper.c
+> @@ -47,6 +47,28 @@ static const char *net_shaper_scope_names[NET_SHAPER_SCOPE_MAX + 1] = {
+>  	"node"
+>  };
+>  
+> +static int parse_scope(const char *str)
+> +{
+> +	if (strcmp(str, "netdev") == 0)
+> +		return NET_SHAPER_SCOPE_NETDEV;
+> +	if (strcmp(str, "queue") == 0)
+> +		return NET_SHAPER_SCOPE_QUEUE;
+> +	if (strcmp(str, "node") == 0)
+> +		return NET_SHAPER_SCOPE_NODE;
+> +	return -1;
 
-> +  # We can't allOf reference Ethernet-controller.yaml because we end up with
-> +  # contradictory $nodename rules (`ethernet@` versus `pci@`). Happily only a
-> +  # small number of the properties are useful on TC956x so we can just reference
-> +  # what we need.
+net_shaper_scope_names exists. Create 1 table used for both parsing and
+printing.
 
-Why not add an subnodes for the ethernet interfaces?
-
-> +examples:
-> +  - |
-> +    pcie {
-> +      #address-cells = <3>;
-> +      #size-cells = <2>;
+> +}
 > +
-> +      tc956x_emac0: pci@0,0 {
-> +        compatible = "pci1179,0220";
-> +        reg = <0x50000 0x0 0x0 0x0 0x0>;
-> +        #address-cells = <3>;
-> +        #size-cells = <2>;
-> +        device_type = "pci";
-> +        ranges;
-> +
-> +        gpio-controller;
-> +        #gpio-cells = <2>;
+> +static int parse_rate(const char *str, __u64 *rate_bps)
+> +{
+> +	if (get_rate64(rate_bps, str)) {
+> +		fprintf(stderr, "Invalid rate value \"%s\"\n", str);
+> +		return -1;
+> +	}
+> +	/* get_rate64 returns bytes/sec, convert to bits/sec */
+> +	*rate_bps *= 8;
 
-I've not got to the GPIO driver patch yet...
-
-Is the GPIO part of the ethernet device, or part of the chip? The
-hierarchy here should match the hierarchy of the hardware.
-
-> +        phy-mode = "10gbase-r";
-> +        phy-handle = <&tc956x_emac0_phy>;
-> +
-> +        mdio {
-> +          compatible = "snps,dwmac-mdio";
-> +          #address-cells = <1>;
-> +          #size-cells = <0>;
-> +
-> +          tc956x_emac0_phy: ethernet-phy@1c {
-> +            compatible = "ethernet-phy-id311c.1c12";
-> +            reg = <0x1c>;
-> +          };
-> +        };
-> +      };
-> +      pci@0,1 {
-> +        compatible = "pci1179,0220";
-> +        reg = <0x50100 0x0 0x0 0x0 0x0>;
-> +        #address-cells = <3>;
-> +        #size-cells = <2>;
-> +        device_type = "pci";
-> +        ranges;
-> +
-
-You second ethernet does not have a gpio controller?
-
-	Andrew
+no magic numbers. Add a define for BITS_PER_BYTE to include/utils.h
+above BIT()
 
