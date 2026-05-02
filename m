@@ -1,176 +1,153 @@
-Return-Path: <netdev+bounces-283394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283395-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WP32Kyfe9WljQAIAu9opvQ
-	(envelope-from <netdev+bounces-283394-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 13:21:11 +0200
+	id QPK0LK7g9WmxQAIAu9opvQ
+	(envelope-from <netdev+bounces-283395-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 13:31:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 927BA4B1BCD
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 13:21:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1D914B1CCB
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 13:31:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D69E6300441F
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 11:20:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 411EF300694C
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 11:31:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75E01335067;
-	Sat,  2 May 2026 11:20:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9802432ED32;
+	Sat,  2 May 2026 11:31:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="OJWgz/dx"
+	dkim=pass (2048-bit key) header.d=xn--rombobjrn-67a.se header.i=@xn--rombobjrn-67a.se header.b="At2XEd1M"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-57-87.mail.qq.com (out162-62-57-87.mail.qq.com [162.62.57.87])
+Received: from smtp.xn--rombobjrn-67a.se (nestor.xn--rombobjrn-67a.se [188.126.83.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284D33290AF;
-	Sat,  2 May 2026 11:20:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8CD31A6831;
+	Sat,  2 May 2026 11:31:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.126.83.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777720848; cv=none; b=Y9beD4QLpMYObkXFwPW+FgtFdHZTAkuEZkWtXZoJlunM9bqZXiIoDs52AQjLab2AzZWrvInDUvTFSVOrVKukEs0BCwe9dAMzWfEzcV5i5H2e9ZYkZoxrZQYmfcyEpiPXsIRfwcjLH2DsoHhk5tjhkPhyOISm1iNNe1gfi2lQuxg=
+	t=1777721515; cv=none; b=Pitjyo9PIjpERVIwXtfq6kw1BegK6fm2sx+4J0c6roUcUKUNrOSOrJ8G2rWXfxUiKoxvCIL4WQj3Z08O9SJYEbuLeUKi3kWSyebwbydde5EBcNrFPSUip1uyn2rfUY2Ek/xhEfHrkrAeSJVFpgpxYby3iWK+ZW56wrY4GRzQU2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777720848; c=relaxed/simple;
-	bh=kroM3dHiwX8iXnLTgoNK2Ui7tiIdu/xn7VeGYjqdHck=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=lE3tumE/L3VW1QD5P/nsqgzV7yuGtPph7M29HArPbEbBJe9a9LpTaA5AkGSvUJrDrsJ2yzMk8xAlGgbs29dPlDhZRfpnwjbSKWM+0t8N3YgD0cxC5aeTHRzOAold+5XZD6uykJs7NGsBuQEWwEvtur/HASyH2zA4OTpUwMdmDXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=OJWgz/dx; arc=none smtp.client-ip=162.62.57.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1777720835; bh=/P2+h0oopeGcJLkWbR2iUk4xU6TlOScWeXXKUXMCSiQ=;
-	h=From:To:Cc:Subject:Date;
-	b=OJWgz/dxOfeyt77d99bE1qNa2dc/l/iwMH6HV8d0yp//W5/rdaTYFQ5NH2cjex/H2
-	 b4w5MA+vTwoFg7sbCSHZOeBc4FuSwd4LUkwuIGAnmDapFYOQ5ooqD2H6GdtH5QgHim
-	 aFxBu9CocLhqnPVu2m35VLcC5qLMMP7IpM2C6pL4=
-Received: from Lang.smartont.net ([2409:8a44:2312:14e1:56d8:1e1e:3f0b:d0f3])
-	by newxmesmtplogicsvrszc50-0.qq.com (NewEsmtp) with SMTP
-	id 4D013C04; Sat, 02 May 2026 19:19:16 +0800
-X-QQ-mid: xmsmtpt1777720756thcvqggum
-Message-ID: <tencent_B1D6CBBF95486E31D04C2E1B92F5E605A307@qq.com>
-X-QQ-XMAILINFO: MLMEjb5zWVcNZZuUZyxHibZ1w+zisKptqYUhi/n6boR51UmP7NHS8C4/S4TwPE
-	 sGhHegepQweJhOWf0lnRWad3ibJaI33gTpKd4J2h8wubBIvPvYqgeYEJ1rA6dVNXCVNaY0UEECeZ
-	 PIxOLhUlSxTboDw78cjaEmSdfcyf3Meqzkh0gyCB1y5zWNS9fYuG4qGawMYElyJRGuuVqRx8Zf4N
-	 QCdXAa6S/8nRI10lTNwpLAoQA0DM9FOy0m4bVyvv3o7zThEk6V0zKMfnDPm/MhJT0LC6h8j7/2Xc
-	 ULiJO1ju+7+REB9UH/FhWoYAgD2+4BYQY4nnR3jrMIKV64+I+bjBVwtWpIreuUnNNuQCGkRONe/l
-	 HtxGCswDbacj6VJ+K9w33mujR7GZVReAtMqbgdwjfTUqPqtBTgKSTaPmzzkZjaOzjOuXtS1VZLDY
-	 0qWZQDd1+KQT153BCfbWRXaJi1uFBddsj/UC70CnMxJCFdOWlCgNHZKxuCvSh1MSvn9i40U0o+8O
-	 IJOIG5GdhXoxpv2P8asYMgp/hKKwEFpgurcH8lHeN31PqBgOmMiqJQhaG2paGFdOepXHyUE6Wd6L
-	 R95zAvxRCk8nC02tP9N38FaW+KksyO5WFk/8Y2WyWv2RW6a0z2h6Wlc1YaxRCNTTh88XLs5H71qa
-	 x3VWqnrgno1zRl/vYAsD+OVyqJjdhZtRQrSisa234FcWBPGivpN6K+yZiGAd1LCH8sQkrqOyKt9q
-	 PA83pciw39FMxZzNWNpqmwbXBhVR8lHHbuHwndqk8gNExKhD8nvJzDL//+HSTz8gc+l0V/uuX/IF
-	 sVwVU0AKPkFQaqFtO62JdWCxvB/g4wI/f1yaGNhUk+zEdWNyua5riNlkJ3TQ9qGiePSEu5KmM61a
-	 1G8HkXwZZPHMOUlmYpEJkjAMBfIvSSW41+t7iqqDHTFr7rGjr32burNA1aRKJad/5Fg7yJ82qd1j
-	 ypFYj/bE19aaGqh+D7EsozLIsR2tIh9BhaCj2a9PemF3/CwbkJJ+GBmu8O3+cHzFRAEWMqd3JG2e
-	 y8Lk7UDixe7j5mR0mquA+eP3cGKFzG8VJUzs0NBfRdjJnHjCCNswTZhvhTwhw3h3+aKJyjatx0iX
-	 9ENtrI+dKX4kUkDnMvAD+jFINbRpP1d9qbZCDp
-X-QQ-XMRINFO: M/715EihBoGS47X28/vv4NpnfpeBLnr4Qg==
-From: Wang Zihan <3772548978@qq.com>
-To: netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-media@vger.kernel.org,
-	linux-um@lists.infradead.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	corbet@lwn.net,
-	skhan@linuxfoundation.org,
-	mchehab@kernel.org,
-	richard@nod.at,
-	anton.ivanov@cambridgegreys.com,
-	johannes@sipsolutions.net,
-	linux-kernel@vger.kernel.org,
-	Wang Zihan <3772548978@qq.com>
-Subject: [PATCH] Documentation: Fix duplicated words
-Date: Sat,  2 May 2026 19:19:16 +0800
-X-OQ-MSGID: <20260502111916.145238-1-3772548978@qq.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1777721515; c=relaxed/simple;
+	bh=A3vGxSeaEOC0ehyCWhZbXgnccbtdifS+SSyz8g4nKaU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bO28V9Grv+91kJ1YMa0rRGvTk64ljoXOshIMJ+K8eOUduYmPqDQ6457lvbsR+tviHOMHN78DZ3qO+L7ks6CEGFUcHZDwER57Z0S/9VCo+HZIlt9X5NkTaq0PSeMxBkY0hItQCQ3h6xZChp5pqwIuNw1XMy9TVfBRTnl5rBcNObM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xn--rombobjrn-67a.se; spf=pass smtp.mailfrom=xn--rombobjrn-67a.se; dkim=pass (2048-bit key) header.d=xn--rombobjrn-67a.se header.i=@xn--rombobjrn-67a.se header.b=At2XEd1M; arc=none smtp.client-ip=188.126.83.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xn--rombobjrn-67a.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xn--rombobjrn-67a.se
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xn--rombobjrn-67a.se;
+	s=a; t=1777721144; bh=A3vGxSeaEOC0ehyCWhZbXgnccbtdifS+SSyz8g4nKaU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:From:Sender:Reply-To:Original-From:
+	 Organization:To:CC:Subject:Original-Subject:Date:Message-ID:
+	 In-Reply-To:References:Original-Message-ID:
+	 Disposition-Notification-To:Disposition-Notification-Options:
+	 MIME-Version:Content-Transfer-Encoding:Content-Type:
+	 Content-Features:Content-Alternative:Content-Location:
+	 TLS-Report-Domain:TLS-Report-Submitter:MT-Priority;
+	b=At2XEd1MVpaO35gBD2TNsWZ0EQSMzsDeLvO+4TC860rCrdQVkRIcYAjb6uRpv9AsZ
+	 2UvJZoN1wFMcDWFba2fwZD2rZWIbL8PKt9jvDELHUC0xiCXc9Q4pr6vLrvV9N3ipnc
+	 CvKHZmNZXji76OB6OQjnMT2ltFFcUxG60NbHBtW4RRE3jj8NYh+4wkMTDpX98NfND2
+	 liNXyy1gz+hObdXo9V6SRm6zL6ZavbnZAXHH/MLape5TNtBT09ZVjqFlXKbT5KH7lq
+	 +kwSOXzmBFOEgBj7in43UF6V8aZTo6/Vesf3LRL+m5k/nhpjX+8815dR34o2Tjsgrf
+	 toU547BRNodXw==
+Received: from tag.xn--rombobjrn-67a.se (tag.xn--rombobjrn-67a.se [192.168.72.9])
+	by smtp.xn--rombobjrn-67a.se (Postfix) with ESMTPSA id DB4EE407BE00;
+	Sat,  2 May 2026 13:25:44 +0200 (CEST)
+Date: Sat, 2 May 2026 13:24:46 +0200
+From: =?UTF-8?B?QmrDtnJu?= Persson <Bjorn@xn--rombobjrn-67a.se>
+To: Wang Zihan <jiyu03@qq.com>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org, kuba@kernel.org
+Subject: Re: [PATCH v2] net: switchdev: fix duplicate word in documentation
+Message-ID: <20260502132446.5b2c51cf@tag.xn--rombobjrn-67a.se>
+In-Reply-To: <tencent_93F8CA2FB714A80C571AC978F39E51D6E506@qq.com>
+References: <tencent_93F8CA2FB714A80C571AC978F39E51D6E506@qq.com>
+X-Mailer: Claws Mail 4.4.0 (GTK 3.24.52; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 927BA4B1BCD
+Content-Type: multipart/signed; boundary="Sig_/7KymnrWYGcZ_jCt9wcilTxM";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Rspamd-Queue-Id: F1D914B1CCB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-3.76 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[qq.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[qq.com:s=s201512];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[xn--rombobjrn-67a.se:s=a];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[qq.com];
+	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283394-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,nod.at,cambridgegreys.com,sipsolutions.net,vger.kernel.org,qq.com];
+	FREEMAIL_TO(0.00)[qq.com];
+	TAGGED_FROM(0.00)[bounces-283395-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[xn--rombobjrn-67a.se];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[3772548978@qq.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[qq.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_THREE(0.00)[4];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Bjorn@xn--rombobjrn-67a.se,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[xn--rombobjrn-67a.se:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qq.com:email,qq.com:dkim,qq.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,xn--rombobjrn-67a.se:dkim]
 
-Remove duplicated words in three documentation files:
-- "in in" -> "in" (switchdev.rst)
-- "The the" -> "The" (dmx-reqbufs.rst)
-- "on on" -> "on" (user_mode_linux_howto_v2.rst)
+--Sig_/7KymnrWYGcZ_jCt9wcilTxM
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Wang Zihan <3772548978@qq.com>
----
- Documentation/networking/switchdev.rst                | 2 +-
- Documentation/userspace-api/media/dvb/dmx-reqbufs.rst | 2 +-
- Documentation/virt/uml/user_mode_linux_howto_v2.rst   | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+Wang Zihan wrote:
+> @@ -162,7 +162,7 @@ The switchdev driver can know a particular port's pos=
+ition in the topology by
+>  monitoring NETDEV_CHANGEUPPER notifications.  For example, a port moved =
+into a
+>  bond will see its upper master change.  If that bond is moved into a bri=
+dge,
+>  the bond's upper master will change.  And so on.  The driver will track =
+such
+> -movements to know what position a port is in in the overall topology by
+> +movements to know what position a port is in the overall topology by
+>  registering for netdevice events and acting on NETDEV_CHANGEUPPER.
+> =20
+>  L2 Forwarding Offload
 
-diff --git a/Documentation/networking/switchdev.rst b/Documentation/networking/switchdev.rst
-index 2966b7122..948bce44c 100644
---- a/Documentation/networking/switchdev.rst
-+++ b/Documentation/networking/switchdev.rst
-@@ -162,7 +162,7 @@ The switchdev driver can know a particular port's position in the topology by
- monitoring NETDEV_CHANGEUPPER notifications.  For example, a port moved into a
- bond will see its upper master change.  If that bond is moved into a bridge,
- the bond's upper master will change.  And so on.  The driver will track such
--movements to know what position a port is in in the overall topology by
-+movements to know what position a port is in the overall topology by
- registering for netdevice events and acting on NETDEV_CHANGEUPPER.
- 
- L2 Forwarding Offload
-diff --git a/Documentation/userspace-api/media/dvb/dmx-reqbufs.rst b/Documentation/userspace-api/media/dvb/dmx-reqbufs.rst
-index d2bb1909e..18810f0bb 100644
---- a/Documentation/userspace-api/media/dvb/dmx-reqbufs.rst
-+++ b/Documentation/userspace-api/media/dvb/dmx-reqbufs.rst
-@@ -72,4 +72,4 @@ appropriately. The generic error codes are described at the
- :ref:`Generic Error Codes <gen-errors>` chapter.
- 
- EOPNOTSUPP
--    The  the requested I/O method is not supported.
-+    The requested I/O method is not supported.
-diff --git a/Documentation/virt/uml/user_mode_linux_howto_v2.rst b/Documentation/virt/uml/user_mode_linux_howto_v2.rst
-index c37e8e594..7b08738c3 100644
---- a/Documentation/virt/uml/user_mode_linux_howto_v2.rst
-+++ b/Documentation/virt/uml/user_mode_linux_howto_v2.rst
-@@ -1092,7 +1092,7 @@ be formatted as plain text.
- 
- Developing always goes hand in hand with debugging. First of all,
- you can always run UML under gdb and there will be a whole section
--later on on how to do that. That, however, is not the only way to
-+later on how to do that. That, however, is not the only way to
- debug a Linux kernel. Quite often adding tracing statements and/or
- using UML specific approaches such as ptracing the UML kernel process
- are significantly more informative.
--- 
-2.54.0
+This change claims that a port is a position. The preceding sentences,
+talking about "a particular port's position" and a port being moved,
+make it clear that a port is *in* a position *in* the topology. The
+port is not itself a position.
 
+Bj=C3=B6rn Persson
+
+--Sig_/7KymnrWYGcZ_jCt9wcilTxM
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signatur
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE52SginNFTPmg+iBb4Tha3NZK5j8FAmn13v8ACgkQ4Tha3NZK
+5j8s8hAAkqDw+y4bCs96k3Igesu6YhghD/E8YXetS5I+A9gsAg6Digqw/V99nkRn
+ntFhbaZIqmb3KsFCE2RABP0XP6Mj91Rfq+pYpV+balVx6v0U2yoCJqwjfgJl29yd
+VybG9I9IDQdrCmTAh4YWvUOKiuSmtdWYsIsH0hESWIaB+dHvOoEvba1F0pLWfnd0
+com35sHH9qIz72YwcU2+pamyhjb5j4H58zaFJFn3SqbVZvFlmCI2yfDaRw5kNoEt
+v4LKBZGlC0UEik74u+mK2YdHRp43gRsG4dzIIlWVpGiBAqPGOtl0FGg7O5Bjnofr
+vaAsZRXOJlX7BdhuYx+QC0pw9YqRqELD9FExSai+NXTaF9llOHLwZhtlR2qcn1Jt
+SvMmKggcvJkh1BLKqtS3ApYKMN4AqnHFqd3CMarW03wU0kuO6gReJHU+ecXpmroj
+RfSFbH1qM0OHKU+YRE9m9HzAnkZXxj/0gyTlYPHmuPxY+84ie4hKTN1H8jQXnIGo
+ITzrLVyy/08rfBbS4WFHgIC++c+xE7KZbBt18YLrFawo2Kozzb9U0ZTw/d1fS/FR
+bedfEoO+phVwrhFESwNj32xXG4CGeaCIr7b81i87iTP/H/4UorucnKEJBDVMho/n
+mrdhyY1LjWBoLnckoZT26zUaSkmCaidYcgka++DjGtwtwBfE8EQ=
+=PIgh
+-----END PGP SIGNATURE-----
+
+--Sig_/7KymnrWYGcZ_jCt9wcilTxM--
 
