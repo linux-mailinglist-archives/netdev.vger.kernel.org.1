@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-283355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283356-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2KnmD5ls9WlVLAIAu9opvQ
-	(envelope-from <netdev+bounces-283355-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 05:16:41 +0200
+	id +HZSDKRs9WlVLAIAu9opvQ
+	(envelope-from <netdev+bounces-283356-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 05:16:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4C6E4B0C57
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 05:16:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C3BA34B0C5F
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 05:16:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 30E79303CD1C
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 03:14:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7F7DF303F049
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 03:14:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EA0A2D5C91;
-	Sat,  2 May 2026 03:14:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF3D1E5B68;
+	Sat,  2 May 2026 03:14:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h4v9PryX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Sklnti39"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5EFB2C3257
-	for <netdev@vger.kernel.org>; Sat,  2 May 2026 03:14:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66AA825782D
+	for <netdev@vger.kernel.org>; Sat,  2 May 2026 03:14:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777691660; cv=none; b=TxWlmQbzwj9hQQNiM5OOxeW/KJXBp5LicrH2sGZ98gQvQyJwVf56DWJiOZovrNm7c2qDZfqByHZ7LgRCwbzHfIuQo2XnEAMHa4yVu2/HJEt4dRHUAl7XPWsAFXLOSuqCLvHtuLB/k9LYrxX1h88ayp4xRoptX0wsxTdT9PBDa0M=
+	t=1777691663; cv=none; b=E7JkehOTUzlWR2Q8cZLdchj/tB59WjeoSyAdekDqvqnce4cxcz9GeSuQa7sU72snXj+S9TQg5Bn9p8M3oaxx7VyDsMmY15cdLZ3BoM96+OgulCFD+bQ6kf3sf6GEWmak3KbJaczQHsMeH+GLdAl58kJ1Pytf8y4nIU1w3qZs7ZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777691660; c=relaxed/simple;
-	bh=WHvI9thA8f+9Dwyb4c0i1CwICrs++o6o/1tUs/9Wwww=;
+	s=arc-20240116; t=1777691663; c=relaxed/simple;
+	bh=/k9fKV38cjmHdlczsBGdSARv8/083/Wo4acMHXeW51Y=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=X+Y5/TmtVynWu74PdbZNA/CCqN2IH70sHg79dFQ/0Wzs6TBizCGP7xR64/fTtzbrjHAhif9uxwQJa+EgrCgT5MURZT+Rj5/lJ/juumArpewnkQuqAO0rZQYrs2L8ePYVLVYR1QMgD6enBXm5tWLkxXSAbTXPhsOk5Fvki7H4tP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h4v9PryX; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=Fg7NQI7RLGNNssjaKuUogCQZsrnnsi6SpfHqVi+X9p5o104hCLfKh9hfcHHQVos5F0Rx2XwXsELPFh+RN7hhK9woUF3cFPUiQ972PX+LoSexGcwxGpaadoBOdInGtBzy/gz1q9kIU2YHERleaIUqECn+VbrMz9WvH27DEgotf1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Sklnti39; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-35da97f6a6dso3094280a91.0
-        for <netdev@vger.kernel.org>; Fri, 01 May 2026 20:14:19 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-834e0452d98so3418290b3a.1
+        for <netdev@vger.kernel.org>; Fri, 01 May 2026 20:14:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777691659; x=1778296459; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1777691661; x=1778296461; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vkm8Z9gWjhY3TEBfk4zh+n6ni3yKNgZWxh5Z676e3tk=;
-        b=h4v9PryXRyAxFi0E42gFwk432xa10IImnywuPpMRXK2YdU3/s7qYfZC48OffsgUuHj
-         ts0PKdEeFYsVrFzzJTKBCUrTCrp3EJbZ0MST2/4k0dX5nZRXbWXgzzwk8WVbmXBNV9Vq
-         XH+kLa6rRtM5ui4Bb1Po7XBAAMP/KkA00Ka8v8rcoYsCPRuGNXNS6ApRDLHpK7O1h1De
-         VEM4M1KzuZfcHIg935obkyAvfZQblD0u0V5gC5vJrd55dT/b6sSUwfBS9u2RRPyF3Myq
-         89rVeoVqXPkRxx7UQtHMOokNeKeeKEdXkjVBy12M31k279nuNz0bcm5S8YpHTMRg0AZo
-         GriA==
+        bh=n8VaMDxu2h/4/wZu2WRImhK3DOnZku42IU243eovHt0=;
+        b=Sklnti39P/LfYFzmng/A8lBKQw3giOOLuawO32zzuQ5D9cxK4UMjM/SQXNNZNlgknK
+         DCKQJ5oeBSCIZS65ia9LLcTmS4atqy0et/lQDIDmxokzHBdzml5BUPPGq11EYsKmBiKS
+         fCNmVGl4Pfh5NZAYt9npi8BUgqwqOEtCFlhKBkKinpr2Z3Bi2ctyRLXmnjH201r2nVop
+         +uW1zf24uVI+6qQ2T431BctkMGSoOgfqCvKuw5PkLxvPBQLY0VapKOS5iMpCzQ8BZlpw
+         C96kXsmdtgwfxiC5iw7XK7WpP8CuXu+K4TZFpjnV3ZT+AHeS7JWgpl71fAWexXYTEZBN
+         WVdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777691659; x=1778296459;
+        d=1e100.net; s=20251104; t=1777691661; x=1778296461;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vkm8Z9gWjhY3TEBfk4zh+n6ni3yKNgZWxh5Z676e3tk=;
-        b=cCrlYSZ7Iy1/Heuukd9vY0X3qNsbL2aHUGo6H/WQPwgB2RaUZN2J7t3zRijlX/yMcG
-         WhRarg9w4TULYUd93PRn21MgaudCg3N3sjS5HFUdy8M+xwj47EF+OHXNq2F1+xWazzOe
-         iWhorns3gxLd0b/eWOM2AMqS5sBFh+PvFJuwaFEcPKPSOzgey/fvd0SD1QV/ZbELL/u4
-         jFk/0wupy7wKTSjuDBrIpK8yKQqu9yM7XdG70gS9Qse1RzW2+C/QxERlgN0ImRFx0L/x
-         E7hiRwhitEjY/W5qwTWbuNI9p7n5iEuaj/0/uEICOB23E0WWn4OwhGVfmEfs3YM128E+
-         jFEQ==
-X-Forwarded-Encrypted: i=1; AFNElJ94RIBUmsGUMBJ6ob6/CSO6MjZC8KqqT8oOW9NqK3SEVBaVqlQzcmsZiRlJomsOYGLF+Clh4iY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsfBW/GkgGJplj4y+RrTcuAYN9ckCzSAz4Q9bKFQ6m/+Coxjfi
-	z/reEcWRkFVME6/ivgHC7F2K6PGWtSyey37yV8nJVYrup6SMmrFoDPjG7+UGGoITOAmOM+17hqp
-	Bp8vwvQ==
-X-Received: from pfbhb4.prod.google.com ([2002:a05:6a00:8584:b0:834:e113:ef04])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3ca2:b0:3a2:ebfc:6bf3
- with SMTP id adf61e73a8af0-3a7f1bc418cmr1325524637.29.1777691658588; Fri, 01
- May 2026 20:14:18 -0700 (PDT)
-Date: Sat,  2 May 2026 03:13:01 +0000
+        bh=n8VaMDxu2h/4/wZu2WRImhK3DOnZku42IU243eovHt0=;
+        b=D73jwEJNWF79LgaJLeS1TWIYWwl0tBaNWCSElgD0AD6l3SmESi52YmwcUM/MFmEhXM
+         YJs8GM99OamhfzmFtghIW/0k3g5SdsYuGvsAU95ZtJNg7UISe1igBL2Pews5hVKl/KrZ
+         zAsC/gYzrc3MQ0k/GSacpwKbhtg6nEcNmZ3ZdUhzAHJGfdfq729iywBuxZqgiQ3+lFOW
+         Ox2cU5NhjVamvcb2c9qlXKRPeRTGxXeDDex+8ed8helbcJsCLEy5RuTSwuRq+4bQ6rPz
+         L7l2qMfZ5QhCSA5oSOzIr9oMNe4LdBrwsmuInNtxlJkbhJYMlRNNZjnQz5D+8j76ik6W
+         62RQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/FEwW32KKQU4qMHBBET6IE5RbRW+28lG178SDGNqzq6VbNy/4VKdiQ+1vShp+bQUBjMMiFGN8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYYkL0pvS4L/fop1V99DGYIIMGCYPUELBSc5W7NocinPH0FyKf
+	b1i6p6l/B+Cj7DF+rInuSc3pBF23lWKHUBOKn/9bM2cyfs/kJeAyUayN2qCwmRqAp+Y8wS6vW/h
+	DgtiEqg==
+X-Received: from pfbho20.prod.google.com ([2002:a05:6a00:8814:b0:82f:36fa:1a58])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:883:b0:82f:3ecc:c42f
+ with SMTP id d2e1a72fcca58-8352d257262mr1647947b3a.40.1777691660354; Fri, 01
+ May 2026 20:14:20 -0700 (PDT)
+Date: Sat,  2 May 2026 03:13:02 +0000
 In-Reply-To: <20260502031401.3557229-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,15 +76,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260502031401.3557229-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260502031401.3557229-9-kuniyu@google.com>
-Subject: [PATCH v1 net-next 08/15] vxlan: Free vxlan_sock with kfree_rcu().
+Message-ID: <20260502031401.3557229-10-kuniyu@google.com>
+Subject: [PATCH v1 net-next 09/15] geneve: Store struct sock in struct geneve_sock.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>
 Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
 	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: C4C6E4B0C57
+X-Rspamd-Queue-Id: C3BA34B0C5F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
@@ -103,7 +103,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283355-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283356-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -116,53 +116,209 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-We will remove synchronize_rcu() in udp_tunnel_sock_release().
+geneve does not need to access struct socket itself in the fast
+path; it only reads struct sock, and struct socket is only used for
+tunnel setup and teardown.
 
-We must ensure that vxlan_sock is freed after inflight RX fast path.
+Let's store struct sock directly in struct geneve_sock.
 
-Let's free vxlan_sock with kfree_rcu().
-
-Note that vxlan_sock.vni_list[] is 8K and struct rcu_head must
-be placed before it.
+__geneve_sock_release() frees geneve_sock with kfree_rcu(), so
+geneve no longer needs synchronize_rcu() in udp_tunnel_sock_release().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- drivers/net/vxlan/vxlan_core.c | 4 ++--
- include/net/vxlan.h            | 1 +
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ drivers/net/geneve.c | 54 ++++++++++++++++++++++----------------------
+ 1 file changed, 27 insertions(+), 27 deletions(-)
 
-diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index ce99da44ea7d..00facbfabced 100644
---- a/drivers/net/vxlan/vxlan_core.c
-+++ b/drivers/net/vxlan/vxlan_core.c
-@@ -1524,13 +1524,13 @@ static void vxlan_sock_release(struct vxlan_dev *vxlan)
+diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
+index 9cf62d3ee471..b36fad833724 100644
+--- a/drivers/net/geneve.c
++++ b/drivers/net/geneve.c
+@@ -106,7 +106,7 @@ struct geneve_sock {
+ 	bool			collect_md;
+ 	bool			gro_hint;
+ 	struct list_head	list;
+-	struct socket		*sock;
++	struct sock		*sk;
+ 	struct rcu_head		rcu;
+ 	int			refcnt;
+ 	struct hlist_head	vni_list[VNI_HASH_SIZE];
+@@ -167,7 +167,7 @@ static bool eq_tun_id_and_vni(u8 *tun_id, u8 *vni)
  
- 	if (__vxlan_sock_release_prep(sock4)) {
- 		udp_tunnel_sock_release(sock4->sk);
--		kfree(sock4);
-+		kfree_rcu(sock4, rcu);
- 	}
- 
- #if IS_ENABLED(CONFIG_IPV6)
- 	if (__vxlan_sock_release_prep(sock6)) {
- 		udp_tunnel_sock_release(sock6->sk);
--		kfree(sock6);
-+		kfree_rcu(sock6, rcu);
- 	}
- #endif
+ static sa_family_t geneve_get_sk_family(struct geneve_sock *gs)
+ {
+-	return gs->sock->sk->sk_family;
++	return gs->sk->sk_family;
  }
-diff --git a/include/net/vxlan.h b/include/net/vxlan.h
-index 8b52294b2902..dfba89695efc 100644
---- a/include/net/vxlan.h
-+++ b/include/net/vxlan.h
-@@ -186,6 +186,7 @@ struct vxlan_metadata {
- struct vxlan_sock {
- 	struct hlist_node hlist;
- 	struct sock	  *sk;
-+	struct rcu_head	  rcu;
- 	struct hlist_head vni_list[VNI_HASH_SIZE];
- 	refcount_t	  refcnt;
- 	u32		  flags;
+ 
+ static struct geneve_dev *geneve_lookup(struct geneve_sock *gs,
+@@ -760,11 +760,11 @@ static int geneve_udp_encap_err_lookup(struct sock *sk, struct sk_buff *skb)
+ 	return -EPFNOSUPPORT;
+ }
+ 
+-static struct socket *geneve_create_sock(struct net *net, bool ipv6,
+-					 __be16 port, bool ipv6_rx_csum)
++static struct sock *geneve_create_sock(struct net *net, bool ipv6,
++				       __be16 port, bool ipv6_rx_csum)
+ {
+-	struct socket *sock;
+ 	struct udp_port_cfg udp_conf;
++	struct socket *sock;
+ 	int err;
+ 
+ 	memset(&udp_conf, 0, sizeof(udp_conf));
+@@ -786,7 +786,7 @@ static struct socket *geneve_create_sock(struct net *net, bool ipv6,
+ 		return ERR_PTR(err);
+ 
+ 	udp_allow_gso(sock->sk);
+-	return sock;
++	return sock->sk;
+ }
+ 
+ static bool geneve_hdr_match(struct sk_buff *skb,
+@@ -974,28 +974,28 @@ static struct geneve_sock *geneve_socket_create(struct net *net, __be16 port,
+ 						bool ipv6, bool ipv6_rx_csum)
+ {
+ 	struct geneve_net *gn = net_generic(net, geneve_net_id);
+-	struct geneve_sock *gs;
+-	struct socket *sock;
+ 	struct udp_tunnel_sock_cfg tunnel_cfg;
++	struct geneve_sock *gs;
++	struct sock *sk;
+ 	int h;
+ 
+ 	gs = kzalloc_obj(*gs);
+ 	if (!gs)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	sock = geneve_create_sock(net, ipv6, port, ipv6_rx_csum);
+-	if (IS_ERR(sock)) {
++	sk = geneve_create_sock(net, ipv6, port, ipv6_rx_csum);
++	if (IS_ERR(sk)) {
+ 		kfree(gs);
+-		return ERR_CAST(sock);
++		return ERR_CAST(sk);
+ 	}
+ 
+-	gs->sock = sock;
++	gs->sk = sk;
+ 	gs->refcnt = 1;
+ 	for (h = 0; h < VNI_HASH_SIZE; ++h)
+ 		INIT_HLIST_HEAD(&gs->vni_list[h]);
+ 
+ 	/* Initialize the geneve udp offloads structure */
+-	udp_tunnel_notify_add_rx_port(gs->sock->sk, UDP_TUNNEL_TYPE_GENEVE);
++	udp_tunnel_notify_add_rx_port(sk, UDP_TUNNEL_TYPE_GENEVE);
+ 
+ 	/* Mark socket as an encapsulation socket */
+ 	memset(&tunnel_cfg, 0, sizeof(tunnel_cfg));
+@@ -1006,7 +1006,7 @@ static struct geneve_sock *geneve_socket_create(struct net *net, __be16 port,
+ 	tunnel_cfg.encap_rcv = geneve_udp_encap_recv;
+ 	tunnel_cfg.encap_err_lookup = geneve_udp_encap_err_lookup;
+ 	tunnel_cfg.encap_destroy = NULL;
+-	setup_udp_tunnel_sock(net, sock->sk, &tunnel_cfg);
++	setup_udp_tunnel_sock(net, sk, &tunnel_cfg);
+ 	list_add(&gs->list, &gn->sock_list);
+ 	return gs;
+ }
+@@ -1017,8 +1017,8 @@ static void __geneve_sock_release(struct geneve_sock *gs)
+ 		return;
+ 
+ 	list_del(&gs->list);
+-	udp_tunnel_notify_del_rx_port(gs->sock->sk, UDP_TUNNEL_TYPE_GENEVE);
+-	udp_tunnel_sock_release(gs->sock->sk);
++	udp_tunnel_notify_del_rx_port(gs->sk, UDP_TUNNEL_TYPE_GENEVE);
++	udp_tunnel_sock_release(gs->sk);
+ 	kfree_rcu(gs, rcu);
+ }
+ 
+@@ -1048,7 +1048,7 @@ static struct geneve_sock *geneve_find_sock(struct geneve_net *gn,
+ 	struct geneve_sock *gs;
+ 
+ 	list_for_each_entry(gs, &gn->sock_list, list) {
+-		if (inet_sk(gs->sock->sk)->inet_sport == dst_port &&
++		if (inet_sk(gs->sk)->inet_sport == dst_port &&
+ 		    geneve_get_sk_family(gs) == family &&
+ 		    gs->gro_hint == gro_hint) {
+ 			return gs;
+@@ -1390,7 +1390,7 @@ static int geneve_xmit_skb(struct sk_buff *skb, struct net_device *dev,
+ 	if (unlikely(err))
+ 		return err;
+ 
+-	udp_tunnel_xmit_skb(rt, gs4->sock->sk, skb, saddr, info->key.u.ipv4.dst,
++	udp_tunnel_xmit_skb(rt, gs4->sk, skb, saddr, info->key.u.ipv4.dst,
+ 			    tos, ttl, df, sport, geneve->cfg.info.key.tp_dst,
+ 			    !net_eq(geneve->net, dev_net(geneve->dev)),
+ 			    !test_bit(IP_TUNNEL_CSUM_BIT, info->key.tun_flags),
+@@ -1424,7 +1424,7 @@ static int geneve6_xmit_skb(struct sk_buff *skb, struct net_device *dev,
+ 				  geneve->cfg.port_min,
+ 				  geneve->cfg.port_max, true);
+ 
+-	dst = udp_tunnel6_dst_lookup(skb, dev, geneve->net, gs6->sock->sk, 0,
++	dst = udp_tunnel6_dst_lookup(skb, dev, geneve->net, gs6->sk, 0,
+ 				     &saddr, key, sport,
+ 				     geneve->cfg.info.key.tp_dst, prio,
+ 				     use_cache ?
+@@ -1480,7 +1480,7 @@ static int geneve6_xmit_skb(struct sk_buff *skb, struct net_device *dev,
+ 	if (unlikely(err))
+ 		return err;
+ 
+-	udp_tunnel6_xmit_skb(dst, gs6->sock->sk, skb, dev,
++	udp_tunnel6_xmit_skb(dst, gs6->sk, skb, dev,
+ 			     &saddr, &key->u.ipv6.dst, prio, ttl,
+ 			     info->key.label, sport, geneve->cfg.info.key.tp_dst,
+ 			     !test_bit(IP_TUNNEL_CSUM_BIT,
+@@ -1592,7 +1592,7 @@ static int geneve_fill_metadata_dst(struct net_device *dev, struct sk_buff *skb)
+ 					  geneve->cfg.port_min,
+ 					  geneve->cfg.port_max, true);
+ 
+-		dst = udp_tunnel6_dst_lookup(skb, dev, geneve->net, gs6->sock->sk, 0,
++		dst = udp_tunnel6_dst_lookup(skb, dev, geneve->net, gs6->sk, 0,
+ 					     &saddr, &info->key, sport,
+ 					     geneve->cfg.info.key.tp_dst, prio,
+ 					     use_cache ? &info->dst_cache : NULL);
+@@ -1654,10 +1654,10 @@ static void geneve_offload_rx_ports(struct net_device *dev, bool push)
+ 
+ 	list_for_each_entry(gs, &gn->sock_list, list) {
+ 		if (push) {
+-			udp_tunnel_push_rx_port(dev, gs->sock->sk,
++			udp_tunnel_push_rx_port(dev, gs->sk,
+ 						UDP_TUNNEL_TYPE_GENEVE);
+ 		} else {
+-			udp_tunnel_drop_rx_port(dev, gs->sock->sk,
++			udp_tunnel_drop_rx_port(dev, gs->sk,
+ 						UDP_TUNNEL_TYPE_GENEVE);
+ 		}
+ 	}
+@@ -2183,12 +2183,12 @@ static void geneve_quiesce(struct geneve_dev *geneve, struct geneve_sock **gs4,
+ 	*gs4 = rtnl_dereference(geneve->sock4);
+ 	rcu_assign_pointer(geneve->sock4, NULL);
+ 	if (*gs4)
+-		rcu_assign_sk_user_data((*gs4)->sock->sk, NULL);
++		rcu_assign_sk_user_data((*gs4)->sk, NULL);
+ #if IS_ENABLED(CONFIG_IPV6)
+ 	*gs6 = rtnl_dereference(geneve->sock6);
+ 	rcu_assign_pointer(geneve->sock6, NULL);
+ 	if (*gs6)
+-		rcu_assign_sk_user_data((*gs6)->sock->sk, NULL);
++		rcu_assign_sk_user_data((*gs6)->sk, NULL);
+ #else
+ 	*gs6 = NULL;
+ #endif
+@@ -2201,11 +2201,11 @@ static void geneve_unquiesce(struct geneve_dev *geneve, struct geneve_sock *gs4,
+ {
+ 	rcu_assign_pointer(geneve->sock4, gs4);
+ 	if (gs4)
+-		rcu_assign_sk_user_data(gs4->sock->sk, gs4);
++		rcu_assign_sk_user_data(gs4->sk, gs4);
+ #if IS_ENABLED(CONFIG_IPV6)
+ 	rcu_assign_pointer(geneve->sock6, gs6);
+ 	if (gs6)
+-		rcu_assign_sk_user_data(gs6->sock->sk, gs6);
++		rcu_assign_sk_user_data(gs6->sk, gs6);
+ #endif
+ 	synchronize_net();
+ }
 -- 
 2.54.0.545.g6539524ca2-goog
 
