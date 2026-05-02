@@ -1,96 +1,74 @@
-Return-Path: <netdev+bounces-283428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283429-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GPmhLgcU9mnMSAIAu9opvQ
-	(envelope-from <netdev+bounces-283428-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 17:11:03 +0200
+	id KPyvA7kX9mlQSQIAu9opvQ
+	(envelope-from <netdev+bounces-283429-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 17:26:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20F454B2968
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 17:11:02 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF1324B2987
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 17:26:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C8BEE302A6D0
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 15:09:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 351F9300C260
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 15:26:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1AE93815F1;
-	Sat,  2 May 2026 15:09:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A572133D51A;
+	Sat,  2 May 2026 15:26:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MpnIrw1h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l7d9m0q5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C4037C0FA
-	for <netdev@vger.kernel.org>; Sat,  2 May 2026 15:09:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EAFF1A9F8D;
+	Sat,  2 May 2026 15:26:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777734568; cv=none; b=C/Atgy3mqjI4HjkhKW21WJ0jDBFcRcXQuvNrvzdlWGd2zjzGcIm/ADI11/KeIYxXNWU/ic2qF0ArvC4BJ+POJ5v+he2HWwBD5xryvwoMGWOgJoJDf1Xt9aZeKXZ4UljwqaEDhbvQOfDwzBtT0RVOvcdVDD0fP28tT96U33K/7K8=
+	t=1777735602; cv=none; b=e+HSbHT95/TixqAR41DmU6JsoG0+5NWFPt08jjsm4KzNLg9YWrfyCbMOFN+WNmdkF8q9eFDL5mdMcwKnkAEqIGN4FlCTuaBrI//FSqZyvgHueGGYiBEY1Q+dN51HkqNL84AmmtwqFYGc0jq5ukbigM9SQ+aCNc0BUkghK9Fb1g4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777734568; c=relaxed/simple;
-	bh=uazcdPaE5njKmpLYawFPN4mUVC9ypP4hDv4opGgd7Iw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=i63czfT8fxM27dYzfcFLu0lLqxMFB5GFY8GiKoWPh9+/qm+6eqrd+WMuzeKWvix4UMzp3ri3mSCpcPt47KHnHuw6o5508C/v9zoO+Uv/NFJ7gYsJBOVQzhgKCWThTXxzIroe98fHUYzMVOZzNdnTEIS/6bR44o3Rp0q5mafWLGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MpnIrw1h; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-824c9da9928so1228965b3a.3
-        for <netdev@vger.kernel.org>; Sat, 02 May 2026 08:09:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777734564; x=1778339364; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=uZCg2ntfiIQSDRsAzajTIBjeudz9C8jXIZXlecgKHlI=;
-        b=MpnIrw1h6hGrASr6P0bNa973sOIWzwfxBIpdAQRI/aHetUnIAYziAcHh0CMjxzd4e8
-         otAiR1fqCgIxW2LubpHI60XDQDSb61nVQwAaB9nmjsQxXdWlc7n2K3wswxc3FZyA2PpR
-         uKbnolmGxJOyB8WeJHYgtWowgE3tgxylcQYYnqxe24ZKl1nQ3Zc9VcNxdChtWebQ8684
-         uODeJhombxEVFnGeODR3kp63i79CfrTLMJC46prAyZL4HRzVfdMhEKSorF7FceWSDs57
-         0PJltxHx8kX7dn8xW7KDMWcoERpnYM9ElHAUCB1F58smJdynxv2zxRB1MVc8De0t1Oen
-         0iuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777734564; x=1778339364;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uZCg2ntfiIQSDRsAzajTIBjeudz9C8jXIZXlecgKHlI=;
-        b=sLX8kdwAtm/7+kJg9TT229zVkXBsFYL62zUtsT/uUwbeo6QuRh/TGSP0Xz3rovDq0r
-         Wge7JQokquTaBuUXVWyZGP/dwC8PI5AapY0gUGI1e4WppoaSMoOZEcbtuTV+Bys/VEqK
-         AySm4nTI597L5Xqv+4B6jZcciiURwoHIupQlaNEFNxY9RFoYcOV/S7TzQFG3U8LnVYav
-         wQ0Pzfbh6JvK0fcGpkgpk5NT72lWEXTwbLq51N+mIHc4UR2/Djs6dTQJHVoflWEcqLxm
-         oAGKpEanwLz6KxxHDqlB8lzOMnmETrb7DJTcujRItGYloSKmayZ59AaMR80/UhUEFV7i
-         BK+A==
-X-Forwarded-Encrypted: i=1; AFNElJ+QZ7NjM9nALruPC50ZXP2tcCMAgskl1pYMAmLCs9vmpDDU8T055r9WcfkdgUmSfALr5XVs4S4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8wr1nyW91zm1251dCdXOxX8ulashYsL9UlUSa9aKQTiqQ8EuU
-	D+/4eRaob5DPsCN57KGWYWopTCpwfRxGPMVAYtrqcPZiWjlC54HLeAT8
-X-Gm-Gg: AeBDieuIvkoDkp6xR0wBUtytH2RK4/HcyYuEtZEVTPsThocovR1DJOqZpIycDxLiNrG
-	lgmk8MMYJdOr4n5dKBynegnDUwhjpNxNBMY1o+nMOH+96oM8c+x7FTYGVGaY+6NygMQZj/yOFMa
-	fCzl4oruqk1xXugX/TGFfwFPU813RPHnjz6IGL4I9ogz34CzHHQIvURkrcahi9VVcLdd9bOucCA
-	+EGs1G/aPrb1FFGQeEALd0NDGW2NduuJbY1rucu4LYMOBQsdyls/n/XFayuv10aREt9tYuJr0Oh
-	AETH/iaZexZj8A9GOSbA+oHY9IyJvvlKJYrDPjp4jRy19FbuCrqTpTQNxtbeh7NfNggXlcY6/Om
-	4kMvUZxGfYPh8xMaxY7c2F+kl2uROr4Yv8Pgfzx6ERy/xSR+pF7/o+giMuJRXjfgT73NRmgsYI8
-	kgqXC2Smc4ryKhESCF3t+lEEfL9/7ZWKR0zmFMjtMBFfHm8bgo9f8XNoVD
-X-Received: by 2002:a05:6a21:6d95:b0:3a1:90ef:7e46 with SMTP id adf61e73a8af0-3a7f1bc4197mr3551311637.33.1777734563683;
-        Sat, 02 May 2026 08:09:23 -0700 (PDT)
-Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83515833ee3sm6080310b3a.11.2026.05.02.08.09.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 May 2026 08:09:23 -0700 (PDT)
-From: Maoyi Xie <maoyixie.tju@gmail.com>
-X-Google-Original-From: Maoyi Xie <maoyi.xie@ntu.edu.sg>
-To: davem@davemloft.net,
+	s=arc-20240116; t=1777735602; c=relaxed/simple;
+	bh=SheQN8rmthb94Gq8c40zeewK7HYzbJWGeqJFZU+aUW8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=O6NwFgZDRHfZVYABqp5gWTOdrU5c1AnsMX80nugb3Ex3/eZ2SOYdHt0813gfQDtTvMH76BQLMLyI6+7hKTpyvXTcitj/2SkUJyZXdE45uCgkf9xSmRv//o3aoQqg15CWLCZQgTcncM2QczY4AE0RdQb7fKRZsxh/q9RFeP4EfJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l7d9m0q5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5BD3C19425;
+	Sat,  2 May 2026 15:26:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777735602;
+	bh=SheQN8rmthb94Gq8c40zeewK7HYzbJWGeqJFZU+aUW8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=l7d9m0q5kI/2kINLnLXgpwvtlTRfOVrkIwcN90A5/hZKreGUEgawWm5GVNMIrRN1b
+	 H8Dj5+Cm40OImDwmmy+UW7Bzm4AT+U48SNZeZrzNbBawyYzGEH0HZ+RBou1HTLBmJv
+	 Ui/5lHCaHcRQhSSzqmnwSxw1Ju5Kw0MA+FNByGdfbXFM5+rulklaVAzSelksybc1nk
+	 6iit0CZ3OCQAtECSt1WyXXHSFjH/nGcAEEncY4GCzJoosEsky+ZjQ67bgLyclvFXrS
+	 TMwV95/z65gxgZ7cBW0Ky69ct9lDBsbeZC/1+ih39ouzepBtIqaSigm+Dn39lxA7Jj
+	 6HWuXyT+Lfgdw==
+From: Simon Horman <horms@kernel.org>
+To: longli@microsoft.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	kotaranov@microsoft.com,
 	kuba@kernel.org,
+	davem@davemloft.net,
 	pabeni@redhat.com,
-	edumazet@google.com
-Cc: dsahern@kernel.org,
-	kuznet@ms2.inr.ac.ru,
-	willemb@google.com,
-	willemdebruijn.kernel@gmail.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	jgg@ziepe.ca,
+	leon@kernel.org,
+	haiyangz@microsoft.com,
+	kys@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net v6] ipv6: flowlabel: enforce per-netns limit for unprivileged callers
-Date: Sat,  2 May 2026 23:09:18 +0800
-Message-Id: <20260502150918.4171847-1-maoyi.xie@ntu.edu.sg>
-X-Mailer: git-send-email 2.34.1
+	linux-rdma@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v6 1/6] net: mana: Create separate EQs for each vPort
+Date: Sat,  2 May 2026 16:23:55 +0100
+Message-ID: <20260502152354.289044-2-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260429221625.1841150-2-longli@microsoft.com>
+References: <20260429221625.1841150-2-longli@microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,180 +76,266 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 20F454B2968
+X-Rspamd-Queue-Id: BF1324B2987
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-283429-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283428-lists,netdev=lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
-	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,ms2.inr.ac.ru,google.com,gmail.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.991];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-fl_size, fl_ht and ip6_fl_lock in net/ipv6/ip6_flowlabel.c are file
-scope and shared across netns. mem_check() reads fl_size to decide
-whether to deny non-CAP_NET_ADMIN callers; capable() runs against
-init_user_ns, so an unprivileged user in any non-init userns can
-push fl_size past FL_MAX_SIZE - FL_MAX_SIZE/4 and starve every
-other unprivileged userns on the host.
+From: 'Simon Horman' <horms@kernel.org>
 
-Add struct netns_ipv6::flowlabel_count, bumped and decremented next
-to fl_size in fl_intern, ip6_fl_gc and ip6_fl_purge. The new field
-is placed in the existing 4-byte hole after ipmr_seq, so struct
-netns_ipv6 stays the same size on 64-bit builds.
-
-Bump FL_MAX_SIZE from 4096 to 8192. It has been 4096 since the file
-was added; machines and connection counts have grown.
-
-mem_check() folds an extra per-netns ceiling into the existing
-non-CAP_NET_ADMIN conditional. The ceiling is half of the total
-budget that unprivileged callers have ever been able to use, i.e.
-(FL_MAX_SIZE - FL_MAX_SIZE/4) / 2 = 3072 entries. With FL_MAX_SIZE
-doubled, this preserves the original per-user reach (~3K, what an
-unprivileged caller could already obtain before this change) while
-forcing an attacker to spread allocations across at least two
-netns to exhaust the global non-CAP_NET_ADMIN budget.
-
-CAP_NET_ADMIN against init_user_ns still bypasses both caps.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Suggested-by: Willem de Bruijn <willemb@google.com>
-Cc: stable@vger.kernel.org # v5.15+
-Signed-off-by: Maoyi Xie <maoyi.xie@ntu.edu.sg>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
 ---
-v6 (this submission, addressing v5 review by Willem):
-    - Rebased onto current net (resolves the conflict on
-      include/net/netns/ipv6.h that v5 hit. ipmr_seq is now
-      atomic_t but remains 4 bytes, so flowlabel_count still
-      fills the 4-byte hole after it).
-    - Restored fl_free() to its original position in both
-      ip6_fl_gc() and ip6_fl_purge(). v5 had moved fl_free()
-      after the new atomic_dec() to avoid the use-after-free
-      on fl->fl_net. v6 instead caches fl->fl_net into a
-      local before fl_free() in ip6_fl_gc(), and uses the
-      net argument already in scope in ip6_fl_purge().
-v5: replaced the per-netns ceiling FL_MAX_SIZE/8 with the
-    computed unpriv_user_limit = (FL_MAX_SIZE - FL_MAX_SIZE/4)/2,
-    which evaluates to 3072. v4's FL_MAX_SIZE/8 = 1024 would
-    have reduced the per-user budget below the ~3K an
-    unprivileged caller could already obtain before any of
-    this work, defeating the reason FL_MAX_SIZE was doubled
-    in the first place.
-v4: addressed Willem's v3 review on netdev. Dropped the
-    flowlabel_has_excl cacheline argument in favour of "fills
-    the existing 4-byte hole after ipmr_seq", and reordered
-    atomic_dec(&...flowlabel_count) to sit immediately after
-    atomic_dec(&fl_size) in ip6_fl_gc and ip6_fl_purge.
-v3: addressed Willem's review on the private security@ thread.
-    Merged FL_MAX_SIZE doubling, dropped test data, moved
-    flowlabel_count near ipmr_seq, inlined fl->fl_net in
-    ip6_fl_gc.
-v2: per-netns counter + cap, sent to security@ as a 2-patch
-    series.
-v1: fix-shape sketch in original disclosure.
+net: mana: Create separate EQs for each vPort
 
- include/net/netns/ipv6.h |  1 +
- net/ipv6/ip6_flowlabel.c | 14 ++++++++++++--
- 2 files changed, 13 insertions(+), 2 deletions(-)
+This change moves EQ ownership from struct mana_context to struct
+mana_port_context so each vPort can have dedicated EQs, and exports
+mana_create_eq()/mana_destroy_eq() for use by the MANA RDMA driver.
 
-diff --git a/include/net/netns/ipv6.h b/include/net/netns/ipv6.h
-index 499e42881..ef698f5fa 100644
---- a/include/net/netns/ipv6.h
-+++ b/include/net/netns/ipv6.h
-@@ -119,6 +119,7 @@ struct netns_ipv6 {
- 	struct fib_notifier_ops	*notifier_ops;
- 	struct fib_notifier_ops	*ip6mr_notifier_ops;
- 	atomic_t		ipmr_seq;
-+	atomic_t		flowlabel_count;
- 	struct {
- 		struct hlist_head head;
- 		spinlock_t	lock;
-diff --git a/net/ipv6/ip6_flowlabel.c b/net/ipv6/ip6_flowlabel.c
-index c92f98c6f..28e43718d 100644
---- a/net/ipv6/ip6_flowlabel.c
-+++ b/net/ipv6/ip6_flowlabel.c
-@@ -36,7 +36,7 @@
- /* FL hash table */
- 
- #define FL_MAX_PER_SOCK	32
--#define FL_MAX_SIZE	4096
-+#define FL_MAX_SIZE	8192
- #define FL_HASH_MASK	255
- #define FL_HASH(l)	(ntohl(l)&FL_HASH_MASK)
- 
-@@ -161,9 +161,12 @@ static void ip6_fl_gc(struct timer_list *unused)
- 					fl->expires = ttd;
- 				ttd = fl->expires;
- 				if (time_after_eq(now, ttd)) {
-+					struct net *net = fl->fl_net;
-+
- 					*flp = fl->next;
- 					fl_free(fl);
- 					atomic_dec(&fl_size);
-+					atomic_dec(&net->ipv6.flowlabel_count);
- 					continue;
- 				}
- 				if (!sched || time_before(ttd, sched))
-@@ -197,6 +200,7 @@ static void __net_exit ip6_fl_purge(struct net *net)
- 				*flp = fl->next;
- 				fl_free(fl);
- 				atomic_dec(&fl_size);
-+				atomic_dec(&net->ipv6.flowlabel_count);
- 				continue;
- 			}
- 			flp = &fl->next;
-@@ -245,6 +249,7 @@ static struct ip6_flowlabel *fl_intern(struct net *net,
- 	fl->next = fl_ht[FL_HASH(fl->label)];
- 	rcu_assign_pointer(fl_ht[FL_HASH(fl->label)], fl);
- 	atomic_inc(&fl_size);
-+	atomic_inc(&net->ipv6.flowlabel_count);
- 	spin_unlock_bh(&ip6_fl_lock);
- 	rcu_read_unlock();
- 	return NULL;
-@@ -464,6 +469,9 @@ fl_create(struct net *net, struct sock *sk, struct in6_flowlabel_req *freq,
- 
- static int mem_check(struct sock *sk)
- {
-+	const int unpriv_total_limit = FL_MAX_SIZE - (FL_MAX_SIZE / 4);
-+	const int unpriv_user_limit = unpriv_total_limit / 2;
-+	struct net *net = sock_net(sk);
- 	int room = FL_MAX_SIZE - atomic_read(&fl_size);
- 	struct ipv6_fl_socklist *sfl;
- 	int count = 0;
-@@ -478,7 +486,9 @@ static int mem_check(struct sock *sk)
- 
- 	if (room <= 0 ||
- 	    ((count >= FL_MAX_PER_SOCK ||
--	      (count > 0 && room < FL_MAX_SIZE/2) || room < FL_MAX_SIZE/4) &&
-+	      (count > 0 && room < FL_MAX_SIZE/2) ||
-+	      room < FL_MAX_SIZE/4 ||
-+	      atomic_read(&net->ipv6.flowlabel_count) >= unpriv_user_limit) &&
- 	     !capable(CAP_NET_ADMIN)))
- 		return -ENOBUFS;
- 
--- 
-2.34.1
+> diff --git a/drivers/infiniband/hw/mana/main.c b/drivers/infiniband/hw/mana/main.c
+> index ac5e75dd3494..60cc02e4ad10 100644
+> --- a/drivers/infiniband/hw/mana/main.c
+> +++ b/drivers/infiniband/hw/mana/main.c
+> @@ -20,8 +20,10 @@ void mana_ib_uncfg_vport(struct mana_ib_dev *dev, struct mana_ib_pd *pd,
+>  	pd->vport_use_count--;
+>  	WARN_ON(pd->vport_use_count < 0);
+>  
+> -	if (!pd->vport_use_count)
+> +	if (!pd->vport_use_count) {
+> +		mana_destroy_eq(mpc);
+>  		mana_uncfg_vport(mpc);
+> +	}
+>  
+>  	mutex_unlock(&pd->vport_mutex);
+>  }
+> @@ -55,15 +57,21 @@ int mana_ib_cfg_vport(struct mana_ib_dev *dev, u32 port, struct mana_ib_pd *pd,
+>  		return err;
+>  	}
+>  
+> -	mutex_unlock(&pd->vport_mutex);
+>  
+>  	pd->tx_shortform_allowed = mpc->tx_shortform_allowed;
+>  	pd->tx_vp_offset = mpc->tx_vp_offset;
+> +	err = mana_create_eq(mpc);
+> +	if (err) {
+> +		mana_uncfg_vport(mpc);
+> +		pd->vport_use_count--;
+> +	}
+> +
+> +	mutex_unlock(&pd->vport_mutex);
+>  
+>  	ibdev_dbg(&dev->ib_dev, "vport handle %llx pdid %x doorbell_id %x\n",
+>  		  mpc->port_handle, pd->pdn, doorbell_id);
 
+On the failure path, mana_uncfg_vport() is called and pd->vport_use_count
+is decremented, but execution falls through to the ibdev_dbg() line that
+prints the vport handle as if it were a success. Should this debug print
+be skipped on the error path so logs are not ambiguous?
+
+Also, pd->tx_shortform_allowed and pd->tx_vp_offset are assigned from mpc
+before the mana_create_eq() attempt and are not cleared when that call
+fails. Callers are expected to gate on pd->vport_use_count, but is it
+worth resetting these fields on failure so the state matches the
+pre-patch behavior?
+
+The mutex_unlock(&pd->vport_mutex) has moved from before the field
+assignments to after mana_create_eq(). That now holds pd->vport_mutex
+across GFP_KERNEL allocations, debugfs directory creation, and multiple
+mana_gd_create_mana_eq() firmware RPCs, and establishes the lock order
+pd->vport_mutex -> apc->vport_mutex via mana_uncfg_vport() on the error
+path. Is the extended critical section intentional?
+
+>  
+> -	return 0;
+> +	return err;
+>  }
+>  
+>  int mana_ib_alloc_pd(struct ib_pd *ibpd, struct ib_udata *udata)
+> diff --git a/drivers/infiniband/hw/mana/qp.c b/drivers/infiniband/hw/mana/qp.c
+> index 645581359cee..6f1043383e8c 100644
+> --- a/drivers/infiniband/hw/mana/qp.c
+> +++ b/drivers/infiniband/hw/mana/qp.c
+> @@ -168,7 +168,15 @@ static int mana_ib_create_qp_rss(struct ib_qp *ibqp, struct ib_pd *pd,
+>  		cq_spec.gdma_region = cq->queue.gdma_region;
+>  		cq_spec.queue_size = cq->cqe * COMP_ENTRY_SIZE;
+>  		cq_spec.modr_ctx_id = 0;
+> -		eq = &mpc->ac->eqs[cq->comp_vector];
+> +		/* EQs are created when a raw QP configures the vport.
+> +		 * A raw QP must be created before creating rwq_ind_tbl.
+> +		 */
+> +		if (!mpc->eqs) {
+> +			ret = -EINVAL;
+> +			i--;
+> +			goto fail;
+> +		}
+> +		eq = &mpc->eqs[cq->comp_vector % mpc->num_queues];
+
+Can the mpc->eqs read race with a concurrent free? mana_ib_create_qp_rss()
+runs without pd->vport_mutex or RTNL, but mpc->eqs is freed by
+mana_destroy_eq() from two paths:
+
+  mana_ib_uncfg_vport()   (under pd->vport_mutex, on last raw-QP destroy)
+  mana_dealloc_queues()   (under RTNL, on netdev down)
+
+both of which do:
+
+  kfree(apc->eqs);
+  apc->eqs = NULL;
+
+with no RCU grace period or reader-visible synchronization. If CPU-A
+passes the !mpc->eqs check after CPU-B begins ip link set dev X down,
+does CPU-A then dereference freed memory via mpc->eqs[...].eq->id?
+
+Separately, what populates mpc->eqs for an RDMA-only RSS QP user on a
+probed-but-idle Ethernet port? Pre-patch mana_probe() called
+mana_create_eq(ac) unconditionally, so ac->eqs existed for the device
+lifetime. After this patch the only creators are mana_alloc_queues()
+(Ethernet up) and mana_ib_cfg_vport() (raw QP). An RDMA application that
+uses only RSS QPs and never creates a raw QP will now get -EINVAL here
+where it used to succeed. Is this intended, and should the commit log
+mention it?
+
+The adjacent comment:
+
+   /* EQs are created when a raw QP configures the vport.
+    * A raw QP must be created before creating rwq_ind_tbl.
+    */
+
+omits the Ethernet-up path that also populates mpc->eqs. Would it be
+clearer to describe both creators?
+
+There is also a behavior change in the index expression:
+
+   eq = &mpc->eqs[cq->comp_vector % mpc->num_queues];
+
+Pre-patch this was ac->eqs[cq->comp_vector] sized by gc->max_num_queues.
+Now comp_vector is folded modulo mpc->num_queues, which is tunable via
+ethtool -L. Userspace that used distinct comp_vector values to hit
+distinct EQs will silently alias when comp_vector >= num_queues. Should
+this be documented or rejected with -EINVAL rather than silently
+wrapped?
+
+Can mpc->num_queues be 0 at this point? mana_set_channels() does not
+reject new_count==0, and kzalloc_objs(struct mana_eq, 0) returns
+ZERO_SIZE_PTR, which passes the !mpc->eqs check. During the window
+between mana_create_eq() and the subsequent netif_set_real_num_tx_queues()
+failing, a concurrent RDMA QP create would compute
+cq->comp_vector % 0 here. Should mpc->num_queues be validated alongside
+mpc->eqs?
+
+The placement of the !mpc->eqs check is inside the per-iteration loop
+over ind_tbl_size, but mpc->eqs cannot change across iterations, so the
+check is only meaningful at i==0. It works today because i-- then makes
+i = -1 and the cleanup while (i-- > 0) skips. Would hoisting the check
+above the loop be clearer and less fragile against refactoring?
+
+>  		cq_spec.attached_eq = eq->eq->id;
+>  
+>  		ret = mana_create_wq_obj(mpc, mpc->port_handle, GDMA_RQ,
+> @@ -317,7 +325,11 @@ static int mana_ib_create_qp_raw(struct ib_qp *ibqp, struct ib_pd *ibpd,
+>  	cq_spec.queue_size = send_cq->cqe * COMP_ENTRY_SIZE;
+>  	cq_spec.modr_ctx_id = 0;
+>  	eq_vec = send_cq->comp_vector;
+> -	eq = &mpc->ac->eqs[eq_vec];
+> +	if (!mpc->eqs) {
+> +		err = -EINVAL;
+> +		goto err_destroy_queue;
+> +	}
+> +	eq = &mpc->eqs[eq_vec % mpc->num_queues];
+
+The same mpc->eqs TOCTOU concern applies here: the check and subsequent
+dereference occur without pd->vport_mutex or RTNL held, so a concurrent
+mana_dealloc_queues() on the Ethernet side can free mpc->eqs between the
+check and the index access. Is there synchronization that prevents this?
+
+The same comp_vector % num_queues aliasing and num_queues==0 divide
+concerns apply here as well.
+
+>  	cq_spec.attached_eq = eq->eq->id;
+>  
+>  	err = mana_create_wq_obj(mpc, mpc->port_handle, GDMA_SQ, &wq_spec,
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> index a654b3699c4c..6c709f8b875d 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+
+[ ... ]
+
+> -static int mana_create_eq(struct mana_context *ac)
+> +int mana_create_eq(struct mana_port_context *apc)
+>  {
+> -	struct gdma_dev *gd = ac->gdma_dev;
+> +	struct gdma_dev *gd = apc->ac->gdma_dev;
+>  	struct gdma_context *gc = gd->gdma_context;
+>  	struct gdma_queue_spec spec = {};
+>  	int err;
+>  	int i;
+>  
+> -	ac->eqs = kzalloc_objs(struct mana_eq, gc->max_num_queues);
+> -	if (!ac->eqs)
+> +	WARN_ON(apc->eqs);
+> +	apc->eqs = kzalloc_objs(struct mana_eq, apc->num_queues);
+> +	if (!apc->eqs)
+>  		return -ENOMEM;
+
+WARN_ON(apc->eqs) is used as a defensive assertion but execution
+proceeds to overwrite apc->eqs unconditionally. If the invariant is
+violated, the previous array and all HW EQs it referenced are leaked.
+Should this instead bail out with an error or call mana_destroy_eq()
+first to keep the function idempotent against future callers?
+
+[ ... ]
+
+> @@ -3326,6 +3349,9 @@ static int mana_dealloc_queues(struct net_device *ndev)
+>  	mana_fence_rqs(apc);
+>  
+>  	/* Even in err case, still need to cleanup the vPort */
+> +	mana_destroy_rxqs(apc);
+> +	mana_destroy_txq(apc);
+> +	mana_destroy_eq(apc);
+>  	mana_destroy_vport(apc);
+
+What is the intended interaction with outstanding RDMA QPs here? An
+RDMA user that created an RSS QP while the Ethernet netdev was up sees
+mpc->eqs populated by mana_alloc_queues(). When the admin issues
+ip link set dev N down, mana_dealloc_queues() -> mana_destroy_eq()
+destroys those EQs and frees mpc->eqs while the RDMA QPs are still
+alive, leaving the QPs with dangling attached_eq IDs at the hardware
+level and stale kernel references.
+
+Pre-patch ac->eqs lived for the full mana_context lifetime and was torn
+down only in mana_remove(). Is unconditionally destroying the EQs on
+netdev-down the intended new behavior, and if so how are concurrent
+RDMA consumers expected to recover?
+
+>  	return 0;
+>  }
 
