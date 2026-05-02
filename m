@@ -1,289 +1,188 @@
-Return-Path: <netdev+bounces-283416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283417-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oFS0KUv99WntRAIAu9opvQ
-	(envelope-from <netdev+bounces-283416-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 15:34:03 +0200
+	id qJJgANn+9WlrRQIAu9opvQ
+	(envelope-from <netdev+bounces-283417-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 15:40:41 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E0804B22ED
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 15:34:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D00E4B2312
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 15:40:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 542433008235
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 13:34:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2D265300DE0C
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 13:40:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5BA227BF79;
-	Sat,  2 May 2026 13:34:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CBA228643C;
+	Sat,  2 May 2026 13:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KTgakDz0"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="AKYMD5qV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011010.outbound.protection.outlook.com [52.101.57.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FFBE22F388
-	for <netdev@vger.kernel.org>; Sat,  2 May 2026 13:33:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777728840; cv=none; b=Jl3/3P7caMmP3EZGYkttAEo+nT7rFAITHwkuLcV44RY5nEHKSzyfWFQPfcp+SsaQh8IOYXUA+SE+z7mt1godin1bffqNPV8rP6PiPZJX4aeNOjRvhSHAiKPBloOQayygP+gx5VaoUIid4BmQNsRsEWxKVIDc7FrXLB4NrewzRRo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777728840; c=relaxed/simple;
-	bh=AZ67Up3J+Lw8gQpCeX9dILqmHFCACAvb+Eh5CTxVt4U=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=StHQqrlA1dx41AaMwQfas6doAiCv+nMgVGb/VerIStRcbDhYFWkgo38DBaYa7UlB/8A8YmmAavn/VjCz6tEa3Agb5K1jIPRpK920eMFLBUDO4jJbd8ogg+B4YWAFXAyKsxDwGcJQxFqkcvpjtTZYYpoBjUpEI30qg99OmSE6Ero=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KTgakDz0; arc=none smtp.client-ip=74.125.224.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-6579254f996so1488522d50.1
-        for <netdev@vger.kernel.org>; Sat, 02 May 2026 06:33:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777728838; x=1778333638; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xJLk920qj6m+fkV0PzZ6Aaob+A5EwJlY0//ShcXomiU=;
-        b=KTgakDz0OfagPZxy/g2lRkaKmGGtBshdkACcVEKWsmNdgTbWkZgG+wNZzj+bEGniuV
-         16SsYKK/+6WueAXHPbN4ZRTE/xCk4XAespVRcrDBVwfJBOwtTFstRrAPCQBaP3tBj6ni
-         KjacbSuM/kgNFQ5qrhE+cKNOkcbtiriL+PWyIq6Lgsx5VjuNYjCJmEhfTN1mu+iAmiKf
-         a8tS7FITtmXoxl9/eJpuXP5rDSmq2sIXotHcxjRQ+H4iPQS4ckKSaibCnf9oMWYSSCU8
-         ERCifZSibSBaj6IqIdEoSAv+7fbtGaErA0/Yq25cLxRlozwuqly31wKsqY5sgwVBxbvu
-         KBzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777728838; x=1778333638;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xJLk920qj6m+fkV0PzZ6Aaob+A5EwJlY0//ShcXomiU=;
-        b=OSwnxD4Sc/0nZx6PBBNooD5KdYuxA4PKyA/Qd16b7f3tmu89CKSeSc0QMUc5ymtQaT
-         JOee768fDqH6P4Bz/jkNKKq+yv1QD01T27oaU21huljKkqd7cVoWWEf4FaTmqjV1Ux36
-         zBxAfRmEAxMVpjYLkKgs9kp8E+71dCf39wa0w9Xoc/8HBna1SQ9ENRfXfEzB4R8ElRnb
-         97fXJhAkz4pa7cU65QD6AsmyKIgYEEucJnAk143kBxPdyzitK8dY1zt2al61170ZV1RU
-         vtGwj2D73l2n6ZMmBb/zAYwbPJ67VslPAfJRaM1iR+2x+iUDhRh87MClxxWXR9bWFp9O
-         xXWw==
-X-Forwarded-Encrypted: i=1; AFNElJ8WFle0Wqcc8Mgp7TZ7YgMUR1pAO3T3gdJI7AguQCulE6MYKXtMS8Va+wlbjajtU5cMC/nB9To=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyx+Rno+ZEZhZaZ6JDib2RLfwEp3ABxro8I5dB9H0BJV6Eaw2ma
-	WDhPm+hKVyibIuZYCNcrpyBFgdiSPkG5KbMUZWykQ2xIyz488getEJ1j
-X-Gm-Gg: AeBDietX+0CaWurNmH9cpXSABhSGV92DMDRHOUvsAlrTI1ZlLK4W1zi/YjJsXmlq+VK
-	CNirBGYM95JNqTFQZmrC0oGJGZg3Jmy7mB8Bfk1UfOAlbIgOu/X9VzTRlIu10//MbdU+Pba5GmM
-	7DsH+Us0N2cj9bs0k7q6CUSLxbY/KkKE6KhCH4rDyJVYViryMhSCOCJK/0IVSa0HHKVhJaapiZ3
-	AwANVtvovKn9VLNh5fit6MUTSZTvx5Topkfpibxc2i4KnLLpZ94HQN3twYqP4qgncG8rqHc3lXW
-	8h5MXJQxhxs9NmD60XQLm9qcG6by7S7vq7bDOfr3MR72mAMVeb555mFOPIxXna9eYl2SOpmXdRo
-	JSoR3GEJDTIyB5u5HhD+I09bPAwwwZTsRfnIN3sUwbJ6RaXxDj41KUVLK2R0L9IpKrFJCbO77mz
-	HNxEvy0jK2gzdQjGdecc2Jb+olZ+t7ywZXis/cUQWx1SPecWSXQ743VFImm3Qwv0l989O7GzAEs
-	xKNj/aR1+spreA=
-X-Received: by 2002:a05:690e:4396:b0:651:d634:6d32 with SMTP id 956f58d0204a3-65c3d9fb469mr1993284d50.20.1777728838205;
-        Sat, 02 May 2026 06:33:58 -0700 (PDT)
-Received: from gmail.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65c2e1ce958sm2626253d50.8.2026.05.02.06.33.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 May 2026 06:33:55 -0700 (PDT)
-Date: Sat, 02 May 2026 09:33:55 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Maoyi Xie <maoyixie.tju@gmail.com>, 
- netdev@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com, 
- willemb@google.com, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- kuba@kernel.org, 
- davem@davemloft.net, 
- dsahern@kernel.org, 
- kuznet@ms2.inr.ac.ru, 
- linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.baf2d17bd197@gmail.com>
-In-Reply-To: <20260502050037.3800122-1-maoyi.xie@ntu.edu.sg>
-References: <20260502050037.3800122-1-maoyi.xie@ntu.edu.sg>
-Subject: Re: [PATCH net v5] ipv6: flowlabel: enforce per-netns limit for
- unprivileged callers
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02599175A66;
+	Sat,  2 May 2026 13:40:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777729232; cv=fail; b=XtKOY8AwwD5siRHOV88IJVIya+NguoSJK7qeFTI0Dj1X6rKOBfFf3e4kl8voYCeKXL0KeLkrxlL5e8W1k2C6W5ZtDFhvz9OOCzrBMmC+kPHtOSL2ZCDOTom2+wRMWHjwvIOQE8eD67Eqo+MtWNjX3QCsSxt/n81Zk4eUXa0YeHY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777729232; c=relaxed/simple;
+	bh=nm3PVgMMxdPWcgzW3XERj2TYCZkN9Neyp36kF1ydPeg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=qZGWas6rK7C6eRK2midqO+rZim4bCeo9xlwXQeALjK6FBpLz2m6N2HLt5yEoh0uYQTkvQJW6nEdQI5TlGpx7deb2G2+NGq/ahQsjV3zBnV8VXf7ytweZq0iwohThtPRmv6CY6t8Yx/OD2vOL30t/kYruDJJM9xNYo6LCFjQTyAc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=AKYMD5qV; arc=fail smtp.client-ip=52.101.57.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=LVjLFwgk7OClZ/hBdljG+y3YHas+R7ssLpWZ6iV8TBXOTUkHfy4YIyqrfzMl4X5s0XiQ6+c6rp0NTSIi3azCDH8hcCU/V3Goz/PQYvoSU4nakWkpmCM0yLIsz2aQUG8vd9OWMnrbbuyaQ43wVGgneEuB7pA4mR+DMTghqkpGsyNqN+WpiE0COVGWBN7O+Re7oOeiHtGpkpwbXKEL2h5m0IjoWv2+I2mOwbNC2iQ5ygkC/0JT6Dt2V+jaLrBW9qpDqceNECNloC/NbcO22zfsDAdVhSj23C+ZuzBoj6jAgtquEMx4i41jEWIKcJodoJIUd5U7abmGBzxa3gj08FClJA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lPLLxaN/HNkZxGxyFNnJeAly4uq4N4+5z3KTupex5I4=;
+ b=YuAnsKtjF0wYjxNMcIWGJeFN/bf85yjPOg3YEk7RPipNMXO1er7vSTV/NUs5R/bMxSnspyZj6uMAF5Xu+k/CbUN918VK/GSZpTHd7VGOy5kzBg2GBVRtjEqEeQadDDpxldnT41AUW/paSjfbmNc9UQY+tK6MLgHdDzO7PQRvIZFruxiDrnKguPomKxQNcfPS5w7zvxVpkLpJZ86nxJRn5RipYVLhsQfP1gDP6+h75sZmghgculx2FUeODW74qoV5iCiUXOfOS4rfNQDjDH1c9lWsfyaI6FSPaoOOfM3tHzscBCBtK8h7nViRLDHEUmUyLSv9dgIUottt2JMe2pAddA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lPLLxaN/HNkZxGxyFNnJeAly4uq4N4+5z3KTupex5I4=;
+ b=AKYMD5qVbtgcRZ+u31KN2hCcNvQTLeIhmizekyMd9x5+3PM1IQ7h4U+bN/Y4JqFzATfYP88Sx/jB3DbPfrba0T5AXPzpNstdsqNkbH6ZdOrDsQQynnDAEqOsvL2Y/FeK2hVN9dwE+yASsDETwEXZAD3RUppc/a01WN6b/7Hkw5fLyXyDitf4hZqQ4SZXWDtOtBYEMsobqtgFY8kRlIkVZSUFsYmbiNKTMCyspo1IybeqCKoNPDtskvWE3Bnk0xCHkTbSLAjdMFCXxd4n7f8aZtxpgLbFkZoRY6pysaFG4Au4f2qQGqmp1Wefz0e2UzD09n5B47UNI1wlBDZtAC78UQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV8PR12MB9620.namprd12.prod.outlook.com (2603:10b6:408:2a1::19)
+ by SN7PR12MB7953.namprd12.prod.outlook.com (2603:10b6:806:345::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.23; Sat, 2 May
+ 2026 13:40:26 +0000
+Received: from LV8PR12MB9620.namprd12.prod.outlook.com
+ ([fe80::299d:f5e0:3550:1528]) by LV8PR12MB9620.namprd12.prod.outlook.com
+ ([fe80::299d:f5e0:3550:1528%5]) with mapi id 15.20.9870.022; Sat, 2 May 2026
+ 13:40:26 +0000
+Date: Sat, 2 May 2026 10:40:24 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Alex Williamson <alex@shazbot.org>
+Cc: David Matlack <dmatlack@google.com>, kvm@vger.kernel.org,
+	Leon Romanovsky <leon@kernel.org>, linux-kselftest@vger.kernel.org,
+	linux-rdma@vger.kernel.org, Mark Bloch <mbloch@nvidia.com>,
+	netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
+	Shuah Khan <shuah@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	patches@lists.linux.dev
+Subject: Re: [PATCH 00/11] mlx5 support for VFIO self test
+Message-ID: <20260502134024.GC1381708@nvidia.com>
+References: <0-v1-dc5fa250ca1d+3213-mlx5st_jgg@nvidia.com>
+ <71afd479-71b4-4ab7-bcbe-3f7b53bd11f4@app.fastmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <71afd479-71b4-4ab7-bcbe-3f7b53bd11f4@app.fastmail.com>
+X-ClientProxiedBy: MN2PR18CA0001.namprd18.prod.outlook.com
+ (2603:10b6:208:23c::6) To LV8PR12MB9620.namprd12.prod.outlook.com
+ (2603:10b6:408:2a1::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 0E0804B22ED
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV8PR12MB9620:EE_|SN7PR12MB7953:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1a8b3557-836b-4728-00ff-08dea8505da8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|376014|22082099003|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	/fI7RtQ6J2R6tUfxWAexS5pfHh1lK5GUaTkID68n8l9wbWtaYvgbO1acGaLzJGdQkO4x4bmsqy8UrIOCv0l0B3GLE59iD/jQt9MtqsDoiIwlTjL54eTPeLi7Dv+ALs3r9GQxQQ47+wtg+xgD5vkEP3KGLZMYeiDC7hl3FZBAPgUYI3opJ/VvkNPqqbzyb8iltY0dhIvdpyi5y3peUbcS/FWorCNDpFiOtRItcrUEGLi9EGr9DOE6d5W6IP+DXjAS7BqvpG9yqBBeC6OXY2aTBiJ/gX0zAa2UrTvAlMsMdCpNmuPfcmcz/p8jUwhI+guGjYCmK5dFNlk4FFRi8q0hELaP7Apl8epWhEnaIsLACM48+pL1wkDfuQYuKG3nFG2MA7NDDm3FN/kSAxyXajiuW5Tt5/QckQqZvmcxSNueMFUkeuvU3cOQx0jps/iKzZJ/K3iKmUY4agP0RlFcj2JtPK0wwTN/Bnx+OMfLSLBwdChfmJFM3DLrwt7MBmfaD3GIJv6utVhyFLn83dwPHyTcm5+oSnQpQxySzqdAtX6oTU4Fe1RH1bLqgCSPGeJyeDiqL2OhstSc8c4oa0tkn1VkX3sL5d9M04XcXq2saUHfhAqoW8zfLgLkreBtSQJpJcHS8RuORJX8pF9+weLb8RDVDtA++EPMLyUYZDO27tG2RePmkuPX975xF5Gihj+ywO08
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR12MB9620.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?AWtf1Gs4myadVtoBxR3FwGW1AKLKIQh3KnyeD6h7656HPQfTlsTZ8K9OQ9xy?=
+ =?us-ascii?Q?d7vOxBtwjF/rdVOfVLIkBKeYccGJmc6Bzl3Cl3uRLCwV+gnbn1tywCWp9AZd?=
+ =?us-ascii?Q?wAy33ZrkDFZogjt9pzz5NsRb6srr65NkM2dgkAXpof5lad++SJCJ74fnhpbL?=
+ =?us-ascii?Q?RGP1ShFLtxix8/w1jTzgKuiMZA+jUuyzEdWMY8iD/AlVY3TADmc08Kc490Yd?=
+ =?us-ascii?Q?BcPwhzgrMQnPD+fWZRmqlzTDpFJojIngTTChtDGdpWk2xgeH1+yWFqraWnLG?=
+ =?us-ascii?Q?q4XGucArLwJg26jQcqvDxssvsrGyM17dfLbxuvuSMnb7FK9HmSHVFCb1XJZ7?=
+ =?us-ascii?Q?TxtxlRPkjJq7iqxsifwWqoTYz4N6M4skFGigXzs/HNX7f2WYNsKQ/HktF9sV?=
+ =?us-ascii?Q?RwocFR+3KkJtuqWZXhk1tC6y9I5pS0TbWpcCAoMyNrKc50vXpdSl3cR4uIEK?=
+ =?us-ascii?Q?amAL7/aNlpxEw7XCYffIiipJm7JLvn95LVU7Z1TK9WmSOcHLRDFGdEE7IHAp?=
+ =?us-ascii?Q?+2fVj8P5clPzozK6evztVoVGxI9E1eC0L03jyCAQG+W7JGoZGiJ3lbSMxhFm?=
+ =?us-ascii?Q?bpe5gNUKF94ZWSx4a8Vg+zA+W8get2CXB1W4KPLahY8jIM1FZY+6IxbQ4aQG?=
+ =?us-ascii?Q?ltBc9XSoYSufBBxhX0BRbfZmT9Z8h6UDHElmUS+HU4XxyOqIj+KjvM/uGvDt?=
+ =?us-ascii?Q?7/Qt8AyEEOb47uwJHt1aQsEc56CPqeAcld9VbgZXGdXZStzm4eDe350pe05v?=
+ =?us-ascii?Q?1YzqMm6qVoIddM9HauHaxuqghLAyAGJLSMyRY3870TfIX/A2hT5lMZD+nOcb?=
+ =?us-ascii?Q?h85Lc9KYA8xwjyHlJ+hZg/e/YZkczH6azfQm1bNSqiSLbS2rGjFB3Ji3T8sE?=
+ =?us-ascii?Q?meRaKB2DRsBXLiYUKhlJC3MkIMpI7rqyHCgX0oTuh2Hx7nh4nZ37DtUQjhpc?=
+ =?us-ascii?Q?0r2jg5pGMeQrDdxLYN/R2erx53Hgk1D50JDyMg+KFKg9MI3i0y57RVuuWXRQ?=
+ =?us-ascii?Q?R3w6Tx31WO3QJzuJFvp189JfuFkwMMleRkh0zNc4lBwzhCNDpT7KFvXx1n3R?=
+ =?us-ascii?Q?6mOWTtpBUyed54/vj6nM0hW7bZId3hU2u2G/7Uo2Sp7QrQ9TIL0nptCOklQh?=
+ =?us-ascii?Q?SnTx9yAd0IuO2JeMdm751oIY6FyA9rwVSquaYrW/UoiHfX8CvdoDhemtyRNR?=
+ =?us-ascii?Q?Ij6TB6s6MONMBu9ILIw5xkZ03r8x+3bCYQx4MCGzklK3WdLnvhFFzhnG4Ape?=
+ =?us-ascii?Q?Useg4ifcAS6wyZU1Gl3LwHWbJhp0AQ72N/OfBhm6Uvh1iYiFhQoWBW9wng/i?=
+ =?us-ascii?Q?B7b5ImSEqkKjn6bxc/loy8eXllHHG2f8a+ayFEQYMqTlbJ/d+dNdm9gsAak/?=
+ =?us-ascii?Q?MlB3o6828UNy/H7iZlemGKb99eJmouClyNUmIKJm6iasNEbe38kLGGOfXijd?=
+ =?us-ascii?Q?CiuzCP/bNtAgD6LaHj1kG0lDFm4X7ajMXyr3j9vxGv08OEInKnPkG3+I98Se?=
+ =?us-ascii?Q?Wf8dK1JHiGmUiIuNm7DtuoiZfyjUMAhfQ+65d4qHMclLQgT1IJR1CnV96zLv?=
+ =?us-ascii?Q?Ton2M9R/simxpEy7an3YH/R8uPrTKp6/gtY81xHm6lRG8BfckUaHct96HVGj?=
+ =?us-ascii?Q?/9tgXU83Fgwt5jGZI6L8U4csgM64mHmVDZtTaS+LVE7YZjQozyOpbQCKnOWb?=
+ =?us-ascii?Q?32o30xeAq5J6bqW9YOoM2aZFLOsQsrfQX/5r1lhH8652vWqP?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1a8b3557-836b-4728-00ff-08dea8505da8
+X-MS-Exchange-CrossTenant-AuthSource: LV8PR12MB9620.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 May 2026 13:40:25.8863
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AjP5Cw59N1Fjbp/BzvGsDjE5kQAiGPt5WBy7RxEXdKT9+W4FBXz34tw0urwLFySW
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7953
+X-Rspamd-Queue-Id: 5D00E4B2312
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283416-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283417-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,google.com,redhat.com,kernel.org,davemloft.net,ms2.inr.ac.ru,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jgg@nvidia.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ntu.edu.sg:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,Nvidia.com:dkim,nvidia.com:mid]
 
-Maoyi Xie wrote:
-> fl_size, fl_ht and ip6_fl_lock in net/ipv6/ip6_flowlabel.c are file
-> scope and shared across netns. mem_check() reads fl_size to decide
-> whether to deny non-CAP_NET_ADMIN callers; capable() runs against
-> init_user_ns, so an unprivileged user in any non-init userns can
-> push fl_size past FL_MAX_SIZE - FL_MAX_SIZE/4 and starve every
-> other unprivileged userns on the host.
+On Fri, May 01, 2026 at 10:31:49PM -0600, Alex Williamson wrote:
+> On Thu, Apr 30, 2026, at 6:08 PM, Jason Gunthorpe wrote:
+> > Add an mlx5 driver to VFIO self test. This is largely a remix of the
+> > existing VFIO mlx5 driver in rdma-core. It uses an RDMA loopback QP
+> > to issue RDMA WRITE operations which effectively perform memory
+> > copies using DMA. Since mlx5 has a stable programming ABI this
+> > should work on devices from CX5 to current HW. The device FW must
+> > support the QP loopback configuration.
 > 
-> Add struct netns_ipv6::flowlabel_count, bumped and decremented next
-> to fl_size in fl_intern, ip6_fl_gc and ip6_fl_purge. The new field
-> is placed in the existing 4-byte hole after ipmr_seq, so struct
-> netns_ipv6 stays the same size on 64-bit builds.
-> 
-> Bump FL_MAX_SIZE from 4096 to 8192. It has been 4096 since the file
-> was added; machines and connection counts have grown.
-> 
-> mem_check() folds an extra per-netns ceiling into the existing
-> non-CAP_NET_ADMIN conditional. The ceiling is half of the total
-> budget that unprivileged callers have ever been able to use, i.e.
-> (FL_MAX_SIZE - FL_MAX_SIZE/4) / 2 = 3072 entries. With FL_MAX_SIZE
-> doubled, this preserves the original per-user reach (~3K, what an
-> unprivileged caller could already obtain before this change) while
-> forcing an attacker to spread allocations across at least two
-> netns to exhaust the global non-CAP_NET_ADMIN budget.
-> 
-> CAP_NET_ADMIN against init_user_ns still bypasses both caps.
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Suggested-by: Willem de Bruijn <willemb@google.com>
-> Cc: stable@vger.kernel.org # v5.15+
-> Signed-off-by: Maoyi Xie <maoyi.xie@ntu.edu.sg>
+> Does the PCI ID table in the series need some pruning then?  It
+> includes CX4.  
 
-No longer applies cleanly to net. Conflict on
-include/net/netns/ipv6.h. Please update your tree.
+Maybe.. I don't actually know that it doesn't work on CX4 and before,
+I only was able to test as far back as CX5. I'm thinking to leave it
+and if someone does try it and it doesn't work then remove it.
 
-> ---
-> v5 (this submission, addressing v4 review by Willem):
->     - Replaced the per-netns ceiling FL_MAX_SIZE/8 with the
->       computed unpriv_user_limit = (FL_MAX_SIZE - FL_MAX_SIZE/4)/2,
->       which evaluates to 3072. v4's FL_MAX_SIZE/8 = 1024 would have
->       reduced the per-user budget below the ~3K an unprivileged
->       caller could already obtain before any of this work, defeating
->       the reason FL_MAX_SIZE was doubled in the first place. The new
->       ceiling preserves the original per-user reach while still
->       requiring an attacker to spread across at least two netns to
->       drain the global non-CAP_NET_ADMIN budget.
->     - Reworded the corresponding paragraph in the commit body.
-> v4: addressed Willem's v3 review on netdev. Dropped the
->     flowlabel_has_excl cacheline argument in favour of "fills the
->     existing 4-byte hole after ipmr_seq", and reordered
->     atomic_dec(&...flowlabel_count) to sit immediately after
->     atomic_dec(&fl_size) in ip6_fl_gc and ip6_fl_purge.
-> v3: addressed Willem's review on the private security@ thread.
->     Merged FL_MAX_SIZE doubling, dropped test data, moved
->     flowlabel_count near ipmr_seq, inlined fl->fl_net in ip6_fl_gc.
-> v2: per-netns counter + cap, sent to security@ as a 2-patch series.
-> v1: fix-shape sketch in original disclosure.
-> 
->  include/net/netns/ipv6.h |  1 +
->  net/ipv6/ip6_flowlabel.c | 16 ++++++++++++----
->  2 files changed, 13 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/net/netns/ipv6.h b/include/net/netns/ipv6.h
-> index 34bdb1308..329482373 100644
-> --- a/include/net/netns/ipv6.h
-> +++ b/include/net/netns/ipv6.h
-> @@ -119,6 +119,7 @@ struct netns_ipv6 {
->  	struct fib_notifier_ops	*notifier_ops;
->  	struct fib_notifier_ops	*ip6mr_notifier_ops;
->  	unsigned int ipmr_seq; /* protected by rtnl_mutex */
-> +	atomic_t		flowlabel_count;
->  	struct {
->  		struct hlist_head head;
->  		spinlock_t	lock;
-> diff --git a/net/ipv6/ip6_flowlabel.c b/net/ipv6/ip6_flowlabel.c
-> index c92f98c6f..758a2fc4d 100644
-> --- a/net/ipv6/ip6_flowlabel.c
-> +++ b/net/ipv6/ip6_flowlabel.c
-> @@ -36,7 +36,7 @@
->  /* FL hash table */
->  
->  #define FL_MAX_PER_SOCK	32
-> -#define FL_MAX_SIZE	4096
-> +#define FL_MAX_SIZE	8192
->  #define FL_HASH_MASK	255
->  #define FL_HASH(l)	(ntohl(l)&FL_HASH_MASK)
->  
-> @@ -162,8 +162,9 @@ static void ip6_fl_gc(struct timer_list *unused)
->  				ttd = fl->expires;
->  				if (time_after_eq(now, ttd)) {
->  					*flp = fl->next;
-> -					fl_free(fl);
->  					atomic_dec(&fl_size);
-> +					atomic_dec(&fl->fl_net->ipv6.flowlabel_count);
-> +					fl_free(fl);
-
-Do not touch fl_free (here and below)
->  					continue;
->  				}
->  				if (!sched || time_before(ttd, sched))
-> @@ -195,8 +196,9 @@ static void __net_exit ip6_fl_purge(struct net *net)
->  			if (net_eq(fl->fl_net, net) &&
->  			    atomic_read(&fl->users) == 0) {
->  				*flp = fl->next;
-> -				fl_free(fl);
->  				atomic_dec(&fl_size);
-> +				atomic_dec(&net->ipv6.flowlabel_count);
-> +				fl_free(fl);
->  				continue;
->  			}
->  			flp = &fl->next;
-> @@ -245,6 +247,7 @@ static struct ip6_flowlabel *fl_intern(struct net *net,
->  	fl->next = fl_ht[FL_HASH(fl->label)];
->  	rcu_assign_pointer(fl_ht[FL_HASH(fl->label)], fl);
->  	atomic_inc(&fl_size);
-> +	atomic_inc(&net->ipv6.flowlabel_count);
->  	spin_unlock_bh(&ip6_fl_lock);
->  	rcu_read_unlock();
->  	return NULL;
-> @@ -464,6 +467,9 @@ fl_create(struct net *net, struct sock *sk, struct in6_flowlabel_req *freq,
->  
->  static int mem_check(struct sock *sk)
->  {
-> +	const int unpriv_total_limit = FL_MAX_SIZE - (FL_MAX_SIZE / 4);
-> +	const int unpriv_user_limit = unpriv_total_limit / 2;
-> +	struct net *net = sock_net(sk);
->  	int room = FL_MAX_SIZE - atomic_read(&fl_size);
->  	struct ipv6_fl_socklist *sfl;
->  	int count = 0;
-> @@ -478,7 +484,9 @@ static int mem_check(struct sock *sk)
->  
->  	if (room <= 0 ||
->  	    ((count >= FL_MAX_PER_SOCK ||
-> -	      (count > 0 && room < FL_MAX_SIZE/2) || room < FL_MAX_SIZE/4) &&
-> +	      (count > 0 && room < FL_MAX_SIZE/2) ||
-> +	      room < FL_MAX_SIZE/4 ||
-> +	      atomic_read(&net->ipv6.flowlabel_count) >= unpriv_user_limit) &&
->  	     !capable(CAP_NET_ADMIN)))
->  		return -ENOBUFS;
->  
-> -- 
-> 2.34.1
-> 
-
-
+Jason
 
