@@ -1,233 +1,178 @@
-Return-Path: <netdev+bounces-283388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283389-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 5c30AUC59WmAOQIAu9opvQ
-	(envelope-from <netdev+bounces-283388-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 10:43:44 +0200
+	id ME/WDjbD9Wm8OgIAu9opvQ
+	(envelope-from <netdev+bounces-283389-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 11:26:14 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 523F34B17A0
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 10:43:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 962C94B1843
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 11:26:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 73E5230134A2
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 08:43:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3C33D3011129
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 09:26:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE0262DEA90;
-	Sat,  2 May 2026 08:43:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 533A930BB80;
+	Sat,  2 May 2026 09:26:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="WHgcvyx8"
+	dkim=pass (2048-bit key) header.d=ericsson.com header.i=@ericsson.com header.b="CziTYEC4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011011.outbound.protection.outlook.com [52.101.70.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C0C7209F43;
-	Sat,  2 May 2026 08:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777711420; cv=none; b=j8rOvW8p9p/LsFRk/Q/q4OzTMA15PqyrmKlkuWERXkJEeoa0ULbazGiYsezCPJkjYBhIK54A0/2iFW6jhXayptrkD6tbmXDtfHK0NIaNigrIjpSGGJHekCp00nRhXsvD58XwyY7sngiMF5mCebA21HpPJKXx0mSdlauR3FJqMc0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777711420; c=relaxed/simple;
-	bh=cGT2LsQdCuNfBjWP4h6E5RQfcN7GyBzIdyAZwXqCsII=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p8Xxo9hCAvBUceCmJcIdjJ7M8/LLbWJdldGQnCBKm7gRhFFitSK0iRG6uCtHzZZ/73eODjib+tVcrzEJyXXffVe3ObfRkfGMBVldcenNFgEPm9P+46acmsx8tZ1DO0vPDmz6NZ5WCxnzymAQr4VEFMUWwpNNklvZ0UvR4LZ8Xm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=WHgcvyx8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C810C19425;
-	Sat,  2 May 2026 08:43:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1777711420;
-	bh=cGT2LsQdCuNfBjWP4h6E5RQfcN7GyBzIdyAZwXqCsII=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WHgcvyx8/S1amLAK7e2Ztp3yr7HLWIs+4kJGxKENpajrxypdEsYBoIYC7UsSvcfNK
-	 SATUdZ3L7mqYn2PVaNY1aovGWzePgAdBL36FExXmdPhAv6vdigKZVzi9hyZFaF4P33
-	 fMyuMjVxEbeski3JStShgMDFn66DjQVS8dhLFjqI=
-Date: Sat, 2 May 2026 10:42:58 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Yuan Tan <yuantan098@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, stable <stable@kernel.org>
-Subject: Re: [PATCH net v3] ipv6: rpl: reserve mac_len headroom when
- recompressed SRH grows
-Message-ID: <2026050237-subheader-footsie-9f72@gregkh>
-References: <2026042133-gout-unvented-1bd9@gregkh>
- <CAPuPA7JS-yG_dYaPVjv9JiGOEXSpExXSQhsZaexUkr-WMeQHrw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DAD72FD681;
+	Sat,  2 May 2026 09:26:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777713962; cv=fail; b=csdl4CBH3LGklQ/yO7cI5th3ZHfnKn7Z3nN5lAqGQLxO7g5IppvQUjcwul8Vazr9h1NLLzA36JYDNbobdZ2dnGUcyaFkLHeYFi7zhBcAqeCtQDazmusQ6Yy78sm4J76LleRpc+6hRjKgPyFawI/w94MuTKJk/c/MSN4FNSIo7KM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777713962; c=relaxed/simple;
+	bh=WzI0XFBLrsw+I/UIMAemIKuaPl8WkIHY2pSMJmn/z6k=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cHfWz4dRbOZVpmHpgJxa3xXUC4ZxL8fxgBCsgBqUVBSDaAG4nWbAKJUP0PY1B574S7GsGeSd590SYuT4WE45m5/1vm6LNbQ19mH1tEjVtTlAiRPvf8DC5Thbb8LUQepCzMVFC+Gc1AS0YHnNiRDAPT+BlSMX5EBqogqEFzivEzY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ericsson.com; spf=pass smtp.mailfrom=ericsson.com; dkim=pass (2048-bit key) header.d=ericsson.com header.i=@ericsson.com header.b=CziTYEC4; arc=fail smtp.client-ip=52.101.70.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ericsson.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ericsson.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Z7NYFCp+n69KLR48g4WdQN2JgWyWGyIzmI5vcaGuO4B3JeMOweA0E87yVDj2MbHePYuREp9M+AEn4IVsz/Wjt83Gxel42GPDakoTQi2OW462eNiprh/C/jE+ZeWoOkKrOmFa4+JObypMmHY385ublz+v0ipiYAudVUZm8cyLB2IpVGNLuxEpoIAQg8D24TU2WpTWaVtNwTGjq+vH8pFaHF7+5+Q7ozLabbKKAqSuuBgAyv/SwtPNHAgPHHeitRmViGryop9fhCTc38PF9J5k9WB7WLGZLpPHDdGOUt3WbcBPFtV1k5fiyGWgsehNsxjCcgIypR4gZuBl/oUBqIdnoA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=crXNQPpS7bTdq3eMZFpBVtCyidF8jttCKQxntZ2buFM=;
+ b=g6RyW3EaqyfaJIgHFe498x/jd7hxTT5fybNtaUWACeFZ2FnapDY5nFndslCPkZ2fxCjhoVx+5l5tZUamAR+rFf3888Y23M822xqYbJ5UGcC+cA3k1mDUtQJiDNwNCa/n492M3c2F/HvjuNR0pjEG8h5dsOExrlS7Ko/PldN2haAmdYP9ZDK5yoo7Uupx+0ZGv3nYZbKWXWmp11KzT4MEbxI9toAAOW27Ol/9zkv9BQUS+tOFpYdp4ZwNLJSMMfqBgzKdOLtDfFh7H2QYnba+Dv78nf+FxpYzP+mnsHpIPtXmRu4i7TorCkhjojDHmFTH5Vp9yHuyiSVex66CHwUPmw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 192.176.1.74) smtp.rcpttodomain=davemloft.net smtp.mailfrom=ericsson.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=ericsson.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ericsson.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=crXNQPpS7bTdq3eMZFpBVtCyidF8jttCKQxntZ2buFM=;
+ b=CziTYEC4DRvnxvnLpz+/hcDAvdk2Tto9JsjGOksWTenoQB/LdAIHbEqLOrp1YmfJVSiapIQZGP837P+zsN9Qc9dl0ipwvMjk0zqJos6Njwe+xX8dTNCJ0ql9Zm8472iuvrdSXo35WL+YqfeTKtkl2F+8HIxaNAZl5/Txr73dNCubi0kDFQvuvE1TmrOQroXWPJ28bZvBnuD7c2bNeDNLnb384hfncYx3oSi0X1ezRou+V5mBOWRMJCuL4V042iTXKXKsqwiGtYxUDszKfklvc2lOIH4sRh1VmGcHNi7QAc+HAwnd3DRkspD+oEJxqpUNyvBC9FtoiDZserIfCjREyQ==
+Received: from DU2PR04CA0027.eurprd04.prod.outlook.com (2603:10a6:10:3b::32)
+ by AMBPR07MB10620.eurprd07.prod.outlook.com (2603:10a6:20b:6b0::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.18; Sat, 2 May
+ 2026 09:25:57 +0000
+Received: from DU6PEPF0000A7E0.eurprd02.prod.outlook.com
+ (2603:10a6:10:3b:cafe::f1) by DU2PR04CA0027.outlook.office365.com
+ (2603:10a6:10:3b::32) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9870.23 via Frontend Transport; Sat,
+ 2 May 2026 09:25:57 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 192.176.1.74)
+ smtp.mailfrom=ericsson.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=ericsson.com;
+Received-SPF: Pass (protection.outlook.com: domain of ericsson.com designates
+ 192.176.1.74 as permitted sender) receiver=protection.outlook.com;
+ client-ip=192.176.1.74; helo=oa.msg.ericsson.com; pr=C
+Received: from oa.msg.ericsson.com (192.176.1.74) by
+ DU6PEPF0000A7E0.mail.protection.outlook.com (10.167.8.39) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9891.9 via Frontend Transport; Sat, 2 May 2026 09:25:56 +0000
+Received: from seroius18815.sero.gic.ericsson.se (153.88.142.248) by
+ smtp-central.internal.ericsson.com (100.87.178.62) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Sat, 2 May 2026 11:25:56 +0200
+Received: from seroius06448.sero.gic.ericsson.se (seroius06448.sero.gic.ericsson.se [10.117.92.228])
+	by seroius18815.sero.gic.ericsson.se (Postfix) with ESMTP id 80F4E4020840;
+	Sat,  2 May 2026 11:25:55 +0200 (CEST)
+Received: by seroius06448.sero.gic.ericsson.se (Postfix, from userid 7434092)
+	id 6B2B91005C88; Sat,  2 May 2026 11:25:55 +0200 (CEST)
+From: Fidan Aliyeva <fidan.aliyeva.ext@ericsson.com>
+To: <andrew@lunn.ch>
+CC: <olteanv@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <thomas.eckerman.ext@ericsson.com>,
+	<fidan.aliyeva.ext@ericsson.com>
+Subject: Re: Re: [PATCH net-next v2 1/2] mv88e6xxx: Refactor 6352's serdes functions
+Date: Sat, 2 May 2026 11:25:52 +0200
+Message-ID: <20260502092552.2217977-1-fidan.aliyeva.ext@ericsson.com>
+X-Mailer: git-send-email 2.36.0
+In-Reply-To: <8f2a1956-5cd9-4267-8035-b81024148a9d@lunn.ch>
+References: <8f2a1956-5cd9-4267-8035-b81024148a9d@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAPuPA7JS-yG_dYaPVjv9JiGOEXSpExXSQhsZaexUkr-WMeQHrw@mail.gmail.com>
-X-Rspamd-Queue-Id: 523F34B17A0
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DU6PEPF0000A7E0:EE_|AMBPR07MB10620:EE_
+X-MS-Office365-Filtering-Correlation-Id: c376b90a-b8dc-4a59-1dcd-08dea82cd0ad
+X-SMTP-Server: smtp-central.internal.ericsson.com
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|82310400026|376014|36860700016|18002099003|56012099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	xcS0MTKrXVMXQnslsryCEP1DhimVtI7ZLLZF7t/kovYpG2S6eQl/9+NpoGjA7a4psIWEoFwa/lclpWCPSy+hJhc+Cs7Aw/cNHutY6txTl0/CtgBjdfriJFFLMgSRTPC6J4cpQx1KAm9Hmmf2aAfkgUjBwKi+JFOezAe2WDrF9cLNiHgIQqdyx1lMz64iNu4nFoZLgQdNlvWY0RMVUlC91GDLLw/Sf8Q6++ZX2hAf+iMT5pfQEozK5eAVCB1uVL1RquCirN/Tlw9YRkMYWskMl3NDe2GPI1td70y8DiE1HxqGgk4Xe/zKL39cJN60d8u/1tahQ5c4IhcjM/rHY7NGIxBhUIlf/rhhxq9+J9d988I6JnA80p/H4WlVGTasHBNA4QFryPeANXJC/ySitiBw64CUwRFEzAHmau9UEHRKjZ0BUv5dYX+9eeMGUrPrmskY+6zCKw64X4YNvj9V+o+ldJlk0JilvKXKr1LZPxaljF2H1r3f2/bnntWzJJxNTqaJWhxz+088b2HIYFbqc8WPYhnvtlGpzuvBbEaGKtrPZteY0ykZvKbST/+REbXiPQ6cNKFspVc9pFDhaOQ5Pnggp7fNDg7uJSwz7bPxaMnjPxw+OK60xNzD43Y5H10sBeUOhnVMZlf+G+X3gqKdn6sSn8CQ9GPHr3P91ZSpc3vDym+Pc+BzMuesGEdSwZU9WeLKcnoHfBFfBGKjp3LHAXkNuX595RkW4ZLNj3O3Jku95nE=
+X-Forefront-Antispam-Report:
+	CIP:192.176.1.74;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:oa.msg.ericsson.com;PTR:office365.se.ericsson.net;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(36860700016)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	/SeAGb+Vbf3KJbGgp7KqutbQeI0RP65b/pyhDTz7ZruRIXD/cd2dnBuE9QZaAGilLcCL1KH21S7h/9bczCZ3+ccjJGuuN1jskLeVBdRD9vARhB9rcnWgwHQVM4ouc6GvS31gpuJ6e2AosKwv4oIPc/EKShKqcxEyU4+V2Uu1GmVf/QEKaAsB9we7gZerOwHU31yVmGqgRtIudaGkrv7K586NvmL7hOsOoTIJnmZKHkkEiCP+pgrKNS0iDNk9O1ahKtdps4IFs2C8ca2H7Nb8ACAt2G8PtIb9bYU4hNuszkhhnaS8cEHjw8VZAMVVDX5zcQX1h4+tp8lS71s03jH0a51nhPmEnZjbM8ydF0NDK1/x3MfpHiHvoI2/gzHz1/+MjOvvEEXasK9a0ruhxM+9FYbcsATSA5yzTdHviG3an3JzHTKa900+/WWGo0QfA96i
+X-OriginatorOrg: ericsson.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 May 2026 09:25:56.5434
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c376b90a-b8dc-4a59-1dcd-08dea82cd0ad
+X-MS-Exchange-CrossTenant-Id: 92e84ceb-fbfd-47ab-be52-080c6b87953f
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=92e84ceb-fbfd-47ab-be52-080c6b87953f;Ip=[192.176.1.74];Helo=[oa.msg.ericsson.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DU6PEPF0000A7E0.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AMBPR07MB10620
+X-Rspamd-Queue-Id: 962C94B1843
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.34 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[ericsson.com,reject];
+	R_DKIM_ALLOW(-0.20)[ericsson.com:s=selector1];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[fidan.aliyeva.ext@ericsson.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,ericsson.com];
+	TAGGED_FROM(0.00)[bounces-283389-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283388-lists,netdev=lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[linuxfoundation.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[ericsson.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[foxmail.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linuxfoundation.org:dkim,linuxfoundation.org:email,davemloft.net:email]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ericsson.com:dkim,ericsson.com:mid]
 
-On Sat, May 02, 2026 at 01:36:18AM -0700, Yuan Tan wrote:
-> On Tue, Apr 21, 2026 at 6:16 AM Greg Kroah-Hartman
-> <gregkh@linuxfoundation.org> wrote:
-> >
-> > ipv6_rpl_srh_rcv() decompresses an RFC 6554 Source Routing Header, swaps
-> > the next segment into ipv6_hdr->daddr, recompresses, then pulls the old
-> > header and pushes the new one plus the IPv6 header back.  The
-> > recompressed header can be larger than the received one when the swap
-> > reduces the common-prefix length the segments share with daddr (CmprI=0,
-> > CmprE>0, seg[0][0] != daddr[0] gives the maximum +8 bytes).
-> >
-> > pskb_expand_head() was gated on segments_left == 0, so on earlier
-> > segments the push consumed unchecked headroom.  Once skb_push() leaves
-> > fewer than skb->mac_len bytes in front of data,
-> > skb_mac_header_rebuild()'s call to:
-> >
-> >         skb_set_mac_header(skb, -skb->mac_len);
-> >
-> > will store (data - head) - mac_len into the u16 mac_header field, which
-> > wraps to ~65530, and the following memmove() writes mac_len bytes ~64KiB
-> > past skb->head.
-> >
-> > A single AF_INET6/SOCK_RAW/IPV6_HDRINCL packet over lo with a two
-> > segment type-3 SRH (CmprI=0, CmprE=15) reaches headroom 8 after one
-> > pass; KASAN reports a 14-byte OOB write in ipv6_rthdr_rcv.
-> >
-> > Fix this by expanding the head whenever the remaining room is less than
-> > the push size plus mac_len, and request that much extra so the rebuilt
-> > MAC header fits afterwards.
-> >
-> > Fixes: 8610c7c6e3bd ("net: ipv6: add support for rpl sr exthdr")
-> > Cc: "David S. Miller" <davem@davemloft.net>
-> > Cc: David Ahern <dsahern@kernel.org>
-> > Cc: Eric Dumazet <edumazet@google.com>
-> > Cc: Jakub Kicinski <kuba@kernel.org>
-> > Cc: Paolo Abeni <pabeni@redhat.com>
-> > Cc: Simon Horman <horms@kernel.org>
-> > Cc: stable <stable@kernel.org>
-> > Reported-by: Anthropic
-> > Assisted-by: gkh_clanker_t1000
-> > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > ---
-> > v3: - skb_postpull_rcsum() should not be changed, it's chdr NOT hdr, ugh
-> >       Link to v2: https://lore.kernel.org/r/2026042158-sediment-elliptic-a954@gregkh
-> >
-> > v2: - fixed up if statement to actually work properly, and test it
-> >       against a working poc (poc will be sent separately)
-> >       Reworded the changelog and the subject to make more sense
-> >       Link to v1: https://lore.kernel.org/r/2026042024-cabbie-gills-9371@gregkh
-> >
-> >  net/ipv6/exthdrs.c | 9 ++++++---
-> >  1 file changed, 6 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
-> > index 95558fd6f447..03cbce842c1a 100644
-> > --- a/net/ipv6/exthdrs.c
-> > +++ b/net/ipv6/exthdrs.c
-> > @@ -491,6 +491,7 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
-> >         struct net *net = dev_net(skb->dev);
-> >         struct inet6_dev *idev;
-> >         struct ipv6hdr *oldhdr;
-> > +       unsigned int chdr_len;
-> >         unsigned char *buf;
-> >         int accept_rpl_seg;
-> >         int i, err;
-> > @@ -592,8 +593,10 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
-> >         skb_pull(skb, ((hdr->hdrlen + 1) << 3));
-> >         skb_postpull_rcsum(skb, oldhdr,
-> >                            sizeof(struct ipv6hdr) + ((hdr->hdrlen + 1) << 3));
-> > -       if (unlikely(!hdr->segments_left)) {
-> > -               if (pskb_expand_head(skb, sizeof(struct ipv6hdr) + ((chdr->hdrlen + 1) << 3), 0,
-> > +       chdr_len = sizeof(struct ipv6hdr) + ((chdr->hdrlen + 1) << 3);
-> > +       if (unlikely(!hdr->segments_left ||
-> > +                    skb_headroom(skb) < chdr_len + skb->mac_len)) {
-> > +               if (pskb_expand_head(skb, chdr_len + skb->mac_len, 0,
-> >                                      GFP_ATOMIC)) {
-> >                         __IP6_INC_STATS(net, ip6_dst_idev(skb_dst(skb)), IPSTATS_MIB_OUTDISCARDS);
-> >                         kfree_skb(skb);
-> > @@ -603,7 +606,7 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
-> >
-> >                 oldhdr = ipv6_hdr(skb);
-> >         }
-> > -       skb_push(skb, ((chdr->hdrlen + 1) << 3) + sizeof(struct ipv6hdr));
-> > +       skb_push(skb, chdr_len);
-> >         skb_reset_network_header(skb);
-> >         skb_mac_header_rebuild(skb);
-> >         skb_set_transport_header(skb, sizeof(struct ipv6hdr));
-> > --
-> > 2.53.0
-> >
+> > I wanted to make those functions generic and not introduce new 
+> > functions other than 6321_serdes_get_lane. However, those functions 
+> > cannot be generalised the obvious way because they run with reg_lock 
+> > already taken which would cause deadlock in mv88e6352_serdes_get_lane function.
 > 
-> I am happy to see this bug is finally fixed.
+> Ah, the scratch register. None of the other serdes_get_lane() functions need to read a register. O.K.
 > 
-> However, it seems the Reported-by tag does not include our credit.
+> So we don't expect the scratch register to change at runtime do we?
 > 
-> We first submitted the security report and patch to
-> security@kernel.org on February 23, titled:
-> 
-> [SECURITY] IPv6/RPL: 14-byte controllable OOB write via SRH len
-> overflow + skb_mac_header_rebuild() u16 wraparound
-> 
-> [PATCH] ipv6: rpl: rebuild MAC+metadata safely when rewriting SRH
-> 
-> We have aslo followed up and resent the patch several times, CCing all
-> relevant maintainers.
-> 
-> Could our credit be added to the patch?
-> 
-> Reported-by: Yuan Tan <yuantan098@gmail.com>
-> Reported-by: Yifan Wu <yifanwucs@gmail.com>
-> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-> Reported-by: Xin Liu <dstsmallbird@foxmail.com>
-> 
-> I noticed this patch has already been merged into the mainline. Maybe
-> it's too late to amend this patch. Is there any other way to document
-> our reporting credit in the official records? Maybe in the stable
-> backport?
+> Nope, the value in it is read during reset. After that, it does not matter what happens to the pin, the value in the scratch register is fixed. So maybe read it during mv88e6xxx_setup_port() and store the value in struct mv88e6xxx_port?
 
-Sorry, I made this patch based on a different report to me as is
-documented in this patch, and did not notice that it was the same thing
-as this one as I am drowning in reports.
+Hi again. Thank you for your feedback. I can make the proposed change. But
+I do not have the functional specification for 6352 to refer the change
+to, neither do I have access to a 6352 to be able to test the change on.
+Do you have the functional specification document of the switch, maybe?
 
-This happens at times, and we can't rewrite public git history as that's
-impossible to do, sorry about that.  You have a public confirmation here
-that yes, you did report this same issue, and yes, you did submit a
-patch to resolve this, but it ended up being different from the one that
-was accepted.  Which again, happens all the time, it's just the nature
-of development with a huge body of contributors.
-
-thanks,
-
-greg k-h
+Thanks,
+Fidan.
 
