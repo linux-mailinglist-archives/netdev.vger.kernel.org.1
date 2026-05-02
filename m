@@ -1,206 +1,269 @@
-Return-Path: <netdev+bounces-283370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283372-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IGpCEPmC9WkHMAIAu9opvQ
-	(envelope-from <netdev+bounces-283370-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 06:52:09 +0200
+	id MXVfNQWF9WlfMAIAu9opvQ
+	(envelope-from <netdev+bounces-283372-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 07:00:53 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94FF44B0F60
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 06:52:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 611334B0FAB
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 07:00:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 471B33034BFC
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 04:51:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1DB1B3024515
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 05:00:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B86B2F1FC7;
-	Sat,  2 May 2026 04:51:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA5F129E11A;
+	Sat,  2 May 2026 05:00:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="Uf+de1L6";
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="GEWB0HAS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XI/tRLa6"
 X-Original-To: netdev@vger.kernel.org
-Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC73F2E7BB6;
-	Sat,  2 May 2026 04:50:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3CD1CEAC2
+	for <netdev@vger.kernel.org>; Sat,  2 May 2026 05:00:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777697461; cv=none; b=rMOgIpv8Oza+t3Cyt2zQICJhDWY+El+PxrrQ9QsV/9DQ6dx9WdOMIxeWRzyEm3dbc5jtMM7y3Gak7qahxSZeUehNCOzamaf0+Q4eLJDgHVnnI/HxSwXUHiB5BIEQGX+1QXzJKwxVA7RNXsO0HSgQfQ1bDqa8LDzuWa8OHjdxLu8=
+	t=1777698045; cv=none; b=mE+8lu8plhX6TzLrBHr1f+DoG2VVKdsUlkeF7Tm416qdDcAnO7dymm/0Ls/D062RyrYZ1FTYwahka9U5sCXhyHWMlG2ALKHVxd84Jq91YdCoDIeWkQ5cxmBhoVu2QruZ00jaOZj25k0Nvv+Cs6cOgDC+YEhD95paH41vCNCfBmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777697461; c=relaxed/simple;
-	bh=/j+KdgXrFyd32qLGN8tIJdWw4prZxjlLtFjpgrKqngo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=pe0cjb1+MnMuBv8KvIOXlBJvUOe6MCNj4DT/qCRPYngzyxgGC96rdIH9ESEf9P6lxw4LuA5ovTujPf39lmixhbswrgbz+qfesap3T49RymUabxdyJvgdszCja3VAjlFYSnpHj+IWaM74OiEEuwrBBtHndOqPtFYe6xMAxHsINp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=Uf+de1L6; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=GEWB0HAS; arc=none smtp.client-ip=23.88.97.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1777697458;
-	bh=/j+KdgXrFyd32qLGN8tIJdWw4prZxjlLtFjpgrKqngo=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Uf+de1L6ba1cmQh5W9u6DHCem3tWhBpH4sLYYXlL4KdxP7mKklgIOHO+JTLj4Myh/
-	 o73nS66zYjiFg79rX3kbVZ1kWwN59WZZ12obQuOH0KIUmQkewsxF0XB8X7BlEnXZjH
-	 ft+820uaxyc8zZwbnEctzRShniHNGDK1JXZsoJl4wxP3HBOD+45vCjB6z9JI79zMmc
-	 d+8cQg1AlhtFBT9xqke9XffCRctm4Rtofek53c11xR0148zbgKQRtWatobAY4TNSQy
-	 ZpJNHyZffM4W8zKvb51WBuPnND3HgeEzghy1zNC/P2tTlAxj8jzWd4+TC2jyCCg3am
-	 B+zcB1Mr4Km2g==
-Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
-	id 6DEC8482C8; Sat,  2 May 2026 04:50:58 +0000 (UTC)
-X-Spam-Level: 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1777697455;
-	bh=/j+KdgXrFyd32qLGN8tIJdWw4prZxjlLtFjpgrKqngo=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=GEWB0HASwP+BopFacHE4eT3xm539NokEuSnTmeTH9BmM/x2tKhQdp1K3tmfA3HI1p
-	 5LQzzLQOQ30jceIzRBe+VWPUBxQCNIOgA6pzEeXaprHpXO2MYCxPtv1ZsKn/XKMf4W
-	 VjyKUvvjPAevdjDdaIhJlK140e4NPstd4NLeI5/PNXMOWgUlO30XObpUYrRpU68ljB
-	 9XBigyayWJgGnQcFS0f1L6molOfxRT+EHd6ycSWWPei5KJKCt4dhS+WI90nYCy/4dJ
-	 RAiv4tFJ3hYIY95NsQyVIEHhbz1KwxPdzkUiFN9hZVbDEXKg7EYKnsu19gj8xZEocA
-	 XpS2rweai0Cvw==
-Received: from AMDDesktop.lan (unknown [IPv6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb])
-	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 54241482A2;
-	Sat,  2 May 2026 04:50:55 +0000 (UTC)
-From: Birger Koblitz <mail@birger-koblitz.de>
-Date: Sat, 02 May 2026 06:50:38 +0200
-Subject: [PATCH net-next v3 3/3] r8152: Add firmware upload capability for
- RTL8157/RTL8159
+	s=arc-20240116; t=1777698045; c=relaxed/simple;
+	bh=ver2UoWpS2YcfE27GaQTuIn81K78hKcA2yLnGa8/hiQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eTqF+AOoBocEDPxZuthP+TNoiBUcpUhz3s03xgAFeXIBh8nOiNQ6gzDzULB+jXwyySGV1otipLps9UldjxtHESh32LyTCwvPeEq+uVwjSjzHpnGRVf6UI6Ky2g1ee3cbNvM0QSgB+cxZ9Mhj8huKjbn/emFdmdfasMW/TuNklKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XI/tRLa6; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-364eef1891dso779376a91.1
+        for <netdev@vger.kernel.org>; Fri, 01 May 2026 22:00:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777698043; x=1778302843; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Rd4mi+oKC8Y6Z2wEWlSkY1p2DPTiyoqQPePQg0Iz5kc=;
+        b=XI/tRLa6sYagm2yYw51q9lWcK22L6ZqGnIdLX6qXMUeK8SajyUhORqqcvXzEYcFol5
+         Vs2lO6Qr2ImfZ5+rUBtFHlLBCbz4n1sLCqhMdsrB+zuNvbRxV9DgduovYoNf64juSpdM
+         EGbgDMQSrLYmRiPo2zASDlhNu2OKpKI9Bss59j4joWwZdphUF8mmTbzJoY0mB4euV6o2
+         sVCw0KnKImJHTyDViF/AO0cBkHkhqB8BR/U5YhGy1VjOeiWzft64nsdo5uN1BHur8a46
+         fumZy8JoS4byyv+d0BSERdnGzVh5ZSs0FVke8eRXE05rFAnPwfC2tRHQJkANcfH8M92n
+         2HlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777698043; x=1778302843;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Rd4mi+oKC8Y6Z2wEWlSkY1p2DPTiyoqQPePQg0Iz5kc=;
+        b=D4n/7ZX1XMWQwmn6Y0rk4CGvPbd/LEXHaohKtWgy6lB6JfrxJEBsc7dkPbX47467xW
+         O3esZLawT5GTec0+QYoEAbuoslcX2I9UcK+AhAJ5ZLOw0sgI07zSx4KXs0lE+KaY3fcw
+         NBJUGlH9Kl8RmyBR1RoeKyxcQrDjLSRH3su/3mjUg4Pl5e8hqEALOLxhLfgJw6XkmTEk
+         OACSfJVexw6b23LE8ylZL2iUErBqVkpgnpp6DsS2VvQbgexXzISf0LX7PhW3IyLXsOQj
+         noEhQYmaL1zf7hkvRJZ5R1KEFigIejt8+kjl06HHTmH7N8aLKl1ZaMyYnZU+2r5rCNLb
+         ibVg==
+X-Gm-Message-State: AOJu0Yw+OqN/lIbZdl49BbcKCxNXqI+yfIEA1dtwO5WWAUy7c9xZreyh
+	i6mVdYEHGvOW1Qirf+9Ecrr2IDOHxfGbii9zxsAJsEJugKaqg+D22DwFCMgmmQ==
+X-Gm-Gg: AeBDiev+xagUN4QIE5IVhiaNajTAvdKfSMQJCtpLoeytV7cy+raL1NC5eiZv7HYQDF1
+	53S05h6qB7NFJEaUOg9bn0akKmFMQT2IkA/jCf1wVKA3DlQaEy9OO1Pc06r9zv9eW8z5ZG0iDJ+
+	Tya44Mwai1KexDjP3VCQUEE41KZ4u4YTlmJ/GLtvOVRzlHUrhuKY7Q4osh3NCFQSdJgLSAkh5Xe
+	+9rpe+ouLDz50fTNSp3VW40eI1WnDqmufs05c8Znk4YzQ5hMsRc53z6ZpFaPie2Wnw0KFiaWQ9v
+	8tTP79/12XN6RkK9l3qzWlvLz4F0ENLCrdwj1FVs9smcES9LxwW/JYITu307OZfPQrfRBGkIt+Z
+	ml9rydkO3cxBRt2HGbkLHJ5PNdSGmcjy7xUp2rcqZzF9yziTE5Z9DDf6x49YbRxZqQGorOqnCt9
+	8lr7Wk45TNA1VX9w9lAEreKClzo3qEx7fHdnUGfTvvtLG9RGmHmeJMk63pIM10K112AUo=
+X-Received: by 2002:a17:90b:17d0:b0:35a:cf:64a6 with SMTP id 98e67ed59e1d1-3650ce552camr2070944a91.23.1777698043292;
+        Fri, 01 May 2026 22:00:43 -0700 (PDT)
+Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-364ec03c944sm3822498a91.15.2026.05.01.22.00.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 May 2026 22:00:42 -0700 (PDT)
+From: Maoyi Xie <maoyixie.tju@gmail.com>
+X-Google-Original-From: Maoyi Xie <maoyi.xie@ntu.edu.sg>
+To: netdev@vger.kernel.org
+Cc: willemdebruijn.kernel@gmail.com,
+	willemb@google.com,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuznet@ms2.inr.ac.ru,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net v5] ipv6: flowlabel: enforce per-netns limit for unprivileged callers
+Date: Sat,  2 May 2026 13:00:37 +0800
+Message-Id: <20260502050037.3800122-1-maoyi.xie@ntu.edu.sg>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260502-rtl8159_net_next-v3-3-12c895d46cd6@birger-koblitz.de>
-References: <20260502-rtl8159_net_next-v3-0-12c895d46cd6@birger-koblitz.de>
-In-Reply-To: <20260502-rtl8159_net_next-v3-0-12c895d46cd6@birger-koblitz.de>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Chih Kai Hsu <hsu.chih.kai@realtek.com>, 
- Birger Koblitz <mail@birger-koblitz.de>, 
- Aleksander Jan Bajkowski <olek2@wp.pl>
-X-Mailer: b4 0.14.2
-X-Rspamd-Queue-Id: 94FF44B0F60
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 611334B0FAB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,realtek.com,birger-koblitz.de,wp.pl];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_FROM(0.00)[bounces-283372-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283370-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[birger-koblitz.de];
-	DKIM_TRACE(0.00)[birger-koblitz.de:+];
+	FREEMAIL_CC(0.00)[gmail.com,google.com,redhat.com,kernel.org,davemloft.net,ms2.inr.ac.ru,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.991];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,wp.pl:email,birger-koblitz.de:email,birger-koblitz.de:dkim,birger-koblitz.de:mid]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ntu.edu.sg:mid,ntu.edu.sg:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-The RTL8159 (RTL_VER_17) requires firmware for its PHY in order to work
-at connection speeds > 5GBit. Add support for uploading firmware for
-the PHY using the existing rtl8152_apply_firmware() function
-in r8157_hw_phy_cfg() and set up the correct names for the firmware
-files.
+fl_size, fl_ht and ip6_fl_lock in net/ipv6/ip6_flowlabel.c are file
+scope and shared across netns. mem_check() reads fl_size to decide
+whether to deny non-CAP_NET_ADMIN callers; capable() runs against
+init_user_ns, so an unprivileged user in any non-init userns can
+push fl_size past FL_MAX_SIZE - FL_MAX_SIZE/4 and starve every
+other unprivileged userns on the host.
 
-This also adds support for uploading firmware for the RTL8157
-(RTL_VER_16) PHY, for which firmware is however not strictly necessary
-to work. Still, this allows to upload newer versions of the firmware used
-by this chip, e.g. to improve interoperability.
+Add struct netns_ipv6::flowlabel_count, bumped and decremented next
+to fl_size in fl_intern, ip6_fl_gc and ip6_fl_purge. The new field
+is placed in the existing 4-byte hole after ipmr_seq, so struct
+netns_ipv6 stays the same size on 64-bit builds.
 
-If no firmware is found, both the RTL8157 and the RTL8159 will continue
-to work.
+Bump FL_MAX_SIZE from 4096 to 8192. It has been 4096 since the file
+was added; machines and connection counts have grown.
 
-Signed-off-by: Birger Koblitz <mail@birger-koblitz.de>
-Tested-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+mem_check() folds an extra per-netns ceiling into the existing
+non-CAP_NET_ADMIN conditional. The ceiling is half of the total
+budget that unprivileged callers have ever been able to use, i.e.
+(FL_MAX_SIZE - FL_MAX_SIZE/4) / 2 = 3072 entries. With FL_MAX_SIZE
+doubled, this preserves the original per-user reach (~3K, what an
+unprivileged caller could already obtain before this change) while
+forcing an attacker to spread allocations across at least two
+netns to exhaust the global non-CAP_NET_ADMIN budget.
+
+CAP_NET_ADMIN against init_user_ns still bypasses both caps.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Suggested-by: Willem de Bruijn <willemb@google.com>
+Cc: stable@vger.kernel.org # v5.15+
+Signed-off-by: Maoyi Xie <maoyi.xie@ntu.edu.sg>
 ---
- drivers/net/usb/r8152.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+v5 (this submission, addressing v4 review by Willem):
+    - Replaced the per-netns ceiling FL_MAX_SIZE/8 with the
+      computed unpriv_user_limit = (FL_MAX_SIZE - FL_MAX_SIZE/4)/2,
+      which evaluates to 3072. v4's FL_MAX_SIZE/8 = 1024 would have
+      reduced the per-user budget below the ~3K an unprivileged
+      caller could already obtain before any of this work, defeating
+      the reason FL_MAX_SIZE was doubled in the first place. The new
+      ceiling preserves the original per-user reach while still
+      requiring an attacker to spread across at least two netns to
+      drain the global non-CAP_NET_ADMIN budget.
+    - Reworded the corresponding paragraph in the commit body.
+v4: addressed Willem's v3 review on netdev. Dropped the
+    flowlabel_has_excl cacheline argument in favour of "fills the
+    existing 4-byte hole after ipmr_seq", and reordered
+    atomic_dec(&...flowlabel_count) to sit immediately after
+    atomic_dec(&fl_size) in ip6_fl_gc and ip6_fl_purge.
+v3: addressed Willem's review on the private security@ thread.
+    Merged FL_MAX_SIZE doubling, dropped test data, moved
+    flowlabel_count near ipmr_seq, inlined fl->fl_net in ip6_fl_gc.
+v2: per-netns counter + cap, sent to security@ as a 2-patch series.
+v1: fix-shape sketch in original disclosure.
 
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index a2cdd57558c78b025ea61d33b99eca72c19f535f..7efba20de03deb06ac75c3b57a0d0e27b30b8e3a 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -4663,10 +4663,11 @@ static bool rtl8152_is_fw_phy_speed_up_ok(struct r8152 *tp, struct fw_phy_speed_
- 	case RTL_VER_11:
- 	case RTL_VER_12:
- 	case RTL_VER_14:
--	case RTL_VER_16:
- 		goto out;
- 	case RTL_VER_13:
- 	case RTL_VER_15:
-+	case RTL_VER_16:
-+	case RTL_VER_17:
- 	default:
- 		break;
- 	}
-@@ -7982,12 +7983,14 @@ static void r8157_hw_phy_cfg(struct r8152 *tp)
- 	data = r8153_phy_status(tp, 0);
- 	switch (data) {
- 	case PHY_STAT_EXT_INIT:
-+		rtl8152_apply_firmware(tp, true);
- 		ocp_reg_clr_bits(tp, 0xa466, BIT(0));
- 		ocp_reg_clr_bits(tp, 0xa468, BIT(3) | BIT(1));
- 		break;
- 	case PHY_STAT_LAN_ON:
- 	case PHY_STAT_PWRDN:
- 	default:
-+		rtl8152_apply_firmware(tp, false);
- 		break;
- 	}
+ include/net/netns/ipv6.h |  1 +
+ net/ipv6/ip6_flowlabel.c | 16 ++++++++++++----
+ 2 files changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/include/net/netns/ipv6.h b/include/net/netns/ipv6.h
+index 34bdb1308..329482373 100644
+--- a/include/net/netns/ipv6.h
++++ b/include/net/netns/ipv6.h
+@@ -119,6 +119,7 @@ struct netns_ipv6 {
+ 	struct fib_notifier_ops	*notifier_ops;
+ 	struct fib_notifier_ops	*ip6mr_notifier_ops;
+ 	unsigned int ipmr_seq; /* protected by rtnl_mutex */
++	atomic_t		flowlabel_count;
+ 	struct {
+ 		struct hlist_head head;
+ 		spinlock_t	lock;
+diff --git a/net/ipv6/ip6_flowlabel.c b/net/ipv6/ip6_flowlabel.c
+index c92f98c6f..758a2fc4d 100644
+--- a/net/ipv6/ip6_flowlabel.c
++++ b/net/ipv6/ip6_flowlabel.c
+@@ -36,7 +36,7 @@
+ /* FL hash table */
  
-@@ -9923,6 +9926,8 @@ static int rtl_ops_init(struct r8152 *tp)
- #define FIRMWARE_8153C_1	"rtl_nic/rtl8153c-1.fw"
- #define FIRMWARE_8156A_2	"rtl_nic/rtl8156a-2.fw"
- #define FIRMWARE_8156B_2	"rtl_nic/rtl8156b-2.fw"
-+#define FIRMWARE_8157_1		"rtl_nic/rtl8157-1.fw"
-+#define FIRMWARE_8159_1		"rtl_nic/rtl8159-1.fw"
+ #define FL_MAX_PER_SOCK	32
+-#define FL_MAX_SIZE	4096
++#define FL_MAX_SIZE	8192
+ #define FL_HASH_MASK	255
+ #define FL_HASH(l)	(ntohl(l)&FL_HASH_MASK)
  
- MODULE_FIRMWARE(FIRMWARE_8153A_2);
- MODULE_FIRMWARE(FIRMWARE_8153A_3);
-@@ -9931,6 +9936,8 @@ MODULE_FIRMWARE(FIRMWARE_8153B_2);
- MODULE_FIRMWARE(FIRMWARE_8153C_1);
- MODULE_FIRMWARE(FIRMWARE_8156A_2);
- MODULE_FIRMWARE(FIRMWARE_8156B_2);
-+MODULE_FIRMWARE(FIRMWARE_8157_1);
-+MODULE_FIRMWARE(FIRMWARE_8159_1);
+@@ -162,8 +162,9 @@ static void ip6_fl_gc(struct timer_list *unused)
+ 				ttd = fl->expires;
+ 				if (time_after_eq(now, ttd)) {
+ 					*flp = fl->next;
+-					fl_free(fl);
+ 					atomic_dec(&fl_size);
++					atomic_dec(&fl->fl_net->ipv6.flowlabel_count);
++					fl_free(fl);
+ 					continue;
+ 				}
+ 				if (!sched || time_before(ttd, sched))
+@@ -195,8 +196,9 @@ static void __net_exit ip6_fl_purge(struct net *net)
+ 			if (net_eq(fl->fl_net, net) &&
+ 			    atomic_read(&fl->users) == 0) {
+ 				*flp = fl->next;
+-				fl_free(fl);
+ 				atomic_dec(&fl_size);
++				atomic_dec(&net->ipv6.flowlabel_count);
++				fl_free(fl);
+ 				continue;
+ 			}
+ 			flp = &fl->next;
+@@ -245,6 +247,7 @@ static struct ip6_flowlabel *fl_intern(struct net *net,
+ 	fl->next = fl_ht[FL_HASH(fl->label)];
+ 	rcu_assign_pointer(fl_ht[FL_HASH(fl->label)], fl);
+ 	atomic_inc(&fl_size);
++	atomic_inc(&net->ipv6.flowlabel_count);
+ 	spin_unlock_bh(&ip6_fl_lock);
+ 	rcu_read_unlock();
+ 	return NULL;
+@@ -464,6 +467,9 @@ fl_create(struct net *net, struct sock *sk, struct in6_flowlabel_req *freq,
  
- static int rtl_fw_init(struct r8152 *tp)
+ static int mem_check(struct sock *sk)
  {
-@@ -9969,6 +9976,12 @@ static int rtl_fw_init(struct r8152 *tp)
- 		rtl_fw->pre_fw		= r8153b_pre_firmware_1;
- 		rtl_fw->post_fw		= r8153c_post_firmware_1;
- 		break;
-+	case RTL_VER_16:
-+		rtl_fw->fw_name		= FIRMWARE_8157_1;
-+		break;
-+	case RTL_VER_17:
-+		rtl_fw->fw_name		= FIRMWARE_8159_1;
-+		break;
- 	default:
- 		break;
- 	}
-
++	const int unpriv_total_limit = FL_MAX_SIZE - (FL_MAX_SIZE / 4);
++	const int unpriv_user_limit = unpriv_total_limit / 2;
++	struct net *net = sock_net(sk);
+ 	int room = FL_MAX_SIZE - atomic_read(&fl_size);
+ 	struct ipv6_fl_socklist *sfl;
+ 	int count = 0;
+@@ -478,7 +484,9 @@ static int mem_check(struct sock *sk)
+ 
+ 	if (room <= 0 ||
+ 	    ((count >= FL_MAX_PER_SOCK ||
+-	      (count > 0 && room < FL_MAX_SIZE/2) || room < FL_MAX_SIZE/4) &&
++	      (count > 0 && room < FL_MAX_SIZE/2) ||
++	      room < FL_MAX_SIZE/4 ||
++	      atomic_read(&net->ipv6.flowlabel_count) >= unpriv_user_limit) &&
+ 	     !capable(CAP_NET_ADMIN)))
+ 		return -ENOBUFS;
+ 
 -- 
-2.47.3
+2.34.1
 
 
