@@ -1,75 +1,60 @@
-Return-Path: <netdev+bounces-283436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283437-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oC9OAJkq9mksSwIAu9opvQ
-	(envelope-from <netdev+bounces-283436-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 18:47:21 +0200
+	id KJSoDi4r9mk+SwIAu9opvQ
+	(envelope-from <netdev+bounces-283437-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 18:49:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A27E4B2E03
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 18:47:20 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C49BB4B2E69
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 18:49:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 34A71300EF65
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 16:47:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id ADD50300CCA9
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 16:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 383E7382384;
-	Sat,  2 May 2026 16:47:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C042382F23;
+	Sat,  2 May 2026 16:49:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C2a0Vi3Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rs2m19hc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1439A1E633C;
-	Sat,  2 May 2026 16:47:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38613175A6B;
+	Sat,  2 May 2026 16:49:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777740436; cv=none; b=M3KBxGmFqdA5NpwjHUnpkflCSrO9IO4Dnnj8NNNhQLU8CXmvT/pTcwzx7hKH4owvg9dO6fMz6Je7eHUC51CPLkEA91UdXneXP0wulEPPtWrazd1Qf2t6T9H2vK5vhjqltRufgbMk9umdFJnXyL8X3r7ZI5FHqW+i2rxF+SH+O94=
+	t=1777740586; cv=none; b=r+HDAy3FR97+wD8qtu4kRoISqywhjX8LKAyBP6lN6KzK0aANO/9qFvhqD93AE96mOtAkaRnr4ogynny2Slz2Oegnp8GxKkZFEJU7mcfF4N61uTlejb45jlgxTIXBmoQ0JXQNCLWnm55cBsW8fwgIOgg1+B9Pm3/TfCsSDfzkBWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777740436; c=relaxed/simple;
-	bh=zymvXjOjeTSggFeuoM050BBTeP4ivuV+K0ZODz63sG8=;
+	s=arc-20240116; t=1777740586; c=relaxed/simple;
+	bh=bszYzwC1o/Xp6s0BB8DnMIAglKIchkNIyHABgW0+lJE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uQp/EtTLnNkk6qAMz66zeq5u8bLcgc7gi8wrAoFshW7+AHXdhc+kDwSNZEWFTNXhW7JLLozTeXWJtTpGMRkOBRRbDdhvOW4GXBErqetZDvhMhUn7orn+AcF/05DwP/1X+KVdJ7TaruX8ym+xExD/CznlrcIjYO+HX/QORvE+8DA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C2a0Vi3Q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4943CC19425;
-	Sat,  2 May 2026 16:47:13 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ERWJlm4/aykiiRhCoHoi4IzTRAa2SjSDcjNaw/hsysg2EHihbwR9Ue2mcvChbae4jkJmBpFjFSVr1j1r3+560PI8Qp85RVLe6RXAmef0+PazHtd5Dioko/f1WizcJ0UKHLuLO1dpW7OMHvTZnICpD4fa7GKoXaHyZ3eV4dP1YuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rs2m19hc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B1EDC2BCC6;
+	Sat,  2 May 2026 16:49:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777740435;
-	bh=zymvXjOjeTSggFeuoM050BBTeP4ivuV+K0ZODz63sG8=;
+	s=k20201202; t=1777740585;
+	bh=bszYzwC1o/Xp6s0BB8DnMIAglKIchkNIyHABgW0+lJE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=C2a0Vi3QX0WD3xutTIXFvjrVMuUqle24NF4BAQHxyUpWgq77agsQiQDARZ48oGEr8
-	 zWeFVrQ+2yNo3XsQXXseVTkoumlvbwMcqRQ9Yrv9/oCfoJJfiKSyfy/R/1KWeM8Ejx
-	 j3kgXK8lc2stL15qKUXCkaF9uBbZyYkkj9ca4JUpNJEbRoD1qD1piUoN2e5hAWLFZo
-	 hmI8PjcAL1L79x9BIkN1E2eRROzi9GCkLp+6y/VFSfpgKhQs2XFoSYrQPXb4whpnxD
-	 2Fh+iykG/8DvSFLTzfAlLeLNrYwBZESP4BuukCRYY4PUWPAJsNa9OBiyeLZcaDz2BO
-	 p7nB8soAtHKMg==
-Date: Sat, 2 May 2026 09:47:12 -0700
+	b=Rs2m19hcs9F1mPNEnlXAQrKimjzpmqazjL5w2VfMM6JkWs2UhXeDSFIEvmcSqPMrA
+	 sceD8V17IRrLvlIy6X6JNN5WcEURFWCCFry1+BlvlHJ1RmnQpsiTrU17Bs+ndFkHWp
+	 Z6Z2PBxvbws2+aj5hvPO6n0AX3QOGurTkDt3zBTJekTUYfAQMW9H3hALqLHPwXykA3
+	 VjUC2KQIwuzuvgkGXV8WUdf5ShvlBAmhzn6g2OPqJtsxUSSpSfdbtBWtdSrcF5+2w+
+	 IijEaYqLJ2uKTgggauMnkh9aeInIj7JQR9l+3UsdK6WEhbrnHQHjZEd+I1/Q2KB0TU
+	 DKSJaKMSBe1Xw==
+Date: Sat, 2 May 2026 09:49:44 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Alex Elder <elder@riscstar.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, maxime.chevallier@bootlin.com,
- rmk+kernel@armlinux.org.uk, andersson@kernel.org, konradybcio@kernel.org,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- linusw@kernel.org, brgl@kernel.org, arnd@arndb.de,
- gregkh@linuxfoundation.org, daniel@riscstar.com,
- mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com,
- alexandre.torgue@foss.st.com, ast@kernel.org, boon.khai.ng@altera.com,
- chenchuangyu@xiaomi.com, chenhuacai@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, hkallweit1@gmail.com, inochiama@gmail.com,
- john.fastabend@gmail.com, julianbraha@gmail.com, livelycarpet87@gmail.com,
- matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc,
- prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
- rohan.g.thomas@altera.com, sdf@fomichev.me, siyanteng@cqsoftware.com.cn,
- weishangjuan@eswincomputing.com, wens@kernel.org, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 00/12] net: enable TC956x support
-Message-ID: <20260502094712.69b29dc8@kernel.org>
-In-Reply-To: <20260501155421.3329862-1-elder@riscstar.com>
-References: <20260501155421.3329862-1-elder@riscstar.com>
+To: Ashutosh Desai <ashutoshdesai993@gmail.com>
+Cc: netdev@vger.kernel.org, edumazet@google.com, davem@davemloft.net,
+ pabeni@redhat.com, horms@kernel.org, stable@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6] nfc: hci: fix out-of-bounds read in HCP header
+ parsing
+Message-ID: <20260502094944.6aa267c6@kernel.org>
+In-Reply-To: <20260502163116.3409687-1-ashutoshdesai993@gmail.com>
+References: <20260502163116.3409687-1-ashutoshdesai993@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,47 +63,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 5A27E4B2E03
+X-Rspamd-Queue-Id: C49BB4B2E69
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283436-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283437-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,bootlin.com,armlinux.org.uk,kernel.org,arndb.de,linuxfoundation.org,riscstar.com,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[49];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel,dt];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,davemloft.net:email]
 
-On Fri,  1 May 2026 10:54:08 -0500 Alex Elder wrote:
->  create mode 100644 Documentation/devicetree/bindings/net/toshiba,tc956x-dwmac.yaml
->  create mode 100644 drivers/gpio/gpio-tc956x.c
->  create mode 100644 drivers/misc/tc956x_pci.c
->  create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-tc956x.c
->  create mode 100644 drivers/net/pcs/pcs-xpcs-regmap.c
->  create mode 100644 include/linux/pcs/pcs-xpcs-regmap.h
->  create mode 100644 include/soc/toshiba/tc956x-dwmac.h
+On Sat,  2 May 2026 16:31:16 +0000 Ashutosh Desai wrote:
+> To: netdev@vger.kernel.org
+> Cc: kuba@kernel.org, edumazet@google.com, davem@davemloft.net, pabeni@redhat.com, horms@kernel.org, stable@vger.kernel.org, linux-kernel@vger.kernel.org, Ashutosh Desai <ashutoshdesai993@gmail.com>
 
-Please add an entry to MAITNAINERS for tx956x stuff?
+You are not CCing the (recently added) NFC maintainer.
+Please wait until Monday and repost with the CC list corrected.
 
