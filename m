@@ -1,105 +1,147 @@
-Return-Path: <netdev+bounces-283438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283439-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uzQEKIEr9mlNSwIAu9opvQ
-	(envelope-from <netdev+bounces-283438-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 18:51:13 +0200
+	id IICRHvYr9mlNSwIAu9opvQ
+	(envelope-from <netdev+bounces-283439-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 18:53:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23BB44B2E82
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 18:51:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1022E4B2E93
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 18:53:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4DD283005D24
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 16:51:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 91A3A3009516
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 16:53:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93DD838237D;
-	Sat,  2 May 2026 16:51:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 252A538642A;
+	Sat,  2 May 2026 16:53:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DqupWy9o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N7ONpL4/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6746F2DAFAF
-	for <netdev@vger.kernel.org>; Sat,  2 May 2026 16:51:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEECC1A6808;
+	Sat,  2 May 2026 16:53:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777740670; cv=none; b=Ta4aahVYVBtOvucRmB6xpZvaha9Eidp1v86JUMzkqQMoez7Ow6tNBBc2zxSiL7ugz6Uzx1tmZD2topXvt65arpSdH5V8KBwpcuSbKIuXdWSkfQyk6xUxP2ywcMOIogWVaZLTV/mhrS5YakvJpy9kUug/40hnOF4YDnmr2ubX/ic=
+	t=1777740787; cv=none; b=eM117kfo+KqM7CknbkCJyohBM1LKSK9WbkIf5eiR5clb2iLgG1euJhKRbHIUZKZXZCYE+gWfOwPzuOjq6ZlLvtoLfvGeZxndoLzcnypU28S2jQ+ckPPltviKCnnGQ2uND9Tx7NbndfDz6E+GHPARWG2JzFgwDTTZkbx6V7PscRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777740670; c=relaxed/simple;
-	bh=aJ108+WvKBs1a23mc3aOanUKXjVOe27Cu6VYyK8JpRg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QaEGTA8rPtHEV2NR2a4icf7RknSTsJXF/IJnYOBt5KDmn1jJ1Kc86dI42WucIawHaEYdCxBv/zwn8/zZSbVxe64nqQ6IXhyVE5G6nVEb3thZQY22mvuzZJz82YxbiHx681UcHYa6d54pDgZbK79JSZ8I30T+w8qlRfi+FUXAB4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DqupWy9o; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E812C19425;
-	Sat,  2 May 2026 16:51:09 +0000 (UTC)
+	s=arc-20240116; t=1777740787; c=relaxed/simple;
+	bh=63je9fQk8rbq2FWAeTdpdXqpGJDjhaBfm7Vkh48f+Ak=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sztee4XeCF2m/q8jxWRxeHaR6DUYT/rCea+779idKj8AFUjss7Mke3GA86aQ2MmowsaVP4QOy0DqcwvA9y3xo5bOdVx9uLdUJlD+gH46eyi6OXjROweujeP3i1+4xV/YYxP5SwIodQ5mdBLF5doH8Q0a0wpththqSLkl9tjVJJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N7ONpL4/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C79B8C19425;
+	Sat,  2 May 2026 16:53:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777740670;
-	bh=aJ108+WvKBs1a23mc3aOanUKXjVOe27Cu6VYyK8JpRg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DqupWy9o5G+83Nhr19yfZTLFeHZhJti09fUO+s5fVznIR8d6WZ2iSe9a0/0RJFGer
-	 otn/2oSL8uhH6pxw+Y9XJqd7HFS+BvgU74d6rOv8eBLKHfSu/8La9pI8BidmDjT3Q1
-	 neLOYnjjguS72ifB7JSgPi3Cl8WguQqZ2AJLAYpBrEnLdF4Kt8NoDV2qNgIZBFocqw
-	 T0VO7r8fVEPT87KLnath+uV2WzXKmbbilvvJOgmeirwc/yKzmeHPot874SA+TSChUE
-	 LSsCGw8yg/dyzAyTcRQMQMPma3otq/MBoGR4vzKyg6nkUsiy9PWDv+9MR/0epyNpUH
-	 jFCK+UIn0rbQQ==
-Date: Sat, 2 May 2026 09:51:08 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Peter Lee <fronce09@gmail.com>
-Cc: netdev@vger.kernel.org, dsahern@kernel.org, idosch@nvidia.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org
-Subject: Re: [RFC] net: ipv4: add KUnit coverage for net/ipv4*
-Message-ID: <20260502095108.752a12bf@kernel.org>
-In-Reply-To: <CA+2kspPQ0ZyirDsCyDugzb7Wtt9MPNPdz2xDaxM4DGh+hqy=XA@mail.gmail.com>
-References: <CA+2kspPQ0ZyirDsCyDugzb7Wtt9MPNPdz2xDaxM4DGh+hqy=XA@mail.gmail.com>
+	s=k20201202; t=1777740786;
+	bh=63je9fQk8rbq2FWAeTdpdXqpGJDjhaBfm7Vkh48f+Ak=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=N7ONpL4/AN7uJhb9ZXPsM8kwagVU4kLEko7Mr30q3l37I+nFleUIC9bJUewS+COES
+	 vAq9Xoeh1KBfFEER9HbAzXuSfm+PLr5ZcrgC9bbeRIFgA+5td5E7ouSF5cxo5enZae
+	 IjzzO6c9eApZiajedDnwHroPsHCUOYqXyopE2Srlb4mqt6tbKf2JwLWlCBy/NtXbwd
+	 dAA5vXmkR9PauyaFsPWFmzHfS4ET5EpfpFO/yN7m2JV+5uIbc2IuYREw+LDTAlORn6
+	 V8VRnhf7gMUhAzPQjy1jWLltibcj7n0yKtGE8r7LeYzUbNKFCkS+kojVMhOSg/82E8
+	 fmT51UAmd4Ffw==
+Date: Sat, 2 May 2026 17:52:58 +0100
+From: Simon Horman <horms@kernel.org>
+To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	leon@kernel.org, longli@microsoft.com, kotaranov@microsoft.com,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	stephen@networkplumber.org, jacob.e.keller@intel.com,
+	dipayanroy@microsoft.com, leitao@debian.org, kees@kernel.org,
+	john.fastabend@gmail.com, hawk@kernel.org, bpf@vger.kernel.org,
+	daniel@iogearbox.net, ast@kernel.org, sdf@fomichev.me,
+	yury.norov@gmail.com
+Subject: Re: [PATCH 0/3] net: mana: Fix mana_destroy_rxq() cleanup for
+ partial RXQ init
+Message-ID: <20260502165258.GM15617@horms.kernel.org>
+References: <20260430035935.1859220-1-dipayanroy@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 23BB44B2E82
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260430035935.1859220-1-dipayanroy@linux.microsoft.com>
+X-Rspamd-Queue-Id: 1022E4B2E93
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283438-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283439-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
 
-On Sat, 2 May 2026 23:08:38 +1000 Peter Lee wrote:
-> Was looking to start contributing to the kernel and thought i would start
-> with some test coverage action. For net/ipv4, are you looking to increase
-> the level of kunit testing across this submodule, or do you prefer coverage
-> only through higher-level selftests?
+On Wed, Apr 29, 2026 at 08:57:51PM -0700, Dipayaan Roy wrote:
+> When mana_create_rxq() fails partway through initialization (e.g. the
+> hardware rejects the WQ object creation), the error path calls
+> mana_destroy_rxq() to tear down a partially-initialized RXQ.
+> This exposed multiple issues in mana_destroy_rxq() path, as it assumed
+> the RXQ was always fully initialized, leading to multiple issues:
+> 
+> 1. xdp_rxq_info_unreg() was called on an unregistered xdp_rxq,
+>    triggering a WARN_ON ("Driver BUG") in net/core/xdp.c.
+> 
+> 2. mana_destroy_wq_obj() was called with INVALID_MANA_HANDLE,
+>    sending a bogus destroy command to the hardware.
+> 
+> 3. mana_deinit_cq() was called twice — once inside mana_destroy_rxq()
+>    and again in mana_create_rxq()'s error path — causing a
+>    use-after-free since mana_destroy_rxq() frees the rxq first.
+> 
+> This was observed during ethtool ring parameter changes when the
+> hardware returned an error creating the RXQ. This series makes
+> mana_destroy_rxq() safe to call at any stage of RXQ initialization
+> by guarding each teardown step, and removes the redundant cleanup
+> in mana_create_rxq().
 
-What's your methodology? If you're planning to generate some code with
-AI we are not interested.
+For the series:
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+I don't think that you need to repost for this. But please keep in mind for
+future submissions that fixes for code present in the net tree should be
+targeted at that tree, like this:
+
+Subject: [PATCH net vN/M] ...
+
+Also, FTR, there is an AI generated review of this patch-set available
+on sashiko.dev. It seems to me that the issues flagged there pre-date
+this patch-set and should not block progress of it. But you may wish
+to use that review as the basis of some follow-up.
 
