@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-283348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283349-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wNuXDQNs9WlVLAIAu9opvQ
-	(envelope-from <netdev+bounces-283348-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 05:14:11 +0200
+	id iDVxCCds9WlVLAIAu9opvQ
+	(envelope-from <netdev+bounces-283349-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 05:14:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C71504B0C13
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 05:14:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 775DA4B0C1C
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 05:14:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DB84130089A3
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 03:14:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 66274302204C
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 03:14:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7698329AB02;
-	Sat,  2 May 2026 03:14:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 445142C11E6;
+	Sat,  2 May 2026 03:14:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="raSvF+C0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lWylJZmB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE322C15A9
-	for <netdev@vger.kernel.org>; Sat,  2 May 2026 03:14:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B24872C21C4
+	for <netdev@vger.kernel.org>; Sat,  2 May 2026 03:14:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777691649; cv=none; b=XsQSf9x/Y+1SNL5/Apy6Y89jmVJOj8xG/X++l6i4tzccqCGzYbO7FF3bEuuv1KAlIVtRqNX8ehkPoyRkLJmmRm6F5t+N6NwNrTkODx9wYyARBN0MngxFPcouQpLai7M64/lNrmncStWPBjGfmUHevsPPYK3T1JoyEswEqYLJAmU=
+	t=1777691651; cv=none; b=CBoXftv9E3GAgOLF/qZjNdlOX7YrWplbqgCfrcg0aBAj9dugNzIVwvhEjkakI+ZdfONga9bB5lIbPvgAO338UCqsuR/6UhwPSiW58uu1HjpTXfjkqVKZfbrchY/kqS2OU4oap/jpqq36wI/yiTgY2GFA3cB77UILqqo0tL+FEqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777691649; c=relaxed/simple;
-	bh=UgRGr+WKxRWNf7eLNHdLblTifuqZuSid3imMHFEpzKo=;
+	s=arc-20240116; t=1777691651; c=relaxed/simple;
+	bh=133yG3tjr711QIq5Ag3aVURMO5PlgCyHCDPLOTM70VE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gn7AhikkfDFk0eeAmfF/nLDwd8m/zTW0s1I13OnKjn184CYzbztMKnWORxhgnsW1cnU0Vf+H7dQEWfffMDZ4FIswDAay3aRawjnUvdaX9rUhr9p8Kk5kEaST+KIzuSU9EMZNZTtYjbx8CONr7DmFOaicX6nZ2vsCvC8yqU26r40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=raSvF+C0; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=dKlvN5Zgkt2x3yU5qiknz+eDCLQVYc6q4eWsWnsA0nmnJ71oWCrWzDza5NcKNJ1JifSSU/+yS2YSTjDv8Yc8efV9FHMf9oj8s3UkDNVaSpEWO+i5kOG2Pts8fvHnxF2ukdchhUH6MV7MuO+2VJVFn9i0+OGXhiK9Rj/BF/otaVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lWylJZmB; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-36512c65928so269143a91.2
-        for <netdev@vger.kernel.org>; Fri, 01 May 2026 20:14:07 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-8230d6d54a5so2303777b3a.1
+        for <netdev@vger.kernel.org>; Fri, 01 May 2026 20:14:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777691647; x=1778296447; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1777691649; x=1778296449; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pzSZrQeG4f4nP07qHFLajU5wfv/F2NWySsay3SjAE44=;
-        b=raSvF+C0emh0zZNrF1kED2uV5u+1BP9DxlD2AL3fhEgD7OIz4Hc1MCTKLKig/Phjal
-         Y7EkpEpmNDvPZsg+6yMo1cOcFdikJAuROpL29zqOmSELG9fYE6srEPi8KQ16iKQ2+xML
-         p1ogyP7mMaxvNqAxsXyTq8K0BcPU/IWwCJUJtBHMIG+IRv085u9RrRa+A1xqMNEpAkDa
-         xD9/33H+SfNfMNDXiisDQOWiDzqUnVzykutDSJhahwK7jeuyzuA3SaZp7W8iMdaCCdQk
-         o5GRI+BVfFe0cwRXoksMsH5EQMma5jpi5KjBqGJiZT6jXGynzc1DKvLOa462m86Z6gCQ
-         l+NQ==
+        bh=E4knP9OCtjVSV8O1hl4zOxzZJWx3N0YXNwhIwFnvGxs=;
+        b=lWylJZmBV7SZ2yVvMUMrWvcHS+Hd5KHISLV7kzT7i98Gid9nq5CJHCtakdwuSzWD8e
+         uL1bBEirLKMJhP3cFK6sUir2oPSArQXNe/RAZ6Mi0iJ8PQb+S9+q7/A3PjYJ1FsyukAo
+         yIDtEnsClAHriqbe7WWQ7IkD/jtpZSIHwVvnGkuPYhtqLvcOWglWxK2EdvNmRDDNRnnE
+         6LY92lA5ovUpT5LkS96kS/LoucQJyHU8d0o/ZoskeTCl0s6c0aWE3o6OolG1xaM1zfz4
+         9pgdAPfivJiaPy8xanq3Nol0jC/soS6K4peYp0mfRHNRVgzBGGDn6As/QZsp/IUyoZOD
+         cVKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777691647; x=1778296447;
+        d=1e100.net; s=20251104; t=1777691649; x=1778296449;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pzSZrQeG4f4nP07qHFLajU5wfv/F2NWySsay3SjAE44=;
-        b=FBqoHLMAbfuhShRocvKWVbINbr2f64VxzAC60qNp+SSgySPyc8A/cRVvPZ3tG1doid
-         5oqpYlP2UBGjimVLu321RdyXwc9Q6X1E3uLyxGi67qEgEO9x/GlXcYgKwk5giooU9cqw
-         +EnoQZXBxcG6tX6FtNgfdbjdCHU7LjhGeOqfpkW3Y2j0dBnvehWiHALijK1NdDVH73an
-         KscnPtPk9Zk3HLw11XEEs5h/o39fXinCUw8hKsGNJPURNMFXyx/1hxIQgJhCu1MTxlYD
-         DlRukO1sUWCfgW7+oDuB6x6Y0a+53mXGLImAZWMEcTfWv5VR2DFY7sEl95b3g4aF36mB
-         1+ww==
-X-Forwarded-Encrypted: i=1; AFNElJ9G2Qjv/KLshRo6lQsQLV/+a/wzbfKgEt7rigzk15QicgfPD73HLUmECb/4YSuwLmCvdexw9z4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3ld4/yNsCyb6QlWAiqVn0aYW1LGXAGuWJgW3P6+zkMc2WrCia
-	uIdazoUAIduS/OAJIGkfGDyrvTEQ/czdvPVuE2g4pRh5xKmmJ8azrO71covmOZe15NnqaSUja4o
-	iAmdkxQ==
-X-Received: from pfib3.prod.google.com ([2002:aa7:8103:0:b0:82f:bd60:74cb])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:33a7:b0:398:71f2:59b7
- with SMTP id adf61e73a8af0-3a7f1c6cba8mr1575674637.33.1777691646838; Fri, 01
- May 2026 20:14:06 -0700 (PDT)
-Date: Sat,  2 May 2026 03:12:54 +0000
+        bh=E4knP9OCtjVSV8O1hl4zOxzZJWx3N0YXNwhIwFnvGxs=;
+        b=hlRslEZdIb3TZ95MjNtZUArG7FFjuM+2bxHQrWyZCA8gFMBD8kynEVf3RmuGVr0bOW
+         CuNOaCFJPy4eE4icyxS/os+1/2o8drXbyZ4EEVK59Jos+DkDGFe5JaE9trRTH0pXHGXM
+         CX9LAyX3X6O6v5oyAkTewIEv2405VTcFRYIkdzkgF2DRDiwQYqJdyOKyRLWMAI1Uolpk
+         EW2ur2dRnuFkB1umq6EDlywXU2qNWFIRAex2aZcTQUDFgS8N5pShyJfaevgm0fujU8ua
+         wEvBDDsrB2DQeg3B56M3tQDxKL9jOFrWXY3SWjQLmpSOaYBc/X5wR4o+9rYd3CucHJJI
+         Bkuw==
+X-Forwarded-Encrypted: i=1; AFNElJ8pkzHBsEXFIVcKU1unJqT5b+NxVTLMtoZwuL3OG2iIv3YrX89gR52ZLYNDudsUQiZPL0Ty10s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPv2bT79SlmXBvwIA5Y4j1O2kCCpWUJyA2tXSLrKxTGDdOvM13
+	r77WHXd/rT262lTq2099Nmu0gIKkkhlyFzRbUy4NHq2GSpSdhxa38SRV0O+LO8jE7WAvbfBSNnU
+	Lr/1mYw==
+X-Received: from pfbfb27.prod.google.com ([2002:a05:6a00:2d9b:b0:82f:b45c:d628])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3386:b0:82a:15a1:14d
+ with SMTP id d2e1a72fcca58-8352c49fe18mr1342620b3a.14.1777691648564; Fri, 01
+ May 2026 20:14:08 -0700 (PDT)
+Date: Sat,  2 May 2026 03:12:55 +0000
 In-Reply-To: <20260502031401.3557229-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,15 +76,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260502031401.3557229-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260502031401.3557229-2-kuniyu@google.com>
-Subject: [PATCH v1 net-next 01/15] udp_tunnel: Pass struct sock to udp_tunnel_sock_release().
+Message-ID: <20260502031401.3557229-3-kuniyu@google.com>
+Subject: [PATCH v1 net-next 02/15] udp_tunnel: Pass struct sock to setup_udp_tunnel_sock().
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>
 Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
 	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: C71504B0C13
+X-Rspamd-Queue-Id: 775DA4B0C1C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
@@ -93,7 +93,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -103,7 +103,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283348-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283349-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -113,313 +113,276 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
 None of the udp_tunnel users need struct socket in their
 fast paths; it is only used for tunnel setup / teardown.
 
-While the UDP tunnel interface accepts struct socket, this
-encourages users to store the pointer unnecessarily.  This
-leads to extra dereferences when accessing struct sock fields
-(e.g., sk->sk_user_data instead of sock->sk->sk_user_data).
+Even setup_udp_tunnel_sock() does not need struct socket.
 
-Furthermore, these dereferences necessitate synchronize_rcu()
-in udp_tunnel_sock_release() to protect the fast paths from
-sock_orphan() setting sk->sk_socket to NULL.
-
-This overhead can be avoided if users store the struct sock
-pointer directly in their private structures.
-
-As a prep, let's change udp_tunnel_sock_release() to take
-struct sock instead of struct socket.
+Let's change setup_udp_tunnel_sock() to take struct sock
+instead of struct socket.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- drivers/infiniband/sw/rxe/rxe_net.c | 4 ++--
- drivers/infiniband/sw/rxe/rxe_ns.c  | 4 ++--
+ drivers/infiniband/sw/rxe/rxe_net.c | 2 +-
  drivers/net/amt.c                   | 2 +-
  drivers/net/bareudp.c               | 2 +-
  drivers/net/geneve.c                | 2 +-
- drivers/net/gtp.c                   | 6 +++---
+ drivers/net/gtp.c                   | 4 ++--
+ drivers/net/ovpn/udp.c              | 2 +-
  drivers/net/pfcp.c                  | 2 +-
- drivers/net/vxlan/vxlan_core.c      | 4 ++--
+ drivers/net/vxlan/vxlan_core.c      | 2 +-
  drivers/net/wireguard/socket.c      | 4 ++--
  include/net/udp_tunnel.h            | 2 +-
- net/ipv4/fou_core.c                 | 7 ++-----
- net/ipv4/udp_tunnel_core.c          | 6 ++++--
- net/sctp/protocol.c                 | 6 +++---
- net/tipc/udp_media.c                | 4 ++--
- 14 files changed, 27 insertions(+), 28 deletions(-)
+ net/ipv4/fou_core.c                 | 2 +-
+ net/ipv4/udp_tunnel_core.c          | 4 +---
+ net/l2tp/l2tp_core.c                | 2 +-
+ net/rxrpc/local_object.c            | 2 +-
+ net/sctp/protocol.c                 | 4 ++--
+ net/tipc/udp_media.c                | 2 +-
+ 16 files changed, 19 insertions(+), 21 deletions(-)
 
 diff --git a/drivers/infiniband/sw/rxe/rxe_net.c b/drivers/infiniband/sw/rxe/rxe_net.c
-index 50a2cb5405e2..b454e4a17997 100644
+index b454e4a17997..082ff387d081 100644
 --- a/drivers/infiniband/sw/rxe/rxe_net.c
 +++ b/drivers/infiniband/sw/rxe/rxe_net.c
-@@ -288,7 +288,7 @@ static struct socket *rxe_setup_udp_tunnel(struct net *net, __be16 port,
+@@ -283,7 +283,7 @@ static struct socket *rxe_setup_udp_tunnel(struct net *net, __be16 port,
+ 	tnl_cfg.encap_rcv = rxe_udp_encap_recv;
+ 
+ 	/* Setup UDP tunnel */
+-	setup_udp_tunnel_sock(net, sock, &tnl_cfg);
++	setup_udp_tunnel_sock(net, sock->sk, &tnl_cfg);
+ 
  	return sock;
  }
- 
--static void rxe_release_udp_tunnel(struct socket *sk)
-+static void rxe_release_udp_tunnel(struct sock *sk)
- {
- 	if (sk)
- 		udp_tunnel_sock_release(sk);
-@@ -636,7 +636,7 @@ static void rxe_sock_put(struct sock *sk,
- 	if (refcount_read(&sk->sk_refcnt) > SK_REF_FOR_TUNNEL) {
- 		__sock_put(sk);
- 	} else {
--		rxe_release_udp_tunnel(sk->sk_socket);
-+		rxe_release_udp_tunnel(sk);
- 		sk = NULL;
- 		set_sk(net, sk);
- 	}
-diff --git a/drivers/infiniband/sw/rxe/rxe_ns.c b/drivers/infiniband/sw/rxe/rxe_ns.c
-index 8b9d734229b2..64621c89f8bf 100644
---- a/drivers/infiniband/sw/rxe/rxe_ns.c
-+++ b/drivers/infiniband/sw/rxe/rxe_ns.c
-@@ -47,7 +47,7 @@ static void rxe_ns_exit(struct net *net)
- 	rcu_read_unlock();
- 	if (sk) {
- 		rcu_assign_pointer(ns_sk->rxe_sk4, NULL);
--		udp_tunnel_sock_release(sk->sk_socket);
-+		udp_tunnel_sock_release(sk);
- 	}
- 
- #if IS_ENABLED(CONFIG_IPV6)
-@@ -56,7 +56,7 @@ static void rxe_ns_exit(struct net *net)
- 	rcu_read_unlock();
- 	if (sk) {
- 		rcu_assign_pointer(ns_sk->rxe_sk6, NULL);
--		udp_tunnel_sock_release(sk->sk_socket);
-+		udp_tunnel_sock_release(sk);
- 	}
- #endif
- }
 diff --git a/drivers/net/amt.c b/drivers/net/amt.c
-index f2f3139e38a5..fc415072864b 100644
+index fc415072864b..c03aa7c207e6 100644
 --- a/drivers/net/amt.c
 +++ b/drivers/net/amt.c
-@@ -3032,7 +3032,7 @@ static int amt_dev_stop(struct net_device *dev)
- 	RCU_INIT_POINTER(amt->sock, NULL);
- 	synchronize_net();
- 	if (sock)
--		udp_tunnel_sock_release(sock);
-+		udp_tunnel_sock_release(sock->sk);
+@@ -2979,7 +2979,7 @@ static int amt_socket_create(struct amt_dev *amt)
+ 	tunnel_cfg.encap_rcv = amt_rcv;
+ 	tunnel_cfg.encap_err_lookup = amt_err_lookup;
+ 	tunnel_cfg.encap_destroy = NULL;
+-	setup_udp_tunnel_sock(amt->net, sock, &tunnel_cfg);
++	setup_udp_tunnel_sock(amt->net, sock->sk, &tunnel_cfg);
  
- 	cancel_work_sync(&amt->event_wq);
- 	for (i = 0; i < AMT_MAX_EVENTS; i++) {
+ 	rcu_assign_pointer(amt->sock, sock);
+ 	return 0;
 diff --git a/drivers/net/bareudp.c b/drivers/net/bareudp.c
-index da5866ba0699..f3025a5c5261 100644
+index f3025a5c5261..169ab90393cc 100644
 --- a/drivers/net/bareudp.c
 +++ b/drivers/net/bareudp.c
-@@ -290,7 +290,7 @@ static void bareudp_sock_release(struct bareudp_dev *bareudp)
- 	sock = bareudp->sock;
- 	rcu_assign_pointer(bareudp->sock, NULL);
- 	synchronize_net();
--	udp_tunnel_sock_release(sock);
-+	udp_tunnel_sock_release(sock->sk);
- }
+@@ -268,7 +268,7 @@ static int bareudp_socket_create(struct bareudp_dev *bareudp, __be16 port)
+ 	tunnel_cfg.encap_rcv = bareudp_udp_encap_recv;
+ 	tunnel_cfg.encap_err_lookup = bareudp_err_lookup;
+ 	tunnel_cfg.encap_destroy = NULL;
+-	setup_udp_tunnel_sock(bareudp->net, sock, &tunnel_cfg);
++	setup_udp_tunnel_sock(bareudp->net, sock->sk, &tunnel_cfg);
  
- static int bareudp_stop(struct net_device *dev)
+ 	rcu_assign_pointer(bareudp->sock, sock);
+ 	return 0;
 diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-index c6563367d382..8d55160305ee 100644
+index 8d55160305ee..c3a7736cd6fc 100644
 --- a/drivers/net/geneve.c
 +++ b/drivers/net/geneve.c
-@@ -1018,7 +1018,7 @@ static void __geneve_sock_release(struct geneve_sock *gs)
- 
- 	list_del(&gs->list);
- 	udp_tunnel_notify_del_rx_port(gs->sock, UDP_TUNNEL_TYPE_GENEVE);
--	udp_tunnel_sock_release(gs->sock);
-+	udp_tunnel_sock_release(gs->sock->sk);
- 	kfree_rcu(gs, rcu);
+@@ -1006,7 +1006,7 @@ static struct geneve_sock *geneve_socket_create(struct net *net, __be16 port,
+ 	tunnel_cfg.encap_rcv = geneve_udp_encap_recv;
+ 	tunnel_cfg.encap_err_lookup = geneve_udp_encap_err_lookup;
+ 	tunnel_cfg.encap_destroy = NULL;
+-	setup_udp_tunnel_sock(net, sock, &tunnel_cfg);
++	setup_udp_tunnel_sock(net, sock->sk, &tunnel_cfg);
+ 	list_add(&gs->list, &gn->sock_list);
+ 	return gs;
  }
- 
 diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-index 5150f2e4f66b..064ce1029d33 100644
+index 064ce1029d33..a60ef32b35b8 100644
 --- a/drivers/net/gtp.c
 +++ b/drivers/net/gtp.c
-@@ -885,8 +885,8 @@ static void gtp_encap_disable_sock(struct sock *sk)
- static void gtp_encap_disable(struct gtp_dev *gtp)
- {
- 	if (gtp->sk_created) {
--		udp_tunnel_sock_release(gtp->sk0->sk_socket);
--		udp_tunnel_sock_release(gtp->sk1u->sk_socket);
-+		udp_tunnel_sock_release(gtp->sk0);
-+		udp_tunnel_sock_release(gtp->sk1u);
- 		gtp->sk_created = false;
- 		gtp->sk0 = NULL;
- 		gtp->sk1u = NULL;
-@@ -1451,7 +1451,7 @@ static int gtp_create_sockets(struct gtp_dev *gtp, const struct nlattr *nla,
+@@ -1434,7 +1434,7 @@ static struct sock *gtp_create_sock(int type, struct gtp_dev *gtp,
+ 	tuncfg.encap_rcv = gtp_encap_recv;
+ 	tuncfg.encap_destroy = NULL;
  
- 	sk1u = gtp_create_sock(UDP_ENCAP_GTP1U, gtp, nla, family);
- 	if (IS_ERR(sk1u)) {
--		udp_tunnel_sock_release(sk0->sk_socket);
-+		udp_tunnel_sock_release(sk0);
- 		return PTR_ERR(sk1u);
+-	setup_udp_tunnel_sock(net, sock, &tuncfg);
++	setup_udp_tunnel_sock(net, sock->sk, &tuncfg);
+ 
+ 	return sock->sk;
+ }
+@@ -1689,7 +1689,7 @@ static struct sock *gtp_encap_enable_socket(int fd, int type,
+ 	tuncfg.encap_rcv = gtp_encap_recv;
+ 	tuncfg.encap_destroy = gtp_encap_destroy;
+ 
+-	setup_udp_tunnel_sock(sock_net(sock->sk), sock, &tuncfg);
++	setup_udp_tunnel_sock(sock_net(sock->sk), sk, &tuncfg);
+ 
+ out_rel_sock:
+ 	release_sock(sock->sk);
+diff --git a/drivers/net/ovpn/udp.c b/drivers/net/ovpn/udp.c
+index 059e896b4a2f..493a5a0744af 100644
+--- a/drivers/net/ovpn/udp.c
++++ b/drivers/net/ovpn/udp.c
+@@ -399,7 +399,7 @@ int ovpn_udp_socket_attach(struct ovpn_socket *ovpn_sock, struct socket *sock,
+ 	if (!old_data) {
+ 		/* socket is currently unused - we can take it */
+ 		rcu_read_unlock();
+-		setup_udp_tunnel_sock(sock_net(ovpn_sock->sk), sock, &cfg);
++		setup_udp_tunnel_sock(sock_net(ovpn_sock->sk), sock->sk, &cfg);
+ 		return 0;
  	}
  
 diff --git a/drivers/net/pfcp.c b/drivers/net/pfcp.c
-index 28e6bc4a1f14..ce58038cfccb 100644
+index ce58038cfccb..870137695e8a 100644
 --- a/drivers/net/pfcp.c
 +++ b/drivers/net/pfcp.c
-@@ -104,7 +104,7 @@ static int pfcp_encap_recv(struct sock *sk, struct sk_buff *skb)
+@@ -172,7 +172,7 @@ static struct socket *pfcp_create_sock(struct pfcp_dev *pfcp)
+ 	tuncfg.encap_rcv = pfcp_encap_recv;
+ 	tuncfg.encap_type = 1;
  
- static void pfcp_del_sock(struct pfcp_dev *pfcp)
- {
--	udp_tunnel_sock_release(pfcp->sock);
-+	udp_tunnel_sock_release(pfcp->sock->sk);
- 	pfcp->sock = NULL;
+-	setup_udp_tunnel_sock(net, sock, &tuncfg);
++	setup_udp_tunnel_sock(net, sock->sk, &tuncfg);
+ 
+ 	return sock;
  }
- 
 diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index e88798497503..1d1aba1c7cfc 100644
+index 1d1aba1c7cfc..394801c068b3 100644
 --- a/drivers/net/vxlan/vxlan_core.c
 +++ b/drivers/net/vxlan/vxlan_core.c
-@@ -1519,13 +1519,13 @@ static void vxlan_sock_release(struct vxlan_dev *vxlan)
- 		vxlan_vs_del_dev(vxlan);
- 
- 	if (__vxlan_sock_release_prep(sock4)) {
--		udp_tunnel_sock_release(sock4->sock);
-+		udp_tunnel_sock_release(sock4->sock->sk);
- 		kfree(sock4);
+@@ -3620,7 +3620,7 @@ static struct vxlan_sock *vxlan_socket_create(struct net *net, bool ipv6,
+ 		tunnel_cfg.gro_complete = vxlan_gro_complete;
  	}
  
- #if IS_ENABLED(CONFIG_IPV6)
- 	if (__vxlan_sock_release_prep(sock6)) {
--		udp_tunnel_sock_release(sock6->sock);
-+		udp_tunnel_sock_release(sock6->sock->sk);
- 		kfree(sock6);
- 	}
- #endif
+-	setup_udp_tunnel_sock(net, sock, &tunnel_cfg);
++	setup_udp_tunnel_sock(net, sock->sk, &tunnel_cfg);
+ 
+ 	return vs;
+ }
 diff --git a/drivers/net/wireguard/socket.c b/drivers/net/wireguard/socket.c
-index c362c78d908e..4a4c177af170 100644
+index 4a4c177af170..0028ef17dc71 100644
 --- a/drivers/net/wireguard/socket.c
 +++ b/drivers/net/wireguard/socket.c
-@@ -335,7 +335,7 @@ static void sock_free(struct sock *sock)
- 	if (unlikely(!sock))
- 		return;
- 	sk_clear_memalloc(sock);
--	udp_tunnel_sock_release(sock->sk_socket);
-+	udp_tunnel_sock_release(sock);
- }
+@@ -389,7 +389,7 @@ int wg_socket_init(struct wg_device *wg, u16 port)
+ 		goto out;
+ 	}
+ 	set_sock_opts(new4);
+-	setup_udp_tunnel_sock(net, new4, &cfg);
++	setup_udp_tunnel_sock(net, new4->sk, &cfg);
  
- static void set_sock_opts(struct socket *sock)
-@@ -396,7 +396,7 @@ int wg_socket_init(struct wg_device *wg, u16 port)
- 		port6.local_udp_port = inet_sk(new4->sk)->inet_sport;
- 		ret = udp_sock_create(net, &port6, &new6);
- 		if (ret < 0) {
--			udp_tunnel_sock_release(new4);
-+			udp_tunnel_sock_release(new4->sk);
- 			if (ret == -EADDRINUSE && !port && retries++ < 100)
- 				goto retry;
- 			pr_err("%s: Could not create IPv6 socket\n",
+ #if IS_ENABLED(CONFIG_IPV6)
+ 	if (ipv6_mod_enabled()) {
+@@ -404,7 +404,7 @@ int wg_socket_init(struct wg_device *wg, u16 port)
+ 			goto out;
+ 		}
+ 		set_sock_opts(new6);
+-		setup_udp_tunnel_sock(net, new6, &cfg);
++		setup_udp_tunnel_sock(net, new6->sk, &cfg);
+ 	}
+ #endif
+ 
 diff --git a/include/net/udp_tunnel.h b/include/net/udp_tunnel.h
-index 47c23d4a1740..dbbd56280f50 100644
+index dbbd56280f50..49324e28ec27 100644
 --- a/include/net/udp_tunnel.h
 +++ b/include/net/udp_tunnel.h
-@@ -176,7 +176,7 @@ static inline void udp_tunnel_set_inner_protocol(struct sk_buff *skb,
- 		skb_set_inner_protocol(skb, inner_proto);
- }
+@@ -94,7 +94,7 @@ struct udp_tunnel_sock_cfg {
+ };
  
--void udp_tunnel_sock_release(struct socket *sock);
-+void udp_tunnel_sock_release(struct sock *sk);
+ /* Setup the given (UDP) sock to receive UDP encapsulated packets */
+-void setup_udp_tunnel_sock(struct net *net, struct socket *sock,
++void setup_udp_tunnel_sock(struct net *net, struct sock *sk,
+ 			   struct udp_tunnel_sock_cfg *sock_cfg);
  
- struct rtable *udp_tunnel_dst_lookup(struct sk_buff *skb,
- 				     struct net_device *dev,
+ /* -- List of parsable UDP tunnel types --
 diff --git a/net/ipv4/fou_core.c b/net/ipv4/fou_core.c
-index 5bae3cf7fe76..422f86291b42 100644
+index 422f86291b42..6bed0e1dbe0e 100644
 --- a/net/ipv4/fou_core.c
 +++ b/net/ipv4/fou_core.c
-@@ -558,11 +558,8 @@ static int fou_add_to_port_list(struct net *net, struct fou *fou,
+@@ -615,7 +615,7 @@ static int fou_create(struct net *net, struct fou_cfg *cfg,
+ 		goto error;
+ 	}
  
- static void fou_release(struct fou *fou)
- {
--	struct socket *sock = fou->sock;
--
- 	list_del(&fou->list);
--	udp_tunnel_sock_release(sock);
--
-+	udp_tunnel_sock_release(fou->sock->sk);
- 	kfree_rcu(fou, rcu);
- }
+-	setup_udp_tunnel_sock(net, sock, &tunnel_cfg);
++	setup_udp_tunnel_sock(net, sk, &tunnel_cfg);
  
-@@ -634,7 +631,7 @@ static int fou_create(struct net *net, struct fou_cfg *cfg,
- error:
- 	kfree(fou);
- 	if (sock)
--		udp_tunnel_sock_release(sock);
-+		udp_tunnel_sock_release(sock->sk);
+ 	sk->sk_allocation = GFP_ATOMIC;
  
- 	return err;
- }
 diff --git a/net/ipv4/udp_tunnel_core.c b/net/ipv4/udp_tunnel_core.c
-index b1f667c52cb2..1159a6a6fbb2 100644
+index 1159a6a6fbb2..3090b4745d47 100644
 --- a/net/ipv4/udp_tunnel_core.c
 +++ b/net/ipv4/udp_tunnel_core.c
-@@ -195,9 +195,11 @@ void udp_tunnel_xmit_skb(struct rtable *rt, struct sock *sk, struct sk_buff *skb
+@@ -68,11 +68,9 @@ static bool sk_saddr_any(struct sock *sk)
+ #endif
  }
- EXPORT_SYMBOL_GPL(udp_tunnel_xmit_skb);
  
--void udp_tunnel_sock_release(struct socket *sock)
-+void udp_tunnel_sock_release(struct sock *sk)
+-void setup_udp_tunnel_sock(struct net *net, struct socket *sock,
++void setup_udp_tunnel_sock(struct net *net, struct sock *sk,
+ 			   struct udp_tunnel_sock_cfg *cfg)
  {
--	rcu_assign_sk_user_data(sock->sk, NULL);
-+	struct socket *sock = sk->sk_socket;
-+
-+	rcu_assign_sk_user_data(sk, NULL);
- 	synchronize_rcu();
- 	kernel_sock_shutdown(sock, SHUT_RDWR);
- 	sock_release(sock);
+-	struct sock *sk = sock->sk;
+-
+ 	/* Disable multicast loopback */
+ 	inet_clear_bit(MC_LOOP, sk);
+ 
+diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
+index 157fc23ce4e1..cbc5a3e57b33 100644
+--- a/net/l2tp/l2tp_core.c
++++ b/net/l2tp/l2tp_core.c
+@@ -1683,7 +1683,7 @@ int l2tp_tunnel_register(struct l2tp_tunnel *tunnel, struct net *net,
+ 			.encap_destroy = l2tp_udp_encap_destroy,
+ 		};
+ 
+-		setup_udp_tunnel_sock(net, sock, &udp_cfg);
++		setup_udp_tunnel_sock(net, sock->sk, &udp_cfg);
+ 	}
+ 
+ 	sk->sk_allocation = GFP_ATOMIC;
+diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
+index 111f574fe667..169f9dfdaa77 100644
+--- a/net/rxrpc/local_object.c
++++ b/net/rxrpc/local_object.c
+@@ -194,7 +194,7 @@ static int rxrpc_open_socket(struct rxrpc_local *local, struct net *net)
+ 	tuncfg.encap_rcv = rxrpc_encap_rcv;
+ 	tuncfg.encap_err_rcv = rxrpc_encap_err_rcv;
+ 	tuncfg.sk_user_data = local;
+-	setup_udp_tunnel_sock(net, local->socket, &tuncfg);
++	setup_udp_tunnel_sock(net, local->socket->sk, &tuncfg);
+ 
+ 	/* set the socket up */
+ 	usk = local->socket->sk;
 diff --git a/net/sctp/protocol.c b/net/sctp/protocol.c
-index 5800e7ee7ea0..ffe594ad4414 100644
+index ffe594ad4414..5c6fa8e8d34d 100644
 --- a/net/sctp/protocol.c
 +++ b/net/sctp/protocol.c
-@@ -878,7 +878,7 @@ int sctp_udp_sock_start(struct net *net)
- 	err = udp_sock_create(net, &udp_conf, &sock);
- 	if (err) {
- 		pr_err("Failed to create the SCTP UDP tunneling v6 sock\n");
--		udp_tunnel_sock_release(net->sctp.udp4_sock->sk_socket);
-+		udp_tunnel_sock_release(net->sctp.udp4_sock);
- 		net->sctp.udp4_sock = NULL;
- 		return err;
- 	}
-@@ -896,11 +896,11 @@ int sctp_udp_sock_start(struct net *net)
- void sctp_udp_sock_stop(struct net *net)
- {
- 	if (net->sctp.udp4_sock) {
--		udp_tunnel_sock_release(net->sctp.udp4_sock->sk_socket);
-+		udp_tunnel_sock_release(net->sctp.udp4_sock);
- 		net->sctp.udp4_sock = NULL;
- 	}
- 	if (net->sctp.udp6_sock) {
--		udp_tunnel_sock_release(net->sctp.udp6_sock->sk_socket);
-+		udp_tunnel_sock_release(net->sctp.udp6_sock);
- 		net->sctp.udp6_sock = NULL;
- 	}
- }
+@@ -864,7 +864,7 @@ int sctp_udp_sock_start(struct net *net)
+ 	tuncfg.encap_type = 1;
+ 	tuncfg.encap_rcv = sctp_udp_rcv;
+ 	tuncfg.encap_err_lookup = sctp_udp_v4_err;
+-	setup_udp_tunnel_sock(net, sock, &tuncfg);
++	setup_udp_tunnel_sock(net, sock->sk, &tuncfg);
+ 	net->sctp.udp4_sock = sock->sk;
+ 
+ #if IS_ENABLED(CONFIG_IPV6)
+@@ -886,7 +886,7 @@ int sctp_udp_sock_start(struct net *net)
+ 	tuncfg.encap_type = 1;
+ 	tuncfg.encap_rcv = sctp_udp_rcv;
+ 	tuncfg.encap_err_lookup = sctp_udp_v6_err;
+-	setup_udp_tunnel_sock(net, sock, &tuncfg);
++	setup_udp_tunnel_sock(net, sock->sk, &tuncfg);
+ 	net->sctp.udp6_sock = sock->sk;
+ #endif
+ 
 diff --git a/net/tipc/udp_media.c b/net/tipc/udp_media.c
-index 2c66b356025a..d7c050ff5804 100644
+index d7c050ff5804..0db172f1a41a 100644
 --- a/net/tipc/udp_media.c
 +++ b/net/tipc/udp_media.c
-@@ -793,7 +793,7 @@ static int tipc_udp_enable(struct net *net, struct tipc_bearer *b,
+@@ -771,7 +771,7 @@ static int tipc_udp_enable(struct net *net, struct tipc_bearer *b,
+ 	tuncfg.encap_type = 1;
+ 	tuncfg.encap_rcv = tipc_udp_recv;
+ 	tuncfg.encap_destroy = NULL;
+-	setup_udp_tunnel_sock(net, ub->ubsock, &tuncfg);
++	setup_udp_tunnel_sock(net, ub->ubsock->sk, &tuncfg);
  
- free:
- 	dst_cache_destroy(&ub->rcast.dst_cache);
--	udp_tunnel_sock_release(ub->ubsock);
-+	udp_tunnel_sock_release(ub->ubsock->sk);
- err:
- 	kfree(ub);
- 	return err;
-@@ -815,7 +815,7 @@ static void cleanup_bearer(struct work_struct *work)
- 	tn = tipc_net(sock_net(ub->ubsock->sk));
- 
- 	dst_cache_destroy(&ub->rcast.dst_cache);
--	udp_tunnel_sock_release(ub->ubsock);
-+	udp_tunnel_sock_release(ub->ubsock->sk);
- 
- 	/* Note: could use a call_rcu() to avoid another synchronize_net() */
- 	synchronize_net();
+ 	err = dst_cache_init(&ub->rcast.dst_cache, GFP_ATOMIC);
+ 	if (err)
 -- 
 2.54.0.545.g6539524ca2-goog
 
