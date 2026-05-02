@@ -1,74 +1,96 @@
-Return-Path: <netdev+bounces-283427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283428-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CHYEKLkT9mnMSAIAu9opvQ
-	(envelope-from <netdev+bounces-283427-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 17:09:45 +0200
+	id GPmhLgcU9mnMSAIAu9opvQ
+	(envelope-from <netdev+bounces-283428-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 17:11:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB52F4B292A
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 17:09:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20F454B2968
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 17:11:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C4055300DE3A
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 15:08:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C8BEE302A6D0
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 15:09:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4971B366DB6;
-	Sat,  2 May 2026 15:08:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1AE93815F1;
+	Sat,  2 May 2026 15:09:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fg9+d/4X"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MpnIrw1h"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 219FB28488F;
-	Sat,  2 May 2026 15:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C4037C0FA
+	for <netdev@vger.kernel.org>; Sat,  2 May 2026 15:09:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777734533; cv=none; b=r8pdo7bXMNkHPSwucM9jHNk00o3X0Ys6QXCPNV7gv+umIOz0m1fgyBUyLbnSL8t8r8b0UArNltauEIu3T/uAJX8RtK/kLai7br710bp/b7+GdGPBN5DepkVhrIMhE+nY+1pZkV+Pv9hHDKLEAks/JE85WWQpMuIhyiDDM4fRzpM=
+	t=1777734568; cv=none; b=C/Atgy3mqjI4HjkhKW21WJ0jDBFcRcXQuvNrvzdlWGd2zjzGcIm/ADI11/KeIYxXNWU/ic2qF0ArvC4BJ+POJ5v+he2HWwBD5xryvwoMGWOgJoJDf1Xt9aZeKXZ4UljwqaEDhbvQOfDwzBtT0RVOvcdVDD0fP28tT96U33K/7K8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777734533; c=relaxed/simple;
-	bh=e+xLXGdEYxLgZ323ptVAsu7s9bXYjwxYRgM/sQDjECo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jA6JfkpFNZtp/L50JW7zMFpxW1ecQNqtnsf+Bli8aruaUk1vx2yGTxIr6rfKzfjjAOQGR4ACc4IpOO3oMyxb4m97NxmsoPtpqaDWnNPshsxnBS6NHD97G295biLHXVW26nYObomVIIdP8b2vaq1mPlyq5xdGBctr+upyAC3gLoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fg9+d/4X; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 800A5C19425;
-	Sat,  2 May 2026 15:08:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777734532;
-	bh=e+xLXGdEYxLgZ323ptVAsu7s9bXYjwxYRgM/sQDjECo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fg9+d/4XKgn65KJcALgx52hjbibflVP0oUjGuv13JKvvrSYRXT1nA67xqiIpEySnl
-	 n/2WJJ3/TTOXGejPzue/9waKnO3gDiLPIXoNM3gCxJtpugPnfB9jT3bJYhBBUpev/Q
-	 WVYRyAXtoAN6uIgrQ0pySakeKxbdYOCWZWa1MdbsqYoJe/OtvDPGY+7dgE2Poyy6cG
-	 pnHEsi0J5uEg/C0IC7jId3amRmYVMLKL4YOHBouvSHJS23eUZbAmIeASV7fXPG2jtz
-	 bpp2huuzeopVNuDAHffhaLzsej3iJDbiKFiDkwJSIHDf9mW57PgPzvdMcJDGF0iQE5
-	 KtOCKnlOsTpOw==
-From: Simon Horman <horms@kernel.org>
-To: longli@microsoft.com
-Cc: 'Simon Horman' <horms@kernel.org>,
-	kotaranov@microsoft.com,
+	s=arc-20240116; t=1777734568; c=relaxed/simple;
+	bh=uazcdPaE5njKmpLYawFPN4mUVC9ypP4hDv4opGgd7Iw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=i63czfT8fxM27dYzfcFLu0lLqxMFB5GFY8GiKoWPh9+/qm+6eqrd+WMuzeKWvix4UMzp3ri3mSCpcPt47KHnHuw6o5508C/v9zoO+Uv/NFJ7gYsJBOVQzhgKCWThTXxzIroe98fHUYzMVOZzNdnTEIS/6bR44o3Rp0q5mafWLGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MpnIrw1h; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-824c9da9928so1228965b3a.3
+        for <netdev@vger.kernel.org>; Sat, 02 May 2026 08:09:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777734564; x=1778339364; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uZCg2ntfiIQSDRsAzajTIBjeudz9C8jXIZXlecgKHlI=;
+        b=MpnIrw1h6hGrASr6P0bNa973sOIWzwfxBIpdAQRI/aHetUnIAYziAcHh0CMjxzd4e8
+         otAiR1fqCgIxW2LubpHI60XDQDSb61nVQwAaB9nmjsQxXdWlc7n2K3wswxc3FZyA2PpR
+         uKbnolmGxJOyB8WeJHYgtWowgE3tgxylcQYYnqxe24ZKl1nQ3Zc9VcNxdChtWebQ8684
+         uODeJhombxEVFnGeODR3kp63i79CfrTLMJC46prAyZL4HRzVfdMhEKSorF7FceWSDs57
+         0PJltxHx8kX7dn8xW7KDMWcoERpnYM9ElHAUCB1F58smJdynxv2zxRB1MVc8De0t1Oen
+         0iuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777734564; x=1778339364;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uZCg2ntfiIQSDRsAzajTIBjeudz9C8jXIZXlecgKHlI=;
+        b=sLX8kdwAtm/7+kJg9TT229zVkXBsFYL62zUtsT/uUwbeo6QuRh/TGSP0Xz3rovDq0r
+         Wge7JQokquTaBuUXVWyZGP/dwC8PI5AapY0gUGI1e4WppoaSMoOZEcbtuTV+Bys/VEqK
+         AySm4nTI597L5Xqv+4B6jZcciiURwoHIupQlaNEFNxY9RFoYcOV/S7TzQFG3U8LnVYav
+         wQ0Pzfbh6JvK0fcGpkgpk5NT72lWEXTwbLq51N+mIHc4UR2/Djs6dTQJHVoflWEcqLxm
+         oAGKpEanwLz6KxxHDqlB8lzOMnmETrb7DJTcujRItGYloSKmayZ59AaMR80/UhUEFV7i
+         BK+A==
+X-Forwarded-Encrypted: i=1; AFNElJ+QZ7NjM9nALruPC50ZXP2tcCMAgskl1pYMAmLCs9vmpDDU8T055r9WcfkdgUmSfALr5XVs4S4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8wr1nyW91zm1251dCdXOxX8ulashYsL9UlUSa9aKQTiqQ8EuU
+	D+/4eRaob5DPsCN57KGWYWopTCpwfRxGPMVAYtrqcPZiWjlC54HLeAT8
+X-Gm-Gg: AeBDieuIvkoDkp6xR0wBUtytH2RK4/HcyYuEtZEVTPsThocovR1DJOqZpIycDxLiNrG
+	lgmk8MMYJdOr4n5dKBynegnDUwhjpNxNBMY1o+nMOH+96oM8c+x7FTYGVGaY+6NygMQZj/yOFMa
+	fCzl4oruqk1xXugX/TGFfwFPU813RPHnjz6IGL4I9ogz34CzHHQIvURkrcahi9VVcLdd9bOucCA
+	+EGs1G/aPrb1FFGQeEALd0NDGW2NduuJbY1rucu4LYMOBQsdyls/n/XFayuv10aREt9tYuJr0Oh
+	AETH/iaZexZj8A9GOSbA+oHY9IyJvvlKJYrDPjp4jRy19FbuCrqTpTQNxtbeh7NfNggXlcY6/Om
+	4kMvUZxGfYPh8xMaxY7c2F+kl2uROr4Yv8Pgfzx6ERy/xSR+pF7/o+giMuJRXjfgT73NRmgsYI8
+	kgqXC2Smc4ryKhESCF3t+lEEfL9/7ZWKR0zmFMjtMBFfHm8bgo9f8XNoVD
+X-Received: by 2002:a05:6a21:6d95:b0:3a1:90ef:7e46 with SMTP id adf61e73a8af0-3a7f1bc4197mr3551311637.33.1777734563683;
+        Sat, 02 May 2026 08:09:23 -0700 (PDT)
+Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83515833ee3sm6080310b3a.11.2026.05.02.08.09.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 02 May 2026 08:09:23 -0700 (PDT)
+From: Maoyi Xie <maoyixie.tju@gmail.com>
+X-Google-Original-From: Maoyi Xie <maoyi.xie@ntu.edu.sg>
+To: davem@davemloft.net,
 	kuba@kernel.org,
-	davem@davemloft.net,
 	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	jgg@ziepe.ca,
-	leon@kernel.org,
-	haiyangz@microsoft.com,
-	kys@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
+	edumazet@google.com
+Cc: dsahern@kernel.org,
+	kuznet@ms2.inr.ac.ru,
+	willemb@google.com,
+	willemdebruijn.kernel@gmail.com,
 	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v6 2/6] net: mana: Query device capabilities and configure MSI-X sharing for EQs
-Date: Sat,  2 May 2026 16:08:35 +0100
-Message-ID: <20260502150835.281887-1-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260429221625.1841150-3-longli@microsoft.com>
-References: <20260429221625.1841150-3-longli@microsoft.com>
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net v6] ipv6: flowlabel: enforce per-netns limit for unprivileged callers
+Date: Sat,  2 May 2026 23:09:18 +0800
+Message-Id: <20260502150918.4171847-1-maoyi.xie@ntu.edu.sg>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,132 +98,180 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: EB52F4B292A
+X-Rspamd-Queue-Id: 20F454B2968
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	TAGGED_FROM(0.00)[bounces-283427-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283428-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,ms2.inr.ac.ru,google.com,gmail.com,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-0.991];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FROM_HAS_DN(0.00)[]
 
-From: 'Simon Horman' <horms@kernel.org>
+fl_size, fl_ht and ip6_fl_lock in net/ipv6/ip6_flowlabel.c are file
+scope and shared across netns. mem_check() reads fl_size to decide
+whether to deny non-CAP_NET_ADMIN callers; capable() runs against
+init_user_ns, so an unprivileged user in any non-init userns can
+push fl_size past FL_MAX_SIZE - FL_MAX_SIZE/4 and starve every
+other unprivileged userns on the host.
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
+Add struct netns_ipv6::flowlabel_count, bumped and decremented next
+to fl_size in fl_intern, ip6_fl_gc and ip6_fl_purge. The new field
+is placed in the existing 4-byte hole after ipmr_seq, so struct
+netns_ipv6 stays the same size on 64-bit builds.
+
+Bump FL_MAX_SIZE from 4096 to 8192. It has been 4096 since the file
+was added; machines and connection counts have grown.
+
+mem_check() folds an extra per-netns ceiling into the existing
+non-CAP_NET_ADMIN conditional. The ceiling is half of the total
+budget that unprivileged callers have ever been able to use, i.e.
+(FL_MAX_SIZE - FL_MAX_SIZE/4) / 2 = 3072 entries. With FL_MAX_SIZE
+doubled, this preserves the original per-user reach (~3K, what an
+unprivileged caller could already obtain before this change) while
+forcing an attacker to spread allocations across at least two
+netns to exhaust the global non-CAP_NET_ADMIN budget.
+
+CAP_NET_ADMIN against init_user_ns still bypasses both caps.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Suggested-by: Willem de Bruijn <willemb@google.com>
+Cc: stable@vger.kernel.org # v5.15+
+Signed-off-by: Maoyi Xie <maoyi.xie@ntu.edu.sg>
 ---
-net: mana: Query device capabilities and configure MSI-X sharing for EQs
+v6 (this submission, addressing v5 review by Willem):
+    - Rebased onto current net (resolves the conflict on
+      include/net/netns/ipv6.h that v5 hit. ipmr_seq is now
+      atomic_t but remains 4 bytes, so flowlabel_count still
+      fills the 4-byte hole after it).
+    - Restored fl_free() to its original position in both
+      ip6_fl_gc() and ip6_fl_purge(). v5 had moved fl_free()
+      after the new atomic_dec() to avoid the use-after-free
+      on fl->fl_net. v6 instead caches fl->fl_net into a
+      local before fl_free() in ip6_fl_gc(), and uses the
+      net argument already in scope in ip6_fl_purge().
+v5: replaced the per-netns ceiling FL_MAX_SIZE/8 with the
+    computed unpriv_user_limit = (FL_MAX_SIZE - FL_MAX_SIZE/4)/2,
+    which evaluates to 3072. v4's FL_MAX_SIZE/8 = 1024 would
+    have reduced the per-user budget below the ~3K an
+    unprivileged caller could already obtain before any of
+    this work, defeating the reason FL_MAX_SIZE was doubled
+    in the first place.
+v4: addressed Willem's v3 review on netdev. Dropped the
+    flowlabel_has_excl cacheline argument in favour of "fills
+    the existing 4-byte hole after ipmr_seq", and reordered
+    atomic_dec(&...flowlabel_count) to sit immediately after
+    atomic_dec(&fl_size) in ip6_fl_gc and ip6_fl_purge.
+v3: addressed Willem's review on the private security@ thread.
+    Merged FL_MAX_SIZE doubling, dropped test data, moved
+    flowlabel_count near ipmr_seq, inlined fl->fl_net in
+    ip6_fl_gc.
+v2: per-netns counter + cap, sent to security@ as a 2-patch
+    series.
+v1: fix-shape sketch in original disclosure.
 
-When querying the device, this adjusts the max number of queues to allow
-dedicated MSI-X vectors for each vPort, clamping to no less than
-MANA_DEF_NUM_QUEUES. MSI-X sharing among vPorts is disabled by default
-and enabled only when there are not enough vectors. It also renames
-mana_query_device_cfg() to mana_gd_query_device_cfg().
+ include/net/netns/ipv6.h |  1 +
+ net/ipv6/ip6_flowlabel.c | 14 ++++++++++++--
+ 2 files changed, 13 insertions(+), 2 deletions(-)
 
-> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+diff --git a/include/net/netns/ipv6.h b/include/net/netns/ipv6.h
+index 499e42881..ef698f5fa 100644
+--- a/include/net/netns/ipv6.h
++++ b/include/net/netns/ipv6.h
+@@ -119,6 +119,7 @@ struct netns_ipv6 {
+ 	struct fib_notifier_ops	*notifier_ops;
+ 	struct fib_notifier_ops	*ip6mr_notifier_ops;
+ 	atomic_t		ipmr_seq;
++	atomic_t		flowlabel_count;
+ 	struct {
+ 		struct hlist_head head;
+ 		spinlock_t	lock;
+diff --git a/net/ipv6/ip6_flowlabel.c b/net/ipv6/ip6_flowlabel.c
+index c92f98c6f..28e43718d 100644
+--- a/net/ipv6/ip6_flowlabel.c
++++ b/net/ipv6/ip6_flowlabel.c
+@@ -36,7 +36,7 @@
+ /* FL hash table */
+ 
+ #define FL_MAX_PER_SOCK	32
+-#define FL_MAX_SIZE	4096
++#define FL_MAX_SIZE	8192
+ #define FL_HASH_MASK	255
+ #define FL_HASH(l)	(ntohl(l)&FL_HASH_MASK)
+ 
+@@ -161,9 +161,12 @@ static void ip6_fl_gc(struct timer_list *unused)
+ 					fl->expires = ttd;
+ 				ttd = fl->expires;
+ 				if (time_after_eq(now, ttd)) {
++					struct net *net = fl->fl_net;
++
+ 					*flp = fl->next;
+ 					fl_free(fl);
+ 					atomic_dec(&fl_size);
++					atomic_dec(&net->ipv6.flowlabel_count);
+ 					continue;
+ 				}
+ 				if (!sched || time_before(ttd, sched))
+@@ -197,6 +200,7 @@ static void __net_exit ip6_fl_purge(struct net *net)
+ 				*flp = fl->next;
+ 				fl_free(fl);
+ 				atomic_dec(&fl_size);
++				atomic_dec(&net->ipv6.flowlabel_count);
+ 				continue;
+ 			}
+ 			flp = &fl->next;
+@@ -245,6 +249,7 @@ static struct ip6_flowlabel *fl_intern(struct net *net,
+ 	fl->next = fl_ht[FL_HASH(fl->label)];
+ 	rcu_assign_pointer(fl_ht[FL_HASH(fl->label)], fl);
+ 	atomic_inc(&fl_size);
++	atomic_inc(&net->ipv6.flowlabel_count);
+ 	spin_unlock_bh(&ip6_fl_lock);
+ 	rcu_read_unlock();
+ 	return NULL;
+@@ -464,6 +469,9 @@ fl_create(struct net *net, struct sock *sk, struct in6_flowlabel_req *freq,
+ 
+ static int mem_check(struct sock *sk)
+ {
++	const int unpriv_total_limit = FL_MAX_SIZE - (FL_MAX_SIZE / 4);
++	const int unpriv_user_limit = unpriv_total_limit / 2;
++	struct net *net = sock_net(sk);
+ 	int room = FL_MAX_SIZE - atomic_read(&fl_size);
+ 	struct ipv6_fl_socklist *sfl;
+ 	int count = 0;
+@@ -478,7 +486,9 @@ static int mem_check(struct sock *sk)
+ 
+ 	if (room <= 0 ||
+ 	    ((count >= FL_MAX_PER_SOCK ||
+-	      (count > 0 && room < FL_MAX_SIZE/2) || room < FL_MAX_SIZE/4) &&
++	      (count > 0 && room < FL_MAX_SIZE/2) ||
++	      room < FL_MAX_SIZE/4 ||
++	      atomic_read(&net->ipv6.flowlabel_count) >= unpriv_user_limit) &&
+ 	     !capable(CAP_NET_ADMIN)))
+ 		return -ENOBUFS;
+ 
+-- 
+2.34.1
 
-[ ... ]
-
-> +	/*
-> +	 * Adjust gc->max_num_queues returned from the SOC to allow dedicated
-> +	 * MSIx for each vPort. Clamp to no less than MANA_DEF_NUM_QUEUES.
-> +	 */
-> +	max_num_queues = (gc->num_msix_usable - 1) / num_ports;
-> +	max_num_queues = roundup_pow_of_two(max(max_num_queues, 1U));
-
-Does rounding up here inflate max_num_queues and unnecessarily force MSI-X
-sharing?
-
-For example, if there are 63 usable MSIs and 2 ports, the division yields 31.
-Rounding up gives 32. The subsequent check below:
-
-> +	/*
-> +	 * Use dedicated MSIx for EQs whenever possible, use MSIx sharing for
-> +	 * Ethernet EQs when (max_num_queues * num_ports > num_msix_usable - 1)
-> +	 */
-> +	max_num_queues = min(gc->max_num_queues, max_num_queues);
-> +	if (max_num_queues * num_ports > gc->num_msix_usable - 1)
-> +		gc->msi_sharing = true;
-
-would then evaluate to true (32 * 2 > 63) and force the driver into MSI-X
-shared mode. This seems to contradict the intent to use dedicated MSI-X
-whenever possible.
-
-Would it be better to use rounddown_pow_of_two() instead to ensure the
-calculated queues fit within the available dedicated vectors?
-
-[ ... ]
-
-> @@ -1968,20 +2008,30 @@ static int mana_gd_setup(struct pci_dev *pdev)
->  	if (err)
->  		goto destroy_hwc;
->  
-> -	err = mana_gd_query_max_resources(pdev);
-> +	err = mana_gd_detect_devices(pdev);
->  	if (err)
->  		goto destroy_hwc;
->  
-> -	err = mana_gd_setup_remaining_irqs(pdev);
-> -	if (err) {
-> -		dev_err(gc->dev, "Failed to setup remaining IRQs: %d", err);
-> -		goto destroy_hwc;
-> -	}
-> -
-> -	err = mana_gd_detect_devices(pdev);
-> +	err = mana_gd_query_max_resources(pdev);
->  	if (err)
->  		goto destroy_hwc;
->  
-> +	if (!gc->msi_sharing) {
-> +		gc->msi_bitmap = bitmap_zalloc(gc->num_msix_usable, GFP_KERNEL);
-> +		if (!gc->msi_bitmap) {
-> +			err = -ENOMEM;
-> +			goto destroy_hwc;
-> +		}
-> +		/* Set bit for HWC */
-> +		set_bit(0, gc->msi_bitmap);
-> +	} else {
-> +		err = mana_gd_setup_remaining_irqs(pdev);
-> +		if (err) {
-> +			dev_err(gc->dev, "Failed to setup remaining IRQs: %d", err);
-> +			goto destroy_hwc;
-> +		}
-> +	}
-
-If msi_sharing is disabled, we allocate the msi_bitmap but skip calling
-mana_gd_setup_remaining_irqs(). 
-
-Since mana_gd_setup_hwc_irqs() only allocates a single vector for the hardware
-channel when dynamic allocation is supported, does this leave the device
-without interrupts for its Ethernet queues?
-
-If so, it seems this could lead to queue creation failures when the driver
-attempts to map uninitialized vectors. I notice this is fixed in a later patch
-in the series ("net: mana: Allocate interrupt context for each EQ when
-creating vPort"), but does leaving it out here break bisectability?
 
