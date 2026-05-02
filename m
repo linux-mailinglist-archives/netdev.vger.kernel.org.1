@@ -1,135 +1,135 @@
-Return-Path: <netdev+bounces-283448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283449-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id JnLvBc8y9mkLTAIAu9opvQ
-	(envelope-from <netdev+bounces-283448-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 19:22:23 +0200
+	id EOH8Oacz9mkgTAIAu9opvQ
+	(envelope-from <netdev+bounces-283449-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 19:25:59 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63D934B307C
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 19:22:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F8394B3098
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 19:25:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0F053300C008
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 17:22:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7CEA4300BDBB
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 17:25:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89A003033EA;
-	Sat,  2 May 2026 17:22:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 107C93033EA;
+	Sat,  2 May 2026 17:25:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hvP55usX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CyXm7Z6b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296D7155C97
-	for <netdev@vger.kernel.org>; Sat,  2 May 2026 17:22:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CEE0358D32
+	for <netdev@vger.kernel.org>; Sat,  2 May 2026 17:25:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777742540; cv=pass; b=prUuRuVzi8xOuMOkB8ukFvYRBPKlZUmzYDj73CkA0Qkmt26yh/hraOYQoMRtvOU450UfvjGPqzDnv4Kf78+ppmHEqffIy1oW2PoXFROrhKNUW8/igSvzZ9hsLDCaWzqhYiVlqJNwc0n1brqXFnmeopGoumicudYrkDaTAU7H+vI=
+	t=1777742756; cv=pass; b=jJ8kzFk/gkiAE4p4DNlqPr0lPkGXMtslU0/2qsaaV5nz72/zrhy9qn9SOhxGx4xUA0uXcOh2yJ5rH/JQ45kLdZ598ussKgDHME1MwhwCTVzEqKtJb54UY75leTJmfKztdE0vdef/NzOO07pZziFDAurrg3izBoP1pWfQFZ2p84Q=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777742540; c=relaxed/simple;
-	bh=hzlKEZieuX665PXRSN9cb5s5g1iCk0kMYnOSLzI3MII=;
+	s=arc-20240116; t=1777742756; c=relaxed/simple;
+	bh=zVLQpkyliinpbC1REK+CRGmV+piTDuhN1wWWCedvfwc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IbWJmhLJg0z28pfkvArIFuNXvbolvl+IiWA2CrWvbtgMeQ0ZKWNtdKUNwr3HP0ZBW9dypw3eDvrUs7lbQWnXFy/M6pDTNHaJrcju5vzcPC7IEgg/pwAeDwghdLdl3MFuRuuoSXNVBO1A6KZEnQ1n9F3wwjnFvjKSK8sbZhrQt58=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hvP55usX; arc=pass smtp.client-ip=209.85.160.182
+	 To:Cc:Content-Type; b=RS3twLP7dVdBN834eVfkxDsxK/V2+R5+hEDm2qDzmEVh1t3I3j0Gkg8+hr4ZWF2gVCifWjfH9wrpmlpjd6pjj+1AyrYQPWW7ABpUGoTvJIUJMg/dsI2tZ3cqL4lz3R/1Vk6UvZFLDFAl4yx/d+LvfmN5Cd2TR7ypKq+CPtVds9o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CyXm7Z6b; arc=pass smtp.client-ip=209.85.219.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-50fb18c55beso28443261cf.2
-        for <netdev@vger.kernel.org>; Sat, 02 May 2026 10:22:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777742538; cv=none;
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-8a4b8c3a30bso30818846d6.3
+        for <netdev@vger.kernel.org>; Sat, 02 May 2026 10:25:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777742755; cv=none;
         d=google.com; s=arc-20240605;
-        b=kfINLljWpc68iUBn2muBFuughNPIc51RHRZLjQwoWwDfNF8wHZQuN8NU3ChWzW8BQ8
-         oQ4sjbzUpxLuiTzR7sStF/97w+MulGdj5Pdui65R3UAXWdym/aJ7Qh+x8DHapx+QraTw
-         JFLPiZV1iMwH1HphrfuDVuwa8os6+oagg0KD7+CGC0Fp4zc9X3ABqpzrKGV8IKfsNFlb
-         kmtv2joyEO863X1K8RTWq/1EzBpVR9381u96NM0wcJJzfVK2TKJgADf4yzFqOFErMHIO
-         ebXuReVwKZUsjn5bHc39AOq37iihTOBXTN8ZKWecULQo1DKxJg+ojkL2H6uREUGW7bax
-         Aajg==
+        b=iWz9z2Wj41OdWspJIvtI7VsKNwL3kBRGiuLaHT17cB3FhBtxkmNr0xL3BOWZWd23Nk
+         tO2/QSJhMPGseQ7aX3zl+C3hddvFZ53upGHVbuI+vKpu52LVTGoJNW5S7e8wAq2sZ71F
+         oAojI1Nb3uAjWaAAQplDWpWsuPZ5IpEHckveCURVG3koKHmGPIfexqmUpdPGsCo4AGfc
+         tlJ2m6zWw5O0nAzgFp6wI22P88N83zKCKeifSi7usCLFzySf1AYM3J9hSEx/ofO1bjKH
+         XVRnIO2+5VRzsQilicYUIn79AI4rh0H0RnWPL63a21S2waXR0hghFbwb1WZRBeKTloyr
+         12Kw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=tpDLBzhforPHF1ldl2VfP3FW81cMY29j0SUvp1IkuNQ=;
-        fh=cSnMia7+t8AnTgIwSzT4yMHHU+51ijbfiWqgjJKc/LE=;
-        b=SPRq6hgYhM9nZurnRyNSzTo2uEpo+1Q83Jps2DSOIT/aQ3gwhnOwmzUXPrMa3qUhvd
-         INKCcxwRvpOym5An/35x9vHvoDWLkrQlYCLcG6v/E1u9sbWNr+CnpTPQuEKNSYId4IY2
-         1SHu89yQKDD6TPSYT6lrTd5M3yS3p61YMsjYYbN2hHV1eXlYvb/ZNm4crkZBETSTzCsI
-         QBffMi8MoZ5R4ZPPGtc0HpxotbyfimyDPN5NH+uMdiX4dZck3yJCTrDDsOz60iNxSJmi
-         zvXARZF53zDLILjpoe6sOcBC2uWV9BPSR0DsSmmnW4e5Z9pFpWfqbwrYo09XirAsMHwX
-         390A==;
+        bh=zVLQpkyliinpbC1REK+CRGmV+piTDuhN1wWWCedvfwc=;
+        fh=jq7Eb/XJ481woNKLA93pPeQOmzXLJ7tAxDuxf69Fi3s=;
+        b=fgM5zst8RUP5I4FHEZ/mz8DrikFC/v3GAzdfCDadQCGAfgOL36b6TFphzCba8jo8SO
+         sxYOjH5VrsAhb4Rif+uTEj9jpvT/8rRQHsqoxLUrU3Z2UtKWymmr0HquQsUijTDkM3VB
+         YaE+XNnr1aPjg8HClkPb7XciG12ygSluVg8O/6a/9EUSlcFxsODIYxOLVGVmeLC00QW/
+         +XFWjMLQD27AmTl38BE2ifAz5cdZHnRlARnksDEY4bWrVDqRVk9CxuLVloTg0fARA7hc
+         6ncg/muJR3JJ5K3I4qno6IZftGxEAFnltBqPPg21whCvVMESLhSZhsLiE4wpS+/be1Hg
+         +FWA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777742538; x=1778347338; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1777742755; x=1778347555; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tpDLBzhforPHF1ldl2VfP3FW81cMY29j0SUvp1IkuNQ=;
-        b=hvP55usXoEfD1InhOi317DiOA+YjwH/FpEdC+R/RfAZOJxcjLDDy8GCaSKEw5hBRUZ
-         PItCH84kpIerU8G0t36RNoLvSqtKbTSSTKVAKghm5/CWRAW/zoRcYwZW2hVNbA41Vhjg
-         1+KQl+oV1uVMHJoxtJ6UQFd8gfAD0z3INV3GTrX4uGwryKIC4DFYqQf/QarSdrheuT/F
-         jyX6NBPCuHIeYtXdecQzBCsgllYPoU33T03kOgrEFAohOPxiBPuOiWhdRYiZr6CeH0yV
-         /sKDL26IoaviUkk4fuHmDhy0EY9xR5WNFN6Wl72NzobwBs8qPp7TZcV2mkjUtPiUVxxf
-         Nv3w==
+        bh=zVLQpkyliinpbC1REK+CRGmV+piTDuhN1wWWCedvfwc=;
+        b=CyXm7Z6bqqbV0HWcCgqMPYUqG3jFbQb/Sq3cqvgCsyi5StUXfcPYU8GUiJxdikYzQA
+         6UEhOkj9nr6HTE2JMXOpzC4mJxlpW55bGg6eg6AeDYjJzrd8WcA2TpMu28qiBJntjTke
+         EupAw6XZDHQMQ7hJ7mm5aK5SMTtisggWkJuJYnHMl76pwQhrVpGg7miNeMEdrdAuF2Yy
+         vf2rpsDaErSMTJWyL/DHR7MPorBRgqQlr3bKsFWzBUOYBLNBUvcp7Gg56242YhTAobbJ
+         qZf3RwhgGZyekzpeSjZjZtRv+muVE52vFOjyQShI+mVWtDs0boMK+3kVR9ZWIpasqegZ
+         QZ2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777742538; x=1778347338;
+        d=1e100.net; s=20251104; t=1777742755; x=1778347555;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=tpDLBzhforPHF1ldl2VfP3FW81cMY29j0SUvp1IkuNQ=;
-        b=en2N0mHRAWmju1Bvydk6I03utGlDaMbYANEjJg8UBPkQbdgQNAzx4cOXpRxcSpuyiq
-         ndrVDA2Au78Jdt6OL2evVRD9y6PDnahW2iu2gO1cN7Immh4qUg2KHVIvpKvvMov/j2T6
-         1aKehEGBftExg1LYfAoClddRQfC/Sm1a2zPEcWd2rfKs13vCHwyL+0rpodCkFOraKOLh
-         asSFmCfhjxe8mqcTmw0TzEaNrCz2LXOjlEjAVvYKIOLjGLcv1Vk8UDQIgun7cyDr4uXk
-         bBpAxw8rGsaLywj67MVxun7O+SFuGNl0ZKnlP2kV+LJH/SDU7YkzwNmcQRWOCf/shD6F
-         /VQA==
-X-Forwarded-Encrypted: i=1; AFNElJ+JWjoDmwYYGJjMM7awIAwO6MbNZNJZD8WHaz1lC+fW0mK6yrA9dIx7E7YY5yZZKe6vYZPNAhI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYQsu2NfHxB3atQgI5ddRvyrrb+61L7unV8trBZq7dwZ54B43k
-	ZtSFL97B7w5CKyTz5IpyislM1OENWNM3n7WlglvBVzW9DdlXidefHmd6DMBcl/OUOMYQRvg4m9x
-	L9ZRR6zdTsv9aRX3QI+0M32AaucKtLf5FAkLktMw3
-X-Gm-Gg: AeBDietu9M1wwbGKc2qB0QXu3dB7krey0NwdclwwKSzwFkYtINqwEZ60o8eaLF8NXxs
-	w+cPm6cq8EsS0/3mPnRGdQxfcvkfIWWSnJt7LGm7B86dP1tvjUuUT2fwOCWpZ32MrDb+dLJO8O/
-	8BZ7Zirk2JtKooV78LVv9xn+HzhA5wCtqFDoMGMpy1JvrOSVSr+l3JKznZmpZYJPXJAL+ULQIBh
-	629YE9YUbfOE7wTXghtMgSRUEPKZRprys4/5vUhcIt0kIGE6WlZB9hmF562BHTWzlPGp6PWnRwR
-	gVY3Ow0UY/oB9JgpFrmMurvk8AEBInLXgHURnRBL558fECtrfuBA79yPN3/wNFLh8369NFePDWB
-	PrIcmM4rXS1oRPkfWBEY+/6Kw96nufFlGEgMbgq6Ejc2s/gXDDco=
-X-Received: by 2002:a05:622a:1ba9:b0:50d:e298:8f1c with SMTP id
- d75a77b69052e-5104bee9d67mr56732281cf.32.1777742537586; Sat, 02 May 2026
- 10:22:17 -0700 (PDT)
+        bh=zVLQpkyliinpbC1REK+CRGmV+piTDuhN1wWWCedvfwc=;
+        b=IjDGISxhXaQhRjXSB7bZts8K1lFNA0U3V5vNH5i66RuzaJeh/vrAF4kKecG5Mmy9ty
+         CxdK4vcPofxmNBOonDg9aPsQo5/rfo+UNumnNJnxNVM0/4HIx/qDt5Hkz/4RD59nTZTB
+         UnL/wcELj+BbKBPr/jzwmnjYjcCnxNX1wZog/Byjcm/JdoEKGIrBOUY22b9KJR35AHIp
+         VVJiPdyH4cNtyOVYOitNaF9yisqnlutRj7UrMSOT8eDE8TfytqcPQqAaXnGzu86UJDmr
+         N7BF+jzaJusTEU+8XDY8FlpTSfxN+jFkJL1QsWIapp+YdFiZXwhkJywVrqK2xAgJAdXt
+         Uk+g==
+X-Forwarded-Encrypted: i=1; AFNElJ+M79zYaeD6/rysqndGOAohwzUWF+d9TCYRC98XDcdaHaiEyClYcw2+RGn2Xsu23ODSaRDqfxk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywnilg9GKbU1Sv+J8rCiFeUe//2+o8u6PcOwLXHDi/nd9BHLjR9
+	RaEBAnwBIe9Bjahz7Dr3PyL+izbp3HXDrD9Ec+T7oqUmbaBlwrf161bYOVuK0W1Y6Kzy+8Os9fz
+	nsOQUwGjmgSS1CIpT7ARVodU5OKn2uLUVcxiIYYBr
+X-Gm-Gg: AeBDietU7tKHlUzlltv4jpDegUbgrVQIX04LlI7N7IitfTxmNCYohKnmLFJJgwx7Cex
+	y0aGsBu3hZKIKNhgrjCfeQMAhan93YSJifnj1EbEII2LBbnmyLDgCU3Z2rA9olO8I2fXbLEKfrf
+	1UTArChtdSnmbDWqFkDuiZ1S0qZ4Yk5uZL4hdV3negz80pAIS7ajJ8NS92dQhxhDsN6tjgBQEd3
+	6lL/1OhiqBGZxr/z/sHCgH5caYDuurOnBhhK11Ye6UQIduG6G4PNFC/CUjTqdf97SflpoUPUKzX
+	pVwIQYbGWoDKVoYS0BzFpTvIeRQlrmwYDCFAFSCq/ebT+X6RPjTXXR6kof4rLE0NZNAt1SCHDZ3
+	Kd4DH2TVIo31Ddtm7YvWWqN8b9fwN+c33MDFGAKZg
+X-Received: by 2002:a05:6214:4d06:b0:8ac:732b:6cf1 with SMTP id
+ 6a1803df08f44-8b6682579b0mr63611486d6.24.1777742754183; Sat, 02 May 2026
+ 10:25:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260501064247.2027688-1-edumazet@google.com>
-In-Reply-To: <20260501064247.2027688-1-edumazet@google.com>
+References: <20260428082851.3240821-1-edumazet@google.com> <18134b6e-8944-49f4-9bb0-2903aa00d28a@kernel.org>
+ <CAM0EoMmHMMsAbORxETh72c0=CyyAY+PhXReXwP-woGp31YOkHw@mail.gmail.com>
+In-Reply-To: <CAM0EoMmHMMsAbORxETh72c0=CyyAY+PhXReXwP-woGp31YOkHw@mail.gmail.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 2 May 2026 10:22:06 -0700
-X-Gm-Features: AVHnY4L76fhrJfXJkd1D6BOWRTJx4KdxOwHhYreGjEgXu0fFOu0Q1_XP70iJ-T0
-Message-ID: <CANn89iKeHvxWPR1QGLNZ1ruP9jTLxEtucxcYU2s0CVUkDe1L3A@mail.gmail.com>
-Subject: Re: [PATCH net-next] net/sched: taprio: prepare taprio_dump() for
- RTNL removal
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
+Date: Sat, 2 May 2026 10:25:42 -0700
+X-Gm-Features: AVHnY4L47nkTAPq5MfCrk33pCVRgDaDpC4mNVwoiv9u1569lQeB-LNtb9MeA3ho
+Message-ID: <CANn89iLTH=_=qYS6RzqpGeCo2FuuVW70h_yRycy2L59G+APiew@mail.gmail.com>
+Subject: Re: [PATCH iproute2-next] tc: use ll_init_map() only when needed
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: David Ahern <dsahern@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, 
+	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
 	netdev@vger.kernel.org, eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 63D934B307C
+X-Rspamd-Queue-Id: 4F8394B3098
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-283448-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,networkplumber.org,davemloft.net,redhat.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-283449-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -143,49 +143,37 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,mojatatu.com:email]
 
-On Thu, Apr 30, 2026 at 11:42=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
+On Thu, Apr 30, 2026 at 11:20=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com=
+> wrote:
+>
+> On Thu, Apr 30, 2026 at 11:36=E2=80=AFAM David Ahern <dsahern@kernel.org>=
  wrote:
+> >
+> > Jamal: waiting for your review ...
+> >
+> > On 4/28/26 2:28 AM, Eric Dumazet wrote:
+> > > Some setups can have thousands of devices.
+> > >
+> > > ll_init_map() is rather expensive for them.
+> > >
+> > > Only call ll_init_map() in the following cases:
+> > >
+> > > 1) tc runs in batch mode.
+> > > 2) tc runs in monitor mode.
+> > > 3) tc dumps qdiscs/classes/filters for all netdev.
+> > >
+> > > This greatly reduces RTNL pressure on common operations.
+> > >
+> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
 >
-> We soon will no longer hold RTNL in qdisc dumps.
+> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
 >
-> Add READ_ONCE()/WRITE_ONCE() annotations.
->
-> Note: taprio already uses RCU to protect most of its fields.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-I think sashiko feedback is a bit wrong.
+Gentle reminder, this patch has not been merged.
 
-<quote>
-Should the reads of q->flags in taprio_dump() also be annotated, given
-that the write side in taprio_change() is now using WRITE_ONCE()?
-The same expression reads q->flags twice:
-if (q->flags && nla_put_u32(skb, TCA_TAPRIO_ATTR_FLAGS, q->flags))
-and the earlier check in taprio_dump() also does a plain read:
-if (!FULL_OFFLOAD_IS_ENABLED(q->flags) &&
-nla_put_s32(skb, TCA_TAPRIO_ATTR_SCHED_CLOCKID, q->clockid))
-Without an annotation, is the compiler free to reload q->flags between
-the guard and the nla_put_u32() argument, so the guard could observe one
-value while the emitted attribute reflects a different one once RTNL is
-dropped from the dump path?
+I have other patches coming that depend on this one.
 
-</quote>
-
-My answer: q->flags can not be changed on a live taprio qdisc, it is
-set once (and the logic is even visible in the patch diff)
-
-<quote>
-On a related note, q->clockid is read in taprio_dump() as:
-nla_put_s32(skb, TCA_TAPRIO_ATTR_SCHED_CLOCKID, q->clockid)
-and written plainly in taprio_parse_clockid() (q->clockid =3D clockid;)
-and in taprio_init() (q->clockid =3D -1;).
-Is q->clockid intentionally left out of this preparation, or should it
-get READ_ONCE()/WRITE_ONCE() treatment along with q->flags and
-q->txtime_delay? If it is intentional, would a note in the commit
-message help explain why clockid is exempt?
-</quote>
-
-Same answer.  q->clockid can not change on a live taprio qdisc.
+Thanks!
 
