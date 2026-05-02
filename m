@@ -1,216 +1,158 @@
-Return-Path: <netdev+bounces-283391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283392-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4Ia7D3TF9Wk5OwIAu9opvQ
-	(envelope-from <netdev+bounces-283391-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 11:35:48 +0200
+	id WGSIHbHH9Wm8OwIAu9opvQ
+	(envelope-from <netdev+bounces-283392-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 11:45:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90EF04B189F
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 11:35:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3B874B18CE
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 11:45:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 51B6C30115BC
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 09:35:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1CBA1300F79F
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 09:45:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25FB030FC0F;
-	Sat,  2 May 2026 09:35:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E9B62F290B;
+	Sat,  2 May 2026 09:45:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="J45eh6Jr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G3RIta4S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A65E30EF97;
-	Sat,  2 May 2026 09:35:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D54B30FF2A
+	for <netdev@vger.kernel.org>; Sat,  2 May 2026 09:45:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777714542; cv=none; b=HlGZJdle4dJmL1Fchtx8jnBe+Hj4enBVQFpsL95ME5jXmPp74Sjuhax1V3z07xGyDdYpmbGrUd2F0Ts7UY6guEvHlf+w1fNOBCXCqOmA5mvCJvq95PSAmS7U//13ONeiNjRXAuFHNgSBCcq040kaf66akgNTPwj+83Jtj98cjh4=
+	t=1777715115; cv=none; b=ke0uB60HxtDQzqWWO4IR/WRyrBh0DYT3cM6MHZ7JFtERVa4QeE3YNQKymaD4K/We3l4ny9zJRq4zaxw3tBE8h//iH7IgGApd6D1ZHt24/mJediq0Qx1+2mjPDi4+4NOQsxk9FyAjiIZWH4UusUNQyKImQOjsld7si6efk7rXfZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777714542; c=relaxed/simple;
-	bh=Wz4Q/hX6nmO+cFQ0TpRkx6Ettzn+NjVNA6GnTV0eqew=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=mocMbyztq0VMxMIru6nCCVECZYVpIgfCDTkPJozeU7pNgeEIGwBEFiKfzZ4gaMxuuI1YH9C6LWAY9pbnVOQiquuMQX3/FvHoqDUtYJ0XzT5deh15AW0CcO9XpFzaF9limPg5V/0ApKm8DDdyjzxaNL6b+o9cSE4EwPg9j139TxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=J45eh6Jr; arc=none smtp.client-ip=80.241.56.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4g72nz4pppz9tyJ;
-	Sat,  2 May 2026 11:35:35 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1777714535;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YD62FYaG+7ooT7sr2cKJAZ5DvdUXH1HM8sfBS4QoUA8=;
-	b=J45eh6JrrVZdlBu3Wzaiadrr68NgOmaw5yCqFwlRVC4cddiPzQtt631SBsDWhIFUGvkydH
-	1jYIp3FdjNHV/G4D3dB7nbkRu6VpkUUqnd8vCVb+yGpxpINj/3k731k2sCBMZLZmCeEZtk
-	G9pDmSPvPf9nby1A8W77Jcgz+v65v7odnkXVEU5eGBa/q/1m0X0W9v9gOreJnYilpijO3B
-	R+CG2yCVmOgJLqNcONBrll71la4685hmnMcjK8Ajat1x44witE4AXIMLsaAg8sF5CkjugI
-	aMXLhdV5DPdgqKYRN5UvLkSP7Cito6CyHHJoMHYRHC/W+O4uz6LLfydo/SoWnw==
-Message-ID: <a43eea6c80e60351102cd722252b963a1eb7f013.camel@mailbox.org>
-Subject: Re: [PATCH 09/11] vfio: selftests: Add mlx5 driver - HW init and
- command interface
-From: Manuel Ebner <manuelebner@mailbox.org>
-To: Jason Gunthorpe <jgg@nvidia.com>, Alex Williamson <alex@shazbot.org>, 
- David Matlack <dmatlack@google.com>, kvm@vger.kernel.org, Leon Romanovsky
- <leon@kernel.org>,  linux-kselftest@vger.kernel.org,
- linux-rdma@vger.kernel.org, Mark Bloch <mbloch@nvidia.com>,
- netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,  Shuah Khan
- <shuah@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
-Cc: patches@lists.linux.dev
-Date: Sat, 02 May 2026 11:35:29 +0200
-In-Reply-To: <9-v1-dc5fa250ca1d+3213-mlx5st_jgg@nvidia.com>
-References: <9-v1-dc5fa250ca1d+3213-mlx5st_jgg@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1777715115; c=relaxed/simple;
+	bh=tQaOSTmRG8h+Q60TQrv4Ps1DXYna/JcS4+Wi1K4sznA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JO9rS+PJUNU8e8i6KJgXnBA13OPUtds38zblu3amEWW5Wf021NqApdC63XF6dUDRrubAeKIloWKS0VJZkMAV8usGEes+IMSD1WDjncwIt/s6BuqS8IdpzlueU65+NfciF55l5Uv2qNrv9Eg3oW1z/iK/km0YH6wWPZ/5/w+bS30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G3RIta4S; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-8d4f78fc9f6so288549685a.3
+        for <netdev@vger.kernel.org>; Sat, 02 May 2026 02:45:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777715111; x=1778319911; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tQaOSTmRG8h+Q60TQrv4Ps1DXYna/JcS4+Wi1K4sznA=;
+        b=G3RIta4SbEe728iWpoGF26UeJ4CJffYNebybl7tV4EcJGxvlXG2CU0ykufo1lv4RHS
+         xqZdNXiMMYrATW/wfKUkM7dG5YJNeizCgssMicfmz4VKBxO/Nna0c0LWRHhSzNA36G2A
+         a8KvKAO4ezzGiymHhiK+0bEzQlZqqHv+WdsX6wzLhdGM0rSAKBMjcewupv/C/6aCwT/A
+         YzASZcMxQ9B3KAfzvzh49Q7Ar1iDbpZGAhGlVJYNSQ32i2WTNjv97/D7nIn355VDUrs1
+         wuudXFa54UkyDHQz9pvagFbvkWLvCxMPeOBSJRBZCb7BIKGu712rhENsmz6EAX8M14m0
+         W58w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777715111; x=1778319911;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tQaOSTmRG8h+Q60TQrv4Ps1DXYna/JcS4+Wi1K4sznA=;
+        b=b4B/ZumOlgpnQGU8uQaNdT5o+mLgYaavQjg4J2P0d3vb98nXyAAkJq2ddnzO7KYiyX
+         fnp0ySEDNW2bRy7wPzoKHW1Qlk2X4zQ30z76AD/DLuH25O+3RQB6S/bqS4waTHzngKRf
+         Q3gg5GDe/9o4ebf2NKBcTxWo04+JyNnTe3SrwKWEPNgIwjHtQhhHYBhMMuxBuTicYZQt
+         xswojSslPSQ83HFt/V+7YfJG7gxAv+yPbgIBUz2Z2wFgKe8pamKS3IBE6DIWQB7l+M+2
+         8xepb5Katyg6LGCyeTxZvPiaWiT4CDiRKZXfV3q0gWk8eddFxgLXJ7GbAJaik2z7yv3d
+         SS9Q==
+X-Forwarded-Encrypted: i=1; AFNElJ+hYWO8V9FTkZJ17Falb7Pd/R1BnN6Ii29lgMVB5vJdrHgFzyV8IYJE503QVhdPuYNnkupEGGE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWmYJOin+Ht/7uIgtbB+51raUjjo3bqvScJDNt+kYBiKf3HA8x
+	8Cu1H5RKs0j9oSWl5kVRVMvTBdL4kfsY5oJREjQLVuSfQ2r7Kora8Hdd
+X-Gm-Gg: AeBDietx/A4/N00+4zIh2/WQ4YWc53GN9zphwswPUEORrEtSivxzX2wwj5SBgl6tiZs
+	w9MQxvTq1+bBXDuwzCKMtVnNBkLEB2J4ERIFWpbaFlnV5MKjX01rMjOgYG1MX5PAkS8EjB0SNk6
+	EaRTkO6BLp69Bh0D/B9mnfjZrFKMVg1zxDpHBg58OHxADmYFlvkZFFNH1rAUnRbXUfRg+F9h+9q
+	gH23apZaBkTRpzd/YF+ndYnpC32Fo/3WozY8+glX/B7Ygdmu6neuCCKm7s7GgE5ynlXF2iFiBab
+	pko/sjdUuocqI4QcTyIrA0seXn7Ud9v7PVQC9r7i+tBfd9rCgIg8tKZtTJXxIBhalW1gsdUKCwn
+	8hCaP1c4AkTUsRsMKORvxuBuQoVC7XzqkBy5ZGq/sPlAaEAhSD33iw+6LlDYIXzQYVylFfQM06Q
+	Hp1yuWnHJ/+ucwAzFOCeVUfZiJvmFokYZhvqFUEVyL9KihUQ+p8mkiSipL9Dn9KKNt4Qs=
+X-Received: by 2002:a05:620a:371a:b0:8ee:7dcf:ac75 with SMTP id af79cd13be357-8fd15dd0b63mr450795785a.18.1777715110658;
+        Sat, 02 May 2026 02:45:10 -0700 (PDT)
+Received: from PF5YBGDS.localdomain ([163.114.130.5])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8fc2c9229c8sm475713985a.36.2026.05.02.02.45.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 02 May 2026 02:45:10 -0700 (PDT)
+Date: Sat, 2 May 2026 05:45:08 -0400
+From: Mike Marciniszyn <mike.marciniszyn@gmail.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Alexander Duyck <alexanderduyck@fb.com>,
+	Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net] net: eth: fbnic: Fix addr validation in pcs write
+Message-ID: <afXHpPPKhayawr9x@PF5YBGDS.localdomain>
+References: <20260429150049.1643-1-mike.marciniszyn@gmail.com>
+ <20260501134636.GE15617@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MBO-RS-META: uaweiay3waw59qou6hnfz4oty9y3zsb3
-X-MBO-RS-ID: cbc3c8409f818b73279
-X-Rspamd-Queue-Id: 90EF04B189F
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260501134636.GE15617@horms.kernel.org>
+X-Rspamd-Queue-Id: D3B874B18CE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283391-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283392-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[mailbox.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[manuelebner@mailbox.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mikemarciniszyn@gmail.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mailbox.org:dkim,mailbox.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,PF5YBGDS.localdomain:mid]
 
-Hi Jason,
+On Fri, May 01, 2026 at 02:46:36PM +0100, Simon Horman wrote:
+> On Wed, Apr 29, 2026 at 11:00:49AM -0400, mike.marciniszyn@gmail.com wrote:
+> > From: "Mike Marciniszyn (Meta)" <mike.marciniszyn@gmail.com>
+> >
+> > This patch contains a fix for addr validation in fbnic_mdio_write_pcs().
+>
+> Hi Mike,
+>
+> I think this warrants a bit more explanation: Why should addr 2 be
+> accepted? What happens from a user-perspective when it is not?
+>
 
-i've gone through your patch, just some minor and some optional things.
+The DW IP part has two distinct PCS address ranges cooresponding
+to the C45 PCS registers.
 
-On Thu, 2026-04-30 at 21:08 -0300, Jason Gunthorpe wrote:
+The shim translates the PCS mmd/addr/regno into specific CSR writes
+to one of two zero-relative addr values into one of those two
+ranges.
 
-> [...]
-> diff --git a/tools/testing/selftests/vfio/lib/drivers/mlx5/mlx5.c
-> b/tools/testing/selftests/vfio/lib/drivers/mlx5/mlx5.c
-> new file mode 100644
-> index 00000000000000..0ab941bad7a66c
-> --- /dev/null
-> +++ b/tools/testing/selftests/vfio/lib/drivers/mlx5/mlx5.c
-> @@ -0,0 +1,1406 @@
-> +// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
-> +/*
-> + * mlx5 VFIO selftest driver
-> + *
-> + * Programs mlx5 ConnectX VFs and PFs through the bare-metal command
-> interface
-> + * and RDMA Write self-loopback to perform DMA.=C2=A0 Implements
+This patch fixes a one off in the test that could allow an invalid
+CSR write if an addr == 2 was called.
 
-Write -> write
-else it feels like there is a new sentence=20
+I can update the commit message to reflect the above?
 
-> + * (probe/init/remove) and plugs into the VFIO selftest framework.
-> + */
-> +#include <stdint.h>
-> +#include <stdbool.h>
-> +#include <string.h>
-> +#include <time.h>
-> +#include <sched.h>
-> +#include <unistd.h>
-> +#include <stdlib.h>
-> +
-> +#include <linux/errno.h>
-> +#include <linux/io.h>
-> +#include <linux/log2.h>
-> +#include <linux/pci_regs.h>
-
-sort =C3=A1lphabetically:=20
-
-+#include <sched.h>
-+#include <stdbool.h>
-+#include <stdint.h>
-+#include <stdlib.h>~
-+#include <string.h>
-+#include <time.h>
-+#include <unistd.h>
-
-+#include <linux/errno.h>
-+#include <linux/io.h>
-+#include <linux/log2.h>
-+#include <linux/pci_regs.h>
-
-> +
-> +#include <libvfio.h>
-> +
-> +#include "mlx5_hw.h"
-
-why are these two lines grouped individually?
-
-
-> +/* Forward declaration =E2=80=94 cmd_exec polls events during command wa=
-it */
-> +static void mlx5st_process_events(struct mlx5st_device *dev);
-> +
-> +static const char *mlx5st_cmd_name(u16 opcode)
-> +{
-> +	switch (opcode) {
-> +	case MLX5_CMD_OP_QUERY_HCA_CAP: return "QUERY_HCA_CAP";
-> +	case MLX5_CMD_OP_INIT_HCA: return "INIT_HCA";
-> +	case MLX5_CMD_OP_TEARDOWN_HCA: return "TEARDOWN_HCA";
-> +	case MLX5_CMD_OP_ENABLE_HCA: return "ENABLE_HCA";
-> +	case MLX5_CMD_OP_DISABLE_HCA: return "DISABLE_HCA";
-> +	[...]
-> +	}
-> +}
-
-Maybe line them up like:
-Depends on your taste.
-
-+	switch (opcode) {
-+	case MLX5_CMD_OP_QUERY_HCA_CAP:	return "QUERY_HCA_CAP";
-+	case MLX5_CMD_OP_INIT_HCA: 	return "INIT_HCA";
-+	case MLX5_CMD_OP_TEARDOWN_HCA: 	return "TEARDOWN_HCA";
-+	case MLX5_CMD_OP_ENABLE_HCA: 	return "ENABLE_HCA";
-+	case MLX5_CMD_OP_DISABLE_HCA: 	return "DISABLE_HCA";
-+	case MLX5_CMD_OP_QUERY_PAGES: 	return "QUERY_PAGES";
-+ 	[...]
-
-> +
-> +	/*
-> +	 * Compute signatures: mailbox blocks first, then cmd_queue_entry
-> last.
-> +	 * The sig must cover the final state including ownership=3D0x1, but
-> +	 * we must not set ownership until after the sig is in place =E2=80=94
-> +	 * XOR in the 0x1 without storing it to memory.
-> +	 */
-
-- " last"
-
-+	/*
-+	 * Compute signatures: mailbox blocks first, then cmd_queue_entry.
-
-Thanks
- Manuel
+Mike
 
