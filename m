@@ -1,366 +1,289 @@
-Return-Path: <netdev+bounces-283415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283416-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OBbeFH/69WkHRAIAu9opvQ
-	(envelope-from <netdev+bounces-283415-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 15:22:07 +0200
+	id oFS0KUv99WntRAIAu9opvQ
+	(envelope-from <netdev+bounces-283416-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 15:34:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C39794B2238
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 15:22:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E0804B22ED
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 15:34:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E4BB1303EFE3
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 13:20:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 542433008235
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 13:34:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36B8B257435;
-	Sat,  2 May 2026 13:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5BA227BF79;
+	Sat,  2 May 2026 13:34:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dPAAqsyb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KTgakDz0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2B8D257851
-	for <netdev@vger.kernel.org>; Sat,  2 May 2026 13:19:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FFBE22F388
+	for <netdev@vger.kernel.org>; Sat,  2 May 2026 13:33:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777727999; cv=none; b=pYmwMQIl+gVm3DBd14d6vi8rCeoBehFjOaZiEDZjXPOq56LmcipSCyIkJ0x152sooqh1+hRiFQa8UO6BAP6IAS0z92ETOBC7fcz2Rum7NkWj/sN4XZ9WvXnD0k7ZSf9j/FU/Y4F3VV+zOtDjBXO7P3V22GQ5PqcrsQvKl3JQxDs=
+	t=1777728840; cv=none; b=Jl3/3P7caMmP3EZGYkttAEo+nT7rFAITHwkuLcV44RY5nEHKSzyfWFQPfcp+SsaQh8IOYXUA+SE+z7mt1godin1bffqNPV8rP6PiPZJX4aeNOjRvhSHAiKPBloOQayygP+gx5VaoUIid4BmQNsRsEWxKVIDc7FrXLB4NrewzRRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777727999; c=relaxed/simple;
-	bh=lxcyWp12IdlZXXKd8Ugl4on7xBBXleJuqVt+0M1OoPk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bZ/7VSGk8ITtjr1HuVcVTzOWVFmWJyL2a2VIHVIFVb6pWzYrXaecK/CHIJTLOvbf9PwfnGJVnfqdEPsUkjwFWjwbKv6IKw8IsvBWaS23YpwzaFTX1xpx1TKg/Ig37ywN0lpR5F81Wy69ThDYK/OcbEU1M/UAZbO4JWUFcxLBBCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dPAAqsyb; arc=none smtp.client-ip=209.85.210.169
+	s=arc-20240116; t=1777728840; c=relaxed/simple;
+	bh=AZ67Up3J+Lw8gQpCeX9dILqmHFCACAvb+Eh5CTxVt4U=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=StHQqrlA1dx41AaMwQfas6doAiCv+nMgVGb/VerIStRcbDhYFWkgo38DBaYa7UlB/8A8YmmAavn/VjCz6tEa3Agb5K1jIPRpK920eMFLBUDO4jJbd8ogg+B4YWAFXAyKsxDwGcJQxFqkcvpjtTZYYpoBjUpEI30qg99OmSE6Ero=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KTgakDz0; arc=none smtp.client-ip=74.125.224.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-82f8893bff3so1289652b3a.2
-        for <netdev@vger.kernel.org>; Sat, 02 May 2026 06:19:56 -0700 (PDT)
+Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-6579254f996so1488522d50.1
+        for <netdev@vger.kernel.org>; Sat, 02 May 2026 06:33:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777727996; x=1778332796; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1777728838; x=1778333638; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2gfGrYQ7AWXi3RXTSR0Z1BGRv06bnLTOB4wH+tsRKV8=;
-        b=dPAAqsybsiX8QZ3ITlSHXnOzi+2xC6mnt78AYeFl2Xlm/wdBl/72cXJ/9lh3+2yAR/
-         i3RRjFXi0C/fnxPnn/RYSX5K2jV7BkEQe07rpqLBSF40sL1eoEaXcInIoLeHu4jTfz5w
-         UW3yYRA2h+JwMU4xos1t2N0wNJOfbbSO637Ffe3q+iRa94bzmEEQ0yXqEJlBEFaWHVdS
-         gTCEM5IboBAYZZHVRmCbNTPkcNtCpf6KLfWqzgSKunNrtlXg+OHvc93oUplo9HIjsJ7v
-         V9K9POv5sI8xX8QSVpryzZk+5WaTO+kM/a2qT1z6MIVPKdLAsqY8TZOjB1UILoajNK2/
-         rg4g==
+        bh=xJLk920qj6m+fkV0PzZ6Aaob+A5EwJlY0//ShcXomiU=;
+        b=KTgakDz0OfagPZxy/g2lRkaKmGGtBshdkACcVEKWsmNdgTbWkZgG+wNZzj+bEGniuV
+         16SsYKK/+6WueAXHPbN4ZRTE/xCk4XAespVRcrDBVwfJBOwtTFstRrAPCQBaP3tBj6ni
+         KjacbSuM/kgNFQ5qrhE+cKNOkcbtiriL+PWyIq6Lgsx5VjuNYjCJmEhfTN1mu+iAmiKf
+         a8tS7FITtmXoxl9/eJpuXP5rDSmq2sIXotHcxjRQ+H4iPQS4ckKSaibCnf9oMWYSSCU8
+         ERCifZSibSBaj6IqIdEoSAv+7fbtGaErA0/Yq25cLxRlozwuqly31wKsqY5sgwVBxbvu
+         KBzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777727996; x=1778332796;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=2gfGrYQ7AWXi3RXTSR0Z1BGRv06bnLTOB4wH+tsRKV8=;
-        b=Gs0sbc0HyPTG1pJmNz+SRsQWGtTYqEBKEgL9JXVZg8ZBNt8FVCybuBtsfNoZpE+Ata
-         E1TvMdECKhRvQcweqwMBdzdVvVQ5mD2G+FcMifTCQ3cpE1vjZz7NPB9qmnpbhzglQ7C6
-         WipRGjY5ar6tgmiHpKis6NJaWMQ0C1RmHY+FuCy1IYrSyRVWkU7w2ISxRF4GL6VelfPt
-         pASfORPC/Oiv9s2GFwemMLqjy3e8iXS9Z5VJT6j/Gw8IKXCZbtUtPnnzCIovNyQBoq4C
-         /0a2YiBN5HGHOBRZxksjKNosLNkTamxUEpKsD+NyAJWyANo/oxZN4VhXNBjAGLmJITiB
-         +R2w==
-X-Forwarded-Encrypted: i=1; AFNElJ9Bbk3hIelxF81Ei6M9iSHiy6StIRaX7rktXWURQ+bF+2XY2HX0rHexz43zdYGYKbdPXKymGkQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEy/3OuBsHtUG/D/c194xVXZE6YA7MQQlIbSt3FxQ6rEdMvMaO
-	7hUy1RtpU1vrKe4g7qAylu28N/woVyERvWidqJUHPhoGTc0GIZ2/9PQb
-X-Gm-Gg: AeBDiesDOl1wOzj5YmQ8B+YrDcJXYud1ApjTtmOlM+9fr2vTsutyWNEjwcR6JQidRBU
-	wKrtK/Dg3mtRy1Li1i+OrsHSwy0bxq0Jc/8RJPSn1m4wubR3/dz8zH34hhf8NmvKan9YXvfdhCO
-	Al9kKS22gOHO+/TP66zygyQF/tejw8DljQMawIx9+pl+6X68jxDb0zkeAwTjpxf2ByPryKfnT4N
-	yGJC4staIlFcyHwK6yqx8M0UCpCY7/H88H3/LbRE5UO8G8aOWGjX0GIjzladtU7LkrNuCGsgj2d
-	NeAoOYeEhlSYk+ggHPOfPwMEimw8SKn5ISEuuHK3OurH38rmhEww3mW6jyosZpBog+jLiuxymI8
-	oc2QBsu6yuua0T+DqKg3uZIgfv/cbnLq5nqp2h+/+T1z/0gRcr6XtovUOnDLGS38Ovid7ZvtzWA
-	DIbaz/ZZ697g9fICtKO/qK/EWbRmqPCjxXa36KvGDZRK/ptgpCUff+2IN27402
-X-Received: by 2002:a05:6a00:aa8c:b0:82c:6bcc:f3fa with SMTP id d2e1a72fcca58-8352d2b58c1mr2888895b3a.35.1777727996093;
-        Sat, 02 May 2026 06:19:56 -0700 (PDT)
-Received: from DESKTOP-82PPU4A.localdomain ([202.8.116.84])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83515ad0176sm5553791b3a.39.2026.05.02.06.19.49
+        d=1e100.net; s=20251104; t=1777728838; x=1778333638;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xJLk920qj6m+fkV0PzZ6Aaob+A5EwJlY0//ShcXomiU=;
+        b=OSwnxD4Sc/0nZx6PBBNooD5KdYuxA4PKyA/Qd16b7f3tmu89CKSeSc0QMUc5ymtQaT
+         JOee768fDqH6P4Bz/jkNKKq+yv1QD01T27oaU21huljKkqd7cVoWWEf4FaTmqjV1Ux36
+         zBxAfRmEAxMVpjYLkKgs9kp8E+71dCf39wa0w9Xoc/8HBna1SQ9ENRfXfEzB4R8ElRnb
+         97fXJhAkz4pa7cU65QD6AsmyKIgYEEucJnAk143kBxPdyzitK8dY1zt2al61170ZV1RU
+         vtGwj2D73l2n6ZMmBb/zAYwbPJ67VslPAfJRaM1iR+2x+iUDhRh87MClxxWXR9bWFp9O
+         xXWw==
+X-Forwarded-Encrypted: i=1; AFNElJ8WFle0Wqcc8Mgp7TZ7YgMUR1pAO3T3gdJI7AguQCulE6MYKXtMS8Va+wlbjajtU5cMC/nB9To=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyx+Rno+ZEZhZaZ6JDib2RLfwEp3ABxro8I5dB9H0BJV6Eaw2ma
+	WDhPm+hKVyibIuZYCNcrpyBFgdiSPkG5KbMUZWykQ2xIyz488getEJ1j
+X-Gm-Gg: AeBDietX+0CaWurNmH9cpXSABhSGV92DMDRHOUvsAlrTI1ZlLK4W1zi/YjJsXmlq+VK
+	CNirBGYM95JNqTFQZmrC0oGJGZg3Jmy7mB8Bfk1UfOAlbIgOu/X9VzTRlIu10//MbdU+Pba5GmM
+	7DsH+Us0N2cj9bs0k7q6CUSLxbY/KkKE6KhCH4rDyJVYViryMhSCOCJK/0IVSa0HHKVhJaapiZ3
+	AwANVtvovKn9VLNh5fit6MUTSZTvx5Topkfpibxc2i4KnLLpZ94HQN3twYqP4qgncG8rqHc3lXW
+	8h5MXJQxhxs9NmD60XQLm9qcG6by7S7vq7bDOfr3MR72mAMVeb555mFOPIxXna9eYl2SOpmXdRo
+	JSoR3GEJDTIyB5u5HhD+I09bPAwwwZTsRfnIN3sUwbJ6RaXxDj41KUVLK2R0L9IpKrFJCbO77mz
+	HNxEvy0jK2gzdQjGdecc2Jb+olZ+t7ywZXis/cUQWx1SPecWSXQ743VFImm3Qwv0l989O7GzAEs
+	xKNj/aR1+spreA=
+X-Received: by 2002:a05:690e:4396:b0:651:d634:6d32 with SMTP id 956f58d0204a3-65c3d9fb469mr1993284d50.20.1777728838205;
+        Sat, 02 May 2026 06:33:58 -0700 (PDT)
+Received: from gmail.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65c2e1ce958sm2626253d50.8.2026.05.02.06.33.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 May 2026 06:19:55 -0700 (PDT)
-From: Ujjal Roy <royujjal@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	David Ahern <dsahern@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Andy Roulin <aroulin@nvidia.com>,
-	Yong Wang <yongwang@nvidia.com>,
-	Petr Machata <petrm@nvidia.com>
-Cc: Ujjal Roy <ujjal@alumnux.com>,
-	bridge@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v6 5/5] selftests: net: bridge: add MRC and QQIC field encoding tests
-Date: Sat,  2 May 2026 13:19:06 +0000
-Message-ID: <20260502131907.987-6-royujjal@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260502131907.987-1-royujjal@gmail.com>
-References: <20260502131907.987-1-royujjal@gmail.com>
+        Sat, 02 May 2026 06:33:55 -0700 (PDT)
+Date: Sat, 02 May 2026 09:33:55 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Maoyi Xie <maoyixie.tju@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: willemdebruijn.kernel@gmail.com, 
+ willemb@google.com, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ kuba@kernel.org, 
+ davem@davemloft.net, 
+ dsahern@kernel.org, 
+ kuznet@ms2.inr.ac.ru, 
+ linux-kernel@vger.kernel.org, 
+ stable@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.baf2d17bd197@gmail.com>
+In-Reply-To: <20260502050037.3800122-1-maoyi.xie@ntu.edu.sg>
+References: <20260502050037.3800122-1-maoyi.xie@ntu.edu.sg>
+Subject: Re: [PATCH net v5] ipv6: flowlabel: enforce per-netns limit for
+ unprivileged callers
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: C39794B2238
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 0E0804B22ED
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-283415-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283416-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[royujjal@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,google.com,redhat.com,kernel.org,davemloft.net,ms2.inr.ac.ru,vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,blackwall.org:email,bridge_vlan_mcast.sh:url,nvidia.com:email]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ntu.edu.sg:email]
 
-Enhance vlmc_query_intvl_test and vlmc_query_response_intvl_test in
-bridge_vlan_mcast.sh to validate IGMPv3/MLDv2 protocol compliance for
-MRC and QQIC field encoding across both linear and exponential ranges.
+Maoyi Xie wrote:
+> fl_size, fl_ht and ip6_fl_lock in net/ipv6/ip6_flowlabel.c are file
+> scope and shared across netns. mem_check() reads fl_size to decide
+> whether to deny non-CAP_NET_ADMIN callers; capable() runs against
+> init_user_ns, so an unprivileged user in any non-init userns can
+> push fl_size past FL_MAX_SIZE - FL_MAX_SIZE/4 and starve every
+> other unprivileged userns on the host.
+> 
+> Add struct netns_ipv6::flowlabel_count, bumped and decremented next
+> to fl_size in fl_intern, ip6_fl_gc and ip6_fl_purge. The new field
+> is placed in the existing 4-byte hole after ipmr_seq, so struct
+> netns_ipv6 stays the same size on 64-bit builds.
+> 
+> Bump FL_MAX_SIZE from 4096 to 8192. It has been 4096 since the file
+> was added; machines and connection counts have grown.
+> 
+> mem_check() folds an extra per-netns ceiling into the existing
+> non-CAP_NET_ADMIN conditional. The ceiling is half of the total
+> budget that unprivileged callers have ever been able to use, i.e.
+> (FL_MAX_SIZE - FL_MAX_SIZE/4) / 2 = 3072 entries. With FL_MAX_SIZE
+> doubled, this preserves the original per-user reach (~3K, what an
+> unprivileged caller could already obtain before this change) while
+> forcing an attacker to spread allocations across at least two
+> netns to exhaust the global non-CAP_NET_ADMIN budget.
+> 
+> CAP_NET_ADMIN against init_user_ns still bypasses both caps.
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Suggested-by: Willem de Bruijn <willemb@google.com>
+> Cc: stable@vger.kernel.org # v5.15+
+> Signed-off-by: Maoyi Xie <maoyi.xie@ntu.edu.sg>
 
-TEST: Vlan multicast snooping enable                                [ OK ]
-TEST: Vlan mcast_query_interval global option default value         [ OK ]
-TEST: Number of tagged IGMPv2 general query                         [ OK ]
-TEST: IGMPv3 QQIC linear value 60(s)                                [ OK ]
-TEST: MLDv2 QQIC linear value 60(s)                                 [ OK ]
-TEST: IGMPv3 QQIC non linear value 160(s)                           [ OK ]
-TEST: MLDv2 QQIC non linear value 160(s)                            [ OK ]
-TEST: Vlan mcast_query_response_interval global option default value   [ OK ]
-TEST: IGMPv3 MRC linear value of 60(x0.1s)                          [ OK ]
-TEST: MLDv2 MRC linear value of 24000(ms)                           [ OK ]
-TEST: IGMPv3 MRC non linear value of 240(x0.1s)                     [ OK ]
-TEST: MLDv2 MRC non linear value of 48000(ms)                       [ OK ]
+No longer applies cleanly to net. Conflict on
+include/net/netns/ipv6.h. Please update your tree.
 
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-Signed-off-by: Ujjal Roy <royujjal@gmail.com>
----
- .../net/forwarding/bridge_vlan_mcast.sh       | 140 +++++++++++++++++-
- 1 file changed, 132 insertions(+), 8 deletions(-)
+> ---
+> v5 (this submission, addressing v4 review by Willem):
+>     - Replaced the per-netns ceiling FL_MAX_SIZE/8 with the
+>       computed unpriv_user_limit = (FL_MAX_SIZE - FL_MAX_SIZE/4)/2,
+>       which evaluates to 3072. v4's FL_MAX_SIZE/8 = 1024 would have
+>       reduced the per-user budget below the ~3K an unprivileged
+>       caller could already obtain before any of this work, defeating
+>       the reason FL_MAX_SIZE was doubled in the first place. The new
+>       ceiling preserves the original per-user reach while still
+>       requiring an attacker to spread across at least two netns to
+>       drain the global non-CAP_NET_ADMIN budget.
+>     - Reworded the corresponding paragraph in the commit body.
+> v4: addressed Willem's v3 review on netdev. Dropped the
+>     flowlabel_has_excl cacheline argument in favour of "fills the
+>     existing 4-byte hole after ipmr_seq", and reordered
+>     atomic_dec(&...flowlabel_count) to sit immediately after
+>     atomic_dec(&fl_size) in ip6_fl_gc and ip6_fl_purge.
+> v3: addressed Willem's review on the private security@ thread.
+>     Merged FL_MAX_SIZE doubling, dropped test data, moved
+>     flowlabel_count near ipmr_seq, inlined fl->fl_net in ip6_fl_gc.
+> v2: per-netns counter + cap, sent to security@ as a 2-patch series.
+> v1: fix-shape sketch in original disclosure.
+> 
+>  include/net/netns/ipv6.h |  1 +
+>  net/ipv6/ip6_flowlabel.c | 16 ++++++++++++----
+>  2 files changed, 13 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/net/netns/ipv6.h b/include/net/netns/ipv6.h
+> index 34bdb1308..329482373 100644
+> --- a/include/net/netns/ipv6.h
+> +++ b/include/net/netns/ipv6.h
+> @@ -119,6 +119,7 @@ struct netns_ipv6 {
+>  	struct fib_notifier_ops	*notifier_ops;
+>  	struct fib_notifier_ops	*ip6mr_notifier_ops;
+>  	unsigned int ipmr_seq; /* protected by rtnl_mutex */
+> +	atomic_t		flowlabel_count;
+>  	struct {
+>  		struct hlist_head head;
+>  		spinlock_t	lock;
+> diff --git a/net/ipv6/ip6_flowlabel.c b/net/ipv6/ip6_flowlabel.c
+> index c92f98c6f..758a2fc4d 100644
+> --- a/net/ipv6/ip6_flowlabel.c
+> +++ b/net/ipv6/ip6_flowlabel.c
+> @@ -36,7 +36,7 @@
+>  /* FL hash table */
+>  
+>  #define FL_MAX_PER_SOCK	32
+> -#define FL_MAX_SIZE	4096
+> +#define FL_MAX_SIZE	8192
+>  #define FL_HASH_MASK	255
+>  #define FL_HASH(l)	(ntohl(l)&FL_HASH_MASK)
+>  
+> @@ -162,8 +162,9 @@ static void ip6_fl_gc(struct timer_list *unused)
+>  				ttd = fl->expires;
+>  				if (time_after_eq(now, ttd)) {
+>  					*flp = fl->next;
+> -					fl_free(fl);
+>  					atomic_dec(&fl_size);
+> +					atomic_dec(&fl->fl_net->ipv6.flowlabel_count);
+> +					fl_free(fl);
 
-diff --git a/tools/testing/selftests/net/forwarding/bridge_vlan_mcast.sh b/tools/testing/selftests/net/forwarding/bridge_vlan_mcast.sh
-index e8031f68200a..07a377652a59 100755
---- a/tools/testing/selftests/net/forwarding/bridge_vlan_mcast.sh
-+++ b/tools/testing/selftests/net/forwarding/bridge_vlan_mcast.sh
-@@ -162,14 +162,27 @@ vlmc_query_cnt_setup()
- {
- 	local type=$1
- 	local dev=$2
-+	local match=($3)
- 
- 	if [[ $type == "igmp" ]]; then
--		tc filter add dev $dev egress pref 10 prot 802.1Q \
-+		# This matches: IP Protocol 2 (IGMP)
-+		tc filter add dev "$dev" egress pref 10 prot 802.1Q \
- 			flower vlan_id 10 vlan_ethtype ipv4 dst_ip 224.0.0.1 ip_proto 2 \
-+			action goto chain 1
-+		# AND Type 0x11 (Query) at offset 0 of IGMP header
-+		# 20 bytes IPv4 header + 4 bytes Router Alert option + IGMP[offset 0]
-+		tc filter add dev "$dev" egress pref 20 chain 1 prot 802.1Q u32 \
-+			match u8 0x11 0xff at 24 "${match[@]}" \
- 			action pass
- 	else
--		tc filter add dev $dev egress pref 10 prot 802.1Q \
-+		# This matches: ICMPv6
-+		tc filter add dev "$dev" egress pref 10 prot 802.1Q \
- 			flower vlan_id 10 vlan_ethtype ipv6 dst_ip ff02::1 ip_proto icmpv6 \
-+			action goto chain 1
-+		# AND Type 0x82 (Query) at offset 0 of MLD header
-+		# 40 bytes IPv6 header + 8 bytes Hop-by-hop option + MLD[offset 0]
-+		tc filter add dev "$dev" egress pref 20 chain 1 prot 802.1Q u32 \
-+			match u8 0x82 0xff at 48 "${match[@]}" \
- 			action pass
- 	fi
- 
-@@ -181,7 +194,39 @@ vlmc_query_cnt_cleanup()
- 	local dev=$1
- 
- 	ip link set dev br0 type bridge mcast_stats_enabled 0
--	tc filter del dev $dev egress pref 10
-+	tc filter del dev "$dev" egress pref 20 chain 1
-+	tc filter del dev "$dev" egress pref 10
-+}
-+
-+vlmc_query_get_intvl_match()
-+{
-+	local type=$1
-+	local version=$2
-+	local test=$3
-+	local enc_val=$4
-+
-+	if [ "$test" = "qqic" ]; then
-+		# QQIC is 8-bit floating point encoding for IGMPv3 and MLDv2
-+		if [ "${type}v${version}" = "igmpv3" ]; then
-+			# QQIC is at offset 9 of IGMP header
-+			# 20 bytes IPv4 header + 4 bytes Router Alert option + IGMP[offset 9]
-+			echo "match u8 $enc_val 0xff at 33"
-+		elif [ "${type}v${version}" = "mldv2" ]; then
-+			# QQIC is at offset 25 of MLD header
-+			# 40 bytes IPv6 header + 8 bytes Hop-by-hop option + MLD[offset 25]
-+			echo "match u8 $enc_val 0xff at 73"
-+		fi
-+	elif [ "$test" = "mrc" ]; then
-+		if [ "${type}v${version}" = "igmpv3" ]; then
-+			# MRC is 8-bit floating point encoding at offset 1 of IGMP header
-+			# 20 bytes IPv4 header + 4 bytes Router Alert option + IGMP[offset 1]
-+			echo "match u8 $enc_val 0xff at 25"
-+		elif [ "${type}v${version}" = "mldv2" ]; then
-+			# MRC is 16-bit floating point encoding at offset 4 of MLD header
-+			# 40 bytes IPv6 header + 8 bytes Hop-by-hop option + MLD[offset 4]
-+			echo "match u16 $enc_val 0xffff at 52"
-+		fi
-+	fi
- }
- 
- vlmc_check_query()
-@@ -191,9 +236,13 @@ vlmc_check_query()
- 	local dev=$3
- 	local expect=$4
- 	local time=$5
-+	local test=$6
-+	local enc_val=$7
-+	local intvl_match=""
- 	local ret=0
- 
--	vlmc_query_cnt_setup $type $dev
-+	intvl_match="$(vlmc_query_get_intvl_match "$type" "$version" "$test" "$enc_val")"
-+	vlmc_query_cnt_setup "$type" "$dev" "$intvl_match"
- 
- 	local pre_tx_xstats=$(vlmc_query_cnt_xstats $type $version $dev)
- 	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_querier 1
-@@ -201,7 +250,7 @@ vlmc_check_query()
- 	if [[ $ret -eq 0 ]]; then
- 		sleep $time
- 
--		local tcstats=$(tc_rule_stats_get $dev 10 egress)
-+		local tcstats=$(tc_rule_stats_get "$dev" 20 egress)
- 		local post_tx_xstats=$(vlmc_query_cnt_xstats $type $version $dev)
- 
- 		if [[ $tcstats != $expect || \
-@@ -448,8 +497,46 @@ vlmc_query_intvl_test()
- 	# 1 is sent immediately, then 2 more in the next 5 seconds
- 	vlmc_check_query igmp 2 $swp1 3 5
- 	check_err $? "Wrong number of tagged IGMPv2 general queries sent"
--	log_test "Vlan 10 mcast_query_interval option changed to 200"
-+	log_test "Number of tagged IGMPv2 general query"
-+
-+	RET=0
-+	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_igmp_version 3
-+	check_err $? "Could not set mcast_igmp_version in vlan 10"
-+	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_mld_version 2
-+	check_err $? "Could not set mcast_mld_version in vlan 10"
-+	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_query_interval 6000
-+	check_err $? "Could not set mcast_query_interval in vlan 10"
-+	# 1 is sent immediately, IGMPv3 QQIC should match with linear value 60 (0x3c)
-+	# which is 8-bit encoded value of 60 [units of seconds]
-+	vlmc_check_query igmp 3 $swp1 1 1 qqic 0x3c
-+	check_err $? "Wrong QQIC in generated IGMPv3 general queries"
-+	log_test "IGMPv3 QQIC linear value 60(s)"
-+
-+	RET=0
-+	# 1 is sent immediately, MLDv2 QQIC should match with linear value 60 (0x3c)
-+	# which is 8-bit encoded value of 60 [units of seconds]
-+	vlmc_check_query mld 2 $swp1 1 1 qqic 0x3c
-+	check_err $? "Wrong QQIC in generated MLDv2 general queries"
-+	log_test "MLDv2 QQIC linear value 60(s)"
-+
-+	RET=0
-+	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_query_interval 16000
-+	check_err $? "Could not set mcast_query_interval in vlan 10"
-+	# 1 is sent immediately, IGMPv3 QQIC should match with non linear value 132 (0x84)
-+	# which is 8-bit encoded value of 160 [units of seconds]
-+	vlmc_check_query igmp 3 $swp1 1 1 qqic 0x84
-+	check_err $? "Wrong QQIC in generated IGMPv3 general queries"
-+	log_test "IGMPv3 QQIC non linear value 160(s)"
- 
-+	RET=0
-+	# 1 is sent immediately, MLDv2 QQIC should match with non linear value 132 (0x84)
-+	# which is 8-bit encoded value of 160 [units of seconds]
-+	vlmc_check_query mld 2 $swp1 1 1 qqic 0x84
-+	check_err $? "Wrong QQIC in generated MLDv2 general queries"
-+	log_test "MLDv2 QQIC non linear value 160(s)"
-+
-+	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_igmp_version 2
-+	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_mld_version 1
- 	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_startup_query_count 2
- 	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_query_interval 12500
- }
-@@ -469,10 +556,47 @@ vlmc_query_response_intvl_test()
- 	log_test "Vlan mcast_query_response_interval global option default value"
- 
- 	RET=0
--	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_query_response_interval 200
-+	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_startup_query_count 0
-+	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_igmp_version 3
-+	check_err $? "Could not set mcast_igmp_version in vlan 10"
-+	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_mld_version 2
-+	check_err $? "Could not set mcast_mld_version in vlan 10"
-+	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_query_response_interval 600
-+	check_err $? "Could not set mcast_query_response_interval in vlan 10"
-+	# 1 is sent immediately, IGMPv3 MRC should match with linear value 60 (0x3c)
-+	# which is 8-bit encoded value of 60 [units of 0.1s = 6 seconds]
-+	vlmc_check_query igmp 3 $swp1 1 1 mrc 0x3c
-+	check_err $? "Wrong MRC in generated IGMPv3 general queries"
-+	log_test "IGMPv3 MRC linear value of 60(x0.1s)"
-+
-+	RET=0
-+	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_query_response_interval 2400
-+	check_err $? "Could not set mcast_query_response_interval in vlan 10"
-+	# 1 is sent immediately, MLDv2 MRC should match with linear value 0x5dc0 (24000)
-+	# which is 16-bit encoded value of 24000 [units of ms / 24 seconds]
-+	vlmc_check_query mld 2 $swp1 1 1 mrc 0x5dc0
-+	check_err $? "Wrong MRC in generated MLDv2 general queries"
-+	log_test "MLDv2 MRC linear value of 24000(ms)"
-+
-+	RET=0
-+	# 1 is sent immediately, IGMPv3 MRC should match with non linear value 142 (0x8e)
-+	# which is 8-bit encoded value of 240 [units of 0.1s = 24 seconds]
-+	vlmc_check_query igmp 3 $swp1 1 1 mrc 0x8e
-+	check_err $? "Wrong MRC in generated IGMPv3 general queries"
-+	log_test "IGMPv3 MRC non linear value of 240(x0.1s)"
-+
-+	RET=0
-+	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_query_response_interval 4800
- 	check_err $? "Could not set mcast_query_response_interval in vlan 10"
--	log_test "Vlan 10 mcast_query_response_interval option changed to 200"
-+	# 1 is sent immediately, MLDv2 MRC should match with non linear value 0x8770 (34672)
-+	# which is 16-bit encoded value of 48000 [units of ms / 48 seconds]
-+	vlmc_check_query mld 2 $swp1 1 1 mrc 0x8770
-+	check_err $? "Wrong MRC in generated MLDv2 general queries"
-+	log_test "MLDv2 MRC non linear value of 48000(ms)"
- 
-+	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_igmp_version 2
-+	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_mld_version 1
-+	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_startup_query_count 2
- 	bridge vlan global set vid 10 dev br0 mcast_snooping 1 mcast_query_response_interval 1000
- }
- 
--- 
-2.43.0
+Do not touch fl_free (here and below)
+>  					continue;
+>  				}
+>  				if (!sched || time_before(ttd, sched))
+> @@ -195,8 +196,9 @@ static void __net_exit ip6_fl_purge(struct net *net)
+>  			if (net_eq(fl->fl_net, net) &&
+>  			    atomic_read(&fl->users) == 0) {
+>  				*flp = fl->next;
+> -				fl_free(fl);
+>  				atomic_dec(&fl_size);
+> +				atomic_dec(&net->ipv6.flowlabel_count);
+> +				fl_free(fl);
+>  				continue;
+>  			}
+>  			flp = &fl->next;
+> @@ -245,6 +247,7 @@ static struct ip6_flowlabel *fl_intern(struct net *net,
+>  	fl->next = fl_ht[FL_HASH(fl->label)];
+>  	rcu_assign_pointer(fl_ht[FL_HASH(fl->label)], fl);
+>  	atomic_inc(&fl_size);
+> +	atomic_inc(&net->ipv6.flowlabel_count);
+>  	spin_unlock_bh(&ip6_fl_lock);
+>  	rcu_read_unlock();
+>  	return NULL;
+> @@ -464,6 +467,9 @@ fl_create(struct net *net, struct sock *sk, struct in6_flowlabel_req *freq,
+>  
+>  static int mem_check(struct sock *sk)
+>  {
+> +	const int unpriv_total_limit = FL_MAX_SIZE - (FL_MAX_SIZE / 4);
+> +	const int unpriv_user_limit = unpriv_total_limit / 2;
+> +	struct net *net = sock_net(sk);
+>  	int room = FL_MAX_SIZE - atomic_read(&fl_size);
+>  	struct ipv6_fl_socklist *sfl;
+>  	int count = 0;
+> @@ -478,7 +484,9 @@ static int mem_check(struct sock *sk)
+>  
+>  	if (room <= 0 ||
+>  	    ((count >= FL_MAX_PER_SOCK ||
+> -	      (count > 0 && room < FL_MAX_SIZE/2) || room < FL_MAX_SIZE/4) &&
+> +	      (count > 0 && room < FL_MAX_SIZE/2) ||
+> +	      room < FL_MAX_SIZE/4 ||
+> +	      atomic_read(&net->ipv6.flowlabel_count) >= unpriv_user_limit) &&
+>  	     !capable(CAP_NET_ADMIN)))
+>  		return -ENOBUFS;
+>  
+> -- 
+> 2.34.1
+> 
+
 
 
