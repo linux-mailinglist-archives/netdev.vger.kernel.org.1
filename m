@@ -1,396 +1,381 @@
-Return-Path: <netdev+bounces-283482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283483-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eOMgGtxZ9mn2UAIAu9opvQ
-	(envelope-from <netdev+bounces-283482-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 22:09:00 +0200
+	id YAzXDGJa9mn2UAIAu9opvQ
+	(envelope-from <netdev+bounces-283483-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 22:11:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF1804B3659
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 22:08:59 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F67C4B3697
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 22:11:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C6AB2300C592
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 20:08:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4281B300405C
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 20:11:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE06F38B127;
-	Sat,  2 May 2026 20:08:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A23238643B;
+	Sat,  2 May 2026 20:10:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="c739SUgb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wdmpil0s"
 X-Original-To: netdev@vger.kernel.org
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013014.outbound.protection.outlook.com [40.93.196.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62219327C1D;
-	Sat,  2 May 2026 20:08:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6588A2F6910
+	for <netdev@vger.kernel.org>; Sat,  2 May 2026 20:10:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.43
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777752536; cv=fail; b=Sf+NfnG79ZqAdAtBJPV8Yh6uuZFlFivW9x7s23KuRG+BxpPhwBJWeqd3ZzxLm/f5lZcCwJxsSfe0vVmRVDxiL78GIsRFwgbColzpi2sulxVXr53utQfBlSoyNAbKKEe5spbsMji868933CBahAoAsdv2Qfx3nRzZwmbYGIcKUcA=
+	t=1777752657; cv=pass; b=gRC4Rg8L5XCdjS+0A5Be0WYW5JYeGGtdIcqJ8hkxOtwGgav+BqqCEYE8oUhWUCkMKjkoARPlmIDg+yJzOgJHINb3OXdC+5laNZ+2WOlTn/a1ldhc1x/0fF45grPgxiq9C4fSc7+0LNMSOjWWOWpglrRf00PS53Kn6RMxlT58mj4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777752536; c=relaxed/simple;
-	bh=NhA1jd+jCetkxrCgu0Ac9bmjmHQpA65TMn1J8icIQVg=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=OZlnZJkR3IyxtDfr+faOcNRzGdBFenRG8Q5qOaXkUlkGtFIPHwSkKN9HQW/pYHVXURfGls9f2EzkC3QbAbQEW3hfwLl5HzTXs+cZDy9ZZ+hHXSlok/gWD/7hnUwOCNBDDvs/tTwV94F212woztYQyvcUdlKZa3EU0WKzyoCmuRw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=c739SUgb; arc=fail smtp.client-ip=40.93.196.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LA5GQ3sic3K4jTR9aFeYPOIAPmFXPzf5cIQ8axZELZ28CI5XUyj6y/nZ+Nah4JVyQZlpMitvx8pL/dldmPyIUqvCupeF6C4HY2GO/KIky9Fmzbki6cvmQZ0kOnBDSBiAYp4H8U66E7alRiXvVQPuj2ycN8ESzAAKaBm4Pc/Mcplx3JtxJNVZt956qN2lxbHwtRlhac1ZT5OYP9rldqtIf8D6X7SX4D1Znpx1EA7easP1PSARY0bUa72e8vPvqGEXaGR6MnCPDU+Pr2YW9PNr9ZG5lQRiGwa4acbt16Q4zn+U2x3GDdoqZinLCh4b3Tu6+kFrYhgwBepSOcK4+MHzKw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ARwFGS3tp/flqjxR23xJJBU8Ssdl2qZ/VkZDWKCvOvQ=;
- b=xWfakVBqpQXnRvkzw3dmL9HOVu645iK0WtKQR5rseZ+RKE5r24h534FBh9B7HWK5yMuxuBIuHKuHanXoG5VA6hP6MMMm+mynE/lGbTPbGn3PJNPlneInxc/yrLHnbZI0jz1KUsF4ThmtLtwp/CVjodmvVS03l5mnO5+ZvGCpaOgpTqvC4vCkJBF8q9SbSK4dcZDJb0fJESdgaX0K9M0N9eA0NOuSoJk6o/hsFOFf3CrYHn9lBfD4O0LuYBqayebmfB3RtnV5m8W8NbiC0R8S6v9FP2A7yTN7stbddmRWhfDZM/+9NIZnti3IIDV53lT3yqgK11eLPYT+E17sXkxLCg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ARwFGS3tp/flqjxR23xJJBU8Ssdl2qZ/VkZDWKCvOvQ=;
- b=c739SUgbVh9TPvGRe6N44QZbjDdwXXzdxvpCexUkZd9t6Irfrh42ozkymp6oY0RZfui1wbLHLdLKaRojgV4MYPB69h/oRf7ODeclm/4BEqFUMiD6t6ofunxcvbQqjYpnBXvOywBObakstPVNzE/wi3zazm2tA5Fx5lClZQXrddoq/cEwefGxUq69a0ZTrQphMAFnCUen05xWltAMHG/IWJl4t8CF3Zi0qnN6kquwpe4/9AmgR5apMiLIfzZolMy9VE/V1bP7MEgHt0d1uA3ZRbMTh91XhB2641AkW2DdFnMXiXeNBZXys7+vDfMxkyNcLTuI0yc2KWsZwp42Ro6iRw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB7548.namprd12.prod.outlook.com (2603:10b6:610:144::12)
- by CH3PR12MB7548.namprd12.prod.outlook.com (2603:10b6:610:144::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.24; Sat, 2 May
- 2026 20:08:47 +0000
-Received: from CH3PR12MB7548.namprd12.prod.outlook.com
- ([fe80::b710:d6a1:ab16:76de]) by CH3PR12MB7548.namprd12.prod.outlook.com
- ([fe80::b710:d6a1:ab16:76de%6]) with mapi id 15.20.9870.023; Sat, 2 May 2026
- 20:08:47 +0000
-Message-ID: <421e8885-5849-4390-8956-9bc344fa0bf0@nvidia.com>
-Date: Sat, 2 May 2026 23:08:43 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next V2 7/7] net/mlx5: Add profile to auto-enable
- switchdev mode at device init
-To: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
-Cc: Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
- Saeed Mahameed <saeedm@nvidia.com>, Shay Drory <shayd@nvidia.com>,
- Or Har-Toov <ohartoov@nvidia.com>, Edward Srouji <edwards@nvidia.com>,
- Maher Sanalla <msanalla@nvidia.com>, Simon Horman <horms@kernel.org>,
- Gerd Bayer <gbayer@linux.ibm.com>, Moshe Shemesh <moshe@nvidia.com>,
- Kees Cook <kees@kernel.org>, Patrisious Haddad <phaddad@nvidia.com>,
- Parav Pandit <parav@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>,
- Cosmin Ratiu <cratiu@nvidia.com>, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- Gal Pressman <gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
-References: <20260501041633.231662-1-tariqt@nvidia.com>
- <20260501041633.231662-8-tariqt@nvidia.com>
-Content-Language: en-US
-From: Mark Bloch <mbloch@nvidia.com>
-In-Reply-To: <20260501041633.231662-8-tariqt@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: TL2P290CA0003.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:2::20) To CH3PR12MB7548.namprd12.prod.outlook.com
- (2603:10b6:610:144::12)
+	s=arc-20240116; t=1777752657; c=relaxed/simple;
+	bh=BmEnXgg8tPmIxiFsOcmAbWfmmt0C7J2crnmvAJpu9+w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lrxt0tn6pnxCa0QBFBgBtIzcgWRwmFZZReWpVk23F3bHTdFIOpvxqzT4e0g/pRR7EiOySfLJhg+slsS5J5R0Xw15+Tw757gZ/KuzpYBgTvfRyTAiBTY9iDGq6qyxGYYDZxQAbNQ+PdDXbfwtYQ7aJkS8jbWX509WNFIrh9Vmi6o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wdmpil0s; arc=pass smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5a41099fa86so3190853e87.2
+        for <netdev@vger.kernel.org>; Sat, 02 May 2026 13:10:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777752652; cv=none;
+        d=google.com; s=arc-20240605;
+        b=k1FNtnXu3eRneqhJTb/VqXnHToEs2vfJgMnKVV79iqVxO+W/Mw9sJgseSiCAWOlwsp
+         wxwPh0nExDBd96dAAiqiFRQVP6N8axGyp8cVs5o3sB4J8ehlcGaWgKRCq/JnpPRarBqp
+         /2h/Ge00UELV7MeTrj1M2wzR1aDiaFrkMcum13/4r7hD1Lt60BwPuUo8ilW2TEfwktRc
+         WYyNqSRQZ2Ue89bMZhb+Mv/3/Yj9aboNW1hU6Nj/TuN437VaL1ljsvRyirjz1S+XU5Dx
+         laXUioHkltVeoczdTnPb0Coe4dXaygkWPkfBOA423AVls4RumhiDun98bKtGtD+82TpF
+         JDzA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=jW8dBReU46ZQAD/dWYei/c27fmURyLmNJvMDiBp4D0g=;
+        fh=bVimzyjf7Z26YOC+DhPuzYcYIjFITHj+t8jUQ+mkIvw=;
+        b=QXBbBOCTW8QDdMznqDb8h2Q2UljNgXIG795gHYvcHLXHBCmg4MVV4e+aGqFQjxzhZr
+         9uimsK3Qbmoi7RQQE2YOMVskDAMK3WzRvsenFMR+GLzmA7OFbrRaEuG0mUKJFuFAYP+Z
+         3LatXr95x+dyr6G4XQkX5aZ3xRWnVQNUzdd9apEzSRjt2A7qZQQ8dNsxAz2Okq7wEdnp
+         EE7t7pxf5eViZ8i8O8YWf/a4CjjAQeSGPeMgEm0uEw+UC47aGI8rNupfNkVYPFN29kKm
+         McOgrL1efXB9CepppRX9MY9+q/s7lTve2SJJZ2YT2Yv4+BMD1jETNgUmI4LDO9+RPLFE
+         LvSg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777752652; x=1778357452; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jW8dBReU46ZQAD/dWYei/c27fmURyLmNJvMDiBp4D0g=;
+        b=Wdmpil0swa6R91ryCKVrIxLw1aJs57it2jWYC+uayqAim3pMevx/+8RYtHwsT2h6GX
+         alMoRt9UcqD9Es8rZWlvo1hKnrqYnOmge/fx8mfBC2Ub6T5OcSrdnRkFT91S6oGqilIk
+         IF2p2KOu81rOvrvLZ01HjGX5Vehr2GaCJRmUkZIMIIlJfq6AURBG64eavvor9dkbM8o9
+         CNxyJTBZuSThphePgE2oYi7lpN56VSGAevIR0pCbUkLnEokffCWSKRBOyd1Rl8djcaxo
+         NiUdvIK3UpZAVm8RCigA0E9COS0Ap+jmpx7MEe+YQ/3NlOxWrNT9FdJBUx4H75VpyjKG
+         JyPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777752652; x=1778357452;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=jW8dBReU46ZQAD/dWYei/c27fmURyLmNJvMDiBp4D0g=;
+        b=LwWcZUXFIf/OwZkaLGp38KPccmbcXPcEKCHcPPs+S265s3ZgalO0gJH0RMYoi4zJeM
+         0nHBgJcf4Fr07d6FzXHXn0NjT8ruk+Cgh9Z60se7TX+kY9Vm48OyqrVaakL4Rhk9zINk
+         wy0vn+iwfbwcpwP7Qn3UjgwPi82JAVxDZWShLxsavaCDYYkFmsoQl3odfC7UzksA5gmS
+         1eQjTiz1aixq+zIbXGH7FxU7plOKdNXWetO6OMm6uCQw5nMfuotEV04o37RrFBLECtjQ
+         ciyLTRDnw/rI217r/m2aGDdz4kfAipO2GQ9QvYR0Ol2jmjCVSuzGdUtIcWPl4N2ESEuI
+         MNAg==
+X-Forwarded-Encrypted: i=1; AFNElJ+2b3uUT9Wdwqib7TwNEUCqror6FDwQ8qW5YrlvgHeiirFwy5QJWDqooCqLeQZlT/3AnMXLrXw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzj9SlBVj/eHUC4zWGy64abyUyCPLpbQ/SVzF1RYdIRtUoLaXxd
+	pzsnInEnFF6GEwYJyx29gj+jttmtpqChrPVdaM3irHcVyELbcQCkKrkWa3qnIm158UeX7wBS0q8
+	bIA6aF2BJxJtinltvDea94FPfGCelhzw=
+X-Gm-Gg: AeBDieuu8FSA0qga/z3zXNAEhsjUETB6uQzdmMOaBUKvKgKsG6rF5DlmUmwaQ8089bm
+	dtQgxzUPZ+ZviSTNTBK2uPo43QST7e+V7h3zRunmiUSnqzX2n4fVqGyi4/punY3iZE5h06m53n+
+	U3OH7ywuHbxMN2TBCyLxpnla+2KjHYH5mwXRF6ljcT3GzYaqOWZw7J3Js+WtKNZbktgCmGwNd1K
+	LikjZ7D6wTnJMnQ8hFtGtsHyEFUqiplLgaIN5Jmonpnr0P2tVP1RC310G6WHCWqrmEbeD/zFoWD
+	lMpAbxSzlaIYGKuMUdjXC6IfQ3XMJsDmRZ5fdsaxNIdKpODH
+X-Received: by 2002:a05:6512:3b84:b0:5a2:a3dc:51e3 with SMTP id
+ 2adb3069b0e04-5a862ec11b8mr1072024e87.12.1777752652108; Sat, 02 May 2026
+ 13:10:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7548:EE_
-X-MS-Office365-Filtering-Correlation-Id: b6f4a65d-6342-48bf-3aed-08dea8869e54
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|22082099003|56012099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	60QpwlP1AZl/X62vn210A8gzGflRdgTxQ330WPuUAs3QPRSQveQuHyFUNrAWcz5VtMDD67pZG8/T1SaFPjXTsd84je0EfiimDsEDSUUCT9Cc8p1vGQbqrRhcVEZwxXxKcvSoJK7uEssTr1BWwLSDmn3k2Q6ifuYzftbgFHSiGu3L/ORDytW/2lclFMBZ83XiNr9QVDfnh6CdWHScpbvJy7tyFcNqZMRTIqtSeI7y/unn9bzeqWInpQ9QQ5S6IFZLBCqZUcNXON+9p6iSfyu/Z/maDDmSj4Q7tLOFPXy1JujGkSQvbSb1je0by3QFskzHnym1t+dEJTyaG196psuJKObmLx/s3cMTDc8S4ILCbEF7ok1keurG6LceYxmQNy52IJp7qKec8ww3av4hcglUFbqAXKiKR1jB+XgEG8r9zR4uzLhU8CRm8m9UJtJQMuPp9JkXIGGLrD4kra0bwMhhZtUChOUd4g3YUFOt6VyNRO1ppx2SNZV2eHAMfw81RVibWmmWdIEIfJPhtl5xYUr6LhgvRf30M7EkQicbBZNNq5rEmG9/FhJ5I9AreBfrjtsHfKOskYtUWz2hhoQjmS0FDCgRDM7J57hergAKbOtXkr+gSED9H009eHlGY22Cwwz3cT6rKQ1Y4IMr0HD+Zu3DJbUhrQPC0Fw0WNDcsjgp5dNBPYyhjsPrq0l89PVIeA1/
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7548.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?OEU3bnVtRVJBV0s1bUtzYklCYkNteWQxY2ViREtQQUQwU2ZOUmUyL1NzODdB?=
- =?utf-8?B?Q3lVM3ZzN2s4Smx5WmRvSFZJZkxFK0x1QXRURWNGaXg1RWRQN29CWmE4WGJG?=
- =?utf-8?B?Z3RTeEo0Q2JtZ09MS2VkYkJQaGdiWEZHSEYxNm9QaHMzWFpxN0FyenB6ZHpV?=
- =?utf-8?B?RnFLSnZGS3BEM2FGdEdXVHhCOStaVTIwditWaFlEMVFEdXB3Q1FqaU9jZHpF?=
- =?utf-8?B?Y1ZzMWIwOG5sdFJWSGM4TXBjWXExYVVFcnZPZXJqc3ZqemNPKzg5WmdLb00z?=
- =?utf-8?B?b2lkNUs0L0xLdnFrcFdDZzdoMGYrZEtGenlMdUg2clpQbjhjZ1dLYmFnVCtr?=
- =?utf-8?B?TXY2S0k0TFdVR3FoVG9talkxNVhyN2JzWTFEZWtpd2JWbnJORnAzOXd2YUxC?=
- =?utf-8?B?bVprRWFqSE13aGRqWkxnWmRwL25ZMEdUWUp6OTdTcUlLQ2N2eTRud0tjTU5a?=
- =?utf-8?B?UlBrVUtHZW8vQTJjN3RjWTVjLzViUXN1RzZNeDhvSVlsNVluOGtTNzVtY3lp?=
- =?utf-8?B?V1pyTVFGakpKT3RMS1RZbkNENGV3b1Eyd21qL3NCbjNwL0ptN3M0OWlIZHlT?=
- =?utf-8?B?L2l2c2JFN0lyOEpXUldoS05hVmxGMEx2L01xdEE5QUxVV0JyYk5iTDB1cCtw?=
- =?utf-8?B?R3hHZjBMYmJ5ZHRuRFVVMFptMjRGZmJrU2YzeHZUcG1HT1N5aXdMenE0T0pE?=
- =?utf-8?B?NmdHZGNWdWVLM09rSWcxa1NGKzh1b1Bzb2l0MkRGRmdPbUxHeDcrbkRVZlV4?=
- =?utf-8?B?TkRBblhYckFOWVBwYjZ6TjRCdzcwTXNINmJRbGFYaWxVZ3Y0ME9mZUthekpn?=
- =?utf-8?B?NkU0aXh5a01yN2RFYnVxa0pZUFRwaDdxMVAwNEMyaEx0S2lmdHh5bHpaRHJT?=
- =?utf-8?B?clFYVS80RzFnUHZuM0t4TEx6clpuMnZQQllOUURPR1FtK1lUU3lhODVaclNJ?=
- =?utf-8?B?bEdpZlpKRkpRWjUySTNjVTJVVlZxcHVrK2g1Ry9rOVcxakVqL2p0M0JSK2xM?=
- =?utf-8?B?S3RtWlhBRG1VelFtT3UrZzRBZm1MT0VBYXk4TUFheSs4aFN5MUY1NjBYWXQv?=
- =?utf-8?B?V212WCtxc08vSVlNc1Q1ekU2QXBNN1dtQlp5WDMwMkFjcHRzWmV1RFRRZms1?=
- =?utf-8?B?cHZMcGpnMElyTXh2THAvY1dBRXVQcFFWYmk1cHlISGNzK2pvQlBKb004Mmwz?=
- =?utf-8?B?U1Z2dFgzMzRwUE9KdFRxT3F0UGI2NjdWZklneHI3VUdHQ3liUEdaN2VkUEdQ?=
- =?utf-8?B?WFgyLzErOG5NcXBKSVhvZXNzQjFPQ3JqUDBabkR1b3YxMUN1YVB5U1JhSVFJ?=
- =?utf-8?B?akxzVHdnZ3hEUjRwR1ZYS3l0b3M3S1pQN3hYazVCYTBPNjkxejBLaG15MVpw?=
- =?utf-8?B?ZlVWQzBDbFg2NGJRakJVbHJTOU4zYzAwMkNFQ2Zia2VRR3BaRW1CMHZnL2hq?=
- =?utf-8?B?SVFjYkJlVzNmK1NsbjZxRGV1Y3F6REtXL3o4WkREQ0tNYnJOU3ZsaVF0by9L?=
- =?utf-8?B?Vkt2amlsUnE4SGRxNzF6WnJaa0luZjBvNGFxaEFDUnFNWDFCaVpCRkl6clZN?=
- =?utf-8?B?bUZrMTBIbXo0S2RGNUZIMDYwUHF3WWhoSEFVckoweWp1ZTdyWnhBemhoOU9G?=
- =?utf-8?B?bTBHS0pEOXpUakxuT1hkZWtBT2o3OE1PbC9Zc3dWdFlBZUJQdHZQMDdkVWhs?=
- =?utf-8?B?M1pDNEEwMUpLWW9yNkpEQW8wS1NpcFAzczA3dXRlM1JISzlFalZBbTlLOFpH?=
- =?utf-8?B?dnZ5Yk9BK252SFlnOStlTUozNk5PeWV5enFCWmlkSkQvSE5kZTl0NWxUOU05?=
- =?utf-8?B?TVB5T1dxdE16ZHE1eHpiWVRod004aVZYSlVxdi9XTDRhWklMMjBlT2NUZ2ZL?=
- =?utf-8?B?Z3JONm9OZUdxb0Yzb2lEK3hPendZYldmNzJvYXlwQlhYYTk5WmI2QU5aTmR5?=
- =?utf-8?B?TjN2amZtSHJ6UU83bUNMbkFLOURIT0k2bHg2MEpUeUhrZi9NRVBsT2xBekpP?=
- =?utf-8?B?MHUxY1lVQnB5QU04TGFoUGMzMytHVWlLOHd6M1lzaWpacnc0c0l1Tk9jbDN6?=
- =?utf-8?B?YTVmcld2NTZIMkQ5eGNJTnhxZVhmcldPWU9od0ZQQ2dmaVBUYTR3SjYzVG95?=
- =?utf-8?B?cGN0bnJ3OURTNXNpb2hZWDVDUG5nN1FNb2hZaUx5bDVnQjd3WDZuTTMwVmVO?=
- =?utf-8?B?THRDejBhckJWSjZLeFc5Vk0xc0p0RFh5QjZQWmNxeG5EaTllTmVHcGZMQUNB?=
- =?utf-8?B?U2FHMnZaZEE0anZ3UE9tSFIwTHNueUp6TEwrZDR5WlFXRXBJcHRzaW9RbVdk?=
- =?utf-8?B?M2hCemJkU2xhQnlUL2ZlU1BZVUE5S0N4M0ZqdlBpL0RWRjZ3dGFZZz09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b6f4a65d-6342-48bf-3aed-08dea8869e54
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7548.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 May 2026 20:08:47.0617
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EfDDkHiwbKTU1V7PJOU/djohQ1AuGTdkK9QcriIQWvbZ8FFVimYcgXCg/9asNNArJHBfoJj63RLELMZ14MEYUA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7548
-X-Rspamd-Queue-Id: BF1804B3659
+References: <20260424053816.27965-1-kerneljasonxing@gmail.com>
+ <20260424053816.27965-9-kerneljasonxing@gmail.com> <afE7EFYdrNg1u_g2@devvm7509.cco0.facebook.com>
+ <CAL+tcoA0j+tHOPr-DLyW26_EF1JhwqV+no0Lcx335FtKRbwUAw@mail.gmail.com>
+ <afIeuwJNfwVmk9Pn@devvm7509.cco0.facebook.com> <CAL+tcoBTO9QGM220EO=m1TdiXwod7QzG59j7vQL3qoVSrb2QEw@mail.gmail.com>
+ <afQdzWlMzjgpAUq7@devvm7509.cco0.facebook.com>
+In-Reply-To: <afQdzWlMzjgpAUq7@devvm7509.cco0.facebook.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sat, 2 May 2026 23:10:14 +0300
+X-Gm-Features: AVHnY4Jgcbb21Gilb1zdl9-vTL4PgXfvRBz0aENbiyrkhBnNys-4k2fvK1e251M
+Message-ID: <CAL+tcoDWQG-QaixC_WDsGJemZHN0AffCqCMtdeaqad8ecF-EnA@mail.gmail.com>
+Subject: Re: [PATCH net v4 8/8] xsk: fix u64 descriptor address truncation on
+ 32-bit architectures
+To: Stanislav Fomichev <sdf.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, aleksander.lobakin@intel.com, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 1F67C4B3697
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	TAGGED_FROM(0.00)[bounces-283482-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283483-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mbloch@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,fomichev.me,iogearbox.net,vger.kernel.org,tencent.com];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,nvidia.com:email,Nvidia.com:dkim,sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,tencent.com:email,mail.gmail.com:mid]
 
+On Fri, May 1, 2026 at 6:29=E2=80=AFAM Stanislav Fomichev <sdf.kernel@gmail=
+.com> wrote:
+>
+> On 04/29, Jason Xing wrote:
+> > On Wed, Apr 29, 2026 at 6:14=E2=80=AFPM Stanislav Fomichev <sdf.kernel@=
+gmail.com> wrote:
+> > >
+> > > On 04/29, Jason Xing wrote:
+> > > > On Wed, Apr 29, 2026 at 2:11=E2=80=AFAM Stanislav Fomichev <sdf.ker=
+nel@gmail.com> wrote:
+> > > > >
+> > > > > On 04/24, Jason Xing wrote:
+> > > > > > From: Jason Xing <kernelxing@tencent.com>
+> > > > > >
+> > > > > > In copy mode TX, xsk_skb_destructor_set_addr() stores the 64-bi=
+t
+> > > > > > descriptor address into skb_shinfo(skb)->destructor_arg (void *=
+) via a
+> > > > > > uintptr_t cast:
+> > > > > >
+> > > > > >     skb_shinfo(skb)->destructor_arg =3D (void *)((uintptr_t)add=
+r | 0x1UL);
+> > > > > >
+> > > > > > On 32-bit architectures uintptr_t is 32 bits, so the upper 32 b=
+its of
+> > > > > > the descriptor address are silently dropped. In unaligned mode =
+the chunk
+> > > > > > offset is encoded in bits 48-63 of the descriptor address
+> > > > > > (XSK_UNALIGNED_BUF_OFFSET_SHIFT =3D 48), meaning the offset is =
+lost
+> > > > > > entirely. The completion queue then returns a truncated address=
+ to
+> > > > > > userspace, making buffer recycling impossible.
+> > > > > >
+> > > > > > Fix this by handling the 32-bit case in the destructor_arg help=
+ers:
+> > > > > >
+> > > > > > - xsk_skb_destructor_set_addr(): on !CONFIG_64BIT, allocate an
+> > > > > >   xsk_addrs struct via kmem_cache_zalloc() to store the full u6=
+4
+> > > > > >   address. Leave num_descs as 0 (zalloc) so that the subsequent
+> > > > > >   xsk_inc_num_desc() brings it to the correct count of 1.
+> > > > > >
+> > > > > > - xsk_skb_destructor_is_addr(): on !CONFIG_64BIT, return true o=
+nly
+> > > > > >   when destructor_arg is NULL (not yet set), false when it poin=
+ts to
+> > > > > >   an xsk_addrs struct.
+> > > > > >
+> > > > > > - xsk_skb_init_misc(): call xsk_skb_destructor_set_addr() first
+> > > > > >   before touching any other skb fields; on failure return early=
+ so
+> > > > > >   the skb destructor is never changed from sock_wfree.
+> > > > > >
+> > > > > > The existing xsk_consume_skb() already handles 32-bit correctly=
+ after
+> > > > > > these changes: xsk_skb_destructor_is_addr() returns false for a=
+ny
+> > > > > > allocated xsk_addrs, so the kmem_cache_free path is always take=
+n.
+> > > > > >
+> > > > > > The overhead is one extra kmem_cache_zalloc per first descripto=
+r on
+> > > > > > 32-bit only; 64-bit builds are completely unchanged.
+> > > > > >
+> > > > > > Closes: https://lore.kernel.org/all/20260419045824.D9E5EC2BCAF@=
+smtp.kernel.org/
+> > > > > > Fixes: 0ebc27a4c67d ("xsk: avoid data corruption on cq descript=
+or number")
+> > > > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > > > ---
+> > > > > >  net/xdp/xsk.c | 38 +++++++++++++++++++++++++++++++-------
+> > > > > >  1 file changed, 31 insertions(+), 7 deletions(-)
+> > > > > >
+> > > > > > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> > > > > > index ed96f6ec8ff2..fe88f47741b5 100644
+> > > > > > --- a/net/xdp/xsk.c
+> > > > > > +++ b/net/xdp/xsk.c
+> > > > > > @@ -558,7 +558,10 @@ static int xsk_cq_reserve_locked(struct xs=
+k_buff_pool *pool)
+> > > > > >
+> > > > > >  static bool xsk_skb_destructor_is_addr(struct sk_buff *skb)
+> > > > > >  {
+> > > > > > -     return (uintptr_t)skb_shinfo(skb)->destructor_arg & 0x1UL=
+;
+> > > > > > +     if (IS_ENABLED(CONFIG_64BIT))
+> > > > > > +             return (uintptr_t)skb_shinfo(skb)->destructor_arg=
+ & 0x1UL;
+> > > > > > +     else
+> > > > > > +             return !skb_shinfo(skb)->destructor_arg;
+> > > > >
+> > > > > Don't understand why we need to special case CONFIG_64BIT here?
+> > > > > Shouldn't the same existing condition work on 32bit?
+> > > >
+> > > > Because 0x1UL is the particular semantic applied on a 64-bit arch.
+> > > > xsk_skb_destructor_set_addr() sets it while
+> > > > xsk_skb_destructor_is_addr() recognizes it. They are a pair.
+> > > >
+> > > > As you noticed, one liner works but is not that appropriate: on a
+> > > > 32-bit arch, this member should be either a NULL point or a valid
+> > > > pointer pointing to a memory region. Testing if it's NULL can be
+> > > > helpful as to the long term maintenance because of its readability =
+and
+> > > > robustness/safety.
+> > > >
+> > > > The error path in allocation of skb is really complex, which is why
+> > > > I'm so cautious to take care of it :)
+> > >
+> > > Let's cleanup the error path instead of adding more complexity? Simil=
+ar to what
+> > > you do with your "xsk: fix xsk_addrs slab leak on multi-buffer error =
+path",
+> > > but maybe add a few NULL checks?
+> >
+> > Good suggestion. I think I can cook a follow up patch to do such a
+> > thing targetting net-next tree. This patch 8 belongs to net material
+> > which means it will be backported to the older stable kernel as soon
+> > as it gets merged. IIUC, the better way is to make it as simple as
+> > possible?
+> >
+> > >
+> > > Instead of 32 vs 64, I'd like to reason about whether destructor_arg
+> > > is an address or an allocated array (not whether we have 1 or >1
+> > > descriptors). And we special case 32 bit by always allocating it.
+> > >
+> > > Haven't checked, but maybe this is all you need (besides your _set_ad=
+dr
+> > > changes)?
+> > >
+> > > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> > > index 6149f6a79897..03f217e85d31 100644
+> > > --- a/net/xdp/xsk.c
+> > > +++ b/net/xdp/xsk.c
+> > > @@ -589,6 +589,8 @@ static u32 xsk_get_num_desc(struct sk_buff *skb)
+> > >                 return 1;
+> > >
+> > >         xsk_addr =3D (struct xsk_addrs *)skb_shinfo(skb)->destructor_=
+arg;
+> > > +       if (!xsk_addr)
+> > > +               return 0;
+> > >
+> > >         return xsk_addr->num_descs;
+> > >  }
+> >
+> > Right, as I mentioned, how about posting a new cleanup patch with your
+> > suggested-by tag?
+> >
+> > >
+> > > > I've noticed the status has been changed to 'changes requested'. Do=
+es
+> > > > that mean one way or another I have to post a new version?
+> > >
+> > > That wasn't me :-) From my POW, patches 1-7 are good to go..
+> >
+> > Great! Thanks for the review. My hope is to get this series merged
+> > soon in the net tree.
+> >
+> > >
+> > > > >
+> > > > > >  }
+> > > > > >
+> > > > > >  static u64 xsk_skb_destructor_get_addr(struct sk_buff *skb)
+> > > > > > @@ -566,9 +569,21 @@ static u64 xsk_skb_destructor_get_addr(str=
+uct sk_buff *skb)
+> > > > > >       return (u64)((uintptr_t)skb_shinfo(skb)->destructor_arg &=
+ ~0x1UL);
+> > > > > >  }
+> > > > > >
+> > > > > > -static void xsk_skb_destructor_set_addr(struct sk_buff *skb, u=
+64 addr)
+> > > > > > +static int xsk_skb_destructor_set_addr(struct sk_buff *skb, u6=
+4 addr)
+> > > > > >  {
+> > > > >
+> > > > > [..]
+> > > > >
+> > > > > > +     if (!IS_ENABLED(CONFIG_64BIT)) {
+> > > > > > +             struct xsk_addrs *xsk_addr;
+> > > > > > +
+> > > > > > +             xsk_addr =3D kmem_cache_zalloc(xsk_tx_generic_cac=
+he, GFP_KERNEL);
+> > > > > > +             if (!xsk_addr)
+> > > > > > +                     return -ENOMEM;
+> > > > > > +             xsk_addr->addrs[0] =3D addr;
+> > > > > > +             skb_shinfo(skb)->destructor_arg =3D (void *)xsk_a=
+ddr;
+> > > > > > +             return 0;
+> > > > > > +     }
+> > > > > > +
+> > > > > >       skb_shinfo(skb)->destructor_arg =3D (void *)((uintptr_t)a=
+ddr | 0x1UL);
+> > > > > > +     return 0;
+> > > > >
+> > > > > I think this is gonna be a 3rd copy paste of the same logic? Let'=
+s
+> > > > > move to a new helper and replace existing kmem_cache_zalloc place=
+s?
+> > > > >
+> > > > > xsk_skb_destructor_alloc_list(prev_addr) ?
+> > >
+> > > Any comments on this?
+> >
+> > I didn't comment on this because I thought I was not that sure if we
+> > needed to wrap it up in the stable kernels :)
+> >
+> > Of course, it would be easier for me to work on the net-next tree to
+> > make the code look
+> > more neat and elegant.
+>
+> Are you concerned that you're gonna break something in the net tree? Why =
+not
 
+My primary concern is this patch would be a little bit more
+complicated (more insertions/deletions). IIUC, the fix should be as
+simple as possible to easily get backported while we can do some
+cleanup work on the next branch.
 
-On 01/05/2026 7:16, Tariq Toukan wrote:
-> From: Mark Bloch <mbloch@nvidia.com>
-> 
-> Deployments that always operate in switchdev mode currently require
-> manual devlink configuration after driver probe, which complicates
-> automated provisioning.
-> 
-> Introduce MLX5_PROF_MASK_DEF_SWITCHDEV, a new profile mask bit, and
-> profile index 8. When a device is initialized or reloaded with this
-> profile, the driver automatically switches the e-switch to switchdev
-> mode by calling mlx5_devlink_eswitch_mode_set() immediately after
-> bringing the device online.
-> 
-> A no-op stub of mlx5_devlink_eswitch_mode_set() is added for builds
-> without CONFIG_MLX5_ESWITCH.
-> 
-> Signed-off-by: Mark Bloch <mbloch@nvidia.com>
-> Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> ---
->  .../net/ethernet/mellanox/mlx5/core/eswitch.h |  6 +++
->  .../net/ethernet/mellanox/mlx5/core/main.c    | 43 ++++++++++++++++++-
->  include/linux/mlx5/driver.h                   |  2 +
->  3 files changed, 50 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-> index 3858690e09b4..cfb9595f9de8 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-> @@ -1049,6 +1049,12 @@ mlx5_esw_lag_demux_rule_create(struct mlx5_eswitch *esw, u16 vport_num,
->  	return ERR_PTR(-EOPNOTSUPP);
->  }
->  
-> +static inline int
-> +mlx5_devlink_eswitch_mode_set(struct devlink *devlink, u16 mode,
-> +			      struct netlink_ext_ack *extack)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
->  #endif /* CONFIG_MLX5_ESWITCH */
->  
->  #endif /* __MLX5_ESWITCH_H__ */
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-> index 74827e8ca125..4cdda15ed7f5 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-> @@ -86,7 +86,7 @@ MODULE_PARM_DESC(debug_mask, "debug mask: 1 = dump cmd data, 2 = dump cmd exec t
->  
->  static unsigned int prof_sel = MLX5_DEFAULT_PROF;
->  module_param_named(prof_sel, prof_sel, uint, 0444);
-> -MODULE_PARM_DESC(prof_sel, "profile selector. Valid range 0 - 2");
-> +MODULE_PARM_DESC(prof_sel, "profile selector. Valid range 0 - 3 and 8");
+Please see this new version (v5) with your advice applied. Does it look goo=
+d?
+https://lore.kernel.org/all/20260502200722.53960-9-kerneljasonxing@gmail.co=
+m/
 
-sashiko.dev says:
-"
-Does using a module parameter to configure e-switch mode bypass the standard
-devlink uAPI? 
-The networking subsystem typically standardizes this configuration via
-netlink/devlink interfaces, and relying on a module parameter for this might
-fragment automated provisioning workflows.
-"
-
-The target here is DPU side deployments where switchdev is the only valid
-operating mode, and the goal is to boot directly into that mode instead
-of relying on userspace scripts after probe. I agree devlink remains the
-runtime uapi. This profile is only an opt-in transition step so we can
-avoid forcing switchdev in code before users have a way to reject that behavior.
-This does not replace devlink provisioning, it provides a DPU side default for
-environments that explicitly choose this profile.
-
-
->  
->  static u32 sw_owner_id[4];
->  #define MAX_SW_VHCA_ID (BIT(__mlx5_bit_sz(cmd_hca_cap_2, sw_vhca_id)) - 1)
-> @@ -99,6 +99,8 @@ enum {
->  
->  #define LOG_MAX_SUPPORTED_QPS 0xff
->  
-> +#define MLX5_PROF_SEL_LAST_NIC 3
-> +#define MLX5_PROF_SEL_FIRST_ESW 8
->  static struct mlx5_profile profile[] = {
->  	[0] = {
->  		.mask           = 0,
-> @@ -120,6 +122,11 @@ static struct mlx5_profile profile[] = {
->  		.log_max_qp	= LOG_MAX_SUPPORTED_QPS,
->  		.num_cmd_caches = 0,
->  	},
-> +	[8] = {
-> +		.mask = MLX5_PROF_MASK_DEF_SWITCHDEV | MLX5_PROF_MASK_QP_SIZE,
-> +		.log_max_qp = LOG_MAX_SUPPORTED_QPS,
-> +		.num_cmd_caches = MLX5_NUM_COMMAND_CACHES,
-> +	},
->  };
->  
->  static int wait_fw_init(struct mlx5_core_dev *dev, u32 max_wait_mili,
-> @@ -1385,6 +1392,22 @@ static void mlx5_unload(struct mlx5_core_dev *dev)
->  	mlx5_free_bfreg(dev, &dev->priv.bfreg);
->  }
->  
-> +static void mlx5_set_default_switchdev(struct mlx5_core_dev *dev)
-> +{
-> +	int err;
-> +
-> +	/* Default switchdev is best-effort; keep the device usable on
-> +	 * failure.
-> +	 */
-> +	err = mlx5_devlink_eswitch_mode_set(priv_to_devlink(dev),
-> +					    DEVLINK_ESWITCH_MODE_SWITCHDEV,
-> +					    NULL);
-> +	if (err && err != -EOPNOTSUPP)
-> +		mlx5_core_warn(dev,
-> +			       "Failed to set switchdev as default, continuing in current mode, err(%d)\n",
-> +			       err);
-> +}
-> +
->  int mlx5_init_one_devl_locked(struct mlx5_core_dev *dev)
->  {
->  	bool light_probe = mlx5_dev_is_lightweight(dev);
-> @@ -1431,6 +1454,10 @@ int mlx5_init_one_devl_locked(struct mlx5_core_dev *dev)
->  		mlx5_core_err(dev, "mlx5_hwmon_dev_register failed with error code %d\n", err);
->  
->  	mutex_unlock(&dev->intf_state_mutex);
-> +
-> +	if (dev->profile.mask & MLX5_PROF_MASK_DEF_SWITCHDEV)
-> +		mlx5_set_default_switchdev(dev);
-> +
->  	return 0;
-
-sashiko.dev says:
-"
-If a user explicitly sets the e-switch mode to legacy via devlink after
-initialization, will this override their setting during driver reload or
-firmware error recovery?
-Since mlx5_set_default_switchdev() is called unconditionally here based on
-the profile mask, it seems like it could silently revert the device back to
-switchdev mode, discarding the active user configuration.
-"
-
-Yes, with this profile selected, switchdev is intentionally reapplied after
-reload or recovery. A devlink change to legacy affects the current lifetime,
-but the selected profile defines the default mode after the device is
-reinitialized, users that want legacy to persist should not use this profile.
-
->  
->  err_register:
-> @@ -1532,6 +1559,10 @@ int mlx5_load_one_devl_locked(struct mlx5_core_dev *dev, bool recovery)
->  		goto err_attach;
->  
->  	mutex_unlock(&dev->intf_state_mutex);
-> +
-> +	if (dev->profile.mask & MLX5_PROF_MASK_DEF_SWITCHDEV)
-> +		mlx5_set_default_switchdev(dev);
-> +
->  	return 0;
->  
->  err_attach:
-> @@ -2314,6 +2345,16 @@ static void mlx5_core_verify_params(void)
->  			MLX5_DEFAULT_PROF);
->  		prof_sel = MLX5_DEFAULT_PROF;
->  	}
-> +
-> +	if (prof_sel > MLX5_PROF_SEL_LAST_NIC &&
-> +	    prof_sel < MLX5_PROF_SEL_FIRST_ESW) {
-> +		pr_warn("mlx5_core: WARNING: Invalid module parameter prof_sel %d invalid range %d - %d, changing back to default (%d)\n",
-> +			prof_sel,
-> +			MLX5_PROF_SEL_LAST_NIC + 1,
-> +			MLX5_PROF_SEL_FIRST_ESW - 1,
-> +			MLX5_DEFAULT_PROF);
-> +		prof_sel = MLX5_DEFAULT_PROF;
-> +	}
->  }
->  
->  static int __init mlx5_init(void)
-> diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
-> index 04b96c5abb57..65298c07df4d 100644
-> --- a/include/linux/mlx5/driver.h
-> +++ b/include/linux/mlx5/driver.h
-> @@ -705,6 +705,8 @@ struct mlx5_st;
->  
->  enum {
->  	MLX5_PROF_MASK_QP_SIZE		= (u64)1 << 0,
-> +	MLX5_PROF_MASK_MR_CACHE		= (u64)1 << 1,
-> +	MLX5_PROF_MASK_DEF_SWITCHDEV    = (u64)1 << 2,
->  };
-
-sashiko.dev says:
-"
-This isn't a bug, but it looks like MLX5_PROF_MASK_MR_CACHE is introduced
-here but never used in the driver code. Is this mask intended for a future
-patch?
-"
-
-Before I respin for the unrelated MR_CACHE cleanup, I’d like to confirm
-whether the opt-in profile approach is acceptable at all. Regardless
-of this last patch, the first 6 patches fix real representor/LAG locking
-issues and are needed independently, so I’d like to keep those moving toward
-acceptance as soon as possible.
-
-Mark
-
-
->  
->  struct mlx5_profile {
-
+Thanks,
+Jason
 
