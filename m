@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-283410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283411-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id fhIsBt359WkHRAIAu9opvQ
-	(envelope-from <netdev+bounces-283410-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 15:19:25 +0200
+	id sHxHDg769WkFRAIAu9opvQ
+	(envelope-from <netdev+bounces-283411-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 15:20:14 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60C464B21C1
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 15:19:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 82C564B21F3
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 15:20:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CA228300C5A5
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 13:19:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 07E5C302494C
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 13:19:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C8AD1E32A2;
-	Sat,  2 May 2026 13:19:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 901DA248861;
+	Sat,  2 May 2026 13:19:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FLJ91kIh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UfMnZV22"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D7301A9FAB
-	for <netdev@vger.kernel.org>; Sat,  2 May 2026 13:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3174A1E8342
+	for <netdev@vger.kernel.org>; Sat,  2 May 2026 13:19:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777727962; cv=none; b=JG0dHMrTfX5xz4wAQLzdfgBGr5H0QgU5Ehld+70ekEv4p52YNm6IUOM3D+MFqXAbkb6GqH3oaMNi4k58hFDorY580PcH4jbRjzPxb9B29T2yF1+6UOjSinc6BwU1XvqzkTZ7id+XMAR6MMND0lBQdFGZ6SNzK4/nOTp1ujWRayI=
+	t=1777727969; cv=none; b=psCednFyZZrDu4c6DU6BC1Qb7CSFsmI4zgd2abeKKMNSt+6l+XEm/SPzEwoq5CXScbpY0wTB1XTm581woFgEwCGGkGpAadIAUc6CP4rLsA4bXC5pmZzfz+qyQRLbHznGt0eY5lMX0RLEI8dhNqP1ERqcEWPJf8ImVpSfqyxdoeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777727962; c=relaxed/simple;
-	bh=HyVORvmUzvwB1Nl5p7wOIBo6yAmsVN9A+bqB5xudpLQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=twZko0mpa06xS4pq7xf9nHT/up6V92GKpK2D2SlUTiQDb1McrueRf6J3SnJ9CrZ17iUHFcPSAo3LJB6fozdFCNCSLFq6VvJ9XAVSiBQSckFZj6zX9vckFGpZsq0F3OKh37Oky8K8AeMPGSdo+KIjIl6vzT9dtVNp+lkO/8eaE9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FLJ91kIh; arc=none smtp.client-ip=209.85.210.171
+	s=arc-20240116; t=1777727969; c=relaxed/simple;
+	bh=PH9zdGszS2v4ltP/Vm27MJNnYZX6pbBgq07/H3IXfok=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=P3jZxdbgVDzR34ocnfDUUuIuLIjROT9J+UUmBAEoYCPcb9+c1mqIeIi+mDtB3bMnxyZONx5jCstNXPgDXqIvYm9H65L/KnQo76P+yIvZ+9gFhS2Voj50jJMxbGI3e51LR7Yk6GwyE00PY6p9VVAIjwy483FALIGCO/VNAG7S65Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UfMnZV22; arc=none smtp.client-ip=209.85.210.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-83538fbd0b2so67632b3a.0
-        for <netdev@vger.kernel.org>; Sat, 02 May 2026 06:19:20 -0700 (PDT)
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-835399c11e0so63813b3a.0
+        for <netdev@vger.kernel.org>; Sat, 02 May 2026 06:19:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777727960; x=1778332760; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FwzP1nrwPQwraOurWhbU6oQqB1NFo74SdXflMLy9biw=;
-        b=FLJ91kIh5HwHulG9KfG2l4axMbkJksF4RFmmYmuRgXzsdX9BRPGIDm8K6NRbtiBptl
-         RUCx/bew3P9G+J7nmgGyUnq7dsHe2/XYZCuJ1pBC7NMJA+ZG9GFrVfYv+fawOCGm02R4
-         CIQDgnQ1zPmOgb6I00lofW6oIrG40IgJGOEaMPRd9/4Pv30iNxIK48DzMA0NIZC6If2i
-         qRCMi38e0yihp+Zfv8LJ9ZrhGzJzNnU841sgVeUAsl9Nnyjo40aQm+hdte5GRajZUYYL
-         w/vqXHyXzLKLMyDH/41ycdbbxevDEG2uIZVc6hJ2X/KHlTcH8fK1x3L8kcM6P9oSI2nb
-         g+Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777727960; x=1778332760;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1777727966; x=1778332766; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FwzP1nrwPQwraOurWhbU6oQqB1NFo74SdXflMLy9biw=;
-        b=jvTYlrk82IiG62kx8VNGhcFsfF+rrGIX0pAm/B9pcc0fF1EUMTqtIsYjYNad0uZjMO
-         X5wwScN1sIE8BoLAO602l2PkUrG0iKxusv4pgT+R0bVYt6qpQSpvEyLCDr11uIyVxM3p
-         6k5wKqczmLeg5IX7uHQ7yT1sdDLPWQXUUF32lvbolBNuptPl/yl948qtK76KHMfFJryz
-         wgxa6RQL1F+TWWUobMtERZ7k0hupyrj8dE7fLswQgcAIDdGz6gPHWOxhlkyBKjr5UqZV
-         CYRdD+t/Y3GJIGbrZU0hqEgc7DordOcALBuvAvK56r6SXwv6a8wbF075QARMODHF8u6F
-         xIXQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8Hiku22UR477qZenxRmo12W/PKJ3N97vPyn2SY+GTsyBGEUWep73eR5LRIBPcKoaDwrRAdxQ4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHYP4PL5CjhM3mHP/vUvI9LvqVHmlJFWb0apiqUkUb69/yibB9
-	Zb76fmfwsT9pxA7AO/4S3M7Z6JE/p5vtWwba2FhOwSyRL7uZiiaV2dWYlLb+oGvwgF8=
-X-Gm-Gg: AeBDieu+KwTaMwH/od2lrvnv2Dn6f1YorVasjRvlBfrJOekyahClpLvDf/uC/bNyMMm
-	VeLB5xlmJKw56RQorWgGlMfCPDix46787go+IV8DETcN1H3qp3+iHXRJBpkj1CXvP5rw1N3TA8Z
-	bn1yrPVWTbv2w5bxcnmQw3tcwvmqoGhxsLLCIactdDuq+OzHDKdyNjjl+BDspe4RaaDPauogjqH
-	U2ZEW3yyQt+YEJKDI0TKpXoQufXhSxrng0hfMj30oOAuGtWq2FmbEsnFumr2C+v8NTHWjlI0yl3
-	YqiYOh9kKqAfhwFET4tsvEN4eZtDFtm2J5tq49uLb4aPtlDYvfLKU4SBwSHqoNG3rQcMNGWUvbI
-	5UZiJ/4h+Ovw1p68tis+c8/vQB2kEV9+nqSqAYI0xiAjkdc0WmrsoocyFznwejlZRkwSTBaHWGY
-	DoQkAdyKwKcFIwSdcbsOLDQelTu1/YrnJK1skAB5bOAa7WAM99hw==
-X-Received: by 2002:a05:6a00:4188:b0:834:e5a2:d089 with SMTP id d2e1a72fcca58-8352d29abeamr2977873b3a.33.1777727959490;
-        Sat, 02 May 2026 06:19:19 -0700 (PDT)
+        bh=6SBkUEIvhzDL4buR9DLMar8que8lJAciCkjc6oYU6Uo=;
+        b=UfMnZV22qNIpgn8pCuTMoDoZgglP77k9+lmvq4VdheTpJX4iVXUaHFFPyFoy2ewMJC
+         QeDT/mpThi66RfgX2CSaycMvcHmRZX0FAeVz1V720Xpw8TM3Wp268DDgEJIeRGKAh8NU
+         nY4SmmvIl9vqwzYqs8zjg8aifn7UE4EIzdu8Tu9z762HNNpevi9Fgwo1dTN4+2wCC3MO
+         RDW4mvZhwTmk6HMaSw3dx2adJFc3LRPl4mxAjqlaDlKfesVhBloSpGcRX4dTuoJUq8eP
+         fYzIGKA+P0shAeL6DIKyGSS+WNdljMclG71CrXjWt23lhl7thtyBmLu/DuXX6p+y81SB
+         vBAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777727966; x=1778332766;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=6SBkUEIvhzDL4buR9DLMar8que8lJAciCkjc6oYU6Uo=;
+        b=NwA9F1bF9tpWl6RYSo+dmpu4KWJRN14gtMe/1SlCuYfVLC6kBno0cYMWzU5JXelVDV
+         mjLLotz+/oVrophNru8a3ppnpzQjqpZ6L2Ii24MIJb/OP8ZXKDOANMTYx7xt28ZSl41J
+         e0cAiQM8BLSKTSml+BaZdhjAkBMX5x/vMOL/1Z1eS3WiZIra7q0sgJbyFXfPfqT/kfru
+         rlWctqZ8dJEleXufM9zuMQKRGiakW69q/sVWZlcMF+g2bDdQzWMzIvfPKinlRjMhAS47
+         vQ6xuOkhnFXXSFVAcqLStc6eDegTQ+YznuAfc0H0bf3EdxMRw1SLLCE5YqZlpuMfrEaK
+         HRVA==
+X-Forwarded-Encrypted: i=1; AFNElJ9a3VgrRAyWDFUTTeGYjtSfxd38Rcvwb9MH3Z7UXVOgCS96jXQrhfq24Yv9zB+LKqkhQ0Og20o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCcYbgw01FoU3pJVh1/4tiLA9FIDR7MXEN+8/xQzKu0q3PWOQW
+	MLQlgltMED72V2b694fGeaheT5tmgTc8Uap3qSS80gcB9xiO4o+3oV2l
+X-Gm-Gg: AeBDieuDYNJdMOOr5Ygu8P+9BYq6HMMLh3FAzyThF4dkqfuS8zr2ZUe0Cnn8lyA/WPa
+	MtYW7rRMm1QwHYdD8DmTbH8H8YnpxS8EoRLl85qInEkpfoMrQp7wjqmV6RMdHudi0WaK7XQiXYd
+	B2BbAcknwMFxSpNqV9NYJmqTEYp82AJ1vRRzQ6YSxJVJDMFBFxnJ8RarnqXau/xpYWEqeAFX+uX
+	H8t2zLqK6LJ6lHIYWYPrAj5nJlY1GlmuvB+/eCX4e7Ulafgl/gyCIGRxWlHFLDJWNMJ6Vf0KN43
+	V/PM29LxvIMvESKx9Iqo/muvXTZSDOd0nLEV3aLYGpybFZ8OjLXIy0cPDXyFAKoCeoLYdTi5Tho
+	ql0Mvz1Oh7GllqhE+kw4WkneJG76QM3xfwcrBCI9NhptmjUElNJ9eOghKFXf7PoIPuWtrAJ/2ph
+	UCbJrEAmqeZjIoi87VVi22LgTLYV7nnm+SfYlaJYT+ZVqjnyhbYxwXWfECAOQu
+X-Received: by 2002:a05:6a00:448b:b0:82c:d7c4:4c5c with SMTP id d2e1a72fcca58-8352d178e85mr3057979b3a.20.1777727966440;
+        Sat, 02 May 2026 06:19:26 -0700 (PDT)
 Received: from DESKTOP-82PPU4A.localdomain ([202.8.116.84])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83515ad0176sm5553791b3a.39.2026.05.02.06.19.12
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83515ad0176sm5553791b3a.39.2026.05.02.06.19.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 May 2026 06:19:18 -0700 (PDT)
+        Sat, 02 May 2026 06:19:25 -0700 (PDT)
 From: Ujjal Roy <royujjal@gmail.com>
 To: "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -92,10 +94,12 @@ Cc: Ujjal Roy <ujjal@alumnux.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v6 0/5] net: bridge: mcast: support exponential field encoding
-Date: Sat,  2 May 2026 13:19:01 +0000
-Message-ID: <20260502131907.987-1-royujjal@gmail.com>
+Subject: [PATCH net-next v6 1/5] ipv4: igmp: get rid of IGMPV3_{QQIC,MRC} and simplify calculation
+Date: Sat,  2 May 2026 13:19:02 +0000
+Message-ID: <20260502131907.987-2-royujjal@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260502131907.987-1-royujjal@gmail.com>
+References: <20260502131907.987-1-royujjal@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,7 +107,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 60C464B21C1
+X-Rspamd-Queue-Id: 82C564B21F3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -118,7 +122,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-283410-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283411-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -133,144 +137,159 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[blackwall.org:email,bridge_vlan_mcast.sh:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[blackwall.org:email,nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Description:
-This series addresses a mismatch in how multicast query
-intervals and response codes are handled across IPv4 (IGMPv3)
-and IPv6 (MLDv2). While decoding logic currently exists,
-the corresponding encoding logic is missing during query
-packet generation. This leads to incorrect intervals being
-transmitted when values exceed their linear thresholds.
+Get rid of the IGMPV3_MRC macro and use the igmpv3_mrt() API to
+calculate the Max Resp Time from the Maximum Response Code.
 
-The patches introduce a unified floating-point encoding
-approach based on RFC3376 and RFC3810, ensuring that large
-intervals are correctly represented in QQIC and MRC fields
-using the exponent-mantissa format.
+Similarly, for IGMPV3_QQIC, use the igmpv3_qqi() API to calculate
+the Querier's Query Interval from the QQIC field.
 
-Key Changes:
-* ipv4: igmp: get rid of IGMPV3_{QQIC,MRC} and simplify calculation
-  Removes legacy macros in favor of a cleaner, unified
-  calculation for retrieving intervals from encoded fields,
-  improving code maintainability.
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Signed-off-by: Ujjal Roy <royujjal@gmail.com>
+---
+ include/linux/igmp.h      | 80 +++++++++++++++++++++++++++++++++++----
+ net/bridge/br_multicast.c |  2 +-
+ net/ipv4/igmp.c           |  6 +--
+ 3 files changed, 76 insertions(+), 12 deletions(-)
 
-* ipv6: mld: rename mldv2_mrc() and add mldv2_qqi()
-  Standardizes MLDv2 terminology by renaming mldv2_mrc()
-  to mldv2_mrd() (Maximum Response Delay) and introducing
-  a new API mldv2_qqi for QQI calculation, improving code
-  readability.
-
-* ipv4: igmp: encode multicast exponential fields
-  Introduces the logic to dynamically calculate the exponent
-  and mantissa using bit-scan (fls). This ensures QQIC and
-  MRC fields (8-bit) are properly encoded when transmitting
-  query packets with intervals that exceed their respective
-  linear threshold value of 128 (for QQI/MRT).
-
-* ipv6: mld: encode multicast exponential fields
-  Applies similar encoding logic for MLDv2. This ensures
-  QQIC (8-bit) and MRC (16-bit) fields are properly encoded
-  when transmitting query packets with intervals that exceed
-  their respective linear thresholds (128 for QQI; 32768
-  for MRD).
-
-* selftests: net: bridge: add MRC and QQIC field encoding tests
-  Updates bridge selftests to validate both linear and non-linear
-  (exponential) encoding for MRC and QQIC fields, ensuring
-  protocol compliance across IGMPv3 and MLDv2.
-
-Impact:
-These changes ensure that multicast queriers and listeners
-stay synchronized on timing intervals, preventing protocol
-timeouts or premature group membership expiration caused
-by incorrectly formatted packet headers.
-
-Test results:
-Giving results only from modified API vlmc_query_intvl_test() and
-vlmc_query_response_intvl_test() of the script bridge_vlan_mcast.sh.
-
-Using old Linux code, here is the result:
-    - TEST: Vlan multicast snooping enable                                [ OK ]
-    - TEST: Vlan mcast_query_interval global option default value         [ OK ]
-    - TEST: Number of tagged IGMPv2 general query                         [ OK ]
-    - TEST: IGMPv3 QQIC linear value 60(s)                                [ OK ]
-    - TEST: MLDv2 QQIC linear value 60(s)                                 [ OK ]
-    - TEST: IGMPv3 QQIC non linear value 160(s)                           [FAIL]
-    -         Wrong QQIC in generated IGMPv3 general queries
-    - TEST: MLDv2 QQIC non linear value 160(s)                            [FAIL]
-    -         Wrong QQIC in generated MLDv2 general queries
-    - TEST: Vlan mcast_query_response_interval global option default value   [ OK ]
-    - TEST: IGMPv3 MRC linear value of 60(x0.1s)                          [ OK ]
-    - TEST: MLDv2 MRC linear value of 24000(ms)                           [ OK ]
-    - TEST: IGMPv3 MRC non linear value of 240(x0.1s)                     [FAIL]
-    -         Wrong MRC in generated IGMPv3 general queries
-    - TEST: MLDv2 MRC non linear value of 48000(ms)                       [FAIL]
-    -         Wrong MRC in generated MLDv2 general queries
-
-Linux code with this patchset, here is the result:
-    * TEST: Vlan multicast snooping enable                                [ OK ]
-    * TEST: Vlan mcast_query_interval global option default value         [ OK ]
-    * TEST: Number of tagged IGMPv2 general query                         [ OK ]
-    * TEST: IGMPv3 QQIC linear value 60(s)                                [ OK ]
-    * TEST: MLDv2 QQIC linear value 60(s)                                 [ OK ]
-    * TEST: IGMPv3 QQIC non linear value 160(s)                           [ OK ]
-    * TEST: MLDv2 QQIC non linear value 160(s)                            [ OK ]
-    * TEST: Vlan mcast_query_response_interval global option default value   [ OK ]
-    * TEST: IGMPv3 MRC linear value of 60(x0.1s)                          [ OK ]
-    * TEST: MLDv2 MRC linear value of 24000(ms)                           [ OK ]
-    * TEST: IGMPv3 MRC non linear value of 240(x0.1s)                     [ OK ]
-    * TEST: MLDv2 MRC non linear value of 48000(ms)                       [ OK ]
-
-v6:
-- Added Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-- Previous thread can be found here:
-  https://lore.kernel.org/all/20260501173130.3486-1-royujjal@gmail.com/
-
-v5:
-- Added 'Reviewed-by:' as requested
-- Modified script to fix AND logic in classifiers and updated comments
-- Passed expected value as argument rather than hard coding in script
-- Added minor comments for macros
-
-v4:
-- Removed binary application and related codes for selftests
-- Decided hard coded match based on extra arguments for selftests
-- Ran shellcheck on modified selftests code and fixed
-- Updated comments on patch[1,2,3,4] as per review
-- Added 'Reviewed-by:' as requested on patch4
-
-v3:
-- Updated the series title for better clarity; old one is here
-  https://lore.kernel.org/all/20260326150742.50289-1-royujjal@gmail.com/
-- Added key changes section for new selftests patch
-- Updated netdev style comments and addressed review comments
-- Fixed MLDv2 MRC conversion logic during query generation
-- Mentioned intervals in units wherever applicable
-- Dropped type casting and fixed indentations
-
-v2:
-- Retargeted the series to net-next as suggested
-- Fixed a compilation warning in the MLD rename change
-- Kept reverse xmas tree order in IGMP exponential encoding change
-- Added bridge selftests to validate IGMPv3 Query MRC and QQIC handling
-
-Ujjal Roy (5):
-  ipv4: igmp: get rid of IGMPV3_{QQIC,MRC} and simplify calculation
-  ipv6: mld: rename mldv2_mrc() and add mldv2_qqi()
-  ipv4: igmp: encode multicast exponential fields
-  ipv6: mld: encode multicast exponential fields
-  selftests: net: bridge: add MRC and QQIC field encoding tests
-
- include/linux/igmp.h                          | 167 +++++++++++++++-
- include/net/mld.h                             | 185 +++++++++++++++++-
- net/bridge/br_multicast.c                     |  22 +--
- net/ipv4/igmp.c                               |   6 +-
- net/ipv6/mcast.c                              |  19 +-
- .../net/forwarding/bridge_vlan_mcast.sh       | 140 ++++++++++++-
- 6 files changed, 483 insertions(+), 56 deletions(-)
-
-
-base-commit: 0f19519fdd22bc0f5429377da3a52327c5eee166
+diff --git a/include/linux/igmp.h b/include/linux/igmp.h
+index 073b30a9b850..0e095c9f234e 100644
+--- a/include/linux/igmp.h
++++ b/include/linux/igmp.h
+@@ -92,15 +92,79 @@ struct ip_mc_list {
+ 	struct rcu_head		rcu;
+ };
+ 
++/* RFC3376, relevant sections:
++ *  - 4.1.1. Maximum Response Code
++ *  - 4.1.7. QQIC (Querier's Query Interval Code)
++ *
++ * For both MRC and QQIC, values >= 128 use the same floating-point
++ * encoding as follows:
++ *
++ *  0 1 2 3 4 5 6 7
++ * +-+-+-+-+-+-+-+-+
++ * |1| exp | mant  |
++ * +-+-+-+-+-+-+-+-+
++ */
++#define IGMPV3_FP_EXP(value)		(((value) >> 4) & 0x07)
++#define IGMPV3_FP_MAN(value)		((value) & 0x0f)
++
++/* IGMPv3 floating-point exponential field min threshold */
++#define IGMPV3_EXP_MIN_THRESHOLD	128
++
+ /* V3 exponential field decoding */
+-#define IGMPV3_MASK(value, nb) ((nb)>=32 ? (value) : ((1<<(nb))-1) & (value))
+-#define IGMPV3_EXP(thresh, nbmant, nbexp, value) \
+-	((value) < (thresh) ? (value) : \
+-        ((IGMPV3_MASK(value, nbmant) | (1<<(nbmant))) << \
+-         (IGMPV3_MASK((value) >> (nbmant), nbexp) + (nbexp))))
+-
+-#define IGMPV3_QQIC(value) IGMPV3_EXP(0x80, 4, 3, value)
+-#define IGMPV3_MRC(value) IGMPV3_EXP(0x80, 4, 3, value)
++
++/* IGMPv3 MRC/QQIC 8-bit exponential field decode
++ *
++ * RFC3376, 4.1.1 & 4.1.7. defines the decoding formula:
++ *      0 1 2 3 4 5 6 7
++ *     +-+-+-+-+-+-+-+-+
++ *     |1| exp | mant  |
++ *     +-+-+-+-+-+-+-+-+
++ * Max Resp Time = (mant | 0x10) << (exp + 3)
++ * QQI = (mant | 0x10) << (exp + 3)
++ */
++static inline unsigned long igmpv3_exp_field_decode(const u8 code)
++{
++	if (code < IGMPV3_EXP_MIN_THRESHOLD) {
++		return code;
++	} else {
++		unsigned long mc_man, mc_exp;
++
++		mc_exp = IGMPV3_FP_EXP(code);
++		mc_man = IGMPV3_FP_MAN(code);
++
++		return (mc_man | 0x10) << (mc_exp + 3);
++	}
++}
++
++/* Calculate Max Resp Time from Maximum Response Code
++ *
++ * RFC3376, relevant sections:
++ *  - 4.1.1. Maximum Response Code
++ *  - 8.3. Query Response Interval
++ *
++ * After decode, MRC represents the Maximum Response Time (MRT) in
++ * units of 0.1 seconds (100 ms).
++ */
++static inline unsigned long igmpv3_mrt(const struct igmpv3_query *ih3)
++{
++	return igmpv3_exp_field_decode(ih3->code);
++}
++
++/* Calculate Querier's Query Interval from Querier's Query Interval Code
++ *
++ * RFC3376, relevant sections:
++ *  - 4.1.7. QQIC (Querier's Query Interval Code)
++ *  - 8.2. Query Interval
++ *  - 8.12. Older Version Querier Present Timeout
++ *    (the [Query Interval] in the last Query received)
++ *
++ * After decode, QQIC represents the Querier's Query Interval in units
++ * of seconds.
++ */
++static inline unsigned long igmpv3_qqi(const struct igmpv3_query *ih3)
++{
++	return igmpv3_exp_field_decode(ih3->qqic);
++}
+ 
+ static inline int ip_mc_may_pull(struct sk_buff *skb, unsigned int len)
+ {
+diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
+index 881d866d687a..9fec76e887bc 100644
+--- a/net/bridge/br_multicast.c
++++ b/net/bridge/br_multicast.c
+@@ -3518,7 +3518,7 @@ static void br_ip4_multicast_query(struct net_bridge_mcast *brmctx,
+ 			goto out;
+ 
+ 		max_delay = ih3->code ?
+-			    IGMPV3_MRC(ih3->code) * (HZ / IGMP_TIMER_SCALE) : 1;
++			    igmpv3_mrt(ih3) * (HZ / IGMP_TIMER_SCALE) : 1;
+ 	} else {
+ 		goto out;
+ 	}
+diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+index a674fb44ec25..d7eff36d98c3 100644
+--- a/net/ipv4/igmp.c
++++ b/net/ipv4/igmp.c
+@@ -991,7 +991,7 @@ static bool igmp_heard_query(struct in_device *in_dev, struct sk_buff *skb,
+ 		 * different encoding. We use the v3 encoding as more likely
+ 		 * to be intended in a v3 query.
+ 		 */
+-		max_delay = IGMPV3_MRC(ih3->code)*(HZ/IGMP_TIMER_SCALE);
++		max_delay = igmpv3_mrt(ih3) * (HZ / IGMP_TIMER_SCALE);
+ 		if (!max_delay)
+ 			max_delay = 1;	/* can't mod w/ 0 */
+ 	} else { /* v3 */
+@@ -1006,7 +1006,7 @@ static bool igmp_heard_query(struct in_device *in_dev, struct sk_buff *skb,
+ 			ih3 = igmpv3_query_hdr(skb);
+ 		}
+ 
+-		max_delay = IGMPV3_MRC(ih3->code)*(HZ/IGMP_TIMER_SCALE);
++		max_delay = igmpv3_mrt(ih3) * (HZ / IGMP_TIMER_SCALE);
+ 		if (!max_delay)
+ 			max_delay = 1;	/* can't mod w/ 0 */
+ 		WRITE_ONCE(in_dev->mr_maxdelay, max_delay);
+@@ -1016,7 +1016,7 @@ static bool igmp_heard_query(struct in_device *in_dev, struct sk_buff *skb,
+ 		 * configured value.
+ 		 */
+ 		in_dev->mr_qrv = ih3->qrv ?: READ_ONCE(net->ipv4.sysctl_igmp_qrv);
+-		in_dev->mr_qi = IGMPV3_QQIC(ih3->qqic)*HZ ?: IGMP_QUERY_INTERVAL;
++		in_dev->mr_qi = igmpv3_qqi(ih3) * HZ ? : IGMP_QUERY_INTERVAL;
+ 
+ 		/* RFC3376, 8.3. Query Response Interval:
+ 		 * The number of seconds represented by the [Query Response
 -- 
 2.43.0
 
