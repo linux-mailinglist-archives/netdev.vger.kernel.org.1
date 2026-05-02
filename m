@@ -1,430 +1,210 @@
-Return-Path: <netdev+bounces-283491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283493-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eOxFHshy9mloVAIAu9opvQ
-	(envelope-from <netdev+bounces-283491-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 23:55:20 +0200
+	id gAFZIBiI9mkUWAIAu9opvQ
+	(envelope-from <netdev+bounces-283493-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 01:26:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 208DD4B38D7
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 23:55:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E77F4B39FC
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 01:26:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4166F301705C
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 21:54:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A3CEE30151DF
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 23:25:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8333D38B7B0;
-	Sat,  2 May 2026 21:54:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5D0F314A90;
+	Sat,  2 May 2026 23:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c4L/sLbC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qAO4cdUq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3BF63A3E62
-	for <netdev@vger.kernel.org>; Sat,  2 May 2026 21:54:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7910627FB1C;
+	Sat,  2 May 2026 23:25:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777758857; cv=none; b=sba0Oc9EpmMRnhT8qadfbKV13PQHJpM5oiwBL9NQ8viLIbZZ7ezt+zU5kEFQ9PMTKLBg+6XlLLgbUMod/aDYVtis72GOFuS1+9HvaP2c5qryHkfm/jVXi9J4Yg8DSjBPedWOHuEersATTp4ZWUF4tD/5Z7bd3blfI0COyi5X3zM=
+	t=1777764337; cv=none; b=RFkAVn5wlN1CUvyMG5UIz34yJiRFwg6E5yMOPSzidp/k3vSjVb5GHP/NygPyJiM0TTrjMmSSG/grxmF2YCNUchQTh+owT48B3zQ4WU8eErG/QNI3LrOWv1QdDiQ/S2y2Pu7hnptcLW8V2EmNhrsHroReDyKiitOvSvEQTNcx44Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777758857; c=relaxed/simple;
-	bh=cRnWCMQ88GSHrKRzoEl4e2//bkZFdnLonj7I/X92Vlc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WeAdW9582qEEXbPwq3CMR5OISEe2fu9Vz65Hbrye0uARfDZdUVLD2YDn82ZOCQgCqiHZKO0v2/PKmh03y0IqRnc9XfFNiYhk6BCLSaUAS7NIYGm2OeDyRmW+jbh0ayZrMK+UqP3ybKyCd9ciI64uRhetO0ifhZ5F72WCjjGQtws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c4L/sLbC; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2a7a9b8ed69so25966235ad.2
-        for <netdev@vger.kernel.org>; Sat, 02 May 2026 14:54:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777758855; x=1778363655; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jTLIWvyiu4EREhHJ+YnuwMmWukQlgS0TtUJWhXuNCiw=;
-        b=c4L/sLbCVLrA+BpVC1i4lO/G+UpE6dp7fBJiUYbxldKSYUFxK5zvI6ekBPRTOoGhy2
-         41YBhYaA3VrIF8sWyEg/iRsEGE65Eo5lPPvMMngsCT+AtQqorCb+rtYs1KJCHa6JcNLq
-         HhGDJq6JULqcJCA4F6+7KixnFifXu+CLIpPOQZEHQ0IsF2PswEulaEBqZ7b/pVNY/2HY
-         Rw07NVTy1E0WWSRL+uGhV5FcQ+GDCsakqs3KtpcJnqshCFxsEHdGJn2mbvE5AMx+AhoG
-         si5IzmhfLEJukaylWcVLKHeNTtZOE7wuDEIRq9IAflkoWlMLxa1ZQ7C1XM6/nTX2P57Y
-         ImLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777758855; x=1778363655;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=jTLIWvyiu4EREhHJ+YnuwMmWukQlgS0TtUJWhXuNCiw=;
-        b=l5N5oEvE3zhVSwxpnX9IHK24xvMJEs2OoiWSSi5fG0W1hvcdrJEFmTWYWTXDvboBj1
-         iCPWFKKnp693oy/9TezvOmbJHKaEBqT0TENb0JmUt+OVd8rXRTJFfcfK04g5PdBtLDke
-         vNBbFN9EyGb5NpchnkWBSxQCLlHYQPs0a5kJSdN5YCHqFsxvZ9pejnPQ7CWYwjLs/bse
-         ngdPnpPfL60dwkhjVlXL2lr3PgfQ6aX7cDutMAo0vHM/RbN47SKLLzKm+Odx3bRb9+HB
-         edVMOFp4sSqQ3gWbffGVAk5hRtIX2ApV/XC/9Z/vrwQTQgsucgcI1DDHzCQvqrPwgu5m
-         peBQ==
-X-Gm-Message-State: AOJu0YzrGRPSE+lVQDZg6IhaK6o8LKG5H5pk09jVQUq2bb1acG0FbV//
-	Ez929Gqzj80RPfRpoYlEm5QwNBWxPZ7XgRJhv1UEY+7pIlry/34r/CMW67BTZekf
-X-Gm-Gg: AeBDieskdBoNBMqteE26XzXjBBTdxqQQWkMddf/Ojtg3ayolDVD/Q4kem7aNf8SPwpb
-	mAJk7Ip0+3NUhFUmrPsYpt8RQRWLq2o8OkicTye2LVnMt7U1wYOqSNgZY9nP8VTjqJyDQ4657yD
-	uw6rc4mWAOyENzHreKDA2ciY8jkLrlFDBTqlAxkT4StkMEt6GPR7tbJZJ6oEx9CMphjBAIoAe3b
-	zt5vbLdRQ26Iuv9pL3Es1Lq15+KXWyMBATrUYri4/GrdlN288TgQ9aNwBCp2gtLK8yPwtU+37f/
-	8NgXrfutCnufd4WLPTj+VX8YbTd4VzlrdQG7y1OrXdgdcDv+Pmi/YdSxeGQZxkB2OKUug/7Dds7
-	SlpcgOImsabiUNcUddz4LbT25FQMA1iT8Z80Aa30F0gaHVghyCnmO/qsFvkiiK4wductDk7Likp
-	jXTriCEi71jB0DZu4F3T6F+c3BVT0cRN/fEhTqkInXse0LWQZS4oyYybFAvcSU
-X-Received: by 2002:a17:903:2f4f:b0:2b9:cd2d:6f14 with SMTP id d9443c01a7336-2b9f25343e2mr43703005ad.2.1777758855137;
-        Sat, 02 May 2026 14:54:15 -0700 (PDT)
-Received: from d.home.yangfl.dn42 ([2a09:bac5:6619:3046::4cf:90])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b9cae1e293sm60508315ad.45.2026.05.02.14.54.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 May 2026 14:54:14 -0700 (PDT)
-From: David Yang <mmyangfl@gmail.com>
-To: netdev@vger.kernel.org
-Cc: David Yang <mmyangfl@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 3/3] net: dsa: yt921x: Add port qdisc tbf support
-Date: Sun,  3 May 2026 05:53:10 +0800
-Message-ID: <20260502215314.917687-4-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260502215314.917687-1-mmyangfl@gmail.com>
-References: <20260502215314.917687-1-mmyangfl@gmail.com>
+	s=arc-20240116; t=1777764337; c=relaxed/simple;
+	bh=/W92qVR03CbZRW8UHk+eSWnYxaVea1W7O/eNRCZFrvU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=YyCe9JC1EtbJTnM+E1jW8gYYZLuxg68wxcTw7ZljQ0H1vFPNGdQtGE2SjICiUBZF7X1QFA7yW0/2bMr/gbIscZAefGEeehgKHmSNx800BRQUofhlhRdf13fVefQOPrdV99K9nM4D0XH8aSjyAn1aMNLP4h//6/ASQUVivKi5VyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qAO4cdUq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1480AC19425;
+	Sat,  2 May 2026 23:25:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777764337;
+	bh=/W92qVR03CbZRW8UHk+eSWnYxaVea1W7O/eNRCZFrvU=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=qAO4cdUqxLHd4sRc9P7Z0/fka1bzNoJ8RkMIosz5BI6tDhqAsozMD1bKgHSSvSA+Q
+	 GX+5IGdfBn0QJDd/IEbn5eUr/TRpl62etP9/HtHhZ92S63hcUaL8gRkQ1j3+xZhNH5
+	 yGlmUjFtfCE+WRbxm1erx0bm7zb8CnD3HZ1jvEUmlu7ti5YSUwdRagPdN0hNIrMMtS
+	 szeVv0q+a6y1ueuu0JBT2yfYEloXEOf9i8nGCtg4T+6dGBT5FrRg10357Zw3r3jGTK
+	 oqpebH0KogEkdWmM+5kbh/dZ4AmYSRyBX1NFp1nPSK+ZK1FI39VZhHgeHiEOU1Elod
+	 DatwkiN6xQpUg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03922CD3423;
+	Sat,  2 May 2026 23:25:37 +0000 (UTC)
+From: Ciprian Regus via B4 Relay <devnull+ciprian.regus.analog.com@kernel.org>
+Subject: [PATCH net-next 0/5] net: Add ADIN1140 support
+Date: Sun, 03 May 2026 02:24:49 +0300
+Message-Id: <20260503-adin1140-driver-v1-0-dd043cdd88f0@analog.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 208DD4B38D7
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMGH9mkC/x3MSwqDQBBF0a1IjS3oj/jbimTQpF9iTUqpFhHEv
+ afJ8AzuvanABIXm5ibDKUU2rfBtQ+816RcsuZqCC73rwsQpi3rfOc4mJ4ynmOByHProR6rVbvj
+ I9T8upDhYcR30ep4fRQP+YWsAAAA=
+To: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+ Shuah Khan <skhan@linuxfoundation.org>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-doc@vger.kernel.org, devicetree@vger.kernel.org, 
+ Ciprian Regus <ciprian.regus@analog.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1777764335; l=4571;
+ i=ciprian.regus@analog.com; s=20260330; h=from:subject:message-id;
+ bh=/W92qVR03CbZRW8UHk+eSWnYxaVea1W7O/eNRCZFrvU=;
+ b=9I5lCGeJwQ9U+jGD0xmD1gwarv3Gl44zOKfWaLZYM3N8pEDydrjZYK0E0Ox5CF7T+bz7356b+
+ 1+XrxzC/yGqDm09arGzec4f0OJlkwgthto3HkJGoD1O7xbsyBcWzdbc
+X-Developer-Key: i=ciprian.regus@analog.com; a=ed25519;
+ pk=8WoNhI0kQcQUl8YqJO5ZevROYk9HP8lOIeIgIYgjfbc=
+X-Endpoint-Received: by B4 Relay for ciprian.regus@analog.com/20260330 with
+ auth_id=703
+X-Original-From: Ciprian Regus <ciprian.regus@analog.com>
+Reply-To: ciprian.regus@analog.com
+X-Rspamd-Queue-Id: 2E77F4B39FC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,mojatatu.com,resnulli.us,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-283491-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-283493-lists,netdev=lfdr.de,ciprian.regus.analog.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FROM_HAS_DN(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	HAS_REPLYTO(0.00)[ciprian.regus@analog.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,analog.com:email,analog.com:replyto,analog.com:mid]
 
-Enable port shaping and support limiting the rate of outgoing traffic.
+This series introduces support for the ADIN1140 (also called AD3306)
+10BASE-T1S single port MACPHY. The device integrates the MAC and PHY in
+the same package. The communication with the host CPU is done through an
+SPI interface, using the Open Alliance TC6 protocol for control and data
+transactions. As a result, the oa_tc6 framework is used to implement
+the communication with the device (register accesses and Ethernet frame
+RX/TX).
 
-Signed-off-by: David Yang <mmyangfl@gmail.com>
+The MAC and PHY are connected internally using an MII and MDIO bus.
+
+The PHY is a half duplex 10Mbps device, which implements both the PLCA
+RS (IEEE 802.3 clause 148) and CSMA/CD methods of accessing the Ethernet
+medium. The 10BASE-T1S standard allows multiple PHY devices to be
+connected (in parallel) on the same single twisted pair network segment,
+so PLCA can be configured in order to provide a fair access scheme to
+all the nodes and reduce the jitter introduced by the unordered CSMA/CD
+transmits. The PHY's internal register map can be accessed using the
+direct MDIO mode of the OA TC6. The control, status, phy id 1 & 2 C22
+registers are mapped to the 0xFF00 - 0xFF03 range. As for C45
+addressable devices, the PHY has PCS, PMA and PLCA blocks.
+
+The first 2 patches in the series are changes to the oa_tc6, that would
+make the framework usable by the subsequent ADIN1140 MAC driver.
+
+The first commit is required because the ADIN1140 only allows protected
+mode OA TC6 control transactions, which the oa_tc6 framework doesn't
+currently implement.
+
+The second commit is required in order to allow the MAC driver to have a
+custom implementation for the mii_bus access methods as a workaround for
+hardware issues:
+
+1. The OA TC6 standard defines the direct and indirect access modes for
+   MDIO transactions. The ADIN1140 incorrectly advertises indirect mode
+   only (supported capabilities register - 0x2, bit 9), while actually
+   implementing just the direct mode. We cannot rely on the CAP register
+   to choose an access method (which oa_tc6 does by default, even though
+   it only implements the direct mode), so the driver has to use its
+   own.
+2. The ADIN1140 cannot access the C22 register space of the internal
+   PHY, while the PHY is busy receiving frames. If that happens, the
+   CONFIG0 and CONFIG2 registers of the MAC will get corrupted and the
+   data transfer will stop. Those two registers configure settings for
+   the transfer protocol between the MAC and host, so the value for some
+   of their subfields shouldn't be changed while the netdev is up.
+   Since we know the PHY is internal, the MAC driver can implement a
+   custom mii_bus, which can intercept C22 accesses. Most of the
+   registers mapped in the 0x0 - 0x3 range (the only ones the PHY offers)
+   are read only, and their value can be read from somewhere else (e.g
+   the PHYID 1 & 2 have the same value as 0x1 in the MAC memory map).
+   C45 accesses do not cause this issue, so we can properly implement
+   them.
+
+Even though they have different driver, the MAC one cannot function
+without the PHY driver, since the PHY is not compatible with the generic
+c22 driver. As such CONFIG_ADIN1140 selects CONFIG_ADIN1140_PHY.
+
+Signed-off-by: Ciprian Regus <ciprian.regus@analog.com>
 ---
- drivers/net/dsa/yt921x.c | 138 +++++++++++++++++++++++++++++++++++++++
- drivers/net/dsa/yt921x.h |  66 ++++++++++++++++++-
- 2 files changed, 203 insertions(+), 1 deletion(-)
+Ciprian Regus (5):
+      net: ethernet: oa_tc6: Handle the OA TC6 SPI protected mode
+      net: ethernet: oa_tc6: Allow custom mii_bus
+      net: phy: Add support for the ADIN1140 PHY
+      net: ethernet: adi: Add a driver for the ADIN1140 MACPHY
+      dt-bindings: net: Add bindings for the ADIN1140
 
-diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
-index fd1fdcd5f9a3..9560fb2b8657 100644
---- a/drivers/net/dsa/yt921x.c
-+++ b/drivers/net/dsa/yt921x.c
-@@ -24,6 +24,7 @@
- #include <net/dsa.h>
- #include <net/dscp.h>
- #include <net/ieee8021q.h>
-+#include <net/pkt_cls.h>
- 
- #include "yt921x.h"
- 
-@@ -1272,6 +1273,19 @@ yt921x_marker_tfm_police(struct yt921x_marker *marker,
- 				 priv, port, extack);
- }
- 
-+static int
-+yt921x_marker_tfm_shape(struct yt921x_marker *marker, u64 rate, u64 burst,
-+			unsigned int flags, bool queue,
-+			struct yt921x_priv *priv, int port,
-+			struct netlink_ext_ack *extack)
-+{
-+	return yt921x_marker_tfm(marker, rate, burst, flags,
-+				 queue ? priv->queue_shape_slot_ns :
-+				 priv->port_shape_slot_ns, YT921X_SHAPE_CIR_MAX,
-+				 YT921X_SHAPE_CBS_MAX, YT921X_SHAPE_UNIT_MAX,
-+				 priv, port, extack);
-+}
-+
- static int
- yt921x_police_validate(const struct flow_action_police *police,
- 		       const struct flow_action *action,
-@@ -1378,6 +1392,115 @@ yt921x_dsa_port_policer_add(struct dsa_switch *ds, int port,
- 	return res;
- }
- 
-+static int
-+yt921x_tbf_validate(struct yt921x_priv *priv,
-+		    const struct tc_tbf_qopt_offload *qopt, int *queuep)
-+{
-+	struct netlink_ext_ack *extack = qopt->extack;
-+	int queue = -1;
-+
-+	/* TODO: queue support */
-+	if (qopt->parent != TC_H_ROOT) {
-+		NL_SET_ERR_MSG_MOD(extack, "Parent should be \"root\"");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	switch (qopt->command) {
-+	case TC_TBF_REPLACE: {
-+		const struct tc_tbf_qopt_offload_replace_params *p;
-+
-+		p = &qopt->replace_params;
-+
-+		if (p->mtu || p->peak.rate_bytes_ps) {
-+			NL_SET_ERR_MSG_MOD(extack,
-+					   "Offload not supported when mtu/peakrate is configured");
-+			return -EOPNOTSUPP;
-+		}
-+
-+		if (!p->rate.mpu) {
-+			NL_SET_ERR_MSG_MOD(extack, "Assuming mpu = 64");
-+		} else if (p->rate.mpu != 64) {
-+			NL_SET_ERR_MSG_MOD(extack,
-+					   "Offload not supported when mpu is other than 64");
-+			return -EOPNOTSUPP;
-+		}
-+
-+		break;
-+	}
-+	default:
-+		break;
-+	}
-+
-+	*queuep = queue;
-+	return 0;
-+}
-+
-+static int
-+yt921x_dsa_port_setup_tc_tbf_port(struct dsa_switch *ds, int port,
-+				  const struct tc_tbf_qopt_offload *qopt)
-+{
-+	struct yt921x_priv *priv = to_yt921x_priv(ds);
-+	u32 ctrls[2];
-+	int res;
-+
-+	switch (qopt->command) {
-+	case TC_TBF_DESTROY:
-+		ctrls[0] = 0;
-+		ctrls[1] = 0;
-+		break;
-+	case TC_TBF_REPLACE: {
-+		const struct tc_tbf_qopt_offload_replace_params *p;
-+		struct yt921x_marker marker;
-+
-+		p = &qopt->replace_params;
-+
-+		res = yt921x_marker_tfm_shape(&marker, p->rate.rate_bytes_ps,
-+					      p->max_size,
-+					      YT921X_MARKER_SINGLE_BUCKET,
-+					      false, priv, port, NULL);
-+		if (res)
-+			return res;
-+
-+		ctrls[0] = YT921X_PORT_SHAPE_CTRLa_CIR(marker.cir) |
-+			   YT921X_PORT_SHAPE_CTRLa_CBS(marker.cbs);
-+		ctrls[1] = YT921X_PORT_SHAPE_CTRLb_UNIT(marker.unit) |
-+			   YT921X_PORT_SHAPE_CTRLb_EN;
-+		break;
-+	}
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+
-+	mutex_lock(&priv->reg_lock);
-+	res = yt921x_reg64_write(priv, YT921X_PORTn_SHAPE_CTRL(port), ctrls);
-+	mutex_unlock(&priv->reg_lock);
-+
-+	return res;
-+}
-+
-+static int
-+yt921x_dsa_port_setup_tc(struct dsa_switch *ds, int port,
-+			 enum tc_setup_type type, void *type_data)
-+{
-+	struct yt921x_priv *priv = to_yt921x_priv(ds);
-+	int res;
-+
-+	switch (type) {
-+	case TC_SETUP_QDISC_TBF: {
-+		const struct tc_tbf_qopt_offload *qopt = type_data;
-+		int queue;
-+
-+		res = yt921x_tbf_validate(priv, qopt, &queue);
-+		if (res)
-+			return res;
-+
-+		return yt921x_dsa_port_setup_tc_tbf_port(ds, port, qopt);
-+	}
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
- static int
- yt921x_mirror_del(struct yt921x_priv *priv, int port, bool ingress)
- {
-@@ -3524,6 +3647,20 @@ static int yt921x_chip_setup_tc(struct yt921x_priv *priv)
- 		return res;
- 	priv->meter_slot_ns = ctrl * op_ns;
- 
-+	ctrl = max(priv->port_shape_slot_ns / op_ns,
-+		   YT921X_PORT_SHAPE_SLOT_MIN);
-+	res = yt921x_reg_write(priv, YT921X_PORT_SHAPE_SLOT, ctrl);
-+	if (res)
-+		return res;
-+	priv->port_shape_slot_ns = ctrl * op_ns;
-+
-+	ctrl = max(priv->queue_shape_slot_ns / op_ns,
-+		   YT921X_QUEUE_SHAPE_SLOT_MIN);
-+	res = yt921x_reg_write(priv, YT921X_QUEUE_SHAPE_SLOT, ctrl);
-+	if (res)
-+		return res;
-+	priv->queue_shape_slot_ns = ctrl * op_ns;
-+
- 	return 0;
- }
- 
-@@ -3680,6 +3817,7 @@ static const struct dsa_switch_ops yt921x_dsa_switch_ops = {
- 	/* rate */
- 	.port_policer_del	= yt921x_dsa_port_policer_del,
- 	.port_policer_add	= yt921x_dsa_port_policer_add,
-+	.port_setup_tc		= yt921x_dsa_port_setup_tc,
- 	/* hsr */
- 	.port_hsr_leave		= dsa_port_simple_hsr_leave,
- 	.port_hsr_join		= dsa_port_simple_hsr_join,
-diff --git a/drivers/net/dsa/yt921x.h b/drivers/net/dsa/yt921x.h
-index 546b12a8994a..0114a89b58b8 100644
---- a/drivers/net/dsa/yt921x.h
-+++ b/drivers/net/dsa/yt921x.h
-@@ -521,6 +521,12 @@ enum yt921x_app_selector {
- #define  YT921X_PORT_VLAN_CTRL1_CVLAN_DROP_TAGGED	BIT(1)
- #define  YT921X_PORT_VLAN_CTRL1_CVLAN_DROP_UNTAGGED	BIT(0)
- 
-+#define YT921X_PORTn_PRIO_UCAST_QUEUE(port)	(0x300200 + 4 * (port))
-+#define  YT921X_PORT_PRIOm_UCAST_QUEUE_M(m)	(7 << (3 * (m)))
-+#define   YT921X_PORT_PRIOm_UCAST_QUEUE(m, x)		((x) << (3 * (m)))
-+#define YT921X_PORTn_PRIO_MCAST_QUEUE(port)	(0x300280 + 4 * (port))
-+#define  YT921X_PORT_PRIOm_MCAST_QUEUE_M(m)	(3 << (2 * (m)))
-+#define   YT921X_PORT_PRIOm_MCAST_QUEUE(m, x)		((x) << (2 * (m)))
- #define YT921X_MIRROR			0x300300
- #define  YT921X_MIRROR_IGR_PORTS_M		GENMASK(26, 16)
- #define   YT921X_MIRROR_IGR_PORTS(x)			FIELD_PREP(YT921X_MIRROR_IGR_PORTS_M, (x))
-@@ -531,6 +537,48 @@ enum yt921x_app_selector {
- #define  YT921X_MIRROR_PORT_M			GENMASK(3, 0)
- #define   YT921X_MIRROR_PORT(x)				FIELD_PREP(YT921X_MIRROR_PORT_M, (x))
- 
-+#define YT921X_QUEUE_SHAPE_SLOT		0x340008
-+#define  YT921X_QUEUE_SHAPE_SLOT_SLOT_M		GENMASK(11, 0)
-+#define YT921X_PORT_SHAPE_SLOT		0x34000c
-+#define  YT921X_PORT_SHAPE_SLOT_SLOT_M		GENMASK(11, 0)
-+#define YT921X_QUEUEn_SCH(x)		(0x341000 + 4 * (x))
-+#define  YT921X_QUEUE_SCH_E_DWRR_M		GENMASK(27, 18)
-+#define   YT921X_QUEUE_SCH_E_DWRR(x)			FIELD_PREP(YT921X_QUEUE_SCH_E_DWRR_M, (x))
-+#define  YT921X_QUEUE_SCH_C_DWRR_M		GENMASK(17, 8)
-+#define   YT921X_QUEUE_SCH_C_DWRR(x)			FIELD_PREP(YT921X_QUEUE_SCH_C_DWRR_M, (x))
-+#define  YT921X_QUEUE_SCH_E_PRIO_M		GENMASK(7, 4)
-+#define   YT921X_QUEUE_SCH_E_PRIO(x)			FIELD_PREP(YT921X_QUEUE_SCH_E_PRIO_M, (x))
-+#define  YT921X_QUEUE_SCH_C_PRIO_M		GENMASK(3, 0)
-+#define   YT921X_QUEUE_SCH_C_PRIO(x)			FIELD_PREP(YT921X_QUEUE_SCH_C_PRIO_M, (x))
-+#define YT921X_C_DWRRn(x)		(0x342000 + 4 * (x))
-+#define YT921X_E_DWRRn(x)		(0x343000 + 4 * (x))
-+#define  YT921X_DWRR_PKT_MODE			BIT(0)	/* 0: byte rate mode */
-+#define YT921X_QUEUEn_SHAPE_CTRL(x)	(0x34c000 + 0x10 * (x))
-+#define  YT921X_QUEUE_SHAPE_CTRLc_TOKEN_OVERFLOW_EN	BIT(6)
-+#define  YT921X_QUEUE_SHAPE_CTRLc_E_EN		BIT(5)
-+#define  YT921X_QUEUE_SHAPE_CTRLc_C_EN		BIT(4)
-+#define  YT921X_QUEUE_SHAPE_CTRLc_PKT_MODE	BIT(3)	/* 0: byte rate mode */
-+#define  YT921X_QUEUE_SHAPE_CTRLc_UNIT_M	GENMASK(2, 0)
-+#define   YT921X_QUEUE_SHAPE_CTRLc_UNIT(x)		FIELD_PREP(YT921X_QUEUE_SHAPE_CTRLc_UNIT_M, (x))
-+#define  YT921X_QUEUE_SHAPE_CTRLb_EBS_M		GENMASK(31, 18)
-+#define   YT921X_QUEUE_SHAPE_CTRLb_EBS(x)		FIELD_PREP(YT921X_QUEUE_SHAPE_CTRLb_EBS_M, (x))
-+#define  YT921X_QUEUE_SHAPE_CTRLb_EIR_M		GENMASK(17, 0)
-+#define   YT921X_QUEUE_SHAPE_CTRLb_EIR(x)		FIELD_PREP(YT921X_QUEUE_SHAPE_CTRLb_EIR_M, (x))
-+#define  YT921X_QUEUE_SHAPE_CTRLa_CBS_M		GENMASK(31, 18)
-+#define   YT921X_QUEUE_SHAPE_CTRLa_CBS(x)		FIELD_PREP(YT921X_QUEUE_SHAPE_CTRLa_CBS_M, (x))
-+#define  YT921X_QUEUE_SHAPE_CTRLa_CIR_M		GENMASK(17, 0)
-+#define   YT921X_QUEUE_SHAPE_CTRLa_CIR(x)		FIELD_PREP(YT921X_QUEUE_SHAPE_CTRLa_CIR_M, (x))
-+#define YT921X_PORTn_SHAPE_CTRL(port)	(0x354000 + 8 * (port))
-+#define  YT921X_PORT_SHAPE_CTRLb_EN		BIT(4)
-+#define  YT921X_PORT_SHAPE_CTRLb_PKT_MODE	BIT(3)	/* 0: byte rate mode */
-+#define  YT921X_PORT_SHAPE_CTRLb_UNIT_M		GENMASK(2, 0)
-+#define   YT921X_PORT_SHAPE_CTRLb_UNIT(x)		FIELD_PREP(YT921X_PORT_SHAPE_CTRLb_UNIT_M, (x))
-+#define  YT921X_PORT_SHAPE_CTRLa_CBS_M		GENMASK(31, 18)
-+#define   YT921X_PORT_SHAPE_CTRLa_CBS(x)		FIELD_PREP(YT921X_PORT_SHAPE_CTRLa_CBS_M, (x))
-+#define  YT921X_PORT_SHAPE_CTRLa_CIR_M		GENMASK(17, 0)
-+#define   YT921X_PORT_SHAPE_CTRLa_CIR(x)		FIELD_PREP(YT921X_PORT_SHAPE_CTRLa_CIR_M, (x))
-+#define YT921X_PORTn_SHAPE_STAT(port)	(0x356000 + 4 * (port))
-+
- #define YT921X_EDATA_EXTMODE	0xfb
- #define YT921X_EDATA_LEN	0x100
- 
-@@ -556,6 +604,11 @@ enum yt921x_fdb_entry_status {
- #define YT921X_METER_UNIT_MAX	((1 << 3) - 1)
- #define YT921X_METER_CIR_MAX	((1 << 18) - 1)
- #define YT921X_METER_CBS_MAX	((1 << 16) - 1)
-+#define YT921X_PORT_SHAPE_SLOT_MIN	80
-+#define YT921X_QUEUE_SHAPE_SLOT_MIN	132
-+#define YT921X_SHAPE_UNIT_MAX	((1 << 3) - 1)
-+#define YT921X_SHAPE_CIR_MAX	((1 << 18) - 1)
-+#define YT921X_SHAPE_CBS_MAX	((1 << 14) - 1)
- 
- #define YT921X_LAG_NUM		2
- #define YT921X_LAG_PORT_NUM	4
-@@ -573,7 +626,16 @@ enum yt921x_fdb_entry_status {
- #define YT921X_TAG_LEN	8
- 
- /* 8 internal + 2 external + 1 mcu */
--#define YT921X_PORT_NUM			11
-+#define YT921X_PORT_NUM		11
-+#define YT921X_UCAST_QUEUE_NUM	8
-+#define YT921X_MCAST_QUEUE_NUM	4
-+#define YT921X_PORT_QUEUE_NUM \
-+	(YT921X_UCAST_QUEUE_NUM + YT921X_MCAST_QUEUE_NUM)
-+#define YT921X_UCAST_QUEUE_ID(port, queue) \
-+	(YT921X_UCAST_QUEUE_NUM * (port) + (queue))
-+#define YT921X_MCAST_QUEUE_ID(port, queue) \
-+	(YT921X_UCAST_QUEUE_NUM * YT921X_PORT_NUM + \
-+	 YT921X_MCAST_QUEUE_NUM * (port) + (queue))
- 
- #define yt921x_port_is_internal(port) ((port) < 8)
- #define yt921x_port_is_external(port) (8 <= (port) && (port) < 9)
-@@ -652,6 +714,8 @@ struct yt921x_priv {
- 
- 	const struct yt921x_info *info;
- 	unsigned int meter_slot_ns;
-+	unsigned int port_shape_slot_ns;
-+	unsigned int queue_shape_slot_ns;
- 	/* cache of dsa_cpu_ports(ds) */
- 	u16 cpu_ports_mask;
- 	unsigned char cycle_ns;
+ .../devicetree/bindings/net/adi,adin1140.yaml      |  69 ++
+ Documentation/networking/oa-tc6-framework.rst      |   3 +-
+ MAINTAINERS                                        |  15 +
+ drivers/net/ethernet/adi/Kconfig                   |  12 +
+ drivers/net/ethernet/adi/Makefile                  |   1 +
+ drivers/net/ethernet/adi/adin1140.c                | 805 +++++++++++++++++++++
+ drivers/net/ethernet/microchip/lan865x/lan865x.c   |   6 +-
+ drivers/net/ethernet/oa_tc6.c                      | 194 +++--
+ drivers/net/phy/Kconfig                            |   6 +
+ drivers/net/phy/Makefile                           |   1 +
+ drivers/net/phy/adin1140.c                         | 102 +++
+ include/linux/oa_tc6.h                             |   9 +-
+ 12 files changed, 1173 insertions(+), 50 deletions(-)
+---
+base-commit: fbf6f64a4322cfeb0d98f39baf8ce18246dd12c0
+change-id: 20260429-adin1140-driver-93ae0d376318
+
+Best regards,
 -- 
-2.53.0
+Ciprian Regus <ciprian.regus@analog.com>
+
 
 
