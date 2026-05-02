@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-283330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283331-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 46GUGbxH9WkNKAIAu9opvQ
-	(envelope-from <netdev+bounces-283330-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 02:39:24 +0200
+	id k0imLDxJ9Wk4KAIAu9opvQ
+	(envelope-from <netdev+bounces-283331-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 02:45:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B22CA4B07FC
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 02:39:23 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id A63294B0814
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 02:45:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 97AA83015711
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 00:39:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C688D3008091
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 00:45:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 921121DF27D;
-	Sat,  2 May 2026 00:39:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 748D918BBAE;
+	Sat,  2 May 2026 00:45:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LeXyTvxv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MjI+RAru"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0DBE54B;
-	Sat,  2 May 2026 00:39:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51BC440DFA0;
+	Sat,  2 May 2026 00:45:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777682360; cv=none; b=lpE4DHooKslf2lg5WMSAg7ONNU5vDUnIdVNbQsbA1ufKfRKa7Ts75NAPv22F17JwyDUA17sTxVhpJDYPS028SMNBtEy0lTh3QM1hR4EtJE8gyiCj74Fb3KMA/v4+pOIctmtGCMXcsc3ZXPqhbsZfgTJvl6SyBHWtp4pu4B194Vg=
+	t=1777682743; cv=none; b=Y7PYs0X2TobtvnEWgI+h0ig1hy/krgghIojWcDLbWB7cFbgci0hjBT7ptzfVJwhqhrhmXzCEJfsln95tn9i90YAL2f5H226raZlpOrq1hN0UCNSsZwWv+9XfNp1utc0vnp9P9Y832vreUe1t/HlH3MubiRTGAEDr5q8qQmCmjYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777682360; c=relaxed/simple;
-	bh=A9P80tFDatGn9HK1Rhit/6p3pTgu+2au+Lp5WwFVn38=;
+	s=arc-20240116; t=1777682743; c=relaxed/simple;
+	bh=2bVyOlG8DIIcdk2f1Ny3W3YiMVFlBFhBI1XAed3eLKE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DdGg4c5+l6+/FADBT6pVnQ1Zipb4uGCYuAAJViA0Xetw3yQzVoGkukiGY+42sFsMj5ESoUtASOoRnbRhgPqDPpoWvAjTuQaB44qf9UeCPJJ+yuqXoewNAaxJI9e2qjNgOGuILkwjvdAZXmYUNsuwdknDjik1x8zqliDULC9Ihnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LeXyTvxv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A3E2C2BCB4;
-	Sat,  2 May 2026 00:39:19 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Ya1R/3W+vnvTUgUsxiLtG5TY+YY8KVgHzbhjo3BRvNAc/jmkNKNP50NkcozJIj1P4lIePNRXB+jl7wstEILP00EhcjEq753WbAej+zodl+cEhYv0Xn5BKKS+P8Muj0Iy8brxEubTmikLHusW8OkHTrf1G4Ols6a5RGvDS10dbb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MjI+RAru; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F0E3C2BCB4;
+	Sat,  2 May 2026 00:45:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777682359;
-	bh=A9P80tFDatGn9HK1Rhit/6p3pTgu+2au+Lp5WwFVn38=;
+	s=k20201202; t=1777682742;
+	bh=2bVyOlG8DIIcdk2f1Ny3W3YiMVFlBFhBI1XAed3eLKE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LeXyTvxvdhbtBM0AJEWfXwRayFrE0rN+jZO6D4igvu2Z78LaiYP/zu5RhIrve0f2t
-	 iiW3Y337lKDu+xFEIj+daBc7cP4024+rxRWqe97zZqgNX6sbQFB3Ym8YsCdPXiIrjK
-	 sUNxHJrdmk03cJNzuaFsM/xdG+YgLAWbcLdV/VVHC084CX+8y3LCbRf2Rymx8UEHEo
-	 iQFUkDJ2TZO9IFK1A4BrnJQ5pAG10TgBtgV9ayaT8SeISafsNrIUck6uSkxmVV++1g
-	 h+4sIDCByoGQbohAGzs9AjlZtdNUvMQ0Epzm8i6ipt9TqWlA3DsoQ9Mzc5ShdJi9hj
-	 wdkrgI+3vkmjA==
-Date: Fri, 1 May 2026 17:39:18 -0700
+	b=MjI+RAru2LMTZkN3fARRyNW3ryR1auKn/XqBrLyJvhN7neIeB5IZPClHx7kJtSdPJ
+	 sRUvBdRxjkaXAmUzSSRx4qh5iIwrLZDtLCqSXzobYKa65sK19/UAgk9MTv55594078
+	 STvOP7zICOgnv7Kmpdqm58QvHWmx7uwGDpvvwaXdwmSnQj47+BhFGHhgCtlhfYJCgb
+	 Y0ZY3+zsz6KN5tFZrM0eSAvBAUAF/qaCmdGYQmPkWQnC+o05gV74WUOCqZW7vAUQzF
+	 dvEvisQQAn3oX8GepGZl3tBbJNJN/buQUbdJssP1pRB+U+SR52+fCC+yYGYV/8HksA
+	 4hPQPgTQoy45g==
+Date: Fri, 1 May 2026 17:45:41 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
  pabeni@redhat.com, horms@kernel.org, linux-kselftest@vger.kernel.org,
  shuah@kernel.org, Willem de Bruijn <willemb@google.com>
-Subject: Re: [PATCH net-next v6 1/3] selftests: net: py: support cmd
- verifying expected failure
-Message-ID: <20260501173918.575ecdc4@kernel.org>
-In-Reply-To: <20260430132820.1944517-2-willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH net-next v6 3/3] selftests: drv-net: convert so_txtime
+ to drv-net
+Message-ID: <20260501174541.0338ad0e@kernel.org>
+In-Reply-To: <20260430132820.1944517-4-willemdebruijn.kernel@gmail.com>
 References: <20260430132820.1944517-1-willemdebruijn.kernel@gmail.com>
-	<20260430132820.1944517-2-willemdebruijn.kernel@gmail.com>
+	<20260430132820.1944517-4-willemdebruijn.kernel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,19 +64,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: B22CA4B07FC
+X-Rspamd-Queue-Id: A63294B0814
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283330-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283331-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[gmail.com];
@@ -84,7 +84,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
@@ -95,59 +95,19 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-On Thu, 30 Apr 2026 09:28:04 -0400 Willem de Bruijn wrote:
+On Thu, 30 Apr 2026 09:28:06 -0400 Willem de Bruijn wrote:
 > From: Willem de Bruijn <willemb@google.com>
 > 
-> Support negative tests, where cmd raises an exception if the command
-> succeeded.
+> In preparation for extending to pacing hardware offload, convert the
+> so_txtime.sh test to a drv-net test that can be run against netdevsim
+> and real hardware.
 > 
-> Existing fail values are
-> 
-> - True:            Pass if returncode == 0, raise Exception otherwise
-> - False:           Pass unconditionally
-> - None:            True iff not terminated explicitly
-> 
-> Introduce a variant of True that inverses the condition:
-> 
-> - 'verify_failed': Pass if returncode != 0, raise Exception otherwise
-> 
-> We cannot reuse False for this, because existing tests rely on current
-> behavior to pass unconditionally.
-> 
-> Only suppress regular test failure. Python subprocess may set a
-> negative return code on process crash or timeout. Those are not
-> anticipated failures.
+> Also update so_txtime.c to not exit on first failure, but run to
+> completion and report exit code there. This helps with debugging
+> unexpected results, especially when processing multiple packets,
+> as happens in the "reverse_order" testcase.
 
-The fact that subprocess sets retcode to negative on crash / timeout
-may be worth a comment in the code. I didn't know that.
-
-> diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
-> index 6c44a3d2bbf7..ef31c0ba47fc 100644
-> --- a/tools/testing/selftests/net/lib/py/utils.py
-> +++ b/tools/testing/selftests/net/lib/py/utils.py
-> @@ -111,10 +111,14 @@ class cmd:
->  
->          stdout, stderr = self._process_terminate(terminate=terminate,
->                                                   timeout=timeout)
-> -        if self.proc.returncode != 0 and fail:
-> +
-> +        if (self.proc.returncode != 0 and fail and
-> +            (self.proc.returncode < 0 or fail != 'verify_failed')):
-
-Personal preference but doesn't feel clean. I would have added 
-a dedicated argument for this. Up to you..
-
->              if len(stderr) > 0 and stderr[-1] == "\n":
->                  stderr = stderr[:-1]
->              raise CmdExitFailure("Command failed", self)
-> +        elif self.proc.returncode == 0 and fail == 'verify_failed':
-> +            raise CmdExitFailure("Command succeeded while should fail", self)
-
-Can we create a new exception type? Just inherit CmdExitFailure 
-but name it more appropriately.
-
-Regarding the message maybe: "Command succeeded (expected fail)" or
-"Command succeeded (unexpectedly)"
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 
