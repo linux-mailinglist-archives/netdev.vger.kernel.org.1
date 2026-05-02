@@ -1,72 +1,99 @@
-Return-Path: <netdev+bounces-283322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283323-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iH6hHCVC9WmFJwIAu9opvQ
-	(envelope-from <netdev+bounces-283322-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 02:15:33 +0200
+	id iIAlHfJC9WmXJwIAu9opvQ
+	(envelope-from <netdev+bounces-283323-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 02:18:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B59114B073C
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 02:15:32 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E9B74B0756
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 02:18:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3FBE8300DDE6
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 00:15:31 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id EDCAC30055F0
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 00:18:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B71C3135A53;
-	Sat,  2 May 2026 00:15:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 928E61A0BF3;
+	Sat,  2 May 2026 00:18:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WunWZdIe"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="NhFh9Uwx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941FF4C81;
-	Sat,  2 May 2026 00:15:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 103E117BA6
+	for <netdev@vger.kernel.org>; Sat,  2 May 2026 00:18:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777680930; cv=none; b=RkzXuIwTGGrc5GOZNAEQDL0Ki860/K4VVNzs5EtntYIo/ktjolxEN3pvq0q6cANCRjBrFrury/Zc0x3DUPQrHhbOv3TKXu4OurQ/8wz0kLf8lxAWcV1/mAiXiV467ooEbHoKrgAILRtu0f8MupbG9UZcHt+JaGWrAIKWXhL4Yv0=
+	t=1777681131; cv=none; b=ZpmyfmGs96bdWHYc7tyYGHTb9bDl6GRLUjlK2bYGrLw9am4rIjhoyh6YvVciE85RTXu7Oxk75t/ukqdLMCuzu3FLfqtV+R2DTSSyuRx7DKZ3rVBC+C8vGtsXMUhn2SVZSlJvrvz2mzCBV4ce6yHdf8CUbqFT4IrqtJ0N3dBKZYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777680930; c=relaxed/simple;
-	bh=1wnHG4DhEEWaHsYbpTUTr9P6ZlzbVGKMECFzT3v6umw=;
+	s=arc-20240116; t=1777681131; c=relaxed/simple;
+	bh=W7C+dBwfvQI7pyYUYr+zYeXuo8mjljpFj7hRJ1Euwcw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Fdlj/HKUsirL8NUC6/gKwwGLN8yor2I5XJaczqSC3YXegNbWs8mJldCEEeB5FrBEC6e6RZP2Uk0DLGIb0baKmdfnoUa9Izzt0AiXUEkykX1BTJ17swceMLTTbuVH8A386/IRrDDgaEF19eJwmPvHiHUFDwNzrbyxdBmUZLkAoxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WunWZdIe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 788FEC2BCB4;
-	Sat,  2 May 2026 00:15:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777680930;
-	bh=1wnHG4DhEEWaHsYbpTUTr9P6ZlzbVGKMECFzT3v6umw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WunWZdIeZJFgZgtbL3geAU1sEoIluVoBwb8CBkaHuPnqzbSukHjdXLDnsn5iqeKFr
-	 PVtZMGeJdu8tG10RHBEz+PpDLj6ZH2FOe4gsr8rcXFbZwYcXEL9Bh+Nt7WkNGiM7qp
-	 +uLllWxch+WadlDKYMO6NzokyEopRTSUrpbX79CbJMBWPXcGGvK3f3wcCkQPzoI2iq
-	 QNxgoN9kbzctoWTPc56Em2hUwRfQigb86qFLgtuyeE/5/GO47XureFsewh7VxS3bc1
-	 UZrR1myCgPuew3Tzghum2adGhJEheVzhqtdhDLg06M9Av/PBYzTU/aFgaFVcpTUOMM
-	 jJp+sfO+gDLeQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: daniel@makrotopia.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	chester.a.unal@arinc9.com,
-	andrew@lunn.ch,
-	olteanv@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com,
-	linux@armlinux.org.uk,
-	ansuelsmth@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net v5] net: dsa: mt7530: fix .get_stats64 sleeping in atomic context
-Date: Fri,  1 May 2026 17:15:27 -0700
-Message-ID: <20260502001527.3603463-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <4086098f5333d48221f83fa775607330836336d7.1777590741.git.daniel@makrotopia.org>
-References: <4086098f5333d48221f83fa775607330836336d7.1777590741.git.daniel@makrotopia.org>
+	 MIME-Version; b=Nfa4PQUy4D8AEQgAcpbQ3nw5olOleaMmnItb+0BAGkZjmhNkmdjQFUHPfnRFFqNNNUXl9lZ+7cKWTWL2bGVD3g1k/rF4UB70illNi2Ma6yyOBTpSBsQ0+IwKrITqePti0wJBHxybTGYpyr6oqhrp49uedPWEKijzo2/jYvITI1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=NhFh9Uwx; arc=none smtp.client-ip=74.125.82.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-12c8cc7a77eso2481253c88.1
+        for <netdev@vger.kernel.org>; Fri, 01 May 2026 17:18:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1777681129; x=1778285929; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dC/Ueu1kfnIjF0F9KEkQ0SHLAKKi0/ENPhtIGGkeBmo=;
+        b=NhFh9UwxyXtt4nI5VjbPM/3A6oe8KN9rg+mL0xCaiJI+AuDmlQmQi0GMu0ttlWJgh9
+         JZ9audO3SsNUuuY9aAZh0CQErUwqE97Z6IAMeMGsjxyAv0p0nXPKKwq/yTZ/k9OCNHVk
+         yqQFzwODX6cFUuNVJcwZ639jtN1rPWW184WnzbkEehoQ7RYyX7lZsAOId3w7PhFiQ+3j
+         RGCk2BjdMCHUPB67AsnNnT6/2KqUU26cIelK1zmlGUcstRPmEwGV4qZHgo744bURqL7s
+         d7Z7XbZ1WmPpyqH2VMxSErCQltBdXlTy7PH7zWK6Clc7sy05jwjI3xXo7XFDYLJit6Uo
+         mxcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777681129; x=1778285929;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=dC/Ueu1kfnIjF0F9KEkQ0SHLAKKi0/ENPhtIGGkeBmo=;
+        b=aLqXjJT95wyUVMP1zVwR8XgNnev6nyHPLi9I2sivM33K6MQICFWAWyLQfFHsU4agdW
+         eoQG4ZgOgqyYj7IoCCDS93ZmpBn5RUk5dZGwpJKZyt5C/6vrVSXBCVeVTkBqMXN0P+gm
+         TKLzR5/enU3pw48gj65EjyjeOLYI4ENvMSqZOro1mXq4+/Sq0VxRvYbamD7g2qwVMYLf
+         DP30BHi61ezk5ErJUvcnD6qARMAnwuNotvUmNEYxQcmSSXFnvdx1GjtqERzsix6WaVIL
+         zhi4Es/Vqky/xk987ki9dSvyUbXrbz4vDplT8pKKZI0tHwkESFD8mpcCAk2MqoI+2Cvw
+         jhYg==
+X-Forwarded-Encrypted: i=1; AFNElJ/j0R61Y+CdgrJOq2fvyqzStgISUGAiP6TCFLiJ6dy5WV8x1h+YuBATc7FZuHw7c+yF6voIwL8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyoKWpN2u/5d85o6yM5Fn4NA26SnZHIeRSfjsllVIWVPav8Fnbt
+	nPiTijkjAcQ9ESPeXeJmsSJK4q0uSbZnmDr0jwMfYApEQieExC40D9tezJXA0nZ76ss=
+X-Gm-Gg: AeBDiesP+Xk3jVBub1kiVJmYwxqz8shWhUSlO0WbRV6wEkrSW3P6QkEgY425CUg9WIE
+	noT0N64Uu79WadR/zwsEdMcpYsJeiRKFOQskwAs6tt+gyqtZFczEYds6c2cdBWYcTt/DmVWNOaq
+	uEGruJiWj+mQUKcEUVQgMDzwG7YtsMnMxBgq6NMLtg21LfInUmANXhpz5W62QEoqwXX5dk8awcY
+	O8wC4NcJreNs5a6ByJHqjP+ViIvhG2oYlrAMk/9DWQLrL6iOXkoCeT0ohH6xyao1LDm8xkVoTD8
+	nSF3aCF7vgbocp1kDaJPLJlncHMbyA5lqyVA+Y6NjifNCZozSF3kouRf0MrlYzRPJAyCg+2MTTS
+	48Itdzxr1t39a3I8IdscE/8HmsS3y9hh1jjSejFRr1J0wkqkWyIMqE+wGTaN9mPx+QCrvrrttj1
+	vrGVZJU2ooauFd3QaWyNRt0rYObZokGDiyYO1r9EkHD/Fq1e/M4c+HwQ==
+X-Received: by 2002:a05:7300:7244:b0:2c0:df3b:ec1e with SMTP id 5a478bee46e88-2ed4f1ba5f4mr3458868eec.11.1777681129058;
+        Fri, 01 May 2026 17:18:49 -0700 (PDT)
+Received: from phoenix.lan ([104.202.41.210])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ee3b29b2e0sm6419484eec.16.2026.05.01.17.18.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 May 2026 17:18:48 -0700 (PDT)
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@kernel.org
+Cc: jhs@mojatatu.com,
+	jiri@resnulli.us,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org (open list:NETEM NETWORK EMULATOR),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next 1/4] net/sched: netem: move state enums out of struct netem_sched_data
+Date: Fri,  1 May 2026 17:17:09 -0700
+Message-ID: <20260502001844.19107-2-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260502001844.19107-1-stephen@networkplumber.org>
+References: <20260502001844.19107-1-stephen@networkplumber.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,158 +101,92 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: B59114B073C
+X-Rspamd-Queue-Id: 5E9B74B0756
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.06 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,arinc9.com,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,collabora.com,armlinux.org.uk,vger.kernel.org,lists.infradead.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-283322-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283323-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.994];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[networkplumber.org:mid,networkplumber.org:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+The _4_state_model and GE_state_model enum definitions are declared
+as struct members but are never read or written. Only the enum
+constants they define (TX_IN_GAP_PERIOD, GOOD_STATE, etc.) are used.
+
+Move them to file scope as anonymous enums and remove the unused
+struct fields, saving 8 bytes per netem instance.
+
+Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
-Subject: net: dsa: mt7530: fix .get_stats64 sleeping in atomic context
+ net/sched/sch_netem.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-This patch moves MIB counter reads for MDIO-connected switches into a
-self-rearming delayed work, and has .get_stats64 return cached values
-under a spinlock. A mod_delayed_work() call on each read triggers an
-immediate refresh.
-
-> diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-> index b9423389c2ef..e769914d726c 100644
-> --- a/drivers/net/dsa/mt7530.c
-> +++ b/drivers/net/dsa/mt7530.c
-
-[ ... ]
-
-> @@ -3137,6 +3187,12 @@ mt753x_setup(struct dsa_switch *ds)
->  	if (ret && priv->irq_domain)
->  		mt7530_free_mdio_irq(priv);
->  
-> +	if (!ret && priv->bus) {
-> +		mt7530_stats_refresh(priv);
-> +		schedule_delayed_work(&priv->stats_work,
-> +				      MT7530_STATS_POLL_INTERVAL);
-> +	}
-> +
->  	return ret;
->  }
-
-Can the delayed work outlive priv on a probe failure path?
-
-mt753x_setup() is installed as ds->ops->setup and is invoked from
-dsa_register_switch() via:
-
-  dsa_register_switch()
-    dsa_switch_probe()
-      dsa_tree_setup()
-        dsa_tree_setup_switches()
-          dsa_switch_setup()
-            ds->ops->setup == mt753x_setup()   /* queues stats_work */
-        dsa_tree_setup_ports()                 /* may fail here */
-        dsa_tree_setup_conduit()               /* or here */
-        dsa_tree_setup_lags()                  /* or here */
-
-If any of the later dsa_tree_setup_* steps fail after mt753x_setup()
-has queued stats_work, dsa_tree_teardown_switches() is called, which
-invokes ds->ops->teardown per switch. The mt7530 dsa_switch_ops does
-not define a .teardown op, so nothing cancels the delayed work.
-
-mt7530_probe() then propagates the error. The driver core does not
-invoke .remove() after a failed probe, so mt7530_remove_common()
-(which holds the cancel_delayed_work_sync()) never runs. Once
-mt7530_probe() returns the error, devres releases priv and priv->ds
-while stats_work is still queued. When it fires, mt7530_stats_poll()
-dereferences priv, walks priv->ds->dst->ports and issues MDIO reads
-via priv->bus on freed memory.
-
-Would it be safer to cancel the work in mt753x_setup()'s own error
-path (and/or add a .teardown op) so the work is stopped whenever
-setup reports failure?
-
-> @@ -3409,6 +3468,9 @@ mt7530_remove_common(struct mt7530_priv *priv)
->  
->  	dsa_unregister_switch(priv->ds);
->  
-> +	if (priv->bus)
-> +		cancel_delayed_work_sync(&priv->stats_work);
-> +
->  	mutex_destroy(&priv->reg_mutex);
->  }
-
-Is the ordering of dsa_unregister_switch() vs. cancel_delayed_work_sync()
-correct here?
-
-dsa_unregister_switch() ends up in dsa_switch_remove():
-
-  net/dsa/dsa.c:
-  static void dsa_switch_remove(struct dsa_switch *ds)
-  {
-        struct dsa_switch_tree *dst = ds->dst;
-
-        dsa_tree_teardown(dst);
-        dsa_switch_release_ports(ds);
-        dsa_tree_put(dst);
-  }
-
-and dsa_switch_release_ports() does list_del + kfree on every
-dsa_port entry:
-
-  dsa_switch_for_each_port_safe(dp, next, ds) {
-        ...
-        list_del(&dp->list);
-        kfree(dp);
-  }
-
-Meanwhile, mt7530_stats_refresh() iterates the same list without any
-locking or RCU:
-
-  dsa_switch_for_each_user_port(dp, priv->ds) {
-        port = dp->index;
-        mt7530_read_port_stats64(priv, port, &stats);
-        ...
-  }
-
-and dsa_switch_for_each_user_port expands to a plain
-list_for_each_entry over ds->dst->ports.
-
-stats_work rearms itself every MT7530_STATS_POLL_INTERVAL (one
-second), and mt7530_get_stats64() can mod_delayed_work(..., 0) it to
-fire immediately. With the cancel happening after
-dsa_unregister_switch(), the worker can run concurrently with port
-teardown and dereference dsa_port entries that have already been
-list_del'd and kfree'd, or walk priv->ds->dst after dsa_tree_put()
-has released it.
-
-Should cancel_delayed_work_sync(&priv->stats_work) run before
-dsa_unregister_switch(), with a guard to prevent mt7530_get_stats64()
-from requeuing the work during unregister?
+diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
+index bc18e1976b6e..148b22fb3ca3 100644
+--- a/net/sched/sch_netem.c
++++ b/net/sched/sch_netem.c
+@@ -71,6 +71,18 @@ struct disttable {
+ 	s16 table[] __counted_by(size);
+ };
+ 
++enum GE_state_model {
++	GOOD_STATE = 1,
++	BAD_STATE,
++};
++
++enum _4_state_model {
++	TX_IN_GAP_PERIOD = 1,
++	TX_IN_BURST_PERIOD,
++	LOST_IN_GAP_PERIOD,
++	LOST_IN_BURST_PERIOD,
++};
++
+ struct netem_sched_data {
+ 	/* internal t(ime)fifo qdisc uses t_root and sch->limit */
+ 	struct rb_root t_root;
+@@ -121,18 +133,6 @@ struct netem_sched_data {
+ 		CLG_GILB_ELL,
+ 	} loss_model;
+ 
+-	enum {
+-		TX_IN_GAP_PERIOD = 1,
+-		TX_IN_BURST_PERIOD,
+-		LOST_IN_GAP_PERIOD,
+-		LOST_IN_BURST_PERIOD,
+-	} _4_state_model;
+-
+-	enum {
+-		GOOD_STATE = 1,
+-		BAD_STATE,
+-	} GE_state_model;
+-
+ 	/* Correlated Loss Generation models */
+ 	struct clgstate {
+ 		/* state of the Markov chain */
 -- 
-pw-bot: cr
+2.53.0
+
 
