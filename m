@@ -1,67 +1,63 @@
-Return-Path: <netdev+bounces-283313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283314-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CORYENc89Wn1JgIAu9opvQ
-	(envelope-from <netdev+bounces-283313-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 01:52:55 +0200
+	id NERZFYY+9WkzJwIAu9opvQ
+	(envelope-from <netdev+bounces-283314-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 02:00:06 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99A834B064F
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 01:52:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C05134B068D
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 02:00:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1F293301C166
-	for <lists+netdev@lfdr.de>; Fri,  1 May 2026 23:52:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1BEB2301AF66
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 00:00:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B914037E2E4;
-	Fri,  1 May 2026 23:52:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AED4736EAAC;
+	Sat,  2 May 2026 00:00:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qCSuiiD6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XVeYMbWN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916ED26C39E;
-	Fri,  1 May 2026 23:52:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE2D369203;
+	Sat,  2 May 2026 00:00:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777679569; cv=none; b=d4XyBdjKWExIp9kloRrJltLoeiPnCZDHNQMvokJivpb/tPCahlwm7VP6fTcXbuS6/BUJqFevS5eDOeZr6NFtqchsAppLS+UXCAB07BBA0Pv8MzARusZHAHx86MMyszs0EfhC4UgpFmkySQVaCK2t7pAap8Zcq2C+jloXY500uV4=
+	t=1777680002; cv=none; b=XrWDcgWffPxdeNBs8TVdQ5CSGu81R+CScsXx5WSe2oFItAFM3N2l1+/BWX25BWonucdm9n2FandLmWrk1JkZLGnFfwelL4CxgZoA6pX/WMZDNvSfVSMvySlslhD+jOHW/FmLXqrGdp/pt1I+oH4gEqXTHZlqwhjsxM1fvWsjMWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777679569; c=relaxed/simple;
-	bh=FX4PXwR541nk9lqlpg4ZyWwJ0QQeR085TUZDYDxe0JM=;
+	s=arc-20240116; t=1777680002; c=relaxed/simple;
+	bh=/1jl2+Gk38jlQWfMB2nGgmVBHt+hIZIsXUnMvuPjpHY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lMQtEsEYmBuI7C9Spfx8eO/xWZoS6dbZXmyHhuvN9vmhcdGRiJdMWlFsRehh2/OIGC4spX/N3Qpo0690u/C8iUQGlajs0tCY/2q1hWOhmLMaXcriDvX8My/IF1IwlcMy+2Iu5EKKH7WCNl/VbIVqB+J/QKAYmSRrJADbNJ4o0AE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qCSuiiD6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87969C2BCB4;
-	Fri,  1 May 2026 23:52:48 +0000 (UTC)
+	 MIME-Version:Content-Type; b=LgzGVUmyrrrXw0v7wF59Z7SBB55NkFhzOGc4VCI6KxFhh3ckJ0/9Db3l5u/AUghETiEyfp+tJRxArlU6Jg4AJq+6qiRoihKkWk0a/xK7CK0XqQBxt1gR0+odLVf31pw22/9cIw2RZDrUWHsbhbb3t0OLy9zCkMw70MPnHj8puQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XVeYMbWN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58577C2BCB8;
+	Sat,  2 May 2026 00:00:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777679569;
-	bh=FX4PXwR541nk9lqlpg4ZyWwJ0QQeR085TUZDYDxe0JM=;
+	s=k20201202; t=1777680002;
+	bh=/1jl2+Gk38jlQWfMB2nGgmVBHt+hIZIsXUnMvuPjpHY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qCSuiiD6ZPC2W9yrDUa+OApu0jbE2HOK9AwTbkyBPuov+iVJ7IYUQRGDc5hP/azYQ
-	 v9Rj3bXmv/4WuEPoTbWCl9QzCk6m7hNXjaGB96nf5nmM39b7sgyOaVAoZ31dE9efTV
-	 ZuKg8RqfOtpPXU1tr1Uo2/WgZuKs/rjZWdcKMiONlM21sOJbQ9rcDG+2hyXJKqaDtG
-	 PIXHHh0tBvGhlM/VwmVn2ZSiEdlhUmMKkZ903eUGWTo6j4Hjri7W0gusynCM1L+TKc
-	 VQjnqsrsXSYzKjypOHrwcHHcB8zSSI/2P2H3dhhXz5GDQk0vvou9+98QaCiZuf/+dG
-	 1RvD1ZSMnZ+vg==
-Date: Fri, 1 May 2026 16:52:47 -0700
+	b=XVeYMbWNowv5y3lB/pAGbd6gzyAXJfK2zq/KETKqZxWXT4ai/IfsdFHS8DyTZ50bk
+	 dbrUi9R2bQJ7mc+gnQlMZz7WGutQyjbT8ViJF5+KzlaQGdCRxMYsvgeC3qtydN5svo
+	 cUrrQI9/P/w+Woud29zc9QACvClWQiX02jYGMATotNIYthU2ydFTZGP1XBZvyy64fQ
+	 7NurA9HAFlwuFEccUHjHBxOM2e85jYY1RrhcR+gAvhHfXnnLBlKEgUBHKplioccoU5
+	 HN90OSsNQXBRIR9cc3bwv7PRiKkrnBJNGVho/gvc5Zwk+0JQuGJ3vYG/zGNTkleEmb
+	 zcPsGhk7kwTgA==
+Date: Fri, 1 May 2026 17:00:00 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jann Horn <jannh@google.com>
-Cc: Dmitry Vyukov <dvyukov@google.com>, Andrey Konovalov
- <andreyknvl@gmail.com>, kasan-dev@googlegroups.com, Andrew Morton
- <akpm@linux-foundation.org>, Alexander Potapenko <glider@google.com>,
- Valentina Manea <valentina.manea.m@gmail.com>, Shuah Khan
- <shuah@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>, Hongren Zheng
- <i@zenithal.me>, linux-usb@vger.kernel.org, "Michael S. Tsirkin"
- <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Eugenio
- =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] kcov: refactor common handle ID into
- kcov_common_handle_id
-Message-ID: <20260501165247.7ed4511f@kernel.org>
-In-Reply-To: <20260430-kcov-refactor-common-handle-v1-1-23a0c7a0ba38@google.com>
-References: <20260430-kcov-refactor-common-handle-v1-1-23a0c7a0ba38@google.com>
+To: David Carlier <devnexen@gmail.com>
+Cc: daniel.zahka@gmail.com, willemdebruijn.kernel@gmail.com,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ horms@kernel.org, raeds@nvidia.com, kees@kernel.org, cratiu@nvidia.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+Subject: Re: [PATCH net v2] psp: strip variable-length PSP header in
+ psp_dev_rcv()
+Message-ID: <20260501170000.5a687eae@kernel.org>
+In-Reply-To: <20260501130046.16008-1-devnexen@gmail.com>
+References: <20260430062033.20428-1-devnexen@gmail.com>
+	<20260501130046.16008-1-devnexen@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,7 +66,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 99A834B064F
+X-Rspamd-Queue-Id: C05134B068D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -78,40 +74,34 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283313-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[google.com,gmail.com,googlegroups.com,linux-foundation.org,kernel.org,linuxfoundation.org,zenithal.me,vger.kernel.org,redhat.com,lists.linux.dev];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283314-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,kernel.org,nvidia.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Thu, 30 Apr 2026 16:15:33 +0200 Jann Horn wrote:
-> Store common handle IDs in "struct kcov_common_handle_id", which consumes
-> no space in non-KCOV builds.
-> This cleanup removes #ifdef boilerplate code from subsystems that
-> integrate with KCOV (in particular in usbip_common.h and skbuff.h, see the
-> diffstat).
-> This should also make it easier to add KCOV remote coverage to more
-> subsystems in the future.
-> 
-> Signed-off-by: Jann Horn <jannh@google.com>
+On Fri,  1 May 2026 14:00:46 +0100 David Carlier wrote:
+> +	psp_hdr_len = ((u32)psph->hdrlen + 1) * 8;
 
-Acked-by: Jakub Kicinski <kuba@kernel.org>
+nit: psp_hlen ? all the other header lengths in this function use hlen 
 
