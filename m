@@ -1,234 +1,123 @@
-Return-Path: <netdev+bounces-283432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283433-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KAEcH/4m9mkASwIAu9opvQ
-	(envelope-from <netdev+bounces-283432-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 18:31:58 +0200
+	id sBYVLqYo9mkSSwIAu9opvQ
+	(envelope-from <netdev+bounces-283433-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 18:39:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECA334B2D0F
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 18:31:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 211FB4B2D5F
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 18:39:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E406A300DD61
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 16:31:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DAD36300D459
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 16:39:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E8403845C1;
-	Sat,  2 May 2026 16:31:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65A6B3559E1;
+	Sat,  2 May 2026 16:39:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s80wTa5L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AJ8HIbHJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF6433DEF7
-	for <netdev@vger.kernel.org>; Sat,  2 May 2026 16:31:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 423F59463;
+	Sat,  2 May 2026 16:39:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777739500; cv=none; b=oHd9cWbsIzgZp36ib1YcD9AX03WlnugxYUD1s3QJ0/bsLd8S4X6GUpoBoagW1atz4DRnzO2Krp0pSlFCab0vBNX7iaOLvQkl+D8JoQg5XvXn4lTvG7S4/cGtPRWKOeI5z9fnzMAMeD/nmBoJrcJwl1avKgX8lvf6Hv/kGdAe9bU=
+	t=1777739940; cv=none; b=FT5LmOznR2Kk1ctdX+78sQbeB5ZOV/7O/lnifEyFYWWKnOiNUhdHEPr+5CdfbPxA1+PYcf/9kwzr+jjkxNqMKhGATrivKC+P522YkX0yzGhNQxQaU4JHAkCNPhafutxo3ihh+FxsKoAeLnDMNQNHtklcoume2ONghi5zVD21+Js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777739500; c=relaxed/simple;
-	bh=WVKJdgc/QUTT/L8tYYDqk5ux1njNQl6pEco9+XPg/tw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=E7pJoQ8fqnMm4FjbSgWCB3EzLKfQOofQ2euG5MCmMFVvLBysx0jofQY3TDxK7Ar5GgWPGg/hdFJp3rdi3OoVdFWaxCRrWcriFs/93eVyTK0Tog7R+4c1uys1ICYlyToqqStR9bBeaTcpErjkN+NrptoxDfOeaGLLawZ2n/7MA+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=s80wTa5L; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-8a016799d2cso30771526d6.1
-        for <netdev@vger.kernel.org>; Sat, 02 May 2026 09:31:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777739497; x=1778344297; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JHSGmWJLA8XXidhFzeVkn9Y0uqp8yNzjVJ9f8OAcqY4=;
-        b=s80wTa5L125eZl3v5fwTG/ISft18rvkTZnfSncqZFLp1Sb3rwwKii6MLXolhwzTUQ+
-         RWq3XyCxcG6jGMpAF2Yqp2DXMC7UgOntYF769LvV1Hhanrvy3nDD0vkjl6u0KJ1vf2ae
-         ls0YsSoujjxOEjcMpRzQp2FXq6YJB2h9og+LPn0ttoy8xCzssixUwZ+SK5aWUEW5TXPl
-         2AJBKHnJAWmelu3TQmiHJcyJDhRbnZyaZTXmmXxfszNC+BGMCLCe8HYTuD2pEY/Gf3km
-         hX4b3EMMRNwVlJFiNLs01Nv+aeczeYsbUHuZtu8ChXBZAEWaGw3vI1T10JZftoWlxzf1
-         wZSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777739497; x=1778344297;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JHSGmWJLA8XXidhFzeVkn9Y0uqp8yNzjVJ9f8OAcqY4=;
-        b=UVz65jk70Pay49bS8vmnjCSOGbX1zCW5PNkdiAxWhRhwO2pKoFihdUr8hGF4wZm8g1
-         s7H8VXWeeLD+rYrRcXhPPySSoUwnfcVA8fmP6+4VVxT8CD/xZZuzY76JX2TCBQTmskiy
-         pQMm4oqulwSaBb3QIqerbYzb89X3M2c6BvKru0qmGubadHTE03Ot9K6vk0gZCGrNj9U0
-         aBArnYv4ZU5vsPbaj5iILtKuao875zqmIP7IE8fecBBXrpZSZYf3/iCw0gx3zIDgY/kg
-         9c2LHrO0hGN28sKew3190G1N19LDm09LU9BITAwaBINZmaSmT6XvZ4L1Xh2iCrXib2DT
-         2aug==
-X-Gm-Message-State: AOJu0Yx9eQDBZwfu4VEh9ucTP4GYNZFRoY49lI/waSqrMVKm27HJcFd1
-	/735mkJjL/UlB1NTaAqhiJB2qpQbs0bj6a6jNyonioASu6/oZicQy1Kr8vRCWB+kcVmZ2w==
-X-Gm-Gg: AeBDieuyJw9mUz90KPcv1qYzw7OAzCGu0ZRRzScSpnX+AGVIE/HyYXAU34CMjcKfNRV
-	P4KGNZJwcpANRwQ9NE0VR8NRQbqSVw1WPi/o4+6u+66BUyCsf7beHZag2M4ngO2VSaUTtvehgjO
-	bp9WVxQh0z9hObpiw0KNkxHZOmjvFOG9DVnU5gcGxei/5PvgOnNSTPlOoQl7Is6cva3ZeYkpDMh
-	TQ29IQDeHGNXC3cBUA3n2Xsqsg5oXkpa+Y13MqPzMckK5yQyF75nS4IHuswazFCC2opTfRYdAo1
-	hlk6f2jGHhf9YMm+r950g75PQsO8odqE+KrLl3g6U2OnL+0qJgY2ODks/oFnFpvqr4KjkLjOrQg
-	Oy0orxHl4PGoc1YxQzKdAMCGrSelaNj4fFuDTokYUjgw6tWLtqGCF2cHUtbLphE3bD4yHDdBXRv
-	2eIGu9SfJfMg1c3uTURIAnPuwI3s9r+vyuqcVLoivmYHv8nTVvu6x1b7zQvVUMfOLkl9vhDB/z9
-	vp3ENe8mO9+WLOnaIcc1dt7XNu1JVPgJx/KcpI=
-X-Received: by 2002:a05:6214:6014:b0:8b3:f59d:e6a4 with SMTP id 6a1803df08f44-8b6665f1d8emr66141656d6.17.1777739497391;
-        Sat, 02 May 2026 09:31:37 -0700 (PDT)
-Received: from TDC4045031631.e0cglfehwr0e5gttmepj3hi3hf.ux.internal.cloudapp.net ([20.63.37.123])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b53c0e7ebdsm71694846d6.29.2026.05.02.09.31.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 May 2026 09:31:35 -0700 (PDT)
-From: Ashutosh Desai <ashutoshdesai993@gmail.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	stable@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ashutosh Desai <ashutoshdesai993@gmail.com>
-Subject: [PATCH v6] nfc: hci: fix out-of-bounds read in HCP header parsing
-Date: Sat,  2 May 2026 16:31:16 +0000
-Message-Id: <20260502163116.3409687-1-ashutoshdesai993@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1777739940; c=relaxed/simple;
+	bh=Z5nCRgne7eNYBRvJ4vlO/FCOvZarm4F5SNo4cIXNnXc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QutInUN4orcHA2qjeZORFIVMnYuNTjdE3VuKCEsdQQJkBRTasDV9ivYNMrQGyfkMxv+zOUZAZ1Y28Fs29b74f+qnBs7j22mbEMaQyRlrHvp9e4TSatFaa9AwNRH3vMwLQr2eBN5y5tTYPsGqCnpUUFiZOdESUrkGSc8DQJxNxrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AJ8HIbHJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E561C19425;
+	Sat,  2 May 2026 16:38:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777739940;
+	bh=Z5nCRgne7eNYBRvJ4vlO/FCOvZarm4F5SNo4cIXNnXc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AJ8HIbHJN841AEPhBO3qBsVjkjEtebLa7Dq8zYMPVE5dJEUi0aY4TX/ZQfWXjcS6v
+	 BuTRgGshVU8pj/m1unFCQgUuInCl1C2bvh71pEEnpuz3NOM166uFHCFluZIVQiw/Jh
+	 6QLGhn3TSmjvMtNnB2f8/EM4NAdYT70zBTbxtHnSnJEOgSn+TVKLnpLhvkRDsdQ2Wv
+	 4XSxjKK6LQ3tVVZaVkLtcFLfsobtj9oB6pkf0PAav+X0xNzRL9HAaEqMXSWryZQstq
+	 U/6LAGPytBPjMK5ssfuX1+rD6Bszuax2w6augnmUimieSvEO7DsZc3c2b/3L5lvyIs
+	 8hSjPr7vpaB5g==
+Date: Sat, 2 May 2026 09:38:58 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Allison Henderson <achender@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+ horms@kernel.org, linux-rdma@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, shuah@kernel.org
+Subject: Re: [PATCH net-next v2 5/7] selftests: rds: Fix gcov and pcap
+ collection
+Message-ID: <20260502093858.35b27793@kernel.org>
+In-Reply-To: <843faae8c03ce534fad28e73b155d33c84f69bee.camel@kernel.org>
+References: <20260428222716.2960871-6-achender@kernel.org>
+	<20260430024206.2452353-1-kuba@kernel.org>
+	<20260429194806.6ae176a9@kernel.org>
+	<843faae8c03ce534fad28e73b155d33c84f69bee.camel@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: ECA334B2D0F
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 211FB4B2D5F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,davemloft.net,redhat.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-283432-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-283433-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ashutoshdesai993@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,run.sh:url]
 
-Both nfc_hci_recv_from_llc() and nci_hci_data_received_cb() read
-packet->header from skb->data at function entry without first checking
-that the buffer holds at least one byte. A malicious NFC peer can send
-a 0-byte HCP frame that passes through the SHDLC layer and reaches
-these functions, causing an out-of-bounds heap read of packet->header.
-The same 0-byte frame, if queued as a non-final fragment, also causes
-the reassembly loop to underflow msg_len to UINT_MAX, triggering
-skb_over_panic() when the reassembled skb is written.
+On Fri, 01 May 2026 22:43:04 -0700 Allison Henderson wrote:
+> > point #2 my vng does have an overlayfs mounted over /tmp so the
+> > mountpoint check doesn't trigger IDK if this is what you meant 
+> > or I have a different version.  
+> 
+> I did try using --overlay-rwdir, and I think that gives rw to the
+> guest, but it's ro to the host, so we dont get to keep the pcaps post
+> mortem.
+> 
+> What we can do, if it sounds ok to you, is set up a temp scratch area
+> in the rds_logs folder so it's not mounting over /tmp, and then
+> run.sh can handle the mount with a cleanup trap addressing Sashiko's
+> concern
+> 
+> Let me know what you think?
 
-Fix this by adding a pskb_may_pull() check at the entry of each
-function before packet->header is first accessed. The existing
-pskb_may_pull() checks before the reassembled hcp_skb is cast to
-struct hcp_packet remain in place to guard the 2-byte HCP message
-header.
-
-Fixes: 8b8d2e08bf0d ("NFC: HCI support")
-Fixes: 11f54f228643 ("NFC: nci: Add HCI over NCI protocol support")
-Cc: stable@vger.kernel.org
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Ashutosh Desai <ashutoshdesai993@gmail.com>
----
-Changes in v6:
-- Add pskb_may_pull(skb, 1) at function entry in both functions before
-  packet->header is first accessed, to fix OOB read on 0-byte frames
-  and prevent integer underflow in the fragment reassembly path
-  (Paolo Abeni)
-
-V5 -> V6: add entry-point length checks per Paolo Abeni's review
-V4 -> V5: fix whitespace damage
-V3 -> V4: add Fixes tags
-V2 -> V3: drop redundant checks from nfc_hci_msg_rx_work/nci_hci_msg_rx_work;
-          remove incorrect Suggested-by tag
-V1 -> V2: use pskb_may_pull() instead of skb->len check
-
-v5: https://lore.kernel.org/netdev/20260416051522.4154698-1-ashutoshdesai993@gmail.com/
-v4: https://lore.kernel.org/netdev/177614425081.3600288.2536320552978506086@gmail.com/
-v3: https://lore.kernel.org/netdev/20260413024329.3293075-1-ashutoshdesai993@gmail.com/
-v2: https://lore.kernel.org/netdev/20260409150825.2217133-1-ashutoshdesai993@gmail.com/
-v1: https://lore.kernel.org/netdev/20260408223113.2009304-1-ashutoshdesai993@gmail.com/
-
- net/nfc/hci/core.c | 10 ++++++++++
- net/nfc/nci/hci.c  | 10 ++++++++++
- 2 files changed, 20 insertions(+)
-
-diff --git a/net/nfc/hci/core.c b/net/nfc/hci/core.c
-index 0d33c81a15fe..ba6f0310ffd7 100644
---- a/net/nfc/hci/core.c
-+++ b/net/nfc/hci/core.c
-@@ -861,6 +861,11 @@ static void nfc_hci_recv_from_llc(struct nfc_hci_dev *hdev, struct sk_buff *skb)
- 	struct sk_buff *frag_skb;
- 	int msg_len;
- 
-+	if (!pskb_may_pull(skb, NFC_HCI_HCP_PACKET_HEADER_LEN)) {
-+		kfree_skb(skb);
-+		return;
-+	}
-+
- 	packet = (struct hcp_packet *)skb->data;
- 	if ((packet->header & ~NFC_HCI_FRAGMENT) == 0) {
- 		skb_queue_tail(&hdev->rx_hcp_frags, skb);
-@@ -904,6 +909,11 @@ static void nfc_hci_recv_from_llc(struct nfc_hci_dev *hdev, struct sk_buff *skb)
- 	 * unblock waiting cmd context. Otherwise, enqueue to dispatch
- 	 * in separate context where handler can also execute command.
- 	 */
-+	if (!pskb_may_pull(hcp_skb, NFC_HCI_HCP_HEADER_LEN)) {
-+		kfree_skb(hcp_skb);
-+		return;
-+	}
-+
- 	packet = (struct hcp_packet *)hcp_skb->data;
- 	type = HCP_MSG_GET_TYPE(packet->message.header);
- 	if (type == NFC_HCI_HCP_RESPONSE) {
-diff --git a/net/nfc/nci/hci.c b/net/nfc/nci/hci.c
-index 40ae8e5a7ec7..c03e8a0bd3bd 100644
---- a/net/nfc/nci/hci.c
-+++ b/net/nfc/nci/hci.c
-@@ -439,6 +439,11 @@ void nci_hci_data_received_cb(void *context,
- 		return;
- 	}
- 
-+	if (!pskb_may_pull(skb, NCI_HCI_HCP_PACKET_HEADER_LEN)) {
-+		kfree_skb(skb);
-+		return;
-+	}
-+
- 	packet = (struct nci_hcp_packet *)skb->data;
- 	if ((packet->header & ~NCI_HCI_FRAGMENT) == 0) {
- 		skb_queue_tail(&ndev->hci_dev->rx_hcp_frags, skb);
-@@ -482,6 +487,11 @@ void nci_hci_data_received_cb(void *context,
- 	 * unblock waiting cmd context. Otherwise, enqueue to dispatch
- 	 * in separate context where handler can also execute command.
- 	 */
-+	if (!pskb_may_pull(hcp_skb, NCI_HCI_HCP_HEADER_LEN)) {
-+		kfree_skb(hcp_skb);
-+		return;
-+	}
-+
- 	packet = (struct nci_hcp_packet *)hcp_skb->data;
- 	type = NCI_HCP_MSG_GET_TYPE(packet->message.header);
- 	if (type == NCI_HCI_HCP_RESPONSE) {
--- 
-2.34.1
-
+Oh, you need these files for a post mortem analysis? I missed that
+point. IDK if there's a well established way to save extra debug info
+from the tests. runner has per_test_log_dir but I don't think it's
+exposed to tests? Until ksft has such a thing I'd probably go with
+an extra env variable to point the test to a specific dir.
+Which dir will depend on the CI harness. If var is not set - don't
+output the logs or use /tmp and clean up when test exits.
 
