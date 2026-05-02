@@ -1,84 +1,85 @@
-Return-Path: <netdev+bounces-283378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283379-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sJvUB7yT9Wm8MgIAu9opvQ
-	(envelope-from <netdev+bounces-283378-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 08:03:40 +0200
+	id eLagOgmU9Wm8MgIAu9opvQ
+	(envelope-from <netdev+bounces-283379-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 08:04:57 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89A474B116F
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 08:03:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 69BDA4B1189
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 08:04:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0CF5C301106F
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 06:03:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 94DA33013889
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 06:04:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A72A2D3220;
-	Sat,  2 May 2026 06:03:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0443C2ECD1D;
+	Sat,  2 May 2026 06:04:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="P//+BWXz"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="kG2wG6Jn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365781EEA31
-	for <netdev@vger.kernel.org>; Sat,  2 May 2026 06:03:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74EB52DF13E
+	for <netdev@vger.kernel.org>; Sat,  2 May 2026 06:04:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777701816; cv=none; b=j3ClmVRSAEYhNcIbkEEsGxtno5mwsUaS5HTCaObEkc8TunHuox43JREZhze0jmDhN1HB923Q9sL5zuLLCtptsAygT7fLMzVv7uRHjedSB2e5g8zbDZYtoTb9u3Md+A+mX8Xu5QSN1ySJUslkL2MuEGiOX+skX633I6/6mdqn78A=
+	t=1777701892; cv=none; b=Ergiq9B2t+ceKLGhLIordijfqs4O/9zFwYYvJucJzZRr107MOeUa4duT79yFClxIYTQXsUVkRc1pFLc6/smdB606eCWJkI2iCJOParKL//ReTKBUeTq7dUcedf0b3QEVk8t2U2t6j1FzVgxTKF4MBBSLzJgO4AEozoRvU82n7/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777701816; c=relaxed/simple;
-	bh=S7Lb+q3oEv3NVM0NPPBYU6eUyq6N8yTsNyIwBajUKE0=;
+	s=arc-20240116; t=1777701892; c=relaxed/simple;
+	bh=5VSyqBvoid9uFXOUdR772I1+U0H44cOPYNrNocs56ME=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dbDJ+bJznKASXDrDPcRXngpuTf8K3esvu/fnB9GsRx1b5zxGL7O534qcrKJWc5PxIdsfmTZCqBu8fyqWGMDHJJ8HvGry+jeXA0u6kOtctWQ9yUggDfqzs3nu2EcY2wXrG43ekgeYX2HEvoRTRoSqdTtHUg2lmLMUhyX0Nv+r8ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=P//+BWXz; arc=none smtp.client-ip=209.85.128.53
+	 In-Reply-To:Content-Type; b=InUQpwSZZWk+c1BENKcBTenyPLw1AvN/9CyYRVUdKKS9aL6AkLWQVI3oFYYh+JehtwTFhn6Ypc7KlrF9DFpzY6H/vZ+XB1IcLPo3gCEO3kZstQSvk/R9T7VZxguP7PwPzpKW/1/q1Uhd8dfFScsPahwgnWVicoNJBCuk25Tfeuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=kG2wG6Jn; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4838c15e3cbso19864785e9.3
-        for <netdev@vger.kernel.org>; Fri, 01 May 2026 23:03:35 -0700 (PDT)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-488d2079582so27135215e9.2
+        for <netdev@vger.kernel.org>; Fri, 01 May 2026 23:04:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1777701814; x=1778306614; darn=vger.kernel.org;
+        d=blackwall.org; s=google; t=1777701890; x=1778306690; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=LZREXi6KS9s2NVYeEPr0xKFupND9na8xQrKsYAgQ4Cc=;
-        b=P//+BWXz7ZP9o+BvGp8jKVHG4AfZwRgsVPatQpCuJY2QiFkDW11orO9/bIUt2VGN9s
-         Q37Z7pUIY8cBu/GZ6eiGk7gVD58NEGFzsxhVEbJ7Bb4oph9RH28nr6FpMMv12A+t/t/p
-         jQTUinTDanSdC71tD9/BtGHoYiewTKjwWLFJK4y82EJdKu7QNKFcHgL5aBJkkUVutsbL
-         WE8Ns2q/YlHU5SZPVuM0lr/Neaqgd/kYAas2MK6sYDsKdtLqQikQh5E9W8yDxKGU6P9P
-         u2Eaxc4yU/ZPhMFe/OIl0jDZrSAyfrTLLDn8LVea0zCB8stBZhC0dQAMNRKJjoh2zTBo
-         oxaA==
+        bh=ePyFY9tU1bqBeZ/CDvqIuK5nLfvL0Jsqz80NzKwHDyY=;
+        b=kG2wG6Jnt3Cj/nb5Iw7wIlfK0BOqouM0pPso1iI1aFMM1JRGe4Rc5gGpHAUarvapK+
+         BDO3iNo5ZSsbbTBw0CfT2JK6mLRa9fCWNcREMIHoRVXwquDWZyZ+8aBHJN06BiQ2qSA8
+         iM+hzH9wyNK157wxeE8yduPVxgWhhFJwF8k0OFEp2Lb5x1ylHUiLo6P6qJQaUQw+mhgp
+         SlZZ0Fi4ufkWTgt5hqgf/GaDt4bNT5uxerA9Lbw0OkvYUAU+Jsr/K7nuJxkVTTUcAyuO
+         ZjYFqpAKaWWYexn/ySeK9mVByCTSCgCAOZSDR0kj4krgJwkwRvFOxJyS7bx4072CwQII
+         1GOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777701814; x=1778306614;
+        d=1e100.net; s=20251104; t=1777701890; x=1778306690;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=LZREXi6KS9s2NVYeEPr0xKFupND9na8xQrKsYAgQ4Cc=;
-        b=TUDSF8p8kCV7dU4UWlI8+jQZ3H/wGmyx2K69kQXsBWkQ07rMrfOCnuTbWPnYAPKKr3
-         oVFbsqrUDPFCcAOfKogBFfNe7Gr7HhpNsKiwuJDZrWxSuIrLnwuW7ud5F1vX94EnJ0Ce
-         WV6MJ43xZn8DV7ADYqbAlzfAoQWWsSLORmx+emvBOt2NXDTBAcmvqHZ9pP46jpSZ5SeW
-         QlUR+SQDoiqLFxCq9m+0dnduNBzIqmMk3nlk2+JWxLJkRgtQnFy0lF8+9zRM+Qr1oZmN
-         v1aeJjqAv39pS5FLe2zz6zj8qmazM2iuvpQRRie94IaF5aaM8ElZvQDaUFAloCavE08v
-         ADPA==
-X-Forwarded-Encrypted: i=1; AFNElJ8w6zrsEA1wlzeWsV+C4RAk1XkdDhTLCDUYCfIZhxNaF9zLJx2lyN+v9EVMCe93zcpzn7FJ70g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDre5lV38yWrI9D8hqrMTETRgJE6dr7l72f3ls2vuvXLIZdK3V
-	jThXv3pxAJvxZ9Phlb6d/Etq1VC1mGRlrJC0DRi9kwCI6Jb6hOq85FV4GofreG59oi8=
-X-Gm-Gg: AeBDiev2RNT0EPeu4u/4gkdBFh8IH+7XwsWbZJuFbAz08ylmQSUvUOShX32lZwbRwr4
-	5TTD08qOYLo72/F0KRuduAqcvoaRJRTzrjSmxsVmQFJnj1ySYamBtwV7F4KCA6TM/1PKh2JBckp
-	edXNNp3+SgesgBCIxz24hllRozejI08nBhsAiwlCSzCVknWQKk6ujQYMYkBwoATJRGrpaozrtXT
-	3D8W70p+RfTNQuMs+wr/VbG7/jXXPYzBKwp5ie9HfEbCrD+Axv6ZQQJ8goNcHZaO5FaWVlAoZ4s
-	ntzlBng0+YLvpDKGUBFlKBjY0S/EOShGSYyO8CRwMFTv/1JQqE7qAGBlsEpVgJQHAAPN0u0JXJ7
-	oByaPz/H+g1JrMI9vbz92StV3972j3/RYAoB6+iK0J8egFM1oP+rKksJqapbqfA/nUMx4VWWOpv
-	nYGZOwsDgrOrfGQThTWcCLj1YlqmqM12nwPEb/2YXUiQxBifQDpIY8YqS/vqaZzTbe
-X-Received: by 2002:a05:600d:8453:b0:48a:5339:ef0e with SMTP id 5b1f17b1804b1-48a9852f5e7mr19973775e9.3.1777701813598;
-        Fri, 01 May 2026 23:03:33 -0700 (PDT)
+        bh=ePyFY9tU1bqBeZ/CDvqIuK5nLfvL0Jsqz80NzKwHDyY=;
+        b=EqhkrblpFfQwF0ft4ao3TbL1GkhC9rWCTHsLFzlWpn0zeNS3eEm7oLSl2KQn4sWn3q
+         2WwGhDKAOJ49pVy7y32a4K4sMFfXgkZlg3gzXZ2z1LX11VARmA3WRgkWEgiGsqw2/kdC
+         jjRv1fj+VGupVcryE40a3Zi98t74Dp4mtSo2jEmkWRojwMM0l8cp+Ys8qLaDm1OfVks8
+         flfMpUpptUl3D2uOeYbbjq+pvWRBvUqouxD6oorZrLU6Dpqrayv7OLzYBT2whUztcJsM
+         qPD9sVJoUX82VaQ7fv6mq8ISTZSd9VD2uxkSGJizsLtve3VRNECrhl0ydPhyIL6Y+XQR
+         r5yg==
+X-Forwarded-Encrypted: i=1; AFNElJ+kaO/30/Z/j8gyDQBFLJhsPxKeuqBI1pXpdddY/qLrb/kLRaSzkxltvNWbUO64V0N5lFcEnpk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy82ZANiyLx4vri3xW95by6aqnyc264RrBuv94iTHYScMZGsanN
+	mUDMr167AorfreMNrErFMg4zHrENpbF2bLMnku1XrRIitPKI50Wo600CR5tB/UV8B5I=
+X-Gm-Gg: AeBDievZ5EK+Io7W9uq0DqiaUxSdZ0zAQF31gZFF9D3KYD/0KQ70kXvxUHz9qm6+SId
+	00a3MzuHAY2+xf9FwJPWZ2YdmRqlLb8m/QF5apOa89AGIhi2gxsqFYY76EepO408R42nvNiF+Vy
+	Dq9QQznU1ewb3XAWzQW+gdWbGYKhBxIFq6LsoFZIGywS0St+aTmMUpRG4beHy9MesYp+NHhNoDT
+	/RoK36ErbChFaJ7EjE+RDX+owJ5x7VGFOmJ7/vJoID5E278lJPICgLuTZTIUrn/Q8fi7BDkPzZu
+	xP7a0hhFDlphA/YRiAWtc8l1UFeJX77cHurDwZsT0Je3pbPtq9ss2NIN0b2Jcv+DvPl/6uu8lMy
+	vxdtmWv5nnxefxOvhQITbKqaJl/RrOhxybXkYNZaFgnDrpjT3HLzmvP2dHol3RXvAdG1NL5dLP1
+	EVjHZtJGhxc9FS7kQnbfEWCqki32ILH7OtMqVI6MrV7DhwXiiO/wkWwGDCDpdE8ngiWEqg7Vo5H
+	cE=
+X-Received: by 2002:a05:600c:4450:b0:487:4eb:d125 with SMTP id 5b1f17b1804b1-48a98639086mr24427625e9.9.1777701889840;
+        Fri, 01 May 2026 23:04:49 -0700 (PDT)
 Received: from [192.168.0.161] (78-154-15-182.ip.btc-net.bg. [78.154.15.182])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a8fee4d60sm27091805e9.19.2026.05.01.23.03.32
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a8eb69698sm185348695e9.1.2026.05.01.23.04.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 May 2026 23:03:33 -0700 (PDT)
-Message-ID: <82343bf4-18ab-4482-9241-2f235f6f1449@blackwall.org>
-Date: Sat, 2 May 2026 09:03:31 +0300
+        Fri, 01 May 2026 23:04:49 -0700 (PDT)
+Message-ID: <b4d8277a-2a5b-49d4-a132-0f875e580fae@blackwall.org>
+Date: Sat, 2 May 2026 09:04:48 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,8 +87,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 2/5] ipv6: mld: rename mldv2_mrc() and add
- mldv2_qqi()
+Subject: Re: [PATCH net-next v5 3/5] ipv4: igmp: encode multicast exponential
+ fields
 Content-Language: en-US, bg
 To: Ujjal Roy <royujjal@gmail.com>, "David S . Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
@@ -99,12 +100,12 @@ Cc: Ujjal Roy <ujjal@alumnux.com>, bridge@lists.linux.dev,
  netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-kselftest@vger.kernel.org
 References: <20260501173130.3486-1-royujjal@gmail.com>
- <20260501173130.3486-3-royujjal@gmail.com>
+ <20260501173130.3486-4-royujjal@gmail.com>
 From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20260501173130.3486-3-royujjal@gmail.com>
+In-Reply-To: <20260501173130.3486-4-royujjal@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 89A474B116F
+X-Rspamd-Queue-Id: 69BDA4B1189
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
@@ -114,7 +115,7 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283378-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283379-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	DMARC_NA(0.00)[blackwall.org];
 	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,nvidia.com];
@@ -136,20 +137,34 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email,blackwall.org:email,blackwall.org:dkim,blackwall.org:mid]
 
 On 01/05/2026 20:31, Ujjal Roy wrote:
-> Rename mldv2_mrc() to mldv2_mrd() as it is used to calculate
-> the Maximum Response Delay from the Maximum Response Code.
+> In IGMP, MRC and QQIC fields are not correctly encoded
+> when generating query packets. Since the receiver of the
+> query interprets these fields using the IGMPv3 floating-
+> point decoding logic, any value that exceeds the linear
+> threshold is incorrectly parsed as an exponential value,
+> leading to an incorrect interval calculation.
 > 
-> Introduce a new API mldv2_qqi() to define the existing
-> calculation logic of QQI from QQIC. This also organizes
-> the existing mld_update_qi() API.
+> Encode and assign the corresponding protocol fields during
+> query generation. Introduce the logic to dynamically
+> calculate the exponent and mantissa using bit-scan (fls).
+> This ensures MRC and QQIC fields (8-bit) are properly
+> encoded when transmitting query packets with intervals
+> that exceed their respective linear threshold value of
+> 128 (for MRT/QQI).
+> 
+> RFC3376: for both MRC and QQIC, values >= 128 represent
+> the same floating-point encoding as follows:
+>       0 1 2 3 4 5 6 7
+>      +-+-+-+-+-+-+-+-+
+>      |1| exp | mant  |
+>      +-+-+-+-+-+-+-+-+
 > 
 > Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 > Signed-off-by: Ujjal Roy <royujjal@gmail.com>
 > ---
->   include/net/mld.h         | 66 +++++++++++++++++++++++++++++++++------
->   net/bridge/br_multicast.c |  2 +-
->   net/ipv6/mcast.c          | 19 ++---------
->   3 files changed, 61 insertions(+), 26 deletions(-)
+>   include/linux/igmp.h      | 87 +++++++++++++++++++++++++++++++++++++++
+>   net/bridge/br_multicast.c | 14 +++----
+>   2 files changed, 93 insertions(+), 8 deletions(-)
 > 
 
 Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
