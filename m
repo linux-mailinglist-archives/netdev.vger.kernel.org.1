@@ -1,219 +1,157 @@
-Return-Path: <netdev+bounces-283364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283365-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id zykrLT979WmKLgIAu9opvQ
-	(envelope-from <netdev+bounces-283364-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 06:19:11 +0200
+	id kCiDGVN+9WnZLgIAu9opvQ
+	(envelope-from <netdev+bounces-283365-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 06:32:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D1FF4B0D0F
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 06:19:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01D794B0E4C
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 06:32:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8F444300FB41
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 04:19:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E7DD33016929
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 04:32:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7579F265CA8;
-	Sat,  2 May 2026 04:19:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 087722BE043;
+	Sat,  2 May 2026 04:32:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="GWVNuaAS";
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="K3UCuM5V"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="ortqi6uW";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="HUtDmXXB"
 X-Original-To: netdev@vger.kernel.org
-Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
+Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D111326299;
-	Sat,  2 May 2026 04:19:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CDED1A9F97;
+	Sat,  2 May 2026 04:32:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777695546; cv=none; b=gv7IfrDSIZlSxWRQxkdYtWqTIvO6rkRPyV4+7fti4waaR+E+ITYdy1HmKrXhW2NREOpTEHJ2LWpNlKt1e1HtzNX0Nb2xu2gfN0x9DOM1JpCea1rg9/Tw3rZabM+YTdYfreeZC+LM0yogFEzXzv7PtDIc5yL4HcTlp7xniGFXnc0=
+	t=1777696333; cv=none; b=Lryt8aV5tsi1Y6jtCDXQCsAOcMl290ojOX/waXZcJo0denoHsPNkBWJjZR0yDH5TkB20FQvZqpEfheXGSOc1Exno4LyF2rKTOK5DMTKi3cFXT+aYVXi+p4qoiFeXY7TcvhAPIdjrIHJ49uzKCAs6XraKLlDJrB7DO2X1nQeX84I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777695546; c=relaxed/simple;
-	bh=1b77sLSfeXEOigrZw4MjY7aEQchhQA9i9p4wri9IWk4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BvXVmZ48thq+laIFC+nHPkJ5MVlBWDkSysX+DlaxWqxYOQojTEIRC3MHE75VhELoAzKMngkJswPz9YddJkCjXSgGOBfuCsA0SB60dBAoLLjzEiYxaTW1uC2pG0KSmxVHzxcRHmSll1PS+wVxZjSC4z4/JhtJROpvslggvBQHvCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=GWVNuaAS; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=K3UCuM5V; arc=none smtp.client-ip=23.88.97.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1777695536;
-	bh=1b77sLSfeXEOigrZw4MjY7aEQchhQA9i9p4wri9IWk4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=GWVNuaASz/dqAig2c1xts30Opc374F1DmcTsc15lB6yOK/ljWCylMP0Bxu6yFg3vi
-	 8BQY13Fl88UHXYLpPI0/RRyRoXOjaocXU6GE/QYRCOfcVE1f1snJtI1/VTCZ4q6w1F
-	 xAV9fJkST0eiMT7H4wVGBs3CDkGLaLx3K+zJDRguQi4zIzGBAeizFRWEd3TTbXxrC6
-	 fbkWxOEn6B7xv3dhEECYWh1Q3CNn7DHC+uEeRMFxVEpD4o468yHonBSlCYKgq7dBt0
-	 UQ+GGfY+dh4BDJp3rFpIvv2bWhmpfuw2L8Mnr9qEUKXaeae8wSAJg7S0FF4NOTb75+
-	 PNuKGQfBVFBUQ==
-Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
-	id 9D640482A8; Sat,  2 May 2026 04:18:56 +0000 (UTC)
-X-Spam-Level: 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1777695535;
-	bh=1b77sLSfeXEOigrZw4MjY7aEQchhQA9i9p4wri9IWk4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=K3UCuM5VJBOc8I8znTEJVI27E5CpoAqK5t7DPEG1EqDT8zYo51E80FG9JL4A09QIh
-	 MreL1j2gAqArCtV7bfktGZ7RlP9+H/BOHlGrPcGOgOgew8jqS2XuZInTCweqsP+j6l
-	 M6O7wpjpCrbiqNFLSLdO//N6gVmlEgTJdUcVmAyibGtROCtznUo1bFBuomSckBbbvW
-	 vbIRth99UpzkEXh1K557INd5053FR0hGeMzCa7pZTpLVIafRjVfesxW3q6QDtePr8g
-	 dIQYIYWAkcEi/9Pa45q3LWozS+Y4wTJDC9gmGm18rOxbkwJjsixxsT2O5oX8f7FrrT
-	 IooJDtQR7pD4g==
-Received: from [IPV6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb] (unknown [IPv6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb])
-	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 6833C4122D;
-	Sat,  2 May 2026 04:18:55 +0000 (UTC)
-Message-ID: <575c9dc5-cf3b-451b-b6df-e8b533ba06c6@birger-koblitz.de>
-Date: Sat, 2 May 2026 06:18:55 +0200
+	s=arc-20240116; t=1777696333; c=relaxed/simple;
+	bh=VvzNqcyWvOSXIgK/Bn248L/jEf6SxdUEYXGuhkZRyNQ=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=m7savpaJtISdfieT8K0HSVe+O6SfhPyfoeJzsZA2wLKz5pdkxL+cjZtFlthkKT9q/6Aocj37LdAjTZXjbHcmzdnlmV/EHGrt6qG0K75TJHoxZTy2h9ezraVrS0iYgdGzAS+kLIkAwXRMFbwFMEO9dzUkvdQPV0WKypTaCaQ2d6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=ortqi6uW; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=HUtDmXXB; arc=none smtp.client-ip=103.168.172.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 703E51400176;
+	Sat,  2 May 2026 00:32:10 -0400 (EDT)
+Received: from phl-imap-18 ([10.202.2.89])
+  by phl-compute-02.internal (MEProxy); Sat, 02 May 2026 00:32:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1777696330;
+	 x=1777782730; bh=BREJYA/ynimdlvkziKMjJqbroFR4YvUmHC1hcGjm9x8=; b=
+	ortqi6uWikQ8D9//DCJX6HdxN8qFN/wNEWu0GjtX/JPurb0gBkR4R/br/H8uDKTd
+	nmVrg/zHJo0fowP7PEuIKYgTWsjvTn/JdCJtKg4LDUDZerAGHgfF9Wi4dCDnEz/z
+	xo7Cu6HZlvV/3FeDd6e5zuviTb21KWNY546Y37/CojJP/NnsnHd7W6hCdYhaIWB2
+	ArmF0d7GHsn5B6tN9kr+tNJUVJ9hJfLXqTpV2a0cEtPuE1POhSO63SN8Qiz+45JU
+	D8R7mCSTm10le84gZO/UDNJ7N5uJWx1tlUX9FBoTm+TUhhqIbt5kMjahBTcPcbkn
+	JYkoZCpvAl2ZZlRXYr67xg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1777696330; x=
+	1777782730; bh=BREJYA/ynimdlvkziKMjJqbroFR4YvUmHC1hcGjm9x8=; b=H
+	UtDmXXBWutpUdoGrBRVkz3b0v9T8jZ9AxD3wms8UA4sCaccGEoiIGJpK176hlCs1
+	++oYIaUXtDgRouEW/wv6KP3LjaKSxpYEltfcSD3oZEfFP6TyMC99JLukz1YL/v4G
+	cjKGQjjPtr33m2OCkT0tTqbHjMzDxnYagJ1qStOR0GFdJeU7amfTXugPKwN62WUq
+	hiyssUkSzOmygpsS8dCbuuyOvMh1Kb5d+dg7nkr6nXgnPKgEUPja215mCA1Cw5S1
+	MsafOhxA8wAd/KM9YBS4Jec6jghW6ceGUIVgYIZwj1gCHRoczHzzL6q0RZXW//VV
+	iH4LIN0H3D4mzXmiHQclQ==
+X-ME-Sender: <xms:Sn71af8e8p1BZAIxzaNAVYGvLu3pfDMXKBpJ5rTpm9xoo5togOtt_A>
+    <xme:Sn71aWggk1gjkF9-EHfQIMZHiV4bsxMT7xaTeKwa00mLlxXLEKvL1_2UxMe9e0Wxv
+    hDOHgv0q7JWKiWysf5stfrURGwhzrGbcofLmOa0cnS1a18WrK_A>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdelvddufecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdetlhgvgicu
+    hghilhhlihgrmhhsohhnfdcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrf
+    grthhtvghrnhepgfeffeelgffgffevffetteeivdettdfgvdeiveefjeeffeffveetjeet
+    udffgfevnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    eprghlvgigsehshhgriigsohhtrdhorhhgpdhnsggprhgtphhtthhopeduvddpmhhouggv
+    pehsmhhtphhouhhtpdhrtghpthhtohepughmrghtlhgrtghksehgohhoghhlvgdrtghomh
+    dprhgtphhtthhopehlvghonheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhhuhgr
+    hheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrthgthhgvsheslhhishhtshdrlh
+    hinhhugidruggvvhdprhgtphhtthhopehjghhgsehnvhhiughirgdrtghomhdprhgtphht
+    thhopehmsghlohgthhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepshgrvggvughmse
+    hnvhhiughirgdrtghomhdprhgtphhtthhopehtrghrihhqthesnhhvihguihgrrdgtohhm
+    pdhrtghpthhtohepkhhvmhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:Sn71abxKiOXJB7RlQcQ0yz-wxuLtklAZqMqe2BAF8vmaUaUeZEd0oA>
+    <xmx:Sn71af8FJynU3OCbEob14bK3zdFzrZp2mhbGaDRk_tZAmL75iuQH9g>
+    <xmx:Sn71aZOKAri6LW5ABVGBIXnZ0WVwarqNA3Af0NJ3y5SX_iMTF7-AEQ>
+    <xmx:Sn71afoF33idoETcqH1XenMvYie6Fa-e0WkFHEuikluE6lh-pDs1Zw>
+    <xmx:Sn71aeZ3SmnZnKSEnikCL7LK8w_aZoWWQ1OImsJAmIbITGiETqVEP4kj>
+Feedback-ID: i03f14258:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 14AE715C008F; Sat,  2 May 2026 00:32:10 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/4] r8152: Add support for 10Gbit Link Speeds
- and EEE
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, linux-usb@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, hsu.chih.kai@realtek.com
-References: <20260429-rtl8159_net_next-v2-1-bab3cd4e4c66@birger-koblitz.de>
- <20260501011556.3154166-1-kuba@kernel.org>
-From: Birger Koblitz <mail@birger-koblitz.de>
-Content-Language: en-US
-In-Reply-To: <20260501011556.3154166-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+X-ThreadId: ALXc8_xz--ng
+Date: Fri, 01 May 2026 22:31:49 -0600
+From: "Alex Williamson" <alex@shazbot.org>
+To: "Jason Gunthorpe" <jgg@nvidia.com>, "David Matlack" <dmatlack@google.com>,
+ kvm@vger.kernel.org, "Leon Romanovsky" <leon@kernel.org>,
+ linux-kselftest@vger.kernel.org, linux-rdma@vger.kernel.org,
+ "Mark Bloch" <mbloch@nvidia.com>, netdev@vger.kernel.org,
+ "Saeed Mahameed" <saeedm@nvidia.com>, "Shuah Khan" <shuah@kernel.org>,
+ "Tariq Toukan" <tariqt@nvidia.com>
+Cc: patches@lists.linux.dev
+Message-Id: <71afd479-71b4-4ab7-bcbe-3f7b53bd11f4@app.fastmail.com>
+In-Reply-To: <0-v1-dc5fa250ca1d+3213-mlx5st_jgg@nvidia.com>
+References: <0-v1-dc5fa250ca1d+3213-mlx5st_jgg@nvidia.com>
+Subject: Re: [PATCH 00/11] mlx5 support for VFIO self test
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 1D1FF4B0D0F
+X-Rspamd-Queue-Id: 01D794B0E4C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.15 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	DMARC_POLICY_ALLOW(-0.50)[shazbot.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[shazbot.org:s=fm2,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[birger-koblitz.de:+];
-	TAGGED_FROM(0.00)[bounces-283364-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[birger-koblitz.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-283365-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alex@shazbot.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[shazbot.org:+,messagingengine.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,birger-koblitz.de:dkim,birger-koblitz.de:mid]
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[shazbot.org:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Thanks a lot for reviewing this patch, Jakub!
-On 01/05/2026 3:15 am, Jakub Kicinski wrote:
+On Thu, Apr 30, 2026, at 6:08 PM, Jason Gunthorpe wrote:
+> Add an mlx5 driver to VFIO self test. This is largely a remix of the
+> existing VFIO mlx5 driver in rdma-core. It uses an RDMA loopback QP
+> to issue RDMA WRITE operations which effectively perform memory
+> copies using DMA. Since mlx5 has a stable programming ABI this
+> should work on devices from CX5 to current HW. The device FW must
+> support the QP loopback configuration.
 
->> +	if (enable && (tp->eee_adv2 & MDIO_EEE_10GT))
->> +		config |= MDIO_EEE_10GT;
->> +	else
->> +		config &= ~MDIO_EEE_10GT;
->> +
->>   	ocp_reg_write(tp, OCP_EEE_ADV2, config);
->>   }
-> 
-> Is MDIO_EEE_10GT actually a bit of the EEE advertisement 2 register
-> (7.62, cap2 / OCP_EEE_ADV2)?
-> 
-No, and it should have been clear to me. The entire bit of code is 
-actually unneccessary, as the MDIO_EEE_10GT-BIT is part of OCP_EEE_ADV 
-and is set in tp->eee_adv, so that rtl_eee_enable() correctly already 
-sets it:
-static void rtl_eee_enable(struct r8152 *tp, bool enable)
-{
-	case RTL_VER_17:
-		if (enable) {
-			r8156_eee_en(tp, true);
-			ocp_reg_write(tp, OCP_EEE_ADV, tp->eee_adv);
-		}
-	...
-}
-Will be fixed in v3.
+Does the PCI ID table in the series need some pruning then?  It includes CX4.
+Thanks,
 
-> 
-> [ ... ]
-> 
->> @@ -8968,6 +9008,13 @@ static int r8153_get_eee(struct r8152 *tp, struct ethtool_keee *eee)
->>   			linkmode_set_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT, common);
->>   	}
->>   
->> +	if (tp->support_10000full) {
->> +		linkmode_set_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT, eee->supported);
->> +
->> +		if (speed & _10000bps)
->> +			linkmode_set_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT, common);
->> +	}
->> +
->>   	eee->eee_enabled = tp->eee_en;
-> 
-> Should this hunk also extend the earlier gating inside r8153_get_eee()?
-> 
-> A few lines above, the cap2 register reads are still gated on:
-> 
-> 	if (tp->support_2500full || tp->support_5000full) {
-> 		val = ocp_reg_read(tp, OCP_EEE_ADV2);
-> 		mii_eee_cap2_mod_linkmode_adv_t(eee->advertised, val);
-> 
-> 		val = ocp_reg_read(tp, OCP_EEE_LPABLE2);
-> 		mii_eee_cap2_mod_linkmode_adv_t(eee->lp_advertised, val);
-> 	}
-> 
-> The equivalent disjunction in rtl8152_set_speed() and
-> rtl8152_get_link_ksettings() was updated to include support_10000full,
-> but r8153_get_eee() (and r8152_set_eee() at the analogous spot) still
-> only checks support_2500full || support_5000full.
-> 
-> A hypothetical chip that sets only support_10000full would bypass the
-> OCP_EEE_ADV2 / OCP_EEE_LPABLE2 reads and never reflect 10G EEE into
-> eee->advertised.  Should the condition be made consistent with the
-> other sites?
-The AI here actually contradicts itself with the previous issue. The 
-10GBit modes are part of OCP_EEE_ADV (MMD 7.0x003C) and OCP_EEE_LPABLE 
-(MMD 7.0x003D). A hypothetical chip that sets only support_10000full 
-would still reflect the correct LP-ability 10GBit setting.
-
-> 
->> @@ -9982,6 +10029,11 @@ static int rtl8152_probe_once(struct usb_interface *intf,
->>   			tp->speed = SPEED_5000;
->>   			tp->advertising |= RTL_ADVERTISED_5000_FULL;
->>   		}
->> +		if (tp->support_10000full &&
->> +		    tp->udev->speed >= USB_SPEED_SUPER) {
->> +			tp->speed = SPEED_10000;
->> +			tp->advertising |= RTL_ADVERTISED_10000_FULL;
->> +		}
->>   		tp->advertising |= RTL_ADVERTISED_1000_FULL;
->>   	}
->>   	tp->duplex = DUPLEX_FULL;
-> 
-> Is USB_SPEED_SUPER the correct gate for defaulting to a 10 Gbit link?
-I believe this is the correct gate. In order to get the full speed out 
-of the 10GBit Ethernet connection, a 20GBit USB link would be needed, 
-anyway, with 10GBit USB-C, i.e. USB_SPEED_SUPER_PLUS, I see only about 
-7.6GBit throughput. The difference of 10GBit wire-speed to 5GBit Speed 
-for USB 3.0 is not that bad, and the overhead does not seem to make a 
-problem.
-
-But I think this is not the point: an important aspect of the 10GBit 
-USB-Ethernet adapters is that they are used for testing 10GBit 
-connections with network equipment. The RTL8159 is even put in 
-connection with a media converter and an SFP+ cage in the same housing 
-and advertised for testing 10GBit fiber lines. It should be possible to 
-test and use 10GBit connectivity even on a 5GBit USB port.
-
-Birger
-
+Alex
 
