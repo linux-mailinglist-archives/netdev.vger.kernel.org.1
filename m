@@ -1,80 +1,82 @@
-Return-Path: <netdev+bounces-283472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283473-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gNSNDodZ9mn2UAIAu9opvQ
-	(envelope-from <netdev+bounces-283472-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 22:07:35 +0200
+	id EHFFKphZ9mn2UAIAu9opvQ
+	(envelope-from <netdev+bounces-283473-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 22:07:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8C824B35E2
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 22:07:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 19C474B35FF
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 22:07:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AE4DB300D68C
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 20:07:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1C001300D455
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 20:07:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC1DE388378;
-	Sat,  2 May 2026 20:07:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB2D388E7A;
+	Sat,  2 May 2026 20:07:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J4muSleW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L99LJwb7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C35638758E
-	for <netdev@vger.kernel.org>; Sat,  2 May 2026 20:07:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F199D38B127
+	for <netdev@vger.kernel.org>; Sat,  2 May 2026 20:07:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777752451; cv=none; b=if/CYMEV54JWb7L+F0O+sTH5xs8OHUijBAcGa3QBpNPSvFRQKOeyWdm60Ba+GgODtYXHHKrm09EdLiuI7XuosR8kHRCYSnQ9FqJlrg/tirVpM5uHfQMXYBNLMXRZO9xrcwDi3vdf/RvTt2acsvuPgJytl2YtWlx9oIgRBEJEHkk=
+	t=1777752454; cv=none; b=AuS0kBN57n/fkhaV9gJpzBlH1V8IZs72Rhqdp+I4n/UnE0tBFtFdG2bZKkwZgelNIgv9R3LCnGQi1T5M3ssByZ8sYIejMM67o7NMPnfgcJ/Ftsa/ELfiv50B/SSIFrm+nvY8eyKCU4/AtVoJeR3LNonJfvF1agTIOOikGCBrLqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777752451; c=relaxed/simple;
-	bh=TURl7kKo2rz7v+LlDTeZ01AGJ284PRpIn80ytw66Cxs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=boPcKmiMF65GqqrbphGn0ERakPkH/V116D1HHtP08NUcALKCUC1bmtu5ClStcPyrpAvq9GBEB7x1pxXY47xDdox2MnDep/pb5/i7oIePUGUujMC0ydB0PFpfSwenW8P6a/rawkJk1Ws/rzATV3pMx0jCxcY7KJ7YsfrYEOLh4zQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J4muSleW; arc=none smtp.client-ip=209.85.208.52
+	s=arc-20240116; t=1777752454; c=relaxed/simple;
+	bh=fctOOu8ihanad4KwnadnhQVcL0yq7+8B+O+aK7WYNr0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=EqVQWjTDUC6Z4+EPC0UUS//aREtEsQT3B7Rl2Q6VvQwGG94NnA1XcvwF/fBhhWV3NQzd1SkGOoN3XaPOuH5C3QdHQ0GvL+O7dmcbvhT0Zk2n5ZevMZ5X7UWcypiHumGLDEQVost2d4lTPf3XzjJfljQXlJNcRIgyRWhy/JiDFUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L99LJwb7; arc=none smtp.client-ip=209.85.208.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-67c2b4809baso894297a12.3
-        for <netdev@vger.kernel.org>; Sat, 02 May 2026 13:07:30 -0700 (PDT)
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-670ab084a39so5153528a12.3
+        for <netdev@vger.kernel.org>; Sat, 02 May 2026 13:07:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777752449; x=1778357249; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zAg/0mIVowv8LOWrAsq6a7YduxLHVN0hmFUezp0XVPE=;
-        b=J4muSleWHrfdFEtOuEqD1x0PgGfxM01KVbGNVMnLB7LDtpgZ3VYENet2Lj42xPRAyx
-         pN3ZfQWJiDE0g0TbelIvs4fURGO81d5rlNdWtBDe72pgcqjr4sVSTOmWYLxygWQ+BdKy
-         yxl9FDPDf46Wt11PJ+yOZMm0QOM4rUg3uXx50aVE+HTswzrCdbIbhihJRfuUTGBJgRmy
-         C0r0OKShIkI+prp5yUzi12vuA+r31M9CCivTlxZh4hUBA6TIxbzcGYQgZuuJU/QyoLOG
-         7YXbL84WWuUxO8dL03cX0PRz7V7AsfvV/8oKdhMA55ixNnq2e25ztEMfr6YDc+TZDoWB
-         zjPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777752449; x=1778357249;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1777752451; x=1778357251; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zAg/0mIVowv8LOWrAsq6a7YduxLHVN0hmFUezp0XVPE=;
-        b=ShWUu2oQ5/EyACVlg+u258bQ6g6BwNbEFCY2CedftRw+mz2q9D1tfXjnbqxaFUAk1i
-         9q7vKnEPNFU+1gPbt0ONaMgDvYSP67E4XOvV6JWXd7f72xMtEeJXXrHeHijU1/TBhHaR
-         rSoxBEduvAx91P2DMhD+nVsGfNpaLb6XZ6gPXSMJKOFQQI19dJoxqCSiq1UAcwrGdNmi
-         fktiE3ErQfrgODRxHsjKs9vpTHLvSXGPB41LYJNJQW5FGlnge59lBE8g12Bxxwik5VAn
-         AOLEeA5M2z2cd//pSLPP9JsB4oQE93cqMtGV8yoB4Ks7wW0HhMKbimOhgLTq5bUroIvZ
-         8kmA==
-X-Forwarded-Encrypted: i=1; AFNElJ+9wr+X4ZTESEdoQDvL7YzLcLM22cjXD2GuiKpw/Wz0XnNRHlZktPrKx16o2Vm+CBDA2cxQWTQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyn22YtVFQYY4lzQeBXOBDCgmNyDTHp0lZXcj1XqkHgO8DZBCz/
-	sUo+zpsNhSMrpq0BY1g+yUL1m/L5XJQni0p/opLI7PiQvLTRbpQTk0ym
-X-Gm-Gg: AeBDievQLBTAi7L+3jl3dOJ3W3TdYtV88AztbXC9mzQITAhu3J/iU6UxFhFKwoGJ7qV
-	SOoJSAlgZolA1oraRpKYEw4fMtk5DVT+t9HdfTWgPRduxIBiGmah6nmnfTYbP7u3a6wt8OAjJBq
-	GHKOz4uFfOvZmKBGm4QMdyFAL1CvrStVkSQWqSAVeKWqUU7Lx+46aUqIFk9rOVoJi4kql0qojqK
-	3VRIg1Uwsz4NgAXwY4e6kQlKLMH3nGfxmXSnJeF/JLiCSDvesZvz6PwUcQ73Q/5MRCwoBecVxyg
-	TvP8a6WJJkjekpFBy2dCMnkq7Wc2ufQwhEZMOESmhMmtNTkZA3WE28bM9UZU/J6oMFUqwXyU4O5
-	JEoSz869vJ6YyNEee5UJuE0wAfcMIFGLAsrhb+NLnm4g5/QYM5Jr8xesLwthoP/Hv9dxd+AgazR
-	TzdmhVZL13T+OX3fmaKavRnIHmCTOZKpC948HaCI+3xSKh2UMoe7YOiKLxeeyA3H3Um7ZkUe+tA
-	WCDMyvfI9cSppWpNcpmD/mzd2M6
-X-Received: by 2002:a05:6402:605:b0:671:a18b:32b8 with SMTP id 4fb4d7f45d1cf-67c150d2b76mr1186953a12.0.1777752448468;
-        Sat, 02 May 2026 13:07:28 -0700 (PDT)
+        bh=i0ej40ghKn8TLZMMNc2ToDzMeEQCp4B7994Wm2iXNOY=;
+        b=L99LJwb7ghjZyJGAltcmlCigsj1usM68fDPWZpkd3mI5PpuZCKqf9rBZ8Ot0+3xfJV
+         Klvb9dBriboTRcFfzlaxtebi/tbyn9sXgKRGvc6wg9rNngLXmfpyQk6y0IRu4Zv6jq0R
+         jvoNHa8bgcdVdFNXXa8eYo5mLZYQCvyVeni/bLh3fAjtb0krx4HUyD4+o2pri/RJvgKT
+         jefcTC8GiJluLmgVb05QPMPx1RbsFI1NeiQ29MIpVdabAU7D0uAIiYFfRothlyAytDEN
+         4LqnnhfutO3FMlgsNRT2O7Yh2bdgt7pvlzWKk69MPkmyO7PCta7AwddDexDRs16bGoYB
+         0Fvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777752451; x=1778357251;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=i0ej40ghKn8TLZMMNc2ToDzMeEQCp4B7994Wm2iXNOY=;
+        b=QP0GQtKvrzOSnn8dEFX/rFteFvWOqKgQEKy1dhbGkNvIeWleugCtvj+L8fG28NTt2u
+         KU1/pTOMtF6zTYG/weOx7pAvC9XIDFz8UfqulvIEzNQAA88gzGp12FXR1WFT1MN80hfU
+         qBt5dIY/ut3iXQ0mb/v/Zu4JWoKNWtfkR46A9IMmTp2wL9hA12v/AXaofb8ZeeV1azOl
+         V7T6mzFbEZ3zsdoK98K5IIvWrvyZnar+WZT7RbbqyVX0f5pzhQvoi87xnemRtqE9EB8E
+         5F7vyL10urAxewpnlYS4M2FFMctxVzvpjheJo7BD7XArTdHGuIfiU2UB7SIWVdyXMPaB
+         IahA==
+X-Forwarded-Encrypted: i=1; AFNElJ/4BCDEBJ8e6SjAJM9V9A1c6MZN8uBOTvCR7f8uwdZN4VVscQ9D6Lcurgb3MAhcYXmNNhkz7/Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3wagKkWDykTdk6VqyICL+XW6rkkdrC2iVk0msdrr9We2wUwh0
+	QblLTlqvxG8qTeTIDdQWDf/86z1GyZQFWG0ZJ07NLl5KX+Yf56QO+VIP
+X-Gm-Gg: AeBDiev/P0rF6tD/z+wiCeOuECo17kyyrVTLf5ocwyovNxdIM4S99EcCA75F+/eyEVa
+	nvHCH3wWwXG1yti8bCuiTeFXZD+48DR1miSPrFqQkzm6rBeiRvPYpnQhLHRNYA69tLU4hKgnX55
+	c06lxVCt47Z5+qsDsqlSkXLHwqtsPO+AU5lyd0Di63VusQwXXHZPfsV9scFmKeRThsQLrPy31k0
+	X8vqVQ7QN2262eLav5BjcKXyoRCrOzMyA/pSCkAvnGD28UxbvBkKhdsKOU0ubhRqa0CBdZ7CnH0
+	qkD/1L0vwSr+HipK8UBixW2snPrn7bpBwyUj2x0DRCGo5wv4gWnh4UzS76XyueiFGGFzqUVSWKl
+	v6IMJQLkH3kUjaCRWk8NB1aSo4J0KpLembSPc7ccSFejY6Hjfd2RML10BQHlcri7Dp9Lrt13scU
+	05S1FrZobf0Mk9QWrwvKqr8oVwcmMVCNZA+99Fp5fAfzE/Zo6V/0/Raa2mIrSva3KXK42AZXKEQ
+	TtOypyjWqCKDyK7emMHnMFnO2fZ
+X-Received: by 2002:a05:6402:158d:b0:678:f8f4:a7f3 with SMTP id 4fb4d7f45d1cf-67c1620cccemr1505390a12.0.1777752451354;
+        Sat, 02 May 2026 13:07:31 -0700 (PDT)
 Received: from KERNELXING-MC1.tencent.com ([41.128.91.35])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-67b88094aa4sm1902528a12.24.2026.05.02.13.07.25
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-67b88094aa4sm1902528a12.24.2026.05.02.13.07.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 May 2026 13:07:27 -0700 (PDT)
+        Sat, 02 May 2026 13:07:30 -0700 (PDT)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -94,10 +96,12 @@ To: davem@davemloft.net,
 Cc: bpf@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net v5 0/8] xsk: fix bugs around xsk skb allocation
-Date: Sat,  2 May 2026 23:07:14 +0300
-Message-Id: <20260502200722.53960-1-kerneljasonxing@gmail.com>
+Subject: [PATCH net v5 1/8] xsk: reject sw-csum UMEM binding to IFF_TX_SKB_NO_LINEAR devices
+Date: Sat,  2 May 2026 23:07:15 +0300
+Message-Id: <20260502200722.53960-2-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20260502200722.53960-1-kerneljasonxing@gmail.com>
+References: <20260502200722.53960-1-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,7 +109,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: A8C824B35E2
+X-Rspamd-Queue-Id: 19C474B35FF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
@@ -122,7 +126,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-283472-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283473-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[18];
 	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,fomichev.me,iogearbox.net,lunn.ch];
@@ -134,61 +138,65 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.996];
+	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tencent.com:email]
 
 From: Jason Xing <kernelxing@tencent.com>
 
-There are rare issues around xsk_build_skb(). Some of them
-were founded by Sashiko[1][2].
+skb_checksum_help() is a common helper that writes the folded
+16-bit checksum back via skb->data + csum_start + csum_offset,
+i.e. it relies on the skb's linear head and fails (with WARN_ONCE
+and -EINVAL) when skb_headlen() is 0.
 
-[1]: https://lore.kernel.org/all/20260415082654.21026-1-kerneljasonxing@gmail.com/
-[2]: https://lore.kernel.org/all/20260418045644.28612-1-kerneljasonxing@gmail.com/
+AF_XDP generic xmit takes two very different paths depending on the
+netdev. Drivers that advertise IFF_TX_SKB_NO_LINEAR (e.g. virtio_net)
+skip the "copy payload into a linear head" step on purpose as a
+performance optimisation: xsk_build_skb_zerocopy() only attaches UMEM
+pages as frags and never calls skb_put(), so skb_headlen() stays 0
+for the whole skb. For these skbs there is simply no linear area for
+skb_checksum_help() to write the csum into - the sw-csum fallback is
+structurally inapplicable.
 
+The patch tries to catch this and reject the combination with error at
+setup time. Rejecting at bind() converts this silent per-packet failure
+into a synchronous, actionable -EOPNOTSUPP at setup time. HW csum and
+launch_time metadata on IFF_TX_SKB_NO_LINEAR drivers are unaffected
+because they do not call skb_checksum_help().
+
+Without the patch, every descriptor carrying 'XDP_TX_METADATA |
+XDP_TXMD_FLAGS_CHECKSUM' produces:
+1) a WARN_ONCE "offset (N) >= skb_headlen() (0)" from skb_checksum_help(),
+2) sendmsg() returning -EINVAL without consuming the descriptor
+   (invalid_descs is not incremented),
+3) a wedged TX ring: __xsk_generic_xmit() does not advance the
+    consumer on non-EOVERFLOW errors, so the next sendmsg() re-reads
+    the same descriptor and re-hits the same WARN until the socket
+    is closed.
+
+Closes: https://lore.kernel.org/all/20260419045822.843BFC2BCAF@smtp.kernel.org/#t
+Fixes: 30c3055f9c0d ("xsk: wrap generic metadata handling onto separate function")
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
-v5
-Link: https://lore.kernel.org/all/20260424053816.27965-1-kerneljasonxing@gmail.com/
-1. reword patch 3
-2. adjust the order of patch 6 that is now moved up to be patch 2)
-3. use helper in patch (Stan)
+ net/xdp/xsk_buff_pool.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-v4
-Link: https://lore.kernel.org/all/20260422033650.68457-1-kerneljasonxing@gmail.com/
-1. fix 32-bit arch issue in patch 8 (Alexander && Maciej)
-2. add acked-by tags (Stan)
-
-v3
-Link: https://lore.kernel.org/all/20260420082805.14844-1-kerneljasonxing@gmail.com/
-1. use !xs->skb as the indicator of first frag in patch 3 (Stan)
-2. move init skb after it's allocated successfully, so patch 4,5,6 have
-   been adjusted accordingly (Stan)
-3. do not support 32-bit arch (Stan)
-4. add acked-by tags (Stan)
-
-v2
-Link: https://lore.kernel.org/all/20260418045644.28612-1-kerneljasonxing@gmail.com/#t
-1. add four patches spotted by sashiko to fix buggy pre-existing
-behavior
-2. adjust the order of 8 patches.
-
-
-
-Jason Xing (8):
-  xsk: reject sw-csum UMEM binding to IFF_TX_SKB_NO_LINEAR devices
-  xsk: free the skb when hitting the upper bound MAX_SKB_FRAGS
-  xsk: handle NULL dereference of the skb without frags issue
-  xsk: fix use-after-free of xs->skb in xsk_build_skb() free_err path
-  xsk: prevent CQ desync when freeing half-built skbs in xsk_build_skb()
-  xsk: avoid skb leak in XDP_TX_METADATA case
-  xsk: fix xsk_addrs slab leak on multi-buffer error path
-  xsk: fix u64 descriptor address truncation on 32-bit architectures
-
- net/xdp/xsk.c           | 115 ++++++++++++++++++++++++++--------------
- net/xdp/xsk_buff_pool.c |   3 ++
- 2 files changed, 77 insertions(+), 41 deletions(-)
-
+diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
+index 37b7a68b89b3..c2521b6547e3 100644
+--- a/net/xdp/xsk_buff_pool.c
++++ b/net/xdp/xsk_buff_pool.c
+@@ -169,6 +169,9 @@ int xp_assign_dev(struct xsk_buff_pool *pool,
+ 	if (force_zc && force_copy)
+ 		return -EINVAL;
+ 
++	if (pool->tx_sw_csum && (netdev->priv_flags & IFF_TX_SKB_NO_LINEAR))
++		return -EOPNOTSUPP;
++
+ 	if (xsk_get_pool_from_qid(netdev, queue_id))
+ 		return -EBUSY;
+ 
 -- 
 2.41.3
 
