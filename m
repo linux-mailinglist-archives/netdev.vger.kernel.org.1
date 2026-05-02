@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-283451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283452-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qPB/FHo09mk5TAIAu9opvQ
-	(envelope-from <netdev+bounces-283451-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 19:29:30 +0200
+	id 4LoMCA819mk5TAIAu9opvQ
+	(envelope-from <netdev+bounces-283452-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 19:31:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A27894B30C6
-	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 19:29:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C9BA4B30EE
+	for <lists+netdev@lfdr.de>; Sat, 02 May 2026 19:31:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8E0E53001FA4
-	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 17:29:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 28CDE300CE79
+	for <lists+netdev@lfdr.de>; Sat,  2 May 2026 17:31:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 922F738734A;
-	Sat,  2 May 2026 17:29:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5682A346E46;
+	Sat,  2 May 2026 17:31:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rvp6Q5pS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gGyfBsqb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6569E386C30;
-	Sat,  2 May 2026 17:29:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340B81531C8;
+	Sat,  2 May 2026 17:31:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777742965; cv=none; b=ZJwgjQPmJPuKCbIQriL5DrBBsY8J/YFXGDV2IwG/cfdi6A2EO+2Fmcrk9CIjxS4RbUfhehsX+OO5Wh+UXEnv6QZRkllR6TU21z/2Akk38f31VhbGKg4uBaN5gDMgF0tzz65zayyp8N1bxvbobwp0wYcdgg/lhgV7mPe/076j2Yc=
+	t=1777743116; cv=none; b=sHgrbP4X15iRDxdbu+ysvhMBKjWKdBCSXxHmMpr9aE+rtjOrXgWfAV/GQ7TSM2Mt3al6EwxVR2gaqqto+msP4oHBOpru8MIYhDGAOxKsCdQ+OIqzRSXC6nW9g/65BEsCpM9XMsxBrOBt04XQp6HRrDme3E8Wrp6Mz05Ci1aHj+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777742965; c=relaxed/simple;
-	bh=ftq2NTo4CCCcZGp16kODQPjcMmmyZ9VO5wcQNeix6wI=;
+	s=arc-20240116; t=1777743116; c=relaxed/simple;
+	bh=FO6nMcMn/OGU6uVS1myEZJa/Wri94sywk/kufi7znt0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WoD++oJl+y8J8gK5TYAReOrHd9qatI93oM4zQyVKz6eQZ1xxTNjCc42Mr6/Amfm894mZnpT6oN6lTpnvgMJmAfaaF27FCn2nM2luYj5zRlRTiwFa6+yEKZVN2y1mEshTmCAs+RKdkdECahup4i9xXuXfQ4Mf1lhpIldOoOtUo3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rvp6Q5pS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F11FDC19425;
-	Sat,  2 May 2026 17:29:23 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Q2JDDq749vq1NLP+L+/wTlIF5zf7mP3dQFLKQd9Iqay0sO5oR0FNWkRG4LiK6DCovD35KBFq8ZcR+aAx26WrRvwaOYvYCj9+5rGu4/NsASdYdtTu3Sh3Ae8g+Y37Y80PhmgiMC87RB7k6uRCYCbqQuRRv3nJSYymS3rrPY/3ZwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gGyfBsqb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 406F3C19425;
+	Sat,  2 May 2026 17:31:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777742964;
-	bh=ftq2NTo4CCCcZGp16kODQPjcMmmyZ9VO5wcQNeix6wI=;
+	s=k20201202; t=1777743116;
+	bh=FO6nMcMn/OGU6uVS1myEZJa/Wri94sywk/kufi7znt0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rvp6Q5pS4d43mbHp/YRnBWWZJul6oHKUx+CQ0BuuCiysilBNgZ0WpdCB13CMfsAOt
-	 12bcI7HzzN469jRDh8siugt/Qq5c7Jas3FQBWYCse+rA+ff4pf/zpl6y57Lj61m98Q
-	 Aqriw6Yjt872g0hlbviW3N3WtFRPl13aWiHgUrpebw6KWLHuRb2LSlR1Zo6xhBXj7X
-	 U2MD0BuC0iIbZD4Ur6usvRYksOudWt+uWuoT7PVpGRxTYKtYd+eyXmwzRz3zTfTM8S
-	 dIJ78qYRa8doCVb7CYzO6WQSVonyNnvWHa81x/h3X1YP0jSfSNQK5zvP1i8W4MoDIh
-	 7n7FmX4rojesw==
-Date: Sat, 2 May 2026 10:29:23 -0700
+	b=gGyfBsqb83MA8IoSJM0udPhNHy69AFryi5X9Dy1SpE2tZSuT/RBvrQY5Jn8npArWI
+	 QP/NC9fNm24xkYgn8Bc05tSVeeZtoUka8ZdRvW18FspJFWxkn3seyZT4U0kYaR8CMJ
+	 +gwG8EoHsCXuoxKx0lpsT5HE00uMHmF8H8RaJvBZBJC3tyXPNQ/d8PrXnWlwqyqNR8
+	 DrSB6NndZGdyyaIZ5XhkoV5z9qHxyO3C3UNF63S9CkRQtWLcyYM6+rIFH1Bc7AFbV6
+	 A5driE33UrVCc19Qicg/o0+tgPvcOtOV4Xg15JBzeO65GG693lGKrq+ayDHXa3uOjh
+	 DxIDhfFia9WPg==
+Date: Sat, 2 May 2026 10:31:54 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Grzegorz Nitka <grzegorz.nitka@intel.com>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -58,7 +58,7 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  <aleksandr.loktionov@intel.com>
 Subject: Re: [PATCH v7 net-next 3/8] dpll: extend pin notifier and netlink
  events with notification source ID
-Message-ID: <20260502102923.79d491b1@kernel.org>
+Message-ID: <20260502103154.71b4b5de@kernel.org>
 In-Reply-To: <20260430094238.987976-4-grzegorz.nitka@intel.com>
 References: <20260430094238.987976-1-grzegorz.nitka@intel.com>
 	<20260430094238.987976-4-grzegorz.nitka@intel.com>
@@ -70,7 +70,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: A27894B30C6
+X-Rspamd-Queue-Id: 6C9BA4B30EE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -78,11 +78,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283451-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283452-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -100,13 +100,13 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
 On Thu, 30 Apr 2026 11:42:33 +0200 Grzegorz Nitka wrote:
->  
-> -int dpll_pin_delete_ntf(struct dpll_pin *pin)
-> +int dpll_pin_delete_ntf(struct dpll_pin *pin,  u64 src_clock_id)
+> Subject: [PATCH v7 net-next 3/8] dpll: extend pin notifier and netlink events with notification source ID
 
-double space
+As AI points out you're only adding this for the internal notification,
+but the commit title mentions netlink too. If we don't need it in
+netlink we can just drop the references in the commit msg?
 
