@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-283566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283567-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8FxnAMv99mkabAIAu9opvQ
-	(envelope-from <netdev+bounces-283566-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 09:48:27 +0200
+	id sJxNGt/99mkabAIAu9opvQ
+	(envelope-from <netdev+bounces-283567-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 09:48:47 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 609D04B4D2C
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 09:48:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E13C14B4D34
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 09:48:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4256A3004203
-	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 07:48:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6B3443002F97
+	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 07:48:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 072833A901C;
-	Sun,  3 May 2026 07:48:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CF463A9622;
+	Sun,  3 May 2026 07:48:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b="NXOqWzMo"
+	dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b="WDGX+bNv"
 X-Original-To: netdev@vger.kernel.org
 Received: from sender4-of-o54.zoho.com (sender4-of-o54.zoho.com [136.143.188.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14B33A8738
-	for <netdev@vger.kernel.org>; Sun,  3 May 2026 07:48:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4FF4358D32
+	for <netdev@vger.kernel.org>; Sun,  3 May 2026 07:48:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777794501; cv=pass; b=s3Re2ry/Zr7rM1SLDd4jhNFD6RINC+ndXE2T8dkTpz7OVEaAw449tA17WC6GhWx5m09BKzapAbU3U7XyYvcO9qks8sc5xonDUc3QS0Xt/Mo5noKQnNvJcEdu6umZBzwgciEHwicdv8/7AAyVmAca5M2PYqzsE1MsO3XJgnFQjtY=
+	t=1777794512; cv=pass; b=rL9JmaOEYvWDwsGuIDvuFIOACppPRqMo0TxZYLz/lpdSKiLW6/N2FF1NPBikUpBYBybEi59KMfuczjmPM/1cWfG5pKr7+TP7s7zGax88wYZhSNNSDAnO0N6oCPwTahrm7N6FKSjHLSHCV8igZPk3kc7ZYp4pN6h2pDilxjgbZ18=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777794501; c=relaxed/simple;
-	bh=Ccb8tQzoShPuL0hmj7Pis15UJCYtR7HB0Kb58MJZkQ4=;
+	s=arc-20240116; t=1777794512; c=relaxed/simple;
+	bh=1XRYlzOC/ZRhcJvxdudk21etwe/qkfGoyC6hQrxq/GM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=go4P0Rdi/DexVCkgsk660l4iER6yXX8MPXz9DIUd774N//s8UHNEpSVxMvPg7Vl/YsvZVyiJBEdrmKVTJw4PhdvHYqk/JBS17QyEejmXykUIhrn2wh0jlnzxPqXCTPcL62XH0ch09Nnap6/WMg7LUMaXe1UO3xICTrnSpqviR7U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net; spf=pass smtp.mailfrom=machnikowski.net; dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b=NXOqWzMo; arc=pass smtp.client-ip=136.143.188.54
+	 MIME-Version; b=kBXosEE+SYMf5iPO/EY/ftyyq3nFQsSKMBsv7rV2nGeYTAwCngxa3BsGJhMm9VtjQ3gIFyEe5UMN+0xNWOvqfsT25vmz39DpSulfZZD9nIpUw2blgwhEAiEEiOphO3aBOkXP4R+DyBHVvp2wuA2aI5LyrQhUH9JhtYmVXtOXfOc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net; spf=pass smtp.mailfrom=machnikowski.net; dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b=WDGX+bNv; arc=pass smtp.client-ip=136.143.188.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=machnikowski.net
-ARC-Seal: i=1; a=rsa-sha256; t=1777794477; cv=none; 
+ARC-Seal: i=1; a=rsa-sha256; t=1777794481; cv=none; 
 	d=zohomail.com; s=zohoarc; 
-	b=LE90OCye0mWgFKIFQbdFDaUC1f9o7Uw9sGIpUK8GK+zOSzUCNNlrazUh5Oh67JSZHJSjbzffapG6pHv4A/0l63hyDgxOuXDZwUiMD0uLlt60KEK/3/5TVP+cKPcI6D+QDR30PBCrOWA3p3ES5xhgNoOcIE4iWxF6IvmsLit4ivU=
+	b=cwFAVwWMPyiB8oFyW538niNt3mOiyVBCck7oLvgR0jVOUz5B4FcHp81/XdN5JGI0eXJ6mB9r23oHq8jKnuhFZVYJtZmou2UAXfizXvMX/Siej3RlO8+dJLvlBbm/lhEV8jqTltf7GwIB6oX//BjjbyLaBqDus/ZvznfkiTfpMg4=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1777794477; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=VvozILmGFLoAF0L6Dx1RZ+/DiEr0O/5jxn30rAr7BGs=; 
-	b=XGVfg3Qb1X86GSt1KzTI97eocU3tiN/jDGfWMVRW+UIQtfFDDOGQI/3qPGsruddb4uR2KNCnm5dBoTQRq96RbWArL7YyqVj3DtupW63eYprflbzQa9tSa5qgTrqO4TOzizvG6Fbrinkg/7HBp3QOYvXznlcz3xX8Kxd+4onL3kY=
+	t=1777794481; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=xFHQoZ6fuNGVjAvhtHH5TmCGgL7aT227IsmVOiqAfmw=; 
+	b=Mae0nbe19VYQA8d4wX2Zno8Q+cHxusSt+VlfvL2LXNDehtgrnIz6f87vpBr+WKqDWinzWle5vxONIVE9TcSaTTlZIKtm4kxv96Gi/Ue97Tl7PD8Bb3ztLpE+7DAGh5LYCj64pCfQJHE0+9GH0qThkiO392z6X21LNqRjYHuGKnI=
 ARC-Authentication-Results: i=1; mx.zohomail.com;
 	dkim=pass  header.i=machnikowski.net;
 	spf=pass  smtp.mailfrom=maciek@machnikowski.net;
 	dmarc=pass header.from=<maciek@machnikowski.net>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1777794477;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1777794481;
 	s=zoho; d=machnikowski.net; i=maciek@machnikowski.net;
 	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=VvozILmGFLoAF0L6Dx1RZ+/DiEr0O/5jxn30rAr7BGs=;
-	b=NXOqWzMoa2pn9Sc9GOsVXKaH7Xf+0x/THwDmOqPEvGqJ5kS6WA99IvYwDFPFrbVF
-	jOrG01ah7FNs+wh9rNFfz3BhRF4tN9Kly1sEnMPXeZTpkbmxRlihilwRyldZDtXqJCk
-	huWlXwvfr3jloTh4T88g6RnvS4YtSgjQlAmWIDrH3n3jYhZRAx6eiQ+nZzdvqdgZDWr
-	P3IzE08EIhL3bvwuFvZCwWQ3WpJDGgAmebci8q8UIKhoaK0ORK2524DGZtX9+fb2GzT
-	ACb2Y3r+ewcG+fZlodYpfnwSDyVtaCOO55tdDGo/0kFoTGowG5XTbiADtYVwAfmUldF
-	DUqC8Uxgkw==
-Received: by mx.zohomail.com with SMTPS id 1777794476094189.29802151061642;
-	Sun, 3 May 2026 00:47:56 -0700 (PDT)
+	bh=xFHQoZ6fuNGVjAvhtHH5TmCGgL7aT227IsmVOiqAfmw=;
+	b=WDGX+bNvXJMDV+0S25tJObny9urM4qGLIWmX2ubeEYnb9UBgSxGeMT1CjlN1mHRA
+	QdRlmsboBjJt04GFRd6y3xRBelk9golGGjTq1MRSndY05cf2frfYyfkAtRFfmOcij+C
+	mgDIWvxin6Bxo/5NNTdFZMknOM6/JTg4/o0YN8x7QkzQn8AD6+am45g3GHQ+ZV4j7u3
+	Ofp0r0WHX71ZBT6lmWB5sWUynNWKnfPUOrn669+e08dvR9VBEExOWJqk0jhHoiFsnnV
+	5gtqw6YASa9jdDVjia/dKMTthyY0vmU7KXCE8PpeAOpyzqEnl6obl+OHp5Q/ewIHzxM
+	9+w204eL7w==
+Received: by mx.zohomail.com with SMTPS id 1777794478574970.4195197562548;
+	Sun, 3 May 2026 00:47:58 -0700 (PDT)
 From: Maciek Machnikowski <maciek@machnikowski.net>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -67,9 +67,9 @@ Cc: kuba@kernel.org,
 	andrew@lunn.ch,
 	vadim.fedorenko@linux.dev,
 	horms@kernel.org
-Subject: [PATCH v5 net-next 1/3] ptp_mock: Expose ptp_clock_info to external drivers
-Date: Sun,  3 May 2026 09:47:45 +0200
-Message-ID: <20260503074747.1321-2-maciek@machnikowski.net>
+Subject: [PATCH v5 net-next 2/3] netdevsim: Implement basic ptp support
+Date: Sun,  3 May 2026 09:47:46 +0200
+Message-ID: <20260503074747.1321-3-maciek@machnikowski.net>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260503074747.1321-1-maciek@machnikowski.net>
 References: <20260503074747.1321-1-maciek@machnikowski.net>
@@ -81,7 +81,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-ZohoMailClient: External
-X-Rspamd-Queue-Id: 609D04B4D2C
+X-Rspamd-Queue-Id: E13C14B4D34
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.34 / 15.00];
@@ -97,7 +97,7 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_CC(0.00)[kernel.org,machnikowski.net,gmail.com,intel.com,lunn.ch,linux.dev];
 	DMARC_NA(0.00)[machnikowski.net];
-	TAGGED_FROM(0.00)[bounces-283566-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283567-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[machnikowski.net:+];
@@ -109,123 +109,193 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_NONE(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.989];
+	NEURAL_HAM(-0.00)[-0.991];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[machnikowski.net:email,machnikowski.net:dkim,machnikowski.net:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[machnikowski.net:email,machnikowski.net:dkim,machnikowski.net:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email]
 
-Allow exposing the ptp_clock_info of the ptp_mock to the external drivers.
-Convert spinlocks to SLIS to allow gettime to be called from the netdevsim.
-This is a prerequisite for implementing ptp support on netdevsim.
+Add support for virtual timestamping inside the netdevsim driver.
+The implementation uses two attached ptp_mock clocks, reads the timestamps
+of the ones attached either to the netdevsim or its peer and returns
+timestamps using standard timestamps APIs.
+
+This implementation enables running ptp4l on netdevsim adapters and
+introduces a new ptp selftest.
 
 Co-developed-by: Milena Olech <milena.olech@intel.com>
 Signed-off-by: Milena Olech <milena.olech@intel.com>
 Signed-off-by: Maciek Machnikowski <maciek@machnikowski.net>
 ---
- drivers/ptp/ptp_mock.c   | 26 ++++++++++++++++++--------
- include/linux/ptp_mock.h |  5 +++++
- 2 files changed, 23 insertions(+), 8 deletions(-)
+ drivers/net/netdevsim/ethtool.c   | 11 ++++
+ drivers/net/netdevsim/netdev.c    | 91 +++++++++++++++++++++++++++++++
+ drivers/net/netdevsim/netdevsim.h |  1 +
+ 3 files changed, 103 insertions(+)
 
-diff --git a/drivers/ptp/ptp_mock.c b/drivers/ptp/ptp_mock.c
-index 4d66b6147121..7a4e5f3274a6 100644
---- a/drivers/ptp/ptp_mock.c
-+++ b/drivers/ptp/ptp_mock.c
-@@ -49,15 +49,16 @@ static u64 mock_phc_cc_read(struct cyclecounter *cc)
- static int mock_phc_adjfine(struct ptp_clock_info *info, long scaled_ppm)
+diff --git a/drivers/net/netdevsim/ethtool.c b/drivers/net/netdevsim/ethtool.c
+index 36a201533aae..5b709033cc5f 100644
+--- a/drivers/net/netdevsim/ethtool.c
++++ b/drivers/net/netdevsim/ethtool.c
+@@ -200,7 +200,18 @@ static int nsim_get_ts_info(struct net_device *dev,
  {
- 	struct mock_phc *phc = info_to_phc(info);
-+	unsigned long flags;
- 	s64 adj;
+ 	struct netdevsim *ns = netdev_priv(dev);
  
- 	adj = (s64)scaled_ppm << MOCK_PHC_FADJ_SHIFT;
- 	adj = div_s64(adj, MOCK_PHC_FADJ_DENOMINATOR);
- 
--	spin_lock(&phc->lock);
-+	spin_lock_irqsave(&phc->lock, flags);
- 	timecounter_read(&phc->tc);
- 	phc->cc.mult = MOCK_PHC_CC_MULT + adj;
--	spin_unlock(&phc->lock);
-+	spin_unlock_irqrestore(&phc->lock, flags);
- 
- 	return 0;
- }
-@@ -65,10 +66,11 @@ static int mock_phc_adjfine(struct ptp_clock_info *info, long scaled_ppm)
- static int mock_phc_adjtime(struct ptp_clock_info *info, s64 delta)
- {
- 	struct mock_phc *phc = info_to_phc(info);
-+	unsigned long flags;
- 
--	spin_lock(&phc->lock);
-+	spin_lock_irqsave(&phc->lock, flags);
- 	timecounter_adjtime(&phc->tc, delta);
--	spin_unlock(&phc->lock);
-+	spin_unlock_irqrestore(&phc->lock, flags);
- 
- 	return 0;
- }
-@@ -78,10 +80,11 @@ static int mock_phc_settime64(struct ptp_clock_info *info,
- {
- 	struct mock_phc *phc = info_to_phc(info);
- 	u64 ns = timespec64_to_ns(ts);
-+	unsigned long flags;
- 
--	spin_lock(&phc->lock);
-+	spin_lock_irqsave(&phc->lock, flags);
- 	timecounter_init(&phc->tc, &phc->cc, ns);
--	spin_unlock(&phc->lock);
-+	spin_unlock_irqrestore(&phc->lock, flags);
- 
- 	return 0;
- }
-@@ -89,11 +92,12 @@ static int mock_phc_settime64(struct ptp_clock_info *info,
- static int mock_phc_gettime64(struct ptp_clock_info *info, struct timespec64 *ts)
- {
- 	struct mock_phc *phc = info_to_phc(info);
-+	unsigned long flags;
- 	u64 ns;
- 
--	spin_lock(&phc->lock);
-+	spin_lock_irqsave(&phc->lock, flags);
- 	ns = timecounter_read(&phc->tc);
--	spin_unlock(&phc->lock);
-+	spin_unlock_irqrestore(&phc->lock, flags);
- 
- 	*ts = ns_to_timespec64(ns);
- 
-@@ -171,5 +175,11 @@ void mock_phc_destroy(struct mock_phc *phc)
- }
- EXPORT_SYMBOL_GPL(mock_phc_destroy);
- 
-+struct ptp_clock_info *mock_phc_get_ptp_info(struct mock_phc *phc)
-+{
-+	return &phc->info;
-+}
-+EXPORT_SYMBOL_GPL(mock_phc_get_ptp_info);
++	ethtool_op_get_ts_info(dev, info);
 +
- MODULE_DESCRIPTION("Mock-up PTP Hardware Clock driver");
- MODULE_LICENSE("GPL");
-diff --git a/include/linux/ptp_mock.h b/include/linux/ptp_mock.h
-index 72eb401034d9..e33188dec2b7 100644
---- a/include/linux/ptp_mock.h
-+++ b/include/linux/ptp_mock.h
-@@ -16,6 +16,7 @@ struct mock_phc;
- struct mock_phc *mock_phc_create(struct device *dev);
- void mock_phc_destroy(struct mock_phc *phc);
- int mock_phc_index(struct mock_phc *phc);
-+struct ptp_clock_info *mock_phc_get_ptp_info(struct mock_phc *phc);
+ 	info->phc_index = mock_phc_index(ns->phc);
++	if (info->phc_index < 0)
++		return 0;
++
++	info->so_timestamping |= SOF_TIMESTAMPING_TX_HARDWARE |
++				 SOF_TIMESTAMPING_RX_HARDWARE |
++				 SOF_TIMESTAMPING_RAW_HARDWARE;
++
++	info->tx_types = BIT(HWTSTAMP_TX_OFF) | BIT(HWTSTAMP_TX_ON);
++	info->rx_filters = BIT(HWTSTAMP_FILTER_NONE) | BIT(HWTSTAMP_FILTER_ALL);
  
- #else
+ 	return 0;
+ }
+diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+index a05af192caf3..66493c94df94 100644
+--- a/drivers/net/netdevsim/netdev.c
++++ b/drivers/net/netdevsim/netdev.c
+@@ -30,6 +30,8 @@
+ #include <net/rtnetlink.h>
+ #include <net/udp_tunnel.h>
+ #include <net/busy_poll.h>
++#include <linux/ptp_clock_kernel.h>
++#include <linux/timecounter.h>
  
-@@ -33,6 +34,10 @@ static inline int mock_phc_index(struct mock_phc *phc)
- 	return -1;
+ #include "netdevsim.h"
+ 
+@@ -122,7 +124,11 @@ static int nsim_forward_skb(struct net_device *tx_dev,
+ 
+ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ {
++	struct skb_shared_hwtstamps shhwtstamps = {};
+ 	struct netdevsim *ns = netdev_priv(dev);
++	struct ptp_clock_info *ptp_info;
++	struct timespec64 tx_ts, rx_ts;
++	struct sk_buff *skb_orig = skb;
+ 	struct skb_ext *psp_ext = NULL;
+ 	struct net_device *peer_dev;
+ 	unsigned int len = skb->len;
+@@ -164,6 +170,36 @@ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		skb_linearize(skb);
+ 
+ 	skb_tx_timestamp(skb);
++
++	/* Generate RX timestamp using the peer's PHC if RX timestamping is enabled */
++	if (peer_ns->tstamp_config.rx_filter != HWTSTAMP_FILTER_NONE) {
++		ptp_info = mock_phc_get_ptp_info(peer_ns->phc);
++		ptp_info->gettime64(ptp_info, &rx_ts);
++	}
++
++	/* If TX hardware timestamping is enabled, generate and attach a TX timestamp */
++	if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP &&
++	    peer_ns->tstamp_config.tx_type == HWTSTAMP_TX_ON) {
++		ptp_info = mock_phc_get_ptp_info(ns->phc);
++		ptp_info->gettime64(ptp_info, &tx_ts);
++
++		/* Create a copy of the SKB to forward to peer and prevent
++		 * from reporting incorrect TX timestamp when skb_hwtstamps is set.
++		 */
++		skb = skb_copy(skb_orig, GFP_ATOMIC);
++		if (skb) {
++			shhwtstamps.hwtstamp = timespec64_to_ktime(tx_ts);
++			skb_tstamp_tx(skb_orig, &shhwtstamps);
++			consume_skb(skb_orig);
++		} else {
++			skb = skb_orig;
++		}
++	}
++
++	/* set the rx timestamp to the skb */
++	if (peer_ns->tstamp_config.rx_filter != HWTSTAMP_FILTER_NONE)
++		skb_hwtstamps(skb)->hwtstamp = timespec64_to_ktime(rx_ts);
++
+ 	if (unlikely(nsim_forward_skb(dev, peer_dev,
+ 				      skb, rq, psp_ext) == NET_RX_DROP))
+ 		goto out_drop_cnt;
+@@ -185,6 +221,59 @@ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	return NETDEV_TX_OK;
  }
  
-+static inline struct ptp_clock_info *mock_phc_get_ptp_info(struct mock_phc *phc)
++static int nsim_set_ts_config(struct net_device *netdev,
++			      struct kernel_hwtstamp_config *config,
++			      struct netlink_ext_ack *extack)
 +{
-+	return NULL;
++	struct netdevsim *ns = netdev_priv(netdev);
++
++	if (!ns->phc)
++		return -EOPNOTSUPP;
++
++	switch (config->tx_type) {
++	case HWTSTAMP_TX_OFF:
++		ns->tstamp_config.tx_type = HWTSTAMP_TX_OFF;
++		break;
++	case HWTSTAMP_TX_ON:
++		ns->tstamp_config.tx_type = HWTSTAMP_TX_ON;
++		break;
++	default:
++		return -ERANGE;
++	}
++
++	switch (config->rx_filter) {
++	case HWTSTAMP_FILTER_NONE:
++		ns->tstamp_config.rx_filter = HWTSTAMP_FILTER_NONE;
++		break;
++	case HWTSTAMP_FILTER_PTP_V1_L4_EVENT:
++	case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
++	case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
++	case HWTSTAMP_FILTER_PTP_V2_EVENT:
++	case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
++	case HWTSTAMP_FILTER_PTP_V2_SYNC:
++	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
++	case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
++	case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
++	case HWTSTAMP_FILTER_NTP_ALL:
++	case HWTSTAMP_FILTER_ALL:
++		ns->tstamp_config.rx_filter = HWTSTAMP_FILTER_ALL;
++		break;
++	default:
++		return -ERANGE;
++	}
++
++	return 0;
 +}
- #endif
++
++static int nsim_get_ts_config(struct net_device *netdev,
++			      struct kernel_hwtstamp_config *config)
++{
++	struct netdevsim *ns = netdev_priv(netdev);
++
++	*config = ns->tstamp_config;
++	return 0;
++}
++
+ static void nsim_set_rx_mode(struct net_device *dev,
+ 			     struct netdev_hw_addr_list *uc,
+ 			     struct netdev_hw_addr_list *mc)
+@@ -646,6 +735,8 @@ static const struct net_device_ops nsim_netdev_ops = {
+ 	.ndo_vlan_rx_add_vid	= nsim_vlan_rx_add_vid,
+ 	.ndo_vlan_rx_kill_vid	= nsim_vlan_rx_kill_vid,
+ 	.net_shaper_ops		= &nsim_shaper_ops,
++	.ndo_hwtstamp_get	= nsim_get_ts_config,
++	.ndo_hwtstamp_set	= nsim_set_ts_config,
+ };
  
- #endif /* _PTP_MOCK_H_ */
+ static const struct net_device_ops nsim_vf_netdev_ops = {
+diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
+index 7e129dddbbe7..dade677448bc 100644
+--- a/drivers/net/netdevsim/netdevsim.h
++++ b/drivers/net/netdevsim/netdevsim.h
+@@ -109,6 +109,7 @@ struct netdevsim {
+ 	struct net_device *netdev;
+ 	struct nsim_dev *nsim_dev;
+ 	struct nsim_dev_port *nsim_dev_port;
++	struct kernel_hwtstamp_config tstamp_config;
+ 	struct mock_phc *phc;
+ 	struct nsim_rq **rq;
+ 
 -- 
 2.53.0
 
