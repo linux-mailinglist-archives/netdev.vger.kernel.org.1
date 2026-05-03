@@ -1,144 +1,190 @@
-Return-Path: <netdev+bounces-283658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283659-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +CgZMIef92kwjwIAu9opvQ
-	(envelope-from <netdev+bounces-283658-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 21:18:31 +0200
+	id WGxeNzCh92mQjwIAu9opvQ
+	(envelope-from <netdev+bounces-283659-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 21:25:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F9E64B7168
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 21:18:30 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 268FC4B71E5
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 21:25:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7B91F30062EF
-	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 19:18:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3076C30073CA
+	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 19:25:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BADC033F59A;
-	Sun,  3 May 2026 19:18:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 491343876DE;
+	Sun,  3 May 2026 19:25:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="WfpOGw+8"
+	dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b="Mq47np6+";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="khcXLXqb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826EB1519B4;
-	Sun,  3 May 2026 19:18:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51FC235DA46;
+	Sun,  3 May 2026 19:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777835906; cv=none; b=dfCtFE6rIfcLmMnyvotKQzRF73yo2ui6JEltuNEvklG1INQrXZu9ELHJLuP1M0HqQZ5TE0ZaO5AiRHgdrDmjIjgir9mnCuzHfjL9RJowsh77H/+7F0CdgDygPvbUXdQ3d5SyRpO0qgc1vNyumwvmarpiJyi9ThE7KCiTM7g8fEM=
+	t=1777836332; cv=none; b=eGHxTUxjJiW4t69FxDxSYYj2AWIrU6S9eBV8+NBGLRmEXya/zD4VhkHLU4N12ymesSVGtjG9g1e2Bd++j+XzdYwLa5TAEJFn6hr6z8PD1ConIujUK4HGyFfeOK8P0XgMxWlp97HX4x2FwQSrMTMrc7kAOmV1O356iMZA4SmWUn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777835906; c=relaxed/simple;
-	bh=ePcpXM5/Zdl03afA48w5tWP6f5yL4+QENjD7b1gbXdE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=loTbkfiia4dzNwocoqqUgo7wvXJ58L+/epJpmCG44CAcqxKwtysaItug0GB1MBrdxJtt8dY6/ZNXlkX1KnCPWUr6XS1+l7HOi2rua5xSXGyuYdM0NsKdF1zsZl3SZd2RcJDPv9226uhdYMUq3D9yrkq2eOp1BNNLhXXjkfy6tE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=WfpOGw+8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1967C2BCB4;
-	Sun,  3 May 2026 19:18:24 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="WfpOGw+8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1777835903;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CvbCPF33TR3vMOeCZdDKdWWTrx7EGQFu5M3mI1ro1aU=;
-	b=WfpOGw+8pFVtoMGIxVQizVs4Jv4NDANcfdhQf+tP4fqjMOfDXFGntaoDcQpGGLBbN8cjJQ
-	baTbK1KBcs1E+IZqqMe3t3xZiJYDPcgpsCdp7PZYhTNQ764q1DlBSLmINL8j+FwHwQjeTk
-	PBq49vKXxvxGoNM1PMLRWTEOWABilLE=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7a0af592 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Sun, 3 May 2026 19:18:22 +0000 (UTC)
-Date: Sun, 3 May 2026 21:18:18 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Valentin Spreckels <valentin@spreckels.dev>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1777836332; c=relaxed/simple;
+	bh=x/wOzfKy6Tv1YrzEMjVzowsos/hDExwprVUESKdpS7E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pL1zUuHnJFx1RyqSxXJhi3X46ldz/MxlXbHbsvK/zrS7jr2SMmqFyTEFu917zk4iMILTE2bIbct+Dvu8APACsddqXgStQnfxtTR7vXTEmPF7mKqk1BDsroUhQ/1q/8dSQINUVhrfXsBX0mWueZFgWNHPdtA8NrKxDXFpgLtSodE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alyssa.is; spf=pass smtp.mailfrom=alyssa.is; dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b=Mq47np6+; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=khcXLXqb; arc=none smtp.client-ip=103.168.172.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alyssa.is
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alyssa.is
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfout.phl.internal (Postfix) with ESMTP id 62FBEEC0136;
+	Sun,  3 May 2026 15:25:28 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Sun, 03 May 2026 15:25:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alyssa.is; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1777836328; x=1777922728; bh=XV9Ma9YmSNclWXwR8NgoE
+	70luGvmhGEBVVi/JFPH2SI=; b=Mq47np6+IcE4AK1cZ2v0P05UjlPP8ZbwE5U1A
+	88DZYBxjMHceQ7uS6z/4cdo12tJmQZLGidVqM5+VgNXxdzW+Ch+ogycf1IehL4Nw
+	XPQeQI2p8CNoSyacmeUC70jOYH1njkjXTfR7+ipcgyMJjmGuduG9sc3KqfZmfALd
+	ZrtoYfuro+YTs1by6pJWSzN25r9Z7sh+ssUynN1ViWClhFN7cj84no3hN+cpW5EK
+	az/KX4pvX02sQwDoByhn4FkDDjwylg1fgQ6JvS8dtdDrYUqUnnSnn2uOMT/I18b8
+	OZ2BONBnNT1YdMCOEH2fe3INJN/rx0WVxoZlW+l5IKgdUVB5g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1777836328; x=1777922728; bh=XV9Ma9YmSNclWXwR8NgoE70luGvmhGEBVVi
+	/JFPH2SI=; b=khcXLXqbXGQc73FnKe9fN9+6nTjqr2sOwe4XXP+N85ge+8aZl+x
+	knpePEVTMsCw1hyz1HQg/DTQ8esRluPzMbsLhl5G32oBou2VzXu+FOv4IAwMGwxu
+	o3bywXMsss6SftDPRioMO0YXnSb9w0DFJG6mCZ/WgvWSvKvVFIP1/oEQQOXQA4zp
+	3E4XQ/R3Tj6lzGGwxWLwDup0iKED9h/Xd/wVs8HaNZeTCuI4+cPjD8MuoEtPZrdE
+	XFc8veEvdwy4gJcGIO9vGat7DIDW2pbSEfOZS/NNjP118YJVTaJC3VA63dKIaLeA
+	la1aSQ6TImEeWBr5tSCwmpsQR6Bde6V+SJg==
+X-ME-Sender: <xms:J6H3aSUHklxzstRczS_-QIC6IFw7kg9h11HDvY_HK_ZBpyau34SlCg>
+    <xme:J6H3ac3OLKudP3_0uIqBW0Jl9Z0AGi4W5qJCbxvGHqbWIRR1sqYWxCVWAtl97UCBD
+    tOt02vbKBqL4LnDKNRNcB9Gn9Y0OazlRxA-xgQKAf0b1UR7LPvGlWw>
+X-ME-Received: <xmr:J6H3aft-KoYYmDAJm9WYUP7GR9VbWuUb74Ql6QwdOmVE2Zf3guOGL7WVddctq0wAYajkDDUm2J9ftApmrFS2RZNV0lPV>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdelieejlecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeetlhihshhsrgcutfho
+    shhsuceohhhisegrlhihshhsrgdrihhsqeenucggtffrrghtthgvrhhnpeehkefgtdevte
+    dtkeduudeguefgudejheeugfelgeettdfhffduhfehudfhudeuhfenucevlhhushhtvghr
+    ufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehhihesrghlhihsshgrrdhish
+    dpnhgspghrtghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegu
+    rghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtse
+    hgohhoghhlvgdrtghomhdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlhdrohhr
+    ghdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkrh
+    iikheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhr
+    ghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprh
+    gsmhesshhushgvrdgtohhmpdhrtghpthhtohepfhhmrghntggvrhgrsehsuhhsvgdruggv
+X-ME-Proxy: <xmx:J6H3acVldv6HATcL4L255UmTKKV2z-9RFS62Qc_uT40BSXrrJON3hA>
+    <xmx:J6H3afxtPy-0XLjZ3w3ksNtYGL93HIIuVvjzo42aW-pqyD-cJ3fGww>
+    <xmx:J6H3aTGnU8ROaZLW5IALQaod4rW1iU0cfKYBoCId-1jf6xoAfLCL1g>
+    <xmx:J6H3aUtvUSdbetNUPbt4rneOrVFidvgL2ULZtlm4F-872u1ikr3abw>
+    <xmx:KKH3aWKZp6s0bd0mFXRK70A-w-iti8VAYnssT5MqfsAbXbabJaDTmQDx>
+Feedback-ID: i12284293:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 3 May 2026 15:25:27 -0400 (EDT)
+Received: by mbp.qyliss.net (Postfix, from userid 1000)
+	id 5950C7E6B068; Sun, 03 May 2026 21:25:25 +0200 (CEST)
+From: Alyssa Ross <hi@alyssa.is>
+To: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH wireguard] wireguard: prevent ipv6 addrconf via
- IFF_NO_ADDRCONF flag
-Message-ID: <afefejiY8SX8UfTm@zx2c4.com>
-References: <20260208170545.31942-1-valentin@spreckels.dev>
- <abHz3xcsLhIPc_Jn@zx2c4.com>
- <c486b63c-521f-4972-80bf-ebb2bfe04724@spreckels.dev>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Fernando Fernandez Mancera <fmancera@suse.de>,
+	=?UTF-8?q?Ricardo=20B=20=2E=20Marli=C3=A8re?= <rbm@suse.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>
+Subject: [PATCH v2] ipv6: default IPV6_SIT to m
+Date: Sun,  3 May 2026 21:25:16 +0200
+Message-ID: <20260503192515.290900-2-hi@alyssa.is>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <c486b63c-521f-4972-80bf-ebb2bfe04724@spreckels.dev>
-X-Rspamd-Queue-Id: 1F9E64B7168
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 268FC4B71E5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[zx2c4.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[zx2c4.com:s=20210105];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[alyssa.is:s=fm2,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[zx2c4.com:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283658-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[alyssa.is:+,messagingengine.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Jason@zx2c4.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283659-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[alyssa.is];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hi@alyssa.is,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,messagingengine.com:dkim];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,zx2c4.com:url,zx2c4.com:dkim,zx2c4.com:mid]
+	RCVD_COUNT_SEVEN(0.00)[7]
 
-On Sat, Mar 21, 2026 at 08:20:53PM +0100, Valentin Spreckels wrote:
-> Hi Jason,
-> 
-> On 11/03/2026 23:59, Jason A. Donenfeld wrote:
-> > Hi Valentin,
-> > 
-> > On Sun, Feb 08, 2026 at 06:05:45PM +0100, Valentin Spreckels wrote:
-> >> Use the flag introduced in commit 8a321cf7becc6 ("net: add
-> >> IFF_NO_ADDRCONF and use it in bonding to prevent ipv6 addrconf")
-> >> instead of mangling the addr_gen_mode to prevent ipv6 addrconf.
-> > 
-> > Can you give some more context here? Why was IFF_NO_ADDRCONF added when
-> > the IN6_ADDR_GEN_MODE_NONE method has been working fine? What's the
-> > difference between these approaches? I don't doubt that your patch is
-> > correct, but I would like to better understand this.
-> 
-> Only wireguard configures addr_gen_mode inside the kernel, otherwise it 
-> is only set by userspace; userspace is also able to overwrite the 
-> IFF_NO_ADDRCONF set by wireguard.
-> 
-> Commit 8a321cf7becc ("net: add IFF_NO_ADDRCONF and use it in bonding to 
-> prevent ipv6 addrconf") introduces the private interface flag 
-> IFF_NO_ADDRCONF, which isn't accessible by userspace.
-> 
-> Thus use the IFF_NO_ADDRCONF flag in wireguard.
-> 
-> 
-> Does that answer your questions? If yes, I will submit a v2 with this as 
-> commit message.
+This basically defaulted to m until recently, since IPV6 defaulted to
+m.  Since IPV6 was changed to a boolean with a default of y, IPV6_SIT
+started defaulting to built-in as well.  This results in a surprise
+sit0 device by default for defconfig (and defconfig-derived config)
+users at boot.  For me, this broke an (admittedly non-robust) script.
+Preserve the behaviour of most configs by avoiding building this
+module, that's probably overall seldom used compared to IPv6 as a
+whole, into the kernel.
 
-I applied this here:
-https://git.zx2c4.com/wireguard-linux/commit/?id=88427bcbe5bd3711de387b1c1f6540ef6fc05a78
+Fixes: 309b905deee59 ("ipv6: convert CONFIG_IPV6 to built-in only and clean up Kconfigs")
+Signed-off-by: Alyssa Ross <hi@alyssa.is>
+---
+v2: update help text as well
 
-Sorry for the delay! Patch looks good as-is, once I looked into the
-internal mechanism.
+ net/ipv6/Kconfig | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Jason
+diff --git a/net/ipv6/Kconfig b/net/ipv6/Kconfig
+index c024aa77f25ba..c3806c6ac96f9 100644
+--- a/net/ipv6/Kconfig
++++ b/net/ipv6/Kconfig
+@@ -164,7 +164,7 @@ config IPV6_SIT
+ 	select INET_TUNNEL
+ 	select NET_IP_TUNNEL
+ 	select IPV6_NDISC_NODETYPE
+-	default y
++	default m
+ 	help
+ 	  Tunneling means encapsulating data of one protocol type within
+ 	  another protocol and sending it over a channel that understands the
+@@ -172,7 +172,7 @@ config IPV6_SIT
+ 	  into IPv4 packets. This is useful if you want to connect two IPv6
+ 	  networks over an IPv4-only path.
+ 
+-	  Saying M here will produce a module called sit. If unsure, say Y.
++	  Saying M here will produce a module called sit. If unsure, say M.
+ 
+ config IPV6_SIT_6RD
+ 	bool "IPv6: IPv6 Rapid Deployment (6RD)"
+
+base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
+-- 
+2.53.0
+
 
