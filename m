@@ -1,191 +1,253 @@
-Return-Path: <netdev+bounces-283649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283650-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mCDgDMyR92lhjAIAu9opvQ
-	(envelope-from <netdev+bounces-283649-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 20:19:56 +0200
+	id IJMZLuqR92lhjAIAu9opvQ
+	(envelope-from <netdev+bounces-283650-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 20:20:26 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35E504B6F81
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 20:19:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DFFBE4B6FA6
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 20:20:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4F7E93001398
-	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 18:19:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 14E263001A64
+	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 18:20:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6B153CBE84;
-	Sun,  3 May 2026 18:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C4B73D0925;
+	Sun,  3 May 2026 18:20:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="JOU2kj68"
+	dkim=pass (2048-bit key) header.d=analog.com header.i=@analog.com header.b="DkTNkRbx"
 X-Original-To: netdev@vger.kernel.org
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012056.outbound.protection.outlook.com [52.101.43.56])
+Received: from mx0a-00128a01.pphosted.com (mx0a-00128a01.pphosted.com [148.163.135.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9903537D2
-	for <netdev@vger.kernel.org>; Sun,  3 May 2026 18:19:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.56
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777832390; cv=fail; b=QcDCZH0l3T5qlZc5NWbbSF8nmLJKF0ElM7KieEgDx00h1pZDzk/hOih7z+J02c9+zUeliXXikld/r0sTxRj4CX2ygGMS5o+A/wh9PVyF9Ccan5GqqLQ75xv270dUZEbKX+1eH7tDaFvJ0AvhLdY/vozF8/LluD2rFsPS1LJABbk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777832390; c=relaxed/simple;
-	bh=QqXKm0FzoOjXOOiCV2AGnNkVcGr2cskkgvZyCjCzzqQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=iTXtymGMo1jUvh8tv7r469rkicYpHp10UTgMwGSMkJ+4pRTdoOcDuXQPOTUiHe6MITxh9Eg6KPM/Yb6U5Ge3mNfi7sd69IHPh4e3QFg9juvdbJmlYAeDYjOJkPWyd/meqNVeqVRonAEpAF7dD+9iiuO3AobG+jjl0X/DFOApTpU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=JOU2kj68; arc=fail smtp.client-ip=52.101.43.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HT73/N365LplGjJaddMEglB3ZQd/Tcci1FLBLa+HAJ26J0d31v2sRo36ZNGSPbfN2y1PXuF1S6kRmzV9RJc8R/Tni9U+Y4tFNYWN+2dpNl0Xgz1Te4tFHEcHtc4QtuA6GweEpBTQUOUbUdr/Z8YAZAnitD6myZaJ5Pre34PDt5vAfgOTzMB/DjpbcKHaLr1Ela2luBEnyHCxhohpgDt1qvXExw5HzZPkZYBAGVcVJYbbOuuEi4T/GluPPtZ6JSqFmGk3dYkNaKKIK+meE6k7Zd9iT4UbW4m8E7zR57qOXPTsJK8higqVGwMx2lm43aA+VWpPMeLKkcVAHo3rwV7jRg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UwNGogs77wpzHNH0ku7kTspIs4jGIHPzoNIHZi4c4/c=;
- b=BewZzXQBD3vsY66FujmIyrFVXF50rp3tLGeQpHeqeMJlHujQJ/g88F8vr1B0GpPnsanWXTEss8pJyjNKJd4A2soWcMAEDPM537XvidMzyBc83cY1l5dWkwy++xwxoFzvZpkl1UxVsdWLq/ZErRRBO0s1jBRfz7FDgTxq4aJDVVVU1MoQPyuTZJW50Y9a29PlkPtSR5dhuHftwcNYY/zNPfkEzZn6gxzNMGhc3D2v5ZTVngmVOiw2Hg1DUXUSLz6OB5QLR+urOtOQDe/vT8s1cxIZUWnHJgL6NvyWqDNSsJjX200cMalCTW9DCxnVp164EtBOOqbwGMycZoARzh8f5g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UwNGogs77wpzHNH0ku7kTspIs4jGIHPzoNIHZi4c4/c=;
- b=JOU2kj68VZkKTZUusMuPmlF0aLojM4rM7AHZuTLiBGdvuJz1p3NFkMAFQrSmQMwOEfqjngnUfbqWolCkwW2CxigI0Pf8O/9zMmIpFLss8k3ACo6glOqDHtqSE3DNqi1QfIuz5ch4hq3Ha47vm6V+z/ACSchKtURD9hwVSKuQ2fwxp41516Pjlnh/Lnm/SI4cZTFREu7FS0d24+FvuUJ/FTP6yCLHW4d2HSmvTAh1fpIQO3dmEio2ZWQt7UXrKReaGRMUvSmkvsTQBYU8SFO99jqaxOQl8qIWkvloZPTEFLJnF/748XrVJrkAkgGWg3Qf1Ub9bR8LPGr1o9/FFOo2MQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
- by CH3PR12MB9078.namprd12.prod.outlook.com (2603:10b6:610:196::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.23; Sun, 3 May
- 2026 18:19:44 +0000
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.20.9870.023; Sun, 3 May 2026
- 18:19:44 +0000
-Date: Sun, 3 May 2026 21:19:34 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, pabeni@redhat.com,
-	edumazet@google.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	petrm@nvidia.com
-Subject: Re: [PATCH net-next 2/3] macvlan: Do not transfer operational state
- when protodown is enabled
-Message-ID: <20260503181934.GB269092@shredder>
-References: <20260429124624.835335-1-idosch@nvidia.com>
- <20260429124624.835335-3-idosch@nvidia.com>
- <20260501180948.1f68c43f@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260501180948.1f68c43f@kernel.org>
-X-ClientProxiedBy: TL2P290CA0006.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:2::6)
- To SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948453CBE84;
+	Sun,  3 May 2026 18:20:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.77
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777832421; cv=none; b=LuMR0Txdf+VTIDAPD4HSvytR0MM4Z8m3FuifXG3+dyCpDsX8IK4F6AewT0WdAs5nicAckAUEJ/YICC+n4mMjhpSle+EZ4m7A5KphLCDiuWfe/8pRtViZ9lwocHjTPYwO9iSeIJNvvPhZJITtt1TsJ6h+d9Wg3fjzTIssOr7IzHY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777832421; c=relaxed/simple;
+	bh=RzINv7C0Bv0GAZFB5TSWPEzlVeYBlX2l1W7C9mocVc8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=eu7bEAzB7z5Bx7zbV+LRCzuNmMToGJM0yn63gtc18Jzh30uQ2JoSF2oXQhNcCubhapcMIcLkyhDjzQ6HqTPAo7MHaHsRGHt3+UpDWGjCLMegzGiktHcZ5i/HVWK32SN7d825WEl7M+Fs819elPGbMszad0IiV+1xAlvtr48/s0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=analog.com; spf=pass smtp.mailfrom=analog.com; dkim=pass (2048-bit key) header.d=analog.com header.i=@analog.com header.b=DkTNkRbx; arc=none smtp.client-ip=148.163.135.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=analog.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=analog.com
+Received: from pps.filterd (m0167089.ppops.net [127.0.0.1])
+	by mx0a-00128a01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 643D2mJI025250;
+	Sun, 3 May 2026 14:19:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=analog.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=DKIM; bh=4vAO4
+	415P6z37caL+yzayBA15C5TCwbTNDHqi2x4iAw=; b=DkTNkRbxqOji7nLgCYIPc
+	oVtHGn5pshnlwpRb5oQ3m5PXcClyM1ytZR90V4Bys7q4dEnQ5Al0iB4OsHC9FDPY
+	icFEAsZKTmJZV61ZwVX1yT02itp40eBRU3Jb3MGf4ZFlCZjRqw5N/aLg1PJ5Q87d
+	6XQyr9TLdH4Zcf2HX62DXvts9JK+u53GqQliJ+lFxm9BXRp4CaUYGFM6P2D6mQSm
+	N++rWCna8o1y/zWiRxayo+PL6wGli4TklSCLP53hZP4EGV6479nU3tqnzK5JCLe4
+	4RSwjlB71Qqq93EDz7a6SlFnsF96DMDsnHCScb+HCRi6t4l3Xbr7JepW0+e8UaEO
+	Q==
+Received: from nwd2mta4.analog.com ([137.71.173.58])
+	by mx0a-00128a01.pphosted.com (PPS) with ESMTPS id 4dwe6137nm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 03 May 2026 14:19:54 -0400 (EDT)
+Received: from ASHBMBX9.ad.analog.com (ASHBMBX9.ad.analog.com [10.64.17.10])
+	by nwd2mta4.analog.com (8.14.7/8.14.7) with ESMTP id 643IJqf2000698
+	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Sun, 3 May 2026 14:19:52 -0400
+Received: from ASHBMBX9.ad.analog.com (10.64.17.10) by ASHBMBX9.ad.analog.com
+ (10.64.17.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.37; Sun, 3 May
+ 2026 14:19:52 -0400
+Received: from ASHBMBX9.ad.analog.com ([fe80::a11:40fc:1a6f:d912]) by
+ ASHBMBX9.ad.analog.com ([fe80::a11:40fc:1a6f:d912%20]) with mapi id
+ 15.02.1748.037; Sun, 3 May 2026 14:19:52 -0400
+From: "Regus, Ciprian" <Ciprian.Regus@analog.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
+        Andrew Lunn
+	<andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Eric
+ Dumazet" <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Simon Horman <horms@kernel.org>, Jonathan Corbet
+	<corbet@lwn.net>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Heiner Kallweit
+	<hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
+Subject: RE: [PATCH net-next 4/5] net: ethernet: adi: Add a driver for the
+ ADIN1140 MACPHY
+Thread-Topic: [PATCH net-next 4/5] net: ethernet: adi: Add a driver for the
+ ADIN1140 MACPHY
+Thread-Index: AQHc2osB4TQBSYFAe0qN63YeObU/GbX76fKAgADDcYD//+2AwA==
+Date: Sun, 3 May 2026 18:19:51 +0000
+Message-ID: <ea6dfd64c0314bfa9c8961ec36d77f33@analog.com>
+References: <20260503-adin1140-driver-v1-0-dd043cdd88f0@analog.com>
+ <20260503-adin1140-driver-v1-4-dd043cdd88f0@analog.com>
+ <afc1cf8d-4a02-430e-89a5-b213c15a4f70@lunn.ch>
+ <0b09b317-0a21-4b9f-aba9-0b9caa14c0d9@lunn.ch>
+In-Reply-To: <0b09b317-0a21-4b9f-aba9-0b9caa14c0d9@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-adiruleop-newscl: Rule Triggered
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|CH3PR12MB9078:EE_
-X-MS-Office365-Filtering-Correlation-Id: 45819636-57df-45c9-847f-08dea9408d4c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|366016|56012099003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	jRjS5IBDuo9zagrnpRfXeg3aq/6zZgrcZv/W/WwLaeivLWmbncCcAWLD05kWhxxXM8UxOmwGDsfJGJndum1/My9Rnt/ojn0/6ZIEUcHjGHeXdqvlO9ZqSX9FUTRf2dFi/nyX/KF9FkRq/O7xxgpG166CoqvwvWXZw8r2y/toFdJdwn5Tshv9N/2zm8Q7hOzGcJiLtv9SpuMBmQah968lbqGcUzE9TA8ARmTDkQZXbZz8szol1QYak/T+7a5kN83Q/gEDoLl+yO9EAT0mCwZdKi8OVJKnrjJi2f2ggfQAGLbpZx9Rm5l1j88MTTmwcoTFe4+VtPkapfrBjM0bHaAKl+0Ejz7AxUMG91vNlTqFPUwGTn0mpx3dQ1KI6a+6On8fyjMRlCQPV89sOsvSrLh+EzhTcU6YpIy81wSpYlYA83rK/m3+kCOdVWmuBzdCof48A96SESFB8ewFRfaxKl0b+YlfWg3Skw907ZZdx90ZEvUPhNIVacB1eCZ88kNa3i27pCLQ6cAa8pyizEA849WPYC+oA7PusJEi9UfNi1GC0kO5Il9zsmSpAiBEFt+1cg1taAKQ6nduaX+WGIQFTJDns0x6FHFndmSllA8a5c4GWmglaH9AH1uRl3S9spQklgLdINe+wBOwGkr06SgIKQLc2EqpYwHueRCjMoFlK9ZVLfwKeL4kE6JDHci27MiPhXu982FhFfB8mRDpNZmq8qMpAg==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?PJLS94O5SDbrmTNO58k0A6BO3SbN9ft2ksJhKmavO4yEBPIae6xDAtk0jztV?=
- =?us-ascii?Q?XJAK+1Ed2Wa0pBdN697ZCvCqY+c6RpLDPcl32GGkUH/d9UOLKy8l6VHnZUDf?=
- =?us-ascii?Q?/AaamsD0YLvn2Khrs28Q4ZYQlSFcitCK6EJSdKT1c0Est8ys4fuCo5DR4dgl?=
- =?us-ascii?Q?1Z9bKa7+vR3MNOpblHhKLk78i0SItWeA5Tba844UKJO3yK23fzA3pk9Oi67I?=
- =?us-ascii?Q?eE4U5Xe/t6kGb6z65qK2XUU9aeZKAskCj9ISXZ/yatUyIkPZNJIMGNVZlRDm?=
- =?us-ascii?Q?/VbgC3p1UTdy0STKMiUnK+3GrTgmO0JaUfVXAOEN6KXUqmBZAMptGgMHen8R?=
- =?us-ascii?Q?bH9/Nc3JWEpz4dvqqFQa56SpUGxK3Hj2IuGLEZ8jXbsN9230O6cVLUDwAN9x?=
- =?us-ascii?Q?0EbSaxON+aM1U+UFKVLW0Qp9UzK0vDM++KnLsWt5nFlyjaVHxc3wvsVmg6gU?=
- =?us-ascii?Q?s1lGQEfUGX9tefMbY2LTp5nUeYeL1hdKleQhChhE+vI0XHK263rbG3Fil/S8?=
- =?us-ascii?Q?Qqhe0J8QBj4adPliIMM6Zy3f1z5ppAc2SqdlJbSPSjnwoBmWp7tFc+N/VIbQ?=
- =?us-ascii?Q?pVn5uMn4czGQ2Y71FR1qQCUd18yntiCwgHra29UzAzCTANhLmS6jWiRvfJpF?=
- =?us-ascii?Q?wJhroRlFJ2oJTMDTNe0IGtsKcTPH3anttAyu0DJ8mjp0hDqBFIICOGN75m0l?=
- =?us-ascii?Q?8ZrglT5KH7e55ubiKkSc7zV8ydSaGMeW6h0EmuuuuCjR3VWDBPwTd40foqrQ?=
- =?us-ascii?Q?cEWvL3FgTaahUR7IG+MI8xKKoQlIn1+AwzDxb2hx5nvETs4DhyUWX37Iw9t3?=
- =?us-ascii?Q?6yfXN6GEL41nsHcFeVjntfGzR7g0zhNwY3vFAmWtXkgUS/LHR2CN5GjNuBNn?=
- =?us-ascii?Q?Zp0Bj7R1vwMabmTSnQkG9KqAr0Wlg5d8CkSyIQVRneQDtrts/UgPI2OtXLYJ?=
- =?us-ascii?Q?hHCz4eFDfoI/xwJVqIARh7Cru4xajCOXxlJP3rsyw5bQS6h6H+ZWMlLbKNu4?=
- =?us-ascii?Q?LIo9qdNwNZCkQUJ0QdZaSPEXef8StNGixHuMYZckBmU3fPYyxra11LUqsRIQ?=
- =?us-ascii?Q?ajdOfQNZz9syHJlQQYncDvzjDB3nGSZHAdid5qY8ViMKkwsm+vXO3llr810Y?=
- =?us-ascii?Q?2sOilnvxnL7zvrhxH9XFmTzwmM0IQfS9zsT6TjZk1GHPBoQOYupfJ7rSug84?=
- =?us-ascii?Q?7sYOihQOM3vpLL28XSvk4bjvR8et/9WT+phv1XuRxaPhDPzOPMwie7epg8DN?=
- =?us-ascii?Q?BEvYBDFAk/ciGOKuy+1U1cZ+qtQCtI+HEoYXBdtBnWWo6EjO9E/wFJJagAb4?=
- =?us-ascii?Q?CysKLaTTx4ZWkYpWBvbtENawvUdcEyQGXtf9tzmYVX6L/FziG9ck3lLq3ZRI?=
- =?us-ascii?Q?9P/B0RYR1cWIC6ISeK8HuqzcMMq8F50Il6VfKie/nJmj6eaNW2Pwvc1c5jMX?=
- =?us-ascii?Q?Siw61K52tRf47j1EstMNtdoItEdoUKBZGsrnyEU+RTRvQNhEYphu51WdlEvu?=
- =?us-ascii?Q?mg3ZmdG3eVqJWQporDxJczrVvgb7YoP5cGjtksiwRr27VFwpDbvQG31NDRwA?=
- =?us-ascii?Q?Rr+A3YKaxTZZ6ofwTjEcLJkrbv/+JLAKK4hhT1bI7IMcfIACB4u4sHIVv6aw?=
- =?us-ascii?Q?k5q0NNEEugT9n5oSEu2FUOFFDK4u0tor3fkN1ArKlhJDbC1z2FuBF4ztUunj?=
- =?us-ascii?Q?kU8S9k0ZYUOcK62qJuWCK+Xn+7QFEb/ywI3AXI5o8h+JvjTI?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 45819636-57df-45c9-847f-08dea9408d4c
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 May 2026 18:19:44.8033
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: p99Wid3K92uOufN1ipzjonbydTr0T4Z7oG+EItjdDM+eNpetY1kRWSIU+q9i9OMjo28Mf9QFer8tRI9OPUrhuQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9078
-X-Rspamd-Queue-Id: 35E504B6F81
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTAzMDIwNiBTYWx0ZWRfX0QD2cBPDm6w+
+ o8JHB1kAGrYQoNLXkzO6kjwSTYmscGXQl3+6k1HVz++GfgX6WszOxiEhYqNO5Db9GRyf4Rj0ipG
+ zL/eaeyoWs6Lr0NY2YDzri1Q3DPT/ZIWaGnGLtjavmaVZ3ZfuO328tp6pE21TSPZcLFAr+zqhvM
+ jU1pG3NJeOiq0MmvMFQRBoo6FNNRGmTYenp5S+6/KRQuhk7es2DCtFohwZ8SVJ5ycEspvV+rIre
+ qTsVJpsl0KTKpX2vP86cQ5clpm6rF2I8BkDSWypqjLV9u97cHafrkFYDJYjstIIk/y2oxTyscMF
+ CAW7Y7gHBaFt1xDYrfSp2AW8kNW95NK4Oaem+jdhptYPPJaB1hF4HQSvE4MHS+rID5a4FN9vaso
+ r7ln73eY5zykMrNGEWQB705EsNvP1dwAbiZor+WTtB9mIbp1aFgUvgR7lT5mFpPrRxAw/oZf1xy
+ tCf2EQ77QcNNFYFD1zg==
+X-Authority-Analysis: v=2.4 cv=YcONIQRf c=1 sm=1 tr=0 ts=69f791ca cx=c_pps
+ a=3WNzaoukacrqR9RwcOSAdA==:117 a=3WNzaoukacrqR9RwcOSAdA==:17
+ a=xqWC_Br6kY4A:10 a=HAm-ab27MHsA:10 a=kj9zAlcOel0A:10 a=NGcC8JguVDcA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=0sLvza09kfJOxVLZPwjg:22 a=Z0pTeXoby7EwIRygza74:22
+ a=gAnH3GRIAAAA:8 a=XYAwZIGsAAAA:8 a=J1Y8HTJGAAAA:8 a=1XWaLZrsAAAA:8
+ a=VwQbUJbxAAAA:8 a=20KFwNOVAAAA:8 a=07d9gI8wAAAA:8 a=ag1SF4gXAAAA:8
+ a=pGLkceISAAAA:8 a=PHq6YzTAAAAA:8 a=KytjqbFpDIeuf0yDoPcA:9 a=CjuIK1q_8ugA:10
+ a=E8ToXWR_bxluHZ7gmE-Z:22 a=y1Q9-5lHfBjTkpIzbSAN:22 a=e2CUPOnPG4QKp8I52DXD:22
+ a=Yupwre4RP9_Eg_Bd0iYG:22 a=ZKzU8r6zoKMcqsNulkmm:22
+X-Proofpoint-GUID: lkPE0x1i-LLgqNZl4hFLc_cClK2-IPfw
+X-Proofpoint-ORIG-GUID: lkPE0x1i-LLgqNZl4hFLc_cClK2-IPfw
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-03_06,2026-04-30_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 clxscore=1011 malwarescore=0 spamscore=0 phishscore=0
+ bulkscore=0 adultscore=0 impostorscore=0 priorityscore=1501 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2605030206
+X-Rspamd-Queue-Id: DFFBE4B6FA6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[analog.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_DKIM_ALLOW(-0.20)[analog.com:s=DKIM];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283649-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-283650-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	DKIM_TRACE(0.00)[analog.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Ciprian.Regus@analog.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCVD_COUNT_SEVEN(0.00)[8]
 
-On Fri, May 01, 2026 at 06:09:48PM -0700, Jakub Kicinski wrote:
-> On Wed, 29 Apr 2026 15:46:23 +0300 Ido Schimmel wrote:
-> > -		list_for_each_entry(vlan, &port->vlans, list)
-> > +		list_for_each_entry(vlan, &port->vlans, list) {
-> > +			if (vlan->dev->proto_down)
-> > +				continue;
-> >  			netif_stacked_transfer_operstate(vlan->lowerdev,
-> >  							 vlan->dev);
-> 
-> Doesn't feel particularly macvlan-specific?
-> Other simple upper devs don't support protodown
-> but when they do presumably they'll have to add
-> this exact condition, too, so why not add it in
-> netif_stacked_transfer_operstate()?
 
-It seemed more consistent with patch #1 that invokes
-netif_stacked_transfer_operstate() from the driver. I can move it to the
-core in v2 [1] assuming we go for a solution that doesn't involve the
-driver at all.
 
-[1] https://github.com/idosch/linux/commit/1d86acbf0affc9004fad79820bbb2172aeb305a4.patch
+> -----Original Message-----
+> From: Andrew Lunn <andrew@lunn.ch>
+> Sent: Sunday, May 3, 2026 6:16 PM
+> To: Regus, Ciprian <Ciprian.Regus@analog.com>
+> Cc: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>;
+> Andrew Lunn <andrew+netdev@lunn.ch>; David S. Miller
+> <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
+> Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Simon
+> Horman <horms@kernel.org>; Jonathan Corbet <corbet@lwn.net>; Shuah
+> Khan <skhan@linuxfoundation.org>; Heiner Kallweit
+> <hkallweit1@gmail.com>; Russell King <linux@armlinux.org.uk>; Rob Herring
+> <robh@kernel.org>; Krzysztof Kozlowski <krzk+dt@kernel.org>; Conor
+> Dooley <conor+dt@kernel.org>; netdev@vger.kernel.org; linux-
+> kernel@vger.kernel.org; linux-doc@vger.kernel.org;
+> devicetree@vger.kernel.org
+> Subject: Re: [PATCH net-next 4/5] net: ethernet: adi: Add a driver for th=
+e
+> ADIN1140 MACPHY
+>=20
+> [External]
+>=20
+> On Sun, May 03, 2026 at 05:36:13AM +0200, Andrew Lunn wrote:
+> > On Sun, May 03, 2026 at 02:24:53AM +0300, Ciprian Regus via B4 Relay
+> wrote:
+> > > From: Ciprian Regus <ciprian.regus@analog.com>
+> > >
+> > > Add a driver for ADIN1140. The device is a 10BASE-T1S MAC-PHY
+> > > (integrated in the same package) that connects to a CPU over an SPI b=
+us,
+> > > and implements the Open Alliance TC6 protocol for control and frame
+> > > transfers. As such, this driver relies on oa_tc6 for the communicatio=
+n
+> > > with the device. The device has an alternative name (AD3306), so the
+> > > driver can be probed using one of the two compatible strings.
+> > >
+> > > For control transactions, ADIN1140 only implements the protected mode=
+.
+> > > The driver has a custom implementation for the mii_bus access methods
+> as a
+> > > workaround for hardware issues:
+> > >
+> > > 1. The OA TC6 standard defines the direct and indirect access modes f=
+or
+> > >    MDIO transactions. The ADIN1140 incorrectly advertises indirect mo=
+de
+> > >    only (supported capabilities register - 0x2, bit 9), while actuall=
+y
+> > >    implementing just the direct mode. We cannot rely on the CAP regis=
+ter
+> > >    to choose an access method (which oa_tc6 does by default, even
+> though
+> > >    it only implements the direct mode), so the driver has to use its
+> > >    own.
+> > > 2. The ADIN1140 cannot access the C22 register space of the internal
+> > >    PHY, while the PHY is busy receiving frames. If that happens, the
+> > >    CONFIG0 and CONFIG2 registers of the MAC will get corrupted and th=
+e
+> > >    data transfer will stop. Those two registers configure settings fo=
+r
+> > >    the transfer protocol between the MAC and host, so the value for s=
+ome
+> > >    of their subfields shouldn't be changed while the netdev is up.
+>=20
+> This device is pretty broken. Has it been shipped to customers? Is
+> there going to be a new stepping of the silicon which is less broken?
+> A new device to replace this one?
+
+Hello Andrew,
+
+The device has been out for some time, but it's only now being made public.
+There are customers using it at the moment. I'm not aware of future revisio=
+ns
+of the silicon,  but I can ask further about that.
+
+>=20
+> 	Andrew
+
 
