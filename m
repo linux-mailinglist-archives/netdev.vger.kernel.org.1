@@ -1,218 +1,154 @@
-Return-Path: <netdev+bounces-283637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283638-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mN18Dd1792kpiQIAu9opvQ
-	(envelope-from <netdev+bounces-283637-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 18:46:21 +0200
+	id kCEiGBh892kpiQIAu9opvQ
+	(envelope-from <netdev+bounces-283638-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 18:47:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2FEF4B6909
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 18:46:20 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 051214B6937
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 18:47:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 428943006B2A
-	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 16:45:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 52F163003348
+	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 16:47:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EC7427F4F5;
-	Sun,  3 May 2026 16:45:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ED503CBE93;
+	Sun,  3 May 2026 16:47:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AAgd1w53"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ATPjrw10"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745F4372EEF
-	for <netdev@vger.kernel.org>; Sun,  3 May 2026 16:45:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777826746; cv=pass; b=CMoyPNz4cB6sQSh8G3J4G/nAvtCwvDOIPMvQkM9HggrzqjvOgNE4QlTDUi39ZyLeBRM6bLRWtx5hWeCQk9opkx42967KTR0OtFrbV7otWwbPr1LJLIwpAfA3wE2GmcurA2/WXgoD/tvZVajiNNZqUiE9qWo5W8NKxZ4KtPcP2gk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777826746; c=relaxed/simple;
-	bh=LV2XOb0jyUnumBexNMfNxtwYt5s7oyI9ARwa0OImnCM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PTKezEe0yp+fmGnhN8/E4CHxzSdbYLlzbsVX6RivjoY6vmhFdO9dJ0J30SlTjals4YCWrqQNu40IWjQV7l/ipwrY8myqh7hXDz6m5jiTnwt6GBMOhiwupOU342PuY3Hkc+o8KBSojw4YL9gUUjr0R05J7wlGNd1B0yV2BfS9A6M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AAgd1w53; arc=pass smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FDFB391E7C
+	for <netdev@vger.kernel.org>; Sun,  3 May 2026 16:47:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777826835; cv=none; b=BRzf7CPDAyXt/EHg9Pn6FEwt5Q3f6qBnYx8PGPd09uFSf9aj/nXUkmJAHRmaEDZFMWF9hQaJda7wK/T+T0D6tDDXxjogXTi2BH49zDpn3bwPojEGSM9nm7eRvoUurNaS0oeKYAt4NBEXNgFvuvA0Iqi5D6H9vLw20vy4LnDahd0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777826835; c=relaxed/simple;
+	bh=ebx9DytCjEe5hkX4lMtfi5pzQvgPYCMmi4NGe2LpsWw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Ndq6hUajZ6jdFg2FAD6BmIF9ivxxt+3eMcWQhcnYpgU3yX221cjaSDUfRs6FNDAxg5JdiI2cJK8a9XG+fMSZXcqnmSUUmgpvJlDGkLbn1mnHXVGIxMsXfFYJ9zfMOhJDPtXpOs0cg9IElTRtfeFWtxtrfovsb/m16/pSBfEeadg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ATPjrw10; arc=none smtp.client-ip=209.85.208.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-ba6838e76f2so363913566b.2
-        for <netdev@vger.kernel.org>; Sun, 03 May 2026 09:45:45 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777826744; cv=none;
-        d=google.com; s=arc-20240605;
-        b=PFlWkSDo5UfrqBLLRle8zURAizQIo0WQN0v1Ka6SGtbmDm6oqJ2AAzWLXO7E9btjxh
-         x/QpEdB5TNiql4XmVFuBWf9q5FU6l6olcqLLJZIY5fIJb+zogU59BS1nlW3ImAduxt6+
-         suk+SyrGOdJrn/xhH36nyCJnxO/OAOKVNFWemciVUyFWLTRWy9lmlbeq8CuctKEwJgDt
-         umeGRaHjX3Ifvunc79mSxiDOB0dv0A+TFdUCPwadnzWYLK+FrQd3y2IuSdW6XfzyOIu6
-         caTMUEc49nXlIGds8ljdg93bfa7Jmn+D1i9s8e3RYJj9E/CU2/UK6MW0Y/u2C+O1oP6p
-         ToFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=8JgN0Hefm3t3vAV3GW6QiuYzvhcPvf24+7SaYMn7ur0=;
-        fh=rjGajMQUesDGdaDJgCl5JHj4gmkBog9P3lfhQh09egQ=;
-        b=cUw3Q04U5UFJdKCCwUggDuk/VUEaJYihfOya52dxTcMhcG/WIutP0CcJPI7GbKwPZN
-         bVK8dvoqxW6n+JYRV4YfZVTTPolWmByQOXgoy8x2ulbZAESxch4dXjH9sNB+tgjlNXd2
-         qs0nUOEJL75LYkVKPUCw9CALzAdBQ2m92Pz7Lp07orfx10g4dQYCjV05S8hva9JepNK9
-         YW2J/45gPxbF4CFPqkPXEaXNp3110L84F/21VwJRTc3PFxO0E76BrdBYQ3AnAFhC/Ofi
-         4V+iD31Onkg3JttBCPuN1qRzqeckE6D2OnuZYtu0ZAIRXCPlbAolw3Tf3ugdd7W65+SY
-         ajaQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-38e7d983f79so33621891fa.0
+        for <netdev@vger.kernel.org>; Sun, 03 May 2026 09:47:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777826744; x=1778431544; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1777826832; x=1778431632; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8JgN0Hefm3t3vAV3GW6QiuYzvhcPvf24+7SaYMn7ur0=;
-        b=AAgd1w537meSNpN8m9OyAc/ycTd+YmUKiznHGwvSuRPsYRRfT4VS1GlpzwHVZ8AEjK
-         czQ6gyMbMykKQYNpiq+YZi+SPHYJk3yveJHNWvi9uc/SvX012cWG1jI/BO4pUyF5FUa5
-         01vf9F1AJtMVC5NEWxlhmbaulgvV7Arjtiyb6GR/JwWwkWArzmIJB4xd/yAh+KqLWj9I
-         U9GVoH9XfTPzhwqWC1AeFMmJXnNakaiqH3oRrjjoPKviVAWPE64QIi/QEXNhMVpXXot5
-         BB5I7Aat0N8/zChheK4tQ/pQnJMpOVcqAakbC6DiO1U9Tt9n1j0MdVm9BaETAC5XPSdw
-         3Wxw==
+        bh=ebx9DytCjEe5hkX4lMtfi5pzQvgPYCMmi4NGe2LpsWw=;
+        b=ATPjrw10h1EqCjqyBDFmFmTj42m+UPelzagG60oKl8aoaXllRLR+UKCV5CGZ0r9ZJY
+         6ts3iCFXIOwLceciqZ2VNGskSoACul1ce+u757TzkEm7PmAk04AfTSECOmZ78jbfQQA9
+         9USvWXdb9x0DTcF0wXCtPpnzT0//gpsX6xrK8oVzFHP5qpxdVOcx+NyHAncUFkS839hP
+         3y6jCU5I808hXXIrQ+/eF2UH5VRuMQe4Zym2GFor4mS8HezxRQyRSgz+ZPNz2QrIdEvF
+         AlKttAWACApdH96SNEzHYvt2GmVdgLBASR7Apc+UfxB9ssj3OSmY/c2VobeZ74QYIEmh
+         ZwaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777826744; x=1778431544;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1777826832; x=1778431632;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=8JgN0Hefm3t3vAV3GW6QiuYzvhcPvf24+7SaYMn7ur0=;
-        b=e2OGNkpDrJwf6kWupNGyACN9YRU1zTioMVdowNtQ/6mNHXxK1owE+scXClUMAWNtob
-         /DYiPqoVoRHsie/m+KtqlHS+N3+QA+9UPleHsu7mTsUSuOzdTJz3oT4tSqEC5MbZyREI
-         olYeXi3MEvsI3eCVXajYEFPmMBUcXcNFIClMTarfN+azxZ0k3Hwg9j0+h7oW6uUbFMGG
-         SOOVx6lHMMUsDG8PJZ8nDwcx3BTkmfFX3b8KYP20rdKu/QN3OY6UyIqxGtBKy/yyaSAM
-         nRzBF//r1UFm08CWg+ASrOpre6DF7DLCFHjFcCj/q4wXU6CoVPhFXxwDBR8wog8fzzgC
-         t/9Q==
-X-Gm-Message-State: AOJu0Yy1LCWhg7sw8h0JyFEFLxKddmBqXxi7miLluyRyAmttubHnv9xC
-	F54BEun1IacWaf53aGvMgd3YVTrCIldWVAkw343MuCRmHLXpuQEjWmWzSMjXgZ2D2Rtbx3o/+5Q
-	A8Es5sMXTAiszp5p/usQl1jxkMdQKZRs=
-X-Gm-Gg: AeBDies1LIe04SgwboTjJYfgz2G9GSo3oXcZDtKdt2/6Ynq5vZ+a2U3L4hSZ/4eAzWI
-	zWvfKZuCbhdCe210L912f9/oIpQFKNWcqrL/MJgCWC+haGEeIEWGwD0bX4GS45G40GHDNKeZ0yH
-	fD2ZIczPmruDP1Cr3zaIZL+yDSTWYUZciZK8FyK46Rb7/zHObeTd/BJDV014OyKhtnE6FKoH8NT
-	OTo5aHaag0tUC2nQ4e7Xs8HrFKxZRI981Whs3jjQSUeM9ycDcH9jHwcFmuAQ2+0nyyy0KXfinpX
-	3CJUBPVjoj86mSrl7/2vtUoAvbiZ8v7aJPBhPWH50bRqoJPe+Jad
-X-Received: by 2002:a17:907:7b83:b0:b9c:2c55:3384 with SMTP id
- a640c23a62f3a-bbffb846e81mr366878366b.31.1777826743537; Sun, 03 May 2026
- 09:45:43 -0700 (PDT)
+        bh=ebx9DytCjEe5hkX4lMtfi5pzQvgPYCMmi4NGe2LpsWw=;
+        b=iLf21FVvYvUZZjpIxyzMXBNv9aL6ieYBLl6f0leW1gIg7TQ9gcxZwCFflKtB4xddYu
+         BiSDophN5lTNMEc++NdZf1iKB/8ejojm/79ElQd3bwXhkfm/OLhGSte/cBN7gMjqFvkc
+         hIVzjmRiv4Hw+GBT79tWdyCa+UeKK58Edku44IGzmcAEwm4CsI4ViYJCVLhWfPP/Ovg0
+         9IguJTkYFQdCO4Yz5vXVA6wWK2kA1v+8lKoEcKaI9HBjs97WrXMxIdL5rri6OSdbllKG
+         67qwibYAtgTJR0bW2HD5MyUnTc2VwKppLVGxRDwucQH13ePejBPKGF/koYbckDs7NkoU
+         4Liw==
+X-Gm-Message-State: AOJu0Yx+1PAAnYUORCzQ6VnJxNaC6eHVV8od69eHzsqhrz02P8mom144
+	5ZcrgNGqplDt7I7v7oARKBelW0we08hOoYNCSQGqgmJVsnlgijTGe+23
+X-Gm-Gg: AeBDievAg4luAKyaYmoqxPAgPNnKIBP+LA3QeCqNjF1SOleFXrezu88oCj7BNGcTq/o
+	x5bqbhJ7iY2Jkb6h7qmvYSU1VxbNPG29XVwbsId1oEaaKFCWXVasGUqvZj4ml5vnY/oH6NepFvF
+	iWQAhwCnmogtEtbEVs2d1rtDeEK+4I/XEoKn9e2xU3iMiAlnixMfT0azlB1ZbPHbV522ccJg306
+	vpxn3ojCUVChaE/BdAAa0HbJ+ps0uvDw/69vA4dm0MNYz763+sRRhWLf2bQgFX2LGOPSLWMN9Oa
+	c73+sWUpOMLRC7Ysgkh29kI9Lp3MBlVN+Df1/QG4fCJFO/RIHx0zRwVpmqBOFe3vaMIncfpMwic
+	jzsJ/eKsr0Cr411duEazS6KzlPNU+laV9w6o0noAGi8NKaYGYUqhqeKR1Gd+SB2eF3TJVyQJipr
+	FpHI6jEcHHxqR2/H4vKkfHoYROkMYp958LXRmzrOKlsPVsVwVGwswDKkc4NUdzwgGrVGZOnCs=
+X-Received: by 2002:a05:651c:1501:b0:38a:aba:9bf9 with SMTP id 38308e7fff4ca-3937849422fmr21458861fa.8.1777826831339;
+        Sun, 03 May 2026 09:47:11 -0700 (PDT)
+Received: from va-HP-Pavilion-Desktop-595-p0xxx.mshome.net ([193.0.150.248])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-39361323f4csm23033091fa.32.2026.05.03.09.47.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 03 May 2026 09:47:10 -0700 (PDT)
+From: Vastargazing <vebohr@gmail.com>
+To: idosch@nvidia.com
+Cc: netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	David Ahern <dsahern@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] selftests: net: fib_nexthops: detect kernel splats from torture tests
+Date: Sun,  3 May 2026 19:47:08 +0300
+Message-ID: <20260503164708.348543-1-vebohr@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260503061740.GA98182@shredder>
+References: <20260502122219.262611-1-vebohr@gmail.com> <20260503061740.GA98182@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260503153006.900533-1-y-kusakabe@bbsakura.net>
-In-Reply-To: <20260503153006.900533-1-y-kusakabe@bbsakura.net>
-From: Yuya Kusakabe <yuya.kusakabe@gmail.com>
-Date: Mon, 4 May 2026 01:45:31 +0900
-X-Gm-Features: AVHnY4KphqnnGL_fETaHA4JnbzJ5DlVkT9VAjwd25brXuGY3u1NsNWJOgzjbyW4
-Message-ID: <CAGCJULNRzdbVJAtRmAjRcLZ-U9y+Rk9O53yWoivBkjxeyTu9+A@mail.gmail.com>
-Subject: Re: [PATCH iproute2-next 0/6] seg6: SRv6 Mobile User Plane (RFC 9433)
-To: stephen@networkplumber.org, dsahern@kernel.org
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: A2FEF4B6909
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 051214B6937
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283637-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-283638-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[vebohr@gmail.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yuyakusakabe@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[3];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[end.map:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,ietf.org:url]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_HAS_DN(0.00)[]
 
-Please ignore this thread; resent due to a local git config issue
-that put the Message-IDs under the wrong domain.
+On Sat, May 03, 2026 at 06:17:40AM +0000, Ido Schimmel wrote:
+> Do you have a trace?
 
-Correct thread:
-  https://lore.kernel.org/netdev/20260503154510.912576-1-yuya.kusakabe@gmai=
-l.com/
+No. I did not run a KASAN-enabled kernel before the fix; the commit
+message stated "would have been visible to a KASAN run" as a fact
+when I had only inferred it from the code. That was wrong.
 
-On Mon, May 4, 2026 at 12:30=E2=80=AFAM Yuya Kusakabe <yuya.kusakabe@gmail.=
-com> wrote:
->
-> From: Yuya Kusakabe <yuya.kusakabe@gmail.com>
->
-> This series adds the iproute2 frontend for the SRv6 Mobile User Plane
-> (MUP) endpoint behaviors of RFC 9433.  It is sent in parallel with the
-> matching kernel net-next series; each commit here is self-contained
-> and brings in the seg6local UAPI bits it needs from the in-progress
-> kernel UAPI header (include/uapi/linux/seg6_local.h):
->
->   Section 6.2  End.MAP
->   Section 6.3  End.M.GTP6.D
->   Section 6.4  End.M.GTP6.D.Di
->   Section 6.5  End.M.GTP6.E
->   Section 6.6  End.M.GTP4.E
->   Section 6.7  H.M.GTP4.D
->
-> The series adds these seg6local CLI keywords:
->
->   src                  IPv6 source-address template
->   v4_mask_len          length of the IPv4 DA portion of the SID, in
->                        bits (1..32)
->   sr_prefix_len        locator length of the egress End.M.GTP*.E SID,
->                        in bits (1..88, leaving 40 bits for the
->                        Args.Mob.Session field)
->   v6_src_prefix_len    Source UPF Prefix length P in the IPv6 SA
->                        template (1..127, defaults to 64); requires
->                        P + v4_mask_len <=3D 128
->   pdu_type             GTP-U PDU Session Container PDU Type (3GPP
->                        TS 38.415 Section 5.5.2): downlink|dl|uplink|ul
->                        or 0..15.  When omitted, the egress emits a
->                        short GTPv1-U header (no PDU Session Container)
->                        regardless of the QFI in the SID; 5G N3
->                        deployments must set pdu_type explicitly.
->
-> A small per-action attribute validator (introduced in patch 1 and
-> extended by each subsequent behavior) rejects obvious typos in the
-> seg6local block at the userspace layer instead of leaving the
-> operator with an opaque kernel EINVAL.
->
-> Link: https://datatracker.ietf.org/doc/html/rfc9433
->
-> Yuya Kusakabe (6):
->   seg6: add support for the End.MAP behavior
->   seg6: add support for the End.M.GTP4.E behavior
->   seg6: add support for the End.M.GTP6.E behavior
->   seg6: add support for the End.M.GTP6.D behavior
->   seg6: add support for the End.M.GTP6.D.Di behavior
->   seg6: add support for the H.M.GTP4.D behavior
->
->  include/uapi/linux/seg6_local.h |  17 +++
->  ip/ip_common.h                  |   2 +-
->  ip/ipnexthop.c                  |   2 +-
->  ip/iproute.c                    |  14 +-
->  ip/iproute_lwtunnel.c           | 263 +++++++++++++++++++++++++++++++-
->  man/man8/ip-route.8.in          | 154 +++++++++++++++++++
->  6 files changed, 442 insertions(+), 10 deletions(-)
->
->
-> base-commit: 4f5de57e2ff11a5925dacdf3deeeabee7ba9502a
-> --
-> 2.50.1
->
+> The netdev CI and our internal CI run the test and look at the kernel
+> log for splats. Both did not flag it, most likely because per-CPU
+> allocations are not covered by KASAN.
 
+I did not check what the netdev CI already does, so the second claim
+in that paragraph ("the torture loop just did not bother to look") was
+also wrong. Combined with the percpu/KASAN gap you point out, the
+patch does not close anything.
 
---=20
-Yuya Kusakabe
+> I prefer to avoid such random markers and rely on the system running the
+> tests to catch these issues.
+
+Understood. Please drop v1.
 
