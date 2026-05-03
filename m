@@ -1,247 +1,222 @@
-Return-Path: <netdev+bounces-283686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283687-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AGJ2NnfI92nQmAIAu9opvQ
-	(envelope-from <netdev+bounces-283686-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 00:13:11 +0200
+	id wIhfKtXI92nQmAIAu9opvQ
+	(envelope-from <netdev+bounces-283687-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 00:14:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D3464B7A91
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 00:13:11 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C2544B7AAF
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 00:14:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D25FB30053D5
-	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 22:12:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9616F300564B
+	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 22:14:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98EF13ACEEB;
-	Sun,  3 May 2026 22:12:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E373ACEEB;
+	Sun,  3 May 2026 22:14:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Io95VhSx";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="tyLMLcKU";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Io95VhSx";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="tyLMLcKU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XmaM2YET"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3282A370D6D
-	for <netdev@vger.kernel.org>; Sun,  3 May 2026 22:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B001D3AD508
+	for <netdev@vger.kernel.org>; Sun,  3 May 2026 22:14:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777846377; cv=none; b=rZM8TkGGJR+lHnmZd3UoliXrzgUOWUc/Q/sZsOcUiOWtXmXAI1D7X+7GwKxGrG+lPLiQWP7xlOODj21viGMDA0LnvNRvaYJjyGKXbE9a6p/Q1HkhCjsTIaUwpWb9bPGVtiluJG1E44nje/tprXNxLWAcTwMbQAt6rexLwsbZ9+g=
+	t=1777846481; cv=none; b=UbmaEVufAtpsRE0IV6qg6m/wujh/H0eZ5xa7aPNS22+bYJe/vGehad/fuSx61+24CDqGTJggg5KraTEKhb6WUbdPRPQ4qsvI2JVuWmdQiKWd2M2du2zgi1o5u4UPkrSQDbLdmY1KBfxtC8V3Ol9wkGEJZzpj7tPJDiy0Mb7cBIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777846377; c=relaxed/simple;
-	bh=1mf3tkl8qWKbkeqF5RRpeyrpELdMLqU8OYYZzq5+rL0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CQEq7rgL/48wQJb+hTdihwAarc2Z0f5KI/B9hYz6FutmZb7Hq3fFzfOZILFufajUBQjx1Egj0FwPO4nswuv3cH9XJg7tSK+LIMVEZDkesm6kall3Vrux2Qpc32rkejj8UP4DGgMYYCo5e3PyEmUQdm5sjlGkPvB0pNmFkImncA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Io95VhSx; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=tyLMLcKU; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Io95VhSx; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=tyLMLcKU; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 6F7AF5C393;
-	Sun,  3 May 2026 22:12:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1777846374; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=huoKVWsTKeHYGBOjUnA95QGOFj5UB8vjB5w/jEXmfKg=;
-	b=Io95VhSxTKmj6KKUxuF6WnSpUWg61Z+vQF3SXLWvg7GBKBu1XAd/Hso+hJoYv4ZjYZopBK
-	O4lz6pGPqisnJ99bc3wjSdBsC8O3eOmbMAjsGqJyPsKxaJIkkrjjp25N6Acdklc22UL/to
-	mvr9slmRMxZXMVlS9grYUzLfZo9qShY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1777846374;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=huoKVWsTKeHYGBOjUnA95QGOFj5UB8vjB5w/jEXmfKg=;
-	b=tyLMLcKUV3EPzd+ixjt9uj2Oj+7Ya74ZaZR08oijB1q+UB2BCyrKUbUwAeWq0dHZ9KY29w
-	PSv18nN4oJO0KPCQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Io95VhSx;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=tyLMLcKU
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1777846374; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=huoKVWsTKeHYGBOjUnA95QGOFj5UB8vjB5w/jEXmfKg=;
-	b=Io95VhSxTKmj6KKUxuF6WnSpUWg61Z+vQF3SXLWvg7GBKBu1XAd/Hso+hJoYv4ZjYZopBK
-	O4lz6pGPqisnJ99bc3wjSdBsC8O3eOmbMAjsGqJyPsKxaJIkkrjjp25N6Acdklc22UL/to
-	mvr9slmRMxZXMVlS9grYUzLfZo9qShY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1777846374;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=huoKVWsTKeHYGBOjUnA95QGOFj5UB8vjB5w/jEXmfKg=;
-	b=tyLMLcKUV3EPzd+ixjt9uj2Oj+7Ya74ZaZR08oijB1q+UB2BCyrKUbUwAeWq0dHZ9KY29w
-	PSv18nN4oJO0KPCQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D2CFF593A3;
-	Sun,  3 May 2026 22:12:53 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id cDGmMGXI92kabwAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Sun, 03 May 2026 22:12:53 +0000
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-To: netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	idosch@nvidia.com,
-	dsahern@kernel.org,
-	Fernando Fernandez Mancera <fmancera@suse.de>
-Subject: [PATCH 2/2 net] selftests: fib_tests: add temporary IPv6 address renewal test
-Date: Mon,  4 May 2026 00:11:41 +0200
-Message-ID: <20260503221139.3742-4-fmancera@suse.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260503221139.3742-3-fmancera@suse.de>
-References: <20260503221139.3742-3-fmancera@suse.de>
+	s=arc-20240116; t=1777846481; c=relaxed/simple;
+	bh=BaFK+l1sX3ADpfIjQNA2IUZt5l5N4nAXC9kCyMDguRA=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Rki4Z9hxAo1VKZOHZOtln7YbD/IQ4/qD71/n+kKQW8npl7kISrZP/sZCUcOwly0PmHr+d6/lZQJMtVjGdh068Cwuo9TUjks7ZICjvii1hbRzlz429NZP73YV4iOFBsLrQXVgpKeF6lgLwuXVha1/pTRrB6X1NWb5duwn10oJ0IA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XmaM2YET; arc=none smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-79a60975dc5so36672497b3.0
+        for <netdev@vger.kernel.org>; Sun, 03 May 2026 15:14:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777846479; x=1778451279; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1s7lxifgy912ACtUOU9iNuu7fnofGoCw3ubhmVVhWxE=;
+        b=XmaM2YET0AFJ1o1ITTvsLx/tHYs3R6DoQsJpc7pTJIS2vyEE2dhAf7fdKhv1n+lRze
+         /h4ftr5/P2SmHXwlhX838V4sMnXCknpsmASodGqqiXcord/G0WCGwOJhdswdILocqDmb
+         Z/G+6jL1squm05oRG9kPW0LOMW8FGzhHGatteBMhBXFgZSrnyd1xz8b+/ayoHexlw0Ni
+         XnazVQcVKEw6EDICy2MujYux+/Unn/s2Nk/2h9oqLHh5bpMg6wh8R6q3XAFxrbuWhaEc
+         Smvo2f7eahpk03ShRCcONJr+8/hFBYcRXg1eACiLjV4opaopcVAWFpmXz0OkyygyLXnK
+         IPvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777846479; x=1778451279;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1s7lxifgy912ACtUOU9iNuu7fnofGoCw3ubhmVVhWxE=;
+        b=r+H2eTlEGd/H7WrjBueCE2X5yIFQbc2blzKoYun0SxdxMoNOOQyiK0Fr8iC+AJJa0N
+         qtR6UfkD6j40FCqe/mZ2TLdp9cdJ5cWh2tM1j229RHp8gbniz8OMMfH3PfWOcjKb/UxL
+         u9kQipi/2J7kavYnFqytkhsoNlOLFcChpxBuThxF6uLSujBxO75wW464NI/bm5hftsup
+         TlHtHxQXPt8RdRHjTkOOpg6A2JoUvD105aDRIJFSyUZFVzuT6fXhfAWc9A928CJp7EQj
+         FUMBrZyhzFVzZhCalKwIeh/fkzOX6Z+yphOaDmJwjGG1eVXOab+sAVCrUe/LfTBmEtLb
+         qDxw==
+X-Gm-Message-State: AOJu0YzLCHV2aXlte9ZhjZiMYLbX6HN4h5MKsZm6aRYf68FU83z2+owg
+	q+RxAOzuiZJbZ2FEbd6PtMZwXxmB+s9oDrzFtRagQmxkeghB0AxGDWQp
+X-Gm-Gg: AeBDietZnMDjqP68oQbknjs96SYk7nUGbsMouHjV/n+MXzU3zaL12geiQPSsNGI3yXs
+	B4ebKWxzkoYnSJYaQFqL6wPpAo1uteGAKb2a9cosgnCX9BWGgw0kNRrEP+Bolu3WWLkD3LC22tS
+	Kf6ADUtEDw9hJl82YqSP2fjuro1I1UL447KymYYoR9AqUQ5FU3HddGl/rZnhmfS869PsPAHLa70
+	xYLbuVN1OfJEg9v6Msa6xSLNUMCUFNfNuYWn73vK4gINfsgT6aEhaeGcmPwITfhUyxvXdqUAe2w
+	9YJAM+EAi17zhjlxBhAIwjTVzdhR6SpUeLy/utC0O8Vx+pSwpXIBlEmrEp1RECftHrsrrcqry4l
+	b5+S82HeNZW2KUchRZ15jgz3+x4HjRq11FCv9JWsjfkqbQk7LwJmjOCoepKeJHCE0aQhinsny0G
+	oXukw1KAGpgn7NQhil5Z2VkzMBmqPxO+uzbrS9xGTFP8uBNf1Nzl/VwMgNazglThzUrQUG/L/nW
+	3Qy0eD7nh3Aq1A=
+X-Received: by 2002:a05:690c:92:b0:7a4:8718:8c73 with SMTP id 00721157ae682-7bd76f7591emr72539927b3.9.1777846478752;
+        Sun, 03 May 2026 15:14:38 -0700 (PDT)
+Received: from gmail.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7bd66837e34sm40744557b3.28.2026.05.03.15.14.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 03 May 2026 15:14:38 -0700 (PDT)
+Date: Sun, 03 May 2026 18:14:37 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ horms@kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ shuah@kernel.org, 
+ Willem de Bruijn <willemb@google.com>
+Message-ID: <willemdebruijn.kernel.258359727e7a2@gmail.com>
+In-Reply-To: <20260501173918.575ecdc4@kernel.org>
+References: <20260430132820.1944517-1-willemdebruijn.kernel@gmail.com>
+ <20260430132820.1944517-2-willemdebruijn.kernel@gmail.com>
+ <20260501173918.575ecdc4@kernel.org>
+Subject: Re: [PATCH net-next v6 1/3] selftests: net: py: support cmd verifying
+ expected failure
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -3.01
-X-Spam-Level: 
-X-Rspamd-Queue-Id: 3D3464B7A91
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 1C2544B7AAF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283686-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-283687-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-Add a test to check that temporary IPv6 address is regenerated properly
-after the base prefix is deprecated and restored.
+Jakub Kicinski wrote:
+> On Thu, 30 Apr 2026 09:28:04 -0400 Willem de Bruijn wrote:
+> > From: Willem de Bruijn <willemb@google.com>
+> > 
+> > Support negative tests, where cmd raises an exception if the command
+> > succeeded.
+> > 
+> > Existing fail values are
+> > 
+> > - True:            Pass if returncode == 0, raise Exception otherwise
+> > - False:           Pass unconditionally
+> > - None:            True iff not terminated explicitly
+> > 
+> > Introduce a variant of True that inverses the condition:
+> > 
+> > - 'verify_failed': Pass if returncode != 0, raise Exception otherwise
+> > 
+> > We cannot reuse False for this, because existing tests rely on current
+> > behavior to pass unconditionally.
+> > 
+> > Only suppress regular test failure. Python subprocess may set a
+> > negative return code on process crash or timeout. Those are not
+> > anticipated failures.
+> 
+> The fact that subprocess sets retcode to negative on crash / timeout
+> may be worth a comment in the code. I didn't know that.
+> 
+> > diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
+> > index 6c44a3d2bbf7..ef31c0ba47fc 100644
+> > --- a/tools/testing/selftests/net/lib/py/utils.py
+> > +++ b/tools/testing/selftests/net/lib/py/utils.py
+> > @@ -111,10 +111,14 @@ class cmd:
+> >  
+> >          stdout, stderr = self._process_terminate(terminate=terminate,
+> >                                                   timeout=timeout)
+> > -        if self.proc.returncode != 0 and fail:
+> > +
+> > +        if (self.proc.returncode != 0 and fail and
+> > +            (self.proc.returncode < 0 or fail != 'verify_failed')):
+> 
+> Personal preference but doesn't feel clean. I would have added 
+> a dedicated argument for this. Up to you..
 
-Fib6 temporary address renewal test
-    TEST: IPv6 temporary address cleanly deprecated and regenerated     [ OK ]
+Do you mean adding an expect_fail as below? I have to thread it to cmd and bkg,
+but it's not too bad.
 
-Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
----
- tools/testing/selftests/net/fib_tests.sh | 55 +++++++++++++++++++++++-
- 1 file changed, 54 insertions(+), 1 deletion(-)
+@@ -112,13 +120,17 @@ class cmd:
+         stdout, stderr = self._process_terminate(terminate=terminate,
+                                                  timeout=timeout)
 
-diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
-index af64f93bb2e1..6a6e545cb40d 100755
---- a/tools/testing/selftests/net/fib_tests.sh
-+++ b/tools/testing/selftests/net/fib_tests.sh
-@@ -12,7 +12,7 @@ TESTS="unregister down carrier nexthop suppress ipv6_notify ipv4_notify \
-        ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr \
-        ipv6_del_addr ipv4_mangle ipv6_mangle ipv4_bcast_neigh fib6_gc_test \
-        ipv4_mpath_list ipv6_mpath_list ipv4_mpath_balance ipv6_mpath_balance \
--       ipv4_mpath_balance_preferred fib6_ra_to_static"
-+       ipv4_mpath_balance_preferred fib6_ra_to_static fib6_temp_addr_renewal"
+-        if (self.proc.returncode != 0 and fail and
+-            (self.proc.returncode < 0 or fail != 'verify_failed')):
++        # Fail on unexpected test failure if fail.
++        # Fail on unexpected test success if expect_fail.
++        # Fail on negative returncode if either:
++        # Set by subprocess on crash or signal, this is never expected failure.
++        if (self.proc.returncode != 0 and fail or
++            (self.proc.returncode < 0 and expect_fail)):
+             if len(stderr) > 0 and stderr[-1] == "\n":
+                 stderr = stderr[:-1]
+             raise CmdExitFailure("Command failed", self)
+-        elif self.proc.returncode == 0 and fail == 'verify_failed':
+-            raise CmdExitFailure("Command succeeded while should fail", self)
++        elif self.proc.returncode == 0 and expect_fail:
++            raise CmdExitZeroFailure("Command succeeded (expected fail)", self)
+
  
- VERBOSE=0
- PAUSE_ON_FAIL=no
-@@ -1611,6 +1611,58 @@ fib6_ra_to_static()
- 	cleanup &> /dev/null
- }
- 
-+fib6_temp_addr_renewal() {
-+	setup
-+
-+	echo
-+	echo "Fib6 temporary address renewal test"
-+	set -e
-+
-+	# ra6 is required for the test. (ipv6toolkit)
-+	if [ ! -x "$(command -v ra6)" ]; then
-+	    echo "SKIP: ra6 not found."
-+	    set +e
-+	    cleanup &> /dev/null
-+	    return
-+	fi
-+
-+	# Create a pair of veth devices to send a RA message from one
-+	# device to another.
-+	$IP link add veth1 type veth peer name veth2
-+	$IP link set dev veth1 up
-+	$IP link set dev veth2 up
-+
-+	# Make veth1 ready to receive RA messages.
-+	$NS_EXEC sysctl -wq net.ipv6.conf.veth1.accept_ra=2
-+	$NS_EXEC sysctl -wq net.ipv6.conf.veth1.use_tempaddr=2
-+	$NS_EXEC sysctl -wq net.ipv6.conf.veth1.temp_prefered_lft=15
-+	$NS_EXEC sysctl -wq net.ipv6.conf.veth1.max_desync_factor=0
-+
-+	# Send a RA message with a prefix from veth2.
-+	$NS_EXEC ra6 -i veth2 -s fe80::1 -d ff02::1 -P 2001:12::/64\#LA\#3600\#3600 -e
-+	sleep 2
-+
-+	# Deprecate it
-+	$NS_EXEC ra6 -i veth2 -s fe80::1 -d ff02::1 -P 2001:12::/64\#LA\#3600\#0 -e
-+	sleep 2
-+
-+	# Restore it
-+	$NS_EXEC ra6 -i veth2 -s fe80::1 -d ff02::1 -P 2001:12::/64\#LA\#3600\#3600 -e
-+
-+	ret=1
-+	for i in $(seq 1 25); do
-+		sleep 1
-+		num_dep="$($IP -6 addr | grep -c "temporary deprecated" || true)"
-+		num_tot="$($IP -6 addr | grep -c "temporary" || true)"
-+
-+		if [ "$num_dep" -eq 1 ] && [ "$num_tot" -ge 2 ]; then
-+			ret=0
-+			break
-+		fi
-+	done
-+	log_test "$ret" 0 "IPv6 temporary address cleanly deprecated and regenerated"
-+}
-+
- # add route for a prefix, flushing any existing routes first
- # expected to be the first step of a test
- add_route()
-@@ -3002,6 +3054,7 @@ do
- 	ipv6_mpath_balance)		ipv6_mpath_balance_test;;
- 	ipv4_mpath_balance_preferred)	ipv4_mpath_balance_preferred_test;;
- 	fib6_ra_to_static)		fib6_ra_to_static;;
-+	fib6_temp_addr_renewal)		fib6_temp_addr_renewal;;
- 
- 	help) echo "Test names: $TESTS"; exit 0;;
- 	esac
--- 
-2.53.0
+> >              if len(stderr) > 0 and stderr[-1] == "\n":
+> >                  stderr = stderr[:-1]
+> >              raise CmdExitFailure("Command failed", self)
+> > +        elif self.proc.returncode == 0 and fail == 'verify_failed':
+> > +            raise CmdExitFailure("Command succeeded while should fail", self)
+> 
+> Can we create a new exception type? Just inherit CmdExitFailure 
+> but name it more appropriately.
+> 
+> Regarding the message maybe: "Command succeeded (expected fail)" or
+> "Command succeeded (unexpectedly)"
+
 
 
