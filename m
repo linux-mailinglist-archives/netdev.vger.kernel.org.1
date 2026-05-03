@@ -1,94 +1,95 @@
-Return-Path: <netdev+bounces-283625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283626-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kLUyLddt92nYhgIAu9opvQ
-	(envelope-from <netdev+bounces-283625-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 17:46:31 +0200
+	id 8Dw0Oult92nYhgIAu9opvQ
+	(envelope-from <netdev+bounces-283626-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 17:46:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18F1F4B64CB
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 17:46:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 439B44B64D3
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 17:46:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BD20230191BE
-	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 15:45:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 70166300C5BB
+	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 15:45:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D7C437FF54;
-	Sun,  3 May 2026 15:45:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27D8838423D;
+	Sun,  3 May 2026 15:45:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OhNtfGpI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ihuDVGA9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF19237F8D3
-	for <netdev@vger.kernel.org>; Sun,  3 May 2026 15:45:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3AF33806CD
+	for <netdev@vger.kernel.org>; Sun,  3 May 2026 15:45:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777823134; cv=none; b=nYof2sU93GQMvBy37e9X+uDB425aXGSpcmiwoUzZiaDKY7qYm9P27iag0VPZSG8HD23DvyuliP4ZP1TqAUN+Ms+/7WwcEwc12D9DUOJ6f3DVzDaYk6qWVicn+g0Tqj75LvZ4jQrd7ibJb5JlznmvZwX1gIXD2mW1gPB/wbCIVPo=
+	t=1777823137; cv=none; b=IfcIXKXc1ZCnyEn3xpAFzjIPO1mdc4Q/nA4YpMoCFx/T2Vjxhpn8NOrTet7NZnJnaSMakztZwtCcDpi9LygJOtSFilMLhfq7/gB/lYxVAyadOzAUB4Hqdy5PynBXMcxf4LmQFmbOElO3c9espUwaIyDk519ndJjjWePnGTrCXCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777823134; c=relaxed/simple;
-	bh=n/6IgxG+Q4iGQZ5Cq6naZ3Tm9LdZe+yVVzsGlIOrRDc=;
+	s=arc-20240116; t=1777823137; c=relaxed/simple;
+	bh=o0P9uSwVi64qgMlnqkrAnB95e0bM9xPu6QzPhskIjAg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bEUbasPs6HGY4HAg7DlbVnAiaH+Mr86nZeUReY+++NTecBlIc6nE2XYVCSfynE2VxRhprn56BI80UWpXcRhUOxmi0f5Tp423umFm8JGwHT2TLzyAAB7vB0xtskivEy3hrwF3DVm4j1Su7+fdE4aJ7OHyTpzu34ACZE3HpcCJG7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OhNtfGpI; arc=none smtp.client-ip=209.85.210.171
+	 MIME-Version; b=YRm8MVtXyvZqr2j9VzTeambDSoUE4eohMAROn1xkU26c55m5Hetni503D5l6u5YgqjYag+2E0W7OQJLiHeYctPl8sf90DiFTqotrn1ZtW3fGxOd6BX3jun45MEv6EEFjg0vCdqmU8pgGjXy3foxDmA90e4mTV48fDDxN0I1pC64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ihuDVGA9; arc=none smtp.client-ip=209.85.216.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-834da62e52dso1551985b3a.3
-        for <netdev@vger.kernel.org>; Sun, 03 May 2026 08:45:32 -0700 (PDT)
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-3652546e41aso435758a91.1
+        for <netdev@vger.kernel.org>; Sun, 03 May 2026 08:45:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777823132; x=1778427932; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1777823135; x=1778427935; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0KAC+6y8HBkAz4GwU5wBbOVh9KAOU7MwBbL/BgJDL9c=;
-        b=OhNtfGpIhNrpF9B244Q8gxu6lyQ6ArkhDcYR4np8NUH0foQiRouZlUAmae2w3HIubt
-         U+hQBDE0Ubha92W3hHS4kj/vN7rTil8hsU7lG6Yu47tt2UKijnf63Z2TO+DSdBqJ6Pg1
-         Rb+aD3WxnnkI7MDOqI6SXdNaY5MBF+h5W9YlCNuzVf2othf6aeSA8240UTlenkCn2d2m
-         djg4FCiSgwYwL5ijawIsX5QrSqiES2FJJW6iwWOIBuPalaZzXsdvPvXtANyqb4wXRjSi
-         1aHAHLofmpQ5ZBo16hw9azSIE4o47qSL5X4KNyq7RSsSSF1KygDiSxpHmNPBvBK9968y
-         K/bA==
+        bh=ddQCiovV9ee98Z8Ln2EaXKwGbcTLIXt1V+VEqUmKoW0=;
+        b=ihuDVGA9I8uxldXoS+9GF55bvzp4ziXfxv7jxYoWnQP4F2iUdD6f6ZJ77+XgaDwWgO
+         KrASVX4UfTJn0QEpwHAE3VnbI4vojXcNgTZYUTB6GT9E+VScRhfpwCDeQRLqhzNwutrg
+         Acz72K3Kz73D3okyWm3cT545kH4m2MX6ZHNnJtc9cgiHW86iH8pSK+B7EIwHT9SbQyN0
+         kudXyYzaSMUL2J2H29/x6JMOQql+UsUQZkqXDgGi+qID/rvBJ0qhvrK+5+BmOydxjY15
+         QfXX6wO6p08dRWE42Nh1q9u8wXQ0pdgWtLDnetNx0y/2O4E4rtM3P/6CFU7j3059WRsn
+         CEJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777823132; x=1778427932;
+        d=1e100.net; s=20251104; t=1777823135; x=1778427935;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=0KAC+6y8HBkAz4GwU5wBbOVh9KAOU7MwBbL/BgJDL9c=;
-        b=WMJgMhv83HOp9WBgqoWPG4kviR8xFMUuOO2SkpTOPuzkYqMB82STQZkcYgIPzEbKiT
-         BKD7fEjVpJu90Vk9tJ6gdXyuO8jI3OiOcbeVzjy6Yh6var2JCfjpF+F1A3m1ZmsyN8c7
-         fVYEbE/McP8ny8+X0b5lYj6WvAhJ+yBSnvEZfhoIGWVdiUIu3GncbgOx52mXykVaSNv0
-         rLPfXDnQ12zHG5SMg6Op69heTibY8iaZkwYav/Rl10p2sfO+1UQO73gWiLnjBsRoW0Ry
-         MafYPTXwq1qvfqy5lQfy1XKZlQbuKoQ0ZaU02XGXMmJB4U4a16nI7+ZrbSRxtuMP839j
-         QYmg==
-X-Gm-Message-State: AOJu0YyVisz8C7lRfA/JOQH8VQbcQXTeztKFcpdx7bkxeAMSGsnDPA84
-	CK7iAoJw782Aehz658BX6d/WrL3Snhmx9WAoQGPBnLPGuvSRKKerKKL4
-X-Gm-Gg: AeBDieu3ve/VQuyTMo+JW4PPSRE0wyFb1mERsmXjC931OVvONj1ijhzn/Lon4QCNmrB
-	AqS0RKHSj0T7U/uQzHriZN0EJ3lky9PGN5Co1x/ZMMvEulm1ITj8lH9DQanuqm/XEQZIQwv7PoC
-	OpAhyOgVZz8Y32ss80FFQcEKv9whyCXsAVDhEJKeI0Nha38C8h48L4+idSlUlQCafdQAGXajV15
-	BUsNMMw25fky88vAusmEM6EPNj5Ybuz6FMQyh6mKqIrPKtCHyEZtMmORnzlsZYPTORfNZMVFPcV
-	lNsEXZgMEtwC+c2sYhzESh6XND/r5C1bcZOMgXCvAThmqLAH1v7A303cCkVOCWwWgYVK7kI+Jbh
-	MSUnjSULP4Em6kje44STZS0ZR4Z06KM/KAtypw7MBKg5RtNU6hZtE7Y7x+ksb8XVIR3jn03VxzZ
-	1goO8Akl23Bb6DOXTlurXpHsgT0No=
-X-Received: by 2002:a05:6a21:3283:b0:39f:acae:f12e with SMTP id adf61e73a8af0-3a7f1aadb14mr6897204637.22.1777823131916;
-        Sun, 03 May 2026 08:45:31 -0700 (PDT)
+        bh=ddQCiovV9ee98Z8Ln2EaXKwGbcTLIXt1V+VEqUmKoW0=;
+        b=BLad4tgiWOGpYd8Gfi3kxxM8sCuzVFKHsPyOln81E+fcVOSEQkxBEaRr7IBo8/FO3B
+         hbCrWzavcu6CRA9Qc5mxWxHPGikPjjnJDifvOQ9PI128kbYFNJZ2GtjPe9xffW8n1Dmm
+         z21Bd+cbtqoZW2HkXvTrY3omifqf30OzxxzdL9051gp953PSLWJroh7jWkRFYI0A01qJ
+         +3wqyby4bGGrG++5LOpA2dXo//ZXOWvGSU+JQchdSmmEPPokoCUhXMDzNjLyGcM/Km//
+         bD9N2L+9VZH7c40hKe8VSsxRmePrBsN9mtX6EkisId6Y8s/B6ZBO4Fw9ULDjAQp/eHBf
+         9rjQ==
+X-Gm-Message-State: AOJu0YwgnmJPuIJw/NS31rudhv3ZUgnzj0JnyYLZyuh6emVC1H8XvikI
+	t6vMG1eb3VIQHp6vCtTEEr/WO4Qc1XtJbPoHqr60m4OSqcU6Rn252ANK
+X-Gm-Gg: AeBDieuHg9hYjVCUSeY6UUKi4eed4BLnDep7piNxqsQtJyxgEAr1DkL7irA/O6h//zJ
+	JHVdIitEb5ktz1cGVweK3FhUaTjOU7jDzGn1BqQ8ZCWZgYV8lRqGi32zrJlZ8H24jqDQiV30Pch
+	7zLS6u9RUElC0k3zBKW8N06NgAq7MPXdgLbLuE3Mil7MNnDx6WamYxVrjH9NyKhONAYGlSf+SHF
+	tlLN+5Fk1+kqe9C2J9Ao6EKTiNl6dLw/kYHplscwvfdjf4c0WK1pTSOLtpcHmQRSCbHfzQHU9AV
+	JuCcMxPn5ie3NJrcYyRoRdrrCb34JcENyUE088rREelyLJ9euQd2l9+z972vrXto1NC66E8NCd3
+	/tdQdfHdLGeJ1KbksJPjPUPgqveZ8dq5UTRDlfQ7+cDVsRJQIk2qbYXo5yom7cn9mk1rpbh8B3Q
+	Dn3/XNZ3SgG/k1YRAfXLuTv8DuIuo=
+X-Received: by 2002:a05:6a20:6a08:b0:3a3:17f8:bedd with SMTP id adf61e73a8af0-3a7f1a9a450mr6682580637.17.1777823135003;
+        Sun, 03 May 2026 08:45:35 -0700 (PDT)
 Received: from dev ([163.43.103.131])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c7ffbc6ec67sm7207421a12.17.2026.05.03.08.45.30
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c7ffbc6ec67sm7207421a12.17.2026.05.03.08.45.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 May 2026 08:45:30 -0700 (PDT)
+        Sun, 03 May 2026 08:45:34 -0700 (PDT)
 From: Yuya Kusakabe <yuya.kusakabe@gmail.com>
 To: stephen@networkplumber.org,
 	dsahern@kernel.org
 Cc: netdev@vger.kernel.org,
 	Yuya Kusakabe <yuya.kusakabe@gmail.com>
-Subject: [PATCH iproute2-next v1 RESEND 4/6] seg6: add support for the End.M.GTP6.D behavior
-Date: Mon,  4 May 2026 00:45:08 +0900
-Message-ID: <20260503154510.912576-5-yuya.kusakabe@gmail.com>
+Subject: [PATCH iproute2-next v1 RESEND 5/6] seg6: add support for the End.M.GTP6.D.Di behavior
+Date: Mon,  4 May 2026 00:45:09 +0900
+Message-ID: <20260503154510.912576-6-yuya.kusakabe@gmail.com>
 X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20260503154510.912576-4-yuya.kusakabe@gmail.com>
+In-Reply-To: <20260503154510.912576-5-yuya.kusakabe@gmail.com>
 References: <20260503154510.912576-1-yuya.kusakabe@gmail.com>
  <20260503154510.912576-2-yuya.kusakabe@gmail.com>
  <20260503154510.912576-3-yuya.kusakabe@gmail.com>
  <20260503154510.912576-4-yuya.kusakabe@gmail.com>
+ <20260503154510.912576-5-yuya.kusakabe@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,7 +97,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 18F1F4B64CB
+X-Rspamd-Queue-Id: 439B44B64D3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
@@ -105,19 +106,19 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-283625-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283626-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[yuyakusakabe@gmail.com,netdev@vger.kernel.org];
@@ -130,241 +131,111 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[ietf.org:url,end.am:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,end.map:url,end.bm:url,end.as:url]
 
-Add support for the End.M.GTP6.D behavior, which translates IPv6/GTP-U
-traffic into an SRv6 SR Policy.  The SR Policy is supplied through the
-existing srh segs syntax, and a new sr_prefix_len keyword specifies
-the locator length of the egress End.M.GTP6.E SID (1..88, leaving
-40 bits for the Args.Mob.Session field).
+Add support for the End.M.GTP6.D.Di drop-in interconnect behavior,
+which translates IPv6/GTP-U traffic into an SRv6 SR Policy while
+preserving the original outer IPv6 destination as the final SRH
+segment.  Unlike End.M.GTP6.D, this behavior does not take
+sr_prefix_len.
 
 Example:
-ip -6 r a 2001:db8:f::/64 encap seg6local action End.M.GTP6.D \
+ip -6 r a 2001:db8:f::/64 encap seg6local action End.M.GTP6.D.Di \
     srh segs 2001:db8:2::1,2001:db8:3::e \
-    src 2001:db8::1 sr_prefix_len 88 dev sr0
+    src 2001:db8::1 dev sr0
 
 Link: https://datatracker.ietf.org/doc/html/rfc9433
 
 Signed-off-by: Yuya Kusakabe <yuya.kusakabe@gmail.com>
 ---
- include/uapi/linux/seg6_local.h |  3 ++
- ip/iproute.c                    |  6 ++--
- ip/iproute_lwtunnel.c           | 61 +++++++++++++++++++++++++++++----
- man/man8/ip-route.8.in          | 29 ++++++++++++++++
- 4 files changed, 90 insertions(+), 9 deletions(-)
+ include/uapi/linux/seg6_local.h |  2 ++
+ ip/iproute.c                    |  2 +-
+ ip/iproute_lwtunnel.c           | 10 ++++++++++
+ man/man8/ip-route.8.in          | 16 ++++++++++++++++
+ 4 files changed, 29 insertions(+), 1 deletion(-)
 
 diff --git a/include/uapi/linux/seg6_local.h b/include/uapi/linux/seg6_local.h
-index 6af145259ffb..ed44fb858600 100644
+index ed44fb858600..0ca8405df2f2 100644
 --- a/include/uapi/linux/seg6_local.h
 +++ b/include/uapi/linux/seg6_local.h
-@@ -33,6 +33,7 @@ enum {
- 	SEG6_LOCAL_MOBILE_V4_MASK_LEN,
- 	SEG6_LOCAL_MOBILE_PDU_TYPE,
- 	SEG6_LOCAL_MOBILE_V6_SRC_PREFIX_LEN,
-+	SEG6_LOCAL_MOBILE_SR_PREFIX_LEN,
- 	__SEG6_LOCAL_MAX,
- };
- #define SEG6_LOCAL_MAX (__SEG6_LOCAL_MAX - 1)
-@@ -77,6 +78,8 @@ enum {
- 	SEG6_LOCAL_ACTION_END_M_GTP4_E	= 18,
- 	/* SRv6 to IPv6/GTP-U encap (RFC 9433 Section 6.5) */
+@@ -80,6 +80,8 @@ enum {
  	SEG6_LOCAL_ACTION_END_M_GTP6_E	= 19,
-+	/* IPv6/GTP-U decap into SRv6 (RFC 9433 Section 6.3) */
-+	SEG6_LOCAL_ACTION_END_M_GTP6_D	= 20,
+ 	/* IPv6/GTP-U decap into SRv6 (RFC 9433 Section 6.3) */
+ 	SEG6_LOCAL_ACTION_END_M_GTP6_D	= 20,
++	/* IPv6/GTP-U decap into SRv6, drop-in mode (RFC 9433 Section 6.4) */
++	SEG6_LOCAL_ACTION_END_M_GTP6_D_DI = 21,
  
  	__SEG6_LOCAL_ACTION_MAX,
  };
 diff --git a/ip/iproute.c b/ip/iproute.c
-index a77df0da0efe..8ced32a4f84e 100644
+index 8ced32a4f84e..1604545febc8 100644
 --- a/ip/iproute.c
 +++ b/ip/iproute.c
-@@ -106,11 +106,13 @@ static void usage(void)
- 		"ACTION := { End | End.X | End.T | End.DX2 | End.DX6 | End.DX4 |\n"
+@@ -107,7 +107,7 @@ static void usage(void)
  		"            End.DT6 | End.DT4 | End.DT46 | End.B6 | End.B6.Encaps |\n"
  		"            End.BM | End.S | End.AS | End.AM | End.BPF |\n"
--		"            End.MAP | End.M.GTP4.E | End.M.GTP6.E }\n"
-+		"            End.MAP | End.M.GTP4.E | End.M.GTP6.E |\n"
-+		"            End.M.GTP6.D }\n"
+ 		"            End.MAP | End.M.GTP4.E | End.M.GTP6.E |\n"
+-		"            End.M.GTP6.D }\n"
++		"            End.M.GTP6.D | End.M.GTP6.D.Di }\n"
  		"OPTIONS := OPTION [ OPTIONS ]\n"
  		"OPTION := { flavors FLAVORS | srh SEG6HDR | nh4 ADDR | nh6 ADDR | iif DEV | oif DEV |\n"
  		"            table TABLEID | vrftable TABLEID | endpoint PROGNAME | MOBILE_OPTION }\n"
--		"MOBILE_OPTION := { src ADDR | v4_mask_len BITS | v6_src_prefix_len BITS |\n"
-+		"MOBILE_OPTION := { src ADDR | v4_mask_len BITS | sr_prefix_len BITS |\n"
-+		"                   v6_src_prefix_len BITS |\n"
- 		"                   pdu_type { downlink | dl | uplink | ul | 0..15 } }\n"
- 		"FLAVORS := { FLAVOR[,FLAVOR] }\n"
- 		"FLAVOR := { psp | usp | usd | next-csid }\n"
 diff --git a/ip/iproute_lwtunnel.c b/ip/iproute_lwtunnel.c
-index 7a4acc33602b..d54bf4628f6f 100644
+index d54bf4628f6f..1234c9f146bf 100644
 --- a/ip/iproute_lwtunnel.c
 +++ b/ip/iproute_lwtunnel.c
-@@ -408,6 +408,7 @@ static const char *seg6_action_names[SEG6_LOCAL_ACTION_MAX + 1] = {
- 	[SEG6_LOCAL_ACTION_END_MAP]		= "End.MAP",
+@@ -409,6 +409,7 @@ static const char *seg6_action_names[SEG6_LOCAL_ACTION_MAX + 1] = {
  	[SEG6_LOCAL_ACTION_END_M_GTP4_E]	= "End.M.GTP4.E",
  	[SEG6_LOCAL_ACTION_END_M_GTP6_E]	= "End.M.GTP6.E",
-+	[SEG6_LOCAL_ACTION_END_M_GTP6_D]	= "End.M.GTP6.D",
+ 	[SEG6_LOCAL_ACTION_END_M_GTP6_D]	= "End.M.GTP6.D",
++	[SEG6_LOCAL_ACTION_END_M_GTP6_D_DI]	= "End.M.GTP6.D.Di",
  };
  
  static const char *format_action_type(int action)
-@@ -589,6 +590,11 @@ static void print_encap_seg6local(FILE *fp, struct rtattr *encap)
- 		print_uint(PRINT_ANY, "v4_mask_len", "v4_mask_len %u ",
- 			   rta_getattr_u8(tb[SEG6_LOCAL_MOBILE_V4_MASK_LEN]));
- 
-+	if (tb[SEG6_LOCAL_MOBILE_SR_PREFIX_LEN])
-+		print_uint(PRINT_ANY, "sr_prefix_len",
-+			   "sr_prefix_len %u ",
-+			   rta_getattr_u8(tb[SEG6_LOCAL_MOBILE_SR_PREFIX_LEN]));
-+
- 	if (tb[SEG6_LOCAL_MOBILE_V6_SRC_PREFIX_LEN])
- 		print_uint(PRINT_ANY, "v6_src_prefix_len",
- 			   "v6_src_prefix_len %u ",
-@@ -616,9 +622,26 @@ static void print_encap_seg6local(FILE *fp, struct rtattr *encap)
- 	}
- }
- 
-+/*
-+ * SRH-supplying actions (the seg6local equivalents of seg6 inline mode)
-+ * pass the entire segment list explicitly; parse_srh() must not append the
-+ * implicit terminating SID it adds for inline-style callers.
-+ */
-+static bool seg6local_action_excludes_final_seg(int action)
-+{
-+	switch (action) {
-+	case SEG6_LOCAL_ACTION_END_B6_ENCAP:
-+	case SEG6_LOCAL_ACTION_END_M_GTP6_D:
-+		return true;
-+	default:
-+		return false;
-+	}
-+}
-+
- static void seg6local_action_check_attrs(int action, int srh_ok, int nh6_ok,
- 					 int mobile_src_ok,
- 					 int mobile_v4mask_ok,
-+					 int mobile_sr_plen_ok,
- 					 int mobile_v6src_plen_ok,
- 					 __u8 v4_mask_len,
- 					 __u8 v6_src_prefix_len,
-@@ -635,6 +658,11 @@ static void seg6local_action_check_attrs(int action, int srh_ok, int nh6_ok,
- 		if (srh_ok)
- 			invarg("End.M.GTP6.E does not accept \"srh\"\n", "");
+@@ -632,6 +633,7 @@ static bool seg6local_action_excludes_final_seg(int action)
+ 	switch (action) {
+ 	case SEG6_LOCAL_ACTION_END_B6_ENCAP:
+ 	case SEG6_LOCAL_ACTION_END_M_GTP6_D:
++	case SEG6_LOCAL_ACTION_END_M_GTP6_D_DI:
+ 		return true;
+ 	default:
+ 		return false;
+@@ -663,6 +665,14 @@ static void seg6local_action_check_attrs(int action, int srh_ok, int nh6_ok,
+ 			invarg("End.M.GTP6.D requires \"srh segs\", \"src\","
+ 			       " and \"sr_prefix_len\"\n", "");
  		break;
-+	case SEG6_LOCAL_ACTION_END_M_GTP6_D:
-+		if (!srh_ok || !mobile_src_ok || !mobile_sr_plen_ok)
-+			invarg("End.M.GTP6.D requires \"srh segs\", \"src\","
-+			       " and \"sr_prefix_len\"\n", "");
++	case SEG6_LOCAL_ACTION_END_M_GTP6_D_DI:
++		if (!srh_ok || !mobile_src_ok)
++			invarg("End.M.GTP6.D.Di requires \"srh segs\" and \"src\"\n",
++			       "");
++		if (mobile_sr_plen_ok)
++			invarg("End.M.GTP6.D.Di does not accept \"sr_prefix_len\"\n",
++			       "");
 +		break;
  	case SEG6_LOCAL_ACTION_END_M_GTP4_E:
  		if (!mobile_src_ok || !mobile_v4mask_ok)
  			invarg("End.M.GTP4.E requires \"src\" and \"v4_mask_len\"\n",
-@@ -666,9 +694,10 @@ static void seg6local_action_check_attrs(int action, int srh_ok, int nh6_ok,
- 			       " \"v4_mask_len\" + 40 <= 128\n", "");
- 		break;
- 	default:
--		if (mobile_src_ok || mobile_v4mask_ok || mobile_v6src_plen_ok)
--			invarg("\"src\", \"v4_mask_len\", and"
--			       " \"v6_src_prefix_len\" are only valid for"
-+		if (mobile_src_ok || mobile_v4mask_ok || mobile_sr_plen_ok ||
-+		    mobile_v6src_plen_ok)
-+			invarg("\"src\", \"v4_mask_len\", \"sr_prefix_len\","
-+			       " and \"v6_src_prefix_len\" are only valid for"
- 			       " SRv6 Mobile User Plane actions\n", "");
- 		break;
- 	}
-@@ -1547,7 +1576,7 @@ static int parse_encap_seg6local(struct rtattr *rta, size_t len, int *argcp,
- 	int segs_ok = 0, hmac_ok = 0, table_ok = 0, vrftable_ok = 0;
- 	int action_ok = 0, srh_ok = 0, bpf_ok = 0, counters_ok = 0;
- 	int mobile_src_ok = 0, mobile_v4mask_ok = 0, mobile_pdusess_ok = 0;
--	int mobile_v6src_plen_ok = 0;
-+	int mobile_sr_plen_ok = 0, mobile_v6src_plen_ok = 0;
- 	__u32 action = 0, table, vrftable, iif, oif;
- 	struct ipv6_sr_hdr *srh;
- 	char **argv = *argvp;
-@@ -1555,7 +1584,7 @@ static int parse_encap_seg6local(struct rtattr *rta, size_t len, int *argcp,
- 	char segbuf[1024];
- 	inet_prefix addr;
- 	__u32 hmac = 0;
--	__u8 v4_mask_len = 0, v6_src_prefix_len = 0;
-+	__u8 v4_mask_len = 0, sr_prefix_len = 0, v6_src_prefix_len = 0;
- 	int ret = 0;
- 
- 	while (argc > 0) {
-@@ -1679,6 +1708,23 @@ static int parse_encap_seg6local(struct rtattr *rta, size_t len, int *argcp,
- 				       *argv);
- 			ret = rta_addattr8(rta, len, SEG6_LOCAL_MOBILE_V4_MASK_LEN,
- 					   v4_mask_len);
-+		} else if (strcmp(*argv, "sr_prefix_len") == 0) {
-+			NEXT_ARG();
-+			if (mobile_sr_plen_ok++)
-+				duparg2("sr_prefix_len", *argv);
-+			/*
-+			 * The egress SID must leave room for the 40-bit
-+			 * Args.Mob.Session field, so the locator can be at
-+			 * most (128 - 40) = 88 bits.
-+			 */
-+			if (get_u8(&sr_prefix_len, *argv, 0) ||
-+			    sr_prefix_len == 0 ||
-+			    sr_prefix_len > 88)
-+				invarg("\"sr_prefix_len\" must be in the range 1..88\n",
-+				       *argv);
-+			ret = rta_addattr8(rta, len,
-+					   SEG6_LOCAL_MOBILE_SR_PREFIX_LEN,
-+					   sr_prefix_len);
- 		} else if (strcmp(*argv, "v6_src_prefix_len") == 0) {
- 			NEXT_ARG();
- 			if (mobile_v6src_plen_ok++)
-@@ -1737,14 +1783,15 @@ static int parse_encap_seg6local(struct rtattr *rta, size_t len, int *argcp,
- 	}
- 
- 	seg6local_action_check_attrs(action, srh_ok, nh6_ok, mobile_src_ok,
--				     mobile_v4mask_ok, mobile_v6src_plen_ok,
-+				     mobile_v4mask_ok, mobile_sr_plen_ok,
-+				     mobile_v6src_plen_ok,
- 				     v4_mask_len, v6_src_prefix_len, dst_len);
- 
- 	if (srh_ok) {
- 		int srhlen;
- 
- 		srh = parse_srh(segbuf, hmac,
--				action == SEG6_LOCAL_ACTION_END_B6_ENCAP);
-+				seg6local_action_excludes_final_seg(action));
- 		srhlen = (srh->hdrlen + 1) << 3;
- 		ret = rta_addattr_l(rta, len, SEG6_LOCAL_SRH, srh, srhlen);
- 		free(srh);
 diff --git a/man/man8/ip-route.8.in b/man/man8/ip-route.8.in
-index 7cf97924d699..35e6e2080a1f 100644
+index 35e6e2080a1f..0487338707c6 100644
 --- a/man/man8/ip-route.8.in
 +++ b/man/man8/ip-route.8.in
-@@ -1088,6 +1088,35 @@ takes the same syntax and semantics as in
- .B End.M.GTP4.E
- above (no PDU Session Container is inserted unless explicitly set).
+@@ -1117,6 +1117,22 @@ The action requires either no SRH or an SRH with
+ equal to zero on the inbound packet; other matching packets are
+ dropped.
  
-+.B End.M.GTP6.D srh segs
++.B End.M.GTP6.D.Di srh segs
 +.IR SEGMENTS
 +.B src
 +.IR ADDRESS
++- SRv6 Mobile User Plane End.M.GTP6.D.Di drop-in interconnect behavior
++(RFC 9433 Section 6.4).  Identical to
++.B End.M.GTP6.D
++except that the original outer IPv6 destination address of the
++incoming GTP-U packet is preserved as the final segment of the new
++SRH, allowing existing SRv6 networks to be inserted into a legacy
++mobile path without changing the destination semantics.
 +.B sr_prefix_len
-+.IR BITS
-+- SRv6 Mobile User Plane End.M.GTP6.D behavior (RFC 9433 Section 6.3).
-+At the SR ingress gateway, the matching IPv6/UDP/GTP-U packet has its
-+GTP-U envelope removed and the inner T-PDU is re-encapsulated in SRv6
-+using the supplied SR Policy
-+.RI ( srh
-+\fBsegs\fR\~\fISEGMENTS\fR).  The TEID is folded into the 40-bit
-+Args.Mob.Session field placed immediately after the egress
-+End.M.GTP6.E SID's locator (RFC 9433 Section 6.5),
-+.B sr_prefix_len
-+specifying the locator length in bits (1..88 -- the upper bound
-+leaves room for the 40-bit Args.Mob.Session field within the
-+128-bit egress SID).  The egress SID's locator
-+length cannot be inferred from local state at the SR Gateway.  The
-+egress
-+.B End.M.GTP6.E
-+SID can then recover the per-session identifier from the same offset.
-+The new outer IPv6 source address is taken from
-+.BR src .
-+The action requires either no SRH or an SRH with
-+.B Segments Left
-+equal to zero on the inbound packet; other matching packets are
-+dropped.
++is rejected for this action: the original outer destination is
++preserved verbatim instead of being repacked with an Args.Mob.Session
++field, so no locator length needs to be carried.
 +
  .B Flavors parameters
  
