@@ -1,186 +1,230 @@
-Return-Path: <netdev+bounces-283556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283557-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WDT3Ji3q9mnhZgIAu9opvQ
-	(envelope-from <netdev+bounces-283556-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 08:24:45 +0200
+	id z3x3Jvr69mmcawIAu9opvQ
+	(envelope-from <netdev+bounces-283557-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 09:36:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 036D44B49C0
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 08:24:44 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEBA34B4BAD
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 09:36:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 90E3E3003E90
-	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 06:23:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BCD153006F23
+	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 07:36:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FB153A8727;
-	Sun,  3 May 2026 06:23:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225963806D7;
+	Sun,  3 May 2026 07:36:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jnusn47/"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="nvyolhVN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010028.outbound.protection.outlook.com [40.93.198.28])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55C913A7F78
-	for <netdev@vger.kernel.org>; Sun,  3 May 2026 06:23:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777789431; cv=none; b=hWabObZTPOzEractp63iUdxF5E49ubaexa5pxqr1/8WIIvhkQ5t+Z8YBFdoQ4yh7jqPMjI4zugXbICaAlRU7jlK2Sd4saKCBqMdLFxuL/W+5gEaR20lInviFe0/S4dWuKxsxx7XcGb/Jr6Vns1KICsg/1Oh3dRvCWNeUWsuBlC0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777789431; c=relaxed/simple;
-	bh=Fsmgq5cAKrXPL9pLv0TXR5n4zPRRZMK9jy8Mv9X5XLw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pQGk8bAbFr1SJ37wu4yFmQu65sW6UV0myohG6uX3VJXF6pyDiCAXwRT4PWbjOisViZC4hG+GbPGdC5b9qtIm4KyuEqM76v9QTRkV9VTOgCbhUyZPy7D99bd1swJzZGG/iDidLMdhmf6F9z0cs2/c8Hv/CWvo9C/GyPpBlsVEQ0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jnusn47/; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-365212191f6so376140a91.3
-        for <netdev@vger.kernel.org>; Sat, 02 May 2026 23:23:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777789430; x=1778394230; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jauMLsv8rVhaM9q3nubRO4klXhEWZOV4Z40Yc2+Ynwc=;
-        b=Jnusn47/gLBcYwmf37RoNooyu6JOJii+mFOmJnqk1EiwQoUgYVe/hZQRJ1S+6om7Xh
-         gTIyc0YfmMBYDR9jO4pp1EwYVN3VBgeQ94u1CnofFGv3xqRa5v9HdnW749wVTvxfybLr
-         04G6VQyZIN45aMLBRMbdJOy8+djOxcKBikODtPrpsVOqNPBa45arDuK088idEKEacfFI
-         z9UhLu4Fuk+JYdI4NeTDjrdaslYW79wID27/zA2g8fyNIPMJfgpaMknGC9trGuiCgZQn
-         7cfB5AMwC3lSgD5zfO8/voUeMI3ve03uCnoDsPXU/DF9axD0O5UY/1qTHYh6ODYSFVL3
-         ZCyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777789430; x=1778394230;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jauMLsv8rVhaM9q3nubRO4klXhEWZOV4Z40Yc2+Ynwc=;
-        b=nIQLu6zZcpnZlpHmXIrS5nmqdbBIs+UPLEuoDuUM2EZ2RGs8jUxg8iZQeQWNFAVHpO
-         BY3BN6EZjMHzLMaG0ikyU6DTNL1Lw6CVLX3eE4TOOGyUIbGfy2ZCBjvu9PQ1gI/NeX5a
-         VWWptUPHKFA8bIPzMQWWPQcQ2vllKHMKQdzKVT50SELQ46MGTCD4EOKXo/9FvNRGoOF2
-         CXzKRfgeFcQBF3h9hGQphFFS1xRAAZeZasRml3V9NGMb1Y5u7ihujaccs0Ncaq5SQ3x8
-         CCIAb3FeXS5FIg+OkBCqJbtejok8ebSX1MzT0zVhhsELt9OSbd/FUKjatCjvAxLbup9h
-         7n0Q==
-X-Forwarded-Encrypted: i=1; AFNElJ+hCm6XLssmJjktbsxZLPmF4HWelxSrxSix/zc7vyDOx+IOZjLgKpLLIivCg6X4FJUIDFBK69s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yym3jXbn4lDY7y5Dpgs7oqlHSL4CDeDM5ZMy49wOG8z/cdi7smi
-	PUncPWt0Xy3/943beHqbDc5ZplLXrc3L4RYzL7RBVi3Xvuv3TjAz8PBp
-X-Gm-Gg: AeBDiesc2FnR7Q0fP1XlsJYZiI01FL2RLYzituF6d55mbwsvGsDsvCYYljUjmbBbw7k
-	RbYREFMsj+w3S5v2SN4zW8ntgAtkuZJtuL/FAx7KljYyy++aUt+qwhlNo9BGc9NLsd5zl6rPTzD
-	X4l5QX9FnaiypCjzMRMK3KjKYci9Kisvvi9IsFojndnEoYWq2INPIRMeYu1fF09s260yAdZvFAr
-	dGOOmIA4LuuGmx7pWs4iXdJPWItZI5JeHNa1D1mFfj7D5u0KMqpD7BOvTDpl6Wb8DMPwKoMIZqi
-	03ZHLinXIMA7xdyOSBss1XsJ/SDy5NTbe796XbxN+/55hrYO1aikV9LyG2bwx+ziG/PFBUmtbug
-	d6sp05MPWNK0X0SqySSZzTIZ/vQF8MF9OPw0gTgJsFmNCVLe3/Z9Nx1vJm5qhxBcAJI4x78+Jo7
-	r9OrVkBs+e6bjuRYlaoJznM8S9AlaekMHvVc7dgIFg/D7V8SFD2eiXOovAVNm6u3TC
-X-Received: by 2002:a17:90b:3849:b0:359:87a8:e65c with SMTP id 98e67ed59e1d1-3650ce38382mr5709647a91.17.1777789429662;
-        Sat, 02 May 2026 23:23:49 -0700 (PDT)
-Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-364ebec736dsm7243126a91.3.2026.05.02.23.23.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 May 2026 23:23:49 -0700 (PDT)
-Date: Sun, 3 May 2026 15:23:45 +0900
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: Ziyi Guo <n7l8m4@u.northwestern.edu>
-Cc: David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	imv4bel@gmail.com
-Subject: Re: [PATCH] rxrpc: always copy skb on in-place decrypt to avoid
- pagecache aliasing
-Message-ID: <afbp8dod6IK2xTVd@v4bel>
-References: <20260502211340.446927-1-n7l8m4@u.northwestern.edu>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A6912165EA;
+	Sun,  3 May 2026 07:36:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.28
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777793784; cv=fail; b=hn7NTWVFkahELZOu/qda6ohlahrTX96aPdz/ErQaTiMJGx6D9mfUntqFGiihPgpNxqgw+tNMsBJiPe0XmrbLOAzELnJ3cxu65H3UpN9SsAghfsPZuTg/I06oTtpyEM0tnn6yfOjFwwIUJaff92PRVK+yXhIF2Yaya2P8ma0YxZ4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777793784; c=relaxed/simple;
+	bh=9qJ/Au30IaAibAQUjTx6j3TPjB6z2NmSXjgXHEspn8g=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OQcd/mO1pdlRydaR2uQUdiFmWtYhYy3aBXUbEqYQOrSFJZ6H+5jnApQZwD881FhRbkuMQYEaa4OTX8Yr6slpCai7jb/iX+qCQ+1DP4yRnvi7zETOUWTAie1DIl3eApJTZn1fTmZEMu8l3HqfDotdyKEoAXeK2m0ywudxGOllqOQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=nvyolhVN; arc=fail smtp.client-ip=40.93.198.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=UQeWneDPjbL5nOQmZd55EnZzcJsArNJiOVeheC7btsqJS1tg5M/m38YM7JRQo7FsjX1koPwTGsQ68vH6ZNx5vXwvfowwUq9cxlKETdN9Ry6BkW/nAsgXCa1yojsGQptoV2anxWza1b02/nrYikPuS1dp2vlNKTwtvrer3kO6ZCGE6rS/OLL7YZzwyHmYlwjga9iNQSmcEg85ffu+9gRQ4l0zaJE3f+wx2ldte1Lkc+qHnY5uTolWIS4413+uJzeyVxdtZeSZJf3LCepGvt5dMiigArAJakf0Ce74lWuOKCrtPEl3NFWJTbP1WCvFmHbaEZFwEW2skj8t+UGVP6aPeA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Hy0LjOvbmD8MG/X88wL57pQTVebKl1DdoZP4B6WAWJU=;
+ b=qw1LUbdxLIONoUyDbffaSrIXIKXGFsypgCRdFtsjMIhd7i+lNDaSPWGhDtmtQGO4Nl6HHzpbCve1o9mU+ZmfCUK6da+3GYo3cw0QY/l1kLCcqM1Vc07Z0mEXr1HAFxzbqizoffAElVpp7AfC3di1bL9aoVszId7fMNoAjiqgvz7sQY2w4cX8B2EPSNAEjp1IFP3YvPEbGSszgi5JyXrGVHKzukxtHOytvp8NUUTL9IG/rZIX70/wv8h/boK6vxR0NYl43IkKptzxTXqJgc3qpEe2uIu5Zd6yiVtK3Dds9x2lgSk8YJfCKwL94IZt3sEfeEO4A0LgKmrxQcsHbVRzxQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Hy0LjOvbmD8MG/X88wL57pQTVebKl1DdoZP4B6WAWJU=;
+ b=nvyolhVNXlwNmc756Fc6wbxI0uwCYNVrNvvVD2gxFhXwjtfqQEyjcYeGTlKPwIj7kMlzFGJ+9isG7gVXohIGJ853RtoHXByWcORpNej0S3eLVjNLjn4of68w1Fta/8IW+EdnVbV/Bv7yFi3X+PDV6k6+6kdkyFMAKX86qpmLkRUxObfSD25vXq6Y5GS3myBPLOMpxQG17FX1KdLz8eZiM+bLYH3kU4QJ5mIFGFB+yrrUoglfoqnBgVUFH7JI0biPPc5sXiCiHeKS5vEN5USJ7l/RsuTJTFMyBn4314mGidckpyrH9A8W1A+uoddEb6s4UwBvVpVyNETOCHSqrfR8Nw==
+Received: from SJ0PR13CA0177.namprd13.prod.outlook.com (2603:10b6:a03:2c7::32)
+ by DM6PR12MB4465.namprd12.prod.outlook.com (2603:10b6:5:28f::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Sun, 3 May
+ 2026 07:36:14 +0000
+Received: from CO1PEPF00012E7D.namprd03.prod.outlook.com
+ (2603:10b6:a03:2c7:cafe::db) by SJ0PR13CA0177.outlook.office365.com
+ (2603:10b6:a03:2c7::32) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9891.11 via Frontend Transport; Sun,
+ 3 May 2026 07:36:14 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CO1PEPF00012E7D.mail.protection.outlook.com (10.167.249.52) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9891.9 via Frontend Transport; Sun, 3 May 2026 07:36:13 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 3 May
+ 2026 00:35:58 -0700
+Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.37) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Sun, 3 May 2026 00:35:51 -0700
+From: Danielle Ratson <danieller@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <donald.hunter@gmail.com>, <kuba@kernel.org>, <davem@davemloft.net>,
+	<edumazet@google.com>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<razor@blackwall.org>, <idosch@nvidia.com>, <andrew+netdev@lunn.ch>,
+	<shuah@kernel.org>, <ast@fiberby.net>, <liuhangbin@gmail.com>,
+	<daniel@iogearbox.net>, <aroulin@nvidia.com>, <fmaurer@redhat.com>,
+	<sdf.kernel@gmail.com>, <sd@queasysnail.net>, <kees@kernel.org>,
+	<nickgarlis@gmail.com>, <amorenoz@redhat.com>, <alasdair@mcwilliam.dev>,
+	<johannes.wiesboeck@aisec.fraunhofer.de>, <petrm@nvidia.com>,
+	<linux-kernel@vger.kernel.org>, <bridge@lists.linux.dev>,
+	<linux-kselftest@vger.kernel.org>, Danielle Ratson <danieller@nvidia.com>
+Subject: [PATCH net-next 0/6] bridge: Add selective forwarding of gratuitous neighbor announcements
+Date: Sun, 3 May 2026 10:35:26 +0300
+Message-ID: <20260503073532.2138165-1-danieller@nvidia.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260502211340.446927-1-n7l8m4@u.northwestern.edu>
-X-Rspamd-Queue-Id: 036D44B49C0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF00012E7D:EE_|DM6PR12MB4465:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6f3a7e9a-43c6-4b05-528c-08dea8e6a791
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|82310400026|7416014|376014|36860700016|13003099007|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	qAvOQpS2HJNAtNS650qAg2+/wpyhf/FSGcTY3T9zQ7Bct8vGasFCSfs+b/5ZTTJjXLPemzvdVFFmBCMjLbS8AnLolPSRYcqqIODP4IjN34lWSXeknmC00b6g+eKXfNxVCyTQW9EpVdqwuDRvWepQZwq59LKG/EYSKxYvZAOUa+3/Tc7ata5x8SNWnu2mdkHRz5EgwRZYPkwVHAE6oCWZ5GjQtnB/utaPXZZ0BnxU/tVnDWmCLL0hMvW/PDRir7spHOSRwkVPdl+bp5M+AQMirOzCIutwuDxj0ybbTz2/b5G8QFgOVDmlXuUyrG6rJ6SCMGqqIbxrWvnARbwnuHjoQ3TE9RxmEKRObHWJ4Il/4nCtkXsaRbZdffQ9Yez3LXiiyGpwZzAKVzB4+igcoAZZ8Iw0fVHmUgbCTvjpO5Ie/DXa9zex+Kd1utR6eBxMSExU7VTCBJVKKCe1W9XJ09va+OB3ajRiWiJwGMK3TZ5QB5pyAtOPBP17TB3Pcwpt6jQCyIKBuTw+iChxeuVlu9e8eoKlDOagpl5pdJc7/GCMNJk79YdEwQGe264nDuWiTC153mTS5hSf6vPYCC4X09VfNUrTVlhEXvEw1L2N74kOmc01fkq6lOfxx8viDVR7S6DpGTVdWafrRcbAoZ/RrXHposUfgiulLtqK8Y+gBJjyOIoxeoxOxFSV3BySRrNmQ5FzClWlT1wF4Uzv0c1zlN0ijVqd+P34rPfERCIPMiv6wy8=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(7416014)(376014)(36860700016)(13003099007)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	N6IFiloX5teDqGioHfx4tuykF21k3BE99/dR2DARgnKa2iSgdp9Mw08u2Ylwj2hhf8fzGuvPKRr8nQmWZAPKlicn2tWGXa7a32fk7mG6oYdFP+WR2R/znDgLe/kJFNEhKhyhvLN8XdeiE6s3072J+dtvv+3R8sMufYXWNZMn4Xb/wU4y7AIxmdK7mRIEhLXsDkkuhaXNlk32YFH0CZhwv/kU4g7VK8EjItOvQaobamfsmX1RAjCK2kkp6rRKKofZgEF8lOhPTEWvgWwMYTRRoGvCGSYYqj7Dr+tJY6JxDgLwHCoVekOvmd/iZJX/yWDdpaL4UOpLgSZ4r6kHg/VN9MyV88SiLjP4DNLFqJY4W77nVeOGvSGrxYb7SeEohUVZ5UzNA7huMoZ2dOzcFvr8pp40wLdc+I7alVQeiKJedX3DP7yS9GbLyVqXRfauy1Xk
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 May 2026 07:36:13.9500
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6f3a7e9a-43c6-4b05-528c-08dea8e6a791
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF00012E7D.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4465
+X-Rspamd-Queue-Id: EEBA34B4BAD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [3.84 / 15.00];
-	SEM_URIBL(3.50)[northwestern.edu:email];
-	MID_RHS_NOT_FQDN(0.50)[];
+X-Spamd-Result: default: False [2.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283556-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[redhat.com,auristor.com,davemloft.net,google.com,kernel.org,lists.infradead.org,vger.kernel.org,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	R_DKIM_ALLOW(0.00)[gmail.com:s=20251104];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,blackwall.org,nvidia.com,lunn.ch,fiberby.net,iogearbox.net,queasysnail.net,mcwilliam.dev,aisec.fraunhofer.de,vger.kernel.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[28];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_FROM(0.00)[bounces-283557-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[danieller@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:mid,Nvidia.com:dkim];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	R_SPF_ALLOW(0.00)[+ip4:172.234.253.10:c];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
 
-On Sat, May 02, 2026 at 09:13:40PM +0000, Ziyi Guo wrote:
-> skb_cloned() does not detect frag-level page sharing introduced by splice()
-> with MSG_SPLICE_PAGES.  When such an skb reaches the rxrpc DATA path,
-> in-place decryption (rxkad/rxgk) writes plaintext into file
-> pagecache pages still aliased to the source file, leading to
-> corrupt the page cache of any readable file.
-> 
-> Drop the skb_cloned() gate so skb_copy() is performed unconditionally
-> for DATA packets, severing the alias before decrypt.
-> 
-> Fixes: d0d5c0cd1e71 ("rxrpc: Use skb_unshare() rather than skb_cow_data()")
-> Signed-off-by: Ziyi Guo <n7l8m4@u.northwestern.edu>
-> ---
->  net/rxrpc/call_event.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/rxrpc/call_event.c b/net/rxrpc/call_event.c
-> index fdd683261226..39d19a354172 100644
-> --- a/net/rxrpc/call_event.c
-> +++ b/net/rxrpc/call_event.c
-> @@ -333,10 +333,12 @@ bool rxrpc_input_call_event(struct rxrpc_call *call)
->  			saw_ack |= sp->hdr.type == RXRPC_PACKET_TYPE_ACK;
->  
->  			if (sp->hdr.type == RXRPC_PACKET_TYPE_DATA &&
-> -			    sp->hdr.securityIndex != 0 &&
-> -			    skb_cloned(skb)) {
-> -				/* Unshare the packet so that it can be
-> -				 * modified by in-place decryption.
-> +			    sp->hdr.securityIndex != 0) {
-> +				/* Always unshare: skb_cloned() does not
-> +				 * detect frag-level page sharing introduced
-> +				 * by splice() with MSG_SPLICE_PAGES, so
-> +				 * in-place decryption could otherwise corrupt
-> +				 * the source file's page cache.
->  				 */
->  				struct sk_buff *nskb = skb_copy(skb, GFP_ATOMIC);
->  
-> -- 
-> 2.34.1
-> 
+The existing neighbor suppression unconditionally suppresses gratuitous
+ARPs and unsolicited Neighbor Advertisements, which prevents fast
+mobility of hosts between VTEPs.
 
-Hi,
+This series adds a new neigh_forward_grat option that provides
+independent control of gratuitous ARP and unsolicited NA forwarding.
+When neigh_suppress is enabled but neigh_forward_grat is enabled,
+regular neighbor discovery is suppressed while gratuitous announcements
+are forwarded.
 
-A patch for this issue has already been posted earlier:
+The implementation marks gratuitous ARPs and unsolicited NAs in
+BR_INPUT_SKB_CB during input processing, then checks the per-output-port
+neigh_forward_grat setting during flooding. This allows gratuitous
+announcements from any input port to be selectively forwarded based on
+each output port's individual configuration.
 
-https://lore.kernel.org/all/afKV2zGR6rrelPC7@v4bel/
+Both port-level control (via IFLA_BRPORT_NEIGH_FORWARD_GRAT) and
+per-VLAN control (via BRIDGE_VLANDB_ENTRY_NEIGH_FORWARD_GRAT) are
+provided. The default value of OFF preserves existing behavior.
 
-Best regards,
-Hyunwoo Kim
+This behavior is in accordance with RFC 9161 (Section 3.6), which
+recommends that VTEPs forward gratuitous ARP and unsolicited NA messages
+to avoid traffic disruption during host mobility events.
+
+The new attributes use NLA_U8, although the kernel netlink guideline
+recommends NLA_U32 as the minimum integer type on the grounds that
+alignment makes smaller types equivalent on the wire. For a simple
+on/off attribute there is no technical advantage to u32 over u8, and
+keeping u8 preserves consistency with all surrounding bridge port
+attributes and avoids introducing new helpers alongside the existing
+infrastructure.
+
+Patchset overview:
+Patch #1: adds uapi headers.
+Patches #2-#3: support selective forwarding of gratuitous ARP.
+Patches #4-#5: add netlink handling.
+Patch #6: adds tests.
+
+Please see iproute related patches in the last 3 commits of:
+https://github.com/daniellerts/iproute2
+
+Danielle Ratson (6):
+  bridge: uapi: Add neigh_forward_grat netlink attributes
+  bridge: Add internal flags for neigh_forward_grat
+  bridge: Add selective forwarding of gratuitous neighbor announcements
+  bridge: Add port-level netlink handling for neigh_forward_grat
+  bridge: Add per-VLAN netlink handling for neigh_forward_grat
+  selftests: net: Add tests for neigh_forward_grat option
+
+ Documentation/netlink/specs/rt-link.yaml      |   3 +
+ include/linux/if_bridge.h                     |   1 +
+ include/uapi/linux/if_bridge.h                |   1 +
+ include/uapi/linux/if_link.h                  |  17 +
+ net/bridge/br_arp_nd_proxy.c                  |  22 ++
+ net/bridge/br_forward.c                       |  15 +-
+ net/bridge/br_netlink.c                       |   8 +-
+ net/bridge/br_private.h                       |   3 +
+ net/bridge/br_vlan.c                          |   1 +
+ net/bridge/br_vlan_options.c                  |  24 +-
+ net/core/rtnetlink.c                          |   2 +-
+ .../net/test_bridge_neigh_suppress.sh         | 298 +++++++++++++++++-
+ 12 files changed, 385 insertions(+), 10 deletions(-)
+
+-- 
+2.51.0
+
 
