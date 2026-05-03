@@ -1,98 +1,110 @@
-Return-Path: <netdev+bounces-283638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283643-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kCEiGBh892kpiQIAu9opvQ
-	(envelope-from <netdev+bounces-283638-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 18:47:20 +0200
+	id sObWD5t+92lsiQIAu9opvQ
+	(envelope-from <netdev+bounces-283643-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 18:58:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 051214B6937
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 18:47:19 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B80A4B6B07
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 18:58:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 52F163003348
-	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 16:47:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 52B843001596
+	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 16:58:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ED503CBE93;
-	Sun,  3 May 2026 16:47:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE6DD37BE6E;
+	Sun,  3 May 2026 16:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ATPjrw10"
+	dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b="SkyJi43O";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="FNSQAcz4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FDFB391E7C
-	for <netdev@vger.kernel.org>; Sun,  3 May 2026 16:47:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8511C2D877A;
+	Sun,  3 May 2026 16:57:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777826835; cv=none; b=BRzf7CPDAyXt/EHg9Pn6FEwt5Q3f6qBnYx8PGPd09uFSf9aj/nXUkmJAHRmaEDZFMWF9hQaJda7wK/T+T0D6tDDXxjogXTi2BH49zDpn3bwPojEGSM9nm7eRvoUurNaS0oeKYAt4NBEXNgFvuvA0Iqi5D6H9vLw20vy4LnDahd0=
+	t=1777827480; cv=none; b=dmGfRq1I8bJZGQk3SrEUYF+vxWjoSuKEl1nl3vTy1oqu4dPEF1q8NtUWXuleDnJk+ZvWsz6zf/UTxz8bcVZqiwCKG5m57aCASezwtYufbMqVJd6v6Xr7/KcnQiCnS3g8uL3LpC7gyP98GnZvWPusTx13+6yW4pCAxkkVXpztRDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777826835; c=relaxed/simple;
-	bh=ebx9DytCjEe5hkX4lMtfi5pzQvgPYCMmi4NGe2LpsWw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ndq6hUajZ6jdFg2FAD6BmIF9ivxxt+3eMcWQhcnYpgU3yX221cjaSDUfRs6FNDAxg5JdiI2cJK8a9XG+fMSZXcqnmSUUmgpvJlDGkLbn1mnHXVGIxMsXfFYJ9zfMOhJDPtXpOs0cg9IElTRtfeFWtxtrfovsb/m16/pSBfEeadg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ATPjrw10; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-38e7d983f79so33621891fa.0
-        for <netdev@vger.kernel.org>; Sun, 03 May 2026 09:47:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777826832; x=1778431632; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ebx9DytCjEe5hkX4lMtfi5pzQvgPYCMmi4NGe2LpsWw=;
-        b=ATPjrw10h1EqCjqyBDFmFmTj42m+UPelzagG60oKl8aoaXllRLR+UKCV5CGZ0r9ZJY
-         6ts3iCFXIOwLceciqZ2VNGskSoACul1ce+u757TzkEm7PmAk04AfTSECOmZ78jbfQQA9
-         9USvWXdb9x0DTcF0wXCtPpnzT0//gpsX6xrK8oVzFHP5qpxdVOcx+NyHAncUFkS839hP
-         3y6jCU5I808hXXIrQ+/eF2UH5VRuMQe4Zym2GFor4mS8HezxRQyRSgz+ZPNz2QrIdEvF
-         AlKttAWACApdH96SNEzHYvt2GmVdgLBASR7Apc+UfxB9ssj3OSmY/c2VobeZ74QYIEmh
-         ZwaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777826832; x=1778431632;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ebx9DytCjEe5hkX4lMtfi5pzQvgPYCMmi4NGe2LpsWw=;
-        b=iLf21FVvYvUZZjpIxyzMXBNv9aL6ieYBLl6f0leW1gIg7TQ9gcxZwCFflKtB4xddYu
-         BiSDophN5lTNMEc++NdZf1iKB/8ejojm/79ElQd3bwXhkfm/OLhGSte/cBN7gMjqFvkc
-         hIVzjmRiv4Hw+GBT79tWdyCa+UeKK58Edku44IGzmcAEwm4CsI4ViYJCVLhWfPP/Ovg0
-         9IguJTkYFQdCO4Yz5vXVA6wWK2kA1v+8lKoEcKaI9HBjs97WrXMxIdL5rri6OSdbllKG
-         67qwibYAtgTJR0bW2HD5MyUnTc2VwKppLVGxRDwucQH13ePejBPKGF/koYbckDs7NkoU
-         4Liw==
-X-Gm-Message-State: AOJu0Yx+1PAAnYUORCzQ6VnJxNaC6eHVV8od69eHzsqhrz02P8mom144
-	5ZcrgNGqplDt7I7v7oARKBelW0we08hOoYNCSQGqgmJVsnlgijTGe+23
-X-Gm-Gg: AeBDievAg4luAKyaYmoqxPAgPNnKIBP+LA3QeCqNjF1SOleFXrezu88oCj7BNGcTq/o
-	x5bqbhJ7iY2Jkb6h7qmvYSU1VxbNPG29XVwbsId1oEaaKFCWXVasGUqvZj4ml5vnY/oH6NepFvF
-	iWQAhwCnmogtEtbEVs2d1rtDeEK+4I/XEoKn9e2xU3iMiAlnixMfT0azlB1ZbPHbV522ccJg306
-	vpxn3ojCUVChaE/BdAAa0HbJ+ps0uvDw/69vA4dm0MNYz763+sRRhWLf2bQgFX2LGOPSLWMN9Oa
-	c73+sWUpOMLRC7Ysgkh29kI9Lp3MBlVN+Df1/QG4fCJFO/RIHx0zRwVpmqBOFe3vaMIncfpMwic
-	jzsJ/eKsr0Cr411duEazS6KzlPNU+laV9w6o0noAGi8NKaYGYUqhqeKR1Gd+SB2eF3TJVyQJipr
-	FpHI6jEcHHxqR2/H4vKkfHoYROkMYp958LXRmzrOKlsPVsVwVGwswDKkc4NUdzwgGrVGZOnCs=
-X-Received: by 2002:a05:651c:1501:b0:38a:aba:9bf9 with SMTP id 38308e7fff4ca-3937849422fmr21458861fa.8.1777826831339;
-        Sun, 03 May 2026 09:47:11 -0700 (PDT)
-Received: from va-HP-Pavilion-Desktop-595-p0xxx.mshome.net ([193.0.150.248])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-39361323f4csm23033091fa.32.2026.05.03.09.47.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 May 2026 09:47:10 -0700 (PDT)
-From: Vastargazing <vebohr@gmail.com>
-To: idosch@nvidia.com
-Cc: netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
+	s=arc-20240116; t=1777827480; c=relaxed/simple;
+	bh=GWXOocp7AUgPPBOxZT6llGYGBfJgPDV3T3W+xglzGNU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GZrzQFYxzQwyo6l+tOnqHwi9MkiNlLPrI/mr8zYSTN/jeQhffoRgcPhy+8WSLNCIn5+zKeoloC5yesR4JnXBnJAof7sIl9kA+RzQNVPq9OetlPnqBDo5UZ8u9SHbMxCgfYetmfjLMc9pFjebpq5Ljcrm0t7XHCeqFfqU26cQ7JY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alyssa.is; spf=pass smtp.mailfrom=alyssa.is; dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b=SkyJi43O; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=FNSQAcz4; arc=none smtp.client-ip=103.168.172.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alyssa.is
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alyssa.is
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfout.phl.internal (Postfix) with ESMTP id 6252EEC0081;
+	Sun,  3 May 2026 12:57:56 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Sun, 03 May 2026 12:57:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alyssa.is; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1777827476; x=1777913876; bh=tMCgbw9JP6++EMQIiWQDT
+	jkgT5TM8HAnim+IqX1/stU=; b=SkyJi43OEgoQ7sb44Wt0qmoPWote/3EUt6E0o
+	sr/vF4d3whWEsNCWWcdHA2YceJu1+E1BUpHLLn0yziGF75MDl1terR9kWXVy7Ndt
+	H+d+NHvvnKTZ2hyZ1zCk6IVmuUKeVC1RbSTlccii7l4jLowb13g9ZBlcMdgDGnsO
+	mK5bRqad7l5vcqJZVL8FYZyQ5Jb3ymjfSq8P9xht1X1OY+FwNs6j2elitNs8n+Dv
+	4VvV3YQ5+qHVE5U13c7jyo8ncbovmDf2XsCb1YTt192ieQelEmqIU5SrMaKaaBDJ
+	LFhXZ9ce9k5SnZxxOP1cExNeZXQDP1bfheJycsTADLtY33oWQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1777827476; x=1777913876; bh=tMCgbw9JP6++EMQIiWQDTjkgT5TM8HAnim+
+	IqX1/stU=; b=FNSQAcz45NhHLoUS5XLZbi7XJt8B5sXDAjLHBmw5NQI0L7/LPGg
+	/KhyEjTVW4H9oAlxWlGsm3VkP2F8OpmkGkrgjuLT9egSmoq9ST8dCqxVdOf9WWbi
+	QuCSV2mSAv1WarRBypsalEt9ezI65BcfvO39OIi5d4iK7cJ0x1EgH9m4PNLLux6/
+	U5u9RttRoKeBFQcnHsVAmepQ/jtd5piIlD9jNLkc/kI9IrPQqLnVZszAku14Fo5x
+	dARGSgEVoMkvgM9qBlmsUSJ+oRk+xxpn2ZWLqdjP9L7ZhTcFWVOIuO8wilG+EFX6
+	NjxTczLUDCuTEVxfhZtD2JrIbkjiPZItE7g==
+X-ME-Sender: <xms:k373aZytS-2ZUEny8ZFERSsz7NXf2r8E2-HOjpzUehnaWTjI7hZU4g>
+    <xme:k373aXiZe70GFyf9EnMamI3lJKipy-7ttGfxFHhfEiwhydjGJEWl8c5ahEBE3hQwL
+    vJZKAKlKBFBcb8qu41cwzjtO1VVB_GuCFG4LDvsaJJVDBRKttUVXg>
+X-ME-Received: <xmr:k373acprcDtNT_vit7kSf7_Ca7Vjj8keitF1aEIYoD3n5UsPFjdjahHDsrh6_bgGIPip3tHy9xB_hQnIS5wQ8BU5Dtf_>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdelieehtdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeetlhihshhsrgcutfho
+    shhsuceohhhisegrlhihshhsrgdrihhsqeenucggtffrrghtthgvrhhnpeehkefgtdevte
+    dtkeduudeguefgudejheeugfelgeettdfhffduhfehudfhudeuhfenucevlhhushhtvghr
+    ufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehhihesrghlhihsshgrrdhish
+    dpnhgspghrtghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegu
+    rghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtse
+    hgohhoghhlvgdrtghomhdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlhdrohhr
+    ghdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkrh
+    iikheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhr
+    ghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprh
+    gsmhesshhushgvrdgtohhmpdhrtghpthhtohepfhhmrghntggvrhgrsehsuhhsvgdruggv
+X-ME-Proxy: <xmx:k373aegz0tAqFzQKrEg-ouNEkv7if0SeaqJwQFl0gEqIsDu0fzKM6w>
+    <xmx:k373aeOkzZ0ofZqiCQ0m8sL05nCOeg2h2pwDiJKhg2IH1aPQlEtnAg>
+    <xmx:k373aYyRKIsdf5G48L4zcFPHlgqqNBElhsR1nboTHUfRCJWZxfC8ug>
+    <xmx:k373aQr6ahD6XUoMSBYpWgYtuUFT5hH6tpelFStD3VKLzPsjF0Q_Ng>
+    <xmx:lH73aS2KFC5VbT_zP9LcQDIkbZiZu2coZgNl3tp-oJJ49yYELLCrkog1>
+Feedback-ID: i12284293:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 3 May 2026 12:57:55 -0400 (EDT)
+Received: by mbp.qyliss.net (Postfix, from userid 1000)
+	id 389C17E625A1; Sun, 03 May 2026 18:57:53 +0200 (CEST)
+From: Alyssa Ross <hi@alyssa.is>
+To: "David S. Miller" <davem@davemloft.net>,
 	David Ahern <dsahern@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] selftests: net: fib_nexthops: detect kernel splats from torture tests
-Date: Sun,  3 May 2026 19:47:08 +0300
-Message-ID: <20260503164708.348543-1-vebohr@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260503061740.GA98182@shredder>
-References: <20260502122219.262611-1-vebohr@gmail.com> <20260503061740.GA98182@shredder>
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Fernando Fernandez Mancera <fmancera@suse.de>,
+	=?UTF-8?q?Ricardo=20B=20=2E=20Marli=C3=A8re?= <rbm@suse.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>
+Subject: [PATCH] ipv6: default IPV6_SIT to m
+Date: Sun,  3 May 2026 18:57:14 +0200
+Message-ID: <20260503165714.1477819-1-hi@alyssa.is>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,55 +112,68 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 051214B6937
+X-Rspamd-Queue-Id: 6B80A4B6B07
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[alyssa.is:s=fm2,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283638-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[vebohr@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[alyssa.is:+,messagingengine.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283643-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[alyssa.is];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[hi@alyssa.is,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,alyssa.is:email,alyssa.is:dkim,alyssa.is:mid];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
+	RCVD_COUNT_SEVEN(0.00)[7]
 
-On Sat, May 03, 2026 at 06:17:40AM +0000, Ido Schimmel wrote:
-> Do you have a trace?
+This basically defaulted to m until recently, since IPV6 defaulted to
+m.  Since IPV6 was changed to a boolean with a default of y, IPV6_SIT
+started defaulting to built-in as well.  This results in a surprise
+sit0 device by default for defconfig (and defconfig-derived config)
+users at boot.  For me, this broke an (admittedly non-robust) script.
+Preserve the behaviour of most configs by avoiding building this
+module, that's probably overall seldom used compared to IPv6 as a
+whole, into the kernel.
 
-No. I did not run a KASAN-enabled kernel before the fix; the commit
-message stated "would have been visible to a KASAN run" as a fact
-when I had only inferred it from the code. That was wrong.
+Fixes: 309b905deee59 ("ipv6: convert CONFIG_IPV6 to built-in only and clean up Kconfigs")
+Signed-off-by: Alyssa Ross <hi@alyssa.is>
+---
+ net/ipv6/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> The netdev CI and our internal CI run the test and look at the kernel
-> log for splats. Both did not flag it, most likely because per-CPU
-> allocations are not covered by KASAN.
+diff --git a/net/ipv6/Kconfig b/net/ipv6/Kconfig
+index c024aa77f25ba..3cfccb6ce5c29 100644
+--- a/net/ipv6/Kconfig
++++ b/net/ipv6/Kconfig
+@@ -164,7 +164,7 @@ config IPV6_SIT
+ 	select INET_TUNNEL
+ 	select NET_IP_TUNNEL
+ 	select IPV6_NDISC_NODETYPE
+-	default y
++	default m
+ 	help
+ 	  Tunneling means encapsulating data of one protocol type within
+ 	  another protocol and sending it over a channel that understands the
 
-I did not check what the netdev CI already does, so the second claim
-in that paragraph ("the torture loop just did not bother to look") was
-also wrong. Combined with the percpu/KASAN gap you point out, the
-patch does not close anything.
+base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
+-- 
+2.53.0
 
-> I prefer to avoid such random markers and rely on the system running the
-> tests to catch these issues.
-
-Understood. Please drop v1.
 
