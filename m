@@ -1,223 +1,184 @@
-Return-Path: <netdev+bounces-283514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283515-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GDSXCNmo9mmgXQIAu9opvQ
-	(envelope-from <netdev+bounces-283514-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 03:46:01 +0200
+	id qFlAOwup9mmgXQIAu9opvQ
+	(envelope-from <netdev+bounces-283515-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 03:46:51 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9292B4B40A8
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 03:46:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AF714B40B8
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 03:46:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C52C3300A626
-	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 01:45:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F15E430107ED
+	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 01:45:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5320223FC41;
-	Sun,  3 May 2026 01:45:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C03125783A;
+	Sun,  3 May 2026 01:45:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VgYQ427k"
+	dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b="jiEwwJEI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3040B40DFD0;
-	Sun,  3 May 2026 01:45:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F8024E4A8
+	for <netdev@vger.kernel.org>; Sun,  3 May 2026 01:45:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777772723; cv=none; b=pVtUkSaPD8wX+qctzlLlhsi6GZdpyPl3pYiGo2OVkTUtuVH5l6D3LfD3XIRPeekc9SDqrTtMfJvfPMc0xdmDeS/R32ITA4R8uNQzIQeU9PbgPZCOLM/fJItEP94yrU1T185lQEXpi/+wLDGoXExWlJ6vP7lrKABpLmhzijiCtMw=
+	t=1777772755; cv=none; b=LoyzEBc+6ZsGQpCEhmw3eqJ/lR3oLBzMCN0LFwgoUHIavnigaHs2y1Kwe6H6buTHjiXbYC8B0/ie9JdaGuDqGi7xi1hBh1g8VhdFeeb1iL5p3t7SOLquBds/XdKlV25wlr99U8Jv5izeGFgGEWebOFihP7VWCXGCg+TK5zOqpZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777772723; c=relaxed/simple;
-	bh=OcoE6oTTHn+MqLfiKmS2JWn13hTHY26HJsZtSuao5Ow=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=upa1qIntEC9LVlC4b1ifIvVBO/G9JRs3+5rQ7GhvC+/szUPyrZ+u7Eo1woV12aWILbuJi+2bukREzMU1+hZtzoxDBlySUMtSXeBJy/P7bPM0CxP4I0den3AXI5FpsPvPXc6f1Vfrmz+AuYsGkatOSnaNLYuGLmrEmwsJYCngJAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VgYQ427k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AD69C19425;
-	Sun,  3 May 2026 01:45:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777772723;
-	bh=OcoE6oTTHn+MqLfiKmS2JWn13hTHY26HJsZtSuao5Ow=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VgYQ427k+iLvvL9YOyYZgSxzukF5XVV8kzvSCLAsAilNyDXPAt3Qu8rPHiyPUK9Lv
-	 QnVEGsyzMZzB/yUsJcGJpSK+7jfUGpafrRnnW3IJDl58i0yzz2fFZEUsUNUZcj4TWf
-	 FGY/UiOXR8fT3yrzoNAgwAC/cB5zt75+JpM41UW3WgLdbE1hVaX6Mn9OisDNempdcj
-	 M2MfbRGMKlLtb1ra4zBxmOj5gKebGWDrxjIveoJ19jbeDRM8qdrwbvSuh0vUQ5eb21
-	 gaA1b8J0gIp3BvdMjUZm0fM4bseH0MZ3i81Sn3yum6NitFrOmpFjjIixrx3iCgfQw/
-	 orlR1sWdFfIZA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: tariqt@nvidia.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	saeedm@nvidia.com,
-	leon@kernel.org,
-	mbloch@nvidia.com,
-	moshe@nvidia.com,
-	agoldberger@nvidia.com,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	gal@nvidia.com,
-	dtatulea@nvidia.com
-Subject: Re: [PATCH net-next 3/3] net/mlx5: Add VHCA_ID page management mode support
-Date: Sat,  2 May 2026 18:45:20 -0700
-Message-ID: <20260503014520.4098577-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260501044156.260875-4-tariqt@nvidia.com>
-References: <20260501044156.260875-4-tariqt@nvidia.com>
+	s=arc-20240116; t=1777772755; c=relaxed/simple;
+	bh=YKj28Q85niDGU70q6VNatHef1IVTl7zI9IJbJKkrDqg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hT1b4EUvHwdPb07xfCOOH6GNN5b+oRbCRCuO5yXOoYVm/wiL4kg7pfcabmkcZajIdZLsa1/Q8D7NHuaxwI9ZCRZvjYMbqmtWpcBRH6/4+hZeS9r7t8jg9g1y/7y1q/pbaM1wnHN2y06taXI96mwEj8skE6yV82N/qRZwF3JYLWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com; spf=pass smtp.mailfrom=riscstar.com; dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b=jiEwwJEI; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riscstar.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-8cb20bcff5aso288061085a.3
+        for <netdev@vger.kernel.org>; Sat, 02 May 2026 18:45:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=riscstar-com.20251104.gappssmtp.com; s=20251104; t=1777772753; x=1778377553; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=k2VDIdBulUU5TGbhBANhJGFN/QeEIFSIYNJHL/TT6dc=;
+        b=jiEwwJEIidVBpn5VKvdaqyut0STQFn5mUin1j0c7CPH3JyqMyIemYiIdKm9lx22P81
+         sv3BQST9ufNYY5RSEqNxV3ydmGcdP1P9DKRRfCF/5VLCbkV6KzJqtEfwrP7XxN7jBkVY
+         3jU+aJxY9wP68cm09MacVfg8HbSfAvnFojocv4c4fv1kJ3r4vGRF693QpbgFbJZNZYHm
+         J9+kpgPA04Up0whIt4myKwa9Jrr13USBrhogdKpVf+nKoicoHY/Mhr+9Yzv6lxXfccbY
+         PLOCKahXZZEwa6PRj9NvYXtyz1209AcMuvvlNoRYrWPVFUrhTtGhdFrtL1ARQTGX/ijI
+         b60w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777772753; x=1778377553;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=k2VDIdBulUU5TGbhBANhJGFN/QeEIFSIYNJHL/TT6dc=;
+        b=IGGKdwyhFTwKp9LH1TxD87zZlASBVTPfJvFR1OHWg2gkElkQVrc+cn/jc1m1sgdUw7
+         BGl4P91ltrmUM/pGtfiK7UQh/WsaWDLsubggCxVjOF/wcaBiMi0o2l+AvcXbYDHt3GyB
+         5/quSsP3ZDMsfwj3bUZNRNNbaDmuNe/nCGzX8z4SQqg3FbTtykVKNbjngci3i7RrTPM1
+         lZAutuPfDIZGUU9JUdngdOW1fqYR7jKbBSgOhuYD3m87i2Zw9LmFrXb9ytbjHl4nHSB4
+         eilMmPD9HKECxG1WP+CSjmycGS9wInkuaxm72WRSF0l/kQbYLM/mpwpT0bS7KWglg398
+         YHSg==
+X-Forwarded-Encrypted: i=1; AFNElJ/YxiF7EMLKSU7zyfyMWiuEmBTTUsiScCoaMTvxOo6dTILopEGFzxDVEtf8cSPQb5C1gzGxyzQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQOI4MpCQhgqkXTctT2psQFpCS5Ozz1mNV+QkZDms3BbmQHX4G
+	ojLhir4dRCmdaOV1wnk46sgDh/NgcuJWgBIo8pV2F/Y+toJxhIlCF4VMTxt1Zz6dtJQ=
+X-Gm-Gg: AeBDiesOkwGtjK8EBMkSAzNsFZ3rtrYD9bHKfPprQBTs7ZO6nUnowVhiIi+aT78pR3X
+	h9Go0rcReeXDUM1i78DkyL8WYhwUAMx5gNcQDgn5D40ogkheaRICj+f/x6Yj+i14rd9/YajRYLL
+	+Hwy3qp3QLl1iwjZzNIl4rg6/ReZFHTfCU6w4RBidMnhbnKBv1y52FnYQyWDk4Q3+hlXS+aGVmG
+	rAFfX0YZC2iI0NTL5lJl9sfAOfSUi3mOohsX7x9sdkR6jMU1OHJElV/1okCYFkhxl76OUTRUb5/
+	Ymw8J9uObA+Rf05pwGeXP9HOEfUGXZjk+CqgCkmSq8rOy/prhCwxNFBwX05uZUzxElu/x4gRI4E
+	0rSwo//2ueuqgot0gdzaZo5f9S7Bve5vuaF1xLu+BypGLga77S73dthAQ3jp3CAZ5u8C10Mn5c9
+	euCNtQur80pEvUbTO+VQi4TpWGFc4Y/8wdUUWKcwXUQlQ0LqymhkEc0J/TRYzMlXs8sxaatu/+Z
+	Q==
+X-Received: by 2002:a05:620a:284a:b0:8eb:10d4:a471 with SMTP id af79cd13be357-8fd17e4b6c1mr769719785a.43.1777772753243;
+        Sat, 02 May 2026 18:45:53 -0700 (PDT)
+Received: from [172.22.22.28] (c-75-72-117-212.hsd1.mn.comcast.net. [75.72.117.212])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8fc2c9229c8sm680230385a.36.2026.05.02.18.45.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 02 May 2026 18:45:52 -0700 (PDT)
+Message-ID: <30cec7dd-ac3c-47ab-896a-c29992bd5ba5@riscstar.com>
+Date: Sat, 2 May 2026 20:45:48 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 9292B4B40A8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 09/12] gpio: tc956x: add TC956x/QPS615 support
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, maxime.chevallier@bootlin.com,
+ rmk+kernel@armlinux.org.uk, andersson@kernel.org, konradybcio@kernel.org,
+ robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, linusw@kernel.org,
+ brgl@kernel.org, arnd@arndb.de, gregkh@linuxfoundation.org,
+ daniel@riscstar.com, mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com,
+ alexandre.torgue@foss.st.com, ast@kernel.org, boon.khai.ng@altera.com,
+ chenchuangyu@xiaomi.com, chenhuacai@kernel.org, daniel@iogearbox.net,
+ hawk@kernel.org, hkallweit1@gmail.com, inochiama@gmail.com,
+ john.fastabend@gmail.com, julianbraha@gmail.com, livelycarpet87@gmail.com,
+ matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc,
+ prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
+ rohan.g.thomas@altera.com, sdf@fomichev.me, siyanteng@cqsoftware.com.cn,
+ weishangjuan@eswincomputing.com, wens@kernel.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20260501155421.3329862-1-elder@riscstar.com>
+ <20260501155421.3329862-10-elder@riscstar.com>
+ <736fb3b7-c88a-4ec4-96ad-d1b79cc48d30@lunn.ch>
+Content-Language: en-US
+From: Alex Elder <elder@riscstar.com>
+In-Reply-To: <736fb3b7-c88a-4ec4-96ad-d1b79cc48d30@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 5AF714B40B8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.06 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[riscstar-com.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[riscstar.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-283514-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,riscstar.com,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283515-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[riscstar-com.20251104.gappssmtp.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.997];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[elder@riscstar.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_GT_50(0.00)[50];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,riscstar.com:mid]
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-Subject: net/mlx5: Add VHCA_ID page management mode support
+On 5/1/26 1:36 PM, Andrew Lunn wrote:
+>> + * There is a TC956X PCI power controller driver that accesses the
+>> + * direction and output value registers for GPIOs 2 and 3.  These
+>> + * GPIOs control the reset signal for the two downstream PCIe ports.
+>> + * Their values will never change during operation of this driver, and
+>> + * this driver reserves these two GPIOS.
+> 
+> Why doesn't this power controller driver actually use this driver to
+> control the GPIOs? Chicken/egg?
 
-This commit adds support for VHCA_ID-based page management mode. It
-updates page management commands to conditionally use vhca_id and adds
-a function to resolve the function type via vport lookup.
+I am not the one with authority on this, but yes, that's my
+understanding.  *Something* about this chip requires that the
+PCIe ports need to have some configuration done on them *before*
+PCIe is powered up.  So that driver uses the I2C interface to
+apply these settings.  Meanwhile this driver uses the PCIe-mapped
+memory to manage the GPIO registers.
 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-> @@ -852,6 +852,48 @@ bool mlx5_esw_vport_vhca_id(struct mlx5_eswitch *esw, u16 vportn, u16 *vhca_id)
->  	return true;
->  }
->  
-> +u16 mlx5_esw_vhca_id_to_func_type(struct mlx5_core_dev *dev, u16 vhca_id)
-> +{
-> +	struct mlx5_eswitch *esw = dev->priv.eswitch;
-> +	struct mlx5_vport *vport;
-> +	unsigned long i;
-> +	u16 type;
-> +
-> +	if (vhca_id == MLX5_CAP_GEN(dev, vhca_id))
-> +		return MLX5_SELF;
-> +
-> +	if (!esw)
-> +		return MLX5_FUNC_TYPE_NONE;
-> +
-> +	mutex_lock(&esw->state_lock);
+> Maybe add a comment why gpio-regmap.c cannot be used. You probably
+> need to instantiate it twice, but i still think you will end up with
+> less code.
 
-Can this race with driver unload?
+It's possible gpio-regmap.c *could* be used.  We started with
+vendor code and this code got separated at some point along
+the way.  It was working, and I don't think I pursued other
+options at that point.  I'll look at this possibility before we
+send out the next version.
 
-Since the page allocator workqueue (pg_wq) is asynchronous and destroyed
-after the eswitch structure is freed, could a pending page request evaluate
-esw as valid just before it's freed, and then attempt to lock it here?
+What do you mean instantiate it twice?
 
-Also, is there a potential deadlock when acquiring esw->state_lock here?
+					-Alex
 
-If a thread holds the lock while sending a firmware command, and the
-firmware issues a page request to complete it, the pg_wq worker will block
-here waiting for the lock. Would this prevent the firmware command from
-completing?
+> 
+> 	Andrew
 
-[ ... ]
-
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-[ ... ]
-> -static int give_pages(struct mlx5_core_dev *dev, u16 func_id, int npages,
-> +static int give_pages(struct mlx5_core_dev *dev, u16 func_vhca_id, int npages,
->  		      int event, bool ec_function)
->  {
-> -	u32 function = get_function(func_id, ec_function);
-> +	u32 function = get_function_key(dev, func_vhca_id, ec_function);
->  	u32 out[MLX5_ST_SZ_DW(manage_pages_out)] = {0};
->  	int inlen = MLX5_ST_SZ_BYTES(manage_pages_in);
-
-This isn't a new issue introduced by this patch, but does the npages
-calculation risk an integer overflow?
-
-The npages parameter is derived from the firmware payload, and the
-allocation size is calculated as:
-
-inlen += npages * MLX5_FLD_SZ_BYTES(manage_pages_in, pas[0]);
-
-If a compromised firmware provides a massive npages value, could this
-overflow the 32-bit inlen and result in an undersized kvzalloc allocation,
-followed by an out-of-bounds write in the subsequent loop?
-
-[ ... ]
-
-> @@ -577,8 +626,9 @@ static int reclaim_pages(struct mlx5_core_dev *dev, u16 func_id, int npages,
->  	if (nclaimed)
->  		*nclaimed = num_claimed;
->  
-> -	func_type = func_id_to_type(dev, func_id, ec_function);
-> -	dev->priv.page_counters[func_type] -= num_claimed;
-> +	func_type = func_vhca_id_to_type(dev, func_vhca_id, ec_function);
-> +	if (func_type != MLX5_FUNC_TYPE_NONE)
-> +		dev->priv.page_counters[func_type] -= num_claimed;
-
-Does this dynamically look up the vport during page reclaim?
-
-If an SF or VF has been destroyed and its vport removed, the lookup will
-return MLX5_FUNC_TYPE_NONE. Will this cause the decrement to be skipped,
-leading to a counter leak and triggering the WARN() statements in
-mlx5_reclaim_startup_pages() during driver unload?
-
-[ ... ]
-
-> @@ -658,30 +708,101 @@ static int req_pages_handler(struct notifier_block *nb,
-[ ... ]
-> +	} else {
-> +		if (MLX5_CAP_GEN_MAX(dev, icm_mng_function_id_mode) ==
-> +		    MLX5_ID_MODE_FUNCTION_VHCA_ID) {
-> +			err = mlx5_pagealloc_migrate_pf_to_vhca_id(dev);
-> +			if (err)
-> +				return err;
-> +			mlx5_page_mgt_mode_set(dev, MLX5_PAGE_MGT_MODE_VHCA_ID);
-> +		}
-> +	}
-
-What happens to the device state if mlx5_pagealloc_migrate_pf_to_vhca_id()
-fails?
-
-The firmware has already been instructed to use VHCA_ID mode during driver
-load, but if the migration fails, the function returns early and leaves
-dev->priv.page_mgt_mode as FUNC_ID.
-
-When the initialization aborts and mlx5_reclaim_startup_pages() runs, will
-the driver send reclaim commands using the old ID, causing the firmware
-to reject them and leak the allocated DMA memory?
 
