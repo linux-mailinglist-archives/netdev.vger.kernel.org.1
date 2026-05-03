@@ -1,253 +1,286 @@
-Return-Path: <netdev+bounces-283650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283651-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IJMZLuqR92lhjAIAu9opvQ
-	(envelope-from <netdev+bounces-283650-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 20:20:26 +0200
+	id QAXUDlqX92mdjQIAu9opvQ
+	(envelope-from <netdev+bounces-283651-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 20:43:38 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFFBE4B6FA6
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 20:20:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2767B4B7045
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 20:43:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 14E263001A64
-	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 18:20:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 96E4E3001CCC
+	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 18:43:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C4B73D0925;
-	Sun,  3 May 2026 18:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 352933988E0;
+	Sun,  3 May 2026 18:43:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=analog.com header.i=@analog.com header.b="DkTNkRbx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ulOLG/af"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00128a01.pphosted.com (mx0a-00128a01.pphosted.com [148.163.135.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948453CBE84;
-	Sun,  3 May 2026 18:20:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.77
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777832421; cv=none; b=LuMR0Txdf+VTIDAPD4HSvytR0MM4Z8m3FuifXG3+dyCpDsX8IK4F6AewT0WdAs5nicAckAUEJ/YICC+n4mMjhpSle+EZ4m7A5KphLCDiuWfe/8pRtViZ9lwocHjTPYwO9iSeIJNvvPhZJITtt1TsJ6h+d9Wg3fjzTIssOr7IzHY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777832421; c=relaxed/simple;
-	bh=RzINv7C0Bv0GAZFB5TSWPEzlVeYBlX2l1W7C9mocVc8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=eu7bEAzB7z5Bx7zbV+LRCzuNmMToGJM0yn63gtc18Jzh30uQ2JoSF2oXQhNcCubhapcMIcLkyhDjzQ6HqTPAo7MHaHsRGHt3+UpDWGjCLMegzGiktHcZ5i/HVWK32SN7d825WEl7M+Fs819elPGbMszad0IiV+1xAlvtr48/s0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=analog.com; spf=pass smtp.mailfrom=analog.com; dkim=pass (2048-bit key) header.d=analog.com header.i=@analog.com header.b=DkTNkRbx; arc=none smtp.client-ip=148.163.135.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=analog.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=analog.com
-Received: from pps.filterd (m0167089.ppops.net [127.0.0.1])
-	by mx0a-00128a01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 643D2mJI025250;
-	Sun, 3 May 2026 14:19:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=analog.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=DKIM; bh=4vAO4
-	415P6z37caL+yzayBA15C5TCwbTNDHqi2x4iAw=; b=DkTNkRbxqOji7nLgCYIPc
-	oVtHGn5pshnlwpRb5oQ3m5PXcClyM1ytZR90V4Bys7q4dEnQ5Al0iB4OsHC9FDPY
-	icFEAsZKTmJZV61ZwVX1yT02itp40eBRU3Jb3MGf4ZFlCZjRqw5N/aLg1PJ5Q87d
-	6XQyr9TLdH4Zcf2HX62DXvts9JK+u53GqQliJ+lFxm9BXRp4CaUYGFM6P2D6mQSm
-	N++rWCna8o1y/zWiRxayo+PL6wGli4TklSCLP53hZP4EGV6479nU3tqnzK5JCLe4
-	4RSwjlB71Qqq93EDz7a6SlFnsF96DMDsnHCScb+HCRi6t4l3Xbr7JepW0+e8UaEO
-	Q==
-Received: from nwd2mta4.analog.com ([137.71.173.58])
-	by mx0a-00128a01.pphosted.com (PPS) with ESMTPS id 4dwe6137nm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 03 May 2026 14:19:54 -0400 (EDT)
-Received: from ASHBMBX9.ad.analog.com (ASHBMBX9.ad.analog.com [10.64.17.10])
-	by nwd2mta4.analog.com (8.14.7/8.14.7) with ESMTP id 643IJqf2000698
-	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Sun, 3 May 2026 14:19:52 -0400
-Received: from ASHBMBX9.ad.analog.com (10.64.17.10) by ASHBMBX9.ad.analog.com
- (10.64.17.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.37; Sun, 3 May
- 2026 14:19:52 -0400
-Received: from ASHBMBX9.ad.analog.com ([fe80::a11:40fc:1a6f:d912]) by
- ASHBMBX9.ad.analog.com ([fe80::a11:40fc:1a6f:d912%20]) with mapi id
- 15.02.1748.037; Sun, 3 May 2026 14:19:52 -0400
-From: "Regus, Ciprian" <Ciprian.Regus@analog.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
-        Andrew Lunn
-	<andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Eric
- Dumazet" <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>,
-        Simon Horman <horms@kernel.org>, Jonathan Corbet
-	<corbet@lwn.net>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Heiner Kallweit
-	<hkallweit1@gmail.com>,
-        Russell King <linux@armlinux.org.uk>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
-Subject: RE: [PATCH net-next 4/5] net: ethernet: adi: Add a driver for the
- ADIN1140 MACPHY
-Thread-Topic: [PATCH net-next 4/5] net: ethernet: adi: Add a driver for the
- ADIN1140 MACPHY
-Thread-Index: AQHc2osB4TQBSYFAe0qN63YeObU/GbX76fKAgADDcYD//+2AwA==
-Date: Sun, 3 May 2026 18:19:51 +0000
-Message-ID: <ea6dfd64c0314bfa9c8961ec36d77f33@analog.com>
-References: <20260503-adin1140-driver-v1-0-dd043cdd88f0@analog.com>
- <20260503-adin1140-driver-v1-4-dd043cdd88f0@analog.com>
- <afc1cf8d-4a02-430e-89a5-b213c15a4f70@lunn.ch>
- <0b09b317-0a21-4b9f-aba9-0b9caa14c0d9@lunn.ch>
-In-Reply-To: <0b09b317-0a21-4b9f-aba9-0b9caa14c0d9@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-adiruleop-newscl: Rule Triggered
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAFE63859E6
+	for <netdev@vger.kernel.org>; Sun,  3 May 2026 18:43:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777833812; cv=pass; b=DimAGGJ8/h52/ylohQW75XXZ7+MYPMxOmFE2IORE+hVYFw4rvfuGWzNYwup/erIlmKPauMRMySiA9FwSn6hob3nlsj/Y2ljzkUqUV7M8spfQb6fCPRGPUh71Ihx1YasSyxJWirrQGAUJI0GpNiWDgIdgxM5+UxMXDzPZIi4WJ/U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777833812; c=relaxed/simple;
+	bh=f1hC6iEIXkPQ17P2Xw3+xWe4ppF+RMkkpnONRcne0aU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SQFiIquD5tlGGo0q2zLXq6LcRGGR7EFO962POKAJ+gcwq3A5yhlYEsMETakwY+sYAu3qHMH6ar9GMVqcoYsOhrsqLyixhsO25w4ReL+qseOzy1SZSxmue8EuVQfPnAmcty8o5vUfjfFzc8KSVBAW+Xkha7zRfvprnIhEDbETP2c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ulOLG/af; arc=pass smtp.client-ip=74.125.82.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-12c1a170a50so4257828c88.0
+        for <netdev@vger.kernel.org>; Sun, 03 May 2026 11:43:30 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777833810; cv=none;
+        d=google.com; s=arc-20240605;
+        b=HntcVCT2hmiPI2QQpKWTnSzf8I+WpznahLymWnX6LriG2G61RzlU0QViM3gKGQdIOB
+         dEwJTxV59ek0+V97Q7gn/QldI8HnUBijkLVBzGkL6xoAsol8U8a6EBAP+XFeihoxnfub
+         Dnb4cJQf1GE1OSemgDN4kQe+FQA2kLZqVAekupc7rrWkfWtU8mIKjkgy6sLHxz6Vz47N
+         9OvEf/0yEPD2p17cizXzQOyaqrhnxya8WsqZ6h0Q2H0d0hSkCGBKALBZeMIz1MXQCM0n
+         6Hh32ulGeXJgIqGVskCHxFdXRt5RGWQ/tk4dMxXGKe2ctxr07ud9selT23Y/9wQj1g/h
+         xuUA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=IfvuJm+0t0GcG8lJDQwtknZ/zPfDtgffOwkhX9UhnN0=;
+        fh=HF/9TwV850h/aNv+81pXws+sL1FusDTJ9uVmh/LX8YA=;
+        b=C5XdIPWhDpwsuN2yaprKKqjPlXZYyIwKg1ipldcBPq0G8sFNH/an3Ve+Ongz64CDoF
+         E25uQSbJLecACTSr4d+W327hNJiseNiYlynnbdBmItkeN7mJeXFYTP//6PZDFOZFce8L
+         uJJzaZjZH0Y2zpgRwzlMTX9ELJ9NF78ynyRwK9Deh/dNMunQ/z1CeHP07IRt9FApSA4w
+         3MsEd8DLlYShTVgWISkhiOE011++TKjToK6dHdiYgPT6RzMlbRqhVoYYgCLukViVL83u
+         TACx7gyFRt14VuAqHMeTpx4cW/uMPejkc+0LFl2Jne5Ol/savBighwnFL/OMgpjPVRTL
+         4IPw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777833810; x=1778438610; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IfvuJm+0t0GcG8lJDQwtknZ/zPfDtgffOwkhX9UhnN0=;
+        b=ulOLG/afKKKFuyyFWQUGIPTy9V8iPXfowHz05M45p169rIt30X2woVjXFSgCyfVoe4
+         ahrZIaIGoTKIKw0VDXLk9WoLV4vD2gDpL2Beh/Tf/49G7ah3mkLhxP0UR7UCU9yjPwYx
+         PD523kRy0FEu4jowA536JUkj7BTzujOBAzp2KkPCZYR0+Nwb4df363R+zd7shpT2rE0T
+         jomVb6x4jfJaPaWORyfTSPEDYuJ44hoPEKi36RZy01ZgWFf6aWgBXgjXAPHCV4T0RTqR
+         wbl00acXW/s6Zz5eR0O0o/qSTVIO2It6ktg/UDx9yTKLY0VemqjSXlI+tmKKZP0qsbTq
+         RMZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777833810; x=1778438610;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=IfvuJm+0t0GcG8lJDQwtknZ/zPfDtgffOwkhX9UhnN0=;
+        b=ljJVPHrH5Cw8doZ8WVeX/DWhHDVJ57F69DhLO0A//nefOv7iiXaNAX1jkVM3OADJhU
+         NJuMzqqyI1ntkRwc8FwlQmuILcQjD8wWSyvHq+3ot88e05O7K/PcRz+XyvvF9ptlY+a7
+         W+GNttdVLMuU0OGO/Lj2HJ24T4dPCdW5EFR41yUS5mb5OV0eikKbXBspfJpv8x5YGetx
+         ZmHpL8Z2ivbnFRNPuZ0S8hK7N+rfhhc+9pIrvBMD1IhmUIBK2Jav90oY9F6F3o+8rA8+
+         wRJyWW+inhtPWYIiN1npiodOSsM/gF/wfB/dJlfYWnzu8AtjGUTc5Ba/BJ5InHyZz1NY
+         DSog==
+X-Forwarded-Encrypted: i=1; AFNElJ9MGA4niSn/fZaJ2om6Z0gUzMVwkZzlMo7suDHNOw63OE4XfAJvgmXwfmzEit26icESXSdO1Uc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIjXwUhZD7LmTNCyunNS5krWdED9WYugy9ntsY1T7r5mPIk0pL
+	0kNMY7V9h/IhpjWMBh+jQ+Izq0AAXfRoILf3qNlYOW8bLXw3oFjOnOH6NVwgbZf8YGOVR8V6TxS
+	tWgCJHEpehsR1aHN4ZIQ2SRR75O9XF58cEgBLRuqg
+X-Gm-Gg: AeBDiev9KS6MUmI2JI2eQQmdRjM/MyB2JFGP/jXy8Q2PA2oBd8fzao06Beh9b4X//Au
+	o4/11Jk4qphmW8VmpXe7WgxK4h9Fi8kczy6zm8W8C1VxxNfJZ95MobXRhVSRHXD5r3XUF3Ys1tP
+	5Odil/WnW56iYSU/ssQ6GLpAURyF61YPCkFLuSqH9zNC2lm6MxL+99uklZBRwG78OmdNIvSrvo7
+	f89gS5OPYBR6TVvcQL8apl1ZDtADqyp8wsuhtjAPm0uxM79feuEZeigh/HLifjWxp+nq5ESogLD
+	gMjmzruM/Ag55R2TIgcgDT7CPGxhEb+krdmtM1c5E5TUxIn/38sANSmGnQnSP1bHt1eZOO92LVW
+	+XL20AEnLw04okwVSR7NnsGfpxHbRFx+I980LPeDmUuxd7s/9I4U09mh7F1vr6VN0brMS8cjt3A
+	==
+X-Received: by 2002:a05:7022:2218:b0:12d:de3f:f3ea with SMTP id
+ a92af1059eb24-12dfd885f96mr3108846c88.42.1777833809180; Sun, 03 May 2026
+ 11:43:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTAzMDIwNiBTYWx0ZWRfX0QD2cBPDm6w+
- o8JHB1kAGrYQoNLXkzO6kjwSTYmscGXQl3+6k1HVz++GfgX6WszOxiEhYqNO5Db9GRyf4Rj0ipG
- zL/eaeyoWs6Lr0NY2YDzri1Q3DPT/ZIWaGnGLtjavmaVZ3ZfuO328tp6pE21TSPZcLFAr+zqhvM
- jU1pG3NJeOiq0MmvMFQRBoo6FNNRGmTYenp5S+6/KRQuhk7es2DCtFohwZ8SVJ5ycEspvV+rIre
- qTsVJpsl0KTKpX2vP86cQ5clpm6rF2I8BkDSWypqjLV9u97cHafrkFYDJYjstIIk/y2oxTyscMF
- CAW7Y7gHBaFt1xDYrfSp2AW8kNW95NK4Oaem+jdhptYPPJaB1hF4HQSvE4MHS+rID5a4FN9vaso
- r7ln73eY5zykMrNGEWQB705EsNvP1dwAbiZor+WTtB9mIbp1aFgUvgR7lT5mFpPrRxAw/oZf1xy
- tCf2EQ77QcNNFYFD1zg==
-X-Authority-Analysis: v=2.4 cv=YcONIQRf c=1 sm=1 tr=0 ts=69f791ca cx=c_pps
- a=3WNzaoukacrqR9RwcOSAdA==:117 a=3WNzaoukacrqR9RwcOSAdA==:17
- a=xqWC_Br6kY4A:10 a=HAm-ab27MHsA:10 a=kj9zAlcOel0A:10 a=NGcC8JguVDcA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=0sLvza09kfJOxVLZPwjg:22 a=Z0pTeXoby7EwIRygza74:22
- a=gAnH3GRIAAAA:8 a=XYAwZIGsAAAA:8 a=J1Y8HTJGAAAA:8 a=1XWaLZrsAAAA:8
- a=VwQbUJbxAAAA:8 a=20KFwNOVAAAA:8 a=07d9gI8wAAAA:8 a=ag1SF4gXAAAA:8
- a=pGLkceISAAAA:8 a=PHq6YzTAAAAA:8 a=KytjqbFpDIeuf0yDoPcA:9 a=CjuIK1q_8ugA:10
- a=E8ToXWR_bxluHZ7gmE-Z:22 a=y1Q9-5lHfBjTkpIzbSAN:22 a=e2CUPOnPG4QKp8I52DXD:22
- a=Yupwre4RP9_Eg_Bd0iYG:22 a=ZKzU8r6zoKMcqsNulkmm:22
-X-Proofpoint-GUID: lkPE0x1i-LLgqNZl4hFLc_cClK2-IPfw
-X-Proofpoint-ORIG-GUID: lkPE0x1i-LLgqNZl4hFLc_cClK2-IPfw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-03_06,2026-04-30_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 clxscore=1011 malwarescore=0 spamscore=0 phishscore=0
- bulkscore=0 adultscore=0 impostorscore=0 priorityscore=1501 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2605030206
-X-Rspamd-Queue-Id: DFFBE4B6FA6
+References: <20260502031401.3557229-1-kuniyu@google.com> <20260502031401.3557229-2-kuniyu@google.com>
+In-Reply-To: <20260502031401.3557229-2-kuniyu@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Sun, 3 May 2026 11:43:17 -0700
+X-Gm-Features: AVHnY4KF8nbjgow-xptmbPmRMpR1rWhkHVXrdBqFkBX3dyaWaRHUByeHOfb6i2w
+Message-ID: <CAAVpQUCFu0r_h7x2QefnHgKhtpM6A7te4P-QuCxcw2wGxaNbMg@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next 01/15] udp_tunnel: Pass struct sock to udp_tunnel_sock_release().
+To: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 2767B4B7045
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[analog.com,quarantine];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[analog.com:s=DKIM];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-283650-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[analog.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Ciprian.Regus@analog.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-283651-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid]
 
+For Sashiko's review:
 
-
-> -----Original Message-----
-> From: Andrew Lunn <andrew@lunn.ch>
-> Sent: Sunday, May 3, 2026 6:16 PM
-> To: Regus, Ciprian <Ciprian.Regus@analog.com>
-> Cc: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>;
-> Andrew Lunn <andrew+netdev@lunn.ch>; David S. Miller
-> <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
-> Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Simon
-> Horman <horms@kernel.org>; Jonathan Corbet <corbet@lwn.net>; Shuah
-> Khan <skhan@linuxfoundation.org>; Heiner Kallweit
-> <hkallweit1@gmail.com>; Russell King <linux@armlinux.org.uk>; Rob Herring
-> <robh@kernel.org>; Krzysztof Kozlowski <krzk+dt@kernel.org>; Conor
-> Dooley <conor+dt@kernel.org>; netdev@vger.kernel.org; linux-
-> kernel@vger.kernel.org; linux-doc@vger.kernel.org;
-> devicetree@vger.kernel.org
-> Subject: Re: [PATCH net-next 4/5] net: ethernet: adi: Add a driver for th=
-e
-> ADIN1140 MACPHY
->=20
-> [External]
->=20
-> On Sun, May 03, 2026 at 05:36:13AM +0200, Andrew Lunn wrote:
-> > On Sun, May 03, 2026 at 02:24:53AM +0300, Ciprian Regus via B4 Relay
+On Fri, May 1, 2026 at 8:14=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.com=
 > wrote:
-> > > From: Ciprian Regus <ciprian.regus@analog.com>
-> > >
-> > > Add a driver for ADIN1140. The device is a 10BASE-T1S MAC-PHY
-> > > (integrated in the same package) that connects to a CPU over an SPI b=
-us,
-> > > and implements the Open Alliance TC6 protocol for control and frame
-> > > transfers. As such, this driver relies on oa_tc6 for the communicatio=
-n
-> > > with the device. The device has an alternative name (AD3306), so the
-> > > driver can be probed using one of the two compatible strings.
-> > >
-> > > For control transactions, ADIN1140 only implements the protected mode=
-.
-> > > The driver has a custom implementation for the mii_bus access methods
-> as a
-> > > workaround for hardware issues:
-> > >
-> > > 1. The OA TC6 standard defines the direct and indirect access modes f=
-or
-> > >    MDIO transactions. The ADIN1140 incorrectly advertises indirect mo=
-de
-> > >    only (supported capabilities register - 0x2, bit 9), while actuall=
-y
-> > >    implementing just the direct mode. We cannot rely on the CAP regis=
-ter
-> > >    to choose an access method (which oa_tc6 does by default, even
-> though
-> > >    it only implements the direct mode), so the driver has to use its
-> > >    own.
-> > > 2. The ADIN1140 cannot access the C22 register space of the internal
-> > >    PHY, while the PHY is busy receiving frames. If that happens, the
-> > >    CONFIG0 and CONFIG2 registers of the MAC will get corrupted and th=
-e
-> > >    data transfer will stop. Those two registers configure settings fo=
-r
-> > >    the transfer protocol between the MAC and host, so the value for s=
-ome
-> > >    of their subfields shouldn't be changed while the netdev is up.
->=20
-> This device is pretty broken. Has it been shipped to customers? Is
-> there going to be a new stepping of the silicon which is less broken?
-> A new device to replace this one?
+[...]
+> diff --git a/drivers/infiniband/sw/rxe/rxe_net.c b/drivers/infiniband/sw/=
+rxe/rxe_net.c
+> index 50a2cb5405e2..b454e4a17997 100644
+> --- a/drivers/infiniband/sw/rxe/rxe_net.c
+> +++ b/drivers/infiniband/sw/rxe/rxe_net.c
+> @@ -288,7 +288,7 @@ static struct socket *rxe_setup_udp_tunnel(struct net=
+ *net, __be16 port,
+>         return sock;
+>  }
+>
+> -static void rxe_release_udp_tunnel(struct socket *sk)
+> +static void rxe_release_udp_tunnel(struct sock *sk)
+>  {
+>         if (sk)
+>                 udp_tunnel_sock_release(sk);
+> @@ -636,7 +636,7 @@ static void rxe_sock_put(struct sock *sk,
+>         if (refcount_read(&sk->sk_refcnt) > SK_REF_FOR_TUNNEL) {
+>                 __sock_put(sk);
+>         } else {
+> -               rxe_release_udp_tunnel(sk->sk_socket);
+> +               rxe_release_udp_tunnel(sk);
+>                 sk =3D NULL;
+>                 set_sk(net, sk);
+>         }
 
-Hello Andrew,
+---8<---
+This isn't a bug introduced by this patch, but does this assume sk_refcnt
+exclusively tracks rxe endpoints?
+If the network stack holds a transient reference via sock_hold() when this =
+is
+called, it appears this would decrement the refcount and skip releasing the
+tunnel.
+Could this lead to a permanent socket leak when the network stack drops its
+reference?
+---8<---
 
-The device has been out for some time, but it's only now being made public.
-There are customers using it at the moment. I'm not aware of future revisio=
-ns
-of the silicon,  but I can ask further about that.
+Pre-existing issue.
+The socket management in RXE is fundamentally broken
+(vulnerable to concurrent newlink/dellink), and I'm working
+on a fix here.
+https://lore.kernel.org/all/0e05de34-79a0-415f-afb2-cc6c194ad87d@linux.dev/
 
->=20
-> 	Andrew
 
+> diff --git a/drivers/infiniband/sw/rxe/rxe_ns.c b/drivers/infiniband/sw/r=
+xe/rxe_ns.c
+> index 8b9d734229b2..64621c89f8bf 100644
+> --- a/drivers/infiniband/sw/rxe/rxe_ns.c
+> +++ b/drivers/infiniband/sw/rxe/rxe_ns.c
+> @@ -47,7 +47,7 @@ static void rxe_ns_exit(struct net *net)
+>         rcu_read_unlock();
+>         if (sk) {
+>                 rcu_assign_pointer(ns_sk->rxe_sk4, NULL);
+> -               udp_tunnel_sock_release(sk->sk_socket);
+> +               udp_tunnel_sock_release(sk);
+>         }
+>
+
+---8<---
+This isn't a bug introduced by this patch, but could dereferencing sk here
+cause a use-after-free?
+The sk pointer is obtained via rcu_dereference() but used after
+rcu_read_unlock() completes:
+rcu_read_lock();
+sk =3D rcu_dereference(ns_sk->rxe_sk4);
+rcu_read_unlock();
+If a concurrent thread drops the last reference to the socket right after t=
+he
+lock is released, could sk point to freed memory during the
+udp_tunnel_sock_release() call?
+---8<---
+
+Same RXE pre-existing issue.
+
+
+[...]
+> diff --git a/net/ipv4/fou_core.c b/net/ipv4/fou_core.c
+> index 5bae3cf7fe76..422f86291b42 100644
+> --- a/net/ipv4/fou_core.c
+> +++ b/net/ipv4/fou_core.c
+[...]
+> @@ -634,7 +631,7 @@ static int fou_create(struct net *net, struct fou_cfg=
+ *cfg,
+>  error:
+>         kfree(fou);
+>         if (sock)
+> -               udp_tunnel_sock_release(sock);
+> +               udp_tunnel_sock_release(sock->sk);
+>
+>         return err;
+>  }
+
+---8<---
+This isn't a bug introduced by this patch, but is there a use-after-free ri=
+sk
+in this error path?
+Because kfree(fou) is called before udp_tunnel_sock_release(), if a UDP pac=
+ket
+is received concurrently, could the network softirq invoke fou_udp_recv() a=
+nd
+access the freed fou object via rcu_dereference_sk_user_data(sk)?
+Should kfree(fou) be called after the release, or replaced with kfree_rcu()=
+?
+---8<---
+
+Pre-existing issue that I mentioned in patch 11 and
+orthogonal to this series.
+
+
+> diff --git a/net/ipv4/udp_tunnel_core.c b/net/ipv4/udp_tunnel_core.c
+> index b1f667c52cb2..1159a6a6fbb2 100644
+> --- a/net/ipv4/udp_tunnel_core.c
+> +++ b/net/ipv4/udp_tunnel_core.c
+> @@ -195,9 +195,11 @@ void udp_tunnel_xmit_skb(struct rtable *rt, struct s=
+ock *sk, struct sk_buff *skb
+>  }
+>  EXPORT_SYMBOL_GPL(udp_tunnel_xmit_skb);
+>
+> -void udp_tunnel_sock_release(struct socket *sock)
+> +void udp_tunnel_sock_release(struct sock *sk)
+>  {
+> -       rcu_assign_sk_user_data(sock->sk, NULL);
+> +       struct socket *sock =3D sk->sk_socket;
+> +
+> +       rcu_assign_sk_user_data(sk, NULL);
+>         synchronize_rcu();
+>         kernel_sock_shutdown(sock, SHUT_RDWR);
+>         sock_release(sock);
+
+---8<---
+Can kernel_sock_shutdown() cause a NULL pointer dereference here?
+---8<---
+
+No, this function is not supposed to be called more than once.
+Sashiko's example is due to broken RXE.
 
