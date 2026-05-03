@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-283559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283560-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kHg1CBf79mmcawIAu9opvQ
-	(envelope-from <netdev+bounces-283559-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 09:36:55 +0200
+	id +JgLCV379mmlawIAu9opvQ
+	(envelope-from <netdev+bounces-283560-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 09:38:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C62CD4B4BCE
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 09:36:54 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB7CE4B4C45
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 09:38:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 93D48300828C
-	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 07:36:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 949B73020A97
+	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 07:36:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6131839B484;
-	Sun,  3 May 2026 07:36:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AD333A9628;
+	Sun,  3 May 2026 07:36:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="X63WCVov"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Nd0BBP5q"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010043.outbound.protection.outlook.com [52.101.61.43])
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010011.outbound.protection.outlook.com [52.101.46.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160E621CC4F;
-	Sun,  3 May 2026 07:36:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8581346AD3;
+	Sun,  3 May 2026 07:36:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.11
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777793799; cv=fail; b=UAv4AFsHnm4GuAoTfLY84TnnC4VaNoIIvC0mkqVsK2jZCoB988QJBSAVY0WR6AjwhG0Dnpkd19AR++V8dSO/M5gN9PherDGD+mO1YTD2EaHC3M//Q2LRVxdEndCUbT7wm1Bg6wg501Jbxwo0LxwNXqDvOkH7zRQS04UAgSMcvZc=
+	t=1777793800; cv=fail; b=XULxiyQdsEspEo08FnY71dYU9JEwDn1lpk+nHi2cK1ksrng7NDyT85J1D0AKQQoSuV2M6BgVGYcsWDAhYmSv17kUTBzXEdn26vFTBgvJPVdhvXWwjZg2sEz7kRwSMbeWbrMdbpmXslTSUZtbX/G+7N23FBx2aoDBAYWLhh6/TU4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777793799; c=relaxed/simple;
-	bh=JL6JIMfGscfi8zA2lgrbnp2T4Z99rfDaI/y3bNsqk08=;
+	s=arc-20240116; t=1777793800; c=relaxed/simple;
+	bh=7Ea4YC/XfIWk2yomo87QxykNlk5pG3iNXNkuxokJG5Q=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JlDcocDt+vi2HsW11bkgwcaORJt0VBT2ZaLj/czdKNjeJ9yYlXY7niNUps9qMAV2TMXkQ8ixe9+EQYjTgBQhYAg/JvmmKdVkwjDc2ZHJyllNLhhm6o8w2v56rLBR8UjQZWJFr7I7rxjiLhhxNsNnQ7vnG2NmUNgOaHJXwaCcNOU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=X63WCVov; arc=fail smtp.client-ip=52.101.61.43
+	 MIME-Version:Content-Type; b=KO5YVLpeGRw6kR6RB4tqXy6BOQScO1U2Se2Y/vPkMP7m1XbBQHuenEELZWxUEbPuw65qXKPleMCZM8hox+E93FNxz4AUga2kPHRapIrEI+/FfAt9PD8cAGEMv30t4bTOxaBXY70uh1JEVI5Ap2RfqdiSti4D7ZfdR8dmuHnKeWI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Nd0BBP5q; arc=fail smtp.client-ip=52.101.46.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GQRYeUXe8gaTE93twy7s9k+u2dDU7yW6n/ROr/JlkOiQdF07rON2xEhrSeTjLPy+lqi+ylg90sDk9XTy4PffZn3tuZBgCd5t15gMm+SmoEAeCUibgs7L+Gwpswun/3WXrfDyZ+ZKOLvfIop07eyctDXzUn1NkjOguWUfuScWvmq7qPMNmNuMLzp15Ndid6Syq5M4vQ3q7135IYfk9uZi4Qvn/ONaLi7vlpxjhcmRJVE7oMylCpal10CQ+QxcgWTxxTcee46yUAhnHMkuix6yblEkk/bN23+4o81/6Isc974s5IsrpgbhQewBPaHM5Eh7Bg6qD0Hcmm5cLAHwjcIsYQ==
+ b=bNzWGVX/gxRVbkBHTZkjjy6gLF87G8Dch0gT8W0ktLFpFcYbDcpo2Fc/U8AGo2UbSMRui6P4n3/L9+PeeQiXBUrwHaz8H19d5RpTAv/ZsnYm5TNx4BbNtU53ChvG+RpcbnoY78Tzr7z1YgyhDeeR2BoiqPljU3X834XtOIVwB/eSQkWbFA38A24jM2Y3tUBUHKMvUKvamtn9cB/eOBh/IOJhBMamP6fZWnBznbFlEthsHc7tt35uERtvt/k7bJ5ccLbkVYd1CVbUFJWlhgMLvtL+oJgxzGAtBNkXvnraK6V+3aVwl6bKtWw006ZXc9BhNTk6JnksjHKbydccPeYgbg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=J12PKuDpQG+BTi9fnVCl3WUbxi47ISJyEYVAG2YSvI8=;
- b=eTb+WW0MC0avlBr3YOSFO+21l2JNDx2OaHqT7H8+3Ybx4F1p2CaVcT2/MrrTxxiqIX1LiXA0IEgaDCcQ8ZtNsTh3vLqZbsCsn8Fx6LJdZLPvY13ULRB4aPq3xVDgyGigkJkVjQCyZRD7mBPI0jCjtt6E6Ht6dtCCV7wIXMS8Y8LaDP98DwiIEOMIEAW0B/YKUwsg1vwMJo9GMMZ+xskv2N0slDPQLC4jb4AT7jVqqny3KrYgbr7PtaQTdh1VUOLNUQgbIj2PJczDhdpSEIaiMzdzVMQm7L1LIsuMGQW86PepRg3ztCi3Olp2in9Zs7N8mbSb5o2F4Hn32UQbwSEutA==
+ bh=n9i7ZLcebWWXdoxwmuU0xOjIHKYW8+2MP/jPDMzU/6Q=;
+ b=iiw3akiHpgzRRYoj/gFh8pS+EESSjVvU3s8lBausZDvjQBXr0SdPzKH4yTLnT6vmikF83sTfyJvsE7YWhTWAKvj50V0CbErufc22MVxnrY1yPXf8UYkxqmV5meULjTtvUU/KuNU6PFlkpQqE76y75eJrtVEgZnRzsa3yf6OPH2v+RYvgNA37cPDr9BbnAOfvBVq/fgcGCkIt+isrAYyoHcwGhch4xM/bea1NmAAjQQTkeQpxWbPFml5/aPJPOw3hiZmlt7bicst2MVp31X+RwzVQNQKBnF34QOV1PCH2zvgJ3HYAfFWh5xF/e839laIG6ttXXRUWobtViRKWKRSKlQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -48,18 +48,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J12PKuDpQG+BTi9fnVCl3WUbxi47ISJyEYVAG2YSvI8=;
- b=X63WCVovqeedvMCcPMlNRBKw/NuvGNIDWC4g01Mw3JDNHsJBJkI05muEiBNmCMxsWthMKKVXpKbr8f+2nJLZ6BSdSa0BguaJ6wUr1YW1z5dG6A0jgugvboKOaZJvYDbvubiR8UvfkqYnjeBsxHpaJ0w70Vf4LJ2cSymf2XLSHHNp6hlq794wOdbTeCyW5t0ZboKvMcelh1GMuVV9wlYUWKtO0+dUP2yA/NUF6ChkCYm9EnOi8O45R5Q3Ab3SQVUHwV15qAxywvhcvWv4Xm3ZuFg0+T1HD6XYdkCotKNqWkjDxiPQb6uZVgakw1nZXF0GScCIQngaylvbm1QeD4ZB2w==
-Received: from MW4PR04CA0178.namprd04.prod.outlook.com (2603:10b6:303:85::33)
- by DS2PR12MB9589.namprd12.prod.outlook.com (2603:10b6:8:279::7) with
+ bh=n9i7ZLcebWWXdoxwmuU0xOjIHKYW8+2MP/jPDMzU/6Q=;
+ b=Nd0BBP5qVRvv6nQZC3FPHt75FiJWF6aCKgM9FMbVY0ZA7vUA/FlsCE9zM1gwBKiYUswB0bWuSzSoHPVUjGiq86wpsLGp7QM4D1RW03ccxltqpEBhGsatxcJR5cWrXYrio42Bhh3tEfK2S9L1nLuH/GI1Mh/wzZpbUbexp0qQSZoyN4/HfODe05ZMSOfTWTUBug0h/yCzphXmmhgIHdH4NnVyE1QdXMjOPpl7HqjuBVLJr1iVqJ2Y7fGeqgE5dckCNCo8GjkZwdpefULkHA4yRmxBCeV2Fom7bGCH7bt+Q3uyhDSInTD9v0XQH037W+xD8o7YokyA1ky7Vvf/uzBTkA==
+Received: from PH7P221CA0076.NAMP221.PROD.OUTLOOK.COM (2603:10b6:510:328::32)
+ by BY5PR12MB4308.namprd12.prod.outlook.com (2603:10b6:a03:20a::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.23; Sun, 3 May
- 2026 07:36:27 +0000
-Received: from MW1PEPF0001615F.namprd21.prod.outlook.com
- (2603:10b6:303:85:cafe::12) by MW4PR04CA0178.outlook.office365.com
- (2603:10b6:303:85::33) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9870.24 via Frontend Transport; Sun,
- 3 May 2026 07:36:27 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Sun, 3 May
+ 2026 07:36:33 +0000
+Received: from MW1PEPF0001615B.namprd21.prod.outlook.com
+ (2603:10b6:510:328:cafe::ad) by PH7P221CA0076.outlook.office365.com
+ (2603:10b6:510:328::32) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9870.25 via Frontend Transport; Sun,
+ 3 May 2026 07:36:33 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -67,17 +67,17 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- MW1PEPF0001615F.mail.protection.outlook.com (10.167.249.90) with Microsoft
+ MW1PEPF0001615B.mail.protection.outlook.com (10.167.249.86) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.25.1 via Frontend Transport; Sun, 3 May 2026 07:36:27 +0000
+ 15.21.25.1 via Frontend Transport; Sun, 3 May 2026 07:36:33 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 3 May
- 2026 00:36:12 -0700
+ 2026 00:36:19 -0700
 Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.37) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Sun, 3 May 2026 00:36:05 -0700
+ 15.2.2562.20; Sun, 3 May 2026 00:36:12 -0700
 From: Danielle Ratson <danieller@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <donald.hunter@gmail.com>, <kuba@kernel.org>, <davem@davemloft.net>,
@@ -90,9 +90,9 @@ CC: <donald.hunter@gmail.com>, <kuba@kernel.org>, <davem@davemloft.net>,
 	<johannes.wiesboeck@aisec.fraunhofer.de>, <petrm@nvidia.com>,
 	<linux-kernel@vger.kernel.org>, <bridge@lists.linux.dev>,
 	<linux-kselftest@vger.kernel.org>, Danielle Ratson <danieller@nvidia.com>
-Subject: [PATCH net-next 2/6] bridge: Add internal flags for neigh_forward_grat
-Date: Sun, 3 May 2026 10:35:28 +0300
-Message-ID: <20260503073532.2138165-3-danieller@nvidia.com>
+Subject: [PATCH net-next 3/6] bridge: Add selective forwarding of gratuitous neighbor announcements
+Date: Sun, 3 May 2026 10:35:29 +0300
+Message-ID: <20260503073532.2138165-4-danieller@nvidia.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260503073532.2138165-1-danieller@nvidia.com>
 References: <20260503073532.2138165-1-danieller@nvidia.com>
@@ -108,31 +108,31 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW1PEPF0001615F:EE_|DS2PR12MB9589:EE_
-X-MS-Office365-Filtering-Correlation-Id: 462ddf72-ff4d-4e3c-bbeb-08dea8e6afb9
+X-MS-TrafficTypeDiagnostic: MW1PEPF0001615B:EE_|BY5PR12MB4308:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0b248815-31a7-4c67-6529-08dea8e6b2f0
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|82310400026|1800799024|376014|7416014|18002099003|22082099003|56012099003;
+	BCL:0;ARA:13230040|36860700016|376014|7416014|82310400026|1800799024|18002099003|22082099003|56012099003;
 X-Microsoft-Antispam-Message-Info:
-	b6XcLfqiovdinORbz3P3ALMvqwkfejcaX+aqymrgu4dxt2S2mBV/Oo+aWJlQvKV6ZgOVXHevGqPF2glTiTCKKG9IW77SniQFTydAWykW9Bn6yJYnEoyWVsbXs71tMwb/JbdlKp0Ju1apF5Nzw9mUNnXzXjFT+9ZfPN2FbwduvvdExLjNZat+HBMgsYfnLg71wB7VkG9U1nl978K8y7qzPntvGpq85pMdo/k1aulwu+EsRDlF7vgf5UC7IFNqz1xIjkqcr2O/Xkvp0ynXgSvzPAAKl5bwFd9nfxfnP5uNzxpn9Irj80oXWTnFGJyn512eeZD9vdrvZU8juerfIiDB7AoXrPaN2rB1edYC46sA6er2kdJUK0oqf7phdCwMNHyvXkfs98+UOHpU9rUE/ihMoTGoYT1tuSdiBg2TleUcYo5nCpwjBCli6jJ9nHrT8dQD23l61n8zcdNKZghCODbsm6A0QlW8fHAQ8WaWJ6Qz58S25lUcK+2Yxjnb/pixYmCTtRTfTkqYov1m+YR7aBPHomLD0qEl3sG6SAcioLJcyb796WC+E9r/7qOnBlyqkLbq3aczmcKrCWhX7CzXtwpq60Wql39dorCw5VGP0P7/7vqjlQH9UuRwqfb48OTG+L2QuNl/sHo47jVNrq19YAl+b3mNxwKWciF5PUQNZd1ZXtIEvBhFwioQZA5v/iNcgiJBgZ//AzBxzb8vXX0l8aZxvYpWsK7LhD2NHE7nJJGR3uc=
+	dbp8Y/eSnT8KPrRTt/OcoK/WxotCKCVApMrAvEfCglCyqE+uwMyzJfIN7jafCTtb6QbqbTHZTBbeYFaFZtzhdZ8VPqyEghOIyY3aPKMaXvQb88gdnwIkNfFt/3gaImByVN85NVSQwKuNxr7CS9QWJHEKlZBikbxm8A2LJvmMU3C6qdLKnNEmfrgfsG7ZXYtAdLfOb/FPVtLBoXXR2I3Rzbhgd+r+y/FngP8uuu9v9vNq5HViVgrjnPHodpi/CyqS+SnSAeGoP+PwIvC+lsykKw8Cc3seiAxid14xo7hI+TmEEEIMaycXRgdI9+RAc+laCxt/j9uFpiDWb/2Fn6ZFeCmcQE+BXGNtxmJSlIA7SmuIM1TjjWxOAj+URpO7umTGShTK45pBzVxfBlnnELDu6uPeaTQs7MHW/egUf5nASq6ZCWj0v1TG5kfuuZfel1WEM9oPdqL2sr1pzjK3BXulI3AET6xtl+2u4tCTUXsPEkzy7BkEvIXySWQ3DEzSMbB6wfzB/tTw3FkXnYcO87/eA2youQ1cEQ6lherv+exChZKrAIJuNJoz/zwR3mL0coHOE7ImvlM5BQfdsGB6J+QnelBY7BTE+EB49VCn8sHp8dBR8JrPVaiMtMSI3AIAglLae+1IoeZ1C7yytbb1QTX/ILAw3plDEi+/IygUUSlt3SsLo/WTz8DcpIzBn5wDklPn77BoTeBS0QNQoMmM1g/xyr1pi61CVvCUQb8GBFTbanQ=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(82310400026)(1800799024)(376014)(7416014)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(376014)(7416014)(82310400026)(1800799024)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	8oKhTsLameKE6En2iUbGBAjScLJXLoUNejsI3O5sD4yEcJ/6i2aYS65M39GAjHDXpi4UyInzwnJdQ4g+UV2eOJdCzS3P/0cZgjPGfWsKiWKbXTgoSL6BvlyPnnn5p+7h2zc2umQRsGUlVxx/yuR4dpW8SG+c0+kzlV/ravolBMsz3AUKp2Lr5PD/T78AQddZ7h47l6HGznRov5wEsqtHBDwbBodQgOrDtjKXTaN6OzVENoMA4ecQtn1woeNoxUQ//i8qFQQSDAdCsu+BQBYGLjyACLPlFBUH2EcmTTt+5S0K4ihK+80JdGaXWK7TMco86vYS7xW7Ntz9aWq4BfOK754HraBL8NdwD8o14oT36RTw0GaJdTKxTjYZj1kg27u9go5iX4ddY9jqy0cb6WxDnjmHar5S4n/LPdoAUUan4z5LyTUa0ybyvFyqYvYD3N8F
+	OeBCM+uGdvzGcx4QtKnwnfMIUHyNqGAzfklM71jyP4KGrNFRMuPwZnO6euDvpUjs/TPjLIonWzHL5baLd1hwomHLJDIVHSGtVmaWDYI3manCtpp7gTZfrh1xMc2CF6/ptnHBLE8LlmxMLilbdNnAP9sM//989mi+lp8yeZLOXf9HFQ9Ckp+msusYefJFAbwK0+oBUQf/Bj8uitVHbNfTKYsp8YxRT0rnSwWWbjZh3FPQMoELCD4BE8eiiPbgxkp88QTJ0j9lglNzrsTh9yi8OIX8qjDLyDP79lGmEP91yhXkAkLdNWRWLsQjzzWeT1WsDnGzQrqZ/nhFMydHcorVMvHDKlilQtc0vcDyKUMz4AbwzPcn9IWy8ygXuz9xVvN8ohahK5wNijAJQ1QYTwU2qrwLt/OmXINfCgrGoo39ET+mYCW9NcGRxDiviRTmZp9L
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 May 2026 07:36:27.6286
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 May 2026 07:36:33.0267
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 462ddf72-ff4d-4e3c-bbeb-08dea8e6afb9
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0b248815-31a7-4c67-6529-08dea8e6b2f0
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	MW1PEPF0001615F.namprd21.prod.outlook.com
+	MW1PEPF0001615B.namprd21.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS2PR12MB9589
-X-Rspamd-Queue-Id: C62CD4B4BCE
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4308
+X-Rspamd-Queue-Id: BB7CE4B4C45
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [2.84 / 15.00];
@@ -141,7 +141,7 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -149,7 +149,7 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,blackwall.org,nvidia.com,lunn.ch,fiberby.net,iogearbox.net,queasysnail.net,mcwilliam.dev,aisec.fraunhofer.de,vger.kernel.org,lists.linux.dev];
 	RCPT_COUNT_TWELVE(0.00)[28];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-283559-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283560-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[Nvidia.com:+];
@@ -158,52 +158,152 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[danieller@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:mid,nvidia.com:email];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,nvidia.com:email,Nvidia.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.994];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.991];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[8]
 
-Add internal flags for the neigh_forward_grat feature:
+The existing neighbor suppression unconditionally suppresses gratuitous
+ARPs and unsolicited Neighbor Advertisements, which prevents fast
+mobility of hosts between VTEPs.
 
-- BR_NEIGH_FORWARD_GRAT: Port-level flag
-- BR_VLFLAG_NEIGH_FORWARD_GRAT_ENABLED: Per-VLAN flag
+Add the neigh_forward_grat option to allow selective control of gratuitous
+neighbor announcements. When neigh_suppress is enabled but
+neigh_forward_grat is disabled (default), gratuitous announcements are
+suppressed. When neigh_forward_grat is enabled, gratuitous announcements
+are forwarded while regular neighbor discovery remains suppressed.
 
-These will be used to control whether gratuitous ARP and unsolicited NA
-packets are forwarded when neighbor suppression is enabled.
+The implementation provides per-output-port control by:
+1. Adding a 'grat_arp' flag to BR_INPUT_SKB_CB to mark gratuitous ARPs and
+   unsolicited NAs.
+2. Setting both grat_arp and proxyarp_replied flags in
+   br_do_proxy_suppress_arp() and br_do_suppress_nd() when gratuitous
+   packets are detected.
+3. Checking neigh_forward_grat per output port during flooding:
+   - For gratuitous ARPs/NAs: suppress unless the output port has
+     neigh_forward_grat enabled.
+   - For regular ARPs/NDs: maintain existing behavior.
+
+This allows gratuitous announcements from any input port to be selectively
+forwarded based on each output port's individual neigh_forward_grat
+setting, enabling gratuitous neighbor announcements to be flooded to the
+VXLAN fabric.
+
+Regular neighbor discovery (ARP requests, NS queries, solicited replies)
+remains controlled by neigh_suppress and is unaffected.
 
 Signed-off-by: Danielle Ratson <danieller@nvidia.com>
-Reviewed-by: Petr Machata <petrm@nvidia.com>
 Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 ---
- include/linux/if_bridge.h | 1 +
- net/bridge/br_private.h   | 1 +
- 2 files changed, 2 insertions(+)
+ net/bridge/br_arp_nd_proxy.c | 22 ++++++++++++++++++++++
+ net/bridge/br_forward.c      | 15 +++++++++++----
+ net/bridge/br_private.h      |  2 ++
+ 3 files changed, 35 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/if_bridge.h b/include/linux/if_bridge.h
-index c5fe3b2a53e8..ec9ffea1e46e 100644
---- a/include/linux/if_bridge.h
-+++ b/include/linux/if_bridge.h
-@@ -61,6 +61,7 @@ struct br_ip_list {
- #define BR_PORT_LOCKED		BIT(21)
- #define BR_PORT_MAB		BIT(22)
- #define BR_NEIGH_VLAN_SUPPRESS	BIT(23)
-+#define BR_NEIGH_FORWARD_GRAT	BIT(24)
+diff --git a/net/bridge/br_arp_nd_proxy.c b/net/bridge/br_arp_nd_proxy.c
+index 3205346f298c..5263232278b4 100644
+--- a/net/bridge/br_arp_nd_proxy.c
++++ b/net/bridge/br_arp_nd_proxy.c
+@@ -132,6 +132,7 @@ void br_do_proxy_suppress_arp(struct sk_buff *skb, struct net_bridge *br,
+ 	__be32 sip, tip;
  
- #define BR_DEFAULT_AGEING_TIME	(300 * HZ)
+ 	BR_INPUT_SKB_CB(skb)->proxyarp_replied = 0;
++	BR_INPUT_SKB_CB(skb)->grat_arp = 0;
  
+ 	if ((dev->flags & IFF_NOARP) ||
+ 	    !pskb_may_pull(skb, arp_hdr_len(dev)))
+@@ -167,6 +168,7 @@ void br_do_proxy_suppress_arp(struct sk_buff *skb, struct net_bridge *br,
+ 		    sip == tip) {
+ 			/* prevent flooding to neigh suppress ports */
+ 			BR_INPUT_SKB_CB(skb)->proxyarp_replied = 1;
++			BR_INPUT_SKB_CB(skb)->grat_arp = 1;
+ 			return;
+ 		}
+ 	}
+@@ -419,6 +421,7 @@ void br_do_suppress_nd(struct sk_buff *skb, struct net_bridge *br,
+ 	struct neighbour *n;
+ 
+ 	BR_INPUT_SKB_CB(skb)->proxyarp_replied = 0;
++	BR_INPUT_SKB_CB(skb)->grat_arp = 0;
+ 
+ 	if (br_is_neigh_suppress_enabled(p, vid))
+ 		return;
+@@ -431,6 +434,7 @@ void br_do_suppress_nd(struct sk_buff *skb, struct net_bridge *br,
+ 	    !msg->icmph.icmp6_solicited) {
+ 		/* prevent flooding to neigh suppress ports */
+ 		BR_INPUT_SKB_CB(skb)->proxyarp_replied = 1;
++		BR_INPUT_SKB_CB(skb)->grat_arp = 1;
+ 		return;
+ 	}
+ 
+@@ -522,3 +526,21 @@ bool br_is_neigh_suppress_enabled(const struct net_bridge_port *p, u16 vid)
+ 		return !!(p->flags & BR_NEIGH_SUPPRESS);
+ 	}
+ }
++
++bool br_is_neigh_forward_grat_enabled(const struct net_bridge_port *p, u16 vid)
++{
++	if (!vid)
++		return !!(p->flags & BR_NEIGH_FORWARD_GRAT);
++
++	if (p->flags & BR_NEIGH_VLAN_SUPPRESS) {
++		struct net_bridge_vlan_group *vg = nbp_vlan_group_rcu(p);
++		struct net_bridge_vlan *v;
++
++		v = br_vlan_find(vg, vid);
++		if (!v)
++			return false;
++		return !!(v->priv_flags & BR_VLFLAG_NEIGH_FORWARD_GRAT_ENABLED);
++	} else {
++		return !!(p->flags & BR_NEIGH_FORWARD_GRAT);
++	}
++}
+diff --git a/net/bridge/br_forward.c b/net/bridge/br_forward.c
+index dea09096ad0f..4a77d0743374 100644
+--- a/net/bridge/br_forward.c
++++ b/net/bridge/br_forward.c
+@@ -230,10 +230,17 @@ void br_flood(struct net_bridge *br, struct sk_buff *skb,
+ 		/* Do not flood to ports that enable proxy ARP */
+ 		if (p->flags & BR_PROXYARP)
+ 			continue;
+-		if (BR_INPUT_SKB_CB(skb)->proxyarp_replied &&
+-		    ((p->flags & BR_PROXYARP_WIFI) ||
+-		     br_is_neigh_suppress_enabled(p, vid)))
+-			continue;
++		if (BR_INPUT_SKB_CB(skb)->proxyarp_replied) {
++			if (p->flags & BR_PROXYARP_WIFI)
++				continue;
++			/* For gratuitous ARPs/NAs, check neigh_forward_grat.
++			 * For regular ARPs/NDs, check only neigh_suppress.
++			 */
++			if (br_is_neigh_suppress_enabled(p, vid) &&
++			    (!BR_INPUT_SKB_CB(skb)->grat_arp ||
++			     !br_is_neigh_forward_grat_enabled(p, vid)))
++				continue;
++		}
+ 
+ 		prev = maybe_deliver(prev, p, skb, local_orig);
+ 		if (IS_ERR(prev)) {
 diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
-index 31e317a3529c..677cd5d68dc7 100644
+index 677cd5d68dc7..377fd0933409 100644
 --- a/net/bridge/br_private.h
 +++ b/net/bridge/br_private.h
-@@ -187,6 +187,7 @@ enum {
- 	BR_VLFLAG_GLOBAL_MCAST_ENABLED = BIT(3),
- 	BR_VLFLAG_NEIGH_SUPPRESS_ENABLED = BIT(4),
- 	BR_VLFLAG_TAGGING_BY_SWITCHDEV = BIT(5),
-+	BR_VLFLAG_NEIGH_FORWARD_GRAT_ENABLED = BIT(6),
- };
- 
- /**
+@@ -605,6 +605,7 @@ struct br_input_skb_cb {
+ 	u8 proxyarp_replied:1;
+ 	u8 src_port_isolated:1;
+ 	u8 promisc:1;
++	u8 grat_arp:1;
+ #ifdef CONFIG_BRIDGE_VLAN_FILTERING
+ 	u8 vlan_filtered:1;
+ #endif
+@@ -2366,4 +2367,5 @@ void br_do_suppress_nd(struct sk_buff *skb, struct net_bridge *br,
+ 		       u16 vid, struct net_bridge_port *p, struct nd_msg *msg);
+ struct nd_msg *br_is_nd_neigh_msg(const struct sk_buff *skb, struct nd_msg *m);
+ bool br_is_neigh_suppress_enabled(const struct net_bridge_port *p, u16 vid);
++bool br_is_neigh_forward_grat_enabled(const struct net_bridge_port *p, u16 vid);
+ #endif
 -- 
 2.51.0
 
