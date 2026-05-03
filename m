@@ -1,91 +1,92 @@
-Return-Path: <netdev+bounces-283622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283623-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EMVhI6lt92ndhgIAu9opvQ
-	(envelope-from <netdev+bounces-283622-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 17:45:45 +0200
+	id +EldAbxt92ndhgIAu9opvQ
+	(envelope-from <netdev+bounces-283623-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 17:46:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 089D74B64B4
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 17:45:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D4724B64BD
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 17:46:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0088A300DF46
-	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 15:45:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D0D033012EB1
+	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 15:45:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C5537E2ED;
-	Sun,  3 May 2026 15:45:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF2C26F46F;
+	Sun,  3 May 2026 15:45:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P1S1oMeA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AhLzJEgj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD9D37F8D2
-	for <netdev@vger.kernel.org>; Sun,  3 May 2026 15:45:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC37D2773DE
+	for <netdev@vger.kernel.org>; Sun,  3 May 2026 15:45:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777823128; cv=none; b=FgydvB+Rjs4kLaQmg6D5foayX7rn08p7XU6xFRS6ILYI9OmIUlFs6C2tJIA5TUuuH3QWuCrH8EYPgBzJutB9Ofobqc1l+Z/yQJvn5WVu/noL93tOy9+yXxCO9/Mq+Rml0hUO5E0/TNRvUhYdTPOorZelCD6e5rcZT6l4MnEGmoY=
+	t=1777823130; cv=none; b=oq1XYC9dZ014n0dfq9QOxSkZth6SR+qU9UHtqfLi2L96YJ68Ia1pvvmhvX+zMq0anzCT5fBZzDoaCW0hyRs726gilTZ1mFDUw1O42zTO/1qRd0yRDJ+6/L7nbN0hUqkgUYWc/YwFxUTfNUOHr5eRmWEAuQ9+Ii8oQQlWONAyu1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777823128; c=relaxed/simple;
-	bh=OPjsz1jGKcVX1fXkIdGnfGN/KyXB+Pxn7dgh78NmvUM=;
+	s=arc-20240116; t=1777823130; c=relaxed/simple;
+	bh=rnesv0SgeZTFqi3HVfIs2hw372k7XZPoM10wH0+cwUk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rABDiM7/PZhp9UBLuczS77v8E4R+AaeTXG0AJGqGLW13eOS5QeSl7I2mQvRnDB+y7x+rXgT2knBaG5QSO/4uaTaDo1Wig4xhBA+HOgkmXkNjUcbkbzabNl1aVXp9IsKPz6NaBA9/ELFw+DlU7C/a68jTTyA//yVLxbP9Q0Np8Mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P1S1oMeA; arc=none smtp.client-ip=209.85.216.50
+	 MIME-Version; b=EtwRVRXI6QLXDDiUFXUWC89iekSm+RypJbbAR3E5NHnIWm4FKY7/mJZUU9p4XGtegvZbSy6R6IlYjfe4h4gUO5Y03AxCE5Zf/pRnSHNWdhIOCuc6b9+ilyMdIAfE0LzN81w9yw0EBzDSx1ge/pk5nCInIcviibbruWQT44vOdl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AhLzJEgj; arc=none smtp.client-ip=209.85.216.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-35fb0bb27e7so2104312a91.1
-        for <netdev@vger.kernel.org>; Sun, 03 May 2026 08:45:26 -0700 (PDT)
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-3567e2b4159so2588639a91.0
+        for <netdev@vger.kernel.org>; Sun, 03 May 2026 08:45:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777823126; x=1778427926; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1777823128; x=1778427928; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ffXicW+s1cKBNHB47hunsEtf/NKICiphlYlpye9diJo=;
-        b=P1S1oMeAacGM+NlZ2MwUDuQy66aKT5Na1DH59Qk3a3hJNOTb0T9V9S4OpMe2kD8T6m
-         eAaJztFJezw24ZVxz+BaLLuSD4hUJIHY9oNh6173aJw8ERfaZGxAtEJw74eMoj506Wxa
-         HqJoG2lw0z8/RQ+h9+OLORnNbdjB2Fagk1YTye7hilmpfGXZVBZm+VDahXG0rP8ssXlA
-         e5UHh16z8yXW5p01qI6+eYZNvGRTF1CraKyxmoBlR6mBoCTcNpZSOCGqnic7TtllmDTQ
-         62KgTIcAzF+kRyOiU1TWuXFXe9t5ohZUbeUkElNTsEZlIAPv3fgNrskNMyDKQrFK5EGg
-         FmvQ==
+        bh=pIByDSKgg9nD4ZRSxgFQ1rZvp0JC+zZjR3GdaVZQpK4=;
+        b=AhLzJEgjno+3vvWAVXR6Hl8gavBxhfdYPhNb9m5sSsenY1Bz7v9tUtvML5tjTxSSJR
+         nYxx5Y5yf5oWkyD2w9MVRglKegeb/PMN1a0ODyeF0kLSvdIDWyw4JKBsDs4wbMn6qBuV
+         Z6TJA6no90e939T614d1Lhf3e6zIn816pSNzFskQZiKmiRXKQ2ksLeOvp47W5CCs3H5d
+         RhiskiTBBO8W4MTUu21mACe3N9gDFQh7RDcseyReiZEQpEkGNWZkiNg2/QBW9oUvzt+T
+         3otc/0lsmvvvBOO74oVMUnatRKezSRdolDNl5eUuzRfSsyvcKoP3npoHjxeui3Ny3JAi
+         M2uQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777823126; x=1778427926;
+        d=1e100.net; s=20251104; t=1777823128; x=1778427928;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ffXicW+s1cKBNHB47hunsEtf/NKICiphlYlpye9diJo=;
-        b=Rb36sUu/5oF72FtcgzzAnnR5z0Tcp0MC8vS7tqN+EaBpgTmvVcW4mguUL81Ba2TLTT
-         koJ/+V7cq7NQ8NQJVyfh8MydSV/RQQxVPfk1eJs4+TtM5r7HUGOl8szMLB4luu5LmBHk
-         fU6wEFDSZOW62p6O5uanojKxKYQIUx+/e2SFOVSI7x/nvgPTyvFq4d43UaHZ1cfDBaDD
-         rAOE/yA2lkwqfNlstvuvkRTH10HWJiw4Udzhj1CSMmBO5U3Cr5wEo7myTR5Bw5PuSRIF
-         aJSijeMzCi5fnNpGQsZs/SqA5IR0NTaI5vZs0hTU9aW2JzSGDGoNnwPdkmU7gkFJpW7S
-         S8RA==
-X-Gm-Message-State: AOJu0YwiPHPVdDgCUmufdp9zjiXjrMuLHzm1Jssv9f3akJhCPH5Nk0ER
-	RjfQrb884ZZojjWTRU3odcrTQ0y8t7Csj0RYzNERzmWLA10dqlCakXcW
-X-Gm-Gg: AeBDiest+A8az30pGjrdtnhaX8+wwpl1DNLy3tBKpessK9x0gTtrs/V/s6DDdQDKIzD
-	NQXd8fruShn6LGSemwK3u/r0Apduw8hqTLQh/8aSc+NcfzoStN4XGCohd6D7JnNswVWL/P5u8EG
-	EFc41ZRdWe8R+Cl96jNg7w2ImQDC9xClezD+zjzPAm0I+tItVwDazm0nJoe/dqA2SGcypCiuf2x
-	5X9kvzRSQ3PcVTPcAkppzmGBTrTQbiEp5sdEnTJoBsuI1RE8FtuALrcwCNL1eYkTZQjuyru4Ix7
-	1ubvrS1+jgkwQ/wG2BQ/xNeXMULjYA5/MYtooVYGJIDQndfAdZgKpaMl/gH/haJVquI9LrojigO
-	NWtvFkLY4+wkMiM0goCj7bChb5vvEzFZdUle/v+IwWmZQ56GV3j0pnQCOdoE2bvJzqYkOe1AeUk
-	KJQYwSIM/gabKPveNqxVuHO9OiImk=
-X-Received: by 2002:a05:6a20:1582:b0:3a1:90ef:7e31 with SMTP id adf61e73a8af0-3a7f1f9bad6mr7018485637.54.1777823126239;
-        Sun, 03 May 2026 08:45:26 -0700 (PDT)
+        bh=pIByDSKgg9nD4ZRSxgFQ1rZvp0JC+zZjR3GdaVZQpK4=;
+        b=VvKtTAG9VyGvB88GZifLFMHcwSlVJ8wEW37uAcnKj9c51+Xu3wFVWVUWLsm4RzJKaN
+         t6mSEZ4PWtoFTWE5YYD+7+9uaqRM68CT9NwNpjaxDGkLKTplxllub1lOa3Ehhd6jLlpb
+         9YARD9f8e8oMr+AtRi59AYcTw3urnYJCWZvQMT+pUFBcbiFWBL8hU2aEvBtXLBaDaHk6
+         5YQQXCLoSudQrb4Kknh+R68t0jY5Pfiq8LZhFKZMLoqlrEfnZ/5XkcGsLVYoUqXe9hzr
+         ulwcRkKqEsUMexAzf0YfDdrJP/p9dArWU3P/sV6kqC2Wy0SH9xyijFqv4YsfIHX4rFTA
+         Cd9g==
+X-Gm-Message-State: AOJu0YxfKLIeCs6zo1xnpe6w1MNHzeOyTUrN/osZLU8dWTAqIkOkv90Z
+	qd1EJYiIu2f6Rbe6iviwW0pdensRf9RKW3RCW0rFIhdYymKLbwaniUs0
+X-Gm-Gg: AeBDietaEWwU7EKmdU9MhIlqQoqiqC/SCRm03X94D4yesUFtts0MVUFxNgITTgOziEh
+	Njsnk+5votnlM7P4XE1O1O8mBFx7mpmYx3p9v2bQdDvnSO6SvVbs53nwSZL63+81V/GajAW46YT
+	XwK0wKCNYyS5fivfC7MtUUgzNUfPa5f518k19jGQyOQ+lUrXMjr2MUcHvCCa9kvIEesuAyzsIuy
+	ild+fyUI/0onpKRTZO0cizd5npsJP9R+CC1gx1WcJQnYxkWTWdRcxt5V0dRBsPe5VnBIglujez0
+	Y0NseBM6aTeOI5SJTIjZ+27sq7TJQOErEuuy4IebkJIhvZKnSxdvPuqKeHRMIz3IXSzHaPbci4m
+	LMJqkQ8hyer0OxNYcBfdRxBZJc5SeQ5bV++i/cNHFjuI6RPD9HaVPFNZqROKSWdKkFzmdS8tbTG
+	+GDz/D0wpr1F1vN1QwJzu2QnO9JrU=
+X-Received: by 2002:a05:6a20:938e:b0:3a2:e8f1:b873 with SMTP id adf61e73a8af0-3a7f1d346d8mr5721062637.36.1777823127944;
+        Sun, 03 May 2026 08:45:27 -0700 (PDT)
 Received: from dev ([163.43.103.131])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c7ffbc6ec67sm7207421a12.17.2026.05.03.08.45.24
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c7ffbc6ec67sm7207421a12.17.2026.05.03.08.45.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 May 2026 08:45:25 -0700 (PDT)
+        Sun, 03 May 2026 08:45:27 -0700 (PDT)
 From: Yuya Kusakabe <yuya.kusakabe@gmail.com>
 To: stephen@networkplumber.org,
 	dsahern@kernel.org
 Cc: netdev@vger.kernel.org,
 	Yuya Kusakabe <yuya.kusakabe@gmail.com>
-Subject: [PATCH iproute2-next v1 RESEND 1/6] seg6: add support for the End.MAP behavior
-Date: Mon,  4 May 2026 00:45:05 +0900
-Message-ID: <20260503154510.912576-2-yuya.kusakabe@gmail.com>
+Subject: [PATCH iproute2-next v1 RESEND 2/6] seg6: add support for the End.M.GTP4.E behavior
+Date: Mon,  4 May 2026 00:45:06 +0900
+Message-ID: <20260503154510.912576-3-yuya.kusakabe@gmail.com>
 X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20260503154510.912576-1-yuya.kusakabe@gmail.com>
+In-Reply-To: <20260503154510.912576-2-yuya.kusakabe@gmail.com>
 References: <20260503154510.912576-1-yuya.kusakabe@gmail.com>
+ <20260503154510.912576-2-yuya.kusakabe@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,7 +94,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 089D74B64B4
+X-Rspamd-Queue-Id: 4D4724B64BD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
@@ -102,19 +103,19 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-283622-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283623-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[yuyakusakabe@gmail.com,netdev@vger.kernel.org];
@@ -127,110 +128,398 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[ietf.org:url,end.map:url,end.am:url,end.as:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,end.bm:url]
 
-Add support for the End.MAP behavior, which swaps the IPv6 destination
-address with the next SID without consuming the SRH.  The new SID is
-specified using the existing nh6 attribute.
+Add support for the End.M.GTP4.E behavior, which translates SRv6
+traffic into IPv4/GTP-U.  Four new keywords are introduced:
 
-A small per-action attribute validator is also introduced so that
-invalid keyword combinations fail at the userspace layer instead of
-returning an opaque kernel EINVAL.  Subsequent SRv6 Mobile behaviors
-extend the validator with their own keyword bookkeeping.
+  src                  IPv6 source-address template
+  v4_mask_len          IPv4 DA portion of the SID, in bits (1..32)
+  v6_src_prefix_len    Source UPF Prefix length P in the IPv6 SA
+                       template (1..127, defaults to 64); requires
+                       P + v4_mask_len <= 128
+  pdu_session_type     GTP-U PDU Session Type (downlink|dl|uplink|ul
+                       or 0..15)
+
+The route prefix length is propagated through lwt_parse_encap() so
+that route_prefix_len + v4_mask_len + 40 <= 128 can be enforced at
+parse time.
 
 Example:
-ip -6 r a 2001:db8:f::/64 encap seg6local action End.MAP \
-    nh6 2001:db8:1::beef dev sr0
+ip -6 r a 2001:db8:1::/56 encap seg6local action End.M.GTP4.E \
+    src 2001:db8::1 v4_mask_len 32 v6_src_prefix_len 64 \
+    pdu_session_type ul dev sr0
 
 Link: https://datatracker.ietf.org/doc/html/rfc9433
 
 Signed-off-by: Yuya Kusakabe <yuya.kusakabe@gmail.com>
 ---
- include/uapi/linux/seg6_local.h |  2 ++
- ip/iproute.c                    |  3 ++-
- ip/iproute_lwtunnel.c           | 13 +++++++++++++
- man/man8/ip-route.8.in          |  9 +++++++++
- 4 files changed, 26 insertions(+), 1 deletion(-)
+ include/uapi/linux/seg6_local.h |   6 ++
+ ip/ip_common.h                  |   2 +-
+ ip/ipnexthop.c                  |   2 +-
+ ip/iproute.c                    |  11 ++-
+ ip/iproute_lwtunnel.c           | 159 +++++++++++++++++++++++++++++++-
+ man/man8/ip-route.8.in          |  34 +++++++
+ 6 files changed, 203 insertions(+), 11 deletions(-)
 
 diff --git a/include/uapi/linux/seg6_local.h b/include/uapi/linux/seg6_local.h
-index 6e71d97f6f44..1678db71e8e7 100644
+index 1678db71e8e7..8bb3cdc3a649 100644
 --- a/include/uapi/linux/seg6_local.h
 +++ b/include/uapi/linux/seg6_local.h
-@@ -67,6 +67,8 @@ enum {
- 	SEG6_LOCAL_ACTION_END_BPF	= 15,
- 	/* decap and lookup of DA in v4 or v6 table */
+@@ -29,6 +29,10 @@ enum {
+ 	SEG6_LOCAL_VRFTABLE,
+ 	SEG6_LOCAL_COUNTERS,
+ 	SEG6_LOCAL_FLAVORS,
++	SEG6_LOCAL_MOBILE_SRC_ADDR,
++	SEG6_LOCAL_MOBILE_V4_MASK_LEN,
++	SEG6_LOCAL_MOBILE_PDU_TYPE,
++	SEG6_LOCAL_MOBILE_V6_SRC_PREFIX_LEN,
+ 	__SEG6_LOCAL_MAX,
+ };
+ #define SEG6_LOCAL_MAX (__SEG6_LOCAL_MAX - 1)
+@@ -69,6 +73,8 @@ enum {
  	SEG6_LOCAL_ACTION_END_DT46	= 16,
-+	/* swap DA with new SID, leave SRH untouched (RFC 9433 Section 6.2) */
-+	SEG6_LOCAL_ACTION_END_MAP	= 17,
+ 	/* swap DA with new SID, leave SRH untouched (RFC 9433 Section 6.2) */
+ 	SEG6_LOCAL_ACTION_END_MAP	= 17,
++	/* SRv6 to IPv4/GTP-U encap (RFC 9433 Section 6.6) */
++	SEG6_LOCAL_ACTION_END_M_GTP4_E	= 18,
  
  	__SEG6_LOCAL_ACTION_MAX,
  };
+diff --git a/ip/ip_common.h b/ip/ip_common.h
+index 3f55ea336b37..f9a8fd6e576c 100644
+--- a/ip/ip_common.h
++++ b/ip/ip_common.h
+@@ -153,7 +153,7 @@ extern const struct ipstats_stat_desc ipstats_stat_desc_xstats_slave_bond_group;
+ 
+ /* iproute_lwtunnel.c */
+ int lwt_parse_encap(struct rtattr *rta, size_t len, int *argcp, char ***argvp,
+-		    int encap_attr, int encap_type_attr);
++		    int encap_attr, int encap_type_attr, __u8 dst_len);
+ void lwt_print_encap(FILE *fp, struct rtattr *encap_type, struct rtattr *encap);
+ 
+ /* iplink_xdp.c */
+diff --git a/ip/ipnexthop.c b/ip/ipnexthop.c
+index 14b525aa0d67..aaa75680b585 100644
+--- a/ip/ipnexthop.c
++++ b/ip/ipnexthop.c
+@@ -1100,7 +1100,7 @@ static int ipnh_modify(int cmd, unsigned int flags, int argc, char **argv)
+ 			rta->rta_len = RTA_LENGTH(0);
+ 
+ 			lwt_parse_encap(rta, sizeof(buf), &argc, &argv,
+-					NHA_ENCAP, NHA_ENCAP_TYPE);
++					NHA_ENCAP, NHA_ENCAP_TYPE, 0);
+ 
+ 			if (rta->rta_len > RTA_LENGTH(0)) {
+ 				addraw_l(&req.n, 1024, RTA_DATA(rta),
 diff --git a/ip/iproute.c b/ip/iproute.c
-index 5b9e7ac1134a..61394847018f 100644
+index 61394847018f..628bccc28074 100644
 --- a/ip/iproute.c
 +++ b/ip/iproute.c
-@@ -105,7 +105,8 @@ static void usage(void)
- 		"SEG6LOCAL := action ACTION [ OPTIONS ] [ count ]\n"
+@@ -106,10 +106,12 @@ static void usage(void)
  		"ACTION := { End | End.X | End.T | End.DX2 | End.DX6 | End.DX4 |\n"
  		"            End.DT6 | End.DT4 | End.DT46 | End.B6 | End.B6.Encaps |\n"
--		"            End.BM | End.S | End.AS | End.AM | End.BPF }\n"
-+		"            End.BM | End.S | End.AS | End.AM | End.BPF |\n"
-+		"            End.MAP }\n"
+ 		"            End.BM | End.S | End.AS | End.AM | End.BPF |\n"
+-		"            End.MAP }\n"
++		"            End.MAP | End.M.GTP4.E }\n"
  		"OPTIONS := OPTION [ OPTIONS ]\n"
  		"OPTION := { flavors FLAVORS | srh SEG6HDR | nh4 ADDR | nh6 ADDR | iif DEV | oif DEV |\n"
- 		"            table TABLEID | vrftable TABLEID | endpoint PROGNAME }\n"
+-		"            table TABLEID | vrftable TABLEID | endpoint PROGNAME }\n"
++		"            table TABLEID | vrftable TABLEID | endpoint PROGNAME | MOBILE_OPTION }\n"
++		"MOBILE_OPTION := { src ADDR | v4_mask_len BITS | v6_src_prefix_len BITS |\n"
++		"                   pdu_type { downlink | dl | uplink | ul | 0..15 } }\n"
+ 		"FLAVORS := { FLAVOR[,FLAVOR] }\n"
+ 		"FLAVOR := { psp | usp | usd | next-csid }\n"
+ 		"IOAM6HDR := trace prealloc type IOAM6_TRACE_TYPE ns IOAM6_NAMESPACE size IOAM6_TRACE_SIZE\n"
+@@ -1076,7 +1078,7 @@ static int parse_one_nh(struct nlmsghdr *n, struct rtmsg *r,
+ 			int old_len = rta->rta_len;
+ 
+ 			if (lwt_parse_encap(rta, len, &argc, &argv,
+-					    RTA_ENCAP, RTA_ENCAP_TYPE))
++					    RTA_ENCAP, RTA_ENCAP_TYPE, 0))
+ 				return -1;
+ 			rtnh->rtnh_len += rta->rta_len - old_len;
+ 		} else if (strcmp(*argv, "as") == 0) {
+@@ -1523,7 +1525,8 @@ static int iproute_modify(int cmd, unsigned int flags, int argc, char **argv)
+ 			rta->rta_len = RTA_LENGTH(0);
+ 
+ 			lwt_parse_encap(rta, sizeof(buf), &argc, &argv,
+-					RTA_ENCAP, RTA_ENCAP_TYPE);
++					RTA_ENCAP, RTA_ENCAP_TYPE,
++					req.r.rtm_dst_len);
+ 
+ 			if (rta->rta_len > RTA_LENGTH(0))
+ 				addraw_l(&req.n, 1024
 diff --git a/ip/iproute_lwtunnel.c b/ip/iproute_lwtunnel.c
-index 00b4f7565be6..15c0077a4566 100644
+index 15c0077a4566..1a92b7d94e88 100644
 --- a/ip/iproute_lwtunnel.c
 +++ b/ip/iproute_lwtunnel.c
-@@ -405,6 +405,7 @@ static const char *seg6_action_names[SEG6_LOCAL_ACTION_MAX + 1] = {
- 	[SEG6_LOCAL_ACTION_END_AM]		= "End.AM",
+@@ -406,6 +406,7 @@ static const char *seg6_action_names[SEG6_LOCAL_ACTION_MAX + 1] = {
  	[SEG6_LOCAL_ACTION_END_BPF]		= "End.BPF",
  	[SEG6_LOCAL_ACTION_END_DT46]		= "End.DT46",
-+	[SEG6_LOCAL_ACTION_END_MAP]		= "End.MAP",
+ 	[SEG6_LOCAL_ACTION_END_MAP]		= "End.MAP",
++	[SEG6_LOCAL_ACTION_END_M_GTP4_E]	= "End.M.GTP4.E",
  };
  
  static const char *format_action_type(int action)
-@@ -578,6 +579,16 @@ static void print_encap_seg6local(FILE *fp, struct rtattr *encap)
+@@ -577,15 +578,92 @@ static void print_encap_seg6local(FILE *fp, struct rtattr *encap)
+ 
+ 	if (tb[SEG6_LOCAL_FLAVORS])
  		print_seg6_local_flavors(fp, tb[SEG6_LOCAL_FLAVORS]);
++
++	if (tb[SEG6_LOCAL_MOBILE_SRC_ADDR])
++		print_string(PRINT_ANY, "src", "src %s ",
++			     rt_addr_n2a_rta(AF_INET6,
++					     tb[SEG6_LOCAL_MOBILE_SRC_ADDR]));
++
++	if (tb[SEG6_LOCAL_MOBILE_V4_MASK_LEN])
++		print_uint(PRINT_ANY, "v4_mask_len", "v4_mask_len %u ",
++			   rta_getattr_u8(tb[SEG6_LOCAL_MOBILE_V4_MASK_LEN]));
++
++	if (tb[SEG6_LOCAL_MOBILE_V6_SRC_PREFIX_LEN])
++		print_uint(PRINT_ANY, "v6_src_prefix_len",
++			   "v6_src_prefix_len %u ",
++			   rta_getattr_u8(tb[SEG6_LOCAL_MOBILE_V6_SRC_PREFIX_LEN]));
++
++	if (tb[SEG6_LOCAL_MOBILE_PDU_TYPE]) {
++		__u8 t = rta_getattr_u8(tb[SEG6_LOCAL_MOBILE_PDU_TYPE]);
++		const char *name = NULL;
++
++		switch (t) {
++		case 0:
++			name = "downlink";
++			break;
++		case 1:
++			name = "uplink";
++			break;
++		}
++
++		if (name)
++			print_string(PRINT_ANY, "pdu_type",
++				     "pdu_type %s ", name);
++		else
++			print_uint(PRINT_ANY, "pdu_type",
++				   "pdu_type %u ", t);
++	}
  }
  
-+static void seg6local_action_check_attrs(int action, int nh6_ok)
-+{
-+	switch (action) {
-+	case SEG6_LOCAL_ACTION_END_MAP:
-+		if (!nh6_ok)
-+			invarg("End.MAP requires \"nh6\"\n", "");
-+		break;
-+	}
-+}
-+
- static void print_encap_mpls(FILE *fp, struct rtattr *encap)
+-static void seg6local_action_check_attrs(int action, int nh6_ok)
++static void seg6local_action_check_attrs(int action, int srh_ok, int nh6_ok,
++					 int mobile_src_ok,
++					 int mobile_v4mask_ok,
++					 int mobile_v6src_plen_ok,
++					 __u8 v4_mask_len,
++					 __u8 v6_src_prefix_len,
++					 __u8 dst_len)
  {
- 	struct rtattr *tb[MPLS_IPTUNNEL_MAX+1];
-@@ -1571,6 +1582,8 @@ static int parse_encap_seg6local(struct rtattr *rta, size_t len, int *argcp,
+ 	switch (action) {
+ 	case SEG6_LOCAL_ACTION_END_MAP:
+ 		if (!nh6_ok)
+ 			invarg("End.MAP requires \"nh6\"\n", "");
+ 		break;
++	case SEG6_LOCAL_ACTION_END_M_GTP4_E:
++		if (!mobile_src_ok || !mobile_v4mask_ok)
++			invarg("End.M.GTP4.E requires \"src\" and \"v4_mask_len\"\n",
++			       "");
++		if (srh_ok)
++			invarg("End.M.GTP4.E does not accept \"srh\"\n", "");
++		/*
++		 * The IPv6 source-address layout per RFC 9433 Section 6.6
++		 * Figure 10 packs the Source UPF Prefix (P bits) followed
++		 * by the IPv4 SA portion (v4_mask_len bits) and padding
++		 * inside the 128-bit IPv6 SA, so P + v4_mask_len <= 128.
++		 */
++		if (mobile_v6src_plen_ok &&
++		    (unsigned int)v6_src_prefix_len +
++		    (unsigned int)v4_mask_len > 128)
++			invarg("End.M.GTP4.E requires \"v6_src_prefix_len\" +"
++			       " \"v4_mask_len\" <= 128\n", "");
++		/*
++		 * The egress SID layout (Locator | IPv4 DA | Args.Mob.Session)
++		 * must fit in the 128-bit IPv6 destination address.  The
++		 * locator length here is the route prefix length the SID is
++		 * installed under.  dst_len == 0 means the caller did not
++		 * propagate the route prefix (e.g. nexthop encap), in which
++		 * case we leave the check to the kernel at install time.
++		 */
++		if (dst_len &&
++		    (unsigned int)dst_len + (unsigned int)v4_mask_len + 40 > 128)
++			invarg("End.M.GTP4.E requires route_prefix_len +"
++			       " \"v4_mask_len\" + 40 <= 128\n", "");
++		break;
++	default:
++		if (mobile_src_ok || mobile_v4mask_ok || mobile_v6src_plen_ok)
++			invarg("\"src\", \"v4_mask_len\", and"
++			       " \"v6_src_prefix_len\" are only valid for"
++			       " SRv6 Mobile User Plane actions\n", "");
++		break;
+ 	}
+ }
+ 
+@@ -1456,11 +1534,13 @@ static int seg6local_parse_flavors(struct rtattr *rta, size_t len,
+ }
+ 
+ static int parse_encap_seg6local(struct rtattr *rta, size_t len, int *argcp,
+-				 char ***argvp)
++				 char ***argvp, __u8 dst_len)
+ {
+ 	int nh4_ok = 0, nh6_ok = 0, iif_ok = 0, oif_ok = 0, flavors_ok = 0;
+ 	int segs_ok = 0, hmac_ok = 0, table_ok = 0, vrftable_ok = 0;
+ 	int action_ok = 0, srh_ok = 0, bpf_ok = 0, counters_ok = 0;
++	int mobile_src_ok = 0, mobile_v4mask_ok = 0, mobile_pdusess_ok = 0;
++	int mobile_v6src_plen_ok = 0;
+ 	__u32 action = 0, table, vrftable, iif, oif;
+ 	struct ipv6_sr_hdr *srh;
+ 	char **argv = *argvp;
+@@ -1468,6 +1548,7 @@ static int parse_encap_seg6local(struct rtattr *rta, size_t len, int *argcp,
+ 	char segbuf[1024];
+ 	inet_prefix addr;
+ 	__u32 hmac = 0;
++	__u8 v4_mask_len = 0, v6_src_prefix_len = 0;
+ 	int ret = 0;
+ 
+ 	while (argc > 0) {
+@@ -1569,6 +1650,72 @@ static int parse_encap_seg6local(struct rtattr *rta, size_t len, int *argcp,
+ 			if (lwt_parse_bpf(rta, len, &argc, &argv, SEG6_LOCAL_BPF,
+ 			    BPF_PROG_TYPE_LWT_SEG6LOCAL) < 0)
+ 				exit(-1);
++		} else if (strcmp(*argv, "src") == 0) {
++			/*
++			 * Mobile User Plane "src" template; scoped to the
++			 * seg6local block and unrelated to the top-level
++			 * "src" prefsrc keyword.
++			 */
++			NEXT_ARG();
++			if (mobile_src_ok++)
++				duparg2("src", *argv);
++			get_addr(&addr, *argv, AF_INET6);
++			ret = rta_addattr_l(rta, len, SEG6_LOCAL_MOBILE_SRC_ADDR,
++					    &addr.data, addr.bytelen);
++		} else if (strcmp(*argv, "v4_mask_len") == 0) {
++			NEXT_ARG();
++			if (mobile_v4mask_ok++)
++				duparg2("v4_mask_len", *argv);
++			if (get_u8(&v4_mask_len, *argv, 0) ||
++			    v4_mask_len == 0 || v4_mask_len > 32)
++				invarg("\"v4_mask_len\" must be in the range 1..32\n",
++				       *argv);
++			ret = rta_addattr8(rta, len, SEG6_LOCAL_MOBILE_V4_MASK_LEN,
++					   v4_mask_len);
++		} else if (strcmp(*argv, "v6_src_prefix_len") == 0) {
++			NEXT_ARG();
++			if (mobile_v6src_plen_ok++)
++				duparg2("v6_src_prefix_len", *argv);
++			/*
++			 * Per RFC 9433 Section 6.6 Figure 10, the IPv6 SA is
++			 * "Source UPF Prefix (P bits) | IPv4 SA (b bits) |
++			 * padding (128 - P - b)".  P must be a non-zero
++			 * multiple of 8 up to 128; the combined check
++			 * (P + v4_mask_len <= 128) is enforced per-action.
++			 */
++			if (get_u8(&v6_src_prefix_len, *argv, 0) ||
++			    v6_src_prefix_len == 0 ||
++			    v6_src_prefix_len > 127)
++				invarg("\"v6_src_prefix_len\" must be in the range 1..127\n",
++				       *argv);
++			ret = rta_addattr8(rta, len,
++					   SEG6_LOCAL_MOBILE_V6_SRC_PREFIX_LEN,
++					   v6_src_prefix_len);
++		} else if (strcmp(*argv, "pdu_type") == 0) {
++			__u8 psc_type;
++
++			NEXT_ARG();
++			if (mobile_pdusess_ok++)
++				duparg2("pdu_type", *argv);
++			/*
++			 * 3GPP TS 38.415 PDU Session Type is a 4-bit field; the
++			 * kernel mirrors that range (0..15).  0 = DL, 1 = UL.
++			 */
++			if (strcmp(*argv, "downlink") == 0 ||
++			    strcmp(*argv, "dl") == 0) {
++				psc_type = 0;
++			} else if (strcmp(*argv, "uplink") == 0 ||
++				   strcmp(*argv, "ul") == 0) {
++				psc_type = 1;
++			} else if (get_u8(&psc_type, *argv, 0) ||
++				   psc_type > 15) {
++				invarg("invalid \"pdu_type\" value"
++				       " (must be downlink|dl|uplink|ul"
++				       " or 0..15)\n", *argv);
++			}
++			ret = rta_addattr8(rta, len,
++					   SEG6_LOCAL_MOBILE_PDU_TYPE,
++					   psc_type);
+ 		} else {
+ 			break;
+ 		}
+@@ -1582,7 +1729,9 @@ static int parse_encap_seg6local(struct rtattr *rta, size_t len, int *argcp,
  		exit(-1);
  	}
  
-+	seg6local_action_check_attrs(action, nh6_ok);
-+
+-	seg6local_action_check_attrs(action, nh6_ok);
++	seg6local_action_check_attrs(action, srh_ok, nh6_ok, mobile_src_ok,
++				     mobile_v4mask_ok, mobile_v6src_plen_ok,
++				     v4_mask_len, v6_src_prefix_len, dst_len);
+ 
  	if (srh_ok) {
  		int srhlen;
+@@ -2289,7 +2438,7 @@ static int parse_encap_xfrm(struct rtattr *rta, size_t len,
+ }
  
+ int lwt_parse_encap(struct rtattr *rta, size_t len, int *argcp, char ***argvp,
+-		    int encap_attr, int encap_type_attr)
++		    int encap_attr, int encap_type_attr, __u8 dst_len)
+ {
+ 	struct rtattr *nest;
+ 	int argc = *argcp;
+@@ -2328,7 +2477,7 @@ int lwt_parse_encap(struct rtattr *rta, size_t len, int *argcp, char ***argvp,
+ 		ret = parse_encap_seg6(rta, len, &argc, &argv);
+ 		break;
+ 	case LWTUNNEL_ENCAP_SEG6_LOCAL:
+-		ret = parse_encap_seg6local(rta, len, &argc, &argv);
++		ret = parse_encap_seg6local(rta, len, &argc, &argv, dst_len);
+ 		break;
+ 	case LWTUNNEL_ENCAP_RPL:
+ 		ret = parse_encap_rpl(rta, len, &argc, &argv);
 diff --git a/man/man8/ip-route.8.in b/man/man8/ip-route.8.in
-index 9f29fd436f59..c0b1e87ad022 100644
+index c0b1e87ad022..a878d4375f03 100644
 --- a/man/man8/ip-route.8.in
 +++ b/man/man8/ip-route.8.in
-@@ -1024,6 +1024,15 @@ followed by the specified SRH. The destination address of the outer IPv6
- header is set to the first segment of the new SRH. The source
- address is set as described in \fBip-sr\fR(8).
+@@ -1033,6 +1033,40 @@ with the configured next SID
+ and forward via the IPv6 FIB. The Segment Routing Header is left
+ untouched.
  
-+.B End.MAP nh6
++.B End.M.GTP4.E src
 +.IR ADDRESS
-+- SRv6 Mobile User Plane End.MAP behavior (RFC 9433 Section 6.2).
-+Decrement the IPv6 Hop Limit, replace the IPv6 destination address
-+with the configured next SID
-+.RI ( nh6 ),
-+and forward via the IPv6 FIB. The Segment Routing Header is left
-+untouched.
++.B v4_mask_len
++.IR BITS
++.RB [ "v6_src_prefix_len"
++.IR BITS ]
++.RB [ "pdu_type"
++.IR DIR ]
++- SRv6 Mobile User Plane End.M.GTP4.E behavior (RFC 9433 Section 6.6).
++At the SR egress gateway, the matching SRv6 packet is converted into
++an IPv4/UDP/GTP-U packet for delivery to a legacy IPv4-attached gNB or
++eNB.  The IPv6 destination address of the matching SID encodes
++.IR Locator " | " "IPv4 DA" " (\fBv4_mask_len\fR bits) | "
++.IR "Args.Mob.Session" " (40 bits, RFC 9433 Section 6.1)" ,
++and the IPv6 source address is built from
++.B src
++as
++.IR "Source UPF Prefix" " (\fBv6_src_prefix_len\fR bits) | "
++.IR "IPv4 SA" " (\fBv4_mask_len\fR bits) | padding" .
++.B v4_mask_len
++must be in 1..32 and
++.B v6_src_prefix_len
++in 1..127 (default 64); the route prefix length plus
++.BR v4_mask_len " + 40"
++and
++.BR v6_src_prefix_len " + " v4_mask_len
++must each fit in 128 bits.
++.B pdu_type
++.RB ( downlink | dl | uplink | ul " or " 0..15 )
++forces a GTP-U PDU Session Container (3GPP TS 38.415) with the given
++PDU Type; when omitted no Container is inserted, so 5G N3 deployments
++must set it explicitly.
++The action only accepts packets with Segments Left = 0 or no SRH.
 +
  .B Flavors parameters
  
