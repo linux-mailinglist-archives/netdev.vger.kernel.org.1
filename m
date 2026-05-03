@@ -1,161 +1,153 @@
-Return-Path: <netdev+bounces-283573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283574-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cJmpI8EH92mfbQIAu9opvQ
-	(envelope-from <netdev+bounces-283573-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 10:30:57 +0200
+	id 2BqmLywI92mfbQIAu9opvQ
+	(envelope-from <netdev+bounces-283574-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 10:32:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB2154B4E27
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 10:30:56 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55B854B4E3F
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 10:32:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E97DE3006B3C
-	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 08:30:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 59594300383E
+	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 08:32:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831A12DCBFC;
-	Sun,  3 May 2026 08:30:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB19A3AC0C5;
+	Sun,  3 May 2026 08:32:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="a4wIEfje"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rexion.ai header.i=@rexion.ai header.b="j94Khmym"
 X-Original-To: netdev@vger.kernel.org
-Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from out-06.smtp.spacemail.com (out-06.smtp.spacemail.com [66.29.159.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E029175A7B
-	for <netdev@vger.kernel.org>; Sun,  3 May 2026 08:30:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C7C273D8D;
+	Sun,  3 May 2026 08:32:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.29.159.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777797054; cv=none; b=YPcOThqbylMRBYy5CNaREjfl32kO8yWZBv9bozIdbVf38HLsgkwDJ7r2vGNvcbDLeRoN0/5mwpqKWH41sQcw8MFaB6k8oCjxAauiiMHzlSwYcZMsm1kS3l+VmXjbVh4X677VCJfuwCWlA8SRyd+fWAzuRYFMfqwwMtL4kvZCGio=
+	t=1777797159; cv=none; b=AB15X73zvLxaVcR4Gd6nT4FB1z9lBzgs2Gtd/Xp1uSeL0UWsu7oaAOau/363qcNde/J+YGzT3w+3wWELw+fFrfiS2tbQNWDggtji86W+a9aEzh3Ql7KCm51TcGfYdNu5gAPjC4DwdvsR8nw5qEzsPmEXbe+mJCdgFeTmbnU974k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777797054; c=relaxed/simple;
-	bh=xuy7E00c+ImwnU7UKGCuTUi+YywSoQjFOGhNjkdHvk8=;
-	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
-	 References:Date:Message-Id; b=Q3N/G2fLjLyuIL21imRxO5Hfg3iI0a/fSscy2x6XbUtsMZrwm/wRaSQl0El5YLAEGnNzB3txPAYSAKASJsB5A9/6BPSceHQNGGBDjJJkE5QhQKD02I4EcLQE1YHk0JE89+PtpuHvqnTdcoBRJFU42TzeqFZOjNEHYuS5iRx4Dgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=a4wIEfje; arc=none smtp.client-ip=213.160.73.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
-Received: by dvalin.narfation.org (Postfix) id C2B501FF83;
-	Sun, 03 May 2026 08:30:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
-	s=20121; t=1777797050;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XTOQamUfUbzlHhKbOnpJ+ZSbw2FCajFGk+eYIoB+kqs=;
-	b=a4wIEfje0aR1NmV8+qvaul+10jw+p6Qq2p7sxcpFG37RG2VWQJv9F9Wfwg6PJNumOsYRad
-	K+QysshPv8yBOPeyUqCqGgyGdPV3sqKjiegx2ttyHUWgaI5NTM0YYXwej2mwdULH2hdtC5
-	teUqyomPjWNsGAEvRVoXtl5VRoVUKP8=
+	s=arc-20240116; t=1777797159; c=relaxed/simple;
+	bh=S3bdgBPGI79X4uU8E8SKCYpMjmNwlQs0xu68QWji2lc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=vFqnLkDDOc5DrXSzeHLP9CmVJVCGSpjG5tWzsPr4BJTw0vgHzKq5p9CvaXU+sliSFUTdT69iR3k0VyEwZ14fbbgqhcltgsot991tys53a/V8/Zv+Vf1Y7S9BMf9OHiFODqsk4g7aF2ZdKSNDAvwr30ABU9R13Me4iMmbXCrDna0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rexion.ai; spf=pass smtp.mailfrom=rexion.ai; dkim=fail (0-bit key) header.d=rexion.ai header.i=@rexion.ai header.b=j94Khmym reason="key not found in DNS"; arc=none smtp.client-ip=66.29.159.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rexion.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rexion.ai
+Received: from Kyren (unknown [49.207.224.37])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.spacemail.com (Postfix) with ESMTPSA id 4g7dLh4k4Kz8sc7;
+	Sun, 03 May 2026 08:32:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rexion.ai;
+	s=spacemail; t=1777797152;
+	bh=+2SH8ZXr4rVy0HR2sYavhqA8v3/knTQ2qsNiVVXoX/c=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=j94KhmymVkpe292xwwUtIaInwZteiKw6ZoinBYUhY18MQqhYdsiv0jly0FRGWchg6
+	 10+fxaGfR9XTi7HnDyD6LHFf3lvnPI3rCV4kNuwNTi+h/GIrxC6BlON8Koe8GMlg2c
+	 deMe5CF+apxclK86kS8jJErPYbD/pBuogwyHKQ11Et68b68/U60mPB1UU3ImF2Lyx/
+	 AEoTsLd4G+bMyw5oBlDDMyWNw6aCQyqHmlXEGqZrDOsN/9xjudpeY8RdvwQEW7Lm+B
+	 J/bQO8zQwP6dsE3/h6xOnluSOyd7XOtUBAZyaUWUm8l7wcP7b1poFucNKGk9gSWuUv
+	 RkxddHBgwKCkA==
+From: HACKE-RC <rc@rexion.ai>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>
+Cc: Phil Sutter <phil@nwl.cc>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	HACKE-RC <rc@rexion.ai>
+Subject: [PATCH net-next v3 0/4] netfilter: conntrack: shared port parser for helpers
+Date: Sun,  3 May 2026 14:02:16 +0530
+Message-ID: <20260503083220.630655-1-rc@rexion.ai>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <afSBzDE-caw3Dsr1@orbyte.nwl.cc>
+References: <afSBzDE-caw3Dsr1@orbyte.nwl.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH net 1/1] batman-adv: stop caching unowned originator
- pointers in BAT IV
-From: Sven Eckelmann <sven@narfation.org>
-To: Ren Wei <n05ec@lzu.edu.cn>
-Cc: b.a.t.m.a.n@lists.open-mesh.org, netdev@vger.kernel.org, 
- marek.lindner@mailbox.org, sw@simonwunderlich.de, antonio@mandelbit.com, 
- sven@narfation.org, davem@davemloft.net, edumazet@google.com, 
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, yuantan098@gmail.com, 
- yifanwucs@gmail.com, tomapufckgml@gmail.com, bird@lzu.edu.cn, 
- wangjiexun2025@gmail.com
-In-Reply-To: <e12a51ee998808be6381780d6aaf32e093dc7d1e.1777692024.git.wangjiexun2025@gmail.com>
-References: <cover.1777692024.git.wangjiexun2025@gmail.com>
- <e12a51ee998808be6381780d6aaf32e093dc7d1e.1777692024.git.wangjiexun2025@gmail.com>
-Date: Sun, 03 May 2026 10:30:28 +0200
-Message-Id: <177779702879.645574.14368201380729825498.b4-review@b4>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1710; i=sven@narfation.org;
- h=from:subject:message-id; bh=xuy7E00c+ImwnU7UKGCuTUi+YywSoQjFOGhNjkdHvk8=;
- b=owGbwMvMwCXmy1+ufVnk62nG02pJDJnf2Td2/nRtvDnhioP9nm8TFQ2jE4U/vI7vairRfSsx+
- cLq0t1rO0pZGMS4GGTFFFn2XMk/v5n9rfznaR+PwsxhZQIZwsDFKQATWbCYkeHC5ONvlkQsLj4n
- 7n9J1ObUjqOnUg9u6Otcvn7dniO+7/c8Y2TYwHt49Z3L7HLGvNdfNjTfdDvbcP/kk0wGH/En4Wv
- XT//GAgA=
-X-Developer-Key: i=sven@narfation.org; a=openpgp;
- fpr=522D7163831C73A635D12FE5EC371482956781AF
-X-Rspamd-Queue-Id: CB2154B4E27
+Content-Transfer-Encoding: 8bit
+X-Envelope-From: rc@rexion.ai
+X-Rspamd-Queue-Id: 55B854B4E3F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[narfation.org,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[narfation.org:s=20121];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-283574-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_FROM(0.00)[bounces-283573-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[narfation.org:+];
-	TO_DN_SOME(0.00)[];
+	DMARC_NA(0.00)[rexion.ai];
+	RCVD_COUNT_THREE(0.00)[4];
+	R_DKIM_PERMFAIL(0.00)[rexion.ai:s=spacemail];
+	DKIM_TRACE(0.00)[rexion.ai:~];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_SPAM(0.00)[0.099];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sven@narfation.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[lists.open-mesh.org,vger.kernel.org,mailbox.org,simonwunderlich.de,mandelbit.com,narfation.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lzu.edu.cn];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[rc@rexion.ai,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[narfation.org:dkim,narfation.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-On Sun, 03 May 2026 12:28:58 +0800, Ren Wei <n05ec@lzu.edu.cn> wrote:
-> [...]
-> Reported-by: Yuan Tan <yuantan098@gmail.com>
-> Reported-by: Yifan Wu <yifanwucs@gmail.com>
-> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-> Reported-by: Xin Liu <bird@lzu.edu.cn>
-> Signed-off-by: Jiexun Wang <wangjiexun2025@gmail.com>
-> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+Both nf_conntrack_irc and nf_conntrack_amanda parse port numbers from
+application-layer data using simple_strtoul(), which requires
+NUL-terminated input and returns unsigned long without range validation.
 
-This looks half finished from the types perspective: 
+This series introduces two shared helpers in the conntrack core:
 
-net/batman-adv/bat_v_ogm.c:
-713 |         if (router && router->orig_node != orig_node && !orig_neigh_router) {
+  nf_ct_helper_parse_uint() -- generic bounded integer parser that
+    operates on a length-delimited buffer without requiring NUL
+    termination.
 
-net/batman-adv/originator.c:
-697 |         neigh_node->orig_node = orig_node;
+  nf_ct_helper_parse_port() -- calls nf_ct_helper_parse_uint() with
+    max=65535 and rejects port zero.
 
-net/batman-adv/types.h:
+Patches 2 and 3 convert IRC and Amanda to use nf_ct_helper_parse_port().
+Patch 4 converts the two port-parsing sites in nf_conntrack_sip to use
+nf_ct_helper_parse_port() as well, retaining the SIP-specific minimum
+port check (>= 1024).
 
-631 |         struct batadv_orig_node *orig_node;
+v3: add nf_ct_helper_parse_uint() as the generic base; nf_ct_helper_parse_port()
+    is now a thin wrapper; extend the series with a fourth patch converting
+    nf_conntrack_sip (Phil Sutter)
+v2: replace simple_strtoul() with a shared nf_ct_helper_parse_port()
+    in the conntrack helper core, modelled on 8cf6809cddcb (Florian Westphal)
+v1: inline range checks in IRC and Amanda
 
+HACKE-RC (4):
+  netfilter: conntrack: add shared port and uint parsers for helpers
+  netfilter: nf_conntrack_irc: use nf_ct_helper_parse_port()
+  netfilter: nf_conntrack_amanda: use nf_ct_helper_parse_port()
+  netfilter: nf_conntrack_sip: use nf_ct_helper_parse_port()
 
-Not sure if __private and ACCESS_PRIVATE() would be an option - just to handle
-this non-deref comparison while still allowing a fast comparison of the pointer
-value.
-
-I don't want to make this a show-stopper - just a possibility to think about
-this for a moment. Especially because I am waiting for some info about the
-sashiko.dev "Embargoed" state
-
->
->
-> diff --git a/net/batman-adv/bat_iv_ogm.c b/net/batman-adv/bat_iv_ogm.c
-> index f28e9cbf..168b413d 100644
-> --- a/net/batman-adv/bat_iv_ogm.c
-> +++ b/net/batman-adv/bat_iv_ogm.c
-> @@ -906,6 +899,31 @@ static u8 batadv_iv_orig_ifinfo_sum(struct batadv_orig_node *orig_node,
-> [ ... skip 22 lines ... ]
-> +	sum = batadv_iv_orig_ifinfo_sum(orig_neigh, neigh_node->if_incoming);
-> +	batadv_orig_node_put(orig_neigh);
-> +
-> +	return sum;
-> +}
-> +
-
-@Marek, @Simon, Maybe you can also get a good cup of tea and think (besides
-performance implications) think about other side effects.
+ include/net/netfilter/nf_conntrack_helper.h |  5 +++
+ net/netfilter/nf_conntrack_amanda.c         | 11 +++---
+ net/netfilter/nf_conntrack_helper.c         | 39 +++++++++++++++++++++
+ net/netfilter/nf_conntrack_irc.c            |  4 ++-
+ net/netfilter/nf_conntrack_sip.c            | 14 ++++----
+ 5 files changed, 61 insertions(+), 12 deletions(-)
 
 -- 
-Sven Eckelmann <sven@narfation.org>
+2.54.0
+
 
