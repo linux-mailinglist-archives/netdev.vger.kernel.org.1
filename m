@@ -1,73 +1,53 @@
-Return-Path: <netdev+bounces-283527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283528-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YNBQJAGw9mlyXgIAu9opvQ
-	(envelope-from <netdev+bounces-283527-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 04:16:33 +0200
+	id uFxZIxCx9mmgXgIAu9opvQ
+	(envelope-from <netdev+bounces-283528-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 04:21:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0F1E4B41F9
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 04:16:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 214584B420D
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 04:21:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F08FE30182AD
-	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 02:15:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E0FFA3007CAE
+	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 02:21:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B00F435DA61;
-	Sun,  3 May 2026 02:15:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51BBF38947E;
+	Sun,  3 May 2026 02:20:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="slI1z2sl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IMW+ssfY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9AB35E549
-	for <netdev@vger.kernel.org>; Sun,  3 May 2026 02:15:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A0D421CC4F;
+	Sun,  3 May 2026 02:20:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777774540; cv=none; b=OnDOcZYYMw0zm9HtHaVw6aQ+gnQZV8I04thSnRIbKp6A8POdVpqxIOYLZkmyzh6kRB0/pc2pceGiGWBDeQ37mc34Yf+KqLLfqr0u5bC3CeVmB5N77cKzjxh+SGDG7UX7p3j/W4SbPngptUzG5gsg3Anqd+Xya7gdjRrK/U8y4lI=
+	t=1777774859; cv=none; b=JwdoJkCmGDY5R4Hg8ojBW73vS4WId7Gl08nhetFQIL8uYG3GuuetBxDq66yqjjXY7PfCmpi8hlINtJN2bpdvNFZRIIhvQBHixqf1q0UCzSeGhZYWO4Sm1YW/mXqUoA6VcJYhGIxXegrfWXucohRYaLqBc14v86btVTRVEP4YipQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777774540; c=relaxed/simple;
-	bh=XcIkrF9u8KEvBcFwQuOzXM8O898ziH5rvIIDFJaig0c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Lmo9iZMh1mVR1XR4gmu7kzuAOVP6g/4mo9u912uLE1RgAhDx77t6j/9zrpuZPHQd2b8n8X8120l13PPTMCuwfckdmGAFRcx10GWibDLU6t9vxcDDO407hI0gBGVNwnMqNflZDhEzVFV4Kltz51JFiWgiKaOHDXY4C0Ed0gnaE5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=slI1z2sl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79186C19425;
-	Sun,  3 May 2026 02:15:39 +0000 (UTC)
+	s=arc-20240116; t=1777774859; c=relaxed/simple;
+	bh=EMyqomnyxRApDEITdtBFpV/A2iTOiaKaUchQkA05FTM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=PL311TKyI8i85uDbBetfFpPwgwuesGa93OnbCuChYUBMokvY1PHiBTn4o5ErJu00GRUyJOlsnBxdDz5xDyzaGwnCVxkBXl1q3HaYasTB1xIT/HdKL0AzZN3fV430uORjv17wUy38FyN+3PImDR5cZEUJLTR3EfH6Mq9zqH1YxM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IMW+ssfY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAC94C19425;
+	Sun,  3 May 2026 02:20:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777774540;
-	bh=XcIkrF9u8KEvBcFwQuOzXM8O898ziH5rvIIDFJaig0c=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=slI1z2slKAhZnLWsMYeu3pu9OphAl8v1dMPebwvW05KWQXWk3+RUqp1j74PZs336y
-	 O3Nj1QxUM0ERFlkV/8B9dfJoTC1j6fGn4i1wT/4MZ1swlFA8LlqyaCLibR+8XyIYqD
-	 PhDvVTvKyMsF8mdf6zP6heMimsHpyifhqTK5k1Ey7wfUGlz2lhx1O5C9GQrT20Ecjb
-	 Br2ws6zgn1llHuKoyNWE8dgrrnqxmgOaXCpncdoYMwSu5P9ty/fIUPf9oLCwtXffV6
-	 Qa6yIw7zpgAQPZcesYbpWkgqQwpDuiyI6vEb7iOVEm1N3bRbV1a5M85Tma7tDOtSyL
-	 pu7PC8/pz1Uww==
-From: Jakub Kicinski <kuba@kernel.org>
-To: jiawenwu@trustnetic.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	mengyuanlou@net-swift.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	richardcochran@gmail.com,
-	linux@armlinux.org.uk,
-	horms@kernel.org,
-	kees@kernel.org,
-	larysa.zaremba@intel.com,
-	leitao@debian.org,
-	joe@dama.to,
-	jacob.e.keller@intel.com,
-	fabio.baltieri@gmail.com
-Subject: Re: [PATCH net-next v2 6/6] net: wangxun: implement pci_error_handlers ops
-Date: Sat,  2 May 2026 19:15:38 -0700
-Message-ID: <20260503021538.4127382-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260430082517.19612-7-jiawenwu@trustnetic.com>
-References: <20260430082517.19612-7-jiawenwu@trustnetic.com>
+	s=k20201202; t=1777774858;
+	bh=EMyqomnyxRApDEITdtBFpV/A2iTOiaKaUchQkA05FTM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=IMW+ssfYStNYF88x7lj14xgU0XUkheaiznsUmV1iJ/xiKeWAYsdkjw3t3j4TU+i45
+	 CYU2VIRXVI6frORf8lnORIKV8oih4q/LFpvqowh7C7/LfKdX469f7vf85OZ7prxmbY
+	 jHUV+6Chbj5PtUtO5x9b2m6c8YT153+AnRmMUt7zIXT7tAyHEfQ/IpuYXNp1MNmw5s
+	 hZdMyS7iBUHvefUpOWMrklHZby6aMSOsIqtT83603zRjkW73xIYx9WvcPnS+dlTlfx
+	 ilbMv8ZHNyzltrDHKzXs7XFGtjzrfAu7z4n3y2Brsqle5poz+PBDm5nKeOHr30LMEq
+	 CkwR5hkiO7QrQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02ECA380CFEC;
+	Sun,  3 May 2026 02:20:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,191 +55,95 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: F0F1E4B41F9
+Subject: Re: [PATCH net 0/7] net: tls: fix a few random bugs
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177777481080.3993534.13171841772484372879.git-patchwork-notify@kernel.org>
+Date: Sun, 03 May 2026 02:20:10 +0000
+References: <20260429222944.2139041-1-kuba@kernel.org>
+In-Reply-To: <20260429222944.2139041-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ bpf@vger.kernel.org, john.fastabend@gmail.com, sd@queasysnail.net,
+ linux-kselftest@vger.kernel.org
+X-Rspamd-Queue-Id: 214584B420D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,net-swift.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,armlinux.org.uk,intel.com,debian.org,dama.to];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_FROM(0.00)[bounces-283527-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,queasysnail.net];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-283528-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.995];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-net: wangxun: implement pci_error_handlers ops
+Hello:
 
-Support AER driver to handle the PCIe errors.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.c b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-> --- a/drivers/net/ethernet/wangxun/libwx/wx_err.c
-> +++ b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-[ ... ]
-> +static pci_ers_result_t wx_io_error_detected(struct pci_dev *pdev,
-> +					     pci_channel_state_t state)
-> +{
-> +	struct wx *wx = pci_get_drvdata(pdev);
-> +	struct net_device *netdev;
-> +
-> +	netdev = wx->netdev;
+On Wed, 29 Apr 2026 15:29:37 -0700 you wrote:
+> Fix a few random bugs, from external reports and my local scan
+> with various AI tools. Mostly corner cases in code which I don't
+> think TLS maintainers would consider "battle tested".
+> 
+> Jakub Kicinski (7):
+>   net: tls: fix silent data drop under pipe back-pressure
+>   selftests: tls: add test for data loss on small pipe
+>   net: tls: fix page pin leak on sendpage_ok() failure
+>   net: tls: fix off-by-one in sg_chain entry count for wrapped sk_msg
+>     ring
+>   selftests: bpf: cover wrapped sk_msg ring chaining in ktls TX path
+>   net: tls: fix use-after-free in tls_sw_sendmsg_locked after bpf
+>     verdict
+>   selftests: bpf: cover tls_sw_sendmsg UAF after bpf_exec_tx_verdict
+>     split
+> 
+> [...]
 
-If an AER event triggers during ngbe_probe() or txgbe_probe() before
-pci_set_drvdata() is called, wx will be NULL here.
+Here is the summary with links:
+  - [net,1/7] net: tls: fix silent data drop under pipe back-pressure
+    https://git.kernel.org/netdev/net/c/7e7be31bfdb0
+  - [net,2/7] selftests: tls: add test for data loss on small pipe
+    https://git.kernel.org/netdev/net/c/bd3a4795d574
+  - [net,3/7] net: tls: fix page pin leak on sendpage_ok() failure
+    (no matching commit)
+  - [net,4/7] net: tls: fix off-by-one in sg_chain entry count for wrapped sk_msg ring
+    (no matching commit)
+  - [net,5/7] selftests: bpf: cover wrapped sk_msg ring chaining in ktls TX path
+    (no matching commit)
+  - [net,6/7] net: tls: fix use-after-free in tls_sw_sendmsg_locked after bpf verdict
+    (no matching commit)
+  - [net,7/7] selftests: bpf: cover tls_sw_sendmsg UAF after bpf_exec_tx_verdict split
+    (no matching commit)
 
-Could this lead to a NULL pointer dereference when accessing wx->netdev?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Should the handler validate the wx pointer, or should pci_set_drvdata()
-be moved earlier in the probe sequence?
 
-> +	if (!netif_device_present(netdev))
-> +		return PCI_ERS_RESULT_DISCONNECT;
-> +
-> +	rtnl_lock();
-> +	netif_device_detach(netdev);
-> +
-> +	if (netif_running(netdev))
-> +		wx->close_suspend(wx);
-> +
-> +	if (state == pci_channel_io_perm_failure) {
-> +		rtnl_unlock();
-> +		return PCI_ERS_RESULT_DISCONNECT;
-> +	}
-
-Does calling wx->close_suspend(wx) before checking for
-pci_channel_io_perm_failure cause illegal MMIO accesses?
-
-If the device is in a permanent failure state, it is physically
-disconnected, and MMIO accesses could result in Master Aborts or system
-lockups.
-
-Should the check for permanent failure precede the hardware teardown?
-
-> +	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-> +		pci_disable_device(pdev);
-> +	rtnl_unlock();
-> +
-> +	/* Request a slot reset. */
-> +	return PCI_ERS_RESULT_NEED_RESET;
-> +}
-
-Should the background service task (wx->service_task) be canceled here
-using cancel_work_sync()?
-
-Since WX_STATE_DISABLED is not checked within the service task's
-execution path, it appears the task could wake up and attempt to interact
-with the device while its MMIO space is disabled.
-
-[ ... ]
-> +static pci_ers_result_t wx_io_slot_reset(struct pci_dev *pdev)
-> +{
-> +	struct wx *wx = pci_get_drvdata(pdev);
-> +	pci_ers_result_t result;
-> +
-> +	if (pci_enable_device_mem(pdev)) {
-> +		wx_err(wx, "Cannot re-enable PCI device after reset.\n");
-> +		result = PCI_ERS_RESULT_DISCONNECT;
-> +	} else {
-> +		/* make all bar access done before reset. */
-> +		smp_mb__before_atomic();
-> +		clear_bit(WX_STATE_DISABLED, wx->state);
-> +		pci_set_master(pdev);
-> +		pci_restore_state(pdev);
-> +		pci_wake_from_d3(pdev, false);
-> +
-> +		wx->do_reset(wx->netdev, false);
-
-Is it safe to call wx->do_reset() here without holding the rtnl_lock()?
-
-Other paths that reset the hardware (such as wx_reset_subtask()) appear
-to acquire rtnl_lock() to serialize against concurrent network
-configurations.
-
-Could failing to hold the lock here allow concurrent userspace requests
-to access hardware registers while the device is in a reset state?
-
-> +		result = PCI_ERS_RESULT_RECOVERED;
-> +	}
-> +
-> +	pci_aer_clear_nonfatal_status(pdev);
-> +
-> +	return result;
-> +}
-[ ... ]
-> +static void wx_io_resume(struct pci_dev *pdev)
-> +{
-> +	struct wx *wx = pci_get_drvdata(pdev);
-> +	struct net_device *netdev;
-> +	int err;
-> +
-> +	netdev = wx->netdev;
-> +	rtnl_lock();
-> +	if (netif_running(netdev)) {
-> +		err = netdev->netdev_ops->ndo_open(netdev);
-
-By calling ndo_open() directly instead of dev_open(), is there a risk of
-bypassing the core network state machine?
-
-If ndo_open() fails, it cleans up its allocations, but the core network
-stack's __LINK_STATE_START bit remains set.
-
-If a user subsequently administratively downs the interface, the network
-core might unconditionally call ndo_stop(), potentially leading to a
-double-free when it attempts to clean up the already-freed resources.
-
-> +		if (err) {
-> +			wx_err(wx, "Failed to open netdev after reset\n");
-> +			goto out;
-> +		}
-> +	}
-> +	netif_device_attach(netdev);
-> +out:
-> +	rtnl_unlock();
-> +}
-[ ... ]
-> diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-> --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-> +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-[ ... ]
-> @@ -900,6 +901,7 @@ static int txgbe_probe(struct pci_dev *pdev,
->  		goto err_remove_phy;
->  
->  	pci_set_drvdata(pdev, wx);
-> +	pci_save_state(pdev);
->  
->  	netif_tx_stop_all_queues(netdev);
-
-This isn't a bug introduced by this patch, but does the ordering here
-expose the interface to userspace before queue initialization?
-
-Since register_netdev() is called prior to this code, the interface
-becomes visible to userspace.
-
-If a management daemon immediately brings the interface UP, invoking
-ndo_open() and waking the TX queues, could this netif_tx_stop_all_queues()
-erroneously stop the queues of the logically UP interface, resulting in a
-silent TX hang?
 
