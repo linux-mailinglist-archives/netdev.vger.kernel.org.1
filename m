@@ -1,423 +1,213 @@
-Return-Path: <netdev+bounces-283635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283636-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oHX6EiJ492mUiAIAu9opvQ
-	(envelope-from <netdev+bounces-283635-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 18:30:26 +0200
+	id 6EiqAfB692kBiQIAu9opvQ
+	(envelope-from <netdev+bounces-283636-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 18:42:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7DF84B67BC
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 18:30:25 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05B284B6878
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 18:42:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 38406303CA52
-	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 16:26:40 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AE67530015A5
+	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 16:42:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E38B33CD8D5;
-	Sun,  3 May 2026 16:26:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B16B31352B;
+	Sun,  3 May 2026 16:42:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PI+J/Yob"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tfn1MwKW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B6B3CE49D
-	for <netdev@vger.kernel.org>; Sun,  3 May 2026 16:26:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E6B137CD25
+	for <netdev@vger.kernel.org>; Sun,  3 May 2026 16:42:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777825595; cv=none; b=Dj31m6Vx+bk8YfezizkB5IpMVJW0Yu9vNZDHvf0w/WJ2gguVSczei5ya7EeTSCGH2LUmqJMnFNM6g/PItM9q0ltp+h490qFgQHpo7LmN9kWRzkbXkll6nISxmi/lopeXcHqj8FyUY33Mr3awyqMdjzkPR6aTiSHxkl12jb7Ev5s=
+	t=1777826536; cv=none; b=lUvf9hJ1bZWwLj5/rfxnRpz1hUjFh7afDv49nYMqxe2IjNvK37qppONgiDJUYsZAdOSf9oqSwe7WoKDbDtJ5IFv5ersNnURBNQYMCOpJ2c/eJwxRd6s09MHBUlKhauQ0MA99mMbii0c4P33gIvyMycy2DPLYOpUxvCvS1QDl0Is=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777825595; c=relaxed/simple;
-	bh=ytJNk6Sp5oqo2mhDyk8PHPFkvKfco1b3mZP7WKRR2TM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=uFPTgY4Su+8hoe5draJeUjGITmnyx98fFjD6HieFkSbBmc3lg2Yj391yYhvkukZHUhAYO3q8dFY2AQ/gxuNd1WZAo4b5ECKjo2CHj8XitOl03Mh+3f8JpKqbwCpEF9twwjHM15q4Jp997a5HeKt7TvBbOBPKEKCbE8E4FjascqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PI+J/Yob; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-8296d553142so2263346b3a.3
-        for <netdev@vger.kernel.org>; Sun, 03 May 2026 09:26:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777825592; x=1778430392; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MGj4HzPbiY0MFbpVfiKxyLwbBa+PWzq3vhH8Hs94Z0I=;
-        b=PI+J/YobHQWKAp6UM4i8nBLtmtUsqtEnWVKsKYbttfAkw5fiA3mgH8ayDPK0n3R/4l
-         aLSJ9TShFc94a4PoIIFDzmuL9AyEKQ0WlufK6uA2rzjaw7C2lino5YUBDw8L/N4HvGjN
-         dNNbmY4+u1cYb2mE/u/LjLgijwl5LlF90fwJYO1YqMEbSrfoT7M7HXQUIdwfYtXwLZ+f
-         3ocoW8M2I2gvF47cT6yoflLG6qjyGf9WizYsZoF5RZJ3igabqbYm8QX/ZUh+Np+bIiFX
-         wVJHHM97Y9iNdG7Z7dotkW75GA92F3EXPbLpeejfnwbxI6iJXP2J+j38M+tC2mzN+nW0
-         dUPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777825592; x=1778430392;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=MGj4HzPbiY0MFbpVfiKxyLwbBa+PWzq3vhH8Hs94Z0I=;
-        b=pCYreH5K+0SRcO4ofv1PnsPc14pMIwU1V2QknO1M8Te9XGprFXOqtNWEpVFPidpeZq
-         bVgVZG4lnQfbiIWkFLMkcTBsEejhU3RXXoZvRS1Sa613lw/CvAY3uChMTfbtVIzCQnV0
-         StbuyUMccmZR9yJ+dPLjcHmUgKDtRW3LEE3akYPmD5b5+tu0KIPe6QIvFXtwEGwXqAiP
-         AxVi9vsF0SarRtQK2hQQVeGKVOYL68zo4zd92gK/aw49WPruFMLZbaX3rnLvnUYm7K2C
-         2Y6JM09t8xR0xl8w3igN1Oi9kjt2PyAwxJ60w6u77n7rmoPjJmBZtioVXvUSMe1WFeii
-         1ilA==
-X-Forwarded-Encrypted: i=1; AFNElJ+wrNYorzdqO1AaIGR4UKe3+7D6b/U6cLVFjqkqPd48sGZNY62sDIJw4oUOXHNv9oBxnqmLa5w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyguB3paGBW4OA7B98vq7OjTZNFmYVVWzYOJyKZNWQJ6gQASj7h
-	6nXX/XUgB/l2e7hvbVKstlWcyBHrjFOnfOXuacH94UaIiYAlk4nN2OXS
-X-Gm-Gg: AeBDiev88+5vjQOn+WGwHUyuK1nPLxpkX9S01//fYW993dokiNGlwbO/+62M36BNcdV
-	gHp6np93wS2EAQjGisT+8leIhcpk2kmx3kXOQzL3jcFCctrspODkk7K1JQOvGKcLc1uAGWZFo92
-	5Ru0IWEz6Ozw6eZtxbiBXK0r4X8FL+Di+KQURUGcQjiy39MLBFoolXW7KwYdkipeeY+cZ3q42ht
-	UUVSSX9zTuEvMuHnQpxemhMd8FdjIQD/utRPHeLZI/t84mbPpU26x7dddZAJnEQUOIi+iHCa0qt
-	3QEkjq8FFskKOl2RIShTnM8+roJzUtYH2L4qhAf+k45SwykKgYbjHjVL84jLN6mekRPVIAHnzRW
-	FCUbdsQJWVZDCOlnGuvwY62WHExv0tzjW9tufEXlqwLKYJK+j73HaAgwyNyZu8MMBHtLQCwr9JA
-	C5e8jA/O9DlM+uyxKPrRG04RhpEAOvnZankSE+hxrR73LUmqYJnHpgXB8=
-X-Received: by 2002:a05:6a00:1407:b0:82a:7046:86a2 with SMTP id d2e1a72fcca58-8352d03beecmr6175792b3a.10.1777825592351;
-        Sun, 03 May 2026 09:26:32 -0700 (PDT)
-Received: from [163.43.103.131] ([163.43.103.131])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83515b8500dsm9788911b3a.58.2026.05.03.09.26.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 May 2026 09:26:31 -0700 (PDT)
-From: Yuya Kusakabe <yuya.kusakabe@gmail.com>
-Date: Mon, 04 May 2026 01:26:00 +0900
-Subject: [PATCH 7/7] Documentation: networking: add seg6_mobile guide
+	s=arc-20240116; t=1777826536; c=relaxed/simple;
+	bh=Se9S5vUeFZoS9hDDulyLslLqrZjqxeW2hVsu+xMPWEc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fnH1Gbu+7+22o4ie9NrEQXgo17nzvZrzJswweK/O6BF6FAnERubDGFXabU+oj6mpI5n/4JPMnU/oNNkDpt2Rk1U8nvf96vFTUBzSxavCm9eLgW5myPZLdZg9MNvgVxr9yy6hKe9lK9LhqvzCjpZaYExoinfjgWWvKxZ0pVqTh8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Tfn1MwKW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777826525;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=6OMnXFksPWYgCbDa0fqBN0MsKqolVLOn4UZAcKfFliU=;
+	b=Tfn1MwKWdTmLWaWQ2ibmQJyvq4kpfwdPH0DPHBLYEmMrv9GXDgSaUwaG1vu1KdchFoBwra
+	rth2o01hp1RY4iYUt0Ur7ppQ/P3iA5O5hRTuch2EjaGNPBTSuQdTIS6rm34UDbFekW3JtG
+	VmHCRB6uH4h1N/llnXU1A106z5VKNHc=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-461-340km-k-NsG7GjbczS2N4g-1; Sun,
+ 03 May 2026 12:42:04 -0400
+X-MC-Unique: 340km-k-NsG7GjbczS2N4g-1
+X-Mimecast-MFC-AGG-ID: 340km-k-NsG7GjbczS2N4g_1777826523
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 593C51800473;
+	Sun,  3 May 2026 16:42:03 +0000 (UTC)
+Received: from p16v.redhat.com (unknown [10.44.48.53])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9EE3C1800480;
+	Sun,  3 May 2026 16:42:01 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Petr Oros <poros@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH iproute2] dpll: fix man page correctness issues
+Date: Sun,  3 May 2026 18:42:00 +0200
+Message-ID: <20260503164200.145679-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260504-srv6-mup-v1-v1-7-e0a6791575cb@gmail.com>
-References: <20260504-srv6-mup-v1-v1-0-e0a6791575cb@gmail.com>
-In-Reply-To: <20260504-srv6-mup-v1-v1-0-e0a6791575cb@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Andrea Mayer <andrea.mayer@uniroma2.it>, Shuah Khan <shuah@kernel.org>, 
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, 
- Yuya Kusakabe <yuya.kusakabe@gmail.com>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=11107;
- i=yuya.kusakabe@gmail.com; h=from:subject:message-id;
- bh=ytJNk6Sp5oqo2mhDyk8PHPFkvKfco1b3mZP7WKRR2TM=;
- b=owEBbQKS/ZANAwAIASrX0XUqXRtNAcsmYgBp93cjoBhU12NhAo5DhnO7WXlrPkNVwC8k27WVS
- 6rre30V1mKJAjMEAAEIAB0WIQTaB7usAfxNKMeqa6Yq19F1Kl0bTQUCafd3IwAKCRAq19F1Kl0b
- TSJhEAChTxUHMC+AEQPv+H3YRz1SHAK+o75w0CosXqUyoJ0NbRa7Za6+J5EncU42AvpkfKXtdEF
- Csf+uSRPVSvZwb5U9Ny1bPh05hywD+RdRpTQUHx0KAFoCJix/9lbxnXfAcwEKDDTJdO42dm9UJc
- N7WsKVR8ln+ppe2PNc24h4fOLaq08kOTf4UpNBUVLFURFEFy0F9ZWRfxluOzZ/hgt5FwIeKfAMk
- mfDh4TGgpo8gyYnG7TLaJ49Qk/Ulx9WqYKfNeFbS2M0iZappIa9sum4ChlKQpeQTt8NjN+KtCpT
- JILpoUGdSIqvUa1KP9bEnTKfMX0M2xOFEKrST5Q9uuGaNariDVZUn1GM6Oav4OlwGOhjfgrLWr6
- I9HOHd/rq6nRoQP+kkEBuIZiDTctBM4JMeo2VbH9uTlwbwcQO8KsjxrVXjLXm8WytSy0ClUwk68
- agn+8hTh/u1stcqdqtza71n5HNER4IUOHToRv/9sa+wT5DKO2WzBh9GLxptO/5J9WFyAA4A/8wH
- eVQL125YfZz0iYz9tAqcZXUlPxYrYllOtreuC0o8HrPmXVQj0/FVlTme7i9lXchzPgJGjUfUYJZ
- CPihrbry8qJJ04DcTWLvek3r/4OhphLgylhESaQv4QdhJDzSb9SoB5YrMceQpYSnCveyeN8BD+l
- iGyWPBCWDcPigXw==
-X-Developer-Key: i=yuya.kusakabe@gmail.com; a=openpgp;
- fpr=DA07BBAC01FC4D28C7AA6BA62AD7D1752A5D1B4D
-X-Rspamd-Queue-Id: A7DF84B67BC
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Rspamd-Queue-Id: 05B284B6878
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283635-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283636-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yuyakusakabe@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[rfc-editor.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,end.map:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-Document the six RFC 9433 Mobile User Plane behaviors implemented
-by seg6_local, the SID layout used by the GTP behaviors, security
-considerations (HMAC, SR-domain perimeter filtering), netfilter
-integration with nf_hooks_lwtunnel, and the location of the
-selftests.
+Fix several inaccuracies in dpll.8 man page:
+- Remove bogus "holdover" and "freerun" from operating modes list,
+  only "manual" and "automatic" modes exist in the DPLL API
+- Fix typo "locked-ho-ack" -> "locked-ho-acq" in lock status list
+- Add missing device show output fields: lock-status-error,
+  clock-quality-level, mode-supported, phase-offset-monitor and
+  phase-offset-avg-factor
+- Add missing pin show output fields: panel-label, package-label,
+  fractional-frequency-offset and esync-pulse
+- Remove non-existent exit codes 2 and 255, the tool only returns
+  0 (success) or 1 (failure)
+- Use canonical enable/disable for phase-offset-monitor to match
+  the tool's help text
 
-Link: https://www.rfc-editor.org/rfc/rfc9433
-Signed-off-by: Yuya Kusakabe <yuya.kusakabe@gmail.com>
+Fixes: 656cfc3ce05b ("dpll: Add dpll command")
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 ---
- Documentation/networking/index.rst       |   1 +
- Documentation/networking/seg6_mobile.rst | 236 +++++++++++++++++++++++++++++++
- 2 files changed, 237 insertions(+)
+ man/man8/dpll.8 | 32 +++++++++++++++++++++-----------
+ 1 file changed, 21 insertions(+), 11 deletions(-)
 
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index 44a422ad3b05..90fa0ad223da 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -108,6 +108,7 @@ Contents:
-    sctp
-    secid
-    seg6-sysctl
-+   seg6_mobile
-    skbuff
-    smc-sysctl
-    sriov
-diff --git a/Documentation/networking/seg6_mobile.rst b/Documentation/networking/seg6_mobile.rst
-new file mode 100644
-index 000000000000..6a268bedf3be
---- /dev/null
-+++ b/Documentation/networking/seg6_mobile.rst
-@@ -0,0 +1,236 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+=================================
-+SRv6 Mobile User Plane (RFC 9433)
-+=================================
-+
-+This document describes the SRv6 Mobile User Plane (MUP) behaviors
-+implemented by the ``seg6_local`` lightweight tunnel.  Six of the
-+seven behaviors defined in `RFC 9433`_ are supported and configurable
-+through ``ip route ... encap seg6local action ...``: End.MAP,
-+End.M.GTP6.D, End.M.GTP6.D.Di, End.M.GTP6.E, End.M.GTP4.E, and
-+H.M.GTP4.D.
-+
-+End.Limit (RFC 9433 Section 6.8) is unimplemented.
-+
-+.. _`RFC 9433`: https://www.rfc-editor.org/rfc/rfc9433
-+
-+Behaviors
-+=========
-+
-+End.MAP (`RFC 9433`_ Section 6.2)
-+---------------------------------
-+
-+Endpoint with SID mapping.  Replaces the IPv6 destination address with
-+the next SID; the SRH is left untouched.  Standard SRv6 endpoint hop
-+limit handling applies (an ICMP Time Exceeded is emitted when the IPv6
-+Hop Limit would reach zero per RFC 9433 Section 6.2 S01-S03; the Hop
-+Limit is decremented per S04 before forwarding).  ``nh6`` selects the
-+replacement SID::
-+
-+    ip -6 route add 2001:db8:f::/64 \
-+        encap seg6local action End.MAP nh6 2001:db8:2::e \
-+        dev <dev>
-+
-+End.M.GTP6.D (`RFC 9433`_ Section 6.3)
-+--------------------------------------
-+
-+Encapsulation endpoint that consumes IPv6/UDP/GTP-U and emits SRv6.
-+The new SRH is built from the configured segment list, with the
-+original outer IPv6 destination ``D`` of the inbound GTP-U packet
-+stamped at SRH ``segments[0]`` (the ultimate destination of the SR
-+Policy).  The configured ``srh segs`` last entry is the remote
-+End.M.GTP6.E SID and lands at SRH ``segments[1]``, the penultimate
-+position required by RFC 9433 Section 6.5 Note; the kernel encodes
-+``Args.Mob.Session`` into the locator-relative slice of that SID so
-+that the egress End.M.GTP6.E peer can recover ``D`` (and hence the
-+original gNB-side GTP-U destination) from ``segments[0]`` after its
-+SRv6 strip::
-+
-+    ip -6 route add 2001:db8:f::/64 \
-+        encap seg6local action End.M.GTP6.D \
-+            srh segs 2001:db8:2::e \
-+            src 2001:db8:2::1 \
-+            sr_prefix_len 64 \
-+        dev <dev>
-+
-+``sr_prefix_len`` declares the locator length used by the remote
-+End.M.GTP6.E SID and must match the prefix length configured on that
-+remote endpoint; the SR Gateway has no way to discover the remote
-+SID's locator length on its own.
-+
-+The wire SRH for the example above is
-+``[D, 2001:db8:2::e | Args.Mob.Session]``: ``segments[0]`` is the
-+saved original outer IPv6 DA of the GTP-U packet, and
-+``segments[1]`` is the End.M.GTP6.E SID at the egress UPF in the
-+penultimate position required by RFC 9433 Section 6.5.
-+
-+End.M.GTP6.D.Di (`RFC 9433`_ Section 6.4)
-+-----------------------------------------
-+
-+Drop-in variant of End.M.GTP6.D that preserves the original IPv6
-+destination address as ``segments[0]`` (the last in-transit SID in the
-+new SRH) and discards TEID/QFI rather than folding them into
-+Args.Mob.Session.  Useful when the upstream service expects the
-+original destination to survive untouched::
-+
-+    ip -6 route add 2001:db8:f::/64 \
-+        encap seg6local action End.M.GTP6.D.Di \
-+            srh segs 2001:db8:2::e,2001:db8:3::e \
-+            src 2001:db8:2::1 \
-+        dev <dev>
-+
-+End.M.GTP6.E (`RFC 9433`_ Section 6.5)
-+--------------------------------------
-+
-+Egress endpoint that decapsulates SRv6 and emits IPv6/UDP/GTP-U.  The
-+active SID carries the 40-bit ``Args.Mob.Session`` field defined in
-+RFC 9433 Section 6.1 immediately after the locator; TEID and QFI are
-+extracted from it.  The route prefix length implicitly declares the
-+locator length on this end of the tunnel; no explicit
-+``sr_prefix_len`` is required because the SID is locally instantiated
-+by this route::
-+
-+    ip -6 route add 2001:db8:e::/64 \
-+        encap seg6local action End.M.GTP6.E src 2001:db8:2::1 \
-+        dev <dev>
-+
-+The route prefix length must leave room for the 40-bit
-+``Args.Mob.Session`` that immediately follows the locator, so the
-+constraint ``prefix_len + 40 <= 128`` (i.e. ``prefix_len <= 88``)
-+is enforced at install time.
-+
-+The optional ``pdu_type {dl|ul|<num>}`` attribute supplies the PDU
-+Type field (3GPP TS 38.415 Section 5.5.2) of the GTP-U PDU Session
-+Container.  When set, every emitted packet carries the container with
-+that PDU Type and the QFI from ``Args.Mob.Session``; when unset the
-+kernel emits a short GTPv1-U header with no container, regardless of
-+the QFI.  ``pdu_type`` MUST be set on routes serving 5G N3 traffic;
-+omitting it targets LTE-only / S1-U deployments.  Numeric ``<num>``
-+in 0..15 is also accepted (per TS 38.415 the field is 4 bits wide;
-+2..15 are currently reserved).
-+
-+End.M.GTP4.E (`RFC 9433`_ Section 6.6)
-+--------------------------------------
-+
-+Egress endpoint that decapsulates SRv6 and emits IPv4/UDP/GTP-U.
-+The SID encodes the IPv4 destination per RFC 9433 Section 6.6
-+Figure 9.  ``v4_mask_len`` declares the width of the IPv4 DA slice
-+that immediately follows the locator (in 1..32, the constraint
-+``locator + v4_mask_len + 40 <= 128`` is enforced at install time)::
-+
-+    ip -6 route add 2001:db8::/32 \
-+        encap seg6local action End.M.GTP4.E \
-+            src 2001:db8:2::1 v4_mask_len 32 \
-+        dev <dev>
-+
-+The IPv6 source address carries the IPv4 SA per RFC 9433 Section 6.6
-+Figure 10.  ``v6_src_prefix_len`` declares the Source UPF Prefix
-+length P in bits (1..127, default 64); the IPv4 SA slice is then
-+``v4_mask_len`` bits wide starting at bit offset P.  The kernel
-+always reads a 32-bit window from the configured ``src`` template at
-+offset P (the upper ``v4_mask_len`` bits are overlaid with the
-+recovered IPv4 SA), so the constraint ``v6_src_prefix_len <= 96``
-+(equivalently ``v6_src_prefix_len + 32 <= 128``) is enforced at
-+install time.  Bits outside the IPv4 SA slice are taken verbatim
-+from the configured ``src`` template::
-+
-+    ip -6 route add 2001:db8::/32 \
-+        encap seg6local action End.M.GTP4.E \
-+            src 2001:db8:2::1 v4_mask_len 32 v6_src_prefix_len 64 \
-+        dev <dev>
-+
-+``pdu_type`` takes the same values and has the same effect as on
-+End.M.GTP6.E (see above).
-+
-+H.M.GTP4.D (`RFC 9433`_ Section 6.7)
-+------------------------------------
-+
-+Headend behavior that consumes IPv4/UDP/GTP-U and emits IPv6 with
-+the SID encoding the original IPv4 destination plus Args.Mob.Session
-+per RFC 9433 Section 6.7 Figure 11::
-+
-+    ip -4 route add 10.99.0.0/24 \
-+        encap seg6local action H.M.GTP4.D \
-+            nh6 2001:db8:: \
-+            src 2001:db8:2::1 \
-+            v4_mask_len 32 sr_prefix_len 32 \
-+        dev <dev>
-+
-+The inbound IPv4 SA is encoded into the IPv6 SA using the same
-+Figure 10 layout as End.M.GTP4.E (controlled by ``v6_src_prefix_len``,
-+default 64).
-+
-+Per-route VRF / interface binding
-+=================================
-+
-+The five GTP-related behaviors (End.M.GTP4.E, End.M.GTP6.E,
-+End.M.GTP6.D, End.M.GTP6.D.Di and H.M.GTP4.D) accept the standard
-+``oif`` ``seg6_local`` attribute to bind their egress lookup to a
-+specific output interface or VRF device.  This lets operators keep
-+the SRv6 underlay, the N3 reference point (toward gNB) and the N6
-+reference point (toward the data network) on separate routing tables
-+or VLAN sub-interfaces, which matches typical multi-tenant
-+deployments::
-+
-+    ip -6 route add 2001:db8:e::/64 \
-+        encap seg6local action End.M.GTP6.E \
-+            src 2001:db8:2::1 \
-+            oif vrf-n3 \
-+        dev <dev>
-+
-+Without ``oif`` the egress lookup uses the default routing table.
-+
-+Netfilter integration
-+=====================
-+
-+The five GTP-related behaviors expose IPv4 / IPv6 inner T-PDUs to
-+``NF_INET_PRE_ROUTING`` between the outer strip and the new outer
-+push (mirroring ``End.DX4`` / ``End.DX6``), so iptables / nftables /
-+conntrack can apply policy on the inner 5-tuple before
-+re-encapsulation.  Non-IP inner payloads bypass the hook and are
-+re-encapsulated unchanged.
-+
-+Enable with::
-+
-+    sysctl -w net.netfilter.nf_hooks_lwtunnel=1
-+
-+This sysctl is one-way: it cannot be cleared without reloading the
-+kernel (see :doc:`nf_conntrack-sysctl`).
-+
-+Example: drop traffic from a UE address on an ``End.M.GTP6.D`` SR
-+Gateway::
-+
-+    nft add table ip filter
-+    nft 'add chain ip filter prerouting \
-+        { type filter hook prerouting priority 0; }'
-+    nft add rule ip filter prerouting \
-+        ip saddr 10.0.0.42 counter drop
-+
-+GTP-U non-T-PDU handling
-+========================
-+
-+The three GTP-U decap behaviors (``End.M.GTP6.D``,
-+``End.M.GTP6.D.Di`` and ``H.M.GTP4.D``) only encapsulate ``T-PDU``
-+frames (3GPP TS 29.281 Section 5.1, message type 255) into SRv6.
-+Any other GTP-U message (``Echo Request``/``Echo Response``,
-+``Error Indication``, ``Supported Extension Headers Notification``,
-+...) is forwarded unchanged toward its IPv4 / IPv6 destination as
-+a regular packet, so a downstream UPF that owns the GTP-U control
-+plane can process it.
-+
-+The downstream UPF must therefore live behind the SR Gateway, on
-+the IPv4 / IPv6 network the GTP-U destination is reachable through.
-+Assigning the UPF's address to a local interface on the SR Gateway
-+is not a supported topology: the SR Gateway cannot at the same
-+time intercept ``T-PDU`` for SRv6 encapsulation and deliver
-+non-T-PDU GTP-U to a local userspace socket addressed to the same
-+destination.
-+
-+Debugging
-+=========
-+
-+The SRv6 Mobile data path drops malformed or out-of-policy packets via
-+the standard skb drop-reason infrastructure (``SEG6_MOBILE_*`` in
-+``include/net/dropreason-core.h``) rather than silent ``-EINVAL``, so
-+the cause is observable via the ``skb:kfree_skb`` tracepoint.
-
+diff --git a/man/man8/dpll.8 b/man/man8/dpll.8
+index 89f17af74923..3abed86f1d52 100644
+--- a/man/man8/dpll.8
++++ b/man/man8/dpll.8
+@@ -102,13 +102,23 @@ Module name providing the device
+ .IP \[bu]
+ Clock ID (unique identifier)
+ .IP \[bu]
+-Operating mode (manual, automatic, holdover, freerun)
++Operating mode (manual, automatic)
+ .IP \[bu]
+-Lock status (locked-ho-ack, locked, unlocked, holdover)
++Lock status (unlocked, locked, locked-ho-acq, holdover)
++.IP \[bu]
++Lock status error (if present)
++.IP \[bu]
++Clock quality level (if supported)
+ .IP \[bu]
+ Temperature (if supported)
+ .IP \[bu]
+ Type (PPS or EEC)
++.IP \[bu]
++Supported modes
++.IP \[bu]
++Phase offset monitor status (enable/disable)
++.IP \[bu]
++Phase offset averaging factor
+ .RE
+ 
+ .SS dpll device set id ID [ mode { automatic | manual } ] [ phase-offset-monitor { enable | disable } ] [ phase-offset-avg-factor FACTOR ]
+@@ -131,7 +141,7 @@ mode, the input source must be explicitly configured and the DPLL
+ will not automatically switch sources.
+ 
+ .TP
+-.BI phase-offset-monitor " { enable | disable | true | false | 0 | 1 }"
++.BI phase-offset-monitor " { enable | disable }"
+ Enable or disable phase offset monitoring between the device and its pins.
+ When enabled, the kernel continuously measures and reports phase differences.
+ 
+@@ -231,6 +241,10 @@ Clock ID
+ .IP \[bu]
+ Board label (hardware label from device tree or ACPI)
+ .IP \[bu]
++Panel label
++.IP \[bu]
++Package label
++.IP \[bu]
+ Pin type (mux, ext, synce-eth-port, int-oscillator, gnss)
+ .IP \[bu]
+ Frequency and supported frequency ranges
+@@ -239,13 +253,15 @@ Capabilities (state-can-change, priority-can-change, direction-can-change)
+ .IP \[bu]
+ Phase adjustment range, granularity, and current value
+ .IP \[bu]
++Fractional frequency offset
++.IP \[bu]
+ Parent device relationships (direction, priority, state, phase offset)
+ .IP \[bu]
+ Parent pin relationships
+ .IP \[bu]
+ Reference sync information
+ .IP \[bu]
+-Esync frequency support (if applicable)
++Esync frequency and pulse support (if applicable)
+ .RE
+ 
+ .SS dpll pin set id ID [ PARAMETER VALUE ] ...
+@@ -495,13 +511,7 @@ changes.
+ Success
+ .TP
+ .B 1
+-General failure
+-.TP
+-.B 2
+-Invalid arguments or usage
+-.TP
+-.B 255
+-Netlink communication error
++Failure
+ 
+ .SH NOTES
+ .IP \[bu] 2
 -- 
-2.50.1
+2.53.0
 
 
