@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-283551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283552-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sNFkLW3p9mnhZgIAu9opvQ
-	(envelope-from <netdev+bounces-283551-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 08:21:33 +0200
+	id cFLmGpPp9mnhZgIAu9opvQ
+	(envelope-from <netdev+bounces-283552-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 08:22:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45D704B4979
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 08:21:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88C9B4B4988
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 08:22:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 93B1C300A619
-	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 06:19:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6826B300CC26
+	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 06:19:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CA283A7F72;
-	Sun,  3 May 2026 06:18:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 199C63A8725;
+	Sun,  3 May 2026 06:19:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XP0irmU7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kftozOmt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
+Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54293A7F7C
-	for <netdev@vger.kernel.org>; Sun,  3 May 2026 06:18:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C7323A8727
+	for <netdev@vger.kernel.org>; Sun,  3 May 2026 06:19:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777789138; cv=none; b=Q4eBKmwV+8jx+swoVq72nzK8Mydnn/yh2o01zkcUBddFDUERcdTsvi4nwENgNuU/by342B3vNuyKFTlnANaU7qY660eu1FUhrLdfzU6TgEnR/k0tZI0abjnj6GBEEnTdyXzC5jHm8S0clsIqyDuUIO0223HB+pPDvAOLeRFv4lk=
+	t=1777789145; cv=none; b=pTaje7ahen/rUTvHuZej1YYPBw8gZ2z03Y+/jXutjCcrH01bNRT95J7JQDXvJbpPngTWD3JSu+ebg5/NSgD6jAweDxHKSRXFNXEwxkVleyGMHjCrAMpxQjOPJFuwlDybxL3nAEKcZr216ZQoQT7X5lONCnr1Vc260jCX8MgwkxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777789138; c=relaxed/simple;
-	bh=2O3OVf0qQonHfMYCjR5XMsgEwKGyLOvJsjDd38RQBc8=;
+	s=arc-20240116; t=1777789145; c=relaxed/simple;
+	bh=VMQsjajBTWUTQXHM1uLTk+CZzZIS4OFy8XH2mouJhdI=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Y6Ct5uB1DPHvh12xYG7pHs2MMcVi9AlNqqfMtQoenW/A8M8AvYrv5mSPSS1hJIB9At7Ihuy9bqs16Kz2wdHC+3X+PSCAD1XjrolOZciq8L4s2P9Kn09KMp1vQmgytLAmgJQ7tQa4yuxINdoyMZz9heGz7n67p8bmnG+GkozLz5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XP0irmU7; arc=none smtp.client-ip=74.125.82.171
+	 In-Reply-To:To:Cc; b=smebWDuNW1Dl3pbOJ9urtdwpXL9Ne7rHm5BxzOLwmf91QzbtWgujzzbrsI7+RwOfney5SHy+78pg3ua5iSnNHQbpnz/ycgWIaCk86Yg0n8LhKiyQ/drnLZscDf+9mPSruLDqe8DjLqiu7nKn1H6h+IXGha2WLshvwpGJiuy4rZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kftozOmt; arc=none smtp.client-ip=74.125.82.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-2ecf9e398f4so6727708eec.1
-        for <netdev@vger.kernel.org>; Sat, 02 May 2026 23:18:56 -0700 (PDT)
+Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-2b4520f6b32so4749068eec.0
+        for <netdev@vger.kernel.org>; Sat, 02 May 2026 23:19:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777789136; x=1778393936; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1777789141; x=1778393941; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=bRSwGQhEcEkS2pSs9y/DbwvyjK9+2Xd4unXeg0ecWPI=;
-        b=XP0irmU7XQ3Q0RQf8u0mphCEN1IHGP4t2Wf3wvzXPR+VWyP930CRKgeFF8eo+c3Y9S
-         ek65GGhwi9235B3bGh4wdCootbWnZ5DSlhIvd7hLxaIRyRN0LGhCBgrMvIutPqCdB8wP
-         1E5XrWn+Czw7TDfWb/iIJz4OOp2beXnOCw80r/m/uMRDBhBumOiBBCyGaivgFJGNsAy4
-         FMKTkuVUk7UqF87XMXrQai0nojzEKC23BAj4assqNM/gyYKssWNDhndn6yEKY4tu99jM
-         69ENrGIB3AJxhOLWPIIqZDUk37xKJxCOr5HslbqYmB9bj50JLGJTH11qPnyaQVroVE/w
-         l7fQ==
+        bh=zVJS3wiaZvv/tYLrAi0tZVsh8Vflal+/KTUpI5m0XWA=;
+        b=kftozOmtCK4PXAGlyJlVq3e7y8hhKhDhpy74H6p18o8nFfxGZGTXc4ORIIgYhCFN4g
+         x8V3ojPaHHb5DSrKGyEq/M7HmlYR1vPZbK/VptbXcz03LAmO8/ddCUxy9a5A0wu8TQFG
+         30cQM3eW6//uz+jgx4R2qCwrrQDJB8QI4TK3q5rMvH6YSjgrvD44/KiZQyqAV6KIToZr
+         dvmLO275gtzkRFyZ8X5Dn1xsmgoPrAMYRV71+0C5NbzCHA+jzUgYTBQ08oo49VwQTzs+
+         OItHLVhXZWOos6Lbzj2BrsJMES2K2yOKA6w+RSqkkjihqoXjCWk3FOoufGtNxT6ZfXRG
+         2vCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777789136; x=1778393936;
+        d=1e100.net; s=20251104; t=1777789141; x=1778393941;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=bRSwGQhEcEkS2pSs9y/DbwvyjK9+2Xd4unXeg0ecWPI=;
-        b=sZ2vdEwVgmcp3DPyUqQUL9OIbUiyRZbGVZMY3T5l55NKXwHqJCN/vYtbCutEUbLSA2
-         CPJoaVHKKcRu2lUvjEZnntGWgixTqKurDkzgxSfY18UOv1oI0wGH8XcRk1e6RIgezVIT
-         A+eiJqYE5odoSEGTPm+5uz/y6054QqY0LHO2jI6PKGqgL7XY4Sb6qFH2QBnrTzqYblXJ
-         eihJvXC+VcC2qwco/AUKsl4Mp6tPDzcJBfMxG1jNG+GuxE+vOd7KtQqAHK+SgaBXgBdd
-         tBYcYswP8bclhN+RHb1MVZqdcCWtl1hEazhtTaYceB00L+/KMKkfs4M947gNnM3enfQQ
-         MkoQ==
-X-Gm-Message-State: AOJu0YylIc2v8tWqzZT+lUdpBHW0nc2KGvTrsECnEETqAzZNz5A3nEmt
-	0g/8/aBl+HzmMA+gbSwLDvzlOnTvNWMZh24wVIgj/P2xQ7TM5vIj+e/O
-X-Gm-Gg: AeBDietclaGo8S3jy1FtSVms6LU9GWmciaIZqC+oMDv+xM5f1S1+9DpR/XsTR1ccW39
-	Wn1sNkhElI5JvKkntZYMNupPuFd/owCqlYRhp3sVGmMdVufaSHa0/hQyCtYZK5Uv4PVb/g5mXnZ
-	2F3cjWR3tYBPjNqet+hWjvGzfGrJ8wn9riOPgi8R440gekKUatbmhcAI4LQ8des/B3kXq0xvj0a
-	hgp81raLFYhwkfwSHcKET+39mDtllr8fqHoHl5iImIxXAXTDjHeVCwVjbw7IDiBA2T3afIolLvg
-	hi7EJwNu10kM3/Zcna7zaUp1BOckfEmbuKljjh9kIfNeO4c5HUCj4vOuU1zwj20Av5aGeWcGnoR
-	Vxizo9NSM4GIis2vMJF1qKN1FHrzxGZENq6w+Ir2n1uCxs0ldlX8mamzYgrMXKO3PPpyjzhAuKK
-	XDx2sv53ULqF9armIRRyaqMV+cwxVtAaTMKakTT7ndQA7UeWW9OA==
-X-Received: by 2002:a05:7300:570b:b0:2df:919f:ce59 with SMTP id 5a478bee46e88-2efb99a1519mr2183515eec.19.1777789135791;
-        Sat, 02 May 2026 23:18:55 -0700 (PDT)
+        bh=zVJS3wiaZvv/tYLrAi0tZVsh8Vflal+/KTUpI5m0XWA=;
+        b=o8ZlKoE6Z1frO0iAGBy8RHwB7imUCdgZFc9ZVYLDnPyYT/s11oQGw7LhkGinqtVGCZ
+         zixwFk3muRN4MZBYbO84vhv7t2KKAajlqTXOv7/Yl6+FtfKxcBCD/FVTOTYmWHXU7hJp
+         ll9lVYa7uj20xy6Wn7z1wWUJt6XhQBwyBgwoJH8pnkSaryv+3Zuy7N/ZtD26WbpwStpT
+         qQ5DKOnEm3k7rd3IEXRdo4FkMmMeBs24TFOZ0SDyNJeuy6JKn4RgBzkZyN3tSimjrhRv
+         0+I/egDMOmE+4xR40XzAxl02ltUmFOrHnlEs1Yo0uk4NCyxzpZ59rKc73Y+yjibGwdDw
+         p2Cw==
+X-Gm-Message-State: AOJu0YzKWMtzDWHc7oFHBAtI68kaImSq4l6NsFJZBtk76rnEo/W8P3Mu
+	Us7oWebpO/DntCrCznNISHAAbRajLpAcH+CZkzIdZkmMJEHT4psvrby0
+X-Gm-Gg: AeBDiesqyrCAXGffZCpWcycPOtq6bYqLiT1ChK6zbhaz5hKLOURKeTpFTNCYEk/dSLb
+	YR/yQIH4DKjhk5EbPrAEhO5T2q5xhRgefoaHTS1/+U/Nk1No3yPqXJRKSJkvdcAdZ5rds8AJmoX
+	6Kyu6FGUKhx10/3nqZVGjYCFcDyfUOg+cIgmjdQGDm7m1D3SuOqM44bSvD2tP6K/xikSivu9bql
+	1adEA3r9LJ2GIw9DHNE6MrHga+scFPTiBKAryyagC8iSsz4tKFvvRHx3Xpv1yR9b0G0ZlXSc0IU
+	PMQZ/5JIxUCeVobdBTk1ZIoZDc+PcBK/QSoc/JN7BNhomlG5EV+Cqgeuo6p+tF0+CBfZGcmnXrq
+	b+0jpGvoWSThybBuVZjX1JEC15rC3cxYXl1WP7MZupnsVxoe63wnuutZhP+P7xPIVUOaAq3fB4P
+	8oVpav2lLqSu7jn7owdmw9oQ6geDEGWwR6hbtvcn4FTiorugHV3w==
+X-Received: by 2002:a05:7301:228f:b0:2e2:d94d:6175 with SMTP id 5a478bee46e88-2efb82b2519mr2449850eec.12.1777789141073;
+        Sat, 02 May 2026 23:19:01 -0700 (PDT)
 Received: from tresc054937.tre-sc.gov.br ([187.65.210.13])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ee3bf6811fsm11100344eec.29.2026.05.02.23.18.51
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ee3bf6811fsm11100344eec.29.2026.05.02.23.18.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 May 2026 23:18:55 -0700 (PDT)
+        Sat, 02 May 2026 23:19:00 -0700 (PDT)
 From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Sun, 03 May 2026 03:18:24 -0300
-Subject: [net-next PATCH v2 4/8] net: dsa: realtek: rtl8365mb: add table
- lookup interface
+Date: Sun, 03 May 2026 03:18:25 -0300
+Subject: [net-next PATCH v2 5/8] net: dsa: realtek: rtl8365mb: add VLAN
+ support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,7 +87,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20260503-realtek_forward-v2-4-d064e220b391@gmail.com>
+Message-Id: <20260503-realtek_forward-v2-5-d064e220b391@gmail.com>
 References: <20260503-realtek_forward-v2-0-d064e220b391@gmail.com>
 In-Reply-To: <20260503-realtek_forward-v2-0-d064e220b391@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
@@ -99,27 +99,29 @@ To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
  Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
  Russell King <linux@armlinux.org.uk>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Yury Norov <ynorov@nvidia.com>, 
+ Abdulkader Alrezej <abdulkader.alrezej@gmail.com>, 
  Luiz Angelo Daros de Luca <luizluca@gmail.com>
 X-Mailer: b4 0.15.2
-X-Rspamd-Queue-Id: 45D704B4979
+X-Rspamd-Queue-Id: 88C9B4B4988
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283551-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283552-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -131,438 +133,1222 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bang-olufsen.dk:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bang-olufsen.dk:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
 
 From: Alvin Šipraga <alsi@bang-olufsen.dk>
 
-Add a generic table lookup interface to centralize access to
-the RTL8365MB internal tables.
+Realtek RTL8365MB switches (a.k.a. RTL8367C family) use two different
+structures for VLANs:
 
-This interface abstracts the low-level table access logic and
-will be used by subsequent commits to implement FDB and VLAN
-operations.
+- VLAN4K: A full table with 4096 entries defining port membership and
+  tagging.
+- VLANMC: A smaller table with 32 entries used primarily for PVID
+  assignment.
 
+In this hardware, a port's PVID must point to an index in the VLANMC
+table rather than a VID directly. Since the VLANMC table is limited to
+32 entries, the driver implements a dynamic allocation scheme to
+maximize resource usage:
+
+- VLAN4K is treated by the driver as the source of truth for membership.
+- A VLANMC entry is only allocated when a port is configured to use a
+  specific VID as its PVID.
+- VLANMC entries are deleted when no longer needed as a PVID by any port.
+
+Although VLANMC has a members field, the switch only checks membership
+in the VLAN4K table. However, when a corresponding VLAN entry also exists
+in VLANMC, this driver keeps both membership configurations in sync.
+
+VLANMC index 0, although a valid entry, is reserved in this driver as a
+neutral PVID value for ports not using a specific PVID.
+
+In the subsequent RTL8367D switch family, VLANMC table was
+removed and PVID assignment was delegated to a dedicated set of
+registers.
+
+All ports start isolated, forwarding exclusively to CPU ports, and
+with VLAN transparent, ignoring VLAN membership. Once a member in a
+bridge, the port isolation is expanded to include the bridge members.
+When that bridge enables VLAN filtering, the VLAN transparent feature is
+disabled, letting the switch filter based on VLAN setup.
+
+The use of FIELD_PREP for reconstructing LO/HI values was suggested by
+Yury Norov.
+
+Fix for vlan_setup and vlan_filtering was suggested by Abdulkader
+Alrezej.
+
+Suggested-by: Yury Norov <ynorov@nvidia.com>
+Suggested-by: Abdulkader Alrezej <abdulkader.alrezej@gmail.com>
 Co-developed-by: Alvin Šipraga <alsi@bang-olufsen.dk>
 Signed-off-by: Alvin Šipraga <alsi@bang-olufsen.dk>
 Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Reviewed-by: Linus Walleij <linusw@kernel.org>
 ---
- drivers/net/dsa/realtek/Makefile          |   1 +
- drivers/net/dsa/realtek/rtl8365mb_table.c | 255 ++++++++++++++++++++++++++++++
- drivers/net/dsa/realtek/rtl8365mb_table.h | 133 ++++++++++++++++
- 3 files changed, 389 insertions(+)
+ drivers/net/dsa/realtek/Makefile         |   1 +
+ drivers/net/dsa/realtek/rtl8365mb_main.c | 248 ++++++++++
+ drivers/net/dsa/realtek/rtl8365mb_vlan.c | 824 +++++++++++++++++++++++++++++++
+ drivers/net/dsa/realtek/rtl8365mb_vlan.h |  25 +
+ 4 files changed, 1098 insertions(+)
 
 diff --git a/drivers/net/dsa/realtek/Makefile b/drivers/net/dsa/realtek/Makefile
-index 3f986e04912f..99654c4c5a3d 100644
+index 99654c4c5a3d..b7fc4e852fd8 100644
 --- a/drivers/net/dsa/realtek/Makefile
 +++ b/drivers/net/dsa/realtek/Makefile
-@@ -17,3 +17,4 @@ rtl8366-objs 				+= rtl8366rb-leds.o
- endif
+@@ -18,3 +18,4 @@ endif
  obj-$(CONFIG_NET_DSA_REALTEK_RTL8365MB) += rtl8365mb.o
  rtl8365mb-objs := rtl8365mb_main.o \
-+		  rtl8365mb_table.o \
-diff --git a/drivers/net/dsa/realtek/rtl8365mb_table.c b/drivers/net/dsa/realtek/rtl8365mb_table.c
-new file mode 100644
-index 000000000000..e706ea2ccb85
---- /dev/null
-+++ b/drivers/net/dsa/realtek/rtl8365mb_table.c
-@@ -0,0 +1,255 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Look-up table query interface for the rtl8365mb switch family
-+ *
-+ * Copyright (C) 2022 Alvin Šipraga <alsi@bang-olufsen.dk>
+ 		  rtl8365mb_table.o \
++		  rtl8365mb_vlan.o \
+diff --git a/drivers/net/dsa/realtek/rtl8365mb_main.c b/drivers/net/dsa/realtek/rtl8365mb_main.c
+index 7ddb82fcd026..b37aa847a9aa 100644
+--- a/drivers/net/dsa/realtek/rtl8365mb_main.c
++++ b/drivers/net/dsa/realtek/rtl8365mb_main.c
+@@ -104,6 +104,7 @@
+ #include "realtek-smi.h"
+ #include "realtek-mdio.h"
+ #include "rtl83xx.h"
++#include "rtl8365mb_vlan.h"
+ 
+ /* Family-specific data and limits */
+ #define RTL8365MB_PHYADDRMAX		7
+@@ -292,6 +293,67 @@
+ #define   RTL8365MB_MSTI_CTRL_PORT_STATE_MASK(_physport) \
+ 		(0x3 << RTL8365MB_MSTI_CTRL_PORT_STATE_OFFSET((_physport)))
+ 
++/* Miscellaneous port configuration register, incl. VLAN egress mode */
++#define RTL8365MB_PORT_MISC_CFG_REG_BASE			0x000E
++#define RTL8365MB_PORT_MISC_CFG_REG(_p) \
++		(RTL8365MB_PORT_MISC_CFG_REG_BASE + ((_p) << 5))
++#define   RTL8365MB_PORT_MISC_CFG_SMALL_TAG_IPG_MASK		0x8000
++#define   RTL8365MB_PORT_MISC_CFG_TX_ITFSP_MODE_MASK		0x4000
++#define   RTL8365MB_PORT_MISC_CFG_FLOWCTRL_INDEP_MASK		0x2000
++#define   RTL8365MB_PORT_MISC_CFG_DOT1Q_REMARK_ENABLE_MASK	0x1000
++#define   RTL8365MB_PORT_MISC_CFG_INGRESSBW_FLOWCTRL_MASK	0x0800
++#define   RTL8365MB_PORT_MISC_CFG_INGRESSBW_IFG_MASK		0x0400
++#define   RTL8365MB_PORT_MISC_CFG_RX_SPC_MASK			0x0200
++#define   RTL8365MB_PORT_MISC_CFG_CRC_SKIP_MASK			0x0100
++#define   RTL8365MB_PORT_MISC_CFG_PKTGEN_TX_FIRST_MASK		0x0080
++#define   RTL8365MB_PORT_MISC_CFG_MAC_LOOPBACK_MASK		0x0040
++/* See &rtl8365mb_vlan_egress_mode */
++#define   RTL8365MB_PORT_MISC_CFG_VLAN_EGRESS_MODE_MASK		0x0030
++#define   RTL8365MB_PORT_MISC_CFG_CONGESTION_SUSTAIN_TIME_MASK	0x000F
++
++/**
++ * enum rtl8365mb_vlan_egress_mode - port VLAN egress mode
++ * @RTL8365MB_VLAN_EGRESS_MODE_ORIGINAL: follow untag mask in VLAN4k table entry
++ * @RTL8365MB_VLAN_EGRESS_MODE_KEEP: the VLAN tag format of egressed packets
++ * will remain the same as their ingressed format, but the priority and VID
++ * fields may be altered
++ * @RTL8365MB_VLAN_EGRESS_MODE_PRI_TAG: always egress with priority tag
++ * @RTL8365MB_VLAN_EGRESS_MODE_REAL_KEEP: the VLAN tag format of egressed
++ * packets will remain the same as their ingressed format, and neither the
++ * priority nor VID fields can be altered
 + */
++enum rtl8365mb_vlan_egress_mode {
++	RTL8365MB_VLAN_EGRESS_MODE_ORIGINAL = 0,
++	RTL8365MB_VLAN_EGRESS_MODE_KEEP = 1,
++	RTL8365MB_VLAN_EGRESS_MODE_PRI_TAG = 2,
++	RTL8365MB_VLAN_EGRESS_MODE_REAL_KEEP = 3,
++};
 +
-+#include "rtl8365mb_table.h"
-+#include <linux/regmap.h>
++/* VLAN control register */
++#define RTL8365MB_VLAN_CTRL_REG			0x07A8
++#define   RTL8365MB_VLAN_CTRL_EN_MASK		0x0001
 +
-+/* Table access control register */
-+#define RTL8365MB_TABLE_CTRL_REG		0x0500
-+/* Should be one of rtl8365mb_table enum members */
-+#define   RTL8365MB_TABLE_CTRL_TABLE_MASK	GENMASK(2, 0)
-+/* Should be one of rtl8365mb_table_op enum members */
-+#define   RTL8365MB_TABLE_CTRL_OP_MASK		GENMASK(3, 3)
-+/* Should be one of rtl8365mb_table_l2_method enum members */
-+#define   RTL8365MB_TABLE_CTRL_METHOD_MASK	GENMASK(7, 4)
-+/* NOTE: PORT_MASK is only 4 bit, which suggests that port-based
-+ * look-up of the L2 table only works for physical port addresses
-+ * 0~4. It could be that the Realtek driver is out-of-date and
-+ * actually the mask is something like 0xFF00, but this is
-+ * unconfirmed.
-+ */
-+#define   RTL8365MB_TABLE_CTRL_PORT_MASK	GENMASK(11, 8)
++/* VLAN ingress filter register */
++#define RTL8365MB_VLAN_INGRESS_REG				0x07A9
++#define   RTL8365MB_VLAN_INGRESS_MASK				GENMASK(10, 0)
++#define   RTL8365MB_VLAN_INGRESS_FILTER_PORT_EN_OFFSET(_p)	(_p)
++#define   RTL8365MB_VLAN_INGRESS_FILTER_PORT_EN_MASK(_p)	BIT(_p)
 +
-+/* Table access address register */
-+#define RTL8365MB_TABLE_ACCESS_ADDR_REG		0x0501
-+#define   RTL8365MB_TABLE_ADDR_MASK		GENMASK(13, 0)
++/* VLAN "transparent" setting registers */
++#define RTL8365MB_VLAN_EGRESS_TRANSPARENT_REG_BASE	0x09D0
++#define RTL8365MB_VLAN_EGRESS_TRANSPARENT_REG(_p) \
++		(RTL8365MB_VLAN_EGRESS_TRANSPARENT_REG_BASE + (_p))
 +
-+/* Table status register */
-+#define RTL8365MB_TABLE_STATUS_REG			0x0502
-+#define   RTL8365MB_TABLE_STATUS_ADDRESS_MASK		GENMASK(10, 0)
-+/* set for L3, unset for L2  */
-+#define   RTL8365MB_TABLE_STATUS_ADDR_TYPE_MASK		GENMASK(11, 11)
-+#define   RTL8365MB_TABLE_STATUS_HIT_STATUS_MASK	GENMASK(12, 12)
-+#define   RTL8365MB_TABLE_STATUS_BUSY_FLAG_MASK		GENMASK(13, 13)
-+#define   RTL8365MB_TABLE_STATUS_ADDRESS_EXT_MASK	GENMASK(14, 14)
++/* Frame type filtering registers */
++#define RTL8365MB_VLAN_ACCEPT_FRAME_TYPE_BASE	0x07aa
++#define RTL8365MB_VLAN_ACCEPT_FRAME_TYPE_REG(port) \
++		(RTL8365MB_VLAN_ACCEPT_FRAME_TYPE_BASE + ((port) >> 3))
++/* required as FIELD_PREP cannot use non-constant masks */
++#define RTL8365MB_VLAN_ACCEPT_FRAME_TYPE_MASK(port) \
++		(0x3 << RTL8365MB_VLAN_ACCEPT_FRAME_TYPE_OFFSET(port))
++#define RTL8365MB_VLAN_ACCEPT_FRAME_TYPE_OFFSET(port) \
++		(((port) & 0x7) << 1)
 +
-+/* Table read/write registers */
-+#define RTL8365MB_TABLE_WRITE_BASE			0x0510
-+#define RTL8365MB_TABLE_WRITE_REG(_x) \
-+		(RTL8365MB_TABLE_WRITE_BASE + (_x))
-+#define RTL8365MB_TABLE_READ_BASE			0x0520
-+#define RTL8365MB_TABLE_READ_REG(_x) \
-+		(RTL8365MB_TABLE_READ_BASE + (_x))
-+#define RTL8365MB_TABLE_ENTRY_MAX_SIZE			10
-+#define RTL8365MB_TABLE_10TH_DATA_MASK			GENMASK(3, 0)
-+#define RTL8365MB_TABLE_WRITE_10TH_REG \
-+		RTL8365MB_TABLE_WRITE_REG(RTL8365MB_TABLE_ENTRY_MAX_SIZE - 1)
-+
-+static int rtl8365mb_table_poll_busy(struct realtek_priv *priv)
+ /* MIB counter value registers */
+ #define RTL8365MB_MIB_COUNTER_BASE	0x1000
+ #define RTL8365MB_MIB_COUNTER_REG(_x)	(RTL8365MB_MIB_COUNTER_BASE + (_x))
+@@ -1196,6 +1258,175 @@ static void rtl8365mb_port_stp_state_set(struct dsa_switch *ds, int port,
+ 			   val << RTL8365MB_MSTI_CTRL_PORT_STATE_OFFSET(port));
+ }
+ 
++static int rtl8365mb_port_set_transparent(struct realtek_priv *priv,
++					  int igr_port, int egr_port,
++					  bool enable)
 +{
-+	u32 val;
++	dev_dbg(priv->dev, "%s transparent VLAN from %d to %d\n",
++		enable ? "Enable" : "Disable", igr_port, egr_port);
 +
-+	return regmap_read_poll_timeout(priv->map_nolock,
-+			RTL8365MB_TABLE_STATUS_REG, val,
-+			!FIELD_GET(RTL8365MB_TABLE_STATUS_BUSY_FLAG_MASK, val),
-+			10, 100);
++	/* "Transparent" between the two ports means that packets forwarded by
++	 * igr_port and egressed on egr_port will not be filtered by the usual
++	 * VLAN membership settings.
++	 */
++	return regmap_update_bits(priv->map,
++			RTL8365MB_VLAN_EGRESS_TRANSPARENT_REG(egr_port),
++			BIT(igr_port), enable ? BIT(igr_port) : 0);
 +}
 +
-+int rtl8365mb_table_query(struct realtek_priv *priv,
-+			  enum rtl8365mb_table table,
-+			  enum rtl8365mb_table_op op, u16 *addr,
-+			  enum rtl8365mb_table_l2_method method,
-+			  u16 port, u16 *data, size_t size)
++static int rtl8365mb_port_set_ingress_filtering(struct realtek_priv *priv,
++						int port, bool enable)
 +{
-+	bool addr_as_input = true;
-+	bool write_data = false;
-+	int ret = 0;
-+	u32 cmd;
-+	u32 val;
-+	u32 hit;
-+
-+	if (!addr) {
-+		dev_err(priv->dev, "%s: addr is NULL\n", __func__);
-+		return -EINVAL;
-+	}
-+
-+	if (!data) {
-+		dev_err(priv->dev, "%s: data is NULL\n", __func__);
-+		return -EINVAL;
-+	}
-+
-+	if (size > RTL8365MB_TABLE_ENTRY_MAX_SIZE) {
-+		dev_err(priv->dev, "%s: size too big: %zu\n", __func__, size);
-+		return -E2BIG;
-+	}
-+
-+	if (size == 0) {
-+		dev_err(priv->dev, "%s: size is 0\n", __func__);
-+		return -EINVAL;
-+	}
-+
-+	if (!FIELD_FIT(RTL8365MB_TABLE_CTRL_TABLE_MASK, table)) {
-+		dev_err(priv->dev, "%s: table %d does not fit in MASK\n",
-+			__func__, table);
-+		return -EINVAL;
-+	}
-+
-+	/* Prepare target table and operation (read or write) */
-+	cmd = 0;
-+	cmd |= FIELD_PREP(RTL8365MB_TABLE_CTRL_TABLE_MASK, table);
-+	cmd |= FIELD_PREP(RTL8365MB_TABLE_CTRL_OP_MASK, op);
-+	if (op == RTL8365MB_TABLE_OP_READ && table == RTL8365MB_TABLE_L2) {
-+		if (!FIELD_FIT(RTL8365MB_TABLE_CTRL_METHOD_MASK, method))
-+			return -EINVAL;
-+
-+		cmd |= FIELD_PREP(RTL8365MB_TABLE_CTRL_METHOD_MASK, method);
-+		switch (method) {
-+		case RTL8365MB_TABLE_L2_METHOD_MAC:
-+			/*
-+			 * Method MAC requires as input the same L2 table format
-+			 * you'll get as result. However, it might only use mac
-+			 * address and FID/VID fields.
-+			 */
-+			write_data = true;
-+
-+			/* METHOD_MAC does not use addr as input, but may return
-+			 * the matched index.
-+			 */
-+			addr_as_input = false;
-+
-+			break;
-+		case RTL8365MB_TABLE_L2_METHOD_ADDR:
-+		case RTL8365MB_TABLE_L2_METHOD_ADDR_NEXT:
-+		case RTL8365MB_TABLE_L2_METHOD_ADDR_NEXT_UC:
-+		case RTL8365MB_TABLE_L2_METHOD_ADDR_NEXT_MC:
-+			break;
-+		case RTL8365MB_TABLE_L2_METHOD_ADDR_NEXT_UC_PORT:
-+			if (!FIELD_FIT(RTL8365MB_TABLE_CTRL_PORT_MASK, port))
-+				return -EINVAL;
-+
-+			cmd |= FIELD_PREP(RTL8365MB_TABLE_CTRL_PORT_MASK, port);
-+			break;
-+		default:
-+			return -EINVAL;
-+		}
-+	} else if (op == RTL8365MB_TABLE_OP_WRITE) {
-+		write_data = true;
-+
-+		/* Writing to L2 does not use addr as input, as the table index
-+		 * is derived from key fields.
-+		 */
-+		if (table == RTL8365MB_TABLE_L2)
-+			addr_as_input = false;
-+	}
-+
-+	/* Validate addr only when used as an input */
-+	if (addr_as_input) {
-+		if (!FIELD_FIT(RTL8365MB_TABLE_ADDR_MASK, *addr)) {
-+			dev_err(priv->dev, "%s: addr %u does not fit in MASK\n",
-+				__func__, *addr);
-+			return -EINVAL;
-+		}
-+	}
-+
-+	/* To prevent concurrent access to the look-up tables, take the regmap
-+	 * lock manually and access via the map_nolock regmap.
++	/* Ingress filtering enabled: Discard VLAN-tagged frames if the port is
++	 * not a member of the VLAN with which the packet is associated.
++	 * Untagged packets will also be discarded unless the port has a PVID
++	 * programmed. Priority-tagged frames are treated as untagged frames.
++	 *
++	 * Ingress filtering disabled: Accept all tagged and untagged frames.
 +	 */
-+	mutex_lock(&priv->map_lock);
++	return regmap_update_bits(priv->map, RTL8365MB_VLAN_INGRESS_REG,
++			RTL8365MB_VLAN_INGRESS_FILTER_PORT_EN_MASK(port),
++			enable ?
++			RTL8365MB_VLAN_INGRESS_FILTER_PORT_EN_MASK(port) :
++			0);
++}
 +
-+	/* Write entry data if writing to the table (or L2_METHOD_MAC) */
-+	if (write_data) {
-+		/* bulk write data up to 9th byte */
-+		ret = regmap_bulk_write(priv->map_nolock,
-+					RTL8365MB_TABLE_WRITE_BASE,
-+					data,
-+					min_t(size_t, size,
-+					      RTL8365MB_TABLE_ENTRY_MAX_SIZE -
-+						      1));
-+		if (ret)
-+			goto out;
++static int
++rtl8365mb_port_set_vlan_egress_mode(struct realtek_priv *priv, int port,
++				    enum rtl8365mb_vlan_egress_mode mode)
++{
++	u32 val;
 +
-+		/* 10th register uses only 4 less significant bits */
-+		if (size == RTL8365MB_TABLE_ENTRY_MAX_SIZE) {
-+			val = FIELD_PREP(RTL8365MB_TABLE_10TH_DATA_MASK,
-+					 data[size - 1]);
-+			ret = regmap_update_bits(priv->map_nolock,
-+						 RTL8365MB_TABLE_WRITE_10TH_REG,
-+						 RTL8365MB_TABLE_10TH_DATA_MASK,
-+						 val);
-+		}
++	val = FIELD_PREP(RTL8365MB_PORT_MISC_CFG_VLAN_EGRESS_MODE_MASK, mode);
++	return regmap_update_bits(priv->map,
++			RTL8365MB_PORT_MISC_CFG_REG(port),
++			RTL8365MB_PORT_MISC_CFG_VLAN_EGRESS_MODE_MASK, val);
++}
 +
-+		if (ret)
-+			goto out;
-+	}
++static int rtl8365mb_port_vlan_filtering(struct dsa_switch *ds, int port,
++					 bool vlan_filtering,
++					 struct netlink_ext_ack *extack)
++{
++	enum rtl8365mb_vlan_egress_mode mode;
++	struct realtek_priv *priv = ds->priv;
++	struct dsa_port *dp;
++	int ret;
 +
-+	/* Write address (if needed) */
-+	if (addr_as_input) {
-+		ret = regmap_write(priv->map_nolock,
-+				   RTL8365MB_TABLE_ACCESS_ADDR_REG,
-+				   FIELD_PREP(RTL8365MB_TABLE_ADDR_MASK,
-+					      *addr));
-+		if (ret)
-+			goto out;
-+	}
++	dev_dbg(priv->dev, "port %d: %s VLAN filtering\n", port,
++		vlan_filtering ? "enable" : "disable");
 +
-+	/* Execute */
-+	ret = regmap_write(priv->map_nolock, RTL8365MB_TABLE_CTRL_REG, cmd);
++	/* When vlan filter is enable/disabled in a bridge, this function is
++	 * called for all member ports. We need to enable/disable ingress
++	 * VLAN membership check.
++	 */
++	ret = rtl8365mb_port_set_ingress_filtering(priv, port, vlan_filtering);
 +	if (ret)
-+		goto out;
++		return ret;
 +
-+	/* Poll for completion */
-+	ret = rtl8365mb_table_poll_busy(priv);
-+	if (ret)
-+		goto out;
-+
-+	/* For both reads and writes to the L2 table, check status */
-+	if (table == RTL8365MB_TABLE_L2) {
-+		ret = regmap_read(priv->map_nolock, RTL8365MB_TABLE_STATUS_REG,
-+				  &val);
++	/* However, we also enable/disable egress filtering because the switch
++	 * still consider the egress interface VLAN membership to forward the
++	 * traffic. We enable/disable that check disabling/enabling transparent
++	 * VLAN between the ingress port and all other available ports.
++	 */
++	dsa_switch_for_each_available_port(dp, ds) {
++		/* port isolation will still keep traffic inside the bridge */
++		ret = rtl8365mb_port_set_transparent(priv, port, dp->index,
++						     !vlan_filtering);
 +		if (ret)
-+			goto out;
-+
-+		/* Did the query find an entry? */
-+		hit = FIELD_GET(RTL8365MB_TABLE_STATUS_HIT_STATUS_MASK, val);
-+		if (!hit) {
-+			ret = -ENOENT;
-+			goto out;
-+		}
-+
-+		/* If so, extract the address */
-+		*addr = 0;
-+		*addr |= FIELD_GET(RTL8365MB_TABLE_STATUS_ADDRESS_MASK, val);
-+		*addr |= FIELD_GET(RTL8365MB_TABLE_STATUS_ADDRESS_EXT_MASK, val)
-+			 << 11;
-+		/* only set if it is a L3 address */
-+		*addr |= FIELD_GET(RTL8365MB_TABLE_STATUS_ADDR_TYPE_MASK, val)
-+			 << 12;
++			return ret;
 +	}
 +
-+	/* Finally, get the table entry if we were reading */
-+	if (op == RTL8365MB_TABLE_OP_READ) {
-+		ret = regmap_bulk_read(priv->map_nolock,
-+				       RTL8365MB_TABLE_READ_BASE,
-+				       data, size);
++	/* When VLAN filtering is disabled, preserve frames exactly as received.
++	 * Otherwise, the VLAN egress pipeline may still alter tag state
++	 * according to VLAN membership and untag configuration.
++	 */
++	if (vlan_filtering)
++		mode = RTL8365MB_VLAN_EGRESS_MODE_ORIGINAL;
++	else
++		mode = RTL8365MB_VLAN_EGRESS_MODE_REAL_KEEP;
 +
-+		/* For the biggest table entries, the uppermost table
-+		 * entry register has space for only one nibble. Mask
-+		 * out the remainder bits. Empirically I saw nothing
-+		 * wrong with omitting this mask, but it may prevent
-+		 * unwanted behaviour. FYI.
-+		 */
-+		if (size == RTL8365MB_TABLE_ENTRY_MAX_SIZE) {
-+			val = FIELD_GET(RTL8365MB_TABLE_10TH_DATA_MASK,
-+					data[size - 1]);
-+			data[size - 1] = val;
++	return rtl8365mb_port_set_vlan_egress_mode(priv, port, mode);
++}
++
++static int rtl8365mb_port_vlan_add(struct dsa_switch *ds, int port,
++				   const struct switchdev_obj_port_vlan *vlan,
++				   struct netlink_ext_ack *extack)
++{
++	bool untagged = !!(vlan->flags & BRIDGE_VLAN_INFO_UNTAGGED);
++	bool pvid = !!(vlan->flags & BRIDGE_VLAN_INFO_PVID);
++	struct realtek_priv *priv = ds->priv;
++	int ret;
++
++	dev_dbg(priv->dev, "add VLAN %d on port %d, %s, %s\n",
++		vlan->vid, port, untagged ? "untagged" : "tagged",
++		pvid ? "PVID" : "no PVID");
++	/* add port to vlan4k. It knows nothing about PVID */
++	ret = rtl8365mb_vlan_4k_port_add(ds, port, vlan, extack);
++	if (ret)
++		return ret;
++
++	/* Set PVID if needed */
++	if (pvid) {
++		ret = rtl8365mb_vlan_pvid_port_add(ds, port, vlan, extack);
++		if (ret)
++			goto undo_vlan_4k;
++	}
++
++	return 0;
++
++undo_vlan_4k:
++	(void)rtl8365mb_vlan_4k_port_del(ds, port, vlan);
++	return ret;
++}
++
++static int rtl8365mb_port_vlan_del(struct dsa_switch *ds, int port,
++				   const struct switchdev_obj_port_vlan *vlan)
++{
++	bool untagged = !!(vlan->flags & BRIDGE_VLAN_INFO_UNTAGGED);
++	bool pvid = !!(vlan->flags & BRIDGE_VLAN_INFO_PVID);
++	struct realtek_priv *priv = ds->priv;
++	int ret1, ret2;
++
++	dev_dbg(priv->dev, "del VLAN %d on port %d, %s, %s\n",
++		vlan->vid, port, untagged ? "untagged" : "tagged",
++		pvid ? "PVID" : "no PVID");
++
++	ret1 = rtl8365mb_vlan_pvid_port_del(ds, port, vlan);
++	ret2 = rtl8365mb_vlan_4k_port_del(ds, port, vlan);
++
++	return ret1 ?: ret2;
++}
++
++/* VLAN support is always enabled in the switch.
++ *
++ * Standalone forwarding relies on transparent VLAN mode combined with per-port
++ * isolation masks restricting egress to CPU ports only.
++ *
++ */
++static int rtl8365mb_vlan_setup(struct dsa_switch *ds)
++{
++	struct realtek_priv *priv = ds->priv;
++	struct dsa_port *dp;
++	int ret;
++
++	dsa_switch_for_each_available_port(dp, ds) {
++		/* Disable vlan-filtering for all ports */
++		ret = rtl8365mb_port_vlan_filtering(ds, dp->index, false, NULL);
++		if (ret) {
++			dev_err(priv->dev,
++				"Failed to disable vlan filtering on port %d\n",
++				dp->index);
++			return ret;
 +		}
 +	}
 +
-+out:
-+	mutex_unlock(&priv->map_lock);
++	/* VLAN is always enabled. */
++	ret = regmap_update_bits(priv->map, RTL8365MB_VLAN_CTRL_REG,
++				 RTL8365MB_VLAN_CTRL_EN_MASK,
++				 FIELD_PREP(RTL8365MB_VLAN_CTRL_EN_MASK, 1));
++	return ret;
++}
++
+ static int rtl8365mb_port_set_learning(struct realtek_priv *priv, int port,
+ 				       bool enable)
+ {
+@@ -2035,6 +2266,20 @@ static int rtl8365mb_setup(struct dsa_switch *ds)
+ 	if (ret)
+ 		goto out_teardown_irq;
+ 
++	ds->configure_vlan_while_not_filtering = true;
++
++	/* Set up VLAN */
++	ret = rtl8365mb_vlan_setup(ds);
++	if (ret)
++		goto out_teardown_irq;
++
++	/* Set maximum packet length to 1536 bytes */
++	ret = regmap_update_bits(priv->map, RTL8365MB_CFG0_MAX_LEN_REG,
++				 RTL8365MB_CFG0_MAX_LEN_MASK,
++				 FIELD_PREP(RTL8365MB_CFG0_MAX_LEN_MASK, 1536));
++	if (ret)
++		goto out_teardown_irq;
++
+ 	ret = rtl83xx_setup_user_mdio(ds);
+ 	if (ret) {
+ 		dev_err(priv->dev, "could not set up MDIO bus\n");
+@@ -2145,6 +2390,9 @@ static const struct dsa_switch_ops rtl8365mb_switch_ops = {
+ 	.teardown = rtl8365mb_teardown,
+ 	.phylink_get_caps = rtl8365mb_phylink_get_caps,
+ 	.port_stp_state_set = rtl8365mb_port_stp_state_set,
++	.port_vlan_add = rtl8365mb_port_vlan_add,
++	.port_vlan_del = rtl8365mb_port_vlan_del,
++	.port_vlan_filtering = rtl8365mb_port_vlan_filtering,
+ 	.get_strings = rtl8365mb_get_strings,
+ 	.get_ethtool_stats = rtl8365mb_get_ethtool_stats,
+ 	.get_sset_count = rtl8365mb_get_sset_count,
+diff --git a/drivers/net/dsa/realtek/rtl8365mb_vlan.c b/drivers/net/dsa/realtek/rtl8365mb_vlan.c
+new file mode 100644
+index 000000000000..efe66cbebb3c
+--- /dev/null
++++ b/drivers/net/dsa/realtek/rtl8365mb_vlan.c
+@@ -0,0 +1,824 @@
++// SPDX-License-Identifier: GPL-2.0
++/* VLAN configuration interface for the rtl8365mb switch family
++ *
++ * Copyright (C) 2022 Alvin Šipraga <alsi@bang-olufsen.dk>
++ *
++ * VLAN configuration takes place in two separate domains of the switch: the
++ * VLAN4k table and the VLAN membership configuration (MC) database. While the
++ * VLAN4k table is exhaustive and can be fully populated with 4096 VLAN
++ * configurations, the same does not hold for the VLAN membership configuration
++ * database, which is limited to 32 entries.
++ *
++ * The switch will normally only use the VLAN4k table when making forwarding
++ * decisions. The VLAN membership configuration database is a vestigial ASIC
++ * design and is only used for a few specific features in the rtl8365mb
++ * family. This means that the limit of 32 entries should not hinder us in
++ * programming a huge number of VLANs into the switch.
++ *
++ * One necessary use of the VLAN membership configuration database is for the
++ * programming of a port-based VLAN ID (PVID). The PVID is programmed on a
++ * per-port basis via register field, which refers to a specific VLAN membership
++ * configuration via an index 0~31. In order to maintain coherent behaviour on a
++ * port with a PVID, it is necessary to keep the VLAN configuration synchronized
++ * between the VLAN4k table and the VLAN membership configuration database.
++ *
++ * Since VLAN membership configs are a scarce resource, it will only be used
++ * when strictly needed (i.e. a VLAN with members using PVID). Otherwise, the
++ * VLAN4k will be enough.
++ *
++ * With some exceptions, the entries in both the VLAN4k table and the VLAN
++ * membership configuration database offer the same configuration options. The
++ * differences are as follows:
++ *
++ * 1. VLAN4k entries can specify whether to use Independent or Shared VLAN
++ *    Learning (IVL or SVL respectively). VLAN membership config entries
++ *    cannot. This underscores the fact that VLAN membership configs are not
++ *    involved in the learning process of the ASIC.
++ *
++ * 2. VLAN membership config entries use an "enhanced VLAN ID" (efid), which has
++ *    a range 0~8191 compared with the standard 0~4095 range of the VLAN4k
++ *    table. This underscores the fact that VLAN membership configs can be used
++ *    to group ports on a layer beyond the standard VLAN configuration, which
++ *    may be useful for ACL rules which specify alternative forwarding
++ *    decisions.
++ *
++ * VLANMC index 0 is reserved as a neutral PVID, used for standalone ports.
++ *
++ */
++
++#include "rtl8365mb_vlan.h"
++#include "rtl8365mb_table.h"
++#include <linux/if_bridge.h>
++#include <linux/regmap.h>
++
++/* CVLAN (i.e. VLAN4k) table entry layout, u16[3] */
++#define RTL8365MB_CVLAN_ENTRY_SIZE			3 /* 48-bits */
++#define RTL8365MB_CVLAN_ENTRY_D0_MBR_MASK		GENMASK(7, 0)
++#define   RTL8365MB_CVLAN_MBR_LO_MASK			GENMASK(7, 0)
++#define RTL8365MB_CVLAN_ENTRY_D0_UNTAG_MASK		GENMASK(15, 8)
++#define   RTL8365MB_CVLAN_UNTAG_LO_MASK			GENMASK(7, 0)
++#define RTL8365MB_CVLAN_ENTRY_D1_FID_MASK		GENMASK(3, 0)
++#define RTL8365MB_CVLAN_ENTRY_D1_VBPEN_MASK		GENMASK(4, 4)
++#define RTL8365MB_CVLAN_ENTRY_D1_VBPRI_MASK		GENMASK(7, 5)
++#define RTL8365MB_CVLAN_ENTRY_D1_ENVLANPOL_MASK		GENMASK(8, 8)
++#define RTL8365MB_CVLAN_ENTRY_D1_METERIDX_MASK		GENMASK(13, 9)
++#define   RTL8365MB_CVLAN_METERIDX_LO_MASK		GENMASK(4, 0)
++#define RTL8365MB_CVLAN_ENTRY_D1_IVL_SVL_MASK		GENMASK(14, 14)
++/* extends RTL8365MB_CVLAN_ENTRY_D0_MBR_MASK */
++#define RTL8365MB_CVLAN_ENTRY_D2_MBR_EXT_MASK		GENMASK(2, 0)
++#define   RTL8365MB_CVLAN_MBR_HI_MASK			GENMASK(10, 8)
++/* extends RTL8365MB_CVLAN_ENTRY_D0_UNTAG_MASK */
++#define RTL8365MB_CVLAN_ENTRY_D2_UNTAG_EXT_MASK		GENMASK(5, 3)
++#define   RTL8365MB_CVLAN_UNTAG_HI_MASK			GENMASK(10, 8)
++/* extends RTL8365MB_CVLAN_ENTRY_D1_METERIDX_MASK */
++#define RTL8365MB_CVLAN_ENTRY_D2_METERIDX_EXT_MASK	GENMASK(6, 6)
++#define   RTL8365MB_CVLAN_METERIDX_HI_MASK		GENMASK(5, 5)
++
++/* VLAN member configuration registers 0~31, u16[3] */
++#define RTL8365MB_VLAN_MC_BASE				0x0728
++#define RTL8365MB_VLAN_MC_ENTRY_SIZE			4 /* 64-bit */
++#define RTL8365MB_VLAN_MC_REG(index) \
++		(RTL8365MB_VLAN_MC_BASE + \
++		 (RTL8365MB_VLAN_MC_ENTRY_SIZE * (index)))
++#define   RTL8365MB_VLAN_MC_D0_MBR_MASK			GENMASK(10, 0)
++#define   RTL8365MB_VLAN_MC_D1_FID_MASK			GENMASK(3, 0)
++
++#define   RTL8365MB_VLAN_MC_D2_VBPEN_MASK		GENMASK(0, 0)
++#define   RTL8365MB_VLAN_MC_D2_VBPRI_MASK		GENMASK(3, 1)
++#define   RTL8365MB_VLAN_MC_D2_ENVLANPOL_MASK		GENMASK(4, 4)
++#define   RTL8365MB_VLAN_MC_D2_METERIDX_MASK		GENMASK(10, 5)
++#define   RTL8365MB_VLAN_MC_D3_EVID_MASK		GENMASK(12, 0)
++
++/* Some limits for VLAN4k/VLAN membership config entries */
++#define RTL8365MB_PRIORITYMAX	7
++#define RTL8365MB_FIDMAX	15
++#define RTL8365MB_METERMAX	63
++#define RTL8365MB_VLAN_MCMAX	31
++
++/* RTL8367S supports 4k vlans (vid<=4095) and 32 enhanced vlans
++ * for VIDs up to 8191
++ */
++#define RTL8365MB_MAX_4K_VID	0x0FFF /* 4095 */
++#define RTL8365MB_MAX_MC_VID	0x1FFF /* 8191 */
++
++ /* Port-based VID registers 0~5 - each one holds an MC index for two ports */
++#define RTL8365MB_VLAN_PVID_CTRL_BASE			0x0700
++#define RTL8365MB_VLAN_PVID_CTRL_REG(_p) \
++		(RTL8365MB_VLAN_PVID_CTRL_BASE + ((_p) >> 1))
++#define   RTL8365MB_VLAN_PVID_CTRL_PORT0_MCIDX_MASK	0x001F
++#define   RTL8365MB_VLAN_PVID_CTRL_PORT1_MCIDX_MASK	0x1F00
++#define   RTL8365MB_VLAN_PVID_CTRL_PORT_MCIDX_OFFSET(_p) \
++		(((_p) & 1) << 3)
++#define   RTL8365MB_VLAN_PVID_CTRL_PORT_MCIDX_MASK(_p) \
++		(0x1F << RTL8365MB_VLAN_PVID_CTRL_PORT_MCIDX_OFFSET(_p))
++
++/* Frame type filtering registers */
++#define RTL8365MB_VLAN_ACCEPT_FRAME_TYPE_BASE	0x07aa
++#define RTL8365MB_VLAN_ACCEPT_FRAME_TYPE_REG(port) \
++		(RTL8365MB_VLAN_ACCEPT_FRAME_TYPE_BASE + ((port) >> 3))
++/* required as FIELD_PREP cannot use non-constant masks */
++#define RTL8365MB_VLAN_ACCEPT_FRAME_TYPE_MASK(port) \
++		(0x3 << RTL8365MB_VLAN_ACCEPT_FRAME_TYPE_OFFSET(port))
++#define RTL8365MB_VLAN_ACCEPT_FRAME_TYPE_OFFSET(port) \
++		(((port) & 0x7) << 1)
++
++/**
++ * struct rtl8365mb_vlan4k - VLAN4k table entry
++ * @vid: VLAN ID (0~4095)
++ * @member: port mask of ports in this VLAN
++ * @untag: port mask of ports which untag on egress
++ * @fid: filter ID - only used with SVL (unused)
++ * @priority: priority classification (unused)
++ * @priority_en: enable priority (unused)
++ * @policing_en: enable policing (unused)
++ * @ivl_en: enable IVL instead of default SVL
++ * @meteridx: metering index (unused)
++ *
++ * This structure is used to get/set entries in the VLAN4k table. The
++ * VLAN4k table dictates the VLAN configuration for the switch for the
++ * vast majority of features.
++ */
++struct rtl8365mb_vlan4k {
++	u16 vid;
++	u16 member;
++	u16 untag;
++	u8 fid : 4;
++	u8 priority : 3;
++	u8 priority_en : 1;
++	u8 policing_en : 1;
++	u8 ivl_en : 1;
++	u8 meteridx : 6;
++};
++
++/**
++ * struct rtl8365mb_vlanmc - VLAN membership config
++ * @evid: Enhanced VLAN ID (0~8191)
++ * @member: port mask of ports in this VLAN
++ * @fid: filter ID - only used with SVL (unused)
++ * @priority: priority classification (unused)
++ * @priority_en: enable priority (unused)
++ * @policing_en: enable policing (unused)
++ * @meteridx: metering index (unused)
++ *
++ * This structure is used to get/set entries in the VLAN membership
++ * configuration database. This feature is largely vestigial, but
++ * still needed for at least the following features:
++ *   - PVID configuration
++ *   - ACL configuration
++ *   - selection of VLAN by the CPU tag when VSEL=1, although the switch
++ *     can also select VLAN based on the VLAN tag if VSEL=0
++ *
++ * This is a low-level structure and it is recommended to interface with
++ * the VLAN membership config database via &struct rtl8365mb_vlanmc_entry.
++ */
++struct rtl8365mb_vlanmc {
++	u16 evid;
++	u16 member;
++	u8 fid : 4;
++	u8 priority : 3;
++	u8 priority_en : 1;
++	u8 policing_en : 1;
++	u8 meteridx : 6;
++};
++
++enum rtl8365mb_frame_ingress {
++	RTL8365MB_FRAME_TYPE_ANY_FRAME = 0,
++	RTL8365MB_FRAME_TYPE_TAGGED_ONLY,
++	RTL8365MB_FRAME_TYPE_UNTAGGED_ONLY,
++};
++
++static int rtl8365mb_vlan_4k_read(struct realtek_priv *priv, u16 vid,
++				  struct rtl8365mb_vlan4k *vlan4k)
++{
++	u16 data[RTL8365MB_CVLAN_ENTRY_SIZE];
++	int val;
++	int ret;
++
++	ret = rtl8365mb_table_query(priv, RTL8365MB_TABLE_CVLAN,
++				    RTL8365MB_TABLE_OP_READ, &vid, 0, 0,
++				    data, ARRAY_SIZE(data));
++	if (ret)
++		return ret;
++
++	/* Unpack table entry */
++	memset(vlan4k, 0, sizeof(*vlan4k));
++	vlan4k->vid = vid;
++
++	val = FIELD_GET(RTL8365MB_CVLAN_ENTRY_D0_MBR_MASK, data[0]);
++	vlan4k->member = FIELD_PREP(RTL8365MB_CVLAN_MBR_LO_MASK, val);
++	val = FIELD_GET(RTL8365MB_CVLAN_ENTRY_D2_MBR_EXT_MASK, data[2]);
++	vlan4k->member |= FIELD_PREP(RTL8365MB_CVLAN_MBR_HI_MASK, val);
++
++	val = FIELD_GET(RTL8365MB_CVLAN_ENTRY_D0_UNTAG_MASK, data[0]);
++	vlan4k->untag = FIELD_PREP(RTL8365MB_CVLAN_UNTAG_LO_MASK, val);
++	val = FIELD_GET(RTL8365MB_CVLAN_ENTRY_D2_UNTAG_EXT_MASK, data[2]);
++	vlan4k->untag |= FIELD_PREP(RTL8365MB_CVLAN_UNTAG_HI_MASK, val);
++
++	vlan4k->fid = FIELD_GET(RTL8365MB_CVLAN_ENTRY_D1_FID_MASK, data[1]);
++	vlan4k->priority_en =
++		FIELD_GET(RTL8365MB_CVLAN_ENTRY_D1_VBPEN_MASK, data[1]);
++	vlan4k->priority =
++		FIELD_GET(RTL8365MB_CVLAN_ENTRY_D1_VBPRI_MASK, data[1]);
++	vlan4k->policing_en =
++		FIELD_GET(RTL8365MB_CVLAN_ENTRY_D1_ENVLANPOL_MASK, data[1]);
++
++	val = FIELD_GET(RTL8365MB_CVLAN_ENTRY_D1_METERIDX_MASK, data[1]);
++	val = FIELD_PREP(RTL8365MB_CVLAN_METERIDX_LO_MASK, val);
++	vlan4k->meteridx = val;
++	val = FIELD_GET(RTL8365MB_CVLAN_ENTRY_D2_METERIDX_EXT_MASK, data[2]);
++	val = FIELD_PREP(RTL8365MB_CVLAN_METERIDX_HI_MASK, val);
++	vlan4k->meteridx |= val;
++
++	vlan4k->ivl_en =
++		FIELD_GET(RTL8365MB_CVLAN_ENTRY_D1_IVL_SVL_MASK, data[1]);
++
++	return 0;
++}
++
++static int rtl8365mb_vlan_4k_write(struct realtek_priv *priv,
++				   const struct rtl8365mb_vlan4k *vlan4k)
++{
++	u16 data[RTL8365MB_CVLAN_ENTRY_SIZE] = { 0 };
++	u16 vid;
++	int val;
++
++	if (vlan4k->fid > RTL8365MB_FIDMAX ||
++	    vlan4k->priority > RTL8365MB_PRIORITYMAX ||
++	    vlan4k->meteridx > RTL8365MB_METERMAX)
++		return -EINVAL;
++
++	/* Pack table entry value */
++	val = FIELD_GET(RTL8365MB_CVLAN_MBR_LO_MASK, vlan4k->member);
++	data[0] |= FIELD_PREP(RTL8365MB_CVLAN_ENTRY_D0_MBR_MASK, val);
++
++	val = FIELD_GET(RTL8365MB_CVLAN_UNTAG_LO_MASK, vlan4k->untag);
++	data[0] |= FIELD_PREP(RTL8365MB_CVLAN_ENTRY_D0_UNTAG_MASK, val);
++
++	data[1] |= FIELD_PREP(RTL8365MB_CVLAN_ENTRY_D1_FID_MASK, vlan4k->fid);
++	data[1] |= FIELD_PREP(RTL8365MB_CVLAN_ENTRY_D1_VBPEN_MASK,
++			      vlan4k->priority_en);
++	data[1] |= FIELD_PREP(RTL8365MB_CVLAN_ENTRY_D1_VBPRI_MASK,
++			      vlan4k->priority);
++	data[1] |= FIELD_PREP(RTL8365MB_CVLAN_ENTRY_D1_ENVLANPOL_MASK,
++			      vlan4k->policing_en);
++
++	/* FIELD_* does not play nice with struct bitfield. */
++	val = vlan4k->meteridx;
++	val = FIELD_GET(RTL8365MB_CVLAN_METERIDX_LO_MASK, val);
++	data[1] |= FIELD_PREP(RTL8365MB_CVLAN_ENTRY_D1_METERIDX_MASK, val);
++
++	data[1] |= FIELD_PREP(RTL8365MB_CVLAN_ENTRY_D1_IVL_SVL_MASK,
++			      vlan4k->ivl_en);
++
++	val = FIELD_GET(RTL8365MB_CVLAN_MBR_HI_MASK, vlan4k->member);
++	data[2] |= FIELD_PREP(RTL8365MB_CVLAN_ENTRY_D2_MBR_EXT_MASK, val);
++
++	val = FIELD_GET(RTL8365MB_CVLAN_UNTAG_HI_MASK, vlan4k->untag);
++	data[2] |= FIELD_PREP(RTL8365MB_CVLAN_ENTRY_D2_UNTAG_EXT_MASK, val);
++
++	val = vlan4k->meteridx;
++	val = FIELD_GET(RTL8365MB_CVLAN_METERIDX_HI_MASK, val);
++	data[2] |= FIELD_PREP(RTL8365MB_CVLAN_ENTRY_D2_METERIDX_EXT_MASK, val);
++
++	vid = vlan4k->vid;
++	return rtl8365mb_table_query(priv, RTL8365MB_TABLE_CVLAN,
++				     RTL8365MB_TABLE_OP_WRITE, &vid, 0, 0,
++				     data, ARRAY_SIZE(data));
++}
++
++#define RTL_VLAN_ERR(msg)						\
++	do {								\
++		const char *__msg = (msg);				\
++									\
++		if (extack)						\
++			NL_SET_ERR_MSG_FMT_MOD(extack, "%s", __msg);	\
++		dev_err(priv->dev, "%s", __msg);			\
++	} while (0)
++
++static int
++rtl8365mb_vlan_4k_port_set(struct dsa_switch *ds, int port,
++			   const struct switchdev_obj_port_vlan *vlan,
++			   struct netlink_ext_ack *extack,
++			       bool include)
++{
++	struct realtek_priv *priv = ds->priv;
++	struct rtl8365mb_vlan4k vlan4k = {0};
++	int ret;
++
++	dev_dbg(priv->dev, "%s VLAN %d 4K on port %d\n",
++		include ? "add" : "del",
++		vlan->vid, port);
++
++	if (vlan->vid > RTL8365MB_MAX_4K_VID) {
++		RTL_VLAN_ERR("VLAN ID greater than "
++			     __stringify(RTL8365MB_MAX_4K_VID));
++		return -EINVAL;
++	}
++
++	ret = rtl8365mb_vlan_4k_read(priv, vlan->vid, &vlan4k);
++	if (ret) {
++		RTL_VLAN_ERR("Failed to read VLAN 4k table");
++		return ret;
++	}
++
++	if (include)
++		vlan4k.member |= BIT(port);
++	else
++		vlan4k.member &= ~BIT(port);
++
++	if (include && (vlan->flags & BRIDGE_VLAN_INFO_UNTAGGED))
++		vlan4k.untag |= BIT(port);
++	else
++		vlan4k.untag &= ~BIT(port);
++	vlan4k.ivl_en = true; /* always use Independent VLAN Learning */
++
++	ret = rtl8365mb_vlan_4k_write(priv, &vlan4k);
++	if (ret) {
++		RTL_VLAN_ERR("Failed to write VLAN 4k table");
++		return ret;
++	}
++
++	return 0;
++}
++
++int rtl8365mb_vlan_4k_port_add(struct dsa_switch *ds, int port,
++			       const struct switchdev_obj_port_vlan *vlan,
++			       struct netlink_ext_ack *extack)
++{
++	return rtl8365mb_vlan_4k_port_set(ds, port, vlan, extack, true);
++}
++
++int rtl8365mb_vlan_4k_port_del(struct dsa_switch *ds, int port,
++			       const struct switchdev_obj_port_vlan *vlan)
++{
++	return rtl8365mb_vlan_4k_port_set(ds, port, vlan, NULL, false);
++}
++
++static int rtl8365mb_vlan_mc_read(struct realtek_priv *priv, u32 index,
++				  struct rtl8365mb_vlanmc *vlanmc)
++{
++	u16 data[RTL8365MB_VLAN_MC_ENTRY_SIZE];
++	int ret;
++
++	if (index > RTL8365MB_VLAN_MCMAX)
++		return -EINVAL;
++
++	ret = regmap_bulk_read(priv->map, RTL8365MB_VLAN_MC_REG(index), &data,
++			       RTL8365MB_VLAN_MC_ENTRY_SIZE);
++	if (ret)
++		return ret;
++
++	vlanmc->member = FIELD_GET(RTL8365MB_VLAN_MC_D0_MBR_MASK, data[0]);
++	vlanmc->fid = FIELD_GET(RTL8365MB_VLAN_MC_D1_FID_MASK, data[1]);
++	vlanmc->priority = FIELD_GET(RTL8365MB_VLAN_MC_D2_VBPRI_MASK, data[2]);
++	vlanmc->evid = FIELD_GET(RTL8365MB_VLAN_MC_D3_EVID_MASK, data[3]);
++
++	return 0;
++}
++
++static int rtl8365mb_vlan_mc_write(struct realtek_priv *priv, u32 index,
++				   const struct rtl8365mb_vlanmc *vlanmc)
++{
++	u16 data[4] = { 0 };
++	int ret;
++
++	if (index > RTL8365MB_VLAN_MCMAX ||
++	    vlanmc->fid > RTL8365MB_FIDMAX ||
++	    vlanmc->priority > RTL8365MB_PRIORITYMAX ||
++	    vlanmc->meteridx > RTL8365MB_METERMAX)
++		return -EINVAL;
++
++	data[0] |= FIELD_PREP(RTL8365MB_VLAN_MC_D0_MBR_MASK, vlanmc->member);
++	data[1] |= FIELD_PREP(RTL8365MB_VLAN_MC_D1_FID_MASK, vlanmc->fid);
++	data[2] |= FIELD_PREP(RTL8365MB_VLAN_MC_D2_METERIDX_MASK,
++			      vlanmc->meteridx);
++	data[2] |= FIELD_PREP(RTL8365MB_VLAN_MC_D2_ENVLANPOL_MASK,
++			      vlanmc->policing_en);
++	data[2] |=
++		FIELD_PREP(RTL8365MB_VLAN_MC_D2_VBPRI_MASK, vlanmc->priority);
++	data[2] |= FIELD_PREP(RTL8365MB_VLAN_MC_D2_VBPEN_MASK,
++			      vlanmc->priority_en);
++	data[3] |= FIELD_PREP(RTL8365MB_VLAN_MC_D3_EVID_MASK, vlanmc->evid);
++
++	ret = regmap_bulk_write(priv->map, RTL8365MB_VLAN_MC_REG(index), &data,
++				RTL8365MB_VLAN_MC_ENTRY_SIZE);
 +
 +	return ret;
 +}
-diff --git a/drivers/net/dsa/realtek/rtl8365mb_table.h b/drivers/net/dsa/realtek/rtl8365mb_table.h
++
++static int rtl8365mb_vlan_mc_erase(struct realtek_priv *priv, u32 index)
++{
++	u16 data[4] = { 0 };
++	int ret;
++
++	if (index > RTL8365MB_VLAN_MCMAX)
++		return -EINVAL;
++
++	ret = regmap_bulk_write(priv->map, RTL8365MB_VLAN_MC_REG(index), &data,
++				RTL8365MB_VLAN_MC_ENTRY_SIZE);
++
++	return ret;
++}
++
++/**
++ * rtl8365mb_vlan_mc_find() - find VLANMC index by VID or the first free index
++ *
++ * @priv: realtek_priv pointer
++ * @vid: VLAN ID
++ * @index: found index
++ * @first_free: found free index
++ *
++ * If a VLAN MC entry using @vid was found, @index will return the matched index
++ * and @first_free is undefined. If not found, @index will return 0 and
++ * @first_free will return the first found free index in VLAN MC or 0 if the
++ * table is full.
++ *
++ * Although 0 is a valid VLAN MC index, it is reserved for ports without PVID,
++ * including standalone, non-member ports.
++ *
++ * Both @index and @first_free will be in the * 1..@RTL8365MB_VLAN_MCMAX range.
++ *
++ * Return: Returns 0 on success, a negative error on failure.
++ *
++ */
++static int rtl8365mb_vlan_mc_find(struct realtek_priv *priv, u16 vid,
++				  u8 *index, u8 *first_free)
++{
++	u32 vlan_entry_d3;
++	u8 vlanmc_idx;
++	u16 evid;
++	int ret;
++
++	if (!index)
++		return -EINVAL;
++	if (!first_free)
++		return -EINVAL;
++	if (!vid)
++		return -EINVAL;
++
++	*index = 0;
++	*first_free = 0;
++
++	/* look for existing entry or an empty one */
++	/* vlanmc index 0 is reserved as a neutral PVID value for standalone
++	 * ports. Traffic reaches the CPU via VLAN transparent mode.
++	 **/
++	for (vlanmc_idx = 1; vlanmc_idx <= RTL8365MB_VLAN_MCMAX; vlanmc_idx++) {
++		/* just read the 4th word, where the evid is */
++		ret = regmap_read(priv->map,
++				  RTL8365MB_VLAN_MC_REG(vlanmc_idx) + 3,
++				  &vlan_entry_d3);
++		if (ret)
++			return ret;
++
++		evid = FIELD_GET(RTL8365MB_VLAN_MC_D3_EVID_MASK, vlan_entry_d3);
++
++		if (evid == vid) {
++			*index = vlanmc_idx;
++			return 0;
++		}
++
++		if (evid == 0x0 && *first_free < 1)
++			*first_free = vlanmc_idx;
++	}
++	return 0;
++}
++
++static int rtl8365mb_vlan_port_get_pvid(struct realtek_priv *priv,
++					int port, u8 *vlanmc_idx)
++{
++	u32 data;
++	int ret;
++
++	ret = regmap_read(priv->map, RTL8365MB_VLAN_PVID_CTRL_REG(port), &data);
++	if (ret)
++		return ret;
++
++	*vlanmc_idx = (data & RTL8365MB_VLAN_PVID_CTRL_PORT_MCIDX_MASK(port))
++		      >> RTL8365MB_VLAN_PVID_CTRL_PORT_MCIDX_OFFSET(port);
++
++	return 0;
++}
++
++/**
++ * rtl8365mb_vlan_mc_pvid_members() - Get a bitmap of vlan PVID members
++ *
++ * @ds: DSA switch
++ * @vlanmc_idx: the index of a VLAN in VLAN MC table
++ * @members: the returned bitmap of members that have PVID status
++ *
++ * This function iterates over DSA ports and creates a bitmap representation of
++ * those ports that have PVID pointing to this VLAN (identified by its table
++ * index and not VID). If you need to get the table index from VID, see
++ * rtl8365mb_vlan_mc_find()
++ *
++ * Return: Returns 0 on success, a negative error on failure.
++ **/
++static int rtl8365mb_vlan_mc_pvid_members(struct dsa_switch *ds,
++					  u8 vlanmc_idx, u16 *members)
++{
++	struct realtek_priv *priv = ds->priv;
++	struct dsa_port *dp;
++	u8 _vlanmc_idx;
++	int ret;
++
++	if (!members)
++		return -EINVAL;
++
++	*members = 0;
++
++	dsa_switch_for_each_available_port(dp, ds) {
++		ret = rtl8365mb_vlan_port_get_pvid(priv, dp->index,
++						   &_vlanmc_idx);
++		if (ret)
++			return ret;
++
++		if (_vlanmc_idx == vlanmc_idx)
++			*members |= BIT(dp->index);
++	}
++
++	return 0;
++}
++
++/** rtl8365mb_vlanmc_port_set() - include or exclude a port from vlanMC
++ * @ds: dsa switch
++ * @port: the port number
++ * @vlan: the vlan to include/exclude @port
++ * @extack: optional extack to return errors
++ * @include: whether to include or exclude @port
++ *
++ * This function is used to include/exclude ports to the vlanMC table.
++ *
++ * VlanMC stands for VLAN membership config and it is used exclusively for
++ * PVID. If @vlan members are not using PVID, this function will either
++ * remove or not create a new vlanMC entry.
++ *
++ * vlanMC members are kept in sync with vlan4k, although the switch only
++ * checks membership in vlan4k table.
++ *
++ * Port PVID and accepted frame type are updated as well.
++ *
++ * Return: Returns 0 on success, a negative error on failure.
++ *
++ */
++static
++int rtl8365mb_vlan_mc_port_set(struct dsa_switch *ds, int port,
++			       const struct switchdev_obj_port_vlan *vlan,
++			       struct netlink_ext_ack *extack,
++			       bool include)
++{
++	bool pvid = !!(vlan->flags & BRIDGE_VLAN_INFO_PVID);
++	struct realtek_priv *priv = ds->priv;
++	struct rtl8365mb_vlan4k vlan4k = {0};
++	struct rtl8365mb_vlanmc vlanmc = {0};
++	u16 pvid_members = 0;
++	u8 first_unused = 0;
++	u8 vlanmc_idx = 0;
++	int ret;
++
++	dev_dbg(priv->dev, "%s VLAN %d MC on port %d\n",
++		include ? "add" : "del",
++		vlan->vid, port);
++
++	if (vlan->vid > RTL8365MB_MAX_MC_VID) {
++		RTL_VLAN_ERR("VLAN ID greater than "
++			     __stringify(RTL8365MB_MAX_MC_VID));
++		return -EINVAL;
++	}
++
++	/* look for existing entry or an empty slot */
++	ret = rtl8365mb_vlan_mc_find(priv, vlan->vid, &vlanmc_idx,
++				     &first_unused);
++	if (ret) {
++		RTL_VLAN_ERR("Failed to find a VLAN MC table index");
++		return ret;
++	}
++
++	if (vlanmc_idx) {
++		ret = rtl8365mb_vlan_mc_read(priv, vlanmc_idx, &vlanmc);
++		if (ret) {
++			RTL_VLAN_ERR("Failed to read VLAN MC table");
++			return ret;
++		}
++	} else if (include) {
++		/* for now, vlan_mc is only required for PVID. Defer allocation
++		 * until at least one port uses PVID.
++		 */
++		if (!pvid) {
++			dev_dbg(priv->dev,
++				"Not creating VlanMC for vlan %d until a port uses PVID (%d does not)\n",
++				vlan->vid, port);
++			return 0;
++		}
++
++		if (!first_unused) {
++			RTL_VLAN_ERR("All VLAN MC entries ("
++				     __stringify(RTL8365MB_VLAN_MCMAX + 1)
++				     ") are in use.");
++			return -E2BIG;
++		}
++
++		/* Retrieve vlan4k members as we might have deferred VlanMC
++		 * before.
++		 */
++		if (vlan->vid <= RTL8365MB_MAX_4K_VID) {
++			ret = rtl8365mb_vlan_4k_read(priv, vlan->vid, &vlan4k);
++			if (ret) {
++				RTL_VLAN_ERR("Failed to read VLAN 4k table");
++				return ret;
++			}
++		}
++
++		vlanmc_idx = first_unused;
++		vlanmc.evid = vlan->vid;
++
++		/* for new vlan_mc, sync current vlan4k members,
++		 * although only vlan4k members matter.
++		 */
++		vlanmc.member |= vlan4k.member;
++	} else /* excluding and VLANMC not found */ {
++		return 0;
++	}
++
++	ret = rtl8365mb_vlan_mc_pvid_members(ds, vlanmc_idx,
++					     &pvid_members);
++	if (ret) {
++		RTL_VLAN_ERR("Failed to read VLANMC PVID members");
++		return ret;
++	}
++	dev_dbg(priv->dev,
++		"VLAN %d (idx: %d) PVID curr members: %08x\n",
++		vlan->vid, vlanmc_idx, pvid_members);
++
++	/* here we either have an existing VLANMC (with PVID members) or the
++	 * added port is using this VLAN as PVID
++	 */
++	if (include) {
++		vlanmc.member |= BIT(port);
++		if (pvid)
++			pvid_members |= BIT(port);
++	} else {
++		vlanmc.member &= ~BIT(port);
++		pvid_members &= ~BIT(port);
++	}
++
++	/* just like we don't need to create a VLAN_MC when there is no port
++	 * using it as PVID, we can erase it when there is no more port using
++	 * it as PVID.
++	 */
++	if (!pvid_members) {
++		dev_dbg(priv->dev,
++			"Clearing VlanMC index %d previously used by VID %d\n",
++			vlanmc_idx, vlan->vid);
++		ret = rtl8365mb_vlan_mc_erase(priv, vlanmc_idx);
++	} else {
++		dev_dbg(priv->dev,
++			"Saving VlanMC index %d with VID %d\n",
++			vlanmc_idx, vlan->vid);
++		ret = rtl8365mb_vlan_mc_write(priv, vlanmc_idx, &vlanmc);
++	}
++	if (ret) {
++		RTL_VLAN_ERR("Failed to write vlan MC entry");
++		return ret;
++	}
++
++	return 0;
++}
++
++static int rtl8365mb_vlan_port_set_pvid(struct realtek_priv *priv,
++					int port, u16 vlanmc_idx)
++{
++	int ret;
++	u32 val;
++
++	val = vlanmc_idx << RTL8365MB_VLAN_PVID_CTRL_PORT_MCIDX_OFFSET(port);
++	ret = regmap_update_bits(priv->map,
++				 RTL8365MB_VLAN_PVID_CTRL_REG(port),
++				 RTL8365MB_VLAN_PVID_CTRL_PORT_MCIDX_MASK(port),
++				 val);
++	if (ret)
++		return ret;
++
++	return 0;
++}
++
++static int
++rtl8365mb_vlan_port_set_framefilter(struct realtek_priv *priv,
++				    int port,
++				    enum rtl8365mb_frame_ingress accepted_frame)
++{
++	/* Even if ACCEPT_FRAME_TYPE_ANY, the switch will still check if the
++	 * port is a member of vlan PVID
++	 */
++	accepted_frame = accepted_frame
++			 << RTL8365MB_VLAN_ACCEPT_FRAME_TYPE_OFFSET(port);
++
++	return regmap_update_bits(priv->map,
++				  RTL8365MB_VLAN_ACCEPT_FRAME_TYPE_REG(port),
++				  RTL8365MB_VLAN_ACCEPT_FRAME_TYPE_MASK(port),
++				  accepted_frame);
++}
++
++int rtl8365mb_vlan_pvid_port_add(struct dsa_switch *ds, int port,
++				 const struct switchdev_obj_port_vlan *vlan,
++				 struct netlink_ext_ack *extack)
++{
++	bool pvid = !!(vlan->flags & BRIDGE_VLAN_INFO_PVID);
++	enum rtl8365mb_frame_ingress accepted_frame;
++	struct realtek_priv *priv = ds->priv;
++	u8 _unused_first_free_idx;
++	u8 vlanmc_idx;
++	int ret;
++
++	if (!pvid)
++		return 0;
++
++	/* Find or allocate a new vlan MC and add port to members,
++	 * although members are not checked by the HW in vlan MC.
++	 */
++	ret = rtl8365mb_vlan_mc_port_set(ds, port, vlan, extack, true);
++	if (ret)
++		return ret;
++
++	/* look for existing entry */
++	ret = rtl8365mb_vlan_mc_find(priv, vlan->vid, &vlanmc_idx,
++				     &_unused_first_free_idx);
++	if (ret) {
++		RTL_VLAN_ERR("Failed to find a VLAN MC table index");
++		goto undo_vlan_mc_port_set;
++	}
++
++	if (!vlanmc_idx) {
++		RTL_VLAN_ERR("VLAN should already exist in VLAN MC");
++		goto undo_vlan_mc_port_set;
++	}
++
++	ret = rtl8365mb_vlan_port_set_pvid(priv, port, vlanmc_idx);
++	if (ret) {
++		RTL_VLAN_ERR("Failed to set port PVID");
++		goto undo_vlan_mc_port_set;
++	}
++
++	/* Changing accept frame is what enables PVID (if not enabled before) */
++	accepted_frame = RTL8365MB_FRAME_TYPE_ANY_FRAME;
++	ret = rtl8365mb_vlan_port_set_framefilter(priv, port, accepted_frame);
++	if (ret) {
++		RTL_VLAN_ERR("Failed to set port frame filter");
++		goto undo_vlan_pvid_port_set;
++	}
++
++	return 0;
++
++undo_vlan_pvid_port_set:
++	(void)rtl8365mb_vlan_port_set_pvid(priv, port, 0);
++
++undo_vlan_mc_port_set:
++	(void)rtl8365mb_vlan_mc_port_set(ds, port, vlan, NULL, false);
++	return ret;
++}
++
++int rtl8365mb_vlan_pvid_port_del(struct dsa_switch *ds, int port,
++				 const struct switchdev_obj_port_vlan *vlan)
++{
++	enum rtl8365mb_frame_ingress accepted_frame;
++	struct netlink_ext_ack *extack = NULL;
++	struct realtek_priv *priv = ds->priv;
++	struct rtl8365mb_vlanmc vlanmc = {0};
++	u8 vlanmc_idx;
++	int ret;
++
++	ret = rtl8365mb_vlan_port_get_pvid(priv, port, &vlanmc_idx);
++	if (ret)
++		return ret;
++
++	/* Port is not using PVID. Nothing to remove. */
++	if (!vlanmc_idx)
++		return 0;
++
++	ret = rtl8365mb_vlan_mc_read(priv, vlanmc_idx, &vlanmc);
++	if (ret) {
++		RTL_VLAN_ERR("Failed to read VLAN MC table");
++		return ret;
++	}
++
++	/* We are leaving a non PVID vlan, Nothing to remove. */
++	if (vlanmc.evid != vlan->vid)
++		return 0;
++
++	/* Changing accept frame is what really removes PVID */
++	accepted_frame = RTL8365MB_FRAME_TYPE_TAGGED_ONLY;
++	ret = rtl8365mb_vlan_port_set_framefilter(priv, port, accepted_frame);
++	if (ret) {
++		RTL_VLAN_ERR("Failed to set port frame filter");
++		return ret;
++	}
++
++	ret = rtl8365mb_vlan_port_set_pvid(priv, port, 0);
++	if (ret) {
++		RTL_VLAN_ERR("Failed to set port PVID to 0");
++		return ret;
++	}
++
++	/* Clears the VLAN MC membership and maybe VLAN MC entry if empty */
++	return rtl8365mb_vlan_mc_port_set(ds, port, vlan, NULL, false);
++}
+diff --git a/drivers/net/dsa/realtek/rtl8365mb_vlan.h b/drivers/net/dsa/realtek/rtl8365mb_vlan.h
 new file mode 100644
-index 000000000000..0b1a89bd81f1
+index 000000000000..ed63a0ec0d10
 --- /dev/null
-+++ b/drivers/net/dsa/realtek/rtl8365mb_table.h
-@@ -0,0 +1,133 @@
++++ b/drivers/net/dsa/realtek/rtl8365mb_vlan.h
+@@ -0,0 +1,25 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
-+/* Look-up table query interface for the rtl8365mb switch family
++/* VLAN configuration interface for the rtl8365mb switch family
 + *
 + * Copyright (C) 2022 Alvin Šipraga <alsi@bang-olufsen.dk>
++ *
 + */
 +
-+#ifndef _REALTEK_RTL8365MB_TABLE_H
-+#define _REALTEK_RTL8365MB_TABLE_H
++#ifndef _REALTEK_RTL8365MB_VLAN_H
++#define _REALTEK_RTL8365MB_VLAN_H
 +
-+#include <linux/if_ether.h>
 +#include <linux/types.h>
 +
 +#include "realtek.h"
 +
-+/**
-+ * struct rtl8365mb_table - available switch tables
-+ *
-+ * @RTL8365MB_TABLE_ACL_RULE - ACL rules
-+ * @RTL8365MB_TABLE_ACL_ACTION - ACL actions
-+ * @RTL8365MB_TABLE_CVLAN - VLAN4k configurations
-+ * @RTL8365MB_TABLE_L2 - filtering database (2K hash table)
-+ * @RTL8365MB_TABLE_IGMP_GROUP - IGMP group database (readonly)
-+ *
-+ * NOTE: Don't change the enum values. They must concur with the field
-+ * described by @RTL8365MB_TABLE_CTRL_TABLE_MASK.
-+ */
-+enum rtl8365mb_table {
-+	RTL8365MB_TABLE_ACL_RULE = 1,
-+	RTL8365MB_TABLE_ACL_ACTION = 2,
-+	RTL8365MB_TABLE_CVLAN = 3,
-+	RTL8365MB_TABLE_L2 = 4,
-+	RTL8365MB_TABLE_IGMP_GROUP = 5,
-+};
-+
-+/**
-+ * enum rtl8365mb_table_op - table query operation
-+ *
-+ * @RTL8365MB_TABLE_OP_READ: read an entry from the target table
-+ * @RTL8365MB_TABLE_OP_WRITE: write an entry to the target table
-+ *
-+ * NOTE: Don't change the enum values. They must concur with the field
-+ * described by @RTL8365MB_TABLE_CTRL_OP_MASK.
-+ */
-+enum rtl8365mb_table_op {
-+	RTL8365MB_TABLE_OP_READ = 0,
-+	RTL8365MB_TABLE_OP_WRITE = 1,
-+};
-+
-+/**
-+ * enum rtl8365mb_table_l2_method - look-up method for read queries of L2 table
-+ *
-+ * @RTL8365MB_TABLE_L2_METHOD_MAC: look-up by source MAC address and FID (or
-+ *   VID)
-+ * @RTL8365MB_TABLE_L2_METHOD_ADDR: look-up by entry address
-+ * @RTL8365MB_TABLE_L2_METHOD_ADDR_NEXT: look-up next entry starting from the
-+ *   supplied address
-+ * @RTL8365MB_TABLE_L2_METHOD_ADDR_NEXT_UC: same as ADDR_NEXT but search only
-+ *   unicast addresses
-+ * @RTL8365MB_TABLE_L2_METHOD_ADDR_NEXT_MC: same as ADDR_NEXT but search only
-+ *   multicast addresses
-+ * @RTL8365MB_TABLE_L2_METHOD_ADDR_NEXT_UC_PORT: same as ADDR_NEXT_UC but
-+ *   search only entries with matching source port
-+ *
-+ * NOTE: Don't change the enum values. They must concur with the field
-+ * described by @RTL8365MB_TABLE_CTRL_METHOD_MASK
-+ */
-+enum rtl8365mb_table_l2_method {
-+	RTL8365MB_TABLE_L2_METHOD_MAC = 0,
-+	RTL8365MB_TABLE_L2_METHOD_ADDR = 1,
-+	RTL8365MB_TABLE_L2_METHOD_ADDR_NEXT = 2,
-+	RTL8365MB_TABLE_L2_METHOD_ADDR_NEXT_UC = 3,
-+	RTL8365MB_TABLE_L2_METHOD_ADDR_NEXT_MC = 4,
-+	/*
-+	 * RTL8365MB_TABLE_L2_METHOD_ADDR_NEXT_MC_L3 = 5,
-+	 * RTL8365MB_TABLE_L2_METHOD_ADDR_NEXT_MC_L2L3 = 6,
-+	 */
-+	RTL8365MB_TABLE_L2_METHOD_ADDR_NEXT_UC_PORT = 7,
-+};
-+
-+/**
-+ * rtl8365mb_table_query() - read from or write to a switch table
-+ * @priv: driver context
-+ * @table: target table, see &enum rtl8365mb_table
-+ * @op: read or write operation, see &enum rtl8365mb_table_op
-+ * @addr: table address. For indexed tables, this selects the entry to access.
-+ *        For L2 read queries, it is ignored as input for MAC-based lookup
-+ *        methods and used as input for address-based lookup methods. On
-+ *        successful L2 queries, it is updated with the matched entry address.
-+ * @method: L2 table lookup method, see &enum rtl8365mb_table_l2_method.
-+ *	    Ignored for non-L2 tables.
-+ * @port: for L2 read queries using method
-+ *        %RTL8365MB_TABLE_L2_METHOD_ADDR_NEXT_UC_PORT, restrict the search
-+ *        to entries associated with this source port. Ignored otherwise.
-+ * @data: data buffer used to read from or write to the table. For L2 MAC
-+ *        lookups, this buffer provides the lookup key and receives the
-+ *        matched entry contents on success.
-+ * @size: size of @data in 16-bit words
-+ *
-+ * This function provides unified access to the internal tables of the switch.
-+ * All tables except the L2 table are simple indexed tables, where @addr
-+ * selects the entry and @op determines whether the access is a read or a
-+ * write operation.
-+ *
-+ * The L2 table is a hash table and supports multiple lookup methods. For
-+ * %RTL8365MB_TABLE_L2_METHOD_MAC, an entry is searched based on the MAC
-+ * address and FID/VID fields provided in @data, using the same format as
-+ * an L2 table entry. Address-based methods either read a specific entry
-+ * (%RTL8365MB_TABLE_L2_METHOD_ADDR) or iterate over valid entries starting
-+ * from @addr (%RTL8365MB_TABLE_L2_METHOD_ADDR_NEXT and variants). When using
-+ * %RTL8365MB_TABLE_L2_METHOD_ADDR_NEXT_UC_PORT, only entries associated with
-+ * the specified @port are considered.
-+ *
-+ * On successful L2 lookups, @addr is updated with the matched table address
-+ * and @data contains the corresponding table entry. If no matching entry
-+ * is found, -ENOENT is returned.
-+ *
-+ * The contents of @data are used as input when writing to tables or when
-+ * specifying the lookup key for L2 MAC searches, and as output for all
-+ * successful read operations. If an error occurs, the contents of @addr
-+ * and @data are undefined.
-+ *
-+ * @size must match the size of the target table entry, expressed in 16-bit
-+ * words. This function only validates that it is non-zero and fits in the
-+ * available register space.
-+ *
-+ */
-+int rtl8365mb_table_query(struct realtek_priv *priv,
-+			  enum rtl8365mb_table table,
-+			  enum rtl8365mb_table_op op, u16 *addr,
-+			  enum rtl8365mb_table_l2_method method,
-+			  u16 port, u16 *data, size_t size);
-+
-+#endif /* _REALTEK_RTL8365MB_TABLE_H */
++int rtl8365mb_vlan_4k_port_add(struct dsa_switch *ds, int port,
++			       const struct switchdev_obj_port_vlan *vlan,
++			       struct netlink_ext_ack *extack);
++int rtl8365mb_vlan_4k_port_del(struct dsa_switch *ds, int port,
++			       const struct switchdev_obj_port_vlan *vlan);
++int rtl8365mb_vlan_pvid_port_add(struct dsa_switch *ds, int port,
++				 const struct switchdev_obj_port_vlan *vlan,
++				 struct netlink_ext_ack *extack);
++int rtl8365mb_vlan_pvid_port_del(struct dsa_switch *ds, int port,
++				 const struct switchdev_obj_port_vlan *vlan);
++#endif /* _REALTEK_RTL8365MB_VLAN_H */
 
 -- 
 2.53.0
