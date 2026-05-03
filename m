@@ -1,73 +1,81 @@
-Return-Path: <netdev+bounces-283509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283510-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qCTnMlek9mlfXQIAu9opvQ
-	(envelope-from <netdev+bounces-283509-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 03:26:47 +0200
+	id x5sTAOqn9mmgXQIAu9opvQ
+	(envelope-from <netdev+bounces-283510-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 03:42:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 693024B3FC6
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 03:26:47 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 348C34B402E
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 03:42:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BE3FF3001FF3
-	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 01:26:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 76B26300A8C5
+	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 01:41:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 464952264A9;
-	Sun,  3 May 2026 01:26:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CBFC237713;
+	Sun,  3 May 2026 01:41:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f9k5TN4H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dY64iFDJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212BF86329;
-	Sun,  3 May 2026 01:26:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398541946BC;
+	Sun,  3 May 2026 01:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777771600; cv=none; b=sh/62fIQYSRPSbVS2zPkjPZTz8Xi8gEy0IWrCZYhr+tf/743xDieh+gkQ+Bh5VHBPNIBNAaZAgGZryizFLAPh+RFw3aZDw4I8QyLMNy7JsnVswgOo/83VxTU2RZ1eukGLeeASZgi197buX1UkCzQnMpgfyMxBNXa3IJZPx0gW5U=
+	t=1777772516; cv=none; b=WGnTdkioNOE8PzvvjIvs/J9k/IXGMYJMBnTViazGY8WVRhtaO9naSQRJaw97Df42KS4taigsYVek0gDPtcOQZhOt+Zg22Ytyvwy0yMlSBAO0Tyc6rhDShXUTCHcheIUgUv9Q/lecFQ5t0ArYEsgjhFPUxi1kb62P5IzFMfZiPLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777771600; c=relaxed/simple;
-	bh=RnFDZamsttLUqXOACgPINZSnkXDGAnCNp70OoODu96E=;
+	s=arc-20240116; t=1777772516; c=relaxed/simple;
+	bh=sdhzFmIu5+xwpn/icCOWMOFjiPJj5PJM+2/5CtvDErc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KieMv4w1panFfEHOvgyxtb/8DjQi0hJMXQ1a01BzFtcAIdjiIkPI+qOHWsWKWALJH0FwdVoRbv0+eQcX7tGMFy0ZMhw51t9wmbK9wvoLD8Rwg6YDE8XYaVKxcQvsMVoSAI3X5/oeKGMOdpX5sWl0kqHnIfFvPbI77mg4f07VCAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f9k5TN4H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 110D5C19425;
-	Sun,  3 May 2026 01:26:39 +0000 (UTC)
+	 MIME-Version:Content-Type; b=lRLxKDxEmfVCGKVgwNawGOWjeuDQESkoP5Lcok+SrFqm4itPwuTZKOwjuSPwkwqmKZy7Hqk0xAhro6BZ7arLOHOXU1QIJ3iuVxTRmU/wLoY9QJn3RqzwWgly068/8b/YEoIfKjU9gOUByUNJNp1At3sKWPOMMR0ESf2tdzwQiZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dY64iFDJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC189C19425;
+	Sun,  3 May 2026 01:41:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777771599;
-	bh=RnFDZamsttLUqXOACgPINZSnkXDGAnCNp70OoODu96E=;
+	s=k20201202; t=1777772515;
+	bh=sdhzFmIu5+xwpn/icCOWMOFjiPJj5PJM+2/5CtvDErc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=f9k5TN4HDWAbh1YAQqpyuO9U1tPJfFAZ9Q0C5yt7XD8KCeRqiQmFay5PBnklHsFRC
-	 d2wAWcqxA6mFaTi8l2vp0BB5AlXKeVBc6AzmLkiY99EEUuBY1Qi3aI7Dik7n89wQO5
-	 kU7BhQIUAw37dLjrw9Q+7a9DejDRNNmObvT9OIyNzrLas9sKE+vMpmrn1lJh2nu8Pe
-	 BqqS4ZGId8hnnI5UX1Qep7FxZ1sBv0YyBVS9WSrZ+cVwnceQZ/BGvzB1dKFHjNnXSp
-	 4exSREE2oAvRTbdpDmbRNlMmbCO5J6I/uH16lRRsi1S5RO5eRNjecPv4KpXxxt4+vp
-	 ESNXjSxhhBuWA==
-Date: Sat, 2 May 2026 18:26:37 -0700
+	b=dY64iFDJ/4tE9xaXtnuuPF1zru1DE+NZ+sbjT1vjoHW9zsHTw7SRFPVZMB4e0ILuA
+	 vUGJvF15rBJhwXJ+/HauxbfZ6rK4syTXVzpQy9bCYmrJs8pkNbN/beAqfn+I9YBNQo
+	 /Yp66Tsp2NwoDBCv9cLkNWuTCfID+oYfPhwIfE+XpIO+f1EhVXV1CGUcx0kdhxcPJk
+	 t/ZISkA2jxVb5ffjtoass3FnnaVL5Zdi3QOrV+aGGbqFZXIj/LXz53O+5/cA8+WWZP
+	 qQOo1Y+a2rDjbGW6gx6NhwS8SAHkE/1LsHd3OP2u0qGUgHLy2qOwPkFYS5Wmar7Fh9
+	 OSO79E6OqyIKA==
+Date: Sat, 2 May 2026 18:41:53 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- bpf@vger.kernel.org, john.fastabend@gmail.com,
- linux-kselftest@vger.kernel.org, =?UTF-8?B?6ZKx5LiA6ZOt?=
- <yimingqian591@gmail.com>, daniel@iogearbox.net, jonathan.lemon@gmail.com
-Subject: Re: [PATCH net 4/7] net: tls: fix off-by-one in sg_chain entry
- count for wrapped sk_msg ring
-Message-ID: <20260502182633.60d6a07e@kernel.org>
-In-Reply-To: <afTXe_kAumf2vjvE@krikkit>
-References: <20260429222944.2139041-1-kuba@kernel.org>
-	<20260429222944.2139041-5-kuba@kernel.org>
-	<afTXe_kAumf2vjvE@krikkit>
+To: Mark Bloch <mbloch@nvidia.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Leon Romanovsky <leon@kernel.org>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Saeed Mahameed <saeedm@nvidia.com>, Shay
+ Drory <shayd@nvidia.com>, Or Har-Toov <ohartoov@nvidia.com>, Edward Srouji
+ <edwards@nvidia.com>, Maher Sanalla <msanalla@nvidia.com>, Simon Horman
+ <horms@kernel.org>, Gerd Bayer <gbayer@linux.ibm.com>, Moshe Shemesh
+ <moshe@nvidia.com>, Kees Cook <kees@kernel.org>, Patrisious Haddad
+ <phaddad@nvidia.com>, Parav Pandit <parav@nvidia.com>, Carolina Jubran
+ <cjubran@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Gal Pressman <gal@nvidia.com>, Dragos Tatulea
+ <dtatulea@nvidia.com>
+Subject: Re: [PATCH net-next V2 7/7] net/mlx5: Add profile to auto-enable
+ switchdev mode at device init
+Message-ID: <20260502184153.4fd8d06f@kernel.org>
+In-Reply-To: <421e8885-5849-4390-8956-9bc344fa0bf0@nvidia.com>
+References: <20260501041633.231662-1-tariqt@nvidia.com>
+	<20260501041633.231662-8-tariqt@nvidia.com>
+	<421e8885-5849-4390-8956-9bc344fa0bf0@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 693024B3FC6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 348C34B402E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -75,20 +83,20 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283509-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,iogearbox.net];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-283510-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
@@ -96,19 +104,23 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Fri, 1 May 2026 18:40:27 +0200 Sabrina Dubroca wrote:
-> > -			 MAX_SKB_FRAGS - msg_pl->sg.start + 1,
-> > +			 NR_MSG_FRAG_IDS - msg_pl->sg.start + 1,
-> >  			 msg_pl->sg.data);  
-> 
-> And get rid of the [start] / NR - start dance to make this code a bit
-> clearer?
+On Sat, 2 May 2026 23:08:43 +0300 Mark Bloch wrote:
+> Before I respin for the unrelated MR_CACHE cleanup, I=E2=80=99d like to c=
+onfirm
+> whether the opt-in profile approach is acceptable at all. Regardless
+> of this last patch, the first 6 patches fix real representor/LAG locking
+> issues and are needed independently, so I=E2=80=99d like to keep those mo=
+ving toward
+> acceptance as soon as possible.
 
-Heh, yes. In hindsight that is quite a silly construct..
+For probe-time config module param is probably our only option.
+I'd obviously prefer to have a devlink-level knob for this, instead=20
+of a mlx5 specific one. Can we come up with some format that'd apply
+more broadly? devlink=3D[$bfd:]flag1 ? so devlink=3D[$bdf:]switchdev-mode ?
 
-Let me apply the first 2 since the first fix is trivial and hopefully
-find some time to check what Sashiko was saying some time this well.
+BTW looks like issues Sashiko/Claude finds are slightly different,
+let me send them out.
 
