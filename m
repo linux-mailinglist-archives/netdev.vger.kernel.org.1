@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-283632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283633-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sFrKB8N392mEiAIAu9opvQ
-	(envelope-from <netdev+bounces-283632-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 18:28:51 +0200
+	id +LXBF1N392mEiAIAu9opvQ
+	(envelope-from <netdev+bounces-283633-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 18:26:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38A234B6780
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 18:28:49 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D77B4B6721
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 18:26:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8A2FF302D520
-	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 16:26:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id F0C0E30060B2
+	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 16:26:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 564F73CBE7A;
-	Sun,  3 May 2026 16:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EE873CD8D0;
+	Sun,  3 May 2026 16:26:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eGro33cU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lacGE2xF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69423CBE66
-	for <netdev@vger.kernel.org>; Sun,  3 May 2026 16:26:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1C13CBE84
+	for <netdev@vger.kernel.org>; Sun,  3 May 2026 16:26:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777825590; cv=none; b=mfVS9sHKQRCKUoh86uhJY9EwCWJxnEX01dlgQZrP1zBYi07LKXICNxvNhj6Nxmq4MIEiFJpsV+OGQQePMDyGmapuqQEdpU1HpZZqNZNxK1InLXHkLKGKNF9f2wfagAY+HPm284x4wveEf7hD9h76+3Zc1NjO1YsLur+QC1U8gok=
+	t=1777825591; cv=none; b=ZtCgA0wRN8Ln+SbwATkPCFVCRB53vURAd0VjaF4RSMcvYtrYgjP2WQnaY7ziEQDPPb4R8NEOek9b/mO0F33Rz4K++GloxQrM2d+ZsxYt+0gtkFaIS5gie+KcYhrxXzocb2IoyMTjdtV7zJBkiXYL/BlWO5ZQ9L6yZO7jMFkkkLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777825590; c=relaxed/simple;
-	bh=lAmhvud8DJT1TnGXr3FPni6vH/gxo1WayILgZEjRzl8=;
+	s=arc-20240116; t=1777825591; c=relaxed/simple;
+	bh=iWy4oAPkgs8cmIDV4jisE4x6QoSBLvsTaYWdsteovZQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=F9tHZHHKD/cx5yK/PiB8aHGrUYD1rgxHDSRHJ0ertPrecIq+oCYmJu+Ubn7wkmf28vU4cp7iDKe5HsibYqglncXoH5IuzrOlCVHHEGY4/0T/J1Lo7SwoUlX/pf+jfIZjTrLgJLmAMuVw6qVE+Ot+WvcemPoZjQkM2Kw2gM2XPm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eGro33cU; arc=none smtp.client-ip=209.85.214.178
+	 In-Reply-To:To:Cc; b=lbl9BdAABOXVuYDuPwGhJ2p55CxgsAjPgWsQNH3tOzD4ggAg4mJNi5Zv6Yh4/5ZYk9Bg9RTFQJyxtft+z0jjS5QEe+TXPpf/sWHWgppKXnvqu+6H/nxx9/Y91cEs4oPN9BUDdsPSEFhcoTBg4+y/0G/EZTo3Qzh2p2XMQMgcxPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lacGE2xF; arc=none smtp.client-ip=209.85.210.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2b458ca2296so19160125ad.0
-        for <netdev@vger.kernel.org>; Sun, 03 May 2026 09:26:25 -0700 (PDT)
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-82f8b60e485so1561009b3a.0
+        for <netdev@vger.kernel.org>; Sun, 03 May 2026 09:26:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777825585; x=1778430385; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1777825587; x=1778430387; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=7OGyNf/G/NUfxGyxAPHvO+QDV0lYjw4rC39Twclqgs4=;
-        b=eGro33cUTtVwfWaeuICGQvtbyzTiRgwRxAfu5LIQClwB+rylpmY3I6/LHC1kaYetVo
-         EOBlMTUgqqFTFsCjixQ+fZtiopZS4VciakMKMZ60kcr33v8oEzo6vLwRQFrISRVFqSp3
-         kRkT9uQ4N+hfauMGPMftkUBorJn49jZRrnanmeyApr/t90pVBLh6A86uqWBn95iWoZjK
-         GrydlyCbY5cSKw7K+kzL1yeIzw9WEdWy0ppoZ96tblyD9885nRMQCNdLi2BRJgUjGkHZ
-         jGmt5bNKr78TlRXtGI2Mu3sB5/GPREvpUv0zQB7HcYl24U8O4qUfRYyI5FsAaRRPpujY
-         tmZg==
+        bh=M1OXlDvR00KN5EgUZsriT8WnGpvoPbCTL1Vxu0+S0hc=;
+        b=lacGE2xFykt6Xu7wbRjZDlNXdghNhKj1fJxnb2ATQUKvq8fZoqbVGcFO1CyoiDB2Mp
+         bk+DSoNGMT3IfRIiL9l21UeJkP9N5zwQeaO4itxEFu7EHs6XdUnOgsU9fxAe7bWG4cVN
+         SPTc0mEis0Vz9RDPuRNxhZ0BcQw+wfmIHiDiq9ELgQq8pG/tSvL3cBy5DOUr7t2KFmfY
+         qS1+bHQpGOWmgb9e83BbriRt65dcDumJ42DuYmsUXtn4baU6xWush8rFKFxvICAzcqVH
+         HXfHcLbURA5ill4+/9mPCmnmRo1691dvfE/8uwSJpjHhITL9KTm3wfz+9lrqZNv/tqET
+         4LOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777825585; x=1778430385;
+        d=1e100.net; s=20251104; t=1777825587; x=1778430387;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=7OGyNf/G/NUfxGyxAPHvO+QDV0lYjw4rC39Twclqgs4=;
-        b=ozIGzV0GHBiJ4l+0wj3lpay9Pw7wt/j6jkf3TOo1Rw0516mO8KIJNR0r+RCy2+yKXR
-         H9dbYqu+29Pl46iylIgcpn+GbM0W2InY41E3bezF1+Z6prNOjTifF0uPnUVsLD97CiGx
-         RPSMdaxhX9JsxHwvrrbP5rywhDgQQk/a8oW0U7+frK7JeQFzYwOaEDRZIbHkEf8HaQQw
-         db6UR4WjKhdtF262t/ih0eU1678u6u+YIZtG7LwMayW0O7WfJWWXFjmkLT9Vy1S0fMMV
-         1CLAkAgQcmGkPjKk6i6d7naVDVPa9pNyrNfRfh+WWNVbp+SUMyEwVG5N8kZMtz35fE0J
-         fiLw==
-X-Forwarded-Encrypted: i=1; AFNElJ+HV85Ba37aTZhx3+YJZjx1g5u1SDTSBYpon1cWTQCDNE+WKQc1zko4dTiWsJnbC0LPQafosSc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1SDQc5bCIRiBbcrzZhpqFE95kJ1Cb3zi2A6Ub6Cz1Xaq6DCTR
-	VMZ5Lvlpm4BzAtHmS8soYyeFDVfkyYGDBBbcCwuGYAswsA8vP5pZisNN
-X-Gm-Gg: AeBDiesSSXpOc3IrE9Qpxpng5b5636OlBrPACqIvpbmcdGHT5Qi0jPTXle4yMY9PHNU
-	5MAVKxS+tUB1yE0l3LH3aTmDhH/y11fEx3x78pIK7Z/dgjT29K+p/R0G2Ylbzhpv4tEJBtYZxtq
-	eo++1KRE/iQgLyt/GTEWFXDV4ao+Y4xAdRERB8jWarebHqBspvxsxG8ZiAk4i7Y210T7rmWbkMg
-	9BqrSFtXRhtVbB0AGMp09tCtU8KzPF1kgYVfoaJyXxbOd4twxGCncLXpGHL5AJtNZgyeac4C8R3
-	WtD/jTmxRbNLOW+4bAkCAOg/QnXRZWIjBmVMiVheZ6keYi81b+hHQUZR0aFUlc57V9UYRzWDJcD
-	UptLWIjAR2/QBftv/TRGR6X4x0JbvFXDh5xzyAO7hlVtavCo4CW/1JDma1jaWxuXx9v4b20hyXP
-	BpsaxfvNsWzB/HVKSIDC7O+MCQQzhwZV0KrnvLJ7mkdb+E
-X-Received: by 2002:a05:6a20:e210:b0:39f:df57:ee7b with SMTP id adf61e73a8af0-3a7f1a9f5c8mr6930786637.21.1777825584718;
-        Sun, 03 May 2026 09:26:24 -0700 (PDT)
+        bh=M1OXlDvR00KN5EgUZsriT8WnGpvoPbCTL1Vxu0+S0hc=;
+        b=ZSm0eKEqgWH0fzhVjDD1iZ+tCSkkX95hRNDNxy7sksDHTSIbnRyV/hP+68MHcpUqE8
+         9qXqS2JD587IUuYXCQSIsfTQGdgyajahrmYUlP02fZviNR/IEG9X0Fq5gjmTYpLgFHcO
+         oyfHXUMIZz9yS71aMwRTkK2DCWL8uPez3IZ+vz5xIIBwsE2jFD/h+YAO4+SRJvpDfW/M
+         1oPbUlZ4Q+8kbBMaLAO/AJgNwDhZOtNbHwGkYuE+gJFhKoY07jgXSx/+JAveHZvxBOGQ
+         ZC2VeQhxlXlAVXCljZA0VePVpok+QrCeT6+L4YsYOabMUBD/Ye8h0zl1yvlV3L6Z6+Q4
+         y78Q==
+X-Forwarded-Encrypted: i=1; AFNElJ84RzZfjUg6w7xxJv2gFa+K2GFLjotx7y+QcVWrtH+EAT8t5JWsJJOI2L3azqx26w3nAAWIFLU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx02LsSAl1FyUTd4G+OvhyuFyaJ7dmYsrEP9kh/Bpz7k/Smy89f
+	7ZHp4LFcrNyI4tz8XjtPRwKxWj8cwlekgwbUabYWBbPzWE5iEZEIHIdU
+X-Gm-Gg: AeBDieuggiwjhaAxv2su5Scd05JwMRbwdJHS2GxHi1wbl4ZqmllxdDElbJ/4IhQuNZY
+	AigDMYQO2kN6XzvLBFyzsJ0npVWVPFGmipIcfYULmpB7f7Mdmh8iPkfXeFgueT66ZyO6CW8xz6o
+	kP+O+LMaaWQT076PnAWl6uXjfRvFmHZ1MTW5xaNQIFU2o/hBu259FQAuyODMCe9BrpR7rRNdM/5
+	XFRLMEAfZ/pDpJwp7vhDf+YO8seFnrwgIoFqk8idJvJd9Li0MeSdtuDr1KD5J7OaSgknuOQ3mmr
+	JGarhQTPXWuq/r90psOa6R0Bybe7qLfzSU2BG5HM9wk2Ui2HLpDbXk6BS4ycBUbPjQnjclhtttK
+	WwsqtbL/0Q9bbPfiiJqIMzqdPPoqQZMBE+kUGATIqq/Hj730vG0+McikJsJeHAnN+/6wsYHXMxY
+	A1I/Mw5qDfgEva+bnqBhehTixQMx0N2X5hooHwlzTAQg8Cgs5NA3YDzUY=
+X-Received: by 2002:a05:6a00:ab89:b0:82c:9c47:fef9 with SMTP id d2e1a72fcca58-8352d02558fmr5675855b3a.2.1777825587264;
+        Sun, 03 May 2026 09:26:27 -0700 (PDT)
 Received: from [163.43.103.131] ([163.43.103.131])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83515b8500dsm9788911b3a.58.2026.05.03.09.26.21
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83515b8500dsm9788911b3a.58.2026.05.03.09.26.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 May 2026 09:26:23 -0700 (PDT)
+        Sun, 03 May 2026 09:26:26 -0700 (PDT)
 From: Yuya Kusakabe <yuya.kusakabe@gmail.com>
-Date: Mon, 04 May 2026 01:25:57 +0900
-Subject: [PATCH 4/7] seg6: add End.M.GTP6.D behavior
+Date: Mon, 04 May 2026 01:25:58 +0900
+Subject: [PATCH 5/7] seg6: add End.M.GTP6.D.Di behavior
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,8 +86,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260504-srv6-mup-v1-v1-4-e0a6791575cb@gmail.com>
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260504-srv6-mup-v1-v1-5-e0a6791575cb@gmail.com>
 References: <20260504-srv6-mup-v1-v1-0-e0a6791575cb@gmail.com>
 In-Reply-To: <20260504-srv6-mup-v1-v1-0-e0a6791575cb@gmail.com>
 To: "David S. Miller" <davem@davemloft.net>, 
@@ -99,24 +99,24 @@ Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
  linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, 
  Yuya Kusakabe <yuya.kusakabe@gmail.com>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=41279;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=23751;
  i=yuya.kusakabe@gmail.com; h=from:subject:message-id;
- bh=lAmhvud8DJT1TnGXr3FPni6vH/gxo1WayILgZEjRzl8=;
- b=owEBbQKS/ZANAwAIASrX0XUqXRtNAcsmYgBp93ci3NHeHwjMwqjM2Fc6dek9CbwIDqAB986iA
- 1nrQS/29C+JAjMEAAEIAB0WIQTaB7usAfxNKMeqa6Yq19F1Kl0bTQUCafd3IgAKCRAq19F1Kl0b
- TUuvD/9PH+7Mj9DZXmXzyHkkfi5gdKaBZszFYHuSFcBC1NNG/Pyv8EtQKjjJT6rEBbuKS/EW8Ng
- s74OVaMw4Zz9YuB+mqo0yiD3kFbvwrphVy56+RlH6lKT+VM/5Su1z6Hle8wnlEffQQHPN7NsjOL
- y2ZMonh9/yjO9FN3Lbm3VBjSKD2ceW9+CwPCA3cUlNIBctClrZM7WyXZ/rJ5uqpmN64Fubwugla
- XN7tIPutNaRB/AjKgBVajW18wSWAoERUTSggJNnARh/xTCiX4Y9o5SEfqDdcCNhbl0PNMiHfzmO
- tgv68AZbklDBX1nnMyjMCrCjgwD9r3m6gYIku24WMe4KcZa4z1hb0ssQJapUVxt81Pczk0SPZhU
- XaKpaHE3UZoau+5vPFKZf2UKPwB2nbybYSgrFQxfQe6PoiTjm9DsJv4SaLX6lxOewSBYx9LxAYA
- +/86XhuYQ+TQRurQdek8b6ga32iAduNraaRj7WzdiqRIZmLMwqNZTIacosNMr9ShD0wc3TyR7Y/
- dLZ/rAa8VJwV+BA62lAu7dH7iODCLqvrWk7xaSr/u+i/vfNi/KM2BwIy2G0j/dlXbdtfn2Ha1Re
- eMsl4QUgIHj9rQhSxDPozeZZZrQjIj5RpwYGUEFr5OCXcdRpuSQ63feWPztyu6jI8IUxcqWxssn
- BQq/DU3bNPheQXw==
+ bh=iWy4oAPkgs8cmIDV4jisE4x6QoSBLvsTaYWdsteovZQ=;
+ b=owEBbQKS/ZANAwAIASrX0XUqXRtNAcsmYgBp93cix8Dun/ggRgtpWKfYXOpCMJZSSFkn9shdD
+ 6fBwOVcNbCJAjMEAAEIAB0WIQTaB7usAfxNKMeqa6Yq19F1Kl0bTQUCafd3IgAKCRAq19F1Kl0b
+ TZp+D/4o9ogpouWVAJIA2sLXi0b6k6j1MumI00wR6qEElI0uNb1jr57hPt0gtvRZZwyZBpGS3Cd
+ Zss+mUK6Xg7E2S9bMEbsnEsmWIPnzZqMPPlJ9uJjrXRCnCq78Xh6kg4FTm3MSez4hqJKMa/VvCe
+ /llF8BMY72jEk1B2xeBSqDVSoGLybHarIfx+MmCmBV47k4dznu+cXVfN9DtAqvw+8e6iHQ/uG91
+ sl7GZAdx7wSNBEfou68xRM6y/GsxLftrYMSR5Fd9/rv+lVABktV4/BUOnsFmT/FrCNHRuZddncX
+ SOL+lUqLP0JEVSIk3QxwgRCQ5F5rXmKTzPpgTzD5RnNaos1rD8+9MrHFrJJdOY38MJQ7Pcbc1Hz
+ +AcSK07Mx4WNH7LjPoJp6oyum/G4L0DAJk32vqpDZQzh/thFDUAwONESb0ytK8MBPtigkc8J3mu
+ Qz53hOZyuGdJIXBGXRXjOmoJvegh+xsC0oZX1M2DXM397wbA7HdZILmiHwMPk0Iq/zdAVwOvcq9
+ Zpwr9Hx6u6qj4bnZMNQhN0aIEjw+XsY/y9w0obEZ5lN2/msz/cRl+m+guqJ/ySKAMSLD/BY6hEp
+ s+rfLh+VZFK9SWlWz6kuygLjJb1LJgPQGkre8DReIDUSw0w4nFiw3EpdpG2RxPgIIG4t8QdCmAw
+ m27iZMfMksf+kHg==
 X-Developer-Key: i=yuya.kusakabe@gmail.com; a=openpgp;
  fpr=DA07BBAC01FC4D28C7AA6BA62AD7D1752A5D1B4D
-X-Rspamd-Queue-Id: 38A234B6780
+X-Rspamd-Queue-Id: 8D77B4B6721
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -124,11 +124,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283632-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283633-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -136,7 +136,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCPT_COUNT_TWELVE(0.00)[14];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -147,319 +147,83 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[rfc-editor.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lib.sh:url,srv6_end_m_gtp6_d_test.sh:url,dst.dev:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lib.sh:url,srv6_end_m_gtp6_d_di_test.sh:url,rfc-editor.org:url]
 
-Add the End.M.GTP6.D headend behavior (RFC 9433 Section 6.3), which
-receives an IPv6/UDP/GTP-U packet matching a locally instantiated
-End.M.GTP6.D SID and re-encapsulates the inner T-PDU in SRv6 using
-the configured SR Policy.  TEID and QFI are folded into the 40-bit
-Args.Mob.Session field defined by RFC 9433 Section 6.1.
+Add the End.M.GTP6.D.Di drop-in mode variant of End.M.GTP6.D
+(RFC 9433 Section 6.4).  Unlike End.M.GTP6.D, the drop-in variant
+does NOT fold the GTP-U identifiers into Args.Mob.Session: the
+original outer IPv6 destination is preserved at SRH[0] of the new
+SRH, so the destination side can keep the original address
+untouched while still benefiting from SR Policy steering.
 
-RFC 9433 Section 6.3 Step S08 specifies "Write in the SRH[0] the
-Args.Mob.Session" for a single-SID SR Policy.  When the SR Policy
-contains more segments, the augmented SRH must reserve a leading
-slot for the original outer destination D so that the downstream
-End.M.GTP6.E (which Section 6.5 requires to sit at the penultimate
-SID and Step S01 instructs to "Copy SRH[0] and D to buffer memory")
-can rebuild the GTP-U tunnel.  Args.Mob.Session is therefore stamped
-into segments[1] (the End.M.GTP6.E SID's locator-relative tail).
-
-The augmented SRH (slwt->srh + one extra leading slot) is built
-once at build_state time and reused on every packet.
-
-The new SEG6_LOCAL_MOBILE_SR_PREFIX_LEN attribute carries the
-locator length used by the remote End.M.GTP6.E SID; it is required
-because the SR Gateway has no way to discover the remote SID's
-prefix length from the FIB on its own.
+The augmented SRH builder/destroyer is shared with End.M.GTP6.D.
+The TEID and QFI parsed out of the inbound GTP-U header are
+intentionally discarded for this variant (matching RFC 9433
+Section 6.4).
 
 When net.netfilter.nf_hooks_lwtunnel=1, the inner T-PDU traverses
 NF_INET_PRE_ROUTING between the GTP-U strip and the SRv6 push,
 mirroring End.DX4 / End.DX6.
 
-Inbound GTP-U packets are classified by message type (3GPP TS
-29.281 Section 5.1).  Only T-PDU (type 255) is encapsulated into
-SRv6.  Any other GTP-U message (Echo Request/Response, Error
-Indication, ...) is forwarded unchanged via the lwtunnel's saved
-orig_input so that a downstream peer that owns the GTP-U control
-plane can process it.
+Non-T-PDU GTP-U messages are forwarded the same way as in
+End.M.GTP6.D: passed through via the lwtunnel's saved orig_input
+to a downstream peer that owns the GTP-U control plane.
 
 Configuration:
 
   ip -6 route add 2001:db8:f::/64 \
-      encap seg6local action End.M.GTP6.D \
-          srh segs 2001:db8:2::e \
+      encap seg6local action End.M.GTP6.D.Di \
+          srh segs 2001:db8:2::e,2001:db8:3::e \
           src 2001:db8:2::1 \
-          sr_prefix_len 64 \
       dev <dev>
 
-Link: https://www.rfc-editor.org/rfc/rfc9433.html#section-6.3
+Link: https://www.rfc-editor.org/rfc/rfc9433.html#section-6.4
 Signed-off-by: Yuya Kusakabe <yuya.kusakabe@gmail.com>
 ---
- include/uapi/linux/seg6_local.h                    |   3 +
- net/ipv6/seg6_local.c                              | 512 +++++++++++++++++++++
+ include/uapi/linux/seg6_local.h                    |   2 +
+ net/ipv6/seg6_local.c                              | 222 +++++++++++
  tools/testing/selftests/net/Makefile               |   1 +
- .../selftests/net/srv6_end_m_gtp6_d_test.sh        | 496 ++++++++++++++++++++
- 4 files changed, 1012 insertions(+)
+ .../selftests/net/srv6_end_m_gtp6_d_di_test.sh     | 426 +++++++++++++++++++++
+ 4 files changed, 651 insertions(+)
 
 diff --git a/include/uapi/linux/seg6_local.h b/include/uapi/linux/seg6_local.h
-index 8e46ede2980d..7d3d3d245b47 100644
+index 7d3d3d245b47..326da65ad5aa 100644
 --- a/include/uapi/linux/seg6_local.h
 +++ b/include/uapi/linux/seg6_local.h
-@@ -33,6 +33,7 @@ enum {
- 	SEG6_LOCAL_MOBILE_V4_MASK_LEN,
- 	SEG6_LOCAL_MOBILE_PDU_TYPE,
- 	SEG6_LOCAL_MOBILE_V6_SRC_PREFIX_LEN,
-+	SEG6_LOCAL_MOBILE_SR_PREFIX_LEN,
- 	__SEG6_LOCAL_MAX,
- };
- #define SEG6_LOCAL_MAX (__SEG6_LOCAL_MAX - 1)
-@@ -77,6 +78,8 @@ enum {
- 	SEG6_LOCAL_ACTION_END_M_GTP4_E	= 18,
- 	/* SRv6 to IPv6/GTP-U encap (RFC 9433 Section 6.5) */
+@@ -80,6 +80,8 @@ enum {
  	SEG6_LOCAL_ACTION_END_M_GTP6_E	= 19,
-+	/* IPv6/GTP-U decap into SRv6 (RFC 9433 Section 6.3) */
-+	SEG6_LOCAL_ACTION_END_M_GTP6_D	= 20,
+ 	/* IPv6/GTP-U decap into SRv6 (RFC 9433 Section 6.3) */
+ 	SEG6_LOCAL_ACTION_END_M_GTP6_D	= 20,
++	/* IPv6/GTP-U decap into SRv6, drop-in mode (RFC 9433 Section 6.4) */
++	SEG6_LOCAL_ACTION_END_M_GTP6_D_DI = 21,
  
  	__SEG6_LOCAL_ACTION_MAX,
  };
 diff --git a/net/ipv6/seg6_local.c b/net/ipv6/seg6_local.c
-index 2ebcbd7b99a4..6ac4de529c08 100644
+index 6ac4de529c08..cecf87cc84e5 100644
 --- a/net/ipv6/seg6_local.c
 +++ b/net/ipv6/seg6_local.c
-@@ -13,6 +13,7 @@
- #include <linux/net.h>
- #include <linux/module.h>
- #include <net/ip.h>
-+#include <net/ipv6.h>
- #include <net/lwtunnel.h>
- #include <net/netevent.h>
- #include <net/netns/generic.h>
-@@ -194,7 +195,9 @@ struct seg6_mobile_info {
- 	u8			v4_mask_len;		/* IPv4 portion length (bits) */
- 	u8			pdu_type;		/* PDU Type (0=downlink, 1=uplink) */
- 	bool			pdu_type_set;		/* PDU Session Container enabled */
-+	u8			sr_prefix_len;		/* egress SR prefix length (bits) */
- 	u8			v6_src_prefix_len;	/* Source UPF Prefix length (bits) */
-+	struct ipv6_sr_hdr	*aug_srh;		/* augmented SRH for End.M.GTP6.D{,.Di} */
- };
- 
- #define SEG6_MOBILE_V6_SRC_PREFIX_LEN_DEFAULT	64
-@@ -1637,6 +1640,53 @@ static bool seg6_mobile_extract_args_mob(const struct in6_addr *daddr,
- 	return true;
- }
- 
-+/* Write @nbits of @val (top bits) into a 16-byte big-endian @addr at
-+ * bit offset @bit_off, preserving surrounding bits.  Caller ensures
-+ * bit_off + nbits <= 128 and 1 <= nbits <= 64.
-+ */
-+static void seg6_mobile_addr_set_bits(u8 *addr, unsigned int bit_off,
-+				      unsigned int nbits, u64 val)
-+{
-+	u64 hi = get_unaligned_be64(addr);
-+	u64 lo = get_unaligned_be64(addr + 8);
-+	u64 mask_hi, mask_lo;
-+
-+	val &= GENMASK_ULL(63, 64 - nbits);
-+
-+	if (bit_off >= 64) {
-+		mask_lo = GENMASK_ULL(63, 64 - nbits) >> (bit_off - 64);
-+		lo = (lo & ~mask_lo) | (val >> (bit_off - 64));
-+	} else if (bit_off + nbits <= 64) {
-+		mask_hi = GENMASK_ULL(63, 64 - nbits) >> bit_off;
-+		hi = (hi & ~mask_hi) | (val >> bit_off);
-+	} else {
-+		unsigned int hi_bits = 64 - bit_off;
-+
-+		mask_hi = GENMASK_ULL(hi_bits - 1, 0);
-+		mask_lo = GENMASK_ULL(63, 64 - (nbits - hi_bits));
-+		hi = (hi & ~mask_hi) | (val >> bit_off);
-+		lo = (lo & ~mask_lo) | ((val << hi_bits) & mask_lo);
-+	}
-+
-+	put_unaligned_be64(hi, addr);
-+	put_unaligned_be64(lo, addr + 8);
-+}
-+
-+/* @prefix_bits is bounded to [1, 88] by parse_nla_mobile_sr_prefix_len()
-+ * before this function is reached, so the guard below is unreachable
-+ * today.  Defense-in-depth against a future regression.
-+ */
-+static int seg6_mobile_write_args_mob(struct in6_addr *addr,
-+				      unsigned int prefix_bits, u64 args_mob)
-+{
-+	if (prefix_bits + SEG6_MOBILE_ARGS_MOB_LEN > 128)
-+		return -EINVAL;
-+
-+	seg6_mobile_addr_set_bits(addr->s6_addr, prefix_bits,
-+				  SEG6_MOBILE_ARGS_MOB_LEN, args_mob);
-+	return 0;
-+}
-+
- /* GTP-U PDU Session extension header (3GPP TS 38.415).
-  * 4-byte minimum unit: ext_len=1, PDU Type in high 4 bits of @pdu_type_spare,
-  * QFI in low 6 bits of @spare_qfi, next_ext=0.
-@@ -1664,6 +1714,16 @@ struct seg6_mobile_pdu_session_ext {
- #define SEG6_MOBILE_ARGS_QFI_SHIFT	58
- #define SEG6_MOBILE_ARGS_TEID_SHIFT	24
- 
-+/* Combine TEID and QFI into a left-justified Args.Mob.Session value
-+ * (RFC 9433 Section 6.1 Figure 8); R/U are emitted as zero.
-+ */
-+static u64 seg6_mobile_args_from_teid_qfi(u32 teid, u8 qfi)
-+{
-+	return ((u64)(qfi & SEG6_MOBILE_PDU_SESSION_QFI_MASK) <<
-+		 SEG6_MOBILE_ARGS_QFI_SHIFT) |
-+	       ((u64)teid << SEG6_MOBILE_ARGS_TEID_SHIFT);
-+}
-+
- static u8 seg6_mobile_qfi_from_args(u64 args_mob)
- {
- 	return (args_mob >> SEG6_MOBILE_ARGS_QFI_SHIFT) &
-@@ -1722,6 +1782,121 @@ static int seg6_mobile_push_gtpu(struct sk_buff *skb, u32 teid, u8 qfi,
- 	return 0;
- }
- 
-+/* Parse the GTP-U header at @skb offset @gtp_off.  Pulls each
-+ * additional region (long header, extension chain) into the linear
-+ * area as it walks; on success returns the total header length to
-+ * consume (mandatory + optional + extension headers), or a negative
-+ * errno on failure.
-+ *
-+ * Returns -EOPNOTSUPP if the packet is a well-formed GTPv1-U header
-+ * that this code path does not consume itself (any non-T-PDU message
-+ * such as Echo Request / Error Indication).  Callers pass such packets
-+ * through to the configured forwarding path via
-+ * seg6_mobile_passthrough_non_tpdu().
-+ *
-+ * Returns -EINVAL when the GTP-U header is structurally malformed
-+ * (truncated extension chain, ext_units == 0, etc.).  Callers should
-+ * drop those.
-+ *
-+ * On success, *@teid is set to the GTP-U TEID and *@qfi is set to the
-+ * QFI found in a PDU Session extension header, or 0 if none is present.
-+ *
-+ * Callers must re-derive any pointers into @skb->data after this
-+ * function returns: pskb_may_pull() may have reallocated skb->head.
-+ */
-+static int seg6_mobile_parse_gtpu(struct sk_buff *skb, unsigned int gtp_off,
-+				  u32 *teid, u8 *qfi)
-+{
-+	const struct gtp1_header *gtph;
-+	const struct gtp1_header_long *gtphl;
-+	const u8 *gtp;
-+	unsigned int hdrlen;
-+	u8 flags, next;
-+
-+	if (!pskb_may_pull(skb, gtp_off + sizeof(*gtph)))
-+		return -EINVAL;
-+	gtp = skb->data + gtp_off;
-+	gtph = (const struct gtp1_header *)gtp;
-+	flags = gtph->flags;
-+
-+	/* Accept only GTPv1-U T-PDU (3GPP TS 29.281 Section 5.1).  Other
-+	 * GTPv1-U message types (Echo Request/Response, Error Indication,
-+	 * ...) are dispatched separately by the caller.
-+	 */
-+	if ((flags & ~GTP1_F_MASK) != SEG6_MOBILE_GTP1U_FLAGS_BASE)
-+		return -EOPNOTSUPP;
-+	if (gtph->type != GTP_TPDU)
-+		return -EOPNOTSUPP;
-+
-+	*teid = ntohl(gtph->tid);
-+	*qfi = 0;
-+
-+	if (!(flags & (GTP1_F_EXTHDR | GTP1_F_SEQ | GTP1_F_NPDU)))
-+		return sizeof(*gtph);
-+
-+	if (!pskb_may_pull(skb, gtp_off + sizeof(*gtphl)))
-+		return -EINVAL;
-+	gtp = skb->data + gtp_off;
-+	gtphl = (const struct gtp1_header_long *)gtp;
-+	hdrlen = sizeof(*gtphl);
-+
-+	if (!(flags & GTP1_F_EXTHDR))
-+		return hdrlen;
-+
-+	next = gtphl->next;
-+	while (next != 0) {
-+		unsigned int ext_units, ext_bytes;
-+		const u8 *ext;
-+
-+		if (!pskb_may_pull(skb, gtp_off + hdrlen + 1))
-+			return -EINVAL;
-+		ext = skb->data + gtp_off + hdrlen;
-+		ext_units = ext[0];
-+		if (ext_units == 0)
-+			return -EINVAL;
-+
-+		ext_bytes = ext_units * 4;
-+		if (!pskb_may_pull(skb, gtp_off + hdrlen + ext_bytes))
-+			return -EINVAL;
-+		ext = skb->data + gtp_off + hdrlen;
-+
-+		if (next == SEG6_MOBILE_PDU_SESSION_NH) {
-+			/* 3GPP TS 38.415: the PDU Session extension header
-+			 * is exactly 4 bytes long.
-+			 */
-+			if (ext_bytes != 4)
-+				return -EINVAL;
-+			*qfi = ext[2] & SEG6_MOBILE_PDU_SESSION_QFI_MASK;
-+		}
-+
-+		next = ext[ext_bytes - 1];
-+		hdrlen += ext_bytes;
-+	}
-+
-+	return hdrlen;
-+}
-+
-+/* Pass a non-T-PDU GTP-U message (Echo, Error Indication, ...) through
-+ * the configured forwarding path so that a downstream UPF (which owns
-+ * the GTP-U control plane) can process it.  The packet is delivered via
-+ * the lwtunnel's saved orig_input -- ip6_forward for an IPv6 SID route
-+ * or ip_forward for an IPv4 route -- which forwards using the existing
-+ * skb_dst, reaching the UPF that lives in the L3 network behind the
-+ * SRGW.
-+ *
-+ * @skb is consumed.
-+ */
-+static int seg6_mobile_passthrough_non_tpdu(struct sk_buff *skb)
-+{
-+	struct dst_entry *dst = skb_dst(skb);
-+
-+	if (dst && dst->lwtstate && dst->lwtstate->orig_input)
-+		return dst->lwtstate->orig_input(skb);
-+
-+	kfree_skb_reason(skb, SKB_DROP_REASON_SEG6_MOBILE_BAD_GTPU);
-+	return -EINVAL;
-+}
-+
- /* Per-skb context preserved across the NF_INET_PRE_ROUTING hook on
-  * the inner T-PDU exposed by End.M.GTP4.E.  After the outer SRv6 has
-  * been popped the inner IP is briefly visible to netfilter; the
-@@ -2119,6 +2294,289 @@ static int input_action_end_m_gtp6_e_finish(struct net *net,
- 	return -EINVAL;
+@@ -2577,6 +2577,216 @@ static void seg6_end_m_gtp6_d_aug_destroy(struct seg6_local_lwt *slwt)
+ 	slwt->mobile_info.aug_srh = NULL;
  }
  
 +/* Per-skb context preserved across the NF_INET_PRE_ROUTING hook on
-+ * the inner T-PDU exposed by End.M.GTP6.D / End.M.GTP6.D.Di.  The
-+ * outer IPv6/UDP/GTP-U is gone by the time the finish callback runs,
-+ * but the SRH built in finish still needs the original outer DA and
-+ * the Args.Mob.Session derived from TEID/QFI.
++ * the inner T-PDU exposed by End.M.GTP6.D.Di.  Only the original
++ * outer DA is needed in the finish half (it is stamped into SRH[0]
++ * after seg6_do_srh_encap()).
 + */
-+struct seg6_mobile_gtp6_d_cb {
-+	u64		args_mob;
++struct seg6_mobile_gtp6_d_di_cb {
 +	struct in6_addr	orig_dst;
 +};
 +
-+#define SEG6_MOBILE_GTP6_D_CB(skb)	\
-+	((struct seg6_mobile_gtp6_d_cb *)((skb)->cb))
++#define SEG6_MOBILE_GTP6_D_DI_CB(skb)	\
++	((struct seg6_mobile_gtp6_d_di_cb *)((skb)->cb))
 +
-+static int input_action_end_m_gtp6_d_finish(struct net *net,
-+					    struct sock *sk,
-+					    struct sk_buff *skb)
++static int input_action_end_m_gtp6_d_di_finish(struct net *net,
++					       struct sock *sk,
++					       struct sk_buff *skb)
 +{
-+	struct seg6_mobile_gtp6_d_cb cb = *SEG6_MOBILE_GTP6_D_CB(skb);
++	struct seg6_mobile_gtp6_d_di_cb cb = *SEG6_MOBILE_GTP6_D_DI_CB(skb);
 +	struct dst_entry *orig_dst = skb_dst(skb);
 +	enum skb_drop_reason reason;
 +	const struct seg6_mobile_info *minfo;
@@ -483,21 +247,15 @@ index 2ebcbd7b99a4..6ac4de529c08 100644
 +
 +	skb->protocol = htons(ETH_P_IPV6);
 +
++	/* Stamp the prepended segments[0] (originally zeroed in
++	 * minfo->aug_srh) with the saved original outer DA, in the
++	 * in-skb SRH that seg6_do_srh_encap() just pushed.
++	 */
 +	new_srh = (struct ipv6_sr_hdr *)(skb_network_header(skb) +
 +					 sizeof(struct ipv6hdr));
 +	new_srh->segments[0] = cb.orig_dst;
-+	if (seg6_mobile_write_args_mob(&new_srh->segments[1],
-+				       minfo->sr_prefix_len, cb.args_mob)) {
-+		reason = SKB_DROP_REASON_SEG6_MOBILE_BAD_SID;
-+		goto drop;
-+	}
 +
 +	ipv6_hdr(skb)->saddr = minfo->src_addr;
-+
-+	/* seg6_do_srh_encap() copied segments[first_segment] to the outer
-+	 * DA before Args.Mob.Session was stamped; refresh it.
-+	 */
-+	ipv6_hdr(skb)->daddr = new_srh->segments[new_srh->first_segment];
 +
 +	skb_set_transport_header(skb, sizeof(struct ipv6hdr));
 +	nf_reset_ct(skb);
@@ -511,41 +269,32 @@ index 2ebcbd7b99a4..6ac4de529c08 100644
 +	return -EINVAL;
 +}
 +
-+/* RFC 9433 Section 6.3 -- End.M.GTP6.D
-+ * Receives an IPv6/UDP/GTP-U packet matching a locally instantiated
-+ * End.M.GTP6.D SID and re-encapsulates the inner T-PDU in SRv6 using
-+ * the configured SR Policy.  TEID and QFI are folded into
-+ * Args.Mob.Session.  Per RFC 9433 Section 6.5 ("End.M.GTP6.E SID MUST
-+ * always be the penultimate SID"), Args.Mob.Session is encoded into
-+ * segments[1] of the new SRH (the penultimate SID at the egress UPF)
-+ * while segments[0] holds the original outer DA so that the egress
-+ * has a real GTP-U destination after End.M.GTP6.E decap.
++/* RFC 9433 Section 6.4 -- End.M.GTP6.D.Di
++ * Drop-in interconnect variant of End.M.GTP6.D: instead of folding the
++ * GTP-U identifiers into Args.Mob.Session, the original outer IPv6 DA
++ * is preserved at SRH[0] so the destination side can keep the address
++ * untouched.
 + *
 + * When net.netfilter.nf_hooks_lwtunnel=1 the inner T-PDU is exposed
 + * to NF_INET_PRE_ROUTING after the GTP-U strip and before the SRv6
-+ * push, mirroring End.DX4 / End.DX6.  This lets nftables / conntrack
-+ * apply policy on the inner 5-tuple at the SR Gateway.
++ * push, identical to End.M.GTP6.D.
 + */
-+static int input_action_end_m_gtp6_d(struct sk_buff *skb,
-+				     struct seg6_local_lwt *slwt)
++static int input_action_end_m_gtp6_d_di(struct sk_buff *skb,
++					struct seg6_local_lwt *slwt)
 +{
++	enum skb_drop_reason reason = SKB_DROP_REASON_SEG6_MOBILE_BAD_GTPU;
 +	unsigned int outer_len, inner_off;
 +	int gtp_hdrlen, inner_proto, inner_nfproto;
 +	struct in6_addr orig_dst;
-+	u8 inner_first, qfi;
 +	struct ipv6_sr_hdr *srh;
 +	struct ipv6hdr *ip6h;
 +	struct udphdr *uh;
-+	u64 args_mob;
 +	u32 teid;
-+	enum skb_drop_reason reason = SKB_DROP_REASON_SEG6_MOBILE_BAD_GTPU;
++	u8 inner_first, qfi;
 +
-+	BUILD_BUG_ON(sizeof(struct seg6_mobile_gtp6_d_cb) >
++	BUILD_BUG_ON(sizeof(struct seg6_mobile_gtp6_d_di_cb) >
 +		     sizeof_field(struct sk_buff, cb));
 +
-+	/* RFC 9433 Section 6.3 SRH-S01: drop if outer SRH carries
-+	 * SegmentsLeft != 0
-+	 */
 +	srh = seg6_get_srh(skb, 0);
 +	if (srh && srh->segments_left != 0) {
 +		reason = SKB_DROP_REASON_SEG6_MOBILE_INVALID_SRH_SL;
@@ -560,9 +309,10 @@ index 2ebcbd7b99a4..6ac4de529c08 100644
 +	ip6h = ipv6_hdr(skb);
 +	orig_dst = ip6h->daddr;
 +
-+	/* RFC 9433 Section 6.3 upper-layer S01-S11: dispatch on
-+	 * (NH == UDP && UDP dport == GTP-U); otherwise delegate to the
-+	 * regular End behaviour (S10-S11).
++	/* Same dispatch as End.M.GTP6.D (RFC 9433 Section 6.4 reuses
++	 * the S01-S11 logic from Section 6.3): GTP-U traffic is
++	 * decapsulated and re-encapsulated, anything else falls
++	 * through to End.
 +	 */
 +	{
 +		__be16 frag_off;
@@ -592,6 +342,11 @@ index 2ebcbd7b99a4..6ac4de529c08 100644
 +		if (uh->dest != htons(GTP1U_PORT))
 +			return input_action_end(skb, slwt);
 +
++		/* TEID/QFI are not consumed by the drop-in variant
++		 * (RFC 9433 Section 6.4); seg6_mobile_parse_gtpu() is
++		 * still required to compute the GTP-U header length so
++		 * the outer chain (IPv6+UDP+GTP) can be popped correctly.
++		 */
 +		gtp_hdrlen = seg6_mobile_parse_gtpu(skb,
 +						    upper_off + sizeof(*uh),
 +						    &teid, &qfi);
@@ -601,11 +356,11 @@ index 2ebcbd7b99a4..6ac4de529c08 100644
 +			reason = SKB_DROP_REASON_SEG6_MOBILE_BAD_GTPU;
 +			goto drop;
 +		}
++		(void)teid;
++		(void)qfi;
 +
 +		outer_len = upper_off + sizeof(*uh) + gtp_hdrlen;
 +	}
-+
-+	args_mob = seg6_mobile_args_from_teid_qfi(teid, qfi);
 +
 +	if (!pskb_may_pull(skb, outer_len + 1)) {
 +		reason = SKB_DROP_REASON_SEG6_MOBILE_BAD_INNER;
@@ -638,10 +393,6 @@ index 2ebcbd7b99a4..6ac4de529c08 100644
 +	skb_pull_rcsum(skb, outer_len);
 +	skb_reset_network_header(skb);
 +
-+	/* Set skb->protocol to match the inner header so that the
-+	 * NF_INET_PRE_ROUTING hook (and seg6_do_srh_encap() inside
-+	 * the finish half) see a coherent IPv4/IPv6 packet.
-+	 */
 +	skb->protocol = (inner_proto == IPPROTO_IPIP) ? htons(ETH_P_IP)
 +						      : htons(ETH_P_IPV6);
 +
@@ -651,94 +402,35 @@ index 2ebcbd7b99a4..6ac4de529c08 100644
 +				 sizeof(struct ipv6hdr));
 +	nf_reset_ct(skb);
 +
-+	SEG6_MOBILE_GTP6_D_CB(skb)->args_mob = args_mob;
-+	SEG6_MOBILE_GTP6_D_CB(skb)->orig_dst = orig_dst;
++	SEG6_MOBILE_GTP6_D_DI_CB(skb)->orig_dst = orig_dst;
 +
 +	if (static_branch_unlikely(&nf_hooks_lwtunnel_enabled))
 +		return NF_HOOK(inner_nfproto, NF_INET_PRE_ROUTING,
 +			       dev_net(skb->dev), NULL, skb, skb->dev,
-+			       NULL, input_action_end_m_gtp6_d_finish);
++			       NULL, input_action_end_m_gtp6_d_di_finish);
 +
-+	return input_action_end_m_gtp6_d_finish(dev_net(skb->dev), NULL, skb);
++	return input_action_end_m_gtp6_d_di_finish(dev_net(skb->dev), NULL,
++						   skb);
 +
 +drop:
 +	kfree_skb_reason(skb, reason);
 +	return -EINVAL;
 +}
 +
-+/* Shared between End.M.GTP6.D and End.M.GTP6.D.Di -- both
-+ * prepend a single leading slot to the user-configured SRH to leave
-+ * room for the original outer DA at SRH[0].  End.M.GTP6.D writes
-+ * Args.Mob.Session into segments[1] at runtime; End.M.GTP6.D.Di
-+ * leaves segments[1+] as the user provided them.
-+ */
-+static int seg6_end_m_gtp6_d_aug_build(struct seg6_local_lwt *slwt,
-+				       const void *cfg,
-+				       struct netlink_ext_ack *extack)
-+{
-+	struct ipv6_sr_hdr *aug;
-+	int orig_len, aug_len;
-+
-+	if (!slwt->srh) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "End.M.GTP6.D{,.Di} requires srh segs");
-+		return -EINVAL;
-+	}
-+
-+	/* The augmented SRH adds one extra leading slot, so its hdrlen
-+	 * field (u8) must still fit the +2-segment-equivalent encoding.
-+	 * Reject pathological srh inputs at setup time so that no
-+	 * silent overflow can produce an undersized aug->hdrlen and a
-+	 * subsequent OOB read in seg6_do_srh_encap().
-+	 */
-+	if (slwt->srh->hdrlen > 253) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "End.M.GTP6.D{,.Di} srh too large to augment (max 126 segments)");
-+		return -EINVAL;
-+	}
-+
-+	orig_len = (slwt->srh->hdrlen + 1) << 3;
-+	aug_len = orig_len + sizeof(struct in6_addr);
-+
-+	aug = kzalloc(aug_len, GFP_KERNEL);
-+	if (!aug)
-+		return -ENOMEM;
-+
-+	memcpy(aug, slwt->srh, sizeof(*aug));
-+	aug->hdrlen = (aug_len >> 3) - 1;
-+	aug->segments_left = slwt->srh->segments_left + 1;
-+	aug->first_segment = slwt->srh->first_segment + 1;
-+	/* segments[0] left zero; data path stamps the original outer
-+	 * DA into the in-skb copy after seg6_do_srh_encap().
-+	 */
-+	memcpy(&aug->segments[1], &slwt->srh->segments[0],
-+	       orig_len - sizeof(*aug));
-+
-+	slwt->mobile_info.aug_srh = aug;
-+	return 0;
-+}
-+
-+static void seg6_end_m_gtp6_d_aug_destroy(struct seg6_local_lwt *slwt)
-+{
-+	kfree(slwt->mobile_info.aug_srh);
-+	slwt->mobile_info.aug_srh = NULL;
-+}
-+
  /* RFC 9433 Section 6.5 -- End.M.GTP6.E
   * Receives an SRv6 packet whose current SID is an End.M.GTP6.E SID
   * (Segments Left == 1) and re-encapsulates the inner payload in
-@@ -2449,6 +2907,19 @@ static struct seg6_action_desc seg6_action_table[] = {
- 			.build_state = seg6_mobile_gtp6_e_validate,
+@@ -2920,6 +3130,18 @@ static struct seg6_action_desc seg6_action_table[] = {
+ 			.destroy_state = seg6_end_m_gtp6_d_aug_destroy,
  		},
  	},
 +	{
-+		.action		= SEG6_LOCAL_ACTION_END_M_GTP6_D,
++		.action		= SEG6_LOCAL_ACTION_END_M_GTP6_D_DI,
 +		.attrs		= SEG6_F_ATTR(SEG6_LOCAL_SRH)		     |
-+				  SEG6_F_ATTR(SEG6_LOCAL_MOBILE_SRC_ADDR)    |
-+				  SEG6_F_ATTR(SEG6_LOCAL_MOBILE_SR_PREFIX_LEN),
++				  SEG6_F_ATTR(SEG6_LOCAL_MOBILE_SRC_ADDR),
 +		.optattrs	= SEG6_F_LOCAL_COUNTERS |
 +				  SEG6_F_ATTR(SEG6_LOCAL_OIF),
-+		.input		= input_action_end_m_gtp6_d,
++		.input		= input_action_end_m_gtp6_d_di,
 +		.slwt_ops	= {
 +			.build_state = seg6_end_m_gtp6_d_aug_build,
 +			.destroy_state = seg6_end_m_gtp6_d_aug_destroy,
@@ -747,122 +439,34 @@ index 2ebcbd7b99a4..6ac4de529c08 100644
  	{
  		.action		= SEG6_LOCAL_ACTION_END_MAP,
  		.attrs		= SEG6_F_ATTR(SEG6_LOCAL_NH6),
-@@ -2549,6 +3020,7 @@ static const struct nla_policy seg6_local_policy[SEG6_LOCAL_MAX + 1] = {
- 		NLA_POLICY_EXACT_LEN(sizeof(struct in6_addr)),
- 	[SEG6_LOCAL_MOBILE_V4_MASK_LEN] = { .type = NLA_U8 },
- 	[SEG6_LOCAL_MOBILE_PDU_TYPE] = { .type = NLA_U8 },
-+	[SEG6_LOCAL_MOBILE_SR_PREFIX_LEN] = { .type = NLA_U8 },
- 	[SEG6_LOCAL_MOBILE_V6_SRC_PREFIX_LEN] = { .type = NLA_U8 },
- };
- 
-@@ -2964,6 +3436,39 @@ static int seg6_mobile_gtp6_e_validate(struct seg6_local_lwt *slwt,
- 	return 0;
- }
- 
-+static int parse_nla_mobile_sr_prefix_len(struct nlattr **attrs,
-+					  struct seg6_local_lwt *slwt,
-+					  struct netlink_ext_ack *extack)
-+{
-+	u8 len = nla_get_u8(attrs[SEG6_LOCAL_MOBILE_SR_PREFIX_LEN]);
-+
-+	/* The SR locator must be non-zero and leave room for the 40-bit
-+	 * Args.Mob.Session that follows it (RFC 9433 Section 6.5/6.7).
-+	 */
-+	if (len == 0 || len + SEG6_MOBILE_ARGS_MOB_LEN > 128) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "SRv6 Mobile SR prefix length must be in 1..88 (leaving room for the 40-bit Args.Mob.Session)");
-+		return -EINVAL;
-+	}
-+	slwt->mobile_info.sr_prefix_len = len;
-+	return 0;
-+}
-+
-+static int put_nla_mobile_sr_prefix_len(struct sk_buff *skb,
-+					struct seg6_local_lwt *slwt)
-+{
-+	if (nla_put_u8(skb, SEG6_LOCAL_MOBILE_SR_PREFIX_LEN,
-+		       slwt->mobile_info.sr_prefix_len))
-+		return -EMSGSIZE;
-+	return 0;
-+}
-+
-+static int cmp_nla_mobile_sr_prefix_len(struct seg6_local_lwt *a,
-+					struct seg6_local_lwt *b)
-+{
-+	return a->mobile_info.sr_prefix_len != b->mobile_info.sr_prefix_len;
-+}
-+
- #define MAX_PROG_NAME 256
- static const struct nla_policy bpf_prog_policy[SEG6_LOCAL_BPF_PROG_MAX + 1] = {
- 	[SEG6_LOCAL_BPF_PROG]	   = { .type = NLA_U32, },
-@@ -3406,6 +3911,10 @@ static struct seg6_action_param seg6_action_params[SEG6_LOCAL_MAX + 1] = {
- 					 .put = put_nla_mobile_pdu_type,
- 					 .cmp = cmp_nla_mobile_pdu_type },
- 
-+	[SEG6_LOCAL_MOBILE_SR_PREFIX_LEN] = { .parse = parse_nla_mobile_sr_prefix_len,
-+					      .put = put_nla_mobile_sr_prefix_len,
-+					      .cmp = cmp_nla_mobile_sr_prefix_len },
-+
- 	[SEG6_LOCAL_MOBILE_V6_SRC_PREFIX_LEN] = { .parse = parse_nla_mobile_v6_src_prefix_len,
- 						  .put = put_nla_mobile_v6_src_prefix_len,
- 						  .cmp = cmp_nla_mobile_v6_src_prefix_len },
-@@ -3734,6 +4243,9 @@ static int seg6_local_get_encap_size(struct lwtunnel_state *lwt)
- 	if (attrs & SEG6_F_ATTR(SEG6_LOCAL_MOBILE_PDU_TYPE))
- 		nlsize += nla_total_size(1);
- 
-+	if (attrs & SEG6_F_ATTR(SEG6_LOCAL_MOBILE_SR_PREFIX_LEN))
-+		nlsize += nla_total_size(1);
-+
- 	if (attrs & SEG6_F_ATTR(SEG6_LOCAL_MOBILE_V6_SRC_PREFIX_LEN))
- 		nlsize += nla_total_size(1);
- 
 diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 2eeff97cac21..70cec00aebdb 100644
+index 70cec00aebdb..ad1e2ff3842f 100644
 --- a/tools/testing/selftests/net/Makefile
 +++ b/tools/testing/selftests/net/Makefile
 @@ -84,6 +84,7 @@ TEST_PROGS := \
  	sctp_vrf.sh \
  	skf_net_off.sh \
  	so_txtime.sh \
-+	srv6_end_m_gtp6_d_test.sh \
++	srv6_end_m_gtp6_d_di_test.sh \
+ 	srv6_end_m_gtp6_d_test.sh \
  	srv6_end_m_gtp6_e_test.sh \
  	srv6_end_m_gtp4_e_test.sh \
- 	srv6_end_map_test.sh \
-diff --git a/tools/testing/selftests/net/srv6_end_m_gtp6_d_test.sh b/tools/testing/selftests/net/srv6_end_m_gtp6_d_test.sh
+diff --git a/tools/testing/selftests/net/srv6_end_m_gtp6_d_di_test.sh b/tools/testing/selftests/net/srv6_end_m_gtp6_d_di_test.sh
 new file mode 100755
-index 000000000000..1b39e6093c9c
+index 000000000000..e2101501e866
 --- /dev/null
-+++ b/tools/testing/selftests/net/srv6_end_m_gtp6_d_test.sh
-@@ -0,0 +1,496 @@
++++ b/tools/testing/selftests/net/srv6_end_m_gtp6_d_di_test.sh
+@@ -0,0 +1,426 @@
 +#!/bin/bash
 +# SPDX-License-Identifier: GPL-2.0
 +#
-+# Selftest for the SRv6 End.M.GTP6.D behavior (RFC 9433 Section 6.3).
++# Selftest for the SRv6 End.M.GTP6.D.Di drop-in behavior
++# (RFC 9433 Section 6.4).
 +#
-+#   +-------+   2001:db8:1::/64   +-------+   2001:db8:2::/64   +-------+
-+#   |  gnb  | ------------------- | srgw  | ------------------- | srupf |
-+#   +-------+        veth-n3      +-------+        veth-n9      +-------+
-+#                                     |
-+#                                     |   2001:db8:6::/64
-+#                                     +--------veth-n6--------- +-------+
-+#                                                               | lupf  |
-+#                                                               +-------+
-+#
-+# gnb is the GTP-U-side test peer that injects the GTP-U packets.
-+# srupf is the SR-domain-side SRv6-aware UPF (RFC 9433 sense, not
-+# a 3GPP UPF) that receives the resulting SRv6 T-PDU.  lupf is the
-+# SRv6-non-aware legacy UPF that owns the GTP-U control plane and
-+# receives non-T-PDU GTP-U (Echo Request, Error Indication, ...)
-+# forwarded by srgw via the H.M.GTP6.D route's dev.  srgw runs the
-+# End.M.GTP6.D behavior under test.
-+#
-+# An End.M.GTP6.D SID is installed on srgw for locator
-+# 2001:db8:f::/48 with src=2001:db8:2::1.  Args.Mob.Session is the
-+# fixed 40-bit field defined by RFC 9433 Section 6.1, Figure 8.  When gnb sends an
-+# IPv6/UDP/GTP-U packet to 2001:db8:f::1 carrying TEID 0x123, the srgw
-+# is expected to emit an SRv6 packet toward 2001:db8:3::e whose last
-+# SRH segment carries Args.Mob.Session in its right-aligned 40-bit
-+# tail (QFI=5, R=0, U=0, PDU Session ID=0x123 → bytes 14 00 00 01 23).
++# Topology mirrors srv6_end_m_gtp6_d_test.sh.  The key difference is
++# that the End.M.GTP6.D.Di action preserves the original outer IPv6
++# destination address (here 2001:db8:f::dead) as the final SRH segment,
++# rather than folding GTP-U identifiers into Args.Mob.Session.
 +
 +source lib.sh
 +
@@ -892,7 +496,6 @@ index 000000000000..1b39e6093c9c
 +	ip -n "$lupf" link set lo up
 +	ip -n "$srupf_vrf" link set lo up
 +
-+	# gnb <-> srgw
 +	ip link add veth-n3 netns "$gnb" type veth peer name veth-n3-srgw \
 +		netns "$srgw"
 +	ip -n "$gnb" addr add 2001:db8:1::2/64 dev veth-n3 nodad
@@ -917,32 +520,7 @@ index 000000000000..1b39e6093c9c
 +	ip -n "$lupf" link set veth-n6-lupf up
 +
 +	ip netns exec "$srgw" sysctl -wq net.ipv6.conf.all.forwarding=1
-+	ip netns exec "$srgw" sysctl -wq net.ipv6.conf.all.seg6_enabled=1
-+	ip netns exec "$srgw" sysctl -wq net.ipv6.conf.veth-n9.seg6_enabled=1
-+	ip netns exec "$srgw" sysctl -wq net.ipv6.conf.veth-n6.seg6_enabled=1
-+	ip netns exec "$srupf" sysctl -wq net.ipv6.conf.all.seg6_enabled=1
-+	ip netns exec "$srupf" sysctl -wq net.ipv6.conf.veth-n9-srupf.seg6_enabled=1
 +
-+	# route on gnb toward the End.M.GTP6.D SID
-+	ip -n "$gnb" -6 route add 2001:db8:f::/64 via 2001:db8:1::1
-+
-+	# install End.M.GTP6.D on srgw.  sr_prefix_len declares the locator
-+	# length used by the remote End.M.GTP6.E SID; with /64 the kernel
-+	# writes Args.Mob.Session into bytes 8..12 of the penultimate SID.
-+	# dev veth-n6 is the legacy UPF leg: T-PDU encap takes the IPv6 SR
-+	# Policy path (independent of dst.dev) while non-T-PDU is forwarded
-+	# out veth-n6 via ip6_forward.
-+	ip -n "$srgw" -6 route add 2001:db8:f::/64 \
-+		encap seg6local action End.M.GTP6.D \
-+			srh segs 2001:db8:2::e,2001:db8:3::e \
-+			src 2001:db8:2::1 sr_prefix_len 64 count \
-+		dev veth-n6
-+
-+	# accept the SRv6 packet on srupf
-+	ip -n "$srupf" -6 route add 2001:db8:2::e/128 dev lo
-+	ip -n "$srupf" -6 route add 2001:db8:3::/64 dev veth-n9-srupf
-+
-+	# avoid ND-resolution timing flakiness with static neighbours
 +	local srupf_mac srgw_n9_mac lupf_mac
 +	srupf_mac=$(ip -n "$srupf" -j link show veth-n9-srupf | \
 +		python3 -c 'import sys, json; print(json.load(sys.stdin)[0]["address"])')
@@ -951,19 +529,29 @@ index 000000000000..1b39e6093c9c
 +	lupf_mac=$(ip -n "$lupf" -j link show veth-n6-lupf | \
 +		python3 -c 'import sys, json; print(json.load(sys.stdin)[0]["address"])')
 +	ip -n "$srgw" -6 neigh replace 2001:db8:2::e dev veth-n9 \
-+		lladdr "$srupf_mac" nud permanent
++		lladdr "$srupf_mac" nud permanent 2>/dev/null || true
 +	ip -n "$srupf" -6 neigh replace 2001:db8:2::1 dev veth-n9-srupf \
-+		lladdr "$srgw_n9_mac" nud permanent
-+	# Non-T-PDU passthrough: srgw forwards GTP-U control out the
-+	# H.M.GTP6.D route's dev (veth-n6); pre-resolve the lupf neighbour
-+	# for the Echo Request DA.
-+	ip -n "$srgw" -6 neigh replace 2001:db8:f::1 dev veth-n6 \
-+		lladdr "$lupf_mac" nud permanent
++		lladdr "$srgw_n9_mac" nud permanent 2>/dev/null || true
++	# Non-T-PDU passthrough: pre-resolve the Echo Request DA so the
++	# srgw can hand the packet off to the legacy upf via veth-n6.
++	ip -n "$srgw" -6 neigh replace 2001:db8:f::dead dev veth-n6 \
++		lladdr "$lupf_mac" nud permanent 2>/dev/null || true
++
++	ip -n "$gnb" -6 route add 2001:db8:f::/64 via 2001:db8:1::1
++
++	# dev veth-n6 is the legacy UPF leg for non-T-PDU passthrough; T-PDU
++	# encap takes the IPv6 SR Policy path via a separate FIB lookup.
++	ip -n "$srgw" -6 route add 2001:db8:f::/64 \
++		encap seg6local action End.M.GTP6.D.Di \
++			srh segs 2001:db8:2::e,2001:db8:3::e \
++			src 2001:db8:2::1 \
++		dev veth-n6
++
++	ip -n "$srupf" -6 route add 2001:db8:3::/64 dev veth-n9-srupf
 +
 +	# Per-route VRF case: a second SR-side upf in its own VRF.  The
-+	# End.M.GTP6.D SID for this tenant binds the SRv6 underlay output to
-+	# the VRF via 'oif'; without it the lookup would fall through to
-+	# the main table.  Reported as [SKIP] when CONFIG_NET_VRF is not loaded.
++	# End.M.GTP6.D.Di SID for this tenant binds the SRv6 underlay output
++	# to the VRF via 'oif'.  Reported as [SKIP] when CONFIG_NET_VRF is not loaded.
 +	modprobe vrf 2>/dev/null
 +	if ip -n "$srgw" link add vrf-n9 type vrf table 100 2>/dev/null; then
 +		have_vrf=1
@@ -978,27 +566,7 @@ index 000000000000..1b39e6093c9c
 +		ip -n "$srgw" link set dev veth-n9-2 up
 +		ip -n "$srupf_vrf" link set dev veth-n9-2-srupf up
 +
-+		ip netns exec "$srgw" sysctl -wq \
-+			net.ipv6.conf.veth-n9-2.seg6_enabled=1
-+		ip netns exec "$srupf_vrf" sysctl -wq \
-+			net.ipv6.conf.all.seg6_enabled=1
-+		ip netns exec "$srupf_vrf" sysctl -wq \
-+			net.ipv6.conf.veth-n9-2-srupf.seg6_enabled=1
-+
-+		ip -n "$gnb" -6 route add 2001:db8:f0::/64 via 2001:db8:1::1
-+
-+		ip -n "$srgw" -6 route add 2001:db8:f0::/64 \
-+			encap seg6local action End.M.GTP6.D \
-+				srh segs 2001:db8:4::e,2001:db8:5::e \
-+				src 2001:db8:4::1 sr_prefix_len 64 count \
-+				oif vrf-n9 \
-+			dev veth-n9-2
-+
-+		ip -n "$srupf_vrf" -6 route add 2001:db8:4::e/128 dev lo
-+		ip -n "$srupf_vrf" -6 route add 2001:db8:5::/64 dev veth-n9-2-srupf
-+
-+		local upf_vrf_mac
-+		local srgw_e2_mac
++		local upf_vrf_mac srgw_e2_mac
 +		upf_vrf_mac=$(ip -n "$srupf_vrf" -j link show \
 +			veth-n9-2-srupf | python3 -c \
 +			'import sys, json; print(json.load(sys.stdin)[0]["address"])')
@@ -1006,38 +574,45 @@ index 000000000000..1b39e6093c9c
 +			python3 -c \
 +			'import sys, json; print(json.load(sys.stdin)[0]["address"])')
 +		ip -n "$srgw" -6 neigh replace 2001:db8:4::e dev veth-n9-2 \
-+			lladdr "$upf_vrf_mac" nud permanent
++			lladdr "$upf_vrf_mac" nud permanent 2>/dev/null || true
 +		ip -n "$srupf_vrf" -6 neigh replace 2001:db8:4::1 \
-+			dev veth-n9-2-srupf lladdr "$srgw_e2_mac" nud permanent
++			dev veth-n9-2-srupf lladdr "$srgw_e2_mac" nud permanent \
++			2>/dev/null || true
++
++		ip -n "$gnb" -6 route add 2001:db8:f0::/64 via 2001:db8:1::1
++
++		ip -n "$srgw" -6 route add 2001:db8:f0::/64 \
++			encap seg6local action End.M.GTP6.D.Di \
++				srh segs 2001:db8:4::e,2001:db8:5::e \
++				src 2001:db8:4::1 oif vrf-n9 \
++			dev veth-n9-2
++
++		ip -n "$srupf_vrf" -6 route add 2001:db8:5::/64 \
++			dev veth-n9-2-srupf
 +	fi
 +}
 +
 +check_dependencies()
 +{
 +	if ! command -v tcpdump >/dev/null; then
-+		echo "SKIP: tcpdump is required"
-+		exit "$ksft_skip"
++		echo "SKIP: tcpdump is required"; exit "$ksft_skip"
 +	fi
-+
 +	if ! command -v python3 >/dev/null; then
-+		echo "SKIP: python3 is required"
-+		exit "$ksft_skip"
++		echo "SKIP: python3 is required"; exit "$ksft_skip"
 +	fi
-+
-+	if ! ip route help 2>&1 | grep -qF "End.M.GTP6.D"; then
-+		echo "SKIP: iproute2 too old, missing seg6local action End.M.GTP6.D"
-+		exit "$ksft_skip"
-+	fi
-+
 +	if ! python3 -c "import scapy.all" 2>/dev/null; then
-+		echo "SKIP: python3-scapy is required"
++		echo "SKIP: python3-scapy is required"; exit "$ksft_skip"
++	fi
++
++	if ! ip route help 2>&1 | grep -qF "End.M.GTP6.D.Di"; then
++		echo "SKIP: iproute2 too old, missing seg6local action End.M.GTP6.D.Di"
 +		exit "$ksft_skip"
 +	fi
 +}
 +
 +send_gtpu()
 +{
-+	local outer_dst="$1"	# IPv6 destination of the GTP-U packet
++	local outer_dst="$1"
 +	local srgw_mac
 +
 +	srgw_mac=$(ip -n "$srgw" -j link show veth-n3-srgw | \
@@ -1047,28 +622,20 @@ index 000000000000..1b39e6093c9c
 +		ip netns exec "$gnb" python3 - <<'PY'
 +import os
 +from scapy.all import IPv6, UDP, IP, ICMP, sendp, Ether
-+
 +mac = os.environ['SRGW_MAC']
 +outer_dst = os.environ['OUTER_DST']
-+# GTPv1 long header (E bit set, next ext = 0x85 PDU Session) carrying
-+# TEID 0x00000123, followed by a PDU Session ext (PDU Type=DL, QFI=5).
 +gtpu = bytes.fromhex(
-+    "34 ff 00 24 00 00 01 23 00 00 00 85"  # long header
-+    "01 00 05 00"                            # PDU Session ext
-+)
-+inner = bytes(IP(src="10.0.0.1", dst="10.0.0.2") / ICMP())
++    "34 ff 00 24 00 00 01 23 00 00 00 85"
++    "01 00 05 00")
++inner = bytes(IP(src='10.0.0.1', dst='10.0.0.2') / ICMP())
 +pkt = (Ether(dst=mac) /
-+       IPv6(src="2001:db8:1::2", dst=outer_dst) /
++       IPv6(src='2001:db8:1::2', dst=outer_dst) /
 +       UDP(sport=2152, dport=2152) /
 +       (gtpu + inner))
-+sendp(pkt, iface="veth-n3", verbose=False)
++sendp(pkt, iface='veth-n3', verbose=False)
 +PY
 +}
 +
-+# Send a GTPv1-U Echo Request; End.M.GTP6.D must NOT consume it but
-+# pass it through to the configured forwarding path so the downstream
-+# UPF (legacy GTP-U control plane) can answer.  Verified by capturing
-+# the unaltered Echo Request (type 0x01) on the upf side.
 +send_gtpu_echo()
 +{
 +	local outer_dst="$1"
@@ -1085,10 +652,10 @@ index 000000000000..1b39e6093c9c
 +outer_dst = os.environ['OUTER_DST']
 +gtpu_echo = bytes.fromhex("32 01 00 04 00 00 00 00 42 42 00 00")
 +pkt = (Ether(dst=mac) /
-+       IPv6(src="2001:db8:1::2", dst=outer_dst) /
++       IPv6(src='2001:db8:1::2', dst=outer_dst) /
 +       UDP(sport=2152, dport=2152) /
 +       gtpu_echo)
-+sendp(pkt, iface="veth-n3", verbose=False)
++sendp(pkt, iface='veth-n3', verbose=False)
 +PY
 +}
 +
@@ -1129,7 +696,7 @@ index 000000000000..1b39e6093c9c
 +    if len(payload) >= 2 and payload[1] == 0x01:
 +        sys.exit(0)
 +sys.exit("no GTPv1-U Echo Request observed at lupf "
-+         "(End.M.GTP6.D failed to pass non-T-PDU through)")
++         "(End.M.GTP6.D.Di failed to pass non-T-PDU through)")
 +PYEOF
 +	rc=$?
 +	rm -f "$out"
@@ -1160,41 +727,33 @@ index 000000000000..1b39e6093c9c
 +run_test()
 +{
 +	local outer_dst="$1"			# GTP-U outer IPv6 DA
-+	local expected_srh0="$2"		# expected SRH[0] in upf
-+	local capture_ns="${3:-$srupf}"	# netns where SRv6 should land
-+	local capture_iface="${4:-veth-n9-srupf}"
++	local capture_ns="${2:-$srupf}"	# netns where SRv6 should land
++	local capture_iface="${3:-veth-n9-srupf}"
 +	local out
 +
 +	out=$(mktemp)
 +	capture_traffic "$capture_ns" "$capture_iface" "$outer_dst" "$out"
 +
-+	# Verify with scapy: an SRv6 packet (IPv6 + Routing Header type 4)
-+	# must reach the upf.  Per RFC 9433 Section 6.5 Note, SRH[1]
-+	# carries Args.Mob.Session and SRH[0] carries the original outer DA.
-+	EXPECTED_SRH0="$expected_srh0" python3 - "$out" <<'PYEOF'
-+import ipaddress, os, sys
++	# scapy field check: an SRv6 (RT6 type=4) packet must reach upf
++	# and one of the SRH segments must contain the original outer DA
++	# (preserved by the drop-in variant).
++	OUTER_DST="$outer_dst" python3 - "$out" <<'PYEOF'
++import os, sys
 +from scapy.all import rdpcap, IPv6, IPv6ExtHdrSegmentRouting
 +
-+expected_srh0 = os.environ['EXPECTED_SRH0']
++outer_dst = os.environ['OUTER_DST'].lower()
 +pkts = rdpcap(sys.argv[1])
 +for p in pkts:
 +    if not (IPv6 in p and IPv6ExtHdrSegmentRouting in p):
 +        continue
 +    srh = p[IPv6ExtHdrSegmentRouting]
 +    if srh.type != 4:
-+        sys.exit(f"unexpected RH type {srh.type}")
-+    if len(srh.addresses) < 2:
 +        continue
-+    srh0 = ipaddress.IPv6Address(str(srh.addresses[0])).packed
-+    if srh0 != ipaddress.IPv6Address(expected_srh0).packed:
-+        sys.exit(f"SRH[0] = {ipaddress.IPv6Address(srh0)} "
-+                 f"(want {expected_srh0}, the preserved outer DA)")
-+    srh1 = ipaddress.IPv6Address(str(srh.addresses[1])).packed
-+    args = srh1[8:13]
-+    if args != bytes.fromhex("1400000123"):
-+        sys.exit(f"Args.Mob.Session = {args.hex()} (want 1400000123)")
-+    sys.exit(0)
-+sys.exit("no SRv6 (RT6 type=4) packet with 2+ segments observed at upf")
++    addrs = [str(a).lower() for a in srh.addresses]
++    if outer_dst in addrs:
++        sys.exit(0)
++    sys.exit(f"original DA not in SRH segments: {addrs}")
++sys.exit("no SRv6 (RT6 type=4) packet observed")
 +PYEOF
 +	local rc=$?
 +	rm -f "$out"
@@ -1209,11 +768,10 @@ index 000000000000..1b39e6093c9c
 +run_nf_test()
 +{
 +	local verdict="$1"		# drop | accept
-+	local expect_srh0="$2"	# preserved-DA test, empty when no packet expected
-+	local outer_dst="2001:db8:f::1"
++	local expect_da="$2"	# preserved-DA address, empty when no packet expected
++	local outer_dst="2001:db8:f::dead"
 +	local out
 +
-+	# fresh prerouting chain so each invocation starts clean
 +	ip netns exec "$srgw" nft flush chain ip filter prerouting
 +	ip netns exec "$srgw" nft add rule ip filter prerouting \
 +		ip saddr 10.0.0.1 "$verdict"
@@ -1221,21 +779,19 @@ index 000000000000..1b39e6093c9c
 +	out=$(mktemp)
 +	capture_traffic "$srupf" "veth-n9-srupf" "$outer_dst" "$out"
 +
-+	if [ -n "$expect_srh0" ]; then
-+		EXPECTED_SRH0="$expect_srh0" python3 - "$out" <<'PYEOF'
-+import ipaddress, os, sys
++	if [ -n "$expect_da" ]; then
++		OUTER_DST="$expect_da" python3 - "$out" <<'PYEOF'
++import os, sys
 +from scapy.all import rdpcap, IPv6, IPv6ExtHdrSegmentRouting
 +
-+expected_srh0 = os.environ['EXPECTED_SRH0']
++outer_dst = os.environ['OUTER_DST'].lower()
 +pkts = rdpcap(sys.argv[1])
 +for p in pkts:
 +    if not (IPv6 in p and IPv6ExtHdrSegmentRouting in p):
 +        continue
 +    srh = p[IPv6ExtHdrSegmentRouting]
-+    if len(srh.addresses) < 2:
-+        continue
-+    srh0 = ipaddress.IPv6Address(str(srh.addresses[0])).packed
-+    if srh0 == ipaddress.IPv6Address(expected_srh0).packed:
++    addrs = [str(a).lower() for a in srh.addresses]
++    if outer_dst in addrs:
 +        sys.exit(0)
 +sys.exit("expected SRv6 packet not observed at upf despite nft accept")
 +PYEOF
@@ -1263,38 +819,35 @@ index 000000000000..1b39e6093c9c
 +	check_dependencies
 +	setup
 +
-+	if run_test "2001:db8:f::1" "2001:db8:f::1"; then
-+		echo "TEST: End.M.GTP6.D (default) [PASS]"
++	if run_test "2001:db8:f::dead"; then
++		echo "TEST: End.M.GTP6.D.Di (default) [PASS]"
 +	else
-+		echo "TEST: End.M.GTP6.D (default) [FAIL]"
++		echo "TEST: End.M.GTP6.D.Di (default) [FAIL]"
 +		rc=1
 +	fi
 +
-+	if run_echo_test "2001:db8:f::1"; then
-+		echo "TEST: End.M.GTP6.D (non-T-PDU passthrough) [PASS]"
++	if run_echo_test "2001:db8:f::dead"; then
++		echo "TEST: End.M.GTP6.D.Di (non-T-PDU passthrough) [PASS]"
 +	else
-+		echo "TEST: End.M.GTP6.D (non-T-PDU passthrough) [FAIL]"
++		echo "TEST: End.M.GTP6.D.Di (non-T-PDU passthrough) [FAIL]"
 +		rc=1
 +	fi
 +
 +	# VRF binding: SRv6 underlay output goes through vrf-n9 (table 100).
 +	# Reported as [SKIP] when CONFIG_NET_VRF is not loaded.
 +	if [ "$have_vrf" = "1" ]; then
-+		if run_test "2001:db8:f0::1" "2001:db8:f0::1" \
-+			    "$srupf_vrf" "veth-n9-2-srupf"; then
-+			echo "TEST: End.M.GTP6.D (oif vrf-n9) [PASS]"
++		if run_test "2001:db8:f0::dead" "$srupf_vrf" "veth-n9-2-srupf"; then
++			echo "TEST: End.M.GTP6.D.Di (oif vrf-n9) [PASS]"
 +		else
-+			echo "TEST: End.M.GTP6.D (oif vrf-n9) [FAIL]"
++			echo "TEST: End.M.GTP6.D.Di (oif vrf-n9) [FAIL]"
 +			rc=1
 +		fi
 +	else
-+		echo "TEST: End.M.GTP6.D (oif vrf-n9) [SKIP] (CONFIG_NET_VRF not loaded)"
++		echo "TEST: End.M.GTP6.D.Di (oif vrf-n9) [SKIP] (CONFIG_NET_VRF not loaded)"
 +	fi
 +
 +	# Inner T-PDU netfilter hook: only meaningful when nft is present
-+	# and the kernel exposes net.netfilter.nf_hooks_lwtunnel.  The
-+	# sysctl is one-way (cannot be cleared), but each test runs in a
-+	# fresh netns so this is harmless.
++	# and the kernel exposes net.netfilter.nf_hooks_lwtunnel.
 +	if command -v nft >/dev/null && \
 +	   ip netns exec "$srgw" sysctl -wq \
 +		net.netfilter.nf_hooks_lwtunnel=1 2>/dev/null; then
@@ -1303,28 +856,28 @@ index 000000000000..1b39e6093c9c
 +			'add chain ip filter prerouting { type filter hook prerouting priority 0; }'
 +
 +		if run_nf_test drop ""; then
-+			echo "TEST: End.M.GTP6.D (nft drop on inner) [PASS]"
++			echo "TEST: End.M.GTP6.D.Di (nft drop on inner) [PASS]"
 +		else
-+			echo "TEST: End.M.GTP6.D (nft drop on inner) [FAIL]"
++			echo "TEST: End.M.GTP6.D.Di (nft drop on inner) [FAIL]"
 +			rc=1
 +		fi
 +
-+		if run_nf_test accept "2001:db8:f::1"; then
-+			echo "TEST: End.M.GTP6.D (nft accept on inner) [PASS]"
++		if run_nf_test accept "2001:db8:f::dead"; then
++			echo "TEST: End.M.GTP6.D.Di (nft accept on inner) [PASS]"
 +		else
-+			echo "TEST: End.M.GTP6.D (nft accept on inner) [FAIL]"
++			echo "TEST: End.M.GTP6.D.Di (nft accept on inner) [FAIL]"
 +			rc=1
 +		fi
 +	else
-+		echo "TEST: End.M.GTP6.D (inner-flow netfilter hook) [SKIP]" \
++		echo "TEST: End.M.GTP6.D.Di (inner-flow netfilter hook) [SKIP]" \
 +		     "(nft or nf_hooks_lwtunnel unavailable)"
 +	fi
 +
 +	if [ "$rc" -eq 0 ]; then
-+		echo "TEST: End.M.GTP6.D [PASS]"
++		echo "TEST: End.M.GTP6.D.Di [PASS]"
 +		exit "$ksft_pass"
 +	else
-+		echo "TEST: End.M.GTP6.D [FAIL]"
++		echo "TEST: End.M.GTP6.D.Di [FAIL]"
 +		exit "$ksft_fail"
 +	fi
 +}
