@@ -1,119 +1,171 @@
-Return-Path: <netdev+bounces-283608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283609-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EDoDOsBa92kNggIAu9opvQ
-	(envelope-from <netdev+bounces-283608-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 16:25:04 +0200
+	id COqRMKxl92n6gwIAu9opvQ
+	(envelope-from <netdev+bounces-283609-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 17:11:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 464134B60C1
-	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 16:25:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AC1A4B62F2
+	for <lists+netdev@lfdr.de>; Sun, 03 May 2026 17:11:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 45E1C300916F
-	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 14:24:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7CCA13008760
+	for <lists+netdev@lfdr.de>; Sun,  3 May 2026 15:11:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A3383CD8B1;
-	Sun,  3 May 2026 14:24:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E25992C0294;
+	Sun,  3 May 2026 15:11:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q5HbDCJ1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ARP95uiB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758963B7B98;
-	Sun,  3 May 2026 14:24:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D872BE05E
+	for <netdev@vger.kernel.org>; Sun,  3 May 2026 15:11:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777818285; cv=none; b=gEp8v0nrOEwrIZG2cVoBezoQprQt+HRbWpoFY4/BkSVwoQl0xa/TBnNkT6+Uz/3n+G9PS4m8wMAKW1bam/OfEkWtUCQNhphbcmJxH/W3CRF+zgv2g1J9e68nUqRt0S5EmtcU/7hFMriBO/ti4daByGvmMJWvxxib8Uq/yfeXAyA=
+	t=1777821097; cv=none; b=b9zAfGHoo6QwOYLx40FO722p8dgIAdjz99m+Qlc1PbuHirK4uPP0rrj5GseoqxOXl2QFxvNVVkd67PUCFFJc8QOvinh9hYVesdvOzmgM9iMXZNahiy+STK7rPMXIJN6T7GICPKM3EcnAVinKiQN/qej6VpNNOqG0S0NZQtHlmYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777818285; c=relaxed/simple;
-	bh=9nPh5kF8zGB/VEWWRaAcsTWdrXI0R2fhmr1VXxVUk+s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UPctwsoQ1XK/4V0GKXplbuh7OPUyS0v7W+8DZfI9sM1ZbulW0UUIZyVacOdesGGVMP2IGVqxgUOJh78wsW8SEssx7Ml2D/ez2vB2SS4+rIgL1HoNJVt6Zd8CW5hFzY94iiCAyBiPUWlqSFNKvSHG7DFw4f53fDGbCChNA972o2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q5HbDCJ1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A22EC2BCB4;
-	Sun,  3 May 2026 14:24:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777818285;
-	bh=9nPh5kF8zGB/VEWWRaAcsTWdrXI0R2fhmr1VXxVUk+s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Q5HbDCJ19mPrLkSNEFpf4vGqIv1OJ3gECmIzM4fZkDVrbanWdpb9TK/an33jRv/xK
-	 0ouVbS0HeGM9iTm87g/6u5QDm+MqUhQSDnNOCBleJCimqMBlnay0YntSInk0rFx/ks
-	 mGTjHeYopVklpaz/diGRN+6ZZMjXNCvCl355Ch73imj/2aDXonKOeTQADsR/1hMAzu
-	 R30ymFI9cTGBgqiwTdcsRqluhXRJ7FJfKUfbCfACoBBcYVH91bOdfz9Sa2WJzLtCmE
-	 qM0ST3lVazbfaqf/0xFQp7ZjW0c8jXtLZHVjHtFfYuOzJlTSqJ40i7LbQ5Smq2uhJ8
-	 SXIE/0PYl7Wsg==
-Date: Sun, 3 May 2026 16:24:42 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Imran Shaik <imran.shaik@oss.qualcomm.com>
-Cc: Bjorn Andersson <andersson@kernel.org>, 
-	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Richard Cochran <richardcochran@gmail.com>, Ajit Pandey <ajit.pandey@oss.qualcomm.com>, 
-	Taniya Das <taniya.das@oss.qualcomm.com>, Jagadeesh Kona <jagadeesh.kona@oss.qualcomm.com>, 
-	linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 2/5] dt-bindings: clock: qcom: Add Qualcomm Shikra SoC
- Global Clock Controller
-Message-ID: <20260503-enigmatic-thankful-jerboa-020faa@quoll>
-References: <20260429-shikra-gcc-rpmcc-clks-v1-0-c3cd77558b7a@oss.qualcomm.com>
- <20260429-shikra-gcc-rpmcc-clks-v1-2-c3cd77558b7a@oss.qualcomm.com>
+	s=arc-20240116; t=1777821097; c=relaxed/simple;
+	bh=3KB6BPj2pZKILGJ0G7T+UPTzOpI37lurqaGIEDM2598=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CoL5QKmjg0Hrqv9q1w/t9E3WiF5IfdNZXhFP3kVT4IXX9Veqvux0T8WanHPyJn94t0y5iHQkFoNkzY9317lAomyQalVFKO/CxhW/3Z//BLxDH50QIz2FTjsbFPzwA08txgguOgj1iSDpQ5EjWSjmGVU2lhZCOWD0EYdTRL7GRUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ARP95uiB; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777821095;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O35DQj2POXduALoNRER0IMDyFb5F6YT44e06L3b7XJU=;
+	b=ARP95uiBh80jci/Lj7gCMzkknbn67zQhEUmg4Jbd0Qcq9ZoBo5lqRhufe7OwMi1KTUBSux
+	6IYndfaI9FCavXGmia7rcbMRYcHXz5cwblYThQwqWqgt47d2PLzXyZWca1E6NxqgXvD5PX
+	7+KgXdyHHgpBb5XVzQ1jwDmDjNc7PHk=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-240-t3GSMh1fMw6wsKQeoD4GVg-1; Sun,
+ 03 May 2026 11:11:33 -0400
+X-MC-Unique: t3GSMh1fMw6wsKQeoD4GVg-1
+X-Mimecast-MFC-AGG-ID: t3GSMh1fMw6wsKQeoD4GVg_1777821093
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D1D721800473;
+	Sun,  3 May 2026 15:11:32 +0000 (UTC)
+Received: from [10.44.48.53] (unknown [10.44.48.53])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A5EA130001A1;
+	Sun,  3 May 2026 15:11:31 +0000 (UTC)
+Message-ID: <545853b6-a209-4ed4-aa97-4b63fe123214@redhat.com>
+Date: Sun, 3 May 2026 17:11:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260429-shikra-gcc-rpmcc-clks-v1-2-c3cd77558b7a@oss.qualcomm.com>
-X-Rspamd-Queue-Id: 464134B60C1
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2-next 2/2] dpll: add frequency monitoring support
+To: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+ Petr Oros <poros@redhat.com>
+References: <20260428152115.2815860-1-ivecera@redhat.com>
+ <20260428152115.2815860-3-ivecera@redhat.com>
+ <d99ca8ef-c11f-4190-bf08-b94c3ac76462@kernel.org>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <d99ca8ef-c11f-4190-bf08-b94c3ac76462@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Rspamd-Queue-Id: 2AC1A4B62F2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283608-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,baylibre.com,gmail.com,oss.qualcomm.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283609-lists,netdev=lfdr.de];
+	RCPT_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Wed, Apr 29, 2026 at 04:21:50PM +0530, Imran Shaik wrote:
-> Add device tree bindings for the global clock controller on Qualcomm
-> Shikra SoC.
+Hi David,
+
+On 5/2/26 8:29 PM, David Ahern wrote:
+> On 4/28/26 9:21 AM, Ivan Vecera wrote:
+>> diff --git a/man/man8/dpll.8 b/man/man8/dpll.8
+>> index 89f17af74923..59ec4208f251 100644
+>> --- a/man/man8/dpll.8
+>> +++ b/man/man8/dpll.8
+>> @@ -111,7 +111,7 @@ Temperature (if supported)
+>>   Type (PPS or EEC)
+>>   .RE
+>>   
+>> -.SS dpll device set id ID [ mode { automatic | manual } ] [ phase-offset-monitor { enable | disable } ] [ phase-offset-avg-factor FACTOR ]
+>> +.SS dpll device set id ID [ mode { automatic | manual } ] [ phase-offset-monitor { enable | disable } ] [ phase-offset-avg-factor FACTOR ] [ frequency-monitor { enable | disable } ]
 > 
-> Signed-off-by: Imran Shaik <imran.shaik@oss.qualcomm.com>
-> ---
->  .../devicetree/bindings/clock/qcom,shikra-gcc.yaml |  63 +++++
->  include/dt-bindings/clock/qcom,shikra-gcc.h        | 259 +++++++++++++++++++++
->  2 files changed, 322 insertions(+)
+> very long line; please fix up.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+Will fix in v2.
 
-Best regards,
-Krzysztof
+> 
+> Keep Petr reviewed by on patch 1.
+> 
+> Claude has some comments on the man page in general:
+> 
+> ● I found three issues. Let me show them clearly:
+> 
+>    Issue 1 — Typo: "locked-ho-ack" should be "locked-ho-acq" (line 107)
+> 
+>    The man page description of device show output says locked-ho-ack but
+> the code (dpll_lock_status_name) returns locked-ho-acq
+>    (ACQuired, not ACKnowledge).
+> 
+>    Issue 2 — Wrong mode values in output description (lines 104–105)
+> 
+>    The "Output includes" section says:
+> 
+>    ▎ Operating mode (manual, automatic, holdover, freerun)
+> 
+>    But dpll_mode_map and DPLL_MODE_* only define manual and automatic.
+> Holdover and freerun are not DPLL modes — they are lock statuses.
+>     This should read (manual, automatic).
+> 
+>    Issue 3 — Undocumented but accepted alternate values for monitors
+> (lines 134, 144)
+> 
+>    The man page documents { enable | disable | true | false | 0 | 1 } for
+> phase-offset-monitor and frequency-monitor. The tool's own
+>    help text shows only { enable | disable } and the error message says
+> "use enable/disable". While str_to_bool technically accepts
+>    true/false/0/1, the canonical interface is enable | disable. The extra
+> forms in the man page are inconsistent with the help text.
+
+Will send a separate fix for the dpll man page (non-next)...
+
+Thanks,
+Ivan
 
 
