@@ -1,264 +1,190 @@
-Return-Path: <netdev+bounces-283888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283889-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8EqjNVOy+GkdzAIAu9opvQ
-	(envelope-from <netdev+bounces-283888-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:50:59 +0200
+	id QKeJFjmy+GkdzAIAu9opvQ
+	(envelope-from <netdev+bounces-283889-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:50:33 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 534AB4C014B
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:50:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A31424C012C
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:50:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E4198304A66B
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 14:44:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 08D773050E8C
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 14:44:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D6903DF019;
-	Mon,  4 May 2026 14:44:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E7E83DFC77;
+	Mon,  4 May 2026 14:44:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="SS9+gYGc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HZkLxFBD"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97BE33DF011;
-	Mon,  4 May 2026 14:44:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CD933DBD65;
+	Mon,  4 May 2026 14:44:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777905844; cv=none; b=AXhgXh2xRem/GkKvQFkSEVLbWw63/ZHFyRJum+FuFMO/HJx+Pd8UbPiHjFk3OQJW6A6Q/Q40yLvHSltI5gl/BrIxA81510Ga8KmhRUuHoT6/c0OzXg+6ycJDKayNHWdcmsRsmUz4EXx9b6ZuPm8EZg3urrrYg5c/AC0/CkErUXk=
+	t=1777905845; cv=none; b=i4JULHFJjngSxY4Y7h3gYf2M2HMsQuXuJ7OD6QQyHvusqt9OiL0MiI9ZhGl5xiqLtuBRG1lr76xjjb001Ka7ql1VSo7LuS7qk1mC8EdyBhS7LiolarlMbOh8xbcbpno4KHt/mdbQevBlh/NgbMWbl60gCl0KxCaQOIE7L6xWxGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777905844; c=relaxed/simple;
-	bh=7kododvTQ68yKTSDo3YpbRkIFBnTYQ7gfRla+bTGEck=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=HpjfxMLpUhbItjSKDz3FWlUy12Xzela02Dmpg+z2eanzukNPuXhgWO28m6iQh82zZ+fpUJwH9pwB27BX8psGQgjyuQAy/Ia/Z3IhVoNoSCbBLDpHkDuCeOkhvejdcb8x2eWYchUW1ZCSC48O5v5BZ5L+tk1J3UDfkBMnADix2bc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=SS9+gYGc; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+	s=arc-20240116; t=1777905845; c=relaxed/simple;
+	bh=YvBSeEFqbbJHPGpcBG9RqC3NXahLfq7pQptie9Q7N2Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LkHRzM4RaS4g2qkKgg97EgzrkQiL+c9b7qxbXYEcJrQcwMJFXRKHrPMf7UItXFC+COXlJAbXVBpMOf5uelw3aFgoau+eGxEpBM10gGEmisv4iUemDtdpeWlbXpMvzYgebSEoRRWV8xYITu67nxCNng3flo7XgpjTGns39IDIN6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HZkLxFBD; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1777905842; x=1809441842;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=7kododvTQ68yKTSDo3YpbRkIFBnTYQ7gfRla+bTGEck=;
-  b=SS9+gYGctxMGki4ihPmqubub3bFfXM7UsE2kfOowV0lYqqsokm7O/kcG
-   W5i3GQ4sNafao6qbbCdMNGxQ1xjqFmUQxg1OXGZRc3Xgt951XPJADdN/H
-   qWGcVRqaj0eHvcWfvgx3J+d30rctupYT1+MJ4PcsBcfnvAzESY+Nm3h74
-   aGm63pTa4iozphC46WYu948Ww9vQqTU+bJNqntwK6LXflagrCP9oGXvex
-   YNFRHKy7g+2/RCZF7IpBGNfbhGg4lTdVmenHiLAO8ct1zxgNrx6cK3n6E
-   LRBJty4kWmcuFwxOPK6TX+elODKFTUYMDJdqeCDCgdJ6TYi/WduJCpvHV
-   Q==;
-X-CSE-ConnectionGUID: 7uQDdU03S3GOFdMVRa3EAA==
-X-CSE-MsgGUID: vi0Vgd5cTEiICpPW0xbVMg==
-X-IronPort-AV: E=Sophos;i="6.23,215,1770620400"; 
-   d="scan'208";a="56221892"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 07:44:01 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
- chn-vm-ex3.mchp-main.com (10.10.87.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.37; Mon, 4 May 2026 07:44:01 -0700
-Received: from DEN-DL-M70577.microsemi.net (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Mon, 4 May 2026 07:43:57 -0700
-From: Daniel Machon <daniel.machon@microchip.com>
-Date: Mon, 4 May 2026 16:43:42 +0200
-Subject: [PATCH net 1/4] net: sparx5: defer VCAP debugfs creation until
- after netdev registration
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777905843; x=1809441843;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=YvBSeEFqbbJHPGpcBG9RqC3NXahLfq7pQptie9Q7N2Q=;
+  b=HZkLxFBDk3wpE9CEkRc/O/Z5lY6kMyqk+JlueniUOABcUYNLKNBDryyQ
+   I6L/CU4A3TyO1N80+mMg1pSqfqXc4B7SOIrlVE9xT0U2syMP6agcRJSrO
+   m6O4E0cU4UA3RiYK+vl89k+MXiUcFgIeMZoP1OyJzFKKED+W/Mfll/Eup
+   6P7DZPzu+6RcmoL0+lCH8O6rUmrKsbMTraSzcsWXCajZRIq6mg7kGRlis
+   u2LcUYVa+rMqEbKZA6RtoYM6P7QUA8pAuGLeBbC4UgXNHgTn4cOgJMNXK
+   GRiOqMwRYJWcbboI+l2CZ9AJf1PKES9a0kk9TVXP3h70VoefQLihyLqBS
+   A==;
+X-CSE-ConnectionGUID: Fc70YtvASrCW7RTHQimKjQ==
+X-CSE-MsgGUID: qdQHEE2YTHGfgVZtRxAVow==
+X-IronPort-AV: E=McAfee;i="6800,10657,11776"; a="104211931"
+X-IronPort-AV: E=Sophos;i="6.23,215,1770624000"; 
+   d="scan'208";a="104211931"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 07:44:02 -0700
+X-CSE-ConnectionGUID: oj3o4ySlTKuiwaDDHYKuVQ==
+X-CSE-MsgGUID: dV99omDhT2OF7cZLzXNe6Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,215,1770624000"; 
+   d="scan'208";a="239830499"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa004.jf.intel.com with ESMTP; 04 May 2026 07:44:00 -0700
+Received: from mglak.igk.intel.com (mglak.igk.intel.com [10.237.112.146])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id C17812FC54;
+	Mon,  4 May 2026 15:43:57 +0100 (IST)
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	Jacob Keller <jacob.e.keller@intel.com>
+Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Joshua Hay <joshua.a.hay@intel.com>,
+	Willem de Bruijn <willemb@google.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH iwl-net v2] idpf: fix RSS LUT memcpy size
+Date: Mon,  4 May 2026 16:43:43 +0200
+Message-ID: <20260504144345.293219-1-larysa.zaremba@intel.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20260504-misc-fixes-sparx5-lan969x-v1-1-6604306b5743@microchip.com>
-References: <20260504-misc-fixes-sparx5-lan969x-v1-0-6604306b5743@microchip.com>
-In-Reply-To: <20260504-misc-fixes-sparx5-lan969x-v1-0-6604306b5743@microchip.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Steen Hegelund
-	<Steen.Hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>, "Sebastian
- Andrzej Siewior" <bigeasy@linutronix.de>, Clark Williams
-	<clrkwllms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, Bjarni Jonasson
-	<bjarni.jonasson@microchip.com>, Lars Povlsen <lars.povlsen@microchip.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, Steen Hegelund
-	<steen.hegelund@microchip.com>, <linux-rt-devel@lists.linux.dev>
-X-Mailer: b4 0.14.3
-X-Rspamd-Queue-Id: 534AB4C014B
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: A31424C012C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283888-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[microchip.com:+];
+	TAGGED_FROM(0.00)[bounces-283889-lists,netdev=lfdr.de];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel.machon@microchip.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[larysa.zaremba@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:email,microchip.com:dkim,microchip.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-0.997];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sashiko.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-Commit 3a95973e7c79 ("net: sparx5: move VCAP initialization to probe")
-moved sparx5_vcap_init() ahead of sparx5_register_netdevs() in probe.
-The VCAP init path ends by calling vcap_port_debugfs() for every port,
-which uses netdev_name(ndev) as the debugfs file name. At that point
-the netdevs have only been allocated, not registered, so dev->name
-still holds the "eth%d" template and netdev_name() returns
-"(unnamed net_device)". Every port tries to create the same file under
-vcaps/, producing a flood of warnings at boot:
+Based on the following feedback from Sashiko (received for iXD phase 1
+patchset, but valid for the net tree):
 
-  debugfs: '(unnamed net_device)' already exists in 'vcaps'
-  debugfs: '(unnamed net_device)' already exists in 'vcaps'
-  ...
+ "Is the bounds check xn_params.recv_mem.iov_len < lut_buf_size sufficient?
+  Since lut_buf_size only represents the size of the array elements, should
+  this check instead verify that the payload is at least
+  sizeof(struct virtchnl2_rss_lut) + lut_buf_size?
 
-Move the debugfs setup into a new sparx5_debugfs() helper in
-sparx5_debugfs.c, invoked after sparx5_register_notifier_blocks()
-succeeds so the netdev names are finalized. sparx5_vcap_init() now
-only deals with VCAP state. The sparx5/ debugfs root is created in
-the new helper as well.
+  [...]
 
-Fixes: 3a95973e7c79 ("net: sparx5: move VCAP initialization to probe")
-Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+  Does memcpy copy the correct amount of data here? rss_lut_size stores the
+  number of 32-bit entries, not the size in bytes. Should it use
+  lut_buf_size or rss_data->rss_lut_size * sizeof(u32) instead?"
+
+After inspecting the code, it was concluded that RSS memcpy size is in fact
+4 times smaller than it has to be, since a single array entry in a u32, and
+rss_data->rss_lut_size is clearly used as an array size. Required Rx buffer
+size is also too small, but this is a common issue in the idpf code.
+
+Use a full buffer size (lut_buf_size) instead of the array length
+(rss_data->rss_lut_size) when doing memcpy of RSS lookup table.
+While at it, increase required Rx buffer size to a whole flex-array
+containing structure instead of just the array.
+
+Link: https://sashiko.dev/#/patchset/20260323174052.5355-1-larysa.zaremba%40intel.com?part=8
+Fixes: 95af467d9a4e ("idpf: configure resources for RX queues")
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
 ---
- drivers/net/ethernet/microchip/sparx5/Makefile     |  3 ++-
- .../net/ethernet/microchip/sparx5/sparx5_debugfs.c | 26 ++++++++++++++++++++++
- .../net/ethernet/microchip/sparx5/sparx5_main.c    |  4 ++--
- .../net/ethernet/microchip/sparx5/sparx5_main.h    |  7 ++++++
- .../ethernet/microchip/sparx5/sparx5_vcap_impl.c   |  6 -----
- 5 files changed, 37 insertions(+), 9 deletions(-)
+v1 -> v2: replace manual array size calculation with flex_array_size()
 
-diff --git a/drivers/net/ethernet/microchip/sparx5/Makefile b/drivers/net/ethernet/microchip/sparx5/Makefile
-index d447f9e84d92..eb5c81527f41 100644
---- a/drivers/net/ethernet/microchip/sparx5/Makefile
-+++ b/drivers/net/ethernet/microchip/sparx5/Makefile
-@@ -14,7 +14,8 @@ sparx5-switch-y  := sparx5_main.o sparx5_packet.o \
-  sparx5_psfp.o sparx5_mirror.o sparx5_regs.o
+v1: https://lore.kernel.org/netdev/20260429074232.180528-1-larysa.zaremba@intel.com/
+
+ drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+index be66f9b2e101..0fc7c68447f8 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+@@ -2915,8 +2915,9 @@ int idpf_send_get_set_rss_lut_msg(struct idpf_adapter *adapter,
+ 	if (reply_sz < sizeof(struct virtchnl2_rss_lut))
+ 		return -EIO;
  
- sparx5-switch-$(CONFIG_SPARX5_DCB) += sparx5_dcb.o
--sparx5-switch-$(CONFIG_DEBUG_FS) += sparx5_vcap_debugfs.o
-+sparx5-switch-$(CONFIG_DEBUG_FS) += sparx5_vcap_debugfs.o \
-+				    sparx5_debugfs.o
+-	lut_buf_size = le16_to_cpu(recv_rl->lut_entries) * sizeof(u32);
+-	if (reply_sz < lut_buf_size)
++	lut_buf_size = flex_array_size(recv_rl, lut,
++				       le16_to_cpu(recv_rl->lut_entries));
++	if (reply_sz < lut_buf_size + sizeof(struct virtchnl2_rss_lut))
+ 		return -EIO;
  
- sparx5-switch-$(CONFIG_LAN969X_SWITCH) += lan969x/lan969x_regs.o \
- 					  lan969x/lan969x.o \
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_debugfs.c b/drivers/net/ethernet/microchip/sparx5/sparx5_debugfs.c
-new file mode 100644
-index 000000000000..f6cb1eeaab80
---- /dev/null
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_debugfs.c
-@@ -0,0 +1,26 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/* Microchip Sparx5 Switch driver debug filesystem support
-+ *
-+ * Copyright (c) 2026 Microchip Technology Inc. and its subsidiaries.
-+ */
-+
-+#include <linux/debugfs.h>
-+
-+#include "sparx5_main.h"
-+#include "vcap_api_debugfs.h"
-+
-+void sparx5_debugfs(struct sparx5 *sparx5)
-+{
-+	const struct sparx5_consts *consts = sparx5->data->consts;
-+	struct vcap_control *ctrl = sparx5->vcap_ctrl;
-+	struct dentry *dir;
-+	int idx;
-+
-+	sparx5->debugfs_root = debugfs_create_dir("sparx5", NULL);
-+
-+	dir = vcap_debugfs(sparx5->dev, sparx5->debugfs_root, ctrl);
-+	for (idx = 0; idx < consts->n_ports; ++idx)
-+		if (sparx5->ports[idx])
-+			vcap_port_debugfs(sparx5->dev, dir, ctrl,
-+					  sparx5->ports[idx]->ndev);
-+}
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-index dad713e9ddd5..bec07560e6fe 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-@@ -820,8 +820,6 @@ static int mchp_sparx5_probe(struct platform_device *pdev)
- 	/* Default values, some from DT */
- 	sparx5->coreclock = SPX5_CORE_CLOCK_DEFAULT;
- 
--	sparx5->debugfs_root = debugfs_create_dir("sparx5", NULL);
--
- 	ports = of_get_child_by_name(np, "ethernet-ports");
- 	if (!ports) {
- 		dev_err(sparx5->dev, "no ethernet-ports child node found\n");
-@@ -1000,6 +998,8 @@ static int mchp_sparx5_probe(struct platform_device *pdev)
- 		goto cleanup_netdevs;
+ 	/* size didn't change, we can reuse existing lut buf */
+@@ -2933,7 +2934,7 @@ int idpf_send_get_set_rss_lut_msg(struct idpf_adapter *adapter,
  	}
  
-+	sparx5_debugfs(sparx5);
-+
- 	goto cleanup_config;
+ do_memcpy:
+-	memcpy(rss_data->rss_lut, recv_rl->lut, rss_data->rss_lut_size);
++	memcpy(rss_data->rss_lut, recv_rl->lut, lut_buf_size);
  
- cleanup_netdevs:
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.h b/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
-index 6a745bb71b5c..d5e6644ff124 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
-@@ -565,6 +565,13 @@ void sparx5_get_hwtimestamp(struct sparx5 *sparx5,
- int sparx5_vcap_init(struct sparx5 *sparx5);
- void sparx5_vcap_deinit(struct sparx5 *sparx5);
- 
-+/* sparx5_debugfs.c */
-+#if defined(CONFIG_DEBUG_FS)
-+void sparx5_debugfs(struct sparx5 *sparx5);
-+#else
-+static inline void sparx5_debugfs(struct sparx5 *sparx5) {}
-+#endif
-+
- /* sparx5_pgid.c */
- enum sparx5_pgid_type {
- 	SPX5_PGID_FREE,
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c b/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c
-index 95b93e46a41d..dd446b3a9f20 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c
-@@ -2035,7 +2035,6 @@ int sparx5_vcap_init(struct sparx5 *sparx5)
- 	const struct sparx5_vcap_inst *cfg;
- 	struct vcap_control *ctrl;
- 	struct vcap_admin *admin;
--	struct dentry *dir;
- 	int err = 0, idx;
- 
- 	/* Create a VCAP control instance that owns the platform specific VCAP
-@@ -2074,11 +2073,6 @@ int sparx5_vcap_init(struct sparx5 *sparx5)
- 			sparx5_vcap_port_key_selection(sparx5, admin);
- 		list_add_tail(&admin->list, &ctrl->list);
- 	}
--	dir = vcap_debugfs(sparx5->dev, sparx5->debugfs_root, ctrl);
--	for (idx = 0; idx < consts->n_ports; ++idx)
--		if (sparx5->ports[idx])
--			vcap_port_debugfs(sparx5->dev, dir, ctrl,
--					  sparx5->ports[idx]->ndev);
- 
- 	return err;
+ 	return 0;
  }
-
 -- 
-2.34.1
+2.47.0
 
 
