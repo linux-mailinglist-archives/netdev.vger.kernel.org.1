@@ -1,141 +1,177 @@
-Return-Path: <netdev+bounces-283797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283799-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QNYHGX99+GkowAIAu9opvQ
-	(envelope-from <netdev+bounces-283797-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 13:05:35 +0200
+	id QE/eLcSA+GmrwAIAu9opvQ
+	(envelope-from <netdev+bounces-283799-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 13:19:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2E814BC21F
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 13:05:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D4B84BC4B4
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 13:19:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 50C4C302CD00
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 11:03:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3BF11301A1EE
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 11:19:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 306FB3AA4EF;
-	Mon,  4 May 2026 11:03:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE7093A6B68;
+	Mon,  4 May 2026 11:19:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gqaiFVQ8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L2eGRh8z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0768B3A7597;
-	Mon,  4 May 2026 11:03:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777892590; cv=none; b=iSQsrX9PGNBWJX3xXE9qqOBm7q6QGPulYpUCAQyntR3qfjw3KFd6o6YBWiquNha6AvcZ+w0YLBxckm2a7dUZ/l32Mop2gQ25nc2XOaCX6EAwN34MRoBz8Lx8zDn0ngFFJOehI59giE2Rk1zhFP5hR9kPHP5GZQfpdPOni0mrTnc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777892590; c=relaxed/simple;
-	bh=obeiVtyp4Aj7jNlwRQKxtGryEoah8EYRmG/dfY1J/D0=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=Qp9WHS23nG1PY3F9DFREXs+bV02E/+8nNfIV7noCjQEUQ3NsPrLZzv8xl/lQ0ef+UssJ65EOcmz8fYngAJo6ZTjB14FwxvaEdio8s5W0XeQKD3VvLOciLWXVyYPLIj5PYtLSWIYtVgTYu8Bm2ohUd2u6gofGBR3tQngrGSxSeTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gqaiFVQ8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C680C2BCB8;
-	Mon,  4 May 2026 11:03:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777892589;
-	bh=obeiVtyp4Aj7jNlwRQKxtGryEoah8EYRmG/dfY1J/D0=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=gqaiFVQ8ZwcbanWBWYFRgAHWwph3f2dmY8xqXpMJbLKetZdJ7jDJ5vG20+mABkMgj
-	 WC0IG1JesYdnKUfDTDEf+WiTFe8ZpQfLRIsOhxl3mP4LCKj4Ft4gn+OmjFQ8zUYAce
-	 S3rXqo/z0H1VJ3wIN95Xx6aG6pQXoziB87z1Hbj/NILBzv7OfQCq9miz2GWu3heOOh
-	 2nBoPMRid/b0SPZJTNUuThL8fiM/V5Z5fqG+Tl96KBwUDNV29HU2oeNQ7rHpBxwtC9
-	 khm7UifZsKSPIXhMWZ9pTzzGALGKn9SYZCJUHkYVNIHpH3L0jUveWEof4S/nHA5JAb
-	 LtJcYXPe4QX/Q==
-Content-Type: multipart/mixed; boundary="===============2329766587970040855=="
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ED0937E2EF
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 11:19:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777893551; cv=pass; b=tBA+UzAekTlC0V41ehDp4AgHtk5h6Q7N+iXX7XdkVe7HTIeE2Rql3FB6Dsy6fVd2nHatxWj+LozS7ADgGdcBanwxXdGvWrmyiYlx03NI+7vh/Fzkypt4vPNlqXl8WoPQ+1wrhPkRjshZ3IRcCxLaj/bhXwGxCY11fkSLwCMi8SM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777893551; c=relaxed/simple;
+	bh=ZzvoZyDaV+9GQ9a6TuOYJKQ0Evbo9uBsNcTG1aZxwVY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sKFrgaf+gGdIXzFyuptQ3Hy972Irid3AgUPk4yArcUdi6RMQSrgV1zYMNTmWlZmimQb7irDrnDfmd0HZo/gZ0eFrCcZGat9+E593XfdLtZPfS5dqYNQIOQoWwFUfwlQKjNDNgPYMypfrvOoW75Ot5VXKgJXHm9YkB9peMQvk//U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L2eGRh8z; arc=pass smtp.client-ip=74.125.224.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-65c305f381eso2560366d50.3
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 04:19:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777893549; cv=none;
+        d=google.com; s=arc-20240605;
+        b=XEornxXFYnIVzo0ISYodTr4JfElZmN19GIAyR5YW78GJDPCcWqMJcWjvdn8x2hcgE/
+         6eJDNHZIm9kfwhYhVHqOdW7Q7t4vDm2XDNi0Cu735GoUYwbvo+JEIhvO+jPfK0pxsV2L
+         /AKoPVwdP3DqDNEcTOQVqVX4qA1cjMOXEJ/IQNzNbD7izN3YdsYzPtFvNu9yY3csuyZz
+         VeF1MY/oqFfsAyFVk73qgVneBn7RCgTGTRTznr0j96LKAgST6bAWe9qvW2f4pIpDYkeQ
+         GfAdMGU54fF55607qUlqpAhNOWXj8kuuqw7FbEHhcZtTyOocJdzGOc6nwk5xGFlH4MvS
+         pgDw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=GUktrT8GuU0q956SxbwjSrFItR1lGCQYJxE8ZlZEKXc=;
+        fh=9hlgN5zvPeNufJrx7ubzI881Hbl40jgy6tGq0Y7VdCg=;
+        b=deNHS4kKZuAXJ/IDwHBlc/mVaPIzUFTbeTEfEXIm/mqNVK4NoAcn9K9T3In2iEePF5
+         ntpzaThhVcdbUUQxEUyWUSsa9F+woQMM9dbNwRh+CnyDRwHS8EupAkJRSQBj6XosXd+u
+         DsK1BAqm7L8qf2bJ6kW1bPZeLK4DUPHtCWd5c9v3TBVAxp6Werg4tXyMcuCZZdMAnBKw
+         Vzwp2sTFAnqd9PKoyWZNqSEZIkuR3HYXCfsrpyd/aYbDi2GkOBwmay3FU7Ha6zUVPZHJ
+         5PxLG28EtDXqd/3L/9cvI4H624cdJVm5G6csi/teRFBQXfjmUBnaW4VRzsbMw7kDjDrX
+         EMyA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777893549; x=1778498349; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GUktrT8GuU0q956SxbwjSrFItR1lGCQYJxE8ZlZEKXc=;
+        b=L2eGRh8zHnK1Ed00MAOaMxx7Setfh4ohIzZspAHSkdMRHG7ougdq94LTquV5beH+e5
+         YkSx2oEwDYi45SYxc0VkorpcHIYbp4UCOddj1CiHPP2a573cjoKtVc3aXIig701ZsoFW
+         s2KnRxH9yv5aH1JSLLBOmDZHYkfH4CLBN43pcz13uxN/KIdtX7yFULS1ytCqW/eQTc34
+         DftcYU0HFUm07+j3DY14XUZ1gmlp5yFhqkIE8UoSvo89AwF/HrRm0oYBI6Y+r3AlTZCB
+         3dFeCnSAgWM4pg61FVNramO89OM2tMjhY+VdVxpaNgOOoGH/mpUp9mH2wsNaFwDMi/kq
+         e9Rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777893549; x=1778498349;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=GUktrT8GuU0q956SxbwjSrFItR1lGCQYJxE8ZlZEKXc=;
+        b=j4p8LnTGUeKvISck0D+OaSGlKwtcuBjU7fDgPEFEoKEvikla2DpIzKgK8egk5Dt9XU
+         ZYbMdBwCNncYg/JVPWt1i1lDvaXFAZIPIowD/B0WBoRHywLaOtxVLhuH6BvQod89WyCT
+         WNIx8QfEXzVrygUCemfF+B0oZZIGm8b1n2VhQavsz8ECOKehav70ezvo3kSmYrWnTf1l
+         MzNjhPb4+6CL3f3Euvcu2v2lsS2LAlDeq318RaY7h/H0RGZNI8yWaYKeHZc7ziOcdbhy
+         VPcqzyi1wCaBRcX4Wj0gvbFwR5LE2p51S5ZFrl499+cSdy0qt1cFrR/dMvcT+vl8OX3q
+         g7Jg==
+X-Forwarded-Encrypted: i=1; AFNElJ9s7GIGOezBE9hcE+eVBP9cV5uqt6ZJE0W+tVOtnEut0zt4Wk3qptHiyLAo2f0eWYWmTZFzFxE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yytbto1uph5nk8EenjaZPY5RDojSpcXCPiFg6JYtP/kpVZL0XYu
+	lBXlzfldB3eIYaWeyL/jEbRjSWw044vZgAEVHRkzKcD7fg9gIcP+mFnM39gE2gawAj2W/ONzDEP
+	YhkNJa74Zj9awRt2+zYHIjaxCi8WOltc=
+X-Gm-Gg: AeBDieuGVa59pdU8n+SfpRDHlJTGxDGdXcvFpq8ZCHCmlRsjDg+LuWig+HZB39YmpKJ
+	8BMwPacbvE4gHw8z213b+1gKAa1PxaQLqQu0oA0KwmF/3RVMhm02yq/k0VGeTlQVhIk1QHEziI4
+	0uexzPBvCGroXgFgEowtW1afrGEIB9sIdn7qsZRL+qIaDY95QiytYmG0sS9+xzsLRcpsLqjgKtZ
+	R3l1Av+nUibgAOTuVVq9c8bE5rChH8skQEyvYgDwzYwODvY0bma29NJjbu6ZRWZzbzOgghCo7k6
+	oxOcIL6LVzFungkXq18=
+X-Received: by 2002:a05:690e:43d0:b0:652:f423:47e5 with SMTP id
+ 956f58d0204a3-65c3dafd73fmr7032604d50.42.1777893549046; Mon, 04 May 2026
+ 04:19:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <b34cad7979e008864dda72087dc003fa1228bf61210d824cdb5793e9f0f96794@mail.kernel.org>
-In-Reply-To: <20260504101759.3319427-2-nhudson@akamai.com>
-References: <20260504101759.3319427-2-nhudson@akamai.com>
-Subject: Re: [PATCH v6 1/6] bpf: name the enum for BPF_FUNC_skb_adjust_room flags
-From: bot+bpf-ci@kernel.org
-To: nhudson@akamai.com,bpf@vger.kernel.org,netdev@vger.kernel.org,willemb@google.com,martin.lau@linux.dev
-Cc: nhudson@akamai.com,mtottenh@akamai.com,aglasgal@akamai.com,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,eddyz87@gmail.com,memxor@gmail.com,linux-kernel@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Mon,  4 May 2026 11:03:07 +0000 (UTC)
-X-Rspamd-Queue-Id: D2E814BC21F
+References: <20260324204016.2089193-1-anzaki@gmail.com>
+In-Reply-To: <20260324204016.2089193-1-anzaki@gmail.com>
+From: Ahmed Zaki <anzaki@gmail.com>
+Date: Mon, 4 May 2026 05:18:32 -0600
+X-Gm-Features: AVHnY4IY0lLYrd3lltgEmZEsaExiL_o12SlXBsrcMKQ_K6GyfdPRWP-pijiOczM
+Message-ID: <CANczwAH0_RZqdi+XheKzwviwvDJeXm98pt7Ki0SkcfWVAWKsaw@mail.gmail.com>
+Subject: Re: [PATCH nf-next v2 0/2] Update (DSA) netdev stats with offloaded flows
+To: netfilter-devel@vger.kernel.org, andrew@lunn.ch, olteanv@gmail.com, 
+	pablo@netfilter.org, fw@strlen.de, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com
+Cc: coreteam@netfilter.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 1D4B84BC4B4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	CTYPE_MIXED_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[akamai.com,kernel.org,iogearbox.net,gmail.com,vger.kernel.org,linux.dev,meta.com];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-283799-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-283797-lists,netdev=lfdr.de,bpf-ci];
-	MIME_TRACE(0.00)[0:+,1:+];
+	FREEMAIL_TO(0.00)[vger.kernel.org,lunn.ch,gmail.com,netfilter.org,strlen.de,kernel.org,redhat.com,google.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[anzaki@gmail.com,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.kernel.org:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
---===============2329766587970040855==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> index 552bc5d9afbd..c021ed8d7b44 100644
-> --- a/include/uapi/linux/bpf.h
-> +++ b/include/uapi/linux/bpf.h
-> @@ -6211,7 +6211,7 @@ enum {
->  };
+On Tue, Mar 24, 2026 at 2:41=E2=80=AFPM Ahmed Zaki <anzaki@gmail.com> wrote=
+:
 >
->  /* BPF_FUNC_skb_adjust_room flags. */
-> -enum {
-> +enum bpf_adj_room_flags {
->  	BPF_F_ADJ_ROOM_FIXED_GSO	= (1ULL << 0),
->  	BPF_F_ADJ_ROOM_ENCAP_L3_IPV4	= (1ULL << 1),
->  	BPF_F_ADJ_ROOM_ENCAP_L3_IPV6	= (1ULL << 2),
+> Some devices (notably DSA) delegate the nft flowtable HW offloaded flows
+> to a parent drivers. The delegating drivers cannot collect or report
+> the offloaded flows stats since they have no access to the underlying
+> hardware. This breaks SNMP-based network monitoring systems that rely on
+> netdev stats to report the network traffic.
+>
+> Fix by moving the offloaded flow stat reporting to the nft flowtable
+> subsystem. The first patch adds a new stats field "fstats" to net_device
+> that is allocated and updated by the nft subsystem only if the new
+> flag "flow_offload_via_parent" is set by the driver. It also report these
+> stats back to the user in dev_get_stats().
+>
+> Patch 2 sets the new flag "flow_offload_via_parent" for the DSA driver.
+> ---
+> v2: - added the new "net_device->fstats" field since the existing
+>       tstats cannot be used since it would double-count on devices that
+>       already use tstats for hardware MIBs (P1).
+>     - fixed the outdev ifindex logic based. See new func
+>       "flow_offload_egress_ifidx()" in P1.
+>
 
-Martin KaFai Lau raised a concern in v2 about demonstrating the intended
-CO-RE usage, specifically suggesting bpf_core_enum_value_exists():
+Hello,
 
-https://lore.kernel.org/bpf/e5a2ad16-d2ac-4fa0-be41-162227257682@linux.dev/
+This series has been marked as "Needs Review" on patchwork for about 6
+weeks. Anything I can do to help?
 
-He also requested that similar tests be added to test_tc_tunnel.c for the
-new flags, as was done for earlier BPF_F_ADJ_ROOM_* flag additions.
-
-While v3+ added selftests for decap GSO state validation, does the current
-version include tests that explicitly demonstrate the CO-RE enum lookups for
-bpf_adj_room_flags that motivated naming this enum?
-
-> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
-> index 677be9a47347..ca35ed622ed5 100644
-> --- a/tools/include/uapi/linux/bpf.h
-> +++ b/tools/include/uapi/linux/bpf.h
-
-[ ... ]
-
-
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/25314425016
---===============2329766587970040855==--
+Thanks.
 
