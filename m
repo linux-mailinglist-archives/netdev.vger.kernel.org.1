@@ -1,100 +1,133 @@
-Return-Path: <netdev+bounces-283995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283996-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WLOlAy/m+Gkt2wIAu9opvQ
-	(envelope-from <netdev+bounces-283995-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 20:32:15 +0200
+	id OIsfO2zn+Gmt2wIAu9opvQ
+	(envelope-from <netdev+bounces-283996-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 20:37:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C21A4C2936
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 20:32:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 555EF4C2A52
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 20:37:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1B0BA301BC2B
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 18:32:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BA89A3037EFD
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 18:35:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 064F13E4C9E;
-	Mon,  4 May 2026 18:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95F583E3D94;
+	Mon,  4 May 2026 18:35:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="C8WvEPj1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YolnfL6f"
 X-Original-To: netdev@vger.kernel.org
-Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010015.outbound.protection.outlook.com [52.101.56.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801D63ACA65;
-	Mon,  4 May 2026 18:32:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 336A51E515
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 18:35:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777919530; cv=fail; b=TujhHabmu3BCMcY2D2LsnGWdeU7k5lIqB2P2+3gM83weqR5+yUIS1VSdn5gjPaV+1ZCJ6ywgxQgvQ9xOoUKHYDeFRzSIR0DaOdttUaNoMCHxEzFPcIAz6ZnR/tKSE5wbrqLoEqjXYibZmv2bVGEkcZRNF4H+yRwUnKoEomVIUn0=
+	t=1777919727; cv=fail; b=TA2ocGIw+nnw5fze90q/WdkT1a0mcyNLLhjwGfGOEjWQMg18xzmDrU7w6PchmkvhbvFExgqckC4kmQzA9uvvrOIovLu5E/Ls9/13LMpp4qwSPG/PdfLSS7QzVT4p9BoMsbNuX4h0nuofrRToJ2on1h7vQy181nsFDqK2N/3NXDM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777919530; c=relaxed/simple;
-	bh=8qEHna0BQChiwkWAU9chQvc3ppCH4aCE0gCZ7CBb5nA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=heTSTGieGSOiSN07urN4UcTkWaTAeFS72vJY393DdOvGueGbXj8MNxIj97zU4D7/V3LRTqhSRbZMNxIYbCZjEark6IdCKLRqTviQpqM2IA2bN0OFRZRFOf79kj2TG1raT/JD2u8hY9Eu8nPMjYlwnAf4xblsrWblLBjXPeu02ic=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=C8WvEPj1; arc=fail smtp.client-ip=52.101.56.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1777919727; c=relaxed/simple;
+	bh=YPSoINydVJYE+lF3UTCcIxmJf4fHgb3mGMZBMmg64bk=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=dSNGWRdk9fzRKO2ZBd/uy8U1eE7BmRPAGa0qCB5DJJmPGpOnJrBDQM7ALBQLhaZR8UXWxfQKb0xo4D2tWqXnfBhj6pEMwLo4WJ6CVrd8Sis0m+2aLLkODyJ+9EPIYZ8j97Mp3JttH1L2/i6vYnrR60G5bgREmCL/z4aZF6FtGTM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YolnfL6f; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777919725; x=1809455725;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=YPSoINydVJYE+lF3UTCcIxmJf4fHgb3mGMZBMmg64bk=;
+  b=YolnfL6fiQuXlNwC0Zvlyx8gC14eqGYk8kqZyIYLYTnZQkwKRSNIN7S/
+   38YY8iFpgv9PpJIXvWWhrFiP8q01PYrBsqNHxAs+kzJcoYq+7eKdu9ylJ
+   RLYrYBkbjjf4q0Lx4ECRHolGQlCG0aKkkS8QI0p0mGD3UEWVnzBX4RE4S
+   ot5zbjEHkwFfnqo34bsxca/LfxNr152P2So1YaytZiqN3wIebdFihF2o4
+   7cBzVogiKgSUnQ+V4H3CX/4DJl8i7sPwh5bJctW9pqKWcWGupGXRCuRTB
+   R8HPIhPk6uK6BFlwCrTRDxpattp1LeoF0dXBMra64EMGatMRrI5K/2uht
+   w==;
+X-CSE-ConnectionGUID: w79En9tGQfGjTdsOkwak4A==
+X-CSE-MsgGUID: qpDNXdw1QdKQJ/icxGM6rw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11776"; a="104233627"
+X-IronPort-AV: E=Sophos;i="6.23,216,1770624000"; 
+   d="scan'208";a="104233627"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 11:35:24 -0700
+X-CSE-ConnectionGUID: F0w1UcbDQW6nIwdBAttbew==
+X-CSE-MsgGUID: 0wTjhcCxRAaVpz1cVb7WJg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,216,1770624000"; 
+   d="scan'208";a="273713945"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 11:35:25 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 4 May 2026 11:35:23 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Mon, 4 May 2026 11:35:23 -0700
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (52.101.43.24) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 4 May 2026 11:35:23 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lFs2FYh7Vo4BqUCXih480TfE+630N95NMFlRf5QR3eqs2LJrDOUt165nNf4VzX7m+Foo3b5TDA4ONIk0zWCM099oQlX4e8kPscGbAmnYd4bwm929rwsV3ve2o74FGQ/JbCPxXcr3JuvL1b99+iMlZpJjZxV/afPgK0H8tVqydg7Gmqrvx2CYvDF+5mQuV+NVLK9iqdBm5XOC8IxlzQ8AQTP8gy2qR66Xsv2EFckunfKyxTphsp3tJBmKF/2UIHnSUGu18LL5K6lOd1t+g1Aqn4FgP9aS4L7fueIEACOZxxSat2A5ej3Su8E6KBUi6/KLD8rZf0mwI5phqNbJOzQxTw==
+ b=ITtDhZiUaNEvB1+6u1BNYaYuFIn7PYIbZVQY7U2R8TOADufub35lP06MQTZiM7NZ0QHgYwQQpvjeI1o1mgvpHma7v4GbCuluAHM+xWYLmEUWGriZEf1rg1GYmUtusDNsEbrDMe3chmFB2SPhA7XFpHoTPLRvPLvuQMLX+7X2wgY7zFeTlD/teXK9SZmefDyuai0+LvW8ApYOfxxURbVT0NnOAW59IF8zc1eIujCqKASeT9exrlFyFmYLN67sshmBPZrOtCJcqLtPmTrBaRkmCWvqaLkuksnx8tEdgt25e9YncZJIXAkpQl/ayF1rR1R4NQ3VX/Qh4ACT/MxCvybXcA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CBW7ZFI4MKlBJxx30Z8ejLX20Y+H39dCGpQz/YXPEdY=;
- b=vZi34K/6bwnB3x5jPUGS2a9fw8iiBzuvwhkn6TL8+jomGg5OcU/aT/P1sHWuLA9JQ5gVvyJ/10yzaOo+RUHQn65iKm3giG2DoclRDSK5Tgf4n9iIe7tp2QajeCvO0d0RopO405hu7MfgyyqKNsvFnOIBkq+XhKIHCENLyB1QAG26EpVVfFjSy8CewcduN3SdZjLki3s3wXhbqoX5vG8oDUUroUnZ7XOFq9Nws1fkzJr3KMOldsmNZuSPGkO7IkO5uTO1INy8TNGN0iLuF/rsMc/SQQ9Isd/JZfM9uLYuONbMhAAwltZDIWe1grdDc3JuGYSFb0ZPzY/goRmObDX/CA==
+ bh=g/fkL9T9klfDwMeDzYFBxbj+6Lj/a7X47IZjMIXt6KY=;
+ b=UraRtYDupMdZoq5LNaF5ksxZmBfom0G5Jat/21sSbSdmNbFdk7E3kY4O2+1GqqZ88Q0c2LIrWQ/KmYAz5mS5u+MtRsPfvhWcGazs9veb+jias/zst+RWF70hxSPngQ8VEYqzLhDCz64ypbSmoRe58M5nB37sAbcvFkqf4eTAoRrBxJRQFLcVvGauk2cmldWTSNAA8rDC8Q6ZtripM0XAqkJdw0uEHM1VeEGmEb0+0lBeAXi0QKZgUhSinWz+qmu8/fQi2hPnQEAE18fm2yvd9B+BWfgFJeCIw3kBjullUdhxeF5yfxYH9ui3FTZAXkZB6leW8cBweaxThwxpfhoJLA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CBW7ZFI4MKlBJxx30Z8ejLX20Y+H39dCGpQz/YXPEdY=;
- b=C8WvEPj1tx+QC7VuTC1pt2NskhzltUgRDxBje0OVLkEMp7kNKpegVxRDoaqXVJ78si1u7SF5pjjnpBw9efautWJM4kxn5XSCmR9iIzvBz4Au/Gj+Dx0hZXUhADrIx6TwPYpfj3LnIKgzRQH6+QTvoG+4QQheD2q5cm1siqqNG4CXdxMfXxN23mSODcdBSlKRhNxTa6vAzBzTeekmZfDKuub1g1l8szhYmhl96WzbyW5uaS5TqeOW7v15IKfn/q8PetYNcVusp1/jKxsCbajjR5yx9g4Zh4qjZ1ZDKfIBoj8eIOmKT4xPuyahl9cIevQCB8ixEdmbXTuwA+faTRGkbg==
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY8PR12MB8300.namprd12.prod.outlook.com (2603:10b6:930:7d::16)
- by LV5PR12MB9779.namprd12.prod.outlook.com (2603:10b6:408:301::14) with
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CYYPR11MB8430.namprd11.prod.outlook.com (2603:10b6:930:c6::19)
+ by LV8PR11MB8771.namprd11.prod.outlook.com (2603:10b6:408:206::18) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Mon, 4 May
- 2026 18:32:04 +0000
-Received: from CY8PR12MB8300.namprd12.prod.outlook.com
- ([fe80::ce75:8187:3ac3:c5de]) by CY8PR12MB8300.namprd12.prod.outlook.com
- ([fe80::ce75:8187:3ac3:c5de%3]) with mapi id 15.20.9870.023; Mon, 4 May 2026
- 18:32:02 +0000
-Date: Mon, 4 May 2026 14:32:00 -0400
-From: Yury Norov <ynorov@nvidia.com>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Yury Norov <yury.norov@gmail.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Ruan Jinjie <ruanjinjie@huawei.com>, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	Linux-Arch <linux-arch@vger.kernel.org>,
-	Netdev <netdev@vger.kernel.org>, bpf@vger.kernel.org,
-	Nathan Chancellor <nathan@kernel.org>
-Subject: Re: [PATCH 1/6] lib: include crc32.h conditionally on CONFIG_CRC32
-Message-ID: <afjmIK4mlCWeywuS@yury>
-References: <20260430211351.658193-1-ynorov@nvidia.com>
- <20260430211351.658193-2-ynorov@nvidia.com>
- <ec4ed7f5-b1c8-49e4-b83d-e29c5414b9de@app.fastmail.com>
- <afjNaToyptiMogV4@yury>
- <9d45acd1-667b-4acf-9e2e-bcd79630d726@app.fastmail.com>
-Content-Type: text/plain; charset=us-ascii
+ 2026 18:35:20 +0000
+Received: from CYYPR11MB8430.namprd11.prod.outlook.com
+ ([fe80::1d86:a34:519a:3b0d]) by CYYPR11MB8430.namprd11.prod.outlook.com
+ ([fe80::1d86:a34:519a:3b0d%5]) with mapi id 15.20.9870.023; Mon, 4 May 2026
+ 18:35:20 +0000
+Date: Mon, 4 May 2026 14:35:13 -0400
+From: Rodrigo Vivi <rodrigo.vivi@intel.com>
+To: "Tauro, Riana" <riana.tauro@intel.com>
+CC: Jakub Kicinski <kuba@kernel.org>, <aravind.iddamsetty@linux.intel.com>,
+	Raag Jadav <raag.jadav@intel.com>, <dri-devel@lists.freedesktop.org>,
+	<netdev@vger.kernel.org>, <anshuman.gupta@intel.com>,
+	<joonas.lahtinen@linux.intel.com>, <simona.vetter@ffwll.ch>,
+	<airlied@gmail.com>, <pratik.bari@intel.com>,
+	<joshua.santosh.ranjan@intel.com>, <ashwin.kumar.kulkarni@intel.com>,
+	<shubham.kumar@intel.com>, <ravi.kishore.koppuravuri@intel.com>,
+	<anvesh.bakwad@intel.com>, <maarten.lankhorst@linux.intel.com>, Zack McKevitt
+	<zachary.mckevitt@oss.qualcomm.com>, Lijo Lazar <lijo.lazar@amd.com>,
+	"Hawking Zhang" <Hawking.Zhang@amd.com>, "David S. Miller"
+	<davem@davemloft.net>, "Paolo Abeni" <pabeni@redhat.com>, Eric Dumazet
+	<edumazet@google.com>, <intel-xe@lists.freedesktop.org>
+Subject: Re: [PATCH 3/4] drm/drm_ras: Add DRM RAS netlink error event
+ notification
+Message-ID: <afjm4XJx1WdO-J_B@intel.com>
+References: <20260311102913.3387468-6-riana.tauro@intel.com>
+ <20260311102913.3387468-9-riana.tauro@intel.com>
+ <acPjxf5XTYuR7sbM@black.igk.intel.com>
+ <09f253b3-ee64-4fbb-8cec-820e9769aa80@intel.com>
+ <adc6hTz-xMopiJsc@black.igk.intel.com>
+ <69c061b4-eb40-4e2d-aeaa-5dfa47b2db8c@intel.com>
+ <65c6839f-a92d-4122-b347-a1250dde961d@intel.com>
+ <20260423092922.6c527d75@kernel.org>
+ <615d5a74-0865-4f42-a048-a32fff23f8e2@intel.com>
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Disposition: inline
-In-Reply-To: <9d45acd1-667b-4acf-9e2e-bcd79630d726@app.fastmail.com>
-X-ClientProxiedBy: SJ0PR03CA0263.namprd03.prod.outlook.com
- (2603:10b6:a03:3a0::28) To CY8PR12MB8300.namprd12.prod.outlook.com
- (2603:10b6:930:7d::16)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <615d5a74-0865-4f42-a048-a32fff23f8e2@intel.com>
+X-ClientProxiedBy: SJ0PR05CA0151.namprd05.prod.outlook.com
+ (2603:10b6:a03:339::6) To CYYPR11MB8430.namprd11.prod.outlook.com
+ (2603:10b6:930:c6::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,209 +135,138 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY8PR12MB8300:EE_|LV5PR12MB9779:EE_
-X-MS-Office365-Filtering-Correlation-Id: d44c07fa-c92f-4013-00c7-08deaa0b6f50
+X-MS-TrafficTypeDiagnostic: CYYPR11MB8430:EE_|LV8PR11MB8771:EE_
+X-MS-Office365-Filtering-Correlation-Id: 72d18865-bd6e-405b-c552-08deaa0be54d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|10070799003|56012099003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	+yKFsHxbNKLnafRFPLrd8Ts8Zaq6EmJ0YGf/eYfUhjomUdDpyCqU2/2WcMNZWtqjKNRL7Q/pFHKCmRx258D8SOLHAF1mBjKNP1UqRISHwU3wKEB6Q5cuDh15Ib91GO9coLTabYOFgJ/dHhHf0OuVORC9MC6yAZrE3lRMZTgSCYKyf0bhmBHjboe5LquzwoPaB3Ps4ZUJ3Stsr8jt+cvNPg9v0uajTYqJBmqpgWLPdJijtz6BV3Q7fwQVnEC0TUk2Voe4Hmtd2/s30KU4o+hkurGf64OdyTkz8ZyWy9F4xWzE8fbrM8k0wIJ85Ke1R0ydPOiYrgLGXgJXGzNNp88twXAZXRdqMZiBjbR9yxp3c5kCUeTUjjeCke5tbMx8e5ud37y3JVrhaNgrjKjJ7du0nt7LSJY1mtXuktTye40Fi3w7D6q5ceTQ4iQLuW0gErYBEUisqwCiD04uqNC8W5W5AEzrAtE7GrORTF28B3tkTNZncOhyx2G/+Hhm6qJgbDlmpk/Ys5CrKo6dvpknmDL16zZW2AvR0Epwg2nYdwhdzJigpTaXCKaTJxKGmbPdBvGoo8OZcfCL96C+aRhJTMQ2lVisAd9eETxvFPkA9U9ERje5FLYZf1RI+Qez5oJpY2JFrgFwbgqojzYoDlqJzmYZ1eFWuidEbuArl11AhpmqrjICr7LHSr/2xp2WkP90bMaCaQBPwaiFeCbx9OBoycMJzA==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB8300.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(10070799003)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014|13003099007|18002099003|22082099003|56012099003;
+X-Microsoft-Antispam-Message-Info: iSVW20lyu2mrbH9qYlZTjH6qjfflo2EI/m2erELZm5sVpLS8BQY4Jn9qp4krMHXg7wZMAmARnadJ4swP6Im/ioL5M2QW7JNi7EnS4wcNwbjogrC2KMUV+JbokXThPYKlIh8dITNxgXp99pfCaJtwZT9+sRezKlvCzpYB0Gze91ypqLBCO7O1Vmg0R9ELR4hUm4LrNVefSAQr8d1M7o7GNKKK7YU+22nwFKHOh6N8Hl1MlB2aZ4U1YSORG8Nq9Tk46tAAah8rWEMfCl36D8y0C8KbF//2kmlxJ/JYGX37RAq90gxg+yyC+jlLEpoQFfUpT5dUj1t5QpaMVUM2cTHAGu4Ny9X5uBNyX+azL0d012puBk6MdlgvF6OjfzAfL3Tbyr40mt2s5MwRb6mB4aa35HJP6fRu9w7EiM/GlHv56xkfLAPeWeSJxxGYV2xUpLmxrf5th8c+3LZx+EWb0nzBrFnBl2XQ5rIoXwpSslyHGNSb4WahLLaP2D1/SrCNtFBXGaZZtGjZtJS5g2+NGbOhJVPr8Cs/ypbKPEkNkydO9MqitR/VJxoaSCzDSwFc1AaYtiXGm8rszNE9830YRWUIa5PrrmSCIa1mIkRzVxFXdgs2gto+yPEbGIrHPkTvTxCwEa5PAuWuvKXK3bc5iS/UMDnbtOk+ByL0VgOkCApLXsZYCNyuZiPDGnT09hMjVqk6
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8430.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(13003099007)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Y84ya5zJUOdPbm0F/Tyj0VA9daBoKJTOdJd6a5LqSj1N3sJpNkuT05HSH0c0?=
- =?us-ascii?Q?GKTYfiB1gNN7EePhsNtrLokvLaJuRL24d5FaaxV4442h9iocGr5xF58MLeV7?=
- =?us-ascii?Q?WLtd4xqlmSRzny2CF9OLLeVU3wCruL1SzF1lLfhEKVpLfJQTr9vE351SnsKr?=
- =?us-ascii?Q?KfwMrQsbocanuoAwsGesdjm4VkialHyMHuMw791hlqzVOB1eE6AO87yz9JvX?=
- =?us-ascii?Q?Zhi+nkplIi2zkBW97lOvodEfUJJPFQzVodRwT/sB+WjD9Bf0CQ4h5r7rqg4S?=
- =?us-ascii?Q?8IzhBlkpsOnEPqpRXtx4mBRn+Z99ZRdsvu1hY0xApD/4Y3Xwi46B55/smMgZ?=
- =?us-ascii?Q?N/WPWJyuXY6KQX6HumHb0zOEj7JPY/7H80IrmIk3YGBRJ57fMolfuP8ZZXsu?=
- =?us-ascii?Q?oVBwbb709q4SoqXfq0hdmc+s68rFJcpEJpgGluxibgXlplWW1PfNe4WI+U+R?=
- =?us-ascii?Q?Abd+RbKR5j6H9qDq4rRT366KT+Rt7dS8OP6PzKUAylAj59tTTzbZnQ6sBk1x?=
- =?us-ascii?Q?VHyz1I1yZmj1dGRR+TegSe98bPhkodgWHTQnXzSFS0Huzh4Sl+zyL0sUs86F?=
- =?us-ascii?Q?5SVkn94TiMieiUHufeTQ6CA1+u47F5kl+dVcQ6PLHB/aCIWXkTN7QjHXeNM6?=
- =?us-ascii?Q?TW1xNhilL74iELsA67u1VCgrNcaWKtTwP16eEVmG/nQqyyJ262v4qA+Lvi0o?=
- =?us-ascii?Q?EoEGqS8CQlhMGEcI+TTNZOPmXNZ+dIa4nGAvgAoiNdYJ/eHWeZE3GRV5DyhS?=
- =?us-ascii?Q?AZmixSTc3BZvnHjRBOZ0m8vCCbCSIfG2i+CKuPDX8sJ0T8Y7oi2vGdjAZQ50?=
- =?us-ascii?Q?wjHOqUECoBCzg9LlWTGf5zvKSy07ckcM7pX0gG9WtlzFBeNQKZzZKXj4xFx9?=
- =?us-ascii?Q?o93/t6B9EY3Hetqe5avbhppwPDLxfcV2MWU/LGkav8pLyrrTJGaNIfx1hvu3?=
- =?us-ascii?Q?vz4aNBeXWKhuzNlVWUJBmD+H98DYP3puu9BukSL+Mh5cFMQ6evo4nwsJk4lB?=
- =?us-ascii?Q?hm68QzveBjBqOUz/TnHRjCXegIc82B3lDy1HwJzlArnDre/Vflmh84kI3NT6?=
- =?us-ascii?Q?irNolNqRfOOh2qgfehG5NFu06fD6eWYcFrzZGBFvy6yYGb0eIB3FRgFCk/71?=
- =?us-ascii?Q?xTnNv83SAv7FDgXS7UHK3Y1GVe/oHcMmwg5wfGT+Sk0dyDhhBMDhCZQrnraJ?=
- =?us-ascii?Q?r+aEckTVajgcI5mLOCHBXta8WlQSjvSvHZNhlXRS9p7WD/VKex68IZweieeK?=
- =?us-ascii?Q?v2GZUYJCLpxMdGZzFIuHs4kLbDfskVsq7VsKEC1H/iHZB64SyBoyLdNHXibB?=
- =?us-ascii?Q?QQ8XGN7pKmnRHs8VXoRFBJjpxGT9MskMjzPnykcKAmJzOFt7j+Zp/maNFXI/?=
- =?us-ascii?Q?a80cf1Al0zsncHSo4/cZ3X79UOF3LqmDtTu8z/UmC/Xjo4fT/VaRov2LBBFJ?=
- =?us-ascii?Q?+XtiQn1N7CkVH79Se8ubxf0ODKUVzN36LmIeC1QHVvUBt0P69O/VAG5XCTrI?=
- =?us-ascii?Q?5/BLiRrJAmtxMvmPSY9IqqPs9oZfW1ukQZpS870JcsdaBGEJFQBfc+5lfLjS?=
- =?us-ascii?Q?gr5h9Z16yWuNM1CsaWasuZZACcYIsBEAosidttjhXozUKswjDwxmYe+zL4Pq?=
- =?us-ascii?Q?/dZV5RA8d6IG4lu5Or16w1CwF8zG7HUgShtRx8ssv2TUA8z1cIlgV4orczxy?=
- =?us-ascii?Q?zwgJbYbpB60VNih7dfVziibTHrcnRvvosM25aGYVMe/hNvkn6HJgqxAQEPn/?=
- =?us-ascii?Q?AhEzN0UPR3seHYvskkgI7pwtKB4IF7koehtVAnBXeV2pA40qj/pv?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d44c07fa-c92f-4013-00c7-08deaa0b6f50
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB8300.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?iso-8859-1?Q?NeblHsTKemHD1jGQZyFbhwvPGmY/k2PKua+e35J9duoCx6A1UXh/wiEMCP?=
+ =?iso-8859-1?Q?eI8exgxzVzdt/VopwMyVu0suLqPUiw1FIGnkqbY9+Ysik21icTkzHWak8a?=
+ =?iso-8859-1?Q?mpSDtRt0BYeGCXgfbdW/OYhqcAPS0TK9yvDlfMY9v1W1z04aFDuU+Eixrk?=
+ =?iso-8859-1?Q?pRbY/AV+m8lmRdHLMMbxaz3TwPtqNr8vNC/tHPtj36sVlUBzMFQoKMrLoK?=
+ =?iso-8859-1?Q?khPIosRajp0jmDB5So6yAOSeN0JhK+0ASJQ3/1w+5ROg+yjqkVas/UAi03?=
+ =?iso-8859-1?Q?irrCgYxZDGEHKop9likaWvx7dberp0RLQXXCGXe5bE9uNq/Z9Za7yV+anG?=
+ =?iso-8859-1?Q?03G5f9tJOIEUvlyhDuMmk4eLH6CFVXAgVlaOxgUmmB4GQt6poY59sNhBYf?=
+ =?iso-8859-1?Q?D+fkukdaOBC4l4FcxYq9HBrpg/mGFwpca1IeQA9nMEq+rCSekdW6cihGk3?=
+ =?iso-8859-1?Q?KsWR75It3CxVGV0fqP3LJaqLgkBjgDlKuWrcd1OOX8ldrE61rbcYEP6JVo?=
+ =?iso-8859-1?Q?KPPa9WdmeCmX9yzNnrurSz8FoNf2iLvhUVaVy1V92RO5PjEAYxCCgoegEb?=
+ =?iso-8859-1?Q?o8fSM8xo6RZQAR0JsDOOpTZkAj5onPNJ3MyyXUQGA7Q0c1ojJTIlrs1x8p?=
+ =?iso-8859-1?Q?GYKZm2TTq/lYz+3zPV6B9zposO8NMJZhdCIMsGt6HXY0ODvtIDA/lxNrN9?=
+ =?iso-8859-1?Q?Jd4SdR6108R2CtKp05E+SM/g41IQNU9EIQ1HLrSEIqT2K5Em+8gm99APlh?=
+ =?iso-8859-1?Q?4pRnrhJjbBW8nLH8ZXMoQndnB0rlz8XO/GnFEyQpOdQ+9ieAqTRSmF1fqF?=
+ =?iso-8859-1?Q?ag4SMIx3kAi+TM0NKSWFpon75EQ7nVHADMJx/62PBhzCUwm+KkjDIE9022?=
+ =?iso-8859-1?Q?8JwLAZwGdQ7uVig5b/UgjBC03exwqtt/czjmFYcWR6W2bymzUg60SMvfkH?=
+ =?iso-8859-1?Q?8e43/dR3DXMno9JCH0r0m/IqjGvt4wlMspcw3xd1hZolnqwHgMmRNLIubD?=
+ =?iso-8859-1?Q?i7fGcxLyTJge04dhtLZItXIr1DccCNT4n59XBCweJ13gHdtgM1ZqOqpXyg?=
+ =?iso-8859-1?Q?dcmqMZzV0rw6fnw/abfhUn6ZEmB3CmUw9z3TBlZ/88unFdhQnQ9/JPoHSA?=
+ =?iso-8859-1?Q?M8XoJ447x7kUa46SDrCplBUiBOnSS3gOHs2akj5sN8pxfCJHmZdu2e9FoA?=
+ =?iso-8859-1?Q?es1XRwIP0vASMwKTzGNpmHUkqRlfZJkBDq2vsCDRmkOkzf1EB4atIOxNRw?=
+ =?iso-8859-1?Q?NLkADA2rSOG0OnaB8GZYkcXq+EcG0+XLo3N6ITdz1tT7Lyl/VSg6H/A4Lj?=
+ =?iso-8859-1?Q?L+6VZ6pXkgUfrYsUhgn33DsEQTyEavBqjdEaUDcBSxAa+FeFmuYszK84uY?=
+ =?iso-8859-1?Q?GHTOtmDhEo1omwdXfNSQxFpffsZKilabeLWYU05V8ESGtixabHuAM7jwTI?=
+ =?iso-8859-1?Q?TVMDCIp7DskHuyO0Hs1KRmrLdU0Xo3SznTVVCMB6NWQWAWg0jV/OpCqVKP?=
+ =?iso-8859-1?Q?w08wWesKunMl4wCfuoZN7VdqlbQG1/UtH3Dq57sJUqx2wCQIiEzANIP3Ko?=
+ =?iso-8859-1?Q?aH7E0zaYWndX5TsOYgYHh5tKqBLRsPes3dp1Um20JUG2v7kKVJBDFuv99c?=
+ =?iso-8859-1?Q?QLSRMTywbBRTCzyyG2VwPJK/YdNv4qPE2tRSoIA83I0uTdxpjvSuDjTpH/?=
+ =?iso-8859-1?Q?51TK+FS9mRl1svXE2iXD0E14ubNFbGvvNvFEv0N4Q3HWgsVLwpyeXMMcRr?=
+ =?iso-8859-1?Q?CT7ysEgmtMazfSrbquvBk+fYu5VaJ3LHNBGnLxhvEmAmMZbE9ct1kpY00B?=
+ =?iso-8859-1?Q?vf7lVu8H6Q=3D=3D?=
+X-Exchange-RoutingPolicyChecked: jO1Ki+iXj/UQRT7nvKW8F7Cjba9t6KZwR+Z3eafl0WhUMn+WXN9I+S5REoO3OtnTnJnDgr9SI82BcCEopZW3AGn9KEdNN3HxnmZqVJnSkDx3KRdMg8eKHPQO6QUEU/JZh+D/qA0DMxBfXFwM+SHtzAXWKg2oPwTp+3nSEpwNOHBbapdsK2OQzKcp1sA3HtDTEcTRUgWpXSl6N09PPYMy/6BvriYw+tH5lNGwW2sjyr2IaF1Av8BhrCIEfwFAxcPJcsXVT0DepDa7ZWlfIea2xRvdnHQ09XmsYsLv3KX9AnGW1lJgo+b5ThhlcnyWCQAMwZin0yKuiv4eJN4tUrUkPA==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 72d18865-bd6e-405b-c552-08deaa0be54d
+X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8430.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2026 18:32:02.6056
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2026 18:35:20.4031
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9Ks9ibU0ZDdaUrpWvb428KkpFFXXRujFuJihsFGJvgwa7mPyWyzCchj3HU9iOKcbgU2qYVy1X5VR6ncZ+U5KSg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV5PR12MB9779
-X-Rspamd-Queue-Id: 6C21A4C2936
+X-MS-Exchange-CrossTenant-UserPrincipalName: mbbI7ifl/Yw0luxyX3eO3W7YajQoziNXWUyphBbi89MfA0ldZN1Nfdshy3jJcvgxA+bcYmGNs/ol7q6c+x9dyg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8771
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: 555EF4C2A52
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr,gmail.com,rasmusvillemoes.dk,lunn.ch,davemloft.net,google.com,redhat.com,linux-foundation.org,iogearbox.net,fomichev.me,huawei.com,vger.kernel.org,lists.infradead.org];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-283996-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283995-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,linux.intel.com,intel.com,lists.freedesktop.org,vger.kernel.org,ffwll.ch,gmail.com,oss.qualcomm.com,amd.com,davemloft.net,redhat.com,google.com];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ynorov@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[rodrigo.vivi@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[]
+	RCVD_COUNT_SEVEN(0.00)[10]
 
-On Mon, May 04, 2026 at 07:18:49PM +0200, Arnd Bergmann wrote:
-> On Mon, May 4, 2026, at 18:46, Yury Norov wrote:
-> > On Mon, May 04, 2026 at 10:03:10AM +0200, Arnd Bergmann wrote:
-> >> On Thu, Apr 30, 2026, at 23:13, Yury Norov wrote:
-> >> I'm not following that description. Why is it an error to declare
-> >> a funtion that is not implemented? Isn't that how optional interfaces
-> >> tend to work in general?
-> >
-> > Never heard about such a thing like "optional interface". And git grep
-> > tends to second that...
+On Mon, May 04, 2026 at 12:58:13PM +0530, Tauro, Riana wrote:
 > 
-> I meant any library interface that can be turned on or off
-
-So? If I disable CRC32, can I use the either_crc()? In case of that
-networking header, the answer is yes. In some other piece of code
-the answer is no. Is that correct?
-  
-> >> > The only header requiring the crc32 and bitreverse prototypes is
-> >> > include/linux/etherdevice.h. Thus, protect inclusion of corresponding
-> >> > headers in the etherdevice with CONFIG_CRC32, together with the only
-> >> > function depending on it.
-> >> ...
-> >> >  #include <linux/if_ether.h>
-> >> >  #include <linux/netdevice.h>
-> >> >  #include <linux/random.h>
-> >> > +#ifdef CONFIG_CRC32
-> >> >  #include <linux/crc32.h>
-> >> > +#endif
-> >> >  #include <linux/unaligned.h>
-> >> >  #include <asm/bitsperlong.h>
-> >> 
-> >> Don't add #ifdef blocks around headers. If the header cannot
-> >> be included without side-effects, change the linux/crc32.h
-> >> file instead of its users.
-> >
-> > linux/acpi.h does that like many othes. What exactly is wrong with
-> > protecting headers inclusion?
+> On 4/23/2026 9:59 PM, Jakub Kicinski wrote:
+> > On Thu, 23 Apr 2026 11:22:45 +0530 Tauro, Riana wrote:
+> > > We had some questions regarding events in netlink
+> > > 
+> > > 1) According to netlink spec, "Events are considered less idiomatic for
+> > > netlink and notifications should be preferred."
+> > > Since we currently don't have a response that matches a get operation to
+> > > use notify. Would using an event be acceptable?
+> > I have only glanced at previous messages but would it not work to
+> > include the counter values into the "event" as if it was it was a
+> > counter get?
 > 
-> There is no "protecting" here, you just add complexity to the
-> build when headers are sometimes included indirectly and but
-> other times are not, depending on kernel configuration.
+> We wanted to keep the notification general with error name and node name.
+> There is another series which will re-use this event [PATCH v7 3/3]
+> drm/xe/ras: Introduce correctable error handling - Raag Jadav <https://lore.kernel.org/intel-xe/20260428054826.1202076-4-raag.jadav@intel.com/>
+> <https://lore.kernel.org/intel-xe/20260417085812.4013309-15-riana.tauro@intel.com/>[PATCH
+> v4 00/13] Introduce Xe Uncorrectable Error Handling - Riana Tauro <https://lore.kernel.org/intel-xe/20260417085812.4013309-15-riana.tauro@intel.com/> .
+> We do not have the complete counter value there.
+> @Aravind/@Rodrigo Do you think we should add the counter value to the event?
 
-Sorry, don't understand... I use the 'protecting' term with the meaning:
-the functionality that is explicitly disabled should be never used.
-Otherwise, what for we disable it?
+I don't see any reason why we couldn't include the counter value in the event.
+Although we know that this value is likely the threshold, I don't see any problem
+with this flow. In many cases it could mean one less call from user space.
 
-This comes with the cost of increasing the config space, but that's
-how it works.
-
-In terms of build complexity, I guess that the more you disable on
-preprocessing stage, the less a compiler should actually process.
-
-> It's unlikely to cause problems for the crc32.h header, but
-> the acpi example definitely risks running into circular
-> inclusions when you end up with some other header that depending
-> on configuration ends up including linux/acpi.h while also
-> bring included indirectly from that one.
 > 
-> >> It looks like the problem is the check for CONFIG_GENERIC_BITREVERSE
-> >> in include/asm-generic/bitops/__bitrev.h, which ends up
-> >> hinding the generic___bitrev32() helper without need.
-> >> 
-> >> Simply removing the #ifdef there should avoid the build failure.
-> >
-> > OK, it seems like this is what I don't understand.
-> >
-> > We've got an optional feature, like CRC32, which is enabled by
-> > CONFIG_CRC32. The most conservative way is to declare everything
-> > CRC32-related in the corresponding header, and then protect the header
-> > with IS_ENABLED(CONFIG_CRC32).
-> >
-> > I understand that from practical perspective, we can declare some simple
-> > macros, like header size, unprotected. But what we've got now is a sort
-> > of mess: all CRC32-related functions are declared unprotected, and
-> > generic headers are good to use them. Compiler is happy while those
-> > functions are actually unused. Next, CRC32 depends on BITREVERSE, which
-> > is again unprotected, and it may optionally have an arch implementation.
-> >
-> > So if arch bitrev() is implemented, you can use part of bitreverse and
-> > crc32 APIs despite that they are explicitly disabled - just because they
-> > are implemented as macros in unprotected headers. And you cannot use some
-> > others - because they are implemented differently, as a real functions.
+> Also, there is a request to add other parameters in the review comments
+> so cannot re-use get-counter response
 > 
-> I think you trying to solve a non-problem here.
-
-This was reported by Nathan for tinyconfig. At least x86 and s390 are
-affected.
-
-https://lore.kernel.org/all/20260429202922.GA3575295@ax162/
-
-Is tinyconfig important?
-
-> It is extremely rare
-> for any kernel to be built without crc32 or bitrev. Even in randconfig
-> builds, both are usually selected by some driver. The behavior
-> we've always had here is that in the rare one randconfig in 10000
-> that hits the one driver missing 'select BITREVERSE', we get a link
-> failure with an obvious fix. If you add the extra #ifdef, it gets
-> a little more likely to actually run into the bug, and it shows
-> up a little earlier as a compile failure instead of a link failure,
-> but otherwise, nothing changes.
-
-Except that it fixes the tinyconfig build.
-
-The above argument sounds to me like you believe that CRC32 config is
-really useless because it's enabled for any practical configuration.
-And the same for BITREVERSE. Would it be better to get rid of them?
-Would simplification of config space overweights the bloat of the
-tinyconfig?
-
-On the context: CONFIG_CRC32 is pre-historic, and BITREVERSE is 2006.
-
-Right now half CRC32 is available if CONFIG_CRC32 is on, and half is
-not available. The bitreverse is the same. If HAVE_ARCH_BITREVERSE is
-enabled, one can use the API, bypassing the BITREVERSE. This doesn't
-sound right to me long-term.
-
-Whatever this ends up, let's figure out a consistent solution please?
-
-Thanks,
-Yury
+> > 
+> > If it makes no sense - it's fine. We have been adding events in some
+> > places, too, in networking. The thinking is basically that when the app
+> > that does the user space monitoring starts it will often want to know
+> > the state of the world. So we end up with "get state of the world"
+> > and "notify about state of the world" which should really be the same
+> > format.
+> 
+> Sure. Thank you
+> 
+> > 
+> > > 2) Is there a way to check if there are subscribers to a group before
+> > > creating the event message?
+> > >      Currently the subscriber check happens in
+> > > netlink_broadcast_filtered, but a reviewer suggested we could
+> > >      optimize by skipping message creation if there are no subscribers.
+> > Yes, genl_has_listeners()
+> 
+> Thank you
+> 
+> Riana
+> 
+> 
 
