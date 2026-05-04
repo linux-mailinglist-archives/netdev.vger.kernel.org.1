@@ -1,260 +1,178 @@
-Return-Path: <netdev+bounces-283794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283795-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wkcGFGV++GmHwAIAu9opvQ
-	(envelope-from <netdev+bounces-283794-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 13:09:25 +0200
+	id AIQ1MhR9+GkowAIAu9opvQ
+	(envelope-from <netdev+bounces-283795-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 13:03:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADA9A4BC2FA
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 13:09:24 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D05974BC1CC
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 13:03:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6AEEA301F4AB
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 11:00:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D02EF30080A5
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 11:03:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7264D3A783C;
-	Mon,  4 May 2026 11:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EAAF3A6407;
+	Mon,  4 May 2026 11:03:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ea8gYidQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B5pIEjzW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A2D3A6B92;
-	Mon,  4 May 2026 11:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B05F345724;
+	Mon,  4 May 2026 11:03:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777892410; cv=none; b=XesU8s3uNAVGhY8YOPwMF4SuWXXE3lvWpuS0xUkDOLiI8InvX9MgYehGmHAWPpIQjJAHHYUw0GbFrWRgcs51UkXWdRpN+ULtyxl6svMOrqUX/EI3iMWpR+9FvPEVp1phXjm4JOlgaWmn+J8Lv9j+DvGiXw8GDlZuN19B1/+kFvk=
+	t=1777892583; cv=none; b=i9Wk4Iy9HKCkuvVzTlbhdez/gKiWa+Zvl+hrwBtC0f57c6QyJ5+5Uqh+yIhCtdKQRMgPx/vzsfRZbLvoUebLnTFszkv5OX35KOvOF6e18KPXRslf64+g9TSzgNy1FV3m7/BP3mSzvu+0weRXedj2VpYvRKLE/Vo0gMMTlVVReGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777892410; c=relaxed/simple;
-	bh=Qekei4EBSl8zy90b3baTSwFNYdFd4J9Yt5RBNUtCJWw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nj8RwWddPxCvfgU81AmOErs1Xhm2igliJeWfvS0bSKDMD6iypwWXmIYgp+jXtgBiSgBOr25hSHLqXZd7wEhtAAupD+wz4bziFjNK11eNH6JWQCv3URSg5gdIDrwuPV7ePsoGn/VEjqqYzgiVHEjpvOeVciqxxhASfHdCJcKx7sE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ea8gYidQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AE67C2BCB8;
-	Mon,  4 May 2026 11:00:09 +0000 (UTC)
+	s=arc-20240116; t=1777892583; c=relaxed/simple;
+	bh=Wb/d6S/2mzWOGqM4EZhviXMHCgqp/1GcbQpyy4tUiwc=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=ehDIbSCup6l/bBz8jkHkvVjStWg7fSV84yVfUm/tkqJPaj7QF92eAWojctWQdEdVFJDUHYdJGs64kpK0VypHSGHA9PrbtWGK6ihCOTtpSyd/4eBH7hnLnueC9MyLxoGm4BcsXN7thrELKANRWmI+HjOUBL3Bu7aKWZxc/wxCd+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B5pIEjzW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 335E2C2BCB9;
+	Mon,  4 May 2026 11:03:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777892410;
-	bh=Qekei4EBSl8zy90b3baTSwFNYdFd4J9Yt5RBNUtCJWw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ea8gYidQNl+OaH9FchlMaM9K+7g6ktdoQHPZPXS4Qs92VgpYkUkRUPZEDZDwNx0VH
-	 Drq+pTs9CBE039unHT2/+Hu4Ky2OnpMq6+A8jUev0t6NMD0HQV+aIGH7nMCjRD3l83
-	 YM3CptFu9pWmZn7Oi69MAVLlQGL4YBL2n/vA4LEjJJHEYA9khVhT+eOxgIC4mqFkGu
-	 xIDmYOJtKTgQY6T5hX+jrjcR0s7iGVUWLJJTh5JuvV5zfAPqGfRnDQpdfoZm6+YOCP
-	 ol3dq2DVdr/RxOxqX/rLm7m6/r9I10FeSAQTYgaOBZPi7m9mgQt1vE11qcLQ+0rDAJ
-	 jFc/WIwAKuRTg==
-Date: Mon, 4 May 2026 13:00:07 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Alex Elder <elder@riscstar.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, maxime.chevallier@bootlin.com, 
-	rmk+kernel@armlinux.org.uk, andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org, 
-	krzk+dt@kernel.org, conor+dt@kernel.org, linusw@kernel.org, brgl@kernel.org, 
-	arnd@arndb.de, gregkh@linuxfoundation.org, 
-	Daniel Thompson <daniel@riscstar.com>, mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com, 
-	alexandre.torgue@foss.st.com, ast@kernel.org, boon.khai.ng@altera.com, chenchuangyu@xiaomi.com, 
-	chenhuacai@kernel.org, daniel@iogearbox.net, hawk@kernel.org, hkallweit1@gmail.com, 
-	inochiama@gmail.com, john.fastabend@gmail.com, julianbraha@gmail.com, 
-	livelycarpet87@gmail.com, matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, 
-	me@ziyao.cc, prabhakar.mahadev-lad.rj@bp.renesas.com, 
-	richardcochran@gmail.com, rohan.g.thomas@altera.com, sdf@fomichev.me, 
-	siyanteng@cqsoftware.com.cn, weishangjuan@eswincomputing.com, wens@kernel.org, 
-	netdev@vger.kernel.org, bpf@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 08/12] dt-bindings: net: toshiba,tc965x-dwmac:
- add TC956x Ethernet bridge
-Message-ID: <20260504-fascinating-teal-tarsier-b116c8@quoll>
-References: <20260501155421.3329862-1-elder@riscstar.com>
- <20260501155421.3329862-9-elder@riscstar.com>
+	s=k20201202; t=1777892583;
+	bh=Wb/d6S/2mzWOGqM4EZhviXMHCgqp/1GcbQpyy4tUiwc=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=B5pIEjzW5h5Y+mDuplIe2nEXf7CkXJw3rOGHBvInZOfBZBkjKWwyEGciL2x/4ud80
+	 tXfSakkYSSxyJDSg1sLiPD2MBxmFXdEfxlaAMUCY8sUbMAp0nKc3Th5GeOmIefxPAe
+	 BbpSOrMNvGZvak4e10BBJyVgiBb31LB2y/GxthnLyM9blTy2ez7Y4r3Vywb47YV5zW
+	 xkGqTG9DPYryWacyWAiklfOuizhLaUYrFEPxPmcL/POkZ0JenW85RzLVzO/Q6wsgJR
+	 ryyvZceMFeurcFyA7PUsKj2TJFtZdaPHuH5PKixulZtZYFKVgR6v2ejRPR2iK/Wt1p
+	 Z60a3siK0C1Sg==
+Content-Type: multipart/mixed; boundary="===============8283254778776529300=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260501155421.3329862-9-elder@riscstar.com>
-X-Rspamd-Queue-Id: ADA9A4BC2FA
+Message-Id: <2f7f312ca0ffaa0a9bf0ca5e33b83dc035a9df051f557edf68378f23921c087d@mail.kernel.org>
+In-Reply-To: <20260504101759.3319427-3-nhudson@akamai.com>
+References: <20260504101759.3319427-3-nhudson@akamai.com>
+Subject: Re: [PATCH v6 2/6] bpf: refactor masks for ADJ_ROOM flags and encap validation
+From: bot+bpf-ci@kernel.org
+To: nhudson@akamai.com,bpf@vger.kernel.org,netdev@vger.kernel.org,willemb@google.com,martin.lau@linux.dev
+Cc: nhudson@akamai.com,mtottenh@akamai.com,aglasgal@akamai.com,daniel@iogearbox.net,ast@kernel.org,andrii@kernel.org,eddyz87@gmail.com,memxor@gmail.com,davem@davemloft.net,edumazet@google.com,kuba@kernel.org,pabeni@redhat.com,linux-kernel@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Mon,  4 May 2026 11:03:01 +0000 (UTC)
+X-Rspamd-Queue-Id: D05974BC1CC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [5.34 / 15.00];
-	SEM_URIBL(3.50)[0.0.0.0:email];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_RHS_NOT_FQDN(0.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	CTYPE_MIXED_BOGUS(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283794-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[akamai.com,iogearbox.net,kernel.org,gmail.com,davemloft.net,google.com,redhat.com,vger.kernel.org,linux.dev,meta.com];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,riscstar.com,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	MIME_TRACE(0.00)[0:+];
-	R_DKIM_ALLOW(0.00)[kernel.org:s=k20201202];
+	TAGGED_FROM(0.00)[bounces-283795-lists,netdev=lfdr.de,bpf-ci];
+	MIME_TRACE(0.00)[0:+,1:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	GREYLIST(0.00)[pass,body];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[50];
-	TAGGED_RCPT(0.00)[netdev,kernel,dt];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	R_SPF_ALLOW(0.00)[+ip4:172.105.105.114:c];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	NEURAL_SPAM(0.00)[0.293];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[1c:email,devicetree.org:url,riscstar.com:email,0.0.0.0:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.kernel.org:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-On Fri, May 01, 2026 at 10:54:16AM -0500, Alex Elder wrote:
-> From: Daniel Thompson <daniel@riscstar.com>
-> 
-> Add devicetree bindings for the Toshiba TC956x family of Ethernet-AVB/TSN
-> bridges.
-> 
-> Signed-off-by: Daniel Thompson <daniel@riscstar.com>
-> Signed-off-by: Alex Elder <elder@riscstar.com>
-> ---
->  .../bindings/net/toshiba,tc956x-dwmac.yaml    | 111 ++++++++++++++++++
->  1 file changed, 111 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/toshiba,tc956x-dwmac.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/toshiba,tc956x-dwmac.yaml b/Documentation/devicetree/bindings/net/toshiba,tc956x-dwmac.yaml
-> new file mode 100644
-> index 0000000000000..d95d22a3761da
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/toshiba,tc956x-dwmac.yaml
-> @@ -0,0 +1,111 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/toshiba,tc956x-dwmac.yaml#
+--===============8283254778776529300==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Filename and here: toshiba,tc9564-dwmac
-(s/x/4/)
-
-
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -3484,15 +3484,20 @@ #define BPF_F_ADJ_ROOM_ENCAP_L3_MASK	(BPF_F_ADJ_ROOM_ENCAP_L3_IPV4 | \
+>  #define BPF_F_ADJ_ROOM_DECAP_L3_MASK	(BPF_F_ADJ_ROOM_DECAP_L3_IPV4 | \
+>  					 BPF_F_ADJ_ROOM_DECAP_L3_IPV6)
+>
+> -#define BPF_F_ADJ_ROOM_MASK		(BPF_F_ADJ_ROOM_FIXED_GSO | \
+> -					 BPF_F_ADJ_ROOM_ENCAP_L3_MASK | \
+> +#define BPF_F_ADJ_ROOM_ENCAP_MASK	(BPF_F_ADJ_ROOM_ENCAP_L3_MASK | \
+>  					 BPF_F_ADJ_ROOM_ENCAP_L4_GRE | \
+>  					 BPF_F_ADJ_ROOM_ENCAP_L4_UDP | \
+>  					 BPF_F_ADJ_ROOM_ENCAP_L2_ETH | \
+>  					 BPF_F_ADJ_ROOM_ENCAP_L2( \
+> -					  BPF_ADJ_ROOM_ENCAP_L2_MASK) | \
+> -					 BPF_F_ADJ_ROOM_DECAP_L3_MASK)
+> +					  BPF_ADJ_ROOM_ENCAP_L2_MASK))
 > +
-> +title: Toshiba TC956x Ethernet-AVB/TSN Controller
+> +#define BPF_F_ADJ_ROOM_DECAP_MASK	(BPF_F_ADJ_ROOM_DECAP_L3_MASK)
+>
+> +#define BPF_F_ADJ_ROOM_MASK		(BPF_F_ADJ_ROOM_FIXED_GSO | \
+> +					 BPF_F_ADJ_ROOM_ENCAP_MASK | \
+> +					 BPF_F_ADJ_ROOM_DECAP_MASK | \
+> +					 BPF_F_ADJ_ROOM_NO_CSUM_RESET)
 > +
-> +maintainers:
-> +  - Alex Elder <elder@riscstar.com>
-> +  - Daniel Thompson <daniel@riscstar.com>
-> +
-> +description: |
-> +  This node provides properties for configuring the Ethernet PCI functions
-> +  that are attached to the internal downstream port of the TC956x's PCIe
-> +  switch.
+>  static int bpf_skb_net_grow(struct sk_buff *skb, u32 off, u32 len_diff,
+>  			    u64 flags)
+>  {
 
-Describe rather the hardware directly, not the DTS or the binding
-itself.
+[ ... ]
 
-Just say what is the hardware, what is consists of, what is less
-obvious or usual (if there is such).
+> @@ -3614,8 +3619,8 @@ static int bpf_skb_net_shrink(struct sk_buff *skb, u32 off, u32 len_diff,
+>  	bool decap = flags & BPF_F_ADJ_ROOM_DECAP_L3_MASK;
+>  	int ret;
+>
+> -	if (unlikely(flags & ~(BPF_F_ADJ_ROOM_FIXED_GSO |
+> -			       BPF_F_ADJ_ROOM_DECAP_L3_MASK |
+> +	if (unlikely(flags & ~(BPF_F_ADJ_ROOM_DECAP_MASK |
+> +			       BPF_F_ADJ_ROOM_FIXED_GSO |
+>  			       BPF_F_ADJ_ROOM_NO_CSUM_RESET)))
+>  		return -EINVAL;
+>
+> @@ -3627,6 +3632,9 @@ static int bpf_skb_net_shrink(struct sk_buff *skb, u32 off, u32 len_diff,
+>  	if (decap) {
+>  		/* Match skb->protocol to new outer l3 protocol */
+>  		if (flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV6)
 
-> +
-> +  TC956x are a family of Ethernet-AVB/TSN bridge chips that combine a PCIe
-> +  switch together with a number of Ethernet controllers. These bindings
-> +  cover only the Ethernet functions of these devices.
+Martin KaFai Lau raised a concern in v5 about whether non-GSO packets
+properly handle decapsulation state clearing when bpf_skb_adjust_room()
+is used to decapsulate them. He noted this has been asked multiple
+times by AI review bots but has been ignored.
 
-What about the rest of the hardware - a PCIe switch? Shouldn't it be
-described?
+The concern is that BPF programs can call bpf_skb_adjust_room() to
+decapsulate non-GSO packets, but if skb->encapsulation remains set after
+tunnel headers are stripped, downstream network stack components could
+misinterpret the packet as still being encapsulated.
 
-> +
-> +allOf:
-> +  - $ref: /schemas/pci/pci-bus-common.yaml#
-> +  - $ref: /schemas/pci/pci-device.yaml#
-> +
-> +unevaluatedProperties: false
+Martin noted that bpf_skb_net_grow() sets encapsulation regardless of
+skb_is_gso. Looking at the v6 patch series, the code that handles
+decapsulation state still only operates inside the skb_is_gso() block.
 
-Place both (allOf+unevaluatedProperties) after "required:".
+Should the decapsulation state clearing logic handle non-GSO packets as
+well?
 
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - pci1179,0220 # Toshiba TC9564 (a.k.a. Qualcomm QPS615)
-> +
-> +  "#gpio-cells":
-> +    const: 2
-> +
-> +  gpio-controller: true
-> +
-> +  # We can't allOf reference Ethernet-controller.yaml because we end up with
+Lore reference: https://lore.kernel.org/bpf/2026427201356.-eYM.martin.lau@linux.dev/
+Reviewer: Martin KaFai Lau
+Date: Mon, 27 Apr 2026 15:19:53 -0700
 
-s/Ethernet-controller.yaml/ethernet-controller.yaml/
-
-> +  # contradictory $nodename rules (`ethernet@` versus `pci@`). Happily only a
-
-But which schema requires pci@ for devices? If I am not mistaken, only
-dtschema/schemas/pci/pci-bus-common.yaml requires it, and it does not
-apply to actual PCI device.
+[ ... ]
 
 
-> +  # small number of the properties are useful on TC956x so we can just reference
-> +  # what we need.
-> +  phy-connection-type:
-> +    $ref: ethernet-controller.yaml#/properties/phy-connection-type
-> +
-> +  phy-handle:
-> +    $ref: ethernet-controller.yaml#/properties/phy-handle
-> +
-> +  phy-mode:
-> +    $ref: ethernet-controller.yaml#/properties/phy-mode
-> +
-> +  mdio:
-> +    $ref: snps,dwmac.yaml#/properties/mdio
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +
-> +examples:
-> +  - |
-> +    pcie {
-> +      #address-cells = <3>;
-> +      #size-cells = <2>;
-> +
-> +      tc956x_emac0: pci@0,0 {
-> +        compatible = "pci1179,0220";
-> +        reg = <0x50000 0x0 0x0 0x0 0x0>;
-> +        #address-cells = <3>;
-> +        #size-cells = <2>;
-> +        device_type = "pci";
-> +        ranges;
-> +
-> +        gpio-controller;
-> +        #gpio-cells = <2>;
-> +
-> +        phy-mode = "10gbase-r";
-> +        phy-handle = <&tc956x_emac0_phy>;
-> +
-> +        mdio {
-> +          compatible = "snps,dwmac-mdio";
-> +          #address-cells = <1>;
-> +          #size-cells = <0>;
-> +
-> +          tc956x_emac0_phy: ethernet-phy@1c {
-> +            compatible = "ethernet-phy-id311c.1c12";
-> +            reg = <0x1c>;
-> +          };
-> +        };
-> +      };
+---
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
-Keep only one example, unless you have different properties (not their
-values, but their presence),
-
-
-Best regards,
-Krzysztof
-
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/25314425016
+--===============8283254778776529300==--
 
