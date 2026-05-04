@@ -1,311 +1,221 @@
-Return-Path: <netdev+bounces-283705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283706-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iD3IHAc1+GmxrQIAu9opvQ
-	(envelope-from <netdev+bounces-283705-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 07:56:23 +0200
+	id oKi4JpI1+GmxrQIAu9opvQ
+	(envelope-from <netdev+bounces-283706-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 07:58:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D30734B8B72
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 07:56:21 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D7704B8BB3
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 07:58:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8FC6B3008234
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 05:56:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C74C130038D2
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 05:58:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED2562797AC;
-	Mon,  4 May 2026 05:56:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A8E82253FC;
+	Mon,  4 May 2026 05:58:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lXCou6SR"
+	dkim=pass (2048-bit key) header.d=hitachienergy.com header.i=@hitachienergy.com header.b="FL/eEEfO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011056.outbound.protection.outlook.com [52.101.70.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 478212874E1
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 05:56:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777874161; cv=none; b=UV+XBZ3TBXMMgTOwiAc3+a6/Zh4FFJIwEO+1MiMZVjNJ8tV75PIVXMmZ9Do/IP+CY1DLmHx90PMDV3mdexqVFCr50uJN7zjjQchLI3fm+RpU1te272368I1z+nfqNGQlGHR5e+ViZguwoq/LzwrvR8VEp+upbXlmfzrMgMoEqZ4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777874161; c=relaxed/simple;
-	bh=XxUkJoC4qkniet9rm8IFPmA1zychifHtUTOvXXU+dk4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Oy9JXmsxRt2H6nPnIRHKckrR19Y4ZaqRwa4mmJpbRjR57Ec31r5gZNvLXpQjHWsskk0AUMDlkKyV6T7NASUZAsqutlThQ9rq946sS9XqV82c6PON/m59yF3oqmhf+EXP2Xd2sn6XTY0VcxPTf4fGZv+rftA7IL4ZblXSrx02ebs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lXCou6SR; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8ed2c173d3bso764915185a.2
-        for <netdev@vger.kernel.org>; Sun, 03 May 2026 22:56:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777874159; x=1778478959; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Mo2OYmTF1lOKjLCZCEGRf/gC8F2l3tZ5x0FMurlXEeg=;
-        b=lXCou6SRILfKVGnse+ybjGfJDOhEPwAOUQXfbn52/wMI/TxublSdzkOoAPrtRoyEmm
-         BnJDBUcOpVlznI6MNaQqLx4ddCUhCH4/uoeWo49E6FtT2tQ8z5iq0KmCtAzPqaIAsVwH
-         DwSFDtOuBkzUYWM1QGMmP6rH6YCeXTCssB6KjHO/VEMLKr2q26SZw7JvY1YyqU/bxatY
-         97NTGXc249EUD7dg+Z+Ffkq7hTO/4Qo5xq+v0OHYLT1xRDr1TlVLNh/LuuG866DByU6g
-         qHH87PgchD9Mj5LKFR+BuP3Nkom4A3CyN1tNNEXFOIHMDVcNbJntCnWk300LQoHUTH16
-         ZQWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777874159; x=1778478959;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Mo2OYmTF1lOKjLCZCEGRf/gC8F2l3tZ5x0FMurlXEeg=;
-        b=Far02mumQUl9hAijkobHjneRLThAmWTfuHZlfUmkDFa3/vSx1I4bKtu6rQyCWkxv4z
-         xQhiEtQuSw/obDyU8BUFj9xqgRAtxJUbMsGnHWVoxrpZszhnEtGIhmBcB2UtgcOtatZS
-         the4WSpA6EDiNy0w5d7O+8FKracu+QogmeJ4J9pIhnEEJl8HoNJYE2Jz0avCzGilLaEA
-         n0Qr8rrXxQeEq5RZQ6wP8Li+Rmuu2sN80CXJukR26uoB6dOrZkKon56KH+ty8sPcPSBD
-         KrSl+vC+5HR7Yac/t5LHmfYt3jbog3i8JNbeqIwKPjV1RbxNDkxB4LxDhNo1Lw+DoiqS
-         JaGA==
-X-Forwarded-Encrypted: i=1; AFNElJ+1tkeUQgJ4D6A0K4Z2Fx8xfutRbwQDXLafjtETojMgg2ikFNDgWRFvDuqDD18joigruQzOYAI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yym+5DQqLAVQ86popewMsdGUkSDoLsSxtBbm2OjqsWr68l3LHPN
-	Hm4FV6Oy/oWow446L3XEoA+7mLKj81IwxrX613Fpf6RSNrQoBAcwsMFxflXvCfoWs9RLovNRLB+
-	oBYrqd/Zmaj2NuQ==
-X-Received: from qknpa30.prod.google.com ([2002:a05:620a:831e:b0:8ee:421f:675d])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:c54:b0:8fb:186c:7e8a with SMTP id af79cd13be357-8fd15bd8998mr1315695385a.13.1777874158909;
- Sun, 03 May 2026 22:55:58 -0700 (PDT)
-Date: Mon,  4 May 2026 05:55:58 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8968628C009
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 05:58:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.56
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777874320; cv=fail; b=VEnxusoljVcv21sIIlKXRHYncxen6R+aPnDfDYRTl6FmQC9RdfjkmFrYiC1yYTF90DyOVh+RJCiD+qFx+O7WQLE8Pg8McIG4RTovwJQV+79A1BSS0swUVBl2yFfeNfSJVOiMnkvj4fLsn0DhkwfH05kYS+3sVOE+PGVPqjZCTH4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777874320; c=relaxed/simple;
+	bh=pO7M432LXorKJV0/hujW4Ln6D8PFn6w8rGP/QffMxsc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Pu8I3lb69MuQS18yfCIct4NiFiM2fQQSUvxeKqLSREpUpiiHtYHuNZnmCqsCMt8vC+akUcKdNpsr+bv7/flVCJ0ivu1kshNM5RFp7X+dngTdpX+EryfugvX2Zz6hGWL7sbkYO73MIUbCx6oZMJXo579uu200SaeZoc6c5pJ3Me0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hitachienergy.com; spf=pass smtp.mailfrom=hitachienergy.com; dkim=pass (2048-bit key) header.d=hitachienergy.com header.i=@hitachienergy.com header.b=FL/eEEfO; arc=fail smtp.client-ip=52.101.70.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hitachienergy.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hitachienergy.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=vO2v6XbQJHyd0r6tzCYFo/4Zh81nzyknI/5WLphX68Wipw0qRB5dkHbW1lJr9S5b/t4kbWP2dR7iTQ02FWbH6OA5n1uXq3LH2JNSgixCmlJGvU6F75W69XIBck0K6y24sST0w7/pfkD32p3kcsBP9cICGjAmrs2wpWASSYww10gu7NM9AU9pPatlBu/pdKkMeLhc0l/e/vHDCDiOp1Hol4faX/JON7BLeCRsE2bL3wewDgQQy4d1WBNbsmQN+1zSN2Kn3elIWnbESXGItVkARsQPeigi5OZjQRTtqhMiRO4pyu/pXGAHLSPmzKtx9tu7XQ1juTqsH0wsZESBF53SqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=goS/RWqTYCu+aSndrQeOOU2qMmF5HP0unuX6icaaVbQ=;
+ b=MeGEY2katqWHvHoonP7JLz5Lazi3cHNgu4OMWE88hubR6ZE9UuElpx/mLIC+JhqJGPwC+/SaBMl0EL/Ap2V6XQGU0zAzlLfa50Zpz2cI3Z7W1gov7mcwQeBySG99ZddsjKfJy9vpPA55AGTioKzGiMZ/E/HINMILFPwgqv4I8XdWRZGRW25SlsJGdUivCZ6vI77wJh/agLgr71gW/6LIYabs0x2y1Oh5ozxFq6v/R22C0SPsQ/o7mcbZhNLoqRBTn3DleOjvFYkEwwesCYZ5U/6WVrMVUAxUwyo92K4NWIP3KEUd1+OnDWxmedc4WYZNLhg/MezwlFmCzlfpI4B7Ug==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=hitachienergy.com; dmarc=pass action=none
+ header.from=hitachienergy.com; dkim=pass header.d=hitachienergy.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hitachienergy.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=goS/RWqTYCu+aSndrQeOOU2qMmF5HP0unuX6icaaVbQ=;
+ b=FL/eEEfOsY1VrgDQTwalWACxBhBwM4vq6EZYGHdTMN/CtSr14Aydogwq4x924StAIi0LvKK8OXMzsrykqtHq3PPtdnCckCQ5Mp/oWlFIs1Nvd16k7M6CuT0MX7WLIVNppPeMq82z58HophGcH7mU0V3smMAZM+9ucK0d8OpLuS5Ab0SkT/INq43mVGlXeuiLmgo9T+M/5OCOICiv2wfNGp5xtWqMoIuIzmgsCCHDkEIIMTqHnn7tE44Jdz5H4tOEnff/R3UJ84drHaU3DxvckR1K9eGEPXFGpabMTUAF85TYV1BrHw21Auk4GhZIgiLfjQCb1cFO0ayZWh+Lqwi3ag==
+Received: from AM0PR06MB10396.eurprd06.prod.outlook.com (2603:10a6:20b:6fd::9)
+ by GV2PR06MB11048.eurprd06.prod.outlook.com (2603:10a6:150:343::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Mon, 4 May
+ 2026 05:58:33 +0000
+Received: from AM0PR06MB10396.eurprd06.prod.outlook.com
+ ([fe80::f64e:6a20:6d85:183f]) by AM0PR06MB10396.eurprd06.prod.outlook.com
+ ([fe80::f64e:6a20:6d85:183f%5]) with mapi id 15.20.9870.023; Mon, 4 May 2026
+ 05:58:33 +0000
+From: Holger Brunck <holger.brunck@hitachienergy.com>
+To: Simon Horman <horms@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "chleroy@kernel.org"
+	<chleroy@kernel.org>, "qiang.zhao@nxp.com" <qiang.zhao@nxp.com>
+Subject: RE: [PATCH 1/2] net: wan: fsl_ucc_hdlc: fix uhdlc_memclean
+Thread-Topic: [PATCH 1/2] net: wan: fsl_ucc_hdlc: fix uhdlc_memclean
+Thread-Index: AQHc181CUlbpXlMAkUeEM17nC2/SEbX5HEUAgARIxcA=
+Date: Mon, 4 May 2026 05:58:33 +0000
+Message-ID:
+ <AM0PR06MB10396EA1DB3F5A3DD966704D5F7312@AM0PR06MB10396.eurprd06.prod.outlook.com>
+References: <20260429114208.941011-1-holger.brunck@hitachienergy.com>
+ <20260501122756.GB15617@horms.kernel.org>
+In-Reply-To: <20260501122756.GB15617@horms.kernel.org>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=hitachienergy.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AM0PR06MB10396:EE_|GV2PR06MB11048:EE_
+x-ms-office365-filtering-correlation-id: 612c9450-7b6b-433e-2d17-08dea9a22cca
+x-he-o365-outbound: HEO365Out
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|376014|38070700021|18002099003|22082099003|56012099003;
+x-microsoft-antispam-message-info:
+ be+eak+D5pOXe8ojbyIE57FSvdbbSTQMrap7F1CFewjYMsIbv0KGNnIQIglurGefK90Ao45T3xCv9LWCmNf6iFThDQVVDN3XaebsvpRIQCqFzCsXHlHMoVt8BNe9Yqq2DDx57c4W+2RWbYt6yhe1DgTG30Zy345Ri13/1KyRJ/HA2OZ0iYkwMVbxcYB4F1mlFY1ftX9DkaAYpWZNrNmcx66a93nsHHcbC+hmkz5lI0bP1bXmiXk39HgV+CN6XZrZdRjLRqtk02oHbdKnHMO+3KJ6wYH29nnj1oAkEKD/YV0DofSm4SOuw2e+/t67HsE0QPQGNBNtIbqAc3sZYsggXqPsw9TE8asrBZVwDD33SqS1APL0oRYjr7eMipKfN8vFHyMH21kIpbugY8zVMDJwrDmE+r8iCzB1cUTJhVa/qozHFlCv2zYoXQThjqvi5t6C777Zi5jRDOpJm1rhtMitYIdQDrMqMu4e/g4li4NYx40SmjYIxXIESF4zyJfvoeEHtDJf7FqDFVCSWzDESFgEQlmKPMnckCmdPrG+COmnf//xdz2NkhsknVNXMyClgKS4nhVw0SQdnRLrRXtJnuHsQS/P3DHEwyiUO1Nf8PadcTheb77xwGy0hxqDWsgHIlG6q4xPnmcFrtw0I0CsexaVrrJI/BwxIfD778ZKY65vnIeKwOQ6Q0EX8IEpxQLFrD8dN6Lve0LqVXM+h7rsWGBqf8SJK+LXQlXJ4OMfGm7prxSzWfPaSiV/1fX5QKGOUkDn
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR06MB10396.eurprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700021)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?ggyXwVxrY/dARRcDPxgt5KaMe+/2P58iuUe1RggaRB3z84b1zkBOOMqDBsT5?=
+ =?us-ascii?Q?Ifos8qkOu4ojfOvwZHethekE6bQnEIT05eYup4Uc4YkrPKPm+sCLVCPZTZ/5?=
+ =?us-ascii?Q?p3iUiuJ9SYkqiOcqc5s9NR2B2Sg/95x3X1hS40uw9BgGzrkZP+JJTfrk2lRN?=
+ =?us-ascii?Q?c9HtO7hvQ6BZQChjRgQAuN6Ck2DXsS/ve8VRrUoZ3UaX2yRb974oFoqurRCc?=
+ =?us-ascii?Q?XANrkk0LOgRuv18d/YsJS2mF7Q16Tso1p+CzPPDharg+DR+ZpefGYpfdw5FO?=
+ =?us-ascii?Q?dtrDkOdvK8/meW3YXys0k2zR2+hkEb0CD8pjBGnM5vmiT6xAF9W2U6Q8ZXlp?=
+ =?us-ascii?Q?1qOEOd6Y/Y5Wq3Fs3QfgJzQxry1Vcmy+cFfEEvVpxOqP9aejhmNQXL1mnhw3?=
+ =?us-ascii?Q?9z/ZAzQdg8W3AXAPtKjNafoTRDNICdGPzR3gAqXRnKGUKA4EXGBOAkAt45cl?=
+ =?us-ascii?Q?/L44gfGVf3PHymt4SGivWfkLje/4OI0qcoi/AxVrUr/fUDBLQEq95W0cSy21?=
+ =?us-ascii?Q?w75E+DqwmmcNhqIPuNbaDjG8pKQOPJRpYWJmuz8yIpnFPQaOl1qwhVD3Yq1f?=
+ =?us-ascii?Q?owprCtzT5GSw5xQyrG1nY+G0lNsDq9Uiepkw2Z88C47l0P/AqtDOvnU89+OC?=
+ =?us-ascii?Q?ad4nK24D2dxlXPIaf+wF+EgNRjIRxCUazzZ5AsH9Qglbi1jkdlqqkA6Ad2VS?=
+ =?us-ascii?Q?kZJNs1zSWwpyxn0ozL3zKZ2e+hFNGA3etX5KInJihQPChNPlVLegXumRWI3P?=
+ =?us-ascii?Q?ZBOTLFy9Rxl1H32vEciLmOAeEYkv7EnuF0/ITCesvc5yZcLEmQ1JEjFPXf+A?=
+ =?us-ascii?Q?kkUD3hWzGqttavf6hSI6o76Sv1j0zl/ZwzyMePHESnXa/8wr4PSFKAEd9nLt?=
+ =?us-ascii?Q?K9hEMS7X0d81ctYiVkqIzZ0zhvQPQcer0q852asn7ut/vAMdVH7R/F88nhLy?=
+ =?us-ascii?Q?xiNS1lAQWaCfJDXTkEJKCeLHcY4ZPHIy6IK7tDu1TQ11mA6NG6YEKDaYNdJS?=
+ =?us-ascii?Q?6qCGIAhKQ9iCQXZsytbfjElFP7Izyrnzb8P3AG42auGq5fIIgJfRXzNx7zdP?=
+ =?us-ascii?Q?t2UwyYo3X1vrM13G5K6ZACbx8RUZc8o+Jc+hgSh5A35PGrDz8Gy8DEMMPB60?=
+ =?us-ascii?Q?tk6Tvmp/UYQK4Ya2ceZJVhBWjNpYr6+xWy0KBfK3cC0yd7CXvcRnghXnkea7?=
+ =?us-ascii?Q?vJ66gGa5N9TEEDbb6CJkW8auuRXQ9ykaLkwJu2WoUnxNAOUccc/JpEPE7UFM?=
+ =?us-ascii?Q?NFDPHt9lTj3+ROceiBqYjpJDJSynGLsKYe1nQ4vnNwwQQxnaG9QiAR+HwK/9?=
+ =?us-ascii?Q?I2j64cP2mx/dErMBq9PyxP79m4e5KAhRzupparQiBGUMemOh84arIoMJwbIe?=
+ =?us-ascii?Q?jBDLpGBYKCah8rSEjkq9Gkb/ORv7rNHlz2lnbL34d6GiePwGGRs5FkVbQKe8?=
+ =?us-ascii?Q?Lw+Ie4ptzTFILNLqC75HDmPOqefUTi5shEnnDOnuF9v0NqpMgHit18n4CgYT?=
+ =?us-ascii?Q?5+n2mGpaR5aT9wvHvdJT2pE1IqEH5VMtZs/Xi7IWUUYHE6IR9jol1aFNcUlP?=
+ =?us-ascii?Q?cDvZDacnYPqHtE5fOWUyIikaLoGX1ebS4SfbZyNO/xDzvZ7G6zFv9VMFdsrb?=
+ =?us-ascii?Q?3pFyjmcDYfe2Itri49WTgZ9dPXwsUx/c7W8VYlNjLX/zatkqkntG7ijqeNyH?=
+ =?us-ascii?Q?1DcpV9WVttRLc2j0QDXNjMe2e9PhxbELAvqqVqi8ywdSAMqZfBqDICABJzmT?=
+ =?us-ascii?Q?OLCr6KRVVJelqcVrxtC86iSokF/lDrE=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260504055558.3470994-1-edumazet@google.com>
-Subject: [PATCH net] net/sched: sch_sfq: annotate data-races from sfq_dump_class_stats()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
-	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: D30734B8B72
+MIME-Version: 1.0
+X-OriginatorOrg: hitachienergy.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR06MB10396.eurprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 612c9450-7b6b-433e-2d17-08dea9a22cca
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 May 2026 05:58:33.4036
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 7831e6d9-dc6c-4cd1-9ec6-1dc2b4133195
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: VAdVORKISYmfwpVyVK8ueKG8T6m4LBArpxSvgvcE2wMDcGjQhFYxzODgcv+p7b2yrnb1qZ57h+0Pq3ZEv4iGwM3kw0bxCrpCEYT2puCH+Xg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR06MB11048
+X-Rspamd-Queue-Id: 0D7704B8BB3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[hitachienergy.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[hitachienergy.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com,google.com];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283706-lists,netdev=lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283705-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[holger.brunck@hitachienergy.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[hitachienergy.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,hitachienergy.com:dkim,hitachienergy.com:email]
 
-sfq_dump_class_stats() runs locklessly, add needed READ_ONCE()
-and WRITE_ONCE() annotations.
+>=20
+> On Wed, Apr 29, 2026 at 01:42:07PM +0200, Holger Brunck wrote:
+> > Unmapping of uf_regs is done from ucc_fast_free and doesn't need to be
+> > done explicitly. If already unmapped ucc_fast_free will crash.
+> >
+> > Signed-off-by: Holger Brunck <holger.brunck@hitachienergy.com>
+>=20
+> As a fix for code present in net, this warrants a fixes tag that cites th=
+e commit
+> that introduced this bug.
+> Perhaps this one is appropriate.
+>=20
+> Fixes: ca20e191eed0 ("net: wan: fsl_ucc_hdlc: fix ucc_hdlc_remove")
+>=20
+> Also, as a fix for net it would be best to explicitly target that branch,=
+ like this:
+>=20
+> Subject: [PATCH net 1/2] ...
+>=20
+> I don't think it's necessary to repost to just to address either of the a=
+bove.  But for
+> reference more information on the Netdev development process can be found
+> here:
+>=20
 
-Fixes: edb09eb17ed8 ("net: sched: do not acquire qdisc spinlock in qdisc/class stats dump")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/sched/sch_sfq.c | 48 +++++++++++++++++++++++----------------------
- 1 file changed, 25 insertions(+), 23 deletions(-)
+ok I will take care of this next time.
 
-diff --git a/net/sched/sch_sfq.c b/net/sched/sch_sfq.c
-index c3f3181dba5424eb9d26362a1628653bb9392e89..bf55e3d71ef4da24eaa5a73444c14d809268ef54 100644
---- a/net/sched/sch_sfq.c
-+++ b/net/sched/sch_sfq.c
-@@ -225,7 +225,8 @@ static inline void sfq_dec(struct sfq_sched_data *q, sfq_index x)
- 
- 	sfq_unlink(q, x, n, p);
- 
--	d = q->slots[x].qlen--;
-+	d = q->slots[x].qlen - 1;
-+	WRITE_ONCE(q->slots[x].qlen, d);
- 	if (n == p && q->cur_depth == d)
- 		q->cur_depth--;
- 	sfq_link(q, x);
-@@ -238,7 +239,8 @@ static inline void sfq_inc(struct sfq_sched_data *q, sfq_index x)
- 
- 	sfq_unlink(q, x, n, p);
- 
--	d = ++q->slots[x].qlen;
-+	d = q->slots[x].qlen + 1;
-+	WRITE_ONCE(q->slots[x].qlen, d);
- 	if (q->cur_depth < d)
- 		q->cur_depth = d;
- 	sfq_link(q, x);
-@@ -298,7 +300,7 @@ static unsigned int sfq_drop(struct Qdisc *sch, struct sk_buff **to_free)
- drop:
- 		skb = q->headdrop ? slot_dequeue_head(slot) : slot_dequeue_tail(slot);
- 		len = qdisc_pkt_len(skb);
--		slot->backlog -= len;
-+		WRITE_ONCE(slot->backlog, slot->backlog - len);
- 		sfq_dec(q, x);
- 		sch->q.qlen--;
- 		qdisc_qstats_backlog_dec(sch, skb);
-@@ -314,7 +316,7 @@ static unsigned int sfq_drop(struct Qdisc *sch, struct sk_buff **to_free)
- 			q->tail = NULL; /* no more active slots */
- 		else
- 			q->tail->next = slot->next;
--		q->ht[slot->hash] = SFQ_EMPTY_SLOT;
-+		WRITE_ONCE(q->ht[slot->hash], SFQ_EMPTY_SLOT);
- 		goto drop;
- 	}
- 
-@@ -364,10 +366,10 @@ sfq_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
- 		x = q->dep[0].next; /* get a free slot */
- 		if (x >= SFQ_MAX_FLOWS)
- 			return qdisc_drop_reason(skb, sch, to_free, QDISC_DROP_MAXFLOWS);
--		q->ht[hash] = x;
-+		WRITE_ONCE(q->ht[hash], x);
- 		slot = &q->slots[x];
- 		slot->hash = hash;
--		slot->backlog = 0; /* should already be 0 anyway... */
-+		WRITE_ONCE(slot->backlog, 0); /* should already be 0 anyway... */
- 		red_set_vars(&slot->vars);
- 		goto enqueue;
- 	}
-@@ -426,7 +428,7 @@ sfq_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
- 		head = slot_dequeue_head(slot);
- 		delta = qdisc_pkt_len(head) - qdisc_pkt_len(skb);
- 		sch->qstats.backlog -= delta;
--		slot->backlog -= delta;
-+		WRITE_ONCE(slot->backlog, slot->backlog - delta);
- 		qdisc_drop_reason(head, sch, to_free, QDISC_DROP_FLOW_LIMIT);
- 
- 		slot_queue_add(slot, skb);
-@@ -436,7 +438,7 @@ sfq_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
- 
- enqueue:
- 	qdisc_qstats_backlog_inc(sch, skb);
--	slot->backlog += qdisc_pkt_len(skb);
-+	WRITE_ONCE(slot->backlog, slot->backlog + qdisc_pkt_len(skb));
- 	slot_queue_add(slot, skb);
- 	sfq_inc(q, x);
- 	if (slot->qlen == 1) {		/* The flow is new */
-@@ -452,7 +454,7 @@ sfq_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
- 		 */
- 		q->tail = slot;
- 		/* We could use a bigger initial quantum for new flows */
--		slot->allot = q->quantum;
-+		WRITE_ONCE(slot->allot, q->quantum);
- 	}
- 	if (++sch->q.qlen <= q->limit)
- 		return NET_XMIT_SUCCESS;
-@@ -489,7 +491,7 @@ sfq_dequeue(struct Qdisc *sch)
- 	slot = &q->slots[a];
- 	if (slot->allot <= 0) {
- 		q->tail = slot;
--		slot->allot += q->quantum;
-+		WRITE_ONCE(slot->allot, slot->allot + q->quantum);
- 		goto next_slot;
- 	}
- 	skb = slot_dequeue_head(slot);
-@@ -497,10 +499,10 @@ sfq_dequeue(struct Qdisc *sch)
- 	qdisc_bstats_update(sch, skb);
- 	sch->q.qlen--;
- 	qdisc_qstats_backlog_dec(sch, skb);
--	slot->backlog -= qdisc_pkt_len(skb);
-+	WRITE_ONCE(slot->backlog, slot->backlog - qdisc_pkt_len(skb));
- 	/* Is the slot empty? */
- 	if (slot->qlen == 0) {
--		q->ht[slot->hash] = SFQ_EMPTY_SLOT;
-+		WRITE_ONCE(q->ht[slot->hash], SFQ_EMPTY_SLOT);
- 		next_a = slot->next;
- 		if (a == next_a) {
- 			q->tail = NULL; /* no more active slots */
-@@ -508,7 +510,7 @@ sfq_dequeue(struct Qdisc *sch)
- 		}
- 		q->tail->next = next_a;
- 	} else {
--		slot->allot -= qdisc_pkt_len(skb);
-+		WRITE_ONCE(slot->allot, slot->allot - qdisc_pkt_len(skb));
- 	}
- 	return skb;
- }
-@@ -549,9 +551,9 @@ static void sfq_rehash(struct Qdisc *sch)
- 			sfq_dec(q, i);
- 			__skb_queue_tail(&list, skb);
- 		}
--		slot->backlog = 0;
-+		WRITE_ONCE(slot->backlog, 0);
- 		red_set_vars(&slot->vars);
--		q->ht[slot->hash] = SFQ_EMPTY_SLOT;
-+		WRITE_ONCE(q->ht[slot->hash], SFQ_EMPTY_SLOT);
- 	}
- 	q->tail = NULL;
- 
-@@ -570,7 +572,7 @@ static void sfq_rehash(struct Qdisc *sch)
- 				dropped++;
- 				continue;
- 			}
--			q->ht[hash] = x;
-+			WRITE_ONCE(q->ht[hash], x);
- 			slot = &q->slots[x];
- 			slot->hash = hash;
- 		}
-@@ -581,7 +583,7 @@ static void sfq_rehash(struct Qdisc *sch)
- 			slot->vars.qavg = red_calc_qavg(q->red_parms,
- 							&slot->vars,
- 							slot->backlog);
--		slot->backlog += qdisc_pkt_len(skb);
-+		WRITE_ONCE(slot->backlog, slot->backlog + qdisc_pkt_len(skb));
- 		sfq_inc(q, x);
- 		if (slot->qlen == 1) {		/* The flow is new */
- 			if (q->tail == NULL) {	/* It is the first flow */
-@@ -591,7 +593,7 @@ static void sfq_rehash(struct Qdisc *sch)
- 				q->tail->next = x;
- 			}
- 			q->tail = slot;
--			slot->allot = q->quantum;
-+			WRITE_ONCE(slot->allot, q->quantum);
- 		}
- 	}
- 	sch->q.qlen -= dropped;
-@@ -905,16 +907,16 @@ static int sfq_dump_class_stats(struct Qdisc *sch, unsigned long cl,
- 				struct gnet_dump *d)
- {
- 	struct sfq_sched_data *q = qdisc_priv(sch);
--	sfq_index idx = q->ht[cl - 1];
-+	sfq_index idx = READ_ONCE(q->ht[cl - 1]);
- 	struct gnet_stats_queue qs = { 0 };
- 	struct tc_sfq_xstats xstats = { 0 };
- 
- 	if (idx != SFQ_EMPTY_SLOT) {
- 		const struct sfq_slot *slot = &q->slots[idx];
- 
--		xstats.allot = slot->allot;
--		qs.qlen = slot->qlen;
--		qs.backlog = slot->backlog;
-+		xstats.allot = READ_ONCE(slot->allot);
-+		qs.qlen = READ_ONCE(slot->qlen);
-+		qs.backlog = READ_ONCE(slot->backlog);
- 	}
- 	if (gnet_stats_copy_queue(d, NULL, &qs, qs.qlen) < 0)
- 		return -1;
-@@ -930,7 +932,7 @@ static void sfq_walk(struct Qdisc *sch, struct qdisc_walker *arg)
- 		return;
- 
- 	for (i = 0; i < q->divisor; i++) {
--		if (q->ht[i] == SFQ_EMPTY_SLOT) {
-+		if (READ_ONCE(q->ht[i]) == SFQ_EMPTY_SLOT) {
- 			arg->count++;
- 			continue;
- 		}
--- 
-2.54.0.545.g6539524ca2-goog
+>=20
+> The above not withstanding, this looks good to me.
+>=20
+> Reviewed-by: Simon Horman <horms@kernel.org>
+>=20
+> FTR, an AI generated review of this patch is available on sashiko.dev.
+> All the issues flagged there seem to be pre-existing and I do not believe=
+ they
+> should block progress of this patch. But you may want to look into then i=
+n the
+> context of follow-up.
+>
+
+Thanks, I will have a look at this.
+
+Best regards
+Holger
 
 
