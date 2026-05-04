@@ -1,171 +1,349 @@
-Return-Path: <netdev+bounces-283815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283816-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id BpRJE4iQ+GlswgIAu9opvQ
-	(envelope-from <netdev+bounces-283815-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 14:26:48 +0200
+	id YMKBOMWR+Gl8wgIAu9opvQ
+	(envelope-from <netdev+bounces-283816-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 14:32:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDBBA4BCDD7
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 14:26:47 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EB724BCE8D
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 14:32:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B7D2930065CC
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 12:26:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7A3153004D37
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 12:32:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 632CB3CF677;
-	Mon,  4 May 2026 12:26:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A0493C063F;
+	Mon,  4 May 2026 12:31:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b="FxZRCPzF"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="zJ0Ee1zO";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="CUnLkjH7";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="zJ0Ee1zO";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="CUnLkjH7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 005CC313550
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 12:26:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D701343D64
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 12:31:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777897604; cv=none; b=p+Si/Mhacv6PdX9dcYUZw9l92c2r5ztbOY4JviAH1pVhffYt3Ardzru2HzJlseTArvtiVuxsBTBdrlpBB4sHIaAEq/NxBoFASLPMuJDNEIhbOx23Z6u0v+/oryreqFNGHZyPqarN+4Ystpv/ufQpBW1mHQQgfsWJ3rhhxJ4xS94=
+	t=1777897919; cv=none; b=JLlLRk/zsqHH5Jm1ae7ku83K3D87Vf5VZODPZmfGHoE2SAjkvYGRqvuyCXE5kcTuSpMTkPnYu3BxAFQNNFgkuqkUZV4KXlvcL5GUBFckpc6TucuIekG3H46RDhR+coIjTQqsx/JzHnm5G9mq+CdWxj/beOr/yYmG3DVsAB4CZqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777897604; c=relaxed/simple;
-	bh=GuKduAnAifjM+KgXSrO9TSTQq1fQjT1dMuJSNnmK2KU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OtLDdSHgArITnr84YQ33WN+mQAki15PT+RGpUzuMRC7HmYSva5vLEEn64326rEzoJ1igX3H1kAALcFMIVlopNnyblgoDxOQt5CAtaoC+ZlTkNB1KNbstLemz2YhfMHCRyofRdsBImKiq9OPAe+JEJmVBYsX/CpSgjZ1IhzW26do=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=FxZRCPzF; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-488ad135063so36259285e9.0
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 05:26:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1777897599; x=1778502399; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=djsbXCX96LzcDVFKY3N8T8f6fULjj9Xl7NUY8EOdjGw=;
-        b=FxZRCPzFYRv2+F+2okSUuhTlDvhfok8708y2yAhiSK/6qikCv2BPPK2beb7Du2qKfm
-         0Qri/7wtazK0S6qU4WpOGBqsSgG0nmkcTf8piFxbopGdzFSXuNC4N/n6VCttw8MWA2t2
-         5oJ7vY9EtKgehzdQRnhHWFwoa0pEDqxgPyMTbWydWhe4d5Va587TWR6kkZQsy5zsZKv1
-         3rnmsfMf69aqP0m+4z6h9NwQ5RoOBg0++bxncSL3SmdPrkpk1zkVk1bREXtm8+jYHev1
-         Aq0MZEoJFUSB304hWU4KZsRjNIa+AWbkJr/nc1Gq0XOocorpsfYyC1No5vc4P3lQfkgb
-         Mxww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777897599; x=1778502399;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=djsbXCX96LzcDVFKY3N8T8f6fULjj9Xl7NUY8EOdjGw=;
-        b=kRmsKR+lZRZo3G3vHCLSjLXmBjWfGaUMcUfhAYLrVHvVR3bJaNT5CJelxAqqSK8djL
-         Jo6UFgP5vcflmnBU2LCgEvQoOwedlY0nk6VjOX9wR9lil3oosT6D5hM1gGIM6+xbOudc
-         1YqkTlXIqyVo5YPukxNxQ9xpeEWg68HADZr/YwKZajRKEu493jc9lgknub3Lc/GxZHBZ
-         PnbY6mxl2lfd3vlVHqiHzfF8iR68gNAp54a75j9r0ssFnJL/n8oL10ccrloJOKjdpfmz
-         IWVM5ufMDTjOYll8Z82t+LxQzr3YwXgEK8j3f8Ee+1wEjyCVpO0OMX15AMcZVYsvVQpN
-         kNtQ==
-X-Gm-Message-State: AOJu0YyhXyDe+559EGnP5bjNiV97tUHY2k5/G3AIhgzhRt7XGvhqBX7T
-	Q5WejMFB0e7B0sc9iOeoTXe9ITKUX5sQ5McrgrrqO4QqOsyhI2UoftrdzVn0pX/x72s=
-X-Gm-Gg: AeBDievb5xg9APxoYXLMB0SmNL81ONvcq4bNb3gnaC0/fWKF7pnnN3YBZapFP+lgzCC
-	f59u7KaBhaKtd/MLHCKYM5sEWfxalq8himMVVvskt9HR1t2rs1ugDVHbHBUH+oaL6XjO3M5Zpmp
-	cZ3NmElqjgxhneJCTReh6rxHwGwAJcWVjSMVXUtW1FTEivOAxEzA3k69ofrRXvFp8NzZF5suCUN
-	y9m6j1bAwve2wrtMXlv4RMu8s7foO7ZE6G2cWbX9q3SqKJv6TkcDqq8R/iSkDLyhqYMocHjWTdp
-	Xp+pRRG4FO74I3MHvC5JXm7S3uH5XVDKj7QVx3kOuF1/B8oEuddTBXFi9rlhlGsc5wtSqd8jPf2
-	XU8AXGsz7dthGvoQQ4qxEt485feomhpxVJzBhHDAkAZqCfopQQrM9SkMsWKlN3/xsaljzDli4ZR
-	lAJWDP9mlJmaVwMHlsm2SjZEvCd5gdW9U6qk/gJn83YNWE9g==
-X-Received: by 2002:a05:600c:c058:b0:487:2671:fb8f with SMTP id 5b1f17b1804b1-48a98874de2mr121990565e9.8.1777897598760;
-        Mon, 04 May 2026 05:26:38 -0700 (PDT)
-Received: from FV6GYCPJ69 ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a82307f7csm334623445e9.12.2026.05.04.05.26.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2026 05:26:38 -0700 (PDT)
-Date: Mon, 4 May 2026 14:26:34 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, "David S. Miller" <davem@davemloft.net>, 
-	Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, 
-	Michal Schmidt <mschmidt@redhat.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Pasi Vaananen <pvaanane@redhat.com>, Petr Oros <poros@redhat.com>, 
-	Prathosh Satish <Prathosh.Satish@microchip.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Simon Horman <horms@kernel.org>, 
-	Tariq Toukan <tariqt@nvidia.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/2] dpll: move
- fractional-frequency-offset-ppt under pin-parent-device
-Message-ID: <afiQTPaMyAApbLRk@FV6GYCPJ69>
-References: <20260430173611.3312596-1-ivecera@redhat.com>
- <20260430173611.3312596-2-ivecera@redhat.com>
- <afhdCnT0ns-PgZD8@FV6GYCPJ69>
- <290673a1-fb5b-4586-b44a-e109cc1a4629@redhat.com>
+	s=arc-20240116; t=1777897919; c=relaxed/simple;
+	bh=McscWhvJwj1zWE8TsujrK4pG5ZWM0ZKc3cGmYAHEVGs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GgWBdmQcnY4FIeKLVd8ESuEgtdL5c/auGm4xGQbcoZBHkjPlpciaCCQsWeCpPV3t41Yj04G247xzXqfTHunAEN87cv2vm6f7Hn0Z1PbZzs2J5K81AC3xZ6nG0bZlEFOqP1BD+Az64ROScgaYMxKc5H+Y4dJjx4NLb7cRahitmzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=zJ0Ee1zO; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=CUnLkjH7; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=zJ0Ee1zO; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=CUnLkjH7; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id CDC625C548;
+	Mon,  4 May 2026 12:31:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1777897915; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=qdNZkpYkMDIfXPNch/T3ArSLzUSxwvRLRIbxxXTB5YI=;
+	b=zJ0Ee1zOTjPLWKD24yU9LZ3q7fBHTyxqFuBzFJ5DpZed5SbbVPS2bLsnnMSVLjzUJ9ZMEY
+	MbopH8pqggtRNOvz9zYx2/g/g+aMWKmtYmZHgAgkZ4GH8hSnu0D4z2CCzr1ELrsihK+IIS
+	C36E3fo882JztlCGeROVCKU9SB4msdw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1777897915;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=qdNZkpYkMDIfXPNch/T3ArSLzUSxwvRLRIbxxXTB5YI=;
+	b=CUnLkjH7mjstQFwUGf3yk9XVh+hZ8AShxIyeFGLvXvTGFWTRcNXVKE2ktPflFKx54zREp3
+	1sQP4skVS5N089Cg==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1777897915; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=qdNZkpYkMDIfXPNch/T3ArSLzUSxwvRLRIbxxXTB5YI=;
+	b=zJ0Ee1zOTjPLWKD24yU9LZ3q7fBHTyxqFuBzFJ5DpZed5SbbVPS2bLsnnMSVLjzUJ9ZMEY
+	MbopH8pqggtRNOvz9zYx2/g/g+aMWKmtYmZHgAgkZ4GH8hSnu0D4z2CCzr1ELrsihK+IIS
+	C36E3fo882JztlCGeROVCKU9SB4msdw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1777897915;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=qdNZkpYkMDIfXPNch/T3ArSLzUSxwvRLRIbxxXTB5YI=;
+	b=CUnLkjH7mjstQFwUGf3yk9XVh+hZ8AShxIyeFGLvXvTGFWTRcNXVKE2ktPflFKx54zREp3
+	1sQP4skVS5N089Cg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 38BAD593A3;
+	Mon,  4 May 2026 12:31:55 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id fAHoCruR+GnBXQAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Mon, 04 May 2026 12:31:55 +0000
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+To: netdev@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org,
+	horms@kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	idosch@nvidia.com,
+	dsahern@kernel.org,
+	Fernando Fernandez Mancera <fmancera@suse.de>
+Subject: [PATCH 1/3 net-next v3] ipv4: centralize devconf sysctl handling
+Date: Mon,  4 May 2026 14:31:41 +0200
+Message-ID: <20260504123143.6284-1-fmancera@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <290673a1-fb5b-4586-b44a-e109cc1a4629@redhat.com>
-X-Rspamd-Queue-Id: CDBBA4BCDD7
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: -2.80
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 6EB724BCE8D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283815-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[resnulli.us];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[suse.de:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,intel.com,davemloft.net,gmail.com,google.com,kernel.org,lwn.net,nvidia.com,redhat.com,microchip.com,linuxfoundation.org,linux.dev];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283816-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,resnulli-us.20251104.gappssmtp.com:dkim]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,suse.de:email,suse.de:dkim,suse.de:mid]
 
-Mon, May 04, 2026 at 11:36:19AM +0200, ivecera@redhat.com wrote:
->Hi Jiri,
->
->On 5/4/26 10:48 AM, Jiri Pirko wrote:
->> Thu, Apr 30, 2026 at 07:36:10PM +0200, ivecera@redhat.com wrote:
->> > Move the fractional-frequency-offset-ppt attribute from the top-level
->> > pin attributes into the pin-parent-device nested attribute set. This
->> > makes it consistent with phase-offset which is already per-parent and
->> > clarifies that FFO PPT represents the frequency difference between
->> > a pin and its parent DPLL device.
->> > 
->> > The top-level fractional-frequency-offset attribute (in PPM) remains
->> > unchanged for backward compatibility.
->> 
->> That is odd. The ppt one was added just for higher precision but was
->> semantically the same. Now you change it. Could you still treat both the
->> same?
->> 
->WDYM?
->
->Keep fractional-frequency-offset-ppt at the top-level and add both
->fractional-frequency-offset and fractional-frequency-offset-ppt into
->pin-parent-device nested attribute set?
+The logic for handling IPv4 devconf sysctls is scattered. Notification
+and cache flushes are managed in devinet_conf_proc(), while a separate
+ipv4_doint_and_flush() function and DEVINET_SYSCTL_FLUSHING_ENTRY macro
+is used for properties that solely require a cache flush.
 
-Since both are the same, only different unit, it would make sense to
-treat them both the same. That prevents from user confusion, hopefully.
+This patch refactors the sysctl handling by introducing a centralized
+helper, devinet_conf_post_set(). This new function evaluates the changed
+attribute and handles all necessary operations like triggering netlink
+notifications. It returns a boolean indicating whether a routing cache
+flush is required.
 
->
->Thanks,
->Ivan
->
+Note that the boolean is necessary as this function will be re-used for
+netlink IPv4 devconf handling where the cache flushing must wait until
+all the attributes have been processed.
+
+Finally, this is introducing a small change in behavior for
+IPV4_DEVCONF_ROUTE_LOCALNET. As commit d0daebc3d622 ("ipv4: Add
+interface option to enable routing of 127.0.0.0/8") intended, the cache
+flush should only be performed when ROUTE_LOCALNET changes from 1 to 0.
+Unfortunately, this was not true because while implementing it the
+DEVINET_SYSCTL_FLUSHING_ENTRY was used for the attribute, making the
+code related to it on devinet_conf_proc() dead.
+
+IPV4_DEVCONF_FORWARDING is still being handled separately as it requires
+more operations.
+
+Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+---
+v2: no changes
+v3: no changes
+---
+ net/ipv4/devinet.c | 127 ++++++++++++++++++++++++---------------------
+ 1 file changed, 68 insertions(+), 59 deletions(-)
+
+diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
+index 58fe7cb69545..8300516fb38f 100644
+--- a/net/ipv4/devinet.c
++++ b/net/ipv4/devinet.c
+@@ -2128,6 +2128,46 @@ static int inet_validate_link_af(const struct net_device *dev,
+ 	return 0;
+ }
+ 
++static bool devinet_conf_post_set(struct net *net, struct ipv4_devconf *cnf,
++				  int attr, int new, int old, int ifindex)
++{
++	if (new == old)
++		return false;
++
++	switch (attr) {
++	case IPV4_DEVCONF_ROUTE_LOCALNET:
++	case IPV4_DEVCONF_ACCEPT_LOCAL:
++		if (new == 0)
++			return true;
++		break;
++	case IPV4_DEVCONF_NOXFRM:
++	case IPV4_DEVCONF_NOPOLICY:
++	case IPV4_DEVCONF_PROMOTE_SECONDARIES:
++	case IPV4_DEVCONF_DROP_UNICAST_IN_L2_MULTICAST:
++	case IPV4_DEVCONF_BC_FORWARDING:
++		return true;
++	case IPV4_DEVCONF_RP_FILTER:
++		inet_netconf_notify_devconf(net, RTM_NEWNETCONF,
++					    NETCONFA_RP_FILTER,
++					    ifindex, cnf);
++		break;
++	case IPV4_DEVCONF_PROXY_ARP:
++		inet_netconf_notify_devconf(net, RTM_NEWNETCONF,
++					    NETCONFA_PROXY_NEIGH,
++					    ifindex, cnf);
++		break;
++	case IPV4_DEVCONF_IGNORE_ROUTES_WITH_LINKDOWN:
++		inet_netconf_notify_devconf(net, RTM_NEWNETCONF,
++					    NETCONFA_IGNORE_ROUTES_WITH_LINKDOWN,
++					    ifindex, cnf);
++		break;
++	default:
++		break;
++	}
++
++	return false;
++}
++
+ static int inet_set_link_af(struct net_device *dev, const struct nlattr *nla,
+ 			    struct netlink_ext_ack *extack)
+ {
+@@ -2509,44 +2549,31 @@ static int devinet_conf_proc(const struct ctl_table *ctl, int write,
+ 
+ 	if (write) {
+ 		struct ipv4_devconf *cnf = ctl->extra1;
+-		struct net *net = ctl->extra2;
+ 		int i = (int *)ctl->data - cnf->data;
++		struct net *net = ctl->extra2;
+ 		int ifindex;
+ 
+-		set_bit(i, cnf->state);
+-
+-		if (cnf == net->ipv4.devconf_dflt)
+-			devinet_copy_dflt_conf(net, i);
+-		if (i == IPV4_DEVCONF_ACCEPT_LOCAL - 1 ||
+-		    i == IPV4_DEVCONF_ROUTE_LOCALNET - 1)
+-			if ((new_value == 0) && (old_value != 0))
+-				rt_cache_flush(net);
++		/* These attributes are bypassing the tracking state,
++		 * for the rest track the state and propagate the changes
++		 * to default config
++		 */
++		switch (i + 1) {
++		case IPV4_DEVCONF_NOXFRM:
++		case IPV4_DEVCONF_NOPOLICY:
++		case IPV4_DEVCONF_PROMOTE_SECONDARIES:
++		case IPV4_DEVCONF_DROP_UNICAST_IN_L2_MULTICAST:
++			break;
++		default:
++			set_bit(i, cnf->state);
++			if (cnf == net->ipv4.devconf_dflt)
++				devinet_copy_dflt_conf(net, i);
++			break;
++		}
+ 
+-		if (i == IPV4_DEVCONF_BC_FORWARDING - 1 &&
+-		    new_value != old_value)
++		ifindex = devinet_conf_ifindex(net, cnf);
++		if (devinet_conf_post_set(net, cnf, i + 1, new_value,
++					  old_value, ifindex))
+ 			rt_cache_flush(net);
+-
+-		if (i == IPV4_DEVCONF_RP_FILTER - 1 &&
+-		    new_value != old_value) {
+-			ifindex = devinet_conf_ifindex(net, cnf);
+-			inet_netconf_notify_devconf(net, RTM_NEWNETCONF,
+-						    NETCONFA_RP_FILTER,
+-						    ifindex, cnf);
+-		}
+-		if (i == IPV4_DEVCONF_PROXY_ARP - 1 &&
+-		    new_value != old_value) {
+-			ifindex = devinet_conf_ifindex(net, cnf);
+-			inet_netconf_notify_devconf(net, RTM_NEWNETCONF,
+-						    NETCONFA_PROXY_NEIGH,
+-						    ifindex, cnf);
+-		}
+-		if (i == IPV4_DEVCONF_IGNORE_ROUTES_WITH_LINKDOWN - 1 &&
+-		    new_value != old_value) {
+-			ifindex = devinet_conf_ifindex(net, cnf);
+-			inet_netconf_notify_devconf(net, RTM_NEWNETCONF,
+-						    NETCONFA_IGNORE_ROUTES_WITH_LINKDOWN,
+-						    ifindex, cnf);
+-		}
+ 	}
+ 
+ 	return ret;
+@@ -2599,20 +2626,6 @@ static int devinet_sysctl_forward(const struct ctl_table *ctl, int write,
+ 	return ret;
+ }
+ 
+-static int ipv4_doint_and_flush(const struct ctl_table *ctl, int write,
+-				void *buffer, size_t *lenp, loff_t *ppos)
+-{
+-	int *valp = ctl->data;
+-	int val = *valp;
+-	int ret = proc_dointvec(ctl, write, buffer, lenp, ppos);
+-	struct net *net = ctl->extra2;
+-
+-	if (write && *valp != val)
+-		rt_cache_flush(net);
+-
+-	return ret;
+-}
+-
+ #define DEVINET_SYSCTL_ENTRY(attr, name, mval, proc) \
+ 	{ \
+ 		.procname	= name, \
+@@ -2633,9 +2646,6 @@ static int ipv4_doint_and_flush(const struct ctl_table *ctl, int write,
+ #define DEVINET_SYSCTL_COMPLEX_ENTRY(attr, name, proc) \
+ 	DEVINET_SYSCTL_ENTRY(attr, name, 0644, proc)
+ 
+-#define DEVINET_SYSCTL_FLUSHING_ENTRY(attr, name) \
+-	DEVINET_SYSCTL_COMPLEX_ENTRY(attr, name, ipv4_doint_and_flush)
+-
+ static struct devinet_sysctl_table {
+ 	struct ctl_table_header *sysctl_header;
+ 	struct ctl_table devinet_vars[IPV4_DEVCONF_MAX];
+@@ -2678,15 +2688,14 @@ static struct devinet_sysctl_table {
+ 					"ignore_routes_with_linkdown"),
+ 		DEVINET_SYSCTL_RW_ENTRY(DROP_GRATUITOUS_ARP,
+ 					"drop_gratuitous_arp"),
+-
+-		DEVINET_SYSCTL_FLUSHING_ENTRY(NOXFRM, "disable_xfrm"),
+-		DEVINET_SYSCTL_FLUSHING_ENTRY(NOPOLICY, "disable_policy"),
+-		DEVINET_SYSCTL_FLUSHING_ENTRY(PROMOTE_SECONDARIES,
+-					      "promote_secondaries"),
+-		DEVINET_SYSCTL_FLUSHING_ENTRY(ROUTE_LOCALNET,
+-					      "route_localnet"),
+-		DEVINET_SYSCTL_FLUSHING_ENTRY(DROP_UNICAST_IN_L2_MULTICAST,
+-					      "drop_unicast_in_l2_multicast"),
++		DEVINET_SYSCTL_RW_ENTRY(NOXFRM, "disable_xfrm"),
++		DEVINET_SYSCTL_RW_ENTRY(NOPOLICY, "disable_policy"),
++		DEVINET_SYSCTL_RW_ENTRY(PROMOTE_SECONDARIES,
++					"promote_secondaries"),
++		DEVINET_SYSCTL_RW_ENTRY(ROUTE_LOCALNET,
++					"route_localnet"),
++		DEVINET_SYSCTL_RW_ENTRY(DROP_UNICAST_IN_L2_MULTICAST,
++					"drop_unicast_in_l2_multicast"),
+ 	},
+ };
+ 
+-- 
+2.53.0
+
 
