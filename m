@@ -1,204 +1,156 @@
-Return-Path: <netdev+bounces-283745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283747-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eORND7hV+GmWtAIAu9opvQ
-	(envelope-from <netdev+bounces-283745-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 10:15:52 +0200
+	id oFxbB5BZ+GlStQIAu9opvQ
+	(envelope-from <netdev+bounces-283747-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 10:32:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B043F4BA089
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 10:15:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB8784BA41E
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 10:32:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 40A73301652E
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 08:11:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 66AC53016EF6
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 08:28:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B2D2EA168;
-	Mon,  4 May 2026 08:11:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B20E83321A2;
+	Mon,  4 May 2026 08:28:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vvufxi4g"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="LDyW/NZU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838574C97
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 08:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA87A331A61;
+	Mon,  4 May 2026 08:28:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777882279; cv=none; b=fZRvHzKX7oUv7KiLLEcHZXFym6KRtNxuE/9pI5Y1rfbeapce+bIzxf1cr5WKLoHI6hMVk2kYt9vuYBda3sS4pcWjvOJ7zWz6ghiVNfVLl81lQ4lNXslUkzAhuQlLIgNgaydwCYF2Pf9EIXSt8hfbJAkK6sxGyyFqWzdY7mWZstM=
+	t=1777883293; cv=none; b=tG5obAHb7kG/n9IjxYL4IL+F3pNMcB0lrgtnUTbK2buS/xf4m0U+lcjZqLrRM29dZtokrhJNJ88mErWMH6Ul5laKqk8K9aQHhbWuPlPPsOQzJTHGRnhOuzw6AVIBBDFkYumM0dPsAC/P98PYPSh58PjZH7fK6SHH2fpP6Durw9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777882279; c=relaxed/simple;
-	bh=hBrj2lSJTLetwTP2wz6GowWY14Ggyw59DxllDhGpQHw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J9zCQSX5p2pZuJfD4eljJelbkIZJRR4ozve7pG7A1V5alHGD4WRZwksKzDG9VPGV5k+KB4Xn0/jdVlL0bT/L8ESMoUO3EYxRVpDEzicWN0GEcamSuCOiln+g0qQPKujxCqqaiNeO4CpwCMTR9O4Qpw6Wu6WoyuCPT3I1Gc7A5gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vvufxi4g; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-3652546e41aso714602a91.1
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 01:11:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777882278; x=1778487078; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=JMYtbUj01a1nUxyIuR4eIbeTRMLJqB5qPkqXXsohEzg=;
-        b=Vvufxi4g+y3iSewiybyPuqLpxrlTUp2N+mSh//ua9ozm9Ltu7k+iSLzZOUzn6geVQH
-         VDZO7aqvxvgJw5Mq0577iGaiQ4sfWaylCgn72Ab2VdsTQ0KhJAQTiiDIZWLyLOzhCJM1
-         dyGU3Mg5yudbdf8RicwHPGDiLCtLUAU4Q0H5QcW0KJuA+txKDVOTHWzpJv4QwK9WxLPj
-         /sZy5z7SbIO8RMiqXpwh3Rs8nJVhGNyw8gOU32QkCZVKx2gDupazUSBV6w8XAJfiJ/QV
-         J7+pvR6k7BTKc0UQub+8pwi5wNxMiQlz2AGZY852ZM7UZUWpIr6uI5l8dr++g9bgh6XQ
-         sCbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777882278; x=1778487078;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JMYtbUj01a1nUxyIuR4eIbeTRMLJqB5qPkqXXsohEzg=;
-        b=KejKHJc7zrkhRvGhrAwF5H347AqLyELb0Q8wo27qU6OsXkwREXTK0nhKVvg90AKuJz
-         IFl1P+ST2SvtMGhIoPXYvKnSAS34J/geuolm9XtztfXTxeBdT8dT07PvXTnq8ZGA0QDR
-         RxiEleYzmRQslemks5+0UTiab6CApSgiGfVqsx8ah6a0QVsnr5+sLOqjm96pYdY2ruOv
-         qJ8wVcn3k0TzSwD4Yt3C/rSgdtZbOXqPBa7A9a/eDI7JL+AAKJ2fJjZpEf3jCcxckTXH
-         1ifBQ9a73QQjCdR1sob/GfrTpAabnhBTiBD3MTlMnt2PfURuD4ERgSoKNC3/z3lHGQZ8
-         7r1w==
-X-Forwarded-Encrypted: i=1; AFNElJ8d9G0TNpqyc7o7IRsHm9V1MWxKyNG+oH9+ftIMXiA4CwAwSckOLb2/kQ7CcxfhDXi4+zI8uZA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+nfSHnamZBfoWDuqqnZhgiKbJ1h3qc/TeWc+XGzLQ5tWx8wjl
-	LCaeFT312x1xZFT3y6qvU9c0wGYMG9DG5eog2ehZJnuKo+glE7y5C/Nm
-X-Gm-Gg: AeBDietPHkS8sRdpelBPkpMEMyQVmqXN37ECnMz65B8mCPbp1bpDr6pzKG9ANQ8+8OM
-	vg+/7o39cD667V8yQ+epaeA4zG4B/4sJSi/IU/dtnxZ73DJMjZoFZLCdyF8Ln+bwtb9fqhJ1wxw
-	Olk0b3jkjgNR0vfPRBKcy3gCuOkFcJdPLVzvgSxMCfhmW4wtZKGvNHE4BNk/Rr5KZSmQecaHNPl
-	VZzqWiQm4ceAhhGSYAfUWahg4WO7YB6/DFeKcCmnh36tla3EYEGfCNkgPnnOjUGEq6Zi2Z0UZkv
-	xa5DlDZzxLhSMpGG+umvRXDtD+xEtUVJLxQY1qSzPTAt3iHtcmeIkSg4nlO3UEUCB0B8tSTwQnu
-	tB8rgVAkhc9UQt/I7o/LinXu7vC4qSxueX3weX4S2yJ+WdQWRVp4fm8tyStyCulMt9lXQTQ7jaa
-	cOutKbYRHs72xZOtOpPJtJ1nUL3vZYe1zxJ2X6biMXWO9rIie0OMZc6XG395ZVwV6r
-X-Received: by 2002:a17:90a:2ce2:b0:365:46aa:e62e with SMTP id 98e67ed59e1d1-36546aaec0bmr1885640a91.24.1777882277739;
-        Mon, 04 May 2026 01:11:17 -0700 (PDT)
-Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-364dd3e9a3dsm11587831a91.16.2026.05.04.01.11.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2026 01:11:17 -0700 (PDT)
-Date: Mon, 4 May 2026 17:11:13 +0900
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Eric Dumazet <edumazet@google.com>, HexRabbit <h3xrabbit@gmail.com>,
-	netdev@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Simon Horman <horms@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>,
-	linux-kernel@vger.kernel.org, imv4bel@gmail.com
-Subject: Re: [PATCH net] xfrm: esp: avoid in-place decrypt on shared skb frags
-Message-ID: <afhUocdXhimtPK5W@v4bel>
-References: <20260504073403.38854-1-h3xrabbit@gmail.com>
- <afhQjlpmt2agPcRE@secunet.com>
- <CANn89iLeX5eZuH6c=_HcADzgejYzE36HhFxmvg+2U3gqsOqHkg@mail.gmail.com>
- <afhTekPcnIak0IcI@secunet.com>
+	s=arc-20240116; t=1777883293; c=relaxed/simple;
+	bh=vpVfXkwpSYaRIefcy0a61BzjkpwY7MPWY+jgKHbMKMY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=FBi1U7oWqe8xmVuQ7eGXODLD3WHGbIdkoGBRILe+1KooPIddzAU9rfo3YIDxvmOJAZQGCIMKvPpY6zWgm4A2LQfNI1a8ihwvdDq1k3e9Xr7J7cKpvHzhJRNpfDqMsK02ibSWWP6Q+eQKNg/uC4P7cVvVtN9uouP6z71VJYdV/Qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net; spf=none smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=LDyW/NZU; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=BN4uSPdgnhHaUi6vQoU5jOpHW/0+tIz+jFTceVnzRvY=;
+	t=1777883291; x=1779092891; b=LDyW/NZUpuU5JKgYIuP4ky975STQ7+LmwAd6M1t1QRtANtb
+	g2vwZEARtCqnowsyLqpqbHgGHaKMPMTVAs0iM0IhwVy7kEr6NZOC6V4KSXzjGG9bX+wk8THO4ggcL
+	J5Iy3XyQeK3wsAzN+TDsnAvVz6gI10eHGKHURLVpJeff9sOaT6jkS4us1iR1GgaaH2s03cQ2R/47D
+	YcviQrniQ1ZQYEmvWXpU5qGFpDFIHXSNzIuPW3Z/9qwoR4KxDuSjeG2GNQJq2hJOCzcjvHQd25NVW
+	lzq/Eyc7IpDG9beHNr4JEWINQFyKzHROG5UTOiENm8OFfFMrM4TzPu8XDz5p/p8Q==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1wJoen-0000000EpQB-2exg;
+	Mon, 04 May 2026 10:28:01 +0200
+Message-ID: <316680e2dc0103774bf0cfb77f60341a85ef5b81.camel@sipsolutions.net>
+Subject: Re: nl80211: SET_WIPHY_NETNS does not check caller's CAP_NET_ADMIN 
+ over the target netns
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Xie Maoyi <maoyi.xie@ntu.edu.sg>
+Cc: "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>, 
+ "linux-kernel@vger.kernel.org"
+	 <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
+Date: Mon, 04 May 2026 10:28:00 +0200
+In-Reply-To: <TYZPR01MB6758FE8FDBB58A6CAA4DC6BBDC302@TYZPR01MB6758.apcprd01.prod.exchangelabs.com>
+References: 
+	<TYZPR01MB6758FE8FDBB58A6CAA4DC6BBDC302@TYZPR01MB6758.apcprd01.prod.exchangelabs.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <afhTekPcnIak0IcI@secunet.com>
-X-Rspamd-Queue-Id: B043F4BA089
+X-malware-bazaar: not-scanned
+X-Rspamd-Queue-Id: BB8784BA41E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283745-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[google.com,gmail.com,vger.kernel.org,linuxfoundation.org,gondor.apana.org.au,kernel.org,davemloft.net,redhat.com,nvidia.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[sipsolutions.net: no valid DMARC record];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283747-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_THREE(0.00)[4];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[sipsolutions.net:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,secunet.com:email]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sipsolutions.net:dkim,sipsolutions.net:mid]
 
-On Mon, May 04, 2026 at 10:06:18AM +0200, Steffen Klassert wrote:
-> On Mon, May 04, 2026 at 12:56:50AM -0700, Eric Dumazet wrote:
-> > On Mon, May 4, 2026 at 12:53 AM Steffen Klassert
-> > <steffen.klassert@secunet.com> wrote:
-> > >
-> > > We have antoher patch that addresses this issue in a different way,
-> > > so Cc the author of the other patch.
-> > >
-> > > On Mon, May 04, 2026 at 03:34:03PM +0800, HexRabbit wrote:
-> > > > From: Kuan-Ting Chen <h3xrabbit@gmail.com>
-> > > >
-> > > > MSG_SPLICE_PAGES can attach pages from a pipe directly to an skb. TCP
-> > > > marks such skbs with SKBFL_SHARED_FRAG after skb_splice_from_iter(),
-> > > > so later paths that may modify packet data can first make a private
-> > > > copy. The IPv4/IPv6 datagram append paths did not set this flag when
-> > > > splicing pages into UDP skbs.
-> > > >
-> > > > That leaves an ESP-in-UDP packet made from shared pipe pages looking
-> > > > like an ordinary uncloned nonlinear skb. ESP input then takes the no-COW
-> > > > fast path for uncloned skbs without a frag_list and decrypts in place
-> > > > over data that is not owned privately by the skb.
-> > > >
-> > > > Mark IPv4/IPv6 datagram splice frags with SKBFL_SHARED_FRAG, matching
-> > > > TCP. Also make ESP input fall back to skb_cow_data() when the flag is
-> > > > present, so ESP does not decrypt externally backed frags in place.
-> > > > Private nonlinear skb frags still use the existing fast path.
-> > > >
-> > > > This intentionally does not change ESP output. In esp_output_head(),
-> > > > the path that appends the ESP trailer to existing skb tailroom without
-> > > > calling skb_cow_data() is not reachable for nonlinear skbs:
-> > > > skb_tailroom() returns zero when skb->data_len is nonzero, while ESP
-> > > > tailen is positive. Thus ESP output will either use the separate
-> > > > destination-frag path or fall back to skb_cow_data().
-> > > >
-> > > > Signed-off-by: Kuan-Ting Chen <h3xrabbit@gmail.com>
-> > > > ---
-> > > >  net/ipv4/esp4.c       | 3 ++-
-> > > >  net/ipv4/ip_output.c  | 2 ++
-> > > >  net/ipv6/esp6.c       | 3 ++-
-> > > >  net/ipv6/ip6_output.c | 2 ++
-> > > >  4 files changed, 8 insertions(+), 2 deletions(-)
-> > >
-> > > This looks ok to me. From the IPsec point of view, I'm
-> > > fine with this patch, but it also touches generic
-> > > networking code. So I'd like to hear an opinion of one
-> > > of the networking maintainers before proceeding.
-> > 
-> > I have not seen a Fixes: tag.
-> 
-> Right, we need a v2 with a Fixes tag, and maybe also
-> 'Cc: stable@vger.kernel.org'
-> 
-> > Do we need to split this patch into two parts?
-> 
-> I don't think we need to spilt it, we can merge it
-> either to the net or the ipsec tree. Both should
-> be OK.
+Hi,
 
-Also, please add:
-Reported-by: Hyunwoo Kim <imv4bel@gmail.com>
+On Sun, 2026-05-03 at 06:55 +0000, Xie Maoyi wrote:
+> Hi Johannes,
+>=20
+> I think I have found two related namespace handling gaps in nl80211 on v7=
+.0 mainline. I would appreciate your view on whether they are bugs and whet=
+her they are worth fixing. The second one is much narrower than the first.
+>=20
+> Bug A: NL80211_CMD_SET_WIPHY_NETNS does not check the target netns.
 
+I guess that's more a question of convention than anything else?
 
-Best regards,
-Hyunwoo Kim
+But I guess we should follow the netdev convention:
+
+> By comparison, net/core/rtnetlink.c::rtnl_get_net_ns_capable() spells out=
+ the convention:
+>=20
+>     /* For now, the caller is required to have CAP_NET_ADMIN in
+>      * the user namespace owning the target net ns. */
+>     if (!sk_ns_capable(sk, net->user_ns, CAP_NET_ADMIN))
+>         return ERR_PTR(-EACCES);
+
+which (also?) requires access in the target netns.
+
+> Bug B: nl80211_prepare_wdev_dump() continuation does not re-check netns.
+>=20
+> The first dumpit invocation validates the wdev against the caller via __c=
+fg80211_wdev_from_attrs(..., sock_net(cb->skb->sk), ...). Subsequent invoca=
+tions look up the wiphy by global index via wiphy_idx_to_wiphy(). They do n=
+ot re-check sock_net(cb->skb->sk) against the wiphy's current netns.
+>=20
+> Other dump paths in the same file do this check on every iteration. See n=
+l80211_dump_wiphy() at line 3437 and the parallel scheduled scan dump at li=
+ne 4420.
+>=20
+> If a wiphy moves between dumpit invocations of NL80211_CMD_GET_SCAN via N=
+L80211_CMD_SET_WIPHY_NETNS, the dump silently keeps copying BSS list conten=
+ts from the wiphy's new netns into the caller's netns. On its own this race=
+ needs a separate caller to migrate the wiphy mid-dump. With bug A, the att=
+acker can arrange the race themselves.
+
+This seems ... inconsequential? After all, moving a wireless device
+between namespaces doesn't really change the physical layout of the
+machine. Perhaps that'd give someone access to the SSID of some hidden
+network but that's not really a secret anyway since it's over the air.
+
+Maybe we should fix it for clarity and convention, but I don't see it's
+really an issue?
+
+johannes
 
