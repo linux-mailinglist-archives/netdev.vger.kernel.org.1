@@ -1,212 +1,162 @@
-Return-Path: <netdev+bounces-283789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283790-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wDLHIoF2+GlavgIAu9opvQ
-	(envelope-from <netdev+bounces-283789-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 12:35:45 +0200
+	id cFreKeZ4+GmgvgIAu9opvQ
+	(envelope-from <netdev+bounces-283790-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 12:45:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D242D4BBD16
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 12:35:44 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A3C74BBEAE
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 12:45:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 76A3630166D6
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 10:31:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B7321301D95F
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 10:45:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1E473A4F47;
-	Mon,  4 May 2026 10:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 696A43A6F0C;
+	Mon,  4 May 2026 10:45:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xYxjMFmh";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YqBbdDuY";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xYxjMFmh";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YqBbdDuY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ojyvViIX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E603A3E80
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 10:31:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F18303A6B89
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 10:45:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777890673; cv=none; b=PKHIKeeDnUzd5r7ELmdXsBk94cJKFgmg8rbsyWFnsNOi0mDKXRWWJs1BREi0lfaxVtOdaDvtIZ9qGo1wP/jor0O26ht83Frs9DEXQUabM/qQlWyRcQYn2Ayidfmw+fJArgthFsLG5wAvUYQ88xy4Ly9wFGrG7DcHW7zmxq1W1FA=
+	t=1777891528; cv=none; b=Bny4aeTbmv4WC46m32WpXQGbygYpR2FfzSbZA+qbpEP2/pAH24/sU9tKfpOsDdx3/29NUsn2R9LEURj4iYwAFQUtu3LXY3ZZ3Ls1a9OPCJzOl7gbu2rFoqYJUG6Fe8wztARfIRsX4DIvHIE3JDsGRhKqv3eVPgFqTPzcxc1yJtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777890673; c=relaxed/simple;
-	bh=wJhXnbFY0+jDbtjduHzwvEhN6qvojnft62Jqr7eALSs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ODLNd/8sfJwRvVykh6ETAinjQE3Rdhwj9muLlfetwXUbluzgL6k4/bRTgPz17da8+Iv287GRPma/ltaXy7rv2IhnbgSKbaIfra6Kdi+Wqx+SiCsL+OSl04z0x+LY7f/2e/HV0kxOr3XYFKlM9Ggede4FL0BEXNve+N8QYaMa8Mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xYxjMFmh; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YqBbdDuY; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xYxjMFmh; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YqBbdDuY; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 2E5FC6AE96;
-	Mon,  4 May 2026 10:31:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1777890665; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ka224WK7K1NxjuenX+lj710v1T/IIc0xGm98n+lp5eQ=;
-	b=xYxjMFmhJkVU88eqHwBBE7zdZkZNiftCpctn3szT6mC8sFmCcZjlC0RTtHy11fYlm5mG8/
-	48TNge6OBok5STGdDKuNayeUqxLctbepeMQAn57vFz6ImJcKmpyMg4N9Ax91e/ACkplEa2
-	/G8+Xsx1Gb2nvPWVgdcM1E6POoA43TE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1777890665;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ka224WK7K1NxjuenX+lj710v1T/IIc0xGm98n+lp5eQ=;
-	b=YqBbdDuYQmXXdDFphvGgzkQ4kvU6TT04BJwDmbztlDXA08PEfnoSESp6ozq62PD/g+fZjz
-	2EFStI1bTa4sc+CQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=xYxjMFmh;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=YqBbdDuY
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1777890665; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ka224WK7K1NxjuenX+lj710v1T/IIc0xGm98n+lp5eQ=;
-	b=xYxjMFmhJkVU88eqHwBBE7zdZkZNiftCpctn3szT6mC8sFmCcZjlC0RTtHy11fYlm5mG8/
-	48TNge6OBok5STGdDKuNayeUqxLctbepeMQAn57vFz6ImJcKmpyMg4N9Ax91e/ACkplEa2
-	/G8+Xsx1Gb2nvPWVgdcM1E6POoA43TE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1777890665;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ka224WK7K1NxjuenX+lj710v1T/IIc0xGm98n+lp5eQ=;
-	b=YqBbdDuYQmXXdDFphvGgzkQ4kvU6TT04BJwDmbztlDXA08PEfnoSESp6ozq62PD/g+fZjz
-	2EFStI1bTa4sc+CQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8ED53593A3;
-	Mon,  4 May 2026 10:31:04 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 8XEJIGh1+GmwYgAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Mon, 04 May 2026 10:31:04 +0000
-Message-ID: <5f676587-fcdd-4704-9523-07a7fd98455a@suse.de>
-Date: Mon, 4 May 2026 12:30:43 +0200
+	s=arc-20240116; t=1777891528; c=relaxed/simple;
+	bh=9v4I0rrhjr02/PfB8x9dXyidG3msYuPLuRZKE3wmILQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=CiBiMMOnn3wa5sgRkGAV7uWMTlhE0eabKhhUic91nxb+pHj9ugVFg8yk5JdaD7MJh981b8/rT35Y/7RRim7mA5BjLL9gmDUY9yDLhdNdWh/NYZ+it2yywURPpcfyoOdnjA5VOTfBEdB7pZzA2vsZUM8r8Yba/JDpHRQQ1YFdbCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ojyvViIX; arc=none smtp.client-ip=209.85.221.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-4470d6d2a4fso4394081f8f.1
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 03:45:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777891524; x=1778496324; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9v4I0rrhjr02/PfB8x9dXyidG3msYuPLuRZKE3wmILQ=;
+        b=ojyvViIXfccBVR3KvSvCPXt9CocsRP0LR2fFVrxJk+TnqLHouXTKuInwVByMmT54O5
+         zf6Od+TLhHw5oJRiDYE7sBWOP0R1QqWwU3E1gd/gN/IyIsrQ509Ng1CfdiyQJFnR7Tit
+         g3tqCzQS4qwMoy8yEfg8LZnBXSUylhspzLi4b/CMuuDbpmrjY38nD3pW7GakUh0O+wWo
+         fiodNWKJ66/59IAR0cCSIR2TQywgwh+vhsGO104OqdL/gOv6/wzu7111nMpZ4Jv2Q2uJ
+         hbZzlsw8+9Zy6BHO3E3Gh9qCL6N5LuH9AC3z28dhgv/QRIQ/8fgOsU0oVX8lGx6X5hHL
+         cJuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777891524; x=1778496324;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=9v4I0rrhjr02/PfB8x9dXyidG3msYuPLuRZKE3wmILQ=;
+        b=G3F27xwzqm82RkUZiWAFIBE0eY1k3Ifr9v78BYkNo6N5yJB6fKMaPn4RL1UQGR0FQe
+         y6vL1356Uhcmk1hcoc1GBXik8fRlQnoA4MIDC1bY1qJPrYD0zbmCxxf8WdYU7aQSXoAS
+         b2KeH4+DW7yrWLAEAmLyrF3jgklUijb1NX+8dOxnOryo0QEQXU0lLGxyMWI2QZWHXw8h
+         Prrf9Kdtl2hXMyGW7HzduFjXAruNh2UAiQTM40W3cltVKZUb3WDXr5iBzPNlhNIVphGu
+         5OGyqX0TC1w8DuEvfZaTXpjNk/pdrnijOqEGNOFCGH1IbybW9Jy/V22j41Q1cRlKIjil
+         4W4g==
+X-Forwarded-Encrypted: i=1; AFNElJ9oFUdP/zWmSpB73K6O6fr1TMG6kGOvDvEWbpC1LTEmCtAjWcA0hpHnr94WqpWpJllpXBpxHjU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjzxwB8kSeScfiLSPAw1n+7YDNZUY897o6gSNuL4O/cuOyeEHN
+	4DPsfkOpIwuee9GhalZTz0xKYceHNKciZ6Kzm36gFpYwzQ8YIdawMJRQCdFfnRaP+LNiDXQhzsY
+	2iudx7g2OeqUAs3QAVQ==
+X-Received: from wmxb3-n1.prod.google.com ([2002:a05:600d:8443:10b0:485:3aa2:da59])
+ (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:3f14:b0:488:f453:b976 with SMTP id 5b1f17b1804b1-48a98675809mr164982575e9.27.1777891524379;
+ Mon, 04 May 2026 03:45:24 -0700 (PDT)
+Date: Mon, 4 May 2026 10:45:22 +0000
+In-Reply-To: <CANn89iLkG7EMgmixYtOCBEFQQiBXy+-CdvTHx+EfpXF96GXyNQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] ipv6: default IPV6_SIT to m
-To: Alyssa Ross <hi@alyssa.is>, "David S. Miller" <davem@davemloft.net>,
- David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- =?UTF-8?Q?Ricardo_B_=2E_Marli=C3=A8re?= <rbm@suse.com>,
- Krzysztof Kozlowski <krzk@kernel.org>
-References: <20260503192515.290900-2-hi@alyssa.is>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20260503192515.290900-2-hi@alyssa.is>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Spam-Level: 
-X-Rspamd-Queue-Id: D242D4BBD16
+Mime-Version: 1.0
+References: <20260504-genlmsg-return-v1-1-093f3ba970af@google.com> <CANn89iLkG7EMgmixYtOCBEFQQiBXy+-CdvTHx+EfpXF96GXyNQ@mail.gmail.com>
+Message-ID: <afh4wpShm4kKrDgi@google.com>
+Subject: Re: [PATCH] genetlink: free the skb on 'group >= family->n_mcgrps'
+From: Alice Ryhl <aliceryhl@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Matthew Maurer <mmaurer@google.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 3A3C74BBEAE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283790-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283789-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[google.com:+];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:dkim,suse.de:mid]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:email]
 
-On 5/3/26 9:25 PM, Alyssa Ross wrote:
-> This basically defaulted to m until recently, since IPV6 defaulted to
-> m.  Since IPV6 was changed to a boolean with a default of y, IPV6_SIT
-> started defaulting to built-in as well.  This results in a surprise
-> sit0 device by default for defconfig (and defconfig-derived config)
-> users at boot.  For me, this broke an (admittedly non-robust) script.
-> Preserve the behaviour of most configs by avoiding building this
-> module, that's probably overall seldom used compared to IPv6 as a
-> whole, into the kernel.
-> 
-> Fixes: 309b905deee59 ("ipv6: convert CONFIG_IPV6 to built-in only and clean up Kconfigs")
-> Signed-off-by: Alyssa Ross <hi@alyssa.is>
+On Mon, May 04, 2026 at 03:20:25AM -0700, Eric Dumazet wrote:
+> On Mon, May 4, 2026 at 2:17=E2=80=AFAM Alice Ryhl <aliceryhl@google.com> =
+wrote:
+> >
+> > These methods generally consume ownership of the provided skb, so even
+> > if an error path is encountered, the skb is freed. This is because the
+> > very first thing they do after some initial setup is to unconditionally
+> > consume the skb via consume_skb(skb). Any subsequent errors lead to the
+> > core netlink layer freeing the skb.
+> >
+> > However, there is one check that occurs before ownership is passed,
+> > which is the check for the group index. So if this error condition is
+> > encountered, then the skb is leaked. This error condition is generally
+> > considered a violation of the netlink API, so it's not expected to occu=
+r
+> > under normal circumstances. For the same reason, no callers check for
+> > this error condition, and no callers need to be adjusted. However, we
+> > should still follow the same ownership semantics of the rest of the
+> > function. Thus, free the skb in this codepath.
+> >
+> > Assisted-by: Antigravity:gemini
+> > Suggested-by: Andrew Lunn <andrew@lunn.ch>
+> > Suggested-by: Matthew Maurer <mmaurer@google.com>
+> > Link: https://lore.kernel.org/r/845b36ba-7b3a-41f2-acb2-b284f253e2ca@lu=
+nn.ch
+> > Signed-off-by: Alice Ryhl <aliceryhl@google.com>
+>=20
+> 1) This looks like a fix meant for net tree ?
+>=20
+> 2) We require a Fixes: tag for bug fixes.
+>=20
+> For more details I highly recommend reading at least the tl;dr part of:
+>=20
+> Documentation/process/maintainer-netdev.rst
 
-Hi, I am not sure about this. IPV6_SIT was already defaulting to 'y' for 
-most distributions (except for ARM). Sure, if you had CONFIG_IPV6=m then 
-CONFIG_IPV6_SIT was defaulting to 'm'.
+Sorry I forgot that the net subsystem has special rules.
 
-Hm. Maybe we can aim this for net-next tree instead of net? I just don't 
-think this is a fix but a change in behavior. FWIW, it makes sense to me 
-to have this as a module by default.
+I do not believe any callers actually excercise this codepath, but I
+will add a Fixes: tag and indicate 'net' tree for the next version in a
+few days.
 
-Let's see what do others think.
-
-Please respect the 24 hours period before reposting
-
-https://docs.kernel.org/process/maintainer-netdev.html#resending-after-review
-
-Thanks,
-Fernando.
-
-> ---
-> v2: update help text as well
-> 
->   net/ipv6/Kconfig | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/ipv6/Kconfig b/net/ipv6/Kconfig
-> index c024aa77f25ba..c3806c6ac96f9 100644
-> --- a/net/ipv6/Kconfig
-> +++ b/net/ipv6/Kconfig
-> @@ -164,7 +164,7 @@ config IPV6_SIT
->   	select INET_TUNNEL
->   	select NET_IP_TUNNEL
->   	select IPV6_NDISC_NODETYPE
-> -	default y
-> +	default m
->   	help
->   	  Tunneling means encapsulating data of one protocol type within
->   	  another protocol and sending it over a channel that understands the
-> @@ -172,7 +172,7 @@ config IPV6_SIT
->   	  into IPv4 packets. This is useful if you want to connect two IPv6
->   	  networks over an IPv4-only path.
->   
-> -	  Saying M here will produce a module called sit. If unsure, say Y.
-> +	  Saying M here will produce a module called sit. If unsure, say M.
->   
->   config IPV6_SIT_6RD
->   	bool "IPv6: IPv6 Rapid Deployment (6RD)"
-> 
-> base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
-
+Alice
 
