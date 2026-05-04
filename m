@@ -1,177 +1,336 @@
-Return-Path: <netdev+bounces-284030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284026-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id II2lAl31+Glr3gIAu9opvQ
-	(envelope-from <netdev+bounces-284030-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 21:37:01 +0200
+	id CJx6Nk/y+GnJ3QIAu9opvQ
+	(envelope-from <netdev+bounces-284026-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 21:23:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CC514C34D4
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 21:36:59 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E24D04C3318
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 21:23:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 55C12301E21F
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 19:34:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4551130106B2
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 19:23:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97EFD3E3159;
-	Mon,  4 May 2026 19:34:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF523FADEE;
+	Mon,  4 May 2026 19:23:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="LWeTmMIZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C8K66Ufl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 206A61F3BA2
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 19:34:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.171
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777923260; cv=pass; b=bZPu4EE88al8NPecXtMUCy2VraeMIxR8N2evrPRi7c81WxXD8Ey+4swxrKwimjZSInvtyfrlupHFRciKtqI/mvh2ZFFVTnBNJH1MGSPAev6ruKxBvvtBY4ix8X9vJSh8jJWqnBjAyMYfCjLv+PX74GVJ1WADBUhXOfLz4ZR5VdQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777923260; c=relaxed/simple;
-	bh=zj6ULZj67Vqj1Mse5JGlo6IoRtgXQL6j3pjArb/71BY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Poi3eslQJkFzjmBmGXS2AmXYZrOIjwuhWvEs67obfs53JKRUA+ODOGBGZAuQnDEDrRpDncKuD/0bZLfWLsjfxOAWOf5uGofnqDNz4A4TOzKBj8bHwwiPpE9t7zNbczSdy3mOACJIfofJvnX9ga7s1JVLfbz1lFRiB8J3DBj9b78=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=LWeTmMIZ; arc=pass smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-82fbf5d4dc2so3256020b3a.1
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 12:34:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777923258; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Rc6Tg6KFXfASJLQPZBrMyuJvKX8DPsm8+2F+Dcp9RglhNhhlqA0KQihu3e0mwF4BJM
-         N2JG8a1uydm0IwnvXynF7hRIKz3Fuvn6WGcGOBXbyzEZ6iNr8qN6ZpUA9Xj7iLD0RaE+
-         tLLvAgyNWxCl4rlQPUzenTN8KXF4MjaaAkkyNwUbMEe/y+rg6db8ocWIeN98N1RK0pUY
-         +hPJ+46ckEN3NHbJQIuchjDJK4Ai0gAP5BYwKWWQTLbH3ZAVS63Vd9GMF+7n1025Fqnp
-         G3NSgh73x2z6HCOgRBpG+IXadj7443Rdgp4wM45mtRg0v4Hf9es0YAB7lwkSMM53ltHp
-         nfyg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=tFgwmP0p6qo8nLGW4UxMcwNl1CxRtvNw8UOsQAVjVio=;
-        fh=U982vp40VPY3eAQz5eX5XRjZxqSW0hG2OzYjssu2lHY=;
-        b=WBBQWzgJ///jKN/rrE0XIvfihC2Wb/a6p667Zy9i5ibmCfxIUbrIWyY5RUX2HSStPG
-         bjhSoBuLmkeGjsyA3fOXirabtBQH61Smy4Bx7V29Vvq+JLojwArDSTzio9csrKxX4jMv
-         XkmFlEVSlzVHXPV+3WGJNPpflY43Ba22nLwPhopX8BTmNYsvn9d8C8A8btjyXADsq3cS
-         ICj7voYaUPj7j/ooXsmBYYHR7dm9zOwhyljcRBaUY2LDplHhAybMLnuhyxUC041QBQJf
-         NGEUd6ITkZPJnqYOq9AEn17UUkGTWSEheyb+meftWCYJITwuFO086WDyUIhl0Du1YdGv
-         AwJg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1777923258; x=1778528058; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tFgwmP0p6qo8nLGW4UxMcwNl1CxRtvNw8UOsQAVjVio=;
-        b=LWeTmMIZWB4a3dKfzzb0TD6czGre/LX4IZ8C+0ronz6HOwjkYUjMP/BAKFfcbH6LwS
-         DKfdLdP+/OhRZDTVCnYOZM+A3awIgSsuIilIKidtsuSQSeKlfbhjnjIbzz/1OwetzRGo
-         DO2eS9G/eN8kY9WO+fAZN8rER59GQ7D370cvyHwvlqJH+DNO9qe5hxbb6p10yM6e+yS2
-         oMF8I04jmuaCPQUCT3f34LMsi1ZbvFSyyhC4wddVXKQn1OW2qZ9veVdtKNZSGd+03/P3
-         deCWQUW8hIM4OUxW1Gvs2uy6ff4Yxtz1+tgmwh9PZT++HeCc+rnT2h4X0Di6ISIphwWI
-         smXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777923258; x=1778528058;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=tFgwmP0p6qo8nLGW4UxMcwNl1CxRtvNw8UOsQAVjVio=;
-        b=MmxLf0GbJE8aRIbAn2U/QHstYfyte5Ewod9W0MjbPefjdJWf+mYOYTma/4hI4+PCcb
-         g/++yIOXXNzT+i3fVfmbu41HMFQ0BJst4JgG3ohJYoxSljK8DcSFk+Rj//7W6GqPXXvr
-         JKWJrVnylzbe0Ije2SVqVFbjH1YYkBZ3E1OG9sYWecWZJ+LIYxDlYUscuCxXw66uFw5x
-         05VWRN0z7ovSWsr8zja2QaCiE7ogv0CKSnE/cZBbLzK4IMzEkMsVH9Yx/OAj5zzk6Oya
-         x5gcqJhpqW70hGJ7K4UG4ckPGJ77fr72wzc+4D/URx+9FpR6sOMuWt5HW+ScshZ5WHVu
-         KqKA==
-X-Forwarded-Encrypted: i=1; AFNElJ9/Z9zdUcUce4zaXL+2XWqidyyEFn7XAPg9aTJzCggW1znUi8CfLzR4GuT5inQbXYTSbeM/EqA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYaf4EE6PRt1si/4vhu4Cyf3uUmsLaTphiXme3vonM2ztBN2ja
-	Pr13Qh2kbdz4wDU0wmdeXdztDho30OQZepBA4ZmH0pxZe6gtAzzDG3ort5XkdBFSx8wbK6Exfva
-	7bQR5TJ2OCQFJHH5wMuLGbM9fJKctSykDC9RjQA8Y
-X-Gm-Gg: AeBDievLjWTbZ8HaTeCXaXABVjkxsgFtOgasPx1FEXzI3RzO5zB0pRpuq9Og9P0RFmP
-	F7ZGY9FmwPs2yX6T1e3hsnEPohDXY418PTgcwRCmyq2n2q72+B4G7h00M2hnvq4obzPEqCw/mp2
-	fKOkdRWqk/aXCwFL5zXTiEfGze9QL/pA4dT+1UeR6GU+8cr1f9xKVoU7jArmh4OIr46xIsh+Sr/
-	3beuv5Wi8xZVRNLRPlo7qyYqiIjm1xlgztoSXbFoeaVfKKYA8ZJZlK0FixnMeEfElfJcEV/wn8f
-	Mxahgzr08CDFJPFYbQjHjtjzAKLGSA==
-X-Received: by 2002:a05:6a00:4b10:b0:82c:247b:ffdc with SMTP id
- d2e1a72fcca58-83923e9857cmr209899b3a.29.1777923258428; Mon, 04 May 2026
- 12:34:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A36633FA5DC;
+	Mon,  4 May 2026 19:23:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777922603; cv=none; b=G1OD5HEn93eS1vf+pqtIuRGhJrbpO+cHqwKD9NiRkFGHLTttQghE2Z7ccbsuzcMOtwvV9/LxoGM74hWaj8KH+hMf4b506q3hjD47jGOoAlOkLXZcMTo46sz0BeydKETDMfIfdYUQ+MP2RlcmiBeBJROJV22Cq65AUB1flqh9Tjw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777922603; c=relaxed/simple;
+	bh=6EehDOOpmIN6njM8C8Ksja0bF905DNnueZTtvSexwhc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kwMNsKv/+l7AZqQFXkgC4Lp+ogBtIHOY5vpMhJTuhZ/12BX3UY12Og8l0c51tHOb5h9BwBgL6DtXi5O1kK/qlCLvfXBcN5ic8zVqipCwVhlpRT2M7JsFQG9O5avze7dEGMBV8XG9kAKXFwepHNeGHGDvGOXmRg6hFcC4QdBV6HQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C8K66Ufl; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777922602; x=1809458602;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=6EehDOOpmIN6njM8C8Ksja0bF905DNnueZTtvSexwhc=;
+  b=C8K66UflgURtBKPsQY7OCbFxs7Q5YurIEixfhe3jJ+LcLhja0kHlzRCC
+   pInL0yMM2t6t+sEn8FNdTfoFycD9l1CNhfku4JvLf5UWVJlNznzRsM7Q2
+   6rkN64qJx1lgn76eMJDj9iw8FWIcKOI5BHj6kWV+2I1F25aeUaiBoU3te
+   s3ZT92LKDDfOndWncsDbxEOT1mxBUa47/j/IMS4KdmRVVcPTs1ODQIYwD
+   NTeWxNkaK8QIEU8HbEIzMPU619j/X04vw1pEC4kzTcIPxvo0kDrmEHV3D
+   LMsj5gzLFKLo9NMpoq5gNHnHdXscPQ8HBZLnFbXb5r690PPtDau+eR4h8
+   Q==;
+X-CSE-ConnectionGUID: VcqMJQzMQeOI8TGSRoKOog==
+X-CSE-MsgGUID: 1raj9dz8RgqOP+nJlvlEVg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11776"; a="89482102"
+X-IronPort-AV: E=Sophos;i="6.23,216,1770624000"; 
+   d="scan'208";a="89482102"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 12:23:21 -0700
+X-CSE-ConnectionGUID: 6fohn/fARMWEjEy5uKwJbQ==
+X-CSE-MsgGUID: 0h6DVZXBTsKewiNeZrDZ/w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,216,1770624000"; 
+   d="scan'208";a="239565838"
+Received: from bnilawar-desk2.iind.intel.com ([10.190.239.41])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 12:23:13 -0700
+From: Badal Nilawar <badal.nilawar@intel.com>
+To: dri-devel@lists.freedesktop.org,
+	intel-xe@lists.freedesktop.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: badal.nilawar@intel.com,
+	rodrigo.vivi@intel.com,
+	wojciech.drewek@intel.com,
+	michael.brooks@intel.com,
+	heikki.krogerus@intel.com,
+	michael.j.ruhl@intel.com,
+	thomas.hellstrom@linux.intel.com,
+	michal.winiarski@intel.com,
+	anshuman.gupta@intel.com,
+	jacob.e.keller@intel.com,
+	maarten.lankhorst@linux.intel.com,
+	matthew.brost@intel.com,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	mika.westerberg@linux.intel.com,
+	andriy.shevchenko@linux.intel.com,
+	singaravelan.nallasellan@intel.com,
+	kelvin.gardiner@intel.com,
+	jk@codeconstruct.com.au,
+	matt@codeconstruct.com.au,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	james.ausmus@intel.com
+Subject: [RFC PATCH 0/1] Proposal for in-band firmware update over PLDM-MCTP
+Date: Tue,  5 May 2026 01:04:21 +0530
+Message-ID: <20260504193420.1232842-3-badal.nilawar@intel.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260503114515.2460477-1-edumazet@google.com> <CAM0EoMkH-7jjV3Z=74yF4ZKbPsw5JCJo1RRjnt3fEVvzgNbRSg@mail.gmail.com>
- <CANn89iKAdEGGZ_q09-3EtY_SUhjq__T9nU-jNkgDy2urYsqpkA@mail.gmail.com>
-In-Reply-To: <CANn89iKAdEGGZ_q09-3EtY_SUhjq__T9nU-jNkgDy2urYsqpkA@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 4 May 2026 15:34:07 -0400
-X-Gm-Features: AVHnY4KBIGS7IZdMRRJuW7KH9rEMuF4h9k1YE7vd9LPda8hz3pUgdmCStYUzLwo
-Message-ID: <CAM0EoMkwojA87PR3mzmGiKZfHdx9nu8RbuYAP3Kku82rQdZ+Jg@mail.gmail.com>
-Subject: Re: [PATCH net-next] net/sched: speedup tc_dump_qdisc() when
- tcm_handle is provided
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jiri Pirko <jiri@resnulli.us>, 
-	netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 5CC514C34D4
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: E24D04C3318
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284030-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-284026-lists,netdev=lfdr.de];
+	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,resnulli.us,vger.kernel.org,gmail.com];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[badal.nilawar@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mojatatu.com:email,mojatatu-com.20251104.gappssmtp.com:dkim]
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[30];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:dkim,intel.com:mid]
 
-On Mon, May 4, 2026 at 3:20=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> On Mon, May 4, 2026 at 12:13=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.co=
-m> wrote:
-> >
-> > On Sun, May 3, 2026 at 7:45=E2=80=AFAM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> > >
-> > > "tc qdisc show ... handle xxx" filtering can be done by the kernel.
-> > >
-> > > A followup patch can do the same for tcm_parent.
-> > >
-> > > iproute2/tc needs a small companion patch.
-> > >
-> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> >
-> > If you ever redo this for whatever reason, showing the dump of before
-> > and after will be good documentation.
->
-> There is no difference in tc output.
->
->  One can use strace and look at all the recvmsg() values, but they are
-> quite verbose :/
+Problem statement: 
 
-Ah, i see it now ;->
+The CRI platform includes a dedicated I2C controller for in-band access to AMC.
+AMC firmware updates leverage PLDM over MCTP, using the I2C controller as the
+physical transport, enabled by the Linux kernel's MCTP-I2C driver
+(drivers/net/mctp/mctp-i2c.c), which manages MCTP framing and delivery over the
+I2C bus.
 
-cheers,
-jamal
+CRI Inband firmware update flow
+
+        +-----------------------------------+
+        |         User Space                |
+        |	(PLDM requester/responder)  | 
+        |   PLDM client via AF_MCTP socket  |
+        +-----------------------------------+
+                          |
+        +-----------------------------------+
+        |        net/mctp core              |
+        |   (routing, EID resolution,       |
+        |    MCTP framing)                  |
+        +-----------------------------------+
+                          |
+        +-----------------------------------+
+        |           mctp-i2c.c              |
+        |   MCTP transport over i2c         |
+        +-----------------------------------+
+                          |
+        +-----------------------------------+
+        |          AMC Firmware             |
+        |	(PLDM requester/responder)  | 
+        |  MCTP Decode -> PLDM Processing   |
+        +-----------------------------------+
+
+Future GPU platforms may not include a dedicated I2C controller for MCTP
+access; however, the requirement to support PLDM over MCTP persists. To
+address this, a vendor-specific mailbox-based transport is proposed to
+carry MCTP messages between the host and the GPU/AMC.
+
+Solution:
+
+The proposed approach involves implementing an MCTP transport layer with
+binding type MCTP_PHYS_BINDING_VENDOR (0xFF) and incorporating it either
+into the drivers/net/mctp/ directory or the drivers/gpu/drm/xe subsystem.
+The latter is particularly fitting, as Xe is the exclusive consumer of
+this functionality.
+
+
+Option 1: MCTP Transport as Part of drivers/gpu/drm/xe Subsystem
+
+Under this design, the Xe KMD takes sole ownership of the MCTP mailbox
+transport layer. The implementation is introduced as a new source file,
+xe-mctp-mailbox.c, placed within the drivers/gpu/drm/xe/ driver tree.
+
+Although xe-mctp-mailbox.c resides within the Xe subsystem, it does not
+operate in isolation from the broader networking stack. It integrates
+with the standard Linux MCTP stack by registering an MCTP net device
+via mctp_register_netdev(), allowing the net/mctp core to manage
+routing, EID resolution, and MCTP framing in the usual way.
+This means Xe retains direct ownership of the mailbox MMIO interface
+(status, and data registers via BAR), while still participating as
+transport in the MCTP network subsystem.
+
+
+  +--------------------------------------------------+
+  |                  User Space                      |
+  |         (PLDM Requester / Responder)             |
+  |       PLDM Client via AF_MCTP Socket             |
+  +--------------------------------------------------+
+                         |
+                    AF_MCTP API
+                         |
+  +--------------------------------------------------+
+  |              net/mctp Core                       |
+  |    (Routing, EID Resolution, MCTP Framing)       |
+  +--------------------------------------------------+
+            |                        ^
+            | mctp_register_netdev() | netdev / mctp_dev ops
+            |   (called by Xe KMD)   |
+  +--------------------------------------------------+
+  | [NEW] drivers/gpu/drm/xe/xe-mctp-mailbox.c       |
+  |                                                  |
+  |   Owned by  : Xe KMD (drivers/gpu/drm/xe/)       |
+  |   - Registers directly as MCTP net device        |
+  |   - Implements MCTP transport over Mailbox MMIO  |
+  +--------------------------------------------------+
+                         |
+           Direct MMIO access (BAR registers)
+                         |
+  +--------------------------------------------------+
+  |         Intel Mailbox MMIO Registers             |
+  |    (Doorbell, Status, Data Registers via BAR)    |
+  +--------------------------------------------------+
+                         |
+              Hardware Mailbox Interface
+                         |
+  +--------------------------------------------------+
+  |             GPU / AMC Firmware                   |
+  |         (PLDM Requester / Responder)             |
+  |   Mailbox Handler --> MCTP Decode                |
+  |              --> PLDM Processing                 |
+  +--------------------------------------------------+
+
+Pros:
+    + Tightly coupled with Xe and doesn't polute current generic mctp
+      subsystem with vendor specific mailbox solution.
+Cons:
+    - Not a generic layer; cannot be easily reused or consumed
+      by other drivers or subsystems outside of Xe.
+
+RFC Patch: "xe/xe_mctp_mailbox: Add support for MCTP transport over mailbox"
+
+Option 2: MCTP Transport as Part of net/mctp Subsystem
+
+The MCTP mailbox driver (intel-mctp-mailbox.c) resides under
+drivers/net/mctp/ and registers itself as an Auxiliary Bus Driver on the
+Linux auxiliary bus. The Xe KMD is responsible for constructing an
+Auxiliary Bus Device which encapsulates the mailbox ops and registering
+it against the MCTP auxiliary bus driver. This binding allows the MCTP
+layer to send and receive messages through the GPU mailbox interface.
+
+  +--------------------------------------------------+
+  |                  User Space                      |
+  |         (PLDM Requester / Responder)             |
+  |       PLDM Client via AF_MCTP Socket             |
+  +--------------------------------------------------+
+                         |
+                    AF_MCTP API
+                         |
+  +--------------------------------------------------+
+  |              net/mctp Core                       |
+  |    (Routing, EID Resolution, MCTP Framing)       |
+  +--------------------------------------------------+
+                         |
+              mctp_dev ops / netdev interface
+                         |
+  +--------------------------------------------------+
+  | [NEW] drivers/net/mctp/intel-mctp-mailbox.c      |
+  |                                                  |
+  |   Registered as: Auxiliary Bus Driver            |
+  |   - Binds to Auxiliary Device exposed by Xe KMD  |
+  |   - Accesses mailbox ops shared via aux device   |
+  +--------------------------------------------------+
+       |                              |
+       | auxiliary_driver_register()  | auxiliary_device_register()
+       |                              |
+  +--------------------+   +-------------------------+
+  | Auxiliary Bus      |<->| Auxiliary Device        |
+  | Driver             |   | (created by Xe KMD)     |
+  | (intel-mctp-       |   | - Contains mailbox_ops  |
+  |  mailbox.c)        |   |                         |
+  | drivers/net/mctp/  |   |                         |
+  +--------------------+   +-------------------------+
+                         |
+              mailbox_ops (send/recv via MMIO)
+                         |
+  +--------------------------------------------------+
+  |         Intel Mailbox MMIO Registers             |
+  |    (Status, Data Registers via BAR)              |
+  +--------------------------------------------------+
+                         |
+              Hardware Mailbox Interface
+                         |
+  +--------------------------------------------------+
+  |             GPU / AMC Firmware                   |
+  |       (PLDM Requester / Responder)               |
+  |   Mailbox Handler --> MCTP Decode                |
+  |       --> PLDM Processing                        |
+  +--------------------------------------------------+
+
+
+Pros:
+    + Natively part of the MCTP stack.
+    + Consistent with existing MCTP transport implementations
+      such as mctp-i2c and mctp-i3c. Probe occurs naturally
+      when the auxiliary device is created, following standard
+      kernel device model patterns.
+Cons:
+    - Introduction of vendor specific cases along with current
+      generic mctp entries
+
+	
+Open for other ideas and suggestions.
+
+Note: This RFC is prepared with AI assistance (e.g. GitHub Copilot etc).
+
+Badal Nilawar (1):
+  xe/xe_mctp_mailbox: Add support for MCTP transport over mailbox
+
+ drivers/gpu/drm/xe/Makefile          |   1 +
+ drivers/gpu/drm/xe/xe_device.c       |   3 +
+ drivers/gpu/drm/xe/xe_device_types.h |   4 +
+ drivers/gpu/drm/xe/xe_mctp_mailbox.c | 186 +++++++++++++++++++++++++++
+ drivers/gpu/drm/xe/xe_mctp_mailbox.h |  14 ++
+ 5 files changed, 208 insertions(+)
+ create mode 100644 drivers/gpu/drm/xe/xe_mctp_mailbox.c
+ create mode 100644 drivers/gpu/drm/xe/xe_mctp_mailbox.h
+
+-- 
+2.54.0
+
 
