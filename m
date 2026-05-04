@@ -1,153 +1,160 @@
-Return-Path: <netdev+bounces-283873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283877-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cBjdK9qw+GkdzAIAu9opvQ
-	(envelope-from <netdev+bounces-283873-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:44:42 +0200
+	id WIGIJTSx+Gk6zAIAu9opvQ
+	(envelope-from <netdev+bounces-283877-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:46:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3E644BFF5E
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:44:41 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB6D24BFFB1
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:46:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 03EDC3042284
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 14:26:11 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 12DBD3052D01
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 14:27:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 817A13DFC85;
-	Mon,  4 May 2026 14:24:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3461F3DF00A;
+	Mon,  4 May 2026 14:24:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="QUiss1XC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MTxx6nna"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F503E3146;
-	Mon,  4 May 2026 14:24:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE6E03DEAED
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 14:24:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777904667; cv=none; b=PfYn43jB24/51QypPxLQ6Y8QXj7OeXAf8u6xWtsPXDy20cmf5BjeYZCvyrMAiYK8WNgN3efV58AR5dFpl7WpyzAmiveVuEFYDUkKtXRsrB5EiSwTN4d9RELgSssSO4RSc7jL+1257UpDhZYwgmN7AaydtWM+yUE4urS6XZUcaPQ=
+	t=1777904696; cv=none; b=QUoCdpf2mqvBEb9t3qeebgFpjGjnzGH1DpgrV9OWC25UZYDu525QRwRzLdbIfAVUZN3xq+CJ+fCwB+z7hl6LtnBoLpSoC3VINaaFelWiIgCkarfbdOJHWAc+hBNDrRyhiIbqlyq+u6P6gwpef1Vnvf87FLTTSmWLfzneTN5hWjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777904667; c=relaxed/simple;
-	bh=wGxs+F/+5Vrhuyz2y5uEWLeuFrAw1YPbFSMnjR0PIic=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=Xn+K1XI298eUzeckGm4QiFa1XfUAGNOCfkFSnRyX8zTIiB7KCMkOs2/iD8kBm27MDBo3Kz/TMRFxgddD2eKPEZ8e6VE3nB3XE708Gql1HH2DGJbup5Lnc4Qj5+HUd8MhIt97iaMRy5QYFSpOQIHDEmFHmGmV/F9HqbdghH0MOBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=QUiss1XC; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+	s=arc-20240116; t=1777904696; c=relaxed/simple;
+	bh=u9QAqbxxkv4Jyk8sMgNMipr0e8IzMMKRqQwmVEF/39c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XUmcXp/TtEp/OXY5oFI8eLj4PW2UTiURohRTAJkuU61qpE4i60W7hGbQLz/Ww+k55idBT8+yb1Hmy9c3D7zXWxOf7AkE/RgvcBxiULJIbGZYx5rttg6gzJ3vaki3nUmUEZSijrJGEixr8MiFpl1pK6rLyNuInr/wFJYX634lMQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MTxx6nna; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1777904666; x=1809440666;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=wGxs+F/+5Vrhuyz2y5uEWLeuFrAw1YPbFSMnjR0PIic=;
-  b=QUiss1XCzPCTqtnXWs2xppdFpiFUoTul9UorOaSKshBl+m3csLnKdRn7
-   74UrkvPWXzUZmfcMX9AOYabINhUP8kN5Qr3TdpmwXQ8eC+c7uN3H0nJzE
-   VbgmBQLKuCiDEDRbJ90rQ06X+jvfQBlPzRtrPugSudUF3t/msvFs/5h8x
-   AximT0v1U5jIkYyCd4oBGuCjznNvWFpie713pPx9HsoJcdAVRbfSQV9oY
-   x296c0HTrDJVLpJzgt+nmHQ/4hcneK05pPL757KhjRSLdIDQ/OHAn2TLN
-   5OSEbcEvjzEtyWcKhxfvTjlN/qbjWbAvnqAOQTb90u+b6EmC2v3crZml0
-   Q==;
-X-CSE-ConnectionGUID: 4MSG04KWTFi2g0cHazpwAg==
-X-CSE-MsgGUID: +y3hhGb+R46qJVvTtfL0+A==
-X-IronPort-AV: E=Sophos;i="6.23,215,1770620400"; 
-   d="scan'208";a="288370150"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 07:24:25 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
- chn-vm-ex3.mchp-main.com (10.10.87.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.37; Mon, 4 May 2026 07:24:24 -0700
-Received: from DEN-DL-M70577.microsemi.net (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Mon, 4 May 2026 07:24:20 -0700
-From: Daniel Machon <daniel.machon@microchip.com>
-Date: Mon, 4 May 2026 16:23:26 +0200
-Subject: [PATCH net-next v3 13/13] misc: lan966x-pci: dts: add fdma
- interrupt to overlay
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777904695; x=1809440695;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=u9QAqbxxkv4Jyk8sMgNMipr0e8IzMMKRqQwmVEF/39c=;
+  b=MTxx6nnauuEZuK01NPdvcga41j4/O3Tyc6nWj8SCl+UbwBv0haLEL/n2
+   NqTc6UKozm7zruplnC8uJYC2ckUoRp2I9LT0aq9aQnxNxIhgARqc0vmXw
+   Gt3MGngexx3eCUReKPztZ7MI+DZ35jtGQ9Aw0OvL3XJLCqT0g5a0mYY5/
+   I9u0X1B+g9gGB+yNsE9QHkB/qCtFBaLEmx++QjaNysB2YAT6Gb8t35lhI
+   VRfrFsJ/LmYB1ya/BCR3QvrKSjn70yP0X03VDYBz7y3Wzj8L/vlEg+KTp
+   INlb7cTlI0pjwRPRhY6FXameciswshEU72D9ewvFvRsmPJySOA0Qm7Jnz
+   g==;
+X-CSE-ConnectionGUID: RBgjHAxzQqmcUuqSwyVIhQ==
+X-CSE-MsgGUID: IB/IcDZhTGK6cu+HsmWKAA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11776"; a="78691602"
+X-IronPort-AV: E=Sophos;i="6.23,215,1770624000"; 
+   d="scan'208";a="78691602"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 07:24:55 -0700
+X-CSE-ConnectionGUID: oNwi77ReRvqctkNN1Sebzg==
+X-CSE-MsgGUID: b0dDRgZsRYmfnpDjojkztQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,215,1770624000"; 
+   d="scan'208";a="230935394"
+Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
+  by fmviesa006.fm.intel.com with ESMTP; 04 May 2026 07:24:53 -0700
+From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	aleksandr.loktionov@intel.com
+Cc: netdev@vger.kernel.org
+Subject: [PATCH iwl-next v2 0/5] ice: five small fixes and cleanups
+Date: Mon,  4 May 2026 16:24:46 +0200
+Message-ID: <20260504142451.4161845-1-aleksandr.loktionov@intel.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20260504-lan966x-pci-fdma-v3-13-a56f5740d870@microchip.com>
-References: <20260504-lan966x-pci-fdma-v3-0-a56f5740d870@microchip.com>
-In-Reply-To: <20260504-lan966x-pci-fdma-v3-0-a56f5740d870@microchip.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>, Steen Hegelund
-	<steen.hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>, "Alexei
- Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
-	"Jesper Dangaard Brouer" <hawk@kernel.org>, John Fastabend
-	<john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, Herve
- Codina <herve.codina@bootlin.com>, Arnd Bergmann <arnd@arndb.de>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Mohsin Bashir
-	<mohsin.bashr@gmail.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<bpf@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
-X-Mailer: b4 0.14.3
-X-Rspamd-Queue-Id: B3E644BFF5E
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: CB6D24BFFB1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283873-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,iogearbox.net,gmail.com,fomichev.me,bootlin.com,arndb.de,linuxfoundation.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_FROM(0.00)[bounces-283877-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel.machon@microchip.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,e0000000:email,microchip.com:email,microchip.com:dkim,microchip.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-Add the fdma interrupt (OIC interrupt 14) to the lan966x PCI device
-tree overlay, enabling FDMA-based frame injection/extraction when
-the switch is connected over PCIe.
+Three correctness fixes and two cleanups for the ice driver.
 
-Tested-by: Herve Codina <herve.codina@bootlin.com>
-Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
----
- drivers/misc/lan966x_pci.dtso | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Patch 1 corrects a kernel-doc comment in ice_ptp_hw.h that described the
+ETH56G MAC Rx offset field as unsigned when it is signed (trivial doc fix,
+no functional change).
 
-diff --git a/drivers/misc/lan966x_pci.dtso b/drivers/misc/lan966x_pci.dtso
-index 7bb726550caf..5bb12dbc0843 100644
---- a/drivers/misc/lan966x_pci.dtso
-+++ b/drivers/misc/lan966x_pci.dtso
-@@ -141,8 +141,9 @@ switch: switch@e0000000 {
- 
- 					interrupt-parent = <&oic>;
- 					interrupts = <12 IRQ_TYPE_LEVEL_HIGH>,
-+						     <14 IRQ_TYPE_LEVEL_HIGH>,
- 						     <9 IRQ_TYPE_LEVEL_HIGH>;
--					interrupt-names = "xtr", "ana";
-+					interrupt-names = "xtr", "fdma", "ana";
- 
- 					resets = <&reset 0>;
- 					reset-names = "switch";
+Patch 2 removes the PF_SB_REM_DEV_CTL sideband register write from
+ice_ptp_init_phc_e82x().  PHY access is enabled by default on E82X and
+the register write was a leftover from an earlier SWITCH_MODE workaround
+that is no longer needed.
+
+Patch 3 renames ICE_SMA2_UFL2_RX_DIS to ICE_SMA2_UFL2_RX_EN to match
+the actual active-high hardware semantics and inverts the three use sites
+in ice_dpll.c so that the logic remains correct.
+
+Patch 4 replaces the static per-type frequency tables for CGU pins with a
+single DPLL_PIN_FREQUENCY_RANGE(1, 25 MHz) entry.  The firmware defines
+an any_freq capability for configurable CGU inputs, but the old tables
+restricted users to 1 PPS or 10 MHz.  GNSS pins retain a 1 PPS-only
+entry since they are physically constrained.
+
+Patch 5 exports ice_dcb_need_recfg() and calls it in the four SW LLDP
+netlink setters instead of memcmp() on a non-packed struct, which is
+undefined behaviour due to uninitialised padding bytes.  The redundant
+memcmp in ice_pf_dcb_cfg() is removed since callers now guard it.
+
+Aleksandr Loktionov (2):
+  ice: add correct handling of SMA/u.FL states
+  ice: use element-by-element comparison for DCB config changes
+
+Arkadiusz Kubalewski (1):
+  ice: fix DPLL pin frequency range in CGU pin descriptors
+
+Karol Kolacinski (2):
+  ice: fix ETH56G Rx offset type description in kernel-doc comment
+  ice: remove unnecessary PF_SB_REM_DEV_CTL write for E82X
+
+v1 -> v2 updated mail subject with PATCH iwl-next
+
+
+ drivers/net/ethernet/intel/ice/ice_dcb_lib.c |  13 +-
+ drivers/net/ethernet/intel/ice/ice_dcb_lib.h |   2 +
+ drivers/net/ethernet/intel/ice/ice_dcb_nl.c  |  30 +++-
+ drivers/net/ethernet/intel/ice/ice_dpll.c    |   6 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c  | 141 ++++++++++---------
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h  |   8 +-
+ 6 files changed, 113 insertions(+), 87 deletions(-)
 
 -- 
-2.34.1
+2.52.0
 
 
