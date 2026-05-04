@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-284065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284066-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8NiNEm4e+Wlw5wIAu9opvQ
-	(envelope-from <netdev+bounces-284065-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 00:32:14 +0200
+	id SNnhJMYe+Wlw5wIAu9opvQ
+	(envelope-from <netdev+bounces-284066-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 00:33:42 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CDC44C4690
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 00:32:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EE0E24C46A7
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 00:33:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8BD2E3015717
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 22:31:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3EE2F3011749
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 22:33:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24B8137C930;
-	Mon,  4 May 2026 22:31:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875FC370D4A;
+	Mon,  4 May 2026 22:33:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fOfD5OXF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jAY8IMVX"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2F1359A7E;
-	Mon,  4 May 2026 22:31:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFCA93233F4;
+	Mon,  4 May 2026 22:33:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777933896; cv=fail; b=aLNDj76a3AJHNJnkZH14CzFNbfFkpHSahYLZahm1q4EFbkjSTqYczdzwVFXNz/lt9RIaZOPFuvwzi6b0QNTeK44OGg1In+rfRaJQe7fc3o3R9TZ8yWOjr97VIfxep5GeDS0Bw4YhYoPi7f3aqEGOi6wQkesn0GspoESgWEP21/E=
+	t=1777934019; cv=fail; b=fkkP9M8DbU6Qg+B30U96DkRTuN2MZLiST93wAWzfw+PlAYEZvamrhSnH2Bc6VnvraMrb/R7cx27gr5qmKxuaFCMuNO/46HTOFlrY2keqapAse12wgQi9K1p+lvrS4jVkNKxUalzxZdshliubemBNJH7oL2PZBasJusjLZ0lH1dE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777933896; c=relaxed/simple;
-	bh=VZ6jtyevJIQjnIduk3JU1VyVdh3wQ+cp7uWu5N5TM/g=;
+	s=arc-20240116; t=1777934019; c=relaxed/simple;
+	bh=sfWhgvl7UeSwvqPcYSbZCsD3QfAsGw9//ZPEsE39DWc=;
 	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=IkqdM8BAxhohnqIJAi9cXIr0DNZLbu021rTNRq39rz93kX9kEvhHK2KNd6yEhlwMkkV8Ti0crGz7EGCd3ewxkSNc818ZhDnEBdaT+EMdAp2MmYVFe0MzMLedkSXz1U2+3u/4cFxnPXc4t+u1p39KM1SEMtzLKHdU5TlUh9VFQno=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fOfD5OXF; arc=fail smtp.client-ip=192.198.163.16
+	 Content-Type:MIME-Version; b=gdrth7uzpm7CtjmakCziI99IED44K0+6lZCkea2gWyBD31avM7d8b+anCQH1d3/3CuDpbvw+O83ll9PHxgO5hH6Rc+uWmDXSx2NJ6gvcOOj+YReYA/yg00C+MEZOvMAJnxjHNsRuzz3Gd4f+xPtdviy3bFWnPD/PESCV2YA3bmE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jAY8IMVX; arc=fail smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777933894; x=1809469894;
+  t=1777934018; x=1809470018;
   h=message-id:date:subject:to:cc:references:from:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=VZ6jtyevJIQjnIduk3JU1VyVdh3wQ+cp7uWu5N5TM/g=;
-  b=fOfD5OXFQ1jVsI+bwfxvCPfNVnJdSaxThZ4phzx4FofpeBSrNjux1Ag+
-   +aLDovG4fD+t83FkPdQ5Gh9RsfSz7t4C0lDBV4x5RSQzz8wAV4JB2NNXD
-   O4WZSPcZuuvId1cZi3pnRtHXaVnJizeg666oSb/DPJAXJcXAy5mJR89t5
-   kzwGPA4LZLbIrPW2Hv4r8o6vIQ7x7XhyWRe15I/TgbElW6r2ds84DK3xR
-   vJ39tcMoZuEqChGKOIGRYfDUaP92rRYiu0e3Mk7u4fD5Np8ggO6pWlq9u
-   I2Pe+E0qm3lK4QqddbgN/urK3EomC1qpZE6Gy54k/77dwIeMh7pUkmN0c
+  bh=sfWhgvl7UeSwvqPcYSbZCsD3QfAsGw9//ZPEsE39DWc=;
+  b=jAY8IMVXsZdwBEX171yiub4G1/JAC/99a8CqQ1GZBFSPZXfczo04KNAE
+   SuHkSwSaeMDQ3GOI7Qp6FifmvxB5AFqpu3vd6MV+cDmHgMRfeEGgrKtwG
+   Oq1xYBNLdr0/ozCQZuAq7ch5SKmu0cgtKYe7+sbG9ZcSzr5Fgs2RDgLvj
+   dwRLoUdrYa9R4A3uSUoh/+xT+RYcf+tM0D8HiRq/OxSqem43k6B3pFW6B
+   GGeUBeFBUwKsbpKgw+/CvmWGoRedi3U/AZ8waN93gT2v3pbmMpdmm4gld
+   cCKh6Hd5MCpEHXx0rKglPZFA6IbrezpUwXgQ6JESvU3SOwowx1EkIfrQY
    w==;
-X-CSE-ConnectionGUID: 7b34IcLATAKIZXPbaV4HJw==
-X-CSE-MsgGUID: YV6m/D+GQ5O2wQpi/AupkA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11776"; a="66329320"
+X-CSE-ConnectionGUID: JSMbFF6jTCKlZJ/eeqwoFg==
+X-CSE-MsgGUID: GbPq6xX/TAmOIbpknJoNrA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11776"; a="66329488"
 X-IronPort-AV: E=Sophos;i="6.23,216,1770624000"; 
-   d="scan'208";a="66329320"
+   d="scan'208";a="66329488"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 15:31:33 -0700
-X-CSE-ConnectionGUID: O2uUxDqCSjq+5U3VMdy5Mw==
-X-CSE-MsgGUID: MTKKxgjaTiyq4zLv0NA8uQ==
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 15:33:37 -0700
+X-CSE-ConnectionGUID: x0GIUhyVTm6KMZtptUaHNg==
+X-CSE-MsgGUID: W1XLRnI7QwCtBaylVgTs+g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,216,1770624000"; 
-   d="scan'208";a="232498952"
+   d="scan'208";a="232499294"
 Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 15:31:33 -0700
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 15:33:37 -0700
 Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
  fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Mon, 4 May 2026 15:31:33 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ 15.2.2562.37; Mon, 4 May 2026 15:33:36 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
  FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Mon, 4 May 2026 15:31:33 -0700
-Received: from DM5PR21CU001.outbound.protection.outlook.com (52.101.62.51) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ 15.2.2562.37 via Frontend Transport; Mon, 4 May 2026 15:33:36 -0700
+Received: from CY7PR03CU001.outbound.protection.outlook.com (40.93.198.31) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Mon, 4 May 2026 15:31:32 -0700
+ 15.2.2562.37; Mon, 4 May 2026 15:33:35 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hxGv3BjARpT5MSyudurSklhjyuXd7IHr6VbhSDLIgiOeAxP/+j2c0JNnsNoaNkocyUXw+YtXOtrt53cmYp5cSUR32h65qCkmYqFN9nbl0RAuli1IwUs2N3urgfCZPEBKasRglO/kjYoIljJo9pYHYGbN5SUypNPIZqF59mqpzeJ1P8eA4Ig56WfstpHykagZuwd7qLjd4wp/b+zNnAh5yXLNouA/y1KWo5A79o9bEXRv8e2+9rr3gs904XJypFJz1GzC17ZOhmvdhmlKJaki99XkTLXPguzPsR5fV4l62iyzO7APJAQkTQRPAT2ERYSjl2yk/A3UskDcUrc++BCT/w==
+ b=CxDsFXbylaodCfcEVSpr7x6gMArj87Jo+p8IKI+0EFjdjX1v2vlV0crJKuLicKposkz2sqxU2BTeBhu+plSPzslpQUl0NU9QAXMxJrG8CGNbA+k7zkKMgPG3Es7obfbp8l94csvC3hGp9XlDMdpQo92JBhnTecOlN2UvjHYoAHJxq6ViK+xkuD64qtLGTRQrH+2P1Ac2vMLRFkNVu8QhST4048eJkXHeTyjTEyclcqtzrdVC6QgFoYV88vNjv6NsYxn8fQ3ap1/VgvS8PnOJDsnANJAnrSRYPxqI5kdksK2jLjM6yMOwHdiOQgWgxhNu84neXyYhwFnukI2lqrxahg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5wF3Zj2TgcRsc/ohyXDSIAPyiUQGydul42pPf/HxHhQ=;
- b=f4onmYGePbwGrfpEhjrE937q80ozR5GCRlaSkryixqsHe5JK3nqNS3uQbuaVV1jyTgSoqbpChPUtzxrdsmb6e6kCkYv4v8qR0xcZIpwoORuJpoNL1UM9mECDXvi0Cethgdb140pLnm+QuA34w83liH8bpX+dnAFibz8XgtUCxeVPYLiQYCS0pqh12a7aJd8xqN/iZy4hPLZKRoPFwpn+4YI2u9jQqFWJGtGBT0SXAeUkFq1yFEdS/0IlG5hDRgEL2FrIvG9uZ5YmsZN6R7W8T1WMW+BHDulxpS2jAI9kDcVdtsGe90LBHfpenQfo4cADzJmYQLOx4pme9MeITn9Rbg==
+ bh=bpHn3TrF8xSYaf7fmZBniQXiG8qjcy1AI79qdeRwyvo=;
+ b=fh+b0aKsif8FUtlBQcEa+Mrk7j/3lewhuUdXLFmflfgPOR6NVKWXGUeyK+zUTAuG3ttWEGRnts/5A/nUiC2aWIMWN7YUnJjh4gJ07s2ENnAJA+fbGcjaw9MKmVyiUIdrbNQGGBU7jHYRK7o53ecZS/luKKzndHkKa8vC8oPszwzHVbuLA9jhJDibWDk1rbts4QL1keCWjRzu8cBIpsqVWyyXcmY2rAnB7YJ+zLlgQcpqriwcegQB1BsotIhG1teg0IwfMWdxBQDJlHeXzRyFevX7IxGkHu8BPFhlYxlDDoR/abD//QRhKmcbViFFqpqq5F7hueKq2stToepltDqnKQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
@@ -89,31 +89,35 @@ Received: from SN7PR11MB7592.namprd11.prod.outlook.com (2603:10b6:806:343::16)
  by IA1PR11MB6122.namprd11.prod.outlook.com (2603:10b6:208:3ee::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Mon, 4 May
- 2026 22:31:27 +0000
+ 2026 22:33:31 +0000
 Received: from SN7PR11MB7592.namprd11.prod.outlook.com
  ([fe80::3e09:8700:df72:37b6]) by SN7PR11MB7592.namprd11.prod.outlook.com
  ([fe80::3e09:8700:df72:37b6%6]) with mapi id 15.20.9870.022; Mon, 4 May 2026
- 22:31:26 +0000
-Message-ID: <ca256097-1538-4c08-ba01-777bf646fc33@intel.com>
-Date: Mon, 4 May 2026 15:31:23 -0700
+ 22:33:29 +0000
+Message-ID: <7505d7e3-4686-457e-a79e-776c634e9edb@intel.com>
+Date: Mon, 4 May 2026 15:33:25 -0700
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v11] ice: add support for unmanaged DPLL on E830
- NIC
-To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>
-CC: <netdev@vger.kernel.org>, <anthony.l.nguyen@intel.com>,
-	<przemyslaw.kitszel@intel.com>, <linux-doc@vger.kernel.org>,
+Subject: Re: [PATCH net-next 07/15] ixgbe: E610: add ACI dynamic debug
+To: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+CC: <przemyslaw.kitszel@intel.com>, <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<aleksander.lobakin@intel.com>, <horms@kernel.org>,
+	<michal.swiatkowski@linux.intel.com>, <jedrzej.jagielski@intel.com>,
+	<aleksandr.loktionov@intel.com>, <grzegorz.nitka@intel.com>,
+	<ivecera@redhat.com>, <arkadiusz.kubalewski@intel.com>,
+	<anthony.l.nguyen@intel.com>, <stefan.wegrzyn@intel.com>,
+	<piotr.kwapulinski@intel.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <pmenzel@molgen.mpg.de>,
-	<aleksandr.loktionov@intel.com>, <horms@kernel.org>,
-	<grzegorz.nitka@intel.com>, <vgrinber@redhat.com>, <zoltan.fodor@intel.com>
-References: <20260217155808.1209194-1-arkadiusz.kubalewski@intel.com>
+	<sunithax.d.mekala@intel.com>
+References: <20260430-jk-iwl-net-next-2026-04-30-v1-7-6f27ae1cd073@intel.com>
+ <20260503020636.4114758-1-kuba@kernel.org>
 Content-Language: en-US
 From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20260217155808.1209194-1-arkadiusz.kubalewski@intel.com>
+In-Reply-To: <20260503020636.4114758-1-kuba@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0264.namprd03.prod.outlook.com
- (2603:10b6:303:b4::29) To SN7PR11MB7592.namprd11.prod.outlook.com
+X-ClientProxiedBy: MW4PR03CA0263.namprd03.prod.outlook.com
+ (2603:10b6:303:b4::28) To SN7PR11MB7592.namprd11.prod.outlook.com
  (2603:10b6:806:343::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -123,83 +127,84 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SN7PR11MB7592:EE_|IA1PR11MB6122:EE_
-X-MS-Office365-Filtering-Correlation-Id: dfead2c5-53be-49f1-b2e6-08deaa2ce11d
+X-MS-Office365-Filtering-Correlation-Id: 441c8858-b167-4fc1-0916-08deaa2d2a4d
 X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|22082099003|18002099003|56012099003;
-X-Microsoft-Antispam-Message-Info: 9alGAZbSwzCIQ07AgQxOp6KwpMqbx0r62QtXJfDyRl/LDgp70lKnfQjy6qfoS8uJXWRxVyNXQbs5dK/pyno4Oj43h98PhYQ1fPVxAGcOZQ8J4KqFdnvz7jjPzsZH1X2+AcRnuw/rcO4ydkrnAY4nrjMr85E4e2mkMF+7+zzkJC/U6p8PtwJXLbcZMB5NDh9M2wtmTo4GaDUe+4HJy76bdU1vwDr1fw8NjcK/wmKC7dTFrfNV2KtbRepxBE39tPHlAMiutwZUD4+/gB8abso3PD7SC2CVDlC6Sb2B3gy6Khn3U956/06FfbI6y4/Cbx1AZjx9UtY6Bi4mPiJq0oNwwPSYUNzWXTUyK9W6iYsiiu2soA9WAzLgmKe3n51UkxWjrZg3o3Tu8sRoGnRZUHhH0+MGJ2ZLOnuYVa0UTYNh2krV2mA09AHaRGGVIpLl2MYn4XPvWm33b8unYtHNzm0PslaGmvc6upwhR7CW2QknLy2zXZmSj51HJ+ZN6Ln/Y1/1aeS55KtFGm1UfZyMdEfop6lp8uFRILLXsePqNQstPijvutgckisecR7Vw+QvuLmPhwYEKUQUSZE9wyPjnANrKVuXI0mt6e7csAkbNsFLs5C4VNU5fOLlqEhnTFgm09haEWGdTLcalnTjgtTMdi+caQQ1du/O2uiBbT/iG5lo0dVdKpCeUpXv5kDXQk6Wcx73
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7592.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014|22082099003|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info: +JjnHPFSGIl6Sk69aKDE3bjOX9Hv3E3mcab9VI/VYRncYowxVjWLnx+mx5+Fyo92n4wEADqrDZwBiV5AGTwUsJcwhpIyOUJXnOk8YchYovUbdzGpMpw1EQSGDWoCDzCxukQMUuDnb4soYw2/7qiP0Fm/+gsAaD661CCAAtt23/NY2KjA/QPxvvNWykadE3y39qmMTUo4TXmirInP7R6pXFLjez7600c/oRiIEEzGRZL+txGuTvVyusILAMm7oyVtRPNlBT5ovH+Mbg1GyYSxFAkyGTLtdIfiseMyaqEeWBV/1DOVxXbe1ZZ+ulkjreDQAXB+AMNBsW674SfzvxA+uOhn6ysNHzaxJlCrpNq5cva4dVRXCnPSsn9K+0HXTtNO11PKX55C9p2dPa6RK8gn14h3kFIpD+AVWbSFtW4fk2RYSvQJrDlXdNf2tRq7sviPwOCTFPPStXjj+KmhqKFayLIl0YzHKSNCQmvrPptDfn2o4suXZe/R6Ybh2EcM7TaDJg6/fkihSXhsdk0TmFqLvuPpOlJ1ZOzhqzjVO9r7TLBw97+KgCFa0Q+n0zyXIBKB40UcZWADnzJYvhd/qZngsz+YRz52CDb0SI+ue9Ku6KN43ZkiHx3mXEYyW0lNVqUCXNB2vh69W5CRyw1w63IFjaG0WKWPh3V9q3E01DhXJYpRZwN872aMgvWk0MEeR9PK
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7592.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?R0dqdVlMeTg0bENxL3JRQk9yenhzVzFqMisvdmR0dUZoSkdsZ0VtcFBEZkRw?=
- =?utf-8?B?THFDUW0xcXFLUGRXeEFtdjNpbjhubGcxWDVSbkNZWEpSeUx5bWN5SjdHUlJI?=
- =?utf-8?B?QjdvZ01MSWJLTzl0anAwa0k1ZytEc3VDTXEyTGpHeEJETTc3a0V4cmNQVFYz?=
- =?utf-8?B?NUw1bHQxa0dRaVJOM3N3N3U4eUZFVUs1bldzQ2JTUHJpTzB2KzFtVEpSd21p?=
- =?utf-8?B?am9seXlyL2dJMUpUQk53cWxGKzM0aTRzeElSSk1zcjdEbGZJTFNHUUUxcXND?=
- =?utf-8?B?bWlzOE9EZFVWeVlyNUo2VkFySWpDSGxkaFVqNFZOakV6NldHVVpNbEpQZ2JG?=
- =?utf-8?B?ZjF0TzBGSFBRbVlXZDZxNlcvQlZ0NHo5ZGtrTm83L0pyMFQyVGo1NXdydisw?=
- =?utf-8?B?eXQyOCtJdDA5Z2JZYnZiSjZmaVJRQnBwT0sxUjNGdjBUaUdEVGRXVy9JYnY5?=
- =?utf-8?B?c2R0dEJyMjVCc3lIT3d4ZXpsZ3RobkVRbllqNnZzMXR4dkV0akN2dnNWTC9O?=
- =?utf-8?B?b2J6VWhMTDJsZm5jLzlWc1g3WGUyaHlQWWZxQ0JZbFRzdjk0M08zejQyUjd0?=
- =?utf-8?B?NGFZZGtoYlBubDZMdWp1WGlGWE8xUmxTb2NPcW1nTXc5L0lpanJtQzJhcnZW?=
- =?utf-8?B?cXczSlliTGNid2VnM29WSXU4Yk04ZFNydGRtc0kvT1EwMHJnQ1ZyS2tzb2J6?=
- =?utf-8?B?ZloyVU5iblRtMHBsOWFXNUZ5cUM4NkE3VjRXTjB3aVhZdE1VaTdicVErQVBB?=
- =?utf-8?B?WFRHQThoNjY4VGpqZVRFbE9RL1NkUGo0ZDVKNkZucnJnam5iQ2hFM3NwcE5i?=
- =?utf-8?B?c3dzWnF3WUFyUDB3N2o2UWVLSzRTbHQrS0xkRE51QXllNS9xN3Z6Q3hxVnZB?=
- =?utf-8?B?WjBubDR3YVlqY3hGN1pnNzJKWjRnRktIZFYvUmV5S3RENGVxdzh5Rlh6NEMy?=
- =?utf-8?B?KzdZTWJpQjVSTkJ1TC9TTVdmRmxDN1VpZGxCRHVFL3l3bFprMTBTQllRWXBL?=
- =?utf-8?B?c054aDdIUDNZSFgwOHVTZHVPMjVQUDZMaDFpV2lxa2Y5S0UyZXNLb3Z3NVBt?=
- =?utf-8?B?SXFDVXc2VTVtbVRzYml2aW5haFRYOTFxdGw5MVJCVHl2Y2swUjVFN2FLTlpZ?=
- =?utf-8?B?Ri83bDNZSkpGVis4VStOUzJxZ2t4SEowRHhuV1BPSnhZVVZzSUtYa3FLdHVK?=
- =?utf-8?B?WndwMG5WMnozSmRmQnhud1h4ZTBrMEozSldpZVdtV1RXUnQvQjNQRHF0aUpK?=
- =?utf-8?B?bHBjb0Z3OFJNdGg4Rk9lR25EYmxLZ3g5U2VBUS91ZXczMFNnK3N3S28vajk1?=
- =?utf-8?B?N1NpZzEreUFmcFBBOEpEL3Z3RHlEZGRWZnJ5ZWI0R1NaZ1h4UVIwTHBwejFW?=
- =?utf-8?B?WjIwc25MdHowTVJJRjRZTTVTVFMyaXdYRGZUS0tJNC9lNHU1OVFCT1VBbisr?=
- =?utf-8?B?cy9KZzM3MmxCZ1luL1EwM0tvaXpPbG5wbnZtdmhDNGhzQ0ZNVnVhdDl1SDly?=
- =?utf-8?B?NEhMWUxTdGpDSldNRy9aS1N2aHd1UE9oN0k4MXF2YXJCcHQvRStTWkFNSVNo?=
- =?utf-8?B?ajg0Z2tVY3Z4aHVBUGlJOUo2dUF4Z0dQTDBoOHBsRmpsTk1kR1dleUJKWUl3?=
- =?utf-8?B?YWlBdWh2L0FtZWdoaDZiZU1LTzFJVW1PNkVmTWVOMCttMjl6cUc2S1dTa0I5?=
- =?utf-8?B?YUFiVENjSnZKU2JvOWdKeG1GWmU5dXlTMnNSRllrVDdxTENjTDQycHZ2djFo?=
- =?utf-8?B?OG5pRDE4TlZmeHdIaDJOS2Q2SVZCOURnN203TEc3UjY1Qlg4WkFHVUtQTElw?=
- =?utf-8?B?SUdVdVNVeElBUTVIa1hZYUFvd0dqTzFMa05XS2JsYStyU1VrdE02cjh4SENY?=
- =?utf-8?B?RVVHOEJndmFTSHRqTThzM0d4cVducHZmQWplTCs5aUxON2ZpQThtQnR5cnc3?=
- =?utf-8?B?UmJjNnB0UHFIdEJGSk4vWGdpSTdkQXRNMkVsT2ZWbVdwUzMvWmFBdy9vbmRT?=
- =?utf-8?B?Z202cnVocUlTYjVObVduVGR2Y2JNU1dvR2lsS0lKRTNTMUVTc2ZaL1hsOWdx?=
- =?utf-8?B?bDhuRmluRXhrd0xsaFd1UFdxK2N3ZExkZUZLdTU2UlhJZ1lOM1p4Y3N6cFZK?=
- =?utf-8?B?UXc0V3VsSmtFNTNiU2JEbWh3SElhc2NqM09nRFA5V1BuN09McHJzai9JOG13?=
- =?utf-8?B?a3JTUHQvZVdhbzRKVUlCMW5VWFNvNzB4QUw1anU0ZWRQb2ljdjZjcHFCcnoy?=
- =?utf-8?B?Wnp3RnYwRUYzSXRlWEFOVDdubC9FNElUVHVWUHg4eUJLWUVXbUVwWXovbTN3?=
- =?utf-8?B?WFRRYUFTdStndEhNdW9nU2NsNnFhMmYxcks3ZmZYYnd3QXVobVpHdz09?=
-X-Exchange-RoutingPolicyChecked: LoKFGufrGWFtTATMOm9yZkMJ9a5EA3J0hfeLVMmv+69fX2d8w8odUgLMVyaO1JtXCJLVnw7cP+HFrjKdbqgMJ1sSv1Pmbq17JRqSa9Pi35rigiypPTtxgP1rTXjhgOcW1XuuKdHsN3QAQS4Xmqt+PLmQx0zxQ5hm7l0bvAfZeYGmMHMjQl3qaTixnWaFJjKTw1Frk42egx2j/TFfB7QTYW6A0cpdW6BxkCNWpqo8NQvXlfT0PESxYw01hMJ/BHN4j9jakXiuxItJAvHM+ZhUKy+v4Y/5J4cXQJguVoVVnvYxKSmXKDDN77nmYupjctZZ4uC4Oy988GA3YXcOd+GzQA==
-X-MS-Exchange-CrossTenant-Network-Message-Id: dfead2c5-53be-49f1-b2e6-08deaa2ce11d
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Sk9WZUhqUXp6OWcvRU4rWEFJcmJGRVJQcGlRWnIyRnFTeGRoRDFzRnBiL1ZJ?=
+ =?utf-8?B?UnFndDhWTjJrbFJ5c2daS1BWNWZEUlBPOWtjSjBZMStYY3JRM3Nld0kyNmk3?=
+ =?utf-8?B?RFFuamtqd3pWSWhPblgzTkNZWkZNbGQrenZLOWRRdGtEQ0MrVDNTYVIrZzBU?=
+ =?utf-8?B?Q3EraitSZFE1V1UxUURsK241dXBYVGdJeFhzU2lXTXJlSXpKL09CZjBUaXhS?=
+ =?utf-8?B?Nk5DRm5HMlZKQmlydm0rcExuK1FYeW4yY1hPKy90T2pYMTFoMmJjUzdhZ2o0?=
+ =?utf-8?B?ZnFBNmFFVWNNRlI3MXR0V1FjUk04MGN0QUlFWjd6aWg5UUQyaExLMXA0Zldk?=
+ =?utf-8?B?dnNEc3NHUVYyekJWb2laR2FFYzVLSjlHKzhKZ2dOL1FDcSszZXdVbjVDeGtM?=
+ =?utf-8?B?aU10S3ZTMlhmcVBzYlZ1R3Z5aXpoeXZXRGU0bHp2MUJkV2tQNk5YOWhrVW5U?=
+ =?utf-8?B?aUVNb1F2eEJQRG5uL1RwcE9QVzc3ckN2RVd0bXg5MEdHTk9EZHJtQmdSVWo2?=
+ =?utf-8?B?QXNFbEJSZlFQZUVWUitZTFVNN3JUaDlBZGNFWmxpb3RKcEJmVWRCUEowY2Jz?=
+ =?utf-8?B?bGx4V0hESWtRdm1RZFZLSVczTFVCNW9wN0F1L2xudnJCQTNKN2NwTVdYdnlq?=
+ =?utf-8?B?WW1nZktkTnMybFlBUm5oUFdRT0sxd0tqV0k3R3NqaU9qYm8wMzBVTHZPM2xG?=
+ =?utf-8?B?dVd3d2YzWHp3ZnlkT0NyWkFhTzhOdE1MTlpqTUM5L0tCR25jeWZFNmI1cUor?=
+ =?utf-8?B?NlkwT1VpcHo5dS9aRjZTU0daeGh4b3ZDMVBmWTFsMjVnVzBKMjF3dGNxQjMr?=
+ =?utf-8?B?SWlwYkoxcU9IOXR4VEh1TGxmK09SMmlMc1pYdW1IekE3cnN4SXMxdXB4cEhL?=
+ =?utf-8?B?Vjd6cTZIUm53MUZWVWVZbnlxRjA0OW04SEw0eGlCbkVybnMxcDkyTm8vY3Zu?=
+ =?utf-8?B?eUZmVU9iS3VxYVk1UUo5UHppenRNUVNrSkV2bDVzTjdQQldyTU12a09jRE0v?=
+ =?utf-8?B?MlZRMTdKTjM2UmlQQTFkM01YRDRoeWtOYlhaWFhaNG15UEhwMTE3ajlLMHRh?=
+ =?utf-8?B?SWlvd3FsdHVOQ09KR25hdzJObWo1NlJRUkVkMlR1OWN3MHZrY0JZM0t0dnNu?=
+ =?utf-8?B?NGxub2F4QTdrakRkQy9YMDNZS3pnUTh0T0Fxck1PZUZuMWlPUFc0TXpLZk1H?=
+ =?utf-8?B?SDZIZnh3ZWRvVTNlUysvSCtUK3hQV2orakRXYm54ZlhyNllPZm9zL2ttOVFJ?=
+ =?utf-8?B?dHpEdkFPNEpaSmVYdnlScUpMRUVXZ1BkMUJJR1pyY1E4Vm83d2FYemhMc1Nh?=
+ =?utf-8?B?SkJHOG9ud0JGejdUamlWS0FDaGpiQUFOaDhjTEVwQ1l0UmxUTHpITFFEMlN5?=
+ =?utf-8?B?bVBBWVUzaWtEYVg3cTNrOXZwdVRLa3VuMXpnYy9zM0dWMllOT2lJck5kZWdl?=
+ =?utf-8?B?UTZhbDlaNHBsNVV1U3A1TW5rUzRLSzBJbVk0clZZS05OUVRHSm1UUlpJNXBx?=
+ =?utf-8?B?Z1hrdEVhWW1vT2FBcFY1MXNLV1VUalNPc3VpTzFEQlRMakt0YzNxMEhyK1ZS?=
+ =?utf-8?B?WklZWVpYd0NDOWRRaXRseEhBem9ZTnJPUmVPSkFwZkFqeW9obENGNDRWNU8w?=
+ =?utf-8?B?ZWE4ditWYkJkODkyaGhKa0xHcjJKbUFnR1FtdTlIK3JTaWtyaW5VRUJPUjFT?=
+ =?utf-8?B?Q3h0UHF6dVNqWnRIQ1VseFFVQlB2eFowVW90cG9yZHhBbDVWTHU0dEFmd3gz?=
+ =?utf-8?B?T3IzVzFKSkZnY1Qva3AvSVQxdS9hRUgzeFZ0bk1WMFNlZXFHMVphbzNRZ0ll?=
+ =?utf-8?B?QUVuRUl6QlMvYUR0ZkxOUXArZkRVL3BxNmc1U3FZVlFiMkZTNm9hSmVNWHBq?=
+ =?utf-8?B?Tkw1V1pBc2hpUTdDQkhidWowWnFaUlVNSVowYnRRMWtmdVNSM293TmpCQThI?=
+ =?utf-8?B?dU4zWFF1a3J1Q0pzczQxMDVrOFNIb2tCQmZPS0hWMVJtUy9FSCtNN0hEOUxo?=
+ =?utf-8?B?YVpwS28zV29YQ2NqWDNPeUdTaVZwLzJHNGFGK09FTDJFWURINThIWjlTZk5C?=
+ =?utf-8?B?OXhKZnZEMVF1R1VRYnozYUdUSVNkdlFjZ3NSV2JmVXpGTW8yc2dKRUx3Y29p?=
+ =?utf-8?B?Y0I4QUVrbzZ6OTYzb3JpTkx1cy9ZQ3lyQitiRGZLU3Z3dmNKVmVwOUtqREoy?=
+ =?utf-8?B?YVNlcDMzREo5VkRGZ28xR2s4WUpZbWZsZWJUTStkS0cvMW1PSkE1elZkMFdh?=
+ =?utf-8?B?dTZYYzZHUHBZT3habDlXckNiRDJJVUFLZmYwdDRGb0RFUzF6N3pTYzRRelVI?=
+ =?utf-8?B?RmpQZEVyWlIzVkVUaTE3Z3d3b2J3a0pNL080UGxZTk9Fa3d0R0F5UT09?=
+X-Exchange-RoutingPolicyChecked: JgjYIBJEUvbI/lvZbY/qvO8LgGCUDqyPvm5+3YN2fBHTUhZUezi8QeeTKNolgUe4fR9ShD1g256W989SetUkeLAY0CWg+pD3jJi9HTOMZHdUrExIoOk86JA4gddK1uGzrc37EK4BJF9dAUGmjZt8qMjjm2dHbsA094mnTfkH+5MZlbhj6onrPHtv+X/zFV3D5aTtBRJL5voE+Eg5MotbX7OXUdq17U+pUcWflCurQm2OPmLg9qo6Fy92HoiRXk5JgmQyqaW8RegX8Hw/iBJYFxZaThIjSWdGDnAFmoZw2mESyeyOwWu1uLEvn9vgndA43kGwB4BauTVvMCkPL01LhA==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 441c8858-b167-4fc1-0916-08deaa2d2a4d
 X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7592.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2026 22:31:26.8249
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2026 22:33:29.5997
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jXmdebOuWsbmZUsmghWYiRtnynRIPt7jiAV2UtyKFvhglv6tm1fvqhQ92igLItmN8mnnbao55TAN0g7aXAs8uYgKOugdF3X/mLDBxzHsw+4=
+X-MS-Exchange-CrossTenant-UserPrincipalName: InhEMKgoAWk8ErZ0WKE1OdSDaERH23Fo4S8wJ8ULdF5bY7qVscMWB9n/aHEREImqqBp1S8opMoKtVvjZhMTM1UFF8vTJ1CzHHR+WKKtNnn0=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6122
 X-OriginatorOrg: intel.com
-X-Rspamd-Queue-Id: 9CDC44C4690
+X-Rspamd-Queue-Id: EE0E24C46A7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-284065-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-284066-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,mpg.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -212,258 +217,137 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[10]
 
-On 2/17/2026 7:58 AM, Arkadiusz Kubalewski wrote:
-> Hardware variants of E830 may support an unmanaged DPLL where the
-> configuration is hardcoded within the hardware and firmware, meaning
-> users cannot modify settings. However, users are able to check the DPLL
-> lock status and obtain configuration information through the Linux DPLL
-> and devlink health subsystem.
-> 
-> Availability of 'loss of lock' health status code determines if such
-> support is available, if true, register single DPLL device with 1 input
-> and 1 output and provide hardcoded/read only properties of a pin and
-> DPLL device. User is only allowed to check DPLL device status and receive
-> notifications on DPLL lock status change.
-> 
-> When present, the DPLL device locks to an external signal provided
-> through the PCIe/OCP pin. The expected input signal is 1PPS
-> (1 Pulse Per Second) embedded on a 10MHz reference clock.
-> The DPLL produces output:
-> - for MAC (Media Access Control) & PHY (Physical Layer) clocks,
-> - 1PPS for synchronization of onboard PHC (Precision Hardware Clock) timer.
-> 
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+On 5/2/2026 7:06 PM, Jakub Kicinski wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
 > ---
-> v11:
-> - rebase and fix conflicts
-
-
-Jakub rightfully pointed out the mistaken inclusion of HAVE_DPLL_ESYNC.
-
-> diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
-> index 73a4e28ed75f..64518202dfff 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_dpll.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
-> @@ -2588,6 +2601,21 @@ static const struct dpll_pin_ops ice_dpll_output_ops = {
->  	.esync_get = ice_dpll_output_esync_get,
->  };
->  
-> +static const struct dpll_pin_ops ice_dpll_input_unmanaged_ops = {
-> +	.frequency_get = ice_dpll_input_frequency_get,
-> +	.direction_get = ice_dpll_input_direction,
-> +	.state_on_dpll_get = ice_dpll_input_state_get,
-> +#if defined(HAVE_DPLL_ESYNC)
-> +	.esync_get = ice_dpll_input_esync_get,
-> +#endif /* HAVE_DPLL_ESYNC */
-> +};
-> +
-Please fix this, and remove any other remaining kcompat cruft as well.
-
-Also could you please review the following Sashiko reports and make sure
-there is no issues?
-
-The netdev sashiko.dev bot says this:
-
-> commit 7aae4a54d3ef18d8694bc535b6e5959839c9adfd
-> Author: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-> ice: add support for unmanaged DPLL on E830 NIC
-> Hardware variants of E830 may support an unmanaged DPLL where the
-> configuration is hardcoded. This patch allows users to check the DPLL
-> lock status and obtain configuration information through the Linux DPLL
-> and devlink health subsystem.
->> diff --git a/drivers/net/ethernet/intel/ice/devlink/health.c b/drivers/net/ethernet/intel/ice/devlink/health.c
->> --- a/drivers/net/ethernet/intel/ice/devlink/health.c
->> +++ b/drivers/net/ethernet/intel/ice/devlink/health.c
+> ixgbe: E610: add ACI dynamic debug
+> 
+> This commit enables dynamic debugging of the Admin Command Interface (ACI)
+> for the e610 adapter, allowing ACI commands and descriptor details to be
+> printed into the kernel log.
+> 
+>> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+>> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+>> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> 
 > [ ... ]
->> @@ -242,6 +244,8 @@ void ice_process_health_status_event(struct ice_pf *pf, struct ice_rq_event_info
->>  				pf->health_reporters.fw_status = *health_info;
->>  				devlink_health_report(pf->health_reporters.fw,
->>  						      "FW syndrome reported", NULL);
->> +				if (status_code == ICE_AQC_HEALTH_STATUS_INFO_LOSS_OF_LOCK)
->> +					ice_dpll_lock_state_set_unmanaged(pf, health_info, true);
-> Is it possible for this health event to arrive when the DPLL subsystem is not
-> fully initialized or already torn down?
-> Looking at ice_dpll_lock_state_set_unmanaged(), it unconditionally acquires
-> pf->dplls.lock:
-> void ice_dpll_lock_state_set_unmanaged(...)
-> {
->     ...
-> 	mutex_lock(&pf->dplls.lock);
->     ...
-> }
-> If the hardware doesn't support DPLL, ice_dpll_init() is never called, leaving
-> the mutex uninitialized. Additionally, if ice_dpll_init_unmanaged() fails,
-> it destroys the mutex and exits.
-> During driver unload, ice_dpll_deinit() destroys the mutex and frees the
-> DPLL structures, but the service task processing these admin queue events
-> might not be stopped until later in the teardown sequence.
-> Could this lead to a kernel panic from locking an uninitialized or destroyed
-> mutex, or a use-after-free when passing the d->dpll pointer to
-> dpll_device_change_ntf()?
-> Should there be a check ensuring DPLL is active (e.g. by checking
-> test_bit(ICE_FLAG_DPLL, pf->flags)) before handling the event?
-
-
-My own execution using claude had this to say:
-
-> Now I have everything. Let me compose the report.
-> commit d9b481c1d5d8be9dbbca36f40be64db91eb12caa
-> Author: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-> ice: add support for unmanaged DPLL on E830 NIC
-> This patch adds support for an unmanaged DPLL on E830 NIC variants,
-> where the DPLL configuration is hardcoded in hardware/firmware.  It
-> registers a single PPS DPLL device with one input and one output,
-> reporting lock status via health status events and the DPLL subsystem.
-> A few things stood out during review.
->> diff --git a/drivers/net/ethernet/intel/ice/devlink/health.c b/drivers/net/ethernet/intel/ice/devlink/health.c
->> index 8e9a8a8178d4..31e6c5107c97 100644
->> --- a/drivers/net/ethernet/intel/ice/devlink/health.c
->> +++ b/drivers/net/ethernet/intel/ice/devlink/health.c
-> [ ... ]
->> @@ -242,6 +244,8 @@ void ice_process_health_status_event(struct ice_pf *pf, struct ice_rq_event_info
->> 				pf->health_reporters.fw_status = *health_info;
->> 				devlink_health_report(pf->health_reporters.fw,
->> 						      "FW syndrome reported", NULL);
->>+				if (status_code == ICE_AQC_HEALTH_STATUS_INFO_LOSS_OF_LOCK)
->>+					ice_dpll_lock_state_set_unmanaged(pf, health_info, true);
->> 				break;
-> This calls ice_dpll_lock_state_set_unmanaged() for every PF that
-> receives a 0x601 health event, with no check for pf->dplls.unmanaged
-> or test_bit(ICE_FLAG_DPLL, pf->flags).
-> The only guard inside ice_dpll_lock_state_set_unmanaged() is
-> ice_pf_src_tmr_owned(), which checks PTP timer ownership -- not
-> whether the DPLL subsystem was initialized.
-> Consider a device where the firmware supports health code 0x601 but
-> the ZL80640 CGU is not in the netlist.  In ice_init_features():
->>+	err = ice_is_health_status_code_supported(&pf->hw, code,
->>+						  &pf->dplls.unmanaged);
->>+	if (err || !ice_is_unmanaged_cgu_in_netlist(&pf->hw))
->>+		pf->dplls.unmanaged = false;
-> This sets pf->dplls.unmanaged = false, so ice_dpll_init() is never
-> called and pf->dplls.lock is never initialized via mutex_init().
-> But the firmware can still send the health event, and then:
->>+void ice_dpll_lock_state_set_unmanaged(struct ice_pf *pf,
->>+				       const struct ice_aqc_health_status_elem *buff,
->>+				       bool notify)
->>+{
-> [ ... ]
->>+	mutex_lock(&pf->dplls.lock);
-> Can this mutex_lock() on an uninitialized mutex cause undefined
-> behavior?  With CONFIG_DEBUG_MUTEXES this would trigger a BUG().
-> Also, on managed DPLL devices (e.g. E810 with CGU), the DPLL worker
-> thread maintains pf->dplls.pps.dpll_state via ice_dpll_update_state().
-> Would this unconditional call overwrite the managed state machine?
->> diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
->> index 3eea83b0cdc9..00704dfeb3b2 100644
->> --- a/drivers/net/ethernet/intel/ice/ice_dpll.c
->> +++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
-> [ ... ]
->>+static const struct dpll_pin_ops ice_dpll_input_unmanaged_ops = {
->>+	.frequency_get = ice_dpll_input_frequency_get,
->>+	.direction_get = ice_dpll_input_direction,
->>+	.state_on_dpll_get = ice_dpll_input_state_get,
->>+#if defined(HAVE_DPLL_ESYNC)
->>+	.esync_get = ice_dpll_input_esync_get,
->>+#endif /* HAVE_DPLL_ESYNC */
->>+};
-> HAVE_DPLL_ESYNC does not appear to be defined anywhere in the upstream
-> kernel tree -- it looks like an out-of-tree compatibility macro.  In
-> upstream builds this means .esync_get is always NULL for unmanaged
-> input pins.
-> The managed ice_dpll_input_ops sets .esync_get unconditionally, and
-> ice_dpll_input_esync_get() already has explicit unmanaged-specific
-> logic added by this patch.  The init code also unconditionally sets
-> ICE_AQC_GET_CGU_IN_CFG_STATUS_ESYNC_CAP and ICE_DPLL_IN_ESYNC_ENABLED
-> on unmanaged input pins.
-> The documentation example at the end of the patch shows
-> esync-frequency and esync-pulse in the pin dump, but those fields
-> will never appear in an upstream build since the callback is compiled
-> out.  Should the ifdef be removed so this matches ice_dpll_input_ops?
-> [ ... ]
->> @@ -3153,12 +3181,15 @@ ice_dpll_init_direct_pins(struct ice_pf *pf, bool cgu,
->>  	int ret;
->>  
->>  	ret = ice_dpll_get_pins(pf, pins, start_idx, count, pf->dplls.clock_id);
->>- 	if (ret)
->>+	if (!cgu || ret)
->>  		return ret;
->>- 	if (cgu) {
->>+
->>+	if (first) {
->>  		ret = ice_dpll_register_pins(first, pins, ops, count);
->>  		if (ret)
->>  			goto release_pins;
->>+	}
->>+	if (second) {
->>  		ret = ice_dpll_register_pins(second, pins, ops, count);
->>  		if (ret)
->>  			goto unregister_first;
-> ice_dpll_init_direct_pins() was updated with NULL guards for first
-> and second.  However, ice_dpll_deinit_direct_pins() was not:
-> ice_dpll_deinit_direct_pins() {
->     if (cgu) {
->         ice_dpll_unregister_pins(first, pins, ops, count);
->         ice_dpll_unregister_pins(second, pins, ops, count);
->     }
->     ...
-> }
-> For the unmanaged case, ice_dpll_init_unmanaged() only creates the
-> PPS dpll -- eec.dpll stays NULL.  If output pin init fails inside
-> ice_dpll_init_pins(pf, true), the error path falls through to
-> deinit_inputs which calls:
->     ice_dpll_deinit_direct_pins(pf, cgu=true, ...,
->                                 pf->dplls.pps.dpll,
->                                 pf->dplls.eec.dpll);
->                                               ^^^^
->                                               NULL
-> This passes NULL as second to ice_dpll_unregister_pins(), which
-> calls dpll_pin_unregister(NULL, ...), dereferencing the NULL dpll
-> pointer.  Would it make sense to add the same NULL guards to
-> ice_dpll_deinit_direct_pins() that were added to the init path?
-> [ ... ]
->> @@ -3923,6 +4001,15 @@ ice_dpll_init_info_direct_pins(struct ice_pf *pf,
->>  		pins[i].prop.board_label = ice_cgu_get_pin_name(hw, i, input);
->>  		pins[i].prop.type = ice_cgu_get_pin_type(hw, i, input);
->>  		if (input) {
->>+			if (pf->dplls.unmanaged) {
->>+				pins[i].freq = ice_dpll_pin_freq_info(hw, i,
->>+								      input);
->>+				pins[i].state[0] = DPLL_PIN_STATE_CONNECTED;
->>+				pins[i].status =
->>+					ICE_AQC_GET_CGU_IN_CFG_STATUS_ESYNC_CAP;
->>+				pins[i].flags[0] = ICE_DPLL_IN_ESYNC_ENABLED;
->>+				continue;
->>+			}
-> [ ... ]
->>  		} else {
->>+			if (pf->dplls.unmanaged) {
->>+				pins[i].freq = ice_dpll_pin_freq_info(hw, i,
->>+								      input);
->>+				pins[i].state[0] = DPLL_PIN_STATE_CONNECTED;
->>+				continue;
->>+			}
-> [ ... ]
->>  		pins[i].prop.freq_supported =
->>  			ice_cgu_get_pin_freq_supp(hw, i, input, &freq_supp_num);
->>  		pins[i].prop.freq_supported_num = freq_supp_num;
->>  		pins[i].pf = pf;
+> 
+>> @@ -106,8 +185,12 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+>>  		if (desc->flags & cpu_to_le16(LIBIE_AQ_FLAG_RD)) {
+>>  			for (i = 0; i < buf_size / 4; i++)
+>>  				IXGBE_WRITE_REG(hw, IXGBE_PF_HIBA(i), ((u32 *)buf)[i]);
+>> -			if (buf_tail_size)
+>> +			ixgbe_aci_debug(hw, desc, buf, buf_size);
+>> +			if (buf_tail_size) {
+>>  				IXGBE_WRITE_REG(hw, IXGBE_PF_HIBA(i), buf_tail);
+>> +				ixgbe_aci_debug(hw, desc, &buf_tail,
+>> +						buf_tail_size);
+>> +			}
+>>  		}
 >>  	}
-> Both unmanaged branches use continue, which skips the assignments of
-> pins[i].prop.freq_supported, pins[i].prop.freq_supported_num, and
-> pins[i].pf at the bottom of the loop.
-> The missing freq_supported / freq_supported_num means the DPLL netlink
-> code cannot report supported frequency ranges to userspace for
-> unmanaged pins, even though the data is available from
-> ice_cgu_get_pin_freq_supp().
-> The missing pins[i].pf = pf assignment leaves the pointer NULL (from
-> kcalloc zeroing).  Current unmanaged callbacks use d->pf from
-> dpll_priv so there is no immediate crash, but if any callback that
-> dereferences p->pf were added to the unmanaged ops in the future it
-> would hit a NULL pointer dereference.  Was the continue intended to
-> skip all of these assignments?
+> 
+> Does this result in redundant output being printed to the kernel log?
+> 
+> When buf_tail_size is non-zero, ixgbe_aci_debug() is called twice: once for
+> the full buffer, and a second time for just the tail. Since ixgbe_aci_debug()
+> prints the full CQ CMD descriptor details each time, this appears to print the
+> descriptor headers twice and fragment the buffer output.
+> 
+> [ ... ]
+> 
+>> @@ -183,10 +278,13 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+>>  	if (valid_buf) {
+>>  		for (i = 0; i < buf_size / 4; i++)
+>>  			((u32 *)buf)[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIBA(i));
+>> +		ixgbe_aci_debug(hw, raw_desc, buf, buf_size);
+>>  		if (buf_tail_size) {
+>>  			buf_tail = IXGBE_READ_REG(hw, IXGBE_PF_HIBA(i));
+>>  			memcpy(buf + buf_size - buf_tail_size, &buf_tail,
+>>  			       buf_tail_size);
+>> +			ixgbe_aci_debug(hw, raw_desc, &buf_tail,
+>> +					buf_tail_size);
+>>  		}
+>>  	}
+> 
+> Can this read uninitialized memory from the buffer?
+> 
+> At the point ixgbe_aci_debug(..., buf, buf_size) is called, the loop has only
+> populated the 4-byte aligned chunks of the buffer. The trailing bytes at the
+> end of the buffer are not populated until the memcpy() occurs later in the
+> block. Because ixgbe_aci_debug() consumes buf_size bytes, it looks like it
+> will read and log uninitialized trailing memory (potentially from the kernel
+> stack).
+> 
+> Also, similar to the transmit path, this calls ixgbe_aci_debug() a second
+> time on &buf_tail, which will print the descriptor headers again.
+> 
+> Could we move a single ixgbe_aci_debug(..., buf, buf_size) call to the end of
+> the block, after the entire buffer including the tail has been fully written?
+
+Piotr,
+
+Please review this report and submit a new version of this patch to
+Intel Wired LAN.
+
+While you are at it, please review the following report from a run of
+sashiko I did myself using claude:
+
+> commit 198ec0389c757125d9079647a6c8aba34ba29048
+> Author: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+> ixgbe: E610: add ACI dynamic debug
+> This patch enables dynamic debug of the Admin Command Interface (ACI)
+> for the E610 adapter, adding descriptor and buffer hex dumps via the
+> standard dyndbg infrastructure, plus hw_dbg() calls on error paths.
+>> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+>> index 665a9813e251..b686636beb93 100644
+>> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+>> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> [ ... ]
+>> @@ -147,6 +230,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+>> 			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA(i));
+>> 			raw_desc[i] = raw_desc[i];
+>> 		}
+>>+		ixgbe_aci_debug(hw, raw_desc, NULL, 0);
+>> 	}
+> [ ... ]
+>> 	/* Handle timeout and invalid state of HICR register */
+>>-	if (hicr & IXGBE_PF_HICR_C)
+>>+	if (hicr & IXGBE_PF_HICR_C) {
+>>+		hw_dbg(hw, "error: Admin Command 0x%X command timeout\n",
+>>+		       le16_to_cpu(desc->opcode));
+>> 		return -ETIME;
+>>+	}
+> Since raw_desc is declared as a cast of desc:
+>     u32 *raw_desc = (u32 *)desc;
+> and the sync response read loop overwrites raw_desc[] (and thus desc)
+> with firmware response data, could le16_to_cpu(desc->opcode) here
+> print the response opcode rather than the original command opcode?
+> The local variable opcode already holds the original value saved
+> earlier via:
+>     opcode = le16_to_cpu(desc->opcode);
+> Would it be more correct to use opcode directly in this hw_dbg() call
+> (and the one in the invalid-state check below)?
+>> @@ -183,10 +278,13 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+>> 	if (valid_buf) {
+>> 		for (i = 0; i < buf_size / 4; i++)
+>> 			((u32 *)buf)[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIBA(i));
+>>+		ixgbe_aci_debug(hw, raw_desc, buf, buf_size);
+>> 		if (buf_tail_size) {
+>> 			buf_tail = IXGBE_READ_REG(hw, IXGBE_PF_HIBA(i));
+>> 			memcpy(buf + buf_size - buf_tail_size, &buf_tail,
+>> 			       buf_tail_size);
+>>+			ixgbe_aci_debug(hw, raw_desc, &buf_tail,
+>>+					buf_tail_size);
+>> 		}
+>> 	}
+> When buf_size is not 4-byte aligned, ixgbe_aci_debug() is called
+> with the full buf_size before the tail bytes have been read from
+> hardware and memcpy'd into buf. The hex dump will show stale content
+> for the last 1-3 bytes of the buffer.
+> Should the ixgbe_aci_debug() call be moved after the tail memcpy so
+> that it dumps the complete response?
+
 
 
 
