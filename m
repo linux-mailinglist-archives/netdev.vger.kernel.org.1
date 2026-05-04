@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-283922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283923-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YKBXOV28+Gnh0AIAu9opvQ
-	(envelope-from <netdev+bounces-283922-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 17:33:49 +0200
+	id OCmDNG+8+Gnh0AIAu9opvQ
+	(envelope-from <netdev+bounces-283923-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 17:34:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A86F4C0BAF
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 17:33:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 304DD4C0BBD
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 17:34:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0F9443020A42
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 15:32:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7AED7302BA62
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 15:32:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2D163D348B;
-	Mon,  4 May 2026 15:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 272F63DE45C;
+	Mon,  4 May 2026 15:32:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QbI9wg3R"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N2j4RLyS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F8B73A5E92
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 15:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0449E3C2782
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 15:32:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777908760; cv=none; b=pjw3aNCnzOsQPrnjgWSBL2cRzQQlyCFFlmmByQdovueNGVmnSmEbZXdyvrmeGLNnH+EI9nCDxxoTFVBlghSAqvltzUczBe3vg+dYBJ5ugWc0MFMjlD0SxlZjKBGSv/wOCHYmiDnZV4oZspUeBOZZxQ8o1BoyRahKZbnv6maFmLQ=
+	t=1777908763; cv=none; b=nGMsrcx4HVZINDilmJh9yQdLtndGWzdxrg0lwiQe+Zv1PhJ72TfuBwVQGLswJslEebMheFI/MQajKOaY5NyxZ2e3PyEuLXyczPfmz6DO55633WF1HDpeUyZo9R1ll2CXCjd61SqTXkbaS8FWb9x4kkTKqXpZbeO8WszLJiKlZAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777908760; c=relaxed/simple;
-	bh=EYI4V78aTv/qKhCSa+8f/27QMleraEp8qZkWOkkFvtQ=;
+	s=arc-20240116; t=1777908763; c=relaxed/simple;
+	bh=gab0qtlvfknerI/pBhkJBoBSMb610TfLqUBMn+lcgdw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Cr+h6Bh+FQcls+DJw47ZrdjPtBnraVnA8jMatzIiOP88slcjXUGUrXdq6I/9ZnS2pVyaU9jLwhovY0ZxfEeCZOyp6FkXnlhx8sJtYoTTEaO6xZPiZRNVunRtO6PO8qbKiXuhSGRhpkQ0gOOzGeyWpg6YUJl8yI3E8H9e/QA6RrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QbI9wg3R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27E9FC2BCF6;
-	Mon,  4 May 2026 15:32:37 +0000 (UTC)
+	 MIME-Version:Content-Type; b=KI1tLy5dI+MxqSi0MROwR613SLQR+p8UxsH8BcAEEml9a7HYg5zY9KYjs37ZIJk2JKBwGpEv+Cnz3Xx5OpxbmY+r2IJnMG5Fo94Avu5sFE7OKAhCeUlJJCyKSGE56Ht25BgkePtPO9rVbGJz4L+OMoRwsMFo30vhk6iA5unyQiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N2j4RLyS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96817C2BCB8;
+	Mon,  4 May 2026 15:32:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777908760;
-	bh=EYI4V78aTv/qKhCSa+8f/27QMleraEp8qZkWOkkFvtQ=;
+	s=k20201202; t=1777908762;
+	bh=gab0qtlvfknerI/pBhkJBoBSMb610TfLqUBMn+lcgdw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QbI9wg3RAhq3eRSEZ7gyZI9FV9iAZnJdKxF15QhGLLWoT09gCMjAnu3d21F2NFbBc
-	 SEk5gMQj5j1kEPuodwkTTVl9wiMGJLhHYuGekFmuH2gkOQkvM5QSRvNdybdAKoinUB
-	 RVwPbqXkcCc1pFxiKyUNiUSbfHcRCWxIsL4z+Hs2q9vriMx8OQEwUljfCxK/jgPrep
-	 w4iBzOJkX6Xvq4Cy+7bQD2Suun9YMVqaKqeu+1IEz3yDXXKuSHggmeyohu113HM9zz
-	 HmMOImAqf3GnyiW2MwblzqYKg3jglqz4Rso6nK7EaOn3mEIX0PwcqTgDWnU/ioxWXV
-	 3Msz0FO/mq0MQ==
+	b=N2j4RLySl89Hh5YZx3YdNqoSQUyXJbJwD7iojtOZIVHWtbeMjO9lV25dfU27QBge0
+	 FQVbcK/sAbHIC4XefKPbysOkPw4/Imsq1QNr6Z3WSvLssX18VbM7GNZYIE1vWIyLVh
+	 FPGVmqzMTfbAGy/v7OpLGxGzwlBEXgqI/zLiwFpCzUfDtLM7vVYjvfD80xczOyAwZx
+	 ZvQxjzHsH99aiwN/yos3v1gC1Au1kND/btbEtFl3qHN18EtjnhuvPhTkuNLbAUXa0e
+	 Cb8WA64kv1qz51Kc9mCz2vBQT6OOO5BXwaTzJNTV+84m6dX+RvUTSEe9c9l8DfDHKv
+	 RsDpgTgFhLXXQ==
 From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -54,9 +54,9 @@ To: Andrew Lunn <andrew@lunn.ch>,
 	Fidan Aliyeva <fidan.aliyeva.ext@ericsson.com>
 Cc: Lev Olshvang <lev_o@rad.com>,
 	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
-Subject: [PATCH net-next 3/5] net: dsa: mv88e6xxx: define .pot_clear() for 6321
-Date: Mon,  4 May 2026 17:32:25 +0200
-Message-ID: <20260504153227.1390546-4-kabel@kernel.org>
+Subject: [PATCH net-next 4/5] net: dsa: mv88e6xxx: enable .rmu_disable() for 6320 family
+Date: Mon,  4 May 2026 17:32:26 +0200
+Message-ID: <20260504153227.1390546-5-kabel@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260504153227.1390546-1-kabel@kernel.org>
 References: <20260504153227.1390546-1-kabel@kernel.org>
@@ -68,7 +68,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4A86F4C0BAF
+X-Rspamd-Queue-Id: 304DD4C0BBD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.34 / 15.00];
@@ -77,11 +77,11 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283922-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283923-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -97,30 +97,37 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,kernel];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Commit 9e907d739cc3 ("net: dsa: mv88e6xxx: add POT operation") did not
-add the .pot_clear() method to the 6321 switch operations structure.
-Add them now.
+Commit 9e5baf9b3636 ("net: dsa: mv88e6xxx: add RMU disable op") did not
+add the .rmu_disable() method for the 6320 family. Add it now.
 
 Signed-off-by: Marek Behún <kabel@kernel.org>
 ---
- drivers/net/dsa/mv88e6xxx/chip.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/dsa/mv88e6xxx/chip.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 78799666e6b7..b55a9d4a1ee1 100644
+index b55a9d4a1ee1..09da154f80d7 100644
 --- a/drivers/net/dsa/mv88e6xxx/chip.c
 +++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -5244,6 +5244,7 @@ static const struct mv88e6xxx_ops mv88e6321_ops = {
- 	.set_egress_port = mv88e6095_g1_set_egress_port,
- 	.watchdog_ops = &mv88e6390_watchdog_ops,
- 	.mgmt_rsvd2cpu = mv88e6352_g2_mgmt_rsvd2cpu,
-+	.pot_clear = mv88e6xxx_g2_pot_clear,
+@@ -5195,6 +5195,7 @@ static const struct mv88e6xxx_ops mv88e6320_ops = {
  	.hardware_reset_pre = mv88e6xxx_g2_eeprom_wait,
  	.hardware_reset_post = mv88e6xxx_g2_eeprom_wait,
  	.reset = mv88e6352_g1_reset,
++	.rmu_disable = mv88e6352_g1_rmu_disable,
+ 	.vtu_getnext = mv88e6352_g1_vtu_getnext,
+ 	.vtu_loadpurge = mv88e6352_g1_vtu_loadpurge,
+ 	.stu_getnext = mv88e6352_g1_stu_getnext,
+@@ -5248,6 +5249,7 @@ static const struct mv88e6xxx_ops mv88e6321_ops = {
+ 	.hardware_reset_pre = mv88e6xxx_g2_eeprom_wait,
+ 	.hardware_reset_post = mv88e6xxx_g2_eeprom_wait,
+ 	.reset = mv88e6352_g1_reset,
++	.rmu_disable = mv88e6352_g1_rmu_disable,
+ 	.vtu_getnext = mv88e6352_g1_vtu_getnext,
+ 	.vtu_loadpurge = mv88e6352_g1_vtu_loadpurge,
+ 	.stu_getnext = mv88e6352_g1_stu_getnext,
 -- 
 2.53.0
 
