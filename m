@@ -1,155 +1,154 @@
-Return-Path: <netdev+bounces-283976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283977-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OKttO2ja+GnJ2QIAu9opvQ
-	(envelope-from <netdev+bounces-283976-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 19:42:00 +0200
+	id 8OJoCt3a+GnG2QIAu9opvQ
+	(envelope-from <netdev+bounces-283977-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 19:43:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E0E34C2079
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 19:42:00 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24DD64C2126
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 19:43:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 16FF9300DECC
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 17:41:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8B48F300B2B8
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 17:43:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC373E4C71;
-	Mon,  4 May 2026 17:41:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2AA93E4C72;
+	Mon,  4 May 2026 17:43:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="ja8k4e+h"
+	dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b="X9uVeR9j"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0FD11862;
-	Mon,  4 May 2026 17:41:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 899DF3E317A
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 17:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777916501; cv=none; b=WqeiqAFw/M16lS+ACZBYIqsLNP7ef0F2G6CFDQjDcEBrTEalmhLOzOPtZeAzWTd00PXV6pK793hn0kRnOESGSctRtDnevRHpzrIEHlA5TK/VM/tpkcUMyDeOfJ/5sF54jUHwL1w4FQbxVCJ6kppl4RllT2gnQe2dVIKGJl857m4=
+	t=1777916619; cv=none; b=N9U62+M9pIrAz/SMmy6LN1f309vW0Ds+rwSGAPJ8VSe6av21moYGXrcC/L11Ptodi1q0pY3W+dZTWugFV8kG7umxpkPtGXke0GgTf6bCkCpcxPa9Xy0+KeNFRfQjyjQ1+mVDFZV0M7U8CYMo/Ng8mnLoBtn93Cn3rf6cRe+cVhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777916501; c=relaxed/simple;
-	bh=Dju5V9WI247b+gw5Gxnh3v0/NH6IZ1jQn/OQVxY+c9I=;
+	s=arc-20240116; t=1777916619; c=relaxed/simple;
+	bh=UmnAEidipRT5i3DpB57vlHvWvY7ZbghL8NryuFr/o2E=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type:Content-Disposition; b=hb2xIhb1fQQCtnFZadeSUKeBFClwN+rsRtW6hqcPHbqFJ9n5fYsRODrwLpYcYBYmy+R+opK2oY3H+PO+Om7YJAGjQvDnxgboYJnMnB+dSgO5HReg7D4Gbaxc3Qj/HXhcou5GHSXkt1wsS8x7xhju9uCJOygPK7lfQok2e7O4TBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=ja8k4e+h; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from jeffbarnes-ThinkPad-P14s-Gen-2i (unknown [52.177.6.131])
-	by linux.microsoft.com (Postfix) with ESMTPSA id C871A20B7169;
-	Mon,  4 May 2026 10:41:36 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C871A20B7169
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1777916497;
-	bh=f+1Y5EUYXPSxAF/znLYyDNUbOTcdHMnI7MLeAMmAaPE=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=ja8k4e+hHrAMRcxYCgXNUexidzSdZliw2fZEgTBHaD77ph7Q84MPBiJJSYnlZLhsM
-	 NilPwYVgfkoU+81wpXZsJPiTNAD6mDZv3RDJ2F3/gHwk1wUSS5kkdR7BZAwHaPOx6T
-	 u/WHCHHu4a+cU/x2an1SFDUm5fq6j0ldEjijM5xM=
-Date: Mon, 4 May 2026 13:41:37 -0400
-From: Jeff Barnes <jeffbarnes@linux.microsoft.com>
-To: Jon Kohler <jon@nutanix.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, 
- "=?utf-8?Q?linux-crypto=40vger.kernel.org?="
- <linux-crypto@vger.kernel.org>, Herbert Xu
- <herbert@gondor.apana.org.au>, "=?utf-8?Q?linux-doc=40vger.kernel.org?="
- <linux-doc@vger.kernel.org>, "=?utf-8?Q?linux-api=40vger.kernel.org?="
- <linux-api@vger.kernel.org>, 
- "=?utf-8?Q?linux-kernel=40vger.kernel.org?="
- <linux-kernel@vger.kernel.org>, "=?utf-8?Q?netdev=40vger.kernel.org?="
- <netdev@vger.kernel.org>, Linus Torvalds
- <torvalds@linux-foundation.org>
-Message-ID: <0D4B157F-AEDE-4470-BDBE-E6467CA19089@getmailspring.com>
-In-Reply-To: <4D424F50-7E9F-4B1F-AE9C-86D8526284E6@nutanix.com>
-References: <4D424F50-7E9F-4B1F-AE9C-86D8526284E6@nutanix.com>
-Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
-X-Mailer: Mailspring
+	 MIME-Version:Content-Type; b=W51yPz2apBxNR7Z4uXCnGy1nLIXCEBzZizVTwdcTGVz4Cjt3yHoaP8PZtVKvvJ/9cA7b+2IgzWXFIKZo90pPkxQiRIF4spCryQGj2OxngC/Blhh5AJjIwp8mWrveAFyHlRUaVB39aSpnZ5kgP5PQi1LV4r4wQdIZTCJ3tXHcuZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=X9uVeR9j; arc=none smtp.client-ip=195.121.94.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xs4all.nl
+X-KPN-MessageId: c3abf1da-47e0-11f1-bea8-005056992ed3
+Received: from mta.kpnmail.nl (unknown [10.31.161.188])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id c3abf1da-47e0-11f1-bea8-005056992ed3;
+	Mon, 04 May 2026 19:43:30 +0200 (CEST)
+Received: from mtaoutbound.kpnmail.nl (unknown [10.128.135.189])
+	by mta.kpnmail.nl (Halon) with ESMTP
+	id c3b04f5b-47e0-11f1-80fc-00505699693e;
+	Mon, 04 May 2026 19:43:30 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=xs4all.nl; s=xs4all01;
+	h=content-type:mime-version:subject:message-id:to:from:date;
+	bh=kdpYfIX+URTvw/wf5koeiRsTKprTy2NaYWQX03NB+IU=;
+	b=X9uVeR9j1Iz9IcchmfYfcB2+oARQT9t00sirJbn8eZN5SB+W/czEx2L9vOWtBlE8YYIw1a9/uf0QL
+	 JtbgDvpP0p7Bn/X00H82OIfktOat2f8Mui7MMc74KIrTzVkqjdOaWRu+BxVGultMEfJeQTMm1o1Nb/
+	 wXLCaW1fqbs5QxhPTQd8CNfbnfC3LDUvFajwKv3AxyvSAoQeJ3TjvNA2+6jc5r1adRgt0Wqt4KXbBW
+	 eSmyroMauz3V3v89IiN8uQCMNOGlng/LskwtHpT4/WxmRQhQEFQOihrl+k1RpmdagSJAKn2HVWWAB0
+	 iPtn6T0mXfDGEfuhS0K/CA9XfW+PVAg==
+X-KPN-MID: 33|Oe96tHjdqLcXG0+4p3g9qL+qjYCkVqfDCbZeSJ15n5e+210MBUIX8rTzjMrdbVD
+ FRArJlNNiY+UlB9IHfFx7dOSKHBq8DIgfF2pCihJ73ow=
+X-CMASSUN: 33|sm6o1OA6K6UEpMWW6cTWJ0kgfRL2hfIYXSaPNctPG5j1Bd6gVKJ0hWLwCZMWN+I
+ Bk/mQSOTh0WfSmVVk1hIwew==
+X-KPN-VerifiedSender: Yes
+Received: from cpxoxapps-mh02 (cpxoxapps-mh02.personalcloud.so.kpn.org [10.128.135.208])
+	by mtaoutbound.kpnmail.nl (Halon) with ESMTPSA
+	id c39bf502-47e0-11f1-94b1-00505699eff2;
+	Mon, 04 May 2026 19:43:30 +0200 (CEST)
+Date: Mon, 4 May 2026 19:43:30 +0200 (CEST)
+From: Jori Koolstra <jkoolstra@xs4all.nl>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Kees Cook <kees@kernel.org>, Simon Horman <horms@kernel.org>,
+	Andy Lutomirski <luto@amacapital.net>,
+	Will Drewry <wad@chromium.org>, Jeff Layton <jlayton@kernel.org>,
+	Oleg Nesterov <oleg@redhat.com>, Andrei Vagin <avagin@gmail.com>,
+	Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
+	Mateusz Guzik <mjguzik@gmail.com>,
+	Joel Granados <joel.granados@kernel.org>,
+	Charlie Mirabile <cmirabil@redhat.com>,
+	Aleksa Sarai <cyphar@cyphar.com>, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	io-uring@vger.kernel.org
+Message-ID: <1440036704.77422.1777916610532@kpc.webmail.kpnmail.nl>
+In-Reply-To: <CAAVpQUDKgWdgPjPmJKhNxofssasS8-RdaLAcbFXHMWH8ztMJXA@mail.gmail.com>
+References: <20260428175125.2705296-1-jkoolstra@xs4all.nl>
+ <20260428175125.2705296-2-jkoolstra@xs4all.nl>
+ <CAAVpQUBKeN2KtRkRAFr8sYJM1_-rbkdjsujau5fAyaiP_dO6FA@mail.gmail.com>
+ <89346381.2074764.1777649680664@kpc.webmail.kpnmail.nl>
+ <CAAVpQUDKgWdgPjPmJKhNxofssasS8-RdaLAcbFXHMWH8ztMJXA@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/2] net: af_unix: Useful handling of LSM denials on
+ SCM_RIGHTS
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-Rspamd-Queue-Id: 8E0E34C2079
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+Importance: Normal
+X-Rspamd-Queue-Id: 24DD64C2126
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.95 / 15.00];
-	CC_EXCESS_QP(1.20)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[xs4all.nl,reject];
+	R_DKIM_ALLOW(-0.20)[xs4all.nl:s=xs4all01];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283976-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283977-lists,netdev=lfdr.de];
+	HAS_X_PRIO_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[zeniv.linux.org.uk,kernel.org,suse.cz,google.com,redhat.com,davemloft.net,kernel.dk,amacapital.net,chromium.org,gmail.com,virtuozzo.com,cyphar.com,vger.kernel.org];
+	FREEMAIL_FROM(0.00)[xs4all.nl];
+	RCPT_COUNT_TWELVE(0.00)[26];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jeffbarnes@linux.microsoft.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[jkoolstra@xs4all.nl,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[xs4all.nl:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nutanix.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,getmailspring.com:mid]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[xs4all.nl:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
 
-
-On May 4 2026, at 10:39 am, Jon Kohler <jon=40nutanix.com> wrote:
-
-> =20
-> Quick passing observation
-> I noticed that when attempting to completely disable these Crypto APIs,=
-
-> I was experiencing boot failures with fips=3D1 enabled systems.
-> =20
-> Using 6.18-based kernel with an el9-based user space, I see the
-> following hang in the early boot console from dracut-pre-pivot:
->  Check integrity of kernel
->  libkcapi - Error: A=46=5FALG: socket syscall failed (errno: -97)
->  Allocation of hmac(sha512) cipher failed (-97)
-
-One thing that for certain that would cause this panic is the sha512hmac
-binary that does the fips integrity check. On many distros this check is
-called, for example by dracut among others, during initramfs to check
-the integrity of the kernel before any crypto is used. On failure, the
-kernel won't finish boot.
-
-sha512hmac is a binary shipped with kcapitools. It uses libkcapi.
-
-sha512hmac -> libkcapi -> A=46=5FALG.
-
-Is there a planned replacement for this integrity check=3F I don't know o=
-f
-anybody doing this for =46IPS yet, but is there a case where IMA / EVM
-could be a workaround=3F
-
-Regards,
-Jeff
-
-> =20
-> I haven't looked at every elX version, but at least in el9 and el10,
-> they use libkcapi-hmaccalc to provide sha512hmac, which dracut =5B1=5D
-> uses to calculate the HMAC value in do=5Ffips().
-> =20
-> Digging further, I was only able to disable RNG and AEAD APIs, but
-> not HASH and SKCIPHER APIs when =46IPS was in the picture with el9++.
-> =20
-> I=E2=80=99m not sure how other distros do the same, but this could be p=
-roblematic
-> elsehwere if other distros went down the libkcapi route.
-> =20
-> =5B1=5D https://github.com/dracutdevs/dracut/blob/059/modules.d/01fips/=
-fips.sh=23L167
-> =20
+> Op 02-05-2026 03:24 CEST schreef Kuniyuki Iwashima <kuniyu@google.com>:
 > 
+> > >
+> > > Does this flag need per-recvmsg() granularity ?
+> > >
+> >
+> > Perhaps not. What would be the alternative? A fcntl option for the socket fd?
+> 
+> I'd add a new socket option like
+> 
+> setsockopt(SOL_SOCKET, SO_RIGHTS_TRUNC, &(int){0}, sizeof(int));
+> 
+> 
+
+I think this is reasonable suggestion (and better than using the MSG_ flags).
+Let's just let this sit for a few days to see if anyone else has suggestions/
+objections.
 
