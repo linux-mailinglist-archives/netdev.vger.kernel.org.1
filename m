@@ -1,157 +1,364 @@
-Return-Path: <netdev+bounces-283892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283893-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uFURCXuy+GkdzAIAu9opvQ
-	(envelope-from <netdev+bounces-283892-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:51:39 +0200
+	id SH/3Dtuy+Gl2zAIAu9opvQ
+	(envelope-from <netdev+bounces-283893-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:53:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95EFC4C018C
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:51:38 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3DB94C022B
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:53:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 70BD9306BDDC
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 14:45:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 42CD2308984F
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 14:45:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FC503E0C60;
-	Mon,  4 May 2026 14:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 245353DFC6B;
+	Mon,  4 May 2026 14:44:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="vAh2cZmq"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="SRq74ycr"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90713E0C59;
-	Mon,  4 May 2026 14:44:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3943DE44C
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 14:44:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777905854; cv=none; b=kF4XmALb6HwPlLs04uZc1PhHeDvnE2BLAGVpwJM9zvZuMfVZskP4VSyt/pwDK08WtdrVRKPI7L4JDdFJf/frZw68VtskjJ1DZS00pYkB/jfednP/wBleNdI7EshR4w0BmBAcWqXlBCShixO3oIvfkgHk8U7USS7DcayQIVounxI=
+	t=1777905893; cv=none; b=tU1xTi6JfLh7QRXOPzUrXUqsqzq0jgi5+n4SuDWtkaN5D+x4pxIIbnH8qDRJ/yGHaTuWqO1h1G90Ww8Y3bOEHCgURQDR421W7PUAIs2MeSx8mLSlPPsRHhe4aCoyRe5JfRdR7dE1XtCMzJDV2Q2bJAVAScvEWpRxiFHaUIqKXYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777905854; c=relaxed/simple;
-	bh=MEHpsXH9lNIJOnJl8LRK8fvASgeNl0B9kl50QUAwWqE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=nniAgIHEDsJrxyCuQ8I7cNXyqBZ7hguzbf5v3d9PFsxcBjJ3MxNFV5rbbMu9SeLYVnbOgslJhim5Dy+RCAvhFFM3OTBJpunp8wpuHmlGgfpS0eClcgB09MfYTPROV9r8dI8Z27Ivu0a/Gwi5GvVrrV/jq6F+OUeRJwZlsZKwKK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=vAh2cZmq; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1777905852; x=1809441852;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=MEHpsXH9lNIJOnJl8LRK8fvASgeNl0B9kl50QUAwWqE=;
-  b=vAh2cZmqAEP/fbQjkcvGDiVtwi8Oz8dFL3eSwrjtxeHsFAXQ/00CJhWg
-   8xozWbCAd6hg3Se4Z7ALSwPT+rFhl42NkMlIYs90EMdLxlW7HWQw0eva1
-   TDg5wVdiehkXrDlcsfXAQTEZSZjWfQ+sFVFN5qExYH/WoDXbYFPisfsHP
-   zdonlT/BGaY1FzV9vXoFQCpoZc628NE3k9+EJAS1bZC/ihTLOEbg+iiDD
-   1r5SfvoUkSLTD1fefIQ1GT1PY+TieTaR8JPtqeoJ6tNBhODqywkOYl+Bb
-   JtER2glL2j0fMBSpuSyJM+72QwRLNXikgZicEpJqKDfjRmZk9iQGD700a
-   w==;
-X-CSE-ConnectionGUID: f6FNNhZuRiuYZMD8mQLEXA==
-X-CSE-MsgGUID: AB2JYIKvQpaCASb5LbruRA==
-X-IronPort-AV: E=Sophos;i="6.23,215,1770620400"; 
-   d="scan'208";a="57409533"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 May 2026 07:44:12 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Mon, 4 May 2026 07:44:11 -0700
-Received: from DEN-DL-M70577.microsemi.net (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Mon, 4 May 2026 07:44:08 -0700
-From: Daniel Machon <daniel.machon@microchip.com>
-Date: Mon, 4 May 2026 16:43:45 +0200
-Subject: [PATCH net 4/4] net: sparx5: configure serdes for 1000BASE-X in
- sparx5_port_init()
+	s=arc-20240116; t=1777905893; c=relaxed/simple;
+	bh=r05xa/ZlRonArsVrOGbiE/86QHQVkUeFA8z00Hn0Fv4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=B/+GthSA4WjfTIcDMndMCe+KR0tfKzmuk7KW66+zIWLKFzv9fgvHIRufAe07Pxh5l68SM+lMRD8Q2LAoznBdupPR/IsbvprS/2dnUct5Gk4NauEPoK3s4tUwuL9726u+bxjg5zRhHxHWmmOkHsM9k94fPrvi82L2koF+DcIyIbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=SRq74ycr; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1777905882; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=E0OzptJ2mWwnwjHWn+kUxqb4okp+OAvWhNC65WgeWUo=;
+	b=SRq74ycr9w1mAzF32DKvmRlyc5e3NHfFV7iUC2BeeckVwxd3TaCJRTAwlyV2iDp2umNruNgRTROX5EARo1hYz1V1gt5mdR3hbZ897uWkXaro+PlH3jAfvaHsc7JvwFyjPCxLSM9g0j5i+xtPnY4JTj4p7fn7kGS5RB3c01JZpJ8=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam011083073210;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0X2D5xF0_1777905879;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X2D5xF0_1777905879 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 04 May 2026 22:44:40 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Philo Lu <lulie@linux.alibaba.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Dong Yibo <dong100@mucse.com>,
+	Mingyu Wang <25181214217@stu.xidian.edu.cn>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Dust Li <dust.li@linux.alibaba.com>
+Subject: [PATCH net-next v42 0/8] eea: Add basic driver framework for Alibaba Elastic Ethernet Adaptor
+Date: Mon,  4 May 2026 22:44:31 +0800
+Message-Id: <20260504144439.29570-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20260504-misc-fixes-sparx5-lan969x-v1-4-6604306b5743@microchip.com>
-References: <20260504-misc-fixes-sparx5-lan969x-v1-0-6604306b5743@microchip.com>
-In-Reply-To: <20260504-misc-fixes-sparx5-lan969x-v1-0-6604306b5743@microchip.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Steen Hegelund
-	<Steen.Hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>, "Sebastian
- Andrzej Siewior" <bigeasy@linutronix.de>, Clark Williams
-	<clrkwllms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, Bjarni Jonasson
-	<bjarni.jonasson@microchip.com>, Lars Povlsen <lars.povlsen@microchip.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, Steen Hegelund
-	<steen.hegelund@microchip.com>, <linux-rt-devel@lists.linux.dev>, Andrew Lunn
-	<andrew@lunn.ch>
-X-Mailer: b4 0.14.3
-X-Rspamd-Queue-Id: 95EFC4C018C
+X-Git-Hash: 9e749460a759
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: A3DB94C022B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283892-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel.machon@microchip.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-283893-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.alibaba.com,linux.dev,mucse.com,stu.xidian.edu.cn,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,microchip.com:email,microchip.com:dkim,microchip.com:mid]
+	NEURAL_HAM(-0.00)[-0.996];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:dkim,linux.alibaba.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sashiko.dev:url,linux.dev:url]
 
-sparx5_port_init() only invokes sparx5_serdes_set() and the associated
-shadow-device enable and low-speed device switch for SGMII and QSGMII.
-On any port with a high-speed primary device (DEV5G/DEV10G/DEV25G)
-configured for 1000BASE-X the serdes is therefore left uninitialized,
-the DEV2G5 shadow is never enabled, and the port stays pointed at its
-high-speed device rather than the DEV2G5. The PCS1G block looks
-healthy in isolation, but no frames reach the link partner.
+Add a driver framework for EEA that will be available in the future.
 
-Add 1000BASE-X to the check so the same three steps run.
+This driver is currently quite minimal, implementing only fundamental
+core functionalities. Key features include: I/O queue management via
+adminq, basic PCI-layer operations, and essential RX/TX data
+communication capabilities. It also supports the creation,
+initialization, and management of network devices (netdev). Furthermore,
+the ring structures for both I/O queues and adminq have been abstracted
+into a simple, unified, and reusable library implementation,
+facilitating future extension and maintenance.
 
-Reported-by: Andrew Lunn <andrew@lunn.ch>
-Fixes: 946e7fd5053a ("net: sparx5: add port module support")
-Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
----
- drivers/net/ethernet/microchip/sparx5/sparx5_port.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+v42:
+    1. fix the comments from Jakub
+    2. fix the comments from sashiko
 
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_port.c b/drivers/net/ethernet/microchip/sparx5/sparx5_port.c
-index 04bc8fffaf96..62c49893de3c 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_port.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_port.c
-@@ -1128,7 +1128,8 @@ int sparx5_port_init(struct sparx5 *sparx5,
- 		DEV2G5_PCS1G_SD_CFG(port->portno));
- 
- 	if (conf->portmode == PHY_INTERFACE_MODE_QSGMII ||
--	    conf->portmode == PHY_INTERFACE_MODE_SGMII) {
-+	    conf->portmode == PHY_INTERFACE_MODE_SGMII ||
-+	    conf->portmode == PHY_INTERFACE_MODE_1000BASEX) {
- 		err = sparx5_serdes_set(sparx5, port, conf);
- 		if (err)
- 			return err;
+v41:
+    1. make https://sashiko.dev/ happy
 
--- 
-2.34.1
+v40:
+    1. fix comments from https://sashiko.dev/
+
+v39:
+    1. fix comments from https://sashiko.dev/#/patchset/20260407122001.22265-1-xuanzhuo%40linux.alibaba.com
+
+v38:
+    1. fix comments from https://sashiko.dev/#/patchset/20260404135144.33166-1-xuanzhuo%40linux.alibaba.com
+
+v36:
+    1. fix comments from https://sashiko.dev/#/patchset/20260323074441.91691-1-xuanzhuo%40linux.alibaba.com
+
+v35:
+    1. fix comments from https://netdev-ai.bots.linux.dev/ai-review.html?id=24371ffc-a1ea-46e1-a6b3-b8cbcbb52efb
+
+v34:
+    1. fix the comments from https://sashiko.dev/#/patchset/20260317015257.79494-1-xuanzhuo%40linux.alibaba.com
+
+v33:
+    1. fix the comments. old version refers enet_bind_new_q_and_cfg, but that is
+       changed to eea_bind_q_and_cfg.
+
+v32:
+    1. remove unused parameters from eea_net_ha_reset_remove and eea_create_pp
+    2. call skb_mark_for_recycle for new skb for frag_list skbs
+
+v31:
+    1. remove unused parameter "enet" from eex_rx_post()
+
+v30:
+   1. fix some small problems
+
+v29:
+    Address AI-generated review suggestions from the previous version.
+
+v28:
+    Address AI-generated review suggestions from the previous version.
+
+v27:
+    Address AI-generated review suggestions from the previous version.
+
+v26:
+    Adopting suggestions from the previous AI review, another significant
+    change is the introduction of an IRQ block to implement IRQ proxying. With
+    this design, when an IRQ occurs, we no longer invoke the RX data structure
+    directly -- instead, the IRQ block serves as an intermediary proxy. This
+    approach offers several advantages: IRQ resources no longer need to be
+    reallocated during reset operations, and IRQs are decoupled from RX
+    structures. Consequently, when certain errors occur, we can fall back and
+    safely reuse the original memory resources.
+
+v25:
+    I have adopted most of the suggestions from the AI's feedback. However, I
+    believe some of the feedback is incorrect. I have already replied in the
+    previous thread. http://lore.kernel.org/all/1770002612.3297296-2-xuanzhuo@linux.alibaba.com
+
+v24:
+    1. Add null checks for enet->rx and enet->tx in eea_get_ethtool_stat to
+       prevent errors when reading rx = enet->rx[i] in case enet->rx is null.
+       tx is similar. With rtnl protection in place, this check is sufficient.
+    2. Use 'received' as the return value in eea_poll.
+
+v23:
+    I have moved netif_set_real_num_queues() out of eea_start_rxtx(), so
+    eea_start_rxtx() is now a void function. I believe enet_bind_new_q_and_cfg()
+    is a more suitable place to include netif_set_real_num_queues(). In
+    eea_active_ring_and_irq(), I first execute request_irq() before interacting
+    with the hardware to create queues. Therefore, during the NIC setup process,
+    all driver-internal operations (memory allocation, IRQ initialization, sysfs
+    configuration, etc.) will be completed before the final notification to the
+    hardware.
+
+v22:
+    1. Use the budget from the NAPI poll function as the parameter for
+       napi_consume_skb.
+    2. Stop the TX queue when the remaining ring slots cannot hold an SKB.
+
+v21:
+    Fix two issues from the previous version:
+    1, a DMA unmap operation was missing.
+    2, RCU APIs were not used in eea_stats. Although the standard practice when
+        using RCU would require adding the __rcu annotation to both the rx and
+        tx fields, in many cases these fields are read without needing RCU
+        protection.  Therefore, I do not want to add the __rcu annotation.
+        Instead, I use a spin lock to protect modifications to rx and tx.
+
+v20:
+    Fix the partially initialized structure passed to db. @Jakub
+    http://lore.kernel.org/all/20260113172353.2ae6ef81@kernel.org
+
+v19:
+    fix the comments from @Simon Horman
+
+v18:
+    v17 with [PATCH] prefix.
+
+v17:
+    1. In `eea_adminq_dev_status`, uniformly use `enet->cfg.rx_ring_num`.
+    2. Add a `struct eea_net_cfg *cfg` parameter to `eea_free_rx` and
+        `eea_free_tx`. When called in the normal path, pass `enet->cfg` as
+        the argument; when called during initialization, pass the temporary
+        `cfg` instead.
+    3. Move the `.ndo_get_stats64` callback into `eea_net.c`.
+    4. In the `.ndo_get_stats64` callback, add a comment explaining how the TX
+        and RX statistics are protected by RCU.
+
+       /* This function is protected by RCU. Here uses enet->tx and enet->rx
+        * to check whether the TX and RX structures are safe to access. In
+        * eea_free_rxtx_q_mem, before freeing the TX and RX resources, enet->rx
+        * and enet->tx are set to NULL, and synchronize_net is called.
+        */
+
+
+v16:
+    1. follow the advices from @ALOK TIWARI
+       http://lore.kernel.org/all/5ff95a71-69e5-4cb6-9b2a-5224c983bdc2@oracle.com
+
+v15:
+    1. remove 'default m' from eea kconfig
+    2. free the resources when open failed.
+
+v14:
+    1. some tiny fixes
+
+v13:
+    1. fix some tiny fixes @Simon
+
+v12:
+    I encountered some issues with sending the v11 patches, as they were quite
+    messy. Therefore, I'm resending them as v12.
+
+v11:
+    1. remove auto clean __free(kfree)
+    2. some tiny fixes
+
+v10:
+    1. name the jump labels after the target @Jakub
+    2. rm __GFP_ZERO from dma_alloc_coherent @Jakub
+v9:
+    1. some fixes for ethtool from http://lore.kernel.org/all/20251027183754.52fe2a2c@kernel.org
+
+v8: 1. rename eea_net_tmp to eea_net_init_ctx
+    2. rm code that allocs memory to destroy queues
+    3. some other minor changes
+
+v7: 1. remove the irrelative code from ethtool commit
+    2. build every commits with W12
+
+v6: Split the big one commit to five commits
+v5: Thanks for the comments from Kalesh Anakkur Purayil, ALOK TIWARI
+v4: Thanks for the comments from Troy Mitchell, Przemek Kitszel, Andrew Lunn, Kalesh Anakkur Purayil
+v3: Thanks for the comments from Paolo Abenchi
+v2: Thanks for the comments from Simon Horman and Andrew Lunn
+v1: Thanks for the comments from Simon Horman and Andrew Lunn
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Xuan Zhuo (8):
+  eea: introduce PCI framework
+  eea: introduce ring and descriptor structures
+  eea: probe the netdevice and create adminq
+  eea: create/destroy rx,tx queues for netdevice open and stop
+  eea: implement packet receive logic
+  eea: implement packet transmit logic
+  eea: introduce ethtool support
+  eea: introduce callback for ndo_get_stats64 and register netdev
+
+ MAINTAINERS                                   |   8 +
+ drivers/net/ethernet/Kconfig                  |   1 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/alibaba/Kconfig          |  28 +
+ drivers/net/ethernet/alibaba/Makefile         |   5 +
+ drivers/net/ethernet/alibaba/eea/Makefile     |   9 +
+ drivers/net/ethernet/alibaba/eea/eea_adminq.c | 518 ++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_adminq.h |  83 ++
+ drivers/net/ethernet/alibaba/eea/eea_desc.h   | 138 +++
+ .../net/ethernet/alibaba/eea/eea_ethtool.c    | 273 ++++++
+ .../net/ethernet/alibaba/eea/eea_ethtool.h    |  48 +
+ drivers/net/ethernet/alibaba/eea/eea_net.c    | 885 ++++++++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_net.h    | 198 ++++
+ drivers/net/ethernet/alibaba/eea/eea_pci.c    | 730 +++++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_pci.h    |  73 ++
+ drivers/net/ethernet/alibaba/eea/eea_ring.c   | 249 +++++
+ drivers/net/ethernet/alibaba/eea/eea_ring.h   |  99 ++
+ drivers/net/ethernet/alibaba/eea/eea_rx.c     | 814 ++++++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_tx.c     | 498 ++++++++++
+ 19 files changed, 4658 insertions(+)
+ create mode 100644 drivers/net/ethernet/alibaba/Kconfig
+ create mode 100644 drivers/net/ethernet/alibaba/Makefile
+ create mode 100644 drivers/net/ethernet/alibaba/eea/Makefile
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_desc.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_rx.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_tx.c
+
+--
+2.32.0.3.g01195cf9f
 
 
