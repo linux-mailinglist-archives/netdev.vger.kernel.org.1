@@ -1,187 +1,153 @@
-Return-Path: <netdev+bounces-283765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283766-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KA89J/Vp+Gl4uQIAu9opvQ
-	(envelope-from <netdev+bounces-283765-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 11:42:13 +0200
+	id eI8EISZq+GmauQIAu9opvQ
+	(envelope-from <netdev+bounces-283766-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 11:43:02 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 073964BB258
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 11:42:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E3A34BB270
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 11:43:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2F8793035AA6
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 09:35:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 12CD0301D064
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 09:36:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB5A37F01B;
-	Mon,  4 May 2026 09:33:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A2F337D114;
+	Mon,  4 May 2026 09:36:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZPERwZAt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DB+pSZmS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D634D37F010
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 09:33:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C1237C909
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 09:36:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777887233; cv=none; b=U77LpwcHOae1apvueq4cLxeafHok5XhR2d81UPAid2uylZ4bSnGrpCfMZygRLx96iaZ8AQKKxoZd4W+zFdacNVSi1f3M5a4Kj8gPmFJw/4e95gtl2WHTNlHpLKvDOV2LL3VVi9PuJEKu+uA+rkFhT7z+FAsNzt0x6JrqDKGu/r0=
+	t=1777887395; cv=none; b=WcZ/oW0+iUY7TCS+sy03LKNfbcVgtb7/cvJUTxBIosLnWOV/c55xZgtaH0faOoIAEUBIApAIvLN2DNZsjSUyIJzhEzhHKChW2wgY7BU0mjOskJ9vXaZUsA6vKflx4TLgbQOW/s4wmF5Z78Ma/vFU+RTC64Jc43j4pLrK8xb20e4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777887233; c=relaxed/simple;
-	bh=CyK600bSpcUvxA2oEnqumwhvBvdD8/TNjAiasJ7K1YM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bwAuZaQ0SwmO9lXUpq4bLFpl0X68cVpQWPTYgufnEikI46K/7fxx9yid8QPtec8YAv8WD25Eha9KzxCPNnZdsKSC+9jbFibJrbEhPYf/BRUl5DtfiQclQFJfNHvho94ILT7F6vhzK25exRE6I3XKb45AwTwsWfdgosNtbmK2n50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZPERwZAt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B54DBC2BCF7
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 09:33:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777887232;
-	bh=CyK600bSpcUvxA2oEnqumwhvBvdD8/TNjAiasJ7K1YM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=ZPERwZAtJMJuT6qAO5lhMriYlKSY9SgtFD3U+MaZQ8Lff9g3BfjLa+DJLNtY8lvXC
-	 8bWG+8BFWxeH9W4FwgXZwW6P742ORQFMpHoqFvaRfcIDJ4Hkuh7dvI6FZKKy2kbqHr
-	 xILC9UExiKXQmSGcS3sFyMB3txVuNENNu+ShNkyze1mJns62kSWNnDerg7NOdcKykj
-	 ee9VuQ1c4PTeDxW9Lc3CH3jJXzMNDzlz3Z78wVOR30fGIZiqobok76GJBuPmzMOLBB
-	 LalQ9VL509NJOClmrb45cm7J73N1tsNd38Q1/WXmpDnxqo2EHkZHpnm31QiiviPEVf
-	 sztBrAFMaD36Q==
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5a86c1fe573so1821656e87.3
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 02:33:52 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ+jEE1XIjFW0hRFBY/o5LsG40GC+C7di7gYfg/l5DRNtF6twG+QSLcwSEszssCCwNlU6H5XTIA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/QJiMf3Jl0LSnUvyA/5NlQqhhFy8FUVrsEl6gWkk08qaeWNA6
-	LclIug9bBUd8PENx0m8YLWN7eE2rRYzRz+NTxSdGlzE52BxiATKmyuFOsbeJvIci4dwbsg0Wm01
-	Xmfy1ZOPsiiaODyL8JOFdBnyzCVFN1aXeHLNYw18zhw==
-X-Received: by 2002:a05:6512:682:b0:5a2:78f8:60aa with SMTP id
- 2adb3069b0e04-5a8631c5839mr3050732e87.37.1777887231319; Mon, 04 May 2026
- 02:33:51 -0700 (PDT)
+	s=arc-20240116; t=1777887395; c=relaxed/simple;
+	bh=TaiE6VPRhMdw40zBsC2LL5E3LA6Izko2YcBBVpykQjs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kUXu4NWpFs7OqNqz9OxGmmPr9XySslX2w34aHtMoHn1Zu2sEMcXlyy41NFYGclKFrUI+wDajE2UWpmufmal941flngoLACpuGQTizElRkwAutfhtjVHwCHk7o6OJxxyBdrLqG/vK6fd4igqV19CXoMGfMq4oZLtl0VmkmKVNosU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DB+pSZmS; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777887392;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nAq+++R2tX36PC5zxXCYWGZvvyeat8gPL+5FluYskoY=;
+	b=DB+pSZmS3yz5nncNqv2MGHdS3pG7FBbJ1yKPXHTfvoMNVZ5oqpVL/yvMXAY0L1c0mvGaec
+	IM96PDwsxXBp8hFiLjKkAAeFkfYBrdkTc/oPE2ptsjO7bU9T9FaaNug7OnY7HBM4rE2mxZ
+	It5IlN4AVLRgQQ4P3z7lZ0trxCepVyA=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-272-XpdB2FISPMCx6GsI_yi-_w-1; Mon,
+ 04 May 2026 05:36:31 -0400
+X-MC-Unique: XpdB2FISPMCx6GsI_yi-_w-1
+X-Mimecast-MFC-AGG-ID: XpdB2FISPMCx6GsI_yi-_w_1777887388
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CEEF0195609E;
+	Mon,  4 May 2026 09:36:27 +0000 (UTC)
+Received: from [10.44.48.185] (unknown [10.44.48.185])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1FDE51800357;
+	Mon,  4 May 2026 09:36:20 +0000 (UTC)
+Message-ID: <290673a1-fb5b-4586-b44a-e109cc1a4629@redhat.com>
+Date: Mon, 4 May 2026 11:36:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260205-fc-nxp-nci-remove-interrupt-trigger-type-v2-1-79d2ed4a7e42@amd.com>
- <ca967f7e-d671-4be5-bcc2-30d75fa919aa@gmail.com> <abE6yxLHNqvq2Imz@carl-amd>
-In-Reply-To: <abE6yxLHNqvq2Imz@carl-amd>
-From: Bartosz Golaszewski <brgl@kernel.org>
-Date: Mon, 4 May 2026 11:33:39 +0200
-X-Gmail-Original-Message-ID: <CAMRc=MfADC2ncuUQiSW7TnUwBUWCJn9i=wZ9dqYMZNo2h6qOxw@mail.gmail.com>
-X-Gm-Features: AVHnY4JpWj0gJsafJp-8HOpr4-E6aktK4TBIV9WGSFNNuJkNFFpcCHDXtgAANd4
-Message-ID: <CAMRc=MfADC2ncuUQiSW7TnUwBUWCJn9i=wZ9dqYMZNo2h6qOxw@mail.gmail.com>
-Subject: Re: [PATCH v2] nfc: nxp-nci: remove interrupt trigger type
-To: Carl Lee <qq1145099@gmail.com>
-Cc: Luca Stefani <luca.stefani.ge1@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, krzk@kernel.org, peter.shen@amd.com, 
-	colin.huang2@amd.com, carl.lee@amd.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 073964BB258
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/2] dpll: move
+ fractional-frequency-offset-ppt under pin-parent-device
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+ Michal Schmidt <mschmidt@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
+ Pasi Vaananen <pvaanane@redhat.com>, Petr Oros <poros@redhat.com>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Shuah Khan <skhan@linuxfoundation.org>,
+ Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <20260430173611.3312596-1-ivecera@redhat.com>
+ <20260430173611.3312596-2-ivecera@redhat.com> <afhdCnT0ns-PgZD8@FV6GYCPJ69>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <afhdCnT0ns-PgZD8@FV6GYCPJ69>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Rspamd-Queue-Id: 2E3A34BB270
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,kernel.org,amd.com];
-	TAGGED_FROM(0.00)[bounces-283765-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283766-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,intel.com,davemloft.net,gmail.com,google.com,kernel.org,lwn.net,nvidia.com,redhat.com,microchip.com,linuxfoundation.org,linux.dev];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amd.com:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Wed, Mar 11, 2026 at 11:01=E2=80=AFAM Carl Lee <qq1145099@gmail.com> wro=
-te:
->
-> On Mon, Mar 09, 2026 at 07:13:18PM +0100, Luca Stefani wrote:
-> >
-> > On 05/02/2026 12:11, Carl Lee wrote:
-> > > For NXP NCI devices (e.g. PN7150), the interrupt is level-triggered a=
-nd
-> > > active high, not edge-triggered.
-> > >
-> > > Using IRQF_TRIGGER_RISING in the driver can cause interrupts to fail
-> > > to trigger correctly.
-> > >
-> > > Remove IRQF_TRIGGER_RISING and rely on the IRQ trigger type configure=
-d
-> > > via Device Tree.
-> > >
-> > > Signed-off-by: Carl Lee <carl.lee@amd.com>
-> > > ---
-> > > This v2 of the series includes Krzysztof Kozlowski in the review list
-> > > for NXP-NCI NFC.
-> > >
-> > > This series removes IRQF_TRIGGER_RISING in nxp-nci driver,
-> > > relying on the IRQ trigger type specified via Device Tree.
-> > > ---
-> > > Changes in v2:
-> > > - Include Krzysztof Kozlowski in the review list for NXP-NCI NFC.
-> > > - Link to v1: https://lore.kernel.org/r/20260204-fc-nxp-nci-remove-in=
-terrupt-trigger-type-v1-1-3bde91593173@amd.com
-> > > ---
-> > >   drivers/nfc/nxp-nci/i2c.c | 2 +-
-> > >   1 file changed, 1 insertion(+), 1 deletion(-)
-> > >
-> > > diff --git a/drivers/nfc/nxp-nci/i2c.c b/drivers/nfc/nxp-nci/i2c.c
-> > > index 049662ffdf97..6a5ce8ff91f0 100644
-> > > --- a/drivers/nfc/nxp-nci/i2c.c
-> > > +++ b/drivers/nfc/nxp-nci/i2c.c
-> > > @@ -305,7 +305,7 @@ static int nxp_nci_i2c_probe(struct i2c_client *c=
-lient)
-> > >     r =3D request_threaded_irq(client->irq, NULL,
-> > >                              nxp_nci_i2c_irq_thread_fn,
-> > > -                            IRQF_TRIGGER_RISING | IRQF_ONESHOT,
-> > > +                            IRQF_ONESHOT,
-> >
-> > This is causing an IRQ storm on my ACPI device that eats away a core of=
- my
-> > cpu...
-> >
-> > I'm not sure how this should be fixed but by looking at other drivers t=
-hey
-> > all use irq_get_trigger_type() and then apply extra bits on top.
-> >
-> > If there's no clear path that handles both ACPI+DT I'll upload a revert=
-.
-> >
->
-> Thanks for the report.
->
-> I=E2=80=99ve sent a follow-up patch series that restores a fallback to th=
-e
-> historically used rising-edge trigger when the firmware does not provide
-> a trigger type. This should prevent the IRQ storm on ACPI platforms
-> while keeping proper behavior on DT-based systems.
->
-> Patch series link: https://lore.kernel.org/all/20260311-nfc-nxp-nci-i2c-r=
-estore-irq-trigger-fallback-v1-1-9e20714411d7@amd.com/
->
+Hi Jiri,
 
-Hi!
+On 5/4/26 10:48 AM, Jiri Pirko wrote:
+> Thu, Apr 30, 2026 at 07:36:10PM +0200, ivecera@redhat.com wrote:
+>> Move the fractional-frequency-offset-ppt attribute from the top-level
+>> pin attributes into the pin-parent-device nested attribute set. This
+>> makes it consistent with phase-offset which is already per-parent and
+>> clarifies that FFO PPT represents the frequency difference between
+>> a pin and its parent DPLL device.
+>>
+>> The top-level fractional-frequency-offset attribute (in PPM) remains
+>> unchanged for backward compatibility.
+> 
+> That is odd. The ppt one was added just for higher precision but was
+> semantically the same. Now you change it. Could you still treat both the
+> same?
+> 
+WDYM?
 
-I'm experiencing the same issue since v6.19.5 (still present on
-v7.0.3) and the linked patch *does not* fix the problem - only
-reverting the offending commit
-(57be33f85e369ce9f69f61eaa34734e0d3bd47a7 in mainline) does. I'm
-running a T14s laptop with AMD Ryzen 7 PRO 6850U.
+Keep fractional-frequency-offset-ppt at the top-level and add both
+fractional-frequency-offset and fractional-frequency-offset-ppt into
+pin-parent-device nested attribute set?
 
-Best Regards,
-Bartosz Golaszewski
+Thanks,
+Ivan
+
 
