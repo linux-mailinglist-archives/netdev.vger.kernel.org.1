@@ -1,282 +1,184 @@
-Return-Path: <netdev+bounces-284018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284019-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CI0gOxzu+Gla3QIAu9opvQ
-	(envelope-from <netdev+bounces-284018-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 21:06:04 +0200
+	id SHXaIcXw+Gmr3QIAu9opvQ
+	(envelope-from <netdev+bounces-284019-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 21:17:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A7E44C2E14
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 21:06:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE6BB4C31EE
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 21:17:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8AD0D3008CAC
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 19:05:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C089F3099A82
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 19:11:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F0513EE1D4;
-	Mon,  4 May 2026 19:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 038A93F20E7;
+	Mon,  4 May 2026 19:10:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="a0Iinxvv";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RmVGq3QM"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="fkYQIm3u"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B740B3EF0D0;
-	Mon,  4 May 2026 19:05:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777921557; cv=none; b=GgvF+4IkxBAkazwaV4a/OTxIRuGl7FvSbyuhpu3K2vxuz7t1wb3BotQi0BZDhozX4DIhH4WJxPjy17sYO/n17ZVAvz/nxpdis1jCqp+W1agJuuYs5XVh2R+HgkfmbgHxlW8UgU7C3UVtVOODZirCWqRXFapnjjncPtpUUQ9ZFJE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777921557; c=relaxed/simple;
-	bh=5wu3ZqkjPvTfVjp3z80Q7450MQ06D/chbyoitbHSOI4=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=UR7OXtGemTlzoOJaQUfhJHg6vguvs8oZlGTsD/WlkCSaLhb/ZZEQ6KNSafePXm9ENzWTj6bUm3xk7BH0N3p7sF+XYy/R6K0Bzq2zLPEDZnwToQCJJZ5EVk1hhwy3XPhu6oZ/s4pcMKrEkZPOrYFFlsYJMrSjp+V+/X8IQxkQznw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=a0Iinxvv; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=RmVGq3QM; arc=none smtp.client-ip=202.12.124.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id B8FDD7A00D1;
-	Mon,  4 May 2026 15:05:52 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-04.internal (MEProxy); Mon, 04 May 2026 15:05:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1777921552;
-	 x=1778007952; bh=1LQnbToEHrPoOfl2g/PxEQZpeTfQhJj3qIDyqk5cnEI=; b=
-	a0IinxvvdoK8EFEijvR6HfQxxv+bDUxqXGi/EB5YQyzO+S6tdGAC0ncajJXgZ8ZO
-	Asb1FTutvnSPs21Vuaj9lwnb8Pyhjj2udQ3GgYgG94wT/EjB/TdLf+RHXpUNTinp
-	l6uNThX8yJGz+Cy21D/CHf3MTRmWQftwoI5tEEc/M85McRh5PDHYs/ZKhcF9dF1r
-	GCuFVvsBur/sda6CqfCTQfrJ87Xpscqz1MdzctIlycpfoZP21cLQ3RUUxxchXUo7
-	ed/JbewoFKEnQhlXZbsD4ulALNu9TihG6fJmwLS0/fAPGutLQUeWdIZWugcGchm4
-	eDeZkErZPgufJiX+LS9OOQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1777921552; x=
-	1778007952; bh=1LQnbToEHrPoOfl2g/PxEQZpeTfQhJj3qIDyqk5cnEI=; b=R
-	mVGq3QM4P2J49KJ/2W/JkSh24bhqE2ujufRo+bMrTXeeM/0m71goO+ltkni0PTSa
-	QJ0GplStOf9LinTWBL1T01csFE6rTeLduKoU4nhqsFabv1Eis2hiYoujDKisLPcg
-	RmXFBHrxffoaiPBzvPoWLKuo7Pj0iiHxRb7xu9IQfdcEI1KsGuBJGmh5lDA/cbyB
-	lkq5cyTm68xHVrv70VGskIKoCqLYzjyY9RfdsROwtnJBSFAkUBvJOl0dckynT71V
-	AK4Q1K3Yx16aa+pWDS6L5Eh7kVzE7AOo6yyjmZ2HWZnJAJ8DiVcPrdM4H+wlk0sS
-	yVEGGJ6wXPcbv5lR8Wjpw==
-X-ME-Sender: <xms:Du74aUD_O_mxB3ckow7YSXdZMabHQh_VP9hyK8puuRazpQMvPxRWKQ>
-    <xme:Du74aRUCbrDM73y9hOQL4Mjc-KgbjYb7pjz4LeABBGRhgaHkC-Mrv2_KbZJIrhz6M
-    vKUjP_sNJJTBpfPP7bLRPZcJ8Kjp7L54S0mbXIaojtGTyDIYt7qkkEg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdelleeifecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdetrhhnugcu
-    uegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtthgvrh
-    hnpeefhfehteffuddvgfeigefhjeetvdekteekjeefkeekleffjeetvedvgefhhfeihfen
-    ucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghp
-    thhtohepvdehpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehprghlmhgvrhesug
-    grsggsvghlthdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhn
-    vghtpdhrtghpthhtoheprghouhesvggvtghsrdgsvghrkhgvlhgvhidrvgguuhdprhgtph
-    htthhopehsughfsehfohhmihgthhgvvhdrmhgvpdhrtghpthhtoheprghlvgigsehghhhi
-    thhirdhfrhdprhgtphhtthhopehjohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtg
-    homhdprhgtphhtthhopeihuhhrhidrnhhorhhovhesghhmrghilhdrtghomhdprhgtphht
-    thhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoheprhhurghnjh
-    hinhhjihgvsehhuhgrfigvihdrtghomh
-X-ME-Proxy: <xmx:Du74aeZMh9v9cdoij1HMj1riYaqIZQYCh22bGoo2FUwhXdhnhMSZkA>
-    <xmx:Du74aRThnIAM3MKouBt4eQVBKuI1_AdO3WgTzvSbW_T5vKnKD_c3rw>
-    <xmx:Du74aWTUS-L5C8Sbdsbcp7YLjPCr_z3TMkS4Xm432XGAnnRMETdYTQ>
-    <xmx:Du74ac39--YTA3Uh5flzyCuHXgGQF0iuUFFmeQMdRoq-Vh7VI0L56w>
-    <xmx:EO74aQOAj7DNRjoA53HnmTNGpOCdaYUxtM323Axm1czS8pgTOPOg7p2C>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 805FE700069; Mon,  4 May 2026 15:05:50 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A463EF649
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 19:10:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777921823; cv=pass; b=CQcTbXxLBRLQDVDw3if1BfD5ncOPCUT8EXVUiAAyomSDfPAJIc6JYRnZGsJZlTLSBeoL758+QjO7WxSn0mgbcyIxL7T3tirfUUl43FIjbSN/t4jVYdTAKkBLQ9WBJISAhMfzDUynA3wa0zQPuNUgcoTRx2pFWDDIA1m/eMHWI9s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777921823; c=relaxed/simple;
+	bh=fbW1lmwMKbR7U8sH3t0pUYRt9uZb1c97zojBGzt05M4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=shXP74En4ByzRqD4Zfr9eDnVliKln0UoMpDpJIXPJRPosgSlxT4mFuJcXLC8+6UYYJKp+K6QTJxUtCWDpzh9C9cWKMAP77QXYFILiOkhnUAa1PTvJHIyUhJuBjPYf1gH2cOl4m6BVW9ewYy/FLFfys13s6EesFWJbeCVmtl+3Xo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=fkYQIm3u; arc=pass smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-82fbdd60b64so3220423b3a.3
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 12:10:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777921822; cv=none;
+        d=google.com; s=arc-20240605;
+        b=MInuKN/tORL4B62HJcOTMp/TDlpsmyfFaGKqlXlu06XtpLIQhRUGqrEFOLO8nwkTWz
+         DmArqey74MpdPQUPG3lMoAe1yVllh6VTjPMFf+LKkpt/qGuWup1ZIL/5eg1xRFkUa0tG
+         sR2ZGhpNQqVHci41TASlab6sCdHO/ofxfmgljwW7rk9h1cPbp9hb4SxbyWj6qunqOgo3
+         CVvz9YloVuq6IjKFjYW8DTK/Z654IROT1ERqZKuiO1HtQ6MAjlDPHPQG9sHil1Uz33l+
+         kYK7mXYGi08WXWHMQajh7adBdcRGAFL7cFsNPgi64jSs8mVV425dr2ESUg8mW7V5llJm
+         NN2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=5KH9OfxNuUuiTqz2j5K8SaWZtcRXyNCgll5zc0AiOiE=;
+        fh=M7Ns+JwX+EmeCLfL5XkejFp8h571IOx6czi1e4tzE/U=;
+        b=FVbrFKRyHs4E2Jr6QmhYTXOPr8GdIA53J2FvcmDB7r9YV0S3qH5vLVXLT68yWj2Yji
+         ChQN+LZQFhhW6tD97cYo7DjUeYs06Acn1QzgFkubaW+bUzxIO6gWEBELWEWMArpR8h8j
+         ql9QGeJUDj2Z5DRn8neqoJBOonqfAfwFFXcy+a5o9bVfcXr7CiyUyigHTxYZagsa5h1F
+         cGvxvfXSBsOJTZWdsViIWUHdsj08KoHCXceS1knwZ0c/y6qhaY8YlX4y0+Qx/96l+Rjs
+         1bsoYS7AoGIzylA4tjWYYuMPeBFf/g5aJLZv/aCBxVo1vDKwrvvXGwTteY2tQmEKU3TP
+         b8fg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1777921822; x=1778526622; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5KH9OfxNuUuiTqz2j5K8SaWZtcRXyNCgll5zc0AiOiE=;
+        b=fkYQIm3uMeQKSTvhIRTYcWNeE9mgrZ5mpjPsaQ7RPzOaVe2Fu2vJNlbHvSeelEnhqo
+         uyUrGRSA2TliD6unB+yiP67n41EYuYq7fY6xQqBTbhLLC1BtlI1ocGsZiOknOqUuPIFA
+         JAvx8C8yaTvpgKA6rk/DRAy7sh0WeVoie6jBqvB3/sMkcLwA+EgjaL1aJvRd2xjr1Bm3
+         bz3VNSrkvEfh+dFgMRrf0LSnQChh8GrvWEvleMPFBA8ELTuoosyjvB2GRAS0Oq6+yXw7
+         QtWtLsGMyIwaQ97OXFwNAXFli/2jq3OupMmUGujxgI1GOzgIEKhtbyDrJxqQIcyrTaqg
+         I4Gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777921822; x=1778526622;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=5KH9OfxNuUuiTqz2j5K8SaWZtcRXyNCgll5zc0AiOiE=;
+        b=NTiz+k1A3GFHnwZq7elErcdAyb21GaeQVpxVMYW3xpO4IVuXbNhDsIOvd09Q1ILCMU
+         ir4nL+caSMjWyeqAXd8mwSRbSF+vWJ18n/fdrM3gBbNPG74u+lt6D3CcmfMxZx6+9JSM
+         HZYBpSfjZ+BDYDc25AujHWyya3t+Ln0X9CjKdcvCmYXJ5KiIrBK2yADiSvJ5isThojBS
+         /PbeH4/OIzDtvXVrTjCSVO/R8bGuwQCW6KFLTv4NHNb+Mzc45pN1hqTuOQDVF1IIjUsk
+         hxyFVj9W5uD7WJOp7gOErYEqwxP7wPBNFp7AlmkyNLeWqfec0gG1hjIGrdqa2QemTWQo
+         qQhw==
+X-Forwarded-Encrypted: i=1; AFNElJ/OLCT4W4vUORtjvpVY4/pI21GagCHVojO+P2bM3xfdMbqPX8RSIgjgfkHFiMhJAqsESqmRc2A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx63ineHktbPMEbzRMmtzmxlJG5Ac9YDMz+ujbkZrAokC6SWANu
+	EBQGe/VP0p8NEoUhATk7S8JyA4tGP+xPUzEqgZpNX/hgvCWVVqAD7oGq7jop3vtlzlCM6XFW7hh
+	fC/xkJDmwHsbgjLWe+MtT/RTisWEoDSC/TvxrIWKKwM4wmOD7EV0=
+X-Gm-Gg: AeBDietTZNsaLnZvSXSybW1qSbEfiozFUmAcjqC37SSZgDfrPqVkPsQqbUqkATVNAL0
+	TxeKbX33kgnWxdLdOvxlA7Il4DOloucALFuBp2cnI4CYJHFSnBBeSD/EwWUZsfXOE4Akoop4SDv
+	Iyh4vyU1ufHD+wJeXAsWmc3wFQPUlCAlvwDnxjpXw/mZkZltMdsypHPsRLpdtLq+81izW7ZefQl
+	TzPDxyFPsBVgNna7m20LYKhTJmfQid6oDbEV4LqUZGX/i70r1EIANsu7XOgsxvKSzAxipwXPIb5
+	Jap4gGt+2Y9psl1PRVkpefBLp0ycEg==
+X-Received: by 2002:a05:6a00:139f:b0:838:1c02:276c with SMTP id
+ d2e1a72fcca58-8381c022c71mr3828983b3a.40.1777921821498; Mon, 04 May 2026
+ 12:10:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AduvTQsiZ6dJ
-Date: Mon, 04 May 2026 21:05:30 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Yury Norov" <ynorov@nvidia.com>
-Cc: "Paul Walmsley" <pjw@kernel.org>, "Palmer Dabbelt" <palmer@dabbelt.com>,
- "Albert Ou" <aou@eecs.berkeley.edu>, "Alexandre Ghiti" <alex@ghiti.fr>,
- "Yury Norov" <yury.norov@gmail.com>,
- "Rasmus Villemoes" <linux@rasmusvillemoes.dk>,
- "Andrew Lunn" <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>,
- "Andrew Morton" <akpm@linux-foundation.org>,
- "Alexei Starovoitov" <ast@kernel.org>,
- "Daniel Borkmann" <daniel@iogearbox.net>,
- "Jesper Dangaard Brouer" <hawk@kernel.org>,
- "John Fastabend" <john.fastabend@gmail.com>,
- "Stanislav Fomichev" <sdf@fomichev.me>,
- "Ruan Jinjie" <ruanjinjie@huawei.com>, linux-kernel@vger.kernel.org,
- linux-riscv@lists.infradead.org, Linux-Arch <linux-arch@vger.kernel.org>,
- Netdev <netdev@vger.kernel.org>, bpf@vger.kernel.org,
- "Nathan Chancellor" <nathan@kernel.org>
-Message-Id: <abf4a586-b675-4e29-9570-fd3ed4158f58@app.fastmail.com>
-In-Reply-To: <afjmIK4mlCWeywuS@yury>
-References: <20260430211351.658193-1-ynorov@nvidia.com>
- <20260430211351.658193-2-ynorov@nvidia.com>
- <ec4ed7f5-b1c8-49e4-b83d-e29c5414b9de@app.fastmail.com>
- <afjNaToyptiMogV4@yury>
- <9d45acd1-667b-4acf-9e2e-bcd79630d726@app.fastmail.com>
- <afjmIK4mlCWeywuS@yury>
-Subject: Re: [PATCH 1/6] lib: include crc32.h conditionally on CONFIG_CRC32
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 2A7E44C2E14
+References: <20260503115138.2467123-1-edumazet@google.com>
+In-Reply-To: <20260503115138.2467123-1-edumazet@google.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 4 May 2026 15:10:10 -0400
+X-Gm-Features: AVHnY4IkprHfvbLb0IQZKmFgY1hy-preBjv03pBRmWe8MSplASkGANteRd6Lw5U
+Message-ID: <CAM0EoMk8sXEyV6OLWtTRBm9mZsj34sZ_pLHYZi7+3Tcv01U72A@mail.gmail.com>
+Subject: Re: [PATCH iproute2-next] tc: qdisc: provide tcm_handle and
+ tcm_parent to kernel dump requests
+To: Eric Dumazet <edumazet@google.com>
+Cc: David Ahern <dsahern@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, 
+	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: DE6BB4C31EE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.65 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[arndb.de,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[arndb.de:s=fm2,messagingengine.com:s=fm3];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr,gmail.com,rasmusvillemoes.dk,lunn.ch,davemloft.net,google.com,redhat.com,linux-foundation.org,iogearbox.net,fomichev.me,huawei.com,vger.kernel.org,lists.infradead.org];
-	TAGGED_FROM(0.00)[bounces-284018-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284019-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[mojatatu.com];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,networkplumber.org,davemloft.net,redhat.com,vger.kernel.org,gmail.com];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[arnd@arndb.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[arndb.de:+,messagingengine.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mojatatu-com.20251104.gappssmtp.com:dkim,mojatatu.com:email]
 
-On Mon, May 4, 2026, at 20:32, Yury Norov wrote:
-> On Mon, May 04, 2026 at 07:18:49PM +0200, Arnd Bergmann wrote:
->> On Mon, May 4, 2026, at 18:46, Yury Norov wrote:
->> > Never heard about such a thing like "optional interface". And git grep
->> > tends to second that...
->> 
->> I meant any library interface that can be turned on or off
+On Sun, May 3, 2026 at 7:51=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
+rote:
 >
-> So? If I disable CRC32, can I use the either_crc()? In case of that
-> networking header, the answer is yes. In some other piece of code
-> the answer is no. Is that correct?
-
-Since it's a macro defiend in terms of both bitref32 and
-crc32_le, you can only call it from dead code, such as an
-inline function that is not itself used, or from inside of
-a block that is protected with IS_ENABLED(CONFIG_CRC32) etc.
-  
->> >> 
->> >> Don't add #ifdef blocks around headers. If the header cannot
->> >> be included without side-effects, change the linux/crc32.h
->> >> file instead of its users.
->> >
->> > linux/acpi.h does that like many othes. What exactly is wrong with
->> > protecting headers inclusion?
->> 
->> There is no "protecting" here, you just add complexity to the
->> build when headers are sometimes included indirectly and but
->> other times are not, depending on kernel configuration.
+> linux-7.2 can filter "tc qdisc show ..." on tcm_handle / tcm_parent and
+> reduce dump costs.
 >
-> Sorry, don't understand... I use the 'protecting' term with the meaning:
-> the functionality that is explicitly disabled should be never used.
-> Otherwise, what for we disable it?
-
-Arguably, both configuration symbols are at the point of not actually
-saving enough object code size to actually be worth the Kconfig
-dependencies.
-
-As long as we have CONFIG_CRC32 and CONFIG_BITREVERSE, the
-point of having the Kconfig symbols is to let drivers request
-the inclusion of the library helpers.
-
->> It's unlikely to cause problems for the crc32.h header, but
->> the acpi example definitely risks running into circular
->> inclusions when you end up with some other header that depending
->> on configuration ends up including linux/acpi.h while also
->> bring included indirectly from that one.
->> 
->> >> It looks like the problem is the check for CONFIG_GENERIC_BITREVERSE
->> >> in include/asm-generic/bitops/__bitrev.h, which ends up
->> >> hinding the generic___bitrev32() helper without need.
->> >> 
->> >> Simply removing the #ifdef there should avoid the build failure.
->> >
->> > OK, it seems like this is what I don't understand.
->> >
->> > We've got an optional feature, like CRC32, which is enabled by
->> > CONFIG_CRC32. The most conservative way is to declare everything
->> > CRC32-related in the corresponding header, and then protect the header
->> > with IS_ENABLED(CONFIG_CRC32).
->> >
->> > I understand that from practical perspective, we can declare some simple
->> > macros, like header size, unprotected. But what we've got now is a sort
->> > of mess: all CRC32-related functions are declared unprotected, and
->> > generic headers are good to use them. Compiler is happy while those
->> > functions are actually unused. Next, CRC32 depends on BITREVERSE, which
->> > is again unprotected, and it may optionally have an arch implementation.
->> >
->> > So if arch bitrev() is implemented, you can use part of bitreverse and
->> > crc32 APIs despite that they are explicitly disabled - just because they
->> > are implemented as macros in unprotected headers. And you cannot use some
->> > others - because they are implemented differently, as a real functions.
->> 
->> I think you trying to solve a non-problem here.
+> Old kernels ignore these values.
 >
-> This was reported by Nathan for tinyconfig. At least x86 and s390 are
-> affected.
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
+
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+
+cheers,
+jamal
+> ---
+>  tc/tc_qdisc.c | 3 +++
+>  1 file changed, 3 insertions(+)
 >
-> https://lore.kernel.org/all/20260429202922.GA3575295@ax162/
+> diff --git a/tc/tc_qdisc.c b/tc/tc_qdisc.c
+> index b3c395b65c2f6b47abbcb6aa37b7dc1f080032e8..7c3e7cb36b4830bca9f2785a5=
+8b38d319ec4b563 100644
+> --- a/tc/tc_qdisc.c
+> +++ b/tc/tc_qdisc.c
+> @@ -408,6 +408,9 @@ static int tc_qdisc_list(int argc, char **argv)
+>                 argc--; argv++;
+>         }
 >
-> Is tinyconfig important?
-
-Nathan reported a build regression caused by a small mistake
-in 596a9ea9015b ("bitops: Define generic __bitrev8/16/32 for reuse"),
-which is of course needs to be fixed.
-
-What I meant is that there is no reason to not use the obvious
-fix and do
-
---- a/include/asm-generic/bitops/__bitrev.h
-+++ b/include/asm-generic/bitops/__bitrev.h
-@@ -2,7 +2,6 @@
- #ifndef _ASM_GENERIC_BITOPS___BITREV_H_
- #define _ASM_GENERIC_BITOPS___BITREV_H_
- 
--#ifdef CONFIG_GENERIC_BITREVERSE
- #include <asm/types.h>
- 
- extern u8 const byte_rev_table[256];
-@@ -20,6 +19,5 @@ static __always_inline __attribute_const__ u32 generic___bitrev32(u32 x)
- {
-        return (generic___bitrev16(x & 0xffff) << 16) | generic___bitrev16(x >> 16);
- }
--#endif /* CONFIG_GENERIC_BITREVERSE */
- 
- #endif /* _ASM_GENERIC_BITOPS___BITREV_H_ */
-
-> Right now half CRC32 is available if CONFIG_CRC32 is on, and half is
-> not available. The bitreverse is the same. If HAVE_ARCH_BITREVERSE is
-> enabled, one can use the API, bypassing the BITREVERSE. This doesn't
-> sound right to me long-term.
+> +       /* Recent kernels (7.2+) can filter on tcm_parent/tcm_handle */
+> +       req.t.tcm_parent =3D filter_parent;
+> +       req.t.tcm_handle =3D filter_handle;
 >
-> Whatever this ends up, let's figure out a consistent solution please?
-
-I really don't think we need any sort of solution here, aside from
-the trivial regression fix that returns it to the previous working
-state.
-
-      Arnd
+>         if (d[0]) {
+>                 req.t.tcm_ifindex =3D ll_name_to_index(d);
+> --
+> 2.54.0.545.g6539524ca2-goog
+>
 
