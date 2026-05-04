@@ -1,489 +1,469 @@
-Return-Path: <netdev+bounces-284063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284065-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qGLjKgMe+Wlw5wIAu9opvQ
-	(envelope-from <netdev+bounces-284063-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 00:30:27 +0200
+	id 8NiNEm4e+Wlw5wIAu9opvQ
+	(envelope-from <netdev+bounces-284065-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 00:32:14 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B8E84C463B
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 00:30:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CDC44C4690
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 00:32:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 685C33015465
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 22:30:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8BD2E3015717
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 22:31:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 168B5386428;
-	Mon,  4 May 2026 22:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24B8137C930;
+	Mon,  4 May 2026 22:31:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="cJw4nH1L"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fOfD5OXF"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11020089.outbound.protection.outlook.com [52.101.193.89])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0363845B6;
-	Mon,  4 May 2026 22:30:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2F1359A7E;
+	Mon,  4 May 2026 22:31:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777933823; cv=fail; b=OmpeaW4niX3w5QG53Mi3s4I9vU/YCuSMyoNoWozQIT5TdEEZrumEiA9MNgazZJiplaBTNHW0qvEpRBFR+72YNggybgDAeQud0ot+LPR3jqFjkk9B61vNiz15d1BUPLGMunovm/lCeOmGWF9xlzh5gZfIObzDVbYPhcqu8zOJIe4=
+	t=1777933896; cv=fail; b=aLNDj76a3AJHNJnkZH14CzFNbfFkpHSahYLZahm1q4EFbkjSTqYczdzwVFXNz/lt9RIaZOPFuvwzi6b0QNTeK44OGg1In+rfRaJQe7fc3o3R9TZ8yWOjr97VIfxep5GeDS0Bw4YhYoPi7f3aqEGOi6wQkesn0GspoESgWEP21/E=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777933823; c=relaxed/simple;
-	bh=1oyQ85WhHlMuub4p2sG+iumFu0QAYhBQ9YEs4eoC/Q4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=uB/i9e3CI2cweCd2COIcYNIbSorSV5pSvs5o2Oa43+WkPKU39aYyey99CRvnLg4A/9Ev4QGk9fRkGwnc+SXUlxknm2cXN2ezczk9G3ekW/LBoX6eQ2h8doodS2njePlSPSMAtvQZPMPCyyy0TJE/AfpPpidbTqEehkyAANZC7mI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=cJw4nH1L; arc=fail smtp.client-ip=52.101.193.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+	s=arc-20240116; t=1777933896; c=relaxed/simple;
+	bh=VZ6jtyevJIQjnIduk3JU1VyVdh3wQ+cp7uWu5N5TM/g=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=IkqdM8BAxhohnqIJAi9cXIr0DNZLbu021rTNRq39rz93kX9kEvhHK2KNd6yEhlwMkkV8Ti0crGz7EGCd3ewxkSNc818ZhDnEBdaT+EMdAp2MmYVFe0MzMLedkSXz1U2+3u/4cFxnPXc4t+u1p39KM1SEMtzLKHdU5TlUh9VFQno=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fOfD5OXF; arc=fail smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777933894; x=1809469894;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=VZ6jtyevJIQjnIduk3JU1VyVdh3wQ+cp7uWu5N5TM/g=;
+  b=fOfD5OXFQ1jVsI+bwfxvCPfNVnJdSaxThZ4phzx4FofpeBSrNjux1Ag+
+   +aLDovG4fD+t83FkPdQ5Gh9RsfSz7t4C0lDBV4x5RSQzz8wAV4JB2NNXD
+   O4WZSPcZuuvId1cZi3pnRtHXaVnJizeg666oSb/DPJAXJcXAy5mJR89t5
+   kzwGPA4LZLbIrPW2Hv4r8o6vIQ7x7XhyWRe15I/TgbElW6r2ds84DK3xR
+   vJ39tcMoZuEqChGKOIGRYfDUaP92rRYiu0e3Mk7u4fD5Np8ggO6pWlq9u
+   I2Pe+E0qm3lK4QqddbgN/urK3EomC1qpZE6Gy54k/77dwIeMh7pUkmN0c
+   w==;
+X-CSE-ConnectionGUID: 7b34IcLATAKIZXPbaV4HJw==
+X-CSE-MsgGUID: YV6m/D+GQ5O2wQpi/AupkA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11776"; a="66329320"
+X-IronPort-AV: E=Sophos;i="6.23,216,1770624000"; 
+   d="scan'208";a="66329320"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 15:31:33 -0700
+X-CSE-ConnectionGUID: O2uUxDqCSjq+5U3VMdy5Mw==
+X-CSE-MsgGUID: MTKKxgjaTiyq4zLv0NA8uQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,216,1770624000"; 
+   d="scan'208";a="232498952"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 15:31:33 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 4 May 2026 15:31:33 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Mon, 4 May 2026 15:31:33 -0700
+Received: from DM5PR21CU001.outbound.protection.outlook.com (52.101.62.51) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 4 May 2026 15:31:32 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GuFiA2WLEwysSmrZFkD1gDUIeKztbAPlGBVIvbkyZSa8TR0ptHXs6bomhzI0T3jRmdyIs7XlPHASytOQcjP0ChLyb4YvQSaEDIII/Fieq2/3uFHrd9gX5MOBNgH/TwEZn+rHQ4WUGWily4bHv8bYR9gLPd6+NS/a4oJDFMpaqw411yztU7VmERXNk4pdgBpzI9rLY4WsqVSNLk33PFJAcgVKyWBTfy6DzTrO2jdwP9cjAGWGgqP4F1b63wpHafZrCeieciaUf9ofd96FXkFukVtNJlnEU8tMJTZug+CdYjTVXPpBcLhodEl+69uJmn9H7VMjjj3MuyqaQzw8LFnfmg==
+ b=hxGv3BjARpT5MSyudurSklhjyuXd7IHr6VbhSDLIgiOeAxP/+j2c0JNnsNoaNkocyUXw+YtXOtrt53cmYp5cSUR32h65qCkmYqFN9nbl0RAuli1IwUs2N3urgfCZPEBKasRglO/kjYoIljJo9pYHYGbN5SUypNPIZqF59mqpzeJ1P8eA4Ig56WfstpHykagZuwd7qLjd4wp/b+zNnAh5yXLNouA/y1KWo5A79o9bEXRv8e2+9rr3gs904XJypFJz1GzC17ZOhmvdhmlKJaki99XkTLXPguzPsR5fV4l62iyzO7APJAQkTQRPAT2ERYSjl2yk/A3UskDcUrc++BCT/w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=T0hS7jrevbgcH5FyTAKA5vJ7W2yRs5cGOWqcniZGkc8=;
- b=Q2lQiKu5OUXj6T6wH1Zonoa2oPJBYYSI3cx8VwDF8YpT6cPiRtQw2Ta+tZudRa7wRZoYifSBR39QAiI1Nn6cQvc/q0tStOu0Mn0CczEBwb3iEUdEv3+P3o4mfVAaSgp06bESYiAyKaIw8IfNIPgSrQgpKCHppZILsha9NKPWQufvNkrX2lR2gAh9Z4Qytv1eLISHTydbYP3prZz6BXsz9cnfBFg2YFZaePsZEZvbMuKct1SXORSNgBoeJPj/EYPTjlwMeDFg61FygaXO6PA6hDM6R688+rfykm2+zRvf3gOOMm/6dNCDU6YIyZaVHzmf3aV1sb1P2a8IB2qDEzHWtQ==
+ bh=5wF3Zj2TgcRsc/ohyXDSIAPyiUQGydul42pPf/HxHhQ=;
+ b=f4onmYGePbwGrfpEhjrE937q80ozR5GCRlaSkryixqsHe5JK3nqNS3uQbuaVV1jyTgSoqbpChPUtzxrdsmb6e6kCkYv4v8qR0xcZIpwoORuJpoNL1UM9mECDXvi0Cethgdb140pLnm+QuA34w83liH8bpX+dnAFibz8XgtUCxeVPYLiQYCS0pqh12a7aJd8xqN/iZy4hPLZKRoPFwpn+4YI2u9jQqFWJGtGBT0SXAeUkFq1yFEdS/0IlG5hDRgEL2FrIvG9uZ5YmsZN6R7W8T1WMW+BHDulxpS2jAI9kDcVdtsGe90LBHfpenQfo4cADzJmYQLOx4pme9MeITn9Rbg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=T0hS7jrevbgcH5FyTAKA5vJ7W2yRs5cGOWqcniZGkc8=;
- b=cJw4nH1LJQG7HTN5wWXHlrY1mu0JnBPVq4I44wefzHLvswqAaz2aJPeEp8fxDuQrWRQ/Euza0it2Y9Vjya1TB21osS08/QnFuscM1O0VBdQ6qV1gIRHgGGi0U1E0AEyvzurF8xJNnakQ4aghu4SraOQY6lj1J8LEEVCfkbj1APo=
-Received: from DS0PR21MB6673.namprd21.prod.outlook.com (2603:10b6:8:2f4::19)
- by DS4PR21MB6580.namprd21.prod.outlook.com (2603:10b6:8:2ed::16) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7592.namprd11.prod.outlook.com (2603:10b6:806:343::16)
+ by IA1PR11MB6122.namprd11.prod.outlook.com (2603:10b6:208:3ee::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9913.3; Mon, 4 May
- 2026 22:30:18 +0000
-Received: from DS0PR21MB6673.namprd21.prod.outlook.com
- ([fe80::cf40:aa85:b680:dda5]) by DS0PR21MB6673.namprd21.prod.outlook.com
- ([fe80::cf40:aa85:b680:dda5%6]) with mapi id 15.20.9913.002; Mon, 4 May 2026
- 22:30:18 +0000
-From: Long Li <longli@microsoft.com>
-To: Simon Horman <horms@kernel.org>
-CC: Konstantin Taranov <kotaranov@microsoft.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "edumazet@google.com"
-	<edumazet@google.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"jgg@ziepe.ca" <jgg@ziepe.ca>, "leon@kernel.org" <leon@kernel.org>, Haiyang
- Zhang <haiyangz@microsoft.com>, KY Srinivasan <kys@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui <DECUI@microsoft.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [EXTERNAL] Re: [PATCH net-next v6 2/6] net: mana: Query device
- capabilities and configure MSI-X sharing for EQs
-Thread-Topic: [EXTERNAL] Re: [PATCH net-next v6 2/6] net: mana: Query device
- capabilities and configure MSI-X sharing for EQs
-Thread-Index: AQHc2CXbc8fRBuJmuEq63Eta9ef5BbX63+cAgAOZOPA=
-Date: Mon, 4 May 2026 22:30:18 +0000
-Message-ID:
- <DS0PR21MB6673A4070FA474021381771FCE312@DS0PR21MB6673.namprd21.prod.outlook.com>
-References: <20260429221625.1841150-3-longli@microsoft.com>
- <20260502152649.292433-5-horms@kernel.org>
-In-Reply-To: <20260502152649.292433-5-horms@kernel.org>
-Accept-Language: en-US
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Mon, 4 May
+ 2026 22:31:27 +0000
+Received: from SN7PR11MB7592.namprd11.prod.outlook.com
+ ([fe80::3e09:8700:df72:37b6]) by SN7PR11MB7592.namprd11.prod.outlook.com
+ ([fe80::3e09:8700:df72:37b6%6]) with mapi id 15.20.9870.022; Mon, 4 May 2026
+ 22:31:26 +0000
+Message-ID: <ca256097-1538-4c08-ba01-777bf646fc33@intel.com>
+Date: Mon, 4 May 2026 15:31:23 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v11] ice: add support for unmanaged DPLL on E830
+ NIC
+To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: <netdev@vger.kernel.org>, <anthony.l.nguyen@intel.com>,
+	<przemyslaw.kitszel@intel.com>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <pmenzel@molgen.mpg.de>,
+	<aleksandr.loktionov@intel.com>, <horms@kernel.org>,
+	<grzegorz.nitka@intel.com>, <vgrinber@redhat.com>, <zoltan.fodor@intel.com>
+References: <20260217155808.1209194-1-arkadiusz.kubalewski@intel.com>
 Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=2375efac-7a34-4d6a-b9ba-389feae3c3d3;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2026-05-04T22:24:02Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR21MB6673:EE_|DS4PR21MB6580:EE_
-x-ms-office365-filtering-correlation-id: cebe2acf-b23b-4d8a-f423-08deaa2cb879
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|376014|7416014|366016|38070700021|22082099003|18002099003|56012099003;
-x-microsoft-antispam-message-info:
- MLWI625Z8FXFeESONMjE3HGj6GHjgLywHZkDzyIIWNoF4wrl0d0iFIYaKPmtl67v01s0FXs7A8OjwTUX09LLihvMIx4rY/tYaGh2LIXXPa0TIV9pPA/M9+Y0JQmQElg0HumEM+/hiiZGSwDSC4z5PFPictbOD21l35glJbUJoStbq3f8VTs2o8A1XlBZRHBVB52ty64CBgC2NS48fekTtTovy0x/XVCBYX+JjrqQFKIVUsdcHPk/82rOWHUVBqJPBGpAAuIBNB0A5xsx3gUlJCyn8JIBdzpfNMjf6CpcNhK+uYQYIaeKPkzqm/b2eBZbEtpHdc+vssTxFk2ptNsbU3WJg2oTmK/M3qkz1blzM1oQzfVu9xq01MYduFAjdBofizJQA025kZFbFddmT+j05UzDhj7iivjlSX2eyglF/z75ikuuCnoq6QJgon9nOXGwQ0uF7H0LECqv0qSVBH79AVIlEG31JqovyYI8Zt1Wa/g3isZNDfi7B+mYcAb6QBxvz5lAwf0MTgyuZCpyXjraIDr3/eZcH/QNJrjQ6zAEWvBqyUPS334AfUSYNob2sKnIQcURx7Uu0AqNtfXAvdp8RaJIt3Awe+j9gCD+3fwxe2wX99jAbu23gQAxGiygIe9A6VHT4e3BY531nA9akUtXTJQItEnxBQBbUsiiYB0dbO8+wQM6nltiJf8+3Srlu4D0Sd2ps6T4NfbvHAYua55lkE8BfLUuJQiLXErMlEklzCNnIZmaLMsg1318FsLnPjWJ
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR21MB6673.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(38070700021)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?oBRRY3ShUx3VPz2mzxiUS9++pgI5oakKOp9p1TPnUepkLkX8h0RKhz4aQMyk?=
- =?us-ascii?Q?jwh/pbS0RocXxYJtychgDFUdfS4T8O0WIaFnlDGtdYvhmCtODQ9M0DouCvHY?=
- =?us-ascii?Q?244wG6VVcz+Pee0OURcWgXUzI/JUhh9p+k5+aPLWgcQAhZ22ySjB9NqLfhLs?=
- =?us-ascii?Q?Ca5/97emjskUR5UV5GxPrfzbTqU8IPW7chyWZWOnAXzUNnygiurDoPqBroI+?=
- =?us-ascii?Q?F08qKLZe9BUm/sH6nbcuvBl7Tfyrz7DaWF2BofyExZjJ1EpkJU2eHyv1VgnD?=
- =?us-ascii?Q?+Er5JR7yYZDi4seST+mZtqmagaZXpOStkFiiFS/R/v5nRYJKXDTP3vtAPEdS?=
- =?us-ascii?Q?3aZakh4i0xrSV278GETpfiBmrS11PoNIv1G3H1tPbT2tkqBT6kDfVq4Ok4Zs?=
- =?us-ascii?Q?G/8FaWOAup8zOIiCyzxVspsdaAd9jVbA0q1s4BBgTqGsYEBSmVxd8LUj6dHq?=
- =?us-ascii?Q?05WyTsp62RckvvT1soqiqRzMdZm2LySov0uWSLv4Z6nU84Lge+GgBk/F818o?=
- =?us-ascii?Q?0LPkHW4PI3p8kYNruZ1D/sx52V9iJOAx8jE77gjqcvV13vih88P4bxRfeNyc?=
- =?us-ascii?Q?iYADcWbfHl72IYtXEkaDIzYbsnXKTEXzYMYpWRWts2/n8qgKFDhrmCKmenZf?=
- =?us-ascii?Q?cx8qZQ/MFmZNJ6lhQzRWJtLQXuxUIedb2aJ+eWn9A5uSTHBHOlNygU0NR1L3?=
- =?us-ascii?Q?nNIP+lJXME2xx+pEoTp6iiprdxpgn51yXWsLjvb+0cHN1DADgeISESqQWxh6?=
- =?us-ascii?Q?Q2sog3cGNuTldmFY4EsxeUQ80x3PAlcHoKxGHHSrE9vyURUbUlDUwuoGcA90?=
- =?us-ascii?Q?l4NfbMvsn0YlK7cSBmyf31PzWfeDYiBLztuNZFOcJeA2dQauBVUlrKiqf8wV?=
- =?us-ascii?Q?qJrvXiIG28hKj+qlTbKE1X1Rne70a3ts4d8U1ggHhf0pgMDKs9aex6yQUced?=
- =?us-ascii?Q?eCd5hEhSRkdktR+DshhZAb1aDwwDVNGIZkZi82cIveHHdJHzuaRfz6uC42PE?=
- =?us-ascii?Q?bf+P4faAqZbGSS+9M9mH1Ub4BrW7/amSQbxuSoQmf7ZeSYsNYDMsFEonZSxH?=
- =?us-ascii?Q?iIRjHdiyocoHP6UDBObtlgGLt1uWheEIT69Mm3MwPnw0S/YcCfTCpdNrTEFH?=
- =?us-ascii?Q?F9EclRdMtN/TH6P4nVRixcgqRaNJt4HbY5xQpQudg0v2wD7rQOFRQf0TNtxp?=
- =?us-ascii?Q?UNOuKD8zG5PB5W0jUWLIxJObJhCEl84AuSwUWJNPnNCawCOlxW0hdW9iv5oL?=
- =?us-ascii?Q?FlxI6dbGLNA0exG4NapK5FjT5f4b9GAq5EsJ6nZ7+Ot4xKpQJ6oD7k8RfPMV?=
- =?us-ascii?Q?EleoWff0H7vcrUJf29Cv1XPIOKJmaZ5TYbUOOPbyrFekKRQgZNhtlqk4hT8j?=
- =?us-ascii?Q?SfJPU8yXKSp2ecn1QaGZ+xUcZKCmEOdCsBIlys8kBbE2s6iiE2PaJf906YhI?=
- =?us-ascii?Q?6rq8nPOy5CNI0VgrDNW0f7BkzPDCcONh3Bg/P8ETXWdZJOwm5tDFsbh4X8zs?=
- =?us-ascii?Q?QgbPyDfuKh3Re/tgeT07uTP/kB6U2SBvm5Gyw5ayuzpskd8f9p+9MgBL76G2?=
- =?us-ascii?Q?ofYKPfvc4IOV27J2Z7JvV/Ic4xzuonGwGD8edzE9nzCpqDlh14y1Em6KMW8u?=
- =?us-ascii?Q?3Yh1BkYJ9yn8xEQljfSXRIsyXhnIeTFxL+OjqazFIWwhT9ZCLy3rDmDrjDwu?=
- =?us-ascii?Q?wFq1Ohj/vGjOBEuqDy2dIlwdkYoMLFLng5SR4HUZPfPWassr?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20260217155808.1209194-1-arkadiusz.kubalewski@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0264.namprd03.prod.outlook.com
+ (2603:10b6:303:b4::29) To SN7PR11MB7592.namprd11.prod.outlook.com
+ (2603:10b6:806:343::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7592:EE_|IA1PR11MB6122:EE_
+X-MS-Office365-Filtering-Correlation-Id: dfead2c5-53be-49f1-b2e6-08deaa2ce11d
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|22082099003|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info: 9alGAZbSwzCIQ07AgQxOp6KwpMqbx0r62QtXJfDyRl/LDgp70lKnfQjy6qfoS8uJXWRxVyNXQbs5dK/pyno4Oj43h98PhYQ1fPVxAGcOZQ8J4KqFdnvz7jjPzsZH1X2+AcRnuw/rcO4ydkrnAY4nrjMr85E4e2mkMF+7+zzkJC/U6p8PtwJXLbcZMB5NDh9M2wtmTo4GaDUe+4HJy76bdU1vwDr1fw8NjcK/wmKC7dTFrfNV2KtbRepxBE39tPHlAMiutwZUD4+/gB8abso3PD7SC2CVDlC6Sb2B3gy6Khn3U956/06FfbI6y4/Cbx1AZjx9UtY6Bi4mPiJq0oNwwPSYUNzWXTUyK9W6iYsiiu2soA9WAzLgmKe3n51UkxWjrZg3o3Tu8sRoGnRZUHhH0+MGJ2ZLOnuYVa0UTYNh2krV2mA09AHaRGGVIpLl2MYn4XPvWm33b8unYtHNzm0PslaGmvc6upwhR7CW2QknLy2zXZmSj51HJ+ZN6Ln/Y1/1aeS55KtFGm1UfZyMdEfop6lp8uFRILLXsePqNQstPijvutgckisecR7Vw+QvuLmPhwYEKUQUSZE9wyPjnANrKVuXI0mt6e7csAkbNsFLs5C4VNU5fOLlqEhnTFgm09haEWGdTLcalnTjgtTMdi+caQQ1du/O2uiBbT/iG5lo0dVdKpCeUpXv5kDXQk6Wcx73
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7592.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?R0dqdVlMeTg0bENxL3JRQk9yenhzVzFqMisvdmR0dUZoSkdsZ0VtcFBEZkRw?=
+ =?utf-8?B?THFDUW0xcXFLUGRXeEFtdjNpbjhubGcxWDVSbkNZWEpSeUx5bWN5SjdHUlJI?=
+ =?utf-8?B?QjdvZ01MSWJLTzl0anAwa0k1ZytEc3VDTXEyTGpHeEJETTc3a0V4cmNQVFYz?=
+ =?utf-8?B?NUw1bHQxa0dRaVJOM3N3N3U4eUZFVUs1bldzQ2JTUHJpTzB2KzFtVEpSd21p?=
+ =?utf-8?B?am9seXlyL2dJMUpUQk53cWxGKzM0aTRzeElSSk1zcjdEbGZJTFNHUUUxcXND?=
+ =?utf-8?B?bWlzOE9EZFVWeVlyNUo2VkFySWpDSGxkaFVqNFZOakV6NldHVVpNbEpQZ2JG?=
+ =?utf-8?B?ZjF0TzBGSFBRbVlXZDZxNlcvQlZ0NHo5ZGtrTm83L0pyMFQyVGo1NXdydisw?=
+ =?utf-8?B?eXQyOCtJdDA5Z2JZYnZiSjZmaVJRQnBwT0sxUjNGdjBUaUdEVGRXVy9JYnY5?=
+ =?utf-8?B?c2R0dEJyMjVCc3lIT3d4ZXpsZ3RobkVRbllqNnZzMXR4dkV0akN2dnNWTC9O?=
+ =?utf-8?B?b2J6VWhMTDJsZm5jLzlWc1g3WGUyaHlQWWZxQ0JZbFRzdjk0M08zejQyUjd0?=
+ =?utf-8?B?NGFZZGtoYlBubDZMdWp1WGlGWE8xUmxTb2NPcW1nTXc5L0lpanJtQzJhcnZW?=
+ =?utf-8?B?cXczSlliTGNid2VnM29WSXU4Yk04ZFNydGRtc0kvT1EwMHJnQ1ZyS2tzb2J6?=
+ =?utf-8?B?ZloyVU5iblRtMHBsOWFXNUZ5cUM4NkE3VjRXTjB3aVhZdE1VaTdicVErQVBB?=
+ =?utf-8?B?WFRHQThoNjY4VGpqZVRFbE9RL1NkUGo0ZDVKNkZucnJnam5iQ2hFM3NwcE5i?=
+ =?utf-8?B?c3dzWnF3WUFyUDB3N2o2UWVLSzRTbHQrS0xkRE51QXllNS9xN3Z6Q3hxVnZB?=
+ =?utf-8?B?WjBubDR3YVlqY3hGN1pnNzJKWjRnRktIZFYvUmV5S3RENGVxdzh5Rlh6NEMy?=
+ =?utf-8?B?KzdZTWJpQjVSTkJ1TC9TTVdmRmxDN1VpZGxCRHVFL3l3bFprMTBTQllRWXBL?=
+ =?utf-8?B?c054aDdIUDNZSFgwOHVTZHVPMjVQUDZMaDFpV2lxa2Y5S0UyZXNLb3Z3NVBt?=
+ =?utf-8?B?SXFDVXc2VTVtbVRzYml2aW5haFRYOTFxdGw5MVJCVHl2Y2swUjVFN2FLTlpZ?=
+ =?utf-8?B?Ri83bDNZSkpGVis4VStOUzJxZ2t4SEowRHhuV1BPSnhZVVZzSUtYa3FLdHVK?=
+ =?utf-8?B?WndwMG5WMnozSmRmQnhud1h4ZTBrMEozSldpZVdtV1RXUnQvQjNQRHF0aUpK?=
+ =?utf-8?B?bHBjb0Z3OFJNdGg4Rk9lR25EYmxLZ3g5U2VBUS91ZXczMFNnK3N3S28vajk1?=
+ =?utf-8?B?N1NpZzEreUFmcFBBOEpEL3Z3RHlEZGRWZnJ5ZWI0R1NaZ1h4UVIwTHBwejFW?=
+ =?utf-8?B?WjIwc25MdHowTVJJRjRZTTVTVFMyaXdYRGZUS0tJNC9lNHU1OVFCT1VBbisr?=
+ =?utf-8?B?cy9KZzM3MmxCZ1luL1EwM0tvaXpPbG5wbnZtdmhDNGhzQ0ZNVnVhdDl1SDly?=
+ =?utf-8?B?NEhMWUxTdGpDSldNRy9aS1N2aHd1UE9oN0k4MXF2YXJCcHQvRStTWkFNSVNo?=
+ =?utf-8?B?ajg0Z2tVY3Z4aHVBUGlJOUo2dUF4Z0dQTDBoOHBsRmpsTk1kR1dleUJKWUl3?=
+ =?utf-8?B?YWlBdWh2L0FtZWdoaDZiZU1LTzFJVW1PNkVmTWVOMCttMjl6cUc2S1dTa0I5?=
+ =?utf-8?B?YUFiVENjSnZKU2JvOWdKeG1GWmU5dXlTMnNSRllrVDdxTENjTDQycHZ2djFo?=
+ =?utf-8?B?OG5pRDE4TlZmeHdIaDJOS2Q2SVZCOURnN203TEc3UjY1Qlg4WkFHVUtQTElw?=
+ =?utf-8?B?SUdVdVNVeElBUTVIa1hZYUFvd0dqTzFMa05XS2JsYStyU1VrdE02cjh4SENY?=
+ =?utf-8?B?RVVHOEJndmFTSHRqTThzM0d4cVducHZmQWplTCs5aUxON2ZpQThtQnR5cnc3?=
+ =?utf-8?B?UmJjNnB0UHFIdEJGSk4vWGdpSTdkQXRNMkVsT2ZWbVdwUzMvWmFBdy9vbmRT?=
+ =?utf-8?B?Z202cnVocUlTYjVObVduVGR2Y2JNU1dvR2lsS0lKRTNTMUVTc2ZaL1hsOWdx?=
+ =?utf-8?B?bDhuRmluRXhrd0xsaFd1UFdxK2N3ZExkZUZLdTU2UlhJZ1lOM1p4Y3N6cFZK?=
+ =?utf-8?B?UXc0V3VsSmtFNTNiU2JEbWh3SElhc2NqM09nRFA5V1BuN09McHJzai9JOG13?=
+ =?utf-8?B?a3JTUHQvZVdhbzRKVUlCMW5VWFNvNzB4QUw1anU0ZWRQb2ljdjZjcHFCcnoy?=
+ =?utf-8?B?Wnp3RnYwRUYzSXRlWEFOVDdubC9FNElUVHVWUHg4eUJLWUVXbUVwWXovbTN3?=
+ =?utf-8?B?WFRRYUFTdStndEhNdW9nU2NsNnFhMmYxcks3ZmZYYnd3QXVobVpHdz09?=
+X-Exchange-RoutingPolicyChecked: LoKFGufrGWFtTATMOm9yZkMJ9a5EA3J0hfeLVMmv+69fX2d8w8odUgLMVyaO1JtXCJLVnw7cP+HFrjKdbqgMJ1sSv1Pmbq17JRqSa9Pi35rigiypPTtxgP1rTXjhgOcW1XuuKdHsN3QAQS4Xmqt+PLmQx0zxQ5hm7l0bvAfZeYGmMHMjQl3qaTixnWaFJjKTw1Frk42egx2j/TFfB7QTYW6A0cpdW6BxkCNWpqo8NQvXlfT0PESxYw01hMJ/BHN4j9jakXiuxItJAvHM+ZhUKy+v4Y/5J4cXQJguVoVVnvYxKSmXKDDN77nmYupjctZZ4uC4Oy988GA3YXcOd+GzQA==
+X-MS-Exchange-CrossTenant-Network-Message-Id: dfead2c5-53be-49f1-b2e6-08deaa2ce11d
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7592.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR21MB6673.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cebe2acf-b23b-4d8a-f423-08deaa2cb879
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 May 2026 22:30:18.3185
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2026 22:31:26.8249
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: JIiGHm3LqMWgHa2GASyGsKf3tTE3HnJN7RB+8V8r/L+DKVX75MHolLuxyaFTqhFj7UNn2ol4Qn0/I/OiC7MH7Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PR21MB6580
-X-Rspamd-Queue-Id: 0B8E84C463B
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jXmdebOuWsbmZUsmghWYiRtnynRIPt7jiAV2UtyKFvhglv6tm1fvqhQ92igLItmN8mnnbao55TAN0g7aXAs8uYgKOugdF3X/mLDBxzHsw+4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6122
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: 9CDC44C4690
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[microsoft.com,reject];
-	R_DKIM_ALLOW(-0.20)[microsoft.com:s=selector2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284063-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-284065-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,mpg.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[longli@microsoft.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[microsoft.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,DS0PR21MB6673.namprd21.prod.outlook.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,outlook.com:url]
+	RCVD_COUNT_SEVEN(0.00)[10]
 
-> From: 'Simon Horman' <horms@kernel.org>
->=20
-> This is an AI-generated review of your patch. The human sending this emai=
-l has
-> considered the AI review valid, or at least plausible.
-> Full review at:
-> https://nam06.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fnetde=
-v-
-> ai.bots.linux.dev%2Fsashiko%2F&data=3D05%7C02%7Clongli%40microsoft.com%7
-> Ca5d48bdebd0240e5d91308dea85ff3a8%7C72f988bf86f141af91ab2d7cd011db4
-> 7%7C1%7C0%7C639133327234427106%7CUnknown%7CTWFpbGZsb3d8eyJFbX
-> B0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbC
-> IsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=3D4doWStoTQ4w7CbmhN3I294b%
-> 2B9c3NNjDGySSmISHGZk4%3D&reserved=3D0
->=20
-> I apologise for any overlap with this and the review of this patchset ava=
-ilable at
-> sashiko.dev. They both seem relevant and I'm unsure how to cleanly pass t=
-hem
-> both on.
->=20
-> Both Sashiko instances also flagged concerns in the remaining patches of =
-this
-> patchset. But I am not forwarding them as they seem to be lower priority,=
- and I
-> think I've already created enough noise here.
->=20
+On 2/17/2026 7:58 AM, Arkadiusz Kubalewski wrote:
+> Hardware variants of E830 may support an unmanaged DPLL where the
+> configuration is hardcoded within the hardware and firmware, meaning
+> users cannot modify settings. However, users are able to check the DPLL
+> lock status and obtain configuration information through the Linux DPLL
+> and devlink health subsystem.
+> 
+> Availability of 'loss of lock' health status code determines if such
+> support is available, if true, register single DPLL device with 1 input
+> and 1 output and provide hardcoded/read only properties of a pin and
+> DPLL device. User is only allowed to check DPLL device status and receive
+> notifications on DPLL lock status change.
+> 
+> When present, the DPLL device locks to an external signal provided
+> through the PCIe/OCP pin. The expected input signal is 1PPS
+> (1 Pulse Per Second) embedded on a 10MHz reference clock.
+> The DPLL produces output:
+> - for MAC (Media Access Control) & PHY (Physical Layer) clocks,
+> - 1PPS for synchronization of onboard PHC (Precision Hardware Clock) timer.
+> 
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 > ---
-> net: mana: Query device capabilities and configure MSI-X sharing for EQs
->=20
-> This patch queries device capabilities early in GDMA probe and chooses be=
-tween
-> dedicated MSI-X per vPort or a shared-MSI-X mode based on the available v=
-ector
-> count, introducing gc->max_num_queues_vport,
-> gc->msi_sharing and gc->msi_bitmap, and renaming mana_query_device_cfg()
-> to mana_gd_query_device_cfg() so it can be called from the GDMA layer.
->=20
-> > diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > index 098fbda0d128..b96859e0aec9 100644
-> > --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > @@ -149,6 +149,9 @@ static int mana_gd_query_max_resources(struct
-> pci_dev *pdev)
-> >  	struct gdma_context *gc =3D pci_get_drvdata(pdev);
-> >  	struct gdma_query_max_resources_resp resp =3D {};
-> >  	struct gdma_general_req req =3D {};
-> > +	unsigned int max_num_queues;
-> > +	u8 bm_hostmode;
-> > +	u16 num_ports;
-> >  	int err;
-> >
-> >  	mana_gd_init_req_hdr(&req.hdr, GDMA_QUERY_MAX_RESOURCES,
-> @@ -194,6
-> > +197,40 @@ static int mana_gd_query_max_resources(struct pci_dev *pdev)
-> >  	if (gc->max_num_queues > gc->num_msix_usable - 1)
-> >  		gc->max_num_queues =3D gc->num_msix_usable - 1;
-> >
-> > +	err =3D mana_gd_query_device_cfg(gc, MANA_MAJOR_VERSION,
-> MANA_MINOR_VERSION,
-> > +				       MANA_MICRO_VERSION, &num_ports,
-> &bm_hostmode);
-> > +	if (err)
-> > +		return err;
->=20
-> Is this the same MANA_QUERY_DEV_CONFIG that mana_probe() issues shortly
-> after?  mana_probe() still contains:
->=20
-> 	err =3D mana_gd_query_device_cfg(gc, MANA_MAJOR_VERSION,
-> MANA_MINOR_VERSION,
-> 				       MANA_MICRO_VERSION, &num_ports,
-> &bm_hostmode);
->=20
-> so the same HWC round-trip runs twice on every probe with identical argum=
-ents,
-> both populating gc->adapter_mtu.
->=20
-> The commit message frames this rename as consolidation ("used at GDMA dev=
-ice
-> probe time"), but the mana_probe() call-site is not removed.  Was one of =
-the two
-> call-sites meant to go away?
->=20
-> The relocation of debugfs_create_u16("adapter-MTU", ...) from
-> mana_gd_query_device_cfg() into mana_probe() only makes sense if the func=
-tion
-> is now invoked more than once, which hints at the same duplication.
-
-  The two calls are intentional and serve different layers. The call in man=
-a_gd_query_max_resources() runs at the GDMA layer during device setup - it =
-needs num_ports to compute per-vPort MSI-X
-  allocation before any MANA-level structures exist. The call in mana_probe=
-() runs at the MANA layer and consumes the results differently: it populate=
-s ac->num_ports, ac->bm_hostmode, and on
-  resume validates that the port count hasn't changed.
-
-  The HWC round-trip is lightweight (a single command/response exchange), a=
-nd the function is renamed to mana_gd_ precisely because it now has callers=
- at both layers. The debugfs move is the same
-  reason - the debugfs node should only be created once, so it moves to man=
-a_probe() which runs once, rather than staying in the function that is now =
-called from both sites.
-
->=20
-> > +
-> > +	if (!num_ports)
-> > +		return -EINVAL;
-> > +
-> > +	/*
-> > +	 * Adjust gc->max_num_queues returned from the SOC to allow
-> dedicated
-> > +	 * MSIx for each vPort. Clamp to no less than
-> MANA_DEF_NUM_QUEUES.
-> > +	 */
-> > +	max_num_queues =3D (gc->num_msix_usable - 1) / num_ports;
-> > +	max_num_queues =3D roundup_pow_of_two(max(max_num_queues, 1U));
-> > +	if (max_num_queues < MANA_DEF_NUM_QUEUES)
-> > +		max_num_queues =3D MANA_DEF_NUM_QUEUES;
-> > +
-> > +	/*
-> > +	 * Use dedicated MSIx for EQs whenever possible, use MSIx sharing for
-> > +	 * Ethernet EQs when (max_num_queues * num_ports >
-> num_msix_usable - 1)
-> > +	 */
-> > +	max_num_queues =3D min(gc->max_num_queues, max_num_queues);
-> > +	if (max_num_queues * num_ports > gc->num_msix_usable - 1)
-> > +		gc->msi_sharing =3D true;
->=20
-> Is gc->msi_sharing ever reset to false?  The only two writers are this li=
-ne and
-> mana_gd_setup_hwc_irqs() (the !pci_msix_can_alloc_dyn branch), and both o=
-nly
-> set it to true.  mana_gd_remove_irqs() frees msi_bitmap and zeros
-> max_num_msix / num_msix_usable, but does not clear msi_sharing, and the
-> gdma_context survives mana_gd_suspend() / mana_gd_resume().
->=20
-> Once true is latched in any setup cycle, mana_gd_setup() will always take=
- the
-> sharing branch on resume even if the recomputed max_num_queues * num_port=
-s
-> fits within num_msix_usable - 1.  Is that consistent with the commit mess=
-age
-> saying sharing "is only enabled when there are not enough MSI-X vectors f=
-or
-> dedicated allocation"?
-
-  msi_sharing is one-directional by design, but this is not a problem in pr=
-actice. The inputs to the sharing computation - num_msix_usable, num_ports,=
- and hardware queue limits - are properties of
-  the hardware and do not change across suspend/resume cycles. The gdma_con=
-text is kzalloc'd at probe time (so msi_sharing starts as false), and on an=
-y given hardware configuration the computation
-  in mana_gd_query_max_resources() will always produce the same result.
-
-  On resume, mana_gd_setup_hwc_irqs() re-evaluates dynamic MSI-X support an=
-d mana_gd_query_max_resources() recomputes the sharing check from the same =
-hardware parameters. Since the hardware
-  doesn't change, the flag converges to the same value. Adding an explicit =
-reset would be defensive but not functionally necessary.
-
->=20
-> > +
-> > +	/* If MSI is shared, use max allowed value */
-> > +	if (gc->msi_sharing)
-> > +		gc->max_num_queues_vport =3D min(gc->num_msix_usable - 1,
-> gc->max_num_queues);
-> > +	else
-> > +		gc->max_num_queues_vport =3D max_num_queues;
-> > +
-> > +	dev_info(gc->dev, "MSI sharing mode %d max queues %d\n",
-> > +		 gc->msi_sharing, gc->max_num_queues);
->=20
-> Should this print gc->max_num_queues_vport rather than
-> gc->max_num_queues?  The block immediately above computes
-> gc->max_num_queues_vport and leaves gc->max_num_queues unchanged, and
-> mana_probe_port() sizes alloc_etherdev_mq() and apc->max_queues from
-> gc->max_num_queues_vport:
->=20
-> 	ndev =3D alloc_etherdev_mq(sizeof(struct mana_port_context),
-> 				 gc->max_num_queues_vport);
-> 	...
-> 	apc->max_queues =3D gc->max_num_queues_vport;
-> 	apc->num_queues =3D min(gc->max_num_queues_vport,
-> MANA_DEF_NUM_QUEUES);
->=20
-> so the logged value does not match the per-vPort queue count the driver a=
-ctually
-> exposes.
+> v11:
+> - rebase and fix conflicts
 
 
-  The printed value is intentional. gc->max_num_queues is the GDMA device-l=
-evel maximum, which is consumed by both the Ethernet and RDMA drivers - the=
- RDMA driver uses it to size its queue
-  resources. Printing max_num_queues_vport here would only reflect the Ethe=
-rnet per-vPort limit and would be misleading in a device-level log message.=
- The per-vPort value is already visible
-  through ethtool channel reporting.
+Jakub rightfully pointed out the mistaken inclusion of HAVE_DPLL_ESYNC.
 
->=20
-> > +
-> >  	return 0;
-> >  }
-> >
-> > @@ -1856,6 +1893,7 @@ static int mana_gd_setup_hwc_irqs(struct pci_dev
-> > *pdev)
->=20
+> diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
+> index 73a4e28ed75f..64518202dfff 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_dpll.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
+> @@ -2588,6 +2601,21 @@ static const struct dpll_pin_ops ice_dpll_output_ops = {
+>  	.esync_get = ice_dpll_output_esync_get,
+>  };
+>  
+> +static const struct dpll_pin_ops ice_dpll_input_unmanaged_ops = {
+> +	.frequency_get = ice_dpll_input_frequency_get,
+> +	.direction_get = ice_dpll_input_direction,
+> +	.state_on_dpll_get = ice_dpll_input_state_get,
+> +#if defined(HAVE_DPLL_ESYNC)
+> +	.esync_get = ice_dpll_input_esync_get,
+> +#endif /* HAVE_DPLL_ESYNC */
+> +};
+> +
+Please fix this, and remove any other remaining kcompat cruft as well.
+
+Also could you please review the following Sashiko reports and make sure
+there is no issues?
+
+The netdev sashiko.dev bot says this:
+
+> commit 7aae4a54d3ef18d8694bc535b6e5959839c9adfd
+> Author: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> ice: add support for unmanaged DPLL on E830 NIC
+> Hardware variants of E830 may support an unmanaged DPLL where the
+> configuration is hardcoded. This patch allows users to check the DPLL
+> lock status and obtain configuration information through the Linux DPLL
+> and devlink health subsystem.
+>> diff --git a/drivers/net/ethernet/intel/ice/devlink/health.c b/drivers/net/ethernet/intel/ice/devlink/health.c
+>> --- a/drivers/net/ethernet/intel/ice/devlink/health.c
+>> +++ b/drivers/net/ethernet/intel/ice/devlink/health.c
 > [ ... ]
->=20
-> > @@ -1968,20 +2008,30 @@ static int mana_gd_setup(struct pci_dev *pdev)
-> >  	if (err)
-> >  		goto destroy_hwc;
-> >
-> > -	err =3D mana_gd_query_max_resources(pdev);
-> > +	err =3D mana_gd_detect_devices(pdev);
-> >  	if (err)
-> >  		goto destroy_hwc;
-> >
-> > -	err =3D mana_gd_setup_remaining_irqs(pdev);
-> > -	if (err) {
-> > -		dev_err(gc->dev, "Failed to setup remaining IRQs: %d", err);
-> > -		goto destroy_hwc;
-> > -	}
-> > -
-> > -	err =3D mana_gd_detect_devices(pdev);
-> > +	err =3D mana_gd_query_max_resources(pdev);
-> >  	if (err)
-> >  		goto destroy_hwc;
-> >
-> > +	if (!gc->msi_sharing) {
-> > +		gc->msi_bitmap =3D bitmap_zalloc(gc->num_msix_usable,
-> GFP_KERNEL);
-> > +		if (!gc->msi_bitmap) {
-> > +			err =3D -ENOMEM;
-> > +			goto destroy_hwc;
-> > +		}
-> > +		/* Set bit for HWC */
-> > +		set_bit(0, gc->msi_bitmap);
-> > +	} else {
-> > +		err =3D mana_gd_setup_remaining_irqs(pdev);
-> > +		if (err) {
-> > +			dev_err(gc->dev, "Failed to setup remaining IRQs: %d",
-> err);
-> > +			goto destroy_hwc;
-> > +		}
-> > +	}
-> > +
->=20
-> Can the driver bring up any vPort after this change when the !msi_sharing=
- branch
-> is taken?
->=20
-> In the dedicated branch, only gc->msi_bitmap is allocated and bit 0 is se=
-t for
-> HWC.  mana_gd_setup_remaining_irqs() is skipped, so no gdma_irq_context i=
-s
-> inserted into gc->irq_contexts for indices 1..
-> num_msix_usable-1.
->=20
-> Later, mana_create_eq() still assigns
->=20
-> 	spec.eq.msix_index =3D (i + 1) % gc->num_msix_usable;
->=20
-> and mana_gd_register_irq() does:
->=20
-> 	gic =3D xa_load(&gc->irq_contexts, msi_index);
-> 	if (WARN_ON(!gic))
-> 		return -EINVAL;
->=20
-> On a typical cloud SKU with, for example, num_msix_usable=3D32,
-> num_ports=3D1 and num_online_cpus=3D16, the new math keeps msi_sharing=3D=
-false
-> (16 * 1 <=3D 31), so every EQ-create goes down this path and hits the WAR=
-N_ON.
-> Doesn't that make every vPort open and every resume fail for the common
-> dedicated-MSI-X case?
->=20
-> The msi_bitmap allocated here is not consumed anywhere in this commit; th=
-e on-
-> demand allocation via mana_gd_get_gic() appears in the later commit "net:
-> mana: Allocate interrupt context for each EQ when creating vPort"
-> (dbbdf40a8974).  Should the bitmap and the new branch be introduced in th=
-e
-> same commit that actually uses them, so each commit in the series is
-> independently bootable?
+>> @@ -242,6 +244,8 @@ void ice_process_health_status_event(struct ice_pf *pf, struct ice_rq_event_info
+>>  				pf->health_reporters.fw_status = *health_info;
+>>  				devlink_health_report(pf->health_reporters.fw,
+>>  						      "FW syndrome reported", NULL);
+>> +				if (status_code == ICE_AQC_HEALTH_STATUS_INFO_LOSS_OF_LOCK)
+>> +					ice_dpll_lock_state_set_unmanaged(pf, health_info, true);
+> Is it possible for this health event to arrive when the DPLL subsystem is not
+> fully initialized or already torn down?
+> Looking at ice_dpll_lock_state_set_unmanaged(), it unconditionally acquires
+> pf->dplls.lock:
+> void ice_dpll_lock_state_set_unmanaged(...)
+> {
+>     ...
+> 	mutex_lock(&pf->dplls.lock);
+>     ...
+> }
+> If the hardware doesn't support DPLL, ice_dpll_init() is never called, leaving
+> the mutex uninitialized. Additionally, if ice_dpll_init_unmanaged() fails,
+> it destroys the mutex and exits.
+> During driver unload, ice_dpll_deinit() destroys the mutex and frees the
+> DPLL structures, but the service task processing these admin queue events
+> might not be stopped until later in the teardown sequence.
+> Could this lead to a kernel panic from locking an uninitialized or destroyed
+> mutex, or a use-after-free when passing the d->dpll pointer to
+> dpll_device_change_ntf()?
+> Should there be a check ensuring DPLL is active (e.g. by checking
+> test_bit(ICE_FLAG_DPLL, pf->flags)) before handling the event?
 
-  You're right that the non-sharing EQ creation path is not fully functiona=
-l until patch 5 wires mana_gd_get_gic() into mana_create_eq(). However, thi=
-s is a new capability being built
-  incrementally: patch 2 introduces the decision framework and bitmap, patc=
-h 3 adds the GIC infrastructure, patch 4 converts global IRQ setup to use i=
-t, and patch 5 integrates it into per-vPort EQ
-  creation.
 
-  The intermediate state between patches 2 and 5 results in a clean error (=
--EINVAL from mana_gd_register_irq) - not a crash or data corruption. The de=
-dicated MSI-X mode is a new feature that did
-  not exist before this series, so there is no regression from the pre-patc=
-h baseline. Restructuring to make it functional at each intermediate commit=
- would require squashing the GIC
-  infrastructure into this patch, producing a significantly larger and hard=
-er-to-review change. I'd prefer to keep the logical separation as-is.
+My own execution using claude had this to say:
+
+> Now I have everything. Let me compose the report.
+> commit d9b481c1d5d8be9dbbca36f40be64db91eb12caa
+> Author: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> ice: add support for unmanaged DPLL on E830 NIC
+> This patch adds support for an unmanaged DPLL on E830 NIC variants,
+> where the DPLL configuration is hardcoded in hardware/firmware.  It
+> registers a single PPS DPLL device with one input and one output,
+> reporting lock status via health status events and the DPLL subsystem.
+> A few things stood out during review.
+>> diff --git a/drivers/net/ethernet/intel/ice/devlink/health.c b/drivers/net/ethernet/intel/ice/devlink/health.c
+>> index 8e9a8a8178d4..31e6c5107c97 100644
+>> --- a/drivers/net/ethernet/intel/ice/devlink/health.c
+>> +++ b/drivers/net/ethernet/intel/ice/devlink/health.c
+> [ ... ]
+>> @@ -242,6 +244,8 @@ void ice_process_health_status_event(struct ice_pf *pf, struct ice_rq_event_info
+>> 				pf->health_reporters.fw_status = *health_info;
+>> 				devlink_health_report(pf->health_reporters.fw,
+>> 						      "FW syndrome reported", NULL);
+>>+				if (status_code == ICE_AQC_HEALTH_STATUS_INFO_LOSS_OF_LOCK)
+>>+					ice_dpll_lock_state_set_unmanaged(pf, health_info, true);
+>> 				break;
+> This calls ice_dpll_lock_state_set_unmanaged() for every PF that
+> receives a 0x601 health event, with no check for pf->dplls.unmanaged
+> or test_bit(ICE_FLAG_DPLL, pf->flags).
+> The only guard inside ice_dpll_lock_state_set_unmanaged() is
+> ice_pf_src_tmr_owned(), which checks PTP timer ownership -- not
+> whether the DPLL subsystem was initialized.
+> Consider a device where the firmware supports health code 0x601 but
+> the ZL80640 CGU is not in the netlist.  In ice_init_features():
+>>+	err = ice_is_health_status_code_supported(&pf->hw, code,
+>>+						  &pf->dplls.unmanaged);
+>>+	if (err || !ice_is_unmanaged_cgu_in_netlist(&pf->hw))
+>>+		pf->dplls.unmanaged = false;
+> This sets pf->dplls.unmanaged = false, so ice_dpll_init() is never
+> called and pf->dplls.lock is never initialized via mutex_init().
+> But the firmware can still send the health event, and then:
+>>+void ice_dpll_lock_state_set_unmanaged(struct ice_pf *pf,
+>>+				       const struct ice_aqc_health_status_elem *buff,
+>>+				       bool notify)
+>>+{
+> [ ... ]
+>>+	mutex_lock(&pf->dplls.lock);
+> Can this mutex_lock() on an uninitialized mutex cause undefined
+> behavior?  With CONFIG_DEBUG_MUTEXES this would trigger a BUG().
+> Also, on managed DPLL devices (e.g. E810 with CGU), the DPLL worker
+> thread maintains pf->dplls.pps.dpll_state via ice_dpll_update_state().
+> Would this unconditional call overwrite the managed state machine?
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
+>> index 3eea83b0cdc9..00704dfeb3b2 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_dpll.c
+>> +++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
+> [ ... ]
+>>+static const struct dpll_pin_ops ice_dpll_input_unmanaged_ops = {
+>>+	.frequency_get = ice_dpll_input_frequency_get,
+>>+	.direction_get = ice_dpll_input_direction,
+>>+	.state_on_dpll_get = ice_dpll_input_state_get,
+>>+#if defined(HAVE_DPLL_ESYNC)
+>>+	.esync_get = ice_dpll_input_esync_get,
+>>+#endif /* HAVE_DPLL_ESYNC */
+>>+};
+> HAVE_DPLL_ESYNC does not appear to be defined anywhere in the upstream
+> kernel tree -- it looks like an out-of-tree compatibility macro.  In
+> upstream builds this means .esync_get is always NULL for unmanaged
+> input pins.
+> The managed ice_dpll_input_ops sets .esync_get unconditionally, and
+> ice_dpll_input_esync_get() already has explicit unmanaged-specific
+> logic added by this patch.  The init code also unconditionally sets
+> ICE_AQC_GET_CGU_IN_CFG_STATUS_ESYNC_CAP and ICE_DPLL_IN_ESYNC_ENABLED
+> on unmanaged input pins.
+> The documentation example at the end of the patch shows
+> esync-frequency and esync-pulse in the pin dump, but those fields
+> will never appear in an upstream build since the callback is compiled
+> out.  Should the ifdef be removed so this matches ice_dpll_input_ops?
+> [ ... ]
+>> @@ -3153,12 +3181,15 @@ ice_dpll_init_direct_pins(struct ice_pf *pf, bool cgu,
+>>  	int ret;
+>>  
+>>  	ret = ice_dpll_get_pins(pf, pins, start_idx, count, pf->dplls.clock_id);
+>>- 	if (ret)
+>>+	if (!cgu || ret)
+>>  		return ret;
+>>- 	if (cgu) {
+>>+
+>>+	if (first) {
+>>  		ret = ice_dpll_register_pins(first, pins, ops, count);
+>>  		if (ret)
+>>  			goto release_pins;
+>>+	}
+>>+	if (second) {
+>>  		ret = ice_dpll_register_pins(second, pins, ops, count);
+>>  		if (ret)
+>>  			goto unregister_first;
+> ice_dpll_init_direct_pins() was updated with NULL guards for first
+> and second.  However, ice_dpll_deinit_direct_pins() was not:
+> ice_dpll_deinit_direct_pins() {
+>     if (cgu) {
+>         ice_dpll_unregister_pins(first, pins, ops, count);
+>         ice_dpll_unregister_pins(second, pins, ops, count);
+>     }
+>     ...
+> }
+> For the unmanaged case, ice_dpll_init_unmanaged() only creates the
+> PPS dpll -- eec.dpll stays NULL.  If output pin init fails inside
+> ice_dpll_init_pins(pf, true), the error path falls through to
+> deinit_inputs which calls:
+>     ice_dpll_deinit_direct_pins(pf, cgu=true, ...,
+>                                 pf->dplls.pps.dpll,
+>                                 pf->dplls.eec.dpll);
+>                                               ^^^^
+>                                               NULL
+> This passes NULL as second to ice_dpll_unregister_pins(), which
+> calls dpll_pin_unregister(NULL, ...), dereferencing the NULL dpll
+> pointer.  Would it make sense to add the same NULL guards to
+> ice_dpll_deinit_direct_pins() that were added to the init path?
+> [ ... ]
+>> @@ -3923,6 +4001,15 @@ ice_dpll_init_info_direct_pins(struct ice_pf *pf,
+>>  		pins[i].prop.board_label = ice_cgu_get_pin_name(hw, i, input);
+>>  		pins[i].prop.type = ice_cgu_get_pin_type(hw, i, input);
+>>  		if (input) {
+>>+			if (pf->dplls.unmanaged) {
+>>+				pins[i].freq = ice_dpll_pin_freq_info(hw, i,
+>>+								      input);
+>>+				pins[i].state[0] = DPLL_PIN_STATE_CONNECTED;
+>>+				pins[i].status =
+>>+					ICE_AQC_GET_CGU_IN_CFG_STATUS_ESYNC_CAP;
+>>+				pins[i].flags[0] = ICE_DPLL_IN_ESYNC_ENABLED;
+>>+				continue;
+>>+			}
+> [ ... ]
+>>  		} else {
+>>+			if (pf->dplls.unmanaged) {
+>>+				pins[i].freq = ice_dpll_pin_freq_info(hw, i,
+>>+								      input);
+>>+				pins[i].state[0] = DPLL_PIN_STATE_CONNECTED;
+>>+				continue;
+>>+			}
+> [ ... ]
+>>  		pins[i].prop.freq_supported =
+>>  			ice_cgu_get_pin_freq_supp(hw, i, input, &freq_supp_num);
+>>  		pins[i].prop.freq_supported_num = freq_supp_num;
+>>  		pins[i].pf = pf;
+>>  	}
+> Both unmanaged branches use continue, which skips the assignments of
+> pins[i].prop.freq_supported, pins[i].prop.freq_supported_num, and
+> pins[i].pf at the bottom of the loop.
+> The missing freq_supported / freq_supported_num means the DPLL netlink
+> code cannot report supported frequency ranges to userspace for
+> unmanaged pins, even though the data is available from
+> ice_cgu_get_pin_freq_supp().
+> The missing pins[i].pf = pf assignment leaves the pointer NULL (from
+> kcalloc zeroing).  Current unmanaged callbacks use d->pf from
+> dpll_priv so there is no immediate crash, but if any callback that
+> dereferences p->pf were added to the unmanaged ops in the future it
+> would hit a NULL pointer dereference.  Was the continue intended to
+> skip all of these assignments?
+
+
 
