@@ -1,156 +1,172 @@
-Return-Path: <netdev+bounces-283747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283748-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oFxbB5BZ+GlStQIAu9opvQ
-	(envelope-from <netdev+bounces-283747-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 10:32:16 +0200
+	id 0F22AtNa+GlStQIAu9opvQ
+	(envelope-from <netdev+bounces-283748-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 10:37:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB8784BA41E
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 10:32:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50CFA4BA508
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 10:37:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 66AC53016EF6
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 08:28:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AB4CF301AA51
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 08:34:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B20E83321A2;
-	Mon,  4 May 2026 08:28:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E788C33FE1F;
+	Mon,  4 May 2026 08:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="LDyW/NZU"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="V3c+ECGM"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA87A331A61;
-	Mon,  4 May 2026 08:28:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777883293; cv=none; b=tG5obAHb7kG/n9IjxYL4IL+F3pNMcB0lrgtnUTbK2buS/xf4m0U+lcjZqLrRM29dZtokrhJNJ88mErWMH6Ul5laKqk8K9aQHhbWuPlPPsOQzJTHGRnhOuzw6AVIBBDFkYumM0dPsAC/P98PYPSh58PjZH7fK6SHH2fpP6Durw9s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777883293; c=relaxed/simple;
-	bh=vpVfXkwpSYaRIefcy0a61BzjkpwY7MPWY+jgKHbMKMY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=FBi1U7oWqe8xmVuQ7eGXODLD3WHGbIdkoGBRILe+1KooPIddzAU9rfo3YIDxvmOJAZQGCIMKvPpY6zWgm4A2LQfNI1a8ihwvdDq1k3e9Xr7J7cKpvHzhJRNpfDqMsK02ibSWWP6Q+eQKNg/uC4P7cVvVtN9uouP6z71VJYdV/Qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net; spf=none smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=LDyW/NZU; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=BN4uSPdgnhHaUi6vQoU5jOpHW/0+tIz+jFTceVnzRvY=;
-	t=1777883291; x=1779092891; b=LDyW/NZUpuU5JKgYIuP4ky975STQ7+LmwAd6M1t1QRtANtb
-	g2vwZEARtCqnowsyLqpqbHgGHaKMPMTVAs0iM0IhwVy7kEr6NZOC6V4KSXzjGG9bX+wk8THO4ggcL
-	J5Iy3XyQeK3wsAzN+TDsnAvVz6gI10eHGKHURLVpJeff9sOaT6jkS4us1iR1GgaaH2s03cQ2R/47D
-	YcviQrniQ1ZQYEmvWXpU5qGFpDFIHXSNzIuPW3Z/9qwoR4KxDuSjeG2GNQJq2hJOCzcjvHQd25NVW
-	lzq/Eyc7IpDG9beHNr4JEWINQFyKzHROG5UTOiENm8OFfFMrM4TzPu8XDz5p/p8Q==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1wJoen-0000000EpQB-2exg;
-	Mon, 04 May 2026 10:28:01 +0200
-Message-ID: <316680e2dc0103774bf0cfb77f60341a85ef5b81.camel@sipsolutions.net>
-Subject: Re: nl80211: SET_WIPHY_NETNS does not check caller's CAP_NET_ADMIN 
- over the target netns
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Xie Maoyi <maoyi.xie@ntu.edu.sg>
-Cc: "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>, 
- "linux-kernel@vger.kernel.org"
-	 <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
-Date: Mon, 04 May 2026 10:28:00 +0200
-In-Reply-To: <TYZPR01MB6758FE8FDBB58A6CAA4DC6BBDC302@TYZPR01MB6758.apcprd01.prod.exchangelabs.com>
-References: 
-	<TYZPR01MB6758FE8FDBB58A6CAA4DC6BBDC302@TYZPR01MB6758.apcprd01.prod.exchangelabs.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B5A0308F3E
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 08:34:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777883662; cv=pass; b=oIwlVfuO07L7ikR85w+o1/xECF/ikjuYKaOVJam9/jeRb+fk+mFfjExSPO780zEDFHhJFxdyvxCTs9lb6L6SKoMFDZ3fheb+uUTbkRkuQ+ab/mhGjVTcvmVcXFjUO0n4zKv14a9e20yfD8qT9McAjzmZrwlFFqSsle4HrCgjsnQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777883662; c=relaxed/simple;
+	bh=bTExqUWesGWj14rqmgcSagqu9B67yS2fYcp6s+nvHLY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ijx6RLP2eb6bRCvW9XGFcJbVMnj00sOjvF5f0mhBaY3RdeiEUYxbMiFzKqSXjnSi2ApaT28zyw2uSTfQqDLjnFfAJ2wauY6U6fBK3ZpW+EJH90RdkUjUfhpw4Y9/ubz4/L8OJnm0CoAQCu8WTp8P/NXCoS6DmCZxSLAHpI1qux8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=V3c+ECGM; arc=pass smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5a41099fa86so4406175e87.2
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 01:34:21 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777883660; cv=none;
+        d=google.com; s=arc-20240605;
+        b=F6tZn2/uN2NiwgePJ4iBQoMt8UWEx1xNEweSIPAl0MhVfhAk+4h6EoyZ1oe4hn8e/R
+         jOI9V2ZoUrKJeSa6FfJapG3oBP2WEtsr2TydEReTluaaamWtcaE4j5ZDtnKtPa70lVNM
+         XFI3kOW1KEyADuKHzsRa+zR5wQ8z0KfFXiWi8DrXWaB/Na5OF3B7u063dCkYKLqi/bvb
+         Sz2vJKYM87s5XOdpftEWWXilkya72vEZ+MBNaaUMQ7/o9V4Xbu+Dt6AYQSyIu8KJXDYu
+         wO/v4J5Sai+r2rQgwuw7/6LiVzX9dbPd6Osgg1ubIpD1Mv44pVgMFm4eeLIN/0D+9XB+
+         y5dw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=bTExqUWesGWj14rqmgcSagqu9B67yS2fYcp6s+nvHLY=;
+        fh=GQG81KEndCNWQZLJ1d5JEKAb8AB/l7go2vMJoH93RYk=;
+        b=QbgdfZZKwFp35R8k2s8eS7Sh6ufMMZmhvcA6tFNU4AuTri6HmMck2p9AfymnAP+kAI
+         4dKS9jhsV/KM4/vA9nefgVwz1x3qzB82bJxVi0I8zigmaDCgD6D5cRwT85Df/M6GR6hp
+         WdrF8vUKf0dSuPGbnXbS/W/fMqFsJewCsy0owMzrphEvMV2ecV/nwUd32myX9G9JL0q9
+         sod74GR1NXslVkSbSsuq1JI9Zvx5+6OvG+aPbZrO7GW8du3YTjU6F1KRBIFZuQX8muSA
+         zXYaWB5HrbAZN8ShlGFMKB8gE7EDKwFR5Aoh86nPiVUEQpoEJPbuZAOBzGlzoWIwgX0/
+         o75A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1777883660; x=1778488460; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bTExqUWesGWj14rqmgcSagqu9B67yS2fYcp6s+nvHLY=;
+        b=V3c+ECGMNeNws7cpRZL7mGxuMxzpqUICgNa68nwlge+e5OpJlw++ZUWQwxjEITCT1S
+         rege2EqldZOc6voAjo+6QSEVweay7NPemKA9Ewhbyxn10RuIqYgy1iBgJvds1nFHHu4Z
+         MM4mjMbYXEhi41C69hjpO4/jHWT4XHp/4rgI+jpF/cjyyIvFIhwsgQqWpREyhbbkA0Il
+         9Gi6yx1UVvXQlD/Al/Srhd4lKMrOTtk0ynHo8QwKhDffKCCMDcVYUIzxl1kSKeB3QlIL
+         iZZZpWWVx08KDN+zAb8GVDsmCkCsATrXEd3kYeX/paBtAUcUOeDtZgyC4ScKygem0aKY
+         dthw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777883660; x=1778488460;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=bTExqUWesGWj14rqmgcSagqu9B67yS2fYcp6s+nvHLY=;
+        b=Levv/rjeJAwyCpLscdFtAJU2ET/h1bBAg0pzZ/WJ8/Gpu0N+kxkp24yMVBS/PW8EAL
+         KyNcVwJtEkWJC4sQbu40dkz3vhXVPnZksXAsevoUFdy0VOubBSsJIXpDXUGqbfrsYVW6
+         WXFft7cpPzFWPKco4eyDryP3cVzzPVygYKqXzQxenYj8pxPateArBWxGws5ds+XVAaTZ
+         cv2cDxeU7dSESks/znkrhUh/8aRah0zdXuC/NIqEyxiC5CMkedzOUbaf0d5mpjMc2riY
+         ooB7YYJ5clNubEQ3zd9jra56RLcAtmZt+gkaAi4xb1HLwGwV/NP0wpm9SROQaeQTHdhB
+         vHPw==
+X-Forwarded-Encrypted: i=1; AFNElJ9Xh2BJHyG2u0n1/1wCCONyfCtkZ22KNZvaWk7zAxYRuGUTNUBdc3COJZu/XaY1gOziueVOEm0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJUl3ufi+E0gVbphjFaD+oJRJfLYsYPsDtQ3b9kH1+gTCP1LSN
+	OgqPgLw9VzraEHVXWyl+4qJhgoEzlUyVs/bXO3av9oTFisVw7XB4wZtTAQtrlhbKwgD6nLLQsua
+	3OXvtXIxxGM59OqdLZB0yp3xCJMP8YSKLW4bIESKAvQ==
+X-Gm-Gg: AeBDieufk/K5tDDp4G0hHII0noeOjqtlD4P2elTk9A1ea+lfyk6RY8G9ikUJZDcJhHk
+	2rz56Bpewj72JkAP7WPkdoRqt4Tvytm5rXDuzL8g57YHmsVdoHtDLNXCTMogCJjaOjvVYMhhfbs
+	SpRQnpMDV2+EymRun4UxY55YDNfRyRfzrVondrh4gRKhNu/FW8l5vHdvmQjmfPGkPB3n4G9tFEY
+	z4JkRbZ4wrA3n4iOlv/m/sioyl2DVj8NKjVDEwgJYejyfWj1fpto00tL4MkfeHWJSZTXDaM6f2d
+	zTnECHvweJkMulEBgKP6WwtSQaH8GLKshrYPym8uqcUNp1vtE68=
+X-Received: by 2002:a05:6512:220c:b0:5a8:73c3:f27b with SMTP id
+ 2adb3069b0e04-5a873c3f374mr608834e87.15.1777883659699; Mon, 04 May 2026
+ 01:34:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
-X-Rspamd-Queue-Id: BB8784BA41E
+References: <20260430085412.96961-1-marco.crivellari@suse.com>
+ <8d1eff7b-3712-4039-87d6-028a4118e210@app.fastmail.com> <afNguCraI6AvmZrR@localhost.localdomain>
+ <1e220a70-4318-49de-aaac-332c0a1cfab4@app.fastmail.com> <afNvZKtiQPLbi-3F@localhost.localdomain>
+ <4edf7abf-8f48-4433-98f0-2ed2d97a32f5@app.fastmail.com>
+In-Reply-To: <4edf7abf-8f48-4433-98f0-2ed2d97a32f5@app.fastmail.com>
+From: Marco Crivellari <marco.crivellari@suse.com>
+Date: Mon, 4 May 2026 10:34:07 +0200
+X-Gm-Features: AVHnY4J16ygGjVvEIBbe2vlcSe4Mr-lVUzQBWrZHQB6R7WSpDdVqMuTZa6g545w
+Message-ID: <CAAofZF4HSbzEAvHj9--TP7QuogE03GXAhY=qecU4BnXBebemZA@mail.gmail.com>
+Subject: Re: [RFC PATCH] xprtrdma: Move long delayed work on system_dfl_long_wq
+To: Chuck Lever <cel@kernel.org>
+Cc: Frederic Weisbecker <frederic@kernel.org>, linux-kernel@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, netdev@vger.kernel.org, Tejun Heo <tj@kernel.org>, 
+	Lai Jiangshan <jiangshanlai@gmail.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+	Michal Hocko <mhocko@suse.com>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>, 
+	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 50CFA4BA508
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283748-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[sipsolutions.net: no valid DMARC record];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283747-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_THREE(0.00)[4];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[sipsolutions.net:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sipsolutions.net:dkim,sipsolutions.net:mid]
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,linutronix.de,suse.com,oracle.com,brown.name,redhat.com,talpey.com,davemloft.net,google.com];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marco.crivellari@suse.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
 
-Hi,
+On Thu, Apr 30, 2026 at 5:09=E2=80=AFPM Chuck Lever <cel@kernel.org> wrote:
+> [...]
+> The light dawns (for me). That's what I'd like to see in the commit messa=
+ge.
+>
+> I don't have any technical objections to the code change.
 
-On Sun, 2026-05-03 at 06:55 +0000, Xie Maoyi wrote:
-> Hi Johannes,
->=20
-> I think I have found two related namespace handling gaps in nl80211 on v7=
-.0 mainline. I would appreciate your view on whether they are bugs and whet=
-her they are worth fixing. The second one is much narrower than the first.
->=20
-> Bug A: NL80211_CMD_SET_WIPHY_NETNS does not check the target netns.
+Hello Chuck,
 
-I guess that's more a question of convention than anything else?
+Thanks for all your feedback.
+I will improve the commit log with your suggestion and then send v2.
 
-But I guess we should follow the netdev convention:
+Thanks.
 
-> By comparison, net/core/rtnetlink.c::rtnl_get_net_ns_capable() spells out=
- the convention:
->=20
->     /* For now, the caller is required to have CAP_NET_ADMIN in
->      * the user namespace owning the target net ns. */
->     if (!sk_ns_capable(sk, net->user_ns, CAP_NET_ADMIN))
->         return ERR_PTR(-EACCES);
+--=20
 
-which (also?) requires access in the target netns.
+Marco Crivellari
 
-> Bug B: nl80211_prepare_wdev_dump() continuation does not re-check netns.
->=20
-> The first dumpit invocation validates the wdev against the caller via __c=
-fg80211_wdev_from_attrs(..., sock_net(cb->skb->sk), ...). Subsequent invoca=
-tions look up the wiphy by global index via wiphy_idx_to_wiphy(). They do n=
-ot re-check sock_net(cb->skb->sk) against the wiphy's current netns.
->=20
-> Other dump paths in the same file do this check on every iteration. See n=
-l80211_dump_wiphy() at line 3437 and the parallel scheduled scan dump at li=
-ne 4420.
->=20
-> If a wiphy moves between dumpit invocations of NL80211_CMD_GET_SCAN via N=
-L80211_CMD_SET_WIPHY_NETNS, the dump silently keeps copying BSS list conten=
-ts from the wiphy's new netns into the caller's netns. On its own this race=
- needs a separate caller to migrate the wiphy mid-dump. With bug A, the att=
-acker can arrange the race themselves.
-
-This seems ... inconsequential? After all, moving a wireless device
-between namespaces doesn't really change the physical layout of the
-machine. Perhaps that'd give someone access to the SSID of some hidden
-network but that's not really a secret anyway since it's over the air.
-
-Maybe we should fix it for clarity and convention, but I don't see it's
-really an issue?
-
-johannes
+SUSE Labs
 
