@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-284043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284044-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YMzPCLAK+Wnt4gIAu9opvQ
-	(envelope-from <netdev+bounces-284043-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 23:08:00 +0200
+	id yOgFCFQK+Wn54gIAu9opvQ
+	(envelope-from <netdev+bounces-284044-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 23:06:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 770454C3E0D
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 23:07:59 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F215D4C3DE8
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 23:06:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 478893051288
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 21:06:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BDBEE3004911
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 21:06:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2216D33F598;
-	Mon,  4 May 2026 21:06:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1CE933E346;
+	Mon,  4 May 2026 21:06:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ills+6fq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jnyU3p6r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB9CF33E368
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 21:06:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9263333F58D
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 21:06:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777928779; cv=none; b=pYBJd88PbQ7TaQkY5NBS47aw6skPDw1xm3yprDDbM0VDzr3P+6UIIYwcjX41F02HfAvhQcfyA6JfykvRMtJWPwNVHgyxepKKvhaQ4JS7DGKqiwkPhEnCU+1UhrO8frhARe6pvn8schhEEoI+C9PD9YPrzgDXBFR3bAMh7pqCELA=
+	t=1777928780; cv=none; b=NG7/EtNowIL3N/qLZZx1R0mV/xsOEyZyrFB1bO8ZLZNE+wq3JB6FLao26LIwczmI5/XBDR/YpiayLBc443JByGwLu+wPbAf9iUEFa+ITO7qfKYirZpQgHEYhPZANObX5duJt8wr4ELag1mUEVeQqqAR+g+mMKjDxoZUt3a6b/CQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777928779; c=relaxed/simple;
-	bh=t+vSCHW8sXankiqKU0KBJsHXgvrd1DectD2FhYEqlNU=;
+	s=arc-20240116; t=1777928780; c=relaxed/simple;
+	bh=cmn2WSZTNYGCpkywBNeAvhkC9f6GUFEKUwCc7EBVnK8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=AeQv6IhLU1le4fZHB3rl7Plqa2mgeke0cZ2gqU+DpVlAte1AFycAVciLHJaapxW3lmrK51lnOeolDUPuSUrAGzGCZAM1CwD5lpSxrpPtmXUI8hjXMIftlPdcq/nycktaxvnrInVCiydwJ80d/INHB2Xc8IPo78W8PXkTpxVID6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ills+6fq; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=F9o4qXaL9YNai6kDmdZUhYP7lGZTmr8guQFtmkCq7s1mh86YDSpwzWBoDcJqNVkybbMJKJm8xoVqdxmAcH6mRBYXYDOyyvGlrxrxiY+UHT0HEUXQ1UqwfXbgYTzvg0sy0MjmMY6Bu1N6iY3v0Ng6Am5YOiO1wW73ekWwsDCcLzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jnyU3p6r; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-36512c65928so2579668a91.2
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 14:06:17 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-82fa7c6699fso5596837b3a.1
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 14:06:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777928777; x=1778533577; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1777928779; x=1778533579; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sSqMpkiDL5DK8PRDUUfeCWvxInuXlDLXwweDPX2/AgM=;
-        b=Ills+6fqXtP2x4NrQJNgHEXv72pgDxqQ1XDWEcYKysIX9wh3s1vkQZom1OjFtV7A2h
-         POK8ybLbpGdmcOujQsVcGQojlt6mYkUbzHegCgdbSth38n1Xqlxz7DkiHWTe6qRxvKcV
-         +hOqe1k20h8TKBVBqfTL7KJvY7bLGVv37z7QRllSmbbZjnVWRsqFs2nV5X2+NZ3Z7EX1
-         dnGKQ+fzwqWO4ybqgswgOszEg5Imge/RXFJt8h3BnVyPPkpcoV4vZVjempnX6/BccHuA
-         9lLn+wLosE2+Qe8B6u2kmtloCDiLtREAQT/tb0zRm81Q670hIu6twZIdZfUEZsA5/4CG
-         OWvA==
+        bh=uhJlx1wKuGc9b2//z9ZBMpryakhxff7H3kevgbt7OKQ=;
+        b=jnyU3p6rIFeNyVvwlFGiMk8+0QGhcu2F2FuDL4uVB5x2mRQaDc/Pv1kWmlmGucIEe2
+         wP6fPsTvR8v+TiHa2+5RtCk7bOgCdgGsvUAE/X0YMYVwYubBevtjn8ssJJnk9+Wa0BMy
+         sgqJbuWtnE4SSh99MpjnGKz3LwGpL2RQtg+c36YzO8YUoq57pYoospGqE3R4niZfDHKu
+         ZnLO3W1OM2tis7+2uuCXQxNwkRkO4x8xTOVTbzB9gcctvCbXia4GSp7xq3ZLHn2p/icW
+         5Qd7Pcg1zrltFTkN82c/TdKD3o391bn4FHwuLrE22wEwQL1QvYHsxWZRqWX4lw/oC4II
+         t8GQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777928777; x=1778533577;
+        d=1e100.net; s=20251104; t=1777928779; x=1778533579;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sSqMpkiDL5DK8PRDUUfeCWvxInuXlDLXwweDPX2/AgM=;
-        b=Fn/iiyY2R/bRm2WsjhCoFDPoxrnW5kKpTOO3+MNTmNWwGUHYx7P1z1KWramPEZJzPq
-         CHxtaNsqswvsyoz5N7CrkBnLKU9/puuhm66FbS33QaOmq5BdUsAzUValOH6HKdhXOtAJ
-         mcQY9xo3zrmRm6QMJLvbcvx7k6q/a23wKYOT0xbtbp3vGoabmiXzNRRuxx3jmu/APk4S
-         qCro3jSPGLAFuGGXqL8bz8FDgqGKS3Qyc7WvYpcSJQwWA6KeAmymDloXN5ET2ej88+Uc
-         nITkckiFG7nkt4MdyiaGUeQXGUAaxcEZILljtgFeVMhzhAChgt+WC5xEcqlj11TtLhG9
-         6oAQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9eIJA+QH3HmHu8/wfMGJNFmGyISjNH6zujsItxA0nJ7cSrJ8qxccCW93tf4pnZbXU7VOmu6oo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyINau9Nvo+9RsrzNrPaOuFzxi0d/iBgt5jMYQkptUs99sJDuWz
-	ZzEbyRFs7IL4dSRI+QGTa98tRS6VJxXRON4nNNKXsUJwNiT2a+fIoXZZ6Q0X78o4c5iKJyW07Qj
-	NPFE6nw==
-X-Received: from plas14.prod.google.com ([2002:a17:903:200e:b0:2ba:1a1e:b2d2])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:48:b0:35b:a7be:ae47
- with SMTP id 98e67ed59e1d1-365774d3253mr527355a91.21.1777928777100; Mon, 04
- May 2026 14:06:17 -0700 (PDT)
-Date: Mon,  4 May 2026 21:04:50 +0000
+        bh=uhJlx1wKuGc9b2//z9ZBMpryakhxff7H3kevgbt7OKQ=;
+        b=rgejfkolgoUbunm+BtL2l3yduRSSm7KDppgd9nATb9qI7gkN4nRZdAeKynamB2pQBG
+         /OLIwsGQpNvn3fqzagPrDqv8dO7hTxDrF/2eFf2fMcXm0t4luiHx1aYj049YjPwqA2jI
+         9OK34QmuBlnvziKGDFZaGhrFnOKxPwgu1LwESZvO/iKmYZIDIaJEMgY76oPm3LACI7Ys
+         hNOr241sZt8twCZk1VZ7amYr5z0sgI8NiW5m3ZIX5ZsxkPms74OAT92JdBFhTPBQjiGK
+         DgrqwVIU6g5Q7ORSVRrnNjaxH0hUXI44yecjl/xnmBO+TQXdy0bYfIoqrzdFKBmTACj8
+         RTXA==
+X-Forwarded-Encrypted: i=1; AFNElJ+Pkh/hDZRWDo30oGEppKDJW+KKiZMZSmfO0JRf/FE6oj/haQW+ZdA4ar59LYI3Pf4uqHOQhrY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpZYrT/PPx3RXfV7rd0qPCM1a2GIwBEFSx+p0OrcO/ayPY7Bnd
+	heYyr7+4k3NMoqQJnO/KXjd1sfp9zcdJs2h0GF81rC9QPBYmcKHd+6l46UYC6tI+9I5uuEpDgym
+	dyv8UTQ==
+X-Received: from pfbcd20.prod.google.com ([2002:a05:6a00:4214:b0:82f:d0ad:4d57])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2d11:b0:81f:5037:a317
+ with SMTP id d2e1a72fcca58-8352d19f3ecmr11425299b3a.11.1777928778691; Mon, 04
+ May 2026 14:06:18 -0700 (PDT)
+Date: Mon,  4 May 2026 21:04:51 +0000
 In-Reply-To: <20260504210610.180150-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260504210610.180150-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260504210610.180150-4-kuniyu@google.com>
-Subject: [PATCH v2 bpf 3/6] mptcp: bpf: fix type confusion in bpf_mptcp_sock_from_subflow()
+Message-ID: <20260504210610.180150-5-kuniyu@google.com>
+Subject: [PATCH v2 bpf 4/6] bpf: tcp: Fix type confusion in bpf_skc_to_tcp_sock().
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: Martin KaFai Lau <martin.lau@linux.dev>, Daniel Borkmann <daniel@iogearbox.net>, 
 	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
@@ -85,10 +85,9 @@ To: Martin KaFai Lau <martin.lau@linux.dev>, Daniel Borkmann <daniel@iogearbox.n
 Cc: John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
 	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
 	Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	"Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 770454C3E0D
+X-Rspamd-Queue-Id: F215D4C3DE8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
@@ -98,7 +97,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -106,8 +105,8 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[linux.dev,iogearbox.net,kernel.org,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284043-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-284044-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[google.com:+];
@@ -116,45 +115,37 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[gmail.com,fomichev.me,kernel.org,linux.dev,google.com,vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-
-bpf_mptcp_sock_from_subflow() only checks if sk->sk_protocol is
+bpf_skc_to_tcp_sock() only checks if sk->sk_protocol is
 IPPROTO_TCP, but RAW socket can bypass it:
 
   socket(AF_INET, SOCK_RAW, IPPROTO_TCP)
 
-In this case, it would NOT be valid to call sk_is_mptcp() which will
-assume sk is a pointer to a struct tcp_sock, and wrongly checks for:
-tcp_sk(sk)->is_mptcp.
+Let's use sk_is_tcp().
 
-Fixes: 3bc253c2e652 ("bpf: Add bpf_skc_to_mptcp_sock_proto")
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Fixes: 478cfbdf5f13 ("bpf: Add bpf_skc_to_{tcp, tcp_timewait, tcp_request}_sock() helpers")
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
-v1: https://lore.kernel.org/mptcp/20260430-mptcp-bpf-mptcp-sock-type-v1-1-d2ed5cda7da9@kernel.org/
----
- net/mptcp/bpf.c | 2 +-
+ net/core/filter.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/mptcp/bpf.c b/net/mptcp/bpf.c
-index 8a16672b94e2..4cc16cbeb328 100644
---- a/net/mptcp/bpf.c
-+++ b/net/mptcp/bpf.c
-@@ -14,7 +14,7 @@
+diff --git a/net/core/filter.c b/net/core/filter.c
+index cd88633f8dc1..7d945dc2cb92 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -11963,7 +11963,7 @@ const struct bpf_func_proto bpf_skc_to_tcp6_sock_proto = {
  
- struct mptcp_sock *bpf_mptcp_sock_from_subflow(struct sock *sk)
+ BPF_CALL_1(bpf_skc_to_tcp_sock, struct sock *, sk)
  {
--	if (sk && sk_fullsock(sk) && sk->sk_protocol == IPPROTO_TCP && sk_is_mptcp(sk))
-+	if (sk && sk_fullsock(sk) && sk_is_tcp(sk) && sk_is_mptcp(sk))
- 		return mptcp_sk(mptcp_subflow_ctx(sk)->conn);
+-	if (sk && sk_fullsock(sk) && sk->sk_protocol == IPPROTO_TCP)
++	if (sk && sk_fullsock(sk) && sk_is_tcp(sk))
+ 		return (unsigned long)sk;
  
- 	return NULL;
+ 	return (unsigned long)NULL;
 -- 
 2.54.0.545.g6539524ca2-goog
 
