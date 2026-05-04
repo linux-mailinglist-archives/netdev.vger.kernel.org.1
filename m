@@ -1,297 +1,199 @@
-Return-Path: <netdev+bounces-283884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283885-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qI0yLu+y+GkdzAIAu9opvQ
-	(envelope-from <netdev+bounces-283884-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:53:35 +0200
+	id 2HGsNkSy+GkdzAIAu9opvQ
+	(envelope-from <netdev+bounces-283885-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:50:44 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDBCB4C0274
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:53:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D9AD94C0134
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:50:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 20A59307D52D
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 14:29:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DADE930F526F
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 14:32:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C09513E3C45;
-	Mon,  4 May 2026 14:27:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF0643E0231;
+	Mon,  4 May 2026 14:31:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CetqyqCd"
+	dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b="ZyT34O6U";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="FAcRtxgF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A3963E317A
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 14:27:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22434202963;
+	Mon,  4 May 2026 14:30:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777904863; cv=none; b=QFyhrY2DVXrkKFEkVvCQHqm+Pbv0lZBfyVaSsVMDlyROM3oWsXJTyMe10paJyfTUq7Us2ZrogInR9tFkJkyGPwcjU3/JUJJ7VXkTKf32EZg3IeGp8m7sK94g8mQRu6UBp6ixu1U+C8a1d3GRJXF7PwdgHeyy0DZLI3+crVObPwk=
+	t=1777905062; cv=none; b=rArVq+9K5bk3uN89DUR+M+gCspIGwzPvXHrmtI1DpBxGn7jAPIG3bIUyzErtw/f6jqQXZtP0c4VUuTyAQQ02OxHxez6yZpks11jMfiUdhRb0mZ2FxymNnm1Pjo/QpUhWvgZY4zRm9kqL4kAg7EzjaZ8pVuAUV5SHfjj0qZw5GEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777904863; c=relaxed/simple;
-	bh=vvEh2bcJjDHTEu49dfPKRZ5OIW+CAt6wUr8DC1l33J8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lOwUWZN5L1S+vcI0eVt4sji+Kmo1vWRnoFMb/zVdMUNsmPRfXbjM+g1zCvaHtT7wHc4fCmEiGDqU3ohVXXABy1Wthhi//NHRIc1lhv8E9s2V5gaicyApJw8EM8dbgiA+2YeJc4MO62vXIW8gURxPF+yNInA0QNd/g9CgVqgo2PA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CetqyqCd; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-834f1075805so2771308b3a.2
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 07:27:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777904862; x=1778509662; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y14fsCh2hvBLp5LgfY7vOJDAXfPr7uBAgs7IcUtTCWQ=;
-        b=CetqyqCdIyuPHcO6ZRKCTX2uOO6A6oWWo/X2dnpQDer4EgNxgYel3idMhtjZGE0NX7
-         ipN8CRXUPgAGfF1qdiQ/wnI7f9rx0f+bJL5wlLdvBldPggUGZGjufHE7CNOKq2jclhuV
-         Ap1XWtqHGWI6iPVu6BsBDZLsmG6d9AaZj9sH3Up52MsV4lRxeDnFzc53tk2GSTaxZ19o
-         iAIN2SanULeKl+3d/yHdQVTf/Z9yykGZn7qze8JNZqKArDtA3E2oivBbeUj2he9iiAKQ
-         i/cJW02G54YY2rYEJOGnnyAKUpLXyl9xgif3m1uhvOaKOp41Fg+6AalVYe3QA2Kkd1im
-         DcuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777904862; x=1778509662;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y14fsCh2hvBLp5LgfY7vOJDAXfPr7uBAgs7IcUtTCWQ=;
-        b=AgShu90QPD5lHBBw18ntQDZ56t/u3aJoeZZOFDRtHIil7Jdu98sJ7iJRJ1PZyTWrr6
-         KpI3oh5rY418EerMtjH1cQROHnmprXH/e3l3OSbTsclBsL03pmauocaKFBq7ZxBnL/jE
-         dBOWapLmog3IZxlApd+pidfNnAQ+RkNqjnFwDa5qCnlMMp6Ulu9I3JZkIRy1nMWPdqxU
-         xofQgZ03ahmyNb0W5P4KoUoG96R7k3M2OqYtu79K7OAQf0xW9KFy9UoXkyfj8k7h2kys
-         zfandDJaR76BdgBVWEhex0OljF8V5CQgzA/qMZopKHQr6Yr4kWTjGFfvLiaB8rCMlkMI
-         MU8A==
-X-Forwarded-Encrypted: i=1; AFNElJ8p6DuUJN5m+mm7MrTNw/wQZ6xLjTD+QV/M4GXZ6gWOEKJS8+QFzzXvfHNnHwOP9kJkIJa98ZE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzI9HvBrUGftH4y7cRCEH1OShUeyV8OBpBx2NOLGzAA2HaTnJCk
-	hoMxbciEMZQdgBOFt0+Uc1szQfWDFTgRs+dgZHE3a8BvpX3lqakAEaEG
-X-Gm-Gg: AeBDievlg7OE/YtEQnnC3gARN9kGT16bISVh4K00clD8Q6rvB4uiGRdqMwT9fSz3i8h
-	5PGqQFxBVcmBiFxLBEUJSEoTMb8sBWJihBBxmTtVsDHt2P4RVzqqPCCIb8Q86ThAxmAfR2OhcfG
-	xFdKtr9gBYUBQ3z2zSi0nPY95db5jh1xNzXhxqo9IO6Cv7JD2XGrxDXP1QiD5pkCMcb8s/UiVL1
-	40tbi9Hl6WfeeYqncCmrNiEdJ+hUyV7NYu5gCxVbqfvRBbtYAE1SjnMZhvOox29z4LFVZqMIuwT
-	PnMDIxSyvtdXeDIXh3OD0dhIYktE6gwO2rV3yeNmjJTh4RidrQd9reGVCqs/D1SiGX/GPsuE/gs
-	6oxTB7f5/DbKAi/rXWy4v3VQBFddip0r/xxetkxYOwFBQyKQ8tEZiIBWoZg6RiLPyd+cwfpEWrn
-	CS4Tm3vKpsFfBf1sPC6RB/ehNpi0bgTrg1SP4VyG3XRYEmgPdNwaAEuHn6
-X-Received: by 2002:a05:6a00:1748:b0:832:e65:ddcd with SMTP id d2e1a72fcca58-8352d2ac0a2mr9386999b3a.45.1777904861465;
-        Mon, 04 May 2026 07:27:41 -0700 (PDT)
-Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-835293f022asm9111662b3a.45.2026.05.04.07.27.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2026 07:27:40 -0700 (PDT)
-From: Maoyi Xie <maoyixie.tju@gmail.com>
-X-Google-Original-From: Maoyi Xie <maoyi.xie@ntu.edu.sg>
-To: steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	horms@kernel.org,
-	antony.antony@secunet.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net] xfrm: route MIGRATE notifications to caller's netns
-Date: Mon,  4 May 2026 22:27:36 +0800
-Message-Id: <20260504142736.1228425-1-maoyi.xie@ntu.edu.sg>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1777905062; c=relaxed/simple;
+	bh=nZoBjIez/Vl2E5L1bHRv5PYHbPJxJ30C4EztBDlQ694=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ctpUecSXOiQO9SQTkjXKCaEckqmhsMQEYggsTbCMUcFgUOYHwEOVA1RwD2vwOaOKOKwLOaV9ZYBPMoMw70ydlhPQgy3QsTRcOg+9+KSQbtWFeUdvZugaY2AKLd9lLcYA7ZQVgYujjL+swgtqvTqbskMOiy45AjoVqNEMDU3cm00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alyssa.is; spf=pass smtp.mailfrom=alyssa.is; dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b=ZyT34O6U; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=FAcRtxgF; arc=none smtp.client-ip=202.12.124.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alyssa.is
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alyssa.is
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfout.stl.internal (Postfix) with ESMTP id D689F1D000D0;
+	Mon,  4 May 2026 10:30:58 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Mon, 04 May 2026 10:30:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alyssa.is; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm2; t=1777905058; x=1777991458; bh=WuazV6TJ6v
+	iKYbAxIlD1RDkT/kBkM0+QnMk1N1i/atA=; b=ZyT34O6UlXvgeDU11g090OIrdo
+	SqXpJ709Xz4Jr2GPl4YtF23/KJbRH0XhvWF/eS1suGlqG4IanIp4CAsRtPW/FCu2
+	SyfpMNa2GN6hiIR00zjCIi+57N5zDyl8owzjNAY+otr+c4q8Ji5yG85Jfz55IR2Q
+	Ys1R4+BglsF29yhKEb5VbWdcWMHUNW+6K/K0BO0/+Qjl54oMXHtjR4yOczfL5Fi/
+	cyLQIEyNavMs7Zl6Uzj46yTpNWPfErocb0YM0y9Yz2yKRcEIT03kmzryoNCcAjoP
+	zZBKD8GwoySVIXSpbJ1V4sKYVYp1nFILUtElaAzmfHJUXXWTL0PF9l4/mv3Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1777905058; x=1777991458; bh=WuazV6TJ6viKYbAxIlD1RDkT/kBkM0+QnMk
+	1N1i/atA=; b=FAcRtxgFUTBUOifh70JiNb6Tblxum3Wiwe9DJOGajy3n5MKiFDK
+	qBfnh89tx64OjTNQZEtttYYTKIVsCsmlm82hx765q9n7Q5qVxTxKV8TgISa/tgW+
+	KucWh6D13PMbHSi/78tAZgFZDSwGflgbUl/KKq3Y27E5gSskS4IYbkkuxQOI4s5A
+	SGu/AEyP1ihp46zaz3D5z6SWwrxjB57OCrCUO/PI06mrqiKxwmra0XvDZ6qvDi2B
+	kRH0PXDN1M2cRhMiXH5lOpkW9ZMyWqwN7+1a4XGuhAzbLx2EG7xfdiUHp6Ul5UV+
+	jW3QWSmb/SWghRL1qvJyvyG2/WpFYBs8lRQ==
+X-ME-Sender: <xms:oq34aXz0YFgCVbV9x0MwLjSmkjhHYnUQQhnw5pCooIFJy0XMTvF15Q>
+    <xme:oq34adgGuAkbpOuzPNvYVdE_uqvb_wmvezqEK3wzo0JJdq5_ZXhQYsoJPqzvUIRbM
+    Y8u83MrIV4Jhw4zM9A56zJFPY5rAkrjDrANLFpTTnuMfQH3Lj3X3w>
+X-ME-Received: <xmr:oq34aao97w8iP34C-bumb8hRjd8bwEsLW31CmxAh0tGbtN0QAYxS3qpWba1ThfOR_OPygZG1urV9mulrhgtZYGoqBQJGHipkRp2idkg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdelledtkecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefhvfevufgjfhffkfggtgesghdtreertddttdenucfhrhhomheptehlhihsshgrucft
+    ohhsshcuoehhihesrghlhihsshgrrdhisheqnecuggftrfgrthhtvghrnhepieduffeuie
+    elgfetgfdttddtkeekheekgfehkedufeevteegfeeiffetvdetueevnecuvehluhhsthgv
+    rhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhephhhisegrlhihshhsrgdrih
+    hspdhnsggprhgtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohep
+    uggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvth
+    esghhoohhglhgvrdgtohhmpdhrtghpthhtohepughsrghhvghrnheskhgvrhhnvghlrdho
+    rhhgpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkh
+    hriihksehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdho
+    rhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhope
+    hrsghmsehsuhhsvgdrtghomhdprhgtphhtthhopehfmhgrnhgtvghrrgesshhushgvrdgu
+    vg
+X-ME-Proxy: <xmx:oq34aUjQ4PVlIOmtWqao7bOcQ6-uMcYPaT2AdwvuYGwRbHwoQN7lPA>
+    <xmx:oq34acN5BO7SO-vu79-AAJCwojKsHRSMEzt9JAF-aTZUgff0NAsWgg>
+    <xmx:oq34aex0QnQHgTiQYy4MJz8TE3qf0MlrMK8IV0i3cR0mYOQFI6U6cA>
+    <xmx:oq34aeoJOW-EPpKdcKsf2o65YljDZLbwzZZsade_BdN1AAvVzFXi7Q>
+    <xmx:oq34aY277pOWuTyXEREkpAsbJV7NJpna7MZ5bWhnzSBqTC2frasLgPPw>
+Feedback-ID: i12284293:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 4 May 2026 10:30:57 -0400 (EDT)
+Received: by mbp.qyliss.net (Postfix, from userid 1000)
+	id 4DC267E81A08; Mon, 04 May 2026 16:30:55 +0200 (CEST)
+From: Alyssa Ross <hi@alyssa.is>
+To: Fernando Fernandez Mancera <fmancera@suse.de>, "David S. Miller"
+ <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, =?utf-8?Q?Ricard?=
+ =?utf-8?Q?o_B_=2E_Marli=C3=A8re?= <rbm@suse.com>, Krzysztof Kozlowski
+ <krzk@kernel.org>
+Subject: Re: [PATCH v2] ipv6: default IPV6_SIT to m
+In-Reply-To: <5f676587-fcdd-4704-9523-07a7fd98455a@suse.de>
+References: <20260503192515.290900-2-hi@alyssa.is>
+ <5f676587-fcdd-4704-9523-07a7fd98455a@suse.de>
+Date: Mon, 04 May 2026 16:30:51 +0200
+Message-ID: <878q9zdz6s.fsf@alyssa.is>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: BDBCB4C0274
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
+X-Rspamd-Queue-Id: D9AD94C0134
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-3.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[alyssa.is:s=fm2,messagingengine.com:s=fm3];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
-	TO_DN_NONE(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283884-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-283885-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,suse.de:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,alyssa.is:email,alyssa.is:dkim,alyssa.is:mid];
+	DKIM_TRACE(0.00)[alyssa.is:+,messagingengine.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[alyssa.is];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,ntu.edu.sg:mid,ntu.edu.sg:email]
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hi@alyssa.is,netdev@vger.kernel.org];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
 
-xfrm_send_migrate() in net/xfrm/xfrm_user.c and pfkey_send_migrate()
-in net/key/af_key.c both hardcode &init_net for the multicast that
-announces a successful XFRM_MSG_MIGRATE / SADB_X_MIGRATE.
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-XFRM_MSG_MIGRATE arrives on a per-netns NETLINK_XFRM socket, and the
-rest of the xfrm/af_key netlink path was made netns-aware in 2008.
-The other 14 multicast paths in xfrm_user.c route their event using
-xs_net(x), xp_net(xp) or sock_net(skb->sk); only the migrate path
-was missed.
+Fernando Fernandez Mancera <fmancera@suse.de> writes:
 
-Two consequences of the init_net hardcoding:
+> On 5/3/26 9:25 PM, Alyssa Ross wrote:
+>> This basically defaulted to m until recently, since IPV6 defaulted to
+>> m.  Since IPV6 was changed to a boolean with a default of y, IPV6_SIT
+>> started defaulting to built-in as well.  This results in a surprise
+>> sit0 device by default for defconfig (and defconfig-derived config)
+>> users at boot.  For me, this broke an (admittedly non-robust) script.
+>> Preserve the behaviour of most configs by avoiding building this
+>> module, that's probably overall seldom used compared to IPv6 as a
+>> whole, into the kernel.
+>>=20
+>> Fixes: 309b905deee59 ("ipv6: convert CONFIG_IPV6 to built-in only and cl=
+ean up Kconfigs")
+>> Signed-off-by: Alyssa Ross <hi@alyssa.is>
+>
+> Hi, I am not sure about this. IPV6_SIT was already defaulting to 'y' for=
+=20
+> most distributions (except for ARM). Sure, if you had CONFIG_IPV6=3Dm the=
+n=20
+> CONFIG_IPV6_SIT was defaulting to 'm'.
+>
+> Hm. Maybe we can aim this for net-next tree instead of net? I just don't=
+=20
+> think this is a fix but a change in behavior. FWIW, it makes sense to me=
+=20
+> to have this as a module by default.
+>
+> Let's see what do others think.
 
-  1. The notification (selector, old/new endpoint addresses, and the
-     km_address) is delivered to listeners on init_net's
-     XFRMNLGRP_MIGRATE / pfkey BROADCAST_ALL groups rather than on
-     the issuing netns. An IKE daemon running in init_net therefore
-     receives migration notifications originating from any other
-     netns on the host.
+Yes, it appears you're right.  I had only tested on ARM.  In that case,
+perhaps it make sense to instead set this to m in the arm64 defconfig, to
+preserve the previous situation, but I can also see the value in
+reducing platform discongruity by letting it change to y on arm64 too.
 
-  2. An IKE daemon running inside a non-init netns and subscribed
-     to its own XFRMNLGRP_MIGRATE / pfkey groups never receives the
-     notification of its own migration. IKEv2 MOBIKE / address-update
-     handling inside a netns is silently broken.
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thread struct net through km_migrate() and the xfrm_mgr.migrate
-function pointer, drop the &init_net override in xfrm_send_migrate()
-and pfkey_send_migrate(), and pass the caller's net (already in
-scope in xfrm_migrate() via sock_net(skb->sk)) all the way down.
-struct xfrm_mgr is in-tree only and not exported as a stable API,
-so the function-pointer signature change is internal.
+-----BEGIN PGP SIGNATURE-----
 
-pfkey_broadcast() is already netns-aware via net_generic(net,
-pfkey_net_id) since the pernet conversion. The five other
-pfkey_broadcast() callers in af_key.c already pass xs_net(x),
-sock_net(sk) or a per-netns net, so this only removes the
-&init_net outlier.
-
-Fixes: 5c79de6e79cd ("[XFRM]: User interface for handling XFRM_MSG_MIGRATE")
-Cc: stable@vger.kernel.org # v5.15+
-Signed-off-by: Maoyi Xie <maoyi.xie@ntu.edu.sg>
----
- include/net/xfrm.h     | 3 ++-
- net/key/af_key.c       | 6 +++---
- net/xfrm/xfrm_policy.c | 2 +-
- net/xfrm/xfrm_state.c  | 4 ++--
- net/xfrm/xfrm_user.c   | 5 ++---
- 5 files changed, 10 insertions(+), 10 deletions(-)
-
-diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-index 10d3edde6..874409127 100644
---- a/include/net/xfrm.h
-+++ b/include/net/xfrm.h
-@@ -715,6 +715,7 @@ struct xfrm_mgr {
- 					   const struct xfrm_migrate *m,
- 					   int num_bundles,
- 					   const struct xfrm_kmaddress *k,
-+					   struct net *net,
- 					   const struct xfrm_encap_tmpl *encap);
- 	bool			(*is_alive)(const struct km_event *c);
- };
-@@ -1891,7 +1892,7 @@ int xfrm_sk_policy_insert(struct sock *sk, int dir, struct xfrm_policy *pol);
- #ifdef CONFIG_XFRM_MIGRATE
- int km_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
- 	       const struct xfrm_migrate *m, int num_bundles,
--	       const struct xfrm_kmaddress *k,
-+	       const struct xfrm_kmaddress *k, struct net *net,
- 	       const struct xfrm_encap_tmpl *encap);
- struct xfrm_state *xfrm_migrate_state_find(struct xfrm_migrate *m, struct net *net,
- 						u32 if_id);
-diff --git a/net/key/af_key.c b/net/key/af_key.c
-index a166a88d8..9cffeef18 100644
---- a/net/key/af_key.c
-+++ b/net/key/af_key.c
-@@ -3564,7 +3564,7 @@ static int set_ipsecrequest(struct sk_buff *skb,
- #ifdef CONFIG_NET_KEY_MIGRATE
- static int pfkey_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
- 			      const struct xfrm_migrate *m, int num_bundles,
--			      const struct xfrm_kmaddress *k,
-+			      const struct xfrm_kmaddress *k, struct net *net,
- 			      const struct xfrm_encap_tmpl *encap)
- {
- 	int i;
-@@ -3669,7 +3669,7 @@ static int pfkey_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
- 	}
- 
- 	/* broadcast migrate message to sockets */
--	pfkey_broadcast(skb, GFP_ATOMIC, BROADCAST_ALL, NULL, &init_net);
-+	pfkey_broadcast(skb, GFP_ATOMIC, BROADCAST_ALL, NULL, net);
- 
- 	return 0;
- 
-@@ -3680,7 +3680,7 @@ static int pfkey_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
- #else
- static int pfkey_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
- 			      const struct xfrm_migrate *m, int num_bundles,
--			      const struct xfrm_kmaddress *k,
-+			      const struct xfrm_kmaddress *k, struct net *net,
- 			      const struct xfrm_encap_tmpl *encap)
- {
- 	return -ENOPROTOOPT;
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index c944327ce..59968dcba 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -4703,7 +4703,7 @@ int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
- 	}
- 
- 	/* Stage 5 - announce */
--	km_migrate(sel, dir, type, m, num_migrate, k, encap);
-+	km_migrate(sel, dir, type, m, num_migrate, k, net, encap);
- 
- 	xfrm_pol_put(pol);
- 
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 1748d374a..8f1379681 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -2837,7 +2837,7 @@ EXPORT_SYMBOL(km_policy_expired);
- #ifdef CONFIG_XFRM_MIGRATE
- int km_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
- 	       const struct xfrm_migrate *m, int num_migrate,
--	       const struct xfrm_kmaddress *k,
-+	       const struct xfrm_kmaddress *k, struct net *net,
- 	       const struct xfrm_encap_tmpl *encap)
- {
- 	int err = -EINVAL;
-@@ -2848,7 +2848,7 @@ int km_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
- 	list_for_each_entry_rcu(km, &xfrm_km_list, list) {
- 		if (km->migrate) {
- 			ret = km->migrate(sel, dir, type, m, num_migrate, k,
--					  encap);
-+					  net, encap);
- 			if (!ret)
- 				err = ret;
- 		}
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index d56450f61..b39c33276 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -3271,10 +3271,9 @@ static int build_migrate(struct sk_buff *skb, const struct xfrm_migrate *m,
- 
- static int xfrm_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
- 			     const struct xfrm_migrate *m, int num_migrate,
--			     const struct xfrm_kmaddress *k,
-+			     const struct xfrm_kmaddress *k, struct net *net,
- 			     const struct xfrm_encap_tmpl *encap)
- {
--	struct net *net = &init_net;
- 	struct sk_buff *skb;
- 	int err;
- 
-@@ -3292,7 +3291,7 @@ static int xfrm_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
- #else
- static int xfrm_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
- 			     const struct xfrm_migrate *m, int num_migrate,
--			     const struct xfrm_kmaddress *k,
-+			     const struct xfrm_kmaddress *k, struct net *net,
- 			     const struct xfrm_encap_tmpl *encap)
- {
- 	return -ENOPROTOOPT;
-
-base-commit: bd3a4795d5744f59a1f485379f1303e5e606f377
--- 
-2.34.1
-
+iHUEARYKAB0WIQRV/neXydHjZma5XLJbRZGEIw/wogUCafitmwAKCRBbRZGEIw/w
+or0EAQDFdUqaDgVAWzQCvBcq5MeKTpoMcu8P9q0+TsR4I249TwD/XWXc+Y1bp3To
+BCuHzMnUih5DCohtUAXHZ+cz+O1N0gM=
+=uL/Y
+-----END PGP SIGNATURE-----
+--=-=-=--
 
