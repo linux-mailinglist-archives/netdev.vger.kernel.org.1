@@ -1,91 +1,93 @@
-Return-Path: <netdev+bounces-284098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284099-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iNcDAVIz+WkG6gIAu9opvQ
-	(envelope-from <netdev+bounces-284098-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 02:01:22 +0200
+	id gHgCBWQz+WkG6gIAu9opvQ
+	(envelope-from <netdev+bounces-284099-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 02:01:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8480F4C5108
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 02:01:21 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FAD54C5111
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 02:01:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A6A77303744B
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 23:59:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C4F43303AF24
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 23:59:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DCBE3FB7EB;
-	Mon,  4 May 2026 23:59:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33CF23FFAD1;
+	Mon,  4 May 2026 23:59:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Mv9yheg8"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QwdE5VGC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f99.google.com (mail-pj1-f99.google.com [209.85.216.99])
+Received: from mail-oa1-f97.google.com (mail-oa1-f97.google.com [209.85.160.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 001753FE64B
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 23:59:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ECD43FE665
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 23:59:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777939155; cv=none; b=NL9tVTc05/dJFYAP4vniBgNbHjXVjqbRxhWlDdi64wS7T9fO2nBq0t0k4BwSQXKV1wDAfbP7dpU3PAYmoE1VaRzrbmtx/zpvFLs8M+OJJm1XcIfFZaz8pZ/YjoY/I1tGC+OAsGtLVDtS3ZAyX1cDGDR3Z1nW/zPpuPGI3cuPxtE=
+	t=1777939157; cv=none; b=ZIi7UXFaFKgQou4tvlBGrfZftJJOL1xuoo2aWCyEc/Nh7rmihz+AZyVovJUL+sMHfMHOiyd4SXhcsN+raj8zpZB1x5fVxz3eU8I7SUroGz8GaQn4E/ou7w2e+pyW43BiGobmsPZLZgXxrEnuosB3iWf7xeiWBFXa4hVZEyrUqy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777939155; c=relaxed/simple;
-	bh=8S94N5AMn2Nw79Id+daK2147NkKHS1v+lvcg2G8yXUA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b1ogE8aJiIjXtfyJ7jyIi5g6t8VIwDuEfxNTeF/UZT7Y3zx3IbZzyp/uUCpcej/AufRC5Vmz3kgYJWTbz3KnAi5t4jzpmgn3TG0i8qFijZ8RIJQ7FDepzoIUKFcWANzOVCazWzk1I2rwN77cxdEdZk69jpH9PCjypC9kdqQMPFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Mv9yheg8; arc=none smtp.client-ip=209.85.216.99
+	s=arc-20240116; t=1777939157; c=relaxed/simple;
+	bh=3YUpCMIXg+11UDi/QURkMKp5zmRMaoFYducGF8em0i4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OIhPKbWaiJX5ikwmi/QLNzqPAUDZZ/bnZup8vBOmvh9vF2uLHMzJkGTv+MSLkj9trf0QIlsBxFUVAjIkSVyyMlFYAvsHWpo3T6U3jx6LqvUS1z1UZHiXuuJl5hVa29PFVe1+WUmnDnpTYRfW3YdgjFPDxCRha5XOMr8XnzsjzoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QwdE5VGC; arc=none smtp.client-ip=209.85.160.97
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f99.google.com with SMTP id 98e67ed59e1d1-364f7c42c62so2042715a91.0
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 16:59:13 -0700 (PDT)
+Received: by mail-oa1-f97.google.com with SMTP id 586e51a60fabf-43454c72d2bso897711fac.0
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 16:59:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777939153; x=1778543953;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vavz6c+PchbYtvmG/R/XGPmcZUThQvUNUiefOF0nwf4=;
-        b=dhvvwNLZ4vJ/QDfkYeT5Cx+Wb0yDiQnv9LTjs0gAokW8PXbuR+YZ0uyc4zBEB4lbKo
-         u0NXd+N1xvGAIGQK71xb5DfRyQKiQaZKIZF7OrIKKVLWhzZIae4Fc3hZ/3jfggWYJjXc
-         kP18Pxw/Xip94zNUjRYrZQzlNazmCAkg36h9L/W4wXlxqKCoinhMHD+kcu4u9a0rKKjo
-         pMR8G+NNNBwfNYfb2SscAqKrfWNlx8OLTEk/eL++CpXXRPpKu+C/C8AIzuD17RKiGqHj
-         tAXm4RntY81ES2BBeV75HFgQSd9MiMVmMxUGLBNCcjf2cTxhUrSzgY4NKMxklR/7nc4K
-         +ewA==
-X-Gm-Message-State: AOJu0Yxm0N4s4C1M8S7qTJYhEo3XfycVD6ACxRGpPtPuvz1el2Rdz/Bv
-	LgjRiOtptj/OCakk+3Ll1M40qUWF25zV+sgZoxTJbzEKjoOlsy8T20xsw0lMWI+xYL6qAYR3GAt
-	ue6E2vZFxiF4clsWOF0p3lHgP289tem1uOA76QpE+piX6dJLUW9+I6BoSRVkjMs4Cj1OLx8KP4u
-	7rOxCh4vYfy4FctmORI9+BDwXB7IZMTnAWrSh5A4M12QvyTJ0E99RJwosalupxZ7of8tcYrKnOS
-	RPDh14jDaI=
-X-Gm-Gg: AeBDieuSvJiOJn5ZXLQ2Xy1ZWEGNeskoKewEnmIS6tFdElb65kFh4mSgFm1Y1jfpxWw
-	XA6CZ9rWxj9fS/yRYhCS/TEVPlcQ48w4AYLSlG2+18jzReBVLZGM3ehIg5YSRJ+hHUT+voGgQ7c
-	2rIHMg5TxKhs+s0F4hAaWaqFXxTUgMoeNKlWJCFoXmin6Dl5yPSZ1oDt7yLFkcwNZj6YMiiHbmN
-	MQNnb6kvU6nYgCU9o+uG0I3v/sK3Zg29LJDi9wFpTcDC+rbenJx/JlI+hGMH8FvccqRJxAWmZ+I
-	lGMjC23pTu6v66Ztt/BWjY1r4xOXOb/XegvWDymigOao66bBf9U826NM1SI2k0PLQXtUd5WPdLU
-	vDoF357qwCfSda1L8QMHRfsW0gQasUFpux/SeBW5Zpa16OP+T4HhLK/JrbvUjro2uQKpf/e+pX7
-	8UWCcZW78rbN7DAZA=
-X-Received: by 2002:a17:90b:5830:b0:354:a57c:65db with SMTP id 98e67ed59e1d1-3650ce71f60mr12473723a91.20.1777939152973;
-        Mon, 04 May 2026 16:59:12 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com ([144.49.247.127])
-        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-3651617f824sm755398a91.1.2026.05.04.16.59.12
+        d=1e100.net; s=20251104; t=1777939154; x=1778543954;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8KciwR5BaNCwF4GQGuRyoUy7gW89k4fxCShw17/m+Io=;
+        b=eSn+StASIlTJmZ/GFoofVL+fHK0JXzTnxZcB0caRvi8PpkNyhhdqAEvbRPJM3cT9s+
+         UzQNFb9xlInbyxTynJxTeeZzMPTYiVPWEFA4Q8YVsy4jxKe+VzwNrQG+IOTmGjdmRhcu
+         vA4ayBdEEkk+1R+7g6E7WrvImA4O4nnFKOh3jQIrcpjRGpoM3Mul+Pldqmw4mzQzMmjY
+         47q+7e3NQtNxY8PA3If1trWxl3/8f44VPOsZwUeNPzsR0CUCTscKgpQ1Bt+JWLsJbf+0
+         OHKQsNwO0M2SBbFLMsTtlmoYHGEJJ8sKWNIpc36eJJaYGgP9qYORmj0xPqSnXrO16SGP
+         Zohw==
+X-Gm-Message-State: AOJu0Yw1uf5da++9w5g3/bSmxjyTjoVQe7F+rwb1YIQhQW1pD9Wess0s
+	7PjdsKPO6LtHx10zHjLQQrLkF5TmxNJtuO/dhElI7OfJxCw6M3eEaxAlGS46CBbB1p2zWSQkMT5
+	okCGqP7yaw+sL4/Cd/1aD9SvDWwwSAMr2LdR4ltXh/Wu6yFOLnjR5LKi2WFtk78xizNKV3I3PZe
+	Usnrk1C3g/fFAQT9CYj1IQyuEJ4jkLx1H13JS3hYtJwihUBx6Fn0/mY/L0gMURXjmswq+F9/1l4
+	iNzrAqYWjM=
+X-Gm-Gg: AeBDietUidDlR7XBd/d/w4l+QRQYzO+DwXd49HYUVftylQkaSqc8ITxDLtHncs9Jq/l
+	5Gi41XCJVMncrLGYBdP/+1OmqhUlFv0Mr9r+nnFCUh9c7IOYLen7hbglj/Rpuf6UqrRUb+B219R
+	nzLyjAUBnP1874XNvHu1xc0duZn7eiOLkk+nA3siBT3gAxevfSQ7qFWUfhx6kS6uq+aPs6CPYZB
+	UP6lvvu349lBj+kl0Hee2NexDh6hYXDcCCVN6VuvkA4b118yPXf40jA/y73MLJhocGlzqJ7nPjM
+	JrftrNernrXYbkjd5p0S2NHaSuO2LBY/NjXkvfvQTasr+gI7wUxhorL1ntP2VJjc4rfoXF2PUQS
+	h3GkDCDVf9HBPWwAvNJN4f0LaWLbJVplcTysvPJy6UH4KxfmLVY2+/uWxm3NZsMhH7Tw8qgVuU4
+	eg4jv1FUWG4FRpkE3NNhgEWmkjdnUwvH/FYlFQc+evw4Fmmz8Of68HdtE/ijEdRL4BCeE=
+X-Received: by 2002:a05:6871:5e06:b0:417:369f:4dee with SMTP id 586e51a60fabf-434d421ebd6mr553269fac.31.1777939154386;
+        Mon, 04 May 2026 16:59:14 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-21.dlp.protect.broadcom.com. [144.49.247.21])
+        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-43454dee3c9sm1002644fac.15.2026.05.04.16.59.14
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 04 May 2026 16:59:12 -0700 (PDT)
+        Mon, 04 May 2026 16:59:14 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-8aca172588cso122056146d6.0
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 16:59:12 -0700 (PDT)
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-8b3fe2f190bso185459176d6.2
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 16:59:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1777939151; x=1778543951; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vavz6c+PchbYtvmG/R/XGPmcZUThQvUNUiefOF0nwf4=;
-        b=Mv9yheg8F3QZI4FwcsdDiIi7WrtzdZbRxb5qplwxDPnP4pz37LFEPZfCEadvjaAiaw
-         lHQXmclEdj0hs53fq7suzGcaTgQdTIHZuSBZX05zzH8ZJ4LnTjX8irOlZGRLSziKYcH8
-         3AnF8rfi1eIFlYR607bhmtc+VK2csyu8H1jaI=
-X-Received: by 2002:a05:6214:2261:b0:8b1:f8fe:507f with SMTP id 6a1803df08f44-8b669ac48c6mr207329006d6.46.1777939151361;
-        Mon, 04 May 2026 16:59:11 -0700 (PDT)
-X-Received: by 2002:a05:6214:2261:b0:8b1:f8fe:507f with SMTP id 6a1803df08f44-8b669ac48c6mr207328676d6.46.1777939150904;
-        Mon, 04 May 2026 16:59:10 -0700 (PDT)
+        d=broadcom.com; s=google; t=1777939153; x=1778543953; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8KciwR5BaNCwF4GQGuRyoUy7gW89k4fxCShw17/m+Io=;
+        b=QwdE5VGCMLTTcjj16eyffMOFpRCGeo9u9MeyQB5fHY2LkNX/VMpYU/uopg+LJj6qew
+         Kwjen02uP0v0wdMw7X0nSSGZtv5K3kIVz9uZl5iaT0DoOnDNAjOB7v5dPVg7ub/BlMwx
+         Z2AH+tyCB7M2DYbDRNQZLgfbFV+fp9VOTJmhw=
+X-Received: by 2002:a05:6214:4781:b0:8b4:d8dd:b75b with SMTP id 6a1803df08f44-8badc9e3d5amr11851176d6.34.1777939153356;
+        Mon, 04 May 2026 16:59:13 -0700 (PDT)
+X-Received: by 2002:a05:6214:4781:b0:8b4:d8dd:b75b with SMTP id 6a1803df08f44-8badc9e3d5amr11850906d6.34.1777939152854;
+        Mon, 04 May 2026 16:59:12 -0700 (PDT)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b5396c4b7dsm132298246d6.18.2026.05.04.16.59.09
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b5396c4b7dsm132298246d6.18.2026.05.04.16.59.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2026 16:59:10 -0700 (PDT)
+        Mon, 04 May 2026 16:59:12 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -94,11 +96,15 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	andrew+netdev@lunn.ch,
 	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com
-Subject: [PATCH net-next 00/15] bnxt_en: Add kTLS TX offload support
-Date: Mon,  4 May 2026 16:58:21 -0700
-Message-ID: <20260504235836.3019499-1-michael.chan@broadcom.com>
+	andrew.gospodarek@broadcom.com,
+	Ajit Khaparde <ajit.khaparde@broadcom.com>,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Subject: [PATCH net-next 01/15] bnxt_en: Add Midpath channel information
+Date: Mon,  4 May 2026 16:58:22 -0700
+Message-ID: <20260504235836.3019499-2-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.45.4
+In-Reply-To: <20260504235836.3019499-1-michael.chan@broadcom.com>
+References: <20260504235836.3019499-1-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -107,98 +113,237 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-X-Rspamd-Queue-Id: 8480F4C5108
+X-Rspamd-Queue-Id: 6FAD54C5111
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	TAGGED_FROM(0.00)[bounces-284098-lists,netdev=lfdr.de];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TAGGED_FROM(0.00)[bounces-284099-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[broadcom.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-0.999];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:dkim,broadcom.com:mid];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:email,broadcom.com:dkim,broadcom.com:mid];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[7]
 
-This patchset adds kTLS offload support for TX direction.  A number
-of new files are added:
+Midpath channels (MPCs) are rings for hardware control paths.  These
+control paths are used to offload kTLS directly to the hardware
+without going through firmware.  This patch adds the basic information
+structures for these MPCs.
 
-bnxt_mpc.[ch] handle midpath channels (MPCs) used to offload kTLS
-connections to the chip's crypto blocks without going through FW.
+An MPC is basically a TX and completion ring pair with a HW TLS block
+as the destination.  Two MPC channel types are used to offload
+connections to the TX crypto engine (TCE) and the RX crypto
+engine (RCE) respectively.  In the driver, we re-use the
+bnxt_tx_ring_info and bnxt_cp_ring_info control structs for the MPCs.
 
-bnxt_crypto.[ch] handle the crypto interface and resources.
+This patch also adds the CONFIG_BNXT_TLS Kconfig option to conditionally
+include the MPC logic.  The first few patches in the series add the MPC
+support.  kTLS support will be added later in the series.
 
-bnxt_ktls.[ch] handle kTLS offload.
-
-A new CONFIG_BNXT_TLS is added enable all of the above.  The first 6
-patches add the MPC logic including resource accounting and reservations.
-The next 5 patches add the crypto logic to handle the crypto resources
-and to send/receive control data using the MPCs.  The last 4 patches
-add kTLS offload for the TX direction.
-
-There will be a follow-on patchset to make the TX offload more complete
-and to add the RX direction offload.
-
-Michael Chan (15):
-  bnxt_en: Add Midpath channel information
-  bnxt_en: Account for the MPC TX and CP rings
-  bnxt_en: Set default MPC ring count
-  bnxt_en: Rename xdp_tx_lock to tx_lock
-  bnxt_en: Allocate and free MPC software structures
-  bnxt_en: Allocate and free MPC channels from firmware
-  bnxt_en: Allocate crypto structure and backing store
-  bnxt_en: Reserve crypto RX and TX key contexts on a PF
-  bnxt_en: Add infrastructure for crypto key context IDs
-  bnxt_en: Add MPC transmit and completion functions
-  bnxt_en: Add crypto MPC transmit/completion infrastructure
-  bnxt_en: Support kTLS TX offload by implementing .tls_dev_add/del()
-  bnxt_en: Implement kTLS TX normal path
-  bnxt_en: Add support for inline transmit BDs
-  bnxt_en: Add kTLS retransmission support
-
- drivers/net/ethernet/broadcom/Kconfig         |   9 +
- drivers/net/ethernet/broadcom/bnxt/Makefile   |   1 +
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 205 +++++-
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  84 ++-
- .../net/ethernet/broadcom/bnxt/bnxt_crypto.c  | 571 +++++++++++++++
- .../net/ethernet/broadcom/bnxt/bnxt_crypto.h  | 223 ++++++
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  50 ++
- drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c |   2 +-
- .../net/ethernet/broadcom/bnxt/bnxt_ktls.c    | 455 ++++++++++++
- .../net/ethernet/broadcom/bnxt/bnxt_ktls.h    | 128 ++++
- drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c | 692 ++++++++++++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h | 210 ++++++
- .../net/ethernet/broadcom/bnxt/bnxt_sriov.c   |   6 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |   4 +-
- include/linux/bnxt/hsi.h                      |  37 +
- 15 files changed, 2627 insertions(+), 50 deletions(-)
- create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.c
- create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.h
- create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.c
- create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.h
+Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+---
+ drivers/net/ethernet/broadcom/Kconfig         |  9 ++++
+ drivers/net/ethernet/broadcom/bnxt/Makefile   |  1 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  8 ++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  2 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c | 26 ++++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h | 47 +++++++++++++++++++
+ 6 files changed, 93 insertions(+)
  create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c
  create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h
 
+diff --git a/drivers/net/ethernet/broadcom/Kconfig b/drivers/net/ethernet/broadcom/Kconfig
+index 4287edc7ddd6..0114760c3ac4 100644
+--- a/drivers/net/ethernet/broadcom/Kconfig
++++ b/drivers/net/ethernet/broadcom/Kconfig
+@@ -254,6 +254,15 @@ config BNXT_HWMON
+ 	  Say Y if you want to expose the thermal sensor data on NetXtreme-C/E
+ 	  devices, via the hwmon sysfs interface.
+ 
++config BNXT_TLS
++	bool "Broadcom NetXtreme-C/E TLS offload support"
++	default y
++	depends on BNXT && TLS_DEVICE
++	depends on TLS=y || BNXT=m
++	help
++	  Say Y if you want to enable Transport Layer Security (TLS) hardware
++	  encryption and decryption offload on supported NetXtreme-C/E devices.
++
+ config BNGE
+ 	tristate "Broadcom ThorUltra Ethernet device support"
+ 	depends on PCI
+diff --git a/drivers/net/ethernet/broadcom/bnxt/Makefile b/drivers/net/ethernet/broadcom/bnxt/Makefile
+index debef78c8b6d..0506574c007a 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/Makefile
++++ b/drivers/net/ethernet/broadcom/bnxt/Makefile
+@@ -5,3 +5,4 @@ bnxt_en-y := bnxt.o bnxt_hwrm.o bnxt_sriov.o bnxt_ethtool.o bnxt_dcb.o bnxt_ulp.
+ bnxt_en-$(CONFIG_BNXT_FLOWER_OFFLOAD) += bnxt_tc.o
+ bnxt_en-$(CONFIG_DEBUG_FS) += bnxt_debugfs.o
+ bnxt_en-$(CONFIG_BNXT_HWMON) += bnxt_hwmon.o
++bnxt_en-$(CONFIG_BNXT_TLS) += bnxt_mpc.o
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 8c55874f44ca..978c82a7a625 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -76,6 +76,7 @@
+ #include "bnxt_hwmon.h"
+ #include "bnxt_gso.h"
+ #include <net/tso.h>
++#include "bnxt_mpc.h"
+ 
+ #define BNXT_TX_TIMEOUT		(5 * HZ)
+ #define BNXT_DEF_MSG_ENABLE	(NETIF_MSG_DRV | NETIF_MSG_HW | \
+@@ -9934,6 +9935,11 @@ static int __bnxt_hwrm_func_qcaps(struct bnxt *bp)
+ 	}
+ 	bp->tso_max_segs = le16_to_cpu(resp->max_tso_segs);
+ 
++	if (resp->mpc_chnls_cap)
++		bnxt_alloc_mpc_info(bp, resp->mpc_chnls_cap);
++	else
++		bnxt_free_mpc_info(bp);
++
+ hwrm_func_qcaps_exit:
+ 	hwrm_req_drop(bp, req);
+ 	return rc;
+@@ -16482,6 +16488,7 @@ static void bnxt_remove_one(struct pci_dev *pdev)
+ 	bp->ptp_cfg = NULL;
+ 	kfree(bp->fw_health);
+ 	bp->fw_health = NULL;
++	bnxt_free_mpc_info(bp);
+ 	bnxt_cleanup_pci(bp);
+ 	bnxt_free_ctx_mem(bp, true);
+ 	bnxt_free_crash_dump_mem(bp);
+@@ -17153,6 +17160,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	bnxt_ethtool_free(bp);
+ 	kfree(bp->fw_health);
+ 	bp->fw_health = NULL;
++	bnxt_free_mpc_info(bp);
+ 	bnxt_cleanup_pci(bp);
+ 	bnxt_free_ctx_mem(bp, true);
+ 	bnxt_free_crash_dump_mem(bp);
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index 61c847b36b9f..ab88d96f807c 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -2451,6 +2451,8 @@ struct bnxt {
+ 
+ 	u8			tph_mode;
+ 
++	struct bnxt_mpc_info	*mpc_info;
++
+ 	unsigned int		current_interval;
+ #define BNXT_TIMER_INTERVAL	HZ
+ 
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c
+new file mode 100644
+index 000000000000..86087e538550
+--- /dev/null
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c
+@@ -0,0 +1,26 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/* Copyright (c) 2026 Broadcom Inc. */
++
++#include <linux/stddef.h>
++#include <linux/types.h>
++#include <linux/slab.h>
++#include <linux/bnxt/hsi.h>
++
++#include "bnxt.h"
++#include "bnxt_mpc.h"
++
++void bnxt_alloc_mpc_info(struct bnxt *bp, u8 mpc_chnls_cap)
++{
++	if (!bp->mpc_info)
++		bp->mpc_info = kzalloc_obj(*bp->mpc_info);
++	if (bp->mpc_info)
++		bp->mpc_info->mpc_chnls_cap = mpc_chnls_cap;
++	else
++		netdev_warn(bp->dev, "Unable to allocate MPC info\n");
++}
++
++void bnxt_free_mpc_info(struct bnxt *bp)
++{
++	kfree(bp->mpc_info);
++	bp->mpc_info = NULL;
++}
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h
+new file mode 100644
+index 000000000000..cd3f268a3a29
+--- /dev/null
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h
+@@ -0,0 +1,47 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/* Copyright (c) 2026 Broadcom Inc. */
++
++#ifndef BNXT_MPC_H
++#define BNXT_MPC_H
++
++/* Mid path channel (MPC) definitions.  An MPC is special TX/completion
++ * ring pair to send/receive control plane data to the TCE and RCE
++ * (Transmit/Receive Crypto Engine) HW blocks.
++ */
++
++enum bnxt_mpc_type {
++	BNXT_MPC_TCE_TYPE = RING_ALLOC_REQ_MPC_CHNLS_TYPE_TCE,
++	BNXT_MPC_RCE_TYPE = RING_ALLOC_REQ_MPC_CHNLS_TYPE_RCE,
++	BNXT_MPC_TYPE_MAX,
++};
++
++#define BNXT_MAX_MPC		8
++
++struct bnxt_mpc_info {
++	u8			mpc_chnls_cap;
++	u8			mpc_cp_rings;
++	u8			mpc_ring_count[BNXT_MPC_TYPE_MAX];
++	struct bnxt_tx_ring_info *mpc_rings[BNXT_MPC_TYPE_MAX];
++};
++
++#define BNXT_MPC_CRYPTO_CAP    \
++	(FUNC_QCAPS_RESP_MPC_CHNLS_CAP_TCE | FUNC_QCAPS_RESP_MPC_CHNLS_CAP_RCE)
++
++#define BNXT_MPC_CRYPTO_CAPABLE(bp)					\
++	((bp)->mpc_info ?						\
++	 ((bp)->mpc_info->mpc_chnls_cap & BNXT_MPC_CRYPTO_CAP) ==	\
++	  BNXT_MPC_CRYPTO_CAP : false)
++
++#ifdef CONFIG_BNXT_TLS
++void bnxt_alloc_mpc_info(struct bnxt *bp, u8 mpc_chnls_cap);
++void bnxt_free_mpc_info(struct bnxt *bp);
++#else
++static inline void bnxt_alloc_mpc_info(struct bnxt *bp, u8 mpc_chnls_cap)
++{
++}
++
++static inline void bnxt_free_mpc_info(struct bnxt *bp)
++{
++}
++#endif	/* CONFIG_BNXT_TLS */
++#endif	/* BNXT_MPC_H */
 -- 
 2.51.0
 
