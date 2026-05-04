@@ -1,154 +1,166 @@
-Return-Path: <netdev+bounces-283977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283978-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8OJoCt3a+GnG2QIAu9opvQ
-	(envelope-from <netdev+bounces-283977-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 19:43:57 +0200
+	id YLeNHkDb+GnG2QIAu9opvQ
+	(envelope-from <netdev+bounces-283978-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 19:45:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24DD64C2126
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 19:43:55 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8201B4C21A4
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 19:45:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8B48F300B2B8
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 17:43:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9F04530189B4
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 17:44:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2AA93E4C72;
-	Mon,  4 May 2026 17:43:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EABA3E4C95;
+	Mon,  4 May 2026 17:44:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b="X9uVeR9j"
+	dkim=pass (1024-bit key) header.d=hitachienergy.com header.i=@hitachienergy.com header.b="aZvd5+BX";
+	dkim=pass (2048-bit key) header.d=outbound.mailhop.org header.i=@outbound.mailhop.org header.b="Juzjj/lg"
 X-Original-To: netdev@vger.kernel.org
-Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.183])
+Received: from out-ip0051.fra.mailhop.org (out-ip0051.fra.mailhop.org [18.193.30.102])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 899DF3E317A
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 17:43:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692AC3E558E
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 17:44:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.193.30.102
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777916619; cv=none; b=N9U62+M9pIrAz/SMmy6LN1f309vW0Ds+rwSGAPJ8VSe6av21moYGXrcC/L11Ptodi1q0pY3W+dZTWugFV8kG7umxpkPtGXke0GgTf6bCkCpcxPa9Xy0+KeNFRfQjyjQ1+mVDFZV0M7U8CYMo/Ng8mnLoBtn93Cn3rf6cRe+cVhU=
+	t=1777916663; cv=none; b=HPaL57tKA9W97VBFwJ6yKc2TExi0qu6rv6HWPucVaUBOqsFV8RSmLcaNIMA0qyZa7+ULQrhjIUgOvZ5BQfqM8epf+RE0z9t1u4+uGOC7omnjQYhtPOlyfg+LFH3CSkmaBP1cVLQNHu9Uem9MiLHXBXae5UD8urxx1U5mf1qSPHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777916619; c=relaxed/simple;
-	bh=UmnAEidipRT5i3DpB57vlHvWvY7ZbghL8NryuFr/o2E=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=W51yPz2apBxNR7Z4uXCnGy1nLIXCEBzZizVTwdcTGVz4Cjt3yHoaP8PZtVKvvJ/9cA7b+2IgzWXFIKZo90pPkxQiRIF4spCryQGj2OxngC/Blhh5AJjIwp8mWrveAFyHlRUaVB39aSpnZ5kgP5PQi1LV4r4wQdIZTCJ3tXHcuZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=X9uVeR9j; arc=none smtp.client-ip=195.121.94.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xs4all.nl
-X-KPN-MessageId: c3abf1da-47e0-11f1-bea8-005056992ed3
-Received: from mta.kpnmail.nl (unknown [10.31.161.188])
-	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
-	id c3abf1da-47e0-11f1-bea8-005056992ed3;
-	Mon, 04 May 2026 19:43:30 +0200 (CEST)
-Received: from mtaoutbound.kpnmail.nl (unknown [10.128.135.189])
-	by mta.kpnmail.nl (Halon) with ESMTP
-	id c3b04f5b-47e0-11f1-80fc-00505699693e;
-	Mon, 04 May 2026 19:43:30 +0200 (CEST)
+	s=arc-20240116; t=1777916663; c=relaxed/simple;
+	bh=pgyk1XkkcAVDb93IMh8jK3qZMEbn5gs9m//IXWxJBWo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nk1CiwSz9NqU7Fq1GSppPX32Yke9pv4sZMfaTgGBxc1FfRMAzLyOLK82piRLka8CahGqCTZqctadzmbrqXiY4RFuYV1IlcZ/AInIbTp3gYn/GV+InBCgSJ8t6xxmqA0MgZZa1iNqEeSjOEJQnP6JcPA3tECLBLVatDvfkCUS30I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hitachienergy.com; spf=pass smtp.mailfrom=hitachienergy.com; dkim=pass (1024-bit key) header.d=hitachienergy.com header.i=@hitachienergy.com header.b=aZvd5+BX; dkim=pass (2048-bit key) header.d=outbound.mailhop.org header.i=@outbound.mailhop.org header.b=Juzjj/lg; arc=none smtp.client-ip=18.193.30.102
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hitachienergy.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hitachienergy.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=xs4all.nl; s=xs4all01;
-	h=content-type:mime-version:subject:message-id:to:from:date;
-	bh=kdpYfIX+URTvw/wf5koeiRsTKprTy2NaYWQX03NB+IU=;
-	b=X9uVeR9j1Iz9IcchmfYfcB2+oARQT9t00sirJbn8eZN5SB+W/czEx2L9vOWtBlE8YYIw1a9/uf0QL
-	 JtbgDvpP0p7Bn/X00H82OIfktOat2f8Mui7MMc74KIrTzVkqjdOaWRu+BxVGultMEfJeQTMm1o1Nb/
-	 wXLCaW1fqbs5QxhPTQd8CNfbnfC3LDUvFajwKv3AxyvSAoQeJ3TjvNA2+6jc5r1adRgt0Wqt4KXbBW
-	 eSmyroMauz3V3v89IiN8uQCMNOGlng/LskwtHpT4/WxmRQhQEFQOihrl+k1RpmdagSJAKn2HVWWAB0
-	 iPtn6T0mXfDGEfuhS0K/CA9XfW+PVAg==
-X-KPN-MID: 33|Oe96tHjdqLcXG0+4p3g9qL+qjYCkVqfDCbZeSJ15n5e+210MBUIX8rTzjMrdbVD
- FRArJlNNiY+UlB9IHfFx7dOSKHBq8DIgfF2pCihJ73ow=
-X-CMASSUN: 33|sm6o1OA6K6UEpMWW6cTWJ0kgfRL2hfIYXSaPNctPG5j1Bd6gVKJ0hWLwCZMWN+I
- Bk/mQSOTh0WfSmVVk1hIwew==
-X-KPN-VerifiedSender: Yes
-Received: from cpxoxapps-mh02 (cpxoxapps-mh02.personalcloud.so.kpn.org [10.128.135.208])
-	by mtaoutbound.kpnmail.nl (Halon) with ESMTPSA
-	id c39bf502-47e0-11f1-94b1-00505699eff2;
-	Mon, 04 May 2026 19:43:30 +0200 (CEST)
-Date: Mon, 4 May 2026 19:43:30 +0200 (CEST)
-From: Jori Koolstra <jkoolstra@xs4all.nl>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Kees Cook <kees@kernel.org>, Simon Horman <horms@kernel.org>,
-	Andy Lutomirski <luto@amacapital.net>,
-	Will Drewry <wad@chromium.org>, Jeff Layton <jlayton@kernel.org>,
-	Oleg Nesterov <oleg@redhat.com>, Andrei Vagin <avagin@gmail.com>,
-	Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
-	Mateusz Guzik <mjguzik@gmail.com>,
-	Joel Granados <joel.granados@kernel.org>,
-	Charlie Mirabile <cmirabil@redhat.com>,
-	Aleksa Sarai <cyphar@cyphar.com>, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	io-uring@vger.kernel.org
-Message-ID: <1440036704.77422.1777916610532@kpc.webmail.kpnmail.nl>
-In-Reply-To: <CAAVpQUDKgWdgPjPmJKhNxofssasS8-RdaLAcbFXHMWH8ztMJXA@mail.gmail.com>
-References: <20260428175125.2705296-1-jkoolstra@xs4all.nl>
- <20260428175125.2705296-2-jkoolstra@xs4all.nl>
- <CAAVpQUBKeN2KtRkRAFr8sYJM1_-rbkdjsujau5fAyaiP_dO6FA@mail.gmail.com>
- <89346381.2074764.1777649680664@kpc.webmail.kpnmail.nl>
- <CAAVpQUDKgWdgPjPmJKhNxofssasS8-RdaLAcbFXHMWH8ztMJXA@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/2] net: af_unix: Useful handling of LSM denials on
- SCM_RIGHTS
+	d=hitachienergy.com; s=duo-1630306886989-947ac67a;
+	h=content-transfer-encoding:mime-version:message-id:date:subject:cc:to:from:
+	 cfbl-address:cfbl-feedback-id:from;
+	bh=X3J19TUk0OReXY5Z/IXa99Q+WScavHAWc7VKN6O0XgE=;
+	b=aZvd5+BXAJm1lfZnCC1OzeFBIms7xOprBxHPhmpyMYffLcs65F7rhhYGf/W6iO6YwBk0kkQm7mRl7
+	 JZuz/9w5nGiEmnPcOXZRZpupO5EEJS3GoNkS1fdxFMYa0a6ufvoVGPO/wg2KCHlFIe1WnvDf2tk/0j
+	 UosNl3jXOS/Dey+4=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=outbound.mailhop.org; s=dkim-high;
+	h=content-transfer-encoding:mime-version:message-id:date:subject:cc:to:from:
+	 cfbl-address:cfbl-feedback-id:from;
+	bh=X3J19TUk0OReXY5Z/IXa99Q+WScavHAWc7VKN6O0XgE=;
+	b=Juzjj/lgGc9mC+8V6q34/F0PuU9MCH4XNa2VI+zmQnJEaR1pRbHvxJUKA783FIk3Gt8knh1IB5oR6
+	 /+BDhtdzsybzQsYwd/vWPkgRnaL+4TB9nqilK3gs/qG/yUjsYUSGKciN2kC7ek3pU4DmQVu1720WCL
+	 F5Rd8h1SRVnqbv3269gk4gjSL9bYBQ+GgDys/LseAujRk0WldIK1cz9yI3shlRjUOSlxrA09Ql9D6o
+	 gId5veNMrjum1TOCojE8UCaqawnkur7myt9cN5Ft9WMOdyrsSBKG84SXeMo+EX3qI3waejJeXNGwhR
+	 LVeqVBvgeWf+UK5a21Uw/DeKY5JDMJA==
+X-MHO-RoutePath: aGVkY3NtdHA=
+X-MHO-User: daf647d2-47e0-11f1-8ef6-f54febe22707
+X-Report-Abuse-To: https://support.duocircle.com/support/solutions/articles/5000540958-duocircle-standard-smtp-abuse-information
+X-Mail-Handler: DuoCircle Outbound SMTP
+CFBL-Feedback-ID: daf647d2-47e0-11f1-8ef6-f54febe22707:13
+CFBL-Address: prvs=058485b737=abuse@outbound.mailhop.org; report=arf
+Received: from HPG0000000426.corp.hitachi-powergrids.com (unknown [20.82.50.241])
+	by outbound3.eu.mailhop.org (Halon) with ESMTPSA
+	id daf647d2-47e0-11f1-8ef6-f54febe22707;
+	Mon, 04 May 2026 17:44:11 +0000 (UTC)
+Received: from gitsiv.hitachienergy.com (unknown [10.54.139.14])
+	by HPG0000000426.corp.hitachi-powergrids.com (Postfix) with ESMTP id 99C25805244;
+	Mon,  4 May 2026 17:44:09 +0000 (UTC)
+Received: from chbrn3-p-dev015.keymile.net (chbrn3-p-dev015.keymile.net [172.31.41.201])
+	by gitsiv.hitachienergy.com (Postfix) with ESMTP id 76E5160B7D47;
+	Mon,  4 May 2026 19:44:09 +0200 (CEST)
+From: Holger Brunck <holger.brunck@hitachienergy.com>
+To: netdev@vger.kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org,
+	andrew+netdev@lunn.ch,
+	chleroy@kernel.org,
+	qiang.zhao@nxp.com,
+	horms@kernel.org,
+	Holger Brunck <holger.brunck@hitachienergy.com>
+Subject: [PATCH net] net: wan: fsl_ucc_hdlc: return NETDEV_TX_OK if skb was freed
+Date: Mon,  4 May 2026 19:44:06 +0200
+Message-ID: <20260504174406.2229693-1-holger.brunck@hitachienergy.com>
+X-Mailer: git-send-email 2.52.0.120.gb31ab939fe
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Priority: 3
-Importance: Normal
-X-Rspamd-Queue-Id: 24DD64C2126
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 8201B4C21A4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[xs4all.nl,reject];
-	R_DKIM_ALLOW(-0.20)[xs4all.nl:s=xs4all01];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[hitachienergy.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[hitachienergy.com:s=duo-1630306886989-947ac67a,outbound.mailhop.org:s=dkim-high];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283977-lists,netdev=lfdr.de];
-	HAS_X_PRIO_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[zeniv.linux.org.uk,kernel.org,suse.cz,google.com,redhat.com,davemloft.net,kernel.dk,amacapital.net,chromium.org,gmail.com,virtuozzo.com,cyphar.com,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[xs4all.nl];
-	RCPT_COUNT_TWELVE(0.00)[26];
+	FROM_NEQ_ENVFROM(0.00)[holger.brunck@hitachienergy.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283978-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jkoolstra@xs4all.nl,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[xs4all.nl:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-0.999];
+	DKIM_TRACE(0.00)[hitachienergy.com:+,outbound.mailhop.org:+];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[xs4all.nl:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,outbound.mailhop.org:dkim,hitachienergy.com:email,hitachienergy.com:dkim,hitachienergy.com:mid]
 
+If the skb was freed in the ucc_hdlc_tx function and the packet marked
+as dropped we need to return NETDEV_TX_OK. Otherwise the above layer
+will try to requeue an already freed skb.
 
-> Op 02-05-2026 03:24 CEST schreef Kuniyuki Iwashima <kuniyu@google.com>:
-> 
-> > >
-> > > Does this flag need per-recvmsg() granularity ?
-> > >
-> >
-> > Perhaps not. What would be the alternative? A fcntl option for the socket fd?
-> 
-> I'd add a new socket option like
-> 
-> setsockopt(SOL_SOCKET, SO_RIGHTS_TRUNC, &(int){0}, sizeof(int));
-> 
-> 
+Fixes: c19b6d246a35 ("drivers/net: support hdlc function for QE-UCC")
+Signed-off-by: Holger Brunck <holger.brunck@hitachienergy.com>
+---
+ drivers/net/wan/fsl_ucc_hdlc.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-I think this is reasonable suggestion (and better than using the MSG_ flags).
-Let's just let this sit for a few days to see if anyone else has suggestions/
-objections.
+diff --git a/drivers/net/wan/fsl_ucc_hdlc.c b/drivers/net/wan/fsl_ucc_hdlc.c
+index 7af558780bdc..6ce539151618 100644
+--- a/drivers/net/wan/fsl_ucc_hdlc.c
++++ b/drivers/net/wan/fsl_ucc_hdlc.c
+@@ -360,7 +360,7 @@ static netdev_tx_t ucc_hdlc_tx(struct sk_buff *skb, struct net_device *dev)
+ 			dev->stats.tx_dropped++;
+ 			dev_kfree_skb(skb);
+ 			netdev_err(dev, "No enough space for hdlc head\n");
+-			return -ENOMEM;
++			return NETDEV_TX_OK;
+ 		}
+ 
+ 		skb_push(skb, HDLC_HEAD_LEN);
+@@ -377,7 +377,7 @@ static netdev_tx_t ucc_hdlc_tx(struct sk_buff *skb, struct net_device *dev)
+ 			dev->stats.tx_dropped++;
+ 			dev_kfree_skb(skb);
+ 			netdev_err(dev, "Wrong ppp header\n");
+-			return -ENOMEM;
++			return NETDEV_TX_OK;
+ 		}
+ 
+ 		dev->stats.tx_bytes += skb->len;
+@@ -390,7 +390,7 @@ static netdev_tx_t ucc_hdlc_tx(struct sk_buff *skb, struct net_device *dev)
+ 	default:
+ 		dev->stats.tx_dropped++;
+ 		dev_kfree_skb(skb);
+-		return -ENOMEM;
++		return NETDEV_TX_OK;
+ 	}
+ 	netdev_sent_queue(dev, skb->len);
+ 	spin_lock_irqsave(&priv->lock, flags);
+-- 
+2.47.3
+
 
