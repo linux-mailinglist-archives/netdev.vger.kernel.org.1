@@ -1,180 +1,146 @@
-Return-Path: <netdev+bounces-283914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283916-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QDiLOHm6+Gnh0AIAu9opvQ
-	(envelope-from <netdev+bounces-283914-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 17:25:45 +0200
+	id cKBQHOi4+Gn1zAIAu9opvQ
+	(envelope-from <netdev+bounces-283916-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 17:19:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 049CA4C0A64
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 17:25:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 883B34C08FD
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 17:19:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B0FBE3013ABA
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 15:12:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0AECC303B4E2
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 15:17:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94AA73D6CA4;
-	Mon,  4 May 2026 15:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DAF23DFC65;
+	Mon,  4 May 2026 15:17:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20251104.gappssmtp.com header.i=@baylibre-com.20251104.gappssmtp.com header.b="Rsj/NsQW"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="v8EOGJNf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E3A53D8114
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 15:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A277E212FAD;
+	Mon,  4 May 2026 15:17:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777907533; cv=none; b=C5Wc2sChy4wnprw5YVt97EUL43qRriyeTsPbEoCFJ611UzoWnpWDPyGZzzdoZucNdHB+wBh0mXsUyCJD/46Gkp4M03OczotH+TCpjULT8b+qd84ZFEOgv1erKzjhpkK55dGKk9qFjQGXS6fc6h1PdCzjdNysuZ19vsnD8yWR2j4=
+	t=1777907825; cv=none; b=lMwPZCoAH9kdZ8isR0POsU/emZbC1UaETyGk6osfX7YraYH9LOAgfLiAj/wZlSe0RSUPwiuvHJncRhnqFb+Bp3voIb774SbIRhBnFZPS/njrM1BYoC1vS5MLKRiOY1G7Vu4Tp7yc3EgzC3ZVk/U2PA61zmP7kTrCalxDO8vW6Ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777907533; c=relaxed/simple;
-	bh=GQicZ6yZ62pnjzm570OJWX3OWvGBTqzTvY8wkRH2lU4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fQEMtpxuOsqf9Yk7kiAzrFLQyLH4YOJttojX8vlDLx0fV5O4vL+ILqom/THChMw4KNissypx35stfVTkeF98Dd6trjSIMX7d/9xvxbJF6sVvSp43Ll1xjishAiDTzqcxP8AzSIqcmHaFamebQeduHQLRqfNOpwrk5zDv6BOZOfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20251104.gappssmtp.com header.i=@baylibre-com.20251104.gappssmtp.com header.b=Rsj/NsQW; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-48909558b3aso45322465e9.0
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 08:12:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20251104.gappssmtp.com; s=20251104; t=1777907530; x=1778512330; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=uzs0BkQvCPRt6F84mKmO5B0KxLBnGhAmM0EUe+fHF5E=;
-        b=Rsj/NsQWNh7EUHLGQBgKqQLrtQlLQKTPpi9D4Ht0Zmt8775+vF8g+f4eSHBwW08P14
-         cHemegHuVzExY634yu8nLnoOPdCqDZOEcnSmWzX7fRIGx2tiNXmrIry9dDsFZuSPXNd7
-         rYtZj0im/zyB4rER9yWa3leENcTqNGmRNimPDJpCgFpxLlyEbWqp3YIua7SlfWZ7b2dQ
-         bZhXXQZ+3vHcXxqdBeQaN4o8pSENVFB8/fOkjs/ZD/eT2itNX1TJT5iSJpH2OCP9nxal
-         R0IehhQZyv5NgO7XVjs6CcSRoAd3idAWA2lQa0t3S9qcoA0yavD4Hi5TN+LBA88HcdJ/
-         zxVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777907530; x=1778512330;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uzs0BkQvCPRt6F84mKmO5B0KxLBnGhAmM0EUe+fHF5E=;
-        b=W9BLe4kolE/j9xSLA0SPFWAkMBMVJHmln9yvleGup+/9KDNwVotX8ib/JSp9sJGLCW
-         N6oOpq1fYR+Jr1iz70Bhj2Gm1uW/Lb/YoYpkK+Cjw6JhR+Yqk8DJXuzzzqgbRF1Kamtj
-         K8Y4XtCp3M7etNKd8Z+0Setv9TRtKZcgYN1LNqBp4DEb/h7TzG11m6FWcQrqNMvvXTwt
-         PfgFshm+DBbCMmYQpbQDx8JvUpr7VvHU4mjYolIfhtqOMucr4NreOySQ5JByirGv3Hgx
-         XplZXEcPjRjL8baypnIlmfz1z5prPMyFSu5svRI68JMezQ8NWZ3Mto/8zRal1Ebjr0xL
-         1Y2A==
-X-Forwarded-Encrypted: i=1; AFNElJ8M623vCWA3vyNj/5mkPYI6NSk7+OHSO2ofUeAla+QONUdz+9xlLy3n6qqs9nEh+m0k+E5VMkw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyc9AZS/KgpdR4YVRhmHUcIZYt3pz7x5Va8o4pyiUuSUZiRTOcv
-	fF5/+3wsXgh8A/XZqVoT9B6Th0DX4zUB/39JAQdY0mKi1QyVYqKMQ0fkBU9sH1c0BOw=
-X-Gm-Gg: AeBDieslznkbQMTKxtM/6/JFqKg8DYIlsc1NsrA0T40Y8u8YQ9aBsyJyMjuVNr2g4sG
-	2zV4Iue7m5rZICw34GythtyZ+oF1GiZwDMyppVxTkLeqX+BjonHFTh5HNWimUq5R3iRuJ7ioj0Z
-	XY+ORgqhD5CA4tGqE+gwetcnbRMIhW1ExpKQNw2pxSAQ2SExZEulLcalKTCav95SYwtaSw9rV+j
-	0JPfOD6GWjADk4UzCGxECQ84sIXe7JYnOop35gOdYSFelQOjPqOdoDezNxDjzcRsULABJUul6sz
-	ssOd6Qre32T72yT5bzfEwM02p8Z4oWbSyQFweY86Xp8YLWg1uOuWCAhR1zv8CYR6l+QjpiX4UTU
-	a2HH3ojvF9WspCU0ifOtAtQtXd1Fee5yhcTJtFLMcSWkcsaJ7raevWXVnOQD3d9V+CIHNVTl8rt
-	tNGhFPu3Mxt32bOYfA0Kjn0+ArU18eCa0aZZmkSeJ/2TJYXPE1c2U5frG5R7kMMcGWCyB4I1fuN
-	hSQmBIggL1Qq/8VExJ69yg5DRrYJ2zCZSsu
-X-Received: by 2002:a05:600c:6091:b0:489:19e9:b139 with SMTP id 5b1f17b1804b1-48a9852e435mr181848855e9.1.1777907530015;
-        Mon, 04 May 2026 08:12:10 -0700 (PDT)
-Received: from localhost (p200300f65f114e08197264a4bf9e813f.dip0.t-ipconnect.de. [2003:f6:5f11:4e08:1972:64a4:bf9e:813f])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-48a8fea68b4sm82719845e9.9.2026.05.04.08.12.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2026 08:12:09 -0700 (PDT)
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>
-To: Chas Williams <3chas3@gmail.com>
-Cc: linux-atm-general@lists.sourceforge.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Markus Schneider-Pargmann <msp@baylibre.com>
-Subject: [PATCH net-next] atm: solos-pci: Simplify initialisation of pci_device_id array
-Date: Mon,  4 May 2026 17:12:01 +0200
-Message-ID: <20260504151202.2139919-2-u.kleine-koenig@baylibre.com>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1777907825; c=relaxed/simple;
+	bh=Sa2svEuLBLZ8KH/j6RQ4fA5zFnL3S+2a01dYu7BXg3I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m4fuQEWo2YG/j5gH8wzWd5IgXYW6O6SPoUESF14ZVzqHlVI0Xduc/qJcHCr3D1iaQfLlRiextC2SYwLfqTBeXE35hKUXMHbOfF28p+eIZ2oSdMNXe9ORbDToEaaOo48oRWweoAdauJRtvhrzc3CuI9h08UAoCNEikCWrscHWNe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=v8EOGJNf; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=t5mOwJSbOKVmcddoujovssiEkLg2+KNjkUu/7AIUfk4=; b=v8EOGJNfTFTqkEbMl40D58wnNP
+	0OVyx4oJ9ioxV6r29xmzi/ohoTWDxEtBZFj4+U9j6oQFFzs0LZErYH/TQ1rrAh0wb/1Q33lklgNTA
+	dbWilQeoz0xgbzgILqbZIsC5HB7V6nFBNP4M94NW6oe8uqgzePJd31QCIV+qDCsOLvC8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wJv2X-001I3F-HC; Mon, 04 May 2026 17:16:57 +0200
+Date: Mon, 4 May 2026 17:16:57 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>
+Subject: Re: [PATCH net-next v1 0/5] net: mdiobus: HIde ACPI implementation
+Message-ID: <28a4ebd7-2670-439d-836b-14559a916ed0@lunn.ch>
+References: <20260504074610.40799-1-andriy.shevchenko@linux.intel.com>
+ <aee27459-387c-46ce-9c06-3de66309c8d6@lunn.ch>
+ <afij7wOkQUGUN0kM@ashevche-desk.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1687; i=u.kleine-koenig@baylibre.com; h=from:subject; bh=GQicZ6yZ62pnjzm570OJWX3OWvGBTqzTvY8wkRH2lU4=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBp+LdC3j2lx1QGDBvEo78HvoMI7VnkL0aG6eqtI 9jmw243xYiJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCafi3QgAKCRCPgPtYfRL+ Tn/AB/9FCiYRSl7IgTxm9OSuFymEf9XBT0iAz42pGxBxUkQJRucXSXEadwf8gkQc+hxsHdHe6vG gAjirh9WW1boJVxULyzIbWvPT3cy/bDQfJoAUZ6nPpnI/WJ00zoHIkGmHtKspqObZREIEGHxRjk gUMhW0mZs9MMgcuAq4r5DSbmepqE99T5tOrOLlwumRTel+Hn5amLKzaX7niMdmjw4b7whp7qtvC PEYeoKXhjCGWePDUB9cvtFcUVS2jJfPCEuNsgHaaU/TrshN6LXH6Hr6oZNxEU98D2odIXvp/Wpp 4ZZj6S9iHOqpLux6CJE2ZoeLbfz6DXfqp5ibCTBRMKIkAyfK
-X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 049CA4C0A64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <afij7wOkQUGUN0kM@ashevche-desk.local>
+X-Rspamd-Queue-Id: 883B34C08FD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[baylibre-com.20251104.gappssmtp.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
+	TAGGED_FROM(0.00)[bounces-283916-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[baylibre.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-283914-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[u.kleine-koenig@baylibre.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[baylibre-com.20251104.gappssmtp.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[baylibre.com:mid,baylibre.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,baylibre-com.20251104.gappssmtp.com:dkim]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
 
-Use the convenience macro PCI_DEVICE to initialize .vendor, .device,
-.subvendor and .subdevice. Drop explicit zeros that the compiler also
-fills in.
+On Mon, May 04, 2026 at 04:49:35PM +0300, Andy Shevchenko wrote:
+> On Mon, May 04, 2026 at 03:02:54PM +0200, Andrew Lunn wrote:
+> > On Mon, May 04, 2026 at 09:29:51AM +0200, Andy Shevchenko wrote:
+> > > This mini-series is dedicated to hiding ACPI implementation details
+> > > from the wider users as they (as of today) do not need to know that.
+> > 
+> > Please could you expand on that. ACPI != OF. They have different
+> > bindings, so you need different implementations.
+> 
+> As of today the users that want ACPI also have the OF support. Even without
+> that if the device is pure ACPI supported one (and somehow never going to DT)
+> the proposed API (see the first patch) will be no-op in case when CONFIG_ACPI=n
+> or when it's a non-ACPI platform with no support of the device. Hence, the
+> pure ACPI (and actually OF as well) do not need to be exposed. The decision is
+> made based on the type of firmware node.
 
-Signed-off-by: Uwe Kleine-König (The Capable Hub) <u.kleine-koenig@baylibre.com>
----
-Hello,
+I see two different things here:
 
-The secret plan is to make struct pci_device_id::driver_data an
-anonymous union (similar to
-https://lore.kernel.org/all/cover.1776579304.git.u.kleine-koenig@baylibre.com/)
-and that requires named initializers. But IMHO it's also a nice cleanup
-on its own.
+You are refactoring code into a helper, so reducing the amount of
+duplicated code. That in itself is good.
 
-The anonymous union will allow changes like the following:
+However, we have the problem in general that developers think that OF
+and ACPI do the same thing. And that is not true. OF MDIO busses have
+support for a GPIO used as a reset. In retrospect, that was a bad
+idea. The documented ACPI binding does not have this, and if anybody
+was to suggest adding it, i want to NACK it.
 
--       { PCI_DEVICE(0x8086, 0x8108), .driver_data = (long) &psb_chip_ops },
-+       { PCI_DEVICE(0x8086, 0x8108), .driver_data_ptr = &psb_chip_ops },
+Having OF code and ACPI code to instantiate the MDIO bus makes it
+clearer they are different things. fwnode gives the impression they
+are the same, which is not true. Hence i don't like fwnode at this
+level.
 
-(together with the respective change in the code when the value is
-used). This gets rid of a bunch of casts and thus slightly improves
-type safety. But that doesn't affect drivers/atm as here no pointers
-are used as driver data. Still this driver needs adaption to work with
-the changed definition of pci_device_id.
+Where fwnode makes sense is deeper down in the implementation of the
+bindings, for properties which are the same in both bindings.  Then
+you can use fwnode_ for the shared properties, of_ for the OF only
+properties, and acpi_ for the ACPI only properties.
 
-Best regards
-Uwe
+So although i like the reduction in duplicated code, i think overall
+it makes the code worse because developers are more likely to wrongly
+understand it.
 
- drivers/atm/solos-pci.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/atm/solos-pci.c b/drivers/atm/solos-pci.c
-index 24c764664c24..bcb1353877e4 100644
---- a/drivers/atm/solos-pci.c
-+++ b/drivers/atm/solos-pci.c
-@@ -1464,8 +1464,8 @@ static void fpga_remove(struct pci_dev *dev)
- }
- 
- static const struct pci_device_id fpga_pci_tbl[] = {
--	{ 0x10ee, 0x0300, PCI_ANY_ID, PCI_ANY_ID, 0, 0, 0 },
--	{ 0, }
-+	{ PCI_DEVICE(0x10ee, 0x0300) },
-+	{ }
- };
- 
- MODULE_DEVICE_TABLE(pci,fpga_pci_tbl);
-
-base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
--- 
-2.47.3
-
+	    Andrew
 
