@@ -1,146 +1,212 @@
-Return-Path: <netdev+bounces-283825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283824-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cPn9FfmU+GnnwgIAu9opvQ
-	(envelope-from <netdev+bounces-283825-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 14:45:45 +0200
+	id OJdZMfSU+Gn0wgIAu9opvQ
+	(envelope-from <netdev+bounces-283824-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 14:45:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0F544BD224
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 14:45:44 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F1BB4BD215
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 14:45:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C74193043D40
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1119C3021D00
 	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 12:43:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 453303D523F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2282C3D522F;
 	Mon,  4 May 2026 12:43:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MWni85lC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XvLtTlsJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 977C03D47B2;
-	Mon,  4 May 2026 12:43:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE3A3D0917
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 12:43:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777898605; cv=none; b=WKgcJYlaATDbg6DaO/5XFMd9s6CfqhaJG15snnvFtfZMd52Py2vH8sLyQ5qztJ6wwwqnkx02hp3zrv4HhhuY9cblp1nmfP+74xjPdT9o46o7VGZLS/wt0uA45bA7v+6S+koXC8f0yTbjymdDEkz39O5ujz1wIMWHPmZRcd6TZqk=
+	t=1777898605; cv=none; b=Ay5nxKnkeeWAgRJpsKvfCLI/bMoFO2909JtzZ8fA8PZDPclNGkP0RzjH0HVRgO+fbD48jn11r9spC0nTENpGuiKXkTTatC9oH2OjKUbOnz/yGw/Bncr36rdwRWSdQg7qI/ucbucpUpovy803MtngjDy/aiZbiGWie0kIRJW63aY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1777898605; c=relaxed/simple;
-	bh=LtuSCMu6dVDP8H3xYJPu5UCHu9oQhiVtrJaeCKFjKm4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ozq4U4SUWycFDFysAwvn8LCWTlYiZ3Bw+s/C9WAI+sA8tLl83UhVjqKHzuqc2uiE9l+IU4s0ROnFdGH4q71SG9SpA7RIl0O3r2R9IMo1RDJ2hxRjg5WJBAIcL+f5wVCHITPPDRk3Q4xPIxLcZiLtvayvqTXtv4E0SEFJEJkr964=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MWni85lC; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=1PMEvjlLQCF+IhJSDR+OfV1rOuww5+zhdmbObo+aXic=; b=MWni85lCQoXDMVP6bhjc2GczaN
-	d2l5A5HEaNUgy12XQ4iQZtIe76OLfLdlkr+3UkGGsN91//fZs9i34a7a6W2d0B4l5DUg4Jj0gzZuE
-	E8fkLl9+/Q/NH8aebCYfcaS4GPk+jTY4AS0wwKnvqR+S4pMzK5PXQlXYyPzY2UVvNpjA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wJsdl-001GDe-KX; Mon, 04 May 2026 14:43:13 +0200
-Date: Mon, 4 May 2026 14:43:13 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, Felix Fietkau <nbd@nbd.name>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"open list:ARM/Mediatek SoC support" <linux-kernel@vger.kernel.org>,
-	"moderated list:ARM/Mediatek SoC support" <linux-arm-kernel@lists.infradead.org>,
-	"moderated list:ARM/Mediatek SoC support" <linux-mediatek@lists.infradead.org>
-Subject: Re: [PATCH net-next] net: mtk_star_emac: use of_get_ethdev_address
-Message-ID: <64c2b026-88b1-4560-8763-9f6696d854a5@lunn.ch>
-References: <20260504031019.607682-1-rosenp@gmail.com>
+	bh=jWGoglP6jmcwlrHvt1gQ9/+zWIwt0vegzHr25BbK6cc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TS78XL6/qlxkjzp7ffmmRWonZHI0Tu4rkFuHeN/yiT8eXMdZVo8hx70rm84fpcuOfBorPhRoxWV5PyQmmuY9N27SeEYZzB8DvMDFQx2/IjppkaqrENt1OJCGXGNUrz32fv4DZm4PPtFEh4cFcAXy5LtmG/WTqNRWGgOJauUiajc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XvLtTlsJ; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-488b150559bso27321085e9.1
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 05:43:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777898600; x=1778503400; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+ufm/8wyV7h2cWwxL5F4jbAArsiyVqXQndXIOjfMIX4=;
+        b=XvLtTlsJ9uh3K33svRXL/rWcr2sD5q3Xga6b5UTIeCDK0LNib8hVKkfBTGtUmww0/M
+         WoKK8s8TQdmUbdOxi8ywztkLLraGkG1nG+bUb5ZASV5SwteD8gFcQs8+2K6vDMXpOOok
+         klki9QE/d2fWuF8JQcIHyyMjxdRdS4KTQB9gSrYmpvSc6o90dKvqDW584M/CjZxa+8xB
+         LG2mgEB7bUGvJ3XUx2+cCKLgauyRDQyHHsq9HHlU+/63Klhep0rDOgo7cMrsuzP9ZAw9
+         lHYItr+KtzOk/AQeaU6GxYZA4zLPGwN/BXSgogNGA51dQBxgN/F0YEykHtwtR7ygbykd
+         hjjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777898600; x=1778503400;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=+ufm/8wyV7h2cWwxL5F4jbAArsiyVqXQndXIOjfMIX4=;
+        b=VVW9Vhziom2i+umCUSJXGf/fWabAfzg2CGbN83h3uUaFe/UMnzOpJ0oUwwGFmElq3M
+         3NG4kkbLurXLTuS45lKxcn3/R9Ii6VJiEYGfcqmk/1KMgjEEbjMG0T5OwfQek1IYUDw8
+         H3bsKILasnDYBdm3jnxH9jZ0yL5C5wmIRcLPlbsOejKB+cUZoPWFPxUy9zS+yGJNccZa
+         9JPCzVIv+wOxEAxfa3Go9JoH4c9Ze0NxCoBIFJhMtSjc7SfTc3JpJ0+MihxjK1/vaj5N
+         DEV25TM5Qz4mZmJxjrRQZJc4ZdMORGZk9bC1gcBIzoEgumM+yzPWZ6XgGD29iuO5/9i5
+         AwsQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/ZU4XuukmzaYv0PpSNxyA3Op3G80+FL2Ik8c/XZyVRZHWdz0ysq3G89OftiJ831oHff8C/THk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+/IQHe4zA1aEgq6IkOt49BBBS/+kRD23SKUIaNZ0V2i0TPlkZ
+	oo4vyJO3SGq0sGNhBeJ9ktzx49XY/7/pALwRFfHeaRHrQZaWhj6axLb+
+X-Gm-Gg: AeBDievfuj3cgOMPgacqLB798gnajIRvc4A19m2B/t8wP8vid14JIOUrVng0keo+EB8
+	lR1MM/2/IfWaNb3Ql0II99zxgqoekEQ+HfPeOMMbJkFFbgw+OaKs5vvPqEyja6rCCWmowx3rj0f
+	cUwshOIEFHbfLP3EjhTYY5DDB2NK1vplYsotKoQXpLe52HFp++QphonK+qqX8ogcuCDpSlS505Q
+	f1vhGH1MjkarwlGdg4iOzI65XyOXdTlvB1IN2hZpIGYw167EkD+HvOGBeX3Bi0ViYNBqKAEI4W0
+	8bkQoLlbik0gCa7Lv0nBonh6k1ZX43w96fmJeK7l1cov7Ogj6cBgieskUOriMuv+hzNtG1wQCFO
+	/jHrQ5kSe5PPLnpZ8cve+dxH7sVfEPhqUhzJzQSD+PsrwBtYJheDVMr8rhP7tFBmhGqjGhNMGFc
+	L3zxYMsLpzzejoOVpdc8rWI3xxcv0HHxXpTAD2xQa+S8Slzwqqz7LK/CjqSSzQPeq7o1J8UsrnO
+	0I=
+X-Received: by 2002:a05:600c:a411:b0:48a:7b55:12a6 with SMTP id 5b1f17b1804b1-48a980fc3e7mr112517875e9.0.1777898600087;
+        Mon, 04 May 2026 05:43:20 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a8fef2a67sm111207925e9.5.2026.05.04.05.43.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 May 2026 05:43:19 -0700 (PDT)
+Date: Mon, 4 May 2026 13:43:18 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: "Arnd Bergmann" <arnd@arndb.de>
+Cc: "Yury Norov" <ynorov@nvidia.com>, "Paul Walmsley" <pjw@kernel.org>,
+ "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>,
+ "Alexandre Ghiti" <alex@ghiti.fr>, "Yury Norov" <yury.norov@gmail.com>,
+ "Rasmus Villemoes" <linux@rasmusvillemoes.dk>, "Andrew Lunn"
+ <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, "Andrew Morton" <akpm@linux-foundation.org>,
+ "Alexei Starovoitov" <ast@kernel.org>, "Daniel Borkmann"
+ <daniel@iogearbox.net>, "Jesper Dangaard Brouer" <hawk@kernel.org>, "John
+ Fastabend" <john.fastabend@gmail.com>, "Stanislav Fomichev"
+ <sdf@fomichev.me>, "Ruan Jinjie" <ruanjinjie@huawei.com>,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, Linux-Arch
+ <linux-arch@vger.kernel.org>, Netdev <netdev@vger.kernel.org>,
+ bpf@vger.kernel.org, "Nathan Chancellor" <nathan@kernel.org>
+Subject: Re: [PATCH 1/6] lib: include crc32.h conditionally on CONFIG_CRC32
+Message-ID: <20260504134318.6eae8193@pumpkin>
+In-Reply-To: <ec4ed7f5-b1c8-49e4-b83d-e29c5414b9de@app.fastmail.com>
+References: <20260430211351.658193-1-ynorov@nvidia.com>
+	<20260430211351.658193-2-ynorov@nvidia.com>
+	<ec4ed7f5-b1c8-49e4-b83d-e29c5414b9de@app.fastmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260504031019.607682-1-rosenp@gmail.com>
-X-Rspamd-Queue-Id: C0F544BD224
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 3F1BB4BD215
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283825-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283824-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nbd.name,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,collabora.com,lists.infradead.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	FREEMAIL_CC(0.00)[nvidia.com,kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr,gmail.com,rasmusvillemoes.dk,lunn.ch,davemloft.net,google.com,redhat.com,linux-foundation.org,iogearbox.net,fomichev.me,huawei.com,vger.kernel.org,lists.infradead.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,arndb.de:email]
 
-On Sun, May 03, 2026 at 08:10:19PM -0700, Rosen Penev wrote:
-> The platform_ variant calls arch_get_platform_mac_address which is only
-> implemented under SPARC.
+On Mon, 04 May 2026 10:03:10 +0200
+"Arnd Bergmann" <arnd@arndb.de> wrote:
 
-platform_get_ethdev_address() calls eth_platform_get_mac_address().
+> On Thu, Apr 30, 2026, at 23:13, Yury Norov wrote:
+> > Currently, bitreverse API is either declared based on
+> > CONFIG_HAVE_ARCH_BITREVERSE, wired to arch implementation, or if the
+> > arch has no bitreverse, based on generic implementation.
+> >
+> > So, regardless of CONFIG_BITREVERSE=n, the corresponding API is always
+> > declared. If that happens, the functions become declared but not
+> > implemented, which is an error.  
+> 
+> I'm not following that description. Why is it an error to declare
+> a funtion that is not implemented? Isn't that how optional interfaces
+> tend to work in general?
+> 
+> > The only header requiring the crc32 and bitreverse prototypes is
+> > include/linux/etherdevice.h. Thus, protect inclusion of corresponding
+> > headers in the etherdevice with CONFIG_CRC32, together with the only
+> > function depending on it.  
+> ...
+> >  #include <linux/if_ether.h>
+> >  #include <linux/netdevice.h>
+> >  #include <linux/random.h>
+> > +#ifdef CONFIG_CRC32
+> >  #include <linux/crc32.h>
+> > +#endif
+> >  #include <linux/unaligned.h>
+> >  #include <asm/bitsperlong.h>  
+> 
+> Don't add #ifdef blocks around headers. If the header cannot
+> be included without side-effects, change the linux/crc32.h
+> file instead of its users.
+> 
+> It looks like the problem is the check for CONFIG_GENERIC_BITREVERSE
+> in include/asm-generic/bitops/__bitrev.h, which ends up
+> hinding the generic___bitrev32() helper without need.
+> 
+> Simply removing the #ifdef there should avoid the build failure.
+> 
+> > +#ifdef CONFIG_CRC32
+> >  /**
+> >   * eth_hw_addr_crc - Calculate CRC from netdev_hw_addr
+> >   * @ha: pointer to hardware address
+> > @@ -291,6 +294,7 @@ static inline u32 eth_hw_addr_crc(struct netdev_hw_addr *ha)
+> >  {
+> >  	return ether_crc(ETH_ALEN, ha->addr);
+> >  }
+> > +#endif  
+> 
+> I see there are only user users of this function, neither of
+> them are performance critical. So the other options would
+> be to either open-code this function in the two callers
+> and remove it entirely, or move it into net/ethernet/eth.c.
 
-int eth_platform_get_mac_address(struct device *dev, u8 *mac_addr)
-{
-	unsigned char *addr;
-	int ret;
+Or change to a #define so that only the users need to have the
+required headers included.
 
-	ret = of_get_mac_address(dev->of_node, mac_addr);
-	if (!ret)
-		return 0;
+But open-coding in the callers saves anyone trying to read the code
+having to look at another file to see what is going on.
 
-	addr = arch_get_platform_mac_address();
-	if (!addr)
-		return -ENODEV;
+-- David
 
-	ether_addr_copy(mac_addr, addr);
+> 
+>       Arnd
+> 
 
-	return 0;
-}
- 
-> Switch to the of variant as of functions are used in the surrounding
-> code and to get EPROBE_DEFER support in order to handle NVMEM MAC
-> address specifications.
-
-So there is a call to of_get_mac_address(). And it calls
-arch_get_platform_mac_address() as well. If you only call
-of_get_mac_address(), don't you break SPARC?
-
-If EPROBE_DEFER is what you are trying to get, please change
-eth_platform_get_mac_address() to actually return it, not break SPARC.
-
-    Andrew
-
----
-pw-bot: cr
 
