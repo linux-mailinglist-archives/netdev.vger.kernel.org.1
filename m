@@ -1,125 +1,164 @@
-Return-Path: <netdev+bounces-283827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283828-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UAv6E6WX+GknwwIAu9opvQ
-	(envelope-from <netdev+bounces-283827-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 14:57:09 +0200
+	id 6L7KKUOY+GmcwwIAu9opvQ
+	(envelope-from <netdev+bounces-283828-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 14:59:47 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0CB84BD4B0
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 14:57:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 48DCD4BD54D
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 14:59:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3D435301C3CD
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 12:57:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3FC783022AA9
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 12:59:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 632733AA4E0;
-	Mon,  4 May 2026 12:57:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA1B13D7D8D;
+	Mon,  4 May 2026 12:59:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="w7pAD9Id"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QZJrLBGv"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D587333730;
-	Mon,  4 May 2026 12:57:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3CE939BFEE
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 12:59:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777899426; cv=none; b=WJDs5qaso2MPoCfzfTGBRxahnRp7B+RXByZfPIwGO+ZkmLl4H8MPnKrsEHWy+ufszpTco8vT445yVS9qV1TNbWdHarmdYcQhJw5a3UfernwsOYdWtJ5TOrIxOcDHZ2WIik15HZnIo/Y1kSiHa1J+1A5DrwuQnk4h9idbI8zmVx8=
+	t=1777899578; cv=none; b=iQMaLzkY9DVlbIn3FbftQNSFXk5kPtQL2pO10xcalL+EZDVE0yu7eqmzBsgZ3C8EOujzQcgLoMW8iJZWHaX8auEmeP373615hSPO12D+dWbbW8WaJ1w3Hm+KCaT0DbHhM1bW7klvgoMEW62ooWotGFy3EQjAaqIMGT0o0b1sHKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777899426; c=relaxed/simple;
-	bh=EMtw5q2Y3rod4LkjP2d/0okxaGgbp2FDWTI8fSJk9+w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sSeKPVkxnhgy1x9jPkMotQPJFGjHRy7/ttZSmtA8y9NMQevWaewdcUNGy2qnNA9rM67/cKcDc4cA3/DOGuauYyQLLdLlH/Wuz0u1SxcbiiUYlafN9F0I6dFJoYOhjI5IQ/XLkPre7Ur9BiyG/t1sjObmcTl5I+csm2vomqTF1hM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=w7pAD9Id; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=sf8GrloyhDcDE0JIcXxVsYAPHoYQg8R8OEPXBypIWtk=; b=w7pAD9IdOiU9ws7Vk7/0w0jJDK
-	gNWkzXN+gg7jRKD+2XD79IoezU1UTa7QePCmPJyOWTJfhWO2Fk0IxFYmi3WMdwtVGRIN+ECvnxv6f
-	yisuELJ2BO8yfV1hWy2U7IgWl0Qw2Ltd0OS98JKa3Eh2C4tmpVX4JQgFL4bLgUlyQlOk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wJsqy-001GIp-Kw; Mon, 04 May 2026 14:56:52 +0200
-Date: Mon, 4 May 2026 14:56:52 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: David Carlier <devnexen@gmail.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ixgbe: E610: do not fill EEE lp_advertised from local
- PHY caps
-Message-ID: <2e4cc698-70da-4305-ad0c-b5258f029daf@lunn.ch>
-References: <20260504062257.77460-1-devnexen@gmail.com>
+	s=arc-20240116; t=1777899578; c=relaxed/simple;
+	bh=AkaRMWJcfZQngMfBbKjbOZI3+ub0kaJeMvKtlY7x+cw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n++GzToX0iPy09VUpIzNs8esE2Od3E97z8YzisKgEAGjnSlWU6KKxLCbvIeCcl1bDKKknNC3L6qBFkMEJuVD1VU/6g31xCXaGlnL2GQ3Zj5nk/3iGUKFhkC3h++cm/85QJbtJG3ioTLYC80oy4nrAIm/tj/09s2esGB6hToMlPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QZJrLBGv; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777899575;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6Z+wfwvn6biVJ4qI194NIBWVjqR1H3eW4BSETGvGmIg=;
+	b=QZJrLBGvlCv+4qCNdb3sxJPFFsvZe3whHALxC3cH2umraaKHkjwjVtDuwA86m/ofugSeLw
+	6g7vFQv04JwfRVRhA3feAgI3APBjNyEwr/W1F+PoKMCqYX6DrEBazPkGvMColBgYxf2Juz
+	qsIqYj6ZFH6OtUi1EY3ZqR/sys7v55U=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-194-LAUXZOfJMQagBvPmZnST8A-1; Mon,
+ 04 May 2026 08:59:33 -0400
+X-MC-Unique: LAUXZOfJMQagBvPmZnST8A-1
+X-Mimecast-MFC-AGG-ID: LAUXZOfJMQagBvPmZnST8A_1777899569
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9BB431800652;
+	Mon,  4 May 2026 12:59:28 +0000 (UTC)
+Received: from [10.44.32.88] (unknown [10.44.32.88])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9596E1955D84;
+	Mon,  4 May 2026 12:59:22 +0000 (UTC)
+Message-ID: <40bb04ec-87a2-4e5f-9934-4ed46a731e4b@redhat.com>
+Date: Mon, 4 May 2026 14:59:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260504062257.77460-1-devnexen@gmail.com>
-X-Rspamd-Queue-Id: A0CB84BD4B0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/2] dpll: move
+ fractional-frequency-offset-ppt under pin-parent-device
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+ Michal Schmidt <mschmidt@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
+ Pasi Vaananen <pvaanane@redhat.com>, Petr Oros <poros@redhat.com>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Shuah Khan <skhan@linuxfoundation.org>,
+ Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <20260430173611.3312596-1-ivecera@redhat.com>
+ <20260430173611.3312596-2-ivecera@redhat.com> <afhdCnT0ns-PgZD8@FV6GYCPJ69>
+ <290673a1-fb5b-4586-b44a-e109cc1a4629@redhat.com>
+ <afiQTPaMyAApbLRk@FV6GYCPJ69>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <afiQTPaMyAApbLRk@FV6GYCPJ69>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Rspamd-Queue-Id: 48DCD4BD54D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283827-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283828-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,intel.com,davemloft.net,gmail.com,google.com,kernel.org,lwn.net,nvidia.com,redhat.com,microchip.com,linuxfoundation.org,linux.dev];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Mon, May 04, 2026 at 07:22:57AM +0100, David Carlier wrote:
-> ixgbe_get_eee_e610() fills kedata->lp_advertised from pcaps.eee_cap
-> returned by ixgbe_aci_get_phy_caps() with IXGBE_ACI_REPORT_ACTIVE_CFG.
-> That report mode (and the other IXGBE_ACI_REPORT_* modes) describe the
-> local PHY only, not the link partner. The X550 path uses a separate
-> FW_PHY_ACT_UD_2 activity for partner data; the E610 ACI has no
-> equivalent.
+
+
+On 5/4/26 2:26 PM, Jiri Pirko wrote:
+> Mon, May 04, 2026 at 11:36:19AM +0200, ivecera@redhat.com wrote:
+>> Hi Jiri,
+>>
+>> On 5/4/26 10:48 AM, Jiri Pirko wrote:
+>>> Thu, Apr 30, 2026 at 07:36:10PM +0200, ivecera@redhat.com wrote:
+>>>> Move the fractional-frequency-offset-ppt attribute from the top-level
+>>>> pin attributes into the pin-parent-device nested attribute set. This
+>>>> makes it consistent with phase-offset which is already per-parent and
+>>>> clarifies that FFO PPT represents the frequency difference between
+>>>> a pin and its parent DPLL device.
+>>>>
+>>>> The top-level fractional-frequency-offset attribute (in PPM) remains
+>>>> unchanged for backward compatibility.
+>>>
+>>> That is odd. The ppt one was added just for higher precision but was
+>>> semantically the same. Now you change it. Could you still treat both the
+>>> same?
+>>>
+>> WDYM?
+>>
+>> Keep fractional-frequency-offset-ppt at the top-level and add both
+>> fractional-frequency-offset and fractional-frequency-offset-ppt into
+>> pin-parent-device nested attribute set?
 > 
-> Leave lp_advertised zeroed via the existing linkmode_zero() and drop
-> the now-unused ixgbe_eee_cap_map[]. eee_active/eee_enabled are
-> unaffected (sourced from link.eee_status).
+> Since both are the same, only different unit, it would make sense to
+> treat them both the same. That prevents from user confusion, hopefully.
+> 
+Agree... will update in v3.
 
-Hi David
+Thanks,
+Ivan
 
-Did you test the EEE autoneg capabilities? Is just lp_advertise wrong,
-or is the negotiation itself also broken?
-
-	Andrew
 
