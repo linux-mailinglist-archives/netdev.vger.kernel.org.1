@@ -1,210 +1,334 @@
-Return-Path: <netdev+bounces-283850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283851-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 9YBFFzSg+GkgxQIAu9opvQ
-	(envelope-from <netdev+bounces-283850-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 15:33:40 +0200
+	id yHAdMYii+GlExQIAu9opvQ
+	(envelope-from <netdev+bounces-283851-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 15:43:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A23154BDECE
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 15:33:39 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDCC64BE021
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 15:43:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BAE5B3007368
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 13:33:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A30CF3008A5B
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 13:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 651993D75BF;
-	Mon,  4 May 2026 13:33:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB1503DC4A9;
+	Mon,  4 May 2026 13:34:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="BhWlE1Zp";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="oOiqHwnX"
+	dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b="IARYnIuF"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b3-smtp.messagingengine.com (fhigh-b3-smtp.messagingengine.com [202.12.124.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C79813D5642
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 13:33:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 903163D5227
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 13:34:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777901616; cv=none; b=DOi4oF/R7aWVhFRex1zIrDqwCE9rwFDpT4siCsIJ6QqCxzdfX70isj3QUTjKyYxRGYU5avl4XrY68Kbo4LmqizKs2i+pj5oOAL8oEt0Iki8yNPmVBqmBB8Z4TRyOnhYTVVhWFwmlC78F9bt6QVa8lT3v8Ps8Ey16QCyXd+zyW8g=
+	t=1777901684; cv=none; b=tkqBDngi4FREY6KvkUKR9wDYidO3mRdcyAshk1HTKtFb1dLSmg3xo3mSQs5Hkij14N5Ubn5QLz6DJm2u2pBAe3i8esrqvLZ3fiq5KBj6Kw6tVkIatpUoZFbwPM1n0uIdu71mhEJ7dw5wZN1SYxdtHpIHstXAfDjABRxKnkJYIBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777901616; c=relaxed/simple;
-	bh=17hTDSvaPtKhuQVLwIiqwqmRRNL4ReFrnXooVhB5+Dg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=etX43LLf29Xj1Ft1aAoxH8XxeCoG2DJtDvhr3pIeOSQ6BBCWf/ys/Okqk763XYAFcYYdcH/6GwZFknYEzwlrsEA6iz3WnEPUP4MwbEh5lUbg52788bd0Myt/8yN7kgk6Z0YtNfhkkAgHVBa2DBDKszkaKvBRHwvqQJeT/oeRv7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=BhWlE1Zp; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=oOiqHwnX; arc=none smtp.client-ip=202.12.124.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id B54FB7A0065;
-	Mon,  4 May 2026 09:33:32 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Mon, 04 May 2026 09:33:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1777901612; x=
-	1777988012; bh=YVKA7BH3EoRCoupsBSXH71xVJ9Wcy7+XJR3rBZAUCe4=; b=B
-	hWlE1Zp0mq8iLF5JDXn1rN7qtUrdTXnMFedwIdACrq8yEMMJ1smrHShdvNGBS/IM
-	Ssn2oKjZGo3kmHvbyEHarbzoisRWUPMGhNmK+6inucHD0fHtfn7c2BrMIkCb2tVt
-	klR+tBwuwByJcPaArkKH52xZHg95MjQUdV5rs0eVlgiZpOZzZEnXO1jF6dQ2t0Oh
-	CKT5qzIh8BSL1Aa593XhnuAAuz865S8sZAEdYd7+ps9RYqPKgq9nbIKf6mzy2zcg
-	hT9kt+dxL7sp2qybtwi3RGi9t/Sj+wG6SZHCziy2DSgK1CesH4aOetf0xDbr7zjU
-	mbiZXx9nTSPWTMYsIuXaQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1777901612; x=1777988012; bh=YVKA7BH3EoRCoupsBSXH71xVJ9Wcy7+XJR3
-	rBZAUCe4=; b=oOiqHwnXxEBjlsS11UqePNt0MN5BLcOgVeV4OI+2hp9aSKW3R6q
-	3YO8qK71rL9laROZ4Vv7M/+lGzLWGMHtvf+r6/DV9QEcnq+yMPsV4nj5a+4gNPFP
-	FEZWB/rElESwQZrmOENRhvXZvklFqHOxf4Rhi6Cm4w1t/ext29SifkfjwCS9Ha1s
-	550HFOTfdlfmuK1PGDNvgAxca6I8a9/Lv3z2e/haRLX453qNgNHFT6WbFqWKNexJ
-	m6ZZy3Eme3czQQBdPE+GcPOLvKBa/qYsK9SaOfzFyOyngxSy/uhe+WkZhsHOAp7h
-	HI8cptoxWrmtizU5QMAmEEkCX0WQwmMpVfA==
-X-ME-Sender: <xms:LKD4aaCvYfOmsZAz1nBhuAR9jVmIAPL7E0u1IJ2dKs7UiXSR4lUFaQ>
-    <xme:LKD4aSwNWm6F6KA0DLNY0mUaEwNuQBFgM0Op77b70AqKnCvjvjktyO8gp5-0HyroB
-    W1ZU4DadJdBans8L5DsZtBMwjM7ejpqZFm23yr0wZtqs7hPJhP4HMU>
-X-ME-Received: <xmr:LKD4aW5nCyho3jzLjQEugLN-uQHvQIlgcKi-Nzwde3HsP3X6ucUxGQfJOUPD>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdelkeeljecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdortddttdejnecuhfhrohhmpefurggsrhhinhgr
-    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
-    htthgvrhhnpeejkeelveelkeefgfeuheevjeeukedvhedvueegvdekleeghfelgeeiveff
-    tdeuudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepuddupdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopegtvghlsehkvghrnhgvlhdrohhrghdprhgtph
-    htthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhhohhhnrdhfrghs
-    thgrsggvnhgusehgmhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgoh
-    hoghhlvgdrtghomhdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgt
-    phhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepnhgvthguvg
-    hvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhgvrhhnvghlqdhtlhhs
-    qdhhrghnughshhgrkhgvsehlihhsthhsrdhlihhnuhigrdguvghvpdhrtghpthhtoheptg
-    hhuhgtkhdrlhgvvhgvrhesohhrrggtlhgvrdgtohhm
-X-ME-Proxy: <xmx:LKD4abywFAD-EPV_UCFXQRdCci1HLBBLDc2Y2ZOHcJg8KxDamtUW8g>
-    <xmx:LKD4aSdDs2Q5ohFVh2LErB-zNwpyQu539QGklRLlRY5yQGNjVF5kiw>
-    <xmx:LKD4aYAMzmVoIFmmSxbv6mtBmS-kACKTQdLsrK0m5G41nto6FglH9w>
-    <xmx:LKD4ae6LR8aBlW9AuerfTxd50Vkk8WxObYlDhIzy0HdLzt3o16g4Jg>
-    <xmx:LKD4aREnKRztkNTYpJO_hpKasvsFjoESxgTQ64PjbUi5aXSAP7rEWRO9>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 4 May 2026 09:33:31 -0400 (EDT)
-Date: Mon, 4 May 2026 15:33:29 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Chuck Lever <cel@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	kernel-tls-handshake@lists.linux.dev,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Alistair Francis <alistair.francis@wdc.com>
-Subject: Re: [PATCH net-next v9 0/5] TLS read_sock performance scalability
-Message-ID: <afigKenambAyKkhu@krikkit>
-References: <20260429-tls-read-sock-v9-0-39e71aa7810f@oracle.com>
- <20260502180415.0b0bf12b@kernel.org>
- <2d2b5da3-3bfc-4882-8886-8f20b61254e3@kernel.org>
+	s=arc-20240116; t=1777901684; c=relaxed/simple;
+	bh=fE/FMqRtr05uo+J0w0E8qsFyUlmDDBPKI19czQaErzI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GsLVA8Mk11yAkUgtxoxGKra9ugXu6yVWan9wEIe1/YxfK+2G2JGD4ShYQO6k1fnxAzKW+b5z7BBZmBYo4++SDikyW37FbQitoZ2Ch6y+ZsWjJ0OyJxpP9XcwA3m+AwSM+eOOJjrsbXkJNrXuUzn1FakXUNsoy2nED1SXU9TYZNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com; spf=pass smtp.mailfrom=riscstar.com; dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b=IARYnIuF; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riscstar.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-5102582e23eso31434731cf.1
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 06:34:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=riscstar-com.20251104.gappssmtp.com; s=20251104; t=1777901678; x=1778506478; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1O51d4ds85yTh8lyD3JZ4q7u8vPdQtNHSLTt8d3PVfM=;
+        b=IARYnIuF1jJJrB45HAzJaAtwE+AeyXoN91edqT8qe4dqB9eycPEBOeLfpbjRndv2p7
+         b1KTlNc/O7xHE8z8JpMGnwfuvFJOsigZyTVXl9Dzv3zHK3rS12ZhVun3jts6+mXEGbmw
+         70OKRfGlkhCJrz8BtUen4+30f0EA2u0RZqvTLPUb4ZInITmwks28S48SG273UIh+Dafz
+         J+dLHOlNYGpwQGzTTLA8thF81/iZcz62YxDr6puMELr40aJJPq99InHfWYgqNGBkjfhA
+         saRoIlS47YYiU6OqLCOdreoTIPFJVBwtTe2xXAvwWc3S+wjEVEfKGKHCJVvDqdaWHouy
+         U3zQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777901678; x=1778506478;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1O51d4ds85yTh8lyD3JZ4q7u8vPdQtNHSLTt8d3PVfM=;
+        b=Z4G+Pd5KpbnnCR4BnzL69u5MmcCqJRUEDMBCwHoPD867h6D9tB+ULrlA/bf88CpZAJ
+         L46u8WWlqn5WvniovhtJy5GcG5JFePcSvDLf6K1vmY8xBv6QOn7Em8cz38Ty6rlEpdWd
+         cbfKepptpVDYijFLeKYQ0cvjXQM9QsClDtg2m3pF1mgH6/yQ2Rkf5qEEAjFHiu/4kpfk
+         F0IrNFaUSxyjdpaO9GkXJC0PyLnObZA0rbmCcXCx65gQ/EpuonfDnDTWl217sdgQmI9l
+         DAoZKp3NyJyc0kRDv6ajkBSh+i3EOraodEruUixT5CFt5SsBv54DAxIJ0EQBO4TeuDJX
+         T4Iw==
+X-Forwarded-Encrypted: i=1; AFNElJ/4B8vU+/yfb6qDjRJ5hmHeeH6l+AeD+zBbhYvzFZIBu9HolrKORxhBT2BNWEdCaSt5bhtOr4Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJPjQz1jYNaqcPRzCSGeikpBhbJ2+elMzxiiQntpfGVS0FDF6j
+	pw+66tz4zcERLoMgUl0nVvtmPcxyFciK5PrQprRqw3TPFU+SpvBuctzC5bLE5LYMLZw=
+X-Gm-Gg: AeBDieuN6DQJ4C4XzaB2OI6wp/F+VeVGXOHfvJ4bY8uheiamgQGg+qefK7HPUCtH4fM
+	1kKIc1y7tXu2h3On/PcM9oYlBzlcZZyWOnOFGTXyo2mFFCBeGHfCY77dudvxnZhie9YTE30D7is
+	4EmLc5RNhLshUeATJt2XdvyYoegNNWXO1bj9Dvv8hJDDBUu/+HomKEUkxOr4wG5Ny2PBozaGJvF
+	oJVXSszE0KZh3gCPDWS3Mor/aPN2CerQ+AyHEEEPyxLnFk6nW6u/aOgFiCfoSjrAetkdZFKv3kd
+	yPHRwsnHabELLx846ey4Xd9n5DwSWNQGukQWj0Xo4/2xoP0tPM83ULk48PAk/4F6rc+HFXwGMKf
+	qS/6Sl8uTXWaZYj6hD9fOllnNJxa/3/xPIbuD95rI57CVk+7+z4+nd+F0P6fMqbAq9Iv90HVuAx
+	LX6vP56kVlaoRl7PNUmFFzNzdsNVHxrdT9kYFODwasX1ZCNmEu4+XmqDottkbAQWxClqwWqzmE7
+	A==
+X-Received: by 2002:a05:622a:48a:b0:50d:9e8d:9837 with SMTP id d75a77b69052e-5104bde3d42mr142601201cf.11.1777901678300;
+        Mon, 04 May 2026 06:34:38 -0700 (PDT)
+Received: from [172.22.22.28] (c-75-72-117-212.hsd1.mn.comcast.net. [75.72.117.212])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8fc2c91c807sm1137764785a.32.2026.05.04.06.34.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 May 2026 06:34:37 -0700 (PDT)
+Message-ID: <164fb5ca-9c42-46ad-a13c-3757ff5d2fdd@riscstar.com>
+Date: Mon, 4 May 2026 08:34:33 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2d2b5da3-3bfc-4882-8886-8f20b61254e3@kernel.org>
-X-Rspamd-Queue-Id: A23154BDECE
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 08/12] dt-bindings: net: toshiba,tc965x-dwmac:
+ add TC956x Ethernet bridge
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, maxime.chevallier@bootlin.com,
+ rmk+kernel@armlinux.org.uk, andersson@kernel.org, konradybcio@kernel.org,
+ robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, linusw@kernel.org,
+ brgl@kernel.org, arnd@arndb.de, gregkh@linuxfoundation.org,
+ Daniel Thompson <daniel@riscstar.com>, mohd.anwar@oss.qualcomm.com,
+ a0987203069@gmail.com, alexandre.torgue@foss.st.com, ast@kernel.org,
+ boon.khai.ng@altera.com, chenchuangyu@xiaomi.com, chenhuacai@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, hkallweit1@gmail.com,
+ inochiama@gmail.com, john.fastabend@gmail.com, julianbraha@gmail.com,
+ livelycarpet87@gmail.com, matthew.gerlach@altera.com,
+ mcoquelin.stm32@gmail.com, me@ziyao.cc,
+ prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
+ rohan.g.thomas@altera.com, sdf@fomichev.me, siyanteng@cqsoftware.com.cn,
+ weishangjuan@eswincomputing.com, wens@kernel.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20260501155421.3329862-1-elder@riscstar.com>
+ <20260501155421.3329862-9-elder@riscstar.com>
+ <20260504-fascinating-teal-tarsier-b116c8@quoll>
+Content-Language: en-US
+From: Alex Elder <elder@riscstar.com>
+In-Reply-To: <20260504-fascinating-teal-tarsier-b116c8@quoll>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: DDCC64BE021
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [4.94 / 15.00];
+	SEM_URIBL(3.50)[0.0.0.0:email];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	BAD_REP_POLICIES(0.10)[];
+	DMARC_POLICY_SOFTFAIL(0.10)[riscstar.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283850-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,google.com,redhat.com,vger.kernel.org,lists.linux.dev,oracle.com,suse.de,wdc.com];
+	TAGGED_FROM(0.00)[bounces-283851-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,riscstar.com,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	RCVD_TLS_LAST(0.00)[];
+	GREYLIST(0.00)[pass,body];
+	R_DKIM_ALLOW(0.00)[riscstar-com.20251104.gappssmtp.com:s=20251104];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[riscstar-com.20251104.gappssmtp.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_GT_50(0.00)[50];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[elder@riscstar.com,netdev@vger.kernel.org];
+	NEURAL_SPAM(0.00)[0.717];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_SPF_ALLOW(0.00)[+ip4:172.234.253.10:c];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,kernel,dt];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,messagingengine.com:dkim,queasysnail.net:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[riscstar.com:mid,riscstar.com:email,1c:email,devicetree.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,0.0.0.0:email,riscstar-com.20251104.gappssmtp.com:dkim]
 
-2026-05-03, 21:34:01 +0200, Chuck Lever wrote:
-> On 5/3/26 3:04 AM, Jakub Kicinski wrote:
-> > On Wed, 29 Apr 2026 17:48:07 -0400 Chuck Lever wrote:
-> >> I'd like to encourage in-kernel kTLS consumers (i.e., NFS and
-> >> NVMe/TCP) to coalesce on the use of read_sock. When I suggested
-> >> this to Hannes, he reported a few performance scalability issues
-> >> with read_sock. 
-> > 
-> > Meaning, this series achieves.. what right now?
-> > I mean - the headline is "performance scalability" and there's no
-> > performance testing result in any of the messages :S
-> > Patch 5 for instance "seems logical" but how much difference does
-> > it make?
+On 5/4/26 6:00 AM, Krzysztof Kozlowski wrote:
+> On Fri, May 01, 2026 at 10:54:16AM -0500, Alex Elder wrote:
+>> From: Daniel Thompson <daniel@riscstar.com>
+>>
+>> Add devicetree bindings for the Toshiba TC956x family of Ethernet-AVB/TSN
+>> bridges.
+>>
+>> Signed-off-by: Daniel Thompson <daniel@riscstar.com>
+>> Signed-off-by: Alex Elder <elder@riscstar.com>
+>> ---
+>>   .../bindings/net/toshiba,tc956x-dwmac.yaml    | 111 ++++++++++++++++++
+>>   1 file changed, 111 insertions(+)
+>>   create mode 100644 Documentation/devicetree/bindings/net/toshiba,tc956x-dwmac.yaml
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/toshiba,tc956x-dwmac.yaml b/Documentation/devicetree/bindings/net/toshiba,tc956x-dwmac.yaml
+>> new file mode 100644
+>> index 0000000000000..d95d22a3761da
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/net/toshiba,tc956x-dwmac.yaml
+>> @@ -0,0 +1,111 @@
+>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>> +%YAML 1.2
+>> +---
+>> +$id: http://devicetree.org/schemas/net/toshiba,tc956x-dwmac.yaml#
 > 
-> The cover Subject: line has not been changed so all the revisions of
-> this series can be located easily.
+> Filename and here: toshiba,tc9564-dwmac
+> (s/x/4/)
+> 
+> 
+>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>> +
+>> +title: Toshiba TC956x Ethernet-AVB/TSN Controller
+>> +
+>> +maintainers:
+>> +  - Alex Elder <elder@riscstar.com>
+>> +  - Daniel Thompson <daniel@riscstar.com>
+>> +
+>> +description: |
+>> +  This node provides properties for configuring the Ethernet PCI functions
+>> +  that are attached to the internal downstream port of the TC956x's PCIe
+>> +  switch.
+> 
+> Describe rather the hardware directly, not the DTS or the binding
+> itself.
+> 
+> Just say what is the hardware, what is consists of, what is less
+> obvious or usual (if there is such).
 
-(not to bikeshed, links to lore also do that)
+I understand what you're saying.  We will reword this to focus
+on the hardware in version 2.
 
-> The cover letter makes it clear that the series is now only a clean-up
-> series. Since async_capable is set to false for TLSv1.3, there is no
-> performance benefit to these changes, so I don't intend to post a
-> motivation for it based on performance.
+> 
+>> +
+>> +  TC956x are a family of Ethernet-AVB/TSN bridge chips that combine a PCIe
+>> +  switch together with a number of Ethernet controllers. These bindings
+>> +  cover only the Ethernet functions of these devices.
+> 
+> What about the rest of the hardware - a PCIe switch? Shouldn't it be
+> described?
 
-Maybe I misunderstood, but I thought there was a somewhat noticeable
-benefit to the "suppress spurious wakeups" patch (not +20%, but at
-least improved behavior for some users of kTLS), and maybe the "flush
-backlog" one.
+It maybe should, just to provide a more complete picture.  It's
+a little strange, because the PCIe switch support (or at least
+its power controller) was already upstreamed:
 
-Patch 2 may still be beneficial (though it's now mixing 2 separate
-changes), and patch 1 is a very reasonable code cleanup.
+  
+https://lore.kernel.org/all/20251101-tc9563-v9-0-de3429f7787a@oss.qualcomm.com/
 
-Patch 4 does feel like a pretty large amount of churn if it has no
-observable benefit.
+That introduced DeviceTree bindings for a PCI device, which is
+itself sort of spanning two worlds of discoverability.
 
+That code focused on the *switch*.  This series is focused on
+the *Ethernet interfaces*.  But the "chip" has several other
+components, some of which (GPIO anyway, for now) also need to
+be modeled.
 
-> > FTR async support is a major pain and we'd rather get rid of it
-> > (and switch away from cryto API) than extend it.
+I want to talk more with Daniel about this but either way we
+will revisit this and will attempt to describe the hardware in
+a more complete way when we send out v2.
 
-(the "don't use crypto API" thing is news to me, that seems to be
-trendy these days)
+>> +
+>> +allOf:
+>> +  - $ref: /schemas/pci/pci-bus-common.yaml#
+>> +  - $ref: /schemas/pci/pci-device.yaml#
+>> +
+>> +unevaluatedProperties: false
+> 
+> Place both (allOf+unevaluatedProperties) after "required:".
 
-> That would have been nice to know three months ago when I started work
-> on this series.
+OK.
 
-I remember discussing this with Jakub, but I don't know if that was
-on-list. There's been a lot of bugs in that code.
+> 
+>> +
+>> +properties:
+>> +  compatible:
+>> +    enum:
+>> +      - pci1179,0220 # Toshiba TC9564 (a.k.a. Qualcomm QPS615)
+>> +
+>> +  "#gpio-cells":
+>> +    const: 2
+>> +
+>> +  gpio-controller: true
+>> +
+>> +  # We can't allOf reference Ethernet-controller.yaml because we end up with
+> 
+> s/Ethernet-controller.yaml/ethernet-controller.yaml/
 
+OK.
 
-> We'd really like
-> to get TLS KeyUpdate working for in-kernel TLS consumers, so anything
-> that can move this process forward is welcome.
+> 
+>> +  # contradictory $nodename rules (`ethernet@` versus `pci@`). Happily only a
+> 
+> But which schema requires pci@ for devices? If I am not mistaken, only
+> dtschema/schemas/pci/pci-bus-common.yaml requires it, and it does not
+> apply to actual PCI device.
 
-But net/tls doesn't need any changes for that, right? net/handshake
-maybe, but that's a separate "component" (MAINTAINERS entry).
+We'll revisit this and will simplify/clarify if possible in v2.
 
--- 
-Sabrina
+>> +  # small number of the properties are useful on TC956x so we can just reference
+>> +  # what we need.
+>> +  phy-connection-type:
+>> +    $ref: ethernet-controller.yaml#/properties/phy-connection-type
+>> +
+>> +  phy-handle:
+>> +    $ref: ethernet-controller.yaml#/properties/phy-handle
+>> +
+>> +  phy-mode:
+>> +    $ref: ethernet-controller.yaml#/properties/phy-mode
+>> +
+>> +  mdio:
+>> +    $ref: snps,dwmac.yaml#/properties/mdio
+>> +
+>> +required:
+>> +  - compatible
+>> +  - reg
+>> +
+>> +examples:
+>> +  - |
+>> +    pcie {
+>> +      #address-cells = <3>;
+>> +      #size-cells = <2>;
+>> +
+>> +      tc956x_emac0: pci@0,0 {
+>> +        compatible = "pci1179,0220";
+>> +        reg = <0x50000 0x0 0x0 0x0 0x0>;
+>> +        #address-cells = <3>;
+>> +        #size-cells = <2>;
+>> +        device_type = "pci";
+>> +        ranges;
+>> +
+>> +        gpio-controller;
+>> +        #gpio-cells = <2>;
+>> +
+>> +        phy-mode = "10gbase-r";
+>> +        phy-handle = <&tc956x_emac0_phy>;
+>> +
+>> +        mdio {
+>> +          compatible = "snps,dwmac-mdio";
+>> +          #address-cells = <1>;
+>> +          #size-cells = <0>;
+>> +
+>> +          tc956x_emac0_phy: ethernet-phy@1c {
+>> +            compatible = "ethernet-phy-id311c.1c12";
+>> +            reg = <0x1c>;
+>> +          };
+>> +        };
+>> +      };
+> 
+> Keep only one example, unless you have different properties (not their
+> values, but their presence),
+
+OK.  Thanks a lot for your review Krzysztof.
+
+					-Alex
+> 
+> 
+> Best regards,
+> Krzysztof
+> 
+
 
