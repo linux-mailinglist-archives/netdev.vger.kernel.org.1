@@ -1,247 +1,293 @@
-Return-Path: <netdev+bounces-283862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283874-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8AuaGfmr+GnHxgIAu9opvQ
-	(envelope-from <netdev+bounces-283862-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:23:53 +0200
+	id cIHnHPav+GkdzAIAu9opvQ
+	(envelope-from <netdev+bounces-283874-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:40:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F00E84BF474
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:23:52 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBBD44BFDF0
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:40:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D59403017EC9
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 14:20:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9E66E3042986
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 14:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 261C03DE43C;
-	Mon,  4 May 2026 14:20:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655FA3E022E;
+	Mon,  4 May 2026 14:24:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="ZivXVeQ7"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="nfjSuRxY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F0F29E116
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 14:20:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D013DE455;
+	Mon,  4 May 2026 14:24:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777904441; cv=none; b=iakVEXvh2a4wFzE+zv9VfT78dYeIzGzDa1HybfzwvO45E1viHzxuKFk1JzCII/5OrgqNQ6QVf8nBdJX+xFmO0byy46Mx26YVcdOrZ20Eu1Ztk24FrVMzd17njFLYTUPXfh1MLK0RN3hsrdx6La9rTUWcZwpkvIwvGtaKwqrGcQE=
+	t=1777904686; cv=none; b=LMWtYuEffnN8EkSNsqUJ5scZdAIPPtf2hfARmDk0WtjXzNWjj0BPofqtV+EX1t0xDB0BumaDA2WTq9qql6z5vMYfGTgSLmbgyF2vkJHFS9vBYzmHPz5GapHK9P8zJZ4TvU450GJzzmCUU20YGdd8ufFtDEXJX2XsfcwHpKvy7as=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777904441; c=relaxed/simple;
-	bh=9OUajsvoVYdXpMybKSG/0NvwqxgowwKsta8AaAO2Zbo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QHo/5Clp3oXHbXJbqrP0sy4oOutmXDxuQNDVyMj6maRSfei71RIPWiRVZMEe4jQeUEc38W4cs0hd5Ul/T10To3fpS52xOx8pti4naiiBsuBa/xf99ZWgu+iKpRWDH99dLdz3cR9Z7tbVT+wz855KoUyANP3FYxkxYDiISZxils8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=ZivXVeQ7; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4852a9c6309so33561225e9.0
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 07:20:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1777904437; x=1778509237; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=eIwRzJNBGP4qpF839RJR539plQuxlG2HBX9ojRw93ys=;
-        b=ZivXVeQ7xHjY61ZT0O3MqC9DMtIwIJCZ3EomDi92DIULRjSmrQtxWK4e2n7Yx2GHpT
-         dpDBs3vl7Rqq4M/ni7hOtzvbAftM2+e2OlnwsC/xlmTAADqOFt/6FFxJlFjf6g2djanR
-         AHafBW7xteLU9bLLHUda9MqUBLwP0xS1oEb/V47aWySlt69HOOPmqbe0TO7iDHYF9xEo
-         liBsGhfB7eLSmE2C20dlmpnWASWLs8+uGaINk4iHnUkt9ltixQnfsOgd5fvrshHF871z
-         ZF70NyL/f4v2NAL4Gc1bYly5M1Pbx9jSNaURRfKlbJErJIQyveU/mdDDfrVnrh9ow040
-         elYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777904437; x=1778509237;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eIwRzJNBGP4qpF839RJR539plQuxlG2HBX9ojRw93ys=;
-        b=s8BPCucRy+jx5qbQl8awV80DmPOLrKsPNQ/lNk9JN/dUxghO6GoWArRSN9woFA/8V/
-         VC+m5+H7Kps+enTlU/NspDG8sgjUOYCcxdRwkM1TYeF8OiYT2/nh6qwy9slKm+ODz11c
-         CNmytOlk9K1UbE2OUKYl0ngQ1ufAmjpkJ3PdrDJExdXfCwu59TAE5poXajSBRF/LafXq
-         qpwXRs7BbDbpW2hULv1c4kP6koRQS7lrdsnlNdmK1rZaYy1FnSXwiWTPqsBcpnDfr8Hz
-         4zWe3hP3VMcfc2BrgTTH0T/yQsUFzj+/A56G7u6IZjM/0N+Ue/JfXUKEgV8zGH6rBudG
-         RVWA==
-X-Gm-Message-State: AOJu0YyzXxHqNedHCUTanNCfSjUnEGShGozXQPWRh4kV0BMVe0s6ZcA1
-	v7IRbkGv/jwnrRkvAKwqNJiQcT9Eze92AXekXciO9pGaF1JjZvUEKuxQ9RcFK2J2bO9SwgIhhDX
-	uLpZvus3Gy2q2V1YHixrSpSpjN5bfFg+X1GoncTuMaHnFznmVnCGvl2ZTA3xfzAD6hgU=
-X-Gm-Gg: AeBDietwSt9tI0mnz15M+jMgeDRHFSjsBMWJwbAqg2XGijIFEay0LJueVSspq9He9aj
-	vDU/jMIDf2cZKmrpQs9dCmsTNpofGqYchGUNm3Coo3CiFQric+VWnVo2jWf7PiVWIPu6D9ROh7i
-	IwtZ2DcOf7ryTto0qA6xO1NDvDxV7iD/zzXeCtXfzKJxFqzT+8CudxvSMW5gAF6paRORSkw4xZX
-	DEV4ZpTUqMANkQON7NZuErJf5AVAFJgOd+8SwHkZ6l1myviThORR8YrH6TWwZaa52gZh7kDXP1y
-	3pA0lS6mT49sY80L4vt8gwyxFGG5VUTxDU6DbCGyf6tAdyW03vn0rdngVxMKlFgfI88CMfKBzMH
-	3Mp65xRYyrL16TMrjuiC9D78J7EVQLcY7iujGU7kyPxt3llVBjkCHGmNxKtTF3HGxN1k2dgnI8A
-	2+n/Y1R+2X5tuApfeCDCzslKybxjouUwP+sNcpPYow9w1m/Lc=
-X-Received: by 2002:a05:600d:f:b0:488:904b:f31 with SMTP id 5b1f17b1804b1-48a9866a9a3mr130488175e9.22.1777904437271;
-        Mon, 04 May 2026 07:20:37 -0700 (PDT)
-Received: from inifinity.mandelbit.com ([2001:67c:2fbc:1:4b13:4164:f406:ce59])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a8ebb2fa5sm237782595e9.12.2026.05.04.07.20.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2026 07:20:36 -0700 (PDT)
-From: Antonio Quartulli <antonio@openvpn.net>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	ralf@mandelbit.com,
-	Antonio Quartulli <antonio@openvpn.net>,
-	Hyunwoo Kim <imv4bel@gmail.com>,
-	Sabrina Dubroca <sd@queasysnail.net>
-Subject: [RFC net] ovpn: fix race between deleting interface and adding new peer
-Date: Mon,  4 May 2026 16:20:33 +0200
-Message-ID: <20260504142033.2327646-1-antonio@openvpn.net>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1777904686; c=relaxed/simple;
+	bh=71Xurdx5vJpihuHuZwJGTYt1cBFho/ZdMoBdcPlU5wk=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=t17llM0gkbkK6ty4saFln0hHnug8bEE/vUm00s9BZ83xQ4ZyOQp4F2KKmuhq1YWc8E7JdaSvMDNTyPq80GLaM0e/AJJgcxnbZ0yyBNWp6tGjhjdK37zmYCMOsdRkCJyR0dHc5uZmguiNIwET3JJmNATlRxCOzpLGsL/6ChN0BOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=nfjSuRxY; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1777904685; x=1809440685;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=71Xurdx5vJpihuHuZwJGTYt1cBFho/ZdMoBdcPlU5wk=;
+  b=nfjSuRxYNB51gYAFHH+TJsFDFTyQpcOZJNUIuDDwVwwJMuO80BqHRPmj
+   1Wvu9DY0zN6OT30ZGfCHJoVXGOiwnS96ya4v0WStd+oqj9hu6Y6ZCVIr9
+   c8+zXW3Dq/dbsv+UAECzg17BCAEa+K9jXdfAwjoXNIP147KJjE0UPsQC0
+   TS5qop57jQUF4sQJIque5+43PxU0ESZHiObKsfHIO355N6pwOBE3+LFmp
+   Ol5Kqr2zPN6MLh3Y7SzhUi2KBlmTB0BWkJmZ2KqpCG62n/KJJMLsfalYD
+   cU/bgqnWTS902hcX3Givog/jkpTp4lEpmBS+lY8OLdx3wp3k5jju6IjTg
+   w==;
+X-CSE-ConnectionGUID: wzRnnTf3QRmZCQDuK+CT3A==
+X-CSE-MsgGUID: EbI6GhoXR4a3VIlKBuhfkw==
+X-IronPort-AV: E=Sophos;i="6.23,215,1770620400"; 
+   d="scan'208";a="56221181"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 07:23:36 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
+ chn-vm-ex1.mchp-main.com (10.10.87.30) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.37; Mon, 4 May 2026 07:23:35 -0700
+Received: from DEN-DL-M70577.microsemi.net (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Mon, 4 May 2026 07:23:31 -0700
+From: Daniel Machon <daniel.machon@microchip.com>
+Subject: [PATCH net-next v3 00/13] net: lan966x: add support for PCIe FDMA
+Date: Mon, 4 May 2026 16:23:13 +0200
+Message-ID: <20260504-lan966x-pci-fdma-v3-0-a56f5740d870@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: F00E84BF474
+X-B4-Tracking: v=1; b=H4sIANKr+GkC/23NQQ7CIBAF0KsY1mIoUNK68h7GBYXBTmKhgYbUN
+ L27BBcm6vLnz3+zkQQRIZHzYSMRMiYMvgRxPBAzan8HirZkwhlXTDSCPrTvlVrpbJA6O2naS7C
+ yay0XTpMymyM4XCt5JR4W6mFdyK00I6YlxGf9lZvav1nOftncUEbBtdIM/cCMHC4TmhjMiPPJh
+ KmCmX8Qybs/CC+IFWCUAqbK3Tey7/sL+ipiywMBAAA=
+X-Change-ID: 20260313-lan966x-pci-fdma-94ed485d23fa
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>, Steen Hegelund
+	<steen.hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>, "Alexei
+ Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+	"Jesper Dangaard Brouer" <hawk@kernel.org>, John Fastabend
+	<john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, Herve
+ Codina <herve.codina@bootlin.com>, Arnd Bergmann <arnd@arndb.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Mohsin Bashir
+	<mohsin.bashr@gmail.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<bpf@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+X-Mailer: b4 0.14.3
+X-Rspamd-Queue-Id: DBBD44BFDF0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
-	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,mandelbit.com,openvpn.net,gmail.com,queasysnail.net];
-	TAGGED_FROM(0.00)[bounces-283862-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283874-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[openvpn.net:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,iogearbox.net,gmail.com,fomichev.me,bootlin.com,arndb.de,linuxfoundation.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel.machon@microchip.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,queasysnail.net:email,openvpn.net:email,openvpn.net:dkim,openvpn.net:mid]
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-While deleting an existing ovpn interface, there is a very
-narrow window where adding a new peer via netlink may cause
-the netdevice to hang and prevent its unregistration.
+When lan966x operates as a PCIe endpoint, the driver currently uses
+register-based I/O for frame injection and extraction. This approach is
+functional but slow, topping out at around 33 Mbps on an Intel x86 host
+with a lan966x PCIe card.
 
-It may happen during ovpn_dellink(), when all existing peers are
-freed and the device is queued for deregistration, but a
-CMD_PEER_NEW message comes in adding a new peer that takes again
-a reference to the netdev.
+This series adds FDMA (Frame DMA) support for the PCIe path. When
+operating as a PCIe endpoint, the internal FDMA engine on lan966x cannot
+directly access host memory, so DMA buffers are allocated as contiguous
+coherent memory and mapped through the PCIe Address Translation Unit
+(ATU). The ATU provides outbound windows that translate internal FDMA
+addresses to PCIe bus addresses, allowing the FDMA engine to read and
+write host memory. Because the ATU requires contiguous address regions,
+page_pool and normal per-page DMA mappings cannot be used. Instead,
+frames are transferred using memcpy between the ATU-mapped buffers and
+the network stack. With this, throughput increases from ~33 Mbps to
+~620 Mbps for default MTU.
 
-At this point there is no way to release the device because we are
-under the assumption that all peers were already released.
+Patch 1 adds the shared drivers/net/ethernet/microchip/fdma/ directory
+to the Sparx5 SoC MAINTAINERS entry.
 
-Fix the race condition by releasing all peers in ndo_uninit(),
-when the netdevice has already been removed from the netdev
-list.
+Patches 2-3 prepare the shared FDMA library: patch 2 renames the
+contiguous dataptr helpers for clarity, and patch 3 adds PCIe ATU
+region management and coherent DMA allocation with ATU mapping.
 
-Also ovpn_peer_add() has now an extra check that forces the
-function to bail out if the device reg_state is not REGISTERED.
-This way any incoming CMD_PEER_NEW racing with the interface
-deletion routine will simply stop before adding the peer.
+Patches 4-6 refactor the lan966x FDMA code to support both platform
+and PCIe paths: extracting the LLP register write into a helper,
+exporting shared functions, and introducing an ops dispatch table
+selected at probe time.
 
-Note that the above check happens while holding the netdev_lock
-to prevent racing netdev state changes.
+Patches 7-8 harden the existing FDMA path for the PCIe endpoint
+lifecycle: patch 7 clears latched FDMA error/interrupt stickies after
+the switch reset so they don't assert as soon as interrupts are
+enabled, and patch 8 adds a shutdown() callback that quiesces the
+FDMA engine on host warm reboot (on the PCIe card the FDMA survives
+host reset and would otherwise keep the shared INTx asserted into
+the next probe).
 
-ovpn_dellink() is now empty and can be removed.
+Patch 9 adds the core PCIe FDMA implementation with RX/TX using
+contiguous ATU-mapped buffers. Patches 10 and 11 extend it with MTU
+change and XDP support respectively. XDP_PASS, XDP_TX, XDP_DROP and
+XDP_ABORTED are supported; XDP_REDIRECT is deliberately not, because
+the PCIe data path does not use page_pool.
 
-Reported-by: Hyunwoo Kim <imv4bel@gmail.com>
-Closes: https://lore.kernel.org/netdev/aaVgJ16edTfQkYbx@v4bel/
-Suggested-by: Sabrina Dubroca <sd@queasysnail.net>
-Fixes: 80747caef33d ("ovpn: introduce the ovpn_peer object")
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
-Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+Patches 12-13 update the lan966x PCI device tree overlay to extend the
+cpu register mapping to cover the ATU register space and add the FDMA
+interrupt.
+
+To: Andrew Lunn <andrew+netdev@lunn.ch>
+To: David S. Miller <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Steen Hegelund <steen.hegelund@microchip.com>
+To: UNGLinuxDriver@microchip.com
+To: Alexei Starovoitov <ast@kernel.org>
+To: Daniel Borkmann <daniel@iogearbox.net>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+To: John Fastabend <john.fastabend@gmail.com>
+To: Stanislav Fomichev <sdf@fomichev.me>
+To: Herve Codina <herve.codina@bootlin.com>
+To: Arnd Bergmann <arnd@arndb.de>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: bpf@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+
+Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
 ---
+Changes in v3:
 
-This patch is sent as RFC to give the AI a chance to review it once
-again, since it was able to spot a new race condition in its
-previous version.
+Version 3 fixes a number of issues reported by sashiko - mostly
+hardening.
 
+- Fix double use of XDP_PACKET_HEADROOM.
+- Fix ERR_PTR persistence in fdma->atu_region and add missing
+  NULL/ERR_PTR guard in fdma_pci_atu_region_unmap().
+- Reject size <= 0 in fdma_pci_atu_region_map() and return
+  -ENOSPC (was -ENOMEM) when no region is free.
+- Introduce lan966x_fdma_pci_tx_size_fits() that accounts for
+  XDP_PACKET_HEADROOM; use it from both xmit paths to keep
+  bpf_xdp_adjust_tail from writing past the TX slot.
+- Validate BLOCKL in rx_check_frame() (reject < IFH+FCS or
+  > db_size) before it feeds memcpy/XDP sizes.
+- READ_ONCE(port->xdp_prog) inside lan966x_xdp_pci_run() to close
+  a TOCTOU on XDP detach that could deref NULL in
+  bpf_prog_run_xdp().
+- Strip IFH and FCS pre-XDP in rx_check_frame(). After BPF runs
+  the driver cannot tell whether the tail was modified; drop the
+  unconditional skb_pull/skb_trim in rx_get_frame().
+- Account tx_bytes/tx_packets on XDP_TX success and tx_dropped on
+  XDP_TX size reject.
+- Add dma_wmb()/dma_rmb() around DCB status writes and reads in
+  xmit, xmit_xdpf, and napi_poll.
+- Collected Tested-by: Hervé Codina.
+- Link to v2: https://lore.kernel.org/r/20260428-lan966x-pci-fdma-v2-0-d3ec66e06202@microchip.com
 
- drivers/net/ovpn/main.c | 12 ++----------
- drivers/net/ovpn/peer.c | 21 ++++++++++++++++++---
- 2 files changed, 20 insertions(+), 13 deletions(-)
+Changes in v2:
 
-diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
-index 2e0420febda0..9993c1dfe471 100644
---- a/drivers/net/ovpn/main.c
-+++ b/drivers/net/ovpn/main.c
-@@ -92,6 +92,8 @@ static void ovpn_net_uninit(struct net_device *dev)
- {
- 	struct ovpn_priv *ovpn = netdev_priv(dev);
- 
-+	disable_delayed_work_sync(&ovpn->keepalive_work);
-+	ovpn_peers_free(ovpn, NULL, OVPN_DEL_PEER_REASON_TEARDOWN);
- 	gro_cells_destroy(&ovpn->gro_cells);
- }
- 
-@@ -208,15 +210,6 @@ static int ovpn_newlink(struct net_device *dev,
- 	return register_netdevice(dev);
- }
- 
--static void ovpn_dellink(struct net_device *dev, struct list_head *head)
--{
--	struct ovpn_priv *ovpn = netdev_priv(dev);
--
--	cancel_delayed_work_sync(&ovpn->keepalive_work);
--	ovpn_peers_free(ovpn, NULL, OVPN_DEL_PEER_REASON_TEARDOWN);
--	unregister_netdevice_queue(dev, head);
--}
--
- static int ovpn_fill_info(struct sk_buff *skb, const struct net_device *dev)
- {
- 	struct ovpn_priv *ovpn = netdev_priv(dev);
-@@ -235,7 +228,6 @@ static struct rtnl_link_ops ovpn_link_ops = {
- 	.policy = ovpn_policy,
- 	.maxtype = IFLA_OVPN_MAX,
- 	.newlink = ovpn_newlink,
--	.dellink = ovpn_dellink,
- 	.fill_info = ovpn_fill_info,
- };
- 
-diff --git a/drivers/net/ovpn/peer.c b/drivers/net/ovpn/peer.c
-index c02dfab51a6e..7bf912e40ee2 100644
---- a/drivers/net/ovpn/peer.c
-+++ b/drivers/net/ovpn/peer.c
-@@ -1034,14 +1034,29 @@ static int ovpn_peer_add_p2p(struct ovpn_priv *ovpn, struct ovpn_peer *peer)
-  */
- int ovpn_peer_add(struct ovpn_priv *ovpn, struct ovpn_peer *peer)
- {
-+	int ret = -ENODEV;
-+
-+	/* Prevent adding new peers while destroying the ovpn interface.
-+	 * Failing to do so would end up holding the device reference
-+	 * endlessly hostage of the new peer object with no chance of
-+	 * release..
-+	 */
-+	netdev_lock(ovpn->dev);
-+	if (ovpn->dev->reg_state != NETREG_REGISTERED)
-+		goto out;
-+
- 	switch (ovpn->mode) {
- 	case OVPN_MODE_MP:
--		return ovpn_peer_add_mp(ovpn, peer);
-+		ret = ovpn_peer_add_mp(ovpn, peer);
-+		break;
- 	case OVPN_MODE_P2P:
--		return ovpn_peer_add_p2p(ovpn, peer);
-+		ret = ovpn_peer_add_p2p(ovpn, peer);
-+		break;
- 	}
-+out:
-+	netdev_unlock(ovpn->dev);
- 
--	return -EOPNOTSUPP;
-+	return ret;
- }
- 
- /**
+Version 2 primarily addresses issues with module unload/load, where
+traffic would stop working (Hervé), and XDP head/tail adjust that would be
+discarded (Mohsin).
+
+Apart from that, I ran through issues reported by Sashiko, and fixed a
+number of other issues.
+
+- New patch 1: add drivers/net/ethernet/microchip/fdma/ to the Sparx5
+  SoC MAINTAINERS entry.
+- New patch 7: clear latched FDMA error/interrupt stickies after the
+  switch reset so they don't fire as soon as interrupts are enabled.
+- New patch 8: shutdown() callback, quiescing FDMA on host warm reboot.
+- Replaced the depth-2 dev_is_pci(parent->parent) backend selector
+  with a parent-chain walk.
+- XDP: use xdp.data/xdp.data_end for the post-XDP frame length so that
+  bpf_xdp_adjust_head/tail are respected (Mohsin Bashir)
+- MTU change: drain in-flight xmits with netif_tx_disable() on every
+  port before reallocating rings, waking them again on completion.
+- MTU change: cap the PCIe DCB ring at 256 entries so a full-ring
+  coherent DMA allocation fits in a single MAX_PAGE_ORDER block at
+  jumbo MTU.
+- PCIe ATU: disable the region before clearing its translation on
+  unmap.
+- PCIe FDMA: hold tx_lock in napi_poll around the free-DCB check used
+  to wake stopped netdev queues.
+- PCIe FDMA: return -ENOSPC (not -1) when the DCB ring is exhausted.
+- Link to v1: https://lore.kernel.org/r/20260320-lan966x-pci-fdma-v1-0-ef54cb9b0c4b@microchip.com
+
+---
+Daniel Machon (13):
+      MAINTAINERS: add FDMA library to Sparx5 SoC entry
+      net: microchip: fdma: rename contiguous dataptr helpers
+      net: microchip: fdma: add PCIe ATU support
+      net: lan966x: add FDMA LLP register write helper
+      net: lan966x: export FDMA helpers for reuse
+      net: lan966x: add FDMA ops dispatch for PCIe support
+      net: lan966x: clear FDMA interrupt stickies after switch reset
+      net: lan966x: add shutdown callback to stop FDMA on reboot
+      net: lan966x: add PCIe FDMA support
+      net: lan966x: add PCIe FDMA MTU change support
+      net: lan966x: add PCIe FDMA XDP support
+      misc: lan966x-pci: dts: extend cpu reg to cover PCIE DBI space
+      misc: lan966x-pci: dts: add fdma interrupt to overlay
+
+ MAINTAINERS                                        |   1 +
+ drivers/misc/lan966x_pci.dtso                      |   5 +-
+ drivers/net/ethernet/microchip/fdma/Makefile       |   4 +
+ drivers/net/ethernet/microchip/fdma/fdma_api.c     |  33 ++
+ drivers/net/ethernet/microchip/fdma/fdma_api.h     |  25 +-
+ drivers/net/ethernet/microchip/fdma/fdma_pci.c     | 182 ++++++
+ drivers/net/ethernet/microchip/fdma/fdma_pci.h     |  42 ++
+ drivers/net/ethernet/microchip/lan966x/Makefile    |   4 +
+ .../net/ethernet/microchip/lan966x/lan966x_fdma.c  |  51 +-
+ .../ethernet/microchip/lan966x/lan966x_fdma_pci.c  | 656 +++++++++++++++++++++
+ .../net/ethernet/microchip/lan966x/lan966x_main.c  |  74 ++-
+ .../net/ethernet/microchip/lan966x/lan966x_main.h  |  45 ++
+ .../net/ethernet/microchip/lan966x/lan966x_regs.h  |  25 +
+ .../net/ethernet/microchip/lan966x/lan966x_xdp.c   |  10 +
+ 14 files changed, 1117 insertions(+), 40 deletions(-)
+---
+base-commit: 790ead9394860e7d70c5e0e50a35b243e909a618
+change-id: 20260313-lan966x-pci-fdma-94ed485d23fa
+
+Best regards,
 -- 
-2.53.0
+Daniel Machon <daniel.machon@microchip.com>
 
 
