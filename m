@@ -1,203 +1,204 @@
-Return-Path: <netdev+bounces-283746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283745-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8FDGL3hW+GnTtAIAu9opvQ
-	(envelope-from <netdev+bounces-283746-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 10:19:04 +0200
+	id eORND7hV+GmWtAIAu9opvQ
+	(envelope-from <netdev+bounces-283745-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 10:15:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1837B4BA141
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 10:19:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B043F4BA089
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 10:15:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1A7F13041AB5
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 08:13:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 40A73301652E
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 08:11:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CD7C31A045;
-	Mon,  4 May 2026 08:13:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B2D2EA168;
+	Mon,  4 May 2026 08:11:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C0Os4fDi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vvufxi4g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2480318EF6
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 08:13:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838574C97
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 08:11:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777882435; cv=none; b=KURci5b2HvzwaeHxOpOBZ/qyRSzEQOJ57J+e+Xn/xYWVu+0Bq5stoIt6xok/V0fGrqyDK6bhWYBgge4lxjSelUDpqRk1Pv4lbGr7UlCAfsqnVKMHgryyGW2f1lmlxSOVLEdhSKZ/r0mnat7gpKsFAXYmoTrIS/cQXKraabptv6U=
+	t=1777882279; cv=none; b=fZRvHzKX7oUv7KiLLEcHZXFym6KRtNxuE/9pI5Y1rfbeapce+bIzxf1cr5WKLoHI6hMVk2kYt9vuYBda3sS4pcWjvOJ7zWz6ghiVNfVLl81lQ4lNXslUkzAhuQlLIgNgaydwCYF2Pf9EIXSt8hfbJAkK6sxGyyFqWzdY7mWZstM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777882435; c=relaxed/simple;
-	bh=i0ow0BGME4ktvZKUNMDO7lIwbJDhWGcBGUZClqgLTvE=;
+	s=arc-20240116; t=1777882279; c=relaxed/simple;
+	bh=hBrj2lSJTLetwTP2wz6GowWY14Ggyw59DxllDhGpQHw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qlyF5R2XrmdoEqEzVgzDlH+4ZANuzdXpf8UlLtzXrj1M5RNAgr2ogWqKeuJsYa8FQRmwSza76nzx655q03PDyz42SNczKiPsPvF4JXRMZQOnFj53JdZu7VsDKnYQGD6z+04/4rP6NCWjqzoy+hTP3DH6WV8srW2nXJadbo0ZREI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C0Os4fDi; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777882434; x=1809418434;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=i0ow0BGME4ktvZKUNMDO7lIwbJDhWGcBGUZClqgLTvE=;
-  b=C0Os4fDiK/tiJxWEygkm/r4sTvACATvvtm8Ebf4pL9vlN4At9W9/7TZb
-   SL1YgRXP644wpbcdrvtsiIIBbFijc+n0h8VFX2eEnpOgWuuTWmV2o2AC9
-   B6ASbWfNINq1g4H3Pq3qmpqJL4/sO0Qq5EwMkoXf2/6fhCnFqH3miLGeM
-   TRS1OmB4X0YUFSD3BBgZ2jIlZDrdQY7KCPsCLohxOsX+6qgWnpfkWD90b
-   BxMhb8teU5ZEv5BWxoRULUB7qHRpD/ddVa8J+g3VoE9TsQJU4Wc9/xo1Q
-   /QkHwvwoXeG+ZVDlxMDRWkQ+c6csKi5cLpOg3mhQpcTznfX7O8ussmfv2
-   w==;
-X-CSE-ConnectionGUID: ObTG+0dPS+GYHRr/gVhZAg==
-X-CSE-MsgGUID: EE0gWmiGSLmM8ptT+TeLyQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11775"; a="66267429"
-X-IronPort-AV: E=Sophos;i="6.23,215,1770624000"; 
-   d="scan'208";a="66267429"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 01:13:53 -0700
-X-CSE-ConnectionGUID: FJTjzmBeRjKWGxOzEDSmhA==
-X-CSE-MsgGUID: UPX6moqJSWqissfla8fyxg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,215,1770624000"; 
-   d="scan'208";a="230852817"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 01:13:51 -0700
-Date: Mon, 4 May 2026 10:09:55 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Simon Horman <horms@kernel.org>
-Cc: michal.swiatkowski@linux.intel.com, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, jramaseu@redhat.com,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	aleksandr.loktionov@intel.com
-Subject: Re: [PATCH iwl-net v1 2/2] ice: use NETIF_F_HW_CSUM instead of
- IP/IPV6
-Message-ID: <afhUUwTq7xPSe75N@mev-dev.igk.intel.com>
-References: <20260428070647.777141-3-michal.swiatkowski@linux.intel.com>
- <20260430152948.1683359-2-horms@kernel.org>
- <20260430162149.GC900403@horms.kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=J9zCQSX5p2pZuJfD4eljJelbkIZJRR4ozve7pG7A1V5alHGD4WRZwksKzDG9VPGV5k+KB4Xn0/jdVlL0bT/L8ESMoUO3EYxRVpDEzicWN0GEcamSuCOiln+g0qQPKujxCqqaiNeO4CpwCMTR9O4Qpw6Wu6WoyuCPT3I1Gc7A5gs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vvufxi4g; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-3652546e41aso714602a91.1
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 01:11:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777882278; x=1778487078; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=JMYtbUj01a1nUxyIuR4eIbeTRMLJqB5qPkqXXsohEzg=;
+        b=Vvufxi4g+y3iSewiybyPuqLpxrlTUp2N+mSh//ua9ozm9Ltu7k+iSLzZOUzn6geVQH
+         VDZO7aqvxvgJw5Mq0577iGaiQ4sfWaylCgn72Ab2VdsTQ0KhJAQTiiDIZWLyLOzhCJM1
+         dyGU3Mg5yudbdf8RicwHPGDiLCtLUAU4Q0H5QcW0KJuA+txKDVOTHWzpJv4QwK9WxLPj
+         /sZy5z7SbIO8RMiqXpwh3Rs8nJVhGNyw8gOU32QkCZVKx2gDupazUSBV6w8XAJfiJ/QV
+         J7+pvR6k7BTKc0UQub+8pwi5wNxMiQlz2AGZY852ZM7UZUWpIr6uI5l8dr++g9bgh6XQ
+         sCbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777882278; x=1778487078;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JMYtbUj01a1nUxyIuR4eIbeTRMLJqB5qPkqXXsohEzg=;
+        b=KejKHJc7zrkhRvGhrAwF5H347AqLyELb0Q8wo27qU6OsXkwREXTK0nhKVvg90AKuJz
+         IFl1P+ST2SvtMGhIoPXYvKnSAS34J/geuolm9XtztfXTxeBdT8dT07PvXTnq8ZGA0QDR
+         RxiEleYzmRQslemks5+0UTiab6CApSgiGfVqsx8ah6a0QVsnr5+sLOqjm96pYdY2ruOv
+         qJ8wVcn3k0TzSwD4Yt3C/rSgdtZbOXqPBa7A9a/eDI7JL+AAKJ2fJjZpEf3jCcxckTXH
+         1ifBQ9a73QQjCdR1sob/GfrTpAabnhBTiBD3MTlMnt2PfURuD4ERgSoKNC3/z3lHGQZ8
+         7r1w==
+X-Forwarded-Encrypted: i=1; AFNElJ8d9G0TNpqyc7o7IRsHm9V1MWxKyNG+oH9+ftIMXiA4CwAwSckOLb2/kQ7CcxfhDXi4+zI8uZA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+nfSHnamZBfoWDuqqnZhgiKbJ1h3qc/TeWc+XGzLQ5tWx8wjl
+	LCaeFT312x1xZFT3y6qvU9c0wGYMG9DG5eog2ehZJnuKo+glE7y5C/Nm
+X-Gm-Gg: AeBDietPHkS8sRdpelBPkpMEMyQVmqXN37ECnMz65B8mCPbp1bpDr6pzKG9ANQ8+8OM
+	vg+/7o39cD667V8yQ+epaeA4zG4B/4sJSi/IU/dtnxZ73DJMjZoFZLCdyF8Ln+bwtb9fqhJ1wxw
+	Olk0b3jkjgNR0vfPRBKcy3gCuOkFcJdPLVzvgSxMCfhmW4wtZKGvNHE4BNk/Rr5KZSmQecaHNPl
+	VZzqWiQm4ceAhhGSYAfUWahg4WO7YB6/DFeKcCmnh36tla3EYEGfCNkgPnnOjUGEq6Zi2Z0UZkv
+	xa5DlDZzxLhSMpGG+umvRXDtD+xEtUVJLxQY1qSzPTAt3iHtcmeIkSg4nlO3UEUCB0B8tSTwQnu
+	tB8rgVAkhc9UQt/I7o/LinXu7vC4qSxueX3weX4S2yJ+WdQWRVp4fm8tyStyCulMt9lXQTQ7jaa
+	cOutKbYRHs72xZOtOpPJtJ1nUL3vZYe1zxJ2X6biMXWO9rIie0OMZc6XG395ZVwV6r
+X-Received: by 2002:a17:90a:2ce2:b0:365:46aa:e62e with SMTP id 98e67ed59e1d1-36546aaec0bmr1885640a91.24.1777882277739;
+        Mon, 04 May 2026 01:11:17 -0700 (PDT)
+Received: from v4bel ([58.123.110.97])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-364dd3e9a3dsm11587831a91.16.2026.05.04.01.11.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 May 2026 01:11:17 -0700 (PDT)
+Date: Mon, 4 May 2026 17:11:13 +0900
+From: Hyunwoo Kim <imv4bel@gmail.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Eric Dumazet <edumazet@google.com>, HexRabbit <h3xrabbit@gmail.com>,
+	netdev@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Simon Horman <horms@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>,
+	linux-kernel@vger.kernel.org, imv4bel@gmail.com
+Subject: Re: [PATCH net] xfrm: esp: avoid in-place decrypt on shared skb frags
+Message-ID: <afhUocdXhimtPK5W@v4bel>
+References: <20260504073403.38854-1-h3xrabbit@gmail.com>
+ <afhQjlpmt2agPcRE@secunet.com>
+ <CANn89iLeX5eZuH6c=_HcADzgejYzE36HhFxmvg+2U3gqsOqHkg@mail.gmail.com>
+ <afhTekPcnIak0IcI@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260430162149.GC900403@horms.kernel.org>
-X-Rspamd-Queue-Id: 1837B4BA141
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <afhTekPcnIak0IcI@secunet.com>
+X-Rspamd-Queue-Id: B043F4BA089
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283746-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283745-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[google.com,gmail.com,vger.kernel.org,linuxfoundation.org,gondor.apana.org.au,kernel.org,davemloft.net,redhat.com,nvidia.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michal.swiatkowski@linux.intel.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mev-dev.igk.intel.com:mid,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,secunet.com:email]
 
-On Thu, Apr 30, 2026 at 05:21:49PM +0100, Simon Horman wrote:
-> On Thu, Apr 30, 2026 at 04:29:49PM +0100, Simon Horman wrote:
-> > From: 'Simon Horman' <horms@kernel.org>
+On Mon, May 04, 2026 at 10:06:18AM +0200, Steffen Klassert wrote:
+> On Mon, May 04, 2026 at 12:56:50AM -0700, Eric Dumazet wrote:
+> > On Mon, May 4, 2026 at 12:53 AM Steffen Klassert
+> > <steffen.klassert@secunet.com> wrote:
+> > >
+> > > We have antoher patch that addresses this issue in a different way,
+> > > so Cc the author of the other patch.
+> > >
+> > > On Mon, May 04, 2026 at 03:34:03PM +0800, HexRabbit wrote:
+> > > > From: Kuan-Ting Chen <h3xrabbit@gmail.com>
+> > > >
+> > > > MSG_SPLICE_PAGES can attach pages from a pipe directly to an skb. TCP
+> > > > marks such skbs with SKBFL_SHARED_FRAG after skb_splice_from_iter(),
+> > > > so later paths that may modify packet data can first make a private
+> > > > copy. The IPv4/IPv6 datagram append paths did not set this flag when
+> > > > splicing pages into UDP skbs.
+> > > >
+> > > > That leaves an ESP-in-UDP packet made from shared pipe pages looking
+> > > > like an ordinary uncloned nonlinear skb. ESP input then takes the no-COW
+> > > > fast path for uncloned skbs without a frag_list and decrypts in place
+> > > > over data that is not owned privately by the skb.
+> > > >
+> > > > Mark IPv4/IPv6 datagram splice frags with SKBFL_SHARED_FRAG, matching
+> > > > TCP. Also make ESP input fall back to skb_cow_data() when the flag is
+> > > > present, so ESP does not decrypt externally backed frags in place.
+> > > > Private nonlinear skb frags still use the existing fast path.
+> > > >
+> > > > This intentionally does not change ESP output. In esp_output_head(),
+> > > > the path that appends the ESP trailer to existing skb tailroom without
+> > > > calling skb_cow_data() is not reachable for nonlinear skbs:
+> > > > skb_tailroom() returns zero when skb->data_len is nonzero, while ESP
+> > > > tailen is positive. Thus ESP output will either use the separate
+> > > > destination-frag path or fall back to skb_cow_data().
+> > > >
+> > > > Signed-off-by: Kuan-Ting Chen <h3xrabbit@gmail.com>
+> > > > ---
+> > > >  net/ipv4/esp4.c       | 3 ++-
+> > > >  net/ipv4/ip_output.c  | 2 ++
+> > > >  net/ipv6/esp6.c       | 3 ++-
+> > > >  net/ipv6/ip6_output.c | 2 ++
+> > > >  4 files changed, 8 insertions(+), 2 deletions(-)
+> > >
+> > > This looks ok to me. From the IPsec point of view, I'm
+> > > fine with this patch, but it also touches generic
+> > > networking code. So I'd like to hear an opinion of one
+> > > of the networking maintainers before proceeding.
 > > 
-> > This is an AI-generated review of your patch. The human sending this
-> > email has considered the AI review valid, or at least plausible.
-> > Full review at: https://sashiko.dev
+> > I have not seen a Fixes: tag.
 > 
-> Sorry, the email I am responding to was supposed to come with
-> some commentary - it seems my method for adding it is broken :(
-> So I'm adding it below (as best as I can remember what it was).
+> Right, we need a v2 with a Fixes tag, and maybe also
+> 'Cc: stable@vger.kernel.org'
 > 
-
-Thanks for adding the comments.
-
-> > ---
-> > ice: use NETIF_F_HW_CSUM instead of IP/IPV6
-> > 
-> > This commit replaces the IP and IPV6 checksum offload flags with HW_CSUM
-> > in the ice driver to allow hardware checksumming for IPv6 packets with
-> > extension headers. It also removes the mutual exclusivity check between
-> > TSO and GCS.
-> > 
-> > > diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-> > > index 5f92377d4dfc..33f252a6a22f 100644
-> > > --- a/drivers/net/ethernet/intel/ice/ice_main.c
-> > > +++ b/drivers/net/ethernet/intel/ice/ice_main.c
-> > > @@ -3491,9 +3491,8 @@ void ice_set_netdev_features(struct net_device *netdev)
-> > >  			NETIF_F_RXHASH;
-> > >  
-> > >  	csumo_features = NETIF_F_RXCSUM	  |
-> > > -			 NETIF_F_IP_CSUM  |
-> > >  			 NETIF_F_SCTP_CRC |
-> > > -			 NETIF_F_IPV6_CSUM;
-> > > +			 NETIF_F_HW_CSUM;
-> > 
-> > By advertising NETIF_F_HW_CSUM, the network stack assumes the driver can handle
-> > checksums for any protocol and passes non-IP packets (e.g., from AF_PACKET
-> > injected frames) to the driver with CHECKSUM_PARTIAL.
-> > 
-> > Since ice_tx_csum() strictly parses the L3 header and expects IPv4 or IPv6,
-> > returning -1 for other protocols, will this regression cause non-IP packets to
-> > be silently dropped instead of falling back to software checksums in the kernel?
+> > Do we need to split this patch into two parts?
 > 
-> The problem above seems to be a legitimate concern, if a corner case.
-> It seems to also exist in i40e.
-> 
+> I don't think we need to spilt it, we can merge it
+> either to the net or the ipsec tree. Both should
+> be OK.
 
-I think there is a lack of skb_checksum_help() before one error return
-from ice_tx_csum(). I will add it.
+Also, please add:
+Reported-by: Hyunwoo Kim <imv4bel@gmail.com>
 
-> > Additionally, skb_csum_hwoffload_help() relies on NETIF_F_IPV6_CSUM to
-> > safely fall back to software checksums when IPv6 extension headers are
-> > present.
-> > 
-> > Does using NETIF_F_HW_CSUM bypass this safeguard, potentially causing
-> > legacy hardware (like E810) or E830 without GCS descriptors to compute
-> > incorrect pseudo-headers and silently corrupt IPv6 packets with extension
-> > headers?
-> 
-> The issue above seems to be a false positive as the ice driver
-> doesn't rely on the behaviour described. Rather ice_tx_csum()
-> uses ipv6_skip_exthdr() to correctly handle extension headers.
-> 
 
-Yeah, righ.
-
-> > 
-> > Finally, for protocols other than TCP, UDP, or SCTP, the driver falls back to
-> > calling skb_checksum_help(skb) in the default case of ice_tx_csum().
-> > 
-> > However, the driver appears to ignore the return value of skb_checksum_help().
-> > 
-> > If skb_checksum_help() fails (e.g., due to -ENOMEM during pskb_expand_head()),
-> > could this result in the packet being transmitted with an uncomputed checksum?
-> 
-> The problem above seems real to me, but it also seems to be pre-existing.
-> So I don't think it should delay progress of this patch.
-> 
-> If it is a problem, it also seems to be present in i40e.
-
-idpf, igbe too. It should return error in such case and drop the packet.
-What do you think, should I add the patch for that here or send it separately?
-To be honest I prefer sending it separately as this is in already exsisting
-code and touch more than one driver.
-
-Thanks
+Best regards,
+Hyunwoo Kim
 
