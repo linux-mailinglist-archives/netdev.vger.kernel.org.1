@@ -1,474 +1,307 @@
-Return-Path: <netdev+bounces-283835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283848-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OMv9MIib+GlgxAIAu9opvQ
-	(envelope-from <netdev+bounces-283835-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 15:13:44 +0200
+	id IL2KGp2c+GmdxAIAu9opvQ
+	(envelope-from <netdev+bounces-283848-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 15:18:21 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B3344BD9E6
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 15:13:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C3E724BDBB2
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 15:18:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CB6FB30BB9B3
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 13:08:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E911730D37C8
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 13:12:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A351F3D905D;
-	Mon,  4 May 2026 13:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 904023D903B;
+	Mon,  4 May 2026 13:11:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b="vRzD39VN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HiNiin/d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A70433D812B
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 13:07:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777900077; cv=none; b=YSbhP50jY2I64JIuG4Nu3lrjPJ36VIsB2J6KB/D7mf1VetuWmZPIhha2VWOJ1rM2jieR2tIchIb8Nv3CUCxNwmbbs+acneEsnz3Ut3vk23FJlaLRyIP7TEpIjExoppdjDvzpvTg5uxkVUXtDGLH58lIScUojfKb0fk08XJ0RlaI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777900077; c=relaxed/simple;
-	bh=SfrLhYfvia58mIrqMwiqY24xvyzZfeN95GCFj9Ymlu8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eHtFqFkTDDTWs1OJsyPVP7tvD2j+HdS8TEWwOiBdVHVLwzBbqULBmw7y2zwSy+zsBZILiDKqfnNFMhXkQJzwTh2zScKtw+fwovYttY7+/CdapN17YEnzZh8vBP0vFu3vBHtTXAKVwILnEhtly/oV6Kpfp+mjVtoPaQFBQb5nfeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com; spf=pass smtp.mailfrom=riscstar.com; dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b=vRzD39VN; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riscstar.com
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-8b6c9fdb68cso17006166d6.2
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 06:07:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=riscstar-com.20251104.gappssmtp.com; s=20251104; t=1777900075; x=1778504875; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=orEuFxihbtCw78bb0MGSYlMJ0pgE+offZfO0F9CrVb0=;
-        b=vRzD39VN3deczejGqt9SufnxB8wHk6NHfv9oYhWXRya1NwOOjMIr9pvl/sNUvMCl9H
-         FOi1wFLMGpO1uG+7ISWuUgc9msPeJIczmqB/JK/kknw36JtsV1Iog4u/ZSQcDuZcwLdW
-         3crdaBslFVDS7hgCZcj0Ga1++6O3wReejN6gK2qSHNq0CB2w8thMmsCPbk37852ToJev
-         W14PGnDaI6D/WpVMtBJJILy2gxHKuZh2ppEJq3aRW9hwUJ9+G+JTC/mf9DX7+06Y/fl7
-         qq9mCTQYjdFGU+GBx6FzsXtT+MCOhrPDHsqpdEwrGLNgfM69naPCqIzNylOrB/g52E+E
-         GfUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777900075; x=1778504875;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=orEuFxihbtCw78bb0MGSYlMJ0pgE+offZfO0F9CrVb0=;
-        b=VqtRYMI8d4AF+6zHRK/xUxzjdfm+ogGyKxCJl8En9JioRalIspdyoJl5utxRQq48hz
-         L2prr6HIad8QPZoaXWazcVAMTSbTaKOm+/S4yYtiVqMQoSc6ls3Be+Pk1PE5/ky6AMok
-         NIRJ3+n7EgIyl0HV+RtTiP5UDJG2eq6Ihg8uUjl73avsC7gr8xzK1GfwqbDyK0r69pYI
-         X0ysjZfYvVi/1N6oHofht9K21oquFIdvm35eVvX9OkYnHBTy6dAbRKDIbcGQgbc2j4q2
-         +fZ1deu442ZjPQVkynTjbQTfW9NoouTl2fBjJOakXKzqUGDwiqGqamf763oNChOUcIHs
-         EpfA==
-X-Forwarded-Encrypted: i=1; AFNElJ+O8uvqkeu0FFWEl9G4cnGnAhm0qG8bOS+Qou8P5uRQxW0H9H+qDj6sB2lCoyjnC9cMNUhdGKg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8gzDcfJ57AeQk0B7Q54Dz3fy2rquOBo+YuAz4ynurnSpAzRyO
-	JPHHLvrXXFbCG1EChvBrUEPZwrFKzVliItuxWngTlP3fT3VLmdGtGE70jHGE0kgGUZU=
-X-Gm-Gg: AeBDieuFCychG+KQ5sMSte+IuueJPg+OrtaZpyAYiORiwKmtZbSmyMxnL+0gxooVZlB
-	yRZvX1yWSIeuSWR7pfIidr4/4CrKV46FcZZ/Xsg9qcmifN2BC4yG4+nuls1LhRSfejswDjMGZb1
-	I/W2+bpRhI+8T3A6tzx1foSQ3SYkoSq5TmrALqE3jtHZfBCnkGSSfWlg/xUUl2N/rwPGaxw04md
-	tQcya/J61DlptkrbcxgHErQ9XqA9tYut6JGmFGjH2u30oVM4AHC2Nab2kG7ciljyxvVowmyix3m
-	OD2Q1BH/zwbcsv5fEl2v5OyFUKKSReqrb7hnJ3Pz43CLV264adFE3ExnV0dj+jIYT8lu5MPqjAC
-	INA4dXszUvVQMSOTPurzxouJdOit3mKaE06Lrp7M8C7bE3X9BdGzBVvwfta1tC9N7QXu7QujDkt
-	INVTfmyjGqGhE4Q++7w7EJuA2ci0OCpM8KN/O7Ph3kt12GL5sjumVim6X80ViefESdOsGoij0+w
-	Q==
-X-Received: by 2002:a05:6214:5342:b0:8ac:b4d5:50ec with SMTP id 6a1803df08f44-8b668a1fafbmr160317526d6.38.1777900074368;
-        Mon, 04 May 2026 06:07:54 -0700 (PDT)
-Received: from [172.22.22.28] (c-75-72-117-212.hsd1.mn.comcast.net. [75.72.117.212])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b53c6b8398sm130363776d6.37.2026.05.04.06.07.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 May 2026 06:07:53 -0700 (PDT)
-Message-ID: <53fb87c9-25f3-4da1-aa7b-104c10c92a06@riscstar.com>
-Date: Mon, 4 May 2026 08:07:50 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 853693D567D;
+	Mon,  4 May 2026 13:11:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777900306; cv=fail; b=ennMPsAau9EeP4QsfSvjnfkRh0JSAymPjgM1OiKLYhbISRiSpVh2GVjGU5JfLmnwJ8Bgb5xNxSgBeIkFK0fBcfFEoC30rRX81AzvWkBLm2TvQH4bvvj8NP7TcnTQC7ihHa35286GIawFcce1yVXfpmx3fyAwUcR5r86cRc+vfEU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777900306; c=relaxed/simple;
+	bh=GKx0v6ghzyiiyKL1b2aF4rlj7Oe/hjegscBz35C44sc=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=hP5YgmBq4XHFfvQYj8mJesHHkhff4YOBHSIEkoNsBPcR9uEzUxu+fcTRYOcYoYNkgKne/TdMjbfyUZYKDDiKfTYKZ9oyz/GWLxKkxOnyI6F3enmOXp2bd1/SWgN/wXL24gk86z8E1P6YOKxpRIo4bK+Ay3rKaCyZZ74t6Fgaulo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HiNiin/d; arc=fail smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777900304; x=1809436304;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=GKx0v6ghzyiiyKL1b2aF4rlj7Oe/hjegscBz35C44sc=;
+  b=HiNiin/d03MTnB4f8gLFPftIjvbU3IrQcVL4COJJS970IhO1evy7QC73
+   Fqu15NPe+1cHdqrXWei8+iFRqQIwe6byOUcm1PpdROJJFq7O84L1hGye9
+   FHqs31j8uC61HpydD83hU1I2OdmFMj02Xy4jA/x+9M9WQe3O4NPz//wc+
+   SlhC6hJIaZroJfhGW5SH1he60OVYDLnRejpWuoQiwZcKqIc8dih+QlSHj
+   BLYhCHyvZolsp7EoxENw+h8FHW9cxH401OWKPf+DDyOsdHenLgqsEsamE
+   L8d/1ZxLubNDcQ2encg00AryLeoOi04x4BjYnxYQl6SUhZIPX31Q7hU1U
+   A==;
+X-CSE-ConnectionGUID: Gz5wJjCrT8WJ9MF4k852DQ==
+X-CSE-MsgGUID: W35S2AhBRqaEnW9fZnz4mw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11776"; a="82366555"
+X-IronPort-AV: E=Sophos;i="6.23,215,1770624000"; 
+   d="scan'208";a="82366555"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 06:11:43 -0700
+X-CSE-ConnectionGUID: xnWSFZqeRYSUpg1FXLNh1Q==
+X-CSE-MsgGUID: 06oFl7Y4TU2iJ1RSNBm8pA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,215,1770624000"; 
+   d="scan'208";a="234652069"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 06:11:44 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 4 May 2026 06:11:43 -0700
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Mon, 4 May 2026 06:11:43 -0700
+Received: from DM1PR04CU001.outbound.protection.outlook.com (52.101.61.33) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 4 May 2026 06:11:42 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=X4yysZQG95rocaiy9DaD6gK2z9mdR2t9BPGr3rTucXRBCtvED/sjgOiCi4m554I598dmYYMHj1o1Aa9IMfOelQ3UeRlSOSabL4ZAPEo9XZ7fjYiCnOECLgmwFyYu0w8rnUaqe7ETIka6/omaTHwvxw8luNxa4/d1xvhZnXUOveJWj0pAryD4ucLGA0tMRTmE94sa49uWQ4warQ1gVIX4bHL63Cxr/LgAYOb853Gcam+qJzbfqfqdt2mOF3mEgA1EdpDIAP81NTtQsuFmXQWCBmxad5f6AtVXLTvZazMSCMJRcBwUrT7WmLhYbASRB6eyGs2i9ceNBv1sn2maHbyXlg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=of6Fiaf/IpKk3XwG069heysr6eP3/97tbHcdfL1nUz8=;
+ b=gol8DFBw6MzJjGvapmtS70C96zDa8rfh1rIb8KlvAp2D3fXeNMwlA7sSF92tzB1P1AJcOZBsMq6cr+niA3bk6ECWbSKjr6Ti/Uqrl/97zmFHTT//8xyVZ4X0z4iIm3gQXhBDUSY0Zz+wj43Rm7YufOci89WIZOTsIrJlxnJw40uhRWSgsO6rB4bOVcnpHq7kwjAgf0qEr0ZVIcsQdo3OrCSt4dTWKl9YMTu/F224lL0BrdwYpmCKKV2BP1xq9XgN+IAuvHASlNkBAzwJLCykPCP+sAAKSmwFRFRzqp72oKm8HkoO/Omojii+AirUCEd34kpn6NHTOadaFrgQGMVnBw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by BL3PR11MB6315.namprd11.prod.outlook.com (2603:10b6:208:3b2::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Mon, 4 May
+ 2026 13:11:06 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::8d98:e538:8d7:6311]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::8d98:e538:8d7:6311%5]) with mapi id 15.20.9870.023; Mon, 4 May 2026
+ 13:11:05 +0000
+Message-ID: <3bce6411-6d65-4f4d-b5db-53fffbb0b77d@intel.com>
+Date: Mon, 4 May 2026 15:09:28 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] ice: fix stats array overflow when VF requests more
+ queues
+To: Michal Schmidt <mschmidt@redhat.com>
+CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Jacob Keller <jacob.e.keller@intel.com>, Petr Oros
+	<poros@redhat.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20260427151827.43342-1-mschmidt@redhat.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <20260427151827.43342-1-mschmidt@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1P191CA0004.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:800:1ba::10) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 09/12] gpio: tc956x: add TC956x/QPS615 support
-To: Bartosz Golaszewski <brgl@kernel.org>
-Cc: daniel@riscstar.com, mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com,
- alexandre.torgue@foss.st.com, ast@kernel.org, boon.khai.ng@altera.com,
- chenchuangyu@xiaomi.com, chenhuacai@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, hkallweit1@gmail.com, inochiama@gmail.com,
- john.fastabend@gmail.com, julianbraha@gmail.com, livelycarpet87@gmail.com,
- matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc,
- prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
- rohan.g.thomas@altera.com, sdf@fomichev.me, siyanteng@cqsoftware.com.cn,
- weishangjuan@eswincomputing.com, wens@kernel.org, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, maxime.chevallier@bootlin.com,
- rmk+kernel@armlinux.org.uk, andersson@kernel.org, konradybcio@kernel.org,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, linusw@kernel.org,
- arnd@arndb.de, gregkh@linuxfoundation.org
-References: <20260501155421.3329862-1-elder@riscstar.com>
- <20260501155421.3329862-10-elder@riscstar.com>
- <CAMRc=McWXCqyv1LmWMuEMmE3HqaURx_eMD8rkDs9AJT+7W2aYw@mail.gmail.com>
-Content-Language: en-US
-From: Alex Elder <elder@riscstar.com>
-In-Reply-To: <CAMRc=McWXCqyv1LmWMuEMmE3HqaURx_eMD8rkDs9AJT+7W2aYw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 2B3344BD9E6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|BL3PR11MB6315:EE_
+X-MS-Office365-Filtering-Correlation-Id: be91d9e4-8649-41f1-dc5d-08dea9de9917
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014|18002099003|22082099003|56012099003;
+X-Microsoft-Antispam-Message-Info: YlD6bht/uLnfWac9JCYPB/vLA+JCx8pWdu+9lRDRXoIFpJq0S4JefOxbqXQPGT05IV2cjuWcP4XIt0SDvnF1pEUlC3hqc8foihKvm73pukp9kBvXvbQGQHj+MBWIAzxPh/dt3s5ZljwBYbhxH9E0qd2scznVMQzutr7j3+z/GjMWSeVSdxI1eUwNcFAjkC/PHXEJVcV3VCR8Ir6POE5ed5wcI/V5GHedQdS+AegBLMPx3I6/SDUMxmNsZ1iDmDNNAp3HmIF7l4I2De6vuQto1DwL7ZR9Xtsj+WTUEOKVOf6wyK1cSz/T9tgn+NSZQ2nZT9xCj053jFzkrSH6vh0irt7fpOK8dQeHG22KWzGFA+4nAtz8fq/oib6d6Wi7lR/gZQpiormhPSO0jI/RcX7M0U55fLRtbFUt8EgSMS4HM3Z2ByKWLzoJoE3U7VNrLZ7JWzj/dBtmiiJCFgnLFrwmLaNQ4s43J3lwU+OxjB2vxvm57eD8qcR6EJ4t01xSQREOyd7HmdtMy4T5iiPF0FMcQQdNnq94wMZdooPvofF9HC7b8mu6+9DnXUQYc4Nlk0AtJ8aXvmgJh3FqkDuRlacFa2uFPZKDgVSNEeEmBNlrYt9zJ6qL8OlonI6nZeyDLj2NU5/y8H+UKAGrzL26lU5Uko4Z5PS5QtH/hMyZowMgAaw6mvCBQF23Ar0F/FwBXrOw
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VXFMTGhSL3cxR0JkQXFxQUVvaGhwWWxnRkhLRjRFR0VjenlzQWUwMGhNcEdY?=
+ =?utf-8?B?cjhmV1dMaGsyRUZwQXFTZXBVTEpHbVoxakZVZDBOLzZQSXk0SVo2Y29WLzRK?=
+ =?utf-8?B?WXlxYXBEbkJrclYvVERLM2tjTHpoalEwUmpJSmt3R2pRb0hvZHprVHZEMllo?=
+ =?utf-8?B?MVlFRWcvSVJOU3g4WXYzeUNOMm0vbG42MXVqRnFVOWUycXF5SHZnbjMzaVpT?=
+ =?utf-8?B?UGxTR3lGODU4eStuYnkxN2w5djNqRXZzYWhUUmJQTHZJSmdyMUFGTHhCbDhM?=
+ =?utf-8?B?MGlIUXhMbzBxL2FrcENybDk2Vy9CNXQremZMNGRqdG1JQTZXK1R2VTJjUjJH?=
+ =?utf-8?B?N1llOFlQaXlQcTBodjU3OURDY2hrem9HUkNGaGpLZ29VTXQ4SkJ4NSswNUZV?=
+ =?utf-8?B?Rzk4VnM3WXEvY20yQjU4S3RRSVZlL1BrN2I2Z2R5Lzg5bHFHczdMNm5uYkpB?=
+ =?utf-8?B?cUVEaWY5aC8xNHg5bnViY3hUSVBJT1YxczlVK3hYbVo5alp3Tmh5ZzNsQVlR?=
+ =?utf-8?B?bWtScVhoL1c2TXpKWUtLSktPRGRqVnBNS3NNcG1GZk80UENNTjdNM0hEVUFL?=
+ =?utf-8?B?TTB2K0ZWUFEzU1BvQ01LRXFwUzcyaG1wUXl3Sm5jWUM5SERrRG1uMmY2ay9W?=
+ =?utf-8?B?R0V6ZHdGS2QyMGpvTlFZclZ0U1BtNGY3MnhyS1RYdjVkUnJ2eXRPRlczT2tm?=
+ =?utf-8?B?UjJ1Mk11MXAvVWF3NHZMWHdtQ09VcE1tNjdYd3JkODhDeEZNcDk0ZjhtLzFW?=
+ =?utf-8?B?MjBkaWlMdE9PRitYN3lKZ1VmbnJKRE42TVZxd3NhSWd6S2dMMDhLTys1djk2?=
+ =?utf-8?B?SHU1UHlEUC9vVHJtRVY1cVFLemhvZWg1ZjZKQzR5MXlQWlZ3ZFZjN25mdzVY?=
+ =?utf-8?B?VDdkWXpXdGkycDJwbit0Rnp0QnUrT0FUek01TjBLVVVMT01oa2ZDR29SUVR5?=
+ =?utf-8?B?b1VKbGFqazROcG5GblJuTDduTVByN3pIV29tMmVxOVFkV01Ua2pzSm92aEhB?=
+ =?utf-8?B?VWZHVHZwL0ZuL3EyY0hTR1hSeTFIN3RwR1ZKdWQrR295SDVEV2tCWVBNZHh3?=
+ =?utf-8?B?T3lSak9tMi9KY3R5WndoU0VWRXROUlFyR013UFJEbFpFeTd6K3RWWjVrcXkw?=
+ =?utf-8?B?czVpbUZlZExlYVdQZWpadkcxMlNDUjl2ME5pZ3plbzJFWENiT3M2cEJwaUlM?=
+ =?utf-8?B?Yk54VUV1N2pNbTVUM2xwNWcrOUIrTVBxTkpTaDI3b1NocytIU1BuYzF5UlJ4?=
+ =?utf-8?B?VDRWS3l0c0FmZGpvY3d1S1dZdUdtaG1BRHFHMlhEMTR3SjJ5NFgxcnZQV0Nh?=
+ =?utf-8?B?VGgxRFNGMmpCcE9JclFGRFpKbmZETUg1WE5EYnZaanR5RGYwNDJIY0dWNDZF?=
+ =?utf-8?B?NHdad2FlOGxJK1Z1Vjd0WlVpSWJESExpWHA2V2NjLytucm5obzBrbHBVdUFv?=
+ =?utf-8?B?UVNjUWc0Zk5mZW1jODZ4R2RtWFd6dmxKWEx5MjloUHFZZjFTM1FjL25JREg3?=
+ =?utf-8?B?ZGdLQkZmZFVLUFE3N1dhY2hPSXpTQUMzRGthRnoxUnh3QlhOM0dTcUNPU0xU?=
+ =?utf-8?B?cFN0QkNRbVFIZnBIS2diWlJRUXVGSTJkcXc4UjJoNm5WZEtuUi82ZWxQTVF2?=
+ =?utf-8?B?T3dHaGJuOXR3N09GZlFVQzlMdTNocTFuK0pldS9OczBPemF6L2FRd2NjUlF0?=
+ =?utf-8?B?Um9pMmM1R080bng2WTFwaDdUakduK0hld0laZGJyRHRmWlJrZW1IRTAzR2Fl?=
+ =?utf-8?B?cnJNQW5PY1VqV2IrT0RWVktBMkJOUCtGTzBQVHlPd0dnSUtEcGZNUzAvb1Rj?=
+ =?utf-8?B?Y1JYdWxTVGJ5eVQwMmo2bXM1cjdWWVRHcUZ1TFo4dzZUdHBuL2pGQnBuTVM5?=
+ =?utf-8?B?NHRuRk84eUVjU0VmdGJsTzF1OXo3RXF4Q28yRWdrMW1QSnliKzRRM1VFWXpK?=
+ =?utf-8?B?THFvSmtYeFhWYzUrdnNWTER1c2pqclpyMW5yNTBDZGtTRFFoQndTRHZOK0t5?=
+ =?utf-8?B?bnJUNDdPRzhEeDhYU2htL3dYUGpnWWF0ZTBybG1wSGZoWFBycnpMT1BzbTJQ?=
+ =?utf-8?B?S0x1Z3p6MXJiVWY5QllCeFk2TkUwa1ltTGtOUm5PeFcwQmMvU2ZiTTFpekhZ?=
+ =?utf-8?B?QWNCMWtyK2Jja2ptdmRYRFBWNUxXTk5ZY2ZQUjFocFFyT1o0VGZWSW5FdnVD?=
+ =?utf-8?B?T29BSE05TWdabG9WaTcxSnNJaHUwQnp1a01Oc0lRaE9jWFptRnVOamkzaTlQ?=
+ =?utf-8?B?a1NCU0NWeVhxOFhCSTVMWXZwdmszTnZNQkFIaHZSa1RsOHdoMGtOOFEzL0Q3?=
+ =?utf-8?B?R3B0ck84Qmthdm9GN3FQQ3FCMHJ6UEV6RlFDdGxBYWs5bytBTHJtanpHNGQ0?=
+ =?utf-8?Q?ccjjeuW40KDjPO1o=3D?=
+X-Exchange-RoutingPolicyChecked: a+fXiFOqsEaCE90G1zZYcbn+D1XoHC8jjOsLZjfnMzHaW3VOig0l1IhUbC3TY6ZScUBqtugmsrLuEUZZ9BBXhRAIZQc85yaNR0DPjB6NsjWQNlxbdSd/rWXpNxPhCcXc8UkBz3CUiqMs5plxFKSiQvD8VXj152wfczhUrsbidMB35gJbtSISjZ01JtqKAw2cnjXDTR+JLThgj23/w9ve1Qhjz7yBLSoFaRXfEWgJ00jbURWmbvzUh3d0c7yKrxkgnzLJdu2mngRgYQtX6rJXXhChOIjLEqe2Loc160lfRru9mJX0dqgp6yGcWwYL8sSZ089BuesameNpy2XxBNCXpw==
+X-MS-Exchange-CrossTenant-Network-Message-Id: be91d9e4-8649-41f1-dc5d-08dea9de9917
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2026 13:11:05.6927
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 47MDRRNazBwvto6al72fUkUMg2inYY+94or/Q25kCtT6mwes2XatiCcN/UGFEvbZuDFdzHQ49LBkSBkNfZ3dDNwyErSJG/Q1Ny1OX1RW7nU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB6315
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: C3E724BDBB2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.06 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[riscstar-com.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[riscstar.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283835-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[riscstar.com,oss.qualcomm.com,gmail.com,foss.st.com,kernel.org,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,lunn.ch,davemloft.net,google.com,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org];
-	RCPT_COUNT_TWELVE(0.00)[49];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[riscstar-com.20251104.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[elder@riscstar.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-283848-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid,atlassian.net:url];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,kernel,dt];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[przemyslaw.kitszel@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,riscstar-com.20251104.gappssmtp.com:dkim,riscstar.com:mid,riscstar.com:email]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 
-On 5/4/26 7:46 AM, Bartosz Golaszewski wrote:
-> On Fri, 1 May 2026 17:54:17 +0200, Alex Elder <elder@riscstar.com> said:
->> Toshiba TC956x is an Ethernet-AVB/TSN bridge and is essentially
->> a small and highly-specialized SoC.  TC956x includes a GPIO block that
->> can be accessed, alongside several other peripherals, via two PCIe
->> endpoint functions.  The PCIe function driver creates an auxiliary
->> device for the GPIO block, and that device gets bound to this auxiliary
->> device driver.
->>
->> Co-developed-by: Daniel Thompson <daniel@riscstar.com>
->> Signed-off-by: Daniel Thompson <daniel@riscstar.com>
->> Signed-off-by: Alex Elder <elder@riscstar.com>
-
-Thanks Bartosz, I've got some responses below.
-
->> ---
->>   drivers/gpio/Kconfig       |  11 ++
->>   drivers/gpio/Makefile      |   1 +
->>   drivers/gpio/gpio-tc956x.c | 209 +++++++++++++++++++++++++++++++++++++
->>   3 files changed, 221 insertions(+)
->>   create mode 100644 drivers/gpio/gpio-tc956x.c
->>
->> diff --git a/drivers/gpio/Kconfig b/drivers/gpio/Kconfig
->> index 020e51e30317a..746cedea7e91d 100644
->> --- a/drivers/gpio/Kconfig
->> +++ b/drivers/gpio/Kconfig
->> @@ -1646,6 +1646,17 @@ config GPIO_TC3589X
->>   	  This enables support for the GPIOs found on the TC3589X
->>   	  I/O Expander.
->>
->> +config GPIO_TC956X
->> +	tristate "Toshiba TC956X GPIO support"
->> +	depends on TOSHIBA_TC956X_PCI
->> +	default m if TOSHIBA_TC956X_PCI
->> +	help
->> +	  This enables support for the GPIO controller embedded in the Toshiba
->> +	  TC956X (and Qualcomm QPS615).  This device connects to the host
->> +	  via PCIe port, which is the upstream port on an internal PCIe
->> +	  switch.  On some platforms, a few of the GPIO lines are used to
->> +	  manage external resets.
->> +
->>   config GPIO_TIMBERDALE
->>   	bool "Support for timberdale GPIO IP"
->>   	depends on MFD_TIMBERDALE
->> diff --git a/drivers/gpio/Makefile b/drivers/gpio/Makefile
->> index b267598b517de..c3584e7cba9b4 100644
->> --- a/drivers/gpio/Makefile
->> +++ b/drivers/gpio/Makefile
->> @@ -178,6 +178,7 @@ obj-$(CONFIG_GPIO_SYSCON)		+= gpio-syscon.o
->>   obj-$(CONFIG_GPIO_TANGIER)		+= gpio-tangier.o
->>   obj-$(CONFIG_GPIO_TB10X)		+= gpio-tb10x.o
->>   obj-$(CONFIG_GPIO_TC3589X)		+= gpio-tc3589x.o
->> +obj-$(CONFIG_GPIO_TC956X)		+= gpio-tc956x.o
->>   obj-$(CONFIG_GPIO_TEGRA186)		+= gpio-tegra186.o
->>   obj-$(CONFIG_GPIO_TEGRA)		+= gpio-tegra.o
->>   obj-$(CONFIG_GPIO_THUNDERX)		+= gpio-thunderx.o
->> diff --git a/drivers/gpio/gpio-tc956x.c b/drivers/gpio/gpio-tc956x.c
->> new file mode 100644
->> index 0000000000000..12221d8f812d9
->> --- /dev/null
->> +++ b/drivers/gpio/gpio-tc956x.c
->> @@ -0,0 +1,209 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +
->> +/*
->> + * Copyright (C) 2026 by RISCstar Solutions Corporation.  All rights reserved.
->> + */
->> +
->> +/*
->> + * The Toshiba TC956X implements a PCIe Gen 3 switch that connects an
->> + * upstream x4 port to two downstream PCIe x2 ports.  It incorporates
->> + * an internal endpoint on a internal PCIe port that implements two
->> + * Synopsys XGMAC Ethernet interfaces.
->> + *
->> + * 35 GPIOs are also implemented by an embedded GPIO controller.  Three
->> + * registers control the first 32 GPIOs (other than 20 and 21, which are
->> + * reserved).  Three other registers control GPIOs 32 through 36. GPIOs
->> + * 22-24, 27-28, 31, and 34 are treated as "input only".
->> + *
->> + * There is a TC956X PCI power controller driver that accesses the
->> + * direction and output value registers for GPIOs 2 and 3.  These
->> + * GPIOs control the reset signal for the two downstream PCIe ports.
->> + * Their values will never change during operation of this driver, and
->> + * this driver reserves these two GPIOS.
->> + */
->> +
->> +#include <linux/auxiliary_bus.h>
->> +#include <linux/dev_printk.h>
+On 4/27/26 17:18, Michal Schmidt wrote:
+> When a VF increases its queue count via VIRTCHNL_OP_REQUEST_QUEUES,
+> ice_vc_request_qs_msg() sets vf->num_req_qs and triggers a VF reset.
+> The reset calls ice_vf_reconfig_vsi(), which does ice_vsi_decfg()
+> followed by ice_vsi_cfg(). ice_vsi_decfg() does not free the per-ring
+> stats arrays. Inside ice_vsi_cfg_def(), ice_vsi_set_num_qs() updates
+> alloc_txq/alloc_rxq to the new larger value, but
+> ice_vsi_alloc_stat_arrays() returns early because the stats already
+> exist. ice_vsi_alloc_ring_stats() then iterates using the new larger
+> alloc_txq and writes beyond the bounds of the old, smaller
+> tx_ring_stats/rx_ring_stats pointer arrays, corrupting adjacent SLUB
+> metadata.
 > 
-> This is implied by device.h which is guarnteed by platform_device.h. Please
-> drop it.
+> KASAN detects the bug:
 
-OK, I'll drop it.
-
->> +#include <linux/gpio/driver.h>
->> +#include <linux/module.h>
->> +#include <linux/platform_device.h>
->> +#include <linux/regmap.h>
->> +
->> +#define DRIVER_NAME		"tc956x-gpio"
->> +
->> +#define TC956X_GPIO_COUNT	37	/* Number of GPIOs (20-21 reserved) */
->> +
->> +/* The GPIO offsets are relative to 0x1200 in TC956X SFR space */
->> +#define GPIO_IN0_OFFSET		0x00		/* Input value (0-31) */
->> +#define GPIO_EN0_OFFSET		0x08		/* 0: out; 1: in (0-31) */
->> +#define GPIO_OUT0_OFFSET	0x10		/* Output value (0-31) */
->> +
->> +#define GPIO_IN1_OFFSET		0x04		/* Input value (32-36) */
->> +#define GPIO_EN1_OFFSET		0x0c		/* 0: out; 1: in (32-36) */
->> +#define GPIO_OUT1_OFFSET	0x14		/* Output value (32-36) */
->> +
->> +/*
->> + * struct tc956x_gpio - Information related to the embedded GPIO controller
->> + * @chip:		GPIO chip structure
->> + * @regmap:		MMIO register map for SFR GPIO region access
->> + * @input_only:		Bitmap indicating which GPIOs are input-only
->> + */
->> +struct tc956x_gpio {
->> +	struct gpio_chip chip;
->> +	struct regmap *regmap;
->> +	DECLARE_BITMAP(input_only, TC956X_GPIO_COUNT);
->> +};
->> +
->> +static int tc956x_gpio_get_direction(struct gpio_chip *gc, unsigned int offset)
->> +{
->> +	struct tc956x_gpio *gpio = gpiochip_get_data(gc);
->> +	u32 reg;
->> +	u32 val;
->> +
->> +	if (test_bit(offset, gpio->input_only))
->> +		return GPIO_LINE_DIRECTION_IN;
->> +
->> +	reg = offset < 32 ? GPIO_EN0_OFFSET : GPIO_EN1_OFFSET;
->> +
->> +	regmap_read(gpio->regmap, reg, &val);
->> +	if (val & BIT(offset % 32))
->> +		return GPIO_LINE_DIRECTION_IN;
->> +
->> +	return GPIO_LINE_DIRECTION_OUT;
->> +}
->> +
->> +static int tc956x_gpio_direction_input(struct gpio_chip *gc,
->> +				       unsigned int offset)
->> +{
->> +	u32 reg = offset < 32 ? GPIO_EN0_OFFSET : GPIO_EN1_OFFSET;
->> +	struct tc956x_gpio *gpio = gpiochip_get_data(gc);
->> +	u32 mask = BIT(offset % 32);
->> +
->> +	return regmap_update_bits(gpio->regmap, reg, mask, mask);
->> +}
->> +
->> +static int tc956x_gpio_direction_output(struct gpio_chip *gc,
->> +					unsigned int offset, int value)
->> +{
->> +	struct tc956x_gpio *gpio = gpiochip_get_data(gc);
->> +	u32 vreg;
->> +	u32 dreg;
->> +	u32 mask;
->> +
->> +	if (test_bit(offset, gpio->input_only))
->> +		return -EINVAL;
->> +
->> +	if (offset < 32) {
->> +		vreg = GPIO_OUT0_OFFSET;
->> +		dreg = GPIO_EN0_OFFSET;
->> +	} else {
->> +		vreg = GPIO_OUT1_OFFSET;
->> +		dreg = GPIO_EN1_OFFSET;
->> +	}
->> +	mask = BIT(offset % 32);
->> +
->> +	/* Set output value first, then direction */
->> +	regmap_update_bits(gpio->regmap, vreg, mask, value ? mask : 0);
->> +
->> +	return regmap_update_bits(gpio->regmap, dreg, mask, 0);
->> +}
->> +
->> +static int tc956x_gpio_get(struct gpio_chip *gc, unsigned int offset)
->> +{
->> +	u32 reg = offset < 32 ? GPIO_IN0_OFFSET : GPIO_IN1_OFFSET;
->> +	struct tc956x_gpio *gpio = gpiochip_get_data(gc);
->> +	u32 val;
->> +
->> +	regmap_read(gpio->regmap, reg, &val);
->> +
->> +	return val & BIT(offset % 32) ? 1 : 0;
->> +}
->> +
->> +static int tc956x_gpio_set(struct gpio_chip *gc, unsigned int offset, int value)
->> +{
->> +	u32 reg = offset < 32 ? GPIO_OUT0_OFFSET : GPIO_OUT1_OFFSET;
->> +	struct tc956x_gpio *gpio = gpiochip_get_data(gc);
->> +	u32 mask = BIT(offset % 32);
->> +
->> +	return regmap_update_bits(gpio->regmap, reg, mask, value ? mask : 0);
->> +}
->> +
->> +static int tc956x_gpio_init_valid_mask(struct gpio_chip *gc,
->> +				       unsigned long *valid_mask,
->> +				       unsigned int ngpios)
->> +{
->> +	/*
->> +	 * GPIOs 2 and 3 are used by the PCI power control driver, and
->> +	 * we don't allow them to be used.  GPIOs 20 and 21 are reserved
->> +	 * (and not usable).
->> +	 */
->> +	bitmap_fill(valid_mask, ngpios);
->> +	bitmap_clear(valid_mask, 2, 2);
->> +	bitmap_clear(valid_mask, 20, 2);
->> +
->> +	return 0;
->> +}
->> +
->> +static int tc956x_gpio_probe(struct auxiliary_device *adev,
->> +			     const struct auxiliary_device_id *id)
->> +{
->> +	struct device *dev = &adev->dev;
->> +	struct tc956x_gpio *gpio;
->> +	struct gpio_chip *gc;
->> +
->> +	if (!dev->platform_data)
->> +		return -EINVAL;
->> +
->> +	gpio = devm_kzalloc(dev, sizeof(*gpio), GFP_KERNEL);
->> +	if (!gpio)
->> +		return -ENOMEM;
-> 
-> Add newline.
-
-I will add a newline here.
+[...]
 
 > 
->> +	gpio->regmap = dev->platform_data;
+> ice_vsi_rebuild() handles this correctly by calling
+> ice_vsi_realloc_stat_arrays() before reconfiguration, but
+> ice_vf_reconfig_vsi() was missing this call.
 > 
-> It's not clear whether this is an mmio regmap or a slow-bus one that can fail.
-> In the code above you're checking the return values of regmap operations quite
-> inconsistently. Could you please verify if you need it and either always check
-> them or not at all?
-
-You're right.  I'm returning the result of regmap_update_bits()
-from two callback functions.  But yes, this is an MMIO regmap.
-
-I will return 0 and ignore the return value of regmap_update_bits()
-in those spots, and will add some comments that make it clear that
-this is an MMIO regmap.
-
->> +
->> +	/* Mark GPIOs 22, 23, 24, 27, 28, 31, and 34 as input only */
->> +	bitmap_set(gpio->input_only, 22, 3);
->> +	bitmap_set(gpio->input_only, 27, 2);
->> +	set_bit(31, gpio->input_only);
->> +	set_bit(34, gpio->input_only);
->> +
->> +	gc = &gpio->chip;
->> +
->> +	gc->label = DRIVER_NAME;
->> +	gc->parent = dev->parent;
->> +
->> +	gc->get_direction = tc956x_gpio_get_direction;
->> +	gc->direction_input = tc956x_gpio_direction_input;
->> +	gc->direction_output = tc956x_gpio_direction_output;
->> +	gc->get = tc956x_gpio_get;
->> +	gc->set = tc956x_gpio_set;
->> +	gc->init_valid_mask = tc956x_gpio_init_valid_mask;
->> +
->> +	gc->base = -1;
->> +	gc->ngpio = TC956X_GPIO_COUNT;
->> +	gc->can_sleep = false;
+> Fix by calling ice_vsi_realloc_stat_arrays() in ice_vf_reconfig_vsi()
+> before ice_vsi_decfg(), mirroring the ice_vsi_rebuild() pattern. Set
+> vsi->req_txq/req_rxq from vf->num_req_qs so the realloc function knows
+> the target array size.
 > 
-> This makes me think this is an MMIO regmap after all.
-
-You are correct.
-
+> See the linked RHEL Jira item for a reproducer.
 > 
->> +
->> +	dev_set_drvdata(dev, gpio);
+> Fixes: 2a2cb4c6c181 ("ice: replace ice_vf_recreate_vsi() with ice_vf_reconfig_vsi()")
+> Closes: https://redhat.atlassian.net/browse/RHEL-164321
+> Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+
+I have an unpublished fix for the same issue,
+but your patch is smaller, and thus more suitable for net-
+
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+
+thank you
+
+> Assisted-by: Claude:claude-opus-4-6 semcode
+> ---
+>   drivers/net/ethernet/intel/ice/ice_lib.c    | 2 +-
+>   drivers/net/ethernet/intel/ice/ice_lib.h    | 1 +
+>   drivers/net/ethernet/intel/ice/ice_vf_lib.c | 7 +++++++
+>   3 files changed, 9 insertions(+), 1 deletion(-)
 > 
-> There's no corresponding dev_get_drvdata().
-
-I hadn't noticed that.  We're only using the GPIO chip data
-field (gc->gpiodev->data) instead.  I'll drop this call.
-
->> +
->> +	return devm_gpiochip_add_data(dev, gc, gpio);
->> +}
->> +
->> +static const struct auxiliary_device_id tc956x_gpio_ids[] = {
->> +	{ .name = "tc956x_pci.tc9564-gpio", },
->> +	{ }
->> +};
->> +MODULE_DEVICE_TABLE(auxiliary, tc956x_gpio_ids);
->> +
->> +static struct auxiliary_driver tc956x_gpio_driver = {
->> +	.name		= DRIVER_NAME,
->> +	.probe          = tc956x_gpio_probe,
->> +	.id_table       = tc956x_gpio_ids,
->> +	.driver = {
->> +		.name		= DRIVER_NAME,
->> +		.owner		= THIS_MODULE,
->> +		.probe_type	= PROBE_PREFER_ASYNCHRONOUS,
->> +	},
->> +};
->> +module_auxiliary_driver(tc956x_gpio_driver);
->> +
->> +MODULE_DESCRIPTION("Toshiba TC956X PCIe GPIO Driver");
->> +MODULE_LICENSE("GPL");
->> +MODULE_ALIAS("auxiliary:" DRIVER_NAME);
->> --
->> 2.51.0
->>
->>
-> 
-> There are a few minor issues but overall looks good!
-
-Thank you very much for the review Bartosz.  I'll implement
-all of your suggestions in the next version.
-
-					-Alex
-
-
-> 
-> Bart
+> diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+> index 837b71b7b2b7..fc78176a2a8d 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_lib.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+> @@ -3015,7 +3015,7 @@ ice_vsi_rebuild_set_coalesce(struct ice_vsi *vsi,
+>    * ice_vsi_realloc_stat_arrays - Frees unused stat structures or alloc new ones
+>    * @vsi: VSI pointer
+>    */
+> -static int
+> +int
+>   ice_vsi_realloc_stat_arrays(struct ice_vsi *vsi)
+>   {
+>   	u16 req_txq = vsi->req_txq ? vsi->req_txq : vsi->alloc_txq;
+> diff --git a/drivers/net/ethernet/intel/ice/ice_lib.h b/drivers/net/ethernet/intel/ice/ice_lib.h
+> index 49454d98dcfe..6f7da84384e5 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_lib.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_lib.h
+> @@ -66,6 +66,7 @@ int ice_ena_vsi(struct ice_vsi *vsi, bool locked);
+>   void ice_vsi_decfg(struct ice_vsi *vsi);
+>   void ice_dis_vsi(struct ice_vsi *vsi, bool locked);
+>   
+> +int ice_vsi_realloc_stat_arrays(struct ice_vsi *vsi);
+>   int ice_vsi_rebuild(struct ice_vsi *vsi, u32 vsi_flags);
+>   int ice_vsi_cfg(struct ice_vsi *vsi);
+>   struct ice_vsi *ice_vsi_alloc(struct ice_pf *pf);
+> diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+> index 772f6b07340d..9edb2c14f553 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+> @@ -268,6 +268,13 @@ static int ice_vf_reconfig_vsi(struct ice_vf *vf)
+>   
+>   	vsi->flags = ICE_VSI_FLAG_NO_INIT;
+>   
+> +	vsi->req_txq = vf->num_req_qs;
+> +	vsi->req_rxq = vf->num_req_qs;
+> +
+> +	err = ice_vsi_realloc_stat_arrays(vsi);
+> +	if (err)
+> +		return err;
+> +
+>   	ice_vsi_decfg(vsi);
+>   	ice_fltr_remove_all(vsi);
+>   
 
 
