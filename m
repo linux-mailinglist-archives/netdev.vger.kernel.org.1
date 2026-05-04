@@ -1,178 +1,394 @@
-Return-Path: <netdev+bounces-284086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284087-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sBW6FqYm+Wmz5wIAu9opvQ
-	(envelope-from <netdev+bounces-284086-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 01:07:18 +0200
+	id MIEhD74o+Wnj6AIAu9opvQ
+	(envelope-from <netdev+bounces-284087-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 01:16:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6A7F4C4BDE
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 01:07:17 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD3964C4C8D
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 01:16:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E4A173037434
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 23:03:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B5D36301C13E
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 23:16:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C3A390C86;
-	Mon,  4 May 2026 23:03:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 450903859D2;
+	Mon,  4 May 2026 23:16:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="W7EKEV8u"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="eZfiXreV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04893390226
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 23:03:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFEBC3988E4;
+	Mon,  4 May 2026 23:16:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777935823; cv=none; b=Jyin+Wwcuvx6Qk2OfI9zMpUq4q1xhvpWBR/adIxDV+FtB4EuuxCYdMJfk3dAlryzre2SEKpnQVAt2ShtPLQyyID/UZXkOJ4Bs3+5tSfmjwHKT0ZjOtbfdcnXapDUqfXQHq6O0Su8jLpXWmymF7wE9bN9NfrN9/KKuPjIEKMF0yA=
+	t=1777936571; cv=none; b=UpomWA5Nn+Aygk3QOMcBLF5akA+oBjrqluS0jiHodv0MT2YvZ8k+G2OB3hqu/bw7lMlFUIWE6Uf4J8oamNhjEKTLd6n50lS+WmV2sGMBSgymOiJTRf/w3BNDa4qExcytlBbSxyjBQflvSxtg2sAPlajvsJ2yEJtcZmnMEHFenvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777935823; c=relaxed/simple;
-	bh=RTsVaPujv1Zipjqi6owizB/hu8GwpxevK7plImcp/R0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Fnmjkhtbr3Kh6y/+1/zXcE9Cfv13pFLUAM7BampxplR/yXR0CjaQrwhfd5NeG08bKmuLIrhYT7QXlCybaQ52wC39B9CGNzXYtA3YC1LL+xcMpF6u/JotTx+d0ftvA020VTeUf8v9/zy2z02HRlVxpqsVK4BtONGVEUtTguwUkj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=W7EKEV8u; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-48a3e9862f0so30445375e9.1
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 16:03:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1777935820; x=1778540620; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zACIKFEwz1yqIQZvSt58R2/bdNJrXZHSjp9IUUKiaOs=;
-        b=W7EKEV8uOw7botOA8bYBB72ywzKUVOfhNfbKRBb4Q3PeUAFpWWbSO5XG8OUwD6UNv4
-         mv0Os6GJ07nQMXN01Y9l+GI4zXnYeIlDjejXSmmcdwHhjJ0JN1BgK0nx3+s/Ke0xQSvp
-         LRDknmeDsGrligTZaYV1akTMoH8XnEMV/3CSTvQ3h/cr/P7M3fuqsga4Od30d88SLJ9H
-         rsXyH4FzFSdpekSRu/xhyUqeEk+9tarqudOlNZ9wfbl63u2dLGpghSRd2IetpVds61rr
-         ssGBNPW9HjgXBLPTILQpPzPyYGhxA/1AutoMlaxmGKka4UXUg0d6PGHl7AAVpZz4BcWJ
-         juAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777935820; x=1778540620;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=zACIKFEwz1yqIQZvSt58R2/bdNJrXZHSjp9IUUKiaOs=;
-        b=PJn/jQ/HCWKpA/f4eVEvw06BKlirf+3kGQAZ10IR/fvMRJWw1QfN6zFSawG4V1LPoN
-         HFLWSczW7nnYp04HtYVdYvEC2RMqtZUbCJPga2YdbVA1u2ewmdWHpJDSZyP0L3zys0r/
-         hR2BvsR656DGKpJjdKsjtWb41PLqY9fY2s487KNi1WCrPkFGCUWy8Nn9+IPsVgjdihQ4
-         ZT+4rTLdwQqQpM5Oru4cEuxkfe+gImlEE0bNB9moYSNRM7vglOZXccItAfw5kGCvulDx
-         ciT22xvtxCz2DXBzwcpnDhLWxfoOc3rXmQCgLm7BBNgNcLPc8OOtEj68wBjntJkD4xuL
-         dwug==
-X-Gm-Message-State: AOJu0YzP09o4rNjA4WTvZk5j95+kjC70NZmEgJA1V6T7x6xpbbrCTnb2
-	TkMmJQbwD4WCGzF+JU88mFzny4a5H170SuxCpBeI0R/ZN9ByqUfwuWAkqktM2zS9UATlGcz88uB
-	iUUsqQWdrJgGT43mzT0Q9BUkevjGoeIZC8q4eR5xe9LK7U/UXbLnN/PIqn+k/mZpEXOg=
-X-Gm-Gg: AeBDieuQq6c2OR2wXSD0z9E5+DiqR3iEe2kMbC4PWwiTH2JZkl71uvLuKfOJpe0Ac3X
-	S5ExPYlquXHivTREM/Ialn29yPZVsI2umiV1me1W0fP8uIQWeKmBO9F1xabiJa9EX2o+aDG31aV
-	QfARcz0m9yvCgJ9d0wN9erHvO/i1LSiR9dnu8qXfEGYKESc7+0ZWbIR7nUneUHrfo7zCub/6uHb
-	ErIPi8W7u+ayY9I7ZX5p4Rh/Db79Kc7URf7+S7PD9aScEiH4OdGSDEm0pIMnMrRE7fcjs5gyeT8
-	QWyW953Uq2aHQV+bK0XoSF453DgVilEmx/mD6VgYc7z0CTVo9JPKABXhF6qTJQ3tLue5QocnsGJ
-	eBgSy+Uqcx5mS55zaMFJ2lgkn7AlAa0WGsumfjPa3wygZtjhLmiffUw56n8FMbbFbXg43pkFP4J
-	aq1NrVtLSIDiHBXfS+yoXanLN9i9tcs2tv/SROeqRrj+P++II=
-X-Received: by 2002:a05:600c:19d4:b0:485:3c2e:60d5 with SMTP id 5b1f17b1804b1-48d1422baefmr21167775e9.2.1777935820006;
-        Mon, 04 May 2026 16:03:40 -0700 (PDT)
-Received: from inifinity.mandelbit.com ([2001:67c:2fbc:1:1d7d:7ce5:717a:133e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a81ed6bafsm636149165e9.2.2026.05.04.16.03.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2026 16:03:39 -0700 (PDT)
-From: Antonio Quartulli <antonio@openvpn.net>
-To: netdev@vger.kernel.org
-Cc: edumazet@google.com,
-	sd@queasysnail.net,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ralf@mandelbit.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	Antonio Quartulli <antonio@openvpn.net>
-Subject: [PATCH net 3/3] selftests: ovpn: reduce ping count in test.sh
-Date: Tue,  5 May 2026 01:03:05 +0200
-Message-ID: <20260504230305.2681646-4-antonio@openvpn.net>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260504230305.2681646-1-antonio@openvpn.net>
-References: <20260504230305.2681646-1-antonio@openvpn.net>
+	s=arc-20240116; t=1777936571; c=relaxed/simple;
+	bh=z/IwEabEGMkMutEiXXMOngJfCaGhkT9gsXkp1eMqZ8M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J+VbsDNEAPkxFrStVgeZOTeMEr0IGzAI8lvauFVE0T8r20w6eZ5Nti+/ks2yTu2QN0sQyVtCAj3ptUMooG6zslKfiW79g3E1K2JZYGK+V4l05fSz+yiavQvFEqjop49SqeRSfqWxRwLj3J4dHqTTPgKALrrJCBkSmmPvjEyAEMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=eZfiXreV; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id B380E6017D;
+	Tue,  5 May 2026 01:16:04 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1777936564;
+	bh=VT5MwRkATQPD60mCpAYF97d9SCIKVmkZ8YSLwDvh06I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eZfiXreVeBV6zU5zGnTUYG1rXWcDBubUTWpBVbsOJnFM7KNoCvSAAXqYuhgun0RBD
+	 yUuDsTa3eOVlethGbVzvhtk13P8pjjPQSo6uRPvyP4xt2fICPrhI0UBd4pOSQ3PNLK
+	 oFPiAQtqvZfMGX+LZ8/Cx4QtoeU6uo1Dd1BB7c24Cl1X0JiPqfOCTutjXeBUSfiUp7
+	 cVeNqNvBBMM4P6j5kGLKFaOO39EcK+dKsFaMAsnUl3HRZ32wedcKP7BUvavNPTPT1h
+	 eO/CuK+ri76ysqut7wn4mGQpjiLsvAS35Lda8xtGCzkrqDuZmw2ia7JiT2APBiMuHR
+	 0C7uzyIDnScyQ==
+Date: Tue, 5 May 2026 01:16:02 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: netfilter-devel@vger.kernel.org, fw@strlen.de, davem@davemloft.net,
+	netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, horms@kernel.org,
+	Eelco Chaudron <echaudro@redhat.com>,
+	Aaron Conole <aconole@redhat.com>
+Subject: Re: [PATCH net 06/12] netfilter: nf_conntrack_expect: honor
+ expectation helper field
+Message-ID: <afkosr2fDEPA_jX9@chamomile>
+References: <20260326125153.685915-1-pablo@netfilter.org>
+ <20260326125153.685915-7-pablo@netfilter.org>
+ <8fd5d3a3-d1d7-4542-a0db-1678989940d4@ovn.org>
+ <afSCXEg-X-ieL9cY@chamomile>
+ <ef01005e-d867-4936-b138-b98f37e5f394@ovn.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: E6A7F4C4BDE
+Content-Type: multipart/mixed; boundary="BoDvjb+CgOGFYgDu"
+Content-Disposition: inline
+In-Reply-To: <ef01005e-d867-4936-b138-b98f37e5f394@ovn.org>
+X-Rspamd-Queue-Id: BD3964C4C8D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain,text/x-diff];
 	HAS_LIST_UNSUB(-0.01)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284086-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[openvpn.net:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
+	DMARC_NA(0.00)[netfilter.org];
+	TAGGED_FROM(0.00)[bounces-284087-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+,1:+,2:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	HAS_ATTACHMENT(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[test.sh:url,mandelbit.com:email,openvpn.net:email,openvpn.net:dkim,openvpn.net:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,netfilter.org:dkim,netfilter.org:email]
 
-From: Ralf Lici <ralf@mandelbit.com>
 
-The second stage of test.sh ("run baseline data traffic") performs a
-basic connectivity check with ping -qfc 500 -w 3.  On slower CI
-instances this is too strict for TCP: the RTT is high enough that 500
-echo requests do not reliably complete within 3 seconds, so the stage
-flakes and the test fails even though the ovpn setup is healthy.
+--BoDvjb+CgOGFYgDu
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 
-Reduce the packet count to 100 for both the plain and 3000-byte pings in
-that stage.  This still verifies peer setup, key exchange, routing, and
-data-path traffic, without making the basic connectivity check depend on
-timing out under load.
+Hi Ilya,
 
-Fixes: 959bc330a439 ("testing/selftests: add test tool and scripts for ovpn module")
-Signed-off-by: Ralf Lici <ralf@mandelbit.com>
-Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
----
- tools/testing/selftests/net/ovpn/test.sh | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Mon, May 04, 2026 at 02:19:20PM +0200, Ilya Maximets wrote:
+> On 5/1/26 12:37 PM, Pablo Neira Ayuso wrote:
+> > Hi Ilya,
+> > 
+> > On Thu, Apr 30, 2026 at 10:58:38PM +0200, Ilya Maximets wrote:
+> >> On 3/26/26 1:51 PM, Pablo Neira Ayuso wrote:
+> >>> The expectation helper field is mostly unused. As a result, the
+> >>> netfilter codebase relies on accessing the helper through exp->master.
+> >>>
+> >>> Always set on the expectation helper field so it can be used to reach
+> >>> the helper.
+> >>>
+> >>> nf_ct_expect_init() is called from packet path where the skb owns
+> >>> the ct object, therefore accessing exp->master for the newly created
+> >>> expectation is safe. This saves a lot of updates in all callsites
+> >>> to pass the ct object as parameter to nf_ct_expect_init().
+> >>>
+> >>> This is a preparation patches for follow up fixes.
+> >>>
+> >>> Signed-off-by: Florian Westphal <fw@strlen.de>
+> >>> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+> >>> ---
+> >>
+> >> Hi, Pablo and Florian.
+> >>
+> >> I was investigating FTP test failures in OVS with 7.0 kernel and bisected
+> >> the issue down to this commit.  AFAIU, with this change all the related
+> >> connections over time gain their parents' helpers,.  This is causing a change
+> >> visible to the userspace, because FTP data connections are now reported to
+> >> have helpers in the conntrack dump:
+> >>
+> >> # conntrack -L
+> >> tcp      6 119 TIME_WAIT src=10.1.1.1 dst=10.1.1.2 sport=59534 dport=21 \
+> >>                          src=10.1.1.2 dst=10.1.1.1 sport=21    dport=59534 \
+> >>            [ASSURED] mark=0 helper=ftp use=2
+> >> tcp      6 119 TIME_WAIT src=10.1.1.2 dst=10.1.1.1 sport=52709 dport=52381 \
+> >>                          src=10.1.1.1 dst=10.1.1.2 sport=52381 dport=52709 \
+> >>            [ASSURED] mark=0 helper=ftp use=1
+> >>
+> >> Before this commit only the control connection had helper=ftp reported in
+> >> the dump.  The traffic seems to work fine, but our tests fail because we
+> >> do not expect the helper attached.
+> >>
+> >> AFAIU, it's generally not something that should be happening, as helpers
+> >> on data connections do not really make much sense.  But I'm just trying to
+> >> figure out if you would consider this as a regression and fix in the kernel
+> >> or if we should adjust our userspace components for this new dump content,
+> >> which would not be very straightforward to do if we want to be able to run
+> >> tests on both old and the new versions.
+> >>
+> >> What do you think?
+> > 
+> > It seems previous behaviour to 9c42bc9db90a was inconsistent, ie. only
+> > the h323 helper sets on exp->helper, then it shows helper= in expected
+> > connections via ctnetlink. I guess this is for debugging given that
+> > h323 is actually a family of helpers.
+> > 
+> > To consistently skip dumping this for expected connections, probably
+> > this is the way to do:
+> > 
+> > diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_conn
+> > index eda5fe4a75c8..9491ae9e080e 100644
+> > --- a/net/netfilter/nf_conntrack_netlink.c
+> > +++ b/net/netfilter/nf_conntrack_netlink.c
+> > @@ -226,7 +226,7 @@ static int ctnetlink_dump_helpinfo(struct sk_buff *sk
+> >         const struct nf_conn_help *help = nfct_help(ct);
+> >         struct nf_conntrack_helper *helper;
+> >  
+> > -       if (!help)
+> > +       if (!help || ct->status & IPS_EXPECTED)
+> >                 return 0;
+> >  
+> >         rcu_read_lock();
+> 
+> I'm not sure.  I tried this change and it fixed one case but broke another.
+> Looking at what we're testing, the old behavior (at least for FTP) was:
+> "if helper was committed - report it, if not - don't".  i.e. it's not really
+> about the connection being expected it's about if the user committed the
+> helper for the connection or not.
+>
+> Let me explain a few scenarios that we have in the OVS system tests and what
+> I see with the old kernel (6.19), the new (7.0) and the patch above.
+> 
+> A) The first scenario has the following OpenFlow rules (simplified):
+> 
+>   table=0,in_port=1,tcp,action=ct(alg=ftp,commit),2
+>   table=0,in_port=2,tcp,action=ct(table=1)
+>   table=1,in_port=2,tcp,ct_state=+trk+est,action=1
+>   table=1,in_port=2,tcp,ct_state=+trk+rel,action=1
+> 
+> This set of rule blindly commits every packet coming from port 1 with the
+> helper and sends to port 2.  Packets from port 2 are passed through ct and
+> only related or established traffic is passed to port 1.  This is a very
+> rudimentary setup that users can make to allow ftp from port 1 towards port 2,
+> but not in the opposite direction.
+> 
+> For this scenario regardless of the kernel version or the patch above I see
+> that both the data and the control connections have a helper reported in the
+> ctnetlink dump.
 
-diff --git a/tools/testing/selftests/net/ovpn/test.sh b/tools/testing/selftests/net/ovpn/test.sh
-index b50dbe45a4d0..c06e3135fbef 100755
---- a/tools/testing/selftests/net/ovpn/test.sh
-+++ b/tools/testing/selftests/net/ovpn/test.sh
-@@ -98,10 +98,10 @@ ovpn_run_basic_traffic() {
- 		sleep 0.3
- 		ovpn_cmd_ok "send baseline traffic to peer ${p}" \
- 			ip netns exec ovpn_peer0 \
--			ping -qfc 500 -w 3 5.5.5.$((p + 1))
-+			ping -qfc 100 -w 3 5.5.5.$((p + 1))
- 		ovpn_cmd_ok "send large-payload traffic to peer ${p}" \
- 			ip netns exec ovpn_peer0 \
--			ping -qfc 500 -s 3000 -w 3 5.5.5.$((p + 1))
-+			ping -qfc 100 -s 3000 -w 3 5.5.5.$((p + 1))
+This ruleset then is attached the conntrack helper to data connection,
+that is, ALG is inspecting the FTP data connection but it will just
+find no patterns because it is only the FTP control connection that
+creates expectations?
+
+> B) The second scenario:
+> 
+>   table=0,in_port=1,tcp,action=ct(table=1)
+>   table=1,in_port=1,tcp,ct_state=+trk+new,action=ct(commit,alg=ftp),2
+>   table=1,in_port=1,tcp,ct_state=+trk+est,action=2
+> 
+>   table=0,in_port=2,tcp,action=ct(table=1)
+>   table=1,in_port=2,tcp,ct_state=+trk+new+rel,action=ct(commit),1
+>   table=1,in_port=2,tcp,ct_state=+trk+est,action=1
+> 
+> This is a more reasonable setup where new connections are committed on the
+> way from 1 to 2 and new related connections are committed on the way from
+> 2 to 1.  This allows port 1 to initiate the control connection and the port
+> 2 to initiate the related data connection.
+> 
+> In case of active FTP (port 1 initiates control, port 2 initiates the data):
+> - old:   control has the helper, data does not.
+> - new:   both have the helper.
+> - patch: control has the helper, data does not.
+> 
+> In case of passive FTP (port 1 initiates both the control and data):
+> - old:   both have the helper (because both are +new traffic from port 1).
+> - new:   both have the helper.
+> - patch: control has the helper, data does not.
+>
+> C) We can modify the scenario B to avoid committing the helper on related:
+> 
+>   table=0,in_port=1,tcp,action=ct(table=1)
+>   table=1,in_port=1,tcp,ct_state=+trk+new-rel,action=ct(commit,alg=ftp),2
+>   table=1,in_port=1,tcp,ct_state=+trk+new+rel,action=ct(commit),2
+>   table=1,in_port=1,tcp,ct_state=+trk+est,action=2
+> 
+>   table=0,in_port=2,tcp,action=ct(table=1)
+>   table=1,in_port=2,tcp,ct_state=+trk+new+rel,action=ct(commit),1
+>   table=1,in_port=2,tcp,ct_state=+trk+est,action=1
+> 
+> Here we have (same for active and passive):
+> - old:   control has the helper, data does not.
+> - new:   both have the helper.
+> - patch: control has the helper, data does not.
+>
+> I hope that clarifies the situation a little bit.
+> 
+> So, if we want to restore the old behavior, the we'd probably need to track
+> how connection gained the helper, i.e. was it via commit or was it inherited.
+>
+> I'm also not sure why we see the helper with the patch above in scenario A that
+> commits established traffic, but not in B or C that only commits new traffic.
+
+Thanks for the detailed report. It seems I changed the semantics of
+exp->helper, this used to be use to set a new helper for an expected
+connection, which is the case for sip and h323.
+
+Would this patch help address the issue you are observing?
+
+Thanks.
+
+--BoDvjb+CgOGFYgDu
+Content-Type: text/x-diff; charset=utf-8
+Content-Disposition: attachment; filename="fix-exp-helper.patch"
+
+commit 39b6894dd511e14450e2a640eeaa83379e0f8eb1
+Author: Pablo Neira Ayuso <pablo@netfilter.org>
+Date:   Tue May 5 01:15:19 2026 +0200
+
+    x
+
+diff --git a/include/net/netfilter/nf_conntrack_expect.h b/include/net/netfilter/nf_conntrack_expect.h
+index e9a8350e7ccf..80f50fd0f7ad 100644
+--- a/include/net/netfilter/nf_conntrack_expect.h
++++ b/include/net/netfilter/nf_conntrack_expect.h
+@@ -45,9 +45,12 @@ struct nf_conntrack_expect {
+ 	void (*expectfn)(struct nf_conn *new,
+ 			 struct nf_conntrack_expect *this);
  
- 		wait "${tcpdump_pid1}" || return 1
- 		wait "${tcpdump_pid2}" || return 1
--- 
-2.53.0
+-	/* Helper to assign to new connection */
++	/* Helper that created this expectation */
+ 	struct nf_conntrack_helper __rcu *helper;
+ 
++	/* Helper to assign to new connection */
++	struct nf_conntrack_helper __rcu *assign_helper;
++
+ 	/* The conntrack of the master connection */
+ 	struct nf_conn *master;
+ 
+diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_conntrack_core.c
+index b08189226320..656287d16d86 100644
+--- a/net/netfilter/nf_conntrack_core.c
++++ b/net/netfilter/nf_conntrack_core.c
+@@ -1815,10 +1815,10 @@ init_conntrack(struct net *net, struct nf_conn *tmpl,
+ 			__set_bit(IPS_EXPECTED_BIT, &ct->status);
+ 			/* exp->master safe, refcnt bumped in nf_ct_find_expectation */
+ 			ct->master = exp->master;
+-			if (exp->helper) {
++			if (exp->assign_helper) {
+ 				help = nf_ct_helper_ext_add(ct, GFP_ATOMIC);
+ 				if (help)
+-					rcu_assign_pointer(help->helper, exp->helper);
++					rcu_assign_pointer(help->helper, exp->assign_helper);
+ 			}
+ 
+ #ifdef CONFIG_NF_CONNTRACK_MARK
+diff --git a/net/netfilter/nf_conntrack_h323_main.c b/net/netfilter/nf_conntrack_h323_main.c
+index 3f5c50455b71..b2fe6554b9cf 100644
+--- a/net/netfilter/nf_conntrack_h323_main.c
++++ b/net/netfilter/nf_conntrack_h323_main.c
+@@ -643,7 +643,7 @@ static int expect_h245(struct sk_buff *skb, struct nf_conn *ct,
+ 			  &ct->tuplehash[!dir].tuple.src.u3,
+ 			  &ct->tuplehash[!dir].tuple.dst.u3,
+ 			  IPPROTO_TCP, NULL, &port);
+-	rcu_assign_pointer(exp->helper, &nf_conntrack_helper_h245);
++	rcu_assign_pointer(exp->assign_helper, &nf_conntrack_helper_h245);
+ 
+ 	nathook = rcu_dereference(nfct_h323_nat_hook);
+ 	if (memcmp(&ct->tuplehash[dir].tuple.src.u3,
+@@ -767,7 +767,7 @@ static int expect_callforwarding(struct sk_buff *skb,
+ 	nf_ct_expect_init(exp, NF_CT_EXPECT_CLASS_DEFAULT, nf_ct_l3num(ct),
+ 			  &ct->tuplehash[!dir].tuple.src.u3, &addr,
+ 			  IPPROTO_TCP, NULL, &port);
+-	rcu_assign_pointer(exp->helper, nf_conntrack_helper_q931);
++	rcu_assign_pointer(exp->assign_helper, nf_conntrack_helper_q931);
+ 
+ 	nathook = rcu_dereference(nfct_h323_nat_hook);
+ 	if (memcmp(&ct->tuplehash[dir].tuple.src.u3,
+@@ -1234,7 +1234,7 @@ static int expect_q931(struct sk_buff *skb, struct nf_conn *ct,
+ 				&ct->tuplehash[!dir].tuple.src.u3 : NULL,
+ 			  &ct->tuplehash[!dir].tuple.dst.u3,
+ 			  IPPROTO_TCP, NULL, &port);
+-	rcu_assign_pointer(exp->helper, nf_conntrack_helper_q931);
++	rcu_assign_pointer(exp->assign_helper, nf_conntrack_helper_q931);
+ 	exp->flags = NF_CT_EXPECT_PERMANENT;	/* Accept multiple calls */
+ 
+ 	nathook = rcu_dereference(nfct_h323_nat_hook);
+@@ -1306,7 +1306,7 @@ static int process_gcf(struct sk_buff *skb, struct nf_conn *ct,
+ 	nf_ct_expect_init(exp, NF_CT_EXPECT_CLASS_DEFAULT, nf_ct_l3num(ct),
+ 			  &ct->tuplehash[!dir].tuple.src.u3, &addr,
+ 			  IPPROTO_UDP, NULL, &port);
+-	rcu_assign_pointer(exp->helper, nf_conntrack_helper_ras);
++	rcu_assign_pointer(exp->assign_helper, nf_conntrack_helper_ras);
+ 
+ 	if (nf_ct_expect_related(exp, 0) == 0) {
+ 		pr_debug("nf_ct_ras: expect RAS ");
+@@ -1523,7 +1523,7 @@ static int process_acf(struct sk_buff *skb, struct nf_conn *ct,
+ 			  &ct->tuplehash[!dir].tuple.src.u3, &addr,
+ 			  IPPROTO_TCP, NULL, &port);
+ 	exp->flags = NF_CT_EXPECT_PERMANENT;
+-	rcu_assign_pointer(exp->helper, nf_conntrack_helper_q931);
++	rcu_assign_pointer(exp->assign_helper, nf_conntrack_helper_q931);
+ 
+ 	if (nf_ct_expect_related(exp, 0) == 0) {
+ 		pr_debug("nf_ct_ras: expect Q.931 ");
+@@ -1577,7 +1577,7 @@ static int process_lcf(struct sk_buff *skb, struct nf_conn *ct,
+ 			  &ct->tuplehash[!dir].tuple.src.u3, &addr,
+ 			  IPPROTO_TCP, NULL, &port);
+ 	exp->flags = NF_CT_EXPECT_PERMANENT;
+-	rcu_assign_pointer(exp->helper, nf_conntrack_helper_q931);
++	rcu_assign_pointer(exp->assign_helper, nf_conntrack_helper_q931);
+ 
+ 	if (nf_ct_expect_related(exp, 0) == 0) {
+ 		pr_debug("nf_ct_ras: expect Q.931 ");
+diff --git a/net/netfilter/nf_conntrack_sip.c b/net/netfilter/nf_conntrack_sip.c
+index 1eb55907d470..d24bfa9e8234 100644
+--- a/net/netfilter/nf_conntrack_sip.c
++++ b/net/netfilter/nf_conntrack_sip.c
+@@ -1383,7 +1383,7 @@ static int process_register_request(struct sk_buff *skb, unsigned int protoff,
+ 	nf_ct_expect_init(exp, SIP_EXPECT_SIGNALLING, nf_ct_l3num(ct),
+ 			  saddr, &daddr, proto, NULL, &port);
+ 	exp->timeout.expires = sip_timeout * HZ;
+-	rcu_assign_pointer(exp->helper, helper);
++	rcu_assign_pointer(exp->assign_helper, helper);
+ 	exp->flags = NF_CT_EXPECT_PERMANENT | NF_CT_EXPECT_INACTIVE;
+ 
+ 	hooks = rcu_dereference(nf_nat_sip_hooks);
 
+--BoDvjb+CgOGFYgDu--
 
