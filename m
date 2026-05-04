@@ -1,124 +1,172 @@
-Return-Path: <netdev+bounces-283819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283820-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yNJ6Az6S+Gl8wgIAu9opvQ
-	(envelope-from <netdev+bounces-283819-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 14:34:06 +0200
+	id KMdaJBGT+Gl8wgIAu9opvQ
+	(envelope-from <netdev+bounces-283820-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 14:37:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AB304BCF26
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 14:34:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CA614BCF83
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 14:37:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5F2033017BD1
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 12:33:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 59C34301A73E
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 12:37:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93B513D1CC0;
-	Mon,  4 May 2026 12:33:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 053D43CE4BA;
+	Mon,  4 May 2026 12:37:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="06TZ+vkD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HDSKrjF4"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C703D1CB6;
-	Mon,  4 May 2026 12:33:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F403D3319
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 12:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777898031; cv=none; b=LgkCwr9kr8mpgLEul/tzQxLj+ZFXipsR2ozb6YHb15IE7MrMJklNfWLOwnhr7ri0JDbOvRmZ+ljrI8WdrUmXE7ZD5mD3Ef0LtHxndwRypIQZmnDeOYq2LTlbyIC2QcgK0cDVyYA93YWM5VzurpLerCkIPyR4K0e6KyVHX6D2nqY=
+	t=1777898245; cv=none; b=evBWuWU06md2T3z2gFetKGhnAtuVIAgOR2IC8+k1vXX4YzE8ckAdmXVjFipZHRszn2zc784RMSPrczVojwHs2ps64Qy7Q802RMYv0CX0zk4CWgnSmmuQeRti4Pe6OeqX6XuSFmfjTC7bEutb+HJNjBwBiRXPT0LCkFHvHigM/Jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777898031; c=relaxed/simple;
-	bh=KOIBqQQqe9G6PoM9EzxhZmNSlWk8f4sRBJgU3Od2nKw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qGVkvrjomo9lpaDkxk40+NEyOdQIa5ZQMX+PSpBB7TYoWfYJH/Y2pztYMUCd+j9WTXpurTJThqsDblTm517o4lCwFQXQ3nxfW8LMkZPg76CLyYk+7Jbpqq2l2rhs13u4ap/lhEzgUvE9F3W0jRXBh8eJhPh0SAFxMOsKqZkSp9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=06TZ+vkD; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=vwIeQRyi7/LPm8LVvGfYx8R/Q1FLGGNiB7e7sj8C6ns=; b=06TZ+vkD34iCABtd/RT0MRcZQa
-	k0XYh4D6FH8Uvam4N180a46knA3vURmUWzNwsmdlH86861w7gz2qdex1TySUv7MJFDujmYIQaqYU6
-	6lzYRbVbxNg39qOuLxGyS7ojgHTxSmfGNIk6o3qQqsZJU4Oj3fDARGk/IGg7rOwE+fsc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wJsUW-001G8J-8h; Mon, 04 May 2026 14:33:40 +0200
-Date: Mon, 4 May 2026 14:33:40 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Myeonghun Pak <mhun512@gmail.com>
-Cc: Horatiu Vultur <horatiu.vultur@microchip.com>,
-	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ijae Kim <ae878000@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] net: lan966x: avoid unregistering netdev on register
- failure
-Message-ID: <8bc1d1e5-6be5-4b4f-81cd-2571ef441275@lunn.ch>
-References: <20260502050741.76945-1-mhun512@gmail.com>
+	s=arc-20240116; t=1777898245; c=relaxed/simple;
+	bh=bTuKn1DdihsBzgZCLCw2WFo+hdCwIzZvIiVGWxyeO0M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UEtc8WypxJk53sDFdH/QTAxU96gKFGu1NqUegzN+3WtNLZMeJXmX43Tu1yDGpYknCWegnjIZlkSsQbD7IhkQ5R4g0RUEqIiibG7eBU2TmqmRIuHoicZ/bcm/IdELx0rrxcbwHeeaMzOeQEuAhtiWbrZlPa22D6TAdpFWKraX9S0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HDSKrjF4; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-36534668247so1100248a91.1
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 05:37:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777898244; x=1778503044; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=c9T1i7FdZhwacHJsq1bHlPf1QctcwfXVB2lsLVY3Qpg=;
+        b=HDSKrjF4S8DSUoB8amkx3Rts699x/Td14Z+oU2a+E6DkNlk1x3+JuPNUby8Yv8F3Li
+         /cBKY07/TtGAmd0v4F3Uhks/bgDqQRVI3iYNPHffv5ZuVFXbcNLWfeDxCsqyBoFtgs5p
+         UKY6S4Tykv9u8QDcPx6TsLlTA53FARBlpwBUwIvG/J1MS+pZDNZWnoQMt/1ebalcEpsS
+         zyjgui4e4OfI93OzaXsdsrOJSLBTuPc7njAqH/6po/fhYOMhrCAgVfj4rOBPW7CHWstX
+         SiIOK7mW01vttTXNgErJyZ5pZfEkb+ZJrMl7TcE2US+ydWEUl/Bme2BF3ytbV5KJMjtG
+         CqsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777898244; x=1778503044;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c9T1i7FdZhwacHJsq1bHlPf1QctcwfXVB2lsLVY3Qpg=;
+        b=ILyFtsC9AmWGzjMcJIZIcFvzkXvfEtkNt6obLonX9hDRI2t0uPU/iREaPc539ZpyKg
+         /jVCsCa0iopjFgsZS7jsm3lUsamyJ2Xj3s/W3UgVtL2UIivsjVhCkhh3yuDKfxzB5qNe
+         T3G61D+5xTbCglPa2ZN3gFpv2GYIkuvOOVlnTNxXO3rzBiM5YOJ/Dgndib6g50lK6L7o
+         wKZsiWlHAnQctQZzg2Jt1HlA+hh814npzJXUPv7VWZe0Wtq73S898QH5QShVvW0IS5he
+         HnEPoGalPjNLZclLxNhftHjtBiRkLudngBs0SHKcmx7wWcs2VH7UZ6JzRtF69Li7ES/l
+         +NJA==
+X-Gm-Message-State: AOJu0YzcIk+WNmq4ZkvaZwdtz9ExLrdjmRq4rg/wCoMnBjrsmbAWvxPg
+	Hwxvdv8fe0LCU9FEsKCasIyqnt0E7DNCfNY6ku0fqjlQDOo1ZjehdpgeMjRw8fe8pUc=
+X-Gm-Gg: AeBDiesonhuANm0uHAQ1bn18pc0OAEDp4qwJzW9iRMq5xOTZXj5/I5OijLNI/+libp8
+	1Ix/ZgPjjRuJXChleLGh78uIVMmF9kYYMH5pOdh7IbAE4lOhSDx46BKQQ208rnKMtQHT4j+FooW
+	uXvzGZkOT1DLP8FuZKLJXHJduRTcTmlGZXOY8rs1IPG1qoam5AZNC9fa6tAgoZV2jR+XC/gE2Bq
+	aVTTKbYtdfW6M5V2R4PZBRLpePQ4CMVNujETp5C1yMf2y4dzIxfewdwsNdT4BmCYq76C6h2Xulb
+	UszQt1P96XHDeBss9PqMxX3/IYfjaF0b6EUIsE/f3n4UeWeIfgWK3Z2I7hDvkOgrDL3NPXnnuTW
+	3Wsa8t92bMwojtRGNsC9KAQap4500WwSEOADVzPrzyLwu/emL33vbk5fpMsaEl1n5eRXXVFsr4I
+	LjP9290f1b2f+zpH9/XaEjvmXv8sK7NLKbL5xa6g==
+X-Received: by 2002:a17:90b:44:b0:35f:b348:63e with SMTP id 98e67ed59e1d1-3650cdd0f75mr9531724a91.9.1777898243721;
+        Mon, 04 May 2026 05:37:23 -0700 (PDT)
+Received: from houminxi ([151.242.165.70])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-364f4558e0dsm5883550a91.2.2026.05.04.05.37.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 May 2026 05:37:23 -0700 (PDT)
+From: Minxi Hou <houminxi@gmail.com>
+To: netdev@vger.kernel.org
+Cc: aconole@redhat.com,
+	echaudro@redhat.com,
+	i.maximets@ovn.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org,
+	dev@openvswitch.org,
+	linux-kselftest@vger.kernel.org,
+	Minxi Hou <houminxi@gmail.com>
+Subject: [PATCH net-next v4 0/2] selftests: openvswitch: add pop_vlan test
+Date: Mon,  4 May 2026 20:37:11 +0800
+Message-ID: <20260504123713.555461-1-houminxi@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260502050741.76945-1-mhun512@gmail.com>
-X-Rspamd-Queue-Id: 5AB304BCF26
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 3CA614BCF83
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283819-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[redhat.com,ovn.org,davemloft.net,google.com,kernel.org,openvswitch.org,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-283820-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-0.998];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-> @@ -756,7 +756,7 @@ static void lan966x_cleanup_ports(struct lan966x *lan966x)
->  			unregister_netdev(port->dev);
->  
->  		lan966x_xdp_port_deinit(port);
-> -		if (lan966x->fdma && lan966x->fdma_ndev == port->dev)
-> +		if (lan966x->fdma && port->dev && lan966x->fdma_ndev == port->dev)
->  			lan966x_fdma_netdev_deinit(lan966x, port->dev);
->  
->  		if (port->phylink) {
+Add test_pop_vlan() to verify OVS kernel datapath pop_vlan action
+correctly strips 802.1Q VLAN tags from frames.
 
-Maybe this is better?
+Patch 1 extends ovs-dpctl.py with vlan(vid=X,pcp=Y,cfi=Z) formatting
+and parsing, plus an encap_ovskey subclass for safe ENCAP NLA decoding.
+Patch 2 adds the selftest with baseline, negative, and positive checks.
 
-		port = lan966x->ports[p];
-		if (!port || port->dev)
-			continue;
+Tested with vng on x86_64, all OVS selftests pass (including new
+test_pop_vlan).
 
-		unregister_netdev(port->dev);
+v4:
+  - fix all checkpatch line-length warnings in new code
+  - fix pylint W0707: use explicit exception chaining (from exc)
+v3: https://lore.kernel.org/netdev/20260503120946.51869-1-houminxi@gmail.com/
+  - encap_ovskey: MPLS type "ovs_key_mpls" -> "array(ovs_key_mpls)"
+  - encap_ovskey: PRIORITY/IN_PORT set to "none" (metadata, not in ENCAP)
+  - _vlan_dpstr: cfi=0 falls back to tci=0x%04x for round-trip safety
+  - encap parse(): check return value for unrecognized trailing content
+  - vlan parser: boundary check + raise-from for exception chaining
+  - start_capture: || return $? to propagate ksft_skip correctly
+  - on_exit: moved after resource creation, not before
+  - ping success: changed from NOTE to FAIL + return 1
+  - VLAN interface creation: added || return 1 error propagation
+  - netns probe: distinguish EEXIST from missing CONFIG_NET_NS
+  - sbx_add: || return $ksft_skip -> || return $? (match sibling tests)
+v2: https://lore.kernel.org/netdev/20260501133924.3100680-1-houminxi@gmail.com/
 
-	Andrew
+Minxi Hou (2):
+  selftests: openvswitch: add vlan() and encap() flow string parsing
+  selftests: openvswitch: add pop_vlan test
+
+ .../selftests/net/openvswitch/openvswitch.sh  | 196 +++++++++++++
+ .../selftests/net/openvswitch/ovs-dpctl.py    | 268 +++++++++++++++++-
+ 2 files changed, 456 insertions(+), 8 deletions(-)
+
+-- 
+2.53.0
+
 
